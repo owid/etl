@@ -143,15 +143,62 @@ def set_scope(engine: Engine, catalog_path: str, change_key: str, scope: str, au
         )
 
 
-def get_mdim_changes(source_engine: Engine, target_engine: Engine) -> pd.DataFrame:
-    """All MDIMs on the staging server, flagging those whose config differs from production.
+def _metadata_signature(row: dict[str, Any] | None) -> tuple:
+    """The user-visible metadata of one indicator, normalized for comparison across environments."""
+    if row is None:
+        return ()
 
-    NOTE: an unchanged MDIM config does not imply unchanged texts — the texts mostly live
-    in indicator metadata, which can change without touching the config. This flag is only
-    used to sort the selection list, not to skip diffing.
+    def norm(value: Any) -> str:
+        if value is None or (isinstance(value, float) and value != value):
+            return ""
+        return str(value).strip()
+
+    return tuple(norm(row.get(key)) for key in ["name", *METADATA_FIELDS])
+
+
+def _mdims_with_changed_indicators(
+    source_engine: Engine, target_engine: Engine, configs: dict[str, dict[str, Any]]
+) -> set[str]:
+    """MDIMs at least one of whose indicators' metadata differs between the environments.
+
+    A metadata text usually changes *without* touching the MDIM config — it lives in the indicator,
+    authored in the garden step. Flagging config changes alone therefore misses the common case (and
+    flags MDIMs whose config moved but whose texts didn't), so we compare the indicator layer too.
+
+    Cheap in practice: there are a few dozen MDIMs referencing ~1k distinct indicators in total, so
+    this is two chunked `variables` lookups, not a per-MDIM query.
+    """
+    from apps.wizard.app_pages.metadata_diff.usage import _indicator_ids_in_mdim_config
+
+    ids_by_mdim = {cp: _indicator_ids_in_mdim_config(cfg) for cp, cfg in configs.items()}
+    all_ids = sorted({i for ids in ids_by_mdim.values() for i in ids})
+    if not all_ids:
+        return set()
+
+    source_rows = fetch_variable_rows(source_engine, all_ids)
+    target_rows = fetch_variable_rows(target_engine, all_ids)
+
+    changed_ids = {
+        i
+        for i in all_ids
+        # An id absent from the baseline is a new indicator — that is a change to show, not to skip.
+        if _metadata_signature(source_rows.get(i)) != _metadata_signature(target_rows.get(i))
+    }
+    return {cp for cp, ids in ids_by_mdim.items() if ids & changed_ids}
+
+
+def get_mdim_changes(source_engine: Engine, target_engine: Engine) -> pd.DataFrame:
+    """All MDIMs on the staging server, flagging those that differ from the baseline.
+
+    Two independent signals, because either can change the texts a reader sees:
+    - `config_changed`: the MDIM's own config (view definitions, view-level metadata overrides).
+    - `indicator_changed`: the metadata of an indicator the MDIM uses. This is where most text edits
+      land (they are authored in the garden step), and it moves without touching the config at all.
+
+    `has_changes` is the union — what the selection list marks. Neither flag is used to skip diffing.
     """
     q = """
-    select catalogPath, configMd5, published, slug
+    select catalogPath, configMd5, published, slug, config
     from multi_dim_data_pages
     where catalogPath is not null
     order by updatedAt desc
@@ -159,9 +206,37 @@ def get_mdim_changes(source_engine: Engine, target_engine: Engine) -> pd.DataFra
     df_source = read_sql(q, engine=source_engine)
     df_target = read_sql(q, engine=target_engine)
 
-    df = pd.merge(df_source, df_target, on="catalogPath", suffixes=("_source", "_target"), how="left")
+    configs: dict[str, dict[str, Any]] = {}
+    for record in df_source.to_dict("records"):
+        raw = record.get("config")
+        try:
+            parsed = json.loads(raw) if isinstance(raw, str) else raw
+        except (TypeError, ValueError):
+            continue
+        if isinstance(parsed, dict):
+            configs[str(record["catalogPath"])] = parsed
+
+    df = pd.merge(
+        df_source.drop(columns=["config"]),
+        df_target.drop(columns=["config"]),
+        on="catalogPath",
+        suffixes=("_source", "_target"),
+        how="left",
+    )
     df["is_new"] = df["configMd5_target"].isnull()
     df["config_changed"] = df["configMd5_source"] != df["configMd5_target"]
+
+    try:
+        changed = _mdims_with_changed_indicators(source_engine, target_engine, configs)
+    except Exception as e:
+        # Never let the marker break the page: fall back to the config-only signal and say so.
+        log.warning("metadata_diff.indicator_change_check_failed", error=str(e))
+        changed = set()
+        df["indicator_check_failed"] = True
+    else:
+        df["indicator_check_failed"] = False
+    df["indicator_changed"] = df["catalogPath"].isin(changed)
+    df["has_changes"] = df["is_new"] | df["config_changed"] | df["indicator_changed"]
     return df.set_index("catalogPath")
 
 

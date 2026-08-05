@@ -255,3 +255,23 @@ def test_indicator_ids_in_mdim_config_scans_all_axes():
         ]
     }
     assert _indicator_ids_in_mdim_config(config) == {1, 2, 3, 4, 5}
+
+
+def test_metadata_signature_detects_text_change_and_ignores_nulls():
+    """The MDim list's ✏️ marker compares this signature across environments.
+
+    A text edit usually lands in indicator metadata without touching the MDim config, so comparing
+    configs alone would leave the edited MDim unmarked. NULL/NaN/"" must normalize to the same thing,
+    or every indicator with an empty optional field would look changed.
+    """
+    from apps.wizard.app_pages.metadata_diff.data import _metadata_signature
+
+    base = {"name": "V", "titlePublic": None, "descriptionShort": "s", "descriptionKey": '["a"]'}
+    assert _metadata_signature(base) == _metadata_signature(dict(base))
+    # A changed WYSK must change the signature.
+    assert _metadata_signature(base) != _metadata_signature({**base, "descriptionKey": '["b"]'})
+    # None, NaN, "" and surrounding whitespace are all the same absence of text.
+    assert _metadata_signature(base) == _metadata_signature({**base, "titlePublic": float("nan")})
+    assert _metadata_signature(base) == _metadata_signature({**base, "titlePublic": "  "})
+    # A missing indicator (absent from the baseline) is a change, not a match.
+    assert _metadata_signature(None) != _metadata_signature(base)

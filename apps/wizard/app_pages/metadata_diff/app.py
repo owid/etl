@@ -1544,12 +1544,19 @@ def main() -> None:
     if df_mdims.empty:
         st.warning("No MDims found on this staging server.")
         return
+    if "indicator_check_failed" in df_mdims.columns and bool(df_mdims["indicator_check_failed"].any()):
+        st.warning(
+            "Could not compare indicator metadata against the baseline, so ✏️ only reflects MDim "
+            "**config** changes here — an MDim whose texts changed may be unmarked. Open it to diff anyway."
+        )
 
     def _format_mdim(path: str) -> str:
         row = df_mdims.loc[path]
         if row["is_new"]:
             return f"{path} 🆕"
-        if row["config_changed"]:
+        # Mark on either signal: a text edit usually changes indicator metadata without touching the
+        # MDim config, so a config-only marker misses exactly the case this tool is for.
+        if row.get("has_changes", row["config_changed"]):
             return f"{path} ✏️"
         return path
 
@@ -1578,9 +1585,9 @@ def main() -> None:
             placeholder="Select an MDim…",
             format_func=_format_mdim,
             on_change=_clear_view_params,
-            help="Select the MDim to review — type in the box to search it. "
-            "✏️ marks MDims whose config differs from the baseline; texts can also change through "
-            "indicator metadata without a config change, and the diff catches both.",
+            help="Select the MDim to review — type in the box to search it. ✏️ marks MDims that differ "
+            "from the baseline — either their own config, or the metadata of an indicator they use "
+            "(where most text edits land). 🆕 marks MDims that don't exist in the baseline.",
         )
 
     if not catalog_path:
