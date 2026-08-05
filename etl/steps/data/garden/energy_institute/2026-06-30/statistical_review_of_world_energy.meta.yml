@@ -656,26 +656,26 @@ tables:
       #   short_unit: 'TWh'
       #   description_key:
       #     - "Includes renewable power (apart from hydro, which is reported separately) and biofuels. Renewable power is based on gross generation and does not account for cross-border electricity supply. 'Input-equivalent' energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output."
-      renewables_consumption_ej:
-        title: 'Renewables consumption - EJ'
-        unit: 'exajoules'
-        short_unit: 'EJ'
-        description_short: |-
-          Total energy supply from renewables (wind, solar, hydro, geothermal, biomass and other renewables), in exajoules. It does not account for cross-border electricity supply.
-        description_from_producer: *producer-consumption-gross
-        presentation:
-          title_public: 'Renewables consumption'
-      renewables_consumption_twh:  # Added by OWID.
-        title: 'Renewables consumption - TWh'
-        unit: 'terawatt-hours'
-        short_unit: 'TWh'
-        description_short: |-
-          Total energy supply from renewables (wind, solar, hydro, geothermal, biomass and other renewables), in terawatt-hours. It does not account for cross-border electricity supply.
-        description_from_producer: *producer-consumption-gross
-        display:
-          name: Renewables
-        presentation:
-          title_public: 'Renewables consumption'
+      # renewables_consumption_excl_hydro_ej:
+      #   title: 'Renewables consumption (excl. hydro) - EJ'
+      #   unit: 'exajoules'
+      #   short_unit: 'EJ'
+      #   description_short: |-
+      #     Total energy supply from renewables (wind, solar, geothermal, biomass and other renewables, but excluding hydro), in exajoules. It does not account for cross-border electricity supply.
+      #   description_from_producer: *producer-consumption-gross
+      #   presentation:
+      #     title_public: 'Renewables consumption'
+      # renewables_consumption_excl_hydro_twh:  # Added by OWID.
+      #   title: 'Renewables consumption (excl. hydro) - TWh'
+      #   unit: 'terawatt-hours'
+      #   short_unit: 'TWh'
+      #   description_short: |-
+      #     Total energy supply from renewables (wind, solar, geothermal, biomass and other renewables, but excluding hydro), in terawatt-hours. It does not account for cross-border electricity supply.
+      #   description_from_producer: *producer-consumption-gross
+      #   display:
+      #     name: Renewables
+      #   presentation:
+      #     title_public: 'Renewables consumption'
       solar_consumption_ej:
         title: 'Solar consumption - EJ'
         unit: 'exajoules'

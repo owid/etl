@@ -134,8 +134,8 @@ COLUMNS = {
     "wind_tes_ej": "wind_consumption_ej",
     # Wind electricity generation.
     "wind_twh": "wind_electricity_generation_twh",
-    # Renewables (including hydro) consumption (Total Energy Supply).
-    "renewables_tes_ej": "renewables_consumption_ej",
+    # Renewables consumption (excluding hydro, Total Energy Supply).
+    # "renewables_tes_ej": "renewables_consumption_excl_hydro_ej",
     # Biodiesel production.
     "biodiesel_prod_pj": "biodiesel_production_pj",
     # Biodiesel consumption (Total Energy Supply).
