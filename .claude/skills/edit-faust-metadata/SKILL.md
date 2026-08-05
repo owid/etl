@@ -118,6 +118,14 @@ Match the file's own authoring pattern before writing a single sentence — your
   - keep the new, better wording but place it **under the existing key's name**, replacing that key's text.
 
   The second reaches every indicator already referencing that key, so **blast-radius the shared key first** — `blast_radius.py --anchor <key> --meta-file <path>` expands a definitions key to its variables — and report which surfaces the reworded text lands on. Also check the new wording still fits the key's *name* and the distinction it encodes: a key called `…_national_estimates` should not end up asserting the data is harmonized.
+- **Then widen the search past the file, to the other datasets carrying the same text.** Metadata boilerplate travels: the same source caveat, classification note, or methodology sentence is often pasted into several datasets' `.meta.yml` (and mirrored in MDim `.py` constants). Search a few **distinctive 5–8 word fragments** of the text across `etl/steps/` — near-duplicates differ by a word or two, so one long exact-match search finds nothing while three short ones find everything:
+
+  ```bash
+  rg -l -i "harmonizes labor statistics from national sources" etl/steps/
+  rg -n -i "may not be directly comparable across countries" etl/steps/ | head -30
+  ```
+
+  Report every hit with a recommendation, and use it in both directions: when your new wording supersedes theirs, propose the same fix there; when a sibling dataset already words the point better, adopt its wording instead of minting a third variant. **Do not fold other datasets into the current PR** — they have their own owners, their own charts, and their own review; the current PR stays scoped to the indicator at hand and the sibling fixes ship as a **separate PR** (offer to open it, and list the affected datasets as a proposed follow-up in the current body so the item can't get lost).
 - **Prove a pure-refactor edit is text-neutral without building the dataset.** Moving text into definitions must not change one rendered character. Resolve both versions of the file with the catalog's own loader and compare the resolved `tables:` section — `definitions:` never reaches the output, so identical `tables:` means identical metadata for *every* variable at *every* dimension value. That's both stronger and far cheaper than a garden+grapher rebuild:
 
   ```python
@@ -201,7 +209,7 @@ Like the parent edit itself, child fixes land on **staging only** and ride chart
 
 **Style rules for writing text** live in `.claude/skills/owid-metadata-generation/SKILL.md` — follow its field-by-field guidelines whenever composing new text (description_short must not repeat the title; plain language, expand acronyms; description_key ordered data-specific → methodology → caveats; curly apostrophes; American English; per-field guidance in `schemas/definitions.json`).
 
-**The check suite** is also defined there (see "Metadata quality checks" in that SKILL — the canonical list, mirroring `/update-dataset` §6b/§6c): typos (`/check-metadata-typos`), Jinja spacing (`/check-metadata-spacing`), style guide (`/check-metadata-style`), the manual clarity checklist, link + `#dod:` verification, and adversarial claims verification (`/adversarial-data-review`).
+**The check suite** is also defined there (see "Metadata quality checks" in that SKILL — the canonical list, mirroring `/update-dataset` §6b/§6c): typos (`/check-metadata-typos`), Jinja spacing (`/check-metadata-spacing`), style guide (`/check-metadata-style`), the manual clarity checklist, link + `#dod:` verification, the dimension sweep, and adversarial claims verification (`/adversarial-data-review`).
 
 Scoping rules specific to this skill:
 

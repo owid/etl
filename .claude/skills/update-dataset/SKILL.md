@@ -420,12 +420,13 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    Do this **before** step 6b (metadata checks) so any re-runs triggered by comment-removal happen before the metadata sweep, not after.
 
 6b) Metadata quality checks — run after all ETL steps are built
-   Run all four checks on the newly built garden and grapher datasets so every issue surfaces together. Each skill writes results to the terminal; fix what comes up before moving on.
+   Run all five checks on the newly built garden and grapher datasets so every issue surfaces together. Each skill writes results to the terminal; fix what comes up before moving on.
 
    - **Typos** — `/check-metadata-typos` scoped to the current step. Run on each of the new `.meta.yml` files (garden first, then grapher). Accept or skip each suggested fix.
    - **Jinja spacing** — `/check-metadata-spacing` on the built garden and grapher datasets. Catches template artifacts like doubled spaces or stray newlines that only appear after Jinja rendering.
    - **Style guide** — `/check-metadata-style` on the grapher step. Audits user-facing fields (title, subtitle, description_short, display.name, presentation.*) against OWID's Writing and Style Guide. Rules live in `.claude/skills/check-metadata-style/STYLE_GUIDE.md`, so no Notion access is usually needed — the skill checks the file's `Last synced from Notion` date and refreshes it from Notion (in a separate PR) when it is more than two months old.
    - **Clarity for a general audience** — read every user-facing field with non-specialist eyes. The other three skills enforce structure and style; this one judges whether the text is *understandable*.
+   - **Dimension sweep** (dimensional indicators only) — a sentence written for one breakdown renders on all the sibling views, where the view's own filtering can make it false: a caveat that the data doesn't control for X is wrong on the variant grouped **by** X, a scope word like "all employees" overclaims on a variant filtered to a subgroup, a sentence about a toggle is wrong on views that exist for only one choice of that dimension. Render the text per dimension value (the grapher channel already has it flattened) and read each output as a reader of that chart. Prefer qualifying the wording so it holds everywhere over adding a Jinja branch. Full version: check 6 of the canonical suite in `/owid-metadata-generation`.
 
    ### Clarity checklist (do manually, no skill yet)
 
