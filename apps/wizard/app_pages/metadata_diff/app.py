@@ -422,8 +422,19 @@ def _render_diff_body(
 
 
 def _reviewer() -> str | None:
-    """Identity of the person signing off (audit trail) — the name set in the sidebar, if any."""
+    """Identity of the person signing off (audit trail) — the name set in the reviewer field, if any."""
     return (st.session_state.get("mdd_reviewer") or "").strip() or None
+
+
+def _reviewer_input() -> None:
+    """Reviewer identity, captured on the page (not the sidebar). Recorded with each Approve/Flag sign-off."""
+    st.session_state.setdefault("mdd_reviewer", _detected_identity())
+    st.text_input(
+        "Reviewer (your name or GitHub handle)",
+        key="mdd_reviewer",
+        placeholder="Set your name to attribute your sign-offs",
+        help="Recorded with every Approve/Flag decision. Set it before you sign off.",
+    )
 
 
 def _detected_identity() -> str:
@@ -904,6 +915,7 @@ def render_review_page(
         "This review pass is a way to go through the metadata changes and iterate with the author. At the "
         "end of the review, you can decide whether to share comments with the author or create a PR."
     )
+    _reviewer_input()
     if n_appr == n and n > 0:
         st.success(f"✅ **All {n} changes reviewed** — approved.")
     else:
@@ -1229,6 +1241,7 @@ def _render_chart_review(
         "This review pass is a way to go through the chart's metadata changes. At the end of the review, "
         "you can create a PR of the changes."
     )
+    _reviewer_input()
     if n_appr == n and n > 0:
         st.success(f"✅ **All {n} change{'s' if n != 1 else ''} reviewed** — approved.")
     else:
@@ -1398,16 +1411,6 @@ def main() -> None:
         st.warning("No production env file found — comparing against `staging-site-master` instead.")
 
     source_engine, target_engine = get_engines(baseline)
-
-    # Who's signing off — attributed to every Approve/Flag decision. Default to a detected identity
-    # (never the container's OS user), and let the reviewer correct it.
-    st.session_state.setdefault("mdd_reviewer", _detected_identity())
-    st.sidebar.text_input(
-        "Reviewer (your name or GitHub handle)",
-        key="mdd_reviewer",
-        help="Recorded with every Approve/Flag sign-off. Set this before you review — it's whoever is at "
-        "the wheel, not the staging container.",
-    )
 
     target = url_persist(st.segmented_control)(
         label="Review",
