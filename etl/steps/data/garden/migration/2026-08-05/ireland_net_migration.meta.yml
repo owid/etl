@@ -21,23 +21,16 @@ definitions:
   ireland_sources: |-
     Our World in Data maintains this long-run series on Irish migration by combining three sources from the Central Statistics Office and its predecessors:
 
-    - **1871–1926 — averages for the periods between censuses.** The 1926 census report estimated net emigration for each period between censuses as a residual: the change in population, minus registered births, plus registered deaths. Civil registration of births and deaths began in 1864, so 1871 is the first census this method can start from. Each year shows the average for its period.
-    - **1926–1951 — averages for the periods between censuses.** The same residual method, as published with the 2022 census results. Each year shows the average for its period.
-    - **From 1951 — annual estimates.** The Central Statistics Office's annual net migration estimates, which it revises after each census. Each figure refers to the year ending in April.
+    - **1871–1951 — averages for the periods between censuses.** The census reports of 1926 and 2022 estimated net emigration for each period between censuses as a residual: the change in population, minus registered births, plus registered deaths. Civil registration of births and deaths began in 1864, so 1871 is the first census this method can start from. Each year shows the average for its period.
+    - **From 1951 — annual estimates.** The Central Statistics Office's annual net migration estimates, which it revises after each census.
 
     All figures cover the same area — the 26 counties of today's Republic of Ireland. The census reports restate the pre-independence results for this area, so independence in 1922 does not create a break in the series.
 
   ireland_periods: |-
-    Before 1951, the data shows one average value per period between censuses, not what happened in each individual year. The periods are 1871–81, 1881–91, 1891–1901, 1901–11, 1911–26, 1926–36, 1936–46, and 1946–51.
+    Before 1951, the data shows one average value per period between censuses, not what happened in each individual year.
 
   ireland_war_caveat: |-
-    The 1911–1926 value is the hardest to interpret. The residual method counts any unregistered population loss as emigration, so the Irish soldiers who died abroad in the First World War — deaths never registered in Ireland — are counted as emigrants. The period also includes the departure of the British Army and administration after independence.
-
-  ireland_sign: |-
-    Positive values mean more people arrived than left; negative values mean more people left than arrived. Ireland lost people to migration in every year of this series until the 1960s, and in most years until the 1990s.
-
-  ireland_share_denominator: |-
-    This indicator divides net migration in a year by the population in the same year. Before 1951, we interpolate the population between censuses; from 1951, we use the Central Statistics Office's annual population estimates.
+    The 1911–1926 value is the hardest to interpret. The residual method counts any unregistered population loss as emigration, so the Irish soldiers who died abroad in the First World War — deaths never registered in Ireland — are counted as emigrants. The period also includes the departure of the British Army and the disbanded police force after independence.
 
   ireland_processing: |-
     We combined three sources into one series:
@@ -62,8 +55,6 @@ tables:
         short_unit: ""
         description_short: Number of people moving to Ireland each year, minus the number leaving. Negative values mean more people left than arrived.
         description_key: |-
-          {definitions.ireland_sign}
-
           {definitions.ireland_sources}
 
           {definitions.ireland_periods}
@@ -79,10 +70,6 @@ tables:
         short_unit: "%"
         description_short: Number of people moving to Ireland each year, minus the number leaving, as a share of the population. Negative values mean more people left than arrived.
         description_key: |-
-          {definitions.ireland_sign}
-
-          {definitions.ireland_share_denominator}
-
           {definitions.ireland_sources}
 
           {definitions.ireland_periods}
