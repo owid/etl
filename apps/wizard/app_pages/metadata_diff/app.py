@@ -611,6 +611,24 @@ def _garden_location_lines(g: ChangeGroup, reach: str) -> list[str]:
     ]
 
 
+# Indicator fields that a chart's own text can inherit. A chart that sets the corresponding key in
+# its config patch is "shielded" — it keeps its own text and does NOT change with the indicator edit
+# (see the edit-faust-metadata skill's per-field inheritance analysis).
+INHERITED_TO_CHART_TEXT = {"titlePublic": "title", "descriptionShort": "subtitle"}
+
+# Surfaces the blast radius here does NOT cover, and where to get each one. Named explicitly because
+# an unlisted surface reads as "nothing else is affected", which is the one wrong signal to send.
+_UNCOVERED_SURFACES = [
+    "**Narrative charts** — children of an affected chart or MDim view. They inherit the parent's text, "
+    "but the stored merged config can be stale, so an inheriting child keeps showing the OLD text until "
+    "its patch is re-saved. A child that overrides the field keeps its own text permanently.",
+    "**Explorer views** — deliberately not queried here (explorers are being phased out); legacy "
+    "CSV-backed explorers are invisible to the DB tables entirely.",
+    "**Data insights, static viz, key-chart slots, article links & embeds** — not queried here. Embeds "
+    "don't break, but the text a reader sees changes.",
+]
+
+
 def _changed_text_lines(g: ChangeGroup) -> list[str]:
     """The exact text that changed, as a diff — the right payload for a shared-definition edit.
 
@@ -668,6 +686,17 @@ def _surface_lines(g: ChangeGroup, usage: dict[int, dict[str, list[dict[str, Any
         out.append(f"- **Other MDims that {verb} ({len(mdims)}):**")
         for m in sorted(mdims, key=lambda m: str(m.get("slug") or "")):
             out.append(f"  - `{m.get('slug') or m.get('catalogPath')}`")
+    # These fields also feed a chart's title/subtitle by inheritance, and a chart carrying its own
+    # value for that field is *shielded* — it keeps its current text. We list usage, not inheritance,
+    # so for those fields the list above is an upper bound on the charts whose visible text changes.
+    if g.field in INHERITED_TO_CHART_TEXT and charts:
+        out.append(
+            f"- _⚠️ Upper bound: `{field_label(g.field)}` also feeds the chart's "
+            f"{INHERITED_TO_CHART_TEXT[g.field]} by inheritance, and a chart that sets its own "
+            f"{INHERITED_TO_CHART_TEXT[g.field]} in its config keeps that text. This list is indicator "
+            "usage, not per-field inheritance — for the exact set, run "
+            f"`blast_radius.py --field {INHERITED_TO_CHART_TEXT[g.field]}` (edit-faust-metadata skill)._"
+        )
     return out
 
 
@@ -781,6 +810,17 @@ def _ship_section(approved_groups: list[ChangeGroup], baseline_name: str) -> lis
         "- [ ] **Rebuild + upsert to staging:**",
         build,
         "- [ ] **Verify on staging** — indicator metadata API / data page",
+        *(
+            [
+                "- [ ] **Surfaces this brief did NOT check** — sweep them before merge:",
+                *[f"  - {s}" for s in _UNCOVERED_SURFACES],
+                "  - Full reference sweep: `find-chart-references` skill. Per-field inheritance (which "
+                "surfaces an edit actually reaches, which are shielded): `blast_radius.py --field <f>` "
+                "(edit-faust-metadata skill).",
+            ]
+            if shared
+            else []
+        ),
         "- [ ] **Open the PR** with the description below; post a bare `@codex review`; run the pr-babysitter loop",
         "",
         "## 📝 PR description (draft — paste as the PR body)",
@@ -795,7 +835,13 @@ def _ship_section(approved_groups: list[ChangeGroup], baseline_name: str) -> lis
         "**Changes**",
         *[f"- {_change_one_liner(g)}" for g in approved_groups],
         "",
-        f"**Blast radius:** {blast}.",
+        f"**Blast radius:** {blast}."
+        + (
+            " Counts cover published charts and MDims; narrative charts, explorer views, data insights "
+            "and static viz were checked separately (see below)."
+            if shared
+            else ""
+        ),
         "**Checks:** `make check` · typos · Jinja spacing · style guide · claims-vs-producer.",
         f"**Reviewed against baseline:** {baseline_name} (Metadata Diff tool).",
         "**Verification:** staging preview — <link>.",
