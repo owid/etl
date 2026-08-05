@@ -11,7 +11,6 @@ from structlog import get_logger
 
 from etl.analytics.data import (
     get_chart_views_by_chart_id,
-    get_explorer_views_by_url,
     get_post_views_by_chart_id,
     get_visualizations_using_data_by_producer,
 )
@@ -176,23 +175,6 @@ def insert_list_with_links_in_gdoc(google_doc: GoogleDoc, df: pd.DataFrame, plac
 
     # Remove the original placeholder text.
     google_doc.replace_text(mapping={placeholder: ""})
-
-
-def get_explorer_views(explorer_links: list[str], min_date: str, max_date: str) -> pd.DataFrame:
-    """Get views for a list of explorer links."""
-    rows = []
-    for link in explorer_links:
-        # Extract the explorer name from the URL.
-        explorer_name = link.split("/")[-1]
-        # Get the views for the explorer.
-        df_views = get_explorer_views_by_url(urls=[link], date_min=min_date, date_max=max_date).rename(
-            columns={"url": "url", "views": "views"}
-        )
-        df_views["explorer_name"] = explorer_name
-        rows.append(df_views)
-
-    df_explorer_views = pd.concat(rows, ignore_index=True)
-    return df_explorer_views
 
 
 class Report:
