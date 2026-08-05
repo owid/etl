@@ -10,6 +10,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     build_view_bundle,
     change_group_identity,
     diff_views,
+    distinct_indicator_short_names,
     group_changes,
     override_snippet,
     parse_catalog_path,
@@ -145,6 +146,52 @@ def test_parse_catalog_path_resolves_garden_file_and_anchor():
     # Unusable inputs return None (brief falls back to a generic hint).
     assert parse_catalog_path(None) is None
     assert parse_catalog_path("grapher/ns/2020/ds") is None
+
+
+def test_distinct_indicator_short_names_fingerprints_shared_definition():
+    """A change hitting several indicators is the fingerprint of a shared definition/anchor.
+
+    Different flatten suffixes on the same base name collapse to one; genuinely different base names
+    (gini vs share_top_1) stay distinct, so >1 signals a shared `definitions.*` edit to the PR brief."""
+    # Same indicator, two dimension-flattened columns -> one base short_name.
+    assert distinct_indicator_short_names(
+        {
+            "grapher/wid/2026-06-18/wid/inequality#gini__welfare_type_wealth",
+            "grapher/wid/2026-06-18/wid/inequality#gini",
+        }
+    ) == ["gini"]
+    # Two different indicators sharing the identical text -> the shared-definition fingerprint.
+    assert distinct_indicator_short_names(
+        {
+            "grapher/wid/2026-06-18/wid/inequality#gini__welfare_type_wealth",
+            "grapher/wid/2026-06-18/wid/inequality#share_top_1__welfare_type_wealth",
+        }
+    ) == ["gini", "share_top_1"]
+    assert distinct_indicator_short_names(set()) == []
+
+
+def test_group_changes_collects_catalog_paths_across_indicators():
+    """A shared text change accumulates every indicator's catalogPath, so the brief can detect a
+    shared definition (>1 distinct base short_name) rather than guessing one variable."""
+    shared = {"descriptionKey": {"old": ["a"], "new": ["a", "NEW"]}}
+    v1 = ViewDiff(
+        dimensions={"metric": "gini", "welfare_type": "wealth"},
+        fields=shared,
+        indicator_id=1,
+        catalog_path="grapher/wid/2026-06-18/wid/inequality#gini__welfare_type_wealth",
+        indicator_changed_fields={"descriptionKey"},
+    )
+    v2 = ViewDiff(
+        dimensions={"metric": "share_top_1", "welfare_type": "wealth"},
+        fields=shared,
+        indicator_id=2,
+        catalog_path="grapher/wid/2026-06-18/wid/inequality#share_top_1__welfare_type_wealth",
+        indicator_changed_fields={"descriptionKey"},
+    )
+    (group,) = group_changes([v1, v2])
+    assert distinct_indicator_short_names(group.catalog_paths) == ["gini", "share_top_1"]
+    # Both indicators are collected so the brief can union their blast radius (apply-to-all reaches all).
+    assert group.indicator_ids == {1, 2}
 
 
 def test_yaml_field_snippet_is_pastable():

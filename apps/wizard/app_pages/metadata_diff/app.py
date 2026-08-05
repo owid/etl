@@ -34,6 +34,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     change_group_identity,
     diff_preview_html,
     diff_views,
+    distinct_indicator_short_names,
     field_label,
     group_changes,
     inline_diff_html,
@@ -474,8 +475,8 @@ def _review_markdown(
         comment = (st.session_state.get(_review_comment_key(catalog_path, r["change_key"]), "") or "").strip()
         scope = "shared indicator metadata" if g.affects_indicator else "MDim override"
         reach = f"{len(g.view_dims)} view(s)"
-        if g.affects_indicator and g.indicator_id is not None:
-            n_charts = len(usage.get(g.indicator_id, {}).get("charts", []))
+        if g.affects_indicator:
+            n_charts = len(_group_usage(g, usage).get("charts", []))
             if n_charts:
                 reach += f", {n_charts} chart(s)"
         lines.append(f"## {field_label(g.field)} — {status}")
@@ -521,19 +522,68 @@ def _yaml_block(field_name: str, value: Any) -> list[str]:
     return ["```yaml", yaml_field_snippet(field_name, value), "```"]
 
 
-def _garden_location_lines(catalog_path: str | None, reach: str) -> list[str]:
-    """File + key hint for a shared indicator field, from its catalogPath. Best-guess location."""
-    parsed = parse_catalog_path(catalog_path)
-    if parsed:
-        garden_dir, table, short = parsed
+def _group_usage(g: ChangeGroup, usage: dict[int, dict[str, list[dict[str, Any]]]]) -> dict[str, list[dict[str, Any]]]:
+    """Union the blast radius over *every* indicator the change touches, deduped.
+
+    A shared definition renders into many indicators, so "apply to all" reaches the union of all their
+    charts and MDims. Reading only the group's first indicator (`usage[g.indicator_id]`) undercounts
+    that reach — for a shared-definition edit, badly. We aggregate over `g.indicator_ids` (falling back
+    to the single `indicator_id` for older groups), deduping charts by chartId and MDims by catalogPath.
+    """
+    ids = g.indicator_ids or ({g.indicator_id} if g.indicator_id is not None else set())
+    charts: dict[int, dict[str, Any]] = {}
+    mdims: dict[str, dict[str, Any]] = {}
+    for iid in ids:
+        imp = usage.get(iid, {})
+        for c in imp.get("charts", []):
+            charts.setdefault(c["chartId"], c)
+        for m in imp.get("mdims", []):
+            mdims.setdefault(m["catalogPath"], m)
+    return {"charts": list(charts.values()), "mdims": list(mdims.values())}
+
+
+def _garden_location_lines(g: ChangeGroup, reach: str) -> list[str]:
+    """File + key hint for a shared indicator field, from its catalogPath.
+
+    Two cases. If the identical text change lands on a single indicator, point at that variable's key.
+    If it lands on *several* indicators (the fingerprint of a shared `definitions.*`/anchor — one Jinja
+    template renders into many variables), point at the definition instead of guessing a variable, and
+    flag the diff-observed reach as a floor. The single-variable key is a wrong, misleading target for a
+    shared-definition edit, which is exactly the mistake this tool exists to prevent."""
+    parsed = parse_catalog_path(g.catalog_path)
+    garden_dir = parsed[0] if parsed else None
+    table = parsed[1] if parsed else None
+    file_line = (
+        f"- **File (best guess):** `{garden_dir}.meta.yml` — or `{garden_dir}.meta.override.yml`"
+        if garden_dir
+        else "- **Where:** the indicator's garden `.meta.yml` (catalogPath unavailable)"
+    )
+
+    shared_names = distinct_indicator_short_names(g.catalog_paths)
+    if len(shared_names) > 1:
+        preview = ", ".join(f"`{n}`" for n in shared_names[:6]) + (" …" if len(shared_names) > 6 else "")
+        dont_edit = f"`tables.{table}.variables.<short>`" if table else "any single variable"
         return [
-            f"- **File (best guess):** `{garden_dir}.meta.yml` — or `{garden_dir}.meta.override.yml`",
-            f"- **Key:** `tables.{table}.variables.{short}`",
-            f"- **Reach:** shared — {reach}",
+            file_line,
+            f"- **Likely a shared definition/anchor** — the identical text renders on "
+            f"{len(shared_names)} indicators ({preview}), which happens through a shared `definitions.*` "
+            "(Jinja) block or `shared.meta.yml`, not a per-variable field.",
+            f"- **Find it:** grep the garden `.meta.yml` for the changed text and edit the `definitions.` "
+            f"entry (or `shared.meta.yml`) — do **not** edit {dont_edit} directly.",
+            f"- **Reach (observed in this diff):** {reach} — **treat as a floor.** A shared definition "
+            f"renders on every indicator that references it, so the true reach spans all {len(shared_names)}+ "
+            "indicators' matching views, not just those counted here. (A branched definition changes only "
+            "the matching branch — e.g. wealth views, not income — so verify which branch you edited.)",
+        ]
+    if parsed:
+        return [
+            file_line,
+            f"- **Key:** `tables.{table}.variables.{parsed[2]}`",
+            f"- **Reach (observed in this diff):** {reach}.",
         ]
     return [
-        "- **Where:** the indicator's garden `.meta.yml` (catalogPath unavailable)",
-        f"- **Reach:** shared — {reach}",
+        file_line,
+        f"- **Reach (observed in this diff):** {reach}.",
     ]
 
 
@@ -617,17 +667,28 @@ def _ship_section(approved_groups: list[ChangeGroup], baseline_name: str) -> lis
         )
 
     shared = any(g.affects_indicator for g in approved_groups)
+    shared_def = any(len(distinct_indicator_short_names(g.catalog_paths)) > 1 for g in approved_groups)
     blast = (
         "shared indicator metadata — reaches every chart / MDim view using the indicator(s); see per-change **Reach** above"
         if shared
         else "contained — no surface beyond the target is affected"
     )
+    if shared_def:
+        blast += " — includes a **shared definition/anchor** edit reaching multiple indicators (the **Reach** counts above are floors)"
     fields = ", ".join(sorted({field_label(g.field) for g in approved_groups}))
 
     out = [
         "## 🚀 Ship it — run before opening the PR",
         "_Scope every check to the edited text only._",
         "- [ ] **Blast radius** reviewed (see *Reach* above) — apply-to-all vs scope decided",
+        *(
+            [
+                "- [ ] **Shared definition** — confirmed the edit is in `definitions.*` / `shared.meta.yml` "
+                "(not a single variable), and checked every indicator & dimension branch it renders on"
+            ]
+            if shared_def
+            else []
+        ),
         "- [ ] `make check`",
         "- [ ] **Typos** — `/check-metadata-typos`",
         "- [ ] **Jinja spacing** — `/check-metadata-spacing`",
@@ -706,10 +767,10 @@ def _pr_brief_markdown(
                 lines.append(f"# … and {len(g.view_dims) - 8} more view(s) — same override")
             lines.append("```")
         else:
-            imp = usage.get(g.indicator_id, {}) if g.indicator_id is not None else {}
+            imp = _group_usage(g, usage)
             n_c, n_m = len(imp.get("charts", [])), len(imp.get("mdims", []))
             reach = f"{n_c} chart(s)" + (f" · {n_m} other MDim(s)" if n_m else "") + f" · {len(g.view_dims)} view(s)"
-            lines += _garden_location_lines(g.catalog_path, reach)
+            lines += _garden_location_lines(g, reach)
             lines += _yaml_block(field, g.new)
         lines.append("")
 
@@ -768,10 +829,10 @@ def _chart_pr_brief_markdown(
             )
             lines.append(f"- **Set to:** {_as_plaintext(g.new)}")
         elif g.affects_indicator:
-            imp = usage.get(g.indicator_id, {}) if g.indicator_id is not None else {}
+            imp = _group_usage(g, usage)
             n_c, n_m = len(imp.get("charts", [])), len(imp.get("mdims", []))
             reach = f"{n_c} other chart(s)" + (f" · {n_m} MDim(s)" if n_m else "") or "no other surface"
-            lines += _garden_location_lines(g.catalog_path, reach)
+            lines += _garden_location_lines(g, reach)
             lines += _yaml_block(field, g.new)
         else:
             lines.append("- **Where:** the indicator's garden `.meta.yml`.")
@@ -844,7 +905,7 @@ def render_review_page(
         # Default to the conservative "only this view" unless the author explicitly chose "all" (matches
         # the View-diff toggle default), so the scope label and PR brief agree with what the author saw.
         scope = scopes.get(text_change_key(catalog_path, g.field, g.old, g.new), "scoped")
-        imp = usage.get(g.indicator_id, {}) if (g.affects_indicator and g.indicator_id is not None) else {}
+        imp = _group_usage(g, usage) if g.affects_indicator else {}
         charts, mdims = imp.get("charts", []), imp.get("mdims", [])
         row = reviews.get(change_key)
         stale = bool(row) and row.get("contentHash") != content_hash

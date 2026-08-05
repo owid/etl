@@ -13,6 +13,7 @@ import difflib
 import hashlib
 import html
 import json
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -362,6 +363,15 @@ class ChangeGroup:
     affects_indicator: bool = False
     indicator_id: int | None = None
     catalog_path: str | None = None  # indicator catalogPath (shared changes) — for the PR brief
+    # Every distinct indicator *id* whose indicator layer carries this same text change. A shared
+    # definition renders into many indicators, so the reach of "apply to all" is the union of all their
+    # charts/MDims — not just the first indicator's. The brief aggregates usage over this whole set.
+    indicator_ids: set[int] = field(default_factory=set)
+    # Every distinct indicator catalogPath whose *indicator layer* carries this same text change. When
+    # the identical change lands on more than one indicator, that's the fingerprint of a shared
+    # `definitions.*`/anchor edit (one template renders into many variables) — the PR brief points there
+    # instead of guessing a single variable, and warns the observed reach is a floor.
+    catalog_paths: set[str] = field(default_factory=set)
 
 
 def group_changes(view_diffs: list[ViewDiff]) -> list[ChangeGroup]:
@@ -389,7 +399,27 @@ def group_changes(view_diffs: list[ViewDiff]) -> list[ChangeGroup]:
                     g.indicator_id = v.indicator_id
                 if g.catalog_path is None:
                     g.catalog_path = v.catalog_path
+                if v.indicator_id is not None:
+                    g.indicator_ids.add(v.indicator_id)
+                if v.catalog_path:
+                    g.catalog_paths.add(v.catalog_path)
     return sorted((groups[k] for k in order), key=lambda g: (-len(g.view_dims), g.field))
+
+
+def distinct_indicator_short_names(catalog_paths: Iterable[str]) -> list[str]:
+    """Distinct base (pre-flatten) indicator short_names among a set of indicator catalogPaths.
+
+    When one distinct text change renders identically across several of these, that's the fingerprint of
+    a shared `definitions.*`/anchor edit: the same text can only reach multiple indicators via a shared
+    template. The PR brief uses this to point at the shared definition instead of a single variable, and
+    to warn that the reach observed in the diff is a floor.
+    """
+    names: list[str] = []
+    for cp in catalog_paths:
+        parsed = parse_catalog_path(cp)
+        if parsed and parsed[2] not in names:
+            names.append(parsed[2])
+    return sorted(names)
 
 
 def text_change_key(catalog_path: str, field: str, old: Any, new: Any) -> str:
