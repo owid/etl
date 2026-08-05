@@ -76,3 +76,5 @@ tables:
             <% if category in ["capacity", "shipments"] %>0<% else %>1<% endif %>
           name: |-
             <% if category == "capacity" %>Annual capacity<% elif category == "shipments" %>Quarterly shipments<% else %><< metric >><% endif %>
+          timeInterval: |-
+            <% if category == "capacity" %>year<% else %>quarter<% endif %>

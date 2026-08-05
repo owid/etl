@@ -37,6 +37,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Daily AI users
+          timeInterval: quarter
         presentation:
           title_public: *daily_title
 
@@ -52,6 +53,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Frequent AI users
+          timeInterval: quarter
         presentation:
           title_public: *frequent_title
 
@@ -67,5 +69,6 @@ tables:
         display:
           numDecimalPlaces: 0
           name: Total AI users
+          timeInterval: quarter
         presentation:
           title_public: *total_title

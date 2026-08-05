@@ -3,6 +3,12 @@ definitions:
   others:
     interval: <% if interval == "cumulative" %> over time <% elif interval == "weekly" %> in the last week <% elif interval == "4-weekly" %> in the last four weeks <% elif interval == "7-day rolling sum" %> in the last 7 days <%- endif -%>
   common:
+    display:
+      # The `interval` dimension mixes cadences: `weekly` points are 7 days apart, while
+      # `cumulative` and `7-day rolling sum` are reported daily. `4-weekly` is exactly 28 days,
+      # which no timeInterval value expresses (it is not a calendar month), so it stays `day`.
+      timeInterval: |-
+        <% if interval == "weekly" %>week<% else %>day<% endif %>
     presentation:
       topic_tags:
         - COVID-19
