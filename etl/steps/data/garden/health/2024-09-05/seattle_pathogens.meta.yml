@@ -25,6 +25,13 @@ dataset:
     - Lucas Rodés-Guirao
 tables:
   seattle_pathogens:
+    # NOTE: display replaces (not merges with) definitions.common.display, so the inherited
+    # keys are repeated here alongside the weekly interval of this table's data.
+    common:
+      display:
+        numDecimalPlaces: 0
+        name: << organism >>
+        timeInterval: week
     variables:
       present:
         title: Number of specimens with pathogen <<organism>>
@@ -41,6 +48,7 @@ tables:
         display:
           numDecimalPlaces: 2
           name: << organism >>
+          timeInterval: week
 
       tested:
         title: Total number of specimens tested for presence of pathogen <<organism>>
@@ -50,6 +58,11 @@ tables:
 
 
   seattle_pathogens_month:
+    common:
+      display:
+        numDecimalPlaces: 0
+        name: << organism >>
+        timeInterval: month
     variables:
       present_month:
         title: Number of specimens with pathogen <<organism>> (monthly)
@@ -66,6 +79,7 @@ tables:
         display:
           numDecimalPlaces: 2
           name: << organism >>
+          timeInterval: month
 
       tested_month:
         title: Total number of specimens tested for presence of pathogen <<organism>> (monthly)

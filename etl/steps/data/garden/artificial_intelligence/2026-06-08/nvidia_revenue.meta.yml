@@ -38,3 +38,4 @@ tables:
         display:
           name: NVIDIA's quarterly revenue
           numDecimalPlaces: 0
+          timeInterval: quarter
