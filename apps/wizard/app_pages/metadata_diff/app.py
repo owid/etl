@@ -577,15 +577,15 @@ def _garden_location_lines(g: ChangeGroup, reach: str) -> list[str]:
         dont_edit = f"`tables.{table}.variables.<short>`" if table else "any single variable"
         return [
             file_line,
-            f"- **Likely a shared definition/anchor** — the identical text renders on "
-            f"{len(shared_names)} indicators ({preview}), which happens through a shared `definitions.*` "
-            "(Jinja) block or `shared.meta.yml`, not a per-variable field.",
+            f"- **Likely a shared definition/anchor** — the identical text renders on at least "
+            f"{len(shared_names)} indicators ({preview}) *within this MDim alone*, which happens through a "
+            "shared `definitions.*` (Jinja) block or `shared.meta.yml`, not a per-variable field.",
             f"- **Find it:** grep the garden `.meta.yml` for the changed text and edit the `definitions.` "
             f"entry (or `shared.meta.yml`) — do **not** edit {dont_edit} directly.",
-            f"- **Reach (observed in this diff):** {reach} — **treat as a floor.** A shared definition "
-            f"renders on every indicator that references it, so the true reach spans all {len(shared_names)}+ "
-            "indicators' matching views, not just those counted here. (A branched definition changes only "
-            "the matching branch — e.g. wealth views, not income — so verify which branch you edited.)",
+            f"- **Reach (observed in this diff):** {reach} — **treat as a floor.** This diff only sees the "
+            "indicators used by this MDim; the definition is typically referenced by many more, so grep it "
+            "to get the real count before deciding. (A branched definition changes only the matching branch "
+            "— e.g. wealth views, not income — so verify which branch you edited.)",
         ]
     if parsed:
         return [
@@ -597,6 +597,35 @@ def _garden_location_lines(g: ChangeGroup, reach: str) -> list[str]:
         file_line,
         f"- **Reach (observed in this diff):** {reach}.",
     ]
+
+
+def _changed_text_lines(g: ChangeGroup) -> list[str]:
+    """The exact text that changed, as a diff — the right payload for a shared-definition edit.
+
+    For a shared `definitions.*` edit the pastable full-field YAML is actively wrong: the diffed value
+    is the *rendered* output, so pasting it under a variable hardcodes rendered text and destroys the
+    Jinja branches for every other dimension. What the executor needs is the one line to find and
+    replace inside the definition, so we emit only the changed bullet(s) as a diff."""
+    old, new = as_bullets(g.old), as_bullets(g.new)
+    if isinstance(old, list) and isinstance(new, list):
+        old_set = {str(x).strip() for x in old}
+        new_set = {str(x).strip() for x in new}
+        removed = [str(x) for x in old if str(x).strip() not in new_set]
+        added = [str(x) for x in new if str(x).strip() not in old_set]
+    else:
+        removed = [str(old)] if str(old).strip() else []
+        added = [str(new)] if str(new).strip() else []
+    if not removed and not added:
+        return []
+    out = [
+        "- **The text that changed** — find this inside the definition and replace it "
+        "(do not paste a rendered value into a variable, it would break the Jinja branches):",
+        "```diff",
+    ]
+    out += [f"- {t}" for t in removed]
+    out += [f"+ {t}" for t in added]
+    out.append("```")
+    return out
 
 
 def _surface_lines(g: ChangeGroup, usage: dict[int, dict[str, list[dict[str, Any]]]], scope: str) -> list[str]:
@@ -743,7 +772,10 @@ def _ship_section(approved_groups: list[ChangeGroup], baseline_name: str) -> lis
         "- [ ] **Open the PR** with the description below; post a bare `@codex review`; run the pr-babysitter loop",
         "",
         "## 📝 PR description (draft — paste as the PR body)",
-        "> _Written by <assistant> <model name> — @<handle> at the wheel._",
+        # Attribution is mandatory on anything posted to GitHub under a human's identity. Left as
+        # placeholders on purpose: the tool can't know which assistant/model opens the PR, nor whose
+        # handle is at the wheel, and a wrong @-tag pings a real person.
+        "> _Written by <assistant> <model name> — @<handle> at the wheel (fill these in)._",
         "",
         f"Update user-facing metadata ({fields}) — {len(approved_groups)} change(s), reviewed and approved in the "
         "Metadata Diff tool.",
@@ -817,7 +849,12 @@ def _pr_brief_markdown(
             lines += _garden_location_lines(g, reach)
             # Applying to all means these specific charts change — name them, so the author can check.
             lines += _surface_lines(g, usage, "all")
-            lines += _yaml_block(field, g.new)
+            # For a shared definition the pastable full-field YAML would break the Jinja branches, so
+            # show the changed line instead; a plain per-variable field still gets the pastable block.
+            if len(distinct_indicator_short_names(g.catalog_paths)) > 1:
+                lines += _changed_text_lines(g)
+            else:
+                lines += _yaml_block(field, g.new)
         lines.append("")
 
     if flagged:
@@ -880,7 +917,10 @@ def _chart_pr_brief_markdown(
             reach = f"{n_c} other chart(s)" + (f" · {n_m} MDim(s)" if n_m else "") or "no other surface"
             lines += _garden_location_lines(g, reach)
             lines += _surface_lines(g, usage, "all")
-            lines += _yaml_block(field, g.new)
+            if len(distinct_indicator_short_names(g.catalog_paths)) > 1:
+                lines += _changed_text_lines(g)
+            else:
+                lines += _yaml_block(field, g.new)
         else:
             lines.append("- **Where:** the indicator's garden `.meta.yml`.")
             lines += _yaml_block(field, g.new)
