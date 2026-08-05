@@ -327,13 +327,20 @@ def parse_catalog_path(catalog_path: str | None) -> tuple[str, str, str] | None:
         return None
     namespace, version, dataset = parts[0], parts[1], parts[2]
     table = parts[3] if len(parts) >= 4 else dataset
-    return f"etl/steps/data/garden/{namespace}/{version}/{dataset}", table, short_name
+    # The grapher channel flattens a dimensional indicator into one column per dimension combination,
+    # suffixing the base name with `__<dim>_<value>...`. The garden `.meta.yml` is authored under the
+    # BASE name (the Jinja template renders per dimension), so strip the flattening suffix.
+    base_short_name = short_name.split("__", 1)[0]
+    return f"etl/steps/data/garden/{namespace}/{version}/{dataset}", table, base_short_name
 
 
 def yaml_field_snippet(field_name: str, value: Any) -> str:
     """A pastable `<snake_key>: <value>` YAML snippet for one indicator metadata field, so the value
     (including multi-bullet `description_key` lists) can be dropped straight under its variable."""
     key = OVERRIDE_TARGET.get(field_name, (None, None, field_name))[2]
+    # The grapher channel serializes `description_key` as one markdown string ("- b1\n- b2"); normalize
+    # it back to a list so it dumps as YAML bullets rather than one giant quoted scalar.
+    value = as_bullets(value)
     try:
         return ruamel_dump({key: value}).rstrip("\n")
     except Exception:

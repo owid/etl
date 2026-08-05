@@ -14,6 +14,7 @@ so it also catches changes coming from garden step templates.
 """
 
 import html
+import json
 import os
 import urllib.parse
 from typing import Any
@@ -536,6 +537,44 @@ def _pending_lines(header: str, rows: list[dict[str, Any]]) -> list[str]:
     return out
 
 
+def _markdown_output(text: str, filename: str, key: str) -> None:
+    """Render a Markdown output with a reliable copy button + a clipboard-free download.
+
+    Streamlit's built-in `st.code` copy icon uses the async Clipboard API, which silently no-ops
+    when the page isn't a secure context or runs in an iframe without clipboard permission — both
+    common on the staging Wizard, which is why the built-in button "doesn't work" there. Our button
+    falls back to `execCommand('copy')` on a scratch textarea (works in non-secure contexts), and the
+    download button needs no clipboard at all."""
+    st.code(text, language="markdown")
+    payload = json.dumps(text)  # safe JS string literal: handles quotes, newlines, unicode
+    btn_id = f"cp_{key}"
+    components.html(
+        f"""
+        <button id="{btn_id}" style="font:inherit;padding:4px 12px;border:1px solid #ccc;
+                border-radius:6px;background:#f6f6f6;cursor:pointer">📋 Copy to clipboard</button>
+        <script>
+        const _t = {payload};
+        const _b = document.getElementById("{btn_id}");
+        _b.addEventListener("click", async () => {{
+            let ok = false;
+            try {{ await navigator.clipboard.writeText(_t); ok = true; }} catch (e) {{
+                try {{
+                    const ta = document.createElement("textarea");
+                    ta.value = _t; ta.style.position = "fixed"; ta.style.opacity = "0";
+                    document.body.appendChild(ta); ta.focus(); ta.select();
+                    ok = document.execCommand("copy"); ta.remove();
+                }} catch (e2) {{ ok = false; }}
+            }}
+            _b.textContent = ok ? "✓ Copied" : "⚠ Select the text and press Ctrl/Cmd+C";
+            setTimeout(() => {{ _b.textContent = "📋 Copy to clipboard"; }}, 1600);
+        }});
+        </script>
+        """,
+        height=44,
+    )
+    st.download_button("⬇ Download .md", data=text, file_name=filename, mime="text/markdown", key=f"dl_{key}")
+
+
 def _pr_brief_markdown(
     catalog_path: str,
     baseline_name: str,
@@ -861,13 +900,13 @@ def render_review_page(
     st.markdown("**Outputs** — copy either as Markdown:")
     with st.expander("📋 Review summary — share with the author"):
         st.caption("The punch-list of decisions and comments, for the person who wrote the changes.")
-        st.code(_review_markdown(catalog_path, baseline_name, resolved, usage), language="markdown")
+        _markdown_output(_review_markdown(catalog_path, baseline_name, resolved, usage), "review-summary.md", "review")
     with st.expander("🔀 PR brief — changes to execute (all charts / only this view)"):
         st.caption(
             "Every change with its exact target (shared garden `.meta.yml` vs a scoped MDim override) and "
             "the scope decision — ready to drive the PR. Markdown for now."
         )
-        st.code(_pr_brief_markdown(catalog_path, baseline_name, resolved, usage), language="markdown")
+        _markdown_output(_pr_brief_markdown(catalog_path, baseline_name, resolved, usage), "pr-brief.md", "mdim_brief")
 
 
 def render_view_diff_page(
@@ -1152,7 +1191,9 @@ def _render_chart_review(
             "Each change with its target — the indicator's garden `.meta.yml` (shared) or the chart's own "
             "config — ready to drive the PR. Markdown for now."
         )
-        st.code(_chart_pr_brief_markdown(chart, baseline_name, resolved, usage, catalog_root), language="markdown")
+        _markdown_output(
+            _chart_pr_brief_markdown(chart, baseline_name, resolved, usage, catalog_root), "pr-brief.md", "chart_brief"
+        )
 
 
 def _chart_flow(source_engine: Engine, target_engine: Engine, baseline: str) -> None:
