@@ -14,8 +14,8 @@ def run() -> None:
     ds_garden = paths.load_dataset()
 
     # Read table from garden dataset.
-    tb = ds_garden["eu_wild_bird_populations"]
-    tb_farmland = ds_garden["farmland_bird_index"]
+    tb = ds_garden.read("eu_wild_bird_populations")
+    tb_farmland = ds_garden.read("farmland_bird_index")
 
     #
     # Save outputs.
