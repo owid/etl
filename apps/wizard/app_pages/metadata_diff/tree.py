@@ -90,7 +90,6 @@ def render_affected_charts_html(
     charts: list[dict[str, Any]],
     preview_html: str,
     staging_site: str,
-    chart_diff_url: str,
     per_page: int = 10,
 ) -> tuple[str, int]:
     """Self-contained component: paginated affected-chart links with a hover preview of the change.
@@ -120,9 +119,8 @@ def render_affected_charts_html(
     paged = n > per_page
     header = (
         f'<p class="ac-header">These <b>{n}</b> chart{"s" if n != 1 else ""} also use this indicator, so each '
-        "inherits this same change. Hover a chart to preview it, or click to open it on <b>this staging "
-        "server</b>. &nbsp;"
-        f'<a href="{html.escape(chart_diff_url)}" target="_blank" rel="noopener">Open all in Chart Diff &#8599;</a></p>'
+        "inherits this same change. Hover a chart to preview the change, or click to open its data page on "
+        "<b>this staging server</b>.</p>"
     )
     footnote = ""
     if n_no_dp:

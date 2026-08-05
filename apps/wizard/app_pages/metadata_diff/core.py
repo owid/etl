@@ -246,7 +246,7 @@ def field_label(field_name: str) -> str:
 
 # Where a per-view override for a given diff field lives in the MDim's Python step:
 # (view attribute, nested dict key or None, snake_case metadata/config key).
-_OVERRIDE_TARGET: dict[str, tuple[str, str | None, str]] = {
+OVERRIDE_TARGET: dict[str, tuple[str, str | None, str]] = {
     "titlePublic": ("metadata", "presentation", "title_public"),
     "descriptionShort": ("metadata", None, "description_short"),
     "descriptionKey": ("metadata", None, "description_key"),
@@ -274,7 +274,7 @@ def override_snippet(view: ViewDiff, field_name: str, value: Any) -> str:
     Mirrors the real override idiom (`view.metadata = view.metadata or {}; view.metadata[...] = ...`)
     used in e.g. wb/latest/incomes_pip.py.
     """
-    container, nested, key = _OVERRIDE_TARGET[field_name]
+    container, nested, key = OVERRIDE_TARGET[field_name]
     dims = ", ".join(f"{slug}={json.dumps(choice, ensure_ascii=False)}" for slug, choice in view.dimensions.items())
     value = _py_value(value)
     lines = [

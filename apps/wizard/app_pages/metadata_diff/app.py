@@ -27,6 +27,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     CHART_FIELD_PREFIX,
     CHART_FIELDS,
     METADATA_FIELDS,
+    OVERRIDE_TARGET,
     ViewDiff,
     as_bullets,
     change_group_identity,
@@ -290,12 +291,11 @@ def _render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any
 def _render_affected_lists(view: ViewDiff, charts: list[dict], mdims: list[dict]) -> None:
     """The affected charts (paginated, hover-to-preview) and other MDims shown inside the popover."""
     if charts:
-        chart_diff_url = f"{SOURCE.wizard_url}/chart-diff?diff-type=charts&indicator_id={view.indicator_id}"
         # The charts all inherit this view's indicator, so they all show the same change — build the
         # preview once from the indicator-layer fields and reuse it as every chart's hover tooltip.
         indicator_fields = {f: view.fields[f] for f in view.indicator_changed_fields if f in view.fields}
         preview_html = diff_preview_html(ViewDiff(dimensions=view.dimensions, fields=indicator_fields))
-        component_html, height = render_affected_charts_html(charts, preview_html, SOURCE.site, chart_diff_url)
+        component_html, height = render_affected_charts_html(charts, preview_html, SOURCE.site)
         components.html(component_html, height=height, scrolling=True)
     if mdims:
         st.markdown(f"**Other MDims ({len(mdims)})** — also use this indicator:")
@@ -311,10 +311,13 @@ def _render_author_scope(
     usage: dict[int, dict[str, list[dict[str, Any]]]],
     source_engine: Engine,
     scopes: dict[str, str],
+    multi: bool = False,
 ) -> None:
-    """The AUTHOR's per-change scope toggle on the View diff: apply everywhere the indicator is shared,
-    or scope to only this view. Persisted (`metadata_scope`) so the reviewer is *shown* the decision —
-    the reviewer approves or rejects it, they don't set it."""
+    """The AUTHOR's per-change scope toggle, shown right under the affected-charts button: apply the
+    shared change everywhere the indicator is used, or scope it to only this view. Default is
+    **scope to this view** (the conservative choice — the other charts keep their existing text).
+    Persisted (`metadata_scope`) so the reviewer is *shown* the decision — they approve or reject it,
+    they don't set it. `multi` prefixes the field name when a view has several shared changes."""
     key = text_change_key(catalog_path, field_name, change["old"], change["new"])
     imp = usage.get(view_diff.indicator_id, {}) if view_diff.indicator_id is not None else {}
     n_c, n_m = len(imp.get("charts", [])), len(imp.get("mdims", []))
@@ -324,14 +327,16 @@ def _render_author_scope(
 
     sk = f"scope::{key}"
     if sk not in st.session_state:
-        st.session_state[sk] = "scoped" if scopes.get(key) == "scoped" else "all"
+        # Default to the conservative "only this view" unless the author explicitly chose "apply to all".
+        st.session_state[sk] = "all" if scopes.get(key) == "all" else "scoped"
 
     def _save() -> None:
-        set_scope(source_engine, catalog_path, key, st.session_state.get(sk, "all"), _reviewer())
+        set_scope(source_engine, catalog_path, key, st.session_state.get(sk, "scoped"), _reviewer())
 
     labels = {"all": f"Apply to all — {reach}", "scoped": "Scope to only this view"}
+    radio_label = f"“{field_label(field_name)}” applies to" if multi else "This change applies to"
     st.radio(
-        "This change applies to",
+        radio_label,
         options=["all", "scoped"],
         format_func=lambda x: labels[x],
         key=sk,
@@ -382,6 +387,22 @@ def _render_diff_body(
     st.warning(f"**{n} field{'s' if n > 1 else ''} changed** in this {unit}.")
     _render_impact(view_diff, usage, unit=unit)
 
+    # The author's scope decision(s) sit directly under the affected-charts button — scope is about
+    # those shared charts: apply the change everywhere the indicator is used, or only to this view.
+    if unit == "view" and source_engine is not None:
+        shared_fields = [f for f in FIELD_ORDER if f in view_diff.fields and f in view_diff.indicator_changed_fields]
+        for field_name in shared_fields:
+            _render_author_scope(
+                catalog_path,
+                view_diff,
+                field_name,
+                view_diff.fields[field_name],
+                usage,
+                source_engine,
+                scopes or {},
+                multi=len(shared_fields) > 1,
+            )
+
     for field_name in [f for f in FIELD_ORDER if f in view_diff.fields]:
         change = view_diff.fields[field_name]
         st.markdown(f"##### {field_label(field_name)}")
@@ -394,9 +415,6 @@ def _render_diff_body(
         with col_new:
             st.markdown(f":green[**This staging server**] · [{link_kind}]({staging_url})")
             st.markdown(_render_text_html(change["new"], change["old"], side="new"), unsafe_allow_html=True)
-        # Author's scope decision (MDim views, shared fields only): apply-to-all vs scope-to-this-view.
-        if unit == "view" and source_engine is not None and field_name in view_diff.indicator_changed_fields:
-            _render_author_scope(catalog_path, view_diff, field_name, change, usage, source_engine, scopes or {})
 
 
 def _reviewer() -> str | None:
@@ -463,6 +481,70 @@ def _review_markdown(
     return "\n".join(lines)
 
 
+def _pr_brief_markdown(
+    catalog_path: str,
+    baseline_name: str,
+    resolved: list[dict[str, Any]],
+    usage: dict[int, dict[str, list[dict[str, Any]]]],
+) -> str:
+    """An execute-ready brief for turning this review into a PR: every change with its exact target
+    (shared garden `.meta.yml` vs a scoped MDim override), the author's scope, before→after, the
+    reviewer's decision + suggested wording, and — for scoped changes — the override snippet.
+
+    Markdown for now, but structured so it can drive the actual edits: each entry says *what* to change
+    and *where*, honouring the all-charts vs only-this-view decision."""
+    lines = [
+        f"# PR brief — `{catalog_path}`",
+        "",
+        f"_Baseline: {baseline_name}. {len(resolved)} distinct change(s)._",
+        "",
+        "Apply each change at its **Target**, honouring the author's **Scope**. 🚩 flagged items carry the "
+        "reviewer's requested wording under 💬.",
+        "",
+    ]
+    for r in resolved:
+        g = r["g"]
+        field = g.field
+        status = st.session_state.get(_review_status_key(catalog_path, r["change_key"]), r["seed_label"])
+        comment = (st.session_state.get(_review_comment_key(catalog_path, r["change_key"]), "") or "").strip()
+        scope = r["scope"]
+        garden_key = OVERRIDE_TARGET.get(field, (None, None, field))[2]
+        views = "; ".join(_dims_str(d) for d in g.view_dims[:8]) + (" …" if len(g.view_dims) > 8 else "")
+
+        lines.append(f"## {field_label(field)} — {status}")
+        if not g.affects_indicator:
+            lines.append("- **Target:** MDim-level field — edit this MDim's step (config/py) for its view(s).")
+            lines.append(f"- **Scope:** this MDim only · **Views:** {views}")
+        elif scope == "scoped":
+            n_c = len(r["charts"])
+            others = f"the {n_c} other chart(s) keep the old text" if n_c else "no other surface is affected"
+            lines.append(
+                f"- **Target:** MDim override in this MDim's `.py` step — and revert the shared "
+                f"`{garden_key}` change in the indicator's garden `.meta.yml` if it was made there."
+            )
+            lines.append(f"- **Scope:** only these views ({others}) · **Views:** {views}")
+        else:
+            imp = usage.get(g.indicator_id, {}) if g.indicator_id is not None else {}
+            n_c = len(imp.get("charts", []))
+            lines.append(
+                f"- **Target:** indicator garden `.meta.yml` → `{garden_key}` — updates every surface using "
+                "this indicator."
+            )
+            lines.append(f"- **Scope:** all — {n_c} chart(s) + {len(g.view_dims)} view(s) get this text")
+        lines.append(f"- **Before:** {_as_plaintext(g.old)}")
+        lines.append(f"- **After:** {_as_plaintext(g.new)}")
+        if comment:
+            lines.append(f"- **💬 Reviewer:** {comment}")
+        if g.affects_indicator and scope == "scoped" and field in OVERRIDE_TARGET:
+            snippet = override_snippet(ViewDiff(dimensions=g.view_dims[0] if g.view_dims else {}), field, g.new)
+            lines.append("")
+            lines.append("```python")
+            lines.append(snippet)
+            lines.append("```")
+        lines.append("")
+    return "\n".join(lines)
+
+
 # The reviewer only accepts or rejects — the scope decision belongs to the author (View diff toggle).
 _REVIEW_STATUSES = ["⏳ Pending", "✅ Approve", "🚩 Flag"]
 _STATUS_TO_DB = {"✅ Approve": "approved", "🚩 Flag": "flagged"}
@@ -509,7 +591,9 @@ def render_review_page(
     resolved: list[dict[str, Any]] = []
     for g in groups:
         change_key, content_hash = change_group_identity(catalog_path, g)
-        scope = scopes.get(text_change_key(catalog_path, g.field, g.old, g.new), "all")
+        # Default to the conservative "only this view" unless the author explicitly chose "all" (matches
+        # the View-diff toggle default), so the scope label and PR brief agree with what the author saw.
+        scope = scopes.get(text_change_key(catalog_path, g.field, g.old, g.new), "scoped")
         imp = usage.get(g.indicator_id, {}) if (g.affects_indicator and g.indicator_id is not None) else {}
         charts, mdims = imp.get("charts", []), imp.get("mdims", [])
         row = reviews.get(change_key)
@@ -558,9 +642,13 @@ def render_review_page(
         states.count("pending"),
     )
 
-    # --- Lock-in gate summary ---
+    # --- Review status (this pass is OPTIONAL — it doesn't gate the PR or the merge) ---
+    st.caption(
+        "This review pass is **optional** — a way to go through the metadata changes with the author and "
+        "iterate on them before they ship. It doesn't gate the PR or the merge."
+    )
     if n_appr == n and n > 0:
-        st.success(f"🔒 **All {n} changes approved** — review is locked in. This MDim is signed off.")
+        st.success(f"✅ **All {n} changes reviewed** — approved.")
     else:
         bits = []
         if n_pend:
@@ -569,9 +657,7 @@ def render_review_page(
             bits.append(f"**{n_flag}** flagged")
         if n_stale:
             bits.append(f"**{n_stale}** edited since review")
-        st.warning(
-            f"🔒 **Not signed off** — {', '.join(bits)} of {n}. All changes must be approved to lock in the review."
-        )
+        st.info(f"Review pending — {', '.join(bits)} of {n}.")
     st.caption(
         f"{n_appr}/{n} approved · decisions are stored on this staging server and bound to the exact text — "
         "any later edit reopens that change for re-review."
@@ -651,8 +737,16 @@ def render_review_page(
                 st.caption(f"Signed off by **{r['reviewer']}**{when}")
 
     st.divider()
-    with st.expander("📋 Review summary — copy as Markdown for the author"):
+    st.markdown("**Outputs** — copy either as Markdown:")
+    with st.expander("📋 Review summary — share with the author"):
+        st.caption("The punch-list of decisions and comments, for the person who wrote the changes.")
         st.code(_review_markdown(catalog_path, baseline_name, resolved, usage), language="markdown")
+    with st.expander("🔀 PR brief — changes to execute (all charts / only this view)"):
+        st.caption(
+            "Every change with its exact target (shared garden `.meta.yml` vs a scoped MDim override) and "
+            "the scope decision — ready to drive the PR. Markdown for now."
+        )
+        st.code(_pr_brief_markdown(catalog_path, baseline_name, resolved, usage), language="markdown")
 
 
 def render_view_diff_page(
