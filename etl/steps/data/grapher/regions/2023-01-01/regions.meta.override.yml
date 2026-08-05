@@ -775,7 +775,7 @@ tables:
 
       # IHME GBD (super-regions)
       ihme_gbd_1_region:
-        title: World super-regions according to IHME
+        title: World super-regions according to IHME GBD
         description_short: |-
           Super-regions as defined by the Institute for Health Metrics and Evaluation (IHME) in its Global Burden of Disease (GBD) study.
         type: ordinal
@@ -813,7 +813,7 @@ tables:
 
       # IHME GBD (regions)
       ihme_gbd_2_region:
-        title: World regions according to IHME
+        title: World regions according to IHME GBD
         description_short: |-
           Regions as defined by the Institute for Health Metrics and Evaluation (IHME) in its Global Burden of Disease (GBD) study.
         type: ordinal
