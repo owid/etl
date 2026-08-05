@@ -178,7 +178,9 @@ def sweep_charts(env: OWIDEnv, variable_ids: list[int], field: str | None) -> li
                MAX(cd.property = 'y') AS affected_var_in_y,
                (SELECT COUNT(*) FROM chart_dimensions cd2
                 WHERE cd2.chartId = c.id AND cd2.property = 'y') AS n_y_dims,
-               GROUP_CONCAT(DISTINCT v.shortName ORDER BY v.shortName SEPARATOR ', ') AS via_indicators
+               GROUP_CONCAT(DISTINCT v.shortName ORDER BY v.shortName SEPARATOR ', ') AS via_indicators,
+               GROUP_CONCAT(DISTINCT IF(cd.property = 'y', v.shortName, NULL)
+                            ORDER BY IF(cd.property = 'y', v.shortName, NULL) SEPARATOR ', ') AS via_y_indicators
                {shielded_col}
         FROM chart_dimensions cd
         JOIN charts c ON c.id = cd.chartId
@@ -199,6 +201,12 @@ def sweep_charts(env: OWIDEnv, variable_ids: list[int], field: str | None) -> li
                 c["no_inherit_reason"] = "several y series — grapher has no inheritance parent"
             elif not c["inheritance_enabled"]:
                 c["no_inherit_reason"] = "inheritance disabled on the chart"
+            else:
+                # The inheritance parent is the single y variable, so for chart text that y
+                # indicator alone carries the edit. An affected variable sitting in x/color/size
+                # on the same chart (e.g. a scatter whose two axes share the anchor) would be
+                # misattributed by the all-properties list — credit only the y one.
+                c["via_indicators"] = c["via_y_indicators"]
     return charts
 
 
