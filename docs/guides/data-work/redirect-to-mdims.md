@@ -170,9 +170,12 @@ migrates their old slugs in one transaction.
     turns its old URLs into 404s.
 
 !!! note "The CSV takes one bare chart path per row"
-    Anything else validates and then fails silently. An `/explorers/` source sends *every*
-    view to one MDIM view — use the explorer route above instead. A `?…` source never
-    matches, and covering that needs a change to the script (ask a Grapher developer).
+    A source is `/grapher/<slug>` and stops there — no query string, meaning nothing from the
+    `?` onward, which on a chart URL is what picks the view (`?tab=map`, `?country=~FRA`).
+    A source carrying one validates and then never matches an incoming URL, so the redirect
+    silently never fires; sending different parameters to different views would need a change
+    to the script (ask a Grapher developer). An `/explorers/` source also validates, then
+    sends *every* view of the explorer to one MDIM view — use the explorer route above.
 
 ## Why the two differ
 
