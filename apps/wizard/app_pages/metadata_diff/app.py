@@ -297,7 +297,9 @@ def _render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any
                 "MDims currently use this indicator — so nothing else is affected."
             )
     with col_btn:
-        if n_c or n_m:
+        # Standalone charts have no scope decision, so they get the peek popover here. For MDim views the
+        # affected list is revealed at the scope decision, which gates "apply to all" behind seeing it.
+        if (n_c or n_m) and unit == "chart":
             btn_label = (
                 f"📊 Show {n_c} affected chart{'s' if n_c != 1 else ''}"
                 if n_c
@@ -349,21 +351,48 @@ def _render_author_scope(
         # Default to the conservative "only this view" unless the author explicitly chose "apply to all".
         st.session_state[sk] = "all" if scopes.get(key) == "all" else "scoped"
 
-    def _save() -> None:
-        set_scope(source_engine, catalog_path, key, st.session_state.get(sk, "scoped"), _reviewer())
+    def _save(value: str | None = None) -> None:
+        set_scope(source_engine, catalog_path, key, value or st.session_state.get(sk, "scoped"), _reviewer())
+
+    # Gate: applying the change to *all* charts is only selectable once the author has expanded and seen
+    # the affected list — so "apply to all" is a deliberate choice, never the path of least resistance.
+    # A previously-saved "all" counts as already reviewed. With no other surface, there's nothing to gate.
+    has_reach = bool(n_c or n_m)
+    seen_key = f"scope-seen::{key}"
+    st.session_state.setdefault(seen_key, st.session_state[sk] == "all")
+    if has_reach:
+        st.checkbox(
+            f"👀 Show the {reach} this would also change — required to apply to all",
+            key=seen_key,
+            help="See every chart / MDim affected before applying the change to all of them.",
+        )
+    reviewed = (not has_reach) or bool(st.session_state.get(seen_key))
+    if has_reach and st.session_state.get(seen_key):
+        _render_affected_lists(view_diff, imp.get("charts", []), imp.get("mdims", []))
+    elif has_reach and st.session_state.get(sk) == "all":
+        # Un-reviewed can't stay on "apply to all" — fall back to the conservative scope.
+        st.session_state[sk] = "scoped"
+        _save("scoped")
 
     labels = {"all": f"Apply to all — {reach}", "scoped": "Scope to only this view"}
     radio_label = f"“{field_label(field_name)}” applies to" if multi else "This change applies to"
     st.radio(
         radio_label,
-        options=["all", "scoped"],
+        options=["scoped", "all"],
         format_func=lambda x: labels[x],
         key=sk,
         on_change=_save,
         horizontal=True,
-        help="The author's decision: does this shared change apply everywhere the indicator is used, or "
-        "only to this view? The reviewer is shown this and approves or rejects it — they don't set it.",
+        disabled=not reviewed,
+        help="The author's decision: apply this shared change everywhere the indicator is used, or only to "
+        "this view. Review the affected charts above to unlock 'apply to all'. The reviewer is shown this "
+        "and approves or rejects it — they don't set it.",
     )
+    if has_reach and not reviewed:
+        st.caption(
+            f"⤷ Defaults to **only this view** — since {reach} also use this indicator, *apply to all* "
+            "unlocks only once you expand the affected list above and see what would change."
+        )
 
 
 def _render_diff_body(
