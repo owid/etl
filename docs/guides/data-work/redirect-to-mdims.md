@@ -170,9 +170,9 @@ migrates their old slugs in one transaction.
     turns its old URLs into 404s.
 
 !!! note "The CSV takes one bare chart path per row"
-    Both other shapes validate and then fail silently: an `/explorers/` source sends *every*
-    view to one MDIM view — use the explorer route above instead — and a `?…` source never
-    matches, which needs a change to the script (ask a Grapher developer).
+    Anything else validates and then fails silently. An `/explorers/` source sends *every*
+    view to one MDIM view — use the explorer route above instead. A `?…` source never
+    matches, and covering that needs a change to the script (ask a Grapher developer).
 
 ## Why the two differ
 
