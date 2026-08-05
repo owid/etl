@@ -24,7 +24,7 @@ from etl.files import ruamel_dump
 METADATA_FIELDS = {
     "titlePublic": "Title",
     "descriptionShort": "Description",
-    "descriptionKey": "What you should know about this data",
+    "descriptionKey": "WYSK",
     "descriptionProcessing": "Processing notes",
     "descriptionFromProducer": "Description from producer",
 }

@@ -364,13 +364,6 @@ def _render_author_scope(
         help="The author's decision: does this shared change apply everywhere the indicator is used, or "
         "only to this view? The reviewer is shown this and approves or rejects it — they don't set it.",
     )
-    if st.session_state.get(sk) == "scoped":
-        with st.popover("Override code (scope to this view)", use_container_width=True):
-            st.caption(
-                "To apply only here: **revert the shared change** in the indicator's garden `.meta.yml`, "
-                "then add this override to the MDim's Python step (after its `c.views` are built):"
-            )
-            st.code(override_snippet(view_diff, field_name, change["new"]), language="python")
 
 
 def _render_diff_body(
@@ -811,15 +804,17 @@ _STATUS_FROM_DB = {"approved": "✅ Approve", "flagged": "🚩 Flag"}
 
 
 def _scope_label(scope: str, g: Any, usage: dict[int, dict[str, list[dict[str, Any]]]]) -> str:
-    """Human-readable summary of the author's scope decision, for the reviewer."""
+    """The blast-radius consequence of the author's scope decision, shown by each change in the review."""
     if not g.affects_indicator:
-        return "🔒 MDim override (local to this view)"
+        return "🔒 MDim override — local to this view; no other charts or MDims are affected."
     imp = usage.get(g.indicator_id, {}) if g.indicator_id is not None else {}
     n_c, n_m = len(imp.get("charts", [])), len(imp.get("mdims", []))
-    reach = f"{n_c} chart{'s' if n_c != 1 else ''}" + (f" · {n_m} other MDim{'s' if n_m else ''}" if n_m else "")
+    if not n_c and not n_m:
+        return "🔗 Shared indicator metadata — no other charts or MDims use it, so nothing else changes."
+    also = f"{n_c} chart{'s' if n_c != 1 else ''}" + (f" and {n_m} other MDim{'s' if n_m != 1 else ''}" if n_m else "")
     if scope == "scoped":
-        return "✏️ Author: **scope to these views only**"
-    return f"🔗 Author: **apply to all** — {reach}"
+        return f"✏️ {also} also use this indicator — **scoped to this MDim only**, so they keep their current text."
+    return f"🔗 {also} also use this indicator — **all will change** with this edit."
 
 
 def render_review_page(
@@ -946,8 +941,6 @@ def render_review_page(
         eff = _effective(r)
 
         reach_word = f"{len(g.view_dims)} view{'s' if len(g.view_dims) != 1 else ''}"
-        if r["charts"]:
-            reach_word += f" · {len(r['charts'])} chart{'s' if len(r['charts']) != 1 else ''}"
 
         icon = "⚠️" if stale else status.split()[0]
         header = f"{icon} {field_label(g.field)} — {reach_word}"
@@ -1022,9 +1015,8 @@ def render_view_diff_page(
     scopes = load_scopes(source_engine, catalog_path)
 
     # --- Jump straight to a changed view -----------------------------------------
-    # Direct navigation to the changes, so the user doesn't have to hunt through the controls (the
-    # 🟡 dots below help once a dropdown is open, but this is the glance-able shortcut). Written via
-    # a callback because url_persist only reads the URL when a control's state is still empty.
+    # Direct navigation to the changes, so the user doesn't have to hunt through the controls. Written
+    # via a callback because url_persist only reads the URL when a control's state is still empty.
     changed_views = [v for v in view_diffs if v.changed]
     # Which changed views have been opened (scoped to this MDim) — drives the reviewed count + dot colours.
     visited: set[int] = st.session_state.setdefault(f"mdd_visited::{catalog_path}", set())
@@ -1090,9 +1082,8 @@ def render_view_diff_page(
     # --- MDim controls (navigation across views) ---------------------------------
     if changed_views:
         st.caption(
-            "🟡 marks a control option that leads to a changed view; it turns 🟢 once you've viewed that "
-            "change (viewed — not necessarily approved).  \n"
-            "Follow the dots, or use **Next change ▶** to step through them one by one."
+            "In the jump menu above: 🟡 a changed view · 🟢 already viewed · 🆕 a new view. "
+            "Use **Next change ▶** to step through the changes one by one."
         )
     selection: dict[str, str] = {}
     columns = st.columns(min(4, max(1, len(dimensions))))
@@ -1106,37 +1097,14 @@ def render_view_diff_page(
                 choice = v.dimensions.get(dim_slug)
                 if choice is not None and choice not in available:
                     available.append(choice)
-        # Choices from which at least one *changed* view is reachable given the current selection —
-        # so the user can drill straight to the changes instead of hunting blindly.
-        changed_choices = {
-            v.dimensions.get(dim_slug)
-            for v in view_diffs
-            if v.changed and all(v.dimensions.get(s) == c for s, c in selection.items())
-        }
-        # A changed choice turns 🟢 once every changed view reachable through it has been viewed.
-        viewed_choices = set()
-        for choice in changed_choices:
-            reachable = [
-                j
-                for j, cv in enumerate(changed_views)
-                if cv.dimensions.get(dim_slug) == choice
-                and all(cv.dimensions.get(s) == c for s, c in selection.items())
-            ]
-            if reachable and all(j in visited for j in reachable):
-                viewed_choices.add(choice)
         names = {c["slug"]: (c.get("name") or c["slug"]) for c in dim.get("choices", [])}
         # Drop a stale URL value (e.g. after switching MDim) so the widget doesn't crash.
         if st.query_params.get(key) not in available:
             st.query_params.pop(key, None)
             st.session_state.pop(key, None)
 
-        def _fmt(slug, names=names, changed_choices=changed_choices, viewed_choices=viewed_choices):
-            # Prefix (not suffix) so the marker survives the selectbox's "…" truncation and shows
-            # in the collapsed box too.
-            label = names.get(slug, slug)
-            if slug in viewed_choices:
-                return f"🟢 {label}"
-            return f"🟡 {label}" if slug in changed_choices else label
+        def _fmt(slug, names=names):
+            return names.get(slug, slug)
 
         with columns[i % len(columns)]:
             selection[dim_slug] = url_persist(st.selectbox)(
