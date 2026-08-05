@@ -161,6 +161,8 @@ The author-side audit is optional to *run* in `/update-dataset` (the `check-empt
 
 If the author didn't run it, **you MUST offer it to the user** as an optional add-on to this review (name the token cost) — surfacing this offer is mandatory, never silently skip it — and recommend accepting when the risk is real: many charts remapped, hand-curated (non-auto) mappings, a restructure, or indicators whose country coverage shrank. Run the full sweep on opt-in.
 
+For a cheap version of the same question — *which* surfaces carry this dataset at all, without the per-view availability checks — run `find-chart-references --dataset-id <id>`. It's the surface list both step-7 audits are built on, and it answers "did the author miss a surface entirely" in one query.
+
 Either way, do a cheap manual spot-check as part of the base review: open 2–3 of the most-viewed upgraded charts on staging (SVG render is enough) and confirm their pinned entity selections still draw lines — an empty published chart is a 🔴 however it's found, and a spot-check hit is itself a reason to recommend the full sweep.
 
 ### 8e. Hardcoded-time-bounds audit (standard)
@@ -211,7 +213,11 @@ Run `/check-metadata-typos`, `/check-metadata-spacing`, `/check-metadata-style` 
 
 Also grep the metadata **prose** for numbers carried over from the previous release (country counts, category counts, year ranges in `description_key`/descriptions): validated fields are covered by checks, prose numbers are not — a panel-composition change (dropped country, new category set) silently strands them (see `/update-dataset` Guardrails, "Grep metadata prose"). Stale prose count: 🟡.
 
-Three further prose checks from `/update-dataset` § 6b that the skills don't automate:
+Five further prose checks from `/update-dataset` § 6b that the skills don't automate:
+
+- **Redundant user-facing text.** Read each indicator's `description_key` as the reader gets it, together with `description_short` and the chart title: a bullet that restates another bullet, or the short line, at the same level of detail is padding — 🟡, with a proposed merge into the bullet that already covers it. Unpacking `description_short` (full definition, how it's measured, what's included) is not redundancy and must not be flagged. Watch new bullets added by this PR against the ones already there, and Jinja variants that restate the shared bullet for only some dimension values.
+
+- **Dimensional text that only holds for one breakdown.** For indicators templated over a dimension (or sharing a `definitions:` key across variants), read each rendered variant, not just one: a caveat that the data doesn't control for X is wrong on the variant grouped **by** X, a scope word like "all employees" overclaims on a variant filtered to a subgroup, and a sentence about a toggle is wrong on views that exist for only one choice of that dimension. Text that misdescribes the population on some variants: 🟡 (🔴 when it contradicts what the view actually shows). Author side: `/update-dataset` § 6b dimension sweep.
 
 - **Methodology-attribution claims** ("following guidance from <agency>…"): open the cited link and confirm it actually says that — agencies revise methodology, and a stale claim survives every link check (real case: metadata cited BEA guidance for an office-PPI deflator after BEA had switched that category to a different composite). A claim the cited page doesn't support: 🔴 (it's factually wrong reader-facing text).
 - **Scope qualifiers in the origin title** (private-only, adults-only, market-exchange-rates-only) must surface in `description_short`/`description_key`, not only in the citation. Missing: 🟡.

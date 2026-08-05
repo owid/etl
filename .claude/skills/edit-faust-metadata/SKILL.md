@@ -108,6 +108,35 @@ Three routes:
 
 **Narrative charts** (rare): their config is a patch over the parent chart. Edit via `AdminAPI(OWIDEnv.from_staging(branch)).get_narrative_chart(id)` / `update_narrative_chart(id, cfg)` — and audit `configFull`, never the bare `patch` (it lacks every inherited field). Note `configFull` **is** the stored `chart_configs.full` (the materialized parent+patch merge, not a live one): it goes stale when the parent is edited without the child being re-saved — see the narrative-children section below for the re-save that fixes that. When a narrative chart is affected *indirectly* — because you edited its parent's FAUST — follow [Narrative-chart children of an edited FAUST field](#narrative-chart-children-of-an-edited-faust-field).
 
+## Writing new text into a garden `.meta.yml` (route a)
+
+Match the file's own authoring pattern before writing a single sentence — your diff should look like the rest of the file.
+
+- **A file that keeps its text in `definitions:` gets the new text there too, never inline under the variable.** When the `.meta.yml` declares its sentences as `definitions:` entries (anchors and/or Jinja `<% if dim == … %>` branches) and the variables reference them as `{definitions.<key>}`, add new text as new definitions **at the top of the file, next to the related definitions**, and reference them from the variable. Inline prose parses and renders fine, so nothing fails — it just leaves the file with two authoring styles and the text unreusable and un-Jinja-able. **The bigger the dataset, the more this matters:** in a `.meta.yml` with hundreds of variables, definitions-at-top is what keeps the file readable — all the prose lives in one place a reviewer can read end to end, and the variable blocks stay skimmable as short lists of references instead of walls of text. Default to it even for text used by a single variable. Slot each key where the definitions order already puts its neighbors (these files usually track table order), name it in the file's convention (`description_key_<topic>`), and keep the reference list's order so bullet order doesn't move. In a `|-` block scalar keep each bullet on one long line — a wrapped line inserts a real newline into the rendered text.
+- **Before adding a definition, grep the existing ones for text that already says the same thing.** New text often duplicates a bullet the file already carries under a different name (a source/comparability caveat, a classification note) and that other indicators already reference. Reuse beats near-duplication, and there are two ways to get it — put both to the user, don't pick silently:
+  - reference the existing key from the new variable (the new wording is dropped); or
+  - keep the new, better wording but place it **under the existing key's name**, replacing that key's text.
+
+  The second reaches every indicator already referencing that key, so **blast-radius the shared key first** — `blast_radius.py --anchor <key> --meta-file <path>` expands a definitions key to its variables — and report which surfaces the reworded text lands on. Also check the new wording still fits the key's *name* and the distinction it encodes: a key called `…_national_estimates` should not end up asserting the data is harmonized.
+- **Read the whole rendered list before adding to it — new text must not read as redundant.** This applies to any field but bites hardest on `description_key`, where bullets are read as a set under `description_short` and the chart's title/subtitle. Render the existing bullets for the view being edited (not the raw YAML — a Jinja branch may already say your sentence for that dimension value) and ask what the new one adds. If it only says an existing bullet more fully, edit that bullet instead of adding a second; if it repeats another bullet at the same level of detail, drop it. Expanding `description_short` is fine and often expected — that one-sentence summary is meant to be unpacked here; the thing to avoid is a bullet that restates it without going further. Field-by-field style rules, including this one, are in [`owid-metadata-generation`](../owid-metadata-generation/SKILL.md).
+- **Then widen the search past the file, to the other datasets carrying the same text.** Metadata boilerplate travels: the same source caveat, classification note, or methodology sentence is often pasted into several datasets' `.meta.yml` (and mirrored in MDim `.py` constants). Search a few **distinctive 5–8 word fragments** of the text across `etl/steps/` — near-duplicates differ by a word or two, so one long exact-match search finds nothing while three short ones find everything:
+
+  ```bash
+  rg -l -i "harmonizes labor statistics from national sources" etl/steps/
+  rg -n -i "may not be directly comparable across countries" etl/steps/ | head -30
+  ```
+
+  Report every hit with a recommendation, and use it in both directions: when your new wording supersedes theirs, propose the same fix there; when a sibling dataset already words the point better, adopt its wording instead of minting a third variant. **Do not fold other datasets into the current PR** — they have their own owners, their own charts, and their own review; the current PR stays scoped to the indicator at hand and the sibling fixes ship as a **separate PR** (offer to open it, and list the affected datasets as a proposed follow-up in the current body so the item can't get lost).
+- **Prove a pure-refactor edit is text-neutral without building the dataset.** Moving text into definitions must not change one rendered character. Resolve both versions of the file with the catalog's own loader and compare the resolved `tables:` section — `definitions:` never reaches the output, so identical `tables:` means identical metadata for *every* variable at *every* dimension value. That's both stronger and far cheaper than a garden+grapher rebuild:
+
+  ```python
+  from owid.catalog.core.utils import dynamic_yaml_load, dynamic_yaml_to_dict
+  from owid.catalog.core.yaml_metadata import merge_with_shared_meta
+  resolved = dynamic_yaml_to_dict(dynamic_yaml_load(merge_with_shared_meta(Path(p)), {}))
+  ```
+
+  Diff per variable and per field, so an intended change shows up as exactly one entry and collateral ones can't hide. Then render the Jinja for every dimension value the edited variable takes (`owid.catalog.core.jinja._expand_jinja_text(text, {"<dim>": value})`) and show the user the bullets as a reader sees them — that also confirms which branches render empty and drop out of the list.
+
 ## Blast radius — notify and ask first
 
 Before applying an edit, report every other surface it would change:
@@ -125,6 +154,19 @@ Run it whenever:
 - the route is **(c)** and the chart has narrative-chart children or gdoc embeds (the reporter checks).
 
 It sweeps: **charts** (with `--field`, charts shielded by their own patch override of that field are listed separately — they will NOT change; for the chart-text fields title/subtitle/note, charts with no inheritance path — variable not a y series, several y series, or inheritance disabled — are also listed separately and excluded from the beyond-target count, since grapher only inherits chart config from a single-y, inheritance-enabled parent), **MDim views**, **explorer views** (legacy CSV explorers are invisible to these tables — caveat is printed), **narrative charts**, and **article references** (informational: embeds don't break, but the displayed text changes).
+
+**Report it specifically, never as counts alone.** "13 charts, 3 MDim views" tells the user nothing they can check: they can't see whether the affected surfaces are the ones where the new wording actually fits. Pass on what the script prints, for **every** surface — not just charts:
+
+- the **indicators** carrying the edit, with how many charts each feeds, so a lopsided distribution is visible;
+- **charts** as links, each annotated with the indicator it comes through, published state included;
+- **MDim views** as links — the reader URL with the view's dimension query string, plus the admin collection preview;
+- **explorers** as links, with the number of affected views in each;
+- **narrative charts** as admin links, marking the ones shielded by their own override;
+- **article references**, which change what readers see even though the embeds keep working.
+
+Then read the slugs before asking, and say what you notice: a slug can reveal that the edit lands somewhere the wording contradicts (a `…-modeled-vs-national` chart receiving a sentence about harmonized data), which is the finding the user needs and a count can never carry. Keep the list in the chat message, not only in a file — and if it's long, lead with the surfaces that matter and say how many more there are.
+
+`blast_radius.py` stays the tool for *this* skill: its value is the per-field inheritance analysis (which surfaces are shielded by their own patch, which have no inheritance path), which decides whether an edit actually reaches a surface — a question no generic sweep answers. For the plainer question "what references this object at all", including surfaces this script doesn't cover (data insights, static viz, key-chart slots, WordPress), use `find-chart-references`.
 
 Decision rule: if surfaces **beyond the one the user pointed at** are affected (count > 0), STOP and ask the user before applying:
 
@@ -151,7 +193,7 @@ Like the parent edit itself, child fixes land on **staging only** and ride chart
 **The single checkpoint rule: nothing is committed or pushed before the user's explicit go-ahead.** Everything up to the checkpoint happens on the branch + staging server only.
 
 1. Parse the request; run `resolve_target.py --no-db` for instant identification feedback to the user.
-2. Create the branch + draft PR: `.venv/bin/etl pr "<title, no emoji>" data` (never manual branching). This spins up the staging server the whole workflow depends on.
+2. Create the branch + draft PR: `.venv/bin/etl pr "<title, no emoji>" data` (never manual branching). This spins up the staging server the whole workflow depends on. Name the title after the field that actually changes, using the team's own shorthand where one exists — when the edit is only about `description_key`, write **WYSK**, not the full "What you should know about this indicator" (e.g. `Add WYSK to the ILO gender wage gap indicator`). The shorthand is in CLAUDE.md's glossary, so every colleague reads it, and it leaves room in the title for the indicator being edited.
 3. Wait for staging readiness: retry `OWIDEnv.from_staging(branch).read_sql("SELECT 1")` (builds take a few minutes).
 4. Run `resolve_target.py` with the DB; pick the route via the decision tree.
 5. Run `blast_radius.py` per the rules above; ask the user if other surfaces are affected.
@@ -172,18 +214,20 @@ Like the parent edit itself, child fixes land on **staging only** and ride chart
     - first push needs the upstream: `git push -u origin <branch>`, then verify `gh pr view --json files` is non-empty;
     - PR description via `gh pr edit` — first line is the attribution blockquote (`> _Written by Claude <model name> — @<handle> at the wheel._`), then: what changed and why (public facts only), the blast-radius summary, any route-(c) DB-only edits (they have **no file diff** — describe them explicitly and note they ride to production via chart-diff approval), and any `#dod:` follow-ups ("create in admin");
     - if the PR has committed files: post a bare `@codex review` comment, record its exact timestamp, and spawn the `pr-babysitter` skill's background agent to watch CI, judge/fix findings, reply + resolve threads;
-    - if the PR is DB-only (zero committed files): skip Codex entirely and tell the user the path to production is chart-diff approval in the Wizard + merge.
+    - if the PR is DB-only (zero committed files): skip Codex entirely and tell the user the path to production is chart-diff approval in the Wizard + merge;
+    - **suggest a human reviewer from the dataset's owners.** Read `dataset.owners` in the garden `.meta.yml` of every dataset the edit touches (first entry = accountable owner). More than one candidate → show the options and let the user choose, never pick for them; exactly one → name them and ask to confirm; the only owner being the user directing the work → say so instead of proposing a self-review. Add with `gh pr edit <n> --add-reviewer <handle>`, resolving handles from CLAUDE.md's team table (never guess a handle — a wrong one pings a real person). Carry the ask into the open-items block as a handed-off item until it's requested or declined.
 
 ## Metadata quality checks (before the checkpoint)
 
 **Style rules for writing text** live in `.claude/skills/owid-metadata-generation/SKILL.md` — follow its field-by-field guidelines whenever composing new text (description_short must not repeat the title; plain language, expand acronyms; description_key ordered data-specific → methodology → caveats; curly apostrophes; American English; per-field guidance in `schemas/definitions.json`).
 
-**The check suite** is also defined there (see "Metadata quality checks" in that SKILL — the canonical list, mirroring `/update-dataset` §6b/§6c): typos (`/check-metadata-typos`), Jinja spacing (`/check-metadata-spacing`), style guide (`/check-metadata-style`), the manual clarity checklist, link + `#dod:` verification, and adversarial claims verification (`/adversarial-data-review`).
+**The check suite** is also defined there (see "Metadata quality checks" in that SKILL — the canonical list, mirroring `/update-dataset` §6b/§6c): typos (`/check-metadata-typos`), Jinja spacing (`/check-metadata-spacing`), style guide (`/check-metadata-style`), the manual clarity checklist, link + `#dod:` verification, the dimension sweep, and adversarial claims verification (`/adversarial-data-review`).
 
 Scoping rules specific to this skill:
 
 - **Adversarial claims verification is MANDATORY here, but only on the metadata being added or edited — never on the data.** Run `/adversarial-data-review` scoped to the new/changed text: treat every added or edited sentence as a claim and verify it against the producer's documentation (fetch what's behind the links in the edited text and the dataset's snapshot `.dvc` — the link check only proves URLs resolve; this reads what they say). Skip the skill's data-value cross-checks, anomaly scans, and indicator prioritization entirely — no data changed. Unedited metadata is out of scope too. This keeps the pass cheap (a handful of web calls) while catching the failure mode nothing else covers: text that is well-formed, well-styled, and factually wrong (stale methodology attributions, scope overclaims, misread units in prose).
 
+- **Dimension sweep — every sentence must hold at every dimension value it renders on.** Text written for the view the user pointed at then renders on all the sibling views of a dimensional indicator (Jinja over `<dim>`, or a `definitions:` key several variants reference). Render it for every value the indicator takes (recipe in the route-(a) section above) and read each output as a reader of *that* chart, asking what the view already restricts: a caveat that the data doesn't control for X is wrong on the variant grouped **by** X; a scope word like "all employees" overclaims on a variant filtered to a subgroup; a sentence about a toggle is wrong on views that exist for only one choice of that dimension (see also item 4 of [Target-driven description_key restructuring](#target-driven-description_key-restructuring-across-sibling-mdims)). Prefer fixing it by qualifying the wording so it's true everywhere — often one word, and nothing extra to maintain — and add a Jinja branch or a view-level override only when the qualified version loses something the reader needs. Run it before the checkpoint: automated reviewers catch this class reliably, so a sweep of your own saves a review round.
 - **Pin-coupling check — the mirror of [`check-hardcoded-years`](../check-hardcoded-years/SKILL.md)' deliberate-pin signal.** That audit refuses to bump a time pin when the pin's value lives in the FAUST text; this skill edits the text side of the same coupling, so check it from here too, in both directions. (i) When the edited text names a year or a figure the chart's current window produces ("increased 12-fold", "more than 95%", a ratio in the title, "the past three decades"), read the config's `minTime`/`maxTime`/`map.time` before shipping: changing the words without the pin — or leaving words that a pin bump has already invalidated — breaks the pairing that audit deliberately preserves. Scan for **numbers, not just years**: "grown 300%" names no year but is entirely determined by the pinned endpoint. (ii) When *adding* text, an endpoint-dependent figure creates a new coupling that silently goes stale at the next data update — prefer phrasing that survives updates ("has increased more than tenfold" only if it stays true with more years), and where the figure is the point, say so in the PR body so the next update cycle's audit knows the pin↔text pair is deliberate.
 - Route (c) chart-config text has no `.meta.yml` — apply the style guide, the clarity checklist, and a typo pass directly to the new text.
 - If a check rewrites a `.meta.yml`, re-run the affected step (grapher steps with `--grapher`) and re-run the check to confirm zero remaining violations.
@@ -407,6 +451,7 @@ The FAUST diff only covers user-facing **text**. It will NOT catch indicator-ord
 - Do NOT report `description_processing` in dump mode; the user explicitly doesn't care about it for FAUST review.
 - Do NOT load metadata from the garden channel; it exposes pre-template Jinja text and unflattened dimensions. Always use the grapher channel.
 - Do NOT judge "explicitly set at chart level" from `chart_configs.full` — only `patch` distinguishes overrides from inherited values.
+- Do NOT write new text inline under a variable in a `.meta.yml` whose text lives in `definitions:`, and do NOT add a definition that near-duplicates one the file already has — check for an existing key first, and blast-radius it before reusing its name.
 - Do NOT write to production — no `admin.owid.io` writes, no prod DB writes, ever. All chart edits go to the branch's staging server and ride chart-diff to production.
 - Do NOT call `AdminAPI.put_grapher_config` or `put_mdim_config` by hand — the ETL files are the source of truth and the next rebuild overwrites DB-side edits.
 - Do NOT hand-build `staging-site-<branch>` hostnames — use `get_container_name` / `OWIDEnv.from_staging`.

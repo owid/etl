@@ -85,7 +85,7 @@ definitions:
     This indicator is calculated using compensation of employees (wages and salaries in cash and in kind benefits, and social contributions paid by employers) and labor income of the self-employed (the part of the remuneration attributable for work done by self-employed workers).
 
   description_key_ilo_national_estimates: |-
-    This data comes from national sources, typically labor force surveys, household surveys, or population censuses. Each country uses its own definitions and methods, so this data may not be directly comparable across countries and over time.
+    This data comes from the International Labour Organization’s ILOSTAT database, which compiles labor statistics from national sources. Underlying national surveys differ in design and coverage, so cross-country comparisons should be made with some caution.
 
   description_processing_informal_employment: |-
     In the case of Chile, we only select informal employment estimates from 2018 onward, given inconsistencies in the official series for previous years.
