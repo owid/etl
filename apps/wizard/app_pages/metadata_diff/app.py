@@ -37,7 +37,9 @@ from apps.wizard.app_pages.metadata_diff.core import (
     group_changes,
     inline_diff_html,
     override_snippet,
+    parse_catalog_path,
     text_change_key,
+    yaml_field_snippet,
 )
 from apps.wizard.app_pages.metadata_diff.data import (
     build_chart_bundle,
@@ -481,67 +483,126 @@ def _review_markdown(
     return "\n".join(lines)
 
 
+def _decision(catalog_root: str, r: dict[str, Any]) -> str:
+    """The reviewer's call for one change — approved | flagged | pending | stale — used to route it
+    into the PR brief's Apply / Hold / Pending sections."""
+    if r["stale"]:
+        return "stale"
+    label = st.session_state.get(_review_status_key(catalog_root, r["change_key"]), r["seed_label"])
+    return _STATUS_TO_DB.get(label, "pending")
+
+
+# Shared instruction header — spells out what each review decision means, so it never has to be
+# re-explained to whoever executes the PR.
+_BRIEF_LEGEND = [
+    "**How to action each change (from the review decisions):**",
+    "- ✅ **Approve → add to the PR** — apply the edit shown.",
+    "- 🚩 **Flag → hold** — do NOT add; the reviewer wants a change (see the note).",
+    "- ⏳ **Pending → do nothing** — not reviewed yet; leave as-is.",
+    "",
+    "_The **value** to set is exact. The **location** (file + key) is a best guess from the indicator's "
+    "catalogPath — confirm it against the metadata build before committing, since a value set via "
+    "`definitions`/anchors, `shared.meta.yml`, Jinja, or the step `.py` can live elsewhere._",
+    "",
+]
+
+
+def _yaml_block(field_name: str, value: Any) -> list[str]:
+    return ["```yaml", yaml_field_snippet(field_name, value), "```"]
+
+
+def _garden_location_lines(catalog_path: str | None, reach: str) -> list[str]:
+    """File + key hint for a shared indicator field, from its catalogPath. Best-guess location."""
+    parsed = parse_catalog_path(catalog_path)
+    if parsed:
+        garden_dir, table, short = parsed
+        return [
+            f"- **File (best guess):** `{garden_dir}.meta.yml` — or `{garden_dir}.meta.override.yml`",
+            f"- **Key:** `tables.{table}.variables.{short}`",
+            f"- **Reach:** shared — {reach}",
+        ]
+    return [
+        "- **Where:** the indicator's garden `.meta.yml` (catalogPath unavailable)",
+        f"- **Reach:** shared — {reach}",
+    ]
+
+
+def _pending_lines(header: str, rows: list[dict[str, Any]]) -> list[str]:
+    out = [header]
+    for r in rows:
+        tag = "edited since review" if r["stale"] else "not reviewed"
+        out.append(f"- {field_label(r['g'].field)} — {tag}")
+    out.append("")
+    return out
+
+
 def _pr_brief_markdown(
     catalog_path: str,
     baseline_name: str,
     resolved: list[dict[str, Any]],
     usage: dict[int, dict[str, list[dict[str, Any]]]],
 ) -> str:
-    """An execute-ready brief for turning this review into a PR: every change with its exact target
-    (shared garden `.meta.yml` vs a scoped MDim override), the author's scope, before→after, the
-    reviewer's decision + suggested wording, and — for scoped changes — the override snippet.
+    """Decision-grouped PR brief for an MDim: **Apply** (approved) carries a turnkey edit — a pastable
+    YAML value with a best-guess file+key, or a scoped `.py` override; **Hold** (flagged) carries the
+    reviewer's note and is explicitly not applied; **Pending** is listed for reference only."""
+    approved = [r for r in resolved if _decision(catalog_path, r) == "approved"]
+    flagged = [r for r in resolved if _decision(catalog_path, r) == "flagged"]
+    pending = [r for r in resolved if _decision(catalog_path, r) in ("pending", "stale")]
 
-    Markdown for now, but structured so it can drive the actual edits: each entry says *what* to change
-    and *where*, honouring the all-charts vs only-this-view decision."""
     lines = [
         f"# PR brief — `{catalog_path}`",
         "",
-        f"_Baseline: {baseline_name}. {len(resolved)} distinct change(s)._",
+        f"_Baseline: {baseline_name}. ✅ {len(approved)} to apply · 🚩 {len(flagged)} on hold · "
+        f"⏳ {len(pending)} pending._",
         "",
-        "Apply each change at its **Target**, honouring the author's **Scope**. 🚩 flagged items carry the "
-        "reviewer's requested wording under 💬.",
-        "",
+        *_BRIEF_LEGEND,
+        f"## ✅ Apply — add to the PR ({len(approved)})",
     ]
-    for r in resolved:
+    if not approved:
+        lines.append("_Nothing approved yet._")
+    for r in approved:
         g = r["g"]
         field = g.field
-        status = st.session_state.get(_review_status_key(catalog_path, r["change_key"]), r["seed_label"])
-        comment = (st.session_state.get(_review_comment_key(catalog_path, r["change_key"]), "") or "").strip()
-        scope = r["scope"]
-        garden_key = OVERRIDE_TARGET.get(field, (None, None, field))[2]
-        views = "; ".join(_dims_str(d) for d in g.view_dims[:8]) + (" …" if len(g.view_dims) > 8 else "")
-
-        lines.append(f"## {field_label(field)} — {status}")
+        lines.append(f"### {field_label(field)}")
         if not g.affects_indicator:
-            lines.append("- **Target:** MDim-level field — edit this MDim's step (config/py) for its view(s).")
-            lines.append(f"- **Scope:** this MDim only · **Views:** {views}")
-        elif scope == "scoped":
-            n_c = len(r["charts"])
-            others = f"the {n_c} other chart(s) keep the old text" if n_c else "no other surface is affected"
             lines.append(
-                f"- **Target:** MDim override in this MDim's `.py` step — and revert the shared "
-                f"`{garden_key}` change in the indicator's garden `.meta.yml` if it was made there."
+                f"- **Where:** MDim-level field in `{catalog_path}` — set it on the view(s) in this MDim's step."
             )
-            lines.append(f"- **Scope:** only these views ({others}) · **Views:** {views}")
+            lines += _yaml_block(field, g.new)
+        elif r["scope"] == "scoped" and field in OVERRIDE_TARGET:
+            n_c = len(r["charts"])
+            others = f"the {n_c} other chart(s) keep the old text" if n_c else "no other surface changes"
+            lines.append(
+                "- **Where:** scope to these views — add an override in this MDim's `.py` step **and** revert "
+                f"the shared change in the indicator's garden `.meta.yml` ({others})."
+            )
+            lines.append("```python")
+            for dims in g.view_dims[:8]:
+                lines.append(override_snippet(ViewDiff(dimensions=dims), field, g.new))
+            if len(g.view_dims) > 8:
+                lines.append(f"# … and {len(g.view_dims) - 8} more view(s) — same override")
+            lines.append("```")
         else:
             imp = usage.get(g.indicator_id, {}) if g.indicator_id is not None else {}
-            n_c = len(imp.get("charts", []))
-            lines.append(
-                f"- **Target:** indicator garden `.meta.yml` → `{garden_key}` — updates every surface using "
-                "this indicator."
-            )
-            lines.append(f"- **Scope:** all — {n_c} chart(s) + {len(g.view_dims)} view(s) get this text")
-        lines.append(f"- **Before:** {_as_plaintext(g.old)}")
-        lines.append(f"- **After:** {_as_plaintext(g.new)}")
-        if comment:
-            lines.append(f"- **💬 Reviewer:** {comment}")
-        if g.affects_indicator and scope == "scoped" and field in OVERRIDE_TARGET:
-            snippet = override_snippet(ViewDiff(dimensions=g.view_dims[0] if g.view_dims else {}), field, g.new)
-            lines.append("")
-            lines.append("```python")
-            lines.append(snippet)
-            lines.append("```")
+            n_c, n_m = len(imp.get("charts", [])), len(imp.get("mdims", []))
+            reach = f"{n_c} chart(s)" + (f" · {n_m} other MDim(s)" if n_m else "") + f" · {len(g.view_dims)} view(s)"
+            lines += _garden_location_lines(g.catalog_path, reach)
+            lines += _yaml_block(field, g.new)
         lines.append("")
+
+    if flagged:
+        lines.append(f"## 🚩 Hold — flagged, do NOT add ({len(flagged)})")
+        for r in flagged:
+            g = r["g"]
+            comment = (st.session_state.get(_review_comment_key(catalog_path, r["change_key"]), "") or "").strip()
+            lines.append(f"### {field_label(g.field)}")
+            if comment:
+                lines.append(f"- **Reviewer:** {comment}")
+            lines.append(f"- **Proposed:** {_as_plaintext(g.old)} → {_as_plaintext(g.new)}")
+            lines.append("")
+
+    if pending:
+        lines += _pending_lines(f"## ⏳ Pending — no action ({len(pending)})", pending)
     return "\n".join(lines)
 
 
@@ -552,43 +613,56 @@ def _chart_pr_brief_markdown(
     usage: dict[int, dict[str, list[dict[str, Any]]]],
     catalog_root: str,
 ) -> str:
-    """Execute-ready brief for a standalone chart's changes: each change with its target — the indicator's
-    garden `.meta.yml` (shared, so it updates every surface using that indicator) or the chart's own
-    config (title/subtitle/footnote, edited on the chart itself). A standalone chart has no scope
-    decision. Markdown for now, structured to drive the actual PR."""
+    """Decision-grouped PR brief for a standalone chart. Approved indicator-layer changes carry a turnkey
+    garden YAML edit; approved chart-config changes (title/subtitle/footnote) are flagged as NOT an ETL
+    edit (they belong on the chart itself). Flagged → hold; pending → no action."""
+    approved = [r for r in resolved if _decision(catalog_root, r) == "approved"]
+    flagged = [r for r in resolved if _decision(catalog_root, r) == "flagged"]
+    pending = [r for r in resolved if _decision(catalog_root, r) in ("pending", "stale")]
     slug = chart.get("slug")
+
     lines = [
         f"# PR brief — chart `{slug}`",
         "",
-        f"_Baseline: {baseline_name}. {len(resolved)} distinct change(s)._",
+        f"_Baseline: {baseline_name}. ✅ {len(approved)} to apply · 🚩 {len(flagged)} on hold · "
+        f"⏳ {len(pending)} pending._",
         "",
-        "Apply each change at its **Target**. 🚩 flagged items still need the author's attention.",
-        "",
+        *_BRIEF_LEGEND,
+        f"## ✅ Apply — add to the PR ({len(approved)})",
     ]
-    for r in resolved:
+    if not approved:
+        lines.append("_Nothing approved yet._")
+    for r in approved:
         g = r["g"]
         field = g.field
-        status = st.session_state.get(_review_status_key(catalog_root, r["change_key"]), r["seed_label"])
-        lines.append(f"## {field_label(field)} — {status}")
+        lines.append(f"### {field_label(field)}")
         if field.startswith(CHART_FIELD_PREFIX):
             lines.append(
-                "- **Target:** the chart's **own config** (title/subtitle/footnote) — edit it on the chart "
-                "itself (grapher config / admin), not in indicator metadata."
+                "- ⚠️ **Not an ETL edit** — this is the chart's own config (title/subtitle/footnote). Change "
+                "it on the chart itself (grapher admin / chart-diff), not in the ETL repo."
             )
+            lines.append(f"- **Set to:** {_as_plaintext(g.new)}")
         elif g.affects_indicator:
             imp = usage.get(g.indicator_id, {}) if g.indicator_id is not None else {}
             n_c, n_m = len(imp.get("charts", [])), len(imp.get("mdims", []))
-            garden_key = OVERRIDE_TARGET.get(field, (None, None, field))[2]
-            others = f"{n_c} other chart(s)" + (f" · {n_m} MDim(s)" if n_m else "")
-            lines.append(
-                f"- **Target:** indicator garden `.meta.yml` → `{garden_key}` — shared, so this updates the "
-                f"data page of every surface using this indicator ({others})."
-            )
+            reach = f"{n_c} other chart(s)" + (f" · {n_m} MDim(s)" if n_m else "") or "no other surface"
+            lines += _garden_location_lines(g.catalog_path, reach)
+            lines += _yaml_block(field, g.new)
         else:
-            lines.append("- **Target:** the indicator's garden `.meta.yml`.")
-        lines.append(f"- **Before:** {_as_plaintext(g.old)}")
-        lines.append(f"- **After:** {_as_plaintext(g.new)}")
+            lines.append("- **Where:** the indicator's garden `.meta.yml`.")
+            lines += _yaml_block(field, g.new)
         lines.append("")
+
+    if flagged:
+        lines.append(f"## 🚩 Hold — flagged, do NOT add ({len(flagged)})")
+        for r in flagged:
+            g = r["g"]
+            lines.append(f"### {field_label(g.field)}")
+            lines.append(f"- **Proposed:** {_as_plaintext(g.old)} → {_as_plaintext(g.new)}")
+            lines.append("")
+
+    if pending:
+        lines += _pending_lines(f"## ⏳ Pending — no action ({len(pending)})", pending)
     return "\n".join(lines)
 
 

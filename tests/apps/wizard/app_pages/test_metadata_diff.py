@@ -12,6 +12,8 @@ from apps.wizard.app_pages.metadata_diff.core import (
     diff_views,
     group_changes,
     override_snippet,
+    parse_catalog_path,
+    yaml_field_snippet,
 )
 from apps.wizard.app_pages.metadata_diff.usage import _indicator_ids_in_mdim_config
 
@@ -129,6 +131,28 @@ def test_override_snippet_routes_each_field():
     # chart field -> view.config
     cs = override_snippet(v, "chart.subtitle", "S")
     assert "view.config = view.config or {}" in cs and 'view.config["subtitle"] = "S"' in cs
+
+
+def test_parse_catalog_path_resolves_garden_file_and_anchor():
+    """The PR brief resolves an indicator catalogPath to (garden dir, table, short_name)."""
+    assert parse_catalog_path("grapher/worldbank_wdi/2026-07-27/wdi/wdi#fp_cpi_totl_zg") == (
+        "etl/steps/data/garden/worldbank_wdi/2026-07-27/wdi",
+        "wdi",
+        "fp_cpi_totl_zg",
+    )
+    # No explicit table segment -> table defaults to the dataset name.
+    assert parse_catalog_path("grapher/ns/2020-01-01/ds#col") == ("etl/steps/data/garden/ns/2020-01-01/ds", "ds", "col")
+    # Unusable inputs return None (brief falls back to a generic hint).
+    assert parse_catalog_path(None) is None
+    assert parse_catalog_path("grapher/ns/2020/ds") is None
+
+
+def test_yaml_field_snippet_is_pastable():
+    """The snippet uses the snake_case metadata key and renders lists as YAML bullets."""
+    assert yaml_field_snippet("descriptionShort", "Annual inflation.") == "description_short: Annual inflation."
+    dk = yaml_field_snippet("descriptionKey", ["One.", "Two."])
+    assert dk.splitlines()[0] == "description_key:"
+    assert "- One." in dk and "- Two." in dk
 
 
 def test_group_changes_collapses_shared_text_and_ranks_by_reach():

@@ -16,6 +16,8 @@ import json
 from dataclasses import dataclass, field
 from typing import Any
 
+from etl.files import ruamel_dump
+
 # Metadata fields we diff, in display order. Keys are the camelCase names used both as
 # columns of the `variables` table and in the (camelized) view-level `metadata`
 # overrides stored in the MDIM config.
@@ -71,6 +73,7 @@ class ViewBundle:
     # (the indicator itself changed) or contained to this MDIM (only an override changed).
     base: dict[str, Any] = field(default_factory=dict)
     indicator_id: int | None = None  # id of the view's first y-indicator in this environment
+    catalog_path: str | None = None  # e.g. grapher/ns/ver/dataset/table#short_name — for the PR brief
 
 
 @dataclass
@@ -81,6 +84,7 @@ class ViewDiff:
     fields: dict[str, dict[str, Any]] = field(default_factory=dict)
     # Staging id of the view's first y-indicator — the key for the blast-radius lookup.
     indicator_id: int | None = None
+    catalog_path: str | None = None  # indicator catalogPath — resolves to the garden file in the PR brief
     # Subset of METADATA_FIELDS whose *indicator-layer* value changed (i.e. the change is not
     # just an MDIM override). These are the changes that also propagate to charts / other MDIMs.
     indicator_changed_fields: set[str] = field(default_factory=set)
@@ -151,6 +155,9 @@ def build_view_bundle(
             base["titlePublic"] = variable_row.get("name")
         if variable_row.get("id") is not None:
             indicator_id = int(variable_row["id"])
+    catalog_path = variable_row.get("catalogPath") if variable_row else None
+    if _is_nan(catalog_path):
+        catalog_path = None
 
     merged = base
     for override in (config_metadata, view.get("metadata")):
@@ -161,7 +168,14 @@ def build_view_bundle(
     if chart_config:
         chart = {key: chart_config.get(key) for key in CHART_FIELDS}
 
-    return ViewBundle(dimensions=view["dimensions"], metadata=merged, chart=chart, base=base, indicator_id=indicator_id)
+    return ViewBundle(
+        dimensions=view["dimensions"],
+        metadata=merged,
+        chart=chart,
+        base=base,
+        indicator_id=indicator_id,
+        catalog_path=str(catalog_path) if catalog_path else None,
+    )
 
 
 def as_bullets(value: Any) -> Any:
@@ -211,7 +225,12 @@ def diff_views(
     diffs = []
     for src in source_bundles:
         target = target_by_key.get(_dims_key(src.dimensions))
-        view_diff = ViewDiff(dimensions=src.dimensions, is_new=target is None, indicator_id=src.indicator_id)
+        view_diff = ViewDiff(
+            dimensions=src.dimensions,
+            is_new=target is None,
+            indicator_id=src.indicator_id,
+            catalog_path=src.catalog_path,
+        )
 
         for fields, attr, prefix in (
             (METADATA_FIELDS, "metadata", ""),
@@ -289,6 +308,38 @@ def override_snippet(view: ViewDiff, field_name: str, value: Any) -> str:
     return "\n".join(lines)
 
 
+def parse_catalog_path(catalog_path: str | None) -> tuple[str, str, str] | None:
+    """Resolve an indicator's grapher catalogPath to (garden .meta file dir, table, short_name).
+
+    `grapher/worldbank_wdi/2026-07-27/wdi/wdi#fp_cpi_totl_zg`
+        -> ('etl/steps/data/garden/worldbank_wdi/2026-07-27/wdi', 'wdi', 'fp_cpi_totl_zg')
+
+    The metadata texts are authored in the *garden* step, so we point there (the grapher step just
+    re-exports). The exact filename (`<dataset>.meta.yml` vs `.meta.override.yml`) and whether the
+    garden version matches the grapher one are confirmed when the PR is actually built."""
+    if not catalog_path or "#" not in catalog_path:
+        return None
+    left, short_name = catalog_path.split("#", 1)
+    parts = left.strip("/").split("/")
+    if parts and parts[0] in ("grapher", "garden", "meadow", "snapshot"):
+        parts = parts[1:]
+    if len(parts) < 3 or not short_name:
+        return None
+    namespace, version, dataset = parts[0], parts[1], parts[2]
+    table = parts[3] if len(parts) >= 4 else dataset
+    return f"etl/steps/data/garden/{namespace}/{version}/{dataset}", table, short_name
+
+
+def yaml_field_snippet(field_name: str, value: Any) -> str:
+    """A pastable `<snake_key>: <value>` YAML snippet for one indicator metadata field, so the value
+    (including multi-bullet `description_key` lists) can be dropped straight under its variable."""
+    key = OVERRIDE_TARGET.get(field_name, (None, None, field_name))[2]
+    try:
+        return ruamel_dump({key: value}).rstrip("\n")
+    except Exception:
+        return f"{key}: {value!r}"
+
+
 @dataclass
 class ChangeGroup:
     """One distinct text change, shared by every view that renders it — the review unit.
@@ -303,6 +354,7 @@ class ChangeGroup:
     view_dims: list[dict[str, str]] = field(default_factory=list)
     affects_indicator: bool = False
     indicator_id: int | None = None
+    catalog_path: str | None = None  # indicator catalogPath (shared changes) — for the PR brief
 
 
 def group_changes(view_diffs: list[ViewDiff]) -> list[ChangeGroup]:
@@ -328,6 +380,8 @@ def group_changes(view_diffs: list[ViewDiff]) -> list[ChangeGroup]:
                 g.affects_indicator = True
                 if g.indicator_id is None:
                     g.indicator_id = v.indicator_id
+                if g.catalog_path is None:
+                    g.catalog_path = v.catalog_path
     return sorted((groups[k] for k in order), key=lambda g: (-len(g.view_dims), g.field))
 
 
