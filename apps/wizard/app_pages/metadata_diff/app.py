@@ -606,7 +606,7 @@ def _scope_label(scope: str, g: Any, usage: dict[int, dict[str, list[dict[str, A
     n_c, n_m = len(imp.get("charts", [])), len(imp.get("mdims", []))
     reach = f"{n_c} chart{'s' if n_c != 1 else ''}" + (f" · {n_m} other MDim{'s' if n_m else ''}" if n_m else "")
     if scope == "scoped":
-        return "✏️ Author: **scope to these views only** (other surfaces revert)"
+        return "✏️ Author: **scope to these views only**"
     return f"🔗 Author: **apply to all** — {reach}"
 
 
@@ -689,10 +689,10 @@ def render_review_page(
         states.count("pending"),
     )
 
-    # --- Review status (this pass is OPTIONAL — it doesn't gate the PR or the merge) ---
+    # --- Review status: iterate on the changes, then share comments or create a PR at the end ---
     st.caption(
-        "This review pass is **optional** — a way to go through the metadata changes with the author and "
-        "iterate on them before they ship. It doesn't gate the PR or the merge."
+        "This review pass is a way to go through the metadata changes and iterate with the author. At the "
+        "end of the review, you can decide whether to share comments with the author or create a PR."
     )
     if n_appr == n and n > 0:
         st.success(f"✅ **All {n} changes reviewed** — approved.")
@@ -1016,8 +1016,8 @@ def _render_chart_review(
 
     st.divider()
     st.caption(
-        "This review pass is **optional** — a way to go through the chart's changes and iterate before "
-        "they ship. It doesn't gate the PR or the merge."
+        "This review pass is a way to go through the chart's metadata changes. At the end of the review, "
+        "you can create a PR of the changes."
     )
     if n_appr == n and n > 0:
         st.success(f"✅ **All {n} change{'s' if n != 1 else ''} reviewed** — approved.")
