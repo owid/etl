@@ -191,6 +191,8 @@ Set in `definitions.common`, override per-variable as needed.
 
 **Use `<<: *anchor` merge** to extend a shared mapping while overriding specific keys (e.g. `<<: *common_display` then `numDecimalPlaces: 0`).
 
+**Adding text to an existing file: follow the pattern it already uses.** If its text lives in `definitions:` and variables reference `{definitions.<key>}`, add your text as new definitions at the top next to the related ones — inline prose under the variable renders fine but leaves the file with two authoring styles. In big datasets prefer definitions-at-top regardless of reuse: with hundreds of variables it is what keeps the file readable, since all the prose sits in one place and the variable blocks stay skimmable. Grep the existing definitions first: new text often duplicates a bullet already defined under another name, and reusing (or replacing that key's text, after checking which other variables reference it) beats a near-duplicate. Details and the text-neutrality proof for such refactors are in `.claude/skills/edit-faust-metadata/SKILL.md` ("Writing new text into a garden `.meta.yml`").
+
 **Use Jinja templates** for dimensional datasets (age, sex, cause breakdowns). Custom delimiters: `<% %>` for blocks, `<< >>` for expressions.
 
 ```yaml
@@ -209,6 +211,8 @@ variables:
     display:
       name: With <<who_category>>
 ```
+
+**Sweep every dimension value before you ship dimensional text.** A sentence written with one breakdown in mind renders on all the others, where the view's own filtering can make it false: a caveat that the data doesn't control for X is wrong on the variant grouped **by** X, and a scope word like "all workers" overclaims on a variant restricted to a subgroup. Render the text for every value the indicator takes and read each output as a reader of that chart; qualify the wording so it holds everywhere (usually one word) rather than adding a Jinja branch, unless the qualified version loses something the reader needs.
 
 **Use `{definitions.xxx}` string interpolation** for reusing text fragments inline (e.g. `'{definitions.methodology}'` in a `description_key` bullet). Unlike YAML anchors which substitute entire nodes, this inserts text within strings. Use anchors for whole fields/blocks, interpolation for composing text.
 
