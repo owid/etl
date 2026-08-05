@@ -4,6 +4,7 @@ definitions:
   common:
     processing_level: major
     presentation:
+      attribution: Central Statistics Office, Ireland (1934, 2023, 2025)
       topic_tags:
         - Migration
       grapher_config:
