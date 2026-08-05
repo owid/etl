@@ -851,10 +851,16 @@ def _pr_brief_markdown(
             lines += _surface_lines(g, usage, "all")
             # For a shared definition the pastable full-field YAML would break the Jinja branches, so
             # show the changed line instead; a plain per-variable field still gets the pastable block.
-            if len(distinct_indicator_short_names(g.catalog_paths)) > 1:
-                lines += _changed_text_lines(g)
-            else:
-                lines += _yaml_block(field, g.new)
+            # The changed line is always the safe, minimal edit. The full rendered field is kept for
+            # reference but explicitly NOT pastable unless the field is authored literally — most
+            # description_key fields are lists of `{definitions.*}` refs, and overwriting them with a
+            # rendered value silently drops every other definition and Jinja branch.
+            lines += _changed_text_lines(g)
+            lines.append(
+                "- _Full rendered value, for reference — do **not** paste it over the field unless "
+                "the field is authored literally (no `{definitions.*}` refs, no Jinja):_"
+            )
+            lines += _yaml_block(field, g.new)
         lines.append("")
 
     if flagged:
@@ -917,10 +923,16 @@ def _chart_pr_brief_markdown(
             reach = f"{n_c} other chart(s)" + (f" · {n_m} MDim(s)" if n_m else "") or "no other surface"
             lines += _garden_location_lines(g, reach)
             lines += _surface_lines(g, usage, "all")
-            if len(distinct_indicator_short_names(g.catalog_paths)) > 1:
-                lines += _changed_text_lines(g)
-            else:
-                lines += _yaml_block(field, g.new)
+            # The changed line is always the safe, minimal edit. The full rendered field is kept for
+            # reference but explicitly NOT pastable unless the field is authored literally — most
+            # description_key fields are lists of `{definitions.*}` refs, and overwriting them with a
+            # rendered value silently drops every other definition and Jinja branch.
+            lines += _changed_text_lines(g)
+            lines.append(
+                "- _Full rendered value, for reference — do **not** paste it over the field unless "
+                "the field is authored literally (no `{definitions.*}` refs, no Jinja):_"
+            )
+            lines += _yaml_block(field, g.new)
         else:
             lines.append("- **Where:** the indicator's garden `.meta.yml`.")
             lines += _yaml_block(field, g.new)
