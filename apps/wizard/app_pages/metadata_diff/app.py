@@ -363,6 +363,18 @@ def _render_author_scope(
         "The reviewer is shown this and approves or rejects it — they don't set it.",
     )
 
+    # Choosing "apply to all" must show WHAT it applies to: a count is not something the author can
+    # check, so name every chart here, at the moment of the decision (and again in the PR brief).
+    if st.session_state.get(sk) == "all" and (n_c or n_m):
+        rows = []
+        for c in sorted(imp.get("charts", []), key=lambda c: str(c.get("slug") or "")):
+            slug = c.get("slug") or f"chart {c.get('chartId')}"
+            flag = "" if c.get("wysk_shown", True) else " ⚠️ no data page — WYSK not shown to readers"
+            rows.append(f"- [`{slug}`]({SOURCE.site}/grapher/{slug}){flag}")
+        for m in sorted(imp.get("mdims", []), key=lambda m: str(m.get("slug") or "")):
+            rows.append(f"- MDim `{m.get('slug') or m.get('catalogPath')}`")
+        st.warning(f"**This will change {reach}.** These are the surfaces that get the new text:\n" + "\n".join(rows))
+
 
 def _render_diff_body(
     view_diff: ViewDiff,
@@ -587,6 +599,37 @@ def _garden_location_lines(g: ChangeGroup, reach: str) -> list[str]:
     ]
 
 
+def _surface_lines(g: ChangeGroup, usage: dict[int, dict[str, list[dict[str, Any]]]], scope: str) -> list[str]:
+    """Name every chart and MDim this change lands on — not just a count.
+
+    A count ("10 charts") is not something an author can check. Applying to all means those specific
+    charts change, so the brief lists them by slug, and flags any chart that does NOT render a data page
+    (a multi-indicator chart has no single data page, so a WYSK edit is invisible to its readers). When
+    the change is scoped, the same list is what *keeps* the old text — equally worth seeing."""
+    imp = _group_usage(g, usage)
+    charts, mdims = imp.get("charts", []), imp.get("mdims", [])
+    if not charts and not mdims:
+        return ["- **Affected surfaces:** none — no published chart or other MDim uses these indicators."]
+
+    verb = "will change" if scope != "scoped" else "keep the old text (scoped)"
+    out: list[str] = []
+    if charts:
+        out.append(f"- **Charts that {verb} ({len(charts)}):**")
+        for c in sorted(charts, key=lambda c: str(c.get("slug") or "")):
+            slug = c.get("slug") or f"chart {c.get('chartId')}"
+            note = (
+                ""
+                if c.get("wysk_shown", True)
+                else " — ⚠️ multi-indicator chart: no data page, so WYSK is not shown to readers"
+            )
+            out.append(f"  - [`{slug}`](https://ourworldindata.org/grapher/{slug}){note}")
+    if mdims:
+        out.append(f"- **Other MDims that {verb} ({len(mdims)}):**")
+        for m in sorted(mdims, key=lambda m: str(m.get("slug") or "")):
+            out.append(f"  - `{m.get('slug') or m.get('catalogPath')}`")
+    return out
+
+
 def _pending_lines(header: str, rows: list[dict[str, Any]]) -> list[str]:
     out = [header]
     for r in rows:
@@ -766,11 +809,14 @@ def _pr_brief_markdown(
             if len(g.view_dims) > 8:
                 lines.append(f"# … and {len(g.view_dims) - 8} more view(s) — same override")
             lines.append("```")
+            lines += _surface_lines(g, usage, "scoped")
         else:
             imp = _group_usage(g, usage)
             n_c, n_m = len(imp.get("charts", [])), len(imp.get("mdims", []))
             reach = f"{n_c} chart(s)" + (f" · {n_m} other MDim(s)" if n_m else "") + f" · {len(g.view_dims)} view(s)"
             lines += _garden_location_lines(g, reach)
+            # Applying to all means these specific charts change — name them, so the author can check.
+            lines += _surface_lines(g, usage, "all")
             lines += _yaml_block(field, g.new)
         lines.append("")
 
@@ -833,6 +879,7 @@ def _chart_pr_brief_markdown(
             n_c, n_m = len(imp.get("charts", [])), len(imp.get("mdims", []))
             reach = f"{n_c} other chart(s)" + (f" · {n_m} MDim(s)" if n_m else "") or "no other surface"
             lines += _garden_location_lines(g, reach)
+            lines += _surface_lines(g, usage, "all")
             lines += _yaml_block(field, g.new)
         else:
             lines.append("- **Where:** the indicator's garden `.meta.yml`.")
