@@ -1387,11 +1387,7 @@ def main() -> None:
         "Compare against",
         key="baseline",
         options=list(BASELINES),
-        format_func=lambda b: (
-            "🌍 Production (what readers will see change)"
-            if b == "production"
-            else "🌿 master (what this branch changes)"
-        ),
+        format_func=lambda b: "🌍 Production" if b == "production" else "🌿 Master (what this branch changes)",
         horizontal=True,
         help="Production can lag behind master (e.g. while a deploy is pending), which shows up "
         "here as changes this branch didn't make. Compare against `staging-site-master` to "
