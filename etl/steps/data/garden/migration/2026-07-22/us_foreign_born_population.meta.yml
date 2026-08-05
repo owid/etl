@@ -1,0 +1,147 @@
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+definitions:
+  common:
+    presentation:
+      attribution: US Census Bureau (2006, 2025)
+      topic_tags:
+        - Migration
+      grapher_config:
+        note: This is a snapshot of the people present at a given time, not a count of arrivals.
+  who_counts: |-
+    The foreign-born population covers everyone living in the United States who was not a US citizen at birth, whatever their current legal status. People born in the United States, in its territories such as Puerto Rico, or abroad to American parents count as native-born.
+  sources: |-
+    The data comes from two sources with the same definition of foreign-born:
+    - **1850–2000:** the decennial census. Figures up to 1940 come from a full count of the population; figures from 1950 to 2000 are based on large census samples (between 1 in 4 and 1 in 6 people).
+    - **2005 onward:** the American Community Survey, an annual survey of about 3.5 million households. Survey estimates are less exact than a census count.
+  caveats: |-
+    Two things changed over the course of the series:
+    - The population included: Alaska and Hawaii are included from 1960 onward. The 1890 figures exclude about 325,000 people living in the Indian Territory and on Indian reservations, who were not asked about their place of birth.
+    - The list of US territories: people born in a territory count as native-born, so when a territory's status changed, so did their classification. For example, people born in the Philippines counted as native-born until it became independent in 1946, and as foreign-born after.
+  missing_years: |-
+    There is no data for 1940 and 1950, because the census publications of those years only gave the country of birth of the white population, and no data for 2020, because no survey estimates were released for that year.
+  old_countries: |-
+    Country borders have changed over this period, so a country's figures may not always refer to the same area.
+    - The Soviet Union includes its Asian part for the whole period; before 1920 it corresponds to the Russian Empire.
+    - Before 1930, the United Kingdom figures cover Great Britain only; Northern Ireland is included in the Ireland figures.
+    - China includes Taiwan until 1980 and excludes it afterward. The source does not say how Hong Kong is counted before 1980. Between 1980 and 2005, people born in Taiwan and Hong Kong are grouped in the "Not specified" category. They are only shown separately from 2005 onward.
+    - Czechoslovakia covers Czechia and Slovakia combined, including in the years after the country split. Korea includes both North and South Korea.
+  undercount: |-
+    People living in the country without authorization are included in the definition, but censuses and surveys are known to miss part of this group. Other sources that try to adjust for this can find a slightly higher foreign-born population.
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Edouard Mathieu
+
+tables:
+  us_foreign_born_population:
+    variables:
+      foreign_born_population:
+        title: Foreign-born population of the United States
+        unit: people
+        short_unit: ""
+        description_key: |-
+          {definitions.who_counts}
+
+          {definitions.sources}
+
+          {definitions.caveats}
+
+          {definitions.undercount}
+        display:
+          numDecimalPlaces: 0
+      share_foreign_born:
+        title: Share of the United States population born in another country
+        unit: "%"
+        short_unit: "%"
+        description_key: |-
+          {definitions.who_counts}
+
+          {definitions.sources}
+
+          {definitions.caveats}
+
+          {definitions.undercount}
+        description_processing: |-
+          We calculated this indicator by dividing the foreign-born population by the total resident population reported by the same census or survey. Using the same source for both numbers means the share is internally consistent: any undercount affects both the numerator and the denominator.
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
+  by_country_of_birth:
+    variables:
+      foreign_born_population:
+        title: Foreign-born population of the United States, by country of birth
+        unit: people
+        short_unit: ""
+        description_key: |-
+          {definitions.who_counts}
+
+          {definitions.sources}
+
+          {definitions.missing_years}
+
+          {definitions.old_countries}
+
+          {definitions.caveats}
+
+          Entities like "Asia (not specified)" cover people known to be born in a region but in a country the source does not list separately. Their size depends on how many countries the source lists: the census data lists only about 40, so by 2000 they cover about 40% of the foreign-born population, while the survey data from 2005 onward lists about 120, leaving only a few percent unattributed. "Not specified" covers the small number of people with no recorded country of birth, including people born at sea.
+
+          {definitions.undercount}
+        description_processing: |-
+          We combined the source's "Turkey in Europe" and "Turkey in Asia" series into a single series for Turkey, and used the source's Great Britain series to extend the United Kingdom series before 1930. People not attributed to a listed country are assigned to a "(not specified)" entity of their region, so all entities together add up to the source's total.
+        processing_level: major
+        display:
+          numDecimalPlaces: 0
+          entityAnnotationsMap: |-
+            Korea: includes North & South
+            Czechoslovakia: includes Czechia & Slovakia
+
+  share_by_origin_group:
+    variables:
+      share_of_population:
+        title: Share of the United States population born in another country, by place of birth
+        unit: "%"
+        short_unit: "%"
+        description_key: |-
+          {definitions.who_counts}
+
+          {definitions.sources}
+
+          {definitions.missing_years}
+
+          {definitions.caveats}
+
+          "Rest of America" covers everyone born in the Americas outside Mexico and Canada. "Not specified" covers people whose country of birth was not recorded, and people born at sea.
+
+          {definitions.undercount}
+        description_processing: |-
+          We calculated these shares by dividing the foreign-born population of each group of origin by the total resident population reported by the same census or survey. "Rest of America" is the Americas minus Mexico and Canada. People born in the European part of Turkey are counted in Asia, and everyone born in the former Soviet Union is counted in Europe.
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
+  by_region_of_birth:
+    variables:
+      foreign_born_population:
+        title: Foreign-born population of the United States, by region of birth
+        unit: people
+        short_unit: ""
+        description_key: |-
+          {definitions.who_counts}
+
+          {definitions.sources}
+
+          {definitions.missing_years}
+
+          {definitions.caveats}
+
+          "Not specified" covers people whose country of birth was not recorded, and people born at sea.
+
+          {definitions.undercount}
+        description_processing: |-
+          We calculated these regional totals from the source's data, grouping countries into regions as defined by Our World in Data. They can differ from the source's own regional totals: for example, we count the Caribbean and Central America (including Mexico) as part of North America. Everyone born in the former Soviet Union is counted in Europe, because the source does not separate its Asian part.
+        processing_level: major
+        display:
+          numDecimalPlaces: 0

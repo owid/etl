@@ -1,0 +1,36 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Yearbook of Immigration Statistics
+    title_snapshot: Yearbook of Immigration Statistics 2020 - Lawful Permanent Residents
+    description: |-
+      The 2020 Yearbook of Immigration Statistics is a collection of tables about immigration for the fiscal year.
+    description_snapshot: |-
+      This archive contains the Lawful Permanent Residents tables of the 2020 Yearbook (Tables 1-12). We use this older edition of the yearbook because its Table 2 shows the number of people who obtained lawful permanent resident status by region and country of last residence for each decade, from the 1820s to the 2010s. Later editions of the yearbook only show the last ten fiscal years.
+
+      DHS notes on the historical data: official recording of immigration to the United States began in 1820. From 1820 to 1867, the figures count passengers arriving at seaports; from 1868 to 1891 and 1895 to 1897, arriving immigrants; and from 1892 onward, immigrants admitted for permanent residence. People arriving by land were not fully counted until 1908. Before 1906, the figures refer to a person's country of origin; from 1906 onward, to their country of last residence. A few early fiscal years were shorter or longer than 12 months (1832, 1843, 1850, 1868, and 1976).
+    date_published: "2022-01-06"
+
+    # Citation
+    producer: US Department of Homeland Security
+    citation_full: |-
+      United States. Department of Homeland Security. 2020 Yearbook of Immigration Statistics. Washington, D.C.: U.S. Department of Homeland Security, Office of Immigration Statistics, 2022.
+    attribution_short: DHS
+
+    # Files
+    url_main: https://ohss.dhs.gov/topics/immigration/yearbook/2020/table2
+    # NOTE: the 2020 Yearbook also ships an LPR supplementary-tables zip
+    # (21_0920_plcy_2020_yrbk_lpr_supplement.zip) and workbooks for the other yearbook
+    # sections (refugees, naturalizations, nonimmigrants, enforcement) - not snapshotted (2026-07-22).
+    url_download: https://ohss.dhs.gov/sites/default/files/2023-12/21_0920_plcy_2020_yrbk_lpr_excel_final.zip
+    date_accessed: "2026-07-22"
+
+    # License
+    license:
+      name: Public domain
+outs:
+  - md5: cd3fa1ebd9162852ec93b80c816774c0
+    size: 218821
+    path: yearbook_lawful_permanent_residents_2020.zip
