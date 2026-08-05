@@ -299,23 +299,11 @@ def add_reserves_to_production_ratio(tb: Table, tb_review: Table) -> Table:
 
 
 def add_total_fossil_fuels(tb: Table) -> Table:
-    """Add total fossil fuel production (coal + oil + gas), absolute and per capita."""
-    specs = {
-        "production_twh": ("Fossil fuel production", "terawatt-hours", "TWh"),
-        "production_per_capita_kwh": ("Fossil fuel production per capita", "kilowatt-hours per person", "kWh"),
-        "consumption_twh": ("Fossil fuel consumption", "terawatt-hours", "TWh"),
-        "consumption_per_capita_kwh": ("Fossil fuel consumption per capita", "kilowatt-hours per person", "kWh"),
-    }
-    for suffix, (title, unit, short_unit) in specs.items():
-        cols = [f"{fuel}_{suffix}" for fuel in FUELS]
+    """Add total fossil fuel production and consumption (coal + oil + gas), absolute and per capita."""
+    for suffix in ["production_twh", "production_per_capita_kwh", "consumption_twh", "consumption_per_capita_kwh"]:
         # Table.sum(axis=1) preserves the columns' metadata/origins. min_count=1 keeps NaN only where
         # every fuel is missing (a coal-only producer's total is just its coal production).
-        tb[f"total_{suffix}"] = tb[cols].sum(axis=1, min_count=1)
-        meta = tb[f"total_{suffix}"].metadata
-        meta.title = title
-        meta.unit = unit
-        meta.short_unit = short_unit
-        meta.display = {"name": "Fossil fuels"}
+        tb[f"total_{suffix}"] = tb[[f"{fuel}_{suffix}" for fuel in FUELS]].sum(axis=1, min_count=1)
     return tb
 
 
