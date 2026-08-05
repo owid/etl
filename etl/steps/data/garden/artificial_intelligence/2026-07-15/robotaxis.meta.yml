@@ -36,6 +36,7 @@ tables:
           name: Completed trips
           numDecimalPlaces: 0
 
+          timeInterval: month
       totalpassengerscarried:
         title: Monthly number of people who rode in robotaxis
         unit: passengers
@@ -52,6 +53,7 @@ tables:
           name: Passengers carried
           numDecimalPlaces: 0
 
+          timeInterval: month
       totalpmt:
         title: Monthly distance traveled by robotaxi passengers
         unit: kilometers
@@ -70,3 +72,4 @@ tables:
         display:
           name: Passenger-kilometers
           numDecimalPlaces: 0
+          timeInterval: month

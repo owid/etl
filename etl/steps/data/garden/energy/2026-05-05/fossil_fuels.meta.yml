@@ -189,7 +189,11 @@ tables:
         title: Monthly oil production
         unit: cubic metres
         short_unit: m³
+        display:
+          timeInterval: month
       oil_production_monthly_per_capita:
         title: Monthly oil production per capita
         unit: cubic metres per person
         short_unit: m³
+        display:
+          timeInterval: month
