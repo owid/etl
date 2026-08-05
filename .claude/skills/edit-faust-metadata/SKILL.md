@@ -118,6 +118,7 @@ Match the file's own authoring pattern before writing a single sentence — your
   - keep the new, better wording but place it **under the existing key's name**, replacing that key's text.
 
   The second reaches every indicator already referencing that key, so **blast-radius the shared key first** — `blast_radius.py --anchor <key> --meta-file <path>` expands a definitions key to its variables — and report which surfaces the reworded text lands on. Also check the new wording still fits the key's *name* and the distinction it encodes: a key called `…_national_estimates` should not end up asserting the data is harmonized.
+- **Read the whole rendered list before adding to it — new text must not read as redundant.** This applies to any field but bites hardest on `description_key`, where bullets are read as a set under `description_short` and the chart's title/subtitle. Render the existing bullets for the view being edited (not the raw YAML — a Jinja branch may already say your sentence for that dimension value) and ask what the new one adds. If it only says an existing bullet more fully, edit that bullet instead of adding a second; if it repeats another bullet at the same level of detail, drop it. Expanding `description_short` is fine and often expected — that one-sentence summary is meant to be unpacked here; the thing to avoid is a bullet that restates it without going further. Field-by-field style rules, including this one, are in [`owid-metadata-generation`](../owid-metadata-generation/SKILL.md).
 - **Then widen the search past the file, to the other datasets carrying the same text.** Metadata boilerplate travels: the same source caveat, classification note, or methodology sentence is often pasted into several datasets' `.meta.yml` (and mirrored in MDim `.py` constants). Search a few **distinctive 5–8 word fragments** of the text across `etl/steps/` — near-duplicates differ by a word or two, so one long exact-match search finds nothing while three short ones find everything:
 
   ```bash
@@ -153,6 +154,17 @@ Run it whenever:
 - the route is **(c)** and the chart has narrative-chart children or gdoc embeds (the reporter checks).
 
 It sweeps: **charts** (with `--field`, charts shielded by their own patch override of that field are listed separately — they will NOT change; for the chart-text fields title/subtitle/note, charts with no inheritance path — variable not a y series, several y series, or inheritance disabled — are also listed separately and excluded from the beyond-target count, since grapher only inherits chart config from a single-y, inheritance-enabled parent), **MDim views**, **explorer views** (legacy CSV explorers are invisible to these tables — caveat is printed), **narrative charts**, and **article references** (informational: embeds don't break, but the displayed text changes).
+
+**Report it specifically, never as counts alone.** "13 charts, 3 MDim views" tells the user nothing they can check: they can't see whether the affected surfaces are the ones where the new wording actually fits. Pass on what the script prints, for **every** surface — not just charts:
+
+- the **indicators** carrying the edit, with how many charts each feeds, so a lopsided distribution is visible;
+- **charts** as links, each annotated with the indicator it comes through, published state included;
+- **MDim views** as links — the reader URL with the view's dimension query string, plus the admin collection preview;
+- **explorers** as links, with the number of affected views in each;
+- **narrative charts** as admin links, marking the ones shielded by their own override;
+- **article references**, which change what readers see even though the embeds keep working.
+
+Then read the slugs before asking, and say what you notice: a slug can reveal that the edit lands somewhere the wording contradicts (a `…-modeled-vs-national` chart receiving a sentence about harmonized data), which is the finding the user needs and a count can never carry. Keep the list in the chat message, not only in a file — and if it's long, lead with the surfaces that matter and say how many more there are.
 
 `blast_radius.py` stays the tool for *this* skill: its value is the per-field inheritance analysis (which surfaces are shielded by their own patch, which have no inheritance path), which decides whether an edit actually reaches a surface — a question no generic sweep answers. For the plainer question "what references this object at all", including surfaces this script doesn't cover (data insights, static viz, key-chart slots, WordPress), use `find-chart-references`.
 

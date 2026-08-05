@@ -448,6 +448,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - Domain phrases that have a plain-English equivalent (e.g. "anthropogenic emissions" → "human-caused emissions")
    - Methodology-attribution claims ("following guidance from <agency>…") — open the cited link and confirm it actually says that. Agencies revise methodology, so a claim that was defensible when written can be stale now, and the 6c link check only proves the URL resolves, not the claim (real case: metadata cited BEA guidance for deflating data centers with the office PPI; BEA's 2025 annual update had switched them to an industrial+warehouse composite, and the cited page never contained the guidance at all)
    - Scope qualifiers present in the origin title but absent from user-facing text — if the source is "**Private** Construction" / adults-only / market-exchange-rate-only, `description_short` and `description_key` must say so; the citation line alone doesn't reach readers
+   - Text that repeats what the reader has already read — a `description_key` bullet restating another bullet, `description_short`, or the title at the same level of detail. Unpacking `description_short` in the first bullet (full definition, how it's measured, what's included) is exactly what the panel is for; saying it again in other words is padding. Merge it into the bullet that already covers the ground, or drop it
 
    When a phrasing is ambiguous, propose a concrete rewrite — don't just flag it.
 
