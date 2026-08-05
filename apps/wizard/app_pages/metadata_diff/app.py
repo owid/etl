@@ -545,6 +545,53 @@ def _pr_brief_markdown(
     return "\n".join(lines)
 
 
+def _chart_pr_brief_markdown(
+    chart: dict[str, Any],
+    baseline_name: str,
+    resolved: list[dict[str, Any]],
+    usage: dict[int, dict[str, list[dict[str, Any]]]],
+    catalog_root: str,
+) -> str:
+    """Execute-ready brief for a standalone chart's changes: each change with its target — the indicator's
+    garden `.meta.yml` (shared, so it updates every surface using that indicator) or the chart's own
+    config (title/subtitle/footnote, edited on the chart itself). A standalone chart has no scope
+    decision. Markdown for now, structured to drive the actual PR."""
+    slug = chart.get("slug")
+    lines = [
+        f"# PR brief — chart `{slug}`",
+        "",
+        f"_Baseline: {baseline_name}. {len(resolved)} distinct change(s)._",
+        "",
+        "Apply each change at its **Target**. 🚩 flagged items still need the author's attention.",
+        "",
+    ]
+    for r in resolved:
+        g = r["g"]
+        field = g.field
+        status = st.session_state.get(_review_status_key(catalog_root, r["change_key"]), r["seed_label"])
+        lines.append(f"## {field_label(field)} — {status}")
+        if field.startswith(CHART_FIELD_PREFIX):
+            lines.append(
+                "- **Target:** the chart's **own config** (title/subtitle/footnote) — edit it on the chart "
+                "itself (grapher config / admin), not in indicator metadata."
+            )
+        elif g.affects_indicator:
+            imp = usage.get(g.indicator_id, {}) if g.indicator_id is not None else {}
+            n_c, n_m = len(imp.get("charts", [])), len(imp.get("mdims", []))
+            garden_key = OVERRIDE_TARGET.get(field, (None, None, field))[2]
+            others = f"{n_c} other chart(s)" + (f" · {n_m} MDim(s)" if n_m else "")
+            lines.append(
+                f"- **Target:** indicator garden `.meta.yml` → `{garden_key}` — shared, so this updates the "
+                f"data page of every surface using this indicator ({others})."
+            )
+        else:
+            lines.append("- **Target:** the indicator's garden `.meta.yml`.")
+        lines.append(f"- **Before:** {_as_plaintext(g.old)}")
+        lines.append(f"- **After:** {_as_plaintext(g.new)}")
+        lines.append("")
+    return "\n".join(lines)
+
+
 # The reviewer only accepts or rejects — the scope decision belongs to the author (View diff toggle).
 _REVIEW_STATUSES = ["⏳ Pending", "✅ Approve", "🚩 Flag"]
 _STATUS_TO_DB = {"✅ Approve": "approved", "🚩 Flag": "flagged"}
@@ -919,6 +966,7 @@ def _render_chart_review(
     baseline_name: str,
     baseline_url: str,
     staging_url: str,
+    usage: dict[int, dict[str, list[dict[str, Any]]]],
 ) -> None:
     """Per-chart review: each changed field is a collapsible holding its diff + an Approve/Flag decision
     (no comment box), collapsing once decided — same DB lock-in as the MDim review, keyed by chart slug.
@@ -962,12 +1010,26 @@ def _render_chart_review(
     states = [_eff(r) for r in resolved]
     n = len(states)
     n_appr = states.count("approved")
+    n_flag = states.count("flagged")
+    n_stale = states.count("stale")
+    n_pend = states.count("pending")
 
     st.divider()
+    st.caption(
+        "This review pass is **optional** — a way to go through the chart's changes and iterate before "
+        "they ship. It doesn't gate the PR or the merge."
+    )
     if n_appr == n and n > 0:
-        st.success(f"🔒 **Signed off** — all {n} change{'s' if n != 1 else ''} approved (locked to the current text).")
+        st.success(f"✅ **All {n} change{'s' if n != 1 else ''} reviewed** — approved.")
     else:
-        st.warning(f"🔒 **Not signed off** — {n_appr}/{n} approved. Sign off each change below to lock it in.")
+        bits = []
+        if n_pend:
+            bits.append(f"**{n_pend}** pending")
+        if n_flag:
+            bits.append(f"**{n_flag}** flagged")
+        if n_stale:
+            bits.append(f"**{n_stale}** edited since review")
+        st.info(f"Review pending — {', '.join(bits)} of {n}.")
 
     def _make_save(change_key: str, content_hash: str):
         sk = _review_status_key(catalog_root, change_key)
@@ -1010,6 +1072,14 @@ def _render_chart_review(
                 when = f" · {r['updatedAt']}" if r.get("updatedAt") else ""
                 st.caption(f"Signed off by **{r['reviewer']}**{when}")
 
+    st.divider()
+    with st.expander("🔀 PR brief — changes to execute"):
+        st.caption(
+            "Each change with its target — the indicator's garden `.meta.yml` (shared) or the chart's own "
+            "config — ready to drive the PR. Markdown for now."
+        )
+        st.code(_chart_pr_brief_markdown(chart, baseline_name, resolved, usage, catalog_root), language="markdown")
+
 
 def _chart_flow(source_engine: Engine, target_engine: Engine, baseline: str) -> None:
     """Review a standalone chart's data-page WYSK (the indicator metadata it inherits), vs the baseline."""
@@ -1018,10 +1088,10 @@ def _chart_flow(source_engine: Engine, target_engine: Engine, baseline: str) -> 
         "Chart",
         key="chart",
         placeholder="Chart slug, id, or grapher URL (e.g. daily-mean-income)",
-        help="Select a chart to see changes to its data page.",
+        help="Select a chart to see changes to its metadata.",
     )
     if not ref:
-        st.info("Select a chart to see changes to its data page.")
+        st.info("Select a chart to see changes to its metadata.")
         return
 
     src = build_chart_bundle(source_engine, ref)
@@ -1074,7 +1144,7 @@ def _chart_flow(source_engine: Engine, target_engine: Engine, baseline: str) -> 
     st.warning(f"**{nf} field{'s' if nf != 1 else ''} changed** in this chart.")
     _render_impact(diff, usage, unit="chart")
     # Each changed field: collapsible with its diff + Approve/Flag decision (decision right after content).
-    _render_chart_review(chart, diff, source_engine, baseline_name, baseline_url, staging_url)
+    _render_chart_review(chart, diff, source_engine, baseline_name, baseline_url, staging_url, usage)
 
 
 _ALL_NS = "(all namespaces)"
@@ -1166,6 +1236,8 @@ def main() -> None:
             "MDim",
             key="mdim",
             options=mdim_options,
+            index=None,
+            placeholder="Select an MDim…",
             format_func=_format_mdim,
             on_change=_clear_view_params,
             help="Select the MDim to review — type in the box to search it. "
@@ -1174,7 +1246,7 @@ def main() -> None:
         )
 
     if not catalog_path:
-        st.info("Select an MDim.")
+        st.info("Select an MDim to see changes to its metadata.")
         return
 
     mode = url_persist(st.segmented_control)(
