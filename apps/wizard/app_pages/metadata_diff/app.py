@@ -15,7 +15,6 @@ so it also catches changes coming from garden step templates.
 
 import html
 import json
-import os
 import urllib.parse
 from typing import Any
 
@@ -199,10 +198,14 @@ def _view_url(env, catalog_path: str, published_slug: str | None, dims: dict[str
     return f"{env.admin_site}/grapher/{urllib.parse.quote(catalog_path, safe='')}/?{params}"
 
 
-def _render_text_html(value: Any, other: Any, side: str) -> str:
-    """One side of the side-by-side diff, with word-level highlights against the other side."""
-    # Reflect the field's real structure: a description_key stored as a "- a\n- b" markdown string
-    # (or a JSON list) renders as bullets; genuine prose renders as prose.
+def _render_text_html(value: Any, other: Any, side: str, changed_only: bool = False) -> str:
+    """One side of the side-by-side diff, with word-level highlights against the other side.
+
+    Reflect the field's real structure: a description_key stored as a "- a\\n- b" markdown string (or a
+    JSON list) renders as bullets; genuine prose renders as prose. With `changed_only` (used in the
+    review), a list field (WYSK) shows only the bullets that changed on this side — hiding bullets that
+    are unchanged — so the reviewer sees just the relevant points, not the whole list.
+    """
     value, other = as_bullets(value), as_bullets(other)
     old, new = (other, value) if side == "new" else (value, other)
 
@@ -212,6 +215,18 @@ def _render_text_html(value: Any, other: Any, side: str) -> str:
     if isinstance(value, list) or isinstance(other, list):
         value_list = value if isinstance(value, list) else ([value] if value else [])
         other_list = other if isinstance(other, list) else ([other] if other else [])
+        if changed_only:
+            # Only bullets not present (unchanged) on the other side: additions/edits on the new side,
+            # removals/edits on the old side. Unchanged bullets are hidden.
+            unchanged = {str(x).strip() for x in other_list if x}
+            items = [
+                f"<li>{(_one('', v) if side == 'new' else _one(v, ''))}</li>"
+                for v in value_list
+                if v and str(v).strip() not in unchanged
+            ]
+            if not items:
+                return '<div class="mdd-text mdd-empty">(no changes here)</div>'
+            return f'<div class="mdd-text"><ul>{"".join(items)}</ul></div>'
         items = []
         for i in range(max(len(value_list), len(other_list))):
             v = value_list[i] if i < len(value_list) else ""
@@ -422,33 +437,9 @@ def _render_diff_body(
 
 
 def _reviewer() -> str | None:
-    """Identity of the person signing off (audit trail) — the name set in the reviewer field, if any."""
+    """Identity of the person signing off (audit trail), from session state if set. There is currently no
+    reviewer input in the UI, so this is normally None — sign-offs are recorded without a name."""
     return (st.session_state.get("mdd_reviewer") or "").strip() or None
-
-
-def _reviewer_input() -> None:
-    """Reviewer identity, captured on the page (not the sidebar). Recorded with each Approve/Flag sign-off."""
-    st.session_state.setdefault("mdd_reviewer", _detected_identity())
-    st.text_input(
-        "Reviewer (your name or GitHub handle)",
-        key="mdd_reviewer",
-        placeholder="Set your name to attribute your sign-offs",
-        help="Recorded with every Approve/Flag decision. Set it before you sign off.",
-    )
-
-
-def _detected_identity() -> str:
-    """Best-effort *default* for the reviewer field — the Streamlit-authenticated user, else a GitHub
-    handle from the environment. Never the container's OS user, which is `owid` on staging (the old
-    `os.getenv("USER")` default is exactly why every sign-off read "owid")."""
-    try:
-        user = st.user  # populated only when Streamlit-native auth is configured
-        val = getattr(user, "email", None) or getattr(user, "name", None)
-        if val:
-            return str(val)
-    except Exception:
-        pass
-    return os.getenv("GITHUB_USER") or ""
 
 
 def _dims_str(dims: dict[str, str]) -> str:
@@ -915,7 +906,6 @@ def render_review_page(
         "This review pass is a way to go through the metadata changes and iterate with the author. At the "
         "end of the review, you can decide whether to share comments with the author or create a PR."
     )
-    _reviewer_input()
     if n_appr == n and n > 0:
         st.success(f"✅ **All {n} changes reviewed** — approved.")
     else:
@@ -986,10 +976,10 @@ def render_review_page(
             c1, c2 = st.columns(2)
             with c1:
                 st.markdown(f":gray[**{baseline_name.capitalize()}**] · [{link_kind}]({b_url})")
-                st.markdown(_render_text_html(g.old, g.new, side="old"), unsafe_allow_html=True)
+                st.markdown(_render_text_html(g.old, g.new, side="old", changed_only=True), unsafe_allow_html=True)
             with c2:
                 st.markdown(f":green[**This staging server**] · [{link_kind}]({s_url})")
-                st.markdown(_render_text_html(g.new, g.old, side="new"), unsafe_allow_html=True)
+                st.markdown(_render_text_html(g.new, g.old, side="new", changed_only=True), unsafe_allow_html=True)
             s1, s2 = st.columns([1, 3])
             with s1:
                 st.radio("Sign-off", _REVIEW_STATUSES, key=sk, on_change=save, label_visibility="collapsed")
@@ -1010,7 +1000,7 @@ def render_review_page(
     with st.expander("📋 Review summary — share with the author"):
         st.caption("The punch-list of decisions and comments, for the person who wrote the changes.")
         _markdown_output(_review_markdown(catalog_path, baseline_name, resolved, usage), "review-summary.md", "review")
-    with st.expander("🔀 PR brief — changes to execute (all charts / only this view)"):
+    with st.expander("🔀 PR brief — changes to execute"):
         st.caption(
             "A complete PR spec — the changes, the checks to run, and a ready PR description. **Copy it and "
             "paste it to Claude Code, asking it to open the PR.**"
@@ -1241,7 +1231,6 @@ def _render_chart_review(
         "This review pass is a way to go through the chart's metadata changes. At the end of the review, "
         "you can create a PR of the changes."
     )
-    _reviewer_input()
     if n_appr == n and n > 0:
         st.success(f"✅ **All {n} change{'s' if n != 1 else ''} reviewed** — approved.")
     else:
@@ -1284,10 +1273,10 @@ def _render_chart_review(
             c1, c2 = st.columns(2)
             with c1:
                 st.markdown(f":gray[**{baseline_name.capitalize()}**] · [{link_kind}]({baseline_url})")
-                st.markdown(_render_text_html(g.old, g.new, side="old"), unsafe_allow_html=True)
+                st.markdown(_render_text_html(g.old, g.new, side="old", changed_only=True), unsafe_allow_html=True)
             with c2:
                 st.markdown(f":green[**This staging server**] · [{link_kind}]({staging_url})")
-                st.markdown(_render_text_html(g.new, g.old, side="new"), unsafe_allow_html=True)
+                st.markdown(_render_text_html(g.new, g.old, side="new", changed_only=True), unsafe_allow_html=True)
             st.radio(
                 "Sign-off", _REVIEW_STATUSES, key=sk, on_change=save, horizontal=True, label_visibility="collapsed"
             )
