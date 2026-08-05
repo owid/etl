@@ -1,6 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from etl.collection import combine_collections
+from etl.collection.download_package import build_download_package_for_collection
+from etl.config import OWID_ENV
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -292,6 +294,18 @@ def run() -> None:
     # Save garden dataset.
     #
     c.save()
+
+    #
+    # PROTOTYPE (mdim-downloads project) -- build the "complete dataset" zip
+    # (wide CSV + metadata.json + readme.md, covering every dimension
+    # combination) and publish it to R2. The data page just links to it. Needs
+    # c.save() to have already run once, so indicator catalog paths are fully
+    # expanded and the MDIM has a page slug. See
+    # mdim-downloads/solution-space/etl-feasibility.md.
+    #
+    package = build_download_package_for_collection(c, dest_dir=paths.dest_dir / "download_package")
+    c.download_package = package.to_config()
+    c.upsert_to_db(OWID_ENV)
 
 
 def adjust_dimensions_schooling(tb):

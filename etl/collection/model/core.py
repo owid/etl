@@ -127,6 +127,12 @@ class Collection(MDIMBase):
     topic_tags: list[str] | None = None
     _default_dimensions: dict[str, str] | None = None
 
+    # PROTOTYPE (mdim-downloads project): a pre-built "download the complete
+    # dataset" package covering every dimension combination, as opposed to
+    # the per-view download. Shape matches grapher's DownloadPackage type.
+    # None (the default) means no package -- pages render exactly as before.
+    download_package: dict | None = None
+
     # Internal use. For save() method.
     _collection_type: str | None = field(init=False, default="multidim")
     _group_operations_done: int = field(init=False, default=0)
