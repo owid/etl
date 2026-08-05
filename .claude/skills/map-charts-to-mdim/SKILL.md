@@ -36,6 +36,32 @@ at it, and its bulk endpoint accepts explorer sources only. The CLI
 (`owid-grapher/devTools/createMultiDimRedirectsFromCsv.ts`) exists precisely for
 the chart case.
 
+**And only for that case: one bare chart path per row.** Two things the CSV
+pipeline cannot express — if a migration needs either, the CLI itself has to
+change first, so raise it with a Grapher developer instead of bending the CSV
+around it:
+
+- **Source query params.** The source column is a path. Anything after `?`
+  survives into `multi_dim_redirects.source` verbatim, and chart sources are baked
+  as a flat slug → path map that strips only the `/grapher/` prefix
+  (`getGrapherToMultiDimRedirects` → `getMultiDimRedirectTargets`), so the row
+  matches no request and the redirect never fires. Conditioning on the incoming
+  params is what the `sourceQueryParams` column does, and the CLI never writes it —
+  grapher honors it for `/explorers/` sources only (they bake to a query-param
+  decision tree resolved at the edge), and the admin route rejects it outright on a
+  `/grapher/` source. A per-params chart redirect therefore needs changes on both
+  sides, CLI and serving. `preflight.py` rejects a source carrying a query string
+  for this reason.
+- **Explorer sources.** `/explorers/...` passes the CLI's source regex, and the row
+  it writes is worse than inert: with `sourceQueryParams` NULL it bakes as an
+  *unconditional* rule, and explorer redirects are consulted on **every** request
+  (unlike chart redirects, which fire only on a 404), so the entire explorer —
+  every view, whatever the params — starts 302-ing to the single target view. The
+  chart handling it also skips, silently: the source is never unpublished
+  (`getChartSlugsToUnpublish` skips non-`/grapher/` sources), and the chained
+  old-slug migration early-returns. Explorers go through the admin bulk endpoint,
+  which is `map-explorer-to-mdim`'s job, not this skill's.
+
 ## Inputs
 
 Exactly one chart selection:
@@ -508,9 +534,9 @@ them:
   tolerated **only** on line 1, no comment lines anywhere, no duplicate sources,
   both fields must start with `/`. Any violation aborts the CLI's whole run. The
   extractor validates its own output and `preflight.py` re-validates it.
-- **Never put query params on the source.** They pass the CLI's regex and get
-  stored verbatim, but serving matches the bare path — so the redirect would
-  simply never fire.
+- **Never put query params on the source, and never an `/explorers/` source.**
+  Both pass the CLI's regex and neither works — see "one bare chart path per row"
+  above for the mechanism and for what would have to change in grapher.
 - **Targets carry every dimension or none.** The CLI resolves the target query
   string to exactly one view; a partial dimension spec matches several and
   throws. Our targets always carry the full dict, so don't hand-trim them.
