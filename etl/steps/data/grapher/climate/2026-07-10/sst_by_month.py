@@ -2,6 +2,7 @@
 
 import pandas as pd
 
+from etl.grapher.helpers import adapt_table_with_dates_to_grapher
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -47,7 +48,8 @@ def run() -> None:
     # Drop the original year and month columns
     tb = tb.drop(columns=["year", "month"])
 
-    tb = tb.format(["date", "country"])
+    tb = adapt_table_with_dates_to_grapher(tb, time_interval="month")
+    tb = tb.format(["country", "year"])
     #
     # Save outputs.
     #

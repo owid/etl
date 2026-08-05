@@ -45,6 +45,37 @@ from etl.paths import EXPORT_DIR, SCHEMAS_DIR
 # Logging
 log = get_logger()
 
+# Query params that Grapher reads from a chart URL. Dimension slugs are also encoded as query
+# params on multidim/explorer pages, so they must not collide with these.
+# Source: `GRAPHER_QUERY_PARAM_KEYS` in owid-grapher (packages/@ourworldindata/types/src/
+# grapherTypes/GrapherTypes.ts), plus `hideControls` (a page-level param not in that list).
+GRAPHER_RESERVED_QUERY_PARAMS = {
+    "country",
+    "endpointsOnly",
+    "facet",
+    "focus",
+    "globe",
+    "globeRotation",
+    "globeZoom",
+    "hideControls",
+    "mapSelect",
+    "overlay",
+    "peerCountries",
+    "region",
+    "showNoDataArea",
+    "showSelectionOnlyInTable",
+    "stackMode",
+    "tab",
+    "tableFilter",
+    "tableSearch",
+    "time",
+    "uniformYAxis",
+    "xScale",
+    "yScale",
+    "year",
+    "zoomToSelection",
+}
+
 
 class _GroupedViewsEntry(TypedDict):
     overwrite: bool
@@ -225,6 +256,9 @@ class Collection(MDIMBase):
 
         # Check that no choice name or slug is repeated
         self.validate_dimension_uniqueness()
+
+        # Check that no dimension slug collides with a query param reserved by Grapher
+        self.validate_dimension_slugs_not_grapher_query_params()
 
         # Validate that datasets used are part of the dependencies
         indicators = self.indicators_in_use(tolerate_extra_indicators)
@@ -563,6 +597,25 @@ class Collection(MDIMBase):
 
             # Add slug to set
             slugs.add(dim.slug)
+
+    def validate_dimension_slugs_not_grapher_query_params(self):
+        """Validate that no dimension slug collides with a query param reserved by Grapher.
+
+        Dimension choices are encoded as query params on multidim/explorer pages (e.g.
+        ``?sex=female``), in the same URL where Grapher reads its own params (``time``,
+        ``country``, ``tab``, ...). A colliding slug would break one or the other.
+
+        Slugs are compared in their snake_case form, since that is what `save()` persists
+        and what ends up in the URL (e.g. a slug "Time" would be saved as "time").
+        """
+        for dim in self.dimensions:
+            slug = underscore(dim.slug)
+            if slug in GRAPHER_RESERVED_QUERY_PARAMS:
+                raise ValueError(
+                    f"Dimension slug '{slug}' in collection '{self.catalog_path}' collides with a query param "
+                    f"reserved by Grapher. Rename the dimension slug. Reserved names: "
+                    f"{sorted(GRAPHER_RESERVED_QUERY_PARAMS)}"
+                )
 
     def validate_indicators_are_from_dependencies(self, indicators):
         """Validate that the provided indicators are from tables in datasets specified in the collections dependencies."""
