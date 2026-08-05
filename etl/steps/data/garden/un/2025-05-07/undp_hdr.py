@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
@@ -93,10 +95,7 @@ def run() -> None:
     # Process data.
     #
     # Harmonize country names.
-    tb = geo.harmonize_countries(
-        df=tb,
-        countries_file=paths.country_mapping_path,
-    )
+    tb = paths.regions.harmonize_names(tb, country_col="country", countries_file=paths.country_mapping_path)
 
     # Drop irrelevant columns
     tb = tb.drop(columns=["iso3", "hdicode", "region"])
@@ -144,10 +143,14 @@ def run() -> None:
     tb = tb.drop(columns=COLUMNS_SEX)
     tb = tb.format(["country", "year"])
 
+    # --- Long-run average years of schooling (UNDP + Lee & Lee splice) ---
+    tb_mys_long_run = make_mys_long_run(tb_sex)
+
     # Build tables list
     tables = [
         tb,
         tb_sex,
+        tb_mys_long_run,
     ]
 
     #
@@ -201,6 +204,44 @@ def region_avg(tb, ds_regions, ds_income_groups, columns):
         ].m.description_processing = "We calculated averages over continents and income groups by taking the population-weighted average of the countries in each group. If less than 80% of countries in an area report data for a given year, we do not calculate the average for that area."
 
     return tb[tb_cols]
+
+
+LEE_LEE_AVG_YEARS_COL = "mf_youth_and_adults__15_64_years__average_years_of_education"
+
+
+def make_mys_long_run(tb_sex):
+    """Create a long-run mean years of schooling table by splicing UNDP (1990+) with Lee & Lee (pre-1990).
+
+    For each country, UNDP data is used from its earliest available year. Lee & Lee fills the earlier period.
+    """
+    ds_lee_lee = paths.load_dataset("education_lee_lee")
+    tb_lee_lee = ds_lee_lee["education_lee_lee"].reset_index()
+
+    # UNDP: extract mys for sex=total.
+    tb_undp = tb_sex.reset_index() if "country" not in tb_sex.columns else tb_sex
+    tb_undp = tb_undp.loc[tb_undp["sex"] == "total", ["country", "year", "mys"]].copy()
+    tb_undp = tb_undp.rename(columns={"mys": "average_years_of_schooling"})
+    tb_undp = tb_undp.dropna(subset=["average_years_of_schooling"])
+
+    # Lee & Lee: extract average years of education.
+    tb_ll = tb_lee_lee[["country", "year", LEE_LEE_AVG_YEARS_COL]].copy()
+    tb_ll = tb_ll.rename(columns={LEE_LEE_AVG_YEARS_COL: "average_years_of_schooling"})
+    tb_ll = tb_ll.dropna(subset=["average_years_of_schooling"])
+
+    # For each country, find the earliest year with UNDP data.
+    undp_first_year = tb_undp.groupby("country")["year"].min().to_dict()
+
+    # Keep Lee & Lee rows only for years before the earliest UNDP data point.
+    mask = tb_ll.apply(
+        lambda row: row["country"] not in undp_first_year or row["year"] < undp_first_year[row["country"]],
+        axis=1,
+    )
+    tb_ll = tb_ll[mask]
+
+    tb_combined = pr.concat([tb_ll, tb_undp], short_name="undp_hdr_mys_long_run")
+    tb_combined = tb_combined.format(["country", "year"], short_name="undp_hdr_mys_long_run")
+
+    return tb_combined
 
 
 def make_table_with_dimension_sex(tb, columns):
