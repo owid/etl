@@ -178,7 +178,7 @@ METRIC_UNIT_PHRASE = {
 }
 SOURCE_COMPOSITION = {
     "fossil_fuels": "Fossil fuels are the sum of coal, oil, and gas.",
-    "renewables": "Renewables include hydropower, solar, wind, geothermal, wave, tidal, and bioenergy, but not traditional biomass.",
+    "renewables": "Renewables include hydropower, solar, wind, geothermal, bioenergy, and waste, but not traditional biomass.",
     "low_carbon_energy": "Low-carbon energy is the sum of nuclear and renewables.",
     # No entry for "other_renewables": its composition is carried as a footnote (OTHER_RENEWABLES_NOTE),
     # not inline in the subtitle, wherever "Other renewables" appears (standalone views and by-source stacks).
@@ -255,7 +255,7 @@ OTHER_RENEWABLES_NOTE = "Other renewables include geothermal, biomass, and waste
 # energy is nuclear plus renewables); the other-renewables views spell out their contents.
 SOURCE_NOTES = {
     "total": TRADITIONAL_BIOMASS_NOTE,
-    "low_carbon_energy": "Renewables include hydropower, solar, wind, geothermal, wave, tidal, and bioenergy, but not traditional biomass.",
+    "low_carbon_energy": "Renewables include hydropower, solar, wind, geothermal, bioenergy, and waste, but not traditional biomass.",
     "other_renewables": OTHER_RENEWABLES_NOTE,
 }
 

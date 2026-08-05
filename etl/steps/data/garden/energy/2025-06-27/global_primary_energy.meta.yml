@@ -18,7 +18,7 @@ definitions:
   description_short_pct_equivalent: &description_short_pct_equivalent |-
     Measured as a percentage of the total primary energy, using the substitution method.
   description_processing_traditional_biomass: &description_processing_traditional_biomass |-
-    - Traditional biomass (fuelwood, charcoal, crop residues, and dung) is estimated by Smil (2017) from per-capita consumption and population.
+    - Traditional biomass (fuelwood, charcoal, crop residues, and dung) is estimated by Smil (2017).
     - Smil's series ends in 2015. For later years we hold the last available value constant.
 
 dataset:
