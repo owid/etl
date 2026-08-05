@@ -1341,8 +1341,12 @@ def _chart_flow(source_engine: Engine, target_engine: Engine, baseline: str) -> 
 
     st.markdown(DIFF_CSS, unsafe_allow_html=True)  # same diff styling as the MDim view page
     st.markdown(f"#### {chart.get('title') or chart['slug']}")
-    baseline_url = f"{_baseline_env(baseline).site}/grapher/{chart['slug']}"
-    staging_url = f"{SOURCE.site}/grapher/{chart['slug']}"
+    # Single-indicator chart data pages don't render on a staging server by default (they come up
+    # blank); the admin chart preview with `forceDatapage=true` forces the data page, so WYSK /
+    # description_key edits are actually visible. Use it for both envs (works on production too).
+    cid = chart["chartId"]
+    baseline_url = f"{_baseline_env(baseline).admin_site}/admin/charts/{cid}/preview?forceDatapage=true"
+    staging_url = f"{SOURCE.admin_site}/admin/charts/{cid}/preview?forceDatapage=true"
     links = f"[{baseline_name} (data page)]({baseline_url}) · [this staging server (data page)]({staging_url})"
 
     if diff.is_new:
