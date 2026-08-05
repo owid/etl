@@ -450,7 +450,11 @@ tables:
         short_unit: "%"
         description_short: Difference between average earnings of men and average earnings of women expressed as a percentage of average earnings of men.
         description_key:
+          - "This data measures the gender wage gap: the difference between the average hourly earnings of men and the average hourly earnings of women, expressed as a percentage of men’s average earnings. Positive values mean that men earn more than women on average; negative values mean that women earn more."
+          - This is an unadjusted gender wage gap. It compares the average earnings of all men and women employees, without accounting for other differences, such as education, experience, and detailed occupation. This means the gap reflects not only differences in pay for similar work, but also differences in individual characteristics and the kinds of jobs men and women hold.
           - "{definitions.description_key_occupation}"
+          - This data covers paid employees only. It does not include self-employed workers, who make up a large share of the workforce in many countries.
+          - This data comes from the International Labour Organization’s ILOSTAT database, which harmonizes labor statistics from national sources. Underlying national surveys differ in design and coverage, so cross-country comparisons should be made with some caution.
         processing_level: major
         description_processing: "{definitions.description_processing_unreliable_data}"
         display:
