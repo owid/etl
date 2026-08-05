@@ -173,7 +173,7 @@ Like the parent edit itself, child fixes land on **staging only** and ride chart
 **The single checkpoint rule: nothing is committed or pushed before the user's explicit go-ahead.** Everything up to the checkpoint happens on the branch + staging server only.
 
 1. Parse the request; run `resolve_target.py --no-db` for instant identification feedback to the user.
-2. Create the branch + draft PR: `.venv/bin/etl pr "<title, no emoji>" data` (never manual branching). This spins up the staging server the whole workflow depends on.
+2. Create the branch + draft PR: `.venv/bin/etl pr "<title, no emoji>" data` (never manual branching). This spins up the staging server the whole workflow depends on. Name the title after the field that actually changes, using the team's own shorthand where one exists — when the edit is only about `description_key`, write **WYSK**, not the full "What you should know about this indicator" (e.g. `Add WYSK to the ILO gender wage gap indicator`). The shorthand is in CLAUDE.md's glossary, so every colleague reads it, and it leaves room in the title for the indicator being edited.
 3. Wait for staging readiness: retry `OWIDEnv.from_staging(branch).read_sql("SELECT 1")` (builds take a few minutes).
 4. Run `resolve_target.py` with the DB; pick the route via the decision tree.
 5. Run `blast_radius.py` per the rules above; ask the user if other surfaces are affected.
