@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Census of Population 1926, Volume X — General Report
+    description: |-
+      The general report on the 1926 Census of the Irish Free State, the first census taken after independence. Its chapter on population changes restates results from the pre-independence censuses for the 26-county area that became the state, so that changes can be compared on constant boundaries.
+
+      We hand-entered two small tables from the report: average yearly net emigration by sex for each period between censuses from 1871 to 1926 (page 19), and the population at each census from 1871 to 1926 (page 11). The report estimates net emigration as a residual: the change in population between two censuses, minus registered births plus registered deaths. Civil registration of births and deaths began in 1864, so 1871-1881 is the first period this method can cover.
+    date_published: "1934"
+
+    # Citation
+    producer: Central Statistics Office, Ireland
+    citation_full: |-
+      Census of Population 1926, Volume X — General Report. Statistics Branch, Department of Industry and Commerce, Dublin, 1934. Published online by the Central Statistics Office, Ireland. Available at: https://www.cso.ie/en/media/csoie/census/census1926results/volume10/C_1926_V10.pdf
+
+    # Files
+    url_main: https://www.cso.ie/en/census/censusvolumes1926to1991/historicalreports/census1926reports/census1926volume10-generalreports/
+    date_accessed: "2026-08-05"
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.cso.ie/en/aboutus/whoweare/copyrightpolicy/
+outs:
+  - md5: 90f92597a1cc9d55d4cc223286707eb1
+    size: 280
+    path: ireland_net_emigration_1871_1926.csv

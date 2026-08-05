@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Census of Population 2022 — Components of Population Change
+    description: |-
+      Population, natural increase, actual change, and estimated net migration for each period between Irish censuses from 1926 to 2022, published by the Central Statistics Office as part of the 2022 census results.
+
+      The Central Statistics Office estimates net migration for each intercensal period as a residual: the change in population between two censuses, minus the natural increase (registered births minus registered deaths) over the same period.
+    date_published: "2023-06-29"
+
+    # Citation
+    producer: Central Statistics Office, Ireland
+    citation_full: |-
+      Central Statistics Office, Ireland (2023). Census of Population 2022. Table F1005: Components of Population Change.
+
+    # Files
+    url_main: https://data.cso.ie/table/F1005
+    url_download: https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset/F1005/JSON-stat/2.0/en
+    date_accessed: "2026-08-05"
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.cso.ie/en/aboutus/whoweare/copyrightpolicy/
+outs:
+  - md5: 7c92e90c0cb285b2b37ce7ef51b1b93b
+    size: 6296
+    path: ireland_components_of_population_change.json
