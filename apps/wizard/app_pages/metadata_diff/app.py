@@ -18,6 +18,7 @@ import json
 import urllib.parse
 from typing import Any
 
+import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 from sqlalchemy.engine.base import Engine
@@ -108,6 +109,17 @@ def _baseline_env(baseline: str) -> OWIDEnv:
 def get_engines(baseline: str) -> tuple[Engine, Engine]:
     assert OWID_ENV.env_remote != "production", "Metadata Diff must run on a staging server, not production."
     return SOURCE.engine, _baseline_env(baseline).engine
+
+
+@st.cache_data(ttl=300, show_spinner="Checking which MDims changed…")
+def list_mdim_changes(_source_engine: Engine, _target_engine: Engine, cache_key: str) -> pd.DataFrame:
+    """MDim list + change flags, cached across reruns.
+
+    Streamlit reruns the whole script on every widget interaction, and this compares the metadata of
+    every indicator the MDims use — so without a cache it would re-query on each click. Indicator
+    metadata changes are picked up by the TTL, same as `compute_diff`.
+    """
+    return get_mdim_changes(_source_engine, _target_engine)
 
 
 @st.cache_data(ttl=300, show_spinner="Computing metadata diff for all views…")
@@ -1540,7 +1552,7 @@ def main() -> None:
         _chart_flow(source_engine, target_engine, baseline)
         return
 
-    df_mdims = get_mdim_changes(source_engine, target_engine)
+    df_mdims = list_mdim_changes(source_engine, target_engine, cache_key=baseline)
     if df_mdims.empty:
         st.warning("No MDims found on this staging server.")
         return

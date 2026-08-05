@@ -156,6 +156,28 @@ def _metadata_signature(row: dict[str, Any] | None) -> tuple:
     return tuple(norm(row.get(key)) for key in ["name", *METADATA_FIELDS])
 
 
+def _load_configs(engine: Engine) -> dict[str, dict[str, Any]]:
+    """Every MDIM's config, keyed by catalogPath.
+
+    Deliberately unordered: `config` is a large JSON blob, and combining it with an `order by` makes
+    MySQL sort rows carrying those blobs, which overruns the server's sort buffer.
+    """
+    df = read_sql(
+        "select catalogPath, config from multi_dim_data_pages where catalogPath is not null",
+        engine=engine,
+    )
+    configs: dict[str, dict[str, Any]] = {}
+    for record in df.to_dict("records"):
+        raw = record.get("config")
+        try:
+            parsed = json.loads(raw) if isinstance(raw, str) else raw
+        except (TypeError, ValueError):
+            continue
+        if isinstance(parsed, dict):
+            configs[str(record["catalogPath"])] = parsed
+    return configs
+
+
 def _mdims_with_changed_indicators(
     source_engine: Engine, target_engine: Engine, configs: dict[str, dict[str, Any]]
 ) -> set[str]:
@@ -197,8 +219,11 @@ def get_mdim_changes(source_engine: Engine, target_engine: Engine) -> pd.DataFra
 
     `has_changes` is the union — what the selection list marks. Neither flag is used to skip diffing.
     """
+    # Keep `config` OUT of this query: it is a large JSON blob, and selecting it alongside
+    # `order by updatedAt` makes MySQL sort rows carrying those blobs, which overruns the server's
+    # sort buffer ("Out of sort memory"). The configs are fetched separately, unordered.
     q = """
-    select catalogPath, configMd5, published, slug, config
+    select catalogPath, configMd5, published, slug
     from multi_dim_data_pages
     where catalogPath is not null
     order by updatedAt desc
@@ -206,28 +231,12 @@ def get_mdim_changes(source_engine: Engine, target_engine: Engine) -> pd.DataFra
     df_source = read_sql(q, engine=source_engine)
     df_target = read_sql(q, engine=target_engine)
 
-    configs: dict[str, dict[str, Any]] = {}
-    for record in df_source.to_dict("records"):
-        raw = record.get("config")
-        try:
-            parsed = json.loads(raw) if isinstance(raw, str) else raw
-        except (TypeError, ValueError):
-            continue
-        if isinstance(parsed, dict):
-            configs[str(record["catalogPath"])] = parsed
-
-    df = pd.merge(
-        df_source.drop(columns=["config"]),
-        df_target.drop(columns=["config"]),
-        on="catalogPath",
-        suffixes=("_source", "_target"),
-        how="left",
-    )
+    df = pd.merge(df_source, df_target, on="catalogPath", suffixes=("_source", "_target"), how="left")
     df["is_new"] = df["configMd5_target"].isnull()
     df["config_changed"] = df["configMd5_source"] != df["configMd5_target"]
 
     try:
-        changed = _mdims_with_changed_indicators(source_engine, target_engine, configs)
+        changed = _mdims_with_changed_indicators(source_engine, target_engine, _load_configs(source_engine))
     except Exception as e:
         # Never let the marker break the page: fall back to the config-only signal and say so.
         log.warning("metadata_diff.indicator_change_check_failed", error=str(e))
