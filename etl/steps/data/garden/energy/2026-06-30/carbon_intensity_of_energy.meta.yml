@@ -20,7 +20,7 @@ tables:
     variables:
       emissions_total_per_unit_energy:
         title: Carbon intensity of energy
-        description_short: Fossil [carbon dioxide (CO₂)](#dod:co2) emissions per unit of [total energy supply](#dod:total-energy-supply), measured in grams of CO₂ per kilowatt-hour.
+        description_short: Fossil carbon dioxide (CO₂) emissions per unit of [total energy supply](#dod:total-energy-supply), measured in grams of CO₂ per [kilowatt-hour](#dod:watt-hours).
         display:
           name: Carbon intensity of energy
           # Axis and tooltip read "412 g", matching the carbon intensity of electricity chart; the
@@ -30,7 +30,7 @@ tables:
           title_public: '{tables.carbon_intensity_of_energy.variables.emissions_total_per_unit_energy.title}'
       emissions_total_including_land_use_change_per_unit_energy:
         title: Carbon intensity of energy (including land-use change)
-        description_short: Fossil and land-use-change [carbon dioxide (CO₂)](#dod:co2) emissions per unit of [total energy supply](#dod:total-energy-supply), measured in grams of CO₂ per kilowatt-hour.
+        description_short: Fossil and land-use-change carbon dioxide (CO₂) emissions per unit of [total energy supply](#dod:total-energy-supply), measured in grams of CO₂ per [kilowatt-hour](#dod:watt-hours).
         display:
           name: Carbon intensity of energy (including land-use change)
           shortUnit: g
