@@ -121,7 +121,7 @@ The canonical items, in order:
 8. Apply the reviewer's flagged notes; regenerate the HTML and re-import their JSON.
 9. Chart-diff sign-off on staging, then merge.
 10. **Confirm the scatter views actually reached production.** A merged PR is not evidence that they did: chart-sync only carries chart edits whose diffs were **approved** in Chart Diff, so a PR can merge green with every row ✅ on staging and leave production untouched. An abandoned first attempt (PR #6173, merged 2026-06-24) left production untouched on all seven of its pairs — deliberately: the `target_query_param` needed for Part 2 did not exist yet, so it was dropped and the migration restarted from scratch rather than left half-done. Whatever the reason, check production directly rather than inferring it from the merge.
-11. **Reference sweep on the old charts** — `find-chart-references` over each source slug *and its aliases*. Re-point embeds and links at the target's scatter view **before** retiring anything: an embed is never fixed by a redirect, and a link that works only via a 301 outlives everyone's memory of why.
+11. **Reference sweep on the old charts** — `find-chart-references` over each source slug *and its aliases*. Re-point embeds and links at the target's scatter view **before** retiring anything: an embed is never fixed by a redirect, and a link that works only via a 301 outlives everyone's memory of why. **Do not skip this because the Part 2 audit reports few references** — it counts a narrower set; see the key-chart trap below.
 12. Narrative charts on the sources: replace where the parent is being retired (create → re-point articles → delete; never delete first).
 13. **Part 2 audit** — `redirect_to_scatter.py` with no `--apply`. Read every verdict.
 14. Part 2 `--apply` on staging, then the browser checks in "Verifying Part 2".
@@ -304,6 +304,14 @@ The script's own table covers only gdoc links and embeds — enough to spot the 
 ```
 
 Include the sources' **aliases** in `--chart-slugs`: an article may well link an even older slug. The sweep catches what `get_chart_references` counts but doesn't locate — explorers, data insights, static viz, narrative charts, key-chart slots, WordPress posts — and it reports its own **gaps**, so a surface it couldn't check is visible rather than silently absent. Triage it the way that skill does: an **embed** is 🔴 and blocks the row (it breaks the moment the source is unpublished), a **link** is 🟡 (the 301 covers it; update the href anyway), and an unpublished or draft page is ℹ️.
+
+### Key-chart slots — the Part 2 audit cannot see them
+
+`get_chart_references` counts `postsWordpress`, `postsGdocs`, `explorers`, `narrativeCharts`, `dataInsights` and `staticViz`. **Key charts are none of those** — a key chart is a chart↔tag association (`chart_tags.keyChartLevel`), not a row in any reference table — so `redirect_to_scatter.py` reports nothing for them and its verdicts look clean while topic pages quietly depend on the chart you are about to unpublish.
+
+Unpublishing the source does not break a link here; it removes the chart from the topic page's key-chart list. So the loss is silent, on pages nobody is looking at during the migration. **Move each association to the target chart** (same tag, same `keyChartLevel`) as part of step 11.
+
+This is the concrete reason step 11 says not to trust a quiet Part 2 audit: on 2026-08-04 the audit's own tables held 6 embeds + 3 links, while the full sweep found **15 key-chart slots across 13 topic pages** — the largest single category, and entirely invisible to Part 2.
 
 ### Narrative charts
 
