@@ -201,7 +201,7 @@ Like the parent edit itself, child fixes land on **staging only** and ride chart
 
 **Style rules for writing text** live in `.claude/skills/owid-metadata-generation/SKILL.md` — follow its field-by-field guidelines whenever composing new text (description_short must not repeat the title; plain language, expand acronyms; description_key ordered data-specific → methodology → caveats; curly apostrophes; American English; per-field guidance in `schemas/definitions.json`).
 
-**The check suite** is also defined there (see "Metadata quality checks" in that SKILL — the canonical list, mirroring `/update-dataset` §6b/§6c): typos (`/check-metadata-typos`), Jinja spacing (`/check-metadata-spacing`), style guide (`/check-metadata-style`), the manual clarity checklist, link + `#dod:` verification, and adversarial claims verification (`/adversarial-data-review`).
+**The check suite** is also defined there (see "Metadata quality checks" in that SKILL — the canonical list, mirroring `/update-dataset` §6b/§6c): typos (`/check-metadata-typos`), Jinja spacing (`/check-metadata-spacing`), style guide (`/check-metadata-style`), the manual clarity checklist, link + `#dod:` verification, the dimension sweep, and adversarial claims verification (`/adversarial-data-review`).
 
 Scoping rules specific to this skill:
 
