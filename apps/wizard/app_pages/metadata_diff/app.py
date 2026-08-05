@@ -1055,8 +1055,8 @@ def render_view_diff_page(
             if i == "":
                 return "Select a changed view…"
             cv = changed_views[int(i)]
-            # 🟢 once reviewed, 🟡 not yet, 🆕 for a view that doesn't exist in the baseline.
-            marker = "🆕" if cv.is_new else ("🟢" if int(i) in visited else "🟡")
+            # 🟢 once reviewed, 🟡 not yet.
+            marker = "🟢" if int(i) in visited else "🟡"
             charts, _ = _view_impact(cv, usage)
             suffix = f"  —  ↗ {len(charts)} charts" if charts else ""
             return f"{marker} {_view_label(cv, dimensions)}{suffix}"
@@ -1082,7 +1082,7 @@ def render_view_diff_page(
     # --- MDim controls (navigation across views) ---------------------------------
     if changed_views:
         st.caption(
-            "In the jump menu above: 🟡 a changed view · 🟢 already viewed · 🆕 a new view. "
+            "In the jump menu above: 🟡 a changed view · 🟢 already viewed. "
             "Use **Next change ▶** to step through the changes one by one."
         )
     selection: dict[str, str] = {}
