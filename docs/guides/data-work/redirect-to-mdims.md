@@ -172,7 +172,8 @@ migrates their old slugs in one transaction.
 !!! note "The CSV takes one bare chart path per row"
     No query string on the source, no `/explorers/` source. Both pass validation and then
     misbehave — a `?…` source never matches; an explorer source sends *every* view to one
-    MDIM view. The fix is in the script, not the CSV: ask a Grapher developer.
+    MDIM view. The fix is in the script, not the CSV — ask a Grapher developer if you need
+    to cover either case.
 
 ## Why the two differ
 
