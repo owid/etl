@@ -36,10 +36,9 @@ at it, and its bulk endpoint accepts explorer sources only. The CLI
 (`owid-grapher/devTools/createMultiDimRedirectsFromCsv.ts`) exists precisely for
 the chart case.
 
-**And only for that case: one bare chart path per row.** Two things the CSV
-pipeline cannot express — if a migration needs either, the CLI itself has to
-change first, so raise it with a Grapher developer instead of bending the CSV
-around it:
+**And only for that case: one bare chart path per row.** Two shapes the CSV
+pipeline cannot express. Neither is worked around by editing the CSV — one has
+another route, the other needs the CLI changed:
 
 - **Source query params.** The source column is a path. Anything after `?`
   survives into `multi_dim_redirects.source` verbatim, and chart sources are baked
