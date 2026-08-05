@@ -1,6 +1,6 @@
 ---
 name: add-provider-regions
-description: Add an external provider's regional aggregation (e.g. World Bank, WHO, Maddison, WID, ILO) to OWID's regions dataset — definitions in regions.yml, per-provider grapher map indicators, and metadata — then register it in owid-grapher, including proposing each region's chart color (ContinentColors) and map color (MapContinentColors) for design sign-off. First checks whether the provider's dataset already encodes the regions and their country composition; if not, asks the user for a reference (link/doc) to derive it from. Trigger when the user wants to add/define a provider's world regions, expose "{Provider} regions" on a map, pick or fix the colors of a provider's regions, or migrate an in-dataset region variable to the shared regions dataset.
+description: Add an external provider's regional aggregation (e.g. World Bank, WHO, Maddison, WID, ILO) to OWID's regions dataset — definitions in regions.yml, per-provider grapher map indicators, and metadata — then register it in owid-grapher, including proposing each region's chart color (ContinentColors) and map color (MapContinentColors) for design sign-off and recording the agreed palette on the design team's Figma board. First checks whether the provider's dataset already encodes the regions and their country composition; if not, asks the user for a reference (link/doc) to derive it from. Trigger when the user wants to add/define a provider's world regions, expose "{Provider} regions" on a map, pick or fix the colors of a provider's regions, or migrate an in-dataset region variable to the shared regions dataset.
 metadata:
   internal: true
 ---
@@ -470,11 +470,38 @@ Confirm the provider appears in `regionGroupLabels` and the relevant label recor
 Colors are a design call, and what the skill produces is a **first stab** — it always goes to a human. All of this happens on the **owid-grapher** PR, not the ETL one:
 
 1. **Open the PR** (above) with the proposed colors in the body: a `region → chart color → map color` table (constant names *and* hex), the provider you mirrored, and the link to **this branch's** test page — `http://<container-name>/admin/test-region-maps`, with `<container-name>` derived as above. Wait for the staging server to build before sharing the link; open it yourself first.
-2. **Ask Marwa** — draft a Slack message to `@mrwbkrm` with that same table and link, asking her to look at the rendered maps on the test page (point at the *"Providers with hard-coded region colors"* section). Don't request the code review yet.
+
+   **Don't name or `@`-tag the designer anywhere in the PR** — not in the body, not in a comment, not as a reviewer. `owid-grapher` is public, and a handle in a public thread both pings someone who was never asked there and puts who-reviews-what on the open internet (`CLAUDE.md` → Team). Say that a design pass is pending and leave it unattributed; the request itself goes over Slack in the next step. The same goes for reporting back: describe what the design pass concluded, never who concluded it.
+2. **Ask for the design pass over Slack** — draft a message to `@mrwbkrm` with that same table and link, asking her to look at the rendered maps on the test page (point at the *"Providers with hard-coded region colors"* section). Slack is the right surface for it precisely because it isn't public. Don't request the code review yet.
 3. **Apply her changes**, push, and only then **request review from Sophia** — `gh pr edit <n> --add-reviewer sophiamersmann`.
-4. Both the PR body and the Slack message carry the attribution blockquote (`CLAUDE.md` → Team).
+4. **Once the colors are agreed, put them on the design team's Figma board** — see below. The board is the design-side record of the palette; a provider that only exists in `CustomSchemes.ts` has no visual record anyone outside the code can look at.
+5. Both the PR body and the Slack message carry the attribution blockquote (`CLAUDE.md` → Team).
 
 > **You can start this before the ETL PR merges** — the color review only needs `regions.data.ts` to know the new provider, and the `ETL_REGIONS_URL` preview gives you that from your ETL branch's staging catalog. What you must **not** do is merge the grapher PR on a staging-derived `regions.data.ts`: re-run `yarn runRegionsUpdater` against prod once the regions are live there, and push that regeneration as the last commit. The colors don't change in that regeneration — only the region data does.
+
+### Record the agreed palette on the Figma board
+
+The design team keeps every provider's regions, rendered under the map palette, on **Frame 99** (node `1733:1130`) of the *"New Categorical Palette for Maps"* page in the [Color Explorations](https://www.figma.com/design/EpWbE8AkTYWxK8FECGhoHj/Color-Explorations?node-id=1733-1130) file. Add the new provider there once the colors are agreed.
+
+**Propose it; don't just write it.** This is a shared design file that other people are working in — show the user exactly what you intend to add (which rows, which maps) and get an explicit go-ahead before touching it. Reading it to check the conventions needs no permission.
+
+How the board is laid out — match it rather than inventing a spot:
+
+- Frame 99 is **absolutely positioned** (`layoutMode: NONE`), one **row per provider tier**, so `fao_1` and `fao_2` are separate rows exactly as `ilo_1`/`ilo_2` already are.
+- Each row is a **594×419 map export**: the **BEFORE** column at `x = 1751`, the **AFTER** column at `x = 2420`, with a text note in the right-hand column at `x ≈ 3043` listing the changes as `Region: OldColor → NewColor`.
+- Rows run down the frame on a **481 px pitch**. Add yours below the last existing row and grow Frame 99's height to fit — don't overlap the bottom edge.
+- **A fresh provider fills the AFTER column only**, and needs no note: there is no "before" when the regions were never colored. The BEFORE column and the note column are for *recolors* of already-published regions (see *Renaming existing regions*), where the point is the change.
+- Name the frame `<provider-full-name-slug>-regions-<defined_by>` — e.g. `food-and-agriculture-organization-regions-fao_2`, `united-nations-regions-un_m49_3`. (On the older paired rows a trailing ` 1`/` 2` distinguishes before/after; don't imitate it for a single new frame.)
+
+The maps are grapher's own SVG export pasted in, which is why each one still carries its country vectors and a `categorical-color-legend` group. Reproduce that with `figma.createNodeFromSvg`, fed from the chart SVG on **your branch's** staging server so the colors are the agreed ones:
+
+```bash
+curl -s "http://<container-name>/grapher/<chart-slug>.svg?tab=map" -o /tmp/<slug>.svg
+```
+
+Then `use_figma` to insert it — **load the `figma-use` skill first** (it's a hard prerequisite for that tool), switch to the page with `await figma.setCurrentPageAsync(page)` since it isn't the default one, and return the created node ids. Finish by screenshotting the new row (`await node.screenshot()`) and showing it to the user: an SVG that imported at the wrong scale or landed on top of a neighboring row is obvious in a picture and invisible in the node list.
+
+If the provider has no published region chart to export, there is nothing to paste — build the chart first (Step 7) or skip the board and say so, rather than hand-drawing an approximation of a map.
 
 ### Renaming existing regions (not a fresh add)
 
@@ -511,5 +538,5 @@ The [world-region-map-definitions](https://ourworldindata.org/world-region-map-d
 - **owid-grapher is a separate repo and a separate PR**, done *after* the ETL regions are merged & on the prod catalog. `regions.data.ts` is auto-generated (`yarn runRegionsUpdater`) — never hand-edit it; the hand-maintained parts are the label/description registries and the two color dictionaries.
 - **Region colors are keyed by name, not by legend position.** A map without `baseColorScheme: OwidCategoricalMap` falls back to `BuGn`, and any `customCategoryColors` block overrides the name lookup entirely — both silently, with a chart that still renders.
 - **`MapContinentColors` spreads `ContinentColors`**, so a region added to only one dictionary looks right on the test page's line chart and wrong on its map (strong chart color where a muted one belongs). Add both.
-- **Colors always go to a human** (`@mrwbkrm` for the design call, `@sophiamersmann` for the code review) — the skill's proposal is a first stab, never the final word.
+- **Colors always go to a human** (`@mrwbkrm` for the design call, `@sophiamersmann` for the code review) — the skill's proposal is a first stab, never the final word. The agreed result then goes on **Frame 99** of the Color Explorations Figma file, one row per tier — and that write to a shared design file needs the user's explicit go-ahead.
 - The grapher `RegionDataProvider` / `RegionGroupKey` / `TooltipKey` types are exhaustive `Record<…>` unions, so a forgotten label is a **typecheck error**, not a silent gap — run `yarn typecheck` to find them.
