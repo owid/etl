@@ -118,7 +118,9 @@ tables:
         presentation:
           grapher_config:
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Northern America (UN)": "Northern America"
                   "Latin America and the Caribbean (UN)": "Latin America and the Caribbean"
@@ -145,7 +147,9 @@ tables:
         presentation:
           grapher_config:
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Americas (UN M49)": "Americas"
                   "Africa (UN M49)": "Africa"
@@ -161,24 +165,19 @@ tables:
           Level-2 regions defined by the United Nations.
         type: ordinal
         sort:
-          # Americas
           - Northern America (UN M49)
           - Latin America and the Caribbean (UN M49)
-          # Africa
-          - Sub-Saharan Africa (UN M49)
           - Northern Africa (UN M49)
-          # Europe
+          - Sub-Saharan Africa (UN M49)
           - Southern Europe (UN M49)
           - Western Europe (UN M49)
           - Northern Europe (UN M49)
           - Eastern Europe (UN M49)
-          # Asia
           - Western Asia (UN M49)
           - Central Asia (UN M49)
           - Southern Asia (UN M49)
           - Eastern Asia (UN M49)
           - South-eastern Asia (UN M49)
-          # Oceania
           - Australia and New Zealand (UN M49)
           - Melanesia (UN M49)
           - Micronesia (UN M49)
@@ -188,7 +187,9 @@ tables:
         presentation:
           grapher_config:
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   # Americas
                   "Northern America (UN M49)": "Northern America"
@@ -221,19 +222,24 @@ tables:
           Level-3 (most granular) regions defined by the United Nations.
         type: ordinal
         sort:
-          - "Central America (UN M49)"
-          - "Caribbean (UN M49)"
-          - "South America (UN M49)"
-          - "Western Africa (UN M49)"
-          - "Middle Africa (UN M49)"
-          - "Southern Africa (UN M49)"
-          - "Eastern Africa (UN M49)"
+          - Central America (UN M49)
+          - Caribbean (UN M49)
+          - South America (UN M49)
+          - Western Africa (UN M49)
+          - Middle Africa (UN M49)
+          - Southern Africa (UN M49)
+          - Eastern Africa (UN M49)
+          # NOTE: not aligned to customRegionDisplayOrder yet. These seven regions have no
+          # entry in MapContinentColors, so their colors come from palette *position* —
+          # reordering would silently recolor them. Reorder together with pinning them.
         origins:
           - *origins_un_m49
         presentation:
           grapher_config:
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Central America (UN M49)": "Central America"
                   "Caribbean (UN M49)": "Caribbean"
@@ -265,7 +271,9 @@ tables:
         presentation:
           grapher_config:
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Europe and Northern America (UN SDG)": "Europe and Northern America"
                   "Latin America and the Caribbean (UN SDG)": "Latin America and the Caribbean"
@@ -297,7 +305,9 @@ tables:
         presentation:
           grapher_config:
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "North America (WB)": "North America"
                   "Latin America and Caribbean (WB)": "Latin America and Caribbean"
@@ -327,7 +337,9 @@ tables:
         presentation:
           grapher_config:
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Americas (WHO)": "Americas"
                   "Africa (WHO)": "Africa"
@@ -345,15 +357,33 @@ tables:
           Regions as defined by the International Energy Agency.
         type: ordinal
         sort:
-          - Asia Pacific (IEA)
-          - Africa (IEA)
-          - Central and South America (IEA)
-          - Europe (IEA)
-          - Middle East (IEA)
           - North America (IEA)
+          - Central and South America (IEA)
+          - Africa (IEA)
+          - Middle East (IEA)
+          - Europe (IEA)
           - Eurasia (IEA)
+          - Asia Pacific (IEA)
         origins:
           - *origins_iea_regions
+        presentation:
+          grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
+            map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
+              colorScale:
+                baseColorScheme: OwidCategoricalMap    # name-keyed region colors
+                customCategoryLabels:
+                  "North America (IEA)": "North America"
+                  "Central and South America (IEA)": "Central and South America"
+                  "Africa (IEA)": "Africa"
+                  "Middle East (IEA)": "Middle East"
+                  "Europe (IEA)": "Europe"
+                  "Eurasia (IEA)": "Eurasia"
+                  "Asia Pacific (IEA)": "Asia Pacific"
+                customHiddenCategories:
+                  "No data": true
 
       # Energy Institute
       ei_region:
@@ -364,9 +394,9 @@ tables:
         sort:
           - North America (EI)
           - South and Central America (EI)
-          - Europe (EI)
           - Africa (EI)
           - Middle East (EI)
+          - Europe (EI)
           - CIS (EI)
           - Asia Pacific (EI)
         origins:
@@ -376,15 +406,9 @@ tables:
             hideAnnotationFieldsInTitle:
               time: true
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
-                customCategoryColors:
-                  "North America (EI)": "#CC7641"
-                  "South and Central America (EI)": "#B04E74"
-                  "Europe (EI)": "#526F9B"
-                  "CIS (EI)": "#92D3DE"
-                  "Middle East (EI)": "#C3A27C"
-                  "Africa (EI)": "#A07AB8"
-                  "Asia Pacific (EI)": "#6FA54F"
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "North America (EI)": "North America"
                   "South and Central America (EI)": "South and Central America"
@@ -405,9 +429,9 @@ tables:
         sort:
           - North America (Ember)
           - Latin America and Caribbean (Ember)
-          - Europe (Ember)
           - Africa (Ember)
           - Middle East (Ember)
+          - Europe (Ember)
           - Asia (Ember)
           - Oceania (Ember)
         origins:
@@ -417,15 +441,9 @@ tables:
             hideAnnotationFieldsInTitle:
               time: true
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
-                customCategoryColors:
-                  "North America (Ember)": "#CC7641"
-                  "Latin America and Caribbean (Ember)": "#B04E74"
-                  "Europe (Ember)": "#526F9B"
-                  "Africa (Ember)": "#A07AB8"
-                  "Middle East (Ember)": "#C3A27C"
-                  "Asia (Ember)": "#238A84"
-                  "Oceania (Ember)": "#5FB8C8"
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Africa (Ember)": "Africa"
                   "Asia (Ember)": "Asia"
@@ -455,7 +473,9 @@ tables:
         presentation:
           grapher_config:
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "North America (Pew)": "North America"
                   "Latin America-Caribbean (Pew)": "Latin America-Caribbean"
@@ -474,13 +494,13 @@ tables:
         type: ordinal
         sort:
           - Western offshoots (Maddison)
+          - Latin America (Maddison)
+          - Sub Saharan Africa (Maddison)
+          - Middle East and North Africa (Maddison)
           - Western Europe (Maddison)
           - Eastern Europe (Maddison)
-          - Latin America (Maddison)
-          - East Asia (Maddison)
           - South and South East Asia (Maddison)
-          - Middle East and North Africa (Maddison)
-          - Sub Saharan Africa (Maddison)
+          - East Asia (Maddison)
         origins:
           - *origins_maddison
         presentation:
@@ -488,7 +508,9 @@ tables:
             hideAnnotationFieldsInTitle:
               time: true
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Western offshoots (Maddison)": "Western offshoots"
                   "Western Europe (Maddison)": "Western Europe"
@@ -510,12 +532,12 @@ tables:
         sort:
           - North America (WID)
           - Latin America (WID)
+          - Sub-Saharan Africa (WID)
+          - Middle East and North Africa (WID)
           - Europe (WID)
           - Russia and Central Asia (WID)
-          - Middle East and North Africa (WID)
-          - Sub-Saharan Africa (WID)
-          - East Asia (WID)
           - South and South-East Asia (WID)
+          - East Asia (WID)
           - Oceania (WID)
         origins:
           - *origins_wid
@@ -524,7 +546,9 @@ tables:
             hideAnnotationFieldsInTitle:
               time: true
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "North America (WID)": "North America"
                   "Latin America (WID)": "Latin America"
@@ -545,11 +569,11 @@ tables:
           Broad regions as defined by the International Labour Organization (ILO).
         type: ordinal
         sort:
-          - Africa (ILO)
           - Americas (ILO)
+          - Africa (ILO)
           - Arab States (ILO)
-          - Asia and the Pacific (ILO)
           - Europe and Central Asia (ILO)
+          - Asia and the Pacific (ILO)
         origins:
           - *origins_ilo
         presentation:
@@ -557,7 +581,9 @@ tables:
             hideAnnotationFieldsInTitle:
               time: true
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Africa (ILO)": "Africa"
                   "Americas (ILO)": "Americas"
@@ -574,17 +600,17 @@ tables:
           Subregions as defined by the International Labour Organization (ILO).
         type: ordinal
         sort:
+          - Northern America (ILO)
+          - Latin America and the Caribbean (ILO)
           - Northern Africa (ILO)
           - Sub-Saharan Africa (ILO)
-          - Latin America and the Caribbean (ILO)
-          - Northern America (ILO)
           - Arab States (ILO)
-          - Eastern Asia (ILO)
-          - South-Eastern Asia and the Pacific (ILO)
-          - Southern Asia (ILO)
-          - Northern, Southern and Western Europe (ILO)
+          - "Northern, Southern and Western Europe (ILO)"
           - Eastern Europe (ILO)
           - Central and Western Asia (ILO)
+          - Southern Asia (ILO)
+          - Eastern Asia (ILO)
+          - South-Eastern Asia and the Pacific (ILO)
         origins:
           - *origins_ilo
         presentation:
@@ -592,7 +618,9 @@ tables:
             hideAnnotationFieldsInTitle:
               time: true
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Northern Africa (ILO)": "Northern Africa"
                   "Sub-Saharan Africa (ILO)": "Sub-Saharan Africa"
@@ -627,7 +655,9 @@ tables:
             hideAnnotationFieldsInTitle:
               time: true
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Africa (FAO)": "Africa"
                   "Americas (FAO)": "Americas"
@@ -672,7 +702,9 @@ tables:
             hideAnnotationFieldsInTitle:
               time: true
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Northern Africa (FAO)": "Northern Africa"
                   "Eastern Africa (FAO)": "Eastern Africa"
@@ -720,7 +752,9 @@ tables:
             hideAnnotationFieldsInTitle:
               time: true
             map:
+              tooltipUseCustomLabels: true   # tooltip shows the stripped label, not "<Region> (<Provider>)"
               colorScale:
+                baseColorScheme: OwidCategoricalMap
                 customCategoryLabels:
                   "Sub-Saharan Africa (FAO)": "Sub-Saharan Africa"
                   "Northern America and Europe (FAO)": "Northern America and Europe"

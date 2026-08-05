@@ -41,7 +41,8 @@ class AdminAPI:
             headers["x-act-as-user"] = str(user_id)
         return headers
 
-    def _json_from_response(self, resp: requests.Response) -> dict:
+    def _raise_for_response(self, resp: requests.Response) -> None:
+        """Log and raise on a failed response. Split out for the routes that answer without a body."""
         if resp.status_code != 200:
             log.error("Admin API error", status_code=resp.status_code, text=resp.text)
         if resp.status_code == 401 and not self.api_key:
@@ -51,6 +52,9 @@ class AdminAPI:
                 f'Generate it with: ssh owid@owid-admin-prod "cd ~/owid-grapher && yarn createAdminApiKey{user_id_hint}"'
             )
         resp.raise_for_status()
+
+    def _json_from_response(self, resp: requests.Response) -> dict:
+        self._raise_for_response(resp)
         try:
             js = resp.json()
         except (json.JSONDecodeError, requests.exceptions.JSONDecodeError) as e:
@@ -138,9 +142,12 @@ class AdminAPI:
     def create_site_redirect(self, source: str, target: str, user_id: int | None = None) -> dict:
         """Create a site-wide URL redirect (redirects table).
 
-        Unlike chart_slug_redirects (slug -> chartId only), this supports an
-        arbitrary target including a query string, e.g. "/grapher/foo?tab=scatter".
-        Source query params are stripped on redirect; the target may carry its own.
+        For arbitrary paths, including wildcards — not just charts. It bakes into the static
+        `_redirects` file as an unconditional 301 that matches before the grapher route runs,
+        so it also shadows any chart redirect on the same source.
+
+        For a chart -> chart redirect prefer `create_chart_redirect`: the alias then shows up in
+        the target chart's editor, and since grapher #6674 it carries a query string too.
         """
         resp = http_session.post(
             f"{self.owid_env.admin_api}/site-redirects/new",
@@ -162,6 +169,96 @@ class AdminAPI:
             timeout=TIMEOUT,
         )
         return self._json_from_response(resp)
+
+    def create_chart_redirect(
+        self,
+        chart_id: int,
+        slug: str,
+        target_query_param: str | None = None,
+        user_id: int | None = None,
+    ) -> dict:
+        """Point an old slug at a chart (chart_slug_redirects).
+
+        The API behind the chart editor's "Alternative URLs for this chart". `chart_id` is the
+        TARGET chart; `slug` is the old, bare slug (no "/grapher/", no leading slash).
+        `target_query_param` is a query string without the leading "?", e.g.
+        "tab=scatter&time=latest" — the server trims it and stores an empty string as NULL.
+
+        The redirect is consulted only when /grapher/<slug> returns a 404, so the chart that
+        owns the slug has to be unpublished for it to fire. The stored params are only a base:
+        the visitor's own query params override them key by key.
+
+        Two asymmetries with `create_site_redirect`, both left to the caller: this endpoint
+        validates nothing (a duplicate slug comes back as a raw MySQL unique-key error rather
+        than a JsonError, and chains are not rejected), and it does not trigger a static build,
+        so the row stays unbaked until some other mutation triggers one.
+        """
+        payload: dict[str, Any] = {"slug": slug}
+        if target_query_param is not None:
+            payload["targetQueryParam"] = target_query_param
+        resp = http_session.post(
+            f"{self.owid_env.admin_api}/charts/{chart_id}/redirects/new",
+            headers=self._headers(user_id),
+            json=payload,
+            timeout=TIMEOUT,
+        )
+        js = self._json_from_response(resp)
+        if not js.get("success"):
+            raise AdminAPIError(
+                {
+                    "error": js.get("error"),
+                    "chart_id": chart_id,
+                    "slug": slug,
+                    "target_query_param": target_query_param,
+                }
+            )
+        return js
+
+    def get_chart_redirects(self, chart_id: int) -> list[dict]:
+        """Old slugs pointing AT this chart: [{id, slug, chartId, targetQueryParam}].
+
+        These are inbound aliases, and unpublishing a chart deletes every one of them
+        ("Unpublishing chart, delete any existing redirects to it" in the grapher admin), so
+        read them before an unpublish if they have to survive it.
+        """
+        resp = http_session.get(
+            f"{self.owid_env.admin_api}/charts/{chart_id}.redirects.json",
+            headers=self._headers(),
+            timeout=TIMEOUT,
+        )
+        return self._json_from_response(resp).get("redirects", [])
+
+    def delete_chart_redirect(self, redirect_id: int, user_id: int | None = None) -> dict:
+        """Delete a chart redirect by id.
+
+        Note the asymmetric paths: creating one is /charts/{chart_id}/redirects/new, deleting it
+        is /redirects/{id}. There is no update endpoint, so callers change a target_query_param
+        by deleting and re-creating. Unlike the create, this does trigger a static build.
+        """
+        resp = http_session.delete(
+            f"{self.owid_env.admin_api}/redirects/{redirect_id}",
+            headers=self._headers(user_id),
+            timeout=TIMEOUT,
+        )
+        return self._json_from_response(resp)
+
+    def trigger_static_build(self) -> None:
+        """Enqueue a static build — the admin's "Manually triggered deploy".
+
+        Most mutating routes trigger one themselves, but a few don't: `create_chart_redirect` is the
+        notable one, so a redirect written that way does not reach the baked redirect map (and so
+        does not serve) until some unrelated mutation happens to bake the site. Call this when a run
+        might not have triggered a build any other way. The deploy queue coalesces changes, so
+        calling it alongside a mutation that already triggered one costs nothing.
+
+        The route answers with an empty body, hence no return value and no JSON parsing.
+        """
+        resp = http_session.put(
+            f"{self.owid_env.admin_api}/deploy",
+            headers=self._headers(),
+            timeout=TIMEOUT,
+        )
+        self._raise_for_response(resp)
 
     def put_grapher_config(self, variable_id: int, grapher_config: dict[str, Any]) -> dict:
         # If schema is missing, use the default one

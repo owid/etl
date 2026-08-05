@@ -46,7 +46,7 @@ blank dimension values that a view leaves unset, and a blank never matches a rea
 views would quietly land on the MDIM's default view instead of the one you mapped them to. The
 payload has them removed.
 
-It also sweeps the site for everything pointing at the explorer, which is step 2.
+The skill also sweeps the site for everything pointing at the explorer, which is step 2.
 
 ### 2. Replace the references in articles
 
@@ -91,7 +91,9 @@ Either action re-bakes automatically.
 ### 4. Apply
 
 At `/admin/multi-dim-redirects`, use **Bulk-create redirects from JSON**, once per explorer.
-Rehearse on staging if you like, but the real redirect is created **in production**. Verify:
+Rehearse on staging if you like, but the real redirect is created **in production**.
+
+If you want, you can verify in the terminal:
 
 ```bash
 curl -sI "https://ourworldindata.org/explorers/<slug>?<one view's params>" \
@@ -124,7 +126,7 @@ Then remove the ETL footprint. **Never delete a step without archiving it** (see
 
 !!! danger "Grep before deleting a shared step"
     Some explorer data steps are read **off-DAG**, by scripts fetching their published CSVs
-    by URL. `.venv/bin/etl archive-dag` cannot see those, so the step looks like a safe leaf when it
+    by URL. `.venv/bin/etl archive-dag` cannot see those, so the step looks archived when it
     is not. Search for its catalog URL first, and keep it until every consumer is retired.
 
 ## Charts
@@ -166,12 +168,6 @@ migrates their old slugs in one transaction.
     and its bulk endpoint takes explorer sources only. Most charts have old slugs, so the
     CLI is the only route — and it is what repoints them, so hand-unpublishing a chart first
     turns its old URLs into 404s.
-
-### 5. Log the cutover date
-
-Ask for confirmation of when the run happened and record it. Once a chart stops being
-published its view history resolves to a null chart id, retroactively, so a continuous
-series needs the old slug before the cutover and the MDIM slug after.
 
 ## Why the two differ
 
