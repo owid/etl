@@ -405,9 +405,19 @@ def _map_config(fuel: str, metric: str, count: str, stats: tuple[float, float, f
 
 # Hand-set map brackets that beat the auto log-ladder for a given view, carried over from the original
 # chart. Gas reserves span such a wide range that the 1-2-5 ladder looks noisy; the original 100b, 300b,
-# 1t, 3t, 10t, 30t brackets (cubic meters) read far better.
+# 1t, 3t, 10t, 30t brackets (cubic meters) read far better. The energy-unit production/consumption
+# views keep the original charts' brackets too: the auto ladder caps at the 99th percentile across all
+# country-years, which lands around 2,000 TWh and lumps the top producers (China's coal production
+# alone is ~26,000 TWh) into a single bracket. Top edges that now sit above the data maximum (coal
+# production's 50,000, oil production's 12,000) are trimmed so the last bracket stays open-ended.
 FIXED_MAP_EDGES = {
     ("gas", "reserves", "total"): [0, 1e11, 3e11, 1e12, 3e12, 1e13, 3e13],
+    ("coal", "production", "total"): [0, 100, 200, 500, 1000, 2000, 5000, 10000, 20000],
+    ("oil", "production", "total"): [0, 50, 150, 500, 1500, 4000, 10000],
+    ("gas", "production", "total"): [0, 10, 30, 100, 300, 1000, 3000, 10000],
+    ("coal", "consumption", "total"): [0, 100, 200, 500, 1000, 2000, 5000, 10000, 20000],
+    ("oil", "consumption", "total"): [0, 200, 500, 1000, 2000, 5000, 10000],
+    ("gas", "consumption", "total"): [0, 100, 200, 500, 1000, 2000, 5000],
 }
 
 
