@@ -252,7 +252,7 @@ definitions:
     <% if decile is defined and decile == "5" %>
     {definitions.description_key_median}
     <%- else %>
-    This data lets you compare incomes across deciles, or tenths of the population. The data shows the income threshold dividing each decile. The poorest decile threshold, for example, is the income level below which the poorest 10% of people in a country or region fall. We discuss these measures and the data in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
+    The data shows the income threshold dividing each decile, or tenth of the population. The poorest decile threshold, for example, is the income level below which the poorest 10% of people in a country or region fall. We discuss these measures and the data in more detail on our page on [economic inequality](https://ourworldindata.org/economic-inequality).
     <%- endif %>
 
   description_key_share: |-
