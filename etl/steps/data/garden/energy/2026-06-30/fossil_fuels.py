@@ -4,8 +4,7 @@ Coal, oil and gas production come from (in priority order):
 - Energy Institute Statistical Review of World Energy (from 1965).
 - Etemad & Luciani (1900-1979), for the historical fill before the Statistical Review.
 - U.S. EIA International Energy (1949-2025), for country breadth and recent years not covered by the
-  Statistical Review (this replaces the role the Shift Data Portal used to play, and fixes the 2016
-  truncation for the many countries the Statistical Review does not report).
+  Statistical Review.
 - Smil (2017), for World coal before 1900.
 - NIC / Fouquet UK historical energy, for United Kingdom coal before 1900.
 

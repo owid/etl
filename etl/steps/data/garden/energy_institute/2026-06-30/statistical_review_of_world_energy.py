@@ -80,7 +80,7 @@ COLUMNS = {
     # Index columns.
     "country": "country",
     "year": "year",
-    # Total energy supply (headline series, replaces the old substitution-method primary energy consumption).
+    # Total energy supply (headline series).
     "tes_ej": "total_energy_supply_ej",
     # Coal production.
     "coalprod_ej": "coal_production_ej",

@@ -1,13 +1,9 @@
-"""Energy mix based on Total Energy Supply (TES) from the Energy Institute's Statistical Review of World Energy.
+"""Energy mix: Total Energy Supply (TES) by source, from the Energy Institute's Statistical Review.
 
-Since the 2025 release, the Statistical Review reports energy as Total Energy Supply (physical energy
-content method) instead of the old substitution-method primary energy consumption. This step therefore
-reports a single TES measure per source (no more "direct" vs "input-equivalent" split).
-
-It consolidates what used to be three separate steps:
-- energy_mix: TES by source (absolute, per capita, share of total, annual change).
-- primary_energy_consumption: the total, extended with EIA for country coverage, plus per-GDP (Maddison).
-- global_primary_energy: the World long-run, extended back with Smil (2017).  [added in a later step]
+For each source and aggregate it reports TES in absolute terms, per capita, as a share of the total,
+and as annual change. The World series is extended back to 1800 with Smil (2017), the total is
+extended to countries not covered by the Statistical Review with EIA data, and a per-GDP variable is
+added (Maddison). Traditional biomass (Smil, World only) is kept separate from TES.
 """
 
 from owid.catalog import Dataset, Table
