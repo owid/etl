@@ -82,8 +82,8 @@ definitions:
   origins_ihme_gbd: &origins_ihme_gbd
     producer: IHME, Global Burden of Disease
     title: Global Burden of Disease, Location Hierarchy
-    url_main: https://ghdx.healthdata.org/record/global-burden-disease-study-2021-gbd-2021-cause-rei-and-location-hierarchies
-    date_accessed: "2026-08-04"
+    url_main: https://ghdx.healthdata.org/record/gbd-2023-cause-rei-and-location-hierarchies
+    date_accessed: "2026-08-05"
     attribution_short: IHME-GBD
 
 tables:

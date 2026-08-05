@@ -5358,13 +5358,16 @@
 
 ##########
 # Institute for Health Metrics and Evaluation (IHME), Global Burden of Disease (GBD)
-# https://ghdx.healthdata.org/record/global-burden-disease-study-2021-gbd-2021-cause-rei-and-location-hierarchies
+# https://ghdx.healthdata.org/record/gbd-2023-cause-rei-and-location-hierarchies
 # The GBD location hierarchy partitions the 204 countries and territories GBD reports on into two
 # nested levels: 7 super-regions (ihme_gbd_1) and 21 regions (ihme_gbd_2). Regions are grouped by
 # epidemiological similarity and geographic proximity, so they do not follow the UN M49 classification
 # (only High-income North America happens to coincide with another provider's region, by chance).
-# Membership is taken from IHME's published GBD location hierarchy file (levels 1-3 of the
-# 'GBD 2021 Locations Hierarchy' sheet); subnational levels 4-6 are ignored.
+# Membership is taken from IHME's published GBD location hierarchy (the Global-rooted location set of
+# the 'All Location Hierarchies' sheet, levels 1-3); subnational levels 4+ are ignored, as are the SDI
+# quintile groups that also sit at level 1 but aggregate by development level rather than geography.
+# GBD 2023 and GBD 2021 define these regions identically: same 7 super-regions, same 21 regions, same
+# 204 countries, verified member for member (ai/ihme_regions/compare_gbd_round.py).
 # NOTE: North Africa and Middle East, and South Asia, are super-regions with no finer breakdown, so
 # each is a single region present at both levels. They are tagged ihme_gbd_1 and back-filled into the
 # ihme_gbd_2 map in the grapher step (as done for ILO's Arab States).
