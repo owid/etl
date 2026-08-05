@@ -134,6 +134,7 @@ description_short: |-
 - **Order**: data-specific points first, methodology second, caveats last
 - Only describe data that actually exists in the indicator. State implications of limitations explicitly.
 - Separate distinct facts with blank lines (paragraphs), so line breaks render meaningfully.
+- **No redundancy.** The bullets are read as a set, directly under `description_short` and the chart's title/subtitle, so a new sentence that restates an existing bullet — or repeats `description_short`, the title, or the footnote — costs the reader attention and makes the panel look padded. Before adding one, read the whole *rendered* list and ask what it adds that isn't already there; if the answer is "it says it more fully", edit the existing bullet instead of adding a second one. Two shapes to watch: a source/caveat sentence that duplicates a caveat already made in different words, and a Jinja variant bullet that restates the shared bullet for some dimension values only.
 
 ```yaml
 # GOOD - prose paragraphs, sub-list only where it helps
