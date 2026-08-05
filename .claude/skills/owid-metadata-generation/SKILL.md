@@ -212,6 +212,8 @@ variables:
       name: With <<who_category>>
 ```
 
+**Sweep every dimension value before you ship dimensional text.** A sentence written with one breakdown in mind renders on all the others, where the view's own filtering can make it false: a caveat that the data doesn't control for X is wrong on the variant grouped **by** X, and a scope word like "all workers" overclaims on a variant restricted to a subgroup. Render the text for every value the indicator takes and read each output as a reader of that chart; qualify the wording so it holds everywhere (usually one word) rather than adding a Jinja branch, unless the qualified version loses something the reader needs.
+
 **Use `{definitions.xxx}` string interpolation** for reusing text fragments inline (e.g. `'{definitions.methodology}'` in a `description_key` bullet). Unlike YAML anchors which substitute entire nodes, this inserts text within strings. Use anchors for whole fields/blocks, interpolation for composing text.
 
 **Use `shared.meta.yml`** when multiple `.meta.yml` files in the same directory share definitions or macros. These files contain only Jinja macros and reusable definitions — no actual variable metadata. Step-level `.meta.yml` files then import and call these macros. Used in large multi-file datasets like IHME GBD.
