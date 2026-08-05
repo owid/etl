@@ -259,7 +259,12 @@ def _orange_banner(html_msg: str) -> None:
     )
 
 
-def _render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any]]]], unit: str = "view") -> None:
+def _render_impact(
+    view: ViewDiff,
+    usage: dict[int, dict[str, list[dict[str, Any]]]],
+    unit: str = "view",
+    scope_reviewed_default: bool = False,
+) -> None:
     """The 'does this also affect charts / other MDims?' flag for one view, with the affected list and
     (for MDim views) the 'change only this view' override — both as on-demand buttons on the right."""
     if not view.affects_indicator:
@@ -283,30 +288,46 @@ def _render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any
     if n_m:
         parts.append(f"<b>{n_m}</b> other MDim{'s' if n_m != 1 else ''}")
 
-    col_msg, col_btn = st.columns([5, 2], vertical_alignment="center")
-    with col_msg:
-        if parts:
-            _orange_banner(
-                "This change is in the <b>shared indicator metadata</b> — it also affects "
-                + " and ".join(parts)
-                + " that use this indicator."
-            )
-        else:
-            _orange_banner(
-                "This change is in the <b>shared indicator metadata</b>, but no published charts or other "
-                "MDims currently use this indicator — so nothing else is affected."
-            )
-    with col_btn:
-        # Standalone charts have no scope decision, so they get the peek popover here. For MDim views the
-        # affected list is revealed at the scope decision, which gates "apply to all" behind seeing it.
-        if (n_c or n_m) and unit == "chart":
-            btn_label = (
-                f"📊 Show {n_c} affected chart{'s' if n_c != 1 else ''}"
-                if n_c
-                else f"🧭 Show {n_m} affected MDim{'s' if n_m != 1 else ''}"
-            )
-            with st.popover(btn_label, use_container_width=True):
-                _render_affected_lists(view, charts, mdims)
+    banner = (
+        "This change is in the <b>shared indicator metadata</b> — it also affects "
+        + " and ".join(parts)
+        + " that use this indicator."
+        if parts
+        else "This change is in the <b>shared indicator metadata</b>, but no published charts or other "
+        "MDims currently use this indicator — so nothing else is affected."
+    )
+    reach_short = f"{n_c} chart{'s' if n_c != 1 else ''}" + (f" · {n_m} other MDim{'s' if n_m else ''}" if n_m else "")
+
+    if unit == "chart":
+        # Standalone charts have no scope decision, so they get a peek popover beside the banner.
+        col_msg, col_btn = st.columns([5, 2], vertical_alignment="center")
+        with col_msg:
+            _orange_banner(banner)
+        with col_btn:
+            if n_c or n_m:
+                with st.popover(f"📊 Show {reach_short}", use_container_width=True):
+                    _render_affected_lists(view, charts, mdims)
+        return
+
+    # MDim view: the banner carries a review *button* that reveals the affected list and marks this
+    # indicator reviewed — which unlocks "apply to all" in the scope decision below.
+    _orange_banner(banner)
+    if n_c or n_m:
+        seen_key = f"affected-seen::{view.indicator_id}"
+        show_key = f"affected-show::{view.indicator_id}"
+        st.session_state.setdefault(seen_key, scope_reviewed_default)
+        showing = bool(st.session_state.get(show_key))
+        label = f"📊 Hide the {reach_short}" if showing else f"📊 Show the {reach_short} this change would also affect"
+        if st.button(
+            label,
+            key=f"affected-btn::{view.indicator_id}",
+            help="Review what else would change before you can apply this to all of them.",
+        ):
+            st.session_state[show_key] = not showing
+            if st.session_state[show_key]:
+                st.session_state[seen_key] = True
+        if st.session_state.get(show_key):
+            _render_affected_lists(view, charts, mdims)
 
 
 def _render_affected_lists(view: ViewDiff, charts: list[dict], mdims: list[dict]) -> None:
@@ -351,28 +372,13 @@ def _render_author_scope(
         # Default to the conservative "only this view" unless the author explicitly chose "apply to all".
         st.session_state[sk] = "all" if scopes.get(key) == "all" else "scoped"
 
-    def _save(value: str | None = None) -> None:
-        set_scope(source_engine, catalog_path, key, value or st.session_state.get(sk, "scoped"), _reviewer())
+    def _save() -> None:
+        set_scope(source_engine, catalog_path, key, st.session_state.get(sk, "scoped"), _reviewer())
 
-    # Gate: applying the change to *all* charts is only selectable once the author has expanded and seen
-    # the affected list — so "apply to all" is a deliberate choice, never the path of least resistance.
-    # A previously-saved "all" counts as already reviewed. With no other surface, there's nothing to gate.
+    # "Apply to all" unlocks only once the author has opened the affected-charts button in the banner
+    # above (which marks this indicator reviewed). With no other surface, there's nothing to gate.
     has_reach = bool(n_c or n_m)
-    seen_key = f"scope-seen::{key}"
-    st.session_state.setdefault(seen_key, st.session_state[sk] == "all")
-    if has_reach:
-        st.checkbox(
-            f"👀 Show the {reach} this would also change — required to apply to all",
-            key=seen_key,
-            help="See every chart / MDim affected before applying the change to all of them.",
-        )
-    reviewed = (not has_reach) or bool(st.session_state.get(seen_key))
-    if has_reach and st.session_state.get(seen_key):
-        _render_affected_lists(view_diff, imp.get("charts", []), imp.get("mdims", []))
-    elif has_reach and st.session_state.get(sk) == "all":
-        # Un-reviewed can't stay on "apply to all" — fall back to the conservative scope.
-        st.session_state[sk] = "scoped"
-        _save("scoped")
+    reviewed = (not has_reach) or bool(st.session_state.get(f"affected-seen::{view_diff.indicator_id}"))
 
     labels = {"all": f"Apply to all — {reach}", "scoped": "Scope to only this view"}
     radio_label = f"“{field_label(field_name)}” applies to" if multi else "This change applies to"
@@ -385,13 +391,13 @@ def _render_author_scope(
         horizontal=True,
         disabled=not reviewed,
         help="The author's decision: apply this shared change everywhere the indicator is used, or only to "
-        "this view. Review the affected charts above to unlock 'apply to all'. The reviewer is shown this "
-        "and approves or rejects it — they don't set it.",
+        "this view. Open the affected-charts button in the banner above to unlock 'apply to all'. The "
+        "reviewer is shown this and approves or rejects it — they don't set it.",
     )
     if has_reach and not reviewed:
         st.caption(
-            f"⤷ Defaults to **only this view** — since {reach} also use this indicator, *apply to all* "
-            "unlocks only once you expand the affected list above and see what would change."
+            f"⤷ Defaults to **only this view** — {reach} also use this indicator, so *apply to all* unlocks "
+            "only after you open the affected list in the banner above."
         )
 
 
@@ -426,12 +432,19 @@ def _render_diff_body(
 
     n = len(view_diff.fields)
     st.warning(f"**{n} field{'s' if n > 1 else ''} changed** in this {unit}.")
-    _render_impact(view_diff, usage, unit=unit)
 
-    # The author's scope decision(s) sit directly under the affected-charts button — scope is about
-    # those shared charts: apply the change everywhere the indicator is used, or only to this view.
+    shared_fields = [f for f in FIELD_ORDER if f in view_diff.fields and f in view_diff.indicator_changed_fields]
+    # A previously-saved "apply to all" on any shared field counts as already reviewed, so the reveal in
+    # the banner starts unlocked instead of silently reverting a saved decision on reload.
+    scope_reviewed_default = any(
+        (scopes or {}).get(text_change_key(catalog_path, f, view_diff.fields[f]["old"], view_diff.fields[f]["new"]))
+        == "all"
+        for f in shared_fields
+    )
+    _render_impact(view_diff, usage, unit=unit, scope_reviewed_default=scope_reviewed_default)
+
+    # The author's scope decision(s) sit under the banner — scope is about those shared charts.
     if unit == "view" and source_engine is not None:
-        shared_fields = [f for f in FIELD_ORDER if f in view_diff.fields and f in view_diff.indicator_changed_fields]
         for field_name in shared_fields:
             _render_author_scope(
                 catalog_path,
