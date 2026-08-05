@@ -51,7 +51,7 @@ tables:
       #     tableDisplay:
       #       hideAbsoluteChange:
       #       hideRelativeChange:
-      #     yearIsDay: false
+      #     timeInterval: day  # day | week | month | quarter | year | decade; omit for yearly data
       #     zeroDay:
       #     roundingMode:
       #     numSignificantFigures:

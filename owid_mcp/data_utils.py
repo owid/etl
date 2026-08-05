@@ -37,6 +37,12 @@ _NAME_TO_CODE_MAPPING: dict[str, str] | None = None
 # SQL validation pattern
 SQL_SELECT_RE = re.compile(r"^\s*select\b", re.IGNORECASE | re.DOTALL)
 
+# DuckDB (Datasette's current query backend) reports a missing column as a
+# "Binder Error", e.g.:
+#   Binder Error: Referenced column "abc" not found in FROM clause!
+#   Candidate bindings: "attribution", "dataChecksum", ...
+DUCKDB_MISSING_COLUMN_RE = re.compile(r'Referenced column "([^"]+)" not found')
+
 
 def _load_regions_mapping() -> dict[str, str]:
     """Load OWID regions mapping from YAML file."""
@@ -245,17 +251,15 @@ async def run_sql(query: str, max_rows: int = MAX_ROWS_DEFAULT) -> dict[str, Any
         if "error" in json_data and json_data["error"] is not None:
             error_msg = json_data["error"]
 
-            # Handle specific case: missing column error like "['\"abc\"']"
-            if isinstance(error_msg, str) and error_msg.startswith("['") and error_msg.endswith("']"):
-                # Extract column name from string like "['\"abc\"']"
-                column_name = error_msg[2:-2].strip("\"'")  # Remove ['"] and quotes
-                if column_name:
-                    error_msg = (
-                        f"SQL Error: Column '{column_name}' does not exist in the table. "
-                        f"You can check columns with: SELECT column_name FROM information_schema.columns WHERE table_name = 'table_name';"
-                    )
-                else:
-                    error_msg = f"SQL Query Error: {error_msg}"
+            # Handle specific case: DuckDB's "missing column" binder error, e.g.
+            # 'Binder Error: Referenced column "abc" not found in FROM clause!\n...'
+            column_match = DUCKDB_MISSING_COLUMN_RE.search(error_msg) if isinstance(error_msg, str) else None
+            if column_match:
+                column_name = column_match.group(1)
+                error_msg = (
+                    f"SQL Error: Column '{column_name}' does not exist in the table. "
+                    f"You can check columns with: SELECT column_name FROM information_schema.columns WHERE table_name = 'table_name';"
+                )
             # For all other errors, just pass through the original message
             else:
                 error_msg = f"SQL Query Error: {error_msg}"

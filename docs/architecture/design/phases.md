@@ -104,7 +104,7 @@ They present a [:octicons-link-external-16: long format](https://towardsdatascie
 
 !!! info "Using date instead of year"
 
-    It's possible to use `date` column instead of `year` if you work with daily data. Grapher step will automatically convert it to `yearIsDay` under the hood. Explicitly defining `yearIsDay` in metadata and converting `date` to `year` has been deprecated.
+    It's possible to use a `date` column instead of `year` if you work with sub-yearly data (daily, weekly, monthly, ...). The grapher step automatically converts it under the hood, encoding dates as days-since-`zeroDay` integers and setting `display.timeInterval`. Manually converting `date` to `year` and setting the interval in metadata yourself has been deprecated.
 
 
 However, datasets in the ETL are often in a very different shape instead. For example, they may have data broken down by gender, disease type, fish stock, or some other dimension. Therefore, we need a step that adapts the ETL dataset format into a Grapher friendly format: **The grapher step**.

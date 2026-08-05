@@ -1,0 +1,9 @@
+# Known upstream data errors in the WHO vaccine stock-out data, corrected locally until fixed at
+# the source. See etl/data_corrections.py for the format.
+- indicator: value
+  match: {value: "Inaccurtae forecasts"}
+  action: override
+  value: "Inaccurate forecasts"
+  reason: Typo in the source's "reason for stockout" answer option.
+  provider: World Health Organization
+  status: open

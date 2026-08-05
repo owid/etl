@@ -13,7 +13,7 @@ from typing import Any, Literal, TypedDict, cast
 import fastjsonschema
 import pandas as pd
 import yaml
-from owid.catalog.core.meta import GrapherConfig
+from owid.catalog.core.meta import GrapherConfig, description_key_to_string
 from owid.catalog.core.utils import underscore
 from structlog import get_logger
 from typing_extensions import Self
@@ -44,6 +44,37 @@ from etl.paths import EXPORT_DIR, SCHEMAS_DIR
 
 # Logging
 log = get_logger()
+
+# Query params that Grapher reads from a chart URL. Dimension slugs are also encoded as query
+# params on multidim/explorer pages, so they must not collide with these.
+# Source: `GRAPHER_QUERY_PARAM_KEYS` in owid-grapher (packages/@ourworldindata/types/src/
+# grapherTypes/GrapherTypes.ts), plus `hideControls` (a page-level param not in that list).
+GRAPHER_RESERVED_QUERY_PARAMS = {
+    "country",
+    "endpointsOnly",
+    "facet",
+    "focus",
+    "globe",
+    "globeRotation",
+    "globeZoom",
+    "hideControls",
+    "mapSelect",
+    "overlay",
+    "peerCountries",
+    "region",
+    "showNoDataArea",
+    "showSelectionOnlyInTable",
+    "stackMode",
+    "tab",
+    "tableFilter",
+    "tableSearch",
+    "time",
+    "uniformYAxis",
+    "xScale",
+    "yScale",
+    "year",
+    "zoomToSelection",
+}
 
 
 class _GroupedViewsEntry(TypedDict):
@@ -226,6 +257,9 @@ class Collection(MDIMBase):
         # Check that no choice name or slug is repeated
         self.validate_dimension_uniqueness()
 
+        # Check that no dimension slug collides with a query param reserved by Grapher
+        self.validate_dimension_slugs_not_grapher_query_params()
+
         # Validate that datasets used are part of the dependencies
         indicators = self.indicators_in_use(tolerate_extra_indicators)
         self.validate_indicators_are_from_dependencies(indicators)
@@ -263,6 +297,10 @@ class Collection(MDIMBase):
         # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
         # TODO: I think we could move this to the Grapher side.
         config = replace_catalog_paths_with_ids(self.to_dict())
+
+        # description_key is a markdown string; a YAML list is authoring sugar
+        # and gets converted before the config is stored.
+        _convert_description_key_lists(config)
 
         # Convert config from snake_case to camelCase
         config = camelize(config, exclude_keys={"dimensions"})
@@ -559,6 +597,25 @@ class Collection(MDIMBase):
 
             # Add slug to set
             slugs.add(dim.slug)
+
+    def validate_dimension_slugs_not_grapher_query_params(self):
+        """Validate that no dimension slug collides with a query param reserved by Grapher.
+
+        Dimension choices are encoded as query params on multidim/explorer pages (e.g.
+        ``?sex=female``), in the same URL where Grapher reads its own params (``time``,
+        ``country``, ``tab``, ...). A colliding slug would break one or the other.
+
+        Slugs are compared in their snake_case form, since that is what `save()` persists
+        and what ends up in the URL (e.g. a slug "Time" would be saved as "time").
+        """
+        for dim in self.dimensions:
+            slug = underscore(dim.slug)
+            if slug in GRAPHER_RESERVED_QUERY_PARAMS:
+                raise ValueError(
+                    f"Dimension slug '{slug}' in collection '{self.catalog_path}' collides with a query param "
+                    f"reserved by Grapher. Rename the dimension slug. Reserved names: "
+                    f"{sorted(GRAPHER_RESERVED_QUERY_PARAMS)}"
+                )
 
     def validate_indicators_are_from_dependencies(self, indicators):
         """Validate that the provided indicators are from tables in datasets specified in the collections dependencies."""
@@ -1298,6 +1355,18 @@ _pattern = re.compile(r"_([a-z])")
 def snake_to_camel(s: str) -> str:
     # Use the compiled pattern to substitute underscores with the uppercase letter.
     return _pattern.sub(lambda match: match.group(1).upper(), s)
+
+
+def _convert_description_key_lists(config: dict[str, Any]) -> None:
+    """Convert description_key lists to markdown strings in the collection-level
+    and per-view metadata of a collection config (in place)."""
+    metadatas = [config.get("metadata"), *(view.get("metadata") for view in config.get("views", []))]
+    for metadata in metadatas:
+        if metadata and isinstance(metadata.get("description_key"), list):
+            # `- *anchor` authoring produces nested lists; flatten them like
+            # dataset YAML metadata does before converting.
+            flat = [item for sub in metadata["description_key"] for item in ([sub] if isinstance(sub, str) else sub)]
+            metadata["description_key"] = description_key_to_string(flat)
 
 
 # model.core

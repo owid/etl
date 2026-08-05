@@ -1,0 +1,27 @@
+# NOTE: This is, as of 2026, the latest quantitative FAO foresight exercise on land use.
+# The 2022 edition of "The future of food and agriculture" (Drivers and triggers for transformation) is qualitative and does not update these projections.
+meta:
+  origin:
+    producer: Food and Agriculture Organization of the United Nations
+    title: The future of food and agriculture - Alternative pathways to 2050
+    description: |-
+      FAO's Global Perspectives Studies report "The future of food and agriculture - Alternative pathways to 2050" explores three scenarios of global food and agriculture up to 2050, based on simulations with the FAO Global Agriculture Perspectives System (GAPS) model:
+      - Business As Usual (BAU): a continuation of historical trends.
+      - Towards Sustainability (TSS): a shift towards more sustainable food systems.
+      - Stratified Societies (SSS): a future of increased inequality.
+    title_snapshot: The future of food and agriculture - Alternative pathways to 2050 - Arable land
+    description_snapshot: |-
+      World totals of arable land, transcribed from Table 4.12 of the report, including a historical value (1970), the base year of the projections (2012), and projections (2030 and 2050) under each of the three scenarios.
+    citation_full: |-
+      FAO. 2018. The future of food and agriculture - Alternative pathways to 2050. Rome. 224 pp.
+    attribution_short: FAO
+    url_main: https://www.fao.org/global-perspectives-studies/resources/detail/en/c/1157074/
+    date_accessed: '2026-07-03'
+    date_published: '2018'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://openknowledge.fao.org/handle/20.500.14283/I8429EN
+outs:
+  - md5: e8f141760175c0eca1e2a37040faff33
+    size: 251
+    path: future_of_food_and_agriculture_arable_land.csv

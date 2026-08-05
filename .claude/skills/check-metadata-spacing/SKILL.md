@@ -46,8 +46,10 @@ for table_name in ds.table_names:
             if val and ('  ' in val or val != val.strip() or '\n' in val):
                 issues.append(f'{table_name}.{col}.{field_name}: {repr(val[:150])}')
 
-        # Check description_key entries
+        # Check description_key entries (modern format is one markdown string; legacy is a list)
         dk = getattr(m, 'description_key', None) or []
+        if isinstance(dk, str):
+            dk = [dk]
         for i, entry in enumerate(dk):
             if entry and ('  ' in entry or entry != entry.strip()):
                 issues.append(f'{table_name}.{col}.description_key[{i}]: {repr(entry[:150])}')

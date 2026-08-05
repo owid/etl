@@ -850,6 +850,59 @@ def test_validate_dimension_uniqueness_single_dimension():
     collection.validate_dimension_uniqueness()
 
 
+def _collection_with_dimension_slug(slug: str) -> Collection:
+    return Collection(
+        catalog_path="test/latest/data#table",
+        title={"en": "Test"},
+        default_selection=[],
+        dimensions=[
+            Dimension(slug=slug, name="Some dimension", choices=[DimensionChoice(slug="a", name="A")]),
+        ],
+        views=[View(dimensions={slug: "a"}, indicators=ViewIndicators(y=[]))],
+        _definitions=Definitions(),
+    )
+
+
+def test_validate_dimension_slugs_not_grapher_query_params_success():
+    """
+    Test Collection.validate_dimension_slugs_not_grapher_query_params - passes with a regular slug.
+
+    Example: Collection with dimension slug "sex" should pass validation
+    """
+    collection = _collection_with_dimension_slug("sex")
+
+    # Should not raise any exception
+    collection.validate_dimension_slugs_not_grapher_query_params()
+
+
+def test_validate_dimension_slugs_not_grapher_query_params_reserved_slug():
+    """
+    Test Collection.validate_dimension_slugs_not_grapher_query_params - fails with a reserved slug.
+
+    Example: Collection with dimension slug "time" (a Grapher query param) should raise ValueError
+    """
+    collection = _collection_with_dimension_slug("time")
+
+    with pytest.raises(ValueError, match="collides with a query param reserved by Grapher"):
+        collection.validate_dimension_slugs_not_grapher_query_params()
+
+
+def test_validate_dimension_slugs_not_grapher_query_params_normalized_slug():
+    """
+    Test Collection.validate_dimension_slugs_not_grapher_query_params - compares snake_case forms.
+
+    Example: slug "Time" is persisted as "time" by save(), so it must fail; slug "stackMode" is
+    persisted as "stack_mode", which does not collide, so it must pass.
+    """
+    collection = _collection_with_dimension_slug("Time")
+
+    with pytest.raises(ValueError, match="collides with a query param reserved by Grapher"):
+        collection.validate_dimension_slugs_not_grapher_query_params()
+
+    # Should not raise any exception
+    _collection_with_dimension_slug("stackMode").validate_dimension_slugs_not_grapher_query_params()
+
+
 def test_validate_dimension_uniqueness_multiple_duplicates():
     """
     Test Collection.validate_dimension_uniqueness - catches first duplicate when multiple exist.
@@ -2211,3 +2264,17 @@ def test_rename_choice_slug_invalid_dedup_value_raises():
     )
     with pytest.raises(ValueError, match="must be 'inherit' or 'overwrite'"):
         c.rename_choice_slug("d", "old", "new", dedup_slug="bogus")  # type: ignore[arg-type]
+
+
+def test_convert_description_key_lists_flattens_anchored_lists():
+    """`- *anchor` authoring in collection configs produces nested lists, which
+    must be flattened before the list is converted to a markdown string."""
+    from etl.collection.model.core import _convert_description_key_lists
+
+    config = {
+        "metadata": {"description_key": [["shared one", "shared two"], "extra"]},
+        "views": [{"metadata": {"description_key": ["only"]}}],
+    }
+    _convert_description_key_lists(config)
+    assert config["metadata"]["description_key"] == "- shared one\n- shared two\n- extra"
+    assert config["views"][0]["metadata"]["description_key"] == "only"

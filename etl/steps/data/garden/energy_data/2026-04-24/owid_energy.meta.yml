@@ -6,5 +6,10 @@ dataset:
     Our complete Energy dataset is a collection of key metrics maintained by Our World in Data. It includes data on energy consumption (primary energy, per capita, and growth rates), energy mix, electricity mix, and fossil fuel production.
 
     It is compiled from a variety of secondary sources, including the Energy Institute's Statistical Review of World Energy, Ember's electricity data, the U.S. Energy Information Administration, and the Shift Dataportal, alongside auxiliary population and GDP data used to calculate per-capita and per-GDP indicators.
+  # License of the compiled OWID dataset (matching the owid/energy-data repo). Takes precedence
+  # over per-source origin licenses on the catalog landing page / JSON-LD.
+  licenses:
+    - name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
   owners:
     - Pablo Rosado

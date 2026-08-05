@@ -1,6 +1,6 @@
 ---
 name: add-provider-regions
-description: Add an external provider's regional aggregation (e.g. World Bank, WHO, Maddison, WID, ILO) to OWID's regions dataset — definitions in regions.yml, per-provider grapher map indicators, and metadata. First checks whether the provider's dataset already encodes the regions and their country composition; if not, asks the user for a reference (link/doc) to derive it from. Trigger when the user wants to add/define a provider's world regions, expose "{Provider} regions" on a map, or migrate an in-dataset region variable to the shared regions dataset.
+description: Add an external provider's regional aggregation (e.g. World Bank, WHO, Maddison, WID, ILO) to OWID's regions dataset — definitions in regions.yml, per-provider grapher map indicators, and metadata — then register it in owid-grapher, including proposing each region's chart color (ContinentColors) and map color (MapContinentColors) for design sign-off. First checks whether the provider's dataset already encodes the regions and their country composition; if not, asks the user for a reference (link/doc) to derive it from. Trigger when the user wants to add/define a provider's world regions, expose "{Provider} regions" on a map, pick or fix the colors of a provider's regions, or migrate an in-dataset region variable to the shared regions dataset.
 metadata:
   internal: true
 ---
@@ -27,7 +27,7 @@ The files you'll touch in **`etl`**:
 - `etl/steps/data/grapher/regions/2023-01-01/regions.meta.override.yml` — origin anchors + per-indicator metadata.
 - **Not** `regions.codes.csv` — that file lists countries and OWID historical codes only; provider aggregates never go there.
 
-And in **`owid-grapher`** (Step 9, separate PR): the auto-generated `packages/@ourworldindata/utils/src/regions/regions.data.ts` plus a few hand-maintained label registries. Reference PR: [owid/owid-grapher#6465](https://github.com/owid/owid-grapher/pull/6465) (IEA regions).
+And in **`owid-grapher`** (Step 9, separate PR): the auto-generated `packages/@ourworldindata/utils/src/regions/regions.data.ts`, a few hand-maintained label registries, and the two region-color dictionaries in `packages/@ourworldindata/grapher/src/color/CustomSchemes.ts`. Reference PRs: [owid/owid-grapher#6465](https://github.com/owid/owid-grapher/pull/6465) (IEA regions) and [#6852](https://github.com/owid/owid-grapher/pull/6852) (regions colored by name on categorical maps).
 
 ---
 
@@ -205,8 +205,8 @@ print(o.producer, "|", o.title, "|", o.url_main, "|", o.date_accessed, "|", o.at
         description_short: |-
           Regions as defined by <Provider full name>.
         type: ordinal
-        sort:
-          - <Region> (<Provider>)              # legend order
+        sort:                                    # legend/map order — see ordering rule below
+          - <Region> (<Provider>)
           - ...
         origins:
           - *origins_<provider>
@@ -215,12 +215,33 @@ print(o.producer, "|", o.title, "|", o.url_main, "|", o.date_accessed, "|", o.at
             hideAnnotationFieldsInTitle:
               time: true                        # hide the placeholder data year in titles
             map:
+              tooltipUseCustomLabels: true          # tooltip shows the stripped label too — see below
               colorScale:
+                baseColorScheme: OwidCategoricalMap    # name-keyed region colors — see Step 9
                 customCategoryLabels:
-                  "<Region> (<Provider>)": "<Region>"   # strip the suffix on the legend
+                  # one entry per region in `sort` — drops the suffix from the
+                  # legend, and from the tooltip via the flag above
+                  "<Region> (<Provider>)": "<Region>"
                 customHiddenCategories:
                   "No data": true
+                # No customCategoryColors. Colors live in MapContinentColors (Step 9),
+                # keyed by region name; a block here would override them and fork the
+                # source of truth.
 ```
+
+> **`customCategoryLabels` alone only fixes the legend.** Hovering a country still shows the raw `"<Region> (<Provider>)"`, because the map tooltip falls back to the unformatted value unless **`map.tooltipUseCustomLabels: true`** is set (`MapChartState.formatValueForTooltip` — it looks up the bin's label only behind that flag). Set both, always, and give **every** region in `sort` a label entry: a region you miss keeps its suffix in the legend *and* the tooltip while its siblings lose theirs, which reads as a data error rather than a missing config line.
+
+> **Set the palette, don't hardcode the colors.** A categorical map with no `baseColorScheme` falls back to `BuGn` — a sequential green ramp (`MapChartState.ts:53`). Region colors are only looked up by name when the map is on **`OwidCategoricalMap`**, the scheme that carries `colorMap: MapContinentColors`. Setting it on the *indicator* means every chart built on it inherits the palette (the same inheritance that already carries `customCategoryLabels`). A chart's **own** patch still wins over the inherited value, so once the chart exists, confirm on staging that it isn't patched to something else (`world-regions-according-to-pew` is patched to `continents` — a *chart* palette on a map, which pulls the strong colors instead of the muted ones).
+
+> **Ordering rule for `sort`:** the map legend renders as a single row in `sort` order, so order the regions to read **left-to-right across a world map**. The house sweep is:
+>
+> **(North/Northern) America → Latin America / Caribbean → Africa (north to south within the slot) → Middle East / North Africa → Europe → CIS / Russia / Central Asia → South Asia → East and South-East Asia → Australia and New Zealand → Oceania**
+>
+> Drop what the provider doesn't have, keep the rest in this relative order. Three wrinkles worth knowing. **Europe sits after Africa and the Middle East**, because Europe and Africa share the same longitudes (Europe north, Africa south) so west-to-east alone can't separate them — the convention sweeps the southern band first. At sub-region granularity, a "Western Asia" that the provider models as *part of Asia* stays in the Asia block rather than moving up to the Middle East slot (compare `un_m49_2` with `ei`). And **which Africa regions land in the Africa slot depends on how the provider splits the continent**: where Africa has its own sub-regions they run north to south inside the slot — `Northern Africa` then `Sub-Saharan Africa` (`un_m49_2`, `ilo_2`), or `Northern Africa` then the compass sub-regions (`fao_2`). Where instead North Africa is folded into a *Middle East and North Africa* bucket, that bucket is not part of the Africa slot at all — it takes the Middle East slot — so `Sub-Saharan Africa` is alone in the Africa slot and therefore comes first (`wb`, `unsdg`, `pew`, `wid`, `fao_sdg`).
+>
+> **The order is defined twice — keep the two equal.** This `sort` drives the published map's legend; `customRegionDisplayOrder[<provider>]` in owid-grapher's `RegionTooltipData.ts` (Step 9) drives the legend of the mini-map in the region hover. When they diverge, the same provider lists its regions in two different orders on the same page. Treat `customRegionDisplayOrder` as the reference and copy it into `sort` verbatim; if you're adding a new provider, write the order once and paste it into both.
+
+> **Reordering is only color-safe once the regions are pinned.** For a region with a `MapContinentColors` entry, `sort` moves legend positions and nothing else — the color follows the name. For a region **without** one, `OwidCategoricalMap` falls back to handing out palette colors *by position*, so reordering silently recolors the map. Check every region of the tier against `MapContinentColors` before touching `sort`: if any are unpinned, pin them first (Step 9, with the design sign-off) and reorder in the same change, or leave the order alone and say why in a `# NOTE:` beside it. The two edits look independent and are not.
 
 **6c. Cross-tier back-fill** — if Step 3 found a region shared across tiers, add the masked back-fill to `grapher/regions/2023-01-01/regions.py` after the inversion loop (see the existing `process_un_definitions` example for the shape).
 
@@ -272,15 +293,18 @@ from apps.chart_sync.admin_api import AdminAPI
 api = AdminAPI(OWID_ENV)
 cfg = api.get_chart_config(CHART_ID)
 cfg["dimensions"] = [{"property": "y", "variableId": NEW_VAR_ID}]
-# re-key map colors/labels from the OLD category values to the NEW "(Provider)"-suffixed values,
-# because the new variable's category values differ (they carry the suffix):
 cs = cfg.setdefault("map", {}).setdefault("colorScale", {})
-cs["customCategoryColors"] = {f"{name} (<Provider>)": color for name, color in OLD_COLORS.items()}
-cs["customCategoryLabels"] = {f"{name} (<Provider>)": name for name in OLD_COLORS}
+# re-key the labels onto the NEW "(Provider)"-suffixed category values (the new
+# variable's categories carry the suffix):
+cs["customCategoryLabels"] = {f"{name} (<Provider>)": name for name in OLD_REGION_NAMES}
+# put the map on the name-keyed palette and drop any hardcoded colors — the old
+# chart's customCategoryColors would override MapContinentColors (Step 9):
+cs["baseColorScheme"] = "OwidCategoricalMap"
+cs.pop("customCategoryColors", None)
 api.update_chart(CHART_ID, cfg)
 ```
 
-Staging admin writes work behind Tailscale without `ADMIN_API_KEY`. The change surfaces in **chart-diff** for review before it reaches production. Verify by re-reading the config (dimensions point at the new variable; colors/labels intact).
+Staging admin writes work behind Tailscale without `ADMIN_API_KEY`. The change surfaces in **chart-diff** for review before it reaches production. Verify by re-reading the config: dimensions point at the new variable, labels are re-keyed, `customCategoryColors` is gone, and the map renders in the muted map colors (chart-diff will show the color change — that's expected, and it's what Step 9 pins).
 
 ---
 
@@ -294,7 +318,7 @@ git add etl/steps/data/garden/regions/2023-01-01/regions.yml \
 git commit -m "📊🤖 Add <Provider> regions to regions dataset"
 ```
 
-If not already on a feature branch, create one and a PR with `etl pr "Add <Provider> regions" data`, then push. In the PR body, open with the disclosure blockquote (`> _Written by Claude Code — @<handle> at the wheel._`) and keep any reviewer attribution out of committed code/YAML.
+If not already on a feature branch, create one and a PR with `etl pr "Add <Provider> regions" data`, then push. In the PR body, open with the disclosure blockquote (`> _Written by Claude <model name> — @<handle> at the wheel._`, model name = the model actually generating the content) and keep any reviewer attribution out of committed code/YAML.
 
 > **Heads-up:** once this merges, the post-merge deploy is **slow** — editing the regions dataset invalidates much of the DAG, so it can take hours for the new regions to reach the production catalog. The owid-grapher follow-up (Step 9) can't start until they do, so don't expect to chain straight into it.
 
@@ -310,7 +334,24 @@ The grapher frontend keeps its own copy of the regions and a few hand-maintained
 curl -s "https://catalog.ourworldindata.org/external/owid_grapher/latest/regions/regions.csv?nocache" | grep -c "PROVIDER_"
 ```
 
-A non-zero count means it's ready. If you're waiting, poll this every few minutes rather than running the updater blind. (To preview earlier you can point the updater at a staging catalog, but the committed PR should be regenerated from prod.)
+A non-zero count means it's ready. If you're waiting, poll this every few minutes rather than running the updater blind.
+
+> **Preview from your ETL branch's staging catalog while you wait.** The updater reads `ETL_REGIONS_URL` if it's set (`devTools/regionsUpdater/update.ts`), and every ETL staging server publishes its own catalog on port 8881 with the same schema as prod. So you can regenerate `regions.data.ts` — and everything downstream of it, including the colors and the test page — before the ETL PR is anywhere near merged:
+>
+> **The host name is not the branch name — derive it, don't hand-write it.** `etl.config.get_container_name()` replaces `/`, `.` and `_` with `-`, strips a leading `staging-site-`, truncates what's left to **28 characters**, then drops any trailing hyphen. Substituting the raw branch (or truncating it yourself) silently produces a host that is either unreachable or, worse, *another* branch's staging server. Get it from the **etl** repo:
+>
+> ```bash
+> .venv/bin/python -c "from etl.config import get_container_name; print(get_container_name('<etl-branch>'))"
+> ```
+>
+> Then, in **owid-grapher**, use that value (it already carries the `staging-site-` prefix):
+>
+> ```bash
+> ETL_REGIONS_URL="http://<container-name>.tail6e23.ts.net:8881/external/owid_grapher/latest/regions/regions.csv" \
+>   yarn runRegionsUpdater
+> ```
+>
+> Use this for previews and for the color review only — before merging the grapher PR, re-run `yarn runRegionsUpdater` with no env var so the committed file is prod-derived (see *Renaming existing regions* for why a stale/hand-edited `regions.data.ts` is a trap).
 
 Work in the `owid-grapher` repo on a new branch. There are two ways to register a provider — `regionGroupLabels` in `RegionGroups.ts` documents the split in its own comments: *"…where we have region definition about what constitutes these regions in regions.ts"* vs *"…we don't have region definitions … (we recognize them by their suffix)"*. They correspond to the `RegionDataProvider` and `AdditionalRegionDataProvider` types. *(Earlier drafts of this skill called these "Path A / Path B" — that's not a codebase term; ignore that wording.)*
 
@@ -351,15 +392,70 @@ When a Grapher chart plots a region entity (e.g. `"Sub-Saharan Africa (ILO)"`) a
 - **The mini-map's configuration is computed in code, not taken from your ETL metadata or the chart's `customCategoryColors`:**
   - *Membership* (which country → which region) comes from `regions.data.ts` (`getCountriesByRegion`); no-data countries fall back to grey.
   - *Geometry* is owid-grapher's bundled world geojson (`getGeoFeaturesForMap`).
-  - *Colors* come from `getRegionsForKey`, which looks up **`MapContinentColors[regionName]` first** and only falls back to `CategoricalMapPalette17[index]` (where `index` is the region's position in **`customRegionDisplayOrder[<provider>]`** in `RegionTooltipData.ts` — or alphabetical if you omit it). So colors auto-assign by display order *unless* you pin a region by name in the color registry (see the color-matching step below).
-- **So for a full-definition provider the hover is two required hand-edits in `RegionTooltipData.ts`** — `descriptions[<provider>]` (text + article link) and optionally `customRegionDisplayOrder[<provider>]` (left-to-right map order, which also fixes the legend order and palette assignment) — **plus an optional color-pinning step (below).** You can't set colors from the ETL side (the hover ignores the chart's `customCategoryColors`); pinning happens in `ContinentColors` (`CustomSchemes.ts`).
-- **Optional — pin the colors to match the published chart.** A region-definition *map chart* (Step 7) colors its categories from the default categorical palette (`CategoricalMapPalette10`) in the indicator's `sort`/legend order. If you keep `customRegionDisplayOrder[<provider>]` equal to that `sort`, the hover's fallback already shows the same colors as the chart (Palette17's first ten == Palette10). To make the match **robust** — surviving a future display-order change, and so the admin **"🌍 Continents" color picker and the `continents` color scheme offer the same colors** — pin each region by name with `"<Region> (<Provider>)": OwidMapColors.<Nth palette color>`, where N is the region's 0-based position in the order (`CategoricalMapPalette10` = `[MutedDenim, SoftOrange, MutedTeal, SoftPurple, Sand, MutedCherry, LeafGreen, SkyTurquoise, Lavendar, Olive]`). **Put the entries in `ContinentColors`, not `MapContinentColors`** — the two are read by *different* consumers: `MapContinentColors` (which `getRegionsForKey` reads) spreads `ContinentColors`, so the hover inherits them automatically, while the admin color picker reads `Object.entries(ContinentColors)` *directly* (`AdminColorPicker.tsx`). Pinning only in `MapContinentColors` reaches the hover but **not** the picker. `ContinentColors` is declared *before* `OwidMapColors` in the file, so move the `OwidMapColors` declaration above it first (it only depends on the `Color` type), otherwise you get a "used before declaration" typecheck error. Maddison and WID are pinned this way.
-  - **Skip a provider whose region is shared across tiers.** A name-keyed entry holds one color, but a shared region (e.g. ILO's `Arab States (ILO)`) sits at a different palette position in each tier — pinning it would mismatch one tier's chart or collide with another region's color in the other tier's hover. Leave such a provider on the position-based fallback (which still matches each tier's own chart), and add a code comment in `ContinentColors` saying why. ILO is left unpinned for exactly this reason.
+  - *Colors* come from `getRegionsForKey`, which looks up **`MapContinentColors[regionName]` first** and only falls back to `CategoricalMapPalette17[index]` for regions that aren't pinned (where `index` is the region's position in **`customRegionDisplayOrder[<provider>]`** in `RegionTooltipData.ts` — or alphabetical if you omit it). Pin the provider's regions (next section) and the hover follows automatically.
+- **So for a full-definition provider the hover is two required hand-edits in `RegionTooltipData.ts`** — `descriptions[<provider>]` (text + article link) and optionally `customRegionDisplayOrder[<provider>]` (left-to-right map order, which fixes the legend order and the fallback palette assignment) — **plus the color step below.** You can't set the hover's colors from the ETL side (it ignores the chart's `customCategoryColors`); they come from `MapContinentColors` in `CustomSchemes.ts`.
 - **Which map a region shows is its own `defined_by` tier**, because `regionIconInfo` returns `tooltipKey: region.definedBy` (in `SeriesLabelState.ts`) — *not* the name suffix. So for a multi-tier provider each tier needs its own `descriptions[<provider>_1]` / `descriptions[<provider>_2]` entry, and a region tagged `<provider>_1` always hovers to the level-1 map, one tagged `<provider>_2` to the level-2 map.
 
 > **Shared-region caveat (multi-tier providers).** A region that exists in two tiers carries a *single* `defined_by`, so its hover only ever shows that one tier's map — the indicator-level back-fill (Step 3 / Step 6c) populates the *other* tier's map indicator but does **not** give the entity a second `defined_by` in `regions.data.ts`. Concrete consequence: in a chart built on the level-2 indicator, the shared region hovers to the level-1 map while its level-2 siblings hover to the level-2 map. It's not wrong (the level-1 map still highlights it), but the "belongs to a set of N regions" framing differs for that one entity. There's no way to make it show *both* — tagging it the other tier just flips which map it shows. (e.g. ILO's Arab States, tagged `ilo_1`, always hovers to the 5-region broad map.)
 
 > **And it leaves a grey hole in the *other* tier's hover map — fix with a frontend back-fill.** Because the shared region is absent from the other tier's provider set in `regions.data.ts` (`getAggregatesByProvider` filters by exact `definedBy`), its member countries are unmapped there and render grey (no-data) whenever you hover *another* region of that tier. Concretely: hovering any `ilo_2` subregion greys out the 12 Arab States countries, and the legend shows 10 regions instead of 11 — even though the ETL `ilo_2_region` *indicator* (and its published map) shows Arab States colored, because the ETL back-fill never reaches `regions.data.ts`. Mirror that back-fill **centrally**, in `getAggregatesByProvider` (`regionsUtils.ts`), via a data-driven map — `PROVIDER_REGION_BACKFILLS = { ilo_2: ["Arab States (ILO)"] }`, appended to the direct `definedBy` matches. Do it *there*, not in `getRegionsForKey` — `getAggregatesByProvider` feeds *every* consumer of the sub-tier (the hover **and** the admin entity presets, …), so a fix in `getRegionsForKey` alone leaves the presets still dropping the region (a real Codex catch). Add the shared region to `customRegionDisplayOrder[<tier>]` for a stable legend slot. Then that tier's hover is a complete partition matching the published map. (The shared region itself still hovers to its home tier — this only fills the hole the *other* regions' map would otherwise have.)
+
+### Region colors — two dictionaries, two jobs
+
+**Colors are not an ETL artifact.** Nothing you can write in `regions.meta.override.yml` sets a region's color. The ETL side sets exactly one thing — `baseColorScheme: OwidCategoricalMap` (Step 6b), which decides that colors are looked up *by region name*. The color values themselves are TypeScript in owid-grapher, so the whole color conversation happens in the Step 9 PR, on an owid-grapher branch:
+
+| Where | What it can show | Good for |
+|---|---|---|
+| ETL staging (`staging-site-<etl-branch>`) | the region chart with **fallback** colors — muted map palette handed out in legend order, because the names aren't pinned yet | checking the *indicator*: membership, legend order, labels. **Not** the color proposal |
+| owid-grapher staging (`staging-site-<grapher-branch>`) → `/admin/test-region-maps` | the real thing: your pinned map colors on a map, beside the chart colors on a line chart | **this is where you present the colors** |
+| Production `/admin/test-region-maps` | every provider as currently deployed | picking which provider to mirror, before you write a line |
+
+So the answer to *"where do I show the colors while I'm working in ETL?"* is: you don't — you open the grapher branch and show them from its staging server. You don't have to wait for the ETL PR to merge to do that; regenerate `regions.data.ts` from your ETL branch's staging catalog (see the `ETL_REGIONS_URL` note at the top of Step 9), push the grapher branch, and its test page renders the new provider with your proposed colors. Re-run the updater against prod before that PR merges.
+
+Both dictionaries live in `packages/@ourworldindata/grapher/src/color/CustomSchemes.ts`, and every provider needs an entry in **both**:
+
+| Dictionary | For | Vocabulary | Backs |
+|---|---|---|---|
+| `ContinentColors` | **charts** (lines, bars, scatters, slope) — regions need strong colors to read as series | `OwidDistinctColors` | the `continents` scheme ("Continents" / "Continents (Lines)") and the **🌍 Regions** tab of the admin color picker |
+| `MapContinentColors` | **maps** — muted colors, a deliberate design decision (maps look better light, charts need strong) | `OwidMapColors` | the `OwidCategoricalMap` scheme ("OWID Categorical Map") and the region hover tooltips |
+
+Colors are looked up **by region name**, not by legend position (`ColorScale.ts` picks `colorScheme.colorMap[value]` before falling back to the positional palette), so the assignment is stable no matter how the `sort` order changes later. Precedence, highest first: a chart's/indicator's `customCategoryColors` → the scheme's `colorMap` → the positional palette. That's why Step 6b bans `customCategoryColors`: it silently defeats everything below it.
+
+> **The two are not interchangeable, and neither one covers for the other.** `MapContinentColors` spreads `...ContinentColors`, so a region added to only `ContinentColors` still renders on maps — in the *strong chart color*, which is the thing the muted map vocabulary exists to avoid. And the admin color picker reads `Object.entries(ContinentColors)` directly, so a region added to only `MapContinentColors` never appears there. Always add both blocks, in the same region order, each headed `// <Provider> regions`.
+
+**Pick the colors by analogy with what's already curated.** The hues below are the house convention, read off the providers already in the file — a region should get roughly the same color everywhere it appears:
+
+| Region concept | Chart (`OwidDistinctColors`) | Map (`OwidMapColors`) |
+|---|---|---|
+| Americas / North(ern) America | `Peach` #e56e5a | `SoftOrange` #CC7641 |
+| Latin America / South America / Caribbean | `Maroon` #883039 | `MutedCherry` #B04E74 |
+| Europe (broad, incl. Northern Europe) | `Denim` #4c6a9c | `MutedDenim` #526F9B |
+| Eastern Europe / CIS / Eurasia | `MidnightBlue` #00295b | `LightDenim` #92D3DE |
+| Africa (whole) | `Mauve` #a2559c | `LightPurple` #A07AB8 |
+| Sub-Saharan Africa | `DarkMauve` #8c4569 | `LightPurple` #A07AB8 |
+| Northern Africa | `Purple` #6d3e91 | `SoftPurple` #77538F |
+| Middle East / MENA / Arab States / Western Asia | `Camel` #bc8e5a | `Sand` #C3A27C |
+| Asia (whole) / Asia-Pacific | `Teal` #00847e | `MutedTeal` #238A84 |
+| East Asia | `TealishGreen` #00875e or `Lime` #3b8e1d | `LeafGreen` #6FA54F |
+| South-East Asia / Asia Pacific (energy providers) | `Lime` #3b8e1d | `LeafGreen` #6FA54F |
+| South Asia / Central and Southern Asia | `OliveGreen` #578145 | `Olive` #5B6D35 |
+| Central Asia | `LightTeal` #58ac8c | `LightTeal` #4FB2AC |
+| Oceania | `Turquoise` #38aaba | `SkyTurquoise` #5FB8C8 |
+| Australia and New Zealand | `Teal` #00847e | `MutedTeal` #238A84 |
+
+- **Mirror the nearest already-curated provider.** Before consulting the table, find the provider whose regions are closest in *composition and count* and copy its assignment wholesale, noting it in the comment — the file already does this (`// IEA regions (mirroring the Energy Institute regions)`, `// FAO SDG regions (mirroring the UN SDG regions)`). Two providers that carve the world the same way should look the same.
+- **No two regions of one provider may share a color.** Where the table would collide, move to a neighboring hue or an extended map color, and prefer keeping the *broadest* region on the canonical hue. Precedents: UN M49 pushes `South-eastern Asia` to `DarkOrange`/`LightOrange` to clear `Eastern Asia`'s green; Maddison's `East Asia` is `Copper`/`LightCherry` because its greens are taken by `South and South East Asia`.
+- **Multi-tier providers get pinned too.** Because colors are name-keyed, a region shared across tiers (e.g. `Arab States (ILO)`, tagged `ilo_1` but back-filled into the `ilo_2` map) carries *one* color that is correct in both tiers. Pin every region of every tier; check the tiers for collisions independently, since each tier is its own legend.
+- Use the **named constants**, never raw hex — `"<Region> (<Provider>)": OwidDistinctColors.Peach` / `OwidMapColors.SoftOrange`. `OwidMapColors` is declared above both dictionaries, so it's available to each.
+
+### Check the colors on the region-maps test page
+
+The admin has a page that renders every provider's regions as a real map next to a fake line chart — i.e. `MapContinentColors` and `ContinentColors` side by side. Use it before showing the colors to anyone:
+
+- **This branch:** `http://<container-name>/admin/test-region-maps` (owid-grapher staging, once the branch has built). Same naming rule as above — derive `<container-name>` from the *grapher* branch with `get_container_name()`, never by pasting the branch in raw.
+- **Production:** <https://admin.owid.io/admin/test> → the **Region maps** bullet — direct link <https://admin.owid.io/admin/test-region-maps>
+
+The page splits into *Providers with hard-coded region colors* and *Providers without*. **Your provider must land in the first section**; if it doesn't, a region is missing from one of the two dictionaries (the check requires the name in *both*). Then compare it against the provider you mirrored: same hues in the same places, no two regions of the tier reading as the same color, and the map muted where the line chart is strong.
 
 ### Verify & open the PR
 
@@ -368,6 +464,24 @@ yarn typecheck          # surfaces any missing label-record entries (the Record<
 yarn fixLintChanged     # lint the changed files; yarn fixFormatChanged to format
 ```
 Confirm the provider appears in `regionGroupLabels` and the relevant label record(s), and that typecheck is clean (a missing entry in a `Record<RegionDataProvider, …>` / `Record<TooltipKey, …>` registry is a compile error — that's your safety net). Open a PR in `owid-grapher` (title like `🔨 update regions file`), with the disclosure blockquote in the body.
+
+### Get the colors signed off
+
+Colors are a design call, and what the skill produces is a **first stab** — it always goes to a human. All of this happens on the **owid-grapher** PR, not the ETL one:
+
+1. **Open the PR** (above) with the proposed colors in the body: a `region → chart color → map color` table (constant names *and* hex), the provider you mirrored, and the link to **this branch's** test page — `http://<container-name>/admin/test-region-maps`, with `<container-name>` derived as above. Wait for the staging server to build before sharing the link; open it yourself first.
+2. **Ask Marwa** — draft a Slack message to `@mrwbkrm` with that same table and link, asking her to look at the rendered maps on the test page (point at the *"Providers with hard-coded region colors"* section). Don't request the code review yet.
+3. **Apply her changes**, push, and only then **request review from Sophia** — `gh pr edit <n> --add-reviewer sophiamersmann`.
+4. Both the PR body and the Slack message carry the attribution blockquote (`CLAUDE.md` → Team).
+
+> **You can start this before the ETL PR merges** — the color review only needs `regions.data.ts` to know the new provider, and the `ETL_REGIONS_URL` preview gives you that from your ETL branch's staging catalog. What you must **not** do is merge the grapher PR on a staging-derived `regions.data.ts`: re-run `yarn runRegionsUpdater` against prod once the regions are live there, and push that regeneration as the last commit. The colors don't change in that regeneration — only the region data does.
+
+### Renaming existing regions (not a fresh add)
+
+Occasionally you're not adding a provider but **renaming** its already-published regions (e.g. WID's `MENA (WID)` → `Middle East and North Africa (WID)`, or `&` → `and`). The Step 9 flow is the same, with two wrinkles:
+
+- **Finish with `runRegionsUpdater` from prod — never merge on a hand-edit.** Renaming a region's `name` shifts the derived name / `RegionDataProvider` union types, so it's tempting to hand-edit the `name`s directly in `regions.data.ts` to keep `yarn typecheck` green before the prod catalog has rebuilt. That stopgap is **always incomplete**: the updater also regenerates each region's `shortName` and `slug` *from* the name, which a hand-edit silently misses (on the WID rename the stopgap kept the stale `mena-wid` slug and dropped MENA's `shortName`). Once the rename is live on prod, run `runRegionsUpdater` and let it overwrite the file — the diff exposes any derived field the stopgap got wrong. Treat the regenerated file as the source of truth, not the hand-edit.
+- **Ignore the "set up redirects" message for provider regions.** The updater unconditionally prints *"Be sure to set up redirects for any slugs that have changed"* on **any** change to `regions.data.ts`. But a `slug` only drives a URL for a **country** profile page (`/country/<slug>`, baked only for `regionType: "country"` — see `countries` in `regionsUtils.ts`). Provider regions are `regionType: "aggregate"` and have no country page, so their slug changes need **no** redirect. Only act on that warning if a real *country's* slug changed.
 
 ---
 
@@ -394,5 +508,8 @@ The [world-region-map-definitions](https://ourworldindata.org/world-region-map-d
 - **`chart_configs.slug`**, not `charts.slug`.
 - **Provider aggregates never go in `regions.codes.csv`.**
 - If you write any helper that touches Tables, preserve metadata/origins: use `pr.*` (no `pd.concat`/`np.where`), and verify member lists with set-equality rather than eyeballing.
-- **owid-grapher is a separate repo and a separate PR**, done *after* the ETL regions are merged & on the prod catalog. `regions.data.ts` is auto-generated (`yarn runRegionsUpdater`) — never hand-edit it; the hand-maintained parts are the label/description registries.
+- **owid-grapher is a separate repo and a separate PR**, done *after* the ETL regions are merged & on the prod catalog. `regions.data.ts` is auto-generated (`yarn runRegionsUpdater`) — never hand-edit it; the hand-maintained parts are the label/description registries and the two color dictionaries.
+- **Region colors are keyed by name, not by legend position.** A map without `baseColorScheme: OwidCategoricalMap` falls back to `BuGn`, and any `customCategoryColors` block overrides the name lookup entirely — both silently, with a chart that still renders.
+- **`MapContinentColors` spreads `ContinentColors`**, so a region added to only one dictionary looks right on the test page's line chart and wrong on its map (strong chart color where a muted one belongs). Add both.
+- **Colors always go to a human** (`@mrwbkrm` for the design call, `@sophiamersmann` for the code review) — the skill's proposal is a first stab, never the final word.
 - The grapher `RegionDataProvider` / `RegionGroupKey` / `TooltipKey` types are exhaustive `Record<…>` unions, so a forgotten label is a **typecheck error**, not a silent gap — run `yarn typecheck` to find them.

@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: World Development Indicators (archived release)
+    title_snapshot: World Development Indicators (archived release) - Employment shares by sector around 1980
+    description: |-
+      The indicators "Employment in agriculture (% of total employment)", "Employment in industry (% of total employment)" and "Employment in services (% of total employment)" as published in archived editions of the World Bank's World Development Indicators, based on the International Labor Organization's labor force statistics. The World Bank later replaced these series with ILO-modeled estimates that begin in 1991, removing the earlier observations from the current World Development Indicators; the superseded editions remain available in the WDI Database Archives.
+    description_snapshot: |-
+      Employment shares in agriculture, industry and services used to connect pre-industrial benchmark estimates with the modern series: the earliest values available around 1980 for France, Italy and the United Kingdom (1980) and for the Netherlands and Poland (1981, with 1980 unavailable). All values verified against the April 2013 edition in the World Bank's WDI Database Archives; the same values also appear in the World Development Indicators extract preserved in the data files of Herrendorf, Rogerson and Valentinyi (2014) (WDISectorData.xls, saved in September 2011).
+    date_published: "2013"
+
+    # Citation
+    producer: International Labor Organization (via World Bank)
+    citation_full: |-
+      International Labor Organization, "Employment in agriculture/industry/services (% of total employment)," World Development Indicators, The World Bank (archived edition of April 2013, WDI Database Archives).
+
+    # Files
+    url_main: https://databank.worldbank.org/source/wdi-database-archives
+    date_accessed: '2026-07-13'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://datacatalog.worldbank.org/public-licenses
+outs:
+  - md5: 1d51c2901ac02cb85a227d3250f64488
+    size: 232
+    path: wdi_employment_by_sector_archive.csv

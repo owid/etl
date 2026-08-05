@@ -1,0 +1,46 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - State Capacity
+      attribution_short: World Bank
+    processing_level: minor
+    display:
+      numDecimalPlaces: 1
+      tolerance: 5
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  owners:
+    - Pablo Arriagada
+tables:
+  worldwide_bureaucracy_indicators:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    # NOTE: Most indicator metadata is generated programmatically in the step code from the producer's
+    # indicator names and series definitions. Indicators curated for charts are defined explicitly below.
+    variables:
+      bi_emp_totl_pb_zs:
+        title: Public sector employment, as a share of total employment
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of all employed people who are paid employees of the public sector, including government, the armed forces, public services, and state-owned enterprises.
+        description_key:
+          - The public sector covers core public administration at the central, regional, and local levels of government, the security sector (including the armed forces), public education and healthcare workers, and public institutions such as central banks and state-owned enterprises.
+          - The indicator counts paid public sector employees relative to all employed people, including the self-employed, employers, and unpaid family workers. In countries where self-employment is widespread — as in much of South Asia and Sub-Saharan Africa — it is therefore much lower than the public sector's share of paid employees, which the dataset reports separately.
+          - Estimates are calculated by the World Bank from harmonized, nationally representative household and labor force surveys, in which respondents report the sector of their main job. Employment definitions follow the International Labour Organization's classification, making the data broadly comparable with ILO statistics.
+          - For countries in the European Economic Area between 2004 and 2018, the public sector is approximated using industry classifications covering public administration, education, and health. This approximation excludes state-owned enterprises and can include some private education and health workers.
+          - Survey availability differs across countries, so the most recent data point can refer to different years in different countries.
+        display:
+          name: Public sector employment
+          numDecimalPlaces: 1
+          tolerance: 5
+

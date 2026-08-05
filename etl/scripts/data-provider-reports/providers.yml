@@ -18,6 +18,8 @@ PROVIDERS:
     alias: []
   - name: "EM-DAT"
     alias: []
+    explorer_links:
+      - "https://ourworldindata.org/explorers/natural-disasters"
   - name: "V-Dem"
     alias: []
   - name: "Equaldex"
