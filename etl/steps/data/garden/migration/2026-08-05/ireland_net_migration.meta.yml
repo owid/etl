@@ -27,9 +27,6 @@ definitions:
 
     All figures cover the same area — the 26 counties of today's Republic of Ireland. The census reports restate the pre-independence results for this area, so independence in 1922 does not create a break in the series.
 
-  ireland_periods: |-
-    Before 1951, the data shows one average value per period between censuses, not what happened in each individual year.
-
   ireland_war_caveat: |-
     The 1911–1926 value is the hardest to interpret. The residual method counts any unregistered population loss as emigration, so the Irish soldiers who died abroad in the First World War — deaths never registered in Ireland — are counted as emigrants. The period also includes people who left when British rule ended, such as the British Army garrison and many former policemen.
 
@@ -58,8 +55,6 @@ tables:
         description_key: |-
           {definitions.ireland_sources}
 
-          {definitions.ireland_periods}
-
           {definitions.ireland_war_caveat}
         description_processing: "{definitions.ireland_processing}"
         display:
@@ -72,8 +67,6 @@ tables:
         description_short: Number of people moving to Ireland each year, minus the number leaving, as a share of the population. Negative values mean more people left than arrived.
         description_key: |-
           {definitions.ireland_sources}
-
-          {definitions.ireland_periods}
 
           {definitions.ireland_war_caveat}
         description_processing: |-
