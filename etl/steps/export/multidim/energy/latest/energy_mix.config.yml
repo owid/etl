@@ -64,6 +64,7 @@ dimensions:
         group: "Individual sources"
       - slug: "biofuels"
         name: "Biofuels"
+        description: "Liquid biofuels such as ethanol and biodiesel"
         group: "Individual sources"
       - slug: "other_renewables"
         name: "Other renewables"
