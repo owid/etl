@@ -512,9 +512,16 @@ def get_mdim_explorer_views_by_producer(
     """
     cols = ["slug", "type", "title", "url", "views", "n_days", "views_daily", "uses_other_producers_data"]
 
+    def _empty_result() -> pd.DataFrame:
+        # NOTE: uses_other_producers_data must be explicitly cast to bool - pd.DataFrame(columns=cols) otherwise
+        # leaves it (like every other column) as dtype object, and boolean-indexing on an empty object-dtype
+        # Series makes pandas drop all columns instead of filtering rows (a pandas quirk, not intentional
+        # behaviour), which breaks callers that do df[~df["uses_other_producers_data"]].
+        return pd.DataFrame(columns=cols).astype({"uses_other_producers_data": bool})
+
     variable_ids = get_producer_variable_ids(producers=producers)
     if not variable_ids:
-        return pd.DataFrame(columns=cols)
+        return _empty_result()
 
     # NOTE: Filtering client-side (rather than a `WHERE indicator_id IN (...)` clause) is deliberate: a prolific
     # producer (e.g. IHME has ~80k indicator ids) would blow past BigQuery's 1MB query-length limit if its full
@@ -529,7 +536,7 @@ def get_mdim_explorer_views_by_producer(
 
     relevant = df_map.loc[df_map["is_producer"], ["slug", "type"]].drop_duplicates()
     if relevant.empty:
-        return pd.DataFrame(columns=cols)
+        return _empty_result()
 
     df_slugs = (
         df_map.merge(relevant, on=["slug", "type"])

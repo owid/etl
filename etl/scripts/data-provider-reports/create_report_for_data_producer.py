@@ -11,6 +11,7 @@ from structlog import get_logger
 
 from etl.analytics.data import (
     get_chart_views_by_chart_id,
+    get_mdim_explorer_views_by_producer,
     get_post_views_by_chart_id,
     get_visualizations_using_data_by_producer,
 )
@@ -72,7 +73,7 @@ def get_chart_title_from_url(chart_url: str) -> str:
     return title
 
 
-def run_sanity_checks(df_charts: pd.DataFrame, df_posts: pd.DataFrame) -> None:
+def run_sanity_checks(df_charts: pd.DataFrame, df_posts: pd.DataFrame, df_additional_charts: pd.DataFrame) -> None:
     error = "Expected no duplicates in df_producer. If there are, drop duplicates (and check if that's expected)."
     assert df_charts[df_charts.duplicated(subset=["chart_id"])].empty, error
 
@@ -81,6 +82,11 @@ def run_sanity_checks(df_charts: pd.DataFrame, df_posts: pd.DataFrame) -> None:
 
     error = "Expected no duplicates in df_posts. If there are, drop duplicates (and check if that's expected)."
     assert df_posts[df_posts.duplicated(subset=["url"])].empty, error
+
+    error = (
+        "Expected no duplicates in df_additional_charts. If there are, drop duplicates (and check if that's expected)."
+    )
+    assert df_additional_charts[df_additional_charts.duplicated(subset=["url"])].empty, error
 
 
 def gather_producer_analytics(producers: list[str], min_date: str, max_date: str) -> dict[str, pd.DataFrame]:
@@ -127,11 +133,44 @@ def gather_producer_analytics(producers: list[str], min_date: str, max_date: str
         .reset_index(drop=True)
     )
 
+    # Get views of mdims and explorers using data from the producer(s).
+    df_additional_charts = get_mdim_explorer_views_by_producer(
+        producers=producers, date_min=min_date, date_max=max_date
+    )
+
+    # Unlike grapher charts and mdims, explorer titles (e.g. "Energy") don't make it obvious that the link points
+    # to an explorer rather than a regular chart, so make that explicit in the title shown in the report.
+    is_explorer = df_additional_charts["type"] == "explorer"
+    df_additional_charts.loc[is_explorer, "title"] = df_additional_charts.loc[is_explorer, "title"] + " Data Explorer"
+
+    df_additional_charts = (
+        df_additional_charts.drop(columns=["type", "slug"]).assign(featured_on_homepage=False).reset_index(drop=True)
+    )
+
+    # Mdims/explorers where every view uses only this producer's data have their views fully attributable to the
+    # producer, so they are folded into the main chart list and totals. Those that also use other producers'
+    # data are kept separate (reported in their own section) since their views can't be cleanly attributed.
+    df_additional_charts_exclusive = (
+        df_additional_charts[~df_additional_charts["uses_other_producers_data"]].drop(
+            columns=["uses_other_producers_data"]
+        )
+    ).reset_index(drop=True)
+    df_additional_charts_mixed = (
+        df_additional_charts[df_additional_charts["uses_other_producers_data"]].drop(
+            columns=["uses_other_producers_data"]
+        )
+    ).reset_index(drop=True)
+
     # Sanity checks.
-    run_sanity_checks(df_charts=df_charts, df_posts=df_posts)
+    run_sanity_checks(df_charts=df_charts, df_posts=df_posts, df_additional_charts=df_additional_charts)
 
     # Create a dictionary with all analytics.
-    analytics = {"charts": df_charts, "posts": df_posts}
+    analytics = {
+        "charts": df_charts,
+        "posts": df_posts,
+        "additional_charts_exclusive": df_additional_charts_exclusive,
+        "additional_charts_mixed": df_additional_charts_mixed,
+    }
 
     return analytics
 
@@ -168,6 +207,46 @@ def insert_list_with_links_in_gdoc(google_doc: GoogleDoc, df: pd.DataFrame, plac
                 }
             }
         )
+        end_index += len(line)
+
+    # Apply edits to insert list in the right place.
+    google_doc.edit(requests=edits)
+
+    # Remove the original placeholder text.
+    google_doc.replace_text(mapping={placeholder: ""})
+
+
+def insert_media_mentions_in_gdoc(google_doc: GoogleDoc, df: pd.DataFrame, placeholder: str) -> None:
+    """Insert one bullet per media mention at the placeholder's position.
+
+    Each bullet reads "<date>: <highlight text>. Link: <source link>", with the source link (if any) turned
+    into a clickable hyperlink.
+    """
+    insert_index = google_doc.find_marker_index(marker=placeholder)
+
+    edits = []
+    end_index = insert_index
+    for _, row in df.iterrows():
+        date_str = row["Date"].strftime("%Y-%m-%d")
+        url = row.get("Source link")
+        has_link = pd.notna(url) and bool(url)
+
+        line = f"• {date_str}: {row['Highlight']}."
+        line += f" Link: {url}\n" if has_link else "\n"
+        edits.append({"insertText": {"location": {"index": end_index}, "text": line}})
+
+        if has_link:
+            link_start = end_index + len(line) - len(url) - 1  # -1 to skip the trailing "\n"
+            link_end = link_start + len(url)
+            edits.append(
+                {
+                    "updateTextStyle": {
+                        "range": {"startIndex": link_start, "endIndex": link_end},
+                        "textStyle": {"link": {"url": url}},
+                        "fields": "link",
+                    }
+                }
+            )
         end_index += len(line)
 
     # Apply edits to insert list in the right place.
@@ -235,6 +314,7 @@ class Report:
 
         # Initialize other attributes (that will be populated later on).
         self.analytics: dict[str, pd.DataFrame] | None = None
+        self.highlights: pd.DataFrame | None = None
         self.google_doc: GoogleDoc | None = None
         if self.doc_id:
             self.google_doc = GoogleDoc(doc_id=self.doc_id)
@@ -278,8 +358,17 @@ class Report:
         else:
             return "Both Google Doc and PDF exist"
 
-    def gather_analytics(self) -> None:
-        """Gather analytics data for this report."""
+    def gather_analytics(self, notion_df: pd.DataFrame | None = None) -> None:
+        """Gather analytics data for this report.
+
+        Parameters
+        ----------
+        notion_df : pd.DataFrame, optional
+            Pre-fetched Notion impact highlights table, already filtered to (at least) this report's period -
+            see get_notion_table_period. Passing it in avoids re-fetching the table from Notion once per
+            producer when generating many reports in a batch. If None, it's fetched here, filtered to
+            [self.min_date, self.max_date] at that point (the only place highlights are date-filtered).
+        """
         if self.aliases:
             log.info(
                 f"Gathering analytics for {self.producer} (with aliases: {', '.join(self.aliases)}) {self.period} {self.year}"
@@ -290,6 +379,12 @@ class Report:
         # Gather analytics for all producer names at once (primary + aliases)
         self.analytics = gather_producer_analytics(
             producers=self.all_producer_names, min_date=self.min_date, max_date=self.max_date
+        )
+
+        # Gather impact highlights (e.g. media mentions) for this producer. Only filters by producer here -
+        # notion_df is expected to already be date-filtered to this report's period (see docstring above).
+        self.highlights = get_impact_highlights(
+            producers=self.all_producer_names, min_date=self.min_date, max_date=self.max_date, df=notion_df
         )
 
     def create_google_doc(self) -> None:
@@ -313,10 +408,21 @@ class Report:
         if not self.analytics or not self.google_doc:
             raise ValueError("Analytics and Google Doc must be initialized")
 
+        # Mdims/explorers where every view is attributable to this producer are folded into the main chart list
+        # and totals below, alongside grapher charts. Mdims/explorers that also use other producers' data are
+        # reported separately (see "Additional charts using your data" section further down) and excluded from
+        # these totals.
+        cols = ["url", "views", "title", "featured_on_homepage", "n_days"]
+        df_charts_and_additional_exclusive = pd.concat(
+            [self.analytics["charts"][cols], self.analytics["additional_charts_exclusive"][cols]], ignore_index=True
+        )
+        df_additional_charts_mixed = self.analytics["additional_charts_mixed"]
+
         # Create dataframes for top content.
         df_top_charts = (
-            self.analytics["charts"]
-            .sort_values("views", ascending=False)[["url", "views", "title", "featured_on_homepage"]]
+            df_charts_and_additional_exclusive.sort_values("views", ascending=False)[
+                ["url", "views", "title", "featured_on_homepage"]
+            ]
             .reset_index(drop=True)
             .iloc[0:10]
         )
@@ -327,14 +433,23 @@ class Report:
             .iloc[0:10]
             .assign(**{"featured_on_homepage": False})
         )
+        df_top_additional_charts = (
+            df_additional_charts_mixed.sort_values("views", ascending=False)[
+                ["url", "views", "title", "featured_on_homepage"]
+            ]
+            .reset_index(drop=True)
+            .iloc[0:5]
+        )
 
         # Calculate metrics.
-        n_charts = len(self.analytics["charts"])
+        n_charts = len(df_charts_and_additional_exclusive)
         n_publications = len(self.analytics["posts"])
-        n_chart_views = self.analytics["charts"]["views"].sum()
+        n_chart_views = df_charts_and_additional_exclusive["views"].sum()
         n_post_views = self.analytics["posts"]["views"].sum()
-        n_daily_chart_views = n_chart_views / self.analytics["charts"]["n_days"].max()
+        n_daily_chart_views = n_chart_views / df_charts_and_additional_exclusive["n_days"].max()
         n_daily_post_views = n_post_views / self.analytics["posts"]["n_days"].max()
+        n_additional = len(df_additional_charts_mixed)
+        n_additional_views = df_additional_charts_mixed["views"].sum()
 
         # Humanize numbers.
         n_charts_humanized = humanize_number(n_charts, sig_figs=3)
@@ -343,6 +458,8 @@ class Report:
         n_daily_chart_views_humanized = humanize_number(n_daily_chart_views, sig_figs=3)
         n_post_views_humanized = humanize_number(n_post_views, sig_figs=3)
         n_daily_post_views_humanized = humanize_number(n_daily_post_views, sig_figs=3)
+        n_additional_humanized = humanize_number(n_additional, sig_figs=3)
+        n_additional_views_humanized = humanize_number(n_additional_views, sig_figs=3)
         max_date_humanized = datetime.strptime(f"{self.year}-{PERIODS[self.period]['max_date']}", "%Y-%m-%d").strftime(
             "%B %d, %Y"
         )
@@ -375,14 +492,100 @@ class Report:
             r"{{n_chart_views_humanized}}": n_chart_views_humanized,
             r"{{n_daily_chart_views_humanized}}": n_daily_chart_views_humanized,
             r"{{n_daily_post_views_humanized}}": n_daily_post_views_humanized,
+            r"{{n_additional_humanized}}": n_additional_humanized,
+            r"{{n_additional_views_humanized}}": n_additional_views_humanized,
         }
         self.google_doc.replace_text(mapping=replacements)
 
-        # Add content
-        top_chart_url = df_top_charts.iloc[0]["url"] + ".png"
+        # Add content.
+        # NOTE: The top chart image can only come from a grapher chart (via its ".png" static export), never from
+        # an mdim/explorer, so it's picked from self.analytics["charts"] directly rather than
+        # df_charts_and_additional_exclusive.
+        top_chart_url = self.analytics["charts"].sort_values("views", ascending=False).iloc[0]["url"] + ".png"
         self.google_doc.insert_image(image_url=top_chart_url, placeholder=r"{{top_chart_image}}", width=320)
         insert_list_with_links_in_gdoc(self.google_doc, df=df_top_charts, placeholder=r"{{top_charts_list}}")
         insert_list_with_links_in_gdoc(self.google_doc, df=df_top_posts, placeholder=r"{{top_posts_list}}")
+
+        # Additional charts using this producer's data: mdims/explorers that also use other producers' data, so
+        # their views aren't folded into the totals above. This section requires the Google Doc template to wrap
+        # it between "{{additional_charts_section_start}}" and "{{additional_charts_section_end}}" marker lines,
+        # and to have a "{{top_additional_charts_list}}" placeholder inside it (plus {{n_additional_humanized}}
+        # and {{n_additional_views_humanized}} in its intro text). If there's nothing to show, the whole section
+        # (both markers included) is deleted rather than left empty; if the template hasn't been updated with
+        # these markers yet, the relevant step is skipped with a warning rather than failing the report.
+        if df_additional_charts_mixed.empty:
+            try:
+                self.google_doc.delete_section(
+                    start_marker=r"{{additional_charts_section_start}}",
+                    end_marker=r"{{additional_charts_section_end}}",
+                )
+            except ValueError:
+                log.warning(
+                    "Markers '{{additional_charts_section_start}}'/'{{additional_charts_section_end}}' not found "
+                    "in the Google Doc template. Add them around the 'Additional charts using your data' section "
+                    "so it can be removed automatically when a producer has none to show."
+                )
+        else:
+            try:
+                insert_list_with_links_in_gdoc(
+                    self.google_doc, df=df_top_additional_charts, placeholder=r"{{top_additional_charts_list}}"
+                )
+            except ValueError:
+                log.warning(
+                    "Placeholder '{{top_additional_charts_list}}' not found in the Google Doc template. Add an "
+                    "'Additional charts using your data' section with this placeholder to include mdims/explorers "
+                    "that also use other producers' data."
+                )
+            # The section is being kept, so (unlike the empty branch above, which deletes the markers along with
+            # the whole section) just strip the marker lines themselves, leaving the section content in place.
+            self.google_doc.replace_text(
+                mapping={
+                    r"{{additional_charts_section_start}}": "",
+                    r"{{additional_charts_section_end}}": "",
+                }
+            )
+
+        # Media mentions: external press/publication coverage of the producer's data, from the Notion impact
+        # highlights table, narrowed to this report's period (see gather_analytics). NOTE: unlike
+        # print_impact_highlights/the scratch doc, these are not manually curated - every highlight logged for
+        # this producer in the period is included, whether or not it's been reviewed for inclusion. This section
+        # requires the Google Doc template to wrap it between "{{media_mentions_section_start}}" and
+        # "{{media_mentions_section_end}}" marker lines, with a "{{media_mentions_list}}" placeholder inside
+        # (plus {{period_humanized}} in its intro text). If there's nothing to show, the whole section (both
+        # markers included) is deleted rather than left empty; if the template hasn't been updated with these
+        # markers yet, the relevant step is skipped with a warning rather than failing the report.
+        if self.highlights is None or self.highlights.empty:
+            try:
+                self.google_doc.delete_section(
+                    start_marker=r"{{media_mentions_section_start}}",
+                    end_marker=r"{{media_mentions_section_end}}",
+                )
+            except ValueError:
+                log.warning(
+                    "Markers '{{media_mentions_section_start}}'/'{{media_mentions_section_end}}' not found in "
+                    "the Google Doc template. Add them around the 'Media mentions' section so it can be removed "
+                    "automatically when a producer has none to show."
+                )
+        else:
+            try:
+                insert_media_mentions_in_gdoc(
+                    self.google_doc,
+                    df=self.highlights.sort_values("Date"),
+                    placeholder=r"{{media_mentions_list}}",
+                )
+            except ValueError:
+                log.warning(
+                    "Placeholder '{{media_mentions_list}}' not found in the Google Doc template. Add a 'Media "
+                    "mentions' section with this placeholder to include external coverage highlights."
+                )
+            # The section is being kept, so (unlike the empty branch above, which deletes the markers along with
+            # the whole section) just strip the marker lines themselves, leaving the section content in place.
+            self.google_doc.replace_text(
+                mapping={
+                    r"{{media_mentions_section_start}}": "",
+                    r"{{media_mentions_section_end}}": "",
+                }
+            )
 
     def create_pdf(self, overwrite: bool = True) -> str:
         """Create PDF from the Google Doc."""
@@ -457,9 +660,11 @@ class Report:
         else:
             log.warning("Emails are not defined. Consider manually changing sharing permissions directly from the PDF.")
 
-    def create_full_report(self, overwrite_pdf: bool = True, grant_permissions: bool = False) -> None:
+    def create_full_report(
+        self, overwrite_pdf: bool = True, grant_permissions: bool = False, notion_df: pd.DataFrame | None = None
+    ) -> None:
         """Create a complete report from scratch."""
-        self.gather_analytics()
+        self.gather_analytics(notion_df=notion_df)
 
         # Create the report
         self.create_google_doc()
@@ -487,7 +692,7 @@ def print_impact_highlights(highlights: pd.DataFrame) -> None:
         for _, highlight in highlights.iterrows():
             log.info(f"* {highlight['Highlight']}")
             log.info(f"Source link: {highlight['Source link']}")
-            log.info(f"Notion highlight: {highlight['notion_url']}")
+            # log.info(f"Notion highlight: {highlight['notion_url']}")
 
 
 @click.command(name="create_data_producer_report", cls=RichCommand, help=__doc__)

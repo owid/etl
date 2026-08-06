@@ -9,7 +9,7 @@ PROVIDERS:
   - name: "WHO Mortality Database"
     alias: []
   - name: "IHME, Global Burden of Disease"
-    alias: []
+    alias: ["IHME Global Burden of Disease"]
   - name: "Epoch AI"
     alias: []
   - name: "Ember"
