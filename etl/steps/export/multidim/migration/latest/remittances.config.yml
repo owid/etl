@@ -47,7 +47,7 @@ views:
         - catalogPath: wdi#bx_trf_pwkr_dt_gd_zs
     config:
       title: Remittances as a share of GDP
-      subtitle: Share of GDP that is made up of the sum of all personal remittances sent by migrants to their home countries.
+      subtitle: Remittances include money sent by migrants to their home countries and the salaries of employees employed by foreign companies. This received sum is given as a share of gross domestic product (GDP).
       map:
         colorScale:
           baseColorScheme: BuPu
@@ -64,8 +64,8 @@ views:
       y:
         - catalogPath: wdi#si_rmt_cost_ob_zs
     config:
-      title: Average cost of sending remittances from country
-      subtitle: The average transaction cost as a percentage of total remittances sent from this country to abroad, for a single transaction of USD 200.
+      title: Average cost of sending remittances from a given country
+      subtitle: Remittances include money sent by migrants to their home countries and the salaries of employees employed by foreign companies. Shown is the average transaction cost of sending US$200, given as a percentage of the total.
       map:
         colorScale:
           baseColorScheme: Oranges
@@ -82,8 +82,8 @@ views:
       y:
         - catalogPath: wdi#si_rmt_cost_ib_zs
     config:
-      title: Average cost of receiving remittances in country
-      subtitle: The average transaction cost as a percentage of total remittances sent from abroad to this country, for a single transaction of USD 200.
+      title: Average cost of receiving remittances in a given country
+      subtitle: Remittances include money sent by migrants to their home countries and the salaries of employees employed by foreign companies. Shown is the average transaction cost of receiving US$200, given as a percentage of the total.
       map:
         colorScale:
           baseColorScheme: Oranges

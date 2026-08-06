@@ -50,7 +50,7 @@ views:
       subtitle: The total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country).
       map:
         colorScale:
-          baseColorScheme: RdYlBu
+          baseColorScheme: PuOr
           binningStrategy: manual
           customNumericValues: [-1000000, -300000, -100000, -30000, -10000, 0, 10000, 30000, 100000, 300000, 1000000]
     metadata:
@@ -68,7 +68,7 @@ views:
       subtitle: The total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country), per 1,000 people in the population.
       map:
         colorScale:
-          baseColorScheme: RdYlBu
+          baseColorScheme: PuOr
           binningStrategy: manual
           customNumericValues: [-10, -5, -2, -1, -0.5, -0.2, 0, 0.2, 0.5, 1, 2, 5, 10, 20]
     metadata:
