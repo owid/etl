@@ -447,6 +447,9 @@ Colors are looked up **by region name**, not by legend position (`ColorScale.ts`
 - **No two regions of one provider may share a color.** Where the table would collide, move to a neighboring hue or an extended map color, and prefer keeping the *broadest* region on the canonical hue. Precedents: UN M49 pushes `South-eastern Asia` to `DarkOrange`/`LightOrange` to clear `Eastern Asia`'s green; Maddison's `East Asia` is `Copper`/`LightCherry` because its greens are taken by `South and South East Asia`.
 - **Multi-tier providers get pinned too.** Because colors are name-keyed, a region shared across tiers (e.g. `Arab States (ILO)`, tagged `ilo_1` but back-filled into the `ilo_2` map) carries *one* color that is correct in both tiers. Pin every region of every tier; check the tiers for collisions independently, since each tier is its own legend.
 - Use the **named constants**, never raw hex — `"<Region> (<Provider>)": OwidDistinctColors.Peach` / `OwidMapColors.SoftOrange`. `OwidMapColors` is declared above both dictionaries, so it's available to each.
+- **Keep the comments to labels.** These dictionaries are dense lists, and their section headings are one line naming the block — `// FAO subregions (level 2)`, `// UN M49 regions (level 3)` — phrased like the headings already around them, tier number included. Resist explaining the choices in the file: why this provider mirrors that one, which region is listed in a different block, how many hues a continent's split needed. That reasoning is real and worth writing, but it belongs in the PR description and the commit message, where it is read once by a reviewer, not in a file that is read whenever someone adds a region. A review of a first attempt at this cut four-line rationales back to single-line labels, and the file is better for it.
+- **The one comment worth keeping is the one that stops a future edit going wrong** — e.g. that new colors are deliberately outside the `CategoricalMapPalette` sets. Even that is a clause, not a paragraph.
+- **New palette colors go after the existing groups**, at the end of `OwidMapColors`, never inserted between the named ones. Slotting a color next to *Extended* or *Main* implies it belongs to the positional palette sets those groups feed, which is exactly what it must not do.
 
 ### Check the colors on the region-maps test page
 
@@ -472,16 +475,17 @@ Colors are a design call, and what the skill produces is a **first stab** — it
 1. **Open the PR** (above) with the proposed colors in the body: a `region → chart color → map color` table (constant names *and* hex), the provider you mirrored, and the link to **this branch's** test page — `http://<container-name>/admin/test-region-maps`, with `<container-name>` derived as above. Wait for the staging server to build before sharing the link; open it yourself first.
 
    **Don't name or `@`-tag the designer anywhere in the PR** — not in the body, not in a comment, not as a reviewer. `owid-grapher` is public, and a handle in a public thread both pings someone who was never asked there and puts who-reviews-what on the open internet (`CLAUDE.md` → Team). Say that a design pass is pending and leave it unattributed; the request itself goes over Slack in the next step. The same goes for reporting back: describe what the design pass concluded, never who concluded it.
-2. **Ask for the design pass over Slack** — draft a message to `@mrwbkrm` with that same table and link, asking her to look at the rendered maps on the test page (point at the *"Providers with hard-coded region colors"* section). Slack is the right surface for it precisely because it isn't public. Don't request the code review yet.
-3. **Apply her changes**, push, and only then **request review from Sophia** — `gh pr edit <n> --add-reviewer sophiamersmann`.
-4. **Once the colors are agreed, put them on the design team's Figma board** — see below. The board is the design-side record of the palette; a provider that only exists in `CustomSchemes.ts` has no visual record anyone outside the code can look at.
-5. Both the PR body and the Slack message carry the attribution blockquote (`CLAUDE.md` → Team).
+2. **Put the map on the Figma board and review it there** — see below. The board is where the design review happens, not the test page: it's the designer's own surface, it shows the new provider beside every provider already curated, and — the part that makes it work — a color changed there can be read straight back out of the file. Adding the row is therefore step *two*, not a formality after sign-off.
+3. **Ask for the design pass over Slack**, pointing at the board row. Slack is the right surface for the request precisely because it isn't public. Don't request the code review yet.
+4. **Pick up her changes from the board**, apply them in `CustomSchemes.ts`, push.
+5. **Then request review from Sophia** — `gh pr edit <n> --add-reviewer sophiamersmann`.
+6. Both the PR body and the Slack message carry the attribution blockquote (`CLAUDE.md` → Team).
 
 > **You can start this before the ETL PR merges** — the color review only needs `regions.data.ts` to know the new provider, and the `ETL_REGIONS_URL` preview gives you that from your ETL branch's staging catalog. What you must **not** do is merge the grapher PR on a staging-derived `regions.data.ts`: re-run `yarn runRegionsUpdater` against prod once the regions are live there, and push that regeneration as the last commit. The colors don't change in that regeneration — only the region data does.
 
-### Record the agreed palette on the Figma board
+### Review the palette on the Figma board
 
-The design team keeps every provider's regions, rendered under the map palette, on **Frame 99** (node `1733:1130`) of the *"New Categorical Palette for Maps"* page in the [Color Explorations](https://www.figma.com/design/EpWbE8AkTYWxK8FECGhoHj/Color-Explorations?node-id=1733-1130) file. Add the new provider there once the colors are agreed.
+The design team keeps every provider's regions, rendered under the map palette, on **Frame 99** (node `1733:1130`) of the *"New Categorical Palette for Maps"* page in the [Color Explorations](https://www.figma.com/design/EpWbE8AkTYWxK8FECGhoHj/Color-Explorations?node-id=1733-1130) file. Put the new provider there **for the design review**, not after it — the board doubles as the review surface and the permanent record.
 
 **Propose it; don't just write it.** This is a shared design file that other people are working in — show the user exactly what you intend to add (which rows, which maps) and get an explicit go-ahead before touching it. Reading it to check the conventions needs no permission.
 
@@ -539,6 +543,29 @@ Finish by screenshotting the row (`get_screenshot` on the node, or `await node.s
 If the provider has no published region chart to export, there is nothing to upload — build the chart first (Step 7) or skip the board and say so, rather than hand-drawing an approximation of a map.
 
 > **Trial runs are cheap; leaving debris is not.** This whole flow was validated by inserting a row and removing it again. If you do that, restore what you touched in the same breath — `node.remove()` **and** `frame99.resize(frame99.width, <original height>)`, since growing the board is a mutation the row's deletion doesn't undo. Record the original height before you change it.
+
+#### Reading the designer's changes back out
+
+The row is reviewable *and* machine-readable: the imported legend is a group of one vector per region, each **named after the region** and carrying a solid fill. So when the designer recolors a swatch on the board, you read the new hex straight out of the file instead of transcribing it from a message.
+
+```js
+const row = await figma.getNodeByIdAsync("<row node id>")
+const hex = (c) => "#" + [c.r, c.g, c.b].map((v) => Math.round(v * 255).toString(16).padStart(2, "0")).join("").toUpperCase()
+return row.query("[name=swatches] VECTOR").map((s) => ({
+    region: s.name,                                   // "South-eastern-Asia" — spaces are hyphens
+    fill: s.fills[0]?.type === "SOLID" ? hex(s.fills[0].color) : null,
+}))
+```
+
+Region names come back hyphenated and **without** the `(Provider)` suffix, exactly as the legend renders them, so map them back with `name.replaceAll("-", " ") + " (<Provider>)"` before diffing against your proposal. Diff, don't assume: report only the regions whose fill actually moved. The country shapes under `[name=countries-with-data]` are named and readable the same way, so a recolored *country* is legible too.
+
+Turning a returned hex into code is its own small step, and it is where a change quietly goes wrong:
+
+- **If the hex matches an existing `OwidMapColors` constant, use that constant.** Never write the raw hex into the dictionary — the whole file is constants, and a literal hides that two regions now share a color.
+- **If it matches nothing, it's a new palette color** and needs a name in `OwidMapColors` alongside the existing ones (see the note on where new colors go, above). Say so explicitly when reporting back; adding to the shared vocabulary is a bigger deal than reassigning within it.
+- **Re-run the per-tier collision check afterwards.** A designer changing one region to a color another region already has is easy to do and invisible until the map renders.
+
+**What you cannot read: Figma comment threads.** None of the Figma tools available here expose comments, so a note typed into a comment bubble is invisible to you — you will not know it exists. Ask for feedback *as a recolor on the board*, and for anything that can't be expressed that way (a hue that needs inventing, a "these two are too close" judgement) ask for it in Slack. Never report a review as clean on the strength of unchanged fills alone: unchanged fills mean nothing was recolored, which is not the same as nothing being said.
 
 ### Renaming existing regions (not a fresh add)
 
