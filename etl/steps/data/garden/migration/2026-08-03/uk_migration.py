@@ -44,7 +44,9 @@ def sanity_check_inputs(tb_boe: Table, tb_ons: Table) -> None:
 
 def sanity_check_england(tb: Table) -> None:
     assert not tb["year"].duplicated().any(), "Duplicate years in the England table."
-    assert len(tb) == 330, "Expected 330 years of England data."
+    # 1541 up to 1854, the year before the UK net migration series begins.
+    assert tb["year"].min() == 1541 and tb["year"].max() == 1854, "Expected coverage 1541-1854."
+    assert len(tb) == 314, "Expected 314 years of England data."
     # Wrigley and Schofield's reconstruction shows a net outflow (negative net migration) in every year.
     assert (tb["net_migration"] < 0).all(), "Unexpected net inflow year in the England series."
     assert tb["net_migration_share_of_population"].between(-0.5, 0).all(), "Share outside the plausible range."
@@ -109,9 +111,12 @@ def run() -> None:
 
     sanity_check_outputs(tb)
 
-    # England, 1541-1870: the source publishes net emigration (positive = people leaving). Flip the
-    # sign to net migration, consistent with the UK indicators, and express the source's per-1,000
-    # rate as a percentage share of the population.
+    # England: the source publishes net emigration (positive = people leaving). Flip the sign to
+    # net migration, consistent with the UK indicators, and express the source's per-1,000 rate as
+    # a percentage share of the population. The source runs to 1870; we end the series just before
+    # the UK series begins, so the two do not overlap.
+    uk_start = int(tb.loc[tb["net_migration"].notna(), "year"].min())
+    tb_england = tb_england[tb_england["year"] < uk_start].copy()
     tb_england["country"] = "England"
     tb_england["net_migration"] = -tb_england["net_emigration"] * 1000
     tb_england["net_migration_share_of_population"] = -tb_england["net_emigration_per_1000"] / 10
