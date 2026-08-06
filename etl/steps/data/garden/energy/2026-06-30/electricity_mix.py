@@ -266,8 +266,10 @@ def add_bioenergy_split_helper_columns(combined: Table) -> Table:
     while keeping full historical coverage.
 
     A stacked chart only renders years where every series has a value, so a sparse bioenergy series would
-    otherwise collapse each country's history to the years the split exists. These two helpers always sum
-    to the true 'other renewables including bioenergy' total, so the stack keeps full coverage:
+    otherwise collapse each country's history to the years the split exists. These two helpers sum to the
+    combined 'other renewables including bioenergy' figure wherever the split and the total come from the
+    same source; for the World during 1965-1999 the split comes from Pinto et al. while the total is the
+    Statistical Review's, so their sum can deviate from it there (within the reconstruction's uncertainty):
       - other_renewables_generation__twh: other renewables excluding bioenergy where known (post-2000 and
         anywhere the split is available), falling back to the combined figure for the earlier years where
         bioenergy cannot be separated. There, its biomass is carried in this 'other renewables' band.
@@ -551,7 +553,8 @@ def add_historical_electricity(combined: Table, tb_historical: Table) -> Table:
     """Extend the World electricity series back to ~1900 using Pinto et al.'s global historical data.
 
     Where the modern electricity mix (Ember and the Statistical Review) already has data, it is kept;
-    the historical dataset only fills the earlier years (roughly 1900-1964).
+    the historical dataset fills the earlier years (roughly 1900-1964) — and, for the bioenergy vs
+    other-renewables split, which the modern sources only report from 2000, also 1965-1999.
     """
     tb_historical = tb_historical[["country", "year"] + list(HISTORICAL_ELECTRICITY_COLUMNS)].rename(
         columns=HISTORICAL_ELECTRICITY_COLUMNS, errors="raise"
