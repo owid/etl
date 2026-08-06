@@ -8,6 +8,7 @@ added (Maddison). Traditional biomass (Smil, World only) is kept separate from T
 
 from owid.catalog import Dataset, Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
+from shared import EXCLUDED_PROVIDER_REGIONS
 
 from etl.data_helpers.geo import add_gdp_to_table
 from etl.helpers import PathFinder
@@ -460,6 +461,10 @@ def run() -> None:
 
     # Remove outliers.
     tb = tb[~tb["country"].isin(OUTLIERS)].reset_index(drop=True)
+
+    # Remove residual and undefined provider regions (kept in the Statistical Review garden as
+    # aggregation inputs, but meaningless to readers).
+    tb = tb[~tb["country"].isin(EXCLUDED_PROVIDER_REGIONS)].reset_index(drop=True)
 
     # Sanity checks.
     sanity_check_outputs(tb=tb)

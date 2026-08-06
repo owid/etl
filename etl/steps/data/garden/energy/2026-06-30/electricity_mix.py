@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from owid.catalog import Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
+from shared import EXCLUDED_PROVIDER_REGIONS
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -803,6 +804,10 @@ def run() -> None:
     combined = add_share_variables(combined=combined)
 
     # Format table conveniently.
+    # Remove residual and undefined provider regions (kept in the Statistical Review garden as
+    # aggregation inputs, but meaningless to readers).
+    combined = combined[~combined["country"].isin(EXCLUDED_PROVIDER_REGIONS)].reset_index(drop=True)
+
     combined = combined.format(sort_columns=True, short_name=paths.short_name)
 
     # Build the Ember-only monthly table (a parallel frequency; the annual data above is untouched).

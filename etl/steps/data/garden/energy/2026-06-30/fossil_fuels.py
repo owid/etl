@@ -22,6 +22,7 @@ The dataset also includes:
 import owid.catalog.processing as pr
 from owid.catalog import Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
+from shared import EXCLUDED_PROVIDER_REGIONS
 
 from etl.helpers import PathFinder
 
@@ -394,6 +395,10 @@ def run() -> None:
 
     # Add World reserves-to-production ratios.
     tb = add_reserves_to_production_ratio(tb=tb, tb_review=tb_review)
+
+    # Remove residual and undefined provider regions (kept in the Statistical Review garden as
+    # aggregation inputs, but meaningless to readers).
+    tb = tb[~tb["country"].isin(EXCLUDED_PROVIDER_REGIONS)].reset_index(drop=True)
 
     # Sanity checks.
     sanity_check_outputs(tb=tb)
