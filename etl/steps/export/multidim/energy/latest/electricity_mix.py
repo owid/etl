@@ -355,6 +355,13 @@ def add_decomposition_views(c) -> None:
                     dimensions={"source": source, "metric": new_metric, "frequency": frequency},
                     indicators=ViewIndicators(y=indicators),
                     config=config,
+                    # Grouped views show only their first indicator's metadata on the datapage
+                    # unless the view carries its own.
+                    metadata={
+                        "description_short": config["subtitle"],
+                        "description_key": [SOURCE_COMPOSITION[source]] if source in SOURCE_COMPOSITION else [],
+                        "presentation": {"title_public": config["title"]},
+                    },
                 )
                 new_view.mark_as_grouped()
                 c.views.append(new_view)

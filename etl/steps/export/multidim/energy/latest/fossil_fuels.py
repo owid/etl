@@ -316,6 +316,13 @@ def add_decomposition_views(c) -> None:
                 dimensions={"fuel": "total", "metric": f"{metric}_by_fuel", "per_capita": count},
                 indicators=ViewIndicators(y=indicators),
                 config=config,
+                # Grouped views show only their first indicator's metadata on the datapage
+                # unless the view carries its own.
+                metadata={
+                    "description_short": config["subtitle"],
+                    "description_key": [FOSSIL_FUELS_NOTE],
+                    "presentation": {"title_public": config["title"]},
+                },
             )
             new_view.mark_as_grouped()
             c.views.append(new_view)

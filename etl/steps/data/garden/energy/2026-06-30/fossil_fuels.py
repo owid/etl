@@ -237,9 +237,11 @@ def add_trade_and_consumption(tb: Table, tb_eia: Table) -> Table:
 
 
 def add_per_capita(tb: Table) -> Table:
+    # Antarctica has EIA energy data (research stations) but no population; its per-capita values
+    # are legitimately empty.
     expected_countries_without_population = [
         country for country in tb["country"].unique() if ("(EI)" in country) or ("(EIA)" in country)
-    ]
+    ] + ["Antarctica"]
     tb = paths.regions.add_population(
         tb=tb,
         warn_on_missing_countries=True,
