@@ -97,7 +97,7 @@ def run() -> None:
         "tab": "map",
         # Line + bar tabs (grapher's default), so single-source views keep the bar tab the
         # original charts had.
-        "chartTypes": ["LineChart", "DiscreteBar"],
+        "chartTypes": ["LineChart", "DiscreteBar", "Dumbbell", "SlopeChart"],
     }
 
     c = paths.create_collection(
@@ -295,7 +295,7 @@ def add_carbon_intensity_view(c) -> None:
     config = {
         "hasMapTab": True,
         "tab": "map",
-        "chartTypes": ["LineChart", "DiscreteBar"],
+        "chartTypes": ["LineChart", "DiscreteBar", "Dumbbell", "SlopeChart"],
         "title": "Carbon intensity of energy",
         "subtitle": (
             "Measured in grams of CO₂ emitted per [kilowatt-hour](#dod:watt-hours) of "
@@ -326,7 +326,7 @@ def add_decomposition_views(c) -> None:
     aggregates, so grapher hides the metric when an individual source is selected.
     """
     base_config = {
-        "chartTypes": ["StackedArea"],
+        "chartTypes": ["StackedArea", "StackedDiscreteBar"],
         "tab": "chart",
         "hasMapTab": False,
         "hideRelativeToggle": False,

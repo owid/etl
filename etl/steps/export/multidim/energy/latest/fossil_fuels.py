@@ -139,9 +139,9 @@ def run() -> None:
     common_view_config = {
         "hasMapTab": True,
         "tab": "map",
-        # Line + bar tabs (grapher's default), so single-fuel views keep the bar tab the
-        # original charts had.
-        "chartTypes": ["LineChart", "DiscreteBar"],
+        # All Group-1 (non-stacked) chart types, matching the electricity-mix multidim: line and bar
+        # as on the original charts, plus slope and dumbbell for comparing two points in time.
+        "chartTypes": ["LineChart", "DiscreteBar", "Dumbbell", "SlopeChart"],
     }
 
     c = paths.create_collection(
@@ -286,7 +286,7 @@ def add_decomposition_views(c) -> None:
     the top), so coal sits at the bottom.
     """
     base_config = {
-        "chartTypes": ["StackedArea"],
+        "chartTypes": ["StackedArea", "StackedDiscreteBar"],
         "tab": "chart",
         "hasMapTab": False,
         "hideRelativeToggle": False,
