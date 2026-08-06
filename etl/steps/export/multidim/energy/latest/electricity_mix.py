@@ -752,6 +752,15 @@ def _with_frequency(title: str, frequency: str) -> str:
     return title
 
 
+# World nets to nothing on the imports metrics (global imports equal exports, so Ember reports no
+# World rows), and the multidim's default selection is World — the chart tab would render empty.
+# These views get their own default selection, copied from the original charts they replace.
+TOTAL_ONLY_SELECTIONS = {
+    "net_imports": ["United States", "United Kingdom", "France", "Sweden", "Canada"],
+    "imports_share": ["United States", "United Kingdom", "France", "Germany", "Sweden", "Canada", "India"],
+}
+
+
 def set_view_titles(c, dims_max: dict) -> None:
     for v in c.views:
         source = v.dimensions["source"]
@@ -764,6 +773,8 @@ def set_view_titles(c, dims_max: dict) -> None:
         config["title"] = _with_frequency(_view_title(source, metric), frequency)
         config["subtitle"] = _view_subtitle(source, metric)
         config["map"] = _map_config(source, metric, dims_max.get((source, metric, frequency)), frequency)
+        if metric in TOTAL_ONLY_SELECTIONS:
+            config["selectedEntityNames"] = TOTAL_ONLY_SELECTIONS[metric]
         note = _view_note(source)
         if note:
             config["note"] = note
