@@ -421,6 +421,11 @@ FIXED_MAP_EDGES = {
 }
 
 
+# Default country selection for the single-fuel (non-stacked) views, carried over from the old
+# fossil fuels explorer. The by-fuel stacks keep the World-only default.
+DEFAULT_SELECTION = ["United States", "Russia", "Norway", "United Kingdom", "Germany", "Sweden", "China"]
+
+
 def set_view_titles(c, dims_stats: dict) -> None:
     for v in c.views:
         fuel = v.dimensions["fuel"]
@@ -432,6 +437,7 @@ def set_view_titles(c, dims_stats: dict) -> None:
         config = dict(v.config or {})
         config["title"] = _view_title(fuel, metric, count)
         config["subtitle"] = _view_subtitle(fuel, metric, count)
+        config["selectedEntityNames"] = DEFAULT_SELECTION
         config["map"] = _map_config(fuel, metric, count, dims_stats.get((fuel, metric, count)))
         # Zero-floored axis everywhere except net imports, which are legitimately negative for net
         # exporters (grapher then picks the axis range automatically).

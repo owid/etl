@@ -144,6 +144,12 @@ SOURCE_TITLE_NAMES = {
 }
 
 
+# Default country selection for the single-source (non-stacked) views, carried over from the old
+# energy explorer. A lone World line makes the bar, slope, and dumbbell tabs pointless; the stacked
+# by-source views keep the World-only default (several entities would facet the stacks).
+DEFAULT_SELECTION = ["United States", "United Kingdom", "China", "World", "India", "Brazil", "South Africa"]
+
+
 def _view_title(source: str, metric: str) -> str:
     if source == "total":
         # "Primary energy use" (not bare "Primary energy"), so the quantity reads as a complete noun
@@ -297,6 +303,7 @@ def add_carbon_intensity_view(c) -> None:
         "tab": "map",
         "chartTypes": ["LineChart", "DiscreteBar", "Dumbbell", "SlopeChart"],
         "title": "Carbon intensity of energy",
+        "selectedEntityNames": DEFAULT_SELECTION,
         "subtitle": (
             "Measured in grams of CO₂ emitted per [kilowatt-hour](#dod:watt-hours) of "
             "[total energy supply](#dod:total-energy-supply)."
@@ -845,6 +852,7 @@ def set_view_titles(c, dims_max: dict) -> None:
         config["title"] = _view_title(source, metric)
         config["subtitle"] = _view_subtitle(source, metric)
         config["map"] = _map_config(source, metric, dims_max.get((source, metric)))
+        config["selectedEntityNames"] = DEFAULT_SELECTION
         note = _view_note(source)
         if note:
             config["note"] = note

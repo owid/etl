@@ -761,6 +761,12 @@ TOTAL_ONLY_SELECTIONS = {
 }
 
 
+# Default country selection for the single-source (non-stacked) views, carried over from the old
+# energy explorer. The imports metrics keep their own selections (TOTAL_ONLY_SELECTIONS): World has
+# no data there.
+DEFAULT_SELECTION = ["United States", "United Kingdom", "China", "World", "India", "Brazil", "South Africa"]
+
+
 def set_view_titles(c, dims_max: dict) -> None:
     for v in c.views:
         source = v.dimensions["source"]
@@ -773,8 +779,7 @@ def set_view_titles(c, dims_max: dict) -> None:
         config["title"] = _with_frequency(_view_title(source, metric), frequency)
         config["subtitle"] = _view_subtitle(source, metric)
         config["map"] = _map_config(source, metric, dims_max.get((source, metric, frequency)), frequency)
-        if metric in TOTAL_ONLY_SELECTIONS:
-            config["selectedEntityNames"] = TOTAL_ONLY_SELECTIONS[metric]
+        config["selectedEntityNames"] = TOTAL_ONLY_SELECTIONS.get(metric, DEFAULT_SELECTION)
         note = _view_note(source)
         if note:
             config["note"] = note
