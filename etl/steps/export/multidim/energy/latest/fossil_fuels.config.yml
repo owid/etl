@@ -62,10 +62,10 @@ dimensions:
         description: "Proven reserves in tonnes (coal) or cubic meters (oil and gas)"
       - slug: "production_by_fuel"
         name: "Energy production by fuel"
-        description: "Fossil fuel production broken down by fuel, stacked"
+        description: "Fossil fuel production broken down by fuel"
       - slug: "consumption_by_fuel"
         name: "Energy consumption by fuel"
-        description: "Fossil fuel consumption broken down by fuel, stacked"
+        description: "Fossil fuel consumption broken down by fuel"
 # NOTE: Once grapher supports checkbox dimensions in multidims, rename this dimension to
 # "Per capita" and add: presentation: {type: checkbox, choice_slug_true: per_capita}.
   - slug: "per_capita"
