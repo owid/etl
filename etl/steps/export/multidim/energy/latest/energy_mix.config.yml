@@ -80,7 +80,7 @@ dimensions:
         description: "Total energy supply per person, in kilowatt-hours"
       - slug: "share"
         name: "Share of primary energy"
-        description: "Share of total energy supply"
+        description: "Share of total energy supply, as a percentage"
       - slug: "annual_change"
         name: "Annual change in primary energy"
         description: "Year-on-year change of total energy supply, in terawatt-hours"
