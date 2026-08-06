@@ -13,7 +13,8 @@ Review.
 
 The dataset also includes:
 - Consumption in energy units, combined from the same sources as production (Statistical Review,
-  extended with EIA).
+  extended with EIA). For the World, consumption before 1965 is filled with production, since at the
+  global level production and consumption are the same.
 - Production in physical units, from EIA (broad country coverage).
 - Proved reserves, trade (imports, exports, net imports), and consumption in physical units, from EIA.
 - The World reserves-to-production ratio for each fossil fuel.
@@ -124,6 +125,32 @@ def combine_production_data(tb_review: Table, tb_etemad: Table, tb_eia: Table, t
     combined = combined.dropna(subset=value_columns, how="all")
     combined = combined.sort_values(index_columns).reset_index(drop=True)
     return combined
+
+
+def backfill_world_consumption(tb: Table) -> Table:
+    """Extend World consumption before 1965 with World production.
+
+    Consumption data starts in 1965 (the Statistical Review's first year), but for the world as a
+    whole production and consumption are the same, so earlier years take the production series.
+    Only the World is filled: for individual countries and regions, trade makes the two differ.
+    """
+    world = tb[tb["country"] == "World"]
+    mask = (tb["country"] == "World") & (tb["year"] < STATISTICAL_REVIEW_FIRST_YEAR)
+    for fuel in FUELS:
+        first_year = world.dropna(subset=[f"{fuel}_consumption_twh"])["year"].min()
+        assert first_year == STATISTICAL_REVIEW_FIRST_YEAR, (
+            f"World {fuel} consumption starts in {first_year}, not {STATISTICAL_REVIEW_FIRST_YEAR}; "
+            "reassess the pre-1965 backfill from production."
+        )
+        backfill = tb[f"{fuel}_production_twh"].copy()
+        backfill.loc[~mask] = float("nan")
+        # World production before 1965 comes only from Etemad & Luciani and (for coal before 1900)
+        # Smil; keep only those origins so fillna doesn't merge production origins the backfilled
+        # rows never use (e.g. the UK-only NIC / Fouquet feeder) into the consumption column.
+        backfill.m.origins = [o for o in backfill.m.origins if o.producer in ("Etemad & Luciani", "Smil")]
+        assert backfill.m.origins, f"Etemad & Luciani missing from the {fuel} production origins."
+        tb[f"{fuel}_consumption_twh"] = tb[f"{fuel}_consumption_twh"].fillna(backfill)
+    return tb
 
 
 def add_annual_change(tb: Table) -> Table:
@@ -346,6 +373,22 @@ def sanity_check_outputs(tb: Table) -> None:
     rel_diff = abs(uk_coal.loc[1900] - uk_coal.loc[1899]) / uk_coal.loc[1900]
     assert rel_diff < 0.10, f"Discontinuity in UK coal production at the 1899->1900 splice ({rel_diff:.0%})."
 
+    # World consumption is backfilled with production before 1965, so its coverage mirrors production.
+    world = tb[tb["country"] == "World"]
+    for fuel, first_year in [("coal", 1800), ("oil", 1900), ("gas", 1900)]:
+        assert world.dropna(subset=[f"{fuel}_consumption_twh"])["year"].min() == first_year, (
+            f"World {fuel} consumption coverage changed."
+        )
+    # Continuity at the 1965 handover from production to Statistical Review consumption. Gas gets a
+    # looser tolerance: production includes gas that was flared rather than consumed (historically a
+    # significant share), so the two series sit on different levels around the seam.
+    world_1965 = world[world["year"] == STATISTICAL_REVIEW_FIRST_YEAR]
+    for fuel, tolerance in [("coal", 0.05), ("oil", 0.05), ("gas", 0.20)]:
+        production = world_1965[f"{fuel}_production_twh"].item()
+        consumption = world_1965[f"{fuel}_consumption_twh"].item()
+        rel_diff = abs(consumption - production) / production
+        assert rel_diff < tolerance, f"Discontinuity in World {fuel} consumption at the 1965 splice ({rel_diff:.0%})."
+
 
 def run() -> None:
     #
@@ -383,6 +426,9 @@ def run() -> None:
     tb = combine_production_data(
         tb_review=tb_review_prod, tb_etemad=tb_etemad, tb_eia=tb_eia_prod, tb_historical=tb_historical
     )
+
+    # Extend World consumption before 1965 with World production.
+    tb = backfill_world_consumption(tb=tb)
 
     # Add annual change, physical-unit production and reserves (Statistical Review only), trade and
     # consumption (EIA), and per-capita.
