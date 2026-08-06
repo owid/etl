@@ -74,7 +74,7 @@ dimensions:
       # Not "Total" (already used for the all-fuels aggregate and in "total energy supply") and not
       # "Per country" (entities include World and regions, which are not countries).
       - slug: "total"
-        name: "Absolute"
+        name: "Total"
       - slug: "per_capita"
         name: "Per capita"
 views:
