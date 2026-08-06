@@ -192,6 +192,26 @@ def resolve_default_year(cfg: dict, y_var_id: int, gdp_var_id: int, engine) -> i
     return min(y_yr[1], x_yr[1])
 
 
+def is_x_independent_line(line: dict) -> bool:
+    """True if a comparison line means the same thing on every view.
+
+    `ComparisonLineConfig` is a union: `{xEquals: number}` draws a vertical line at an x
+    value, and `{yEquals?: string}` draws a formula that may reference x ("2*x^2",
+    "sqrt(x)"). Only a constant `yEquals` is safe to mirror, because the target's other
+    views do not share the scatter's x: on the scatter x is GDP per capita, on a LineChart
+    it is time, so an x-dependent line becomes a meaningless year or curve there.
+
+    Note `yEquals` **defaults to "x"** when omitted, so a bare `{label: ...}` line is
+    x-dependent too — absence is not neutral.
+    """
+    if "xEquals" in line:
+        return False
+    y = line.get("yEquals")
+    if not isinstance(y, str) or not y.strip():
+        return False  # omitted/blank => "x"
+    return "x" not in y.lower()
+
+
 def process_row(
     api: AdminAPI,
     engine,
@@ -339,8 +359,18 @@ def process_row(
     # line that is meaningful for the y indicator is meaningful on the line/bar views too.
     src_lines = src_cfg.get("comparisonLines")
     if src_lines and not cfg.get("comparisonLines"):
-        cfg["comparisonLines"] = src_lines
-        notes.append(f"comparisonLines mirrored from source: {json.dumps(src_lines)}")
+        safe = [ln for ln in src_lines if is_x_independent_line(ln)]
+        skipped = [ln for ln in src_lines if ln not in safe]
+        if safe:
+            cfg["comparisonLines"] = safe
+            notes.append(f"comparisonLines mirrored from source: {json.dumps(safe)}")
+        if skipped:
+            notes.append(
+                f"WARN: {len(skipped)} x-dependent comparisonLine(s) NOT mirrored "
+                f"({json.dumps(skipped)}) — x is GDP on the scatter but time on the "
+                f"line/bar views, so they would render meaningless there; re-author by hand "
+                f"if the scatter needs them"
+            )
 
     # 8) Warnings (no action)
     if not cfg.get("selectedEntityNames"):

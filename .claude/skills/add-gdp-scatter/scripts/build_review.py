@@ -194,7 +194,11 @@ def build_records(pairs: list[dict]) -> list[dict]:
 
         records.append(
             {
-                "id": str(tgt_id),
+                # Keyed by the PAIR: two source scatters can resolve to the same target
+                # (they share the non-GDP indicator), and keying on tgt_id alone made both
+                # rows one decision — approving one silently approved the other, and the
+                # differing src_md5 in fp() then pruned the shared entry as stale on reopen.
+                "id": f"{src_id}-{tgt_id}",
                 "src_id": src_id,
                 "src_slug": src["slug"],
                 "src_title": src["title"],
@@ -512,8 +516,14 @@ async function importJSON(file) {
     const byId = new Map(RECORDS.map((r) => [String(r.id), r]));
     let applied = 0, stale = 0, unknown = 0;
     for (const row of rows) {
-      const id = String(row.id ?? "");
-      const rec = byId.get(id);
+      // Accept exports written before ids became "<src>-<tgt>": fall back to matching on
+      // the pair, so a finished review is not thrown away by the key change.
+      let id = String(row.id ?? "");
+      let rec = byId.get(id);
+      if (!rec && row.src_id && row.tgt_id) {
+        id = row.src_id + "-" + row.tgt_id;
+        rec = byId.get(id);
+      }
       if (!rec) { unknown++; continue; }
       if (!row.status && !row.note) continue;
       // Must stay in step with fp() — a shorter fingerprint here silently skips every row.
