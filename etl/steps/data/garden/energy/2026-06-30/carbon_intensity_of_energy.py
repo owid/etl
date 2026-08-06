@@ -62,6 +62,12 @@ def run() -> None:
         tb.loc[~np.isfinite(tb[column].astype("float64")), column] = np.nan
 
     tb = tb.drop(columns=["emissions_total", "emissions_total_including_land_use_change", "total_energy_supply_twh"])
+
+    # Derived indicators must not inherit key points from the GCB input; key points come only from
+    # this step's own meta.yml.
+    for column in tb.columns:
+        tb[column].m.description_key = []
+
     tb = tb.format(["country", "year"], short_name=paths.short_name)
 
     #

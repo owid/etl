@@ -398,6 +398,15 @@ def run() -> None:
     # Sanity checks.
     sanity_check_outputs(tb=tb)
 
+    # Combined multi-source indicators must not inherit key points or producer text from a single
+    # input (e.g. the UK feeder's interpolation notes, or EI's per-fuel footnotes on series that also
+    # blend Etemad, Smil, NIC and EIA). Key points come only from this step's own meta.yml; producer
+    # text is cleared on the blended energy-unit columns and kept on single-source physical ones.
+    for column in tb.columns:
+        tb[column].m.description_key = []
+        if "twh" in column or "kwh" in column:
+            tb[column].m.description_from_producer = None
+
     # Format table conveniently.
     tb = tb.format(sort_columns=True, short_name=paths.short_name)
 

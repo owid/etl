@@ -464,6 +464,12 @@ def run() -> None:
     # Sanity checks.
     sanity_check_outputs(tb=tb)
 
+    # Derived indicators must not inherit key points from a single input (e.g. EI's oil-consumption
+    # notes on the fossil aggregate, or Maddison boilerplate on energy per GDP). Key points come only
+    # from this step's own meta.yml, which is applied on save.
+    for column in tb.columns:
+        tb[column].m.description_key = []
+
     # Format table conveniently.
     tb = tb.format(sort_columns=True, short_name=paths.short_name)
 
