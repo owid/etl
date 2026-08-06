@@ -62,7 +62,7 @@ def _column_dimensions() -> dict:
                 "metric": slug,
                 "per_capita": "per_capita",
             }
-    # Production in physical units (Statistical Review): coal and oil in tonnes, gas in cubic meters.
+    # Production in physical units (EIA): coal in tonnes, oil and gas in cubic meters.
     # Units differ per fuel, so there is no "total" (they can't be summed).
     dims.update(
         {

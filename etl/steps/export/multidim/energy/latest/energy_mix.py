@@ -284,8 +284,10 @@ COMMON_VIEW_EXTRAS = {
     ],
 }
 
-# Carbon intensity of energy (CO2 per unit of total energy supply) lives in the Global Carbon Budget,
-# which already divides emissions by this same TES. Referenced by short path, expanded via the dep.
+# Carbon intensity of energy (CO2 per unit of total energy supply) comes from the dedicated
+# carbon_intensity_of_energy step, which divides GCB emissions by the Statistical Review's TES
+# (the GCB's own per-unit-energy indicator still divides by substitution-method primary energy).
+# Referenced by short path, expanded via the dep.
 CARBON_INTENSITY_INDICATOR = "carbon_intensity_of_energy#emissions_total_per_unit_energy"
 # Explicit brackets, because this is the one map-bearing view that would otherwise fall back to
 # grapher's automatic (ckmeans) binning. That starts the lowest bin at the data minimum and leaves it

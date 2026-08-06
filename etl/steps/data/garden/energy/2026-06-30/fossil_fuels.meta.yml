@@ -176,6 +176,8 @@ tables:
         unit: years
         short_unit: years
         description_short: Number of years that proved reserves of coal would last if production continued at its current rate.
+        description_processing: |-
+          - The reserves-to-production ratio is calculated by Our World in Data as the Energy Institute Statistical Review of World Energy's proved reserves divided by its production of the same fossil fuel in the same year.
         display:
           name: Coal
         presentation:
@@ -356,6 +358,8 @@ tables:
         unit: years
         short_unit: years
         description_short: Number of years that proved reserves of gas would last if production continued at its current rate.
+        description_processing: |-
+          - The reserves-to-production ratio is calculated by Our World in Data as the Energy Institute Statistical Review of World Energy's proved reserves divided by its production of the same fossil fuel in the same year.
         display:
           name: Gas
         presentation:
@@ -527,6 +531,8 @@ tables:
         unit: years
         short_unit: years
         description_short: Number of years that proved reserves of oil would last if production continued at its current rate.
+        description_processing: |-
+          - The reserves-to-production ratio is calculated by Our World in Data as the Energy Institute Statistical Review of World Energy's proved reserves divided by its production of the same fossil fuel in the same year.
         display:
           name: Oil
         presentation:

@@ -44,7 +44,7 @@ dimensions:
         description: "Consumption in terawatt-hours"
       - slug: "production_physical"
         name: "Amount produced"
-        description: "Production in tonnes (coal and oil) or cubic meters (gas)"
+        description: "Production in tonnes (coal) or cubic meters (oil and gas)"
       - slug: "consumption_physical"
         name: "Amount consumed"
         description: "Consumption in tonnes (coal) or cubic meters (oil and gas)"

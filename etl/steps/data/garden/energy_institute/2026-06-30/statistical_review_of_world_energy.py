@@ -52,9 +52,6 @@ LB_TO_KG = 0.453593
 # Reference year to use for table of price indexes.
 PRICE_INDEX_REFERENCE_YEAR = 2019
 
-# Reference year to use for table of prices.
-PRICE_REFERENCE_YEAR = 2024
-
 # There is overlapping data for gas_reserves_tcm from USSR and Russia between 1991 and 1996.
 # By looking at the original file, this overlap seems to be intentional, so we keep the overlapping data when creating
 # aggregates. To justify this choice, note that: (1) The numbers for USSR are significantly smaller than for Russia in
@@ -187,8 +184,7 @@ COLUMNS_PRICES = {
     "natural_gas__us_henry_hub": "gas_price_us_henry_hub_current_dollars_per_million_btu",
     "natural_gas__zeebrugge": "gas_price_zeebrugge_current_dollars_per_million_btu",
     # Oil prices.
-    # Oil crude prices will be renamed afterwards, once the reference year of the price is known.
-    # f"oil_crude_prices__dollar_{PRICE_REFERENCE_YEAR}": f"oil_price_crude_{PRICE_REFERENCE_YEAR}_dollars_per_barrel",
+    # The constant-dollar oil crude price column is renamed later, once its reference year is known.
     "oil_crude_prices__dollar_money_of_the_day": "oil_price_crude_current_dollars_per_barrel",
     "oil_spot_crude_prices__brent": "oil_spot_crude_price_brent_current_dollars_per_barrel",
     "oil_spot_crude_prices__dubai": "oil_spot_crude_price_dubai_current_dollars_per_barrel",
@@ -337,7 +333,7 @@ def convert_price_units(tb_prices: Table) -> Table:
             tb_prices[column.replace("_per_barrel", "_per_m3")] = tb_prices[column] / BARRELS_TO_CUBIC_METERS
             tb_prices = tb_prices.drop(columns=[column])
         elif column.endswith("_per_million_btu"):
-            # Convert variables given in dollars per million BTU to dollars per kilocalorie.
+            # Convert variables given in dollars per million BTU to dollars per megawatt-hour.
             tb_prices[column.replace("_per_million_btu", "_per_mwh")] = tb_prices[column] / MILLION_BTU_TO_MWH
             tb_prices = tb_prices.drop(columns=[column])
         elif column.endswith("_per_lb"):
@@ -594,7 +590,7 @@ def fix_issues_with_other_regions(tb: Table) -> Table:
         # NOTE: As explained above (where REGIONS are defined), we don't include "Oceania" here because most of "Other Asia Pacific (EI)" are Asian countries; including "Oceania" here would imply unnecessarily removing that aggregate for many indicators.
         "Other Asia Pacific (EI)": ["Asia"],
     }
-    # Fraction of the range (between maximum and minimum) above which discrepancies between "Other *" regions and their containing aggregate regions will be considered for removal.
+    # Divisor applied to each indicator's range of values in the continent to define the minimum relevant magnitude (range / 15) below which "Other *" values are ignored.
     fraction_of_range = 15
     # Percentage (of "Other *" with respect to its containing aggregate region) above which the aggregate region will be removed.
     max_percentage_deviation = 15
@@ -605,7 +601,7 @@ def fix_issues_with_other_regions(tb: Table) -> Table:
             tb_continent = tb[(tb["country"] == continent)].fillna(0).reset_index(drop=True)
             for column in tb.drop(columns=["country", "year"]).columns:
                 remove_aggregate = False
-                # Define the "minimum range" of values that we care about (which is 15% of the maximum range of values for this indicator in the continent).
+                # Define the minimum magnitude of values that we care about (the indicator's range in the continent divided by fraction_of_range).
                 min_range = (tb_continent[column].max() - tb_continent[column].min()) / fraction_of_range
                 # If the "Other *" region has any value larger than the minimum range, consider removing the aggregate.
                 mask = tb_other[column] > min_range

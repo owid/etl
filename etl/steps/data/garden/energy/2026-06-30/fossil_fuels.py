@@ -433,8 +433,8 @@ def run() -> None:
     # Extend World consumption before 1965 with World production.
     tb = backfill_world_consumption(tb=tb)
 
-    # Add annual change, physical-unit production and reserves (Statistical Review only), trade and
-    # consumption (EIA), and per-capita.
+    # Add annual change, physical-unit production, reserves, trade and consumption (all from EIA),
+    # and per-capita.
     tb = add_annual_change(tb=tb)
     tb = add_physical_production(tb=tb, tb_eia=tb_eia)
     tb = add_reserves(tb=tb, tb_eia=tb_eia)

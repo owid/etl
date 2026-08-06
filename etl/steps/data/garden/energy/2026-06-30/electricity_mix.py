@@ -439,7 +439,7 @@ def fix_discrepancies_in_aggregate_regions(tb_review: Table, tb_ember: Table, co
                         _remove_combination.append(col)
                         # DEBUGGING: Uncomment to plot.
                         # px.line(compared.melt(id_vars="year"), x="year", y="value", color="variable", markers=True, title=f"{region} - {col}").show()
-                        assert compared["year"].min() == 1990 if region == "European Union (27)" else 2000, (
+                        assert compared["year"].min() == (1990 if region == "European Union (27)" else 2000), (
                             "Minimum year changed."
                         )
         if set(segments_not_combined[region]) != set(_remove_combination):
@@ -591,8 +591,8 @@ def add_uk_historical_electricity(combined: Table, tb_beis: Table) -> Table:
     estimated with BEIS's implied efficiency. Wind, solar and other renewables were negligible in that
     period, so they are set to zero to complete the historical mix.
 
-    Only the generation columns get BEIS as an origin (last, since it is the lowest-priority source);
-    demand, emissions and carbon intensity are not in BEIS, so those series stay on the modern period.
+    The generation columns and net imports get BEIS as an origin (last, since it is the lowest-priority
+    source); demand, emissions and carbon intensity are not in BEIS, so those stay on the modern period.
     """
     tb_beis = tb_beis.reset_index()[
         ["country", "year"] + list(UK_BEIS_COLUMNS) + ["implied_efficiency", "wind_and_solar"]

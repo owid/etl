@@ -57,6 +57,8 @@ definitions:
       unit: grams of CO₂ equivalents per kilowatt-hour
       description_short: |-
         [Greenhouse gases](#dod:ghgemissions) emitted per unit of generated electricity, measured in grams of [CO₂ equivalents](#dod:carbondioxideequivalents) per [kilowatt-hour](#dod:watt-hours).
+      description_processing: |-
+        {definitions.description_processing_only_ember_origins}
       display:
         name: Carbon intensity
         shortUnit: g
@@ -631,6 +633,20 @@ tables:
       description_from_producer: null
     variables:
       <<: *shared_variables
+      # Override the shared (Ember-only) block: the annual series is extended for the United Kingdom
+      # with BEIS historical data, while the monthly table keeps the shared Ember-only note.
+      total_net_imports__twh:
+        title: Net imports - TWh
+        short_unit: TWh
+        unit: terawatt-hours
+        description_short: |-
+          Electricity imports minus exports, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          - Data from 2000 onwards comes from Ember. For the United Kingdom, earlier data (from 1920) comes from the UK's Department for Business, Energy & Industrial Strategy (BEIS).
+        display:
+          name: Net imports
+        presentation:
+          title_public: Net electricity imports
       population:
         title: Population
         short_unit: people

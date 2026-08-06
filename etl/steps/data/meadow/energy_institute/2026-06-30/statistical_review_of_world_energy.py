@@ -5,9 +5,9 @@ physical energy content method) instead of the old "substitution" primary energy
 
 The energy indicators (total energy supply, generation, production and consumption by fuel,
 electricity by fuel, etc.) are taken from the narrow-format consolidated CSV: it is much simpler to
-parse than the main workbook, and its values are identical to the workbook's. The workbook is only
-used for the data that the consolidated dataset does not include: coal/oil/gas reserves, fossil fuel
-prices, minerals, and the thermal-equivalent efficiency factors.
+parse than the main workbook, and its values are identical to the workbook's. The workbook is used
+for the remaining indicators: coal/oil/gas reserves, fossil fuel prices, and minerals production
+and reserves.
 """
 
 import re
@@ -467,7 +467,7 @@ def run() -> None:
     tb_gas_reserves = parse_gas_reserves(data=data_spreadsheet)
     tb_oil_reserves = parse_oil_reserves(data=data_spreadsheet)
 
-    # Parse minerals production and reserves (only available in the workbook).
+    # Parse minerals production and reserves (from the workbook's per-mineral sheets).
     tb_minerals = parse_minerals_data(data_spreadsheet=data_spreadsheet)
 
     # Parse fossil fuel prices (only available in the workbook).

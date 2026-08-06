@@ -36,15 +36,22 @@ def run() -> None:
         source = column_production.replace("_generation__twh", "")
         column_share = f"{source}_share_of_electricity__pct"
 
-        # Filter to rows where production >= threshold.
-        mask = tb[column_production] >= PRODUCTION_THRESHOLD
-        if mask.sum() == 0:
+        # Track from the first year production reached the threshold, keeping later dips below it
+        # (e.g. bioenergy fell back under 100 TWh during 1991-1993).
+        above_threshold = tb[tb[column_production] >= PRODUCTION_THRESHOLD]
+        if above_threshold.empty:
             continue
+        first_year = above_threshold["year"].min()
+        mask = (tb["year"] >= first_year) & tb[column_production].notna()
 
         tb_source = tb[mask].reset_index(drop=True).reset_index()
         tb_source = tb_source.rename(
             columns={"index": "year", "year": "year_since_100_twh", column_production: "production_since_100_twh"},
             errors="raise",
+        )
+        # The output "year" is years since the crossing, so the calendar years must be consecutive.
+        assert (tb_source["year_since_100_twh"].diff().dropna() == 1).all(), (
+            f"Gap in the {source} series after its first year above {PRODUCTION_THRESHOLD} TWh."
         )
 
         # Add share column: 100% for total (which doesn't have a share column), from data for all other sources.

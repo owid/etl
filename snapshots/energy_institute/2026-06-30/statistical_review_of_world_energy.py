@@ -16,8 +16,8 @@ We ingest two files:
 - The narrow-format consolidated CSV is the source of truth for the energy indicators (total
   energy supply, generation, production and consumption by fuel, electricity by fuel, etc.). It is
   much simpler to parse than the workbook, and its values match the workbook exactly.
-- The workbook is still needed for the indicators that the consolidated dataset does not include:
-  coal/oil/gas reserves, fossil fuel prices, and the thermal-equivalent efficiency factors.
+- The workbook is still needed for the remaining indicators: coal/oil/gas reserves, fossil fuel
+  prices, and minerals production and reserves.
 """
 
 from pathlib import Path
