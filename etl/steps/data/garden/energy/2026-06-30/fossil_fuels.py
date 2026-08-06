@@ -13,8 +13,8 @@ Review.
 
 The dataset also includes:
 - Consumption in energy units, combined from the same sources as production (Statistical Review,
-  extended with EIA). For the World, consumption before 1965 is filled with production, since at the
-  global level production and consumption are the same.
+  extended with EIA). For the World, consumption before 1965 is filled with production (globally the
+  two differ only by stock changes, supply-chain losses, and statistical discrepancies).
 - Production in physical units, from EIA (broad country coverage).
 - Proved reserves, trade (imports, exports, net imports), and consumption in physical units, from EIA.
 - The World reserves-to-production ratio for each fossil fuel.
@@ -130,8 +130,9 @@ def combine_production_data(tb_review: Table, tb_etemad: Table, tb_eia: Table, t
 def backfill_world_consumption(tb: Table) -> Table:
     """Extend World consumption before 1965 with World production.
 
-    Consumption data starts in 1965 (the Statistical Review's first year), but for the world as a
-    whole production and consumption are the same, so earlier years take the production series.
+    Consumption data starts in 1965 (the Statistical Review's first year), but globally consumption
+    closely tracks production (they differ only by stock changes, supply-chain losses, and
+    statistical discrepancies), so earlier years take the production series.
     Only the World is filled: for individual countries and regions, trade makes the two differ.
     """
     world = tb[tb["country"] == "World"]
