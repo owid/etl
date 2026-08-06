@@ -336,6 +336,240 @@ def get_post_views_by_url(
     return df_views
 
 
+def get_explorer_views_by_url(
+    urls: list[str] | None = None,
+    date_min: str = DATE_MIN,
+    date_max: str = DATE_MAX,
+) -> pd.DataFrame:
+    """
+    Fetch number of views for explorer pages for a list of URLs from Metabase.
+
+    Parameters
+    ----------
+    urls : list of str, optional
+        List of explorer URLs to filter the results. If None, all explorer views are included.
+    date_min : str, optional
+        Minimum date to filter the results.
+    date_max : str, optional
+        Maximum date to filter the results.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the number of explorer views per URL, with columns:
+        url, title, views, n_days, views_daily.
+    """
+    query = f"""
+    SELECT
+        url,
+        SUM(views) AS views
+    FROM {SEMANTIC_LAYER_SCHEMA}.views_detailed
+    JOIN {SEMANTIC_LAYER_SCHEMA}.pages USING(url)
+    WHERE day >= '{date_min}'
+    AND day <= '{date_max}'
+    AND type = 'explorer'
+    AND url IS NOT NULL
+    """
+    if urls:
+        url_list = ", ".join(f"'{url}'" for url in urls)
+        query += f" AND url IN ({url_list})"
+    query += """
+    GROUP BY url
+    ORDER BY views DESC
+    """
+    df_views = read_analytics(sql=query)
+
+    df_views["n_days"] = get_number_of_days(
+        date_min=date_min,
+        date_max=date_max,
+        table_name="views_detailed",
+        day_column_name="day",
+    )
+    df_views["views_daily"] = df_views["views"] / df_views["n_days"]
+    df_views.loc[df_views["views_daily"] == float("inf"), "views_daily"] = 0
+
+    # Fetch explorer titles from the OWID DB by joining on slug derived from URL.
+    explorer_base_url = POST_LINK_TYPES_TO_URL["explorer"]
+    df_views["slug"] = df_views["url"].str.removeprefix(explorer_base_url).str.split("?").str[0]
+    df_titles = OWID_ENV.read_sql(
+        "SELECT slug, JSON_UNQUOTE(JSON_EXTRACT(config, '$.explorerTitle')) AS title FROM explorers"
+    )
+    df_views = df_views.merge(df_titles, on="slug", how="left").drop(columns=["slug"])
+
+    # Reorder columns for convenience.
+    cols = ["url", "title", "views", "n_days", "views_daily"]
+    df_views = df_views[cols]
+
+    return df_views
+
+
+def get_mdim_views_by_slug(
+    slugs: list[str],
+    date_min: str = DATE_MIN,
+    date_max: str = DATE_MAX,
+) -> pd.DataFrame:
+    """Fetch number of views for a list of mdim (multidim) slugs from Metabase.
+
+    Mirrors get_explorer_views_by_url, but for mdims. Mdims live under the grapher/ URL path (mixed together
+    with regular charts), and are tracked via grapher_views_detailed rather than views_detailed/pages, so, unlike
+    explorers, there is no 'type' column to filter by: slugs must be given explicitly.
+
+    NOTE: grapher_views_detailed counts every render of the mdim anywhere on the site (including embeds in
+    articles/topic pages), not just visits to its own page - the same definition of "views" already used for
+    regular charts elsewhere in this module (e.g. get_chart_views_by_chart_id).
+
+    Parameters
+    ----------
+    slugs : list of str
+        List of mdim slugs to fetch views for.
+    date_min : str, optional
+        Minimum date to filter the results.
+    date_max : str, optional
+        Maximum date to filter the results.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the number of views per mdim slug, with columns:
+        url, title, views, n_days, views_daily.
+
+    """
+    urls = [f"{GRAPHERS_BASE_URL}{slug}" for slug in slugs]
+    url_list = ", ".join(f"'{url}'" for url in urls)
+    query = f"""
+    SELECT
+        grapher AS url,
+        SUM(events) AS views
+    FROM {SEMANTIC_LAYER_SCHEMA}.grapher_views_detailed
+    WHERE day >= '{date_min}'
+    AND day <= '{date_max}'
+    AND grapher IN ({url_list})
+    GROUP BY grapher
+    ORDER BY views DESC
+    """
+    df_views = read_analytics(sql=query)
+
+    df_views["n_days"] = get_number_of_days(
+        date_min=date_min,
+        date_max=date_max,
+        table_name="grapher_views_detailed",
+        day_column_name="day",
+    )
+    df_views["views_daily"] = df_views["views"] / df_views["n_days"]
+    df_views.loc[df_views["views_daily"] == float("inf"), "views_daily"] = 0
+
+    # Fetch mdim titles from the OWID DB by joining on slug derived from URL.
+    df_views["slug"] = df_views["url"].str.removeprefix(GRAPHERS_BASE_URL)
+    df_titles = OWID_ENV.read_sql(
+        "SELECT slug, JSON_UNQUOTE(JSON_EXTRACT(config, '$.title.title')) AS title FROM multi_dim_data_pages"
+    )
+    df_views = df_views.merge(df_titles, on="slug", how="left").drop(columns=["slug"])
+
+    # Reorder columns for convenience.
+    cols = ["url", "title", "views", "n_days", "views_daily"]
+    df_views = df_views[cols]
+
+    return df_views
+
+
+def get_mdim_explorer_views_by_producer(
+    producers: list[str],
+    date_min: str = DATE_MIN,
+    date_max: str = DATE_MAX,
+) -> pd.DataFrame:
+    """Get number of views of mdims and explorers that use data from a given list of producers.
+
+    A slug is included if at least one of its views uses one of the producer's indicators. The views reported
+    are for the WHOLE mdim/explorer (all of its views combined), not just the view(s) using the producer's data:
+    an mdim/explorer can have other views using other producers' data too, so these numbers can overcount a
+    producer's actual attributable views. There is currently no way to reliably restrict to just the relevant
+    views: view-level tracking (chart_views_detailed's view_config_id) only exists since 2026-03-26, too short a
+    history to rely on for this kind of report.
+
+    Also note that mdim views (via grapher_views_detailed) include renders of the mdim embedded elsewhere on the
+    site (e.g. in an article), whereas explorer views (via views_detailed/pages) only count visits to the
+    explorer's own page - grapher_views_detailed has no explorer rows at all. So mdim and explorer numbers here
+    aren't measuring quite the same thing either.
+
+    Parameters
+    ----------
+    producers : list of str
+        Producer names to include.
+    date_min : str, optional
+        Minimum date to filter the results.
+    date_max : str, optional
+        Maximum date to filter the results.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the number of views per mdim/explorer slug, with columns:
+        slug, type, title, url, views, n_days, views_daily, uses_other_producers_data. The last column is True
+        if the slug has at least one indicator (in any of its views, not just the one(s) using this producer's
+        data) that is NOT attributed to this producer - a quick signal for how much the overcounting caveat
+        above might matter for that specific slug (e.g. False for a single-producer explorer/mdim).
+
+    """
+    cols = ["slug", "type", "title", "url", "views", "n_days", "views_daily", "uses_other_producers_data"]
+
+    def _empty_result() -> pd.DataFrame:
+        # NOTE: uses_other_producers_data must be explicitly cast to bool - pd.DataFrame(columns=cols) otherwise
+        # leaves it (like every other column) as dtype object, and boolean-indexing on an empty object-dtype
+        # Series makes pandas drop all columns instead of filtering rows (a pandas quirk, not intentional
+        # behaviour), which breaks callers that do df[~df["uses_other_producers_data"]].
+        return pd.DataFrame(columns=cols).astype({"uses_other_producers_data": bool})
+
+    variable_ids = get_producer_variable_ids(producers=producers)
+    if not variable_ids:
+        return _empty_result()
+
+    # NOTE: Filtering client-side (rather than a `WHERE indicator_id IN (...)` clause) is deliberate: a prolific
+    # producer (e.g. IHME has ~80k indicator ids) would blow past BigQuery's 1MB query-length limit if its full
+    # id list were inlined into the SQL - and would need to be inlined twice, once to select the relevant slugs
+    # and once more for the "any OTHER producer's indicator" check below. The full mapping table is small
+    # (~13k rows as of writing), so pulling it once and filtering in pandas avoids that limit entirely.
+    df_map = read_analytics(
+        sql=f"SELECT DISTINCT slug, type, indicator_id FROM {SEMANTIC_LAYER_SCHEMA}.mdim_explorers_x_indicators"
+    )
+    variable_ids_set = set(variable_ids)
+    df_map["is_producer"] = df_map["indicator_id"].isin(variable_ids_set)
+
+    relevant = df_map.loc[df_map["is_producer"], ["slug", "type"]].drop_duplicates()
+    if relevant.empty:
+        return _empty_result()
+
+    df_slugs = (
+        df_map.merge(relevant, on=["slug", "type"])
+        .groupby(["slug", "type"])["is_producer"]
+        .agg(lambda is_producer: bool((~is_producer).any()))
+        .rename("uses_other_producers_data")
+        .reset_index()
+    )
+
+    explorer_slugs = df_slugs.loc[df_slugs["type"] == "explorer", "slug"].tolist()
+    mdim_slugs = df_slugs.loc[df_slugs["type"] == "multidim", "slug"].tolist()
+
+    dfs = []
+    if explorer_slugs:
+        df_explorers = get_explorer_views_by_url(
+            urls=[f"{POST_LINK_TYPES_TO_URL['explorer']}{slug}" for slug in explorer_slugs],
+            date_min=date_min,
+            date_max=date_max,
+        )
+        df_explorers["type"] = "explorer"
+        dfs.append(df_explorers)
+    if mdim_slugs:
+        df_mdims = get_mdim_views_by_slug(slugs=mdim_slugs, date_min=date_min, date_max=date_max)
+        df_mdims["type"] = "multidim"
+        dfs.append(df_mdims)
+
+    df_views = _safe_concat(dfs=dfs)
+    df_views["slug"] = df_views["url"].str.split("/").str[-1].str.split("?").str[0]
+    df_views = df_views.merge(df_slugs[["slug", "type", "uses_other_producers_data"]], on=["slug", "type"], how="left")
+
+    return df_views[cols].sort_values("views", ascending=False).reset_index(drop=True)
+
+
 def _get_post_references_of_charts_and_redirected_charts(
     chart_ids: list[int] | None = None, component_types: list[str] | None = None
 ) -> pd.DataFrame:
@@ -668,6 +902,35 @@ def get_post_views_last_n_days(
     return df_views
 
 
+def get_producer_variable_ids(producers: list[str]) -> list[int]:
+    """Get all indicator (variable) IDs attributed to a given list of producers.
+
+    Unlike get_visualizations_using_data_by_producer, this is not restricted to indicators used in charts, so it
+    can also be used to find indicators used in other kinds of visualizations (e.g. mdim/explorer views).
+
+    Parameters
+    ----------
+    producers : list of str
+        Producer names to include.
+
+    Returns
+    -------
+    list of int
+        Distinct variable IDs attributed to the given producers.
+
+    """
+    producers_str = ", ".join(f"'{p}'" for p in [p.replace("'", "''") for p in producers])
+    query = f"""
+    SELECT DISTINCT ov.variableId AS variable_id
+    FROM origins_variables ov
+    JOIN origins o ON o.id = ov.originId
+    WHERE o.producer IN ({producers_str})
+    """
+    df = OWID_ENV.read_sql(query)
+
+    return sorted(df["variable_id"].tolist())
+
+
 def get_visualizations_using_data_by_producer(
     producers: list[str] | None = None, excluded_steps: list[str] | None = None
 ) -> pd.DataFrame:
@@ -718,8 +981,12 @@ AND is_published = true"""
 
     # Select producers, if specified.
     if producers and len(producers) > 0:
-        producers_str = ", ".join(f"'{p}'" for p in [p.replace("'", "''") for p in producers])
-        query += f"\nAND producer IN ({producers_str})"
+        # Resolve producers to their indicator IDs first, and filter on those, instead of matching the producer
+        # name directly in this query (avoids duplicating producer-name-matching logic in two places).
+        variable_ids = get_producer_variable_ids(producers=producers)
+        # Use an impossible id if none is found, so the query below still runs and returns an empty (but well-formed) dataframe.
+        ids_str = ", ".join(str(vid) for vid in variable_ids) if variable_ids else "-1"
+        query += f"\nAND variable_id IN ({ids_str})"
 
     # Execute the query.
     df = OWID_ENV.read_sql(query)
