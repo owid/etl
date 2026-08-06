@@ -512,7 +512,7 @@ views:
       variant: estimates
     indicators:
       y:
-        - catalogPath: grapher/un/2024-07-12/un_wpp/deaths#deaths__sex_all__age_0__variant_estimates
+        - catalogPath: un_wpp/deaths#deaths__sex_all__age_0__variant_estimates
   - dimensions:
       indicator: infant_deaths
       age: "0"
@@ -520,7 +520,7 @@ views:
       variant: estimates
     indicators:
       y:
-        - catalogPath: grapher/un/2024-07-12/un_wpp/deaths#deaths__sex_female__age_0__variant_estimates
+        - catalogPath: un_wpp/deaths#deaths__sex_female__age_0__variant_estimates
   - dimensions:
       indicator: infant_deaths
       age: "0"
@@ -528,7 +528,7 @@ views:
       variant: estimates
     indicators:
       y:
-        - catalogPath: grapher/un/2024-07-12/un_wpp/deaths#deaths__sex_male__age_0__variant_estimates
+        - catalogPath: un_wpp/deaths#deaths__sex_male__age_0__variant_estimates
   # Projection views combine projection + estimates as two y-indicators so
   # grapher renders a solid→dashed transition on the line chart AND the map tab
   # auto-combines them into the full 1950–2100 series (see
@@ -637,7 +637,7 @@ views:
       variant: estimates
     indicators:
       y:
-        - catalogPath: grapher/un/2024-07-12/un_wpp/mortality_rate#mortality_rate__sex_all__age_0__variant_estimates
+        - catalogPath: un_wpp/mortality_rate#mortality_rate__sex_all__age_0__variant_estimates
   - dimensions:
       indicator: child_mortality_rate
       age: 0-4
@@ -645,7 +645,7 @@ views:
       variant: estimates
     indicators:
       y:
-        - catalogPath: grapher/un/2024-07-12/un_wpp/mortality_rate#mortality_rate__sex_all__age_0_4__variant_estimates
+        - catalogPath: un_wpp/mortality_rate#mortality_rate__sex_all__age_0_4__variant_estimates
 
   # Projection views combine projection + estimates as two y-indicators (projection
   # first; see note on infant_deaths above) so grapher renders a solid→dashed

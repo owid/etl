@@ -216,6 +216,39 @@ def test_view_expand_paths_and_indicators_used():
     }
 
 
+def test_view_expand_paths_covers_non_y_dimensions_set_after_creation():
+    """
+    Test that expand_paths resolves short-form paths on every chart dimension, not just y.
+
+    Steps set x/color/size after the collection is built (e.g. to add a Marimekko tab, which
+    needs population on x and region on color). Those indicators miss the create-time
+    expansion, so `Collection.save` calls `expand_paths` again to catch them. This test pins
+    that behavior: short paths assigned via `set_indicator` must end up as full catalog paths.
+    """
+    # Start from a y-only view, as a collection would produce it.
+    view = View(dimensions={"d": "a"}, indicators=ViewIndicators.from_dict({"y": "table#ind1"}))
+
+    # Assign the remaining dimensions afterwards, in short form.
+    view.indicators.set_indicator(x="population#population", color="regions#region", size="table#ind2")
+
+    mapping = {
+        "table": ["grapher/ns/latest/ds/table"],
+        "population": ["grapher/demography/latest/population/population"],
+        "regions": ["grapher/regions/latest/regions/regions"],
+    }
+    view.expand_paths(mapping)
+
+    # Every dimension is now a full catalog path, y included.
+    assert view.indicators.y is not None
+    assert view.indicators.y[0].catalogPath == "grapher/ns/latest/ds/table#ind1"
+    assert view.indicators.x is not None
+    assert view.indicators.x.catalogPath == "grapher/demography/latest/population/population#population"
+    assert view.indicators.color is not None
+    assert view.indicators.color.catalogPath == "grapher/regions/latest/regions/regions#region"
+    assert view.indicators.size is not None
+    assert view.indicators.size.catalogPath == "grapher/ns/latest/ds/table#ind2"
+
+
 def test_view_matches_single_dimension_exact():
     """
     Test View.matches with single dimension exact matching.
