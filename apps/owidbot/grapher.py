@@ -1,36 +1,42 @@
+import json
 from pathlib import Path
+
+from structlog import get_logger
 
 from etl.config import get_container_name
 from etl.paths import BASE_DIR
+
+log = get_logger()
+
+SVG_TESTER_SUITES = ("graphers", "grapher-views", "mdims", "thumbnails")
+
+# Written by devTools/svgTester/verify-graphs.ts, one per suite
+VERIFY_RESULTS_FILENAME = "verify-results.json"
 
 
 def run(branch: str) -> str:
     container_name = get_container_name(branch)
 
-    svg_tester_dirs = ("graphers", "grapher-views", "mdims", "explorers", "thumbnails")
-    svg_tester_has_run = any(
-        (BASE_DIR.parent / "owid-grapher-svgs" / dir_name / "verify-graphs.log").exists()
-        for dir_name in svg_tester_dirs
-    )
-    svg_tester_graphers = make_differences_line("graphers") if svg_tester_has_run else ""
-    svg_tester_grapher_views = make_differences_line("grapher-views") if svg_tester_has_run else ""
-    svg_tester_mdims = make_differences_line("mdims") if svg_tester_has_run else ""
-    svg_tester_explorers = make_differences_line("explorers") if svg_tester_has_run else ""
-    svg_tester_thumbnails = make_differences_line("thumbnails") if svg_tester_has_run else ""
+    svgs_repo = BASE_DIR.parent / "owid-grapher-svgs"
 
-    svg_tester_line = (
-        f"- **SVG tester:** https://github.com/owid/owid-grapher-svgs/compare/{branch}" if svg_tester_has_run else ""
+    results_by_suite = {suite: read_verify_results(svgs_repo / suite) for suite in SVG_TESTER_SUITES}
+
+    # The first owidbot run of a build happens before the SVG tester step,
+    # so no suite has results yet and the whole block is left out.
+    svg_tester_has_run = any(results is not None for results in results_by_suite.values())
+
+    rows = "\n".join(
+        f"- {suite.replace('-', ' ')}: {make_suite_line(results, container_name=container_name, suite=suite)}"
+        for suite, results in results_by_suite.items()
     )
+
+    svg_tester_line = f"- **SVG tester:** {make_report_url(container_name)}" if svg_tester_has_run else ""
     svg_tester_block = (
         f"""
 <details open>
 <summary><b>SVG tester:</b> </summary>
 
-Number of differences (graphers): {svg_tester_graphers}
-Number of differences (grapher views): {svg_tester_grapher_views}
-Number of differences (mdims): {svg_tester_mdims}
-Number of differences (explorers): {svg_tester_explorers}
-Number of differences (thumbnails): {svg_tester_thumbnails}
+{rows}
 
 </details>
 """.strip()
@@ -62,58 +68,52 @@ Number of differences (thumbnails): {svg_tester_thumbnails}
     return body
 
 
-def make_differences_line(dir: str) -> str:
-    log_file = BASE_DIR.parent / "owid-grapher-svgs" / dir / "verify-graphs.log"
-    commit_file = BASE_DIR.parent / "owid-grapher-svgs" / dir / "commit.log"
-    report_filename = f"{dir}/differences.html"
+def read_verify_results(suite_dir: Path) -> dict | None:
+    """Parsed verify-results.json, None when the file does not exist."""
+    path = suite_dir / VERIFY_RESULTS_FILENAME
+    if not path.exists():
+        return None
 
-    # Handle missing log files based on the test suite type:
-    # - 'graphers' is the core test suite that always runs: missing file indicates an error
-    # - Other test suites are optional: missing file likely means skipped
     try:
-        num_differences = get_num_differences(log_file)
-        status_icon = get_status_icon(num_differences)
-    except FileNotFoundError:
-        num_differences = "error" if dir == "graphers" else "_skipped_"
-        status_icon = "❓" if dir == "graphers" else ""
-
-    commit_id = get_commit_id(commit_file)
-    commit_link = f"({make_commit_link(commit_id=commit_id)})" if commit_id else ""
-    report_link = (
-        f"[Report]({make_report_url(commit_id=commit_id, report_filename=report_filename)})"
-        if status_icon == "❌" and commit_id
-        else ""
-    )
-
-    return f"{num_differences} {commit_link} {status_icon} {report_link}".strip()
+        return json.loads(path.read_text())
+    except (OSError, json.JSONDecodeError) as e:
+        # Reported as its own state rather than as absent: absence means "this suite
+        # was never run". A truncated file is plausible - the process can be killed mid-write.
+        log.warning("owidbot.svg_tester.unreadable_results", path=str(path), error=str(e))
+        return {"status": "unreadable"}
 
 
-def get_num_differences(path: Path) -> int:
-    with open(path) as f:
-        return len(f.readlines())
+def make_suite_line(results: dict | None, container_name: str, suite: str) -> str:
+    """One suite's line in the PR comment."""
+    if results is None:
+        return "_skipped_"
+
+    status = results.get("status")
+
+    if status == "unreadable":
+        return "⚠️ no result (results file unreadable)"
+
+    if status == "running":
+        # verify-graphs.ts writes this before its first render and overwrites it at the end
+        return "_running_ (or killed mid-run)"
+
+    counts = results.get("counts", {})
+    num_differences = counts.get("differences", 0)
+    num_errors = counts.get("errors", 0)
+
+    if not num_differences and not num_errors:
+        return "✅ no differences"
+
+    notes = []
+    if num_differences:
+        notes.append(f"❌ {num_differences} difference{'s' if num_differences != 1 else ''}")
+    if num_errors:
+        notes.append(f"⚠️ {num_errors} error{'s' if num_errors != 1 else ''}")
+
+    return f"{', '.join(notes)} ([report]({make_report_url(container_name, suite=suite)}))"
 
 
-def get_status_icon(num_differences: int) -> str:
-    if num_differences > 0:
-        return "❌"
-    else:
-        return "✅"
-
-
-def get_commit_id(path: Path) -> str:
-    try:
-        with open(path) as f:
-            return f.readline().strip()
-    except FileNotFoundError:
-        return ""
-
-
-def make_commit_link(commit_id: str) -> str:
-    commit_hash = commit_id[:6]
-    commit_url = f"https://github.com/owid/owid-grapher-svgs/commit/{commit_id}"
-    return f"[{commit_hash}]({commit_url})"
-
-
-def make_report_url(commit_id: str, report_filename: str) -> str:
-    # raw.githack.com serves raw files from GitHub with proper HTML content type
-    return f"https://rawcdn.githack.com/owid/owid-grapher-svgs/{commit_id}/{report_filename}"
+def make_report_url(container_name: str, suite: str | None = None) -> str:
+    """The SVG tester page on the staging container, for one suite or the index"""
+    url = f"http://{container_name}/admin/svgtester"
+    return f"{url}/{suite}" if suite else url

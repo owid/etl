@@ -208,19 +208,19 @@ class Snapshot:
         """Path to metadata file."""
         return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
+    def _r2_url(self, md5: str) -> str:
+        """R2 URL of the content-addressed object holding the given md5."""
+        bucket = config.R2_SNAPSHOTS_PUBLIC if self.metadata.is_public else config.R2_SNAPSHOTS_PRIVATE
+        return f"s3://{bucket}/{md5[:2]}/{md5[2:]}"
+
     def _snapshot_exists_on_remote(self, md5: str) -> bool:
-        """Check if snapshot file exists on R2 without downloading it."""
-        if self.metadata.is_public:
-            url = f"{config.R2_SNAPSHOTS_PUBLIC_READ}/{md5[:2]}/{md5[2:]}"
-            try:
-                resp = requests.head(url, timeout=10)
-                return resp.status_code == 200
-            except requests.RequestException:
-                return False
-        else:
-            # For private snapshots, assume it exists if md5 matches — we can't
-            # easily do a HEAD request on S3 without more setup
-            return True
+        """Check if snapshot file exists on R2 without downloading it.
+
+        Asks the R2 API rather than the public snapshots.owid.io URL, whose CDN can serve a stale
+        404 for an object that was only just written. This is only used by `dvc_add`, which needs
+        R2 credentials anyway.
+        """
+        return s3_utils.object_exists(self._r2_url(md5))
 
     def _download_dvc_file(self, md5: str) -> None:
         """Download file from remote to self.path."""
@@ -346,19 +346,27 @@ class Snapshot:
         # Get metadata file
         with open(self.metadata_path) as f:
             meta = ruamel_load(f)
+        dvc_md5_matches = bool(meta.get("outs")) and meta["outs"][0]["md5"] == md5
 
-        # If the file already exists with the same md5, verify it's actually on R2 before skipping
-        if meta.get("outs") and meta["outs"][0]["md5"] == md5:
-            if self._snapshot_exists_on_remote(md5):
+        # Snapshot keys are content-addressed, so a key that already exists holds byte-identical
+        # content and there is nothing to upload. Ask R2 rather than trusting the local .dvc file:
+        # the two disagree whenever the md5 lives on a branch we don't have checked out (autoupdate
+        # PRs are built via the GitHub API, see apps/autoupdate/cli.py) or when an earlier run
+        # uploaded the file but died before committing its .dvc. Re-uploading used to be a harmless
+        # overwrite, but the bucket lock policy on owid-snapshots now rejects it with
+        # ObjectLockedByBucketPolicy.
+        if self._snapshot_exists_on_remote(md5):
+            if dvc_md5_matches:
                 log.info("File already exists with the same md5, skipping upload", snapshot=self.uri)
                 return
-            else:
+            log.info("File already exists on R2 under this md5, skipping upload", snapshot=self.uri)
+        else:
+            if dvc_md5_matches:
                 log.warning("File md5 matches .dvc metadata but is missing from R2, re-uploading", snapshot=self.uri)
 
-        # Upload to S3
-        bucket = config.R2_SNAPSHOTS_PUBLIC if self.metadata.is_public else config.R2_SNAPSHOTS_PRIVATE
-        assert self.metadata.is_public is not None
-        s3_utils.upload(f"s3://{bucket}/{md5[:2]}/{md5[2:]}", str(self.path), public=self.metadata.is_public)
+            # Upload to S3
+            assert self.metadata.is_public is not None
+            s3_utils.upload(self._r2_url(md5), str(self.path), public=self.metadata.is_public)
 
         self.m._update_metadata_file({"outs": [{"md5": md5, "size": self.path.stat().st_size, "path": self.path.name}]})
 

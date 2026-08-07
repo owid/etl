@@ -11,6 +11,35 @@ paths = PathFinder(__file__)
 
 START_OF_PROJECTIONS = 2025
 
+# The source rates the plausibility of every city's population figure (0 = low, 1 = moderate,
+# 2 = high, 3 = very high) and the meadow step carries that rating through. We do not publish the
+# figures it rates "low".
+#
+# Why those figures go wrong, per the JRC (July 2026): the underlying population grid is built from
+# only two census epochs per country -- 2006 and 2014 for Angola, 2001 and 2012 for Eritrea -- and the
+# rate of change between them is extrapolated across the whole 1975-2030 series. Where a city was
+# shrinking between its two census years, running that decline backwards inflates its early figures:
+# Angola's Uíge reaches 1.01M in 1975 in 29 km². Where a city was growing fast, the same procedure
+# extrapolates it back to almost nothing, which is why Luanda has no urban centre before 1995. The
+# rating flags precisely these thin-input cases, which is what makes it a good filter for us.
+#
+# Note this is a back-extrapolation artifact, not a spatial one: the population is not assigned to the
+# wrong place, so Uíge's early figures are its own and not Luanda's. A JRC update adding 1995 data for
+# Angola and 1984 data for Eritrea is expected to improve these cases.
+#
+# Two limits on that, both deliberate:
+#
+# 1. Only indicators built from ONE named city are filtered (capital, largest city, top 100). Every
+#    aggregate is left alone -- the city-size buckets, and the regional sums of capital population.
+#    An aggregate sums many cities, so dropping a badly estimated one would delete people who really
+#    do live in that country. Filtering the city-size aggregates would also be far more destructive
+#    than it looks: 38 country-years would lose every one of their cities, and Bangladesh, Yemen, Sudan
+#    and Iran would each lose a fifth to two-thirds of their urban population.
+# 2. Only the historical estimates are filtered, never the projections. From 2025 on the rating mostly
+#    marks ordinary forecast uncertainty for small capitals rather than a bad historical extrapolation
+#    -- Vientiane is rated low from 2025, but it really is the largest city in Laos.
+LOW_PLAUSIBILITY = 0
+
 # Regions for which aggregates will be created.
 REGIONS = [
     "North America",
@@ -34,6 +63,20 @@ CITY_SIZE_CUTOFFS = {
     "5m_10m": (5000000, 10000000),
     "above_10m": (10000000, float("inf")),
 }
+
+
+def blank_low_plausibility(tb, value_columns, flag_column):
+    """Blank the values the source rates as low plausibility, in the historical estimates only.
+
+    Blanks rather than drops, and never re-ranks: for the largest-city indicator the meadow step has
+    already picked the winning city, so removing the row here would let a later step fall through to
+    the second-biggest city and publish that as the largest.
+
+    Rows without a flag (regional and income-group aggregates, which carry NaN) are always left alone.
+    """
+    unreliable = (tb[flag_column] == LOW_PLAUSIBILITY) & (tb["year"] < START_OF_PROJECTIONS)
+    tb.loc[unreliable.fillna(False).astype(bool), value_columns] = float("nan")
+    return tb.drop(columns=[flag_column])
 
 
 def calculate_population_shares(tb_data, tb_total_pop, pop_column, share_prefix):
@@ -180,9 +223,13 @@ def run() -> None:
     ####################################################################################################################
     # Extract capital data (exclude top 100 city rows which have different country names like "Paris (France)").
     tb_capitals = tb[has_capital_data & ~has_top_100_data].copy()
-    tb_capitals = tb_capitals[["country", "year", "urban_pop", "urban_density"]]
+    tb_capitals = tb_capitals[["country", "year", "urban_pop", "urban_density", "urban_pop_plausibility"]]
 
     # Add regional aggregates (sum of capital populations across countries in each region).
+    # Deliberately done BEFORE blanking the low-plausibility capitals below, so that regional and
+    # income-group totals still count every capital the source reports. Those sums are aggregates, and
+    # aggregates keep the people throughout this step. Blanking first would silently lower Africa's
+    # total for 1995-2005 by up to 1.6%.
     tb_capitals = geo.add_regions_to_table(
         tb_capitals,
         aggregations={"urban_pop": "sum"},
@@ -191,6 +238,10 @@ def run() -> None:
         ds_income_groups=ds_income_groups,
         min_num_values_per_year=1,
     )
+
+    # Now blank the individual capitals rated low plausibility. Region rows carry no flag, so they and
+    # their totals are untouched.
+    tb_capitals = blank_low_plausibility(tb_capitals, ["urban_pop", "urban_density"], "urban_pop_plausibility")
 
     # Calculate capital city shares (% of urban/total population living in capital cities).
     # This works for both individual countries and regional aggregates.
@@ -203,7 +254,15 @@ def run() -> None:
     # Extract largest city data (individual countries only, no regional aggregates).
     # Note: "Largest city" is determined purely by population, which may differ from the capital.
     tb_largest_city = tb[has_largest_city_data & ~has_top_100_data].copy()
-    tb_largest_city = tb_largest_city[["country", "year", "largest_city_pop", "largest_city_density"]]
+    tb_largest_city = tb_largest_city[
+        ["country", "year", "largest_city_pop", "largest_city_density", "largest_city_plausibility"]
+    ]
+
+    # Blank the largest cities rated low plausibility, before the shares are derived from them, so the
+    # shares go blank with their numerator instead of being computed from a figure we won't publish.
+    tb_largest_city = blank_low_plausibility(
+        tb_largest_city, ["largest_city_pop", "largest_city_density"], "largest_city_plausibility"
+    )
 
     # Calculate largest city shares (% of urban/total population living in the largest city).
     # No regional aggregates - can't meaningfully sum "largest city" across countries.
@@ -215,7 +274,16 @@ def run() -> None:
     ####################################################################################################################
     # Extract top 100 cities (these have country names like "Paris (France)").
     tb_top_100 = tb[has_top_100_data].copy()
-    tb_top_100 = tb_top_100[["country", "year", "urban_pop_top_100", "urban_density_top_100"]]
+    tb_top_100 = tb_top_100[
+        ["country", "year", "urban_pop_top_100", "urban_density_top_100", "urban_pop_top_100_plausibility"]
+    ]
+
+    # Blank the city-years rated low plausibility. Each row is one named city in one year, so this
+    # touches nothing else; the city itself stays in the top 100, since membership is fixed by 2020
+    # population and should not depend on the rating of a single year's figure.
+    tb_top_100 = blank_low_plausibility(
+        tb_top_100, ["urban_pop_top_100", "urban_density_top_100"], "urban_pop_top_100_plausibility"
+    )
 
     ####################################################################################################################
     # SECTION 4: Process city size aggregates

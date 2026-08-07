@@ -19,6 +19,14 @@ def test_timed_run():
     assert abs(time_taken - 0.05) < 0.2
 
 
+@pytest.fixture(autouse=True)
+def _clear_step_failures():
+    # The failure list is module state, emptied by print_failure_recap() at the end of a run.
+    cmd.STEP_FAILURES.clear()
+    yield
+    cmd.STEP_FAILURES.clear()
+
+
 @pytest.fixture()
 def dag():
     return {"data-private://a": {"data://b"}, "data://e": {"data://f"}}
@@ -61,6 +69,75 @@ def test_exec_graph_parallel():
 
     # Assert that all tasks have been completed
     assert all(task in done for task in exec_graph.keys())
+
+
+def test_exec_graph_parallel_prints_traceback(capsys):
+    def failing_func(task: str, **kwargs):
+        raise ValueError(f"boom in {task}")
+
+    # Without continue_on_failure the exception propagates, but only once the pool has drained
+    # every already-submitted step, so the traceback has to be printed as soon as the step fails.
+    with pytest.raises(ValueError):
+        cmd.exec_graph_parallel({"task1": set()}, failing_func, continue_on_failure=False, workers=1, use_threads=True)
+
+    captured = capsys.readouterr()
+    assert "+++ Failed task1" in captured.out
+    assert "ValueError: boom in task1" in captured.out
+
+
+def test_exec_graph_parallel_reports_every_failure(capsys):
+    def failing_func(task: str, **kwargs):
+        raise ValueError(f"boom in {task}")
+
+    # In continue_on_failure mode only the first exception is ever raised, so each failure needs
+    # its own traceback in the log.
+    with pytest.raises(ValueError):
+        cmd.exec_graph_parallel(
+            {"task1": set(), "task2": set()}, failing_func, continue_on_failure=True, workers=2, use_threads=True
+        )
+
+    captured = capsys.readouterr()
+    assert "ValueError: boom in task1" in captured.out
+    assert "ValueError: boom in task2" in captured.out
+
+
+def test_failure_recap_repeats_every_traceback(capsys):
+    from etl.steps import StepFailedError
+
+    def failing_func(task: str, **kwargs):
+        raise StepFailedError(f"TypeError: bad dtype in {task}\nStep {task} failed with exit code 1")
+
+    with pytest.raises(StepFailedError):
+        cmd.exec_graph_parallel(
+            {"task1": set(), "task2": set()}, failing_func, continue_on_failure=True, workers=2, use_threads=True
+        )
+    # What the CLI does once the run is over, however it ended.
+    cmd.print_failure_recap()
+
+    captured = capsys.readouterr()
+    # CI shows the tail of the log, where the re-raised exception contributes only executor
+    # plumbing, so every failure's traceback is repeated in a recap at the end of the run.
+    assert "+++ 2 step(s) failed" in captured.out
+    for task in ("task1", "task2"):
+        # Header and traceback have to be one write to one stream, or Buildkite interleaves them.
+        assert captured.out.count(f"+++ Failed {task}\nTypeError: bad dtype in {task}") == 1
+        assert captured.out.count(f">>> Failed {task}\nTypeError: bad dtype in {task}") == 1
+    # Emptied, so a later run in the same process doesn't repeat these.
+    assert cmd.STEP_FAILURES == []
+
+
+def test_exec_graph_parallel_does_not_exit_silently_on_system_exit(capsys):
+    # A step that raises SystemExit (as the forked step runner used to on failure) must not end the
+    # run in silence: `except Exception` would not catch it and nothing would be printed.
+    def exiting_func(task: str, **kwargs):
+        raise SystemExit(1)
+
+    with pytest.raises(SystemExit):
+        cmd.exec_graph_parallel({"task1": set()}, exiting_func, continue_on_failure=False, workers=1, use_threads=True)
+
+    captured = capsys.readouterr()
+    assert "+++ Failed task1" in captured.out
+    assert "SystemExit" in captured.out
 
 
 def test_construct_full_dag():

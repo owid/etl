@@ -1,0 +1,62 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Economic Inequality
+      attribution_short: Garbinti, Goupille-Lebret and Piketty
+    description_key:
+      - Wealth refers to net personal wealth.
+      - The estimates cover all adults, with each adult counted individually.
+      - The series combines income-tax, inheritance, and wealth-survey data with national accounts to build estimates stretching back to 1800. Definitions of wealth and the underlying data sources change over such a long period; the source paper documents these changes in detail.
+    description_processing: |-
+      The source workbook reports the summary statistics behind the paper's wealth series — wealth shares, wealth thresholds and inverted Pareto coefficients by year, plus a separate sheet on wealth growth by group. We use only the wealth-share series.
+
+      The wealth shares are reported by the source as fractions of total wealth and have been converted to percentages.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0
+  owners:
+    - Bertha Rohenkohl
+
+tables:
+  wealth_france:
+    variables:
+      share_top_10:
+        title: Wealth share of the richest 10%
+        presentation:
+          title_public: Wealth share of the richest 10%
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of total personal wealth held by the wealthiest 10% of adults.
+        display:
+          name: Top 10%
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      share_top_1:
+        title: Wealth share of the richest 1%
+        presentation:
+          title_public: Wealth share of the richest 1%
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of total personal wealth held by the wealthiest 1% of adults.
+        display:
+          name: Top 1%
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      share_bottom_50:
+        title: Wealth share of the poorest 50%
+        presentation:
+          title_public: Wealth share of the poorest 50%
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of total personal wealth held by the least wealthy 50% of adults.
+        display:
+          name: Bottom 50%
+          numDecimalPlaces: 1
+          tolerance: 5

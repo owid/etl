@@ -1197,3 +1197,22 @@ tables:
                 customNumericValues: *map_brackets_relative_poverty
             selectedEntityNames: *entity_names_inequality
 
+  # NOTE: The percentiles table is garden-only (not pushed to grapher), so no grapher_config is needed.
+  percentiles:
+    variables:
+      thr:
+        title: Threshold income (percentile <<percentile>>, {definitions.per_period}, {definitions.welfare_type}, {definitions.equivalence_scale})
+        unit: international-$ in {definitions.ppp_version} prices
+        short_unit: "$"
+        description_short: |-
+          The level of income {definitions.per_period} below which <<percentile>>% of the population falls.
+        description_key:
+          - "{definitions.description_key_lis}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_equivalence_scale}"
+          - "{definitions.description_key_ppp}"
+        display:
+          name: Threshold income (percentile <<percentile>>) ({definitions.welfare_type})
+          numDecimalPlaces: "{definitions.numdecimalplaces_period}"
+          <<: *common_display
+

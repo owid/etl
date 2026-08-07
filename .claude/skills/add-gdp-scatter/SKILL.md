@@ -1,6 +1,6 @@
 ---
 name: add-gdp-scatter
-description: Add a scatter view (with GDP per capita on x) to existing OWID charts via the admin API, mirroring the admin UI's "Add scatter type" defaults. Trigger when the user pastes a table with columns `chart_admin_url`, `target_chart_admin_url`, `gdp_source`.
+description: Add a scatter view (with GDP per capita on x) to existing OWID charts via the admin API, mirroring the admin UI's "Add scatter type" defaults, then retire the old standalone "X vs. GDP per capita" charts by redirecting their slugs to that scatter view. Trigger when the user pastes a table with columns `chart_admin_url`, `target_chart_admin_url`, `gdp_source` (part 1), or a list of `{grapher_url, target_chart_url}` pairs to redirect (part 2).
 metadata:
   internal: true
 ---
@@ -100,28 +100,108 @@ The source charts are scatter-vs-GDP charts, so their title/subtitle/footnote de
 - Open `OWID_ENV.chart_site(slug)` for one of the targets and switch to the Scatter tab.
 - Re-run the same input. The script is idempotent — all changes are guarded by "if absent" / "if not equal" checks; a second run should print `OK` with empty / minimal notes.
 
-## Part 2: redirect old standalone scatter charts to the new scatter tab
+## Part 2: retire the old standalone scatter charts
 
-Once the targets have their scatter view, the old standalone "X vs. GDP per capita" charts can be retired and redirected to `/grapher/<target-slug>?tab=scatter&time=latest` (the scatter tab on the latest year). Use `scripts/redirect_to_scatter.py`.
+Once the targets have their scatter view, each old standalone "X vs. GDP per capita" chart is retired by registering **its slug as a chart redirect on the target chart** carrying `?tab=scatter&time=latest`, then unpublishing it. Use `scripts/redirect_to_scatter.py`.
+
+That is the same thing as opening the target chart's admin editor, going to **Refs → "Alternative URLs for this chart"**, and filling in both fields: the old slug under **URL**, and `tab=scatter&time=latest` under **Target query params (optional)**. That second field is new (grapher #6674, Jul 2026) and is what makes this possible — before it, `chart_slug_redirects` could only map slug → chart id, so this skill had to use the site `redirects` table instead.
 
 Input: JSON list of `{grapher_url, target_chart_url}` (public `ourworldindata.org/grapher/<slug>` URLs).
 
 ```bash
-# Audit only (default) — reports what references each OLD chart, never mutates:
+# Audit only (default) — a full dry run: references, article follow-ups, and the verdict for
+# every row, mutating nothing:
 echo '<JSON>' | .venv/bin/python .claude/skills/add-gdp-scatter/scripts/redirect_to_scatter.py
-# Apply — create site redirect + unpublish each source:
+# Apply — create the redirects, re-point the sources' own old slugs, unpublish the sources:
 echo '<JSON>' | .venv/bin/python .claude/skills/add-gdp-scatter/scripts/redirect_to_scatter.py --apply
 ```
 
-What it does per pair:
-- Resolves both slugs to chart ids (`chart_configs.slug`).
-- **References audit** of the OLD chart via `get_chart_references`. Counts `wp/gdoc/expl/narr/ins/sviz`; flags `MANUAL` when any of explorers / narrativeCharts / dataInsights / staticViz is non-zero — **a redirect alone does not fix those** (they embed the old chart's config directly). WordPress/Gdoc links are handled by the 302. **Review the audit and skip any MANUAL row** (e.g. pull it out of the input) unless its dependents have been re-pointed first.
-- **Pre-flight guards** (under `--apply`): the target must have `ScatterPlot` in `chartTypes` and be `isPublished` — otherwise the row is `SKIPPED`. This is what protects charts we couldn't generate a scatter for (e.g. StackedArea), and what catches running against the wrong staging server (see branch note below).
-- Creates the site redirect via `AdminAPI.create_site_redirect` (the site `redirects` table — supports the `?tab=scatter` query string; `chart_slug_redirects` does not). Duplicate/chained sources are reported, not fatal.
-- Unpublishes the source chart (`isPublished: false`).
+Other flags: `--skip-alias-repoint` (leave the sources' own old slugs alone — they are still audited, and any source that still has one is `BLOCKED`, because the unpublish would delete it), `--allow-production` (required to `--apply` when `OWID_ENV` resolves to production, which it does on `master`).
 
-**Mechanism / environment notes:**
-- `?tab=scatter` is the valid scatter tab query param (`GRAPHER_TAB_CONFIG_OPTIONS.scatter`).
-- The site `redirects` table is **per-environment** and is **not** synced staging→production by chart-diff. So: run on staging to test, then re-run `--apply` against production `admin.owid.io` once the scatter views are live on prod.
-- `OWID_ENV` (hence the admin host) is derived from the current git branch — be on the branch whose staging holds the scatter views before running.
-- The live 302 only appears after the static `_redirects` file rebakes; the unpublish triggers that build, but allow a few minutes on staging.
+### Pre-checks
+
+All read-only, so the audit reports the verdict `--apply` will act on:
+
+| verdict | meaning |
+|---|---|
+| `CREATE` / `UPDATE` | ready. `UPDATE` = a redirect for this slug exists with the wrong query params |
+| `EXISTS` | redirect already correct — the alias re-point and the unpublish still run |
+| `SKIPPED` | source == target, or the target has no `ScatterPlot` tab / isn't published. **This is the wrong-staging-server detector**, and what protects charts we couldn't generate a scatter for (e.g. StackedArea) |
+| `CHAINED` | the *target's* slug is itself redirected away (chart, site or mdim redirect), **or another row in the same batch retires it**. The in-batch case is the worse one: retiring the target unpublishes it, which deletes every redirect pointing at it — including the one that row just created — leaving that source unpublished with no redirect at all |
+| `CONFLICT` | the source slug is already claimed — by a chart redirect to a different chart, or by a `multi_dim_redirects` row, which **wins** over chart redirects (the mdim map is merged second in `_grapherRedirects.json`) |
+| `SITE_EXISTS` | a site redirect already serves this source. It bakes as a static 301 matched before the grapher route runs, so ours would be dead weight — delete it first if you want the chart redirect's param merging |
+| `BLOCKED` | `--skip-alias-repoint` on a source that still has old slugs of its own. The two cannot both hold: the unpublish deletes every redirect pointing at the source, so sparing them means not unpublishing. Move them by hand, or drop the flag |
+
+### References audit of the OLD chart
+
+`get_chart_references` counts (`wp/gdoc/expl/narr/ins/sviz`), flagging `MANUAL` when explorers / dataInsights / staticViz is non-zero — **a redirect alone does not fix those** (they embed the old chart's config directly). **Pull `MANUAL` rows out of the input** unless their dependents have been re-pointed first.
+
+Plus a table of **article references that need a hand edit**, from `posts_gdocs_links`:
+
+- an **embed** (any `componentType` that isn't `span-*`) resolves to the target chart but renders the target's **default tab** — `makeGrapherLinkedChart` builds its URL without a query string, so `tab=scatter` never reaches it;
+- a **link** carrying its own `tab=` or `time=` keeps those values, because the visitor's params override the stored ones.
+
+### Re-point every reference at the new scatter view
+
+**Recommend this every time, and do it before applying.** The redirect is a safety net for readers who arrive by an old URL — it is not the fix for our own content. Every OWID surface that points at the retired chart should be edited to point at the target chart's scatter view instead:
+
+```
+/grapher/<target-slug>?tab=scatter&time=latest
+```
+
+merged with whatever query string the reference already carries (its own params win, same rule as the redirect — so a reference with `tab=` or `time=` of its own needs a decision, not a blind merge). Two reasons it can't wait: an **embed** never gets fixed by a redirect at all (it resolves the chart itself and renders the target's default tab), and a **link** works but sends readers through an extra hop that will outlive everyone's memory of why it exists.
+
+The script's own table covers only gdoc links and embeds — enough to spot the param collisions, not a full sweep. For the complete surface list use the shared **`find-chart-references`** skill, which is what `/map-charts-to-mdim` does for the same problem (see `scripts/audit_references.py` there: it calls `run_sweep` from `find-chart-references/scripts/reference_report.py` and adds only the replacement URL, which is the workflow-specific part):
+
+```bash
+.venv/bin/python .claude/skills/find-chart-references/scripts/find_references.py \
+  --chart-slugs '<old-slug-1>,<old-slug-2>' --markdown ai/scatter-references.md
+```
+
+Include the sources' **aliases** in `--chart-slugs`: an article may well link an even older slug. The sweep catches what `get_chart_references` counts but doesn't locate — explorers, data insights, static viz, narrative charts, key-chart slots, WordPress posts — and it reports its own **gaps**, so a surface it couldn't check is visible rather than silently absent. Triage it the way that skill does: an **embed** is 🔴 and blocks the row (it breaks the moment the source is unpublished), a **link** is 🟡 (the 301 covers it; update the href anyway), and an unpublished or draft page is ℹ️.
+
+### Narrative charts
+
+**They do not block the retirement.** A narrative chart parented to a chart owns a materialized full config and renders from it, so unpublishing the parent leaves it intact (`isPublished` is in `NARRATIVE_CHART_PROPS_TO_OMIT`). Its only use of the parent slug is the "Explore the data" href, which `GrapherState.canonicalUrlIfIsNarrativeChart` builds as `/grapher/<parent-slug>` + `queryParamsForParentChart` — so the redirect covers it. `narrativeCharts` is therefore counted but deliberately **not** part of the `MANUAL` gate.
+
+The one thing to check is those params: they arrive as *incoming* params on the redirect, so a narrative chart with its own `tab` or `time` overrides `tab=scatter&time=latest`. The script lists every narrative chart on the sources with its params and says which way each will land.
+
+**To actually fix one, replace it — the parent columns are INSERT-only, so there is no re-pointing API and never will be** (owid/owid-grapher#6872, closed as not-planned). Order matters, because `create` rejects a duplicate name, `delete` is refused while a **published** post references the name, and `update` writes only query params — there is no rename:
+
+1. **Create** the replacement from `/grapher/<target-slug>?tab=scatter&time=latest` using that chart's own **"Create narrative chart"** control, under a new kebab-case name. Use the control, not a bare create link — it parents to the view on screen. Entity selection and other controls open at the target's defaults and authored FAUST never transfers, so redo those by hand.
+2. **Update the article(s)** to reference the new name.
+3. **Delete** the old one — now unreferenced, so it succeeds. **Never delete first.**
+
+If you must script it, `POST {admin_api}/narrative-charts` takes `{"type": "chart", "name": "<kebab-case>", "parentChartId": <target chart id>, "config": <the OLD narrative chart's rendered full config>}` and `DELETE {admin_api}/narrative-charts/<id>` removes the old. Get `config` from `AdminAPI.get_narrative_chart(<old id>)["configFull"]` — the endpoint derives the patch by diffing against the new parent, so pass the rendered full config, not the old patch. `AdminAPI` has no create/delete for narrative charts, so scripting means hand-rolled HTTP; prefer the UI.
+
+### Apply, in this order
+
+The order is forced by which calls trigger a bake:
+
+1. **Create** (or delete-then-recreate) the redirect on the target. There is no update endpoint, so wrong query params mean delete + create; if the create fails the original row is put back, and if that restore also fails the row reports `CRITICAL` with the repair.
+2. **Re-point the source's own old slugs** at the target. Unpublishing a chart deletes every `chart_slug_redirects` row pointing at it, so without this step those URLs become hard 404s. Each alias is deleted and re-created on the target — the UNIQUE constraint on `slug` leaves no other way. An alias's own query params are *not* carried over (they were written for the old chart) but are reported.
+3. **Unpublish the source.** This is both what makes the redirect fire (it only resolves on a 404) and what triggers the static build.
+
+Both failure directions are handled so no URL is ever left unserved. If any alias fails to move, it is restored on the source and **the unpublish is skipped** — otherwise the unpublish would delete the restored row and create exactly the 404 step 2 exists to prevent. If the unpublish itself fails, the source is likewise left published. Either way the row reports `CRITICAL` with what to do.
+
+**Every bail-out that leaves the source published also rolls the redirect back**, including the skipped-unpublish one: a row touched in the last week bakes as an unconditional static 302 that does *not* wait for a 404 (see the mechanism notes), so leaving it behind would send readers away from the chart the bail-out just decided to keep serving. For an `UPDATE` the rollback re-creates the row that was replaced, rather than only deleting the replacement — deleting alone would end the run having destroyed a redirect it meant to re-point. Anything the rollback cannot undo is named in the report with the manual repair.
+
+### Mechanism / environment notes
+
+- `?tab=scatter` is the valid scatter tab query param (`GRAPHER_TAB_CONFIG_OPTIONS.scatter`); it is stored without the leading `?`.
+- **Resolution is 404-only** at the edge, then a **301** with `max-age=86400`. A fresh row additionally gets a static **302** in `_redirects` for one week, listed ahead of the site redirects, to defeat the CDN cache.
+- **The stored params are only a base**: the visitor's own query params override them key by key. Good for `?country=`/`?region=` links, which keep their selection through the hop.
+- `POST /charts/<id>/redirects/new` triggers **no** static build (the delete and the unpublish do), and validates nothing — no duplicate, chain or self-redirect check. Hence the pre-checks above.
+- **A source that is already unpublished bakes nothing**, so the redirect would serve nothing until an unrelated mutation happened to bake the site. When a row hits that combination — `CREATE` *or* `EXISTS`, with no aliases to re-point — the script asks for a deploy itself (`PUT /deploy`, the admin's "Manually triggered deploy"), once per run however many rows needed it, and reports `DEPLOY FAILED` with the manual repair if the call fails. `EXISTS` is included deliberately: a row can be there and still have never been baked, because a previous run's deploy failed or because someone added the alternative URL in the chart editor, which bakes nothing either. Every other path already has a delete or an unpublish doing it.
+- `chart_slug_redirects` is **per-environment** and is **not** synced staging→production by chart-diff. Run on staging to test, then re-run `--apply --allow-production` against production `admin.owid.io` once the scatter views are live there.
+- `OWID_ENV` (hence the admin host) is derived from the current git branch — be on the branch whose staging holds the scatter views. On `master` it resolves to **production**, which is what the guard is for.
+- Once the redirect exists, `isSlugUsedInRedirect` blocks re-publishing the source (or any chart) on that slug. **To undo, delete the redirect rows first, then re-publish** — the reverse order is rejected.
+- The reference queries union a chart's own slug with its `chart_slug_redirects` slugs, so afterwards the old chart's referrers show up under the **target's** Refs tab.
+
+### Verifying Part 2
+
+- `curl -sI <site>/grapher/<old-slug>` → 301 to `/grapher/<target-slug>?tab=scatter&time=latest`.
+- `curl -sI '<site>/grapher/<old-slug>?tab=chart'` → `Location` keeps `tab=chart`, proving incoming params win.
+- `curl -s <site>/grapher/_grapherRedirects.json | jq '."<old-slug>"'` → `"<target-slug>?tab=scatter&time=latest"` (bare slugs on both sides — the baker passes an empty URL prefix).
+- Each re-pointed alias resolves to the same target.
+- Re-run the script: every row comes back `EXISTS` and nothing is mutated.
