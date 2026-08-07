@@ -12,7 +12,7 @@ definitions:
 
       - "{definitions.description_key_binding_instrument}"
   description_key_dataset: |-
-    This data comes from the LGBTI National Policy Dataset, compiled by Kristopher Velasco at Princeton University. It tracks the adoption, scope, and enforcement of 27 LGBTI-related policies across 196 countries, with annual data starting in 1991.
+    This data comes from the LGBTI National Policy Dataset, compiled by Kristopher Velasco at Princeton University. It tracks the adoption, scope, and enforcement of 27 LGBTI-related policies across 195 countries, with annual data starting in 1991.
 
   description_key_binding_instrument: |-
     The dataset counts policies established by binding legal instruments — statutes, constitutional provisions, decrees and regulations with the force of law, and binding court rulings. Non-binding guidance and policies operating only in practice are not counted, with narrow exceptions such as health-authority rules that determine public funding of gender-affirming care.
@@ -48,7 +48,7 @@ definitions:
   derivation_gac: |-
     From the original dataset's four indicators for gender-affirming care (adults covered, adults restricted, minors covered, minors restricted), we combined them into a single categorical indicator capturing whether care is publicly funded or legally restricted for adults and for minors. The salient national policy states keep their own category, while the rarer one-group-only states are merged into "Covered for adults or minors only" and "Restricted for adults or minors only"; only country-years with subnational variation or contradictory same-year coding are grouped as "Varies by region or other".
   derivation_gmc: |-
-    From the original dataset, we combined the gender-marker-change proportion (the legal direction) with the recorded legal-pathway requirement to produce a single categorical indicator. When legal change of the gender marker is fully in effect, we classify countries by their procedural requirement ("Self-declaration is enough", "Diagnosis required", "Surgery required", "Surgery and sterilization required", or "Legally possible, requirement unknown" when the requirement is not recorded). Otherwise the country is classified as "Varies by region" (legal change is only partially in effect across subnational jurisdictions) or "Not legally possible" (no legal procedure exists).
+    From the original dataset, we combined the gender-marker-change proportion (the legal direction) with the recorded legal-pathway requirement to produce a single categorical indicator. When legal change of the gender marker is fully in effect, we classify countries by their procedural requirement ("Self-declaration is enough", "Court order required", "Diagnosis required", "Surgery required", "Surgery and sterilization required", or "Legally possible, requirement unknown" when the requirement is not recorded). Otherwise the country is classified as "Varies by region" (legal change is only partially in effect across subnational jurisdictions) or "Not legally possible" (no legal procedure exists).
 
   # Per-law short description (used for description_short and as building block for title)
   law_short: |-
@@ -925,7 +925,7 @@ tables:
       gender_marker_change:
         title: Legal change of gender marker
         description_short: |-
-          Whether a legal process exists to change the gender marker on official identity documents, and what the process requires — self-declaration, medical or psychological diagnosis, surgery, or surgery plus sterilization.
+          Whether a legal process exists to change the gender marker on official identity documents, and what the process requires — self-declaration, a court order, medical or psychological diagnosis, surgery, or surgery plus sterilization.
         description_key:
           - '{definitions.description_key_dataset}'
           - 'The indicator is coded as follows: **_Self-declaration is enough_** (legal change of the gender marker is possible based on self-declaration), **_Court order required_** (legal change requires a judicial procedure, with no medical or surgical condition), **_Diagnosis required_** (legal change requires a medical or psychological diagnosis), **_Surgery required_** (legal change requires gender-affirming surgery), **_Surgery and sterilization required_** (legal change requires both gender-affirming surgery and sterilization), **_Legally possible, requirement unknown_** (legal change is in effect but the procedural requirement is not recorded in the source), **_Varies by region_** (rules differ between subnational jurisdictions, or legal change is only partially in effect) and **_Not legally possible_** (no legal procedure exists to change the gender marker on official identity documents).'
