@@ -57,8 +57,9 @@ tables:
         unit: cubic meters per person per year
         short_unit: m³
         description_short: Annual quantity of freshwater withdrawn for agriculture, industry and municipalities, divided by total population.
+        # NOTE: This is FAO's definition of total water withdrawal (the numerator of this indicator).
         description_from_producer: |-
-          Total annual amount of water withdrawn per capita. Annual quantity of water withdrawn for agricultural, industrial and municipal purposes. It can include water from primary renewable and secondary freshwater resources, as well as water from over-abstraction of renewable groundwater or withdrawal from fossil groundwater, direct use of agricultural drainage water, direct use of (treated) wastewater, and desalinated water. It does not include in-stream uses, which are characterized by a very low net consumption rate, such as recreation, navigation, hydropower, inland capture fisheries, etc.
+          Annual quantity of water withdrawn for agricultural, industrial and municipal purposes. It can include water from primary renewable and secondary freshwater resources, as well as water from over-abstraction of renewable groundwater or withdrawal from fossil groundwater, direct use of agricultural drainage water, direct use of (treated) wastewater, and desalinated water. It does not include in-stream uses, which are characterized by a very low net consumption rate, such as recreation, navigation, hydropower, inland capture fisheries, etc.
         description_key:
           - Total water withdrawal is the sum of agricultural, industrial and municipal water withdrawals. It excludes in-stream uses such as hydropower, navigation, recreation and inland capture fisheries, which consume very little of the water they use.
           - *description_key_sources
