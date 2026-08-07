@@ -10,6 +10,7 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **`dag/archive/*.yml` is a generated record** — it is reconstructed from git history by `etl archive-dag`, so never hand-edit it. It lists steps that were once active (with the commit where they were last active) purely for recovery; to bring one back, `git checkout` that commit.
 - **Never delete a step without archiving it.** Removing or superseding an active step (new version, retirement, replacement) obligates you to archive it — deleting the files alone is a bug. Procedure: remove its `dag/*.yml` entry and delete its files → **commit** → run `etl archive-dag` (it reads *committed* history, so the removal must be committed first) → commit the regenerated `dag/archive/*.yml`. If `archive-dag` sweeps in unrelated steps others left un-archived, `git checkout` those files to keep your PR scoped (never hand-edit the archive). For a migrated/backport dataset, also delete its now-orphaned `snapshots/backport/latest/dataset_<id>_*` mirror files.
 - **Ask the user** if unsure - don't guess
+- **Say what's left open.** Multi-step work rarely ends with everything closed, so close the report (and the PR body) by saying what's still pending, who owns it, and what nobody checked. No fixed format — `.claude/docs/open-items.md` lists what tends to get dropped.
 - **Always run `make check` before committing** (format, lint, typecheck on changed files). Run the test suite with `make unittest` (or `make test` for checks + tests + version-tracker); `lib/*` packages have their own venv and Makefile — run it from inside that directory.
 - If not told otherwise, save outputs to `ai/` directory.
 - **Notebooks**: Always create AND execute immediately using `uv run jupyter nbconvert --to notebook --execute --inplace <path>`
@@ -33,16 +34,6 @@ Most recurring work here has a skill that runs it end to end. Reach for it **bef
 | Announce a finished update | `/data-updates-comms` |
 
 One that's easy to skip and shouldn't be: `/edit-faust-metadata` owns **every** user-facing-text edit — it routes each field to the right layer (garden `.meta.yml` vs MDim yaml vs chart config on staging) and reports the blast radius on other charts before touching shared metadata.
-
-## Close every report with what's still open
-
-Multi-step work — updates, audits, reviews, migrations — rarely ends with everything closed. End the report (and the PR body, when there is one) with an explicit open-items block; never make the user ask "what's left?". Keep three buckets separate:
-
-- **Handed off** — waiting on someone else. Name who acts and what the ask is, and include a locator (link, file, id) — an item the next person must re-derive is not handed off.
-- **Proposed** — waiting on sign-off. State the exact change so "yes" is a complete answer.
-- **Unverified** — nobody checked it: skipped or failed checks, surfaces left uncovered, capped or truncated sweeps. Silence here reads as "clean", which is the one wrong signal a report can send.
-
-Re-state the whole block every time the work is revisited — carry open items forward rather than reporting only the delta, and say explicitly when an item clears instead of dropping it silently.
 
 ## Team
 
@@ -333,6 +324,7 @@ See `.claude/docs/` for:
 - `debugging.md` - Data quality debugging approach
 - `pipeline-stages.md` - Pipeline architecture details
 - `cloud-sandbox.md` - Claude Code on the web: what a cloud session can and can't do
+- `open-items.md` - What tends to be left open at the end of multi-step work
 
 If you are running in a Claude Code cloud sandbox (`CLAUDE_CODE_REMOTE=true`), read
 `.claude/docs/cloud-sandbox.md` **before starting work** — it covers the pre-created
