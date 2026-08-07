@@ -14,3 +14,7 @@ steps:
   export://static_viz/population/2026-02-02/world_population_long_run:
     - data://grapher/demography/2024-07-15/population
     - data://grapher/demography/2025-10-22/life_expectancy
+
+  # Expected height of boys and girls from birth to age 19 (WHO growth reference)
+  export://static_viz/who/2026-08-07/height_for_age:
+    - data://garden/who/2026-08-07/height_for_age
