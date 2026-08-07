@@ -10,6 +10,7 @@ definitions:
 dataset:
   update_period_days: 365
   owners:
+    - Hannah Ritchie
     - Pablo Rosado
 
 tables:
