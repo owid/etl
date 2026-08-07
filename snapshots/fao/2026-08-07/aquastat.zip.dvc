@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: AQUASTAT
+    description: |-
+      AQUASTAT is FAO's global information system on water and agriculture. It compiles country-level statistics on water resources, water use (by agriculture, industry and municipalities), irrigation and drainage, and related environment and health indicators.
+
+      Values are reported for individual years. Where countries do not report a value for a given year, AQUASTAT fills gaps with its own estimates or imputed values (carried forward or linearly interpolated between reported data points); each value carries a symbol identifying whether it is an official figure, an external figure, an FAO estimate, or an imputed value.
+    date_published: "2026-06-22"
+
+    # Citation
+    producer: Food and Agriculture Organization of the United Nations
+    citation_full: |-
+      FAO. 2026. AQUASTAT - FAO's Global Information System on Water and Agriculture. Rome. https://data.apps.fao.org/aquastat
+    attribution_short: FAO
+
+    # Files
+    url_main: https://data.apps.fao.org/aquastat/
+    url_download: https://www.fao.org/aquastat/data/AQUASTAT%20Statistics%20Bulk%20Download%20(English).zip
+    date_accessed: "2026-08-07"
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.fao.org/contact-us/terms/db-terms-of-use/en
+outs:
+  - md5: e1254b611b6c09f8661c6767f24b4dea
+    size: 16394236
+    path: aquastat.zip
