@@ -169,3 +169,124 @@ def test_records_to_dictionary_and_unique_records():
         {"id": 1, "v": "a"},
         {"id": 2, "v": "b"},
     ]
+
+
+def _create_table_with_dimensions():
+    """Create a table with two indicators over dimensions sex and equivalence_scale.
+
+    Mirrors the shape that motivates drop_dimension_keeping_single_value: a table where only one
+    value of a dimension (equivalence_scale="square root") is wanted in a collection.
+    """
+    from owid.catalog import Table, Variable
+    from owid.catalog.core.meta import VariableMeta
+
+    data = {
+        "country": ["USA", "CAN"],
+        "year": [2020, 2020],
+        "income__sex_male__scale_sqrt": [1, 2],
+        "income__sex_female__scale_sqrt": [3, 4],
+        "income__sex_male__scale_none": [5, 6],
+        "income__sex_female__scale_none": [7, 8],
+    }
+    tb = Table(data, short_name="test_table")
+    for col in data:
+        if col in ("country", "year"):
+            continue
+        tb[col] = Variable(
+            tb[col],
+            name=col,
+            metadata=VariableMeta(
+                original_short_name="income",
+                dimensions={
+                    "sex": "female" if "female" in col else "male",
+                    "equivalence_scale": "square root" if "sqrt" in col else "none",
+                },
+            ),
+        )
+    tb.metadata.dimensions = [
+        {"slug": "sex", "name": "Sex"},
+        {"slug": "equivalence_scale", "name": "Equivalence scale"},
+    ]
+    return tb
+
+
+def test_drop_dimension_keeping_single_value():
+    """
+    Test drop_dimension_keeping_single_value - filters indicators to one dimension value and
+    removes that dimension from column-level and table-level metadata.
+    """
+    from etl.collection.utils import drop_dimension_keeping_single_value
+
+    tb = _create_table_with_dimensions()
+
+    result = drop_dimension_keeping_single_value(tb, dimension="equivalence_scale", value="square root")
+
+    # Only the matching indicators are kept; non-dimensional columns (country, year) too.
+    assert sorted(result.columns) == [
+        "country",
+        "income__sex_female__scale_sqrt",
+        "income__sex_male__scale_sqrt",
+        "year",
+    ]
+
+    # The dimension is dropped from the metadata of the kept indicators; other dimensions remain.
+    assert result["income__sex_male__scale_sqrt"].m.dimensions == {"sex": "male"}
+    assert result["income__sex_female__scale_sqrt"].m.dimensions == {"sex": "female"}
+
+    # The dimension is dropped from the table-level metadata.
+    assert result.metadata.dimensions == [{"slug": "sex", "name": "Sex"}]
+
+    # The input table is not modified.
+    assert "income__sex_male__scale_none" in tb.columns
+    assert tb["income__sex_male__scale_sqrt"].m.dimensions == {"sex": "male", "equivalence_scale": "square root"}
+    assert len(tb.metadata.dimensions) == 2
+
+
+def test_drop_dimension_keeping_single_value_expands_without_the_dimension():
+    """
+    Test that a table processed with drop_dimension_keeping_single_value expands into a collection
+    config without the dropped dimension (the motivating use case, see issue #5670).
+    """
+    from etl.collection import expand_config
+    from etl.collection.utils import drop_dimension_keeping_single_value
+
+    tb = _create_table_with_dimensions()
+
+    result = drop_dimension_keeping_single_value(tb, dimension="equivalence_scale", value="square root")
+    config = expand_config(result, indicator_names="income")
+
+    # Only the sex dimension is left, so no single-option dropdown is rendered.
+    assert [dim["slug"] for dim in config["dimensions"]] == ["sex"]
+    assert len(config["views"]) == 2
+    for view in config["views"]:
+        assert "equivalence_scale" not in view["dimensions"]
+
+
+def test_drop_dimension_keeping_single_value_errors():
+    """
+    Test drop_dimension_keeping_single_value error cases - unknown dimension and unknown value.
+    """
+    import pytest
+
+    from etl.collection.utils import drop_dimension_keeping_single_value
+
+    tb = _create_table_with_dimensions()
+
+    with pytest.raises(ValueError, match="Dimension 'welfare' not found"):
+        drop_dimension_keeping_single_value(tb, dimension="welfare", value="income")
+
+    with pytest.raises(ValueError, match="Available values"):
+        drop_dimension_keeping_single_value(tb, dimension="equivalence_scale", value="oecd")
+
+    # An indicator that has dimensions but not the one being filtered cannot be filtered, and keeping it
+    # would add views for values the caller excluded. It must fail instead.
+    from owid.catalog import Variable
+    from owid.catalog.core.meta import VariableMeta
+
+    tb["income__sex_male"] = Variable(
+        tb["income__sex_male__scale_sqrt"],
+        name="income__sex_male",
+        metadata=VariableMeta(original_short_name="income", dimensions={"sex": "male"}),
+    )
+    with pytest.raises(ValueError, match="have dimensions, but not 'equivalence_scale'"):
+        drop_dimension_keeping_single_value(tb, dimension="equivalence_scale", value="square root")

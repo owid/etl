@@ -11,7 +11,7 @@ from string import Formatter
 from typing import Any
 
 from deprecated import deprecated
-from owid.catalog import Dataset
+from owid.catalog import Dataset, Table
 from sqlalchemy.orm import Session
 
 import etl.grapher.model as gm
@@ -150,6 +150,70 @@ def get_complete_dimensions_filter(
                 dimensions_filter_complete[dim] = dimensions_filter[dim]
 
     return expand_combinations(dimensions_filter_complete)
+
+
+# steps (public API, exported from etl.collection)
+def drop_dimension_keeping_single_value(tb: Table, dimension: str, value: Any) -> Table:
+    """Keep only the indicators of `tb` where `dimension` equals `value`, and drop that dimension.
+
+    Useful when a collection should only use one choice of a dimension (e.g. `sex="female"`):
+    keeping the dimension would render a dropdown with a single option, so it is removed entirely
+    from the metadata that `expand_config` / `create_collection` read. The dimension is removed
+    both from the metadata of the kept columns and from the table-level metadata. Columns with no
+    dimensional metadata at all (e.g. index columns like country or year) are kept.
+
+    An indicator that has dimensions but not this one cannot be filtered, and keeping it would add
+    views that the caller did not ask for, so it raises instead. Drop those columns beforehand if
+    they are not wanted.
+
+    The input table is not modified; a copy is returned.
+
+    Example:
+
+        >>> tb = drop_dimension_keeping_single_value(tb, dimension="equivalence_scale", value="square root")
+
+    """
+    columns_keep = []
+    columns_without_dimension = []
+    values_found = set()
+    for column in tb.columns:
+        dims = tb[column].m.dimensions
+        if not dims:
+            columns_keep.append(column)
+        elif dimension not in dims:
+            columns_without_dimension.append(column)
+        else:
+            values_found.add(dims[dimension])
+            if dims[dimension] == value:
+                columns_keep.append(column)
+
+    if not values_found:
+        raise ValueError(f"Dimension '{dimension}' not found in any column of table '{tb.m.short_name}'.")
+    if columns_without_dimension:
+        raise ValueError(
+            f"Columns of table '{tb.m.short_name}' have dimensions, but not '{dimension}', so they cannot be "
+            f"filtered by it: {sorted(columns_without_dimension)[:5]}. Drop them from the table beforehand."
+        )
+    if value not in values_found:
+        raise ValueError(
+            f"No column in table '{tb.m.short_name}' has dimension '{dimension}' with value '{value}'. "
+            f"Available values: {sorted(str(v) for v in values_found)}"
+        )
+
+    # Copy so the metadata edits below don't modify the caller's table.
+    tb = tb[columns_keep].copy()
+
+    # Drop the dimension from the metadata of the kept indicators.
+    for column in tb.columns:
+        dims = tb[column].m.dimensions
+        if dims and dimension in dims:
+            del dims[dimension]
+
+    # Drop the dimension from the table-level metadata, if defined there.
+    if tb.m.dimensions:
+        tb.m.dimensions = [d for d in tb.m.dimensions if d["slug"] != dimension]
+
+    return tb
 
 
 # model.core

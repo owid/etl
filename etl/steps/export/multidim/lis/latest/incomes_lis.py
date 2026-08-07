@@ -1,5 +1,6 @@
 """Multidim export for LIS incomes across the distribution."""
 
+from etl.collection import drop_dimension_keeping_single_value
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
@@ -34,16 +35,13 @@ def run() -> None:
     tb = ds.read("incomes", load_data=False)
 
     # Filter to "square root" equivalence_scale and remove that dimension
-    columns_to_keep = []
-    for column in tb.drop(columns=["country", "year"]).columns:
+    tb = drop_dimension_keeping_single_value(tb, dimension="equivalence_scale", value=EQUIVALENCE_SCALE)
+
+    # Convert integer decile values to clean strings (e.g. 1 -> "1", not "1.0")
+    for column in tb.columns:
         dims = tb[column].metadata.dimensions
-        if dims and dims.get("equivalence_scale") == EQUIVALENCE_SCALE:
-            columns_to_keep.append(column)
-            dims.pop("equivalence_scale")
-            # Convert integer decile values to clean strings (e.g. 1 -> "1", not "1.0")
-            if "decile" in dims and isinstance(dims["decile"], (int, float)):
-                dims["decile"] = str(int(dims["decile"]))
-    tb = tb[columns_to_keep]
+        if dims and "decile" in dims and isinstance(dims["decile"], (int, float)):
+            dims["decile"] = str(int(dims["decile"]))
 
     # Create collection
     c = paths.create_collection(
