@@ -142,11 +142,18 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         // defaults; the message tells you to carry each one over as a keyword parameter with
         // that same default, which keeps behaviour identical instead of dropping the control.
         //
+        // 20 of those options (across 8 manual multi-file importers — PISA, the Global Carbon
+        // Budget, UNEP controlled substances, ...) instead use `prompt=True` with no default,
+        // so click itself collects them interactively and there is no default to carry over.
+        // Dropping the wrapper there would either lose the input or leave a required parameter
+        // that `_call_snapshot_function` never supplies, so the message calls that out as the
+        // one case to leave on click.
+        //
         // SNAPSHOT_SCOPE rather than 'snapshots/**' alone, so the snapshot cookiecutter is covered
         // too. It has been click-free since the commit that added `etls` (which is what made the
         // CLI wrapper redundant), so this is drift protection, not a current gap.
         pattern: /@click\.command/g,
-        message: '`@click` decorators are outdated in snapshot files. The `etls` CLI imports the module and calls `run()` itself, so the CLI wrapper is redundant. Remove the whole decorator stack — `@click.command(...)` and every `@click.option(...)` above the function — and leave a plain `def run(upload: bool = True) -> None:` (add `path_to_file: str | None = None` for a manual import). If the command carries any other options, keep each one as a keyword parameter with the same default it had — `etls` only ever passes `--skip-upload` and `--path-to-file`, so those defaults are already what runs today, and carrying them over keeps behaviour identical rather than dropping the control. Existing click-decorated scripts still work, because the runner also accepts a click command, so this is a cleanup rather than a break.',
+        message: '`@click` decorators are outdated in snapshot files. The `etls` CLI imports the module and calls `run()` itself, so the CLI wrapper is redundant. Remove the whole decorator stack — `@click.command(...)` and every `@click.option(...)` above the function — and leave a plain `def run(upload: bool = True) -> None:` (add `path_to_file: str | None = None` for a manual import). If the command carries any other options, keep each one as a keyword parameter with the same default it had — `etls` only ever passes `--skip-upload` and `--path-to-file`, so those defaults are already what runs today, and carrying them over keeps behaviour identical rather than dropping the control. The one exception is an option declared with `prompt=True` and no default, which click collects interactively — a few manual multi-file importers depend on that, and `etls` has no way to feed it to a plain function, so leave those scripts on click. Existing click-decorated scripts still work, because the runner also accepts a click command, so this is a cleanup rather than a break.',
         severity: vscode.DiagnosticSeverity.Warning,
         scope: SNAPSHOT_SCOPE
     },
