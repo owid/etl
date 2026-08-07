@@ -481,6 +481,12 @@ def main() -> int:
         action="store_true",
         help="leave the sources' own old slugs alone; BLOCKS any source that still has one, since the unpublish would delete it",
     )
+    parser.add_argument(
+        "--allow-manual-refs",
+        action="store_true",
+        help="apply rows whose source is referenced by an explorer / data insight / static viz. Only "
+        "after those references have been re-pointed: the unpublish breaks them and no redirect covers them.",
+    )
     parser.add_argument("--allow-production", action="store_true", help="required to --apply against production")
     args = parser.parse_args()
 
@@ -517,8 +523,25 @@ def main() -> int:
             f"{rec['src']:<58} {str(rec.get('src_id') or '-'):>5} {str(rec.get('tgt_id') or '-'):>5} "
             f"{'MANUAL' if rec.get('manual') else '':>7} {len(rec['aliases']):>7}  {counts}"
         )
+    # MANUAL_REF_KEYS says these BLOCK the row, so make that true rather than leaving it to the
+    # operator to notice the audit column and re-run: the apply loop gates purely on `status`, so a
+    # MANUAL row left at CREATE/UPDATE/EXISTS gets applied and the unpublish breaks the very
+    # explorer / data-insight / static-viz references the audit just flagged. Those surfaces embed
+    # the old chart's own config, so no redirect can save them.
+    for rec in audited:
+        if rec.get("manual") and rec["status"] in ACTIONABLE:
+            if args.allow_manual_refs:
+                rec["note"] = (rec["note"] + "  " if rec["note"] else "") + "[--allow-manual-refs: applying anyway]"
+            else:
+                blockers = ", ".join(f"{REF_LABEL[k]}={rec['refs'][k]}" for k in MANUAL_REF_KEYS if rec["refs"].get(k))
+                rec |= {
+                    "status": "BLOCKED",
+                    "note": f"direct references a redirect cannot fix ({blockers}) — re-point them first, "
+                    f"then pass --allow-manual-refs",
+                }
+
     print("\n  manual = a redirect alone won't fix it: explorers / dataInsights / staticViz reference the old")
-    print("           chart directly. Pull those rows out of the input until they are re-pointed.")
+    print("           chart directly. Those rows are BLOCKED; re-point them, then --allow-manual-refs.")
     print("  narr   = narrative charts. NOT a blocker (see the table below), but they need replacing.")
     print("  aliases = old slugs of the SOURCE chart; the unpublish deletes them, so they get re-pointed too.")
 

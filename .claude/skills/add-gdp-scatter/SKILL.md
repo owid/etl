@@ -261,7 +261,7 @@ echo '<JSON>' | .venv/bin/python .claude/skills/add-gdp-scatter/scripts/redirect
 echo '<JSON>' | .venv/bin/python .claude/skills/add-gdp-scatter/scripts/redirect_to_scatter.py --apply
 ```
 
-Other flags: `--skip-alias-repoint` (leave the sources' own old slugs alone — they are still audited, and any source that still has one is `BLOCKED`, because the unpublish would delete it), `--allow-production` (required to `--apply` when `OWID_ENV` resolves to production, which it does on `master`).
+Other flags: `--skip-alias-repoint` (leave the sources' own old slugs alone — they are still audited, and any source that still has one is `BLOCKED`, because the unpublish would delete it), `--allow-manual-refs` (apply a row whose source an explorer / data insight / static viz references — only once those are re-pointed), `--allow-production` (required to `--apply` when `OWID_ENV` resolves to production, which it does on `master`).
 
 ### Pre-checks
 
@@ -275,11 +275,11 @@ All read-only, so the audit reports the verdict `--apply` will act on:
 | `CHAINED` | the *target's* slug is itself redirected away (chart, site or mdim redirect), **or another row in the same batch retires it**. The in-batch case is the worse one: retiring the target unpublishes it, which deletes every redirect pointing at it — including the one that row just created — leaving that source unpublished with no redirect at all |
 | `CONFLICT` | the source slug is already claimed — by a chart redirect to a different chart, or by a `multi_dim_redirects` row, which **wins** over chart redirects (the mdim map is merged second in `_grapherRedirects.json`) |
 | `SITE_EXISTS` | a site redirect already serves this source. It bakes as a static 301 matched before the grapher route runs, so ours would be dead weight — delete it first if you want the chart redirect's param merging |
-| `BLOCKED` | `--skip-alias-repoint` on a source that still has old slugs of its own. The two cannot both hold: the unpublish deletes every redirect pointing at the source, so sparing them means not unpublishing. Move them by hand, or drop the flag |
+| `BLOCKED` | Two causes. (a) The source is referenced by an **explorer / data insight / static viz** — those embed its config, so no redirect covers them and the unpublish would break them; re-point them, then pass `--allow-manual-refs`. (b) `--skip-alias-repoint` on a source that still has old slugs of its own: the unpublish deletes every redirect pointing at the source, so sparing them means not unpublishing. Move them by hand, or drop the flag |
 
 ### References audit of the OLD chart
 
-`get_chart_references` counts (`wp/gdoc/expl/narr/ins/sviz`), flagging `MANUAL` when explorers / dataInsights / staticViz is non-zero — **a redirect alone does not fix those** (they embed the old chart's config directly). **Pull `MANUAL` rows out of the input** unless their dependents have been re-pointed first.
+`get_chart_references` counts (`wp/gdoc/expl/narr/ins/sviz`), flagging `MANUAL` when explorers / dataInsights / staticViz is non-zero — **a redirect alone does not fix those** (they embed the old chart's config directly). Those rows are turned into `BLOCKED` **before** the apply loop runs, so `--apply` cannot unpublish them: the loop gates purely on `status`, and leaving a MANUAL row at `CREATE` meant the audit flagged the breakage and then caused it anyway. Re-point the dependents, then re-run with `--allow-manual-refs`.
 
 Plus a table of **article references that need a hand edit**, from `posts_gdocs_links`:
 
