@@ -161,7 +161,7 @@ GROUPS = (
         {
             "name": "Inspector",
             "commands": {
-                "inspector": "apps.inspector.inspector.cli",
+                "inspector": "apps.inspector.cli.cli",
             },
         },
         {
