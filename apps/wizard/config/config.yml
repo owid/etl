@@ -115,6 +115,16 @@ sections:
         disable:
           production: True
 
+      - title: "Metadata Review"
+        alias: metadata-review
+        entrypoint: app_pages/metadata_review/app.py
+        description: Review FAUST & metadata of MDims and data pages, with suggestions and comments
+        maintainer: "@pablo.arriagada"
+        icon: ":material/rate_review:"
+        image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Manuscript_correction_at_proof_stage.jpg/960px-Manuscript_correction_at_proof_stage.jpg"
+        disable:
+          production: True
+
   - title: "Data tools"
     description: |-
       Control panel for ETL steps.

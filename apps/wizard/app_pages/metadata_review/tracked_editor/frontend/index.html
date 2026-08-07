@@ -1,0 +1,136 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  :root { color-scheme: light; }
+  body { margin: 0; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; color: #262730; }
+  .editor {
+    width: 100%; box-sizing: border-box; min-height: 4.5rem;
+    border: 1px solid #d5dae5; border-radius: 6px; padding: 0.6rem 0.7rem;
+    font-size: 0.95rem; line-height: 1.55; white-space: pre-wrap; outline: none; background: #fff;
+  }
+  .editor:focus { border-color: #ff4b4b; }
+  .preview {
+    margin-top: 0.5rem; padding: 0.6rem 0.7rem; border-left: 3px solid #d5dae5;
+    background: #fafafa; border-radius: 0 6px 6px 0; font-size: 0.95rem; line-height: 1.55;
+    white-space: pre-wrap;
+  }
+  .preview-label { font-size: 0.75rem; color: #808495; margin-top: 0.6rem; }
+  del { color: #b3261e; text-decoration: line-through; background: #fbe9e7; border-radius: 2px; }
+  ins { color: #0b6e4f; background: #e6f4ea; border-radius: 2px; text-decoration: none; }
+  .comment {
+    width: 100%; box-sizing: border-box; margin-top: 0.6rem; border: 1px solid #d5dae5;
+    border-radius: 6px; padding: 0.45rem 0.7rem; font-size: 0.9rem; font-family: inherit; resize: vertical;
+  }
+  .buttons { margin-top: 0.6rem; display: flex; gap: 0.5rem; }
+  button {
+    border-radius: 6px; padding: 0.4rem 0.9rem; font-size: 0.9rem; cursor: pointer;
+    border: 1px solid #d5dae5; background: #fff;
+  }
+  button.primary { background: #ff4b4b; border-color: #ff4b4b; color: #fff; }
+  button.primary:disabled { background: #f0f2f6; border-color: #d5dae5; color: #a3a8b8; cursor: default; }
+</style>
+</head>
+<body>
+  <div id="editor" class="editor" contenteditable="true" spellcheck="true"></div>
+  <div class="preview-label">Tracked changes vs. the current text:</div>
+  <div id="preview" class="preview"></div>
+  <textarea id="comment" class="comment" rows="2" placeholder="Optional comment — why this change?"></textarea>
+  <div class="buttons">
+    <button id="save" class="primary" disabled>Save proposal</button>
+    <button id="cancel">Cancel</button>
+  </div>
+
+<script>
+(function () {
+  function sendMessage(type, data) {
+    window.parent.postMessage(Object.assign({ isStreamlitMessage: true, type: type }, data), "*");
+  }
+  function setValue(value) { sendMessage("streamlit:setComponentValue", { value: value, dataType: "json" }); }
+  function setHeight() {
+    sendMessage("streamlit:setFrameHeight", { height: document.body.scrollHeight + 8 });
+  }
+
+  // --- word-level diff (LCS over word/whitespace tokens) ---------------------
+  function tokenize(text) { return (text || "").match(/\S+|\s+/g) || []; }
+  function wordDiffHtml(a0, b0) {
+    const a = tokenize(a0), b = tokenize(b0);
+    const n = a.length, m = b.length;
+    // LCS table (fields are short; O(n*m) is fine).
+    const dp = Array.from({ length: n + 1 }, () => new Uint16Array(m + 1));
+    for (let i = n - 1; i >= 0; i--)
+      for (let j = m - 1; j >= 0; j--)
+        dp[i][j] = a[i] === b[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+    const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    let i = 0, j = 0, out = [], delBuf = [], insBuf = [];
+    function flush() {
+      const d = delBuf.join("").trim(), s = insBuf.join("").trim();
+      if (d) out.push("<del>" + esc(d) + "</del> ");
+      if (s) out.push("<ins>" + esc(s) + "</ins> ");
+      delBuf = []; insBuf = [];
+    }
+    while (i < n && j < m) {
+      if (a[i] === b[j]) { flush(); out.push(esc(a[i])); i++; j++; }
+      else if (dp[i + 1][j] >= dp[i][j + 1]) { delBuf.push(a[i]); i++; }
+      else { insBuf.push(b[j]); j++; }
+    }
+    while (i < n) delBuf.push(a[i++]);
+    while (j < m) insBuf.push(b[j++]);
+    flush();
+    return out.join("");
+  }
+
+  // --- component wiring -------------------------------------------------------
+  const editor = document.getElementById("editor");
+  const preview = document.getElementById("preview");
+  const comment = document.getElementById("comment");
+  const saveBtn = document.getElementById("save");
+  let original = "", initialized = false;
+
+  function refresh() {
+    const text = editor.innerText.replace(/\n$/, "");
+    preview.innerHTML = wordDiffHtml(original, text) || "<em>(empty)</em>";
+    saveBtn.disabled = text.trim() === original.trim() && !comment.value.trim();
+    setHeight();
+  }
+  let debounce = null;
+  editor.addEventListener("input", () => { clearTimeout(debounce); debounce = setTimeout(refresh, 250); });
+  comment.addEventListener("input", () => { clearTimeout(debounce); debounce = setTimeout(refresh, 250); });
+  // Paste as plain text so page formatting doesn't leak into the proposal.
+  editor.addEventListener("paste", (e) => {
+    e.preventDefault();
+    document.execCommand("insertText", false, e.clipboardData.getData("text/plain"));
+  });
+
+  saveBtn.addEventListener("click", () => {
+    setValue({
+      action: "save",
+      text: editor.innerText.replace(/\n$/, ""),
+      comment: comment.value.trim(),
+      nonce: Date.now(),
+    });
+  });
+  document.getElementById("cancel").addEventListener("click", () => {
+    setValue({ action: "cancel", nonce: Date.now() });
+  });
+
+  window.addEventListener("message", (event) => {
+    const data = event.data;
+    if (!data || data.type !== "streamlit:render") return;
+    const args = data.args || {};
+    original = args.original || "";
+    if (!initialized) {
+      editor.innerText = args.initial || "";
+      initialized = true;
+      editor.focus();
+    }
+    refresh();
+  });
+
+  sendMessage("streamlit:componentReady", { apiVersion: 1 });
+  setHeight();
+})();
+</script>
+</body>
+</html>
