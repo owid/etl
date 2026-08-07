@@ -1,4 +1,4 @@
-"""Build garden tables for the LGBTI National Policy Dataset (Velasco, v2.0).
+"""Build garden tables for the LGBTI National Policy Dataset (Velasco, v2.2).
 
 The source is long format: one row per (country, year, law, status). We:
   1. Harmonize country names.
@@ -93,15 +93,15 @@ def _binary_map(*, prog_key, reg_key, prog_label, reg_label, neither_label, mixe
       - Progressive 0, regressive 1  → reg_label
       - Any partial (subnational variation) or both = 1 → mixed_label
 
-    Note on `both = 1`: codebook §2.3 / §5.2.15 calls these "transition-year artefacts"
+    Note on `both = 1`: codebook §6.13 calls these "transition-year artefacts"
     (a mid-year policy change recorded as both directions for the calendar year) and
-    recommends using the end-of-year status to disambiguate. In v2.0.x the producer
-    cleaned up almost all of these (we counted 1 stray row across the panel, in Brazil
-    GAC 2025), and the v2.0+ subnational coverage means most countries with both
-    directions populated are real subnational mixes. For both interpretations,
+    recommends using the end-of-year status to disambiguate. The producer cleaned these
+    up across the v2.x revisions — v2.0.x still carried 1 stray row (Brazil GAC 2025),
+    and v2.2 carries none — and the v2.0+ subnational coverage means most countries with
+    both directions populated are real subnational mixes. For both interpretations,
     "Varies by region" is a safer default than picking one direction arbitrarily.
 
-    NOTE (future updates): as of v2.0 the `both = 1` branch fires on ZERO country-years, so no row
+    NOTE (future updates): as of v2.2 the `both = 1` branch fires on ZERO country-years, so no row
     is currently labelled "Varies by region" without partial data. `_warn_on_simultaneous_legal_illegal`
     logs a warning (generically, for any law) if a future source version reintroduces `legal: 1
     illegal: 1` rows, so each can be re-checked by hand: confirm it is a genuine transition-year
@@ -117,7 +117,7 @@ def _binary_map(*, prog_key, reg_key, prog_label, reg_label, neither_label, mixe
         f"{prog_key}: 0.5 {reg_key}: 0.5": mixed_label,
         f"{prog_key}: 1 {reg_key}: 0.5": mixed_label,
         f"{prog_key}: 0.5 {reg_key}: 1": mixed_label,
-        # NOTE: transition-year artefact; 0 rows in v2.0 — re-check each occurrence on future updates (see docstring).
+        # NOTE: transition-year artefact; 0 rows in v2.2 — re-check each occurrence on future updates (see docstring).
         f"{prog_key}: 1 {reg_key}: 1": mixed_label,
     }
     return m
@@ -526,12 +526,13 @@ COMBINED_CONFIGS = [
     # _warn_on_unmapped_bucket_patterns keeps flagging anything new); nothing is silently
     # swept into the catch-all.
     #
-    # NOTE: the "Varies by region or other" default holds only (a) genuinely partial/
-    # subnational country-years (e.g. Canada, United States) and (b) the lone Brazil 2025
-    # transition-year artefact (adults covered=1 AND restricted=1). On each new data release,
-    # re-check what reaches the default and what the unmapped-bucket warning surfaces: give a
-    # new stable state its own category, and treat covered+restricted (or legal+illegal)
-    # contradictions via the codebook's end-of-year recoding rule.
+    # NOTE: as of v2.2 the "Varies by region or other" default holds only genuinely partial/
+    # subnational country-years — Canada, India, Mexico, Spain and the United States (v2.0.x also
+    # routed the lone Brazil 2025 transition-year artefact here, which the producer has since
+    # cleaned up). On each new data release, re-check what reaches the default and what the
+    # unmapped-bucket warning surfaces: give a new stable state its own category, and treat
+    # covered+restricted (or legal+illegal) contradictions via the codebook's end-of-year
+    # recoding rule (§6.13).
     {
         "short_name": "gender_affirming_care",
         "sources": [
@@ -668,7 +669,7 @@ def run() -> None:
     # Harmonize country names
     tb = paths.regions.harmonize_names(tb=tb)
 
-    # NOTE: We ship Velasco v2.1 exactly as published — no local data corrections are applied. The known
+    # NOTE: We ship Velasco v2.2 exactly as published — no local data corrections are applied. The known
     # source issues found in review (the Mexico/Venezuela incitement-to-hatred status misfile; the
     # gender-marker requirement frozen at the pre-reform value for ~9 self-ID/de-medicalized countries;
     # and the Nepal marriage coding) are documented in PR #6454 and reported to the producer, to be
@@ -821,7 +822,7 @@ def sanity_check_index(tb):
     assert tb["country"].nunique() >= 195, f"Index coverage shrank: {tb['country'].nunique()} countries (had 195)."
     per_year = tb.groupby("year")["country"].nunique()
     assert per_year.min() >= 180, (
-        f"Per-year coverage dropped to {per_year.min()} countries (was 183-195 across 1991-2025)."
+        f"Per-year coverage dropped to {per_year.min()} countries (was 185-195 across 1991-2025)."
     )
     assert not tb.duplicated(subset=["country", "year"]).any(), "Duplicate (country, year) rows in index table."
 
@@ -851,7 +852,7 @@ def _warn_on_simultaneous_legal_illegal(tb):
     (a mid-year change logged in both directions). It carries no partial/subnational signal yet
     feeds the combined indicators (folding into "Varies by region" or an unmapped bucket), so it
     should be re-checked by hand. Generic across every law — no hard-coded list — so future source
-    versions that introduce such rows in any law surface automatically. As of v2.0 there are none.
+    versions that introduce such rows in any law surface automatically. As of v2.2 there are none.
     """
     wide = tb.pivot_table(index=["country", "year", "law"], columns="status", values="proportion", aggfunc="first")
     if "legal" not in wide.columns or "illegal" not in wide.columns:
