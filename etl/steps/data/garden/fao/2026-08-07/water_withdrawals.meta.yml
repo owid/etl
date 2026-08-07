@@ -6,10 +6,6 @@ definitions:
         - Water Use & Stress
     display:
       numDecimalPlaces: 0
-  description_key_sources: &description_key_sources |-
-    Withdrawn water can come from renewable surface water and groundwater, over-abstraction of renewable groundwater, withdrawal of fossil groundwater, direct use of agricultural drainage water, direct use of (treated) wastewater, and desalinated water.
-  description_key_imputation: &description_key_imputation |-
-    Not all values are directly reported by countries. Many are estimated by FAO or imputed, by carrying the latest reported value forward or interpolating linearly between reported values; recent years in particular rely heavily on estimates and imputations.
 
 dataset:
   update_period_days: 365
@@ -23,46 +19,26 @@ tables:
         title: Agricultural water withdrawal
         unit: cubic meters per year
         short_unit: m³
-        description_short: Annual quantity of freshwater withdrawn for irrigation, livestock and aquaculture.
         description_from_producer: |-
           Annual quantity of self-supplied water withdrawn for irrigation, livestock and aquaculture purposes. It can include water from primary renewable and secondary freshwater resources, as well as water from over-abstraction of renewable groundwater or withdrawal from fossil groundwater, direct use of agricultural drainage water, direct use of (treated) wastewater, and desalinated water. Water for the dairy and meat industries and industrial processing of harvested agricultural products is included under industrial water withdrawal.
-        description_key:
-          - Agricultural water withdrawal measures water taken for irrigation, livestock (watering and cleaning) and aquaculture. Water for the dairy and meat industries and the industrial processing of harvested agricultural products is counted under industrial water withdrawal.
-          - *description_key_sources
-          - *description_key_imputation
       industrial_water_withdrawal:
         title: Industrial water withdrawal
         unit: cubic meters per year
         short_unit: m³
-        description_short: Annual quantity of freshwater withdrawn for self-supplied industries.
         description_from_producer: |-
           Annual quantity of self-supplied water withdrawn for industrial uses. It can include water from primary renewable and secondary freshwater resources, as well as water from over-abstraction of renewable groundwater or withdrawal from fossil groundwater, direct use of agricultural drainage water, direct use of (treated) wastewater, and desalinated water. This sector refers to self-supplied industries not connected to the public distribution network. The ratio between net consumption and withdrawal is estimated at less than 5%. It includes water for the cooling of thermoelectric and nuclear power plants, but it does not include hydropower. Water withdrawn by industries that are connected to the public supply network is generally included in municipal water withdrawal.
-        description_key:
-          - Industrial water withdrawal measures water taken by self-supplied industries not connected to the public distribution network. It includes water used to cool thermoelectric and nuclear power plants, but excludes hydropower. Industries connected to the public supply network are generally counted under municipal water withdrawal.
-          - *description_key_sources
-          - *description_key_imputation
       municipal_water_withdrawal:
         title: Municipal water withdrawal
         unit: cubic meters per year
         short_unit: m³
-        description_short: Annual quantity of freshwater withdrawn by the public distribution network.
         description_from_producer: |-
           Annual quantity of water withdrawn primarily for the direct use by the population. It can include water from primary renewable and secondary freshwater resources, as well as water from over-abstraction of renewable groundwater or withdrawal from fossil groundwater, direct use of agricultural drainage water, direct use of (treated) wastewater, and desalinated water. It is usually computed as the total water withdrawn by the public distribution network. It can include that part of the industries and urban agriculture, which is connected to the municipal network. The ratio between the net consumption and the water withdrawn can vary from 5 to 15% in urban areas and from 10 to 50% in rural areas.
-        description_key:
-          - Municipal water withdrawal measures water withdrawn primarily for direct use by the population, usually computed as the total water withdrawn by the public distribution network. It can include industries and urban agriculture connected to the municipal network.
-          - *description_key_sources
-          - *description_key_imputation
       total_water_withdrawal_per_capita:
         title: Total water withdrawal per capita
         unit: cubic meters per person per year
         short_unit: m³
-        description_short: Annual quantity of freshwater withdrawn for agriculture, industry and municipalities, divided by total population.
         # NOTE: This is FAO's definition of total water withdrawal (the numerator of this indicator).
         description_from_producer: |-
           Annual quantity of water withdrawn for agricultural, industrial and municipal purposes. It can include water from primary renewable and secondary freshwater resources, as well as water from over-abstraction of renewable groundwater or withdrawal from fossil groundwater, direct use of agricultural drainage water, direct use of (treated) wastewater, and desalinated water. It does not include in-stream uses, which are characterized by a very low net consumption rate, such as recreation, navigation, hydropower, inland capture fisheries, etc.
-        description_key:
-          - Total water withdrawal is the sum of agricultural, industrial and municipal water withdrawals. It excludes in-stream uses such as hydropower, navigation, recreation and inland capture fisheries, which consume very little of the water they use.
-          - *description_key_sources
-          - *description_key_imputation
         display:
           numDecimalPlaces: 1

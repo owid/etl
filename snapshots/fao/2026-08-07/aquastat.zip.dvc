@@ -5,9 +5,7 @@ meta:
     # Data product / Snapshot
     title: AQUASTAT
     description: |-
-      AQUASTAT is FAO's global information system on water and agriculture. It compiles country-level statistics on water resources, water use (by agriculture, industry and municipalities), irrigation and drainage, and related environment and health indicators.
-
-      Values are reported for individual years. Where countries do not report a value for a given year, AQUASTAT fills gaps with its own estimates or imputed values (carried forward or linearly interpolated between reported data points); each value carries a symbol identifying whether it is an official figure, an external figure, an FAO estimate, or an imputed value.
+      AQUASTAT is FAO's Global Information System on Water and Agriculture.
     date_published: "2026-06-22"
 
     # Citation
