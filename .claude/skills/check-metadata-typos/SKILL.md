@@ -86,20 +86,40 @@ Use the existing `.codespell-ignore.txt` file to filter out domain-specific term
 
 **For option 1 (current step only):**
 
-1. Ask the user to provide the step path (e.g., `etl/steps/data/garden/energy/2025-06-27/electricity_mix`)
-2. Construct the full path to the metadata file: `<step_path>/*.meta.yml`
-3. Run codespell on that specific path:
+Ask the user for the path, then normalize it. This scope has to accept three shapes, because `/create-snapshot` step 5 calls it on a single new snapshot file:
+
+- an ETL step directory (`etl/steps/data/garden/energy/2025-06-27/electricity_mix`) → every `.meta.yml` in it
+- a snapshot stem with no extension (`snapshots/who/2026-04-22/mortality`) → the matching `.dvc`
+- a single file, `.meta.yml` or `.dvc` → itself
 
 ```bash
-# For specific step (option 1)
-STEP_PATH="<user_provided_path>"  # e.g., etl/steps/data/garden/energy/2025-06-27/electricity_mix
-find "${STEP_PATH}" -maxdepth 1 -name "*.meta.yml" > /tmp/codespell_targets.txt
+# For specific step or single file (option 1)
+TARGET="<user_provided_path>"
+
+.venv/bin/python - "$TARGET" > /tmp/codespell_targets.txt <<'PY'
+import glob, os, sys
+
+target = sys.argv[1].rstrip("/")
+if os.path.isdir(target):
+    paths = sorted(glob.glob(f"{target}/*.meta.yml")) + sorted(glob.glob(f"{target}/*.dvc"))
+elif os.path.isfile(target):
+    paths = [target]
+else:
+    # A snapshot stem: snapshots/<namespace>/<version>/<short_name>, extension unknown.
+    paths = sorted(glob.glob(f"{target}.*.dvc")) or sorted(glob.glob(f"{target}.dvc"))
+print("\n".join(paths))
+PY
 
 cat /tmp/codespell_targets.txt | xargs .venv/bin/codespell \
   --ignore-words=.codespell-ignore.txt
 ```
 
-Use `find`, not `ls <path>/*.meta.yml`: under zsh a glob that matches nothing aborts the command before the redirect, leaving no target file at all (and a stale one from an earlier run would then be reused). If the list comes back empty, tell the user the step has no `.meta.yml` instead of falling through to a wider scope.
+Two ways this scope silently checks nothing, both of which must be treated as an error rather than a clean result:
+
+- **A `.dvc` target matched by a `*.meta.yml`-only pattern.** A snapshot path has no `.meta.yml` in it, so a `.meta.yml`-only search returns an empty list and codespell reports no typos on a file it never opened. The normalizer above exists for exactly this case.
+- **An empty list from a shell glob.** Don't build the list with `ls <path>/*.meta.yml`: under zsh a glob matching nothing aborts the command before the redirect, so no file is written and a wider list left over from an earlier run gets reused.
+
+**Always report the number of files in `/tmp/codespell_targets.txt` before running codespell.** If it is 0, say the path matched nothing and ask for a corrected one — never fall through to a wider scope, and never report "no typos found".
 
 **For option 2 (all ETL metadata - garden, meadow, grapher):**
 
