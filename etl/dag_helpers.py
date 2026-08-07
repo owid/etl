@@ -422,11 +422,21 @@ def _write_to_nested_dag_file(dag_file: Path, dag_part: dict[str, Any], comments
     original_steps = set(_parse_dag_yaml(doc))
     declared_steps = set(original_steps)
 
+    # Replacing a dependency list below wipes any nested definitions that lived inside it. Those
+    # nested definitions may be the only place a step is declared, so collect them here and
+    # re-declare the lost ones at the top level after all updates (see issue #6165).
+    displaced: list[tuple[str, Any]] = []
+
     for step, dependencies in dag_part.items():
         node = _find_step_mapping(steps, step)
         if node is None:
             continue
         mapping, key = node
+        displaced_here = list(_iter_nested_dep_items(mapping[key]))
+        displaced.extend(displaced_here)
+        # The wiped definitions are no longer declared, so the new sequence is free to re-nest them
+        # (e.g. a child that is updated in this same call keeps its nested place under this step).
+        declared_steps -= {sub_step for sub_step, _ in displaced_here}
         mapping[key] = _build_dependency_sequence(dependencies, dag_part, declared_steps, {step})
         declared_steps.update(_collect_declared_steps(mapping[key]))
 
@@ -438,6 +448,22 @@ def _write_to_nested_dag_file(dag_file: Path, dag_part: dict[str, Any], comments
             steps.yaml_set_comment_before_after_key(step, before=_normalise_ruamel_comment(comments[step]), indent=2)
         declared_steps.add(step)
         declared_steps.update(_collect_declared_steps(steps[step]))
+
+    # Re-declare displaced nested definitions that are no longer present anywhere in the document,
+    # so their steps stay in the DAG (and can later be flagged as unused/archivable) instead of
+    # disappearing without a trace. Parents are yielded before their children, so hoisting a parent
+    # (with its subtree intact) marks its children as declared and they are skipped.
+    still_declared = set(_parse_dag_yaml(doc))
+    for step, dependencies in displaced:
+        if step in still_declared:
+            continue
+        if step in dag_part:
+            # The step was updated in this same call but its declaration was already wiped by the
+            # time it was looked up; write its new dependency list rather than the stale one.
+            dependencies = _build_dependency_sequence(dag_part[step], dag_part, set(still_declared), {step})
+        steps[step] = dependencies
+        still_declared.add(step)
+        still_declared.update(_collect_declared_steps(dependencies))
 
     with open(dag_file, "w") as ostream:
         yaml_rt.dump(doc, ostream)

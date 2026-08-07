@@ -1171,6 +1171,101 @@ steps:
         assert load_dag(p)["data://grapher/foo/2025/bar"] == {"data://garden/foo/2025/bar"}
 
 
+def test_write_to_dag_file_nested_update_preserves_displaced_nested_definitions():
+    # When a parent's dependency list is rewritten (e.g. by `etl update --include-usages`), step
+    # definitions that existed only nested inside it must survive as top-level entries instead of
+    # being silently wiped. See https://github.com/owid/etl/issues/6165.
+    old_content = """\
+steps:
+  export://multidim/foo/latest/bar:
+    - data://grapher/foo/2025-01-01/bar:
+      - data://garden/foo/2025-01-01/bar:
+        - snapshot://foo/2025-01-01/bar.csv
+"""
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(old_content)
+        write_to_dag_file(
+            p,
+            dag_part={
+                "export://multidim/foo/latest/bar": ["data://grapher/foo/2026-01-01/bar"],
+                "data://grapher/foo/2026-01-01/bar": ["data://garden/foo/2026-01-01/bar"],
+                "data://garden/foo/2026-01-01/bar": ["snapshot://foo/2026-01-01/bar.csv"],
+            },
+        )
+        dag = load_dag(p)
+        # The updated chain points at the new version.
+        assert dag["export://multidim/foo/latest/bar"] == {"data://grapher/foo/2026-01-01/bar"}
+        assert dag["data://grapher/foo/2026-01-01/bar"] == {"data://garden/foo/2026-01-01/bar"}
+        assert dag["data://garden/foo/2026-01-01/bar"] == {"snapshot://foo/2026-01-01/bar.csv"}
+        # The old nested-only definitions survive (as top-level entries) instead of being wiped.
+        assert dag["data://grapher/foo/2025-01-01/bar"] == {"data://garden/foo/2025-01-01/bar"}
+        assert dag["data://garden/foo/2025-01-01/bar"] == {"snapshot://foo/2025-01-01/bar.csv"}
+
+
+def test_write_to_dag_file_nested_update_preserves_nested_definition_of_unchanged_child():
+    # Rewriting a parent's dependency list while keeping a nested child as a dependency (e.g. just
+    # adding another dependency to the parent) must not lose the child's definition.
+    old_content = """\
+steps:
+  export://multidim/foo/latest/bar:
+    - data://grapher/foo/2025-01-01/bar:
+      - data://garden/foo/2025-01-01/bar:
+        - snapshot://foo/2025-01-01/bar.csv
+"""
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(old_content)
+        write_to_dag_file(
+            p,
+            dag_part={
+                "export://multidim/foo/latest/bar": [
+                    "data://grapher/foo/2025-01-01/bar",
+                    "data://garden/regions/latest/regions",
+                ],
+            },
+        )
+        dag = load_dag(p)
+        assert dag["export://multidim/foo/latest/bar"] == {
+            "data://grapher/foo/2025-01-01/bar",
+            "data://garden/regions/latest/regions",
+        }
+        assert dag["data://grapher/foo/2025-01-01/bar"] == {"data://garden/foo/2025-01-01/bar"}
+        assert dag["data://garden/foo/2025-01-01/bar"] == {"snapshot://foo/2025-01-01/bar.csv"}
+
+
+def test_write_to_dag_file_nested_update_does_not_duplicate_redeclared_children():
+    # If the new dependency sequence re-declares a nested child (because the child is also updated
+    # in the same call), the displaced-definition handling must not declare it a second time.
+    old_content = """\
+steps:
+  data://grapher/foo/2025-01-01/bar:
+    - data://garden/foo/2025-01-01/bar:
+      - snapshot://foo/2025-01-01/bar.csv
+"""
+    expected_content = """\
+steps:
+  data://grapher/foo/2025-01-01/bar:
+    - data://garden/foo/2025-01-01/bar:
+      - snapshot://foo/2025-01-01/bar.csv
+      - data://garden/regions/latest/regions
+"""
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "dag.yml"
+        p.write_text(old_content)
+        write_to_dag_file(
+            p,
+            dag_part={
+                "data://grapher/foo/2025-01-01/bar": ["data://garden/foo/2025-01-01/bar"],
+                "data://garden/foo/2025-01-01/bar": [
+                    "snapshot://foo/2025-01-01/bar.csv",
+                    "data://garden/regions/latest/regions",
+                ],
+            },
+        )
+        assert p.read_text() == expected_content
+
+
 def test_remove_steps_from_dag_file_handles_nested_input():
     old_content = """\
 steps:
