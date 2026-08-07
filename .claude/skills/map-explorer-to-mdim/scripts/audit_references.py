@@ -431,24 +431,24 @@ def write_markdown(out: Path, runs: dict[str, dict], rows: list[dict], gaps: lis
         "**Lands on** is computed with grapher's own matching rules, so it is where the reader "
         "actually ends up once the redirect exists.",
         "",
-        "## What's still open",
-        "",
         (
-            f"**Handed off** — {len(blockers)} site redirect(s) to repoint and {len(breaks)} embed(s) to "
-            "migrate, both before anything is applied. Each names the surface and the replacement URL."
+            f"{len(blockers)} site redirect(s) to repoint and {len(breaks)} embed(s) to migrate, both before "
+            "anything is applied. Each names the surface and the replacement URL."
             if blockers or breaks
-            else "**Handed off** — nothing. No blocker and no embed needs migrating before applying."
+            else "No blocker and no embed needs migrating before applying."
         ),
         "",
         (
-            f"**Proposed** — {len(links)} link(s) the 302 already covers, worth updating to skip the hop"
-            + (f", and {len(wrong)} reference(s) whose target view needs a decision" if wrong else "")
+            f"The 302 already covers {len(links)} link(s), worth updating to skip the hop"
+            + (f", and {len(wrong)} reference(s) have a target view that needs a decision" if wrong else "")
             + "."
             if links or wrong
-            else "**Proposed** — nothing pending a decision."
+            else "Nothing is pending a decision."
         ),
         "",
-        "**Unverified** — for an explorer subject the sweep covers article links and embeds only: it "
+        "## What this sweep didn't cover",
+        "",
+        "For an explorer subject the sweep covers article links and embeds only: it "
         "does **not** cover data insights that store the reference elsewhere, static visualizations, "
         "key-chart slots, or narrative charts, and it cannot enumerate a legacy CSV/TSV-backed "
         "explorer's own views. Whether the redirects themselves would be accepted is checked by "
