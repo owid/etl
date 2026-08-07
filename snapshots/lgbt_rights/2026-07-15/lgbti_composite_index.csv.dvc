@@ -4,29 +4,29 @@ meta:
     title: LGBTI National Policy Dataset
     title_snapshot: LGBTI National Policy Dataset - Composite index
     description: |-
-      The LGBTI National Policy Dataset (Version 2.1) is a country-year-policy panel tracking the adoption, scope, and enforcement of LGBTI-related policies across 195 countries from 1991 to 2025. The dataset is distributed in long format: each row records one country in one year for one specific policy-status combination. It is designed for use in comparative political research, policy diffusion analysis, and quantitative cross-national studies of LGBTI rights.
+      The LGBTI National Policy Dataset (Version 2.2) is a country-year-policy panel tracking the adoption, scope, and enforcement of LGBTI-related policies across 195 countries from 1991 to 2025. The dataset is distributed in long format: each row records one country in one year for one specific policy-status combination. It is designed for use in comparative political research, policy diffusion analysis, and quantitative cross-national studies of LGBTI rights.
 
-      The dataset covers 27 distinct policy areas organized into 54 policy-status combinations (each policy paired with two mutually exclusive status directions). Of these 54 combinations, 37 contain substantive data; the remaining 17 are structural placeholders with all-zero values, included to maintain a fully balanced panel suitable for econometric methods.
+      The dataset covers 27 distinct policy areas organized into 54 policy-status combinations (each policy paired with two mutually exclusive status directions). Of these 54 combinations, 36 contain substantive data; the remaining 18 are structural placeholders with all-zero values, included to maintain a fully balanced panel suitable for econometric methods.
     description_snapshot: |-
       Pre-built country-year index panel published alongside the policy-level data. For each country and year it carries the Progressive Score (sum of factor scores across 23 progressive policy-status combinations), the Regressive Score (sum across 10 regressive combinations), the Composite Index (Progressive Score minus Regressive Score, built via confirmatory factor analysis over five indicators per policy), and the Unweighted Index (a raw count: +1 per progressive national law fully in force, -1 per regressive one). Produced by the companion script Velasco_LGBTI_Index_Construction.R (codebook §5 and §7).
     citation_full: |-
-      Velasco, Kristopher. 2026. "LGBTI National Policy Dataset, Version 2.1." https://doi.org/10.17605/OSF.IO/WTA9P.
+      Velasco, Kristopher. 2026. "LGBTI National Policy Dataset, Version 2.2." https://doi.org/10.17605/OSF.IO/WTA9P.
     attribution_short: Velasco
-    version_producer: '2.1'
+    version_producer: '2.2'
     url_main: https://osf.io/wta9p/overview
-    # Stable OSF GUID link for LGBTI_Composite_Index.csv — resolves to the file's latest version.
+    # Stable OSF GUID link for LGBTI_Composite_Index.csv — resolves to the file's latest version. (Unlike the
+    # main policy file, this one is replaced in place, so its GUID survives across revisions.)
     url_download: https://osf.io/download/6v89b/
-    date_accessed: '2026-07-24'
-    # NOTE: The composite-index file first appeared in the producer's 2026-06-12 revision and was
-    # replaced again in the 2026-07-24 (Version 2.1) revision (same caveat as the main snapshot:
-    # revisions are not version-labeled in-file — compare OSF file dates when updating).
-    date_published: '2026-07-24'
-    # The producer added a LICENSE file (CC BY 4.0) in the 2026-07-24 revision, replacing the earlier
-    # no-declared-license state.
+    date_accessed: '2026-08-07'
+    # NOTE: The producer revises Version 2.x in place on OSF without a changelog, so the version label alone
+    # can't distinguish revisions — compare OSF file dates/hashes when updating. The index was re-run for the
+    # 2026-07-31 (Version 2.2) revision, because the re-coded Gender_Change_Requirement feeds the
+    # ease-of-access indicator.
+    date_published: '2026-07-31'
     license:
       name: CC BY 4.0
       url: https://osf.io/wta9p/
 outs:
-  - md5: 962ac9a4bd667404f3a2588c830ed28e
-    size: 243242
+  - md5: efdacc35d736335573392f71f0c9f67b
+    size: 243033
     path: lgbti_composite_index.csv

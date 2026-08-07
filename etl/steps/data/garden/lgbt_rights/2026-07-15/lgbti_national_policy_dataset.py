@@ -829,14 +829,17 @@ def sanity_check_index(tb):
 def _detect_structural_placeholders(tb):
     """Return the set of (law, status) combos that are zero for every country and year.
 
-    Codebook (2026 revision) §3.3 reports 17 placeholders and 37 active combinations. We detect them
-    dynamically and assert the count to surface any source-side coding changes. We ship the source
-    as-is (no local corrections), so this matches the codebook's own count of 17.
+    In Version 2.2 there are 18 such combos, matching the producer's own `row_type` column
+    (`structural_placeholder` on exactly those 18). NOTE: the codebook's prose still says 17 active
+    placeholders / 37 substantive — it lags the data, because the 2026-07-31 revision moved Mexico's and
+    Venezuela's incitement-to-hatred protections from the Illegal to the Legal direction, leaving
+    incitement_to_hatred/illegal all-zero. Reported to the producer; we follow the data, not the prose.
     """
     placeholder_series = tb.groupby(["law", "status"], observed=True)["proportion"].max()
     placeholders = set(placeholder_series[placeholder_series == 0].index)
-    assert len(placeholders) == 17, (
-        f"Expected 17 placeholder (law, status) combos per codebook §3.3; found {len(placeholders)}."
+    assert len(placeholders) == 18, (
+        f"Expected 18 placeholder (law, status) combos (the producer's row_type column marks 18 in "
+        f"Version 2.2, though the codebook prose still says 17); found {len(placeholders)}."
     )
     return placeholders
 
@@ -972,15 +975,21 @@ def _build_gmc_combined(wide):
     REQ_LABELS = {
         "Self-ID": "Self-declaration is enough",
         "Self-Declaration": "Self-declaration is enough",
-        # "Court Order" is a procedural (judicial) requirement with no medical/surgical condition — added by
-        # the producer in the 2026-07-24 (v2.1) revision (only Lithuania carries it). We give it its own
-        # category rather than folding it into a medical tier.
+        # "Court Order" is a procedural (judicial) requirement with no medical/surgical condition (codebook
+        # §4.5 / §5.1.5, ease-of-access 0.5; e.g. France after Loi 2016-1547, Greece after Nomos 4491/2017).
+        # We give it its own category rather than folding it into a medical tier.
         "Court Order": "Court order required",
         "Medical/Psychological": "Diagnosis required",
         "Medical Diagnosis": "Diagnosis required",
         "Surgery": "Surgery required",
         "Mixed (Surgery + Medical/Psychological)": "Surgery required",
         "Surgery+Sterilization": "Surgery and sterilization required",
+        # "No Legal Route" documents that recognition was revoked / never available (Bulgaria 2023-, Kyrgyzstan
+        # 2020-). It only ever appears with proportion = 0, so `classify` already returns "Not legally possible"
+        # from the proportion alone and this mapping is never exercised — it is here so the guard below stays a
+        # real check on unknown labels. If a future release pairs it with proportion = 1 that is a source
+        # contradiction worth raising with the producer.
+        "No Legal Route": "Not legally possible",
     }
 
     # Only a blank requirement may fall into "Legally possible, requirement unknown" — a *labeled*
