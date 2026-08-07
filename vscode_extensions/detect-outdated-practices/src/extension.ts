@@ -125,6 +125,22 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         scope: SNAPSHOT_SCOPE
     },
     {
+        // Matches the @click.command decorator on a snapshot script's entry point.
+        //
+        // Anchored on the command decorator rather than on `@click.` generally, so each script
+        // gets ONE warning at the decorator that defines the CLI instead of one per decorator
+        // line (measured over snapshots/: 1171 `@click.command` occurrences vs 2647 `@click.`).
+        // Nothing is missed by the narrower anchor — every file in snapshots/ carrying any
+        // `@click.` decorator also carries `@click.command`, and none use `@click.group`.
+        //
+        // Removing the command decorator alone would leave orphaned `@click.option` lines and
+        // break the script, so the message asks for the whole stack.
+        pattern: /@click\.command/g,
+        message: '`@click` decorators are outdated in snapshot files. The `etls` CLI imports the module and calls `run()` itself, so the CLI wrapper is redundant. Remove the whole decorator stack — `@click.command(...)` and every `@click.option(...)` above the function — and leave a plain `def run(upload: bool = True) -> None:` (add `path_to_file: str | None = None` for a manual import). Existing click-decorated scripts still work, because the runner also accepts a click command, so this is a cleanup rather than a break.',
+        severity: vscode.DiagnosticSeverity.Warning,
+        scope: 'snapshots/**'
+    },
+    {
         // Matches .set_index(...) used to finalize a table before create_dataset.
         // Common patterns:
         // - tb = tb.set_index(["country", "year"])
