@@ -67,7 +67,10 @@ dag_file, is_private = '<dag_file>.yml', False
 update_period_days, topic_tags = 365, []
 
 git_name = subprocess.check_output(['git', 'config', 'user.name'], text=True).strip()
-owner = resolve_owner(git_name) or ''
+owner = resolve_owner(git_name)
+# The garden .meta.yml only renders an `owners:` block when `owner` is truthy, so an
+# unresolved name would silently produce metadata with no accountable owner.
+assert owner, f'resolve_owner() did not recognise git user.name={git_name!r} — ask for a canonical owner'
 
 common = {
     'namespace': namespace,
@@ -104,6 +107,7 @@ Notes on this call:
 
 - **Run the channels one at a time, never concurrently.** `generate_step` writes a temporary `cookiecutter.json` into the template directory and deletes it afterwards, so two simultaneous runs corrupt each other's context.
 - **Every variable a template references must be present in `data`.** There is no committed `cookiecutter.json` supplying defaults, so a missing key is a Jinja `UndefinedError`, not a silent blank. The dicts above are what `apps/wizard/etl_steps/forms.py:309` passes; if a template gains a variable, it has to be added here too.
+- **If the `owner` assert fires, stop and ask** which colleague is the accountable owner, then set `owner` to that canonical name and re-run. `resolve_owner` only recognises the git identities in `etl/owners.py`, so it returns `None` on an unmapped `git config user.name` — a cloud sandbox, a fresh checkout, or a name spelled differently from the enum. The wizard form degrades to an empty string there, but it has a human in front of it who can see the missing block; a skill run does not, and CLAUDE.md requires `owners` on every dataset. Pick the name from the `schemas/dataset-schema.json` enum, and add the git identity to `etl/owners.py` if it is a colleague who is simply missing from the map.
 - `generate_step` prints the context dictionary to stdout, and importing `apps.wizard` logs a `No runtime found, using MemoryCacheStorageManager` warning from Streamlit. Both are expected noise, not errors.
 - Use `/create-playground` if the user does want a playground notebook, rather than keeping the cookiecutter's copy.
 
@@ -111,7 +115,7 @@ Files generated, after the playground removal: meadow `.py`; garden `.py`, `.met
 
 ### 5. Add DAG entries
 
-Append the following entries to `dag/<dag_file>.yml` under the `steps:` key, using `ruamel_load` / `ruamel_dump` to preserve comments. For a private dataset every `data://` below becomes `data-private://` (matching `private_suffix` in the wizard form) — the snapshot URI keeps its own form:
+Append the following entries to `dag/<dag_file>.yml` under the `steps:` key, using `ruamel_load` / `ruamel_dump` to preserve comments. For a private dataset every `data://` below becomes `data-private://` (matching `private_suffix` in the wizard form):
 
 ```yaml
   data://meadow/<namespace>/<version>/<short_name>:
@@ -122,17 +126,32 @@ Append the following entries to `dag/<dag_file>.yml` under the `steps:` key, usi
     - data://garden/<namespace>/<version>/<short_name>
 ```
 
+**The snapshot URI has its own prefix, driven by the snapshot's `.dvc`, not by `is_private`.** A snapshot whose `.dvc` sets `is_public: false` is referenced as `snapshot-private://`; everything else as `snapshot://`. Read `is_public` out of each `.dvc` rather than assuming — a private dataset is normally built on private snapshots, but the two flags are independent, and a public snapshot can feed a private dataset. Getting this wrong is silent: `snapshot-private://` builds a `SnapshotStepPrivate`, whose `run()` asserts `is_public is False` before pulling, and `--private` filtering keys off the prefix too, so a private snapshot mislabelled `snapshot://` loses that assert and is no longer excluded from a public run. Every one of the 294 private snapshots in the active DAG uses `snapshot-private://`, with no exceptions — a plain `snapshot://` on a private snapshot would be the first.
+
 List every snapshot from step 2 as a dependency of the meadow step, not just the first.
 
 ```python
 from etl.files import ruamel_load, ruamel_dump
+from etl.snapshot import Snapshot
+
+base = "<namespace>/<version>/<short_name>"
+snapshot_names = ["<short_name>.<file_extension>"]  # every snapshot from step 2
+is_private = False
+data_prefix = "data-private" if is_private else "data"
+
+# Each snapshot's own is_public decides its prefix, independently of is_private.
+snapshot_uris = []
+for name in snapshot_names:
+    path = f"<namespace>/<version>/{name}"
+    prefix = "snapshot" if Snapshot(path).metadata.is_public else "snapshot-private"
+    snapshot_uris.append(f"{prefix}://{path}")
 
 dag_path = "dag/<dag_file>.yml"
 with open(dag_path, "r") as f:
     data = ruamel_load(f)
-data["steps"]["data://meadow/<namespace>/<version>/<short_name>"] = ["snapshot://<namespace>/<version>/<short_name>.<file_extension>"]
-data["steps"]["data://garden/<namespace>/<version>/<short_name>"] = ["data://meadow/<namespace>/<version>/<short_name>"]
-data["steps"]["data://grapher/<namespace>/<version>/<short_name>"] = ["data://garden/<namespace>/<version>/<short_name>"]
+data["steps"][f"{data_prefix}://meadow/{base}"] = snapshot_uris
+data["steps"][f"{data_prefix}://garden/{base}"] = [f"{data_prefix}://meadow/{base}"]
+data["steps"][f"{data_prefix}://grapher/{base}"] = [f"{data_prefix}://garden/{base}"]
 with open(dag_path, "w") as f:
     f.write(ruamel_dump(data))
 ```
