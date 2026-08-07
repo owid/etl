@@ -1,6 +1,6 @@
 ---
 name: create-etl-steps
-description: Create vanilla meadow, garden, and grapher ETL step files from the wizard's cookiecutter templates, given a snapshot path.
+description: Create vanilla meadow, garden, and grapher ETL step files by invoking the wizard's cookiecutter templates, given a snapshot path.
 triggers:
   - create etl steps
   - create meadow garden grapher
@@ -12,7 +12,11 @@ metadata:
 
 # Create ETL Steps
 
-Create meadow, garden, and grapher step files from the wizard's vanilla cookiecutter templates for a given snapshot.
+Create meadow, garden, and grapher step files for a given snapshot, by running the same cookiecutter templates the wizard runs.
+
+> **Never copy the templates into this file.** `apps/wizard/etl_steps/cookiecutter/{meadow,garden,grapher}/` is the single source of truth, and this skill invokes it via `generate_step_to_channel`. An earlier version of this skill embedded hand-copied templates; they drifted (the multi-snapshot meadow branch and `non_redistributable` for private datasets both went missing) while the copies that hadn't drifted made the rest look current. If a template needs changing, change it in `apps/wizard/etl_steps/cookiecutter/`.
+
+`/create-dataset` calls this skill at its Step 5. Keep the two consistent: if the inputs or generated files change here, check whether `create-dataset/SKILL.md` needs a matching edit, and make it in the same commit.
 
 ## Inputs
 
@@ -21,6 +25,9 @@ Required:
 
 Optional:
 - `dag_file` — which DAG file to add entries to (e.g. `environment`, `climate`). If not provided, ask the user.
+- `is_private` — default `False`. Affects both the generated metadata and the DAG URIs (see steps 4 and 5).
+- `update_period_days` — default `365`.
+- `topic_tags` — default none.
 
 ## Workflow
 
@@ -37,212 +44,74 @@ Look in `snapshots/<namespace>/<version>/` for a `.dvc` file matching `<short_na
 
 For example: `pm25_air_pollution.csv.dvc` → `file_extension = csv`
 
-The full snapshot filename (used in meadow) is `<short_name>.<file_extension>`.
+The full snapshot filename is `<short_name>.<file_extension>`. Collect **all** the snapshot filenames the meadow step should read — if the chain has more than one snapshot, pass them all in step 4 and the meadow template generates the multi-snapshot loop by itself.
 
 ### 3. Determine the DAG file
 
 If the user has not specified a DAG file, list the available files in `dag/` (excluding `archive/`) and ask the user which one to use.
 
-### 4. Create directories
+### 4. Generate the step files
 
-Create the following directories (if they don't exist):
-```
-etl/steps/data/meadow/<namespace>/<version>/
-etl/steps/data/garden/<namespace>/<version>/
-etl/steps/data/grapher/<namespace>/<version>/
-```
+Call the wizard's generator once per channel. It creates the directories, renders the templates, runs ruff on the generated Python, and copies the result into `etl/steps/data/<channel>/`:
 
-### 5. Write the step files
+```bash
+.venv/bin/python -c "
+from apps.utils.files import generate_step_to_channel
+from apps.wizard.etl_steps.utils import COOKIE_STEPS, remove_playground_notebook
+from etl.owners import resolve_owner
+import subprocess
 
-#### Meadow — `etl/steps/data/meadow/<namespace>/<version>/<short_name>.py`
+namespace, version, short_name = '<namespace>', '<version>', '<short_name>'
+snapshot_names = ['<short_name>.<file_extension>']  # every snapshot the meadow step reads
+dag_file, is_private = '<dag_file>.yml', False
+update_period_days, topic_tags = 365, []
 
-```python
-"""Load a snapshot and create a meadow dataset."""
+git_name = subprocess.check_output(['git', 'config', 'user.name'], text=True).strip()
+owner = resolve_owner(git_name) or ''
 
-from etl.helpers import PathFinder
+common = {
+    'namespace': namespace,
+    'short_name': short_name,
+    'version': version,
+    'add_to_dag': True,
+    'dag_file': dag_file,
+    'is_private': is_private,
+}
+per_channel = {
+    'meadow': {'channel': 'meadow', 'snapshot_names_with_extension': snapshot_names},
+    # topic_tags must be a pre-joined string, not a list: cookiecutter renders a list
+    # as only its first element.
+    'garden': {
+        'channel': 'garden',
+        'meadow_version': version,
+        'update_period_days': update_period_days,
+        'topic_tags': ('- ' + '\n- '.join(topic_tags)) if topic_tags else '',
+        'owner': owner,
+    },
+    'grapher': {'channel': 'grapher', 'garden_version': version},
+}
 
-# Get paths and naming conventions for current step.
-paths = PathFinder(__file__)
-
-
-def run() -> None:
-    #
-    # Load inputs.
-    #
-    # Retrieve snapshot.
-    snap = paths.load_snapshot("<short_name>.<file_extension>")
-
-    # Load data from snapshot.
-    tb = snap.read()
-
-    #
-    # Process data.
-    #
-    # Improve tables format.
-    tables = [
-        tb.format(["country", "year"])
-    ]
-
-    #
-    # Save outputs.
-    #
-    # Initialize a new meadow dataset.
-    ds_meadow = paths.create_dataset(tables=tables, default_metadata=snap.metadata)
-
-    # Save meadow dataset.
-    ds_meadow.save()
-```
-
-#### Garden — `etl/steps/data/garden/<namespace>/<version>/<short_name>.py`
-
-```python
-"""Load a meadow dataset and create a garden dataset."""
-
-from etl.helpers import PathFinder
-
-# Get paths and naming conventions for current step.
-paths = PathFinder(__file__)
-
-
-def run() -> None:
-    #
-    # Load inputs.
-    #
-    # Load meadow dataset.
-    ds_meadow = paths.load_dataset("<short_name>")
-
-    # Read table from meadow dataset.
-    tb = ds_meadow.read("<short_name>")
-
-    #
-    # Process data.
-    #
-    # Harmonize country names.
-    tb = paths.regions.harmonize_names(tb=tb)
-
-    # Improve table format.
-    tb = tb.format(["country", "year"])
-
-    #
-    # Save outputs.
-    #
-    # Initialize a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
-
-    # Save garden dataset.
-    ds_garden.save()
+for channel, extra in per_channel.items():
+    dataset_dir = generate_step_to_channel(cookiecutter_path=COOKIE_STEPS[channel], data={**common, **extra})
+    # The meadow and garden cookiecutters both ship a playground.ipynb. The wizard keeps it only
+    # for garden when the user asked for a notebook; this skill never does, so always drop it.
+    remove_playground_notebook(dataset_dir)
+    print(f'{channel}: {dataset_dir}')
+"
 ```
 
-#### Garden metadata — `etl/steps/data/garden/<namespace>/<version>/<short_name>.meta.yml`
+Notes on this call:
 
-```yaml
-# NOTE: To learn more about the fields, hover over their names.
+- **Run the channels one at a time, never concurrently.** `generate_step` writes a temporary `cookiecutter.json` into the template directory and deletes it afterwards, so two simultaneous runs corrupt each other's context.
+- **Every variable a template references must be present in `data`.** There is no committed `cookiecutter.json` supplying defaults, so a missing key is a Jinja `UndefinedError`, not a silent blank. The dicts above are what `apps/wizard/etl_steps/forms.py:309` passes; if a template gains a variable, it has to be added here too.
+- `generate_step` prints the context dictionary to stdout, and importing `apps.wizard` logs a `No runtime found, using MemoryCacheStorageManager` warning from Streamlit. Both are expected noise, not errors.
+- Use `/create-playground` if the user does want a playground notebook, rather than keeping the cookiecutter's copy.
 
+Files generated, after the playground removal: meadow `.py`; garden `.py`, `.meta.yml`, `.countries.json`, `.excluded_countries.json`; grapher `.py`. Verify the notebook is gone — leaving one behind is the easiest thing to get wrong here, since two of the three channels ship it.
 
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
-definitions:
-  common:
-    presentation:
-      topic_tags:
+### 5. Add DAG entries
 
-dataset:
-  update_period_days: 365
-  owners:
-    - <canonical OWID name of the user, from `git config user.name` via `etl.owners.resolve_owner`>
-
-
-tables:
-  <short_name>:
-    variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_key: Key information about the indicator, as free-form markdown text (a YAML list of bullets is also accepted).
-      #   processing_level: minor
-      #   description_processing: Description of processing of testing variable.
-      #   description_from_producer: Description of testing variable from producer.
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     timeInterval: day  # day | week | month | quarter | year | decade; omit for yearly data. Sub-yearly data is encoded as days-since-zeroDay integers.
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
-```
-
-#### Garden countries file — `etl/steps/data/garden/<namespace>/<version>/<short_name>.countries.json`
-
-```json
-{}
-```
-
-#### Garden excluded countries file — `etl/steps/data/garden/<namespace>/<version>/<short_name>.excluded_countries.json`
-
-```json
-[]
-```
-
-#### Grapher — `etl/steps/data/grapher/<namespace>/<version>/<short_name>.py`
-
-```python
-"""Load a garden dataset and create a grapher dataset."""
-
-from etl.helpers import PathFinder
-
-# Get paths and naming conventions for current step.
-paths = PathFinder(__file__)
-
-
-def run() -> None:
-    #
-    # Load inputs.
-    #
-    # Load garden dataset.
-    ds_garden = paths.load_dataset("<short_name>")
-
-    # Read table from garden dataset.
-    tb = ds_garden.read("<short_name>", reset_index=False)
-
-    #
-    # Save outputs.
-    #
-    # Initialize a new grapher dataset.
-    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
-
-    # Save grapher dataset.
-    ds_grapher.save()
-```
-
-### 6. Add DAG entries
-
-Append the following entries to `dag/<dag_file>.yml` under the `steps:` key. Use `ruamel_load` / `ruamel_dump` to preserve comments:
+Append the following entries to `dag/<dag_file>.yml` under the `steps:` key, using `ruamel_load` / `ruamel_dump` to preserve comments. For a private dataset every `data://` below becomes `data-private://` (matching `private_suffix` in the wizard form) — the snapshot URI keeps its own form:
 
 ```yaml
   data://meadow/<namespace>/<version>/<short_name>:
@@ -253,7 +122,7 @@ Append the following entries to `dag/<dag_file>.yml` under the `steps:` key. Use
     - data://garden/<namespace>/<version>/<short_name>
 ```
 
-To append cleanly while preserving YAML comments, use the Python helper:
+List every snapshot from step 2 as a dependency of the meadow step, not just the first.
 
 ```python
 from etl.files import ruamel_load, ruamel_dump
@@ -268,9 +137,23 @@ with open(dag_path, "w") as f:
     f.write(ruamel_dump(data))
 ```
 
+### 6. Run the checks on the generated files
+
+New step files get checked here the same way they do when `/create-dataset` (Step 5) and `/update-dataset` (step 1b) generate them — a standalone run of this skill must not be the one path that produces unchecked step files.
+
+Run `/check-outdated-practices` on every generated `.py`. The templates should come back clean; a hit means the template itself has drifted, and the fix belongs in `apps/wizard/etl_steps/cookiecutter/`, not only in the generated file.
+
+The metadata checks have nothing to bite on yet — the scaffolded `.meta.yml` is entirely commented out. Name them in the report as the checks to run once the steps are filled in:
+
+- `/check-metadata-style` — user-facing text against the Writing and Style Guide
+- `/check-metadata-typos` — spelling
+- `/check-metadata-spacing` — Jinja rendering artifacts, once the metadata uses templates
+
+Also flag `.claude/rules/sanity-checks.md` if the garden step will do more than load-and-format: assertions are expected in the step, and the scaffold has none.
+
 ### 7. Report to the user
 
-List all files created and the DAG entries added. Suggest running:
+List all files created and the DAG entries added, the result of the outdated-practices check, and the deferred checks from step 6. Suggest running:
 
 ```bash
 .venv/bin/etlr <namespace>/<version>/<short_name> --private
