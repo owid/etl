@@ -1,7 +1,6 @@
 import json
 from pathlib import Path
 
-from git import InvalidGitRepositoryError, NoSuchPathError, Repo
 from structlog import get_logger
 
 from etl.config import get_container_name
@@ -19,15 +18,12 @@ def run(branch: str) -> str:
     container_name = get_container_name(branch)
 
     svgs_repo = BASE_DIR.parent / "owid-grapher-svgs"
-    grapher_repo = BASE_DIR.parent / "owid-grapher"
 
-    results_by_suite = {
-        suite: load_suite_results(svgs_repo / suite, grapher_repo=grapher_repo) for suite in SVG_TESTER_SUITES
-    }
+    results_by_suite = {suite: read_verify_results(svgs_repo / suite) for suite in SVG_TESTER_SUITES}
 
     # The first owidbot run of a build happens before the SVG tester step,
     # so no suite has results yet and the whole block is left out.
-    svg_tester_has_run = any(has_results(results) for results in results_by_suite.values())
+    svg_tester_has_run = any(results is not None for results in results_by_suite.values())
 
     rows = "\n".join(
         f"- {suite.replace('-', ' ')}: {make_suite_line(results, container_name=container_name, suite=suite)}"
@@ -72,28 +68,6 @@ def run(branch: str) -> str:
     return body
 
 
-def load_suite_results(suite_dir: Path, grapher_repo: Path) -> dict | None:
-    """Results for one suite. None when the suite produced no file at all."""
-    results = read_verify_results(suite_dir)
-    if results is None:
-        return None
-
-    if is_stale(results, grapher_repo=grapher_repo):
-        log.warning(
-            "owidbot.svg_tester.stale_results",
-            suite_dir=str(suite_dir),
-            results_commit=results.get("grapherCommit"),
-        )
-        return {"status": "stale"}
-
-    return results
-
-
-def has_results(results: dict | None) -> bool:
-    """True when the suite actually reported on the commit under test."""
-    return results is not None and results.get("status") != "stale"
-
-
 def read_verify_results(suite_dir: Path) -> dict | None:
     """Parsed verify-results.json, None when the file does not exist."""
     path = suite_dir / VERIFY_RESULTS_FILENAME
@@ -109,37 +83,12 @@ def read_verify_results(suite_dir: Path) -> dict | None:
         return {"status": "unreadable"}
 
 
-def is_stale(results: dict, grapher_repo: Path) -> bool:
-    """True when the results describe a run against a different commit."""
-    results_commit = results.get("grapherCommit")
-    if not results_commit:
-        return False
-
-    head = get_head_commit(grapher_repo)
-    if head is None:
-        return False
-
-    return results_commit != head
-
-
-def get_head_commit(repo_path: Path) -> str | None:
-    """HEAD of the grapher checkout the SVG tester ran against, or None if unavailable."""
-    try:
-        return Repo(repo_path).head.commit.hexsha
-    except (InvalidGitRepositoryError, NoSuchPathError, ValueError) as e:
-        log.warning("owidbot.svg_tester.no_grapher_checkout", repo_path=str(repo_path), error=str(e))
-        return None
-
-
 def make_suite_line(results: dict | None, container_name: str, suite: str) -> str:
     """One suite's line in the PR comment."""
     if results is None:
         return "_skipped_"
 
     status = results.get("status")
-
-    if status == "stale":
-        return "_skipped_ (ignored a leftover results file)"
 
     if status == "unreadable":
         return "⚠️ no result (results file unreadable)"
