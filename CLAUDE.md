@@ -24,7 +24,7 @@ Most recurring work here has a skill that runs it end to end. Reach for it **bef
 | Refresh an existing dataset to a new version | `/update-dataset` |
 | Brand-new dataset from a file or link the user provides | `/create-dataset` |
 | Add a new snapshot (`.dvc`, plus a script only if needed) | `/create-snapshot` |
-| Scaffold meadow/garden/grapher steps for an existing snapshot | `/create-etl-steps` |
+| Scaffold meadow/garden/grapher steps for a snapshot that already exists | `/create-etl-steps` — the primitive `/create-dataset` calls; don't run it standalone unless scaffolding really is all you need |
 | Bring a legacy (no-catalogPath) dataset into ETL | `/migrate-dataset` |
 | Change user-facing chart/indicator text — title, subtitle, footnote, units, `description_short`, WYSK/`description_key`, entity selection | `/edit-faust-metadata` |
 | Check that text against the Writing and Style Guide | `/check-metadata-style` |
