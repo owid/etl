@@ -71,7 +71,7 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
     },
     {
         // Matches geo.add_region_aggregates (older sibling of add_regions_to_table).
-        // The docstring at etl/data_helpers/geo.py:286 says: "use the add_aggregates() method of the Regions class".
+        // Its docstring in `etl/data_helpers/geo.py` says: "use the add_aggregates() method of the Regions class".
         pattern: /geo\.add_region_aggregates\(/g,
         message: '`geo.add_region_aggregates` is outdated. Use `paths.regions.add_aggregates(tb, ...)` instead (auto-resolves regions and income_groups from the DAG).',
         severity: vscode.DiagnosticSeverity.Warning,
@@ -79,7 +79,7 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
     },
     {
         // Matches geo.list_countries_in_region.
-        // The docstring at etl/data_helpers/geo.py:121 says: "use the get_region() method of the Regions class".
+        // Its docstring in `etl/data_helpers/geo.py` says: "use the get_region() method of the Regions class".
         // The negative lookahead skips list_countries_in_region_that_must_have_data, which has its own warning below.
         pattern: /geo\.list_countries_in_region(?!_that_must_have_data)\(/g,
         message: '`geo.list_countries_in_region` is outdated. Use `paths.regions.get_region(<name>)` instead (auto-resolves regions from the DAG).',
@@ -88,7 +88,7 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
     },
     {
         // Matches geo.list_countries_in_region_that_must_have_data.
-        // The docstring at etl/data_helpers/geo.py:178 says: "Currently no alternative is implemented." Flag anyway so the
+        // Its docstring in `etl/data_helpers/geo.py` says: "Currently no alternative is implemented." Flag anyway so the
         // call site is visible — users may need to inline the logic or wait for a replacement.
         pattern: /geo\.list_countries_in_region_that_must_have_data\(/g,
         message: '`geo.list_countries_in_region_that_must_have_data` is deprecated and no replacement is currently implemented. Inline the country-selection logic locally and flag this for follow-up.',
@@ -97,7 +97,7 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
     },
     {
         // Matches geo.interpolate_table.
-        // The docstring at etl/data_helpers/geo.py:695 says: "Use `etl.data_helpers.misc.interpolate_table` instead".
+        // Its docstring in `etl/data_helpers/geo.py` says: "Use `etl.data_helpers.misc.interpolate_table` instead".
         pattern: /geo\.interpolate_table\(/g,
         message: '`geo.interpolate_table` is outdated. Use `etl.data_helpers.misc.interpolate_table` instead.',
         severity: vscode.DiagnosticSeverity.Warning,
@@ -127,31 +127,18 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
     {
         // Matches the @click.command decorator on a snapshot script's entry point.
         //
-        // Anchored on the command decorator rather than on `@click.` generally, so each script
-        // gets ONE warning at the decorator that defines the CLI instead of one per decorator
-        // line (measured over snapshots/: 1171 `@click.command` occurrences vs 2647 `@click.`).
-        // Nothing is missed by the narrower anchor — every file in snapshots/ carrying any
-        // `@click.` decorator also carries `@click.command`, and none use `@click.group`.
+        // Anchored on the command decorator, not `@click.` generally: one warning per script
+        // instead of one per decorator line, and nothing is missed, since a click-using snapshot
+        // script always declares a command. The message asks for the whole decorator stack,
+        // because removing the command alone leaves orphaned `@click.option` lines behind.
         //
-        // Removing the command decorator alone would leave orphaned `@click.option` lines and
-        // break the script, so the message asks for the whole stack.
+        // Options beyond the two `_call_snapshot_function` supplies already run at their click
+        // defaults, so the message says to carry them over as keyword parameters. Options
+        // declared `prompt=True` with no default are the exception the message calls out: click
+        // collects those interactively and `etls` has no way to feed them to a plain function.
         //
-        // 29 of the 1171 commands carry options beyond `--upload/--skip-upload` and
-        // `--path-to-file` (e.g. `--clear-cache`, `--max-workers`, `--path-to-folder`).
-        // `_call_snapshot_function` never passes those, so they already run at their click
-        // defaults; the message tells you to carry each one over as a keyword parameter with
-        // that same default, which keeps behaviour identical instead of dropping the control.
-        //
-        // 20 of those options (across 8 manual multi-file importers — PISA, the Global Carbon
-        // Budget, UNEP controlled substances, ...) instead use `prompt=True` with no default,
-        // so click itself collects them interactively and there is no default to carry over.
-        // Dropping the wrapper there would either lose the input or leave a required parameter
-        // that `_call_snapshot_function` never supplies, so the message calls that out as the
-        // one case to leave on click.
-        //
-        // SNAPSHOT_SCOPE rather than 'snapshots/**' alone, so the snapshot cookiecutter is covered
-        // too. It has been click-free since the commit that added `etls` (which is what made the
-        // CLI wrapper redundant), so this is drift protection, not a current gap.
+        // SNAPSHOT_SCOPE covers the snapshot cookiecutter too — click-free today, so that is
+        // drift protection rather than a current gap.
         pattern: /@click\.command/g,
         message: '`@click` decorators are outdated in snapshot files. The `etls` CLI imports the module and calls `run()` itself, so the CLI wrapper is redundant. Remove the whole decorator stack — `@click.command(...)` and every `@click.option(...)` above the function — and leave a plain `def run(upload: bool = True) -> None:` (add `path_to_file: str | None = None` for a manual import). If the command carries any other options, keep each one as a keyword parameter with the same default it had — `etls` only ever passes `--skip-upload` and `--path-to-file`, so those defaults are already what runs today, and carrying them over keeps behaviour identical rather than dropping the control. The one exception is an option declared with `prompt=True` and no default, which click collects interactively — a few manual multi-file importers depend on that, and `etls` has no way to feed it to a plain function, so leave those scripts on click. Existing click-decorated scripts still work, because the runner also accepts a click command, so this is a cleanup rather than a break.',
         severity: vscode.DiagnosticSeverity.Warning,
