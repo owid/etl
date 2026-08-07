@@ -99,6 +99,16 @@ tables:
         origins:
           - producer: Our World in Data
             title: Regions
+        presentation:
+          grapher_config:
+            map:
+              colorScale:
+                baseColorScheme: OwidCategoricalMap
+                customHiddenCategories:
+                  "No data": true
+                # No customCategoryLabels/tooltipUseCustomLabels here, unlike every other
+                # region indicator: OWID's own region names carry no "(Provider)" suffix,
+                # so there is nothing to strip from the legend or the tooltip.
 
       # UN
       un_region:
@@ -222,16 +232,15 @@ tables:
           Level-3 (most granular) regions defined by the United Nations.
         type: ordinal
         sort:
-          - Central America (UN M49)
+          # Same order as customRegionDisplayOrder.un_m49_3 in the grapher repo, so the
+          # published map's legend and the region hover's mini-map legend agree.
           - Caribbean (UN M49)
+          - Central America (UN M49)
           - South America (UN M49)
-          - Western Africa (UN M49)
+          - Eastern Africa (UN M49)
           - Middle Africa (UN M49)
           - Southern Africa (UN M49)
-          - Eastern Africa (UN M49)
-          # NOTE: not aligned to customRegionDisplayOrder yet. These seven regions have no
-          # entry in MapContinentColors, so their colors come from palette *position* —
-          # reordering would silently recolor them. Reorder together with pinning them.
+          - Western Africa (UN M49)
         origins:
           - *origins_un_m49
         presentation:
