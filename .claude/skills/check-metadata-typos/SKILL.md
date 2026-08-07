@@ -121,7 +121,7 @@ cat /tmp/active_snapshot_files.txt | xargs .venv/bin/codespell \
   --ignore-words=.codespell-ignore.txt
 ```
 
-Note: Snapshot `.dvc` files contain metadata in the `meta.source.description` and `meta.source.published_by` fields. ~736 archived snapshots are excluded.
+Note: the prose worth checking in a snapshot `.dvc` lives under `meta.origin` — `description`, `description_snapshot`, `title`, `title_snapshot`, `citation_full`, `attribution`. Older files instead use the deprecated `meta.source.description` / `meta.source.published_by`; both shapes are still in the repo (~2,000 files on `origin`, ~6,000 on `source`). codespell reads the whole file either way, so no filtering is needed — but report hits by their real field path, and don't "fix" a typo by migrating a file from `source` to `origin` (that's a separate change, out of scope here). ~736 archived snapshots are excluded.
 
 **For option 4 (all metadata):**
 
@@ -167,14 +167,16 @@ After presenting results, ask the user:
 
 ### 5. Apply fixes (if user confirms)
 
-For automatic fixes:
+For automatic fixes, let codespell apply its own corrections — it rewrites only the words it flagged, at the positions it flagged them:
 
 ```bash
-# Use sed or Python script to replace typos in files
-# Example: sed -i '' 's/seperate/separate/g' file.meta.yml
+cat /tmp/active_meta_files.txt | xargs .venv/bin/codespell \
+  --ignore-words=.codespell-ignore.txt --write-changes
 ```
 
-For reviewed fixes, confirm each change before applying.
+For reviewed fixes, apply each one with the `Edit` tool, matching enough surrounding words to be unambiguous.
+
+**Never fix with an unanchored `sed` substitution.** `sed -i 's/word/word/g' file` rewrites *every* occurrence in the file, including the ones you decided to ignore — inside URLs, domain names, and ALL-CAPS acronyms (see Notes). It also silently rewrites a word codespell never flagged on that line. `sed -i ''` is BSD-only on top of that, so it breaks on Linux (CI, cloud sandbox) where the same command needs `sed -i`.
 
 ### 6. Verify fixes
 

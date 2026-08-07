@@ -15,6 +15,25 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **Notebooks**: Always create AND execute immediately using `uv run jupyter nbconvert --to notebook --execute --inplace <path>`
 - **Skills**: When creating new skills in `.claude/skills/`, always include `metadata: { internal: true }` in the SKILL.md frontmatter unless the user explicitly asks for the skill to be public. This prevents external skill indexes from crawling and listing our internal skills.
 
+## Start from a skill
+
+Most recurring work here has a skill that runs it end to end. Reach for it **before** hand-rolling from the sections below — those document the underlying mechanics (`etls`, `etlr`, `etl pr`) that the skills already orchestrate, not a procedure to follow in parallel with one. Full descriptions live in `.claude/skills/`; this is just the entry-point index.
+
+| Task | Skill |
+|------|-------|
+| Refresh an existing dataset to a new version | `/update-dataset` |
+| Brand-new dataset from a file or link the user provides | `/create-dataset` |
+| Add a new snapshot (`.dvc`, plus a script only if needed) | `/create-snapshot` |
+| Scaffold meadow/garden/grapher steps for an existing snapshot | `/create-etl-steps` |
+| Bring a legacy (no-catalogPath) dataset into ETL | `/migrate-dataset` |
+| Change user-facing chart/indicator text — title, subtitle, footnote, units, `description_short`, WYSK/`description_key`, entity selection | `/edit-faust-metadata` |
+| Check that text against the Writing and Style Guide | `/check-metadata-style` |
+| Build a multi-dim indicator, or an explorer | `/create-multidim`, `/create-explorer` |
+| Review a dataset-update PR | `/review-data-pr` |
+| Announce a finished update | `/data-updates-comms` |
+
+One that's easy to skip and shouldn't be: `/edit-faust-metadata` owns **every** user-facing-text edit — it routes each field to the right layer (garden `.meta.yml` vs MDim yaml vs chart config on staging) and reports the blast radius on other charts before touching shared metadata.
+
 ## Close every report with what's still open
 
 Multi-step work — updates, audits, reviews, migrations — rarely ends with everything closed. End the report (and the PR body, when there is one) with an explicit open-items block; never make the user ask "what's left?". Keep three buckets separate:
