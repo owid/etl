@@ -83,33 +83,51 @@ snapshots/<namespace>/<version>/<short_name>.py    # removed again when no scrip
 
 Either way the script is a plain `run()` — **no `click` decorators and no `if __name__ == "__main__":` block**. The `etls` CLI imports the module and invokes `run` itself, supplying `--path-to-file` for manual imports. The template already gets this right; the warning matters because many old scripts in the repo still carry the boilerplate — don't copy one of those as a model.
 
-**Generate the files.** Every field confirmed in step 2 goes in as cookiecutter context. Pass **all** the keys below — there is no committed `cookiecutter.json` supplying defaults, so a missing key is a Jinja `UndefinedError`, and an empty string is how you say "omit this field" (the template's `{%- if %}` guards drop it from the output):
+**Generate the files.** Every field confirmed in step 2 goes in as cookiecutter context. Pass **all** the keys below — there is no committed `cookiecutter.json` supplying defaults, so a missing key is a Jinja `UndefinedError`, and an empty string is how you say "omit this field" (the template's `{%- if %}` guards drop it from the output).
+
+**Write the context as JSON with the `Write` tool, then run the generator against that file.** Do not interpolate the field values into a `python -c` program: `citation_full`, `title` and `description` are producer prose, and an apostrophe (`World Bank's`), a double quote, a backslash, or a newline in any of them either breaks the program or silently changes the value before cookiecutter sees it. Producer citations contain apostrophes routinely, so this is the normal case, not an edge case. JSON keeps the prose out of shell and Python literals entirely.
+
+First write `/tmp/snapshot_context.json` (booleans are real JSON `true`/`false`, and `""` means "omit this field"):
+
+```json
+{
+  "channel": "snapshots",
+  "namespace": "<namespace>",
+  "snapshot_version": "<version>",
+  "short_name": "<short_name>",
+  "file_extension": "<file_extension>",
+  "is_private": false,
+  "dataset_manual_import": false,
+  "dvc_only": false,
+  "title": "<title>",
+  "description": "<description>",
+  "title_snapshot": "",
+  "description_snapshot": "",
+  "origin_version": "",
+  "date_published": "<date_published>",
+  "producer": "<producer>",
+  "citation_full": "<citation_full>",
+  "attribution": "",
+  "attribution_short": "<attribution_short>",
+  "url_main": "<url_main>",
+  "url_download": "<url_download>",
+  "date_accessed": "<version>",
+  "license_name": "<license_name>",
+  "license_url": "<license_url>"
+}
+```
+
+Then generate. The only string literal in this program is a fixed path, so no field value can break it:
 
 ```bash
 .venv/bin/python -c "
-from pathlib import Path
+import json
 from apps.utils.files import generate_step
 from apps.wizard.etl_steps.utils import COOKIE_SNAPSHOT
 from etl.paths import SNAPSHOTS_DIR
 
-data = {
-    'channel': 'snapshots',
-    # Paths
-    'namespace': '<namespace>', 'snapshot_version': '<version>',
-    'short_name': '<short_name>', 'file_extension': '<file_extension>',
-    # Flags, from the decision above
-    'is_private': False, 'dataset_manual_import': False, 'dvc_only': False,
-    # Origin — '' means omit. date_accessed is the snapshot version date.
-    'title': '<title>', 'description': '<description>',
-    'title_snapshot': '', 'description_snapshot': '', 'origin_version': '',
-    'date_published': '<date_published>', 'producer': '<producer>',
-    'citation_full': '<citation_full>',
-    'attribution': '', 'attribution_short': '<attribution_short>',
-    'url_main': '<url_main>', 'url_download': '<url_download>',
-    'date_accessed': '<version>',
-    # License — belongs to origin; the template nests it correctly.
-    'license_name': '<license_name>', 'license_url': '<license_url>',
-}
+with open('/tmp/snapshot_context.json') as f:
+    data = json.load(f)
 generate_step(cookiecutter_path=COOKIE_SNAPSHOT, data=data, target_dir=SNAPSHOTS_DIR)
 
 # dvc_only: drop the script the template always writes.
@@ -118,6 +136,8 @@ if data['dvc_only']:
     py.unlink(missing_ok=True)
 "
 ```
+
+Note that `license` belongs to `origin` — the template nests `license_name` / `license_url` correctly, so there is nothing to move afterwards.
 
 Which fields to fill, and when to leave them empty:
 
@@ -131,7 +151,21 @@ Which fields to fill, and when to leave them empty:
 | `license_url` | Empty when the producer states no license anywhere — don't fall back to the landing page |
 | `date_accessed` | The snapshot version date |
 
-**After generating**, two things the template cannot express:
+**After generating**, three things to do:
+
+- **Verify the `.dvc` parses, and fix the quoting if it doesn't.** The template emits `title` and `date_published` as double-quoted scalars and `producer`, `title_snapshot`, `attribution`, `attribution_short` and `license_name` as *plain* (unquoted) ones, none of them escaped. So a `"` in the title, or a `: ` or leading `#` in any plain-scalar field, produces a file that is not valid YAML — a real case, since product titles carry both quotes and colons. `description`, `description_snapshot` and `citation_full` use block scalars and are safe. Always check, and re-quote the offending field by hand (single quotes with `''` doubling, or a `|-` block) when it fails:
+
+  ```bash
+  .venv/bin/python -c "
+  import sys, yaml
+  p = 'snapshots/<namespace>/<version>/<short_name>.<file_extension>.dvc'
+  try:
+      yaml.safe_load(open(p))
+  except yaml.YAMLError as e:
+      sys.exit(f'{p} is not valid YAML — re-quote the offending field:\n{e}')
+  print(f'{p}: valid YAML')
+  "
+  ```
 
 - Tidy the end of the `.dvc`. The template's final `{%- endif -%}` leaves a whitespace-only line (`"  "`) after the license block, and for a private snapshot the file also ends without a final newline. Both parse fine as YAML, but committed files shouldn't carry either: drop the whitespace-only line and make sure the file ends with exactly one `\n`.
 - Add any `#` comments this skill calls for: the companion-files `# NOTE:` above `url_download` (step 6), and a one-line note when `citation_full`'s year deliberately differs from `date_published` (step 5).

@@ -70,7 +70,7 @@ git_name = subprocess.check_output(['git', 'config', 'user.name'], text=True).st
 owner = resolve_owner(git_name)
 # The garden .meta.yml only renders an `owners:` block when `owner` is truthy, so an
 # unresolved name would silently produce metadata with no accountable owner.
-assert owner, f'resolve_owner() did not recognise git user.name={git_name!r} — ask for a canonical owner'
+assert owner, f'resolve_owner() did not recognize git user.name={git_name!r} — ask for a canonical owner'
 
 common = {
     'namespace': namespace,
@@ -107,7 +107,7 @@ Notes on this call:
 
 - **Run the channels one at a time, never concurrently.** `generate_step` writes a temporary `cookiecutter.json` into the template directory and deletes it afterwards, so two simultaneous runs corrupt each other's context.
 - **Every variable a template references must be present in `data`.** There is no committed `cookiecutter.json` supplying defaults, so a missing key is a Jinja `UndefinedError`, not a silent blank. The dicts above are what `apps/wizard/etl_steps/forms.py:309` passes; if a template gains a variable, it has to be added here too.
-- **If the `owner` assert fires, stop and ask** which colleague is the accountable owner, then set `owner` to that canonical name and re-run. `resolve_owner` only recognises the git identities in `etl/owners.py`, so it returns `None` on an unmapped `git config user.name` — a cloud sandbox, a fresh checkout, or a name spelled differently from the enum. The wizard form degrades to an empty string there, but it has a human in front of it who can see the missing block; a skill run does not, and CLAUDE.md requires `owners` on every dataset. Pick the name from the `schemas/dataset-schema.json` enum, and add the git identity to `etl/owners.py` if it is a colleague who is simply missing from the map.
+- **If the `owner` assert fires, stop and ask** which colleague is the accountable owner, then set `owner` to that canonical name and re-run. `resolve_owner` only recognizes the git identities in `etl/owners.py`, so it returns `None` on an unmapped `git config user.name` — a cloud sandbox, a fresh checkout, or a name spelled differently from the enum. The wizard form degrades to an empty string there, but it has a human in front of it who can see the missing block; a skill run does not, and CLAUDE.md requires `owners` on every dataset. Pick the name from the `schemas/dataset-schema.json` enum, and add the git identity to `etl/owners.py` if it is a colleague who is simply missing from the map.
 - `generate_step` prints the context dictionary to stdout, and importing `apps.wizard` logs a `No runtime found, using MemoryCacheStorageManager` warning from Streamlit. Both are expected noise, not errors.
 - Use `/create-playground` if the user does want a playground notebook, rather than keeping the cookiecutter's copy.
 
@@ -126,7 +126,7 @@ Append the following entries to `dag/<dag_file>.yml` under the `steps:` key, usi
     - data://garden/<namespace>/<version>/<short_name>
 ```
 
-**The snapshot URI has its own prefix, driven by the snapshot's `.dvc`, not by `is_private`.** A snapshot whose `.dvc` sets `is_public: false` is referenced as `snapshot-private://`; everything else as `snapshot://`. Read `is_public` out of each `.dvc` rather than assuming — a private dataset is normally built on private snapshots, but the two flags are independent, and a public snapshot can feed a private dataset. Getting this wrong is silent: `snapshot-private://` builds a `SnapshotStepPrivate`, whose `run()` asserts `is_public is False` before pulling, and `--private` filtering keys off the prefix too, so a private snapshot mislabelled `snapshot://` loses that assert and is no longer excluded from a public run. Every one of the 294 private snapshots in the active DAG uses `snapshot-private://`, with no exceptions — a plain `snapshot://` on a private snapshot would be the first.
+**The snapshot URI has its own prefix, driven by the snapshot's `.dvc`, not by `is_private`.** A snapshot whose `.dvc` sets `is_public: false` is referenced as `snapshot-private://`; everything else as `snapshot://`. Read `is_public` out of each `.dvc` rather than assuming — a private dataset is normally built on private snapshots, but the two flags are independent, and a public snapshot can feed a private dataset. Getting this wrong is silent: `snapshot-private://` builds a `SnapshotStepPrivate`, whose `run()` asserts `is_public is False` before pulling, and `--private` filtering keys off the prefix too, so a private snapshot mislabeled `snapshot://` loses that assert and is no longer excluded from a public run. Every one of the 294 private snapshots in the active DAG uses `snapshot-private://`, with no exceptions — a plain `snapshot://` on a private snapshot would be the first.
 
 List every snapshot from step 2 as a dependency of the meadow step, not just the first.
 

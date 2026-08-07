@@ -80,7 +80,9 @@ echo "Total files to check: $(wc -l < /tmp/active_meta_files.txt)"
 
 ### 2. Run codespell with ignore list and exclusions
 
-Use the existing `.codespell-ignore.txt` file to filter out domain-specific terms:
+Use the existing `.codespell-ignore.txt` file to filter out domain-specific terms.
+
+**Whichever option the user picked, write that scope's file list to `/tmp/codespell_targets.txt` and check it.** Steps 5 and 6 reuse that one file, so the fix and the verification cannot act on a wider scope than the check did. Never point a later step at a different list.
 
 **For option 1 (current step only):**
 
@@ -91,9 +93,13 @@ Use the existing `.codespell-ignore.txt` file to filter out domain-specific term
 ```bash
 # For specific step (option 1)
 STEP_PATH="<user_provided_path>"  # e.g., etl/steps/data/garden/energy/2025-06-27/electricity_mix
-.venv/bin/codespell "${STEP_PATH}"/*.meta.yml \
+find "${STEP_PATH}" -maxdepth 1 -name "*.meta.yml" > /tmp/codespell_targets.txt
+
+cat /tmp/codespell_targets.txt | xargs .venv/bin/codespell \
   --ignore-words=.codespell-ignore.txt
 ```
+
+Use `find`, not `ls <path>/*.meta.yml`: under zsh a glob that matches nothing aborts the command before the redirect, leaving no target file at all (and a stale one from an earlier run would then be reused). If the list comes back empty, tell the user the step has no `.meta.yml` instead of falling through to a wider scope.
 
 **For option 2 (all ETL metadata - garden, meadow, grapher):**
 
@@ -102,9 +108,9 @@ STEP_PATH="<user_provided_path>"  # e.g., etl/steps/data/garden/energy/2025-06-2
 find etl/steps/data/garden -name "*.meta.yml" > /tmp/all_step_files.txt
 find etl/steps/data/meadow -name "*.meta.yml" >> /tmp/all_step_files.txt
 find etl/steps/data/grapher -name "*.meta.yml" >> /tmp/all_step_files.txt
-grep -vFf /tmp/archived_files.txt /tmp/all_step_files.txt > /tmp/active_step_files.txt
+grep -vFf /tmp/archived_files.txt /tmp/all_step_files.txt > /tmp/codespell_targets.txt
 
-cat /tmp/active_step_files.txt | xargs .venv/bin/codespell \
+cat /tmp/codespell_targets.txt | xargs .venv/bin/codespell \
   --ignore-words=.codespell-ignore.txt
 ```
 
@@ -115,9 +121,9 @@ Note: Excluding archived steps reduces the scope by ~3,570 files and focuses on 
 ```bash
 # For all snapshot metadata (option 3)
 find snapshots -name "*.dvc" > /tmp/all_snapshot_files.txt
-grep -vFf /tmp/archived_files.txt /tmp/all_snapshot_files.txt > /tmp/active_snapshot_files.txt
+grep -vFf /tmp/archived_files.txt /tmp/all_snapshot_files.txt > /tmp/codespell_targets.txt
 
-cat /tmp/active_snapshot_files.txt | xargs .venv/bin/codespell \
+cat /tmp/codespell_targets.txt | xargs .venv/bin/codespell \
   --ignore-words=.codespell-ignore.txt
 ```
 
@@ -128,7 +134,9 @@ Note: the prose worth checking in a snapshot `.dvc` lives under `meta.origin` �
 ```bash
 # For all metadata - ETL and snapshots (option 4)
 # Use the active_meta_files.txt created in step 1
-cat /tmp/active_meta_files.txt | xargs .venv/bin/codespell \
+cp /tmp/active_meta_files.txt /tmp/codespell_targets.txt
+
+cat /tmp/codespell_targets.txt | xargs .venv/bin/codespell \
   --ignore-words=.codespell-ignore.txt
 ```
 
@@ -167,12 +175,14 @@ After presenting results, ask the user:
 
 ### 5. Apply fixes (if user confirms)
 
-For automatic fixes, let codespell apply its own corrections — it rewrites only the words it flagged, at the positions it flagged them:
+For automatic fixes, let codespell apply its own corrections — it rewrites only the words it flagged, at the positions it flagged them. Run it over `/tmp/codespell_targets.txt`, the list step 2 wrote for the scope the user chose:
 
 ```bash
-cat /tmp/active_meta_files.txt | xargs .venv/bin/codespell \
+cat /tmp/codespell_targets.txt | xargs .venv/bin/codespell \
   --ignore-words=.codespell-ignore.txt --write-changes
 ```
+
+**Never widen the scope here.** `--write-changes` rewrites every file it is given, so pointing this at `/tmp/active_meta_files.txt` (the option-4 list) after the user asked for one step would silently edit thousands of unrelated files. The list must be the one that produced the reported typos — if `/tmp/codespell_targets.txt` is missing or you are unsure it matches, re-run step 2 for the chosen option before fixing anything.
 
 For reviewed fixes, apply each one with the `Edit` tool, matching enough surrounding words to be unambiguous.
 
@@ -180,13 +190,14 @@ For reviewed fixes, apply each one with the `Edit` tool, matching enough surroun
 
 ### 6. Verify fixes
 
-After applying fixes, re-run codespell to verify all typos were corrected:
+After applying fixes, re-run codespell over the same scope to verify all typos were corrected:
 
 ```bash
-.venv/bin/codespell <path> --ignore-words=.codespell-ignore.txt
+cat /tmp/codespell_targets.txt | xargs .venv/bin/codespell \
+  --ignore-words=.codespell-ignore.txt
 ```
 
-Should return 0 results.
+Should return 0 results. If the user chose to review typos one by one and deliberately skipped some, expect exactly those to remain — say which, rather than reporting the check as failed.
 
 ### 7. Clean up
 
