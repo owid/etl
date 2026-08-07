@@ -652,27 +652,26 @@ def write_markdown(
             lines += gdoc_table(group) if all(f["doc_edit_url"] for f in group) else bullet_list(group)
             lines.append("")
 
-    # Nothing in this audit is applied by running it, and its coverage is not total — so it
-    # closes by separating what someone must act on from what nobody has checked, rather
-    # than leaving a reader to infer either from the sections above.
-    handed_off = (
-        f"**Handed off** — {len(embeds)} embedded reference(s), in every 🔴 section above. Each names the "
-        "surface that holds it and the replacement URL to put there; whoever owns it has to make the edit, "
-        "because unpublishing the chart breaks it and the redirect does not cover it. `preflight.py` gates "
-        "on this same set."
+    # Nothing in this audit is applied by running it, so it closes with the one call to action
+    # (the embeds a redirect cannot save) and then what the sweep did not reach. The counts
+    # restate the sections above on purpose — the coverage note is the part a reader cannot
+    # infer from them, and silence there would read as "everything was checked".
+    must_act = (
+        f"{len(embeds)} embedded reference(s) need a manual edit before the charts are unpublished — see every "
+        "🔴 section above, each naming the surface that holds it and the replacement URL to put there. A redirect "
+        "does not cover an embed. `preflight.py` gates on this same set."
         if embeds
-        else "**Handed off** — nothing. No reference needs manual migration before the charts are unpublished."
+        else "No reference needs manual migration before the charts are unpublished."
     )
-    proposed = (
-        f"**Proposed** — {len(links)} link-kind reference(s) in the 🟡 sections above"
+    covered_by_redirect = (
+        f"The 301 keeps the {len(links)} link-kind reference(s) in the 🟡 sections working"
         + (f", including {len(narrative)} narrative chart(s) to recreate" if narrative else "")
-        + ". The 301 keeps every one of them working, so acting on each is a call someone still has to "
-        "make, not a blocker."
+        + ", so updating each is a call someone can make later, not a blocker."
         if links
-        else "**Proposed** — nothing. No link updates are pending a decision."
+        else "No link updates are pending a decision."
     )
-    unverified = (
-        "**Unverified** — this audit does not cover non-ETL explorer TSVs, data insights that store the "
+    not_covered = (
+        "This audit does not cover non-ETL explorer TSVs, data insights that store the "
         "reference somewhere other than the surfaces swept here, or charts nested inside layout containers; "
         "see the `find-chart-references` skill for the full surface catalog and its known gaps. "
         f"{len(drafts)} unpublished or draft reference(s) were found and listed but not graded for reader impact. "
@@ -694,7 +693,7 @@ def write_markdown(
         "uses an old one).",
         "",
     ]
-    lines += ["## What's still open", "", handed_off, "", proposed, "", unverified, ""]
+    lines += [must_act, "", covered_by_redirect, "", "## What this sweep didn't cover", "", not_covered, ""]
     # Gaps the sweep hit at RUN time, as opposed to the standing ones named above. Silence
     # here would read as "everything was checked", which is the one wrong signal this
     # section can send — so they are listed individually, not folded into the prose.
@@ -814,7 +813,9 @@ def main() -> int:
           f"links to update: {counts[YELLOW]} | no action (all-charts blocks): {n_allcharts} | "
           f"drafts: {counts[INFO] - n_allcharts})")  # fmt: skip
     if gaps:
-        print(f"  {len(gaps)} surface(s)/subject(s) were NOT swept — see 'What's still open' in the report.")
+        print(
+            f'  {len(gaps)} surface(s)/subject(s) were NOT swept — see "What this sweep didn\'t cover" in the report.'
+        )
     collisions = [f for f in findings if f["param_collisions"]]
     if collisions:
         print(f"\n⚠️  {len(collisions)} reference(s) carry query params that collide with the view's dimensions:")

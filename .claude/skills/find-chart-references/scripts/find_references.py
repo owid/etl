@@ -85,7 +85,7 @@ ARCHIVE_HOST = "archive.ourworldindata.org"
 # Surfaces this run could NOT sweep, and subjects that did not resolve. An empty result for
 # any of these means UNKNOWN, not "nothing references it", so they must survive past stdout:
 # they go into the `--markdown` report's "Not searched" section, and `--gaps-json` hands them
-# to whatever wraps this script (audit_references.py puts them in its own Unverified bucket).
+# to whatever wraps this script (audit_references.py lists them under "What this sweep didn't cover").
 # Otherwise a truncated sweep reads as a complete audit.
 COVERAGE_GAPS: list[str] = []
 
