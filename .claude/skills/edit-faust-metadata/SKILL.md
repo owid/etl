@@ -215,7 +215,7 @@ Like the parent edit itself, child fixes land on **staging only** and ride chart
     - PR description via `gh pr edit` — first line is the attribution blockquote (`> _Written by Claude <model name> — @<handle> at the wheel._`), then: what changed and why (public facts only), the blast-radius summary, any route-(c) DB-only edits (they have **no file diff** — describe them explicitly and note they ride to production via chart-diff approval), and any `#dod:` follow-ups ("create in admin");
     - if the PR has committed files: post a bare `@codex review` comment, record its exact timestamp, and spawn the `pr-babysitter` skill's background agent to watch CI, judge/fix findings, reply + resolve threads;
     - if the PR is DB-only (zero committed files): skip Codex entirely and tell the user the path to production is chart-diff approval in the Wizard + merge;
-    - **suggest a human reviewer from the dataset's owners.** Read `dataset.owners` in the garden `.meta.yml` of every dataset the edit touches (first entry = accountable owner). More than one candidate → show the options and let the user choose, never pick for them; exactly one → name them and ask to confirm; the only owner being the user directing the work → say so instead of proposing a self-review. Add with `gh pr edit <n> --add-reviewer <handle>`, resolving handles from CLAUDE.md's team table (never guess a handle — a wrong one pings a real person). Carry the ask into the open-items block as a handed-off item until it's requested or declined.
+    - **suggest a human reviewer from the dataset's owners.** Read `dataset.owners` in the garden `.meta.yml` of every dataset the edit touches (first entry = accountable owner). More than one candidate → show the options and let the user choose, never pick for them; exactly one → name them and ask to confirm; the only owner being the user directing the work → say so instead of proposing a self-review. Add with `gh pr edit <n> --add-reviewer <handle>`, resolving handles from CLAUDE.md's team table (never guess a handle — a wrong one pings a real person). Carry the ask forward as an open item until it's requested or declined.
 
 ## Metadata quality checks (before the checkpoint)
 
@@ -248,9 +248,9 @@ Scoping rules specific to this skill:
 - Route (c) staging chart edits appear in **chart-diff**; they are synced to production by chart-sync only after approval in the Wizard + merge. Remind the user of the pending approval.
 - Never point a write at `admin.owid.io` or the production DB. The guard in `update_chart_config.py` enforces this; don't work around it.
 
-### Always close with what's still open
+### Close with what's still open
 
-End the checkpoint and the final hand-off with the open-items block defined in CLAUDE.md ("Close every report with what's still open") — in the PR body as well as chat. This skill's usual danglers: `#dod:` terms to create in admin and editorial calls on pin-coupled text (handed off), the checkpoint diff itself and route-(c) chart-diff approval in the Wizard (proposed — easy to leave dangling because the merge doesn't force it), and checks scoped out or staging surfaces not previewed (unverified).
+End the checkpoint and the final hand-off by saying what's still open — a line or two in chat, written out in the PR body when there is one. `.claude/docs/open-items.md` lists what tends to get dropped. This skill's usual danglers: `#dod:` terms to create in admin and editorial calls on pin-coupled text (waiting on someone else), the checkpoint diff itself and route-(c) chart-diff approval in the Wizard (waiting on a decision — easy to leave dangling because the merge doesn't force it), and checks scoped out or staging surfaces not previewed (nobody checked it).
 
 ## The guarded chart editor (route c)
 
