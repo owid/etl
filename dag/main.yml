@@ -650,6 +650,7 @@ include:
   - dag/open_numbers.yml
   - dag/faostat.yml
   - dag/energy.yml
+  - dag/energy_legacy.yml
   - dag/wizard.yml
   - dag/emissions.yml
   - dag/papers.yml
