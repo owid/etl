@@ -136,11 +136,17 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         // Removing the command decorator alone would leave orphaned `@click.option` lines and
         // break the script, so the message asks for the whole stack.
         //
+        // 29 of the 1171 commands carry options beyond `--upload/--skip-upload` and
+        // `--path-to-file` (e.g. `--clear-cache`, `--max-workers`, `--path-to-folder`).
+        // `_call_snapshot_function` never passes those, so they already run at their click
+        // defaults; the message tells you to carry each one over as a keyword parameter with
+        // that same default, which keeps behaviour identical instead of dropping the control.
+        //
         // SNAPSHOT_SCOPE rather than 'snapshots/**' alone, so the snapshot cookiecutter is covered
         // too. It has been click-free since the commit that added `etls` (which is what made the
         // CLI wrapper redundant), so this is drift protection, not a current gap.
         pattern: /@click\.command/g,
-        message: '`@click` decorators are outdated in snapshot files. The `etls` CLI imports the module and calls `run()` itself, so the CLI wrapper is redundant. Remove the whole decorator stack — `@click.command(...)` and every `@click.option(...)` above the function — and leave a plain `def run(upload: bool = True) -> None:` (add `path_to_file: str | None = None` for a manual import). Existing click-decorated scripts still work, because the runner also accepts a click command, so this is a cleanup rather than a break.',
+        message: '`@click` decorators are outdated in snapshot files. The `etls` CLI imports the module and calls `run()` itself, so the CLI wrapper is redundant. Remove the whole decorator stack — `@click.command(...)` and every `@click.option(...)` above the function — and leave a plain `def run(upload: bool = True) -> None:` (add `path_to_file: str | None = None` for a manual import). If the command carries any other options, keep each one as a keyword parameter with the same default it had — `etls` only ever passes `--skip-upload` and `--path-to-file`, so those defaults are already what runs today, and carrying them over keeps behaviour identical rather than dropping the control. Existing click-decorated scripts still work, because the runner also accepts a click command, so this is a cleanup rather than a break.',
         severity: vscode.DiagnosticSeverity.Warning,
         scope: SNAPSHOT_SCOPE
     },
