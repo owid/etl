@@ -62,6 +62,23 @@ steps:
   export://explorers/migration/latest/migration_flows:
     - data://grapher/un/2025-03-18/migration_stock_flows
 
+  # Migration multidims
+  export://multidim/migration/latest/migrant_populations:
+    - data://grapher/un/2025-03-12/migrant_stock
+
+  export://multidim/migration/latest/net_migration:
+    - data://grapher/un/2024-07-12/un_wpp
+
+  export://multidim/migration/latest/asylum_seekers_and_refugees:
+    - data://grapher/un/2025-07-03/refugee_data
+
+  export://multidim/migration/latest/internal_displacement:
+    - data://grapher/idmc/2026-01-19/internal_displacement
+    - data://grapher/un/2025-07-03/refugee_data
+
+  export://multidim/migration/latest/remittances:
+    - data://grapher/worldbank_wdi/2026-07-14/wdi
+
   #Refugee, Asylum and Migration Explorer (2026 Jan update):
   export://explorers/migration/2026-01-27/migration:
     # UNICEF child migration data (up to 2024)
