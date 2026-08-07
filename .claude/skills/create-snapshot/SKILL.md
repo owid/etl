@@ -153,7 +153,7 @@ Which fields to fill, and when to leave them empty:
 
 **After generating**, three things to do:
 
-- **Verify the `.dvc` parses, and fix the quoting if it doesn't.** The template emits `title` and `date_published` as double-quoted scalars and `producer`, `title_snapshot`, `attribution`, `attribution_short` and `license_name` as *plain* (unquoted) ones, none of them escaped. So a `"` in the title, or a `: ` or leading `#` in any plain-scalar field, produces a file that is not valid YAML — a real case, since product titles carry both quotes and colons. `description`, `description_snapshot` and `citation_full` use block scalars and are safe. Always check, and re-quote the offending field by hand (single quotes with `''` doubling, or a `|-` block) when it fails:
+- **Verify the `.dvc` parses.** The template escapes the single-line fields it quotes (`title`, `producer`, `title_snapshot`, `attribution`, `attribution_short`, `version_producer`, `license_name`) and uses block scalars for the multi-line prose (`description`, `description_snapshot`, `citation_full`), so ordinary producer text — quotes, colons, `#`, backslashes — round-trips correctly. This check is therefore a cheap guard, not a workaround for a known gap: if it ever fails, the bug is in the template's escaping and belongs upstream in `apps/wizard/etl_steps/cookiecutter/snapshot/`, not in a hand-fix to the generated file.
 
   ```bash
   .venv/bin/python -c "
