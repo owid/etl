@@ -104,26 +104,11 @@ This creates the branch + a draft PR and does **not** commit. (If the user is on
 This is a **manual-import** snapshot (you hand the snapshot a local file rather than relying on a stable download URL — even for web inputs, you've already saved the file locally in Step 1). Use the file's real extension in the `.dvc` name (`.csv`, `.xlsx`, …). Follow `/create-snapshot` conventions, with these specifics:
 
 - `snapshots/<namespace>/<version>/<short_name>.<ext>.dvc` — fill `origin` from Step 2 (title, producer, citation_full, attribution_short, date_published, url_main, license). `description` must describe the data product factually — use the producer's own text when it is factual (page prose or paper abstract), but rewrite promotional or first-person copy from OWID's point of view (see `/create-snapshot`) — and `citation_full` the producer's recommended citation verbatim when one exists (slight modifications only to fix typos or spacing in the source); for the license, check the documentation too and warn the user if none is stated anywhere (fall back to `© <producer> (<year>)`); if the file is one table/extract of a broader product, use `title_snapshot` + `description_snapshot` for the file specifics and any OWID-side notes (see `/create-snapshot`). Set `date_accessed: <version>`. Omit fields you don't have rather than leaving them blank; use `TBD` placeholders only where the review needs to flag them.
-- `snapshots/<namespace>/<version>/<short_name>.py` — modern manual-import script. **No `click` decorators and no `if __name__ == "__main__"` block** — `etls` wraps a plain `run(upload, path_to_file)` and supplies the CLI itself:
+- `snapshots/<namespace>/<version>/<short_name>.py` — the manual-import script.
 
-```python
-"""Script to create a snapshot of dataset.
+**Generate both files with the command in `/create-snapshot` step 3**, passing `dataset_manual_import: True` and `dvc_only: False`. It runs the wizard's snapshot cookiecutter, which emits the `path_to_file` variant of `run()` and — the part that is easy to get wrong by hand — nests `license` inside `origin` rather than at the top level. Don't hand-write either file, and don't copy a template into this skill: the cookiecutter is the single source of truth, and copies drift.
 
-The data file is provided manually. Run with:
-  etls <namespace>/<version>/<short_name> --path-to-file <path>
-"""
-
-from etl.helpers import PathFinder
-
-paths = PathFinder(__file__)
-
-
-def run(upload: bool = True, path_to_file: str | None = None) -> None:
-    snap = paths.init_snapshot()
-    snap.create_snapshot(filename=path_to_file, upload=upload)
-```
-
-Run it against the user's file:
+Then run it against the user's file:
 
 ```bash
 .venv/bin/etls <namespace>/<version>/<short_name> --path-to-file "<path_to_file>"

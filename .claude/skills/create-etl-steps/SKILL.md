@@ -137,14 +137,15 @@ with open(dag_path, "w") as f:
     f.write(ruamel_dump(data))
 ```
 
-### 6. Run the checks on the generated files
+### 6. Name the checks the filled-in steps will need
 
-New step files get checked here the same way they do when `/create-dataset` (Step 5) and `/update-dataset` (step 1b) generate them — a standalone run of this skill must not be the one path that produces unchecked step files.
+**Don't run `/check-outdated-practices` here.** What this skill produces is untouched cookiecutter output, and the templates are verified clean against the detector's full pattern set — so running it on the scaffold is a guaranteed no-op. The patterns it looks for enter when the scaffold is *adapted*: real load logic, harmonization, aggregations, hand-copied helper modules like `*_omms.py`. That's why `/create-dataset` runs it at its Step 5, after adapting these files, and `/update-dataset` runs it at step 1b on files `etl update` carried over from the previous version — neither of which is scaffold output.
 
-Run `/check-outdated-practices` on every generated `.py`. The templates should come back clean; a hit means the template itself has drifted, and the fix belongs in `apps/wizard/etl_steps/cookiecutter/`, not only in the generated file.
+Template drift is covered by the detector itself rather than by a check here: `apps/wizard/**/cookiecutter/**` is in the scope of every pattern, so a stale practice in a template shows up in the editor as soon as someone opens it.
 
-The metadata checks have nothing to bite on yet — the scaffolded `.meta.yml` is entirely commented out. Name them in the report as the checks to run once the steps are filled in:
+So report the checks the person will need once the steps do something, rather than running them on empty files. The metadata checks in particular have nothing to bite on yet — the scaffolded `.meta.yml` is entirely commented out:
 
+- `/check-outdated-practices` — **after** adapting the step `.py` files, and on any helper module copied in by hand
 - `/check-metadata-style` — user-facing text against the Writing and Style Guide
 - `/check-metadata-typos` — spelling
 - `/check-metadata-spacing` — Jinja rendering artifacts, once the metadata uses templates
@@ -153,7 +154,7 @@ Also flag `.claude/rules/sanity-checks.md` if the garden step will do more than 
 
 ### 7. Report to the user
 
-List all files created and the DAG entries added, the result of the outdated-practices check, and the deferred checks from step 6. Suggest running:
+List all files created and the DAG entries added, and the deferred checks from step 6 — saying plainly that nothing has been checked yet because there is nothing to check, so the next person doesn't read silence as a clean bill of health. Suggest running:
 
 ```bash
 .venv/bin/etlr <namespace>/<version>/<short_name> --private

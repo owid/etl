@@ -16,6 +16,16 @@ interface OutdatedPattern {
     scope?: string | string[];
 }
 
+// The wizard's cookiecutter templates generate the files the scopes below cover, so a stale
+// practice in a template propagates to every step or snapshot created from it — and is invisible
+// to a check that only looks at the generated output. Scoping the templates in as well means
+// drift surfaces when someone opens the template. One glob covers both template trees
+// (apps/wizard/etl_steps/cookiecutter/** and apps/wizard/app_pages/fasttrack/cookiecutter/**),
+// since ** spans path separators.
+const COOKIECUTTER_SCOPE = 'apps/wizard/**/cookiecutter/**';
+const STEP_SCOPE = ['etl/steps/data/**', COOKIECUTTER_SCOPE];
+const SNAPSHOT_SCOPE = ['snapshots/**', COOKIECUTTER_SCOPE];
+
 const OUTDATED_PATTERNS: OutdatedPattern[] = [
     {
         // Matches dest_dir in various contexts:
@@ -27,7 +37,7 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         pattern: /dest_dir(?=[,):\s]|["'])/g,
         message: 'Use of `dest_dir` is outdated. Use paths.create_dataset, which does not need dest_dir.',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'
+        scope: STEP_SCOPE
     },
     {
         // Matches geo.harmonize_countries (from etl.data_helpers import geo)
@@ -37,7 +47,7 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         pattern: /geo\.harmonize_countries\(/g,
         message: '`geo.harmonize_countries` is outdated. Use `paths.regions.harmonize_names(tb)` instead.',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'
+        scope: STEP_SCOPE
     },
     {
         // Matches geo.add_population_to_table (deprecated per its own docstring).
@@ -47,7 +57,7 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         pattern: /geo\.add_population_to_table\(/g,
         message: '`geo.add_population_to_table` is outdated. Use `paths.regions.add_population(tb)` instead (auto-resolves the population dataset from the DAG; for per-capita indicators, prefer `paths.regions.add_per_capita(tb)`).',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'
+        scope: STEP_SCOPE
     },
     {
         // Matches geo.add_regions_to_table (deprecated per its own docstring).
@@ -57,7 +67,7 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         pattern: /geo\.add_regions_to_table\(/g,
         message: '`geo.add_regions_to_table` is outdated. Use `paths.regions.add_aggregates(tb, ...)` instead (auto-resolves regions and income_groups from the DAG).',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'
+        scope: STEP_SCOPE
     },
     {
         // Matches geo.add_region_aggregates (older sibling of add_regions_to_table).
@@ -65,7 +75,7 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         pattern: /geo\.add_region_aggregates\(/g,
         message: '`geo.add_region_aggregates` is outdated. Use `paths.regions.add_aggregates(tb, ...)` instead (auto-resolves regions and income_groups from the DAG).',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'
+        scope: STEP_SCOPE
     },
     {
         // Matches geo.list_countries_in_region.
@@ -74,7 +84,7 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         pattern: /geo\.list_countries_in_region(?!_that_must_have_data)\(/g,
         message: '`geo.list_countries_in_region` is outdated. Use `paths.regions.get_region(<name>)` instead (auto-resolves regions from the DAG).',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'
+        scope: STEP_SCOPE
     },
     {
         // Matches geo.list_countries_in_region_that_must_have_data.
@@ -83,7 +93,7 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         pattern: /geo\.list_countries_in_region_that_must_have_data\(/g,
         message: '`geo.list_countries_in_region_that_must_have_data` is deprecated and no replacement is currently implemented. Inline the country-selection logic locally and flag this for follow-up.',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'
+        scope: STEP_SCOPE
     },
     {
         // Matches geo.interpolate_table.
@@ -91,7 +101,7 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         pattern: /geo\.interpolate_table\(/g,
         message: '`geo.interpolate_table` is outdated. Use `etl.data_helpers.misc.interpolate_table` instead.',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'
+        scope: STEP_SCOPE
     },
     {
         // Matches paths.load_dependency
@@ -101,7 +111,7 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         pattern: /paths\.load_dependency\(/g,
         message: '`paths.load_dependency` is outdated. Use `paths.load_dataset` or `paths.load_snapshot` instead.',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'
+        scope: STEP_SCOPE
     },
     {
         // Matches if __name__ == "__main__" in snapshot files
@@ -112,7 +122,7 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         pattern: /if\s+(__name__|["']__main__["'])\s*==\s*(["']__main__["']|__name__)/g,
         message: '`if __name__ == "__main__"` blocks are outdated in snapshot files. Remove it, as you no longer need it. You can now run snapshots directly with `etls` (or `etl snapshot`) command.',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'snapshots/**'
+        scope: SNAPSHOT_SCOPE
     },
     {
         // Matches .set_index(...) used to finalize a table before create_dataset.
@@ -131,7 +141,7 @@ const OUTDATED_PATTERNS: OutdatedPattern[] = [
         pattern: /\.set_index\([^()]*\)(?!\s*[.\[])/g,
         message: '`set_index` is outdated for finalizing a table. Use `tb.format()` instead, which sets the index and also sorts rows, checks the key is unique, and normalizes column names/types. `format()` expects `country` and `year` by default; pass custom keys with `tb.format(["disease", "year"])`. For year-less tables use `set_index("country")` plus `tb.metadata.short_name`.',
         severity: vscode.DiagnosticSeverity.Warning,
-        scope: 'etl/steps/data/**'
+        scope: STEP_SCOPE
     }
 ];
 
@@ -269,7 +279,7 @@ export function activate(context: vscode.ExtensionContext) {
         // Table. This `load_dataset` signal is more reliable than a name heuristic: it flags genuine
         // reads (including in non-assignment positions) while never flagging Table/DataFrame column
         // access (e.g. after `ds_x = ds_x["t"].reset_index()`, a later `ds_x["col"]` is not flagged).
-        if (matchesScope(document.uri.fsPath, 'etl/steps/data/**')) {
+        if (matchesScope(document.uri.fsPath, STEP_SCOPE)) {
             const datasetVars = new Set<string>();
             const assignRe = /^\s*(\w+)\s*=\s*(.*)$/;
             for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {

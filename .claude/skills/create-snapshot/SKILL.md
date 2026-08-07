@@ -9,7 +9,7 @@ metadata:
 
 Create a new ETL snapshot from a source URL: fetch the page, infer metadata, confirm with the user, write the `.dvc` file (plus a `.py` script only when one is genuinely needed), then run the snapshot.
 
-> **Paired skill — keep in sync.** [`/create-dataset`](../create-dataset/SKILL.md) consumes the conventions defined here (its Step 4 builds the snapshot for a full dataset chain): whenever you change the `.dvc` field guidance, the script templates, or the workflow in this file, check whether `create-dataset/SKILL.md` needs a matching edit (and make it in the same commit if so). The reverse also holds — see the mirror note there. The update-side skills are part of the same family: the fields written here are exactly what [`/update-dataset`](../update-dataset/SKILL.md) §6c re-checks on every version bump and what [`/review-data-pr`](../review-data-pr/SKILL.md) §5 compares old-vs-new at review time — keep the field guidance consistent across all of them.
+> **Paired skill — keep in sync.** [`/create-dataset`](../create-dataset/SKILL.md) consumes the conventions defined here (its Step 4 builds the snapshot for a full dataset chain, reusing this skill's step 3 generator call with `dataset_manual_import: True`): whenever you change the `.dvc` field guidance, the cookiecutter context, or the workflow in this file, check whether `create-dataset/SKILL.md` needs a matching edit (and make it in the same commit if so). The reverse also holds — see the mirror note there. The update-side skills are part of the same family: the fields written here are exactly what [`/update-dataset`](../update-dataset/SKILL.md) §6c re-checks on every version bump and what [`/review-data-pr`](../review-data-pr/SKILL.md) §5 compares old-vs-new at review time — keep the field guidance consistent across all of them.
 
 ## Inputs
 
@@ -63,106 +63,80 @@ Present the inferred metadata and ask the user to fill in or correct:
 
 Present this as a summary block so the user can quickly scan and correct individual fields. Wait for confirmation before proceeding.
 
-### 3. Write the files
+### 3. Generate the files
 
-Once the user confirms, compute:
-```
-snapshot_dir = snapshots/<namespace>/<version>/
-dvc_path     = snapshots/<namespace>/<version>/<short_name>.<file_extension>.dvc
-py_path      = snapshots/<namespace>/<version>/<short_name>.py   # only when a script is needed — see below
-```
+Once the user confirms, generate both files from the wizard's snapshot cookiecutter — the same templates the wizard's snapshot page uses.
 
-Create the directory if it doesn't exist.
+> **Never hand-write these files, and never copy the templates into this file.** `apps/wizard/etl_steps/cookiecutter/snapshot/` is the single source of truth. Hand-copied templates drift: an earlier version of this skill carried its own copies, and the manual-import one had already lost the canonical docstring. The template also gets details right that are easy to fluff by hand — most importantly `license` nested **inside** `origin` (CLAUDE.md's most-repeated snapshot mistake, and a schema `not`-constraint plus `test_snapshot_license_lives_under_origin` exist because of it), and `is_public: false` for a private snapshot.
+
+Files produced:
+```
+snapshots/<namespace>/<version>/<short_name>.<file_extension>.dvc
+snapshots/<namespace>/<version>/<short_name>.py    # removed again when no script is needed — see below
+```
 
 **Decide whether a `.py` script is needed** (CLAUDE.md, "No `.py` for simple downloads"):
 
-- **Plain `url_download`, no custom logic** → write **only the `.dvc`**. `etls <namespace>/<version>/<short_name>` runs it straight from the `.dvc`. This is the default case — `/review-data-pr` §3/§7 treat the script as optional, so don't add one "for completeness".
-- **Manual import** (`dataset_manual_import: true`) → write the manual-import script below.
-- **Download needing custom code** (API pagination, auth, scraping, multi-file assembly, non-trivial parsing before storing) → write the automatic-download script below with the custom logic inside `run()`.
+- **Plain `url_download`, no custom logic** → set `dvc_only: True`, which deletes the generated script so only the `.dvc` remains. `etls <namespace>/<version>/<short_name>` runs it straight from the `.dvc`. This is the default case — `/review-data-pr` §3/§7 treat the script as optional, so don't keep one "for completeness".
+- **Manual import** → set `dataset_manual_import: True`; the template emits the `path_to_file` variant of `run()`.
+- **Download needing custom code** (API pagination, auth, scraping, multi-file assembly, non-trivial parsing before storing) → keep the generated script and add the custom logic inside `run()`, between `paths.init_snapshot()` and `snap.create_snapshot(...)`.
 
-Either script is a plain `run()` — **no `click` decorators and no `if __name__ == "__main__":` block**. The `etls` CLI imports the module and invokes `run` itself, supplying `--path-to-file` for manual imports. (Many old scripts still carry the boilerplate; don't copy them.)
+Either way the script is a plain `run()` — **no `click` decorators and no `if __name__ == "__main__":` block**. The `etls` CLI imports the module and invokes `run` itself, supplying `--path-to-file` for manual imports. The template already gets this right; the warning matters because many old scripts in the repo still carry the boilerplate — don't copy one of those as a model.
 
-**Write the DVC file** (`<short_name>.<file_extension>.dvc`):
+**Generate the files.** Every field confirmed in step 2 goes in as cookiecutter context. Pass **all** the keys below — there is no committed `cookiecutter.json` supplying defaults, so a missing key is a Jinja `UndefinedError`, and an empty string is how you say "omit this field" (the template's `{%- if %}` guards drop it from the output):
 
-```yaml
-# Learn more at:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
-meta:
-  origin:
-    # Data product / Snapshot
-    title: "<title>"
-    title_snapshot: "<title> - <file specifics>"   # only when the file is one table/extract of a broader data product
-    description: |-               # omit block if empty; factual description of the data product (producer's own text when it is factual, never promotional copy)
-      <description>
-    description_snapshot: |-      # required whenever title_snapshot is set; own wording is fine here
-      <what this specific file contains: table number, variables, units, years, plus any OWID-side
-      context such as manual transcription or retrieval from an archived copy>
-    date_published: "<date_published>"
+```bash
+.venv/bin/python -c "
+from pathlib import Path
+from apps.utils.files import generate_step
+from apps.wizard.etl_steps.utils import COOKIE_SNAPSHOT
+from etl.paths import SNAPSHOTS_DIR
 
-    # Citation
-    producer: <producer>
-    citation_full: |-
-      <citation_full>
-    attribution_short: <attribution_short>   # omit if empty
+data = {
+    'channel': 'snapshots',
+    # Paths
+    'namespace': '<namespace>', 'snapshot_version': '<version>',
+    'short_name': '<short_name>', 'file_extension': '<file_extension>',
+    # Flags, from the decision above
+    'is_private': False, 'dataset_manual_import': False, 'dvc_only': False,
+    # Origin — '' means omit. date_accessed is the snapshot version date.
+    'title': '<title>', 'description': '<description>',
+    'title_snapshot': '', 'description_snapshot': '', 'origin_version': '',
+    'date_published': '<date_published>', 'producer': '<producer>',
+    'citation_full': '<citation_full>',
+    'attribution': '', 'attribution_short': '<attribution_short>',
+    'url_main': '<url_main>', 'url_download': '<url_download>',
+    'date_accessed': '<version>',
+    # License — belongs to origin; the template nests it correctly.
+    'license_name': '<license_name>', 'license_url': '<license_url>',
+}
+generate_step(cookiecutter_path=COOKIE_SNAPSHOT, data=data, target_dir=SNAPSHOTS_DIR)
 
-    # Files
-    url_main: <url_main>
-    url_download: <url_download>             # omit if not provided
-    date_accessed: <version>                 # use the snapshot version date
-
-    # License
-    license:
-      name: <license_name>
-      url: <license_url>                     # omit if empty
-
-  is_public: false    # omit this line if is_private is false
-outs:
-  - md5: ""
-    size: 0
-    path: <short_name>.<file_extension>
+# dvc_only: drop the script the template always writes.
+if data['dvc_only']:
+    py = SNAPSHOTS_DIR / data['namespace'] / data['snapshot_version'] / (data['short_name'] + '.py')
+    py.unlink(missing_ok=True)
+"
 ```
 
-**Write the Python script** (`<short_name>.py`) — only in the two cases above:
+Which fields to fill, and when to leave them empty:
 
-If the download runs automatically but needs custom code:
-```python
-"""Script to create a snapshot of dataset."""
+| Context key | Value |
+|---|---|
+| `title` / `description` | The data product. `description` is factual — the producer's own text when it is factual, never promotional copy |
+| `title_snapshot` / `description_snapshot` | Both empty by default. Set them **only** when the file is one table/extract of a broader product; `description_snapshot` then becomes required, and carries the file specifics (table number, variables, units, years) plus any OWID-side context such as manual transcription or an archived copy |
+| `attribution` | Empty unless `producer (year)` is genuinely uninformative |
+| `attribution_short` / `origin_version` | Empty when the producer gives none |
+| `url_download` | Empty for a manual import |
+| `license_url` | Empty when the producer states no license anywhere — don't fall back to the landing page |
+| `date_accessed` | The snapshot version date |
 
-from etl.helpers import PathFinder
+**After generating**, two things the template cannot express:
 
-paths = PathFinder(__file__)
+- Tidy the end of the `.dvc`. The template's final `{%- endif -%}` leaves a whitespace-only line (`"  "`) after the license block, and for a private snapshot the file also ends without a final newline. Both parse fine as YAML, but committed files shouldn't carry either: drop the whitespace-only line and make sure the file ends with exactly one `\n`.
+- Add any `#` comments this skill calls for: the companion-files `# NOTE:` above `url_download` (step 6), and a one-line note when `citation_full`'s year deliberately differs from `date_published` (step 5).
 
-
-def run(upload: bool = True) -> None:
-    """Create a new snapshot.
-
-    Args:
-        upload: Whether to upload the snapshot to S3.
-    """
-    snap = paths.init_snapshot()
-    # ... custom fetch/assembly logic here ...
-    snap.create_snapshot(upload=upload)
-```
-
-If `dataset_manual_import` is `true` (no direct download link) — same template as `/create-dataset` Step 4:
-```python
-"""Script to create a snapshot of dataset.
-
-The data file is provided manually. Steps to obtain it:
-  1. Go to <url_main>
-  2. Download the data file and save it locally.
-  3. Run: etls <namespace>/<version>/<short_name> --path-to-file <path>
-"""
-
-from etl.helpers import PathFinder
-
-paths = PathFinder(__file__)
-
-
-def run(upload: bool = True, path_to_file: str | None = None) -> None:
-    snap = paths.init_snapshot()
-    snap.create_snapshot(filename=path_to_file, upload=upload)
-```
+There is deliberately **no `outs:` block** — `snap.create_snapshot()` writes it with the real md5 and size when step 4 runs. Don't add a placeholder.
 
 ### 4. Run the snapshot
 
