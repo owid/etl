@@ -4,7 +4,7 @@ the new target charts (part 2 of the add-gdp-scatter workflow).
 Reads a JSON list of `{grapher_url, target_chart_url}` from stdin (public
 ourworldindata.org/grapher/<slug> URLs). Report-first: without `--apply` it audits what
 references each OLD chart and prints the plan, mutating nothing. With `--apply` it registers
-the old slug as a chart redirect on the TARGET chart carrying `?tab=scatter&time=latest`,
+the old slug as a chart redirect on the TARGET chart carrying `?tab=scatter&time=latest&country=`,
 re-points the old chart's own aliases at the target, and unpublishes the old chart.
 
 Mechanism notes:
@@ -34,11 +34,23 @@ from etl.config import OWID_ENV
 SLUG_RE = re.compile(r"/grapher/([^/?#]+)")
 TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
 
-# Query string stored on the redirect: open the scatter tab on the latest year.
-TARGET_QUERY = "tab=scatter&time=latest"
+# Query string stored on the redirect. Every part of it is load-bearing, because a tab
+# supplied in the URL does NOT get the adjustments a tab CLICK does: `adjustStateForTab`
+# (which collapses the scatter's time handles and clears its entity selection) is reached
+# only from `onTabChange` <- the ContentSwitchers control, while a URL tab goes through
+# `populateFromQueryParams` -> `setTab`, which just assigns the tab. So each adjustment has
+# to be supplied explicitly here or the reader arriving by an old slug gets a different
+# chart from the reader who clicks the tab:
+#   tab=scatter  the view itself
+#   time=latest  what ensureTimeHandlesAreSensibleForTab would have collapsed to
+#   country=     what ensureEntitySelectionIsSensibleForTab would have cleared;
+#                `parseCountryParam` returns valid([]) for a present-but-empty value, and
+#                `setSelectedEntities([])` clears, so the scatter shows every entity
+#                unhighlighted instead of emphasising the target's line/bar selection
+TARGET_QUERY = "tab=scatter&time=latest&country="
 
 # Params on a referencing link that would override TARGET_QUERY at redirect time.
-OVERRIDING_PARAMS = ("tab=", "time=")
+OVERRIDING_PARAMS = ("tab=", "time=", "country=")
 
 # Reference categories a redirect alone does NOT fix — these BLOCK the row.
 # narrativeCharts is deliberately not here: one parented to a chart owns a materialized full
@@ -469,6 +481,12 @@ def main() -> int:
         action="store_true",
         help="leave the sources' own old slugs alone; BLOCKS any source that still has one, since the unpublish would delete it",
     )
+    parser.add_argument(
+        "--allow-manual-refs",
+        action="store_true",
+        help="apply rows whose source is referenced by an explorer / data insight / static viz. Only "
+        "after those references have been re-pointed: the unpublish breaks them and no redirect covers them.",
+    )
     parser.add_argument("--allow-production", action="store_true", help="required to --apply against production")
     args = parser.parse_args()
 
@@ -505,8 +523,25 @@ def main() -> int:
             f"{rec['src']:<58} {str(rec.get('src_id') or '-'):>5} {str(rec.get('tgt_id') or '-'):>5} "
             f"{'MANUAL' if rec.get('manual') else '':>7} {len(rec['aliases']):>7}  {counts}"
         )
+    # MANUAL_REF_KEYS says these BLOCK the row, so make that true rather than leaving it to the
+    # operator to notice the audit column and re-run: the apply loop gates purely on `status`, so a
+    # MANUAL row left at CREATE/UPDATE/EXISTS gets applied and the unpublish breaks the very
+    # explorer / data-insight / static-viz references the audit just flagged. Those surfaces embed
+    # the old chart's own config, so no redirect can save them.
+    for rec in audited:
+        if rec.get("manual") and rec["status"] in ACTIONABLE:
+            if args.allow_manual_refs:
+                rec["note"] = (rec["note"] + "  " if rec["note"] else "") + "[--allow-manual-refs: applying anyway]"
+            else:
+                blockers = ", ".join(f"{REF_LABEL[k]}={rec['refs'][k]}" for k in MANUAL_REF_KEYS if rec["refs"].get(k))
+                rec |= {
+                    "status": "BLOCKED",
+                    "note": f"direct references a redirect cannot fix ({blockers}) — re-point them first, "
+                    f"then pass --allow-manual-refs",
+                }
+
     print("\n  manual = a redirect alone won't fix it: explorers / dataInsights / staticViz reference the old")
-    print("           chart directly. Pull those rows out of the input until they are re-pointed.")
+    print("           chart directly. Those rows are BLOCKED; re-point them, then --allow-manual-refs.")
     print("  narr   = narrative charts. NOT a blocker (see the table below), but they need replacing.")
     print("  aliases = old slugs of the SOURCE chart; the unpublish deletes them, so they get re-pointed too.")
 

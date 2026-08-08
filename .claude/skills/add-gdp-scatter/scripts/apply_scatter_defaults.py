@@ -35,20 +35,23 @@ from etl.db import get_engine
 from etl.grapher.io import variable_data_df_from_s3
 
 GDP_SOURCES = {
-    "world bank": 1204826,
-    "wdi": 1204826,
+    # World Bank: WDI 2026-07-27. Bumped from 1204826 (WDI 2026-02-27) on 2026-08-04 —
+    # every published "X vs. GDP per capita" scatter already plots this id, so a target
+    # pinned to the older one would disagree with the source it was migrated from.
+    "world bank": 1294305,
+    "wdi": 1294305,
     "maddison": 900793,
     "maddison project database": 900793,
     "pwt": 1108541,
     "penn world table": 1108541,
 }
-GDP_LABEL = {1204826: "World Bank", 900793: "Maddison", 1108541: "PWT"}
-GDP_COVERAGE = {1204826: 1990, 1108541: 1950, 900793: 1}
+GDP_LABEL = {1294305: "World Bank", 900793: "Maddison", 1108541: "PWT"}
+GDP_COVERAGE = {1294305: 1990, 1108541: 1950, 900793: 1}
 
 # catalogPath patterns used to detect when a newer version of each GDP-per-capita
 # indicator has landed in the catalog since this script was last updated.
 GDP_CATALOG_PATTERNS = {
-    1204826: "grapher/worldbank_wdi/%/wdi/wdi#ny_gdp_pcap_pp_kd",
+    1294305: "grapher/worldbank_wdi/%/wdi/wdi#ny_gdp_pcap_pp_kd",
     900793: "grapher/ggdc/%/maddison_project_database/maddison_project_database#gdp_per_capita",
     1108541: "grapher/ggdc/%/penn_world_table/penn_world_table#rgdpo_pc",
 }
@@ -60,7 +63,16 @@ LINE_FAMILY = {"LineChart", "SlopeChart", "DiscreteBar", "Marimekko", "ScatterPl
 STACKED_FAMILY = {"StackedArea", "StackedBar", "StackedDiscreteBar"}
 # Chart types that draw bars/areas from a baseline — they need a ZERO y-axis min,
 # so a non-zero min tuned for the scatter must not be mirrored onto them.
-BAR_AREA_FAMILY = {"DiscreteBar", "Marimekko", "StackedArea", "StackedBar", "StackedDiscreteBar"}
+# DiscreteBar is deliberately NOT here: `DiscreteBarChart.yAxisConfig` hardcodes
+# `min: undefined` and anchors at `x0 = 0`, so it ignores `yAxis.min` outright ("the
+# author-configured minimum is usually intended for the line chart"). Withholding the
+# source's min from a DiscreteBar target protects nothing and costs the scatter a
+# well-fitted axis. Of the rest, only these override nothing and so really do respect it.
+BAR_AREA_FAMILY = {"Marimekko", "StackedArea", "StackedBar", "StackedDiscreteBar"}
+# Tabs that can ONLY show a single time (grapher's checkOnlySingleTimeSelectionPossible).
+# Dumbbell is deliberately excluded: it is single-time only with >=2 y indicators and needs
+# a RANGE with one, so treat it as range-capable.
+SINGLE_TIME_ONLY_FAMILY = {"DiscreteBar", "StackedDiscreteBar", "Marimekko"}
 SCHEMA_DEFAULT_CHART_TYPES = ["LineChart", "DiscreteBar"]
 
 CHART_ID_RE = re.compile(r"/charts/(\d+)")
@@ -74,6 +86,7 @@ def short_admin_host() -> str:
 
 def edit_link(chart_id: int) -> str:
     return f"{short_admin_host()}/charts/{chart_id}/edit"
+
 
 _data_cache: dict[int, Any] = {}
 _pop_variant_cache: dict[int, bool] = {}
@@ -179,6 +192,26 @@ def resolve_default_year(cfg: dict, y_var_id: int, gdp_var_id: int, engine) -> i
     return min(y_yr[1], x_yr[1])
 
 
+def is_x_independent_line(line: dict) -> bool:
+    """True if a comparison line means the same thing on every view.
+
+    `ComparisonLineConfig` is a union: `{xEquals: number}` draws a vertical line at an x
+    value, and `{yEquals?: string}` draws a formula that may reference x ("2*x^2",
+    "sqrt(x)"). Only a constant `yEquals` is safe to mirror, because the target's other
+    views do not share the scatter's x: on the scatter x is GDP per capita, on a LineChart
+    it is time, so an x-dependent line becomes a meaningless year or curve there.
+
+    Note `yEquals` **defaults to "x"** when omitted, so a bare `{label: ...}` line is
+    x-dependent too — absence is not neutral.
+    """
+    if "xEquals" in line:
+        return False
+    y = line.get("yEquals")
+    if not isinstance(y, str) or not y.strip():
+        return False  # omitted/blank => "x"
+    return "x" not in y.lower()
+
+
 def process_row(
     api: AdminAPI,
     engine,
@@ -231,10 +264,7 @@ def process_row(
         added.append(f"x={gdp_var_id}")
     if "color" not in props:
         dims.append({"variableId": color_target, "property": "color"})
-        added.append(
-            f"color={color_target}"
-            + (" (from source)" if color_target != CONTINENTS_ID else "")
-        )
+        added.append(f"color={color_target}" + (" (from source)" if color_target != CONTINENTS_ID else ""))
     if "size" not in props:
         if src_size is None:
             # Source scatter has no size dim — skip on target too.
@@ -321,18 +351,68 @@ def process_row(
             tgt_y["display"] = tgt_display
             notes.append(f"y.display.name: {prev!r} → {src_name!r}")
 
+    # 7b) comparisonLines mirror. These are a scatter's reference lines (e.g. `yEquals: 1`
+    # for a ratio-to-a-benchmark indicator) and are usually the whole point of the source
+    # chart's framing, so losing them silently makes the migrated view say less than the
+    # chart it replaces. Only added when the target has none — never overwrite an existing
+    # set, same rule as the dimensions. `comparisonLines` is global config, but a reference
+    # line that is meaningful for the y indicator is meaningful on the line/bar views too.
+    src_lines = src_cfg.get("comparisonLines")
+    if src_lines and not cfg.get("comparisonLines"):
+        safe = [ln for ln in src_lines if is_x_independent_line(ln)]
+        skipped = [ln for ln in src_lines if ln not in safe]
+        if safe:
+            cfg["comparisonLines"] = safe
+            notes.append(f"comparisonLines mirrored from source: {json.dumps(safe)}")
+        if skipped:
+            notes.append(
+                f"WARN: {len(skipped)} x-dependent comparisonLine(s) NOT mirrored "
+                f"({json.dumps(skipped)}) — x is GDP on the scatter but time on the "
+                f"line/bar views, so they would render meaningless there; re-author by hand "
+                f"if the scatter needs them"
+            )
+
     # 8) Warnings (no action)
     if not cfg.get("selectedEntityNames"):
-        notes.append("WARN: target has no selectedEntityNames — line/bar/slope views will fall back to Grapher defaults")
+        notes.append(
+            "WARN: target has no selectedEntityNames — line/bar/slope views will fall back to Grapher defaults"
+        )
 
     # On scatter, relative mode renders as "Display average annual change". We want
     # the toggle available but OFF by default, i.e. stackMode must not be "relative".
     if cfg.get("stackMode") == "relative":
-        notes.append("WARN: stackMode=relative — scatter defaults to 'average annual change'; set to absolute to disable the default")
+        notes.append(
+            "WARN: stackMode=relative — scatter defaults to 'average annual change'; set to absolute to disable the default"
+        )
 
     excluded = src_cfg.get("excludedEntityNames")
     if excluded:
         notes.append(f"WARN: source excludes {excluded} (not applied on target)")
+
+    # A hidden timeline defeats Grapher's automatic single-year scatter. Normally
+    # `checkSingleTimeSelectionPreferred` collapses the two time handles when the scatter
+    # is a secondary tab, so the scatter shows one year while the other views keep their
+    # full range — no config needed. But with `hideTimeline`,
+    # `GrapherState.timelineHandleTimeBounds` reads the AUTHORED minTime/maxTime on every
+    # chart tab and ignores the runtime handles, so the collapse never takes effect and
+    # the reader has no slider to fix it. Authored `minTime == maxTime` is then the only
+    # way to get a single-year scatter — but that is safe only when every other view is
+    # single-time anyway; a LineChart/SlopeChart/single-indicator Dumbbell needs a range,
+    # and one global time cannot serve both.
+    if cfg.get("hideTimeline") and cfg.get("minTime") != cfg.get("maxTime"):
+        other_tabs = set(cfg.get("chartTypes") or []) - {"ScatterPlot"}
+        if other_tabs and other_tabs <= SINGLE_TIME_ONLY_FAMILY:
+            notes.append(
+                f"WARN: hideTimeline with minTime != maxTime — scatter will show a time RANGE and the reader "
+                f"has no timeline to collapse it. Other views {sorted(other_tabs)} are single-time anyway, "
+                f"so setting minTime=maxTime='latest' is safe"
+            )
+        else:
+            notes.append(
+                f"WARN: hideTimeline with minTime != maxTime — scatter will show a time RANGE with no timeline "
+                f"to collapse it, and {sorted(other_tabs)} needs a range, so no single global time serves both. "
+                f"Un-hide the timeline or leave the scatter as a range"
+            )
 
     y_var_id = (tgt_y or {}).get("variableId")
     if y_var_id is not None:
@@ -388,10 +468,7 @@ def print_action_table(results: list[dict]) -> None:
     print("-" * 180)
     for r in results:
         link = edit_link(r["chart"]) if isinstance(r["chart"], int) else ""
-        print(
-            f"{r['chart']:>6}  {r['src']:>6}  {r['gdp_source']:<13}  {r['status']:<8}  "
-            f"{link:<60}  {r['notes']}"
-        )
+        print(f"{r['chart']:>6}  {r['src']:>6}  {r['gdp_source']:<13}  {r['status']:<8}  {link:<60}  {r['notes']}")
 
 
 def print_display_name_table(api: AdminAPI, results: list[dict]) -> None:
@@ -423,7 +500,10 @@ def print_display_name_table(api: AdminAPI, results: list[dict]) -> None:
     print("Y-DIM DISPLAY NAMES (manual vs ETL)")
     hdrs = ("chart", "varId", "manual (on chart)", "ETL display.name", "variable.name")
     widths = [max(len(str(r[i])) for r in [hdrs] + rows) for i in range(5)]
-    def line(r): return "  ".join(str(c).ljust(widths[i]) for i, c in enumerate(r))
+
+    def line(r):
+        return "  ".join(str(c).ljust(widths[i]) for i, c in enumerate(r))
+
     print(line(hdrs))
     print("-" * (sum(widths) + 8))
     for r in rows:
@@ -434,8 +514,7 @@ def check_gdp_versions() -> None:
     print("GDP-PER-CAPITA VERSION CHECK")
     for hardcoded_id, pattern in GDP_CATALOG_PATTERNS.items():
         latest = OWID_ENV.read_sql(
-            "SELECT id, catalogPath FROM variables "
-            "WHERE catalogPath LIKE %(p)s ORDER BY id DESC LIMIT 1",
+            "SELECT id, catalogPath FROM variables WHERE catalogPath LIKE %(p)s ORDER BY id DESC LIMIT 1",
             params={"p": pattern},
         )
         label = GDP_LABEL[hardcoded_id]
