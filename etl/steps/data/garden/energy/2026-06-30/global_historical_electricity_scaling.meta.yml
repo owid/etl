@@ -5,7 +5,7 @@ definitions:
       topic_tags:
         - Energy
     description_processing: |-
-      - We combine historical estimates from Pinto et al. (2023) with Ember's Yearly electricity data. Where data from both sources is available, data from Ember is prioritized.
+      - We use the World electricity mix long-run series, which combines Ember's Yearly Electricity Data, the Energy Institute's Statistical Review of World Energy, and historical estimates from Pinto et al. (2023). Where data from several sources is available, the most recent source is prioritized.
       - For each electricity source, we identify the first year in which global electricity production surpassed 100 TWh, and track the evolution of global electricity production from that year onward.
 
 

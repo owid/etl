@@ -17,6 +17,6 @@ dataset:
 tables:
   global_historical_electricity:
     variables:
-      # Since (almost) all variables are combined with Ember's data, we don't need to define metadata for them.
-      # The only variables that don't have metadata are other_production and other_share, which we probably won't use.
+      # This is an intermediate dataset (Pinto's historical data), combined with modern data in the
+      # electricity_mix step, so we don't define metadata for its variables here.
         {}

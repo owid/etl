@@ -131,13 +131,13 @@ definitions:
 
   description_key_child_labor: |-
     <% if classif1 == "Age (child labor): 5-11" %>
-    Child labor for children aged 5-11 is defined as those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services during the reference week.
+    Child labor for children aged 5-11 is defined as those who did at least one hour of economic activity and/or at least 21 hours of unpaid household services during the reference week.
     <%- elif classif1 == "Age (child labor): 12-14" %>
-    Child labor for children aged 12-14 is defined as those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services during the reference week.
+    Child labor for children aged 12-14 is defined as those who did at least 14 hours of economic activity and/or at least 21 hours of unpaid household services during the reference week.
     <%- elif classif1 == "Age (child labor): 15-17" %>
     Child labor for children aged 15-17 is defined as those who did at least 43 hours of economic activity during the reference week.
     <%- elif classif1 == "Age (child labor): 5-17" %>
-    Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services; for children aged 12-14, it includes those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services; and for children aged 15-17, it includes those who did at least 43 hours of economic activity during the reference week.
+    Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity and/or at least 21 hours of unpaid household services; for children aged 12-14, it includes those who did at least 14 hours of economic activity and/or at least 21 hours of unpaid household services; and for children aged 15-17, it includes those who did at least 43 hours of economic activity during the reference week.
     <%- endif %>
   description_key_child_labor_economic_activity: |-
     <% if classif1 == "Age (child labor): 5-11" %>

@@ -207,5 +207,6 @@ This extension is installed automatically via `make vsce-sync` from the project 
 
 To manually install:
 ```bash
-code --install-extension vscode_extensions/detect-outdated-practices/install/detect-outdated-practices-0.0.4.vsix
+# install/ holds only the current build — older versions are moved to install/archived/
+code --install-extension vscode_extensions/detect-outdated-practices/install/detect-outdated-practices-*.vsix
 ```

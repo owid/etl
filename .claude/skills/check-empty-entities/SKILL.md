@@ -156,6 +156,6 @@ The same loop covers MDim and explorer views — they are `chart_configs` rows t
 - **Pre-existing gaps** (🟡 — still need fixing, just not necessarily in this PR): table of citation (scroll-to-highlight link), chart (staging grapher link via `OWIDEnv.from_staging(branch).chart_site(slug)` — same normalized-host rule as the API prefix; never hand-build `staging-site-<branch>`), and dead entities — the common pattern is a rename-cycle mismatch between the URL and the live entities (unsuffixed names in old URLs while data lives under suffixed entities, or stale `(OECD)`/`(WB)`-suffixed names after the data moved to unsuffixed forms).
 - **Coverage caveats**: charts with no production baseline; variables whose metadata fetch failed (don't count fetch failures as empty).
 
-### Always close with what's still open
+### Close with what's still open
 
-End every run with the open-items block defined in CLAUDE.md ("Close every report with what's still open") — in the PR body as well as chat. Unverified matters most here: fetch failures, unparsed legacy explorer TSVs, and surfaces skipped for cost read as "clean" when unmentioned, and a pre-existing gap left unlisted gets re-discovered from scratch next cycle.
+End every run by saying what's still open — a line or two in chat, written out in the PR body when there is one. `.claude/docs/open-items.md` lists what tends to get dropped. The "nobody checked it" category matters most here: fetch failures, unparsed legacy explorer TSVs, and surfaces skipped for cost read as "clean" when unmentioned, and a pre-existing gap left unlisted gets re-discovered from scratch next cycle.
