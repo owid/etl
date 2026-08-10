@@ -227,6 +227,22 @@ Side margins and the footer edge are the template's, not yours: content starts a
 
 Verify against the actual clone with `get_metadata` (the templates evolve; the geometry above is a 2026 snapshot). These are **frame-local** coordinates, and `x`/`y` are relative to a node's parent — so append the embed to the template clone **before** positioning it. Left parented to the page (where Step 5 puts imported nodes), the same numbers land it near the page origin, on top of the reference chart:
 
+**Anything you add to the chart aligns to the same box as the subtitle** — annotations, captions, notes all start at the content left edge and may run its full width. Aligning them to the bars' left edge instead leaves a ragged inner margin that reads as a mistake.
+
+**But size them against the plot's own bounds, not the group's.** An annotation is a child of the chart group, so the moment it is wider than the plot it *becomes* the group's width — and the next `rescale(header.width / chart.width)` then scales the plot down to make room for it (a 508-wide group silently became 527). Measure the plot by walking the group and skipping the annotation nodes, size the annotations to that, and only then rescale:
+
+```js
+let left = Infinity, right = -Infinity
+const walk = n => {
+  if (n !== chart && n.type !== 'GROUP' && !annotationIds.has(n.id)) {
+    left = Math.min(left, n.x); right = Math.max(right, n.x + n.width)
+  }
+  if (n.children) n.children.forEach(walk)
+}
+walk(chart)
+for (const t of annotations) { t.x = left; t.resize(right - left, t.height) }
+```
+
 **Match the header box exactly — same left edge and same width.** A chart even a few pixels narrower than the title reads as a mistake. Scale off the header rather than off a constant, and do it *after* the frame is gone, so the group's bounding box is the plot's real extent and no export padding is baked into the width:
 
 ```js
