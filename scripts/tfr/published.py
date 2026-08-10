@@ -476,6 +476,37 @@ def niger():
     return _series([(2006, 7.1), (2012, 7.6), (2021, 6.2)])
 
 
+def cameroon():
+    """INS survey rounds. The 2018 round is the newest fieldwork-based figure Cameroon has.
+
+    The 2005 census gives 5.2 after correction, from a raw 4.1 — see the note in countries.py.
+    """
+    return _series([(2011, 5.1), (2018, 4.8)])
+
+
+def nepal():
+    """National Statistics Office, census rounds. The 2021 report charts the whole series."""
+    return _series([(2001, 3.25), (2011, 2.52), (2021, 1.94)])
+
+
+def venezuela():
+    """INE, "Resumen de Estadísticas 1999-2023" — the fertility chart's observed points.
+
+    The chart runs to 2025 but draws 2020 and 2025 as projections, so only the points up to 2015
+    are used here. All of them come out of the projection exercise built on the 2011 census.
+    """
+    return _series([(2000, 2.9), (2005, 2.6), (2010, 2.4), (2015, 2.3)])
+
+
+def cote_divoire():
+    """INS survey rounds — the only fertility figures Côte d'Ivoire publishes.
+
+    Summing each round's own age-specific rates reproduces its total: 4.95 against the published 5.0
+    for 2011-12, and 4.595 against 4.6 for 2016.
+    """
+    return _series([(2012, 5.0), (2016, 4.6)])
+
+
 def kenya():
     """KNBS, 2019 census analytical report on fertility and nuptiality, volume VI, table 4.5.
 

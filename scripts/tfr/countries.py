@@ -39,6 +39,8 @@ from published import (  # noqa: E402
     algeria,
     angola,
     bangladesh,
+    cameroon,
+    cote_divoire,
     drc,
     ethiopia,
     ghana,
@@ -48,6 +50,7 @@ from published import (  # noqa: E402
     madagascar,
     morocco,
     mozambique,
+    nepal,
     niger,
     nigeria,
     pakistan,
@@ -57,6 +60,7 @@ from published import (  # noqa: E402
     tanzania,
     ukraine,
     uzbekistan,
+    venezuela,
     vietnam,
     yemen,
 )
@@ -545,6 +549,39 @@ COUNTRIES = [
       "of 1.18 was implausibly low because births went unreported. The bureau's queryable data portal "
       "refuses requests from outside the country, but these static files download without trouble.",
       "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/B0603.xls"),
+    C("Nepal", "National Statistics Office — 2021 census", nepal, "Nepal", "survey", False,
+      "The census publishes a fertility rate of 1.94 for 2021, and a series back to 1971. It also publishes, "
+      "through an open census API, the counts behind it: births in the twelve months before enumeration by "
+      "the mother\'s age group, and women by age group.",
+      "We show the office\'s published figure. But dividing its own counts gives 1.556, not 1.94 — a quarter "
+      "lower — and the same counts reproduce every other fertility measure it prints: a general fertility "
+      "rate of 50.16 against its 50.2, and a gross reproduction rate of 0.734 against its 0.73. Had the "
+      "fertility rate really been 1.94, that gross reproduction rate would be about 0.92.",
+      "So the published 1.94 does not follow from the office\'s own numbers, and no method is named anywhere "
+      "in the report that would explain the difference — we searched for every correction technique other "
+      "offices use, in English and Nepali, and found none. This is not the documented raw-versus-adjusted "
+      "split seen in Tanzania, Uganda, Ghana or Cameroon, nor the computed-then-refused correction of "
+      "Madagascar and Niger: it is a figure that contradicts the rest of its own table. We plot what the "
+      "office publishes and let the age-band comparison below show the counts, but the 1.94 should not be "
+      "relied on. Civil registration is not used for fertility; the census reports 74% of children under six "
+      "as registered. The office\'s reports are served inside a JavaScript flipbook with no download link — "
+      "the PDF path sits in a script variable — and its old domain now returns a bare 403.",
+      "https://censusresults.nsonepal.gov.np/fertility"),
+    C("Venezuela", "INE — projection-based fertility series", venezuela, "Venezuela", "projection", False,
+      "INE publishes a fertility series in a statistics summary dated August 2024: 2.9 for 2000 falling to "
+      "2.3 for 2015, then 2.2 and 2.1 drawn as forward projections. The health ministry separately publishes "
+      "registered births by age of mother, but only up to 2014.",
+      "We take the observed points up to 2015 and leave the projected ones out. Pairing the ministry\'s 2014 "
+      "births against INE\'s population gives about 2.25, close to INE\'s 2.3 for 2015.",
+      "Every point in this series comes out of a projection exercise built on the 2011 census and calculated "
+      "in 2013 — nothing has been re-estimated from current registration. The last non-projected point is "
+      "2015, published nine years later, and no national fertility figure exists for any year after that. "
+      "The general statistical yearbook stops at 2003; INE has been digitising volumes from 1909 to 1944 "
+      "instead of adding recent ones. The health ministry\'s births-by-age tables stop at 2014, published in "
+      "2018. One trap for anyone retracing this: the domain everyone cites, ine.gov.ve, no longer resolves — "
+      "the record was removed from the Venezuelan registry, which still answers authoritatively for other "
+      "names. The institute moved to ine.gob.ve and is publishing there.",
+      "https://ine.gob.ve/"),
     C("Niger", "INS — national fertility and health surveys", niger, "Niger", "survey", False,
       "INS publishes a fertility rate from each survey round: 7.1 for 2006, 7.6 for 2012 and 6.2 for its "
       "2021 fertility survey. Its 2012 census gives 7.5, with the births and women behind it printed as "
@@ -625,6 +662,21 @@ COUNTRIES = [
       "female population by age to divide by — the 2007 census is the only one, and it is nineteen years "
       "old. The old statsethiopia.gov.et domain is dead; the service is now at ess.gov.et.",
       "https://ess.gov.et/wp-content/uploads/2026/01/edhs-2024-25-kir-01172026.pdf"),
+    C("Cote d'Ivoire", "INS — Enquête Démographique et de Santé", cote_divoire, "Cote d'Ivoire", "survey",
+      False,
+      "INS publishes a fertility rate from each survey round: 5.7 in 1994, 5.2 in 1998-99, 5.0 in 2011-12 "
+      "and 4.6 in 2016, each with the age-specific rates behind it.",
+      "We read the two rounds inside our window. Summing each round's own rates reproduces its total — 4.95 "
+      "against the published 5.0, and 4.595 against 4.6.",
+      "The 2021 census publishes no fertility rate at all, and not even births by age of mother — the same "
+      "gap as Mozambique. Its own results report lists fertility as one of sixteen thematic volumes to come "
+      "later, and none of them had appeared by the time the site was last readable. Nothing newer than 2016 "
+      "exists: a survey was fielded in 2021 but no report for it was ever published on the institute's site. "
+      "That site is now down — it resolves and answers, but serves only a hosting placeholder, and has done "
+      "since January 2026 — so everything here came from a web archive. Civil registration is not used for "
+      "fertility, and INS explains why by publishing coverage instead: 55% of under-fives registered in 2006, "
+      "65% in 2011-12, 72% in 2016.",
+      "https://www.ins.ci/"),
     C("Democratic Republic of Congo", "INS — Enquête Démographique et de Santé", drc,
       "Democratic Republic of Congo", "survey", False,
       "The Institut National de la Statistique publishes a fertility index for each survey round. The "
@@ -679,6 +731,23 @@ COUNTRIES = [
       "editions dropped the full births-by-age table, so a recalculation for the latest year is not "
       "possible from them.",
       "https://mods.go.kr/board.es?mid=a20108010000&bid=11773"),
+    C("Cameroon", "INS — Enquête Démographique et de Santé", cameroon, "Cameroon", "survey", False,
+      "INS publishes a fertility rate from each survey round: 5.1 for 2011 and 4.8 for 2018. The 2005 census "
+      "reports 5.2, and prints the uncorrected figure of 4.1 alongside it.",
+      "We read the two survey rounds. We also checked the census arithmetic: summing its corrected "
+      "age-specific rates gives 4.16 for urban Cameroon and 6.21 for rural, matching its own printed "
+      "4.1607 and 6.2130.",
+      "Cameroon has had no census since 2005 and no fertility fieldwork since 2018, so the newest national "
+      "figure is eight years old. The fourth census was launched in 2016 but its main enumeration had still "
+      "not happened by the last status report anyone published, in September 2019, which was discussing how "
+      "to count the crisis-hit North-West and South-West regions at all; nothing has appeared since. The "
+      "census bureau\'s own website is gone — parked on an expired hosting account for years — so the 2005 "
+      "volumes had to come from a web archive. That census corrects its raw figure upward with the Brass "
+      "method, from 4.1 to 5.2, and its published long-run trend uses corrected values throughout while "
+      "showing the raw ones only in a technical annex. Civil registration is not used: INS\'s own vital "
+      "statistics report says the system\'s coverage problems mean it uses the survey instead, and puts "
+      "birth registration completeness at 54%, ranging from 92% in one region to 35% in another.",
+      "https://ins-cameroun.cm/"),
     C("Canada", "Statistics Canada — births by age of mother over its population estimates", canada_tfr,
       "Canada", "complete", True,
       "Statistics Canada publishes registered live births by age group of mother, female population by "
