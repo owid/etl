@@ -128,12 +128,22 @@ COUNTRIES = [
       "https://openstat.psa.gov.ph/"),
     C("Egypt", "CAPMAS — Annual Bulletin of Births and Deaths", egypt, "Egypt", "complete", False,
       "Each annual bulletin has a table 13 giving age-specific fertility rates, the female population of "
-      "each age group, and CAPMAS's own total fertility rate.",
-      "We summed the age-specific rates and multiplied by the five-year band width. This reproduces "
-      "CAPMAS's own published total exactly, so we treat the figure as theirs rather than ours.",
-      "One bulletin per year, so the series only covers the editions we have (2021-24). CAPMAS labels "
-      "one band 40-45 where it means 40-44; we treat it as a normal five-year band, which is what "
-      "reproduces their published total.",
+      "each age group, and CAPMAS's own total fertility rate. Table 12 separately gives registered live "
+      "births by age of mother, as counts.",
+      "We summed the age-specific rates and multiplied by the five-year band width, which reproduces "
+      "CAPMAS's own published total exactly. The age-band comparison uses the registered births from table "
+      "12 rather than the rates, because those are the only figures the registry itself produces.",
+      "CAPMAS's published rates are not its registered births divided by its own population. The bulletin "
+      "says so plainly: they are estimated with the fertility module of the Population Analysis "
+      "Spreadsheets, a US Census Bureau tool that takes the crude birth rate and the female population and "
+      "imposes a model age pattern. Dividing the registry's own counts instead gives 2.38 for 2024 against "
+      "the published 2.41 — close in total, but with a very different shape, 143 births per thousand women "
+      "aged 25-29 where CAPMAS publishes 164. That means Egypt's line is closer in kind to a UN estimate "
+      "than to a pure count. The fertility table only appears from the 2019 edition onward and the counts "
+      "by age of mother only from 2021, so the series is short; CAPMAS also revised its 2015 figure from "
+      "3.7 down to 3.3 between editions without explanation. One band is labeled 40-45 where it means "
+      "40-44. CAPMAS's site is a JavaScript application, but the catalog behind it answers plain requests "
+      "and every publication file downloads directly.",
       "https://www.capmas.gov.eg/"),
     C("Brazil", "IBGE — Estatísticas do Registro Civil", brazil, "Brazil", "complete", True,
       "IBGE's SIDRA database gives registered births by mother's age group, and population projections "

@@ -11,7 +11,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 10,Ethiopia,138902185,full,yes,no,survey,EDHS series 2000-2024; no post-2007 female population by age exists
 11,Mexico,132997658,full,yes,yes,complete,
 12,Japan,122427730,full,yes,no,complete,"denominator now the Statistics Bureau's own population, not recovered from rates"
-13,Egypt,120101178,partial,yes,no,complete,"bulletin rate; women come from the same bulletin table, not checked for a fuller source"
+13,Egypt,120101178,full,yes,no,complete,"CAPMAS's rate is a PAS model estimate, not a raw count; registry gives 2.38 vs 2.41"
 14,Philippines,117724473,full,yes,yes,incomplete,
 15,Democratic Republic of Congo,116452162,full,yes,no,survey,EDS rounds only; no census since 1984
 16,Vietnam,102177434,partial,yes,no,survey,PxWeb rate only; no hunt for counts

@@ -162,11 +162,50 @@ def thailand_detail(year):
     return {b: {"births": v, "women": women[b]} for b, v in births.items() if b in women}
 
 
+def _egypt_registered_births(path):
+    """{(lo, hi): births} from table 12, the whole-country row of registered live births.
+
+    Column headers are open-ended lower bounds — "-15" heads the 15-19 column — and the table is
+    one sheet in the 2021-22 editions but split into urban, rural and total in 2023-24.
+    """
+    x = pd.ExcelFile(path)
+    sheet = next((s for s in x.sheet_names if s.strip().endswith("12 (C)")), None)
+    sheet = sheet or next((s for s in x.sheet_names if s.strip().endswith("12")), None)
+    if sheet is None:
+        return None
+    d = pd.read_excel(x, sheet_name=sheet, header=None)
+    head = next((i for i in range(len(d)) if str(d.iloc[i, 0]).strip() == "سن الأم"), None)
+    if head is None:
+        return None
+    lows = {}
+    for j in range(1, d.shape[1]):
+        m = re.fullmatch(r"-(\d{2})(?:\.0)?", str(d.iloc[head, j]).strip())
+        if m and 15 <= int(m.group(1)) <= 45:
+            lows[j] = int(m.group(1))
+    # the first data row repeats the country name; later rows are governorates
+    row = next((d.iloc[i] for i in range(head + 1, len(d))
+                if str(d.iloc[i, 0]).strip() == "إجمالي الجمهورية"), None)
+    if row is None:
+        return None
+    out = {}
+    for j, lo in lows.items():
+        v = pd.to_numeric(row.iloc[j], errors="coerce")
+        if pd.notna(v):
+            out[(lo, lo + 4)] = float(v)
+    return out or None
+
+
 def egypt_detail(year):
+    """Female population from table 13, registered births from table 12.
+
+    CAPMAS's own age-specific rates are model estimates rather than its registered births divided
+    by its population, so using the counts is the only way to see what the registry itself says.
+    """
     path = os.path.join(DATA, f"eg_{year}.xlsx")
     if not os.path.exists(path):
         return None
     d = pd.read_excel(path, sheet_name="جدول Table 13", header=None)
+    births = _egypt_registered_births(path)
     out = {}
     for _, r in d.iterrows():
         if not (isinstance(r[0], str) and re.match(r"^\d{2}-\d{2}$", r[0].strip())):
@@ -175,8 +214,13 @@ def egypt_detail(year):
         hi = lo + 4  # CAPMAS writes "40-45" where it means 40-44
         w = pd.to_numeric(r[1], errors="coerce")
         rate = pd.to_numeric(r[2], errors="coerce")
-        if pd.notna(w) and pd.notna(rate):
-            out[(lo, hi)] = {"women": float(w), "births": float(rate) / 1000 * float(w)}
+        if pd.isna(w):
+            continue
+        b = (births or {}).get((lo, hi))
+        if b is None and pd.notna(rate):
+            b = float(rate) / 1000 * float(w)          # falls back to CAPMAS's modeled rate
+        if b is not None:
+            out[(lo, hi)] = {"women": float(w), "births": b}
     return out or None
 
 

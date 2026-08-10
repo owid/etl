@@ -71,6 +71,8 @@
  table.ov td { padding:0 10px 0 0; white-space:nowrap; vertical-align:middle; }
  /* name and metadata hug their text so the chart column takes whatever is left */
  table.ov td.cn { width:1%; text-align:right; padding-right:12px; }
+ table.ov td.cn a { color:inherit; text-decoration:none; cursor:pointer; }
+ table.ov td.cn a:hover { text-decoration:underline; }
  table.ov td.cc { width:99%; padding-right:10px; }
  table.ov td.n, table.ov td.meta { width:1%; }
  table.ov td.n { text-align:right; color:var(--mut); font-variant-numeric:tabular-nums; }
@@ -190,7 +192,7 @@ const UNPLOTTED = {{UNPLOTTED}};
     rows.forEach((r) => {
       const tr = document.createElement('tr');
       tr.innerHTML =
-        `<td class="cn">${r.country}</td><td class="cc"></td>` +
+        `<td class="cn"><a data-go="${r.country}">${r.country}</a></td><td class="cc"></td>` +
         `<td class="meta"><span class="swatch" style="color:${TIERS[r.tier][1]}"></span> ${TIERS[r.tier][0]}</td>` +
         `<td class="meta">${r.recalc ? 'Recalculated by us' : 'As published'}</td>` +
         `<td class="n">${r.year}</td>`;
@@ -268,6 +270,17 @@ const UNPLOTTED = {{UNPLOTTED}};
   );
   sel.addEventListener('change', apply);
   document.querySelectorAll('#filters input').forEach((i) => i.addEventListener('change', apply));
+  // a country name in the overview opens that country's own page
+  document.getElementById('ov').addEventListener('click', (e) => {
+    const name = e.target.closest('a[data-go]')?.dataset.go;
+    if (!name) return;
+    e.preventDefault();
+    sel.value = name;
+    tab = 'country';
+    apply();
+    window.scrollTo({ top: 0 });
+  });
+
   let t;
   window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(apply, 150); });
   apply();
