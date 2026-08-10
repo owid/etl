@@ -23,7 +23,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 22,United Kingdom,69931528,full,yes,no,complete,we plot England and Wales; ONS's own tables put it a steady 0.02 above the UK
 23,France,66746398,full,yes,no,complete,denominator now INSEE's mean-year population; Mayotte break kept to match the UN territory
 24,South Africa,65453083,full,yes,no,projection,headline TFR is Spectrum model output; registry implies 1.53 vs published 2.41
-25,Italy,58926166,full,yes,no,complete,ISTAT SDMX population route found but the host went down; age-band detail still pending
+25,Italy,58926166,full,yes,no,complete,"SDMX route found and verified by an agent (1.205 vs published 1.20); host down, not built"
 26,Kenya,58636406,full,yes,no,survey,"census and KDHS give 3.4; census report is scanned images, OCR still needed"
 27,Myanmar,55184826,full,yes,yes,survey,recalculated from 2019 ICS counts
 28,Colombia,53936231,full,yes,yes,complete,
