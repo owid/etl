@@ -1,4 +1,4 @@
-"""Comparison source: UN World Population Prospects."""
+"""UN WPP series, plus the national loaders that need no country-specific module."""
 
 import os
 import re
@@ -8,15 +8,10 @@ import pandas as pd
 DATA = os.path.join(os.path.dirname(__file__), "data")
 WPP = "/Users/edouard/dev/owid/etl/data/garden/un/2024-07-12/un_wpp"
 
-# hue per source; scenarios share the hue and are drawn thin + dashed
 COLORS = {
     "nso": "#c94a3b",
     "UN WPP": "#3b82c4",
 }
-
-
-def _f(path):
-    return pd.read_feather(os.path.join(DATA, path))
 
 
 def un_wpp(country):
@@ -262,8 +257,3 @@ def mexico():
                 tfr += b / denom * (hi - lo + 1)
         rows.append({"year": y, "value": tfr})
     return pd.DataFrame(rows)
-
-
-SOURCES = [
-    ("UN WPP", un_wpp),
-]
