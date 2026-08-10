@@ -38,9 +38,10 @@ Companion reference for the `create-figma-chart` skill. Distilled from the desig
 
 - Use them to answer the questions a reader would ask, replicating what the accompanying DI/article text highlights.
 - Font size **12–16px** (**10–14px on maps**). Never below 12px for data labels.
-- Text color: the color of the object being annotated, dark gray `#5B5B5B`, or a mix of both. Bold the part that matters.
+- **The house convention: annotation text in the annotation grey, category words bold and in their category's color.** Set the whole line to `Data Insights/Annotations` `#5B5B5B`, then override just the words naming a series — "Chicken", "beef", "fish and seafood" — to that series' color **and** bold. The colored word is what ties the sentence to the mark, so it does the job an arrow would, without the ink. Use the **line variant** for any category whose fill is too light to read as text (Camel `#BC8E5A` becomes Camel\* `#996D39`); bind both the grey and the category colors to their library styles with `setRangeFillStyleId(start, end, style.id)` and set the weight with `setRangeFontName` — note these range setters are **synchronous**, unlike most of the modern API.
 - **No background rectangles** — they hide chart detail. Instead give the text a **white outside stroke, 2–3px** (match the chart background if it isn't white); placed outside so it doesn't deform letter shapes.
 - If there's no room next to the target, annotate further away and point with an arrow.
+- **On a full-width chart, make room by opening a gap rather than overlaying.** A 100%-stacked bar has no free margin, so an annotation has nowhere to go — but dropping a few entities and re-exporting at a flatter aspect ratio frees a band, and a gap of about one row-and-a-half opened *directly beneath the bar being annotated* puts the text where no leader line is needed at all. Shift every row below the gap down by the same amount, then re-centre. Beware the export arithmetic: a flatter aspect ratio means a bigger downscale to reach the same width, so the base font has to rise with it — at 2:1 the labels came back 8px until `imFontSize` went to 35.
 - Annotate important values directly: write out the values of the **first and last data points** and any point the text mentions.
 
 ## Arrows
