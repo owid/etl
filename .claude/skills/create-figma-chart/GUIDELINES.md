@@ -12,11 +12,22 @@ Companion reference for the `create-figma-chart` skill. Distilled from the desig
 
 ## Text
 
+### Titles
+
 - Make titles **more colloquial**: "Death rate in the United States", not "Death rate, US".
 - Title states the "so what" (or clearly describes what the chart shows) in **5–12 words**; rewrite it several times; make sure the chart actually shows what the title says.
-- **The year does not go in the title.** Grapher appends it (", 2023"); drop it when transferring the title into the template. If the reader needs it — above all when the chart shows a single year — put it in the **subtitle** as `Data for <YYYY>.`
+- **Two or three lines is normal.** What matters is how the lines break: fix a break that cuts a phrase abruptly, and rebalance when one line is left mostly empty — reword or move the break rather than accepting grapher's wrapping. Judge it on the rendered frame, not in the text field.
+- **Drop grapher's trailing year.** Grapher appends ", 2023" to single-year titles; that appendix does not belong in the template — move it to the subtitle as `Data for <YYYY>.` A year that reads naturally *inside* the sentence can stay ("Four developed countries met the UN's target for foreign aid in 2025").
+- **Highlight the entity or category the chart is about by coloring that word in the title**, using the exact color of the marks it refers to — e.g. "**Four** developed countries met the UN's target…" in the same coral as the four highlighted bars. One highlight per title; it must match a color actually used in the chart.
+
+### Subtitles and notes
+
 - Subtitle short, clear, and necessary — cut whatever the visualization already makes obvious.
-- Mind where a title breaks across lines — the break shouldn't fight the reading flow.
+- The subtitle is where a single-year chart says `Data for <YYYY>.`
+- **DI images normally carry no note.** The DI template has no note line, and most notes can go: they explain caveats the DI text already covers. When a note is genuinely load-bearing for reading the chart, fold it into the **subtitle as a bolded second line** — and only if the subtitle isn't already crowded. Anything longer than that belongs in the DI text, not the image.
+
+### General
+
 - Consider replacing "World" with "Global average".
 - No abbreviations the audience may not know; write the full word. Plain language throughout.
 - Keep text horizontal — title, subtitle, annotations, data labels. If labels end up vertical, change the chart's orientation instead (e.g. horizontal bars).
