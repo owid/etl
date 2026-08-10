@@ -29,10 +29,12 @@ from philippines import philippines  # noqa: E402
 from korea import korea_tfr  # noqa: E402
 from myanmar import myanmar_tfr  # noqa: E402
 from published import (  # noqa: E402
+    algeria,
     bangladesh,
     drc,
     ethiopia,
     indonesia,
+    iraq,
     kenya,
     nigeria,
     pakistan,
@@ -470,6 +472,41 @@ COUNTRIES = [
       "editions dropped the full births-by-age table, so a recalculation for the latest year is not "
       "possible from them.",
       "https://mods.go.kr/board.es?mid=a20108010000&bid=11773"),
+    C("Algeria", "ONS — Démographie Algérienne", algeria, "Algeria", "complete", False,
+      "The annual bulletin's main indicators table gives a fertility index for most years from 2002, "
+      "alongside births and age-specific rates. Female population by five-year age group is in the same "
+      "bulletin.",
+      "We read the index row out of the 2019 edition, which carries the whole span in one table. Summing its "
+      "age-specific rates and multiplying by the band width reproduces the published 3.0 for 2019 exactly, "
+      "and multiplying those rates by the female population implies 1,032,000 births against the 1,034,000 "
+      "the same bulletin reports.",
+      "ONS stopped publishing the fertility index after 2019. The 2020-2023 edition dropped the whole "
+      "fertility section — the term survives only in the glossary, with no number attached — so the series "
+      "ends there, which is also the year ONS stopped inflating registered births for under-registration "
+      "using coverage factors last estimated in 2002. The total is a registration count, but the age split "
+      "is not: ONS says the rates for 2010-2019 were readjusted onto the age structure of births taken from "
+      "its labour force surveys, and earlier editions say a single 2008 age curve was reused for several "
+      "years. The population denominator is rolled forward from the 2008 census by natural increase alone, "
+      "assuming no net migration. Some years were never published at all, so the line has gaps. The site "
+      "serves its certificate without the intermediate, so downloads need certificate checking relaxed, and "
+      "the year headers in several editions carry a digit-transposition typo for 2017.",
+      "https://www.ons.dz/spip.php?rubrique182"),
+    C("Iraq", "COSIT — household survey rounds", iraq, "Iraq", "survey", False,
+      "The Annual Statistical Abstract has a table of the fertility rate for the years it was measured: 4.0 "
+      "in 2004 from the living conditions survey, 4.3 in 2006 and 4.5 in 2011 from the two household cluster "
+      "surveys, and 4.2 in 2007 from the socio-economic survey. Separately, COSIT publishes a projection "
+      "series running 4.08 in 2015 down to 3.82 in 2020.",
+      "We read the measured rounds from the abstract's table. We do not use the projection series, on the "
+      "same reasoning as Nigeria: it is model output, not measurement.",
+      "Iraq has no usable vital statistics for this. COSIT says so itself — the interior ministry holds a "
+      "civil registry of more than 46 million people, but it is not yet organised for statistical use, and "
+      "COSIT is only now building that pipeline. So there are no births by age of mother to recalculate from, "
+      "and the series stops in 2011 because that is the last measured round published. Iraq ran its first "
+      "full census since 1987 in November 2024, but only headline counts are out; the fertility results are "
+      "not published yet, so this will be worth revisiting. The Kurdistan region's own statistics office "
+      "blocks automated requests entirely, and the federal figures do not cover it — an adolescent fertility "
+      "table on a COSIT platform reports zero for the three Kurdish governorates.",
+      "https://cosit.gov.iq/"),
     C("Uganda", "UBOS — 2024 National Population and Housing Census", uganda_tfr, "Uganda", "survey", False,
       "Table 7.2 of the 2024 census report gives, for every five-year age group, the number of women, the "
       "births they reported in the previous twelve months, the same births after correction, and both the "

@@ -248,6 +248,52 @@ def sudan():
     return _series([])
 
 
+DZ_BULLETIN = "https://www.ons.dz/IMG/pdf/Demographie2019bis.pdf"
+
+
+def algeria():
+    """ONS, Démographie Algérienne 2019 (BIS edition), main indicators table.
+
+    One row carries the fertility index for 2001 through 2019, with an ellipsis where the year was
+    never published. The row above it, the number of births, anchors the year alignment: it runs
+    from 619 thousand in 2001 to 1,034 thousand in 2019.
+    """
+    path = os.path.join(DATA, "dz", "demo2019bis.txt")
+    if not os.path.exists(path):
+        pdf = fetch(DZ_BULLETIN, os.path.join(DATA, "dz", "demo2019bis.pdf"), insecure=True)
+        subprocess.run(["pdftotext", "-layout", pdf, path], check=True)
+    for ln in open(path, errors="ignore"):
+        if "Indice Conjoncturel de F" not in ln:
+            continue
+        tail = ln.split("femme)", 1)[-1]
+        cells = [t for t in tail.split() if t == "\u2026" or re.fullmatch(r"\d,\d", t)]
+        if len(cells) != 19:                           # 2001 to 2019 inclusive
+            continue
+        rows = [(2001 + i, float(c.replace(",", "."))) for i, c in enumerate(cells) if c != "\u2026"]
+        return _series(rows)
+    return _series([])
+
+
+IQ_TABLE = "https://cosit.gov.iq/AAS13/Human%20Develop%20Statistics%2019/humdev18.htm"
+
+
+def iraq():
+    """COSIT, Annual Statistical Abstract 2013, table 19/18 — the measured survey rounds.
+
+    Four of the five years fall inside our window. Each comes from a different household survey,
+    named in the table's own source line.
+    """
+    path = fetch(IQ_TABLE, os.path.join(DATA, "iq", "tfr.htm"))
+    d = pd.read_html(path, encoding="cp1256")[0]
+    rows = []
+    for _, r in d.iterrows():
+        y = pd.to_numeric(str(r.iloc[0]).strip(), errors="coerce")
+        v = pd.to_numeric(str(r.iloc[1]).strip(), errors="coerce")
+        if pd.notna(y) and pd.notna(v) and 1950 < y < 2100 and 0 < v < 10:
+            rows.append((int(y), float(v)))
+    return _series(sorted(rows))
+
+
 def kenya():
     """KNBS, 2019 census analytical report on fertility and nuptiality, volume VI, table 4.5.
 
