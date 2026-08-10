@@ -119,3 +119,22 @@ def nigeria():
             if vals:
                 return _series([(2013 + i, v) for i, v in enumerate(vals)])
     return _series([])
+
+
+def turkey():
+    """TurkStat Population Statistics Portal, national row of the total-fertility-rate export.
+
+    The modern TurkStat data portal is a JavaScript app whose download links are per-page
+    tokens, but this older server-rendered portal answers a plain request. Calling it with an
+    empty `value` returns the national series rather than the province breakdown.
+    """
+    d = pd.read_excel(os.path.join(DATA, "tr_tfr_nat.xlsx"), header=None)
+    rows = []
+    for _, r in d.iterrows():
+        if str(r[1]).strip() != "Türkiye":
+            continue
+        y = pd.to_numeric(r[0], errors="coerce")
+        v = pd.to_numeric(r[2], errors="coerce")
+        if pd.notna(y) and pd.notna(v):
+            rows.append((int(y), float(v)))
+    return _series(sorted(rows))

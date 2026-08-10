@@ -25,7 +25,16 @@ from colombia import dane_female_pop, dane_registered_tfr  # noqa: E402
 from france import france_tfr  # noqa: E402
 from india import india  # noqa: E402
 from philippines import philippines  # noqa: E402
-from published import bangladesh, china, indonesia, nigeria, pakistan, russia, vietnam  # noqa: E402
+from published import (  # noqa: E402
+    bangladesh,
+    china,
+    indonesia,
+    nigeria,
+    pakistan,
+    russia,
+    turkey,
+    vietnam,
+)
 from sources import egypt, england_wales, germany, japan, mexico, thailand, united_states  # noqa: E402
 
 START = 2000
@@ -265,6 +274,18 @@ COUNTRIES = [
       "4.8 — well below the projected path. Birth registration is far too incomplete to use, and the female "
       "population denominators are projections from the 2006 census.",
       "https://www.nigerianstat.gov.ng/elibrary/read/1241422"),
+    C("Turkey", "TurkStat — Population Statistics Portal", turkey, "Turkey", "complete", False,
+      "TurkStat publishes a total fertility rate annually from 2009, and female population by five-year "
+      "age group from the address-based population register.",
+      "We read the national row of TurkStat's own fertility-rate export. Our 2024 value of 1.48 matches "
+      "the figure in its press bulletin.",
+      "TurkStat's current data portal is a JavaScript application whose download links are single-use "
+      "tokens, so it cannot be read by a script. An older server-rendered portal still answers plain "
+      "requests, and that is what this uses — asking it for the national series rather than the province "
+      "breakdown takes an undocumented empty parameter. Age-specific rates exist in the bulletins but "
+      "only inside the JavaScript portal, so there is no age-band comparison for Turkey. The series starts "
+      "in 2009 on this portal; TurkStat's own bulletins go back to 2001.",
+      "https://nip.tuik.gov.tr/"),
 ]
 
 PANELS = [(c["name"], c["src"], c["loader"], c["wpp_name"]) for c in COUNTRIES if c["loader"]]
