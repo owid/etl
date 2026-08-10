@@ -539,6 +539,11 @@ def syria():
     return _series([(2001, 3.8), (2009, 3.5)])
 
 
+def zambia():
+    """ZamStats survey rounds. The 2024 report's trend chart carries the earlier ones."""
+    return _series([(2002, 5.9), (2007, 6.2), (2014, 5.3), (2018, 4.7), (2024, 4.0)])
+
+
 def kenya():
     """KNBS, 2019 census analytical report on fertility and nuptiality, volume VI, table 4.5.
 

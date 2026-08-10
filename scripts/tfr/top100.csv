@@ -61,7 +61,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 60,Sri Lanka,23348314,no,no,,,
 61,Taiwan,23011292,no,no,,,
 62,Malawi,22785535,no,no,,,
-63,Zambia,22521912,no,no,,,
+63,Zambia,22521912,full,yes,no,survey,"surveys; census raw 3.35 vs published 4.6 (P/F, +37%), multipliers not published"
 64,Chad,21560385,no,no,,,
 65,Kazakhstan,21083624,no,no,,,
 66,Somalia,20305912,no,no,,,

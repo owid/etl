@@ -68,6 +68,7 @@ from published import (  # noqa: E402
     venezuela,
     vietnam,
     yemen,
+    zambia,
 )
 from sources import egypt, england_wales, germany, japan, mexico, thailand, united_states  # noqa: E402
 from south_africa import south_africa_tfr  # noqa: E402
@@ -495,6 +496,21 @@ COUNTRIES = [
       "unified statistics database refuses requests from outside the country altogether. The series stops "
       "at 2022 because that is the latest yearbook edition.",
       "https://rosstat.gov.ru/folder/12781"),
+    C("Zambia", "ZamStats — Demographic and Health Survey", zambia, "Zambia", "survey", False,
+      "ZamStats publishes a fertility rate from each survey round, the latest 4.0 for 2024. Its 2022 census "
+      "reports 4.6, and publishes the raw births and women behind it in a separate tables volume.",
+      "We read the survey rounds. We also computed the census's raw figure from its own counts: 3.35, against "
+      "the 4.6 it publishes.",
+      "That is a 37% upward correction, and ZamStats names the method — the P/F ratio technique, after "
+      "checking reported children ever born against a Brass formula — and says plainly that fertility "
+      "measurement relies on indirect estimation because vital registration is underdeveloped. Only 31% of "
+      "people under 50 have a registered birth. But it publishes neither the age-specific multipliers nor the "
+      "adjusted rates, so the 4.6 cannot be rebuilt from anything public; and its own worked example of the "
+      "Brass check does not reproduce from the inputs it quotes — we get 5.66 where the report says 5.921. "
+      "The census and the survey also disagree in an informative way: 4.6 for 2022 against 4.0 for 2024, a "
+      "0.6 fall in two years where the survey series had been falling about 0.12 a year. The raw counts and "
+      "the adjusted figure live in two separate documents, which is worth knowing before citing either.",
+      "https://www.zamstats.gov.zm/"),
     C("Vietnam", "National Statistics Office — population change and family planning survey", vietnam,
       "Vietnam", "survey", False,
       "The office publishes a total fertility rate annually from 2001. Its PxWeb database stops at 2023, but "
