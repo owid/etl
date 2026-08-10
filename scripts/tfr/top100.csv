@@ -54,7 +54,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 53,Niger,28814878,full,yes,no,survey,survey rounds; census computed a Gompertz correction to 7.8 and refused it
 54,Venezuela,28633721,full,yes,no,projection,"projection series ends 2015; ine.gov.ve removed from DNS, moved to ine.gob.ve"
 55,Australia,27227097,full,yes,yes,complete,fully recalculated; matches ABS to 3 decimals; Victoria/WA registration backlogs
-56,North Korea,26633693,no,no,,,
+56,North Korea,26633693,full,yes,no,survey,"CBS-authored census/survey, UN-hosted only; 2018 census cancelled"
 57,Syria,26472496,no,no,,,
 58,Mali,25932277,full,yes,no,survey,surveys; census applied a Brass correction that nearly doubled its raw birth count
 59,Burkina Faso,24601699,no,no,,,

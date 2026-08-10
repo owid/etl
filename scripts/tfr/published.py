@@ -516,6 +516,15 @@ def mali():
     return _series([(2001, 6.8), (2006, 6.6), (2013, 6.1), (2018, 6.3), (2024, 6.0)])
 
 
+def north_korea():
+    """Central Bureau of Statistics: the 2008 census and the 2014 survey it ran.
+
+    Both are the bureau's own work — the census foreword is signed by its director-general — but
+    neither is hosted by any North Korean server; see the note in countries.py.
+    """
+    return _series([(2008, 2.01), (2014, 1.89)])
+
+
 def kenya():
     """KNBS, 2019 census analytical report on fertility and nuptiality, volume VI, table 4.5.
 

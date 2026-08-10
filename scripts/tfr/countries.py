@@ -55,6 +55,7 @@ from published import (  # noqa: E402
     nepal,
     niger,
     nigeria,
+    north_korea,
     pakistan,
     russia,
     saudi_arabia,
@@ -637,6 +638,24 @@ COUNTRIES = [
       "2026, more than thirteen years after the fourth. One INS chart gives 7.0 and 7.2 for 1992 and 1998 "
       "where its own primary tables give 7.4 and 7.5; the tables are right.",
       "https://stat-niger.org/"),
+    C("North Korea", "Central Bureau of Statistics — 2008 census and 2014 survey", north_korea,
+      "North Korea", "survey", False,
+      "The bureau's 2008 census reports 2.01 and prints the births and women behind it as counts. Its 2014 "
+      "socio-economic and health survey reports 1.89. A 2017 household survey gives 1.9, but its title page "
+      "names UNICEF as publisher, so the authorship is shared.",
+      "We read both figures. We also checked the census: dividing its own counts gives 2.008 against the "
+      "published 2.01.",
+      "North Korea is here rather than on the no-figure list, and the reason is worth stating. Every one of "
+      "these documents is the bureau's own work — the census foreword is signed by its director-general and "
+      "credits the UN population fund only for material and technical support — but not one of them is hosted "
+      "on a North Korean server. The country has no statistics website at all: its two public domains resolve "
+      "but drop every connection before answering, the same pattern as Iran, and neither has ever carried a "
+      "statistics section. So the reports survive only on UN mirrors and in archives. We judge authorship, "
+      "not hosting, which is why these count and a UN estimate would not. The planned 2018 census was "
+      "cancelled, so nothing newer than 2017 exists. Two loose ends: the bureau\'s own publications give "
+      "1993 as both 2.1 and 2.20, and the only analysis of that census available anywhere is the US Census "
+      "Bureau\'s, which is not a North Korean source and is not used here.",
+      "https://dprkorea.un.org/en"),
     C("Nigeria", "National Population Commission — Nigeria Demographic and Health Survey", nigeria,
       "Nigeria", "survey", False,
       "The 2024 survey report sets every round since 2003 side by side in one table: 5.7 in 2003 and 2008, "
