@@ -381,9 +381,10 @@ If you genuinely have nothing to suggest, say that instead of inventing somethin
 
 1. Run the **Good Data Viz Checklist** (GUIDELINES.md, final section) against the composed frame; fix what fails.
 2. `get_screenshot` the new page and show the user — original and adapted version side by side. Iterate on feedback (no re-approval needed within the approved page).
-3. **Rename the final frame to the slug** from Step 2 (`child-mortality-asia-decline`) — Figma uses the frame name as the export filename for the website PNG.
-4. Do **not** export a PNG by default — the designer usually keeps editing. On request: `get_screenshot` with `maxDimension` at the target size (DI images ship at 2160×2160, i.e. 4× the 540 frame), or let the user export from Figma.
-5. Report what was created (page name, frames, edits made) and what remains manual: the no-data pattern and flag plugins, and any design review — **you cannot read Figma comments via MCP, so never report the design review as clean.**
+3. **Rename the final frame to the slug** from Step 2 (`child-mortality-asia-decline`) — Figma uses the frame name as the export filename for the website PNG. **Exactly one frame carries the bare slug**; variants get a suffix (`-palette-a`). Two frames with the same name export two files with the same name.
+4. **Clear the rejected variants off the page.** Proposal frames accumulate fast — a palette trial, a labelling trial, a layout trial — and a page with four near-identical charts makes the reader work out which one is live. When the user picks, delete what they didn't pick and keep what they asked to keep; a variant kept deliberately is fine, one left behind by accident is not.
+5. Do **not** export a PNG by default — the designer usually keeps editing. On request: `get_screenshot` with `maxDimension` at the target size (DI images ship at 2160×2160, i.e. 4× the 540 frame), or let the user export from Figma.
+6. Report what was created (page name, frames, edits made) and what remains manual: the no-data pattern and flag plugins, and any design review — **you cannot read Figma comments via MCP, so never report the design review as clean.**
 
 ## Gotchas
 
