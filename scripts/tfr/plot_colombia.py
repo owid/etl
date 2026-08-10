@@ -1,20 +1,19 @@
 """Colombia TFR: national vital statistics vs UN WPP vs UN Demographic Yearbook."""
 
 import glob
+import os
 import re
 import warnings
 
 import matplotlib.pyplot as plt
-import os
-
 import pandas as pd
-
-DATA = os.path.join(os.path.dirname(__file__), "data")
 from matplotlib.ticker import MultipleLocator
 
 from build_colombia_tfr import dane_female_pop, dane_tgf, dyb_tfr, wpp_tfr, wpp_variant
 
 warnings.filterwarnings("ignore")
+
+DATA = os.path.join(os.path.dirname(__file__), "data")
 
 AGE_ROW = re.compile(r"De\s+(\d+)\s*-\s*(\d+)", re.I)
 

@@ -29,6 +29,8 @@ JS = """<script>
       s.hidden = !on;
       s.classList.toggle('solo', Boolean(v) && on);
     });
+    const ov = document.getElementById('overview');
+    if (ov) ov.classList.toggle('hide', Boolean(v));
     if (v) window.scrollTo({ top: 0 });
   }
   sel.addEventListener('change', apply);
@@ -87,8 +89,8 @@ def _at(series, year, prefer):
 
 
 def spread(model_country, nso):
-    """|UN WPP medium - national| at the NSO's latest year. Before the projections start
-    (2024) the medium variant does not exist, so the WPP estimate stands in for it."""
+    """(WPP medium - national, year, national, WPP) at the NSO's latest year. Before the
+    projections start (2024) the medium variant does not exist, so the estimate stands in."""
     d = nso.dropna()
     yr, val = int(d.year.max()), float(d.iloc[-1].value)
     w = un_wpp(model_country)
@@ -96,8 +98,8 @@ def spread(model_country, nso):
     if ref is None:
         ref = _at(w, yr, "estimates")
     if ref is None:
-        return 0.0, yr, 0
-    return abs(val - ref), yr, 2
+        return 0.0, yr, val, None
+    return ref - val, yr, val, ref
 
 
 def chart(country, nso):
@@ -148,9 +150,11 @@ DB_L, DB_R, DB_T, DB_B, ROW = 84, 24, 16, 32, 30
 
 
 def _nice(top):
-    """Round the axis top up to 1, 2 or 5 times a power of ten."""
+    """Round the axis top up: to the next half for small values, else 1/2/5 x a power of ten."""
     if top <= 0:
         return 1.0
+    if top < 5:
+        return math.ceil(top * 2) / 2
     mag = 10 ** math.floor(math.log10(top))
     for m in (1, 2, 5, 10):
         if top <= m * mag:
@@ -166,14 +170,19 @@ def _fmt(v):
     return f"{v:g}"
 
 
-def dumbbell(rows, title):
-    """rows: [(label, national, wpp)] — one row per age band, the two values joined."""
+def dumbbell(rows, title, label_w=DB_L, values=False, fmt=_fmt):
+    """rows: [(label, national, wpp)] — one row per age band, the two values joined.
+
+    With values=True each dot is labelled, the lower one to its left and the higher one to
+    its right so the two never collide.
+    """
     h = DB_T + len(rows) * ROW + DB_B
+    pad = 46 if values else 0                       # room for the right-hand value label
     top = _nice(max(max(a, b) for _, a, b in rows))
-    span = W - DB_L - DB_R
+    span = W - label_w - DB_R - pad
 
     def dx(v):
-        return DB_L + v / top * span
+        return label_w + v / top * span
 
     g = []
     for i in range(5):
@@ -185,10 +194,17 @@ def dumbbell(rows, title):
 
     for i, (label, a, b) in enumerate(rows):
         y = DB_T + i * ROW + ROW / 2
-        g.append(f'<text class="blab" x="{DB_L - 10}" y="{y + 4:.1f}">{label}</text>')
+        g.append(f'<text class="blab" x="{label_w - 10}" y="{y + 4:.1f}">{label}</text>')
         g.append(f'<line class="bar" x1="{dx(min(a, b)):.1f}" y1="{y:.1f}" x2="{dx(max(a, b)):.1f}" y2="{y:.1f}"/>')
         g.append(f'<circle class="pw" cx="{dx(b):.1f}" cy="{y:.1f}" r="5"/>')
         g.append(f'<circle class="pn" cx="{dx(a):.1f}" cy="{y:.1f}" r="5"/>')
+        if values:
+            for v, cls in ((a, "vn"), (b, "vw")):
+                left = v == min(a, b)
+                x = dx(v) + (-10 if left else 10)
+                anchor = "end" if left else "start"
+                g.append(f'<text class="{cls}" x="{x:.1f}" y="{y + 4:.1f}" '
+                         f'text-anchor="{anchor}">{fmt(v)}</text>')
 
     return f'<svg viewBox="0 0 {W} {h}" role="img" aria-label="{title}">{"".join(g)}</svg>'
 
@@ -218,20 +234,29 @@ def main():
         nso = nso[nso.year >= START].copy()
         span = range(int(nso.year.min()), int(nso.year.max()) + 1)
         nso = nso.set_index("year").reindex(span).rename_axis("year").reset_index()
-        sd, yr, n = spread(model_country, nso)
-        built.append((sd, yr, n, country, src, nso, model_country))
+        gap, yr, nso_v, wpp_v = spread(model_country, nso)
+        built.append((gap, yr, nso_v, wpp_v, country, src, nso, model_country))
 
-    # biggest gap to the UN WPP medium projection first
+    # largest signed gap (WPP medium minus national) first
     built.sort(key=lambda r: -r[0])
+
+    overview = dumbbell(
+        [(f"{c} {yr}", nv, wv) for _, yr, nv, wv, c, *_ in built if wv is not None],
+        "Total fertility rate, national vs UN WPP",
+        label_w=176,
+        values=True,
+        fmt=lambda v: f"{v:.2f}",
+    )
+
     sections, options = [], ['<option value="">All countries</option>']
-    for sd, yr, n, country, src, nso, model_country in built:
+    for gap, yr, nso_v, wpp_v, country, src, nso, model_country in built:
         options.append(f'<option value="{country}">{country}</option>')
         sections.append(
             f'<section data-country="{country}"><h2>{country}</h2>'
             f'<p class="src">{src}</p>{chart(model_country, nso)}'
             f"{detail_block(country, model_country, yr)}</section>"
         )
-    print("  ranked:", ", ".join(f"{c} {sd:.3f}" for sd, _, _, c, *_ in built))
+    print("  ranked:", ", ".join(f"{c} {gap:+.3f}" for gap, _, _, _, c, *_ in built))
 
     keys = "".join(
         f'<span class="k"><i style="border-color:{c}"></i>{n}</span>'
@@ -266,6 +291,8 @@ def main():
  .ln {{ fill:none; stroke-width:1.8; stroke-linejoin:round; stroke-linecap:round; }}
  .proj {{ stroke-dasharray:5 3; }}
  .blab {{ fill:var(--mut); font-size:11.5px; text-anchor:end; }}
+ .vn {{ fill:var(--nso); font-size:11.5px; font-weight:600; }}
+ .vw {{ fill:{COLORS["UN WPP"]}; font-size:11.5px; font-weight:600; }}
  .bar {{ stroke:var(--line); stroke-width:4; stroke-linecap:round; }}
  .pn {{ fill:var(--nso); }}
  .pw {{ fill:{COLORS["UN WPP"]}; }}
@@ -274,6 +301,7 @@ def main():
  .detail {{ display:none; margin-top:24px; padding-top:6px; border-top:1px solid var(--line); }}
  section.solo .detail {{ display:block; }}
  section[hidden] {{ display:none; }}
+ #overview.hide {{ display:none; }}
  h3 {{ font-size:14.5px; font-weight:600; margin:20px 0 4px; }}
  .na {{ color:var(--mut); font-size:13.5px; max-width:70ch; }}
  .k {{ display:inline-flex; align-items:center; font-size:13px; color:var(--mut); }}
