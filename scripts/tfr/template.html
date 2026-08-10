@@ -71,13 +71,14 @@
  table.ov td { padding:0 10px 0 0; white-space:nowrap; vertical-align:middle; }
  /* name and metadata hug their text so the chart column takes whatever is left */
  table.ov td.cn { width:1%; text-align:right; padding-right:12px; }
- table.ov td.cc { width:99%; padding-right:20px; }
+ table.ov td.meta:last-of-type { width:99%; }
+ table.ov td.cc { width:640px; padding-right:20px; }
  table.ov td.n, table.ov td.meta { width:1%; }
  table.ov td.n { text-align:right; color:var(--mut); font-variant-numeric:tabular-nums; }
  table.ov td.meta { color:var(--mut); font-size:12.5px; }
  table.ov tr.ticks td { color:var(--mut); font-size:11px; text-transform:uppercase; letter-spacing:.05em;
                         padding-bottom:2px; }
- svg.rowchart { display:block; width:100%; height:28px; }
+ svg.rowchart { display:block; width:640px; height:28px; }
  tr.ticks svg.rowchart { height:14px; }
 </style>
 <div class="wrap">
@@ -140,15 +141,17 @@ const UNPLOTTED = {{UNPLOTTED}};
     return Math.max(1, Math.ceil(top));
   }
 
-  // one table row per country: name, its own dumbbell on a shared scale, then the metadata
-  const CW = 430, CH = 28, LPAD = 44, RPAD = 44;
+  // one table row per country: name, its own dumbbell on a shared scale, then the metadata.
+  // The SVG is rendered at its natural size — stretching it would turn the dots into ellipses.
+  const CW = 640, CH = 28, LPAD = 44, RPAD = 52;
+
+  const ticks = (top) => Array.from({ length: top + 1 }, (_, i) => i);
 
   function rowSvg(r, top) {
     const dx = (v) => LPAD + (v / top) * (CW - LPAD - RPAD);
     const y = CH / 2;
-    const svg = el('svg', { viewBox: `0 0 ${CW} ${CH}`, class: 'rowchart', preserveAspectRatio: 'none' });
-    for (let i = 0; i <= 4; i++) {
-      const v = (top * i) / 4;
+    const svg = el('svg', { viewBox: `0 0 ${CW} ${CH}`, class: 'rowchart' });
+    for (const v of ticks(top)) {
       svg.appendChild(el('line', { class: 'grid', x1: dx(v), y1: 0, x2: dx(v), y2: CH }));
     }
     svg.appendChild(el('line', {
@@ -176,18 +179,17 @@ const UNPLOTTED = {{UNPLOTTED}};
     const table = document.createElement('table');
     table.className = 'ov';
 
-    const ticks = document.createElement('tr');
-    ticks.className = 'ticks';
-    ticks.innerHTML =
+    const head = document.createElement('tr');
+    head.className = 'ticks';
+    head.innerHTML =
       '<td></td><td>' +
-      '<svg viewBox="0 0 ' + CW + ' 14" class="rowchart" preserveAspectRatio="none">' +
-      [0, 1, 2, 3, 4].map((i) => {
-        const v = (top * i) / 4;
+      '<svg viewBox="0 0 ' + CW + ' 14" class="rowchart">' +
+      ticks(top).map((v) => {
         const x = LPAD + (v / top) * (CW - LPAD - RPAD);
-        return `<text class="xlab" x="${x}" y="11">${+v.toFixed(2)}</text>`;
+        return `<text class="xlab" x="${x}" y="11">${v}</text>`;
       }).join('') +
       '</svg></td><td>Built from</td><td>How obtained</td><td>Year</td>';
-    table.appendChild(ticks);
+    table.appendChild(head);
 
     rows.forEach((r) => {
       const tr = document.createElement('tr');
