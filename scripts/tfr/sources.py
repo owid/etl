@@ -5,6 +5,8 @@ import re
 
 import pandas as pd
 
+from fetch import fetch
+
 DATA = os.path.join(os.path.dirname(__file__), "data")
 WPP = "/Users/edouard/dev/owid/etl/data/garden/un/2024-07-12/un_wpp"
 
@@ -65,26 +67,28 @@ def england_wales():
 
 
 def united_states():
-    """CDC/NCHS via data.cdc.gov: age-specific birth rates per 1,000 females, 2016-2024."""
-    d = pd.read_json(os.path.join(DATA, "us_births.json"))
-    d = d[(d.subtopic == "Birth rate") & (d.group == "Maternal age group")]
-    # 15-19 is also split into 15-17 and 18-19; keep only the non-overlapping groups
-    d = d[
-        d.subgroup.isin(
-            [
-                "10-14 years",
-                "15-19 years",
-                "20-24 years",
-                "25-29 years",
-                "30-34 years",
-                "35-39 years",
-                "40-44 years",
-                "45-54 years",
-            ]
-        )
-    ]
-    d = pd.DataFrame({"year": d.time_period.astype(int), "value": pd.to_numeric(d.estimate, errors="coerce")}).dropna()
-    return _tfr_from_asfr(d)
+    """CDC/NCHS age-specific birth rates, 1940-2024, from two data.cdc.gov datasets.
+
+    Neither one covers the whole period: the historical series stops in 2018 and the current one
+    starts in 2016, so they are stitched at 2016. Summing the bands and multiplying by five is
+    exactly how NCHS builds its own published total, and reproduces it to the decimal.
+    """
+    hist = pd.read_json(fetch("https://data.cdc.gov/resource/yt7u-eiyg.json?$limit=5000",
+                              os.path.join(DATA, "us", "rates_1940_2018.json")))
+    hist = pd.DataFrame({"year": hist.year.astype(int),
+                         "value": pd.to_numeric(hist.birth_rate, errors="coerce")}).dropna()
+
+    url = ("https://data.cdc.gov/resource/daba-4vfq.json?$limit=5000"
+           "&$where=classification%3D%27Demographic%20Characteristic%27%20AND%20subtopic%3D%27Birth%20rate%27")
+    cur = pd.read_json(fetch(url, os.path.join(DATA, "us", "rates_2016_2024.json")))
+    # 15-19 is also split into 15-17 and 18-19; keeping those as well would double-count
+    cur = cur[cur.subgroup.isin(["10-14 years", "15-19 years", "20-24 years", "25-29 years",
+                                 "30-34 years", "35-39 years", "40-44 years", "45-54 years"])]
+    cur = pd.DataFrame({"year": cur.time_period.astype(int),
+                        "value": pd.to_numeric(cur.estimate, errors="coerce")}).dropna()
+
+    out = _tfr_from_asfr(pd.concat([hist[hist.year < 2016], cur], ignore_index=True))
+    return out.sort_values("year").reset_index(drop=True)
 
 
 def japan():

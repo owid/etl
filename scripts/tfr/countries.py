@@ -204,13 +204,18 @@ COUNTRIES = [
       "https://esploradati.istat.it/"),
     C("United States", "CDC / NCHS — natality via data.cdc.gov", united_states, "United States",
       "complete", False,
-      "The NCHS Data Query System publishes age-specific birth rates per 1,000 women by maternal age "
-      "group.",
-      "We summed the rates and multiplied by the band width. Our figures match NCHS's published totals "
-      "to two decimals — 1.621 against 1.617 for 2023.",
-      "Only 2016 onward, because that is all this dataset covers. A longer series would mean CDC WONDER, "
-      "whose API needs an XML request. The dataset splits 15-19 into 15-17 and 18-19 as well as the "
-      "whole band, which would double-count if not filtered.",
+      "NCHS publishes age-specific birth rates per 1,000 women by maternal age group in two datasets: a "
+      "historical one running 1940 to 2018, and a current one covering 2016 to 2024. It also publishes its "
+      "own total fertility rate in the annual Births report.",
+      "We summed the rates and multiplied by the band width, which is exactly how NCHS builds its own "
+      "total. The two datasets are stitched at 2016, where they overlap. Our figures reproduce NCHS's "
+      "published totals to the decimal — 1.621 for 2023, 2.056 for 2000.",
+      "The current dataset splits 15-19 into 15-17 and 18-19 as well as the whole band, which would "
+      "double-count if not filtered, and labels the top band 45-54 where the rate is per woman aged 45-49. "
+      "Births by age of mother as counts do exist, in the annual Births report and in the record-level "
+      "natality files, so a recalculation against Census population is possible — but which Census vintage "
+      "you divide by moves the answer by about 1.4%, so it would no longer match NCHS. The CDC website "
+      "itself refuses automated requests; these two datasets come from a separate host that does not.",
       "https://data.cdc.gov/"),
     C("Russia", "Rosstat — Demographic Yearbook of Russia", russia, "Russia", "complete", False,
       "Rosstat publishes a total fertility rate, age-specific rates, births by age of mother and female "
