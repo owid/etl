@@ -38,11 +38,11 @@ from published import (  # noqa: E402
     pakistan,
     russia,
     tanzania,
-    turkey,
     vietnam,
 )
 from sources import egypt, england_wales, germany, japan, mexico, thailand, united_states  # noqa: E402
 from spain import spain_tfr  # noqa: E402
+from turkey import turkey_tfr  # noqa: E402
 
 START = 2000
 
@@ -382,25 +382,23 @@ COUNTRIES = [
       "motion data; a real browser might well get through where a script cannot. Do not use nocr.ir — it "
       "is no longer the registration organization's domain and now redirects to a domain reseller.",
       "https://www.amar.org.ir/"),
-    C("Turkey", "TurkStat — Population Statistics Portal", turkey, "Turkey", "complete", False,
-      "TurkStat publishes a total fertility rate annually from 2001, and female population by five-year age "
-      "group from the address-based population register. Its annual birth statistics bulletin also has tables "
-      "of births by mother's age group and age-specific fertility rates.",
-      "We read the national row of TurkStat's own fertility-rate export. Our 2024 value of 1.48 matches the "
-      "figure in its press bulletin.",
-      "TurkStat's current data portal is a JavaScript application whose download links are single-use tokens, "
-      "so it cannot be read by a script. An older server-rendered portal still answers plain requests, and "
-      "that is what this uses — asking it for the national series rather than the province breakdown takes an "
-      "undocumented empty parameter. That same portal will also return female population by five-year age "
-      "group for 1935-2025, from a form-encoded POST to /Home/GetInformation with the name "
-      "YasGrubunaGoreNufus; a JSON body gets a 404, which is easy to mistake for the endpoint not existing. "
-      "But the births-by-age and age-specific-rate tables are only in the bulletin, behind the token, so "
-      "there is no age-band comparison for Turkey — closing that gap needs someone to download two "
-      "spreadsheets by hand. Two traps: the old portal rounds the fertility rate to one decimal where the "
-      "bulletin gives two, and TurkStat revises birth figures for up to five years after first release, so "
-      "editions disagree with each other. The series starts in 2009 on this portal; the bulletins reach back "
-      "to 2001, but only 2001 itself is stated in text, so 2002-08 could not be recovered.",
-      "https://nip.tuik.gov.tr/"),
+    C("Turkey", "TurkStat — birth statistics over the address-based population register", turkey_tfr,
+      "Turkey", "complete", False,
+      "TurkStat's annual birth statistics bulletin publishes age-specific fertility rates and births by "
+      "mother's age group, both from 2001. An older population portal gives female population by five-year "
+      "age group from the address-based population register, back to 1935.",
+      "We summed the age-specific rates and multiplied by the band width, giving 1.484 for 2024 against the "
+      "1.48 TurkStat states. We also checked it from the counts: dividing the registered births by the "
+      "register's female population gives 1.4832, which agrees with TurkStat's own arithmetic to four "
+      "decimal places. The age-band comparison uses those counts.",
+      "The two bulletin tables cannot be fetched by a script. TurkStat's current portal is a JavaScript "
+      "application whose download links are single-use tokens, so they were downloaded by hand; the "
+      "population portal, by contrast, answers a form-encoded POST, though a JSON body gets a 404. TurkStat "
+      "splits the teens into 15-17 and 18-19, which we fold together. It also revises birth figures for up "
+      "to five years after first release — rows carry an (r) marker — so editions disagree with each other, "
+      "and the population figures before 2007 come from censuses rather than the register, a break inside "
+      "one table. The population series is complete from 2007, so the age-band comparison cannot go earlier.",
+      "https://data.tuik.gov.tr/Bulten/Index?p=Dogum-Istatistikleri-2024-54196"),
     C("Ethiopia", "Statistical Service — Ethiopia Demographic and Health Survey", ethiopia, "Ethiopia",
       "survey", False,
       "The Statistical Service publishes a total fertility rate for each survey round. The 2024-25 "
