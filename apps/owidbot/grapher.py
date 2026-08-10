@@ -21,8 +21,8 @@ def run(branch: str) -> str:
 
     results_by_suite = {suite: read_verify_results(svgs_repo / suite) for suite in SVG_TESTER_SUITES}
 
-    # The first owidbot run of a build happens before the SVG tester step,
-    # so no suite has results yet and the whole block is left out.
+    # The first owidbot run of a build happens before the SVG tester step, so no suite
+    # has results yet and the per-suite block is left out.
     svg_tester_has_run = any(results is not None for results in results_by_suite.values())
 
     rows = "\n".join(
@@ -30,7 +30,6 @@ def run(branch: str) -> str:
         for suite, results in results_by_suite.items()
     )
 
-    svg_tester_line = f"- **SVG tester:** {make_report_url(container_name)}" if svg_tester_has_run else ""
     svg_tester_block = (
         f"""
 <details open>
@@ -46,7 +45,7 @@ def run(branch: str) -> str:
 
     body = f"""
 - **Site-screenshots:** https://github.com/owid/site-screenshots/compare/{branch}
-{svg_tester_line}
+- **SVG tester:** {make_report_url(container_name)}
 
 <details open>
 <summary><b>Archive:</b> </summary>
