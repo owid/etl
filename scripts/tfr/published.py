@@ -48,20 +48,31 @@ def russia():
 
 
 # ---------------------------------------------------------------- Vietnam
+PCFPS = ("https://www.nso.gov.vn/wp-content/uploads/2026/08/"
+         "Sach-ket-qua-chu-yeu-dieu-tra-bien-dong-dan-so-2025.-pdf.pdf")
+
+
 def vietnam():
-    """National Statistics Office PxWeb table V02.15 — total column, 2001 onward."""
-    d = json.load(open(os.path.join(DATA, "vn_tfr.json"), encoding="utf-8-sig"))
-    meta = json.load(open(os.path.join(DATA, "vn_tfr_meta.json"), encoding="utf-8-sig"))
-    # the latest year is labelled "Sơ bộ 2024" (preliminary), so pull the digits out
-    years = [re.search(r"\d{4}", t).group() for t in meta["variables"][0]["valueTexts"]]
-    rows = []
-    for row in d["data"]:
-        if row["key"][1] != "0":                      # 0 = whole country, 1 = urban, 2 = rural
-            continue
-        v = pd.to_numeric(row["values"][0], errors="coerce")
-        if pd.notna(v):
-            rows.append((int(years[int(row["key"][0])]), float(v)))
-    return _series(sorted(rows))
+    """National Statistics Office, population change survey report for 1 April 2025, table 5.2.
+
+    The office's PxWeb database stops at 2023, but this report prints the whole 2001-2025 series in
+    one table: year, whole country, urban, rural. Rows are read from the whole-country column.
+    """
+    path = os.path.join(DATA, "vn", "pcfps2025.txt")
+    if not os.path.exists(path):
+        pdf = fetch(PCFPS, os.path.join(DATA, "vn", "pcfps2025.pdf"))
+        subprocess.run(["pdftotext", "-layout", pdf, path], check=True)
+    lines = open(path, errors="ignore").read().splitlines()
+    start = next(i for i, ln in enumerate(lines)
+                 if "Tổng tỷ suất sinh chia theo thành thị, nông thôn giai đoạn" in ln)
+    rows = {}
+    for ln in lines[start:start + 60]:
+        # the table spills onto a second page with the header repeated; a stray row uses dots
+        # for the decimal separator instead of commas, so accept both
+        m = re.match(r"\s*(20\d{2})\s+(\d[,.]\d{2})\s+\d[,.]\d{2}\s+\d[,.]\d{2}\s*$", ln)
+        if m:
+            rows[int(m.group(1))] = float(m.group(2).replace(",", "."))
+    return _series(sorted(rows.items()))
 
 
 # ---------------------------------------------------------------- Bangladesh

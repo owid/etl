@@ -250,16 +250,24 @@ COUNTRIES = [
       "unified statistics database refuses requests from outside the country altogether. The series stops "
       "at 2022 because that is the latest yearbook edition.",
       "https://rosstat.gov.ru/folder/12781"),
-    C("Vietnam", "National Statistics Office — PxWeb table V02.15", vietnam, "Vietnam", "survey", False,
-      "The statistics office publishes a total fertility rate annually from 2001, through a PxWeb database "
-      "with a working JSON API.",
-      "We pulled the whole-country column straight from the API. No arithmetic of our own.",
-      "This is not a count of registered births. The office estimates the rate from an annual household "
-      "sample survey and then adjusts it upward with the Trussell P/F technique, because women under-report "
-      "births in the previous twelve months. Some years come from a different, larger survey instead of the "
-      "annual one — 2024 is one of those — so the series is not from a single instrument. Vietnam does have "
-      "civil registration, but it is not what the published rate is built on.",
-      "https://pxweb.nso.gov.vn/"),
+    C("Vietnam", "National Statistics Office — population change and family planning survey", vietnam,
+      "Vietnam", "survey", False,
+      "The office publishes a total fertility rate annually from 2001. Its PxWeb database stops at 2023, but "
+      "the 2025 survey report prints the whole 2001-2025 series in one table. The report and the 2019 census "
+      "volume also publish births by age of mother and population by age group, though only inside long PDFs.",
+      "We read the whole-country column of that table. No arithmetic of our own.",
+      "This is not a count of registered births. The office estimates the rate from a household sample survey "
+      "and then adjusts it upward with the Trussell P/F technique, because women under-report births in the "
+      "previous twelve months. Its own report says so but never prints the adjustment. Dividing the 2019 "
+      "census's own counts gives 1.85 against the published 2.09, so the correction that year was about 13% — "
+      "which makes Vietnam's figure closer in kind to a model estimate than to a count. Doing the same on the "
+      "2025 survey tables implies a far larger correction, but the survey's birth table counts mothers rather "
+      "than births and may not be scaled the same way as its population table, so we do not trust that "
+      "comparison and have not used it. Some years come from a different instrument: 2024 is from the "
+      "mid-term population and housing survey, not the annual one. Vietnam does have civil registration, but "
+      "it is not what the published rate is built on, and neither PxWeb nor the statistical yearbook carries "
+      "any table of births or population by age at all.",
+      "https://www.nso.gov.vn/"),
     C("Bangladesh", "BBS — Sample Vital Registration System", bangladesh, "Bangladesh", "sample", False,
       "The 2023 SVRS report carries a table of every year from 1982 to 2023, giving the total fertility "
       "rate alongside four other fertility measures. Each annual edition also states its own year's figure "
