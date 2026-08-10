@@ -23,9 +23,7 @@ Each year gets a new file. For **2026** the file key is `s6Sv60bakebRRW2TxsMQbF`
 |---|---|---|---|
 | Templates page | `798:54` | — | all templates + instruction frames live here |
 | InstagramPost_Template_English | `798:161` | 540×540 | footer: source + `OurWorldinData.org/[Topic]` + CC BY |
-| InstagramPost_Template_Spanish | `4900:19` | 540×540 | + `ourworldindata_es` handle |
 | InstagramPost_Template_Portrait_English | `6689:8` | 560×700 | footer includes a Note line |
-| InstagramPost_Template_Portrait_Spanish | `6689:22` | 560×700 | |
 | InstagramReel_template | `7336:8` | 616×1096 | has top/bottom no-go zones; contains a worked small-multiples example |
 | DI_Template | `6799:1859` | 540×540 | one-line footer: source + CC BY |
 | Static Chart Template_Mobile (example 1) | `24590:20` | 540×540 | |
@@ -46,7 +44,7 @@ The DI Charts Guidelines file (`8gxqkVmZ9x3MK3ky5oigrJ`) is the source of truth 
 
 - **A chart reference**, in any of the forms of the Step 1 table. If the user only describes the chart ("the life expectancy chart with just the US and China"), resolve candidates first and confirm.
 - Optionally, **the DI/article text** the chart accompanies — the best source for annotation content. Ask for it if annotations are wanted and it exists.
-- Everything else (formats, language, author, slug, topic link) is collected once in Step 2.
+- Everything else (formats, author, slug, topic link) is collected once in Step 2.
 
 ## Step 1 — Resolve the chart and gather its text
 
@@ -58,7 +56,8 @@ Get an SVG URL for the chart, whatever form the reference takes:
 | Customized grapher link (query params) | insert `.svg` before the `?`, keep the query verbatim: `https://ourworldindata.org/grapher/<slug>.svg?country=USA~CHN&time=1990..latest` — `country`, `time`, `tab`, `stackMode`, `region`, `focus`, … are all honored, and slug redirects work |
 | MDim view | same — the dimension params select the view: `.../energy-mix.svg?metric=per_capita&source=coal` |
 | Admin link `/admin/charts/<id>/edit` | **`/admin/charts/<id>.svg` does not exist** (it returns the admin SPA shell). Resolve the chart's `configId` — `SELECT configId FROM charts WHERE id = <id>` on the public Datasette (see the `query-grapher-db` skill), or `GET /admin/api/charts/<id>.config.json` — then use `https://ourworldindata.org/grapher/by-uuid/<configId>.svg`. Works for unpublished drafts too. |
-| Narrative chart (name or admin link) | name → uuid via the unauthenticated map `https://admin.owid.io/api/narrative-chart-map`, then `https://ourworldindata.org/grapher/by-uuid/<uuid>.svg` |
+| Narrative chart (**name**) | name → uuid via the unauthenticated map `https://admin.owid.io/api/narrative-chart-map`, then `https://ourworldindata.org/grapher/by-uuid/<uuid>.svg` |
+| Narrative chart (**admin link with a numeric id**, `/admin/narrative-charts/<id>/edit`) | there is no id→uuid endpoint: the public map is keyed by name, and the Datasette mirror of `narrative_charts` lags behind production by days (it stopped at id 338 while 341 existed). Diff the live map against `select name from narrative_charts` to get the unmirrored names, then order them by uuid — they are **uuidv7, so lexical order is creation order** — and count up from the mirror's highest id. That gives a *candidate*, not an answer: ids have gaps where charts were deleted. **Always render the candidate and have the user confirm it before building.** |
 | Description only | find candidates via site search (`https://ourworldindata.org/search?q=...`) or a Datasette title match; show the candidates and confirm before proceeding |
 
 Then pull the chart's texts, which seed the template texts in Step 6. Read them from **`.metadata.json`**, not `.config.json`, and **keep the view's query params on the request** — `.../energy-mix.metadata.json?metric=per_capita&source=coal` resolves the selected MDim view exactly as the `.svg` request does:
@@ -75,20 +74,25 @@ Then pull the chart's texts, which seed the template texts in Step 6. Read them 
 
 These texts also arrive **render-ready**: the endpoint unwraps grapher's detail-on-demand links across the whole payload, so a `description_short` written as `[lower secondary](#dod:lower-secondary-education)` reaches you as plain `lower secondary` — paste it as-is, and don't hand-strip anything. `.config.json` hands back the raw markup instead, which is one more reason not to take texts from it.
 
+> **The one exception: `by-uuid` has no `.metadata.json`** — that route serves only `.config.json`, `.png` and `.svg`, so the request 404s. For a **narrative chart**, therefore, take the texts from `by-uuid/<uuid>.config.json`, which is complete for that case: a narrative chart stores its own `title`/`subtitle`/`note`/`originUrl` overrides rather than inheriting them. What it still won't give you is the source attribution — read that off the rendered SVG's footer instead, and re-derive nothing (see the producer-name rule below).
+
+**Never shorten the producer's name to make it fit.** The footer string is the producer's official name — verify it against `rg "producer: .*<name>" snapshots/` if you're unsure — and "Food and Agriculture Organization of the United Nations" does not become "UN Food and Agriculture Organization" because the line is too long. When it overruns the CC BY text, wrap it (Step 7) rather than editing it.
+
+**Check that every selected entity actually renders.** Grapher silently drops an entity whose data doesn't reach the displayed year, with no warning anywhere — a chart pinned to 2023 quietly showed ten of its eleven countries because one stopped at 2022, and the DI text still discussed the missing one. Compare `selectedEntityNames` in the config against the entity labels in the exported SVG, and if they differ, say so before building: the fix is the narrative chart's tolerance setting (or pinning the year), and it belongs to whoever owns the chart.
+
 ## Step 2 — Ask the run options, all at once
 
 One `AskUserQuestion` batch — don't drip-feed:
 
 1. **Output format(s)** (multi-select — several deliverables from one run are normal). Constraint from the design team: **Instagram and DI images are always square/mobile**; a static chart (for the OWID website) can be desktop and/or mobile:
-   - Instagram post (square 540×540, English/Spanish) or portrait (560×700)
+   - Instagram post (square 540×540) or portrait (560×700)
    - Data insight image (DI_Template, 540×540)
    - Static chart — mobile/square (540×540 or 540×824) and/or desktop (Horizontal 850×638 / Vertical 850×1095; Vertical when the chart needs height — rankings, long bar lists)
 2. **Author** — goes into the page name and (static templates) the "Licensed under CC-BY by the author …" line. Default: the user.
 3. **The DI's own title — or the claim the image is meant to make.** Ask for this whenever a DI or Instagram image is among the formats, and ask *independently of annotations*: grapher's descriptive title must not survive into those images (GUIDELINES.md → Titles), and the story is not yours to invent. If there's no title written yet, ask for the sentence the image supports and derive a candidate from it for approval in Step 4.
 4. **Annotations** — should the chart carry annotations replicating what the accompanying text says? If yes, ask for that text (DI draft, article paragraph).
-5. **Language**, whenever a Spanish template is picked. The Spanish templates differ in their fixed footer text and handle — they do **not** translate the chart's copy, so every reader-facing text you fill in has to be translated: title, subtitle, note, the producer string, and the `Data for <YYYY>.` line. Ask whether the user supplies the Spanish copy or wants a proposed translation to review. Either way it goes into the Step 4 proposal, and no template gets filled with a mix of languages.
-6. **Topic page** for the `OurWorldinData.org/[Topic]` footer line — default from the config's `originUrl`.
-7. **Slug** for the final frame — short, kebab-case (`child-mortality-asia-decline`). It becomes the PNG filename when the frame is exported for the website. Propose one; let the user override.
+5. **Topic page** for the `OurWorldinData.org/[Topic]` footer line — default from the config's `originUrl`.
+6. **Slug** for the final frame — short, kebab-case (`child-mortality-asia-decline`). It becomes the PNG filename when the frame is exported for the website. Propose one; let the user override.
 
 ## Step 3 — Export the SVGs
 
@@ -153,12 +157,10 @@ Replace the lorem-ipsum text nodes in the cloned template. Source everything fro
 
 - **Title** — for a DI or Instagram image, start from the DI title collected in Step 2, not grapher's; otherwise suggest a more colloquial rewrite per GUIDELINES.md ("Death rate in the United States", not "Death rate, US"). Keep the user's final say. The page name uses this final title. Two or three lines is normal; check the line breaks and the year and highlight-color rules in GUIDELINES.md → Titles.
 - **Subtitle** — the chart's subtitle, trimmed to what's necessary. When the chart shows a single year (or a narrow period the reader needs), append **`Data for <YYYY>.`** here.
-- **Data source:** `Data source: ` + `chart.citation` from Step 1 — that field *is* grapher's own footer line, so don't re-derive a `<producer> (<year>)` string by hand.
+- **Data source:** `Data source: ` + `chart.citation` from Step 1 — that field *is* grapher's own footer line, so don't re-derive a `<producer> (<year>)` string by hand, and don't abbreviate it to save space. A long producer name overruns the CC BY text at x=468; the fix is to wrap it, not to shorten it — set the node to `textAutoResize = "HEIGHT"` and resize it to a width that breaks after the organization's name (300 works for the FAO string), then grow the footer **upward** so its bottom stays at y=524 (`footer.resize(508, source.height); footer.y = 524 - footer.height`), set both the source and CC BY to `y = 0` so CC BY top-aligns with the first line, and re-fit the chart into the reduced space.
 - **Note:** only in templates that carry a Note line, and only if the chart has one worth keeping. **DI images normally carry no note at all** — drop it, or, when it's genuinely load-bearing for understanding the chart, fold it into the subtitle as a bolded second line (only if the subtitle isn't already crowded).
 - **`OurWorldinData.org/[Topic]`** → the confirmed topic path (e.g. `OurWorldinData.org/child-mortality`).
 - **CC BY** stays; static desktop templates also carry `Licensed under CC-BY by the author <Author>`.
-
-**On a Spanish template**, every text above comes from the Spanish copy agreed in Step 2 — the chart metadata is English and must not be pasted into it. Leave the fixed labels the template ships with exactly as they are (they are already Spanish, and the "never restyle the template" rule covers their wording too); translate only the chart-derived prose you are inserting. If a text was missed, stop and ask rather than shipping a half-translated image.
 
 Rules: replace `characters`, and leave the node's **base** styling alone — the fonts, sizes, colors, and positions are the template's, not yours. `await figma.loadFontAsync(node.fontName)` before each text edit. If you need a *new* text block the template doesn't have, **clone the nearest template text node and edit it** — that inherits the correct shared style without hunting style ids.
 
@@ -199,6 +201,8 @@ If the rescaled chart overflows the vertical space, re-export the embed at a fla
 The high-value edits to propose (include them in the Step 4 proposal):
 
 - **Direct labels instead of legends and elbows.** Line charts: put the entity label at the end of its line, colored like the line, and delete the elbow/leader connectors; reclaim the freed right margin for the chart. Area/bar charts: label the series inside the chart area (white ≥12px text on dark fills) and delete the separate legend.
+
+  On a **stacked** chart the reliable recipe is: for each category, find the row where its segment is widest, **clone that segment's existing value label** (the clone inherits the right font, size and — importantly — the black-on-light vs white-on-dark fill grapher already chose), set its characters to the category name, then centre the `[name, 4px, value]` pair on the segment. Categories too thin to hold their name anywhere — 13% of one bar is about the floor — keep a single legend entry; lift its swatch and text out of `categorical-color-legend` before deleting the group, and pull the plot up into the row you freed. Five in-chart labels plus one leftover legend entry is a good outcome, not a failure.
 - **Annotations replicating the accompanying text** (12–16px; 10–14px on maps): text color = the annotated object's color, `Text/Gray 80` #5B5B5B, or a mix; bold the key phrase; 2–3px **white outside stroke** instead of a background rectangle.
 - **Arrows**: copy curvy arrows from node `798:773` — 1px stroke, arrowhead and line the same color as each other and consistent across the chart. Never scale a whole arrow (it distorts the head): Shift-resize the line segment only, then reposition the head. If a curvy arrow gets messy, use a straight thin line. **Maps: never curvy — straight 1px lines or values inside country shapes.**
 - **10×10 px dots** marking highlighted years, with the values written out for the first, last, and any mentioned data point (white-outlined dots on stacked areas; no outline elsewhere).
@@ -220,6 +224,8 @@ The high-value edits to propose (include them in the Step 4 proposal):
 - **`rescale()`, never `resize()`** on imported charts — `resize` crops instead of scaling children.
 - **Figma plugins can't be run from here.** The no-data hashed pattern (Hero Patterns, `4162:5`) and the Flags plugin (`2654:5`) are manual: pre-color no-data shapes `#C9C9C9`, tell the user which manual steps remain.
 - **Fonts**: every text edit needs `loadFontAsync` first; the templates use Playfair Display and Lato — if a font is missing in the user's Figma, text edits throw.
+- **A text node's `width` is stale for the rest of the script that set its `characters`.** Read it back and you get the *old* width, so any layout computed from it lands wrong — twice in a row, because re-running the same maths in a second script reads the same stale number when the real cause is elsewhere. Two separate things bite here: SVG-imported text arrives at a **fixed** width (the clone of a `22px` value label stays 22px wide and wraps "Poultry" onto two lines), so set `textAutoResize = "WIDTH_AND_HEIGHT"` first; and even then the new width only settles on the **next** `use_figma` call. Write the text and the sizing mode in one call, measure and position in the next.
+- **`imType=square` and `imType=uncaptioned` don't render the same chart.** The square re-layout drops per-segment value labels that the uncaptioned crop keeps (and the uncaptioned crop keeps the legend, which is inside the chart area, not the header). Export both and look before deciding which one to embed.
 - **`/admin/charts/<id>.svg` doesn't exist**; narrative charts have no public slug — both go through `by-uuid/<uuid>.svg`.
 - **Texts come from `.metadata.json`, not `.config.json`** — the latter has no source attribution, omits inherited subtitles/notes, and 404s on MDim slugs. Carry the view's query params on the request.
 - **`x`/`y` are parent-relative** — reparent the embed into the template clone before applying the Step 7 coordinates.
