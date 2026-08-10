@@ -6,6 +6,7 @@ Pass --fresh to re-parse the sources.
 """
 
 import datetime
+import json
 import os
 import sys
 import warnings
@@ -16,7 +17,7 @@ import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 warnings.filterwarnings("ignore")
 
-from countries import NOTES, PANELS, START  # noqa: E402
+from countries import COUNTRIES, NOTES, START, TIERS  # noqa: E402
 from detail import compare  # noqa: E402
 from render import dumbbell, line_chart  # noqa: E402
 from sources import COLORS, un_wpp  # noqa: E402
@@ -69,29 +70,31 @@ def at(wpp, year, label):
 
 
 def main():
-    rows = []
-    for country, src, fn, model_country in PANELS:
-        nso = national(country, fn)
-        wpp = wpp_series(model_country)
+    rows, unplotted = [], []
+    for c in COUNTRIES:
+        if not c["loader"]:
+            unplotted.append(dict(country=c["name"], tier=c["tier"], note=c["src"]))
+            continue
+        nso = national(c["name"], c["loader"])
+        wpp = wpp_series(c["wpp_name"])
         d = nso.dropna(subset=["value"])
         year, nso_v = int(d.year.max()), float(d.iloc[-1].value)
         wpp_v = at(wpp, year, "medium") or at(wpp, year, "estimates")
-        rows.append(dict(country=country, src=src, nso=nso, wpp=wpp, model_country=model_country,
-                         year=year, nso_v=nso_v, wpp_v=wpp_v, gap=(wpp_v - nso_v) if wpp_v else 0.0))
+        rows.append(dict(country=c["name"], src=c["src"], nso=nso, wpp=wpp, model_country=c["wpp_name"],
+                         year=year, nso_v=nso_v, wpp_v=wpp_v, tier=c["tier"], recalc=c["recalculated"],
+                         gap=(wpp_v - nso_v) if wpp_v else 0.0))
 
     rows.sort(key=lambda r: -r["gap"])
-
-    overview = dumbbell(
-        [(f"{r['country']} {r['year']}", r["nso_v"], r["wpp_v"]) for r in rows if r["wpp_v"]],
-        "Total fertility rate, national vs UN WPP",
-        label_w=176, values=True, fmt=lambda v: f"{v:.2f}",
-    )
 
     sections, options = [], ['<option value="">All countries</option>']
     for r in rows:
         options.append(f'<option value="{r["country"]}">{r["country"]}</option>')
+        tier_label, tier_color = TIERS[r["tier"]]
+        badges = f'<span class="badge" style="background:{tier_color};color:#fff">{tier_label}</span>'
+        if r["recalc"]:
+            badges += '<span class="badge rc">Recalculated by us</span>'
         sections.append(
-            f'<section data-country="{r["country"]}"><h2>{r["country"]}</h2>'
+            f'<section data-country="{r["country"]}"><h2>{r["country"]}{badges}</h2>'
             f'<p class="src">{r["src"]}</p>{country_chart(r)}'
             f'<p class="note">{NOTES.get(r["country"], "")}</p>{detail_block(r)}</section>'
         )
@@ -99,12 +102,18 @@ def main():
     legend = (f'<span class="k"><i style="color:{COLORS["nso"]}"></i>National statistical office</span>'
               f'<span class="k"><i style="color:{COLORS["UN WPP"]}"></i>UN WPP</span>')
 
+    ov_rows = [dict(country=r["country"], year=r["year"], nso=round(r["nso_v"], 4),
+                    wpp=round(r["wpp_v"], 4), tier=r["tier"], recalc=r["recalc"])
+               for r in rows if r["wpp_v"]]
+
     html = open(os.path.join(HERE, "template.html")).read()
     for token, value in [
         ("{{START}}", str(START)),
         ("{{LEGEND}}", legend),
         ("{{OPTIONS}}", "".join(options)),
-        ("{{OVERVIEW}}", overview),
+        ("{{ROWS}}", json.dumps(ov_rows)),
+        ("{{TIERSJSON}}", json.dumps(TIERS)),
+        ("{{UNPLOTTED}}", json.dumps(unplotted)),
         ("{{SECTIONS}}", "".join(sections)),
         ("{{STAMP}}", datetime.datetime.now().strftime("%Y-%m-%d %H:%M")),
     ]:
@@ -112,6 +121,7 @@ def main():
     open(OUT, "w").write(html)
 
     print("  ranked:", ", ".join(f"{r['country']} {r['gap']:+.3f}" for r in rows))
+    print(f"  unplotted: {len(unplotted)}")
     print(f"wrote {OUT}")
 
 

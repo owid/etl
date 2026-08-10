@@ -13,20 +13,30 @@
  h3 { font-size:14.5px; font-weight:600; margin:20px 0 4px; }
  .lede { color:var(--mut); margin:0 0 20px; max-width:76ch; }
  .key { display:flex; gap:18px; flex-wrap:wrap; align-items:center; font-size:13px; color:var(--mut);
-        position:sticky; top:0; z-index:10; background:var(--bg); margin:0 -24px 30px;
+        position:sticky; top:0; z-index:10; background:var(--bg); margin:0 -24px 22px;
         padding:12px 24px; border-bottom:1px solid var(--line); }
  .key i { display:inline-block; width:11px; height:11px; border-radius:50%; background:currentColor;
           vertical-align:middle; margin-right:7px; }
  .k { display:inline-flex; align-items:center; font-size:13px; color:var(--mut); }
  select { font:inherit; font-size:13px; color:var(--fg); background:var(--bg); border:1px solid var(--line);
           border-radius:6px; padding:4px 8px; margin-left:auto; }
+ .filters { margin:0 0 24px; font-size:13px; color:var(--mut); }
+ .filters fieldset { border:1px solid var(--line); border-radius:8px; margin:0 0 8px; padding:8px 12px; }
+ .filters legend { font-size:11px; text-transform:uppercase; letter-spacing:.06em; padding:0 4px; }
+ .filters label { display:inline-flex; align-items:center; gap:6px; margin-right:16px; cursor:pointer;
+                  white-space:nowrap; }
+ .filters input { accent-color:var(--wpp); }
+ .swatch { display:inline-block; width:9px; height:9px; border-radius:2px; background:currentColor; }
  section { margin:0 0 36px; }
  section[hidden] { display:none; }
- #overview.hide { display:none; }
+ #overview.hide, #unplotted.hide { display:none; }
  .src { color:var(--mut); font-size:13px; margin:0 0 6px; }
  .detail { margin-top:24px; padding-top:6px; border-top:1px solid var(--line); }
  .na { color:var(--mut); font-size:13.5px; max-width:70ch; }
  .note { color:var(--mut); font-size:12.5px; margin:10px 0 0; max-width:82ch; }
+ .badge { display:inline-block; font-size:11px; font-weight:600; border-radius:99px; padding:2px 9px;
+          margin-left:8px; vertical-align:2px; }
+ .badge.rc { background:var(--line); color:var(--mut); }
  svg { width:100%; height:auto; display:block; overflow:visible; }
  .grid { stroke:var(--line); stroke-width:1; }
  .axis { stroke:var(--line); stroke-width:1.4; }
@@ -40,7 +50,10 @@
  .pw { fill:var(--wpp); }
  .vn { fill:var(--nso); font-size:11.5px; font-weight:600; }
  .vw { fill:var(--wpp); font-size:11.5px; font-weight:600; }
- footer { color:var(--mut); font-size:12.5px; border-top:1px solid var(--line); padding-top:16px; max-width:82ch; }
+ .tdot { r:4; }
+ table.list { border-collapse:collapse; font-size:13.5px; width:100%; }
+ table.list td { padding:6px 12px 6px 0; border-bottom:1px solid var(--line); vertical-align:top; }
+ table.list td.n { text-align:right; color:var(--mut); font-variant-numeric:tabular-nums; white-space:nowrap; }
 </style>
 <div class="wrap">
 <h1>National vital statistics vs modelled fertility estimates</h1>
@@ -49,30 +62,135 @@ and UN WPP (in blue).</p>
 
 <div class="key">{{LEGEND}}<select id="pick" aria-label="Pick a country">{{OPTIONS}}</select></div>
 
+<div class="filters" id="filters">
+ <fieldset><legend>What the national figure is built from</legend><span id="tierboxes"></span></fieldset>
+ <fieldset><legend>How we obtained it</legend>
+  <label><input type="checkbox" class="rc" value="1" checked> Recalculated by us from counts</label>
+  <label><input type="checkbox" class="rc" value="0" checked> As the office published it</label>
+ </fieldset>
+</div>
+
 <section id="overview">
 <h2>Total fertility rate, latest national year</h2>
 <p class="src">Each country's own figure against the UN WPP medium projection for the same year,
 ordered by how far above the national figure the UN sits.</p>
-{{OVERVIEW}}
+<div id="ov"></div>
+</section>
+
+<section id="unplotted">
+<h2>Countries with no national figure to plot</h2>
+<p class="src">No official total fertility rate we could source, so only the UN estimate exists.</p>
+<div id="unp"></div>
 </section>
 
 {{SECTIONS}}
 
 <script>
+const ROWS = {{ROWS}};
+const TIERS = {{TIERSJSON}};
+const UNPLOTTED = {{UNPLOTTED}};
+
 (function () {
-  const sel = document.getElementById('pick');
-  const secs = Array.from(document.querySelectorAll('section[data-country]'));
-  const ov = document.getElementById('overview');
-  function apply() {
-    const v = sel.value;
-    // all-countries view is the overview dumbbell alone; a country shows only its own charts
-    secs.forEach((s) => {
-      s.hidden = s.dataset.country !== v;
+  const W = 940, LW = 186, R = 24, T = 16, B = 32, ROW = 30, PAD = 46;
+  const svgns = 'http://www.w3.org/2000/svg';
+
+  function el(name, attrs, text) {
+    const n = document.createElementNS(svgns, name);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+
+  function axisTop(top) {
+    if (top <= 0) return 1;
+    if (top < 5) return Math.ceil(top * 2) / 2;
+    const mag = Math.pow(10, Math.floor(Math.log10(top)));
+    for (const m of [1, 2, 5, 10]) if (top <= m * mag) return m * mag;
+    return 10 * mag;
+  }
+
+  function draw(rows) {
+    const host = document.getElementById('ov');
+    host.textContent = '';
+    if (!rows.length) {
+      host.innerHTML = '<p class="na">No countries match these filters.</p>';
+      return;
+    }
+    const h = T + rows.length * ROW + B;
+    const top = axisTop(Math.max(...rows.flatMap((r) => [r.nso, r.wpp])));
+    const span = W - LW - R - PAD;
+    const dx = (v) => LW + (v / top) * span;
+
+    const svg = el('svg', { viewBox: `0 0 ${W} ${h}`, role: 'img' });
+    for (let i = 0; i <= 4; i++) {
+      const v = (top * i) / 4;
+      svg.appendChild(el('line', { class: 'grid', x1: dx(v), y1: T - 4, x2: dx(v), y2: T + rows.length * ROW }));
+      svg.appendChild(el('text', { class: 'xlab', x: dx(v), y: h - 12 }, String(+v.toFixed(2))));
+    }
+    rows.forEach((r, i) => {
+      const y = T + i * ROW + ROW / 2;
+      svg.appendChild(el('circle', { class: 'tdot', cx: 9, cy: y - 4, fill: TIERS[r.tier][1] }));
+      svg.appendChild(el('text', { class: 'blab', x: LW - 10, y: y + 4 }, `${r.country} ${r.year}`));
+      svg.appendChild(el('line', {
+        class: 'bar', x1: dx(Math.min(r.nso, r.wpp)), y1: y, x2: dx(Math.max(r.nso, r.wpp)), y2: y,
+      }));
+      svg.appendChild(el('circle', { class: 'pw', cx: dx(r.wpp), cy: y, r: 5 }));
+      svg.appendChild(el('circle', { class: 'pn', cx: dx(r.nso), cy: y, r: 5 }));
+      [[r.nso, 'vn'], [r.wpp, 'vw']].forEach(([v, cls]) => {
+        const low = v === Math.min(r.nso, r.wpp);
+        svg.appendChild(el('text', {
+          class: cls, x: dx(v) + (low ? -10 : 10), y: y + 4, 'text-anchor': low ? 'end' : 'start',
+        }, v.toFixed(2)));
+      });
     });
-    if (ov) ov.classList.toggle('hide', Boolean(v));
+    host.appendChild(svg);
+  }
+
+  function drawUnplotted(rows) {
+    const host = document.getElementById('unp');
+    if (!rows.length) {
+      host.innerHTML = '<p class="na">None under these filters.</p>';
+      return;
+    }
+    host.innerHTML =
+      '<table class="list"><tbody>' +
+      rows.map((r) =>
+        `<tr><td><span class="swatch" style="color:${TIERS[r.tier][1]}"></span> ${r.country}</td>` +
+        `<td>${TIERS[r.tier][0]}</td><td class="n">${r.note || ''}</td></tr>`
+      ).join('') +
+      '</tbody></table>';
+  }
+
+  // build the tier checkboxes from the tiers actually present
+  const present = [...new Set(ROWS.concat(UNPLOTTED).map((r) => r.tier))]
+    .sort((a, b) => Object.keys(TIERS).indexOf(a) - Object.keys(TIERS).indexOf(b));
+  document.getElementById('tierboxes').innerHTML = present.map((t) =>
+    `<label><input type="checkbox" class="tier" value="${t}" checked>` +
+    `<span class="swatch" style="color:${TIERS[t][1]}"></span> ${TIERS[t][0]}</label>`
+  ).join('');
+
+  const picked = (cls) => [...document.querySelectorAll('input.' + cls + ':checked')].map((i) => i.value);
+
+  function apply() {
+    const country = document.getElementById('pick').value;
+    const tiers = picked('tier');
+    const rcs = picked('rc');
+    document.querySelectorAll('section[data-country]').forEach((s) => {
+      s.hidden = s.dataset.country !== country;
+    });
+    const solo = Boolean(country);
+    document.getElementById('overview').classList.toggle('hide', solo);
+    document.getElementById('unplotted').classList.toggle('hide', solo);
+    document.getElementById('filters').style.display = solo ? 'none' : '';
+    if (!solo) {
+      draw(ROWS.filter((r) => tiers.includes(r.tier) && rcs.includes(r.recalc ? '1' : '0')));
+      drawUnplotted(UNPLOTTED.filter((r) => tiers.includes(r.tier)));
+    }
     window.scrollTo({ top: 0 });
   }
-  sel.addEventListener('change', apply);
+
+  document.getElementById('pick').addEventListener('change', apply);
+  document.querySelectorAll('#filters input').forEach((i) => i.addEventListener('change', apply));
   apply();
 })();
 </script>

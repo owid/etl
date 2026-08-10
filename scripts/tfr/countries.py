@@ -1,4 +1,15 @@
-"""The country registry: how each national series is loaded, described and caveated."""
+"""The country registry.
+
+Every country carries two independent attributes:
+
+* ``tier`` — what the national number is built from. This is the quality ladder, and it says
+  nothing about whether we could recompute it.
+* ``recalculated`` — whether the figure shown is one we computed from counted births and
+  women, rather than a rate or total the office published itself. A transparency badge, not
+  a quality claim: an incomplete registry we can decompose is still an incomplete registry.
+
+``loader`` is None for countries with no national figure to plot.
+"""
 
 import os
 import sys
@@ -16,6 +27,16 @@ from philippines import philippines  # noqa: E402
 from sources import egypt, england_wales, germany, japan, mexico, thailand, united_states  # noqa: E402
 
 START = 2000
+
+# tier key -> (label, color)
+TIERS = {
+    "complete": ("Complete registration", "#1d7a4c"),
+    "incomplete": ("Incomplete registration", "#a8690a"),
+    "sample": ("Sample registration", "#7b5ea7"),
+    "survey": ("Survey or census", "#b0632c"),
+    "projection": ("Projection only", "#5a7a8c"),
+    "none": ("No official figure", "#8a8a8a"),
+}
 
 
 def colombia():
@@ -39,112 +60,57 @@ def france():
     return france_tfr()
 
 
-# display name, short source label, loader, the name UN WPP uses, and the caveat shown
-# under that country's charts
+def C(name, src, loader, wpp_name, tier, recalculated, note):
+    return dict(name=name, src=src, loader=loader, wpp_name=wpp_name, tier=tier,
+                recalculated=recalculated, note=note)
+
+
 COUNTRIES = [
-    (
-        "Colombia",
-        "DANE — Estadísticas Vitales",
-        colombia,
-        "Colombia",
-        "Registered births by age of mother over DANE's own national population projections. "
-        "The 2025 figure is provisional.",
-    ),
-    (
-        "Brazil",
-        "IBGE — Estatísticas do Registro Civil",
-        brazil,
-        "Brazil",
-        "SIDRA tables 197 (2000–02) and 2612 (2003 onward), over IBGE population projections. "
-        "The 2000–02 points come from the older table and understate the level, because birth "
-        "registration coverage was still improving — the step up in 2003 is coverage, not fertility. "
-        "The 2024 figure is provisional.",
-    ),
-    (
-        "France",
-        "INSEE — état civil",
-        france,
-        "France",
-        "INSEE's own fertility rates by detailed age of mother, summed across ages. Excludes "
-        "Mayotte before 2014 and includes it after. The 2025 figure is provisional.",
-    ),
-    (
-        "Italy",
-        "ISTAT — ANPR / stato civile",
-        italy,
-        "Italy",
-        "ISTAT's own age-specific fertility rates, summed across single years of age.",
-    ),
-    (
-        "England and Wales",
-        "ONS — birth registrations, table 10",
-        england_wales,
-        "United Kingdom",
-        "England and Wales only, which is about 89% of UK births — but the UN WPP lines are UK-wide, "
-        "so the two are not exactly like for like. The 2025 figure is provisional.",
-    ),
-    (
-        "United States",
-        "CDC / NCHS — natality via data.cdc.gov",
-        united_states,
-        "United States",
-        "Age-specific birth rates from the NCHS Data Query System, which only publishes 2016 onward. "
-        "A longer series would need CDC WONDER.",
-    ),
-    (
-        "Japan",
-        "MHLW — Vital Statistics via e-Stat",
-        japan,
-        "Japan",
-        "MHLW's own published total fertility rate. Five-yearly before 2000, annual after.",
-    ),
-    (
-        "Germany",
-        "Destatis — Geburtenstatistik (GENESIS 12612-0008)",
-        germany,
-        "Germany",
-        "Live births per 1,000 women by single year of age, summed across ages 15–49. Rebased on the "
-        "2022 census from 2012 onward, so figures differ slightly from earlier Destatis releases. "
-        "The 2025 figure is provisional.",
-    ),
-    (
-        "Thailand",
-        "NSO — Statistical Yearbook tables 1.10 and 1.4",
-        thailand,
-        "Thailand",
-        "Registered births by age group of mother over the registered female population. The yearbook "
-        "prints a rolling three-year window per table, so only the years where both tables overlap "
-        "can be computed — earlier editions would extend this back.",
-    ),
-    (
-        "Egypt",
-        "CAPMAS — Annual Bulletin of Births and Deaths, table 13",
-        egypt,
-        "Egypt",
-        "CAPMAS's own age-specific fertility rates. One bulletin per year, so the series only covers "
-        "the editions to hand.",
-    ),
-    (
-        "Philippines",
-        "PSA — OpenSTAT registered live births",
-        philippines,
-        "Philippines",
-        "Registered births by age group of mother over PSA's 2020-census-based female population "
-        "projection. Coverage is around 90% and births are tabulated by year of registration, so "
-        "this understates the true rate — PSA's own published figure comes from the NDHS survey. "
-        "OpenSTAT publishes one table per year, hence the short series.",
-    ),
-    (
-        "Mexico",
-        "INEGI — registered births, over CONAPO population",
-        mexico,
-        "Mexico",
-        "Births by year of occurrence, summed across every registration year, over CONAPO mid-year "
-        "female population. Stops at 2022 because later years of occurrence are still filling up with "
-        "late registrations.",
-    ),
+    C("Colombia", "DANE — Estadísticas Vitales", colombia, "Colombia", "complete", True,
+      "Registered births by age of mother over DANE's own national population projections. DANE also "
+      "publishes a projection-based figure of about 1.68 for 2024, far above what its registry shows. "
+      "The 2025 figure is provisional."),
+    C("Mexico", "INEGI — registered births, over CONAPO population", mexico, "Mexico", "complete", True,
+      "Births by year of occurrence, summed across every registration year, over CONAPO mid-year female "
+      "population. CONAPO's own model-based figure is well above this. Stops at 2022 because later "
+      "years of occurrence are still filling up with late registrations."),
+    C("Philippines", "PSA — OpenSTAT registered live births", philippines, "Philippines", "incomplete", True,
+      "Registered births by age group of mother over PSA's 2020-census-based female population "
+      "projection. Coverage is around 90% and births are tabulated by year of registration, so this "
+      "understates the true rate — PSA's own published figure comes from the NDHS survey. OpenSTAT "
+      "publishes one table per year, hence the short series."),
+    C("Egypt", "CAPMAS — Annual Bulletin of Births and Deaths, table 13", egypt, "Egypt", "complete", False,
+      "CAPMAS's own age-specific fertility rates, summed. One bulletin per year, so the series only "
+      "covers the editions to hand."),
+    C("Brazil", "IBGE — Estatísticas do Registro Civil", brazil, "Brazil", "complete", True,
+      "SIDRA tables 197 (2000–02) and 2612 (2003 onward), over IBGE population projections. The "
+      "2000–02 points come from the older table and understate the level, because birth registration "
+      "coverage was still improving — the step up in 2003 is coverage, not fertility. The 2024 figure "
+      "is provisional."),
+    C("England and Wales", "ONS — birth registrations, table 10", england_wales, "United Kingdom",
+      "complete", False,
+      "England and Wales only, which is about 89% of UK births — but the UN WPP lines are UK-wide, so "
+      "the two are not exactly like for like. The 2025 figure is provisional."),
+    C("Germany", "Destatis — Geburtenstatistik (GENESIS 12612-0008)", germany, "Germany", "complete", False,
+      "Live births per 1,000 women by single year of age, summed across ages 15–49. Rebased on the 2022 "
+      "census from 2012 onward, so figures differ slightly from earlier Destatis releases. The 2025 "
+      "figure is provisional."),
+    C("Thailand", "NSO — Statistical Yearbook tables 1.10 and 1.4", thailand, "Thailand", "complete", True,
+      "Registered births by age group of mother over the registered female population. The yearbook "
+      "prints a rolling three-year window per table, so only the years where both tables overlap can be "
+      "computed — earlier editions would extend this back."),
+    C("France", "INSEE — état civil", france, "France", "complete", False,
+      "INSEE's own fertility rates by detailed age of mother, summed across ages. Excludes Mayotte "
+      "before 2014 and includes it after. The 2025 figure is provisional."),
+    C("Japan", "MHLW — Vital Statistics via e-Stat", japan, "Japan", "complete", False,
+      "MHLW's own published total fertility rate. Five-yearly before 2000, annual after."),
+    C("Italy", "ISTAT — ANPR / stato civile", italy, "Italy", "complete", False,
+      "ISTAT's own age-specific fertility rates, summed across single years of age."),
+    C("United States", "CDC / NCHS — natality via data.cdc.gov", united_states, "United States",
+      "complete", False,
+      "Age-specific birth rates from the NCHS Data Query System, which only publishes 2016 onward. A "
+      "longer series would need CDC WONDER."),
 ]
 
-# kept for callers that only need the first four fields
-PANELS = [c[:4] for c in COUNTRIES]
-NOTES = {c[0]: c[4] for c in COUNTRIES}
+PANELS = [(c["name"], c["src"], c["loader"], c["wpp_name"]) for c in COUNTRIES if c["loader"]]
+NOTES = {c["name"]: c["note"] for c in COUNTRIES}
