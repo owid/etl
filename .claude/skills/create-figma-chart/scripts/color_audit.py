@@ -23,6 +23,16 @@ PALETTE = {
     "Turquoise": "#38aaba", "OliveGreen": "#578145", "Cherry": "#970046", "Teal": "#00847e",
     "RustyOrange": "#b13507", "Denim": "#4c6a9c", "Fuchsia": "#cf0a66", "TealishGreen": "#00875e",
     "Copper": "#b16214", "DarkMauve": "#8c4569", "Lime": "#3b8e1d", "Coral": "#d73c50",
+    "Gray": "#6e7581",
+}
+
+# The library's "Categorical Maps" group — muted fills for choropleths, NOT interchangeable with
+# the Default Palette. See the add-provider-regions skill for how map colors get agreed.
+CATEGORICAL_MAPS = {
+    "Sand": "#c3a27c", "LightSand": "#d8c0a2", "Taupe": "#b9b2a6", "Olive": "#5b6d35",
+    "LeafGreen": "#6fa54f", "Mustard": "#d9bc54", "Tomato": "#d94c3f", "Lavendar": "#8e97c7",
+    "SoftPurple": "#77538f", "MutedTeal": "#238a84", "LightTeal": "#4fb2ac",
+    "MutedCherry": "#b04e74", "LightCherry": "#cb7fa0", "MutedDenim": "#526f9b",
 }
 
 # The library's "Line and Slope Charts" group: darkened variants for thin marks and text on
@@ -189,6 +199,8 @@ def main():
     ap.add_argument("colors", help="comma-separated hex colors, in stack/legend order")
     ap.add_argument("--names", help="comma-separated category names, same order")
     ap.add_argument("--suggest", action="store_true", help="search the palette for a safer set")
+    ap.add_argument("--maps", action="store_true",
+                    help="search the Categorical Maps group instead (choropleth fills)")
     ap.add_argument("--line", action="store_true",
                     help="use the Line and Slope Charts variants (thin marks and text on white)")
     ap.add_argument("--keep", default="", help="indices (0-based) to hold fixed when suggesting")
@@ -200,6 +212,9 @@ def main():
     if len(names) != len(hexes):
         ap.error("--names must have the same number of entries as colors")
 
+    if args.maps:
+        PALETTE.clear()
+        PALETTE.update(CATEGORICAL_MAPS)
     if args.line:
         PALETTE.update(LINE_VARIANTS)
 
