@@ -234,18 +234,55 @@ EW_BANDS = {
 }
 
 
+MYEB = ("https://www.ons.gov.uk/file?uri=/peoplepopulationandcommunity/populationandmigration/"
+        "populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland/"
+        "mid2011tomid2024/myebtablesuk20112024.xlsx")
+
+
+def _ew_women(year):
+    """{age: women} for England and Wales at mid-year, from ONS's own population estimates.
+
+    Sheet MYEB4 covers 2011 to 2024 by single year of age and sex. Returns None outside that span,
+    which is what happens for the latest provisional year — ONS itself uses projections there.
+    """
+    from fetch import fetch
+
+    col = f"population_{year}"
+    path = fetch(MYEB, os.path.join(DATA, "uk", "myeb.xlsx"))
+    d = pd.read_excel(path, sheet_name="MYEB4", header=1)
+    if col not in d.columns:
+        return None
+    d = d[(d.Name == "ENGLAND AND WALES") & (d.sex == "f")]
+    out = {}
+    for _, r in d.iterrows():
+        a = pd.to_numeric(r.age, errors="coerce")
+        v = pd.to_numeric(r[col], errors="coerce")
+        if pd.notna(a) and pd.notna(v) and 15 <= a <= 49:
+            out[int(a)] = float(v)
+    return out or None
+
+
 def england_wales_detail(year):
-    """ONS Table 10 gives births and the rate, so the implied female population is
-    births / (rate / 1000)."""
+    """Births from ONS table 10, women from ONS's mid-year population estimates.
+
+    Where the population file does not reach the year, the denominator falls back to what ONS's own
+    published rate implies: births / (rate / 1000).
+    """
     d = pd.read_excel(os.path.join(DATA, "uk_births.xlsx"), sheet_name="Table_10", header=5)
     d = d[(d.iloc[:, 2] == "Mother") & (d.iloc[:, 1] == "England, Wales and Elsewhere")]
     d = d[pd.to_numeric(d.iloc[:, 0], errors="coerce") == year]
+    women = _ew_women(year)
     out = {}
     for _, r in d.iterrows():
         band = EW_BANDS.get(str(r.iloc[3]).strip())
         births = pd.to_numeric(r.iloc[4], errors="coerce")
         rate = pd.to_numeric(r.iloc[5], errors="coerce")
-        if band and pd.notna(births) and pd.notna(rate) and rate > 0:
+        if not band or pd.isna(births):
+            continue
+        counted = sum(women.get(a, 0.0) for a in range(band[0], band[1] + 1)) if women else 0.0
+        if counted:
+            out[band] = {"births": float(births), "women": counted}
+        elif pd.notna(rate) and rate > 0:
             out[band] = {"births": float(births), "women": float(births) / (float(rate) / 1000)}
     return out or None
 

@@ -1,8 +1,9 @@
 """Germany: Destatis birth statistics.
 
-Table 12612-0008 gives live births per 1,000 women for each single year of age; 12612-0005
-gives the births themselves by year, age of mother and birth order. Dividing one by the other
-recovers the female population Destatis used, so no third table is needed.
+Table 12612-0008 gives live births per 1,000 women for each single year of age; 12612-0005 gives
+the births themselves by year, age of mother and birth order. The denominator comes from table
+12411-10, the average population over the year by single year of age, which Destatis publishes as
+part of its annual population report — the same concept its own rates are built on.
 """
 
 import os
@@ -10,6 +11,8 @@ import re
 import warnings
 
 import pandas as pd
+
+from fetch import fetch
 
 warnings.filterwarnings("ignore")
 
@@ -64,14 +67,47 @@ def germany_tfr():
     )
 
 
+POP = ("https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Bevoelkerungsstand/"
+       "Publikationen/Downloads-Bevoelkerungsstand/statistischer-bericht-"
+       "bevoelkerungsfortschreibung-zensus-2022-jaehrlich-5124108257005.xlsx?__blob=publicationFile&v=2")
+
+
+def germany_women():
+    """({age: women}, year) from Destatis table 12411-10, or None.
+
+    This is the average population over the year — the mean of the stocks at the start and end —
+    which is the concept Destatis divides by. The all-residents column is the right one: the
+    German-nationals column is 20-30% smaller and would push the rate far too high. Each edition
+    of the report carries only its own year.
+    """
+    path = fetch(POP, os.path.join(DATA, "de", "bevoelkerung.xlsx"))
+    d = pd.read_excel(path, sheet_name="12411-10", header=None)
+    m = re.search(r"Durchschnittliche Bevölkerung (\d{4})", str(d.iloc[1, 0]))
+    if not m:
+        return None
+    out = {}
+    for _, r in d.iterrows():
+        a = re.fullmatch(r"\s*(\d{1,3}) – \d{1,3}\s*", str(r.iloc[0]))
+        v = pd.to_numeric(r.iloc[3], errors="coerce")   # all residents, female
+        if a and pd.notna(v):
+            out[int(a.group(1))] = float(v)
+    return (out, int(m.group(1))) if out else None
+
+
 def germany_detail(year):
     rates, births = _rates().get(year), _births().get(year)
     if not rates or not births:
         return None
+    counted = germany_women()
+    women = counted[0] if counted and counted[1] == year else None
     out = {}
     for lo, hi in BANDS:
         b = sum(births.get(a, 0.0) for a in range(lo, hi + 1))
-        w = sum(births[a] / (rates[a] / 1000) for a in range(lo, hi + 1) if rates.get(a) and births.get(a))
+        if women:
+            w = sum(women.get(a, 0.0) for a in range(lo, hi + 1))
+        else:
+            # falls back to the population Destatis's own rates imply
+            w = sum(births[a] / (rates[a] / 1000) for a in range(lo, hi + 1) if rates.get(a) and births.get(a))
         if b and w:
             out[(lo, hi)] = {"births": b, "women": w}
     return out or None

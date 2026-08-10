@@ -154,30 +154,46 @@ COUNTRIES = [
       "was still improving — the step up in 2003 is coverage, not fertility. The 2024 figure is "
       "provisional. IBGE's own published fertility rate comes from projections, not the registry.",
       "https://sidra.ibge.gov.br/pesquisa/registro-civil/tabelas"),
-    C("England and Wales", "ONS — birth registrations, table 10", england_wales, "United Kingdom",
-      "complete", False,
-      "ONS table 10 gives live births and age-specific fertility rates by age group of mother, back to "
-      "1938.",
-      "We summed the age-specific rates and multiplied by the band width. Because the table also gives "
-      "births, we can divide one by the other to recover the female population ONS used, which is what "
-      "the age-band comparison uses.",
-      "This is England and Wales only, about 89% of UK births, but the UN figures are UK-wide, so the "
-      "two are not exactly like for like. Scotland and Northern Ireland publish separately and would "
-      "need stitching in. The 2025 figure is provisional.",
+    C("England and Wales", "ONS — birth registrations over the mid-year population", england_wales,
+      "United Kingdom", "complete", False,
+      "ONS table 10 gives live births and age-specific fertility rates by age group of mother, back to 1938. "
+      "ONS also publishes mid-year population by single year of age and sex for the United Kingdom and each "
+      "of its nations, 2011 to 2024, in one spreadsheet.",
+      "We summed the age-specific rates and multiplied by the band width. The age-band comparison divides "
+      "the births by ONS's own mid-year female population, which is what ONS itself divides by.",
+      "This is England and Wales, about 89% of UK births, while the UN figures are UK-wide. We measured how "
+      "much that matters: ONS's own reference table gives both, and England and Wales sits a steady 0.02 "
+      "above the UK — 1.55 against 1.53 in 2021, 1.58 against 1.56 in 2020, 1.65 against 1.63 in 2019. That "
+      "is far smaller than the gaps this page is about, so the shorter, more current England and Wales "
+      "series is used rather than the UK one, which ONS stopped publishing after 2021. Building a UK figure "
+      "ourselves would mean stitching in Scotland and Northern Ireland; Scotland's office publishes what is "
+      "needed, but Northern Ireland's refuses scripted downloads outright, so it would not be reproducible. "
+      "The 2025 figure is provisional and ONS calculates it against population projections rather than "
+      "estimates, so the age-band comparison for that year falls back to the population its own rate "
+      "implies. Table 10 publishes rates on both a 15-44 and a 15-49 base; the 15-49 column is empty for "
+      "most recent years, so the 15-44 one is used throughout.",
       "https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths"),
-    C("Germany", "Destatis — Geburtenstatistik (GENESIS 12612-0008)", germany, "Germany", "complete", False,
-      "Destatis table 12612-0008 gives live births per 1,000 women for every single year of age 15-49, "
-      "from 1972 to 2025. Table 12612-0005 gives the births themselves by age of mother and birth "
-      "order, from 2009.",
+    C("Germany", "Destatis — Geburtenstatistik over the average resident population", germany, "Germany",
+      "complete", False,
+      "Destatis table 12612-0008 gives live births per 1,000 women for every single year of age 15-49, from "
+      "1972 to 2025. Table 12612-0005 gives the births themselves by age of mother and birth order, from "
+      "2009. Table 12411-10, in the annual population report, gives the average population over the year by "
+      "single year of age.",
       "We summed the rates across ages. Because they are single-year rates there is no band width to "
-      "multiply by. Dividing births by the rate recovers the female population Destatis used, which "
-      "is what the age-band comparison shows.",
-      "Rebased on the 2022 census from 2012 onward, so numbers differ slightly from Destatis releases "
-      "published before the rebasing — our 2023 comes out at 1.385 where the original release said 1.35. "
-      "The 2025 figure is provisional. The age-band comparison only starts in 2009, because that is where "
-      "the births table begins. Neither file could be pulled through the GENESIS API — the access token we "
-      "have authenticates as the guest account, which cannot download tables — so both were exported by "
-      "hand from the web interface.",
+      "multiply by. The age-band comparison divides the births by the population from 12411-10, which is "
+      "the concept Destatis itself uses — the mean of the stocks at the start and end of the year.",
+      "Two traps we checked and got right. The population table has an all-residents column and a "
+      "German-nationals column; the nationals column is 20-30% smaller and using it would push the rate far "
+      "too high, so the all-residents column is the one that fits. And the births tables date a mother's age "
+      "by subtracting birth years rather than by exact age on a reference date, while the population tables "
+      "use exact age — mixing the two biases a recalculation by about 1%, which is why the line stays "
+      "Destatis's own summed rates. Rebased on the 2022 census from 2012 onward, so numbers differ slightly "
+      "from releases published before the rebasing — our 2023 comes out at 1.385 where the original release "
+      "said 1.35. The 2025 figure is provisional. The age-band comparison only starts in 2009, because that "
+      "is where the births table begins, and the average-population table ships one year per report edition. "
+      "Neither births file could be pulled through the GENESIS API — the access token we have authenticates "
+      "as the guest account, which cannot download tables — so both were exported by hand from the web "
+      "interface; the population report, by contrast, downloads as a plain spreadsheet with no token at all.",
       "https://www-genesis.destatis.de/genesis/online"),
     C("Thailand", "NSO — Statistical Yearbook tables 1.10 and 1.4", thailand, "Thailand", "complete", True,
       "The Statistical Yearbook has table 1.10, registered live births by age group of mother, and table "
