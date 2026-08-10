@@ -364,7 +364,7 @@ Keep the export URL — same `imFontSize`, same `imType`, same params — so the
 
 ## Step 8b — Bring recommendations of your own
 
-Fitting the chart into the template is the floor, not the job. Before the Step 4 proposal, look at the chart as an editor would and say what you would change. Read the data, not just the vectors — you have the CSV a `.csv` request away, and the values often make the case.
+Fitting the chart into the template is the floor, not the job. Before the Step 4 proposal, look at the chart as an editor would and say what you would change. Read the data, not just the vectors — you have the CSV a `.csv` request away, and the values often make the case. **`by-uuid` has no `.csv`**, so for a narrative chart pull the data from its parent chart's slug instead (`grapher/<parent-slug>.csv?country=…&csvType=filtered&time=…`).
 
 Worth looking for, roughly in order of how often it pays:
 
@@ -443,4 +443,9 @@ Two habits make the difference. **Assert, don't eyeball** — a 1.2px label drif
 - **`?tab=table` silently renders the default tab**; `imSquareSize` is PNG-only; `imWidth`/`imHeight` can't enlarge an SVG (renormalized to ~510k px²).
 - **Line charts with >500 points render no dots** (grapher performance cutoff) — don't hunt for dots that were never exported.
 - **Never stretch one axis** of the imported chart — dots, squares, and arrowheads distort. Re-export at the right aspect ratio instead.
+- **Raising `imFontSize` makes grapher drop labels it can no longer fit.** Bigger type means narrow segments lose their value entirely — Brazil's 7.3% fish label vanished between two exports, and a chart can come back with fewer labels than the one you measured. After changing the font size, check that the specific values an annotation or a recommendation relies on are still present.
+- **The Plugin API's shape is not uniform, and guessing costs a round trip.** `figma.getLocalVariableCollectionsAsync` does not exist — variables live under `figma.variables.*`, and this file has paint and text styles but **no colour variables at all**, so a variables sweep comes back empty and means nothing. The range setters are **synchronous** (`setRangeFontName`, `setRangeFillStyleId`) while the node-level ones are async (`setFillStyleIdAsync`, `setTextStyleIdAsync`); `setRangeFontNameAsync` is not a method. Read the typings rather than pattern-matching the `Async` suffix.
+- **The SVG import renames nodes: spaces become hyphens.** A category displayed as "Beef and buffalo" is the node `Beef-and-buffalo`, so `query('[name=Beef and buffalo]')` finds nothing while the legend text still reads with spaces. Query by the hyphenated node name and map to the label text explicitly — that mismatch is also why the legend has to be paired by geometry rather than by name.
+- **`search_design_system` returns about 14 styles per query.** It cannot enumerate a library group in one call, so query each colour by name (or query several times with different wording) and resolve hexes with `importStyleByKeyAsync`. Never conclude a group is small because one search returned few results.
+- **`get_screenshot` hands back a URL, not an image.** Download it with `curl` and open it with Read — an inline base64 response costs far more context for the same picture.
 - **New year, new file** — ask for the link and re-verify every node id in the map above before the first run of a new year.
