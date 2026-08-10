@@ -277,7 +277,7 @@ The high-value edits to propose (include them in the Step 4 proposal):
 - **Annotations replicating the accompanying text** (12–16px; 10–14px on maps): text color = the annotated object's color, `Text/Gray 80` #5B5B5B, or a mix; bold the key phrase; 2–3px **white outside stroke** instead of a background rectangle.
 - **Arrows**: copy curvy arrows from node `798:773` — 1px stroke, arrowhead and line the same color as each other and consistent across the chart. Never scale a whole arrow (it distorts the head): Shift-resize the line segment only, then reposition the head. If a curvy arrow gets messy, use a straight thin line. **Maps: never curvy — straight 1px lines or values inside country shapes.**
 - **Drop the axis and gridlines when every data point is already labelled.** The checklist says so outright, and it is the cheapest space you will ever find: deleting `horizontal-axis`, `vertical-grid-lines` and `vertical-zero-line` from the imported group frees ~25px — usually the difference between text at the 12px floor and text at a comfortable 13–14px. It applies most obviously to a **100% stacked bar**, where every bar spans 0–100% and the axis tells the reader nothing they can't read off the segment values. Don't do it where the reader still has to estimate: a line chart's y-axis, or any chart whose points are mostly unlabelled.
-- **When it still doesn't fit, the entity count is the last lever — and it isn't yours to pull.** Each bar row costs ~30px, so dropping one or two entities buys a font size. But the image and the interactive chart should show the same countries, so changing the selection means changing the chart itself: surface the trade-off with numbers and let its author decide.
+- **Dropping entities does not buy vertical space — it buys thicker bars.** Easy to get wrong: the export canvas is a fixed size, so grapher redistributes the freed rows into the remaining ones and the chart comes back exactly as tall. Measured: eleven countries and ten countries both returned a 346px chart, with the row pitch going from ~28 to ~31px. So cut entities to reduce clutter or to make bars more readable, never to make something fit. **The lever for fit is the export's aspect ratio** (`imWidth`/`imHeight`, which set the shape the layout is computed for) or removing furniture like the axis — not the entity list. Either way the selection belongs to the chart's author: surface it, don't decide it.
 - **10×10 px dots** marking highlighted years, with the values written out for the first, last, and any mentioned data point (white-outlined dots on stacked areas; no outline elsewhere).
 - **Flags** (`2654:5`) beside country labels/bars where they help; **animals** (`5336:5`) for livestock topics; both are copy/paste.
 - **Colors**: only the file's Chart colors library, in the cheat-sheet order; check red/green pairs and black-and-white legibility (GUIDELINES.md → Colors).
@@ -316,8 +316,19 @@ Fitting the chart into the template is the floor, not the job. Before the Step 4
 Worth looking for, roughly in order of how often it pays:
 
 - **Does the sort serve the story?** A chart ordered by one series reads as a ranking of that series. If the point is variation rather than a ranking, or if the story leads with a different series, say so.
-- **Aggregates sitting among countries.** "World", "European Union", income groups: mixed into a country list at their sorted position, a reader takes them for another country. Pull them to the top or bottom, or set them apart visually.
-- **Near-duplicate entities.** Two countries with near-identical profiles spend a row each to say one thing. Dropping one buys a row — worth flagging even though it isn't your call.
+- **Aggregates sitting among countries.** "World", "European Union", income groups: mixed into a country list at their sorted position, a reader takes them for another country. Lift the row to the top and give it a small gap — ~8px, about a quarter of the row pitch — which says "not one of these" without adding any ink:
+
+  ```js
+  const rows = bars.children.slice().sort((a, b) => a.y - b.y)
+  const pitch = rows[1].y - rows[0].y, topY = rows[0].y
+  const agg = rows.find(r => r.name === "World"), i = rows.indexOf(agg)
+  for (let j = 0; j < i; j++) rows[j].y = topY + (j + 1) * pitch   // everything above drops a slot
+  agg.y = topY
+  for (const r of rows) if (r !== agg) r.y += 8                    // the separation
+  ```
+
+  Reordering rows changes what the image shows relative to the interactive chart, so treat it as a trial and mirror it in the chart if it's kept.
+- **Near-duplicate entities.** Two countries with near-identical profiles spend a row each to say one thing. Dropping one gives the rest thicker bars (not more space — see Step 7) — worth flagging even though it isn't your call.
 - **Entities the accompanying text names.** Darkening just those labels (`Text/Gray 100` #2D2E2D against the default #5B5B5B) points the reader at them and costs no space — the fallback worth proposing when a chart is too full for annotations.
 - **Wording the guidelines already cover** — "World" → "Global average", units spelled out in the chart area, a title that describes rather than tells (GUIDELINES.md → Titles).
 - **Anything the checklist flags** that you can't fix yourself.
