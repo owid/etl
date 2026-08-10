@@ -21,6 +21,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 warnings.filterwarnings("ignore")
 
+from argentina import argentina_tfr  # noqa: E402
 from china import china_tfr  # noqa: E402
 from colombia import dane_female_pop, dane_registered_tfr  # noqa: E402
 from france import france_tfr  # noqa: E402
@@ -473,6 +474,26 @@ COUNTRIES = [
       "editions dropped the full births-by-age table, so a recalculation for the latest year is not "
       "possible from them.",
       "https://mods.go.kr/board.es?mid=a20108010000&bid=11773"),
+    C("Argentina", "Health ministry births over INDEC population", argentina_tfr, "Argentina",
+      "complete", True,
+      "The health ministry publishes registered live births by age group of mother as open CSV, annually "
+      "from 2005. INDEC publishes female population by age group in two projection series, one based on the "
+      "2010 census and one on the 2022 census. What INDEC does not publish is an annual fertility rate: its "
+      "only figures are four projected years, starting at 1.27 for 2025.",
+      "We divided the births by the female population in each age group and summed. Because there is no "
+      "official annual rate to take, this is the only way to get a year-by-year figure for Argentina. Our "
+      "2014 value of 2.35 lines up with the roughly 2.3 usually quoted for that year.",
+      "Argentina's fall is the steepest in this whole dataset — from 2.38 in 2010 to 1.19 in 2024, halving in "
+      "fourteen years. The population switches vintage at 2022, from the 2010 census basis to the 2022 one, "
+      "and we have not smoothed that seam. Births are tabulated by year of registration, but the ministry "
+      "defines the series to absorb only one year of lag and its own tables show 95% of a year's "
+      "registrations occurred that year and almost all the rest the year before, so unlike Mexico there is no "
+      "need to stop the series early. Mothers whose age was not stated — under 1% in recent years and "
+      "falling — are spread across the bands. The top group is open-ended at 45 and over, treated here as "
+      "45-49. The series starts in 2010 because that is where INDEC\'s population by age begins; births go "
+      "back to 2005. INDEC\'s file paths are not linked from its own menus and a stale path returns an HTML "
+      "error page with a 200 status, which is easy to mistake for data.",
+      "https://datos.salud.gob.ar/dataset/nacidos-vivos-registrados-por-jurisdiccion-de-residencia-de-la-madre-republica-argentina"),
     C("Afghanistan", "CSO and Ministry of Public Health — Demographic and Health Survey 2015", afghanistan,
       "Afghanistan", "survey", False,
       "One figure: 5.3 children per woman for the three years to 2015, from the survey the Central "
