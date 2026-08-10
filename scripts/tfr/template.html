@@ -71,14 +71,13 @@
  table.ov td { padding:0 10px 0 0; white-space:nowrap; vertical-align:middle; }
  /* name and metadata hug their text so the chart column takes whatever is left */
  table.ov td.cn { width:1%; text-align:right; padding-right:12px; }
- table.ov td.cc { width:1%; padding-right:10px; }
- table.ov td.sp { width:99%; }
+ table.ov td.cc { width:99%; padding-right:10px; }
  table.ov td.n, table.ov td.meta { width:1%; }
  table.ov td.n { text-align:right; color:var(--mut); font-variant-numeric:tabular-nums; }
  table.ov td.meta { color:var(--mut); font-size:12.5px; }
  table.ov tr.ticks td { color:var(--mut); font-size:11px; text-transform:uppercase; letter-spacing:.05em;
                         padding-bottom:2px; }
- svg.rowchart { display:block; width:640px; height:28px; }
+ svg.rowchart { display:block; width:100%; height:28px; }
  tr.ticks svg.rowchart { height:14px; }
 </style>
 <div class="wrap">
@@ -141,16 +140,18 @@ const UNPLOTTED = {{UNPLOTTED}};
     return Math.max(1, Math.ceil(top));
   }
 
-  // one table row per country: name, its own dumbbell on a shared scale, then the metadata.
-  // The SVG is rendered at its natural size — stretching it would turn the dots into ellipses.
-  const CW = 640, CH = 28, LPAD = 40, RPAD = 38;
+  // One table row per country: name, its own dumbbell on a shared scale, then the metadata.
+  // The chart column takes whatever width is left over, so the SVG is drawn only after the
+  // table is in the document and that width can be measured — a viewBox matching the real
+  // pixel width keeps the dots circular instead of stretching them into ellipses.
+  const CH = 28, LPAD = 40, RPAD = 38;
 
   const ticks = (top) => Array.from({ length: top + 1 }, (_, i) => i);
 
-  function rowSvg(r, top) {
-    const dx = (v) => LPAD + (v / top) * (CW - LPAD - RPAD);
+  function rowSvg(r, top, cw) {
+    const dx = (v) => LPAD + (v / top) * (cw - LPAD - RPAD);
     const y = CH / 2;
-    const svg = el('svg', { viewBox: `0 0 ${CW} ${CH}`, class: 'rowchart' });
+    const svg = el('svg', { viewBox: `0 0 ${cw} ${CH}`, class: 'rowchart' });
     for (const v of ticks(top)) {
       svg.appendChild(el('line', { class: 'grid', x1: dx(v), y1: 0, x2: dx(v), y2: CH }));
     }
@@ -182,13 +183,8 @@ const UNPLOTTED = {{UNPLOTTED}};
     const head = document.createElement('tr');
     head.className = 'ticks';
     head.innerHTML =
-      '<td></td><td>' +
-      '<svg viewBox="0 0 ' + CW + ' 14" class="rowchart">' +
-      ticks(top).map((v) => {
-        const x = LPAD + (v / top) * (CW - LPAD - RPAD);
-        return `<text class="xlab" x="${x}" y="11">${v}</text>`;
-      }).join('') +
-      '</svg></td><td>Built from</td><td>How obtained</td><td>Year</td><td class="sp"></td>';
+      '<td></td><td class="cc"></td>' +
+      '<td>Built from</td><td>How obtained</td><td>Year</td>';
     table.appendChild(head);
 
     rows.forEach((r) => {
@@ -197,11 +193,22 @@ const UNPLOTTED = {{UNPLOTTED}};
         `<td class="cn">${r.country}</td><td class="cc"></td>` +
         `<td class="meta"><span class="swatch" style="color:${TIERS[r.tier][1]}"></span> ${TIERS[r.tier][0]}</td>` +
         `<td class="meta">${r.recalc ? 'Recalculated by us' : 'As published'}</td>` +
-        `<td class="n">${r.year}</td><td class="sp"></td>`;
-      tr.querySelector('td.cc').appendChild(rowSvg(r, top));
+        `<td class="n">${r.year}</td>`;
       table.appendChild(tr);
     });
     host.appendChild(table);
+
+    // now the column has a real width, so draw to it
+    const cells = table.querySelectorAll('td.cc');
+    const cw = Math.max(240, Math.round(cells[1].getBoundingClientRect().width));
+    const axis = el('svg', { viewBox: `0 0 ${cw} 14`, class: 'rowchart' });
+    for (const v of ticks(top)) {
+      axis.appendChild(el('text', {
+        class: 'xlab', x: LPAD + (v / top) * (cw - LPAD - RPAD), y: 11,
+      }, String(v)));
+    }
+    cells[0].appendChild(axis);
+    rows.forEach((r, i) => cells[i + 1].appendChild(rowSvg(r, top, cw)));
   }
 
   function drawUnplotted(rows) {
@@ -262,6 +269,8 @@ const UNPLOTTED = {{UNPLOTTED}};
   );
   sel.addEventListener('change', apply);
   document.querySelectorAll('#filters input').forEach((i) => i.addEventListener('change', apply));
+  let t;
+  window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(apply, 150); });
   apply();
 })();
 </script>
