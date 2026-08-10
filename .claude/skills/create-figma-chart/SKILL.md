@@ -44,7 +44,20 @@ The DI Charts Guidelines file (`8gxqkVmZ9x3MK3ky5oigrJ`) is the source of truth 
 
 - **A chart reference**, in any of the forms of the Step 1 table. If the user only describes the chart ("the life expectancy chart with just the US and China"), resolve candidates first and confirm.
 - Optionally, **the DI/article text** the chart accompanies — the best source for annotation content. Ask for it if annotations are wanted and it exists.
+- Optionally, **a link to a finished page in the file to work like** (see below).
 - Everything else (formats, credit, slug, topic link) is collected once in Step 2.
+
+### When you're pointed at a finished page as the model
+
+A designer's own page is a far better spec than this file, so read it before building rather than after. It answers the questions Step 2 would otherwise have to ask, and it answers them in measurements:
+
+- **Which template.** Don't guess from the size — the 540×540 candidates differ on two tells: the **frame fill** (`DI_Template` is `#ffffff`, the Static Chart Mobile templates are cream `#fffbf5`) and the **footer row count** (DI and static carry one row of source + CC BY; the Instagram ones carry two, with the `OurWorldinData.org/[Topic]` line). Whichever text styles the page's title and subtitle are *bound* to settles it.
+- **Which export route.** The chart group's height, the span between its first and last gridline, and its font size together identify the export — compare them against a couple of candidate exports rather than reasoning about `imFontSize` from scratch. A gridline span that matches the square render and not the uncaptioned one is conclusive.
+- **What was done by hand.** Anything in the page that no export could produce is a design decision to carry over: a **bound library style** (an SVG import can never bind one), a color that isn't in the export, a hidden node, a moved label.
+
+**Every number you read off the reference is a target, not a description of your own export.** This is the trap the whole mode sets: having measured their page you feel informed, and you then report your frame's properties from memory of theirs. A reference showing 1px context lines does not mean the export handed you 1px — it means the designer *set* 1px, and mine had come in at 2px and stayed there through a full verification pass, because I checked the colors I had changed and not the weights I hadn't. **Measure your own frame for every property the treatment names**, including the ones you believe you never touched, and state figures only from that reading.
+
+**Then re-render the chart yourself before assuming the page is reproducible.** A finished page is a snapshot of the chart on the day it was made, and both sides move — the chart's config, and grapher's rendering of it. Where your fresh export and their page disagree, work out which of the two changed before you start matching pixels: it is the difference between a design decision to copy and a chart change to report. (On one run the reference showed a single highlighted line against gray context while the fresh export came back with thirteen colored ones — the answer was that the graying had always been manual, not that anything had regressed.)
 
 ## Step 1 — Resolve the chart and gather its text
 
@@ -57,7 +70,8 @@ Get an SVG URL for the chart, whatever form the reference takes:
 | MDim view | same — the dimension params select the view: `.../energy-mix.svg?metric=per_capita&source=coal` |
 | Admin link `/admin/charts/<id>/edit` | **`/admin/charts/<id>.svg` does not exist** (it returns the admin SPA shell). Resolve the chart's `configId` — `SELECT configId FROM charts WHERE id = <id>` on the public Datasette (see the `query-grapher-db` skill), or `GET /admin/api/charts/<id>.config.json` — then use `https://ourworldindata.org/grapher/by-uuid/<configId>.svg`. Works for unpublished drafts too. |
 | Narrative chart (**name**) | name → uuid via the unauthenticated map `https://admin.owid.io/api/narrative-chart-map`, then `https://ourworldindata.org/grapher/by-uuid/<uuid>.svg` |
-| Narrative chart (**admin link with a numeric id**, `/admin/narrative-charts/<id>/edit`) | there is no id→uuid endpoint: the public map is keyed by name, and the Datasette mirror of `narrative_charts` lags behind production by days (it stopped at id 338 while 341 existed). Diff the live map against `select name from narrative_charts` to get the unmirrored names, then order them by uuid — they are **uuidv7, so lexical order is creation order** — and count up from the mirror's highest id. That gives a *candidate*, not an answer: ids have gaps where charts were deleted. **Always render the candidate and have the user confirm it before building.** |
+| Narrative chart (**admin link with a numeric id**, `/admin/narrative-charts/<id>/edit`) | **Try the direct lookup first** — `select id, name, chartConfigId from narrative_charts where id = <id>` on the public Datasette hands you the uuid outright (note the column is `chartConfigId`, not `configId`). Only when the id isn't mirrored yet do you need the guessing route below. |
+| … the same, when the id is **newer than the Datasette mirror** | there is no id→uuid endpoint, and the mirror lags production by days (it once stopped at 338 while 341 existed). Diff the live name-keyed map against `select name from narrative_charts` to get the unmirrored names, then order them by uuid — they are **uuidv7, so lexical order is creation order** — and count up from the mirror's highest id. That gives a *candidate*, not an answer: ids have gaps where charts were deleted. **Always render the candidate and have the user confirm it before building.** |
 | Description only | find candidates via site search (`https://ourworldindata.org/search?q=...`) or a Datasette title match; show the candidates and confirm before proceeding |
 
 Then pull the chart's texts, which seed the template texts in Step 6. Read them from **`.metadata.json`**, not `.config.json`, and **keep the view's query params on the request** — `.../energy-mix.metadata.json?metric=per_capita&source=coal` resolves the selected MDim view exactly as the `.svg` request does:
@@ -75,6 +89,12 @@ Then pull the chart's texts, which seed the template texts in Step 6. Read them 
 These texts also arrive **render-ready**: the endpoint unwraps grapher's detail-on-demand links across the whole payload, so a `description_short` written as `[lower secondary](#dod:lower-secondary-education)` reaches you as plain `lower secondary` — paste it as-is, and don't hand-strip anything. `.config.json` hands back the raw markup instead, which is one more reason not to take texts from it.
 
 > **The one exception: `by-uuid` has no `.metadata.json`** — that route serves only `.config.json`, `.png` and `.svg`, so the request 404s. For a **narrative chart**, therefore, take the texts from `by-uuid/<uuid>.config.json`, which is complete for that case: a narrative chart stores its own `title`/`subtitle`/`note`/`originUrl` overrides rather than inheriting them. What it still won't give you is the source attribution — read that off the rendered SVG's footer instead, and re-derive nothing (see the producer-name rule below).
+>
+> **In that case read *every* text off the SVG, not just the source.** `.config.json` hands back raw detail-on-demand markup, so a note stored as `expressed in [international-$](#dod:int_dollar_abbreviation)` arrives with the brackets attached and you are one hand-edit away from pasting them into the template. The rendered SVG carries the same strings already unwrapped, in `<g id="header">` (title, subtitle) and `<g id="footer">` (sources, note) — one fetch, render-ready, and it is the file you are importing anyway:
+>
+> ```bash
+> python3 -c "import re,sys; s=open(sys.argv[1]).read(); i=s.find('id=\"header\"'); print(re.sub(r'\s+',' ', re.sub(r'<[^>]+>',' ', s[i:s.find('id=\"chart-area\"')])))" chart.svg
+> ```
 
 **Never shorten the producer's name to make it fit.** The footer string is the producer's official name — verify it against `rg "producer: .*<name>" snapshots/` if you're unsure — and "Food and Agriculture Organization of the United Nations" does not become "UN Food and Agriculture Organization" because the line is too long. When it overruns the CC BY text, wrap it (Step 7) rather than editing it.
 
@@ -131,7 +151,9 @@ curl -sL "https://ourworldindata.org/grapher/<slug>.svg?<params>&imType=uncaptio
 head -c 300 $DIR/embed.svg   # expect <svg ... width="..." height="...">, no <html
 ```
 
-> **Square charts, alternative route:** grapher's `imType=square` render re-lays out the chart for a square canvas (legend placement, font sizing tuned by the web team). When that layout is better than the uncaptioned crop — commonly for maps and charts with big legends — import the full square SVG instead and delete its header/footer layers in Figma after import. Offer both routes; pick per chart.
+> **Square charts, second route:** grapher's `imType=square` render re-lays out the chart for a square canvas (legend placement, font sizing tuned by the web team). When that layout is better than the uncaptioned crop — commonly for maps and charts with big legends — import the full square SVG instead and delete its `header` and `footer` groups in Figma after import. Offer both routes; pick per chart.
+>
+> **For a 540-wide template this is usually the route to prefer, not the fallback — export both and measure before choosing.** The square render is already sized for the frame you are filling, and that removes two whole steps: its chart area comes out ≈505×328 with every label at exactly **15px** — a value on the annotation ladder — so there is no `imFontSize` to tune and no rescale at all (see Step 7 on why not rescaling is worth engineering for). Reaching the same 15px through `imType=uncaptioned` took `imFontSize≈36`, and that export also spent more of the frame on furniture: the same chart came back with a plot **279px** tall against the square route's **294.6px**, and a wider reserved right margin. Compare the two on three numbers — final font size at the template width, plot height, and plot width — rather than on which one is nominally "the embed".
 
 **Size the text at export time with `imFontSize` — scaling in Figma cannot fix it.** Grapher picks a base font for the canvas it renders (`max(10, height/25)`, so ~24 for the default uncaptioned export), and every label is derived from it — the segment values and country names land at about **0.75 × the base**. Placing that export at 508px wide shrinks all of it by the same factor, so a default export ends up with ~12px labels: legal, but on the floor of the 12px minimum. Ask for a bigger base instead — `imFontSize=28` gives ~13.5px labels and ~14px legend text in a 540 frame, which matches the template's own 14px source line. Check the export before importing:
 
@@ -208,6 +230,17 @@ Replace the lorem-ipsum text nodes in the cloned template. Source everything fro
 
 Rules: replace `characters`, and leave the node's **base** styling alone — the fonts, sizes, colors, and positions are the template's, not yours. `await figma.loadFontAsync(node.fontName)` before each text edit. If you need a *new* text block the template doesn't have, **clone the nearest template text node and edit it** — that inherits the correct shared style without hunting style ids.
 
+**Watch for template text that is already mixed-weight, and restore it after writing.** Setting `characters` propagates the *first character's* style over the whole new string, so any node whose label is bolder than its content comes out uniformly bold. The source line is the one that bites — the templates ship `Data source:` in Bold and the attribution in Regular — so write the string, then push Regular back over the tail:
+
+```js
+const PREFIX = "Data source:";
+src.characters = PREFIX + " " + citation;
+src.setRangeFontName(0, PREFIX.length, {family:"Lato", style:"Bold"});
+src.setRangeFontName(PREFIX.length, src.characters.length, {family:"Lato", style:"Regular"});
+```
+
+Read the segments back (`getStyledTextSegments(['fontName'])`) and compare against the untouched template node — a wholly-bold source line looks deliberate enough that nobody catches it in a screenshot.
+
 Two **range-level** exceptions the guidelines actively require, applied after the characters are in place and scoped to just those characters — never to the whole node:
 
 - the title's highlight word → `setRangeFills`, in the exact color of the marks it names (GUIDELINES.md → Titles);
@@ -240,7 +273,11 @@ Side margins and the footer edge are the template's, not yours: content starts a
 | Static Horizontal (850×638) | x=16, w=818 | 118 → 556 |
 | Static Vertical (850×1095) | x=16, w=818 | 116 → 997 |
 
-Verify against the actual clone with `get_metadata` (the templates evolve; the geometry above is a 2026 snapshot). These are **frame-local** coordinates, and `x`/`y` are relative to a node's parent — so append the embed to the template clone **before** positioning it. Left parented to the page (where Step 5 puts imported nodes), the same numbers land it near the page origin, on top of the reference chart:
+Verify against the actual clone with `get_metadata` (the templates evolve; the geometry above is a 2026 snapshot). These are **frame-local** coordinates, and `x`/`y` are relative to a node's parent — so append the embed to the template clone **before** positioning it. Left parented to the page (where Step 5 puts imported nodes), the same numbers land it near the page origin, on top of the reference chart. One wrinkle in the same rule: **a GROUP is transparent for coordinates**, so once the imported chart is inside the template, its descendants report `x`/`y` in the *template frame's* space, not the group's — which is what makes the frame-local numbers above directly usable on the plot's internals.
+
+**The header reflows itself — don't reposition it.** `Frame 14` is a vertical auto-layout and `Frame 13` (title + logo) a horizontal one, so a title that grows from two lines to three pushes the subtitle down and grows the header on its own. Set `characters`, then **read the new `header.y + header.height` back** and measure the band from that; any y you computed before the text went in is stale.
+
+**Prefer reaching the content width without `rescale()` at all.** `rescale()` multiplies font sizes along with geometry, so a 1.006× nudge to close a 3px gap silently moves every label from 15px to 15.09 — off the ladder, and the Step 8c "sizes are named styles" check then fails on a difference no one can see. When the width can be closed another way — the label reclaim above is the usual one — take that route and every size stays exactly where the export put it.
 
 **Anything you add to the chart aligns to the same box as the subtitle** — annotations, captions, notes all start at the content left edge and may run its full width. Aligning them to the bars' left edge instead leaves a ragged inner margin that reads as a mistake.
 
@@ -294,6 +331,10 @@ for (const row of chart.query('[name=bars]').first().children) {
 
 Make this a habit rather than a reaction to someone noticing: **after any scale, re-hug or reflow, check that labels still center on the thing they label** — bar values on their bars, legend labels on their swatches, axis labels on their ticks.
 
+**Re-anchor to the marks, not to a remembered box width.** The snippet above is the fallback for when nothing addressable is nearby; wherever the export gives you the mark, drive off it, because then no amount of re-hugging or stretching can accumulate error. On an axis every anchor is already in the tree: the `tick-marks` group carries one zero-width vector per tick named after its value, and `horizontal-grid-lines` one per gridline, so tick labels align on their mark (grapher **left**-aligns the first and **right**-aligns the last to keep them inside the plot, everything between centered) and value labels right-align on the axis edge. Verified that way, all six tick deltas come back exactly 0 rather than approximately 0.
+
+**And expect a uniform vertical offset there, which is correct — do not zero it.** Grapher positions text by baseline, and digit-only labels have no descenders, so their visual center sits *below* the box center: every value label on an axis measures ~1.2px above its gridline, by construction. The check is that the offset is **uniform across the set**, not that it is zero — forcing box-center onto mark-center puts every number 1.2px low. A *varying* offset is the real defect, and that is what a re-hug introduces.
+
 ## Step 8 — Improve the labeling and annotate
 
 **Read [GUIDELINES.md](GUIDELINES.md) now if you haven't.** Browse 1–2 recent dated pages in the file (`get_screenshot`) to see how finished charts apply these conventions. The imported SVG is a fully editable vector tree — text nodes, line vectors, legend swatches are all addressable via `use_figma`.
@@ -305,7 +346,41 @@ The high-value edits to propose (include them in the Step 4 proposal):
   **This is not a free win on a stacked chart — check that it beats the legend before proposing it.** Direct labeling works when every label can sit *on the mark it names*: over its own segment of the top bar (the pattern in [this DI](https://ourworldindata.org/data-insights/most-collected-waste-in-many-low--and-middle-income-countries-is-stored-in-open-dumps-or-is-burned), where colored category labels sit above the first row and the widest series is labeled in white inside the bar), or inside the widest segment of each category. Both need the segments to be wide enough, which in practice caps it at **three or four categories**. Beyond that the labels collide over the top bar, and spreading them evenly across the plot instead just yields a color-coded legend that is *harder* to read than the real one — the reader has lost the swatch and gained nothing. Six categories is past the line. When it doesn't fit, keep grapher's legend and say why; a conventional legend is not a failure to improve the chart.
 
   When it *does* fit, the reliable recipe is: for each category, find the row where its segment is widest, **clone that segment's existing value label** (the clone inherits the right font, size and — importantly — the black-on-light vs white-on-dark fill grapher already chose), set its characters to the category name, then center the `[name, 4px, value]` pair on the segment. To rebuild a legend you removed too eagerly: recolor the labels to `Text/Gray 80` #5B5B5B, add a 10×10 swatch in each category's own color 4px to their left, and lay them out in grapher's own split — as many as fit on the first row, the longest alone on the second.
-- **Annotations replicating the accompanying text** (12–16px; 12–14px on maps): text color = the annotated object's color, `Text/Gray 80` #5B5B5B, or a mix; bold the key phrase; 2–3px **white outside stroke** instead of a background rectangle.
+
+  **On a line chart, grapher has already done most of the work and left you three moves.** The export ships the labels as a `text-labels` group and the elbows as a sibling `connectors` group, so the first move is one line: hide `connectors`. The other two are where the value is:
+
+  1. **Re-place each label against its line's endpoint, which the connectors encode.** Each connector's bounding box spans *line end → label center*, so the end **further** from the label's current center is the line end — that is your target, and it is the only place the endpoint is recoverable from, since a path's bbox won't tell you which corner the line arrives at. Then de-collide with a **minimum pitch of the font size × 1.33** (20px at 15px labels) by relaxing overlaps half-and-half until stable; that converges on minimum total drift, and it reproduced a designer's hand-placement of the same chart to within a pixel (worst label 8.9px off its line against their 9.5px).
+  2. **Reclaim the freed right margin — and note that the *longest label* is what caps the reclaim, so shortening the longest labels is the lever, not deleting the elbows.** Grapher sizes the margin to fit its widest label, so on a chart where "United Kingdom" is present the label block cannot move right at all; shortening that one and "United States" to **UK** and **US** made "Switzerland" the constraint and bought 30px of plot. The arithmetic is exact: `LABEL_X = content_right − max(label widths)`, then `plot_right = LABEL_X − 5`, and the chart's own width comes out equal to the header's for free.
+
+  **Apply the stretch as a scripted x-map, never as a group `resize()`.** Map `x → L + (x − L) · s` over the `tick-marks`, `horizontal-grid-lines` and `lines` subtrees, scaling each vector's width by `s`; **skip TEXT entirely** (re-anchor it afterwards) and map the *center* of the year markers while keeping their size, so dots stay round — verified 6×6 after a 1.17× stretch. A `resize()` on the group would rewrap every label through its constraints and oval every dot.
+
+  ```js
+  const mapX = x => L + (x - L) * s;
+  const stretch = n => {
+    if (n.type === 'TEXT') return;
+    if (n.children?.length) return n.children.forEach(stretch);
+    if (/^\d{4}$/.test(n.name) && n.width < 8) { n.x = mapX(n.x + n.width/2) - n.width/2; return }  // year marker
+    n.x = mapX(n.x);
+    if (n.width > 0.01) n.resize(n.width * s, n.height);
+  };
+  ```
+
+  **Hiding a series beats deleting one when the labels won't fit** — it is reversible in a click and a reviewer can see what was taken out — but it still changes what the image shows relative to the interactive chart, so it stays a chart-author decision you surface rather than take. Say what it bought: five labels needing 100px of pitch across ~70px of line endpoints is a real collision, and dropping one is one of the two fixes (the other is accepting the drift).
+- **Fill in the gaps in a time axis — but only where they measurably fit, and otherwise leave grapher's axis exactly as it is.** Grapher drops tick labels to avoid collisions at the width it rendered for, so once you reclaim a margin (above) the axis can be left reading `1990 · 2000 · 2005 · 2010 · 2015 · 2025` when the room for a complete 5-year run is now there. Clone an existing **interior** tick vector and label — never build one from scratch, the clone inherits the stroke, size, color and alignment — set the characters, and place both at `x = x(1990) + (year − 1990)/(span) · (x(2025) − x(1990))`.
+
+  **Two fit tests, not one, because the edge labels are anchored differently.** Interior labels are centered on their tick, so they need `pitch ≥ labelWidth + ~8px`. The **first** label is left-aligned *at* its tick and the **last** right-aligned *at* its tick — grapher does this to keep them inside the plot — so each spends a full label width on its inward side, and the two slots next to them need roughly `1.5 × labelWidth + gutter`. Miss that and the arithmetic says yes while the render overlaps: on one chart a 50.3px pitch cleared the 43px interior requirement, added 1995 and 2020, and left both of them 2.2px *inside* the edge labels. Measure the neighbor gaps after adding and revert if any is negative — the honest outcome is often that grapher's axis was already right, and the years it dropped were exactly the edge-adjacent ones.
+
+- **Annotations replicating the accompanying text** (12–16px; 12–14px on maps): text color = the annotated object's color, `Text/Gray 80` #5B5B5B, or a mix; bold the key phrase; and each one wrapped in its **own white (canvas-colored) auto-layout frame, hugging the text on both axes** and appended last so it sits above the chart — see GUIDELINES.md → Annotations for why hugging is the part that matters and when a white outside stroke is the fallback instead.
+
+  ```js
+  const box = figma.createAutoLayout("HORIZONTAL", { name: "annotation__<what>" });
+  clone.appendChild(box);                                   // parent before setting HUG
+  box.fills = [{type:"SOLID", color:{r:1,g:1,b:1}}];
+  box.paddingLeft = box.paddingRight = box.paddingTop = box.paddingBottom = 0;
+  box.appendChild(txt);
+  txt.layoutSizingHorizontal = txt.layoutSizingVertical = "HUG";
+  box.layoutSizingHorizontal = box.layoutSizingVertical = "HUG";
+  ```
 - **Arrows**: copy curvy arrows from node `798:773` — 1px stroke, arrowhead and line the same color as each other and consistent across the chart. Never scale a whole arrow (it distorts the head): Shift-resize the line segment only, then reposition the head. If a curvy arrow gets messy, use a straight thin line. **Maps: never curvy — straight 1px lines or values inside country shapes.**
 - **Drop the axis and gridlines when every data point is already labeled.** The checklist says so outright, and it is the cheapest space you will ever find: deleting `horizontal-axis`, `vertical-grid-lines` and `vertical-zero-line` from the imported group frees ~25px — usually the difference between text at the 12px floor and text at a comfortable 13–14px. It applies most obviously to a **100% stacked bar**, where every bar spans 0–100% and the axis tells the reader nothing they can't read off the segment values. Don't do it where the reader still has to estimate: a line chart's y-axis, or any chart whose points are mostly unlabeled.
 - **Dropping entities does not buy vertical space — it buys thicker bars.** Easy to get wrong: the export canvas is a fixed size, so grapher redistributes the freed rows into the remaining ones and the chart comes back exactly as tall. Measured: eleven countries and ten countries both returned a 346px chart, with the row pitch going from ~28 to ~31px. So cut entities to reduce clutter or to make bars more readable, never to make something fit. **The lever for fit is the export's aspect ratio** (`imWidth`/`imHeight`, which set the shape the layout is computed for) or removing furniture like the axis — not the entity list. Either way the selection belongs to the chart's author: surface it, don't decide it.
@@ -416,9 +491,10 @@ Every one of these caught a real defect on this skill's first run, and none of t
 |---|---|---|
 | Color-vision safety | `color_audit.py` | no pair under **ΔE 20** for deuteranopia or protanopia; tritanopia noted, never acted on alone |
 | Grayscale survival | `color_audit.py` (grayscale seam section) | **adjacent** pairs above ~**1.6:1**; below that they merge in print. Stacked and grouped fills only — with `--line`/`--maps` the tool reports the closest pairs without gating, since legend order says nothing about which marks meet |
-| Off-palette fills | compare every fill against the library groups | every fill is a library color, **bound as a style** — grapher emits `#585c64` for residual categories, which is in no group |
+| Off-palette fills | compare every fill against the library groups | every fill is a library color, **bound as a style** — grapher emits `#585c64` for residual categories, which is in no group. The muting grays of a highlight treatment are the standing exception: list them, don't flag them |
 | Legend agreement | pair swatch→label by geometry, compare against the bars | zero mismatches |
 | Text size | read `fontSize` off every text node | nothing below **12px**; annotations on the named ladder |
+| Mark weight | read `strokeWeight` off the context marks, the highlighted one, and its halo | on a highlight treatment: context **1px**, protagonist **3px**, halo **2× the protagonist**. Read it even when you never set it — the export's own values are 2px and line+1 |
 | Label-on-fill contrast | `contrast(labelHex, barHex)` for every in-bar label | **4.5:1** at 13.5px regular — the 3:1 large-text allowance does not apply |
 | Text hierarchy | list every distinct `fontSize` with what it belongs to, **and its rank** | title > subtitle ≥ annotations > supporting text ≥ labels. Sizes may vary inside the plot by rank; a lead annotation may *equal* the subtitle (Annotation XL 16) but nothing may exceed it, and same-rank items must share a size |
 | Sizes are named styles | every size matches a style in the file | no arbitrary sizes left over from scaling the export (13.7, 16.8). Choose from the ladder by rank rather than by element type — see GUIDELINES.md → Subtitles and notes |
@@ -426,11 +502,20 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Box alignment | compare the chart's left/right against the header frame | identical to the subtitle box, to the pixel |
 | Gap | `(footer.y - headerBottom - chart.height) / 2` | **12–16px**, equal top and bottom |
 
+**Filter the fill sweep to what actually paints, or it invents failures.** Two kinds of phantom show up and both look exactly like a real off-palette color in a listing. **Hidden ancestors:** `visible` is per-node, so the children of a group you hid are still individually `visible: true` — walk up to the frame and skip anything with a hidden ancestor, or a hidden `connectors` group reports a dozen stray colors. **Zero-area vectors:** grapher's exported tick marks are zero-width stroked paths that carry a default black `fill` which can never paint, so an unfiltered sweep reports twelve `#000000` fills on a chart that has none. With both filters the same chart went from 4 apparent off-palette colors to the 2 real ones.
+
+```js
+const paints = n => { let m = n; while (m && m !== clone) { if (!m.visible) return false; m = m.parent } return true }
+// ...and ignore `fills` on nodes whose width or height rounds to 0
+```
+
 **Make label-centering part of the build, not a follow-up.** It regressed three times in one run — each rebuild re-hugs the text, which restores the drift, and a separate "now center the labels" step is forgotten or applied to a chart instance that is later replaced. Put the centering loop at the end of the same function that imports, scales and re-hugs, so it cannot be skipped.
 
 **Re-run this whole pass after the last change, not after each one.** Fixes get lost silently: a label-centering pass applied to a chart instance that is later swapped for a re-export leaves the drift back exactly as it was, and every screenshot in between looks correct. And a structural change spends budget elsewhere — lifting an aggregate row to the top added 8px of height, which came straight out of the 12–16px gap and took it to 8.2 without anything reporting a problem. Treat "I already checked that" as false after any re-export, reorder, rescale or restyle.
 
 **A failing check is a finding to report, not a veto.** Measure it, say plainly what fails and by how much, offer the alternatives with their own numbers — then do what the author decides. If they accept the deviation, record it beside the frame and in the report (GUIDELINES.md → Colors) so it reads as a decision rather than an oversight.
+
+**Check the properties you didn't change, not just the ones you did.** A verification pass naturally retraces the edits — it measures the colors because you set colors, the positions because you moved things — and that is exactly how an inherited value survives it. The context lines on this chart stayed at the export's 2px through a full pass that confirmed their color, because nothing in the pass ever asked what weight they were. Derive the check from **what the finished frame is supposed to look like**, property by property, rather than from your own edit history; anything the treatment specifies gets read back, whether or not you believe you touched it.
 
 Two habits make the difference. **Assert, don't eyeball** — a 1.2px label drift, a 1.18:1 grayscale pair and a scrambled legend all looked perfectly fine in a screenshot. And **re-run the affected checks after every change**, because they interact: applying a text style resets range colors, rescaling rewraps text and shifts label centers, adding an annotation changes the group's width, and swapping one color moves the safety floor to a different pair.
 
@@ -457,7 +542,10 @@ Two habits make the difference. **Assert, don't eyeball** — a 1.2px label drif
 - **`x`/`y` are parent-relative** — reparent the embed into the template clone before applying the Step 7 coordinates.
 - **`?tab=table` silently renders the default tab**; `imSquareSize` is PNG-only; `imWidth`/`imHeight` can't enlarge an SVG (renormalized to ~510k px²).
 - **Line charts with >500 points render no dots** (grapher performance cutoff) — don't hunt for dots that were never exported.
-- **Never stretch one axis** of the imported chart — dots, squares, and arrowheads distort. Re-export at the right aspect ratio instead.
+- **Never stretch one axis** of the imported chart — dots, squares, and arrowheads distort. Re-export at the right aspect ratio instead. The one sanctioned exception is the scripted plot-only x-map in Step 8, which skips text and preserves marker sizes by construction; verify the markers are still square afterwards rather than trusting that.
+- **A sweep over mixed node types must guard every property read.** `dashPattern`, `strokes` and `fills` don't exist on `GROUP`, so one un-guarded read aborts the whole script — and `use_figma` is atomic, so you lose the entire pass, not just that node. Wrap each read in its own `try`, and remember `fontSize`/`fontName`/`lineHeight` can come back as `figma.mixed` rather than a value.
+- **To draw a dashed leader or guide line, create a VECTOR with an explicit path** — `figma.createLine()` gives you a horizontal line you then have to rotate, which is fiddly to place. `v.vectorPaths = [{windingRule:"NONE", data:`M 0 0 L 0 ${len}`}]` then `v.dashPattern = [2,2]` is exact and needs no rotation maths.
+- **The line-chart export's group names are `text-labels`, `connectors`, `lines`, `datapoints__<Entity>`, `outline__<Entity>`, `tick-marks`, `horizontal-grid-lines`** — worth knowing before you go hunting, and worth re-checking per chart type, since the tree is grapher's and it changes.
 - **Raising `imFontSize` makes grapher drop labels it can no longer fit.** Bigger type means narrow segments lose their value entirely — Brazil's 7.3% fish label vanished between two exports, and a chart can come back with fewer labels than the one you measured. After changing the font size, check that the specific values an annotation or a recommendation relies on are still present.
 - **The Plugin API's shape is not uniform, and guessing costs a round trip.** `figma.getLocalVariableCollectionsAsync` does not exist — variables live under `figma.variables.*`, and this file has paint and text styles but **no color variables at all**, so a variables sweep comes back empty and means nothing. The range setters are **synchronous** (`setRangeFontName`, `setRangeFillStyleId`) while the node-level ones are async (`setFillStyleIdAsync`, `setTextStyleIdAsync`); `setRangeFontNameAsync` is not a method. Read the typings rather than pattern-matching the `Async` suffix.
 - **The SVG import renames nodes: spaces become hyphens.** A category displayed as "Beef and buffalo" is the node `Beef-and-buffalo`, so `query('[name=Beef and buffalo]')` finds nothing while the legend text still reads with spaces. Query by the hyphenated node name and map to the label text explicitly — that mismatch is also why the legend has to be paired by geometry rather than by name.
