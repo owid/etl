@@ -407,6 +407,28 @@ def morocco():
     return _series(sorted(rows))
 
 
+UZ_TFR = "https://api.siat.stat.uz/media/uploads/sdmx/sdmx_data_665.json"
+
+
+def uzbekistan():
+    """Statistics Agency indicator 2.01.01.0028, from its own open JSON endpoint.
+
+    Each indicator is published as one document holding every region; the row whose code is 1700 is
+    the republic as a whole, and the years are its keys.
+    """
+    path = fetch(UZ_TFR, os.path.join(DATA, "uz", "tfr.json"))
+    # the document is a one-element list wrapping the metadata and the data rows
+    d = json.load(open(path, encoding="utf-8"))[0]
+    row = next((r for r in d["data"] if str(r.get("Code")).strip() == "1700"), None)
+    if row is None:
+        return _series([])
+    rows = []
+    for k, v in row.items():
+        if re.fullmatch(r"(19|20)\d{2}", str(k)) and isinstance(v, (int, float)):
+            rows.append((int(k), float(v)))
+    return _series(sorted(rows))
+
+
 def kenya():
     """KNBS, 2019 census analytical report on fertility and nuptiality, volume VI, table 4.5.
 

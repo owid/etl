@@ -48,6 +48,7 @@ from published import (  # noqa: E402
     morocco,
     tanzania,
     ukraine,
+    uzbekistan,
     vietnam,
     yemen,
 )
@@ -163,6 +164,21 @@ COUNTRIES = [
       "as a coverage indicator and is not what the rate is built on. Watch out for a separate figure of 2.38 "
       "sometimes attached to 2014: that is a health ministry survey covering roughly 2015-17, not the census.",
       "https://www.hcp.ma/Naissances-et-fecondite_r554.html"),
+    C("Uzbekistan", "Statistics Agency — registered births over its own population estimate", uzbekistan,
+      "Uzbekistan", "complete", False,
+      "The agency publishes a fertility rate annually from 2010, with urban and rural splits, through an "
+      "open endpoint that needs no key. Its own metadata says the births come from the justice ministry's "
+      "civil registry and the denominator is its estimate of the average number of women in each age group.",
+      "We read the republic-wide row. No arithmetic of our own.",
+      "Uzbekistan is the one country here whose fertility rose rather than fell — from 2.42 in 2017 to 3.445 "
+      "in 2023 — and the rise is in the agency's own registration-based numbers, not just in outside "
+      "estimates, and shows in both the urban and rural series. It has since eased back to 3.20 in 2025, so "
+      "the peak may already have passed on the agency's own account. Rural fertility runs 0.3 to 0.5 above "
+      "urban throughout. Recent years are open to revision. The agency publishes no births by age of mother "
+      "and no female population on the standard five-year grid — its population brackets are administrative "
+      "ones that do not split 40-49 and have no clean 15-19 — so there is nothing to recalculate from. Those "
+      "tables do exist in the printed demographic yearbook, but the server hosting it times out.",
+      "https://stat.uz/en/official-statistics/demography"),
     C("Poland", "GUS — births and population by single year of age", poland_tfr, "Poland",
       "complete", True,
       "GUS publishes live births by single year of the mother's age, population by single year of age and "
