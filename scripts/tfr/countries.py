@@ -45,7 +45,9 @@ from published import (  # noqa: E402
     pakistan,
     russia,
     sudan,
+    morocco,
     tanzania,
+    ukraine,
     vietnam,
     yemen,
 )
@@ -129,6 +131,38 @@ COUNTRIES = [
       "1.67 million expected — so plotting them would show a collapse that is not real. CONAPO's own "
       "model-based figure is well above the registry.",
       "https://www.inegi.org.mx/programas/natalidad/"),
+    C("Ukraine", "Держстат — Population 1990-2021", ukraine, "Ukraine", "complete", False,
+      "Held out to 2021: the fertility rate for every year from 1990, with the age-specific rates behind "
+      "it, in one downloadable workbook.",
+      "We read the total column. Summing the age-specific rates and multiplying by the band width "
+      "reproduces it — 1.159 against the published 1.16 for 2021.",
+      "The series stops at 2021 not because publication is running late but because Держстат cannot "
+      "compute a population to divide by. Its own orders trace the problem: a method for estimating "
+      "population from mobile network records was approved in July 2023 and took effect in January 2024, "
+      "then in October 2025 it formed an interagency working group to find additional sources, and was "
+      "still changing that group's membership in December 2025. Nothing on births, fertility or population "
+      "by age has appeared for any year after 2021, and its public data bank returns no observations at all "
+      "for the births dataflow — the structure is defined, including a mother's age dimension, but nothing "
+      "is loaded. The monthly regional releases stop dead after January 2022. Territory matters too: the "
+      "fertility figures exclude Crimea and Sevastopol from 2015, and from that year they drop the whole of "
+      "Donetsk and Luhansk rather than only the occupied parts — a wider exclusion than the 2014 footnote, "
+      "inside the same publication.",
+      "https://stat.gov.ua/uk/datasets/narodzhuvanist"),
+    C("Morocco", "HCP — censuses and demographic surveys", morocco, "Morocco", "survey", False,
+      "HCP publishes one long-run fertility series behind its indicator page, as a spreadsheet: 2.47 for "
+      "2004, 2.19 for 2010, 2.21 for 2014 and 2.00 for 2024.",
+      "We read the whole-country column of that series.",
+      "The series mixes instruments. The 2004, 2014 and 2024 points come from censuses, which ask about "
+      "births in the twelve months before enumeration; 2010 comes from a household survey. Fertility is only "
+      "asked on the census long form, given to about 30% of households and then weighted up — a sampling "
+      "extrapolation, not a demographic correction, and HCP publishes no raw-versus-corrected pair. The 2024 "
+      "census figure is 1.97 exactly; the series rounds it to 2.00, and we keep the series so the line comes "
+      "from one source. HCP has not published the age-specific rates behind the 2024 figure, so it cannot be "
+      "rebuilt from components — only a regional report quotes the national number at all, and no national "
+      "fertility volume exists yet. Birth registration is essentially complete at 99.5%, but it is reported "
+      "as a coverage indicator and is not what the rate is built on. Watch out for a separate figure of 2.38 "
+      "sometimes attached to 2014: that is a health ministry survey covering roughly 2015-17, not the census.",
+      "https://www.hcp.ma/Naissances-et-fecondite_r554.html"),
     C("Poland", "GUS — births and population by single year of age", poland_tfr, "Poland",
       "complete", True,
       "GUS publishes live births by single year of the mother's age, population by single year of age and "

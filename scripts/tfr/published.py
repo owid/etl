@@ -11,6 +11,7 @@ import os
 import re
 import subprocess
 import warnings
+import zipfile
 
 import pandas as pd
 
@@ -348,6 +349,62 @@ def angola():
     ended. Summing the printed rates reproduces both totals — 6.215 and 4.78.
     """
     return _series([(2016, 6.2), (2024, 4.8)])
+
+
+UA_ZIP = ("https://stat.gov.ua/sites/default/files/2023-10/"
+          "%D0%9D%D0%B0%D1%81%D0%B5%D0%BB%D0%B5%D0%BD%D0%BD%D1%8F%20(1990-2021)_2.zip")
+
+
+def ukraine():
+    """Держстат, "Population 1990-2021" workbook — the fertility block, 1990 onward.
+
+    The workbook stacks several tables on one sheet; the fertility one has age-specific rates in
+    columns 1 to 8 and the total in column 9. The archive stores its Cyrillic filename in a legacy
+    encoding, so the spreadsheet is pulled out by suffix rather than by name.
+    """
+    xlsx = os.path.join(DATA, "ua", "population.xlsx")
+    if not os.path.exists(xlsx):
+        z = fetch(UA_ZIP, os.path.join(DATA, "ua", "naselennia.zip"))
+        with zipfile.ZipFile(z) as arch:
+            name = next(n for n in arch.namelist() if n.lower().endswith(".xlsx"))
+            os.makedirs(os.path.dirname(xlsx), exist_ok=True)
+            open(xlsx, "wb").write(arch.read(name))
+    d = pd.read_excel(xlsx, sheet_name=0, header=None)
+    start = next(i for i in range(len(d)) if "Сумарний" in " ".join(str(v) for v in d.iloc[i]))
+    rows = []
+    for i in range(start, len(d)):
+        # from 2014 the year carries a footnote digit glued to it, e.g. "20214" for 2021
+        m = re.match(r"\s*(19|20)(\d{2})", str(d.iloc[i, 0]))
+        v = pd.to_numeric(d.iloc[i, 9], errors="coerce")
+        if m and pd.notna(v):
+            rows.append((int(m.group(1) + m.group(2)), float(v)))
+        elif rows:
+            break                                  # the footnotes, then unrelated tables, follow
+    return _series(sorted(rows))
+
+
+MA_SERIES = ("https://docs.google.com/spreadsheets/d/"
+             "1b_FXhLlqC_Yy_CVKZpT8b7GMhLentivryoyfY8SXgvY/export?gid=0")
+
+
+def morocco():
+    """HCP's own long-run fertility series, published as a spreadsheet behind its indicator page.
+
+    The series mixes instruments: census rounds in 1982, 1994, 2004, 2014 and 2024, and household
+    surveys for the years in between. Only the census points fall inside our window apart from 2010.
+    """
+    path = fetch(MA_SERIES, os.path.join(DATA, "ma", "isf.xlsx"))
+    d = pd.read_excel(path, header=None)
+    head = next(i for i in range(len(d)) if "Année" in [str(v).strip() for v in d.iloc[i]])
+    yc = [j for j in range(d.shape[1]) if str(d.iloc[head, j]).strip() == "Année"][0]
+    vc = [j for j in range(d.shape[1]) if str(d.iloc[head, j]).strip() == "Ensemble"][0]
+    rows = []
+    for i in range(head + 1, len(d)):
+        y = pd.to_numeric(str(d.iloc[i, yc]).strip(), errors="coerce")
+        v = pd.to_numeric(d.iloc[i, vc], errors="coerce")
+        if pd.notna(y) and pd.notna(v) and 1950 < y < 2100:
+            rows.append((int(y), float(v)))
+    return _series(sorted(rows))
 
 
 def kenya():

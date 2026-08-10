@@ -38,8 +38,8 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 37,Yemen,42961661,full,yes,no,survey,"2013 survey only; three of four CSO domains unusable, two squatted"
 38,Canada,40467724,full,yes,yes,complete,fully recalculated 1991-2024; matches StatCan's own rate to 2 decimals
 39,Angola,40215180,full,yes,no,survey,two IIMS rounds; census 5.7 vs INE's own Gompertz-adjusted 5.5; no counts published
-40,Ukraine,39535851,no,no,,,
-41,Morocco,38762441,no,no,,,
+40,Ukraine,39535851,full,yes,no,complete,series ends 2021 — Держстат has no population denominator since the invasion
+41,Morocco,38762441,full,yes,no,survey,HCP long-run series; 2024 census 1.97 (series rounds to 2.00); no ASFR published
 42,Poland,37843196,full,yes,yes,complete,fully recalculated 2013-2025 from the BDL API; matches GUS to 3 decimals
 43,Uzbekistan,37724225,no,no,,,
 44,Mozambique,36639855,no,no,,,
