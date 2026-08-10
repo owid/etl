@@ -125,6 +125,14 @@ def contrast(h1, h2):
     return (a + 0.05) / (b + 0.05)
 
 
+def hue_family(hexcol):
+    """Which 60-degree hue sector a color sits in; None if it is too grey to have a hue."""
+    _, a, b = to_lab(srgb(hexcol))
+    if math.hypot(a, b) < 12:
+        return None
+    return int(((math.degrees(math.atan2(b, a)) + 360) % 360) // 60)
+
+
 def min_delta_e(hexes, kinds=COMMON):
     worst = math.inf
     for kind in kinds:
@@ -175,15 +183,25 @@ def suggest(hexes, names, fixed_idx=()):
             trial[slot] = PALETTE[cname]
         if len(set(trial)) != len(trial):
             continue
-        results.append((min_delta_e(trial), combo))
+        score = min_delta_e(trial)
+        if score < TOO_CLOSE:
+            continue                      # not worth showing a set that still fails
+        families = len({hue_family(h) for h in trial} - {None})
+        results.append((families, score, combo))
+    # rank by hue variety FIRST: ranking on safety alone returns sets that are all blues and
+    # greens (safe, but a reader can no longer tell six categories apart at a glance)
     results.sort(reverse=True)
+    if not results:
+        print("  nothing in the palette clears dE 20 for this many categories — "
+              "consider merging categories instead.")
+        return
     seen, shown = set(), 0
-    for score, combo in results:
+    for families, score, combo in results:
         key = frozenset(combo)
         if key in seen:
             continue
         seen.add(key)
-        print(f"  min dE {score:5.1f}")
+        print(f"  hue families {families}/6   min dE {score:5.1f}")
         for slot, cname in zip(free, combo):
             h = PALETTE[cname]
             label = "white" if contrast("#ffffff", h) >= contrast("#000000", h) else "black"
