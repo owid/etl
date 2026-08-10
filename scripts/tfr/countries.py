@@ -25,6 +25,7 @@ warnings.filterwarnings("ignore")
 from argentina import argentina_tfr  # noqa: E402
 from australia import australia_tfr  # noqa: E402
 from canada import canada_tfr  # noqa: E402
+from chile import chile_tfr  # noqa: E402
 from china import china_tfr  # noqa: E402
 from colombia import dane_female_pop, dane_registered_tfr  # noqa: E402
 from france import france_tfr  # noqa: E402
@@ -37,6 +38,7 @@ from poland import poland_tfr  # noqa: E402
 from korea import korea_tfr  # noqa: E402
 from malaysia import malaysia_tfr  # noqa: E402
 from myanmar import myanmar_tfr  # noqa: E402
+from netherlands import netherlands_tfr  # noqa: E402
 from published import (  # noqa: E402
     afghanistan,
     algeria,
@@ -75,6 +77,7 @@ from published import (  # noqa: E402
     vietnam,
     yemen,
     zambia,
+    zimbabwe,
 )
 from sources import egypt, england_wales, germany, japan, mexico, thailand, united_states  # noqa: E402
 from south_africa import south_africa_tfr  # noqa: E402
@@ -1154,6 +1157,57 @@ COUNTRIES = [
       "results are promised progressively. INSEED's website serves nothing to a plain request — the files "
       "sit on a separate host that its own pages call from the browser.",
       "https://inseed.ssn-tchad.td/"),
+    C("Chile", "INE — registered births over its population estimates", chile_tfr, "Chile",
+      "complete", True,
+      "One spreadsheet carries the whole series from 1992: births by five-year age band of the mother, "
+      "the women in each band, and INE's own rate.",
+      "We divided births by women in each band and summed. Our 1.034 for 2024 is INE's published 1.03, "
+      "and 1.159 against its 1.16 for 2023.",
+      "Chile is the clearest version of a pattern we keep finding in Latin America. Its registry gives "
+      "1.03 for 2024. The population projection INE had in force until early 2026 assumed a flat 1.58 all "
+      "the way to 2030 — a gap of 0.55 against its own counted births. INE then rebased the projection onto "
+      "the 2024 census in February 2026 and the new one assumes 1.06 for 2024, so the gap has closed; but "
+      "anything built on the older vintage still carries it. Which vintage a comparison uses decides "
+      "whether Chile looks like Peru or not. The counting itself is sound: births are dated to the year "
+      "they happened, and the late-registration correction is small — 98.5% of the births registered "
+      "during 2023 had happened in 2023. 2023 and 2024 are still provisional. Santiago was already at 1.03 "
+      "in 2023, a year before the country as a whole. The health ministry's own vital-statistics site is "
+      "behind a bot challenge and its older domain no longer resolves, but nothing there is needed.",
+      "https://www.ine.gob.cl/estadisticas-por-tema/demografia-y-poblacion/estadisticas-vitales"),
+    C("Netherlands", "CBS — births by age of mother over its mean population", netherlands_tfr,
+      "Netherlands", "complete", True,
+      "CBS publishes births by single year of the mother's age from 1950, population by single year of age "
+      "and sex, and its own rate — all through an open interface with no key.",
+      "We divided births at each single age by the women of that age and summed. Our 1.4299 for 2023 is "
+      "CBS's published 1.430, and 1.4262 against its 1.426 for 2024.",
+      "This is the cleanest case in the collection. CBS states exactly what its rate is built from — "
+      "births in an age group over the mean number of women in it, the mean being half the population on "
+      "1 January and half on 31 December — so there is nothing to infer. Births are dated to when they "
+      "happened, not when they were reported, and CBS publishes every year as final rather than "
+      "provisional. The register covers everyone registered as resident in a municipality whatever their "
+      "nationality, so there is no nationals-only variant to pick wrongly. Two practical notes: CBS only "
+      "fills in the mean-population column from 1995, so the series starts there rather than in 1950; and "
+      "its newer interface refuses connections outright, while the older one works fine.",
+      "https://www.cbs.nl/nl-nl/cijfers/detail/85722ned"),
+    C("Zimbabwe", "ZIMSTAT — census and Demographic and Health Survey rounds", zimbabwe, "Zimbabwe",
+      "survey", False,
+      "The 2022 census has a dedicated fertility report, and it publishes the counts behind its figure: "
+      "women enumerated and births in the previous twelve months, by age group. The health survey series "
+      "runs alongside it.",
+      "We read the published rates. We also divided the census's own counts — 438,776 births over 3,814,701 "
+      "women 15-49 — and got 3.72, which rounds to the 3.7 it publishes.",
+      "Zimbabwe belongs with Madagascar, Niger and Senegal's 2013 census in a group worth naming: offices "
+      "that computed an indirect correction and then chose not to use it. ZIMSTAT ran two — an Arriaga "
+      "estimate gave 3.8 and a Gompertz curve gave 3.7 against the counted 3.7 — and said that because the "
+      "three agree, the direct estimate is robust and the unadjusted figure is what it would use "
+      "throughout. That is the opposite outcome from Mali or Ghana, on the same method. Registration is not "
+      "used for any of this and could not be: ZIMSTAT's own vital-statistics report puts birth-registration "
+      "completeness at 30.9% for 2023 and 26.4% for 2024, falling rather than rising, because mobile "
+      "registration drives in 2022 and 2023 pulled registrations forward. That report does publish "
+      "registered births by age of mother, but computes no rate from them. The 2012 census report is no "
+      "longer on ZIMSTAT's site and is not in any web archive, so its 3.8 survives only as a citation "
+      "inside the 2022 report.",
+      "https://www.zimstat.co.zw/wp-content/uploads/Census/Fertility_Report.pdf"),
 ]
 
 PANELS = [(c["name"], c["src"], c["loader"], c["wpp_name"]) for c in COUNTRIES if c["loader"]]

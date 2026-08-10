@@ -411,6 +411,24 @@ def taiwan_band_detail(year):
     return taiwan_detail(year)
 
 
+def chile_band_detail(year):
+    from chile import chile_detail
+
+    return chile_detail(year)
+
+
+def netherlands_band_detail(year):
+    from netherlands import netherlands_detail
+
+    return netherlands_detail(year)
+
+
+def zimbabwe_band_detail(year):
+    from published import zimbabwe_detail
+
+    return zimbabwe_detail(year)
+
+
 DETAIL = {
     "Colombia": colombia_detail,
     "Myanmar": myanmar_band_detail,
@@ -438,6 +456,9 @@ DETAIL = {
     "England and Wales": england_wales_detail,
     "Sri Lanka": sri_lanka_band_detail,
     "Taiwan": taiwan_band_detail,
+    "Chile": chile_band_detail,
+    "Netherlands": netherlands_band_detail,
+    "Zimbabwe": zimbabwe_band_detail,
 }
 
 

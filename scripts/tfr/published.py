@@ -617,3 +617,30 @@ def senegal():
     """
     return _series([(2005, 5.3), (2010, 5.0), (2012, 5.3), (2014, 5.0), (2015, 4.9), (2016, 4.7),
                     (2017, 4.6), (2018, 4.4), (2019, 4.7), (2023, 4.0)])
+
+
+def zimbabwe():
+    """ZIMSTAT census and health-survey rounds.
+
+    The 2022 census's fertility report charts the census series back to 1969, and the 2015 health
+    survey carries its own rounds. Both instruments ask women directly; neither uses registration.
+    """
+    return _series([(2002, 3.6), (2005, 3.8), (2010, 4.1), (2012, 3.8), (2015, 4.0), (2022, 3.7)])
+
+
+# the 2022 census's own table 7.7(a): women enumerated and births in the previous twelve months
+ZIMBABWE_2022 = {
+    (15, 19): (791914, 68753),
+    (20, 24): (676121, 121125),
+    (25, 29): (559313, 95989),
+    (30, 34): (510887, 75054),
+    (35, 39): (533369, 56772),
+    (40, 44): (410155, 18597),
+    (45, 49): (332942, 2486),
+}
+
+
+def zimbabwe_detail(year):
+    if year != 2022:
+        return None
+    return {b: {"women": float(w), "births": float(x)} for b, (w, x) in ZIMBABWE_2022.items()}
