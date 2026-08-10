@@ -67,15 +67,17 @@
  table.list { border-collapse:collapse; font-size:13.5px; width:100%; }
  table.list td { padding:6px 12px 6px 0; border-bottom:1px solid var(--line); vertical-align:top; }
  table.list td.n { text-align:right; color:var(--mut); font-variant-numeric:tabular-nums; white-space:nowrap; }
- table.ov { border-collapse:collapse; width:100%; font-size:13.5px; }
+ table.ov { border-collapse:collapse; width:100%; font-size:13.5px; table-layout:auto; }
  table.ov td { padding:0 10px 0 0; white-space:nowrap; vertical-align:middle; }
- table.ov td.cn { text-align:right; padding-right:12px; }
- table.ov td.cc { width:430px; }
+ /* name and metadata hug their text so the chart column takes whatever is left */
+ table.ov td.cn { width:1%; text-align:right; padding-right:12px; }
+ table.ov td.cc { width:99%; padding-right:20px; }
+ table.ov td.n, table.ov td.meta { width:1%; }
  table.ov td.n { text-align:right; color:var(--mut); font-variant-numeric:tabular-nums; }
  table.ov td.meta { color:var(--mut); font-size:12.5px; }
  table.ov tr.ticks td { color:var(--mut); font-size:11px; text-transform:uppercase; letter-spacing:.05em;
                         padding-bottom:2px; }
- svg.rowchart { display:block; width:430px; height:28px; }
+ svg.rowchart { display:block; width:100%; height:28px; }
  tr.ticks svg.rowchart { height:14px; }
 </style>
 <div class="wrap">
