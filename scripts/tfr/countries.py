@@ -29,6 +29,7 @@ from philippines import philippines  # noqa: E402
 from korea import korea_tfr  # noqa: E402
 from myanmar import myanmar_tfr  # noqa: E402
 from published import (  # noqa: E402
+    afghanistan,
     algeria,
     bangladesh,
     drc,
@@ -472,6 +473,22 @@ COUNTRIES = [
       "editions dropped the full births-by-age table, so a recalculation for the latest year is not "
       "possible from them.",
       "https://mods.go.kr/board.es?mid=a20108010000&bid=11773"),
+    C("Afghanistan", "CSO and Ministry of Public Health — Demographic and Health Survey 2015", afghanistan,
+      "Afghanistan", "survey", False,
+      "One figure: 5.3 children per woman for the three years to 2015, from the survey the Central "
+      "Statistics Organization ran with the health ministry. The same table gives the age-specific rates "
+      "behind it, and the report breaks the figure down by all 34 provinces.",
+      "We read the national column of table 5.1. Summing its age-specific rates and multiplying by the band "
+      "width gives 5.29, the published 5.3.",
+      "Afghanistan has no vital registration usable for this, so the only figure is survey-based, and it is "
+      "now over a decade old. The office's old domain, cso.gov.af, no longer resolves at all — its "
+      "nameservers were deprovisioned but the delegation was never updated, so this report had to come from "
+      "a web archive. Its successor, nsia.gov.af, is alive and actively maintained, with a certificate valid "
+      "into late 2026, but serves a JavaScript application that a script cannot read, so we could not check "
+      "whether anything newer has been published. The survey's own age structure is a weighted sample, not a "
+      "population count, and no Afghan source gives female population by age group outside it, so there is "
+      "nothing to recalculate from.",
+      "https://nsia.gov.af/"),
     C("Algeria", "ONS — Démographie Algérienne", algeria, "Algeria", "complete", False,
       "The annual bulletin's main indicators table gives a fertility index for most years from 2002, "
       "alongside births and age-specific rates. Female population by five-year age group is in the same "

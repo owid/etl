@@ -294,6 +294,27 @@ def iraq():
     return _series(sorted(rows))
 
 
+AFDHS = ("http://web.archive.org/web/20170511114715/http://cso.gov.af/Content/files/"
+         "Afghanistan%20DHS%202015%20KIR/AFDHS_Final%20Report.pdf")
+
+
+def afghanistan():
+    """Central Statistics Organization and Ministry of Public Health, AfDHS 2015, table 5.1.
+
+    Its own domain lapsed years ago, so the report comes from a web archive. The table gives urban,
+    rural and total columns; the last is the national figure.
+    """
+    path = os.path.join(DATA, "af", "afdhs2015.txt")
+    if not os.path.exists(path):
+        pdf = fetch(AFDHS, os.path.join(DATA, "af", "afdhs2015.pdf"))
+        subprocess.run(["pdftotext", "-layout", pdf, path], check=True)
+    for ln in open(path, errors="ignore"):
+        m = re.match(r"\s*TFR \(15-49\)\s+(\d\.\d)\s+(\d\.\d)\s+(\d\.\d)\s*$", ln)
+        if m:
+            return _series([(2015, float(m.group(3)))])
+    return _series([])
+
+
 def kenya():
     """KNBS, 2019 census analytical report on fertility and nuptiality, volume VI, table 4.5.
 

@@ -34,7 +34,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 33,Iraq,48007435,full,yes,no,survey,"measured survey rounds only, stops 2011; 2024 census fertility not yet released"
 34,Spain,47850792,full,yes,yes,complete,
 35,Argentina,46003732,no,no,,,
-36,Afghanistan,45047067,no,no,,,
+36,Afghanistan,45047067,full,yes,no,survey,"AfDHS 2015 only; cso.gov.af nameservers deprovisioned, nsia.gov.af is a JS app"
 37,Yemen,42961661,no,no,,,
 38,Canada,40467724,no,no,,,
 39,Angola,40215180,no,no,,,
