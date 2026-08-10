@@ -67,7 +67,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 66,Somalia,20305912,full,yes,no,survey,2020 survey is the only national figure; the 2026 survey covers five districts
 67,Chile,19945850,full,yes,yes,complete,fully recalculated 1992-2024; registry 1.03 in 2024 vs the old projection's flat 1.58
 68,Senegal,19366551,full,yes,no,survey,"2023 census published all three corrections: raw 3.7, chose Arriaga 4.4; survey says 4.0"
-69,Guatemala,18967983,no,no,,,
+69,Guatemala,18967983,full,yes,yes,complete,fully recalculated 2018-2024 from 2.2m birth records; gap to the projection doubled in a year
 70,Romania,18800600,full,yes,yes,complete,fully recalculated 2012-2024 on the resident basis; matches INS's own rates to 4 decimals
 71,Netherlands,18448770,full,yes,yes,complete,fully recalculated 1995-2025 from the CBS API; matches CBS to 3 decimals
 72,Ecuador,18444504,full,yes,yes,complete,fully recalculated 2010-2024; INEC states in writing that it adopts a figure above the registry
@@ -84,14 +84,14 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 83,Belgium,11774647,no,no,,,
 84,Dominican Republic,11609499,no,no,,,
 85,Jordan,11589538,full,yes,no,survey,survey only; the nationality split runs 2.5 Jordanian to 4.9 Syrian in camps
-86,United Arab Emirates,11574684,no,no,,,
+86,United Arab Emirates,11574684,full,no,,,publishes an Emirati-only rate and no combined one; every government host blocked us
 87,Honduras,11184761,full,yes,no,survey,INE published a registry-based rate for 2013-16 then stopped; census raw 2.13 vs adopted 2.74
 88,Tajikistan,10978600,full,yes,no,complete,third Central Asian rise: 2.64 in 2021 to 3.02 in 2023; 2007's dip looks like an artefact
 89,Papua New Guinea,10947852,no,no,,,
 90,Cuba,10892659,no,no,,,
 91,Sweden,10701038,full,yes,yes,complete,fully recalculated 2006-2024; record low and still falling
 92,Czechia,10527784,no,no,,,
-93,Azerbaijan,10454854,no,no,,,
+93,Azerbaijan,10454854,full,yes,no,complete,its own census later showed the intercensal denominator was too low; 2000s levels overstated
 94,Portugal,10395366,no,no,,,
 95,Greece,9897119,no,no,,,
 96,Israel,9647689,no,no,,,

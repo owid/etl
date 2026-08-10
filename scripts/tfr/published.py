@@ -856,3 +856,13 @@ def jordan():
 def honduras():
     """INE's survey rounds. The 2011-12 report's own table carries the earlier ones."""
     return _series([(2001, 4.4), (2006, 3.3), (2012, 2.9), (2019, 2.6)])
+
+
+def azerbaijan():
+    """The State Statistical Committee's own rate, from its demography tables.
+
+    Table 2.3 carries every year since 1959 as a plain spreadsheet at a stable address.
+    """
+    values = [2.0, 1.8, 1.84, 1.9, 2.1, 2.3, 2.3, 2.3, 2.3, 2.3, 2.3, 2.4, 2.3, 2.2, 2.2, 2.1,
+              2.0, 1.9, 1.8, 1.8, 1.7, 1.5, 1.7, 1.6, 1.4]
+    return _series(list(zip(range(2000, 2000 + len(values)), values)))

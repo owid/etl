@@ -30,6 +30,7 @@ from china import china_tfr  # noqa: E402
 from ecuador import ecuador_tfr  # noqa: E402
 from colombia import dane_female_pop, dane_registered_tfr  # noqa: E402
 from france import france_tfr  # noqa: E402
+from guatemala import guatemala_tfr  # noqa: E402
 from india import india  # noqa: E402
 from peru import peru_tfr  # noqa: E402
 from sri_lanka import sri_lanka_tfr  # noqa: E402
@@ -47,6 +48,7 @@ from published import (  # noqa: E402
     afghanistan,
     algeria,
     angola,
+    azerbaijan,
     bangladesh,
     benin,
     bolivia,
@@ -1514,6 +1516,62 @@ COUNTRIES = [
       "childbearing age. And the census's own twelve-month question found fewer births than the registry "
       "recorded for the same period, which is the reverse of the usual direction.",
       "https://ine.gob.hn/"),
+    C("Guatemala", "INE — registered births over its population projections", guatemala_tfr,
+      "Guatemala", "complete", True,
+      "INE publishes no fertility rate of its own from the registry — its bulletin headlines a crude birth "
+      "rate and adolescent rates. But it does publish the raw records, one row per birth, with the "
+      "mother's age and the year the birth happened, and municipal population projections by single year "
+      "of age.",
+      "We counted the births by age of mother out of 2.2 million individual records and divided by the "
+      "projected women. There is no published total to check against; our figures reproduce the office's "
+      "own reported counts exactly, which is as far as verification can go here.",
+      "Guatemala runs the Latin American pattern, and the gap is widening fast. Its projection assumes "
+      "2.44 for 2022-23 and 2.33 for 2024-25; the registry gives 2.19 for 2023 and 1.90 for 2024. So the "
+      "gap roughly doubles in a year, from about 0.2 to about 0.45. Births are dated to the year they "
+      "occurred with a six-month window for late registration, which INE says follows international "
+      "recommendations, and about 12% of each year's records are late registrations — a stable share, so "
+      "the 2024 figure should not move much. Two things bound what we can say. The denominator is a "
+      "projection built on the 2018 census, and INE's own projections build in sustained net emigration, "
+      "so the population base is not naive. And INE's main website is behind a bot wall that blocks every "
+      "request; only its open-data portal answers, and its statistical tables are not reachable at all.",
+      "https://datos.ine.gob.gt/dataset/estadisticas-vitales-nacimientos"),
+    C("Azerbaijan", "State Statistical Committee — registered births over the average annual population",
+      azerbaijan, "Azerbaijan", "complete", False,
+      "The committee publishes its own rate for every year since 1959, the age-specific rates behind it, "
+      "and births by age of mother as counts back to 1970 — all as plain spreadsheets at stable addresses, "
+      "no key and no interface to negotiate.",
+      "We read the published series. Its own age-specific rates sum to its own total exactly in every year "
+      "we checked. What we could not do is rebuild it independently, and the reason turned out to be "
+      "interesting.",
+      "There is no annual female population by age group anywhere on the site — only census years and one "
+      "current snapshot. Dividing the published births by the census-enumerated women gives 1.75 against a "
+      "published 1.8 for 2019, but 1.83 against 2.3 for 2009 and 1.72 against 2.0 for 1999. The recomputed "
+      "figure is lower every time, and the gap shrinks to almost nothing at the most recent census. That "
+      "is what it looks like when a rate is computed each year from a population estimate rolled forward "
+      "from the last census, the next census reveals the estimate was too low, and the historical rates are "
+      "never revised. So the published levels for the 2000s may be somewhat overstated — not by our "
+      "arithmetic, but by the committee's own later census. Births are dated to when they happened and the "
+      "denominator is the average of the population at the start and end of the year, both stated in its "
+      "methodology. The 2019 census excluded territories then under occupation, and the population series "
+      "since shows no discontinuity from their reincorporation.",
+      "https://www.stat.gov.az/source/demoqraphy/az/002_3.xls"),
+    C("United Arab Emirates", "FCSC — Emirati women only", None, "United Arab Emirates", "none", False,
+      "The federal statistics centre publishes a fertility rate for Emirati women — 3.1 for 2022, down "
+      "from 3.7 in 2016 — and a crude birth rate for everybody. It publishes no rate for non-Emirati "
+      "residents and no combined rate at all.",
+      "Nothing. Every federal and emirate statistics host refuses connections from outside the country or "
+      "answers with a bot challenge, so nothing here could be read from the source.",
+      "This is the most extreme version of the nationality problem in the collection, and the reason there "
+      "is nothing to plot. Emiratis are about 12% of residents. A rate for them alone is not comparable "
+      "with the UN's figure for the country, and no comparable figure exists: the federal office publishes "
+      "Emirati births and an Emirati rate, but its own current population series carries an explicit note "
+      "that the split by nationality is unavailable — so the numerator is public and the denominator is "
+      "not. Only Dubai has ever published a rate for non-nationals, a single 1.2 for 2014 against 3.4 for "
+      "nationals. There has been no census since 2005; the 2010 one was cancelled and replaced by an "
+      "identity register rather than a survey. Every figure quoted here comes from an academic database "
+      "that republishes the office's tables with citations, because the office's own site could not be "
+      "reached — which is why we are not plotting any of it.",
+      "https://uaestat.fcsc.gov.ae/"),
 ]
 
 PANELS = [(c["name"], c["src"], c["loader"], c["wpp_name"]) for c in COUNTRIES if c["loader"]]

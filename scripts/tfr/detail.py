@@ -465,6 +465,12 @@ def sweden_band_detail(year):
     return sweden_detail(year)
 
 
+def guatemala_band_detail(year):
+    from guatemala import guatemala_detail
+
+    return guatemala_detail(year)
+
+
 DETAIL = {
     "Colombia": colombia_detail,
     "Myanmar": myanmar_band_detail,
@@ -505,6 +511,7 @@ DETAIL = {
     "Tunisia": lambda y: _published_detail("tunisia_detail")(y),
     "Tajikistan": lambda y: _published_detail("tajikistan_detail")(y),
     "Sweden": sweden_band_detail,
+    "Guatemala": guatemala_band_detail,
 }
 
 
