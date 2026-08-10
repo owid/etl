@@ -12,16 +12,17 @@
  h2 { font-size:19px; margin:0 0 2px; }
  h3 { font-size:14.5px; font-weight:600; margin:20px 0 4px; }
  .lede { color:var(--mut); margin:0 0 20px; max-width:76ch; }
+ .bar-top { position:sticky; top:0; z-index:10; background:var(--bg); margin:0 -24px 26px;
+            padding:12px 24px 10px; border-bottom:1px solid var(--line); }
  .key { display:flex; gap:18px; flex-wrap:wrap; align-items:center; font-size:13px; color:var(--mut);
-        position:sticky; top:0; z-index:10; background:var(--bg); margin:0 -24px 22px;
-        padding:12px 24px; border-bottom:1px solid var(--line); }
+        margin:0 0 10px; }
  .key i { display:inline-block; width:11px; height:11px; border-radius:50%; background:currentColor;
           vertical-align:middle; margin-right:7px; }
  .k { display:inline-flex; align-items:center; font-size:13px; color:var(--mut); }
  select { font:inherit; font-size:13px; color:var(--fg); background:var(--bg); border:1px solid var(--line);
           border-radius:6px; padding:4px 8px; margin-left:auto; }
- .filters { margin:0 0 24px; font-size:13px; color:var(--mut); }
- .filters fieldset { border:1px solid var(--line); border-radius:8px; margin:0 0 8px; padding:8px 12px; }
+ .filters { margin:0; font-size:13px; color:var(--mut); display:flex; gap:10px; flex-wrap:wrap; }
+ .filters fieldset { border:1px solid var(--line); border-radius:8px; margin:0; padding:6px 12px 7px; }
  .filters legend { font-size:11px; text-transform:uppercase; letter-spacing:.06em; padding:0 4px; }
  .filters label { display:inline-flex; align-items:center; gap:6px; margin-right:16px; cursor:pointer;
                   white-space:nowrap; }
@@ -54,20 +55,29 @@
  table.list { border-collapse:collapse; font-size:13.5px; width:100%; }
  table.list td { padding:6px 12px 6px 0; border-bottom:1px solid var(--line); vertical-align:top; }
  table.list td.n { text-align:right; color:var(--mut); font-variant-numeric:tabular-nums; white-space:nowrap; }
+ table.ov { border-collapse:collapse; width:100%; font-size:13.5px; }
+ table.ov td { padding:0 10px 0 0; white-space:nowrap; vertical-align:middle; }
+ table.ov td.cn { text-align:right; padding-right:12px; }
+ table.ov td.cc { width:430px; }
+ table.ov td.n { text-align:right; color:var(--mut); font-variant-numeric:tabular-nums; }
+ table.ov td.meta { color:var(--mut); font-size:12.5px; }
+ table.ov tr.ticks td { color:var(--mut); font-size:11px; text-transform:uppercase; letter-spacing:.05em;
+                        padding-bottom:2px; }
+ svg.rowchart { display:block; width:430px; height:28px; }
+ tr.ticks svg.rowchart { height:14px; }
 </style>
 <div class="wrap">
 <h1>National vital statistics vs modelled fertility estimates</h1>
-<p class="lede">Comparisons of total fertility rates (children per woman) between national statistical offices (in red)
-and UN WPP (in blue).</p>
 
-<div class="key">{{LEGEND}}<select id="pick" aria-label="Pick a country">{{OPTIONS}}</select></div>
-
-<div class="filters" id="filters">
- <fieldset><legend>What the national figure is built from</legend><span id="tierboxes"></span></fieldset>
- <fieldset><legend>How we obtained it</legend>
-  <label><input type="checkbox" class="rc" value="1" checked> Recalculated by us from counts</label>
-  <label><input type="checkbox" class="rc" value="0" checked> As the office published it</label>
- </fieldset>
+<div class="bar-top">
+ <div class="key">{{LEGEND}}<select id="pick" aria-label="Pick a country">{{OPTIONS}}</select></div>
+ <div class="filters" id="filters">
+  <fieldset><legend>What the national figure is built from</legend><span id="tierboxes"></span></fieldset>
+  <fieldset><legend>How we obtained it</legend>
+   <label><input type="checkbox" class="rc" value="1" checked> Recalculated by us from counts</label>
+   <label><input type="checkbox" class="rc" value="0" checked> As the office published it</label>
+  </fieldset>
+ </div>
 </div>
 
 <section id="overview">
@@ -109,6 +119,31 @@ const UNPLOTTED = {{UNPLOTTED}};
     return 10 * mag;
   }
 
+  // one table row per country: name, its own dumbbell on a shared scale, then the metadata
+  const CW = 430, CH = 28, LPAD = 44, RPAD = 44;
+
+  function rowSvg(r, top) {
+    const dx = (v) => LPAD + (v / top) * (CW - LPAD - RPAD);
+    const y = CH / 2;
+    const svg = el('svg', { viewBox: `0 0 ${CW} ${CH}`, class: 'rowchart', preserveAspectRatio: 'none' });
+    for (let i = 0; i <= 4; i++) {
+      const v = (top * i) / 4;
+      svg.appendChild(el('line', { class: 'grid', x1: dx(v), y1: 0, x2: dx(v), y2: CH }));
+    }
+    svg.appendChild(el('line', {
+      class: 'bar', x1: dx(Math.min(r.nso, r.wpp)), y1: y, x2: dx(Math.max(r.nso, r.wpp)), y2: y,
+    }));
+    svg.appendChild(el('circle', { class: 'pw', cx: dx(r.wpp), cy: y, r: 5 }));
+    svg.appendChild(el('circle', { class: 'pn', cx: dx(r.nso), cy: y, r: 5 }));
+    [[r.nso, 'vn'], [r.wpp, 'vw']].forEach(([v, cls]) => {
+      const low = v === Math.min(r.nso, r.wpp);
+      svg.appendChild(el('text', {
+        class: cls, x: dx(v) + (low ? -9 : 9), y: y + 4, 'text-anchor': low ? 'end' : 'start',
+      }, v.toFixed(2)));
+    });
+    return svg;
+  }
+
   function draw(rows) {
     const host = document.getElementById('ov');
     host.textContent = '';
@@ -116,34 +151,34 @@ const UNPLOTTED = {{UNPLOTTED}};
       host.innerHTML = '<p class="na">No countries match these filters.</p>';
       return;
     }
-    const h = T + rows.length * ROW + B;
     const top = axisTop(Math.max(...rows.flatMap((r) => [r.nso, r.wpp])));
-    const span = W - LW - R - PAD;
-    const dx = (v) => LW + (v / top) * span;
+    const table = document.createElement('table');
+    table.className = 'ov';
 
-    const svg = el('svg', { viewBox: `0 0 ${W} ${h}`, role: 'img' });
-    for (let i = 0; i <= 4; i++) {
-      const v = (top * i) / 4;
-      svg.appendChild(el('line', { class: 'grid', x1: dx(v), y1: T - 4, x2: dx(v), y2: T + rows.length * ROW }));
-      svg.appendChild(el('text', { class: 'xlab', x: dx(v), y: h - 12 }, String(+v.toFixed(2))));
-    }
-    rows.forEach((r, i) => {
-      const y = T + i * ROW + ROW / 2;
-      svg.appendChild(el('circle', { class: 'tdot', cx: 9, cy: y - 4, fill: TIERS[r.tier][1] }));
-      svg.appendChild(el('text', { class: 'blab', x: LW - 10, y: y + 4 }, `${r.country} ${r.year}`));
-      svg.appendChild(el('line', {
-        class: 'bar', x1: dx(Math.min(r.nso, r.wpp)), y1: y, x2: dx(Math.max(r.nso, r.wpp)), y2: y,
-      }));
-      svg.appendChild(el('circle', { class: 'pw', cx: dx(r.wpp), cy: y, r: 5 }));
-      svg.appendChild(el('circle', { class: 'pn', cx: dx(r.nso), cy: y, r: 5 }));
-      [[r.nso, 'vn'], [r.wpp, 'vw']].forEach(([v, cls]) => {
-        const low = v === Math.min(r.nso, r.wpp);
-        svg.appendChild(el('text', {
-          class: cls, x: dx(v) + (low ? -10 : 10), y: y + 4, 'text-anchor': low ? 'end' : 'start',
-        }, v.toFixed(2)));
-      });
+    const ticks = document.createElement('tr');
+    ticks.className = 'ticks';
+    ticks.innerHTML =
+      '<td></td><td>' +
+      '<svg viewBox="0 0 ' + CW + ' 14" class="rowchart" preserveAspectRatio="none">' +
+      [0, 1, 2, 3, 4].map((i) => {
+        const v = (top * i) / 4;
+        const x = LPAD + (v / top) * (CW - LPAD - RPAD);
+        return `<text class="xlab" x="${x}" y="11">${+v.toFixed(2)}</text>`;
+      }).join('') +
+      '</svg></td><td>Year</td><td>Built from</td><td>How obtained</td>';
+    table.appendChild(ticks);
+
+    rows.forEach((r) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        `<td class="cn">${r.country}</td><td class="cc"></td>` +
+        `<td class="n">${r.year}</td>` +
+        `<td class="meta"><span class="swatch" style="color:${TIERS[r.tier][1]}"></span> ${TIERS[r.tier][0]}</td>` +
+        `<td class="meta">${r.recalc ? 'Recalculated by us' : 'As published'}</td>`;
+      tr.querySelector('td.cc').appendChild(rowSvg(r, top));
+      table.appendChild(tr);
     });
-    host.appendChild(svg);
+    host.appendChild(table);
   }
 
   function drawUnplotted(rows) {
