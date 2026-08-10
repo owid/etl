@@ -1,6 +1,6 @@
 ---
 name: create-figma-chart
-description: Turn an OWID grapher chart — given as a slug, a customized grapher link, an MDim view, an admin link, a narrative chart, or just a description — into a templated chart in the design team's yearly "Charts (YYYY)" Figma file. Exports the chart SVG, creates a new page named "YYYYMMDD Title (Author)", places the original chart and an adapted template side by side, replicates title/subtitle/data source/note in the template's styles, fits the chart into the template, proposes better labeling (direct line/bar labels instead of legends) and annotations with the file's curvy arrows, and names the final frame with the kebab-case slug used for the website PNG. Trigger when the user asks to "create a figma chart", "make a static chart in Figma", "prepare this chart for Instagram / as a data insight image", "put this grapher chart into the Charts file", or pastes a grapher/admin/narrative-chart link asking for a designed static version.
+description: Turn an OWID grapher chart — given as a slug, a customized grapher link, an MDim view, an admin link, a narrative chart, or just a description — into a templated chart in the design team's yearly "Charts (YYYY)" Figma file. Exports the chart SVG, creates a new page named "YYYYMMDD Title (Creator)", places the original chart and an adapted template side by side, replicates title/subtitle/data source/note in the template's styles, fits the chart into the template, proposes better labeling (direct line/bar labels instead of legends) and annotations with the file's curvy arrows, and names the final frame with the kebab-case slug used for the website PNG. Trigger when the user asks to "create a figma chart", "make a static chart in Figma", "prepare this chart for Instagram / as a data insight image", "put this grapher chart into the Charts file", or pastes a grapher/admin/narrative-chart link asking for a designed static version.
 metadata:
   internal: true
 ---
@@ -44,7 +44,7 @@ The DI Charts Guidelines file (`8gxqkVmZ9x3MK3ky5oigrJ`) is the source of truth 
 
 - **A chart reference**, in any of the forms of the Step 1 table. If the user only describes the chart ("the life expectancy chart with just the US and China"), resolve candidates first and confirm.
 - Optionally, **the DI/article text** the chart accompanies — the best source for annotation content. Ask for it if annotations are wanted and it exists.
-- Everything else (formats, author, slug, topic link) is collected once in Step 2.
+- Everything else (formats, credit, slug, topic link) is collected once in Step 2.
 
 ## Step 1 — Resolve the chart and gather its text
 
@@ -98,11 +98,16 @@ One `AskUserQuestion` batch — don't drip-feed:
    - Instagram post (square 540×540) or portrait (560×700)
    - Data insight image (DI_Template, 540×540)
    - Static chart — mobile/square (540×540 or 540×824) and/or desktop (Horizontal 850×638 / Vertical 850×1095; Vertical when the chart needs height — rankings, long bar lists)
-2. **Author** — goes into the page name and (static templates) the "Licensed under CC-BY by the author …" line. Default: the user.
-3. **The DI's own title — or the claim the image is meant to make.** Ask for this whenever a DI or Instagram image is among the formats, and ask *independently of annotations*: grapher's descriptive title must not survive into those images (GUIDELINES.md → Titles), and the story is not yours to invent. If there's no title written yet, ask for the sentence the image supports and derive a candidate from it for approval in Step 4.
-4. **Annotations** — should the chart carry annotations replicating what the accompanying text says? If yes, ask for that text (DI draft, article paragraph).
-5. **Topic page** for the `OurWorldinData.org/[Topic]` footer line — default from the config's `originUrl`.
-6. **Slug** for the final frame — short, kebab-case (`child-mortality-asia-decline`). It becomes the PNG filename when the frame is exported for the website. Propose one; let the user override.
+2. **Who is building the chart** — this is the page-name credit, and it is **not** the author of the DI or article the chart accompanies. Default to the user; don't infer it from the gdoc, which names the writer rather than whoever does the design work.
+   - **First names only**, matching the file's existing pages: `(Charlie)`, `(Hannah)`, `(Bertha)`.
+   - **Disambiguate a shared first name with the last initial** — `(Pablo A)` for Pablo Arriagada, `(Pablo R)` for Pablo Rosado. Both are in use, so a bare `(Pablo)` is ambiguous.
+   - **Several people, comma-separated**: `(Bastian, Charlie)`.
+   - An organization instead of a person when there is no individual: `(Our World in Data - Global Change Data Lab)`.
+3. **The author of the piece**, separately, and only when a **static desktop template** is among the formats — it is the one that carries a `Licensed under CC-BY by the author <Name>` line, and that name is the writer being credited for the work, which is often *not* the person building the chart. Skip the question entirely for DI and Instagram formats, whose footers have no author line.
+4. **The DI's own title — or the claim the image is meant to make.** Ask for this whenever a DI or Instagram image is among the formats, and ask *independently of annotations*: grapher's descriptive title must not survive into those images (GUIDELINES.md → Titles), and the story is not yours to invent. If there's no title written yet, ask for the sentence the image supports and derive a candidate from it for approval in Step 4.
+5. **Annotations** — should the chart carry annotations replicating what the accompanying text says? If yes, ask for that text (DI draft, article paragraph).
+6. **Topic page** for the `OurWorldinData.org/[Topic]` footer line — default from the config's `originUrl`.
+7. **Slug** for the final frame — short, kebab-case (`child-mortality-asia-decline`). It becomes the PNG filename when the frame is exported for the website. Propose one; let the user override.
 
 ## Step 3 — Export the SVGs
 
@@ -141,7 +146,7 @@ Caveats: `?tab=table` is silently ignored (renders the default tab); `imSquareSi
 
 ## Step 4 — Propose, then get the go-ahead
 
-Before touching the file, show the user in one message: the page name **`YYYYMMDD <Title> (<Author>)`** (today's date, the *final* — possibly rewritten — title), the chosen template(s), every text that will go into the template, the labeling changes you propose (Step 8), and the annotations with their content. **Wait for explicit approval.** This is the single checkpoint; after it, iterate freely on the same page without re-asking.
+Before touching the file, show the user in one message: the page name **`YYYYMMDD <Title> (<Creator>)`** (today's date, the *final* — possibly rewritten — title), the chosen template(s), every text that will go into the template, the labeling changes you propose (Step 8), and the annotations with their content. **Wait for explicit approval.** This is the single checkpoint; after it, iterate freely on the same page without re-asking.
 
 ## Step 5 — Create the page and place the pieces
 
@@ -152,7 +157,7 @@ Before touching the file, show the user in one message: the page name **`YYYYMMD
 ```js
 const pages = figma.root.children.map((p, i) => `${i}: ${p.name}`)
 const page = figma.createPage()
-page.name = "20260810 Child mortality in Asia (Pablo)"
+page.name = "20260810 Child mortality in Asia (Pablo A)"   // creator, first name + last initial if ambiguous
 // move it to the right index with figma.root.insertChild(index, page)
 await figma.setCurrentPageAsync(page)
 ```
@@ -199,7 +204,7 @@ Replace the lorem-ipsum text nodes in the cloned template. Source everything fro
   Then re-fit the chart into what's left (Step 7). Only if the source is too long even for a full line — beyond ~508px — wrap it with `textAutoResize = "HEIGHT"` at a width that breaks after the organization's name, and top-align CC BY with its first line. Either way CC BY is **left-aligned** once it has its own row — it only sits at x=468 while it shares the source's line.
 - **Note:** only in templates that carry a Note line, and only if the chart has one worth keeping. **DI images normally carry no note at all** — drop it, or, when it's genuinely load-bearing for understanding the chart, fold it into the subtitle as a bolded second line (only if the subtitle isn't already crowded).
 - **`OurWorldinData.org/[Topic]`** → the confirmed topic path (e.g. `OurWorldinData.org/child-mortality`).
-- **CC BY** stays; static desktop templates also carry `Licensed under CC-BY by the author <Author>`.
+- **CC BY** stays; static desktop templates also carry `Licensed under CC-BY by the author <Name>` — the author of the piece from Step 2, not the page-name credit.
 
 Rules: replace `characters`, and leave the node's **base** styling alone — the fonts, sizes, colors, and positions are the template's, not yours. `await figma.loadFontAsync(node.fontName)` before each text edit. If you need a *new* text block the template doesn't have, **clone the nearest template text node and edit it** — that inherits the correct shared style without hunting style ids.
 
