@@ -42,8 +42,8 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 41,Morocco,38762441,full,yes,no,survey,HCP long-run series; 2024 census 1.97 (series rounds to 2.00); no ASFR published
 42,Poland,37843196,full,yes,yes,complete,fully recalculated 2013-2025 from the BDL API; matches GUS to 3 decimals
 43,Uzbekistan,37724225,full,yes,no,complete,2010-2025 from an open endpoint; the post-2017 rise is in their own data
-44,Mozambique,36639855,no,no,,,
-45,Malaysia,36385116,no,no,,,
+44,Mozambique,36639855,full,yes,no,survey,IDS rounds; INE publishes no census TFR at all; registration fell 48% to 31%
+45,Malaysia,36385116,full,yes,no,complete,all-residents denominator (opposite of Japan); no births-by-age counts released
 46,Ghana,35697559,no,no,,,
 47,Saudi Arabia,35165789,no,no,,,
 48,Peru,34922145,no,no,,,

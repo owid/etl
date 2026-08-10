@@ -429,6 +429,15 @@ def uzbekistan():
     return _series(sorted(rows))
 
 
+def mozambique():
+    """INE's own health and demographic survey rounds, from the 2022-23 report's trend table.
+
+    Quadro 5.3.2 of that report sets all four rounds side by side, each computed the same way from
+    women's birth histories for the three years before the survey.
+    """
+    return _series([(1997, 5.2), (2003, 5.5), (2011, 5.9), (2023, 4.9)])
+
+
 def kenya():
     """KNBS, 2019 census analytical report on fertility and nuptiality, volume VI, table 4.5.
 

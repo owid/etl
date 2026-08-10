@@ -31,6 +31,7 @@ from india import india  # noqa: E402
 from philippines import philippines  # noqa: E402
 from poland import poland_tfr  # noqa: E402
 from korea import korea_tfr  # noqa: E402
+from malaysia import malaysia_tfr  # noqa: E402
 from myanmar import myanmar_tfr  # noqa: E402
 from published import (  # noqa: E402
     afghanistan,
@@ -47,6 +48,7 @@ from published import (  # noqa: E402
     russia,
     sudan,
     morocco,
+    mozambique,
     tanzania,
     ukraine,
     uzbekistan,
@@ -180,6 +182,41 @@ COUNTRIES = [
       "ones that do not split 40-49 and have no clean 15-19 — so there is nothing to recalculate from. Those "
       "tables do exist in the printed demographic yearbook, but the server hosting it times out.",
       "https://stat.uz/en/official-statistics/demography"),
+    C("Malaysia", "DOSM — age-specific fertility rates over its population estimates", malaysia_tfr,
+      "Malaysia", "complete", False,
+      "DOSM publishes age-specific fertility rates and its own total, annually from 1958, plus population "
+      "by five-year age group and sex — all as parquet from an open store with no key. It computes the "
+      "rates from the age of mother recorded at birth registration, but does not release those counts.",
+      "We took DOSM's published total. The age-band comparison multiplies each rate by the female "
+      "population, which is how DOSM built the rate in the first place; that implies 453,911 births to "
+      "mothers aged 15-49 in 2023 against the 455,761 registered in total, and reproduces the published "
+      "1.73.",
+      "Malaysia is the mirror image of the Japan trap, and getting it backwards would bias everything: "
+      "DOSM's rate counts all residents including non-citizens, on both sides of the division, where "
+      "Japan's counts nationals only. Non-citizen women are about a tenth of some childbearing age groups — "
+      "131,000 of the 1.3 million aged 25-29 in 2023. A birth is counted if it is registered in Malaysia, so "
+      "a foreign resident who registers a child at home instead drops out. The 2024 rates are rounded to "
+      "whole numbers where earlier years carry two decimals, which reads as a year not yet final, though "
+      "DOSM does not flag it. Population for 2011-19 is still on the 2010 census basis and DOSM says it will "
+      "be revised; 2024 onward are projections. The old DOSM site is a shell now — the open data store is "
+      "the working source.",
+      "https://open.dosm.gov.my/data-catalogue/fertility"),
+    C("Mozambique", "INE — Inquérito Demográfico e de Saúde", mozambique, "Mozambique", "survey", False,
+      "INE publishes a fertility rate for each survey round, and its 2022-23 report sets all four side by "
+      "side: 5.2 in 1997, 5.5 in 2003, 5.9 in 2011 and 4.9 in 2022-23. The 2017 census publishes the raw "
+      "material — births in the twelve months before enumeration by mother's age, and women by age — but no "
+      "fertility rate computed from it.",
+      "We read the trend table. Dividing the census's own counts gives 4.18 for 2017, which sits below both "
+      "the survey before it and the survey after, so we do not use it.",
+      "That INE publishes no fertility rate from its own census is itself the finding. The 4.18 the census "
+      "counts imply is the familiar signature of a twelve-month recall question undercounting births, but "
+      "unlike Tanzania, Uganda or Angola, INE names no correction anywhere in the results volume — and the "
+      "one folder that might hold an adjusted figure renders empty without JavaScript, so we cannot rule out "
+      "that a published version exists. Mozambican civil registration cannot be used at all, and is getting "
+      "worse rather than better: the share of under-fives registered fell from 48% in 2011 to 31% in "
+      "2022-23. INE's site serves an incomplete certificate chain, and its catalogue prepends a stray byte "
+      "to every download, which breaks PDF and spreadsheet readers until it is stripped.",
+      "https://www.ine.gov.mz/"),
     C("Poland", "GUS — births and population by single year of age", poland_tfr, "Poland",
       "complete", True,
       "GUS publishes live births by single year of the mother's age, population by single year of age and "
