@@ -404,6 +404,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Off-palette fills | compare every fill against the library groups | every fill is a library colour, **bound as a style** — grapher emits `#585c64` for residual categories, which is in no group |
 | Legend agreement | pair swatch→label by geometry, compare against the bars | zero mismatches |
 | Text size | read `fontSize` off every text node | nothing below **12px**; annotations on the named ladder |
+| Label-on-fill contrast | `contrast(labelHex, barHex)` for every in-bar label | **4.5:1** at 13.5px regular — the 3:1 large-text allowance does not apply |
 | Label alignment | compare each label's centre against its mark | bar values centred on bars, legend labels on swatches |
 | Box alignment | compare the chart's left/right against the header frame | identical to the subtitle box, to the pixel |
 | Gap | `(footer.y - headerBottom - chart.height) / 2` | **12–16px**, equal top and bottom |
