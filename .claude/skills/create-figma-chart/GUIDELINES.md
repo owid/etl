@@ -33,6 +33,7 @@ Companion reference for the `create-figma-chart` skill. Distilled from the desig
 - No abbreviations the audience may not know; write the full word. Plain language throughout.
 - Keep text horizontal — title, subtitle, annotations, data labels. If labels end up vertical, change the chart's orientation instead (e.g. horizontal bars).
 - Text hierarchy by font size: title > subtitle > source ≈ annotations ≈ labels. All fonts readable, especially the smallest.
+- **Check the hierarchy on the numbers, and expect the export to arrive with it broken.** Grapher's square export renders **legend labels at 16.8px against a 16px subtitle** — the least important text in the chart ends up the second-largest thing on it. List every distinct size with what it belongs to and confirm the sequence is non-increasing; anything inside the plot that outranks the subtitle is a defect to fix, not a size to preserve. Bringing that legend to 14px reads as a *correction*, not a compromise: it restores the order and sits with the bar values at 13.7px. This is why "don't change font sizes" carries the exception it does — the rule protects the export's *relative* type scale, and where the export's own scale is wrong, matching the template's hierarchy wins.
 
 ## Annotations
 

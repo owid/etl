@@ -405,6 +405,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Legend agreement | pair swatch→label by geometry, compare against the bars | zero mismatches |
 | Text size | read `fontSize` off every text node | nothing below **12px**; annotations on the named ladder |
 | Label-on-fill contrast | `contrast(labelHex, barHex)` for every in-bar label | **4.5:1** at 13.5px regular — the 3:1 large-text allowance does not apply |
+| Text hierarchy | list every distinct `fontSize` with what it belongs to | title > subtitle > source ≈ legend ≈ labels, **strictly non-increasing**; nothing inside the plot may exceed the subtitle |
 | Label alignment | compare each label's centre against its mark | bar values centred on bars, legend labels on swatches |
 | Box alignment | compare the chart's left/right against the header frame | identical to the subtitle box, to the pixel |
 | Gap | `(footer.y - headerBottom - chart.height) / 2` | **12–16px**, equal top and bottom |
