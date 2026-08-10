@@ -96,6 +96,10 @@ Use these rather than typing sizes and greys by hand — they are what the templ
 
 The annotation ladder is the concrete form of the "12–16px" rule: pick the named size rather than an arbitrary number, and never go below Annotation XS.
 
+**Every size in the finished frame should be a named style's size, including the text that came in from the export.** A grapher SVG scaled to fit arrives at arbitrary sizes — 13.7px value labels, a 16.8px legend — which no style in the file matches, so the frame drifts out of the type system while looking fine. Map each role onto the ladder and bind it: legend → **Annotation L (15)**, in-plot values → **Annotation M (14)**, footnotes and caveats → **XS (12)**, with the template's own Title / Subtitle / Source untouched. That yields the hierarchy **25 → 16 → 15 → 14**, every step a real style.
+
+Two mechanics to get right. Applying a text style **overwrites the font and clears the fill**, so read the fill first and re-apply it after — the black-on-light versus white-on-dark choice is per-segment and must survive. And **bold text has no matching style** (the ladder is all Lato Regular), so for the bold country names set `fontSize` to the ladder value and leave the weight alone rather than binding the style and losing the bold. Changing sizes changes widths: re-centre the labels in their segments afterwards and check none now overflows its bar.
+
 ## Flags, animals, no-data pattern
 
 - **Flags** next to country labels or bars help when space allows (small multiples, ranked bars). Copy from the cheat sheet (Charts file node `2654:5`); flag height matches bar height; if a flag edge blends into the background (white stripes), add a **1px `#DBE5F0` outside stroke**. The Flags *plugin* the team uses is manual — and it has a known bug with the US flag's stars; the file provides correct US flags to copy.
