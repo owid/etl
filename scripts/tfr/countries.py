@@ -25,6 +25,7 @@ from colombia import dane_female_pop, dane_registered_tfr  # noqa: E402
 from france import france_tfr  # noqa: E402
 from india import india  # noqa: E402
 from philippines import philippines  # noqa: E402
+from published import bangladesh, china, indonesia, nigeria, pakistan, russia, vietnam  # noqa: E402
 from sources import egypt, england_wales, germany, japan, mexico, thailand, united_states  # noqa: E402
 
 START = 2000
@@ -196,6 +197,74 @@ COUNTRIES = [
       "whose API needs an XML request. The dataset splits 15-19 into 15-17 and 18-19 as well as the "
       "whole band, which would double-count if not filtered.",
       "https://data.cdc.gov/"),
+    C("Russia", "Rosstat — Demographic Yearbook of Russia", russia, "Russia", "complete", False,
+      "Rosstat publishes a total fertility rate, age-specific rates, births by age of mother and female "
+      "population by age, all in the Demographic Yearbook, as a PDF with an Excel appendix.",
+      "We read the national row of the Excel appendix's fertility-rate sheet. The number is Rosstat's own.",
+      "The Excel appendix carries only the two most recent years, so this series is short; the yearbook PDF "
+      "has more. Russia's site serves a broken certificate chain, so downloads need certificate checking "
+      "relaxed — an earlier attempt wrongly concluded the site was unreachable. The 2022 figure excludes "
+      "the four annexed Ukrainian regions but includes Crimea, and 2022 was rebased on the 2020 census "
+      "while earlier years were not, so there is a break in the series.",
+      "https://rosstat.gov.ru/folder/12781"),
+    C("Vietnam", "National Statistics Office — PxWeb table V02.15", vietnam, "Vietnam", "survey", False,
+      "The statistics office publishes a total fertility rate annually from 2001, through a PxWeb database "
+      "with a working JSON API.",
+      "We pulled the whole-country column straight from the API. No arithmetic of our own.",
+      "This is not a count of registered births. The office estimates the rate from an annual household "
+      "sample survey and then adjusts it upward with the Trussell P/F technique, because women under-report "
+      "births in the previous twelve months. Some years come from a different, larger survey instead of the "
+      "annual one — 2024 is one of those — so the series is not from a single instrument. Vietnam does have "
+      "civil registration, but it is not what the published rate is built on.",
+      "https://pxweb.nso.gov.vn/"),
+    C("Bangladesh", "BBS — Sample Vital Registration System", bangladesh, "Bangladesh", "sample", False,
+      "The annual SVRS report publishes a total fertility rate with confidence intervals, plus age-specific "
+      "rates and the sample's age structure.",
+      "We took the two years the 2023 report states in its own text: 2.17 in 2023, down from 2.20 in 2022.",
+      "The SVRS is a sample of about 2,000 areas where resident registrars record births monthly — a "
+      "continuous sample system, not full civil registration. A different BBS survey gives 2.10 for the same "
+      "year, so BBS itself publishes two disagreeing figures. Everything is PDF only, and the report's "
+      "longer trend is a chart with no numbers behind it, so only two years could be read.",
+      "https://bbs.gov.bd/"),
+    C("Indonesia", "BPS — Long Form of the 2020 census", indonesia, "Indonesia", "survey", False,
+      "BPS publishes a total fertility rate for census and inter-censal survey rounds only. The Long Form of "
+      "the 2020 census, fielded in 2022, gives 2.42.",
+      "We took the figure from BPS's own press release. No arithmetic of our own.",
+      "BPS says plainly that Indonesian civil registration coverage is still incomplete and cannot be used "
+      "for this, so the rate comes from retrospective questions about children ever born. BPS's main website "
+      "blocks automated access, so a newer figure from the 2025 survey — reported as 2.13 — could not be "
+      "confirmed and is left out.",
+      "https://sensus.bps.go.id/"),
+    C("Pakistan", "PBS — Pakistan Demographic Survey 2020", pakistan, "Pakistan", "survey", False,
+      "The Bureau of Statistics publishes a total fertility rate of 3.7 from its Demographic Survey 2020, "
+      "with age-specific rates alongside. The health survey run by the National Institute of Population "
+      "Studies separately gives 3.6 for 2017-18.",
+      "We took the Bureau's own 3.7 and placed it at 2020, the survey year. Its reference period is 2018-2020.",
+      "Pakistan has no usable civil registration for this. The Bureau's own report explains it revived the "
+      "survey after a thirteen-year gap because the national database authority told them vital-event records "
+      "were not good enough. So this is one survey estimate, not a series.",
+      "https://www.pbs.gov.pk/pds/"),
+    C("China", "NBS — Seventh National Population Census", china, "China", "survey", False,
+      "The statistics bureau states a total fertility rate only around census years. Its director gave 1.3 "
+      "for 2020 at the census press conference. The annual communique reports births and a crude birth rate "
+      "but no fertility rate.",
+      "We took the 1.3 figure as stated. No arithmetic of our own.",
+      "China has no birth-registration-based vital statistics. Figures come from the ten-yearly census and, "
+      "between censuses, a household sample survey covering about one person in a thousand. Detailed "
+      "age-specific tables exist but are published as scanned images rather than text or spreadsheets. Lower "
+      "figures circulating for recent years are computed by outside analysts, not published by the bureau.",
+      "https://www.stats.gov.cn/"),
+    C("Nigeria", "NBS — Demographic Statistics Bulletin, Calculated TFR", nigeria, "Nigeria",
+      "projection", False,
+      "The Bureau of Statistics publishes a row called Calculated TFR running from 5.50 in 2013 to 5.14 in "
+      "2022, sourced to the National Population Commission.",
+      "We read that row out of the 2022 bulletin. No arithmetic of our own.",
+      "This is not a measured rate. The Population Commission produces it by drawing a straight line between "
+      "the 2008, 2013 and 2018 household survey rounds, which is why it falls by almost exactly the same "
+      "amount every year. The most recent actual measurement is the 2023-24 household survey, which found "
+      "4.8 — well below the projected path. Birth registration is far too incomplete to use, and the female "
+      "population denominators are projections from the 2006 census.",
+      "https://www.nigerianstat.gov.ng/elibrary/read/1241422"),
 ]
 
 PANELS = [(c["name"], c["src"], c["loader"], c["wpp_name"]) for c in COUNTRIES if c["loader"]]
