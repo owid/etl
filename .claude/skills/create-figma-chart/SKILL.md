@@ -299,12 +299,12 @@ The high-value edits to propose (include them in the Step 4 proposal):
 - **Colors**: only the file's Chart colors library, in the cheat-sheet order. **Audit them — never eyeball this.** A palette that looks fine can collapse for the ~8% of men with red-green deficiency, and the failure is invisible to you:
 
   ```bash
-  python3 .claude/skills/create-figma-chart/scripts/color_audit.py \
+  .venv/bin/python .claude/skills/create-figma-chart/scripts/color_audit.py \
     '#bc8e5a,#883039,#6d3e91,#d73c50,#4c6a9c,#6e7581' \
     --names 'Poultry,Beef and buffalo,Sheep and goat,Pork,Fish and seafood,Other meats'
   ```
 
-  It simulates deuteranopia, protanopia and tritanopia, reports the closest pairs as CIELAB ΔE (**under 20 fails, 20–30 is tight**), flags which pairs actually touch in the stack, and checks white-vs-black label contrast on every fill. Add `--suggest` (with `--keep` for the colors that carry meaning) to search the OWID palette for a safer set; it ranks by **hue variety first, then safety**, because ranking on safety alone returns sets that are entirely blues and greens — technically separable, but the reader can no longer tell six categories apart at a glance. Constrain the roles as well when you search by hand (fish should stay blue, beef reddish): the unconstrained optimum is rarely the one to propose. Read the results with two cautions: **tritanopia is vanishingly rare**, so never repaint for it alone; and **swapping a single color usually doesn't help**, because the failures are independent — this chart's floor stayed at 9.2 whether you changed Pork or Sheep-and-goat, since a different pair took over each time. Colors live in the chart, so a repaint is a recommendation to its author, not an edit you make.
+  It simulates deuteranopia, protanopia and tritanopia, reports the closest pairs as CIELAB ΔE (**under 20 fails, 20–30 is tight**), flags which pairs actually touch in the stack, checks white-vs-black label contrast on every fill, and measures the **grayscale seam** between each pair of touching fills (under **1.6:1** they merge when printed — two different hues at the same lightness pass every color check and still fail this one). Add `--suggest` (with `--keep` for the colors that carry meaning) to search the OWID palette for a safer set; it ranks by **hue variety first, then safety**, because ranking on safety alone returns sets that are entirely blues and greens — technically separable, but the reader can no longer tell six categories apart at a glance. Constrain the roles as well when you search by hand (fish should stay blue, beef reddish): the unconstrained optimum is rarely the one to propose. Read the results with two cautions: **tritanopia is vanishingly rare**, so never repaint for it alone; and **swapping a single color usually doesn't help**, because the failures are independent — this chart's floor stayed at 9.2 whether you changed Pork or Sheep-and-goat, since a different pair took over each time. Colors live in the chart, so a repaint is a recommendation to its author, not an edit you make.
 
   **Apply the library *style*, not the hex.** A raw fill leaves the designer looking at `#B13507` with no way to tell whether it came from the palette; a bound style shows `Default Palette/Rusty Orange` in the Fill panel, and it updates if the library ever changes. Import each style by key and bind it — the colour comes along, so never set `fills` as well:
 
@@ -400,7 +400,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Check | How | Bar |
 |---|---|---|
 | Colour-vision safety | `color_audit.py` | no pair under **ΔE 20** for deuteranopia or protanopia; tritanopia noted, never acted on alone |
-| Greyscale survival | `color_audit.py` (contrast column) | **adjacent** pairs above ~**1.6:1**; below that they merge in print |
+| Grayscale survival | `color_audit.py` (grayscale seam section) | **adjacent** pairs above ~**1.6:1**; below that they merge in print |
 | Off-palette fills | compare every fill against the library groups | every fill is a library colour, **bound as a style** — grapher emits `#585c64` for residual categories, which is in no group |
 | Legend agreement | pair swatch→label by geometry, compare against the bars | zero mismatches |
 | Text size | read `fontSize` off every text node | nothing below **12px**; annotations on the named ladder |
@@ -414,6 +414,8 @@ Every one of these caught a real defect on this skill's first run, and none of t
 **Make label-centring part of the build, not a follow-up.** It regressed three times in one run — each rebuild re-hugs the text, which restores the drift, and a separate "now centre the labels" step is forgotten or applied to a chart instance that is later replaced. Put the centring loop at the end of the same function that imports, scales and re-hugs, so it cannot be skipped.
 
 **Re-run this whole pass after the last change, not after each one.** Fixes get lost silently: a label-centring pass applied to a chart instance that is later swapped for a re-export leaves the drift back exactly as it was, and every screenshot in between looks correct. And a structural change spends budget elsewhere — lifting an aggregate row to the top added 8px of height, which came straight out of the 12–16px gap and took it to 8.2 without anything reporting a problem. Treat "I already checked that" as false after any re-export, reorder, rescale or restyle.
+
+**A failing check is a finding to report, not a veto.** Measure it, say plainly what fails and by how much, offer the alternatives with their own numbers — then do what the author decides. If they accept the deviation, record it beside the frame and in the report (GUIDELINES.md → Colors) so it reads as a decision rather than an oversight.
 
 Two habits make the difference. **Assert, don't eyeball** — a 1.2px label drift, a 1.18:1 greyscale pair and a scrambled legend all looked perfectly fine in a screenshot. And **re-run the affected checks after every change**, because they interact: applying a text style resets range colours, rescaling rewraps text and shifts label centres, adding an annotation changes the group's width, and swapping one colour moves the safety floor to a different pair.
 

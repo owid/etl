@@ -1,15 +1,16 @@
 """Audit a chart's colors for color-vision deficiency and label contrast.
 
-Usage:
-    python3 color_audit.py '#bc8e5a,#883039,#6d3e91,#d73c50,#4c6a9c,#585c64'
-    python3 color_audit.py '#bc8e5a,#883039' --names Poultry,Beef
-    python3 color_audit.py '#bc8e5a,...' --suggest        # search the OWID palette for a safer set
+Usage (run from the repo root, with the repo interpreter):
+    .venv/bin/python color_audit.py '#bc8e5a,#883039,#6d3e91,#d73c50,#4c6a9c,#585c64'
+    .venv/bin/python color_audit.py '#bc8e5a,#883039' --names Poultry,Beef
+    .venv/bin/python color_audit.py '#bc8e5a,...' --suggest   # search the OWID palette for a safer set
 
 Colors are given in stack/legend order, so adjacent pairs are the ones that touch.
 Run it on every chart before proposing it — eyeballing does not catch a dE of 9.
 """
 
 import argparse
+import heapq
 import itertools
 import math
 
@@ -48,6 +49,13 @@ COMMON = ["normal", "deuteranopia", "protanopia"]
 ALL_KINDS = COMMON + ["tritanopia"]
 
 TOO_CLOSE, TIGHT = 20.0, 30.0
+
+# Two fills that touch must also survive being printed in black and white. Below this ratio the
+# seam between them disappears: Denim beside Gray measures 1.18:1.
+GRAYSCALE_MIN = 1.6
+
+# How many candidate palettes the search keeps in memory, and how many it prints.
+KEEP_BEST, SHOW_BEST = 40, 4
 
 
 def srgb(h):
@@ -133,12 +141,34 @@ def hue_family(hexcol):
     return int(((math.degrees(math.atan2(b, a)) + 360) % 360) // 60)
 
 
+_LAB_CACHE = {}
+
+
+def sim_lab(hexcol, kind):
+    """Lab coordinates of a color as seen with the given deficiency, memoized.
+
+    The search scores hundreds of thousands of candidate palettes drawn from the same 25 colors,
+    so converting each (color, kind) pair once instead of per candidate is most of the speedup.
+    """
+    key = (hexcol, kind)
+    if key not in _LAB_CACHE:
+        _LAB_CACHE[key] = to_lab(simulate(hexcol, kind))
+    return _LAB_CACHE[key]
+
+
 def min_delta_e(hexes, kinds=COMMON):
+    """The closest any two colors come, across the given deficiencies.
+
+    Depends only on the *set* of colors, not their order — every pair is compared. That is what
+    lets the search enumerate combinations rather than permutations.
+    """
     worst = math.inf
     for kind in kinds:
-        sims = [simulate(h, kind) for h in hexes]
-        for i, j in itertools.combinations(range(len(hexes)), 2):
-            worst = min(worst, delta_e(sims[i], sims[j]))
+        labs = [sim_lab(h, kind) for h in hexes]
+        for a, b in itertools.combinations(labs, 2):
+            d = math.dist(a, b)
+            if d < worst:
+                worst = d
     return worst
 
 
@@ -165,9 +195,40 @@ def audit(hexes, names):
             if d < TOO_CLOSE and kind in COMMON:
                 failures.append((d, a, b, kind))
 
+    print(f"\n=== grayscale seam between touching fills (needs {GRAYSCALE_MIN}:1) ===")
+    gray_failures = []
+    for i in range(len(hexes) - 1):
+        ratio = contrast(hexes[i], hexes[i + 1])
+        flag = " MERGES IN PRINT" if ratio < GRAYSCALE_MIN else ""
+        print(f"  {names[i]:<18} | {names[i + 1]:<18} {ratio:4.2f}:1{flag}")
+        if ratio < GRAYSCALE_MIN:
+            gray_failures.append((ratio, names[i], names[i + 1]))
+
     score = min_delta_e(hexes)
     print(f"\n  overall: min dE {score:.1f} across normal/deuteranopia/protanopia")
+    if gray_failures:
+        worst = min(gray_failures)
+        print(f"  grayscale: {worst[1]} and {worst[2]} touch at {worst[0]:.2f}:1 — "
+              f"reorder the stack or move one color")
     return failures, score
+
+
+def _assign(combo, hexes, free):
+    """Choose which replacement lands in which slot, and report the total drift.
+
+    Every arrangement of the same color set scores identically, so pick the one closest to the
+    colors already in use: a designer reads a small shift as a fix and a wholesale repaint as a
+    different chart. Only the finalists get here, so the len(free)! search is cheap.
+    """
+    best, best_drift = (), math.inf
+    for perm in itertools.permutations(combo):
+        drift = sum(
+            math.dist(sim_lab(hexes[slot], "normal"), sim_lab(PALETTE[cname], "normal"))
+            for slot, cname in zip(free, perm)
+        )
+        if drift < best_drift:
+            best, best_drift = perm, drift
+    return best, best_drift
 
 
 def suggest(hexes, names, fixed_idx=()):
@@ -176,8 +237,12 @@ def suggest(hexes, names, fixed_idx=()):
     free = [i for i in range(len(hexes)) if i not in fixed]
     print(f"\n=== searching the OWID palette for {len(free)} replacement(s) "
           f"(keeping {', '.join(names[i] for i in fixed_idx) or 'nothing'}) ===")
-    results = []
-    for combo in itertools.permutations(PALETTE, len(free)):
+    # Combinations, not permutations. min_delta_e and the hue-family count both depend only on the
+    # *set* of colors, so the len(free)! arrangements of one set all score identically. Enumerating
+    # permutations meant 25P6 = 127.5M candidates for a six-category chart (hours, and every
+    # passing one held in memory); the 25C6 = 177k sets are the real search space.
+    heap, passing = [], 0
+    for combo in itertools.combinations(PALETTE, len(free)):
         trial = list(hexes)
         for slot, cname in zip(free, combo):
             trial[slot] = PALETTE[cname]
@@ -186,29 +251,33 @@ def suggest(hexes, names, fixed_idx=()):
         score = min_delta_e(trial)
         if score < TOO_CLOSE:
             continue                      # not worth showing a set that still fails
+        passing += 1
         families = len({hue_family(h) for h in trial} - {None})
-        results.append((families, score, combo))
-    # rank by hue variety FIRST: ranking on safety alone returns sets that are all blues and
-    # greens (safe, but a reader can no longer tell six categories apart at a glance)
-    results.sort(reverse=True)
-    if not results:
+        # Rank by hue variety FIRST: ranking on safety alone returns sets that are all blues and
+        # greens (safe, but a reader can no longer tell six categories apart at a glance).
+        # Bounded to KEEP_BEST candidates, so memory does not scale with the search space.
+        heapq.heappush(heap, (families, score, combo))
+        if len(heap) > KEEP_BEST:
+            heapq.heappop(heap)
+    if not heap:
         print("  nothing in the palette clears dE 20 for this many categories — "
               "consider merging categories instead.")
         return
-    seen, shown = set(), 0
-    for families, score, combo in results:
-        key = frozenset(combo)
-        if key in seen:
-            continue
-        seen.add(key)
-        print(f"  hue families {families}/6   min dE {score:5.1f}")
-        for slot, cname in zip(free, combo):
+    # Hue variety, then safety, then drift as the tiebreaker — among equally varied and equally
+    # safe palettes, the one that moves the fewest colors furthest is the one to propose.
+    finalists = []
+    for families, score, combo in heap:
+        perm, drift = _assign(combo, hexes, free)
+        finalists.append((-families, -score, drift, perm))
+    finalists.sort()
+    print(f"  {passing} palette(s) clear dE {TOO_CLOSE:.0f}; showing the best {SHOW_BEST}, "
+          f"closest to the current colors first")
+    for neg_families, neg_score, drift, perm in finalists[:SHOW_BEST]:
+        print(f"  hue families {-neg_families}/6   min dE {-neg_score:5.1f}   drift {drift:5.1f}")
+        for slot, cname in zip(free, perm):
             h = PALETTE[cname]
             label = "white" if contrast("#ffffff", h) >= contrast("#000000", h) else "black"
             print(f"     {names[slot]:<18} -> {cname:<15} {h}   label: {label}")
-        shown += 1
-        if shown >= 4:
-            break
     print("\n  Colors live in the chart, not the image — hand these to whoever owns it.")
 
 
