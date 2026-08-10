@@ -459,6 +459,15 @@ def ghana():
     return _series([(2003, 4.4), (2008, 4.0), (2022, 3.9)])
 
 
+def madagascar():
+    """INSTAT's own health and demographic survey rounds, direct estimates from birth histories.
+
+    The 2021 round's trend chart carries the earlier ones. The 2018 census gives 4.3 as well, by a
+    different method — see the note in countries.py about the correction INSTAT computed and refused.
+    """
+    return _series([(2004, 5.2), (2009, 4.8), (2021, 4.3)])
+
+
 def kenya():
     """KNBS, 2019 census analytical report on fertility and nuptiality, volume VI, table 4.5.
 

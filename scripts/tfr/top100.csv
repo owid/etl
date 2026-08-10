@@ -47,7 +47,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 46,Ghana,35697559,full,yes,no,survey,GDHS rounds; 2010 census 3.28 raw vs 4.57 Gompertz; 2021 volume still unpublished
 47,Saudi Arabia,35165789,full,yes,no,complete,three series by nationality (2.7/0.8/2.0 in 2024); no ASFR published
 48,Peru,34922145,no,no,,,
-49,Madagascar,33522055,no,no,,,
+49,Madagascar,33522055,full,yes,no,survey,EDS rounds; census computed a Brass correction to 4.7 and explicitly rejected it
 50,Cote d'Ivoire,33494339,no,no,,,
 51,Cameroon,30640815,no,no,,,
 52,Nepal,29629406,no,no,,,
