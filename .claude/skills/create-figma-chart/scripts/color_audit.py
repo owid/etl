@@ -5,7 +5,9 @@ Usage (run from the repo root, with the repo interpreter):
     .venv/bin/python color_audit.py '#bc8e5a,#883039' --names Poultry,Beef
     .venv/bin/python color_audit.py '#bc8e5a,...' --suggest   # search the OWID palette for a safer set
 
-Colors are given in stack/legend order, so adjacent pairs are the ones that touch.
+Colors are given in stack/legend order, so adjacent pairs are the ones that touch. That holds for
+stacked and grouped fills; with --line or --maps nothing touches in legend order (lines cross, map
+neighbors are geographic), so the grayscale seam is reported as information and never gates.
 Run it on every chart before proposing it — eyeballing does not catch a dE of 9.
 """
 
@@ -192,7 +194,7 @@ def min_delta_e(hexes, kinds=COMMON):
     return worst
 
 
-def audit(hexes, names):
+def audit(hexes, names, adjacent_fills=True):
     print("=== label contrast on each fill (WCAG: 4.5 normal text, 3.0 large/bold) ===")
     for name, h in zip(names, hexes):
         cw, cb = contrast("#ffffff", h), contrast("#000000", h)
@@ -210,19 +212,35 @@ def audit(hexes, names):
         print(f"  {kind}:{rare}")
         for d, a, b, adjacent in pairs[:3]:
             flag = " FAILS" if d < TOO_CLOSE else (" tight" if d < TIGHT else "")
-            touch = " [adjacent in the stack]" if adjacent else ""
+            touch = " [adjacent in the stack]" if adjacent and adjacent_fills else ""
             print(f"    {a:<18} vs {b:<18} dE {d:5.1f}{flag}{touch}")
             if d < TOO_CLOSE and kind in COMMON:
                 failures.append((d, a, b, kind))
 
-    print(f"\n=== grayscale seam between touching fills (needs {GRAYSCALE_MIN}:1) ===")
     gray_failures = []
-    for i in range(len(hexes) - 1):
-        ratio = contrast(hexes[i], hexes[i + 1])
-        flag = " MERGES IN PRINT" if ratio < GRAYSCALE_MIN else ""
-        print(f"  {names[i]:<18} | {names[i + 1]:<18} {ratio:4.2f}:1{flag}")
-        if ratio < GRAYSCALE_MIN:
-            gray_failures.append((ratio, names[i], names[i + 1]))
+    if adjacent_fills:
+        print(f"\n=== grayscale seam between touching fills (needs {GRAYSCALE_MIN}:1) ===")
+        for i in range(len(hexes) - 1):
+            ratio = contrast(hexes[i], hexes[i + 1])
+            flag = " MERGES IN PRINT" if ratio < GRAYSCALE_MIN else ""
+            print(f"  {names[i]:<18} | {names[i + 1]:<18} {ratio:4.2f}:1{flag}")
+            if ratio < GRAYSCALE_MIN:
+                gray_failures.append((ratio, names[i], names[i + 1]))
+    else:
+        # Lines cross and map neighbors are geographic, so legend order says nothing about which
+        # fills meet. Report the closest pairs in print and leave the judgement to the reader
+        # instead of failing arbitrary consecutive pairs.
+        print("\n=== grayscale separation, closest pairs (informational — no seam gate) ===")
+        pairs = sorted(
+            (contrast(hexes[i], hexes[j]), names[i], names[j])
+            for i, j in itertools.combinations(range(len(hexes)), 2)
+        )
+        for ratio, a, b in pairs[:3]:
+            flag = " close in print" if ratio < GRAYSCALE_MIN else ""
+            print(f"  {a:<18} | {b:<18} {ratio:4.2f}:1{flag}")
+        print(f"  which marks meet is not knowable from legend order here, so the {GRAYSCALE_MIN}:1 "
+              f"seam gate is not applied — for lines lean on direct labeling, for maps check the "
+              f"neighbors that actually share a border.")
 
     score = min_delta_e(hexes)
     print(f"\n  overall: min dE {score:.1f} across normal/deuteranopia/protanopia")
@@ -265,7 +283,7 @@ def _assign(combo, hexes, free, seams):
     return best
 
 
-def suggest(hexes, names, fixed_idx=()):
+def suggest(hexes, names, fixed_idx=(), adjacent_fills=True):
     """Search the palette for a safer set, keeping the colors at fixed_idx."""
     fixed = {i: hexes[i] for i in fixed_idx}
     free = [i for i in range(len(hexes)) if i not in fixed]
@@ -273,14 +291,19 @@ def suggest(hexes, names, fixed_idx=()):
           f"(keeping {', '.join(names[i] for i in fixed_idx) or 'nothing'}) ===")
     # A seam between two kept colors is outside the search's reach: no choice of replacement can
     # separate them. Say so rather than rejecting every candidate over something it cannot fix.
-    seams = [i for i in range(len(hexes) - 1) if i not in fixed or (i + 1) not in fixed]
-    for i in range(len(hexes) - 1):
-        if i in seams:
-            continue
-        ratio = contrast(hexes[i], hexes[i + 1])
-        if ratio < GRAYSCALE_MIN:
-            print(f"  note: {names[i]} and {names[i + 1]} are both kept and touch at {ratio:.2f}:1 "
-                  f"— the search cannot fix that seam; free one of them or reorder the stack.")
+    # With no adjacency to speak of (--line, --maps) there is no seam to constrain at all: gating on
+    # legend order there rejected every candidate and returned nothing usable.
+    seams = []
+    if adjacent_fills:
+        seams = [i for i in range(len(hexes) - 1) if i not in fixed or (i + 1) not in fixed]
+        for i in range(len(hexes) - 1):
+            if i in seams:
+                continue
+            ratio = contrast(hexes[i], hexes[i + 1])
+            if ratio < GRAYSCALE_MIN:
+                print(f"  note: {names[i]} and {names[i + 1]} are both kept and touch at "
+                      f"{ratio:.2f}:1 — the search cannot fix that seam; free one of them or "
+                      f"reorder the stack.")
     # Combinations, not permutations. min_delta_e and the hue-family count both depend only on the
     # *set* of colors, so the len(free)! arrangements of one set all score identically. Enumerating
     # permutations meant 25P6 = 127.5M candidates for a six-category chart (hours, and every
@@ -369,10 +392,14 @@ def main():
     if args.line:
         PALETTE.update(LINE_VARIANTS)
 
-    failures, score = audit(hexes, names)
+    # Only stacked and grouped fills are laid out in the order they are given, so only there does
+    # "adjacent in the list" mean "these two touch".
+    adjacent_fills = not (args.line or args.maps)
+
+    failures, score = audit(hexes, names, adjacent_fills)
     if args.suggest:
         keep = tuple(int(i) for i in args.keep.split(",") if i.strip() != "")
-        suggest(hexes, names, keep)
+        suggest(hexes, names, keep, adjacent_fills)
     elif failures:
         print("\n  Failing pairs found — rerun with --suggest (and --keep for the colors that")
         print("  carry meaning) to search for a safer set. Note that swapping one color often")
