@@ -381,12 +381,18 @@ The high-value edits to propose (include them in the Step 4 proposal):
   const box = figma.createAutoLayout("HORIZONTAL");         // real API — see the note below
   box.name = "annotation__<what>";
   clone.appendChild(box);                                   // parent before setting HUG
-  box.fills = [{type:"SOLID", color:{r:1,g:1,b:1}}];
+  box.fills = clone.fills.map(f => ({...f}));               // the template's canvas, not white
   box.paddingLeft = box.paddingRight = box.paddingTop = box.paddingBottom = 0;
   box.appendChild(txt);
   txt.layoutSizingHorizontal = txt.layoutSizingVertical = "HUG";
   box.layoutSizingHorizontal = box.layoutSizingVertical = "HUG";
   ```
+
+  > **Take the fill from the template, never hardcode white.** The DI and static templates are white,
+  > but the Instagram ones sit on `Instagram/Beige Background` `#FBF9F3` — a white frame there is a
+  > visible rectangle behind the text, which is exactly the background box the guidelines forbid.
+  > Copying `clone.fills` makes the knockout invisible on whichever template was chosen, and keeps
+  > working if a future template introduces another canvas color.
 
   > **`figma.createAutoLayout()` is a real API — do not "fix" this to `createFrame()`.** It is declared
   > in the official plugin typings (`createAutoLayout(direction?: 'HORIZONTAL' | 'VERTICAL'): FrameNode`)

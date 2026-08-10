@@ -389,7 +389,8 @@ def main():
     ap.add_argument("--separated", action="store_true",
                     help="no fills touch (plain or grouped bars, lines, maps): report the "
                          "grayscale seam but never gate on it")
-    ap.add_argument("--keep", default="", help="indices (0-based) to hold fixed when suggesting")
+    ap.add_argument("--keep", default="",
+                    help="indices (0-based, within range, no repeats) to hold fixed when suggesting")
     args = ap.parse_args()
 
     hexes = [c.strip() for c in args.colors.split(",") if c.strip()]
@@ -397,6 +398,18 @@ def main():
              else [f"series {i + 1}" for i in range(len(hexes))])
     if len(names) != len(hexes):
         ap.error("--names must have the same number of entries as colors")
+
+    # Parse and validate --keep before any work: a negative index is legal Python but nonsense here —
+    # `free` only holds nonnegative positions, so -1 would report the last color as kept while
+    # replacing it in every recommendation, and an out-of-range one raises IndexError inside the search.
+    try:
+        keep = tuple(int(i) for i in args.keep.split(",") if i.strip() != "")
+    except ValueError:
+        ap.error("--keep takes comma-separated integers, e.g. --keep 4,5")
+    if bad := [i for i in keep if not 0 <= i < len(hexes)]:
+        ap.error(f"--keep index out of range: {bad} (valid: 0..{len(hexes) - 1})")
+    if len(set(keep)) != len(keep):
+        ap.error(f"--keep has repeated indices: {args.keep}")
 
     if args.maps:
         PALETTE.clear()
@@ -415,7 +428,6 @@ def main():
 
     failures, score = audit(hexes, names, adjacent_fills)
     if args.suggest:
-        keep = tuple(int(i) for i in args.keep.split(",") if i.strip() != "")
         suggest(hexes, names, keep, adjacent_fills)
     elif failures:
         print("\n  Failing pairs found — rerun with --suggest (and --keep for the colors that")
