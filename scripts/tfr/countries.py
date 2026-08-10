@@ -219,14 +219,20 @@ COUNTRIES = [
       "itself refuses automated requests; these two datasets come from a separate host that does not.",
       "https://data.cdc.gov/"),
     C("Russia", "Rosstat — Demographic Yearbook of Russia", russia, "Russia", "complete", False,
-      "Rosstat publishes a total fertility rate, age-specific rates, births by age of mother and female "
-      "population by age, all in the Demographic Yearbook, as a PDF with an Excel appendix.",
-      "We read the national row of the Excel appendix's fertility-rate sheet. The number is Rosstat's own.",
-      "The Excel appendix carries only the two most recent years, so this series is short; the yearbook PDF "
-      "has more. Russia's site serves a broken certificate chain, so downloads need certificate checking "
-      "relaxed — an earlier attempt wrongly concluded the site was unreachable. The 2022 figure excludes "
-      "the four annexed Ukrainian regions but includes Crimea, and 2022 was rebased on the 2020 census "
-      "while earlier years were not, so there is a break in the series.",
+      "The yearbook is eight chapter spreadsheets behind an HTML index. Chapter 2 gives the total fertility "
+      "rate for the whole country back to the early 1960s; chapter 4 gives live births by age of mother as "
+      "counts. A separate bulletin gives female population by single year of age at 1 January.",
+      "We read the national column of the fertility-rate sheet. Dividing the births by the population gives "
+      "1.39 for 2022 against Rosstat's published 1.416, so the age-band comparison uses those counts while "
+      "the line stays Rosstat's own figure.",
+      "The 1.8% gap is the denominator: Rosstat divides by the average population over the year, and the "
+      "only population file on the same census basis is the one for 1 January, which is slightly larger. "
+      "There is also a rebasing trap — Rosstat did not rebase its published rates for 2011-21 on the 2020 "
+      "census, but the population files are all rebased, so only 2022 is internally consistent. The 2022 "
+      "figure excludes the four annexed Ukrainian regions; Crimea has been included since 2014. Rosstat's "
+      "site serves a broken certificate chain, so downloads need certificate checking relaxed, and its "
+      "unified statistics database refuses requests from outside the country altogether. The series stops "
+      "at 2022 because that is the latest yearbook edition.",
       "https://rosstat.gov.ru/folder/12781"),
     C("Vietnam", "National Statistics Office — PxWeb table V02.15", vietnam, "Vietnam", "survey", False,
       "The statistics office publishes a total fertility rate annually from 2001, through a PxWeb database "

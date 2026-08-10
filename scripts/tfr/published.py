@@ -27,23 +27,24 @@ def _series(pairs):
 
 # ---------------------------------------------------------------- Russia
 def russia():
-    """Rosstat Demographic Yearbook 2023, appendix sheet 2.2 — national row only.
+    """Rosstat Demographic Yearbook 2023, chapter 2, sheet 2.6.
 
-    The appendix carries just the two most recent years; the yearbook PDF adds 2020.
+    The yearbook is split into eight chapter spreadsheets behind an HTML index. Chapter 2 carries
+    the total fertility rate for the whole country back to the early 1960s; the first column of
+    sheet 2.6 is the year and the second is the figure for the whole population. Early rows label
+    two-year averages, which are skipped.
     """
-    d = pd.read_excel(os.path.join(DATA, "ru_demog.xls"), sheet_name="2.2 ", header=None)
+    path = fetch("https://rosstat.gov.ru/storage/2024/04-20/VF5GE3HA/Dem_ej_02-2023.xlsx",
+                 os.path.join(DATA, "ru", "dem02.xlsx"), insecure=True)
+    d = pd.read_excel(path, sheet_name="2.6", header=None)
     rows = []
-    for i in range(len(d)):
-        if str(d.iloc[i, 0]).strip() == "Российская Федерация":
-            for j in range(i + 1, len(d)):
-                y = str(d.iloc[j, 0]).strip()
-                if not re.match(r"^\d{4}$", y):
-                    break
-                v = pd.to_numeric(d.iloc[j, 1], errors="coerce")
-                if pd.notna(v):
-                    rows.append((int(y), float(v)))
-            break
-    return _series(rows)
+    for _, r in d.iterrows():
+        if not re.fullmatch(r"\d{4}", str(r.iloc[0]).strip()):
+            continue
+        v = pd.to_numeric(r.iloc[1], errors="coerce")
+        if pd.notna(v):
+            rows.append((int(str(r.iloc[0]).strip()), float(v)))
+    return _series(sorted(rows))
 
 
 # ---------------------------------------------------------------- Vietnam
