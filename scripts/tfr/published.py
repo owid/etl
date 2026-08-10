@@ -138,22 +138,31 @@ def china():
     return _series([(2020, 1.3)])
 
 
-def nigeria():
-    """NBS Demographic Statistics Bulletin 2022, table 7, row "Calculated TFR", 2013-2022.
+NDHS = ("https://cdn.sanity.io/files/5otlgtiz/production/"
+        "85827e6e5105f14e496d9cd0bcdd92f201a54ce1.pdf")
 
-    This is not a measured rate: the National Population Commission interpolates linearly
-    between the 2008, 2013 and 2018 DHS rounds, so it is a projection.
+
+def nigeria():
+    """National Population Commission, Nigeria DHS 2024, table 5.3.2.
+
+    The table sets every survey round since 2003 side by side, so one document gives the whole
+    measured series. Each round's rate covers the three years before its fieldwork; the value is
+    placed at the survey year, which is how the commission labels it.
     """
-    path = os.path.join(DATA, "ng_bulletin_2022.txt")
+    path = os.path.join(DATA, "ng", "ndhs.txt")
     if not os.path.exists(path):
-        subprocess.run(
-            ["pdftotext", "-layout", os.path.join(DATA, "ng_bulletin_2022.pdf"), path], check=True
-        )
-    for line in open(path, errors="ignore"):
-        if "Calculated TFR" in line:
-            vals = [float(v) for v in re.findall(r"\b\d\.\d{2}\b", line)]
-            if vals:
-                return _series([(2013 + i, v) for i, v in enumerate(vals)])
+        pdf = fetch(NDHS, os.path.join(DATA, "ng", "ndhs2024.pdf"))
+        subprocess.run(["pdftotext", "-layout", pdf, path], check=True)
+    lines = open(path, errors="ignore").read().splitlines()
+    for i, ln in enumerate(lines):
+        if not ln.strip().startswith("TFR (15–49)"):
+            continue
+        vals = [float(v) for v in re.findall(r"\b\d\.\d\b", ln)]
+        # the header wraps, so the round labels do not appear in column order — but the columns
+        # themselves run oldest to newest, so sorting the years lines them up with the values
+        years = sorted({int(y) for y in re.findall(r"(\d{4}) NDHS", "\n".join(lines[i - 14:i]))})
+        if len(vals) == len(years) == 5:
+            return _series(list(zip(years, vals)))
     return _series([])
 
 

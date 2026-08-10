@@ -290,17 +290,22 @@ COUNTRIES = [
       "of 1.18 was implausibly low because births went unreported. The bureau's queryable data portal "
       "refuses requests from outside the country, but these static files download without trouble.",
       "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/B0603.xls"),
-    C("Nigeria", "NBS — Demographic Statistics Bulletin, Calculated TFR", nigeria, "Nigeria",
-      "projection", False,
-      "The Bureau of Statistics publishes a row called Calculated TFR running from 5.50 in 2013 to 5.14 in "
-      "2022, sourced to the National Population Commission.",
-      "We read that row out of the 2022 bulletin. No arithmetic of our own.",
-      "This is not a measured rate. The Population Commission produces it by drawing a straight line between "
-      "the 2008, 2013 and 2018 household survey rounds, which is why it falls by almost exactly the same "
-      "amount every year. The most recent actual measurement is the 2023-24 household survey, which found "
-      "4.8 — well below the projected path. Birth registration is far too incomplete to use, and the female "
-      "population denominators are projections from the 2006 census.",
-      "https://www.nigerianstat.gov.ng/elibrary/read/1241422"),
+    C("Nigeria", "National Population Commission — Nigeria Demographic and Health Survey", nigeria,
+      "Nigeria", "survey", False,
+      "The 2024 survey report sets every round since 2003 side by side in one table: 5.7 in 2003 and 2008, "
+      "then 5.5, 5.3 and 4.8. The Bureau of Statistics separately publishes a row called Calculated TFR, "
+      "and its own 2021 household survey found 4.6.",
+      "We read the trend table out of the survey report. Summing its age-specific rates and multiplying by "
+      "the band width gives 4.79, the published 4.8.",
+      "These are measured rates from women's birth histories, not registration — birth registration in "
+      "Nigeria is far too incomplete to use. Each round's figure covers the three years before its "
+      "fieldwork, so the years are approximate. We do not use the Bureau's Calculated TFR row: the "
+      "Population Commission produces it by drawing a straight line between survey rounds, which is why it "
+      "falls by almost the same amount every year, and it had Nigeria at 5.14 in 2022 when the next actual "
+      "measurement came in at 4.8. Female population by age exists only as projections from the 2006 "
+      "census, and they do not reconcile with the survey's own denominators — about 11% apart — so there is "
+      "nothing solid to recalculate from.",
+      "https://nationalpopulation.gov.ng/publications"),
     C("Turkey", "TurkStat — Population Statistics Portal", turkey, "Turkey", "complete", False,
       "TurkStat publishes a total fertility rate annually from 2009, and female population by five-year "
       "age group from the address-based population register.",

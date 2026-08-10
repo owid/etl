@@ -211,12 +211,11 @@ const UNPLOTTED = {{UNPLOTTED}};
     rows.forEach((r, i) => cells[i + 1].appendChild(rowSvg(r, top, cw)));
   }
 
+  // the whole section disappears when nothing is in it, rather than saying so
   function drawUnplotted(rows) {
     const host = document.getElementById('unp');
-    if (!rows.length) {
-      host.innerHTML = '<p class="na">None under these filters.</p>';
-      return;
-    }
+    document.getElementById('unplotted').hidden = !rows.length;
+    if (!rows.length) return;
     host.innerHTML =
       '<table class="list"><tbody>' +
       rows.map((r) =>

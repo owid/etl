@@ -4,7 +4,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 3,United States,349035484,full,yes,no,complete,rates 1940-2024; counts exist but Census vintage choice moves the answer 1.4%
 4,Indonesia,287886782,partial,yes,no,survey,census long form figure only; no hunt for counts
 5,Pakistan,259299792,full,yes,no,survey,PDS series 2001-2020; the 2007 round publishes real counts
-6,Nigeria,242431835,partial,yes,no,projection,interpolated bulletin row; no hunt for counts
+6,Nigeria,242431835,full,yes,no,survey,switched to the measured NDHS series 2003-2024; no usable counts
 7,Brazil,213562666,full,yes,yes,complete,
 8,Bangladesh,177818039,full,yes,no,sample,"42-year SVRS series 1982-2023; rates only, no counts published"
 9,Russia,143394457,partial,yes,no,complete,yearbook Excel appendix rate only — the yearbook itself also has counts
