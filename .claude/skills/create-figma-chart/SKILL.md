@@ -15,6 +15,8 @@ This skill takes any OWID grapher chart and produces a designed static version i
 
 Read [GUIDELINES.md](GUIDELINES.md) (sibling file) before editing any chart — it distills the DI Charts Guidelines per chart type and the Good Data Viz Checklist.
 
+Three sibling skills do the text work this one depends on, and Step 8c calls them: **`/adversarial-data-review`** (is the FAUST true of the indicator, and is the data), **`/check-metadata-style`** (the Writing and Style Guide) and **`/check-metadata-typos`** (codespell). Anything they turn up is an upstream fix in the garden step, not a Figma edit.
+
 ## The yearly Charts file — node map (2026)
 
 Each year gets a new file. For **2026** the file key is `s6Sv60bakebRRW2TxsMQbF` ([Charts (2026)](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-)). **If the current year is not 2026, ask the user for that year's file link and re-verify every node id below** (the templates page is named " 📑 Templates" — note the leading space).
@@ -490,6 +492,8 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Check | How | Bar |
 |---|---|---|
 | Color-vision safety | `color_audit.py` | no pair under **ΔE 20** for deuteranopia or protanopia; tritanopia noted, never acted on alone |
+| Spelling and prose | `.venv/bin/codespell` over the texts, plus a read against the style guide | American spelling (CLAUDE.md), no typos, no style-guide breaches — see below |
+| The text is *true* of the indicator | `/adversarial-data-review` on the dataset behind the chart | every claim in the title, subtitle, note and annotations survives checking against the producer's own documentation |
 | Grayscale survival | `color_audit.py` (grayscale seam section) | **adjacent** pairs above ~**1.6:1**; below that they merge in print. **Stacked or segmented fills only** — for a plain or grouped bar chart, a line chart or a map pass `--separated` (`--line`/`--maps` imply it) and read the closest pairs as information, since legend order says nothing about which marks meet |
 | Off-palette fills | compare every fill against the library groups | every fill is a library color, **bound as a style** — grapher emits `#585c64` for residual categories, which is in no group. The muting grays of a highlight treatment are the standing exception: list them, don't flag them |
 | Legend agreement | pair swatch→label by geometry, compare against the bars | zero mismatches |
@@ -512,6 +516,15 @@ const paints = n => { let m = n; while (m && m !== clone) { if (!m.visible) retu
 **Make label-centering part of the build, not a follow-up.** It regressed three times in one run — each rebuild re-hugs the text, which restores the drift, and a separate "now center the labels" step is forgotten or applied to a chart instance that is later replaced. Put the centering loop at the end of the same function that imports, scales and re-hugs, so it cannot be skipped.
 
 **Re-run this whole pass after the last change, not after each one.** Fixes get lost silently: a label-centering pass applied to a chart instance that is later swapped for a re-export leaves the drift back exactly as it was, and every screenshot in between looks correct. And a structural change spends budget elsewhere — lifting an aggregate row to the top added 8px of height, which came straight out of the 12–16px gap and took it to 8.2 without anything reporting a problem. Treat "I already checked that" as false after any re-export, reorder, rescale or restyle.
+
+### Checking the words, not just the geometry
+
+The chart's text is not yours — you transcribed it from the indicator's metadata — so a defect in it is a defect **upstream**, and fixing it only in the image leaves the interactive chart, the data page and every other surface still wrong. Check it here because this is where someone finally reads it slowly; fix it where it lives.
+
+- **Spelling and prose.** Run `.venv/bin/codespell` over the strings you are placing (it is a dev dependency; `/check-metadata-typos` covers the same ground on `.meta.yml` and `.dvc` files). American spelling always, per CLAUDE.md — a producer's British spelling gets adapted, and that includes text you are copying out of a chart. For the wording itself, `/check-metadata-style` holds the Writing and Style Guide; the FAUST rules there apply to exactly the strings this skill moves.
+- **Whether the text is true.** Run **`/adversarial-data-review`** on the dataset behind the chart, over both the data and the FAUST you are about to place. A subtitle that misstates the unit, a note that describes a coverage caveat the producer doesn't claim, an annotation whose number is right for a different year — these read as fine in Figma and are wrong on the page. That skill fetches the producer's own documentation from the snapshot's links and treats every metadata sentence as a claim to be refuted, which is the right posture for text you are about to publish as an image.
+- **Where a finding goes.** A wrong or misspelled string belongs in the garden step's `.meta.yml` (or the chart config, for chart-level overrides), not in the Figma frame — same rule as sort order and colors. Report it with the file it lives in, and hold the image until it's fixed if the claim is load-bearing; a static image outlives the chart text it was copied from, so shipping a known-wrong sentence is worse here than on the live chart, where it can be corrected in place.
+- **Annotations you wrote are your own claims.** Anything you drafted rather than transcribed — a derived percentage, a "more than half" — carries no upstream provenance, so verify it against the data yourself and say in the report which annotations are transcribed and which are derived.
 
 **A failing check is a finding to report, not a veto.** Measure it, say plainly what fails and by how much, offer the alternatives with their own numbers — then do what the author decides. If they accept the deviation, record it beside the frame and in the report (GUIDELINES.md → Colors) so it reads as a decision rather than an oversight.
 
