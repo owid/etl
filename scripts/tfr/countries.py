@@ -49,6 +49,7 @@ from published import (  # noqa: E402
     iraq,
     kenya,
     madagascar,
+    mali,
     morocco,
     mozambique,
     nepal,
@@ -247,6 +248,22 @@ COUNTRIES = [
       "this. Two operational notes: INSTAT\'s homepage is currently compromised with injected spam links, "
       "though the report pages and PDFs are clean, and its data dashboard is down.",
       "https://www.instat.mg/autres/rgph-3"),
+    C("Mali", "INSTAT — Enquête Démographique et de Santé", mali, "Mali", "survey", False,
+      "INSTAT publishes a fertility rate from each of seven survey rounds since 1987, the latest 6.0 for "
+      "2023-24. Its 2022 census gives 6.1, and publishes the births and women behind it as counts.",
+      "We read the survey rounds. We also checked the census: dividing its own adjusted counts reproduces "
+      "every one of its published age-specific rates and gives 6.09 against the published 6.1.",
+      "Mali applied the largest correction in this dataset by far. Its census found the raw count of births "
+      "in the previous twelve months unusable — sex ratios of up to 148 boys per 100 girls, and only about "
+      "70% as many declared births as there were children under one in the same count — and states plainly "
+      "that the data \"are of poor quality and require adjustment\". It names the method, the Trussell "
+      "variant of the Brass technique, and says which alternatives it tested and rejected. The effect is "
+      "close to a doubling: 494,742 declared births become 930,503 adjusted ones, about 88% more. INSTAT "
+      "does not print the two totals side by side, so that comparison is ours from its own tables. Civil "
+      "registration is not used: INSTAT says between 40 and 60% of births go unregistered, even though 83% "
+      "of people eventually hold a certificate. Its statistical database at pxweb.instat.ml accepts "
+      "connections then drops them without serving a certificate at all.",
+      "https://www.instat-mali.org/fr/publications/enquete-demographique-et-de-sante-eds"),
     C("Malaysia", "DOSM — age-specific fertility rates over its population estimates", malaysia_tfr,
       "Malaysia", "complete", False,
       "DOSM publishes age-specific fertility rates and its own total, annually from 1958, plus population "

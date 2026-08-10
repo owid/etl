@@ -507,6 +507,15 @@ def cote_divoire():
     return _series([(2012, 5.0), (2016, 4.6)])
 
 
+def mali():
+    """INSTAT survey rounds. The 2023-24 report charts all seven since 1987.
+
+    The 2022 census gives 6.1 as well, after a correction that nearly doubled its raw birth count —
+    see the note in countries.py.
+    """
+    return _series([(2001, 6.8), (2006, 6.6), (2013, 6.1), (2018, 6.3), (2024, 6.0)])
+
+
 def kenya():
     """KNBS, 2019 census analytical report on fertility and nuptiality, volume VI, table 4.5.
 

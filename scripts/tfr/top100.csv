@@ -56,7 +56,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 55,Australia,27227097,full,yes,yes,complete,fully recalculated; matches ABS to 3 decimals; Victoria/WA registration backlogs
 56,North Korea,26633693,no,no,,,
 57,Syria,26472496,no,no,,,
-58,Mali,25932277,no,no,,,
+58,Mali,25932277,full,yes,no,survey,surveys; census applied a Brass correction that nearly doubled its raw birth count
 59,Burkina Faso,24601699,no,no,,,
 60,Sri Lanka,23348314,no,no,,,
 61,Taiwan,23011292,no,no,,,
