@@ -49,14 +49,15 @@ from uganda import uganda_tfr  # noqa: E402
 
 START = 2000
 
-# tier key -> (label, color)
+# tier key -> (label, color). Colors are ColorBrewer Dark2, which is qualitative — the ordering
+# carries no meaning, it just keeps the six categories apart at small sizes and in both themes.
 TIERS = {
-    "complete": ("Complete registration", "#1d7a4c"),
-    "incomplete": ("Incomplete registration", "#a8690a"),
-    "sample": ("Sample registration", "#7b5ea7"),
-    "survey": ("Survey or census", "#b0632c"),
-    "projection": ("Projection only", "#5a7a8c"),
-    "none": ("No official figure", "#8a8a8a"),
+    "complete": ("Complete registration", "#1B9E77"),
+    "incomplete": ("Incomplete registration", "#D95F02"),
+    "sample": ("Sample registration", "#7570B3"),
+    "survey": ("Survey or census", "#E7298A"),
+    "projection": ("Projection only", "#E6AB02"),
+    "none": ("No official figure", "#666666"),
 }
 
 
