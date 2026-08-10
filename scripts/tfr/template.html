@@ -133,12 +133,9 @@ const UNPLOTTED = {{UNPLOTTED}};
     return n;
   }
 
+  // fertility rates are small numbers — just round up to the next whole child per woman
   function axisTop(top) {
-    if (top <= 0) return 1;
-    if (top < 5) return Math.ceil(top * 2) / 2;
-    const mag = Math.pow(10, Math.floor(Math.log10(top)));
-    for (const m of [1, 2, 5, 10]) if (top <= m * mag) return m * mag;
-    return 10 * mag;
+    return Math.max(1, Math.ceil(top));
   }
 
   // one table row per country: name, its own dumbbell on a shared scale, then the metadata
