@@ -78,7 +78,17 @@ These texts also arrive **render-ready**: the endpoint unwraps grapher's detail-
 
 **Never shorten the producer's name to make it fit.** The footer string is the producer's official name — verify it against `rg "producer: .*<name>" snapshots/` if you're unsure — and "Food and Agriculture Organization of the United Nations" does not become "UN Food and Agriculture Organization" because the line is too long. When it overruns the CC BY text, wrap it (Step 7) rather than editing it.
 
-**Check that every selected entity actually renders.** Grapher silently drops an entity whose data doesn't reach the displayed year, with no warning anywhere — a chart pinned to 2023 quietly showed ten of its eleven countries because one stopped at 2022, and the DI text still discussed the missing one. Compare `selectedEntityNames` in the config against the entity labels in the exported SVG, and if they differ, say so before building: the fix is the narrative chart's tolerance setting (or pinning the year), and it belongs to whoever owns the chart.
+**Check that every selected entity actually renders.** Grapher silently drops an entity whose data doesn't reach the displayed year, with no warning anywhere — a chart pinned to 2023 quietly showed ten of its eleven countries because one stopped at 2022, and the DI text still discussed the missing one. Compare the **effective** selection against the entity labels in the exported SVG, and if they differ, say so before building: the fix is the narrative chart's tolerance setting (or pinning the year), and it belongs to whoever owns the chart.
+
+  "Effective" is the catch. `selectedEntityNames` in `.config.json` is the *saved* chart's selection, so it is the wrong baseline for exactly the inputs this skill takes most often:
+
+  | Input | Baseline to compare the SVG against |
+  |---|---|
+  | Bare slug, or `by-uuid` | `selectedEntityNames` from `.config.json` |
+  | Link carrying `country=` (or `focus=`) | the **URL's** list — it overrides the saved selection entirely |
+  | MDim view | the URL's `country=` if present, otherwise render the view and treat its labels as the baseline |
+
+  `life-expectancy.config.json` lists `World, Americas, Europe, Africa, Asia, Oceania`, but `life-expectancy.svg?country=USA~CHN` contains only `China` and `United States` — take the config as the baseline there and the check reports six entities missing and two unexpected, on a chart where nothing is wrong. And note the two sides speak different languages: `country=` takes **ISO codes** while the SVG prints **names**, so resolve the codes before comparing rather than diffing the strings.
 
 ## Step 2 — Ask the run options, all at once
 
