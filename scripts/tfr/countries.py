@@ -28,6 +28,7 @@ from colombia import dane_female_pop, dane_registered_tfr  # noqa: E402
 from france import france_tfr  # noqa: E402
 from india import india  # noqa: E402
 from philippines import philippines  # noqa: E402
+from poland import poland_tfr  # noqa: E402
 from korea import korea_tfr  # noqa: E402
 from myanmar import myanmar_tfr  # noqa: E402
 from published import (  # noqa: E402
@@ -128,6 +129,22 @@ COUNTRIES = [
       "1.67 million expected — so plotting them would show a collapse that is not real. CONAPO's own "
       "model-based figure is well above the registry.",
       "https://www.inegi.org.mx/programas/natalidad/"),
+    C("Poland", "GUS — births and population by single year of age", poland_tfr, "Poland",
+      "complete", True,
+      "GUS publishes live births by single year of the mother's age, population by single year of age and "
+      "sex twice a year, and its own fertility rate — all through one open API with no key.",
+      "We divided the births at each single age by the women of that age at 30 June and summed. That is the "
+      "population GUS says it divides by, and the result reproduces its own published rate to three "
+      "decimals: 1.1576 against 1.158 for 2023, 1.0987 against 1.099 for 2024, 1.0675 against 1.068 for "
+      "2025.",
+      "Poland's rate is now among the lowest anywhere, and still falling. The series starts in 2013 because "
+      "that is where the mid-year population by single age begins; births reach back to 2002. GUS counts "
+      "everyone registered or actually resident for three months or more, which as a matter of law takes in "
+      "Ukrainian nationals given temporary registration after 2022 — so part of the recent fall is the "
+      "denominator growing. That affects GUS's own figure exactly as much as ours, and GUS does not quantify "
+      "it. Nothing is flagged provisional, even 2025. One trap: the summary table in the printed yearbook "
+      "reports births in thousands while the API returns raw counts.",
+      "https://bdl.stat.gov.pl/"),
     C("Philippines", "PSA — OpenSTAT registered live births", philippines, "Philippines", "incomplete", True,
       "PSA's OpenSTAT database gives registered live births by age group of mother, one table per year, "
       "and a projected population by five-year age group and sex.",

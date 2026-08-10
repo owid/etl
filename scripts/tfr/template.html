@@ -136,7 +136,7 @@
  <section id="mapsec">
  <h2>Where the two disagree</h2>
  <p class="src">How far the UN estimate sits above or below the country's own figure, for its latest
- year. Countries with no national figure are left blank.</p>
+ year. Countries not investigated or with no national figure are left blank.</p>
  <div id="mapwrap">
   <svg id="map" viewBox="{{MAPBOX}}" role="img" aria-label="World map of the gap between national and UN figures"></svg>
   <div id="tip" hidden></div>
@@ -268,11 +268,13 @@ const SHAPES = {{SHAPES}};
     return Math.ceil(m * 10) / 10;                 // symmetric, to the next tenth
   }
 
-  function drawMap() {
+  // the colour range is taken from every country, not just the filtered ones, so the shades stay
+  // comparable as the reader ticks boxes on and off
+  function drawMap(rows) {
     const svg = document.getElementById('map');
     const top = mapExtent();
     const byIso = {};
-    ROWS.forEach((r) => { if (r.iso) byIso[r.iso] = r; });
+    rows.forEach((r) => { if (r.iso) byIso[r.iso] = r; });
 
     svg.textContent = '';
     for (const iso in SHAPES) {
@@ -319,9 +321,11 @@ const SHAPES = {{SHAPES}};
     tip.style.top = `${y}px`;
   }
 
+  // only countries currently drawn get a tooltip, so a filtered-out country stays blank and silent
+  let shown = [];
   document.getElementById('map').addEventListener('mousemove', (ev) => {
     const iso = ev.target.dataset ? ev.target.dataset.iso : null;
-    const r = iso ? ROWS.find((x) => x.iso === iso) : null;
+    const r = iso ? shown.find((x) => x.iso === iso) : null;
     if (r) showTip(r, ev); else tip.hidden = true;
   });
   document.getElementById('mapwrap').addEventListener('mouseleave', () => { tip.hidden = true; });
@@ -364,8 +368,11 @@ const SHAPES = {{SHAPES}};
     if (summary) {
       const tiers = picked('tier');
       const rcs = picked('rc');
-      draw(ROWS.filter((r) => tiers.includes(r.tier) && rcs.includes(r.recalc ? '1' : '0')));
+      const keep = ROWS.filter((r) => tiers.includes(r.tier) && rcs.includes(r.recalc ? '1' : '0'));
+      draw(keep);
       drawUnplotted(UNPLOTTED.filter((r) => tiers.includes(r.tier)));
+      shown = keep;
+      drawMap(keep);
     } else {
       if (!sel.value) sel.value = sel.options[0] ? sel.options[0].value : '';
       document.querySelectorAll('section[data-country]').forEach((s) => {
@@ -382,7 +389,6 @@ const SHAPES = {{SHAPES}};
     })
   );
   sel.addEventListener('change', apply);
-  drawMap();
   document.querySelectorAll('#filters input').forEach((i) => i.addEventListener('change', apply));
   // a country name in the overview opens that country's own page
   document.getElementById('ov').addEventListener('click', (e) => {
