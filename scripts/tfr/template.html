@@ -71,8 +71,8 @@
  table.ov td { padding:0 10px 0 0; white-space:nowrap; vertical-align:middle; }
  /* name and metadata hug their text so the chart column takes whatever is left */
  table.ov td.cn { width:1%; text-align:right; padding-right:12px; }
- table.ov td.meta:last-of-type { width:99%; }
- table.ov td.cc { width:640px; padding-right:20px; }
+ table.ov td.cc { width:1%; padding-right:10px; }
+ table.ov td.sp { width:99%; }
  table.ov td.n, table.ov td.meta { width:1%; }
  table.ov td.n { text-align:right; color:var(--mut); font-variant-numeric:tabular-nums; }
  table.ov td.meta { color:var(--mut); font-size:12.5px; }
@@ -143,7 +143,7 @@ const UNPLOTTED = {{UNPLOTTED}};
 
   // one table row per country: name, its own dumbbell on a shared scale, then the metadata.
   // The SVG is rendered at its natural size — stretching it would turn the dots into ellipses.
-  const CW = 640, CH = 28, LPAD = 44, RPAD = 52;
+  const CW = 640, CH = 28, LPAD = 40, RPAD = 38;
 
   const ticks = (top) => Array.from({ length: top + 1 }, (_, i) => i);
 
@@ -188,7 +188,7 @@ const UNPLOTTED = {{UNPLOTTED}};
         const x = LPAD + (v / top) * (CW - LPAD - RPAD);
         return `<text class="xlab" x="${x}" y="11">${v}</text>`;
       }).join('') +
-      '</svg></td><td>Built from</td><td>How obtained</td><td>Year</td>';
+      '</svg></td><td>Built from</td><td>How obtained</td><td>Year</td><td class="sp"></td>';
     table.appendChild(head);
 
     rows.forEach((r) => {
@@ -197,7 +197,7 @@ const UNPLOTTED = {{UNPLOTTED}};
         `<td class="cn">${r.country}</td><td class="cc"></td>` +
         `<td class="meta"><span class="swatch" style="color:${TIERS[r.tier][1]}"></span> ${TIERS[r.tier][0]}</td>` +
         `<td class="meta">${r.recalc ? 'Recalculated by us' : 'As published'}</td>` +
-        `<td class="n">${r.year}</td>`;
+        `<td class="n">${r.year}</td><td class="sp"></td>`;
       tr.querySelector('td.cc').appendChild(rowSvg(r, top));
       table.appendChild(tr);
     });
