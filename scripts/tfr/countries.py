@@ -26,6 +26,7 @@ from colombia import dane_female_pop, dane_registered_tfr  # noqa: E402
 from france import france_tfr  # noqa: E402
 from india import india  # noqa: E402
 from philippines import philippines  # noqa: E402
+from korea import korea_tfr  # noqa: E402
 from myanmar import myanmar_tfr  # noqa: E402
 from published import (  # noqa: E402
     bangladesh,
@@ -250,15 +251,19 @@ COUNTRIES = [
       "birth or population counts by age, only rates, so there is nothing to recalculate from. Everything "
       "is PDF only, served from a cloud bucket behind the BBS site.",
       "https://bbs.gov.bd/"),
-    C("Indonesia", "BPS — Long Form of the 2020 census", indonesia, "Indonesia", "survey", False,
-      "BPS publishes a total fertility rate for census and inter-censal survey rounds only. The Long Form of "
-      "the 2020 census, fielded in 2022, gives 2.42.",
-      "We took the figure from BPS's own press release. No arithmetic of our own.",
+    C("Indonesia", "BPS — censuses and inter-censal surveys", indonesia, "Indonesia", "survey", False,
+      "BPS publishes a total fertility rate for census and inter-censal survey rounds only. Its 2025 survey "
+      "release charts all four rounds together: 2.41 for the 2010 census, 2.28 for the 2015 survey, 2.18 "
+      "for the long form of the 2020 census, and 2.13 for the 2025 survey.",
+      "We read all four values out of that chart. An earlier version of this page had 2.42 for the 2020 "
+      "long form, which is wrong — BPS's own figure is 2.18, and 2.41 belongs to the 2010 census.",
       "BPS says plainly that Indonesian civil registration coverage is still incomplete and cannot be used "
-      "for this, so the rate comes from retrospective questions about children ever born. BPS's main website "
-      "blocks automated access, so a newer figure from the 2025 survey — reported as 2.13 — could not be "
-      "confirmed and is left out.",
-      "https://sensus.bps.go.id/"),
+      "for this, so the rate comes from retrospective questions about children ever born. Each round is "
+      "placed at the year BPS names it for; the 2020 long form was actually fielded in 2022. BPS's main "
+      "website refuses automated requests, so this release had to be read through a web archive; the "
+      "separate census microsite does answer, but its fertility tables hold children ever born over a "
+      "lifetime, not one year's births, so there is nothing to recalculate from.",
+      "https://www.bps.go.id/id/pressrelease/2026/05/05/2645/"),
     C("Pakistan", "PBS — Pakistan Demographic Survey", pakistan, "Pakistan", "survey", False,
       "The Bureau of Statistics ran the Demographic Survey annually until 2007, then again in 2020. Every "
       "edition still online prints a total fertility rate: 4.1 in 2001 falling to 3.7 in 2007, and 3.7 again "
@@ -367,6 +372,24 @@ COUNTRIES = [
       "line is shorter than the population series behind it. The 2024 figure is the first release and will "
       "revise slightly.",
       "https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177007"),
+    C("South Korea", "Statistics Korea — annual birth statistics release", korea_tfr, "South Korea",
+      "complete", False,
+      "Statistics Korea publishes its birth statistics in English every year as a PDF, and each edition's "
+      "first table gives an eleven-year run of the total fertility rate. Some editions also print live "
+      "births by mother's age group as counts. The interior ministry separately publishes female population "
+      "by five-year age group from the resident register, as a spreadsheet download.",
+      "We chained five editions of the release to build 2003-2024, taking the newer edition wherever two "
+      "overlap because the office revises. As a check we recalculated 2015 from the counts — births by age "
+      "group from the release, women by age group from the resident register — and got 1.245 against the "
+      "published 1.24.",
+      "The obvious source would be the KOSIS database, but its interface refuses scripted requests and its "
+      "API rejects everything without a key; getting a key means a Statistics Korea account, and that needs "
+      "either a Korean mobile phone registered in your own name or a Korean identity number. There is no "
+      "route for a foreigner and no English signup at all, so this uses the published PDFs instead. Editions "
+      "before 2013 print only the current and previous year, which is why the series starts in 2003. Recent "
+      "editions dropped the full births-by-age table, so a recalculation for the latest year is not "
+      "possible from them.",
+      "https://mods.go.kr/board.es?mid=a20108010000&bid=11773"),
     C("Kenya", "KNBS — 2019 Population and Housing Census, volume VI", kenya, "Kenya", "survey", False,
       "The census fertility volume gives a national total fertility rate of 3.4 for 2019 and 4.8 for 2009, "
       "plus age-specific rates for every county. The 2022 household health survey, also run by KNBS, "

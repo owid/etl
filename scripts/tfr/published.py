@@ -88,8 +88,27 @@ def bangladesh():
 
 # ---------------------------------------------------------------- single-round figures
 def indonesia():
-    """BPS Long Form of the 2020 census, fieldwork 2022: "hasil Long Form SP2020 sebesar 2,42"."""
-    return _series([(2022, 2.42)])
+    """BPS statistics release for SUPAS 2025, figure 6 — all four rounds in one chart.
+
+    The chart plots the census and inter-censal rounds in order and prints each value above its
+    point, so the whole series can be read from the one document. Each round is placed at the year
+    BPS names it for.
+    """
+    path = os.path.join(DATA, "id", "supas2025.txt")
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"{path} — see the BPS notes in countries.py for how it was obtained")
+    lines = open(path, errors="ignore").read().splitlines()
+    rounds = ["SP2010", "SUPAS 2015", "LF SP2020", "SUPAS 2025"]
+    years = [2010, 2015, 2020, 2025]
+    for i, ln in enumerate(lines):
+        if all(r in ln for r in rounds):
+            # each data label sits alone on its own line; numbers inside prose above the chart
+            # (the replacement level of 2,10, for one) must not be picked up
+            vals = [m.group(1) for ln2 in lines[max(0, i - 20):i]
+                    if (m := re.fullmatch(r"\s*(\d,\d{2})\s*", ln2))]
+            if len(vals) == 4:
+                return _series(list(zip(years, [float(v.replace(",", ".")) for v in vals])))
+    return _series([])
 
 
 PDS = {"pds2003": "pdswriteup-1.pdf", "pds2005": "pds2005report-1.pdf",

@@ -2,7 +2,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 1,India,1476625571,full,yes,no,sample,"SRS publishes rates only; no raw counts exist anywhere, confirmed"
 2,China,1412914090,full,yes,yes,survey,recalculated from the 2000/2010/2020 census counts
 3,United States,349035484,full,yes,no,complete,rates 1940-2024; counts exist but Census vintage choice moves the answer 1.4%
-4,Indonesia,287886782,partial,yes,no,survey,census long form figure only; no hunt for counts
+4,Indonesia,287886782,full,yes,no,survey,"four survey rounds 2010-2025; the old 2.42 was wrong, BPS says 2.18 for 2020"
 5,Pakistan,259299792,full,yes,no,survey,PDS series 2001-2020; the 2007 round publishes real counts
 6,Nigeria,242431835,full,yes,no,survey,switched to the measured NDHS series 2003-2024; no usable counts
 7,Brazil,213562666,full,yes,yes,complete,
@@ -29,7 +29,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 28,Colombia,53936231,full,yes,yes,complete,
 29,Sudan,53282716,no,no,,,
 30,Uganda,52761469,no,no,,,
-31,South Korea,51600389,no,no,,,
+31,South Korea,51600389,full,yes,no,complete,KOSIS needs a Korean-identity account; used the English press releases instead
 32,Algeria,48028337,no,no,,,
 33,Iraq,48007435,no,no,,,
 34,Spain,47850792,full,yes,yes,complete,
