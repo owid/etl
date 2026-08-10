@@ -61,7 +61,17 @@ Get an SVG URL for the chart, whatever form the reference takes:
 | Narrative chart (name or admin link) | name → uuid via the unauthenticated map `https://admin.owid.io/api/narrative-chart-map`, then `https://ourworldindata.org/grapher/by-uuid/<uuid>.svg` |
 | Description only | find candidates via site search (`https://ourworldindata.org/search?q=...`) or a Datasette title match; show the candidates and confirm before proceeding |
 
-Then pull the chart's texts — title, subtitle, note, source attribution, `originUrl` (the topic page) — from `https://ourworldindata.org/grapher/<slug>.config.json` (or `by-uuid/<uuid>.config.json`). These seed the template texts in Step 6.
+Then pull the chart's texts, which seed the template texts in Step 6. Read them from **`.metadata.json`**, not `.config.json`, and **keep the view's query params on the request** — `.../energy-mix.metadata.json?metric=per_capita&source=coal` resolves the selected MDim view exactly as the `.svg` request does:
+
+| Template text | Where it comes from |
+|---|---|
+| Title | `chart.title` |
+| Subtitle | `chart.subtitle`; when that's absent the chart is inheriting the indicator's `description_short` — take `columns[<column>].descriptionShort` |
+| Note | `chart.note` (absent when the chart has none) |
+| Data source | `chart.citation` — verbatim what grapher prints after `Data source:` |
+| Topic page | **`.config.json` → `originUrl`** — the one field `.metadata.json` doesn't give (its `chart.originalChartUrl` is the grapher URL, not the topic page). Often null; fall back to asking the user in Step 2. |
+
+`.config.json` is not a substitute: it never carries the source attribution, it carries `subtitle`/`note` only when a chart overrides them manually, and **for an MDim slug it 404s** — per-view configs aren't exposed under that path. Pass *every* dimension a view needs; a partial MDim param set returns an empty payload (`title: null`, no columns). If a text is ever in doubt, the rendered SVG is the tie-breaker — it shows exactly what the footer will say.
 
 ## Step 2 — Ask the run options, all at once
 
@@ -129,7 +139,7 @@ curl -s -X POST "<submitUrl>" -F "file=@$DIR/original.svg;type=image/svg+xml"
 # → {"success":true, ..., "placedOnNodeId":"<id>"}
 ```
 
-4. **Lay out the page**: the original chart on the left; the adapted template **to its right** (~100 px gap). If several formats were requested, keep one original and line the templates up to its right. Move imported nodes with `use_figma` (`page.appendChild(node)`, set `node.x/node.y`).
+4. **Lay out the page**: the original chart on the left; the adapted template **to its right** (~100 px gap). If several formats were requested, keep one original and line the templates up to its right. Move imported nodes with `use_figma` (`page.appendChild(node)`, set `node.x/node.y`). This page-level parenting is for the **original** reference chart only — the embed gets reparented into the template clone in Step 7.
 
 > **Imported SVGs arrive at their natural size** (850×600 / 540×540). Scale with `node.rescale(target / node.width)` — `frame.resize()` does **not** scale children, it crops.
 
@@ -137,10 +147,10 @@ curl -s -X POST "<submitUrl>" -F "file=@$DIR/original.svg;type=image/svg+xml"
 
 Replace the lorem-ipsum text nodes in the cloned template. Source everything from the chart config (Step 1) and the user's answers (Step 2):
 
-- **Title** — suggest a more colloquial rewrite per GUIDELINES.md ("Death rate in the United States", not "Death rate, US"); keep the user's final say. The page name uses this final title. **Strip the year from the title** — grapher appends it (", 2023") but the templates don't carry it there.
-- **Subtitle** — the chart's subtitle, trimmed to what's necessary. When the chart shows a single year (or a narrow period the reader needs), append **`Data for <YYYY>.`** here — this is where the year lives, not in the title.
-- **Data source:** `Data source: <producer> (<year>)` — matching what grapher's own footer shows.
-- **Note:** only in templates that carry a Note line, and only if the chart has one worth keeping.
+- **Title** — suggest a more colloquial rewrite per GUIDELINES.md ("Death rate in the United States", not "Death rate, US"); keep the user's final say. The page name uses this final title. Two or three lines is normal; check the line breaks and the year and highlight-color rules in GUIDELINES.md → Titles.
+- **Subtitle** — the chart's subtitle, trimmed to what's necessary. When the chart shows a single year (or a narrow period the reader needs), append **`Data for <YYYY>.`** here.
+- **Data source:** `Data source: ` + `chart.citation` from Step 1 — that field *is* grapher's own footer line, so don't re-derive a `<producer> (<year>)` string by hand.
+- **Note:** only in templates that carry a Note line, and only if the chart has one worth keeping. **DI images normally carry no note at all** — drop it, or, when it's genuinely load-bearing for understanding the chart, fold it into the subtitle as a bolded second line (only if the subtitle isn't already crowded).
 - **`OurWorldinData.org/[Topic]`** → the confirmed topic path (e.g. `OurWorldinData.org/child-mortality`).
 - **CC BY** stays; static desktop templates also carry `Licensed under CC-BY by the author <Author>`.
 
@@ -158,7 +168,16 @@ The embed spans the full content width, left-aligned with the title/subtitle/log
 | Static Horizontal (850×638) | x=16, w=818 | y 118–550 |
 | Static Vertical (850×1095) | x=16, w=818 | y 116–990 |
 
-Verify against the actual clone with `get_metadata` (the templates evolve; the geometry above is a 2026 snapshot). Then `node.rescale(508 / node.width)` (or 818), set `node.x` to the content x, and center vertically. If the rescaled chart overflows the vertical space, re-export the embed at a flatter aspect ratio rather than squashing — **never stretch one axis** (it distorts dots, arrowheads, and text).
+Verify against the actual clone with `get_metadata` (the templates evolve; the geometry above is a 2026 snapshot). These are **frame-local** coordinates, and `x`/`y` are relative to a node's parent — so append the embed to the template clone **before** positioning it. Left parented to the page (where Step 5 puts imported nodes), the same numbers land it near the page origin, on top of the reference chart:
+
+```js
+templateClone.appendChild(embed)             // first — x/y are parent-relative
+embed.rescale(508 / embed.width)             // or 818 on the 850-wide templates
+embed.x = 16                                 // content x, now inside the clone
+embed.y = top + (space - embed.height) / 2   // centered between header and footer
+```
+
+If the rescaled chart overflows the vertical space, re-export the embed at a flatter aspect ratio rather than squashing — **never stretch one axis** (it distorts dots, arrowheads, and text).
 
 ## Step 8 — Improve the labelling and annotate
 
@@ -189,6 +208,8 @@ The high-value edits to propose (include them in the Step 4 proposal):
 - **Figma plugins can't be run from here.** The no-data hashed pattern (Hero Patterns, `4162:5`) and the Flags plugin (`2654:5`) are manual: pre-color no-data shapes `#C9C9C9`, tell the user which manual steps remain.
 - **Fonts**: every text edit needs `loadFontAsync` first; the templates use Playfair Display and Lato — if a font is missing in the user's Figma, text edits throw.
 - **`/admin/charts/<id>.svg` doesn't exist**; narrative charts have no public slug — both go through `by-uuid/<uuid>.svg`.
+- **Texts come from `.metadata.json`, not `.config.json`** — the latter has no source attribution, omits inherited subtitles/notes, and 404s on MDim slugs. Carry the view's query params on the request.
+- **`x`/`y` are parent-relative** — reparent the embed into the template clone before applying the Step 7 coordinates.
 - **`?tab=table` silently renders the default tab**; `imSquareSize` is PNG-only; `imWidth`/`imHeight` can't enlarge an SVG (renormalized to ~510k px²).
 - **Line charts with >500 points render no dots** (grapher performance cutoff) — don't hunt for dots that were never exported.
 - **Never stretch one axis** of the imported chart — dots, squares, and arrowheads distort. Re-export at the right aspect ratio instead.
