@@ -24,6 +24,7 @@ warnings.filterwarnings("ignore")
 
 from argentina import argentina_tfr  # noqa: E402
 from australia import australia_tfr  # noqa: E402
+from austria import austria_tfr  # noqa: E402
 from belgium import belgium_tfr  # noqa: E402
 from canada import canada_tfr  # noqa: E402
 from chile import chile_tfr  # noqa: E402
@@ -39,6 +40,7 @@ from india import india  # noqa: E402
 from peru import peru_tfr  # noqa: E402
 from sri_lanka import sri_lanka_tfr  # noqa: E402
 from sweden import sweden_tfr  # noqa: E402
+from switzerland import switzerland_tfr  # noqa: E402
 from taiwan import taiwan_tfr  # noqa: E402
 from philippines import philippines  # noqa: E402
 from poland import poland_tfr  # noqa: E402
@@ -1728,6 +1730,42 @@ COUNTRIES = [
       "census published population counts only, with no fertility results at all.",
       "https://www.statistics.sl/images/StatisticsSL/Documents/Census/2015/"
       "2015_census_national_analytical_report.pdf"),
+    C("Austria", "Statistik Austria — registered births over the mean population", austria_tfr,
+      "Austria", "complete", True,
+      "The office publishes births by five-year age band of the mother from 2006, mean population by "
+      "single year of age from 2004, and its own rate to two decimals. Births by single year of the "
+      "mother's age exist only for the latest year.",
+      "We divided births by women in each band and summed. Our 1.301 for 2025 against a published "
+      "1.296, and 1.317 against 1.311 for 2024 — the third-of-a-percent gap is what working in bands "
+      "rather than single years costs. Doing 2025 at single-year detail, where that is possible, gives "
+      "1.2958 against the published 1.2965.",
+      "Austria's rate has fallen every year since 2021 except one, from 1.48 to 1.30. The nationality "
+      "split is 1.22 for Austrian mothers against 1.58 for foreign ones in 2024 — and broken down "
+      "further, by individual nationality, it runs from 3.79 for Syrian mothers to 0.66 for Iranian, a "
+      "spread far wider than the two-group figure suggests. The denominator is stated plainly as the mean "
+      "population over the year, which is also why the office withholds its final rate until the "
+      "mid-year population is settled around July. Births are counted by when they happened, from the "
+      "central civil-status register, and each year is cleaned once in the following spring: the "
+      "provisional 2025 figure of 75,718 births became 76,067.",
+      "https://www.statistik.at/statistiken/bevoelkerung-und-soziales/bevoelkerung/geburten"),
+    C("Switzerland", "BFS — registered births over the female population", switzerland_tfr,
+      "Switzerland", "complete", False,
+      "The office publishes its rate back to 1803, and separately for Swiss and foreign mothers since "
+      "1971. Its database answers plain requests with no key.",
+      "We read the published series. Nothing can be rebuilt: the office publishes no births by age of "
+      "mother at all, in any form — the only place that breakdown appears on its site is a chart drawn in "
+      "the browser from a third-party service.",
+      "The nationality gap is about 0.3 and stable: 1.20 for Swiss mothers against 1.50 for foreign ones "
+      "in 2024, with 1.29 overall. Two things to be careful about. There is a second office series, the "
+      "one that feeds its population scenarios, whose age-specific rates sum to 1.40 for 2024 against the "
+      "1.29 it publishes as the actual figure — an 8.7% difference, because the scenario schedule is "
+      "smoothed across years. It is the wrong series to use and easy to reach for, since it is the only "
+      "one with rates by age. And the office does not say which population its rate divides by; the only "
+      "single-year-of-age population table it publishes is a 31 December stock, unlike Austria next door, "
+      "which states its mean-population basis explicitly. Nor does it say whether births are dated to "
+      "when they happened or when they were registered.",
+      "https://www.bfs.admin.ch/bfs/de/home/statistiken/bevoelkerung/geburten-todesfaelle/"
+      "fruchtbarkeit.html"),
 ]
 
 PANELS = [(c["name"], c["src"], c["loader"], c["wpp_name"]) for c in COUNTRIES if c["loader"]]

@@ -96,6 +96,6 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 95,Greece,9897119,full,yes,yes,complete,"fully recalculated 2001-2024; the 2021 census cut the population estimate by 140,000"
 96,Israel,9647689,no,no,,,
 97,Hungary,9585819,full,yes,no,complete,"rose to 1.61 in 2021 then fell every year to 1.31 in 2025, below its 2013 level"
-98,Austria,9107265,no,no,,,
-99,Switzerland,9007794,no,no,,,
+98,Austria,9107265,full,yes,yes,complete,fully recalculated 2006-2025 from age bands; by nationality 3.79 Syrian to 0.66 Iranian
+99,Switzerland,9007794,full,yes,no,complete,no births by age of mother published at all; Swiss mothers 1.20 vs foreign 1.50
 100,Sierra Leone,8996749,full,yes,no,survey,"largest correction found anywhere: raw 1.6 to adjusted 5.6, births scaled x3.8"
