@@ -13,7 +13,9 @@ import argparse
 import itertools
 import math
 
-# OWID's categorical palette (OwidDistinctColors in owid-grapher's CustomSchemes.ts).
+# The design team's Chart Colors library, read off the cheat-sheet swatches in the DI Guidelines
+# file (8gxqkVmZ9x3MK3ky5oigrJ) and verified to match OwidDistinctColors in owid-grapher's
+# CustomSchemes.ts. The Figma library is the source of truth; re-read it if the two ever diverge.
 PALETTE = {
     "Purple": "#6d3e91", "DarkOrange": "#c05917", "LightTeal": "#58ac8c", "Blue": "#286bbb",
     "Maroon": "#883039", "Camel": "#bc8e5a", "MidnightBlue": "#00295b", "DustyCoral": "#c15065",
@@ -21,6 +23,13 @@ PALETTE = {
     "Turquoise": "#38aaba", "OliveGreen": "#578145", "Cherry": "#970046", "Teal": "#00847e",
     "RustyOrange": "#b13507", "Denim": "#4c6a9c", "Fuchsia": "#cf0a66", "TealishGreen": "#00875e",
     "Copper": "#b16214", "DarkMauve": "#8c4569", "Lime": "#3b8e1d", "Coral": "#d73c50",
+}
+
+# The library's "Line and Slope Charts" group: darkened variants for thin marks and text on
+# white. Six colors differ from the fill palette; the rest are shared.
+LINE_VARIANTS = {
+    "Camel": "#996d39", "LightTeal": "#2c8465", "Turquoise": "#008291",
+    "Lime": "#338711", "Peach": "#c4523e", "DarkOrange": "#be5915",
 }
 
 # Deuteranopia and protanopia are the common ones (~8% of men between them); tritanopia is
@@ -180,6 +189,8 @@ def main():
     ap.add_argument("colors", help="comma-separated hex colors, in stack/legend order")
     ap.add_argument("--names", help="comma-separated category names, same order")
     ap.add_argument("--suggest", action="store_true", help="search the palette for a safer set")
+    ap.add_argument("--line", action="store_true",
+                    help="use the Line and Slope Charts variants (thin marks and text on white)")
     ap.add_argument("--keep", default="", help="indices (0-based) to hold fixed when suggesting")
     args = ap.parse_args()
 
@@ -188,6 +199,9 @@ def main():
              else [f"series {i + 1}" for i in range(len(hexes))])
     if len(names) != len(hexes):
         ap.error("--names must have the same number of entries as colors")
+
+    if args.line:
+        PALETTE.update(LINE_VARIANTS)
 
     failures, score = audit(hexes, names)
     if args.suggest:

@@ -69,11 +69,23 @@ Companion reference for the `create-figma-chart` skill. Distilled from the desig
 
 ## Colors
 
-- Only the OWID palette — the **Chart colors** library in the Charts file (select an object → Fill → the four-circles library icon → Chart colors).
+- Only the OWID palette — the **[Chart Colors] Library**, a shared Figma library, not a local style set (select an object → Fill → the four-circles library icon → Chart colors). It is the source of truth; `scripts/color_audit.py` carries a copy read off the cheat-sheet swatches, verified against `OwidDistinctColors` in owid-grapher. Re-read the library rather than trusting either copy if they ever disagree.
+- The 24 fills: Denim `#4c6a9c`, Rusty Orange `#b13507`, Camel `#bc8e5a`, Light Teal `#58ac8c`, Purple `#6d3e91`, Maroon `#883039`, Midnight Blue `#00295b`, Mauve `#a2559c`, Dark Copper `#9a5129`, Turquoise `#38aaba`, Cherry `#970046`, Lime `#3b8e1d`, Peach `#e56e5a`, Blue `#286bbb`, Dark Olive Green `#18470f`, Coral `#d73c50`, Copper `#b16214`, Teal `#00847e`, Fuchsia `#cf0a66`, Olive Green `#578145`, Dark Orange `#c05917`, Dark Mauve `#8c4569`, Tealish Green `#00875e`, Dusty Coral `#c15065`.
+- The library's **Line and Slope Charts** group is the same palette with six colors darkened for thin marks and text on white: Camel* `#996d39`, Light Teal* `#2c8465`, Turquoise* `#008291`, Lime* `#338711`, Peach* `#c4523e`, Dark Orange* `#be5915`. Use that group for lines, slopes and scatter dots (`color_audit.py --line`).
 - For **lines, slopes, and scatter dots**, use the line-variant palette and try colors in the cheat-sheet order (better mutual distinction): Denim `#4c6a9c`, Rusty Orange `#b13507`, then the darkened variants Camel* `#996d39`, Light Teal* `#2c8465`, … The starred colors are darkened versions of the standard palette for thin marks on white; in code they are `OwidDistinctLinesPalette` / `DarkerOwidDistinctColors` in owid-grapher's `packages/@ourworldindata/grapher/src/color/CustomSchemes.ts`.
 - Use color to *mean* something: highlight the entity the story is about, mute the rest with gray. Meaningful associations are fine (forests = green).
 - **Color-vision check on every chart, measured not eyeballed** — run `scripts/color_audit.py` (see SKILL.md → Step 8). Pairs closer than ΔE 20 under deuteranopia or protanopia fail; 20–30 is tight. Two things this catches that inspection does not: a *stacked* chart needs its adjacent segments separable **and** every pair separable, because the reader also matches legend to segment; and more than about four categorical colors is where safe palettes start to run out — a six-color stack measured ΔE 9.2, and no single substitution lifted it. Also check contrast of text and marks against the background, and that the chart still reads in black and white (readers print).
 - Map colors should be set in grapher itself (Viridis / ColorBrewer sequential palettes), not repainted in Figma — Brewer palettes distinguish better than the OWID categorical palette when many classes are shown.
+
+## Named styles in the Charts file
+
+Use these rather than typing sizes and greys by hand — they are what the templates are built from, and a new text node cloned from a template node inherits them for free.
+
+**Text styles** — Data Insights: Title (Playfair Display SemiBold 25/29), Subtitle (Lato Regular 16), Source (Lato Regular 14), and an annotation ladder **Annotation XL 16 / L 15 / M 14 / S 13 / XS 12** (all Lato Regular). Instagram adds: Title 25/29, Subtitle 16, Source 14/16, Axis labels 18, Text 30 Bold (Lato SemiBold 30), plus portrait variants Title 28/32 and Subtitle 18.
+
+**Text and furniture colors** — Data Insights: Title `#2D2E2D`, Subtitle `#5B5B5B`, Source `#858585`, Annotations `#5B5B5B`, Axis Lines `#999999`, Axis Grid `#DDDDDD`, Background White `#FFFFFF`. Instagram: same, plus Beige Background `#FBF9F3` and Axis labels `#58595B`.
+
+The annotation ladder is the concrete form of the "12–16px" rule: pick the named size rather than an arbitrary number, and never go below Annotation XS.
 
 ## Flags, animals, no-data pattern
 
