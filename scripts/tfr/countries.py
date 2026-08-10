@@ -233,13 +233,17 @@ COUNTRIES = [
       "civil registration, but it is not what the published rate is built on.",
       "https://pxweb.nso.gov.vn/"),
     C("Bangladesh", "BBS — Sample Vital Registration System", bangladesh, "Bangladesh", "sample", False,
-      "The annual SVRS report publishes a total fertility rate with confidence intervals, plus age-specific "
-      "rates and the sample's age structure.",
-      "We took the two years the 2023 report states in its own text: 2.17 in 2023, down from 2.20 in 2022.",
+      "The 2023 SVRS report carries a table of every year from 1982 to 2023, giving the total fertility "
+      "rate alongside four other fertility measures. Each annual edition also states its own year's figure "
+      "in the text, with a confidence interval.",
+      "We read the whole 42-year table out of the report. We also summed the age-specific rates for 2023 "
+      "and got 2.18 against the printed 2.175, which is what the rounding of those rates allows.",
       "The SVRS is a sample of about 2,000 areas where resident registrars record births monthly — a "
-      "continuous sample system, not full civil registration. A different BBS survey gives 2.10 for the same "
-      "year, so BBS itself publishes two disagreeing figures. Everything is PDF only, and the report's "
-      "longer trend is a chart with no numbers behind it, so only two years could be read.",
+      "continuous sample system, not full civil registration. The health survey run by the government's "
+      "population institute puts the rate about 0.2 higher, because it asks women to recall past births "
+      "and averages three years, so the two are not measuring quite the same thing. BBS publishes no "
+      "birth or population counts by age, only rates, so there is nothing to recalculate from. Everything "
+      "is PDF only, served from a cloud bucket behind the BBS site.",
       "https://bbs.gov.bd/"),
     C("Indonesia", "BPS — Long Form of the 2020 census", indonesia, "Indonesia", "survey", False,
       "BPS publishes a total fertility rate for census and inter-censal survey rounds only. The Long Form of "
@@ -250,14 +254,19 @@ COUNTRIES = [
       "blocks automated access, so a newer figure from the 2025 survey — reported as 2.13 — could not be "
       "confirmed and is left out.",
       "https://sensus.bps.go.id/"),
-    C("Pakistan", "PBS — Pakistan Demographic Survey 2020", pakistan, "Pakistan", "survey", False,
-      "The Bureau of Statistics publishes a total fertility rate of 3.7 from its Demographic Survey 2020, "
-      "with age-specific rates alongside. The health survey run by the National Institute of Population "
-      "Studies separately gives 3.6 for 2017-18.",
-      "We took the Bureau's own 3.7 and placed it at 2020, the survey year. Its reference period is 2018-2020.",
+    C("Pakistan", "PBS — Pakistan Demographic Survey", pakistan, "Pakistan", "survey", False,
+      "The Bureau of Statistics ran the Demographic Survey annually until 2007, then again in 2020. Every "
+      "edition still online prints a total fertility rate: 4.1 in 2001 falling to 3.7 in 2007, and 3.7 again "
+      "in 2020. The 2007 round also publishes live births and female population by age group as counts.",
+      "We read each edition's own figure out of its report. For 2007 we also did the arithmetic from the "
+      "counts: births divided by women in each age group, summed and multiplied by the band width, gives "
+      "3.69 — the Bureau's published 3.7.",
       "Pakistan has no usable civil registration for this. The Bureau's own report explains it revived the "
-      "survey after a thirteen-year gap because the national database authority told them vital-event records "
-      "were not good enough. So this is one survey estimate, not a series.",
+      "survey after a thirteen-year gap because the national database authority told them vital-event "
+      "records were not good enough — hence the empty stretch from 2008 to 2019. The 2020 figure covers "
+      "2018-20 rather than one year. The 2020 report has a trap: a table titled live births by age of "
+      "mother holds children ever born, not one year's births, and totals over 100 million. The health "
+      "survey run by the National Institute of Population Studies gives 3.6 for 2017-18.",
       "https://www.pbs.gov.pk/pds/"),
     C("China", "NBS — census yearbooks, table on fertility by age and birth order", china_tfr, "China",
       "survey", True,

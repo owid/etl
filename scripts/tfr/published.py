@@ -14,6 +14,8 @@ import warnings
 
 import pandas as pd
 
+from fetch import fetch
+
 warnings.filterwarnings("ignore")
 
 DATA = os.path.join(os.path.dirname(__file__), "data")
@@ -63,20 +65,25 @@ def vietnam():
 
 # ---------------------------------------------------------------- Bangladesh
 def bangladesh():
-    """SVRS 2023 report. Only the two years its own text states are used here.
+    """SVRS 2023 report, table 3.13 — the whole 1982-2023 series in one table.
 
-    The report's narrative says "the total fertility rate (TFR) decreased to 2.17 in 2023
-    from 2.20 in 2022", and table 1.6 repeats both with confidence intervals. Earlier
-    editions would extend the series.
+    The table runs across several pages with the header repeated, and each row gives five
+    fertility measures; the third number after the year is the total fertility rate.
     """
     path = os.path.join(DATA, "svrs_2023.txt")
     if not os.path.exists(path):
         subprocess.run(["pdftotext", "-layout", os.path.join(DATA, "svrs_2023.pdf"), path], check=True)
-    text = open(path, errors="ignore").read()
-    m = re.search(r"total fertility rate \(TFR\) decreased to (\d\.\d+) in (\d{4}) from (\d\.\d+) in (\d{4})", text)
-    if not m:
-        return _series([])
-    return _series(sorted([(int(m.group(4)), float(m.group(3))), (int(m.group(2)), float(m.group(1)))]))
+    lines = open(path, errors="ignore").read().splitlines()
+    start = next(i for i, ln in enumerate(lines) if "Trends in fertility as observed in the SVRS" in ln)
+    rows = {}
+    for ln in lines[start:]:
+        m = re.match(r"\s*(19|20)(\d{2})\s+(\d+\.\d+)\s+(\d+(?:\.\d+)?)\s+(\d+\.\d+)"
+                     r"\s+(\d+\.\d+)\s+(\d+\.\d+)\s*$", ln)
+        if m:
+            rows[int(m.group(1) + m.group(2))] = float(m.group(5))
+        elif rows and len(rows) >= 42:                 # 1982-2023 inclusive
+            break
+    return _series(sorted(rows.items()))
 
 
 # ---------------------------------------------------------------- single-round figures
@@ -85,12 +92,41 @@ def indonesia():
     return _series([(2022, 2.42)])
 
 
-def pakistan():
-    """PBS Pakistan Demographic Survey 2020, summary of findings: TFR 3.7.
+PDS = {"pds2003": "pdswriteup-1.pdf", "pds2005": "pds2005report-1.pdf",
+       "pds2006": "complete_report-2-1.pdf", "pds2007": "complete_report-2.pdf",
+       "pds2020": "Pakistan_Demographic_Survey-2020-4.pdf"}
 
-    The reference period is 2018-2020; it is placed at 2020, the survey year.
+
+def pakistan():
+    """PBS Pakistan Demographic Survey, every edition still online.
+
+    Each of the older reports has a table headed "TOTAL FERTILITY RATE (PER WOMAN)" listing its own
+    round and the one before it, so reading all of them together gives 2001 through 2007. The 2020
+    report puts its figure in a table alongside two other surveys instead, with its own round last.
     """
-    return _series([(2020, 3.7)])
+    rows = {}
+    for key in ("pds2003", "pds2005", "pds2006", "pds2007"):
+        lines = _pds_text(key).splitlines()
+        # the same "PDS-2005  3.8  3.3  4.1" shape appears in other tables too, so only the few
+        # lines under this heading are read
+        start = next(i for i, ln in enumerate(lines) if "TOTAL FERTILITY RATE (PER WOMAN)" in ln)
+        for ln in lines[start:start + 8]:
+            m = re.match(r"\s*PDS-(\d{4})\s+(\d\.\d)\s+\d\.\d\s+\d\.\d\s*$", ln)
+            if m:
+                rows[int(m.group(1))] = float(m.group(2))
+    m = re.search(r"Pakistan\s+(\d\.\d)\s+(\d\.\d)\s+(\d\.\d)", _pds_text("pds2020"))
+    if m:
+        rows[2020] = float(m.group(3))
+    return _series(sorted(rows.items()))
+
+
+def _pds_text(key):
+    path = os.path.join(DATA, "pk", f"{key}.txt")
+    if not os.path.exists(path):
+        pdf = fetch(f"https://www.pbs.gov.pk/wp-content/uploads/2020/07/{PDS[key]}",
+                    os.path.join(DATA, "pk", f"{key}.pdf"))
+        subprocess.run(["pdftotext", "-layout", pdf, path], check=True)
+    return open(path, errors="ignore").read()
 
 
 def china():
