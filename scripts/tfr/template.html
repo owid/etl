@@ -114,7 +114,7 @@
   <fieldset><legend>What the national figure is built from</legend><span id="tierboxes"></span></fieldset>
   <fieldset><legend>Validation level</legend>
    <label><input type="checkbox" class="rc" value="1" checked> Fully validated from births &amp; women</label>
-   <label><input type="checkbox" class="rc" value="0" checked> TFR directly copied from the source</label>
+   <label><input type="checkbox" class="rc" value="0" checked> TFR copied from source, not validated</label>
   </fieldset>
  </div>
 </div>
@@ -223,7 +223,7 @@ const SHAPES = {{SHAPES}};
       tr.innerHTML =
         `<td class="cn"><a data-go="${r.country}">${r.country}</a></td><td class="cc"></td>` +
         `<td class="meta"><span class="swatch" style="color:${TIERS[r.tier][1]}"></span> ${TIERS[r.tier][0]}</td>` +
-        `<td class="meta">${r.recalc ? 'Fully validated' : 'Directly copied'}</td>` +
+        `<td class="meta">${r.recalc ? 'Fully validated' : 'Copied from source'}</td>` +
         `<td class="n">${r.year}</td>`;
       table.appendChild(tr);
     });
@@ -310,7 +310,7 @@ const SHAPES = {{SHAPES}};
       `<div class="tr"><span class="tw">UN WPP</span><b class="tw">${r.wpp.toFixed(2)}</b></div>` +
       `<div class="tr"><span>Difference</span><b>${gap >= 0 ? '+' : ''}${gap.toFixed(2)}</b></div>` +
       `<div class="tm"><span class="swatch" style="color:${TIERS[r.tier][1]}"></span> ` +
-      `${TIERS[r.tier][0]}<br>${r.recalc ? 'Fully validated' : 'Directly copied'} · ${r.year}</div>`;
+      `${TIERS[r.tier][0]}<br>${r.recalc ? 'Fully validated' : 'Copied from source'} · ${r.year}</div>`;
     tip.hidden = false;
     // keep the tooltip inside the map, flipping it left or up near the edges
     const w = tip.offsetWidth, h = tip.offsetHeight;
