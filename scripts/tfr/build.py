@@ -87,8 +87,9 @@ def main():
     rows.sort(key=lambda r: -r["gap"])
 
     sections, options = [], []
-    for r in rows:
+    for r in sorted(rows, key=lambda x: x["country"]):
         options.append(f'<option value="{r["country"]}">{r["country"]}</option>')
+    for r in rows:
         tier_label, tier_color = TIERS[r["tier"]]
         badges = f'<span class="badge" style="background:{tier_color};color:#fff">{tier_label}</span>'
         if r["recalc"]:

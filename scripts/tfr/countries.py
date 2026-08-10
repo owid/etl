@@ -140,13 +140,17 @@ COUNTRIES = [
       "https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths"),
     C("Germany", "Destatis — Geburtenstatistik (GENESIS 12612-0008)", germany, "Germany", "complete", False,
       "Destatis table 12612-0008 gives live births per 1,000 women for every single year of age 15-49, "
-      "from 1972 to 2025.",
+      "from 1972 to 2025. Table 12612-0005 gives the births themselves by age of mother and birth "
+      "order, from 2009.",
       "We summed the rates across ages. Because they are single-year rates there is no band width to "
-      "multiply by.",
+      "multiply by. Dividing births by the rate recovers the female population Destatis used, which "
+      "is what the age-band comparison shows.",
       "Rebased on the 2022 census from 2012 onward, so numbers differ slightly from Destatis releases "
       "published before the rebasing — our 2023 comes out at 1.385 where the original release said 1.35. "
-      "The 2025 figure is provisional. We could not pull this through the GENESIS API, so the file was "
-      "exported by hand from the web interface.",
+      "The 2025 figure is provisional. The age-band comparison only starts in 2009, because that is where "
+      "the births table begins. Neither file could be pulled through the GENESIS API — the access token we "
+      "have authenticates as the guest account, which cannot download tables — so both were exported by "
+      "hand from the web interface.",
       "https://www-genesis.destatis.de/genesis/online"),
     C("Thailand", "NSO — Statistical Yearbook tables 1.10 and 1.4", thailand, "Thailand", "complete", True,
       "The Statistical Yearbook has table 1.10, registered live births by age group of mother, and table "
