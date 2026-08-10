@@ -111,7 +111,7 @@ def main():
         tier_label, tier_color = TIERS[r["tier"]]
         badges = f'<span class="badge" style="background:{tier_color};color:#fff">{tier_label}</span>'
         if r["recalc"]:
-            badges += ('<span class="badge rc">Recalculated from counts</span>'
+            badges += ('<span class="badge rc">Fully validated from births &amp; women</span>'
                        if r["recalc"] else '')
         sections.append(
             f'<section data-country="{r["country"]}"><h2>{r["country"]}{badges}</h2>'
