@@ -22,6 +22,7 @@ from detail import compare  # noqa: E402
 from render import dumbbell, line_chart  # noqa: E402
 from sources import COLORS, un_wpp  # noqa: E402
 from track import refresh  # noqa: E402
+from worldmap import paths as world_paths  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CACHE = os.path.join(HERE, "cache")
@@ -70,6 +71,22 @@ def at(wpp, year, label):
     return None
 
 
+def iso_codes():
+    """{our country name: ISO alpha-3}, so the map can be keyed the same way as the geometry."""
+    from owid.catalog import Dataset
+
+    reg = Dataset("/Users/edouard/dev/owid/etl/data/garden/regions/2023-01-01/regions")["regions"]
+    reg = reg.reset_index()
+    by_name = {n: c for n, c in zip(reg.name, reg.iso_alpha3) if isinstance(c, str)}
+    out = {"England and Wales": "GBR"}          # plotted as England and Wales, drawn as the UK
+    for c in COUNTRIES:
+        if c["name"] not in out:
+            code = by_name.get(c["name"]) or by_name.get(c["wpp_name"])
+            if code:
+                out[c["name"]] = code
+    return out
+
+
 def main():
     rows, unplotted = [], []
     for c in COUNTRIES:
@@ -104,9 +121,12 @@ def main():
     legend = (f'<span class="k"><i style="color:{COLORS["nso"]}"></i>National statistical office</span>'
               f'<span class="k"><i style="color:{COLORS["UN WPP"]}"></i>UN WPP</span>')
 
+    iso = iso_codes()
     ov_rows = [dict(country=r["country"], year=r["year"], nso=round(r["nso_v"], 4),
-                    wpp=round(r["wpp_v"], 4), tier=r["tier"], recalc=r["recalc"])
+                    wpp=round(r["wpp_v"], 4), tier=r["tier"], recalc=r["recalc"],
+                    iso=iso.get(r["country"], ""))
                for r in rows if r["wpp_v"]]
+    shapes, map_height = world_paths()
 
     html = open(os.path.join(HERE, "template.html")).read()
     for token, value in [
@@ -117,6 +137,8 @@ def main():
         ("{{TIERSJSON}}", json.dumps(TIERS)),
         ("{{UNPLOTTED}}", json.dumps(unplotted)),
         ("{{SECTIONS}}", "".join(sections)),
+        ("{{SHAPES}}", json.dumps(shapes)),
+        ("{{MAPBOX}}", f"0 0 1000 {map_height}"),
         ("{{STAMP}}", datetime.datetime.now().strftime("%Y-%m-%d %H:%M")),
     ]:
         html = html.replace(token, value)

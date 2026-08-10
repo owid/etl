@@ -81,6 +81,23 @@
                         padding-bottom:2px; }
  svg.rowchart { display:block; width:100%; height:28px; }
  tr.ticks svg.rowchart { height:14px; }
+ #mapwrap { position:relative; }
+ svg#map { width:100%; height:auto; overflow:visible; }
+ svg#map path { stroke:var(--bg); stroke-width:0.6; vector-effect:non-scaling-stroke; }
+ svg#map path.nodata { fill:var(--line); }
+ svg#map path.has:hover { stroke:var(--fg); stroke-width:1.4; }
+ #tip { position:absolute; z-index:20; pointer-events:none; min-width:210px; max-width:290px;
+        background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:9px 11px;
+        box-shadow:0 4px 14px rgba(0,0,0,.18); font-size:12.5px; line-height:1.45; }
+ #tip .tc { font-weight:600; font-size:13.5px; margin-bottom:4px; }
+ #tip .tr { display:flex; justify-content:space-between; gap:14px; color:var(--mut); }
+ #tip .tr b { font-weight:600; font-variant-numeric:tabular-nums; }
+ #tip .tn { color:var(--nso); } #tip .tw { color:var(--wpp); }
+ #tip .tm { margin-top:5px; padding-top:5px; border-top:1px solid var(--line); color:var(--mut);
+            font-size:12px; }
+ #maplegend { display:flex; align-items:center; gap:9px; margin:10px 0 0; font-size:12px;
+              color:var(--mut); }
+ #maplegend .ramp { flex:0 1 260px; height:10px; border-radius:2px; }
 </style>
 <div class="wrap">
 <div class="head">
@@ -115,6 +132,17 @@
  <p class="src">No official total fertility rate we could source, so only the UN estimate exists.</p>
  <div id="unp"></div>
  </section>
+
+ <section id="mapsec">
+ <h2>Where the two disagree</h2>
+ <p class="src">How far the UN estimate sits above or below the country's own figure, for its latest
+ year. Countries with no national figure are left blank.</p>
+ <div id="mapwrap">
+  <svg id="map" viewBox="{{MAPBOX}}" role="img" aria-label="World map of the gap between national and UN figures"></svg>
+  <div id="tip" hidden></div>
+ </div>
+ <div id="maplegend"></div>
+ </section>
 </div>
 
 <div id="tab-country" hidden>
@@ -125,6 +153,7 @@
 const ROWS = {{ROWS}};
 const TIERS = {{TIERSJSON}};
 const UNPLOTTED = {{UNPLOTTED}};
+const SHAPES = {{SHAPES}};
 
 (function () {
   const W = 940, LW = 186, R = 24, T = 16, B = 32, ROW = 30, PAD = 46;
@@ -213,6 +242,90 @@ const UNPLOTTED = {{UNPLOTTED}};
     rows.forEach((r, i) => cells[i + 1].appendChild(rowSvg(r, top, cw)));
   }
 
+  // ---------------------------------------------------------------- world map
+  // ColorBrewer RdBu, eleven classes, read low to high. Red is where the UN sits above the
+  // country's own figure, blue where it sits below, white where the two agree.
+  const RDBU = ['#053061', '#2166ac', '#4393c3', '#92c5de', '#d1e5f0', '#f7f7f7',
+                '#fddbc7', '#f4a582', '#d6604d', '#b2182b', '#67001f'];
+
+  function mix(a, b, t) {
+    const h = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+    const [p, q] = [h(a), h(b)];
+    return '#' + p.map((v, i) => Math.round(v + (q[i] - v) * t).toString(16).padStart(2, '0')).join('');
+  }
+
+  // continuous ramp across the eleven stops, so neighbouring countries don't band together
+  function rdbu(t) {
+    const x = Math.max(0, Math.min(1, t)) * (RDBU.length - 1);
+    const i = Math.min(RDBU.length - 2, Math.floor(x));
+    return mix(RDBU[i], RDBU[i + 1], x - i);
+  }
+
+  const gapOf = (r) => r.wpp - r.nso;
+
+  function mapExtent() {
+    const m = Math.max(...ROWS.map((r) => Math.abs(gapOf(r))), 0.1);
+    return Math.ceil(m * 10) / 10;                 // symmetric, to the next tenth
+  }
+
+  function drawMap() {
+    const svg = document.getElementById('map');
+    const top = mapExtent();
+    const byIso = {};
+    ROWS.forEach((r) => { if (r.iso) byIso[r.iso] = r; });
+
+    svg.textContent = '';
+    for (const iso in SHAPES) {
+      const r = byIso[iso];
+      const p = el('path', { d: SHAPES[iso] });
+      if (r) {
+        p.setAttribute('class', 'has');
+        p.setAttribute('fill', rdbu((gapOf(r) + top) / (2 * top)));
+        p.dataset.iso = iso;
+      } else {
+        p.setAttribute('class', 'nodata');
+      }
+      svg.appendChild(p);
+    }
+
+    document.getElementById('maplegend').innerHTML =
+      `<span>UN ${top.toFixed(1)} below</span>` +
+      `<span class="ramp" style="background:linear-gradient(to right,${
+        Array.from({ length: 21 }, (_, i) => rdbu(i / 20)).join(',')})"></span>` +
+      `<span>UN ${top.toFixed(1)} above</span>`;
+  }
+
+  // the tooltip carries the same facts as the overview table
+  const tip = document.getElementById('tip');
+
+  function showTip(r, ev) {
+    const wrap = document.getElementById('mapwrap');
+    const box = wrap.getBoundingClientRect();
+    const gap = gapOf(r);
+    tip.innerHTML =
+      `<div class="tc">${r.country}</div>` +
+      `<div class="tr"><span class="tn">National</span><b class="tn">${r.nso.toFixed(2)}</b></div>` +
+      `<div class="tr"><span class="tw">UN WPP</span><b class="tw">${r.wpp.toFixed(2)}</b></div>` +
+      `<div class="tr"><span>Difference</span><b>${gap >= 0 ? '+' : ''}${gap.toFixed(2)}</b></div>` +
+      `<div class="tm"><span class="swatch" style="color:${TIERS[r.tier][1]}"></span> ` +
+      `${TIERS[r.tier][0]}<br>${r.recalc ? 'Recalculated by us' : 'As published'} · ${r.year}</div>`;
+    tip.hidden = false;
+    // keep the tooltip inside the map, flipping it left or up near the edges
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    let x = ev.clientX - box.left + 14, y = ev.clientY - box.top + 14;
+    if (x + w > box.width) x = ev.clientX - box.left - w - 14;
+    if (y + h > box.height) y = Math.max(0, ev.clientY - box.top - h - 14);
+    tip.style.left = `${x}px`;
+    tip.style.top = `${y}px`;
+  }
+
+  document.getElementById('map').addEventListener('mousemove', (ev) => {
+    const iso = ev.target.dataset ? ev.target.dataset.iso : null;
+    const r = iso ? ROWS.find((x) => x.iso === iso) : null;
+    if (r) showTip(r, ev); else tip.hidden = true;
+  });
+  document.getElementById('mapwrap').addEventListener('mouseleave', () => { tip.hidden = true; });
+
   // the whole section disappears when nothing is in it, rather than saying so
   function drawUnplotted(rows) {
     const host = document.getElementById('unp');
@@ -269,6 +382,7 @@ const UNPLOTTED = {{UNPLOTTED}};
     })
   );
   sel.addEventListener('change', apply);
+  drawMap();
   document.querySelectorAll('#filters input').forEach((i) => i.addEventListener('change', apply));
   // a country name in the overview opens that country's own page
   document.getElementById('ov').addEventListener('click', (e) => {
