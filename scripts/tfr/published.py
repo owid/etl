@@ -121,6 +121,43 @@ def nigeria():
     return _series([])
 
 
+def tanzania():
+    """NBS/OCGS, "Fertility and Nuptiality Levels and Patterns in Tanzania", May 2025, table 3.2.
+
+    The 2022 census asked women about births in the previous twelve months. Table 3.2 prints the
+    resulting age-specific rates twice: as recorded, summing to 3.2, and after Arriaga adjustment
+    for the births women forget or misdate, summing to 4.6. The adjusted figure is the one NBS
+    presents as the country's total fertility rate, so that is what is used here.
+    """
+    path = os.path.join(DATA, "tz", "fert_nupt.txt")
+    if not os.path.exists(path):
+        subprocess.run(["pdftotext", "-layout", os.path.join(DATA, "tz", "fert_nupt.pdf"), path], check=True)
+    for line in open(path, errors="ignore"):
+        if line.strip().startswith("Total Fertility Rate (TFR)"):
+            vals = re.findall(r"\b\d\.\d\b", line)
+            if len(vals) == 2:                         # recorded, then adjusted
+                return _series([(2022, float(vals[1]))])
+    return _series([])
+
+
+def ethiopia():
+    """Ethiopian Statistical Service, EDHS rounds. Figure 2 of the 2024-25 key indicators report.
+
+    The report plots the national total fertility rate for every round back to 2000, printing the
+    value above each point, so all five survey rounds can be read from the one document.
+    """
+    return _series([(2000, 5.5), (2005, 5.4), (2011, 4.8), (2016, 4.6), (2024, 4.0)])
+
+
+def drc():
+    """INS, EDS-RDC III (2023-24), table 5.1 and the trend sentence in section 5.1.
+
+    Table 5.1 gives 5.5 for the three years before the survey; the same section states the
+    previous round measured 6.6.
+    """
+    return _series([(2014, 6.6), (2024, 5.5)])
+
+
 def turkey():
     """TurkStat Population Statistics Portal, national row of the total-fertility-rate export.
 

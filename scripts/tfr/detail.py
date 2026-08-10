@@ -234,8 +234,15 @@ def germany_band_detail(year):
     return germany_detail(year)
 
 
+def myanmar_band_detail(year):
+    from myanmar import myanmar_detail
+
+    return myanmar_detail(year)
+
+
 DETAIL = {
     "Colombia": colombia_detail,
+    "Myanmar": myanmar_band_detail,
     "Germany": germany_band_detail,
     "Japan": japan_band_detail,
     "France": france_band_detail,

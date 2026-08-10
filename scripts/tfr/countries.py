@@ -25,13 +25,17 @@ from colombia import dane_female_pop, dane_registered_tfr  # noqa: E402
 from france import france_tfr  # noqa: E402
 from india import india  # noqa: E402
 from philippines import philippines  # noqa: E402
+from myanmar import myanmar_tfr  # noqa: E402
 from published import (  # noqa: E402
     bangladesh,
     china,
+    drc,
+    ethiopia,
     indonesia,
     nigeria,
     pakistan,
     russia,
+    tanzania,
     turkey,
     vietnam,
 )
@@ -286,6 +290,54 @@ COUNTRIES = [
       "only inside the JavaScript portal, so there is no age-band comparison for Turkey. The series starts "
       "in 2009 on this portal; TurkStat's own bulletins go back to 2001.",
       "https://nip.tuik.gov.tr/"),
+    C("Ethiopia", "Statistical Service — Ethiopia Demographic and Health Survey", ethiopia, "Ethiopia",
+      "survey", False,
+      "The Statistical Service publishes a total fertility rate for each survey round. The 2024-25 "
+      "report's trend figure prints the national value for all five rounds since 2000, and its table 3 "
+      "gives the age-specific rates behind the latest one.",
+      "We read the five round values off the trend figure. Summing the age-specific rates in table 3 and "
+      "multiplying by the band width gives 4.05, which is the published 4.0.",
+      "These are household surveys asking women about past pregnancies, not registration. Each point is "
+      "the average of the three years before the survey, so the years are approximate. Ethiopia's last "
+      "completed census was 2007 and the next has been postponed repeatedly, so there is no recent "
+      "female population by age to divide by — the 2007 census is the only one, and it is nineteen years "
+      "old. The old statsethiopia.gov.et domain is dead; the service is now at ess.gov.et.",
+      "https://ess.gov.et/wp-content/uploads/2026/01/edhs-2024-25-kir-01172026.pdf"),
+    C("Democratic Republic of Congo", "INS — Enquête Démographique et de Santé", drc,
+      "Democratic Republic of Congo", "survey", False,
+      "The Institut National de la Statistique publishes a fertility index for each survey round. The "
+      "2023-24 report gives 5.5 and states the previous round measured 6.6.",
+      "We took both figures as stated. Summing the age-specific rates in table 5.1 and multiplying by the "
+      "band width gives 5.47, which is the published 5.5.",
+      "There has been no census since 1984 and no civil registration good enough to use, so every "
+      "national fertility figure comes from one of the three surveys. The report's age structure is the "
+      "surveyed sample, not a population count, so there is nothing to recalculate from. The institute's "
+      "ins-rdc.org domain returns a block; the working site is ins.gouv.cd.",
+      "https://ins.gouv.cd/publication/RDC-EDS-III.pdf"),
+    C("Tanzania", "NBS — 2022 Population and Housing Census", tanzania, "Tanzania", "survey", False,
+      "The census fertility monograph prints age-specific rates twice: as women reported them, and after "
+      "adjustment. The reported rates sum to a total fertility rate of 3.2, the adjusted ones to 4.6. NBS "
+      "presents 4.6 as the country's figure. The 2022 household health survey separately found 4.8.",
+      "We read the adjusted total out of table 3.2. We also checked the arithmetic: the reported rates sum "
+      "to 3.195 and the adjusted ones to 4.63, matching both printed totals.",
+      "The gap between 3.2 and 4.6 is entirely the adjustment. NBS applies the Arriaga method because "
+      "women under-report and misdate births, and says plainly that Tanzania's vital registration is too "
+      "incomplete to compute the rate directly. The census does publish births in the last twelve months "
+      "and women by age group, so a direct recalculation is possible, but it would reproduce the "
+      "unadjusted 3.2 rather than the figure NBS stands behind.",
+      "https://www.nbs.go.tz/statistics/topic/demographic-and-socio-economic-statistics"),
+    C("Myanmar", "Department of Population — 2019 Inter-censal Survey", myanmar_tfr, "Myanmar",
+      "survey", True,
+      "Appendix table D-1 of the Union Report gives, for every five-year age group, the number of women "
+      "enumerated and the number of live births in the twelve months before the survey, plus the "
+      "department's own age-specific rate.",
+      "We divided births by women in each age group and summed, times the band width. Every rate we get "
+      "matches the printed one to the second decimal, and our total of 2.007 is the published 2.0.",
+      "This is a sample survey, not registration: the counts are the survey's own enumerated households "
+      "scaled up, and a twelve-month recall question misses births. The 2014 census gave 2.5 by the same "
+      "kind of table. Nothing more recent is published — a 2024 census has been run but its fertility "
+      "results are not out.",
+      "https://www.dop.gov.mm/sites/dop.gov.mm/files/publication_docs/ics_appendixtables_en.pdf"),
 ]
 
 PANELS = [(c["name"], c["src"], c["loader"], c["wpp_name"]) for c in COUNTRIES if c["loader"]]

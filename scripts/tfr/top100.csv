@@ -8,31 +8,31 @@ rank,country,population_2026,searched,note
 7,Brazil,213562666,full,
 8,Bangladesh,177818039,partial,SVRS narrative text only; no hunt for counts
 9,Russia,143394457,partial,yearbook Excel appendix rate only — the yearbook itself also has counts
-10,Ethiopia,138902185,full,
+10,Ethiopia,138902185,full,EDHS series 2000-2024; no post-2007 female population by age exists
 11,Mexico,132997658,full,
 12,Japan,122427730,partial,"e-Stat rate; women recovered from births/rate, not an independent table"
 13,Egypt,120101178,partial,"bulletin rate; women come from the same bulletin table, not checked for a fuller source"
 14,Philippines,117724473,full,
-15,Democratic Republic of Congo,116452162,full,
+15,Democratic Republic of Congo,116452162,full,EDS rounds only; no census since 1984
 16,Vietnam,102177434,partial,PxWeb rate only; no hunt for counts
 17,Iran,93168492,partial,both statistics-office hosts blocked
 18,Turkey,87926083,partial,portal export rate only; age-specific tables locked in the JavaScript portal
 19,Germany,83644257,partial,"Destatis rates; women recovered from births/rate, not an independent table"
-20,Tanzania,72563778,full,
+20,Tanzania,72563778,full,census adjusted TFR; raw counts exist but reproduce the unadjusted 3.2
 21,Thailand,71559619,full,
 22,United Kingdom,69931528,partial,ONS rates; women recovered from births/rate; Scotland and NI not stitched in
 23,France,66746398,partial,"INSEE rates; women recovered from births/rate, not an independent table"
 24,South Africa,65453083,no,
 25,Italy,58926166,partial,SDMX rates; population dataflow timed out
-26,Kenya,58636406,full,
-27,Myanmar,55184826,full,
+26,Kenya,58636406,full,"census and KDHS give 3.4; census report is scanned images, OCR still needed"
+27,Myanmar,55184826,full,recalculated from 2019 ICS counts
 28,Colombia,53936231,full,
 29,Sudan,53282716,no,
 30,Uganda,52761469,no,
 31,South Korea,51600389,no,
 32,Algeria,48028337,no,
 33,Iraq,48007435,no,
-34,Spain,47850792,no,
+34,Spain,47850792,full,"INE JSON API has births and women by single age — recalculation possible, not yet built"
 35,Argentina,46003732,no,
 36,Afghanistan,45047067,no,
 37,Yemen,42961661,no,
