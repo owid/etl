@@ -41,6 +41,7 @@ from korea import korea_tfr  # noqa: E402
 from malaysia import malaysia_tfr  # noqa: E402
 from myanmar import myanmar_tfr  # noqa: E402
 from netherlands import netherlands_tfr  # noqa: E402
+from romania import romania_tfr  # noqa: E402
 from published import (  # noqa: E402
     afghanistan,
     algeria,
@@ -48,6 +49,7 @@ from published import (  # noqa: E402
     bangladesh,
     benin,
     burkina_faso,
+    burundi,
     cambodia,
     cameroon,
     chad,
@@ -56,6 +58,7 @@ from published import (  # noqa: E402
     ethiopia,
     ghana,
     guinea,
+    haiti,
     indonesia,
     iraq,
     kenya,
@@ -70,12 +73,15 @@ from published import (  # noqa: E402
     north_korea,
     pakistan,
     russia,
+    rwanda,
     saudi_arabia,
     senegal,
     somalia,
+    south_sudan,
     sudan,
     syria,
     tanzania,
+    tunisia,
     ukraine,
     uzbekistan,
     venezuela,
@@ -1302,6 +1308,111 @@ COUNTRIES = [
       "needs checking elsewhere. That includes the claim that the 2024 census has published preliminary "
       "results, which we could not confirm. The documents used here are archived copies from 2018.",
       "https://www.dhsprogram.com/pubs/pdf/FR353/FR353.pdf"),
+    C("Romania", "INS — births by age of mother over the resident population", romania_tfr, "Romania",
+      "complete", True,
+      "The institute's database carries births by the mother's age group on a usual-residence basis "
+      "from 2012, resident population by age at 1 July from 2002, and its own age-specific rates — but "
+      "no total. It publishes the general fertility rate and the age-specific rates, and leaves the sum "
+      "to the reader.",
+      "We divided births by women in each band and summed. Our figures match what INS's own published "
+      "age-specific rates imply, to four decimals, in all thirteen years: 1.3757 against 1.376 for 2024, "
+      "1.8596 against 1.8595 for 2019.",
+      "Romania rose and then fell hard: 1.36 in 2012 up to 1.86 by 2019, back to 1.38 by 2024 — the whole "
+      "gain given back in five years. The choice of population is the thing to get right, and INS says so "
+      "itself. It maintains two: the resident population, meaning everyone whose usual residence is in "
+      "the country, and the population by domicile, meaning citizens registered as living there whether "
+      "or not they do. Its own guidance is that only the resident figures should be used for "
+      "international comparison, and in a country with emigration on Romania's scale the two differ "
+      "materially. Births are dated to when they happened, but a year is not final until late "
+      "registrations from the following three years are folded in, so recent values still move. Getting "
+      "the data out took a browser: the export endpoint needs the selection posted back to it, and asking "
+      "for every category at once returns an empty result rather than an error.",
+      "http://statistici.insse.ro:8077/tempo-online/"),
+    C("Rwanda", "NISR — Demographic and Health Survey rounds", rwanda, "Rwanda", "survey", False,
+      "NISR runs the health survey every five years and the 2025 report charts every round since 1992. "
+      "It also publishes census fertility, and — unusually — an annual fertility rate built from civil "
+      "registration.",
+      "We read the survey series. We also recomputed the 2022 census figure from its own women counts "
+      "and age-specific rates and got 3.635 against the 3.63 it publishes.",
+      "Rwanda is the clearest case of an office changing its mind between census rounds using the same "
+      "test. In 2012 the raw census figure was 3.8 against the survey's 4.6 two years earlier; NISR said "
+      "a 20% fall in three years was unlikely, concluded births were under-reported, tried three indirect "
+      "methods, rejected two on stated grounds and adopted Arriaga, publishing 4.02. In 2022 it ran the "
+      "equivalent check, found no evidence of under-reporting, and published the raw 3.6 unadjusted. Same "
+      "office, same diagnostic, opposite decisions. There is also a third channel worth knowing about: "
+      "NISR publishes a registration-based rate every year, scaling registered births up by its own "
+      "measured completeness — 3.2 becomes 3.5 for 2025 — and prints it beside the census and survey "
+      "figures in one table. Registration coverage is about 93% and rising, which is high for the region. "
+      "The census and survey figures, 14% apart in 2020, have essentially converged: 3.6 against 3.7.",
+      "https://statistics.gov.rw/"),
+    C("Tunisia", "INS — registered births over the mid-year population", tunisia, "Tunisia", "complete",
+      False,
+      "INS publishes a fertility rate every year, built from civil registration, and the statistical "
+      "yearbook prints the births by the mother's age group and the mid-year population behind it.",
+      "We read the published series. We also rebuilt 2023 from those counts: dividing them directly gives "
+      "1.489, but 7,709 of the 135,148 births have no age recorded, and spreading those across the bands "
+      "in proportion gives 1.579 — INS's published 1.58, and its printed age-specific rates almost "
+      "exactly. That is how the office handles them, and dropping them instead would understate the rate "
+      "by 6%.",
+      "Tunisia's fall is steep and recent: 2.4 in 2015 to 1.58 in 2023. Only the yearbook's most recent "
+      "year carries the age breakdown, so a full recalculated series would mean opening one edition per "
+      "year. Two things we could not settle. INS never states whether a birth is dated to the year it "
+      "happened or the year it was registered, and it mentions no late-registration correction for live "
+      "births — though it does say that more than half of stillbirths go unregistered. And the population "
+      "is all residents rather than citizens, which in Tunisia hardly matters: the 2024 census puts "
+      "foreign nationals at 0.55% of the population.",
+      "https://www.ins.tn/statistiques/112"),
+    C("Burundi", "ISTEEBU — Demographic and Health Survey rounds", burundi, "Burundi", "survey", False,
+      "Two survey rounds, 2010 and 2016-17. The 2008 census publishes its fertility tables as "
+      "spreadsheets — women and births by age group, and separately children ever born.",
+      "We read the survey figures. We also divided the census's own counts and got 5.954 against the 5.96 "
+      "it publishes, which confirms the published figure is the raw one.",
+      "No correction was applied and none is mentioned anywhere — and for once we can see why that was "
+      "reasonable. The census publishes both the births in the previous twelve months and the children "
+      "ever born, so the standard ratio check can be run on it; doing so gives values close to one at the "
+      "ages usually trusted, unlike Mali's or Senegal's. So a correction would probably have changed "
+      "little. That is our inference, not the office's stated reason. Civil registration produces "
+      "quarterly counts but no rate. Two things to know about the source. The office was renamed in 2022 "
+      "and its old domain has since been squatted — it now serves a placeholder page, so the census "
+      "spreadsheets had to come from a web archive. And the 2024 census has published only preliminary "
+      "population totals; there is no fertility page on the new site at all.",
+      "https://www.insbu.bi/"),
+    C("Haiti", "Ministry of Health — EMMUS survey rounds", haiti, "Haiti", "survey", False,
+      "Three survey rounds, the newest from 2016-17. The 2003 census publishes its fertility tables as "
+      "scanned images of printed pages.",
+      "We read the survey figures. We also divided the census's own counts and got 3.53, which is what "
+      "the institute's rounded statement of 4 children is built from — there is no more precise or "
+      "adjusted number being simplified away.",
+      "Haiti has had no fertility figure since 2016-17, and no census since 2003. The reason is stated "
+      "plainly by the statistics institute itself, which is rare: its 2024 population report says the "
+      "census cannot be run because of the security situation, that vital registration is too weak to "
+      "use, and that it is therefore adopting the UN's own projections rather than producing estimates of "
+      "its own. Its fertility and vital-statistics pages are live and empty, marked as pending. One "
+      "attribution point matters here. The surveys everyone cites as Haiti's fertility rate are run by a "
+      "child-health institute for the health ministry, with an American contractor named as co-preparer; "
+      "the statistics institute is credited only as a collaborator. They are still Haitian government "
+      "figures, which is why they are plotted, but the institute's own last fertility figure is the 2003 "
+      "census. The national archives, which would hold civil registration, no longer resolve at all.",
+      "https://ihsi.gouv.ht/recensement/resultat_rgph_2003"),
+    C("South Sudan", "NBS — household and multiple-indicator surveys", south_sudan, "South Sudan",
+      "survey", False,
+      "Two figures exist: 7.5 from the 2010 household health survey, run by the health ministry with the "
+      "statistics bureau, and 6.4 from the bureau's own 2025 survey, published as a preliminary report in "
+      "2026. The 2008 census tables, from before independence, publish women and births by age group.",
+      "We read both figures. We also divided the 2008 census's own counts and got 3.9 — half the survey's "
+      "figure two years later.",
+      "That gap is the finding, and it is a warning about census fertility questions generally. The 2008 "
+      "census asked women how many children they had borne in the previous twelve months; dividing those "
+      "answers gives 3.9, while a survey asking for full birth histories two years later gives 7.5. "
+      "Nobody thinks fertility doubled. Recent births are simply missed when asked about that way — which "
+      "is exactly what the offices that apply Brass and Arriaga corrections are trying to fix, and here we "
+      "can see the size of the problem uncorrected. South Sudan has had no census since 2008, none since "
+      "independence, and no announced date for one. The bureau's own site is live and well stocked; the "
+      "two domains that look like it are an expired-hosting placeholder and a retired domain answering "
+      "403. Birth registration stands at 36%, and the finance ministry's own review calls the state of "
+      "the system pathetic. One document that looks like it should count does not: the 2013 population "
+      "estimation survey has no fertility figure in it.",
+      "https://nbs.gov.ss/"),
 ]
 
 PANELS = [(c["name"], c["src"], c["loader"], c["wpp_name"]) for c in COUNTRIES if c["loader"]]

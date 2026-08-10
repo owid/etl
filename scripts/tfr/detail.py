@@ -447,6 +447,18 @@ def guinea_band_detail(year):
     return guinea_detail(year)
 
 
+def romania_band_detail(year):
+    from romania import romania_detail
+
+    return romania_detail(year)
+
+
+def _published_detail(name):
+    import published
+
+    return getattr(published, name)
+
+
 DETAIL = {
     "Colombia": colombia_detail,
     "Myanmar": myanmar_band_detail,
@@ -480,6 +492,11 @@ DETAIL = {
     "Ecuador": ecuador_band_detail,
     "Kazakhstan": kazakhstan_band_detail,
     "Guinea": guinea_band_detail,
+    "Romania": romania_band_detail,
+    "Rwanda": lambda y: _published_detail("rwanda_detail")(y),
+    "Burundi": lambda y: _published_detail("burundi_detail")(y),
+    "Haiti": lambda y: _published_detail("haiti_detail")(y),
+    "Tunisia": lambda y: _published_detail("tunisia_detail")(y),
 }
 
 

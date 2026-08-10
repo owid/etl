@@ -68,19 +68,19 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 67,Chile,19945850,full,yes,yes,complete,fully recalculated 1992-2024; registry 1.03 in 2024 vs the old projection's flat 1.58
 68,Senegal,19366551,full,yes,no,survey,"2023 census published all three corrections: raw 3.7, chose Arriaga 4.4; survey says 4.0"
 69,Guatemala,18967983,no,no,,,
-70,Romania,18800600,full,no,,,"TEMPO metadata and methodology mapped, but its CSV export needs a payload only a browser reveals"
+70,Romania,18800600,full,yes,yes,complete,fully recalculated 2012-2024 on the resident basis; matches INS's own rates to 4 decimals
 71,Netherlands,18448770,full,yes,yes,complete,fully recalculated 1995-2025 from the CBS API; matches CBS to 3 decimals
 72,Ecuador,18444504,full,yes,yes,complete,fully recalculated 2010-2024; INEC states in writing that it adopts a figure above the registry
 73,Cambodia,18051219,full,yes,no,survey,NIS adjusted four censuses in a row: raw 1.6/2.05/1.67/1.4 against adopted 3.1/2.8/2.51/2.3
 74,Zimbabwe,17273584,full,yes,no,survey,"2022 census ran Arriaga and Gompertz, found they agreed, and kept the unadjusted 3.7"
 75,Guinea,15441991,full,yes,no,survey,2014 census correction lands almost entirely on 15-19; the INS domain is now squatted
 76,Benin,15170419,full,yes,no,survey,census 4.8 is admitted to be an indirect estimate but no method is named and no raw figure printed
-77,Rwanda,14889701,no,no,,,
-78,Burundi,14729163,no,no,,,
+77,Rwanda,14889701,full,yes,no,survey,"2012 census adjusted by Arriaga, 2022 ran the same test and declined; also has a registry-based rate"
+78,Burundi,14729163,full,yes,no,survey,"no correction applied, and the census's own parity check suggests none was needed"
 79,Bolivia,12749296,no,no,,,
-80,South Sudan,12436040,no,no,,,
-81,Tunisia,12415143,no,no,,,
-82,Haiti,12037515,no,no,,,
+80,South Sudan,12436040,full,yes,no,survey,2008 census counts give 3.9 against the 2010 survey's 7.5 — uncorrected census undercount
+81,Tunisia,12415143,full,yes,no,complete,published series 2015-2023; the 5.7% of births with no age recorded must be redistributed
+82,Haiti,12037515,full,yes,no,survey,nothing since 2016-17; the office says outright it cannot produce estimates and uses the UN's
 83,Belgium,11774647,no,no,,,
 84,Dominican Republic,11609499,no,no,,,
 85,Jordan,11589538,no,no,,,

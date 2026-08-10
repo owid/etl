@@ -689,3 +689,121 @@ def guinea_detail(year):
     if year != 2014:
         return None
     return {b: {"women": float(w), "births": float(x)} for b, (w, x) in GUINEA_2014.items()}
+
+
+def rwanda():
+    """NISR health-survey rounds. The 2025 report's own table carries every round since 1992."""
+    return _series([(2000, 5.8), (2005, 6.1), (2010, 4.6), (2015, 4.2), (2020, 4.1), (2025, 3.7)])
+
+
+# the 2022 census's main indicators table 5 and the fertility monograph's table 4.3: women by age
+# group, and the age-specific rates the census published
+RWANDA_2022 = {
+    (15, 19): (759178, 0.025),
+    (20, 24): (602006, 0.137),
+    (25, 29): (512713, 0.176),
+    (30, 34): (446776, 0.165),
+    (35, 39): (392140, 0.134),
+    (40, 44): (321396, 0.075),
+    (45, 49): (263941, 0.015),
+}
+
+
+def rwanda_detail(year):
+    if year != 2022:
+        return None
+    return {b: {"women": float(w), "births": r * w} for b, (w, r) in RWANDA_2022.items()}
+
+
+def burundi():
+    """ISTEEBU health-survey rounds. The 2016-17 report's own table carries 1987 and 2010."""
+    return _series([(2010, 6.4), (2017, 5.5)])
+
+
+# the 2008 census's chapter 5, table 5.1: women aged 12-49 and births in the previous twelve months
+BURUNDI_2008 = {
+    (15, 19): (504648, 16271),
+    (20, 24): (405830, 78373),
+    (25, 29): (301310, 78868),
+    (30, 34): (203614, 53649),
+    (35, 39): (185379, 42124),
+    (40, 44): (149678, 21364),
+    (45, 49): (133780, 9398),
+}
+
+
+def burundi_detail(year):
+    if year != 2008:
+        return None
+    return {b: {"women": float(w), "births": float(x)} for b, (w, x) in BURUNDI_2008.items()}
+
+
+def south_sudan():
+    """The two national surveys South Sudan has.
+
+    2010 is the household health survey, run by the health ministry with the statistics bureau
+    before independence; 2025 is the bureau's own multiple-indicator survey, published in 2026 as a
+    preliminary report.
+    """
+    return _series([(2010, 7.5), (2025, 6.4)])
+
+
+def haiti():
+    """The EMMUS survey rounds, run for the health ministry.
+
+    The statistics institute is a collaborator on these rather than their author; its own last
+    fertility figure is the 2003 census. See the note in countries.py.
+    """
+    return _series([(2006, 4.0), (2012, 3.5), (2017, 3.0)])
+
+
+# the 2003 census's published tables 201 and 503: women by age group, and births in the previous
+# twelve months
+HAITI_2003 = {
+    (15, 19): (511520, 19558),
+    (20, 24): (438189, 59436),
+    (25, 29): (363609, 59305),
+    (30, 34): (279138, 43466),
+    (35, 39): (256158, 31613),
+    (40, 44): (216206, 13676),
+    (45, 49): (178252, 4747),
+}
+
+
+def haiti_detail(year):
+    if year != 2003:
+        return None
+    return {b: {"women": float(w), "births": float(x)} for b, (w, x) in HAITI_2003.items()}
+
+
+def tunisia():
+    """INS's registration-based fertility rate.
+
+    The statistical yearbook gives two decimals from 2019; the earlier years come from the office's
+    own indicator page and are printed to one.
+    """
+    return _series([(2015, 2.4), (2016, 2.4), (2017, 2.3), (2018, 2.2), (2019, 2.17),
+                    (2020, 1.96), (2021, 1.82), (2022, 1.70), (2023, 1.58)])
+
+
+# the 2023 yearbook's tables 1.3 and 1.7: mid-year women in thousands, and registered births by the
+# mother's age group. 7,709 of the 135,148 births have no age recorded; INS spreads them across the
+# bands in proportion, which is what reproduces its own published rates, so we do the same.
+TUNISIA_2023 = {
+    (15, 19): (406.4, 1391),
+    (20, 24): (376.6, 12541),
+    (25, 29): (403.4, 35521),
+    (30, 34): (438.4, 42195),
+    (35, 39): (471.2, 27483),
+    (40, 44): (453.6, 7720),
+    (45, 49): (413.2, 588),
+}
+TUNISIA_AGE_NOT_STATED = 7709
+
+
+def tunisia_detail(year):
+    if year != 2023:
+        return None
+    stated = sum(x for _, x in TUNISIA_2023.values())
+    scale = (stated + TUNISIA_AGE_NOT_STATED) / stated
+    return {b: {"women": w * 1000, "births": x * scale} for b, (w, x) in TUNISIA_2023.items()}
