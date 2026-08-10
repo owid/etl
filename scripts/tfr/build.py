@@ -86,7 +86,7 @@ def main():
 
     rows.sort(key=lambda r: -r["gap"])
 
-    sections, options = [], ['<option value="">All countries</option>']
+    sections, options = [], []
     for r in rows:
         options.append(f'<option value="{r["country"]}">{r["country"]}</option>')
         tier_label, tier_color = TIERS[r["tier"]]

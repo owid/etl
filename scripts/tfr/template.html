@@ -245,7 +245,7 @@ const UNPLOTTED = {{UNPLOTTED}};
       draw(ROWS.filter((r) => tiers.includes(r.tier) && rcs.includes(r.recalc ? '1' : '0')));
       drawUnplotted(UNPLOTTED.filter((r) => tiers.includes(r.tier)));
     } else {
-      if (!sel.value) sel.value = sel.options[1] ? sel.options[1].value : '';
+      if (!sel.value) sel.value = sel.options[0] ? sel.options[0].value : '';
       document.querySelectorAll('section[data-country]').forEach((s) => {
         s.hidden = s.dataset.country !== sel.value;
       });
