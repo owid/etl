@@ -280,7 +280,15 @@ The high-value edits to propose (include them in the Step 4 proposal):
 - **Dropping entities does not buy vertical space — it buys thicker bars.** Easy to get wrong: the export canvas is a fixed size, so grapher redistributes the freed rows into the remaining ones and the chart comes back exactly as tall. Measured: eleven countries and ten countries both returned a 346px chart, with the row pitch going from ~28 to ~31px. So cut entities to reduce clutter or to make bars more readable, never to make something fit. **The lever for fit is the export's aspect ratio** (`imWidth`/`imHeight`, which set the shape the layout is computed for) or removing furniture like the axis — not the entity list. Either way the selection belongs to the chart's author: surface it, don't decide it.
 - **10×10 px dots** marking highlighted years, with the values written out for the first, last, and any mentioned data point (white-outlined dots on stacked areas; no outline elsewhere).
 - **Flags** (`2654:5`) beside country labels/bars where they help; **animals** (`5336:5`) for livestock topics; both are copy/paste.
-- **Colors**: only the file's Chart colors library, in the cheat-sheet order; check red/green pairs and black-and-white legibility (GUIDELINES.md → Colors).
+- **Colors**: only the file's Chart colors library, in the cheat-sheet order. **Audit them — never eyeball this.** A palette that looks fine can collapse for the ~8% of men with red-green deficiency, and the failure is invisible to you:
+
+  ```bash
+  python3 .claude/skills/create-figma-chart/scripts/color_audit.py \
+    '#bc8e5a,#883039,#6d3e91,#d73c50,#4c6a9c,#585c64' \
+    --names 'Poultry,Beef and buffalo,Sheep and goat,Pork,Fish and seafood,Other meats'
+  ```
+
+  It simulates deuteranopia, protanopia and tritanopia, reports the closest pairs as CIELAB ΔE (**under 20 fails, 20–30 is tight**), flags which pairs actually touch in the stack, and checks white-vs-black label contrast on every fill. Add `--suggest` (with `--keep` for the colors that carry meaning) to search the OWID palette for a safer set. Read the results with two cautions: **tritanopia is vanishingly rare**, so never repaint for it alone; and **swapping a single color usually doesn't help**, because the failures are independent — this chart's floor stayed at 9.2 whether you changed Pork or Sheep-and-goat, since a different pair took over each time. Colors live in the chart, so a repaint is a recommendation to its author, not an edit you make.
 
 ## Re-exporting after a change to the chart itself
 
