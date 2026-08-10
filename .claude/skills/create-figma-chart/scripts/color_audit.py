@@ -154,7 +154,7 @@ def min_seam(hexes):
 
 
 def hue_family(hexcol):
-    """Which 60-degree hue sector a color sits in; None if it is too grey to have a hue."""
+    """Which 60-degree hue sector a color sits in; None if it is too gray to have a hue."""
     _, a, b = to_lab(srgb(hexcol))
     if math.hypot(a, b) < 12:
         return None

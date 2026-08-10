@@ -1,6 +1,6 @@
 ---
 name: create-figma-chart
-description: Turn an OWID grapher chart — given as a slug, a customized grapher link, an MDim view, an admin link, a narrative chart, or just a description — into a templated chart in the design team's yearly "Charts (YYYY)" Figma file. Exports the chart SVG, creates a new page named "YYYYMMDD Title (Author)", places the original chart and an adapted template side by side, replicates title/subtitle/data source/note in the template's styles, fits the chart into the template, proposes better labelling (direct line/bar labels instead of legends) and annotations with the file's curvy arrows, and names the final frame with the kebab-case slug used for the website PNG. Trigger when the user asks to "create a figma chart", "make a static chart in Figma", "prepare this chart for Instagram / as a data insight image", "put this grapher chart into the Charts file", or pastes a grapher/admin/narrative-chart link asking for a designed static version.
+description: Turn an OWID grapher chart — given as a slug, a customized grapher link, an MDim view, an admin link, a narrative chart, or just a description — into a templated chart in the design team's yearly "Charts (YYYY)" Figma file. Exports the chart SVG, creates a new page named "YYYYMMDD Title (Author)", places the original chart and an adapted template side by side, replicates title/subtitle/data source/note in the template's styles, fits the chart into the template, proposes better labeling (direct line/bar labels instead of legends) and annotations with the file's curvy arrows, and names the final frame with the kebab-case slug used for the website PNG. Trigger when the user asks to "create a figma chart", "make a static chart in Figma", "prepare this chart for Instagram / as a data insight image", "put this grapher chart into the Charts file", or pastes a grapher/admin/narrative-chart link asking for a designed static version.
 metadata:
   internal: true
 ---
@@ -141,7 +141,7 @@ Caveats: `?tab=table` is silently ignored (renders the default tab); `imSquareSi
 
 ## Step 4 — Propose, then get the go-ahead
 
-Before touching the file, show the user in one message: the page name **`YYYYMMDD <Title> (<Author>)`** (today's date, the *final* — possibly rewritten — title), the chosen template(s), every text that will go into the template, the labelling changes you propose (Step 8), and the annotations with their content. **Wait for explicit approval.** This is the single checkpoint; after it, iterate freely on the same page without re-asking.
+Before touching the file, show the user in one message: the page name **`YYYYMMDD <Title> (<Author>)`** (today's date, the *final* — possibly rewritten — title), the chosen template(s), every text that will go into the template, the labeling changes you propose (Step 8), and the annotations with their content. **Wait for explicit approval.** This is the single checkpoint; after it, iterate freely on the same page without re-asking.
 
 ## Step 5 — Create the page and place the pieces
 
@@ -214,7 +214,7 @@ Nothing else gets restyled.
 
 The chart spans the full content width, left-aligned with the title/subtitle/logo box, and sits in the band between the header and the footer with an even gap top and bottom.
 
-**Measure that band; don't hardcode it.** The header's height depends on how many lines the title and subtitle take, so a fixed y is wrong as soon as the subtitle wraps — and centring inside a guessed band leaves a lopsided result (18px above, 6px below on the first run of this skill). Read the real edges instead:
+**Measure that band; don't hardcode it.** The header's height depends on how many lines the title and subtitle take, so a fixed y is wrong as soon as the subtitle wraps — and centering inside a guessed band leaves a lopsided result (18px above, 6px below on the first run of this skill). Read the real edges instead:
 
 ```js
 const headerBottom = header.y + header.height     // Frame 14: title + subtitle + logo
@@ -259,12 +259,12 @@ for (const t of annotations) { t.x = left; t.resize(right - left, t.height) }
 const header = clone.children.find(c => c.name === "Frame 14")   // title + subtitle + logo
 chart.rescale(header.width / chart.width)                        // never resize()
 chart.x = header.x                                               // same left edge
-chart.y = top + (bottom - top - chart.height) / 2                // centred between header and footer
+chart.y = top + (bottom - top - chart.height) / 2                // centered between header and footer
 ```
 
 `rescale()` on the group is safe; `resize()` on a frame is not (see Step 5). If the scaled chart overflows the vertical space, re-export at a flatter aspect ratio rather than squashing — **never stretch one axis** (it distorts dots, arrowheads, and text).
 
-**After any scaling, let every text box re-hug its content.** Grapher's exported labels have no slack, so the smallest rounding makes them wrap. Sweep the chart once, preserving each label's anchor — the axis values are centred and the country names right-aligned, so keeping `x` alone would shift them:
+**After any scaling, let every text box re-hug its content.** Grapher's exported labels have no slack, so the smallest rounding makes them wrap. Sweep the chart once, preserving each label's anchor — the axis values are centered and the country names right-aligned, so keeping `x` alone would shift them:
 
 ```js
 for (const t of chart.query('TEXT')) {
@@ -272,11 +272,11 @@ for (const t of chart.query('TEXT')) {
   t.textAutoResize = "WIDTH_AND_HEIGHT"                          // fonts loaded first
   if (a.align === "CENTER") t.x = a.x + (a.w - t.width) / 2
   else if (a.align === "RIGHT") t.x = a.x + a.w - t.width
-  t.y = a.y + (a.h - t.height) / 2                               // keep the vertical centre too
+  t.y = a.y + (a.h - t.height) / 2                               // keep the vertical center too
 }
 ```
 
-**Then verify the alignment against the marks, not against the old box.** Re-hugging changes a box's height as well as its width, so labels drift vertically — every value label on this skill's first run ended up 1.2px above its bar's centre and every legend label 1.31px above its swatch. Individually invisible; as a set, the whole chart reads slightly high. It is worth an explicit pass, because nothing about it looks wrong in a node listing:
+**Then verify the alignment against the marks, not against the old box.** Re-hugging changes a box's height as well as its width, so labels drift vertically — every value label on this skill's first run ended up 1.2px above its bar's center and every legend label 1.31px above its swatch. Individually invisible; as a set, the whole chart reads slightly high. It is worth an explicit pass, because nothing about it looks wrong in a node listing:
 
 ```js
 for (const row of chart.query('[name=bars]').first().children) {
@@ -284,12 +284,12 @@ for (const row of chart.query('[name=bars]').first().children) {
   const mid = bar.y + bar.height / 2
   for (const t of row.query('TEXT')) t.y -= (t.y + t.height / 2) - mid
 }
-// same for the legend: centre each label on its swatch
+// same for the legend: center each label on its swatch
 ```
 
-Make this a habit rather than a reaction to someone noticing: **after any scale, re-hug or reflow, check that labels still centre on the thing they label** — bar values on their bars, legend labels on their swatches, axis labels on their ticks.
+Make this a habit rather than a reaction to someone noticing: **after any scale, re-hug or reflow, check that labels still center on the thing they label** — bar values on their bars, legend labels on their swatches, axis labels on their ticks.
 
-## Step 8 — Improve the labelling and annotate
+## Step 8 — Improve the labeling and annotate
 
 **Read [GUIDELINES.md](GUIDELINES.md) now if you haven't.** Browse 1–2 recent dated pages in the file (`get_screenshot`) to see how finished charts apply these conventions. The imported SVG is a fully editable vector tree — text nodes, line vectors, legend swatches are all addressable via `use_figma`.
 
@@ -297,9 +297,9 @@ The high-value edits to propose (include them in the Step 4 proposal):
 
 - **Direct labels instead of legends and elbows.** Line charts: put the entity label at the end of its line, colored like the line, and delete the elbow/leader connectors; reclaim the freed right margin for the chart. Area/bar charts: label the series inside the chart area (white ≥12px text on dark fills) and delete the separate legend.
 
-  **This is not a free win on a stacked chart — check that it beats the legend before proposing it.** Direct labelling works when every label can sit *on the mark it names*: over its own segment of the top bar (the pattern in [this DI](https://ourworldindata.org/data-insights/most-collected-waste-in-many-low--and-middle-income-countries-is-stored-in-open-dumps-or-is-burned), where colored category labels sit above the first row and the widest series is labelled in white inside the bar), or inside the widest segment of each category. Both need the segments to be wide enough, which in practice caps it at **three or four categories**. Beyond that the labels collide over the top bar, and spreading them evenly across the plot instead just yields a color-coded legend that is *harder* to read than the real one — the reader has lost the swatch and gained nothing. Six categories is past the line. When it doesn't fit, keep grapher's legend and say why; a conventional legend is not a failure to improve the chart.
+  **This is not a free win on a stacked chart — check that it beats the legend before proposing it.** Direct labeling works when every label can sit *on the mark it names*: over its own segment of the top bar (the pattern in [this DI](https://ourworldindata.org/data-insights/most-collected-waste-in-many-low--and-middle-income-countries-is-stored-in-open-dumps-or-is-burned), where colored category labels sit above the first row and the widest series is labelled in white inside the bar), or inside the widest segment of each category. Both need the segments to be wide enough, which in practice caps it at **three or four categories**. Beyond that the labels collide over the top bar, and spreading them evenly across the plot instead just yields a color-coded legend that is *harder* to read than the real one — the reader has lost the swatch and gained nothing. Six categories is past the line. When it doesn't fit, keep grapher's legend and say why; a conventional legend is not a failure to improve the chart.
 
-  When it *does* fit, the reliable recipe is: for each category, find the row where its segment is widest, **clone that segment's existing value label** (the clone inherits the right font, size and — importantly — the black-on-light vs white-on-dark fill grapher already chose), set its characters to the category name, then centre the `[name, 4px, value]` pair on the segment. To rebuild a legend you removed too eagerly: recolor the labels to `Text/Gray 80` #5B5B5B, add a 10×10 swatch in each category's own color 4px to their left, and lay them out in grapher's own split — as many as fit on the first row, the longest alone on the second.
+  When it *does* fit, the reliable recipe is: for each category, find the row where its segment is widest, **clone that segment's existing value label** (the clone inherits the right font, size and — importantly — the black-on-light vs white-on-dark fill grapher already chose), set its characters to the category name, then center the `[name, 4px, value]` pair on the segment. To rebuild a legend you removed too eagerly: recolor the labels to `Text/Gray 80` #5B5B5B, add a 10×10 swatch in each category's own color 4px to their left, and lay them out in grapher's own split — as many as fit on the first row, the longest alone on the second.
 - **Annotations replicating the accompanying text** (12–16px; 10–14px on maps): text color = the annotated object's color, `Text/Gray 80` #5B5B5B, or a mix; bold the key phrase; 2–3px **white outside stroke** instead of a background rectangle.
 - **Arrows**: copy curvy arrows from node `798:773` — 1px stroke, arrowhead and line the same color as each other and consistent across the chart. Never scale a whole arrow (it distorts the head): Shift-resize the line segment only, then reposition the head. If a curvy arrow gets messy, use a straight thin line. **Maps: never curvy — straight 1px lines or values inside country shapes.**
 - **Drop the axis and gridlines when every data point is already labelled.** The checklist says so outright, and it is the cheapest space you will ever find: deleting `horizontal-axis`, `vertical-grid-lines` and `vertical-zero-line` from the imported group frees ~25px — usually the difference between text at the 12px floor and text at a comfortable 13–14px. It applies most obviously to a **100% stacked bar**, where every bar spans 0–100% and the axis tells the reader nothing they can't read off the segment values. Don't do it where the reader still has to estimate: a line chart's y-axis, or any chart whose points are mostly unlabelled.
@@ -316,7 +316,7 @@ The high-value edits to propose (include them in the Step 4 proposal):
 
   It simulates deuteranopia, protanopia and tritanopia, reports the closest pairs as CIELAB ΔE (**under 20 fails, 20–30 is tight**), flags which pairs actually touch in the stack, checks white-vs-black label contrast on every fill, and measures the **grayscale seam** between each pair of touching fills (under **1.6:1** they merge when printed — two different hues at the same lightness pass every color check and still fail this one). Add `--suggest` (with `--keep` for the colors that carry meaning) to search the OWID palette for a safer set; it ranks by **hue variety first, then safety, then drift** from the colors already in use, because ranking on safety alone returns sets that are entirely blues and greens — technically separable, but the reader can no longer tell six categories apart at a glance — and among equally varied, equally safe palettes the one that moves the colors least is the one a designer reads as a fix rather than a different chart. Every suggestion it prints has also cleared the grayscale seam check, and it reports the seam alongside the ΔE so you can see it did: a palette can clear ΔE 20 comfortably and still have touching fills that merge in print, so the search picks the *order* as well as the colors. Where it can't help you is a failing seam between two colors you told it to keep — it says so rather than silently returning nothing. Constrain the roles as well when you search by hand (fish should stay blue, beef reddish): the unconstrained optimum is rarely the one to propose. Read the results with two cautions: **tritanopia is vanishingly rare**, so never repaint for it alone; and **swapping a single color usually doesn't help**, because the failures are independent — this chart's floor stayed at 9.2 whether you changed Pork or Sheep-and-goat, since a different pair took over each time. Colors live in the chart, so a repaint is a recommendation to its author, not an edit you make.
 
-  **Apply the library *style*, not the hex.** A raw fill leaves the designer looking at `#B13507` with no way to tell whether it came from the palette; a bound style shows `Default Palette/Rusty Orange` in the Fill panel, and it updates if the library ever changes. Import each style by key and bind it — the colour comes along, so never set `fills` as well:
+  **Apply the library *style*, not the hex.** A raw fill leaves the designer looking at `#B13507` with no way to tell whether it came from the palette; a bound style shows `Default Palette/Rusty Orange` in the Fill panel, and it updates if the library ever changes. Import each style by key and bind it — the color comes along, so never set `fills` as well:
 
   ```js
   const style = await figma.importStyleByKeyAsync("<style key>")   // from search_design_system
@@ -398,7 +398,7 @@ Worth looking for, roughly in order of how often it pays:
 
 Split what you find in two, and be explicit about which is which:
 
-- **Yours to do** — labelling, emphasis, spacing, annotation, anything living in the Figma page. Do it, and show it.
+- **Yours to do** — labeling, emphasis, spacing, annotation, anything living in the Figma page. Do it, and show it.
 - **The chart author's** — sort order, entity selection, colors, tolerance, the year. Give them a short numbered list with the trade-off spelled out (what it costs, what it buys) and let them decide. Never apply these by editing vectors: the image would stop matching the interactive chart.
 
 If you genuinely have nothing to suggest, say that instead of inventing something. A thin recommendation wastes more of the author's attention than none.
@@ -409,32 +409,32 @@ Every one of these caught a real defect on this skill's first run, and none of t
 
 | Check | How | Bar |
 |---|---|---|
-| Colour-vision safety | `color_audit.py` | no pair under **ΔE 20** for deuteranopia or protanopia; tritanopia noted, never acted on alone |
+| Color-vision safety | `color_audit.py` | no pair under **ΔE 20** for deuteranopia or protanopia; tritanopia noted, never acted on alone |
 | Grayscale survival | `color_audit.py` (grayscale seam section) | **adjacent** pairs above ~**1.6:1**; below that they merge in print |
-| Off-palette fills | compare every fill against the library groups | every fill is a library colour, **bound as a style** — grapher emits `#585c64` for residual categories, which is in no group |
+| Off-palette fills | compare every fill against the library groups | every fill is a library color, **bound as a style** — grapher emits `#585c64` for residual categories, which is in no group |
 | Legend agreement | pair swatch→label by geometry, compare against the bars | zero mismatches |
 | Text size | read `fontSize` off every text node | nothing below **12px**; annotations on the named ladder |
 | Label-on-fill contrast | `contrast(labelHex, barHex)` for every in-bar label | **4.5:1** at 13.5px regular — the 3:1 large-text allowance does not apply |
 | Text hierarchy | list every distinct `fontSize` with what it belongs to, **and its rank** | title > subtitle ≥ annotations > supporting text ≥ labels. Sizes may vary inside the plot by rank; a lead annotation may *equal* the subtitle (Annotation XL 16) but nothing may exceed it, and same-rank items must share a size |
 | Sizes are named styles | every size matches a style in the file | no arbitrary sizes left over from scaling the export (13.7, 16.8). Choose from the ladder by rank rather than by element type — see GUIDELINES.md → Subtitles and notes |
-| Label alignment | compare each label's centre against its mark | bar values centred on bars, legend labels on swatches |
+| Label alignment | compare each label's center against its mark | bar values centered on bars, legend labels on swatches |
 | Box alignment | compare the chart's left/right against the header frame | identical to the subtitle box, to the pixel |
 | Gap | `(footer.y - headerBottom - chart.height) / 2` | **12–16px**, equal top and bottom |
 
-**Make label-centring part of the build, not a follow-up.** It regressed three times in one run — each rebuild re-hugs the text, which restores the drift, and a separate "now centre the labels" step is forgotten or applied to a chart instance that is later replaced. Put the centring loop at the end of the same function that imports, scales and re-hugs, so it cannot be skipped.
+**Make label-centering part of the build, not a follow-up.** It regressed three times in one run — each rebuild re-hugs the text, which restores the drift, and a separate "now center the labels" step is forgotten or applied to a chart instance that is later replaced. Put the centering loop at the end of the same function that imports, scales and re-hugs, so it cannot be skipped.
 
-**Re-run this whole pass after the last change, not after each one.** Fixes get lost silently: a label-centring pass applied to a chart instance that is later swapped for a re-export leaves the drift back exactly as it was, and every screenshot in between looks correct. And a structural change spends budget elsewhere — lifting an aggregate row to the top added 8px of height, which came straight out of the 12–16px gap and took it to 8.2 without anything reporting a problem. Treat "I already checked that" as false after any re-export, reorder, rescale or restyle.
+**Re-run this whole pass after the last change, not after each one.** Fixes get lost silently: a label-centering pass applied to a chart instance that is later swapped for a re-export leaves the drift back exactly as it was, and every screenshot in between looks correct. And a structural change spends budget elsewhere — lifting an aggregate row to the top added 8px of height, which came straight out of the 12–16px gap and took it to 8.2 without anything reporting a problem. Treat "I already checked that" as false after any re-export, reorder, rescale or restyle.
 
 **A failing check is a finding to report, not a veto.** Measure it, say plainly what fails and by how much, offer the alternatives with their own numbers — then do what the author decides. If they accept the deviation, record it beside the frame and in the report (GUIDELINES.md → Colors) so it reads as a decision rather than an oversight.
 
-Two habits make the difference. **Assert, don't eyeball** — a 1.2px label drift, a 1.18:1 greyscale pair and a scrambled legend all looked perfectly fine in a screenshot. And **re-run the affected checks after every change**, because they interact: applying a text style resets range colours, rescaling rewraps text and shifts label centres, adding an annotation changes the group's width, and swapping one colour moves the safety floor to a different pair.
+Two habits make the difference. **Assert, don't eyeball** — a 1.2px label drift, a 1.18:1 grayscale pair and a scrambled legend all looked perfectly fine in a screenshot. And **re-run the affected checks after every change**, because they interact: applying a text style resets range colors, rescaling rewraps text and shifts label centers, adding an annotation changes the group's width, and swapping one color moves the safety floor to a different pair.
 
 ## Step 9 — Checklist pass, review, deliver
 
 1. Run the **Good Data Viz Checklist** (GUIDELINES.md, final section) against the composed frame; fix what fails.
 2. `get_screenshot` the new page and show the user — original and adapted version side by side. Iterate on feedback (no re-approval needed within the approved page).
 3. **Rename the final frame to the slug** from Step 2 (`child-mortality-asia-decline`) — Figma uses the frame name as the export filename for the website PNG. **Exactly one frame carries the bare slug**; variants get a suffix (`-palette-a`). Two frames with the same name export two files with the same name.
-4. **Clear the rejected variants off the page.** Proposal frames accumulate fast — a palette trial, a labelling trial, a layout trial — and a page with four near-identical charts makes the reader work out which one is live. When the user picks, delete what they didn't pick and keep what they asked to keep; a variant kept deliberately is fine, one left behind by accident is not.
+4. **Clear the rejected variants off the page.** Proposal frames accumulate fast — a palette trial, a labeling trial, a layout trial — and a page with four near-identical charts makes the reader work out which one is live. When the user picks, delete what they didn't pick and keep what they asked to keep; a variant kept deliberately is fine, one left behind by accident is not.
 5. Do **not** export a PNG by default — the designer usually keeps editing. On request: `get_screenshot` with `maxDimension` at the target size (DI images ship at 2160×2160, i.e. 4× the 540 frame), or let the user export from Figma.
 6. Report what was created (page name, frames, edits made) and what remains manual: the no-data pattern and flag plugins, and any design review — **you cannot read Figma comments via MCP, so never report the design review as clean.**
 
@@ -454,8 +454,8 @@ Two habits make the difference. **Assert, don't eyeball** — a 1.2px label drif
 - **Line charts with >500 points render no dots** (grapher performance cutoff) — don't hunt for dots that were never exported.
 - **Never stretch one axis** of the imported chart — dots, squares, and arrowheads distort. Re-export at the right aspect ratio instead.
 - **Raising `imFontSize` makes grapher drop labels it can no longer fit.** Bigger type means narrow segments lose their value entirely — Brazil's 7.3% fish label vanished between two exports, and a chart can come back with fewer labels than the one you measured. After changing the font size, check that the specific values an annotation or a recommendation relies on are still present.
-- **The Plugin API's shape is not uniform, and guessing costs a round trip.** `figma.getLocalVariableCollectionsAsync` does not exist — variables live under `figma.variables.*`, and this file has paint and text styles but **no colour variables at all**, so a variables sweep comes back empty and means nothing. The range setters are **synchronous** (`setRangeFontName`, `setRangeFillStyleId`) while the node-level ones are async (`setFillStyleIdAsync`, `setTextStyleIdAsync`); `setRangeFontNameAsync` is not a method. Read the typings rather than pattern-matching the `Async` suffix.
+- **The Plugin API's shape is not uniform, and guessing costs a round trip.** `figma.getLocalVariableCollectionsAsync` does not exist — variables live under `figma.variables.*`, and this file has paint and text styles but **no color variables at all**, so a variables sweep comes back empty and means nothing. The range setters are **synchronous** (`setRangeFontName`, `setRangeFillStyleId`) while the node-level ones are async (`setFillStyleIdAsync`, `setTextStyleIdAsync`); `setRangeFontNameAsync` is not a method. Read the typings rather than pattern-matching the `Async` suffix.
 - **The SVG import renames nodes: spaces become hyphens.** A category displayed as "Beef and buffalo" is the node `Beef-and-buffalo`, so `query('[name=Beef and buffalo]')` finds nothing while the legend text still reads with spaces. Query by the hyphenated node name and map to the label text explicitly — that mismatch is also why the legend has to be paired by geometry rather than by name.
-- **`search_design_system` returns about 14 styles per query.** It cannot enumerate a library group in one call, so query each colour by name (or query several times with different wording) and resolve hexes with `importStyleByKeyAsync`. Never conclude a group is small because one search returned few results.
+- **`search_design_system` returns about 14 styles per query.** It cannot enumerate a library group in one call, so query each color by name (or query several times with different wording) and resolve hexes with `importStyleByKeyAsync`. Never conclude a group is small because one search returned few results.
 - **`get_screenshot` hands back a URL, not an image.** Download it with `curl` and open it with Read — an inline base64 response costs far more context for the same picture.
 - **New year, new file** — ask for the link and re-verify every node id in the map above before the first run of a new year.
