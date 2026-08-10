@@ -4,9 +4,10 @@ Every country carries two independent attributes:
 
 * ``tier`` — what the national number is built from. This is the quality ladder, and it says
   nothing about whether we could recompute it.
-* ``recalculated`` — whether the figure shown is one we computed from counted births and
-  women, rather than a rate or total the office published itself. A transparency badge, not
-  a quality claim: an incomplete registry we can decompose is still an incomplete registry.
+* ``recalculated`` — the validation level. True means the figure was rebuilt from counted births
+  and women and checked against what the office publishes; False means the office's own rate was
+  copied straight from the source. This says how far we could verify the number, not how good the
+  number is: an incomplete registry we can decompose is still an incomplete registry.
 
 ``loader`` is None for countries with no national figure to plot.
 """
