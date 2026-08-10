@@ -293,6 +293,8 @@ chart.y = header.y + header.height + gap
 
 Keep the export URL — same `imFontSize`, same `imType`, same params — so the only thing that changes is what the chart author changed. And re-check the category order and the entity list against what you were told changed: a reorder can move more than the category you asked about.
 
+**Re-export the reference copy too.** The chart on the left of the page is the "before" of a before/after, so a stale one misrepresents the comparison — a reviewer reads a difference you didn't make, or misses one you did. Refresh it from the same source with its own params (`imType=square` for the square templates), replace it in place, and keep its layer name so the page reads the same. This is easy to forget precisely because nothing about the reference looks wrong on its own.
+
 ## Step 9 — Checklist pass, review, deliver
 
 1. Run the **Good Data Viz Checklist** (GUIDELINES.md, final section) against the composed frame; fix what fails.
