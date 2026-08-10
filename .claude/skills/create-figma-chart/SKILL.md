@@ -517,6 +517,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Label-on-fill contrast | `contrast(labelHex, barHex)` for every in-bar label | **4.5:1** at 13.5px regular — the 3:1 large-text allowance does not apply |
 | Text hierarchy | list every distinct `fontSize` with what it belongs to, **and its rank** | title > subtitle ≥ annotations > supporting text ≥ labels. Sizes may vary inside the plot by rank; a lead annotation may *equal* the subtitle (Annotation XL 16) but nothing may exceed it, and same-rank items must share a size |
 | Sizes are named styles | every size matches a style in the file | no arbitrary sizes left over from scaling the export (13.7, 16.8). Choose from the ladder by rank rather than by element type — see GUIDELINES.md → Subtitles and notes |
+| Annotation knockouts cover only furniture | for each `annotation__*` frame, list what its bounds overlap | gridlines, empty space or a muted context line — never a highlighted line, a dot, a value label or a bar segment carrying a number |
 | Label alignment | compare each label's center against its mark | bar values centered on bars, legend labels on swatches |
 | Box alignment | compare the chart's left/right against the header frame | identical to the subtitle box, to the pixel |
 | Gap | `(footer.y - headerBottom - chart.height) / 2` | **12–16px**, equal top and bottom |
