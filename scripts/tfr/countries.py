@@ -23,6 +23,7 @@ sys.path.insert(0, HERE)
 warnings.filterwarnings("ignore")
 
 from argentina import argentina_tfr  # noqa: E402
+from australia import australia_tfr  # noqa: E402
 from canada import canada_tfr  # noqa: E402
 from china import china_tfr  # noqa: E402
 from colombia import dane_female_pop, dane_registered_tfr  # noqa: E402
@@ -492,6 +493,25 @@ COUNTRIES = [
       "it is not what the published rate is built on, and neither PxWeb nor the statistical yearbook carries "
       "any table of births or population by age at all.",
       "https://www.nso.gov.vn/"),
+    C("Australia", "ABS — births by age of mother over its population estimates", australia_tfr,
+      "Australia", "complete", True,
+      "ABS publishes registered births by single year of the mother's age through a data service that needs "
+      "no key, and female population by single year of age at 30 June in its population release. It also "
+      "publishes its own fertility rate.",
+      "We divided the births at each single age by the women of that age and summed. Our 1.482 for 2024 "
+      "matches ABS's published 1.481, and 1.497 against its 1.499 for 2023 — the small gap is the population "
+      "having been revised since ABS calculated that year's rate.",
+      "Australia's rate is at a record low. The one caveat that matters is registration timing: ABS counts "
+      "births by the year they were registered, and two states have had backlogs. Victoria registered nearly "
+      "a quarter of its 2024 births as having occurred in an earlier year, and clearing a 2023 processing "
+      "delay pushed its 2024 registrations up 12.9% against a national rise of 1.9% — ABS says outright that "
+      "much of that is administrative rather than real, and warns against comparing years. Western Australia "
+      "cleared a backlog in early 2025 that also lands in 2024. ABS does publish an occurrence-year series, "
+      "but it is far too incomplete to use for recent years: it has only 248,159 births for 2024 against "
+      "292,318 on the registration basis. Births by single year of age are no longer in the downloadable "
+      "data cubes — that table exists only through the data service now — and the population file\'s address "
+      "carries the release month, so it moves every edition.",
+      "https://www.abs.gov.au/statistics/people/population/births-australia/latest-release"),
     C("Bangladesh", "BBS — Sample Vital Registration System", bangladesh, "Bangladesh", "sample", False,
       "The 2023 SVRS report carries a table of every year from 1982 to 2023, giving the total fertility "
       "rate alongside four other fertility measures. Each annual edition also states its own year's figure "
