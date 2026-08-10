@@ -84,9 +84,11 @@ One `AskUserQuestion` batch — don't drip-feed:
    - Data insight image (DI_Template, 540×540)
    - Static chart — mobile/square (540×540 or 540×824) and/or desktop (Horizontal 850×638 / Vertical 850×1095; Vertical when the chart needs height — rankings, long bar lists)
 2. **Author** — goes into the page name and (static templates) the "Licensed under CC-BY by the author …" line. Default: the user.
-3. **Annotations** — should the chart carry annotations replicating what the accompanying text says? If yes, ask for that text (DI draft, article paragraph).
-4. **Topic page** for the `OurWorldinData.org/[Topic]` footer line — default from the config's `originUrl`.
-5. **Slug** for the final frame — short, kebab-case (`child-mortality-asia-decline`). It becomes the PNG filename when the frame is exported for the website. Propose one; let the user override.
+3. **The DI's own title — or the claim the image is meant to make.** Ask for this whenever a DI or Instagram image is among the formats, and ask *independently of annotations*: grapher's descriptive title must not survive into those images (GUIDELINES.md → Titles), and the story is not yours to invent. If there's no title written yet, ask for the sentence the image supports and derive a candidate from it for approval in Step 4.
+4. **Annotations** — should the chart carry annotations replicating what the accompanying text says? If yes, ask for that text (DI draft, article paragraph).
+5. **Language**, whenever a Spanish template is picked. The Spanish templates differ in their fixed footer text and handle — they do **not** translate the chart's copy, so every reader-facing text you fill in has to be translated: title, subtitle, note, the producer string, and the `Data for <YYYY>.` line. Ask whether the user supplies the Spanish copy or wants a proposed translation to review. Either way it goes into the Step 4 proposal, and no template gets filled with a mix of languages.
+6. **Topic page** for the `OurWorldinData.org/[Topic]` footer line — default from the config's `originUrl`.
+7. **Slug** for the final frame — short, kebab-case (`child-mortality-asia-decline`). It becomes the PNG filename when the frame is exported for the website. Propose one; let the user override.
 
 ## Step 3 — Export the SVGs
 
@@ -149,12 +151,14 @@ curl -s -X POST "<submitUrl>" -F "file=@$DIR/original.svg;type=image/svg+xml"
 
 Replace the lorem-ipsum text nodes in the cloned template. Source everything from the chart config (Step 1) and the user's answers (Step 2):
 
-- **Title** — suggest a more colloquial rewrite per GUIDELINES.md ("Death rate in the United States", not "Death rate, US"); keep the user's final say. The page name uses this final title. Two or three lines is normal; check the line breaks and the year and highlight-color rules in GUIDELINES.md → Titles.
+- **Title** — for a DI or Instagram image, start from the DI title collected in Step 2, not grapher's; otherwise suggest a more colloquial rewrite per GUIDELINES.md ("Death rate in the United States", not "Death rate, US"). Keep the user's final say. The page name uses this final title. Two or three lines is normal; check the line breaks and the year and highlight-color rules in GUIDELINES.md → Titles.
 - **Subtitle** — the chart's subtitle, trimmed to what's necessary. When the chart shows a single year (or a narrow period the reader needs), append **`Data for <YYYY>.`** here.
 - **Data source:** `Data source: ` + `chart.citation` from Step 1 — that field *is* grapher's own footer line, so don't re-derive a `<producer> (<year>)` string by hand.
 - **Note:** only in templates that carry a Note line, and only if the chart has one worth keeping. **DI images normally carry no note at all** — drop it, or, when it's genuinely load-bearing for understanding the chart, fold it into the subtitle as a bolded second line (only if the subtitle isn't already crowded).
 - **`OurWorldinData.org/[Topic]`** → the confirmed topic path (e.g. `OurWorldinData.org/child-mortality`).
 - **CC BY** stays; static desktop templates also carry `Licensed under CC-BY by the author <Author>`.
+
+**On a Spanish template**, every text above comes from the Spanish copy agreed in Step 2 — the chart metadata is English and must not be pasted into it. Leave the fixed labels the template ships with exactly as they are (they are already Spanish, and the "never restyle the template" rule covers their wording too); translate only the chart-derived prose you are inserting. If a text was missed, stop and ask rather than shipping a half-translated image.
 
 Rules: replace `characters`, and leave the node's **base** styling alone — the fonts, sizes, colors, and positions are the template's, not yours. `await figma.loadFontAsync(node.fontName)` before each text edit. If you need a *new* text block the template doesn't have, **clone the nearest template text node and edit it** — that inherits the correct shared style without hunting style ids.
 
