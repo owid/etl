@@ -48,6 +48,7 @@ from published import (  # noqa: E402
     angola,
     bangladesh,
     benin,
+    bolivia,
     burkina_faso,
     burundi,
     cambodia,
@@ -80,6 +81,7 @@ from published import (  # noqa: E402
     south_sudan,
     sudan,
     syria,
+    tajikistan,
     tanzania,
     tunisia,
     ukraine,
@@ -1406,13 +1408,57 @@ COUNTRIES = [
       "answers gives 3.9, while a survey asking for full birth histories two years later gives 7.5. "
       "Nobody thinks fertility doubled. Recent births are simply missed when asked about that way — which "
       "is exactly what the offices that apply Brass and Arriaga corrections are trying to fix, and here we "
-      "can see the size of the problem uncorrected. South Sudan has had no census since 2008, none since "
+      "can see the size of the problem uncorrected. That spread is why South Sudan has the largest gap "
+      "against the UN of any country here, by a wide margin — about 2.7 children. Its own instruments range "
+      "from 3.9 to 7.5 and the UN fits a smooth decline below all of them, from 6.0 in 2005 to 3.7 now. The "
+      "2025 survey is also a preliminary report published in 2026, after the UN's last revision, so it "
+      "could not have been taken into account. This is a country where the honest answer is that nobody "
+      "knows the level, not one where a single source is wrong. South Sudan has had no census since 2008, none since "
       "independence, and no announced date for one. The bureau's own site is live and well stocked; the "
       "two domains that look like it are an expired-hosting placeholder and a retired domain answering "
       "403. Birth registration stands at 36%, and the finance ministry's own review calls the state of "
       "the system pathetic. One document that looks like it should count does not: the 2013 population "
       "estimation survey has no fertility figure in it.",
       "https://nbs.gov.ss/"),
+    C("Bolivia", "INE — Demographic and Health Survey rounds", bolivia, "Bolivia", "survey", False,
+      "INE runs the health survey every few years and its 2023 fertility report charts all five rounds "
+      "since 1998. The 2024 census asks women how many children they have ever borne, and INE publishes "
+      "those counts. Its population projection carries a fertility assumption of its own.",
+      "We read the survey series. There is nothing to recompute as a rate: no Bolivian source publishes "
+      "births by age of mother, in any year, from any instrument.",
+      "Bolivia runs the Latin American pattern backwards, and it is the only country here that does. "
+      "Everywhere else — Colombia, Mexico, Peru, Argentina, Chile, Ecuador — the office headlines a figure "
+      "above its own registered births. INE's headline projection assumes 1.69 for 2024 against a survey "
+      "figure of 2.1 for 2023, so the headline is the lower number. It says why. It treats the survey as "
+      "its most reliable source, built a smoothed curve close to it, then checked that curve against three "
+      "administrative series — birth registrations, school enrolment, and health-ministry birth records — "
+      "found all three implied less fertility, and lowered the adopted figure accordingly. It also "
+      "declined to apply the Brass correction it had used on the 2001 and 2012 censuses, saying it was "
+      "incompatible with how fast fertility had fallen. Our own rough check agrees with the direction: "
+      "registered births over projected women imply something near 1.4 for 2024. One trap to record: the "
+      "electoral court's statistical bulletin looks exactly like a vital-statistics release, but its "
+      "births table counts birth-certificate printouts — 2.7 million for 2021, about thirteen times the "
+      "real number.",
+      "https://www.ine.gob.bo/"),
+    C("Tajikistan", "Agency on Statistics — registered births over the resident population",
+      tajikistan, "Tajikistan", "complete", False,
+      "The demographic yearbook prints the fertility rate for every year since 1989, the age-specific "
+      "rates behind it, and the female population by single year of age for benchmark years.",
+      "We read the published series. We also multiplied the 2023 age-specific rates by the women in each "
+      "band and got 3.032 against the published 3.016, and implied births of 250,616 against the 250,285 "
+      "the agency separately reports as registered. That 0.13% agreement between two independently "
+      "tabulated numbers is a good sign for both.",
+      "Tajikistan is the third Central Asian country here whose own counted fertility has risen: 2.64 in "
+      "2021 to 3.02 in 2023, after Uzbekistan and Kazakhstan. Raw birth counts by age of mother are not "
+      "published anywhere, only the rates, so the series is copied rather than rebuilt. Two caveats from "
+      "the agency's own pages. It flags 2002 to 2017 as preliminary or estimated, and 2007's value of "
+      "2.35 is a one-year drop of nearly a full child that it never explains — treat it as possibly an "
+      "artefact of the series rather than a demographic event. And the denominator is the registered "
+      "resident population, which by the agency's own definition includes people temporarily absent. "
+      "Tajikistan has one of the highest labour-emigration rates in the world, so a large number of "
+      "working-age men abroad are still counted at home; that mostly affects the male side, and our "
+      "reconciliation suggests any effect on women of childbearing age is second-order.",
+      "https://www.stat.tj/ru/soczialno-demograficheskij-sektor/"),
 ]
 
 PANELS = [(c["name"], c["src"], c["loader"], c["wpp_name"]) for c in COUNTRIES if c["loader"]]

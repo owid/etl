@@ -807,3 +807,38 @@ def tunisia_detail(year):
     stated = sum(x for _, x in TUNISIA_2023.values())
     scale = (stated + TUNISIA_AGE_NOT_STATED) / stated
     return {b: {"women": w * 1000, "births": x * scale} for b, (w, x) in TUNISIA_2023.items()}
+
+
+def bolivia():
+    """INE's health-survey rounds. The 2023 report's own trend table carries all five."""
+    return _series([(1998, 4.2), (2003, 3.8), (2008, 3.5), (2016, 2.9), (2023, 2.1)])
+
+
+def tajikistan():
+    """The statistics agency's own fertility rate, from the demographic yearbook.
+
+    The yearbook prints the whole series from 1989 in one table. The agency flags 2002-2017 as
+    preliminary or estimated; 2007's value is a sharp one-year dip that it does not explain.
+    """
+    values = [3.493, 3.487, 3.471, 3.420, 3.354, 3.274, 3.266, 2.349, 2.677, 2.655, 2.905, 2.766,
+              2.611, 2.616, 2.980, 3.064, 2.930, 2.830, 2.884, 2.885, 2.986, 2.642, 2.799, 3.016]
+    return _series(list(zip(range(2000, 2000 + len(values)), values)))
+
+
+# the 2024 yearbook: age-specific rates per 1,000 women for 2023, and the women in each age group at
+# the start of that year. The first band is printed as "under 20" and read against the 15-19 women.
+TAJIKISTAN_2023 = {
+    (15, 19): (423609, 23.82),
+    (20, 24): (452594, 242.54),
+    (25, 29): (402525, 166.63),
+    (30, 34): (400263, 100.51),
+    (35, 39): (338433, 57.77),
+    (40, 44): (259325, 14.34),
+    (45, 49): (217247, 0.83),
+}
+
+
+def tajikistan_detail(year):
+    if year != 2023:
+        return None
+    return {b: {"women": float(w), "births": r / 1000 * w} for b, (w, r) in TAJIKISTAN_2023.items()}

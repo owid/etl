@@ -497,6 +497,7 @@ DETAIL = {
     "Burundi": lambda y: _published_detail("burundi_detail")(y),
     "Haiti": lambda y: _published_detail("haiti_detail")(y),
     "Tunisia": lambda y: _published_detail("tunisia_detail")(y),
+    "Tajikistan": lambda y: _published_detail("tajikistan_detail")(y),
 }
 
 

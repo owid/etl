@@ -61,7 +61,12 @@ def paths():
     features = []
     for f in json.load(open(src))["features"]:
         p = f["properties"]
-        iso = p.get("ADM0_A3") or p.get("ISO_A3")
+        # ISO_A3 first, because Natural Earth's own ADM0_A3 disagrees with it for a few countries —
+        # South Sudan is SDS there and SSD in the standard. ADM0_A3 is the fallback for the entities
+        # whose ISO_A3 is left unset.
+        iso = p.get("ISO_A3")
+        if not iso or iso == "-99":
+            iso = p.get("ADM0_A3")
         if not iso or iso == "-99" or iso in SKIP:
             continue
         rings = [[robinson_raw(lon, lat) for lon, lat in ring] for ring in _rings(f["geometry"])]

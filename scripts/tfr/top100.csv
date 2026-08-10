@@ -77,7 +77,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 76,Benin,15170419,full,yes,no,survey,census 4.8 is admitted to be an indirect estimate but no method is named and no raw figure printed
 77,Rwanda,14889701,full,yes,no,survey,"2012 census adjusted by Arriaga, 2022 ran the same test and declined; also has a registry-based rate"
 78,Burundi,14729163,full,yes,no,survey,"no correction applied, and the census's own parity check suggests none was needed"
-79,Bolivia,12749296,no,no,,,
+79,Bolivia,12749296,full,yes,no,survey,the only country where the headline sits BELOW the survey: 1.69 projected vs 2.1 measured
 80,South Sudan,12436040,full,yes,no,survey,2008 census counts give 3.9 against the 2010 survey's 7.5 — uncorrected census undercount
 81,Tunisia,12415143,full,yes,no,complete,published series 2015-2023; the 5.7% of births with no age recorded must be redistributed
 82,Haiti,12037515,full,yes,no,survey,nothing since 2016-17; the office says outright it cannot produce estimates and uses the UN's
@@ -86,7 +86,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 85,Jordan,11589538,no,no,,,
 86,United Arab Emirates,11574684,no,no,,,
 87,Honduras,11184761,no,no,,,
-88,Tajikistan,10978600,no,no,,,
+88,Tajikistan,10978600,full,yes,no,complete,third Central Asian rise: 2.64 in 2021 to 3.02 in 2023; 2007's dip looks like an artefact
 89,Papua New Guinea,10947852,no,no,,,
 90,Cuba,10892659,no,no,,,
 91,Sweden,10701038,no,no,,,
