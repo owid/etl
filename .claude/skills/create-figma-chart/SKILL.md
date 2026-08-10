@@ -202,15 +202,28 @@ Nothing else gets restyled.
 
 ## Step 7 — Fit the chart into the template
 
-The embed spans the full content width, left-aligned with the title/subtitle/logo box, vertically centered in the space between header and footer:
+The chart spans the full content width, left-aligned with the title/subtitle/logo box, and sits in the band between the header and the footer with an even gap top and bottom.
 
-| Template | Content x / width | Vertical space for the chart (≈) |
+**Measure that band; don't hardcode it.** The header's height depends on how many lines the title and subtitle take, so a fixed y is wrong as soon as the subtitle wraps — and centring inside a guessed band leaves a lopsided result (18px above, 6px below on the first run of this skill). Read the real edges instead:
+
+```js
+const headerBottom = header.y + header.height     // Frame 14: title + subtitle + logo
+const gap = (footer.y - headerBottom - chart.height) / 2
+chart.x = header.x
+chart.y = headerBottom + gap
+```
+
+**How much gap is right: 14px, and 12–16 is the comfortable band.** That's what the finished pages and grapher itself converge on, measured in 540-wide frames — grapher's own square export leaves 13px above the plot and 14px below; recent DI pages in the file sit at 14/19, 15/14 and 7/15. Below ~10px it reads cramped and the legend starts to look like part of the subtitle; above ~20px you are wasting space the plot could use. When the chart comes out a few pixels too tall, spend the slack down to 12px a side **before** shrinking it — that is usually enough, and it keeps the full content width, which matters more than the last pixel of gap.
+
+Side margins and the footer edge are the template's, not yours: content starts at the header's `x` and the footer's bottom stays where the template put it.
+
+| Template | Content x / width | Header bottom → footer top (unwrapped subtitle) |
 |---|---|---|
-| 540-wide (IG square, DI, static mobile ex. 1) | x=16, w=508 | y 134–488 (IG, 2-line footer) / y 134–508 (DI, static) |
-| Static mobile example 2 (540×824) | x=16, w=508 | y 134–792 |
-| IG portrait (560×700) | x=26, w=508 | y 145–630 |
-| Static Horizontal (850×638) | x=16, w=818 | y 118–550 |
-| Static Vertical (850×1095) | x=16, w=818 | y 116–990 |
+| 540-wide (IG square, DI, static mobile ex. 1) | x=16, w=508 | 118 → 508 (DI/static) or 488 (IG, 2-line footer) |
+| Static mobile example 2 (540×824) | x=16, w=508 | 118 → 792 |
+| IG portrait (560×700) | x=26, w=508 | 135 → 640 |
+| Static Horizontal (850×638) | x=16, w=818 | 118 → 556 |
+| Static Vertical (850×1095) | x=16, w=818 | 116 → 997 |
 
 Verify against the actual clone with `get_metadata` (the templates evolve; the geometry above is a 2026 snapshot). These are **frame-local** coordinates, and `x`/`y` are relative to a node's parent — so append the embed to the template clone **before** positioning it. Left parented to the page (where Step 5 puts imported nodes), the same numbers land it near the page origin, on top of the reference chart:
 
