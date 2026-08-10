@@ -530,6 +530,15 @@ def burkina_faso():
     return _series([(2003, 5.9), (2010, 6.0), (2021, 4.4)])
 
 
+def syria():
+    """Central Bureau of Statistics, Statistical Abstract chapter 2, table 9/2.
+
+    The table gives age-specific rates for the two family health survey rounds, 2001 and 2009, and
+    those rates sum to the printed totals. Every edition we could recover reprints it unchanged.
+    """
+    return _series([(2001, 3.8), (2009, 3.5)])
+
+
 def kenya():
     """KNBS, 2019 census analytical report on fertility and nuptiality, volume VI, table 4.5.
 

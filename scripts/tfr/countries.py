@@ -61,6 +61,7 @@ from published import (  # noqa: E402
     russia,
     saudi_arabia,
     sudan,
+    syria,
     tanzania,
     ukraine,
     uzbekistan,
@@ -745,6 +746,22 @@ COUNTRIES = [
       "surveyed sample, not a population count, so there is nothing to recalculate from. The institute's "
       "ins-rdc.org domain returns a block; the working site is ins.gouv.cd.",
       "https://ins.gouv.cd/publication/RDC-EDS-III.pdf"),
+    C("Syria", "Central Bureau of Statistics — family health surveys", syria, "Syria", "survey", False,
+      "The bureau's statistical abstract carries one fertility table, giving age-specific rates for its 2001 "
+      "and 2009 family health surveys: 3.8 and 3.5.",
+      "We read both, from the native spreadsheet inside the abstract's own chapter archive. The rates sum to "
+      "the printed totals.",
+      "Nothing has been added since 2009. Every edition we recovered — 2016, 2017, 2019 and 2020 — reprints "
+      "the same table unchanged, even while the registered-births tables next to it were being updated to "
+      "2019; and those birth tables break down by sex and province only, never by the mother's age, so there "
+      "is nothing to rebuild from. The bureau\'s site is now gone, and how it went is worth recording: it "
+      "kept publishing for months after the change of government in December 2024, with fresh pages as late "
+      "as July 2025, then the domain lapsed and a parking service took it. That service cloaks by browser "
+      "identity — a plain request gets a 410, which reads as retired, while a browser-like one gets a "
+      "for-sale page at 200, which reads as squatted — so testing only one way misdiagnoses it. Everything "
+      "here came from a web archive. The health ministry\'s site is live and modern but publishes only "
+      "disease surveillance.",
+      "https://web.archive.org/web/20241209121919/http://cbssyr.sy/yearbook.htm"),
     C("Tanzania", "NBS — 2022 Population and Housing Census", tanzania, "Tanzania", "survey", False,
       "The census fertility monograph prints age-specific rates twice: as women reported them, and after "
       "adjustment. The reported rates sum to a total fertility rate of 3.2, the adjusted ones to 4.6. NBS "
