@@ -187,16 +187,16 @@ const UNPLOTTED = {{UNPLOTTED}};
         const x = LPAD + (v / top) * (CW - LPAD - RPAD);
         return `<text class="xlab" x="${x}" y="11">${+v.toFixed(2)}</text>`;
       }).join('') +
-      '</svg></td><td>Year</td><td>Built from</td><td>How obtained</td>';
+      '</svg></td><td>Built from</td><td>How obtained</td><td>Year</td>';
     table.appendChild(ticks);
 
     rows.forEach((r) => {
       const tr = document.createElement('tr');
       tr.innerHTML =
         `<td class="cn">${r.country}</td><td class="cc"></td>` +
-        `<td class="n">${r.year}</td>` +
         `<td class="meta"><span class="swatch" style="color:${TIERS[r.tier][1]}"></span> ${TIERS[r.tier][0]}</td>` +
-        `<td class="meta">${r.recalc ? 'Recalculated by us' : 'As published'}</td>`;
+        `<td class="meta">${r.recalc ? 'Recalculated by us' : 'As published'}</td>` +
+        `<td class="n">${r.year}</td>`;
       tr.querySelector('td.cc').appendChild(rowSvg(r, top));
       table.appendChild(tr);
     });
