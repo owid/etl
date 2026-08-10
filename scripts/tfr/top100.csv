@@ -92,9 +92,9 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 91,Sweden,10701038,full,yes,yes,complete,fully recalculated 2006-2024; record low and still falling
 92,Czechia,10527784,full,yes,no,complete,peak 1.83 in 2021 to 1.37 in 2024; Ukrainian refugees are in both numerator and denominator
 93,Azerbaijan,10454854,full,yes,no,complete,its own census later showed the intercensal denominator was too low; 2000s levels overstated
-94,Portugal,10395366,no,no,,,
+94,Portugal,10395366,full,yes,no,complete,"published series 2013-2025; our own rebuild runs 3% below it, cause unresolved"
 95,Greece,9897119,full,yes,yes,complete,"fully recalculated 2001-2024; the 2021 census cut the population estimate by 140,000"
-96,Israel,9647689,no,no,,,
+96,Israel,9647689,full,yes,no,complete,"3.00 Jewish, 2.81 Muslim, 1.75 Druze, 1.64 Christian in 2023; host blocks us, used archives"
 97,Hungary,9585819,full,yes,no,complete,"rose to 1.61 in 2021 then fell every year to 1.31 in 2025, below its 2013 level"
 98,Austria,9107265,full,yes,yes,complete,fully recalculated 2006-2025 from age bands; by nationality 3.79 Syrian to 0.66 Iranian
 99,Switzerland,9007794,full,yes,no,complete,no births by age of mother published at all; Swiss mothers 1.20 vs foreign 1.50

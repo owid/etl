@@ -44,6 +44,7 @@ from switzerland import switzerland_tfr  # noqa: E402
 from taiwan import taiwan_tfr  # noqa: E402
 from philippines import philippines  # noqa: E402
 from poland import poland_tfr  # noqa: E402
+from portugal import portugal_tfr  # noqa: E402
 from kazakhstan import kazakhstan_tfr  # noqa: E402
 from korea import korea_tfr  # noqa: E402
 from malaysia import malaysia_tfr  # noqa: E402
@@ -74,6 +75,7 @@ from published import (  # noqa: E402
     honduras,
     indonesia,
     iraq,
+    israel,
     jordan,
     kenya,
     madagascar,
@@ -1766,6 +1768,41 @@ COUNTRIES = [
       "when they happened or when they were registered.",
       "https://www.bfs.admin.ch/bfs/de/home/statistiken/bevoelkerung/geburten-todesfaelle/"
       "fruchtbarkeit.html"),
+    C("Portugal", "INE — registered births over the resident population", portugal_tfr, "Portugal",
+      "complete", False,
+      "INE's open interface serves births by the mother's age, population by age group, and its own "
+      "rate — no key needed. It does not publish the age-specific rates behind that rate.",
+      "We read the published series. We also rebuilt it from the counts and got about 3% less: 1.284 for "
+      "2023 against a published 1.32. Averaging the population estimates either side of the year closes "
+      "part of the gap but not all of it, so something in INE's denominator is not what we are using, and "
+      "we plot its figure rather than ours.",
+      "Portugal fell to 1.21 in 2013, recovered to 1.43 by 2019, and has fallen back to about 1.27 in "
+      "2024 with a small rise to 1.30 in 2025. One practical thing to know: every indicator is reissued "
+      "whenever the statistical regions are redrawn, and each new edition carries only the last few "
+      "years, so any long series has to be spliced across two or three codes — they agree exactly at the "
+      "years where they overlap. Asking for a year outside an edition's range returns an error message "
+      "inside a successful response, so the answer has to be read rather than the status code. INE also "
+      "publishes births by the mother's nationality, which matters given how much immigration there has "
+      "been since 2018, but we did not get to it.",
+      "https://www.ine.pt/"),
+    C("Israel", "CBS — registered births over the mean population", israel, "Israel", "complete",
+      False,
+      "The statistical abstract publishes fertility rates by age and religion, and births by single year "
+      "of the mother's age. Annual figures appear only for the most recent years; before that the table "
+      "gives five-year averages, which is why the series here has three points.",
+      "We read the published figures and checked that its own age-specific rates for 2023 sum to 2.847 "
+      "against the 2.85 it prints. An agent also spot-checked one age group against the counts and "
+      "matched to within 0.3%.",
+      "Israel is the highest rate in this collection outside sub-Saharan Africa, and the spread between "
+      "groups is what makes it: 3.00 for Jewish women in 2023, 2.81 for Muslim, 1.75 for Druze and 1.64 "
+      "for Christian, against 2.85 overall. The denominator is the mean population over the year, and "
+      "CBS states that its coverage includes East Jerusalem from 1970 and the Golan from 1982 in both "
+      "births and population; the foreign population, about 2% of residents, is excluded from the "
+      "fertility denominator. Everything here was read from archived copies, because the office's own "
+      "host refuses connections from outside the country — for us as well as for the agent. One trap "
+      "found on the way: CBS reuses table numbers between editions, and the file with no year in its "
+      "name has been frozen since 2020 while still being re-crawled.",
+      "https://www.cbs.gov.il/en/publications/Pages/2024/Population-Statistical-Abstract-of-Israel-2024-No.75.aspx"),
 ]
 
 PANELS = [(c["name"], c["src"], c["loader"], c["wpp_name"]) for c in COUNTRIES if c["loader"]]

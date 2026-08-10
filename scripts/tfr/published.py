@@ -915,3 +915,18 @@ def sierra_leone():
     three and a half — see the note in countries.py.
     """
     return _series([(2008, 5.1), (2013, 4.9), (2019, 4.2)])
+
+
+def israel():
+    """CBS, table 2.41 of the statistical abstract, "Fertility rates by age and religion".
+
+    The table gives annual values only for the most recent years and five-year averages before
+    that, so the series is short. Read from an archived copy: the office's own host refuses
+    connections from outside the country.
+    """
+    return _series([(2020, 2.90), (2022, 2.89), (2023, 2.85)])
+
+
+# the same table, 2023: the age-specific rates per 1,000 women for the whole population
+ISRAEL_2023 = {(15, 19): 5.6, (20, 24): 89.2, (25, 29): 161.2, (30, 34): 172.8,
+               (35, 39): 106.6, (40, 44): 30.8, (45, 49): 3.2}
