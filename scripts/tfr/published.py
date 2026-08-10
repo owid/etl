@@ -866,3 +866,43 @@ def azerbaijan():
     values = [2.0, 1.8, 1.84, 1.9, 2.1, 2.3, 2.3, 2.3, 2.3, 2.3, 2.3, 2.4, 2.3, 2.2, 2.2, 2.1,
               2.0, 1.9, 1.8, 1.8, 1.7, 1.5, 1.7, 1.6, 1.4]
     return _series(list(zip(range(2000, 2000 + len(values)), values)))
+
+
+def cuba():
+    """ONEI's own rate, from table 2.4 of the demographic yearbook."""
+    values = [1.72, 1.63, 1.61, 1.65, 1.57, 1.52, 1.47, 1.52, 1.54, 1.29]
+    return _series(list(zip(range(2015, 2015 + len(values)), values)))
+
+
+# the 2024 yearbook's tables 2.7 and 1.9: registered births by the mother's age group and the mean
+# female population. ONEI's own footnotes fold births under 15 into the 15-19 band and births at 50
+# and over into 45-49, which is what reproduces its published rate.
+CUBA_2024 = {
+    (15, 19): (254152.5, 11597 + 365),
+    (20, 24): (276702.0, 21672),
+    (25, 29): (265828.0, 17586),
+    (30, 34): (303864.0, 12361),
+    (35, 39): (311973.5, 6399),
+    (40, 44): (270460.5, 1318),
+    (45, 49): (323388.0, 58 + 2),
+}
+
+
+def cuba_detail(year):
+    if year != 2024:
+        return None
+    return {b: {"women": w, "births": float(x)} for b, (w, x) in CUBA_2024.items()}
+
+
+def papua_new_guinea():
+    """NSO's survey rounds.
+
+    2006 and 2016-18 are the health surveys; 2022 is the socio-demographic survey, whose figure is
+    adjusted — see the note in countries.py. Neither census ever produced a fertility rate.
+    """
+    return _series([(2006, 4.4), (2018, 4.2), (2022, 3.72)])
+
+
+def dominican_republic():
+    """ONE's household survey. The only fertility rate the office publishes from measurement."""
+    return _series([(2019, 2.4)])

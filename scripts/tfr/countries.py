@@ -27,10 +27,12 @@ from australia import australia_tfr  # noqa: E402
 from canada import canada_tfr  # noqa: E402
 from chile import chile_tfr  # noqa: E402
 from china import china_tfr  # noqa: E402
+from czechia import czechia_tfr  # noqa: E402
 from ecuador import ecuador_tfr  # noqa: E402
 from colombia import dane_female_pop, dane_registered_tfr  # noqa: E402
 from france import france_tfr  # noqa: E402
 from guatemala import guatemala_tfr  # noqa: E402
+from hungary import hungary_tfr  # noqa: E402
 from india import india  # noqa: E402
 from peru import peru_tfr  # noqa: E402
 from sri_lanka import sri_lanka_tfr  # noqa: E402
@@ -58,6 +60,8 @@ from published import (  # noqa: E402
     cameroon,
     chad,
     cote_divoire,
+    cuba,
+    dominican_republic,
     drc,
     ethiopia,
     ghana,
@@ -78,6 +82,7 @@ from published import (  # noqa: E402
     nigeria,
     north_korea,
     pakistan,
+    papua_new_guinea,
     russia,
     rwanda,
     saudi_arabia,
@@ -1572,6 +1577,95 @@ COUNTRIES = [
       "that republishes the office's tables with citations, because the office's own site could not be "
       "reached — which is why we are not plotting any of it.",
       "https://uaestat.fcsc.gov.ae/"),
+    C("Czechia", "ČSÚ — registered births over the mid-year population", czechia_tfr, "Czechia",
+      "complete", False,
+      "One spreadsheet carries the office's own rate from 1950 and the fertility rates for every single "
+      "year of the woman's age behind it. The yearly demographic yearbooks also publish births by single "
+      "year of the mother's age as counts, one archive per year.",
+      "We read the published series and its own age decomposition. Summing the single-age rates "
+      "reproduces the printed total, and dividing the yearbook's own counts by its mid-year population "
+      "gives 1.3675 against a published 1.3679 for 2024 — the same 0.0004 gap in every year, which is "
+      "rounding in the printed population.",
+      "Czechia rose and fell as sharply as Romania: 1.71 in 2018, a peak of 1.83 in 2021, then 1.37 by "
+      "2024 and a preliminary 1.28 for 2025 — the steepest fall in the modern series. The denominator is "
+      "the population at midnight between 30 June and 1 July, and it covers all usual residents; from "
+      "2022 that explicitly includes people granted temporary protection, which is how Ukrainian refugees "
+      "enter it. Both sides of the rate move with them: women of childbearing age jumped by about 77,000 "
+      "in 2022, and mothers born in Ukraine went from 1.9% of births in 2021 to 6.3% in 2024. The office "
+      "does not flag this on the fertility series itself, but publishes the tables that show it.",
+      "https://csu.gov.cz/produkty/demograficka-prirucka-2024"),
+    C("Hungary", "KSH — registered births over the mid-year population", hungary_tfr, "Hungary",
+      "complete", False,
+      "The office publishes its rate for every year since 1900, the age-specific rates by five-year band "
+      "since 1980, and population by single year of age — all as small files at stable addresses.",
+      "We read the published series. Multiplying its own rates by the mid-year women gives 88,393 births "
+      "for 2022 against the 88,491 it reports, and a rate of 1.549 against its 1.55.",
+      "Hungary is the clearest case of a rise reversing. Its rate went from 1.23 in 2011 to a peak of "
+      "1.61 in 2021 under an explicit pro-natalist policy, then fell every year after: 1.55, 1.51, 1.39, "
+      "and 1.31 for 2025 — below where it stood in 2013. Births are down from 93,039 in 2021 to 72,017 in "
+      "2025. Raw births by age of mother are not published anywhere free, so the rate cannot be rebuilt "
+      "from counts; the office's legacy database, which might hold them, refuses every request. Two "
+      "things to note. The population series was revised back to 2013 on the basis of the 2022 census, "
+      "and the office does not publish a before-and-after comparison, so the size of that revision is not "
+      "visible. And its own pages need a browser-shaped request: a plain one gets a rejection page under "
+      "an HTTP 200.",
+      "https://www.ksh.hu/stadat_files/nep/hu/nep0006.csv"),
+    C("Cuba", "ONEI — registered births over the mean population", cuba, "Cuba", "complete", False,
+      "The demographic yearbook publishes the rate, the age-specific rates, births by the mother's age "
+      "group and the mean female population by age group — as spreadsheets, one edition per year.",
+      "We read the published series. We also divided the 2024 counts and got 1.28897 against ONEI's "
+      "published 1.2889651766 — an exact reproduction, once its own convention of folding births under 15 "
+      "into the 15-19 band and births at 50 and over into 45-49 is followed.",
+      "Cuba is the one country here where an office deliberately cut its own denominator to account for "
+      "emigration, and said so. From 2021 it stopped counting the resident population and started "
+      "counting the \"effective\" population — everyone actually present for at least 180 of the last "
+      "365 days — because, in its words, it wanted to count the population as realistically as possible "
+      "given the migratory context. Its published population fell from 11.18 million in 2020 to 9.43 "
+      "million in 2025, and it publishes the net migration balance that explains it: about 1.26 million "
+      "people over 2021 to 2024. So the sharp fall in the rate to 1.29 in 2024 is happening despite a "
+      "denominator that has been shrunk, not because of one that has been left stale. Nothing is revised "
+      "backwards, so the pre-2021 and post-2021 series can be joined; the only break is that deliberate "
+      "change of definition. One trap in the tables: the row labelled TFG is the general fertility rate "
+      "per thousand women, and the actual total sits a few rows below it labelled TGF.",
+      "http://www.onei.gob.cu/sites/default/files/publicaciones/2025-07/00-anuario-demografico-2024.pdf"),
+    C("Papua New Guinea", "NSO — Demographic and Health Survey and socio-demographic survey",
+      papua_new_guinea, "Papua New Guinea", "survey", False,
+      "Three figures, all from surveys: 4.4 from 2006, 4.2 from 2016-18, and 3.72 from the 2022 "
+      "socio-demographic survey. The 2022 report publishes the women, the children ever born and the "
+      "births in the previous twelve months behind its figure.",
+      "We read the published figures. We also summed the 2022 survey's own reported rates and got 3.273, "
+      "matching the raw figure it prints before adjustment, and the 2016-18 rates give 4.195 against its "
+      "published 4.2.",
+      "The striking thing about Papua New Guinea is that its censuses have never produced a fertility "
+      "rate at all. The 2011 census asked the questions and never published the answers; the 2024 census "
+      "asked six questions and fertility was not among them. Every figure the country has comes from a "
+      "purpose-built survey. The 2022 one is a fully worked adjustment case: the raw figure is 3.27, a "
+      "Brass ratio correction of about 14% gives the adopted 3.72, and a Gompertz model would have given "
+      "3.93 — and the office says why it chose the first, that it keeps the age pattern of the original "
+      "data and corrects only the level. The census history is its own story: the 2011 census was "
+      "followed by a 2021 one that was deferred twice and replaced by a satellite-based population model "
+      "putting the country at 11.8 million, against the 10.2 million the census eventually counted in "
+      "2024. Nothing published reconciles the two. Birth registration was 13% at the last measurement.",
+      "https://www.nso.gov.pg/"),
+    C("Dominican Republic", "ONE — ENHOGAR-MICS household survey", dominican_republic,
+      "Dominican Republic", "survey", False,
+      "The 2019 household survey is the only fertility rate the office publishes from measurement. Its "
+      "population projection carries an assumption of its own, and its vital-statistics yearbooks publish "
+      "registered births by the mother's age.",
+      "We read the survey figure. We also divided the 2010 census's own counts, which gives 2.51, and the "
+      "2022 registered births by the projected women, which gives 1.86 — but see the caveat.",
+      "That 1.86 is not a fertility rate and should not be read as one, which is why it is not plotted. "
+      "The office publishes a full matrix of when births were registered against when they happened, and "
+      "it shows registration continuing for two decades: the 2020 birth cohort was 141,548 when first "
+      "counted and 159,466 two years later. So any recent year's registered births are a lower bound that "
+      "will keep rising, and a rate built on them understates by an unknown and shrinking amount. The "
+      "office states two reasons registration lags: 18% of 2022 registrations were late, and a mother "
+      "needs an identity card to register a birth at all — it notes explicitly that the fall in "
+      "registered births to mothers under 15 may reflect undocumented mothers rather than fewer births. "
+      "15% of registered births in 2022 were to Haitian mothers. The 2022 census has published a fertility "
+      "volume, but every archived copy of it is truncated and the live site is behind a bot wall, so its "
+      "figure is genuinely unknown to us.",
+      "https://www.one.gob.do/"),
 ]
 
 PANELS = [(c["name"], c["src"], c["loader"], c["wpp_name"]) for c in COUNTRIES if c["loader"]]

@@ -250,18 +250,18 @@ const SHAPES = {{SHAPES}};
   }
 
   // ---------------------------------------------------------------- world map
-  // ColorBrewer RdBu, eleven classes. Blue is where the UN sits below the country's own figure,
+  // ColorBrewer RdBu, nine classes. Blue is where the UN sits below the country's own figure,
   // red where it sits above. The bins are fixed at two tenths of a child rather than stretched to
   // fit the data, so a shade means the same thing however the reader filters, and the two outer
   // bins are open ended.
-  const BREAKS = [-0.9, -0.7, -0.5, -0.3, -0.1, 0.1, 0.3, 0.5, 0.7, 0.9];
-  const FILLS = ['#053061', '#2166ac', '#4393c3', '#92c5de', '#d1e5f0', '#f7f7f7',
-                 '#fddbc7', '#f4a582', '#d6604d', '#b2182b', '#67001f'];
+  const BREAKS = [-0.7, -0.5, -0.3, -0.1, 0.1, 0.3, 0.5, 0.7];
+  const FILLS = ['#2166ac', '#4393c3', '#92c5de', '#d1e5f0', '#f7f7f7',
+                 '#fddbc7', '#f4a582', '#d6604d', '#b2182b'];
 
   const gapOf = (r) => r.wpp - r.nso;
 
-  // eleven bins, each two tenths wide and running [lower, upper), with the middle one straddling
-  // zero from -0.1 to +0.1 and the outer two open ended
+  // nine bins, each two tenths wide and running [lower, upper), with the middle one straddling
+  // zero from -0.1 to +0.1 and the outer two open ended beyond seven tenths
   function fillOf(gap) {
     let i = 0;
     while (i < BREAKS.length && gap >= BREAKS[i]) i++;
@@ -291,7 +291,7 @@ const SHAPES = {{SHAPES}};
   // the legend is fixed, so it is drawn once. The eleven swatches are the ten bins with the
   // exact-agreement colour inserted in the middle; ticks mark every other boundary.
   function drawLegend() {
-    const ticks = [[1, '−0.9'], [3, '−0.5'], [5.5, '±0.1'], [8, '+0.5'], [10, '+0.9']];
+    const ticks = [[1, '−0.7'], [3, '−0.3'], [4.5, '±0.1'], [6, '+0.3'], [8, '+0.7']];
     document.getElementById('maplegend').innerHTML =
       '<span>UN below</span>' +
       `<span class="bins">${FILLS.map((c) => `<i style="background:${c}"></i>`).join('')}` +

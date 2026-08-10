@@ -82,20 +82,20 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 81,Tunisia,12415143,full,yes,no,complete,published series 2015-2023; the 5.7% of births with no age recorded must be redistributed
 82,Haiti,12037515,full,yes,no,survey,nothing since 2016-17; the office says outright it cannot produce estimates and uses the UN's
 83,Belgium,11774647,no,no,,,
-84,Dominican Republic,11609499,no,no,,,
+84,Dominican Republic,11609499,full,yes,no,survey,"registration keeps arriving for two decades, so no registry rate is usable"
 85,Jordan,11589538,full,yes,no,survey,survey only; the nationality split runs 2.5 Jordanian to 4.9 Syrian in camps
 86,United Arab Emirates,11574684,full,no,,,publishes an Emirati-only rate and no combined one; every government host blocked us
 87,Honduras,11184761,full,yes,no,survey,INE published a registry-based rate for 2013-16 then stopped; census raw 2.13 vs adopted 2.74
 88,Tajikistan,10978600,full,yes,no,complete,third Central Asian rise: 2.64 in 2021 to 3.02 in 2023; 2007's dip looks like an artefact
-89,Papua New Guinea,10947852,no,no,,,
-90,Cuba,10892659,no,no,,,
+89,Papua New Guinea,10947852,full,yes,no,survey,no census ever produced a fertility rate; the 2022 survey adjusted 3.27 to 3.72 by Brass
+90,Cuba,10892659,full,yes,no,complete,cut its own denominator for emigration in 2021: 11.18m in 2020 to 9.43m in 2025
 91,Sweden,10701038,full,yes,yes,complete,fully recalculated 2006-2024; record low and still falling
-92,Czechia,10527784,no,no,,,
+92,Czechia,10527784,full,yes,no,complete,peak 1.83 in 2021 to 1.37 in 2024; Ukrainian refugees are in both numerator and denominator
 93,Azerbaijan,10454854,full,yes,no,complete,its own census later showed the intercensal denominator was too low; 2000s levels overstated
 94,Portugal,10395366,no,no,,,
 95,Greece,9897119,no,no,,,
 96,Israel,9647689,no,no,,,
-97,Hungary,9585819,no,no,,,
+97,Hungary,9585819,full,yes,no,complete,"rose to 1.61 in 2021 then fell every year to 1.31 in 2025, below its 2013 level"
 98,Austria,9107265,no,no,,,
 99,Switzerland,9007794,no,no,,,
 100,Sierra Leone,8996749,no,no,,,

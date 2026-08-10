@@ -471,6 +471,18 @@ def guatemala_band_detail(year):
     return guatemala_detail(year)
 
 
+def czechia_band_detail(year):
+    from czechia import czechia_detail
+
+    return czechia_detail(year)
+
+
+def hungary_band_detail(year):
+    from hungary import hungary_detail
+
+    return hungary_detail(year)
+
+
 DETAIL = {
     "Colombia": colombia_detail,
     "Myanmar": myanmar_band_detail,
@@ -512,6 +524,9 @@ DETAIL = {
     "Tajikistan": lambda y: _published_detail("tajikistan_detail")(y),
     "Sweden": sweden_band_detail,
     "Guatemala": guatemala_band_detail,
+    "Czechia": czechia_band_detail,
+    "Hungary": hungary_band_detail,
+    "Cuba": lambda y: _published_detail("cuba_detail")(y),
 }
 
 
