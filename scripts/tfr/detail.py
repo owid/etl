@@ -68,8 +68,7 @@ def _fold(wpp, bands):
 
 # ---------------------------------------------------------------- national
 def colombia_detail(year):
-    from build_colombia_tfr import dane_female_pop
-    from plot_colombia import dane_births_by_age
+    from colombia import dane_births_by_age, dane_female_pop
 
     births = dane_births_by_age().get(year)
     if not births:
@@ -207,8 +206,26 @@ def england_wales_detail(year):
     return out or None
 
 
+def philippines_detail(year):
+    import philippines as ph
+
+    births = ph.births_by_age().get(year)
+    pop = ph.female_pop().get(year)
+    if not births or not pop:
+        return None
+    return {b: {"births": v, "women": pop[b]} for b, v in births.items() if b in pop}
+
+
+def france_band_detail(year):
+    from france import france_detail
+
+    return france_detail(year)
+
+
 DETAIL = {
     "Colombia": colombia_detail,
+    "France": france_band_detail,
+    "Philippines": philippines_detail,
     "Brazil": brazil_detail,
     "Mexico": mexico_detail,
     "Thailand": thailand_detail,

@@ -15,7 +15,8 @@
  .key { display:flex; gap:18px; flex-wrap:wrap; align-items:center; font-size:13px; color:var(--mut);
         position:sticky; top:0; z-index:10; background:var(--bg); margin:0 -24px 30px;
         padding:12px 24px; border-bottom:1px solid var(--line); }
- .key i { display:inline-block; width:22px; height:0; border-top:3px solid; vertical-align:middle; margin-right:7px; }
+ .key i { display:inline-block; width:11px; height:11px; border-radius:50%; background:currentColor;
+          vertical-align:middle; margin-right:7px; }
  .k { display:inline-flex; align-items:center; font-size:13px; color:var(--mut); }
  select { font:inherit; font-size:13px; color:var(--fg); background:var(--bg); border:1px solid var(--line);
           border-radius:6px; padding:4px 8px; margin-left:auto; }
@@ -23,8 +24,7 @@
  section[hidden] { display:none; }
  #overview.hide { display:none; }
  .src { color:var(--mut); font-size:13px; margin:0 0 6px; }
- .detail { display:none; margin-top:24px; padding-top:6px; border-top:1px solid var(--line); }
- section.solo .detail { display:block; }
+ .detail { margin-top:24px; padding-top:6px; border-top:1px solid var(--line); }
  .na { color:var(--mut); font-size:13.5px; max-width:70ch; }
  .note { color:var(--mut); font-size:12.5px; margin:10px 0 0; max-width:82ch; }
  svg { width:100%; height:auto; display:block; overflow:visible; }
@@ -65,13 +65,12 @@ ordered by how far above the national figure the UN sits.</p>
   const ov = document.getElementById('overview');
   function apply() {
     const v = sel.value;
+    // all-countries view is the overview dumbbell alone; a country shows only its own charts
     secs.forEach((s) => {
-      const on = !v || s.dataset.country === v;
-      s.hidden = !on;
-      s.classList.toggle('solo', Boolean(v) && on);
+      s.hidden = s.dataset.country !== v;
     });
     if (ov) ov.classList.toggle('hide', Boolean(v));
-    if (v) window.scrollTo({ top: 0 });
+    window.scrollTo({ top: 0 });
   }
   sel.addEventListener('change', apply);
   apply();

@@ -96,8 +96,8 @@ def main():
             f'<p class="note">{NOTES.get(r["country"], "")}</p>{detail_block(r)}</section>'
         )
 
-    legend = (f'<span class="k"><i style="border-color:{COLORS["nso"]}"></i>National statistical office</span>'
-              f'<span class="k"><i style="border-color:{COLORS["UN WPP"]}"></i>UN WPP</span>')
+    legend = (f'<span class="k"><i style="color:{COLORS["nso"]}"></i>National statistical office</span>'
+              f'<span class="k"><i style="color:{COLORS["UN WPP"]}"></i>UN WPP</span>')
 
     html = open(os.path.join(HERE, "template.html")).read()
     for token, value in [

@@ -11,6 +11,7 @@ sys.path.insert(0, HERE)
 warnings.filterwarnings("ignore")
 
 from colombia import dane_female_pop, dane_registered_tfr  # noqa: E402
+from france import france_tfr  # noqa: E402
 from philippines import philippines  # noqa: E402
 from sources import egypt, england_wales, germany, japan, mexico, thailand, united_states  # noqa: E402
 
@@ -35,7 +36,7 @@ def italy():
 
 
 def france():
-    return pd.read_csv(os.path.join(HERE, "data", "france_tfr.csv"))
+    return france_tfr()
 
 
 # display name, short source label, loader, the name UN WPP uses, and the caveat shown
