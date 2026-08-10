@@ -137,8 +137,8 @@ curl -s -X POST "<submitUrl>" -F "file=@$DIR/original.svg;type=image/svg+xml"
 
 Replace the lorem-ipsum text nodes in the cloned template. Source everything from the chart config (Step 1) and the user's answers (Step 2):
 
-- **Title** — suggest a more colloquial rewrite per GUIDELINES.md ("Death rate in the United States", not "Death rate, US"); keep the user's final say. The page name uses this final title.
-- **Subtitle** — the chart's subtitle, trimmed to what's necessary.
+- **Title** — suggest a more colloquial rewrite per GUIDELINES.md ("Death rate in the United States", not "Death rate, US"); keep the user's final say. The page name uses this final title. **Strip the year from the title** — grapher appends it (", 2023") but the templates don't carry it there.
+- **Subtitle** — the chart's subtitle, trimmed to what's necessary. When the chart shows a single year (or a narrow period the reader needs), append **`Data for <YYYY>.`** here — this is where the year lives, not in the title.
 - **Data source:** `Data source: <producer> (<year>)` — matching what grapher's own footer shows.
 - **Note:** only in templates that carry a Note line, and only if the chart has one worth keeping.
 - **`OurWorldinData.org/[Topic]`** → the confirmed topic path (e.g. `OurWorldinData.org/child-mortality`).

@@ -14,6 +14,7 @@ Companion reference for the `create-figma-chart` skill. Distilled from the desig
 
 - Make titles **more colloquial**: "Death rate in the United States", not "Death rate, US".
 - Title states the "so what" (or clearly describes what the chart shows) in **5–12 words**; rewrite it several times; make sure the chart actually shows what the title says.
+- **The year does not go in the title.** Grapher appends it (", 2023"); drop it when transferring the title into the template. If the reader needs it — above all when the chart shows a single year — put it in the **subtitle** as `Data for <YYYY>.`
 - Subtitle short, clear, and necessary — cut whatever the visualization already makes obvious.
 - Mind where a title breaks across lines — the break shouldn't fight the reading flow.
 - Consider replacing "World" with "Global average".
