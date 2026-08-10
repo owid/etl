@@ -63,18 +63,18 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 62,Malawi,22785535,full,yes,no,survey,2018 census ran three corrections and chose the smallest: 4.167 raw to 4.234 Arriaga
 63,Zambia,22521912,full,yes,no,survey,"surveys; census raw 3.35 vs published 4.6 (P/F, +37%), multipliers not published"
 64,Chad,21560385,full,yes,no,survey,three figures only; the 6.4 is dated 2014-15 in one INSEED report and 2019 in another
-65,Kazakhstan,21083624,no,no,,,
+65,Kazakhstan,21083624,full,yes,yes,complete,fully recalculated 2018-2025 from the open API; matches the bureau to 0.01
 66,Somalia,20305912,full,yes,no,survey,2020 survey is the only national figure; the 2026 survey covers five districts
 67,Chile,19945850,full,yes,yes,complete,fully recalculated 1992-2024; registry 1.03 in 2024 vs the old projection's flat 1.58
 68,Senegal,19366551,full,yes,no,survey,"2023 census published all three corrections: raw 3.7, chose Arriaga 4.4; survey says 4.0"
 69,Guatemala,18967983,no,no,,,
 70,Romania,18800600,no,no,,,
 71,Netherlands,18448770,full,yes,yes,complete,fully recalculated 1995-2025 from the CBS API; matches CBS to 3 decimals
-72,Ecuador,18444504,no,no,,,
+72,Ecuador,18444504,full,yes,yes,complete,fully recalculated 2010-2024; INEC states in writing that it adopts a figure above the registry
 73,Cambodia,18051219,no,no,,,
 74,Zimbabwe,17273584,full,yes,no,survey,"2022 census ran Arriaga and Gompertz, found they agreed, and kept the unadjusted 3.7"
 75,Guinea,15441991,no,no,,,
-76,Benin,15170419,no,no,,,
+76,Benin,15170419,full,yes,no,survey,census 4.8 is admitted to be an indirect estimate but no method is named and no raw figure printed
 77,Rwanda,14889701,no,no,,,
 78,Burundi,14729163,no,no,,,
 79,Bolivia,12749296,no,no,,,

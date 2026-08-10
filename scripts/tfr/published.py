@@ -644,3 +644,12 @@ def zimbabwe_detail(year):
     if year != 2022:
         return None
     return {b: {"women": float(w), "births": float(x)} for b, (w, x) in ZIMBABWE_2022.items()}
+
+
+def benin():
+    """INStaD's health-survey rounds.
+
+    The 2017-18 report's trend table carries the earlier ones. The census figures are not in this
+    series — see the note in countries.py.
+    """
+    return _series([(2001, 5.6), (2006, 5.7), (2012, 4.9), (2018, 5.7)])

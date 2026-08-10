@@ -27,6 +27,7 @@ from australia import australia_tfr  # noqa: E402
 from canada import canada_tfr  # noqa: E402
 from chile import chile_tfr  # noqa: E402
 from china import china_tfr  # noqa: E402
+from ecuador import ecuador_tfr  # noqa: E402
 from colombia import dane_female_pop, dane_registered_tfr  # noqa: E402
 from france import france_tfr  # noqa: E402
 from india import india  # noqa: E402
@@ -35,6 +36,7 @@ from sri_lanka import sri_lanka_tfr  # noqa: E402
 from taiwan import taiwan_tfr  # noqa: E402
 from philippines import philippines  # noqa: E402
 from poland import poland_tfr  # noqa: E402
+from kazakhstan import kazakhstan_tfr  # noqa: E402
 from korea import korea_tfr  # noqa: E402
 from malaysia import malaysia_tfr  # noqa: E402
 from myanmar import myanmar_tfr  # noqa: E402
@@ -44,6 +46,7 @@ from published import (  # noqa: E402
     algeria,
     angola,
     bangladesh,
+    benin,
     burkina_faso,
     cameroon,
     chad,
@@ -1208,6 +1211,54 @@ COUNTRIES = [
       "longer on ZIMSTAT's site and is not in any web archive, so its 3.8 survives only as a citation "
       "inside the 2022 report.",
       "https://www.zimstat.co.zw/wp-content/uploads/Census/Fertility_Report.pdf"),
+    C("Ecuador", "INEC — registered births over its population estimates", ecuador_tfr, "Ecuador",
+      "complete", True,
+      "One sheet of INEC's vital-statistics series carries both sides from 2010: births in each "
+      "five-year age band of the mother, and the projected women in that band. INEC publishes the "
+      "age-specific rates from exactly those two columns, but never their sum.",
+      "We divided births by women in each band and summed. There is no published total to check "
+      "against — INEC's own bulletin headlines a crude birth rate and adolescent rates, not a fertility "
+      "rate at all — but our figures reproduce its printed age-specific rates exactly.",
+      "Ecuador is the sixth Latin American country where the registry sits well below the headline, and "
+      "the only one where the office says why in writing. Its projection methodology lists four estimates "
+      "for 2022 — 2.12 from a P/F ratio, 1.76 from reverse survival, 1.77 from Arriaga, 1.80 from vital "
+      "registration — and adopts 1.86, on the stated grounds that it should sit above the registered "
+      "births because those always carry some under-registration. So the gap is deliberate, not an "
+      "oversight. Its projection assumes 1.82 for 2023 against a counted 1.61, and the 2018 health survey "
+      "gave 2.19. Recent years are incomplete by design: a year is provisional until the following March "
+      "and semi-definitive for three more, so 2024's 1.44 will rise as late registrations arrive.",
+      "https://www.ecuadorencifras.gob.ec/nacidos-vivos-y-defunciones-fetales/"),
+    C("Kazakhstan", "Bureau of National Statistics — births by age of mother over its population",
+      kazakhstan_tfr, "Kazakhstan", "complete", True,
+      "The bureau's database serves births by age of mother, mean annual population by sex and age, and "
+      "its own rate — all to a plain request with no key.",
+      "We divided births by women in each band and summed. Our figures match the bureau's published rate "
+      "to within 0.01 in every year both exist: 2.957 against 2.96 for 2023, 2.798 against 2.80 for 2024.",
+      "Kazakhstan is the second country here whose fertility rose sharply and is now falling back, and "
+      "like Uzbekistan the rise is in its own counted births, not an artefact. The rate went from 2.84 in "
+      "2018 to 3.32 in 2021, then down to 2.57 by 2025 — a fall of 0.75 in four years. Two things bound "
+      "what we can say. Births are counted by registration date, and the bureau states outright that a "
+      "birth registered this year counts this year even if it happened earlier, so the series is not on an "
+      "occurrence basis. And the five-year age classifier was revised in 2025, which is why the mean "
+      "annual population only reaches back to 2018 under the current codes; the bureau's own metadata "
+      "claims history from 1999, but those years sit under superseded identifiers we could not find.",
+      "https://stat.gov.kz/ru/industries/social-statistics/demography/"),
+    C("Benin", "INStaD — Demographic and Health Survey rounds", benin, "Benin", "survey", False,
+      "The 2017-18 survey's trend table carries the rounds back to 1996. The 2013 census publishes a "
+      "single national figure of 4.8 and nothing behind it.",
+      "We read the survey series. Nothing can be recomputed: neither births by age of mother nor women "
+      "by age group is published for the 2013 census, in any form.",
+      "Benin is the case where an office admits to correcting its census figure but never says how. Its "
+      "own dissemination volume states that the fertility, nuptiality and mortality indicators were "
+      "produced by indirect estimation, by a team of demographers with an international expert — so 4.8 is "
+      "a model output, not a count. But no method is named anywhere, and no raw figure is printed beside "
+      "it, so unlike Mali, Senegal or Malawi there is nothing to compare. The two instruments also "
+      "disagree about direction: the censuses fall steadily, 6.1 in 1992 to 5.5 in 2002 to 4.8 in 2013, "
+      "while the surveys are flat or rising since 2012 — 4.9 in the 2011-12 round against 5.7 in 2014 and "
+      "5.7 again in 2017-18. The volumes advertised as six thematic census reports are the same twenty-page "
+      "scanned brochure under two paths, with no statistical annex. Birth registration is high, at 86% of "
+      "under-fives, but is not used for any fertility figure.",
+      "https://instad.bj/"),
 ]
 
 PANELS = [(c["name"], c["src"], c["loader"], c["wpp_name"]) for c in COUNTRIES if c["loader"]]

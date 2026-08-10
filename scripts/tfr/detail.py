@@ -429,6 +429,18 @@ def zimbabwe_band_detail(year):
     return zimbabwe_detail(year)
 
 
+def ecuador_band_detail(year):
+    from ecuador import ecuador_detail
+
+    return ecuador_detail(year)
+
+
+def kazakhstan_band_detail(year):
+    from kazakhstan import kazakhstan_detail
+
+    return kazakhstan_detail(year)
+
+
 DETAIL = {
     "Colombia": colombia_detail,
     "Myanmar": myanmar_band_detail,
@@ -459,6 +471,8 @@ DETAIL = {
     "Chile": chile_band_detail,
     "Netherlands": netherlands_band_detail,
     "Zimbabwe": zimbabwe_band_detail,
+    "Ecuador": ecuador_band_detail,
+    "Kazakhstan": kazakhstan_band_detail,
 }
 
 
