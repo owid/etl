@@ -11,6 +11,7 @@ sys.path.insert(0, HERE)
 warnings.filterwarnings("ignore")
 
 from colombia import dane_female_pop, dane_registered_tfr  # noqa: E402
+from philippines import philippines  # noqa: E402
 from sources import egypt, england_wales, germany, japan, mexico, thailand, united_states  # noqa: E402
 
 START = 2000
@@ -121,6 +122,16 @@ COUNTRIES = [
         "Egypt",
         "CAPMAS's own age-specific fertility rates. One bulletin per year, so the series only covers "
         "the editions to hand.",
+    ),
+    (
+        "Philippines",
+        "PSA — OpenSTAT registered live births",
+        philippines,
+        "Philippines",
+        "Registered births by age group of mother over PSA's 2020-census-based female population "
+        "projection. Coverage is around 90% and births are tabulated by year of registration, so "
+        "this understates the true rate — PSA's own published figure comes from the NDHS survey. "
+        "OpenSTAT publishes one table per year, hence the short series.",
     ),
     (
         "Mexico",
