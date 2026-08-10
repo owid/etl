@@ -28,6 +28,7 @@ from china import china_tfr  # noqa: E402
 from colombia import dane_female_pop, dane_registered_tfr  # noqa: E402
 from france import france_tfr  # noqa: E402
 from india import india  # noqa: E402
+from peru import peru_tfr  # noqa: E402
 from philippines import philippines  # noqa: E402
 from poland import poland_tfr  # noqa: E402
 from korea import korea_tfr  # noqa: E402
@@ -291,6 +292,25 @@ COUNTRIES = [
       "it. Nothing is flagged provisional, even 2025. One trap: the summary table in the printed yearbook "
       "reports births in thousands while the API returns raw counts.",
       "https://bdl.stat.gov.pl/"),
+    C("Peru", "INEI — registered births over its population estimates", peru_tfr, "Peru", "complete",
+      True,
+      "INEI publishes registered births by age group of mother as spreadsheets, and female population by "
+      "age group. It also publishes two fertility rates of its own, neither of them from the registry: 1.8 "
+      "for 2023 from its continuous household survey, and 2.2 as the assumption inside its population "
+      "projection for 2020-25.",
+      "We divided the births by the female population in each age group and summed, giving 1.84 for 2022, "
+      "1.69 for 2023 and 1.51 for 2024.",
+      "Peru follows the Colombia and Mexico pattern: the registry shows a much steeper fall than the "
+      "official figure. Our 1.69 for 2023 sits 0.5 below the projection assumption, which is a 2019 vintage "
+      "predating both the pandemic and the decline since. INEI\'s own text already expects a real fall, "
+      "attributing it to women postponing or forgoing motherhood rather than to a data problem. Births are "
+      "counted by the year they were registered, not the year they occurred, though Peru\'s deadline is 60 "
+      "to 90 days so the two are close. Coverage is high and INEI states it: 97 to 99% of registrations come "
+      "through the electronic birth certificate, and late registration was under 3% in 2023 — but it rose "
+      "again in 2024, so that year is the least final. The 2020 collapse in registrations was lockdown "
+      "closing registry offices, which INEI says outright, so it is not a fertility signal; our series "
+      "starts after it. Each annual annex sits at its own unrelated file id, with no pattern to follow.",
+      "https://www.gob.pe/institucion/inei/informes-publicaciones"),
     C("Philippines", "PSA — OpenSTAT registered live births", philippines, "Philippines", "incomplete", True,
       "PSA's OpenSTAT database gives registered live births by age group of mother, one table per year, "
       "and a projected population by five-year age group and sex.",
