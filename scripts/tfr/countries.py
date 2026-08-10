@@ -30,6 +30,8 @@ from colombia import dane_female_pop, dane_registered_tfr  # noqa: E402
 from france import france_tfr  # noqa: E402
 from india import india  # noqa: E402
 from peru import peru_tfr  # noqa: E402
+from sri_lanka import sri_lanka_tfr  # noqa: E402
+from taiwan import taiwan_tfr  # noqa: E402
 from philippines import philippines  # noqa: E402
 from poland import poland_tfr  # noqa: E402
 from korea import korea_tfr  # noqa: E402
@@ -42,6 +44,7 @@ from published import (  # noqa: E402
     bangladesh,
     burkina_faso,
     cameroon,
+    chad,
     cote_divoire,
     drc,
     ethiopia,
@@ -50,6 +53,7 @@ from published import (  # noqa: E402
     iraq,
     kenya,
     madagascar,
+    malawi,
     mali,
     morocco,
     mozambique,
@@ -60,6 +64,8 @@ from published import (  # noqa: E402
     pakistan,
     russia,
     saudi_arabia,
+    senegal,
+    somalia,
     sudan,
     syria,
     tanzania,
@@ -1054,6 +1060,100 @@ COUNTRIES = [
       "kind of table. Nothing more recent is published — a 2024 census has been run but its fertility "
       "results are not out.",
       "https://www.dop.gov.mm/sites/dop.gov.mm/files/publication_docs/ics_appendixtables_en.pdf"),
+    C("Sri Lanka", "DCS — registered births over the mid-year population", sri_lanka_tfr,
+      "Sri Lanka", "complete", True,
+      "The Department of Census and Statistics stopped publishing a fertility rate of its own after 2000, "
+      "but keeps publishing both ingredients: registered live births by age of mother, and mid-year "
+      "population by age group and sex. The 2024 census separately reports 1.3.",
+      "We divided the births in each age band by the women in it and summed. The same procedure on the "
+      "department's own 2000 data reproduces the 1.9 it published then, which is what tells us the method "
+      "is the one it used.",
+      "Two things to know. First, the series stops at 2021 — not because registration stopped, but because "
+      "the detailed births-by-age tables did. Headline birth totals kept being published through 2025, and "
+      "they fall steeply: 319,108 in 2019 to 214,570 in 2025. The age breakdown needed for a rate exists "
+      "for none of those years, and 2022 appears on the department's site only as a dead link reusing "
+      "2021's files. Second, the 2024 census reports 1.3, far below the 1.64 we get for 2021, but it is a "
+      "different measure: it asks ever-married women about their birth histories rather than counting a "
+      "year's registrations. Neither number is the other's update. The population is published rounded to "
+      "thousands, and its age structure is rolled forward from the 2012 census, not the 2024 one.",
+      "https://www.statistics.gov.lk/Population/StaticalInformation/VitalStatistics/Fertility"),
+    C("Taiwan", "Ministry of the Interior — births by age of mother over the household register",
+      taiwan_tfr, "Taiwan", "complete", True,
+      "The interior ministry publishes births by the mother's age group, population by single year of age "
+      "and sex, and its own fertility rate — all from the household register, all back to at least 2000.",
+      "We divided the births in each age band by the women in it and summed. Our 0.888 for 2024 is the "
+      "ministry's published 0.885, and 0.868 against its 0.865 for 2023.",
+      "Taiwan has the lowest rate in this collection: 0.71 for 2025 on our arithmetic, against 1.66 in "
+      "2000. Zodiac years move it visibly — 2022 was a Tiger year and the rate fell to 0.88, 2024 was a "
+      "Dragon year and it rose to 0.89, the only rise in a decade, before falling 20% in 2025. Two "
+      "definitions matter. Births are counted by the date they happened, which is why the age breakdown is "
+      "only released once a year; 2025 is still filling in, and its occurrence-year total is 2% below the "
+      "registration-year total for the same months. And the population is the year-end household register, "
+      "not a mid-year estimate and not the de facto resident population that the budget agency publishes "
+      "separately. None of this is reachable from the ministry's own portal pages, which are navigation "
+      "shells; the query service behind them answers plain requests but has to be addressed directly.",
+      "https://www.moi.gov.tw/cl.aspx?n=4404"),
+    C("Senegal", "ANSD — continuous Demographic and Health Survey", senegal, "Senegal", "survey", False,
+      "ANSD runs its health and demographic survey every year, and the 2023 census report prints the whole "
+      "series from 1978 in one trend table. The census publishes its own figure separately, along with the "
+      "births and women behind it.",
+      "We read the survey series. We also divided the 2023 census's own counts — 487,108 births to women "
+      "15-49 over 4,499,636 women — and got 3.69, which is the raw figure ANSD itself prints.",
+      "The census is the clearest worked example of an adjustment we have found. ANSD ran three methods on "
+      "the same data, published all three, and said which it chose and why: the P/F ratio gave 4.54, a "
+      "Gompertz model 4.35, and Arriaga 4.41. It picked Arriaga because that method allows fertility to "
+      "have changed between two censuses rather than assuming it constant, and noted that 4.4 sits close to "
+      "the survey's 4.0 for the same year. So the published census figure is 4.4 against a counted 3.7. "
+      "Its own 2013 census ran the same check and found almost no correction was needed, which is worth "
+      "knowing before assuming these adjustments are routine. ANSD's projections document states 4.2 for "
+      "2023 rather than 4.4, and we cannot tell which is the slip. Civil registration is not used for any "
+      "of this: two thirds of people hold a birth certificate, and ANSD says outright that the registration "
+      "system needs strengthening.",
+      "https://www.ansd.sn/"),
+    C("Malawi", "NSO — census and Demographic and Health Survey rounds", malawi, "Malawi", "survey",
+      False,
+      "The 2018 census has a dedicated fertility report, and the 2024 health survey charts every round "
+      "since 1992. The census also publishes its fertility tables as a spreadsheet — women and births by "
+      "age group, which almost no other census in this collection does.",
+      "We read the published rates. We also divided the census's own counts — 576,525 births over 4,267,788 "
+      "women 15-49 — and got 4.166, matching the 4.167 the report prints as its unadjusted figure.",
+      "Malawi is the most legible case of an office deciding how much to correct. It ran three indirect "
+      "methods on the 2018 census and published all of them: the P/F ratio gave 4.9 to 5.1, a Gompertz "
+      "model 4.9 to 5.4, and Arriaga 4.23. It chose Arriaga and said why — that the other methods assume "
+      "fertility is not changing, and Malawi's is falling. So the correction it applied was about 3%, "
+      "against the near-doubling Mali applied to its own census. Fertility is measured from census and "
+      "survey questions, not registration, though registration itself has risen from 67% of under-fives in "
+      "2015 to 78% in 2024. The office's website serves no data at all to a plain request; everything is "
+      "behind an undocumented interface that its own pages call from the browser.",
+      "https://www.nsomalawi.mw/"),
+    C("Somalia", "SNBS — Somali Health and Demographic Survey 2020", somalia, "Somalia", "survey", False,
+      "The 2020 survey is the only national fertility figure Somalia has. It gives 6.9, with age-specific "
+      "rates and the number of women in each age group.",
+      "We read the published figure, and checked that its own age-specific rates sum to it: 6.885 against "
+      "the printed 6.9.",
+      "Two documents look like they should count and do not. A 2026 survey run by the same office reports "
+      "5.7, but its own foreword says it covers five districts and is a step toward national coverage, so "
+      "that is not a national figure. And the 2013 population estimation survey, the one that gave Somalia "
+      "its population count, is copyrighted and published by a UN agency rather than by the statistics "
+      "office — and in any case contains no fertility rate at all. So the 2020 survey stands alone. There "
+      "is no census: the last one was in 1975. Birth registration is between 3.5% and 5.9%, depending on "
+      "which part of the same report you read.",
+      "https://nbs.gov.so/"),
+    C("Chad", "INSEED — survey and census rounds", chad, "Chad", "survey", False,
+      "Three figures exist: 7.1 from the 2009 census, 6.9 from the 2010 multiple-indicator survey, and 6.4 "
+      "from the health survey. Nothing annual, and no age-specific rates at all.",
+      "We read the published figures. There is nothing to recompute: no document INSEED hosts publishes "
+      "births by age of mother, as counts or as rates.",
+      "Chad's own publications disagree about their own data. The 6.4 figure is attributed to the 2014-15 "
+      "health survey in one INSEED report and to the 2019 survey in another; we place it at 2015, the "
+      "fieldwork years. Neither of those survey reports is on INSEED's site, and neither is the 2009 "
+      "census's fertility volume — it is cited by title and page count in another report's bibliography but "
+      "was never digitised, so how the 7.1 was computed cannot be checked. Birth registration was 16% in "
+      "2010, up from 9% in 2004, and only a quarter of those could show a certificate. The 2009 census was "
+      "Chad's most recent for seventeen years; fieldwork for the next one finished in August 2026 and "
+      "results are promised progressively. INSEED's website serves nothing to a plain request — the files "
+      "sit on a separate host that its own pages call from the browser.",
+      "https://inseed.ssn-tchad.td/"),
 ]
 
 PANELS = [(c["name"], c["src"], c["loader"], c["wpp_name"]) for c in COUNTRIES if c["loader"]]

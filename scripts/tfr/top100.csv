@@ -58,15 +58,15 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 57,Syria,26472496,full,yes,no,survey,surveys 2001/2009 only; site lapsed to a UA-cloaking parking service after mid-2025
 58,Mali,25932277,full,yes,no,survey,surveys; census applied a Brass correction that nearly doubled its raw birth count
 59,Burkina Faso,24601699,full,yes,no,survey,"census 5.4 (2019) vs survey 4.4 (2021); Arriaga adjustment went down, not up"
-60,Sri Lanka,23348314,no,no,,,
-61,Taiwan,23011292,no,no,,,
-62,Malawi,22785535,no,no,,,
+60,Sri Lanka,23348314,full,yes,yes,complete,recalculated 2014-2021 from registered births; DCS stopped publishing a rate after 2000
+61,Taiwan,23011292,full,yes,yes,complete,fully recalculated 2000-2025 from the household register; matches the ministry to 0.3%
+62,Malawi,22785535,full,yes,no,survey,2018 census ran three corrections and chose the smallest: 4.167 raw to 4.234 Arriaga
 63,Zambia,22521912,full,yes,no,survey,"surveys; census raw 3.35 vs published 4.6 (P/F, +37%), multipliers not published"
-64,Chad,21560385,no,no,,,
+64,Chad,21560385,full,yes,no,survey,three figures only; the 6.4 is dated 2014-15 in one INSEED report and 2019 in another
 65,Kazakhstan,21083624,no,no,,,
-66,Somalia,20305912,no,no,,,
+66,Somalia,20305912,full,yes,no,survey,2020 survey is the only national figure; the 2026 survey covers five districts
 67,Chile,19945850,no,no,,,
-68,Senegal,19366551,no,no,,,
+68,Senegal,19366551,full,yes,no,survey,"2023 census published all three corrections: raw 3.7, chose Arriaga 4.4; survey says 4.0"
 69,Guatemala,18967983,no,no,,,
 70,Romania,18800600,no,no,,,
 71,Netherlands,18448770,no,no,,,

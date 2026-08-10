@@ -580,3 +580,40 @@ def turkey():
         if pd.notna(y) and pd.notna(v):
             rows.append((int(y), float(v)))
     return _series(sorted(rows))
+
+
+def malawi():
+    """NSO census and health-survey rounds.
+
+    The 2018 census's fertility report charts the whole series back to 1998, and the 2024 survey
+    charts the survey rounds. Both are census or survey measurements; the MICS rounds sit slightly
+    above them and are left out so the series stays on one pair of instruments.
+    """
+    return _series([(2000, 6.3), (2004, 6.0), (2008, 6.0), (2010, 5.7),
+                    (2015, 4.4), (2018, 4.2), (2024, 3.7)])
+
+
+def chad():
+    """INSEED survey and census rounds.
+
+    Chad has no annual figure at all. 2009 is the census, quoted in the 2024 statistical yearbook;
+    2010 is the multiple-indicator survey; 6.4 is the health survey — which two INSEED publications
+    date differently, one to 2014-15 and one to 2019. We place it at 2015, the fieldwork years the
+    survey report itself carries.
+    """
+    return _series([(2009, 7.1), (2010, 6.9), (2015, 6.4)])
+
+
+def somalia():
+    """SNBS, Somali Health and Demographic Survey 2020, table 4.4."""
+    return _series([(2020, 6.9)])
+
+
+def senegal():
+    """ANSD's continuous health and demographic survey.
+
+    The survey runs every year, and the 2023 census report prints the whole series in one trend
+    table. The census's own figures are not in this series — see the note in countries.py.
+    """
+    return _series([(2005, 5.3), (2010, 5.0), (2012, 5.3), (2014, 5.0), (2015, 4.9), (2016, 4.7),
+                    (2017, 4.6), (2018, 4.4), (2019, 4.7), (2023, 4.0)])

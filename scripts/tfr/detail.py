@@ -399,6 +399,18 @@ def myanmar_band_detail(year):
     return myanmar_detail(year)
 
 
+def sri_lanka_band_detail(year):
+    from sri_lanka import sri_lanka_detail
+
+    return sri_lanka_detail(year)
+
+
+def taiwan_band_detail(year):
+    from taiwan import taiwan_detail
+
+    return taiwan_detail(year)
+
+
 DETAIL = {
     "Colombia": colombia_detail,
     "Myanmar": myanmar_band_detail,
@@ -424,6 +436,8 @@ DETAIL = {
     "Thailand": thailand_detail,
     "Egypt": egypt_detail,
     "England and Wales": england_wales_detail,
+    "Sri Lanka": sri_lanka_band_detail,
+    "Taiwan": taiwan_band_detail,
 }
 
 
