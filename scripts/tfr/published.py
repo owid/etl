@@ -525,6 +525,11 @@ def north_korea():
     return _series([(2008, 2.01), (2014, 1.89)])
 
 
+def burkina_faso():
+    """INSD survey rounds. The 2021 report's trend table carries the earlier ones."""
+    return _series([(2003, 5.9), (2010, 6.0), (2021, 4.4)])
+
+
 def kenya():
     """KNBS, 2019 census analytical report on fertility and nuptiality, volume VI, table 4.5.
 

@@ -57,7 +57,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 56,North Korea,26633693,full,yes,no,survey,"CBS-authored census/survey, UN-hosted only; 2018 census cancelled"
 57,Syria,26472496,no,no,,,
 58,Mali,25932277,full,yes,no,survey,surveys; census applied a Brass correction that nearly doubled its raw birth count
-59,Burkina Faso,24601699,no,no,,,
+59,Burkina Faso,24601699,full,yes,no,survey,"census 5.4 (2019) vs survey 4.4 (2021); Arriaga adjustment went down, not up"
 60,Sri Lanka,23348314,no,no,,,
 61,Taiwan,23011292,no,no,,,
 62,Malawi,22785535,no,no,,,

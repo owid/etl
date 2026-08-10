@@ -40,6 +40,7 @@ from published import (  # noqa: E402
     algeria,
     angola,
     bangladesh,
+    burkina_faso,
     cameroon,
     cote_divoire,
     drc,
@@ -804,6 +805,23 @@ COUNTRIES = [
       "statistics report says the system\'s coverage problems mean it uses the survey instead, and puts "
       "birth registration completeness at 54%, ranging from 92% in one region to 35% in another.",
       "https://ins-cameroun.cm/"),
+    C("Burkina Faso", "INSD — Enquête Démographique et de Santé", burkina_faso, "Burkina Faso", "survey",
+      False,
+      "INSD publishes a fertility rate from each survey round — 5.9 for 2003, 6.0 for 2010 and 4.4 for 2021 "
+      "— and separately from each census, giving 5.4 for 2019 with the births and women behind it as counts.",
+      "We read the survey rounds. Summing the census's own published rates reproduces its 5.4.",
+      "The two instruments are a full child apart two years apart: the 2019 census says 5.4 and the 2021 "
+      "survey says 4.4. Nothing in either report reconciles them, and we do not know which is closer to the "
+      "truth, so the survey series is used because it is the more recent and the more consistent run. Burkina "
+      "Faso is also the one country here whose correction went down rather than up. INSD found an implausible "
+      "spike in fertility at ages 45-49 in its raw census data, tested the Brass method (which gave 5.8) and "
+      "then adopted Arriaga instead, which nudged the national figure from 5.5 to 5.4 while cutting the urban "
+      "figure from 4.5 to 4.1. Civil registration is not used; the 2021 survey found 85% of under-fives "
+      "registered and 73% holding a certificate, and INSD\'s own civil-registration statistics page is a chart "
+      "template filled with randomly generated placeholder data. One census volume has an embedded font that "
+      "silently defeats text extraction across some two hundred pages, so its fertility chapter needs "
+      "character recognition rather than a text layer.",
+      "https://www.insd.bf/"),
     C("Canada", "Statistics Canada — births by age of mother over its population estimates", canada_tfr,
       "Canada", "complete", True,
       "Statistics Canada publishes registered live births by age group of mother, female population by "
