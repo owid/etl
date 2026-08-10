@@ -62,6 +62,7 @@ Companion reference for the `create-figma-chart` skill. Distilled from the desig
 ## Direct labelling (the default improvement to propose)
 
 - **Kill the legend when labels can live in the chart** — legends force the reader's eyes to ping-pong. Line charts: entity label at the end of its line, colored like the line, without the elbow/leader connectors grapher draws; reclaim the freed margin for the chart area.
+- **"When labels can live in the chart" is a real test, not a formality.** Each label has to sit on the mark it names — over its segment of the top bar, or inside the widest segment of its series. That holds for about three or four categories; past that they collide, and a color-coded row spread evenly across the plot is a legend with the swatches removed, which is worse than the legend. Keep grapher's legend in that case and tidy it instead.
 - Bars/areas: label inside the chart element when contrast allows — white text on dark fills, **≥12px**.
 - If a legend must stay: **squares**, not circles or rectangles; consider moving it into empty chart space (stacked bars often have some) rather than under the subtitle.
 

@@ -149,7 +149,17 @@ curl -s -X POST "<submitUrl>" -F "file=@$DIR/original.svg;type=image/svg+xml"
 
 4. **Lay out the page**: the original chart on the left; the adapted template **to its right** (~100 px gap). If several formats were requested, keep one original and line the templates up to its right. Move imported nodes with `use_figma` (`page.appendChild(node)`, set `node.x/node.y`). This page-level parenting is for the **original** reference chart only — the embed gets reparented into the template clone in Step 7.
 
-> **Imported SVGs arrive at their natural size** (850×600 / 540×540). Scale with `node.rescale(target / node.width)` — `frame.resize()` does **not** scale children, it crops.
+> **Imported SVGs arrive at their natural size** (850×600 / 540×540). Scale with `node.rescale(factor)` — never `resize()`, see Step 7.
+
+**Bin the import frame.** `upload_assets` wraps the SVG in a FRAME that OWID's charts don't have and that causes two failures of its own: it carries a **white fill** that paints over the footer as soon as the frame overhangs, and `resize()` on it *stretches its children through their constraints* — which silently rewraps every text box in the chart, because grapher's exported labels are sized to their glyphs with no slack ("Brazil" becomes "Bra zil"). Move the frame's children into the template clone and delete the frame; a plain group is what the finished pages use:
+
+```js
+const kids = [...embed.children];
+for (const k of kids) templateClone.appendChild(k);
+embed.remove();
+const chart = kids.length === 1 ? kids[0] : figma.group(kids, templateClone);
+chart.name = "chart";
+```
 
 ## Step 6 — Fill the template texts
 
@@ -157,7 +167,17 @@ Replace the lorem-ipsum text nodes in the cloned template. Source everything fro
 
 - **Title** — for a DI or Instagram image, start from the DI title collected in Step 2, not grapher's; otherwise suggest a more colloquial rewrite per GUIDELINES.md ("Death rate in the United States", not "Death rate, US"). Keep the user's final say. The page name uses this final title. Two or three lines is normal; check the line breaks and the year and highlight-color rules in GUIDELINES.md → Titles.
 - **Subtitle** — the chart's subtitle, trimmed to what's necessary. When the chart shows a single year (or a narrow period the reader needs), append **`Data for <YYYY>.`** here.
-- **Data source:** `Data source: ` + `chart.citation` from Step 1 — that field *is* grapher's own footer line, so don't re-derive a `<producer> (<year>)` string by hand, and don't abbreviate it to save space. A long producer name overruns the CC BY text at x=468; the fix is to wrap it, not to shorten it — set the node to `textAutoResize = "HEIGHT"` and resize it to a width that breaks after the organization's name (300 works for the FAO string), then grow the footer **upward** so its bottom stays at y=524 (`footer.resize(508, source.height); footer.y = 524 - footer.height`), set both the source and CC BY to `y = 0` so CC BY top-aligns with the first line, and re-fit the chart into the reduced space.
+- **Data source:** `Data source: ` + `chart.citation` from Step 1 — that field *is* grapher's own footer line, so don't re-derive a `<producer> (<year>)` string by hand, and don't abbreviate it to save space. A long producer name overruns the CC BY text at x=468. **Give the source its own full line and move CC BY to the row beneath it** — the source stays one unbroken line, which reads better than a wrap, and the template's own two-row footers (the Instagram ones) already use exactly this geometry:
+
+  ```js
+  source.textAutoResize = "WIDTH_AND_HEIGHT";   // one line, its natural width
+  source.x = 0; source.y = 0;
+  ccby.x = 468; ccby.y = 20;                    // the template's row pitch
+  footer.resize(508, 36);
+  footer.y = 524 - footer.height;               // grow upward; bottom margin stays 16px
+  ```
+
+  Then re-fit the chart into what's left (Step 7). Only if the source is too long even for a full line — beyond ~508px — wrap it with `textAutoResize = "HEIGHT"` at a width that breaks after the organization's name, and top-align CC BY with its first line.
 - **Note:** only in templates that carry a Note line, and only if the chart has one worth keeping. **DI images normally carry no note at all** — drop it, or, when it's genuinely load-bearing for understanding the chart, fold it into the subtitle as a bolded second line (only if the subtitle isn't already crowded).
 - **`OurWorldinData.org/[Topic]`** → the confirmed topic path (e.g. `OurWorldinData.org/child-mortality`).
 - **CC BY** stays; static desktop templates also carry `Licensed under CC-BY by the author <Author>`.
@@ -185,14 +205,27 @@ The embed spans the full content width, left-aligned with the title/subtitle/log
 
 Verify against the actual clone with `get_metadata` (the templates evolve; the geometry above is a 2026 snapshot). These are **frame-local** coordinates, and `x`/`y` are relative to a node's parent — so append the embed to the template clone **before** positioning it. Left parented to the page (where Step 5 puts imported nodes), the same numbers land it near the page origin, on top of the reference chart:
 
+**Match the header box exactly — same left edge and same width.** A chart even a few pixels narrower than the title reads as a mistake. Scale off the header rather than off a constant, and do it *after* the frame is gone, so the group's bounding box is the plot's real extent and no export padding is baked into the width:
+
 ```js
-templateClone.appendChild(embed)             // first — x/y are parent-relative
-embed.rescale(508 / embed.width)             // or 818 on the 850-wide templates
-embed.x = 16                                 // content x, now inside the clone
-embed.y = top + (space - embed.height) / 2   // centered between header and footer
+const header = clone.children.find(c => c.name === "Frame 14")   // title + subtitle + logo
+chart.rescale(header.width / chart.width)                        // never resize()
+chart.x = header.x                                               // same left edge
+chart.y = top + (bottom - top - chart.height) / 2                // centred between header and footer
 ```
 
-If the rescaled chart overflows the vertical space, re-export the embed at a flatter aspect ratio rather than squashing — **never stretch one axis** (it distorts dots, arrowheads, and text).
+`rescale()` on the group is safe; `resize()` on a frame is not (see Step 5). If the scaled chart overflows the vertical space, re-export at a flatter aspect ratio rather than squashing — **never stretch one axis** (it distorts dots, arrowheads, and text).
+
+**After any scaling, let every text box re-hug its content.** Grapher's exported labels have no slack, so the smallest rounding makes them wrap. Sweep the chart once, preserving each label's anchor — the axis values are centred and the country names right-aligned, so keeping `x` alone would shift them:
+
+```js
+for (const t of chart.query('TEXT')) {
+  const a = { x: t.x, w: t.width, align: t.textAlignHorizontal }
+  t.textAutoResize = "WIDTH_AND_HEIGHT"                          // fonts loaded first
+  if (a.align === "CENTER") t.x = a.x + (a.w - t.width) / 2
+  else if (a.align === "RIGHT") t.x = a.x + a.w - t.width
+}
+```
 
 ## Step 8 — Improve the labelling and annotate
 
@@ -202,7 +235,9 @@ The high-value edits to propose (include them in the Step 4 proposal):
 
 - **Direct labels instead of legends and elbows.** Line charts: put the entity label at the end of its line, colored like the line, and delete the elbow/leader connectors; reclaim the freed right margin for the chart. Area/bar charts: label the series inside the chart area (white ≥12px text on dark fills) and delete the separate legend.
 
-  On a **stacked** chart the reliable recipe is: for each category, find the row where its segment is widest, **clone that segment's existing value label** (the clone inherits the right font, size and — importantly — the black-on-light vs white-on-dark fill grapher already chose), set its characters to the category name, then centre the `[name, 4px, value]` pair on the segment. Categories too thin to hold their name anywhere — 13% of one bar is about the floor — keep a single legend entry; lift its swatch and text out of `categorical-color-legend` before deleting the group, and pull the plot up into the row you freed. Five in-chart labels plus one leftover legend entry is a good outcome, not a failure.
+  **This is not a free win on a stacked chart — check that it beats the legend before proposing it.** Direct labelling works when every label can sit *on the mark it names*: over its own segment of the top bar (the pattern in [this DI](https://ourworldindata.org/data-insights/most-collected-waste-in-many-low--and-middle-income-countries-is-stored-in-open-dumps-or-is-burned), where colored category labels sit above the first row and the widest series is labelled in white inside the bar), or inside the widest segment of each category. Both need the segments to be wide enough, which in practice caps it at **three or four categories**. Beyond that the labels collide over the top bar, and spreading them evenly across the plot instead just yields a color-coded legend that is *harder* to read than the real one — the reader has lost the swatch and gained nothing. Six categories is past the line. When it doesn't fit, keep grapher's legend and say why; a conventional legend is not a failure to improve the chart.
+
+  When it *does* fit, the reliable recipe is: for each category, find the row where its segment is widest, **clone that segment's existing value label** (the clone inherits the right font, size and — importantly — the black-on-light vs white-on-dark fill grapher already chose), set its characters to the category name, then centre the `[name, 4px, value]` pair on the segment. To rebuild a legend you removed too eagerly: recolor the labels to `Text/Gray 80` #5B5B5B, add a 10×10 swatch in each category's own color 4px to their left, and lay them out in grapher's own split — as many as fit on the first row, the longest alone on the second.
 - **Annotations replicating the accompanying text** (12–16px; 10–14px on maps): text color = the annotated object's color, `Text/Gray 80` #5B5B5B, or a mix; bold the key phrase; 2–3px **white outside stroke** instead of a background rectangle.
 - **Arrows**: copy curvy arrows from node `798:773` — 1px stroke, arrowhead and line the same color as each other and consistent across the chart. Never scale a whole arrow (it distorts the head): Shift-resize the line segment only, then reposition the head. If a curvy arrow gets messy, use a straight thin line. **Maps: never curvy — straight 1px lines or values inside country shapes.**
 - **10×10 px dots** marking highlighted years, with the values written out for the first, last, and any mentioned data point (white-outlined dots on stacked areas; no outline elsewhere).
