@@ -1,2 +1,4 @@
 data/
+cache/
 *.html
+!template.html

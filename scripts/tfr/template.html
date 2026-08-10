@@ -1,0 +1,83 @@
+<title>National vital statistics vs modelled fertility estimates</title>
+<style>
+ :root { --bg:#fff; --fg:#1d1d1b; --mut:#6b6b6b; --line:#e9e9e9; --nso:#c94a3b; --wpp:#3b82c4; }
+ @media (prefers-color-scheme: dark) {
+   :root { --bg:#14161a; --fg:#e9e9e7; --mut:#9a9a97; --line:#2b2e34; --nso:#e8705f; --wpp:#6aa6de; } }
+ :root[data-theme="dark"] { --bg:#14161a; --fg:#e9e9e7; --mut:#9a9a97; --line:#2b2e34; --nso:#e8705f; --wpp:#6aa6de; }
+ :root[data-theme="light"] { --bg:#fff; --fg:#1d1d1b; --mut:#6b6b6b; --line:#e9e9e9; --nso:#c94a3b; --wpp:#3b82c4; }
+ body { background:var(--bg); color:var(--fg); margin:0; padding:34px 24px 76px;
+        font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+ .wrap { max-width:1000px; margin:0 auto; }
+ h1 { font-size:27px; margin:0 0 8px; letter-spacing:-.01em; }
+ h2 { font-size:19px; margin:0 0 2px; }
+ h3 { font-size:14.5px; font-weight:600; margin:20px 0 4px; }
+ .lede { color:var(--mut); margin:0 0 20px; max-width:76ch; }
+ .key { display:flex; gap:18px; flex-wrap:wrap; align-items:center; font-size:13px; color:var(--mut);
+        position:sticky; top:0; z-index:10; background:var(--bg); margin:0 -24px 30px;
+        padding:12px 24px; border-bottom:1px solid var(--line); }
+ .key i { display:inline-block; width:22px; height:0; border-top:3px solid; vertical-align:middle; margin-right:7px; }
+ .k { display:inline-flex; align-items:center; font-size:13px; color:var(--mut); }
+ select { font:inherit; font-size:13px; color:var(--fg); background:var(--bg); border:1px solid var(--line);
+          border-radius:6px; padding:4px 8px; margin-left:auto; }
+ section { margin:0 0 36px; }
+ section[hidden] { display:none; }
+ #overview.hide { display:none; }
+ .src { color:var(--mut); font-size:13px; margin:0 0 6px; }
+ .detail { display:none; margin-top:24px; padding-top:6px; border-top:1px solid var(--line); }
+ section.solo .detail { display:block; }
+ .na { color:var(--mut); font-size:13.5px; max-width:70ch; }
+ .note { color:var(--mut); font-size:12.5px; margin:10px 0 0; max-width:82ch; }
+ svg { width:100%; height:auto; display:block; overflow:visible; }
+ .grid { stroke:var(--line); stroke-width:1; }
+ .axis { stroke:var(--line); stroke-width:1.4; }
+ .ylab { fill:var(--mut); font-size:11px; text-anchor:end; }
+ .xlab { fill:var(--mut); font-size:11px; text-anchor:middle; }
+ .ln { fill:none; stroke-width:1.8; stroke-linejoin:round; stroke-linecap:round; }
+ .proj { stroke-dasharray:5 3; }
+ .blab { fill:var(--mut); font-size:11.5px; text-anchor:end; }
+ .bar { stroke:var(--line); stroke-width:4; stroke-linecap:round; }
+ .pn { fill:var(--nso); }
+ .pw { fill:var(--wpp); }
+ .vn { fill:var(--nso); font-size:11.5px; font-weight:600; }
+ .vw { fill:var(--wpp); font-size:11.5px; font-weight:600; }
+ footer { color:var(--mut); font-size:12.5px; border-top:1px solid var(--line); padding-top:16px; max-width:82ch; }
+</style>
+<div class="wrap">
+<h1>National vital statistics vs modelled fertility estimates</h1>
+<p class="lede">Comparisons of total fertility rates (children per woman) between national statistical offices (in red)
+and UN WPP (in blue).</p>
+
+<div class="key">{{LEGEND}}<select id="pick" aria-label="Pick a country">{{OPTIONS}}</select></div>
+
+<section id="overview">
+<h2>Total fertility rate, latest national year</h2>
+<p class="src">Each country's own figure against the UN WPP medium projection for the same year,
+ordered by how far above the national figure the UN sits.</p>
+{{OVERVIEW}}
+</section>
+
+{{SECTIONS}}
+
+<footer>Comparison source: UN World Population Prospects 2024 — estimates to 2023, then the high, medium and low
+variants. Each country's own source and caveats are given with its charts. Built {{STAMP}}.</footer>
+
+<script>
+(function () {
+  const sel = document.getElementById('pick');
+  const secs = Array.from(document.querySelectorAll('section[data-country]'));
+  const ov = document.getElementById('overview');
+  function apply() {
+    const v = sel.value;
+    secs.forEach((s) => {
+      const on = !v || s.dataset.country === v;
+      s.hidden = !on;
+      s.classList.toggle('solo', Boolean(v) && on);
+    });
+    if (ov) ov.classList.toggle('hide', Boolean(v));
+    if (v) window.scrollTo({ top: 0 });
+  }
+  sel.addEventListener('change', apply);
+  apply();
+})();
+</script>
+</div>
