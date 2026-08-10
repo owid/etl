@@ -393,6 +393,23 @@ Split what you find in two, and be explicit about which is which:
 
 If you genuinely have nothing to suggest, say that instead of inventing something. A thin recommendation wastes more of the author's attention than none.
 
+## Step 8c — The checks that must pass before you show it
+
+Every one of these caught a real defect on this skill's first run, and none of them is visible by looking at the frame. Run them as a pass, and report the numbers rather than "looks fine".
+
+| Check | How | Bar |
+|---|---|---|
+| Colour-vision safety | `color_audit.py` | no pair under **ΔE 20** for deuteranopia or protanopia; tritanopia noted, never acted on alone |
+| Greyscale survival | `color_audit.py` (contrast column) | **adjacent** pairs above ~**1.6:1**; below that they merge in print |
+| Off-palette fills | compare every fill against the library groups | every fill is a library colour, **bound as a style** — grapher emits `#585c64` for residual categories, which is in no group |
+| Legend agreement | pair swatch→label by geometry, compare against the bars | zero mismatches |
+| Text size | read `fontSize` off every text node | nothing below **12px**; annotations on the named ladder |
+| Label alignment | compare each label's centre against its mark | bar values centred on bars, legend labels on swatches |
+| Box alignment | compare the chart's left/right against the header frame | identical to the subtitle box, to the pixel |
+| Gap | `(footer.y - headerBottom - chart.height) / 2` | **12–16px**, equal top and bottom |
+
+Two habits make the difference. **Assert, don't eyeball** — a 1.2px label drift, a 1.18:1 greyscale pair and a scrambled legend all looked perfectly fine in a screenshot. And **re-run the affected checks after every change**, because they interact: applying a text style resets range colours, rescaling rewraps text and shifts label centres, adding an annotation changes the group's width, and swapping one colour moves the safety floor to a different pair.
+
 ## Step 9 — Checklist pass, review, deliver
 
 1. Run the **Good Data Viz Checklist** (GUIDELINES.md, final section) against the composed frame; fix what fails.
