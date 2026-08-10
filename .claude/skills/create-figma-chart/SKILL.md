@@ -297,6 +297,24 @@ The high-value edits to propose (include them in the Step 4 proposal):
   await bar.setFillStyleIdAsync(style.id)                          // NOT bar.fills = [...]
   ```
 
+  **Never map a group's children by index — pair them by geometry.** A node's position in `parent.children` is not its visual position, and sorting on `y` then `x` fails too: after a rescale, swatches on the same legend row differ in `y` by fractions of a pixel, so `a.y - b.y` never returns 0 and `x` is never consulted. Both mistakes recolored a legend that then disagreed with its own bars — the colors were all correct, just attached to the wrong words, which is worse than a wrong color because it silently misreads the chart. Match each **label** to the nearest swatch on its left, and drive the color from the label's text:
+
+  ```js
+  for (const lab of labels) {
+    const sw = swatches.filter(s => Math.abs(s.y - lab.y) < 12 && s.x < lab.x)
+                       .sort((a, b) => (lab.x - a.x) - (lab.x - b.x))[0]
+    if (sw) await sw.setFillStyleIdAsync(style[spec[lab.characters]].id)
+  }
+  ```
+
+  **Then assert it.** Compare each legend swatch's resolved fill against the fill of the segment it names, on one row, and report the mismatches — a legend keyed off text and verified against the bars cannot drift:
+
+  ```js
+  const bars = {}                       // segment name -> fill hex, from any one row
+  for (const seg of chart.query('[name=Brazil]').first().children) { ... }
+  // then for each label: swatchHex === bars[segmentNameFor(label.characters)]
+  ```
+
   Get keys with `search_design_system` scoped to the `[Chart Colors] Library`, querying the color's name. Bind the legend swatches too, or the legend and the bars disagree about where their color came from. Text fills stay raw: the label color is a contrast decision (black or white on that fill), not a palette choice.
 
   **Build the candidate before recommending it.** Clone the finished frame, recolor the copy, and put it beside the original — the score says a set is *safe*, not that it is *good*. The top-scoring set for this chart (ΔE 26.2) turned poultry navy and fish denim, two blues at opposite ends of the stack, and made beef lime green next to olive-green pork: measurably safer and editorially worse, because a normal-vision reader now reads unrelated categories as related. Expect this — deuteranopia collapses the red-green axis, so safe six-category sets drift toward blues and greens. Offer the highest-scoring set that still makes sense, not the highest-scoring set, and let the author see both.
