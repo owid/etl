@@ -489,7 +489,7 @@ The design team keeps every provider's regions, rendered under the map palette, 
 
 **Propose it; don't just write it.** This is a shared design file that other people are working in — show the user exactly what you intend to add (which rows, which maps) and get an explicit go-ahead before touching it. Reading it to check the conventions needs no permission.
 
-> **The Figma mechanics below are shared with the `create-figma-chart` skill** — grapher SVG export, `upload_assets` over `createNodeFromSvg`, `rescale()` over `resize()`, `loadFontAsync` before text edits, the unreadable page listing, and the fact that plugins and comments are out of reach. That skill's *Gotchas* section is the maintained list; read it alongside this one, and when you learn something new about driving Figma from here, fold it in there so both skills stay aligned. What stays specific to this skill is the board itself: Frame 99's layout, the row pitch, and the recolor read-back below.
+> **What you need is all below — but the low-level Figma mechanics are shared with `create-figma-chart`**, which drives the same tools for a much more involved job. Only the plumbing is common (`upload_assets` over `createNodeFromSvg`, `rescale()` over `resize()`, plugins and comments being out of reach); its templates, text styles and labelling rules have nothing to do with this task, so don't go reading that skill to do this one. The one thing to carry across: if you learn something new about driving Figma from here, add it to that skill's *Gotchas* too, so the plumbing stays documented in one place.
 
 How the board is laid out — match it rather than inventing a spot:
 
