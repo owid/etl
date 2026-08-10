@@ -653,3 +653,12 @@ def benin():
     series — see the note in countries.py.
     """
     return _series([(2001, 5.6), (2006, 5.7), (2012, 4.9), (2018, 5.7)])
+
+
+def cambodia():
+    """NIS health-survey rounds. The 2021-22 report charts every round since 2000.
+
+    These are the direct birth-history estimates. The census and inter-censal-survey figures are
+    all indirect estimates and are not in this series — see the note in countries.py.
+    """
+    return _series([(2000, 3.8), (2005, 3.4), (2010, 3.0), (2014, 2.7), (2022, 2.7)])

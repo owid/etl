@@ -48,6 +48,7 @@ from published import (  # noqa: E402
     bangladesh,
     benin,
     burkina_faso,
+    cambodia,
     cameroon,
     chad,
     cote_divoire,
@@ -1259,6 +1260,29 @@ COUNTRIES = [
       "scanned brochure under two paths, with no statistical annex. Birth registration is high, at 86% of "
       "under-fives, but is not used for any fertility figure.",
       "https://instad.bj/"),
+    C("Cambodia", "NIS — Demographic and Health Survey rounds", cambodia, "Cambodia", "survey", False,
+      "The 2021-22 survey charts every round since 2000. Separately, the censuses and inter-censal "
+      "surveys of 2008, 2013, 2019 and 2024 each publish a fertility figure with the arithmetic behind it.",
+      "We read the survey series. We also summed the 2019 census's own published age-specific rates and "
+      "got 2.512 against its printed 2.51, which confirms the table but not the figure — the rates are the "
+      "adjusted ones, and the raw counts they were built from are not published.",
+      "Cambodia is the most systematic case of census adjustment we have found anywhere. NIS has run the "
+      "same exercise four times running and printed both numbers each time: births reported in the twelve "
+      "months before the count give 1.6 in 2008 against an adopted 3.1, 2.05 in 2013 against 2.8, 1.67 in "
+      "2019 against 2.51, and 1.4 in 2024 against about 2.3. The raw figure is between half and two thirds "
+      "of the published one, every time, and the correction is roughly 1.4 to 1.9 times. NIS names the "
+      "methods — Brass, Arriaga, Rele, a relational Gompertz curve — says Brass-Arriaga suits Cambodia "
+      "best, and explains the under-reporting it is correcting for: children who were born and then died "
+      "go undeclared, dates get misplaced, and someone other than the mother often answers. So this is "
+      "settled institutional practice, not a one-off. It also means the census series and the survey "
+      "series are not measuring the same way and should not be spliced: the surveys are flat at 2.7 from "
+      "2014 to 2022 while the adjusted census series falls. One caution about citing across documents — "
+      "the 2019 census report looks back at 2008 and gives 2.7, which is one method's value from the 2008 "
+      "table rather than the 3.1 that report actually adopted. Registration is not used at all, though "
+      "92% of under-fives are registered. The 2008 census and the 2024 survey are scanned images, so their "
+      "figures had to be read by optical character recognition, and the 2024 report's own two tables "
+      "disagree about its own answer.",
+      "https://nis.gov.kh/"),
 ]
 
 PANELS = [(c["name"], c["src"], c["loader"], c["wpp_name"]) for c in COUNTRIES if c["loader"]]
