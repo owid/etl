@@ -409,6 +409,8 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Box alignment | compare the chart's left/right against the header frame | identical to the subtitle box, to the pixel |
 | Gap | `(footer.y - headerBottom - chart.height) / 2` | **12–16px**, equal top and bottom |
 
+**Make label-centring part of the build, not a follow-up.** It regressed three times in one run — each rebuild re-hugs the text, which restores the drift, and a separate "now centre the labels" step is forgotten or applied to a chart instance that is later replaced. Put the centring loop at the end of the same function that imports, scales and re-hugs, so it cannot be skipped.
+
 **Re-run this whole pass after the last change, not after each one.** Fixes get lost silently: a label-centring pass applied to a chart instance that is later swapped for a re-export leaves the drift back exactly as it was, and every screenshot in between looks correct. And a structural change spends budget elsewhere — lifting an aggregate row to the top added 8px of height, which came straight out of the 12–16px gap and took it to 8.2 without anything reporting a problem. Treat "I already checked that" as false after any re-export, reorder, rescale or restyle.
 
 Two habits make the difference. **Assert, don't eyeball** — a 1.2px label drift, a 1.18:1 greyscale pair and a scrambled legend all looked perfectly fine in a screenshot. And **re-run the affected checks after every change**, because they interact: applying a text style resets range colours, rescaling rewraps text and shifts label centres, adding an annotation changes the group's width, and swapping one colour moves the safety floor to a different pair.
