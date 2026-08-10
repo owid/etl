@@ -71,6 +71,14 @@ def at(wpp, year, label):
     return None
 
 
+# shorter labels for the overview table and the map tooltip, where the full name crowds the row.
+# The country pages and the picker keep the full name.
+SHORT = {
+    "Democratic Republic of Congo": "DR Congo",
+    "England and Wales": "England & Wales",
+}
+
+
 def iso_codes():
     """{our country name: ISO alpha-3}, so the map can be keyed the same way as the geometry."""
     from owid.catalog import Dataset
@@ -125,7 +133,7 @@ def main():
     iso = iso_codes()
     ov_rows = [dict(country=r["country"], year=r["year"], nso=round(r["nso_v"], 4),
                     wpp=round(r["wpp_v"], 4), tier=r["tier"], recalc=r["recalc"],
-                    iso=iso.get(r["country"], ""))
+                    iso=iso.get(r["country"], ""), short=SHORT.get(r["country"], r["country"]))
                for r in rows if r["wpp_v"]]
     shapes, map_height = world_paths()
 

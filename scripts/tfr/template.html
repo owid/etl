@@ -221,7 +221,7 @@ const SHAPES = {{SHAPES}};
     rows.forEach((r) => {
       const tr = document.createElement('tr');
       tr.innerHTML =
-        `<td class="cn"><a data-go="${r.country}">${r.country}</a></td><td class="cc"></td>` +
+        `<td class="cn"><a data-go="${r.country}">${r.short}</a></td><td class="cc"></td>` +
         `<td class="meta"><span class="swatch" style="color:${TIERS[r.tier][1]}"></span> ${TIERS[r.tier][0]}</td>` +
         `<td class="meta">${r.recalc ? 'Fully validated' : 'Copied from source'}</td>` +
         `<td class="n">${r.year}</td>`;
@@ -305,7 +305,7 @@ const SHAPES = {{SHAPES}};
     const box = wrap.getBoundingClientRect();
     const gap = gapOf(r);
     tip.innerHTML =
-      `<div class="tc">${r.country}</div>` +
+      `<div class="tc">${r.short}</div>` +
       `<div class="tr"><span class="tn">National</span><b class="tn">${r.nso.toFixed(2)}</b></div>` +
       `<div class="tr"><span class="tw">UN WPP</span><b class="tw">${r.wpp.toFixed(2)}</b></div>` +
       `<div class="tr"><span>Difference</span><b>${gap >= 0 ? '+' : ''}${gap.toFixed(2)}</b></div>` +
