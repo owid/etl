@@ -1,6 +1,6 @@
 rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 1,India,1476625571,full,yes,no,sample,"SRS publishes rates only; no raw counts exist anywhere, confirmed"
-2,China,1412914090,full,yes,no,survey,"2020 census yearbook has single-year births and women — recalculation possible, not yet built"
+2,China,1412914090,full,yes,yes,survey,recalculated from the 2000/2010/2020 census counts
 3,United States,349035484,partial,yes,no,complete,NCHS rates 2016+; WONDER export incomplete; no female-population table
 4,Indonesia,287886782,partial,yes,no,survey,census long form figure only; no hunt for counts
 5,Pakistan,259299792,full,yes,no,survey,PDS series 2001-2020; the 2007 round publishes real counts

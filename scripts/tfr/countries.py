@@ -21,6 +21,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 warnings.filterwarnings("ignore")
 
+from china import china_tfr  # noqa: E402
 from colombia import dane_female_pop, dane_registered_tfr  # noqa: E402
 from france import france_tfr  # noqa: E402
 from india import india  # noqa: E402
@@ -28,7 +29,6 @@ from philippines import philippines  # noqa: E402
 from myanmar import myanmar_tfr  # noqa: E402
 from published import (  # noqa: E402
     bangladesh,
-    china,
     drc,
     ethiopia,
     indonesia,
@@ -259,16 +259,23 @@ COUNTRIES = [
       "survey after a thirteen-year gap because the national database authority told them vital-event records "
       "were not good enough. So this is one survey estimate, not a series.",
       "https://www.pbs.gov.pk/pds/"),
-    C("China", "NBS — Seventh National Population Census", china, "China", "survey", False,
-      "The statistics bureau states a total fertility rate only around census years. Its director gave 1.3 "
-      "for 2020 at the census press conference. The annual communique reports births and a crude birth rate "
-      "but no fertility rate.",
-      "We took the 1.3 figure as stated. No arithmetic of our own.",
-      "China has no birth-registration-based vital statistics. Figures come from the ten-yearly census and, "
-      "between censuses, a household sample survey covering about one person in a thousand. Detailed "
-      "age-specific tables exist but are published as scanned images rather than text or spreadsheets. Lower "
-      "figures circulating for recent years are computed by outside analysts, not published by the bureau.",
-      "https://www.stats.gov.cn/"),
+    C("China", "NBS — census yearbooks, table on fertility by age and birth order", china_tfr, "China",
+      "survey", True,
+      "For each of the last three censuses the statistics bureau publishes a downloadable table giving, for "
+      "every single year of age from 15 to 49, the number of women of childbearing age, the number of "
+      "births they had in the year before the count, and the resulting rate. The bureau's director "
+      "separately stated a fertility rate of 1.3 for 2020 at the census press conference.",
+      "We divided births by women at each single age and summed. This gives 1.221 for 2000, 1.188 for 2010 "
+      "and 1.296 for 2020. The bureau's own companion table computes 1.301 for 2020 from five-year bands, "
+      "and the press conference rounded that to 1.3.",
+      "Only census years. Between censuses the bureau relies on an annual sample survey of about one person "
+      "in a thousand, whose age detail appears in a yearbook it does not publish free of charge — so there "
+      "is no way to fill the gaps, and the line jumps ten years at a time. The counts are the census long "
+      "form's sample, not the whole population, and the reference period is the twelve months to 31 October "
+      "of the census year rather than the calendar year. Chinese demographers argued the 2010 census figure "
+      "of 1.18 was implausibly low because births went unreported. The bureau's queryable data portal "
+      "refuses requests from outside the country, but these static files download without trouble.",
+      "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/B0603.xls"),
     C("Nigeria", "NBS — Demographic Statistics Bulletin, Calculated TFR", nigeria, "Nigeria",
       "projection", False,
       "The Bureau of Statistics publishes a row called Calculated TFR running from 5.50 in 2013 to 5.14 in "
