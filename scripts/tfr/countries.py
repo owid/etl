@@ -383,16 +383,23 @@ COUNTRIES = [
       "is no longer the registration organization's domain and now redirects to a domain reseller.",
       "https://www.amar.org.ir/"),
     C("Turkey", "TurkStat — Population Statistics Portal", turkey, "Turkey", "complete", False,
-      "TurkStat publishes a total fertility rate annually from 2009, and female population by five-year "
-      "age group from the address-based population register.",
-      "We read the national row of TurkStat's own fertility-rate export. Our 2024 value of 1.48 matches "
-      "the figure in its press bulletin.",
-      "TurkStat's current data portal is a JavaScript application whose download links are single-use "
-      "tokens, so it cannot be read by a script. An older server-rendered portal still answers plain "
-      "requests, and that is what this uses — asking it for the national series rather than the province "
-      "breakdown takes an undocumented empty parameter. Age-specific rates exist in the bulletins but "
-      "only inside the JavaScript portal, so there is no age-band comparison for Turkey. The series starts "
-      "in 2009 on this portal; TurkStat's own bulletins go back to 2001.",
+      "TurkStat publishes a total fertility rate annually from 2001, and female population by five-year age "
+      "group from the address-based population register. Its annual birth statistics bulletin also has tables "
+      "of births by mother's age group and age-specific fertility rates.",
+      "We read the national row of TurkStat's own fertility-rate export. Our 2024 value of 1.48 matches the "
+      "figure in its press bulletin.",
+      "TurkStat's current data portal is a JavaScript application whose download links are single-use tokens, "
+      "so it cannot be read by a script. An older server-rendered portal still answers plain requests, and "
+      "that is what this uses — asking it for the national series rather than the province breakdown takes an "
+      "undocumented empty parameter. That same portal will also return female population by five-year age "
+      "group for 1935-2025, from a form-encoded POST to /Home/GetInformation with the name "
+      "YasGrubunaGoreNufus; a JSON body gets a 404, which is easy to mistake for the endpoint not existing. "
+      "But the births-by-age and age-specific-rate tables are only in the bulletin, behind the token, so "
+      "there is no age-band comparison for Turkey — closing that gap needs someone to download two "
+      "spreadsheets by hand. Two traps: the old portal rounds the fertility rate to one decimal where the "
+      "bulletin gives two, and TurkStat revises birth figures for up to five years after first release, so "
+      "editions disagree with each other. The series starts in 2009 on this portal; the bulletins reach back "
+      "to 2001, but only 2001 itself is stated in text, so 2002-08 could not be recovered.",
       "https://nip.tuik.gov.tr/"),
     C("Ethiopia", "Statistical Service — Ethiopia Demographic and Health Survey", ethiopia, "Ethiopia",
       "survey", False,

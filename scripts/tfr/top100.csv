@@ -16,7 +16,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 15,Democratic Republic of Congo,116452162,full,yes,no,survey,EDS rounds only; no census since 1984
 16,Vietnam,102177434,full,yes,no,survey,"2001-2025 from the survey report; published rate is P/F-adjusted, ~13% on the census check"
 17,Iran,93168492,full,no,,,"no TFR obtainable; amar.org.ir drops foreign connections, sci.org.ir is down"
-18,Turkey,87926083,partial,yes,no,complete,portal export rate only; age-specific tables locked in the JavaScript portal
+18,Turkey,87926083,full,yes,no,complete,female population by age now scriptable; births by age still behind a single-use token
 19,Germany,83644257,full,yes,no,complete,"denominator now Destatis table 12411-10, the average resident population"
 20,Tanzania,72563778,full,yes,no,survey,census adjusted TFR; raw counts exist but reproduce the unadjusted 3.2
 21,Thailand,71559619,full,yes,yes,complete,
