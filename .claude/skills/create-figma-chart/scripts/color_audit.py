@@ -10,7 +10,6 @@ Run it on every chart before proposing it — eyeballing does not catch a dE of 
 """
 
 import argparse
-import heapq
 import itertools
 import math
 
@@ -54,8 +53,8 @@ TOO_CLOSE, TIGHT = 20.0, 30.0
 # seam between them disappears: Denim beside Gray measures 1.18:1.
 GRAYSCALE_MIN = 1.6
 
-# How many candidate palettes the search keeps in memory, and how many it prints.
-KEEP_BEST, SHOW_BEST = 40, 4
+# How many candidate palettes the search prints.
+SHOW_BEST = 4
 
 
 def srgb(h):
@@ -127,10 +126,31 @@ def luminance(rgb):
     return 0.2126 * r + 0.7152 * g + 0.0722 * b
 
 
+_LUM_CACHE = {}
+
+
+def _lum(hexcol):
+    """Relative luminance of a hex color, memoized — the seam check calls this in a hot loop."""
+    if hexcol not in _LUM_CACHE:
+        _LUM_CACHE[hexcol] = luminance(srgb(hexcol))
+    return _LUM_CACHE[hexcol]
+
+
 def contrast(h1, h2):
-    a, b = luminance(srgb(h1)), luminance(srgb(h2))
+    a, b = _lum(h1), _lum(h2)
     a, b = max(a, b), min(a, b)
     return (a + 0.05) / (b + 0.05)
+
+
+def min_seam(hexes):
+    """The weakest grayscale seam between any two *touching* fills.
+
+    Unlike the dE floor this depends on the order the colors are laid out in, so the search has to
+    evaluate an arrangement, not just a set. inf when there is nothing to touch.
+    """
+    if len(hexes) < 2:
+        return math.inf
+    return min(contrast(hexes[i], hexes[i + 1]) for i in range(len(hexes) - 1))
 
 
 def hue_family(hexcol):
@@ -213,22 +233,36 @@ def audit(hexes, names):
     return failures, score
 
 
-def _assign(combo, hexes, free):
-    """Choose which replacement lands in which slot, and report the total drift.
+def _assign(combo, hexes, free, seams):
+    """Best arrangement of one candidate set, or None if no arrangement is usable.
 
-    Every arrangement of the same color set scores identically, so pick the one closest to the
-    colors already in use: a designer reads a small shift as a fix and a wholesale repaint as a
-    different chart. Only the finalists get here, so the len(free)! search is cheap.
+    The dE floor and the hue-family count are the same whatever order the set is laid out in, but
+    the grayscale seam is not — it only compares touching fills. So an arrangement, not just a set,
+    is what has to clear GRAYSCALE_MIN, and a set with no clearing arrangement is rejected outright
+    rather than recommended into a palette that fails the check the audit then demands.
+
+    `seams` lists only the seams the search can actually influence (at least one end is being
+    replaced). A seam between two kept colors is not this function's to fix — judging candidates on
+    it would reject every one of them and report nothing useful.
+
+    Among the arrangements that clear it, pick the one closest to the colors already in use: a
+    designer reads a small shift as a fix and a wholesale repaint as a different chart.
     """
-    best, best_drift = (), math.inf
+    best = None
     for perm in itertools.permutations(combo):
+        trial = list(hexes)
+        for slot, cname in zip(free, perm):
+            trial[slot] = PALETTE[cname]
+        seam = min((contrast(trial[i], trial[i + 1]) for i in seams), default=math.inf)
+        if seam < GRAYSCALE_MIN:
+            continue
         drift = sum(
             math.dist(sim_lab(hexes[slot], "normal"), sim_lab(PALETTE[cname], "normal"))
             for slot, cname in zip(free, perm)
         )
-        if drift < best_drift:
-            best, best_drift = perm, drift
-    return best, best_drift
+        if best is None or drift < best[1]:
+            best = (perm, drift, seam)
+    return best
 
 
 def suggest(hexes, names, fixed_idx=()):
@@ -237,11 +271,21 @@ def suggest(hexes, names, fixed_idx=()):
     free = [i for i in range(len(hexes)) if i not in fixed]
     print(f"\n=== searching the OWID palette for {len(free)} replacement(s) "
           f"(keeping {', '.join(names[i] for i in fixed_idx) or 'nothing'}) ===")
+    # A seam between two kept colors is outside the search's reach: no choice of replacement can
+    # separate them. Say so rather than rejecting every candidate over something it cannot fix.
+    seams = [i for i in range(len(hexes) - 1) if i not in fixed or (i + 1) not in fixed]
+    for i in range(len(hexes) - 1):
+        if i in seams:
+            continue
+        ratio = contrast(hexes[i], hexes[i + 1])
+        if ratio < GRAYSCALE_MIN:
+            print(f"  note: {names[i]} and {names[i + 1]} are both kept and touch at {ratio:.2f}:1 "
+                  f"— the search cannot fix that seam; free one of them or reorder the stack.")
     # Combinations, not permutations. min_delta_e and the hue-family count both depend only on the
     # *set* of colors, so the len(free)! arrangements of one set all score identically. Enumerating
     # permutations meant 25P6 = 127.5M candidates for a six-category chart (hours, and every
     # passing one held in memory); the 25C6 = 177k sets are the real search space.
-    heap, passing = [], 0
+    candidates = []
     for combo in itertools.combinations(PALETTE, len(free)):
         trial = list(hexes)
         for slot, cname in zip(free, combo):
@@ -251,29 +295,45 @@ def suggest(hexes, names, fixed_idx=()):
         score = min_delta_e(trial)
         if score < TOO_CLOSE:
             continue                      # not worth showing a set that still fails
-        passing += 1
         families = len({hue_family(h) for h in trial} - {None})
         # Rank by hue variety FIRST: ranking on safety alone returns sets that are all blues and
         # greens (safe, but a reader can no longer tell six categories apart at a glance).
-        # Bounded to KEEP_BEST candidates, so memory does not scale with the search space.
-        heapq.heappush(heap, (families, score, combo))
-        if len(heap) > KEEP_BEST:
-            heapq.heappop(heap)
-    if not heap:
+        candidates.append((-families, -score, combo))
+    if not candidates:
         print("  nothing in the palette clears dE 20 for this many categories — "
               "consider merging categories instead.")
         return
-    # Hue variety, then safety, then drift as the tiebreaker — among equally varied and equally
-    # safe palettes, the one that moves the fewest colors furthest is the one to propose.
-    finalists = []
-    for families, score, combo in heap:
-        perm, drift = _assign(combo, hexes, free)
-        finalists.append((-families, -score, drift, perm))
+    candidates.sort()
+
+    # Drift only ever separates candidates that tie on hue variety AND safety, so work through the
+    # tied groups in ranked order and arrange every member of a group before looking at the next.
+    # Pruning to a fixed number of candidates *before* this point would decide the drift ordering by
+    # whatever came first, which is how a set with drift 31.3 lost to one with 49.6.
+    finalists, rejected = [], 0
+    for _, group in itertools.groupby(candidates, key=lambda c: (c[0], c[1])):
+        for neg_families, neg_score, combo in group:
+            best = _assign(combo, hexes, free, seams)
+            if best is None:
+                rejected += 1                # no arrangement keeps every seam above GRAYSCALE_MIN
+                continue
+            perm, drift, seam = best
+            finalists.append((neg_families, neg_score, drift, perm, seam))
+        # Groups descend in (hue variety, safety), so once this group is finished and we have enough
+        # finalists, nothing later can displace them.
+        if len(finalists) >= SHOW_BEST:
+            break
+    note = f", {rejected} rejected for a grayscale seam under {GRAYSCALE_MIN}:1" if rejected else ""
+    if not finalists:
+        print(f"  {len(candidates)} palette(s) clear dE {TOO_CLOSE:.0f}, but none survives the "
+              f"grayscale seam check{note} — reorder the stack, or merge categories.")
+        return
     finalists.sort()
-    print(f"  {passing} palette(s) clear dE {TOO_CLOSE:.0f}; showing the best {SHOW_BEST}, "
-          f"closest to the current colors first")
-    for neg_families, neg_score, drift, perm in finalists[:SHOW_BEST]:
-        print(f"  hue families {-neg_families}/6   min dE {-neg_score:5.1f}   drift {drift:5.1f}")
+    print(f"  {len(candidates)} palette(s) clear dE {TOO_CLOSE:.0f}{note}; showing the best "
+          f"{SHOW_BEST}, closest to the current colors first")
+    for neg_families, neg_score, drift, perm, seam in finalists[:SHOW_BEST]:
+        shown_seam = f"{seam:4.2f}:1" if math.isfinite(seam) else "    n/a"
+        print(f"  hue families {-neg_families}/6   min dE {-neg_score:5.1f}   "
+              f"seam {shown_seam}   drift {drift:5.1f}")
         for slot, cname in zip(free, perm):
             h = PALETTE[cname]
             label = "white" if contrast("#ffffff", h) >= contrast("#000000", h) else "black"
