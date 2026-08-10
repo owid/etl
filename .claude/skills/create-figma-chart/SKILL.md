@@ -378,9 +378,8 @@ The high-value edits to propose (include them in the Step 4 proposal):
 - **Annotations replicating the accompanying text** (12–16px; 12–14px on maps): text color = the annotated object's color, `Text/Gray 80` #5B5B5B, or a mix; bold the key phrase; and each one wrapped in its **own white (canvas-colored) auto-layout frame, hugging the text on both axes** and appended last so it sits above the chart — see GUIDELINES.md → Annotations for why hugging is the part that matters and when a white outside stroke is the fallback instead.
 
   ```js
-  const box = figma.createFrame();                          // no createAutoLayout() in the API
+  const box = figma.createAutoLayout("HORIZONTAL");         // real API — see the note below
   box.name = "annotation__<what>";
-  box.layoutMode = "HORIZONTAL";                            // this is what makes it auto-layout
   clone.appendChild(box);                                   // parent before setting HUG
   box.fills = [{type:"SOLID", color:{r:1,g:1,b:1}}];
   box.paddingLeft = box.paddingRight = box.paddingTop = box.paddingBottom = 0;
@@ -388,6 +387,13 @@ The high-value edits to propose (include them in the Step 4 proposal):
   txt.layoutSizingHorizontal = txt.layoutSizingVertical = "HUG";
   box.layoutSizingHorizontal = box.layoutSizingVertical = "HUG";
   ```
+
+  > **`figma.createAutoLayout()` is a real API — do not "fix" this to `createFrame()`.** It is declared
+  > in the official plugin typings (`createAutoLayout(direction?: 'HORIZONTAL' | 'VERTICAL'): FrameNode`)
+  > and the `figma-use` skill's rule 12a says to prefer it *over* `figma.createFrame()` with absolute
+  > coordinates. A review pass on this branch asserted it did not exist and the snippet was rewritten to
+  > `createFrame()` + `layoutMode`; that swap is the anti-pattern rule 12a names, and it was reverted.
+  > If a reviewer flags it again, check `references/plugin-api-standalone.d.ts` before changing anything.
 - **Arrows**: copy curvy arrows from node `798:773` — 1px stroke, arrowhead and line the same color as each other and consistent across the chart. Never scale a whole arrow (it distorts the head): Shift-resize the line segment only, then reposition the head. If a curvy arrow gets messy, use a straight thin line. **Maps: never curvy — straight 1px lines or values inside country shapes.**
 - **Drop the axis and gridlines when every data point is already labeled.** The checklist says so outright, and it is the cheapest space you will ever find: deleting `horizontal-axis`, `vertical-grid-lines` and `vertical-zero-line` from the imported group frees ~25px — usually the difference between text at the 12px floor and text at a comfortable 13–14px. It applies most obviously to a **100% stacked bar**, where every bar spans 0–100% and the axis tells the reader nothing they can't read off the segment values. Don't do it where the reader still has to estimate: a line chart's y-axis, or any chart whose points are mostly unlabeled.
 - **Dropping entities does not buy vertical space — it buys thicker bars.** Easy to get wrong: the export canvas is a fixed size, so grapher redistributes the freed rows into the remaining ones and the chart comes back exactly as tall. Measured: eleven countries and ten countries both returned a 346px chart, with the row pitch going from ~28 to ~31px. So cut entities to reduce clutter or to make bars more readable, never to make something fit. **The lever for fit is the export's aspect ratio** (`imWidth`/`imHeight`, which set the shape the layout is computed for) or removing furniture like the axis — not the entity list. Either way the selection belongs to the chart's author: surface it, don't decide it.
