@@ -309,9 +309,10 @@ def suggest(hexes, names, fixed_idx=()):
     # tied groups in ranked order and arrange every member of a group before looking at the next.
     # Pruning to a fixed number of candidates *before* this point would decide the drift ordering by
     # whatever came first, which is how a set with drift 31.3 lost to one with 49.6.
-    finalists, rejected = [], 0
+    finalists, rejected, examined = [], 0, 0
     for _, group in itertools.groupby(candidates, key=lambda c: (c[0], c[1])):
         for neg_families, neg_score, combo in group:
+            examined += 1
             best = _assign(combo, hexes, free, seams)
             if best is None:
                 rejected += 1                # no arrangement keeps every seam above GRAYSCALE_MIN
@@ -322,7 +323,10 @@ def suggest(hexes, names, fixed_idx=()):
         # finalists, nothing later can displace them.
         if len(finalists) >= SHOW_BEST:
             break
-    note = f", {rejected} rejected for a grayscale seam under {GRAYSCALE_MIN}:1" if rejected else ""
+    # Only the top-ranked groups get arranged, so scope the rejection count to what was examined
+    # rather than implying it is a tally over all the candidates that cleared dE.
+    note = (f"; {rejected} of the {examined} best-ranked rejected for a grayscale seam under "
+            f"{GRAYSCALE_MIN}:1" if rejected else "")
     if not finalists:
         print(f"  {len(candidates)} palette(s) clear dE {TOO_CLOSE:.0f}, but none survives the "
               f"grayscale seam check{note} — reorder the stack, or merge categories.")
