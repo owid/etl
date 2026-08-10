@@ -333,6 +333,22 @@ COUNTRIES = [
       "census, and they do not reconcile with the survey's own denominators — about 11% apart — so there is "
       "nothing solid to recalculate from.",
       "https://nationalpopulation.gov.ng/publications"),
+    C("Iran", "Statistical Center of Iran and the civil registration organization — nothing we could reach",
+      None, "Iran", "none", False,
+      "Nothing we could get to. We found one real table — registered births by age of mother for the whole "
+      "country in 1386, which is 2007-08 — but only through a web archive, and no female population by age "
+      "to divide it by. No total fertility rate was found anywhere, live or archived.",
+      "Nothing. Iran is on this list rather than filled in from an international compilation, which is the "
+      "point of the exercise.",
+      "The three hosts fail in three different ways, and the difference matters for anyone trying again. "
+      "The statistics center at amar.org.ir accepts a connection and then drops it before sending anything "
+      "back, identically across every TLS version, cipher setting and browser header we tried — that is a "
+      "perimeter device refusing foreign traffic, not a certificate problem. Its other domain, sci.org.ir, "
+      "answers normally but serves a maintenance notice, so it is worth retrying later. The civil "
+      "registration organization at sabteahval.ir answers too, but with a bot challenge that wants device "
+      "motion data; a real browser might well get through where a script cannot. Do not use nocr.ir — it "
+      "is no longer the registration organization's domain and now redirects to a domain reseller.",
+      "https://www.amar.org.ir/"),
     C("Turkey", "TurkStat — Population Statistics Portal", turkey, "Turkey", "complete", False,
       "TurkStat publishes a total fertility rate annually from 2009, and female population by five-year "
       "age group from the address-based population register.",

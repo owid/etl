@@ -15,7 +15,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 14,Philippines,117724473,full,yes,yes,incomplete,
 15,Democratic Republic of Congo,116452162,full,yes,no,survey,EDS rounds only; no census since 1984
 16,Vietnam,102177434,partial,yes,no,survey,PxWeb rate only; no hunt for counts
-17,Iran,93168492,partial,no,,,both statistics-office hosts blocked
+17,Iran,93168492,full,no,,,"no TFR obtainable; amar.org.ir drops foreign connections, sci.org.ir is down"
 18,Turkey,87926083,partial,yes,no,complete,portal export rate only; age-specific tables locked in the JavaScript portal
 19,Germany,83644257,partial,yes,no,complete,"Destatis rates; women recovered from births/rate, not an independent table"
 20,Tanzania,72563778,full,yes,no,survey,census adjusted TFR; raw counts exist but reproduce the unadjusted 3.2
