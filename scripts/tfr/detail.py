@@ -441,6 +441,12 @@ def kazakhstan_band_detail(year):
     return kazakhstan_detail(year)
 
 
+def guinea_band_detail(year):
+    from published import guinea_detail
+
+    return guinea_detail(year)
+
+
 DETAIL = {
     "Colombia": colombia_detail,
     "Myanmar": myanmar_band_detail,
@@ -473,6 +479,7 @@ DETAIL = {
     "Zimbabwe": zimbabwe_band_detail,
     "Ecuador": ecuador_band_detail,
     "Kazakhstan": kazakhstan_band_detail,
+    "Guinea": guinea_band_detail,
 }
 
 

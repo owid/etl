@@ -55,6 +55,7 @@ from published import (  # noqa: E402
     drc,
     ethiopia,
     ghana,
+    guinea,
     indonesia,
     iraq,
     kenya,
@@ -1283,6 +1284,24 @@ COUNTRIES = [
       "figures had to be read by optical character recognition, and the 2024 report's own two tables "
       "disagree about its own answer.",
       "https://nis.gov.kh/"),
+    C("Guinea", "INS — Demographic and Health Survey rounds", guinea, "Guinea", "survey", False,
+      "The 2018 survey's own table carries the rounds back to 1992. The 2014 census publishes the counts "
+      "behind its figure in an annex: women by age group, and births in the twelve months before the count.",
+      "We read the survey series. We also divided the census's own counts and got 5.19 against the 5.3 it "
+      "publishes, then compared age by age — which is where the interesting part is.",
+      "Guinea's correction is the most selective one we have found. INS applied the Arriaga method, said "
+      "why — the P/F ratios ran from 1.04 to 1.98, well above the 1.02 threshold, so recent births were "
+      "under-reported — and the net effect on the total is only about 2%, far smaller than Mali's or "
+      "Ghana's. But it is not a level shift. For every age group from 20 to 49 the published rate is within "
+      "1% of the counted one; the entire correction lands on 15-19, where 105 per thousand becomes 130, a "
+      "24% increase. INS never says this, and it only shows up if you recompute the rates yourself. "
+      "Registration is not used and could not be: 62% of under-fives are registered and 51% have a "
+      "certificate. One thing readers should know about the source: INS's own website is unreachable, and "
+      "archived copies of it from mid-2025 onward serve gambling spam under the same article and file "
+      "paths the real reports used — so anything dated 2025 or later and sourced only from that domain "
+      "needs checking elsewhere. That includes the claim that the 2024 census has published preliminary "
+      "results, which we could not confirm. The documents used here are archived copies from 2018.",
+      "https://www.dhsprogram.com/pubs/pdf/FR353/FR353.pdf"),
 ]
 
 PANELS = [(c["name"], c["src"], c["loader"], c["wpp_name"]) for c in COUNTRIES if c["loader"]]

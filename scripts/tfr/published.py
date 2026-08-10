@@ -662,3 +662,30 @@ def cambodia():
     all indirect estimates and are not in this series — see the note in countries.py.
     """
     return _series([(2000, 3.8), (2005, 3.4), (2010, 3.0), (2014, 2.7), (2022, 2.7)])
+
+
+def guinea():
+    """INS health-survey rounds. The 2018 report's own table carries the earlier ones.
+
+    The 2014 census gives 5.3, after a correction — see the note in countries.py.
+    """
+    return _series([(2005, 5.7), (2012, 5.1), (2018, 4.8)])
+
+
+# the 2014 census's annex tables A.0.2 and A.0.8: women aged 12-54 and births in the previous
+# twelve months, both as counts
+GUINEA_2014 = {
+    (15, 19): (589555, 62085),
+    (20, 24): (496263, 96498),
+    (25, 29): (444157, 101210),
+    (30, 34): (350747, 72323),
+    (35, 39): (280112, 44261),
+    (40, 44): (235595, 21347),
+    (45, 49): (167746, 9266),
+}
+
+
+def guinea_detail(year):
+    if year != 2014:
+        return None
+    return {b: {"women": float(w), "births": float(x)} for b, (w, x) in GUINEA_2014.items()}

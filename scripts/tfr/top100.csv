@@ -73,7 +73,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 72,Ecuador,18444504,full,yes,yes,complete,fully recalculated 2010-2024; INEC states in writing that it adopts a figure above the registry
 73,Cambodia,18051219,full,yes,no,survey,NIS adjusted four censuses in a row: raw 1.6/2.05/1.67/1.4 against adopted 3.1/2.8/2.51/2.3
 74,Zimbabwe,17273584,full,yes,no,survey,"2022 census ran Arriaga and Gompertz, found they agreed, and kept the unadjusted 3.7"
-75,Guinea,15441991,no,no,,,
+75,Guinea,15441991,full,yes,no,survey,2014 census correction lands almost entirely on 15-19; the INS domain is now squatted
 76,Benin,15170419,full,yes,no,survey,census 4.8 is admitted to be an indirect estimate but no method is named and no raw figure printed
 77,Rwanda,14889701,no,no,,,
 78,Burundi,14729163,no,no,,,
