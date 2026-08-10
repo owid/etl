@@ -518,7 +518,8 @@ curl -s -X POST "<submitUrl>" \
 Then place it with `use_figma` (**load the `figma-use` skill first** — hard prerequisite for that tool). Three things bite, in this order:
 
 - **It lands on whatever page is open in the desktop app**, not the page you last set with `setCurrentPageAsync` — in practice the file's cover page. Never search for it by page; take `placedOnNodeId` from the POST response and reparent explicitly.
-- **It imports at the SVG's natural size** (850×600 for a grapher map), not the board's row size. `resize()` on a frame does **not** scale its children — it would crop the map. Use `node.rescale(594 / node.width)`.
+- **It imports at the SVG's natural size** (850×600 for a grapher map), not the board's row size. Use `node.rescale(594 / node.width)` — **never `resize()`**, which does not scale children at all: it stretches them through their constraints, so a grapher export comes out with its country paths distorted and every text box rewrapped (grapher sizes labels to their glyphs with no slack, so even a small change makes "Brazil" wrap to "Bra zil"). If you ever do scale a node carrying grapher text, sweep it afterwards setting each `TEXT` to `textAutoResize = "WIDTH_AND_HEIGHT"` and restoring its alignment anchor.
+- **The upload wraps the SVG in a FRAME with a white fill.** Harmless on the board, where each row sits on white anyway — but if the frame ends up larger than its content it will paint over whatever it overlaps. Clear `node.fills = []` if you see a neighbouring row disappear.
 - **Grow Frame 99's height before positioning the row.** A row placed past the old height is clipped and looks like the import silently failed.
 
 ```js

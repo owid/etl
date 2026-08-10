@@ -172,12 +172,12 @@ Replace the lorem-ipsum text nodes in the cloned template. Source everything fro
   ```js
   source.textAutoResize = "WIDTH_AND_HEIGHT";   // one line, its natural width
   source.x = 0; source.y = 0;
-  ccby.x = 468; ccby.y = 20;                    // the template's row pitch
+  ccby.x = 0;  ccby.y = 20;                     // left-aligned under the source, template row pitch
   footer.resize(508, 36);
   footer.y = 524 - footer.height;               // grow upward; bottom margin stays 16px
   ```
 
-  Then re-fit the chart into what's left (Step 7). Only if the source is too long even for a full line — beyond ~508px — wrap it with `textAutoResize = "HEIGHT"` at a width that breaks after the organization's name, and top-align CC BY with its first line.
+  Then re-fit the chart into what's left (Step 7). Only if the source is too long even for a full line — beyond ~508px — wrap it with `textAutoResize = "HEIGHT"` at a width that breaks after the organization's name, and top-align CC BY with its first line. Either way CC BY is **left-aligned** once it has its own row — it only sits at x=468 while it shares the source's line.
 - **Note:** only in templates that carry a Note line, and only if the chart has one worth keeping. **DI images normally carry no note at all** — drop it, or, when it's genuinely load-bearing for understanding the chart, fold it into the subtitle as a bolded second line (only if the subtitle isn't already crowded).
 - **`OurWorldinData.org/[Topic]`** → the confirmed topic path (e.g. `OurWorldinData.org/child-mortality`).
 - **CC BY** stays; static desktop templates also carry `Licensed under CC-BY by the author <Author>`.
