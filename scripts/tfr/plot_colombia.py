@@ -19,9 +19,10 @@ warnings.filterwarnings("ignore")
 AGE_ROW = re.compile(r"De\s+(\d+)\s*-\s*(\d+)", re.I)
 
 
-def dane_registered_tfr(pop):
-    """TFR from DANE's own Cuadro 1 (births by age group of mother), per year."""
-    rows = []
+def dane_births_by_age():
+    """{year: {(lo, hi): births}} from DANE's Cuadro 1/9, with unknown maternal age
+    redistributed proportionally across the known groups."""
+    out = {}
     for path in sorted(glob.glob(os.path.join(DATA, "dane_nac/nac_*.xls*"))):
         year = int(re.search(r"nac_(\d{4})", path).group(1))
         try:
@@ -44,8 +45,7 @@ def dane_registered_tfr(pop):
 
         # layout B (pre-2008): age groups across columns, departments down rows
         if not groups:
-            hdr = next((i for i, r in df.iterrows()
-                        if sum(bool(AGE_ROW.match(str(v).strip())) for v in r) >= 5), None)
+            hdr = next((i for i, r in df.iterrows() if sum(bool(AGE_ROW.match(str(v).strip())) for v in r) >= 5), None)
             if hdr is None:
                 continue
             cols = {}
@@ -55,8 +55,10 @@ def dane_registered_tfr(pop):
                     cols[j] = (int(m.group(1)), int(m.group(2)))
                 elif str(v).strip().lower().startswith("sin informaci"):
                     cols[j] = "unknown"
-            trow = next((i for i in range(hdr, len(df))
-                         if str(df.iloc[i, 0]).strip().lower() in {"total", "total nacional"}), None)
+            trow = next(
+                (i for i in range(hdr, len(df)) if str(df.iloc[i, 0]).strip().lower() in {"total", "total nacional"}),
+                None,
+            )
             if trow is None:
                 continue
             for j, key in cols.items():
@@ -72,13 +74,21 @@ def dane_registered_tfr(pop):
 
         counted = sum(groups.values())
         scale = (counted + unknown) / counted if unknown else 1.0
+        out[year] = {band: b * scale for band, b in groups.items()}
+    return out
+
+
+def dane_registered_tfr(pop):
+    """TFR from DANE's own Cuadro 1 (births by age group of mother), per year."""
+    rows = []
+    for year, groups in sorted(dane_births_by_age().items()):
         tfr = 0.0
         for (lo, hi), births in groups.items():
             ages = [a for a in range(lo, hi + 1) if a in pop.columns]
             denom = pop.loc[year, ages].sum()
             if denom > 0:
-                tfr += births * scale / denom * len(ages)
-        rows.append({"year": year, "value": tfr, "births": counted + unknown})
+                tfr += births / denom * len(ages)
+        rows.append({"year": year, "value": tfr, "births": sum(groups.values())})
     return pd.DataFrame(rows).sort_values("year").reset_index(drop=True)
 
 
@@ -113,8 +123,16 @@ if __name__ == "__main__":
     plt.rcParams.update({"font.family": "sans-serif", "font.sans-serif": ["Helvetica Neue", "Arial", "DejaVu Sans"]})
     fig, ax = plt.subplots(figsize=(11, 6.6), dpi=200)
 
-    ax.plot(wpp.year, wpp.value, color="#3b82c4", lw=2.6, marker="o", ms=3.4,
-            label="UN WPP (2024 revision) — estimates", zorder=3)
+    ax.plot(
+        wpp.year,
+        wpp.value,
+        color="#3b82c4",
+        lw=2.6,
+        marker="o",
+        ms=3.4,
+        label="UN WPP (2024 revision) — estimates",
+        zorder=3,
+    )
 
     # projection variants, dashed, carried to the last DANE year
     anchor = wpp.iloc[-1]
@@ -126,11 +144,26 @@ if __name__ == "__main__":
         vl = [anchor.value] + p.value.tolist()
         ax.plot(yr, vl, color=shade, lw=2.0, ls=(0, (4, 2)), marker="o", ms=3.4, zorder=2)
         ax.text(yr[-1] + 0.25, vl[-1], f" {variant}", color=shade, fontsize=8.5, va="center")
-    ax.plot(vital.year, vital.value, color="#c94a3b", lw=2.8, label="DANE — vital statistics (registered births)",
-            marker="o", ms=3.4, zorder=5)
+    ax.plot(
+        vital.year,
+        vital.value,
+        color="#c94a3b",
+        lw=2.8,
+        label="DANE — vital statistics (registered births)",
+        marker="o",
+        ms=3.4,
+        zorder=5,
+    )
 
-    fig.text(0.055, 0.945, "Colombia's fertility rate: what the country records vs what the UN estimates",
-             fontsize=15.5, fontweight="bold", color="#1d1d1b", va="top")
+    fig.text(
+        0.055,
+        0.945,
+        "Colombia's fertility rate: what the country records vs what the UN estimates",
+        fontsize=15.5,
+        fontweight="bold",
+        color="#1d1d1b",
+        va="top",
+    )
 
     ax.set_xlim(1997, 2028)
     ax.set_ylim(0, 3.4)
@@ -143,11 +176,16 @@ if __name__ == "__main__":
     ax.tick_params(length=0, labelsize=10, colors="#555")
     ax.legend(frameon=False, fontsize=9.8, loc="upper right", handlelength=2.4, labelspacing=0.55)
 
-    fig.text(0.008, 0.015,
-             "Sources: DANE Estadísticas Vitales (Cuadro 1, births by age of mother); UN World Population "
-             "Prospects 2024.\nFertility rates computed as the sum of "
-             "five-year age-specific rates, using DANE female population as the denominator.",
-             fontsize=7.6, color="#8a8a8a", va="bottom")
+    fig.text(
+        0.008,
+        0.015,
+        "Sources: DANE Estadísticas Vitales (Cuadro 1, births by age of mother); UN World Population "
+        "Prospects 2024.\nFertility rates computed as the sum of "
+        "five-year age-specific rates, using DANE female population as the denominator.",
+        fontsize=7.6,
+        color="#8a8a8a",
+        va="bottom",
+    )
 
     fig.subplots_adjust(left=0.06, right=0.98, top=0.855, bottom=0.155)
     fig.savefig("colombia_tfr.png", facecolor="white")

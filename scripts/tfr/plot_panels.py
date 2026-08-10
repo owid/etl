@@ -57,8 +57,12 @@ PANELS = [
     ("Brazil", "IBGE — Registro Civil (SIDRA)", brazil, "Brazil"),
     ("France", "INSEE — état civil", france, "France"),
     ("Italy", "ISTAT — ANPR / stato civile", italy, "Italy"),
-    ("England and Wales", "ONS — birth registrations, Table 10 (modelled lines are UK-wide)",
-     england_wales, "United Kingdom"),
+    (
+        "England and Wales",
+        "ONS — birth registrations, Table 10 (modelled lines are UK-wide)",
+        england_wales,
+        "United Kingdom",
+    ),
     ("United States", "CDC / NCHS — natality via data.cdc.gov", united_states, "United States"),
     ("Japan", "MHLW — Vital Statistics via e-Stat", japan, "Japan"),
     ("Germany", "Destatis — Geburtenstatistik (GENESIS 12612-0008)", germany, "Germany"),
@@ -86,8 +90,16 @@ if __name__ == "__main__":
             p = p[p.year <= end]
             if not len(p):
                 continue
-            ax.plot([anchor.year] + p.year.tolist(), [anchor.value] + p.value.tolist(),
-                    color=PROJ_C, lw=1.7, ls=(0, (4, 2)), marker="o", ms=2.6, zorder=2)
+            ax.plot(
+                [anchor.year] + p.year.tolist(),
+                [anchor.value] + p.value.tolist(),
+                color=PROJ_C,
+                lw=1.7,
+                ls=(0, (4, 2)),
+                marker="o",
+                ms=2.6,
+                zorder=2,
+            )
         ax.plot(nso.year, nso.value, color=NSO_C, lw=2.6, marker="o", ms=3.0, zorder=5)
 
         last = nso.dropna().iloc[-1]
@@ -96,8 +108,18 @@ if __name__ == "__main__":
 
         ax.text(0, 1.155, country, transform=ax.transAxes, fontsize=13.5, fontweight="bold", color="#1d1d1b")
         ax.text(0, 1.055, src, transform=ax.transAxes, fontsize=8.8, color="#8a8a8a")
-        ax.text(0.985, 0.93, f"{last.value:.2f}\nin {int(last.year)}", transform=ax.transAxes,
-                fontsize=10.5, fontweight="bold", color=NSO_C, ha="right", va="top", linespacing=1.25)
+        ax.text(
+            0.985,
+            0.93,
+            f"{last.value:.2f}\nin {int(last.year)}",
+            transform=ax.transAxes,
+            fontsize=10.5,
+            fontweight="bold",
+            color=NSO_C,
+            ha="right",
+            va="top",
+            linespacing=1.25,
+        )
 
         ax.set_xlim(START - 0.5, 2027)
         ax.set_ylim(0, 2.6)
@@ -109,21 +131,38 @@ if __name__ == "__main__":
         ax.spines["bottom"].set_color("#cfcfcf")
         ax.tick_params(length=0, labelsize=9.5, colors="#666")
 
-    fig.text(0.038, 0.965, "National vital statistics vs UN WPP fertility estimates",
-             fontsize=17, fontweight="bold", color="#1d1d1b", va="top")
-    fig.text(0.038, 0.928,
-             "Total fertility rate, children per woman. Red: computed from each statistical office's own registered "
-             "births by age of mother.\nBlue: UN World Population Prospects 2024 — solid where estimated, dashed for "
-             "the high / medium / low projections.",
-             fontsize=9.6, color="#666", va="top")
+    fig.text(
+        0.038,
+        0.965,
+        "National vital statistics vs UN WPP fertility estimates",
+        fontsize=17,
+        fontweight="bold",
+        color="#1d1d1b",
+        va="top",
+    )
+    fig.text(
+        0.038,
+        0.928,
+        "Total fertility rate, children per woman. Red: computed from each statistical office's own registered "
+        "births by age of mother.\nBlue: UN World Population Prospects 2024 — solid where estimated, dashed for "
+        "the high / medium / low projections.",
+        fontsize=9.6,
+        color="#666",
+        va="top",
+    )
 
-    fig.text(0.038, 0.017,
-             "Sources: DANE Estadísticas Vitales; IBGE Estatísticas do Registro Civil (SIDRA tables 197 and 2612) with "
-             "IBGE population projections; INSEE fertility rates by detailed age of mother; ISTAT age-specific "
-             "fertility rates.\nUN World Population Prospects 2024. Colombia and Brazil computed as the sum of "
-             "age-specific rates using each country's own female population; France and Italy use the rates their "
-             "statistical office publishes.",
-             fontsize=7.6, color="#999", va="bottom")
+    fig.text(
+        0.038,
+        0.017,
+        "Sources: DANE Estadísticas Vitales; IBGE Estatísticas do Registro Civil (SIDRA tables 197 and 2612) with "
+        "IBGE population projections; INSEE fertility rates by detailed age of mother; ISTAT age-specific "
+        "fertility rates.\nUN World Population Prospects 2024. Colombia and Brazil computed as the sum of "
+        "age-specific rates using each country's own female population; France and Italy use the rates their "
+        "statistical office publishes.",
+        fontsize=7.6,
+        color="#999",
+        va="bottom",
+    )
 
     fig.subplots_adjust(left=0.05, right=0.985, top=0.83, bottom=0.115, hspace=0.44, wspace=0.13)
     fig.savefig("tfr_panels.png", facecolor="white")

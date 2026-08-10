@@ -11,6 +11,7 @@ DATA = os.path.join(os.path.dirname(__file__), "data")
 
 OUT = "colombia_tfr.csv"
 
+
 # ---------------------------------------------------------------- DANE population
 def dane_female_pop():
     """Female population by single age, national total, from DANE PPED files."""
@@ -26,7 +27,9 @@ def dane_female_pop():
     frames.append(sub)
 
     # 2018-2070: two header rows; ages labelled 'Mujeres N años'
-    b = pd.read_excel(os.path.join(DATA, "PPED-AreaSexoEdadNac-2018-2070.xlsx"), sheet_name="PobNacionalxÁreaSexoEdad", header=8)
+    b = pd.read_excel(
+        os.path.join(DATA, "PPED-AreaSexoEdadNac-2018-2070.xlsx"), sheet_name="PobNacionalxÁreaSexoEdad", header=8
+    )
     b.columns = [str(c).strip() for c in b.columns]
     ycol = [c for c in b.columns if c.startswith("Unnamed: 1")][0]
     acol = [c for c in b.columns if c.startswith("Unnamed: 2")][0]
@@ -73,12 +76,7 @@ def wpp_tfr():
 
     ds = Dataset("/Users/edouard/dev/owid/etl/data/garden/un/2024-07-12/un_wpp")
     tb = ds["fertility_rate"].reset_index()
-    sub = tb[
-        (tb.country == "Colombia")
-        & (tb.age == "all")
-        & (tb.sex == "all")
-        & (tb.variant == "estimates")
-    ]
+    sub = tb[(tb.country == "Colombia") & (tb.age == "all") & (tb.sex == "all") & (tb.variant == "estimates")]
     out = pd.DataFrame({"year": sub.year.astype(int), "value": sub.fertility_rate.astype(float)})
     return out.sort_values("year").reset_index(drop=True)
 
@@ -93,9 +91,7 @@ def dyb_tfr(pop):
     df = df[pd.to_numeric(df.Year, errors="coerce").notna()].copy()
     df["Year"] = df.Year.astype(int)
     df = df[
-        (df.Area == "Total")
-        & (df.Sex == "Both Sexes")
-        & (df["Record Type"] == "Data tabulated by year of occurrence")
+        (df.Area == "Total") & (df.Sex == "Both Sexes") & (df["Record Type"] == "Data tabulated by year of occurrence")
     ]
 
     rows = []

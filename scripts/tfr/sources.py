@@ -14,6 +14,7 @@ COLORS = {
     "UN WPP": "#3b82c4",
 }
 
+
 def _f(path):
     return pd.read_feather(os.path.join(DATA, path))
 
@@ -39,9 +40,6 @@ def un_wpp(country):
     return out
 
 
-
-
-
 def _tfr_from_asfr(df, per=1000.0, width=5):
     """TFR = sum of age-specific rates x group width."""
     g = df.groupby("year").value.sum() / per * width
@@ -57,12 +55,14 @@ def england_wales():
     """
     d = pd.read_excel(os.path.join(DATA, "uk_births.xlsx"), sheet_name="Table_10", header=5)
     d = d[(d.iloc[:, 2] == "Mother") & (d.iloc[:, 1] == "England, Wales and Elsewhere")]
-    out = pd.DataFrame({
-        "year": pd.to_numeric(d.iloc[:, 0], errors="coerce"),
-        "age": d.iloc[:, 3].astype(str),
-        # col 5 is the long-running 15-44 based rate; col 6 (15-49 base) exists only for recent years
-        "value": pd.to_numeric(d.iloc[:, 5], errors="coerce").fillna(pd.to_numeric(d.iloc[:, 6], errors="coerce")),
-    }).dropna()
+    out = pd.DataFrame(
+        {
+            "year": pd.to_numeric(d.iloc[:, 0], errors="coerce"),
+            "age": d.iloc[:, 3].astype(str),
+            # col 5 is the long-running 15-44 based rate; col 6 (15-49 base) exists only for recent years
+            "value": pd.to_numeric(d.iloc[:, 5], errors="coerce").fillna(pd.to_numeric(d.iloc[:, 6], errors="coerce")),
+        }
+    ).dropna()
     # ONS reports overlapping groups in recent years; keep the set present in every year
     out = out[out.age.isin(["Under 20", "20 to 24", "25 to 29", "30 to 34", "35 to 39", "40 and over"])]
     out["year"] = out.year.astype(int)
@@ -74,8 +74,20 @@ def united_states():
     d = pd.read_json(os.path.join(DATA, "us_births.json"))
     d = d[(d.subtopic == "Birth rate") & (d.group == "Maternal age group")]
     # 15-19 is also split into 15-17 and 18-19; keep only the non-overlapping groups
-    d = d[d.subgroup.isin(["10-14 years", "15-19 years", "20-24 years", "25-29 years",
-                           "30-34 years", "35-39 years", "40-44 years", "45-54 years"])]
+    d = d[
+        d.subgroup.isin(
+            [
+                "10-14 years",
+                "15-19 years",
+                "20-24 years",
+                "25-29 years",
+                "30-34 years",
+                "35-39 years",
+                "40-44 years",
+                "45-54 years",
+            ]
+        )
+    ]
     d = pd.DataFrame({"year": d.time_period.astype(int), "value": pd.to_numeric(d.estimate, errors="coerce")}).dropna()
     return _tfr_from_asfr(d)
 
@@ -110,17 +122,17 @@ def germany():
         stop = heads[bi + 1] if bi + 1 < len(heads) else len(lines)
         # each year appears twice in the header: once for the value, once for the quality flag
         years = [int(y) for y in lines[hdr].split(";")[1:] if y.strip().isdigit()][0::2]
-        for ln in lines[hdr + 1:stop]:
+        for ln in lines[hdr + 1 : stop]:
             m = re.match(r"^(\d+) years?;", ln)
             if not m:
                 continue
             age = int(m.group(1))
-            vals = ln.split(";")[1:][0::2]                      # value, quality-flag, value, flag, ...
+            vals = ln.split(";")[1:][0::2]  # value, quality-flag, value, flag, ...
             for y, raw in zip(years, vals):
                 v = pd.to_numeric(raw.replace(",", "."), errors="coerce")
                 if pd.notna(v):
                     rows.append({"year": y, "age": age, "value": float(v)})
-    return _tfr_from_asfr(pd.DataFrame(rows), width=1)         # single years of age
+    return _tfr_from_asfr(pd.DataFrame(rows), width=1)  # single years of age
 
 
 # ---------------------------------------------------------------- Thailand
@@ -153,7 +165,7 @@ def thailand():
     for f in ("th23_b.txt", "th25_b.txt"):
         yrs = _th_years(f)
         for key, nums in _th_rows(f):
-            for y, v in zip(yrs, nums[: len(yrs)]):        # counts first, percentages after
+            for y, v in zip(yrs, nums[: len(yrs)]):  # counts first, percentages after
                 births.setdefault(y, {})[key] = v
 
     pop = {}
@@ -162,7 +174,7 @@ def thailand():
         for key, nums in _th_rows(f):
             if not isinstance(key, tuple):
                 continue
-            for i, y in enumerate(yrs):                     # each year is Total, Male, Female
+            for i, y in enumerate(yrs):  # each year is Total, Male, Female
                 if len(nums) >= 3 * i + 3:
                     pop.setdefault(y, {})[key] = nums[3 * i + 2]
 
@@ -203,11 +215,17 @@ def egypt():
 
 # ---------------------------------------------------------------- Mexico
 _MX_AGE = {
-    "Menor de 15 años": (10, 14), "De 15 a 19 años": (15, 19), "De 20 a 24 años": (20, 24),
-    "De 25 a 29 años": (25, 29), "De 30 a 34 años": (30, 34), "De 35 a 39 años": (35, 39),
-    "De 40 a 44 años": (40, 44), "De 45 a 49 años": (45, 49), "De 50  y más años": (50, 54),
+    "Menor de 15 años": (10, 14),
+    "De 15 a 19 años": (15, 19),
+    "De 20 a 24 años": (20, 24),
+    "De 25 a 29 años": (25, 29),
+    "De 30 a 34 años": (30, 34),
+    "De 35 a 39 años": (35, 39),
+    "De 40 a 44 años": (40, 44),
+    "De 45 a 49 años": (45, 49),
+    "De 50  y más años": (50, 54),
 }
-MX_LAST = 2022   # 2023-24 occurrence years are still filling up with late registrations
+MX_LAST = 2022  # 2023-24 occurrence years are still filling up with late registrations
 
 
 def mexico():

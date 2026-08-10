@@ -12,6 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 warnings.filterwarnings("ignore")
 
 from plot_panels import PANELS, START  # noqa: E402
+from detail import compare  # noqa: E402
 from sources import COLORS, SOURCES, un_wpp  # noqa: E402
 import numpy as np  # noqa: E402
 
@@ -19,25 +20,19 @@ OUT = "tfr_charts.html"
 
 JS = """<script>
 (function () {
-  const paths = (src) => document.querySelectorAll('[data-src="' + src + '"]');
-  document.querySelectorAll('button.k').forEach((btn) => {
-    const src = btn.dataset.src;
-    btn.addEventListener('click', () => {
-      const on = btn.getAttribute('aria-pressed') === 'true';
-      btn.setAttribute('aria-pressed', String(!on));
-      paths(src).forEach((p) => p.classList.toggle('off', on));
+  const sel = document.getElementById('pick');
+  const secs = Array.from(document.querySelectorAll('section[data-country]'));
+  function apply() {
+    const v = sel.value;
+    secs.forEach((s) => {
+      const on = !v || s.dataset.country === v;
+      s.hidden = !on;
+      s.classList.toggle('solo', Boolean(v) && on);
     });
-    btn.addEventListener('mouseenter', () => {
-      if (btn.getAttribute('aria-pressed') !== 'true') return;
-      document.querySelectorAll('path.ln, circle.dot').forEach((p) => {
-        p.classList.toggle('hi', p.dataset.src === src);
-        p.classList.toggle('dim', p.dataset.src !== src);
-      });
-    });
-    btn.addEventListener('mouseleave', () => {
-      document.querySelectorAll('path.ln, circle.dot').forEach((p) => p.classList.remove('hi', 'dim'));
-    });
-  });
+    if (v) window.scrollTo({ top: 0 });
+  }
+  sel.addEventListener('change', apply);
+  apply();
 })();
 </script>"""
 W, H = 940, 340
@@ -117,14 +112,15 @@ def chart(country, nso):
 
     top = max(d.value.max() for _, _, d, _ in series)
     step = 0.5 if top > 1.6 else 0.25
-    y1 = math.ceil(top / step) * step + step * 0.15      # a little headroom above the tallest line
+    y1 = math.ceil(top / step) * step + step * 0.15  # a little headroom above the tallest line
 
     g = []
     v = step
     while v < y1:
         g.append(f'<line class="grid" x1="{PAD_L}" y1="{sy(v, y1):.1f}" x2="{W - PAD_R}" y2="{sy(v, y1):.1f}"/>')
-        g.append(f'<text class="ylab" x="{PAD_L - 8}" y="{sy(v, y1) + 3.5:.1f}">{v:.2f}'.rstrip("0").rstrip(".")
-                 + "</text>")
+        g.append(
+            f'<text class="ylab" x="{PAD_L - 8}" y="{sy(v, y1) + 3.5:.1f}">{v:.2f}'.rstrip("0").rstrip(".") + "</text>"
+        )
         v += step
     g.append(f'<line class="axis" x1="{PAD_L}" y1="{sy(0, y1):.1f}" x2="{W - PAD_R}" y2="{sy(0, y1):.1f}"/>')
     g.append(f'<text class="ylab" x="{PAD_L - 8}" y="{sy(0, y1) + 3.5:.1f}">0</text>')
@@ -137,12 +133,82 @@ def chart(country, nso):
         pts = df.dropna(subset=["value"])
         if len(pts) == 1:
             r = pts.iloc[0]
-            g.append(f'<circle class="dot" data-src="{src}" style="fill:{col}" '
-                     f'cx="{sx(r.year):.1f}" cy="{sy(r.value, y1):.1f}" r="3.4"/>')
+            g.append(
+                f'<circle class="dot" data-src="{src}" style="fill:{col}" '
+                f'cx="{sx(r.year):.1f}" cy="{sy(r.value, y1):.1f}" r="3.4"/>'
+            )
         else:
             g.append(f'<path class="{cls}" data-src="{src}" style="stroke:{col}" d="{path(df, y1)}"/>')
 
     return f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="{country} fertility rate">{"".join(g)}</svg>'
+
+
+# ---------------------------------------------------------------- dumbbells
+DB_L, DB_R, DB_T, DB_B, ROW = 84, 24, 16, 32, 30
+
+
+def _nice(top):
+    """Round the axis top up to 1, 2 or 5 times a power of ten."""
+    if top <= 0:
+        return 1.0
+    mag = 10 ** math.floor(math.log10(top))
+    for m in (1, 2, 5, 10):
+        if top <= m * mag:
+            return m * mag
+    return 10 * mag
+
+
+def _fmt(v):
+    if v >= 1e6:
+        return f"{v / 1e6:g}M"
+    if v >= 1e3:
+        return f"{v / 1e3:g}k"
+    return f"{v:g}"
+
+
+def dumbbell(rows, title):
+    """rows: [(label, national, wpp)] — one row per age band, the two values joined."""
+    h = DB_T + len(rows) * ROW + DB_B
+    top = _nice(max(max(a, b) for _, a, b in rows))
+    span = W - DB_L - DB_R
+
+    def dx(v):
+        return DB_L + v / top * span
+
+    g = []
+    for i in range(5):
+        v = top * i / 4
+        g.append(
+            f'<line class="grid" x1="{dx(v):.1f}" y1="{DB_T - 4}" x2="{dx(v):.1f}" y2="{DB_T + len(rows) * ROW}"/>'
+        )
+        g.append(f'<text class="xlab" x="{dx(v):.1f}" y="{h - 12}">{_fmt(v)}</text>')
+
+    for i, (label, a, b) in enumerate(rows):
+        y = DB_T + i * ROW + ROW / 2
+        g.append(f'<text class="blab" x="{DB_L - 10}" y="{y + 4:.1f}">{label}</text>')
+        g.append(f'<line class="bar" x1="{dx(min(a, b)):.1f}" y1="{y:.1f}" x2="{dx(max(a, b)):.1f}" y2="{y:.1f}"/>')
+        g.append(f'<circle class="pw" cx="{dx(b):.1f}" cy="{y:.1f}" r="5"/>')
+        g.append(f'<circle class="pn" cx="{dx(a):.1f}" cy="{y:.1f}" r="5"/>')
+
+    return f'<svg viewBox="0 0 {W} {h}" role="img" aria-label="{title}">{"".join(g)}</svg>'
+
+
+def detail_block(country, model_country, yr):
+    rows = compare(country, model_country, yr)
+    if not rows:
+        return (
+            '<div class="detail"><p class="na">This office publishes fertility rates only, not the '
+            "births and female population behind them, so the two sources cannot be compared "
+            "age band by age band.</p></div>"
+        )
+    births = [(lab, nb, wb) for lab, nb, wb, _, _ in rows]
+    women = [(lab, nw, ww) for lab, _, _, nw, ww in rows]
+    return (
+        f'<div class="detail">'
+        f"<h3>Births by age of mother, {yr}</h3>{dumbbell(births, f'{country} births {yr}')}"
+        f"<h3>Women by age group, {yr}</h3>{dumbbell(women, f'{country} women {yr}')}"
+        f"</div>"
+    )
 
 
 def main():
@@ -157,11 +223,14 @@ def main():
 
     # biggest gap to the UN WPP medium projection first
     built.sort(key=lambda r: -r[0])
-    sections = []
+    sections, options = [], ['<option value="">All countries</option>']
     for sd, yr, n, country, src, nso, model_country in built:
+        options.append(f'<option value="{country}">{country}</option>')
         sections.append(
-            f'<section><h2>{country}</h2>'
-            f'<p class="src">{src}</p>{chart(model_country, nso)}</section>')
+            f'<section data-country="{country}"><h2>{country}</h2>'
+            f'<p class="src">{src}</p>{chart(model_country, nso)}'
+            f"{detail_block(country, model_country, yr)}</section>"
+        )
     print("  ranked:", ", ".join(f"{c} {sd:.3f}" for sd, _, _, c, *_ in built))
 
     keys = "".join(
@@ -196,6 +265,17 @@ def main():
  .xlab {{ fill:var(--mut); font-size:11px; text-anchor:middle; }}
  .ln {{ fill:none; stroke-width:1.8; stroke-linejoin:round; stroke-linecap:round; }}
  .proj {{ stroke-dasharray:5 3; }}
+ .blab {{ fill:var(--mut); font-size:11.5px; text-anchor:end; }}
+ .bar {{ stroke:var(--line); stroke-width:4; stroke-linecap:round; }}
+ .pn {{ fill:var(--nso); }}
+ .pw {{ fill:{COLORS["UN WPP"]}; }}
+ select {{ font:inherit; font-size:13px; color:var(--fg); background:var(--bg); border:1px solid var(--line);
+          border-radius:6px; padding:4px 8px; margin-left:auto; }}
+ .detail {{ display:none; margin-top:24px; padding-top:6px; border-top:1px solid var(--line); }}
+ section.solo .detail {{ display:block; }}
+ section[hidden] {{ display:none; }}
+ h3 {{ font-size:14.5px; font-weight:600; margin:20px 0 4px; }}
+ .na {{ color:var(--mut); font-size:13.5px; max-width:70ch; }}
  .k {{ display:inline-flex; align-items:center; font-size:13px; color:var(--mut); }}
  footer {{ color:var(--mut); font-size:12.5px; border-top:1px solid var(--line); padding-top:16px; max-width:82ch; }}
 </style>
@@ -206,9 +286,9 @@ country's own statistical office — registered births by age of mother over its
 is the UN World Population Prospects 2024: solid where it estimates the past, and one line per projection variant
 after that.</p>
 
-<div class="key">{keys}</div>
+<div class="key">{keys}<select id="pick" aria-label="Pick a country">{"".join(options)}</select></div>
 
-{''.join(sections)}
+{"".join(sections)}
 
 <footer><strong>National sources.</strong> Colombia: DANE Estadísticas Vitales, births by age of mother, over DANE
 population projections. Brazil: IBGE Estatísticas do Registro Civil, SIDRA tables 197 and 2612, over IBGE population
@@ -218,6 +298,7 @@ high, medium and low variants.<br><br>
 Brazil's 2000–02 points come from a different IBGE table than 2003 onward and understate the level, because birth
 registration coverage was still improving — the step up in 2003 is coverage, not fertility. Latest years are
 provisional in Colombia, Brazil and France. Built {stamp}.</footer>
+{JS}
 </div>
 """)
     print(f"wrote {OUT}")
