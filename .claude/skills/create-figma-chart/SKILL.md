@@ -268,6 +268,31 @@ The high-value edits to propose (include them in the Step 4 proposal):
 - **Flags** (`2654:5`) beside country labels/bars where they help; **animals** (`5336:5`) for livestock topics; both are copy/paste.
 - **Colors**: only the file's Chart colors library, in the cheat-sheet order; check red/green pairs and black-and-white legibility (GUIDELINES.md → Colors).
 
+## Re-exporting after a change to the chart itself
+
+Expect this to happen more than once per run. Anything that belongs to the **chart** — the category order, the entity selection, the tolerance, the colors, the year — is fixed in grapher or in the narrative chart by whoever owns it, and then re-exported. **Never patch it by moving vectors in Figma:** the image would then disagree with the interactive chart it accompanies, and the next re-export silently throws your edit away.
+
+The swap is one scripted pass, and it is the same every time — worth doing as a single `use_figma` call rather than rebuilding by hand:
+
+```js
+oldChart.remove()
+const kids = [...imported.children]                  // bin the upload's frame
+for (const k of kids) clone.appendChild(k)
+imported.remove()
+const chart = kids.length === 1 ? kids[0] : figma.group(kids, clone)
+chart.name = "chart"
+for (const n of ["horizontal-axis", "vertical-grid-lines", "vertical-zero-line"])
+  for (const x of chart.query(`[name=${n}]`).toArray()) x.remove()   // if they were dropped before
+chart.rescale(header.width / chart.width)
+// ... re-hug every TEXT, preserving its alignment anchor ...
+chart.rescale(header.width / chart.width)            // re-hugging moves the bbox
+const gap = (footer.y - (header.y + header.height) - chart.height) / 2
+chart.x = header.x
+chart.y = header.y + header.height + gap
+```
+
+Keep the export URL — same `imFontSize`, same `imType`, same params — so the only thing that changes is what the chart author changed. And re-check the category order and the entity list against what you were told changed: a reorder can move more than the category you asked about.
+
 ## Step 9 — Checklist pass, review, deliver
 
 1. Run the **Good Data Viz Checklist** (GUIDELINES.md, final section) against the composed frame; fix what fails.

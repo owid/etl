@@ -65,6 +65,7 @@ Companion reference for the `create-figma-chart` skill. Distilled from the desig
 - **"When labels can live in the chart" is a real test, not a formality.** Each label has to sit on the mark it names — over its segment of the top bar, or inside the widest segment of its series. That holds for about three or four categories; past that they collide, and a color-coded row spread evenly across the plot is a legend with the swatches removed, which is worse than the legend. Keep grapher's legend in that case and tidy it instead.
 - Bars/areas: label inside the chart element when contrast allows — white text on dark fills, **≥12px**.
 - If a legend must stay: **squares**, not circles or rectangles; consider moving it into empty chart space (stacked bars often have some) rather than under the subtitle.
+- **A residual category goes last.** "Other meats", "Other", "Rest of the world" and the like belong at the end of a stacked order and at the end of the legend — they are the leftover, so putting them mid-stack breaks the reading order and pushes the named categories apart. Fix this **in the chart** (the dimension's column order), not by moving vectors in Figma, so the image and the interactive chart agree.
 
 ## Colors
 
