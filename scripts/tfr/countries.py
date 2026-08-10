@@ -22,6 +22,7 @@ sys.path.insert(0, HERE)
 warnings.filterwarnings("ignore")
 
 from argentina import argentina_tfr  # noqa: E402
+from canada import canada_tfr  # noqa: E402
 from china import china_tfr  # noqa: E402
 from colombia import dane_female_pop, dane_registered_tfr  # noqa: E402
 from france import france_tfr  # noqa: E402
@@ -44,6 +45,7 @@ from published import (  # noqa: E402
     sudan,
     tanzania,
     vietnam,
+    yemen,
 )
 from sources import egypt, england_wales, germany, japan, mexico, thailand, united_states  # noqa: E402
 from south_africa import south_africa_tfr  # noqa: E402
@@ -474,6 +476,43 @@ COUNTRIES = [
       "editions dropped the full births-by-age table, so a recalculation for the latest year is not "
       "possible from them.",
       "https://mods.go.kr/board.es?mid=a20108010000&bid=11773"),
+    C("Canada", "Statistics Canada — births by age of mother over its population estimates", canada_tfr,
+      "Canada", "complete", True,
+      "Statistics Canada publishes registered live births by age group of mother, female population by "
+      "age group at 1 July, and its own fertility rate — all three as plain CSV from one open service "
+      "with no key, annually from 1991.",
+      "We divided the births by the female population in each age group and summed. Our figures match "
+      "Statistics Canada's own published rate to the second decimal in every year we checked: 1.269 "
+      "against 1.27 for 2023, 1.255 against 1.25 for 2024, 1.510 against 1.51 for 2018.",
+      "Births are dated by the year they occurred, not the year they were registered, and late "
+      "registrations are folded back into the year of the birth by annual revision — about a thousand cases "
+      "five years on — so recent years do not understate. The 2024 figure is flagged provisional in the "
+      "table notes but not in the data itself, so anything automated has to treat the latest year as "
+      "provisional by hand. Nova Scotia under-recorded births in 2021. Births to mothers of 50 and over are "
+      "folded into the 45-49 row for confidentiality, and mothers whose age was not stated are spread "
+      "across the bands. There is no citizens-only denominator to pick wrongly here, but the population does "
+      "include non-permanent residents, and the number of women aged 20-24 rose 9% between 2019 and 2024 "
+      "partly on student migration — so some of the fall in the rate is the denominator growing rather than "
+      "births falling.",
+      "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310041601"),
+    C("Yemen", "CSO and health ministry — National Health and Demographic Survey 2013", yemen, "Yemen",
+      "survey", False,
+      "One figure inside our window: 4.4 children per woman for the three years to 2013, from the survey "
+      "the Central Statistical Organisation ran with the health ministry. The 2004 census is also covered, "
+      "but the organisation publishes two different figures for it — 4.93 by one method and 6.1 by another.",
+      "We read the national column of table 2. Summing its age-specific rates and multiplying by the band "
+      "width gives 4.43, the published 4.4.",
+      "We use the 2013 survey rather than the census because the census figures are not one number: the "
+      "organisation's own yearbook prints 4.93 from directly observed births and 6.1 from cumulating "
+      "age-specific rates, and a separate study of its own reaches 6.1 by indirect estimation. Choosing "
+      "between those is a methodological judgement, not a lookup, so the survey — a single figure from "
+      "standard birth-history estimation — is the safer one. Nothing has been published since 2013; the war "
+      "began in 2015. Three of the organisation's four domains are unusable: cso-yemen.com sits behind a "
+      "firewall that rejects anything that is not a browser, cso.gov.ye has its secure port blackholed, and "
+      "cso-yemen.org and the planning ministry's domain have both lapsed to squatters — the former now "
+      "serves a spam blog, so anything found live there should not be trusted. This report came from a web "
+      "archive.",
+      "https://web.archive.org/web/20220608201754/https://cso.gov.ye/about_cso"),
     C("Argentina", "Health ministry births over INDEC population", argentina_tfr, "Argentina",
       "complete", True,
       "The health ministry publishes registered live births by age group of mother as open CSV, annually "

@@ -315,6 +315,31 @@ def afghanistan():
     return _series([])
 
 
+YE_NHDS = ("https://web.archive.org/web/20220321032936/http://www.cso-yemen.com/publiction/"
+           "suhee_2013/rebort_sehee_2013.pdf")
+
+
+def yemen():
+    """CSO and the health ministry, National Health and Demographic Survey 2013, table 2.
+
+    The organisation's own site is behind a firewall that rejects anything but a browser, so this
+    report comes from a web archive. The table gives urban, rural and total columns.
+    """
+    path = os.path.join(DATA, "ye", "nhds2013.txt")
+    if not os.path.exists(path):
+        pdf = fetch(YE_NHDS, os.path.join(DATA, "ye", "nhds2013.pdf"))
+        subprocess.run(["pdftotext", "-layout", pdf, path], check=True)
+    for ln in open(path, errors="ignore"):
+        # the table is right to left, so the three figures print before their Arabic label and the
+        # national one comes first: "4.4  5.1  3.2  \u0645\u0639\u062f\u0644 ... TFR (15-49)"
+        if "TFR (15-49" not in ln:
+            continue
+        vals = re.findall(r"\d\.\d", ln)
+        if len(vals) == 3:
+            return _series([(2013, float(vals[0]))])
+    return _series([])
+
+
 def kenya():
     """KNBS, 2019 census analytical report on fertility and nuptiality, volume VI, table 4.5.
 

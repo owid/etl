@@ -35,8 +35,8 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 34,Spain,47850792,full,yes,yes,complete,
 35,Argentina,46003732,full,yes,yes,complete,INDEC publishes no annual rate at all; built from health-ministry births 2010-2024
 36,Afghanistan,45047067,full,yes,no,survey,"AfDHS 2015 only; cso.gov.af nameservers deprovisioned, nsia.gov.af is a JS app"
-37,Yemen,42961661,no,no,,,
-38,Canada,40467724,no,no,,,
+37,Yemen,42961661,full,yes,no,survey,"2013 survey only; three of four CSO domains unusable, two squatted"
+38,Canada,40467724,full,yes,yes,complete,fully recalculated 1991-2024; matches StatCan's own rate to 2 decimals
 39,Angola,40215180,no,no,,,
 40,Ukraine,39535851,no,no,,,
 41,Morocco,38762441,no,no,,,

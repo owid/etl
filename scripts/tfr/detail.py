@@ -315,6 +315,12 @@ def germany_band_detail(year):
     return germany_detail(year)
 
 
+def canada_band_detail(year):
+    from canada import canada_detail
+
+    return canada_detail(year)
+
+
 def argentina_band_detail(year):
     from argentina import argentina_detail
 
@@ -373,6 +379,7 @@ DETAIL = {
     "South Africa": south_africa_band_detail,
     "Uganda": uganda_band_detail,
     "Argentina": argentina_band_detail,
+    "Canada": canada_band_detail,
     "Germany": germany_band_detail,
     "Japan": japan_band_detail,
     "France": france_band_detail,
