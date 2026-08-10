@@ -242,12 +242,26 @@ chart.y = top + (bottom - top - chart.height) / 2                // centred betw
 
 ```js
 for (const t of chart.query('TEXT')) {
-  const a = { x: t.x, w: t.width, align: t.textAlignHorizontal }
+  const a = { x: t.x, y: t.y, w: t.width, h: t.height, align: t.textAlignHorizontal }
   t.textAutoResize = "WIDTH_AND_HEIGHT"                          // fonts loaded first
   if (a.align === "CENTER") t.x = a.x + (a.w - t.width) / 2
   else if (a.align === "RIGHT") t.x = a.x + a.w - t.width
+  t.y = a.y + (a.h - t.height) / 2                               // keep the vertical centre too
 }
 ```
+
+**Then verify the alignment against the marks, not against the old box.** Re-hugging changes a box's height as well as its width, so labels drift vertically — every value label on this skill's first run ended up 1.2px above its bar's centre and every legend label 1.31px above its swatch. Individually invisible; as a set, the whole chart reads slightly high. It is worth an explicit pass, because nothing about it looks wrong in a node listing:
+
+```js
+for (const row of chart.query('[name=bars]').first().children) {
+  const bar = row.query('VECTOR[name=bar]').first()
+  const mid = bar.y + bar.height / 2
+  for (const t of row.query('TEXT')) t.y -= (t.y + t.height / 2) - mid
+}
+// same for the legend: centre each label on its swatch
+```
+
+Make this a habit rather than a reaction to someone noticing: **after any scale, re-hug or reflow, check that labels still centre on the thing they label** — bar values on their bars, legend labels on their swatches, axis labels on their ticks.
 
 ## Step 8 — Improve the labelling and annotate
 
