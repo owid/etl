@@ -149,6 +149,16 @@ def ethiopia():
     return _series([(2000, 5.5), (2005, 5.4), (2011, 4.8), (2016, 4.6), (2024, 4.0)])
 
 
+def kenya():
+    """KNBS, 2019 census analytical report on fertility and nuptiality, volume VI, table 4.5.
+
+    The trends table gives the national total fertility rate for the last two census rounds. The
+    whole report is scanned page images rather than text, so the numbers were read by running
+    optical character recognition over it and then checked by eye against the page.
+    """
+    return _series([(2009, 4.8), (2019, 3.4)])
+
+
 def drc():
     """INS, EDS-RDC III (2023-24), table 5.1 and the trend sentence in section 5.1.
 

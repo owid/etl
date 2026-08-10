@@ -32,6 +32,7 @@ from published import (  # noqa: E402
     drc,
     ethiopia,
     indonesia,
+    kenya,
     nigeria,
     pakistan,
     russia,
@@ -326,6 +327,20 @@ COUNTRIES = [
       "and women by age group, so a direct recalculation is possible, but it would reproduce the "
       "unadjusted 3.2 rather than the figure NBS stands behind.",
       "https://www.nbs.go.tz/statistics/topic/demographic-and-socio-economic-statistics"),
+    C("Kenya", "KNBS — 2019 Population and Housing Census, volume VI", kenya, "Kenya", "survey", False,
+      "The census fertility volume gives a national total fertility rate of 3.4 for 2019 and 4.8 for 2009, "
+      "plus age-specific rates for every county. The 2022 household health survey, also run by KNBS, "
+      "separately found 3.4.",
+      "We read both census values out of the trends table. We also summed the national age-specific rates "
+      "and got 3.24, a little below the published 3.4 — the rates are printed to three decimals and the "
+      "national total absorbs county-level adjustments, so the two do not have to agree exactly.",
+      "The census measures fertility by asking women about births in the three years before the count, not "
+      "from registration. Rates for the North-Eastern counties are adjusted with a Gompertz model because "
+      "reporting there was inconsistent. The whole report is scanned page images with no text layer, so "
+      "everything had to be read by optical character recognition. Births by age of mother as counts are "
+      "not in this volume.",
+      "https://www.knbs.or.ke/wp-content/uploads/2024/05/2019-Kenya-population-and-Housing-Census-"
+      "Analytical-Report-on-Fertility-and-Nuptiality-Vol.VI_.pdf"),
     C("Myanmar", "Department of Population — 2019 Inter-censal Survey", myanmar_tfr, "Myanmar",
       "survey", True,
       "Appendix table D-1 of the Union Report gives, for every five-year age group, the number of women "
