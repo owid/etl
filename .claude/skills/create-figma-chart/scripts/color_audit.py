@@ -381,7 +381,9 @@ def main():
     ap.add_argument("--names", help="comma-separated category names, same order")
     ap.add_argument("--suggest", action="store_true", help="search the palette for a safer set")
     ap.add_argument("--maps", action="store_true",
-                    help="search the Categorical Maps group instead (choropleth fills)")
+                    help="search the Categorical Maps group instead (categorical choropleth "
+                         "fills only — not a sequential Viridis/ColorBrewer ramp, which is "
+                         "ordered and set in grapher)")
     ap.add_argument("--line", action="store_true",
                     help="use the Line and Slope Charts variants (thin marks and text on white)")
     ap.add_argument("--separated", action="store_true",
