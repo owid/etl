@@ -40,12 +40,14 @@ from published import (  # noqa: E402
     bangladesh,
     drc,
     ethiopia,
+    ghana,
     indonesia,
     iraq,
     kenya,
     nigeria,
     pakistan,
     russia,
+    saudi_arabia,
     sudan,
     morocco,
     mozambique,
@@ -182,6 +184,42 @@ COUNTRIES = [
       "ones that do not split 40-49 and have no clean 15-19 — so there is nothing to recalculate from. Those "
       "tables do exist in the printed demographic yearbook, but the server hosting it times out.",
       "https://stat.uz/en/official-statistics/demography"),
+    C("Saudi Arabia", "GASTAT — Population Estimates", saudi_arabia, "Saudi Arabia", "complete", False,
+      "GASTAT publishes a fertility rate annually from 2011, in three parallel series: Saudis, non-Saudis, "
+      "and everyone resident in the kingdom. For 2024 those are 2.7, 0.8 and 2.0.",
+      "We took the whole-population series, which is the one comparable with the UN's figures. No "
+      "arithmetic of our own.",
+      "Getting the nationality split wrong here would be worse than any other country in this dataset: "
+      "non-Saudis are 44% of the population and their fertility is a third of the Saudi figure, because the "
+      "non-Saudi resident population is overwhelmingly working-age and often without families in the "
+      "country. GASTAT resolves the trap for us by publishing all three. Its own methodology describes the "
+      "fertility figures as assumptions inside a cohort-component projection rolled forward from the 2022 "
+      "census, with the components taken from the national administrative records — so this is registration "
+      "data inside a model rather than a straight count. GASTAT publishes no age-specific rates and no "
+      "births by age of mother, so nothing can be rebuilt: the nearest thing, average births by mother\'s "
+      "age, counts children a woman has ever had rather than births in the year, and summing that would be "
+      "meaningless. One translation trap: GASTAT\'s English text repeatedly says these rates are per 1,000 "
+      "women, but the numbers are children per woman.",
+      "https://www.stats.gov.sa/en/statistics-tabs/-/categories/gastat-statistics/119025"),
+    C("Ghana", "GSS — Demographic and Health Survey", ghana, "Ghana", "survey", False,
+      "GSS runs the survey itself and publishes a fertility rate from each round: 4.4 for 2003, 4.0 for "
+      "2008 and 3.9 for 2022. Its censuses give different figures again, and its 2021 census counts are "
+      "published as raw tables through an open database.",
+      "We read the survey rounds. Summing the 2022 report's own age-specific rates reproduces its published "
+      "3.9 exactly.",
+      "Ghana is the clearest example in this dataset of how much the correction matters. For the 2010 census "
+      "GSS publishes both figures and names the method: 3.28 as reported, 4.57 after a relational Gompertz "
+      "adjustment, and it says plainly that comparing the census against the survey before it "
+      "\"clearly indicates miss-reporting of births\". For 2000 the pair is 3.99 and 5.66. For the 2021 "
+      "census it has published neither — the fertility volume has still not appeared five years on, even "
+      "though the underlying counts have been in its public database since 2023. Those counts imply 3.10 "
+      "unadjusted, which by GSS\'s own pattern would land about a child higher once corrected, so we do not "
+      "use it and neither should anyone else without that caveat. Its own survey puts birth registration at "
+      "75% of under-fives, and GSS says outright that census and survey estimation are used because vital "
+      "registration is unreliable. The site renders its publication list only in a browser, but an "
+      "unauthenticated file API behind it lists everything; its statistics database was unreachable from "
+      "here even though it answers elsewhere.",
+      "https://statsghana.gov.gh/"),
     C("Malaysia", "DOSM — age-specific fertility rates over its population estimates", malaysia_tfr,
       "Malaysia", "complete", False,
       "DOSM publishes age-specific fertility rates and its own total, annually from 1958, plus population "

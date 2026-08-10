@@ -438,6 +438,27 @@ def mozambique():
     return _series([(1997, 5.2), (2003, 5.5), (2011, 5.9), (2023, 4.9)])
 
 
+def saudi_arabia():
+    """GASTAT, Population Estimates 2024, figure 6 — the whole-population column, 2011 onward.
+
+    GASTAT publishes three parallel series: Saudis, non-Saudis and everyone resident. The last is
+    the one comparable with the UN's figures, and the three differ enormously — 2.7, 0.8 and 2.0 in
+    2024 — so the choice matters more here than almost anywhere.
+    """
+    return _series([(2011, 2.8), (2012, 2.8), (2013, 2.7), (2014, 2.7), (2015, 2.6), (2016, 2.6),
+                    (2017, 2.7), (2018, 2.7), (2019, 2.5), (2020, 2.3), (2021, 2.2), (2022, 2.1),
+                    (2023, 2.0), (2024, 2.0)])
+
+
+def ghana():
+    """GSS's own health and demographic survey rounds, direct estimates from birth histories.
+
+    The 2022 report states the fall plainly: from 6.4 in 1988 to 3.9 in 2022. The two earlier rounds
+    here are the ones GSS reproduces in its own census monograph's trend chart.
+    """
+    return _series([(2003, 4.4), (2008, 4.0), (2022, 3.9)])
+
+
 def kenya():
     """KNBS, 2019 census analytical report on fertility and nuptiality, volume VI, table 4.5.
 
