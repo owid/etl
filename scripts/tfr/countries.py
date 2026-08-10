@@ -48,6 +48,7 @@ from published import (  # noqa: E402
     madagascar,
     morocco,
     mozambique,
+    niger,
     nigeria,
     pakistan,
     russia,
@@ -544,6 +545,24 @@ COUNTRIES = [
       "of 1.18 was implausibly low because births went unreported. The bureau's queryable data portal "
       "refuses requests from outside the country, but these static files download without trouble.",
       "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/B0603.xls"),
+    C("Niger", "INS — national fertility and health surveys", niger, "Niger", "survey", False,
+      "INS publishes a fertility rate from each survey round: 7.1 for 2006, 7.6 for 2012 and 6.2 for its "
+      "2021 fertility survey. Its 2012 census gives 7.5, with the births and women behind it printed as "
+      "counts.",
+      "We read the survey rounds. We also checked the census: dividing its own counts gives 7.476 against "
+      "the published 7.5.",
+      "Niger has the highest fertility in the world, and its 2012 census is the second case here — after "
+      "Madagascar — where the office computed a correction and refused it. The relational Gompertz method "
+      "would have raised the figure from 7.5 to 7.8, but the report found the model a poor fit and decided "
+      "to \"favour the field data, which are relatively more accurate than extreme hypothetical estimates\", "
+      "so the published number is the lower one. INS also flags that its own census and its own survey "
+      "disagree for the same year, 7.5 against 7.6, and attributes the gap to under-declaration in the "
+      "census\'s twelve-month window. Civil registration is not used nationally; INS does compute a rate "
+      "from registrations for Niamey alone, where completeness is 69% — and it comes out above the survey "
+      "figure for the same city, 4.8 against 4.2. The fifth census is still in its pilot phase as of early "
+      "2026, more than thirteen years after the fourth. One INS chart gives 7.0 and 7.2 for 1992 and 1998 "
+      "where its own primary tables give 7.4 and 7.5; the tables are right.",
+      "https://stat-niger.org/"),
     C("Nigeria", "National Population Commission — Nigeria Demographic and Health Survey", nigeria,
       "Nigeria", "survey", False,
       "The 2024 survey report sets every round since 2003 side by side in one table: 5.7 in 2003 and 2008, "

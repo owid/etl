@@ -468,6 +468,14 @@ def madagascar():
     return _series([(2004, 5.2), (2009, 4.8), (2021, 4.3)])
 
 
+def niger():
+    """INS survey rounds. The 2021 report's trend table carries the earlier ones.
+
+    2006 and 2012 are the health surveys; 2021 is a stand-alone national fertility survey.
+    """
+    return _series([(2006, 7.1), (2012, 7.6), (2021, 6.2)])
+
+
 def kenya():
     """KNBS, 2019 census analytical report on fertility and nuptiality, volume VI, table 4.5.
 
