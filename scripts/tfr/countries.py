@@ -33,6 +33,7 @@ from myanmar import myanmar_tfr  # noqa: E402
 from published import (  # noqa: E402
     afghanistan,
     algeria,
+    angola,
     bangladesh,
     drc,
     ethiopia,
@@ -513,6 +514,22 @@ COUNTRIES = [
       "serves a spam blog, so anything found live there should not be trusted. This report came from a web "
       "archive.",
       "https://web.archive.org/web/20220608201754/https://cso.gov.ye/about_cso"),
+    C("Angola", "INE — Inquérito de Indicadores Múltiplos e de Saúde", angola, "Angola", "survey", False,
+      "INE publishes a fertility rate for each survey round: 6.2 from the 2015-16 survey and 4.8 from the "
+      "2023-24 one, with the age-specific rates behind each. The 2014 census separately gave 5.7.",
+      "We read the national figure from each round. Summing the printed age-specific rates reproduces both "
+      "totals, at 6.215 and 4.78.",
+      "We use the two surveys rather than the census, because they measure the same way — from women\'s own "
+      "birth histories, with no correction applied — while the census figures are not one number. INE\'s own "
+      "population projection re-derived the 2014 baseline as 5.5 rather than the census\'s 5.7, using a "
+      "Gompertz model, because it found women had under-reported their total children and over-reported "
+      "births in the last twelve months. The census also sits oddly against the survey: 5.7 in 2014 against "
+      "6.2 measured two years later. Angolan civil registration cannot be used at all — the 2023-24 survey "
+      "found only 38% of children under five registered, and only 36% of those holding a certificate. No "
+      "Angolan source publishes births by age of mother as counts, only rates, so there is nothing to "
+      "recalculate from. The 2024 census has published definitive results with no fertility indicator at "
+      "all, so a later thematic volume is worth watching for.",
+      "https://www.ine.gov.ao/publicacoes/Todas?titulo2=IIMS"),
     C("Argentina", "Health ministry births over INDEC population", argentina_tfr, "Argentina",
       "complete", True,
       "The health ministry publishes registered live births by age group of mother as open CSV, annually "

@@ -340,6 +340,16 @@ def yemen():
     return _series([])
 
 
+def angola():
+    """INE and the health ministry, the two IIMS survey rounds.
+
+    Quadro 5.1 of each report gives the national figure and the age-specific rates behind it. The
+    2015-16 round gives 6.2 and the 2023-24 round 4.8; each is placed at the year its fieldwork
+    ended. Summing the printed rates reproduces both totals — 6.215 and 4.78.
+    """
+    return _series([(2016, 6.2), (2024, 4.8)])
+
+
 def kenya():
     """KNBS, 2019 census analytical report on fertility and nuptiality, volume VI, table 4.5.
 

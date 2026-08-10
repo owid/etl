@@ -37,7 +37,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 36,Afghanistan,45047067,full,yes,no,survey,"AfDHS 2015 only; cso.gov.af nameservers deprovisioned, nsia.gov.af is a JS app"
 37,Yemen,42961661,full,yes,no,survey,"2013 survey only; three of four CSO domains unusable, two squatted"
 38,Canada,40467724,full,yes,yes,complete,fully recalculated 1991-2024; matches StatCan's own rate to 2 decimals
-39,Angola,40215180,no,no,,,
+39,Angola,40215180,full,yes,no,survey,two IIMS rounds; census 5.7 vs INE's own Gompertz-adjusted 5.5; no counts published
 40,Ukraine,39535851,no,no,,,
 41,Morocco,38762441,no,no,,,
 42,Poland,37843196,no,no,,,
