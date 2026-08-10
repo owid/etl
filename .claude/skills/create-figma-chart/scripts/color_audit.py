@@ -4,10 +4,17 @@ Usage (run from the repo root, with the repo interpreter):
     .venv/bin/python color_audit.py '#bc8e5a,#883039,#6d3e91,#d73c50,#4c6a9c,#585c64'
     .venv/bin/python color_audit.py '#bc8e5a,#883039' --names Poultry,Beef
     .venv/bin/python color_audit.py '#bc8e5a,...' --suggest   # search the OWID palette for a safer set
+    .venv/bin/python color_audit.py '#bc8e5a,...' --separated # bars/lines/maps: no fills touch
 
-Colors are given in stack/legend order, so adjacent pairs are the ones that touch. That holds for
-stacked and grouped fills; with --line or --maps nothing touches in legend order (lines cross, map
-neighbors are geographic), so the grayscale seam is reported as information and never gates.
+Colors are given in stack/legend order. Whether consecutive entries *touch* depends on the chart,
+and the grayscale seam check only applies where they do:
+
+    stacked / segmented fills      consecutive entries share an edge   -> seam gates (the default)
+    separate bars, lines, maps     nothing shares an edge              -> pass --separated
+
+Only a stacked or segmented chart has seams. A plain or grouped bar chart draws each fill against
+the background, so legend order says nothing about adjacency and gating on it would reject good
+palettes for an arbitrary reason: pass --separated there. --line and --maps imply it.
 Run it on every chart before proposing it — eyeballing does not catch a dE of 9.
 """
 
@@ -377,6 +384,9 @@ def main():
                     help="search the Categorical Maps group instead (choropleth fills)")
     ap.add_argument("--line", action="store_true",
                     help="use the Line and Slope Charts variants (thin marks and text on white)")
+    ap.add_argument("--separated", action="store_true",
+                    help="no fills touch (plain or grouped bars, lines, maps): report the "
+                         "grayscale seam but never gate on it")
     ap.add_argument("--keep", default="", help="indices (0-based) to hold fixed when suggesting")
     args = ap.parse_args()
 
@@ -392,9 +402,14 @@ def main():
     if args.line:
         PALETTE.update(LINE_VARIANTS)
 
-    # Only stacked and grouped fills are laid out in the order they are given, so only there does
-    # "adjacent in the list" mean "these two touch".
-    adjacent_fills = not (args.line or args.maps)
+    # Only a stacked or segmented chart lays its fills out edge to edge in the order given, so only
+    # there does "adjacent in the list" mean "these two touch". Everything else — plain and grouped
+    # bars as much as lines and maps — draws each fill against the background.
+    adjacent_fills = not (args.separated or args.line or args.maps)
+    print(f"Assuming fills {'touch in the order given' if adjacent_fills else 'do not touch'}"
+          f" — {'stacked/segmented' if adjacent_fills else 'separated'}."
+          + ("  Pass --separated for a plain or grouped bar chart, a line chart or a map."
+             if adjacent_fills else ""))
 
     failures, score = audit(hexes, names, adjacent_fills)
     if args.suggest:
