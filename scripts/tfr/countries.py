@@ -24,6 +24,7 @@ warnings.filterwarnings("ignore")
 
 from argentina import argentina_tfr  # noqa: E402
 from australia import australia_tfr  # noqa: E402
+from belgium import belgium_tfr  # noqa: E402
 from canada import canada_tfr  # noqa: E402
 from chile import chile_tfr  # noqa: E402
 from china import china_tfr  # noqa: E402
@@ -31,6 +32,7 @@ from czechia import czechia_tfr  # noqa: E402
 from ecuador import ecuador_tfr  # noqa: E402
 from colombia import dane_female_pop, dane_registered_tfr  # noqa: E402
 from france import france_tfr  # noqa: E402
+from greece import greece_tfr  # noqa: E402
 from guatemala import guatemala_tfr  # noqa: E402
 from hungary import hungary_tfr  # noqa: E402
 from india import india  # noqa: E402
@@ -87,6 +89,7 @@ from published import (  # noqa: E402
     rwanda,
     saudi_arabia,
     senegal,
+    sierra_leone,
     somalia,
     south_sudan,
     sudan,
@@ -1666,6 +1669,65 @@ COUNTRIES = [
       "volume, but every archived copy of it is truncated and the live site is behind a bot wall, so its "
       "figure is genuinely unknown to us.",
       "https://www.one.gob.do/"),
+    C("Belgium", "Statbel — registered births over the mean population", belgium_tfr, "Belgium",
+      "complete", False,
+      "Statbel publishes a births-and-fertility workbook for each year since 2011. It gives the rate for "
+      "the country and each region, split by whether the mother is Belgian or foreign, and — in the same "
+      "workbook — births by single year of the mother's age.",
+      "We read the published series. Dividing the 2024 births by the mean of the 1 January populations "
+      "either side gives 1.4361 against the published 1.44, and reproduces its own age-by-age rates to "
+      "four decimals; using the 1 January stock alone is measurably worse, which confirms the mean is "
+      "what it uses.",
+      "The nationality split is wide and moves the picture: 1.33 for Belgian mothers against 1.89 for "
+      "foreign ones in 2024, and 2.13 against 1.35 within Flanders. The headline 1.44 sits between them. "
+      "The population register is a legal-residence concept on both sides of the rate — since 2010 births "
+      "are drawn from the register rather than from civil-registry declarations, which makes 2010 a break "
+      "in any long series, and births abroad to women legally resident in Belgium are counted. Foreign "
+      "nationals went from 11.2% of residents in 2015 to 13.4% in 2023, and Statbel attributes the "
+      "2021-24 inflow to post-pandemic catch-up and the geopolitical situation. 2024 and 2025 are "
+      "provisional; definitive figures come about a year late. The series is the published one rather "
+      "than rebuilt because the population files are hundred-megabyte register extracts, one per year.",
+      "https://statbel.fgov.be/fr/themes/population/natalite-et-fecondite"),
+    C("Greece", "ELSTAT — registered births over the average population", greece_tfr, "Greece",
+      "complete", True,
+      "ELSTAT publishes births by the mother's age group for every year since 1980 and population by age "
+      "group at 1 January. Its own fertility rate appears only in a quarterly booklet, printed to one "
+      "decimal; the age-specific rates behind it are not published at all.",
+      "We divided births by the average of the 1 January populations either side, which is what ELSTAT's "
+      "methodology says the average population means. Our 1.234 for 2024 and 1.261 for 2023 round to the "
+      "1.2 and 1.3 it publishes, and 1.427 for 2021 to its 1.4.",
+      "Greece is the steepest sustained fall here: 1.43 in 2021 to 1.23 in 2024. Two things are worth "
+      "knowing. The 2021 census found the previous estimates had overstated the population by about "
+      "140,000, and ELSTAT spread that gap back across 2012 to 2021 rather than shifting each year "
+      "uniformly — so the revision does not simply raise every rate, and its own published figure for "
+      "2021 came down from 1.5 to 1.4. And the population table has a Greek-citizens-only column "
+      "alongside the all-residents total; the standard age-by-sex table is the total, which is the one "
+      "used here. Births are dated to when they happened, with late registrations folded back to the "
+      "right year. Neither file has a guessable address — they come from a document service keyed to an "
+      "identifier that has to be read off the publication page, and a plain fetch of that page finds no "
+      "links at all.",
+      "https://www.statistics.gr/en/statistics/-/publication/SPO03/2024"),
+    C("Sierra Leone", "Stats SL — Demographic and Health Survey rounds", sierra_leone, "Sierra Leone",
+      "survey", False,
+      "Three survey rounds, falling steadily: 5.1 in 2008, 4.9 in 2013, 4.2 in 2019. The 2015 census "
+      "publishes its own figure, the rates behind it, and the women by age group.",
+      "We read the survey series. We also reconstructed the census's raw arithmetic from its own tables "
+      "and got 1.567, matching the implied figure it prints — 87,472 births among 1,835,328 women against "
+      "the 87,302 and 1,831,953 it states.",
+      "Sierra Leone has the largest census correction we have found anywhere, by a wide margin. The 2015 "
+      "census's own reported births give a fertility rate of 1.6. Stats SL published that number, said it "
+      "could not be right, and applied indirect methods to reach 5.6 — scaling the births from 87,302 to "
+      "328,433, a factor of nearly four. For comparison, Mali's correction not quite doubled its count "
+      "and Cambodia's raw figures ran about half the adopted ones. It is candid about the diagnosis: "
+      "respondents may not have used the definition of a live birth, may have misjudged the twelve-month "
+      "window, may have omitted newborn deaths or reported children who were not their own — and, "
+      "tellingly, a significant number of women reported more than one birth in twelve months. It also "
+      "says it chose the model whose answer sat closest to the survey trend. Its two official census "
+      "volumes, published the same month, then disagree with each other about the answer: the national "
+      "report adopts 5.6 and the fertility volume adopts 5.7, from a different method. The 2021 mid-term "
+      "census published population counts only, with no fertility results at all.",
+      "https://www.statistics.sl/images/StatisticsSL/Documents/Census/2015/"
+      "2015_census_national_analytical_report.pdf"),
 ]
 
 PANELS = [(c["name"], c["src"], c["loader"], c["wpp_name"]) for c in COUNTRIES if c["loader"]]

@@ -483,6 +483,12 @@ def hungary_band_detail(year):
     return hungary_detail(year)
 
 
+def greece_band_detail(year):
+    from greece import greece_detail
+
+    return greece_detail(year)
+
+
 DETAIL = {
     "Colombia": colombia_detail,
     "Myanmar": myanmar_band_detail,
@@ -527,6 +533,7 @@ DETAIL = {
     "Czechia": czechia_band_detail,
     "Hungary": hungary_band_detail,
     "Cuba": lambda y: _published_detail("cuba_detail")(y),
+    "Greece": greece_band_detail,
 }
 
 

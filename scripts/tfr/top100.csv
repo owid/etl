@@ -81,7 +81,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 80,South Sudan,12436040,full,yes,no,survey,2008 census counts give 3.9 against the 2010 survey's 7.5 — uncorrected census undercount
 81,Tunisia,12415143,full,yes,no,complete,published series 2015-2023; the 5.7% of births with no age recorded must be redistributed
 82,Haiti,12037515,full,yes,no,survey,nothing since 2016-17; the office says outright it cannot produce estimates and uses the UN's
-83,Belgium,11774647,no,no,,,
+83,Belgium,11774647,full,yes,no,complete,published series 2011-2025; Belgian mothers 1.33 vs foreign 1.89 in 2024
 84,Dominican Republic,11609499,full,yes,no,survey,"registration keeps arriving for two decades, so no registry rate is usable"
 85,Jordan,11589538,full,yes,no,survey,survey only; the nationality split runs 2.5 Jordanian to 4.9 Syrian in camps
 86,United Arab Emirates,11574684,full,no,,,publishes an Emirati-only rate and no combined one; every government host blocked us
@@ -93,9 +93,9 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 92,Czechia,10527784,full,yes,no,complete,peak 1.83 in 2021 to 1.37 in 2024; Ukrainian refugees are in both numerator and denominator
 93,Azerbaijan,10454854,full,yes,no,complete,its own census later showed the intercensal denominator was too low; 2000s levels overstated
 94,Portugal,10395366,no,no,,,
-95,Greece,9897119,no,no,,,
+95,Greece,9897119,full,yes,yes,complete,"fully recalculated 2001-2024; the 2021 census cut the population estimate by 140,000"
 96,Israel,9647689,no,no,,,
 97,Hungary,9585819,full,yes,no,complete,"rose to 1.61 in 2021 then fell every year to 1.31 in 2025, below its 2013 level"
 98,Austria,9107265,no,no,,,
 99,Switzerland,9007794,no,no,,,
-100,Sierra Leone,8996749,no,no,,,
+100,Sierra Leone,8996749,full,yes,no,survey,"largest correction found anywhere: raw 1.6 to adjusted 5.6, births scaled x3.8"

@@ -906,3 +906,12 @@ def papua_new_guinea():
 def dominican_republic():
     """ONE's household survey. The only fertility rate the office publishes from measurement."""
     return _series([(2019, 2.4)])
+
+
+def sierra_leone():
+    """Stats SL's health-survey rounds. The 2019 report's own table carries the earlier ones.
+
+    The 2015 census figure is not in this series: its raw and adjusted values differ by a factor of
+    three and a half — see the note in countries.py.
+    """
+    return _series([(2008, 5.1), (2013, 4.9), (2019, 4.2)])
