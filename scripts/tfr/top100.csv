@@ -22,12 +22,12 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 21,Thailand,71559619,full,yes,yes,complete,
 22,United Kingdom,69931528,full,yes,no,complete,we plot England and Wales; ONS's own tables put it a steady 0.02 above the UK
 23,France,66746398,full,yes,no,complete,denominator now INSEE's mean-year population; Mayotte break kept to match the UN territory
-24,South Africa,65453083,no,no,,,
+24,South Africa,65453083,full,yes,no,projection,headline TFR is Spectrum model output; registry implies 1.53 vs published 2.41
 25,Italy,58926166,partial,yes,no,complete,SDMX rates; population dataflow timed out
 26,Kenya,58636406,full,yes,no,survey,"census and KDHS give 3.4; census report is scanned images, OCR still needed"
 27,Myanmar,55184826,full,yes,yes,survey,recalculated from 2019 ICS counts
 28,Colombia,53936231,full,yes,yes,complete,
-29,Sudan,53282716,no,no,,,
+29,Sudan,53282716,full,yes,no,survey,CBS site dead (nameservers gone); MICS 2014 figure recovered from a web archive
 30,Uganda,52761469,no,no,,,
 31,South Korea,51600389,full,yes,no,complete,KOSIS needs a Korean-identity account; used the English press releases instead
 32,Algeria,48028337,no,no,,,

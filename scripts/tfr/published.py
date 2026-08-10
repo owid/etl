@@ -225,6 +225,29 @@ def ethiopia():
     return _series([(2000, 5.5), (2005, 5.4), (2011, 4.8), (2016, 4.6), (2024, 4.0)])
 
 
+SD_BRIEF = ("http://web.archive.org/web/20181113165403/http://cbs.gov.sd//resources/uploads/"
+            "files/Fertility%20%20and%20%20married%20%20Status(1).pdf")
+
+
+def sudan():
+    """Central Bureau of Statistics, "Fertility and Married Status", the MICS 2014 figure.
+
+    The Bureau's own website no longer resolves — its nameservers stopped answering — so this brief
+    was recovered from a web archive. It is the only national fertility figure we could find inside
+    our window; the rest of its table stops at a 1990 survey.
+    """
+    path = os.path.join(DATA, "sd", "fertility.txt")
+    if not os.path.exists(path):
+        pdf = fetch(SD_BRIEF, os.path.join(DATA, "sd", "fertility.pdf"))
+        subprocess.run(["pdftotext", "-layout", pdf, path], check=True)
+    lines = open(path, errors="ignore").read().splitlines()
+    for i, ln in enumerate(lines):
+        m = re.search(r"Total Fertility Rate for Women age 15-49\s*year\s+(\d\.\d)", ln)
+        if m and any("MICS 2014" in x for x in lines[i:i + 8]):
+            return _series([(2014, float(m.group(1)))])
+    return _series([])
+
+
 def kenya():
     """KNBS, 2019 census analytical report on fertility and nuptiality, volume VI, table 4.5.
 

@@ -37,10 +37,12 @@ from published import (  # noqa: E402
     nigeria,
     pakistan,
     russia,
+    sudan,
     tanzania,
     vietnam,
 )
 from sources import egypt, england_wales, germany, japan, mexico, thailand, united_states  # noqa: E402
+from south_africa import south_africa_tfr  # noqa: E402
 from spain import spain_tfr  # noqa: E402
 from turkey import turkey_tfr  # noqa: E402
 
@@ -466,6 +468,39 @@ COUNTRIES = [
       "editions dropped the full births-by-age table, so a recalculation for the latest year is not "
       "possible from them.",
       "https://mods.go.kr/board.es?mid=a20108010000&bid=11773"),
+    C("South Africa", "Stats SA — mid-year population estimates", south_africa_tfr, "South Africa",
+      "projection", False,
+      "The fertility rate Stats SA publishes is an input to its population projection, not a rate computed "
+      "from births. Its own report says the series was \"derived following a detailed review of TFR estimates "
+      "(1985-2024), (both published and unpublished), from various authors, methods and data sources\", "
+      "informed by registered births and health-system records. Separately, the recorded live births report "
+      "publishes registered births by age of mother as counts, and the mid-year estimates publish female "
+      "population by age group.",
+      "We read the modelled series from table 2 of the mid-year estimates. The age-band comparison uses the "
+      "registered births instead, because those are the only counts the registry produces.",
+      "The two disagree enormously. Dividing the registered births by the female population gives 1.53 for "
+      "2024 against the published 2.41, and 1.88 for 2016 against 2.33. Some of that is timing — Stats SA "
+      "says about 10% of births are registered a year or more late, and a year keeps filling up for years "
+      "afterwards — but not all of it: it also estimates that even once late registrations are in, "
+      "registration captures only about 90% of births. So South Africa's headline figure is deliberately set "
+      "well above what its own registry shows, and is closer in kind to a UN estimate than to a count. "
+      "Fertility results from the 2022 census have still not been released, which Stats SA notes as a reason "
+      "the census could not feed the estimate. No mid-year estimates edition was published for 2023.",
+      "https://www.statssa.gov.za/publications/P0302/P03022024.pdf"),
+    C("Sudan", "Central Bureau of Statistics — Multiple Indicator Cluster Survey 2014", sudan, "Sudan",
+      "survey", False,
+      "One figure: 5.2 children per woman for women aged 15-49, from the Bureau's own 2014 survey, printed "
+      "in a short fertility brief. The same brief's longer table stops at a 1990 health survey.",
+      "We read the figure from the brief. No arithmetic of our own.",
+      "The Bureau's website no longer exists — its own nameservers stopped answering, so the domain does not "
+      "even resolve, while the rest of the Sudanese government's web presence is fine. That looks like "
+      "abandonment rather than a block, and is unsurprising given the war since 2023. This brief was "
+      "therefore recovered from a web archive; it is genuinely the Bureau's own document but carries no "
+      "publication date, and one of its other tables has stray percent signs on figures that are children "
+      "per woman. There is no age detail to recalculate from, and nothing more recent: the 2008 census files "
+      "that survive give population by area only, with no age breakdown. The health ministry's site is alive "
+      "but stuck in a redirect loop, so nothing can be read from it either.",
+      "http://cbs.gov.sd/"),
     C("Kenya", "KNBS — 2019 Population and Housing Census, volume VI", kenya, "Kenya", "survey", False,
       "The census fertility volume gives a national total fertility rate of 3.4 for 2019 and 4.8 for 2009, "
       "plus age-specific rates for every county. The 2022 household health survey, also run by KNBS, "
