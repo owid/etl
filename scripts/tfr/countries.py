@@ -45,6 +45,7 @@ from sources import egypt, england_wales, germany, japan, mexico, thailand, unit
 from south_africa import south_africa_tfr  # noqa: E402
 from spain import spain_tfr  # noqa: E402
 from turkey import turkey_tfr  # noqa: E402
+from uganda import uganda_tfr  # noqa: E402
 
 START = 2000
 
@@ -468,6 +469,22 @@ COUNTRIES = [
       "editions dropped the full births-by-age table, so a recalculation for the latest year is not "
       "possible from them.",
       "https://mods.go.kr/board.es?mid=a20108010000&bid=11773"),
+    C("Uganda", "UBOS — 2024 National Population and Housing Census", uganda_tfr, "Uganda", "survey", False,
+      "Table 7.2 of the 2024 census report gives, for every five-year age group, the number of women, the "
+      "births they reported in the previous twelve months, the same births after correction, and both the "
+      "reported and corrected rates. The 2014 census gave 5.8. The health survey UBOS runs separately gives a "
+      "direct series: 6.9 in 2000, 6.7 in 2006, 6.2 in 2011, 5.4 in 2016 and 5.2 in 2022.",
+      "We rebuilt the 2024 figure from the corrected rates, getting 4.47 where the report prints 4.5. Summing "
+      "the reported rates instead gives 4.15, and dividing the reported births by the women gives the same — "
+      "so the published figure sits about 8% above what women actually reported. The age-band comparison uses "
+      "the reported counts, because those are what the census counted.",
+      "The correction is a Brass P/F adjustment for births women forget or misdate, which UBOS applies because "
+      "Uganda's civil registration cannot be used at all: the census found only 10% of children under five had "
+      "a registered birth. That also means the census and the health survey are measuring by different methods "
+      "— the survey's 5.2 for 2022 against the census's 4.5 for 2024 is partly a real fall and partly a change "
+      "of instrument, and we have not tried to separate the two. UBOS's site serves a broken certificate "
+      "chain, so downloads need certificate checking relaxed.",
+      "https://www.ubos.org/nphc-2024-census-page/"),
     C("South Africa", "Stats SA — mid-year population estimates", south_africa_tfr, "South Africa",
       "projection", False,
       "The fertility rate Stats SA publishes is an input to its population projection, not a rate computed "

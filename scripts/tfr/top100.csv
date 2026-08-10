@@ -28,7 +28,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 27,Myanmar,55184826,full,yes,yes,survey,recalculated from 2019 ICS counts
 28,Colombia,53936231,full,yes,yes,complete,
 29,Sudan,53282716,full,yes,no,survey,CBS site dead (nameservers gone); MICS 2014 figure recovered from a web archive
-30,Uganda,52761469,no,no,,,
+30,Uganda,52761469,full,yes,no,survey,2024 census prints reported and Brass-adjusted side by side: 4.15 vs 4.47
 31,South Korea,51600389,full,yes,no,complete,KOSIS needs a Korean-identity account; used the English press releases instead
 32,Algeria,48028337,no,no,,,
 33,Iraq,48007435,no,no,,,
