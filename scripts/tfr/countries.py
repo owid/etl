@@ -33,6 +33,7 @@ from france import france_tfr  # noqa: E402
 from india import india  # noqa: E402
 from peru import peru_tfr  # noqa: E402
 from sri_lanka import sri_lanka_tfr  # noqa: E402
+from sweden import sweden_tfr  # noqa: E402
 from taiwan import taiwan_tfr  # noqa: E402
 from philippines import philippines  # noqa: E402
 from poland import poland_tfr  # noqa: E402
@@ -60,8 +61,10 @@ from published import (  # noqa: E402
     ghana,
     guinea,
     haiti,
+    honduras,
     indonesia,
     iraq,
+    jordan,
     kenya,
     madagascar,
     malawi,
@@ -1459,6 +1462,58 @@ COUNTRIES = [
       "working-age men abroad are still counted at home; that mostly affects the male side, and our "
       "reconciliation suggests any effect on women of childbearing age is second-order.",
       "https://www.stat.tj/ru/soczialno-demograficheskij-sektor/"),
+    C("Sweden", "SCB — births by age of mother over the mean population", sweden_tfr, "Sweden",
+      "complete", True,
+      "SCB's database serves births by single year of the mother's age from 1968, mean population by "
+      "single year of age, and its own rate — all without a key.",
+      "We divided births at each single age by the women of that age and summed. Our 1.4245 for 2024 "
+      "against SCB's published 1.43, and 1.4466 against 1.45 for 2023.",
+      "Sweden's rate is at a record low and still falling: 1.85 in 2016 to 1.42 in 2025 on SCB's own "
+      "figures. The half-percent gap in our numbers is a definition rather than an error, and it is worth "
+      "knowing about. The public births table records the age the mother had reached by the end of the "
+      "year; SCB's own rate uses her age at the birth itself. Summing SCB's own five-year age-specific "
+      "rates instead reproduces its published figure exactly, which is how we know that is the whole of "
+      "the difference. SCB says outright that the denominator is the mean of the population at the start "
+      "and the end of the year, and it covers everyone registered as resident whatever their citizenship. "
+      "Two traps in the interface: an oversized request is refused with a bare 403 rather than a truncated "
+      "answer, and the current-year population table carries a marital-status code that is a total across "
+      "the others, so adding it in doubles the population.",
+      "https://www.scb.se/be0101"),
+    C("Jordan", "DOS — Population and Family Health Survey", jordan, "Jordan", "survey", False,
+      "DOS publishes registered births every year, back to 2000, and female population by age group — but "
+      "the births are broken down only by governorate and the child's sex, never by the mother's age. So "
+      "the rate comes from the survey, and only from the survey.",
+      "We read the survey figures. The registry cannot give a fertility rate, but it does reconcile: "
+      "registered births over the mid-year population give a crude birth rate of 15.26 for 2024 against "
+      "DOS's published 15.3.",
+      "The number to be careful with is which population it describes. About a third of Jordan's residents "
+      "are not Jordanian, roughly half of those Syrian, and the 2023 survey publishes the rate separately "
+      "for each group: 2.5 for Jordanians, 4.1 for Syrians — 4.9 for those in camps and 3.9 outside — and "
+      "2.1 for other nationalities, against 2.6 for everyone. That is a wider spread than Saudi Arabia's, "
+      "and unlike Saudi Arabia it appears in one survey table rather than as a standing series. Two things "
+      "to watch when citing DOS. Its \"Jordan in Figures\" booklets carry old survey figures under the "
+      "current year's column with only a footnote — the 2.7 printed for 2022 is 2017-18 survey data. And "
+      "registered births have fallen 16% since 2019, from 197,000 to 166,000, with no explanation offered.",
+      "https://dosweb.dos.gov.jo/"),
+    C("Honduras", "INE — ENDESA survey rounds", honduras, "Honduras", "survey", False,
+      "Four survey rounds since 2001. INE also publishes registered births by the mother's age group every "
+      "year from 2010, and the 2013 census publishes both the women and the births in the previous twelve "
+      "months.",
+      "We read the survey series. We also divided the 2013 census's own counts and got 2.13, against the "
+      "2.74 INE adopted for that year — a headline 29% above what its own census counted.",
+      "Honduras is the one country here where an office published a registration-based rate and then "
+      "stopped. Its vital-statistics releases for 2013-14 and 2015-16 print the full working — age, "
+      "births, women, each rate, the total — giving 2.45 to 2.68, which then tracked the survey and "
+      "projection figures closely. From the 2021-22 release onward it keeps the birth counts by age and "
+      "drops the rate, while the text still says fertility is falling without giving a number. No "
+      "correction method is named anywhere; what INE does instead is take the census's age pattern and "
+      "substitute the survey's level, for stated reasons of internal consistency rather than any criticism "
+      "of the census. Registered births have fallen 27% since 2018, from 181,000 to 132,000. Two "
+      "cautions. There has been no census since 2013 — the next is still in preparation — so any recent "
+      "denominator is a projection eleven years old, and INE itself points to emigration of women of "
+      "childbearing age. And the census's own twelve-month question found fewer births than the registry "
+      "recorded for the same period, which is the reverse of the usual direction.",
+      "https://ine.gob.hn/"),
 ]
 
 PANELS = [(c["name"], c["src"], c["loader"], c["wpp_name"]) for c in COUNTRIES if c["loader"]]

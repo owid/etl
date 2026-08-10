@@ -459,6 +459,12 @@ def _published_detail(name):
     return getattr(published, name)
 
 
+def sweden_band_detail(year):
+    from sweden import sweden_detail
+
+    return sweden_detail(year)
+
+
 DETAIL = {
     "Colombia": colombia_detail,
     "Myanmar": myanmar_band_detail,
@@ -498,6 +504,7 @@ DETAIL = {
     "Haiti": lambda y: _published_detail("haiti_detail")(y),
     "Tunisia": lambda y: _published_detail("tunisia_detail")(y),
     "Tajikistan": lambda y: _published_detail("tajikistan_detail")(y),
+    "Sweden": sweden_band_detail,
 }
 
 

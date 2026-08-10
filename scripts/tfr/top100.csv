@@ -83,13 +83,13 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 82,Haiti,12037515,full,yes,no,survey,nothing since 2016-17; the office says outright it cannot produce estimates and uses the UN's
 83,Belgium,11774647,no,no,,,
 84,Dominican Republic,11609499,no,no,,,
-85,Jordan,11589538,no,no,,,
+85,Jordan,11589538,full,yes,no,survey,survey only; the nationality split runs 2.5 Jordanian to 4.9 Syrian in camps
 86,United Arab Emirates,11574684,no,no,,,
-87,Honduras,11184761,no,no,,,
+87,Honduras,11184761,full,yes,no,survey,INE published a registry-based rate for 2013-16 then stopped; census raw 2.13 vs adopted 2.74
 88,Tajikistan,10978600,full,yes,no,complete,third Central Asian rise: 2.64 in 2021 to 3.02 in 2023; 2007's dip looks like an artefact
 89,Papua New Guinea,10947852,no,no,,,
 90,Cuba,10892659,no,no,,,
-91,Sweden,10701038,no,no,,,
+91,Sweden,10701038,full,yes,yes,complete,fully recalculated 2006-2024; record low and still falling
 92,Czechia,10527784,no,no,,,
 93,Azerbaijan,10454854,no,no,,,
 94,Portugal,10395366,no,no,,,

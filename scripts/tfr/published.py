@@ -842,3 +842,17 @@ def tajikistan_detail(year):
     if year != 2023:
         return None
     return {b: {"women": float(w), "births": r / 1000 * w} for b, (w, r) in TAJIKISTAN_2023.items()}
+
+
+def jordan():
+    """DOS's Population and Family Health Survey rounds.
+
+    Registration is complete enough that DOS publishes registered births every year, but never by
+    age of mother, so the rate comes only from the survey.
+    """
+    return _series([(2018, 2.7), (2023, 2.6)])
+
+
+def honduras():
+    """INE's survey rounds. The 2011-12 report's own table carries the earlier ones."""
+    return _series([(2001, 4.4), (2006, 3.3), (2012, 2.9), (2019, 2.6)])
