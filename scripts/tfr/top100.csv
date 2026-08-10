@@ -10,7 +10,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 9,Russia,143394457,full,yes,no,complete,yearbook series 1990-2022 plus births and women counts for 2022
 10,Ethiopia,138902185,full,yes,no,survey,EDHS series 2000-2024; no post-2007 female population by age exists
 11,Mexico,132997658,full,yes,yes,complete,
-12,Japan,122427730,partial,yes,no,complete,"e-Stat rate; women recovered from births/rate, not an independent table"
+12,Japan,122427730,full,yes,no,complete,"denominator now the Statistics Bureau's own population, not recovered from rates"
 13,Egypt,120101178,partial,yes,no,complete,"bulletin rate; women come from the same bulletin table, not checked for a fuller source"
 14,Philippines,117724473,full,yes,yes,incomplete,
 15,Democratic Republic of Congo,116452162,full,yes,no,survey,EDS rounds only; no census since 1984

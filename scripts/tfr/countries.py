@@ -188,12 +188,18 @@ COUNTRIES = [
       "https://www.insee.fr/fr/statistiques/9000195"),
     C("Japan", "MHLW — Vital Statistics via e-Stat", japan, "Japan", "complete", False,
       "e-Stat table 0003411608 gives the total fertility rate and each age group's contribution to it; "
-      "table 0003411607 gives births by the same age groups.",
+      "table 0003411607 gives births by the same age groups. The Statistics Bureau separately publishes "
+      "population by single year of age and sex every October, as a spreadsheet download.",
       "We took MHLW's published total fertility rate directly. For the age-band comparison we divided "
-      "births by each band's rate to recover MHLW's own female population.",
+      "MHLW's births by the Statistics Bureau's female population, which is where MHLW says its own "
+      "denominator comes from. That gives 1.145 for 2024 against the published 1.15.",
       "Five-yearly before 2000 and annual after, so the early part of the line is coarse. e-Stat "
       "publishes each band as its contribution to the total rather than as a rate per 1,000 women — the "
-      "seven bands sum exactly to the published total.",
+      "seven bands sum exactly to the published total, so do not multiply those by five. MHLW's rate "
+      "counts Japanese women only, not all residents, and the population file gives both columns; using "
+      "the wrong one inflates the denominator by the foreign resident population. Births are published "
+      "only in five-year bands, so a full recalculation would still approximate. The e-Stat API needs a "
+      "key, but registration is email-only and the spreadsheets download without one.",
       "https://www.e-stat.go.jp/"),
     C("Italy", "ISTAT — ANPR / stato civile", italy, "Italy", "complete", False,
       "ISTAT's SDMX service publishes age-specific fertility rates by single year of age of mother, from "
