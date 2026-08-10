@@ -17,7 +17,7 @@ import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 warnings.filterwarnings("ignore")
 
-from countries import COUNTRIES, NOTES, START, TIERS  # noqa: E402
+from countries import COUNTRIES, DOCS, START, TIERS  # noqa: E402
 from detail import compare  # noqa: E402
 from render import dumbbell, line_chart  # noqa: E402
 from sources import COLORS, un_wpp  # noqa: E402
@@ -96,7 +96,7 @@ def main():
         sections.append(
             f'<section data-country="{r["country"]}"><h2>{r["country"]}{badges}</h2>'
             f'<p class="src">{r["src"]}</p>{country_chart(r)}'
-            f'<p class="note">{NOTES.get(r["country"], "")}</p>{detail_block(r)}</section>'
+            f"{docs_block(r['country'])}{detail_block(r)}</section>"
         )
 
     legend = (f'<span class="k"><i style="color:{COLORS["nso"]}"></i>National statistical office</span>'
@@ -123,6 +123,16 @@ def main():
     print("  ranked:", ", ".join(f"{r['country']} {r['gap']:+.3f}" for r in rows))
     print(f"  unplotted: {len(unplotted)}")
     print(f"wrote {OUT}")
+
+
+def docs_block(country):
+    """Plain-language record of what the office publishes, what we did, and what to watch."""
+    found, method, caveats, url = DOCS.get(country, ("", "", "", ""))
+    link = f' <a href="{url}" target="_blank" rel="noopener">Source</a>' if url else ""
+    return (f'<dl class="docs">'
+            f"<dt>What the office publishes</dt><dd>{found}{link}</dd>"
+            f"<dt>What we did</dt><dd>{method}</dd>"
+            f"<dt>Watch out for</dt><dd>{caveats}</dd></dl>")
 
 
 def _pairs(df):

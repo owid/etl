@@ -1,4 +1,4 @@
-<title>National vital statistics vs modeled fertility estimates</title>
+<title>Total fertility rates: national statistics vs. UN estimates</title>
 <style>
  :root { --bg:#fff; --fg:#1d1d1b; --mut:#6b6b6b; --line:#e9e9e9; --nso:#c94a3b; --wpp:#3b82c4; }
  @media (prefers-color-scheme: dark) {
@@ -21,7 +21,9 @@
  .k { display:inline-flex; align-items:center; font-size:13px; color:var(--mut); }
  select { font:inherit; font-size:13px; color:var(--fg); background:var(--bg); border:1px solid var(--line);
           border-radius:6px; padding:4px 8px; margin-left:auto; }
- .tabs { display:flex; gap:6px; align-items:center; margin:0 0 10px; }
+ .head { display:flex; align-items:flex-start; gap:20px; margin:0 0 10px; }
+ .head h1 { margin:0; flex:1; }
+ .tabs { display:flex; gap:6px; align-items:center; margin:0; flex:none; }
  button.tab { font:inherit; font-size:13px; color:var(--mut); background:none; cursor:pointer;
               border:1px solid var(--line); border-radius:99px; padding:4px 14px; }
  button.tab.on { color:var(--bg); background:var(--fg); border-color:var(--fg); }
@@ -40,6 +42,11 @@
  .detail { margin-top:24px; padding-top:6px; border-top:1px solid var(--line); }
  .na { color:var(--mut); font-size:13.5px; max-width:70ch; }
  .note { color:var(--mut); font-size:12.5px; margin:10px 0 0; max-width:82ch; }
+ dl.docs { margin:16px 0 0; font-size:13px; max-width:96ch; }
+ dl.docs dt { color:var(--fg); font-weight:600; font-size:11px; text-transform:uppercase;
+              letter-spacing:.06em; margin:12px 0 2px; }
+ dl.docs dd { color:var(--mut); margin:0; }
+ dl.docs a { color:var(--wpp); }
  .badge { display:inline-block; font-size:11px; font-weight:600; border-radius:99px; padding:2px 9px;
           margin-left:8px; vertical-align:2px; }
  .badge.rc { background:var(--line); color:var(--mut); }
@@ -72,15 +79,16 @@
  tr.ticks svg.rowchart { height:14px; }
 </style>
 <div class="wrap">
-<h1>National vital statistics vs modeled fertility estimates</h1>
-
-<div class="bar-top">
+<div class="head">
+ <h1>Total fertility rates: national statistics vs. UN estimates</h1>
  <div class="tabs">
   <button class="tab on" data-tab="summary">Summary</button>
   <button class="tab" data-tab="country">Country by country</button>
-  <select id="pick" aria-label="Pick a country">{{OPTIONS}}</select>
  </div>
- <div class="key">{{LEGEND}}</div>
+</div>
+
+<div class="bar-top">
+ <div class="key">{{LEGEND}}<select id="pick" aria-label="Pick a country">{{OPTIONS}}</select></div>
  <div class="filters" id="filters">
   <fieldset><legend>What the national figure is built from</legend><span id="tierboxes"></span></fieldset>
   <fieldset><legend>How we obtained it</legend>
