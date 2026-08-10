@@ -21,6 +21,7 @@ from countries import COUNTRIES, DOCS, START, TIERS  # noqa: E402
 from detail import compare  # noqa: E402
 from render import dumbbell, line_chart  # noqa: E402
 from sources import COLORS, un_wpp  # noqa: E402
+from track import refresh  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CACHE = os.path.join(HERE, "cache")
@@ -123,6 +124,7 @@ def main():
 
     print("  ranked:", ", ".join(f"{r['country']} {r['gap']:+.3f}" for r in rows))
     print(f"  unplotted: {len(unplotted)}")
+    print("  " + refresh())
     print(f"wrote {OUT}")
 
 

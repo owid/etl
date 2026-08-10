@@ -41,6 +41,7 @@ from published import (  # noqa: E402
     vietnam,
 )
 from sources import egypt, england_wales, germany, japan, mexico, thailand, united_states  # noqa: E402
+from spain import spain_tfr  # noqa: E402
 
 START = 2000
 
@@ -327,6 +328,19 @@ COUNTRIES = [
       "and women by age group, so a direct recalculation is possible, but it would reproduce the "
       "unadjusted 3.2 rather than the figure NBS stands behind.",
       "https://www.nbs.go.tz/statistics/topic/demographic-and-socio-economic-statistics"),
+    C("Spain", "INE — birth statistics over the continuous population count", spain_tfr, "Spain",
+      "complete", True,
+      "INE publishes registered births by single year of age of mother, 2009 onward, and female "
+      "population by single year of age every quarter back to 1971. Both come out of its open service as "
+      "whole-table CSV with no key and no registration.",
+      "We divided births at each single age by the women of that age on 1 July and summed. Our figures "
+      "land within 0.01 of INE's own published fertility indicator every year — 1.107 against 1.10 for "
+      "2024, 1.122 against 1.12 for 2023.",
+      "The population series is the Estadística Continua de Población, which replaced the older municipal "
+      "register figures and revises as registrations arrive. Births start in 2009 on this table, so the "
+      "line is shorter than the population series behind it. The 2024 figure is the first release and will "
+      "revise slightly.",
+      "https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177007"),
     C("Kenya", "KNBS — 2019 Population and Housing Census, volume VI", kenya, "Kenya", "survey", False,
       "The census fertility volume gives a national total fertility rate of 3.4 for 2019 and 4.8 for 2009, "
       "plus age-specific rates for every county. The 2022 household health survey, also run by KNBS, "
