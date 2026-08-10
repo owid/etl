@@ -489,6 +489,8 @@ The design team keeps every provider's regions, rendered under the map palette, 
 
 **Propose it; don't just write it.** This is a shared design file that other people are working in — show the user exactly what you intend to add (which rows, which maps) and get an explicit go-ahead before touching it. Reading it to check the conventions needs no permission.
 
+> **The Figma mechanics below are shared with the `create-figma-chart` skill** — grapher SVG export, `upload_assets` over `createNodeFromSvg`, `rescale()` over `resize()`, `loadFontAsync` before text edits, the unreadable page listing, and the fact that plugins and comments are out of reach. That skill's *Gotchas* section is the maintained list; read it alongside this one, and when you learn something new about driving Figma from here, fold it in there so both skills stay aligned. What stays specific to this skill is the board itself: Frame 99's layout, the row pitch, and the recolor read-back below.
+
 How the board is laid out — match it rather than inventing a spot:
 
 - Frame 99 is **absolutely positioned** (`layoutMode: NONE`), one **row per provider tier**, so `fao_1` and `fao_2` are separate rows exactly as `ilo_1`/`ilo_2` already are.
