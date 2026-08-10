@@ -1,4 +1,4 @@
-<title>National vital statistics vs modelled fertility estimates</title>
+<title>National vital statistics vs modeled fertility estimates</title>
 <style>
  :root { --bg:#fff; --fg:#1d1d1b; --mut:#6b6b6b; --line:#e9e9e9; --nso:#c94a3b; --wpp:#3b82c4; }
  @media (prefers-color-scheme: dark) {
@@ -7,7 +7,7 @@
  :root[data-theme="light"] { --bg:#fff; --fg:#1d1d1b; --mut:#6b6b6b; --line:#e9e9e9; --nso:#c94a3b; --wpp:#3b82c4; }
  body { background:var(--bg); color:var(--fg); margin:0; padding:34px 24px 76px;
         font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
- .wrap { max-width:1000px; margin:0 auto; }
+ .wrap { max-width:1200px; margin:0 auto; }
  h1 { font-size:27px; margin:0 0 8px; letter-spacing:-.01em; }
  h2 { font-size:19px; margin:0 0 2px; }
  h3 { font-size:14.5px; font-weight:600; margin:20px 0 4px; }
@@ -21,6 +21,11 @@
  .k { display:inline-flex; align-items:center; font-size:13px; color:var(--mut); }
  select { font:inherit; font-size:13px; color:var(--fg); background:var(--bg); border:1px solid var(--line);
           border-radius:6px; padding:4px 8px; margin-left:auto; }
+ .tabs { display:flex; gap:6px; align-items:center; margin:0 0 10px; }
+ button.tab { font:inherit; font-size:13px; color:var(--mut); background:none; cursor:pointer;
+              border:1px solid var(--line); border-radius:99px; padding:4px 14px; }
+ button.tab.on { color:var(--bg); background:var(--fg); border-color:var(--fg); }
+ [hidden] { display:none !important; }
  .filters { margin:0; font-size:13px; color:var(--mut); display:flex; gap:10px; flex-wrap:wrap; }
  .filters fieldset { border:1px solid var(--line); border-radius:8px; margin:0; padding:6px 12px 7px; }
  .filters legend { font-size:11px; text-transform:uppercase; letter-spacing:.06em; padding:0 4px; }
@@ -67,10 +72,15 @@
  tr.ticks svg.rowchart { height:14px; }
 </style>
 <div class="wrap">
-<h1>National vital statistics vs modelled fertility estimates</h1>
+<h1>National vital statistics vs modeled fertility estimates</h1>
 
 <div class="bar-top">
- <div class="key">{{LEGEND}}<select id="pick" aria-label="Pick a country">{{OPTIONS}}</select></div>
+ <div class="tabs">
+  <button class="tab on" data-tab="summary">Summary</button>
+  <button class="tab" data-tab="country">Country by country</button>
+  <select id="pick" aria-label="Pick a country">{{OPTIONS}}</select>
+ </div>
+ <div class="key">{{LEGEND}}</div>
  <div class="filters" id="filters">
   <fieldset><legend>What the national figure is built from</legend><span id="tierboxes"></span></fieldset>
   <fieldset><legend>How we obtained it</legend>
@@ -80,20 +90,24 @@
  </div>
 </div>
 
-<section id="overview">
-<h2>Total fertility rate, latest national year</h2>
-<p class="src">Each country's own figure against the UN WPP medium projection for the same year,
-ordered by how far above the national figure the UN sits.</p>
-<div id="ov"></div>
-</section>
+<div id="tab-summary">
+ <section id="overview">
+ <h2>Total fertility rate, latest national year</h2>
+ <p class="src">Each country's own figure against the UN WPP medium projection for the same year,
+ ordered by how far above the national figure the UN sits.</p>
+ <div id="ov"></div>
+ </section>
 
-<section id="unplotted">
-<h2>Countries with no national figure to plot</h2>
-<p class="src">No official total fertility rate we could source, so only the UN estimate exists.</p>
-<div id="unp"></div>
-</section>
+ <section id="unplotted">
+ <h2>Countries with no national figure to plot</h2>
+ <p class="src">No official total fertility rate we could source, so only the UN estimate exists.</p>
+ <div id="unp"></div>
+ </section>
+</div>
 
+<div id="tab-country" hidden>
 {{SECTIONS}}
+</div>
 
 <script>
 const ROWS = {{ROWS}};
@@ -206,25 +220,38 @@ const UNPLOTTED = {{UNPLOTTED}};
 
   const picked = (cls) => [...document.querySelectorAll('input.' + cls + ':checked')].map((i) => i.value);
 
+  const sel = document.getElementById('pick');
+  let tab = 'summary';
+
   function apply() {
-    const country = document.getElementById('pick').value;
-    const tiers = picked('tier');
-    const rcs = picked('rc');
-    document.querySelectorAll('section[data-country]').forEach((s) => {
-      s.hidden = s.dataset.country !== country;
-    });
-    const solo = Boolean(country);
-    document.getElementById('overview').classList.toggle('hide', solo);
-    document.getElementById('unplotted').classList.toggle('hide', solo);
-    document.getElementById('filters').style.display = solo ? 'none' : '';
-    if (!solo) {
+    const summary = tab === 'summary';
+    document.getElementById('tab-summary').hidden = !summary;
+    document.getElementById('tab-country').hidden = summary;
+    document.getElementById('filters').hidden = !summary;
+    sel.hidden = summary;
+    document.querySelectorAll('button.tab').forEach((b) => b.classList.toggle('on', b.dataset.tab === tab));
+
+    if (summary) {
+      const tiers = picked('tier');
+      const rcs = picked('rc');
       draw(ROWS.filter((r) => tiers.includes(r.tier) && rcs.includes(r.recalc ? '1' : '0')));
       drawUnplotted(UNPLOTTED.filter((r) => tiers.includes(r.tier)));
+    } else {
+      if (!sel.value) sel.value = sel.options[1] ? sel.options[1].value : '';
+      document.querySelectorAll('section[data-country]').forEach((s) => {
+        s.hidden = s.dataset.country !== sel.value;
+      });
     }
-    window.scrollTo({ top: 0 });
   }
 
-  document.getElementById('pick').addEventListener('change', apply);
+  document.querySelectorAll('button.tab').forEach((b) =>
+    b.addEventListener('click', () => {
+      tab = b.dataset.tab;
+      apply();
+      window.scrollTo({ top: 0 });
+    })
+  );
+  sel.addEventListener('change', apply);
   document.querySelectorAll('#filters input').forEach((i) => i.addEventListener('change', apply));
   apply();
 })();
