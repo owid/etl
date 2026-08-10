@@ -204,14 +204,23 @@ COUNTRIES = [
       "windows, so only the years where they overlap can be computed. Earlier editions would extend the "
       "series back to about 2017.",
       "https://www.nso.go.th/"),
-    C("France", "INSEE — état civil", france, "France", "complete", False,
-      "INSEE publishes fertility rates by single year of age of mother, and separately births by single "
-      "year of age, both from the civil register.",
-      "We summed the rates across ages. Both files use age reached during the year, so dividing births "
-      "by the rate recovers INSEE's own female population, which is what the age-band comparison uses.",
-      "Excludes Mayotte before 2014 and includes it after, a small discontinuity we have not corrected. "
-      "The 2025 figure is provisional.",
-      "https://www.insee.fr/fr/statistiques/9000195"),
+    C("France", "INSEE — état civil over the mean resident population", france, "France", "complete", False,
+      "INSEE publishes fertility rates by single year of age of mother and, separately, births by single year "
+      "of age, both from the civil register. Its population pyramid gives women by single year of age at 1 "
+      "January, for the whole country from 1991 and for mainland France from 1901.",
+      "We summed the rates across ages. The age-band comparison divides the births by the mean population "
+      "over the year — the average of the 1 January figures for that year and the next — because that is how "
+      "INSEE defines a fertility rate: births to women of an age over \"la population moyenne de l'année des "
+      "femmes de même âge\".",
+      "Excludes Mayotte before 2014 and includes it after, a small discontinuity we have not corrected. INSEE "
+      "does publish a mainland-only series with no such break, going back to 1901, but mainland France is not "
+      "the territory the UN figures cover, so switching would trade one mismatch for another. Population "
+      "estimates for a given year get revised in later releases — about 1% for one cohort we checked — so "
+      "rates and population have to come from the same vintage. The 2025 figure is provisional. The single "
+      "year of age population is not in INSEE's documented API, which only carries five-year bands; it comes "
+      "from the data file behind INSEE\'s own interactive population pyramid, which answers plain requests but "
+      "is not a published interface, so the path could change.",
+      "https://www.insee.fr/fr/statistiques/8999017"),
     C("Japan", "MHLW — Vital Statistics via e-Stat", japan, "Japan", "complete", False,
       "e-Stat table 0003411608 gives the total fertility rate and each age group's contribution to it; "
       "table 0003411607 gives births by the same age groups. The Statistics Bureau separately publishes "

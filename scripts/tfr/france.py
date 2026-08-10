@@ -1,7 +1,8 @@
 """France: INSEE births and fertility rates by age of mother.
 
-Both files use age reached during the year, so dividing births by the rate recovers INSEE's
-own female population denominator without needing a third file.
+Both files use age reached during the year — the calendar year minus the year of birth — and so
+does INSEE's population pyramid, which supplies the denominator. The conventions match on both
+sides, so the rate is not biased by them.
 """
 
 import os
@@ -9,6 +10,8 @@ import re
 import warnings
 
 import pandas as pd
+
+from fetch import fetch
 
 warnings.filterwarnings("ignore")
 
@@ -59,15 +62,42 @@ def france_tfr():
     )
 
 
+PYRAMID = "https://www.insee.fr/fr/outil-interactif/5014911/data/FR/donnees_pyramide_act.csv"
+
+
+def france_women(year):
+    """{age: women} on INSEE's own definition: the mean population over the year.
+
+    INSEE defines a fertility rate as births to women of an age divided by "la population moyenne
+    de l'année des femmes de même âge". It publishes population at 1 January, so the mean is the
+    average of that year's and the next year's snapshots for the same age.
+    """
+    path = fetch(PYRAMID, os.path.join(DATA, "fr", "pyramide.csv"))
+    d = pd.read_csv(path, sep=";")
+    d = d[d.SEXE == "F"]
+    now = dict(zip(d[d.ANNEE == year].AGE, d[d.ANNEE == year].POP))
+    nxt = dict(zip(d[d.ANNEE == year + 1].AGE, d[d.ANNEE == year + 1].POP))
+    if not now or not nxt:
+        return None
+    return {a: (float(now[a]) + float(nxt[a])) / 2 for a in now if a in nxt and 15 <= a <= 49}
+
+
 def france_detail(year):
-    """Births and the implied female population, by five-year band."""
+    """Births from the civil register, women from INSEE's population estimates.
+
+    Falls back to the population INSEE's own rates imply where the pyramid does not reach the year.
+    """
     rates, births = _rates().get(year), _births().get(year)
     if not rates or not births:
         return None
+    women = france_women(year)
     out = {}
     for lo, hi in BANDS:
         b = sum(births.get(a, 0.0) for a in range(lo, hi + 1))
-        w = sum(births[a] / (rates[a] / 10000) for a in range(lo, hi + 1) if rates.get(a) and a in births)
+        if women:
+            w = sum(women.get(a, 0.0) for a in range(lo, hi + 1))
+        else:
+            w = sum(births[a] / (rates[a] / 10000) for a in range(lo, hi + 1) if rates.get(a) and a in births)
         if b and w:
             out[(lo, hi)] = {"births": b, "women": w}
     return out or None
