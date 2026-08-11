@@ -996,12 +996,17 @@ def dominican_republic():
 
 
 def sierra_leone():
-    """Stats SL's health-survey rounds. The 2019 report's own table carries the earlier ones.
+    """Statistics Sierra Leone's own survey rounds. The 2019 report's table carries the earlier ones.
+
+    2017 is 4.1, from the office's own MICS6 round, whose table TM.1.1 gives 4.087 for the three years
+    before the survey. It is a fourth officially published figure, measured the same way as the health
+    surveys either side of it, and leaving it out made the series look like the whole survey record when
+    it was only the health-survey part of it.
 
     The 2015 census figure is not in this series: its raw and adjusted values differ by a factor of
     three and a half — see the note in countries.py.
     """
-    return _series([(2008, 5.1), (2013, 4.9), (2019, 4.2)])
+    return _series([(2008, 5.1), (2013, 4.9), (2017, 4.1), (2019, 4.2)])
 
 
 def israel():

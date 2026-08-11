@@ -1966,23 +1966,27 @@ COUNTRIES = [
       "https://www.statistics.gr/en/statistics/-/publication/DKT75/2024"),
     C("Sierra Leone", "Stats SL — Demographic and Health Survey rounds", sierra_leone, "Sierra Leone",
       "survey", False,
-      "Three survey rounds, falling steadily: 5.1 in 2008, 4.9 in 2013, 4.2 in 2019. The 2015 census "
-      "publishes its own figure, the rates behind it, and the women by age group.",
-      "We read the survey series. We also reconstructed the census's raw arithmetic from its own tables "
-      "and got 1.567, matching the implied figure it prints — 87,472 births among 1,835,328 women against "
-      "the 87,302 and 1,831,953 it states.",
-      "Sierra Leone has the largest census correction we have found anywhere, by a wide margin. The 2015 "
-      "census's own reported births give a fertility rate of 1.6. Stats SL published that number, said it "
-      "could not be right, and applied indirect methods to reach 5.6 — scaling the births from 87,302 to "
-      "328,433, a factor of nearly four. For comparison, Mali's correction not quite doubled its count "
-      "and Cambodia's raw figures ran about half the adopted ones. It is candid about the diagnosis: "
-      "respondents may not have used the definition of a live birth, may have misjudged the twelve-month "
-      "window, may have omitted newborn deaths or reported children who were not their own — and, "
-      "tellingly, a significant number of women reported more than one birth in twelve months. It also "
-      "says it chose the model whose answer sat closest to the survey trend. Its two official census "
-      "volumes, published the same month, then disagree with each other about the answer: the national "
-      "report adopts 5.6 and the fertility volume adopts 5.7, from a different method. The 2021 mid-term "
-      "census published population counts only, with no fertility results at all.",
+      "Four survey rounds, falling steadily: 5.1 in 2008, 4.9 in 2013, 4.1 in the office's 2017 household "
+      "survey, and 4.2 in 2019. The 2015 census publishes its own figure, the rates behind it, and the "
+      "women by age group.",
+      "We plot the surveys' own figures. We also reconstructed the census's arithmetic from its own "
+      "tables. Applying the rate it publishes for each age group to the women it counted in that group "
+      "gives 87,472 births among 1,835,328 women. Adding those seven rates and multiplying by five gives "
+      "1.567, which matches the 1.6 the census prints directly. Its own text states slightly different "
+      "totals, 87,302 births among 1,831,953 women, and both land on the same rounded rate.",
+      "Sierra Leone's 2015 census carries an unusually large correction. Its own reported births give a "
+      "fertility rate of 1.6. Statistics Sierra Leone published that number, said it could not be right, "
+      "and applied indirect methods to reach 5.6 — scaling the births from 87,302 to 328,433, a factor of "
+      "nearly four. Its fertility volume is candid about why: respondents may not have used the "
+      "definition of a live birth, may have misjudged the twelve-month window, may have omitted newborn "
+      "deaths or reported children who were not their own — and, tellingly, a significant number of women "
+      "reported more than one birth in twelve months. The office also says it chose the model whose "
+      "answer sat closest to the survey trend. Its two official census volumes, published the same month, "
+      "then disagree with each other about the answer: the national report adopts 5.6 and the fertility "
+      "volume adopts 5.7, from a different method. The 2021 mid-term census published population counts "
+      "only, with no fertility results at all. One note on the last plotted point: 4.2 for 2019 comes "
+      "from that survey's key-indicators report, which describes its results as preliminary, and no full "
+      "report has appeared since.",
       "https://www.statistics.sl/images/StatisticsSL/Documents/Census/2015/"
       "2015_census_national_analytical_report.pdf"),
     C("Austria", "Statistik Austria — registered births by the mother's age, over the mean female "
@@ -2008,21 +2012,25 @@ COUNTRIES = [
       switzerland_tfr,
       "Switzerland", "complete", False,
       "The office publishes its rate back to 1803, and separately for Swiss and foreign mothers since "
-      "1971. Its database answers plain requests with no key.",
-      "We read the published series. We could not rebuild it from counts: we found no births by age of "
-      "mother published as figures anywhere on the office's site — the only place that breakdown appears "
-      "is inside an interactive chart.",
+      "1971. One spreadsheet, its table T 01.04.01.01, carries births by the mother's age group, the rate "
+      "for each age group, and the total, for every year from 1960. All of it downloads freely, with no "
+      "registration and no access key.",
+      "We plot the published rate. Adding up the office's own rates for each age group and multiplying by "
+      "five gives 1.2949 for 2024 against its published 1.2879, and the same half-percent excess in every "
+      "year back to 1960. That is expected rather than wrong: the figures it prints for each age group are "
+      "averages across the five single ages inside it, while its own total is built from each single age, "
+      "so the check confirms the shape of the calculation without reproducing it exactly.",
       "The nationality gap is about 0.3 and stable: 1.20 for Swiss mothers against 1.50 for foreign ones "
       "in 2024, with 1.29 overall. Two things to be careful about. There is a second office series, the "
-      "one that feeds its population scenarios, whose age-specific rates sum to 1.40 for 2024 against the "
-      "1.29 it publishes as the actual figure — an 8.7% difference, because the scenario schedule is "
-      "smoothed across years. It is the wrong series to use and easy to reach for, since it is the only "
-      "one with rates by age. And the office does not say which population its rate divides by; the only "
-      "single-year-of-age population table it publishes is a 31 December stock, unlike Austria next door, "
-      "which states its mean-population basis explicitly. Nor does it say whether births are dated to "
-      "when they happened or when they were registered.",
-      "https://www.bfs.admin.ch/bfs/de/home/statistiken/bevoelkerung/geburten-todesfaelle/"
-      "fruchtbarkeit.html"),
+      "one that feeds its population scenarios, whose rates by age sum to 1.40 for 2024 against the 1.29 "
+      "it publishes as the actual figure — an 8.7% difference, because the scenario schedule is smoothed "
+      "across years. It is the wrong series to use and an easy one to reach for. And the latest year "
+      "moves: 2024 was first published as 1.28 in April 2025, described as provisional, and settled at "
+      "1.29 in the definitive figures that September. The office states in its statistical yearbook that "
+      "rates like these are per thousand women of the mean resident population, so the population it "
+      "divides by is an average over the year rather than a count on one date. What it does not say is "
+      "whether births are dated to when they happened or when they were registered.",
+      "https://www.bfs.admin.ch/asset/de/je-d-01.04.01.01"),
     C("Portugal", "INE — registered births by the mother's age, over the resident female population",
       portugal_tfr, "Portugal",
       "complete", False,

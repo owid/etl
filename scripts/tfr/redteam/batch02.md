@@ -2013,3 +2013,66 @@ Human Fertility Collection to test claims about revision that the live site cann
 - **Accepted.** Anchored Nagorno-Karabakh by name instead of "territories then under occupation", cut
   "the reason turned out to be interesting", and replaced "no key and no interface to negotiate",
   "census-enumerated women" and two tangled sentences with plainer wording.
+
+## Switzerland
+
+Verdict: minor problems, and two of them were absence claims — the twenty-fourth and twenty-fifth. Every
+plotted year from 2000 to 2024 verified against the office's own table at full precision.
+
+- **Accepted.** "We found no births by age of mother published as figures anywhere on the office's site —
+  the only place that breakdown appears is inside an interactive chart." It is table T 01.04.01.01, a
+  four-sheet spreadsheet with an official table code, carrying births by the mother's age group, the rate
+  for each group and the total, for every year from 1960. I downloaded it rather than taking the report's
+  word. The page now says so, and the cited link goes to that table instead of the interactive page it
+  used to point at.
+- **Accepted.** "The office does not say which population its rate divides by ... unlike Austria next
+  door, which states its mean-population basis explicitly." Its statistical yearbook footnotes these rates
+  as live births per thousand women of the mean resident population. So it does say, in the yearbook
+  rather than on the page we were reading. The Austria comparison is gone twice over — wrong, and a
+  cross-reference to a page the reader has not opened.
+- **Built, and it says something.** With the table in hand the rate can be checked. Adding up the printed
+  rates for each age group and multiplying by five gives 1.2949 for 2024 against a published 1.2879, and
+  the same half-percent excess in every year back to 1960 — I ran it across eight years. The reviewer
+  suggested this would earn the "Recalculated from births & women" label. It does not: the printed group
+  figures are averages across the five single ages inside each group, while the office builds its total
+  from each single age, so the sum cannot reproduce it and the table gives no women to divide by. The
+  label stays "Rate copied from source" and the page now states the check and why it lands high.
+- **Accepted.** 2024 was first published as 1.28 in April 2025, marked provisional, and settled at 1.29 in
+  the definitive figures that September. We plot the definitive figure, but the page said nothing about
+  the revision. It does now.
+- **Accepted.** "Its database answers plain requests with no key" — jargon, rewritten.
+- **Could not verify, left as it stands.** Whether the office dates births to when they happened or when
+  they were registered. The agent found nothing either way, which is what our sentence already says.
+
+## Sierra Leone
+
+Verdict: minor problems. The agent verified the census reconstruction by hand, reproducing 87,472 and
+1,835,328 exactly from the census's own tables and confirming that 5 × the sum of its rates is 1.567 —
+and it made the point that this rules out the wrong arithmetic, since the naive division would land
+nowhere near.
+
+- **Accepted, and it added a plotted point.** "Three survey rounds" was the health-survey record, not the
+  survey record. The office's own 2017 household survey measures fertility the same way and publishes
+  4.087 for the three years before it, in table TM.1.1. Now plotted at 2017 as 4.1, between the 2013 and
+  2019 rounds.
+- **Accepted.** The candid diagnosis of the census undercount — the live-birth definition, the twelve-month
+  window, omitted newborn deaths, children who were not the respondent's, and women reporting more than
+  one birth in twelve months — is accurate almost word for word, but it comes from the census's fertility
+  volume, not the national report we link to. A reader following our link would not have found it. Now
+  attributed to the volume that contains it.
+- **Accepted.** "Matching the implied figure it prints" contradicts itself: the census prints a row
+  labelled TFR. And the reconciliation sentence carried four numbers and two comparisons at once. Both
+  rewritten, split in two.
+- **Accepted.** Cut "the largest census correction we have found anywhere, by a wide margin" and the
+  comparisons to Mali's and Cambodia's corrections. The size of this one is on the page in its own terms —
+  87,302 births scaled to 328,433 — which is the part a reader can check.
+- **Accepted.** The 4.2 for 2019 comes from a key-indicators report that calls its own results
+  preliminary, and no full report has appeared since. Said on the page now, in the same way five other
+  countries' last points are qualified.
+- **Accepted.** Expanded Stats SL to Statistics Sierra Leone.
+- **And the guard caught my own rewrite.** The reconciliation, rewritten, put 87,472 births, 1,835,328
+  women and the rate 1.567 close enough together that `--audit`'s impossible-arithmetic check fired: those
+  two numbers divide to 0.0477, not 1.567. The check was right to fire — that is precisely the reading to
+  avoid, and it is the mistake three pages in this collection actually made. The operation now sits in its
+  own sentence between the counts and the rate, which clears the guard and makes the arithmetic legible at
+  the same time.
