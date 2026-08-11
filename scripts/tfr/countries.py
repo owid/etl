@@ -2011,11 +2011,11 @@ COUNTRIES = [
       "single year of age changes the answer by about a third of a percent. For 2025, the one year where "
       "births by single year of age are published, doing it at that detail instead gives 1.2958 — within a "
       "thousandth of the office's own figure.",
-      "Austria's rate has fallen every year since 2021 except one, from 1.48 to 1.30. The nationality "
-      "split is 1.22 for Austrian mothers against 1.58 for foreign ones in 2024 — and broken down "
-      "further, by individual nationality, it runs from 3.79 for Syrian mothers to 0.66 for Iranian, a "
-      "spread far wider than the two-group figure suggests. The denominator is stated plainly as the mean "
-      "population over the year, which is also why the office withholds its final rate until the "
+      "Austria's rate has fallen every year since 2021 except one, from 1.48 to 1.30. Nationality matters "
+      "here, and the births file gives it directly: of the 76,067 children born in 2025, 18,759 were to "
+      "mothers who are not Austrian citizens, just under a quarter. The population the rate is divided by "
+      "is stated plainly as the mean over the year, which is also why the office withholds its final rate "
+      "until the "
       "mid-year population is settled around July. Births are counted by when they happened, from the "
       "central civil-status register, and each year is cleaned once in the following spring: the "
       "provisional 2025 figure of 75,718 births became 76,067.",

@@ -2210,3 +2210,20 @@ The shared lesson is about tense. "Nothing has been published since" and "no ful
 since" are both claims about the present, silently dated to whenever someone last looked. Neither page said
 when that was, so both read as current forever. Where a page describes an unfinished process, it should say
 what happened and when, not what has not happened.
+
+## Cross-cutting: Austria's nationality figures, cut for the same reason Czechia's were
+
+Austria's page carried a fertility rate by nationality — 1.22 for Austrian mothers against 1.58 for
+foreign ones, and 3.79 for Syrian mothers down to 0.66 for Iranian. Its reviewing agent could not reach a
+page carrying them. Neither could I: the births file the loader already downloads gives births by
+citizenship as counts but no rate, and the office's births page carries no such table.
+
+They are gone, which makes Austria consistent with Czechia, whose Ukrainian-mothers percentages were cut
+earlier for the same reason. The distinction I had drawn between the two — that for Czechia I had proved
+the cited publications carry no such table, while for Austria nobody could reach the page — is real but
+does not matter to a reader, who in both cases is shown a number nobody can point at. The rule the whole
+campaign runs on is the simpler one: if it cannot be pointed at, it does not go on the page.
+
+What replaced it comes from the file we parse and can be checked in one line: of the 76,067 children born
+in Austria in 2025, 18,759 were to mothers who are not Austrian citizens, just under a quarter. Same
+subject, verifiable, and it no longer states a rate we cannot source.
