@@ -10,7 +10,7 @@ import json
 import re
 from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
-from typing import Any, Literal, NewType, NotRequired, Required, Self, TypedDict, TypeVar
+from typing import Any, Literal, NewType, NoReturn, NotRequired, Required, Self, TypedDict, TypeVar
 
 import mistune
 import pandas as pd
@@ -418,6 +418,70 @@ def _collapse_description_key_item(item: str) -> str:
     return "".join(parts)
 
 
+# Crude bounds on `description_key` authored as a list of bullets. They are meant to
+# exclude obviously broken values, not to encode editorial limits: the longest list
+# authored anywhere in ETL has 13 bullets, so 50 leaves plenty of room. Other
+# user-facing metadata fields with equally obvious bounds (indicator title length,
+# `description_short` length, unit length) can be guarded the same way — a named
+# constant plus a call to `_reject_metadata_value`.
+DESCRIPTION_KEY_MAX_ITEMS = 50
+# Below this many bullets the short-bullet share is too noisy to mean anything.
+DESCRIPTION_KEY_MIN_ITEMS_FOR_SHORT_CHECK = 5
+# A bullet this short is a character or two, not a sentence.
+DESCRIPTION_KEY_SHORT_ITEM_CHARS = 2
+
+
+def _reject_metadata_value(field_name: str, problem: str, context: str | None = None) -> NoReturn:
+    """Raise for a metadata value that fails one of the sanity bounds above."""
+    where = f" of {context}" if context else ""
+    raise ValueError(
+        f"Pathological `{field_name}`{where}: {problem}. The most likely cause is a markdown "
+        f"string that was split into its characters, e.g. `list(description_key)`. In the grapher "
+        f"channel `{field_name}` is already a markdown string — pass it through unchanged instead "
+        f"of rebuilding it as a list."
+    )
+
+
+def validate_description_key_list(items: list[str], context: str | None = None) -> None:
+    """Reject a `description_key` list that cannot plausibly be real content.
+
+    `description_key` is a markdown string in the grapher channel, but it can still be
+    authored as a list of bullets, which is then joined into that string. Nothing about
+    that conversion notices when the "list" is in fact one item per character, so a
+    corrupted value used to be published to readers silently.
+
+    Empty items are ignored, because they are dropped by `description_key_to_string`
+    too — Jinja conditionals routinely render a bullet to nothing.
+
+    Args:
+        items: the bullets, as authored.
+        context: what is being validated (catalog path, indicator or view), quoted in
+            the error so the offending indicator is identifiable.
+
+    Raises:
+        ValueError: if the list is far longer than any real bullet list, or if most of
+            its bullets are one or two characters long.
+    """
+    bullets = [str(item).strip() for item in items if item and str(item).strip()]
+
+    if len(bullets) > DESCRIPTION_KEY_MAX_ITEMS:
+        _reject_metadata_value(
+            "description_key",
+            f"{len(bullets)} bullets, far more than the {DESCRIPTION_KEY_MAX_ITEMS} a real list ever has",
+            context,
+        )
+
+    if len(bullets) >= DESCRIPTION_KEY_MIN_ITEMS_FOR_SHORT_CHECK:
+        n_short = sum(1 for bullet in bullets if len(bullet) <= DESCRIPTION_KEY_SHORT_ITEM_CHARS)
+        if n_short > len(bullets) / 2:
+            _reject_metadata_value(
+                "description_key",
+                f"{n_short} of its {len(bullets)} bullets are at most "
+                f"{DESCRIPTION_KEY_SHORT_ITEM_CHARS} characters long",
+                context,
+            )
+
+
 def description_key_to_string(items: list[str]) -> str | None:
     """Convert a legacy description_key list of bullet points into a single
     markdown string.
@@ -750,6 +814,7 @@ def update_variable_metadata(meta: VariableMeta) -> VariableMeta:
     # empty.
     if meta.description_key:
         if isinstance(meta.description_key, list):
+            validate_description_key_list(meta.description_key, context=getattr(meta, "_name", None) or meta.title)
             meta.description_key = description_key_to_string(meta.description_key)
         elif not meta.description_key.strip():
             meta.description_key = None

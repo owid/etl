@@ -162,6 +162,50 @@ def test_description_key_to_string_flattens_multiline_items():
     assert meta.description_key_to_string(["Para one.\n\nPara two."]) == "Para one.\n\nPara two."
 
 
+def test_validate_description_key_list_rejects_character_explosion():
+    # `list("some markdown string")` gives one bullet per character. This is what shipped
+    # thousands of one-character bullets to readers before the check existed.
+    exploded = list("This is a markdown string that was exploded into its characters.")
+    with pytest.raises(ValueError, match="Pathological `description_key`"):
+        meta.validate_description_key_list(exploded)
+
+    # A short explosion stays under the bullet cap, but is caught by the short-bullet share.
+    with pytest.raises(ValueError, match="at most 2 characters long"):
+        meta.validate_description_key_list(list("Short one."))
+
+    # The context is quoted, so the offending indicator is identifiable.
+    with pytest.raises(ValueError, match="grapher/emdat/latest/x#y"):
+        meta.validate_description_key_list(list("Short one."), context="grapher/emdat/latest/x#y")
+
+
+def test_validate_description_key_list_rejects_too_many_bullets():
+    ok = [f"Bullet number {i}, long enough to be a real sentence." for i in range(meta.DESCRIPTION_KEY_MAX_ITEMS)]
+    meta.validate_description_key_list(ok)
+
+    with pytest.raises(ValueError, match="51 bullets"):
+        meta.validate_description_key_list(ok + ["One bullet too many, but a perfectly real sentence."])
+
+
+def test_validate_description_key_list_accepts_legitimate_lists():
+    # The longest list authored in ETL has 13 bullets.
+    meta.validate_description_key_list(
+        [f"Bullet {i} says something substantive about the indicator." for i in range(13)]
+    )
+    # Short lists, including single-item ones and ones with short-but-real bullets.
+    meta.validate_description_key_list(["Only point"])
+    meta.validate_description_key_list(["Point 1", "Point 2"])
+    meta.validate_description_key_list(["No", "Yes", "Maybe", "Unknown", "Not applicable"])
+    # Empty items are ignored: Jinja conditionals routinely render a bullet to nothing,
+    # and `description_key_to_string` drops those anyway.
+    meta.validate_description_key_list(["Real bullet, kept.", "", "  ", "", ""])
+
+
+def test_update_variable_metadata_rejects_pathological_description_key():
+    m = meta.VariableMeta(description_key=list("Exploded into characters."), title="Some indicator")  # ty: ignore
+    with pytest.raises(ValueError, match="Some indicator"):
+        meta.update_variable_metadata(m)
+
+
 def test_update_variable_metadata_converts_description_key_list():
     # A list of bullet points is converted to a markdown string after Jinja rendering.
     m = meta.VariableMeta(description_key=["Point 1", "Point 2"])

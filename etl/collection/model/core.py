@@ -13,7 +13,7 @@ from typing import Any, Literal, TypedDict, cast
 import fastjsonschema
 import pandas as pd
 import yaml
-from owid.catalog.core.meta import GrapherConfig, description_key_to_string
+from owid.catalog.core.meta import GrapherConfig, description_key_to_string, validate_description_key_list
 from owid.catalog.core.utils import underscore
 from structlog import get_logger
 from typing_extensions import Self
@@ -274,6 +274,9 @@ class Collection(MDIMBase):
         # Run sanity checks on grouped views
         self.validate_grouped_views()
 
+        # Check that no view carries a corrupted description_key
+        self.validate_description_keys()
+
         # Sort views based on dimension order
         self.sort_views_based_on_dimensions()
 
@@ -300,7 +303,7 @@ class Collection(MDIMBase):
 
         # description_key is a markdown string; a YAML list is authoring sugar
         # and gets converted before the config is stored.
-        _convert_description_key_lists(config)
+        _convert_description_key_lists(config, context=self.catalog_path)
 
         # Convert config from snake_case to camelCase
         config = camelize(config, exclude_keys={"dimensions"})
@@ -637,6 +640,27 @@ class Collection(MDIMBase):
         for view in self.views:
             if view.is_grouped:
                 sanity_check_grouped_view(view)
+
+    def validate_description_keys(self):
+        """Fail on a view whose `description_key` list cannot be real content.
+
+        MDIMs convert these lists into a markdown string on upsert, and explorers skip
+        that conversion altogether (they override `upsert_to_db`), so neither path
+        noticed a corrupted value. `grapher_checks` doesn't help either: it only runs
+        from `create_dataset`, never for `export://` steps.
+        """
+        for view in self.views:
+            metadata = view.metadata
+            if metadata is None:
+                continue
+            if not isinstance(metadata, dict):
+                metadata = metadata.to_dict()  # ty: ignore[unresolved-attribute, call-non-callable]
+            description_key = metadata.get("description_key")
+            if isinstance(description_key, list):
+                validate_description_key_list(
+                    _flatten_description_key(description_key),
+                    context=f"{self.catalog_path}, view {view.dimensions}",
+                )
 
     def prune_dimensions(self):
         """Remove dimension if only one of its choice is in use."""
@@ -1357,15 +1381,22 @@ def snake_to_camel(s: str) -> str:
     return _pattern.sub(lambda match: match.group(1).upper(), s)
 
 
-def _convert_description_key_lists(config: dict[str, Any]) -> None:
+def _flatten_description_key(description_key: list[Any]) -> list[str]:
+    """`- *anchor` authoring produces nested lists; flatten them like dataset YAML
+    metadata does."""
+    return [item for sub in description_key for item in ([sub] if isinstance(sub, str) else sub)]
+
+
+def _convert_description_key_lists(config: dict[str, Any], context: str | None = None) -> None:
     """Convert description_key lists to markdown strings in the collection-level
     and per-view metadata of a collection config (in place)."""
     metadatas = [config.get("metadata"), *(view.get("metadata") for view in config.get("views", []))]
     for metadata in metadatas:
         if metadata and isinstance(metadata.get("description_key"), list):
-            # `- *anchor` authoring produces nested lists; flatten them like
-            # dataset YAML metadata does before converting.
-            flat = [item for sub in metadata["description_key"] for item in ([sub] if isinstance(sub, str) else sub)]
+            flat = _flatten_description_key(metadata["description_key"])
+            # The conversion below joins the items into a markdown string, which hides a
+            # corrupted list (e.g. one bullet per character) rather than failing on it.
+            validate_description_key_list(flat, context=context)
             metadata["description_key"] = description_key_to_string(flat)
 
 

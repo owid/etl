@@ -2278,3 +2278,15 @@ def test_convert_description_key_lists_flattens_anchored_lists():
     _convert_description_key_lists(config)
     assert config["metadata"]["description_key"] == "- shared one\n- shared two\n- extra"
     assert config["views"][0]["metadata"]["description_key"] == "only"
+
+
+def test_convert_description_key_lists_rejects_character_explosion():
+    """A markdown string split into its characters must fail here, instead of being
+    silently rejoined into thousands of one-character bullets."""
+    from etl.collection.model.core import _convert_description_key_lists
+
+    config = {
+        "views": [{"metadata": {"description_key": list("A markdown string, not a list of bullets.")}}],
+    }
+    with pytest.raises(ValueError, match="Pathological `description_key`"):
+        _convert_description_key_lists(config, context="multidim/x/latest/y#y")
