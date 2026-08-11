@@ -30,6 +30,12 @@ minutes trying to enumerate variable IDs in the Polish statistics API. Its repla
 to fight the interface and to fall back to published reports instead. Give that instruction to any
 country whose source is an interface rather than a file.
 
+Austria stalled the same way and had to be relaunched, which says the warning belongs in the prompt
+from the start rather than only after a stall. The relaunch spelled out what "do not fight it" means:
+two failed attempts at any one URL or tool, then switch to the office's static releases; and write the
+report even with points unresolved, because a report with three "could not verify" lines beats no
+report. Use that wording for any interface-backed country.
+
 A previous session hit its cap of 200 subagents with 21 countries still to do; a fresh session resets
 that cap, and the campaign resumed from the To do list without any loss. If it happens again, the state
 lives entirely in this file and the findings logs — the brief generator, the standard prompt with its
