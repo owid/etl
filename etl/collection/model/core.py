@@ -650,11 +650,10 @@ class Collection(MDIMBase):
         from `create_dataset`, never for `export://` steps.
         """
         for view in self.views:
+            # `ViewMetadata` is a TypedDict, so view metadata is a plain dict at runtime.
             metadata = view.metadata
             if metadata is None:
                 continue
-            if not isinstance(metadata, dict):
-                metadata = metadata.to_dict()  # ty: ignore[unresolved-attribute, call-non-callable]
             description_key = metadata.get("description_key")
             if isinstance(description_key, list):
                 validate_description_key_list(

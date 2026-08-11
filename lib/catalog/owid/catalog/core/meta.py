@@ -420,10 +420,10 @@ def _collapse_description_key_item(item: str) -> str:
 
 # Crude bounds on `description_key` authored as a list of bullets. They are meant to
 # exclude obviously broken values, not to encode editorial limits: the longest list
-# authored anywhere in ETL has 13 bullets, so 50 leaves plenty of room. Other
-# user-facing metadata fields with equally obvious bounds (indicator title length,
-# `description_short` length, unit length) can be guarded the same way — a named
-# constant plus a call to `_reject_metadata_value`.
+# authored in the repo has 13 bullets and the longest published anywhere is 19, so 50
+# leaves plenty of room. Other user-facing metadata fields with equally obvious bounds
+# (indicator title length, `description_short` length, unit length) can be guarded the
+# same way — a named constant plus a call to `_reject_metadata_value`.
 DESCRIPTION_KEY_MAX_ITEMS = 50
 # Below this many bullets the short-bullet share is too noisy to mean anything.
 DESCRIPTION_KEY_MIN_ITEMS_FOR_SHORT_CHECK = 5
@@ -431,15 +431,19 @@ DESCRIPTION_KEY_MIN_ITEMS_FOR_SHORT_CHECK = 5
 DESCRIPTION_KEY_SHORT_ITEM_CHARS = 2
 
 
-def _reject_metadata_value(field_name: str, problem: str, context: str | None = None) -> NoReturn:
+# The way a `description_key` gets corrupted in practice: a step in the grapher channel,
+# where the field is already a markdown string, rebuilds it as a list.
+_CHARACTER_EXPLOSION_HINT = (
+    "The most likely cause is a markdown string that was split into its characters, e.g. "
+    "`list(description_key)`. In the grapher channel `description_key` is already a markdown "
+    "string — pass it through unchanged instead of rebuilding it as a list."
+)
+
+
+def _reject_metadata_value(field_name: str, problem: str, context: str | None, hint: str) -> NoReturn:
     """Raise for a metadata value that fails one of the sanity bounds above."""
     where = f" of {context}" if context else ""
-    raise ValueError(
-        f"Pathological `{field_name}`{where}: {problem}. The most likely cause is a markdown "
-        f"string that was split into its characters, e.g. `list(description_key)`. In the grapher "
-        f"channel `{field_name}` is already a markdown string — pass it through unchanged instead "
-        f"of rebuilding it as a list."
-    )
+    raise ValueError(f"Pathological `{field_name}`{where}: {problem}. {hint}")
 
 
 def validate_description_key_list(items: list[str], context: str | None = None) -> None:
@@ -469,6 +473,9 @@ def validate_description_key_list(items: list[str], context: str | None = None) 
             "description_key",
             f"{len(bullets)} bullets, far more than the {DESCRIPTION_KEY_MAX_ITEMS} a real list ever has",
             context,
+            # A long list of real sentences is not what this check is aimed at, so say how to
+            # allow one rather than only naming the likely corruption.
+            f"{_CHARACTER_EXPLOSION_HINT} If the bullets really are content, raise `DESCRIPTION_KEY_MAX_ITEMS`.",
         )
 
     if len(bullets) >= DESCRIPTION_KEY_MIN_ITEMS_FOR_SHORT_CHECK:
@@ -479,6 +486,7 @@ def validate_description_key_list(items: list[str], context: str | None = None) 
                 f"{n_short} of its {len(bullets)} bullets are at most "
                 f"{DESCRIPTION_KEY_SHORT_ITEM_CHARS} characters long",
                 context,
+                _CHARACTER_EXPLOSION_HINT,
             )
 
 

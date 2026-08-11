@@ -2290,3 +2290,37 @@ def test_convert_description_key_lists_rejects_character_explosion():
     }
     with pytest.raises(ValueError, match="Pathological `description_key`"):
         _convert_description_key_lists(config, context="multidim/x/latest/y#y")
+
+
+def test_validate_description_keys_rejects_character_explosion():
+    """The shape of the natural-disasters bug (#6647): a grouped view whose
+    `description_key` was rebuilt with `list()` from the grapher-channel markdown string.
+
+    `Collection.save()` runs this before the upsert, so explorers — which override
+    `upsert_to_db` and never convert the list — are covered too.
+    """
+    collection = Collection(
+        catalog_path="multidim/natural_disasters/latest/affected#affected",
+        title={"en": "Test"},
+        default_selection=["World"],
+        dimensions=[
+            Dimension(slug="type", name="Type", choices=[DimensionChoice(slug="all_stacked", name="All disasters")])
+        ],
+        views=[
+            View(
+                dimensions={"type": "all_stacked"},
+                indicators=ViewIndicators(
+                    y=[Indicator(catalogPath="grapher/emdat/2026-04-30/natural_disasters/yearly#total_affected")]
+                ),
+                metadata={"description_key": list("- EM-DAT counts an event as a disaster when...")},
+            )
+        ],
+        _definitions=Definitions(),
+    )
+
+    with pytest.raises(ValueError, match="Pathological `description_key`"):
+        collection.validate_description_keys()
+
+    # The same view with the string left alone passes.
+    collection.views[0].metadata = {"description_key": "- EM-DAT counts an event as a disaster when..."}
+    collection.validate_description_keys()
