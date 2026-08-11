@@ -235,18 +235,21 @@ COUNTRIES = [
       "https://www.hcp.ma/Naissances-et-fecondite_r554.html"),
     C("Uzbekistan", "Statistics Agency — registered births over its own population estimate", uzbekistan,
       "Uzbekistan", "complete", False,
-      "The agency publishes a fertility rate annually from 2010, with urban and rural splits, through an "
-      "open endpoint that needs no key. Its own metadata says the births come from the justice ministry's "
-      "civil registry and the denominator is its estimate of the average number of women in each age group.",
-      "We read the republic-wide row. No arithmetic of our own.",
-      "Uzbekistan is the one country here whose fertility rose rather than fell — from 2.42 in 2017 to 3.445 "
-      "in 2023 — and the rise is in the agency's own registration-based numbers, not just in outside "
-      "estimates, and shows in both the urban and rural series. It has since eased back to 3.20 in 2025, so "
-      "the peak may already have passed on the agency's own account. Rural fertility runs 0.3 to 0.5 above "
-      "urban throughout. Recent years are open to revision. The agency publishes no births by age of mother "
-      "and no female population on the standard five-year grid — its population brackets are administrative "
-      "ones that do not split 40-49 and have no clean 15-19 — so there is nothing to recalculate from. Those "
-      "tables do exist in the printed demographic yearbook, but the server hosting it times out.",
+      "Uzbekistan's statistics agency publishes a fertility rate annually from 2010, free to the public, "
+      "with separate figures for towns and the countryside. It says it counts births from the justice "
+      "ministry's birth registry, and divides them by its own estimate of how many women there are in each "
+      "age group during the year.",
+      "We use the nationwide figure as published. No arithmetic of our own.",
+      "Uzbekistan's fertility rose rather than fell — from 2.42 in 2017 to 3.445 in 2023 — and the rise is in "
+      "the agency's own registration-based figures, not only in outside estimates. It has since eased back "
+      "to 3.20 in 2025, so on the agency's own numbers the peak may already have passed. The rise happened "
+      "in both towns and the countryside, but faster in towns: rural fertility ran about 0.4 to 0.5 above "
+      "urban until 2021, then the gap nearly closed — 0.02 in 2022 — before reopening to 0.41 by 2025. "
+      "Recent years are open to revision. The agency's free online data has no births by age of mother, and "
+      "its population brackets there are administrative ones that do not split 40-49 and have no clean "
+      "15-19, so the rate cannot be rebuilt from what it puts online. Its printed demographic yearbook does "
+      "carry a table of births by the mother's age, so a check against counts should be possible for anyone "
+      "who can obtain it.",
       "https://stat.uz/en/official-statistics/demography"),
     C("Saudi Arabia", "GASTAT — Population Estimates", saudi_arabia, "Saudi Arabia", "projection", False,
       "GASTAT publishes a fertility rate annually from 2011, in three parallel series: Saudis, non-Saudis, "
@@ -1392,8 +1395,8 @@ COUNTRIES = [
       "Benin is the case where an office admits to correcting its census figure but never says how. Its "
       "own dissemination volume states that the fertility, nuptiality and mortality indicators were "
       "produced by indirect estimation, by a team of demographers with an international expert — so 4.8 is "
-      "a model output, not a count. But no method is named anywhere, and no raw figure is printed beside "
-      "it, so unlike Mali, Senegal or Malawi there is nothing to compare. The two instruments also "
+      "a model output, not a count. But we could find no name for the method and no raw figure printed "
+      "beside the corrected one, so there is nothing to compare it against. The two sources also "
       "disagree about direction: the censuses fall steadily, 6.1 in 1992 to 5.5 in 2002 to 4.8 in 2013, "
       "while the surveys are flat or rising since 2012 — 4.9 in the 2011-12 round against 5.7 in 2014 and "
       "5.7 again in 2017-18. The volumes advertised as six thematic census reports are the same twenty-page "
@@ -1555,7 +1558,7 @@ COUNTRIES = [
       "INE runs the health survey every few years and its 2023 fertility report charts all five rounds "
       "since 1998. The 2024 census asks women how many children they have ever borne, and INE publishes "
       "those counts. Its population projection carries a fertility assumption of its own.",
-      "We read the survey series. There is nothing to recompute as a rate: no Bolivian source publishes "
+      "We read the survey series. We could not recompute a rate: we found no Bolivian source publishing "
       "births by age of mother, in any year, from any instrument.",
       "Bolivia runs the Latin American pattern backwards, and it is the only country here that does. "
       "Everywhere else — Colombia, Mexico, Peru, Argentina, Chile, Ecuador — the office headlines a figure "
@@ -1866,9 +1869,9 @@ COUNTRIES = [
       "Switzerland", "complete", False,
       "The office publishes its rate back to 1803, and separately for Swiss and foreign mothers since "
       "1971. Its database answers plain requests with no key.",
-      "We read the published series. Nothing can be rebuilt: the office publishes no births by age of "
-      "mother at all, in any form — the only place that breakdown appears on its site is a chart drawn in "
-      "the browser from a third-party service.",
+      "We read the published series. We could not rebuild it from counts: we found no births by age of "
+      "mother published as figures anywhere on the office's site — the only place that breakdown appears "
+      "is inside an interactive chart.",
       "The nationality gap is about 0.3 and stable: 1.20 for Swiss mothers against 1.50 for foreign ones "
       "in 2024, with 1.29 overall. Two things to be careful about. There is a second office series, the "
       "one that feeds its population scenarios, whose age-specific rates sum to 1.40 for 2024 against the "

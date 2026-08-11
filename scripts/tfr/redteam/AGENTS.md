@@ -30,16 +30,16 @@ country whose source is an interface rather than a file.
 
 ## In flight (5)
 
-- Uzbekistan
 - Mozambique
 - Niger
 - Venezuela
 - Australia
+- North Korea
 
 ## Reported, awaiting write-up (0)
 
 
-## Analyzed (50)
+## Analyzed (51)
 
 - India
 - China
@@ -83,6 +83,7 @@ country whose source is an interface rather than a file.
 - Ukraine
 - Morocco
 - Poland
+- Uzbekistan
 - Malaysia
 - Ghana
 - Saudi Arabia
@@ -92,9 +93,8 @@ country whose source is an interface rather than a file.
 - Cameroon
 - Nepal
 
-## To do (45)
+## To do (44)
 
-- North Korea
 - Syria
 - Mali
 - Burkina Faso

@@ -813,3 +813,43 @@ confirmed almost word for word in its own projections report.
 - **Accepted.** INE spelled out, the survey's name translated, the Gompertz model described rather than
   named, and "the census figures are not one number" — which the agent could not make sense of even
   after reading the census — removed.
+
+## Uzbekistan
+
+Verdict: minor problems. All sixteen plotted values match the agency's own file digit for digit, and
+the rise is real: it shows in the urban and rural files separately and in the UN's own birth counts.
+The methodology claims were confirmed verbatim against the agency's metadata sheet.
+
+- **Accepted, and the fourth instance of the same false claim.** We said "the agency publishes no
+  births by age of mother... so there is nothing to recalculate from" — and then contradicted ourselves
+  two clauses later with "those tables do exist in the printed demographic yearbook". The yearbook's
+  own table of contents lists births by mother's age at page 144. The honest claim is about the free
+  online data, not about the agency, and that is what the page now says.
+- **Accepted, and it was wrong in the years that matter most.** "Rural fertility runs 0.3 to 0.5 above
+  urban throughout" is false exactly where the story is. I pulled the agency's urban and rural files
+  and computed every year: the gap sits at 0.38-0.54 through 2021, collapses to **0.02 in 2022** and
+  0.12 in 2023 — because urban fertility rose faster — then reopens to 0.41 by 2025. Now stated, and it
+  is more interesting than the flat claim it replaces.
+- **Accepted.** "Through an open endpoint that needs no key" and "the server hosting it times out" are
+  both about our own fetching, and the second was being used to excuse the claim above. Gone.
+- **Accepted.** "Uzbekistan is the one country here whose fertility rose rather than fell" leans on the
+  rest of the collection; now stands alone. "Metadata", "denominator" and "row" all replaced.
+
+## Cross-cutting: claims that something does not exist
+
+Five of these have now been proven false — Malaysia's births by age of mother, Sudan's census age
+tables, Nepal's unnamed method, Ghana's unpublished census volume, Uzbekistan's yearbook table. Every
+time, the thing we said did not exist was in a printed report, a census annex or a yearbook, while the
+claim was really about what we could find online.
+
+Two things done about it rather than noted:
+
+- A sweep of the whole collection found **17** absence claims in reader-facing text. The three most
+  categorical have been softened to what we actually established: Bolivia's "no Bolivian source
+  publishes births by age of mother, in any year, from any instrument", Switzerland's "publishes no
+  births by age of mother at all, in any form", and Benin's "no method is named anywhere". All three
+  now say what we found rather than what exists. The rest sit with countries still to be reviewed.
+- The standard brief in `PROMPT.md` now tells every remaining agent to attack absence claims
+  specifically, and names where the missing thing has actually turned up each time: the statistical
+  yearbook, census volumes and their annexes, vital-statistics bulletins, thematic monographs, and the
+  relevant ministry rather than the statistics office.

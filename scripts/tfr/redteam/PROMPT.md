@@ -36,6 +36,15 @@ Then answer five questions, in order.
 2. **Is the metadata accurate?** Everything we assert about the source, about the source's method, and
    about our own method. Look hardest for claims that sound right but are wrong, and for anything
    stated more confidently than the source supports.
+
+   **Attack every claim that something does not exist.** Sentences of the form "the office publishes
+   no X", "no source publishes X", "no method is named anywhere", "there is nothing to recalculate
+   from" have been the single most error-prone thing on these pages — five have been proven false so
+   far, and in each case the missing thing was sitting in a printed annual report, a census annex or a
+   yearbook rather than in the online data the claim was really about. If the country's page makes one,
+   try hard to falsify it: look at the statistical yearbook, the census volumes and their annexes, any
+   vital-statistics bulletin, thematic monographs, and the relevant ministry as well as the statistics
+   office. Finding one of these is the most valuable thing you can do.
 3. **Is it written plainly?** Flag jargon, acronyms, assumed knowledge, and sentences a non-specialist
    reader would stumble on. Suggest the plainer wording. American spelling.
 4. **Is the quality label right?** Both labels. The available values are printed in the brief.

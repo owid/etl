@@ -153,7 +153,6 @@ def unmatched_headings():
     twice, which is how DR Congo happened. Section headings that are deliberately not countries are
     listed here so they stop being reported as problems.
     """
-    allowed = {"Cross-cutting, from this batch"}
     known = {c["name"] for c in COUNTRIES} | {"England and Wales"}
     out = []
     if os.path.isdir(LOG):
@@ -162,7 +161,8 @@ def unmatched_headings():
                 continue
             for line in open(os.path.join(LOG, name), encoding="utf-8"):
                 head = line[3:].strip() if line.startswith("## ") else None
-                if head and head not in known and head not in allowed:
+                # sections about a pattern rather than a country are headed "Cross-cutting"
+                if head and head not in known and not head.startswith("Cross-cutting"):
                     out.append(f"{name}: {head}")
     return out
 
