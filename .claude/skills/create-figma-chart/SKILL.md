@@ -718,66 +718,49 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Box alignment | compare the chart's left/right against the header frame | identical to the subtitle box, to the pixel |
 | Gap | `(footer.y - headerBottom - chart.height) / 2` | equal top and bottom, at the band figure of **the template you filled**: **12–16px** on the 540-wide frames, **30px** on the IG portrait (see Step 7) |
 
-**For arrows, drop vectors entirely and probe the rendered pixels.** Arrow groups are rotated, so every vector-space measurement of theirs is wrong (see Gotchas), and "very close but never on top" is a pixel property anyway. Screenshot the frame at 1:1, take the arrow's **`absoluteBoundingBox`** in frame coordinates, and inside it count pixels of the arrow's gray against pixels of the line's color.
+**For arrows, drop vectors entirely and probe the rendered pixels.** Arrow groups are rotated, so every vector-space measurement of theirs is wrong (see Gotchas), and "very close but never on top" is a pixel property anyway. Screenshot the frame at 1:1, take the arrow's **`absoluteBoundingBox`** in frame coordinates, and inside it measure how close the arrow's pixels come to the target line's.
 
-**Take the target color from the series this arrow points at — never hardcode a hue.** The palette runs to 24 fills and the charts in this skill use orange, purple, maroon and denim as often as a teal, so a fixed predicate collects nothing on most charts and `min()` then dies on an empty sequence instead of reporting a clearance. Read the fill off the node the arrow aims at, match within a tolerance because the antialiased edge pixels blend toward the background, and assert both sets are non-empty so a bad bbox fails loudly rather than looking like a pass:
+**Identify each shape's pixels by node identity, never by color.** Screenshot the frame three times at 1:1 — once whole, once with the arrow's `visible = false`, once with the target line's — and take each shape's pixel set from the difference against the whole render. A pixel belongs to the shape whose hiding changed it, which is true whatever either shape is colored:
 
 ```python
 from math import hypot
 
-TARGET = (0x00, 0x84, 0x7e)   # the fill of the series THIS arrow points at, read off its node
-TOL    = 60                   # antialiasing: edge pixels blend toward the background
+crop   = [(x, y) for y in range(y0, y1) for x in range(x0, x1)]   # arrow's absoluteBoundingBox, padded
+arrow  = [p for p in crop if full[p] != no_arrow[p]]              # visible=False on the arrow
+target = [p for p in crop if full[p] != no_target[p]]             # visible=False on the line it aims at
 
-def isgray(c):                                          # arrow, not text or bg
-    r, g, b = c[:3]                                     # c[:3] — the screenshot may be RGBA
-    return abs(r - g) < 14 and abs(g - b) < 14 and 60 < r < 165
-
-def istarget(c):                                        # the line's own hue, whatever it is
-    r, g, b = c[:3]
-    return hypot(r - TARGET[0], g - TARGET[1], b - TARGET[2]) < TOL and not isgray(c)
-
-grays, target = [], []                       # keep the POSITIONS, not just the verdicts
-for y in range(y0, y1):                      # y0..y1, x0..x1 = the arrow's absoluteBoundingBox, padded
-    for x in range(x0, x1):
-        c = px[x, y]
-        if   isgray(c):   grays.append((x, y))
-        elif istarget(c): target.append((x, y))
-
-assert grays,  "no arrow pixels in the box — wrong bbox, wrong frame, or the arrow is not gray"
-assert target, "no target pixels in the box — pad the bbox, or TARGET is not this arrow's series color"
+assert arrow,  "no arrow pixels — wrong bbox, wrong frame, or the hide never applied"
+assert target, "no target pixels — pad the bbox, or this is not the node the arrow points at"
 
 d        = lambda a, b: hypot(a[0]-b[0], a[1]-b[1])
-minGap   = min(d(a, b) for a in grays for b in target)
-touching = sum(1 for a in grays for b in target if d(a, b) <= 1.5)
+minGap   = min(d(a, b) for a in arrow for b in target)
+touching = sum(1 for a in arrow for b in target if d(a, b) <= 1.5)
 ```
 
-**A gray-on-gray case — an arrow aimed at a muted context line — breaks the color test outright, so stop testing color there.** Both shapes answer `isgray`, so the loop files every target-line pixel into `grays` and `assert target` fails on a chart where nothing is wrong. Neither obvious escape works: a narrower crop still contains both shapes and cannot separate them by the one predicate they both satisfy, and probing the protagonist instead measures the arrow's clearance from a line it is not pointing at, which is the wrong number reported confidently. Separate the two by **node identity** instead — screenshot the frame three times at 1:1, hiding one shape each time, and take each shape's pixel set from the difference against the full render:
+Restore `visible = True` on both afterwards, and **guard the masks**: each difference must fall inside that shape's own `absoluteBoundingBox`. If it doesn't, hiding the node reflowed something else (a group's derived box, an auto-layout sibling) and the mask is measuring the reflow, not the shape.
 
-```python
-crop   = [(x, y) for y in range(y0, y1) for x in range(x0, x1)]         # same padded bbox as above
-arrow  = [p for p in crop if full[p] != no_arrow[p]]                    # visible=False on the arrow
-target = [p for p in crop if full[p] != no_target[p]]                   # visible=False on the line
-```
-
-Restore `visible = True` on both afterwards, and **guard the masks**: each difference must fall inside that shape's own `absoluteBoundingBox`. If it doesn't, hiding the node reflowed something else (a group's derived box, an auto-layout sibling) and the mask is measuring the reflow, not the shape. Feed the two sets into the same `minGap` / `touching` arithmetic with `arrow` in place of `grays` — the pass thresholds below are unchanged. This costs two extra screenshots and is indifferent to color, so use it for any arrow whose target is gray, and keep the color predicates for the colored-target case where one render is enough.
+**Classifying pixels by color instead is the version to avoid — it produced two different false verdicts before it was replaced.** That first cut called the arrow "gray" (`abs(r−g) < 14 and 60 < r < 165`) and the line by its own hue, and both halves break on ordinary charts. A **gray target** — an arrow aimed at a muted context line — satisfies the arrow predicate, so every target pixel is filed as arrow ink and the check dies with an empty target set on a chart where nothing is wrong. And **gray furniture** in the padded crop — a gridline, a second context series, gray annotation text — is collected as arrow ink too, so the target line merely *crossing a gridline* reports `touching > 0` while the arrow itself is comfortably clear. Neither is fixable by narrowing the crop, since a crop cannot separate two shapes that answer the same predicate. Two extra screenshots cost less than one wrong verdict, and hardcoding the hue is worse again: the palette runs to 24 fills, so a fixed `TARGET` collects nothing on most charts and `min()` then dies on an empty sequence instead of reporting a clearance.
 
 **Pass is `touching == 0` with `minGap` about 3–7px.** This is the only check that caught the real defects: it found the peak arrow overlapping the line by 11 pixel pairs where the vector math had reported a comfortable clearance, and it confirmed the fix at 3.0px with zero contacts. Report both numbers per arrow.
 
-**On a line chart the bbox overlap test is not conservative, it is useless — sample the polyline.** A diagonal line's bounding box is most of the plot, so a bbox test reports every annotation as covering every line: on this run it returned 5 collisions across 4 frames, all but one of them phantom, and it *buried the one real defect in the noise* (a portrait annotation genuinely clipping the projection line). Extract the path's points — the numbers in `vectorPaths[0].data` alternate x,y, so map them through the node's own bbox — then walk the segments and sample each at ~1px:
+**On a line chart the bbox overlap test is not conservative, it is useless — sample the polyline.** A diagonal line's bounding box is most of the plot, so a bbox test reports every annotation as covering every line: on this run it returned 5 collisions across 4 frames, all but one of them phantom, and it *buried the one real defect in the noise* (a portrait annotation genuinely clipping the projection line). Extract the path's points — the numbers in `vectorPaths[0].data` alternate x,y, so map each pair through the node's own transform — then walk the segments and sample each at ~1px:
 
 ```js
 const pts = (v, frame) => {                          // path space -> FRAME space
   const n = ((v.vectorPaths||[]).map(p=>p.data).join(" ").match(/-?\d+\.?\d*/g)||[]).map(Number);
-  const xs = n.filter((_,i)=>i%2===0), ys = n.filter((_,i)=>i%2===1);
-  const [mnx,mxx,mny,mxy] = [Math.min(...xs),Math.max(...xs),Math.min(...ys),Math.max(...ys)];
-  const b = v.absoluteBoundingBox, fb = frame.absoluteBoundingBox;   // survives nesting and rotation
-  const ox = b.x - fb.x, oy = b.y - fb.y;
-  return xs.map((x,i)=>({ x: ox + (x-mnx)/((mxx-mnx)||1)*b.width,
-                          y: oy + (ys[i]-mny)/((mxy-mny)||1)*b.height }));
+  const [[a,b,tx],[c,d,ty]] = v.absoluteTransform;   // rotation + scale + translation, in one matrix
+  const fb = frame.absoluteBoundingBox;
+  const out = [];
+  for (let i = 0; i + 1 < n.length; i += 2)          // path coords are local to the node
+    out.push({ x: a*n[i] + b*n[i+1] + tx - fb.x,
+               y: c*n[i] + d*n[i+1] + ty - fb.y });
+  return out;
 };
 ```
 
-**Drive it off `absoluteBoundingBox`, not `v.x`/`v.y`, even though the naive version happens to work on a fresh import.** Group ancestors are transparent for coordinates, so a line nested under `lines` → `chart-area` does report frame coordinates and the short form measures correctly — that is why it produced sound numbers here. But the assumption is invisible and it fails three ways: under a nested **FRAME** ancestor, under an ancestor that was **scaled** rather than rescaled, and on any node with non-zero **rotation** (which is exactly how the arrow measurements in this skill came out as fiction). The absolute form costs one property read and cannot be wrong, so prefer it and keep the audit trustworthy when someone later reparents the chart. Note this also normalizes the *box*: for a rotated node the bbox is the visual one, so the mapping stays a mapping onto what you can see.
+**Drive it off `absoluteTransform`, not `v.x`/`v.y`, even though the naive version happens to work on a fresh import.** Group ancestors are transparent for coordinates, so a line nested under `lines` → `chart-area` does report frame coordinates and the short form measures correctly — that is why it produced sound numbers here. But the assumption is invisible and it fails three ways: under a nested **FRAME** ancestor, under an ancestor that was **scaled** rather than rescaled, and on any node with non-zero **rotation** (which is exactly how the arrow measurements in this skill came out as fiction). The transform costs one property read and cannot be wrong, so prefer it and keep the audit trustworthy when someone later reparents the chart.
+
+**And take the transform, not the bounding box, or rotation silently defeats the fix.** The tempting short version — normalize the local x,y into `absoluteBoundingBox` by their own min/max — reads like it handles rotation, because for a rotated node the bbox *is* the visual one. It does the opposite: normalizing two axes independently into an axis-aligned box cannot rotate anything, so you get an **unrotated polyline stretched across the visual box**, a shape the reader never sees, and the audit then certifies the wrong geometry with more confidence than before. `absoluteTransform` carries the rotation in the matrix, so applying it to each point is both shorter and the only version that is actually rotation-safe. (The regex takes every number in the path data, which is right for the M/L polylines grapher exports; a path with curve commands would need its control points dropped first.)
 
 That took the same four frames to **one** finding, which was real. And the same routine fixes it without guesswork: take the topmost line point under the annotation's x-range and set `box.y = thatY − 12 − box.height` — the ~12px the knockout rule asks for (GUIDELINES.md → Annotations), not the 5px that merely clears the test. **A clear audit is necessary here, not sufficient:** the polyline check only asks whether the box *touches* the line, so it reports 5px as clean, and 5px is the gap a reviewer called visibly too close. If 12px pushes the block somewhere awkward, narrow the block — re-wrap the same sentence into more, shorter lines — rather than moving it further away. Then re-run the test and confirm it still reports clear. (This is the line-chart counterpart of the subpath-bbox rule for maps: boxes decide where things may go, geometry decides how it reads.)
 
@@ -806,7 +789,7 @@ The chart's text is not yours — you transcribed it from the indicator's metada
   | Title | the headline assertion — that the data shows this |
   | Subtitle | what is measured, in what units, over what population |
   | Note | the caveats, and that these are the ones the producer actually states |
-  | The year, wherever it is stated — in the title or as `Data for <YYYY>.` — and any year caveat | that this is the year shown, for every entity |
+  | The year or period, wherever it is stated — in the title, as `Data for <YYYY>.`, or on a time axis — and any year caveat | that it is what the export actually shows, for every entity |
   | Annotations | each number, comparison and superlative — transcribed *or* derived |
   | Direct labels and value labels | that this number belongs to this mark |
   | **Legend and category labels** | that the category contains what the label says it does |
@@ -819,7 +802,9 @@ The chart's text is not yours — you transcribed it from the indicator's metada
   That does not make the short form forbidden. A team may prefer the plain word and accept the imprecision; on this chart the owner did. What it makes it is **a decision, taken knowingly and recorded** (see the accepted-deviations rule below) rather than a side effect of needing 20px. Say what the short label costs, say what keeping the long one costs — here, one row at 12px or two rows at 15px — and let the owner choose.
 - **Rendered spacing.** Metadata is often Jinja-templated, and a template defect shows up only in the rendered string — a double space, or a missing one where a conditional collapsed. You are pasting the rendered form, so you inherit it silently. `/check-metadata-spacing` is the pipeline check for this; here it is enough to read the placed strings once for spacing, and to distrust any sentence whose shape suggests a template (`in {country}`, a units clause that reads oddly).
 - **Entities that render empty — the check this skill learned the hard way.** A pinned selection can silently lose a member: grapher drops an entity whose data doesn't reach the displayed year, with no warning anywhere. This run shipped ten of eleven countries for exactly that reason, and only the accompanying text naming the missing country exposed it. `/check-empty-entities` is the pipeline sweep for this class; the local version is Step 1's rule — compare the **effective** selection against the entity labels in the exported SVG, every time. Effective, not saved: a link carrying `country=` overrides `selectedEntityNames` entirely, and diffing against the config there reports every saved default as missing on a chart where nothing is wrong.
-- **A pinned year, and a frozen image.** `/check-hardcoded-years` exists because a chart pinned to `maxTime: 2019` quietly stops showing new data. The static image has the sharper version of the problem: it is pinned to whatever year it was exported at, permanently, and nothing will ever refresh it. So check two things — that the *source chart* isn't pinned to a stale year (you would be freezing someone else's oversight), and that the year is stated **somewhere the reader will see it** — in the title when the claim is year-specific, otherwise in the subtitle as `Data for <YYYY>.` (GUIDELINES.md → Titles). Check for it in both places before calling it missing, and check it appears in only one of them. The year to state is the one the export shows — a `time=` in the link overrides `maxTime`, so read it off the link or the rendered SVG rather than the saved config. An undated static image is the one defect that gets worse with time.
+- **A pinned year, and a frozen image.** `/check-hardcoded-years` exists because a chart pinned to `maxTime: 2019` quietly stops showing new data. The static image has the sharper version of the problem: it is pinned to whatever year it was exported at, permanently, and nothing will ever refresh it. So check two things — that the *source chart* isn't pinned to a stale year (you would be freezing someone else's oversight), and, **for a single-time export**, that the year is stated **somewhere the reader will see it**: in the title when the claim is year-specific, otherwise in the subtitle as `Data for <YYYY>.` (GUIDELINES.md → Titles). Check for it in both places before calling it missing, and check it appears in only one of them. The year to state is the one the export shows — a `time=` in the link overrides `maxTime`, so read it off the link or the rendered SVG rather than the saved config. An undated single-time image is the one defect that gets worse with time.
+
+  **A time series needs no such caption — its own axis is the date line.** There is no single year a 1990–2025 chart "shows", and appending `Data for 2025.` to one makes a whole series read as a snapshot of its last year. What a time series needs from this check is the *other* half: that the axis actually runs to the latest year the data has, which is the stale-`maxTime` question above. The caption rule is scoped to single-year charts everywhere else it appears (Step 4's subtitle rule, GUIDELINES.md → Subtitles and notes); keep it scoped here too.
 - **Where a finding goes.** A wrong or misspelled string belongs upstream in the chart's own text, not in the Figma frame — same rule as sort order and colors. Route the fix through `/edit-faust-metadata`, always, and don't pick the layer yourself: that skill decides which layer the field actually lives in (garden `.meta.yml`, an MDim's yaml, or the chart config on staging) and reports which *other* charts inherit the same string before anything changes. Editing the garden file directly because it looked like the obvious home is how a one-chart correction silently rewrites text on a dozen others. Report the finding, hand it over, and hold the image until it's fixed if the claim is load-bearing; a static image outlives the chart text it was copied from, so shipping a known-wrong sentence is worse here than on the live chart, where it can be corrected in place.
 - **Annotations you wrote are your own claims.** Anything you drafted rather than transcribed — a derived percentage, a "more than half" — carries no upstream provenance, so verify it against the data yourself and say in the report which annotations are transcribed and which are derived.
 
