@@ -1,5 +1,4 @@
-# NOTE: This file is generated. See the accompanying height_for_age.py for how the two
-# WHO products are combined.
+# See the accompanying height_for_age.py for how the two WHO products are combined.
 
 definitions:
   common:
@@ -18,10 +17,12 @@ definitions:
 
       Two small steps down in the curves come from the source data and are not errors. At age 2 the measurement changes from length measured lying down to height measured standing up, which lowers the curves by about 0.7 cm. At age 5, where the two WHO products meet, the curves drop by a further 0.2 to 0.3 cm.
     description_key:
-      - These curves describe how children grow when they are healthy and well-nourished. They are a benchmark for how children could grow, not a description of how children in any particular country actually do grow.
-      - The standards for children under 5 come from the WHO Multicentre Growth Reference Study, which followed 8,440 healthy children in Brazil, Ghana, India, Norway, Oman, and the United States between 1997 and 2003. Children at all six sites grew very similarly, which is why WHO treats the standards as applying to children everywhere.
-      - A percentile is the share of children who are shorter than a given height. If a 10-year-old boy is at the 25th percentile, then 25% of healthy boys his age would be shorter than him and 75% would be taller.
-      - Being far from the median is not by itself a sign of poor health. In a healthy population, 3 in every 100 children fall below the 3rd percentile and 3 in every 100 rise above the 97th.
+      - These curves are a yardstick for comparing children's height against, not a description of how children in any particular country actually grow.
+      - The two halves of the age range rest on different foundations. Up to age 5 they are standards, showing how children grow when their health and nutrition are not holding them back. From age 5 to 19 they are a reference, showing how a particular sample of children did grow.
+      - The standards for children under 5 come from the WHO Multicentre Growth Reference Study, which followed 8,440 healthy, breastfed children in Brazil, Ghana, India, Norway, Oman, and the United States between 1997 and 2003. Children at all six sites grew very similarly, which is why WHO treats the standards as applying to children everywhere.
+      - The reference for ages 5 to 19 was rebuilt from a 1977 sample of children in the United States, combined with the under-fives sample and smoothed so that the curves join up at age 5. That sample was not screened for good health or nutrition, so for these older ages the curves describe how children grew rather than how they could grow.
+      - A percentile is the share of children who are shorter than a given height. If a 10-year-old boy is at the 25th percentile, then 25% of boys his age in WHO's reference population would be shorter than him and 75% would be taller.
+      - Being far from the median is not by itself a sign of poor health. In the reference population, 3 in every 100 children fall below the 3rd percentile and 3 in every 100 rise above the 97th.
       - A child whose height falls more than 2 standard deviations below the median for their age is defined as stunted. Stunting is a sign of sustained undernutrition or repeated infection rather than of being naturally short.
 
 dataset:
@@ -44,7 +45,7 @@ tables:
       height_percentile_0_1:
         title: Height at the 0.1st percentile
         description_short: |-
-          The height that 0.1% of children of this age fall below, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height that 0.1% of children of this age fall below, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -53,7 +54,7 @@ tables:
       height_percentile_1:
         title: Height at the 1st percentile
         description_short: |-
-          The height that 1% of children of this age fall below, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height that 1% of children of this age fall below, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -62,7 +63,7 @@ tables:
       height_percentile_3:
         title: Height at the 3rd percentile
         description_short: |-
-          The height that 3% of children of this age fall below, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height that 3% of children of this age fall below, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -71,7 +72,7 @@ tables:
       height_percentile_5:
         title: Height at the 5th percentile
         description_short: |-
-          The height that 5% of children of this age fall below, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height that 5% of children of this age fall below, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -80,7 +81,7 @@ tables:
       height_percentile_10:
         title: Height at the 10th percentile
         description_short: |-
-          The height that 10% of children of this age fall below, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height that 10% of children of this age fall below, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -89,7 +90,7 @@ tables:
       height_percentile_15:
         title: Height at the 15th percentile
         description_short: |-
-          The height that 15% of children of this age fall below, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height that 15% of children of this age fall below, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -98,7 +99,7 @@ tables:
       height_percentile_25:
         title: Height at the 25th percentile
         description_short: |-
-          The height that 25% of children of this age fall below, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height that 25% of children of this age fall below, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -107,7 +108,7 @@ tables:
       height_percentile_50:
         title: Height at the 50th percentile
         description_short: |-
-          The height that 50% of children of this age fall below, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height that 50% of children of this age fall below, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -116,7 +117,7 @@ tables:
       height_percentile_75:
         title: Height at the 75th percentile
         description_short: |-
-          The height that 75% of children of this age fall below, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height that 75% of children of this age fall below, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -125,7 +126,7 @@ tables:
       height_percentile_85:
         title: Height at the 85th percentile
         description_short: |-
-          The height that 85% of children of this age fall below, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height that 85% of children of this age fall below, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -134,7 +135,7 @@ tables:
       height_percentile_90:
         title: Height at the 90th percentile
         description_short: |-
-          The height that 90% of children of this age fall below, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height that 90% of children of this age fall below, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -143,7 +144,7 @@ tables:
       height_percentile_95:
         title: Height at the 95th percentile
         description_short: |-
-          The height that 95% of children of this age fall below, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height that 95% of children of this age fall below, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -152,7 +153,7 @@ tables:
       height_percentile_97:
         title: Height at the 97th percentile
         description_short: |-
-          The height that 97% of children of this age fall below, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height that 97% of children of this age fall below, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -161,7 +162,7 @@ tables:
       height_percentile_99:
         title: Height at the 99th percentile
         description_short: |-
-          The height that 99% of children of this age fall below, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height that 99% of children of this age fall below, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -170,7 +171,7 @@ tables:
       height_percentile_99_9:
         title: Height at the 99.9th percentile
         description_short: |-
-          The height that 99.9% of children of this age fall below, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height that 99.9% of children of this age fall below, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -179,7 +180,7 @@ tables:
       height_sd_minus_5:
         title: Height at 5 standard deviations below the median
         description_short: |-
-          The height 5 standard deviations below the median for this age, in the healthy, well-nourished population WHO uses as a growth reference. WHO publishes this cut-off only from age 5, to assess very short stature.
+          The height 5 standard deviations below the median for this age, in the population WHO uses as its growth reference. WHO publishes this cut-off only from age 5, to assess very short stature.
         unit: centimeters
         short_unit: cm
         display:
@@ -188,7 +189,7 @@ tables:
       height_sd_minus_4:
         title: Height at 4 standard deviations below the median
         description_short: |-
-          The height 4 standard deviations below the median for this age, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height 4 standard deviations below the median for this age, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -197,7 +198,7 @@ tables:
       height_sd_minus_3:
         title: Height at 3 standard deviations below the median
         description_short: |-
-          The height 3 standard deviations below the median for this age, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height 3 standard deviations below the median for this age, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -206,7 +207,7 @@ tables:
       height_sd_minus_2:
         title: Height at 2 standard deviations below the median
         description_short: |-
-          The height 2 standard deviations below the median for this age, in the healthy, well-nourished population WHO uses as a growth reference. Children shorter than this are defined as stunted.
+          The height 2 standard deviations below the median for this age, in the population WHO uses as its growth reference. Children shorter than this are defined as stunted.
         unit: centimeters
         short_unit: cm
         display:
@@ -215,7 +216,7 @@ tables:
       height_sd_minus_1:
         title: Height at 1 standard deviation below the median
         description_short: |-
-          The height 1 standard deviation below the median for this age, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height 1 standard deviation below the median for this age, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -224,7 +225,7 @@ tables:
       height_sd_0:
         title: Median height
         description_short: |-
-          The median height for this age in the healthy, well-nourished population WHO uses as a growth reference. Half of children are taller than this and half are shorter.
+          The median height for this age in the population WHO uses as its growth reference. Half of children are taller than this and half are shorter.
         unit: centimeters
         short_unit: cm
         display:
@@ -233,7 +234,7 @@ tables:
       height_sd_plus_1:
         title: Height at 1 standard deviation above the median
         description_short: |-
-          The height 1 standard deviation above the median for this age, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height 1 standard deviation above the median for this age, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -242,7 +243,7 @@ tables:
       height_sd_plus_2:
         title: Height at 2 standard deviations above the median
         description_short: |-
-          The height 2 standard deviations above the median for this age, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height 2 standard deviations above the median for this age, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -251,7 +252,7 @@ tables:
       height_sd_plus_3:
         title: Height at 3 standard deviations above the median
         description_short: |-
-          The height 3 standard deviations above the median for this age, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height 3 standard deviations above the median for this age, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -260,7 +261,7 @@ tables:
       height_sd_plus_4:
         title: Height at 4 standard deviations above the median
         description_short: |-
-          The height 4 standard deviations above the median for this age, in the healthy, well-nourished population WHO uses as a growth reference.
+          The height 4 standard deviations above the median for this age, in the population WHO uses as its growth reference.
         unit: centimeters
         short_unit: cm
         display:
@@ -296,7 +297,7 @@ tables:
       standard_deviation:
         title: Standard deviation of height
         description_short: |-
-          The spread of heights at this age in the healthy, well-nourished population WHO uses as a growth reference, calculated as the median multiplied by the coefficient of variation.
+          The spread of heights at this age in the population WHO uses as its growth reference, calculated as the median multiplied by the coefficient of variation.
         unit: centimeters
         short_unit: cm
         display:

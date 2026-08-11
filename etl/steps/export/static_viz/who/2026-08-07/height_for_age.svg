@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="876.24pt" height="709.988344pt" viewBox="0 0 876.24 709.988344" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="876.24pt" height="727.268344pt" viewBox="0 0 876.24 727.268344" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -20,8 +20,8 @@
  </defs>
  <g id="figure_1">
   <g id="patch_1">
-   <path d="M 0 709.988344 
-L 876.24 709.988344 
+   <path d="M 0 727.268344 
+L 876.24 727.268344 
 L 876.24 0 
 L 0 0 
 z
@@ -82,7 +82,7 @@ z
      <g id="line2d_7">
       <path d="M 87.84 572.280803 
 L 459.84 572.280803 
-" clip-path="url(#p93cd501717)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
+" clip-path="url(#p63c57922a1)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
      <g id="line2d_8"/>
      <g id="text_8">
@@ -93,7 +93,7 @@ L 459.84 572.280803
      <g id="line2d_9">
       <path d="M 87.84 520.688828 
 L 459.84 520.688828 
-" clip-path="url(#p93cd501717)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
+" clip-path="url(#p63c57922a1)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
      <g id="line2d_10"/>
      <g id="text_9">
@@ -104,7 +104,7 @@ L 459.84 520.688828
      <g id="line2d_11">
       <path d="M 87.84 469.096853 
 L 459.84 469.096853 
-" clip-path="url(#p93cd501717)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
+" clip-path="url(#p63c57922a1)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
      <g id="line2d_12"/>
      <g id="text_10">
@@ -115,7 +115,7 @@ L 459.84 469.096853
      <g id="line2d_13">
       <path d="M 87.84 417.504878 
 L 459.84 417.504878 
-" clip-path="url(#p93cd501717)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
+" clip-path="url(#p63c57922a1)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
      <g id="line2d_14"/>
      <g id="text_11">
@@ -126,7 +126,7 @@ L 459.84 417.504878
      <g id="line2d_15">
       <path d="M 87.84 365.912903 
 L 459.84 365.912903 
-" clip-path="url(#p93cd501717)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
+" clip-path="url(#p63c57922a1)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
      <g id="line2d_16"/>
      <g id="text_12">
@@ -137,7 +137,7 @@ L 459.84 365.912903
      <g id="line2d_17">
       <path d="M 87.84 314.320928 
 L 459.84 314.320928 
-" clip-path="url(#p93cd501717)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
+" clip-path="url(#p63c57922a1)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
      <g id="line2d_18"/>
      <g id="text_13">
@@ -148,7 +148,7 @@ L 459.84 314.320928
      <g id="line2d_19">
       <path d="M 87.84 262.728953 
 L 459.84 262.728953 
-" clip-path="url(#p93cd501717)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
+" clip-path="url(#p63c57922a1)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
      <g id="line2d_20"/>
      <g id="text_14">
@@ -159,7 +159,7 @@ L 459.84 262.728953
      <g id="line2d_21">
       <path d="M 87.84 211.136978 
 L 459.84 211.136978 
-" clip-path="url(#p93cd501717)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
+" clip-path="url(#p63c57922a1)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
      <g id="line2d_22"/>
      <g id="text_15">
@@ -170,7 +170,7 @@ L 459.84 211.136978
      <g id="line2d_23">
       <path d="M 87.84 159.545004 
 L 459.84 159.545004 
-" clip-path="url(#p93cd501717)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
+" clip-path="url(#p63c57922a1)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
      <g id="line2d_24"/>
      <g id="text_16">
@@ -4232,7 +4232,7 @@ L 96.354127 536.674597
 L 96.302949 537.136348 
 L 96.251771 537.598098 
 z
-" clip-path="url(#p93cd501717)" style="fill: #f4e3dc"/>
+" clip-path="url(#p63c57922a1)" style="fill: #f4e3dc"/>
    </g>
    <g id="FillBetweenPolyCollection_2">
     <path d="M 96.251771 540.525938 
@@ -8288,7 +8288,7 @@ L 96.354127 539.607604
 L 96.302949 540.066776 
 L 96.251771 540.525938 
 z
-" clip-path="url(#p93cd501717)" style="fill: #e6beb0"/>
+" clip-path="url(#p63c57922a1)" style="fill: #e6beb0"/>
    </g>
    <g id="FillBetweenPolyCollection_3">
     <path d="M 96.251771 543.489903 
@@ -12344,7 +12344,7 @@ L 96.354127 542.576725
 L 96.302949 543.033309 
 L 96.251771 543.489903 
 z
-" clip-path="url(#p93cd501717)" style="fill: #d59279"/>
+" clip-path="url(#p63c57922a1)" style="fill: #d59279"/>
    </g>
    <g id="patch_3">
     <path d="M 87.84 577.44 
@@ -12426,7 +12426,7 @@ L 432.697006 259.62313
 L 442.062635 258.54486 
 L 451.428229 257.706458 
 L 451.428229 257.706458 
-" clip-path="url(#p93cd501717)" style="fill: none; stroke-dasharray: 2.2,2.2; stroke-dashoffset: 0; stroke: #b13507; stroke-width: 1.1"/>
+" clip-path="url(#p63c57922a1)" style="fill: none; stroke-dasharray: 2.2,2.2; stroke-dashoffset: 0; stroke: #b13507; stroke-width: 1.1"/>
    </g>
    <g id="line2d_26">
     <path d="M 96.251771 546.784051 
@@ -12489,7 +12489,7 @@ L 432.697006 221.081321
 L 442.062635 220.462242 
 L 451.428229 220.054653 
 L 451.428229 220.054653 
-" clip-path="url(#p93cd501717)" style="fill: none; stroke: #b13507; stroke-width: 2.4; stroke-linecap: square"/>
+" clip-path="url(#p63c57922a1)" style="fill: none; stroke: #b13507; stroke-width: 2.4; stroke-linecap: square"/>
    </g>
    <g id="line2d_27">
     <path d="M 96.251771 548.682636 
@@ -12548,7 +12548,7 @@ L 424.917932 255.036604
 L 443.649155 254.639328 
 L 451.428229 254.590322 
 L 451.428229 254.590322 
-" clip-path="url(#p93cd501717)" style="fill: none; stroke-dasharray: 4.8,3.6; stroke-dashoffset: 0; stroke: #999999; stroke-width: 1.2"/>
+" clip-path="url(#p63c57922a1)" style="fill: none; stroke-dasharray: 4.8,3.6; stroke-dashoffset: 0; stroke: #999999; stroke-width: 1.2"/>
    </g>
   </g>
   <g id="axes_2">
@@ -12606,7 +12606,7 @@ z
      <g id="line2d_34">
       <path d="M 497.04 572.280803 
 L 869.04 572.280803 
-" clip-path="url(#p8f9f7ac3f5)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
+" clip-path="url(#p9d9003b338)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
      <g id="line2d_35"/>
     </g>
@@ -12614,7 +12614,7 @@ L 869.04 572.280803
      <g id="line2d_36">
       <path d="M 497.04 520.688828 
 L 869.04 520.688828 
-" clip-path="url(#p8f9f7ac3f5)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
+" clip-path="url(#p9d9003b338)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
      <g id="line2d_37"/>
     </g>
@@ -12622,7 +12622,7 @@ L 869.04 520.688828
      <g id="line2d_38">
       <path d="M 497.04 469.096853 
 L 869.04 469.096853 
-" clip-path="url(#p8f9f7ac3f5)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
+" clip-path="url(#p9d9003b338)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
      <g id="line2d_39"/>
     </g>
@@ -12630,7 +12630,7 @@ L 869.04 469.096853
      <g id="line2d_40">
       <path d="M 497.04 417.504878 
 L 869.04 417.504878 
-" clip-path="url(#p8f9f7ac3f5)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
+" clip-path="url(#p9d9003b338)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
      <g id="line2d_41"/>
     </g>
@@ -12638,7 +12638,7 @@ L 869.04 417.504878
      <g id="line2d_42">
       <path d="M 497.04 365.912903 
 L 869.04 365.912903 
-" clip-path="url(#p8f9f7ac3f5)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
+" clip-path="url(#p9d9003b338)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
      <g id="line2d_43"/>
     </g>
@@ -12646,7 +12646,7 @@ L 869.04 365.912903
      <g id="line2d_44">
       <path d="M 497.04 314.320928 
 L 869.04 314.320928 
-" clip-path="url(#p8f9f7ac3f5)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
+" clip-path="url(#p9d9003b338)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
      <g id="line2d_45"/>
     </g>
@@ -12654,7 +12654,7 @@ L 869.04 314.320928
      <g id="line2d_46">
       <path d="M 497.04 262.728953 
 L 869.04 262.728953 
-" clip-path="url(#p8f9f7ac3f5)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
+" clip-path="url(#p9d9003b338)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
      <g id="line2d_47"/>
     </g>
@@ -12662,7 +12662,7 @@ L 869.04 262.728953
      <g id="line2d_48">
       <path d="M 497.04 211.136978 
 L 869.04 211.136978 
-" clip-path="url(#p8f9f7ac3f5)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
+" clip-path="url(#p9d9003b338)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
      <g id="line2d_49"/>
     </g>
@@ -12670,7 +12670,7 @@ L 869.04 211.136978
      <g id="line2d_50">
       <path d="M 497.04 159.545004 
 L 869.04 159.545004 
-" clip-path="url(#p8f9f7ac3f5)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
+" clip-path="url(#p9d9003b338)" style="fill: none; stroke: #e8e8e8; stroke-width: 0.8; stroke-linecap: square"/>
      </g>
      <g id="line2d_51"/>
     </g>
@@ -16729,7 +16729,7 @@ L 505.554127 538.746019
 L 505.502949 539.197447 
 L 505.451771 539.646296 
 z
-" clip-path="url(#p8f9f7ac3f5)" style="fill: #e1eaf5"/>
+" clip-path="url(#p9d9003b338)" style="fill: #e1eaf5"/>
    </g>
    <g id="FillBetweenPolyCollection_5">
     <path d="M 505.451771 542.525131 
@@ -20785,7 +20785,7 @@ L 505.554127 541.635167
 L 505.502949 542.07886 
 L 505.451771 542.525131 
 z
-" clip-path="url(#p8f9f7ac3f5)" style="fill: #bad0e9"/>
+" clip-path="url(#p9d9003b338)" style="fill: #bad0e9"/>
    </g>
    <g id="FillBetweenPolyCollection_6">
     <path d="M 505.451771 545.442659 
@@ -24841,7 +24841,7 @@ L 505.554127 544.560439
 L 505.502949 545.001544 
 L 505.451771 545.442659 
 z
-" clip-path="url(#p8f9f7ac3f5)" style="fill: #8bafda"/>
+" clip-path="url(#p9d9003b338)" style="fill: #8bafda"/>
    </g>
    <g id="patch_5">
     <path d="M 497.04 577.44 
@@ -24910,7 +24910,7 @@ L 841.897006 288.93253
 L 855.919833 288.439802 
 L 860.628229 288.336635 
 L 860.628229 288.336635 
-" clip-path="url(#p8f9f7ac3f5)" style="fill: none; stroke-dasharray: 2.2,2.2; stroke-dashoffset: 0; stroke: #286bbb; stroke-width: 1.1"/>
+" clip-path="url(#p9d9003b338)" style="fill: none; stroke-dasharray: 2.2,2.2; stroke-dashoffset: 0; stroke: #286bbb; stroke-width: 1.1"/>
    </g>
    <g id="line2d_53">
     <path d="M 505.451771 548.682636 
@@ -24969,7 +24969,7 @@ L 834.117932 255.036604
 L 852.849155 254.639328 
 L 860.628229 254.590322 
 L 860.628229 254.590322 
-" clip-path="url(#p8f9f7ac3f5)" style="fill: none; stroke: #286bbb; stroke-width: 2.4; stroke-linecap: square"/>
+" clip-path="url(#p9d9003b338)" style="fill: none; stroke: #286bbb; stroke-width: 2.4; stroke-linecap: square"/>
    </g>
    <g id="line2d_54">
     <path d="M 505.451771 546.784051 
@@ -25032,24 +25032,25 @@ L 841.897006 221.081321
 L 851.262635 220.462242 
 L 860.628229 220.054653 
 L 860.628229 220.054653 
-" clip-path="url(#p8f9f7ac3f5)" style="fill: none; stroke-dasharray: 4.8,3.6; stroke-dashoffset: 0; stroke: #999999; stroke-width: 1.2"/>
+" clip-path="url(#p9d9003b338)" style="fill: none; stroke-dasharray: 4.8,3.6; stroke-dashoffset: 0; stroke: #999999; stroke-width: 1.2"/>
    </g>
   </g>
   <g id="text_26">
-   <text style="font-size: 26px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #111111" x="7.2" y="26.955937" transform="rotate(-0 7.2 26.955937)">Expected height of boys and girls, from birth to age 19</text>
+   <text style="font-size: 26px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: start; fill: #111111" x="7.2" y="26.955938" transform="rotate(-0 7.2 26.955938)">Expected height of boys and girls, from birth to age 19</text>
   </g>
   <g id="text_27">
-   <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #555555" transform="translate(7.2 48.757969)">The bands show the range of heights among healthy, well-nourished children of the same age, as defined by the World</text>
-   <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #555555" transform="translate(7.2 63.315125)">Health Organization: the middle 50% spans the 25th to 75th percentile, the middle 80% the 10th to 90th, and the middle</text>
-   <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #555555" transform="translate(7.2 77.872281)">94% the 3rd to 97th. Girls are taller than boys, on average, between the ages of about 9 and 13.</text>
+   <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #555555" transform="translate(7.2 48.757969)">The bands show the range of heights among children of the same age in the World Health Organization's growth reference</text>
+   <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #555555" transform="translate(7.2 63.315125)">population: the middle 50% spans the 25th to 75th percentile, the middle 80% the 10th to 90th, and the middle 94% the 3rd</text>
+   <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #555555" transform="translate(7.2 77.872281)">to 97th. Girls are taller than boys, on average, between the ages of about 9 and 13.</text>
   </g>
   <g id="text_28">
    <text style="font-size: 9.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #777777" transform="translate(7.2 653.778516)">The curves step down slightly at age 2, where height starts being measured standing up rather than lying down, and at age 5, where WHO's standards for</text>
    <text style="font-size: 9.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #777777" transform="translate(7.2 664.416437)">under-fives give way to its reference for older children. Both steps are in the original data.</text>
+   <text style="font-size: 9.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #777777" transform="translate(7.2 675.054359)">The under-fives standards show how children grow in good conditions; the reference for older children describes how an earlier sample did grow.</text>
   </g>
   <g id="text_29">
-   <text style="font-size: 9px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #888888" transform="translate(7.2 690.838594)">Data sources: WHO Child Growth Standards (2006); WHO Growth Reference (2007)</text>
-   <text style="font-size: 9px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #888888" transform="translate(7.2 700.916625)">This is a visualization from OurWorldInData.org, where you find data and research on how the world is changing.</text>
+   <text style="font-size: 9px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #888888" transform="translate(7.2 708.118594)">Data sources: WHO Child Growth Standards (2006); WHO Growth Reference (2007)</text>
+   <text style="font-size: 9px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #888888" transform="translate(7.2 718.196625)">This is a visualization from OurWorldInData.org, where you find data and research on how the world is changing.</text>
   </g>
   <g id="legend_1">
    <g id="patch_6">
@@ -25115,10 +25116,10 @@ L 654.774375 110.233359
   </g>
  </g>
  <defs>
-  <clipPath id="p93cd501717">
+  <clipPath id="p63c57922a1">
    <rect x="87.84" y="151.2" width="372" height="426.24"/>
   </clipPath>
-  <clipPath id="p8f9f7ac3f5">
+  <clipPath id="p9d9003b338">
    <rect x="497.04" y="151.2" width="372" height="426.24"/>
   </clipPath>
  </defs>

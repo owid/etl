@@ -223,9 +223,9 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float]) -
     fig.text(
         0.045,
         1.075,
-        "The bands show the range of heights among healthy, well-nourished children of the same age, as defined by the World\n"
-        "Health Organization: the middle 50% spans the 25th to 75th percentile, the middle 80% the 10th to 90th, and the middle\n"
-        f"94% the 3rd to 97th. Girls are taller than boys, on average, between the ages of about {crossover_start:.0f} and {crossover_end:.0f}.",
+        "The bands show the range of heights among children of the same age in the World Health Organization's growth reference\n"
+        "population: the middle 50% spans the 25th to 75th percentile, the middle 80% the 10th to 90th, and the middle 94% the 3rd\n"
+        f"to 97th. Girls are taller than boys, on average, between the ages of about {crossover_start:.0f} and {crossover_end:.0f}.",
         ha="left",
         va="top",
         fontsize=13,
@@ -260,12 +260,14 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float]) -
     footnote = (
         f"The curves step down slightly at age {breaks[0]:.0f}, where height starts being measured standing up rather "
         f"than lying down, and at age {breaks[1]:.0f}, where WHO's standards for\nunder-fives give way to its reference "
-        "for older children. Both steps are in the original data."
+        "for older children. Both steps are in the original data.\n"
+        "The under-fives standards show how children grow in good conditions; the reference for older children describes "
+        "how an earlier sample did grow."
     )
     fig.text(0.045, 0.02, footnote, ha="left", va="top", fontsize=9.5, color=MUTED_COLOR)
     fig.text(
         0.045,
-        -0.045,
+        -0.075,
         f"{source_citation}\n"
         "This is a visualization from OurWorldInData.org, where you find data and research on how the world is changing.",
         ha="left",
