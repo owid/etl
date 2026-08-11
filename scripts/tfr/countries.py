@@ -289,16 +289,15 @@ COUNTRIES = [
       "We read the survey rounds. We also checked the census: dividing its own counts and summing gives "
       "4.290 against the published 4.3, and adding the 12-14 and 50-54 groups gives 4.82 against the "
       "published 4.8 for the wider age range.",
-      "Madagascar is the one country here where the office computed a correction and then refused it. Its "
-      "census volume applies the Brass method, finds every age group under-reporting recent births, and "
-      "reports that the correction would raise fertility from 4.3 to 4.7 — then argues the gap looks more "
-      "like a real recent decline than omitted births, concludes \"there will be no adjustment of the "
-      "data\", and publishes the lower figure. Everywhere else that computes a correction applies it. Civil "
-      "registration is not used and INSTAT says why: in a country where the system is not functional, the "
-      "census is the only source for the population\'s age structure. Registration is better than in much of "
-      "the region — 74% of under-fives registered, 57% holding a certificate — but still not usable for "
-      "this. Two operational notes: INSTAT\'s homepage is currently compromised with injected spam links, "
-      "though the report pages and PDFs are clean, and its data dashboard is down.",
+      "Madagascar is the one country here where the office worked out a correction and then declined to use "
+      "it. Its census volume applies a standard demographic correction for births women forget or misdate, "
+      "finds every age group under-reporting, and reports that it would raise fertility from 4.3 to 4.7 — "
+      "then argues the gap looks more like a real recent decline than missed births, concludes \"there will "
+      "be no adjustment of the data\", and publishes the lower figure. Every other office here that works "
+      "out a correction applies it. Civil registration is not used, and INSTAT says why: in a country where "
+      "the system is not functional, the census is the only source for the population's age structure. "
+      "Registration is better than in much of the region — 74% of under-fives registered, 57% holding a "
+      "certificate — but still not good enough to build a fertility rate from.",
       "https://www.instat.mg/autres/rgph-3"),
     C("Mali", "INSTAT — Enquête Démographique et de Santé", mali, "Mali", "survey", False,
       "INSTAT publishes a fertility rate from each of seven survey rounds since 1987, the latest 6.0 for "

@@ -128,6 +128,41 @@ def reviewed():
     return done
 
 
+def _ledger(section):
+    """The country bullets under one heading of redteam/AGENTS.md."""
+    out, inside = [], False
+    for line in open(os.path.join(LOG, "AGENTS.md"), encoding="utf-8"):
+        if line.startswith("## "):
+            inside = line[3:].strip().lower() == section.lower()
+        elif inside and line.startswith("- "):
+            out.append(line[2:].strip())
+    return out
+
+
+def audit():
+    """Cross-check the agent ledger against the findings logs.
+
+    A country an agent reported on but nobody wrote up is a report that was read and dropped, or
+    never read at all. That is the failure worth catching, so it is the one this names.
+    """
+    done, problems = reviewed(), []
+    for name in _ledger("reported"):
+        if name not in done:
+            problems.append(f"reported but never written up: {name}")
+    for name in _ledger("in flight"):
+        if name in done:
+            problems.append(f"listed in flight but already written up: {name}")
+    known = {c["name"] for c in COUNTRIES} | {"England and Wales"}
+    for section in ("in flight", "reported"):
+        for name in _ledger(section):
+            if name not in known:
+                problems.append(f"not a registry name, so unmatchable: {name}")
+    flight = _ledger("in flight")
+    if len(flight) != 5:
+        problems.append(f"{len(flight)} agents in flight, not 5: {', '.join(flight)}")
+    return problems
+
+
 def next_up(count):
     """The next countries due a review, in population-rank order."""
     order = []
@@ -146,5 +181,9 @@ def next_up(count):
 if __name__ == "__main__":
     if sys.argv[1:2] == ["--next"]:
         print("\n".join(next_up(int(sys.argv[2]) if len(sys.argv) > 2 else 10)))
+    elif sys.argv[1:2] == ["--audit"]:
+        found = audit()
+        print("\n".join(found) if found else "ledger and logs agree")
+        sys.exit(1 if found else 0)
     else:
         print(brief(" ".join(sys.argv[1:])))
