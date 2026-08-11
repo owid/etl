@@ -714,3 +714,24 @@ was false and one source fact was backwards.
   rounded, and the brief says what the reader actually sees. That generator has now misled agents
   twice, having also claimed the map showed an average gap. **Anything the brief asserts about the
   page needs checking against the page, not against the cache.**
+
+## Cameroon
+
+Verdict: minor problems. Both plotted values verified against the survey reports, the 2005 census's
+raw-and-corrected pair confirmed exactly, and our own arithmetic check reproduced decimal for decimal
+against the census annex — 4.1607 urban and 6.2130 rural.
+
+- **Accepted, and the claim had gone stale.** We said Cameroon has had "no fertility fieldwork since
+  2018, so the newest national figure is eight years old." The office's own site describes a household
+  survey in the field through 2026. The headline figure is still the 2018 one, so the page now says
+  that, and says a newer figure should follow, rather than asserting nothing has happened.
+- **Accepted, backwards.** We said the census's "published long-run trend uses corrected values
+  throughout while showing the raw ones only in a technical annex." The raw 2005 figure sits in a
+  main-body table; what is in the annex is the corrected-value working. Rewritten to say both appear
+  and that the results chapter's trend table uses the corrected ones.
+- **Accepted, and it conflated two institutions.** The sentence about a census bureau website "parked
+  on an expired hosting account" is our own sourcing problem, is now out of date — the census bureau
+  relaunched and serves the identical volume directly — and named no institution, so a reader would
+  have taken it for the very-much-alive office linked at the top of the entry. Cut.
+- **Accepted.** INS spelled out, the survey's name translated in the source line, the Brass method
+  described rather than named, and the four-clause sentence about the fourth census split up.

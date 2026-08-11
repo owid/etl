@@ -947,21 +947,22 @@ COUNTRIES = [
       "the latest year is not possible from them. The years before 2005 are printed to three decimals and the "
       "rest to two, because that is how the editions they come from print them.",
       "https://mods.go.kr/board.es?mid=a20108010000&bid=11773"),
-    C("Cameroon", "INS — Enquête Démographique et de Santé", cameroon, "Cameroon", "survey", False,
-      "INS publishes a fertility rate from each survey round: 5.1 for 2011 and 4.8 for 2018. The 2005 census "
-      "reports 5.2, and prints the uncorrected figure of 4.1 alongside it.",
-      "We read the two survey rounds. We also checked the census arithmetic: summing its corrected "
-      "age-specific rates gives 4.16 for urban Cameroon and 6.21 for rural, matching its own printed "
-      "4.1607 and 6.2130.",
-      "Cameroon has had no census since 2005 and no fertility fieldwork since 2018, so the newest national "
-      "figure is eight years old. The fourth census was launched in 2016 but its main enumeration had still "
-      "not happened by the last status report anyone published, in September 2019, which was discussing how "
-      "to count the crisis-hit North-West and South-West regions at all; nothing has appeared since. The "
-      "census bureau\'s own website is gone — parked on an expired hosting account for years — so the 2005 "
-      "volumes had to come from a web archive. That census corrects its raw figure upward with the Brass "
-      "method, from 4.1 to 5.2, and its published long-run trend uses corrected values throughout while "
-      "showing the raw ones only in a technical annex. Civil registration is not used: INS\'s own vital "
-      "statistics report says the system\'s coverage problems mean it uses the survey instead, and puts "
+    C("Cameroon", "INS — Demographic and Health Survey", cameroon, "Cameroon", "survey", False,
+      "Cameroon's national statistics office, INS, publishes a fertility rate from each survey round: 5.1 "
+      "for 2011 and 4.8 for 2018. The 2005 census reports 5.2, and prints the uncorrected figure of 4.1 "
+      "alongside it.",
+      "We read the two survey rounds. We also checked the census arithmetic: summing its corrected rates by "
+      "age group gives 4.16 for urban Cameroon and 6.21 for rural, matching its own printed 4.1607 and "
+      "6.2130.",
+      "Cameroon has had no census since 2005, and the newest published fertility figure is the 2018 survey's. "
+      "A new household survey was in the field through 2026, so a more recent figure should follow. The "
+      "fourth census was launched in 2016, but as of the last public update, in September 2019, the main "
+      "population count still had not happened — officials were then deciding how to count the North-West "
+      "and South-West regions, which have been affected by conflict. Nothing has been published since. The "
+      "2005 census corrects its raw figure upward, from 4.1 to 5.2, using a standard demographic method for "
+      "births women forget or misdate; both the raw and the corrected figures appear in the volume, and the "
+      "results chapter's trend table uses the corrected ones. Civil registration is not used: INS's own "
+      "vital statistics report says the system's coverage problems mean it uses the survey instead, and puts "
       "birth registration completeness at 54%, ranging from 92% in one region to 35% in another.",
       "https://ins-cameroun.cm/"),
     C("Burkina Faso", "INSD — Enquête Démographique et de Santé", burkina_faso, "Burkina Faso", "survey",

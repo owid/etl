@@ -30,16 +30,16 @@ country whose source is an interface rather than a file.
 
 ## In flight (5)
 
-- Cameroon
 - Angola
 - Ukraine
 - Morocco
 - Uzbekistan
+- Mozambique
 
 ## Reported, awaiting write-up (0)
 
 
-## Analyzed (46)
+## Analyzed (47)
 
 - India
 - China
@@ -86,11 +86,11 @@ country whose source is an interface rather than a file.
 - Peru
 - Madagascar
 - Cote d'Ivoire
+- Cameroon
 - Nepal
 
-## To do (49)
+## To do (48)
 
-- Mozambique
 - Niger
 - Venezuela
 - Australia
