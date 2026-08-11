@@ -587,3 +587,52 @@ the percentage point.
 - **Accepted.** INSTAT and the survey's name are spelled out, the Brass check is described rather
   than named, and "registration is better than in much of the region" — an uncited comparison — is
   gone.
+
+## Cote d'Ivoire
+
+Verdict: serious problems. Two of the numbers on the page were wrong and the newest survey round was
+missing because we said it did not exist.
+
+- **Accepted, and the series now reaches 2021.** We told readers "a survey was fielded in 2021 but no
+  report for it was ever published on the institute's site." The report exists. I fetched it and read
+  the trend chart myself: it gives 4.3 for 2021, alongside 5.3 for 1994, 5.2 for 1998-99 and 5.0 for
+  2011-12. Added, so the line ends in 2021 rather than 2016.
+- **Accepted, wrong number.** We stated 5.7 for 1994. That same chart — and the 2011-12 report's
+  chart independently — gives 5.3. Corrected.
+- **Accepted, and it changes what the source line claims.** The source line said Demographic and
+  Health Survey, but the 2016 figure of 4.6 comes from a different survey program, the Multiple
+  Indicator Cluster Survey. So the 2016 point is not strictly comparable with the ones on either side
+  of it, which is now said rather than hidden behind one label.
+- **Accepted.** The office was reorganized in 2024: INS became ANSTAT. The page still presented INS as
+  current and linked to its dead domain. Both fixed, and the link now goes to the 2021 report.
+- **Accepted.** The sentence diagnosing the dead site — resolves but serves a placeholder, since
+  January 2026 — is our access problem. Gone, along with "the same gap as Mozambique."
+- **Accepted, with a caveat added.** The 72% registration figure for 2016 appears to count children
+  holding a birth certificate, a narrower thing than the 55% and 65% figures beside it, which count
+  registration. Now flagged rather than presented as a clean trend.
+
+## Nepal
+
+Verdict: serious problems. This was the worst error in the collection: we accused a statistics office
+of publishing a figure it could not account for, and it accounts for it in its own report.
+
+- **Accepted, and the accusation was false.** Our page said "no method is named anywhere in the report
+  that would explain the difference — we searched for every correction technique other offices use, in
+  English and Nepali, and found none." The office's own 2025 fertility report names it plainly. I
+  fetched the report and read the passage: "Due to underreporting issues around fertility in censuses,
+  an indirect approach is used to estimate fertility rate. The ASFRs and the TFR are calculated using
+  the Arriaga method (Arriaga, 1983), which relies on more robust children ever born (CEB) data." It
+  goes on to explain that a post-enumeration check found children under five undercounted, and that
+  the raw 1.56 sits against 2.1 from its household survey and 2.0 from another — which is why it
+  corrected. Its historical table shows an indirect method used at every census since 1971.
+- **Accepted, and our conclusion was backwards.** We told readers "the 1.94 should not be relied on."
+  Two independent surveys put fertility near 2.0. The outlier is the raw 1.556, not 1.94. The entry
+  now explains the raw-versus-corrected split, says the correction is the one to trust, and says why
+  adding up the age bands below does not give the plotted figure.
+- **Accepted.** The sentence about what we searched for, in which languages, is about our own process
+  and would not belong even if it had been right. Gone, with the roll call of six other countries.
+- **Accepted.** "A quarter lower" is wrong arithmetic for 1.556 against 1.94 — it is about a fifth.
+  The unglossed "gross reproduction rate" and "open census API" are gone with the rewrite.
+- **Lesson.** Twice now — here and Ghana — the page has stated more confidently than we could support
+  that a source fails to document something. An absence of evidence found by us is not evidence of
+  absence in the source, and it should never be written as though it were.

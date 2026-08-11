@@ -532,12 +532,15 @@ def venezuela():
 
 
 def cote_divoire():
-    """INS survey rounds — the only fertility figures Côte d'Ivoire publishes.
+    """Survey rounds — the only fertility figures Côte d'Ivoire publishes.
 
     Summing each round's own age-specific rates reproduces its total: 4.95 against the published 5.0
     for 2011-12, and 4.595 against 4.6 for 2016.
+
+    The 2021 round's own trend chart gives 5.3 for 1994, 5.2 for 1998-99, 5.0 for 2011-12 and 4.3 for
+    itself. 2016 comes from a different survey program and is not in that chart.
     """
-    return _series([(2012, 5.0), (2016, 4.6)])
+    return _series([(2012, 5.0), (2016, 4.6), (2021, 4.3)])
 
 
 def mali():

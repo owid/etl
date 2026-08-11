@@ -707,21 +707,23 @@ COUNTRIES = [
       "explanation.",
       "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/B0603.xls"),
     C("Nepal", "National Statistics Office — 2021 census", nepal, "Nepal", "survey", False,
-      "The census publishes a fertility rate of 1.94 for 2021, and a series back to 1971. It also publishes, "
-      "through an open census API, the counts behind it: births in the twelve months before enumeration by "
-      "the mother\'s age group, and women by age group.",
-      "We show the office\'s published figure. But dividing its own counts gives 1.556, not 1.94 — a quarter "
-      "lower — and the same counts reproduce every other fertility measure it prints: a general fertility "
-      "rate of 50.16 against its 50.2, and a gross reproduction rate of 0.734 against its 0.73. Had the "
-      "fertility rate really been 1.94, that gross reproduction rate would be about 0.92.",
-      "So the published 1.94 does not follow from the office\'s own numbers, and no method is named anywhere "
-      "in the report that would explain the difference — we searched for every correction technique other "
-      "offices use, in English and Nepali, and found none. This is not the documented raw-versus-adjusted "
-      "split seen in Tanzania, Uganda, Ghana or Cameroon, nor the computed-then-refused correction of "
-      "Madagascar and Niger: it is a figure that contradicts the rest of its own table. We plot what the "
-      "office publishes and let the age-band comparison below show the counts, but the 1.94 should not be "
-      "relied on. Civil registration is not used for fertility; the census reports 74% of children under six "
-      "as registered.",
+      "The National Statistics Office publishes a fertility rate of 1.94 for 2021, and a series back to 1971. "
+      "It also publishes online the counts behind the census: births in the twelve months before enumeration "
+      "by the mother's age group, and women by age group.",
+      "We show the office's published figure. Dividing its own counts gives 1.556 instead — about a fifth "
+      "lower — and the office says why. A check it ran after the census found children under five had been "
+      "undercounted, which makes the count of births in the previous year too low. So rather than tabulate "
+      "those births directly, it estimated fertility from the number of children women report ever having "
+      "had, comparing the 2011 and 2021 censuses, using a standard indirect method named after its author, "
+      "Arriaga. That is where 1.94 comes from.",
+      "The two figures are the raw count and the corrected estimate, not a contradiction, and the correction "
+      "is the one to trust here: the office's own comparison points out that its household survey put "
+      "fertility at 2.1 and another survey at 2.0, both close to the corrected 1.94 and far above the raw "
+      "1.556. Nepal has estimated fertility this way at every census since 1971 rather than counting births "
+      "directly, so the gap between the two is a permanent feature of these numbers rather than a problem "
+      "with 2021. The age-band comparison below shows the raw counts, which is why adding them up does not "
+      "give the plotted figure. Nepal's birth records are not a usable substitute either: the census found "
+      "26% of children under six had never had their birth registered.",
       "https://censusresults.nsonepal.gov.np/fertility"),
     C("Venezuela", "INE — projection-based fertility series", venezuela, "Venezuela", "projection", False,
       "INE publishes a fertility series in a statistics summary dated August 2024: 2.9 for 2000 falling to "
@@ -845,21 +847,24 @@ COUNTRIES = [
       "count of women by age to divide by — the 2007 census is the only one, and it is nineteen years "
       "old. The old statsethiopia.gov.et domain is dead; the service is now at ess.gov.et.",
       "https://ess.gov.et/wp-content/uploads/2026/01/edhs-2024-25-kir-01172026.pdf"),
-    C("Cote d'Ivoire", "INS — Enquête Démographique et de Santé", cote_divoire, "Cote d'Ivoire", "survey",
+    C("Cote d'Ivoire", "ANSTAT — household survey rounds", cote_divoire, "Cote d'Ivoire", "survey",
       False,
-      "INS publishes a fertility rate from each survey round: 5.7 in 1994, 5.2 in 1998-99, 5.0 in 2011-12 "
-      "and 4.6 in 2016, each with the age-specific rates behind it.",
-      "We read the two rounds inside our window. Summing each round's own rates reproduces its total — 4.95 "
+      "Côte d'Ivoire's national statistics agency publishes a fertility rate from each round of its "
+      "Demographic and Health Survey: 5.3 in 1994, 5.2 in 1998-99, 5.0 in 2011-12 and 4.3 in 2021, each "
+      "with the rates by age group behind it. A separate survey program it also runs, the Multiple "
+      "Indicator Cluster Survey, gives 4.6 for 2016.",
+      "We use the rate each round published. Summing each round's own rates reproduces its total — 4.95 "
       "against the published 5.0, and 4.595 against 4.6.",
-      "The 2021 census publishes no fertility rate at all, and not even births by age of mother — the same "
-      "gap as Mozambique. Its own results report lists fertility as one of sixteen thematic volumes to come "
-      "later, and none of them had appeared by the time the site was last readable. Nothing newer than 2016 "
-      "exists: a survey was fielded in 2021 but no report for it was ever published on the institute's site. "
-      "That site is now down — it resolves and answers, but serves only a hosting placeholder, and has done "
-      "since January 2026 — so everything here came from a web archive. Civil registration is not used for "
-      "fertility, and INS explains why by publishing coverage instead: 55% of under-fives registered in 2006, "
-      "65% in 2011-12, 72% in 2016.",
-      "https://www.ins.ci/"),
+      "The 2021 census publishes no fertility rate at all, and not even births by age of mother. Its results "
+      "report lists fertility as one of the thematic volumes to come later, and that volume has not "
+      "appeared. So the survey rounds are the only source, and because the 2016 figure comes from a "
+      "different survey program than the rest, it is not strictly comparable with the points on either side "
+      "of it. Civil registration is not used for fertility, and the agency explains why by publishing "
+      "coverage instead: 55% of children under five registered in 2006 and 65% in 2011-12. A 2016 figure of "
+      "72% is often quoted alongside those, but it appears to count children holding a birth certificate, "
+      "which is a narrower thing than being registered. The agency itself was reorganized in 2024, when INS "
+      "became ANSTAT.",
+      "https://dhsprogram.com/pubs/pdf/SR280/SR280.pdf"),
     C("Democratic Republic of Congo", "National Institute of Statistics — Demographic and Health Survey",
       drc, "Democratic Republic of Congo", "survey", False,
       "The National Institute of Statistics publishes a fertility rate for each survey round. The "
