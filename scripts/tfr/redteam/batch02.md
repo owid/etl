@@ -1469,3 +1469,34 @@ reproduced exactly.
 - **Accepted.** "The clearest case of an office changing its mind" and "unusually" both leaned on a
   collection the reader has not seen. The survey reference period is now disclosed, "rising" is qualified
   by the early-2020s dip, and the registration material is split into its own paragraph.
+
+## Burundi
+
+Verdict: serious problems. Both plotted values verified against the survey reports, and our census
+recomputation of 5.954 was reproduced exactly from the census's own spreadsheet — including
+confirmation that the right operation is per-age-group division, summed and multiplied by five, not
+total births over total women.
+
+- **Accepted, the seventeenth false absence claim, and this one was about a reason.** "No correction was
+  applied and none is mentioned anywhere... That is our inference, not the office's stated reason." The
+  census's own thematic report gives its reason plainly: it checked its birth reporting, found the births
+  well declared, and concluded the fertility figures could be used without adjustment. It is in the same
+  document whose tables we used. So we credited ourselves with an inference the office had already
+  published, which is the mirror image of the usual mistake.
+- **Rejected, after checking it myself.** The agent said our claim that the ratio check "gives values
+  close to one at the ages usually trusted" is false, reporting ratios of 1.15 to 1.49. I opened the
+  census spreadsheet it had left behind and recomputed: across the middle age groups the ratios come out
+  1.00, 1.04 and 1.06, and the same computation reproduces our 5.954 exactly. So the claim stands on the
+  numbers I can see. I could not reconcile the two results — the workbook has separate urban, rural and
+  combined blocks, and mixing parity from one against cumulated fertility from another would inflate the
+  ratios exactly this way. Left as it was, with the reasoning now attributed to the census rather than to
+  us.
+- **Accepted.** "5.96 it publishes" is not the census's figure; it reports 6.0. The more precise 5.95
+  that exists is a UN recomputation of the same tables, not something the office published. Now says
+  what each source actually gives.
+- **Accepted, overstated.** "There is no fertility page on the new site at all" — the office's current
+  site hosts both survey reports we rely on. Replaced with the accurate point: the 2024 census has
+  published only preliminary population totals so far.
+- **Accepted.** The renamed office, the squatted domain and the web-archive detour are our sourcing
+  workflow; only the rename survives. The Mali and Senegal comparison is gone, and "the raw one", "the
+  standard ratio check" and "ages usually trusted" are now plain.

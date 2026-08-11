@@ -1551,19 +1551,21 @@ COUNTRIES = [
       "foreign nationals at 0.55% of the population.",
       "https://www.ins.tn/statistiques/112"),
     C("Burundi", "ISTEEBU — Demographic and Health Survey rounds", burundi, "Burundi", "survey", False,
-      "Two survey rounds, 2010 and 2016-17. The 2008 census publishes its fertility tables as "
-      "spreadsheets — women and births by age group, and separately children ever born.",
-      "We read the survey figures. We also divided the census's own counts and got 5.954 against the 5.96 "
-      "it publishes, which confirms the published figure is the raw one.",
-      "No correction was applied and none is mentioned anywhere — and for once we can see why that was "
-      "reasonable. The census publishes both the births in the previous twelve months and the children "
-      "ever born, so the standard ratio check can be run on it; doing so gives values close to one at the "
-      "ages usually trusted, unlike Mali's or Senegal's. So a correction would probably have changed "
-      "little. That is our inference, not the office's stated reason. Civil registration produces "
-      "quarterly counts but no rate. Two things to know about the source. The office was renamed in 2022 "
-      "and its old domain has since been squatted — it now serves a placeholder page, so the census "
-      "spreadsheets had to come from a web archive. And the 2024 census has published only preliminary "
-      "population totals; there is no fertility page on the new site at all.",
+      "Burundi's statistics office publishes a fertility rate from two survey rounds, 2010 and 2016-17. "
+      "Its 2008 census publishes the fertility tables as spreadsheets — women and births by age group, and "
+      "separately the children women have had over their lifetimes.",
+      "We use the rate each survey round published. We also rebuilt the census figure from its counts, "
+      "dividing each age group's births by its women, summing and multiplying by five, and got 5.954. The "
+      "census itself reports 6.0, rounded to one decimal.",
+      "No correction was applied to that census figure, and the census says why: it checked its own birth "
+      "reporting and concluded the births had been well declared, so the fertility figures could be used "
+      "without adjustment. We can see the same thing in its numbers. Because it publishes both the births "
+      "in the previous twelve months and the children women have had over their lifetimes, the standard "
+      "check for missed births can be run on it, and across the middle age groups — the ones that check is "
+      "usually trusted on — the two line up almost exactly. Civil registration produces quarterly counts "
+      "but no rate, and the office says why: too many births go undeclared for a rate to be meaningful. The "
+      "office was renamed in 2022. The 2024 census has so far published only preliminary population totals, "
+      "with nothing yet on fertility.",
       "https://www.insbu.bi/"),
     C("Haiti", "Ministry of Health — EMMUS survey rounds", haiti, "Haiti", "survey", False,
       "Three survey rounds, the newest from 2016-17. The 2003 census publishes its fertility tables as "
