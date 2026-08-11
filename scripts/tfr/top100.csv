@@ -70,7 +70,7 @@ rank,country,population_2026,searched,in_dataset,recalculated,tier,note
 69,Guatemala,18967983,full,yes,yes,complete,fully recalculated 2018-2024 from 2.2m birth records; gap to the projection doubled in a year
 70,Romania,18800600,full,yes,yes,complete,fully recalculated 2012-2024 on the resident basis; matches INS's own rates to 4 decimals
 71,Netherlands,18448770,full,yes,yes,complete,fully recalculated 1995-2025 from the CBS API; matches CBS to 3 decimals
-72,Ecuador,18444504,full,yes,yes,complete,fully recalculated 2010-2024; INEC states in writing that it adopts a figure above the registry
+72,Ecuador,18444504,full,yes,yes,incomplete,fully recalculated 2010-2024; INEC states in writing that it adopts a figure above the registry
 73,Cambodia,18051219,full,yes,no,survey,NIS adjusted four censuses in a row: raw 1.6/2.05/1.67/1.4 against adopted 3.1/2.8/2.51/2.3
 74,Zimbabwe,17273584,full,yes,no,survey,"2022 census ran Arriaga and Gompertz, found they agreed, and kept the unadjusted 3.7"
 75,Guinea,15441991,full,yes,no,survey,2014 census correction lands almost entirely on 15-19; the INS domain is now squatted

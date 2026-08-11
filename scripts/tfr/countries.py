@@ -1390,21 +1390,24 @@ COUNTRIES = [
       "report does publish registered births by age of mother, but computes no rate from them.",
       "https://www.zimstat.co.zw/wp-content/uploads/Census/Fertility_Report.pdf"),
     C("Ecuador", "INEC — registered births divided by its population estimates", ecuador_tfr, "Ecuador",
-      "complete", True,
-      "One sheet of INEC's vital-statistics series carries both sides from 2010: births in each "
-      "five-year age band of the mother, and the projected women in that band. INEC publishes the "
-      "age-specific rates from exactly those two columns, but never their sum.",
-      "We divided births by women in each band and summed. There is no published total to check "
-      "against — INEC's own bulletin headlines a crude birth rate and adolescent rates, not a fertility "
-      "rate at all — but our figures reproduce its printed age-specific rates exactly.",
-      "Ecuador is the sixth Latin American country where the registry sits well below the headline, and "
-      "the only one where the office says why in writing. Its projection methodology lists four estimates "
-      "for 2022 — 2.12 from a P/F ratio, 1.76 from reverse survival, 1.77 from Arriaga, 1.80 from vital "
-      "registration — and adopts 1.86, on the stated grounds that it should sit above the registered "
-      "births because those always carry some under-registration. So the gap is deliberate, not an "
-      "oversight. Its projection assumes 1.82 for 2023 against a counted 1.61, and the 2018 health survey "
-      "gave 2.19. Recent years are incomplete by design: a year is provisional until the following March "
-      "and semi-definitive for three more, so 2024's 1.44 will rise as late registrations arrive.",
+      "incomplete", True,
+      "One sheet of INEC's birth records carries both sides from 2010: births in each five-year age group "
+      "of the mother, and the projected women in that group. INEC publishes the rate for each age group "
+      "from exactly those two columns; we did not find it publishing their sum.",
+      "We divided births by the women in each age group and added up the results. Our figures reproduce "
+      "its printed rates for each age group exactly. INEC's own bulletin headlines births per head of "
+      "population and teenage birth rates rather than a fertility rate, so we found no published total to "
+      "check ours against.",
+      "Ecuador's registered births imply lower fertility than the projection INEC publishes, and INEC says "
+      "in writing why. Its projection methodology lists four estimates for 2022, ranging from 1.76 to 2.12 "
+      "by different methods, and adopts 1.86 on the stated grounds that the figure should sit above the "
+      "registered births because those always carry some under-registration. That is the office's own "
+      "account of its registration being incomplete, which is why this sits under incomplete registration "
+      "rather than complete. So the gap is deliberate rather than an oversight. Its projection assumes 1.82 "
+      "for 2023 against a counted 1.61, and the 2018 health survey gave 2.19. Recent years are incomplete "
+      "by design: a year is provisional until the following March and semi-definitive for three more. Our "
+      "line therefore stops at 2023 — registered births fell almost 10% in 2024, against about 4% the year "
+      "before, and INEC's own schedule says that figure will rise as late registrations arrive.",
       "https://www.ecuadorencifras.gob.ec/nacidos-vivos-y-defunciones-fetales/"),
     C("Kazakhstan", "Bureau of National Statistics — births by age of mother divided by its population",
       kazakhstan_tfr, "Kazakhstan", "complete", True,
@@ -1424,20 +1427,23 @@ COUNTRIES = [
       "this line could be extended.",
       "https://stat.gov.kz/ru/industries/social-statistics/demography/"),
     C("Benin", "INStaD — Demographic and Health Survey rounds", benin, "Benin", "survey", False,
-      "The 2017-18 survey's trend table carries the rounds back to 1996. The 2013 census publishes a "
-      "single national figure of 4.8 and nothing behind it.",
-      "We read the survey series. Nothing can be recomputed: neither births by age of mother nor women "
-      "by age group is published for the 2013 census, in any form.",
-      "Benin is the case where an office admits to correcting its census figure but never says how. Its "
-      "own dissemination volume states that the fertility, nuptiality and mortality indicators were "
-      "produced by indirect estimation, by a team of demographers with an international expert — so 4.8 is "
-      "a model output, not a count. But we could find no name for the method and no raw figure printed "
-      "beside the corrected one, so there is nothing to compare it against. The two sources also "
-      "disagree about direction: the censuses fall steadily, 6.1 in 1992 to 5.5 in 2002 to 4.8 in 2013, "
-      "while the surveys are flat or rising since 2012 — 4.9 in the 2011-12 round against 5.7 in 2014 and "
-      "5.7 again in 2017-18. The volumes advertised as six thematic census reports are the same twenty-page "
-      "scanned brochure under two paths, with no statistical annex. Birth registration is high, at 86% of "
-      "under-fives, but is not used for any fertility figure.",
+      "Benin's National Institute of Statistics and Demography publishes a fertility rate from each round "
+      "of its Demographic and Health Survey, and the 2017-18 report's trend table carries them back to "
+      "1996. The 2013 census gives 4.8, broken down by region and by education, but does not publish the "
+      "birth and women counts needed to check it.",
+      "We use the rate each survey round published; adding up the rates by age group in the 2017-18 report "
+      "returns each round's own total. The census figure cannot be checked the same way, because the counts "
+      "behind it are not published.",
+      "Benin's statistics office says it corrected the census figure, but not how. Its own volume states "
+      "that the fertility, marriage and mortality indicators were produced by indirect estimation — working "
+      "the rate out from indirect clues, such as how many children women say they have had in total, rather "
+      "than counting births — by a team of demographers with an international expert. So 4.8 is a model "
+      "output rather than a count. We found no name for the method and no uncorrected figure printed beside "
+      "it, so there is nothing to compare it against. The census and the surveys also disagree about "
+      "direction: the censuses fall steadily, 6.1 in 1992 to 5.5 in 2002 to 4.8 in 2013, while the surveys "
+      "are flat or rising, 4.9 in the 2011-12 round against 5.7 in 2017-18. A separate 2014 survey, run "
+      "under a different program, also reported 5.7. Birth registration is high, at 86% of children under "
+      "five, but is not used for any fertility figure.",
       "https://instad.bj/"),
     C("Cambodia", "NIS — Demographic and Health Survey rounds", cambodia, "Cambodia", "survey", False,
       "The 2021-22 survey charts every round since 2000. Separately, the censuses and the surveys "

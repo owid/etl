@@ -1326,3 +1326,45 @@ wrong.
 - **Accepted.** Two sentences grouped Zimbabwe with Madagascar, Niger, Senegal, Mali and Ghana as though
   the reader had read all five. Both gone, and the two adjustment techniques are described rather than
   named.
+
+## Ecuador
+
+Verdict: serious problems. The page predicted its own last point was wrong and plotted it anyway.
+
+- **Accepted, and we had already said it.** The caveats told readers "2024's 1.44 will rise as late
+  registrations arrive" — and 2024 was plotted on the same footing as every finished year, and used to
+  color the map. Registered births fell 9.7% that year against about 4% the year before. The line now
+  stops at 2023, with a `LAST_COMPLETE` constant. Five countries have now had an unfinished final year
+  dropped, and this is the one where our own text made the case.
+- **Accepted, and the label contradicted our own quotation.** We had Ecuador under complete
+  registration while quoting INEC's stated reason for adopting a higher projection: that it should sit
+  above the registered births "because those always carry some under-registration". That is the producer
+  describing its own registration as incomplete. Moved to incomplete registration, and the page now says
+  that is why.
+- **Accepted.** "Ecuador is the sixth Latin American country where the registry sits well below the
+  headline, and the only one where the office says why in writing" leans on five entries the reader has
+  not seen, and on a count I cannot expect a reader to verify. Rewritten to stand alone.
+- **Accepted.** "Crude birth rate", "adolescent rates", "P/F ratio", "reverse survival" and "Arriaga"
+  all replaced — the four method estimates are now given as a range, which is what the sentence was
+  actually for.
+- **Open.** Whether INEC publishes a total anywhere could not be settled: its document server refused
+  every connection the agent tried. Given this claim shape has now failed fifteen times, the page says
+  we did not find one rather than that none exists.
+
+## Benin
+
+Verdict: serious problems. All six values verified against primary sources, and the odd finding — census
+and surveys moving in opposite directions — is real, not a mix-up.
+
+- **Accepted, the fifteenth false absence claim.** "The volumes advertised as six thematic census reports
+  are the same twenty-page scanned brochure under two paths, with no statistical annex." There are six
+  distinct volumes, different lengths and contents, in Benin's own microdata catalog. What is true is
+  narrower: each is a short synthesis without a births-by-age annex. Gone.
+- **Accepted, an instrument mislabeled.** "The surveys are flat or rising since 2012 — 4.9 in the 2011-12
+  round against 5.7 in 2014 and 5.7 again in 2017-18." The 2014 figure is right but comes from a
+  different survey program, not a round of the one the source line names. It is now identified as such.
+  It does not affect the chart, since 2014 is not plotted.
+- **Accepted, overstated.** "The 2013 census publishes a single national figure of 4.8 and nothing behind
+  it" — it breaks 4.8 down by region and education. What is missing is only the birth and women counts.
+- **Accepted.** "Benin is the case where an office admits..." presumed a set of cases the reader has
+  seen; the office is named in full; and indirect estimation is now described rather than named.
