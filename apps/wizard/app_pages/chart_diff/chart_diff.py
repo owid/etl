@@ -573,7 +573,10 @@ class ChartDiff:
 
     @staticmethod
     def _get_chart_slugs(target_session: Session, slugs: set[str] | None = None) -> set[str]:
-        """Get all chart slugs. Use `slugs` to filter slugs as this can be slow otherwise."""
+        """Get every slug already taken in the /grapher/<slug> namespace.
+
+        Use `slugs` to filter slugs as this can be slow otherwise.
+        """
         if slugs is not None:
             where = "WHERE slug IN %(slugs)s"
             where_charts = "AND cc.slug IN %(slugs)s"
@@ -595,7 +598,25 @@ class ChartDiff:
                 params=params,
             )["slug"]
         )
-        return slugs | slugs_redirects
+        # Multi-dim pages are served from the same /grapher/<slug> route as charts, so a slug a
+        # published multi-dim answers on is taken too — the same reason `chart_slug_redirects` is
+        # included above. `multi_dim_redirects.source` stores a full path rather than a bare slug,
+        # and only its /grapher/ entries share the chart namespace (the rest are /explorers/ ones),
+        # hence the prefix test and strip. LEFT() rather than LIKE, to keep a literal `%` out of a
+        # query that also carries `%(slugs)s` placeholders.
+        slugs_mdim = set(
+            read_sql(
+                "SELECT slug FROM ("
+                "  SELECT slug FROM multi_dim_data_pages WHERE published = 1 AND slug IS NOT NULL"
+                "  UNION"
+                "  SELECT SUBSTRING(source, CHAR_LENGTH('/grapher/') + 1) FROM multi_dim_redirects"
+                "  WHERE LEFT(source, CHAR_LENGTH('/grapher/')) = '/grapher/'"
+                f") t {where}",
+                target_session,
+                params=params,
+            )["slug"]
+        )
+        return slugs | slugs_redirects | slugs_mdim
 
     @staticmethod
     def _get_target_charts(target_session, source_charts):
