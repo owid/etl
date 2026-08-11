@@ -9,8 +9,10 @@ DB_L, DB_R, DB_T, DB_B, ROW = 84, 24, 16, 32, 30
 
 # ---------------------------------------------------------------- line chart
 def line_chart(series, x0, x1, label=""):
-    """series: [(css_class, color, [(year, value_or_None)])]. Zero-based y-axis whose top
-    is set by the tallest point actually drawn; a None breaks the line."""
+    """series: [(css_class, color, [(year, value_or_None)])]. Zero-based y-axis whose top is set by the
+    tallest point actually drawn. Missing years are skipped, not broken around: the line joins whatever
+    the source reports. Put "dots" in the class to mark each reported year with a dot — worth doing for
+    a series that reports every few years, pointless for an annual one."""
     pts = [v for _, _, s in series for _, v in s if v is not None]
     top = max(pts)
     step = 0.5 if top > 1.6 else 0.25
@@ -35,18 +37,21 @@ def line_chart(series, x0, x1, label=""):
 
     for cls, color, s in series:
         drawn = [(y, v) for y, v in s if v is not None]
-        if len(drawn) == 1:
-            year, val = drawn[0]
-            g.append(f'<circle class="pn" style="fill:{color}" cx="{sx(year):.1f}" cy="{sy(val):.1f}" r="3.4"/>')
+        if not drawn:
             continue
-        d, pen = [], False
-        for year, val in s:
-            if val is None:
-                pen = False
-                continue
-            d.append(f"{'M' if not pen else 'L'}{sx(year):.1f},{sy(val):.1f}")
-            pen = True
-        g.append(f'<path class="{cls}" style="stroke:{color}" d="{" ".join(d)}"/>')
+        dots = "dots" in cls
+        stroke_cls = cls.replace("dots", "").strip()
+        # The line runs through every value the country reports, straight across the years it does not.
+        if len(drawn) > 1:
+            d = " ".join(f"{'M' if i == 0 else 'L'}{sx(y):.1f},{sy(v):.1f}"
+                         for i, (y, v) in enumerate(drawn))
+            g.append(f'<path class="{stroke_cls}" style="stroke:{color}" d="{d}"/>')
+        # A dot on each reported year, so it is clear which points are measurements and which stretches
+        # of the line are only joining them up. Annual series pass no "dots" and stay clean.
+        if dots or len(drawn) == 1:
+            for y, v in drawn:
+                g.append(f'<circle class="dot" style="fill:{color}" cx="{sx(y):.1f}" '
+                         f'cy="{sy(v):.1f}" r="3.4"/>')
 
     return f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="{label}">{"".join(g)}</svg>'
 

@@ -184,7 +184,8 @@ def country_chart(r):
     est = est[(est.year >= START) & (est.year <= X1)]
     if not est.empty:
         series.append(("ln", COLORS["UN WPP"], _pairs(est)))
-    series.append(("ln", "var(--nso)", _pairs(r["nso"][r["nso"].year <= X1])))
+    # only the national series carries dots: the UN's is annual, so every year of it is a real value
+    series.append(("ln dots", "var(--nso)", _pairs(r["nso"][r["nso"].year <= X1])))
     return line_chart(series, START, X1, f'{r["country"]} fertility rate')
 
 

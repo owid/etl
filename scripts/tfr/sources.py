@@ -228,14 +228,23 @@ MX_LAST = 2022  # 2023-24 occurrence years are still filling up with late regist
 
 
 def mexico():
-    """INEGI OLAP: registered births by year of occurrence and mother's age, summed over all
-    registration years; CONAPO mid-year female population by single age as the denominator."""
+    """INEGI's registered births by year of occurrence and mother's age, over CONAPO's mid-year
+    female population by single age.
+
+    The table's columns are registration year crossed with age band, and its rows are years of
+    occurrence. Registration only starts in 1985, so a birth that happened before then appears here
+    only if it was registered decades late: the table holds 21,332 births for 1950, against a real
+    total over a million. Those years are dropped rather than divided — publishing them gave Mexico a
+    fertility rate of 0.08 for 1951.
+    """
     d = pd.read_excel(os.path.join(DATA, "mx2.xlsx"), sheet_name=0, header=None)
     ages = d.iloc[4].ffill()
+    reg_years = [int(v) for v in d.iloc[5] if re.fullmatch(r"\d{4}", str(v).strip())]
+    first_complete = min(reg_years)
     births = {}
     for i in range(6, len(d)):
         y = str(d.iloc[i, 0]).strip()
-        if not re.match(r"^\d{4}$", y):
+        if not re.match(r"^\d{4}$", y) or int(y) < first_complete:
             continue
         for j in range(1, d.shape[1]):
             band = _MX_AGE.get(ages[j] if isinstance(ages[j], str) else "")
@@ -245,6 +254,18 @@ def mexico():
             if pd.notna(v):
                 births.setdefault(int(y), {})
                 births[int(y)][band] = births[int(y)].get(band, 0.0) + float(v)
+
+    # The most recent years are still being registered, so they are dropped too — MX_LAST is the last
+    # year INEGI considers settled.
+    births = {y: b for y, b in births.items() if y <= MX_LAST}
+
+    # If a future download reaches further back, the years kept must still look like whole years of
+    # registration rather than the tail of late ones.
+    totals = {y: sum(b.values()) for y, b in births.items()}
+    median = sorted(totals.values())[len(totals) // 2]
+    thin = sorted(y for y, t in totals.items() if t < median / 2)
+    if thin:
+        raise AssertionError(f"Mexico: occurrence years with implausibly few births: {thin}")
 
     pop = pd.read_excel(os.path.join(DATA, "0_Pob_Mitad_1950_2070.xlsx"))
     pop = pop[(pop.CVE_GEO == 0) & (pop.SEXO == "Mujeres")]

@@ -1,8 +1,18 @@
 <title>Total fertility rates: national statistics vs. UN estimates</title>
 <style>
- /* light only, and a warm off-white rather than pure white so long reading is easier on the eyes */
- :root { --bg:#faf9f6; --fg:#1d1d1b; --mut:#6b6b6b; --line:#e4e1da; --nso:#c94a3b; --wpp:#3b82c4;
-         --panel:#fffefb; }
+ /* Light only, on a warm off-white rather than pure white. Greys are named for the job they do, not
+    for how light they are: a gridline, a hairline rule, an axis and a data mark all need different
+    contrast, and one shared grey cannot serve them. --edge in particular has to stay visible against
+    the page, because the middle of the diverging map scale is nearly the same colour as the page. */
+ :root { --bg:#f7f6f2; --panel:#fffdf9; --fg:#1c1c19; --mut:#6a6862;
+         --line:#e3e0d8;      /* hairline rules: table borders, the sticky bar, the tooltip */
+         --grid:#ebe8e1;      /* chart gridlines, fainter than a rule */
+         --axis-c:#cdc9be;    /* axis lines, stronger than a gridline */
+         --mark:#d6d2c6;      /* the connector in the dumbbell charts — a data mark, not a rule */
+         --nodata:#e0ddd4;    /* map fill where there is no national figure */
+         --edge:#b6b1a4;      /* outlines that must read against the page: country borders, ticks */
+         --chip:#eae7df;      /* filled chip behind a badge */
+         --nso:#bf3c2c; --wpp:#2e6da4; }
  body { background:var(--bg); color:var(--fg); margin:0; padding:34px 24px 76px;
         font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
  .wrap { max-width:1200px; margin:0 auto; }
@@ -24,7 +34,7 @@
  .tabs { display:flex; gap:6px; align-items:center; margin:0; flex:none; }
  button.tab { font:inherit; font-size:13px; color:var(--mut); background:none; cursor:pointer;
               border:1px solid var(--line); border-radius:99px; padding:4px 14px; }
- button.tab.on { color:var(--bg); background:var(--fg); border-color:var(--fg); }
+ button.tab.on { color:var(--panel); background:var(--fg); border-color:var(--fg); }
  [hidden] { display:none !important; }
  .filters { margin:0; font-size:13px; color:var(--mut); display:flex; gap:10px; flex-wrap:wrap; }
  .filters fieldset { border:1px solid var(--line); border-radius:8px; margin:0; padding:6px 12px 7px; }
@@ -47,21 +57,24 @@
  dl.docs a { color:var(--wpp); }
  .badge { display:inline-block; font-size:11px; font-weight:600; border-radius:99px; padding:2px 9px;
           margin-left:8px; vertical-align:2px; }
- .badge.rc { background:var(--line); color:var(--mut); }
+ .badge.rc { background:var(--chip); color:#575349; }
  svg { width:100%; height:auto; display:block; overflow:visible; }
- .grid { stroke:var(--line); stroke-width:1; }
- .axis { stroke:var(--line); stroke-width:1.4; }
+ .grid { stroke:var(--grid); stroke-width:1; }
+ .axis { stroke:var(--axis-c); stroke-width:1.4; }
  .ylab { fill:var(--mut); font-size:11px; text-anchor:end; }
  .xlab { fill:var(--mut); font-size:11px; text-anchor:middle; }
  .ln { fill:none; stroke-width:1.8; stroke-linejoin:round; stroke-linecap:round; }
  .proj { stroke-dasharray:5 3; }
  .blab { fill:var(--mut); font-size:11.5px; text-anchor:end; }
- .bar { stroke:var(--line); stroke-width:4; stroke-linecap:round; }
+ .bar { stroke:var(--mark); stroke-width:4; stroke-linecap:round; }
  .pn { fill:var(--nso); }
  .pw { fill:var(--wpp); }
  .vn { fill:var(--nso); font-size:11.5px; font-weight:600; }
  .vw { fill:var(--wpp); font-size:11.5px; font-weight:600; }
- .tdot { r:4; }
+ /* haloed in the page colour so a mark still reads where it lands on a gridline */
+ .tdot { r:4; stroke:var(--bg); stroke-width:1.5; }
+ /* a year with no neighbouring year is drawn as a dot — most countries report every few years */
+ .dot { stroke:var(--bg); stroke-width:1.4; }
  table.list { border-collapse:collapse; font-size:13.5px; width:100%; }
  table.list td { padding:6px 12px 6px 0; border-bottom:1px solid var(--line); vertical-align:top; }
  table.list td.n { text-align:right; color:var(--mut); font-variant-numeric:tabular-nums; white-space:nowrap; }
@@ -81,12 +94,14 @@
  tr.ticks svg.rowchart { height:14px; }
  #mapwrap { position:relative; }
  svg#map { width:100%; height:auto; overflow:visible; }
- svg#map path { stroke:var(--bg); stroke-width:0.6; vector-effect:non-scaling-stroke; }
- svg#map path.nodata { fill:var(--line); }
+ /* a real outline, not a gap in the page colour: the middle bins of the scale are near-white, and on an
+    off-white page a background-coloured stroke would let those countries dissolve into it */
+ svg#map path { stroke:var(--edge); stroke-width:0.5; vector-effect:non-scaling-stroke; }
+ svg#map path.nodata { fill:var(--nodata); }
  svg#map path.has:hover { stroke:var(--fg); stroke-width:1.4; }
  #tip { position:absolute; z-index:20; pointer-events:none; min-width:210px; max-width:290px;
         background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:9px 11px;
-        box-shadow:0 4px 14px rgba(0,0,0,.18); font-size:12.5px; line-height:1.45; }
+        box-shadow:0 2px 10px rgba(58,54,44,.10); font-size:12.5px; line-height:1.45; }
  #tip .tc { font-weight:600; font-size:13.5px; margin-bottom:4px; }
  #tip .tr { display:flex; justify-content:space-between; gap:14px; color:var(--mut); }
  #tip .tr b { font-weight:600; font-variant-numeric:tabular-nums; }
@@ -96,13 +111,14 @@
  #maplegend { display:flex; align-items:center; gap:9px; margin:10px 0 22px; font-size:12px;
               color:var(--mut); }
  #maplegend .bins { position:relative; flex:0 1 320px; height:10px; display:flex; }
- #maplegend .bins i { flex:1 1 0; height:10px; }
+ /* the middle bin is near-white, so every chip carries a faint ring or that one looks like a gap */
+ #maplegend .bins i { flex:1 1 0; height:10px; box-shadow:inset 0 0 0 1px rgba(50,46,38,.10); }
  #maplegend .bins i:first-child { border-radius:2px 0 0 2px; }
  #maplegend .bins i:last-child { border-radius:0 2px 2px 0; }
  #maplegend .tick { position:absolute; top:13px; transform:translateX(-50%); white-space:nowrap;
                     font-size:11px; }
  #maplegend .tick::before { content:''; position:absolute; left:50%; top:-4px; width:1px; height:3px;
-                            background:var(--line); }
+                            background:var(--edge); }
 </style>
 <div class="wrap">
 <div class="head">
@@ -141,7 +157,7 @@
  <section id="mapsec">
  <h2>Where the two disagree</h2>
  <p class="src">How far the UN estimate sits above or below the country's own figure, for its latest
- year. Countries not investigated or with no national figure are left blank.</p>
+ year. Countries not investigated or with no national figure are in gray.</p>
  <div id="mapwrap">
   <svg id="map" viewBox="{{MAPBOX}}" role="img" aria-label="World map of the gap between national and UN figures"></svg>
   <div id="tip" hidden></div>
