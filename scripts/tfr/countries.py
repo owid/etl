@@ -45,6 +45,7 @@ from sri_lanka import sri_lanka_tfr  # noqa: E402
 from sweden import sweden_tfr  # noqa: E402
 from switzerland import switzerland_tfr  # noqa: E402
 from taiwan import taiwan_tfr  # noqa: E402
+from uk import uk_tfr  # noqa: E402
 from philippines import philippines  # noqa: E402
 from poland import poland_tfr  # noqa: E402
 from portugal import portugal_tfr  # noqa: E402
@@ -113,7 +114,7 @@ from published import (  # noqa: E402
     zambia,
     zimbabwe,
 )
-from sources import egypt, england_wales, germany, japan, mexico, thailand, united_states  # noqa: E402
+from sources import egypt, germany, japan, mexico, thailand, united_states  # noqa: E402
 from south_africa import south_africa_tfr  # noqa: E402
 from spain import spain_tfr  # noqa: E402
 from turkey import turkey_tfr  # noqa: E402
@@ -457,28 +458,32 @@ COUNTRIES = [
       "ever recorded. Our registry figure for 2022 is 1.52 — close, but built a different way, from birth "
       "records rather than from asking women how many children they have had.",
       "https://sidra.ibge.gov.br/pesquisa/registro-civil/tabelas"),
-    C("England and Wales", "ONS — birth registrations by the mother's age, over the mid-year female "
-      "population", england_wales,
-      "United Kingdom", "complete", False,
-      "ONS table 10 gives live births and age-specific fertility rates by age group of mother, back to 1938. "
-      "ONS also publishes mid-year population by single year of age and sex for the United Kingdom and each "
-      "of its nations, 2011 to 2024, in one spreadsheet.",
-      "We summed the age-specific rates and multiplied by five, the width of each age group. The age-band comparison divides "
-      "the births by ONS's own mid-year female population, which is what ONS itself divides by.",
-      "This is England and Wales, about 89% of UK births, while the UN figures are UK-wide. The difference "
-      "that makes is small and getting smaller. Adding Scotland and Northern Ireland's own published "
-      "figures to these ones puts the UK about 0.005 to 0.01 below England and Wales in recent years — "
-      "1.409 against 1.415 in 2024 — because Scotland has fallen much further (1.25 in 2024) while "
-      "Northern Ireland has stayed well above (about 1.60), and the two nearly cancel out. Either way it is "
-      "far smaller than the gaps this page is about, which is why the England and Wales series is used: it "
-      "is longer and more current than the UK one, which ONS stopped publishing after 2021. A genuine "
-      "UK-wide series could be built from the three offices' own tables and is worth doing. "
-      "The 2025 figure is provisional, and ONS works it out against population projections rather than "
-      "estimates — so for that year we get the female population by dividing the reported births by the "
-      "reported rate, rather than using a published population count. One quirk of table 10: it offers "
-      "rates on both a 15-44 and a 15-49 base, but the 15-49 column is filled in for 2025 alone and empty "
-      "for every year from 1938 to 2024, so the 15-44 base is used throughout. In the age-band comparison, "
-      "the top group labelled 40-44 is ONS's own \"40 and over\" row, so it includes mothers of 45 and above.",
+    C("United Kingdom", "Three registration offices — births by the mother's age, over ONS's UK female "
+      "population", uk_tfr,
+      "United Kingdom", "complete", True,
+      "No office publishes a fertility rate for the United Kingdom. Its three registration offices each "
+      "publish one for their own part of it, and each publishes the births behind it by the mother's age: "
+      "ONS for England and Wales, back to 1938; National Records of Scotland from 2000; and NISRA for "
+      "Northern Ireland, by single year of the mother's age, back to 1974. ONS separately publishes "
+      "mid-year population by single year of age and sex for the United Kingdom as a whole, 2011 to 2024.",
+      "We built the UK rate ourselves, because nobody publishes it. We added the three offices' births in "
+      "each age group, divided by the women of that age across the whole United Kingdom, and summed. Run "
+      "on one country at a time the same arithmetic reproduces each office's own published rate: for 2024, "
+      "1.415 against ONS's 1.415, 1.247 against Scotland's 1.250, and 1.602 against Northern Ireland's "
+      "1.603.",
+      "This is the one country here whose figure we assembled rather than read, so it is worth being clear "
+      "about why. The UN publishes fertility for the United Kingdom and for nothing smaller, so a series "
+      "for England and Wales — about 89% of UK births — was never a like-for-like comparison, and on a map "
+      "it colored Scotland and Northern Ireland with a rate that excluded both. There is no England or "
+      "England-and-Wales on the UN's side to compare against instead. The four nations differ a lot: in "
+      "2024 Northern Ireland was at about 1.60 and Scotland at 1.25, with England and Wales between them "
+      "at 1.42. The series runs from 2011 because that is where ONS's UK population estimates begin, and "
+      "stops at 2024 because that is the last year all three offices have published; England and Wales "
+      "alone reaches 2025. Two conventions, both ONS's own: births under 20 include every birth below that "
+      "age, and births at 40 and over are divided by the women aged 40 to 44, which is how ONS's own "
+      "long-running rate is built. One year does not line up as well as the rest — for 2023 our England "
+      "and Wales figure comes out 0.016 below ONS's own, because the population estimates now published "
+      "for that year are not the ones ONS used when it calculated the rate.",
       "https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths"),
     C("Germany", "Destatis — birth statistics by the mother's age, over the average resident female "
       "population", germany, "Germany",

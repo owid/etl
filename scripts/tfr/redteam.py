@@ -157,7 +157,7 @@ def reviewed():
     markdown file in the directory pulled in the headings of the prompt, the readme and the agent
     ledger, which inflated the tally and made countries look reviewed when they were not.
     """
-    known = {c["name"] for c in COUNTRIES} | {"England and Wales"}
+    known = {c["name"] for c in COUNTRIES}
     done = set()
     if os.path.isdir(LOG):
         for name in sorted(os.listdir(LOG)):
@@ -176,7 +176,7 @@ def unmatched_headings():
     twice, which is how DR Congo happened. Section headings that are deliberately not countries are
     listed here so they stop being reported as problems.
     """
-    known = {c["name"] for c in COUNTRIES} | {"England and Wales"}
+    known = {c["name"] for c in COUNTRIES}
     out = []
     if os.path.isdir(LOG):
         for name in sorted(os.listdir(LOG)):
@@ -213,10 +213,8 @@ def rank_order():
     out = []
     with open(os.path.join(HERE, "top100.csv")) as f:
         for row in csv.DictReader(f):
-            # the collection covers England and Wales, which is what the UK's rank stands for here
-            name = "England and Wales" if row["country"] == "United Kingdom" else row["country"]
-            if name in names:
-                out.append(name)
+            if row["country"] in names:
+                out.append(row["country"])
     missing = [n for n in names if n not in out]
     return out + sorted(missing)
 
@@ -347,9 +345,6 @@ def next_up(count):
     plotted = {c["name"] for c in COUNTRIES}
     done = reviewed()
     out = [c for c in order if c in plotted and c not in done]
-    # England and Wales stands in for the United Kingdom in the collection
-    if "United Kingdom" in [c for c in order] and "England and Wales" not in done:
-        out = [("England and Wales" if c == "United Kingdom" else c) for c in out]
     return out[:count]
 
 

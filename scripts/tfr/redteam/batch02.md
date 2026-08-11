@@ -223,7 +223,10 @@ ISTAT's own release.
   edge of this chart.
 - **Accepted.** "SDMX service", "ANPR" and "stato civile" all replaced with plain descriptions.
 
-## England and Wales
+## United Kingdom
+
+Reviewed as England and Wales, which is what the entry was at the time. The series has since been
+rebuilt UK-wide; see the note at the end of this log.
 
 Verdict: serious problems. All 16 spot-checked years matched to three decimals, including the 1964 peak
 — but three statements around them were wrong.
@@ -2139,3 +2142,42 @@ against Eurostat's own figures instead, and in doing so found something better t
 - **Accepted.** Paired each rate with its year, replaced "an explicit pro-natalist policy" with what it
   means, expanded KSH, rewrote the source line's "over the mid-year female population", and cut "Hungary is
   the clearest case of a rise reversing", a ranking across pages the reader has not seen.
+
+## Cross-cutting: the United Kingdom replaces England and Wales, and a cache that hid two fixes
+
+Two findings from outside the campaign, both confirmed, and the second one explains why the first was
+invisible.
+
+**England and Wales was never a like-for-like comparison.** The page said so plainly — "this is England
+and Wales, about 89% of UK births, while the UN figures are UK-wide" — and then argued the difference
+was small. Being small does not make it right: the row carried the ISO code GBR, so the map painted
+Scotland and Northern Ireland with a rate that excluded both. There is no England and no
+England-and-Wales on the UN's side to compare against instead; the UN publishes the United Kingdom and
+nothing smaller. So the only honest fix was to build the United Kingdom, which no office publishes.
+
+It is now built from the three registration offices: ONS's births by the mother's age for England and
+Wales, National Records of Scotland's table 3.01b, and NISRA's table 3.3, which gives single years of
+age — over ONS's own mid-year population estimates for the United Kingdom as a whole. 2011 to 2024, the
+span where the population file and all three offices overlap. The check is that the same arithmetic, run
+on one country at a time, reproduces each office's own published rate: for 2024, 1.415 against ONS's
+1.415, 1.247 against Scotland's 1.250, 1.602 against Northern Ireland's 1.603.
+
+That check nearly produced a false alarm of exactly the kind this campaign keeps finding. The first
+version compared against rates I typed from memory, and Northern Ireland's was wrong by 0.16 — which
+made a parse that was in fact exact look like a 12% error. The check now reads every comparison figure
+out of the office's own spreadsheet, and the loader asserts each country's age groups sum to that
+country's own all-ages total.
+
+**And the reason Taiwan's page contradicted its own chart.** Taiwan's entry says the line stops at 2024
+because the 2025 age breakdown is still filling in, and the code does stop there — `LAST_COMPLETE = 2024`.
+The chart, the map and the detail panel all showed 2025 anyway, at 0.7084. The series cache was written
+before that fix and `build.py` read the CSV whenever one existed, so the fix never reached the page.
+Every loader edit made without deleting its cache by hand had done nothing.
+
+`cached()` now stores a hash of the module each loader lives in and rebuilds when it changes — the module
+rather than the function, because Taiwan's fix lived in a constant that never appears in the text of
+`taiwan_tfr()`. The detail panels go through the same guard, hashing the dispatcher and the country's own
+module, since Czechia's factor-of-five error was fixed in `czechia.py`. Rebuilding everything the guard
+flagged moved exactly two countries: Taiwan from 2025 back to 2024, and Chad from 2015 to 2019, a point
+added during the campaign that had also never reached the page. Nothing else moved, which is the
+reassuring half of the result.

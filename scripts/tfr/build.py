@@ -6,6 +6,7 @@ Pass --fresh to re-parse the sources.
 """
 
 import datetime
+import hashlib
 import json
 import os
 import sys
@@ -30,20 +31,63 @@ OUT = os.path.join(HERE, "tfr_charts.html")
 X1 = 2032
 
 
-def cached(name, build):
-    """Read cache/<name>.csv, or build it and write it. --fresh skips the read."""
+FINGERPRINTS = os.path.join(CACHE, "fingerprints.json")
+
+
+def _fingerprints():
+    if os.path.exists(FINGERPRINTS):
+        return json.load(open(FINGERPRINTS))
+    return {}
+
+
+def _fingerprint_of(*fns):
+    """A hash of every module the given functions live in, or None if none of them has a file.
+
+    Modules rather than functions, because a loader's behaviour depends on the constants around it.
+    Taiwan's series was cut to 2024 by setting LAST_COMPLETE, which does not appear in the text of
+    taiwan_tfr() at all — a function-level hash would have missed it, exactly as no hash at all did.
+    Countries whose loaders share published.py all rebuild together when any of them changes, which
+    costs nothing: those loaders are hand-entered figures, not parsing.
+    """
+    h, seen = hashlib.sha256(), set()
+    for fn in fns:
+        mod = sys.modules.get(getattr(fn, "__module__", None))
+        path = getattr(mod, "__file__", None)
+        if not path or path in seen or not os.path.exists(path):
+            continue
+        seen.add(path)
+        h.update(open(path, "rb").read())
+    return h.hexdigest()[:16] if seen else None
+
+
+def cached(name, build, fingerprint=None):
+    """Read cache/<name>.csv, or build it and write it.
+
+    Rebuilds when the code that produced the cache has changed since it was written. Without that,
+    editing a loader left the old series on the page and said nothing: Taiwan's page described a line
+    stopping at 2024 while the chart, the map and the detail panels all still carried the 2025 point
+    the edit had removed. --fresh forces every series to rebuild regardless.
+    """
     os.makedirs(CACHE, exist_ok=True)
     path = os.path.join(CACHE, f"{name}.csv")
-    if "--fresh" not in sys.argv and os.path.exists(path):
+    stored = _fingerprints().get(name)
+    fresh_code = fingerprint is not None and stored != fingerprint
+    if "--fresh" not in sys.argv and os.path.exists(path) and not fresh_code:
         return pd.read_csv(path)
+    if fresh_code and os.path.exists(path):
+        print(f"  rebuilding {name}: its code changed since the cache was written")
     df = build()
     df.to_csv(path, index=False)
+    if fingerprint is not None:
+        marks = _fingerprints()
+        marks[name] = fingerprint
+        json.dump(marks, open(FINGERPRINTS, "w"), indent=0, sort_keys=True)
     return df
 
 
 def national(country, fn):
     """The country's own series, reindexed so missing years break the line."""
-    df = cached(f"nso_{country.replace(' ', '_')}", fn)
+    df = cached(f"nso_{country.replace(' ', '_')}", fn, _fingerprint_of(fn))
     df = df[df.year >= START]
     span = range(int(df.year.min()), int(df.year.max()) + 1)
     return df.set_index("year").reindex(span).rename_axis("year").reset_index()
@@ -75,7 +119,6 @@ def at(wpp, year, label):
 # The country pages and the picker keep the full name.
 SHORT = {
     "Democratic Republic of Congo": "DR Congo",
-    "England and Wales": "England & Wales",
 }
 
 
@@ -86,7 +129,7 @@ def iso_codes():
     reg = Dataset("/Users/edouard/dev/owid/etl/data/garden/regions/2023-01-01/regions")["regions"]
     reg = reg.reset_index()
     by_name = {n: c for n, c in zip(reg.name, reg.iso_alpha3) if isinstance(c, str)}
-    out = {"England and Wales": "GBR"}          # plotted as England and Wales, drawn as the UK
+    out = {}
     for c in COUNTRIES:
         if c["name"] not in out:
             code = by_name.get(c["name"]) or by_name.get(c["wpp_name"])
@@ -108,7 +151,7 @@ def main():
         wpp_v = at(wpp, year, "medium") or at(wpp, year, "estimates")
         rows.append(dict(country=c["name"], src=c["src"], nso=nso, wpp=wpp, model_country=c["wpp_name"],
                          year=year, nso_v=nso_v, wpp_v=wpp_v, tier=c["tier"], recalc=c["recalculated"],
-                         gap=(wpp_v - nso_v) if wpp_v else 0.0))
+                         loader=c["loader"], gap=(wpp_v - nso_v) if wpp_v else 0.0))
 
     rows.sort(key=lambda r: -r["gap"])
 
@@ -189,18 +232,21 @@ def country_chart(r):
     return line_chart(series, START, X1, f'{r["country"]} fertility rate')
 
 
+COLUMNS = ["band", "nso_births", "wpp_births", "nso_women", "wpp_women"]
+
+
 def detail_block(r):
     key = f"detail_{r['country'].replace(' ', '_')}_{r['year']}"
-    path = os.path.join(CACHE, f"{key}.csv")
-    if "--fresh" not in sys.argv and os.path.exists(path):
-        df = pd.read_csv(path)
-        bands = list(df.itertuples(index=False, name=None)) if not df.empty else None
-    else:
-        bands = compare(r["country"], r["model_country"], r["year"])
-        os.makedirs(CACHE, exist_ok=True)
-        pd.DataFrame(bands or [], columns=["band", "nso_births", "wpp_births", "nso_women", "wpp_women"]).to_csv(
-            path, index=False
-        )
+
+    def build():
+        rows = compare(r["country"], r["model_country"], r["year"])
+        return pd.DataFrame(rows or [], columns=COLUMNS)
+
+    # the same code-changed rebuild as the series, over the dispatcher and the country's own module,
+    # since the bands come from both. Czechia's 45-49 births were wrong by a factor of five and the fix
+    # was in czechia.py, so hashing only the dispatcher would have left the wrong dot on the page.
+    df = cached(key, build, _fingerprint_of(compare, r["loader"]))
+    bands = list(df.itertuples(index=False, name=None)) if not df.empty else None
     if not bands:
         return ('<div class="detail"><p class="na">This office publishes fertility rates only, not the births '
                 "and female population behind them, so the two sources cannot be compared age band by age "

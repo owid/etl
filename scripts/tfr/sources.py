@@ -43,29 +43,6 @@ def _tfr_from_asfr(df, per=1000.0, width=5):
     return g.rename("value").reset_index()
 
 
-def england_wales():
-    """ONS Table 10: age-specific fertility rates, England & Wales, 1938-2025.
-
-    Columns are positional: 0 Year, 1 Country, 2 Parent, 3 Age group, 4 births,
-    5 ASFR (15-44 base), 6 ASFR (15-49 base). Both rate headers collide once
-    newlines are stripped, so index rather than rename.
-    """
-    d = pd.read_excel(os.path.join(DATA, "uk_births.xlsx"), sheet_name="Table_10", header=5)
-    d = d[(d.iloc[:, 2] == "Mother") & (d.iloc[:, 1] == "England, Wales and Elsewhere")]
-    out = pd.DataFrame(
-        {
-            "year": pd.to_numeric(d.iloc[:, 0], errors="coerce"),
-            "age": d.iloc[:, 3].astype(str),
-            # col 5 is the long-running 15-44 based rate; col 6 (15-49 base) exists only for recent years
-            "value": pd.to_numeric(d.iloc[:, 5], errors="coerce").fillna(pd.to_numeric(d.iloc[:, 6], errors="coerce")),
-        }
-    ).dropna()
-    # ONS reports overlapping groups in recent years; keep the set present in every year
-    out = out[out.age.isin(["Under 20", "20 to 24", "25 to 29", "30 to 34", "35 to 39", "40 and over"])]
-    out["year"] = out.year.astype(int)
-    return _tfr_from_asfr(out)
-
-
 def united_states():
     """CDC/NCHS age-specific birth rates, 1940-2024, from two data.cdc.gov datasets.
 

@@ -224,69 +224,6 @@ def egypt_detail(year):
     return out or None
 
 
-EW_BANDS = {
-    "Under 20": (15, 19),
-    "20 to 24": (20, 24),
-    "25 to 29": (25, 29),
-    "30 to 34": (30, 34),
-    "35 to 39": (35, 39),
-    "40 and over": (40, 44),
-}
-
-
-MYEB = ("https://www.ons.gov.uk/file?uri=/peoplepopulationandcommunity/populationandmigration/"
-        "populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland/"
-        "mid2011tomid2024/myebtablesuk20112024.xlsx")
-
-
-def _ew_women(year):
-    """{age: women} for England and Wales at mid-year, from ONS's own population estimates.
-
-    Sheet MYEB4 covers 2011 to 2024 by single year of age and sex. Returns None outside that span,
-    which is what happens for the latest provisional year — ONS itself uses projections there.
-    """
-    from fetch import fetch
-
-    col = f"population_{year}"
-    path = fetch(MYEB, os.path.join(DATA, "uk", "myeb.xlsx"))
-    d = pd.read_excel(path, sheet_name="MYEB4", header=1)
-    if col not in d.columns:
-        return None
-    d = d[(d.Name == "ENGLAND AND WALES") & (d.sex == "f")]
-    out = {}
-    for _, r in d.iterrows():
-        a = pd.to_numeric(r.age, errors="coerce")
-        v = pd.to_numeric(r[col], errors="coerce")
-        if pd.notna(a) and pd.notna(v) and 15 <= a <= 49:
-            out[int(a)] = float(v)
-    return out or None
-
-
-def england_wales_detail(year):
-    """Births from ONS table 10, women from ONS's mid-year population estimates.
-
-    Where the population file does not reach the year, the denominator falls back to what ONS's own
-    published rate implies: births / (rate / 1000).
-    """
-    d = pd.read_excel(os.path.join(DATA, "uk_births.xlsx"), sheet_name="Table_10", header=5)
-    d = d[(d.iloc[:, 2] == "Mother") & (d.iloc[:, 1] == "England, Wales and Elsewhere")]
-    d = d[pd.to_numeric(d.iloc[:, 0], errors="coerce") == year]
-    women = _ew_women(year)
-    out = {}
-    for _, r in d.iterrows():
-        band = EW_BANDS.get(str(r.iloc[3]).strip())
-        births = pd.to_numeric(r.iloc[4], errors="coerce")
-        rate = pd.to_numeric(r.iloc[5], errors="coerce")
-        if not band or pd.isna(births):
-            continue
-        counted = sum(women.get(a, 0.0) for a in range(band[0], band[1] + 1)) if women else 0.0
-        if counted:
-            out[band] = {"births": float(births), "women": counted}
-        elif pd.notna(rate) and rate > 0:
-            out[band] = {"births": float(births), "women": float(births) / (float(rate) / 1000)}
-    return out or None
-
-
 def philippines_detail(year):
     import philippines as ph
 
@@ -471,6 +408,12 @@ def guatemala_band_detail(year):
     return guatemala_detail(year)
 
 
+def united_kingdom_band_detail(year):
+    from uk import uk_detail
+
+    return uk_detail(year)
+
+
 def czechia_band_detail(year):
     from czechia import czechia_detail
 
@@ -525,7 +468,7 @@ DETAIL = {
     "Mexico": mexico_detail,
     "Thailand": thailand_detail,
     "Egypt": egypt_detail,
-    "England and Wales": england_wales_detail,
+    "United Kingdom": united_kingdom_band_detail,
     "Sri Lanka": sri_lanka_band_detail,
     "Taiwan": taiwan_band_detail,
     "Chile": chile_band_detail,

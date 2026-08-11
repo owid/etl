@@ -11,8 +11,9 @@ remembered.
 - **Analyzed** — written up in a findings log, with its findings applied or explicitly rejected.
 - **To do** — not started, in population-rank order.
 
-Countries are spelled exactly as `countries.py` spells them. The collection covers England and Wales
-rather than the United Kingdom, so that is the name used for its rank.
+Countries are spelled exactly as `countries.py` spells them. The collection used to cover England and
+Wales in the United Kingdom's place, and the tooling carried an alias to match; the series is now built
+UK-wide from the three registration offices, so the alias is gone and the name is United Kingdom.
 
 Two commands, and both should be run at every launch and every report:
 
@@ -82,7 +83,7 @@ Poland.
 - Germany
 - Tanzania
 - Thailand
-- England and Wales
+- United Kingdom
 - France
 - South Africa
 - Italy
