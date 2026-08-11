@@ -285,13 +285,35 @@ def algeria():
 
 
 IQ_TABLE = "https://cosit.gov.iq/AAS13/Human%20Develop%20Statistics%2019/humdev18.htm"
+IQ_CENSUS = "https://cosit.gov.iq/documents/AAS2024/02.pdf"
+IQ_CENSUS_TABLE = "TOTAL FERTILITY RATE BY GOVERNORATE"
+
+
+def _iraq_census_2024():
+    """COSIT, Annual Statistical Abstract 2024, table 8/2 — the 2024 census.
+
+    The table runs down the governorates and ends with national and Kurdistan Region rows. The
+    growth-rate table just above it also ends with a row labelled Iraq, so reading starts at the
+    fertility table's own caption.
+    """
+    path = os.path.join(DATA, "iq", "census2024.txt")
+    if not os.path.exists(path):
+        pdf = fetch(IQ_CENSUS, os.path.join(DATA, "iq", "census2024.pdf"))
+        subprocess.run(["pdftotext", "-layout", pdf, path], check=True)
+    lines = open(path, errors="ignore").read().splitlines()
+    head = next(i for i, ln in enumerate(lines) if IQ_CENSUS_TABLE in ln)
+    for ln in lines[head:]:
+        m = re.match(r"\s*Iraq\s+(\d\.\d)\s", ln)
+        if m:
+            return [(2024, float(m.group(1)))]
+    raise AssertionError("Iraq: no national row under the 2024 census fertility table")
 
 
 def iraq():
-    """COSIT, Annual Statistical Abstract 2013, table 19/18 — the measured survey rounds.
+    """COSIT's measured rounds: four household surveys, the 1997 census, and the 2024 census.
 
-    Four of the five years fall inside our window. Each comes from a different household survey,
-    named in the table's own source line.
+    The survey rounds and 1997 come from the Annual Statistical Abstract 2013, table 19/18, each
+    named in the table's own source line. The 2024 census figure is in the 2024 abstract instead.
     """
     path = fetch(IQ_TABLE, os.path.join(DATA, "iq", "tfr.htm"))
     d = pd.read_html(path, encoding="cp1256")[0]
@@ -301,6 +323,7 @@ def iraq():
         v = pd.to_numeric(str(r.iloc[1]).strip(), errors="coerce")
         if pd.notna(y) and pd.notna(v) and 1950 < y < 2100 and 0 < v < 10:
             rows.append((int(y), float(v)))
+    rows += _iraq_census_2024()
     return _series(sorted(rows))
 
 

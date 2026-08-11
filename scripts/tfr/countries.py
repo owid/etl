@@ -357,13 +357,17 @@ COUNTRIES = [
       "population GUS says it divides by, and the result reproduces its own published rate to three "
       "decimals: 1.1576 against 1.158 for 2023, 1.0987 against 1.099 for 2024, 1.0675 against 1.068 for "
       "2025.",
-      "Poland's rate is now among the lowest anywhere, and still falling. The series starts in 2013 because "
-      "that is where the mid-year population by single age begins; births reach back to 2002. GUS counts "
-      "everyone registered or actually resident for three months or more, which as a matter of law takes in "
-      "Ukrainian nationals given temporary registration after 2022 — so part of the recent fall is the "
-      "denominator growing. That affects GUS's own figure exactly as much as ours, and GUS does not quantify "
-      "it. Nothing is flagged provisional, even 2025. One trap: the summary table in the printed yearbook "
-      "reports births in thousands while the API returns raw counts.",
+      "Poland's rate is now among the lowest anywhere, and still falling. The series starts in 2013, which is "
+      "where the mid-year population by single year of age begins in the database we read; births reach back "
+      "to 2002, and older population tables exist elsewhere, so the line could be extended. GUS counts as "
+      "resident anyone living in the country for three months or more. Whether that takes in the Ukrainians "
+      "who arrived after 2022 under temporary protection is genuinely unclear: GUS describes the population "
+      "it uses for its own rates as excluding people staying temporarily, but it also flags the treatment of "
+      "recent arrivals as unsettled and does not quantify any effect. If they are in the population, part of "
+      "the recent fall would be the denominator growing, and it would affect GUS's own figure exactly as much "
+      "as ours. GUS has not yet published a final figure for 2025, so ours should be read as provisional even "
+      "though nothing in the database is marked as such. Eurostat's figures for Poland run about 0.03 to 0.04 "
+      "higher throughout, because it uses a different definition of who counts as resident.",
       "https://bdl.stat.gov.pl/"),
     C("Peru", "INEI — registered births over its population estimates", peru_tfr, "Peru", "complete",
       True,
@@ -903,17 +907,18 @@ COUNTRIES = [
       "https://www.nbs.go.tz/uploads/statistics/documents/en-1752866506-Fertility%20and%20Nuptiality.pdf"),
     C("Spain", "INE — birth statistics over the continuous population count", spain_tfr, "Spain",
       "complete", True,
-      "INE publishes registered births by single year of age of mother, 2009 onward, and female "
-      "population by single year of age every quarter back to 1971. Both come out of its open service as "
-      "whole-table CSV with no key and no registration.",
+      "Spain's national statistics office, INE, publishes registered births by single year of age of the "
+      "mother from 2009 onward, and female population by single year of age — twice a year from 1971, and "
+      "every quarter since 2021. Both are free to download from its website.",
       "We divided births at each single age by the women of that age on 1 July and summed. Our figures "
       "land within 0.01 of INE's own published fertility indicator every year — 1.107 against 1.10 for "
       "2024, 1.122 against 1.12 for 2023.",
-      "The population series is the Estadística Continua de Población, which replaced the older municipal "
-      "register figures and revises as registrations arrive. Births start in 2009 on this table, so the "
-      "line is shorter than the population series behind it. The 2024 figure is the first release and will "
-      "revise slightly.",
-      "https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177007"),
+      "The population series is INE's continuously updated population count, which replaced the older "
+      "municipal register figures. Births start in 2009 on this table, so the line is shorter than the "
+      "population series behind it. Recent years can still move a little, because INE keeps revising that "
+      "population as registrations arrive.",
+      "https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177007"
+      "&idp=1254735573002"),
     C("South Korea", "Ministry of Data and Statistics — annual birth statistics release", korea_tfr,
       "South Korea", "complete", False,
       "South Korea's statistics agency — Statistics Korea until October 2025, and the Ministry of Data and "
@@ -1027,31 +1032,36 @@ COUNTRIES = [
       "only figures are four projected years, starting at 1.27 for 2025.",
       "We divided the births by the female population in each age group and summed. Because there is no "
       "official annual rate to take, this is the only way to get a year-by-year figure for Argentina. Our "
-      "2014 value of 2.35 lines up with the roughly 2.3 usually quoted for that year.",
+      "2014 value of 2.35 lines up with the 2.36 the national identity registry publishes for that year.",
       "Argentina's fall is the steepest in this whole dataset — from 2.38 in 2010 to 1.19 in 2024, halving in "
-      "fourteen years. The population switches vintage at 2022, from the 2010 census basis to the 2022 one, "
-      "and we have not smoothed that seam. Births are tabulated by year of registration, but the ministry "
-      "defines the series to absorb only one year of lag and its own tables show 95% of a year's "
-      "registrations occurred that year and almost all the rest the year before, so unlike Mexico there is no "
-      "need to stop the series early. Mothers whose age was not stated — under 1% in recent years and "
-      "falling — are spread across the bands. The top group is open-ended at 45 and over, treated here as "
-      "45-49. The series starts in 2010 because that is where INDEC\'s population by age begins; births go "
-      "back to 2005.",
-      "https://datos.salud.gob.ar/dataset/nacidos-vivos-registrados-por-jurisdiccion-de-residencia-de-la-madre-republica-argentina"),
+      "fourteen years. Argentina's population figures switch source partway along: the years before 2022 rest "
+      "on estimates projected from the 2010 census, and 2022 onward on the 2022 census. We have not adjusted "
+      "for the switch, so there may be a small artificial step right at 2022. On registration, the ministry "
+      "says more than 95% of births are registered within three months — but it also reports that comparing "
+      "registered births against the 2010 census left a shortfall of about 6%, still 3.8% after four years of "
+      "late records arriving. So the counts are close to complete but never quite get there. For 2023 the "
+      "ministry warns separately that provinces had delays and difficulties sending in their figures, which "
+      "matters because the recent years are the ones driving the fall. Mothers whose age was not stated — "
+      "under 1% in recent years and falling — are spread across the bands. The top group is open-ended at 45 "
+      "and over, treated here as 45-49. The series starts in 2010 because that is where INDEC's population by "
+      "age begins; births go back to 2005.",
+      "https://datos.salud.gob.ar/dataset/nacidos-vivos-registrados-por-jurisdiccion-de-residencia-de-la-madre-republica-argentina-ano"),
     C("Afghanistan", "CSO and Ministry of Public Health — Demographic and Health Survey 2015", afghanistan,
       "Afghanistan", "survey", False,
       "One figure: 5.3 children per woman for the three years to 2015, from the survey the Central "
       "Statistics Organization ran with the health ministry. The same table gives the age-specific rates "
       "behind it, and the report breaks the figure down by all 34 provinces.",
-      "We read the national column of table 5.1. Summing its age-specific rates and multiplying by the band "
-      "width gives 5.29, the published 5.3.",
-      "Afghanistan has no vital registration usable for this, so the only figure is survey-based, and it is "
-      "now over a decade old. The office that ran it has been renamed and its old website is gone, so the "
-      "report had to come from a web archive. Its successor, the National Statistics and Information "
-      "Authority, is still publishing, but we found nothing newer on fertility. The survey's own age "
-      "structure is a weighted sample, not a population count, and no Afghan source gives female population "
-      "by age group outside it, so there is nothing to recalculate from.",
-      "https://nsia.gov.af/"),
+      "We read the national column of table 5.1. Adding up the birth rates for each five-year age group of "
+      "women and multiplying by five, the number of years in each group, gives 5.29 — the published 5.3.",
+      "Afghanistan has no birth registration reliable enough to use, so the only figure comes from a survey, "
+      "and it is now over a decade old. The office that ran it has since been renamed the National Statistics "
+      "and Information Authority, which is still publishing, but we found nothing newer on fertility. A 2022 "
+      "household survey is reported to have measured 5.4; we could not reach the report to check it, so it is "
+      "not plotted. The survey's figures come from interviewing a sample of women and scaling the results up "
+      "to the whole country rather than counting everyone, and we did not find an Afghan count of women by "
+      "age group to divide the births by independently.",
+      "https://web.archive.org/web/20170511114715/http://cso.gov.af/Content/files/"
+      "Afghanistan%20DHS%202015%20KIR/AFDHS_Final%20Report.pdf"),
     C("Algeria", "ONS — Démographie Algérienne", algeria, "Algeria", "incomplete", False,
       "The annual bulletin's main indicators table gives a fertility index for most years from 2002, "
       "alongside births and age-specific rates. Female population by five-year age group is in the same "
@@ -1071,21 +1081,23 @@ COUNTRIES = [
       "using births minus deaths alone, as though nobody moved in or out. Some years were never published at "
       "all, so the line has gaps. Some editions misprint 2017 as \"7102\" in the column headers.",
       "https://www.ons.dz/spip.php?rubrique182"),
-    C("Iraq", "COSIT — household survey rounds", iraq, "Iraq", "survey", False,
-      "The Annual Statistical Abstract has a table of the fertility rate for the years it was measured: 4.0 "
-      "in 2004 from the living conditions survey, 4.3 in 2006 and 4.5 in 2011 from the two household cluster "
-      "surveys, and 4.2 in 2007 from the socio-economic survey. Separately, COSIT publishes a projection "
-      "series running 4.08 in 2015 down to 3.82 in 2020.",
-      "We read the measured rounds from the abstract's table. We do not use the projection series, on the "
-      "same reasoning as Nigeria: it is model output, not measurement.",
+    C("Iraq", "COSIT — census and household survey rounds", iraq, "Iraq", "survey", False,
+      "Iraq's statistics office, COSIT, prints a table of the fertility rate for each year it was measured: "
+      "5.7 for the 1997 census, 4.0 in 2004 from the living conditions survey, 4.3 in 2006 and 4.5 in 2011 "
+      "from the two household cluster surveys, and 4.2 in 2007 from the socio-economic survey. The 2024 "
+      "census adds 3.1, in a separate table by governorate in the 2024 edition of the abstract. COSIT also "
+      "publishes a projection series running 4.08 in 2015 down to 3.82 in 2020.",
+      "We read the measured rounds and the census figures from COSIT's own tables. We do not use the "
+      "projection series: it is model output rather than measurement.",
       "Iraq has no usable vital statistics for this. COSIT says so itself — the interior ministry holds a "
-      "civil registry of more than 46 million people, but it is not yet organised for statistical use, and "
-      "COSIT is only now building that pipeline. So there are no births by age of mother to recalculate from, "
-      "and the series stops in 2011 because that is the last measured round published. Iraq ran its first "
-      "full census since 1987 in November 2024, but only headline counts are out; the fertility results are "
-      "not published yet, so this will be worth revisiting. The federal figures leave out the Kurdistan "
-      "region, which runs its own statistics office: an adolescent fertility table on a COSIT platform "
-      "reports zero for the three Kurdish governorates.",
+      "civil registry of more than 46 million people, but it is not yet organized for statistical use, and "
+      "COSIT is only starting to turn it into statistics. So there are no births by age of mother to check "
+      "these figures against. The 2024 census was Iraq's first full count since 1987, and it covers the "
+      "Kurdistan region too, reporting 2.6 there against 3.1 nationally. The older survey rounds are less "
+      "even in that respect: an adolescent fertility table on a COSIT platform reports zero for the three "
+      "Kurdish governorates, which cannot be right. There is also a gap in the middle of the line: a 2018 "
+      "survey round is reported to have measured 3.6, but we could not get hold of the report, so it is not "
+      "plotted.",
       "https://cosit.gov.iq/"),
     C("Uganda", "UBOS — 2024 National Population and Housing Census", uganda_tfr, "Uganda", "survey", False,
       "Table 7.2 of the 2024 census report gives, for every five-year age group, the number of women, the "

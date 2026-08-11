@@ -387,3 +387,101 @@ implied 1,032,000 births against the bulletin's 1,034,000.
 - **Open, page-wide.** Three agents in a row read "TFR copied from source, not validated" as claiming more
   than it does, and all three flagged the bare acronym on a page that otherwise always spells out "fertility
   rate". Wording change to both labels, not a per-country fix.
+
+## Iraq
+
+Verdict: serious problems. All five plotted points verified against COSIT's own tables, but we told
+readers a census result was unpublished when it is out.
+
+- **Accepted, and the series now runs to 2024.** We said "Iraq ran its first full census since 1987 in
+  November 2024, but only headline counts are out; the fertility results are not published yet." They are:
+  table 8/2 of the 2024 Annual Statistical Abstract gives a fertility rate by governorate, Iraq 3.1,
+  Kurdistan Region 2.6. I read the table myself. Added, so the line now ends in 2024 rather than 2011.
+- **Accepted.** The 1997 point (5.7) was plotted but never mentioned in the prose, even though it is one of
+  the rows in the very table the prose describes. Now named with the others.
+- **Accepted, and it reverses a claim.** "The federal figures do not cover [Kurdistan]" is no longer true
+  of the 2024 census, which reports the region separately. Narrowed to the older survey rounds, where the
+  zero-for-three-governorates table really does show the gap.
+- **Accepted.** "organised" → "organized"; "pipeline" and "on the same reasoning as Nigeria" both gone —
+  the second assumed the reader had read another country's entry.
+- **Logged, not plotted.** A 2018 survey round reportedly measured 3.6. The report is hosted on a
+  Kurdistan Regional Statistics Office path that serves HTML rather than the PDF, so I could not read it.
+  The page now says a 2018 figure is reported and why it is not on the chart.
+
+## Spain
+
+Verdict: minor problems. The agent reproduced our whole 2024 recalculation from INE's raw tables and
+checked our "within 0.01 every year" claim across all sixteen years, not just the two we quote — the worst
+year is 0.009. That claim stands.
+
+- **Accepted, dead link.** The link we showed readers 404s on INE's own server. One missing query
+  parameter; confirmed the fix returns 200 and lands on the births statistics page.
+- **Accepted.** "female population by single year of age every quarter back to 1971" overstates it: twice
+  a year from 1971, quarterly only since 2021.
+- **Accepted.** "The 2024 figure is the first release and will revise slightly" overstates how unsettled
+  it is. Replaced with what is certainly true — INE keeps revising the population these births are divided
+  by, so recent years can still move.
+- **Accepted.** INE glossed on first use, "Estadística Continua de Población" replaced with a plain
+  description, and the sentence about whole-table CSV downloads with no key cut.
+
+## Argentina
+
+Verdict: minor problems. Every plotted value verified against the ministry's own microdata and printed
+yearbook, and the steep fall independently corroborated against the national identity registry's series
+for all twelve years — it is real, not an artifact of an incomplete final year.
+
+- **Accepted, dead link.** 404. The live dataset is one path segment away.
+- **Accepted, and this one was our own invention.** We said the ministry's "own tables show 95% of a
+  year's registrations occurred that year and almost all the rest the year before". The ministry actually
+  says more than 95% are registered within three months — a different fact — and separately reports that
+  comparing registrations against the 2010 census left a 6% shortfall, still 3.8% after four years of late
+  records. We had fused a timeliness statement with a completeness one into a number that is in neither.
+  Both facts now stated as the source states them.
+- **Accepted.** The ministry warns that provinces had delays sending 2023 figures. That bears directly on
+  the years driving the fall and was missing. Added.
+- **Accepted.** "unlike Mexico there is no need to stop the series early" assumed the reader had read
+  Mexico; "vintage", "basis" and "seam" all replaced with plain wording.
+- **Accepted.** "the roughly 2.3 usually quoted" for 2014 undersold the match — the identity registry
+  publishes 2.36 against our 2.35. Now cited.
+
+## Poland
+
+Verdict: serious problems, all in the caveats — the plotted values check out against GUS's own published
+rate for 2023 and 2024.
+
+- **Accepted, overclaim.** We told readers GUS's residence rule "as a matter of law takes in Ukrainian
+  nationals given temporary registration after 2022 — so part of the recent fall is the denominator
+  growing." The government's own demographic report describes the population GUS uses for its rates as
+  excluding people staying temporarily, which points the other way, and flags the whole question as
+  unsettled. Rewritten to say plainly that it is unclear, which way it would cut, and that GUS does not
+  quantify it.
+- **Accepted.** "Nothing is flagged provisional, even 2025." GUS finalizes a year's rate in the November
+  of the following year and has not done so for 2025, so ours should be read as provisional whatever the
+  database says. Now said.
+- **Accepted, and it hides an extension.** "The series starts in 2013 because that is where the mid-year
+  population by single age begins" is true of the database we read, not of GUS's data. Population by single
+  year of age exists back to at least the 2002 census, and the Human Fertility Database carries Poland from
+  1971. Reworded, and the possible extension is now stated rather than implied away.
+- **Accepted.** Added the reason Eurostat's Polish figures run 0.03 to 0.04 above GUS's — a different
+  definition of resident — since a reader comparing sources will hit it.
+- **Rejected.** The agent reported the prose claiming 1.068 for 2025 against a chart showing 1.067. That
+  is my brief generator printing four significant figures of 1.0675; the page itself does not disagree.
+- **Accepted, cut.** The note about the printed yearbook reporting births in thousands while the database
+  returns raw counts is a note to whoever builds the pipeline, not to a reader.
+
+## Afghanistan
+
+Verdict: serious problems, though the plotted 5.3 verified exactly — including against the survey
+programme's own API, where the seven age-specific rates sum to our 5.29.
+
+- **Accepted.** The link we showed readers was the successor office's homepage, which never held the 2015
+  report and offers no path to it. Now links to the archived report we actually read.
+- **Accepted, softened.** "No Afghan source gives female population by age group outside it" is probably
+  false — the statistics office publishes population by sex and age group, reproduced in the UN
+  Demographic Yearbook. Neither the agent nor I could reach the office's own site to name the release, so
+  the claim is now about what we did not find rather than what does not exist.
+- **Accepted.** A 2022 household survey is reported to have measured 5.4. Neither of us could reach the
+  report, so it is described and not plotted.
+- **Accepted.** "vital registration", "age-specific rates", "band width" and "weighted sample" all
+  replaced with plain descriptions, and the web-archive sentence rewritten around what it means for the
+  reader rather than how we found the file.
