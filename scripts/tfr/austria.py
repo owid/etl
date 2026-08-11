@@ -123,4 +123,5 @@ def austria_detail(year):
 if __name__ == "__main__":
     t = austria_tfr()
     print(t.tail(6).to_string(index=False), f"({len(t)} years from {int(t.year.min())})")
-    print("Statistik Austria publishes 1.296 for 2025, 1.311 for 2024, 1.32 for 2023")
+    # its own rate, from the Gesamtfertilitätsrate row of table 1 of the births file
+    print("Statistik Austria publishes 1.29649 for 2025, 1.3115 for 2024, 1.3165 for 2023")

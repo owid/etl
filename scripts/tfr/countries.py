@@ -1992,13 +1992,14 @@ COUNTRIES = [
     C("Austria", "Statistik Austria — registered births by the mother's age, over the mean female "
       "population", austria_tfr,
       "Austria", "complete", True,
-      "The office publishes births by five-year age band of the mother from 2006, mean population by "
-      "single year of age from 2004, and its own rate to two decimals. Births by single year of the "
-      "mother's age exist only for the latest year.",
-      "We divided births by women in each band and summed. Our 1.301 for 2025 against a published "
-      "1.296, and 1.317 against 1.311 for 2024 — the third-of-a-percent gap is what working in bands "
-      "rather than single years costs. Doing 2025 at single-year detail, where that is possible, gives "
-      "1.2958 against the published 1.2965.",
+      "The office publishes births by five-year age group of the mother from 2006, mean population by "
+      "single year of age from 2004, and its own rate at full precision — 1.29649 for 2025. Its table of "
+      "births by single year of the mother's age covers only the latest year.",
+      "We divided births by women in each age group and summed. That gives 1.301 for 2025 against the "
+      "office's 1.2965, and 1.317 against its 1.3115 for 2024: using five-year age groups instead of each "
+      "single year of age changes the answer by about a third of a percent. For 2025, the one year where "
+      "births by single year of age are published, doing it at that detail instead gives 1.2958 — within a "
+      "thousandth of the office's own figure.",
       "Austria's rate has fallen every year since 2021 except one, from 1.48 to 1.30. The nationality "
       "split is 1.22 for Austrian mothers against 1.58 for foreign ones in 2024 — and broken down "
       "further, by individual nationality, it runs from 3.79 for Syrian mothers to 0.66 for Iranian, a "

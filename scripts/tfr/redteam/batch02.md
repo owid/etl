@@ -2076,3 +2076,34 @@ nowhere near.
   avoid, and it is the mistake three pages in this collection actually made. The operation now sits in its
   own sentence between the counts and the rate, which clears the guard and makes the arithmetic legible at
   the same time.
+
+## Austria
+
+Verdict: minor problems. This one had to be launched twice — the first agent stalled for ten minutes and
+was killed — and the relaunch, told explicitly not to fight the query tool, verified the birth counts
+against three separate press releases and confirmed the July-timing claim almost word for word.
+
+- **Accepted, and I could settle what the agent could not.** The page quoted two different "published"
+  figures for 2025 a sentence apart, 1.296 and 1.2965, and the agent could not verify either: the office's
+  February 2026 release gives a preliminary 1.29 and says the final indicators would arrive around
+  mid-July 2026, once the mean population is settled. That date has passed. The office's own births file,
+  which our loader already downloads, carries a Gesamtfertilitätsrate row: 1.29649 for 2025, 1.3115 for
+  2024, 1.3165 for 2023. So both figures were the same number quoted to different precision. The page now
+  gives it once.
+- **Accepted.** "Its own rate to two decimals" is wrong for the same reason — the file publishes it at
+  full precision. That claim is what made the three- and four-decimal comparisons look inconsistent.
+- **Confirmed rather than accepted.** "Births by single year of the mother's age exist only for the latest
+  year" is the shape of claim that has been wrong twenty-five times, and the agent's two attempts to check
+  it against the demographic yearbook hit 404s. The file's own table index settles it for this release:
+  table 17 is births by the mother's age and birth order for 2025 alone, while every other age table is by
+  five-year group since 2006. Reworded to be about the office's table rather than about existence in
+  general, since a yearbook annex could still carry history and nobody has read it.
+- **Accepted.** "The third-of-a-percent gap is what working in bands rather than single years costs" now
+  says what it means. The gaps are 0.39% and 0.46%, so "about a third of a percent" is approximate, and
+  the sentence says about.
+- **Left in place, and flagged.** The nationality figures — 1.22 for Austrian mothers against 1.58 for
+  foreign ones, and 3.79 for Syrian mothers down to 0.66 for Iranian — could not be verified this session.
+  Worth being explicit about why this is treated differently from Czechia's Ukraine percentages, which
+  were cut: there I established that the publications we cite carry no such table, so the claim had no
+  home. Here the agent simply could not reach the page, and nothing contradicts the figures. Someone
+  should attach a citable table to them.

@@ -53,15 +53,14 @@ report asserts about the page against the page. And for any country whose source
 than a file, tell the agent not to fight it and to fall back on published reports; that is what unstuck
 Poland.
 
-## In flight (2)
+## In flight (1)
 
 - Hungary
-- Austria
 
 ## Reported, awaiting write-up (0)
 
 
-## Analyzed (98)
+## Analyzed (99)
 
 - India
 - China
@@ -159,6 +158,7 @@ Poland.
 - Portugal
 - Greece
 - Israel
+- Austria
 - Switzerland
 - Sierra Leone
 
