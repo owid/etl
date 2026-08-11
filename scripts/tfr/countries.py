@@ -1573,45 +1573,52 @@ COUNTRIES = [
       "with nothing yet on fertility.",
       "https://www.insbu.bi/"),
     C("Haiti", "Ministry of Health — EMMUS survey rounds", haiti, "Haiti", "survey", False,
-      "Three survey rounds, the newest from 2016-17. The 2003 census publishes its fertility tables as "
-      "scanned images of printed pages.",
-      "We read the survey figures. We also divided the census's own counts and got 3.53, which is what "
-      "the institute's rounded statement of 4 children is built from — there is no more precise or "
-      "adjusted number being simplified away.",
-      "Haiti has had no fertility figure since 2016-17, and no census since 2003. The reason is stated "
-      "plainly by the statistics institute itself, which is rare: its 2024 population report says the "
-      "census cannot be run because of the security situation, that vital registration is too weak to "
-      "use, and that it is therefore adopting the UN's own projections rather than producing estimates of "
-      "its own. Its fertility and vital-statistics pages are live and empty, marked as pending. One "
-      "attribution point matters here. The surveys everyone cites as Haiti's fertility rate are run by a "
-      "child-health institute for the health ministry, with an American contractor named as co-preparer; "
-      "the statistics institute is credited only as a collaborator. They are still Haitian government "
-      "figures, which is why they are plotted, but the institute's own last fertility figure is the 2003 "
-      "census. The national archives, which would hold civil registration, no longer resolve at all.",
-      "https://ihsi.gouv.ht/recensement/resultat_rgph_2003"),
+      "The surveys go back to the 1990s; the three rounds plotted here are the ones with rates measured "
+      "the same way, the newest from 2016-17. The 2003 census publishes its fertility tables as scanned "
+      "images of printed pages.",
+      "We read the survey figures. For 2006 we plot 3.9 rather than the 4.0 on the front page of that "
+      "round's own report, because that round measured fertility over the five years before the survey "
+      "and the two later ones measured it over three: both later reports print 3.9 for 2006 whenever "
+      "they state the trend, and 3.9 is the figure measured the same way as the rest of the line. We "
+      "also divided the census's own counts and got 3.53. The institute publishes only \"4 children\" "
+      "for the census, with no decimal, so we cannot tell whether its 4 comes from the same division or "
+      "from an adjusted calculation. Our 3.53 is lower than the surveys either side of it imply — 4.7 "
+      "for 1994-95 and 3.9 for 2005-06 — which is the usual result when a census asks women how many "
+      "children they had in the previous twelve months, because recent births get missed.",
+      "Haiti has had no fertility figure since 2016-17, and no census since 2003. The statistics "
+      "institute says why in its own 2024 population report: the census could not be held, in what it "
+      "calls the country's many-sided crisis, and it is therefore taking its population figures from "
+      "CELADE, the UN's regional demographic center for Latin America, rather than producing estimates "
+      "of its own. Those CELADE figures were published in 2008, so Haiti's official population now rests "
+      "on projections made before the earthquake. The institute's page for birth and death registration "
+      "is live and empty, with every section marked as pending. The surveys everyone cites as Haiti's "
+      "fertility rate are run by a child-health institute for the health ministry, with an American firm "
+      "credited as co-author; the statistics institute is named only as a collaborator. They are still "
+      "Haitian government figures, which is why they are plotted, but the institute's own last fertility "
+      "figure is the 2003 census.",
+      "https://dhsprogram.com/publications/publication-fr326-dhs-final-reports.cfm"),
     C("South Sudan", "NBS — household and multiple-indicator surveys", south_sudan, "South Sudan",
       "survey", False,
-      "Two figures exist: 7.5 from the 2010 household health survey, run by the health ministry with the "
-      "statistics bureau, and 6.4 from the bureau's own 2025 survey, published as a preliminary report in "
-      "2026. The 2008 census tables, from before independence, publish women and births by age group.",
-      "We read both figures. We also divided the 2008 census's own counts and got 3.9 — half the survey's "
-      "figure two years later.",
-      "That gap is the finding, and it is a warning about census fertility questions generally. The 2008 "
-      "census asked women how many children they had borne in the previous twelve months; dividing those "
-      "answers gives 3.9, while a survey asking for full birth histories two years later gives 7.5. "
-      "Nobody thinks fertility doubled. Recent births are simply missed when asked about that way — which "
-      "is exactly what the offices that apply Brass and Arriaga corrections are trying to fix, and here we "
-      "can see the size of the problem uncorrected. That spread is why South Sudan has the largest gap "
-      "against the UN of any country here, by a wide margin — about 2.7 children. Its own instruments range "
-      "from 3.9 to 7.5 and the UN fits a smooth decline below all of them, from 6.0 in 2005 to 3.7 now. The "
-      "2025 survey is also a preliminary report published in 2026, after the UN's last revision, so it "
-      "could not have been taken into account. This is a country where the honest answer is that nobody "
-      "knows the level, not one where a single source is wrong. South Sudan has had no census since 2008, none since "
-      "independence, and no announced date for one. The bureau's own site is live and well stocked; the "
-      "two domains that look like it are an expired-hosting placeholder and a retired domain answering "
-      "403. Birth registration stands at 36%, and the finance ministry's own review calls the state of "
-      "the system pathetic. One document that looks like it should count does not: the 2013 population "
-      "estimation survey has no fertility figure in it.",
+      "Three figures. The bureau's own estimate from the 2008 census, 6.92, which it published in a 2013 "
+      "report on fertility and mortality in that census. Then 7.5 from the 2010 household health survey, "
+      "run by the health ministry with the bureau. Then 6.4 from the bureau's own 2025 survey, published "
+      "as a preliminary report in 2026. The census tables also publish women and births by age group.",
+      "We plot all three. We also divided the 2008 census's raw counts ourselves and got 3.9, a little "
+      "over half what the bureau itself gets from the same census.",
+      "That distance between 3.9 and 6.92 is the useful thing on this page, because both numbers come "
+      "out of the same census. The census asked women how many children they had borne in the previous "
+      "twelve months. Divide those answers directly and you get 3.9. The bureau did not stop there: it "
+      "combined them with the number of children each woman had ever borne, using standard methods for "
+      "filling in the births a census of this kind misses, and published 6.92. A survey asking women for "
+      "their full birth histories two years later gave 7.5. Nobody thinks fertility nearly doubled "
+      "between 2008 and 2010, so what the 3.9 measures is the size of the undercount, in one country's "
+      "own numbers. It is worth knowing that a raw census figure can be wrong by that much. The UN fits "
+      "a smooth decline below all three of South Sudan's figures, from 6.0 in 2005 to 3.7 now, about 2.7 "
+      "children below the latest national one. The 2025 survey is a preliminary report published in 2026, "
+      "after the UN's last revision, so it could not have been taken into account. This is a country "
+      "where the honest answer is that nobody knows the level, not one where a single source is wrong. "
+      "South Sudan has had no census since 2008, none since independence, and no announced date for one. "
+      "Birth registration stands at 36%.",
       "https://nbs.gov.ss/"),
     C("Bolivia", "INE — Demographic and Health Survey rounds", bolivia, "Bolivia", "survey", False,
       "Bolivia's statistics office, INE, runs a health survey every few years, and its 2023 fertility "

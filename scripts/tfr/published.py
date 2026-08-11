@@ -791,13 +791,21 @@ def burundi_detail(year):
 
 
 def south_sudan():
-    """The two national surveys South Sudan has.
+    """The bureau's own census estimate and the two national surveys.
+
+    2008 is the bureau's adjusted estimate from the census, 6.92, published in "Levels and Patterns of
+    Fertility and Mortality in South Sudan: Analysis of Census 2008" (NBS, 2013), table 4. That report
+    estimates fertility with the indirect techniques of the UN's Manual X, from children ever born and
+    births in the last twelve months, because the raw twelve-month answers alone give 3.9. Its national
+    age-specific rates sum to 6.92 and its state figures run from 4.71 in Western Equatoria to 8.62 in
+    Eastern Equatoria. The bureau's site no longer serves the PDF; it is readable in the Internet
+    Archive's 2017 capture of ssnbss.org.
 
     2010 is the household health survey, run by the health ministry with the statistics bureau
     before independence; 2025 is the bureau's own multiple-indicator survey, published in 2026 as a
     preliminary report.
     """
-    return _series([(2010, 7.5), (2025, 6.4)])
+    return _series([(2008, 6.92), (2010, 7.5), (2025, 6.4)])
 
 
 def haiti():
@@ -805,8 +813,16 @@ def haiti():
 
     The statistics institute is a collaborator on these rather than their author; its own last
     fertility figure is the 2003 census. See the note in countries.py.
+
+    2006 is 3.9, not the 4.0 on the front page of the 2005-06 report (FR192). That report measured
+    fertility over the five years before the survey; the 2012 and 2016-17 rounds measured it over
+    three, which is the standard window. Both later rounds print 3.9 for 2005-06 in their own trend
+    tables and in their own prose -- FR326 p.124, "l'ISF est passe de 3,9 enfants en 2006 a 3,5
+    enfants en 2012, pour se situer a 3,0 enfants en 2016-2017", and the trend row of its table 5.3.2,
+    "ISF 15-49  4,7  3,9  3,5  3,0". Plotting 4.0 would put a five-year window in a series of
+    three-year ones, and would disagree with the way the source itself states its own trend.
     """
-    return _series([(2006, 4.0), (2012, 3.5), (2017, 3.0)])
+    return _series([(2006, 3.9), (2012, 3.5), (2017, 3.0)])
 
 
 # the 2003 census's published tables 201 and 503: women by age group, and births in the previous

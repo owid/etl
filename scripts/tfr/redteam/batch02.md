@@ -1593,3 +1593,69 @@ the other label goes from "Rate copied from source, not validated" to **"Rate co
 Belgium is why: its page describes reproducing Statbel's rate for all 35 single ages exactly, under a
 label announcing the figure was "not validated". Both halves now say who computed the number and stop
 there. That removes the reading that made four separate reviewers argue about whether a label was earned.
+
+## Haiti
+
+Verdict: serious problems, and both were real. The 2003 census figure survived; a plotted value did not.
+
+- **Rejected, after recomputing it.** The agent could not verify our 3.53 for the 2003 census — IHSI
+  publishes only a bare "4" and the fertility tables are scanned images — and noticed that 3.53 is
+  suspiciously close to EMMUS-V's own precise 3.532 nine years later. A fair suspicion: a stray copy of
+  another survey's number is exactly the sort of error that would explain such a coincidence. It is a
+  coincidence. Summing the census's own age-specific rates from tables 201 and 503 gives 3.5299, and each
+  band's counts are in the code. The number stands.
+- **Accepted, and it changed a plotted point.** 2006 was plotted at 4.0, the headline of the 2005-06
+  survey's own report. That round measured fertility over the five years before the survey; the 2012 and
+  2016-17 rounds measured it over three. Both later reports print 3.9 for 2006 whenever they state the
+  trend — FR326 p.124, "l'ISF est passé de 3,9 enfants en 2006 à 3,5 enfants en 2012, pour se situer à
+  3,0 enfants en 2016-2017", and the trend row of its own table 5.3.2, "ISF 15-49  4,7  3,9  3,5  3,0".
+  Verified in the PDF before changing the value. Plotting 4.0 put a five-year window in a series of
+  three-year ones and disagreed with the way the source states its own trend. Now 3.9.
+- **Accepted.** "There is no more precise or adjusted number being simplified away" claimed to know how
+  IHSI got its 4, which we cannot know from a page that prints only "4". Replaced with what is true: we
+  divided its counts and got 3.53, and cannot tell whether its 4 comes from the same division or from an
+  adjusted one. The page now also says why 3.53 is lower than the surveys either side of it — a census
+  asking about the previous twelve months misses recent births.
+- **Accepted.** The "Source" link went to IHSI's 2003 census page while the source line reads "Ministry of
+  Health — EMMUS survey rounds", so a reader checking the plotted series landed on a different agency's
+  census. It now points at the survey report the series comes from.
+- **Accepted.** "The UN's own projections" is not what IHSI adopted; it adopted CELADE's, the UN's regional
+  demographic center for Latin America, published in 2008. Named properly, with the consequence stated:
+  Haiti's official population now rests on projections made before the earthquake. Also narrowed the
+  "live and empty" claim to the one page that is confirmed empty, softened the census's cancellation to
+  the crisis language the report itself uses, cut "One attribution point matters here" and "which is
+  rare", cut the sentence about the national archives not resolving (our access problem, not Haiti's
+  data), and changed "co-preparer" to "co-author" and "three survey rounds" to the three we plot.
+
+## South Sudan
+
+Verdict: the nineteenth false absence claim, and the most costly one yet — the document we dismissed as
+having no fertility figure in it contains the bureau's own corrected fertility estimate for the census
+whose numbers the whole page was built around.
+
+- **Accepted, and it rewrote the page.** "One document that looks like it should count does not: the 2013
+  population estimation survey has no fertility figure in it." No survey by that name exists. What exists
+  is NBS, *Levels and Patterns of Fertility and Mortality in South Sudan: Analysis of Census 2008* (2013),
+  whose entire subject is fertility from that census. The bureau's site no longer serves it and the agent
+  was blocked from opening it; the Internet Archive's 2017 capture of ssnbss.org has it. Its table 4 gives
+  a national total fertility rate of **6.92**, with state values from 4.71 in Western Equatoria to 8.62 in
+  Eastern Equatoria, estimated with the indirect techniques of the UN's Manual X from children ever born
+  and births in the last twelve months. 6.92 is now plotted at 2008.
+- **What that does to the page.** We had presented our own 3.9 — the census's raw twelve-month answers,
+  divided — against the 2010 survey's 7.5, and written that the doubling shows what "the offices that
+  apply Brass and Arriaga corrections are trying to fix". The mechanism was right and the framing was
+  wrong in the worst available way: this office did apply the correction, to this census, and published
+  the result. The page now sets 3.9 against the bureau's own 6.92 from the same census, which is a
+  stronger demonstration of the same point and no longer implies South Sudan failed to do something it
+  did. Its three national figures — 6.92, 7.5, 6.4 — now agree far better with each other than any of
+  them does with the UN.
+- **Accepted.** "The finance ministry's own review calls the state of the system pathetic" could not be
+  substantiated by the agent, and this session's web-search budget was spent, so it could not be
+  substantiated here either. Cut. Birth registration at 36% stays; that one is confirmed exactly, as
+  indicator PR.1 of the 2025 survey.
+- **Accepted.** Cut the sentence about the bureau's live site and the two lookalike domains — a note on
+  our own link checking. Replaced "Brass and Arriaga corrections" with what they do in plain words, and
+  dropped "the largest gap against the UN of any country here", which asks the reader to trust a ranking
+  across pages they have not seen.
+- **Noted, not changed.** Both survey points sit at their fieldwork year rather than the midpoint of the
+  three years each rate covers. That is the convention across this collection and it stays.
