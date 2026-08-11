@@ -1368,3 +1368,55 @@ and surveys moving in opposite directions — is real, not a mix-up.
   it" — it breaks 4.8 down by region and education. What is missing is only the birth and women counts.
 - **Accepted.** "Benin is the case where an office admits..." presumed a set of cases the reader has
   seen; the office is named in full; and indirect estimation is now described rather than named.
+
+## Cambodia
+
+Verdict: minor problems. Every plotted value verified, and all four of the census raw-and-adjusted
+pairs confirmed against the primary reports — 1.6 against 3.1 for 2008, 2.05 against 2.8 for 2013,
+1.67 against 2.51 for 2019, 1.4 against about 2.3 for 2024. Our re-sum of the 2019 rates reproduced
+too. The judgment not to splice the census series onto the survey series was confirmed as the right
+call.
+
+- **Accepted, false in half.** "The 2008 census and the 2024 survey are scanned images, so their
+  figures had to be read by optical character recognition." True of 2024; the 2008 report is
+  born-digital and extracts cleanly, checked across three separate copies. It was also a sentence about
+  our own extraction process, so it is gone either way.
+- **Accepted.** "Cambodia is the most systematic case of census adjustment we have found anywhere"
+  compares the entry to a collection the reader has not seen. Now states the fact instead: the office
+  has corrected its census figure on every count since 2008.
+- **Accepted.** Four method names given with no gloss are now introduced as what they are, statistical
+  techniques for correcting under-reported births. "Brass-Arriaga suits Cambodia best" is narrowed to
+  the two rounds that actually say it — the earlier two averaged across a range.
+- **Accepted.** "Between half and two thirds" was slightly wrong for 2013, where the ratio is 73%; now
+  "about half and three quarters". "Confirms the table but not the figure" is plainer.
+
+## Cross-cutting: the session's agent budget ran out
+
+The campaign reached its limit of 200 subagents with 21 countries still to review. Four were in flight
+at that point — Guinea, Rwanda, Burundi and Bolivia — and they will still report, but no replacements
+can be launched, so `--audit` will correctly complain that four agents are out rather than five until
+the budget resets.
+
+Where the campaign got to: 75 of 100 written up. The remaining 21 are listed under To do in AGENTS.md,
+in population-rank order, and every one of them can be reviewed the same way — the brief generator, the
+standard prompt with its absence-claim instruction, and the audit all work unchanged.
+
+## Guinea
+
+Verdict: minor problems — and our sharpest claim here was confirmed exactly. The agent found the census
+annex, recomputed the rates itself, and reproduced the whole finding: the raw rate for 15-19 is 105.3
+per thousand against a published 130.5, a 24% increase, while every band from 20 to 49 differs by
+between 0.08% and 1.02%. Our 5.19 against the published 5.3 reproduced too, and the office really does
+state only its overall conclusion without pointing out where the correction lands.
+
+- **Accepted, wrong year.** "The 2018 survey's own table carries the rounds back to 1992." It goes back
+  to 1999; 1992 appears in that report only in its bibliography and a list of past rounds, with no
+  figure attached.
+- **Accepted, and doubly wrong.** "The claim that the 2024 census has published preliminary results,
+  which we could not confirm." There was no 2024 census — Guinea's fourth was fielded in 2025, and its
+  preliminary population results were published in early 2026 through the prime minister's office,
+  confirmable without going near the compromised domain. So the year was wrong and the thing we called
+  unconfirmable was confirmable. It carries no fertility figure, so nothing plotted changes.
+- **Accepted.** Three sentences of forensics about gambling spam served under the real reports' paths cut
+  to the one clause a reader needs. INS spelled out, the Arriaga and P/F machinery described rather than
+  named, and both sentences addressed to a fellow analyst rewritten.

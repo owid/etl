@@ -1446,45 +1446,49 @@ COUNTRIES = [
       "five, but is not used for any fertility figure.",
       "https://instad.bj/"),
     C("Cambodia", "NIS — Demographic and Health Survey rounds", cambodia, "Cambodia", "survey", False,
-      "The 2021-22 survey charts every round since 2000. Separately, the censuses and the surveys "
-      "taken between them, in 2008, 2013, 2019 and 2024 each publish a fertility figure with the arithmetic behind it.",
-      "We read the survey series. We also summed the 2019 census's own published age-specific rates and "
-      "got 2.512 against its printed 2.51, which confirms the table but not the figure — the rates are the "
-      "adjusted ones, and the raw counts they were built from are not published.",
-      "Cambodia is the most systematic case of census adjustment we have found anywhere. NIS has run the "
-      "same exercise four times running and printed both numbers each time: births reported in the twelve "
-      "months before the count give 1.6 in 2008 against an adopted 3.1, 2.05 in 2013 against 2.8, 1.67 in "
-      "2019 against 2.51, and 1.4 in 2024 against about 2.3. The raw figure is between half and two thirds "
-      "of the published one, every time, and the correction is roughly 1.4 to 1.9 times. NIS names the "
-      "methods — Brass, Arriaga, Rele, a relational Gompertz curve — says Brass-Arriaga suits Cambodia "
-      "best, and explains the under-reporting it is correcting for: children who were born and then died "
-      "go undeclared, dates get misplaced, and someone other than the mother often answers. So this is "
-      "settled institutional practice, not a one-off. It also means the census series and the survey "
-      "series are not measuring the same way and should not be spliced: the surveys are flat at 2.7 from "
-      "2014 to 2022 while the adjusted census series falls. One caution about citing across documents — "
-      "the 2019 census report looks back at 2008 and gives 2.7, which is one method's value from the 2008 "
-      "table rather than the 3.1 that report actually adopted. Registration is not used at all, though "
-      "92% of under-fives are registered. The 2008 census and the 2024 survey are scanned images, so their "
-      "figures had to be read by optical character recognition, and the 2024 report's own two tables "
-      "disagree about its own answer.",
+      "Cambodia's National Institute of Statistics publishes a fertility rate from each round of its "
+      "Demographic and Health Survey, and the 2021-22 report charts every round since 2000. The 2008 and "
+      "2019 censuses, and the surveys taken in between and after them in 2013 and 2024, each publish a "
+      "figure with the calculation behind it.",
+      "We use the rate each survey round published. We also added up the 2019 census's own rates by age "
+      "group and got 2.512 against its printed 2.51 — which shows the table adds up, not that the number "
+      "behind it is right, because those rates are the corrected ones and the counts they came from are not "
+      "published.",
+      "The office has corrected its census fertility figure on every count since 2008, and printed both "
+      "numbers each time: births reported in the twelve months before the count give 1.6 in 2008 against an "
+      "adopted 3.1, 2.05 in 2013 against 2.8, 1.67 in 2019 against 2.51, and 1.4 in 2024 against about 2.3. "
+      "The uncorrected figure runs between about half and three quarters of the published one every time. It "
+      "names the statistical techniques it uses to correct for under-reported births — Brass, Arriaga, Rele "
+      "and a relational Gompertz curve — and in the two most recent rounds says the Brass-Arriaga "
+      "combination suits Cambodia best; in the earlier two it averaged across a range instead. It also "
+      "explains the under-reporting it is correcting for: children who were born and then died go "
+      "undeclared, dates get misplaced, and someone other than the mother often answers. So this is settled "
+      "practice rather than a one-off. It also means the census figures and the survey figures are not "
+      "measuring the same way and should not be joined into one line: the surveys are flat at 2.7 from 2014 "
+      "to 2022 while the corrected census figures fall. One thing to watch when comparing documents: the "
+      "2019 census report looks back at 2008 and gives 2.7, which is one method's value from the 2008 table "
+      "rather than the 3.1 that report actually adopted. Registration is not used at all, though 92% of "
+      "children under five are registered. The 2024 report's own two tables also disagree about its answer.",
       "https://nis.gov.kh/"),
     C("Guinea", "INS — Demographic and Health Survey rounds", guinea, "Guinea", "survey", False,
-      "The 2018 survey's own table carries the rounds back to 1992. The 2014 census publishes the counts "
-      "behind its figure in an annex: women by age group, and births in the twelve months before the count.",
-      "We read the survey series. We also divided the census's own counts and got 5.19 against the 5.3 it "
-      "publishes, then compared age by age — which is where the interesting part is.",
-      "Guinea's correction is the most selective one we have found. INS applied the Arriaga method, said "
-      "why — the P/F ratios ran from 1.04 to 1.98, well above the 1.02 threshold, so recent births were "
-      "under-reported — and the net effect on the total is only about 2%, far smaller than Mali's or "
-      "Ghana's. But it is not a level shift. For every age group from 20 to 49 the published rate is within "
-      "1% of the counted one; the entire correction lands on 15-19, where 105 per thousand becomes 130, a "
-      "24% increase. INS never says this, and it only shows up if you recompute the rates yourself. "
-      "Registration is not used and could not be: 62% of under-fives are registered and 51% have a "
-      "certificate. One thing readers should know about the source: INS's own website is unreachable, and "
-      "archived copies of it from mid-2025 onward serve gambling spam under the same article and file "
-      "paths the real reports used — so anything dated 2025 or later and sourced only from that domain "
-      "needs checking elsewhere. That includes the claim that the 2024 census has published preliminary "
-      "results, which we could not confirm. The documents used here are archived copies from 2018.",
+      "Guinea's national statistics institute, INS, publishes a fertility rate from each round of its "
+      "Demographic and Health Survey, and the 2018 report's table carries the rounds back to 1999. The 2014 "
+      "census publishes the counts behind its own figure in an annex: women by age group, and births in the "
+      "twelve months before the count.",
+      "We use the rate each survey round published. We also rebuilt the census figure from its counts — "
+      "dividing each age group's births by its women, summing and multiplying by five — and got 5.19 against "
+      "the 5.3 it publishes, then compared it age group by age group.",
+      "That comparison shows something the census report does not. The office raised the census's birth "
+      "counts because a standard check, comparing the children women report having had over their lifetimes "
+      "against their recent births, showed the recent ones were too low. The effect on the total is small, "
+      "about 2%. But the fix was not spread evenly across ages: for every age group from 20 to 49 the "
+      "published rate is within 1% of the counted one, and the whole correction lands on 15-19, where 105 "
+      "births per thousand women becomes 130, a 24% increase. The report states its overall conclusion but "
+      "never points this out; it appears only when the rates are recalculated from the counts it publishes. "
+      "Birth registration cannot substitute as a source here: 62% of children under five are registered and "
+      "51% hold a certificate. The documents used here are archived copies from 2018, because INS's own site "
+      "is currently unreachable. Guinea ran a new census in 2025, and preliminary population results were "
+      "published in early 2026, but they carry no fertility figure.",
       "https://www.dhsprogram.com/pubs/pdf/FR353/FR353.pdf"),
     C("Romania", "INS — births by age of mother divided by the resident population", romania_tfr, "Romania",
       "complete", True,

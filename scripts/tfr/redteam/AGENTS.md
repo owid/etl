@@ -28,10 +28,14 @@ minutes trying to enumerate variable IDs in the Polish statistics API. Its repla
 to fight the interface and to fall back to published reports instead. Give that instruction to any
 country whose source is an interface rather than a file.
 
-## In flight (5)
+**The session that ran this campaign hit its cap of 200 subagents with 21 countries still to do.**
+Rwanda, Burundi and Bolivia were out at that point and will still report; no replacements could be
+launched. So `--audit` correctly reports three agents in flight rather than five until a session with
+budget picks the campaign back up. Everything needed to continue is unchanged: the brief generator,
+the standard prompt with its absence-claim instruction, and this ledger.
 
-- Cambodia
-- Guinea
+## In flight (3)
+
 - Rwanda
 - Burundi
 - Bolivia
@@ -39,7 +43,7 @@ country whose source is an interface rather than a file.
 ## Reported, awaiting write-up (0)
 
 
-## Analyzed (74)
+## Analyzed (76)
 
 - India
 - China
@@ -113,7 +117,9 @@ country whose source is an interface rather than a file.
 - Romania
 - Netherlands
 - Ecuador
+- Cambodia
 - Zimbabwe
+- Guinea
 - Benin
 
 ## To do (21)
