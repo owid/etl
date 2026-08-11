@@ -1680,21 +1680,27 @@ COUNTRIES = [
       "which asked women directly rather than counting registrations, reported 3.8 for the three years "
       "before it — about 30% above what registration gives for the same years.",
       "https://www.stat.tj/ru/elektronnye-versii-publikaczij-arhiv/"),
-    C("Sweden", "SCB — births by age of mother divided by the mean population", sweden_tfr, "Sweden",
-      "complete", True,
-      "SCB's database serves births by single year of the mother's age from 1968, mean population by "
-      "single year of age, and its own rate — all without a key.",
-      "We divided births at each single age by the women of that age and summed. Our 1.4245 for 2024 "
-      "against SCB's published 1.43, and 1.4466 against 1.45 for 2023.",
-      "Sweden's rate is at a record low and still falling: 1.85 in 2016 to 1.42 in 2025 on SCB's own "
-      "figures. The half-percent gap in our numbers is a definition rather than an error, and it is worth "
-      "knowing about. The public births table records the age the mother had reached by the end of the "
-      "year; SCB's own rate uses her age at the birth itself. Summing SCB's own five-year age-specific "
-      "rates instead reproduces its published figure exactly, which is how we know that is the whole of "
-      "the difference. SCB says outright that the denominator is the mean of the population at the start "
-      "and the end of the year, and it covers everyone registered as resident whatever their citizenship. "
-      "One trap in the tables: the current-year population table carries a marital-status code that is a "
-      "total across the others, so adding it in doubles the population.",
+    C("Sweden", "Statistics Sweden — births by the mother's age, over the mean female population",
+      sweden_tfr, "Sweden", "complete", True,
+      "Statistics Sweden's database serves births by single year of the mother's age from 1968, mean "
+      "population by single year of age, and its own rate. All of it downloads freely, with no "
+      "registration and no access key.",
+      "We divided births at each single age by the women of that age and summed. That gives 1.4245 for "
+      "2024 against the office's published 1.43, and 1.4466 against 1.45 for 2023 — the extra digits are "
+      "there only to make the small gap visible.",
+      "Sweden's rate is at a record low and still falling: 1.85 in 2016 to 1.43 in 2024 on the office's "
+      "own figures, and it has since published 1.42 for 2025. That last year is not plotted here, because "
+      "the two tables this series is rebuilt from — births and mean population by single year of age — "
+      "still stop at 2024, and copying one year's published rate into a series recalculated from counts "
+      "would mix two methods in one line. The gap of about four tenths of a percent between our figures "
+      "and the office's is a definition rather than an error, and the office documents it: the public "
+      "births table records the age the mother had reached by the end of the year, while its own rate uses "
+      "her age at the birth itself. Summing its five-year rates instead reproduces its published figure "
+      "exactly. It also states outright that it divides by the mean of the population at the start and the "
+      "end of the year, and that this covers everyone registered as resident whatever their citizenship. "
+      "One trap in the tables: alongside the individual marital statuses, the population table carries an "
+      "\"all marital statuses\" row, so counting that row as well as the individual ones counts everyone "
+      "twice.",
       "https://www.scb.se/be0101"),
     C("Jordan", "DOS — Population and Family Health Survey", jordan, "Jordan", "survey", False,
       "The survey rate, every five or six years. The Department of Statistics also publishes registered "

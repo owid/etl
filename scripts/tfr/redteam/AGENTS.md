@@ -47,16 +47,16 @@ Poland.
 
 ## In flight (5)
 
-- Sweden
 - Czechia
 - Azerbaijan
 - Portugal
 - Greece
+- Israel
 
 ## Reported, awaiting write-up (0)
 
 
-## Analyzed (90)
+## Analyzed (91)
 
 - India
 - China
@@ -148,10 +148,10 @@ Poland.
 - Tajikistan
 - Papua New Guinea
 - Cuba
+- Sweden
 
-## To do (5)
+## To do (4)
 
-- Israel
 - Hungary
 - Austria
 - Switzerland

@@ -1839,3 +1839,33 @@ estimates, which is not what an already-computed rate is, and now says we take t
 the mother's age — which is also what its "what we did" block says, and DOSM does not state what
 population its rate divides by. Azerbaijan's and Czechia's are the two left, deliberately: both are under
 review as this is written, and changing the text an agent is holding invites a phantom finding.
+
+## Sweden
+
+Verdict: minor problems. Values confirmed against the office's own press releases, and the agent
+reproduced the recalculation gap itself rather than taking our word for it.
+
+- **Rejected after checking the source tables, and it produced a better sentence anyway.** The report
+  said the page is a year behind: the office published 1.42 for 2025 in February 2026, the prose already
+  cites it, and "the underlying single-year-of-age tables needed to recompute it already carry 2025
+  columns". They do not. The table the agent saw with 2025 in it is the office's own computed rate by
+  region; the two tables this series is rebuilt from — births by single year of the mother's age, and
+  mean population by single year of age — both stop at 2024. I deleted the local cache and re-fetched
+  the metadata from the API to be sure: 1968-2024 and 2006-2024. So 2025 cannot be recalculated yet, and
+  copying the office's published rate for that one year would put a copied point in a line built from
+  counts. The page now says that outright instead of quoting a year it does not draw.
+- **Accepted.** "Summing SCB's own five-year age-specific rates instead reproduces its published figure
+  exactly, which is how we know that is the whole of the difference." That framing claims we worked out
+  the age definition ourselves. The office's quality declaration for this product, one click from the
+  link we give the reader, states the rule in its variable definitions and gives the formal definition of
+  its own fertility rate as using age at the birth. Now written as something the office documents.
+- **Accepted.** "All without a key" meant no API key and read as unexplained jargon. Expanded SCB to
+  Statistics Sweden on first use. Rewrote the marital-status trap as what it is — an "all marital
+  statuses" row next to the individual ones, which double-counts if you add it in.
+- **Accepted.** "The half-percent gap" is 0.39% for 2024 and 0.24% for 2023; now given as about four
+  tenths of a percent. And the four-decimal figures now say why they carry four decimals.
+- **Sound, and worth recording.** The agent chased the finality question properly: the press release
+  carries a boilerplate "statistics are preliminary" line, but the office's own method document says
+  annual figures become final on publication and are never revised again, and the 2024 figure was
+  unchanged in the release a year later. This is the opposite of the vintage problem that forced five
+  other countries to drop their last year.
