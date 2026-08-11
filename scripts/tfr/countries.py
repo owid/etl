@@ -1373,22 +1373,21 @@ COUNTRIES = [
       "https://www.cbs.nl/nl-nl/cijfers/detail/85722ned"),
     C("Zimbabwe", "ZIMSTAT — census and Demographic and Health Survey rounds", zimbabwe, "Zimbabwe",
       "survey", False,
-      "The 2022 census has a dedicated fertility report, and it publishes the counts behind its figure: "
-      "women enumerated and births in the previous twelve months, by age group. The health survey series "
-      "runs alongside it.",
-      "We read the published rates. We also divided the census's own counts — 438,776 births over 3,814,701 "
-      "women 15-49 — and got 3.72, which rounds to the 3.7 it publishes.",
-      "Zimbabwe belongs with Madagascar, Niger and Senegal's 2013 census in a group worth naming: offices "
-      "that computed an indirect correction and then chose not to use it. ZIMSTAT ran two — an Arriaga "
-      "estimate gave 3.8 and a Gompertz curve gave 3.7 against the counted 3.7 — and said that because the "
-      "three agree, the direct estimate is robust and the unadjusted figure is what it would use "
-      "throughout. That is the opposite outcome from Mali or Ghana, on the same method. Registration is not "
-      "used for any of this and could not be: ZIMSTAT's own vital-statistics report puts birth-registration "
-      "completeness at 30.9% for 2023 and 26.4% for 2024, falling rather than rising, because mobile "
-      "registration drives in 2022 and 2023 pulled registrations forward. That report does publish "
-      "registered births by age of mother, but computes no rate from them. The 2012 census report is no "
-      "longer on ZIMSTAT's site and is not in any web archive, so its 3.8 survives only as a citation "
-      "inside the 2022 report.",
+      "Zimbabwe's statistics agency, ZIMSTAT, gave its 2022 census a dedicated fertility report. The counts "
+      "behind its figure — women counted and births in the previous twelve months, by age group — are in the "
+      "main census report rather than that one. The health survey series runs alongside both.",
+      "We read the published rates. We also checked the census: dividing each age group's births by its "
+      "women, adding the seven results and multiplying by five gives 3.72, which rounds to the 3.7 it "
+      "publishes. Those counts come to 438,776 births among 3,814,701 women — dividing those two totals "
+      "gives the general fertility rate of 115 per thousand that ZIMSTAT also reports, not the fertility "
+      "rate itself.",
+      "ZIMSTAT ran two standard techniques for adjusting undercounted recent births as a check on its "
+      "census figure — one gave 3.8 and the other 3.7 against the counted 3.7 — and concluded that because "
+      "the three agree, the direct estimate is sound and the unadjusted figure is the one it would use "
+      "throughout. Registration is not used for any of this and could not be: ZIMSTAT's own vital-statistics "
+      "report puts birth-registration completeness at 30.9% for 2023 and 26.4% for 2024, falling rather "
+      "than rising, because mobile registration drives in 2022 and 2023 pulled registrations forward. That "
+      "report does publish registered births by age of mother, but computes no rate from them.",
       "https://www.zimstat.co.zw/wp-content/uploads/Census/Fertility_Report.pdf"),
     C("Ecuador", "INEC — registered births divided by its population estimates", ecuador_tfr, "Ecuador",
       "complete", True,

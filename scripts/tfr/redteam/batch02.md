@@ -1298,3 +1298,31 @@ Verdict: serious problems, and the one entry in this batch whose numbers I would
   Now said, and that report is also a route to extending the series back decades.
 - **Accepted.** The export-endpoint sentence is gone, and 2024 is flagged as still moving under our own
   stated three-year revision rule.
+
+## Zimbabwe
+
+Verdict: serious problems. Every plotted value verified against ZIMSTAT's own reports, the 2022
+age-band counts match its main census report band for band, and we plot the right side of its
+correction — the direct figure, which is what ZIMSTAT itself uses. But three claims around them were
+wrong.
+
+- **Accepted, and it is the third instance of one mistake.** "We divided the census's own counts —
+  438,776 births over 3,814,701 women 15-49 — and got 3.72." That division gives 0.115, which is the
+  general fertility rate ZIMSTAT separately reports as 115 per thousand. The total fertility rate needs
+  each age group divided separately, summed, and multiplied by five. Malawi and Senegal carried the same
+  sentence in this batch.
+- **Acted on beyond the country.** Three instances is a template I propagated, so I swept the whole
+  collection: extract every pair of counts sitting near a rate in reader-facing prose and test whether
+  the division can produce it. Zimbabwe was the only remaining hit; Hungary showed up as a false
+  positive, comparing two birth totals rather than dividing. `redteam.py --audit` now runs that scan on
+  every pass, skipping pairs of similar magnitude, since births are always a small fraction of women.
+  It reproduces the broken sentence as a hit and passes on the fixed ones.
+- **Accepted, the fourteenth false absence claim.** "The 2012 census report is no longer on ZIMSTAT's
+  site and is not in any web archive, so its 3.8 survives only as a citation inside the 2022 report."
+  It is in the Wayback Machine, readable, and states the figure directly.
+- **Accepted, and the link was pointing at the wrong document.** We said the dedicated fertility report
+  publishes the counts behind its figure. It publishes rates only; the counts are in the main census
+  report. A reader following our link to check them would not have found them.
+- **Accepted.** Two sentences grouped Zimbabwe with Madagascar, Niger, Senegal, Mali and Ghana as though
+  the reader had read all five. Both gone, and the two adjustment techniques are described rather than
+  named.

@@ -270,9 +270,40 @@ def audit():
         problems.append(f"written up in the findings logs but not listed as analyzed: {name}")
     for bad in unmatched_headings():
         problems.append(f"log heading names no country in the registry: {bad}")
+    for bad in impossible_arithmetic():
+        problems.append(f"arithmetic the text cannot support — read it: {bad}")
     if len(flight) != 5:
         problems.append(f"{len(flight)} agents in flight, not 5: {', '.join(flight) or 'none'}")
     return problems
+
+
+def impossible_arithmetic():
+    """Prose that quotes two counts and a rate the counts cannot produce.
+
+    Three entries described dividing a year's births by a count of women and getting a fertility rate.
+    That division gives a general fertility rate, around 0.1, not a total fertility rate around 4 —
+    the total needs each age group divided separately, summed, and multiplied by the band width. All
+    three read plausibly and none of them could ever have been right.
+
+    Candidates only: a country legitimately quoting two counts and an unrelated rate in one sentence
+    will show up here too, so each hit needs reading rather than trusting.
+    """
+    pat = re.compile(r"([\d]{2,3}(?:,\d{3})+)[^.]{0,60}?([\d]{1,3}(?:,\d{3})+)[^.]{0,80}?(\d\.\d+)")
+    out = []
+    for name, doc in DOCS.items():
+        for block in doc[:3]:
+            for m in pat.finditer(block or ""):
+                a = float(m.group(1).replace(",", ""))
+                b = float(m.group(2).replace(",", ""))
+                c = float(m.group(3))
+                # two numbers of the same size are one quantity being compared against another, not a
+                # numerator and a denominator — births are always a small fraction of women
+                if not b or 0.5 < a / b < 2:
+                    continue
+                if abs(a / b - c) < 0.05 or abs(a / b * 5 - c) < 0.05:
+                    continue
+                out.append(f"{name}: {m.group(1)} / {m.group(2)} = {a / b:.4f}, but the text says {c}")
+    return out
 
 
 def progress():

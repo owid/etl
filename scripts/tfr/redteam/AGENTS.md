@@ -32,14 +32,14 @@ country whose source is an interface rather than a file.
 
 - Ecuador
 - Cambodia
-- Zimbabwe
 - Guinea
 - Benin
+- Rwanda
 
 ## Reported, awaiting write-up (0)
 
 
-## Analyzed (71)
+## Analyzed (72)
 
 - India
 - China
@@ -112,10 +112,10 @@ country whose source is an interface rather than a file.
 - Guatemala
 - Romania
 - Netherlands
+- Zimbabwe
 
-## To do (24)
+## To do (23)
 
-- Rwanda
 - Burundi
 - Bolivia
 - South Sudan
