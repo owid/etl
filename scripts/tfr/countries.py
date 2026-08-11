@@ -1052,7 +1052,7 @@ COUNTRIES = [
       "structure is a weighted sample, not a population count, and no Afghan source gives female population "
       "by age group outside it, so there is nothing to recalculate from.",
       "https://nsia.gov.af/"),
-    C("Algeria", "ONS — Démographie Algérienne", algeria, "Algeria", "complete", False,
+    C("Algeria", "ONS — Démographie Algérienne", algeria, "Algeria", "incomplete", False,
       "The annual bulletin's main indicators table gives a fertility index for most years from 2002, "
       "alongside births and age-specific rates. Female population by five-year age group is in the same "
       "bulletin.",
@@ -1157,18 +1157,27 @@ COUNTRIES = [
       "that is really a collapse in recording.",
       "https://www.knbs.or.ke/wp-content/uploads/2024/05/2019-Kenya-population-and-Housing-Census-"
       "Analytical-Report-on-Fertility-and-Nuptiality-Vol.VI_.pdf"),
-    C("Myanmar", "Department of Population — 2019 Inter-censal Survey", myanmar_tfr, "Myanmar",
-      "survey", True,
-      "Appendix table D-1 of the Union Report gives, for every five-year age group, the number of women "
-      "enumerated and the number of live births in the twelve months before the survey, plus the "
-      "department's own age-specific rate.",
-      "We divided births by women in each age group and summed, times five, the width of each age group. Every rate we get "
-      "matches the printed one to the second decimal, and our total of 2.007 is the published 2.0.",
-      "This is a sample survey, not registration: the counts are the survey's own enumerated households "
-      "scaled up, and a twelve-month recall question misses births. The 2014 census gave 2.5 by the same "
-      "kind of table. Nothing more recent is published — a 2024 census has been run but its fertility "
-      "results are not out.",
-      "https://www.dop.gov.mm/sites/dop.gov.mm/files/publication_docs/ics_appendixtables_en.pdf"),
+    C("Myanmar", "Department of Population — 2024 census and 2019 Inter-censal Survey", myanmar_tfr,
+      "Myanmar", "survey", True,
+      "For both its 2024 census and its 2019 inter-censal survey, the Department of Population publishes an "
+      "appendix table giving, for every five-year age group of women in ordinary households, the number of "
+      "women counted, the live births they reported in the twelve months before enumeration, and the "
+      "department's own rate for that group. The 2024 census also publishes a second, higher figure — 1.8 "
+      "against the 1.4 the reported births give — worked out by a different method.",
+      "We divided each age group's births by its women, added the seven results, and multiplied by five, the "
+      "number of years in each group. That reproduces every rate the department prints, and gives 2.007 "
+      "against its published 2.0 for 2019 and 1.401 against its published 1.40 for 2024. Both plotted points "
+      "are the reported-births figure, so they are on the same method.",
+      "The department's own preferred figure for 2024 is the higher one, 1.8. It is built from the children "
+      "older women report ever having had, which corrects for births a twelve-month recall question misses, "
+      "and the department calls it the more robust of the two. We plot 1.4 because the 2019 round publishes "
+      "nothing equivalent, and putting a corrected point beside an uncorrected one would show a fall that is "
+      "partly a change of method. So read 1.4 as the floor and 1.8 as the department's best estimate. The "
+      "2024 census could not reach the whole country: of 330 townships, 152 were fully enumerated, 120 only "
+      "partly, and 58 not at all, and the population of those was estimated from satellite imagery. The 2019 "
+      "round was a sample survey rather than a count, scaled up from the households it did enumerate. On the "
+      "reported-births method the 2014 census gives 2.3, which is the figure to compare 2019's 2.0 against.",
+      "https://www.dop.gov.mm/sites/dop.gov.mm/files/publication_docs/2024mphc_appendixtables.pdf"),
     C("Sri Lanka", "DCS — registered births over the mid-year population", sri_lanka_tfr,
       "Sri Lanka", "complete", True,
       "The Department of Census and Statistics stopped publishing a fertility rate of its own after 2000, "
