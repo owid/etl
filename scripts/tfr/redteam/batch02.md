@@ -158,3 +158,30 @@ was confirmed verbatim from the bulletin's own footnote.
   holds the bulletins. "Crude birth rate" is now "the number of births per 1,000 people", "a very
   different shape" is now about spread across ages, and the sentence about the site being a JavaScript
   application is gone — production detail, not information.
+
+## Thailand
+
+Verdict: minor problems. All three plotted years verified cell by cell against three separate yearbook
+editions.
+
+- **Rejected — the agent was wrong, and it mattered that I checked.** It reported the 45-49 births cell
+  shown to readers (1,125) as a transcription error against the source's 1,086. The source also has a
+  separate row for mothers of 50 and over, at 39, and 1,086 + 39 = 1,125. The number is the deliberate fold
+  of the open-ended top group into the last band, the same convention used for Cuba and Australia, and it
+  is what produces a standard rate. Had I taken the finding on trust I would have replaced a correct figure
+  with a wrong one. It is a fair complaint about the page though: the number matches no single line of the
+  source and nothing said why. Now it does.
+- **Accepted.** "We divided births by the female population in each age group and summed" describes an
+  operation that yields about 0.22, not the 1.11 shown — the step of multiplying by five was missing from
+  the description. Fixed.
+- **Accepted.** The link was a splash page. Now points into the statistics section.
+- **Accepted, and worth knowing.** Other Thai sources circulate about 1.16 for 2022 and 2023 against our
+  1.07 and 1.11. Since we construct this rate ourselves and the office publishes none, that discrepancy is
+  our problem to disclose, not theirs. It is now on the page, with the most likely cause: the yearbook's
+  population table is a registration snapshot rather than a mid-year population, and non-citizen residents
+  may be counted in it more completely than their births are registered.
+- **Accepted.** The dangling "Earlier editions would extend the series back to about 2017" now says plainly
+  that those editions have not been read.
+- **Rejected.** Renaming the validation label from "validated" to "calculated" for this country alone. The
+  wording covers twenty-four countries and changing one would make the scale inconsistent; the prose now
+  says outright that there is no official figure to check against, which is the substance of the point.

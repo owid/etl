@@ -469,15 +469,25 @@ COUNTRIES = [
       "only starts in 2009, because that is where the births table begins, and Destatis publishes the "
       "population report one year at a time.",
       "https://www-genesis.destatis.de/genesis/online"),
-    C("Thailand", "NSO — Statistical Yearbook tables 1.10 and 1.4", thailand, "Thailand", "complete", True,
-      "The Statistical Yearbook has table 1.10, registered live births by age group of mother, and table "
-      "1.4, registered population by age group and sex.",
-      "We divided births by the female population in each age group and summed. Both tables were read "
-      "out of the yearbook PDFs.",
-      "Each yearbook edition prints only a rolling three-year window, and the two tables cover different "
-      "windows, so only the years where they overlap can be computed. Earlier editions would extend the "
-      "series back to about 2017.",
-      "https://www.nso.go.th/"),
+    C("Thailand", "National Statistical Office — Statistical Yearbook", thailand, "Thailand", "complete",
+      True,
+      "Thailand's Statistical Yearbook publishes registered births by the mother's age group (table 1.10) "
+      "and registered population by age group and sex (table 1.4). It does not publish a total fertility "
+      "rate anywhere, so there is no official figure to check ours against.",
+      "For each five-year age group we divided the births by the women, then added the groups together and "
+      "multiplied by five, the width of each group. The births shown for 45-49 include the yearbook's "
+      "separate row for mothers of 50 and over — 1,086 plus 39 in 2023 — so that figure will not match any "
+      "single line of the source.",
+      "Because we build the rate ourselves rather than copying one, it is worth knowing that other Thai "
+      "sources circulate a higher figure: about 1.16 for 2022 and 2023, against our 1.07 and 1.11. We "
+      "cannot trace where that comes from. One likely part of the answer is the denominator — the "
+      "yearbook's population table is a registration snapshot rather than the mid-year population usually "
+      "used for this, and births to non-citizen residents may be registered less completely than the "
+      "population count includes them. Both would push our figure low. Each yearbook edition prints only a "
+      "rolling three-year window, and the two tables cover different windows, so the series is limited to "
+      "the years where they overlap; older editions would extend it back to about 2017 but have not been "
+      "read.",
+      "https://www.nso.go.th/nsoweb/nso/statistics_and_indicators"),
     C("France", "INSEE — état civil over the mean resident population", france, "France", "complete", False,
       "INSEE publishes fertility rates by single year of age of mother and, separately, births by single year "
       "of age, both from the civil register. Its population pyramid gives women by single year of age at 1 "
