@@ -70,6 +70,46 @@ Companion reference for the `create-figma-chart` skill. Distilled from the desig
 - If a curvy arrow gets messy in tight space, a straight thin line is better.
 - **Maps: no curvy arrows at all** — limited space. Straight 1px lines, or call the value out directly inside the country shape.
 
+### Straight elbowed arrows — the variant for filled areas
+
+**On a stacked area or any chart where the annotation sits *on* a filled band, use a straight elbowed leader in white, not a curvy arrow.** A curvy arrow drawn over big blocks of color reads as a stray squiggle — it has no white ground to sit against, and its curve fights the hard horizontal/vertical edges of the bands. An elbow made of two straight segments looks like part of the chart's own geometry: it leaves the text horizontally, turns once, and arrives perpendicular to the thing it names. This is the house treatment on the file's stacked-area pages.
+
+The shape is exactly two segments meeting at a right angle, with an arrowhead on the far end only:
+
+- **Leaving text horizontally, arriving vertically** — run right (or left) from the text's edge to the target's x, then turn and drop onto it. Use this to point at a *moment*: a collapse, a peak, a crossing.
+- **Leaving text vertically, arriving horizontally** — drop from under the text, then turn and run onto the band. Use this to point at a *level*: a band's thickness at the last year, where the arrival should land on the boundary the value refers to.
+
+**1px white line, and the head is the file's own arrowhead asset — not a `strokeCap`.** This is the part to get right, because a stroke cap is the obvious guess and it looks wrong: `ARROW_LINES` draws a thin open chevron where the house head is a small **solid filled triangle**, and a designer spots the difference immediately. The finished pages build the elbow as two nodes:
+
+1. **The line**: a `VECTOR` with a right-angle path, `strokeWeight = 1`, white, `strokeJoin = "MITER"`, and **every** cap `NONE`.
+2. **The head**: a copy of the same filled arrowhead vector the curvy arrows use (~8×12px, white `fills`, no stroke), cloned and moved so its centre sits at the target. Clone it rather than drawing one — it inherits the house silhouette and its rotation already points the right way, so the down-pointing and right-pointing heads are just the two you copy from an existing page.
+
+```js
+const v = figma.createVector();
+parent.appendChild(v);
+v.vectorPaths = [{ windingRule: "NONE", data: `M 0 0 L ${dx} 0 L ${dx} ${dy}` }];   // out, then down
+v.strokes = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+v.strokeWeight = 1;
+v.strokeJoin = "MITER";                     // a rounded corner softens the geometry the elbow exists to echo
+const head = existingHead.clone();          // the filled asset, already rotated
+parent.appendChild(head);
+const b = head.absoluteBoundingBox, fb = frame.absoluteBoundingBox;
+head.x += target.x - ((b.x - fb.x) + b.width / 2);
+head.y += target.y - ((b.y - fb.y) + b.height / 2);
+```
+
+Stop the **line** ~7px short of the head's centre so the two don't overlap, and compute the target from the data — the x from the year, the y from the band edge (see Stacked area charts below).
+
+**Aim at the event, not at the floor.** An arrow annotating a collapse points at the *top of the collapsing band* at the year it collapses — that is where the change is legible. Running it all the way down to the plot's baseline crosses two other bands to arrive at a sliver, which reads as pointing at nothing; on this chart the difference was 54px of unnecessary line.
+
+**Set `x`/`y` to the path's bounding-box minimum, not to its first vertex.** A leader that runs up or left has negative coordinates, and Figma normalizes the bbox — so assigning the start point puts the box's *top-left* there and the line draws away in the wrong direction. One leader aimed up at Chad ran down into the footer instead:
+
+```js
+const mnx = Math.min(x1, x2), mny = Math.min(y1, y2);
+v.vectorPaths = [{ windingRule: "NONE", data: `M ${x1-mnx} ${y1-mny} L ${x2-mnx} ${y2-mny}` }];
+v.x = mnx; v.y = mny;
+```
+
 ## Dots
 
 - **10×10 px dots** to highlight specific years on a line/slope, centered on the point — `dot.x = end.x − 5`, `dot.y = end.y − 5`.
@@ -201,6 +241,11 @@ Two mechanics to get right. Applying a text style **overwrites the font and clea
 ### Stacked area charts
 - Labels inside the areas or in a legend row above the chart; white text over dark fills, ≥12px, strong contrast.
 - White-outlined dots for highlighted points; a dot in the chart needs an outline to stand out against the fill.
+- **Move grapher's series labels off the right margin and into the bands, white and bold.** The export puts them in a reserved column at the right, each in its series' own color; inside the band they become white bold ~14px and the whole column is reclaimed for plot (see SKILL.md → Step 8 on the x-map). This is the stacked-area equivalent of killing a legend, and it is what the finished pages do.
+  - **They will be invisible until you fix the z-order.** grapher orders `text-labels` *before* the fills, which is harmless while they sit in the margin and fatal once they are inside — the areas paint straight over them. Re-append each label to the chart group after moving it (`chart.appendChild(label)`), and check the render rather than the node list, since nothing in the tree looks wrong.
+- **Get a band's vertical extent from the `borders` strokes, not by sampling the area polygon.** Each border is the *top* edge of its own series, so band *n* runs from its own border down to the next series' border, and the lowest band's floor is the 0% grid line. Sampling the filled polygon instead looks equivalent and quietly fails: a stacked polygon's bottom edge along the baseline may carry only its two end vertices, so a window around your sample x catches top-edge points only and the band measures ~0 tall. That is how a 75px-tall nuclear band came back as 0.5px.
+- **A very tall band takes its label near the top, not centered.** Centering is right for a thin band, but in a band covering half the plot the label drifts into empty space and the middle is exactly where the annotation wants to go. Put it ~14px under the band's top edge and leave the middle free.
+- **Fold the value into the in-area label when the chart has only two or three series.** A 100%-stacked chart of two categories needs no axis reading: `Overfished: 36%` as a bold 16px line with a 14px explanatory line under it — white, right-aligned, in an auto-layout block inside the band — says more than a legend plus a y-axis. Round so the parts sum to 100 (64.5 and 35.5 become 64 and 36), and note that this makes the label a claim to verify, not decoration.
 
 ### Bar / stacked bar charts
 - **Spell out the unit in the chart area**, not only in the subtitle.
@@ -224,6 +269,9 @@ Two mechanics to get right. Applying a text style **overwrites the font and clea
 - For binary/divided axes, annotate the two sides ("countries above this line …") so the divider explains itself.
 
 ### Maps
+- **On a two-bin categorical map, delete the legend and let the title's colored words be the key.** "Countries with fertility rates **above** or **below** replacement level" with those two words in the two bin colors is a complete legend, sitting where the reader already is; grapher's legend strip then costs ~36px of height and repeats the title. Keeping it was the single biggest thing wrong with a first attempt here — it squeezed the map to 214px and pushed the annotations into the subtitle. Removing it gave the map the full width and freed the band above and below for annotations over the ocean, which is how the finished pages are built. (Three or more bins usually still need the strip.)
+  - **When the map's palette can't be read as text, say so rather than forcing it.** The colored title word must be the bin's actual color, but grapher's binary map palettes are often pale — `#92c5de` on white is about 1.9:1 — so the honest move is a darkened same-hue palette color in the title and a note that the map bins are lighter. Never invert the pairing: if the map's high bin is salmon, the title's word for the high bin cannot be teal, and any value called out in an annotation follows the same rule. Inheriting those colors from an older page whose palette was the other way round produces a frame that contradicts itself in three places at once.
+- **Grapher's map export outlines every country in `#333333`; the house treatment is a white hairline.** Sweep the country vectors and set the stroke to white at ~0.3px (207 of them on one map). Dark outlines make a choropleth read as a political map and fight the bins.
 - Annotations 12–14px (the bottom of the ladder — see Annotations for why maps don't go to 10); straight 1px leader lines or values inside countries — never curvy arrows; give annotated countries a distinct outline stroke so their silhouette stands out; thin lines pointing at small countries work best when the labels sit apart from each other.
 - Legends: align left; vertical columns matched to label lengths; one–two categories → shrink the legend; horizontal stretched legends only for sequential palettes, not categorical.
 - **A binned legend's labels are claims about ranges, and every boundary is a chance to be wrong.** Three traps, all of which cost a round on the same chart:
