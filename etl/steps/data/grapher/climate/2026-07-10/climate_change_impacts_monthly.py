@@ -24,6 +24,12 @@ def run() -> None:
     # Adapt table with dates to grapher requirements.
     tb = adapt_table_with_dates_to_grapher(tb, time_interval="month")
 
+    # Ocean pH measurements are irregular Aloha-station cruise dates (17-31 day gaps), not monthly
+    # aggregates. With timeInterval "month", grapher snaps them to the 1st of the month, and the
+    # ~15 months holding two cruises collapse onto one time key (values silently dropped).
+    for column in ["ocean_ph", "ocean_ph_yearly_average"]:
+        tb[column].metadata.display["timeInterval"] = "day"
+
     # Set an appropriate index and sort conveniently.
     tb = tb.format(["country", "year"])
 
