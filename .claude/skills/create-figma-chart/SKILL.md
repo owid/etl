@@ -268,6 +268,12 @@ chart.y = headerBottom + gap
 
 **How much gap is right: 14px, and 12–16 is the comfortable band.** That's what the finished pages and grapher itself converge on, measured in 540-wide frames — grapher's own square export leaves 13px above the plot and 14px below; recent DI pages in the file sit at 14/19, 15/14 and 7/15. Below ~10px it reads cramped and the legend starts to look like part of the subtitle; above ~20px you are wasting space the plot could use. When the chart comes out a few pixels too tall, spend the slack down to 12px a side **before** shrinking it — that is usually enough, and it keeps the full content width, which matters more than the last pixel of gap.
 
+**When the plot and its legend are separate elements, the gap between them is its own decision — and a minimal one is wrong.** A legend strip sitting 16px under a map reads as part of the graphic, a caption bar welded to the bottom edge, rather than as a key you consult; the coastline and the colour band start competing. **26px on a 540-wide frame** is what worked here. But don't take grapher's lead and over-correct: its own square export leaves ~57px, which detaches the legend and lets it drift toward the source line. The rule that settles it is **proximity as grouping — map→legend must stay clearly smaller than legend→footer** (26 against 45 here), so the key reads as belonging to the chart and the footer reads as separate.
+
+**And where the slack goes is a design decision, not a residue.** A chart that cannot fill the band — a wide map in a square frame — leaves a fixed surplus (≈116px here) to distribute across three gaps, and "centre the block and leave the middle minimal" is a choice you made by default rather than on purpose. Take an increase in the internal gap out of the **outer** gaps, never out of the chart: the plot keeps its full size and the frame stays symmetric.
+
+Two mechanics when you re-space: the annotations and leaders are **siblings of the chart group, not children**, so they do not travel with it — translate them by the same delta or every label lands over the wrong geography. Then re-verify that each leader still ends inside the thing it points at; that check is cheap and catches a mistranslation immediately.
+
 Side margins and the footer edge are the template's, not yours: content starts at the header's `x` and the footer's bottom stays where the template put it.
 
 | Template | Content x / width | Header bottom → footer top (unwrapped subtitle) |
