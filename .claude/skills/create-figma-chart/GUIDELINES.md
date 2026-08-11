@@ -61,8 +61,10 @@ Companion reference for the `create-figma-chart` skill. Distilled from the desig
 
 - Copy the signature curvy arrows from the Charts file (node `798:773`); scale, rotate, or tweak as needed — within the rules below.
 - **1px stroke.** Arrowhead and line: one color, never two; the same style and size across the whole chart.
-- **Give the arrowhead a few pixels of air before the mark it points at.** A tip resting on the line reads as attached to it rather than aiming at it; ~6px is enough to fix it, and the arrow still unambiguously points. Move the annotation and its arrow together as a rigid pair, so the arrow keeps its aim.
-- **Don't compute that offset by translating along the closest-point normal** — it only works when the arrow meets the line at an angle. These arrows curve in *alongside* the line for their last stretch, so pushing the tip away brings the shaft in and the measured clearance barely moves (0.9px → 0.7px on one arrow, after a 5px translation). Where the arrow runs parallel, fix the *text* instead — narrow it, or lift the pair — and judge the result on the render rather than on the tip-to-line number.
+- **Very close, but never on top.** An arrowhead resting on the line reads as welded to it, and one overlapping it hides the thing it is pointing at; a few pixels of air is what makes the arrow legible. **3–7px of visible gap** is the target, and the acceptance test is *zero touching pixels* — see the pixel probe in SKILL.md → Step 8c, because vector distances cannot be trusted here (the arrows are rotated groups). Move the annotation and its arrow as a rigid pair so the arrow keeps its aim.
+- **Point at what the sentence actually names — and read the sentence to find out.** An arrow is a claim about *which* mark the words describe, so derive its target from the text, not from convenience: "By 2020, growth had fallen to less than 1%" points at the stretch of line that is **below the 1% gridline near 2020**, which is the elbow where the estimates end. Aiming it higher, as an untargeted placement did here by 10.7px on one frame and 25.2px on the other, has the arrow indicating a value of about 1.1% — a number the annotation explicitly denies.
+  - Note the difference between "**by** 2020" and "**in** 2020": a threshold-crossing phrased with *by* describes a region, so pinning the exact x of the tick is over-precise. Take the year as a neighborhood and pick the point in it that best shows the threshold — usually where the line first clears it.
+- **Don't compute the offset by translating along the closest-point normal** — it only works when the arrow meets the line at an angle. These arrows curve in *alongside* the line for their last stretch, so pushing the tip away brings the shaft in and the measured clearance barely moves (0.9px → 0.7px after a 5px translation). Where the arrow runs parallel, move it along the *line's* normal instead, and confirm on pixels.
 - **Never scale a whole arrow** — the head distorts. Select just the line (cmd/ctrl-click inside the group), Shift-resize it, then move the head back into place.
 - Don't squish an arrow's width or height independently; always hold Shift.
 - If a curvy arrow gets messy in tight space, a straight thin line is better.
@@ -70,7 +72,8 @@ Companion reference for the `create-figma-chart` skill. Distilled from the desig
 
 ## Dots
 
-- **10×10 px dots** to highlight specific years on a line/slope.
+- **10×10 px dots** to highlight specific years on a line/slope, centered on the point — `dot.x = end.x − 5`, `dot.y = end.y − 5`.
+- **Derive a dot's position from the mark *after* the chart's last move, never before.** A dot lives beside the chart group, not inside it, so it does not travel when the chart is re-centered in its band — dots placed before the final centering sat 3.8px above their own lines here, which a designer spotted immediately. Same trap as annotations and leaders, with one difference: a dot has an exact right answer, so **re-derive it from the line's endpoint at the end** rather than translating it by a remembered delta.
 - No outline on the dot — except on **stacked areas**, where a **white outline** makes it stand out against the colored fill.
 - After any resizing of the chart, verify dots are still round (see "never stretch one axis").
 - Grapher renders no dots at all on charts with more than ~500 points — they were never in the export.
