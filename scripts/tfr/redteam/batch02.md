@@ -2190,3 +2190,23 @@ module, since Czechia's factor-of-five error was fixed in `czechia.py`. Rebuildi
 flagged moved exactly two countries: Taiwan from 2025 back to 2024, and Chad from 2015 to 2019, a point
 added during the campaign that had also never reached the page. Nothing else moved, which is the
 reassuring half of the result.
+
+## Cross-cutting: two status claims that had gone stale
+
+Both found from outside the campaign, both confirmed, and both the same failure — a sentence that was true
+when written, describing a world that has since moved on.
+
+- **Sierra Leone.** Written up above and retracted there. That one was mine, from an agent's "could not
+  find".
+- **Cameroon.** "The fourth census was launched in 2016, but as of the last public update, in September
+  2019, the main population count still had not happened ... Nothing has been published since." The census
+  went into the field in 2026. UNFPA's report of the Prime Minister's decree of 29 May 2026 extends it "to
+  July 31, 2026" in those words, so the count finished a fortnight before this was written. I could not
+  confirm the enumeration's start date, so the page states only the sourced part: it went into the field in
+  2026 and was extended by decree to 31 July. The delay's cause — how to enumerate the North-West and
+  South-West — is kept, in the past tense, where it belongs.
+
+The shared lesson is about tense. "Nothing has been published since" and "no full report has appeared
+since" are both claims about the present, silently dated to whenever someone last looked. Neither page said
+when that was, so both read as current forever. Where a page describes an unfinished process, it should say
+what happened and when, not what has not happened.
