@@ -29,21 +29,27 @@ to fight the interface and to fall back to published reports instead. Give that 
 country whose source is an interface rather than a file.
 
 **The session that ran this campaign hit its cap of 200 subagents with 21 countries still to do.**
-Rwanda, Burundi and Bolivia were out at that point and will still report; no replacements could be
-launched. So `--audit` correctly reports three agents in flight rather than five until a session with
-budget picks the campaign back up. Everything needed to continue is unchanged: the brief generator,
-the standard prompt with its absence-claim instruction, and this ledger.
+Rwanda, Burundi and Bolivia were out at that point; Rwanda and Bolivia have since reported and are
+written up, leaving Burundi. No replacements could be launched, so `--audit` correctly reports one
+agent in flight rather than five until a session with budget picks the campaign back up. Everything
+needed to continue is unchanged: the brief generator, the standard prompt with its absence-claim
+instruction, and this ledger.
 
-## In flight (3)
+Two other things a resuming session should know. The brief generator has caused three false findings —
+describing the map as an average gap, printing age-band figures at full float precision, and printing
+the series to four significant figures so an agent read 1.25486 as "1.255" and reported a rounding bug.
+All three are fixed, but check anything a report asserts about the page against the page. And for any
+country whose source is an interface rather than a file, tell the agent not to fight it and to fall
+back on published reports; that is what unstuck Poland.
 
-- Rwanda
+## In flight (1)
+
 - Burundi
-- Bolivia
 
 ## Reported, awaiting write-up (0)
 
 
-## Analyzed (76)
+## Analyzed (78)
 
 - India
 - China
@@ -121,6 +127,8 @@ the standard prompt with its absence-claim instruction, and this ledger.
 - Zimbabwe
 - Guinea
 - Benin
+- Rwanda
+- Bolivia
 
 ## To do (21)
 

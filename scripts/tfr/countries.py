@@ -1513,21 +1513,25 @@ COUNTRIES = [
       "in, so the most recent years will still move.",
       "http://statistici.insse.ro:8077/tempo-online/"),
     C("Rwanda", "NISR — Demographic and Health Survey rounds", rwanda, "Rwanda", "survey", False,
-      "NISR runs the health survey every five years and the 2025 report charts every round since 1992. "
-      "It also publishes census fertility, and — unusually — an annual fertility rate built from civil "
-      "registration.",
-      "We read the survey series. We also recomputed the 2022 census figure from its own women counts "
-      "and age-specific rates and got 3.635 against the 3.63 it publishes.",
-      "Rwanda is the clearest case of an office changing its mind between census rounds using the same "
-      "test. In 2012 the raw census figure was 3.8 against the survey's 4.6 two years earlier; NISR said "
-      "a 20% fall in three years was unlikely, concluded births were under-reported, tried three indirect "
-      "methods, rejected two on stated grounds and adopted Arriaga, publishing 4.02. In 2022 it ran the "
-      "equivalent check, found no evidence of under-reporting, and published the raw 3.6 unadjusted. Same "
-      "office, same diagnostic, opposite decisions. There is also a third channel worth knowing about: "
-      "NISR publishes a registration-based rate every year, scaling registered births up by its own "
-      "measured completeness — 3.2 becomes 3.5 for 2025 — and prints it beside the census and survey "
-      "figures in one table. Registration coverage is about 93% and rising, which is high for the region. "
-      "The census and survey figures, 14% apart in 2020, have essentially converged: 3.6 against 3.7.",
+      "Rwanda's national statistics office, NISR, runs a health survey every five years, and its 2025 "
+      "report charts every round since 2000. It also publishes census fertility, and an annual fertility "
+      "rate built from civil registration, which few countries here have.",
+      "We use the rate each survey round published. Each covers the three years before its fieldwork rather "
+      "than the year we plot it at. We also recomputed the 2022 census figure from its own women counts and "
+      "rates by age group and got 3.635 against the 3.63 it publishes.",
+      "The office changed its mind between census rounds, using the same test both times. In 2012 the raw "
+      "census figure was 3.8 against the survey's 4.6 two years earlier; NISR said a 20% fall in three "
+      "years was unlikely, concluded births had been under-reported, tried three statistical techniques for "
+      "correcting that, rejected two on stated grounds and adopted the third, publishing 4.02. In 2022 it "
+      "ran the equivalent check, found no evidence of under-reporting, and published the raw 3.6 "
+      "unadjusted. Same office, same diagnostic, opposite decisions.\n\nThere is a third channel worth "
+      "knowing about. NISR publishes a registration-based rate every year, scaling registered births up by "
+      "its own measured completeness — 3.2 becomes 3.5 for 2025 — and prints it beside the census and "
+      "survey figures in one table. Registration coverage reached about 93% in 2025, high for the region, "
+      "though it dipped in the early 2020s before recovering. That annual series would give a denser line "
+      "than the five-yearly survey we plot, and is worth switching to. The census and the survey have "
+      "essentially converged — 3.6 from the 2022 census against 3.7 from the 2025 survey — having been 14% "
+      "apart at the previous pair of readings.",
       "https://statistics.gov.rw/"),
     C("Tunisia", "INS — registered births divided by the mid-year population", tunisia, "Tunisia", "complete",
       False,
@@ -1603,24 +1607,26 @@ COUNTRIES = [
       "estimation survey has no fertility figure in it.",
       "https://nbs.gov.ss/"),
     C("Bolivia", "INE — Demographic and Health Survey rounds", bolivia, "Bolivia", "survey", False,
-      "INE runs the health survey every few years and its 2023 fertility report charts all five rounds "
-      "since 1998. The 2024 census asks women how many children they have ever borne, and INE publishes "
-      "those counts. Its population projection carries a fertility assumption of its own.",
-      "We read the survey series. We could not recompute a rate: we found no Bolivian source publishing "
-      "births by age of mother, in any year, from any instrument.",
-      "Bolivia runs the Latin American pattern backwards, and it is the only country here that does. "
-      "Everywhere else — Colombia, Mexico, Peru, Argentina, Chile, Ecuador — the office headlines a figure "
-      "above its own registered births. INE's headline projection assumes 1.69 for 2024 against a survey "
-      "figure of 2.1 for 2023, so the headline is the lower number. It says why. It treats the survey as "
-      "its most reliable source, built a smoothed curve close to it, then checked that curve against three "
-      "administrative series — birth registrations, school enrolment, and health-ministry birth records — "
-      "found all three implied less fertility, and lowered the adopted figure accordingly. It also "
-      "declined to apply the Brass correction it had used on the 2001 and 2012 censuses, saying it was "
-      "incompatible with how fast fertility had fallen. Our own rough check agrees with the direction: "
-      "registered births over projected women imply something near 1.4 for 2024. One trap to record: the "
-      "electoral court's statistical bulletin looks exactly like a vital-statistics release, but its "
-      "births table counts birth-certificate printouts — 2.7 million for 2021, about thirteen times the "
-      "real number.",
+      "Bolivia's statistics office, INE, runs a health survey every few years, and its 2023 fertility "
+      "report charts all five rounds since 1998, each with the rate for every age group behind it. The 2024 "
+      "census asks women how many children they have ever borne, and INE publishes those counts. Its "
+      "population projection carries a fertility assumption of its own.",
+      "We use the rate each survey round published. Adding up each round's own rates by age group returns "
+      "its published total, for all five. We could not go further and rebuild the rate from counts, because "
+      "the reports give the rates rather than the births and women behind them.",
+      "Bolivia's statistics office publishes a headline fertility figure lower than what its own survey "
+      "found, which is the reverse of the usual direction — offices more often publish a figure above what "
+      "their registered births imply. Its projection assumes 1.69 for 2024 against a survey figure of 2.1 "
+      "for 2023, and it explains its reasoning: it treats the survey as its most reliable source, built a "
+      "smoothed curve close to it, then checked that curve against three administrative series — birth "
+      "registrations, school enrollment and health-ministry birth records — found all three implied less "
+      "fertility, and lowered the adopted figure accordingly. It also declined to apply to the 2024 census "
+      "the standard correction for under-reported births it had used on the 2001 and 2012 ones, saying it "
+      "was incompatible with how fast fertility had fallen. Our own rough check agrees with the direction: "
+      "registered births against projected women imply something near 1.4 for 2024. One thing to watch for: "
+      "the electoral court's statistical bulletin looks like a vital-statistics release, but its births "
+      "table counts birth-certificate printouts — 2.7 million for 2021, about thirteen times the number of "
+      "actual births.",
       "https://www.ine.gob.bo/"),
     C("Tajikistan", "Agency on Statistics — registered births divided by the resident population",
       tajikistan, "Tajikistan", "complete", False,

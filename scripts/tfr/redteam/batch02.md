@@ -1420,3 +1420,52 @@ state only its overall conclusion without pointing out where the correction land
 - **Accepted.** Three sentences of forensics about gambling spam served under the real reports' paths cut
   to the one clause a reader needs. INS spelled out, the Arriaga and P/F machinery described rather than
   named, and both sentences addressed to a fellow analyst rewritten.
+
+## Bolivia
+
+Verdict: serious problems in one claim; everything else unusually well grounded. All five plotted
+values match INE's own official table exactly, and the whole methodology narrative — the 1.69
+assumption, the survey treated as the most robust source, the smoothed curve checked against birth
+registrations, school enrollment and health-ministry records, and the refusal to apply the standard
+correction to the 2024 census — was confirmed against INE's own 76-page methodology document, with
+quotations. The electoral-court claim checked out to the digit: its bulletin's births table totals
+2,742,478 certificate printouts for 2021, about thirteen times actual births.
+
+- **Accepted, the sixteenth false absence claim — and the data was in a document we cite two sentences
+  earlier.** "We could not recompute a rate: we found no Bolivian source publishing births by age of
+  mother, in any year, from any instrument." The survey reports publish the rate for every age group,
+  for all five rounds, in the same 2023 fertility report the first block names. Adding those up returns
+  each round's published total. The page now says that, and says what is genuinely missing: the counts
+  behind the rates, which is why the rate cannot be rebuilt from births and women and why there is no
+  age-band chart.
+- **Rejected, on the collection's own convention.** The agent argued this should move to "fully
+  validated from births & women". It should not: summing an office's published rates checks that its
+  table adds up, not that the number is right, and the counts are what the label is about. Uganda,
+  Madagascar, Chad, Niger and Cambodia were all held to the same line.
+- **Rejected, a misreading of the brief.** The agent flagged the map gap as using a rounded 2.1 where
+  the series holds 2.115. Our series holds 2.1; the 2.115 is INE's own unrounded figure, which we do not
+  plot. No inconsistency.
+- **Accepted.** The opening named six other countries' entries; "one trap to record" and "it says why"
+  were written for a compiler rather than a reader; INE and the Brass correction are now explained.
+
+## Rwanda
+
+Verdict: minor problems. Every plotted value verified against NISR's own trend chart and the statistical
+yearbook, the UN comparison matched to three decimals, and the whole decade-long story of the office
+changing its mind was confirmed step by step — including both stated grounds for rejecting two methods
+in 2012, and the 2022 report's explicit finding of no under-reporting. Our 3.635 against its 3.63
+reproduced exactly.
+
+- **Accepted, wrong year.** "The 2025 report charts every round since 1992." Its fertility chart starts
+  at 2000; 1992 appears once in prose, uncharted.
+- **Accepted, a year label doing two jobs.** "The census and survey figures, 14% apart in 2020" compares
+  a census estimate for the year before August 2022 with a survey's three-year estimate — neither is
+  "in 2020". Reworded to name the readings rather than a shared year.
+- **Considered and kept.** The agent argued the first label should be incomplete registration rather
+  than survey, since registration is about 93% complete and NISR publishes an annual registration-based
+  rate. But the label describes what the plotted figure is built from, and we plot the survey series. The
+  real finding is the upgrade: that annual series would give a denser line than five-yearly surveys, and
+  the page now says so.
+- **Accepted.** "The clearest case of an office changing its mind" and "unusually" both leaned on a
+  collection the reader has not seen. The survey reference period is now disclosed, "rising" is qualified
+  by the early-2020s dip, and the registration material is split into its own paragraph.
