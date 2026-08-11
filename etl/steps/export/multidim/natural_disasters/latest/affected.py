@@ -101,8 +101,9 @@ def run() -> None:
     # Process data.
     #
     # Sample the all-disasters aggregate description_key for grouped views (must
-    # run before prepare_table drops the column).
-    sample_description_key = list(tb_yearly["total_affected_all_disasters_yearly"].metadata.description_key or [])
+    # run before prepare_table drops the column). In the grapher channel this is a
+    # markdown string — never wrap it in list(), which splits it into one bullet per character.
+    sample_description_key = tb_yearly["total_affected_all_disasters_yearly"].metadata.description_key
     indicators = [
         ({"impact": impact, "metric": metric}, prefix)
         for (impact, metric), prefix in INDICATOR_BY_IMPACT_METRIC.items()
