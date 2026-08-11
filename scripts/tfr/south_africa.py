@@ -17,7 +17,14 @@ import pandas as pd
 from fetch import fetch
 
 DATA = os.path.join(os.path.dirname(__file__), "data", "za")
-MYPE = "https://www.statssa.gov.za/publications/P0302/P03022024.pdf"
+# The current edition prints the series as a chart and puts the numbers in a companion spreadsheet.
+# Stats SA revised the whole series down in the 2025 and 2026 editions — 2024 went from 2.41 to 2.15 —
+# so the edition matters, and the newest one is the one used.
+MYPE = "https://www.statssa.gov.za/publications/P0302/MYPE%20report%20table%20website_%202026.xlsx"
+MYPE_SHEET = "Total Fertilty Rate"                  # the office's own spelling
+# The age-band comparison is for 2024, so its female population comes from that year's own edition,
+# matching the vintage of the birth counts it is divided into.
+MYPE_2024 = "https://www.statssa.gov.za/publications/P0302/P03022024.pdf"
 RLB = "https://www.statssa.gov.za/publications/P0305/RLB%202024%20Appendices.xlsx"
 BANDS = [(15, 19), (20, 24), (25, 29), (30, 34), (35, 39), (40, 44), (45, 49)]
 
@@ -25,22 +32,22 @@ BANDS = [(15, 19), (20, 24), (25, 29), (30, 34), (35, 39), (40, 44), (45, 49)]
 def _mype_text():
     path = os.path.join(DATA, "mype2024.txt")
     if not os.path.exists(path):
-        pdf = fetch(MYPE, os.path.join(DATA, "mype2024.pdf"), insecure=True)
+        pdf = fetch(MYPE_2024, os.path.join(DATA, "mype2024.pdf"), insecure=True)
         subprocess.run(["pdftotext", "-layout", pdf, path], check=True)
     return open(path, errors="ignore").read().splitlines()
 
 
 def south_africa_tfr():
-    """Table 2 of the mid-year population estimates: the modelled series, 2002 onward."""
-    lines = _mype_text()
-    start = next(i for i, ln in enumerate(lines)
-                 if ln.strip().startswith("Table 2: Assumptions of Total Fertility")
-                 and "..." not in ln)
+    """The modeled fertility series behind Stats SA's mid-year population estimates, 2002 onward."""
+    path = fetch(MYPE, os.path.join(DATA, "mype.xlsx"), insecure=True)
+    d = pd.read_excel(path, sheet_name=MYPE_SHEET)
+    d.columns = [str(c).strip().lower() for c in d.columns]
     rows = []
-    for ln in lines[start:start + 40]:
-        m = re.match(r"\s*(\d{4})\s+(\d,\d{2})\s+\d{2},\d\s+\d{2},\d\s*$", ln)
-        if m:
-            rows.append((int(m.group(1)), float(m.group(2).replace(",", "."))))
+    for _, r in d.iterrows():
+        year = pd.to_numeric(r.get("year"), errors="coerce")
+        value = pd.to_numeric(r.get("tfr"), errors="coerce")
+        if pd.notna(year) and pd.notna(value):
+            rows.append((int(year), float(value)))
     return pd.DataFrame(sorted(rows), columns=["year", "value"])
 
 

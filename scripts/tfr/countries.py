@@ -1106,19 +1106,22 @@ COUNTRIES = [
       "from births. Its own report says the series was \"derived following a detailed review of TFR estimates "
       "(1985-2024), (both published and unpublished), from various authors, methods and data sources\", "
       "informed by registered births and health-system records. Separately, the recorded live births report "
-      "publishes registered the number of births by the mother's age, and the mid-year estimates publish female "
-      "population by age group.",
-      "We read the modelled series from table 2 of the mid-year estimates. The age-band comparison uses the "
-      "registered births instead, because those are the only counts the registry produces.",
-      "The two disagree enormously. Dividing the registered births by the female population gives 1.53 for "
-      "2024 against the published 2.41, and 1.88 for 2016 against 2.33. Some of that is timing — Stats SA "
+      "publishes the number of registered births by the mother's age, and the mid-year estimates publish the "
+      "female population by age group.",
+      "We read the modeled series from the current edition's own spreadsheet. The age-band comparison uses "
+      "the registered births instead, because those are the only counts the registry produces.",
+      "The two disagree sharply. Dividing the registered births by the female population gives 1.53 for "
+      "2024, against the 2.15 Stats SA now publishes for that year. Some of the difference is timing — it "
       "says about 10% of births are registered a year or more late, and a year keeps filling up for years "
-      "afterwards — but not all of it: it also estimates that even once late registrations are in, "
-      "registration captures only about 90% of births. So South Africa's headline figure is deliberately set "
-      "well above what its own registry shows, and is closer in kind to a UN estimate than to a count. "
-      "Fertility results from the 2022 census have still not been released, which Stats SA notes as a reason "
-      "the census could not feed the estimate. No mid-year estimates edition was published for 2023.",
-      "https://www.statssa.gov.za/publications/P0302/P03022024.pdf"),
+      "afterward — but not all of it: it also estimates that even once late registrations are in, "
+      "registration captures only about 90% of births. So South Africa's headline figure sits well above "
+      "what its own registry shows, and is a modeled estimate like the UN's rather than a count. It is also "
+      "revised often, and by a lot: the 2024 edition of this series put 2024 at 2.41 and the 2026 edition "
+      "puts it at 2.15, with every year from 2016 on revised down — Stats SA says the rate was lowered \"to "
+      "reflect what is evident in administrative data sources\". Fertility results from the 2022 census have "
+      "still not been released, which Stats SA notes as a reason the census could not feed the estimate. No "
+      "mid-year estimates edition was published for 2023.",
+      "https://www.statssa.gov.za/publications/P0302/P03022026.pdf"),
     C("Sudan", "Central Bureau of Statistics — Multiple Indicator Cluster Survey 2014", sudan, "Sudan",
       "survey", False,
       "One figure: 5.2 children per woman for women aged 15-49, from the Bureau's own 2014 survey, printed "
@@ -1137,14 +1140,18 @@ COUNTRIES = [
       "The census fertility volume gives a national total fertility rate of 3.4 for 2019 and 4.8 for 2009, "
       "plus age-specific rates for every county. The 2022 household health survey, also run by KNBS, "
       "separately found 3.4.",
-      "We read both census values out of the trends table. We also summed the national age-specific rates "
-      "and got 3.24, a little below the published 3.4 — the rates are printed to three decimals and the "
-      "national total absorbs county-level adjustments, so the two do not have to agree exactly.",
-      "The census measures fertility by asking women about births in the three years before the count, not "
-      "from registration. Rates for the North-Eastern counties are adjusted with a Gompertz model because "
-      "reporting there was inconsistent. The whole report is scanned page images with no text layer, so "
-      "everything had to be read by optical character recognition. Births as the number of births by the mother's age are "
-      "not in this volume.",
+      "We read both census values out of the trends table. We also added up the national rate for each age "
+      "group and got 3.24, a little below the published 3.4: a few counties' rates were statistically "
+      "corrected before being folded into the national total, which is why our own sum does not land exactly "
+      "on it.",
+      "The census measures fertility by asking women about the births they had in the twelve months before "
+      "the count, not from birth records. Rates for the North-Eastern counties were corrected with a "
+      "statistical model because reporting there was inconsistent. This report does not break births down by "
+      "the mother's age at all, and its pages carry no readable text layer, so the figures had to be read "
+      "off the images. KNBS does publish registered births by the mother's age in its annual vital "
+      "statistics reports, and even computes a rate from them — but that rate falls as registration "
+      "completeness falls, from 77% in 2023 to 70% in 2024, so it would read as a collapse in fertility "
+      "that is really a collapse in recording.",
       "https://www.knbs.or.ke/wp-content/uploads/2024/05/2019-Kenya-population-and-Housing-Census-"
       "Analytical-Report-on-Fertility-and-Nuptiality-Vol.VI_.pdf"),
     C("Myanmar", "Department of Population — 2019 Inter-censal Survey", myanmar_tfr, "Myanmar",
