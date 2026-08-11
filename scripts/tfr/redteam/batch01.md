@@ -158,3 +158,9 @@ original reports.
   published at the time as 2.130 and later revised to the 2.056 we plot, after the 2000 census showed the
   population estimates behind it had been too low. Not an error, but a reader who finds the original report
   would think it was one, so the page now says which figure is superseded and why.
+
+### Reversed after review
+
+The overview caption's sentence about survey points sitting later than the fertility they measure has
+been dropped at Edouard's instruction. The country-level versions of the same point — Ethiopia's and
+Nigeria's — remain in their own caveats, which is where a caveat of that kind belongs.
