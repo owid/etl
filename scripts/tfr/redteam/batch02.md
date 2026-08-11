@@ -1536,3 +1536,60 @@ from counts rather than copying it. Uganda's, Guatemala's and Bolivia's reviewer
 was unearned on that misreading, and Myanmar's noted a reader could take it as vouching for the
 underlying survey. The new wording says what we did rather than how much it proves. Turkey's prose, which
 said a year "counts as copied rather than validated", follows the same change.
+
+## Tunisia
+
+Verdict: minor problems, and the tightest replication in the collection. The agent found the underlying
+yearbook row and confirmed our 2023 reconstruction to the fourth decimal — 1.48903 from the known-age
+counts, 1.5791 after spreading the 7,709 age-unknown births in proportion, against INS's published 1.58 —
+and its rates by age group match INS's printed ones to within rounding on every band. All nine plotted
+values check out across four yearbook editions, including that we correctly use the revised 2019 figure
+rather than the stale one.
+
+- **Checked and cleared, unusually.** After five countries whose final year turned out unfinished, I had
+  the agent look. INS marks its own provisional figures with an asterisk — 2023 infant mortality and life
+  expectancy both carry one — and neither the 2023 births total nor the 2023 rate does. The office is
+  saying those are final.
+- **Accepted.** "So a full recalculated series would mean opening one edition per year" is about our
+  reproduction workflow; kept only the half that matters to a reader, that the other years cannot be
+  checked the same way. "Two things we could not settle" was addressed to someone auditing us. INS spelled
+  out, "the bands" now "the age groups".
+- **Accepted, and reframed rather than dropped.** Our claim that INS "never states" whether births are
+  dated to occurrence or registration survived a real attack — the agent checked four editions, the
+  office's methods page and two other publications and found nothing either way — but per the standing
+  lesson it now says what we could not establish rather than what the office never does. The one concrete
+  asymmetry it did find is now on the page: the yearbook labels its deaths total corrected and never
+  labels the births total that way.
+- **Logged, not built.** Four or five more years could be recalculated from other yearbook editions, each
+  carrying one year's age breakdown. The method is proven; it is per-year PDF work.
+
+## Belgium
+
+Verdict: minor problems, but one of them inverted a finding. Every plotted value matches Statbel's own
+workbook, and our reconstruction is better than we claimed: it reproduces Statbel's rate for every single
+year of the mother's age with zero deviation across all 35 ages, not merely to four decimals.
+
+- **Accepted, and it read backwards.** "1.33 for Belgian mothers against 1.89 for foreign ones in 2024,
+  and 2.13 against 1.35 within Flanders." Having just established the order as Belgian then foreign, that
+  second pair tells the reader Belgian mothers in Flanders are at 2.13 and foreign mothers at 1.35.
+  Statbel's table says the opposite — 1.35 Belgian, 2.13 foreign — and the agent confirmed the same
+  ordering in six separate years. The numbers were right and their attribution was reversed, which is
+  worse than a wrong number: it inverts what the reader concludes about who is having the children.
+- **Accepted, and its premise did not hold.** "The series is the published one rather than rebuilt because
+  the population files are hundred-megabyte register extracts, one per year." Those files are that big,
+  but the small workbook we already use for every other figure carries the fully computed rates by age,
+  nationality and region for every year since 2011 — so the stated obstacle does not block what the
+  sentence implies. Cut as our own tooling either way.
+- **Accepted.** "The geopolitical situation" is a euphemism where Statbel names the war in Ukraine, and it
+  bundled two separate year-specific explanations into one. Now given as the office gives them. "A
+  legal-residence concept on both sides of the rate" is plain now.
+- **Prompted the label change below.** The agent argued "Rate copied from source, not validated" flatly
+  contradicts a "what we did" block describing a successful reconstruction. It does.
+
+## Cross-cutting: both validation labels now describe the operation, not the proof
+
+Following the rename of "Fully validated from births & women" to **"Recalculated from births & women"**,
+the other label goes from "Rate copied from source, not validated" to **"Rate copied from source"**.
+Belgium is why: its page describes reproducing Statbel's rate for all 35 single ages exactly, under a
+label announcing the figure was "not validated". Both halves now say who computed the number and stop
+there. That removes the reading that made four separate reviewers argue about whether a label was earned.

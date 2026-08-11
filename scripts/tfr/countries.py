@@ -7,10 +7,10 @@ Every country carries two independent attributes:
 * ``recalculated`` — whether we rebuilt the figure ourselves. True means it was rebuilt from counted
   births and women and checked against what the office publishes; False means the office's own rate
   was copied straight from the source. The labels say "Recalculated from births & women" and "Rate
-  copied from source, not validated" — deliberately not "fully validated", which several reviewers
-  read as a claim about the number being right rather than about how far we could take it apart. This
-  says how far we could verify the number, not how good the number is: an incomplete registry we can
-  decompose is still an incomplete registry.
+  copied from source" — deliberately not "fully validated" and "not validated", which several reviewers
+  read as claims about whether the number is right rather than about who computed it. Both now describe
+  the operation and nothing more. This says how far we could take a figure apart, not how good it is:
+  an incomplete registry we can decompose is still an incomplete registry.
 
 ``loader`` is None for countries with no national figure to plot.
 """
@@ -1538,20 +1538,22 @@ COUNTRIES = [
       "https://statistics.gov.rw/"),
     C("Tunisia", "INS — registered births divided by the mid-year population", tunisia, "Tunisia", "complete",
       False,
-      "INS publishes a fertility rate every year, built from civil registration, and the statistical "
-      "yearbook prints the births by the mother's age group and the mid-year population behind it.",
-      "We read the published series. We also rebuilt 2023 from those counts: dividing them directly gives "
-      "1.489, but 7,709 of the 135,148 births have no age recorded, and spreading those across the bands "
-      "in proportion gives 1.579 — INS's published 1.58, and its printed age-specific rates almost "
-      "exactly. That is how the office handles them, and dropping them instead would understate the rate "
-      "by 6%.",
-      "Tunisia's fall is steep and recent: 2.4 in 2015 to 1.58 in 2023. Only the yearbook's most recent "
-      "year carries the age breakdown, so a full recalculated series would mean opening one edition per "
-      "year. Two things we could not settle. INS never states whether a birth is dated to the year it "
-      "happened or the year it was registered, and it mentions no late-registration correction for live "
-      "births — though it does say that more than half of stillbirths go unregistered. And the population "
-      "is all residents rather than citizens, which in Tunisia hardly matters: the 2024 census puts "
-      "foreign nationals at 0.55% of the population.",
+      "Tunisia's national statistics office, INS, publishes a fertility rate every year, built from civil "
+      "registration, and the statistical yearbook prints the births by the mother's age group and the "
+      "mid-year population behind it.",
+      "We read the published series. We also rebuilt 2023 from those counts. Dividing them directly gives "
+      "1.489, but 7,709 of the 135,148 births have no age recorded, and spreading those across the age "
+      "groups in proportion gives 1.579 — INS's published 1.58, and its printed rates for each age group "
+      "almost exactly. That is how the office handles them, and dropping them instead would understate the "
+      "rate by 6%.",
+      "Tunisia's fall is steep and recent: 2.4 in 2015 to 1.58 in 2023. Only the most recent year of each "
+      "yearbook carries the age breakdown, so the other years cannot be checked the same way. We could not "
+      "establish whether a birth is dated to the year it happened or the year it was registered, or whether "
+      "any late-registration correction is applied to live births — the yearbooks carry no methodology "
+      "section at all. The office does say that more than half of stillbirths go unregistered, and it labels "
+      "its deaths total corrected while never labeling the births total that way. The population is all "
+      "residents rather than citizens, which in Tunisia hardly matters: the 2024 census puts foreign "
+      "nationals at 0.55% of the population.",
       "https://www.ins.tn/statistiques/112"),
     C("Burundi", "ISTEEBU — Demographic and Health Survey rounds", burundi, "Burundi", "survey", False,
       "Burundi's statistics office publishes a fertility rate from two survey rounds, 2010 and 2016-17. "
@@ -1857,19 +1859,19 @@ COUNTRIES = [
       "Statbel publishes a births-and-fertility workbook for each year since 2011. It gives the rate for "
       "the country and each region, split by whether the mother is Belgian or foreign, and — in the same "
       "workbook — births by single year of the mother's age.",
-      "We read the published series. Dividing the 2024 births by the mean of the 1 January populations "
-      "either side gives 1.4361 against the published 1.44, and reproduces its own age-by-age rates to "
-      "four decimals; using the 1 January stock alone is measurably worse, which confirms the mean is "
-      "what it uses.",
-      "The nationality split is wide and moves the picture: 1.33 for Belgian mothers against 1.89 for "
-      "foreign ones in 2024, and 2.13 against 1.35 within Flanders. The headline 1.44 sits between them. "
-      "The population register is a legal-residence concept on both sides of the rate — since 2010 births "
-      "are drawn from the register rather than from civil-registry declarations, which makes 2010 a break "
-      "in any long series, and births abroad to women legally resident in Belgium are counted. Foreign "
-      "nationals went from 11.2% of residents in 2015 to 13.4% in 2023, and Statbel attributes the "
-      "2021-24 inflow to post-pandemic catch-up and the geopolitical situation. 2024 and 2025 are "
-      "provisional; definitive figures come about a year late. The series is the published one rather "
-      "than rebuilt because the population files are hundred-megabyte register extracts, one per year.",
+      "We read the published series. As a check, dividing the 2024 births by the mean of the 1 January "
+      "populations either side gives 1.4361 against the published 1.44, and reproduces Statbel's own rate "
+      "for every single year of the mother's age exactly; using the 1 January count alone fits measurably "
+      "worse, which confirms the mean is what it uses.",
+      "The nationality split is wide and moves the picture. In 2024 the rate was 1.33 for Belgian mothers "
+      "and 1.89 for foreign ones, with the headline 1.44 between them; in Flanders the same split is wider "
+      "still, 1.35 for Belgian mothers against 2.13 for foreign ones. Both the births counted and the "
+      "population they are divided by come from the same legal-residence register. Since 2010 the births "
+      "are drawn from that register rather than from certificates filed with the civil registry, which "
+      "makes 2010 a break in any longer series, and births abroad to women legally resident in Belgium are "
+      "counted. Foreign nationals went from 11.2% of residents in 2015 to 13.4% in 2023 — Statbel puts the "
+      "2021 rebound down to catching up after the pandemic, and the 2022-23 surge down to the war in "
+      "Ukraine. 2024 and 2025 are provisional; definitive figures come about a year later.",
       "https://statbel.fgov.be/fr/themes/population/natalite-et-fecondite"),
     C("Greece", "ELSTAT — registered births divided by the average population", greece_tfr, "Greece",
       "complete", True,
