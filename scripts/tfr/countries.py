@@ -1997,11 +1997,8 @@ COUNTRIES = [
       "answer sat closest to the survey trend. Its two official census volumes, published the same month, "
       "then disagree with each other about the answer: the national report adopts 5.6 and the fertility "
       "volume adopts 5.7, from a different method. The 2021 mid-term census published population counts "
-      "only, with no fertility results at all. One note on the last plotted point: 4.2 for 2019 comes "
-      "from that survey's key-indicators report, which describes its results as preliminary, and no full "
-      "report has appeared since.",
-      "https://www.statistics.sl/images/StatisticsSL/Documents/Census/2015/"
-      "2015_census_national_analytical_report.pdf"),
+      "only, with no fertility results at all.",
+      "https://dhsprogram.com/pubs/pdf/FR365/FR365.pdf"),
     C("Austria", "Statistik Austria — registered births by the mother's age, over the mean female "
       "population", austria_tfr,
       "Austria", "complete", True,

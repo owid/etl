@@ -2069,9 +2069,18 @@ nowhere near.
 - **Accepted.** Cut "the largest census correction we have found anywhere, by a wide margin" and the
   comparisons to Mali's and Cambodia's corrections. The size of this one is on the page in its own terms —
   87,302 births scaled to 328,433 — which is the part a reader can check.
-- **Accepted.** The 4.2 for 2019 comes from a key-indicators report that calls its own results
-  preliminary, and no full report has appeared since. Said on the page now, in the same way five other
-  countries' last points are qualified.
+- **Accepted, and then retracted — it was the twenty-seventh false absence claim, and mine.** The agent
+  said the 4.2 for 2019 comes from a key-indicators report calling its own results preliminary, and that
+  it could not find a full report listed. I wrote that onto the page as "no full report has appeared
+  since", turning "I did not find it" into "it does not exist" — the exact move this campaign has caught
+  twenty-six times in other people's work. It exists: DHS FR365, 647 pages, whose own summary reads "This
+  report presents the final results of survey". Its table gives TFR (15-49) as 3.1 urban, 5.1 rural and
+  4.2 nationally, so the plotted value was right all along and was never preliminary. The sentence is
+  gone, and the link now points at that report instead of at the census volume, which did not match the
+  source line anyway.
+- **What it cost to check.** One download and two greps. The claim went onto the page in the same session
+  that logged twenty-six of these, which says the discipline has to apply to text I write from an agent's
+  report, not only to text I inherit. An agent saying "could not find" is evidence about the agent.
 - **Accepted.** Expanded Stats SL to Statistics Sierra Leone.
 - **And the guard caught my own rewrite.** The reconciliation, rewritten, put 87,472 births, 1,835,328
   women and the rate 1.567 close enough together that `--audit`'s impossible-arithmetic check fired: those
