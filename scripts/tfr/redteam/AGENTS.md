@@ -34,25 +34,29 @@ lives entirely in this file and the findings logs — the brief generator, the s
 absence-claim instruction, and `--sync`/`--audit` all work unchanged. Launch the first five from To do,
 in the order listed.
 
-Two other things a resuming session should know. The brief generator has caused three false findings —
-describing the map as an average gap, printing age-band figures at full float precision, and printing
-the series to four significant figures so an agent read 1.25486 as "1.255" and reported a rounding bug.
-All three are fixed, but check anything a report asserts about the page against the page. And for any
-country whose source is an interface rather than a file, tell the agent not to fight it and to fall
-back on published reports; that is what unstuck Poland.
+Two other things a resuming session should know. The brief generator has caused six false findings, all
+fixed: describing the map as an average gap; printing age-band figures at full float precision; printing
+the series to four significant figures, so an agent read 1.25486 as "1.255" and reported a rounding bug;
+rounding halves to even where offices round up, so an agent reported Cuba's women as one person short of
+the source; and, for a country with nothing plotted, printing both a validation label and the standing
+"this office publishes fertility rates only" sentence, neither of which any reader sees on such a page —
+which had the UAE agent spend two of its five findings on text that is not published. Check anything a
+report asserts about the page against the page. And for any country whose source is an interface rather
+than a file, tell the agent not to fight it and to fall back on published reports; that is what unstuck
+Poland.
 
 ## In flight (5)
 
-- United Arab Emirates
-- Tajikistan
-- Papua New Guinea
-- Cuba
 - Sweden
+- Czechia
+- Azerbaijan
+- Portugal
+- Greece
 
 ## Reported, awaiting write-up (0)
 
 
-## Analyzed (86)
+## Analyzed (90)
 
 - India
 - China
@@ -139,14 +143,14 @@ back on published reports; that is what unstuck Poland.
 - Belgium
 - Dominican Republic
 - Jordan
+- United Arab Emirates
 - Honduras
+- Tajikistan
+- Papua New Guinea
+- Cuba
 
-## To do (9)
+## To do (5)
 
-- Czechia
-- Azerbaijan
-- Portugal
-- Greece
 - Israel
 - Hungary
 - Austria

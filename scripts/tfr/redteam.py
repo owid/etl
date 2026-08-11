@@ -12,6 +12,7 @@ import csv
 import os
 import re
 import sys
+from decimal import ROUND_HALF_UP, Decimal
 
 import pandas as pd
 
@@ -56,24 +57,41 @@ def _bands(country):
     return None, None
 
 
+def _half_up(v):
+    """Round to a whole number the way a statistical office does.
+
+    Some offices publish mean populations that land exactly on a half — Cuba's 2024 women aged 15-19
+    are 254,152.5 — and print them rounded up. Python's own rounding goes to the nearest even number,
+    which prints 254,152 and had an agent report a one-person discrepancy against the source that is
+    purely a rounding convention.
+    """
+    return int(Decimal(str(float(v))).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+
+
 def brief(country):
     c = entry(country)
     if c is None:
         return f"{country} is not in the collection."
     found, method, caveats, url = DOCS.get(country, ("", "", "", ""))
     tier_label = TIERS[c["tier"]][0]
+    plotted = c["loader"] is not None
     out = [f"COUNTRY AS PUBLISHED: {country}",
            f"SOURCE LINE: {c['src']}",
            f"LINK SHOWN TO THE READER: {url or '(none)'}",
-           f"QUALITY LABEL — what the national figure is built from: {tier_label}",
-           f"QUALITY LABEL — validation level: {VALIDATION[bool(c['recalculated'])]}",
-           "",
-           "THE OTHER LABELS AVAILABLE ON THE FIRST SCALE, for judging whether ours is right:",
-           "  " + "; ".join(v[0] for v in TIERS.values()),
-           "THE OTHER LABEL AVAILABLE ON THE SECOND SCALE:",
-           f"  {VALIDATION[not bool(c['recalculated'])]}",
-           "",
-           "PROSE BLOCK 1 — \"What the office publishes\":", found or "(empty)", "",
+           f"QUALITY LABEL — what the national figure is built from: {tier_label}"]
+    # A country with nothing plotted carries no validation label on the page, because there is no
+    # figure of ours to have validated or copied. Printing one had an agent judge a label the reader
+    # is never shown.
+    if plotted:
+        out.append(f"QUALITY LABEL — validation level: {VALIDATION[bool(c['recalculated'])]}")
+    out += ["",
+            "THE OTHER LABELS AVAILABLE ON THE FIRST SCALE, for judging whether ours is right:",
+            "  " + "; ".join(v[0] for v in TIERS.values())]
+    if plotted:
+        out += ["THE OTHER LABEL AVAILABLE ON THE SECOND SCALE:",
+                f"  {VALIDATION[not bool(c['recalculated'])]}"]
+    out += ["",
+            "PROSE BLOCK 1 — \"What the office publishes\":", found or "(empty)", "",
            "PROSE BLOCK 2 — \"What we did\":", method or "(empty)", "",
            "PROSE BLOCK 3 — \"Watch out for\":", caveats or "(empty)", ""]
 
@@ -108,7 +126,9 @@ def brief(country):
             out.append("")
 
     year, bands = _bands(country)
-    if bands is None:
+    # That standing sentence is only shown under a chart, so a not-plotted country never shows it.
+    # Printing it anyway had an agent challenge it as a claim about the country's office.
+    if bands is None and plotted:
         out += ["AGE-BAND BREAKDOWN: none. In its place the page shows the reader this sentence:",
                 "  \"This office publishes fertility rates only, not the births and female population",
                 "  behind them, so the two sources cannot be compared age band by age band.\"", ""]
@@ -124,7 +144,7 @@ def brief(country):
             cells = []
             for k in bands.columns:
                 v = r[k]
-                cells.append(f"{k}={v}" if isinstance(v, str) else f"{k}={float(v):,.0f}")
+                cells.append(f"{k}={v}" if isinstance(v, str) else f"{k}={_half_up(v):,}")
             out.append("  " + ", ".join(cells))
         out.append("")
     return "\n".join(out)

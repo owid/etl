@@ -1730,3 +1730,112 @@ Verdict: serious problems, and one of them was a plotted point belonging to anot
   women tables, which would support a recalculated registration-based series for 2013 to 2016. Four years
   is too short to plot against the survey rounds, but it is the same low-effort build as several other
   countries on this list.
+
+## United Arab Emirates
+
+Verdict: serious problems, on the one page with nothing plotted. The two figures it quotes are right;
+the sentence explaining why nothing can be plotted overreached, and two of the report's five findings
+turned out to be about my brief generator rather than the page.
+
+- **Accepted, softened rather than corrected.** "Only Dubai has ever published a rate for non-nationals,
+  a single 1.2 for 2014 against 3.4 for nationals." The agent found strong secondary evidence that Abu
+  Dhabi's statistics centre publishes a fertility breakdown by citizenship in its annual birth statistics,
+  in at least two editions, but could not open scad.gov.ae. Neither could I — every request to
+  scad.gov.ae times out from here. So the uniqueness claim cannot be defended and the counter-figure
+  cannot be quoted. The page now gives Dubai as an example rather than as the only case, which is true
+  either way.
+- **Accepted.** "There has been no census since 2005" is true only of the federal census. Abu Dhabi
+  counted its own population in 2010, Sharjah in 2015 and Ajman in 2017, none publishing much beyond a
+  total. Said that way now.
+- **Accepted.** Cut "Every figure quoted here comes from an academic database that republishes the
+  office's tables with citations, because the office's own site could not be reached" — our access
+  problem, not the reader's business. Rewrote the two sentences that ranked this country against the rest
+  of the collection so they stand on their own, and replaced "the numerator is public and the denominator
+  is not" with what that actually means.
+- **Not a finding: the brief generator's fault, and now fixed.** The report challenged "This office
+  publishes fertility rates only, not the births and female population behind them" as an inaccurate
+  claim about the federal centre. That sentence is the standing text the page shows under a chart when
+  there is no age-band comparison — and this country has no chart, so no reader ever sees it here. The
+  brief printed it anyway. Same for the validation label: an unplotted country carries none on the page,
+  because there is no figure of ours to have copied or recalculated, but the brief printed one and the
+  agent duly assessed it. Both are now conditional on the country being plotted.
+
+## Tajikistan
+
+Verdict: minor problems, and the strongest verification any page in this collection has had. The agent
+pulled two editions of the demographic yearbook and matched all twenty-four plotted values, the 2023
+birth count to the digit, the women by age to the digit, and both halves of our own reconciliation
+independently — 3.0322 and 250,615 against our 3.032 and 250,616.
+
+- **Accepted.** The link shown to the reader does not lead to the data. It points at a social-demographic
+  section page whose only attachment is a short definitions PDF; the yearbooks live under a different
+  path entirely. Now points at the publications archive.
+- **Accepted, and it bears on the label.** The page carried the "complete registration" label with no
+  mention of how complete registration actually was. Surveys the agency itself cites put the share of
+  births registered at 74.6% in 2000 and 88.3% in 2005, reaching 95.3% by 2010 — so for the early part of
+  this series a quarter of births were missing. Stated now, next to the label it qualifies.
+- **Accepted.** The 2017 health survey reported 3.8 for the three years before it, about 30% above what
+  registration gives for those years. A reader would find that within minutes and wonder why the page was
+  silent. Now on the page.
+- **Rejected as an absence claim, because the agent broke its own attempt.** "Raw birth counts by age of
+  mother are not published anywhere." The agent went after this properly — the yearbook, the open data
+  portal, and volume 10 of the 2020 census, which is entirely about fertility. That volume publishes
+  children ever born by the mother's age, a lifetime measure, not births in a year, so the claim holds.
+  Worth recording that the closest counter-example was checked rather than assumed away.
+- **Accepted.** "Artefact" was a British spelling. Also replaced "band", "second-order", "own counted
+  fertility" and a sentence fragment with plainer wording.
+
+## Cuba
+
+Verdict: minor problems, but the one finding is another confident claim that something does not happen —
+and the agent disproved it by downloading four editions of the yearbook and comparing them.
+
+- **Accepted.** "Nothing is revised backwards, so the pre-2021 and post-2021 series can be joined." The
+  second half is true: the years before 2021 have never been restated on the new definition. The first
+  half is false. Between successive editions, 2021's rate went from 1.45 to 1.47 and 2022's from 1.41 to
+  1.52. The birth counts never moved in any edition; what moved was the population ONEI divides by, as
+  more migration data came in. That makes the newest point, 1.29 for 2024, a first-edition figure of
+  exactly the kind that has shifted before, and the page now says so instead of implying the series is
+  settled.
+- **Accepted.** Rewrote the TFG/TGF warning to actually distinguish them, and stopped quoting ONEI's rate
+  to ten decimal places in prose.
+- **Accepted as a generator fix.** Two of the seven women-by-age figures printed one person below the
+  source's own printed integers, because the source's mean populations land on exact halves — 254,152.5 —
+  and Python rounds halves to even where the office rounds up. Invisible to readers, but the brief prints
+  these numbers, so it now rounds half-up. This is the second time in this campaign that half-up rounding
+  has produced a finding.
+
+## Papua New Guinea
+
+Verdict: minor problems. All three plotted values, both recomputations, the UN series, the map difference
+and every census fact verified. The twenty-first false absence claim.
+
+- **Accepted.** "Its censuses have never produced a fertility rate at all" and "Every figure the country
+  has comes from a purpose-built survey." The counter-example was sitting inside the 2006 survey report
+  this page already cites: its introduction gives a rate of 4.6 for 2000 from an NSO monograph on
+  fertility and mortality, next to a birth rate from that year's census. The page now says the recent
+  censuses published no rate, which is what we could actually establish, and gives the 2000 figure.
+- **Accepted.** "Three figures, all from surveys" reads as a count of everything that exists. A 1996
+  health survey put the rate at 4.8. Now framed as the three plotted here, with the earlier one named.
+- **Accepted.** "A Brass ratio correction of about 14%" and "a Gompertz model" were unglossed. Replaced
+  with what the correction is for: women reported fewer births in the past year than their lifetime totals
+  implied, so the office raised the raw rate. This is the same jargon the South Sudan page was carrying,
+  from the same pair of method names.
+- **Accepted.** The survey's name is the Socio-Demographic and Economic Survey.
+- **Softened.** The 11.8 million pre-census population was attributed to a satellite-based model; the
+  agent could not tie that specific figure to the office's geospatial model rather than to an ordinary
+  projection. The page now states the figure and the census's 10.2 million without attributing the method.
+- **Noted, not changed.** The 2016-18 survey point sits at 2018, the last fieldwork year, where its
+  three-year reference window centers nearer 2016. Same convention as the rest of the collection.
+
+## Cross-cutting: source lines that described a crude birth rate
+
+Tajikistan's source line read "registered births divided by the resident population". Read literally that
+is a crude birth rate, around 0.03, not a fertility rate around 3 — and dividing all births by all women
+is the exact error that produced three of this campaign's worst findings. Twenty-three source lines had
+the same shape. All now name the mother's age and a female population: "registered births by the mother's
+age, over the resident female population". Malaysia's said its rates were divided by its population
+estimates, which is not what an already-computed rate is, and now says we take the office's own rates by
+the mother's age — which is also what its "what we did" block says, and DOSM does not state what
+population its rate divides by. Azerbaijan's and Czechia's are the two left, deliberately: both are under
+review as this is written, and changing the text an agent is holding invites a phantom finding.
