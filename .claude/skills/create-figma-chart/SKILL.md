@@ -694,7 +694,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Off-palette fills | compare every fill against the library groups | every fill is a library color, **bound as a style** — grapher emits `#585c64` for residual categories, which is in no group. Two standing exceptions, listed rather than flagged: the muting grays of a highlight treatment, and a grapher-managed sequential map ramp (see below) |
 | Legend agreement | pair swatch→label by geometry, compare against the bars | zero mismatches |
 | Text size | read `fontSize` off every text node | nothing below **12px**; annotations on the named ladder |
-| Mark weight | read `strokeWeight` off **every** line and halo, after the last scale | on a highlight treatment: context **1–1.5px**, protagonist **3px**, halo 2× (or line+1 where nothing crosses). Read it even when you never set it — and especially *because* you never set it: `rescale()` multiplies stroke weight, so fitting a chart to the band took grapher's 2.5px lines down to **0.88px** hairlines on a frame that otherwise measured perfect. Set the weights explicitly *after* the final scale, never before |
+| Mark weight | read `strokeWeight` off **every** line and halo, after the last scale | on a highlight treatment: context **1px** (the settled value — GUIDELINES.md → Highlighting; 1.5px is the reference-page treatment this skill tells you not to copy), protagonist **3px**, halo 2× (or line+1 where nothing crosses). Read it even when you never set it — and especially *because* you never set it: `rescale()` multiplies stroke weight, so fitting a chart to the band took grapher's 2.5px lines down to **0.88px** hairlines on a frame that otherwise measured perfect. Set the weights explicitly *after* the final scale, never before |
 | Label-on-fill contrast | `contrast(labelHex, barHex)` for every in-bar label | **4.5:1** at 13.5px regular — the 3:1 large-text allowance does not apply |
 | Text hierarchy | list every distinct `fontSize` with what it belongs to, **and its rank** | title > subtitle ≥ annotations > supporting text ≥ labels. Sizes may vary inside the plot by rank; a lead annotation may *equal* the subtitle (Annotation XL 16) but nothing may exceed it, and same-rank items must share a size |
 | Sizes are named styles | every size matches a style in the file | no arbitrary sizes left over from scaling the export (13.7, 16.8). Choose from the ladder by rank rather than by element type — see GUIDELINES.md → Subtitles and notes |
@@ -706,10 +706,20 @@ Every one of these caught a real defect on this skill's first run, and none of t
 **For arrows, drop vectors entirely and probe the rendered pixels.** Arrow groups are rotated, so every vector-space measurement of theirs is wrong (see Gotchas), and "very close but never on top" is a pixel property anyway. Screenshot the frame at 1:1, take the arrow's **`absoluteBoundingBox`** in frame coordinates, and inside it count pixels of the arrow's gray against pixels of the line's color:
 
 ```python
-def isgray(c): r,g,b = c; return abs(r-g)<14 and abs(g-b)<14 and 60 < r < 165   # arrow, not text or bg
-def isteal(c): r,g,b = c; return b > r+40 and g > r+30 and b > 90 and r < 130   # the line's own hue
-minGap  = min(hypot(a-b) for a in grays for b in teals)
-touching = sum(1 for a in grays for b in teals if hypot(a-b) <= 1.5)
+from math import hypot
+def isgray(c): r, g, b = c; return abs(r-g) < 14 and abs(g-b) < 14 and 60 < r < 165   # arrow, not text or bg
+def isteal(c): r, g, b = c; return b > r+40 and g > r+30 and b > 90 and r < 130       # the line's own hue
+
+grays, teals = [], []                        # keep the POSITIONS, not just the verdicts
+for y in range(y0, y1):                      # y0..y1, x0..x1 = the arrow's absoluteBoundingBox, padded
+    for x in range(x0, x1):
+        c = px[x, y]
+        if   isgray(c): grays.append((x, y))
+        elif isteal(c): teals.append((x, y))
+
+d        = lambda a, b: hypot(a[0]-b[0], a[1]-b[1])
+minGap   = min(d(a, b) for a in grays for b in teals)
+touching = sum(1 for a in grays for b in teals if d(a, b) <= 1.5)
 ```
 
 **Pass is `touching == 0` with `minGap` about 3–7px.** This is the only check that caught the real defects: it found the peak arrow overlapping the line by 11 pixel pairs where the vector math had reported a comfortable clearance, and it confirmed the fix at 3.0px with zero contacts. Report both numbers per arrow.
@@ -717,14 +727,18 @@ touching = sum(1 for a in grays for b in teals if hypot(a-b) <= 1.5)
 **On a line chart the bbox overlap test is not conservative, it is useless — sample the polyline.** A diagonal line's bounding box is most of the plot, so a bbox test reports every annotation as covering every line: on this run it returned 5 collisions across 4 frames, all but one of them phantom, and it *buried the one real defect in the noise* (a portrait annotation genuinely clipping the projection line). Extract the path's points — the numbers in `vectorPaths[0].data` alternate x,y, so map them through the node's own bbox — then walk the segments and sample each at ~1px:
 
 ```js
-const pts = v => {                                   // path space -> frame space
+const pts = (v, frame) => {                          // path space -> FRAME space
   const n = ((v.vectorPaths||[]).map(p=>p.data).join(" ").match(/-?\d+\.?\d*/g)||[]).map(Number);
   const xs = n.filter((_,i)=>i%2===0), ys = n.filter((_,i)=>i%2===1);
   const [mnx,mxx,mny,mxy] = [Math.min(...xs),Math.max(...xs),Math.min(...ys),Math.max(...ys)];
-  return xs.map((x,i)=>({ x: v.x + (x-mnx)/((mxx-mnx)||1)*v.width,
-                          y: v.y + (ys[i]-mny)/((mxy-mny)||1)*v.height }));
+  const b = v.absoluteBoundingBox, fb = frame.absoluteBoundingBox;   // survives nesting and rotation
+  const ox = b.x - fb.x, oy = b.y - fb.y;
+  return xs.map((x,i)=>({ x: ox + (x-mnx)/((mxx-mnx)||1)*b.width,
+                          y: oy + (ys[i]-mny)/((mxy-mny)||1)*b.height }));
 };
 ```
+
+**Drive it off `absoluteBoundingBox`, not `v.x`/`v.y`, even though the naive version happens to work on a fresh import.** Group ancestors are transparent for coordinates, so a line nested under `lines` → `chart-area` does report frame coordinates and the short form measures correctly — that is why it produced sound numbers here. But the assumption is invisible and it fails three ways: under a nested **FRAME** ancestor, under an ancestor that was **scaled** rather than rescaled, and on any node with non-zero **rotation** (which is exactly how the arrow measurements in this skill came out as fiction). The absolute form costs one property read and cannot be wrong, so prefer it and keep the audit trustworthy when someone later reparents the chart. Note this also normalizes the *box*: for a rotated node the bbox is the visual one, so the mapping stays a mapping onto what you can see.
 
 That took the same four frames to **one** finding, which was real. And the same routine fixes it without guesswork: take the topmost line point under the annotation's x-range and set `box.y = thatY − 5 − box.height`, then re-run the test and confirm it now reports clear. (This is the line-chart counterpart of the subpath-bbox rule for maps: boxes decide where things may go, geometry decides how it reads.)
 
