@@ -373,22 +373,24 @@ COUNTRIES = [
       "https://bdl.stat.gov.pl/"),
     C("Peru", "INEI — registered births over its population estimates", peru_tfr, "Peru", "complete",
       True,
-      "INEI publishes registered births by age group of mother as spreadsheets, and female population by "
-      "age group. It also publishes two fertility rates of its own, neither of them from the registry: 1.8 "
-      "for 2023 from its continuous household survey, and 2.2 as the assumption inside its population "
-      "projection for 2020-25.",
+      "Peru's national statistics institute, INEI, publishes registered births broken down by the mother's "
+      "age group, and female population by age group. The birth table covers only births registered online, "
+      "which is 97 to 99% of them depending on the year. INEI also publishes two fertility rates of its own, "
+      "neither from the registry: 1.8 for 2023 from its continuous household survey, and 2.2 as the "
+      "assumption inside its population projection for 2020-25.",
       "We divided the births by the female population in each age group and summed, giving 1.84 for 2022, "
       "1.69 for 2023 and 1.51 for 2024.",
-      "Peru follows the Colombia and Mexico pattern: the registry shows a much steeper fall than the "
-      "official figure. Our 1.69 for 2023 sits 0.5 below the projection assumption, which is a 2019 vintage "
-      "predating both the pandemic and the decline since. INEI\'s own text already expects a real fall, "
-      "attributing it to women postponing or forgoing motherhood rather than to a data problem. Births are "
-      "counted by the year they were registered, not the year they occurred, though Peru\'s deadline is 60 "
-      "to 90 days so the two are close. Coverage is high and INEI states it: 97 to 99% of registrations come "
-      "through the electronic birth certificate, and late registration was under 3% in 2023 — but it rose "
-      "again in 2024, so that year is the least final. The 2020 collapse in registrations was lockdown "
-      "closing registry offices, which INEI says outright, so it is not a fertility signal; our series "
-      "starts after it. Each annual annex sits at its own unrelated file id, with no pattern to follow.",
+      "The registry shows a much steeper fall than either of INEI's own figures. Our 1.69 for 2023 sits 0.5 "
+      "children per woman below the projection assumption, which dates from 2019 and so predates both the "
+      "pandemic and the decline since. INEI's own text expects a real fall, attributing it to women "
+      "postponing or forgoing motherhood rather than to a data problem. But some of the gap is registration "
+      "lag rather than fertility: births are counted by the year they were registered rather than the year "
+      "they happened, and although Peru's deadline is 60 to 90 days, enough records arrive later to lift a "
+      "year's total by several percent once the following year's report is published. That correction has not "
+      "happened yet for 2024, so it is the least complete year here and should be expected to rise. Late "
+      "registration was under 3% in 2023 but rose to over 4% in 2024, which makes the point. The 2020 "
+      "collapse in registrations was lockdown closing registry offices, which INEI says outright, so it is "
+      "not a fertility signal; our series starts after it.",
       "https://www.gob.pe/institucion/inei/informes-publicaciones"),
     C("Philippines", "Philippine Statistics Authority — registered live births", philippines,
       "Philippines", "incomplete", True,
@@ -998,20 +1000,22 @@ COUNTRIES = [
       "partly on student migration — so some of the fall in the rate is the denominator growing rather than "
       "births falling.",
       "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310041601"),
-    C("Yemen", "CSO and health ministry — National Health and Demographic Survey 2013", yemen, "Yemen",
+    C("Yemen", "Health ministry and CSO — National Health and Demographic Survey 2013", yemen, "Yemen",
       "survey", False,
-      "One figure inside our window: 4.4 children per woman for the three years to 2013, from the survey "
-      "the Central Statistical Organisation ran with the health ministry. The 2004 census is also covered, "
-      "but the organization publishes two different figures for it — 4.93 by one method and 6.1 by another.",
-      "We read the national column of table 2. Summing its age-specific rates and multiplying by the band "
-      "width gives 4.43, the published 4.4.",
-      "We use the 2013 survey rather than the census because the census figures are not one number: the "
-      "organization's own yearbook prints 4.93 from directly observed births and 6.1 from adding up rates by "
-      "age group, and a separate study of its own reaches 6.1 by an indirect method. Choosing between those "
-      "is a judgment about method rather than a lookup, so the survey — a single figure from the standard way "
-      "of estimating fertility from women's birth histories — is the safer one. Nothing has been published "
-      "since 2013; the war began in 2015, and the office's own websites have not survived it, so this report "
-      "came from a web archive.",
+      "Only one figure falls in the years covered here: 4.4 children per woman for the three years to 2013, "
+      "from the survey the Ministry of Public Health and Population ran with the Central Statistical "
+      "Organisation. The 2004 census is also covered, but two different figures are published for it — 4.93 "
+      "and 6.1.",
+      "We read the national column of table 2. Adding up its birth rates for each five-year age group and "
+      "multiplying by five gives 4.43, the published 4.4.",
+      "We use the 2013 survey rather than the census because the census does not give one number. The 4.93 "
+      "comes from counting the births women reported. The 6.1 comes from an indirect estimate, worked out "
+      "from the number of children women said they had ever had — and the rates by age group printed "
+      "alongside it appear to have been scaled to match that estimate, so the two are not independent "
+      "calculations that happen to agree. Picking between 4.93 and 6.1 means weighing the methods rather "
+      "than reading a number off a table, so the survey — one figure, from the standard approach of asking "
+      "women about the children they have had — is the safer choice. Nothing has been published since 2013: "
+      "the war began in 2015, and the office's own websites have not survived it.",
       "https://web.archive.org/web/20220608201754/https://cso.gov.ye/about_cso"),
     C("Angola", "INE — Inquérito de Indicadores Múltiplos e de Saúde", angola, "Angola", "survey", False,
       "INE publishes a fertility rate for each survey round: 6.2 from the 2015-16 survey and 4.8 from the "

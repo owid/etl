@@ -636,3 +636,50 @@ of publishing a figure it could not account for, and it accounts for it in its o
 - **Lesson.** Twice now — here and Ghana — the page has stated more confidently than we could support
   that a source fails to document something. An absence of evidence found by us is not evidence of
   absence in the source, and it should never be written as though it were.
+
+## Peru
+
+Verdict: minor problems. The agent traced every plotted number to INEI's own tables and reproduced
+both years it checked in full — 1.513 for 2024 and 1.687 for 2023, exact.
+
+- **Accepted, undisclosed scope.** The birth table we use covers only births registered online, 97 to
+  99% of them depending on the year. That was not disclosed anywhere. Now stated in the first block.
+- **Accepted, and the caveat was too weak.** We said registration lag makes the latest year "the least
+  final" and left it there. Reconstructing occurrence years from INEI's own tables, the agent found
+  late records lift a year's total by roughly four to five percent once the following year's report
+  lands — enough to account for about half the gap between our figure and INEI's own survey. 2024 has
+  had no such catch-up at all. The page now says the recent years should be expected to rise, and why.
+- **Accepted.** "Peru follows the Colombia and Mexico pattern" leans on two entries the reader has not
+  seen. Gone.
+- **Accepted.** "Each annual annex sits at its own unrelated file id, with no pattern to follow" is a
+  note about the source's file naming, which is our problem. Gone.
+- **Accepted.** INEI spelled out, "vintage" replaced, "0.5 below" given its units, "least final"
+  replaced with "least complete".
+- **Logged, not built.** The series looks extendable back to 2021, and the health ministry's own live
+  birth certificate system would avoid the registration-lag problem entirely — INEI has itself switched
+  to it in another publication. Both are real upgrades; neither is cheap.
+- **Open.** The link is INEI's whole publications listing rather than the report and annex actually
+  used, so a reader cannot check anything from it. INEI's per-report file ids have no pattern, so a
+  stable deep link needs picking by hand; left as it is for now and worth fixing.
+
+## Yemen
+
+Verdict: minor problems. The plotted 4.4 verified against both the Arabic preliminary report and the
+English final report, our arithmetic check reproduced, and the two competing census figures confirmed
+in the office's own yearbook.
+
+- **Accepted, and it changes what the page implies.** We presented the census's 6.1 as coming from
+  "adding up rates by age group" and then said a separate study reaches 6.1 by an indirect method —
+  which reads as two independent calculations agreeing. The agent found the office's own census
+  monograph indicates the rates by age group were scaled to match the indirect estimate, so there is
+  really one estimate, written back into a rate table. Now said that way.
+- **Accepted.** The survey's own citation names the health ministry as lead and the statistical office
+  as collaborator; our source line had it the other way round. Swapped.
+- **Accepted.** "So this report came from a web archive" is our retrieval process, and redundant with
+  the archive link the reader can already see. Gone.
+- **Accepted.** "One figure inside our window" and "a judgment about method rather than a lookup" are
+  both jargon — the first is about the chart's own construction, the second is from computing. Both
+  rewritten.
+- **Noted.** The reader is walked through an age-band calculation but shown no age-band table for
+  Yemen, because the source publishes rates rather than counts. Not fixable from the published report;
+  only the survey microdata would give the counts.

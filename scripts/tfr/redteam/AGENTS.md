@@ -30,16 +30,16 @@ country whose source is an interface rather than a file.
 
 ## In flight (5)
 
-- Peru
 - Cameroon
-- Yemen
 - Canada
 - Angola
+- Ukraine
+- Morocco
 
 ## Reported, awaiting write-up (0)
 
 
-## Analyzed (43)
+## Analyzed (45)
 
 - India
 - China
@@ -77,18 +77,18 @@ country whose source is an interface rather than a file.
 - Spain
 - Argentina
 - Afghanistan
+- Yemen
 - Poland
 - Malaysia
 - Ghana
 - Saudi Arabia
+- Peru
 - Madagascar
 - Cote d'Ivoire
 - Nepal
 
-## To do (52)
+## To do (50)
 
-- Ukraine
-- Morocco
 - Uzbekistan
 - Mozambique
 - Niger
