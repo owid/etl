@@ -54,6 +54,7 @@ Companion reference for the `create-figma-chart` skill. Distilled from the desig
   - A **white outside stroke, 2–3px** on the text is the fallback for an annotation that can't take a frame (one sitting inside a filled area, where a white box would punch a hole); place it outside so it doesn't deform the letters.
 - **The knockout is for legibility against reference lines — not a license to sit on data.** It exists so gridlines, the axis rule and muted context series don't run through the letterforms. But it is opaque: whatever it covers is gone. So hug tightly — zero horizontal and top padding, with only the descender allowance at the bottom — to keep the footprint to the glyph box, and then place it where it only ever covers **furniture** — gridlines, empty plot space, a muted context line. Never over the highlighted series' own line, a dot, a bar segment carrying a value, or another label. If the only spot where the annotation fits would cover meaningful data, that is the signal to move it out of the plot entirely — open a gap beneath the row it describes, or take the space from an axis you no longer need — not to accept the occlusion. A white box over a data point is worse than an unreadable annotation, because the reader cannot tell anything is missing.
 - If there's no room next to the target, annotate further away and point with an arrow.
+- **Annotations placed outside the plot are part of the plot block, and owe the template's own gaps.** Once a chart's annotations sit in bands above and below the plot (the usual arrangement on a map), the reader sees one content block, and its outer edges — not the plot's — are what has to clear the subtitle and the source line. Measure the gap the template itself uses and apply it to the block: on the 540×540 pages that is **27px under the header frame and 27px above the footer**, with ~15px between an annotation and the plot. Spacing the *plot* correctly and letting the annotations drift into that clearance is the same defect as an unspaced plot, and it looks like a mistake rather than a choice.
 - **On a full-width chart, make room by opening a gap rather than overlaying.** A 100%-stacked bar has no free margin, so an annotation has nowhere to go — but dropping a few entities and re-exporting at a flatter aspect ratio frees a band, and a gap of about one row-and-a-half opened *directly beneath the bar being annotated* puts the text where no leader line is needed at all. Shift every row below the gap down by the same amount, then re-center. Beware the export arithmetic: a flatter aspect ratio means a bigger downscale to reach the same width, so the base font has to rise with it — at 2:1 the labels came back 8px until `imFontSize` went to 35. And size the export **backwards from the gap rule**: the plot plus the annotation gaps should come to the band minus 28px, so that a 14px gap falls out at each end. Padding a short plot with 33px gaps instead is the visible symptom of having exported the wrong height — retune `imHeight` and re-export rather than living with it.
 - Annotate important values directly: write out the values of the **first and last data points** and any point the text mentions.
 
@@ -82,7 +83,7 @@ The shape is exactly two segments meeting at a right angle, with an arrowhead on
 **1px white line, and the head is the file's own arrowhead asset — not a `strokeCap`.** This is the part to get right, because a stroke cap is the obvious guess and it looks wrong: `ARROW_LINES` draws a thin open chevron where the house head is a small **solid filled triangle**, and a designer spots the difference immediately. The finished pages build the elbow as two nodes:
 
 1. **The line**: a `VECTOR` with a right-angle path, `strokeWeight = 1`, white, `strokeJoin = "MITER"`, and **every** cap `NONE`.
-2. **The head**: a copy of the same filled arrowhead vector the curvy arrows use (~8×12px, white `fills`, no stroke), cloned and moved so its centre sits at the target. Clone it rather than drawing one — it inherits the house silhouette and its rotation already points the right way, so the down-pointing and right-pointing heads are just the two you copy from an existing page.
+2. **The head**: a copy of the same filled arrowhead vector the curvy arrows use (~8×12px, white `fills`, no stroke). Clone it rather than drawing one — it inherits the house silhouette.
 
 ```js
 const v = figma.createVector();
@@ -91,16 +92,36 @@ v.vectorPaths = [{ windingRule: "NONE", data: `M 0 0 L ${dx} 0 L ${dx} ${dy}` }]
 v.strokes = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
 v.strokeWeight = 1;
 v.strokeJoin = "MITER";                     // a rounded corner softens the geometry the elbow exists to echo
-const head = existingHead.clone();          // the filled asset, already rotated
-parent.appendChild(head);
-const b = head.absoluteBoundingBox, fb = frame.absoluteBoundingBox;
-head.x += target.x - ((b.x - fb.x) + b.width / 2);
-head.y += target.y - ((b.y - fb.y) + b.height / 2);
 ```
 
-Stop the **line** ~7px short of the head's centre so the two don't overlap, and compute the target from the data — the x from the year, the y from the band edge (see Stacked area charts below).
+**`clone()` keeps the node's own transform and loses its parents' — so copy the source's `absoluteTransform`.** Arrowheads in the finished pages sit inside a group that is itself mirrored or rotated, and that group is where half the orientation lives. Clone the head alone and it lands mirrored: the solid dart renders as a **hollow open chevron**, which is the same wrong silhouette a `strokeCap` gives you, from a different cause. `rotation` will not warn you — a mirrored node's getter returns the un-mirrored angle, so the source reads 169.9° and its clone reads 10.1° while both claim to be "the same node". Set the linear part explicitly, then translate:
+
+```js
+const at = src.absoluteTransform;                       // carries the parent group's flip
+head.relativeTransform = [[at[0][0], at[0][1], 0], [at[1][0], at[1][1], 0]];
+```
+
+**Seat the head by its tip vertex, not its bounding box.** The tip is a point on a rotated path, so the bbox centre is off by a couple of pixels in both axes — enough for the head to read as detached from its line. Transform the vertices yourself and move the extreme one onto the target; then the line's own axis and the tip agree exactly:
+
+```js
+const m = head.absoluteTransform;
+const pts = head.vectorNetwork.vertices.map(q => [
+  m[0][0]*q.x + m[0][1]*q.y + m[0][2] - fb.x,
+  m[1][0]*q.x + m[1][1]*q.y + m[1][2] - fb.y ]);
+const tip = pts.reduce((a, q) => q[1] > a[1] ? q : a);   // largest y for a down-pointing head
+const rt = head.relativeTransform;
+head.relativeTransform = [[rt[0][0], rt[0][1], rt[0][2] + (target.x - tip[0])],
+                          [rt[1][0], rt[1][1], rt[1][2] + (target.y - tip[1])]];
+```
+
+Then stop the **line** ~7px short of the target so the head's rear covers the junction and the two read as one object — a gap between line and head is the other way this arrow looks broken.
 
 **Aim at the event, not at the floor.** An arrow annotating a collapse points at the *top of the collapsing band* at the year it collapses — that is where the change is legible. Running it all the way down to the plot's baseline crosses two other bands to arrive at a sliver, which reads as pointing at nothing; on this chart the difference was 54px of unnecessary line.
+
+**If the sentence names a year, the arrow points at that year** — derive the x from the axis, not by eye. Two traps in doing that:
+
+- **Grapher insets the first and last tick labels** (~17px on a 540px frame) so they don't clip, so a year→x fit through the *edge* labels is wrong for every year. Fit on the interior ticks only and check the residuals: the interior ones land within ±0.1px, and the two edge labels show up as identical opposite-signed outliers.
+- **The first and last data points sit at the plot's edges**, which is where the **gridlines** end — not at the last label's centre. "In 2025, x was y" therefore points at the extreme right of the plot; aiming at the label centre lands the arrow ~17px inside the chart, in the middle of nothing.
 
 **Set `x`/`y` to the path's bounding-box minimum, not to its first vertex.** A leader that runs up or left has negative coordinates, and Figma normalizes the bbox — so assigning the start point puts the box's *top-left* there and the line draws away in the wrong direction. One leader aimed up at Chad ran down into the footer instead:
 
@@ -271,8 +292,35 @@ Two mechanics to get right. Applying a text style **overwrites the font and clea
 ### Maps
 - **On a two-bin categorical map, delete the legend and let the title's colored words be the key.** "Countries with fertility rates **above** or **below** replacement level" with those two words in the two bin colors is a complete legend, sitting where the reader already is; grapher's legend strip then costs ~36px of height and repeats the title. Keeping it was the single biggest thing wrong with a first attempt here — it squeezed the map to 214px and pushed the annotations into the subtitle. Removing it gave the map the full width and freed the band above and below for annotations over the ocean, which is how the finished pages are built. (Three or more bins usually still need the strip.)
   - **When the map's palette can't be read as text, say so rather than forcing it.** The colored title word must be the bin's actual color, but grapher's binary map palettes are often pale — `#92c5de` on white is about 1.9:1 — so the honest move is a darkened same-hue palette color in the title and a note that the map bins are lighter. Never invert the pairing: if the map's high bin is salmon, the title's word for the high bin cannot be teal, and any value called out in an annotation follows the same rule. Inheriting those colors from an older page whose palette was the other way round produces a frame that contradicts itself in three places at once.
-- **Grapher's map export outlines every country in `#333333`; the house treatment is a white hairline.** Sweep the country vectors and set the stroke to white at ~0.3px (207 of them on one map). Dark outlines make a choropleth read as a political map and fight the bins.
-- Annotations 12–14px (the bottom of the ladder — see Annotations for why maps don't go to 10); straight 1px leader lines or values inside countries — never curvy arrows; give annotated countries a distinct outline stroke so their silhouette stands out; thin lines pointing at small countries work best when the labels sit apart from each other.
+- **Grapher's map export outlines every country in `#333333`; the house treatment is a white hairline.** Sweep the country vectors and set the stroke to white at **0.22px** — the finished pages' value, and thin enough that internal borders describe shapes without drawing themselves. Dark outlines make a choropleth read as a political map and fight the bins.
+- **Give each named country a 0.3–0.35px outline in a darker shade of its own bin colour, and raise it to the front of its layer.** Darkening the fill uniformly (`rgb × 0.62`) keeps the hue; scaling channels by different factors turns a pale blue into gray-green. Then `parent.appendChild(country)` — without it the outline comes out **visibly incomplete**, because every neighbour paints its own white hairline over the shared border afterwards. The symptom looks like a broken path and is pure z-order.
+- Annotations 12–14px (the bottom of the ladder — see Annotations for why maps don't go to 10); values inside countries, or hairline leaders — never curvy arrows; thin lines pointing at small countries work best when the labels sit apart from each other.
+
+**Map leaders: hairline elbows that end in a dot.** This is a distinct treatment from the arrows above — no arrowhead anywhere on a map. Read off the finished pages:
+
+- **`#2d2e2d` at 0.3px**, `strokeJoin = "MITER"`. At that weight the line antialiases to a light gray and stays subordinate to the map; a 1px gray line reads as a border.
+- **The country end carries a filled dot** — `strokeCap: "CIRCLE_FILLED"` on the terminal vertex, set through `setVectorNetworkAsync` (per-vertex, so the tail stays `NONE`). The dot is what makes a hairline land *on* a country rather than near it; it is also the whole reason to build these with a vector network instead of `vectorPaths`.
+- **One leader per named country**, never one leader for a list. If the sentence says "In the US, UK or France…", that is three leaders from one text block.
+- **The long run is vertical; the horizontal jog is short (≤40px).** Long horizontals drag across the map and read as graticule. Where several leaders serve one annotation, let **one run straight down at its country's x and the others fork off that corridor** with a short jog 10–15px below the exit — that shared-corridor-plus-fork is what the finished pages do, and it keeps a fan of leaders from looking like unrelated lines.
+- For an annotation *below* the map, run up the corridor and put the jog at the **country** end.
+- **Leave ≥12px between the text block and where the leader starts.** 6px looks like an underline on the text.
+- **The one sanctioned exception to "never overlap the annotation box": a leader may cross it to start at the end of a *shorter line*.** When a text block's last line is shorter than the one above it, the knockout still hugs the longest line, so there is empty canvas beside the short line — and starting the leader there attaches it to the sentence instead of hanging it off the block's bottom edge, which is what the finished pages do. Ride the jog **1.5px above that line's baseline** (with a `CAP_HEIGHT` trim and the descender padding, that is `box.bottom − paddingBottom − 1.5`) so it reads as continuing the line of text, and start it **~11px after the last glyph**. The leader must be appended *after* the annotation frame or the opaque fill hides it — assert the z-order rather than assuming it.
+  - **The API exposes no per-line width, so measure the short line's ink off the render.** A probe clone can't answer it either: setting `characters` resets the bold ranges, and bold is wider, so the measurement comes back short and the leader starts on top of a glyph. Screenshot the frame, then scan the last line's row band for the rightmost non-canvas pixel — one crop settles it (`sum(abs(c-255) for c in px[x,y]) > 36` against a white canvas).
+
+**Fitting the map, and hiding what can't be read:**
+
+- **Hide island countries that render as barely-visible specks** (under ~2.2px), but only *island-like* ones — a shape with a neighbour within ~1.5px is an enclave or a small mainland country, and hiding it punches a **white hole** in a continent, which is far worse than the speck you removed.
+- **A country that straddles the antimeridian reports a bbox spanning the whole map.** Fiji's box is 506px wide and 4px tall; it will pin any bbox-derived measurement and it defeats size filters. Detect it (`w > 150 && h < 12`) and exclude it from the fit — keep it *visible*, it is a real place.
+- **Trim the Pacific fringe at the subpath level.** The US is a single vector of ~10 subpaths, and Hawaii is five ~1px specks 60px southwest of Alaska: they pin the US bbox's left edge and, through it, cost the whole map ~30px of width. Rewrite `vectorPaths` with only the kept subpaths, then put the node back where it was — Figma re-origins a vector when its geometry changes, so measure the kept union first and correct `x`/`y` after:
+
+  ```js
+  node.vectorPaths = [{ windingRule: wind, data: kept.join(" ") }];
+  const b = node.absoluteBoundingBox;                    // where it landed
+  node.x += want.x0 - (b.x - fb.x); node.y += want.y0 - (b.y - fb.y);
+  ```
+
+- **Fit on the real content, then check the margins.** Measure the union of visible country boxes (minus the straddlers), scale so it spans the content width, and afterwards assert that nothing sits outside the 16…524 band — a speck left in the frame's margin shows up as a cut sliver at the edge. And `rescale()` multiplies every stroke, so re-set the hairlines *after* the final scale, never before.
+- **Place a bottom annotation against the deepest ink in its own column, not the map's global bbox.** Empty ocean is placeable space, which is how the reference gets a 247px map into a 540px frame; but a 3px island left in that column will push the text down as if it were a continent (hide it — see above).
 - Legends: align left; vertical columns matched to label lengths; one–two categories → shrink the legend; horizontal stretched legends only for sequential palettes, not categorical.
 - **A binned legend's labels are claims about ranges, and every boundary is a chance to be wrong.** Three traps, all of which cost a round on the same chart:
   - **Match the bin's own inclusivity.** Grapher's manual bins are `(lower, upper]`, so a label reading `> 75%` is false for the countries sitting at *exactly* the boundary — two of them here. Check the data for exact-boundary values before writing any `>` or `<`, and prefer inclusive phrasing (`75% or more`) or a neutral range (`25% to 50%`).
