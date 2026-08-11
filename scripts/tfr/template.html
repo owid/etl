@@ -98,6 +98,7 @@
     off-white page a background-coloured stroke would let those countries dissolve into it */
  svg#map path { stroke:var(--edge); stroke-width:0.5; vector-effect:non-scaling-stroke; }
  svg#map path.nodata { fill:var(--nodata); }
+ svg#map path.has { cursor:pointer; }
  svg#map path.has:hover { stroke:var(--fg); stroke-width:1.4; }
  #tip { position:absolute; z-index:20; pointer-events:none; min-width:210px; max-width:290px;
         background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:9px 11px;
@@ -157,7 +158,8 @@
  <section id="mapsec">
  <h2>Where the two disagree</h2>
  <p class="src">How far the UN estimate sits above or below the country's own figure, for its latest
- year. Countries not investigated or with no national figure are in gray.</p>
+ year. Countries not investigated or with no national figure are in gray. Click a country to open its
+ page.</p>
  <div id="mapwrap">
   <svg id="map" viewBox="{{MAPBOX}}" role="img" aria-label="World map of the gap between national and UN figures"></svg>
   <div id="tip" hidden></div>
@@ -408,15 +410,28 @@ const SHAPES = {{SHAPES}};
   );
   sel.addEventListener('change', apply);
   document.querySelectorAll('#filters input').forEach((i) => i.addEventListener('change', apply));
-  // a country name in the overview opens that country's own page
+  // a country name in the overview, or a country on the map, opens that country's own page
+  function goToCountry(name) {
+    sel.value = name;
+    tab = 'country';
+    apply();
+    tip.hidden = true;
+    window.scrollTo({ top: 0 });
+  }
+
   document.getElementById('ov').addEventListener('click', (e) => {
     const name = e.target.closest('a[data-go]')?.dataset.go;
     if (!name) return;
     e.preventDefault();
-    sel.value = name;
-    tab = 'country';
-    apply();
-    window.scrollTo({ top: 0 });
+    goToCountry(name);
+  });
+
+  // the same countries the tooltip answers for are the ones that can be clicked: drawn, and not
+  // filtered out. Everything else on the map stays inert rather than going somewhere blank.
+  document.getElementById('map').addEventListener('click', (ev) => {
+    const iso = ev.target.dataset ? ev.target.dataset.iso : null;
+    const r = iso ? shown.find((x) => x.iso === iso) : null;
+    if (r) goToCountry(r.country);
   });
 
   let t;
