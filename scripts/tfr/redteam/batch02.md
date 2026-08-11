@@ -943,3 +943,26 @@ census's own reasoning were inverted or misattributed.
   post-pilot enumeration by mid-2026.
 - **Accepted.** The Niamey registration rate of 4.8 and the survey's 4.2 for the same city cover
   different periods, which "for the same city" hid. Now flagged.
+
+## Mali
+
+Verdict: minor problems. Every one of the eight specific numeric claims in the caveats was checked
+against INSTAT's own census fertility report and confirmed — the 112-to-148 sex ratios, the 70%
+shortfall against children under one, the office's own words about poor quality requiring adjustment,
+the named method and the alternatives it rejected, and the 494,742 to 930,503 correction at 88%. Our
+census cross-check reproduces all seven of its published rates and gives 6.0885 against 6.1.
+
+- **Accepted, and this one held up.** "INSTAT does not print the two totals side by side" is the claim
+  shape that has failed five times, so the agent checked three separate INSTAT documents: 494,742
+  appears in two of them, 930,503 only in the fertility report's annex, never adjacent. The claim
+  stands. Worth recording that the instruction to attack absence claims also confirms the true ones.
+- **Accepted, a mismatch between prose and chart.** We say "seven survey rounds since 1987" and plot
+  five. The two earliest are 1987 and 1995-96, both before the chart's 2000 start, so nothing is
+  missing — but a reader counting points against that sentence would think otherwise. Now said.
+- **Accepted, two sources conflated.** "INSTAT says between 40 and 60% of births go unregistered, even
+  though 83% of people eventually hold a certificate" pairs a 2018 estimate by the civil-registration
+  directorate, which INSTAT was citing, with the census's own 2022 finding, as though one office had
+  measured both. Now attributed separately.
+- **Accepted.** "The largest correction in this dataset by far" compared the entry to a collection the
+  reader has not seen. INSTAT is spelled out and the Trussell variant of the Brass technique is
+  described rather than named.

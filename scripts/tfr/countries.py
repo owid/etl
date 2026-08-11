@@ -310,19 +310,23 @@ COUNTRIES = [
       "fertility rate from.",
       "https://dhsprogram.com/pubs/pdf/FR376/FR376.pdf"),
     C("Mali", "INSTAT — Enquête Démographique et de Santé", mali, "Mali", "survey", False,
-      "INSTAT publishes a fertility rate from each of seven survey rounds since 1987, the latest 6.0 for "
-      "2023-24. Its 2022 census gives 6.1, and publishes the births and women behind it as raw numbers.",
-      "We read the survey rounds. We also checked the census: dividing its own adjusted counts reproduces "
-      "every one of its published age-specific rates and gives 6.09 against the published 6.1.",
-      "Mali applied the largest correction in this dataset by far. Its census found the raw count of births "
-      "in the previous twelve months unusable — sex ratios of up to 148 boys per 100 girls, and only about "
-      "70% as many declared births as there were children under one in the same count — and states plainly "
-      "that the data are of poor quality and require adjustment. It names the method, the Trussell "
-      "variant of the Brass technique, and says which alternatives it tested and rejected. The effect is "
-      "close to a doubling: 494,742 declared births become 930,503 adjusted ones, about 88% more. INSTAT "
-      "does not print the two totals side by side, so that comparison is ours from its own tables. Civil "
-      "registration is not used: INSTAT says between 40 and 60% of births go unregistered, even though 83% "
-      "of people eventually hold a certificate.",
+      "Mali's national statistics office, INSTAT, publishes a fertility rate from each of seven survey "
+      "rounds since 1987, the latest 6.0 for 2023-24. The two earliest fall before this chart begins, so "
+      "five of them are drawn. Its 2022 census gives 6.1, and also publishes the underlying birth and women "
+      "counts.",
+      "We use the rate each survey reported. We also checked the census: dividing its own corrected birth "
+      "counts by its women counts, age group by age group, reproduces every rate it published and gives "
+      "6.09 against its printed 6.1.",
+      "Mali's census applied one of the largest corrections we have seen anywhere. It found the raw count of "
+      "births in the previous twelve months unusable — sex ratios running as high as 148 boys per 100 girls, "
+      "and only about 70% as many declared births as there were children under one in the same count — and "
+      "states plainly that the data are of poor quality and require adjustment. It names the method it used, "
+      "an indirect technique for correcting under-reported births, and says which alternatives it tested and "
+      "rejected. The effect is close to a doubling: 494,742 declared births become 930,503 corrected ones, "
+      "about 88% more. Those two totals appear in different tables rather than side by side, so that "
+      "comparison is ours. Civil registration is not used for fertility. The census found 83% of people hold "
+      "a birth certificate, while the civil-registration directorate estimated in 2018 that between 40 and "
+      "60% of births go unregistered — two different bodies measuring different things in different years.",
       "https://www.instat-mali.org/fr/publications/enquete-demographique-et-de-sante-eds"),
     C("Malaysia", "DOSM — age-specific fertility rates divided by its population estimates", malaysia_tfr,
       "Malaysia", "complete", False,

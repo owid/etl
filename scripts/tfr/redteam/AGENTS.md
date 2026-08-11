@@ -32,14 +32,14 @@ country whose source is an interface rather than a file.
 
 - North Korea
 - Syria
-- Mali
 - Burkina Faso
 - Sri Lanka
+- Taiwan
 
 ## Reported, awaiting write-up (0)
 
 
-## Analyzed (55)
+## Analyzed (56)
 
 - India
 - China
@@ -96,10 +96,10 @@ country whose source is an interface rather than a file.
 - Niger
 - Venezuela
 - Australia
+- Mali
 
-## To do (40)
+## To do (39)
 
-- Taiwan
 - Malawi
 - Zambia
 - Chad
