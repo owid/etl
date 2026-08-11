@@ -750,23 +750,24 @@ COUNTRIES = [
       "not used because we could not establish that they are measured comparably.",
       "https://ine.gob.ve/wp-content/uploads/2024/08/Resumen_de_estadisticas_1999-2023.pdf"),
     C("Niger", "INS — national fertility and health surveys", niger, "Niger", "survey", False,
-      "INS publishes a fertility rate from each survey round: 7.1 for 2006, 7.6 for 2012 and 6.2 for its "
-      "2021 fertility survey. Its 2012 census gives 7.5, with the births and women behind it printed as "
-      "counts.",
+      "Niger's national statistics office, INS, publishes a fertility rate from each survey round: 7.1 for "
+      "2006, 7.6 for 2012 and 6.2 for its 2021 fertility survey. Its 2012 census gives 7.5, and also "
+      "publishes the underlying birth and women counts.",
       "We read the survey rounds. We also checked the census: dividing its own counts gives 7.476 against "
       "the published 7.5.",
-      "Niger has the highest fertility in the world, and its 2012 census is the second case here — after "
-      "Madagascar — where the office computed a correction and refused it. The relational Gompertz method "
-      "would have raised the figure from 7.5 to 7.8, but the report found the model a poor fit and decided "
-      "to keep the figures collected in the field, which it judged more accurate than what it called "
-      "extreme hypothetical estimates, "
-      "so the published number is the lower one. INS also flags that its own census and its own survey "
-      "disagree for the same year, 7.5 against 7.6, and attributes the gap to under-declaration in the "
-      "census\'s twelve-month window. Civil registration is not used nationally; INS does compute a rate "
-      "from registrations for Niamey alone, where completeness is 69% — and it comes out above the survey "
-      "figure for the same city, 4.8 against 4.2. The fifth census is still in its pilot phase as of early "
-      "2026, more than thirteen years after the fourth. One INS chart gives 7.0 and 7.2 for 1992 and 1998 "
-      "where its own primary tables give 7.4 and 7.5; the tables are right.",
+      "Niger has the highest fertility in the world, and its 2012 census is one of several cases here where "
+      "an office worked out a correction and then chose not to use it. A standard adjustment for "
+      "under-reported births, the relational Gompertz model, would have raised the figure from 7.5 to 7.8. "
+      "The report rejected it on a technical test — one of the model's own fit parameters fell outside the "
+      "range its authors recommend — and kept the figures collected in the field, so the published number is "
+      "the lower one. The census also examined whether births in its twelve-month window had been "
+      "under-declared, and concluded they probably had not: comparing its 7.5 against the surveys' 7.6 for "
+      "2012 and 7.1 for 2006 argued against under-declaration rather than for it. Civil registration is not "
+      "used nationally; INS does compute a rate from registrations for Niamey alone, where completeness is "
+      "69%, and it comes out above the survey figure for the same city — 4.8 against 4.2, though the two "
+      "cover different periods. The fifth census had reached its post-pilot stage by mid-2026, more than "
+      "thirteen years after the fourth. One INS chart gives 7.0 and 7.2 for 1992 and 1998 where its own "
+      "primary tables give 7.4 and 7.5; the tables are right.",
       "https://stat-niger.org/"),
     C("North Korea", "Central Bureau of Statistics — 2008 census and 2014 survey", north_korea,
       "North Korea", "survey", False,

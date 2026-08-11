@@ -916,3 +916,30 @@ INE's own trend chart, but the entire premise of the caveats paragraph was false
 - **Accepted.** The tooling clause about an empty catalogue folder is gone with the false claim it
   supported, "unlike Tanzania, Uganda or Angola" no longer leans on three other entries, and INE and
   the survey's name are spelled out.
+
+## Niger
+
+Verdict: serious problems. All three plotted values verified, the census cross-check reproduced, and
+two of the sharper claims — the Gompertz pair 7.5 against 7.8, and the chart that misprints 1992 and
+1998 as 7.0 and 7.2 where the tables say 7.4 and 7.5 — confirmed exactly. But two claims about the
+census's own reasoning were inverted or misattributed.
+
+- **Accepted, and it was backwards.** We said the office "attributes the gap to under-declaration in
+  the census's twelve-month window", referring to its 7.5 against the survey's 7.6. The report uses
+  that very comparison to argue the *opposite*: external checks against the 2012 and 2006 surveys "go
+  against this conclusion", and it concludes births in the year before the census were probably all
+  declared. The under-declaration question it does entertain comes from a different, internal
+  comparison. Rewritten to say what the report concluded.
+- **Accepted, misattributed — and my own earlier edit preserved the error.** We had the report
+  rejecting the Gompertz correction because it preferred field data to "extreme hypothetical
+  estimates". That phrase is the report's, but it is about a different method it never computed. Its
+  actual stated reason for rejecting Gompertz is a fit test: one of the model's parameters falls
+  outside the range its authors recommend. Worth noting that I had already rewritten this sentence once
+  in the quotation sweep — taking the quotation marks off a paraphrase does nothing about the
+  paraphrase being wrong.
+- **Accepted.** "The second case here — after Madagascar" leans on another entry; now stands alone. INS
+  spelled out, and the Gompertz model described rather than named.
+- **Accepted, stale.** The fifth census was described as still in its pilot phase; it had reached
+  post-pilot enumeration by mid-2026.
+- **Accepted.** The Niamey registration rate of 4.8 and the survey's 4.2 for the same city cover
+  different periods, which "for the same city" hid. Now flagged.

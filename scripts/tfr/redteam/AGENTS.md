@@ -30,16 +30,16 @@ country whose source is an interface rather than a file.
 
 ## In flight (5)
 
-- Niger
 - North Korea
 - Syria
 - Mali
 - Burkina Faso
+- Sri Lanka
 
 ## Reported, awaiting write-up (0)
 
 
-## Analyzed (54)
+## Analyzed (55)
 
 - India
 - China
@@ -93,12 +93,12 @@ country whose source is an interface rather than a file.
 - Cote d'Ivoire
 - Cameroon
 - Nepal
+- Niger
 - Venezuela
 - Australia
 
-## To do (41)
+## To do (40)
 
-- Sri Lanka
 - Taiwan
 - Malawi
 - Zambia
