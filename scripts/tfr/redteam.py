@@ -22,7 +22,7 @@ from countries import COUNTRIES, DOCS, TIERS  # noqa: E402
 CACHE = os.path.join(HERE, "cache")
 LOG = os.path.join(HERE, "redteam")
 VALIDATION = {True: "Fully validated from births & women",
-              False: "TFR copied from source, not validated"}
+              False: "Rate copied from source, not validated"}
 BAND_YEARS = range(1990, 2027)
 
 
@@ -92,8 +92,15 @@ def brief(country):
             u = dict(zip(wpp.year.astype(int), wpp.value))
             out.append("THE UN FIGURE THE CHART COMPARES IT WITH, in the same years:")
             out.append("  " + ", ".join(f"{y}: {u[y]:.4g}" for y in shared))
-            gaps = [u[y] - n[y] for y in shared]
-            out.append(f"  average gap shown on the map (UN minus ours): {sum(gaps) / len(gaps):+.3f}")
+            # The map colors one number per country: the difference in the latest year the country
+            # itself reports. It is not an average over the series.
+            last = int(nso.dropna(subset=["value"]).year.max())
+            if last in u:
+                out.append(f"  the single difference the map colors, for the latest national year {last} "
+                           f"(UN minus ours): {u[last] - n[last]:+.3f}")
+            else:
+                out.append(f"  the latest national year is {last}; the map colors the difference in that "
+                           f"year against the UN's projection for it, which is not listed above")
             out.append("")
 
     year, bands = _bands(country)

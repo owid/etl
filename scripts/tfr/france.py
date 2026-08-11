@@ -1,5 +1,12 @@
 """France: INSEE births and fertility rates by age of mother.
 
+Every table INSEE publishes here comes in two territorial versions: the whole republic including the
+overseas departments ("France"), and mainland France plus Corsica only ("France metropolitaine").
+The UN's "France" excludes the overseas departments — it lists Mayotte, Reunion, Guadeloupe,
+Martinique and French Guiana as separate entities — so the mainland version is the one that matches
+what the comparison is against, and it is the one read here. Sheets and files named FM are mainland;
+FR is the whole republic.
+
 Both files use age reached during the year — the calendar year minus the year of birth — and so
 does INSEE's population pyramid, which supplies the denominator. The conventions match on both
 sides, so the rate is not biased by them.
@@ -21,7 +28,7 @@ BANDS = [(15, 19), (20, 24), (25, 29), (30, 34), (35, 39), (40, 44), (45, 49)]
 
 def _rates():
     """{year: {age: births per 10,000 women}} from the Bilan démographique table."""
-    d = pd.read_excel(os.path.join(DATA, "fr_asfr_fix.xlsx"), sheet_name="FR - âge détaillé", header=None)
+    d = pd.read_excel(os.path.join(DATA, "fr_asfr_fix.xlsx"), sheet_name="FM - âge détaillé", header=None)
     ages = {j: int(re.match(r"(\d+) ans", str(d.iloc[3, j])).group(1))
             for j in range(1, d.shape[1])
             if re.match(r"\d+ ans", str(d.iloc[3, j]))}
@@ -39,7 +46,7 @@ def _rates():
 
 def _births():
     """{year: {age: births}} from the long-series civil-registry table."""
-    d = pd.read_excel(os.path.join(DATA, "fr_t48_fix.xlsx"), sheet_name="FR", header=None)
+    d = pd.read_excel(os.path.join(DATA, "fr_t48_fix.xlsx"), sheet_name="FM", header=None)
     ages = {j: int(re.match(r"(\d+) ans", str(d.iloc[3, j])).group(1))
             for j in range(1, d.shape[1])
             if re.match(r"\d+ ans$", str(d.iloc[3, j]).strip())}
@@ -62,7 +69,7 @@ def france_tfr():
     )
 
 
-PYRAMID = "https://www.insee.fr/fr/outil-interactif/5014911/data/FR/donnees_pyramide_act.csv"
+PYRAMID = "https://www.insee.fr/fr/outil-interactif/5014911/data/FRMetro/donnees_pyramide_act.csv"
 
 
 def france_women(year):
@@ -72,7 +79,7 @@ def france_women(year):
     de l'année des femmes de même âge". It publishes population at 1 January, so the mean is the
     average of that year's and the next year's snapshots for the same age.
     """
-    path = fetch(PYRAMID, os.path.join(DATA, "fr", "pyramide.csv"))
+    path = fetch(PYRAMID, os.path.join(DATA, "fr", "pyramide_mainland.csv"))
     d = pd.read_csv(path, sep=";")
     d = d[d.SEXE == "F"]
     now = dict(zip(d[d.ANNEE == year].AGE, d[d.ANNEE == year].POP))

@@ -19,20 +19,25 @@ from fetch import fetch
 DATA = os.path.join(os.path.dirname(__file__), "data", "kr")
 BOARD = "https://mods.go.kr/boardDownload.es?bid=11773"
 
-# edition -> (list_no, seq) on the statistics office's own publication board
+# Final edition -> (list_no, seq) on the statistics office's own publication board. Oldest first:
+# later editions win where two overlap, because the office revises.
 RELEASES = {
+    "b2010": (273489, 1),
     "b2013": (329729, 1),
     "b2015": (356403, 1),
     "b2018": (378026, 1),
     "b2020": (391897, 1),
     "b2024": (439008, 2),
 }
+# Each February the office publishes a preliminary figure for the year just ended, about eighteen
+# months before the final edition covering it. It fills only years no final edition reaches yet.
+PRELIMINARY = {"p2025": (444910, 1)}
 
 
 def _text(key):
     path = os.path.join(DATA, f"{key}.txt")
     if not os.path.exists(path):
-        list_no, seq = RELEASES[key]
+        list_no, seq = {**RELEASES, **PRELIMINARY}[key]
         pdf = fetch(f"{BOARD}&list_no={list_no}&seq={seq}", os.path.join(DATA, f"{key}.pdf"))
         subprocess.run(["pdftotext", "-layout", pdf, path], check=True)
     return open(path, errors="ignore").read().splitlines()
@@ -54,21 +59,24 @@ def _from_release(key):
             ys = sorted(years)
             vals = [float(v) for v in re.findall(r"\b\d\.\d+\b", ln)]
             return dict(zip(ys, vals[:len(ys)])) if len(vals) >= len(ys) >= 8 else {}
-        # the header wraps across two or three lines in the older editions
-        years.update(int(y) for y in re.findall(r"\b(?:19|20)\d{2}\b", ln))
+        # the header wraps across two or three lines in the older editions, and a provisional year
+        # is written with a trailing p
+        years.update(int(y) for y in re.findall(r"\b((?:19|20)\d{2})p?\b", ln))
     return {}
 
 
 def korea_tfr():
     """Later editions win where editions overlap, because the office revises."""
     rows = {}
-    for key in sorted(RELEASES):
+    for key in RELEASES:
         rows.update(_from_release(key))
+    for key in PRELIMINARY:
+        rows.update({y: v for y, v in _from_release(key).items() if y not in rows})
     return pd.DataFrame(sorted(rows.items()), columns=["year", "value"])
 
 
 if __name__ == "__main__":
-    for key in sorted(RELEASES):
+    for key in list(RELEASES) + list(PRELIMINARY):
         d = _from_release(key)
         print(key, min(d) if d else "-", max(d) if d else "-", len(d), "years")
     print(korea_tfr().to_string(index=False))

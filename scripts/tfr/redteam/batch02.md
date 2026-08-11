@@ -79,13 +79,32 @@ Verdict: minor problems. Values check out; the population-base description is ri
   government methodology report shows a residual remains — a child of a foreign mother and a Japanese
   father is in the births but the mother is never in a Japanese-only population. Now said.
 
-## DR Congo
+## Democratic Republic of Congo
 
 Verdict: minor problems. Both values verified against the source, and our arithmetic check reproduced.
 
 - **Accepted.** The source line was untranslated French with an unexplained abbreviation, useless to a
   reader who does not read French. Now "National Institute of Statistics — Demographic and Health Survey".
 - **Accepted.** "there is nothing to recalculate from" and "returns a block" both rewritten plainly.
+
+Reviewed a second time by accident — this log had it under "DR Congo" while the registry calls it
+"Democratic Republic of Congo", so `--next` never counted it as done. The heading is now the registry
+name. The second pass earned its keep:
+
+- **Accepted, and it generalizes.** A survey fertility rate describes roughly the three years before the
+  fieldwork, not the year of the report. The institute says so outright for the earlier round — it
+  attributes the 6.6 to 2011-2013 — and the 5.5 covers about 2021-2023. We plot them at 2014 and 2024, so
+  both points sit about two years later than the fertility they measure. Now stated in the caveats.
+  **Not fixed in the plotting**, and deliberately: about half the collection is survey-based, so moving
+  the points is a change to the whole chart's convention, not a DRC fix. Flagged for a decision.
+- **Accepted.** The report's own appendix recomputes the rate allowing for the sample design and gets the
+  same 5.47 we did, with a range of 5.23 to 5.71. That is a stronger check than our age-band sum and it
+  was already in the linked PDF, so it is now cited alongside.
+- **Rejected as a page problem, accepted as a brief problem.** The agent objected to the word "average" on
+  the map difference. The published page says "Difference" and shows one year. The word "average" was in
+  the brief `redteam.py` generates, which also computed it over every shared year — so every agent so far
+  was told the map shows something it does not. Fixed in `redteam.py`: the brief now names the single
+  latest national year the map actually colors.
 
 ## Vietnam
 
@@ -227,3 +246,144 @@ Verdict: serious problems. All 16 spot-checked years matched to three decimals, 
   above. Now stated rather than left to be discovered.
 - **Logged, not built.** A genuine UK-wide series from the three offices' tables: the agent puts it at half
   a day to a day, so it misses the cheap bar — but the excuse for not doing it is gone.
+
+## South Africa
+
+Verdict: serious problems. Our figure was two editions out of date.
+
+- **Accepted, stale source.** We were reading the 2024 mid-year estimates. Stats SA revised the whole
+  series down in its 2025 and 2026 editions — 2024 went from 2.41 to 2.15. Re-sourced to the 2026 edition;
+  the series now runs 2002 to 2026. The age-band comparison still uses the 2024 edition's female
+  population, because the birth counts it divides are that year's.
+- **Note for later.** The sheet name in the 2026 workbook is "Total Fertilty Rate" — the office's own
+  typo. Pinned as-is; a corrected spelling in a future edition will break the loader loudly, which is the
+  behavior we want.
+
+## Kenya
+
+Verdict: minor problems.
+
+- **Logged, not built.** Kenya publishes a registration-based series in its vital statistics reports that
+  would sit above the survey rounds we plot. It is a real upgrade but not a cheap one.
+
+## Colombia
+
+Verdict: minor problems, and one framing error worth fixing.
+
+- **Accepted.** We said DANE's projection-based rate sits "far above what its own registry shows" and left
+  it there, which reads as the office ignoring its own data. DANE revised that assumption down in July 2025,
+  saying births had fallen faster than it first projected — so it is moving toward the registry, not away.
+  Now said.
+- **Accepted.** DANE itself warns that its registry rates are raw and will differ from figures that adjust
+  for missed births. That is the producer's own account of why an estimate like the UN's sits above our
+  line, and it belongs in the caveats. Added.
+- **Accepted.** The gap against the UN is recent — near zero as late as 2015-18, about 0.4 since. Stating
+  that stops a reader from reading it as a permanent disagreement.
+
+## France
+
+Verdict: serious problems. Our stated reason for a choice was backwards, and the choice was wrong.
+
+- **Accepted, and the claim was false.** We told readers INSEE's mainland series exists but that "mainland
+  France is not the territory the UN figures cover, so switching would trade one mismatch for another."
+  The opposite is true. The UN's "France" excludes the overseas departments — it carries Mayotte, Reunion,
+  Guadeloupe, Martinique and French Guiana as separate entities, which I confirmed in our own catalog. And
+  the numbers say the same thing: over the thirty years the two sources overlap, the mainland series is
+  0.004 from the UN's on average against 0.020 for the whole-republic series we were plotting. Switched to
+  the mainland tables. Both source files already carried mainland sheets, and the mainland population
+  pyramid turned out to be one path segment away, so the whole fix was four lines.
+- **Bonus from the switch.** The Mayotte discontinuity we were warning readers about and had not corrected
+  does not exist in the mainland series: Mayotte entered the whole-republic figures in 2014 but was never
+  in the mainland ones. That caveat is now a statement that there is no break.
+- **Accepted.** "The 2025 figure is provisional" understated it. INSEE marks 2023, 2024 and 2025
+  provisional — its own footnote reads "(p) résultats provisoires à fin 2025". All three now named.
+- **Accepted.** The untranslated quote and "vintage" are gone, and the paragraph about INSEE's undocumented
+  single-year-of-age endpoint is gone with them: that was our tooling, not the data.
+
+## South Korea
+
+Verdict: minor problems, but one of them was hiding five years of data.
+
+- **Accepted, and it bought us data.** We told readers "editions before 2013 print only the current and
+  previous year, which is why the series starts in 2003." The 2010 edition prints an eleven-year run back
+  to 2000. Added it; the series now starts in 2000.
+- **Accepted.** The office's own preliminary release, out each February, already gives 2025 at 0.80 — the
+  second yearly rise in a row after the 2023 trough. Added as a fill-only source, so a final edition
+  always wins over a preliminary one for the same year. The series now ends 2025 instead of 2024.
+- **Accepted.** The KOSIS paragraph — no API key without a Korean phone number or identity number, "no
+  route for a foreigner" — was entirely about our own access problems. Cut.
+- **Accepted.** "Each edition's first table gives an eleven-year run" is wrong for the older editions,
+  where the fertility table is the second one. Now just "a table".
+- **Accepted.** The producer has been renamed: Statistics Korea became the Ministry of Data and Statistics
+  on 1 October 2025, which is why kostat.go.kr now redirects to mods.go.kr. Confirmed on the agency's own
+  English site. Source line updated, with the old name kept so the cited editions still make sense.
+- **Explained rather than fixed.** The agent flagged 2004 showing three decimals where its neighbors show
+  two. That is the source's own precision: the earliest edition prints three. Now that 2000-2004 all come
+  from that edition it reads as a block rather than one odd year, and the caveats say so.
+
+## Sudan
+
+Verdict: minor problems. The plotted 5.2 verified against the archived source, and every claim about the
+office's dead website checked out.
+
+- **Accepted.** We said "the 2008 census files that survive give population by area only, with no age
+  breakdown." The agent found a 35MB archive of census tables from the same domain containing both
+  population by five-year age group and a folder of fertility tables by age of mother. True of the
+  per-state files, false as written.
+- **Worth knowing.** The agent tried building a TFR from those tables and got about 1.6 — far too low, the
+  signature of a twelve-month recall question, and probably why the office's own history table skips 2008.
+  So the door it opened may not lead anywhere. The sentence is still wrong.
+
+## Myanmar
+
+Verdict: serious problems. The plotted figure and all seven age bands verified exactly, but the two claims
+around them were both wrong.
+
+- **Accepted.** "Nothing more recent is published — a 2024 census has been run but its fertility results
+  are not out." They are out: the 2024 census Union Report, published October 2025, gives 1.4 by the direct
+  method and 1.8 by the indirect one, and its appendix volume carries the same births-and-women table we
+  used for 2019. That is a five-year jump and a very large fall — worth doing properly rather than
+  patching, so it is queued as an update, not a wording fix.
+- **Accepted.** "The 2014 census gave 2.5 by the same kind of table" mixes methods. The like-for-like 2014
+  figure, from the same office's own comparison table, is 2.3; the 2.5 comes from a different report that
+  applies an indirect correction. Ours overstated the comparability of the 2014-to-2019 fall.
+
+## Uganda
+
+Verdict: minor problems. Every age-band count and both plotted figures verified digit for digit against
+table 7.2, and the agent independently confirmed that the office's own headline 4.5 is the rounded
+*adjusted* rate, which is what we plot.
+
+- **Accepted.** The broken-certificate sentence was our download tooling. Cut.
+- **Accepted.** "Brass P/F adjustment" and "a change of instrument" both replaced with plain descriptions,
+  keeping the method's name as a trailing gloss rather than the explanation.
+- **Noted, not changed.** The agent thought "TFR copied from source, not validated" contradicts a caveats
+  block that describes recomputing the rate. It does not: the recomputation uses the census's own two
+  columns, not an independent count of births and women, which is what the other label means. Two other
+  agents raised the same reading, so the label wording is the problem rather than Uganda's use of it.
+
+## Algeria
+
+Verdict: minor problems. Both specific numbers in our own arithmetic check verified exactly, including the
+implied 1,032,000 births against the bulletin's 1,034,000.
+
+- **Accepted.** The certificate-chain sentence was our tooling. Cut.
+- **Accepted.** "labour force surveys" — British spelling. Fixed.
+- **Accepted.** A full plain-language pass on the caveats: "age structure of births", "age curve",
+  "population denominator", "rolled forward", "natural increase", "under-registration" and "coverage
+  factors" all replaced with plain phrasing, and the 2017 typo described concretely as "7102".
+- **Open.** The agent argues "Complete registration" sits badly with ONS's own statement that raw
+  registration "ne couvre pas les évènements dans leur totalité", corrected by factors unrevised since
+  2002. It could not find the size of the correction, and neither could I. Left as-is pending that number.
+
+## Cross-cutting, from this batch
+
+- **The recurring one, now swept.** Sentences describing our own tooling rather than the data — broken
+  certificates, blocked scripted requests, missing API keys, JavaScript pages a script cannot read, stale
+  paths returning HTML with a 200 status. Cleared out of Mali, Mozambique, Russia, Nepal, China, Turkey,
+  Argentina, Afghanistan, Algeria, Iraq, Uganda, Sweden and South Korea in one pass. Kept where the
+  producer's site being gone is itself the reason a figure is missing or came from an archive, which is a
+  fact about the data.
+- **Open, page-wide.** Three agents in a row read "TFR copied from source, not validated" as claiming more
+  than it does, and all three flagged the bare acronym on a page that otherwise always spells out "fertility
+  rate". Wording change to both labels, not a per-country fix.
