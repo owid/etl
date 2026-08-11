@@ -157,7 +157,7 @@ Two mechanics to get right. Applying a text style **overwrites the font and clea
 
   What that produces is reproducible without the plugin: an **`IMAGE` fill, `scaleMode: "TILE"`, `scalingFactor` exactly `0.5`**, sourced from a **12×12 RGBA PNG** tile. **The 50% tile is the house value, not an approximation — assert it, don't inherit it.** Rescaling the map drifts the factor (a `rescale()` left every country at `0.508337` here while the legend pill stayed at `0.5`, so the hatch was fractionally coarser on the map than in its own key), and nothing warns you. After any map rescale, sweep every no-data shape *and* the legend pill and set `scalingFactor: 0.5` back; then confirm a single value across the whole set. So:
   - **Inside a file that already has it, copy the paint** — `target.fills = source.fills.map(f => ({...f}))`, looped over every no-data shape and the legend pill. This is the whole job, it needs no selection, and it inherits whatever tile scale the designer settled on, so re-imported or hand-added countries match instead of landing as flat grey.
-  - **In a fresh yearly file, rebuild it from the saved tile** — `scripts/../assets/no-data-hatch-tile.png` in this skill, inlined as bytes (`figma.createImage(data: Uint8Array)` is available; `createImageAsync` is not):
+  - **In a fresh yearly file, rebuild it from the saved tile** — `assets/no-data-hatch-tile.png` in this skill, inlined as bytes (`figma.createImage(data: Uint8Array)` is available; `createImageAsync` is not). The byte array is kept ready to paste in `assets/no-data-hatch-tile.bytes.js`, and the same tile as base64 in `assets/no-data-hatch-tile.b64.txt` — the plugin sandbox cannot read files, so the bytes have to travel inside the script:
     ```js
     const bytes = new Uint8Array([/* the 188 bytes of assets/no-data-hatch-tile.png */]);
     const img = figma.createImage(bytes);
@@ -218,7 +218,7 @@ Two mechanics to get right. Applying a text style **overwrites the font and clea
   Also: **frame the ranges in the same direction as the colour ramp.** Labelling an ordered ramp by the *other* side of the ratio ("75-100% men" on a scale of women's share) makes the numbers count down as the colours go up, which reads as an error even when every label is true.
 - **Prefer one row of labels for an ordered ramp; the wording has to earn it.** A sequential legend is a *sequence*, and a single line of labels reads it in one sweep where stacked two-line labels read as a grid of cells to be parsed individually. The constraint is arithmetic: equal bins must be at least as wide as the widest label, so `widest × 5 + no-data key + gap ≤ content width` — miss it and one label wraps to three lines and the row is ruined. If it doesn't fit, shorten the labels *before* stacking them, and re-check the vertical balance afterwards, since a shorter legend leaves the map+legend block off-centre.
 - Tidy grapher's default legend: labels 12–14px, swatch square sized to the font, label color dark gray `#2D2E2D` instead of pure black, group items of similar length into columns.
-- No-data pattern: see above (manual plugin step).
+- No-data pattern: see above — scriptable, no plugin needed.
 
 ## Final pass — the Good Data Viz Checklist (condensed)
 
