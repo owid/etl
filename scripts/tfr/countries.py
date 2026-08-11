@@ -479,9 +479,13 @@ COUNTRIES = [
       "2024 Northern Ireland was at about 1.60 and Scotland at 1.25, with England and Wales between them "
       "at 1.42. The series runs from 2011 because that is where ONS's UK population estimates begin, and "
       "stops at 2024 because that is the last year all three offices have published; England and Wales "
-      "alone reaches 2025. Two conventions, both ONS's own: births under 20 include every birth below that "
-      "age, and births at 40 and over are divided by the women aged 40 to 44, which is how ONS's own "
-      "long-running rate is built. One year does not line up as well as the rest — for 2023 our England "
+      "alone reaches 2025. The youngest and oldest age groups are wider on the births side than on the "
+      "women side, which is how all three offices build their own rates. The youngest counts births to "
+      "every mother under 20, including those below 15, and divides them by the women aged 15 to 19; the "
+      "oldest counts births at 40 and over and divides them by the women aged 40 to 44. Both therefore "
+      "come out a little above a strict 15-to-19 or 40-to-44 rate. Following the same conventions, each "
+      "group's rate here reproduces the one ONS prints, to the decimal ONS prints it to. One year does not "
+      "line up as well as the rest — for 2023 our England "
       "and Wales figure comes out 0.016 below ONS's own, because the population estimates now published "
       "for that year are not the ones ONS used when it calculated the rate.",
       "https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths"),

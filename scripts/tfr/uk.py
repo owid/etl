@@ -18,10 +18,12 @@ here is assembled:
 * Women by single year of age for the United Kingdom, from ONS's mid-year population estimates for the
   UK and its constituent countries, sheet MYEB4.
 
-Two conventions, both ONS's own. Births under 20 include every birth below that age, and births at 40
-and over are divided by the women aged 40 to 44 — which is how ONS's own long-running rate is built,
-and what the England and Wales series here used before. It slightly overstates the oldest group's rate,
-by the handful of births above 45, and understates nothing.
+The two end groups are wider on the births side than on the women side, which is how all three offices
+build their own rates. The youngest counts births to every mother under 20, including those below 15,
+against the women aged 15 to 19; the oldest counts births at 40 and over against the women aged 40 to
+44. Both therefore sit a little above a strict 15-to-19 or 40-to-44 rate. Verified rather than assumed:
+for England and Wales in 2024 this gives 7.43, 37.15, 74.09, 93.56, 55.93 and 14.85 per thousand women,
+against the 7.4, 37.2, 74.1, 93.6, 55.9 and 14.8 that ONS prints.
 
 The window is 2011 to 2024. It starts where the population file starts and ends at the last year all
 three offices have published; England and Wales alone reaches 2025, but a UK figure cannot.

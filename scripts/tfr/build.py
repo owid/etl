@@ -47,7 +47,10 @@ def _fingerprint_of(*fns):
     Taiwan's series was cut to 2024 by setting LAST_COMPLETE, which does not appear in the text of
     taiwan_tfr() at all — a function-level hash would have missed it, exactly as no hash at all did.
     Countries whose loaders share published.py all rebuild together when any of them changes, which
-    costs nothing: those loaders are hand-entered figures, not parsing.
+    costs nothing: those loaders are hand-entered figures, not parsing. A handful of loaders live in
+    countries.py itself, so editing any country's prose rebuilds those few series. That is a few seconds
+    on a text change, and the alternative — a hash narrow enough to miss a real edit — is the bug this
+    exists to prevent.
     """
     h, seen = hashlib.sha256(), set()
     for fn in fns:
