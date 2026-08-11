@@ -21,7 +21,9 @@ Two commands, and both should be run at every launch and every report:
   to do is everything left over. That is what keeps the total at a hundred without anyone counting.
 - `python redteam.py --audit` fails if the four do not partition the hundred, if a country appears
   twice, if anything is awaiting write-up, if analyzed disagrees with the logs, or if there are not
-  exactly five agents in flight.
+  exactly five agents in flight. That last check applies only while To do still has something in it.
+  Once it empties the campaign is draining, the count of agents out can only fall, and requiring five
+  would fail every cycle from then to the end.
 
 One thing worth reusing: Poland had to be launched twice, because the first agent stalled for ten
 minutes trying to enumerate variable IDs in the Polish statistics API. Its replacement was told not
@@ -45,18 +47,17 @@ report asserts about the page against the page. And for any country whose source
 than a file, tell the agent not to fight it and to fall back on published reports; that is what unstuck
 Poland.
 
-## In flight (5)
+## In flight (4)
 
-- Czechia
-- Azerbaijan
-- Portugal
-- Greece
-- Israel
+- Hungary
+- Austria
+- Switzerland
+- Sierra Leone
 
 ## Reported, awaiting write-up (0)
 
 
-## Analyzed (91)
+## Analyzed (96)
 
 - India
 - China
@@ -149,11 +150,12 @@ Poland.
 - Papua New Guinea
 - Cuba
 - Sweden
+- Czechia
+- Azerbaijan
+- Portugal
+- Greece
+- Israel
 
-## To do (4)
+## To do (0)
 
-- Hungary
-- Austria
-- Switzerland
-- Sierra Leone
 

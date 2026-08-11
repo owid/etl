@@ -292,8 +292,12 @@ def audit():
         problems.append(f"log heading names no country in the registry: {bad}")
     for bad in impossible_arithmetic():
         problems.append(f"arithmetic the text cannot support — read it: {bad}")
-    if len(flight) != 5:
-        problems.append(f"{len(flight)} agents in flight, not 5: {', '.join(flight) or 'none'}")
+    # Five in flight is the rule while there is anything left to start. Once To do empties, the
+    # campaign is draining and the count only falls, so requiring five would fail every cycle from
+    # then to the end.
+    if _ledger("To do") and len(flight) != 5:
+        problems.append(f"{len(flight)} agents in flight, not 5, with countries still to do: "
+                        f"{', '.join(flight) or 'none'}")
     return problems
 
 

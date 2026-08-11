@@ -1869,3 +1869,147 @@ reproduced the recalculation gap itself rather than taking our word for it.
   annual figures become final on publication and are never revised again, and the 2024 figure was
   unchanged in the release a year later. This is the opposite of the vintage problem that forced five
   other countries to drop their last year.
+
+## Czechia
+
+Verdict: serious problems, and the first genuine data bug this campaign has found in the charts rather
+than in the prose. Every plotted value matches the office's own rate to five decimals, and the agent
+independently reproduced our reconciliation across three separate years — gaps of -0.00043, -0.00045 and
+-0.00048 against our claimed 0.0004.
+
+- **Accepted, and it was a real bug.** The age-band chart showed 74 births to mothers aged 45-49 in 2024
+  where the yearbook counts 352. The agent guessed a column-selection error; the cause was different and
+  worse. Our births per group are derived from the office's own rates by single year of age, spreading
+  each group's women evenly across its five ages. But the rate table's last row is labelled 45-49 and is
+  the rate for that whole group, computed on all the women in it, not on one year of age. Dividing its
+  women by five divided that group's births by five. Now 370, against the UN's 420, where before it read
+  74 against 420 and drew the dot in the wrong place entirely.
+- **The same misreading was in a claim on the page.** "Summing the single-age rates reproduces the printed
+  total." It does not: add every row once and 2024 comes out at 1.3647 against a published 1.3679, and the
+  shortfall reaches 0.0033. Count the last row five times, as what it measures requires, and it lands at
+  1.3679. Checked across six years — the corrected version is within 0.0002 in all of them, the naive one
+  off by up to 0.0033. The page and the module docstring both said it reproduced the total exactly; both
+  now say what has to be done first. The plotted series was never affected: it uses the office's own
+  printed total.
+- **Accepted.** "Mothers born in Ukraine went from 1.9% of births in 2021 to 6.3% in 2024" could not be
+  traced. The agent could not find the table; the demographic handbook has no births-by-citizenship or
+  country-of-birth table, and the births product page carries none either. Cut. The mechanism stays,
+  supported by the figure that is confirmed exactly: women of childbearing age rose by about 77,000 in
+  2022, from 2,269,150 to 2,345,977.
+- **Accepted.** "Czechia rose and fell as sharply as Romania" asks the reader to trust a comparison with a
+  page they have not opened. Also replaced "denominator", "age decomposition", "both sides of the rate"
+  and "behind it" with plain wording.
+
+## Portugal
+
+Verdict: minor problems, both of them substantive, and one is a revision no reader could have guessed at.
+
+- **Accepted.** "It does not publish the age-specific rates behind that rate." The twenty-second false
+  absence claim. INE prints them in its annual demographic statistics report, and the agent showed they
+  are internally consistent: the 2023 rates, (6.1+28.9+63.2+88.5+59.7+16.1+1.5) per thousand times five,
+  come to exactly the published 1.32. That also reframes our own reconciliation. We had written that
+  falling 3% short meant "something in INE's denominator is not what we are using" — true, but the page
+  implied a data void where there is a published, self-consistent table. It now says the difference sits
+  between INE's figures and ours rather than inside its own.
+- **Accepted, and it is the more useful of the two.** INE revised 2021 to 2024 on 22 June 2026, seven
+  weeks before this review, when it revised its resident population estimates. The rate for 2023 went
+  from 1.44 to the 1.32 we plot, a fall of about 8% with no change in the births. That is also most of
+  why the distance from the UN widens from 2021: INE now counts about 10% more women aged 15 to 49 than
+  the UN does — 2,409,535 against 2,178,747 for 2023 — while the two count almost the same births. None
+  of this was on the page, which discussed lesser freshness caveats instead. It is now, with the warning
+  that recent years may move again.
+- **Fixed a second-order problem the agent did not name.** The prose cited 1.27 for 2024 and 1.30 for
+  2025, neither of which is plotted. INE's fertility indicator genuinely ends at 2023: asking its
+  interface for 2024 returns "Code(s) in Dim1 not valid for the indicator". Since those two figures could
+  not be traced to a vintage, and a newer edition of the indicator may exist under another number, both
+  are out of the prose rather than quoted without provenance. Finding the current edition's number and
+  extending to 2025 is a small job left undone.
+- **Accepted.** Cut "asking for a year outside an edition's range returns an error message inside a
+  successful response" — our own plumbing. Expanded INE, and replaced "interface", "key", "denominator",
+  "statistical regions" and "codes" with plain wording.
+
+## Israel
+
+Verdict: minor problems. The three plotted values were corroborated against independent tallies of the
+bureau's own figures, and the agent confirmed our host problem is real — cbs.gov.il refuses connections
+from outside the country for it as it does for us.
+
+- **Accepted.** Cut both mentions of "an agent", which is our own machinery showing through, along with
+  the note about the bureau reusing table numbers between editions and a file being frozen while still
+  being re-crawled. Expanded CBS to Israel's Central Bureau of Statistics, and rewrote "the spread between
+  groups is what makes it" and the ranking against countries the reader has not seen.
+- **Accepted by removal.** "CBS states that its coverage includes East Jerusalem from 1970 and the Golan
+  from 1982." The agent could not find any source supporting 1970 and notes that Israel extended its
+  jurisdiction in 1967; neither of us could read the bureau's own footnote to settle which date its
+  statistics use. The plotted series covers 2020 to 2023, so the dates carry no weight for anything on
+  the page. Both are gone and the coverage statement stays.
+- **Left open, deliberately.** A 2021 figure of 3.00 is independently attributed to the bureau, and our
+  series jumps from 2020 to 2022. Our page's own claim that annual figures appear for the recent years
+  therefore implied a completeness we do not have, and that implication is gone. The value itself is not
+  added: it comes from a secondary tally, not from the bureau's table, and the table cannot be reached
+  from here. Same for a 2024 figure of about 2.87 and the newer edition of the abstract that carries it.
+  Also unresolved: the agent's independent tally gives Muslim women 2.85 for 2023 where the table we read
+  gives 2.81, a gap four times larger than for the other three groups. All three need someone who can
+  reach the bureau's host.
+
+## Greece
+
+Verdict: serious problems, and the fix was to stop recalculating. The twenty-third false absence claim,
+and the most consequential kind: it had us publishing our own arithmetic in place of a figure the office
+publishes itself.
+
+- **Accepted, and it changed both the series and the label.** "Its own fertility rate appears only in a
+  quarterly booklet, printed to one decimal; the age-specific rates behind it are not published at all."
+  The second half survives. The first is wrong: ELSTAT publishes a total fertility rate for every year
+  from 1950, at full precision, in the time series of its demographic indicators release — one click from
+  the page we already cited. I downloaded it and read it rather than taking the report's word: 2024 is
+  1.255719, and the file carries ELSTAT's own footnote that every rate from 2011 on rests on revised
+  population data. Greece now plots ELSTAT's rate and the label moves from "Recalculated from births &
+  women" to "Rate copied from source".
+- **Which also disposed of a wrong validation claim.** The page said our 1.234 for 2024 rounds to the 1.2
+  ELSTAT publishes. ELSTAT's own figure is 1.2557, which rounds to 1.3. Our recalculation runs about 2%
+  low in every year from 2011 — 1.3380 against 1.3534 for 2019, 1.2340 against 1.2557 for 2024 — even
+  though the agent verified both of our inputs match ELSTAT's tables exactly, band by band. The
+  recalculation is kept in the code as a check, and the page now states the gap instead of claiming a
+  match.
+- **Accepted.** "Its own published figure for 2021 came down from 1.5 to 1.4." ELSTAT's own before-and-
+  after table in its revision note shows 2021 going from 1.44 to 1.45, and the mechanics run the other
+  way: revising a population down raises a rate. Cut. The 140,000 overstatement is confirmed word for
+  word in that note and stays, now in two sentences rather than one three-clause one.
+- **Accepted.** Cut "neither file has a guessable address — they come from a document service keyed to an
+  identifier that has to be read off the publication page", which describes our scraper. It stays in the
+  module docstring, where it belongs.
+
+## Azerbaijan
+
+Verdict: minor problems, from the most thorough source work in the campaign: the agent read the
+committee's 644-page scanned yearbook and pulled archived vintages of the same spreadsheets from the
+Human Fertility Collection to test claims about revision that the live site cannot answer.
+
+- **Accepted.** "The historical rates are never revised." Falsified with a counter-example: every age
+  group's rate for 2019 and 2020 differs between a 2020-21 vintage of the committee's table and the
+  current one. The agent also proved the other half, which is more useful — the rows for 1970 to 2011 are
+  identical in vintages a decade apart, down to a stray unrounded 2003 figure. The page now says recent
+  years get revised and older ones freeze.
+- **Accepted, and checking it produced a better page.** "Its own age-specific rates sum to its own total
+  exactly in every year we checked." I downloaded both tables and compared all 29 years. From 2004 on it
+  holds within rounding. For 1996 through 2003 it does not: the gaps run from 0.08 to 0.31, and 2000 to
+  2003 are inside the plotted window — 1.70 against a published 2.0 for 2000, 1.59 against 1.9 for 2003.
+  That is now on the page, and it strengthens the entry's own argument: the census check and the
+  committee's own table of rates by age both say the published levels for the early 2000s are too high.
+- **Accepted.** "The gap shrinks to almost nothing at the most recent census" describes a trend that is
+  not there: 0.28 in 1999, 0.47 in 2009, 0.05 in 2019 — a bulge, not a decline. Reworded.
+- **Accepted.** "Publishes its own rate for every year since 1959" is false; verified from the file that
+  1960 through 1969 are absent.
+- **Noted on the page, not changed in the data.** 2002 is 1.84 in the online table — confirmed, our
+  transcription is faithful — and 1.8 in the committee's printed 2025 yearbook, which gives one decimal
+  for every year. It is the only two-decimal entry in the column and looks like an unrounded remnant of a
+  spreadsheet built in 2011. The cited source is the online table, so its value stays and the discrepancy
+  is stated.
+- **Rejected as an absence claim, because the agent could not break it.** "No annual female population by
+  age group anywhere on the site." It checked the yearbook's annual age table (no sex split), its
+  sex-and-age table (census years only), the Women and Men thematic report (one snapshot) and the Human
+  Fertility Collection. The claim holds.
+- **Accepted.** Anchored Nagorno-Karabakh by name instead of "territories then under occupation", cut
+  "the reason turned out to be interesting", and replaced "no key and no interface to negotiate",
+  "census-enumerated women" and two tangled sentences with plainer wording.

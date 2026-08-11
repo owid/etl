@@ -1,16 +1,18 @@
-"""Greece: registered births by age of mother over the average population.
+"""Greece: ELSTAT's own total fertility rate, with a recalculation from births and women as a check.
 
-ELSTAT publishes births by the mother's age group for every year since 1980, and population by
-five-year age group at 1 January. Its own methodology says rates use the average population, which it
-defines as the mid-year figure taken as the average of two consecutive years — so that is what the
-denominator here is.
+ELSTAT publishes the rate itself, for every year from 1950, at full precision, in the time series of
+its Demographic Indicators release. That is what is plotted. It does not publish the age-specific
+rates behind it, so the check is built from what it does publish: births by the mother's age group for
+every year since 1980, and population by five-year age group at 1 January. Its methodology defines the
+average population as the mid-year figure, taken as the average of two consecutive years, so that is
+the denominator the check uses.
 
-Its own fertility rate is printed only to one decimal, and only in a quarterly booklet rather than in
-the numbered tables; the age-specific rates it would be built from are not published at all. So the
-recalculation is checked against that one decimal, and it lands on it.
+The check runs about 2% below ELSTAT's own rate in recent years -- 1.234 against 1.2557 for 2024 --
+even though both inputs match its published tables exactly, so something inside its own calculation
+differs from the reconstruction. That is a reason to plot its figure rather than ours.
 
-Neither file has a guessable address: they are served by a document portlet keyed to an identifier
-that has to be read off the publication page.
+None of the three files has a guessable address: they are served by a document portlet keyed to an
+identifier that has to be read off the publication page.
 """
 
 import html
@@ -25,6 +27,7 @@ DATA = os.path.join(os.path.dirname(__file__), "data", "gr")
 PAGES = {
     "births": ("https://www.statistics.gr/en/statistics/-/publication/SPO03/2024", "116915"),
     "women": ("https://www.statistics.gr/en/statistics/-/publication/SPO18/2025", "116979"),
+    "rate": ("https://www.statistics.gr/en/statistics/-/publication/DKT75/2024", "114814"),
 }
 BANDS = [(15, 19), (20, 24), (25, 29), (30, 34), (35, 39), (40, 44), (45, 49)]
 FIRST = 2001            # the population table starts here
@@ -101,6 +104,21 @@ def _women():
 
 
 def greece_tfr():
+    """ELSTAT's own rate. Two columns of its time series: the year, then the value."""
+    d = pd.read_excel(fetch(_document("rate"), os.path.join(DATA, "rate.xlsx")), header=None)
+    rows = []
+    for i in range(len(d)):
+        year = pd.to_numeric(d.iloc[i, 3], errors="coerce")
+        value = pd.to_numeric(d.iloc[i, 4], errors="coerce")
+        if pd.notna(year) and pd.notna(value) and 1900 < year < 2100:
+            rows.append({"year": int(year), "value": float(value)})
+    if not rows:
+        raise RuntimeError("ELSTAT's fertility-rate time series parsed empty")
+    return pd.DataFrame(rows)
+
+
+def greece_recalculated():
+    """The same rate rebuilt from ELSTAT's own births and population, as a check on the above."""
     births, women = _births(), _women()
     rows = []
     for year in sorted(births):
@@ -128,4 +146,9 @@ def greece_detail(year):
 if __name__ == "__main__":
     t = greece_tfr()
     print(t.tail(6).to_string(index=False), f"({len(t)} years from {int(t.year.min())})")
-    print("ELSTAT publishes 1.2 for 2024, 1.3 for 2023 and 2022, 1.4 for 2021 and 2020")
+    own = dict(zip(t.year, t.value))
+    r = greece_recalculated()
+    print("\nagainst the recalculation from births and women:")
+    for _, row in r.tail(6).iterrows():
+        y = int(row.year)
+        print(f"  {y}: ours {row.value:.4f}, ELSTAT {own.get(y, float('nan')):.4f}")

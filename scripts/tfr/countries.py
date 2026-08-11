@@ -1775,25 +1775,32 @@ COUNTRIES = [
       "families. The population we divide by is a projection built on the 2018 census, and it does assume "
       "people keep leaving the country, so it is not simply extrapolating a closed population.",
       "https://datos.ine.gob.gt/dataset/estadisticas-vitales-nacimientos"),
-    C("Azerbaijan", "State Statistical Committee — registered births divided by the average annual population",
+    C("Azerbaijan", "State Statistical Committee — registered births by the mother's age, over the average "
+      "annual female population",
       azerbaijan, "Azerbaijan", "complete", False,
-      "The committee publishes its own rate for every year since 1959, the age-specific rates behind it, "
-      "and the number of births by the mother's age back to 1970 — all as plain spreadsheets at stable addresses, "
-      "no key and no interface to negotiate.",
-      "We read the published series. Its own age-specific rates sum to its own total exactly in every year "
-      "we checked. What we could not do is rebuild it independently, and the reason turned out to be "
-      "interesting.",
+      "The committee publishes its own rate for every year from 1970, and for 1959, with nothing for the "
+      "1960s. It also publishes the rate for each age group, and births by the mother's age back to 1970 "
+      "— all as plain spreadsheets at fixed addresses, with no login and no database to query.",
+      "We plot the published rate. The committee's own rates by age group reproduce that rate to within "
+      "rounding from 2004 onward, but not before: for 2000 through 2003 they come out 0.21 to 0.31 lower, "
+      "1.70 against a published 2.0 for 2000 and 1.59 against 1.9 for 2003. What we could not do is "
+      "rebuild the rate independently, and the reason is worth setting out.",
       "There is no annual female population by age group anywhere on the site — only census years and one "
-      "current snapshot. Dividing the published births by the census-enumerated women gives 1.75 against a "
-      "published 1.8 for 2019, but 1.83 against 2.3 for 2009 and 1.72 against 2.0 for 1999. The recomputed "
-      "figure is lower every time, and the gap shrinks to almost nothing at the most recent census. That "
-      "is what it looks like when a rate is computed each year from a population estimate rolled forward "
-      "from the last census, the next census reveals the estimate was too low, and the historical rates are "
-      "never revised. So the published levels for the 2000s may be somewhat overstated — not by our "
-      "arithmetic, but by the committee's own later census. Births are dated to when they happened and the "
-      "denominator is the average of the population at the start and end of the year, both stated in its "
-      "methodology. The 2019 census excluded territories then under occupation, and the population series "
-      "since shows no discontinuity from their reincorporation.",
+      "current snapshot. Dividing the published births by the women the census actually counted gives 1.75 "
+      "against a published 1.8 for 2019, 1.83 against 2.3 for 2009, and 1.72 against 2.0 for 1999. The "
+      "recomputed figure is lower every time, and much the most so in 2009. That is what happens when a "
+      "rate is worked out each year from a population estimate rolled forward from the last census, and "
+      "the next census finds the estimate was too low. Two separate checks therefore point the same way: "
+      "the published levels for the early 2000s look somewhat overstated — not by our arithmetic, but by "
+      "the committee's own later census and by its own table of rates by age. Recent years do get revised. "
+      "Every age group's rate for 2019 and 2020 changed between editions of that table, though years more "
+      "than a few old appear to freeze: the rows for 1970 to 2011 are identical in editions a decade "
+      "apart. Its methodology states that births are dated to when they happened, and that the population "
+      "it divides by is the average of the figures at the start and end of the year. The 2019 census "
+      "excluded Nagorno-Karabakh and the territories around it, then under Armenian occupation, and the "
+      "population series since shows no jump when they were reincorporated. One figure to treat carefully: "
+      "the online table gives 1.84 for 2002, the only two-decimal entry in a column of one-decimal ones, "
+      "and the committee's own printed 2025 yearbook gives 1.8 for that year.",
       "https://www.stat.gov.az/source/demoqraphy/az/002_3.xls"),
     C("United Arab Emirates", "FCSC — Emirati women only", None, "United Arab Emirates", "none", False,
       "The Federal Competitiveness and Statistics Centre publishes a fertility rate for Emirati women — 3.1 "
@@ -1812,22 +1819,26 @@ COUNTRIES = [
       "counted their own populations since, Abu Dhabi in 2010, Sharjah in 2015 and Ajman in 2017, none "
       "publishing much beyond a total.",
       "https://uaestat.fcsc.gov.ae/"),
-    C("Czechia", "ČSÚ — registered births divided by the mid-year population", czechia_tfr, "Czechia",
-      "complete", False,
-      "One spreadsheet carries the office's own rate from 1950 and the fertility rates for every single "
-      "year of the woman's age behind it. The yearly demographic yearbooks also publish births by single "
-      "year of the mother's age as raw numbers, one archive per year.",
-      "We read the published series and its own age decomposition. Summing the single-age rates "
-      "reproduces the printed total, and dividing the yearbook's own counts by its mid-year population "
-      "gives 1.3675 against a published 1.3679 for 2024 — the same 0.0004 gap in every year, which is "
-      "rounding in the printed population.",
-      "Czechia rose and fell as sharply as Romania: 1.71 in 2018, a peak of 1.83 in 2021, then 1.37 by "
-      "2024 and a preliminary 1.28 for 2025 — the steepest fall in the modern series. The denominator is "
-      "the population at midnight between 30 June and 1 July, and it covers all usual residents; from "
-      "2022 that explicitly includes people granted temporary protection, which is how Ukrainian refugees "
-      "enter it. Both sides of the rate move with them: women of childbearing age jumped by about 77,000 "
-      "in 2022, and mothers born in Ukraine went from 1.9% of births in 2021 to 6.3% in 2024. The office "
-      "does not flag this on the fertility series itself, but publishes the tables that show it.",
+    C("Czechia", "ČSÚ — registered births by the mother's age, over the mid-year female population",
+      czechia_tfr, "Czechia", "complete", False,
+      "One spreadsheet has the office's own total fertility rate back to 1950, together with the "
+      "fertility rate for each single year of a woman's age. The yearly demographic yearbooks also "
+      "publish births by single year of the mother's age as counts, one archive per year.",
+      "We read the published rate and the office's own breakdown of it by age. Adding up the rate for "
+      "each single year of age gives back the total the office prints — once the last row is read for "
+      "what it is. That row is labelled 45-49 and is the rate for the whole group rather than for the "
+      "single age 45, so it counts five times over; add every row once instead and the total comes out "
+      "short by up to 0.0033. Dividing the yearbook's own counts by its mid-year population gives 1.3675 "
+      "against a published 1.3679 for 2024 — the same 0.0004 gap in every year, which is rounding in the "
+      "printed population.",
+      "Czechia's rate rose and fell unusually sharply: 1.71 in 2018, a peak of 1.83 in 2021, then 1.37 by "
+      "2024 and a preliminary 1.28 for 2025, the steepest fall in its modern series. The population "
+      "figure the rate is divided by is measured at midnight between 30 June and 1 July, and counts "
+      "everyone who usually lives in the country; from 2022 that explicitly includes people granted "
+      "temporary protection, which is how Ukrainian refugees enter it. That moves both the births counted "
+      "and the women counted — the number of women of childbearing age jumped by about 77,000 in 2022. "
+      "The office does not flag this on the fertility series itself, but publishes the tables that show "
+      "it.",
       "https://csu.gov.cz/produkty/demograficka-prirucka-2024"),
     C("Hungary", "KSH — registered births by the mother's age, over the mid-year female population",
       hungary_tfr, "Hungary",
@@ -1934,26 +1945,25 @@ COUNTRIES = [
       "2021 rebound down to catching up after the pandemic, and the 2022-23 surge down to the war in "
       "Ukraine. 2024 and 2025 are provisional; definitive figures come about a year later.",
       "https://statbel.fgov.be/fr/themes/population/natalite-et-fecondite"),
-    C("Greece", "ELSTAT — registered births by the mother's age, over the average female population",
-      greece_tfr, "Greece",
-      "complete", True,
-      "ELSTAT publishes births by the mother's age group for every year since 1980 and population by age "
-      "group at 1 January. Its own fertility rate appears only in a quarterly booklet, printed to one "
-      "decimal; the age-specific rates behind it are not published at all.",
-      "We divided births by the average of the 1 January populations either side, which is what ELSTAT's "
-      "methodology says the average population means. Our 1.234 for 2024 and 1.261 for 2023 round to the "
-      "1.2 and 1.3 it publishes, and 1.427 for 2021 to its 1.4.",
-      "Greece is the steepest sustained fall here: 1.43 in 2021 to 1.23 in 2024. Two things are worth "
-      "knowing. The 2021 census found the previous estimates had overstated the population by about "
-      "140,000, and ELSTAT spread that gap back across 2012 to 2021 rather than shifting each year "
-      "uniformly — so the revision does not simply raise every rate, and its own published figure for "
-      "2021 came down from 1.5 to 1.4. And the population table has a Greek-citizens-only column "
-      "alongside the all-residents total; the standard age-by-sex table is the total, which is the one "
-      "used here. Births are dated to when they happened, with late registrations folded back to the "
-      "right year. Neither file has a guessable address — they come from a document service keyed to an "
-      "identifier that has to be read off the publication page, and a plain fetch of that page finds no "
-      "links at all.",
-      "https://www.statistics.gr/en/statistics/-/publication/SPO03/2024"),
+    C("Greece", "ELSTAT — its own published fertility rate", greece_tfr, "Greece",
+      "complete", False,
+      "ELSTAT publishes the rate itself, for every year from 1950, in the time series of its demographic "
+      "indicators release. It also publishes births by the mother's age group for every year since 1980 "
+      "and population by age group at 1 January, though not the rates for each age group.",
+      "We plot ELSTAT's own rate. We also rebuilt it from its births and its population, dividing births "
+      "by the average of the 1 January figures either side, which is what its methodology says the "
+      "average population means. That comes out about 2% lower — 1.234 against its 1.2557 for 2024, and "
+      "the same gap in every year since 2011 — even though both inputs match its published tables "
+      "exactly. Something inside its own calculation therefore differs from the reconstruction, which is "
+      "why its figure is the one plotted.",
+      "Greek fertility has fallen steeply: 1.45 in 2021 to 1.26 in 2024. Two things are worth knowing. "
+      "The 2021 census found that Greece's population had been overstated by about 140,000 people. "
+      "ELSTAT corrected this by revising its population estimates for 2012 through 2021, with larger "
+      "corrections in the later years, and its fertility file carries a note that every rate from 2011 "
+      "on rests on the revised figures. And its population table has a Greek-citizens-only column "
+      "alongside the all-residents total; the age-by-sex table used for the comparison below is the "
+      "total. Births are counted in the year they happened, even if they were registered later.",
+      "https://www.statistics.gr/en/statistics/-/publication/DKT75/2024"),
     C("Sierra Leone", "Stats SL — Demographic and Health Survey rounds", sierra_leone, "Sierra Leone",
       "survey", False,
       "Three survey rounds, falling steadily: 5.1 in 2008, 4.9 in 2013, 4.2 in 2019. The 2015 census "
@@ -2016,39 +2026,41 @@ COUNTRIES = [
     C("Portugal", "INE — registered births by the mother's age, over the resident female population",
       portugal_tfr, "Portugal",
       "complete", False,
-      "INE's open interface serves births by the mother's age, population by age group, and its own "
-      "rate — no key needed. It does not publish the age-specific rates behind that rate.",
-      "We read the published series. We also rebuilt it from the counts and got about 3% less: 1.284 for "
-      "2023 against a published 1.32. Averaging the population estimates either side of the year closes "
-      "part of the gap but not all of it, so something in INE's denominator is not what we are using, and "
-      "we plot its figure rather than ours.",
-      "Portugal fell to 1.21 in 2013, recovered to 1.43 by 2019, and has fallen back to about 1.27 in "
-      "2024 with a small rise to 1.30 in 2025. One practical thing to know: every indicator is reissued "
-      "whenever the statistical regions are redrawn, and each new edition carries only the last few "
-      "years, so any long series has to be spliced across two or three codes — they agree exactly at the "
-      "years where they overlap. Asking for a year outside an edition's range returns an error message "
-      "inside a successful response, so the answer has to be read rather than the status code. INE also "
-      "publishes births by the mother's nationality, which matters given how much immigration there has "
-      "been since 2018, but we did not get to it.",
+      "Statistics Portugal, INE, publishes its own fertility rate, births by the mother's age, and "
+      "population by age group, all free to query with no sign-up. Its annual demographic statistics "
+      "report also prints the rate for each age group.",
+      "We plot INE's own rate. We also rebuilt it from the counts and got about 3% less: 1.284 for 2023 "
+      "against a published 1.32. Averaging the population estimates either side of the year closes part "
+      "of the gap but not all of it, so INE must be working from a slightly different population count "
+      "than the one it publishes by age group. Its own rates by age group add up to its published total "
+      "exactly, so the difference sits between its figures and ours rather than inside its own.",
+      "Portugal fell to 1.21 in 2013, recovered to 1.43 by 2019, and has fallen back since. The thing to "
+      "know about the recent years is that INE cut them sharply in June 2026, when it revised its "
+      "estimates of how many people live in the country. The rate for 2023 went from 1.44 to the 1.32 "
+      "plotted here, a fall of about 8% with no change at all in the number of births. That revision is "
+      "also most of why the distance from the UN's figure widens from 2021 on: INE now counts about 10% "
+      "more women aged 15 to 49 than the UN does, while the two count almost the same number of births. "
+      "Recent years may move again the next time those estimates are revised. INE also reissues each "
+      "indicator under a new number whenever it redraws Portugal's statistical regions, and each edition "
+      "carries only the last few years, so a long series has to be pieced together from two or three of "
+      "them; they agree exactly where they overlap. INE publishes births by the mother's nationality too, "
+      "which matters given how much immigration there has been since 2018, but we have not used it.",
       "https://www.ine.pt/"),
     C("Israel", "CBS — registered births by the mother's age, over the mean female population", israel,
       "Israel", "complete",
       False,
-      "The statistical abstract publishes fertility rates by age and religion, and births by single year "
-      "of the mother's age. Annual figures appear only for the most recent years; before that the table "
-      "gives five-year averages, which is why the series here has three points.",
-      "We read the published figures and checked that its own age-specific rates for 2023 sum to 2.847 "
-      "against the 2.85 it prints. An agent also spot-checked one age group against the counts and "
-      "matched to within 0.3%.",
-      "Israel is the highest rate in this collection outside sub-Saharan Africa, and the spread between "
-      "groups is what makes it: 3.00 for Jewish women in 2023, 2.81 for Muslim, 1.75 for Druze and 1.64 "
-      "for Christian, against 2.85 overall. The denominator is the mean population over the year, and "
-      "CBS states that its coverage includes East Jerusalem from 1970 and the Golan from 1982 in both "
-      "births and population; the foreign population, about 2% of residents, is excluded from the "
-      "fertility denominator. Everything here was read from archived copies, because the office's own "
-      "host refuses connections from outside the country — for us as well as for the agent. One trap "
-      "found on the way: CBS reuses table numbers between editions, and the file with no year in its "
-      "name has been frozen since 2020 while still being re-crawled.",
+      "Israel's Central Bureau of Statistics publishes fertility rates by age and religion in its "
+      "statistical abstract, along with births by single year of the mother's age. The table gives annual "
+      "figures only for its most recent years and five-year averages before that, which is why the series "
+      "here is short: three points, for 2020, 2022 and 2023.",
+      "We read the published figures and checked that the bureau's own rates for each age group in 2023 "
+      "add up to 2.847, against the 2.85 it prints. We also checked one age group against the underlying "
+      "counts of births and women, and it matched to within 0.3%.",
+      "Israel's rate is high for a rich country, and it is high because of a wide spread between groups: "
+      "3.00 for Jewish women in 2023, 2.81 for Muslim women, 1.75 for Druze and 1.64 for Christian, "
+      "against 2.85 for everyone. The population figure the rate is divided by is the average over the "
+      "year, and both the births and the population include East Jerusalem and the Golan Heights. "
+      "Residents who are foreign nationals, about 2% of the population, are left out of it.",
       "https://www.cbs.gov.il/en/publications/Pages/2024/Population-Statistical-Abstract-of-Israel-2024-No.75.aspx"),
 ]
 
