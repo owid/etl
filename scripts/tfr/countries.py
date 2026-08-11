@@ -984,21 +984,23 @@ COUNTRIES = [
     C("Canada", "Statistics Canada — births by age of mother over its population estimates", canada_tfr,
       "Canada", "complete", True,
       "Statistics Canada publishes registered live births by age group of mother, female population by "
-      "age group at 1 July, and its own fertility rate — all three as plain CSV from one open service "
-      "with no key, annually from 1991.",
-      "We divided the births by the female population in each age group and summed. Our figures match "
-      "Statistics Canada's own published rate to the second decimal in every year we checked: 1.269 "
-      "against 1.27 for 2023, 1.255 against 1.25 for 2024, 1.510 against 1.51 for 2018.",
+      "age group at 1 July, and its own fertility rate — all three as open, downloadable files, annually "
+      "from 1991.",
+      "We divided the births by the female population in each age group and summed. Our figures land within "
+      "0.01 of Statistics Canada's own published rate in every year of the series, and the largest gap "
+      "anywhere is 0.009. That is close but not identical: in about a third of the years the two fall on "
+      "opposite sides of a rounding boundary, so our 2024 figure of 1.255 shows as 1.26 where Statistics "
+      "Canada publishes 1.25.",
       "Births are dated by the year they occurred, not the year they were registered, and late "
-      "registrations are folded back into the year of the birth by annual revision — about a thousand cases "
-      "five years on — so recent years do not understate. The 2024 figure is flagged provisional in the "
-      "table notes but not in the data itself, so anything automated has to treat the latest year as "
-      "provisional by hand. Nova Scotia under-recorded births in 2021. Births to mothers of 50 and over are "
-      "folded into the 45-49 row for confidentiality, and mothers whose age was not stated are spread "
-      "across the bands. There is no citizens-only denominator to pick wrongly here, but the population does "
-      "include non-permanent residents, and the number of women aged 20-24 rose 9% between 2019 and 2024 "
-      "partly on student migration — so some of the fall in the rate is the denominator growing rather than "
-      "births falling.",
+      "registrations are added back to the year of the birth when the table is revised each year — about a "
+      "thousand cases five years on — so recent years are not too low for that reason. The 2024 figure is "
+      "described as preliminary in the table's notes and may be revised. Nova Scotia under-recorded births "
+      "in 2021. For confidentiality, Statistics Canada does not show births to mothers of 50 and over "
+      "separately; it puts them in with the births whose mother's age was not recorded, and we spread that "
+      "whole group across the seven age bands in proportion to their size. Canada's population count "
+      "includes non-permanent residents as well as citizens, and the number of women aged 20-24 rose 9% "
+      "between 2019 and 2024, partly because of student migration — so some of the fall in the rate is "
+      "there being more women of that age rather than fewer babies per woman.",
       "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1310041601"),
     C("Yemen", "Health ministry and CSO — National Health and Demographic Survey 2013", yemen, "Yemen",
       "survey", False,

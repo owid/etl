@@ -110,9 +110,19 @@ def brief(country):
                 "  \"This office publishes fertility rates only, not the births and female population",
                 "  behind them, so the two sources cannot be compared age band by age band.\"", ""]
     if bands is not None:
-        out.append(f"AGE-BAND BREAKDOWN SHOWN FOR {year} (the reader sees these numbers):")
+        # The page draws these as two dot charts, one for births and one for women, each pairing the
+        # national figure against the UN's. It prints no numbers, so they are rounded here rather than
+        # shown at full precision — agents were reading the raw floats as a precision claim the page
+        # does not make. Some national birth figures are derived rather than counted, which is the
+        # country's own prose block to explain.
+        out.append(f"AGE-BAND COMPARISON FOR {year}. The reader sees these as two dot charts, births "
+                   "and women, each with the national figure against the UN's — no numbers are printed:")
         for _, r in bands.iterrows():
-            out.append("  " + ", ".join(f"{k}={r[k]}" for k in bands.columns))
+            cells = []
+            for k in bands.columns:
+                v = r[k]
+                cells.append(f"{k}={v}" if isinstance(v, str) else f"{k}={float(v):,.0f}")
+            out.append("  " + ", ".join(cells))
         out.append("")
     return "\n".join(out)
 

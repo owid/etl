@@ -683,3 +683,34 @@ in the office's own yearbook.
 - **Noted.** The reader is walked through an age-band calculation but shown no age-band table for
   Yemen, because the source publishes rates rather than counts. Not fixable from the published report;
   only the survey microdata would give the counts.
+
+## Canada
+
+Verdict: serious problems. The extraction and arithmetic are sound — the agent rebuilt our whole
+series from Statistics Canada's own bulk files and reproduced it — but our central validation claim
+was false and one source fact was backwards.
+
+- **Accepted, and it was a bug in our own check.** We told readers our figures "match Statistics
+  Canada's own published rate to the second decimal in every year we checked" and gave three examples.
+  I recomputed all 34 years, rounding half-up rather than trusting the binary float: **12 of them
+  differ by 0.01**. One of the three examples we quoted is itself a false match — 2024 is 1.2553, which
+  rounds to 1.26, not the 1.25 we claimed to match. Python's `round(1.255, 2)` returns 1.25 because
+  1.255 is stored as 1.25499999999998934, so the disagreement vanished by accident. What is true, and
+  what the page now says, is that we land within 0.01 in every year, with a largest gap of 0.009, and
+  fall on the other side of a rounding boundary in about a third of them.
+- **Accepted, factually wrong.** We said "births to mothers of 50 and over are folded into the 45-49
+  row for confidentiality." Statistics Canada's own footnote 4, which I read in the table's metadata
+  file, says they go into "Age of mother, not stated." That matters for what we then do with them:
+  because we scale the bands up by the not-stated total, those births end up spread thinly across all
+  seven bands rather than sitting at the top. Now described correctly.
+- **Accepted.** "So anything automated has to treat the latest year as provisional by hand" is about
+  our pipeline. "There is no citizens-only denominator to pick wrongly here" only makes sense to
+  someone who has read another country's entry. Both gone, replaced by the Canada-specific fact.
+- **Accepted.** "No key", "denominator" and "so recent years do not understate" all rewritten plainly.
+- **Rejected as a page problem, accepted as a brief problem — for the second time.** The agent
+  objected that the age-band births are shown at absurd precision, like 4492.670822915356, and that
+  presenting a redistributed estimate as a count is misleading. The page shows no numbers at all
+  there; it draws two dot charts. The raw floats were `redteam.py` printing the cache verbatim. Now
+  rounded, and the brief says what the reader actually sees. That generator has now misled agents
+  twice, having also claimed the map showed an average gap. **Anything the brief asserts about the
+  page needs checking against the page, not against the cache.**

@@ -1,9 +1,14 @@
 """Canada: Statistics Canada births by age of mother over its own population estimates.
 
-The cleanest source in this project. Both tables come out of the same open service with no key, the
+One of the cleanest sources in this project. Both tables come out of the same open service, the
 births are dated by the year they occurred rather than the year they were registered, and dividing
-one by the other reproduces Statistics Canada's own published rate to the second decimal in every
-year checked.
+one by the other lands within 0.01 of Statistics Canada's own published rate in every year — the
+largest gap over the whole series is 0.009.
+
+Landing within 0.01 is not the same as agreeing to two decimals, though, and this file used to claim
+the latter. About a third of the years fall on the other side of a rounding boundary: 2024 is 1.2553
+against a published 1.25. Anything comparing the two has to round with half-up rather than trusting
+the binary float, or 1.2553 rounds to 1.25 by accident and the disagreement disappears.
 """
 
 import os
@@ -33,8 +38,10 @@ def _table(pid, **kwargs):
 def _births():
     """{year: {band: births}}, scaled up for mothers whose age was not stated.
 
-    Statistics Canada folds births to mothers of 50 and over into the 45-49 row for confidentiality,
-    and reports the geography as "Canada, place of residence of mother".
+    Statistics Canada puts births to mothers of 50 and over into the "not stated" row for
+    confidentiality rather than into 45-49, so scaling the bands up by the not-stated total spreads
+    those births thinly across all seven rather than leaving them at the top. It reports the geography
+    as "Canada, place of residence of mother".
     """
     d = _table(BIRTHS, usecols=["REF_DATE", "GEO", "Age of mother", "Characteristics", "VALUE"])
     d = d[d.GEO.str.startswith("Canada") & (d.Characteristics == "Number of live births")]
