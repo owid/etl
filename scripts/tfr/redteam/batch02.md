@@ -105,3 +105,56 @@ Verdict: minor problems, but one number had to go.
 - **Verified and left alone.** Every value the agent could check matched the source exactly, 2009-2019
   digit for digit, and the claim that the office corrects upward without publishing the adjustment is
   confirmed almost verbatim from the census volume.
+
+## Tanzania
+
+Verdict: serious problems — not in the numbers, in which number we called the country's figure.
+
+- **Accepted, and the plotted value has changed.** We said "NBS presents 4.6 as the country's figure" and
+  called it "the figure NBS stands behind". The census report says the opposite, two sentences after
+  giving 4.6: "it is recommended to use TFR from TDHS as the official rate." The offices designate the
+  survey's 4.8, not the census's 4.6. We now plot 4.8 and say why. The census's 3.2-against-4.6 correction
+  is still described, because it is the more interesting content — but it is no longer presented as the
+  national figure against the office's own wishes.
+- **Accepted.** The source link returned a not-found page. Now points at the report itself.
+- **Accepted.** "The 2022 household health survey" is the Demographic and Health Survey, run by the same
+  offices — not a separate health-sector survey. Renamed. Zanzibar's statistics office is a co-author and
+  is now acknowledged. "Monograph", "Arriaga method" and "vital registration" are all gone or glossed.
+- **Verified.** Both printed totals and our re-summed 3.195 and 4.63 are right, and the UN figure checks
+  out against an independent mirror.
+
+## Philippines
+
+Verdict: serious problems. Two claims about the source were wrong, and in a way that inverted the
+explanation we gave readers.
+
+- **Accepted, wrong claim.** "Registration covers roughly 90% of births" — the authority's ~90% figure is
+  the share of births *filed within thirty days*, not the share eventually registered. It states plainly
+  that it makes no adjustment for missed births and does not publish a completeness rate at all. Rewritten
+  to say what it actually publishes.
+- **Accepted, backwards.** We said the data is "tabulated by year of registration". The authority counts
+  each birth in the year it happened and closes the books a few months after year end. So the reason our
+  figure understates is not mislabeled years — it is that the newest year has had least time to accumulate
+  late filings. That inverted explanation is now corrected.
+- **Accepted, and it matters for the chart.** Our series falls from 1.61 in 2023 to 1.49 in 2024, a drop
+  far steeper than the authority's own reported change in total births. Most of that is probably the
+  vintage effect above. The 2024 point is now explicitly flagged as one that should rise, rather than
+  presented as a trend.
+- **Accepted.** The office and its survey are now named in full, and the survey's figure is dated: it
+  describes roughly the three years before late 2022, not 2024.
+- **Rejected.** Switching to the survey series to move up a rung. That would replace a rate we build from
+  counts with one we copy, and the survey figure is already on the page as the comparison.
+
+## Egypt
+
+Verdict: minor problems. The central claim — that the published rate is modeled rather than counted —
+was confirmed verbatim from the bulletin's own footnote.
+
+- **Accepted, unverifiable number.** We said CAPMAS "revised its 2015 figure from 3.7 down to 3.3 between
+  editions without explanation". The agent read the 2016, 2017 and 2018 bulletins — none carries a
+  fertility table at all — and both editions that do show a back series already agree at 3.3. No 3.7 could
+  be found anywhere. Removed, on the same grounds as Nigeria's 5.14 and Vietnam's 1.85.
+- **Accepted.** The link was a homepage that leads nowhere; it now points at the catalog that actually
+  holds the bulletins. "Crude birth rate" is now "the number of births per 1,000 people", "a very
+  different shape" is now about spread across ages, and the sentence about the site being a JavaScript
+  application is gone — production detail, not information.

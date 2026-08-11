@@ -378,14 +378,23 @@ COUNTRIES = [
       "closing registry offices, which INEI says outright, so it is not a fertility signal; our series "
       "starts after it. Each annual annex sits at its own unrelated file id, with no pattern to follow.",
       "https://www.gob.pe/institucion/inei/informes-publicaciones"),
-    C("Philippines", "PSA — OpenSTAT registered live births", philippines, "Philippines", "incomplete", True,
-      "PSA's OpenSTAT database gives registered live births by age group of mother, one table per year, "
-      "and a projected population by five-year age group and sex.",
-      "We divided registered births by the projected female population in each age group and summed. "
-      "The population table is published in thousands, which we scaled up.",
-      "Registration covers roughly 90% of births and is tabulated by year of registration, so this "
-      "understates the real rate — our 1.49 for 2024 against PSA's own survey-based figure of about "
-      "1.9. Only two years, because OpenSTAT publishes a separate table per year.",
+    C("Philippines", "Philippine Statistics Authority — registered live births", philippines,
+      "Philippines", "incomplete", True,
+      "The Philippine Statistics Authority publishes registered live births by age group of mother in its "
+      "online database, one table per year, alongside a projected population by five-year age group and sex.",
+      "We divided registered births by the projected women in each age group and added the results. The "
+      "population table is published in thousands, which we scaled up.",
+      "This understates real fertility, and by an amount that grows towards the present. The authority "
+      "counts each birth in the year it happened, but closes the books a few months after the year ends, "
+      "and late filings keep arriving for years afterwards — so the newest year has had the least time to "
+      "fill up. That is the likeliest reason our figure falls from 1.61 in 2023 to 1.49 in 2024, a drop far "
+      "steeper than the authority's own reported change in total births, and it is why the 2024 point "
+      "should be expected to rise. Not every birth is registered either, and the authority states plainly "
+      "that it makes no adjustment for the ones that are missed; it publishes how many are filed within "
+      "thirty days, but not how complete the register eventually becomes. Its own survey, the 2022 National "
+      "Demographic and Health Survey, measured about 1.9 — though from women's birth histories over "
+      "roughly the three years before it, so that figure describes an earlier period than ours. There are "
+      "only two years here because the database publishes a separate table for each one.",
       "https://openstat.psa.gov.ph/"),
     C("Egypt", "CAPMAS — Annual Bulletin of Births and Deaths", egypt, "Egypt", "complete", False,
       "Each annual bulletin has a table 13 giving age-specific fertility rates, the female population of "
@@ -396,16 +405,14 @@ COUNTRIES = [
       "12 rather than the rates, because those are the only figures the registry itself produces.",
       "CAPMAS's published rates are not its registered births divided by its own population. The bulletin "
       "says so plainly: they are estimated with the fertility module of the Population Analysis "
-      "Spreadsheets, a US Census Bureau tool that takes the crude birth rate and the female population and "
-      "imposes a model age pattern. Dividing the registry's own counts instead gives 2.38 for 2024 against "
-      "the published 2.41 — close in total, but with a very different shape, 143 births per thousand women "
-      "aged 25-29 where CAPMAS publishes 164. That means Egypt's line is closer in kind to a UN estimate "
-      "than to a pure count. The fertility table only appears from the 2019 edition onward and the counts "
-      "by age of mother only from 2021, so the series is short; CAPMAS also revised its 2015 figure from "
-      "3.7 down to 3.3 between editions without explanation. One band is labeled 40-45 where it means "
-      "40-44. CAPMAS's site is a JavaScript application, but the catalog behind it answers plain requests "
-      "and every publication file downloads directly.",
-      "https://www.capmas.gov.eg/"),
+      "Spreadsheets, a US Census Bureau tool that takes the number of births per 1,000 people and the "
+      "female population and fits a standard pattern across the age groups. Dividing the registry's own "
+      "counts instead gives 2.38 for 2024 against the published 2.41 — close in total, but spread very "
+      "differently across ages: 143 births per thousand women aged 25-29 where CAPMAS publishes 164. That "
+      "makes Egypt's line closer in kind to a UN estimate than to a pure count. The fertility table only "
+      "appears from the 2019 edition onward and the counts by age of mother only from 2021, so the series "
+      "is short. One age group is labeled 40-45 where it means 40-44.",
+      "https://censusinfo.capmas.gov.eg/metadata-en-v4.2/index.php/catalog"),
     C("Brazil", "IBGE — Estatísticas do Registro Civil", brazil, "Brazil", "complete", True,
       "IBGE's statistics portal, SIDRA, gives registered births by the mother's age group and population "
       "projections by sex and single year of age. Both can be downloaded directly, without an account.",
@@ -852,18 +859,23 @@ COUNTRIES = [
       "here came from a web archive. The health ministry\'s site is live and modern but publishes only "
       "disease surveillance.",
       "https://web.archive.org/web/20241209121919/http://cbssyr.sy/yearbook.htm"),
-    C("Tanzania", "NBS — 2022 Population and Housing Census", tanzania, "Tanzania", "survey", False,
-      "The census fertility monograph prints age-specific rates twice: as women reported them, and after "
-      "adjustment. The reported rates sum to a total fertility rate of 3.2, the adjusted ones to 4.6. NBS "
-      "presents 4.6 as the country's figure. The 2022 household health survey separately found 4.8.",
-      "We read the adjusted total out of table 3.2. We also checked the arithmetic: the reported rates sum "
-      "to 3.195 and the adjusted ones to 4.63, matching both printed totals.",
-      "The gap between 3.2 and 4.6 is entirely the adjustment. NBS applies the Arriaga method because "
-      "women under-report and misdate births, and says plainly that Tanzania's vital registration is too "
-      "incomplete to compute the rate directly. The census does publish births in the last twelve months "
-      "and women by age group, so a direct recalculation is possible, but it would reproduce the "
-      "unadjusted 3.2 rather than the figure NBS stands behind.",
-      "https://www.nbs.go.tz/statistics/topic/demographic-and-socio-economic-statistics"),
+    C("Tanzania", "National Bureau of Statistics — 2022 Demographic and Health Survey", tanzania,
+      "Tanzania", "survey", False,
+      "For 2022 the statistics offices of the mainland and Zanzibar published two different figures: 4.6 "
+      "from the census, and 4.8 from the Demographic and Health Survey they also run. Their own census "
+      "report picks between them, recommending that the survey's 4.8 be used as the official rate.",
+      "We plot the 4.8 the offices name as official. We also checked the census's arithmetic, because it is "
+      "the more interesting number: its report prints the rates for each age group twice, as women reported "
+      "them and after correction, and they sum to 3.195 and 4.63 — matching the 3.2 and 4.6 it prints.",
+      "That gap between 3.2 and 4.6 is entirely the correction. The census asked women about births in the "
+      "previous twelve months, then raised the answers using a standard demographic technique, on the "
+      "grounds that women under-report and misdate recent births — and the report says plainly that the "
+      "country's system for recording births directly is too incomplete to compute a rate from. So the "
+      "census figure could be rebuilt from its own counts, but doing that would reproduce the uncorrected "
+      "3.2 rather than either published figure. We show the survey instead because that is what the "
+      "offices asked for, and because it measures fertility from women's full birth histories rather than "
+      "from a corrected twelve-month recall.",
+      "https://www.nbs.go.tz/uploads/statistics/documents/en-1752866506-Fertility%20and%20Nuptiality.pdf"),
     C("Spain", "INE — birth statistics over the continuous population count", spain_tfr, "Spain",
       "complete", True,
       "INE publishes registered births by single year of age of mother, 2009 onward, and female "

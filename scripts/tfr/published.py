@@ -199,22 +199,31 @@ def nigeria():
 
 
 def tanzania():
-    """NBS/OCGS, "Fertility and Nuptiality Levels and Patterns in Tanzania", May 2025, table 3.2.
+    """The 2022 Demographic and Health Survey's 4.8, which NBS names as the official rate.
 
-    The 2022 census asked women about births in the previous twelve months. Table 3.2 prints the
-    resulting age-specific rates twice: as recorded, summing to 3.2, and after Arriaga adjustment
-    for the births women forget or misdate, summing to 4.6. The adjusted figure is the one NBS
-    presents as the country's total fertility rate, so that is what is used here.
+    NBS and Zanzibar's OCGS publish two figures for 2022: 4.6 from the census, and 4.8 from the
+    health survey they also run. Their own census report picks between them — "it is recommended to
+    use TFR from TDHS as the official rate" — so the survey figure is the one plotted. The census
+    numbers are the more interesting story and are described in countries.py, but they are not what
+    the office asks to be treated as the national figure.
+
+    The census total is still read from its own report rather than hardcoded, because it is quoted
+    in the notes and should move if the report is ever revised.
     """
+    return _series([(2022, 4.8)])
+
+
+def tanzania_census():
+    """(recorded, adjusted) totals from table 3.2 of the 2022 census fertility report."""
     path = os.path.join(DATA, "tz", "fert_nupt.txt")
     if not os.path.exists(path):
         subprocess.run(["pdftotext", "-layout", os.path.join(DATA, "tz", "fert_nupt.pdf"), path], check=True)
     for line in open(path, errors="ignore"):
         if line.strip().startswith("Total Fertility Rate (TFR)"):
             vals = re.findall(r"\b\d\.\d\b", line)
-            if len(vals) == 2:                         # recorded, then adjusted
-                return _series([(2022, float(vals[1]))])
-    return _series([])
+            if len(vals) == 2:
+                return float(vals[0]), float(vals[1])
+    return None, None
 
 
 def ethiopia():
