@@ -1,0 +1,46 @@
+# Known errors in the UN SDG source data, patched locally until the provider fixes them.
+# See etl/data_corrections.py for the format; `etl corrections --charts` inventories them.
+
+# South Africa's 2024 submission for indicator 8.8.1 (occupational injuries) is unusable in
+# both series, and the two look transposed:
+#
+#                       reported   cross-country median (2020+)   ratio
+#   fatal injuries        556.99                           2.23    250x
+#   non-fatal injuries      4.62                         613.58   0.008x
+#
+# Swapping them puts both in the normal range (2.07x and 0.91x of median), but that is a
+# hypothesis about the source's mistake, not something to encode as a value — so both rows are
+# dropped rather than reassigned. Two further signs the whole submission is broken, and the
+# reason we do not keep the sex breakdowns either:
+#
+#   * `Both sexes` is the arithmetic SUM of Male and Female in both series (116.08 + 440.92 =
+#     557.00; 1.09 + 1.11 = 2.20), which is invalid for a rate. In 618 of 634 country-years
+#     `Both sexes` correctly lies between the male and female values.
+#   * South Africa 2024 is the only country-year of 634 where the female fatal-injury rate
+#     exceeds the male one, and by nearly 4x.
+#
+# 2024 is South Africa's only year in the fatal series, so this removes it from that indicator
+# entirely. That is preferable to publishing a rate 250x too high.
+
+- indicator: value
+  match: {seriescode: SL_EMP_FTLINJUR, country: South Africa, year: 2024}
+  action: drop
+  reason: >-
+    Fatal occupational injury rate of 556.99 per 100,000 employees is ~250x the cross-country
+    median (2.23 for 2020 onwards) and the largest value in the indicator by a factor of four.
+    Both sexes is reported as the sum of the male and female rates rather than a weighted
+    average, and it is the only country-year where the female rate exceeds the male rate.
+    Consistent with this series being transposed with the non-fatal one at source.
+  provider: International Labour Organization
+  status: open
+
+- indicator: value
+  match: {seriescode: SL_EMP_INJUR, country: South Africa, year: 2024}
+  action: drop
+  reason: >-
+    Non-fatal occupational injury rate of 4.62 per 100,000 employees is ~0.008x the
+    cross-country median (613.58 for 2020 onwards). Both sexes is reported as the sum of the
+    male and female rates rather than a weighted average. Consistent with this series being
+    transposed with the fatal one at source.
+  provider: International Labour Organization
+  status: open

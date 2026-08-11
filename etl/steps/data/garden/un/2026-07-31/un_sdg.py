@@ -45,6 +45,10 @@ def run(dest_dir: str) -> None:
     # 2018). The UN corrected it in the 2026 Q2 release -- 2017 is now ~34.6% -- so the
     # workaround was removed and Chile's 2010-2017 data is published again.
 
+    # Known upstream errors, declared in un_sdg.corrections.yml. Applied after harmonization so
+    # the entity locators match canonical country names.
+    tb = paths.apply_corrections(tb)
+
     tb = duplicate_latin_america_rows(tb)
 
     # Create a new table with the processed data.
