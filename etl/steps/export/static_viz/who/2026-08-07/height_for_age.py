@@ -94,10 +94,21 @@ def build_source_citation(tb: Table) -> str:
 
 
 def find_crossover(tb: Table) -> tuple[float, float]:
-    """Return the age range, in years, over which girls are taller than boys on average."""
+    """Return the age range, in years, over which girls are taller than boys on average.
+
+    The subtitle states this as one span, so check that it really is a single contiguous
+    stretch. Two separate windows would otherwise be reported as one wide range that
+    includes ages where boys are in fact taller.
+    """
     medians = tb.pivot(index="age_years", columns="sex", values=MEDIAN_COLUMN).sort_index()
-    ages = medians.index[medians["Girls"] > medians["Boys"]].to_numpy()
-    return float(ages[0]), float(ages[-1])
+    taller = np.flatnonzero((medians["Girls"] > medians["Boys"]).to_numpy())
+    assert len(taller) > 0, "Girls are never taller than boys, so the crossover sentence does not apply."
+    assert (np.diff(taller) == 1).all(), (
+        "Girls are taller than boys over more than one separate age range, which the subtitle "
+        "would collapse into a single span."
+    )
+    ages = medians.index.to_numpy()
+    return float(ages[taller[0]]), float(ages[taller[-1]])
 
 
 def find_discontinuities(tb: Table) -> list[float]:
