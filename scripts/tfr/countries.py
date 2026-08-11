@@ -570,21 +570,20 @@ COUNTRIES = [
       "https://www.zamstats.gov.zm/"),
     C("Vietnam", "National Statistics Office — population change and family planning survey", vietnam,
       "Vietnam", "survey", False,
-      "The office publishes a total fertility rate annually from 2001. Its PxWeb database stops at 2023, but "
+      "The office publishes a total fertility rate annually from 2001. Its online database stops at 2023, but "
       "the 2025 survey report prints the whole 2001-2025 series in one table. The report and the 2019 census "
       "volume also publish births by age of mother and population by age group, though only inside long PDFs.",
       "We read the whole-country column of that table. No arithmetic of our own.",
-      "This is not a count of registered births. The office estimates the rate from a household sample survey "
-      "and then adjusts it upward with the Trussell P/F technique, because women under-report births in the "
-      "previous twelve months. Its own report says so but never prints the adjustment. Dividing the 2019 "
-      "census's own counts gives 1.85 against the published 2.09, so the correction that year was about 13% — "
-      "which makes Vietnam's figure closer in kind to a model estimate than to a count. Doing the same on the "
-      "2025 survey tables implies a far larger correction, but the survey's birth table counts mothers rather "
-      "than births and may not be scaled the same way as its population table, so we do not trust that "
-      "comparison and have not used it. Some years come from a different instrument: 2024 is from the "
-      "mid-term population and housing survey, not the annual one. Vietnam does have civil registration, but "
-      "it is not what the published rate is built on, and neither PxWeb nor the statistical yearbook carries "
-      "any table of births or population by age at all.",
+      "This is not a count of registered births. The office estimates the rate from a household sample "
+      "survey and then raises it, using a standard demographic correction that assumes women under-report "
+      "the births they had in the previous twelve months. Its own reports say they do this, but never print "
+      "how large the correction is, and never print the figure before it is applied — so the published rate "
+      "is closer in kind to a model estimate than to a count, and how far from a count cannot be worked out "
+      "from anything published. We tried the same check on the 2025 survey, but its table counts the mothers "
+      "who gave birth rather than the number of babies, so the comparison is not like for like and we have "
+      "left it out. Some years come from a different instrument: 2024 is from the mid-term population and "
+      "housing survey, not the annual one. Vietnam does have civil registration, but it is not what the "
+      "published rate is built on.",
       "https://www.nso.gov.vn/"),
     C("Australia", "ABS — births by age of mother over its population estimates", australia_tfr,
       "Australia", "complete", True,

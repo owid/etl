@@ -86,3 +86,22 @@ Verdict: minor problems. Both values verified against the source, and our arithm
 - **Accepted.** The source line was untranslated French with an unexplained abbreviation, useless to a
   reader who does not read French. Now "National Institute of Statistics — Demographic and Health Survey".
 - **Accepted.** "there is nothing to recalculate from" and "returns a block" both rewritten plainly.
+
+## Vietnam
+
+Verdict: minor problems, but one number had to go.
+
+- **Accepted, unverifiable number.** We stated that dividing the 2019 census's own counts gives 1.85
+  against the published 2.09, "so the correction that year was about 13%". The agent could not reproduce
+  it: the office publishes only the already-corrected rate, never the figure before correction and never
+  the coefficient, so there is nothing public to check 1.85 against. Worse, 1.85 appears in the same census
+  materials as the rate for university-educated women and as several provinces' rates — so it may be a
+  mix-up rather than a coincidence. Same species as Nigeria's 5.14, and removed on the same grounds. The
+  substantive point survives without it: the office raises its figure by an amount it never publishes, so
+  how far the published rate sits from a count cannot be worked out from anything public.
+- **Accepted.** "Trussell P/F technique" was a proper noun with no meaning attached for a reader; now
+  described rather than named. "PxWeb" is now "online database". The dense sentence about the 2025 survey
+  tables is split and plainer.
+- **Verified and left alone.** Every value the agent could check matched the source exactly, 2009-2019
+  digit for digit, and the claim that the office corrects upward without publishing the adjustment is
+  confirmed almost verbatim from the census volume.
