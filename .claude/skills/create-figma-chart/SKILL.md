@@ -356,7 +356,7 @@ Verify against the actual clone with `get_metadata` (the templates evolve; the g
 
 **Anything you add to the chart aligns to the same box as the subtitle** — annotations, captions, notes all start at the content left edge and may run its full width. Aligning them to the bars' left edge instead leaves a ragged inner margin that reads as a mistake.
 
-**But size them against the plot's own bounds, not the group's.** An annotation is a child of the chart group, so the moment it is wider than the plot it *becomes* the group's width — and the next `rescale(header.width / chart.width)` then scales the plot down to make room for it (a 508-wide group silently became 527). Measure the plot by walking the group and skipping the annotation nodes, size the annotations to that, and only then rescale:
+**But size them against the plot's own bounds, not the group's.** An annotation is a child of the chart group, so the moment it is wider than the plot it *becomes* the group's width — and a width-first `rescale(header.width / chart.width)` then scales the plot down to make room for it (a 508-wide group silently became 527). Measure the plot by walking the group and skipping the annotation nodes, size the annotations to that, and only then fit:
 
 ```js
 let left = Infinity, right = -Infinity
@@ -370,16 +370,18 @@ walk(chart)
 for (const t of annotations) { t.x = left; t.resize(right - left, t.height) }
 ```
 
-**Match the header box exactly — same left edge and same width.** A chart even a few pixels narrower than the title reads as a mistake. Scale off the header rather than off a constant, and do it *after* the frame is gone, so the group's bounding box is the plot's real extent and no export padding is baked into the width:
+**Match the header box exactly — same left edge and same width.** A chart even a few pixels narrower than the title reads as a mistake. Read the target box off the header rather than off a constant, and do it *after* the frame is gone, so the group's bounding box is the plot's real extent and no export padding is baked into the width:
 
 ```js
 const header = clone.children.find(c => c.name === "Frame 14")   // title + subtitle + logo
-chart.rescale(header.width / chart.width)                        // never resize()
-chart.x = header.x                                               // same left edge
+const contentX = header.x, contentW = header.width               // the box to match
+chart.rescale(TARGET_H / chart.height)                           // height-first; never resize()
+chart.x = contentX                                               // same left edge
 chart.y = top + (bottom - top - chart.height) / 2                // centered between header and footer
+// then the closed-form x-map above takes the plot out to contentX + contentW
 ```
 
-`rescale()` on the group is safe; `resize()` on a frame is not (see Step 5). If the scaled chart overflows the vertical space, re-export at a flatter aspect ratio rather than squashing — **never stretch one axis** (it distorts dots, arrowheads, and text).
+**The width is the x-map's job, not a second `rescale()`.** `chart.rescale(header.width / chart.width)` is the width-first move this step opened by rejecting, and reaching for it here re-multiplies every font size and re-breaks the band gap the height-fit just made correct. `rescale()` on the group is otherwise safe where `resize()` on a frame is not (see Step 5) — so spend it on the one height-fit and close the width by mapping x. If the height-fitted chart still overflows the vertical space, re-export at a flatter aspect ratio rather than squashing — **never stretch one axis** (it distorts dots, arrowheads, and text).
 
 **After any scaling, let every text box re-hug its content.** Grapher's exported labels have no slack, so the smallest rounding makes them wrap. Sweep the chart once, preserving each label's anchor — the axis values are centered and the country names right-aligned, so keeping `x` alone would shift them:
 
@@ -634,12 +636,13 @@ const chart = kids.length === 1 ? kids[0] : figma.group(kids, clone)
 chart.name = "chart"
 for (const n of ["horizontal-axis", "vertical-grid-lines", "vertical-zero-line"])
   for (const x of chart.query(`[name=${n}]`).toArray()) x.remove()   // if they were dropped before
-chart.rescale(header.width / chart.width)
+const band = footer.y - (header.y + header.height)
+chart.rescale((band - 2 * GAP) / chart.height)        // height-first, as in Step 7; GAP = the template's band figure
 // ... re-hug every TEXT, preserving its alignment anchor ...
-chart.rescale(header.width / chart.width)            // re-hugging moves the bbox
-const gap = (footer.y - (header.y + header.height) - chart.height) / 2
+// re-hugging moves the bbox, so re-run the closed-form x-map — not a second rescale, which would
+// re-multiply the font sizes this fit just put on the ladder
 chart.x = header.x
-chart.y = header.y + header.height + gap
+chart.y = header.y + header.height + (band - chart.height) / 2
 ```
 
 **Everything that lived inside the old chart goes out with it — replay it, from a list.** That pass restores only the furniture removal, the scale and the text re-hug. Every other Step 8 edit was parented under the group you just removed: the hidden `connectors`, the cloned direct labels and their placement, the added ticks, the bound stroke and fill styles, and the whole highlight treatment (gray context lines at 1px, the palette color on the protagonist, the widened halo, the hidden markers). Only the annotations survive, because they are parented to the template clone rather than to the chart. Keep the chart-local edits as **one scripted function you re-run after the import**, or as an explicit list you work down — memory is not enough, because a frame that has quietly reverted to grapher's raw rendering looks finished. Then re-run Step 8c on the new chart; the earlier pass certified an object that no longer exists.
@@ -703,24 +706,40 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Box alignment | compare the chart's left/right against the header frame | identical to the subtitle box, to the pixel |
 | Gap | `(footer.y - headerBottom - chart.height) / 2` | equal top and bottom, at the band figure of **the template you filled**: **12–16px** on the 540-wide frames, **30px** on the IG portrait (see Step 7) |
 
-**For arrows, drop vectors entirely and probe the rendered pixels.** Arrow groups are rotated, so every vector-space measurement of theirs is wrong (see Gotchas), and "very close but never on top" is a pixel property anyway. Screenshot the frame at 1:1, take the arrow's **`absoluteBoundingBox`** in frame coordinates, and inside it count pixels of the arrow's gray against pixels of the line's color:
+**For arrows, drop vectors entirely and probe the rendered pixels.** Arrow groups are rotated, so every vector-space measurement of theirs is wrong (see Gotchas), and "very close but never on top" is a pixel property anyway. Screenshot the frame at 1:1, take the arrow's **`absoluteBoundingBox`** in frame coordinates, and inside it count pixels of the arrow's gray against pixels of the line's color.
+
+**Take the target color from the series this arrow points at — never hardcode a hue.** The palette runs to 24 fills and the charts in this skill use orange, purple, maroon and denim as often as a teal, so a fixed predicate collects nothing on most charts and `min()` then dies on an empty sequence instead of reporting a clearance. Read the fill off the node the arrow aims at, match within a tolerance because the antialiased edge pixels blend toward the background, and assert both sets are non-empty so a bad bbox fails loudly rather than looking like a pass:
 
 ```python
 from math import hypot
-def isgray(c): r, g, b = c; return abs(r-g) < 14 and abs(g-b) < 14 and 60 < r < 165   # arrow, not text or bg
-def isteal(c): r, g, b = c; return b > r+40 and g > r+30 and b > 90 and r < 130       # the line's own hue
 
-grays, teals = [], []                        # keep the POSITIONS, not just the verdicts
+TARGET = (0x00, 0x84, 0x7e)   # the fill of the series THIS arrow points at, read off its node
+TOL    = 60                   # antialiasing: edge pixels blend toward the background
+
+def isgray(c):                                          # arrow, not text or bg
+    r, g, b = c[:3]                                     # c[:3] — the screenshot may be RGBA
+    return abs(r - g) < 14 and abs(g - b) < 14 and 60 < r < 165
+
+def istarget(c):                                        # the line's own hue, whatever it is
+    r, g, b = c[:3]
+    return hypot(r - TARGET[0], g - TARGET[1], b - TARGET[2]) < TOL and not isgray(c)
+
+grays, target = [], []                       # keep the POSITIONS, not just the verdicts
 for y in range(y0, y1):                      # y0..y1, x0..x1 = the arrow's absoluteBoundingBox, padded
     for x in range(x0, x1):
         c = px[x, y]
-        if   isgray(c): grays.append((x, y))
-        elif isteal(c): teals.append((x, y))
+        if   isgray(c):   grays.append((x, y))
+        elif istarget(c): target.append((x, y))
+
+assert grays,  "no arrow pixels in the box — wrong bbox, wrong frame, or the arrow is not gray"
+assert target, "no target pixels in the box — pad the bbox, or TARGET is not this arrow's series color"
 
 d        = lambda a, b: hypot(a[0]-b[0], a[1]-b[1])
-minGap   = min(d(a, b) for a in grays for b in teals)
-touching = sum(1 for a in grays for b in teals if d(a, b) <= 1.5)
+minGap   = min(d(a, b) for a in grays for b in target)
+touching = sum(1 for a in grays for b in target if d(a, b) <= 1.5)
 ```
+
+A gray-on-gray case — an arrow aimed at a muted context line — is the one place the two predicates overlap; there, mute the rest of the chart's grays out of the box by narrowing the crop, or probe against the protagonist's color instead and state which you did.
 
 **Pass is `touching == 0` with `minGap` about 3–7px.** This is the only check that caught the real defects: it found the peak arrow overlapping the line by 11 pixel pairs where the vector math had reported a comfortable clearance, and it confirmed the fix at 3.0px with zero contacts. Report both numbers per arrow.
 
