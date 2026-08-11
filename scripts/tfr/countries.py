@@ -160,12 +160,12 @@ def C(name, src, loader, wpp_name, tier, recalculated, found, method, caveats, u
 COUNTRIES = [
     C("India", "Registrar General — Sample Registration System", india, "India", "sample", False,
       "The SRS Statistical Report 2024 publishes a total fertility rate for India and the bigger states, "
-      "to one decimal place. Annexure table 15 gives it annually for 2019-24. There is also a chart of "
+      "to one decimal place. Its table 15 gives it annually for 2019-24. There is also a chart of "
       "the 1985-2024 trend, but it is a picture with no numbers behind it.",
-      "We read the India row of annexure table 15 straight out of the report's PDF. No arithmetic of our "
+      "We read the India row of table 15 straight out of the report's PDF. No arithmetic of our "
       "own — the number is exactly what the Registrar General states.",
-      "The SRS is a sample, not full civil registration: roughly 8 million people are enumerated "
-      "continuously and the rates are scaled up. India's civil registration now records almost all "
+      "The SRS is a sample, not full civil registration: almost 9 million people are tracked "
+      "continuously and the rates are scaled up to stand for the whole country. India's civil registration now records almost all "
       "births, but it does not tabulate the mother's age consistently across states, so there is no "
       "registration-based national figure to use instead. One decimal place also means the series looks "
       "flatter than it is.",
@@ -192,7 +192,7 @@ COUNTRIES = [
     C("Ukraine", "Держстат — Population 1990-2021", ukraine, "Ukraine", "complete", False,
       "Held out to 2021: the fertility rate for every year from 1990, with the age-specific rates behind "
       "it, in one downloadable workbook.",
-      "We read the total column. Summing the age-specific rates and multiplying by the band width "
+      "We read the total column. Summing the age-specific rates and multiplying by five, the width of each age group "
       "reproduces it — 1.159 against the published 1.16 for 2021.",
       "The series stops at 2021 not because publication is running late but because Держстат cannot "
       "compute a population to divide by. Its own orders trace the problem: a method for estimating "
@@ -293,7 +293,7 @@ COUNTRIES = [
       "https://www.instat.mg/autres/rgph-3"),
     C("Mali", "INSTAT — Enquête Démographique et de Santé", mali, "Mali", "survey", False,
       "INSTAT publishes a fertility rate from each of seven survey rounds since 1987, the latest 6.0 for "
-      "2023-24. Its 2022 census gives 6.1, and publishes the births and women behind it as counts.",
+      "2023-24. Its 2022 census gives 6.1, and publishes the births and women behind it as raw numbers.",
       "We read the survey rounds. We also checked the census: dividing its own adjusted counts reproduces "
       "every one of its published age-specific rates and gives 6.09 against the published 6.1.",
       "Mali applied the largest correction in this dataset by far. Its census found the raw count of births "
@@ -389,8 +389,8 @@ COUNTRIES = [
     C("Egypt", "CAPMAS — Annual Bulletin of Births and Deaths", egypt, "Egypt", "complete", False,
       "Each annual bulletin has a table 13 giving age-specific fertility rates, the female population of "
       "each age group, and CAPMAS's own total fertility rate. Table 12 separately gives registered live "
-      "births by age of mother, as counts.",
-      "We summed the age-specific rates and multiplied by the five-year band width, which reproduces "
+      "births by age of mother, as raw numbers.",
+      "We summed the age-specific rates and multiplied by five, the width of each age group, which reproduces "
       "CAPMAS's own published total exactly. The age-band comparison uses the registered births from table "
       "12 rather than the rates, because those are the only figures the registry itself produces.",
       "CAPMAS's published rates are not its registered births divided by its own population. The bulletin "
@@ -406,20 +406,25 @@ COUNTRIES = [
       "and every publication file downloads directly.",
       "https://www.capmas.gov.eg/"),
     C("Brazil", "IBGE — Estatísticas do Registro Civil", brazil, "Brazil", "complete", True,
-      "IBGE's SIDRA database gives registered births by mother's age group, and population projections "
-      "by sex and single age. Both have a public API.",
-      "We divided births by the female population in each age group and summed. Births come from SIDRA "
-      "table 197 for 2000-02 and table 2612 for 2003 onward.",
+      "IBGE's statistics portal, SIDRA, gives registered births by the mother's age group and population "
+      "projections by sex and single year of age. Both can be downloaded directly, without an account.",
+      "We divided births by the women in each age group and added the results across the groups. Births "
+      "come from SIDRA table 197 for 2000-02 and table 2612 from 2003 on. The older table has since been "
+      "retired and no longer appears in the portal's own list, so the first three years cannot be checked "
+      "from the link above.",
       "The 2000-02 points come from the older table and sit too low, because birth registration coverage "
       "was still improving — the step up in 2003 is coverage, not fertility. The 2024 figure is "
-      "provisional. IBGE's own published fertility rate comes from projections, not the registry.",
+      "provisional. IBGE publishes two other fertility rates that are not this one: an assumption inside its "
+      "population projections, and a figure of 1.55 for 2022 from the census, which it called the lowest "
+      "ever recorded. Our registry figure for 2022 is 1.52 — close, but built a different way, from birth "
+      "records rather than from asking women how many children they have had.",
       "https://sidra.ibge.gov.br/pesquisa/registro-civil/tabelas"),
     C("England and Wales", "ONS — birth registrations over the mid-year population", england_wales,
       "United Kingdom", "complete", False,
       "ONS table 10 gives live births and age-specific fertility rates by age group of mother, back to 1938. "
       "ONS also publishes mid-year population by single year of age and sex for the United Kingdom and each "
       "of its nations, 2011 to 2024, in one spreadsheet.",
-      "We summed the age-specific rates and multiplied by the band width. The age-band comparison divides "
+      "We summed the age-specific rates and multiplied by five, the width of each age group. The age-band comparison divides "
       "the births by ONS's own mid-year female population, which is what ONS itself divides by.",
       "This is England and Wales, about 89% of UK births, while the UN figures are UK-wide. We measured how "
       "much that matters: ONS's own reference table gives both, and England and Wales sits a steady 0.02 "
@@ -439,7 +444,7 @@ COUNTRIES = [
       "1972 to 2025. Table 12612-0005 gives the births themselves by age of mother and birth order, from "
       "2009. Table 12411-10, in the annual population report, gives the average population over the year by "
       "single year of age.",
-      "We summed the rates across ages. Because they are single-year rates there is no band width to "
+      "We summed the rates across ages. Because they are single-year rates there is no age-group width to "
       "multiply by. The age-band comparison divides the births by the population from 12411-10, which is "
       "the concept Destatis itself uses — the mean of the stocks at the start and end of the year.",
       "Two traps we checked and got right. The population table has an all-residents column and a "
@@ -509,31 +514,38 @@ COUNTRIES = [
       "NCHS publishes age-specific birth rates per 1,000 women by maternal age group in two datasets: a "
       "historical one running 1940 to 2018, and a current one covering 2016 to 2024. It also publishes its "
       "own total fertility rate in the annual Births report.",
-      "We summed the rates and multiplied by the band width, which is exactly how NCHS builds its own "
+      "We summed the rates and multiplied by five, the width of each age group, which is exactly how NCHS builds its own "
       "total. The two datasets are stitched at 2016, where they overlap. Our figures reproduce NCHS's "
       "published totals to the decimal — 1.621 for 2023, 2.056 for 2000.",
       "The current dataset splits 15-19 into 15-17 and 18-19 as well as the whole band, which would "
       "double-count if not filtered, and labels the top band 45-54 where the rate is per woman aged 45-49. "
-      "Births by age of mother as counts do exist, in the annual Births report and in the record-level "
+      "Births as the number of births by the mother's age do exist, in the annual Births report and in the record-level "
       "natality files, so a recalculation against Census population is possible — but which Census vintage "
-      "you divide by moves the answer by about 1.4%, so it would no longer match NCHS. The CDC website "
+      "you divide by moves the answer by about 1.4%, so it would no longer match NCHS. One thing to know "
+      "before comparing with older reports: NCHS recalculated its rates for the 1990s and for 2000 and "
+      "2001 once the 2000 census showed its population estimates had been too low. The figures here are "
+      "the revised ones, so a reader who finds the report published at the time will see a higher number "
+      "for 2000 — 2.130 rather than 2.056 — and that is the superseded one. The CDC website "
       "itself refuses automated requests; these two datasets come from a separate host that does not.",
       "https://data.cdc.gov/"),
     C("Russia", "Rosstat — Demographic Yearbook of Russia", russia, "Russia", "complete", False,
       "The yearbook is eight chapter spreadsheets behind an HTML index. Chapter 2 gives the total fertility "
-      "rate for the whole country back to the early 1960s; chapter 4 gives live births by age of mother as "
-      "counts. A separate bulletin gives female population by single year of age at 1 January.",
+      "rate for the whole country back to the early 1960s; chapter 4 gives the number of live births by the "
+      "mother's age. A separate release gives female population by single year of age at 1 January.",
       "We read the national column of the fertility-rate sheet. Dividing the births by the population gives "
-      "1.39 for 2022 against Rosstat's published 1.416, so the age-band comparison uses those counts while "
-      "the line stays Rosstat's own figure.",
-      "The 1.8% gap is the denominator: Rosstat divides by the average population over the year, and the "
-      "only population file on the same census basis is the one for 1 January, which is slightly larger. "
-      "There is also a rebasing trap — Rosstat did not rebase its published rates for 2011-21 on the 2020 "
-      "census, but the population files are all rebased, so only 2022 is internally consistent. The 2022 "
-      "figure excludes the four annexed Ukrainian regions; Crimea has been included since 2014. Rosstat's "
-      "site serves a broken certificate chain, so downloads need certificate checking relaxed, and its "
-      "unified statistics database refuses requests from outside the country altogether. The series stops "
-      "at 2022 because that is the latest yearbook edition.",
+      "1.39 for 2022 against Rosstat's published 1.416. We used those counts for the age-band comparison, "
+      "but the line on the chart is Rosstat's own figure.",
+      "That 1.8% gap comes down to which population the births are divided by. Rosstat divides by the "
+      "average across the year, but the only population count updated to match the 2020 census is a "
+      "snapshot taken on 1 January, and that snapshot is slightly larger. There is a second mismatch of the "
+      "same kind: Rosstat has not updated its published rates for 2011 to 2021 to reflect the 2020 census, "
+      "while the population files it publishes all have been — so 2022 is the only year that is consistent "
+      "with its own population count. The 2022 figure excludes the four annexed Ukrainian regions; Crimea "
+      "has been included since 2014. Rosstat's website has a broken security certificate, so downloading "
+      "from it means turning the certificate check off, and its unified statistics database refuses "
+      "requests from outside the country altogether. The series stops at 2022 because that is the latest "
+      "yearbook edition. If Rosstat publishes its average-population file for 2022, the gap should close "
+      "and this figure could become one we have checked ourselves.",
       "https://rosstat.gov.ru/folder/12781"),
     C("Zambia", "ZamStats — Demographic and Health Survey", zambia, "Zambia", "survey", False,
       "ZamStats publishes a fertility rate from each survey round, the latest 4.0 for 2024. Its 2022 census "
@@ -590,39 +602,44 @@ COUNTRIES = [
     C("Bangladesh", "BBS — Sample Vital Registration System", bangladesh, "Bangladesh", "sample", False,
       "The 2023 SVRS report carries a table of every year from 1982 to 2023, giving the total fertility "
       "rate alongside four other fertility measures. Each annual edition also states its own year's figure "
-      "in the text, with a confidence interval.",
+      "in the text, with a range showing how far out it could be.",
       "We read the whole 42-year table out of the report. We also summed the age-specific rates for 2023 "
-      "and got 2.18 against the printed 2.175, which is what the rounding of those rates allows.",
+      "and got 2.18 against the printed 2.175 — the difference is rounding in the published rates.",
       "The SVRS is a sample of about 2,000 areas where resident registrars record births monthly — a "
       "continuous sample system, not full civil registration. The health survey run by the government's "
-      "population institute puts the rate about 0.2 higher, because it asks women to recall past births "
+      "population institute puts the rate higher — by about 0.1 in 2022 and more in earlier rounds — because "
+      "it asks women to recall past births "
       "and averages three years, so the two are not measuring quite the same thing. BBS publishes no "
       "birth or population counts by age, only rates, so there is nothing to recalculate from. Everything "
-      "is PDF only, served from a cloud bucket behind the BBS site.",
+      "is PDF only, and the files sit on cloud storage rather than on the office's own site.",
       "https://bbs.gov.bd/"),
-    C("Indonesia", "BPS — censuses and inter-censal surveys", indonesia, "Indonesia", "survey", False,
-      "BPS publishes a total fertility rate for census and inter-censal survey rounds only. Its 2025 survey "
+    C("Indonesia", "BPS — censuses and surveys taken between them", indonesia, "Indonesia", "survey", False,
+      "BPS, Indonesia's statistics agency, publishes a total fertility rate for censuses and the surveys "
+      "it runs between them, and for nothing else. Its 2025 survey "
       "release charts all four rounds together: 2.41 for the 2010 census, 2.28 for the 2015 survey, 2.18 "
       "for the long form of the 2020 census, and 2.13 for the 2025 survey.",
       "We read all four values out of that chart. An earlier version of this page had 2.42 for the 2020 "
       "long form, which is wrong — BPS's own figure is 2.18, and 2.41 belongs to the 2010 census.",
-      "BPS says plainly that Indonesian civil registration coverage is still incomplete and cannot be used "
-      "for this, so the rate comes from retrospective questions about children ever born. Each round is "
-      "placed at the year BPS names it for; the 2020 long form was actually fielded in 2022. BPS's main "
-      "website refuses automated requests, so this release had to be read through a web archive; the "
-      "separate census microsite does answer, but its fertility tables hold children ever born over a "
-      "lifetime, not one year's births, so there is nothing to recalculate from.",
+      "None of these figures come from birth records: Indonesia's system for officially recording births is "
+      "still incomplete, so BPS instead asks each woman how many children she has had. Each round is "
+      "plotted at the year BPS names it for, which is not always when it happened — the 2020 census's "
+      "detailed questionnaire was actually carried out in 2022. BPS's main website refuses automated "
+      "requests, so this release had to be read from a saved copy on the Internet Archive. A separate "
+      "BPS census website does load, but its fertility tables give the children a woman has had over her "
+      "whole life rather than in one year, so there is nothing there to check this number against.",
       "https://www.bps.go.id/id/pressrelease/2026/05/05/2645/"),
     C("Pakistan", "PBS — Pakistan Demographic Survey", pakistan, "Pakistan", "survey", False,
-      "The Bureau of Statistics ran the Demographic Survey annually until 2007, then again in 2020. Every "
+      "The Bureau of Statistics ran the Demographic Survey most years until 2007 — it is designed to run "
+      "every other year between censuses — and then again in 2020. Every "
       "edition still online prints a total fertility rate: 4.1 in 2001 falling to 3.7 in 2007, and 3.7 again "
-      "in 2020. The 2007 round also publishes live births and female population by age group as counts.",
+      "in 2020. The 2007 round also publishes live births and female population by age group as raw numbers.",
       "We read each edition's own figure out of its report. For 2007 we also did the arithmetic from the "
-      "counts: births divided by women in each age group, summed and multiplied by the band width, gives "
+      "counts: births divided by women in each age group, summed and multiplied by five, the width of each age group, gives "
       "3.69 — the Bureau's published 3.7.",
-      "Pakistan has no usable civil registration for this. The Bureau's own report explains it revived the "
-      "survey after a thirteen-year gap because the national database authority told them vital-event "
-      "records were not good enough — hence the empty stretch from 2008 to 2019. The 2020 figure covers "
+      "Pakistan has no usable civil registration for this. The thirteen-year gap from 2008 to 2019 is one "
+      "the Bureau explains itself: the survey was skipped while the 2017 census kept being postponed, "
+      "and when that census went ahead without covering fertility, it revived the survey to fill the "
+      "hole. The 2020 figure covers "
       "2018-20 rather than one year. The 2020 report has a trap: a table titled live births by age of "
       "mother holds children ever born, not one year's births, and totals over 100 million. The health "
       "survey run by the National Institute of Population Studies gives 3.6 for 2017-18.",
@@ -633,15 +650,17 @@ COUNTRIES = [
       "every single year of age from 15 to 49, the number of women of childbearing age, the number of "
       "births they had in the year before the count, and the resulting rate. The bureau's director "
       "separately stated a fertility rate of 1.3 for 2020 at the census press conference.",
-      "We divided births by women at each single age and summed. This gives 1.221 for 2000, 1.188 for 2010 "
-      "and 1.296 for 2020. The bureau's own companion table computes 1.301 for 2020 from five-year bands, "
-      "and the press conference rounded that to 1.3.",
-      "Only census years. Between censuses the bureau relies on an annual sample survey of about one person "
-      "in a thousand, whose age detail appears in a yearbook it does not publish free of charge — so there "
-      "is no way to fill the gaps, and the line jumps ten years at a time. The counts are the census long "
-      "form's sample, not the whole population, and the reference period is the twelve months to 31 October "
-      "of the census year rather than the calendar year. Chinese demographers argued the 2010 census figure "
-      "of 1.18 was implausibly low because births went unreported. The bureau's queryable data portal "
+      "We divided births by women at each age from 15 to 49 and added the results. This gives 1.221 for "
+      "2000, 1.188 for 2010 and 1.296 for 2020. Grouping the same table's ages into five-year groups "
+      "instead gives 1.301 for 2020, which is what the press conference rounded to 1.3.",
+      "This series covers census years only, once a decade. Between censuses the bureau runs a smaller "
+      "annual survey covering about one person in a thousand, and its age breakdown appears only in a "
+      "yearbook that is not free — so the gap years cannot be filled, and the line jumps ten years at a "
+      "time. The figures come from the households given the detailed census questionnaire, not from the "
+      "full population count, and they cover the twelve months to 31 October of the census year rather "
+      "than the calendar year. Some Chinese demographers argued the 2010 census figure of 1.18 was "
+      "implausibly low because births went unreported; others concluded under-reporting was not the "
+      "explanation. The bureau's queryable data portal "
       "refuses requests from outside the country, but these static files download without trouble.",
       "https://www.stats.gov.cn/sj/pcsj/rkpc/7rp/zk/html/B0603.xls"),
     C("Nepal", "National Statistics Office — 2021 census", nepal, "Nepal", "survey", False,
@@ -697,7 +716,7 @@ COUNTRIES = [
       "https://stat-niger.org/"),
     C("North Korea", "Central Bureau of Statistics — 2008 census and 2014 survey", north_korea,
       "North Korea", "survey", False,
-      "The bureau's 2008 census reports 2.01 and prints the births and women behind it as counts. Its 2014 "
+      "The bureau's 2008 census reports 2.01 and prints the births and women behind it as raw numbers. Its 2014 "
       "socio-economic and health survey reports 1.89. A 2017 household survey gives 1.9, but its title page "
       "names UNICEF as publisher, so the authorship is shared.",
       "We read both figures. We also checked the census: dividing its own counts gives 2.008 against the "
@@ -716,18 +735,18 @@ COUNTRIES = [
     C("Nigeria", "National Population Commission — Nigeria Demographic and Health Survey", nigeria,
       "Nigeria", "survey", False,
       "The 2024 survey report sets every round since 2003 side by side in one table: 5.7 in 2003 and 2008, "
-      "then 5.5, 5.3 and 4.8. The Bureau of Statistics separately publishes a row called Calculated TFR, "
-      "and its own 2021 household survey found 4.6.",
+      "then 5.5, 5.3 and 4.8. The National Bureau of Statistics separately publishes a row it calls "
+      "Calculated TFR — a filled-in estimate for the years between surveys rather than a new "
+      "measurement — and its own 2021 household survey found 4.6.",
       "We read the trend table out of the survey report. Summing its age-specific rates and multiplying by "
-      "the band width gives 4.79, the published 4.8.",
+      "five, the width of each age group, gives 4.79, the published 4.8.",
       "These are measured rates from women's birth histories, not registration — birth registration in "
       "Nigeria is far too incomplete to use. Each round's figure covers the three years before its "
-      "fieldwork, so the years are approximate. We do not use the Bureau's Calculated TFR row: the "
-      "Population Commission produces it by drawing a straight line between survey rounds, which is why it "
-      "falls by almost the same amount every year, and it had Nigeria at 5.14 in 2022 when the next actual "
-      "measurement came in at 4.8. Female population by age exists only as projections from the 2006 "
-      "census, and they do not reconcile with the survey's own denominators — about 11% apart — so there is "
-      "nothing solid to recalculate from.",
+      "fieldwork, so each point sits later than the fertility it describes. We do not use the Calculated TFR "
+      "row, because it is drawn as a straight line between survey rounds — which is why it falls by almost "
+      "the same amount every year — rather than measured. Counts of women by age exist only as "
+      "projections from the 2006 census, and they do not match the number of women the survey itself "
+      "counted, about 11% apart, so there is nothing solid to check the rate against.",
       "https://nationalpopulation.gov.ng/publications"),
     C("Iran", "Statistical Center of Iran and the civil registration organization — nothing we could reach",
       None, "Iran", "none", False,
@@ -750,7 +769,7 @@ COUNTRIES = [
       "TurkStat's annual birth statistics bulletin publishes age-specific fertility rates and births by "
       "mother's age group, both from 2001. An older population portal gives female population by five-year "
       "age group from the address-based population register, back to 1935.",
-      "We summed the age-specific rates and multiplied by the band width, giving 1.484 for 2024 against the "
+      "We summed the age-specific rates and multiplied by five, the width of each age group, giving 1.484 for 2024 against the "
       "1.48 TurkStat states. We also checked it from the counts: dividing the registered births by the "
       "register's female population gives 1.4832, which agrees with TurkStat's own arithmetic to four "
       "decimal places. The age-band comparison uses those counts.",
@@ -762,17 +781,18 @@ COUNTRIES = [
       "and the population figures before 2007 come from censuses rather than the register, a break inside "
       "one table. The population series is complete from 2007, so the age-band comparison cannot go earlier.",
       "https://data.tuik.gov.tr/Bulten/Index?p=Dogum-Istatistikleri-2024-54196"),
-    C("Ethiopia", "Statistical Service — Ethiopia Demographic and Health Survey", ethiopia, "Ethiopia",
+    C("Ethiopia", "Ethiopian Statistical Service — Demographic and Health Survey", ethiopia, "Ethiopia",
       "survey", False,
-      "The Statistical Service publishes a total fertility rate for each survey round. The 2024-25 "
-      "report's trend figure prints the national value for all five rounds since 2000, and its table 3 "
-      "gives the age-specific rates behind the latest one.",
-      "We read the five round values off the trend figure. Summing the age-specific rates in table 3 and "
-      "multiplying by the band width gives 4.05, which is the published 4.0.",
-      "These are household surveys asking women about past pregnancies, not registration. Each point is "
-      "the average of the three years before the survey, so the years are approximate. Ethiopia's last "
+      "The Ethiopian Statistical Service publishes a total fertility rate for each survey round. The "
+      "2024-25 report's trend figure prints the national value for all five rounds since 2000, and its "
+      "table 3 breaks the latest one down by the mother's age.",
+      "We read the five round values off the trend figure. Adding up the rate for each age group and "
+      "multiplying by five, the width of each group, gives 4.05 — the published 4.0.",
+      "These are household surveys asking women about past pregnancies, not registration. Each point "
+      "covers the three years before the survey, so it sits later than the fertility it describes: the "
+      "point plotted at 2024 is really about 2021 to 2024. Ethiopia's last "
       "completed census was 2007 and the next has been postponed repeatedly, so there is no recent "
-      "female population by age to divide by — the 2007 census is the only one, and it is nineteen years "
+      "count of women by age to divide by — the 2007 census is the only one, and it is nineteen years "
       "old. The old statsethiopia.gov.et domain is dead; the service is now at ess.gov.et.",
       "https://ess.gov.et/wp-content/uploads/2026/01/edhs-2024-25-kir-01172026.pdf"),
     C("Cote d'Ivoire", "INS — Enquête Démographique et de Santé", cote_divoire, "Cote d'Ivoire", "survey",
@@ -846,7 +866,7 @@ COUNTRIES = [
       "complete", False,
       "Statistics Korea publishes its birth statistics in English every year as a PDF, and each edition's "
       "first table gives an eleven-year run of the total fertility rate. Some editions also print live "
-      "births by mother's age group as counts. The interior ministry separately publishes female population "
+      "births by mother's age group as raw numbers. The interior ministry separately publishes female population "
       "by five-year age group from the resident register, as a spreadsheet download.",
       "We chained five editions of the release to build 2003-2024, taking the newer edition wherever two "
       "overlap because the office revises. As a check we recalculated 2015 from the counts — births by age "
@@ -880,7 +900,7 @@ COUNTRIES = [
     C("Burkina Faso", "INSD — Enquête Démographique et de Santé", burkina_faso, "Burkina Faso", "survey",
       False,
       "INSD publishes a fertility rate from each survey round — 5.9 for 2003, 6.0 for 2010 and 4.4 for 2021 "
-      "— and separately from each census, giving 5.4 for 2019 with the births and women behind it as counts.",
+      "— and separately from each census, giving 5.4 for 2019 with the births and women behind it as raw numbers.",
       "We read the survey rounds. Summing the census's own published rates reproduces its 5.4.",
       "The two instruments are a full child apart two years apart: the 2019 census says 5.4 and the 2021 "
       "survey says 4.4. Nothing in either report reconciles them, and we do not know which is closer to the "
@@ -943,7 +963,7 @@ COUNTRIES = [
       "births in the last twelve months. The census also sits oddly against the survey: 5.7 in 2014 against "
       "6.2 measured two years later. Angolan civil registration cannot be used at all — the 2023-24 survey "
       "found only 38% of children under five registered, and only 36% of those holding a certificate. No "
-      "Angolan source publishes births by age of mother as counts, only rates, so there is nothing to "
+      "Angolan source publishes the number of births by the mother's age, only rates, so there is nothing to "
       "recalculate from. The 2024 census has published definitive results with no fertility indicator at "
       "all, so a later thematic volume is worth watching for.",
       "https://www.ine.gov.ao/publicacoes/Todas?titulo2=IIMS"),
@@ -988,7 +1008,7 @@ COUNTRIES = [
       "alongside births and age-specific rates. Female population by five-year age group is in the same "
       "bulletin.",
       "We read the index row out of the 2019 edition, which carries the whole span in one table. Summing its "
-      "age-specific rates and multiplying by the band width reproduces the published 3.0 for 2019 exactly, "
+      "age-specific rates and multiplying by five, the width of each age group reproduces the published 3.0 for 2019 exactly, "
       "and multiplying those rates by the female population implies 1,032,000 births against the 1,034,000 "
       "the same bulletin reports.",
       "ONS stopped publishing the fertility index after 2019. The 2020-2023 edition dropped the whole "
@@ -1040,7 +1060,7 @@ COUNTRIES = [
       "from births. Its own report says the series was \"derived following a detailed review of TFR estimates "
       "(1985-2024), (both published and unpublished), from various authors, methods and data sources\", "
       "informed by registered births and health-system records. Separately, the recorded live births report "
-      "publishes registered births by age of mother as counts, and the mid-year estimates publish female "
+      "publishes registered the number of births by the mother's age, and the mid-year estimates publish female "
       "population by age group.",
       "We read the modelled series from table 2 of the mid-year estimates. The age-band comparison uses the "
       "registered births instead, because those are the only counts the registry produces.",
@@ -1077,7 +1097,7 @@ COUNTRIES = [
       "The census measures fertility by asking women about births in the three years before the count, not "
       "from registration. Rates for the North-Eastern counties are adjusted with a Gompertz model because "
       "reporting there was inconsistent. The whole report is scanned page images with no text layer, so "
-      "everything had to be read by optical character recognition. Births by age of mother as counts are "
+      "everything had to be read by optical character recognition. Births as the number of births by the mother's age are "
       "not in this volume.",
       "https://www.knbs.or.ke/wp-content/uploads/2024/05/2019-Kenya-population-and-Housing-Census-"
       "Analytical-Report-on-Fertility-and-Nuptiality-Vol.VI_.pdf"),
@@ -1086,7 +1106,7 @@ COUNTRIES = [
       "Appendix table D-1 of the Union Report gives, for every five-year age group, the number of women "
       "enumerated and the number of live births in the twelve months before the survey, plus the "
       "department's own age-specific rate.",
-      "We divided births by women in each age group and summed, times the band width. Every rate we get "
+      "We divided births by women in each age group and summed, times five, the width of each age group. Every rate we get "
       "matches the printed one to the second decimal, and our total of 2.007 is the published 2.0.",
       "This is a sample survey, not registration: the counts are the survey's own enumerated households "
       "scaled up, and a twelve-month recall question misses births. The 2014 census gave 2.5 by the same "
@@ -1176,7 +1196,7 @@ COUNTRIES = [
       "Three figures exist: 7.1 from the 2009 census, 6.9 from the 2010 multiple-indicator survey, and 6.4 "
       "from the health survey. Nothing annual, and no age-specific rates at all.",
       "We read the published figures. There is nothing to recompute: no document INSEED hosts publishes "
-      "births by age of mother, as counts or as rates.",
+      "births by age of mother, as raw numbers or as rates.",
       "Chad's own publications disagree about their own data. The 6.4 figure is attributed to the 2014-15 "
       "health survey in one INSEED report and to the 2019 survey in another; we place it at 2015, the "
       "fieldwork years. Neither of those survey reports is on INSEED's site, and neither is the 2009 "
@@ -1287,8 +1307,8 @@ COUNTRIES = [
       "under-fives, but is not used for any fertility figure.",
       "https://instad.bj/"),
     C("Cambodia", "NIS — Demographic and Health Survey rounds", cambodia, "Cambodia", "survey", False,
-      "The 2021-22 survey charts every round since 2000. Separately, the censuses and inter-censal "
-      "surveys of 2008, 2013, 2019 and 2024 each publish a fertility figure with the arithmetic behind it.",
+      "The 2021-22 survey charts every round since 2000. Separately, the censuses and the surveys "
+      "taken between them, in 2008, 2013, 2019 and 2024 each publish a fertility figure with the arithmetic behind it.",
       "We read the survey series. We also summed the 2019 census's own published age-specific rates and "
       "got 2.512 against its printed 2.51, which confirms the table but not the figure — the rates are the "
       "adjusted ones, and the raw counts they were built from are not published.",
@@ -1550,7 +1570,7 @@ COUNTRIES = [
     C("Azerbaijan", "State Statistical Committee — registered births over the average annual population",
       azerbaijan, "Azerbaijan", "complete", False,
       "The committee publishes its own rate for every year since 1959, the age-specific rates behind it, "
-      "and births by age of mother as counts back to 1970 — all as plain spreadsheets at stable addresses, "
+      "and the number of births by the mother's age back to 1970 — all as plain spreadsheets at stable addresses, "
       "no key and no interface to negotiate.",
       "We read the published series. Its own age-specific rates sum to its own total exactly in every year "
       "we checked. What we could not do is rebuild it independently, and the reason turned out to be "
@@ -1588,7 +1608,7 @@ COUNTRIES = [
       "complete", False,
       "One spreadsheet carries the office's own rate from 1950 and the fertility rates for every single "
       "year of the woman's age behind it. The yearly demographic yearbooks also publish births by single "
-      "year of the mother's age as counts, one archive per year.",
+      "year of the mother's age as raw numbers, one archive per year.",
       "We read the published series and its own age decomposition. Summing the single-age rates "
       "reproduces the printed total, and dividing the yearbook's own counts by its mid-year population "
       "gives 1.3675 against a published 1.3679 for 2024 — the same 0.0004 gap in every year, which is "

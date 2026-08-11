@@ -97,6 +97,10 @@ def brief(country):
             out.append("")
 
     year, bands = _bands(country)
+    if bands is None:
+        out += ["AGE-BAND BREAKDOWN: none. In its place the page shows the reader this sentence:",
+                "  \"This office publishes fertility rates only, not the births and female population",
+                "  behind them, so the two sources cannot be compared age band by age band.\"", ""]
     if bands is not None:
         out.append(f"AGE-BAND BREAKDOWN SHOWN FOR {year} (the reader sees these numbers):")
         for _, r in bands.iterrows():
