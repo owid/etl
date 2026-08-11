@@ -775,21 +775,21 @@ COUNTRIES = [
       "https://stat-niger.org/"),
     C("North Korea", "Central Bureau of Statistics — 2008 census and 2014 survey", north_korea,
       "North Korea", "survey", False,
-      "The bureau's 2008 census reports 2.01 and prints the births and women behind it as raw numbers. Its 2014 "
-      "socio-economic and health survey reports 1.89. A 2017 household survey gives 1.9, but its title page "
-      "names UNICEF as publisher, so the authorship is shared.",
-      "We read both figures. We also checked the census: dividing its own counts gives 2.008 against the "
-      "published 2.01.",
-      "North Korea is here rather than on the no-figure list, and the reason is worth stating. Every one of "
-      "these documents is the bureau's own work — the census foreword is signed by its director-general and "
-      "credits the UN population fund only for material and technical support — but not one of them is hosted "
-      "on a North Korean server. The country has no statistics website at all: its two public domains resolve "
-      "but drop every connection before answering, the same pattern as Iran, and neither has ever carried a "
-      "statistics section. So the reports survive only on UN mirrors and in archives. We judge authorship, "
-      "not hosting, which is why these count and a UN estimate would not. The planned 2018 census was "
-      "cancelled, so nothing newer than 2017 exists. Two loose ends: the bureau\'s own publications give "
-      "1993 as both 2.1 and 2.20, and the only analysis of that census available anywhere is the US Census "
-      "Bureau\'s, which is not a North Korean source and is not used here.",
+      "The bureau's 2008 census publishes the underlying birth and women counts as tables without stating a "
+      "rate; the rate of 2.01 appears in its later work. Its 2014 socio-economic and health survey reports "
+      "1.89. A 2017 household survey gives 1.9.",
+      "We read both plotted figures. We also checked the census: dividing its own counts gives 2.008 against "
+      "the 2.01 the bureau states elsewhere.",
+      "These figures are the bureau's own work, even though none of the reports survives on a North Korean "
+      "server — the census foreword is signed by its director-general and credits the UN population fund only "
+      "for material and technical support. There is no North Korean statistics website; the reports are kept "
+      "by UN bodies and in web archives instead. We use them because of who produced them, not where they "
+      "are now kept, which is also why a UN estimate would not count here. The 2017 survey is the one figure "
+      "we have not plotted: it was run by the bureau but published by UNICEF, and by the same test we apply "
+      "to the census it arguably belongs on the line — we have not added it pending a look at the report "
+      "itself. Nothing newer than 2017 has appeared. Two loose ends: the bureau's own publications give 1993 "
+      "as both 2.1 and 2.20, and the only analysis of that census available anywhere is the US Census "
+      "Bureau's, which is not a North Korean source and is not used here.",
       "https://dprkorea.un.org/en"),
     C("Nigeria", "National Population Commission — Nigeria Demographic and Health Survey", nigeria,
       "Nigeria", "survey", False,
@@ -895,20 +895,18 @@ COUNTRIES = [
       "the rate against.",
       "https://ins.gouv.cd/publication/RDC-EDS-III.pdf"),
     C("Syria", "Central Bureau of Statistics — family health surveys", syria, "Syria", "survey", False,
-      "The bureau's statistical abstract carries one fertility table, giving age-specific rates for its 2001 "
+      "The bureau's statistical abstract carries one fertility table, giving rates by age group for its 2001 "
       "and 2009 family health surveys: 3.8 and 3.5.",
-      "We read both, from the native spreadsheet inside the abstract's own chapter archive. The rates sum to "
-      "the printed totals.",
-      "Nothing has been added since 2009. Every edition we recovered — 2016, 2017, 2019 and 2020 — reprints "
-      "the same table unchanged, even while the registered-births tables next to it were being updated to "
-      "2019; and those birth tables break down by sex and province only, never by the mother's age, so there "
-      "is nothing to rebuild from. The bureau\'s site is now gone, and how it went is worth recording: it "
-      "kept publishing for months after the change of government in December 2024, with fresh pages as late "
-      "as July 2025, then the domain lapsed and a parking service took it. That service cloaks by browser "
-      "identity — a plain request gets a 410, which reads as retired, while a browser-like one gets a "
-      "for-sale page at 200, which reads as squatted — so testing only one way misdiagnoses it. Everything "
-      "here came from a web archive. The health ministry\'s site is live and modern but publishes only "
-      "disease surveillance.",
+      "We read both, from the original spreadsheet inside the abstract's own chapter download. The rates sum "
+      "to the printed totals.",
+      "Each of these two figures is an average over the three years before its survey, as the source's own "
+      "table title says, rather than a single year's rate like the UN line beside it. Nothing has been added "
+      "since 2009. Every edition we could find — 2016, 2017, 2019 and 2020 — reprints this same table "
+      "unchanged. The registered-births tables next to it were being updated as late as 2019, but they break "
+      "the data down by sex and province only, never by the mother's age, so a newer rate cannot be built "
+      "from them. The bureau's website is no longer online, so this comes from an archived copy; it kept "
+      "publishing for months after the change of government in December 2024, with fresh pages as late as "
+      "July 2025. The health ministry's site is live and modern but publishes only disease surveillance.",
       "https://web.archive.org/web/20241209121919/http://cbssyr.sy/yearbook.htm"),
     C("Tanzania", "National Bureau of Statistics — 2022 Demographic and Health Survey", tanzania,
       "Tanzania", "survey", False,
@@ -979,20 +977,26 @@ COUNTRIES = [
       "https://ins-cameroun.cm/"),
     C("Burkina Faso", "INSD — Enquête Démographique et de Santé", burkina_faso, "Burkina Faso", "survey",
       False,
-      "INSD publishes a fertility rate from each survey round — 5.9 for 2003, 6.0 for 2010 and 4.4 for 2021 "
-      "— and separately from each census, giving 5.4 for 2019 with the births and women behind it as raw numbers.",
-      "We read the survey rounds. Summing the census's own published rates reproduces its 5.4.",
-      "The two instruments are a full child apart two years apart: the 2019 census says 5.4 and the 2021 "
-      "survey says 4.4. Nothing in either report reconciles them, and we do not know which is closer to the "
-      "truth, so the survey series is used because it is the more recent and the more consistent run. Burkina "
-      "Faso is also the one country here whose correction went down rather than up. INSD found an implausible "
-      "spike in fertility at ages 45-49 in its raw census data, tested the Brass method (which gave 5.8) and "
-      "then adopted Arriaga instead, which nudged the national figure from 5.5 to 5.4 while cutting the urban "
-      "figure from 4.5 to 4.1. Civil registration is not used; the 2021 survey found 85% of under-fives "
-      "registered and 73% holding a certificate, and INSD\'s own civil-registration statistics page is a chart "
-      "template filled with randomly generated placeholder data. One census volume has an embedded font that "
-      "silently defeats text extraction across some two hundred pages, so its fertility chapter needs "
-      "character recognition rather than a text layer.",
+      "Burkina Faso's national statistics office, INSD, publishes a fertility rate from each survey round — "
+      "5.9 for 2003, 6.0 for 2010 and 4.4 for 2021 — and separately from its 2019 census, which gives 5.4 "
+      "and prints the underlying birth and women counts.",
+      "We use the rate each survey reported. Summing the census's own published rates reproduces its 5.4. "
+      "The 2003 round originally headlined 6.2, measured over the five years before it; the 5.9 we plot is "
+      "the office's own later recalculation of that round over three years, which is the window the other "
+      "rounds use, so all three points sit on the same basis.",
+      "The census and the survey are a full child apart two years apart: 5.4 for 2019 against 4.4 for 2021. "
+      "We found nothing that reconciles them, though the census volumes were published before the survey's "
+      "report, so they could not have. We use the survey series because it is the more recent and the more "
+      "internally consistent run. But part of that fall may be coverage rather than fertility: insecurity "
+      "kept the 2021 survey out of 86 of its 600 sampled areas, concentrated in the two highest-fertility "
+      "regions of the country — two thirds of the sampled areas in the Sahel region and a third in the East "
+      "were never visited, and five provinces were dropped altogether. The report warns against relying on "
+      "those regions' own figures but says nothing about what it does to the national one. Unusually, the "
+      "census's correction lowered its figure rather than raising it: INSD found an implausible spike in "
+      "fertility at ages 45-49 in its raw data, tested one standard correction method which gave 5.8, and "
+      "adopted a different one instead, which moved the national figure from 5.5 to 5.4 and cut the urban "
+      "figure from 4.5 to 4.1. Civil registration is not used for fertility; the 2021 survey found 85% of "
+      "children under five registered and 73% holding a certificate.",
       "https://www.insd.bf/"),
     C("Canada", "Statistics Canada — births by age of mother divided by its population estimates", canada_tfr,
       "Canada", "complete", True,
@@ -1218,36 +1222,42 @@ COUNTRIES = [
       "https://www.dop.gov.mm/sites/dop.gov.mm/files/publication_docs/2024mphc_appendixtables.pdf"),
     C("Sri Lanka", "DCS — registered births divided by the mid-year population", sri_lanka_tfr,
       "Sri Lanka", "complete", True,
-      "The Department of Census and Statistics stopped publishing a fertility rate of its own after 2000, "
-      "but keeps publishing both ingredients: registered live births by age of mother, and mid-year "
-      "population by age group and sex. The 2024 census separately reports 1.3.",
-      "We divided the births in each age band by the women in it and summed. The same procedure on the "
-      "department's own 2000 data reproduces the 1.9 it published then, which is what tells us the method "
-      "is the one it used.",
+      "Sri Lanka's Department of Census and Statistics publishes no annual fertility rate built from its "
+      "birth registrations, but it does publish both ingredients every year: registered live births by age "
+      "of mother, and mid-year population by age group and sex. Its own fertility figures come instead from "
+      "surveys and censuses at intervals — 2.3 from a 2006-07 survey, 2.4 from the 2012 census, 2.2 from a "
+      "2016 survey and 1.3 from the 2024 census.",
+      "We divided the births in each age band by the women in it and summed — the two tables the department "
+      "publishes for exactly this purpose. This is our own arithmetic on its counts, not a figure it has "
+      "endorsed, and it is not directly comparable with its survey and census figures.",
       "Two things to know. First, the series stops at 2021 — not because registration stopped, but because "
       "the detailed births-by-age tables did. Headline birth totals kept being published through 2025, and "
-      "they fall steeply: 319,108 in 2019 to 214,570 in 2025. The age breakdown needed for a rate exists "
-      "for none of those years, and 2022 appears on the department's site only as a dead link reusing "
-      "2021's files. Second, the 2024 census reports 1.3, far below the 1.64 we get for 2021, but it is a "
-      "different measure: it asks ever-married women about their birth histories rather than counting a "
-      "year's registrations. Neither number is the other's update. The population is published rounded to "
-      "thousands, and its age structure is rolled forward from the 2012 census, not the 2024 one.",
+      "they fall steeply: 319,108 in 2019 to 214,570 in 2025. We found no age breakdown for any year after "
+      "2021, in the department's tables, the registrar general's, or the statistical abstract. Second, the "
+      "2024 census reports 1.3, far below the 1.64 we get for 2021, but it is a different measure: it asks "
+      "ever-married women how many children they have had and when the last one was born, rather than "
+      "counting a year's registrations. Neither figure replaces the other. The population we divide by is "
+      "published rounded to thousands, and its age structure is rolled forward from the 2012 census rather "
+      "than the 2024 one.",
       "https://www.statistics.gov.lk/Population/StaticalInformation/VitalStatistics/Fertility"),
     C("Taiwan", "Ministry of the Interior — births by age of mother divided by the household register",
       taiwan_tfr, "Taiwan", "complete", True,
       "The interior ministry publishes births by the mother's age group, population by single year of age "
       "and sex, and its own fertility rate — all from the household register, all back to at least 2000.",
-      "We divided the births in each age band by the women in it and summed. Our 0.888 for 2024 is the "
-      "ministry's published 0.885, and 0.868 against its 0.865 for 2023.",
-      "Taiwan has the lowest rate in this collection: 0.71 for 2025 on our arithmetic, against 1.66 in "
-      "2000. Zodiac years move it visibly — 2022 was a Tiger year and the rate fell to 0.88, 2024 was a "
-      "Dragon year and it rose to 0.89, the only rise in a decade, before falling 20% in 2025. Two "
-      "definitions matter. Births are counted by the date they happened, which is why the age breakdown is "
-      "only released once a year; 2025 is still filling in, and its occurrence-year total is 2% below the "
-      "registration-year total for the same months. And the population is the year-end household register, "
-      "not a mid-year estimate and not the de facto resident population that the budget agency publishes "
-      "separately. None of this is reachable from the ministry's own portal pages, which are navigation "
-      "shells; the query service behind them answers plain requests but has to be addressed directly.",
+      "We divided the births in each age band by the women in it and summed. Our figures come out close to "
+      "the ministry's own: 0.888 against its 0.885 for 2024, and 0.868 against its 0.865 for 2023.",
+      "Taiwan has one of the lowest fertility rates in the world — 0.89 in 2024, against 1.66 in 2000 — and "
+      "the ministry's own figure for 2025 is lower again, 0.695. The Chinese zodiac moves the rate visibly, "
+      "because some years are traditionally seen as more auspicious than others for having a child: it fell "
+      "to 0.88 in 2022, a Tiger year, and rose to 0.89 in 2024, a Dragon year, the only rise in a decade. "
+      "Our line stops at 2024 even though the ministry has published a 2025 rate. Births here are counted by "
+      "the date they happened rather than the date they were registered, so the most recent year keeps "
+      "filling in: for 2025 we could account for 105,676 births against the ministry's final 107,812, about "
+      "2% short, and the rate that gives is nearly 2% above the ministry's own where every finished year "
+      "comes out within 0.34% of it. Rather than plot a figure we know to be built on an unfinished count, "
+      "we leave the year out. The population we divide by is the year-end household register — not a "
+      "mid-year estimate, and not the de facto resident population that Taiwan's statistics agency publishes "
+      "separately.",
       "https://www.moi.gov.tw/cl.aspx?n=4404"),
     C("Senegal", "ANSD — continuous Demographic and Health Survey", senegal, "Senegal", "survey", False,
       "ANSD runs its health and demographic survey every year, and the 2023 census report prints the whole "

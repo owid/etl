@@ -1,14 +1,20 @@
-"""Taiwan: births by age of mother over the household-registered female population.
+"""Taiwan: births by age of mother divided by the household-registered female population.
 
-Both come from the interior ministry's statistics query service, which returns JSON to a plain GET
-with no key. The service is only reachable by building the query by hand: the portal pages that link
-to it are navigation shells, and the query tool itself runs in JavaScript.
+Both come from the interior ministry's statistics query service, which returns JSON to a plain GET.
 
-The ministry publishes its own rate too, and the recalculation lands within 0.3% of it. Two details
+The ministry publishes its own rate too, and for finished years the recalculation lands within 0.34%
+of it — the same margin every year, which is what makes an unfinished year obvious. Two details
 matter. Births are counted by the date they happened, not the date they were registered, and are
 only released annually for that reason. And the population is the year-end household register, not a
-mid-year estimate and not the de facto resident population that the budget agency publishes
+mid-year estimate and not the de facto resident population that the statistics agency publishes
 separately.
+
+Because births are dated by occurrence, the newest year keeps filling in after it is first
+published, and the age breakdown lags the headline count. For 2025 our own total was 105,676 against
+the ministry's final 107,812 — about 2% short — and the rate we computed from it came out 1.93% above
+the ministry's own 0.695, against the usual 0.34%. So the series stops at the last year whose age
+breakdown has closed. Advance LAST_COMPLETE when a year does, and check the gap against the
+ministry's published rate before trusting it.
 """
 
 import json
@@ -22,6 +28,8 @@ API = "https://statis.moi.gov.tw/micst/webMain.aspx"
 BIRTHS = "c0120105"                # births by mother's age, by date of occurrence
 POPULATION = "c0110203"            # population by single year of age
 FIRST, LAST = 2000, 2025
+# the newest year whose births-by-age table has stopped filling in; see the note above
+LAST_COMPLETE = 2024
 ROC = 1911                         # the calendar the service uses: ROC year = AD year - 1911
 BANDS = [(15, 19), (20, 24), (25, 29), (30, 34), (35, 39), (40, 44), (45, 49)]
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
@@ -78,6 +86,8 @@ def taiwan_tfr():
     births, women = _births(), _women()
     rows = []
     for year in sorted(set(births) & set(women)):
+        if year > LAST_COMPLETE:
+            continue
         b, w = births[year], women[year]
         if all(b.get(x) and w.get(x) for x in BANDS):
             rows.append({"year": year, "value": sum(b[x] / w[x] for x in BANDS) * 5})
@@ -93,5 +103,12 @@ def taiwan_detail(year):
 
 if __name__ == "__main__":
     t = taiwan_tfr()
-    print(t.tail(8).to_string(index=False), f"({len(t)} years from {int(t.year.min())})")
-    print("the ministry publishes 0.885 for 2024, 0.865 for 2023, 0.695 for 2025")
+    print(t.tail(6).to_string(index=False), f"({len(t)} years from {int(t.year.min())})")
+    print("the ministry publishes 0.865 for 2023, 0.885 for 2024, 0.695 for 2025")
+    # what the excluded year would have looked like, and why it is excluded
+    b, w = _births(), _women()
+    for year in range(LAST_COMPLETE + 1, LAST + 1):
+        if year in b and year in w:
+            ours = sum(b[year][x] / w[year][x] for x in BANDS) * 5
+            print(f"{year} excluded: our {ours:.4f} from {sum(b[year].values()):,.0f} births, "
+                  "still filling in")

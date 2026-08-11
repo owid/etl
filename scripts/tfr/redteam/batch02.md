@@ -966,3 +966,111 @@ census cross-check reproduces all seven of its published rates and gives 6.0885 
 - **Accepted.** "The largest correction in this dataset by far" compared the entry to a collection the
   reader has not seen. INSTAT is spelled out and the Trussell variant of the Brass technique is
   described rather than named.
+
+## Taiwan
+
+Verdict: serious problems. The 2023 and 2024 figures check out, but the newest point was built on an
+unfinished year and we knew it.
+
+- **Accepted, and the page said so while plotting it anyway.** We plotted 0.7084 for 2025 and, three
+  sentences later, told readers that year "is still filling in". I checked our own numbers: for finished
+  years our recomputation sits +0.34% above the ministry's published rate, every year, like clockwork.
+  For 2025 it sits +1.93% — nearly six times off — because our births total for that year is 105,676
+  against the ministry's final 107,812, about 2% short. Births in Taiwan are dated by when they
+  happened, so the newest year keeps filling in after first publication.
+- **Fixed by dropping the year, not by substituting.** The ministry publishes its own 0.695 for 2025,
+  and using it was the other option. But this series is ours throughout, rebuilt from counts, and
+  splicing in one copied figure would put two methods on one line — the mistake corrected for Myanmar
+  earlier in this batch. So the line ends 2024, with a `LAST_COMPLETE` constant to advance when a year
+  closes, and the caveats now tell the reader the ministry has a 2025 figure and why ours stops short.
+- **Accepted.** The closing sentence about portal pages being navigation shells and a query service
+  having to be addressed directly is our own access experience — and overstated: the ministry runs a
+  public, named query tool any reader can open. Cut.
+- **Accepted.** "The lowest rate in this collection" now stands alone as one of the lowest in the
+  world; the zodiac sentence explains why a zodiac year would move births at all; "occurrence-year" and
+  "registration-year" are gone; and "the budget agency" is named as Taiwan's statistics agency.
+
+## North Korea
+
+Verdict: minor problems. Both plotted values verified against the census and survey reports, and our
+2.008 recomputation reproduced from the census's own tables. The census foreword and the 1993
+discrepancy — 2.1 in one bureau publication, 2.20 in another — both confirmed verbatim.
+
+- **Accepted, an inconsistency in our own rule.** We excluded the 2017 survey's 1.9 because "its title
+  page names UNICEF as publisher, so the authorship is shared" — while the sentence two lines down says
+  "we judge authorship, not hosting". UNICEF's own description of that survey is that the bureau
+  conducted it with UNICEF's technical assistance, which is the same framing we accept for the
+  UNFPA-backed census. So our stated test points to including it. I have not added the point, because
+  neither the agent nor I could read the report's imprint page, but the page now says plainly that by
+  our own test it arguably belongs and why it is not there yet.
+- **Accepted, overstated.** "The country has no statistics website at all: its two public domains
+  resolve but drop every connection before answering" reads as a claim about North Korea's whole
+  internet presence, and that is wrong — more than two domains resolve and at least one serves a
+  normal site. Narrowed to what we actually mean: there is no North Korean statistics website.
+- **Accepted.** The Iran cross-reference is gone, the connectivity diagnosis is gone, the authorship
+  rationale is stated as a fact rather than argued against an imagined objection, and "cancelled" is
+  now "canceled" — in fact the cancellation claim itself had no located source, so it now says only
+  that nothing newer than 2017 has appeared, which the agent did confirm.
+
+## Syria
+
+Verdict: minor problems — and the rare case where every absence claim held up. The agent opened four
+separate abstract editions in their original spreadsheet form and confirmed all sixteen values
+identical across them, confirmed the registered-births tables rolling forward to 2019 while the
+fertility table sat frozen, and confirmed those birth tables carry no age dimension.
+
+- **Accepted, a missing disclosure.** Neither plotted figure is a single year's rate: the source's own
+  table title says each covers the three years before its survey. The UN line beside it is annual. The
+  page never said so; now it does.
+- **Accepted.** Three sentences diagnosing how the bureau's domain died — a parking service, cloaking
+  by browser identity, a 410 against a 200 — are our own detective work. Cut to the one clause a reader
+  needs, that the site is gone and this comes from an archive.
+- **Accepted.** The three-clause sentence is split, and "the native spreadsheet inside the abstract's
+  own chapter archive" is now plain.
+
+## Sri Lanka
+
+Verdict: serious problems. The plotted series itself verified — the agent recomputed 2021 from the
+department's own tables and got 1.64139 against our 1.641, and found no double-rounding artifact — but
+the two claims that justify the series were both wrong.
+
+- **Accepted, and it was the basis for our own label.** We said "the same procedure on the department's
+  own 2000 data reproduces the 1.9 it published then, which is what tells us the method is the one it
+  used." The department's own page attributes that 1.9 to a survey, not to registration, and re-running
+  our registration procedure on its 2000 births gives about 2.16. So the sentence claimed a method match
+  that does not exist. It is gone: the page now says plainly that the series is our arithmetic on the
+  department's counts, not a figure it has endorsed, and not comparable with its survey and census
+  figures.
+- **Accepted, false.** "The Department of Census and Statistics stopped publishing a fertility rate of
+  its own after 2000" — it has published four since: 2.3 from a 2006-07 survey, 2.4 from the 2012
+  census, 2.2 from a 2016 survey, and 1.3 from the 2024 census. We mentioned only the last, which left
+  a false impression of a 24-year silence. All four now named, and the accurate claim is narrower: no
+  annual rate from registration.
+- **Accepted.** The clause about 2022 appearing as a dead link reusing 2021's files is our own
+  navigation. The substantive point — that no age breakdown exists for any year after 2021 — is kept and
+  now says where we looked.
+
+## Burkina Faso
+
+Verdict: minor problems. Every one of the six specific claims about the census correction verified
+against the census volume itself, including the implausible spike at 45-49, the 5.8 from the method it
+rejected, and the 5.5-to-5.4 and 4.5-to-4.1 moves. Our own arithmetic check reproduces its 5.4.
+
+- **Accepted, and it is the most useful thing found here.** Insecurity kept the 2021 survey out of 86 of
+  its 600 sampled areas, concentrated in the two highest-fertility regions in the country: two thirds of
+  sampled areas in the Sahel and a third in the East were never visited, and five provinces were dropped
+  entirely. The report warns against relying on those regions' own figures but says nothing about the
+  national one. So part of the 6.0-to-4.4 fall may be coverage rather than fertility, and the page now
+  says so — it is the difference between a real collapse and a partly artefactual one.
+- **Accepted, and it explains a number a reader could not have reconciled.** The 2003 round's own report
+  headlines 6.2, over a five-year window. Our 5.9 is the office's later recalculation of that round over
+  three years, to match the other rounds. Defensible, but a reader checking the 2003 report would have
+  found a different number and no explanation. Now stated.
+- **Accepted, and one was wrong as well as out of place.** "INSD's own civil-registration statistics
+  page is a chart template filled with randomly generated placeholder data" — that boilerplate sits on
+  every page of the site, has no element to render into, and no visitor ever sees a fake chart. It was
+  not a fact about the civil-registration data at all. Cut, along with the embedded-font sentence, whose
+  page count was understated anyway.
+- **Accepted.** "Nothing in either report reconciles them" now notes that the census volumes predate the
+  survey's report and could not have. INSD spelled out, the two correction methods described rather than
+  named, "the two instruments" and the cross-collection comparison gone.
