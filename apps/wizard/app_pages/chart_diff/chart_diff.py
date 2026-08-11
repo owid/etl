@@ -576,15 +576,25 @@ class ChartDiff:
         """Get all chart slugs. Use `slugs` to filter slugs as this can be slow otherwise."""
         if slugs is not None:
             where = "WHERE slug IN %(slugs)s"
+            where_charts = "AND cc.slug IN %(slugs)s"
             params = {"slugs": tuple(slugs)}
         else:
             where = ""
+            where_charts = ""
             params = {}
 
         slugs_redirects = set(
             read_sql(f"SELECT slug FROM chart_slug_redirects {where}", target_session, params=params)["slug"]
         )
-        slugs = set(read_sql(f"SELECT slug FROM chart_configs {where}", target_session, params=params)["slug"])
+        # A slug is only taken if a *chart* owns the config row, hence the join through `charts`
+        slugs = set(
+            read_sql(
+                "SELECT cc.slug FROM chart_configs cc JOIN charts c ON c.configId = cc.id "
+                f"WHERE cc.slug IS NOT NULL {where_charts}",
+                target_session,
+                params=params,
+            )["slug"]
+        )
         return slugs | slugs_redirects
 
     @staticmethod
