@@ -22,7 +22,7 @@ from countries import COUNTRIES, DOCS, TIERS  # noqa: E402
 
 CACHE = os.path.join(HERE, "cache")
 LOG = os.path.join(HERE, "redteam")
-VALIDATION = {True: "Fully validated from births & women",
+VALIDATION = {True: "Recalculated from births & women",
               False: "Rate copied from source, not validated"}
 BAND_YEARS = range(1990, 2027)
 

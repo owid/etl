@@ -47,12 +47,12 @@ back on published reports; that is what unstuck Poland.
 - Tunisia
 - Haiti
 - Belgium
-- Dominican Republic
+- Jordan
 
 ## Reported, awaiting write-up (0)
 
 
-## Analyzed (79)
+## Analyzed (80)
 
 - India
 - China
@@ -133,10 +133,10 @@ back on published reports; that is what unstuck Poland.
 - Rwanda
 - Burundi
 - Bolivia
+- Dominican Republic
 
-## To do (16)
+## To do (15)
 
-- Jordan
 - United Arab Emirates
 - Honduras
 - Tajikistan

@@ -4,10 +4,13 @@ Every country carries two independent attributes:
 
 * ``tier`` — what the national number is built from. This is the quality ladder, and it says
   nothing about whether we could recompute it.
-* ``recalculated`` — the validation level. True means the figure was rebuilt from counted births
-  and women and checked against what the office publishes; False means the office's own rate was
-  copied straight from the source. This says how far we could verify the number, not how good the
-  number is: an incomplete registry we can decompose is still an incomplete registry.
+* ``recalculated`` — whether we rebuilt the figure ourselves. True means it was rebuilt from counted
+  births and women and checked against what the office publishes; False means the office's own rate
+  was copied straight from the source. The labels say "Recalculated from births & women" and "Rate
+  copied from source, not validated" — deliberately not "fully validated", which several reviewers
+  read as a claim about the number being right rather than about how far we could take it apart. This
+  says how far we could verify the number, not how good the number is: an incomplete registry we can
+  decompose is still an incomplete registry.
 
 ``loader`` is None for countries with no national figure to plot.
 """
@@ -842,7 +845,7 @@ COUNTRIES = [
       "for 2024 against the 1.48 TurkStat states. For that one year we also checked it from the counts: "
       "dividing the registered births by the register's female population gives 1.4832, which rounds to the "
       "same 1.48. The rest of the line is TurkStat's own figure, not ours, which is why this counts as "
-      "copied rather than validated. The age-band comparison uses those counts.",
+      "copied rather than recalculated. The age-band comparison uses those counts.",
       "TurkStat splits the teens into 15-17 and 18-19, which we combine into one 15-19 group. It also "
       "revises birth figures for up to five years after "
       "first publishing them, marking each revised row with an 'r', so different editions of the same "
@@ -1830,22 +1833,24 @@ COUNTRIES = [
       "https://www.nso.gov.pg/"),
     C("Dominican Republic", "ONE — ENHOGAR-MICS household survey", dominican_republic,
       "Dominican Republic", "survey", False,
-      "The 2019 household survey is the only fertility rate the office publishes from measurement. Its "
-      "population projection carries an assumption of its own, and its vital-statistics yearbooks publish "
-      "registered births by the mother's age.",
-      "We read the survey figure. We also divided the 2010 census's own counts, which gives 2.51, and the "
-      "2022 registered births by the projected women, which gives 1.86 — but see the caveat.",
-      "That 1.86 is not a fertility rate and should not be read as one, which is why it is not plotted. "
-      "The office publishes a full matrix of when births were registered against when they happened, and "
-      "it shows registration continuing for two decades: the 2020 birth cohort was 141,548 when first "
-      "counted and 159,466 two years later. So any recent year's registered births are a lower bound that "
-      "will keep rising, and a rate built on them understates by an unknown and shrinking amount. The "
-      "office states two reasons registration lags: 18% of 2022 registrations were late, and a mother "
-      "needs an identity card to register a birth at all — it notes explicitly that the fall in "
-      "registered births to mothers under 15 may reflect undocumented mothers rather than fewer births. "
-      "15% of registered births in 2022 were to Haitian mothers. The 2022 census has published a fertility "
-      "volume, but every archived copy of it is truncated and the live site is behind a bot wall, so its "
-      "figure is genuinely unknown to us.",
+      "The Dominican statistics office measures fertility through its household survey, most recently in "
+      "2019. Its population projection carries a fertility assumption of its own, and its vital-statistics "
+      "yearbooks publish registered births by the mother's age.",
+      "We use the survey's own figure. Two other numbers can be worked out from the office's counts, "
+      "neither of which we plot: dividing the 2010 census's counts age group by age group gives 2.51, and "
+      "doing the same with 2022's registered births and projected women gives 1.86.",
+      "That 1.86 is far too low to read as a fertility rate, because a recent year's registered births are "
+      "not all of its births. The office publishes a table of when births were registered against when they "
+      "happened, and it shows registration continuing for two decades: the 2020 birth cohort stood at "
+      "141,548 when first counted and 159,466 two years later. So a rate calculated from a recent year will "
+      "be too low, and by less each year as the count fills in. The office gives two reasons registration "
+      "lags. Nearly a fifth of 2022 registrations were late. And registering a birth in practice requires "
+      "the mother to have an identity document — the law allows other routes, but they are harder — which is "
+      "why the office notes that the fall in registered births to mothers under 15 may reflect undocumented "
+      "mothers rather than fewer births. About 15% of registered births in 2022 were to Haitian mothers. "
+      "Two newer figures exist that we have not been able to read at source: a demographer citing the 2022 "
+      "census puts fertility at 2.3, and the 2025 round of the same household survey is reported at about "
+      "1.97. Both would be worth plotting once confirmed.",
       "https://www.one.gob.do/"),
     C("Belgium", "Statbel — registered births divided by the mean population", belgium_tfr, "Belgium",
       "complete", False,

@@ -1500,3 +1500,39 @@ total births over total women.
 - **Accepted.** The renamed office, the squatted domain and the web-archive detour are our sourcing
   workflow; only the rename survives. The Mali and Senegal comparison is gone, and "the raw one", "the
   standard ratio check" and "ages usually trusted" are now plain.
+
+## Dominican Republic
+
+Verdict: minor problems. The plotted 2019 figure corroborated twice in Dominican reporting, and both of
+our side calculations use the right operation — per age group, summed, times five — with the 1.86 coming
+out below independent estimates exactly as an incomplete-registration figure should.
+
+- **Accepted, the eighteenth false absence claim.** "The 2022 census has published a fertility volume,
+  but every archived copy of it is truncated and the live site is behind a bot wall, so its figure is
+  genuinely unknown to us." A demographer at the planning ministry cites 2.3 from that census's own data
+  in a public Dominican outlet. The figure is knowable; we had only looked in the volume itself. And the
+  sentence was about our own access anyway.
+- **Accepted, and there is a newer round.** The same household survey ran again in 2025 and is reported at
+  about 1.97 — six years past the point we plot. **Not plotted:** the office's site returned 403 to
+  everything I tried, as it did for the agent, so both 2.3 and 1.97 rest on secondary reporting. The page
+  now says both exist and that we have not read them at source, which is the honest version of what used
+  to be a claim that nothing was knowable.
+- **Accepted, overstated.** "A mother needs an identity card to register a birth at all" — Dominican law
+  provides other routes, with witnesses or a birth certificate carrying an identity number. A serious
+  practical barrier, not an absolute bar. Reworded.
+- **Accepted.** "But see the caveat" and "should not be read as one" were written for a colleague;
+  "matrix" is now "table"; "a lower bound that will keep rising" is now plain; and the projection's
+  assumption is said to be about fertility rather than left vague.
+- **Could not verify, left as is.** The 18% late-registration share and the 141,548-to-159,466 cohort
+  figures are blocked behind the same 403. They are consistent with the office's documented lag and with
+  independent reporting of the same pattern, so they stay, unchanged.
+
+## Cross-cutting: the validation label is now "Recalculated"
+
+"Fully validated from births & women" has been renamed **"Recalculated from births & women"**, and the
+short form in the table and map tooltip from "Fully validated" to "Recalculated". Three separate agents
+read "fully validated" as a claim that the number is right, when it only ever meant that we rebuilt it
+from counts rather than copying it. Uganda's, Guatemala's and Bolivia's reviewers each argued the label
+was unearned on that misreading, and Myanmar's noted a reader could take it as vouching for the
+underlying survey. The new wording says what we did rather than how much it proves. Turkey's prose, which
+said a year "counts as copied rather than validated", follows the same change.
