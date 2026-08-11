@@ -735,3 +735,54 @@ against the census annex — 4.1607 urban and 6.2130 rural.
   have taken it for the very-much-alive office linked at the top of the entry. Cut.
 - **Accepted.** INS spelled out, the survey's name translated in the source line, the Brass method
   described rather than named, and the four-clause sentence about the fourth census split up.
+
+## Morocco
+
+Verdict: minor problems. Every plotted value verified against HCP's own publications, and two of the
+methodology claims matched HCP's wording almost verbatim — the 30% long form and the distinction
+between scaling a sample up and correcting for missed births.
+
+- **Accepted, and we were plotting the worse number.** We showed 2.00 for 2024 and told readers in the
+  next breath that the census figure is 1.97, justifying it as keeping the line on one source. That
+  does not hold: 1.97 is HCP's too, one publication later. I fetched the 2024 census volume and read it
+  — ICF-National 1,97, urban 1,77, rural 2,37. Now plotting 1.97.
+- **Accepted, dropped.** "Birth registration is essentially complete at 99.5%" could not be traced to
+  any Moroccan source, and the one independent figure the agent found was 96.9%. It was not
+  load-bearing — the sentence itself said registration is not what the rate is built on — so it is gone
+  rather than restated at a number nobody can source.
+- **Accepted.** "Watch out for a separate figure of 2.38 sometimes attached to 2014" is written for a
+  researcher who might meet 2.38 in another table, not for a reader who has never seen it. Reframed as
+  a fact about the data. The agent could only corroborate 2.38 being attached to 2018, not 2014, so the
+  year claim is gone too.
+- **Accepted.** HCP spelled out; "mixes instruments", "a sampling extrapolation, not a demographic
+  correction", "raw-versus-corrected pair" and "rebuilt from components" all replaced with plain
+  wording.
+- **Accepted, and now disclosed.** 1962 and 1975 fall in no Moroccan census year — the censuses are
+  1960, 1971, 1982, 1994, 2004, 2014, 2024 — so they must come from surveys we have not identified.
+  The page said nothing; it now says that.
+- **Open.** Whether Morocco's civil registration publishes births by the mother's age is unresolved:
+  the agent could not reach the relevant government sites. This is the claim shape that has been wrong
+  three times in this collection, so it should not be closed by assumption either way.
+
+## Ukraine
+
+Verdict: minor problems. The plotted series matched the office's own workbook year for year, our
+arithmetic check reproduced exactly, and the strongest claim on the page — the territorial one — was
+confirmed word for word in the workbook's own footnotes: 2014 excludes part of the occupied areas of
+Donetsk and Luhansk, and from 2015 the footnote drops "part" and excludes the whole of both.
+
+- **Accepted, and the dates could not be stood behind.** We gave a precise chronology of the office's
+  orders — a mobile-network population method approved July 2023 and effective January 2024, an
+  interagency group formed October 2025, its membership changed December 2025. The agent could not
+  verify any of it, and the one relevant document it could read shows a different order and date and
+  never mentions mobile-network data. The substance — the office cannot compute a population to divide
+  by and is still working on a replacement — is kept; the order-by-order dates are gone.
+- **Accepted.** "Its public data bank returns no observations at all for the births dataflow — the
+  structure is defined, including a mother's age dimension, but nothing is loaded" is our query in
+  database jargon. Cut.
+- **Accepted, scoped.** "Nothing on births, fertility or population by age has appeared for any year
+  after 2021" reads as absolute. Birth counts for later years do circulate from the justice ministry's
+  registration records — not by mother's age, and with no population to divide by, so they cannot give
+  a rate. Now said, which is both more accurate and more useful.
+- **Accepted.** Держстат given its English name on first use, "held out to 2021" replaced, and the
+  dangling modifier in the arithmetic sentence fixed.

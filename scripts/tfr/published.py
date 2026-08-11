@@ -422,21 +422,28 @@ MA_SERIES = ("https://docs.google.com/spreadsheets/d/"
 def morocco():
     """HCP's own long-run fertility series, published as a spreadsheet behind its indicator page.
 
-    The series mixes instruments: census rounds in 1982, 1994, 2004, 2014 and 2024, and household
-    surveys for the years in between. Only the census points fall inside our window apart from 2010.
+    The series comes from censuses in 1982, 1994, 2004, 2014 and 2024, and household surveys for the
+    years in between, including 2010. The two earliest points, 1962 and 1975, fall in no census year
+    and we have not identified which surveys they come from.
+
+    The spreadsheet rounds 2024 to 2.00. HCP's own 2024 census volumes give 1.97 — urban 1.77, rural
+    2.37 — so that is what is used: the same producer, one publication later, and no reason to plot a
+    figure less precise than the one we can cite.
     """
     path = fetch(MA_SERIES, os.path.join(DATA, "ma", "isf.xlsx"))
     d = pd.read_excel(path, header=None)
     head = next(i for i in range(len(d)) if "Année" in [str(v).strip() for v in d.iloc[i]])
     yc = [j for j in range(d.shape[1]) if str(d.iloc[head, j]).strip() == "Année"][0]
     vc = [j for j in range(d.shape[1]) if str(d.iloc[head, j]).strip() == "Ensemble"][0]
-    rows = []
+    rows = {}
     for i in range(head + 1, len(d)):
         y = pd.to_numeric(str(d.iloc[i, yc]).strip(), errors="coerce")
         v = pd.to_numeric(d.iloc[i, vc], errors="coerce")
         if pd.notna(y) and pd.notna(v) and 1950 < y < 2100:
-            rows.append((int(y), float(v)))
-    return _series(sorted(rows))
+            rows[int(y)] = float(v)
+    if rows.get(2024) == 2.0:
+        rows[2024] = 1.97
+    return _series(sorted(rows.items()))
 
 
 UZ_TFR = "https://api.siat.stat.uz/media/uploads/sdmx/sdmx_data_665.json"
