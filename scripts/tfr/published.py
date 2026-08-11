@@ -473,8 +473,12 @@ def mozambique():
 
     Quadro 5.3.2 of that report sets all four rounds side by side, each computed the same way from
     women's birth histories for the three years before the survey.
+
+    Each round is plotted at the year most of its fieldwork fell in. The last round ran from July 2022
+    to February 2023, so it sits at 2022 — it used to sit at 2023, which was inconsistent with the
+    2003 round, whose fieldwork also straddled a new year and which has always been plotted at 2003.
     """
-    return _series([(1997, 5.2), (2003, 5.5), (2011, 5.9), (2023, 4.9)])
+    return _series([(1997, 5.2), (2003, 5.5), (2011, 5.9), (2022, 4.9)])
 
 
 def saudi_arabia():

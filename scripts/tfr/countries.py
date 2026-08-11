@@ -188,7 +188,7 @@ COUNTRIES = [
       "2015-18 and has opened to about 0.4 since. We divide by DANE's population projections, which are "
       "themselves modeled rather than counted.",
       "https://www.dane.gov.co/index.php/estadisticas-por-tema/salud/nacimientos-y-defunciones"),
-    C("Mexico", "INEGI — registered births, over CONAPO population", mexico, "Mexico", "complete", True,
+    C("Mexico", "INEGI — registered births, divided by CONAPO population", mexico, "Mexico", "complete", True,
       "INEGI's OLAP cube gives registered births by year of occurrence and mother's age group, for every "
       "registration year separately. CONAPO publishes mid-year population by sex and single age.",
       "We summed births for each year of occurrence across all registration years, then divided by "
@@ -233,7 +233,7 @@ COUNTRIES = [
       "other figure circulates for Morocco, 2.38: that comes from a health ministry survey covering roughly "
       "2015-17, not from a census, and is not part of the series here.",
       "https://www.hcp.ma/Naissances-et-fecondite_r554.html"),
-    C("Uzbekistan", "Statistics Agency — registered births over its own population estimate", uzbekistan,
+    C("Uzbekistan", "Statistics Agency — registered births divided by its own population estimate", uzbekistan,
       "Uzbekistan", "complete", False,
       "Uzbekistan's statistics agency publishes a fertility rate annually from 2010, free to the public, "
       "with separate figures for towns and the countryside. It says it counts births from the justice "
@@ -324,7 +324,7 @@ COUNTRIES = [
       "registration is not used: INSTAT says between 40 and 60% of births go unregistered, even though 83% "
       "of people eventually hold a certificate.",
       "https://www.instat-mali.org/fr/publications/enquete-demographique-et-de-sante-eds"),
-    C("Malaysia", "DOSM — age-specific fertility rates over its population estimates", malaysia_tfr,
+    C("Malaysia", "DOSM — age-specific fertility rates divided by its population estimates", malaysia_tfr,
       "Malaysia", "complete", False,
       "Malaysia's national statistics office, DOSM, publishes fertility rates by age group and its own "
       "total, annually from 1958, along with population by five-year age group and sex. It also publishes "
@@ -343,19 +343,19 @@ COUNTRIES = [
       "or over 49, and a few hundred where the age was not recorded.",
       "https://open.dosm.gov.my/data-catalogue/fertility"),
     C("Mozambique", "INE — Inquérito Demográfico e de Saúde", mozambique, "Mozambique", "survey", False,
-      "INE publishes a fertility rate for each survey round, and its 2022-23 report sets all four side by "
-      "side: 5.2 in 1997, 5.5 in 2003, 5.9 in 2011 and 4.9 in 2022-23. The 2017 census publishes the raw "
-      "material — births in the twelve months before enumeration by mother's age, and women by age — but no "
-      "fertility rate computed from it.",
-      "We read the trend table. Dividing the census's own counts gives 4.18 for 2017, which sits below both "
-      "the survey before it and the survey after, so we do not use it.",
-      "That INE publishes no fertility rate from its own census is itself the finding. The 4.18 the census "
-      "counts imply is the familiar signature of a twelve-month recall question undercounting births, but "
-      "unlike Tanzania, Uganda or Angola, INE names no correction anywhere in the results volume — and the "
-      "one folder of its catalogue that might hold an adjusted figure lists nothing, so we cannot rule out "
-      "that a published version exists. Mozambican civil registration cannot be used at all, and is getting "
-      "worse rather than better: the share of under-fives registered fell from 48% in 2011 to 31% in "
-      "2022-23.",
+      "Mozambique's national statistics office, INE, publishes a fertility rate from each round of its "
+      "Demographic and Health Survey, and its 2022-23 report sets all four side by side: 5.2 in 1997, 5.5 in "
+      "2003, 5.9 in 2011 and 4.9 in 2022-23. Its 2017 census separately publishes the raw material — births "
+      "in the twelve months before the census by the mother's age, and women by age.",
+      "We read the trend table in that report. Each round is plotted at the year most of its fieldwork fell "
+      "in, so the last one sits at 2022 rather than 2023. Dividing the 2017 census's own counts gives 4.18, "
+      "which sits below both the survey before it and the survey after, so we do not plot it.",
+      "The 4.18 that the census counts imply is the usual sign that asking only about the last twelve months "
+      "undercuts births. INE has published a study of fertility from that census, which works out both an "
+      "uncorrected and a corrected figure and names the methods it uses; we have not yet incorporated it, so "
+      "the census is absent from the line above rather than shown at its corrected level. Mozambican civil "
+      "registration cannot be used at all, and is getting worse rather than better: the share of under-fives "
+      "registered fell from 48% in 2011 to 31% in 2022-23.",
       "https://www.ine.gov.mz/"),
     C("Poland", "GUS — births and population by single year of age", poland_tfr, "Poland",
       "complete", True,
@@ -377,7 +377,7 @@ COUNTRIES = [
       "though nothing in the database is marked as such. Eurostat's figures for Poland run about 0.03 to 0.04 "
       "higher throughout, because it uses a different definition of who counts as resident.",
       "https://bdl.stat.gov.pl/"),
-    C("Peru", "INEI — registered births over its population estimates", peru_tfr, "Peru", "complete",
+    C("Peru", "INEI — registered births divided by its population estimates", peru_tfr, "Peru", "complete",
       True,
       "Peru's national statistics institute, INEI, publishes registered births broken down by the mother's "
       "age group, and female population by age group. The birth table covers only births registered online, "
@@ -447,7 +447,7 @@ COUNTRIES = [
       "ever recorded. Our registry figure for 2022 is 1.52 — close, but built a different way, from birth "
       "records rather than from asking women how many children they have had.",
       "https://sidra.ibge.gov.br/pesquisa/registro-civil/tabelas"),
-    C("England and Wales", "ONS — birth registrations over the mid-year population", england_wales,
+    C("England and Wales", "ONS — birth registrations divided by the mid-year population", england_wales,
       "United Kingdom", "complete", False,
       "ONS table 10 gives live births and age-specific fertility rates by age group of mother, back to 1938. "
       "ONS also publishes mid-year population by single year of age and sex for the United Kingdom and each "
@@ -469,7 +469,7 @@ COUNTRIES = [
       "for every year from 1938 to 2024, so the 15-44 base is used throughout. In the age-band comparison, "
       "the top group labelled 40-44 is ONS's own \"40 and over\" row, so it includes mothers of 45 and above.",
       "https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths"),
-    C("Germany", "Destatis — birth statistics, over the average resident population", germany, "Germany",
+    C("Germany", "Destatis — birth statistics, divided by the average resident population", germany, "Germany",
       "complete", False,
       "Destatis publishes live births per 1,000 women for every single year of age 15 to 49, from 1972 to "
       "2025 (table 12612-0008), the births themselves by age of mother and birth order from 2009 (table "
@@ -511,7 +511,7 @@ COUNTRIES = [
       "the years where they overlap; older editions would extend it back to about 2017 but have not been "
       "read.",
       "https://www.nso.go.th/nsoweb/nso/statistics_and_indicators"),
-    C("France", "INSEE — civil register births over the mean resident population", france, "France",
+    C("France", "INSEE — civil register births divided by the mean resident population", france, "France",
       "complete", False,
       "France's national statistics institute, INSEE, publishes fertility rates by single year of age of the "
       "mother and, separately, births by single year of age, both taken from the civil register, the "
@@ -632,24 +632,22 @@ COUNTRIES = [
       "housing survey, not the annual one. Vietnam does have civil registration, but it is not what the "
       "published rate is built on.",
       "https://www.nso.gov.vn/"),
-    C("Australia", "ABS — births by age of mother over its population estimates", australia_tfr,
+    C("Australia", "ABS — births by age of mother divided by its population estimates", australia_tfr,
       "Australia", "complete", True,
-      "ABS publishes registered births by single year of the mother's age through a data service that needs "
-      "no key, and female population by single year of age at 30 June in its population release. It also "
-      "publishes its own fertility rate.",
-      "We divided the births at each single age by the women of that age and summed. Our 1.482 for 2024 "
-      "matches ABS's published 1.481, and 1.497 against its 1.499 for 2023 — the small gap is the population "
-      "having been revised since ABS calculated that year's rate.",
-      "Australia's rate is at a record low. The one caveat that matters is registration timing: ABS counts "
+      "The Australian Bureau of Statistics publishes registered births by single year of the mother's age, "
+      "female population by single year of age at 30 June, and its own fertility rate.",
+      "We divided the births at each single age by the women of that age and summed. Our figures come out "
+      "within a few thousandths of the bureau's own published rate in every year — 1.482 against its 1.481 "
+      "for 2024, 1.497 against 1.499 for 2023 — because population estimates are revised after the bureau "
+      "calculates a year's rate, so our denominator is never quite the one it used.",
+      "Australia's rate is at a record low. The one caveat that matters is registration timing: the bureau counts "
       "births by the year they were registered, and two states have had backlogs. Victoria registered nearly "
       "a quarter of its 2024 births as having occurred in an earlier year, and clearing a 2023 processing "
-      "delay pushed its 2024 registrations up 12.9% against a national rise of 1.9% — ABS says outright that "
+      "delay pushed its 2024 registrations up 12.9% against a national rise of 1.9% — the bureau says outright that "
       "much of that is administrative rather than real, and warns against comparing years. Western Australia "
-      "cleared a backlog in early 2025 that also lands in 2024. ABS does publish an occurrence-year series, "
-      "but it is far too incomplete to use for recent years: it has only 248,159 births for 2024 against "
-      "292,318 on the registration basis. Births by single year of age are no longer in the downloadable "
-      "data cubes — that table exists only through the data service now — and the population file\'s address "
-      "carries the release month, so it moves every edition.",
+      "cleared a backlog in early 2025 that also lands in 2024. The bureau does publish a series counted by "
+      "the year each birth happened rather than the year it was registered, but it is far too incomplete to "
+      "use for recent years: it has only 248,159 births for 2024 against 292,318 on the registration basis.",
       "https://www.abs.gov.au/statistics/people/population/births-australia/latest-release"),
     C("Bangladesh", "BBS — Sample Vital Registration System", bangladesh, "Bangladesh", "sample", False,
       "The 2023 SVRS report carries a table of every year from 1982 to 2023, giving the total fertility "
@@ -734,20 +732,23 @@ COUNTRIES = [
       "26% of children under six had never had their birth registered.",
       "https://censusresults.nsonepal.gov.np/fertility"),
     C("Venezuela", "INE — projection-based fertility series", venezuela, "Venezuela", "projection", False,
-      "INE publishes a fertility series in a statistics summary dated August 2024: 2.9 for 2000 falling to "
-      "2.3 for 2015, then 2.2 and 2.1 drawn as forward projections. The health ministry separately publishes "
-      "registered births by age of mother, but only up to 2014.",
-      "We take the observed points up to 2015 and leave the projected ones out. Pairing the ministry\'s 2014 "
-      "births against INE\'s population gives about 2.25, close to INE\'s 2.3 for 2015.",
-      "Every point in this series comes out of a projection exercise built on the 2011 census and calculated "
-      "in 2013 — nothing has been re-estimated from current registration. The last non-projected point is "
-      "2015, published nine years later, and no national fertility figure exists for any year after that. "
-      "The general statistical yearbook stops at 2003; INE has been digitising volumes from 1909 to 1944 "
-      "instead of adding recent ones. The health ministry\'s births-by-age tables stop at 2014, published in "
-      "2018. One trap for anyone retracing this: the domain everyone cites, ine.gov.ve, no longer resolves — "
-      "the record was removed from the Venezuelan registry, which still answers authoritatively for other "
-      "names. The institute moved to ine.gob.ve and is publishing there.",
-      "https://ine.gob.ve/"),
+      "Venezuela's national statistics institute, INE, publishes a fertility series in a statistics summary "
+      "dated August 2024: 2.9 for 2000 falling to 2.3 for 2015, then 2.2 and 2.1 drawn as forward "
+      "projections. The health ministry separately publishes registered births by age of mother, but only up "
+      "to 2014.",
+      "We take the series up to 2015 and leave out the years INE draws as projections. Dividing the "
+      "ministry's 2014 births by INE's estimate of women aged 15 to 49 gives about 2.25, close to INE's 2.3 "
+      "for 2015.",
+      "Every point here comes out of one projection exercise, built on the 2011 census and calculated in "
+      "2013 — including the years before 2015, which INE draws as a solid line but which are model output "
+      "just the same. Nothing has been re-estimated from current registration. So the cutoff we use is not a "
+      "line between measurement and projection; it is simply where INE itself stops drawing the series as "
+      "elapsed time. The 2015 figure was not published until 2024, nine years after the year it describes. "
+      "The general statistical yearbook stops at 2003, and INE has been digitizing volumes from 1909 to 1944 "
+      "rather than adding recent ones. The health ministry's births-by-age tables stop at 2014, published in "
+      "2018. A university-run household survey has reported fertility figures for later years, which we have "
+      "not used because we could not establish that they are measured comparably.",
+      "https://ine.gob.ve/wp-content/uploads/2024/08/Resumen_de_estadisticas_1999-2023.pdf"),
     C("Niger", "INS — national fertility and health surveys", niger, "Niger", "survey", False,
       "INS publishes a fertility rate from each survey round: 7.1 for 2006, 7.6 for 2012 and 6.2 for its "
       "2021 fertility survey. Its 2012 census gives 7.5, with the births and women behind it printed as "
@@ -823,7 +824,7 @@ COUNTRIES = [
       "provide, so a person browsing normally might get through where we could not. Do not use nocr.ir: it "
       "is no longer that organization's address and now points at a domain reseller.",
       "https://www.amar.org.ir/"),
-    C("Turkey", "TurkStat — birth statistics over the address-based population register", turkey_tfr,
+    C("Turkey", "TurkStat — birth statistics divided by the address-based population register", turkey_tfr,
       "Turkey", "complete", False,
       "TurkStat's annual birth statistics bulletin publishes a birth rate for each age group of mother, and "
       "the births themselves, both from 2001. An older population portal gives female population by "
@@ -921,7 +922,7 @@ COUNTRIES = [
       "offices asked for, and because it measures fertility from women's full birth histories rather than "
       "from a corrected twelve-month recall.",
       "https://www.nbs.go.tz/uploads/statistics/documents/en-1752866506-Fertility%20and%20Nuptiality.pdf"),
-    C("Spain", "INE — birth statistics over the continuous population count", spain_tfr, "Spain",
+    C("Spain", "INE — birth statistics divided by the continuous population count", spain_tfr, "Spain",
       "complete", True,
       "Spain's national statistics office, INE, publishes registered births by single year of age of the "
       "mother from 2009 onward, and female population by single year of age — twice a year from 1971, and "
@@ -988,7 +989,7 @@ COUNTRIES = [
       "silently defeats text extraction across some two hundred pages, so its fertility chapter needs "
       "character recognition rather than a text layer.",
       "https://www.insd.bf/"),
-    C("Canada", "Statistics Canada — births by age of mother over its population estimates", canada_tfr,
+    C("Canada", "Statistics Canada — births by age of mother divided by its population estimates", canada_tfr,
       "Canada", "complete", True,
       "Statistics Canada publishes registered live births by age group of mother, female population by "
       "age group at 1 July, and its own fertility rate — all three as open, downloadable files, annually "
@@ -1044,7 +1045,7 @@ COUNTRIES = [
       "than rates. The 2024 census has published definitive results with no fertility figure at all; a later "
       "volume from it may add one.",
       "https://www.ine.gov.ao/publicacoes/Todas?titulo2=IIMS"),
-    C("Argentina", "Health ministry births over INDEC population", argentina_tfr, "Argentina",
+    C("Argentina", "Health ministry births divided by INDEC population", argentina_tfr, "Argentina",
       "complete", True,
       "The health ministry publishes registered live births by age group of mother as open CSV, annually "
       "from 2005. INDEC publishes female population by age group in two projection series, one based on the "
@@ -1210,7 +1211,7 @@ COUNTRIES = [
       "round was a sample survey rather than a count, scaled up from the households it did enumerate. On the "
       "reported-births method the 2014 census gives 2.3, which is the figure to compare 2019's 2.0 against.",
       "https://www.dop.gov.mm/sites/dop.gov.mm/files/publication_docs/2024mphc_appendixtables.pdf"),
-    C("Sri Lanka", "DCS — registered births over the mid-year population", sri_lanka_tfr,
+    C("Sri Lanka", "DCS — registered births divided by the mid-year population", sri_lanka_tfr,
       "Sri Lanka", "complete", True,
       "The Department of Census and Statistics stopped publishing a fertility rate of its own after 2000, "
       "but keeps publishing both ingredients: registered live births by age of mother, and mid-year "
@@ -1227,7 +1228,7 @@ COUNTRIES = [
       "year's registrations. Neither number is the other's update. The population is published rounded to "
       "thousands, and its age structure is rolled forward from the 2012 census, not the 2024 one.",
       "https://www.statistics.gov.lk/Population/StaticalInformation/VitalStatistics/Fertility"),
-    C("Taiwan", "Ministry of the Interior — births by age of mother over the household register",
+    C("Taiwan", "Ministry of the Interior — births by age of mother divided by the household register",
       taiwan_tfr, "Taiwan", "complete", True,
       "The interior ministry publishes births by the mother's age group, population by single year of age "
       "and sex, and its own fertility rate — all from the household register, all back to at least 2000.",
@@ -1304,7 +1305,7 @@ COUNTRIES = [
       "results are promised progressively. INSEED's website serves nothing to a plain request — the files "
       "sit on a separate host that its own pages call from the browser.",
       "https://inseed.ssn-tchad.td/"),
-    C("Chile", "INE — registered births over its population estimates", chile_tfr, "Chile",
+    C("Chile", "INE — registered births divided by its population estimates", chile_tfr, "Chile",
       "complete", True,
       "One spreadsheet carries the whole series from 1992: births by five-year age band of the mother, "
       "the women in each band, and INE's own rate.",
@@ -1321,7 +1322,7 @@ COUNTRIES = [
       "in 2023, a year before the country as a whole. The health ministry's own vital-statistics site is "
       "behind a bot challenge and its older domain no longer resolves, but nothing there is needed.",
       "https://www.ine.gob.cl/estadisticas-por-tema/demografia-y-poblacion/estadisticas-vitales"),
-    C("Netherlands", "CBS — births by age of mother over its mean population", netherlands_tfr,
+    C("Netherlands", "CBS — births by age of mother divided by its mean population", netherlands_tfr,
       "Netherlands", "complete", True,
       "CBS publishes births by single year of the mother's age from 1950, population by single year of age "
       "and sex, and its own rate — all through an open interface with no key.",
@@ -1355,7 +1356,7 @@ COUNTRIES = [
       "longer on ZIMSTAT's site and is not in any web archive, so its 3.8 survives only as a citation "
       "inside the 2022 report.",
       "https://www.zimstat.co.zw/wp-content/uploads/Census/Fertility_Report.pdf"),
-    C("Ecuador", "INEC — registered births over its population estimates", ecuador_tfr, "Ecuador",
+    C("Ecuador", "INEC — registered births divided by its population estimates", ecuador_tfr, "Ecuador",
       "complete", True,
       "One sheet of INEC's vital-statistics series carries both sides from 2010: births in each "
       "five-year age band of the mother, and the projected women in that band. INEC publishes the "
@@ -1372,7 +1373,7 @@ COUNTRIES = [
       "gave 2.19. Recent years are incomplete by design: a year is provisional until the following March "
       "and semi-definitive for three more, so 2024's 1.44 will rise as late registrations arrive.",
       "https://www.ecuadorencifras.gob.ec/nacidos-vivos-y-defunciones-fetales/"),
-    C("Kazakhstan", "Bureau of National Statistics — births by age of mother over its population",
+    C("Kazakhstan", "Bureau of National Statistics — births by age of mother divided by its population",
       kazakhstan_tfr, "Kazakhstan", "complete", True,
       "The bureau's database serves births by age of mother, mean annual population by sex and age, and "
       "its own rate — all to a plain request with no key.",
@@ -1444,7 +1445,7 @@ COUNTRIES = [
       "needs checking elsewhere. That includes the claim that the 2024 census has published preliminary "
       "results, which we could not confirm. The documents used here are archived copies from 2018.",
       "https://www.dhsprogram.com/pubs/pdf/FR353/FR353.pdf"),
-    C("Romania", "INS — births by age of mother over the resident population", romania_tfr, "Romania",
+    C("Romania", "INS — births by age of mother divided by the resident population", romania_tfr, "Romania",
       "complete", True,
       "The institute's database carries births by the mother's age group on a usual-residence basis "
       "from 2012, resident population by age at 1 July from 2002, and its own age-specific rates — but "
@@ -1481,7 +1482,7 @@ COUNTRIES = [
       "figures in one table. Registration coverage is about 93% and rising, which is high for the region. "
       "The census and survey figures, 14% apart in 2020, have essentially converged: 3.6 against 3.7.",
       "https://statistics.gov.rw/"),
-    C("Tunisia", "INS — registered births over the mid-year population", tunisia, "Tunisia", "complete",
+    C("Tunisia", "INS — registered births divided by the mid-year population", tunisia, "Tunisia", "complete",
       False,
       "INS publishes a fertility rate every year, built from civil registration, and the statistical "
       "yearbook prints the births by the mother's age group and the mid-year population behind it.",
@@ -1574,7 +1575,7 @@ COUNTRIES = [
       "births table counts birth-certificate printouts — 2.7 million for 2021, about thirteen times the "
       "real number.",
       "https://www.ine.gob.bo/"),
-    C("Tajikistan", "Agency on Statistics — registered births over the resident population",
+    C("Tajikistan", "Agency on Statistics — registered births divided by the resident population",
       tajikistan, "Tajikistan", "complete", False,
       "The demographic yearbook prints the fertility rate for every year since 1989, the age-specific "
       "rates behind it, and the female population by single year of age for benchmark years.",
@@ -1593,7 +1594,7 @@ COUNTRIES = [
       "working-age men abroad are still counted at home; that mostly affects the male side, and our "
       "reconciliation suggests any effect on women of childbearing age is second-order.",
       "https://www.stat.tj/ru/soczialno-demograficheskij-sektor/"),
-    C("Sweden", "SCB — births by age of mother over the mean population", sweden_tfr, "Sweden",
+    C("Sweden", "SCB — births by age of mother divided by the mean population", sweden_tfr, "Sweden",
       "complete", True,
       "SCB's database serves births by single year of the mother's age from 1968, mean population by "
       "single year of age, and its own rate — all without a key.",
@@ -1644,7 +1645,7 @@ COUNTRIES = [
       "childbearing age. And the census's own twelve-month question found fewer births than the registry "
       "recorded for the same period, which is the reverse of the usual direction.",
       "https://ine.gob.hn/"),
-    C("Guatemala", "INE — registered births over its population projections", guatemala_tfr,
+    C("Guatemala", "INE — registered births divided by its population projections", guatemala_tfr,
       "Guatemala", "complete", True,
       "INE publishes no fertility rate of its own from the registry — its bulletin headlines a crude birth "
       "rate and adolescent rates. But it does publish the raw records, one row per birth, with the "
@@ -1663,7 +1664,7 @@ COUNTRIES = [
       "so the population base is not naive. And INE's main website is behind a bot wall that blocks every "
       "request; only its open-data portal answers, and its statistical tables are not reachable at all.",
       "https://datos.ine.gob.gt/dataset/estadisticas-vitales-nacimientos"),
-    C("Azerbaijan", "State Statistical Committee — registered births over the average annual population",
+    C("Azerbaijan", "State Statistical Committee — registered births divided by the average annual population",
       azerbaijan, "Azerbaijan", "complete", False,
       "The committee publishes its own rate for every year since 1959, the age-specific rates behind it, "
       "and the number of births by the mother's age back to 1970 — all as plain spreadsheets at stable addresses, "
@@ -1699,7 +1700,7 @@ COUNTRIES = [
       "that republishes the office's tables with citations, because the office's own site could not be "
       "reached — which is why we are not plotting any of it.",
       "https://uaestat.fcsc.gov.ae/"),
-    C("Czechia", "ČSÚ — registered births over the mid-year population", czechia_tfr, "Czechia",
+    C("Czechia", "ČSÚ — registered births divided by the mid-year population", czechia_tfr, "Czechia",
       "complete", False,
       "One spreadsheet carries the office's own rate from 1950 and the fertility rates for every single "
       "year of the woman's age behind it. The yearly demographic yearbooks also publish births by single "
@@ -1716,7 +1717,7 @@ COUNTRIES = [
       "in 2022, and mothers born in Ukraine went from 1.9% of births in 2021 to 6.3% in 2024. The office "
       "does not flag this on the fertility series itself, but publishes the tables that show it.",
       "https://csu.gov.cz/produkty/demograficka-prirucka-2024"),
-    C("Hungary", "KSH — registered births over the mid-year population", hungary_tfr, "Hungary",
+    C("Hungary", "KSH — registered births divided by the mid-year population", hungary_tfr, "Hungary",
       "complete", False,
       "The office publishes its rate for every year since 1900, the age-specific rates by five-year band "
       "since 1980, and population by single year of age — all as small files at stable addresses.",
@@ -1732,7 +1733,7 @@ COUNTRIES = [
       "visible. And its own pages need a browser-shaped request: a plain one gets a rejection page under "
       "an HTTP 200.",
       "https://www.ksh.hu/stadat_files/nep/hu/nep0006.csv"),
-    C("Cuba", "ONEI — registered births over the mean population", cuba, "Cuba", "complete", False,
+    C("Cuba", "ONEI — registered births divided by the mean population", cuba, "Cuba", "complete", False,
       "The demographic yearbook publishes the rate, the age-specific rates, births by the mother's age "
       "group and the mean female population by age group — as spreadsheets, one edition per year.",
       "We read the published series. We also divided the 2024 counts and got 1.28897 against ONEI's "
@@ -1788,7 +1789,7 @@ COUNTRIES = [
       "volume, but every archived copy of it is truncated and the live site is behind a bot wall, so its "
       "figure is genuinely unknown to us.",
       "https://www.one.gob.do/"),
-    C("Belgium", "Statbel — registered births over the mean population", belgium_tfr, "Belgium",
+    C("Belgium", "Statbel — registered births divided by the mean population", belgium_tfr, "Belgium",
       "complete", False,
       "Statbel publishes a births-and-fertility workbook for each year since 2011. It gives the rate for "
       "the country and each region, split by whether the mother is Belgian or foreign, and — in the same "
@@ -1807,7 +1808,7 @@ COUNTRIES = [
       "provisional; definitive figures come about a year late. The series is the published one rather "
       "than rebuilt because the population files are hundred-megabyte register extracts, one per year.",
       "https://statbel.fgov.be/fr/themes/population/natalite-et-fecondite"),
-    C("Greece", "ELSTAT — registered births over the average population", greece_tfr, "Greece",
+    C("Greece", "ELSTAT — registered births divided by the average population", greece_tfr, "Greece",
       "complete", True,
       "ELSTAT publishes births by the mother's age group for every year since 1980 and population by age "
       "group at 1 January. Its own fertility rate appears only in a quarterly booklet, printed to one "
@@ -1847,7 +1848,7 @@ COUNTRIES = [
       "census published population counts only, with no fertility results at all.",
       "https://www.statistics.sl/images/StatisticsSL/Documents/Census/2015/"
       "2015_census_national_analytical_report.pdf"),
-    C("Austria", "Statistik Austria — registered births over the mean population", austria_tfr,
+    C("Austria", "Statistik Austria — registered births divided by the mean population", austria_tfr,
       "Austria", "complete", True,
       "The office publishes births by five-year age band of the mother from 2006, mean population by "
       "single year of age from 2004, and its own rate to two decimals. Births by single year of the "
@@ -1865,7 +1866,7 @@ COUNTRIES = [
       "central civil-status register, and each year is cleaned once in the following spring: the "
       "provisional 2025 figure of 75,718 births became 76,067.",
       "https://www.statistik.at/statistiken/bevoelkerung-und-soziales/bevoelkerung/geburten"),
-    C("Switzerland", "BFS — registered births over the female population", switzerland_tfr,
+    C("Switzerland", "BFS — registered births divided by the female population", switzerland_tfr,
       "Switzerland", "complete", False,
       "The office publishes its rate back to 1803, and separately for Swiss and foreign mothers since "
       "1971. Its database answers plain requests with no key.",
@@ -1883,7 +1884,7 @@ COUNTRIES = [
       "when they happened or when they were registered.",
       "https://www.bfs.admin.ch/bfs/de/home/statistiken/bevoelkerung/geburten-todesfaelle/"
       "fruchtbarkeit.html"),
-    C("Portugal", "INE — registered births over the resident population", portugal_tfr, "Portugal",
+    C("Portugal", "INE — registered births divided by the resident population", portugal_tfr, "Portugal",
       "complete", False,
       "INE's open interface serves births by the mother's age, population by age group, and its own "
       "rate — no key needed. It does not publish the age-specific rates behind that rate.",
@@ -1900,7 +1901,7 @@ COUNTRIES = [
       "publishes births by the mother's nationality, which matters given how much immigration there has "
       "been since 2018, but we did not get to it.",
       "https://www.ine.pt/"),
-    C("Israel", "CBS — registered births over the mean population", israel, "Israel", "complete",
+    C("Israel", "CBS — registered births divided by the mean population", israel, "Israel", "complete",
       False,
       "The statistical abstract publishes fertility rates by age and religion, and births by single year "
       "of the mother's age. Annual figures appear only for the most recent years; before that the table "

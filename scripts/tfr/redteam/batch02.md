@@ -853,3 +853,66 @@ Two things done about it rather than noted:
   specifically, and names where the missing thing has actually turned up each time: the statistical
   yearbook, census volumes and their annexes, vital-statistics bulletins, thematic monographs, and the
   relevant ministry rather than the statistics office.
+
+## Australia
+
+Verdict: minor problems, and the strongest metadata on any page so far — the agent checked eight
+specific claims against the bureau's own release and methodology pages and found every one correct,
+including the Victoria backlog figures, the bureau's own warning against comparing years, and the
+occurrence-basis counts. All 25 plotted years match, and it looked for the Canada double-rounding
+artifact and found none.
+
+- **Accepted.** The closing sentence — which data cubes a table sits in, that it exists only through a
+  data service, that the population file's address moves every edition — is our own collection process
+  end to end. Cut.
+- **Accepted, and it was a narrower claim than the truth.** We explained the 2023 and 2024 gaps against
+  the bureau's own rate as population revisions, as if it were a recent-years phenomenon. The agent
+  compared all 25 years: ours sits 0.001 to 0.004 below the bureau's for nearly every year from 2001,
+  for the same reason. Now stated as the general fact it is.
+- **Accepted.** Calling 1.482 against 1.481 a "match" overstates it; now "within a few thousandths".
+  The bureau is named in full and the acronym dropped from the prose.
+
+## Venezuela
+
+Verdict: minor problems, but one was a contradiction between two of our own paragraphs.
+
+- **Accepted, and the label was right while the prose was wrong.** Block 2 said "we take the observed
+  points up to 2015"; Block 3 said every point comes out of a projection calculated in 2013. Both
+  describe the same four numbers. The agent found INE's own footnote — "Estimaciones y Proyecciones de
+  Población con base al Censo 2011" — applies across the whole 2000-2025 range, not just the dashed
+  part of its chart. So there are no observed points at all, the label Projection only was already
+  right, and the word "observed" was the error. The cutoff stays, because it is where INE stops drawing
+  the series as elapsed time, but it is no longer described as a line between measurement and model.
+- **Accepted.** The passage about ine.gov.ve no longer resolving, a record removed from a registry, and
+  a domain that "still answers authoritatively for other names" is written to a future colleague
+  retracing our sourcing, in DNS jargon. Cut — the working address is already the link.
+- **Accepted, softened.** "No national fertility figure exists for any year after that" is an overclaim:
+  a university-run household survey has reported later figures. We have not used them because we could
+  not establish they are measured comparably, and that is now what the page says.
+- **Accepted.** The link went to INE's homepage, not the document behind the numbers; now the
+  compendium itself. "Digitising" fixed, INE spelled out, and "INE's population" made specific — women
+  aged 15 to 49.
+
+## Mozambique
+
+Verdict: serious problems. The four plotted values verified against the survey reports and against
+INE's own trend chart, but the entire premise of the caveats paragraph was false.
+
+- **Accepted, and this is the fifth time.** We told readers "INE names no correction anywhere in the
+  results volume — and the one folder of its catalogue that might hold an adjusted figure lists
+  nothing." INE has published a fertility study from the 2017 census, reachable from its own census
+  landing page. I confirmed the document's page exists on ine.gov.mz myself; its site is
+  JavaScript-rendered so I could not open the PDF, but the agent read it: it computes an uncorrected
+  figure of about 4.18 — the same number we derived — and a corrected 4.9 by two named methods, and
+  states INE's own official 2017 figure is 5.2. The claim is gone, and the page now says the study
+  exists and that we have not yet incorporated it.
+- **Not plotted, deliberately.** The agent's 5.2 would add a fifth point and sit neatly between the
+  2003 and 2011 surveys. I could not open the document to verify it, and this campaign has already
+  caught one agent misreading a source, so it is described rather than charted until someone reads it.
+- **Accepted, an inconsistency of our own.** The last round was plotted at 2023 though its fieldwork ran
+  July 2022 to February 2023 — while the 2003 round, whose fieldwork also straddled a new year, is
+  plotted at 2003, the majority year. Now 2022, which is consistent, and which roughly halves the gap
+  the map colors for Mozambique.
+- **Accepted.** The tooling clause about an empty catalogue folder is gone with the false claim it
+  supported, "unlike Tanzania, Uganda or Angola" no longer leans on three other entries, and INE and
+  the survey's name are spelled out.
