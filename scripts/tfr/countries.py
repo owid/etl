@@ -1678,39 +1678,54 @@ COUNTRIES = [
       "total across the others, so adding it in doubles the population.",
       "https://www.scb.se/be0101"),
     C("Jordan", "DOS — Population and Family Health Survey", jordan, "Jordan", "survey", False,
-      "DOS publishes registered births every year, back to 2000, and female population by age group — but "
-      "the births are broken down only by governorate and the child's sex, never by the mother's age. So "
-      "the rate comes from the survey, and only from the survey.",
-      "We read the survey figures. The registry cannot give a fertility rate, but it does reconcile: "
-      "registered births over the mid-year population give a crude birth rate of 15.26 for 2024 against "
-      "DOS's published 15.3.",
+      "The survey rate, every five or six years. The Department of Statistics also publishes registered "
+      "births every year and female population by age group, but breaks the births down only by "
+      "governorate and the child's sex, never by the mother's age. A second government body does publish "
+      "them by the mother's age: the Civil Status and Passports Department, which keeps the birth "
+      "register. It goes further and publishes its own fertility rate from them, for every year from 2015 "
+      "to 2022.",
+      "We plot the survey figures. We also read the register's own rate and checked it: it falls from 3.12 "
+      "in 2015 to 2.53 in 2022, and the rates it publishes for each age group sum to those totals exactly. "
+      "That 2.53 sits almost on top of the 2.5 the 2023 survey gives for Jordanian women, which is the "
+      "comparison to make, because the register covers Jordanians and the survey covers everyone living in "
+      "the country. We plot the survey because everyone living in the country is what the UN's figure "
+      "describes.",
       "The number to be careful with is which population it describes. About a third of Jordan's residents "
       "are not Jordanian, roughly half of those Syrian, and the 2023 survey publishes the rate separately "
       "for each group: 2.5 for Jordanians, 4.1 for Syrians — 4.9 for those in camps and 3.9 outside — and "
-      "2.1 for other nationalities, against 2.6 for everyone. That is a wider spread than Saudi Arabia's, "
-      "and unlike Saudi Arabia it appears in one survey table rather than as a standing series. Two things "
-      "to watch when citing DOS. Its \"Jordan in Figures\" booklets carry old survey figures under the "
-      "current year's column with only a footnote — the 2.7 printed for 2022 is 2017-18 survey data. And "
-      "registered births have fallen 16% since 2019, from 197,000 to 166,000, with no explanation offered.",
+      "2.1 for other nationalities, against 2.6 for everyone. That whole spread, from 2.1 to 4.9, appears "
+      "in a single survey table rather than as a series anyone can follow from year to year. Two more "
+      "things to know about the Department of Statistics's own figures. Its \"Jordan in Figures\" booklets "
+      "carry old survey figures under the current year's column with only a footnote — the 2.7 printed for "
+      "2022 is 2017-18 survey data. And registered births have fallen 16% since 2019, from 197,000 to "
+      "166,000.",
       "https://dosweb.dos.gov.jo/"),
     C("Honduras", "INE — ENDESA survey rounds", honduras, "Honduras", "survey", False,
-      "Four survey rounds since 2001. INE also publishes registered births by the mother's age group every "
-      "year from 2010, and the 2013 census publishes both the women and the births in the previous twelve "
-      "months.",
-      "We read the survey series. We also divided the 2013 census's own counts and got 2.13, against the "
-      "2.74 INE adopted for that year — a headline 29% above what its own census counted.",
-      "Honduras is the one country here where an office published a registration-based rate and then "
-      "stopped. Its vital-statistics releases for 2013-14 and 2015-16 print the full working — age, "
-      "births, women, each rate, the total — giving 2.45 to 2.68, which then tracked the survey and "
-      "projection figures closely. From the 2021-22 release onward it keeps the birth counts by age and "
-      "drops the rate, while the text still says fertility is falling without giving a number. No "
-      "correction method is named anywhere; what INE does instead is take the census's age pattern and "
-      "substitute the survey's level, for stated reasons of internal consistency rather than any criticism "
-      "of the census. Registered births have fallen 27% since 2018, from 181,000 to 132,000. Two "
-      "cautions. There has been no census since 2013 — the next is still in preparation — so any recent "
-      "denominator is a projection eleven years old, and INE itself points to emigration of women of "
-      "childbearing age. And the census's own twelve-month question found fewer births than the registry "
-      "recorded for the same period, which is the reverse of the usual direction.",
+      "Three rounds of the national demographic and health survey, ENDESA, which Honduras's statistics "
+      "office INE runs: 2005-06, 2011-12 and 2019. INE also publishes registered births by the mother's "
+      "age group, in bulletins covering two or three years at a time rather than one a year, with nothing "
+      "published for 2017 through 2020. The 2013 census publishes both the women and the births in the "
+      "previous twelve months.",
+      "We plot the three survey rates. We also worked out the census's own rate for 2013: for each "
+      "five-year age group we divided its births in the previous twelve months by its women, then added "
+      "the seven rates and multiplied by five. That gives 2.13. INE adopted 2.74 for the same year, 29% "
+      "higher than what its own census counted.",
+      "Unusually, INE published a registration-based fertility rate for a few years and then stopped. Its "
+      "vital-statistics releases for 2013-14 and 2015-16 print the full working — age, births, women, each "
+      "rate, the total — giving 2.45 for 2013, 2.67 for 2014, 2.85 for 2015 and 2.45 for 2016, close to "
+      "the survey and projection figures for those years. From the 2021-22 release onward it keeps the "
+      "birth counts by age and drops the rate, while the text still says fertility is falling without "
+      "giving a number. INE does set out how it gets from the census to the higher figure it adopts: "
+      "volume 10 of the census series gives the method step by step, taking the census's pattern of "
+      "fertility by age and rescaling it to the survey's level, then checking the result against its own "
+      "count of children under one. It gives internal consistency as the reason, not any criticism of the "
+      "census. Registered births have fallen 27% since 2018, from 181,000 to 132,000. Two cautions. There "
+      "has been no census since 2013, so the population figures used to work out any recent rate are "
+      "projections from a census now thirteen years old. And the census's own question about births in the "
+      "previous twelve months found fewer births than were officially registered for the same period — "
+      "usually it is registration that misses births, not a census. One earlier survey exists and is not "
+      "plotted: a 2001 round run by a family-planning association with the health ministry rather than by "
+      "INE, whose rate covers 1998 to 2000, before this chart starts.",
       "https://ine.gob.hn/"),
     C("Guatemala", "INE — registered births divided by its population projections", guatemala_tfr,
       "Guatemala", "complete", True,

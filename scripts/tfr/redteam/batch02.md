@@ -1659,3 +1659,74 @@ whose numbers the whole page was built around.
   across pages they have not seen.
 - **Noted, not changed.** Both survey points sit at their fieldwork year rather than the midpoint of the
   three years each rate covers. That is the convention across this collection and it stays.
+
+## Jordan
+
+Verdict: serious problems. Every plotted number and every nationality figure verified exactly, including
+all six values of the 2023 survey's nationality panel. The failures were all claims that something does
+not exist, and there were three of them on one page.
+
+- **Accepted.** "The births are broken down only by governorate and the child's sex, never by the mother's
+  age. So the rate comes from the survey, and only from the survey." True of the Department of Statistics,
+  written as though true of Jordan. The Civil Status and Passports Department, which keeps the birth
+  register, publishes births by the mother's age group on the government's open data portal.
+- **Accepted, and it is the worse half.** "The registry cannot give a fertility rate." It does give one.
+  CSPD publishes age-specific fertility rates per thousand and a total, for every year from 2015 to 2022:
+  3.12, 3.03, 3.14, 3.00, 2.90, 2.61, 2.70, 2.53. Downloaded the spreadsheet and checked the arithmetic
+  rather than taking the total on trust — 2022's seven rates sum to 506.25, times five over a thousand is
+  2.531. The series is real, official, annual, and internally consistent.
+- **Why the survey is still plotted.** The register's denominator is the civilly registered mid-year
+  population, so the series covers Jordanians, and about a third of Jordan's residents are not Jordanian.
+  Its 2.53 for 2022 lands almost exactly on the 2.5 the 2023 survey reports for Jordanian women, which is
+  the check that shows both are measuring the same population well. The UN's figure covers everyone living
+  in the country, so the survey is the comparable series and stays. The page now says all of this instead
+  of denying the register's rate exists.
+- **Accepted.** "Registered births have fallen 16% since 2019, from 197,000 to 166,000, with no
+  explanation offered." Both numbers are exact. The clause after them is a third absence claim; the agent
+  found a Higher Population Council study of that fall, and this session's search budget was gone before
+  the document itself could be opened. Neither the claim nor its rebuttal is publishable, so the sentence
+  now stops at the fact.
+- **Accepted.** The crude birth rate of 15.26 for 2024 is not in the code and its denominator is not
+  recorded, and the agent could not reproduce it from the booklet's own population figure — it gets 14.2.
+  Both of ours implied a denominator near 10.9 million where the booklet's total population is 11.7
+  million, which is also what DOS's own published 15.3 implies, so the reconciliation probably held. But an
+  unreproducible number used as evidence of a reconciliation is not worth keeping when the register's own
+  fertility rate is available to compare against instead. Cut.
+- **Accepted.** Cut the two comparisons to Saudi Arabia's entry and "two things to watch when citing DOS",
+  which addresses a researcher rather than a reader. Expanded DOS on first use and glossed the crude birth
+  rate where it survives elsewhere.
+
+## Honduras
+
+Verdict: serious problems, and one of them was a plotted point belonging to another organization.
+
+- **Accepted, and it removed a point.** 4.4 was plotted at 2001 under a source line reading "INE — ENDESA
+  survey rounds". It is not an INE ENDESA round: it comes from ENESF-01, run by the family-planning
+  association ASHONPLAFA with the health ministry, and that report gives its reference period as 1998 to
+  2000. So the point was misattributed and also dated two years late; correctly dated it falls before this
+  chart starts. Dropped, with a sentence saying it exists and why it is not there. The three rounds now
+  plotted are exactly the three INE's own ENDESA page lists.
+- **Accepted.** "No correction method is named anywhere." The twentieth false absence claim. Volume 10 of
+  the 2013 census series sets out INE's method step by step: it rescales the census's fertility pattern by
+  age to the survey's level and checks the result against its own count of children under one. Our
+  description of the mechanism was right; the sentence saying nobody documents it was wrong, about a
+  document that documents it in detail.
+- **Accepted.** "Giving 2.45 to 2.68" understated the range in the two releases we cite. 2015 is 2.8498 in
+  the 2015-16 release's own table. Now given year by year: 2.45, 2.67, 2.85, 2.45.
+- **Accepted.** "INE also publishes registered births by the mother's age group every year from 2010" —
+  the bulletins cover two or three years at a time and nothing at all covers 2017 through 2020. Said
+  plainly now.
+- **Accepted.** "A projection eleven years old" is thirteen years old, and "the next is still in
+  preparation" is a status claim that ages badly and that this session could not check. The page now says
+  only that the projections come from a census now thirteen years old.
+- **Accepted.** Cut "INE itself points to emigration of women of childbearing age" — could not be
+  substantiated as INE's own statement.
+- **Accepted.** Verified independently that our 2.13 uses the right operation: the agent recomputed the
+  census's age-specific rates and got 2.127, and noted that the wrong operation would have given 0.07
+  here. The page now states the operation, so a reader can see which one was done.
+- **Accepted.** Expanded INE and ENDESA, replaced "the one country here where", "headline 29% above",
+  "denominator", "the registry" and "the reverse of the usual direction" with plain wording.
+- **Logged, not built.** INE's 2013-14 and 2015-16 vital-statistics releases carry full age, births and
+  women tables, which would support a recalculated registration-based series for 2013 to 2016. Four years
+  is too short to plot against the survey rounds, but it is the same low-effort build as several other
+  countries on this list.

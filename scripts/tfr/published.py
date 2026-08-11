@@ -922,8 +922,14 @@ def jordan():
 
 
 def honduras():
-    """INE's survey rounds. The 2011-12 report's own table carries the earlier ones."""
-    return _series([(2001, 4.4), (2006, 3.3), (2012, 2.9), (2019, 2.6)])
+    """INE's ENDESA rounds: 2005-06, 2011-12 and 2019, which is what INE's own ENDESA page lists.
+
+    A fourth figure, 4.4, used to be plotted at 2001. It is not an INE ENDESA round: it comes from
+    ENESF-01, run by the family-planning association ASHONPLAFA with the health ministry, and the
+    report gives its reference period as 1998-2000. Dating it 2001 put it two years late, and its
+    correctly dated position falls before this chart starts.
+    """
+    return _series([(2006, 3.3), (2012, 2.9), (2019, 2.6)])
 
 
 def azerbaijan():

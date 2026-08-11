@@ -43,17 +43,16 @@ back on published reports; that is what unstuck Poland.
 
 ## In flight (5)
 
-- Jordan
 - United Arab Emirates
 - Tajikistan
 - Papua New Guinea
 - Cuba
+- Sweden
 
-## Reported, awaiting write-up (1)
+## Reported, awaiting write-up (0)
 
-- Honduras
 
-## Analyzed (84)
+## Analyzed (86)
 
 - India
 - China
@@ -139,10 +138,11 @@ back on published reports; that is what unstuck Poland.
 - Haiti
 - Belgium
 - Dominican Republic
+- Jordan
+- Honduras
 
-## To do (10)
+## To do (9)
 
-- Sweden
 - Czechia
 - Azerbaijan
 - Portugal
