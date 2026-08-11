@@ -485,3 +485,105 @@ programme's own API, where the seven age-specific rates sum to our 5.29.
 - **Accepted.** "vital registration", "age-specific rates", "band width" and "weighted sample" all
   replaced with plain descriptions, and the web-archive sentence rewritten around what it means for the
   reader rather than how we found the file.
+
+## Saudi Arabia
+
+Verdict: serious problems, in the label rather than the numbers. Every plotted year verified against
+GASTAT's own Population Estimates release, including the three-way 2024 split of 2.7 / 0.8 / 2.0 and
+the 44% non-Saudi share.
+
+- **Accepted, and the label was contradicting our own text.** GASTAT's methodology documents are
+  titled for population *projections* and estimates, define the product as assumption-driven, and
+  derive the rate by dividing registered births by a population rolled forward from the 2022 census.
+  Our caveats already said as much — "registration data inside a model rather than a straight count" —
+  while the label above them said Complete registration. Now Projection only, the same call as
+  Algeria.
+- **Accepted.** "Getting the nationality split wrong here would be worse than any other country in
+  this dataset" is a warning to whoever builds the collection, not to a reader, and "GASTAT resolves
+  the trap for us" has the same problem. Both rewritten to say what the reader needs.
+- **Accepted.** "Cohort-component projection" replaced with a plain description of what the method
+  does.
+- **Accepted.** The link went to a generic category browser several clicks from the figure. Now the
+  Population Estimates release itself.
+- **Open.** Whether a 2025 figure exists could not be settled — the agent found no release, but also
+  found a GASTAT methodology note updated this month saying data run to 2025. Worth a recheck.
+
+## Ghana
+
+Verdict: serious problems. The three plotted values verified, but one of the things around them was a
+quotation we appear to have made up.
+
+- **Accepted, and this is the worst kind of error.** We put in quotation marks that the office says
+  comparing the census against the survey before it "clearly indicates miss-reporting of births". The
+  agent, reading the source, reports its actual language is "indicating possible under-reporting of
+  births" — hedged where ours was categorical. I could not reach the report myself to adjudicate:
+  every URL I tried for the 2010 analytical report is dead and the web archive rate-limited me. So I
+  have removed the quotation marks entirely and stated the office's position without claiming its
+  exact words, which is right whether or not the phrase exists. **A paraphrase must never sit inside
+  quotation marks. Worth checking the other quoted phrases in this collection for the same fault.**
+- **Accepted, a missing round.** Ghana ran a survey round in 2014 reporting 4.2. It was absent, so
+  the line jumped fourteen years from 2008 to 2022. Added.
+- **Accepted, false claim.** "The fertility volume has still not appeared five years on" — the agent
+  retrieved it and reports a national figure of 3.1. I could not reach it either, but 3.1 is exactly
+  what our own independent division of the census counts gives, which corroborates the number even
+  though I could not confirm the volume. The claim about it being unpublished is gone; the reason we
+  do not plot it — no corrected figure alongside it — is unchanged and still stands.
+- **Accepted.** "we do not use it and neither should anyone else" addresses other researchers. Gone.
+- **Accepted.** The office is now named in full, "relational Gompertz" is glossed rather than dropped,
+  and the sentence about a browser-only publication list and an unreachable database is cut.
+
+## Malaysia
+
+Verdict: serious problems, and one was a wrong number on the page.
+
+- **Accepted, and it was a real error.** The age-band panel showed 967 births to mothers aged 45-49 in
+  2024. The registered count is 1,278 — we were 24% low. The cause: we had no birth counts, so we
+  multiplied DOSM's published rate by the female population, and for 2024 DOSM printed that rate
+  rounded to a whole birth per thousand women. One instead of 1.32, on a population of 967,400, is
+  the entire error.
+- **Accepted, and it is why the error existed.** "DOSM does not release those counts" is false. Table
+  3.7 of its annual Vital Statistics report gives registered births by age of mother, by state. I
+  fetched it and read the national row: 8,088 / 47,655 / 123,935 / 133,139 / 79,127 / 20,623 / 1,278,
+  summing to the row's own total. The panel now uses those counts, and the reader gets registered
+  births rather than a number implied by the rate.
+- **Consequence worth stating.** The old method reproduced DOSM's rate by construction, because the
+  rate was what built it. Dividing the real counts by the female population gives 1.55 for 2024
+  against DOSM's published 1.60. Rounding explains part of it and not all, and DOSM does not say what
+  population its own rate divides by. That is now on the page instead of a circular check that could
+  never disagree.
+- **Accepted.** "DOSM does not flag it" is wrong — the report labels 2024 preliminary. Our
+  decimal-counting inference was also unreliable: 2023 carries the same whole-number rounding.
+- **Accepted.** "Population for 2011-19" should be 2015-19, which is the range DOSM's own note gives.
+  "2024 onward are projections" conflated preliminary registered data with a projection.
+- **Accepted.** "The mirror image of the Japan trap" assumed the reader had read Japan; "on both sides
+  of the division" is jargon; the sentences about parquet files with no key and the old site being a
+  shell are our tooling. All gone, and the office is named in full.
+
+## Madagascar
+
+Verdict: minor problems. All three plotted values verified against the survey reports, both of our
+arithmetic checks reproduced from the census's own tables, and the registration figures confirmed to
+the percentage point.
+
+- **Verified, not changed.** The agent found the passage behind our strongest claim and quoted it:
+  the census volume's P/F ratios are above 1 in every age group, its own table gives 4.3 declared
+  against 4.7 corrected, and it states "il n'y aura aucun ajustement des données" — the data will not
+  be adjusted. Our account was accurate.
+- **Changed anyway, on a general rule.** That was a translated quotation sitting inside quotation
+  marks, which implies exact words that exist only in French. It is now reported speech. Same for
+  Mali and Niger, whose quoted phrases were also translations. A sweep of the whole collection found
+  eight quoted phrases: four are titles or a term of art and stay, one from Stats SA is verbatim in
+  the source and stays, and the four translations or unverifiable ones are now paraphrase.
+- **Accepted, link mismatch.** The source line names the Demographic and Health Survey but the link
+  went to the census landing page, which holds no survey material at all — none of the three plotted
+  values or the registration figures could be checked from it. Now links to the 2021 survey report.
+- **Accepted.** "Everywhere else that computes a correction applies it" leans on entries the reader
+  has not read. Now says plainly that computing a correction and then declining to use it is unusual.
+- **Accepted.** The two 4.8s — the 2008-09 survey's figure and the census's own wider-age-range
+  figure — sat one sentence apart and read as the same number checked twice. Now distinguished.
+- **Accepted, softened.** "INSTAT says why: in a country where the system is not functional..." could
+  not be found stated in those terms in any of the three volumes. Now says only that the census is
+  the only source for the age structure, without attributing a rationale.
+- **Accepted.** INSTAT and the survey's name are spelled out, the Brass check is described rather
+  than named, and "registration is better than in much of the region" — an uncited comparison — is
+  gone.

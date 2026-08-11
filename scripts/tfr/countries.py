@@ -245,60 +245,64 @@ COUNTRIES = [
       "ones that do not split 40-49 and have no clean 15-19 — so there is nothing to recalculate from. Those "
       "tables do exist in the printed demographic yearbook, but the server hosting it times out.",
       "https://stat.uz/en/official-statistics/demography"),
-    C("Saudi Arabia", "GASTAT — Population Estimates", saudi_arabia, "Saudi Arabia", "complete", False,
+    C("Saudi Arabia", "GASTAT — Population Estimates", saudi_arabia, "Saudi Arabia", "projection", False,
       "GASTAT publishes a fertility rate annually from 2011, in three parallel series: Saudis, non-Saudis, "
       "and everyone resident in the kingdom. For 2024 those are 2.7, 0.8 and 2.0.",
       "We took the whole-population series, which is the one comparable with the UN's figures. No "
       "arithmetic of our own.",
-      "Getting the nationality split wrong here would be worse than any other country in this dataset: "
-      "non-Saudis are 44% of the population and their fertility is a third of the Saudi figure, because the "
-      "non-Saudi resident population is overwhelmingly working-age and often without families in the "
-      "country. GASTAT resolves the trap for us by publishing all three. Its own methodology describes the "
-      "fertility figures as assumptions inside a cohort-component projection rolled forward from the 2022 "
-      "census, with the components taken from the national administrative records — so this is registration "
-      "data inside a model rather than a straight count. GASTAT publishes no age-specific rates and no "
-      "births by age of mother, so nothing can be rebuilt: the nearest thing, average births by mother\'s "
-      "age, counts children a woman has ever had rather than births in the year, and summing that would be "
-      "meaningless. One translation trap: GASTAT\'s English text repeatedly says these rates are per 1,000 "
-      "women, but the numbers are children per woman.",
-      "https://www.stats.gov.sa/en/statistics-tabs/-/categories/gastat-statistics/119025"),
+      "Which of the three series you use matters more here than almost anywhere: non-Saudis are 44% of the "
+      "population and their fertility is a third of the Saudi figure, because the non-Saudi resident "
+      "population is overwhelmingly working-age and often without families in the country. GASTAT avoids "
+      "any confusion by publishing all three separately. Its own methodology says these numbers are "
+      "assumptions built into a population projection: starting from the 2022 census, it adds each year's "
+      "births, deaths and migration, taken from administrative records, to estimate the next year. So the "
+      "births behind the figure are registered ones, but the rate a reader sees comes out of a model rather "
+      "than a head count — which is why this sits under projections rather than registration. GASTAT "
+      "publishes no rates by age of mother and no births by age of mother, so there is nothing to rebuild "
+      "the figure from. The nearest thing it publishes is the average number of children women of each age "
+      "have ever had, which is a lifetime total rather than a count of births in the year, so adding those "
+      "up would mean nothing. One translation trap: GASTAT's English text repeatedly says these rates are "
+      "per 1,000 women, but the numbers are children per woman.",
+      "https://www.stats.gov.sa/documents/20117/2435273/"
+      "Population+Estimates+Statistics+2024+EN.pdf"),
     C("Ghana", "GSS — Demographic and Health Survey", ghana, "Ghana", "survey", False,
-      "GSS runs the survey itself and publishes a fertility rate from each round: 4.4 for 2003, 4.0 for "
-      "2008 and 3.9 for 2022. Its censuses give different figures again, and its 2021 census counts are "
-      "published as raw tables through an open database.",
-      "We read the survey rounds. Summing the 2022 report's own age-specific rates reproduces its published "
-      "3.9 exactly.",
-      "Ghana is the clearest example in this dataset of how much the correction matters. For the 2010 census "
-      "GSS publishes both figures and names the method: 3.28 as reported, 4.57 after a relational Gompertz "
-      "adjustment, and it says plainly that comparing the census against the survey before it "
-      "\"clearly indicates miss-reporting of births\". For 2000 the pair is 3.99 and 5.66. For the 2021 "
-      "census it has published neither — the fertility volume has still not appeared five years on, even "
-      "though the underlying counts have been in its public database since 2023. Those counts imply 3.10 "
-      "unadjusted, which by GSS\'s own pattern would land about a child higher once corrected, so we do not "
-      "use it and neither should anyone else without that caveat. Its own survey puts birth registration at "
-      "75% of under-fives, and GSS says outright that census and survey estimation are used because vital "
-      "registration is unreliable. The site renders its publication list only in a browser, but an "
-      "unauthenticated file API behind it lists everything; its statistics database was unreachable from "
-      "here even though it answers elsewhere.",
+      "The Ghana Statistical Service runs the survey itself and publishes a fertility rate from each round: "
+      "4.4 for 2003, 4.0 for 2008, 4.2 for 2014 and 3.9 for 2022. Its censuses give different figures "
+      "again, and its 2021 census counts are published as raw tables through an open database.",
+      "We use the rate each survey round published. Summing the 2022 report's own rates by age group "
+      "reproduces its published 3.9 exactly.",
+      "Ghana shows more clearly than anywhere else here how much the correction for missed births matters. "
+      "For the 2010 census the office publishes both figures and names the method — 3.28 as reported and "
+      "4.57 after a standard statistical correction for under-reported births, the relational Gompertz "
+      "model — and attributes the gap to mothers misstating their age and under-reporting recent births. For "
+      "2000 the pair is 3.99 and 5.66. For the 2021 census the reported figure is 3.1, which is what its own "
+      "counts give, but we have found no corrected figure published alongside it. On that census's own "
+      "pattern a correction would land about a child higher, so the 3.1 is not comparable with the survey "
+      "rounds and we do not plot it. Its own survey puts birth registration at 75% of under-fives, and the "
+      "office says outright that census and survey estimates are used because birth registration is not "
+      "reliable enough.",
       "https://statsghana.gov.gh/"),
     C("Madagascar", "INSTAT — Enquête Démographique et de Santé", madagascar, "Madagascar", "survey",
       False,
-      "INSTAT publishes a fertility rate from each survey round — 5.2 for 2003-04, 4.8 for 2008-09 and 4.3 "
-      "for 2021 — and its 2018 census gives 4.3 as well, with the births and women behind it printed as "
+      "Madagascar's national statistics office, INSTAT, publishes a fertility rate from each round of its "
+      "Demographic and Health Survey — 5.2 for 2003-04, 4.8 for 2008-09 and 4.3 for 2021. Its 2018 census "
+      "arrives at 4.3 as well, by a different route, and prints the births and women behind that figure as "
       "counts.",
-      "We read the survey rounds. We also checked the census: dividing its own counts and summing gives "
-      "4.290 against the published 4.3, and adding the 12-14 and 50-54 groups gives 4.82 against the "
-      "published 4.8 for the wider age range.",
+      "We use the rate each survey round published. We also checked the census's own arithmetic: dividing "
+      "its counts and summing gives 4.290 against the 4.3 it prints. The census publishes a second figure "
+      "over a wider age range, 12 to 54, and recomputing that from the same counts gives 4.82 against its "
+      "4.8 — which is a different measure from the 2008-09 survey's 4.8, despite the matching number.",
       "Madagascar is the one country here where the office worked out a correction and then declined to use "
-      "it. Its census volume applies a standard demographic correction for births women forget or misdate, "
-      "finds every age group under-reporting, and reports that it would raise fertility from 4.3 to 4.7 — "
-      "then argues the gap looks more like a real recent decline than missed births, concludes \"there will "
-      "be no adjustment of the data\", and publishes the lower figure. Every other office here that works "
-      "out a correction applies it. Civil registration is not used, and INSTAT says why: in a country where "
-      "the system is not functional, the census is the only source for the population's age structure. "
-      "Registration is better than in much of the region — 74% of under-fives registered, 57% holding a "
-      "certificate — but still not good enough to build a fertility rate from.",
-      "https://www.instat.mg/autres/rgph-3"),
+      "it. Its census volume applies a standard demographic check for births women forget or misdate, which "
+      "compares recent births against the totals women report over their lifetimes. It finds under-reporting "
+      "in every age group and reports that correcting for it would raise fertility from 4.3 to 4.7 — then "
+      "argues the gap looks more like a real recent decline than missed births, states that the data will "
+      "not be adjusted, and publishes the lower figure. Declining to apply a correction you have already "
+      "computed is unusual. Civil registration cannot be used here: the census is the only source for the "
+      "population's age structure. Registration is not negligible — the survey puts 74% of births "
+      "registered and 57% of children holding a certificate — but it is still not good enough to build a "
+      "fertility rate from.",
+      "https://dhsprogram.com/pubs/pdf/FR376/FR376.pdf"),
     C("Mali", "INSTAT — Enquête Démographique et de Santé", mali, "Mali", "survey", False,
       "INSTAT publishes a fertility rate from each of seven survey rounds since 1987, the latest 6.0 for "
       "2023-24. Its 2022 census gives 6.1, and publishes the births and women behind it as raw numbers.",
@@ -307,7 +311,7 @@ COUNTRIES = [
       "Mali applied the largest correction in this dataset by far. Its census found the raw count of births "
       "in the previous twelve months unusable — sex ratios of up to 148 boys per 100 girls, and only about "
       "70% as many declared births as there were children under one in the same count — and states plainly "
-      "that the data \"are of poor quality and require adjustment\". It names the method, the Trussell "
+      "that the data are of poor quality and require adjustment. It names the method, the Trussell "
       "variant of the Brass technique, and says which alternatives it tested and rejected. The effect is "
       "close to a doubling: 494,742 declared births become 930,503 adjusted ones, about 88% more. INSTAT "
       "does not print the two totals side by side, so that comparison is ours from its own tables. Civil "
@@ -316,22 +320,21 @@ COUNTRIES = [
       "https://www.instat-mali.org/fr/publications/enquete-demographique-et-de-sante-eds"),
     C("Malaysia", "DOSM — age-specific fertility rates over its population estimates", malaysia_tfr,
       "Malaysia", "complete", False,
-      "DOSM publishes age-specific fertility rates and its own total, annually from 1958, plus population "
-      "by five-year age group and sex — all as parquet from an open store with no key. It computes the "
-      "rates from the age of mother recorded at birth registration, but does not release those counts.",
-      "We took DOSM's published total. The age-band comparison multiplies each rate by the female "
-      "population, which is how DOSM built the rate in the first place; that implies 453,911 births to "
-      "mothers aged 15-49 in 2023 against the 455,761 registered in total, and reproduces the published "
-      "1.73.",
-      "Malaysia is the mirror image of the Japan trap, and getting it backwards would bias everything: "
-      "DOSM's rate counts all residents including non-citizens, on both sides of the division, where "
-      "Japan's counts nationals only. Non-citizen women are about a tenth of some childbearing age groups — "
-      "131,000 of the 1.3 million aged 25-29 in 2023. A birth is counted if it is registered in Malaysia, so "
-      "a foreign resident who registers a child at home instead drops out. The 2024 rates are rounded to "
-      "whole numbers where earlier years carry two decimals, which reads as a year not yet final, though "
-      "DOSM does not flag it. Population for 2011-19 is still on the 2010 census basis and DOSM says it will "
-      "be revised; 2024 onward are projections. The old DOSM site is a shell now — the open data store is "
-      "the working source.",
+      "Malaysia's national statistics office, DOSM, publishes fertility rates by age group and its own "
+      "total, annually from 1958, along with population by five-year age group and sex. It also publishes "
+      "the registered births by age of the mother, as counts, in its annual Vital Statistics report.",
+      "We took DOSM's published total. The age-band comparison divides those registered births by the "
+      "female population. Doing that for 2024 gives 1.55, not the 1.60 DOSM publishes; part of the "
+      "difference is that DOSM printed that year's rates rounded to whole births per thousand women, but it "
+      "does not fully account for the gap, and DOSM does not say what population its own rate divides by.",
+      "Malaysia's rate counts all residents including non-citizens, both in the births counted and in the "
+      "population they are divided by. That matters because non-citizen women are about a tenth of some "
+      "childbearing age groups — 131,000 of the 1.3 million aged 25-29 in 2023. A birth is counted only if "
+      "it is registered in Malaysia, so a foreign resident who registers a child in their home country "
+      "instead drops out. DOSM marks its 2024 figures preliminary: they are real registered data, but late "
+      "registrations will still be added. Population for 2015-19 is still on the 2010 census basis and DOSM "
+      "says it will be revised. The seven age groups leave out a small number of births to mothers under 15 "
+      "or over 49, and a few hundred where the age was not recorded.",
       "https://open.dosm.gov.my/data-catalogue/fertility"),
     C("Mozambique", "INE — Inquérito Demográfico e de Saúde", mozambique, "Mozambique", "survey", False,
       "INE publishes a fertility rate for each survey round, and its 2022-23 report sets all four side by "
@@ -744,7 +747,8 @@ COUNTRIES = [
       "Niger has the highest fertility in the world, and its 2012 census is the second case here — after "
       "Madagascar — where the office computed a correction and refused it. The relational Gompertz method "
       "would have raised the figure from 7.5 to 7.8, but the report found the model a poor fit and decided "
-      "to \"favour the field data, which are relatively more accurate than extreme hypothetical estimates\", "
+      "to keep the figures collected in the field, which it judged more accurate than what it called "
+      "extreme hypothetical estimates, "
       "so the published number is the lower one. INS also flags that its own census and its own survey "
       "disagree for the same year, 7.5 against 7.6, and attributes the gap to under-declaration in the "
       "census\'s twelve-month window. Civil registration is not used nationally; INS does compute a rate "
@@ -993,19 +997,16 @@ COUNTRIES = [
       "survey", False,
       "One figure inside our window: 4.4 children per woman for the three years to 2013, from the survey "
       "the Central Statistical Organisation ran with the health ministry. The 2004 census is also covered, "
-      "but the organisation publishes two different figures for it — 4.93 by one method and 6.1 by another.",
+      "but the organization publishes two different figures for it — 4.93 by one method and 6.1 by another.",
       "We read the national column of table 2. Summing its age-specific rates and multiplying by the band "
       "width gives 4.43, the published 4.4.",
       "We use the 2013 survey rather than the census because the census figures are not one number: the "
-      "organisation's own yearbook prints 4.93 from directly observed births and 6.1 from cumulating "
-      "age-specific rates, and a separate study of its own reaches 6.1 by indirect estimation. Choosing "
-      "between those is a methodological judgement, not a lookup, so the survey — a single figure from "
-      "standard birth-history estimation — is the safer one. Nothing has been published since 2013; the war "
-      "began in 2015. Three of the organisation's four domains are unusable: cso-yemen.com sits behind a "
-      "firewall that rejects anything that is not a browser, cso.gov.ye has its secure port blackholed, and "
-      "cso-yemen.org and the planning ministry's domain have both lapsed to squatters — the former now "
-      "serves a spam blog, so anything found live there should not be trusted. This report came from a web "
-      "archive.",
+      "organization's own yearbook prints 4.93 from directly observed births and 6.1 from adding up rates by "
+      "age group, and a separate study of its own reaches 6.1 by an indirect method. Choosing between those "
+      "is a judgment about method rather than a lookup, so the survey — a single figure from the standard way "
+      "of estimating fertility from women's birth histories — is the safer one. Nothing has been published "
+      "since 2013; the war began in 2015, and the office's own websites have not survived it, so this report "
+      "came from a web archive.",
       "https://web.archive.org/web/20220608201754/https://cso.gov.ye/about_cso"),
     C("Angola", "INE — Inquérito de Indicadores Múltiplos e de Saúde", angola, "Angola", "survey", False,
       "INE publishes a fertility rate for each survey round: 6.2 from the 2015-16 survey and 4.8 from the "
@@ -1131,8 +1132,8 @@ COUNTRIES = [
       "registration captures only about 90% of births. So South Africa's headline figure sits well above "
       "what its own registry shows, and is a modeled estimate like the UN's rather than a count. It is also "
       "revised often, and by a lot: the 2024 edition of this series put 2024 at 2.41 and the 2026 edition "
-      "puts it at 2.15, with every year from 2016 on revised down — Stats SA says the rate was lowered \"to "
-      "reflect what is evident in administrative data sources\". Fertility results from the 2022 census have "
+      "puts it at 2.15, with every year from 2016 on revised down, which Stats SA attributes to bringing the "
+      "rate into line with what its administrative records show. Fertility results from the 2022 census have "
       "still not been released, which Stats SA notes as a reason the census could not feed the estimate. No "
       "mid-year estimates edition was published for 2023.",
       "https://www.statssa.gov.za/publications/P0302/P03022026.pdf"),
@@ -1568,7 +1569,7 @@ COUNTRIES = [
       "2.35 is a one-year drop of nearly a full child that it never explains — treat it as possibly an "
       "artefact of the series rather than a demographic event. And the denominator is the registered "
       "resident population, which by the agency's own definition includes people temporarily absent. "
-      "Tajikistan has one of the highest labour-emigration rates in the world, so a large number of "
+      "Tajikistan has one of the highest rates of labor emigration in the world, so a large number of "
       "working-age men abroad are still counted at home; that mostly affects the male side, and our "
       "reconciliation suggests any effect on women of childbearing age is second-order.",
       "https://www.stat.tj/ru/soczialno-demograficheskij-sektor/"),
@@ -1663,11 +1664,10 @@ COUNTRIES = [
       "since shows no discontinuity from their reincorporation.",
       "https://www.stat.gov.az/source/demoqraphy/az/002_3.xls"),
     C("United Arab Emirates", "FCSC — Emirati women only", None, "United Arab Emirates", "none", False,
-      "The federal statistics centre publishes a fertility rate for Emirati women — 3.1 for 2022, down "
-      "from 3.7 in 2016 — and a crude birth rate for everybody. It publishes no rate for non-Emirati "
-      "residents and no combined rate at all.",
-      "Nothing. Every federal and emirate statistics host refuses connections from outside the country or "
-      "answers with a bot challenge, so nothing here could be read from the source.",
+      "The Federal Competitiveness and Statistics Centre publishes a fertility rate for Emirati women — 3.1 "
+      "for 2022, down from 3.7 in 2016 — and a crude birth rate for everybody. It publishes no rate for "
+      "non-Emirati residents and no combined rate at all.",
+      "Nothing. This is the one country in the collection with no figure we could use.",
       "This is the most extreme version of the nationality problem in the collection, and the reason there "
       "is nothing to plot. Emiratis are about 12% of residents. A rate for them alone is not comparable "
       "with the UN's figure for the country, and no comparable figure exists: the federal office publishes "

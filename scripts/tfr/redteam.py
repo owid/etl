@@ -10,6 +10,7 @@ is one. Nothing about how the code works, and nothing we did not publish.
 
 import csv
 import os
+import re
 import sys
 
 import pandas as pd
@@ -117,50 +118,156 @@ def brief(country):
 
 
 def reviewed():
-    """Countries already covered by a batch log."""
+    """Countries already written up in a findings log.
+
+    Only the batch logs count, and only headings that name a country in the registry. Reading every
+    markdown file in the directory pulled in the headings of the prompt, the readme and the agent
+    ledger, which inflated the tally and made countries look reviewed when they were not.
+    """
+    known = {c["name"] for c in COUNTRIES} | {"England and Wales"}
     done = set()
     if os.path.isdir(LOG):
-        for name in os.listdir(LOG):
-            if name.endswith(".md"):
-                for line in open(os.path.join(LOG, name), encoding="utf-8"):
-                    if line.startswith("## "):
-                        done.add(line[3:].strip())
+        for name in sorted(os.listdir(LOG)):
+            if not (name.startswith("batch") and name.endswith(".md")):
+                continue
+            for line in open(os.path.join(LOG, name), encoding="utf-8"):
+                if line.startswith("## ") and line[3:].strip() in known:
+                    done.add(line[3:].strip())
     return done
+
+
+def unmatched_headings():
+    """Batch-log headings that do not name a country, so nothing counts them.
+
+    A country written up under the wrong spelling is invisible to the tracker and gets reviewed
+    twice, which is how DR Congo happened. Section headings that are deliberately not countries are
+    listed here so they stop being reported as problems.
+    """
+    allowed = {"Cross-cutting, from this batch"}
+    known = {c["name"] for c in COUNTRIES} | {"England and Wales"}
+    out = []
+    if os.path.isdir(LOG):
+        for name in sorted(os.listdir(LOG)):
+            if not (name.startswith("batch") and name.endswith(".md")):
+                continue
+            for line in open(os.path.join(LOG, name), encoding="utf-8"):
+                head = line[3:].strip() if line.startswith("## ") else None
+                if head and head not in known and head not in allowed:
+                    out.append(f"{name}: {head}")
+    return out
+
+
+LEDGER = os.path.join(LOG, "AGENTS.md")
+SECTIONS = ("In flight", "Reported, awaiting write-up", "Analyzed", "To do")
 
 
 def _ledger(section):
     """The country bullets under one heading of redteam/AGENTS.md."""
     out, inside = [], False
-    for line in open(os.path.join(LOG, "AGENTS.md"), encoding="utf-8"):
+    for line in open(LEDGER, encoding="utf-8"):
         if line.startswith("## "):
-            inside = line[3:].strip().lower() == section.lower()
+            # the headings carry their own count, as "## To do (58)"
+            head = re.sub(r"\s*\(\d+\)\s*$", "", line[3:].strip())
+            inside = head.lower() == section.lower()
         elif inside and line.startswith("- "):
             out.append(line[2:].strip())
     return out
 
 
-def audit():
-    """Cross-check the agent ledger against the findings logs.
+def rank_order():
+    """The hundred countries in population-rank order, under the names the registry uses."""
+    names = {c["name"] for c in COUNTRIES}
+    out = []
+    with open(os.path.join(HERE, "top100.csv")) as f:
+        for row in csv.DictReader(f):
+            # the collection covers England and Wales, which is what the UK's rank stands for here
+            name = "England and Wales" if row["country"] == "United Kingdom" else row["country"]
+            if name in names:
+                out.append(name)
+    missing = [n for n in names if n not in out]
+    return out + sorted(missing)
 
-    A country an agent reported on but nobody wrote up is a report that was read and dropped, or
-    never read at all. That is the failure worth catching, so it is the one this names.
+
+def sync_ledger():
+    """Rewrite the ledger so its four lists always partition the hundred countries.
+
+    In flight and awaiting write-up are the only state that has to be asserted by hand, so those two
+    are carried over as they stand. Analyzed comes from the findings logs, and to do is whatever is
+    left in rank order — which is what keeps the four adding up to a hundred without anyone counting.
+    """
+    flight = _ledger("In flight")
+    waiting = [n for n in _ledger("Reported, awaiting write-up") if n not in flight]
+    analyzed = reviewed() - set(flight) - set(waiting)
+    spoken_for = set(flight) | set(waiting) | analyzed
+    todo = [n for n in rank_order() if n not in spoken_for]
+    lists = {"In flight": flight,
+             "Reported, awaiting write-up": waiting,
+             "Analyzed": [n for n in rank_order() if n in analyzed],
+             "To do": todo}
+
+    head = []
+    for line in open(LEDGER, encoding="utf-8"):
+        if line.startswith("## "):
+            break
+        head.append(line)
+    body = []
+    for name in SECTIONS:
+        body.append(f"## {name} ({len(lists[name])})\n\n")
+        body += [f"- {c}\n" for c in lists[name]]
+        body.append("\n")
+    with open(LEDGER, "w", encoding="utf-8") as f:
+        f.writelines(head + body)
+    return {k: len(v) for k, v in lists.items()}
+
+
+def audit():
+    """Check the campaign's live state. Anything this returns is something to fix now.
+
+    The findings logs are the history, so the ledger holds only what they cannot know: which agents
+    are out, and which have come back but not yet been written up. That second list is the one that
+    matters — a report sitting in it is a report that arrived and was not acted on. It should be
+    empty by the end of every cycle. An earlier version of this kept a hand-typed history of every
+    country ever reported, which was a partial copy of the logs and passed while being wrong.
     """
     done, problems = reviewed(), []
-    for name in _ledger("reported"):
-        if name not in done:
-            problems.append(f"reported but never written up: {name}")
-    for name in _ledger("in flight"):
-        if name in done:
-            problems.append(f"listed in flight but already written up: {name}")
-    known = {c["name"] for c in COUNTRIES} | {"England and Wales"}
-    for section in ("in flight", "reported"):
-        for name in _ledger(section):
-            if name not in known:
-                problems.append(f"not a registry name, so unmatchable: {name}")
-    flight = _ledger("in flight")
+    known = set(rank_order())
+    lists = {name: _ledger(name) for name in SECTIONS}
+    flight, waiting, analyzed = lists["In flight"], lists["Reported, awaiting write-up"], lists["Analyzed"]
+
+    # the four lists have to partition the hundred: every country in exactly one of them
+    seen, twice = set(), set()
+    for names in lists.values():
+        for name in names:
+            (twice if name in seen else seen).add(name)
+    total = sum(len(v) for v in lists.values())
+    if total != len(known):
+        problems.append(f"the four lists hold {total} countries, not {len(known)}")
+    if twice:
+        problems.append(f"listed in more than one section: {', '.join(sorted(twice))}")
+    for name in sorted(known - seen):
+        problems.append(f"in the registry but in no section of the ledger: {name}")
+    for name in sorted(seen - known):
+        problems.append(f"in the ledger but not a registry name: {name}")
+
+    for name in waiting:
+        problems.append(f"reported but not yet written up: {name}")
+    for name in sorted(set(analyzed) - done):
+        problems.append(f"listed as analyzed but absent from the findings logs: {name}")
+    for name in sorted(done - set(analyzed)):
+        problems.append(f"written up in the findings logs but not listed as analyzed: {name}")
+    for bad in unmatched_headings():
+        problems.append(f"log heading names no country in the registry: {bad}")
     if len(flight) != 5:
-        problems.append(f"{len(flight)} agents in flight, not 5: {', '.join(flight)}")
+        problems.append(f"{len(flight)} agents in flight, not 5: {', '.join(flight) or 'none'}")
     return problems
+
+
+def progress():
+    """One line of ground truth, counted rather than remembered."""
+    counts = {name: len(_ledger(name)) for name in SECTIONS}
+    total = sum(counts.values())
+    return (" · ".join(f"{name.lower()} {n}" for name, n in counts.items())
+            + f" — {total} in all, of {len(rank_order())}")
 
 
 def next_up(count):
@@ -181,9 +288,15 @@ def next_up(count):
 if __name__ == "__main__":
     if sys.argv[1:2] == ["--next"]:
         print("\n".join(next_up(int(sys.argv[2]) if len(sys.argv) > 2 else 10)))
+    elif sys.argv[1:2] == ["--sync"]:
+        print(", ".join(f"{k.lower()} {v}" for k, v in sync_ledger().items()))
+        found = audit()
+        print("\n".join(found) if found else "nothing outstanding")
+        sys.exit(1 if found else 0)
     elif sys.argv[1:2] == ["--audit"]:
         found = audit()
-        print("\n".join(found) if found else "ledger and logs agree")
+        print("\n".join(found) if found else "nothing outstanding")
+        print(progress())
         sys.exit(1 if found else 0)
     else:
         print(brief(" ".join(sys.argv[1:])))

@@ -485,10 +485,11 @@ def saudi_arabia():
 def ghana():
     """GSS's own health and demographic survey rounds, direct estimates from birth histories.
 
-    The 2022 report states the fall plainly: from 6.4 in 1988 to 3.9 in 2022. The two earlier rounds
-    here are the ones GSS reproduces in its own census monograph's trend chart.
+    The 2022 report states the fall plainly: from 6.4 in 1988 to 3.9 in 2022. The earlier rounds here
+    are the ones GSS reproduces in its own census monograph's trend chart, plus the 2014 round, whose
+    report gives 4.2 — without it the line jumped fourteen years, from 2008 straight to 2022.
     """
-    return _series([(2003, 4.4), (2008, 4.0), (2022, 3.9)])
+    return _series([(2003, 4.4), (2008, 4.0), (2014, 4.2), (2022, 3.9)])
 
 
 def madagascar():
