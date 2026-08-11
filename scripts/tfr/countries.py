@@ -607,17 +607,20 @@ COUNTRIES = [
     C("Zambia", "ZamStats — Demographic and Health Survey", zambia, "Zambia", "survey", False,
       "ZamStats publishes a fertility rate from each survey round, the latest 4.0 for 2024. Its 2022 census "
       "reports 4.6, and publishes the raw births and women behind it in a separate tables volume.",
-      "We read the survey rounds. We also computed the census's raw figure from its own counts: 3.35, against "
-      "the 4.6 it publishes.",
-      "That is a 37% upward correction, and ZamStats names the method — the P/F ratio technique, after "
-      "checking reported children ever born against a Brass formula — and says plainly that fertility "
-      "measurement relies on indirect estimation because vital registration is underdeveloped. Only 31% of "
-      "people under 50 have a registered birth. But it publishes neither the age-specific multipliers nor the "
-      "adjusted rates, so the 4.6 cannot be rebuilt from anything public; and its own worked example of the "
-      "Brass check does not reproduce from the inputs it quotes — we get 5.66 where the report says 5.921. "
-      "The census and the survey also disagree in an informative way: 4.6 for 2022 against 4.0 for 2024, a "
-      "0.6 fall in two years where the survey series had been falling about 0.12 a year. The raw counts and "
-      "the adjusted figure live in two separate documents, which is worth knowing before citing either.",
+      "We use the rate each survey round published, as published. We also computed the census's uncorrected "
+      "figure from its own counts: 3.35, against the 4.6 it prints.",
+      "That is a 37% upward correction, and ZamStats explains why it made one. It compared how many children "
+      "women said they had ever had against what a standard formula predicts, found that recent births had "
+      "been under-reported, and corrected for it using a widely used method that scales the year's birth "
+      "count up to match the more complete lifetime count. It says such a correction is necessary because "
+      "Zambia's birth registration is too incomplete to measure fertility directly — only 31% of people "
+      "under 50 have a registered birth. One oddity is worth recording: the report's own worked example of "
+      "that comparison does not reproduce from the numbers it quotes. Its formula raises a ratio to the "
+      "fourth power, which on its own inputs gives 5.66, but it prints 5.921 — the figure you get by "
+      "multiplying by four instead. The corrected rates themselves are published, in an annex table, and "
+      "adding them up does return the 4.6. The census and the survey also disagree in an informative way: "
+      "4.6 for 2022 against 4.0 for 2024, a 0.6 fall in two years where the survey series had been falling "
+      "about 0.12 a year.",
       "https://www.zamstats.gov.zm/"),
     C("Vietnam", "National Statistics Office — population change and family planning survey", vietnam,
       "Vietnam", "survey", False,
@@ -1390,18 +1393,20 @@ COUNTRIES = [
       "https://www.ecuadorencifras.gob.ec/nacidos-vivos-y-defunciones-fetales/"),
     C("Kazakhstan", "Bureau of National Statistics — births by age of mother divided by its population",
       kazakhstan_tfr, "Kazakhstan", "complete", True,
-      "The bureau's database serves births by age of mother, mean annual population by sex and age, and "
-      "its own rate — all to a plain request with no key.",
-      "We divided births by women in each band and summed. Our figures match the bureau's published rate "
-      "to within 0.01 in every year both exist: 2.957 against 2.96 for 2023, 2.798 against 2.80 for 2024.",
-      "Kazakhstan is the second country here whose fertility rose sharply and is now falling back, and "
-      "like Uzbekistan the rise is in its own counted births, not an artefact. The rate went from 2.84 in "
-      "2018 to 3.32 in 2021, then down to 2.57 by 2025 — a fall of 0.75 in four years. Two things bound "
-      "what we can say. Births are counted by registration date, and the bureau states outright that a "
-      "birth registered this year counts this year even if it happened earlier, so the series is not on an "
-      "occurrence basis. And the five-year age classifier was revised in 2025, which is why the mean "
-      "annual population only reaches back to 2018 under the current codes; the bureau's own metadata "
-      "claims history from 1999, but those years sit under superseded identifiers we could not find.",
+      "Kazakhstan's Bureau of National Statistics publishes births by age of mother, average yearly "
+      "population by sex and age, and its own rate, all as open data.",
+      "We divided births by the women in each five-year age group and added up the results. Our figures "
+      "match the bureau's published rate to within 0.01 in every year both exist: 2.957 against 2.96 for "
+      "2023, 2.798 against 2.80 for 2024.",
+      "Kazakhstan's fertility rose sharply and is now falling back, and the rise shows up in the number of "
+      "births actually counted rather than being a quirk of the data. The rate went from 2.84 in 2018 to "
+      "3.32 in 2021, then down to 2.57 by 2025 — a fall of 0.75 in four years. Two things limit what we can "
+      "say. First, a birth is dated to the year it was registered rather than the year it happened: the "
+      "bureau states outright that a birth registered this year counts in this year's figures even if the "
+      "child was born earlier. Second, the way ages are grouped changed in 2025, and the population series "
+      "we use runs back only to 2018 under the current grouping. Earlier years do exist — the bureau's own "
+      "demographic yearbooks carry births by mother's age and population by age back to at least 2009 — so "
+      "this line could be extended.",
       "https://stat.gov.kz/ru/industries/social-statistics/demography/"),
     C("Benin", "INStaD — Demographic and Health Survey rounds", benin, "Benin", "survey", False,
       "The 2017-18 survey's trend table carries the rounds back to 1996. The 2013 census publishes a "

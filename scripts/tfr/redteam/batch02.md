@@ -1074,3 +1074,42 @@ rejected, and the 5.5-to-5.4 and 4.5-to-4.1 moves. Our own arithmetic check repr
 - **Accepted.** "Nothing in either report reconciles them" now notes that the census volumes predate the
   survey's report and could not have. INSD spelled out, the two correction methods described rather than
   named, "the two instruments" and the cross-collection comparison gone.
+
+## Kazakhstan
+
+Verdict: minor problems. Seven plotted years checked against the bureau's own published rate, all
+within 0.004 — no rounding-boundary case anywhere, unlike Canada. The registration-basis claim was
+confirmed word for word in the bureau's own methodology order.
+
+- **Accepted, and the sixth failure of the same claim.** "The bureau's own metadata claims history from
+  1999, but those years sit under superseded identifiers we could not find." The bureau's demographic
+  yearbooks carry births by mother's age and population by age and sex back to at least 2009, on its own
+  site, found by ordinary search. Our sentence turned a limitation of our search into a limitation of
+  the data. It now says the earlier years exist and that the line could be extended.
+- **Worth noting on the newest year.** After Taiwan, I expected 2025 to be provisional here too. It is
+  not: because Kazakhstan dates a birth to the year it was registered, the annual figure does not keep
+  filling in, and the bureau published 2.57 as a full-year statistic. The same property that makes the
+  series less comparable with occurrence-based countries makes its latest year safe to plot.
+- **Accepted.** "All to a plain request with no key" is our own access route; the Uzbekistan
+  cross-reference leans on another entry; "artefact" was British; and "bound", "occurrence basis",
+  "classifier" and "codes" are all replaced with plain wording.
+
+## Zambia
+
+Verdict: minor problems — and our sharpest accusation against a statistics office turned out to be
+right, with a diagnosis attached.
+
+- **Confirmed, and now explained on the page.** We said the census's own worked example of its
+  under-reporting check "does not reproduce from the inputs it quotes — we get 5.66 where the report says
+  5.921." The agent found the passage, recomputed the inputs from the census's own tables, and got 5.66
+  as well. It also worked out why: the printed formula raises a ratio to the fourth power, but 5.921 is
+  what you get by multiplying by four instead. That diagnosis is now on the page, which makes the claim
+  concrete and fair rather than a bare assertion that the office got it wrong.
+- **Accepted, and the seventh failure of the absence pattern.** "It publishes neither the age-specific
+  multipliers nor the adjusted rates, so the 4.6 cannot be rebuilt from anything public." The corrected
+  rates are published to four decimals in the report's own annex, and a rounded version appears as a
+  figure in the main chapter; adding them up returns 4.6. Removed, and the page now says the corrected
+  rates are published and do reproduce the figure.
+- **Accepted.** "Which is worth knowing before citing either" is addressed to someone about to cite the
+  number in their own work. Gone. "P/F ratio technique", "Brass formula", "indirect estimation" and
+  "age-specific multipliers" are all replaced with descriptions of what they do.
