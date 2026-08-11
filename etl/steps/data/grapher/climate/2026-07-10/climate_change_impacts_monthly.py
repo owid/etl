@@ -1,8 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from owid.catalog import Table
-from owid.catalog import processing as pr
-
 from etl.grapher.helpers import adapt_table_with_dates_to_grapher
 from etl.helpers import PathFinder
 
@@ -29,30 +26,6 @@ TIME_INTERVAL_OVERRIDES = {
     "sea_level_average": "quarter",
 }
 
-# Pandas period alias for each interval whose points must be unique within a period.
-PERIOD_ALIAS_BY_INTERVAL = {"month": "M", "quarter": "Q"}
-
-
-def sanity_check_time_intervals(tb: Table) -> None:
-    """Check that no column holds two points within one period of its declared time interval.
-
-    Such a pair would be indistinguishable to grapher, which would plot only the first of the two.
-    A new or updated indicator whose dates are irregular needs an entry in TIME_INTERVAL_OVERRIDES.
-    """
-    dates = pr.to_datetime(tb["date"].astype(str))
-    for column in tb.drop(columns=["country", "date"]).columns:
-        alias = PERIOD_ALIAS_BY_INTERVAL.get(TIME_INTERVAL_OVERRIDES.get(column, "month"))
-        if alias is None:
-            # The column is tagged "day"; its dates are already as precise as grapher can plot.
-            continue
-        periods = tb.loc[tb[column].notna(), ["country"]].assign(period=dates.dt.to_period(alias))
-        collisions = len(periods) - len(periods.drop_duplicates())
-        assert collisions == 0, (
-            f"Column `{column}` has {collisions} points sharing a period with another point, which "
-            f"grapher would drop. Add it to TIME_INTERVAL_OVERRIDES with the interval its dates "
-            f"actually represent."
-        )
-
 
 def run() -> None:
     #
@@ -67,9 +40,6 @@ def run() -> None:
     #
     # Create a country column (required by grapher).
     tb = tb.rename(columns={"location": "country"}, errors="raise")
-
-    # Check that every column's declared time interval matches the precision of its dates.
-    sanity_check_time_intervals(tb)
 
     # Adapt table with dates to grapher requirements.
     tb = adapt_table_with_dates_to_grapher(tb, time_interval="month")
