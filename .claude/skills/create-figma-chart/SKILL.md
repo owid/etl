@@ -208,7 +208,7 @@ await figma.setCurrentPageAsync(page)
 
 2. **Clone the template frame(s)** onto the new page: `(await figma.getNodeByIdAsync("<template-id>")).clone()`, then `page.appendChild(clone)` and position it.
 
-3. **Import the SVGs with `upload_assets`** — never `createNodeFromSvg` (the `use_figma` code param caps at 50k chars; a grapher SVG is ~165 KB). `upload_assets` returns a single-use `submitUrl`; POST the file to it and keep the returned `placedOnNodeId`:
+3. **Import the original SVG with `upload_assets`** — never `createNodeFromSvg` (the `use_figma` code param caps at 50k chars; a grapher SVG is ~165 KB). `upload_assets` returns a single-use `submitUrl`; POST the file to it and keep the returned `placedOnNodeId`. **Only the original at this stage** — the embed has not been exported yet (Step 3), and it arrives in Step 7 once the band is measurable:
 
 ```bash
 curl -s -X POST "<submitUrl>" -F "file=@$DIR/original.svg;type=image/svg+xml"
@@ -219,14 +219,17 @@ curl -s -X POST "<submitUrl>" -F "file=@$DIR/original.svg;type=image/svg+xml"
 
 > **Imported SVGs arrive at their natural size** (850×600 / 540×540). Scale with `node.rescale(factor)` — never `resize()`, see Step 7.
 
-**Bin the import frame.** `upload_assets` wraps the SVG in a FRAME that OWID's charts don't have and that causes two failures of its own: it carries a **white fill** that paints over the footer as soon as the frame overhangs, and `resize()` on it *stretches its children through their constraints* — which silently rewraps every text box in the chart, because grapher's exported labels are sized to their glyphs with no slack ("Brazil" becomes "Bra zil"). Move the frame's children into the template clone and delete the frame; a plain group is what the finished pages use:
+**Bin the import frame — on every import.** `upload_assets` wraps the SVG in a FRAME that OWID's charts don't have and that causes two failures of its own: it carries a **white fill** that paints over the footer as soon as the frame overhangs, and `resize()` on it *stretches its children through their constraints* — which silently rewraps every text box in the chart, because grapher's exported labels are sized to their glyphs with no slack ("Brazil" becomes "Bra zil"). Move the frame's children out to their real parent and delete the frame; a plain group is what the finished pages use. Only the destination differs: the **original** unwraps onto the page, here in Step 5; the **embed** unwraps into the template clone in Step 7, after its own export.
 
 ```js
-const kids = [...embed.children];
-for (const k of kids) templateClone.appendChild(k);
-embed.remove();
-const chart = kids.length === 1 ? kids[0] : figma.group(kids, templateClone);
-chart.name = "chart";
+const unwrap = (imported, parent, name) => {        // parent = the page (original) or templateClone (embed)
+  const kids = [...imported.children];
+  for (const k of kids) parent.appendChild(k);
+  imported.remove();
+  const node = kids.length === 1 ? kids[0] : figma.group(kids, parent);
+  node.name = name;
+  return node;
+};
 ```
 
 ## Step 6 — Fill the template texts
@@ -278,6 +281,8 @@ Nothing else gets restyled.
 ## Step 7 — Fit the chart into the template
 
 The chart spans the full content width, left-aligned with the title/subtitle/logo box, and sits in the band between the header and the footer with an even gap top and bottom.
+
+**This is where the embed arrives.** The band's edges — `headerBottom` and `footer.y` — don't depend on the chart, so read them first, solve the export aspect against that band (Step 3), *then* export the embed, import it, and unwrap it into the template clone with the `unwrap` helper from Step 5. Fitting comes after. That ordering is the whole reason the embed waited this long.
 
 **Measure that band; don't hardcode it.** The header's height depends on how many lines the title and subtitle take, so a fixed y is wrong as soon as the subtitle wraps — and centering inside a guessed band leaves a lopsided result (18px above, 6px below on the first run of this skill). Read the real edges instead:
 
@@ -421,7 +426,7 @@ The high-value edits to propose (include them in the Step 4 proposal):
   ```
 
   **Hiding a series beats deleting one when the labels won't fit** — it is reversible in a click and a reviewer can see what was taken out — but it still changes what the image shows relative to the interactive chart, so it stays a chart-author decision you surface rather than take. Say what it bought: five labels needing 100px of pitch across ~70px of line endpoints is a real collision, and dropping one is one of the two fixes (the other is accepting the drift).
-- **On a ranked bar chart, the same reclaim is available and it is pure profit — grapher sized the gutter for labels and values you have since replaced.** The label column is wide enough for the longest *un-shortened* entity name and the value column for the *unrounded* numbers, so the moment you shorten `United Kingdom → UK` and round `1.03% → 1%` (Step 6), that reserved space is dead. On a 14-row chart it was **36.8px, 7% of the plot**. The transform is closed-form, distorts nothing (every bar scales by one factor, so the value→length mapping stays linear through zero) and lands the group on the content box exactly:
+- **On a ranked bar chart, the same reclaim is available and it is pure profit — grapher sized the gutter for labels and values you have since replaced.** The label column is wide enough for the longest *un-shortened* entity name and the value column for the *unrounded* numbers, so the moment you shorten `United Kingdom → UK` and round `1.03% → 1%` (Step 6), that reserved space is dead. On a 14-row chart it was **36.8px, 7% of the plot**. The transform is closed-form, distorts nothing (every bar scales by one factor, so the value→length mapping stays linear through zero) and lands the group on the content box exactly. **It assumes every bar is nonnegative and grows rightward from a shared zero** — the usual shape of a ranked bar chart, and the only shape the loop below is correct for. With negative or diverging values it reverses them, in three places at once: it pins every bar's left edge to `newZero`, budgets the available width to the right of zero only, and puts every value label on the right. For those charts, keep each bar's sign — give each side of zero its own budget, and mirror `x`, width and label side per bar.
 
   ```js
   const newZero = LEFT + Math.max(...entityLabels.map(e => e.width)) + G;      // G = 6
@@ -657,7 +662,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Annotation knockouts cover only furniture | for each `annotation__*` frame, test its rect against every line's **sampled polyline** (not bboxes — see below) | gridlines, empty space or a muted context line — never a highlighted line, a dot, a value label or a bar segment carrying a number |
 | Label alignment | compare each label's center against its mark | bar values centered on bars, legend labels on swatches |
 | Box alignment | compare the chart's left/right against the header frame | identical to the subtitle box, to the pixel |
-| Gap | `(footer.y - headerBottom - chart.height) / 2` | **12–16px**, equal top and bottom |
+| Gap | `(footer.y - headerBottom - chart.height) / 2` | equal top and bottom, at the band figure of **the template you filled**: **12–16px** on the 540-wide frames, **30px** on the IG portrait (see Step 7) |
 
 **On a line chart the bbox overlap test is not conservative, it is useless — sample the polyline.** A diagonal line's bounding box is most of the plot, so a bbox test reports every annotation as covering every line: on this run it returned 5 collisions across 4 frames, all but one of them phantom, and it *buried the one real defect in the noise* (a portrait annotation genuinely clipping the projection line). Extract the path's points — the numbers in `vectorPaths[0].data` alternate x,y, so map them through the node's own bbox — then walk the segments and sample each at ~1px:
 
