@@ -1023,21 +1023,23 @@ COUNTRIES = [
       "women about the children they have had — is the safer choice. Nothing has been published since 2013: "
       "the war began in 2015, and the office's own websites have not survived it.",
       "https://web.archive.org/web/20220608201754/https://cso.gov.ye/about_cso"),
-    C("Angola", "INE — Inquérito de Indicadores Múltiplos e de Saúde", angola, "Angola", "survey", False,
-      "INE publishes a fertility rate for each survey round: 6.2 from the 2015-16 survey and 4.8 from the "
-      "2023-24 one, with the age-specific rates behind each. The 2014 census separately gave 5.7.",
-      "We read the national figure from each round. Summing the printed age-specific rates reproduces both "
-      "totals, at 6.215 and 4.78.",
-      "We use the two surveys rather than the census, because they measure the same way — from women\'s own "
-      "birth histories, with no correction applied — while the census figures are not one number. INE\'s own "
-      "population projection re-derived the 2014 baseline as 5.5 rather than the census\'s 5.7, using a "
-      "Gompertz model, because it found women had under-reported their total children and over-reported "
-      "births in the last twelve months. The census also sits oddly against the survey: 5.7 in 2014 against "
-      "6.2 measured two years later. Angolan civil registration cannot be used at all — the 2023-24 survey "
-      "found only 38% of children under five registered, and only 36% of those holding a certificate. No "
-      "Angolan source publishes the number of births by the mother's age, only rates, so there is nothing to "
-      "recalculate from. The 2024 census has published definitive results with no fertility indicator at "
-      "all, so a later thematic volume is worth watching for.",
+    C("Angola", "INE — Multiple Indicator and Health Survey", angola, "Angola", "survey", False,
+      "Angola's national statistics office, INE, publishes a fertility rate for each round of its Multiple "
+      "Indicator and Health Survey: 6.2 from the 2015-16 round and 4.8 from the 2023-24 one, with the rates "
+      "by age group behind each. The 2014 census separately gave 5.7.",
+      "We use the national figure each round published; adding up its printed rates by age group gives the "
+      "same totals back, 6.215 and 4.78.",
+      "We use the two surveys rather than the census, because they measure the same way: from the birth "
+      "histories women give, with no correction applied. INE's own population projection re-derived the 2014 "
+      "census figure as 5.5 rather than 5.7, using a standard statistical correction, because it found women "
+      "had under-reported the children they had ever had and over-reported births in the last twelve "
+      "months. The census and the survey also disagree by more than the time between them explains: 5.7 for "
+      "2014 against 6.2 from a survey whose own three-year window reaches back to about 2013. Angolan civil "
+      "registration cannot be used at all — the 2023-24 survey found only 38% of children under five "
+      "registered, and only 36% holding a birth certificate. We could not check these rates against actual "
+      "birth counts, because we found no Angolan source that publishes births by the mother's age rather "
+      "than rates. The 2024 census has published definitive results with no fertility figure at all; a later "
+      "volume from it may add one.",
       "https://www.ine.gov.ao/publicacoes/Todas?titulo2=IIMS"),
     C("Argentina", "Health ministry births over INDEC population", argentina_tfr, "Argentina",
       "complete", True,

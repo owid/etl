@@ -786,3 +786,30 @@ Donetsk and Luhansk, and from 2015 the footnote drops "part" and excludes the wh
   a rate. Now said, which is both more accurate and more useful.
 - **Accepted.** Держстат given its English name on first use, "held out to 2021" replaced, and the
   dangling modifier in the arithmetic sentence fixed.
+
+## Angola
+
+Verdict: minor problems. Both plotted values verified against the survey reports, our arithmetic
+reproduced exactly, and the strongest claim on the page — that the office re-derived the census figure
+downward because women had under-reported lifetime children and over-reported recent births —
+confirmed almost word for word in its own projections report.
+
+- **Accepted, and it said the opposite of the source.** We wrote "only 38% of children under five
+  registered, and only 36% of those holding a certificate", which reads as a nested figure and implies
+  most registered children have no paperwork. The survey's own numbers are two independent shares of
+  all children: 38% registered, 36% holding a certificate. So nearly every registered child does have
+  one, and registration itself is the bottleneck. Corrected.
+- **Accepted.** "5.7 in 2014 against 6.2 measured two years later" oversells how much of that gap is
+  elapsed time: the survey figure is a three-year rate whose window reaches back to about 2013 and
+  overlaps the census date. Reworded to say the two disagree by more than the interval explains, which
+  is the actual finding.
+- **Accepted.** Three sentences were written for whoever maintains the page rather than for a reader —
+  the transcription check, "so there is nothing to recalculate from", and "a later thematic volume is
+  worth watching for". All turned outward.
+- **Accepted, softened.** "No Angolan source publishes the number of births by the mother's age" is now
+  "we found no Angolan source that publishes" it. The agent checked the four most likely documents and
+  found none, but could not rule out a yearbook or a justice-ministry registry bulletin — and this is
+  the claim shape that has already been wrong three times here.
+- **Accepted.** INE spelled out, the survey's name translated, the Gompertz model described rather than
+  named, and "the census figures are not one number" — which the agent could not make sense of even
+  after reading the census — removed.
