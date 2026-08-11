@@ -2227,3 +2227,22 @@ campaign runs on is the simpler one: if it cannot be pointed at, it does not go 
 What replaced it comes from the file we parse and can be checked in one line: of the 76,067 children born
 in Austria in 2025, 18,759 were to mothers who are not Austrian citizens, just under a quarter. Same
 subject, verifiable, and it no longer states a rate we cannot source.
+
+## Portugal, revisited: the indicator had not stopped, it had been renumbered
+
+Earlier today Portugal's entry lost its 2024 and 2025 figures. The reasoning was that INE's fertility
+indicator ended at 2023 — asking it for 2024 returns "Codigo(s) em Dim1 nao valido(s)" — so the two
+figures the prose quoted could not be traced to a vintage and were cut rather than published unsourced.
+
+The indicator had not ended. It had been reissued under a new number, and the retired one stays queryable
+while quietly stopping at an older year, so the error message reads like the year not existing rather than
+like the series having moved. The current one is 0001293. It runs from 1971, reaches 2025, and covers the
+whole span in one code instead of the two we were splicing.
+
+So Portugal goes from 11 plotted years to 26, 2000 to 2025, and its latest figures are back and sourced:
+1.27 for 2024, 1.30 for 2025, with 2023 unchanged at 1.32, which is what the previous vintage gave.
+
+Worth keeping as a lesson distinct from the absence claims. Nothing here was a false claim about the
+world: INE really does return an error for 2024 on the code we were reading. The mistake was reading an
+interface's error as a fact about the data. "The office has not published it" and "the address we know
+does not serve it" are different sentences, and only the second one was ever established.

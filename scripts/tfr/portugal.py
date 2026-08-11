@@ -25,7 +25,10 @@ API = "https://www.ine.pt/ine/json_indicador/pindica.jsp"
 # each vintage of an indicator covers only part of the span, so they are read in turn
 BIRTHS = {"0008092": range(2012, 2024), "0012441": range(2023, 2026)}
 POPULATION = {"0008273": range(2011, 2024), "0012918": range(2023, 2026)}
-RATE = {"0008274": range(2013, 2026)}
+# The current vintage of the rate, which runs from 1971 and reaches 2025. The one it replaced, 0008274,
+# stopped at 2023 and answered a request for 2024 with "Codigo(s) em Dim1 nao valido(s)", which read as
+# the data not existing yet rather than as the indicator having been reissued under a new number.
+RATE = {"0001293": range(2000, 2026)}
 BANDS = [(15, 19), (20, 24), (25, 29), (30, 34), (35, 39), (40, 44), (45, 49)]
 FEMALE = "2"
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"

@@ -2054,18 +2054,21 @@ COUNTRIES = [
       "of the gap but not all of it, so INE must be working from a slightly different population count "
       "than the one it publishes by age group. Its own rates by age group add up to its published total "
       "exactly, so the difference sits between its figures and ours rather than inside its own.",
-      "Portugal fell to 1.21 in 2013, recovered to 1.43 by 2019, and has fallen back since. The thing to "
-      "know about the recent years is that INE cut them sharply in June 2026, when it revised its "
-      "estimates of how many people live in the country. The rate for 2023 went from 1.44 to the 1.32 "
-      "plotted here, a fall of about 8% with no change at all in the number of births. That revision is "
-      "also most of why the distance from the UN's figure widens from 2021 on: INE now counts about 10% "
-      "more women aged 15 to 49 than the UN does, while the two count almost the same number of births. "
-      "Recent years may move again the next time those estimates are revised. INE also reissues each "
-      "indicator under a new number whenever it redraws Portugal's statistical regions, and each edition "
-      "carries only the last few years, so a long series has to be pieced together from two or three of "
-      "them; they agree exactly where they overlap. INE publishes births by the mother's nationality too, "
-      "which matters given how much immigration there has been since 2018, but we have not used it.",
-      "https://www.ine.pt/"),
+      "Portugal fell to 1.21 in 2013, recovered to 1.43 by 2019, and has fallen back to 1.27 in 2024, with "
+      "1.30 in 2025. The thing to know about the recent years is that INE cut them sharply in June 2026, "
+      "when it revised its estimates of how many people live in the country. The rate for 2023 went from "
+      "1.44 to the 1.32 plotted here, a fall of about 8% with no change at all in the number of births. "
+      "That revision is also most of why the distance from the UN's figure widens from 2021 on: INE now "
+      "counts about 10% more women aged 15 to 49 than the UN does, while the two count almost the same "
+      "number of births. Recent years may move again the next time those estimates are revised. One "
+      "practical thing about INE's database: it reissues an indicator under a new number when it redraws "
+      "Portugal's statistical regions, and the retired one stays queryable while quietly stopping at an "
+      "older year. Asking the version we used to read for 2024 returned not an empty answer but an "
+      "invalid-code error, which reads like the year not existing yet rather than like the series having "
+      "moved. INE publishes births by the mother's nationality too, which matters given how much "
+      "immigration there has been since 2018, but we have not used it.",
+      "https://www.ine.pt/xportal/xmain?xpid=INE&xpgid=ine_indicadores&indOcorrCod=0001293&contexto=bd"
+      "&selTab=tab2"),
     C("Israel", "CBS — registered births by the mother's age, over the mean female population", israel,
       "Israel", "complete",
       False,
