@@ -414,18 +414,25 @@ The high-value edits to propose (include them in the Step 4 proposal):
 
   ```python
   s = img.width / frame_width                          # raster px per frame unit
+  assert s >= 1, "export at 1:1 or larger, or the leader's stroke is sub-pixel"
   nx, ny = -uy, ux                                     # unit normal to the leader
-  off = s / 2 + 2                                      # half the leader's stroke, plus clearance
+  off = 2.5 * s                                        # clearance scales with the stroke it clears
 
-  def is_canvas(x, y):                                 # x, y already in raster px
+  def is_canvas(x, y):                                 # x, y in raster px
       xi, yi = round(x), round(y)
-      return 0 <= xi < img.width and 0 <= yi < img.height and px[xi, yi] == CANVAS
+      if not (0 <= xi < img.width and 0 <= yi < img.height):
+          return False
+      return all(abs(a - b) <= 8 for a, b in zip(px[xi, yi], CANVAS))   # tolerance, not equality
 
   ocean = sum(is_canvas(x + nx * off, y + ny * off) or is_canvas(x - nx * off, y - ny * off)
               for x, y in samples_along(sx * s, sy * s, tx * s, ty * s))
   ```
 
-  Convert the endpoints once, then stay in raster pixels — including the perpendicular offset, which is what clears the stroke and so has to grow with the stroke. Step `samples_along` one raster pixel at a time rather than one frame unit, or on a 4× raster you read every fourth pixel and can miss a thin feature. And sanity-check the scale before trusting any of it: one known-ocean point and one known-land point, asserted to come back canvas and non-canvas.
+  **Compare against the canvas colour with a tolerance, never `== CANVAS`.** This is the line that decides whether any of the rest works. The leader is antialiased, so the pixels beside it are blends of stroke and canvas, and exact equality reads them as "not canvas" — i.e. as land. Measured on a synthetic 4× render of a leader that is **71.4% over open canvas**: exact equality returns **41.5%**, a 30-point false *buried*. The same code with a tolerance of 8 per channel returns **71.6%**, and stays within a point of the truth at 1×, 2× and 4×. Tolerance also makes the result insensitive to the offset, which is what you want from a measurement.
+
+  **Scale the perpendicular offset with `s`; a fixed constant fails silently at high `s`.** The offset exists to clear the leader's own stroke, and the stroke's rendered footprint grows with the raster — at 4× a 1px stroke covers 4px plus its antialiasing fringe, so an offset of 4px is still inside the line and reports it buried. `2.5 * s` clears it at every scale tested. Stepping matters less but is free: step `samples_along` one *raster* pixel, since one frame unit on a 4× raster reads every fourth pixel.
+
+  **Guard the direction of `s`, because inverting it is the plausible silent error.** Writing `frame_width / img.width` gives `0.25` instead of `4`, which shrinks every sample into a corner of the raster that is usually empty canvas — so the leader reads as fully visible, the exact false clear this whole check exists to remove. `assert s >= 1` catches it outright for any real export. The known-ocean / known-land probe catches it too, and it is worth keeping because it also validates the orientation: under an inverted `s` the land probe comes back canvas and the assertion fails. Just don't rely on it alone — it only fires if the mis-mapped point isn't coincidentally dark, whereas the `s >= 1` guard cannot miss.
 
   Rule of thumb: **use boxes to decide where things may go, use pixels to judge how it reads.** And when the user says a line looks fine and your metric says it doesn't, believe the render — they are looking at ground truth and you are looking at a proxy.
 
