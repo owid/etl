@@ -293,7 +293,9 @@ chart.x = header.x
 chart.y = headerBottom + gap
 ```
 
-**Fit to the band's *height*, then map x to fill the width — not the other way round.** `rescale(header.width / chart.width)` is the obvious move and it is the wrong one on any chart with a reserved label margin: it locks the width, leaves the height wherever the export's aspect fell, and hands you a gap you cannot fix without re-exporting. Fitting the height instead makes the gap correct by construction *and* lets you choose the scale so the labels land exactly on the ladder (`rescale(14 / currentFontSize)` — see Step 8c), after which a scripted x-map takes the plot out to the content width without touching a single font size. On this run that one reordering removed the last re-export from four of five pages:
+**Fit to the band's *height*, then map x to fill the width — not the other way round.** `rescale(header.width / chart.width)` is the obvious move and it is the wrong one on any chart with a reserved label margin: it locks the width, leaves the height wherever the export's aspect fell, and hands you a gap you cannot fix without re-exporting. Fitting the height instead makes the gap correct by construction *and* lets you choose the scale so the labels land exactly on the ladder (`rescale(15 / currentFontSize)` — see Step 8c), after which a scripted x-map takes the plot out to the content width without touching a single font size.
+
+**Pick the ladder value nearest the export's own size — usually the one *above*, not below.** The ladder is there to remove arbitrary sizes, not to shrink the chart: an export whose labels come out at 15.4 or 15.75 wants **15**, and choosing 14 because it made some other number come out round costs a size step on the most-read text in the plot. Two frames here went to 14 that way and a reviewer asked for them back at 15, which is also what the finished pages use. Compare against the reference or the raw export before committing to a rung. On this run that one reordering removed the last re-export from four of five pages:
 
 ```js
 chart.rescale(TARGET_H / chart.height)      // TARGET_H = band − 2×14; sets every font size
@@ -312,6 +314,19 @@ const mapX = x => plotLeft + (x - L) * s
 Then place the y tick labels at `plotLeft − 6 − t.width` and re-anchor each x tick label on its own mark (Step 8). Verified this way, every tick delta on five charts came back exactly `0.000`, and the group's width came back exactly `508`.
 
 **How much gap is right: 14px, and 12–16 is the comfortable band.** That's what the finished pages and grapher itself converge on, measured in 540-wide frames — grapher's own square export leaves 13px above the plot and 14px below; recent DI pages in the file sit at 14/19, 15/14 and 7/15. Below ~10px it reads cramped and the legend starts to look like part of the subtitle; above ~20px you are wasting space the plot could use. When the chart comes out a few pixels too tall, spend the slack down to 12px a side **before** shrinking it — that is usually enough, and it keeps the full content width, which matters more than the last pixel of gap.
+
+**The 12–16 band assumes the chart group still contains its axis furniture — once you measure the group tightly, the same picture reports a much bigger gap.** Trimming the dangling reference lines and hugging the label boxes to the ink (Step 8) removes ~10–25px of invisible slack from the group's bounding box without moving a single pixel of ink, and the gap number jumps: **20px** on a 14-row bar chart, **30px** on a 4-row one, both of which look wrong against the band and are in fact correct. The tell is that the equivalent measurement on the reference page agrees (17/19 and ~32/33 there). So on an axis-less chart — a discrete bar chart with every value labelled — measure the gap on the reference too and match *that*, and record the figure with a note that the group is tightly measured. Do not shrink a correct chart to force a number.
+
+**A reference line wants a small overhang past the bars — bounded, and symmetric.** Grapher's plot area is taller than the bars it contains, so the inherited `vertical-zero-line` runs well past the last bar and reads as pointing at the footer; a reviewer described it as "going down and even overlapping the data source". But **trimming it flush to the bars is the other error** — the overhang is the design, and cutting it makes the baseline look clipped. Give it about **4px each way**, and let a guide line you add yourself lead in a little higher (~12px) so it reads as annotation rather than as part of the axis, ending level with the zero line:
+
+```js
+const top = bars[0].y, bot = bars.at(-1).y + bars.at(-1).height, OVER = 4, LEAD = 12;
+zero.resize(zero.width, (bot + OVER) - (top - OVER)); zero.y = top - OVER;
+guide.vectorPaths = [{ windingRule: "NONE", data: `M 0 0 L 0 ${(bot + OVER) - (top - LEAD)}` }];
+guide.y = top - LEAD;
+```
+
+Then state the clearance from the line's bottom to the source row in the report (16px here) — that is the number the complaint was really about, and it is not visible in a gap measurement taken on the chart group.
 
 **The 12–16 band is for the 540-wide frames. The Instagram portrait runs at 30.** It is 700px tall with the same 508px of content width, so a 14px gap there reads as a chart jammed against its own header; the finished portrait pages in the file sit at exactly 30px top and bottom. Take the band figure from the template you are filling, not from the last chart you made.
 
@@ -393,7 +408,21 @@ Make this a habit rather than a reaction to someone noticing: **after any scale,
 
 **Re-anchor to the marks, not to a remembered box width.** The snippet above is the fallback for when nothing addressable is nearby; wherever the export gives you the mark, drive off it, because then no amount of re-hugging or stretching can accumulate error. On an axis every anchor is already in the tree: the `tick-marks` group carries one zero-width vector per tick named after its value, and `horizontal-grid-lines` one per gridline, so tick labels align on their mark (grapher **left**-aligns the first and **right**-aligns the last to keep them inside the plot, everything between centered) and value labels right-align on the axis edge. Verified that way, all six tick deltas come back exactly 0 rather than approximately 0.
 
-**And expect a uniform vertical offset there, which is correct — do not zero it.** Grapher positions text by baseline, and digit-only labels have no descenders, so their visual center sits *below* the box center: every value label on an axis measures ~1.2px above its gridline, by construction. The check is that the offset is **uniform across the set**, not that it is zero — forcing box-center onto mark-center puts every number 1.2px low. A *varying* offset is the real defect, and that is what a re-hug introduces.
+**On an axis, expect a uniform ~1px vertical offset and leave it — but know the bound, because a *large* uniform offset is a real defect.** Grapher positions text by baseline, and digit-only labels have no descenders, so an axis label's visual center sits slightly below its box center: ~1.2px above its gridline, by construction. Uniform and small is fine; uniformity alone is not the test. Bar labels measured **5.46px** above their bars' centers on every row of a 14-row chart — perfectly uniform, and visibly high on the render, which is what a reviewer noticed first.
+
+**The fix, and the rule for anything labeling a mark rather than an axis: trim the box to the ink, then center on the mark.** `leadingTrim = "CAP_HEIGHT"` drops the line box's leading (a 14px label went from 18px tall to 10px — the 8px of leading was the whole error), after which box center *is* ink center and `label.y = markCenter − label.height/2` lands at exactly 0.00 on every row. Do it for the value labels **and** the entity labels, since both read against the same bar:
+
+```js
+for (const t of [...valueLabels, ...entityLabels]) t.leadingTrim = "CAP_HEIGHT";   // one call
+// ...next call, once the heights have settled:
+for (let i = 0; i < bars.length; i++) {
+  const mid = bars[i].y + bars[i].height / 2;
+  valueLabels[i].y = mid - valueLabels[i].height / 2;
+  entityBlocks[i].y = mid - entityBlocks[i].height / 2;    // a wrapped name is a GROUP — center the block
+}
+```
+
+Two consequences to expect. The trim is **height-only for a left- or right-aligned label**, so `x` needs no repair. And it shrinks the chart group, which changes the gap — see the band caveat in Step 7.
 
 ## Step 8 — Improve the labeling and annotate
 
@@ -411,6 +440,16 @@ The high-value edits to propose (include them in the Step 4 proposal):
 
   1. **Re-place each label against its line's endpoint, which the connectors encode.** Each connector's bounding box spans *line end → label center*, so the end **further** from the label's current center is the line end — that is your target, and it is the only place the endpoint is recoverable from, since a path's bbox won't tell you which corner the line arrives at. Then de-collide with a **minimum pitch of the font size × 1.33** (20px at 15px labels) by relaxing overlaps half-and-half until stable; that converges on minimum total drift, and it reproduced a designer's hand-placement of the same chart to within a pixel (worst label 8.9px off its line against their 9.5px).
   2. **Reclaim the freed right margin — and note that the *longest label* is what caps the reclaim, so shortening the longest labels is the lever, not deleting the elbows.** Grapher sizes the margin to fit its widest label, so on a chart where "United Kingdom" is present the label block cannot move right at all; shortening that one and "United States" to **UK** and **US** made "Switzerland" the constraint and bought 30px of plot. The arithmetic is exact: `LABEL_X = content_right − max(label widths)`, then `plot_right = LABEL_X − 5`, and the chart's own width comes out equal to the header's for free.
+
+  **Placing direct labels is a constrained search, not an offset — and "clear of its own line" is not the test.** Putting each label at a fixed offset from its anchor (say `startX + 5`, centered) reads fine in a node listing and lands labels **on top of other entities' lines**, which is the first thing a reviewer sees. Make it a search instead: per label, generate candidate slots and accept the first that passes every acceptance test, with the polyline test (Step 8c) doing the real work.
+
+  - **Candidates** — beside the anchor and on both sides of the line, at several vertical offsets: `left-of-anchor` (centered), `above`, `below`, each also at ±10 and ±22px. On a convergence chart the anchor is the line's *first* point (GUIDELINES.md → Line charts); otherwise its last, or a fraction along it.
+  - **Acceptance** — inside the plot; no overlap with any already-placed label (+2px); and **crosses no line's sampled polyline, its own included**.
+  - **Order** — leftmost/earliest anchor first, so the labels with the most empty space around them commit before the crowded ones.
+  - **Obstacles first.** An annotation's position is a design decision, so seed the placed-set with its box **before** placing any label. Skip that and a label lands under the knockout and is simply erased — which happened here, and is invisible in every measurement that doesn't test for it.
+  - **Report forced placements.** If no candidate passes, fall back to the first and say so; `forced: 0` is the line worth putting in the report.
+
+  Six candidates × five labels resolved two charts here with zero forced placements, including a pair whose lines start at the same year and needed one label pushed 22px down.
 
   **Apply the stretch as a scripted x-map, never as a group `resize()`.** Map `x → L + (x − L) · s` over the `tick-marks`, `horizontal-grid-lines` and `lines` subtrees, scaling each vector's width by `s`; **skip TEXT entirely** (re-anchor it afterwards) and map the *center* of the year markers while keeping their size, so dots stay round — verified 6×6 after a 1.17× stretch. A `resize()` on the group would rewrap every label through its constraints and oval every dot.
 
