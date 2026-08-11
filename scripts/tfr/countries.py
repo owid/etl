@@ -1840,22 +1840,26 @@ COUNTRIES = [
       "The office does not flag this on the fertility series itself, but publishes the tables that show "
       "it.",
       "https://csu.gov.cz/produkty/demograficka-prirucka-2024"),
-    C("Hungary", "KSH — registered births by the mother's age, over the mid-year female population",
-      hungary_tfr, "Hungary",
+    C("Hungary", "KSH — registered births by the mother's age, divided by the women of that age in the "
+      "middle of the year", hungary_tfr, "Hungary",
       "complete", False,
-      "The office publishes its rate for every year since 1900, the age-specific rates by five-year band "
-      "since 1980, and population by single year of age — all as small files at stable addresses.",
-      "We read the published series. Multiplying its own rates by the mid-year women gives 88,393 births "
-      "for 2022 against the 88,491 it reports, and a rate of 1.549 against its 1.55.",
-      "Hungary is the clearest case of a rise reversing. Its rate went from 1.23 in 2011 to a peak of "
-      "1.61 in 2021 under an explicit pro-natalist policy, then fell every year after: 1.55, 1.51, 1.39, "
-      "and 1.31 for 2025 — below where it stood in 2013. Births are down from 93,039 in 2021 to 72,017 in "
-      "2025. Raw births by age of mother are not published anywhere free, so the rate cannot be rebuilt "
-      "from counts; the office's legacy database, which might hold them, refuses every request. Two "
-      "things to note. The population series was revised back to 2013 on the basis of the 2022 census, "
-      "and the office does not publish a before-and-after comparison, so the size of that revision is not "
-      "visible. And its own pages need a browser-shaped request: a plain one gets a rejection page under "
-      "an HTTP 200.",
+      "Hungary's statistical office, KSH, publishes its rate for every year since 1900, the rates by "
+      "five-year age group since 1980, and population by single year of age — all as small files at fixed "
+      "addresses. It does not put the underlying counts of births by the mother's age on those pages, but "
+      "they are public: Eurostat republishes the counts Hungary reports to it, by the mother's single year "
+      "of age.",
+      "We plot the office's own rate. Multiplying its rates by the mid-year women gives 88,393 births for "
+      "2022 against the 88,491 it reports, and a rate of 1.549 against its 1.55.",
+      "Hungary's rate rose and then gave the rise back. It went from 1.23 in 2011 to a peak of 1.61 in "
+      "2021, under government policies designed to raise the birth rate, then fell every year after: 1.55 "
+      "in 2022, 1.51 in 2023, 1.39 in 2024 and 1.31 in 2025, below where it stood in 2013. Births are down "
+      "from 93,039 in 2021 to 72,017 in 2025. Two things to note. The 1.31 for 2025 is the office's "
+      "preliminary year-end estimate, published in January 2026, and has not yet been through the revision "
+      "that settles a year's figures. And the population series was revised back to 2013 on the basis of "
+      "the 2022 census, which found nearly 80,000 fewer people than had been estimated. We could not find "
+      "a before-and-after comparison for the fertility series itself, so the size of the effect on these "
+      "rates is hard to see — though it is visible indirectly, because Eurostat still carries Hungary's "
+      "pre-revision figures and they run up to 0.07 higher than the office's own from 2013 on.",
       "https://www.ksh.hu/stadat_files/nep/hu/nep0006.csv"),
     C("Cuba", "ONEI — registered births by the mother's age, over the mean female population", cuba,
       "Cuba", "complete", False,

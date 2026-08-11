@@ -2107,3 +2107,35 @@ against three separate press releases and confirmed the July-timing claim almost
   were cut: there I established that the publications we cite carry no such table, so the claim had no
   home. Here the agent simply could not reach the page, and nothing contradicts the figures. Someone
   should attach a citable table to them.
+
+## Hungary
+
+Verdict: minor problems, and the hundredth country. The agent could not reach ksh.hu at all — it tried
+curl, a translate proxy and a text-extraction proxy — so it cross-checked the whole 2000-2025 series
+against Eurostat's own figures instead, and in doing so found something better than a corroboration.
+
+- **Accepted, the twenty-sixth false absence claim.** "Raw births by age of mother are not published
+  anywhere free, so the rate cannot be rebuilt from counts." Eurostat's live-births table gives exactly
+  that for Hungary, by the mother's single year of age, as counts, free. I queried it rather than taking
+  the report's word: 46 age categories from 10-14 through 50-and-over, unit "Number". These are the counts
+  Hungary itself reports to Eurostat, so they are its own registration data one step removed. The page now
+  says the office does not put them on its own pages and that Eurostat republishes them.
+- **Accepted.** Cut both sentences about our own scraping — the legacy database refusing every request, and
+  the pages needing "a browser-shaped request: a plain one gets a rejection page under an HTTP 200".
+- **Accepted.** 1.31 for 2025 is the office's preliminary year-end estimate from January 2026, which every
+  Hungarian report of it calls preliminary, and no settled figure has replaced it. The page presented it on
+  the same footing as the final years. Now disclosed, like five other countries' last points.
+- **Accepted, softened rather than cut.** "The office does not publish a before-and-after comparison, so
+  the size of that revision is not visible." The agent found a KSH revision document quantifying a census
+  shortfall of nearly 80,000 people, but could not open it to see whether it covers the population series
+  behind the fertility rate or only the labour force survey's weights. So the blanket claim goes, replaced
+  by what we can stand behind: we could not find a comparison for the fertility series, and the census
+  found nearly 80,000 fewer people than estimated.
+- **A finding hiding inside the agent's own cross-check.** Our figures match Eurostat exactly through 2012
+  and run 0.02 to 0.07 below it from 2013 on — which is precisely where the metadata says the population
+  series was revised. Eurostat has not folded that revision in; the office has, and we follow the office.
+  That is independent confirmation the revision is real and starts where we say, and it gives the reader a
+  way to see its size after all. It is now the last sentence of the entry.
+- **Accepted.** Paired each rate with its year, replaced "an explicit pro-natalist policy" with what it
+  means, expanded KSH, rewrote the source line's "over the mid-year female population", and cut "Hungary is
+  the clearest case of a rise reversing", a ranking across pages the reader has not seen.
