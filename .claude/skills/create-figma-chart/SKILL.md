@@ -737,14 +737,14 @@ Every one of these caught a real defect on this skill's first run, and none of t
 
 **For arrows, drop vectors entirely and probe the rendered pixels.** Arrow groups are rotated, so every vector-space measurement of theirs is wrong (see Gotchas), and "very close but never on top" is a pixel property anyway. Screenshot the frame at 1:1, take the arrow's **`absoluteBoundingBox`** in frame coordinates, and inside it measure how close the arrow's pixels come to the target line's.
 
-**Identify each shape's pixels by node identity, never by color.** Screenshot the frame three times at 1:1 — once whole, once with the arrow's `visible = false`, once with the target line's — and take each shape's pixel set from the difference against the whole render. A pixel belongs to the shape whose hiding changed it, which is true whatever either shape is colored:
+**Identify each shape's pixels by node identity, never by color.** A pixel belongs to the shape whose hiding changed it, which is true whatever either shape is colored. Screenshot the frame at 1:1 **four times** — whole, with the arrow's `visible = false`, with the target line's, and with **both** hidden — and diff each shape against the both-hidden render, from the pass where the *other* shape was already gone:
 
 ```python
 from math import hypot
 
 crop   = [(x, y) for y in range(y0, y1) for x in range(x0, x1)]   # arrow's absoluteBoundingBox, padded
-arrow  = [p for p in crop if full[p] != no_arrow[p]]              # visible=False on the arrow
-target = [p for p in crop if full[p] != no_target[p]]             # visible=False on the line it aims at
+arrow  = [p for p in crop if no_target[p] != no_both[p]]          # arrow alone vs neither
+target = [p for p in crop if no_arrow[p]  != no_both[p]]          # line alone vs neither
 
 assert arrow,  "no arrow pixels — wrong bbox, wrong frame, or the hide never applied"
 assert target, "no target pixels — pad the bbox, or this is not the node the arrow points at"
@@ -754,9 +754,11 @@ minGap   = min(d(a, b) for a in arrow for b in target)
 touching = sum(1 for a in arrow for b in target if d(a, b) <= 1.5)
 ```
 
+**Don't diff either mask against the whole render — that hides the overlap you are testing for.** Whichever node paints on top covers part of the other, and hiding the *covered* one changes nothing in those pixels, so a mask taken from `full` comes back with a hole exactly where the two shapes meet. An arrowhead sitting on the end of its line then measures its `minGap` to the nearest still-*exposed* line pixel and reports a comfortable 3–7px with `touching == 0` while the two are plainly overlapping — the one verdict this check exists to prevent. Diffing from the other-hidden pass costs one extra screenshot and is symmetric, so it holds whichever node is on top.
+
 Restore `visible = True` on both afterwards, and **guard the masks**: each difference must fall inside that shape's own `absoluteBoundingBox`. If it doesn't, hiding the node reflowed something else (a group's derived box, an auto-layout sibling) and the mask is measuring the reflow, not the shape.
 
-**Classifying pixels by color instead is the version to avoid — it produced two different false verdicts before it was replaced.** That first cut called the arrow "gray" (`abs(r−g) < 14 and 60 < r < 165`) and the line by its own hue, and both halves break on ordinary charts. A **gray target** — an arrow aimed at a muted context line — satisfies the arrow predicate, so every target pixel is filed as arrow ink and the check dies with an empty target set on a chart where nothing is wrong. And **gray furniture** in the padded crop — a gridline, a second context series, gray annotation text — is collected as arrow ink too, so the target line merely *crossing a gridline* reports `touching > 0` while the arrow itself is comfortably clear. Neither is fixable by narrowing the crop, since a crop cannot separate two shapes that answer the same predicate. Two extra screenshots cost less than one wrong verdict, and hardcoding the hue is worse again: the palette runs to 24 fills, so a fixed `TARGET` collects nothing on most charts and `min()` then dies on an empty sequence instead of reporting a clearance.
+**Classifying pixels by color instead is the version to avoid — it produced two different false verdicts before it was replaced.** That first cut called the arrow "gray" (`abs(r−g) < 14 and 60 < r < 165`) and the line by its own hue, and both halves break on ordinary charts. A **gray target** — an arrow aimed at a muted context line — satisfies the arrow predicate, so every target pixel is filed as arrow ink and the check dies with an empty target set on a chart where nothing is wrong. And **gray furniture** in the padded crop — a gridline, a second context series, gray annotation text — is collected as arrow ink too, so the target line merely *crossing a gridline* reports `touching > 0` while the arrow itself is comfortably clear. Neither is fixable by narrowing the crop, since a crop cannot separate two shapes that answer the same predicate. Three extra screenshots cost less than one wrong verdict, and hardcoding the hue is worse again: the palette runs to 24 fills, so a fixed `TARGET` collects nothing on most charts and `min()` then dies on an empty sequence instead of reporting a clearance.
 
 **Pass is `touching == 0` with `minGap` about 3–7px.** This is the only check that caught the real defects: it found the peak arrow overlapping the line by 11 pixel pairs where the vector math had reported a comfortable clearance, and it confirmed the fix at 3.0px with zero contacts. Report both numbers per arrow.
 
