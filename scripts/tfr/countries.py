@@ -74,6 +74,7 @@ from published import (  # noqa: E402
     haiti,
     honduras,
     indonesia,
+    iran,
     iraq,
     israel,
     jordan,
@@ -438,27 +439,28 @@ COUNTRIES = [
       "implies. Table 10 publishes rates on both a 15-44 and a 15-49 base; the 15-49 column is empty for "
       "most recent years, so the 15-44 one is used throughout.",
       "https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths"),
-    C("Germany", "Destatis — Geburtenstatistik over the average resident population", germany, "Germany",
+    C("Germany", "Destatis — birth statistics, over the average resident population", germany, "Germany",
       "complete", False,
-      "Destatis table 12612-0008 gives live births per 1,000 women for every single year of age 15-49, from "
-      "1972 to 2025. Table 12612-0005 gives the births themselves by age of mother and birth order, from "
-      "2009. Table 12411-10, in the annual population report, gives the average population over the year by "
-      "single year of age.",
-      "We summed the rates across ages. Because they are single-year rates there is no age-group width to "
-      "multiply by. The age-band comparison divides the births by the population from 12411-10, which is "
-      "the concept Destatis itself uses — the mean of the stocks at the start and end of the year.",
-      "Two traps we checked and got right. The population table has an all-residents column and a "
-      "German-nationals column; the nationals column is 20-30% smaller and using it would push the rate far "
-      "too high, so the all-residents column is the one that fits. And the births tables date a mother's age "
-      "by subtracting birth years rather than by exact age on a reference date, while the population tables "
-      "use exact age — mixing the two biases a recalculation by about 1%, which is why the line stays "
-      "Destatis's own summed rates. Rebased on the 2022 census from 2012 onward, so numbers differ slightly "
-      "from releases published before the rebasing — our 2023 comes out at 1.385 where the original release "
-      "said 1.35. The 2025 figure is provisional. The age-band comparison only starts in 2009, because that "
-      "is where the births table begins, and the average-population table ships one year per report edition. "
-      "Neither births file could be pulled through the GENESIS API — the access token we have authenticates "
-      "as the guest account, which cannot download tables — so both were exported by hand from the web "
-      "interface; the population report, by contrast, downloads as a plain spreadsheet with no token at all.",
+      "Destatis publishes live births per 1,000 women for every single year of age 15 to 49, from 1972 to "
+      "2025 (table 12612-0008), the births themselves by age of mother and birth order from 2009 (table "
+      "12612-0005), and the average population over the year by single year of age, in its annual "
+      "population report (table 12411-10).",
+      "We added the rates across the ages. They are already per single year of age, so there is no "
+      "age-group width to multiply by. The age-band comparison divides the births by the population from "
+      "the third table, which is the population Destatis itself uses — the mean of the counts at the start "
+      "and the end of the year.",
+      "Two mistakes we checked for and avoided. The population table has one column for all residents and "
+      "another for German nationals only; the nationals column is far smaller, and using it would push the "
+      "rate much too high, so the all-residents column is the one that matches. And the births tables work "
+      "out a mother's age by subtracting birth years, while the population tables use her exact age on a "
+      "given date — mixing the two would shift the rate by about 1%, which is why the line stays Destatis's "
+      "own summed rates rather than our arithmetic. Destatis also publishes the rate separately by the "
+      "mother's citizenship, and the two are far apart, so the single national figure plotted here averages "
+      "over a wide gap. Recalculated from 2012 onward using population totals updated by the 2022 census, "
+      "so the numbers differ slightly from releases published before that update — our 2023 comes out at "
+      "1.385 where the original release said 1.35. The 2025 figure is provisional. The age-band comparison "
+      "only starts in 2009, because that is where the births table begins, and Destatis publishes the "
+      "population report one year at a time.",
       "https://www-genesis.destatis.de/genesis/online"),
     C("Thailand", "NSO — Statistical Yearbook tables 1.10 and 1.4", thailand, "Thailand", "complete", True,
       "The Statistical Yearbook has table 1.10, registered live births by age group of mother, and table "
@@ -486,21 +488,25 @@ COUNTRIES = [
       "from the data file behind INSEE\'s own interactive population pyramid, which answers plain requests but "
       "is not a published interface, so the path could change.",
       "https://www.insee.fr/fr/statistiques/8999017"),
-    C("Japan", "MHLW — Vital Statistics via e-Stat", japan, "Japan", "complete", False,
-      "e-Stat table 0003411608 gives the total fertility rate and each age group's contribution to it; "
-      "table 0003411607 gives births by the same age groups. The Statistics Bureau separately publishes "
-      "population by single year of age and sex every October, as a spreadsheet download.",
-      "We took MHLW's published total fertility rate directly. For the age-band comparison we divided "
-      "MHLW's births by the Statistics Bureau's female population, which is where MHLW says its own "
-      "denominator comes from. That gives 1.145 for 2024 against the published 1.15.",
-      "Five-yearly before 2000 and annual after, so the early part of the line is coarse. e-Stat "
-      "publishes each band as its contribution to the total rather than as a rate per 1,000 women — the "
-      "seven bands sum exactly to the published total, so do not multiply those by five. MHLW's rate "
-      "counts Japanese women only, not all residents, and the population file gives both columns; using "
-      "the wrong one inflates the denominator by the foreign resident population. Births are published "
-      "only in five-year bands, so a full recalculation would still approximate. The e-Stat API needs a "
-      "key, but registration is email-only and the spreadsheets download without one.",
-      "https://www.e-stat.go.jp/"),
+    C("Japan", "Ministry of Health, Labour and Welfare — vital statistics", japan, "Japan", "complete",
+      False,
+      "Japan's Ministry of Health, Labour and Welfare publishes the total fertility rate and each age "
+      "group's share of it, and the births by the same age groups, through e-Stat, the government's "
+      "statistics portal (tables 0003411608 and 0003411607). The Statistics Bureau separately publishes "
+      "population by single year of age and sex every October.",
+      "We took the ministry's published total fertility rate directly. For the age-band comparison we "
+      "divided its births by the Statistics Bureau's female population, which is where the ministry says "
+      "its own denominator comes from. That gives 1.145 for 2024 against the published 1.15.",
+      "The rate is five-yearly before 2000 and annual after, so the earlier points are less precise. "
+      "e-Stat gives each age group as its share of the total rather than as a rate per 1,000 women, so the "
+      "seven shares add to the published total directly. The ministry's rate counts Japanese women only, "
+      "not all residents, and the population file offers both columns — picking the wrong one adds the "
+      "foreign resident population to the denominator and pulls the rate down. Even with the right column "
+      "the match is not exact: a child born to a foreign mother and a Japanese father counts among the "
+      "births but the mother never appears in a Japanese-only population, so a small mismatch survives. "
+      "Births are published in five-year age groups for most of the series, which is why we do not rebuild "
+      "the rate ourselves; a single-year table exists from 2015 but covers only births within marriage.",
+      "https://www.e-stat.go.jp/dbview?sid=0003411608"),
     C("Italy", "ISTAT — ANPR / stato civile", italy, "Italy", "complete", False,
       "ISTAT's SDMX service publishes age-specific fertility rates by single year of age of mother, from "
       "2000 onward.",
@@ -748,38 +754,47 @@ COUNTRIES = [
       "projections from the 2006 census, and they do not match the number of women the survey itself "
       "counted, about 11% apart, so there is nothing solid to check the rate against.",
       "https://nationalpopulation.gov.ng/publications"),
-    C("Iran", "Statistical Center of Iran and the civil registration organization — nothing we could reach",
-      None, "Iran", "none", False,
-      "Nothing we could get to. We found one real table — registered births by age of mother for the whole "
-      "country in 1386, which is 2007-08 — but only through a web archive, and no female population by age "
-      "to divide it by. No total fertility rate was found anywhere, live or archived.",
-      "Nothing. Iran is on this list rather than filled in from an international compilation, which is the "
-      "point of the exercise.",
-      "The three hosts fail in three different ways, and the difference matters for anyone trying again. "
-      "The statistics center at amar.org.ir accepts a connection and then drops it before sending anything "
-      "back, identically across every TLS version, cipher setting and browser header we tried — that is a "
-      "perimeter device refusing foreign traffic, not a certificate problem. Its other domain, sci.org.ir, "
-      "answers normally but serves a maintenance notice, so it is worth retrying later. The civil "
-      "registration organization at sabteahval.ir answers too, but with a bot challenge that wants device "
-      "motion data; a real browser might well get through where a script cannot. Do not use nocr.ir — it "
-      "is no longer the registration organization's domain and now redirects to a domain reseller.",
+    C("Iran", "Statistical Center of Iran — trend of fertility, 1396 to 1400", iran, "Iran",
+      "incomplete", False,
+      "The Statistical Center of Iran published a fertility report in 2022 covering the Iranian years 1396 "
+      "to 1400, which are 2017-18 to 2021-22. Its table 3 gives a total fertility rate for each year on "
+      "four different bases; we plot the one computed for the whole population, Iranian and non-Iranian "
+      "residents together, which is the population the UN's figure also covers.",
+      "We read that column: 2.07, 1.97, 1.77, 1.71 and 1.74. The office computed it itself, by adding up "
+      "birth rates for each age group, so the figure is its own rather than ours.",
+      "The office builds this from civil registration but says plainly that registration coverage is "
+      "incomplete, and that births to non-Iranian residents were badly under-recorded in the earlier years "
+      "— which is why it patches in the health ministry's birth records for them, and why its "
+      "Iranian-nationals-only series runs lower from 1397 on: 2.09, 1.95, 1.74, 1.65, 1.65. Nothing more "
+      "recent than 1400 was found. Getting even this much took a web archive, because none of the three "
+      "government hosts can be reached from outside the country, and each fails differently. The statistics "
+      "center at amar.org.ir accepts a connection and then drops it without answering, the same way "
+      "whatever browser settings are used — which looks like something at the edge of the network refusing "
+      "foreign traffic rather than a problem with the site. Its other address, sci.org.ir, answers but "
+      "serves a maintenance notice, so it is worth retrying later. The civil registration organization at "
+      "sabteahval.ir answers with a security check that asks for phone-motion data a script cannot "
+      "provide, so a person browsing normally might get through where we could not. Do not use nocr.ir: it "
+      "is no longer that organization's address and now points at a domain reseller.",
       "https://www.amar.org.ir/"),
     C("Turkey", "TurkStat — birth statistics over the address-based population register", turkey_tfr,
       "Turkey", "complete", False,
-      "TurkStat's annual birth statistics bulletin publishes age-specific fertility rates and births by "
-      "mother's age group, both from 2001. An older population portal gives female population by five-year "
-      "age group from the address-based population register, back to 1935.",
-      "We summed the age-specific rates and multiplied by five, the width of each age group, giving 1.484 for 2024 against the "
-      "1.48 TurkStat states. We also checked it from the counts: dividing the registered births by the "
-      "register's female population gives 1.4832, which agrees with TurkStat's own arithmetic to four "
-      "decimal places. The age-band comparison uses those counts.",
-      "The two bulletin tables cannot be fetched by a script. TurkStat's current portal is a JavaScript "
-      "application whose download links are single-use tokens, so they were downloaded by hand; the "
-      "population portal, by contrast, answers a form-encoded POST, though a JSON body gets a 404. TurkStat "
-      "splits the teens into 15-17 and 18-19, which we fold together. It also revises birth figures for up "
-      "to five years after first release — rows carry an (r) marker — so editions disagree with each other, "
-      "and the population figures before 2007 come from censuses rather than the register, a break inside "
-      "one table. The population series is complete from 2007, so the age-band comparison cannot go earlier.",
+      "TurkStat's annual birth statistics bulletin publishes a birth rate for each age group of mother, and "
+      "the births themselves, both from 2001. An older population portal gives female population by "
+      "five-year age group back to 1935 — from censuses until 2006, and from the address-based population "
+      "register from 2007, when that register began.",
+      "We added the rate for each age group and multiplied by five, the width of each group, giving 1.484 "
+      "for 2024 against the 1.48 TurkStat states. For that one year we also checked it from the counts: "
+      "dividing the registered births by the register's female population gives 1.4832, which rounds to the "
+      "same 1.48. The rest of the line is TurkStat's own figure, not ours, which is why this counts as "
+      "copied rather than validated. The age-band comparison uses those counts.",
+      "The two bulletin tables cannot be fetched automatically — TurkStat's current portal is a JavaScript "
+      "application whose download links work only once, so they were downloaded by hand. The older "
+      "population portal can still be queried automatically. TurkStat splits the teens into 15-17 and 18-19, "
+      "which we combine into one 15-19 group. It also revises birth figures for up to five years after "
+      "first publishing them, marking each revised row with an 'r', so different editions of the same "
+      "bulletin disagree with each other. And because the population figures switch from censuses to the "
+      "register in 2007, the same table mixes two kinds of data — the age-band comparison therefore cannot "
+      "start earlier than 2007.",
       "https://data.tuik.gov.tr/Bulten/Index?p=Dogum-Istatistikleri-2024-54196"),
     C("Ethiopia", "Ethiopian Statistical Service — Demographic and Health Survey", ethiopia, "Ethiopia",
       "survey", False,
@@ -810,16 +825,17 @@ COUNTRIES = [
       "fertility, and INS explains why by publishing coverage instead: 55% of under-fives registered in 2006, "
       "65% in 2011-12, 72% in 2016.",
       "https://www.ins.ci/"),
-    C("Democratic Republic of Congo", "INS — Enquête Démographique et de Santé", drc,
-      "Democratic Republic of Congo", "survey", False,
-      "The Institut National de la Statistique publishes a fertility index for each survey round. The "
+    C("Democratic Republic of Congo", "National Institute of Statistics — Demographic and Health Survey",
+      drc, "Democratic Republic of Congo", "survey", False,
+      "The National Institute of Statistics publishes a fertility rate for each survey round. The "
       "2023-24 report gives 5.5 and states the previous round measured 6.6.",
-      "We took both figures as stated. Summing the age-specific rates in table 5.1 and multiplying by the "
-      "band width gives 5.47, which is the published 5.5.",
+      "We took both figures as stated. Adding up the report's birth rate for each five-year age group and "
+      "multiplying by five, the width of each group, gives 5.47 against the published 5.5.",
       "There has been no census since 1984 and no civil registration good enough to use, so every "
-      "national fertility figure comes from one of the three surveys. The report's age structure is the "
-      "surveyed sample, not a population count, so there is nothing to recalculate from. The institute's "
-      "ins-rdc.org domain returns a block; the working site is ins.gouv.cd.",
+      "national fertility figure comes from one of the three surveys. The age breakdown in the report "
+      "comes from the women surveyed rather than a count of the whole population, so there is no "
+      "independent set of numbers to check the rate against. The institute's ins-rdc.org address is "
+      "unreachable; the working one is ins.gouv.cd.",
       "https://ins.gouv.cd/publication/RDC-EDS-III.pdf"),
     C("Syria", "Central Bureau of Statistics — family health surveys", syria, "Syria", "survey", False,
       "The bureau's statistical abstract carries one fertility table, giving age-specific rates for its 2001 "

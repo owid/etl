@@ -868,6 +868,19 @@ def azerbaijan():
     return _series(list(zip(range(2000, 2000 + len(values)), values)))
 
 
+def iran():
+    """Statistical Center of Iran, "Trend of fertility in Iran, 1396 to 1400", table 3.
+
+    The last column, computed for the whole population — Iranian and non-Iranian residents together —
+    which is the population the UN's figure also covers. The office publishes a separate series for
+    Iranian nationals only: 2.09, 1.95, 1.74, 1.65, 1.65 for the same years.
+
+    Iranian years are placed at the Gregorian year that holds most of them, so 1396 becomes 2017. The
+    report is only reachable through a web archive; the office's own host refuses foreign connections.
+    """
+    return _series([(2017, 2.07), (2018, 1.97), (2019, 1.77), (2020, 1.71), (2021, 1.74)])
+
+
 def cuba():
     """ONEI's own rate, from table 2.4 of the demographic yearbook."""
     values = [1.72, 1.63, 1.61, 1.65, 1.57, 1.52, 1.47, 1.52, 1.54, 1.29]
