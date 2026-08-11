@@ -1523,13 +1523,18 @@ COUNTRIES = [
       "one in the past, in a report covering 1960 to 2010.",
       "We divided births by the women in each five-year age group and added up the results. For 2024 that "
       "gives 1.3757.",
-      "This series should be treated with more caution than most here. It rises from 1.36 in 2012 to 1.86 "
-      "by 2019 and falls back to 1.38 by 2024 — but both Eurostat and the UN put Romania's rise smaller and "
-      "later, peaking around 2021 rather than 2019, and their figures sit up to 0.15 away from ours at both "
-      "ends of the line and up to 0.09 the other way in the middle years. The middle of the range, 2014 to "
-      "2017 and 2022, agrees closely. We have not established what accounts for the rest, and the shape of "
-      "the disagreement — one way at the ends, the other way in between — looks more like the population we "
-      "divide by shifting under the series than like a real pattern in births. Romania keeps two population "
+      "This series should be treated with more caution than most here, and it now starts at 2013 rather "
+      "than 2012. The table's first year is short: it records 179,962 births for 2012 against 187,882 for "
+      "2013 and about 200,000 from 2014, which would mean births rose 17% in five years. They did not, and "
+      "Eurostat, working from the same registrations, puts 2012 above 2013 rather than below it. So the "
+      "first step of the line pointed the wrong way and that point is gone. From 2013 on we agree with "
+      "Eurostat closely — within 0.02 in nine of twelve years — with one stretch that does not: from 2018 "
+      "to 2021 our figures run 0.04 to 0.09 higher, peaking in 2019 where Eurostat peaks in 2021. Working "
+      "backwards from the rates, that gap implies the female population we divide by is about 5% smaller "
+      "than the one behind Eurostat's figure for those years, which points at the population estimates "
+      "rather than at the births. Romania's were revised after the 2021 census, and the census found fewer "
+      "people than had been estimated. We have not established which vintage each side is using. Romania "
+      "keeps two population "
       "counts: the resident population, meaning everyone whose usual residence is in the country, and the "
       "population by domicile, meaning citizens registered as living there whether or not they still do. We "
       "use the resident one, which the institute says is the right choice for international comparison, and "
@@ -2075,7 +2080,8 @@ COUNTRIES = [
       "Israel's Central Bureau of Statistics publishes fertility rates by age and religion in its "
       "statistical abstract, along with births by single year of the mother's age. The table gives annual "
       "figures only for its most recent years and five-year averages before that, which is why the series "
-      "here is short: three points, for 2020, 2022 and 2023.",
+      "here is short. Its annual columns are 2023, 2022 and 2020: the table has no 2021, so neither does "
+      "this line.",
       "We read the published figures and checked that the bureau's own rates for each age group in 2023 "
       "add up to 2.847, against the 2.85 it prints. We also checked one age group against the underlying "
       "counts of births and women, and it matched to within 0.3%.",

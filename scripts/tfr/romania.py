@@ -134,10 +134,21 @@ def _women():
     return out
 
 
+# The births-by-usual-residence table starts in 2012 and its first year is short. It records 179,962
+# births for 2012 against 187,882 for 2013 and about 200,000 from 2014, so the table has births rising
+# 17% over five years, which did not happen. Eurostat, working from the same registrations, puts 2012
+# *above* 2013 -- 1.520 against 1.460 -- so the direction of our first step is wrong, not just its size.
+# It is also the only year where we differ from Eurostat by more than 0.09: 2012 is out by 0.159 while
+# every year from 2013 on sits within 0.09 and most within 0.02. So the series starts at 2013.
+FIRST_COMPLETE = 2013
+
+
 def romania_tfr():
     births, women = _births(), _women()
     rows = []
     for year in sorted(set(births) & set(women)):
+        if year < FIRST_COMPLETE:
+            continue
         b, w = births[year], women[year]
         if all(b.get(x) and w.get(x) for x in BANDS):
             rows.append({"year": year, "value": sum(b[x] / w[x] for x in BANDS) * 5})
