@@ -410,11 +410,22 @@ The high-value edits to propose (include them in the Step 4 proposal):
 
   **But measure it on pixels, not on boxes — this is where the bbox model flips from safe to wrong.** The same subpath-bbox model is *conservative* for placement (it over-states land, so it never puts a label on a country) and therefore *false-alarming* for visibility (it reports a line as buried when it is over open water). A diagonal country is the killer: Mexico's bbox swallows a wedge of open Pacific off its west coast, so a leader crossing that ocean scored **0% visible** when the render shows **45%**. Get ground truth by sampling the rendered PNG — `get_screenshot` the frame, then read pixels **perpendicular** to the line (±2–3px, so you don't sample the leader's own stroke) and count how many are the canvas colour:
 
+  **Scale the coordinates into the raster first — the screenshot is usually not 1:1.** `get_screenshot` honours `maxDimension`, and the size worth exporting is well above the frame's own units (2160 for a 540 frame is 4×), so leader endpoints and the perpendicular offset are in *frame* units while `px` is indexed in *raster* pixels. Feed one to the other unconverted and you sample somewhere else entirely — which is the same false verdict this check exists to remove, arriving by a different route. Derive the factor from the image rather than assuming the one you asked for, and round: Pillow truncates a float index silently, so a half-pixel offset lands a pixel short on one side and not the other.
+
   ```python
+  s = img.width / frame_width                          # raster px per frame unit
   nx, ny = -uy, ux                                     # unit normal to the leader
-  ocean = sum((px[x+nx*2.5, y+ny*2.5] == CANVAS) or (px[x-nx*2.5, y-ny*2.5] == CANVAS)
-              for x, y in samples_along(sx, sy, tx, ty))
+  off = s / 2 + 2                                      # half the leader's stroke, plus clearance
+
+  def is_canvas(x, y):                                 # x, y already in raster px
+      xi, yi = round(x), round(y)
+      return 0 <= xi < img.width and 0 <= yi < img.height and px[xi, yi] == CANVAS
+
+  ocean = sum(is_canvas(x + nx * off, y + ny * off) or is_canvas(x - nx * off, y - ny * off)
+              for x, y in samples_along(sx * s, sy * s, tx * s, ty * s))
   ```
+
+  Convert the endpoints once, then stay in raster pixels — including the perpendicular offset, which is what clears the stroke and so has to grow with the stroke. Step `samples_along` one raster pixel at a time rather than one frame unit, or on a 4× raster you read every fourth pixel and can miss a thin feature. And sanity-check the scale before trusting any of it: one known-ocean point and one known-land point, asserted to come back canvas and non-canvas.
 
   Rule of thumb: **use boxes to decide where things may go, use pixels to judge how it reads.** And when the user says a line looks fine and your metric says it doesn't, believe the render — they are looking at ground truth and you are looking at a proxy.
 
