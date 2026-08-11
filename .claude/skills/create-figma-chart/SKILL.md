@@ -620,7 +620,7 @@ The chart's text is not yours — you transcribed it from the indicator's metada
   | Title | the headline assertion — that the data shows this |
   | Subtitle | what is measured, in what units, over what population |
   | Note | the caveats, and that these are the ones the producer actually states |
-  | `Data for <YYYY>.` and any year caveat | that this is the year shown, for every entity |
+  | The year, wherever it is stated — in the title or as `Data for <YYYY>.` — and any year caveat | that this is the year shown, for every entity |
   | Annotations | each number, comparison and superlative — transcribed *or* derived |
   | Direct labels and value labels | that this number belongs to this mark |
   | **Legend and category labels** | that the category contains what the label says it does |
