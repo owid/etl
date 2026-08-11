@@ -81,8 +81,11 @@ def brief(country):
     if nso is None:
         out += ["NATIONAL SERIES PLOTTED: none — this country is on the not-plotted list.", ""]
     else:
-        out.append("NATIONAL SERIES PLOTTED (year, value), exactly as charted:")
-        out.append("  " + ", ".join(f"{int(y)}: {v:.4g}" for y, v in zip(nso.year, nso.value)))
+        # Printed at more precision than the chart shows. Four significant figures made agents read
+        # 1.25486 as "1.255" and report a rounding-boundary problem that does not exist.
+        out.append("NATIONAL SERIES PLOTTED (year, value). These are the underlying values, shown to more "
+                   "digits than the chart displays, so do not treat a trailing digit as a precision claim:")
+        out.append("  " + ", ".join(f"{int(y)}: {v:.6g}" for y, v in zip(nso.year, nso.value)))
         out.append("")
 
     wpp = _wpp(country)

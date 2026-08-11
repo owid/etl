@@ -1,14 +1,18 @@
 """Guatemala: registered births by age of mother over INE's population projections.
 
-INE publishes no fertility rate of its own from the registry — its bulletin headlines a crude birth
-rate and adolescent rates — but it does publish the raw birth records, one row per birth, with the
+INE publishes no annual fertility rate from the registry — its bulletin headlines a crude birth rate
+and rates for teenagers — but it does publish the raw birth records, one row per birth, with the
 mother's age and the year the birth happened. So the rate is built from scratch here.
 
-Births are dated to the year they occurred, with a six-month window for late registration, which INE
-says it uses to follow international recommendations. About 12% of each year's records are flagged as
-late registrations, and the share is stable between years.
+Two of INE's own figures corroborate the result: its 2018 census estimate of 2.7 for 2018-19 against
+our 2.6, and about 2.2 for 2022 from its maternal and child health survey against our 2.23.
 
-The office's own website is behind a bot wall, but its open-data portal is not.
+Births are dated to the year they occurred, with a six-month window for late registration. That window
+is not always enough. The 2024 file holds 297,408 births to women 15-49, 12.7% fewer than 2023, after
+four years that moved by about a percent either way — and reporting on the 2025 figures shows part of
+that drop reversing. A one-year discontinuity that large, followed by a rebound, is what an
+under-registered year looks like rather than a fall in fertility, so the series stops at the last year
+whose file looks settled. Advance LAST_COMPLETE when a later file stops growing.
 """
 
 import os
@@ -18,6 +22,8 @@ import subprocess
 import pandas as pd
 
 DATA = os.path.join(os.path.dirname(__file__), "data", "gt")
+# the newest year whose birth file looks settled rather than still filling in; see the note above
+LAST_COMPLETE = 2023
 PORTAL = "https://datos.ine.gob.gt/dataset/96888fc0-5ced-4a58-bfd0-2a6a292e3208/resource"
 BIRTHS = {
     2018: f"{PORTAL}/41b95ebc-35c6-43d3-86db-4b85998cda04/download/nacimientos-2018.xlsx",
@@ -108,6 +114,8 @@ def guatemala_tfr():
     births, women = _births(), _women()
     rows = []
     for year in sorted(set(births) & set(women)):
+        if year > LAST_COMPLETE:
+            continue
         b, w = births[year], women[year]
         if all(b.get(x) and w.get(x) for x in BANDS):
             rows.append({"year": year, "value": sum(b[x] / w[x] for x in BANDS) * 5})

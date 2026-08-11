@@ -1263,21 +1263,24 @@ COUNTRIES = [
       "separately.",
       "https://www.moi.gov.tw/cl.aspx?n=4404"),
     C("Senegal", "ANSD — continuous Demographic and Health Survey", senegal, "Senegal", "survey", False,
-      "ANSD runs its health and demographic survey every year, and the 2023 census report prints the whole "
-      "series from 1978 in one trend table. The census publishes its own figure separately, along with the "
-      "births and women behind it.",
-      "We read the survey series. We also divided the 2023 census's own counts — 487,108 births to women "
-      "15-49 over 4,499,636 women — and got 3.69, which is the raw figure ANSD itself prints.",
-      "The census is the clearest worked example of an adjustment we have found. ANSD ran three methods on "
-      "the same data, published all three, and said which it chose and why: the P/F ratio gave 4.54, a "
-      "Gompertz model 4.35, and Arriaga 4.41. It picked Arriaga because that method allows fertility to "
-      "have changed between two censuses rather than assuming it constant, and noted that 4.4 sits close to "
-      "the survey's 4.0 for the same year. So the published census figure is 4.4 against a counted 3.7. "
-      "Its own 2013 census ran the same check and found almost no correction was needed, which is worth "
-      "knowing before assuming these adjustments are routine. ANSD's projections document states 4.2 for "
-      "2023 rather than 4.4, and we cannot tell which is the slip. Civil registration is not used for any "
-      "of this: two thirds of people hold a birth certificate, and ANSD says outright that the registration "
-      "system needs strengthening.",
+      "Senegal's national statistics agency, ANSD, has run its health and demographic survey in most years "
+      "since 2012, and its 2023 census report prints the whole series from 1978 in one trend table. The "
+      "census publishes its own figure separately, along with the births and women behind it.",
+      "We use the rate each survey round published. We also checked the census: adding up the rate for each "
+      "of its seven age groups gives 3.69, which is the uncorrected figure ANSD itself prints.",
+      "The census shows unusually clearly how an office decides how much to correct. ANSD ran three "
+      "estimating methods on the same data and published all three: one that compares the children women "
+      "report having had against their recent birth rates gave 4.54, a curve fitted to the age pattern of "
+      "fertility gave 4.35, and a third that allows fertility to have changed between two censuses gave "
+      "4.41. It chose the third, saying so, and noted that 4.4 sits close to the survey's 4.0 for the same "
+      "year. So the published census figure is 4.4 against an uncorrected 3.7. Its own 2013 census ran a "
+      "narrower version of the check and found almost no correction was needed. One inconsistency to know "
+      "about: ANSD's projections document and its most recent annual population report still carry an "
+      "earlier, provisional estimate of 4.2 for 2023, which was never updated to the census report's "
+      "revised 4.4. The survey rounds are not annual throughout either — none ran between 2019 and 2023 — "
+      "and each figure covers the three years before its fieldwork, so consecutive points overlap. Civil "
+      "registration is not used for any of this; the 2023 survey found 80% of children under five holding a "
+      "birth certificate.",
       "https://www.ansd.sn/"),
     C("Malawi", "NSO — census and Demographic and Health Survey rounds", malawi, "Malawi", "survey",
       False,
@@ -1334,35 +1337,39 @@ COUNTRIES = [
       "https://inseed.ssn-tchad.td/"),
     C("Chile", "INE — registered births divided by its population estimates", chile_tfr, "Chile",
       "complete", True,
-      "One spreadsheet carries the whole series from 1992: births by five-year age band of the mother, "
-      "the women in each band, and INE's own rate.",
-      "We divided births by women in each band and summed. Our 1.034 for 2024 is INE's published 1.03, "
-      "and 1.159 against its 1.16 for 2023.",
-      "Chile is the clearest version of a pattern we keep finding in Latin America. Its registry gives "
-      "1.03 for 2024. The population projection INE had in force until early 2026 assumed a flat 1.58 all "
-      "the way to 2030 — a gap of 0.55 against its own counted births. INE then rebased the projection onto "
-      "the 2024 census in February 2026 and the new one assumes 1.06 for 2024, so the gap has closed; but "
-      "anything built on the older vintage still carries it. Which vintage a comparison uses decides "
-      "whether Chile looks like Peru or not. The counting itself is sound: births are dated to the year "
-      "they happened, and the late-registration correction is small — 98.5% of the births registered "
-      "during 2023 had happened in 2023. 2023 and 2024 are still provisional. Santiago was already at 1.03 "
-      "in 2023, a year before the country as a whole. The health ministry's own vital-statistics site is "
-      "behind a bot challenge and its older domain no longer resolves, but nothing there is needed.",
+      "One spreadsheet from Chile's national statistics institute, INE, carries the whole series from 1992: "
+      "births by five-year age group of the mother, the women in each group, and INE's own rate.",
+      "We divided births by the women in each age group and added up the results. Our 1.034 for 2024 rounds "
+      "to INE's published 1.03, and our 1.159 to its 1.16 for 2023.",
+      "Chile's registered births imply much lower fertility than its own population projections assumed. The "
+      "projection in force until January 2026 put fertility far above what the registry was counting — a gap "
+      "of about half a child per woman. INE then rebuilt its population estimates on the 2024 census that "
+      "month, and the new projection assumes 1.06 for 2024, close to what the registry gives. But that has "
+      "not yet changed the published rate: INE says it is still calculating the national and regional rates "
+      "on the older, 2017-census population base, deliberately, until estimates from the new census exist at "
+      "regional level. So the two figures have converged in the projections without the rate itself having "
+      "been rebuilt. The counting is sound: births are dated to the year they happened, and almost all of a "
+      "year's registrations turn out to belong to that year. The 2024 figure is still preliminary; the 2023 "
+      "one has since been finalized, unchanged at 1.16. The Metropolitan region around Santiago was already "
+      "at 1.03 in 2023, a year before the country as a whole.",
       "https://www.ine.gob.cl/estadisticas-por-tema/demografia-y-poblacion/estadisticas-vitales"),
     C("Netherlands", "CBS — births by age of mother divided by its mean population", netherlands_tfr,
       "Netherlands", "complete", True,
-      "CBS publishes births by single year of the mother's age from 1950, population by single year of age "
-      "and sex, and its own rate — all through an open interface with no key.",
-      "We divided births at each single age by the women of that age and summed. Our 1.4299 for 2023 is "
-      "CBS's published 1.430, and 1.4262 against its 1.426 for 2024.",
-      "This is the cleanest case in the collection. CBS states exactly what its rate is built from — "
-      "births in an age group over the mean number of women in it, the mean being half the population on "
-      "1 January and half on 31 December — so there is nothing to infer. Births are dated to when they "
-      "happened, not when they were reported, and CBS publishes every year as final rather than "
-      "provisional. The register covers everyone registered as resident in a municipality whatever their "
-      "nationality, so there is no nationals-only variant to pick wrongly. Two practical notes: CBS only "
-      "fills in the mean-population column from 1995, so the series starts there rather than in 1950; and "
-      "its newer interface refuses connections outright, while the older one works fine.",
+      "Statistics Netherlands, CBS, publishes births by single year of the mother's age from 1950, "
+      "population by single year of age and sex, and its own rate. The births and the population sit in "
+      "separate tables from the summary rate.",
+      "We divided births at each single age by the women of that age and added up the results. Our total "
+      "for 2023, 1.4299, rounds to CBS's published 1.430; our 1.4262 for 2024 rounds to its 1.426. Every "
+      "year since 1995 matches its published figure.",
+      "CBS states exactly what its rate is built from — births in an age group divided by the average "
+      "number of women in it, the average being half the population on 1 January and half on 31 December — "
+      "so nothing has to be guessed at. Births are dated to when they happened rather than when they were "
+      "reported, and CBS marks every year final rather than provisional, though it does fold late "
+      "notifications back into the year of the birth, so even a final year can edge up. The register covers "
+      "everyone registered as resident in a municipality whatever their nationality. Our line starts in "
+      "1995 because that is where CBS's own average-population figures begin; the births go back to 1950, "
+      "and the January population needed to work the average out ourselves exists back to 1988, so the "
+      "line could be extended at least that far.",
       "https://www.cbs.nl/nl-nl/cijfers/detail/85722ned"),
     C("Zimbabwe", "ZIMSTAT — census and Demographic and Health Survey rounds", zimbabwe, "Zimbabwe",
       "survey", False,
@@ -1476,23 +1483,25 @@ COUNTRIES = [
       "https://www.dhsprogram.com/pubs/pdf/FR353/FR353.pdf"),
     C("Romania", "INS — births by age of mother divided by the resident population", romania_tfr, "Romania",
       "complete", True,
-      "The institute's database carries births by the mother's age group on a usual-residence basis "
-      "from 2012, resident population by age at 1 July from 2002, and its own age-specific rates — but "
-      "no total. It publishes the general fertility rate and the age-specific rates, and leaves the sum "
-      "to the reader.",
-      "We divided births by women in each band and summed. Our figures match what INS's own published "
-      "age-specific rates imply, to four decimals, in all thirteen years: 1.3757 against 1.376 for 2024, "
-      "1.8596 against 1.8595 for 2019.",
-      "Romania rose and then fell hard: 1.36 in 2012 up to 1.86 by 2019, back to 1.38 by 2024 — the whole "
-      "gain given back in five years. The choice of population is the thing to get right, and INS says so "
-      "itself. It maintains two: the resident population, meaning everyone whose usual residence is in "
-      "the country, and the population by domicile, meaning citizens registered as living there whether "
-      "or not they do. Its own guidance is that only the resident figures should be used for "
-      "international comparison, and in a country with emigration on Romania's scale the two differ "
-      "materially. Births are dated to when they happened, but a year is not final until late "
-      "registrations from the following three years are folded in, so recent values still move. Getting "
-      "the data out took a browser: the export endpoint needs the selection posted back to it, and asking "
-      "for every category at once returns an empty result rather than an error.",
+      "Romania's National Institute of Statistics publishes births by the mother's age group on a "
+      "usual-residence basis from 2012, and resident population by age in the middle of each year from "
+      "2002. It does not publish an annual total fertility rate built from them, though it has published "
+      "one in the past, in a report covering 1960 to 2010.",
+      "We divided births by the women in each five-year age group and added up the results. For 2024 that "
+      "gives 1.3757.",
+      "This series should be treated with more caution than most here. It rises from 1.36 in 2012 to 1.86 "
+      "by 2019 and falls back to 1.38 by 2024 — but both Eurostat and the UN put Romania's rise smaller and "
+      "later, peaking around 2021 rather than 2019, and their figures sit up to 0.15 away from ours at both "
+      "ends of the line and up to 0.09 the other way in the middle years. The middle of the range, 2014 to "
+      "2017 and 2022, agrees closely. We have not established what accounts for the rest, and the shape of "
+      "the disagreement — one way at the ends, the other way in between — looks more like the population we "
+      "divide by shifting under the series than like a real pattern in births. Romania keeps two population "
+      "counts: the resident population, meaning everyone whose usual residence is in the country, and the "
+      "population by domicile, meaning citizens registered as living there whether or not they still do. We "
+      "use the resident one, which the institute says is the right choice for international comparison, and "
+      "in a country with emigration on Romania's scale the two differ a lot. Births are dated to when they "
+      "happened, but a year is not final until late registrations from the following three years are folded "
+      "in, so the most recent years will still move.",
       "http://statistici.insse.ro:8077/tempo-online/"),
     C("Rwanda", "NISR — Demographic and Health Survey rounds", rwanda, "Rwanda", "survey", False,
       "NISR runs the health survey every five years and the 2025 report charts every round since 1992. "
@@ -1676,22 +1685,25 @@ COUNTRIES = [
       "https://ine.gob.hn/"),
     C("Guatemala", "INE — registered births divided by its population projections", guatemala_tfr,
       "Guatemala", "complete", True,
-      "INE publishes no fertility rate of its own from the registry — its bulletin headlines a crude birth "
-      "rate and adolescent rates. But it does publish the raw records, one row per birth, with the "
-      "mother's age and the year the birth happened, and municipal population projections by single year "
-      "of age.",
+      "Guatemala's national statistics institute, INE, publishes no annual fertility rate built from its "
+      "birth registry — its bulletin headlines a crude birth rate and rates for teenagers. But it does "
+      "publish the raw records, one row per birth, with the mother's age and the year the birth happened, "
+      "and population projections by single year of age.",
       "We counted the births by age of mother out of 2.2 million individual records and divided by the "
-      "projected women. There is no published total to check against; our figures reproduce the office's "
-      "own reported counts exactly, which is as far as verification can go here.",
-      "Guatemala runs the Latin American pattern, and the gap is widening fast. Its projection assumes "
-      "2.44 for 2022-23 and 2.33 for 2024-25; the registry gives 2.19 for 2023 and 1.90 for 2024. So the "
-      "gap roughly doubles in a year, from about 0.2 to about 0.45. Births are dated to the year they "
-      "occurred with a six-month window for late registration, which INE says follows international "
-      "recommendations, and about 12% of each year's records are late registrations — a stable share, so "
-      "the 2024 figure should not move much. Two things bound what we can say. The denominator is a "
-      "projection built on the 2018 census, and INE's own projections build in sustained net emigration, "
-      "so the population base is not naive. And INE's main website is behind a bot wall that blocks every "
-      "request; only its open-data portal answers, and its statistical tables are not reachable at all.",
+      "projected women. Two of INE's own figures line up with the result: its 2018 census estimate of 2.7 "
+      "for 2018-19 against our 2.6, and the roughly 2.2 for 2022 from its national maternal and child "
+      "health survey against our 2.23.",
+      "Guatemala's registry shows fertility falling faster than its own population projections assume. The "
+      "projection puts it at 2.44 for 2022-23 and 2.33 for 2024-25; the registry gives 2.19 for 2023. Our "
+      "line stops there. Births are dated to the year they occurred, and INE waits six months to catch late "
+      "registrations before publishing, but the 2024 file holds 12.7% fewer births than 2023 after four "
+      "years that moved by about a percent either way, and reporting on the 2025 figures shows part of that "
+      "drop reversing. A break that size followed by a rebound is what an under-registered year looks like "
+      "rather than a fall in fertility, so we leave 2024 out. Late registrations run at roughly 12% of a "
+      "year's records, "
+      "and the share moves around: it rose during the pandemic and has risen since 2018 for indigenous "
+      "families. The population we divide by is a projection built on the 2018 census, and it does assume "
+      "people keep leaving the country, so it is not simply extrapolating a closed population.",
       "https://datos.ine.gob.gt/dataset/estadisticas-vitales-nacimientos"),
     C("Azerbaijan", "State Statistical Committee — registered births divided by the average annual population",
       azerbaijan, "Azerbaijan", "complete", False,

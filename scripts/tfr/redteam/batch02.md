@@ -1205,3 +1205,96 @@ broken, our correction figure was double the truth, and another absence claim fa
 - **Accepted.** Three separate comparisons to the rest of the collection removed, the three correction
   methods described rather than named, the office spelled out, and the P/F range corrected to 4.7-5.1,
   which is what its own table says.
+
+## Chile
+
+Verdict: minor problems. The 2024 age-band births sum exactly to INE's own national total, and both
+recomputed years round to its published figures.
+
+- **Rejected, and it was my brief's fault again.** The agent flagged the plotted 1.255 for 2022 as
+  sitting on a rounding boundary against INE's final 1.25. The true value is 1.25486, which rounds to
+  1.25 correctly. It read 1.255 because `redteam.py` printed four significant figures. That is the third
+  false finding the generator has caused; it now prints six and warns that trailing digits are not a
+  precision claim.
+- **Accepted, wrong date and misleading conclusion.** INE rebased its population estimates in January
+  2026, not February. And "so the gap has closed" was wrong in substance: INE says it is deliberately
+  still calculating the published rates on the older 2017-census base until regional estimates from the
+  new census exist. The projections converged; the rate itself has not been rebuilt.
+- **Accepted.** 2023 is no longer provisional — INE has finalized it, unchanged at 1.16. The "flat 1.58
+  to 2030" claim could not be sourced and INE's own description is of a declining path, so it is gone.
+  "Santiago" is now the Metropolitan region, which is what the source says.
+- **Accepted.** The bot-challenge sentence, the Latin America framing and the Peru comparison are gone,
+  along with "vintage" and "rebased".
+
+## Netherlands
+
+Verdict: minor problems — and the strongest values check in the collection. The agent pulled CBS's own
+published rate for all 31 years and every one matches, with no rounding artifact.
+
+- **Accepted, the claim outran its citation.** The link we showed readers holds only seven broad age
+  bands and the summary rate, not the single-year births and population the calculation actually uses.
+  Those live in tables we never named.
+- **Accepted, and it hid an extension.** "CBS only fills in the mean-population column from 1995, so the
+  series starts there rather than in 1950" is literally true about that column but overstates the limit:
+  the January population needed to work the average out ourselves exists back to 1988 in the same table.
+  Now said.
+- **Accepted.** "Final rather than provisional" needed a caveat: CBS does fold late notifications back
+  into the year of the birth, so even a final year can edge up. Added.
+- **Accepted.** "This is the cleanest case in the collection" leans on the rest of the collection; the
+  two access sentences are ours, not the data's; and the rounding sentence read as asserting two
+  different numbers were equal.
+
+## Senegal
+
+Verdict: minor problems, but one sentence was the same broken arithmetic as Malawi's.
+
+- **Accepted, and it is a repeat.** "We divided the 2023 census's own counts — 487,108 births over
+  4,499,636 women — and got 3.69." That division gives 0.108. The real check sums seven age-group rates.
+  This is the second page in one batch describing a division that cannot produce the number it claims,
+  after Malawi's. Both are now written as what was actually done.
+- **Accepted, and we knew less than we could have.** "ANSD's projections document states 4.2 for 2023
+  rather than 4.4, and we cannot tell which is the slip." It is resolvable: 4.2 is an earlier provisional
+  census estimate that ANSD's projections and annual reports still carry, and 4.4 is the revised figure
+  from the final fertility chapter that ran the three methods. Now stated.
+- **Accepted.** "Runs its health and demographic survey every year" is false across the plotted range —
+  no round ran between 2019 and 2023. And "two thirds of people hold a birth certificate" is a decade
+  out of date; the 2023 survey puts it at 80% of children under five.
+- **Accepted.** Both researcher-facing sentences gone, and the three method names replaced with
+  descriptions of what each does.
+
+## Guatemala
+
+Verdict: serious problems. Our series is now one year shorter.
+
+- **Accepted, and our own numbers settle it.** The 2024 point of 1.90 rests on a birth count 12.7% below
+  2023, after four years that moved by about a percent either way — and reporting on 2025 shows part of
+  that reversing. I printed our own counts: 343,226, 343,776, 340,625, then 297,408. That is a break, not
+  a trend. 2024 is out, with a `LAST_COMPLETE` constant, as Taiwan's 2025 was. Four countries now.
+- **Accepted, the twelfth false absence claim.** "There is no published total to check against... which
+  is as far as verification can go here." Two of INE's own figures exist and both corroborate us: its
+  2018 census estimate of 2.7 for 2018-19 against our 2.6, and about 2.2 for 2022 from its maternal and
+  child health survey against our 2.23. The page now cites them, which makes the series better attested,
+  not worse.
+- **Accepted.** "A stable share" overstates the late-registration pattern, which rose during the pandemic
+  and has risen since 2018 for indigenous families. The bot-wall sentence, the Latin America framing and
+  "the population base is not naive" are gone.
+
+## Romania
+
+Verdict: serious problems, and the one entry in this batch whose numbers I would not defend.
+
+- **Accepted, and it goes beyond wording.** Our series diverges from both Eurostat and the UN by up to
+  0.15 at the ends of the line and up to 0.09 the other way in the middle — I checked ours against the
+  UN directly: 2012 is 0.149 low, 2019 to 2021 are 0.13 to 0.15 high, 2023 is 0.185 low, while 2014-2017
+  and 2022 agree within 0.02. Two independent sources agreeing with each other and disagreeing with us
+  in a shape that flips sign looks like the population we divide by shifting under the series, not a
+  pattern in births. The page now says so plainly instead of presenting the rise and fall as a finding.
+- **Accepted, and the claim was unverifiable from our own code.** "Our figures match what INS's own
+  published age-specific rates imply, to four decimals, in all thirteen years." The loader never fetches
+  INS's published rates — it builds the rate from two count tables — so nothing in the pipeline checks
+  that. Removed rather than restated.
+- **Accepted, the thirteenth false absence claim.** "Its own age-specific rates — but no total... leaves
+  the sum to the reader." INS has published a total fertility rate, in a report covering 1960 to 2010.
+  Now said, and that report is also a route to extending the series back decades.
+- **Accepted.** The export-endpoint sentence is gone, and 2024 is flagged as still moving under our own
+  stated three-year revision rule.
