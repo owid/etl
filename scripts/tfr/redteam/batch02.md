@@ -185,3 +185,45 @@ editions.
 - **Rejected.** Renaming the validation label from "validated" to "calculated" for this country alone. The
   wording covers twenty-four countries and changing one would make the scale inconsistent; the prose now
   says outright that there is no official figure to check against, which is the substance of the point.
+
+## Italy
+
+Verdict: minor problems. Every spot-checked year matched, and the record-low framing is confirmed by
+ISTAT's own release.
+
+- **Accepted.** The third block described our own query failing — a dataflow covering every municipality
+  and timing out. Fourth country in this batch with production detail in reader copy. Replaced with what
+  the reader needs: there is no age-band comparison for Italy.
+- **Accepted.** Nothing told the reader which population the figure covers, though ISTAT publishes it three
+  ways — all residents, Italian citizens, foreign citizens. Our values are the all-residents series; now
+  said.
+- **Accepted, with a correction to the agent.** It argued the series is truncated at 2000, hiding that
+  Italy already reached 1.19 in 1995, which weakens the record-low framing. The truncation is the chart's,
+  not Italy's — every country starts at 2000. So the fix is wording, not data: the page now says 1.18 is
+  the lowest recorded but only just, that 1.19 came in 1995, and that the earlier trough is off the left
+  edge of this chart.
+- **Accepted.** "SDMX service", "ANPR" and "stato civile" all replaced with plain descriptions.
+
+## England and Wales
+
+Verdict: serious problems. All 16 spot-checked years matched to three decimals, including the 1964 peak
+— but three statements around them were wrong.
+
+- **Accepted, false claim about a source.** We said Northern Ireland's office "refuses scripted downloads
+  outright, so it would not be reproducible" — and used that to justify not building a UK-wide figure. The
+  agent downloaded NISRA's own births and fertility tables with one plain request. The claim is both
+  unreproducible and a statement about our tooling rather than the data. Removed, and the page now says a
+  UK-wide series could be built and is worth doing.
+- **Accepted, stale numbers contradicting our own chart.** We quoted England and Wales against the UK as
+  "1.65 against 1.63 in 2019, 1.58 against 1.56 in 2020". Those came from a reference table built on
+  pre-2021-census populations; our own chart plots 1.599 and 1.532 for those years. A reader checking the
+  prose against the chart would have found a 0.05 mismatch. Recomputing from the three offices' current
+  tables puts the UK about 0.005 to 0.01 below England and Wales — 1.409 against 1.415 in 2024 — because
+  Scotland has fallen much further and Northern Ireland stayed well above, and they nearly cancel. The
+  conclusion held; the numbers behind it did not.
+- **Accepted, backwards.** "The 15-49 column is empty for most recent years" — it is empty for every year
+  from 1938 to 2024 and filled for 2025 alone.
+- **Accepted.** The age-band group labelled 40-44 is ONS's "40 and over" row and includes mothers of 45 and
+  above. Now stated rather than left to be discovered.
+- **Logged, not built.** A genuine UK-wide series from the three offices' tables: the agent puts it at half
+  a day to a day, so it misses the cheap bar — but the excuse for not doing it is gone.

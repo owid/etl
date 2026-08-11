@@ -434,17 +434,20 @@ COUNTRIES = [
       "of its nations, 2011 to 2024, in one spreadsheet.",
       "We summed the age-specific rates and multiplied by five, the width of each age group. The age-band comparison divides "
       "the births by ONS's own mid-year female population, which is what ONS itself divides by.",
-      "This is England and Wales, about 89% of UK births, while the UN figures are UK-wide. We measured how "
-      "much that matters: ONS's own reference table gives both, and England and Wales sits a steady 0.02 "
-      "above the UK — 1.55 against 1.53 in 2021, 1.58 against 1.56 in 2020, 1.65 against 1.63 in 2019. That "
-      "is far smaller than the gaps this page is about, so the shorter, more current England and Wales "
-      "series is used rather than the UK one, which ONS stopped publishing after 2021. Building a UK figure "
-      "ourselves would mean stitching in Scotland and Northern Ireland; Scotland's office publishes what is "
-      "needed, but Northern Ireland's refuses scripted downloads outright, so it would not be reproducible. "
-      "The 2025 figure is provisional and ONS calculates it against population projections rather than "
-      "estimates, so the age-band comparison for that year falls back to the population its own rate "
-      "implies. Table 10 publishes rates on both a 15-44 and a 15-49 base; the 15-49 column is empty for "
-      "most recent years, so the 15-44 one is used throughout.",
+      "This is England and Wales, about 89% of UK births, while the UN figures are UK-wide. The difference "
+      "that makes is small and getting smaller. Adding Scotland and Northern Ireland's own published "
+      "figures to these ones puts the UK about 0.005 to 0.01 below England and Wales in recent years — "
+      "1.409 against 1.415 in 2024 — because Scotland has fallen much further (1.25 in 2024) while "
+      "Northern Ireland has stayed well above (about 1.60), and the two nearly cancel out. Either way it is "
+      "far smaller than the gaps this page is about, which is why the England and Wales series is used: it "
+      "is longer and more current than the UK one, which ONS stopped publishing after 2021. A genuine "
+      "UK-wide series could be built from the three offices' own tables and is worth doing. "
+      "The 2025 figure is provisional, and ONS works it out against population projections rather than "
+      "estimates — so for that year we get the female population by dividing the reported births by the "
+      "reported rate, rather than using a published population count. One quirk of table 10: it offers "
+      "rates on both a 15-44 and a 15-49 base, but the 15-49 column is filled in for 2025 alone and empty "
+      "for every year from 1938 to 2024, so the 15-44 base is used throughout. In the age-band comparison, "
+      "the top group labelled 40-44 is ONS's own \"40 and over\" row, so it includes mothers of 45 and above.",
       "https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths"),
     C("Germany", "Destatis — birth statistics, over the average resident population", germany, "Germany",
       "complete", False,
@@ -524,13 +527,19 @@ COUNTRIES = [
       "Births are published in five-year age groups for most of the series, which is why we do not rebuild "
       "the rate ourselves; a single-year table exists from 2015 but covers only births within marriage.",
       "https://www.e-stat.go.jp/dbview?sid=0003411608"),
-    C("Italy", "ISTAT — ANPR / stato civile", italy, "Italy", "complete", False,
-      "ISTAT's SDMX service publishes age-specific fertility rates by single year of age of mother, from "
-      "2000 onward.",
-      "We summed the rates across single ages.",
-      "We could not get births or female population by age: ISTAT's population dataflow covers every "
-      "municipality and times out when requested unfiltered, so there is no age-band comparison for "
-      "Italy yet. Sourced from the national resident register (ANPR).",
+    C("Italy", "ISTAT — national population register and civil status records", italy, "Italy",
+      "complete", False,
+      "ISTAT, Italy's national statistics office, publishes a birth rate for every single year of a "
+      "mother's age, from 2000 onward, drawn from the national population register.",
+      "We added those rates across the ages. They are already per single year of age, so there is no "
+      "age-group width to multiply by.",
+      "This figure covers all residents of Italy. ISTAT also publishes it separately for Italian citizens "
+      "and for foreign citizens, and those two differ; the all-residents figure is the one plotted, and it "
+      "is the one ISTAT headlines. Italy's 1.18 for 2024 is its lowest recorded, but only just: it had "
+      "already reached 1.19 in 1995 before recovering to about 1.44 around 2010 and falling back. This "
+      "chart starts in 2000, as every country here does, so that earlier trough is off the left edge. We "
+      "do not have Italy's births or its female population broken down by age, so there is no age-band "
+      "comparison for it.",
       "https://esploradati.istat.it/"),
     C("United States", "CDC / NCHS — natality via data.cdc.gov", united_states, "United States",
       "complete", False,
