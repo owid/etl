@@ -69,7 +69,7 @@ Companion reference for the `create-figma-chart` skill. Distilled from the desig
 - **Never scale a whole arrow** — the head distorts. Select just the line (cmd/ctrl-click inside the group), Shift-resize it, then move the head back into place.
 - Don't squish an arrow's width or height independently; always hold Shift.
 - If a curvy arrow gets messy in tight space, a straight thin line is better.
-- **Maps: no curvy arrows at all** — limited space. Straight 1px lines, or call the value out directly inside the country shape.
+- **Maps: no curvy arrows at all** — limited space, and no arrowheads either. Use the hairline leaders in Maps → *Map leaders* (`#2d2e2d` at **0.3px**, a filled dot at the country end; at 1px a gray line reads as a border), or call the value out directly inside the country shape. The 1px stroke above is for arrows on a plot.
 
 ### Straight elbowed arrows — the variant for filled areas
 
