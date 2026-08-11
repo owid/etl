@@ -1281,47 +1281,56 @@ COUNTRIES = [
       "https://www.ansd.sn/"),
     C("Malawi", "NSO — census and Demographic and Health Survey rounds", malawi, "Malawi", "survey",
       False,
-      "The 2018 census has a dedicated fertility report, and the 2024 health survey charts every round "
-      "since 1992. The census also publishes its fertility tables as a spreadsheet — women and births by "
-      "age group, which almost no other census in this collection does.",
-      "We read the published rates. We also divided the census's own counts — 576,525 births over 4,267,788 "
-      "women 15-49 — and got 4.166, matching the 4.167 the report prints as its unadjusted figure.",
-      "Malawi is the most legible case of an office deciding how much to correct. It ran three indirect "
-      "methods on the 2018 census and published all of them: the P/F ratio gave 4.9 to 5.1, a Gompertz "
-      "model 4.9 to 5.4, and Arriaga 4.23. It chose Arriaga and said why — that the other methods assume "
-      "fertility is not changing, and Malawi's is falling. So the correction it applied was about 3%, "
-      "against the near-doubling Mali applied to its own census. Fertility is measured from census and "
-      "survey questions, not registration, though registration itself has risen from 67% of under-fives in "
-      "2015 to 78% in 2024. The office's website serves no data at all to a plain request; everything is "
-      "behind an undocumented interface that its own pages call from the browser.",
+      "Malawi's National Statistical Office gave its 2018 census a dedicated fertility report, and its 2024 "
+      "health survey charts every round since 1992. The census publishes the women and births by age group "
+      "behind its own figure, which few censuses here do.",
+      "We read the published rates. Adding up the census's own rates by age group gives 4.17, matching the "
+      "4.167 it prints as its uncorrected figure.",
+      "Malawi's census report is unusually open about how it decided how much to correct that figure. It "
+      "tried three statistical techniques for estimating fertility from imperfect census answers and "
+      "published all three: the P/F ratio method gave 4.7 to 5.1 children per woman, a Gompertz curve fit "
+      "4.9 to 5.4, and the Arriaga method 4.23. It chose Arriaga and said why — that the other two assume "
+      "fertility is not changing, and Malawi's is falling. So the correction it settled on was small, under "
+      "2%, which is far less than some other countries here have applied to their own censuses. The 2008 "
+      "point needs a note: that census's own report gives 5.2 uncorrected, while the 6.0 we plot comes from "
+      "the 2018 report's trend series — the version comparable with the corrected 4.2 we plot for 2018. "
+      "Fertility is measured from census and survey questions, not registration, though registration itself "
+      "has risen from 67% of children under five in 2015 to 78% in 2024.",
       "https://www.nsomalawi.mw/"),
     C("Somalia", "SNBS — Somali Health and Demographic Survey 2020", somalia, "Somalia", "survey", False,
-      "The 2020 survey is the only national fertility figure Somalia has. It gives 6.9, with age-specific "
-      "rates and the number of women in each age group.",
-      "We read the published figure, and checked that its own age-specific rates sum to it: 6.885 against "
+      "Somalia's statistics bureau publishes one national fertility figure of its own, from its 2020 health "
+      "and demographic survey: 6.9, with the rate for each age group behind it.",
+      "We read the published figure, and checked that its own rates by age group sum to it: 6.885 against "
       "the printed 6.9.",
-      "Two documents look like they should count and do not. A 2026 survey run by the same office reports "
-      "5.7, but its own foreword says it covers five districts and is a step toward national coverage, so "
-      "that is not a national figure. And the 2013 population estimation survey, the one that gave Somalia "
-      "its population count, is copyrighted and published by a UN agency rather than by the statistics "
-      "office — and in any case contains no fertility rate at all. So the 2020 survey stands alone. There "
-      "is no census: the last one was in 1975. Birth registration is between 3.5% and 5.9%, depending on "
-      "which part of the same report you read.",
+      "The survey is titled 2020, but its own report dates the fieldwork to 2018 and 2019, and the rate "
+      "covers the three years before each woman was interviewed — so it describes fertility somewhat earlier "
+      "than the year we plot it at. Three other surveys report fertility for Somalia, and none of them "
+      "replaces it. A 2026 survey by the same bureau reports 5.7, but covers five districts and describes "
+      "itself as a step toward national coverage. A 2006 survey gives a national 6.7, but was published by "
+      "a UN agency with three planning ministries rather than by the bureau, and the 2020 report notes that "
+      "its fertility table leaves out nomadic households. And the 2013 population survey, the one that gave "
+      "Somalia its population count, was published by a UN agency and contains no fertility rate at all. No "
+      "census has published results since 1975; another was attempted in the mid-1980s but its findings were "
+      "never released. Birth registration is between 3.5% and 5.9%, depending on which part of the same "
+      "report you read.",
       "https://nbs.gov.so/"),
     C("Chad", "INSEED — survey and census rounds", chad, "Chad", "survey", False,
-      "Three figures exist: 7.1 from the 2009 census, 6.9 from the 2010 multiple-indicator survey, and 6.4 "
-      "from the health survey. Nothing annual, and no age-specific rates at all.",
-      "We read the published figures. There is nothing to recompute: no document INSEED hosts publishes "
-      "births by age of mother, as raw numbers or as rates.",
-      "Chad's own publications disagree about their own data. The 6.4 figure is attributed to the 2014-15 "
-      "health survey in one INSEED report and to the 2019 survey in another; we place it at 2015, the "
-      "fieldwork years. Neither of those survey reports is on INSEED's site, and neither is the 2009 "
-      "census's fertility volume — it is cited by title and page count in another report's bibliography but "
-      "was never digitised, so how the 7.1 was computed cannot be checked. Birth registration was 16% in "
-      "2010, up from 9% in 2004, and only a quarter of those could show a certificate. The 2009 census was "
-      "Chad's most recent for seventeen years; fieldwork for the next one finished in August 2026 and "
-      "results are promised progressively. INSEED's website serves nothing to a plain request — the files "
-      "sit on a separate host that its own pages call from the browser.",
+      "Chad's national statistics office, INSEED, publishes four figures, none of them annual: 7.1 from the "
+      "2009 census, 6.9 from a 2010 survey, and 6.4 from each of two later surveys, in 2014-15 and 2019. "
+      "The survey reports give the rate for each age group, but not the counts of births and women behind "
+      "them.",
+      "We read the published figures. Each survey's own rates by age group add up to the total it prints, "
+      "which is as far as checking can go without the counts.",
+      "None of these figures is measured the same way as a year of registered births: each survey rate "
+      "covers the three to five years before its fieldwork, so the points describe fertility somewhat "
+      "earlier than the years they sit at. The two 6.4s are genuinely separate measurements from separate "
+      "surveys rather than one figure counted twice. A 2019 attribution of the earlier one also circulates, "
+      "but a health ministry document was quoting 6.4 in March 2016, before the later survey existed. The "
+      "2009 census's dedicated fertility volume does not appear to exist in digital form anywhere, so the "
+      "full derivation of the 7.1 cannot be traced, though the census's own results report does publish it "
+      "alongside its other headline rates. Birth registration was 16% in 2010, up from 9% in 2004, and only "
+      "a quarter of those could show a certificate. The 2009 census was Chad's most recent for seventeen "
+      "years; fieldwork for the next one finished in August 2026, with results promised progressively.",
       "https://inseed.ssn-tchad.td/"),
     C("Chile", "INE — registered births divided by its population estimates", chile_tfr, "Chile",
       "complete", True,

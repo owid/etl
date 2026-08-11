@@ -1113,3 +1113,95 @@ right, with a diagnosis attached.
 - **Accepted.** "Which is worth knowing before citing either" is addressed to someone about to cite the
   number in their own work. Gone. "P/F ratio technique", "Brass formula", "indirect estimation" and
   "age-specific multipliers" are all replaced with descriptions of what they do.
+
+## Somalia
+
+Verdict: serious problems. The plotted 6.9 verified twice in the source and our 6.885 recomputation
+reproduced exactly. Two of the three exclusions held up under a full read — including the 2013 survey,
+where the agent text-searched all 121 pages and confirmed it really does contain no fertility rate.
+But the headline claim was contradicted by our own source.
+
+- **Accepted, and the eighth failure of this pattern — this time our own citation refutes us.** We
+  wrote "The 2020 survey is the only national fertility figure Somalia has." The 2020 report itself
+  compares its 6.9 against a 2006 survey's national 6.7. So the document we cite for the claim disproves
+  it. There is a defensible reason not to plot the 2006 figure — it was published by a UN agency with
+  three planning ministries rather than by the bureau, and the 2020 report notes its fertility table
+  leaves out nomadic households — and the page now gives that reason instead of denying the survey
+  exists.
+- **Accepted, a dating problem.** The survey is titled 2020, but its own report puts the fieldwork in
+  2018 and 2019, and the rate covers the three years before each interview. We plot it at 2020 without
+  saying so; now said.
+- **Accepted.** "Two documents look like they should count and do not" is written for whoever audited
+  the sourcing, and was off by one anyway once the 2006 survey is counted. Rewritten for a reader, and
+  the count is now three.
+- **Accepted.** "The last census was in 1975" glossed over one attempted in the mid-1980s whose results
+  were never released. Now precise.
+
+## Cross-cutting: eight failures, and what they have in common
+
+Malaysia, Sudan, Nepal, Ghana, Uzbekistan, Kazakhstan, Zambia, Somalia. Every one was a sentence
+saying a source publishes nothing, names no method, or holds nothing to check against. Every one was
+false. And in every case the thing said not to exist sat in a printed report, a census annex or a
+yearbook, while the claim was written as though it were about the producer rather than about the online
+data we had looked at.
+
+Three of them were worse than wrong:
+
+- Uzbekistan's contradicted itself two clauses later, in the same sentence we published.
+- Zambia's said the corrected rates could not be rebuilt from anything public; they are in the report's
+  own annex, and a rounded version is a figure in its main chapter.
+- Somalia's was refuted by the very document we cite for it.
+
+The instruction added to `PROMPT.md` after the fifth is doing its job — it caught Kazakhstan, Zambia
+and Somalia, and it also confirmed Mali's and Syria's absence claims as true, so it is not merely
+manufacturing doubt. The remaining lesson is for the writing rather than the checking: say what we
+looked at and did not find, never what a producer does not publish.
+
+## Chad
+
+Verdict: serious problems. All three plotted values verified against primary sources, and the 2009
+census's fertility volume really does appear to be undigitized. But two absence claims were false and
+the page contradicted its own age-band note.
+
+- **Accepted, the ninth and tenth failures of the pattern, on one page.** "Neither of those survey
+  reports is on INSEED's site" — both are, in its own microdata catalog, downloadable with a plain
+  request. And "no document INSEED hosts publishes births by age of mother, as raw numbers or as rates"
+  — both reports carry a full table of rates by age group. Our own prose then said "no age-specific
+  rates at all" while the age-band note under the chart tells the reader this office "publishes fertility
+  rates only". The page disagreed with itself.
+- **Accepted, and it adds a point.** The 2019 survey reports 6.4 nationally, four years after the round
+  we had as the newest. Both are genuine separate measurements: the 2015 schedule sums to 6.45 and the
+  2019 schedule to 6.43, each printed as 6.4, which I checked arithmetically. The series now runs to
+  2019. A 2019 attribution of the *earlier* figure also circulates, but a health ministry document was
+  quoting 6.4 in March 2016, so the earlier round is where it comes from.
+- **Accepted, softened.** "How the 7.1 was computed cannot be checked" overstates it: the census's own
+  results report publishes the figure alongside its other headline rates, even though the dedicated
+  fertility volume is not online.
+- **Accepted.** The closing sentence about the website serving nothing to a plain request is our own
+  tooling, and false besides. "Digitised" fixed, INSEED spelled out, and the survey reference periods —
+  three to five years before fieldwork — now disclosed.
+
+## Malawi
+
+Verdict: serious problems. Six of the seven claims about the census's choice of correction verified
+exactly, including the office's own stated reason for its choice. But our arithmetic sentence was
+broken, our correction figure was double the truth, and another absence claim failed.
+
+- **Accepted, and it could not have been right.** We wrote that dividing "576,525 births over 4,267,788
+  women 15-49" gives 4.166. That division gives 0.135. No arrangement of those two numbers produces
+  4.166, so the sentence described an operation that cannot yield the figure it claims — checkable with
+  a calculator and no source at all. The real check is adding up the census's own rates by age group,
+  which gives 4.17 against its printed 4.167. Replaced. The input number was also wrong: the census's
+  own total is 576,606.
+- **Accepted.** "The correction it applied was about 3%" — 4.167 to 4.234 is 1.6%, and under 1% on the
+  rounded headline figures. Overstated by roughly double.
+- **Accepted, the eleventh failure.** "The office's website serves no data at all to a plain request;
+  everything is behind an undocumented interface" — a plain request returns full pages, and its document
+  store serves the very PDFs we cite with no authentication. Cut.
+- **Accepted, and now disclosed.** Our 2008 point of 6.0 is not in the 2008 census report, which gives
+  5.2. It comes from the 2018 report's own trend series — which is the version comparable with the
+  corrected 4.2 we plot for 2018, so it is the right choice, but a reader checking the obvious source
+  would have found a contradiction.
+- **Accepted.** Three separate comparisons to the rest of the collection removed, the three correction
+  methods described rather than named, the office spelled out, and the P/F range corrected to 4.7-5.1,
+  which is what its own table says.

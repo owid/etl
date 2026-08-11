@@ -644,11 +644,16 @@ def chad():
     """INSEED survey and census rounds.
 
     Chad has no annual figure at all. 2009 is the census, quoted in the 2024 statistical yearbook;
-    2010 is the multiple-indicator survey; 6.4 is the health survey — which two INSEED publications
-    date differently, one to 2014-15 and one to 2019. We place it at 2015, the fieldwork years the
-    survey report itself carries.
+    2010 is the multiple-indicator survey; 2015 is the health survey, whose fieldwork ran from October
+    2014 to April 2015; 2019 is the next multiple-indicator survey.
+
+    The 2015 and 2019 rounds both report 6.4, independently — the same number from two different
+    surveys, not one figure double-counted. Each round's own rates by age group confirm it: the 2015
+    schedule sums to 6.45 and the 2019 schedule to 6.43, both printed as 6.4. A 2019 attribution of the
+    2015 figure circulates, but a health ministry document was already quoting 6.4 in March 2016, so
+    the earlier round is where it comes from.
     """
-    return _series([(2009, 7.1), (2010, 6.9), (2015, 6.4)])
+    return _series([(2009, 7.1), (2010, 6.9), (2015, 6.4), (2019, 6.4)])
 
 
 def somalia():

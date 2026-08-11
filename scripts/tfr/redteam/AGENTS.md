@@ -30,16 +30,16 @@ country whose source is an interface rather than a file.
 
 ## In flight (5)
 
-- Malawi
-- Chad
-- Somalia
 - Chile
 - Senegal
+- Guatemala
+- Romania
+- Netherlands
 
 ## Reported, awaiting write-up (0)
 
 
-## Analyzed (63)
+## Analyzed (66)
 
 - India
 - China
@@ -102,14 +102,14 @@ country whose source is an interface rather than a file.
 - Burkina Faso
 - Sri Lanka
 - Taiwan
+- Malawi
 - Zambia
+- Chad
 - Kazakhstan
+- Somalia
 
-## To do (32)
+## To do (29)
 
-- Guatemala
-- Romania
-- Netherlands
 - Ecuador
 - Cambodia
 - Zimbabwe
