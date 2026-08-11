@@ -28,11 +28,11 @@ minutes trying to enumerate variable IDs in the Polish statistics API. Its repla
 to fight the interface and to fall back to published reports instead. Give that instruction to any
 country whose source is an interface rather than a file.
 
-**The session that ran this campaign hit its cap of 200 subagents with 21 countries still to do.**
-All the agents that were out have now reported and been written up, so nothing is in flight and
-`--audit` will say so until a session with budget picks the campaign back up. Everything needed to
-continue is unchanged: the brief generator, the standard prompt with its absence-claim instruction, and
-this ledger. Launch the first five from To do, in the order listed.
+A previous session hit its cap of 200 subagents with 21 countries still to do; a fresh session resets
+that cap, and the campaign resumed from the To do list without any loss. If it happens again, the state
+lives entirely in this file and the findings logs — the brief generator, the standard prompt with its
+absence-claim instruction, and `--sync`/`--audit` all work unchanged. Launch the first five from To do,
+in the order listed.
 
 Two other things a resuming session should know. The brief generator has caused three false findings —
 describing the map as an average gap, printing age-band figures at full float precision, and printing
@@ -41,8 +41,13 @@ All three are fixed, but check anything a report asserts about the page against 
 country whose source is an interface rather than a file, tell the agent not to fight it and to fall
 back on published reports; that is what unstuck Poland.
 
-## In flight (0)
+## In flight (5)
 
+- South Sudan
+- Tunisia
+- Haiti
+- Belgium
+- Dominican Republic
 
 ## Reported, awaiting write-up (0)
 
@@ -129,13 +134,8 @@ back on published reports; that is what unstuck Poland.
 - Burundi
 - Bolivia
 
-## To do (21)
+## To do (16)
 
-- South Sudan
-- Tunisia
-- Haiti
-- Belgium
-- Dominican Republic
 - Jordan
 - United Arab Emirates
 - Honduras
