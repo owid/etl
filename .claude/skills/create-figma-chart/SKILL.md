@@ -321,8 +321,10 @@ The chart spans the full content width, left-aligned with the title/subtitle/log
 > **Local-SVG route: nothing arrives here, and nothing is fitted.** The SVG came in at Step 5 and it
 > is a full frame, not a chart area — importing it into the band would nest the whole visualization,
 > title and footer included, inside the template's chart slot. Align it to the clone's own origin
-> instead (`svg.x = clone.x; svg.y = clone.y`) and it lands correct by construction, because the step
-> drew it at the template's frame size against the same slot positions. So skip the band measurement,
+> instead — `svg.x = 0; svg.y = 0`, since `unwrap` made the clone its parent and a child's `x`/`y` are
+> frame-relative (which is why the fit below reads `chart.x = header.x` and not a page coordinate) —
+> and it lands correct by construction, because the step drew it at the template's frame size against
+> the same slot positions. So skip the band measurement,
 > the `rescale`, the ladder pick and the x-map below — every one of them exists to reconcile an export
 > whose proportions were chosen by grapher, and this one's were chosen from `TEMPLATES.md`.
 >
