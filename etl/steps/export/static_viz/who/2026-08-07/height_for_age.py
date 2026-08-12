@@ -1,33 +1,51 @@
 """Recreate the 'Expected height of boys and girls' growth-curve chart.
 
-Each panel shows nested percentile bands from the WHO growth reference standards, the
-median, and the -2 SD stunting threshold, plus a dashed copy of the other sex's median -- in
-that sex's own color, which is what saves it needing a label -- so the crossover in early
-adolescence stays visible once boys and girls are split apart.
+Each panel shows nested percentile bands from the WHO growth reference standards, the median, and
+the -2 SD stunting threshold, plus a dashed copy of the other sex's median in that sex's own color,
+so the crossover in early adolescence stays visible with boys and girls in separate panels.
+
+An encoding diagram names each part of the chart -- see `draw_encoding_diagram`. There is no legend
+in either version.
 
 Two versions are emitted, following the static-chart templates:
 
-- desktop: panels side by side, footer carrying Note, Data source, the OurWorldinData.org
-  tagline and the license line. The encoding is explained by a diagram in the empty triangle
-  under the Boys curve -- a miniature cross-section of the bands with each part named -- as the
-  chart this replaces did, rather than by a legend.
-- mobile: panels side by side too, in the portrait frame, and a footer reduced to Data source
-  plus the license, which is all the mobile template has room for. The template has no Note
-  slot, so the caveat that the two age ranges rest on different foundations moves into the
-  subtitle rather than being dropped -- see MOBILE_SUBTITLE_TAIL. There is no room for the
-  diagram in a 214px-wide panel, so mobile keeps the legend.
+- desktop, 850x638: panels side by side, diagram inside the Boys panel, footer carrying Note, Data
+  source, the OurWorldinData.org tagline and the license line.
+- mobile, 540x824: panels side by side in the portrait frame, diagram in the header, footer reduced
+  to Data source plus the license, which is all that template has room for. It has no Note slot, so
+  the caveat that the two age ranges rest on different foundations sits in the subtitle instead --
+  see MOBILE_SUBTITLE. Its panels are 217px wide, which is why it carries five age ticks to the
+  desktop's six, and why the diagram cannot sit inside a panel.
 
-Stacking the panels in the portrait frame was tried and rejected: it gives each panel a 2:1
-landscape box, about 222px of height for a 165 cm range, which flattens the curves so far that
-the adolescent growth spurt stops being visible. Side by side gives each 2.4x the vertical
-resolution. That is why the mobile layout carries fewer age ticks -- a 214px-wide panel cannot
-hold six.
+Both layouts put their panels side by side rather than stacked. Stacked in the portrait frame each
+panel is a 2:1 landscape box, about 222px of height for a 165 cm range, and the adolescent growth
+spurt is not visible in it; side by side gives each panel 2.4x the vertical resolution.
 
-Replaces the hand-drawn 'Expected Healthy Growth Curves for Boys and Girls' image used on
-the human-height topic page and the stunting-definition article.
+Replaces the hand-drawn 'Expected Healthy Growth Curves for Boys and Girls' image used on the
+human-height topic page and the stunting-definition article.
 
-Colors, fonts and the logo are deliberately not set here; those are applied in Figma. What
-this step fixes is the structure: which text slots exist, in what order, and which share a row.
+Colors, fonts and the logo are deliberately not set here; those are applied in Figma. What this step
+fixes is the structure: which text slots exist, in what order, and which share a row.
+
+Figma
+-----
+Page `20260812 Expected height of boys and girls, from birth to age 19 (Pablo A)` in `Charts (2026)`
+(file key `s6Sv60bakebRRW2TxsMQbF`), frames `expected-height-boys-girls` and
+`expected-height-boys-girls-mobile`, each beside a reference copy of this step's own render.
+
+The frames take their prose, fonts, logo and background from the static-chart templates and only the
+plot and the encoding diagram from here. To carry a data update through, re-run this step and replace
+the `chart` group in each frame; these are the steps done by hand around it:
+
+1. Rescale the import by 100/96 -- matplotlib declares points and Figma imports at 96px per inch,
+   while this figure is built at 100 template px per inch.
+2. Delete the import's wrapper frame (it carries a white fill) and its `patch_1`, `title`,
+   `subtitle`, `note`, `data-source`, `tagline` and `license` groups. The template's own slots carry
+   those strings, so they are duplicated otherwise.
+3. Restyle the in-plot labels to Lato at 22/14/12, then re-anchor each on its mark: y ticks by their
+   right edge, x ticks by their centre except the last by its right edge, `Almost all children` by
+   its right edge, the median and `8 in 10 children` by their left, the stunting label by its centre.
+4. Centre the group in the band between the header's bottom and the footer's first row.
 """
 
 import matplotlib
@@ -56,18 +74,17 @@ PANEL_COLOR_INDEX = {"Boys": 1, "Girls": 0}
 # Color for reference lines and their labels.
 REFERENCE_LINE_COLOR = "#6c7a89"
 
-# Neutral grey for anything that explains the chart rather than carrying data -- the encoding
-# diagram's bands and median, and the legend's swatches. Grey is what marks them as a key.
+# Neutral grey for the encoding diagram's bands and median. Grey is what marks the diagram as a
+# key rather than as data.
 DIAGRAM_COLOR = "#666666"
 
-# Nested percentile bands, drawn widest first, as (lower column, upper column, how far the fill
-# is blended towards white, label). Each band is a flat tint rather than a translucent fill: an
-# alpha fill has to composite onto something, and the canvas is deliberately transparent so the
-# Figma template supplies the background, which left the fan depending on whatever sat behind the
-# SVG. A precomputed tint renders the same on any backdrop and gives Figma one flat fill per band.
+# Nested percentile bands, drawn widest first, as (lower column, upper column, how far the fill is
+# blended towards white, layer name). Each band is a flat tint, not a translucent fill: an alpha fill
+# composites onto whatever is behind it, and the SVG is saved transparent for the Figma template to
+# supply the background. A tint renders the same on any backdrop and gives Figma one flat fill each.
 BANDS = [
-    ("height_percentile_0_1", "height_percentile_99_9", 0.90, "Almost all children (999 in 1,000)"),
-    ("height_percentile_10", "height_percentile_90", 0.74, "8 in 10 children"),
+    ("height_percentile_0_1", "height_percentile_99_9", 0.90, "almost-all-children"),
+    ("height_percentile_10", "height_percentile_90", 0.74, "8-in-10-children"),
 ]
 
 # Percentiles drawn as lines on top of the bands, as (column, line width), so a specific centile
@@ -106,8 +123,8 @@ TAGLINE = "OurWorldinData.org — Research and data to make progress against the
 #
 # Row positions come from "Static Chart Template_Horizontal" (850x638) and "Static Chart
 # Template_Mobile (example 2)" (540x824); the tall mobile frame is the one that gives two
-# side-by-side panels enough height to read. Font sizes are derived from each slot's height in the template (a template px is
-# 0.72pt, and a line of text occupies about 1.8x its point size).
+# side-by-side panels enough height to read. Font sizes are derived from each slot's height in the
+# template: a template px is 0.72pt, and a line of text occupies about 1.8x its point size.
 LAYOUTS = {
     "height_for_age": {
         "size": (850, 638),
@@ -144,17 +161,19 @@ LAYOUTS = {
         "title_fontsize": 16,
         "body_fontsize": 10.5,
         "footer_fontsize": 8.75,
-        "y_label_space": 52,
+        "y_label_space": 58,
         "x_label_space": 52,
     },
 }
 
-# Appended to the mobile subtitle. The mobile template has no Note slot, and this caveat is
-# about what the chart claims rather than about a visual artifact, so it cannot simply be
-# dropped -- without it the older half of the age range reads as an optimal-growth standard.
-MOBILE_SUBTITLE_TAIL = (
-    "Up to age 5 these are standards, showing how children grow in good conditions; from age 5 they are a "
-    "reference, showing how an earlier sample did grow."
+# The mobile template has no Note slot, and the standards-vs-reference caveat is about what the
+# chart claims rather than about a visual artifact, so it rides in the subtitle instead -- without it
+# the older half of the age range reads as an optimal-growth standard. Its two-line slot at the
+# template's type size is about 114 characters, which is the whole budget for both sentences, so
+# mobile states the crossover more briefly than desktop does.
+MOBILE_SUBTITLE = (
+    "Girls are taller than boys between ages {crossover_start:.0f} and {crossover_end:.0f}. "
+    "Ages 0–{splice:.0f} show healthy growth; {splice:.0f}–{age_max:.0f}, how an earlier sample grew."
 )
 
 # A template pixel in points: the figure is 100 template px per inch and there are 72 points
@@ -166,6 +185,10 @@ POINTS_PER_PIXEL = 0.72
 # of an inch, which keeps the saved image at the template's proportions.
 PIXELS_PER_INCH = 100
 
+# Font size for the encoding diagram's labels, in points, relative to the body size. The design
+# team's floor is 12px and a point here renders as 100/72 px, so this must stay above 8.64pt.
+DIAGRAM_FONTSIZE_DROP = 1.8
+
 # Gap between the title block and the subtitle, in template pixels. Calibrated so that a
 # two-line title puts the subtitle at the templates' own y=80.
 TITLE_SUBTITLE_GAP = 6
@@ -173,6 +196,14 @@ TITLE_SUBTITLE_GAP = 6
 # Vertical rhythm below the subtitle, in multiples of a text line.
 SUBTITLE_GAP = 0.15
 DIAGRAM_CHART_GAP = 0.8
+
+# The y the templates give their chart area, and the breathing room to leave inside it, in template
+# pixels. Filling the area edge to edge leaves the drawn block about 5px from the header and the
+# footer, which reads as cramped; the design team's own pages sit at 12-16px. Only the header-diagram
+# layout needs this, because there the block starts at the chart area's top: the desktop layout
+# centres what is left of a band its one-line title and subtitle have already widened.
+CHART_AREA_TOP = 118
+CHART_AREA_INSET = 14
 
 # Height reserved for the encoding diagram when it sits in the header rather than inside a panel,
 # in template pixels: the slab, plus the row of stunting text below it and the leader reaching it.
@@ -218,21 +249,20 @@ def load_growth_reference() -> Table:
 
 
 def build_source_citation(tb: Table) -> str:
-    """List the data products behind the chart, from the origins on the median indicator.
+    """Cite the producers behind the chart, from the origins on the median indicator.
+
+    Follows grapher's own footer convention of `producer (year)`, so the two WHO products cite as one
+    producer carrying both release years rather than as two separate data products.
 
     Returned without a label, so the caller supplies the template's "Data source:" slot name.
     """
-    seen = set()
-    parts = []
+    years: dict[str, list[str]] = {}
     for origin in tb[MEDIAN_COLUMN].metadata.origins:
-        # Origin titles carry the indicator after a colon; the product name is enough here.
-        product = origin.title.split(":")[0].strip()
         year = origin.date_published.split("-")[0] if origin.date_published else ""
-        key = (product, year)
-        if key not in seen:
-            seen.add(key)
-            parts.append(f"{product} ({year})")
-    return "; ".join(parts)
+        seen = years.setdefault(origin.producer, [])
+        if year and year not in seen:
+            seen.append(year)
+    return "; ".join(f"{producer} ({'; '.join(sorted(ys))})" for producer, ys in years.items())
 
 
 def find_crossover(tb: Table) -> tuple[float, float]:
@@ -292,43 +322,25 @@ def draw_encoding_diagram(
 ) -> None:
     """Draw a miniature cross-section of the encoding, with each part named beside it.
 
-    The chart it replaces explained itself this way rather than with a legend, and it reads better: a
-    swatch in a legend asks the reader to carry a color across the frame to a shape, while a small
-    exemplar of the real thing shows the band-within-a-band directly, in the order it appears. It
-    also gives the stunting line somewhere to be named other than on top of the plot.
+    A slab carrying both bands, the median and the -2 SD line, in grey so it reads as a key rather
+    than as a third sex, with the chart's own tints and line styles. Its conventions:
 
-    Two conventions matter here:
-
-    - The bands get square brackets spanning their full height, not a tick at one edge. A band is a
-      range, and a tick pointing at its boundary invites the reader to take that boundary as the
-      thing being named.
-    - The median gets no leader at all: its label sits on the line, inside the slab. The stunting
-      label does, because it sits below the slab -- which is what lets it be one line rather than the
-      two or three that the space beside the slab forces.
-
-    Everything is grey rather than the panel's color, so the block reads as a key rather than as a
-    third sex; the tints and line styles still match the chart exactly.
+    - Each band gets a square bracket spanning its full height. A band is a range, and a tick at its
+      boundary would read as naming the boundary.
+    - The brackets sit on opposite sides of the slab, since both bands share the same midpoint.
+    - The median's label sits on the line inside the slab, with no leader.
+    - The stunting label sits centred below the slab, with a short leader dropping from the dotted
+      line. That is where there is room for it on one row; beside the slab it has 145px.
 
     Geometry is in axes fractions of whatever `ax` it is given, so the same drawing serves both
-    layouts: inside the first panel on desktop, and in its own axes across the header on mobile,
-    where a 217px-wide panel cannot hold labels that are 89px and 105px wide.
-
-    On desktop it lives in the empty triangle below the growth curve -- the widest clear space either
-    panel has. Two consequences of that shape:
-
-    - The brackets sit on opposite sides, because both bands share the same midpoint. Nested on one
-      side, either their labels collide or one label has to cross the other bracket, and the panel is
-      too narrow for the second label to clear it.
-    - The stunting label sits *below* the slab, centred, with a short leader dropping from the
-      dotted line. Beside the slab it would only have the 145px the triangle leaves clear at that
-      height, forcing it onto two or three rows; below the slab the triangle is wide enough for one.
+    layouts: the empty triangle below the growth curve on desktop, and its own axes across the header
+    on mobile, whose 217px panels are narrower than the 89px and 105px labels.
     """
     # The inner band is the middle 80%, the outer the middle 99.8%, so it is about 0.42 as tall.
     inner_half = outer_half * 0.42
-    # Where -2 SD falls inside the schematic: the outer band's edge is the 99.9th percentile, at
-    # about z = 3.09, so 2 SD sits at 2/3.09 of the half-width. Keeping that ratio right is what
-    # makes the diagram show the true nesting -- the stunting line is inside the outer band, below
-    # the inner one, rather than at the bottom edge.
+    # -2 SD inside the schematic: the outer band's edge is the 99.9th percentile, at about z = 3.09,
+    # so 2 SD sits at 2/3.09 of the half-width. That ratio is what puts the stunting line inside the
+    # outer band and below the inner one, as it is in the data.
     minus_2sd = middle - outer_half * 2 / 3.09
     for lower, upper, weight, name in (
         (middle - outer_half, middle + outer_half, 0.90, "outer-band"),
@@ -464,17 +476,25 @@ def wrap_to_content_width(text: str, layout: dict, fontsize: float) -> str:
     return "\n".join(lines)
 
 
-def build_subtitle(tb: Table, layout: dict) -> str:
-    """Compose the subtitle, folding in the standards-vs-reference caveat on mobile."""
+def build_subtitle(tb: Table, breaks: list[float], layout: dict) -> str:
+    """Compose the subtitle, folding in the standards-vs-reference caveat on mobile.
+
+    It carries what the shapes say together, not how to read them: the encoding diagram names each
+    band where it is drawn, and repeating that here would cost the mobile template's whole slot.
+    """
     crossover_start, crossover_end = find_crossover(tb)
-    text = (
-        "Read it like this: the line is the height at which half of children of that age are taller and half are "
-        "shorter. The darker band covers the middle 8 in 10 children, and the lighter band almost all of them — "
-        "999 in every 1,000. Girls are taller than boys, on average, between the ages of about "
-        f"{crossover_start:.0f} and {crossover_end:.0f}."
-    )
-    if not layout["full_footer"]:
-        text = f"{text} {MOBILE_SUBTITLE_TAIL}"
+    if layout["full_footer"]:
+        text = (
+            "Girls are taller than boys, on average, between the ages of about "
+            f"{crossover_start:.0f} and {crossover_end:.0f}."
+        )
+    else:
+        text = MOBILE_SUBTITLE.format(
+            crossover_start=crossover_start,
+            crossover_end=crossover_end,
+            splice=breaks[1],
+            age_max=float(tb["age_years"].max()),
+        )
     return wrap_to_content_width(text, layout, layout["body_fontsize"])
 
 
@@ -493,9 +513,9 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
     """Build one version of the two-panel growth-curve chart.
 
     Layout notes:
-    - One panel per sex, sharing a y-axis, nested percentile bands deepening where they overlap
-    - Median drawn solid on top; the other sex's median repeated as a faint dashed line
-    - The -2 SD stunting threshold is labeled on the line rather than in the legend
+    - One panel per sex, sharing a y-axis, each with two nested percentile bands as flat tints
+    - Median drawn solid on top; the other sex's median dashed, in that sex's own color
+    - The -2 SD stunting threshold and both bands are named in the encoding diagram
     - No spines; light horizontal gridlines carry the height reading
     - Axis limits, ticks and footnote ages all derived from the data
     """
@@ -557,7 +577,7 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         # gid becomes the SVG element id, so Figma shows named layers instead of "Path 41".
         # Mirrors grapher, which stamps its own SVG nodes with makeFigmaId().
         slug = sex.lower()
-        for lower, upper, weight, label in BANDS:
+        for lower, upper, weight, band_name in BANDS:
             ax.fill_between(
                 age,
                 tb_sex[lower].to_numpy(),
@@ -565,7 +585,7 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
                 facecolor=tint(color, weight),
                 linewidth=0,
                 zorder=2,
-                gid=f"{slug}__{label.lower().replace(' ', '-').replace('%', '')}",
+                gid=f"{slug}__{band_name}",
             )
 
         # --- the other sex's median, so the crossover stays visible in both panels ---
@@ -603,7 +623,7 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
             ax.plot(age, values, color=color, linewidth=line_width, zorder=5, gid=f"{slug}__{column[-3:]}")
 
         if layout["diagram"] == "panel" and ax is axes[0]:
-            draw_encoding_diagram(ax, body_fontsize - 2.5)
+            draw_encoding_diagram(ax, body_fontsize - DIAGRAM_FONTSIZE_DROP)
 
         # --- panel title, in the panel's own color ---
         ax.text(
@@ -614,7 +634,12 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         ax.set_ylim(38, height_max + 4)
         ticks = layout["age_ticks"]
         ax.set_xticks(ticks)
-        ax.set_xticklabels(["Birth" if tick == 0 else str(tick) for tick in ticks])
+        labels = ax.set_xticklabels(["Birth" if tick == 0 else str(tick) for tick in ticks])
+        # The last tick label is right-anchored, as grapher anchors its outermost labels inwards:
+        # centred, it crosses the frame's side margin, which is ink the templates keep clear. The
+        # first label stays centred -- it overhangs only into the space reserved for the y labels,
+        # and anchoring it left pushes it into the next tick.
+        labels[-1].set_horizontalalignment("right")
         ax.yaxis.set_major_formatter(FuncFormatter(lambda value, _: f"{value:.0f} cm"))
         ax.tick_params(axis="both", length=0, labelsize=body_fontsize, labelcolor=TEXT_COLOR)
         # Grapher renders axis labels bold (fontWeight 700 in Axis.ts). Both layouts put the
@@ -631,7 +656,7 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
     title_lines = title.count("\n") + 1
     subtitle_y = layout["title_y"] + title_lines * px(layout["title_fontsize"]) + TITLE_SUBTITLE_GAP
 
-    subtitle = build_subtitle(tb, layout)
+    subtitle = build_subtitle(tb, breaks, layout)
     subtitle_lines = subtitle.count("\n") + 1
 
     fig.text(
@@ -666,10 +691,13 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         # than the panel -- but this row is the full 508px content width, which fits it with room to
         # spare. Keeping the same explanatory device in both versions matters more than the vertical
         # cost, since the pair gets published together.
+        # The diagram is the top of the drawn block, so it is what the floor has to hold down --
+        # applied to the plot instead, the block still starts above the template's chart area.
+        diagram_top_px = max(subtitle_bottom_px, CHART_AREA_TOP) + CHART_AREA_INSET
         diagram_axes = fig.add_axes(
             (
                 fx(margin_px),
-                fy(subtitle_bottom_px + HEADER_DIAGRAM_HEIGHT),
+                fy(diagram_top_px + HEADER_DIAGRAM_HEIGHT),
                 1 - 2 * fx(margin_px),
                 HEADER_DIAGRAM_HEIGHT / height_px,
             )
@@ -679,14 +707,14 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         diagram_axes.patch.set_visible(False)
         draw_encoding_diagram(
             diagram_axes,
-            body_fontsize - 2.5,
+            body_fontsize - DIAGRAM_FONTSIZE_DROP,
             left=0.386,
             right=0.642,
             middle=0.675,
             outer_half=0.315,
             label_gap=0.087,
         )
-        chart_top_px = subtitle_bottom_px + HEADER_DIAGRAM_HEIGHT
+        chart_top_px = diagram_top_px + HEADER_DIAGRAM_HEIGHT
 
     # --- footer, in the slots the static-chart templates define ---
     # Desktop: Note -> Data source -> tagline and license sharing one row, left and right.
@@ -711,7 +739,7 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         )
         chart_bottom_px = note_top_px
     else:
-        chart_bottom_px = layout["chart_bottom_y"]
+        chart_bottom_px = layout["chart_bottom_y"] - (CHART_AREA_INSET if layout["diagram"] == "header" else 0)
 
     fig.text(
         fx(margin_px),
