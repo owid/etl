@@ -1100,7 +1100,6 @@ class Variable(Base):
     license: Mapped[dict | None] = mapped_column(JSON, default=None)
     type: Mapped[VARIABLE_TYPE | None] = mapped_column(ENUM(*get_args(VARIABLE_TYPE)), default=None)
     sort: Mapped[list[str] | None] = mapped_column(JSON, default=None)
-    grapherConfigIdAdmin: Mapped[str | None] = mapped_column(VARCHAR(32), default=None)
     grapherConfigIdETL: Mapped[bytes | None] = mapped_column(CHAR(32), default=None)
     dataChecksum: Mapped[str | None] = mapped_column(VARCHAR(64), default=None)
     metadataChecksum: Mapped[str | None] = mapped_column(VARCHAR(64), default=None)
