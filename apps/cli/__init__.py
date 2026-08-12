@@ -76,6 +76,7 @@ SUBGROUPS = {
             "map-datasets": "apps.utils.map_datasets.cli",
             "scan-chart-diff": "apps.utils.scan_chart_diff.cli",
             "profile": "apps.utils.profile.cli",
+            "republish-description-key": "apps.utils.republish_description_key.cli",
         },
     },
 }
