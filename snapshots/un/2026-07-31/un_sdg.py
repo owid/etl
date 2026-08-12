@@ -180,13 +180,35 @@ def download_goal(url: str, goal: str, area_codes: list) -> list[pd.DataFrame]:
     frames = []
     for i in range(0, len(area_codes), AREA_CHUNK_SIZE):
         chunk = area_codes[i : i + AREA_CHUNK_SIZE]
+        label = f"{i}-{i + len(chunk)}"
         df = _read_goal_csv(_download_with_retries(url, goal, chunk, attempts=MAX_RETRIES))
         observations = count_observations(df)
-        log.info("Downloaded area batch", goal=goal, areas=f"{i}-{i + len(chunk)}", observations=observations)
-        # Batches covering only aggregates/unused areas legitimately come back empty; keep
-        # only the ones carrying observations so they don't muddy the concatenated dtypes.
-        if observations > 0:
-            frames.append(df)
+
+        if observations == 0:
+            # A batch can legitimately carry no observations (areas this goal doesn't cover), but a
+            # successful-but-empty response looks exactly the same while silently dropping up to
+            # AREA_CHUNK_SIZE areas — and the goal-level assertion would still pass on the strength
+            # of the other batches. The response alone can't tell the two apart, so emptiness is
+            # only accepted once it reproduces on a second request.
+            df = _read_goal_csv(_download_with_retries(url, goal, chunk, attempts=MAX_RETRIES))
+            observations = count_observations(df)
+            if observations == 0:
+                log.warning(
+                    "Area batch carries no observations; empty response confirmed on retry.",
+                    goal=goal,
+                    areas=label,
+                    area_codes=chunk,
+                )
+                continue
+            log.warning(
+                "Area batch was empty on the first request but returned data on retry.",
+                goal=goal,
+                areas=label,
+                observations=observations,
+            )
+
+        log.info("Downloaded area batch", goal=goal, areas=label, observations=observations)
+        frames.append(df)
     return frames
 
 
@@ -275,7 +297,10 @@ def download_file(url: str, goal: str, area_codes: list, max_retries: int, bytes
         ) as r:
             r.raise_for_status()
             for chunk in r.iter_content(chunk_size=CHUNK_SIZE):
-                bytes_read += CHUNK_SIZE
+                # `iter_content` yields *at most* CHUNK_SIZE bytes, so the offset must advance by
+                # what actually arrived. Counting a full CHUNK_SIZE would make the `Range` header on
+                # a resume start past bytes we never received, silently dropping part of the CSV.
+                bytes_read += len(chunk)
                 content += chunk
     except requests.exceptions.ChunkedEncodingError:
         if max_retries > 0:

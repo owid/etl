@@ -129,9 +129,17 @@ def select_anomalies(
 
     df = cast(pd.DataFrame, df[df["score_weighted"] >= min_score])
 
+    # `n_rows` counts anomaly rows, so the same entity-indicator pair appears once per anomaly type
+    # that flagged it. The distinct counts are what the header reports, since "N entities flagged"
+    # would otherwise overstate the number of distinct entities affected.
     group_stats = (
         df.groupby(key)
-        .agg(n_rows=("score_weighted", "size"), max_relevance=("score_weighted", "max"))
+        .agg(
+            n_rows=("score_weighted", "size"),
+            n_entities=("entity_name", "nunique"),
+            n_indicators=("indicator_id", "nunique"),
+            max_relevance=("score_weighted", "max"),
+        )
         .sort_values("max_relevance", ascending=False)
     )
 
@@ -192,11 +200,17 @@ def render_header(
     # Coverage. Anomalist samples variables (`--sample-n`, 500 by default; owidbot caps at 1000), so
     # on a large dataset the anomalies cover a fraction of it. Say so — an unqualified digest reads
     # as if the whole dataset had been checked.
+    # Detectors drop zero-score rows (`get_long_format_score_df`), so an indicator that *was*
+    # checked and came back clean is indistinguishable here from one the sampling never reached.
+    # Say both rather than claiming the remainder went unchecked.
     n_covered = df["indicator_id"].nunique()
     n_total = len(indicators)
     coverage = f"Coverage: {n_covered:,} of {n_total:,} indicators in the dataset have anomalies"
     if n_covered < n_total:
-        coverage += " — the rest were NOT checked (Anomalist samples variables; see --sample-n)"
+        coverage += (
+            " — the rest either have no anomalies or were never checked; the stored results cannot "
+            "tell the two apart (Anomalist samples variables; see --sample-n)"
+        )
     lines.append(coverage)
 
     # Staleness. The anomalies were computed against one version of the dataset's data; if the
@@ -205,7 +219,10 @@ def render_header(
     for anomaly in anomalies:
         checksums.setdefault(anomaly.datasetId, set()).add(anomaly.datasetSourceChecksum)
     for row in datasets.itertuples():
-        if row.dataset_id in checksums and row.sourceChecksum not in checksums[row.dataset_id]:
+        # Warn if *any* stored checksum differs from the current one, not just if the current one is
+        # absent: when only some anomaly types were recomputed after a rebuild, both the fresh and the
+        # stale checksum are present, and the digest silently mixes two versions of the data.
+        if row.dataset_id in checksums and checksums[row.dataset_id] != {row.sourceChecksum}:
             lines.append(
                 f"⚠️ {row.dataset_name}: the dataset changed since its anomalies were computed, so they may be "
                 f"stale. Re-run `etl anomalist --dataset-ids {row.dataset_id}`."
@@ -252,9 +269,9 @@ def render_markdown(
                 parts.append(str(first["unit"]))
             if pd.notna(first["views"]):
                 parts.append(f"views14d={int(first['views']):,}")
-            parts.append(flagged(n_rows, "entity"))
+            parts.append(flagged(int(group.n_entities), "entity"))
         else:
-            parts = [f"## {group.Index}", flagged(n_rows, "indicator")]
+            parts = [f"## {group.Index}", flagged(int(group.n_indicators), "indicator")]
 
         lines += ["", " · ".join(parts)]
         lines.append(rows[columns].to_csv(index=False, header=False, lineterminator="\n").strip())
