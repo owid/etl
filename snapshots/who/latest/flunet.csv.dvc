@@ -17,6 +17,6 @@ meta:
       url: https://www.who.int/about/policies/publishing/copyright
 wdir: ../../../data/snapshots/who/latest
 outs:
-  - md5: 0019e14e875c9dc6c37c6d41b953b7c7
-    size: 31788504
+  - md5: 2d08999318751bc19de25771e532453c
+    size: 31790804
     path: flunet.csv
