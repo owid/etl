@@ -156,10 +156,13 @@ One `AskUserQuestion` batch — don't drip-feed:
 > **Local SVG on disk: there is nothing to export.** When the input is a file from an
 > `export://static_viz` step, skip this whole step. The step chose its own `figsize` to match a
 > template's proportions, so none of the `imType` / `imFontSize` / `imWidth` aspect solving below
-> applies, and there is no second "embed" export — the file already *is* the framed chart. Point
-> `$DIR/original.svg` at the committed file and go straight to Step 5; `upload_assets` takes a
-> local path unchanged. If you want a reference copy of the *old* image beside the new one, use
-> the PNG the step emits alongside the SVG.
+> applies, and there is no chart-only "embed" to export — the file already *is* the framed chart,
+> carrying its own title, subtitle, `Note:`, `Data source:` and license at that template's own slot
+> positions. So the two assets below come from the step's own output rather than from a `curl`: the
+> **PNG** it emits beside the SVG is the flat reference copy for the page, and the **SVG** is what
+> goes into the template clone. `upload_assets` takes a local path unchanged. Then follow the
+> local-SVG route in Steps 5 and 7 — it replaces the measure-solve-export-fit ordering entirely,
+> because a frame that already matches the template has nothing left to solve.
 
 Two exports per format family: the **original** (placed on the page as the reference copy) and the **embed** (chart area only, placed inside the template).
 
@@ -254,6 +257,13 @@ const unwrap = (imported, parent, name) => {        // parent = the page (origin
 };
 ```
 
+> **Local-SVG route.** Two imports, and neither is an embed: place the step's **PNG** on the page as
+> the left-hand reference copy, and unwrap the **SVG** straight into the template clone here in Step 5
+> rather than waiting for a band measurement in Step 7. Waiting buys nothing — the SVG's frame is
+> already the template's frame, so there is no aspect to solve against the header and footer. Keep
+> the clone, though: the SVG's text is matplotlib's, not in the file's bound Lato/serif styles, so
+> Step 6 still fills the template's own slots and Step 7 then drops the SVG's duplicate text nodes.
+
 ## Step 6 — Fill the template texts
 
 Replace the lorem-ipsum text nodes in the cloned template. Source everything from the chart config (Step 1) and the user's answers (Step 2):
@@ -307,6 +317,21 @@ Nothing else gets restyled.
 The chart spans the full content width, left-aligned with the title/subtitle/logo box, and sits in the band between the header and the footer with an even gap top and bottom.
 
 **This is where the embed arrives.** The band's edges — `headerBottom` and `footerTop` — don't depend on the chart, so read them first, solve the export aspect against that band (Step 3), *then* export the embed, import it, and unwrap it into the template clone with the `unwrap` helper from Step 5. Fitting comes after. That ordering is the whole reason the embed waited this long.
+
+> **Local-SVG route: nothing arrives here, and nothing is fitted.** The SVG came in at Step 5 and it
+> is a full frame, not a chart area — importing it into the band would nest the whole visualization,
+> title and footer included, inside the template's chart slot. Align it to the clone's own origin
+> instead (`svg.x = clone.x; svg.y = clone.y`) and it lands correct by construction, because the step
+> drew it at the template's frame size against the same slot positions. So skip the band measurement,
+> the `rescale`, the ladder pick and the x-map below — every one of them exists to reconcile an export
+> whose proportions were chosen by grapher, and this one's were chosen from `TEMPLATES.md`.
+>
+> What *does* happen here is removing the duplicate copy: Step 6 filled the template's slots in the
+> file's bound styles, so delete the text groups the step named — `title`, `subtitle`, `note`,
+> `data-source`, `tagline`, whichever of them it emitted — leaving only the plotted marks and the
+> in-chart labels. Verify the deletion by name rather than by position; the template's own slots sit
+> at the same coordinates, and deleting the wrong one of an overlapping pair is invisible in a
+> screenshot.
 
 **Measure that band; don't hardcode it.** The header's height depends on how many lines the title and subtitle take, so a fixed y is wrong as soon as the subtitle wraps — and centering inside a guessed band leaves a lopsided result (18px above, 6px below on the first run of this skill). Read the real edges instead:
 

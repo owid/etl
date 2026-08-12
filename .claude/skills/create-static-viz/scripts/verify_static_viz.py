@@ -5,7 +5,10 @@ plausible, and the problem only shows up once a designer opens the SVG:
 
 - clipping left on, so shapes arrive cropped at the axes boundary
 - text saved as outlines, so none of the copy can be edited or restyled
-- unnamed nodes, so the layer panel is a list of "Path 41"
+- unnamed nodes, so the layer panel is a list of "Path 41"; pass ``--expect-gid`` to check the
+  layers that matter, since the unaided check can only catch a figure with no deliberate name at
+  all (which artists *should* carry one is not knowable from the SVG — matplotlib emits a
+  ``line2d_<n>`` group per tick mark just as it does for an unnamed data line)
 - a frame that no longer matches the template it targets, because something reintroduced
   ``bbox_inches="tight"`` and cropped the canvas to its content
 
@@ -157,7 +160,11 @@ def main() -> int:
         action="append",
         default=[],
         metavar="GID",
-        help="a gid that must appear as an SVG id; repeatable",
+        help=(
+            "a gid that must appear as an SVG id; repeatable. Pass the chart's data layers: without "
+            "them the naming check only proves some node was named, which a figure with a named "
+            "title and an unnamed data line already satisfies."
+        ),
     )
     args = parser.parse_args()
 

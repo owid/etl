@@ -217,7 +217,8 @@ Path `etl/steps/export/static_viz/<namespace>/<version>/<short_name>.py`, DAG en
 
 ### The Figma handoff contract
 
-Non-negotiable — `scripts/verify_static_viz.py` checks all of it:
+Non-negotiable — `scripts/verify_static_viz.py` checks all of it, with one gap you have to close by
+hand, named under `gid=` below:
 
 ```python
 import matplotlib
@@ -232,7 +233,14 @@ matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"  # deterministic ids, cl
   ```
 - **`gid=` on every artist**, so the layer panel reads `boys__median` rather than `Path 41`.
   Grapher does exactly this with `makeFigmaId` (`packages/@ourworldindata/utils/src/Util.ts`).
-  Use `<subject>__<role>` so the names sort into groups.
+  Use `<subject>__<role>` so the names sort into groups. **The verifier cannot enforce this clause on
+  its own, so name the layers and pass them.** It fails an SVG carrying no deliberate name at all,
+  but it cannot tell which artists *ought* to have been named: matplotlib emits `line2d_<n>` groups
+  for every tick mark exactly as it does for an unnamed data line, so "no generated ids left" is not
+  a test any correct figure would pass. Give it the data layers explicitly and the contract becomes a
+  real check rather than a presence check — otherwise a figure whose title is named and whose plotted
+  line is not still reports `OK`. Pass them as
+  `--expect-gid boys__median --expect-gid girls__median`.
 - **Do not pass `bbox_inches="tight"`** when the frame must match a template — cropping to content
   changes the proportions, which is the whole thing the template fixes. `export_fig` already
   injects `metadata={"Date": None}` on the SVG pass for reproducible diffs.
@@ -309,7 +317,14 @@ anything. For the narrow case where nothing in the repo changed but you still ne
 
 Then, in this order:
 
-1. `.venv/bin/python .claude/skills/create-static-viz/scripts/verify_static_viz.py <step-dir> --template <name>`
+1. Run the verifier, and **always pass the data layers** — without `--expect-gid` the naming check
+   only proves *some* node was named, which a figure with a named title and an unnamed line
+   satisfies:
+
+   ```bash
+   .venv/bin/python .claude/skills/create-static-viz/scripts/verify_static_viz.py <step-dir> \
+       --template <name> --expect-gid <data-layer> [--expect-gid <data-layer> ...]
+   ```
 2. **Read the PNG.** The verifier cannot see a collision, a widow, or a label sitting on a curve.
    Every layout bug in this skill's Gotchas was found by looking.
 
