@@ -2286,7 +2286,15 @@ def test_convert_description_key_lists_rejects_character_explosion():
     from etl.collection.model.core import _convert_description_key_lists
 
     config = {
-        "views": [{"metadata": {"description_key": list("A markdown string, not a list of bullets.")}}],
+        "views": [
+            {
+                "metadata": {
+                    "description_key": list(
+                        "A markdown string that is not a list of bullets, and is as long as a real one."
+                    )
+                }
+            }
+        ],
     }
     with pytest.raises(ValueError, match="Pathological `description_key`"):
         _convert_description_key_lists(config, context="multidim/x/latest/y#y")
@@ -2312,7 +2320,11 @@ def test_validate_description_keys_rejects_character_explosion():
                 indicators=ViewIndicators(
                     y=[Indicator(catalogPath="grapher/emdat/2026-04-30/natural_disasters/yearly#total_affected")]
                 ),
-                metadata={"description_key": list("- EM-DAT counts an event as a disaster when...")},
+                metadata={
+                    "description_key": list(
+                        "- EM-DAT counts an event as a disaster when it meets any of several criteria."
+                    )
+                },
             )
         ],
         _definitions=Definitions(),
@@ -2322,5 +2334,7 @@ def test_validate_description_keys_rejects_character_explosion():
         collection.validate_description_keys()
 
     # The same view with the string left alone passes.
-    collection.views[0].metadata = {"description_key": "- EM-DAT counts an event as a disaster when..."}
+    collection.views[0].metadata = {
+        "description_key": "- EM-DAT counts an event as a disaster when it meets any of several criteria."
+    }
     collection.validate_description_keys()

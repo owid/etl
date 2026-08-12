@@ -2,6 +2,8 @@
 #  test_meta.py
 #
 
+import copy
+import json
 from dataclasses import dataclass
 from typing import Any
 
@@ -162,34 +164,72 @@ def test_description_key_to_string_flattens_multiline_items():
     assert meta.description_key_to_string(["Para one.\n\nPara two."]) == "Para one.\n\nPara two."
 
 
-def test_validate_description_key_list_rejects_character_explosion():
-    # `list("some markdown string")` gives one bullet per character. This is what shipped
-    # thousands of one-character bullets to readers before the check existed.
+def test_markdown_refuses_character_iteration():
+    """`list(description_key)` is the mistake that shipped ~2,900 one-character bullets.
+
+    It must fail on the line that writes it, not be judged downstream by bullet count.
+    """
+    m = meta.description_key_to_string(["Point one.", "Point two."])
+    assert isinstance(m, meta.Markdown)
+
+    with pytest.raises(TypeError, match="not a list of bullets"):
+        list(m)
+    with pytest.raises(TypeError, match="not a list of bullets"):
+        [c for c in m]
+    # Concatenating it into a list fails too, though with Python's own message.
+    with pytest.raises(TypeError):
+        sum([m], [])  # ty: ignore
+
+
+def test_markdown_behaves_like_a_string_everywhere_else():
+    m = meta.Markdown("- Point one.\n- Point two.")
+    assert isinstance(m, str)
+    assert len(m) == len("- Point one.\n- Point two.")
+    assert m[:7] == "- Point"
+    assert m.strip() == m
+    assert len(m.splitlines()) == 2
+    assert f"{m}".startswith("- ")
+    assert "Point one." in m
+    assert m == "- Point one.\n- Point two."
+    assert json.loads(json.dumps({"k": m}))["k"] == str(m)
+    assert copy.deepcopy(m) == m
+    # PyYAML resolves representers by exact type, so the subclass needs its own.
+    assert yaml.safe_load(yaml.safe_dump({"k": m}))["k"] == str(m)
+
+
+def test_variable_meta_marks_description_key_as_markdown():
+    """A value loaded from a feather must carry the type too — that is the path the
+    natural-disasters export step read from, and where the bug was actually written."""
+    m = meta.VariableMeta.from_dict({"description_key": "- Point one.\n- Point two.", "title": "X"})
+    assert isinstance(m.description_key, meta.Markdown)
+    with pytest.raises(TypeError, match="not a list of bullets"):
+        list(m.description_key)
+
+    # Round-tripping through to_dict keeps the value intact.
+    assert meta.VariableMeta.from_dict(m.to_dict()).description_key == m.description_key
+
+
+def test_validate_description_key_list_rejects_too_many_bullets():
+    # The backstop for corruption arriving where the type cannot see it — an admin API
+    # payload, a DB row, a list built in a loop.
     exploded = list("This is a markdown string that was exploded into its characters.")
     with pytest.raises(ValueError, match="Pathological `description_key`"):
         meta.validate_description_key_list(exploded)
 
-    # A short explosion stays under the bullet cap, but is caught by the short-bullet share.
-    with pytest.raises(ValueError, match="at most 2 characters long"):
-        meta.validate_description_key_list(list("Short one."))
-
     # The context is quoted, so the offending indicator is identifiable.
     with pytest.raises(ValueError, match="grapher/emdat/latest/x#y"):
-        meta.validate_description_key_list(list("Short one."), context="grapher/emdat/latest/x#y")
+        meta.validate_description_key_list(exploded, context="grapher/emdat/latest/x#y")
 
-
-def test_validate_description_key_list_rejects_too_many_bullets():
     ok = [f"Bullet number {i}, long enough to be a real sentence." for i in range(meta.DESCRIPTION_KEY_MAX_ITEMS)]
     meta.validate_description_key_list(ok)
-
     with pytest.raises(ValueError, match="51 bullets"):
         meta.validate_description_key_list(ok + ["One bullet too many, but a perfectly real sentence."])
 
 
 def test_validate_description_key_list_accepts_legitimate_lists():
-    # The longest list authored in ETL has 13 bullets.
+    # The longest list authored in ETL has 13 bullets; the longest published anywhere is 19.
     meta.validate_description_key_list(
-        [f"Bullet {i} says something substantive about the indicator." for i in range(13)]
+        [f"Bullet {i} says something substantive about the indicator." for i in range(19)]
     )
     # Short lists, including single-item ones and ones with short-but-real bullets.
     meta.validate_description_key_list(["Only point"])
@@ -201,7 +241,8 @@ def test_validate_description_key_list_accepts_legitimate_lists():
 
 
 def test_update_variable_metadata_rejects_pathological_description_key():
-    m = meta.VariableMeta(description_key=list("Exploded into characters."), title="Some indicator")  # ty: ignore
+    exploded = list("A markdown string that was exploded into one bullet per character.")
+    m = meta.VariableMeta(description_key=exploded, title="Some indicator")  # ty: ignore
     with pytest.raises(ValueError, match="Some indicator"):
         meta.update_variable_metadata(m)
 

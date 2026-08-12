@@ -14,6 +14,7 @@ from typing import Any, Literal, NewType, NoReturn, NotRequired, Required, Self,
 
 import mistune
 import pandas as pd
+import yaml
 from dataclasses_json import DataClassJsonMixin
 
 from owid.catalog.core import jinja
@@ -418,28 +419,19 @@ def _collapse_description_key_item(item: str) -> str:
     return "".join(parts)
 
 
-# Crude bounds on `description_key` authored as a list of bullets. They are meant to
-# exclude obviously broken values, not to encode editorial limits: the longest list
-# authored in the repo has 13 bullets and the longest published anywhere is 19, so 50
-# leaves plenty of room. Other user-facing metadata fields with equally obvious bounds
-# (indicator title length, `description_short` length, unit length) can be guarded the
-# same way — a named constant plus a call to `_reject_metadata_value`.
+# A crude bound on `description_key` authored as a list of bullets. It is meant to exclude an
+# obviously broken value, not to encode an editorial limit: the longest list authored in the
+# repo has 13 bullets and the longest published anywhere is 19, so 50 leaves plenty of room.
+# Other user-facing metadata fields with equally obvious bounds (indicator title length,
+# `description_short` length, unit length) can be guarded the same way — a named constant plus
+# a call to `_reject_metadata_value`.
+#
+# This is a backstop, not the primary defence. A list arriving here is legal by design (YAML
+# authoring sugar), so no check at this point can tell corruption from content by type alone;
+# `Markdown` below stops the corruption being constructible in the first place, and this bound
+# only catches what reaches a write path from somewhere the type cannot see — an admin API
+# payload, a DB row, a list built in a loop.
 DESCRIPTION_KEY_MAX_ITEMS = 50
-# Below this many bullets the short-bullet share is too noisy to mean anything.
-DESCRIPTION_KEY_MIN_ITEMS_FOR_SHORT_CHECK = 5
-# A bullet this short is a character or two, not a sentence.
-DESCRIPTION_KEY_SHORT_ITEM_CHARS = 2
-
-
-# The way a `description_key` gets corrupted in practice: a step rebuilds it as a list from a
-# value that had already been converted to markdown. Note this is not predictable from the
-# channel — a grapher-channel dataset holds a string only if the step rendered dimensions or
-# the value came back from the DB, so a step reading one has to handle both shapes.
-_CHARACTER_EXPLOSION_HINT = (
-    "The most likely cause is a markdown string that was split into its characters, e.g. "
-    "`list(description_key)`. Pass the value through unchanged when it is already a string, "
-    "instead of rebuilding it as a list."
-)
 
 
 def _reject_metadata_value(field_name: str, problem: str, context: str | None, hint: str) -> NoReturn:
@@ -451,10 +443,9 @@ def _reject_metadata_value(field_name: str, problem: str, context: str | None, h
 def validate_description_key_list(items: list[str], context: str | None = None) -> None:
     """Reject a `description_key` list that cannot plausibly be real content.
 
-    `description_key` is a markdown string in the grapher channel, but it can still be
-    authored as a list of bullets, which is then joined into that string. Nothing about
-    that conversion notices when the "list" is in fact one item per character, so a
-    corrupted value used to be published to readers silently.
+    A `description_key` can be authored as a list of bullets, which is joined into a markdown
+    string on the way out. Nothing about that conversion notices when the "list" is in fact one
+    item per character, so a corrupted value used to be published to readers silently.
 
     Empty items are ignored, because they are dropped by `description_key_to_string`
     too — Jinja conditionals routinely render a bullet to nothing.
@@ -465,8 +456,7 @@ def validate_description_key_list(items: list[str], context: str | None = None) 
             the error so the offending indicator is identifiable.
 
     Raises:
-        ValueError: if the list is far longer than any real bullet list, or if most of
-            its bullets are one or two characters long.
+        ValueError: if the list is far longer than any real bullet list.
     """
     bullets = [str(item).strip() for item in items if item and str(item).strip()]
 
@@ -475,21 +465,43 @@ def validate_description_key_list(items: list[str], context: str | None = None) 
             "description_key",
             f"{len(bullets)} bullets, far more than the {DESCRIPTION_KEY_MAX_ITEMS} a real list ever has",
             context,
-            # A long list of real sentences is not what this check is aimed at, so say how to
-            # allow one rather than only naming the likely corruption.
-            f"{_CHARACTER_EXPLOSION_HINT} If the bullets really are content, raise `DESCRIPTION_KEY_MAX_ITEMS`.",
+            "The most likely cause is a markdown string that was split into its characters, e.g. "
+            "`list(description_key)`. Pass the value through unchanged when it is already a string, "
+            "instead of rebuilding it as a list. If the bullets really are content, raise "
+            "`DESCRIPTION_KEY_MAX_ITEMS`.",
         )
 
-    if len(bullets) >= DESCRIPTION_KEY_MIN_ITEMS_FOR_SHORT_CHECK:
-        n_short = sum(1 for bullet in bullets if len(bullet) <= DESCRIPTION_KEY_SHORT_ITEM_CHARS)
-        if n_short > len(bullets) / 2:
-            _reject_metadata_value(
-                "description_key",
-                f"{n_short} of its {len(bullets)} bullets are at most "
-                f"{DESCRIPTION_KEY_SHORT_ITEM_CHARS} characters long",
-                context,
-                _CHARACTER_EXPLOSION_HINT,
-            )
+
+class Markdown(str):
+    """A markdown string that refuses to be iterated character by character.
+
+    `description_key` is authored as a list of bullets but published as markdown, and a step
+    reading one has to cope with either shape. That is easy to get wrong in a way no type
+    checker flags: `list(some_markdown_string)` is valid Python that yields one item per
+    character, and every write path then rejoined those characters into convincing markdown —
+    which is how ~2,900 one-character bullets reached readers.
+
+    A bound on the resulting list can only judge the damage after the fact, and cannot
+    distinguish it from real content by type. Refusing to iterate makes the mistake a
+    `TypeError` on the line that writes it instead.
+
+    Everything else a caller does with a string still works: slicing, `len`, `.strip()`,
+    `.splitlines()`, f-strings, `in`, concatenation, `json.dumps`, copying, pickling.
+    """
+
+    __slots__ = ()
+
+    def __iter__(self):
+        raise TypeError(
+            "description_key is a markdown string, not a list of bullets — iterating it yields "
+            "one item per character. Pass the value through unchanged, or use .splitlines()."
+        )
+
+
+# PyYAML picks representers by exact type, so a str subclass would otherwise raise
+# RepresenterError on `yaml.safe_dump`. Dump it as the plain string it is.
+yaml.add_representer(Markdown, lambda dumper, data: dumper.represent_str(str(data)), Dumper=yaml.SafeDumper)
+yaml.add_representer(Markdown, lambda dumper, data: dumper.represent_str(str(data)), Dumper=yaml.Dumper)
 
 
 def description_key_to_string(items: list[str]) -> str | None:
@@ -505,8 +517,8 @@ def description_key_to_string(items: list[str]) -> str | None:
     if not cleaned:
         return None
     if len(cleaned) == 1:
-        return cleaned[0]
-    return "\n".join("- " + _collapse_description_key_item(item) for item in cleaned)
+        return Markdown(cleaned[0])
+    return Markdown("\n".join("- " + _collapse_description_key_item(item) for item in cleaned))
 
 
 @pruned_json
@@ -576,6 +588,12 @@ class VariableMeta(MetaBase):
     original_short_name: str | None = None
     # TODO: it's possible that we might not need `original_title` at all
     original_title: str | None = None
+
+    def __post_init__(self):
+        # A markdown string is not a list of bullets; make that unrepresentable rather than
+        # something each write path has to notice. See `Markdown`.
+        if isinstance(self.description_key, str):
+            self.description_key = Markdown(self.description_key)
 
     @property
     def schema_version(self) -> int:
@@ -828,6 +846,8 @@ def update_variable_metadata(meta: VariableMeta) -> VariableMeta:
             meta.description_key = description_key_to_string(meta.description_key)
         elif not meta.description_key.strip():
             meta.description_key = None
+        else:
+            meta.description_key = Markdown(meta.description_key)
 
     # Convert from string to proper type when it comes from YAML
     grapher_config = getattr(getattr(meta, "presentation", None), "grapher_config", {}) or {}
