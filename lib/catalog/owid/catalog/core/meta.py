@@ -431,12 +431,14 @@ DESCRIPTION_KEY_MIN_ITEMS_FOR_SHORT_CHECK = 5
 DESCRIPTION_KEY_SHORT_ITEM_CHARS = 2
 
 
-# The way a `description_key` gets corrupted in practice: a step in the grapher channel,
-# where the field is already a markdown string, rebuilds it as a list.
+# The way a `description_key` gets corrupted in practice: a step rebuilds it as a list from a
+# value that had already been converted to markdown. Note this is not predictable from the
+# channel — a grapher-channel dataset holds a string only if the step rendered dimensions or
+# the value came back from the DB, so a step reading one has to handle both shapes.
 _CHARACTER_EXPLOSION_HINT = (
     "The most likely cause is a markdown string that was split into its characters, e.g. "
-    "`list(description_key)`. In the grapher channel `description_key` is already a markdown "
-    "string — pass it through unchanged instead of rebuilding it as a list."
+    "`list(description_key)`. Pass the value through unchanged when it is already a string, "
+    "instead of rebuilding it as a list."
 )
 
 
