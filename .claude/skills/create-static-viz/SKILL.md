@@ -237,11 +237,16 @@ matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"  # deterministic ids, cl
   three — and because they are their own groups, dropping the SVG's duplicate text does not uncover
   them. This is the same rule as "the step does not set colors": the background belongs to the
   template, and white is a background even though nobody chose it.
+  The PNG wants the opposite, though: it is what a human reviews, often against a dark editor
+  background, where a transparent canvas makes grey text unreadable. So keep the canvas opaque on the
+  figure and drop it at save time, which means **two `export_fig` calls, not one**:
   ```python
-  fig.patch.set_alpha(0)
-  for ax in fig.axes:
-      ax.patch.set_alpha(0)
+  fig.patch.set_facecolor("white")  # legible when the PNG is reviewed on a dark background
+  paths.export_fig(fig, short_name, ["png"], dpi=300)
+  paths.export_fig(fig, short_name, ["svg"], transparent=True)
   ```
+  Any extra axes you add for annotation needs the same treatment
+  (`ax.patch.set_visible(False)`), or it arrives as one more opaque rectangle.
   **The verifier does not check this yet** — read `patch_1` in the saved SVG: `fill: none` is right,
   `fill: #ffffff` is the bug.
 - **`gid=` on every artist**, so the layer panel reads `boys__median` rather than `Path 41`.
@@ -260,10 +265,6 @@ matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"  # deterministic ids, cl
 - Emit both formats; `paths.export_fig` writes into the step's own directory, so **the PNG and SVG
   are committed next to the `.py`** — for every frame the step emits.
 
-```python
-paths.export_fig(fig, short_name, ["png", "svg"], dpi=300)
-```
-
 ### Style, and where it stops
 
 - **seaborn** `set_style("ticks")` + `set_palette("deep")`, and reference colors by **palette
@@ -280,11 +281,68 @@ paths.export_fig(fig, short_name, ["png", "svg"], dpi=300)
   | Axis line | **none** — the gridlines carry the reading |
   | x gridlines on a line chart | hidden (grapher sets `hideGridlines` on the x axis) |
 
-- Nested percentile/uncertainty bands: one `BAND_ALPHA`, deepening where they overlap, gives the
-  fan for free. **The legend swatch must show the cumulative alpha** — `1-(1-a)**(i+1)` for the
-  nth band — or the key reads inside out against the chart.
-- Reference lines get a **bold title above a regular-weight value**, labeled on the line rather
-  than pushed into the legend, via `AnnotationBbox` / `TextArea` / `VPacker`.
+- **Nested bands get precomputed flat tints, not alpha.** One `BAND_ALPHA` deepening where the bands
+  overlap looks like it gives the fan for free, but an alpha fill has to composite onto *something*,
+  and the canvas is deliberately transparent so the template supplies the background — so the fan
+  ends up depending on whatever sits behind the SVG, and vanishes when the white patch goes. Blend
+  each band towards white yourself; it renders identically on any backdrop and hands Figma one flat
+  fill per band.
+  ```python
+  def tint(color, weight: float) -> tuple[float, float, float]:
+      """Blend `color` towards white; weight 0 keeps it, 1 is white."""
+      return tuple(c + (1.0 - c) * weight for c in to_rgb(color))
+  ```
+  If a key does show swatches, they must carry the **same** tints in the **same** order, or it reads
+  inside out against the chart. (With alpha the equivalent trap was a swatch showing the per-band
+  alpha rather than the cumulative `1-(1-a)**(i+1)`.)
+- Reference lines labeled *on the plot* get a **bold title above a regular-weight value** via
+  `AnnotationBbox` / `TextArea` / `VPacker`. Where an encoding diagram already names the line, label
+  it there instead and drop the inline copy — two labels for one line leave the reader looking for
+  the difference between them.
+
+### Explain the encoding with a diagram, not a legend
+
+When the encoding is *structural* — nested bands, a threshold inside a band, a line whose position
+within a shape carries meaning — draw a miniature of the real thing and name its parts, instead of
+listing swatches. A legend asks the reader to carry a color across the frame and find the shape it
+belongs to; an exemplar shows the structure directly, in the order it appears.
+
+Conventions that make one legible:
+
+- **A span gets a bracket; a line gets a label.** A tick pointing at a band's boundary invites the
+  reader to take that boundary as the thing being named. Bracket the band's full height instead.
+- **A leader only where a label cannot sit next to the thing it names.** Adjacency reads faster
+  than a line to follow, and it is one less thing to route around.
+- **Moving a label buys width.** Beside a shape a label is boxed in by whatever else is beside it;
+  below the shape it usually has the full frame. That is often the difference between one row and
+  three — and three rows of explanation reads as a paragraph, not a label.
+- **Lead with the plain meaning, keep the technical term.** `Stunted: too short for their age`, not
+  `Stunted below here (2 SD below median)` — the jargon is what the chart exists to explain, so
+  putting it first explains nothing.
+- **Draw the key in grey**, even when the chart is colored: grey is what marks it as explanation
+  rather than a further data series. Keep the tints and line styles identical to the chart's.
+- **Get the schematic's internal proportions right.** If a threshold really falls inside a band, the
+  diagram must show it inside — derive its offset from the same z-values the data uses rather than
+  eyeballing the position.
+
+### Keep the desktop and mobile versions paired
+
+The versions get published together, so they should differ only where the template forces it —
+frame, tick count, which footer rows exist. Two different explanatory devices reads as two
+different charts.
+
+When a device does not fit inside a narrow mobile panel, **move it rather than substitute it**: the
+header row spans the full content width, which is more than twice a side-by-side panel's width, and
+a wide-and-short block fits there comfortably. Give it its own frameless axes
+(`fig.add_axes(...)`, `set_axis_off()`, `patch.set_visible(False)` so the transparent SVG stays
+transparent) and reuse the same drawing code.
+
+Two traps when the same drawing serves two hosts:
+
+- **Fractional offsets do not survive a change of host.** A `0.03` gap is 10 px in a 347 px panel
+  and 2 px in a 76 px strip. Any offset that has to look the same in both must be a parameter.
+- **Text does not scale with the box.** Shrinking a container shrinks its shapes but not its
+  absolute-point-size labels, so a block that fits at one size overflows at another.
 
 ### Text slots — take them from the template
 
@@ -444,10 +502,22 @@ claim about human intent that an automated flow should not be making.
   title`. Pin to it under a one-line title and you get a dead line.
 - **A matplotlib legend extends downwards from its `bbox_to_anchor`**, and occupies more than its
   text height. Its anchor must clear the axes by its own full height plus a gap, or the swatches
-  land on the plot.
+  land on the plot. A gap calibrated for a legend's internal padding is too big for anything else,
+  so re-derive it if the legend is later replaced.
 - **A narrow panel cannot hold an inline reference label.** With clipping off it spills into the
-  neighboring panel rather than being cropped — which looks like a rendering bug. Move the label
-  to the legend for narrow layouts.
+  neighboring panel rather than being cropped — which looks like a rendering bug. Move it to a
+  full-width row rather than a different device, per the pairing rule above.
+- **Empty space in a chart has a shape, and a text block has to match it.** A rising curve leaves a
+  triangle that widens downwards, so a block placed there must put its longest line last; a wide
+  line high up runs into the steep part of the curve.
+- **Test clearance against the filled span, not against one edge.** A band occupies
+  `[lower(x), upper(x)]`; a label near a steeply rising band can be *above* it at one end and
+  *below* it at the other, so "is the text above the lower edge?" answers the wrong question and
+  reports collisions that are not there. Interpolate both edges over the label's own x range.
+- **Do the clearance arithmetic in the script, not by eye.** Measure the label with `TextPath`,
+  convert to axes fractions with the real panel box, and compare against the actual curve. Two
+  rounds of guess-render-look is slower than one round of measuring, and it silently accepts
+  near-misses.
 - Fewer axis ticks in a narrow panel. Make the tick set per-layout, not global.
 
 **Workflow**
@@ -470,3 +540,12 @@ claim about human intent that an automated flow should not be making.
 - **Keep docstrings current when a design decision changes.** The above happened because the
   module docstring still said "stacked" after the layout became side-by-side. A stale comment
   invites a reviewer to "fix" working code.
+- **Removing a design element orphans code, and the orphans are the whole point.** Dropping a legend
+  left a label helper, a layout flag and three imports with no callers. `ruff` catches the imports;
+  it does not catch a module-level function nobody calls or a config key nobody reads. Grep for each
+  name you stopped using before calling the change done — and take the simplification, since dead
+  branches are what make the next edit misfire.
+- **Scripted edits need `assert old in s` and a uniqueness check.** A `str.replace` that matches
+  nothing returns the string unchanged and reports success, so the render silently keeps the old
+  behavior while you debug the wrong thing. For the same reason, never delete by slicing between two
+  anchors without checking what lies between them: an unrelated helper sitting there goes too.
