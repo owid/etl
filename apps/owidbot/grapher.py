@@ -14,7 +14,7 @@ SVG_TESTER_SUITES = ("graphers", "grapher-views", "mdims", "thumbnails")
 VERIFY_RESULTS_FILENAME = "verify-results.json"
 
 
-def run(branch: str) -> str:
+def run(branch: str, head_sha: str | None = None) -> str:
     container_name = get_container_name(branch)
 
     svgs_repo = BASE_DIR.parent / "owid-grapher-svgs"
@@ -30,12 +30,14 @@ def run(branch: str) -> str:
         for suite, results in results_by_suite.items()
     )
 
+    details = "\n\n".join(part for part in (rows, make_freshness_note(results_by_suite, head_sha)) if part)
+
     svg_tester_block = (
         f"""
 <details open>
 <summary><b>SVG tester:</b> </summary>
 
-{rows}
+{details}
 
 </details>
 """.strip()
@@ -80,6 +82,22 @@ def read_verify_results(suite_dir: Path) -> dict | None:
         # was never run". A truncated file is plausible - the process can be killed mid-write.
         log.warning("owidbot.svg_tester.unreadable_results", path=str(path), error=str(e))
         return {"status": "unreadable"}
+
+
+def make_freshness_note(results_by_suite: dict[str, dict | None], head_sha: str | None) -> str:
+    """Whether the results above came from the PR's current commit."""
+    if not head_sha:
+        return ""
+
+    commits = {results.get("grapherCommit") for results in results_by_suite.values() if results}
+
+    if commits == {head_sha}:
+        if any(results.get("status") == "running" for results in results_by_suite.values() if results):
+            return f"_⏳ Still running on the current commit `{head_sha[:7]}`._"
+        return f"_Results are for the current commit `{head_sha[:7]}`._"
+
+    ran_on = ", ".join(sorted(f"`{commit[:7]}`" if commit else "an unknown commit" for commit in commits - {head_sha}))
+    return f"_⏳ Stale: from {ran_on}. The run for the current commit `{head_sha[:7]}` hasn't reported yet._"
 
 
 def make_suite_line(results: dict | None, container_name: str, suite: str) -> str:
