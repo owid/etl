@@ -307,8 +307,12 @@ number and position of the discontinuities.
 ```
 
 **The `--export` flag is mandatory.** Without it the step silently does not match, and the error
-says "No steps matched" while listing your step as the closest match. Add `--force` to re-run when
-nothing changed.
+says "No steps matched" while listing your step as the closest match.
+
+Editing the step's `.py` is enough to trigger a rebuild on its own, so you rarely need to force
+anything. For the narrow case where nothing in the repo changed but you still need to re-run, use
+**`--force --only`** — never `--force` alone, which would also re-run every upstream dependency.
+`--only` is safe here because the deps are already on disk from the run you are repeating.
 
 Then, in this order:
 
