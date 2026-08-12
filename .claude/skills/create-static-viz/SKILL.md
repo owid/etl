@@ -231,6 +231,19 @@ matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"  # deterministic ids, cl
   for artist in fig.findobj():
       artist.set_clip_on(False)
   ```
+- **Make the figure and axes backgrounds transparent.** matplotlib fills both white by default, and
+  they leave the step as a frame-sized opaque rectangle (`patch_1`) plus a plot-sized one (`patch_2`).
+  On import those land *above* the template's cream background, its logo and its text and hide all
+  three — and because they are their own groups, dropping the SVG's duplicate text does not uncover
+  them. This is the same rule as "the step does not set colors": the background belongs to the
+  template, and white is a background even though nobody chose it.
+  ```python
+  fig.patch.set_alpha(0)
+  for ax in fig.axes:
+      ax.patch.set_alpha(0)
+  ```
+  **The verifier does not check this yet** — read `patch_1` in the saved SVG: `fill: none` is right,
+  `fill: #ffffff` is the bug.
 - **`gid=` on every artist**, so the layer panel reads `boys__median` rather than `Path 41`.
   Grapher does exactly this with `makeFigmaId` (`packages/@ourworldindata/utils/src/Util.ts`).
   Use `<subject>__<role>` so the names sort into groups. **The verifier cannot enforce this clause on

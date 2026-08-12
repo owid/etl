@@ -328,12 +328,19 @@ The chart spans the full content width, left-aligned with the title/subtitle/log
 > the `rescale`, the ladder pick and the x-map below — every one of them exists to reconcile an export
 > whose proportions were chosen by grapher, and this one's were chosen from `TEMPLATES.md`.
 >
-> What *does* happen here is removing the duplicate copy: Step 6 filled the template's slots in the
-> file's bound styles, so delete the text groups the step named — `title`, `subtitle`, `note`,
-> `data-source`, `tagline`, whichever of them it emitted — leaving only the plotted marks and the
-> in-chart labels. Verify the deletion by name rather than by position; the template's own slots sit
-> at the same coordinates, and deleting the wrong one of an overlapping pair is invisible in a
-> screenshot.
+> What *does* happen here is stripping whatever the template already provides. **The background comes
+> first, and it is the one that ruins the page.** matplotlib fills the figure and axes patches white
+> unless the step turned them off, so the import can carry a frame-sized opaque rectangle (`patch_1`,
+> plus a plot-sized `patch_2`) that lands *above* the clone's cream background, logo and text and
+> hides all three. They are their own groups, so removing the duplicate text does not uncover them —
+> delete them explicitly, before anything else. A step written to the current contract emits
+> `fill: none`; an older one will not, so check rather than assume.
+>
+> **Then the duplicate text:** Step 6 filled the template's slots in the file's bound styles, so
+> delete the text groups the step named — `title`, `subtitle`, `note`, `data-source`, `tagline`,
+> whichever of them it emitted — leaving only the plotted marks and the in-chart labels. Verify both
+> deletions by name rather than by position; the template's own slots sit at the same coordinates, and
+> deleting the wrong one of an overlapping pair is invisible in a screenshot.
 
 **Measure that band; don't hardcode it.** The header's height depends on how many lines the title and subtitle take, so a fixed y is wrong as soon as the subtitle wraps — and centering inside a guessed band leaves a lopsided result (18px above, 6px below on the first run of this skill). Read the real edges instead:
 
