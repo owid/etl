@@ -1,6 +1,6 @@
 ---
 name: create-static-viz
-description: Build or refresh an OWID static visualization end to end — resolve what data it needs from an old static viz image, an indicator, or a grapher chart; check both the ETL catalog and the producer's own site for a newer release and route to /create-dataset or /update-dataset when one exists; write the export://static_viz matplotlib step that emits Figma-ready SVG and PNG at the static-chart templates' proportions; then hand off to /create-figma-chart. Trigger when the user asks to "refresh this static viz", "remake this chart as a static image", "create a static viz", pastes an old static viz image or filename and asks for a better version, or works a row of the static-viz refresh tracker.
+description: Build or refresh an OWID static visualization end to end — resolve what data it needs from an old static viz image, an indicator, or a grapher chart; check both the ETL catalog and the producer's own site for a newer release and route to /create-dataset or /update-dataset when one exists; write the export://static_viz matplotlib step that emits Figma-ready SVG and PNG at the static-chart templates' proportions; then hand off to /create-figma-chart. Trigger when the user asks to "refresh this static viz", "remake this chart as a static image", "create a static viz", pastes an old static viz image or filename and asks for a better version, or picks up a viz from the static-viz refresh queue.
 metadata:
   internal: true
 ---
@@ -95,7 +95,7 @@ Any one of:
 Optionally: the article or topic page the viz belongs to, and a reference page in the Charts file
 to work like (`/create-figma-chart` has a whole mode for that).
 
-## Step 1 — Resolve the input to data, and check the tracker
+## Step 1 — Resolve the input to data
 
 Reuse the existing resolver rather than writing another one:
 
@@ -119,19 +119,12 @@ including a warning when the grapher catalogPath's version differs from what is 
 If neither resolves it, ask. Guessing which dataset an old hand-drawn image was built from is how
 you rebuild the wrong chart.
 
-**Read the refresh tracker once**, and surface what it says before doing any work:
+The project tracks which viz is claimed, parked or already done in a shared tracker, and this
+skill deliberately does not read or write it — **ask instead**. If the user has not already said
+where this viz stands, ask before doing any work: a viz someone else is mid-way through, or one
+already finished, is worth an interruption rather than a duplicate.
 
-```sql
-SELECT url, "Name", "Status", "Comment", "GitHub", "Rank", "Views per day"
-FROM "collection://b9f7b7e5-8923-41f4-9190-d1544914d9e0"
-```
-
-Statuses are `Propose` / `Tackle` / `On the bench` / `Blocked` / `Done` or empty. If the row is
-`Blocked` or `Done`, say so and stop for confirmation rather than redoing it. **Query once, never
-poll** — the Notion allowance is limited.
-
-Then report what you found: which dataset, which version, how many charts use it, and what the
-tracker says.
+Then report what you found: which dataset, which version, and how many charts use it.
 
 ## Step 2 — Check for newer data. Always, even when it is already in ETL
 
@@ -358,7 +351,7 @@ To refresh: re-run this step, re-upload the SVG to the same page, and reapply th
 """
 ```
 
-## Step 9 — PR, review chain, tracker
+## Step 9 — PR and the review chain
 
 The branch, worktree and draft PR already exist from Step 4. Commit the step plus its committed
 PNG/SVG, push, and fill in the PR body — then [`/pr-babysitter`](../pr-babysitter/SKILL.md) for the
@@ -387,8 +380,10 @@ not checks — from `#2459`'s workflow, with the parts this skill touches in bol
 Report which of these are done and which are outstanding — the surrounding prose in particular
 tends to be forgotten, and a corrected chart under an uncorrected caption is worse than neither.
 
-Finally, print the tracker row and the PR link for the user to paste into Notion. Don't write to
-it.
+Finally, **remind the user to set the viz's status in the tracker themselves**, and give them the
+PR link to record against it. This skill never reads or writes the tracker — it is a shared team
+database, the person running the refresh knows the state of their own queue, and a status is a
+claim about human intent that an automated flow should not be making.
 
 ## Gotchas
 
