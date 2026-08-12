@@ -24,8 +24,9 @@
 L 612 459.36 
 L 612 0 
 L 0 0 
+L 0 459.36 
 z
-" style="fill: #ffffff"/>
+" style="fill: none"/>
   </g>
   <g id="axes_1">
    <g id="patch_2">
@@ -33,8 +34,9 @@ z
 L 313.851429 352.805 
 L 313.851429 116.0375 
 L 53.28 116.0375 
+L 53.28 352.805 
 z
-" style="fill: #ffffff"/>
+" style="fill: none"/>
    </g>
    <g id="matplotlib.axis_1">
     <g id="xtick_1">
@@ -180,7 +182,7 @@ L 313.851429 120.672977
    </g>
    <g id="boys__middle-94">
     <defs>
-     <path id="m139f7f6fff" d="M 59.172116 -128.686352 
+     <path id="m3b3dd7d135" d="M 59.172116 -128.686352 
 L 59.172116 -118.482576 
 L 59.207964 -118.729033 
 L 59.243813 -118.976927 
@@ -4236,12 +4238,12 @@ z
 "/>
     </defs>
     <g>
-     <use xlink:href="#m139f7f6fff" x="0" y="459.36" style="fill: #dd8452; fill-opacity: 0.25"/>
+     <use xlink:href="#m3b3dd7d135" x="0" y="459.36" style="fill: #f8e4d9"/>
     </g>
    </g>
    <g id="boys__middle-80">
     <defs>
-     <path id="meb56030b36" d="M 59.172116 -127.059997 
+     <path id="mca1898faf2" d="M 59.172116 -127.059997 
 L 59.172116 -120.107498 
 L 59.207964 -120.356825 
 L 59.243813 -120.606152 
@@ -8297,12 +8299,12 @@ z
 "/>
     </defs>
     <g>
-     <use xlink:href="#meb56030b36" x="0" y="459.36" style="fill: #dd8452; fill-opacity: 0.25"/>
+     <use xlink:href="#mca1898faf2" x="0" y="459.36" style="fill: #f1ceba"/>
     </g>
    </g>
    <g id="boys__middle-50">
     <defs>
-     <path id="ma09473b27f" d="M 59.172116 -125.413577 
+     <path id="m4b292c9af5" d="M 59.172116 -125.413577 
 L 59.172116 -121.753914 
 L 59.207964 -122.004678 
 L 59.243813 -122.255437 
@@ -12358,7 +12360,7 @@ z
 "/>
     </defs>
     <g>
-     <use xlink:href="#ma09473b27f" x="0" y="459.36" style="fill: #dd8452; fill-opacity: 0.25"/>
+     <use xlink:href="#m4b292c9af5" x="0" y="459.36" style="fill: #ebb89b"/>
     </g>
    </g>
    <g id="AnnotationBbox_1">
@@ -12531,8 +12533,9 @@ L 307.959313 173.468685
 L 600.48 352.805 
 L 600.48 116.0375 
 L 339.908571 116.0375 
+L 339.908571 352.805 
 z
-" style="fill: #ffffff"/>
+" style="fill: none"/>
    </g>
    <g id="matplotlib.axis_3">
     <g id="xtick_7">
@@ -12651,7 +12654,7 @@ L 600.48 120.672977
    </g>
    <g id="girls__middle-94">
     <defs>
-     <path id="ma90313745c" d="M 345.800687 -127.54862 
+     <path id="m86bd68573d" d="M 345.800687 -127.54862 
 L 345.800687 -117.508194 
 L 345.836536 -117.743188 
 L 345.872384 -117.976756 
@@ -16707,12 +16710,12 @@ z
 "/>
     </defs>
     <g>
-     <use xlink:href="#ma90313745c" x="0" y="459.36" style="fill: #4c72b0; fill-opacity: 0.25"/>
+     <use xlink:href="#m86bd68573d" x="0" y="459.36" style="fill: #d8e0ee"/>
     </g>
    </g>
    <g id="girls__middle-80">
     <defs>
-     <path id="mf90551f449" d="M 345.800687 -125.949487 
+     <path id="mbf2872fca6" d="M 345.800687 -125.949487 
 L 345.800687 -119.108759 
 L 345.836536 -119.345186 
 L 345.872384 -119.581618 
@@ -20768,12 +20771,12 @@ z
 "/>
     </defs>
     <g>
-     <use xlink:href="#mf90551f449" x="0" y="459.36" style="fill: #4c72b0; fill-opacity: 0.25"/>
+     <use xlink:href="#mbf2872fca6" x="0" y="459.36" style="fill: #b7c7df"/>
     </g>
    </g>
    <g id="girls__middle-50">
     <defs>
-     <path id="m7aebc54928" d="M 345.800687 -124.328861 
+     <path id="m139be2baa5" d="M 345.800687 -124.328861 
 L 345.800687 -120.727948 
 L 345.836536 -120.967244 
 L 345.872384 -121.206541 
@@ -24829,7 +24832,7 @@ z
 "/>
     </defs>
     <g>
-     <use xlink:href="#m7aebc54928" x="0" y="459.36" style="fill: #4c72b0; fill-opacity: 0.25"/>
+     <use xlink:href="#m139be2baa5" x="0" y="459.36" style="fill: #97add1"/>
     </g>
    </g>
    <g id="AnnotationBbox_2">
@@ -25011,7 +25014,7 @@ L 594.587884 154.284835
   <g id="tagline">
    <text style="font-size: 7.75px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #888888" x="11.52" y="444.126602" transform="rotate(-0 11.52 444.126602)">OurWorldinData.org — Research and data to make progress against the world's largest problems.</text>
   </g>
-  <g id="licence">
+  <g id="license">
    <text style="font-size: 7.75px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #888888" x="600.48" y="444.121758" transform="rotate(-0 600.48 444.121758)">Licensed under CC-BY by the author Pablo Arriagada</text>
   </g>
   <g id="legend_1">
@@ -25021,7 +25024,7 @@ L 38.52 95.795312
 L 38.52 88.795312 
 L 20.52 88.795312 
 z
-" style="fill: #666666; opacity: 0.25"/>
+" style="fill: #dddddd; stroke: #cccccc; stroke-width: 0.6; stroke-linejoin: miter"/>
    </g>
    <g id="text_28">
     <text style="font-size: 10px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="46.52" y="95.795312" transform="rotate(-0 46.52 95.795312)">Middle 94%</text>
@@ -25032,7 +25035,7 @@ L 138.768438 95.795312
 L 138.768438 88.795312 
 L 120.768437 88.795312 
 z
-" style="fill: #666666; opacity: 0.4375"/>
+" style="fill: #c2c2c2; stroke: #cccccc; stroke-width: 0.6; stroke-linejoin: miter"/>
    </g>
    <g id="text_29">
     <text style="font-size: 10px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="146.768438" y="95.795312" transform="rotate(-0 146.768438 95.795312)">Middle 80%</text>
@@ -25043,7 +25046,7 @@ L 239.016875 95.795312
 L 239.016875 88.795312 
 L 221.016875 88.795312 
 z
-" style="fill: #666666; opacity: 0.578125"/>
+" style="fill: #a6a6a6; stroke: #cccccc; stroke-width: 0.6; stroke-linejoin: miter"/>
    </g>
    <g id="text_30">
     <text style="font-size: 10px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="247.016875" y="95.795312" transform="rotate(-0 247.016875 95.795312)">Middle 50%</text>

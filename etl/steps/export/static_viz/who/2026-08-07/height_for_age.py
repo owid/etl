@@ -7,9 +7,9 @@ the crossover in early adolescence stays visible once boys and girls are split a
 Two versions are emitted, following the static-chart templates:
 
 - desktop: panels side by side, footer carrying Note, Data source, the OurWorldinData.org
-  tagline and the licence line.
+  tagline and the license line.
 - mobile: panels side by side too, in the portrait frame, and a footer reduced to Data source
-  plus the licence, which is all the mobile template has room for. The template has no Note
+  plus the license, which is all the mobile template has room for. The template has no Note
   slot, so the caveat that the two age ranges rest on different foundations moves into the
   subtitle rather than being dropped -- see MOBILE_SUBTITLE_TAIL.
 
@@ -22,7 +22,7 @@ into the legend -- a 214px-wide panel cannot hold either.
 Replaces the hand-drawn 'Expected Healthy Growth Curves for Boys and Girls' image used on
 the human-height topic page and the stunting-definition article.
 
-Colours, fonts and the logo are deliberately not set here; those are applied in Figma. What
+Colors, fonts and the logo are deliberately not set here; those are applied in Figma. What
 this step fixes is the structure: which text slots exist, in what order, and which share a row.
 """
 
@@ -30,6 +30,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+from matplotlib.colors import to_rgb
 from matplotlib.font_manager import FontProperties
 from matplotlib.lines import Line2D
 from matplotlib.offsetbox import AnnotationBbox, TextArea, VPacker
@@ -47,22 +48,23 @@ matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"
 
 paths = PathFinder(__file__)
 
-# One panel per sex. Colours are seaborn "deep" positions rather than raw hexes, so the
+# One panel per sex. Colors are seaborn "deep" positions rather than raw hexes, so the
 # chart shifts with the shared palette instead of pinning its own.
 PANEL_COLOR_INDEX = {"Boys": 1, "Girls": 0}
 
-# Colour for reference lines and their labels.
+# Color for reference lines and their labels.
 REFERENCE_LINE_COLOR = "#6c7a89"
 
-# Nested percentile bands, drawn widest first. Each band is filled at BAND_ALPHA, so the
-# narrower ones deepen where they overlap and the stack reads as a fan without needing
-# three separate colours.
+# Nested percentile bands, drawn widest first, as (lower column, upper column, how far the fill
+# is blended towards white, label). Each band is a flat tint rather than a translucent fill: an
+# alpha fill has to composite onto something, and the canvas is deliberately transparent so the
+# Figma template supplies the background, which left the fan depending on whatever sat behind the
+# SVG. A precomputed tint renders the same on any backdrop and gives Figma one flat fill per band.
 BANDS = [
-    ("height_percentile_3", "height_percentile_97", "Middle 94%"),
-    ("height_percentile_10", "height_percentile_90", "Middle 80%"),
-    ("height_percentile_25", "height_percentile_75", "Middle 50%"),
+    ("height_percentile_3", "height_percentile_97", 0.78, "Middle 94%"),
+    ("height_percentile_10", "height_percentile_90", 0.60, "Middle 80%"),
+    ("height_percentile_25", "height_percentile_75", 0.42, "Middle 50%"),
 ]
-BAND_ALPHA = 0.25
 
 MEDIAN_COLUMN = "height_percentile_50"
 STUNTING_COLUMN = "height_sd_minus_2"
@@ -80,7 +82,7 @@ MUTED_COLOR = "#777777"
 
 TITLE = "Expected height of boys and girls, from birth to age 19"
 
-# Credited as the author of the visualization on the licence line, mirroring the slot the
+# Credited as the author of the visualization on the license line, mirroring the slot the
 # static-chart templates leave for it.
 AUTHOR = "Pablo Arriagada"
 
@@ -179,9 +181,17 @@ def run() -> None:
 
     for short_name, layout in LAYOUTS.items():
         fig = create_visualization(tb, source_citation, breaks, layout)
-        # No bbox_inches="tight" here: cropping to the drawn content would change the frame,
+        # No bbox_inches="tight" on either: cropping to the drawn content would change the frame,
         # and the point is to hand Figma an image at the template's exact proportions.
-        paths.export_fig(fig, short_name, ["png", "svg"], dpi=300)
+        #
+        # The two formats want opposite things from the canvas, so they are saved separately. The
+        # PNG stays opaque, because it is the copy a human reviews and a transparent one is
+        # unreadable against a dark editor background. The SVG is saved transparent, because it
+        # goes into a Figma template that supplies its own background -- and matplotlib's white
+        # figure patch is its own SVG group, so it would sit over that background and would not be
+        # uncovered by deleting the text.
+        paths.export_fig(fig, short_name, ["png"], dpi=300)
+        paths.export_fig(fig, short_name, ["svg"], transparent=True)
         plt.close(fig)
 
 
@@ -254,10 +264,16 @@ def find_discontinuities(tb: Table) -> list[float]:
 # ---------------------------------------------------------------------------
 
 
+def tint(color, weight: float) -> tuple[float, float, float]:
+    """Blend a color towards white. weight=0 keeps it, weight=1 turns it white."""
+    r, g, b = to_rgb(color)
+    return (r + (1 - r) * weight, g + (1 - g) * weight, b + (1 - b) * weight)
+
+
 def styled_reference_label(parent, x: float, y: float, title: str, value: str, ha: str, fontsize: float) -> None:
     """Annotate a reference line with a title stacked above a value, hung below the anchor.
 
-    Keeps the reference line labelled where it is drawn instead of pushing it into the legend.
+    Keeps the reference line labeled where it is drawn instead of pushing it into the legend.
     """
     common = {"color": REFERENCE_LINE_COLOR, "fontsize": fontsize, "ha": ha, "multialignment": ha}
     children = [TextArea(line, textprops={**common, "fontweight": "bold"}) for line in title.split("\n")]
@@ -333,7 +349,7 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
     Layout notes:
     - One panel per sex, sharing a y-axis, nested percentile bands deepening where they overlap
     - Median drawn solid on top; the other sex's median repeated as a faint dashed line
-    - The -2 SD stunting threshold is labelled on the line rather than in the legend
+    - The -2 SD stunting threshold is labeled on the line rather than in the legend
     - No spines; light horizontal gridlines carry the height reading
     - Axis limits, ticks and footnote ages all derived from the data
     """
@@ -373,6 +389,11 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         sharex=True,
     )
 
+    # The PNG keeps an opaque canvas so it is legible when reviewed against a dark editor
+    # background; the SVG drops it at save time (see run()), because in Figma the template supplies
+    # the background and a white patch would cover it.
+    fig.patch.set_facecolor("white")
+
     for ax, (sex, color_index) in zip(axes, PANEL_COLOR_INDEX.items()):
         color = palette[color_index]
         tb_sex = tb[tb["sex"] == sex].sort_values("age_days")
@@ -390,13 +411,12 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         # gid becomes the SVG element id, so Figma shows named layers instead of "Path 41".
         # Mirrors grapher, which stamps its own SVG nodes with makeFigmaId().
         slug = sex.lower()
-        for lower, upper, label in BANDS:
+        for lower, upper, weight, label in BANDS:
             ax.fill_between(
                 age,
                 tb_sex[lower].to_numpy(),
                 tb_sex[upper].to_numpy(),
-                color=color,
-                alpha=BAND_ALPHA,
+                facecolor=tint(color, weight),
                 linewidth=0,
                 zorder=2,
                 gid=f"{slug}__{label.lower().replace(' ', '-').replace('%', '')}",
@@ -416,7 +436,7 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
                 gid=f"{slug}__median-other-sex",
             )
 
-        # --- stunting threshold, labelled under the line around mid-childhood, where the
+        # --- stunting threshold, labeled under the line around mid-childhood, where the
         # panel is empty; at the right-hand end the bands and medians all converge ---
         stunting = tb_sex[STUNTING_COLUMN].to_numpy()
         ax.plot(
@@ -443,7 +463,7 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         # --- median ---
         ax.plot(age, tb_sex[MEDIAN_COLUMN].to_numpy(), color=color, linewidth=2.4, zorder=5, gid=f"{slug}__median")
 
-        # --- panel title, in the panel's own colour ---
+        # --- panel title, in the panel's own color ---
         ax.text(
             0.2, height_max, sex, fontsize=body_fontsize + 6, color=color, ha="left", va="top", gid=f"{slug}__label"
         )
@@ -473,12 +493,12 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
     subtitle_lines = subtitle.count("\n") + 1
     legend_fontsize = body_fontsize - 0.5
 
-    # --- shared legend; on desktop the stunting line is labelled on the line instead ---
-    # Each band is drawn over the wider ones before it, so the nth band's swatch has to
-    # show n layers of BAND_ALPHA compounded -- otherwise the legend reads inside out.
+    # --- shared legend; on desktop the stunting line is labeled on the line instead ---
+    # Swatches carry the same flat tints as the bands, in the same order, so the key cannot read
+    # inside out against the chart.
     handles = [
-        Patch(facecolor="#666666", alpha=1 - (1 - BAND_ALPHA) ** (index + 1), edgecolor="none", label=label)
-        for index, (_, _, label) in enumerate(BANDS)
+        Patch(facecolor=tint("#666666", weight), edgecolor="#cccccc", linewidth=0.6, label=label)
+        for _, _, weight, label in BANDS
     ]
     handles += [
         Line2D([0], [0], color="#666666", linewidth=2.4, label="Median height"),
@@ -542,8 +562,8 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
     )
 
     # --- footer, in the slots the static-chart templates define ---
-    # Desktop: Note -> Data source -> tagline and licence sharing one row, left and right.
-    # Mobile: Data source -> licence only, which is all that template has room for.
+    # Desktop: Note -> Data source -> tagline and license sharing one row, left and right.
+    # Mobile: Data source -> license only, which is all that template has room for.
     footer_fontsize = layout["footer_fontsize"]
 
     if layout["full_footer"]:
@@ -577,8 +597,8 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         gid="data-source",
     )
 
-    # Desktop puts the tagline on its own row with the licence right-aligned beside it; mobile
-    # has no tagline, so there the licence shares the Data source row.
+    # Desktop puts the tagline on its own row with the license right-aligned beside it; mobile
+    # has no tagline, so there the license shares the Data source row.
     if layout["full_footer"]:
         fig.text(
             fx(margin_px),
@@ -590,18 +610,18 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
             color="#888888",
             gid="tagline",
         )
-        licence = f"Licensed under CC-BY by the author {AUTHOR}"
+        license = f"Licensed under CC-BY by the author {AUTHOR}"
     else:
-        licence = "CC BY"
+        license = "CC BY"
     fig.text(
         fx(width_px - margin_px),
         fy(layout["footer_y"]),
-        licence,
+        license,
         ha="right",
         va="top",
         fontsize=footer_fontsize,
         color="#888888",
-        gid="licence",
+        gid="license",
     )
 
     fig.subplots_adjust(

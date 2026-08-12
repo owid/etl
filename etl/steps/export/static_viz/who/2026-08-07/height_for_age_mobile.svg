@@ -24,8 +24,9 @@
 L 388.8 593.28 
 L 388.8 0 
 L 0 0 
+L 0 593.28 
 z
-" style="fill: #ffffff"/>
+" style="fill: none"/>
   </g>
   <g id="axes_1">
    <g id="patch_2">
@@ -33,8 +34,9 @@ z
 L 205.302857 532.8 
 L 205.302857 204.4375 
 L 48.96 204.4375 
+L 48.96 532.8 
 z
-" style="fill: #ffffff"/>
+" style="fill: none"/>
    </g>
    <g id="matplotlib.axis_1">
     <g id="xtick_1">
@@ -174,7 +176,7 @@ L 205.302857 210.86624
    </g>
    <g id="boys__middle-94">
     <defs>
-     <path id="m2b2f1c7787" d="M 52.49527 -91.173005 
+     <path id="me5d96531b2" d="M 52.49527 -91.173005 
 L 52.49527 -77.021834 
 L 52.516779 -77.363634 
 L 52.538288 -77.707428 
@@ -4230,12 +4232,12 @@ z
 "/>
     </defs>
     <g>
-     <use xlink:href="#m2b2f1c7787" x="0" y="593.28" style="fill: #dd8452; fill-opacity: 0.25"/>
+     <use xlink:href="#me5d96531b2" x="0" y="593.28" style="fill: #f8e4d9"/>
     </g>
    </g>
    <g id="boys__middle-80">
     <defs>
-     <path id="m8a5a6a39bd" d="M 52.49527 -88.917485 
+     <path id="mcee4c3b83c" d="M 52.49527 -88.917485 
 L 52.49527 -79.275368 
 L 52.516779 -79.621148 
 L 52.538288 -79.966928 
@@ -8291,12 +8293,12 @@ z
 "/>
     </defs>
     <g>
-     <use xlink:href="#m8a5a6a39bd" x="0" y="593.28" style="fill: #dd8452; fill-opacity: 0.25"/>
+     <use xlink:href="#mcee4c3b83c" x="0" y="593.28" style="fill: #f1ceba"/>
     </g>
    </g>
    <g id="boys__middle-50">
     <defs>
-     <path id="ma3a775833e" d="M 52.49527 -86.634136 
+     <path id="mbba4680207" d="M 52.49527 -86.634136 
 L 52.49527 -81.558709 
 L 52.516779 -81.906483 
 L 52.538288 -82.25425 
@@ -12352,7 +12354,7 @@ z
 "/>
     </defs>
     <g>
-     <use xlink:href="#ma3a775833e" x="0" y="593.28" style="fill: #dd8452; fill-opacity: 0.25"/>
+     <use xlink:href="#mbba4680207" x="0" y="593.28" style="fill: #ebb89b"/>
     </g>
    </g>
    <g id="boys__label">
@@ -12510,8 +12512,9 @@ L 201.767588 284.086301
 L 377.28 532.8 
 L 377.28 204.4375 
 L 220.937143 204.4375 
+L 220.937143 532.8 
 z
-" style="fill: #ffffff"/>
+" style="fill: none"/>
    </g>
    <g id="matplotlib.axis_3">
     <g id="xtick_6">
@@ -12624,7 +12627,7 @@ L 377.28 210.86624
    </g>
    <g id="girls__middle-94">
     <defs>
-     <path id="m4b80c50975" d="M 224.472412 -89.595135 
+     <path id="m8532a013af" d="M 224.472412 -89.595135 
 L 224.472412 -75.670506 
 L 224.493921 -75.99641 
 L 224.51543 -76.320335 
@@ -16680,12 +16683,12 @@ z
 "/>
     </defs>
     <g>
-     <use xlink:href="#m4b80c50975" x="0" y="593.28" style="fill: #4c72b0; fill-opacity: 0.25"/>
+     <use xlink:href="#m8532a013af" x="0" y="593.28" style="fill: #d8e0ee"/>
     </g>
    </g>
    <g id="girls__middle-80">
     <defs>
-     <path id="mb260095476" d="M 224.472412 -87.377367 
+     <path id="m84493eb1e1" d="M 224.472412 -87.377367 
 L 224.472412 -77.89026 
 L 224.493921 -78.21815 
 L 224.51543 -78.546047 
@@ -20741,12 +20744,12 @@ z
 "/>
     </defs>
     <g>
-     <use xlink:href="#mb260095476" x="0" y="593.28" style="fill: #4c72b0; fill-opacity: 0.25"/>
+     <use xlink:href="#m84493eb1e1" x="0" y="593.28" style="fill: #b7c7df"/>
     </g>
    </g>
    <g id="girls__middle-50">
     <defs>
-     <path id="md8cabe55da" d="M 224.472412 -85.129791 
+     <path id="mc94fdd8e54" d="M 224.472412 -85.129791 
 L 224.472412 -80.135842 
 L 224.493921 -80.467712 
 L 224.51543 -80.799581 
@@ -24802,7 +24805,7 @@ z
 "/>
     </defs>
     <g>
-     <use xlink:href="#md8cabe55da" x="0" y="593.28" style="fill: #4c72b0; fill-opacity: 0.25"/>
+     <use xlink:href="#mc94fdd8e54" x="0" y="593.28" style="fill: #97add1"/>
     </g>
    </g>
    <g id="girls__label">
@@ -24973,7 +24976,7 @@ L 373.74473 257.481058
   <g id="data-source">
    <text style="font-size: 8.75px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #888888" x="11.52" y="576.615195" transform="rotate(-0 11.52 576.615195)">Data source: WHO Child Growth Standards (2006); WHO Growth Reference (2007)</text>
   </g>
-  <g id="licence">
+  <g id="license">
    <text style="font-size: 8.75px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #888888" x="377.28" y="576.503086" transform="rotate(-0 377.28 576.503086)">CC BY</text>
   </g>
   <g id="legend_1">
@@ -24983,7 +24986,7 @@ L 38.52 171.195313
 L 38.52 164.195313 
 L 20.52 164.195313 
 z
-" style="fill: #666666; opacity: 0.25"/>
+" style="fill: #dddddd; stroke: #cccccc; stroke-width: 0.6; stroke-linejoin: miter"/>
    </g>
    <g id="text_22">
     <text style="font-size: 10px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="46.52" y="171.195313" transform="rotate(-0 46.52 171.195313)">Middle 94%</text>
@@ -24994,7 +24997,7 @@ L 38.52 185.340625
 L 38.52 178.340625 
 L 20.52 178.340625 
 z
-" style="fill: #666666; opacity: 0.4375"/>
+" style="fill: #c2c2c2; stroke: #cccccc; stroke-width: 0.6; stroke-linejoin: miter"/>
    </g>
    <g id="text_23">
     <text style="font-size: 10px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="46.52" y="185.340625" transform="rotate(-0 46.52 185.340625)">Middle 80%</text>
@@ -25005,7 +25008,7 @@ L 138.768438 171.195313
 L 138.768438 164.195313 
 L 120.768438 164.195313 
 z
-" style="fill: #666666; opacity: 0.578125"/>
+" style="fill: #a6a6a6; stroke: #cccccc; stroke-width: 0.6; stroke-linejoin: miter"/>
    </g>
    <g id="text_24">
     <text style="font-size: 10px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="146.768438" y="171.195313" transform="rotate(-0 146.768438 171.195313)">Middle 50%</text>
