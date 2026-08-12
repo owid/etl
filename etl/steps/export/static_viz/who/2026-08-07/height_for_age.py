@@ -1,23 +1,27 @@
 """Recreate the 'Expected height of boys and girls' growth-curve chart.
 
 Each panel shows nested percentile bands from the WHO growth reference standards, the
-median, and the -2 SD stunting threshold, plus a faint copy of the other sex's median so
-the crossover in early adolescence stays visible once boys and girls are split apart.
+median, and the -2 SD stunting threshold, plus a dashed copy of the other sex's median -- in
+that sex's own color, which is what saves it needing a label -- so the crossover in early
+adolescence stays visible once boys and girls are split apart.
 
 Two versions are emitted, following the static-chart templates:
 
 - desktop: panels side by side, footer carrying Note, Data source, the OurWorldinData.org
-  tagline and the license line.
+  tagline and the license line. The encoding is explained by a diagram in the empty triangle
+  under the Boys curve -- a miniature cross-section of the bands with each part named -- as the
+  chart this replaces did, rather than by a legend.
 - mobile: panels side by side too, in the portrait frame, and a footer reduced to Data source
   plus the license, which is all the mobile template has room for. The template has no Note
   slot, so the caveat that the two age ranges rest on different foundations moves into the
-  subtitle rather than being dropped -- see MOBILE_SUBTITLE_TAIL.
+  subtitle rather than being dropped -- see MOBILE_SUBTITLE_TAIL. There is no room for the
+  diagram in a 214px-wide panel, so mobile keeps the legend.
 
 Stacking the panels in the portrait frame was tried and rejected: it gives each panel a 2:1
 landscape box, about 222px of height for a 165 cm range, which flattens the curves so far that
 the adolescent growth spurt stops being visible. Side by side gives each 2.4x the vertical
-resolution. That is why the mobile layout carries fewer age ticks and moves the stunting label
-into the legend -- a 214px-wide panel cannot hold either.
+resolution. That is why the mobile layout carries fewer age ticks -- a 214px-wide panel cannot
+hold six.
 
 Replaces the hand-drawn 'Expected Healthy Growth Curves for Boys and Girls' image used on
 the human-height topic page and the stunting-definition article.
@@ -32,9 +36,6 @@ import numpy as np
 import seaborn as sns
 from matplotlib.colors import to_rgb
 from matplotlib.font_manager import FontProperties
-from matplotlib.lines import Line2D
-from matplotlib.offsetbox import AnnotationBbox, TextArea, VPacker
-from matplotlib.patches import Patch
 from matplotlib.textpath import TextPath
 from matplotlib.ticker import FuncFormatter
 from owid.catalog import Table
@@ -55,15 +56,24 @@ PANEL_COLOR_INDEX = {"Boys": 1, "Girls": 0}
 # Color for reference lines and their labels.
 REFERENCE_LINE_COLOR = "#6c7a89"
 
+# Neutral grey for anything that explains the chart rather than carrying data -- the encoding
+# diagram's bands and median, and the legend's swatches. Grey is what marks them as a key.
+DIAGRAM_COLOR = "#666666"
+
 # Nested percentile bands, drawn widest first, as (lower column, upper column, how far the fill
 # is blended towards white, label). Each band is a flat tint rather than a translucent fill: an
 # alpha fill has to composite onto something, and the canvas is deliberately transparent so the
 # Figma template supplies the background, which left the fan depending on whatever sat behind the
 # SVG. A precomputed tint renders the same on any backdrop and gives Figma one flat fill per band.
 BANDS = [
-    ("height_percentile_3", "height_percentile_97", 0.78, "Middle 94%"),
-    ("height_percentile_10", "height_percentile_90", 0.60, "Middle 80%"),
-    ("height_percentile_25", "height_percentile_75", 0.42, "Middle 50%"),
+    ("height_percentile_0_1", "height_percentile_99_9", 0.90, "Almost all children (999 in 1,000)"),
+    ("height_percentile_10", "height_percentile_90", 0.74, "8 in 10 children"),
+]
+
+# Percentiles drawn as lines on top of the bands, as (column, line width), so a specific centile
+# can be read off rather than only a range. Named in the encoding diagram, not on the line.
+QUANTILE_LINES = [
+    ("height_percentile_50", 2.6),
 ]
 
 MEDIAN_COLUMN = "height_percentile_50"
@@ -109,9 +119,8 @@ LAYOUTS = {
         "nrows": 1,
         "ncols": 2,
         "full_footer": True,
-        "legend_ncol": 5,
         "age_ticks": [0, 2, 5, 10, 15, 19],
-        "inline_stunting_label": True,
+        "diagram": "panel",
         "title_fontsize": 16,
         "body_fontsize": 10.5,
         "footer_fontsize": 7.75,
@@ -130,9 +139,8 @@ LAYOUTS = {
         "nrows": 1,
         "ncols": 2,
         "full_footer": False,
-        "legend_ncol": 3,
         "age_ticks": [0, 5, 10, 15, 19],
-        "inline_stunting_label": False,
+        "diagram": "header",
         "title_fontsize": 16,
         "body_fontsize": 10.5,
         "footer_fontsize": 8.75,
@@ -162,10 +170,13 @@ PIXELS_PER_INCH = 100
 # two-line title puts the subtitle at the templates' own y=80.
 TITLE_SUBTITLE_GAP = 6
 
-# Vertical rhythm of the legend, in multiples of a text line. The legend sits tight under the
-# subtitle it belongs with, and well clear of the plot it describes.
-SUBTITLE_LEGEND_GAP = 0.15
-LEGEND_CHART_GAP = 1.8
+# Vertical rhythm below the subtitle, in multiples of a text line.
+SUBTITLE_GAP = 0.15
+DIAGRAM_CHART_GAP = 0.8
+
+# Height reserved for the encoding diagram when it sits in the header rather than inside a panel,
+# in template pixels: the slab, plus the row of stunting text below it and the leader reaching it.
+HEADER_DIAGRAM_HEIGHT = 92
 
 
 def run() -> None:
@@ -270,24 +281,159 @@ def tint(color, weight: float) -> tuple[float, float, float]:
     return (r + (1 - r) * weight, g + (1 - g) * weight, b + (1 - b) * weight)
 
 
-def styled_reference_label(parent, x: float, y: float, title: str, value: str, ha: str, fontsize: float) -> None:
-    """Annotate a reference line with a title stacked above a value, hung below the anchor.
+def draw_encoding_diagram(
+    ax,
+    fontsize: float,
+    left: float = 0.50,
+    right: float = 0.68,
+    middle: float = 0.24,
+    outer_half: float = 0.105,
+    label_gap: float = 0.03,
+) -> None:
+    """Draw a miniature cross-section of the encoding, with each part named beside it.
 
-    Keeps the reference line labeled where it is drawn instead of pushing it into the legend.
+    The chart it replaces explained itself this way rather than with a legend, and it reads better: a
+    swatch in a legend asks the reader to carry a color across the frame to a shape, while a small
+    exemplar of the real thing shows the band-within-a-band directly, in the order it appears. It
+    also gives the stunting line somewhere to be named other than on top of the plot.
+
+    Two conventions matter here:
+
+    - The bands get square brackets spanning their full height, not a tick at one edge. A band is a
+      range, and a tick pointing at its boundary invites the reader to take that boundary as the
+      thing being named.
+    - The median gets no leader at all: its label sits on the line, inside the slab. The stunting
+      label does, because it sits below the slab -- which is what lets it be one line rather than the
+      two or three that the space beside the slab forces.
+
+    Everything is grey rather than the panel's color, so the block reads as a key rather than as a
+    third sex; the tints and line styles still match the chart exactly.
+
+    Geometry is in axes fractions of whatever `ax` it is given, so the same drawing serves both
+    layouts: inside the first panel on desktop, and in its own axes across the header on mobile,
+    where a 217px-wide panel cannot hold labels that are 89px and 105px wide.
+
+    On desktop it lives in the empty triangle below the growth curve -- the widest clear space either
+    panel has. Two consequences of that shape:
+
+    - The brackets sit on opposite sides, because both bands share the same midpoint. Nested on one
+      side, either their labels collide or one label has to cross the other bracket, and the panel is
+      too narrow for the second label to clear it.
+    - The stunting label sits *below* the slab, centred, with a short leader dropping from the
+      dotted line. Beside the slab it would only have the 145px the triangle leaves clear at that
+      height, forcing it onto two or three rows; below the slab the triangle is wide enough for one.
     """
-    common = {"color": REFERENCE_LINE_COLOR, "fontsize": fontsize, "ha": ha, "multialignment": ha}
-    children = [TextArea(line, textprops={**common, "fontweight": "bold"}) for line in title.split("\n")]
-    children.append(TextArea(value, textprops=common))
-    packer = VPacker(children=children, align=ha, pad=0, sep=2)
-    annotation = AnnotationBbox(
-        packer,
-        (x, y),
-        xycoords="data",
-        box_alignment=(1.0 if ha == "right" else 0.0, 1.0),
-        frameon=False,
-        pad=0,
+    # The inner band is the middle 80%, the outer the middle 99.8%, so it is about 0.42 as tall.
+    inner_half = outer_half * 0.42
+    # Where -2 SD falls inside the schematic: the outer band's edge is the 99.9th percentile, at
+    # about z = 3.09, so 2 SD sits at 2/3.09 of the half-width. Keeping that ratio right is what
+    # makes the diagram show the true nesting -- the stunting line is inside the outer band, below
+    # the inner one, rather than at the bottom edge.
+    minus_2sd = middle - outer_half * 2 / 3.09
+    for lower, upper, weight, name in (
+        (middle - outer_half, middle + outer_half, 0.90, "outer-band"),
+        (middle - inner_half, middle + inner_half, 0.74, "inner-band"),
+    ):
+        ax.fill_between(
+            [left, right],
+            [lower] * 2,
+            [upper] * 2,
+            facecolor=tint(DIAGRAM_COLOR, weight),
+            linewidth=0,
+            transform=ax.transAxes,
+            zorder=7,
+            gid=f"diagram__{name}",
+        )
+    ax.plot(
+        [left, right],
+        [middle] * 2,
+        color=DIAGRAM_COLOR,
+        linewidth=2.0,
+        transform=ax.transAxes,
+        zorder=8,
+        gid="diagram__median",
     )
-    parent.add_artist(annotation)
+    ax.plot(
+        [left, right],
+        [minus_2sd] * 2,
+        color=REFERENCE_LINE_COLOR,
+        linestyle=":",
+        linewidth=0.8,
+        transform=ax.transAxes,
+        zorder=8,
+        gid="diagram__stunting-threshold",
+    )
+
+    # Square brackets embracing each band, with the label at the bracket's own midpoint. `cap` is
+    # how far the end caps reach towards the slab; `side` is which way the label runs. The longer
+    # label goes on the left, where there is room for it; the right side runs out of panel.
+    for half, bracket_x, cap, side, name, text in (
+        (outer_half, left - 0.015, 0.015, "right", "almost-all", "Almost all children"),
+        (inner_half, right + 0.015, -0.015, "left", "8-in-10", "8 in 10 children"),
+    ):
+        ax.plot(
+            [bracket_x + cap, bracket_x, bracket_x, bracket_x + cap],
+            [middle - half, middle - half, middle + half, middle + half],
+            color=MUTED_COLOR,
+            linewidth=0.7,
+            solid_capstyle="butt",
+            transform=ax.transAxes,
+            zorder=8,
+            gid=f"diagram__bracket-{name}",
+        )
+        ax.text(
+            bracket_x - cap,
+            middle,
+            text,
+            transform=ax.transAxes,
+            fontsize=fontsize,
+            color=TEXT_COLOR,
+            ha=side,
+            va="center",
+            zorder=8,
+            gid=f"diagram__label-{name}",
+        )
+
+    # The median needs no leader: its label sits on the line, inside the slab.
+    ax.text(
+        left + 0.012,
+        middle + 0.006,
+        "Median",
+        transform=ax.transAxes,
+        fontsize=fontsize,
+        color=TEXT_COLOR,
+        ha="left",
+        va="bottom",
+        zorder=8,
+        gid="diagram__label-median",
+    )
+
+    # The stunting label sits below the slab, where there is room for one line, with a leader
+    # dropping from the middle of the dotted line to it.
+    leader_x = (left + right) / 2
+    label_y = middle - outer_half - label_gap
+    ax.plot(
+        [leader_x] * 2,
+        [minus_2sd, label_y],
+        color=MUTED_COLOR,
+        linewidth=0.7,
+        solid_capstyle="butt",
+        transform=ax.transAxes,
+        zorder=8,
+        gid="diagram__leader-stunted",
+    )
+    ax.text(
+        leader_x,
+        label_y,
+        "Stunted: too short for their age",
+        transform=ax.transAxes,
+        fontsize=fontsize,
+        color=TEXT_COLOR,
+        ha="center",
+        va="top",
+        zorder=8,
+        gid="diagram__label-stunted",
+    )
 
 
 def wrap_to_content_width(text: str, layout: dict, fontsize: float) -> str:
@@ -322,10 +468,10 @@ def build_subtitle(tb: Table, layout: dict) -> str:
     """Compose the subtitle, folding in the standards-vs-reference caveat on mobile."""
     crossover_start, crossover_end = find_crossover(tb)
     text = (
-        "The bands show the range of heights among children of the same age in the World Health Organization's "
-        "growth reference population: the middle 50% spans the 25th to 75th percentile, the middle 80% the 10th "
-        "to 90th, and the middle 94% the 3rd to 97th. Girls are taller than boys, on average, between the ages "
-        f"of about {crossover_start:.0f} and {crossover_end:.0f}."
+        "Read it like this: the line is the height at which half of children of that age are taller and half are "
+        "shorter. The darker band covers the middle 8 in 10 children, and the lighter band almost all of them — "
+        "999 in every 1,000. Girls are taller than boys, on average, between the ages of about "
+        f"{crossover_start:.0f} and {crossover_end:.0f}."
     )
     if not layout["full_footer"]:
         text = f"{text} {MOBILE_SUBTITLE_TAIL}"
@@ -337,8 +483,8 @@ def build_note(breaks: list[float], layout: dict) -> str:
     text = (
         f"Note: The curves step down slightly at age {breaks[0]:.0f}, where height starts being measured standing "
         f"up rather than lying down, and at age {breaks[1]:.0f}, where WHO's standards for under-fives give way to "
-        "its reference for older children. Both steps are in the original data. The under-fives standards show how "
-        "children grow in good conditions; the reference for older children describes how an earlier sample did grow."
+        "its reference for older children. The under-fives standards show how children grow in good conditions; the "
+        "reference for older children describes how an earlier sample did grow."
     )
     return wrap_to_content_width(text, layout, layout["footer_fontsize"])
 
@@ -423,21 +569,24 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
             )
 
         # --- the other sex's median, so the crossover stays visible in both panels ---
+        # Drawn in that sex's own color rather than grey, which saves labelling it: the panel titles
+        # carry the same two colors, so the dashed blue line in the Boys panel reads as the girls'.
         for other_sex, (other_age, other_median) in medians.items():
             if other_sex == sex:
                 continue
             ax.plot(
                 other_age,
                 other_median,
-                color=REFERENCE_LINE_COLOR,
+                color=palette[PANEL_COLOR_INDEX[other_sex]],
                 linewidth=1.2,
                 linestyle=(0, (4, 3)),
                 zorder=6,
                 gid=f"{slug}__median-other-sex",
             )
 
-        # --- stunting threshold, labeled under the line around mid-childhood, where the
-        # panel is empty; at the right-hand end the bands and medians all converge ---
+        # --- stunting threshold; named in the encoding diagram where there is one, and otherwise
+        # under the line around mid-childhood, where the panel is empty (at the right-hand end the
+        # bands and medians all converge) ---
         stunting = tb_sex[STUNTING_COLUMN].to_numpy()
         ax.plot(
             age,
@@ -448,20 +597,13 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
             zorder=4,
             gid=f"{slug}__stunting-threshold",
         )
-        if layout["inline_stunting_label"]:
-            label_age = age_max * 0.5
-            styled_reference_label(
-                ax,
-                label_age,
-                float(np.interp(label_age, age, stunting)) - 2,
-                title="Stunted below this line",
-                value="2 SD below the median",
-                ha="left",
-                fontsize=body_fontsize - 2.5,
-            )
+        # --- percentile lines on top of the bands ---
+        for column, line_width in QUANTILE_LINES:
+            values = tb_sex[column].to_numpy()
+            ax.plot(age, values, color=color, linewidth=line_width, zorder=5, gid=f"{slug}__{column[-3:]}")
 
-        # --- median ---
-        ax.plot(age, tb_sex[MEDIAN_COLUMN].to_numpy(), color=color, linewidth=2.4, zorder=5, gid=f"{slug}__median")
+        if layout["diagram"] == "panel" and ax is axes[0]:
+            draw_encoding_diagram(ax, body_fontsize - 2.5)
 
         # --- panel title, in the panel's own color ---
         ax.text(
@@ -491,34 +633,6 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
 
     subtitle = build_subtitle(tb, layout)
     subtitle_lines = subtitle.count("\n") + 1
-    legend_fontsize = body_fontsize - 0.5
-
-    # --- shared legend; on desktop the stunting line is labeled on the line instead ---
-    # Swatches carry the same flat tints as the bands, in the same order, so the key cannot read
-    # inside out against the chart.
-    handles = [
-        Patch(facecolor=tint("#666666", weight), edgecolor="#cccccc", linewidth=0.6, label=label)
-        for _, _, weight, label in BANDS
-    ]
-    handles += [
-        Line2D([0], [0], color="#666666", linewidth=2.4, label="Median height"),
-        Line2D(
-            [0],
-            [0],
-            color=REFERENCE_LINE_COLOR,
-            linewidth=1.2,
-            linestyle=(0, (4, 3)),
-            label="Median for the other sex",
-        ),
-    ]
-    if not layout["inline_stunting_label"]:
-        handles.append(
-            Line2D([0], [0], color=REFERENCE_LINE_COLOR, linestyle=":", linewidth=0.8, label="Stunted below (-2 SD)")
-        )
-    # Row count comes from the handles actually built, not from a hardcoded total: mobile adds a
-    # sixth entry for the stunting line, so a fixed count would misplace the plot the moment the
-    # band list or that condition changed.
-    legend_rows = -(-len(handles) // layout["legend_ncol"])
 
     fig.text(
         fx(margin_px),
@@ -541,25 +655,38 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         gid="subtitle",
     )
 
-    # The legend sits between the subtitle and the plot. Our subtitle runs longer than the
-    # template's two-line placeholder, so the plot starts below wherever it actually ends
-    # rather than at the template's fixed chart-area top.
-    legend_top_px = subtitle_y + subtitle_lines * px(body_fontsize) + px(body_fontsize) * SUBTITLE_LEGEND_GAP
-    # A matplotlib legend occupies more than its text height (handles, internal padding), so the
-    # plot starts below the legend's own rows plus a clear gap.
-    chart_top_px = legend_top_px + (legend_rows + LEGEND_CHART_GAP) * px(legend_fontsize)
+    # Our subtitle runs longer than the template's two-line placeholder, so whatever comes next
+    # starts below wherever the subtitle actually ends rather than at the template's fixed
+    # chart-area top.
+    subtitle_bottom_px = subtitle_y + subtitle_lines * px(body_fontsize) + px(body_fontsize) * SUBTITLE_GAP
+    chart_top_px = subtitle_bottom_px + DIAGRAM_CHART_GAP * px(body_fontsize)
 
-    fig.legend(
-        handles=handles,
-        loc="upper left",
-        bbox_to_anchor=(fx(margin_px), fy(legend_top_px)),
-        ncol=layout["legend_ncol"],
-        frameon=False,
-        fontsize=legend_fontsize,
-        labelcolor=TEXT_COLOR,
-        handlelength=1.8,
-        columnspacing=2.2,
-    )
+    if layout["diagram"] == "header":
+        # A 217px-wide mobile panel cannot hold the diagram -- the two band labels alone are wider
+        # than the panel -- but this row is the full 508px content width, which fits it with room to
+        # spare. Keeping the same explanatory device in both versions matters more than the vertical
+        # cost, since the pair gets published together.
+        diagram_axes = fig.add_axes(
+            (
+                fx(margin_px),
+                fy(subtitle_bottom_px + HEADER_DIAGRAM_HEIGHT),
+                1 - 2 * fx(margin_px),
+                HEADER_DIAGRAM_HEIGHT / height_px,
+            )
+        )
+        diagram_axes.set_axis_off()
+        # No background patch: the SVG is saved transparent so the Figma template shows through.
+        diagram_axes.patch.set_visible(False)
+        draw_encoding_diagram(
+            diagram_axes,
+            body_fontsize - 2.5,
+            left=0.386,
+            right=0.642,
+            middle=0.675,
+            outer_half=0.315,
+            label_gap=0.087,
+        )
+        chart_top_px = subtitle_bottom_px + HEADER_DIAGRAM_HEIGHT
 
     # --- footer, in the slots the static-chart templates define ---
     # Desktop: Note -> Data source -> tagline and license sharing one row, left and right.
