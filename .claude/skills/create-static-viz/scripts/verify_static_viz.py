@@ -34,9 +34,24 @@ TEMPLATE_RATIOS = {
 }
 TOLERANCE = 0.002
 
-# matplotlib names its own nodes figure_1 / axes_1 / line2d_3 / patch_7 / text_12. Those are not
-# the named layers we are after, so they do not count toward the gid check.
-GENERATED_ID = re.compile(r"^(figure|axes|line2d|patch|text|PathCollection|QuadMesh|xtick|ytick)_\d+$")
+# matplotlib names its own nodes, and those names must not count toward the gid check — otherwise
+# an SVG with no deliberate gid at all still looks "named" and passes. Three families, all
+# auto-generated:
+#   <class>_<n>   figure_1, axes_1, line2d_3, patch_7, text_12, legend_1, xtick_5,
+#                 PathCollection_1, and the dotted matplotlib.axis_1 / matplotlib.axis_2
+#   m<hash>       hashed <defs> paths for reused markers, e.g. m795dccd146
+#   <Font>-<hex>  outlined-glyph defs when svg.fonttype is not "none", e.g. DejaVuSans-30
+# The <class>_<n> rule is deliberately generic rather than an enumerated class list, which was
+# always going to lag matplotlib. The trade-off: a deliberate gid ending in an underscore and
+# digits (say "panel_1") is treated as generated. Name layers <subject>__<role> and it never bites.
+GENERATED_ID = re.compile(
+    r"^(?:[A-Za-z][A-Za-z0-9.]*_\d+|m[0-9a-f]{8,}|[A-Za-z][A-Za-z0-9]*-[0-9a-f]{2,6})$"
+)
+
+# A <use> pointing at one of those outlined-glyph defs means text was saved as curves. A <use>
+# pointing at an m<hash> marker def is just normal marker reuse in a scatter, and must never be
+# mistaken for it — so resolve each reference rather than comparing global <use>/<text> counts.
+GLYPH_DEF_REF = re.compile(r"^[A-Za-z][A-Za-z0-9]*-[0-9a-f]{2,6}$")
 
 # A step commonly emits several frames from one directory (a desktop and a mobile version), so a
 # single --template cannot cover the directory. Take the template from the filename suffix where
@@ -78,19 +93,23 @@ def check_svg(path: Path, expected_gids: list[str]) -> list[str]:
             'Set matplotlib.rcParams["svg.fonttype"] = "none".'
         )
 
-    # Glyphs rendered as <use> references to <symbol> paths mean fonttype is not "none" either,
-    # even when some stray <text> exists.
-    if n_text and svg.count("<use ") > n_text:
+    # Text saved as curves shows up as <use> references to glyph defs. Catch that even when some
+    # stray <text> survives, without tripping over a scatter's reused marker defs.
+    glyph_refs = [ref for ref in re.findall(r"<use[^>]*?href=\"#([^\"]+)\"", svg) if GLYPH_DEF_REF.match(ref)]
+    if glyph_refs:
         failures.append(
-            f"more <use> glyph references ({svg.count('<use ')}) than <text> elements ({n_text}) — "
-            'text is being outlined. Check svg.fonttype = "none".'
+            f"{len(glyph_refs)} <use> references point at outlined-glyph defs "
+            f"({', '.join(sorted(set(glyph_refs))[:3])}...) — text is being saved as curves. "
+            'Set matplotlib.rcParams["svg.fonttype"] = "none".'
         )
 
     ids = set(re.findall(r'\bid="([^"]+)"', svg))
     named = {i for i in ids if not GENERATED_ID.match(i)}
     if not named:
+        generated = sorted(i for i in ids if GENERATED_ID.match(i))
         failures.append(
-            "no named nodes — Figma will show a layer list of anonymous paths. "
+            "no named nodes — every id is one matplotlib generated itself "
+            f"({', '.join(generated[:4])}...), so Figma will show a layer list of anonymous paths. "
             "Pass gid= on each artist (ax.plot(..., gid='boys__median'))."
         )
     for gid in expected_gids:

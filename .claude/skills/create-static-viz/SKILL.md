@@ -203,6 +203,21 @@ here is expensive to redo.
 
 ## Step 4 — Write the `export://static_viz` step
 
+> **Create the branch and worktree first — before the first edit.** `etl pr` seeds the new branch
+> with an *empty* commit and "never stages or commits your local changes"
+> (`apps/pr/cli.py:3-5`), and `--worktree` builds a clean sibling checkout from
+> `origin/<base_branch>` (`branch_out_worktree`, `apps/pr/cli.py:467-485`). So it carries nothing
+> across: run it *after* writing the step and your Step 4–8 work is stranded in whatever checkout
+> you were in, while the PR and the babysitter see an empty branch.
+>
+> ```bash
+> .venv/bin/etl pr "<title>" data --worktree   # opens the draft PR and starts the staging server
+> ```
+>
+> Then do all of Step 4–8 **inside that worktree**. `etl pr` switches the *main* checkout's branch,
+> not your current directory, so confirm where you are before editing and again before committing:
+> `git branch --show-current`.
+
 Path `etl/steps/export/static_viz/<namespace>/<version>/<short_name>.py`, DAG entry in
 `dag/static_viz.yml` (a flat `steps:` map, one comment line per step, keyed by the full
 `export://` URI with its garden/grapher deps as the value).
@@ -341,7 +356,8 @@ To refresh: re-run this step, re-upload the SVG to the same page, and reapply th
 
 ## Step 9 — PR, review chain, tracker
 
-`etl pr "<title>" data --worktree`, then [`/pr-babysitter`](../pr-babysitter/SKILL.md) for the
+The branch, worktree and draft PR already exist from Step 4. Commit the step plus its committed
+PNG/SVG, push, and fill in the PR body — then [`/pr-babysitter`](../pr-babysitter/SKILL.md) for the
 Codex round. **Brief the babysitter with the deliberate decisions** (see the last gotcha).
 
 The code review is only the first of several. The project defines the rest, and they are people,
@@ -403,7 +419,7 @@ it.
   text height. Its anchor must clear the axes by its own full height plus a gap, or the swatches
   land on the plot.
 - **A narrow panel cannot hold an inline reference label.** With clipping off it spills into the
-  neighbouring panel rather than being cropped — which looks like a rendering bug. Move the label
+  neighboring panel rather than being cropped — which looks like a rendering bug. Move the label
   to the legend for narrow layouts.
 - Fewer axis ticks in a narrow panel. Make the tick set per-layout, not global.
 
