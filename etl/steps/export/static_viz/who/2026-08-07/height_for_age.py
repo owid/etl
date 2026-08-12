@@ -8,10 +8,16 @@ Two versions are emitted, following the static-chart templates:
 
 - desktop: panels side by side, footer carrying Note, Data source, the OurWorldinData.org
   tagline and the licence line.
-- mobile: panels stacked, and a footer reduced to Data source plus the licence, which is
-  all the mobile template has room for. The template has no Note slot, so the caveat that
-  the two age ranges rest on different foundations moves into the subtitle rather than
-  being dropped -- see MOBILE_SUBTITLE_TAIL.
+- mobile: panels side by side too, in the portrait frame, and a footer reduced to Data source
+  plus the licence, which is all the mobile template has room for. The template has no Note
+  slot, so the caveat that the two age ranges rest on different foundations moves into the
+  subtitle rather than being dropped -- see MOBILE_SUBTITLE_TAIL.
+
+Stacking the panels in the portrait frame was tried and rejected: it gives each panel a 2:1
+landscape box, about 222px of height for a 165 cm range, which flattens the curves so far that
+the adolescent growth spurt stops being visible. Side by side gives each 2.4x the vertical
+resolution. That is why the mobile layout carries fewer age ticks and moves the stunting label
+into the legend -- a 214px-wide panel cannot hold either.
 
 Replaces the hand-drawn 'Expected Healthy Growth Curves for Boys and Girls' image used on
 the human-height topic page and the stunting-definition article.
@@ -87,8 +93,8 @@ TAGLINE = "OurWorldinData.org — Research and data to make progress against the
 # templates (Note and tagline present) from the mobile ones (neither).
 #
 # Row positions come from "Static Chart Template_Horizontal" (850x638) and "Static Chart
-# Template_Mobile (example 2)" (540x824); the tall mobile frame is the one that suits stacked
-# panels. Font sizes are derived from each slot's height in the template (a template px is
+# Template_Mobile (example 2)" (540x824); the tall mobile frame is the one that gives two
+# side-by-side panels enough height to read. Font sizes are derived from each slot's height in the template (a template px is
 # 0.72pt, and a line of text occupies about 1.8x its point size).
 LAYOUTS = {
     "height_for_age": {
@@ -449,8 +455,9 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         ax.set_xticklabels(["Birth" if tick == 0 else str(tick) for tick in ticks])
         ax.yaxis.set_major_formatter(FuncFormatter(lambda value, _: f"{value:.0f} cm"))
         ax.tick_params(axis="both", length=0, labelsize=body_fontsize, labelcolor=TEXT_COLOR)
-        # Grapher renders axis labels bold (fontWeight 700 in Axis.ts). When the panels are
-        # stacked they share one x axis, so only the bottom one is labelled.
+        # Grapher renders axis labels bold (fontWeight 700 in Axis.ts). Both layouts put the
+        # panels in one row, so each carries its own label; the axes[-1] arm keeps a stacked
+        # layout correct (shared x axis, label on the bottom panel only) if one is ever added.
         if layout["ncols"] > 1 or ax is axes[-1]:
             ax.set_xlabel("Age in years", fontsize=body_fontsize, color=TEXT_COLOR, fontweight="bold", labelpad=10)
 
@@ -465,7 +472,33 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
     subtitle = build_subtitle(tb, layout)
     subtitle_lines = subtitle.count("\n") + 1
     legend_fontsize = body_fontsize - 0.5
-    legend_rows = -(-(len(BANDS) + 2) // layout["legend_ncol"])
+
+    # --- shared legend; on desktop the stunting line is labelled on the line instead ---
+    # Each band is drawn over the wider ones before it, so the nth band's swatch has to
+    # show n layers of BAND_ALPHA compounded -- otherwise the legend reads inside out.
+    handles = [
+        Patch(facecolor="#666666", alpha=1 - (1 - BAND_ALPHA) ** (index + 1), edgecolor="none", label=label)
+        for index, (_, _, label) in enumerate(BANDS)
+    ]
+    handles += [
+        Line2D([0], [0], color="#666666", linewidth=2.4, label="Median height"),
+        Line2D(
+            [0],
+            [0],
+            color=REFERENCE_LINE_COLOR,
+            linewidth=1.2,
+            linestyle=(0, (4, 3)),
+            label="Median for the other sex",
+        ),
+    ]
+    if not layout["inline_stunting_label"]:
+        handles.append(
+            Line2D([0], [0], color=REFERENCE_LINE_COLOR, linestyle=":", linewidth=0.8, label="Stunted below (-2 SD)")
+        )
+    # Row count comes from the handles actually built, not from a hardcoded total: mobile adds a
+    # sixth entry for the stunting line, so a fixed count would misplace the plot the moment the
+    # band list or that condition changed.
+    legend_rows = -(-len(handles) // layout["legend_ncol"])
 
     fig.text(
         fx(margin_px),
@@ -496,28 +529,6 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
     # plot starts below the legend's own rows plus a clear gap.
     chart_top_px = legend_top_px + (legend_rows + LEGEND_CHART_GAP) * px(legend_fontsize)
 
-    # --- shared legend; the stunting line is labelled on the line instead ---
-    # Each band is drawn over the wider ones before it, so the nth band's swatch has to
-    # show n layers of BAND_ALPHA compounded -- otherwise the legend reads inside out.
-    handles = [
-        Patch(facecolor="#666666", alpha=1 - (1 - BAND_ALPHA) ** (index + 1), edgecolor="none", label=label)
-        for index, (_, _, label) in enumerate(BANDS)
-    ]
-    handles += [
-        Line2D([0], [0], color="#666666", linewidth=2.4, label="Median height"),
-        Line2D(
-            [0],
-            [0],
-            color=REFERENCE_LINE_COLOR,
-            linewidth=1.2,
-            linestyle=(0, (4, 3)),
-            label="Median for the other sex",
-        ),
-    ]
-    if not layout["inline_stunting_label"]:
-        handles.append(
-            Line2D([0], [0], color=REFERENCE_LINE_COLOR, linestyle=":", linewidth=0.8, label="Stunted below (-2 SD)")
-        )
     fig.legend(
         handles=handles,
         loc="upper left",
