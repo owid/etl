@@ -91,7 +91,12 @@ mobile size) or about *what the chart claims* (must move into the subtitle inste
 
 - A template pixel is **0.72 pt** (100 template px per inch ÷ 72 pt per inch).
 - Size a matplotlib figure as `figsize = (width_px / 100, height_px / 100)` and the saved image
-  carries the template's exact proportions.
+  carries the template's exact proportions — **its proportions, not its size**. The `/ 100` puts 100
+  template px in an inch, which is what makes every slot figure in this file convert by a plain
+  `px / 100`; matplotlib then writes the SVG root in points, so the 850 × 638 frame saves as
+  `612pt × 459.36pt` and imports into Figma at 0.72× the template. Correct that with one uniform
+  rescale on import (`/create-figma-chart` Step 7) — never by inflating `figsize`, which would put the
+  slot conversion and every point-denominated font size in this file out by the same 1.39×.
 - One line of text occupies roughly `1.3 × fontsize` in points, i.e. `1.8 × fontsize` in template
   px. Useful for stacking blocks; **not** accurate enough for line wrapping — measure that
   (see `SKILL.md`).

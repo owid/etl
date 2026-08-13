@@ -259,10 +259,12 @@ const unwrap = (imported, parent, name) => {        // parent = the page (origin
 
 > **Local-SVG route.** Two imports, and neither is an embed: place the step's **PNG** on the page as
 > the left-hand reference copy, and unwrap the **SVG** straight into the template clone here in Step 5
-> rather than waiting for a band measurement in Step 7. Waiting buys nothing — the SVG's frame is
-> already the template's frame, so there is no aspect to solve against the header and footer. Keep
-> the clone, though: the SVG's text is matplotlib's, not in the file's bound Lato/serif styles, so
-> Step 6 still fills the template's own slots and Step 7 then drops the SVG's duplicate text nodes.
+> rather than waiting for a band measurement in Step 7. Waiting buys nothing — the SVG's frame already
+> carries the template's *aspect*, so there is no aspect to solve against the header and footer. It
+> does not arrive at the template's *size*, though: Step 7 still owes it one uniform rescale to the
+> clone's width. Keep the clone, too: the SVG's text is matplotlib's, not in the file's bound
+> Lato/serif styles, so Step 6 still fills the template's own slots and Step 7 then drops the SVG's
+> duplicate text nodes.
 
 ## Step 6 — Fill the template texts
 
@@ -318,15 +320,32 @@ The chart spans the full content width, left-aligned with the title/subtitle/log
 
 **This is where the embed arrives.** The band's edges — `headerBottom` and `footerTop` — don't depend on the chart, so read them first, solve the export aspect against that band (Step 3), *then* export the embed, import it, and unwrap it into the template clone with the `unwrap` helper from Step 5. Fitting comes after. That ordering is the whole reason the embed waited this long.
 
-> **Local-SVG route: nothing arrives here, and nothing is fitted.** The SVG came in at Step 5 and it
-> is a full frame, not a chart area — importing it into the band would nest the whole visualization,
-> title and footer included, inside the template's chart slot. Align it to the clone's own origin
-> instead — `svg.x = 0; svg.y = 0`, since `unwrap` made the clone its parent and a child's `x`/`y` are
-> frame-relative (which is why the fit below reads `chart.x = header.x` and not a page coordinate) —
-> and it lands correct by construction, because the step drew it at the template's frame size against
-> the same slot positions. So skip the band measurement,
-> the `rescale`, the ladder pick and the x-map below — every one of them exists to reconcile an export
-> whose proportions were chosen by grapher, and this one's were chosen from `TEMPLATES.md`.
+> **Local-SVG route: nothing is *fitted*, but it still has to be scaled.** The SVG came in at Step 5
+> and it is a full frame, not a chart area — importing it into the band would nest the whole
+> visualization, title and footer included, inside the template's chart slot. Align it to the clone's
+> own origin instead — `svg.x = 0; svg.y = 0`, since `unwrap` made the clone its parent and a child's
+> `x`/`y` are frame-relative (which is why the fit below reads `chart.x = header.x` and not a page
+> coordinate).
+>
+> **Its *proportions* come from `TEMPLATES.md`; its *size* does not — so scale it to the clone's width
+> before trusting any of it.** The `figsize = (width_px / 100, height_px / 100)` recipe fixes the
+> aspect ratio, not the canvas: matplotlib writes the root in **points**, and a template pixel is
+> 0.72 pt, so the 850 × 638 horizontal frame arrives as `width="612pt" height="459.36pt"` and imports
+> at 612 × 459.36 — every slot position and font size 72% of target. One uniform rescale to the
+> clone's width puts all of it right at once, and the height lands on the clone's by construction
+> because the ratio already matches:
+>
+> ```js
+> svg.rescale(clone.width / svg.width)          // 850 / 612 = 1.3889 = 1 / 0.72
+> // then assert the height, which is what proves the step used the template's ratio
+> console.assert(Math.abs(svg.height - clone.height) < 1, svg.height, clone.height);
+> ```
+>
+> A height that misses tells you the step cropped the canvas rather than that the scale went wrong —
+> send it back to `verify_static_viz.py --template`, which now measures the SVG root and not only the
+> PNG. What you *do* skip is the band measurement, the ladder pick and the x-map below: those exist to
+> reconcile an export whose proportions were chosen by grapher, and this one's were chosen from
+> `TEMPLATES.md`. The scale is the one piece of the fit the route still needs.
 >
 > What *does* happen here is stripping whatever the template already provides. **The background comes
 > first, and it is the one that ruins the page.** matplotlib fills the figure and axes patches white
@@ -941,7 +960,7 @@ Two habits make the difference. **Assert, don't eyeball** — a 1.2px label drif
 - **A sweep over mixed node types must guard every property read.** `dashPattern`, `strokes` and `fills` don't exist on `GROUP`, so one un-guarded read aborts the whole script — and `use_figma` is atomic, so you lose the entire pass, not just that node. Wrap each read in its own `try`, and remember `fontSize`/`fontName`/`lineHeight` can come back as `figma.mixed` rather than a value.
 - **To draw a dashed leader or guide line, create a VECTOR with an explicit path** — `figma.createLine()` gives you a horizontal line you then have to rotate, which is fiddly to place. `v.vectorPaths = [{windingRule:"NONE", data:`M 0 0 L 0 ${len}`}]` then `v.dashPattern = [2,2]` is exact and needs no rotation math.
 - **The line-chart export's group names are `text-labels`, `connectors`, `lines`, `datapoints__<Entity>`, `outline__<Entity>`, `tick-marks`, `horizontal-grid-lines`** — worth knowing before you go hunting, and worth re-checking per chart type, since the tree is grapher's and it changes.
-- **A local SVG from an `export://static_viz` step has none of those names.** matplotlib names its own nodes `figure_1` / `axes_1` / `line2d_3`, and the step supplies meaningful ones through `gid=` — `<subject>__<role>`, e.g. `boys__median`, `girls__stunting-threshold`, plus `title` / `subtitle` / `note` / `data-source` on the text blocks. So every named-group lookup in Steps 7–8 needs the step's own scheme, which `/create-static-viz` hands over with the file; enumerate the ids from the SVG if it doesn't (`grep -oE 'id="[a-z0-9_-]+"'`). Two consequences: there is no `connectors` group to hide, because a matplotlib chart has no elbow leaders to begin with; and the x-map stretch in Step 7 is unnecessary, because the step already sized the frame to the template.
+- **A local SVG from an `export://static_viz` step has none of those names.** matplotlib names its own nodes `figure_1` / `axes_1` / `line2d_3`, and the step supplies meaningful ones through `gid=` — `<subject>__<role>`, e.g. `boys__median`, `girls__stunting-threshold`, plus `title` / `subtitle` / `note` / `data-source` on the text blocks. So every named-group lookup in Steps 7–8 needs the step's own scheme, which `/create-static-viz` hands over with the file; enumerate the ids from the SVG if it doesn't (`grep -oE 'id="[a-z0-9_-]+"'`). Two consequences: there is no `connectors` group to hide, because a matplotlib chart has no elbow leaders to begin with; and the x-map stretch in Step 7 is unnecessary, because the step already drew the frame at the template's aspect — though it still needs the single uniform rescale to the template's *size*, which the aspect does not give you (Step 7).
 - **Restyling an imported chart's text to Lato: enumerate the ranks, don't bucket by threshold.** A size map like `size > 13 ? 14 : 12` silently collapses two ranks into one — 16px facet titles landed at 14px alongside the tick labels, erasing a distinction grapher makes deliberately. Write the map from the ranks you expect to see (facet title / ticks / annotation), then assert the resulting size histogram has that many entries. Same for weight: a sweep that sets one `fontName` for every node strips bold from whatever had it (the facet titles and the axis label both), so drive it off a set of the strings that are bold rather than off a single default.
 - **Never patch a node's absolute `x`/`y` in a later call from anchors recorded before a fit.** Fitting moves the whole chart group, so anchors captured at import time are stale by that delta the moment the fit runs — reapplying them yanks those nodes back out of the group and the bbox explodes (a 635px chart reported 878px, and its band gap went negative). Re-anchor and fit **in one call**, in that order. If a later change is needed, rebuild the working copy from the untouched reference on the page rather than patching coordinates.
 - **Bind the series color as a library style; derive the band tints from it.** `setStrokeStyleIdAsync` for a line, `setFillStyleIdAsync` for a fill — and note the gid names an SVG **group**, not the vector, so descend to the `VECTOR` children first (`node.query('VECTOR')`) or the setter throws `no such property on GROUP`. The library carries no tints, so a banded chart's fills stay computed blends of the bound color towards white; record that as an accepted deviation from "every fill is a bound style", same as text fills.
