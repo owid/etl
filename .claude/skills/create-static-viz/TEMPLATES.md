@@ -18,6 +18,14 @@ The page's own instructions frame (`798:151`) states the workflow: *"Copy/paste 
 want to use and edit it in a new page"*, *"Page name: Date + Chart title"*. `/create-figma-chart`
 implements that naming as `YYYYMMDD <Title> (<Creator>)`.
 
+**Division of labor with `/create-figma-chart`, since both skills read this same Figma page.** This
+file owns the **measurements** — every slot's position and size, the derived positions, unit
+conversions, colors, exact strings — because a matplotlib step has to reproduce them with no Figma
+call. That skill owns the **operations**: which node to clone, the single band a chart is fitted
+into, and how a clone behaves when you edit it (footer reflow, mixed-weight runs, rescaling). Node
+ids and frame sizes are in both by necessity, and that is the whole of the intended overlap — when
+you learn something new, add it to the file that owns that side rather than to both, and link.
+
 ## The four static-chart templates
 
 | Template | Node | Frame size | Panels it suits |
@@ -111,13 +119,10 @@ mobile size) or about *what the chart claims* (must move into the subtitle inste
   calibrate so the two-line case reproduces 80 exactly.
 - **The title slot is two lines tall** in every template. A title that wraps to one line
   under-fills it; one that wraps to three overflows into the subtitle.
-- **The same reasoning applies to the `Note:` slot, which is also two lines tall** — and the two
-  desktop templates then diverge. `Static Chart Template_Vertical`'s footer (`Frame 8`) is
-  **auto-layout**, so a one-line note lets the rows below it reflow; `Static Chart
-  Template_Horizontal`'s footer rows are **absolutely positioned** and stay where they are, leaving
-  a 19.41px gap where the design has 5.41px. Measured 2026-08-13. Since the note's `y` is also the
-  chart band's bottom edge, a one-line note moves the band — so derive both from the actual slot
-  positions rather than from the table above.
+- **The `Note:` slot is two lines tall too, and the chart band's bottom edge is the note's `y`** — so a
+  one-line note moves the band. Derive both from the actual slot positions rather than from the table
+  above. (What that implies for *editing* a clone in Figma — the two desktop templates re-space
+  differently — is `/create-figma-chart`'s Step 6, not this file's business.)
 - **The two desktop templates disagree on subtitle size:** Horizontal is **16px**, Vertical is
   **15px** (both Lato Regular). Measured 2026-08-13. Not a typo to correct in a clone — match
   whichever template you cloned, and raise it with the design team if the pair should agree.

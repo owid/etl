@@ -39,8 +39,8 @@ Each year gets a new file. For **2026** the file key is `s6Sv60bakebRRW2TxsMQbF`
 | DI_Template | `6799:1859` | 540×540 | **one**-row footer (`Frame 12` @ y=508): source + CC BY |
 | Static Chart Template_Mobile (example 1) | `24590:20` | 540×540 | **two**-row footer (`Frame 15` `25343:276` @ y=486, h=38): `Data source:` then `Licensed under CC-BY by the author […]`, both full width |
 | Static Chart Template_Mobile (example 2) | `24590:32` | 540×824 | taller variant — use when the chart needs vertical room. Same two-row `Frame 15` (`25343:275` @ y=770) |
-| Static Chart Template_Horizontal | `5332:75` | 850×638 | footer: Note, Data source, OWID tagline, "Licensed under CC-BY by the author [Name]". Footer rows are **absolutely positioned** — see the re-spacing rule in Step 6 |
-| Static Chart Template_Vertical | `5332:93` | 850×1095 | same slots; footer `Frame 8` is **auto-layout**, so its rows reflow. **Its subtitle is 15px where Horizontal's is 16px** — a template inconsistency, not something to "fix" in a clone; report it if the pair needs to match |
+| Static Chart Template_Horizontal | `5332:75` | 850×638 | footer: Note, Data source, OWID tagline, "Licensed under CC-BY by the author [Name]" |
+| Static Chart Template_Vertical | `5332:93` | 850×1095 | same slots. The two desktop templates differ in ways that bite — footer re-spacing behavior (Step 6) and subtitle size (`TEMPLATES.md`) |
 | **`small-chart-template-guided`** | **`25344:1357`** | 302 × free | title + optional subtitle, no source row — see [SMALL-CHARTS.md](SMALL-CHARTS.md) |
 | **`small-chart-template-pull`** | **`25344:1391`** | 302 × free | the same plus a mandatory source row — see [SMALL-CHARTS.md](SMALL-CHARTS.md) |
 | `"SMALL" Charts` section heading | `25344:1235` | — | "featured on the OWID website as guided and PULL charts" |
@@ -506,6 +506,8 @@ Side margins and the footer edge are the template's, not yours: content starts a
 | Small / pull chart (302 × free) | **x=12, w=278** | 44 → `H − 10` (guided) or `H − 23` (pull) — see below |
 
 The two static mobile figures were 508 and 792 before 2026-08-13; the two-row footer took 22px off each. The row that used to lump DI together with static mobile is split above, because they no longer agree.
+
+The table gives one number per template — the band you fit a chart into — and that is deliberately all it gives. **Per-slot geometry for the four static templates** (each text slot's own `y`/width/height, the derived positions, unit conversions, the exact footer strings) belongs to [`/create-static-viz`'s TEMPLATES.md](../create-static-viz/TEMPLATES.md), which needs it to place text without opening Figma. Read it there rather than re-measuring into this file: two copies of a measurement drift, and the copy a session happens to read then decides which one was right.
 
 **The 302-wide row is parametric, and its `H` is an output of this step rather than an input** — width is the only fixed dimension, the frame height is chosen from the content, and there is no fit to perform because the export already arrives at 278px wide. Its header block also hugs its own text width instead of spanning the content, so the plot may legitimately rise beside it. All of that is [SMALL-CHARTS.md](SMALL-CHARTS.md)'s; don't apply the fit below to it.
 

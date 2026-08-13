@@ -158,9 +158,8 @@ chart is fitted into a measured band (SKILL.md Steps 3 and 7). Here **the frame 
 5. Resize the clone to `H`, and on a pull clone move the source row to `y = H − 23`.
 
 A consequence worth stating because it will be reached for: **an aspect-ratio check on a small chart
-is meaningless.** Only the width is a target. Don't add a `"small"` entry to
-`create-static-viz/scripts/verify_static_viz.py`'s `TEMPLATE_RATIOS` — wrong pipeline, and a ratio
-test on a free-height frame.
+is meaningless.** Only the width is a target, so there is no ratio to assert and nothing to compare a
+render against — check the width and the margins instead.
 
 ## Sourcing the view
 
