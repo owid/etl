@@ -238,7 +238,7 @@ matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"  # deterministic ids, cl
   them. This is the same rule as "the step does not set colors": the background belongs to the
   template, and white is a background even though nobody chose it.
   The PNG wants the opposite, though: it is what a human reviews, often against a dark editor
-  background, where a transparent canvas makes grey text unreadable. So keep the canvas opaque on the
+  background, where a transparent canvas makes gray text unreadable. So keep the canvas opaque on the
   figure and drop it at save time, which means **two `export_fig` calls, not one**:
   ```python
   fig.patch.set_facecolor("white")  # legible when the PNG is reviewed on a dark background
@@ -284,6 +284,8 @@ treatment from grapher rather than inventing one. Read it out of `owid-grapher`,
 | x-axis tick marks | 5px long, 1px wide, `#999`, hanging below the axis | `HorizontalAxisComponent`; `LineChart` passes `showTickMarks={true}` |
 | Outermost tick labels | anchored **inwards** — `text-anchor` `start` on the first, `end` on the last | `HorizontalAxisComponent` |
 | y-axis line | **none** — the gridlines carry the reading | no component exists |
+| y domain | `[lowest tick, highest tick]` — the extreme gridlines land **on** the plot's edges | verified on a rendered SVG |
+| The gridline on the baseline | drawn **solid** in the tick color, not dashed — it *is* the axis line | `t.solid` in `VerticalAxisGridLines` |
 | x gridlines on a line chart | hidden | grapher sets `hideGridlines` on the x axis |
 | Facet titles | **bold**, `GRAPHER_DARK_TEXT` (*not* the series color), above the panel, left-aligned with its content, half a line of padding beneath | `FACET_LABEL_FONT_WEIGHT = 700`, `labelPadding = 0.5 * facetLabelFontSize` |
 | Facet title size | about `1 / 0.9` of the tick size — one rank up, not a display size | `facetBaseFontSize = facetLabelFontSize / GRAPHER_FONT_SCALE_12 * 0.9` |
@@ -306,8 +308,33 @@ axis line, when in fact every zero-crossing chart appears to have one. One fetch
 curl -sL "https://ourworldindata.org/grapher/life-expectancy.svg?country=USA~CHN" -o /tmp/g.svg
 ```
 
+**Snap the value axis out to whole gridline steps, and then suppress the gridline the baseline draws.**
+This is grapher's answer to "the lowest gridline runs a few pixels clear of the axis line": it never
+has that case, because its domain *is* `[lowest tick, highest tick]`, so there is only ever one line at
+each edge. Leave slack below the lowest tick and you get two nearly-coincident lines; snap the limits
+and you get one. Then drop the gridline at the baseline, or a dashed `#ddd` stroke is laid over the
+solid `#999` one and breaks it up:
+
+```python
+ticks = np.arange(np.floor(low / STEP) * STEP, np.ceil(high / STEP) * STEP + 1, STEP)
+ax.set_ylim(ticks[0], ticks[-1])
+ax.set_yticks(ticks)
+ax.yaxis.get_gridlines()[0].set_visible(False)   # the baseline already draws this one, solid
+```
+
+**A grapher-style axis costs vertical space in two places, and both reserves have to grow.** Tick marks
+with a length push the tick labels and the axis label down — enough to overrun a reserve that fitted
+when the ticks were zero-length, which put the axis label's descenders into the note. And facet titles
+above the plot need `font size + 0.5 line` of their own, taken off the top of the plot rather than out
+of the frame. Re-measure both reserves after adding either.
+
+**When a tick label crowds its neighbor, drop the tick.** That is what grapher does — it hides
+overlapping labels rather than shrinking or rotating them — so a tick set is a per-layout choice, and a
+tick whose label sits closer to its neighbor than the rest of the axis is a tick to remove, even when
+the value is one the note mentions.
+
 **The x range and the label anchoring interact — set the range first.** Anchoring the first tick label
-left will collide with its neighbour while the range still carries padding, because padding compresses
+left will collide with its neighbor while the range still carries padding, because padding compresses
 the left end; pinned to the ticks, the same anchoring has room (measured: 6.7px clear on desktop,
 25px on mobile). So when an anchor "doesn't fit", re-check it after any range change instead of
 concluding it can't be done — and measure the gap rather than eyeballing the render.
@@ -367,7 +394,7 @@ Conventions that make one legible:
 - **Lead with the plain meaning, keep the technical term.** `Stunted: too short for their age`, not
   `Stunted below here (2 SD below median)` — the jargon is what the chart exists to explain, so
   putting it first explains nothing.
-- **Draw the key in grey**, even when the chart is colored: grey is what marks it as explanation
+- **Draw the key in gray**, even when the chart is colored: gray is what marks it as explanation
   rather than a further data series. Keep the tints and line styles identical to the chart's.
 - **Get the schematic's internal proportions right.** If a threshold really falls inside a band, the
   diagram must show it inside — derive its offset from the same z-values the data uses rather than
@@ -417,6 +444,21 @@ all computed, none typed. That is what makes the step survive a data update with
 
 The corollary: **a wording change reflows the layout**, so re-read the rendered PNG after any text
 change, not just after a geometry change.
+
+**Labels that sit side by side belong in one register, and a count has to survive arithmetic.** Naming
+one band `8 in 10 children` and its neighbor `Almost all children` mixes a count with a qualitative
+phrase, and the reader is left asking whether the two are the same kind of statement — so make both
+counts. Then check the count against the percentiles the band is actually drawn from: the 0.1st to the
+99.9th holds 99.8%, which is **998** in 1,000, not the 999 that "almost all" rounds to. A round-looking
+wrong number is worse than either the accurate awkward one or the honest qualitative phrase, and it
+survives review precisely because it looks like a summary rather than a claim.
+
+**A series that traces another for most of the range is redundant, not informative.** Repeating one
+panel's median in the other, to show a crossover, put a second line within a few millimetres of the
+first from birth to age 9 — re-drawing the same information across two thirds of the chart, which is
+the doubling that splitting the panels was meant to remove. Prefer stating the fact in the subtitle and
+letting the reader compare panels at a shared gridline. Check any "for context" series this way: plot
+the two and measure where they actually diverge before deciding it earns its ink.
 
 ### Assertions
 
@@ -571,7 +613,13 @@ claim about human intent that an automated flow should not be making.
   convert to axes fractions with the real panel box, and compare against the actual curve. Two
   rounds of guess-render-look is slower than one round of measuring, and it silently accepts
   near-misses.
-- Fewer axis ticks in a narrow panel. Make the tick set per-layout, not global.
+- Fewer axis ticks in a narrow panel. Make the tick set per-layout, not global — and drop a tick whose
+  label crowds its neighbor, which is what grapher does rather than shrink or rotate it.
+- **A "no room for this" conclusion expires the moment the geometry changes.** Two things I ruled out
+  on measurement — anchoring the first tick label inwards, and a one-line stunting label — both became
+  possible after an unrelated change (pinning the x range to the ticks; moving the label below the
+  slab). Record *why* something didn't fit, so the next geometry change is a prompt to re-measure
+  rather than a settled answer to inherit.
 
 **Workflow**
 
