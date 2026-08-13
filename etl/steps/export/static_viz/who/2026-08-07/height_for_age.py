@@ -1,8 +1,12 @@
 """Recreate the 'Expected height of boys and girls' growth-curve chart.
 
 Each panel shows nested percentile bands from the WHO growth reference standards, the median, and
-the -2 SD stunting threshold, plus a dashed copy of the other sex's median in that sex's own color,
-so the crossover in early adolescence stays visible with boys and girls in separate panels.
+the -2 SD stunting threshold.
+
+Neither panel repeats the other sex's median. The two medians run within a few millimetres of each
+other from birth to about age 9, so a second line traces the panel's own median for two thirds of the
+range -- the same doubling that splitting the sexes into panels was meant to remove. The subtitle
+states the crossover instead, and it can be read off the two panels at a shared gridline.
 
 An encoding diagram names each part of the chart -- see `draw_encoding_diagram`. There is no legend
 in either version.
@@ -314,60 +318,64 @@ def tint(color, weight: float) -> tuple[float, float, float]:
 def draw_encoding_diagram(
     ax,
     fontsize: float,
-    left: float = 0.50,
-    right: float = 0.68,
+    left: float = 0.34,
+    right: float = 0.60,
     middle: float = 0.24,
     outer_half: float = 0.105,
+    rise: float = 0.12,
     label_gap: float = 0.03,
 ) -> None:
-    """Draw a miniature cross-section of the encoding, with each part named beside it.
+    """Draw a miniature growth curve carrying the encoding, with each part named beside it.
 
-    A slab carrying both bands, the median and the -2 SD line, in grey so it reads as a key rather
-    than as a third sex, with the chart's own tints and line styles. Its conventions:
+    Shaped like the chart it explains rather than as a flat block: a rising median with the two bands
+    widening around it and the -2 SD line running below, so the reader recognises the marks by their
+    shape and not only by their colour. It is a schematic, not a data slice -- the bands are drawn
+    wider than the real ones so the four labelled marks separate at the curve's right-hand end, where
+    the labels attach.
 
-    - Each band gets a square bracket spanning its full height. A band is a range, and a tick at its
-      boundary would read as naming the boundary.
-    - The brackets sit on opposite sides of the slab, since both bands share the same midpoint.
-    - The median's label sits on the line inside the slab, with no leader.
-    - The stunting label sits centred below the slab, with a short leader dropping from the dotted
-      line. That is where there is room for it on one row; beside the slab it has 145px.
+    Grey, so it reads as a key rather than as a third sex; the tints and line styles are the chart's.
+
+    Where each label goes, and why:
+
+    - Each band gets a square bracket at the curve's right end, spanning the band's full height there.
+      A band is a range, and a tick at its boundary would read as naming the boundary. The brackets
+      nest outwards and their labels attach to the top cap, which is what keeps the inner label from
+      having to cross the outer bracket -- the panel is too narrow for it to clear.
+    - The median's label sits at the line's left end, and the stunting label below the curve with a
+      short leader. A leader is drawn only where a label cannot sit against the thing it names.
 
     Geometry is in axes fractions of whatever `ax` it is given, so the same drawing serves both
     layouts: the empty triangle below the growth curve on desktop, and its own axes across the header
     on mobile, whose 217px panels are narrower than the 89px and 105px labels.
     """
+    # A growth curve climbs fast and then flattens, so the exponent is well below 1.
+    t = np.linspace(0.0, 1.0, 80)
+    x = left + (right - left) * t
+    median = middle - rise / 2 + rise * t**0.55
+    # The bands widen with age in the data, so they widen along the schematic too.
+    outer = outer_half * (0.35 + 0.65 * t)
     # The inner band is the middle 80%, the outer the middle 99.8%, so it is about 0.42 as tall.
-    inner_half = outer_half * 0.42
+    inner = outer * 0.42
     # -2 SD inside the schematic: the outer band's edge is the 99.9th percentile, at about z = 3.09,
     # so 2 SD sits at 2/3.09 of the half-width. That ratio is what puts the stunting line inside the
     # outer band and below the inner one, as it is in the data.
-    minus_2sd = middle - outer_half * 2 / 3.09
-    for lower, upper, weight, name in (
-        (middle - outer_half, middle + outer_half, 0.90, "outer-band"),
-        (middle - inner_half, middle + inner_half, 0.74, "inner-band"),
-    ):
+    minus_2sd = median - outer * 2 / 3.09
+
+    for half, weight, name in ((outer, 0.90, "outer-band"), (inner, 0.74, "inner-band")):
         ax.fill_between(
-            [left, right],
-            [lower] * 2,
-            [upper] * 2,
+            x,
+            median - half,
+            median + half,
             facecolor=tint(DIAGRAM_COLOR, weight),
             linewidth=0,
             transform=ax.transAxes,
             zorder=7,
             gid=f"diagram__{name}",
         )
+    ax.plot(x, median, color=DIAGRAM_COLOR, linewidth=2.0, transform=ax.transAxes, zorder=8, gid="diagram__median")
     ax.plot(
-        [left, right],
-        [middle] * 2,
-        color=DIAGRAM_COLOR,
-        linewidth=2.0,
-        transform=ax.transAxes,
-        zorder=8,
-        gid="diagram__median",
-    )
-    ax.plot(
-        [left, right],
-        [minus_2sd] * 2,
+        x,
+        minus_2sd,
         color=REFERENCE_LINE_COLOR,
         linestyle=":",
         linewidth=0.8,
@@ -376,66 +384,69 @@ def draw_encoding_diagram(
         gid="diagram__stunting-threshold",
     )
 
-    # Square brackets embracing each band, with the label at the bracket's own midpoint. `cap` is
-    # how far the end caps reach towards the slab; `side` is which way the label runs. The longer
-    # label goes on the left, where there is room for it; the right side runs out of panel.
-    for half, bracket_x, cap, side, name, text in (
-        (outer_half, left - 0.015, 0.015, "right", "almost-all", "Almost all children"),
-        (inner_half, right + 0.015, -0.015, "left", "8-in-10", "8 in 10 children"),
+    # Nested brackets at the curve's right end: the big one around the whole band, the small one
+    # around the middle 80%. Each label sits immediately right of its own bracket, with no leader --
+    # "Almost all children" level with the big bracket's top arm, "8 in 10 children" level with the
+    # small bracket's middle. The big bracket is the *nearer* of the two, which is what lets both
+    # labels sit against their own bracket: the top label then clears the small bracket entirely, and
+    # the middle label starts to the right of both.
+    for half_end, bracket_x, label_x, at_top, name, text in (
+        (outer[-1], right + 0.020, right + 0.035, True, "almost-all", "Almost all children"),
+        (inner[-1], right + 0.050, right + 0.065, False, "8-in-10", "8 in 10 children"),
     ):
         ax.plot(
-            [bracket_x + cap, bracket_x, bracket_x, bracket_x + cap],
-            [middle - half, middle - half, middle + half, middle + half],
+            [bracket_x - 0.012, bracket_x, bracket_x, bracket_x - 0.012],
+            [median[-1] - half_end, median[-1] - half_end, median[-1] + half_end, median[-1] + half_end],
             color=MUTED_COLOR,
-            linewidth=0.7,
+            linewidth=0.8,
             solid_capstyle="butt",
             transform=ax.transAxes,
             zorder=8,
             gid=f"diagram__bracket-{name}",
         )
         ax.text(
-            bracket_x - cap,
-            middle,
+            label_x,
+            median[-1] + half_end if at_top else median[-1],
             text,
             transform=ax.transAxes,
             fontsize=fontsize,
             color=TEXT_COLOR,
-            ha=side,
+            ha="left",
             va="center",
             zorder=8,
             gid=f"diagram__label-{name}",
         )
 
-    # The median needs no leader: its label sits on the line, inside the slab.
+    # The median is named where its line starts, so it needs no leader.
     ax.text(
-        left + 0.012,
-        middle + 0.006,
+        left - 0.02,
+        median[0],
         "Median",
         transform=ax.transAxes,
         fontsize=fontsize,
         color=TEXT_COLOR,
-        ha="left",
-        va="bottom",
+        ha="right",
+        va="center",
         zorder=8,
         gid="diagram__label-median",
     )
 
-    # The stunting label sits below the slab, where there is room for one line, with a leader
-    # dropping from the middle of the dotted line to it.
-    leader_x = (left + right) / 2
-    label_y = middle - outer_half - label_gap
+    # The stunting label sits below the curve, where there is room for one line, with a leader
+    # dropping from the dotted line at the curve's midpoint.
+    mid = len(t) // 2
+    label_y = float((median - outer).min()) - label_gap
     ax.plot(
-        [leader_x] * 2,
-        [minus_2sd, label_y],
+        [x[mid]] * 2,
+        [minus_2sd[mid], label_y],
         color=MUTED_COLOR,
-        linewidth=0.7,
+        linewidth=0.8,
         solid_capstyle="butt",
         transform=ax.transAxes,
         zorder=8,
         gid="diagram__leader-stunted",
     )
     ax.text(
-        leader_x,
+        x[mid],
         label_y,
         "Stunted: too short for their age",
         transform=ax.transAxes,
@@ -514,8 +525,8 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
 
     Layout notes:
     - One panel per sex, sharing a y-axis, each with two nested percentile bands as flat tints
-    - Median drawn solid on top; the other sex's median dashed, in that sex's own color
-    - The -2 SD stunting threshold and both bands are named in the encoding diagram
+    - Median drawn solid on top of the bands
+    - The median, the -2 SD stunting threshold and both bands are named in the encoding diagram
     - No spines; light horizontal gridlines carry the height reading
     - Axis limits, ticks and footnote ages all derived from the data
     """
@@ -526,11 +537,6 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
     body_fontsize = layout["body_fontsize"]
     age_max = float(tb["age_years"].max())
     height_max = float(tb["height_percentile_99_9"].max())
-
-    medians = {}
-    for sex, tb_sex in tb.groupby("sex", observed=True):
-        tb_sex = tb_sex.sort_values("age_days")
-        medians[sex] = (tb_sex["age_years"].to_numpy(), tb_sex[MEDIAN_COLUMN].to_numpy())
 
     width_px, height_px = layout["size"]
     margin_px = layout["margin"]
@@ -586,22 +592,6 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
                 linewidth=0,
                 zorder=2,
                 gid=f"{slug}__{band_name}",
-            )
-
-        # --- the other sex's median, so the crossover stays visible in both panels ---
-        # Drawn in that sex's own color rather than grey, which saves labelling it: the panel titles
-        # carry the same two colors, so the dashed blue line in the Boys panel reads as the girls'.
-        for other_sex, (other_age, other_median) in medians.items():
-            if other_sex == sex:
-                continue
-            ax.plot(
-                other_age,
-                other_median,
-                color=palette[PANEL_COLOR_INDEX[other_sex]],
-                linewidth=1.2,
-                linestyle=(0, (4, 3)),
-                zorder=6,
-                gid=f"{slug}__median-other-sex",
             )
 
         # --- stunting threshold; named in the encoding diagram where there is one, and otherwise
@@ -708,11 +698,12 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         draw_encoding_diagram(
             diagram_axes,
             body_fontsize - DIAGRAM_FONTSIZE_DROP,
-            left=0.386,
-            right=0.642,
-            middle=0.675,
-            outer_half=0.315,
-            label_gap=0.087,
+            left=0.30,
+            right=0.58,
+            middle=0.60,
+            outer_half=0.24,
+            rise=0.30,
+            label_gap=0.05,
         )
         chart_top_px = diagram_top_px + HEADER_DIAGRAM_HEIGHT
 
