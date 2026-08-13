@@ -31,9 +31,6 @@ dataset:
     (2) COVID-19 vaccination figures collated by Our World in Data from public official
     sources. You can download the full
     dataset here: https://github.com/owid/covid-19-data/tree/master/public/data/vaccinations.
-  sources:
-  - name: Imperial College London YouGov Covid 19 Behaviour Tracker Data Hub – Last updated {TODAY}
-    published_by: Imperial College London YouGov Covid 19 Behaviour Tracker Data Hub – Last updated 15 March 2022, 09:00 (London time)
 tables:
   yougov_imperial_behavior_tracker_composite:
     variables:

@@ -11,10 +11,6 @@ dataset:
 
     We have created a new description of all our data sources. You find it at our GitHub repository **[here](https://github.com/owid/covid-19-data/tree/master/public/data/)**.
     There you can download all of our data.
-  sources:
-  - name: Official data collated by Our World in Data – Last updated {TODAY}
-    url: https://github.com/owid/covid-19-data/tree/master/public/data/hospitalizations
-    published_by: Official data collated by Our World in Data
 tables:
   hospital_and_icu:
     variables:

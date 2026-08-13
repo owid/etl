@@ -37,8 +37,3 @@ tables:
         display:
           name: Population
           includeInTable: true
-        sources:
-        - name: Food and Agriculture Organization of the United Nations
-          published_by: World Bank
-          url: http://data.worldbank.org/data-catalog/world-development-indicators
-          date_accessed: 2021-08-08

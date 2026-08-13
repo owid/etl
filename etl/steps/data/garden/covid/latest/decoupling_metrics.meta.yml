@@ -28,9 +28,6 @@ dataset:
 
     - United States: [US CDC](https://covid.cdc.gov/covid-data-tracker/#trends_dailycases) and [Department of Health & Human
     Services](https://healthdata.gov/Hospital/COVID-19-Reported-Patient-Impact-and-Hospital-Capa/g62h-syeh)
-  sources:
-  - name: Official data collated by Our World in Data
-    published_by: Official data collated by Our World in Data
 tables:
   decoupling_metrics:
     variables:

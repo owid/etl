@@ -11,10 +11,6 @@ dataset:
 
     We have created a new description of all our data sources. You find it at our GitHub repository **[here](https://github.com/owid/covid-19-data/tree/master/public/data/)**.
     There you can download all of our data.
-  sources:
-  - name: European CDC – Situation Update Worldwide – Last updated {TODAY}
-    url: https://www.ecdc.europa.eu/en/publications-data/download-todays-data-geographic-distribution-covid-19-cases-worldwide
-    published_by: European Centre for Disease Prevention and Control (ECDC)
 tables:
   ecdc:
     variables:

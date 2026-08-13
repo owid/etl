@@ -142,9 +142,12 @@ def test_dataset_schemas():
         if not _should_validate(meta_file_path, changed_files):
             continue
 
-        # Skip files that are not part of the active DAG (archived steps)
+        # Skip files that are not part of the active DAG (archived steps).
+        # `get_active_steps()` strips the dataset name, so its entries stop at the version
+        # (`garden/who/2026-05-22`), while `rel` includes the short name
+        # (`garden/who/2026-05-22/gho`). The prefix test must run in that direction.
         rel = str(meta_file_path.relative_to(STEPS_DATA_DIR)).rsplit(".meta.yml", 1)[0]
-        if not any(s.startswith(rel) for s in active_steps):
+        if not any(rel.startswith(s) for s in active_steps):
             continue
 
         # extract version from path

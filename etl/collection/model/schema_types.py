@@ -383,11 +383,11 @@ class ViewMetadata(TypedDict, total=False):
     """View metadata options based on dataset schema."""
 
     # Description of the indicator written by the producer, if any was given.
-    description_from_producer: str
+    description_from_producer: str | None
     # Key information about the indicator as free-form markdown text. A YAML list of bullet points is also accepted and converted to a markdown list on load.
-    description_key: str | list[str | list[str]]
+    description_key: str | list[str | list[str]] | None
     # Relevant information about the processing of the indicator done by OWID.
-    description_processing: str
+    description_processing: str | None
     # One or a few lines that complement the title to have a short description of the indicator.
     description_short: str
     display: Any
