@@ -511,26 +511,40 @@ naming scheme along with the file.
 
 ## Step 8 — Record the Figma handoff in the step's docstring
 
-Once the Figma page exists, write it back into the step's module docstring, so whoever re-runs the
-step later finds the design decisions next to the code that feeds them:
+Once the Figma page exists, write the handoff back into the step's module docstring. **The bar is that a
+later session can redo the whole thing from this file alone** — a different person, months on, with none
+of this conversation and no memory of the run. Not notes on what was done: a recipe.
 
-```python
-"""...
+That bar is the point of the step. Everything about the handoff lives in one of two places — this file,
+or a session transcript that vanishes. Whatever is only in the transcript gets re-derived by trial and
+error at the next data update, which is how the numbers drift and how a deliberate design decision
+quietly becomes an accident. So write it down even when it feels obvious today.
 
-Figma handoff
--------------
-Charts (2026), page "20260812 Expected height of boys and girls (Pablo A)"
-Frame: expected-height-boys-girls  (the frame name is the website PNG filename)
-Link:  https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=<id>
+Record, concretely:
 
-Done by hand in Figma, to redo after a data update:
-- retyped title/subtitle onto the template's bound text styles
-- swapped the band fills for Chart colors library styles
-- direct-labeled the two medians, dropped the legend
+- **Where.** File name *and* key, the page name and where it sits in the page order, each frame's name,
+  and the template node id and size it was cloned from. Names, not just a link: a `node-id` is stable
+  but says nothing about what to reproduce.
+- **The import mechanics that are not obvious.** How the SVG gets in (`upload_assets` + POST, never
+  `createNodeFromSvg`), that the wrapper frame is binned and why, and **the scale factor with its
+  derivation** — plus its self-correcting form, so a reader can check the number rather than trust it.
+- **Every text slot**: what fills it and which parts are bold. A table, because setting `characters`
+  flattens the mixed weights the templates ship.
+- **Any position that is derived** rather than taken from the template's fixed y, with the arithmetic.
+- **Every color**, as its library style *name and key*, plus how anything derived from it (band tints)
+  is computed. A hex alone is unreproducible — nobody can tell whether it came from the palette.
+- **The in-plot restyle**: each type rank with its size and weight, and the anchor rule per label family.
+- **The fit**, and whether a rescale is wanted (usually not, and why not).
+- **The audit numbers to expect**, so the next run can tell success from a near-miss.
 
-To refresh: re-run this step, re-upload the SVG to the same page, and reapply the above.
-"""
-```
+Two things that belong here and are easy to leave out. The **order** operations must run in where one
+depends on another settling — widths settle on the next call; a coordinate patch after a fit uses anchors
+the fit has already invalidated. And any **deviation accepted on purpose** — an off-ladder size, a
+grayscale seam that does not gate — with its reason, so a later audit reads it as a decision rather than
+a defect.
+
+Write it in the imperative, as the step's own reference. If you catch yourself writing "we changed X",
+rewrite it as "set X to Y, because Z": the reader wants to reproduce the state, not the history.
 
 ## Step 9 — PR and the review chain
 
