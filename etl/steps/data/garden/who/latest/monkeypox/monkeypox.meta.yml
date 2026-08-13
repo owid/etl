@@ -84,7 +84,3 @@ tables:
       annotation:
         title: annotation
         unit: ''
-      # Merged in from global_health_mpox, which reports weekly (the WHO columns above are daily).
-      suspected_cases_cumulative:
-        display:
-          timeInterval: week

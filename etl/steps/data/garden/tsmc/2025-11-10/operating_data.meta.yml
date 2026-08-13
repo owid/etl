@@ -76,5 +76,11 @@ tables:
             <% if category in ["capacity", "shipments"] %>0<% else %>1<% endif %>
           name: |-
             <% if category == "capacity" %>Annual capacity<% elif category == "shipments" %>Quarterly shipments<% else %><< metric >><% endif %>
-          timeInterval: |-
-            <% if category == "capacity" %>year<% else %>quarter<% endif %>
+          # NOTE: the `capacity` slice is annual, but this table is date-indexed, so every value —
+          # including that one — is encoded as days-since-zeroDay. Tagging it `year` would make grapher
+          # read those offsets (0, 365, 730, ...) as calendar years, and `_get_timespan` would derive a
+          # bogus span from them, since `year` is not treated as sub-yearly there. So tag the whole
+          # column `quarter`; the one annual metric is then labelled as a quarter, which is a small
+          # mislabel rather than a broken encoding. Splitting capacity into its own year-indexed table
+          # would be the exact fix.
+          timeInterval: quarter
