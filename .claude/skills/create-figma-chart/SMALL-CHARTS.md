@@ -328,6 +328,120 @@ added in Figma.
 `World - Richest decile`; the label should read `Richest decile`, since "World" is the only entity and
 therefore distinguishes nothing.
 
+### Order of operations — get this wrong and you place every label twice
+
+Each geometry change invalidates every label position, so **all the maps run before any label is
+placed.** Doing it out of order cost four full re-placement passes on the first run of this route:
+
+1. **Export** at the content width and chosen height (`imWidth=1170`, `imHeight = 4 × plotHeight`).
+2. **Clone** the right template; fix the background (frame fill on, vector out); resize to `H`; move
+   the source row on a pull clone.
+3. **Fill the text slots** — title, optional subtitle, source. The header reflows, so read
+   `headerBottom` back *after* this.
+4. **Import and unwrap** the chart; place at `x = 12`.
+5. **Map the geometry, x then y:** stretch to the content box, then stretch to the bottom margin,
+   reserving a label height under the header. Nothing textual moves yet.
+6. **Add what grapher omitted** — missing dots and missing start values (below).
+7. **Now place labels:** value labels first (they are anchored to marks), then series labels
+   (they only need to avoid lines and the value labels).
+8. **Then round, restyle and re-centre** — and re-run step 7 if any of it changed a width.
+9. **Then the checks.**
+
+The reason is mechanical: a label's position is derived from a mark, and every map moves the marks.
+There is no way to "adjust" placed labels after a map — they have to be re-derived.
+
+### Grapher omits dots and start values — count them before you trust them
+
+A thumbnail export does **not** reliably emit one dot and two value labels per series. Measured on
+these five charts: the Gini chart's UK series arrived with **no start dot**, and the thresholds chart's
+median series arrived with **neither a start dot nor its start value** — 5 labels for 3 series where 6
+were wanted, and the missing one is invisible unless you count.
+
+So **count first: a line chart wants `2 × series` value labels and `2 × series` dots.** Where one is
+missing, add it:
+
+- **Dot:** clone the same series' *other* dot, so size, fill and shape match exactly, then seat it on
+  the line's first path point. Never draw a fresh ellipse.
+- **Value:** take the number from `.csv?…&csvType=filtered` — never read it off the chart or infer it
+  from the other end. The median's 1990 threshold was `3.551` → `$3.55`, which is what the reference
+  shows.
+
+### The margins are 12px sides, 10px top and bottom — and the plot must reach them
+
+The template's own margins are **12px left and right, 10px top and bottom**, and the plot is expected
+to *fill* that box rather than float inside it. This is easy to get wrong in the bottom direction,
+because nothing looks broken: measured across four guided frames the bottom-most ink sat **15.7, 22.8,
+22.7 and 26.9px** from the frame edge instead of 10, so every one of them was floating.
+
+Where the plot's bottom edge lands depends on what is beneath it:
+
+| Frame | Bottom-most ink should be | Which node it is |
+|---|---|---|
+| Guided (no source row) | `H − 10` | the axis tick labels, or the last bar |
+| Pull (source row) | just above the source at `H − 23` | the source line itself then ends at `H − 10` |
+
+The fix is the y-analogue of the earlier map: derive the target baseline from the frame height
+(`newTickTop = H − 10 − tickHeight`, `newBaseline = newTickTop − 2`), map the plot geometry into it, then
+move the baseline and re-seat the tick labels — they are text and must be *translated*, never scaled.
+Measured stretches of 1.10–1.13× closed the gap on three line charts, and 1.03× on the ranked bar.
+
+> **Reserve a value label's height below the header when you map y.** An end label often has to sit
+> *above* its final dot, and if the map takes the data right up to the header there is nowhere for it
+> to go — on the Gini chart it wanted `y=40` against a header bottom of 44. Map to
+> `headerBottom + labelHeight + 6` rather than to `headerBottom`, and the label fits.
+
+### Placing value labels: beside the dot when there is room, above or below when there isn't
+
+**Beside is the default and the better look:** the start value to the **left** of the first dot, the end
+value to the **right** of the last, each **vertically centred on its dot**, with a 6px gap. That is what
+the references do and what grapher's own export does before you touch it.
+
+```js
+it.y = anchor.y - it.h / 2;
+it.x = isStart ? Math.max(12, anchor.x - 6 - it.w)
+               : Math.min(290 - it.w, anchor.x + 6);
+```
+
+Then **de-collide vertically within each side** — two series ending close together will overlap. Sort
+the side's labels by `y` and push overlapping neighbours apart symmetrically until a `height + 2` pitch
+holds; a handful of passes converges.
+
+**Above or below is the fallback, and it is only forced by the content box.** Once you have stretched
+the plot so the end dots sit on x=12 and x=290 there is no room beside them, so those labels must go
+above or below — and at 302px they will clash with a line unless placed deliberately. Two objectives
+that each fail alone:
+
+- **First-candidate-that-passes** leaves clashes. An 8px offset cannot clear a rising line across an
+  88px-wide label, and the search reports success while the label sits on the line.
+- **Maximum clearance** drifts labels away from the marks they name — it parked one 24px from its own
+  dot, in empty space, reading as belonging to nothing.
+
+Use both, in order: **filter to candidates with ≥4px clearance from every line and every already-placed
+label, then take the one nearest its own dot.** Generate candidates on both sides at several gaps
+(5/7/9/12/16/21px) and three horizontal alignments (centred, offset either way), clamp into `[12, 290]`
+and between the header and the bottom margin, and commit the **topmost anchor first** so crowded lower
+labels yield rather than the reverse.
+
+Which regime a chart is in follows from whether you stretched it to the box: the two charts whose dots
+sit on the edges use above/below, the two whose dots sit inboard use beside. Don't mix within a chart.
+
+### What the export's node tree gives you
+
+Worth knowing before writing any of the above, because it is what makes the maps safe and the mapping
+of label → series possible:
+
+| Node | Shape |
+|---|---|
+| `line__<Entity> - <Indicator>` | the path. A sibling `outline__…` carries its white halo — map both |
+| dots | **separate `Vector` nodes** named `Vector`, siblings of the lines. This is why a vertical map doesn't oval them |
+| value labels | a **haloed pair** inside a `Group`: a white stroked copy plus the coloured one |
+| the halo copy's **node name** | **the series name** (`World - Richest decile`) even though its characters are the value — this is how you map a value label to its line |
+| `tick-labels` | text; **translate**, never scale |
+
+Two Figma mechanics that bite here: **`leadingTrim` heights only settle on the next `use_figma` call**,
+so trim in one call and centre in the next; and a text node's **width is stale in the call that set its
+characters**, which silently invalidates any placement search built from it (SKILL.md → Gotchas).
+
 ### Expand the plot to the content box — the dots belong on the title box's edges
 
 Grapher reserves horizontal margin for labels it then places differently, so a thumbnail import
@@ -388,8 +502,13 @@ the gate.
 Grapher folds a per-row year into the value — `25.8% in 2022` — which spends horizontal space on
 repeated words and pushes the value column right. Split it: the **entity name** on one line with the
 **year beneath it** in the label column (Lato Bold 11px `#2d2e2d` over Lato Regular 11px `#5b5b5b`,
-right-aligned), and the bare value beside the bar. That is what the reference does, and the reclaimed
-width goes to the bars.
+right-aligned on a shared edge), and the bare value beside the bar. That is what the reference does, and
+the reclaimed width goes to the bars.
+
+Three details that only show up once it is built: the name/year gap wants **5px ink-to-ink** (2px reads
+as cramped); the whole name+year block is **centred on the bar** as one unit, not each line
+independently; and `United States` takes the standing **`US`** abbreviation here, which also stops it
+being the only two-line label in the column. `United Kingdom → UK` is the other standing one.
 
 ### The y-axis minimum is not yours to set, and it matters here
 
