@@ -77,7 +77,7 @@ steps:
     - data://grapher/un/2025-07-03/refugee_data
 
   export://multidim/migration/latest/remittances:
-    - data://grapher/worldbank_wdi/2026-07-14/wdi
+    - data://grapher/worldbank_wdi/2026-07-27/wdi
 
   #Refugee, Asylum and Migration Explorer (2026 Jan update):
   export://explorers/migration/2026-01-27/migration:
