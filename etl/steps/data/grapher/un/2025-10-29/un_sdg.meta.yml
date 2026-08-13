@@ -60,7 +60,7 @@ definitions:
     Disability, as defined in the [International Classification of Functioning, Disability and Health (ICF)](https://www.who.int/standards/classifications/international-classification-of-functioning-disability-and-health), is used as an umbrella term, covering impairments, activity limitations, and participation restrictions. For measurement purposes, a person with disability is defined as a person who is limited in the kind or amount of activities that he or she can do because of ongoing difficulties due to a long-term physical condition, mental condition or health problem.
 
   description_key_child_labor_5_17: |-
-    Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity and/or more than 21 hours of unpaid household services; for children aged 12-14, it includes those who did at least 14 hours of economic activity and/or more than 21 hours of unpaid household services; and for children aged 15-17, it includes those who did at least 43 hours of economic activity during the reference week.
+    Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity and/or at least 21 hours of unpaid household services; for children aged 12-14, it includes those who did at least 14 hours of economic activity and/or at least 21 hours of unpaid household services; and for children aged 15-17, it includes those who did at least 43 hours of economic activity during the reference week.
 
   description_key_child_labor_economic_activity_5_17: |-
     Child labor is defined differently depending on the age group: for children aged 5-11, it includes those who did at least one hour of economic activity; for children aged 12-14, it includes those who did at least 14 hours of economic activity; and for children aged 15-17, it includes those who did at least 43 hours of economic activity during the reference week.
@@ -85,7 +85,7 @@ definitions:
     This indicator is calculated using compensation of employees (wages and salaries in cash and in kind benefits, and social contributions paid by employers) and labor income of the self-employed (the part of the remuneration attributable for work done by self-employed workers).
 
   description_key_ilo_national_estimates: |-
-    This data comes from national sources, typically labor force surveys, household surveys, or population censuses. Each country uses its own definitions and methods, so this data may not be directly comparable across countries and over time.
+    This data comes from the International Labour Organization’s ILOSTAT database, which compiles labor statistics from national sources. Underlying national surveys differ in design and coverage, so cross-country comparisons should be made with some caution.
 
   description_processing_informal_employment: |-
     In the case of Chile, we only select informal employment estimates from 2018 onward, given inconsistencies in the official series for previous years.

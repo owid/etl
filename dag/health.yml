@@ -133,21 +133,6 @@ steps:
             - snapshot://oecd/2024-07-01/passenger_travel.csv
         - data://garden/demography/2023-03-31/population
 
-  # European Society for Cardiology datasets
-  data://grapher/cardiovascular_diseases/2023-10-10/esc:
-    - data://garden/cardiovascular_diseases/2023-10-10/esc:
-        - data://meadow/cardiovascular_diseases/2023-10-10/esc:
-            - snapshot://cardiovascular_diseases/2023-10-10/esc.csv
-
-  # WHO Medical Devices Atlas
-  data://grapher/who/2023-10-13/medical_devices_atlas:
-    - data://garden/who/2023-10-13/medical_devices_atlas:
-        - data://meadow/who/2023-10-13/medical_devices_atlas:
-            - snapshot://who/2023-10-13/medical_devices_atlas_mri.csv
-            - snapshot://who/2023-10-13/medical_devices_atlas_ct.csv
-            - snapshot://who/2023-10-13/medical_devices_atlas_pet.csv
-            - snapshot://who/2023-10-13/medical_devices_atlas_gc_nm.csv
-
   # WHO Cardiovascular diseases deaths
   data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
     - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
@@ -209,7 +194,7 @@ steps:
     - data://garden/health/2024-04-22/gpei_funding:
         - data://meadow/health/2024-04-22/gpei_funding:
             - snapshot://health/2024-04-22/gpei_funding.xlsx
-        - data://garden/worldbank_wdi/2026-07-14/wdi
+        - data://garden/worldbank_wdi/2026-07-27/wdi
 
   # GBD 2023 - GBD Mental Health Burden
   data-private://grapher/ihme_gbd/2026-02-07/gbd_mental_health_burden_dalys:
@@ -336,25 +321,17 @@ steps:
             - snapshot://health/2024-09-05/seattle_pathogens.csv
 
   # International Agency for Research on Cancer
-  data://grapher/cancer/2024-08-30/gco_alcohol:
-    - data://garden/cancer/2024-08-30/gco_alcohol:
-        - data://meadow/cancer/2024-08-30/gco_alcohol:
-            - snapshot://cancer/2024-08-30/gco_alcohol.csv
   data://grapher/cancer/2024-09-06/gco_infections:
     - data://garden/cancer/2024-09-06/gco_infections:
         - data://meadow/cancer/2024-09-06/gco_infections:
             - snapshot://cancer/2024-09-06/gco_infections.csv
         - data://garden/regions/2023-01-01/regions
 
-  # Cancer diagnosis routes and survival rates
+  # Cancer diagnosis routes
   data://grapher/cancer/2024-09-13/diagnosis_routes_by_route:
     - data://garden/cancer/2024-09-13/diagnosis_routes_by_route:
         - data://meadow/cancer/2024-09-13/diagnosis_routes_by_route:
             - snapshot://cancer/2024-09-13/diagnosis_routes_by_route.csv
-  data://grapher/cancer/2024-09-13/diagnosis_routes_survival:
-    - data://garden/cancer/2024-09-13/diagnosis_routes_survival:
-        - data://meadow/cancer/2024-09-13/diagnosis_routes_survival:
-            - snapshot://cancer/2024-09-13/diagnosis_routes_survival.csv
 
   # Antibiotics data
   data://grapher/antibiotics/2024-10-09/gram:
@@ -795,6 +772,18 @@ steps:
   #export://multidim/who/latest/share_overweight_adults:
   #  - data://grapher/who/2026-05-22/gho
 
+  # WHO growth reference standards for height-for-age (0-19 years)
+  data://garden/who/2026-08-07/height_for_age:
+    - data://meadow/who/2026-08-07/height_for_age:
+        - snapshot://who/2026-08-07/height_for_age_percentiles_boys_under_5.xlsx
+        - snapshot://who/2026-08-07/height_for_age_percentiles_girls_under_5.xlsx
+        - snapshot://who/2026-08-07/height_for_age_zscores_boys_under_5.xlsx
+        - snapshot://who/2026-08-07/height_for_age_zscores_girls_under_5.xlsx
+        - snapshot://who/2026-08-07/height_for_age_percentiles_boys_5_to_19.xlsx
+        - snapshot://who/2026-08-07/height_for_age_percentiles_girls_5_to_19.xlsx
+        - snapshot://who/2026-08-07/height_for_age_zscores_boys_5_to_19.xlsx
+        - snapshot://who/2026-08-07/height_for_age_zscores_girls_5_to_19.xlsx
+
   # Drug approvals - FDA (CDER Approvals & Purple Book (CBER Approvals))
   data://grapher/health/2025-07-16/drug_approvals:
     - data://garden/health/2025-07-16/drug_approvals:
@@ -911,11 +900,6 @@ steps:
   data-private://grapher/ihme_gbd/2025-11-18/gbd_child_treemap:
     - data-private://garden/ihme_gbd/2025-11-18/gbd_child_treemap
 
-  # European Society for Cardiology datasets
-  data://grapher/cardiovascular_diseases/2025-10-21/esc:
-    - data://garden/cardiovascular_diseases/2025-10-21/esc:
-        - data://meadow/cardiovascular_diseases/2025-10-21/esc:
-            - snapshot://cardiovascular_diseases/2025-10-21/esc.csv
   data://grapher/who/2025-12-01/hpv_vaccination_coverage:
     - data://garden/who/2025-12-01/hpv_vaccination_coverage:
         - data://meadow/who/2025-07-15/vaccination_coverage

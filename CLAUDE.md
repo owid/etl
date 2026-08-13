@@ -10,22 +10,42 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **`dag/archive/*.yml` is a generated record** — it is reconstructed from git history by `etl archive-dag`, so never hand-edit it. It lists steps that were once active (with the commit where they were last active) purely for recovery; to bring one back, `git checkout` that commit.
 - **Never delete a step without archiving it.** Removing or superseding an active step (new version, retirement, replacement) obligates you to archive it — deleting the files alone is a bug. Procedure: remove its `dag/*.yml` entry and delete its files → **commit** → run `etl archive-dag` (it reads *committed* history, so the removal must be committed first) → commit the regenerated `dag/archive/*.yml`. If `archive-dag` sweeps in unrelated steps others left un-archived, `git checkout` those files to keep your PR scoped (never hand-edit the archive). For a migrated/backport dataset, also delete its now-orphaned `snapshots/backport/latest/dataset_<id>_*` mirror files.
 - **Ask the user** if unsure - don't guess
+- **Say what's left open.** Multi-step work rarely ends with everything closed, so close the report (and the PR body) by saying what's still pending, who owns it, and what nobody checked. No fixed format — `.claude/docs/open-items.md` lists what tends to get dropped.
 - **Always run `make check` before committing** (format, lint, typecheck on changed files). Run the test suite with `make unittest` (or `make test` for checks + tests + version-tracker); `lib/*` packages have their own venv and Makefile — run it from inside that directory.
 - If not told otherwise, save outputs to `ai/` directory.
 - **Notebooks**: Always create AND execute immediately using `uv run jupyter nbconvert --to notebook --execute --inplace <path>`
 - **Skills**: When creating new skills in `.claude/skills/`, always include `metadata: { internal: true }` in the SKILL.md frontmatter unless the user explicitly asks for the skill to be public. This prevents external skill indexes from crawling and listing our internal skills.
 
+## Start from a skill
+
+Most recurring work here has a skill that runs it end to end. Reach for it **before** hand-rolling from the sections below — those document the underlying mechanics (`etls`, `etlr`, `etl pr`) that the skills already orchestrate, not a procedure to follow in parallel with one. Full descriptions live in `.claude/skills/`; this is just the entry-point index.
+
+| Task | Skill |
+|------|-------|
+| Refresh an existing dataset to a new version | `/update-dataset` |
+| Brand-new dataset from a file or link the user provides | `/create-dataset` |
+| Add a new snapshot (`.dvc`, plus a script only if needed) | `/create-snapshot` |
+| Scaffold meadow/garden/grapher steps for a snapshot that already exists | `/create-etl-steps` — the primitive `/create-dataset` calls; don't run it standalone unless scaffolding really is all you need |
+| Bring a legacy (no-catalogPath) dataset into ETL | `/migrate-dataset` |
+| Change user-facing chart/indicator text — title, subtitle, footnote, units, `description_short`, WYSK/`description_key`, entity selection | `/edit-faust-metadata` |
+| Check that text against the Writing and Style Guide | `/check-metadata-style` |
+| Build a multi-dim indicator, or an explorer | `/create-multidim`, `/create-explorer` |
+| Review a dataset-update PR | `/review-data-pr` |
+| Announce a finished update | `/data-updates-comms` |
+
+One that's easy to skip and shouldn't be: `/edit-faust-metadata` owns **every** user-facing-text edit — it routes each field to the right layer (garden `.meta.yml` vs MDim yaml vs chart config on staging) and reports the blast radius on other charts before touching shared metadata.
+
 ## Team
 
-Everything you post to GitHub or Slack goes out under a **human's identity**. Any text you author and post that a reader could take for the human's own words **must** carry the attribution line below. This is mandatory — not a judgment call about whether the comment is "worth it."
+Everything you post to GitHub or Slack goes out under a **human's identity**. Any text you author and post that a reader could take for the human's own words **must** carry the attribution line below. This is mandatory — not a judgment call about whether the comment is "worth it." (An agent posting under its own bot account, e.g. `chatgpt-codex-connector[bot]`, skips the line: the platform already attributes the content.)
 
 1. **Attribute the work.** Put this blockquote as the *first line* of the content:
 
 ```
-> _Written by Claude <model name> — @<handle> at the wheel._
+> _Written by <assistant> <model name> — @<handle> at the wheel._
 ```
 
-Replace `<model name>` with the human-readable name of the model actually generating the content (e.g. "Sonnet 5", "Opus 4.8", "Fable 5", "Haiku 4.5") — not the literal string "Code". Keeping the "Claude" prefix makes the attribution recognizable even to readers unfamiliar with individual model names.
+Replace `<assistant>` with the product actually generating the content ("Claude", "Codex", "Copilot", ...) and `<model name>` with the human-readable name of its underlying model (e.g. "Fable 5", "Opus 4.8", "GPT-5.6"). For Claude, always use a model name, never the literal string "Code". Keeping the product prefix makes the attribution recognizable even to readers unfamiliar with individual model names.
 
 It applies to **every** surface, **every** time you post:
 - PR descriptions / bodies
@@ -35,7 +55,7 @@ It applies to **every** surface, **every** time you post:
 
 Use the handle of the human directing the work (usually the current git user; ask if ambiguous).
 
-**The only exception** is a comment that is a bare mechanical token with *no prose* — a lone `@codex review` ping or a 👍. The moment your comment contains a sentence of explanation, it needs the line. When in doubt, include it.
+Besides the bot-account case above, **the only exception** is a comment that is a bare mechanical token with *no prose* — a lone `@codex review` ping or a 👍. The moment your comment contains a sentence of explanation, it needs the line. When in doubt, include it.
 
 2. **Use exact handles** from the list below when tagging colleagues. Don't guess — a wrong tag pings a real person. If a name isn't on this list, write the plain name (e.g. "Bastian") instead of `@`-tagging, and ask the user for the handle.
 
@@ -133,7 +153,7 @@ catalog. `✅ No differences found` is itself a result worth reporting.
 ```
 
 **Important:**
-- **Snapshot scripts need no `__main__` guard** — the `etls` CLI imports the module and invokes its click command `run` directly, so don't add `if __name__ == "__main__":` boilerplate. Many old scripts still carry it; don't copy them.
+- **Snapshot scripts need no `__main__` guard and no `click` decorators** — the `etls` CLI imports the module and calls its `run()` function itself, so don't add `if __name__ == "__main__":` boilerplate or `@click.command()` / `@click.option(...)`. New scripts should match the shape the wizard's cookiecutter emits: a plain `def run(upload: bool = True) -> None:`. Most existing scripts still carry both — they keep working, because `etl/snapshot_command.py` also accepts a click command — but don't copy them.
 - **Avoid `--force`** — `etlr` has built-in change detection and re-runs steps whose **code, dag entries, or data** changed. Editing a step's `.py`/`.yml` or its dag dependency line is enough to trigger a rebuild — don't add `--force`. Reserve `--force --only` for the narrow case where nothing in the repo changed but you still need to re-run (e.g., upstream data was patched out-of-band). Never use `--force` alone.
 - **`--only` requires deps on disk.** It skips dep resolution and won't download missing deps — even with `PREFER_DOWNLOAD=1`. If you hit a `FileNotFoundError` on a dep's `index.json`, drop `--only` and let etlr resolve the chain.
 - **`PREFER_DOWNLOAD=1`** — Download already-built datasets from the OWID catalog instead of recomputing locally. Useful when verifying a downstream step still works after a dag edit (the upstream deps get fetched, not rebuilt). Doesn't help if you've edited the dataset's own code. It also **fails with `AccessDenied` when the target version isn't in the catalog yet** (e.g. a version you just created) — use it only to fetch already-published upstream deps, never for the new step you're building locally.
@@ -165,8 +185,6 @@ gh pr edit <number> --body "..."
 ```
 
 **Cleaning up after merge**: `etl pr-clean` lists local branches whose PR was merged or closed (it checks the GitHub PR state, so squash-merges are detected), then deletes the selected branch(es). For branches created in a worktree (`etl pr "..." --worktree`), it also removes the worktree and copies that worktree's Claude sessions back into the main repo's `~/.claude/projects/` dir so they stay resumable.
-
-**After `etl pr --worktree`, verify the branch is current AND actually pushed.** Worktree creation can branch off a stale local `master` (missing recent merges → `_check_dag_completeness` "not in the DAG" errors on steps that should already exist) — fix with `git fetch origin master && git rebase origin/master`. That rebase then needs its own push: check `gh pr view --json additions,deletions` isn't `0`/`0` before assuming the PR reflects your commits.
 
 **Post `@codex review` as a separate PR comment** (not in the PR description) when the PR is ready for a review pass. Do not repost it after every push/update unless the user asks or the changes are substantial enough to warrant a fresh review.
 
@@ -306,6 +324,7 @@ See `.claude/docs/` for:
 - `debugging.md` - Data quality debugging approach
 - `pipeline-stages.md` - Pipeline architecture details
 - `cloud-sandbox.md` - Claude Code on the web: what a cloud session can and can't do
+- `open-items.md` - What tends to be left open at the end of multi-step work
 
 If you are running in a Claude Code cloud sandbox (`CLAUDE_CODE_REMOTE=true`), read
 `.claude/docs/cloud-sandbox.md` **before starting work** — it covers the pre-created
