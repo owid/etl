@@ -91,10 +91,12 @@ BANDS = [
     ("height_percentile_10", "height_percentile_90", 0.74, "8-in-10-children"),
 ]
 
-# The encoding diagram names each band as a count of children, so the counts have to match the
-# percentiles above: the 0.1st to the 99.9th holds 99.8% of children, which is 998 in 1,000 -- not the
-# 999 that "almost all" rounds to -- and the 10th to the 90th holds 8 in 10.
-BAND_LABELS = ["998 in 1,000 children", "8 in 10 children"]
+# The encoding diagram names each band by the share of children inside it, and a percentile is a cut
+# point rather than a share: the 0.1st percentile has 0.1% of children below it and the 99.9th has
+# 0.1% above it, so the band between them holds 99.9 - 0.1 = 99.8%. Labelling it 99.9% would count
+# everyone below the upper edge, including the 0.1% who are below the lower edge and so outside the
+# band. The inner band runs from the 10th to the 90th, holding 80%.
+BAND_LABELS = ["99.8% of children", "80% of children"]
 
 # Percentiles drawn as lines on top of the bands, as (column, line width), so a specific centile
 # can be read off rather than only a range. Named in the encoding diagram, not on the line.

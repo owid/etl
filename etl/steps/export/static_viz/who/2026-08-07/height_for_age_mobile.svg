@@ -17305,7 +17305,7 @@ L 222.92928 102.1091
 " style="fill: none; stroke: #777777; stroke-width: 0.8"/>
    </g>
    <g id="diagram__label-almost-all">
-    <text style="font-size: 8.7px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="232.8048" y="104.358186" transform="rotate(-0 232.8048 104.358186)">998 in 1,000 children</text>
+    <text style="font-size: 8.7px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="232.8048" y="104.358186" transform="rotate(-0 232.8048 104.358186)">99.8% of children</text>
    </g>
    <g id="diagram__bracket-8-in-10">
     <path d="M 233.90208 126.155948 
@@ -17315,7 +17315,7 @@ L 233.90208 111.931052
 " style="fill: none; stroke: #777777; stroke-width: 0.8"/>
    </g>
    <g id="diagram__label-8-in-10">
-    <text style="font-size: 8.7px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="243.7776" y="121.292586" transform="rotate(-0 243.7776 121.292586)">8 in 10 children</text>
+    <text style="font-size: 8.7px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="243.7776" y="121.292586" transform="rotate(-0 243.7776 121.292586)">80% of children</text>
    </g>
    <g id="diagram__label-median">
     <text style="font-size: 8.7px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="124.9056" y="159.193386" transform="rotate(-0 124.9056 159.193386)">Median</text>
