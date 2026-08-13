@@ -307,7 +307,7 @@ Include the sources' **aliases** in `--chart-slugs`: an article may well link an
 
 ### The handoff must keep find-chart-references' presentation
 
-Pass the sweep's `--json` through `scripts/build_reference_handoff.py`, which adds the one workflow-specific column — the replacement URL — while **keeping every locating aid the sweep's own markdown provides**:
+Pass the sweep's `--json` through `scripts/build_reference_handoff.py`, which adds the two workflow-specific columns — the replacement URL, and the reference's own params that silently override it — while **keeping every locating aid the sweep's own markdown provides**:
 
 ```bash
 .venv/bin/python .claude/skills/find-chart-references/scripts/find_references.py \
@@ -324,11 +324,11 @@ Those aids are the difference between a row someone can fix and a row that names
 
 - **📄 doc** — the Google Doc to edit. `posts_gdocs.id` *is* the Doc id, so it is a direct link, and editing the doc is the only way to fix an embed.
 - **👁 preview** — the article in the admin previewer, which renders unpublished drafts the public page won't show.
-- **🔗 page** — the published page, deep-linked with a scroll-to-text fragment when the reference has anchor text, so it opens *at* the reference.
-- **Find in the doc** — a copy-paste search string: the **link text** for a prose hyperlink, or the **chart slug** for a block embed (the doc holds a bare grapher URL there, and `posts_gdocs_links.target` keeps the slug as the author typed it, so it still matches when the doc uses an older one). `—` means there is nothing to search for.
+- **🔗 page** — the published page, deep-linked with a scroll-to-text fragment when the reference has anchor text, so it opens *at* the reference. The **page type decides the base**: a data insight is served under `/data-insights/` and an author page under `/team/`, while the sweep records `where_path` as `/<slug>` for every gdoc type — and a text fragment attached to the wrong base makes a 404 look like a working link.
+- **Find in the doc** — a copy-paste search string: the **link text** for a prose hyperlink, or the **chart slug** for a block embed (the doc holds a bare grapher URL there, and `posts_gdocs_links.target` keeps the slug as the author typed it, so it still matches when the doc uses an older one). A long one is cut short but **stays literal** — no `…`, which is not a character in the document and would make the paste find nothing.
 - **Its params** — the query string the reference already carries, because the replacement URL merges it over `tab=scatter&time=latest&country=` and **the reference's values win**. A ⚠️ marks the keys that override the retirement's own, which is the row that needs a decision rather than a paste: a reference carrying `tab=chart` lands the reader on a different tab than the retirement intends, and the merge is silent about it.
 
-**Import those formatters from `find-chart-references/scripts/find_references.py`; never reimplement them** — `doc_url`, `gdoc_preview_url`, `deep_link`, `search_hint`, `cell`. A second copy drifts, and the drift shows up as a handoff whose links quietly stop resolving. Strip the tailscale suffix from the admin root you pass them, so the links read like the sweep's own (which are already short).
+**Import those formatters from the `find-chart-references` scripts; never reimplement them** — a second copy drifts, and the drift shows up as a handoff whose links quietly stop resolving. Take each one from whichever module gets it right: `doc_url`, `gdoc_preview_url` and `cell` from `find_references.py`, and the **page link** plus the **search string** from `reference_report.py` (`page_deep_link`, `find_in_doc`, and its `cell(..., marker="")`), which is the module that handles the page-type routes and the literal truncation. Strip the tailscale suffix from the admin root you pass them, so the links read like the sweep's own (which are already short).
 
 They only apply to Google Doc surfaces, though — `doc_url` and `gdoc_preview_url` read `surface_id` **as** a Doc id, and on an explorer or narrative-chart row that field holds a slug or a chart id, which renders as a Doc link resolving to nothing. So the two article tables are filtered to `GDOC_SURFACES`, every other surface gets the section that explains its own consequence (key charts, the blocking explorer/data-insight/static-viz set, narrative charts), and whatever no section claims lands in a catch-all table — a row the sweep found must never go missing here.
 

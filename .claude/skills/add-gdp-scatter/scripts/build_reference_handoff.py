@@ -7,14 +7,17 @@ sweep's own presentation, because that presentation is what makes a row fixable:
 * **📄 doc** — the Google Doc to edit. `posts_gdocs.id` IS the Doc id, so it is a direct link.
 * **👁 preview** — the article in the admin previewer, which renders unpublished drafts too.
 * **🔗 page** — the published page, deep-linked to the reference with a scroll-to-text
-  fragment when the reference has anchor text.
+  fragment when the reference has anchor text, under the route its page TYPE is served on.
 * **Find in the doc** — a copy-paste search string: the link text for a prose hyperlink, or
   the chart slug for a block embed (the doc holds a bare grapher URL there, and the slug is
   stored as the author typed it, so it matches even when the doc still uses an old one).
 
 Without those, a handoff row names an article and leaves the editor to hunt through it. The
-formatters are **imported** from `find-chart-references/scripts/find_references.py` rather
-than reimplemented, so the two reports cannot drift apart.
+formatters are **imported** from the `find-chart-references` scripts rather than
+reimplemented, so the reports cannot drift apart — each one from whichever module gets it
+right: `find_references.py` for the doc/preview links, and `reference_report.py` for the page
+link and the search string, since it is the one that knows the page-type routes and truncates
+without an ellipsis.
 
 Usage::
 
@@ -57,19 +60,23 @@ SITE = "https://ourworldindata.org"
 MANUAL_SURFACES = {"explorer", "data insight", "static viz"}
 
 
-def _load_find_references():
-    """Import the sweep's own formatters so the two reports share one presentation."""
-    path = Path(__file__).resolve().parents[2] / "find-chart-references" / "scripts" / "find_references.py"
+def _load_shared(name: str):
+    """Import a find-chart-references module, so the reports share one presentation."""
+    path = Path(__file__).resolve().parents[2] / "find-chart-references" / "scripts" / f"{name}.py"
     if not path.exists():
         raise SystemExit(f"Cannot find the shared formatters at {path}")
-    spec = importlib.util.spec_from_file_location("find_references", path)
+    spec = importlib.util.spec_from_file_location(name, path)
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(module)
     return module
 
 
-fr = _load_find_references()
+fr = _load_shared("find_references")
+# Two of the aids have a second, corrected implementation in `reference_report.py`, and this
+# report takes each formatter from whichever module gets it right — copying either one here
+# would be the drift this script exists to avoid. See `page_link` and `find_hint`.
+rr = _load_shared("reference_report")
 
 
 def chart_ref(url: str) -> int | str:
@@ -128,6 +135,28 @@ def params_cell(own_params: str) -> str:
     shown = f"`{fr.cell(query, 40)}`"
     clashing = sorted({key for key, _ in parse_qsl(query, keep_blank_values=True)} & REDIRECT_KEYS)
     return f"⚠️ {shown} overrides {', '.join(clashing)}" if clashing else shown
+
+
+def page_link(r: dict, host: str, admin: str) -> str:
+    """The published page, scrolled to the reference — page-TYPE aware.
+
+    A gdoc's slug does not sit at the root for every type: a data insight is served under
+    `/data-insights/` and an author page under `/team/`, while the sweep records `where_path`
+    as `/<slug>` for all of them. A prose link's text fragment then attaches to the wrong
+    base and makes a 404 look like a working link, so the type decides the base.
+    """
+    return rr.page_deep_link(r, host, admin)
+
+
+def find_hint(r: dict) -> str:
+    """Copy-paste search string for the doc's find box, truncated WITHOUT an ellipsis.
+
+    A long anchor has to be cut somewhere, but `…` is not a character in the document, so a
+    hint carrying one finds nothing when pasted. A literal prefix still matches, which is
+    what the shared helper's `marker=""` is for.
+    """
+    hint = rr.cell(rr.find_in_doc(r), 55, marker="")
+    return f"`{hint}`" if hint else "—"
 
 
 def open_links(r: dict, host: str, admin: str) -> str:
@@ -231,7 +260,10 @@ def main() -> int:
             ptype = r["context"].split("(")[-1].rstrip(")") if "(" in r.get("context", "") else ""
             page_type = f" _{ptype}_" if ptype else ""
             preview = f" · [👁 preview]({fr.gdoc_preview_url(r, admin)})" if r.get("surface_id") else ""
-            links = f"[📄 doc]({fr.doc_url(r)}){preview} · [🔗 page]({fr.deep_link(r, args.host, admin)})"
+            links = f"[📄 doc]({fr.doc_url(r)}){preview}"
+            page = page_link(r, args.host, admin)
+            if page:
+                links += f" · [🔗 page]({page})"
             if r.get("admin_url"):
                 links += f" · [✎ chart admin]({r['admin_url']})"
             subject = (
@@ -241,7 +273,7 @@ def main() -> int:
             )
             own_params = r.get("query_string", "")
             out.append(
-                f"| {subject} | {fr.cell(r['where'], 44)}{page_type}{draft} | {links} | {fr.search_hint(r)} | "
+                f"| {subject} | {fr.cell(r['where'], 44)}{page_type}{draft} | {links} | {find_hint(r)} | "
                 f"{params_cell(own_params)} | {replacement_url(r['subject_id'], own_params, pairs, slugs)} |"
             )
         out.append("")
@@ -293,12 +325,26 @@ def main() -> int:
     narrative = [r for r in rows if r["surface"] == "narrative chart"]
     placed.update(id(r) for r in narrative)
     if narrative:
-        out += [f"## ℹ️ Narrative charts ({len(narrative)}) — do not block", ""]
-        for r in narrative:
+        out += [
+            f"## ℹ️ Narrative charts ({len(narrative)}) — do not block, but still need replacing",
+            "",
+            "Nothing breaks at retirement: each renders from its own materialized config, and its "
+            '"Explore the data" href is covered by the redirect. It keeps showing the OLD view '
+            "though, and the parent columns are INSERT-only, so there is no re-pointing API. "
+            "Replace each one, **in this order**: **create** the replacement from the URL below "
+            'using the target chart\'s own "Create narrative chart" control, **update the '
+            "article(s)** to the new name, then **delete** the old one. Never delete first — a "
+            "published post referencing the name blocks the delete.",
+            "",
+            "| Narrative chart | On | Its params | Open | Create the replacement from |",
+            "|---|---|---|---|---|",
+        ]
+        for r in sorted(narrative, key=lambda r: str(r["where"])):
+            own_params = r.get("query_string", "")
             out.append(
-                f"- `{r['where']}` on `{r['subject']}` — params `{r.get('query_string') or '—'}`. Renders from "
-                f'its own materialized config, and its "Explore the data" href is covered by the redirect; '
-                f"its params override the stored ones."
+                f"| `{fr.cell(str(r['where']), 44)}` | `{r['subject']}` | {params_cell(own_params)} | "
+                f"{open_links(r, args.host, admin)} | "
+                f"{replacement_url(r['subject_id'], own_params, pairs, slugs)} |"
             )
         out.append("")
 
@@ -333,7 +379,8 @@ def main() -> int:
         "**Find in the doc** is a copy-paste search string for the Google Doc: the link text for a "
         "prose hyperlink, or the chart slug for a block embed (the doc holds a bare grapher URL "
         "there — and the slug is stored as the author typed it, so it matches even when the doc "
-        "still uses an old one). A `—` means there is nothing to search for.",
+        "still uses an old one). A long one is cut short but stays literal, with no `…` appended, "
+        "so it can still be pasted straight into the find box.",
         "",
         "**Replace with** merges the redirect's stored params with the reference's own, and the "
         "reference's win. **Its params** is what the reference already carries, so you can see "
