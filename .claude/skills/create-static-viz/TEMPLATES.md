@@ -6,6 +6,13 @@ re-deriving it through Figma MCP calls every time.
 - **File:** `Charts (2026)`, file key `s6Sv60bakebRRW2TxsMQbF`
 - **Page:** `📑 Templates`, node `798:54`
 - **Re-verify with:** `get_metadata` on `798:54` for positions, `get_screenshot` on a frame for colors
+- **Last verified:** 2026-08-13
+
+The design team edits these frames in place. **Re-verify the geometry at the start of every refresh**
+rather than trusting this file: on 2026-08-13 both mobile templates replaced a single shared footer
+row with a two-row block, which moved the chart area's bottom edge and gave mobile a slot it had not
+had before. A step laid out against the stale numbers still renders and still passes every contract
+check — it just no longer matches the frame it gets pasted into.
 
 The page's own instructions frame (`798:151`) states the workflow: *"Copy/paste the template you
 want to use and edit it in a new page"*, *"Page name: Date + Chart title"*. `/create-figma-chart`
@@ -55,9 +62,12 @@ Same slots and widths as Horizontal, wrapped in auto-layout frames. Header block
 |---|---|---|---|
 | Title | 16 | 16 | 428 (**two lines**; logo sits beside it at x=444) |
 | Subtitle | 80 | 80 | 508 |
-| *chart area* | *118 → 508* | *118 → 792* | 508 |
-| `Data source:` | 508 | 792 | 248 |
-| `CC BY` (right, x=468) | 508 | 792 | 40 |
+| *chart area* | *118 → 486* | *118 → 770* | 508 |
+| `Data source:` | 486 | 770 | 508 |
+| License | 507 | 791 | 508 |
+
+The footer is one auto-layout block (`Frame 15`, `25343:276` and `25343:275`), 38 px tall, 16 px
+above the frame's bottom edge: two full-width rows, 21 px apart.
 
 ## What the mobile templates drop
 
@@ -68,10 +78,12 @@ This is the structural difference that matters, not a styling one:
 | `Note:` | present | **absent** |
 | `Data source:` | present | present |
 | `OurWorldinData.org` tagline | present | **absent** |
-| License | `Licensed under CC-BY by the author [Name of author]` | `CC BY` |
+| License | `Licensed under CC-BY by the author [Name of author]` | same string |
 
-Desktop's tagline and license **share one row**, left- and right-aligned. Mobile's `Data source:`
-and `CC BY` **share one row** the same way.
+Desktop's tagline and license **share one row**, left- and right-aligned. Mobile stacks its two
+footer rows instead, both left-aligned at the full content width, so a long source citation and a
+long author name no longer compete for one row. A step that lays out both sizes therefore emits the
+same license string for each and only varies the alignment.
 
 A caveat that only exists in the `Note:` slot therefore has nowhere to go on mobile. Decide per
 caveat whether it is about a *visual artifact* (safe to drop when the artifact is sub-pixel at

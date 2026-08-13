@@ -70,8 +70,11 @@ templates ship -- setting `characters` propagates the first character's style ov
 | `Note:` (desktop only) | `build_note(...)` | `Note:` Bold, rest Regular |
 | `Data source:` | `Data source: ` + `build_source_citation(...)` | `Data source:` Bold, rest Regular |
 | Tagline (desktop) | leave the template's | -- |
-| License (desktop) | `Licensed under ` / `CC-BY` / ` by the author ` / `AUTHOR` | Medium / Bold / Medium / Bold |
-| `CC BY` (mobile) | leave the template's | -- |
+| License | `Licensed under ` / `CC-BY` / ` by the author ` / `AUTHOR` | Medium / Bold / Medium / Bold |
+
+Both templates carry the same footer slots, so both get the same license string; mobile just stacks
+its two rows (`Frame 15`, source at y=770 and license at y=791) where desktop shares one row with the
+tagline.
 
 Two positions are derived rather than the template's fixed y, because the template pins them for a
 two-line title and a two-line subtitle:
@@ -246,9 +249,11 @@ LAYOUTS = {
         "size": (540, 824),
         "margin": 16,
         "title_y": 16,
-        "chart_bottom_y": 792,
-        "source_y": 792,
-        "footer_y": 792,
+        # The mobile templates' footer is a two-row block at y=770: Data source, then the license 21px
+        # under it. Both run the full content width, so neither shares a row with the other.
+        "chart_bottom_y": 770,
+        "source_y": 770,
+        "footer_y": 791,
         "nrows": 1,
         "ncols": 2,
         "full_footer": False,
@@ -815,7 +820,7 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
 
     # --- footer, in the slots the static-chart templates define ---
     # Desktop: Note -> Data source -> tagline and license sharing one row, left and right.
-    # Mobile: Data source -> license only, which is all that template has room for.
+    # Mobile: Data source -> license, stacked, which is all that template has room for.
     footer_fontsize = layout["footer_fontsize"]
 
     if layout["full_footer"]:
@@ -849,9 +854,11 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         gid="data-source",
     )
 
-    # Desktop puts the tagline on its own row with the license right-aligned beside it; mobile
-    # has no tagline, so there the license shares the Data source row.
-    if layout["full_footer"]:
+    # Desktop puts the tagline on its own row and right-aligns the license beside it. Mobile has no
+    # tagline row and gives the license one of its own, left-aligned under the source -- so both
+    # templates carry the same author credit, and only the alignment differs.
+    shares_tagline_row = layout["full_footer"]
+    if shares_tagline_row:
         fig.text(
             fx(margin_px),
             fy(layout["footer_y"]),
@@ -862,14 +869,11 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
             color="#888888",
             gid="tagline",
         )
-        license = f"Licensed under CC-BY by the author {AUTHOR}"
-    else:
-        license = "CC BY"
     fig.text(
-        fx(width_px - margin_px),
+        fx(width_px - margin_px if shares_tagline_row else margin_px),
         fy(layout["footer_y"]),
-        license,
-        ha="right",
+        f"Licensed under CC-BY by the author {AUTHOR}",
+        ha="right" if shares_tagline_row else "left",
         va="top",
         fontsize=footer_fontsize,
         color="#888888",
