@@ -369,7 +369,8 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   </div>
   <div class="warns" id="m-warns" style="display:none"></div>
   <div class="ctx" id="m-ctx" style="display:none"></div>
-  <div class="panes">
+  <div class="ctx" id="m-empty" style="display:none"></div>
+  <div class="panes" id="panes">
     <div class="pane">
       <h2><span>Old standalone scatter</span><span class="badge primary-badge">scatter IS the chart</span></h2>
       <div class="sel" id="src-title"></div>
@@ -572,8 +573,10 @@ function applyFilter() {
     if (filter === "warned") return rec.warnings.length > 0;
     return st === filter;
   });
-  if (order.length === 0) order = [0];
-  if (pos >= order.length) pos = order.length - 1;
+  // No fallback to record 0. Substituting an unrelated row while the UI claims to show only
+  // matching rows invites the reviewer to overwrite a decision they cannot see is off-filter
+  // — e.g. picking "To review" once every row is approved. render() shows an empty state.
+  if (pos >= order.length) pos = Math.max(0, order.length - 1);
 }
 function setFilter(f) {
   filter = f;
@@ -623,8 +626,34 @@ function tabChips(rec) {
   return chips.join("");
 }
 
+function setFooterEnabled(on) {
+  document.querySelectorAll("footer button, footer select, footer input").forEach((el) => { el.disabled = !on; });
+}
+
+function renderEmpty() {
+  // Nothing matches the active filter. Show that plainly rather than a row that does not match.
+  document.getElementById("panes").style.display = "none";
+  document.getElementById("m-warns").style.display = "none";
+  document.getElementById("m-ctx").style.display = "none";
+  const el = document.getElementById("m-empty");
+  el.style.display = "";
+  el.textContent = `No rows match "${filter}". Pick another filter above.`;
+  document.getElementById("m-rowid").textContent = "0 / 0";
+  document.getElementById("m-gdp").textContent = "";
+  document.getElementById("m-ids").textContent = "";
+  document.getElementById("m-status").textContent = "";
+  document.getElementById("note").value = "";
+  document.getElementById("jump").innerHTML = "";
+  setFooterEnabled(false);
+  updateCounts();
+}
+
 function render() {
   applyFilter();
+  if (order.length === 0) { renderEmpty(); return; }
+  document.getElementById("panes").style.display = "";
+  document.getElementById("m-empty").style.display = "none";
+  setFooterEnabled(true);
   const rec = RECORDS[order[pos]];
   const dec = decisions[rec.id] || {};
 
@@ -655,7 +684,7 @@ function render() {
       <span style="color:var(--muted)">only view · slug <code>${rec.src_slug}</code></span>`;
   const sU = srcUrl(rec);
   document.getElementById("src-url").innerHTML = `<a href="${sU}" target="_blank" rel="noopener">open ↗ ${sU}</a>`;
-  setFrame("src-frame", sU);
+  setFrame("src-frame", sU, rec.id);
 
   // Right: the target, where the scatter is one tab among several.
   const badge = document.getElementById("tgt-badge");
@@ -679,7 +708,7 @@ function render() {
       + "adjustments a tab CLICK would make — a URL-supplied tab does not get them."
     : "What a reader opening this chart sees first. Click the Scatter tab inside the frame to see the "
       + "tab-click state, which no URL can reproduce — it should match the Redirect view.";
-  setFrame("tgt-frame", tU);
+  setFrame("tgt-frame", tU, rec.id + "|" + viewMode);
 
   document.getElementById("note").value = dec.note || "";
   updateCounts();
@@ -690,10 +719,18 @@ function render() {
 // file was opened stays invisible behind the browser's cache. `bust` is bumped by the Reload
 // button to force both frames to refetch; grapher ignores unknown query params.
 let bust = 0;
-function setFrame(id, u) {
+function setFrame(id, u, key) {
   const f = document.getElementById(id);
   const src = bust ? u + (u.includes("?") ? "&" : "?") + "_r=" + bust : u;
-  if (f.getAttribute("data-src") !== src) { f.src = src; f.setAttribute("data-src", src); }
+  // Keyed by row as well as URL. Two records can share a target (they share the non-GDP
+  // indicator), and the workflow asks the reviewer to click tabs *inside* the frame — so on a
+  // URL-only key the next pair would open on the previous pair's manipulated state and could be
+  // approved against it. Same reasoning for the source frame.
+  const cacheKey = (key || "") + "|" + src;
+  if (f.getAttribute("data-key") !== cacheKey) {
+    f.src = src;
+    f.setAttribute("data-key", cacheKey);
+  }
 }
 function reloadFrames() {
   bust++;
@@ -705,6 +742,7 @@ function go(delta) { pos = Math.max(0, Math.min(order.length - 1, pos + delta));
 function jumpTo(k) { pos = parseInt(k, 10); render(); }
 
 function decide(status) {
+  if (order.length === 0) return;
   const rec = RECORDS[order[pos]];
   // Capture the next id before re-filtering: when the active filter drops the row we just
   // decided, the order shifts and a naive pos++ would skip the row we meant to land on.
@@ -722,6 +760,7 @@ function decide(status) {
   render();
 }
 function saveNote(v) {
+  if (order.length === 0) return;
   const rec = RECORDS[order[pos]];
   const cur = decisions[rec.id] || {};
   cur.note = v;
