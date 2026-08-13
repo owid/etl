@@ -476,6 +476,22 @@ number and position of the discontinuities.
 **The `--export` flag is mandatory.** Without it the step silently does not match, and the error
 says "No steps matched" while listing your step as the closest match.
 
+**From a fresh worktree, give it its own `.venv` before rendering.** A worktree starts without one,
+and borrowing the main checkout's is a trap: `etl` is installed there editable via a `.pth` holding
+the *main* checkout's path, so `paths.BASE_DIR` resolves to the main checkout whatever your cwd is.
+`etlr` then loads the main checkout's copy of the step and writes the PNG/SVG next to *it* — the run
+reports `Finished`, your worktree's files never change, and that reads exactly like a no-op render.
+
+```bash
+make .venv                             # uv sync --all-extras --group dev; the pre-commit hook also does this
+ln -s /path/to/main/checkout/data data # gitignored; the built deps only exist in the main checkout
+.venv/bin/etlr export://... --private --export
+```
+
+Confirm before trusting a render: `.venv/bin/python -c "from etl import paths; print(paths.BASE_DIR)"`
+should print the worktree, and the log's "Saved chart to" path should too. Compare output mtimes
+against the step's own — an output older than the source means you are reading a stale file.
+
 Editing the step's `.py` is enough to trigger a rebuild on its own, so you rarely need to force
 anything. For the narrow case where nothing in the repo changed but you still need to re-run, use
 **`--force --only`** — never `--force` alone, which would also re-run every upstream dependency.
