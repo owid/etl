@@ -126,7 +126,7 @@ def stale_charts(entries: list[dict]) -> dict[str, str]:
     if not ids:
         return {}
     df = OWID_ENV.read_sql(
-        "SELECT c.id, cc.slug, cc.fullMd5 AS config_md5 FROM charts c "
+        "SELECT c.id, cc.slug, cc.configMd5 AS config_md5 FROM charts c "
         "JOIN chart_configs cc ON cc.id = c.configId WHERE c.id IN %(ids)s",
         params={"ids": ids},
     )
@@ -160,7 +160,7 @@ def unpublished_sources(entries: list[dict]) -> set[str]:
         return set()
     df = OWID_ENV.read_sql(
         "SELECT c.id FROM charts c JOIN chart_configs cc ON cc.id = c.configId "
-        "WHERE c.id IN %(ids)s AND COALESCE(cc.full->>'$.isPublished', 'false') <> 'true'",
+        "WHERE c.id IN %(ids)s AND COALESCE(cc.config->>'$.isPublished', 'false') <> 'true'",
         params={"ids": ids},
     )
     down = {int(i) for i in df["id"]}
@@ -274,7 +274,7 @@ def stale_targets(entries: list[dict]) -> dict[str, str]:
     if recorded_md5:
         live_md5 = dict(
             OWID_ENV.read_sql(
-                "SELECT id, fullMd5 FROM chart_configs WHERE id IN %(ids)s",
+                "SELECT id, configMd5 FROM chart_configs WHERE id IN %(ids)s",
                 params={"ids": tuple(recorded_md5)},
             ).itertuples(index=False, name=None)
         )
