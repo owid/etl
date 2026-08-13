@@ -269,6 +269,30 @@ only shortens its numbers and drops from 10 nodes to 8 below `MOBILE_BREAKPOINT`
 stacks. The **single-country** view is different: `SplitFlowSankey` stacks its imports and exports
 halves vertically below 500px, which is a genuinely different composition rather than a resize.
 
+## Render to the band, so the import needs no rescale at all
+
+The scale factor is the whole type hierarchy on this route, because a bespoke component's label sizes
+are baked into the export. Measured on the wine chart before this was understood: the horizontal frame
+had been rescaled twice (0.92 then 0.974) and its 33 chart labels came out at **11.04px** — off the
+{25, 16, 12, 11} ladder *and* under the 12px floor — while the vertical, rescaled by just **1.0005**,
+sat at **12.01px**, also off-ladder. Neither is visible; both fail Step 8c.
+
+So render each frame at its own band size and then **do not rescale at all**:
+
+```js
+chart.x = subtitle.x;                                  // no rescale() call
+chart.y = headerBottom + (band - chart.height) / 2;
+```
+
+A natural width 0.4px short of the content box is invisible; a 1.0005 rescale that moves every label
+to 12.01 is a check failure. Re-render rather than nudge. After that both frames audited clean — a
+4-rung ladder of 25 / 16 (15 on Vertical) / 12 / 11, nothing off it, no chart label below 12.
+
+**Measure the band from the real slots, not the template's nominal numbers.** The Horizontal band is
+documented as 118 → 556, but that assumes a two-line subtitle; with a one-line subtitle the header
+bottom is 99, so the band is **456.6**, not 438. Read `subtitle.y + subtitle.height` and `note.y` off
+the clone after the texts are in.
+
 ## What to check, and what to hand back
 
 The Step 8c pass applies, with one route-specific split: **the palette is the component's, not

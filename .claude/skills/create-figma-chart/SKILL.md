@@ -325,6 +325,27 @@ Replace the lorem-ipsum text nodes in the cloned template. Source everything fro
 - **`OurWorldinData.org/[Topic]`** → the confirmed topic path (e.g. `OurWorldinData.org/child-mortality`).
 - **CC BY** stays on the DI and Instagram templates. The static templates — desktop **and mobile** — instead carry `Licensed under CC-BY by the author <Name>`, the author of the piece from Step 2, not the page-name credit. On static mobile that line is the second row of `Frame 15` and reads `Licensed under CC-BY by the author [Name of author]` in the template.
 
+**An orphan last line is a copy problem, not a layout problem — tighten the words.** When a string
+spills a word or two onto a new line, the fix is to rewrite it shorter so it finishes on the line
+before, not to shrink the type, widen the slot, or leave it. This applies to **every** text in the
+frame — title, subtitle, note, source, license — not just the note where it is most obvious. A note
+reading `… are not shown.` with `shown.` alone on line two costs 14px of chart and reads as an
+accident; `… are hidden.` fits on one line and says the same thing.
+
+Make it measurable rather than eyeballing it, because at 12px a one-word overflow is easy to miss:
+clone the node, set `textAutoResize = "WIDTH_AND_HEIGHT"` to get its **unwrapped** width, and compare
+against the slot.
+
+```js
+const lines = Math.max(1, Math.ceil(unwrapped / slotW));
+const lastFill = lines === 1 ? 1 : (unwrapped - (lines - 1) * slotW) / slotW;
+const orphan = lines > 1 && lastFill < 0.2;    // last line under a fifth full
+```
+
+Widths settle on the *next* `use_figma` call, so probe in one call and read in the next, then delete
+the probes. A deliberate two-line title is not an orphan — the wine chart's title runs to a second
+line that is 38% full, which is a real line of text; the test is the fill, not the line count.
+
 **The placeholder text tells you the intended line count — match it.** Every template ships "This is a title on **two lines**, lorem ipsum…" against a slot two lines tall, and "This is a subtitle or description on **one line**…" against a one-line slot. That is a shape instruction, and it is easy to invert: a one-line title with a two-line subtitle fills the same box and reads wrong, because the title stops carrying the weight and the subtitle starts. So give the title enough substance to run to two lines, keep the subtitle to one, and push any reading instruction ("each band is the volume traded between a pair of countries") down into the **Note**, which is where an instruction belongs. Check it by reading the heights back: on the Horizontal template a correct pair measures title `h=58`, subtitle `h=19`.
 
 Rules: replace `characters`, and leave the node's **base** styling alone — the fonts, sizes, colors, and positions are the template's, not yours. `await figma.loadFontAsync(node.fontName)` before each text edit. If you need a *new* text block the template doesn't have, **clone the nearest template text node and edit it** — that inherits the correct shared style without hunting style ids.
