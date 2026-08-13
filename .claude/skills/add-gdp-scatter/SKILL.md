@@ -121,7 +121,7 @@ The canonical items, in order:
 8. Apply the reviewer's flagged notes; regenerate the HTML and re-import their JSON.
 9. Chart-diff sign-off on staging, then merge.
 10. **Confirm the scatter views actually reached production.** A merged PR is not evidence that they did: chart-sync only carries chart edits whose diffs were **approved** in Chart Diff, so a PR can merge green with every row ✅ on staging and leave production untouched. An abandoned first attempt (PR #6173, merged 2026-06-24) left production untouched on all seven of its pairs — deliberately: the `target_query_param` needed for Part 2 did not exist yet, so it was dropped and the migration restarted from scratch rather than left half-done. Whatever the reason, check production directly rather than inferring it from the merge.
-11. **Reference sweep on the old charts** — `find-chart-references` over each source slug *and its aliases*. Re-point embeds and links at the target's scatter view **before** retiring anything: an embed is never fixed by a redirect, and a link that works only via a 301 outlives everyone's memory of why. **Do not skip this because the Part 2 audit reports few references** — it counts a narrower set; see the key-chart trap below.
+11. **Reference sweep on the old charts** — `find-chart-references` over each source slug *and its aliases*, then `scripts/build_reference_handoff.py` to turn it into the handoff (it keeps the sweep's 📄 doc / 👁 preview / 🔗 page links and its "Find in the doc" search string — see below). Re-point embeds and links at the target's scatter view **before** retiring anything: an embed is never fixed by a redirect, and a link that works only via a 301 outlives everyone's memory of why. **Do not skip this because the Part 2 audit reports few references** — it counts a narrower set; see the key-chart trap below.
 12. Narrative charts on the sources: replace where the parent is being retired (create → re-point articles → delete; never delete first).
 13. **Part 2 audit** — `redirect_to_scatter.py` with no `--apply`. Read every verdict.
 14. Part 2 `--apply` on staging, then the browser checks in "Verifying Part 2".
@@ -304,6 +304,26 @@ The script's own table covers only gdoc links and embeds — enough to spot the 
 ```
 
 Include the sources' **aliases** in `--chart-slugs`: an article may well link an even older slug. The sweep catches what `get_chart_references` counts but doesn't locate — explorers, data insights, static viz, narrative charts, key-chart slots, WordPress posts — and it reports its own **gaps**, so a surface it couldn't check is visible rather than silently absent. Triage it the way that skill does: an **embed** is 🔴 and blocks the row (it breaks the moment the source is unpublished), a **link** is 🟡 (the 301 covers it; update the href anyway), and an unpublished or draft page is ℹ️.
+
+### The handoff must keep find-chart-references' presentation
+
+Pass the sweep's `--json` through `scripts/build_reference_handoff.py`, which adds the one workflow-specific column — the replacement URL — while **keeping every locating aid the sweep's own markdown provides**:
+
+```bash
+.venv/bin/python .claude/skills/find-chart-references/scripts/find_references.py \
+  --chart-slugs '<slugs+aliases>' --json ai/<name>_references.json
+.venv/bin/python .claude/skills/add-gdp-scatter/scripts/build_reference_handoff.py \
+  --references ai/<name>_references.json --pairs ai/<name>_part2_pairs.json
+```
+
+Those aids are the difference between a row someone can fix and a row that names an article and leaves them to hunt through it:
+
+- **📄 doc** — the Google Doc to edit. `posts_gdocs.id` *is* the Doc id, so it is a direct link, and editing the doc is the only way to fix an embed.
+- **👁 preview** — the article in the admin previewer, which renders unpublished drafts the public page won't show.
+- **🔗 page** — the published page, deep-linked with a scroll-to-text fragment when the reference has anchor text, so it opens *at* the reference.
+- **Find in the doc** — a copy-paste search string: the **link text** for a prose hyperlink, or the **chart slug** for a block embed (the doc holds a bare grapher URL there, and `posts_gdocs_links.target` keeps the slug as the author typed it, so it still matches when the doc uses an older one). `—` means there is nothing to search for.
+
+**Import those formatters from `find-chart-references/scripts/find_references.py`; never reimplement them** — `doc_url`, `gdoc_preview_url`, `deep_link`, `search_hint`, `cell`. A second copy drifts, and the drift shows up as a handoff whose links quietly stop resolving. Strip the tailscale suffix from the admin root you pass them, so the links read like the sweep's own (which are already short).
 
 ### Key-chart slots — the Part 2 audit cannot see them
 
