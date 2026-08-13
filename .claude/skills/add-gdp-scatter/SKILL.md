@@ -121,7 +121,7 @@ The canonical items, in order:
 8. Apply the reviewer's flagged notes; regenerate the HTML and re-import their JSON.
 9. Chart-diff sign-off on staging, then merge.
 10. **Confirm the scatter views actually reached production.** A merged PR is not evidence that they did: chart-sync only carries chart edits whose diffs were **approved** in Chart Diff, so a PR can merge green with every row ✅ on staging and leave production untouched. An abandoned first attempt (PR #6173, merged 2026-06-24) left production untouched on all seven of its pairs — deliberately: the `target_query_param` needed for Part 2 did not exist yet, so it was dropped and the migration restarted from scratch rather than left half-done. Whatever the reason, check production directly rather than inferring it from the merge.
-11. **Reference sweep on the old charts** — `find-chart-references` over each source slug *and its aliases*. Re-point embeds and links at the target's scatter view **before** retiring anything: an embed is never fixed by a redirect, and a link that works only via a 301 outlives everyone's memory of why. **Do not skip this because the Part 2 audit reports few references** — it counts a narrower set; see the key-chart trap below.
+11. **Reference sweep on the old charts** — `find-chart-references` over each source slug *and its aliases*, then `scripts/build_reference_handoff.py` to turn it into the handoff (it keeps the sweep's 📄 doc / 👁 preview / 🔗 page links and its "Find in the doc" search string — see below). Re-point embeds and links at the target's scatter view **before** retiring anything: an embed is never fixed by a redirect, and a link that works only via a 301 outlives everyone's memory of why. **Do not skip this because the Part 2 audit reports few references** — it counts a narrower set; see the key-chart trap below.
 12. Narrative charts on the sources: replace where the parent is being retired (create → re-point articles → delete; never delete first).
 13. **Part 2 audit** — `redirect_to_scatter.py` with no `--apply`. Read every verdict.
 14. Part 2 `--apply` on staging, then the browser checks in "Verifying Part 2".
@@ -304,6 +304,33 @@ The script's own table covers only gdoc links and embeds — enough to spot the 
 ```
 
 Include the sources' **aliases** in `--chart-slugs`: an article may well link an even older slug. The sweep catches what `get_chart_references` counts but doesn't locate — explorers, data insights, static viz, narrative charts, key-chart slots, WordPress posts — and it reports its own **gaps**, so a surface it couldn't check is visible rather than silently absent. Triage it the way that skill does: an **embed** is 🔴 and blocks the row (it breaks the moment the source is unpublished), a **link** is 🟡 (the 301 covers it; update the href anyway), and an unpublished or draft page is ℹ️.
+
+### The handoff must keep find-chart-references' presentation
+
+Pass the sweep's `--json` through `scripts/build_reference_handoff.py`, which adds the two workflow-specific columns — the replacement URL, and the reference's own params that silently override it — while **keeping every locating aid the sweep's own markdown provides**:
+
+```bash
+.venv/bin/python .claude/skills/find-chart-references/scripts/find_references.py \
+  --chart-slugs '<slugs+aliases>' --json ai/<name>_references.json \
+  --gaps-json ai/<name>_references_gaps.json
+.venv/bin/python .claude/skills/add-gdp-scatter/scripts/build_reference_handoff.py \
+  --references ai/<name>_references.json --pairs ai/<name>_part2_pairs.json \
+  --gaps ai/<name>_references_gaps.json
+```
+
+`--gaps` is not optional in practice: it carries the sweep's run-specific coverage gaps into the handoff, next to the permanent ones the builder restates from the sweep's own `NOT_SEARCHED`. Without it the handoff says so in a ⚠️ line, because a reader who never opens the sweep would otherwise read a short table as a complete blast radius. `--pairs` takes either pair schema — Part 1's table rows (admin URLs) or the Part 2 payload (public grapher URLs, resolved against the DB) — so pass whichever list matches the rows actually being retired, and pass it **before** Part 2 unpublishes them.
+
+Those aids are the difference between a row someone can fix and a row that names an article and leaves them to hunt through it:
+
+- **📄 doc** — the Google Doc to edit. `posts_gdocs.id` *is* the Doc id, so it is a direct link, and editing the doc is the only way to fix an embed.
+- **👁 preview** — the article in the admin previewer, which renders unpublished drafts the public page won't show.
+- **🔗 page** — the published page, deep-linked with a scroll-to-text fragment when the reference has anchor text, so it opens *at* the reference. The **page type decides the base**: a data insight is served under `/data-insights/` and an author page under `/team/`, while the sweep records `where_path` as `/<slug>` for every gdoc type — and a text fragment attached to the wrong base makes a 404 look like a working link.
+- **Find in the doc** — a copy-paste search string: the **link text** for a prose hyperlink, or the **chart slug** for a block embed (the doc holds a bare grapher URL there, and `posts_gdocs_links.target` keeps the slug as the author typed it, so it still matches when the doc uses an older one). A long one is cut short but **stays literal** — no `…`, which is not a character in the document and would make the paste find nothing.
+- **Its params** — the query string the reference already carries, because the replacement URL merges it over `tab=scatter&time=latest&country=` and **the reference's values win**. A ⚠️ marks the keys that override the retirement's own, which is the row that needs a decision rather than a paste: a reference carrying `tab=chart` lands the reader on a different tab than the retirement intends, and the merge is silent about it.
+
+**Import those formatters from the `find-chart-references` scripts; never reimplement them** — a second copy drifts, and the drift shows up as a handoff whose links quietly stop resolving. Take each one from whichever module gets it right: `doc_url`, `gdoc_preview_url` and `cell` from `find_references.py`, and the **page link** plus the **search string** from `reference_report.py` (`page_deep_link`, `find_in_doc`, and its `cell(..., marker="")`), which is the module that handles the page-type routes and the literal truncation. Strip the tailscale suffix from the admin root you pass them, so the links read like the sweep's own (which are already short).
+
+They only apply to Google Doc surfaces, though — `doc_url` and `gdoc_preview_url` read `surface_id` **as** a Doc id, and on an explorer or narrative-chart row that field holds a slug or a chart id, which renders as a Doc link resolving to nothing. So the two article tables are filtered to `GDOC_SURFACES`, every other surface gets the section that explains its own consequence (key charts, the blocking explorer/data-insight/static-viz set, narrative charts), and whatever no section claims lands in a catch-all table — a row the sweep found must never go missing here.
 
 ### Key-chart slots — the Part 2 audit cannot see them
 
