@@ -382,7 +382,8 @@ def sweep_narrative_charts_of_charts(by_slug: dict[str, dict]) -> list[dict]:
                 r["name"],
                 f"/admin/narrative-charts/{r['id']}/edit",
                 surface_id=int(r["id"]),
-                # NOTE: chart_configs.full for a narrative chart is materialized and lags a
+                # NOTE: a narrative chart's rendered config (chart_configs.config for the row
+                # named by chartConfigId) is materialized and lags a
                 # parent edit. To inspect one, use AdminAPI.get_narrative_chart(id)["configFull"]
                 # rather than reading this row directly.
                 config_id=r["chartConfigId"],
@@ -515,7 +516,7 @@ def sweep_charts_of_indicators(variable_ids: list[int]) -> list[dict]:
     """
     df = OWID_ENV.read_sql(
         "SELECT DISTINCT cd.variableId, c.id AS chart_id, cc.id AS config_id, cc.slug, "
-        "       COALESCE(cc.full->>'$.isPublished', 'false') = 'true' AS published, "
+        "       COALESCE(cc.config->>'$.isPublished', 'false') = 'true' AS published, "
         "       c.isInheritanceEnabled AS inheritance "
         "FROM chart_dimensions cd JOIN charts c ON c.id = cd.chartId "
         "JOIN chart_configs cc ON cc.id = c.configId WHERE cd.variableId IN %(ids)s ORDER BY cc.slug",
@@ -734,7 +735,7 @@ def sweep_explorer_views_of_indicators(variable_ids: list[int]) -> list[dict]:
 
     views = OWID_ENV.read_sql(
         "SELECT ev.explorerSlug, ev.viewId, ev.dimensions, ev.chartConfigId, "
-        "       cc.full->'$.dimensions' AS config_dimensions "
+        "       cc.config->'$.dimensions' AS config_dimensions "
         "FROM explorer_views ev JOIN chart_configs cc ON cc.id = ev.chartConfigId "
         "WHERE ev.explorerSlug IN %(s)s ORDER BY ev.explorerSlug, ev.viewId",
         params={"s": tuple(published)},

@@ -199,7 +199,8 @@ ENTITY_CODE_PARAMS = ("country", "focus")
 def narrative_overrides(findings: list[dict]) -> dict[str, dict]:
     """{narrative chart id -> its authored overrides, minus what the target view already has}.
 
-    Read from `chart_configs.patch` (the authored delta), not `full`: the patch is exactly
+    Read the authored layer (the chart_configs row named by narrative_charts.patchConfigId),
+    not the rendered one: the authored layer is exactly
     what a human typed on top of the parent, which is exactly what has to be retyped on top
     of the new one. Each override is compared against the TARGET view's config so the report
     only asks for what actually differs — a title the view already carries needs no work.
@@ -209,18 +210,18 @@ def narrative_overrides(findings: list[dict]) -> dict[str, dict]:
     if not ids:
         return {}
     patches = OWID_ENV.read_sql(
-        "SELECT nc.id, cc.patch FROM narrative_charts nc JOIN chart_configs cc ON cc.id = nc.chartConfigId "
+        "SELECT nc.id, cc.config AS patch FROM narrative_charts nc JOIN chart_configs cc ON cc.id = nc.patchConfigId "
         "WHERE nc.id IN %(ids)s",
         params={"ids": tuple(sorted(ids))},
     )
     views = (
         OWID_ENV.read_sql(
-            "SELECT id, full FROM chart_configs WHERE id IN %(ids)s", params={"ids": tuple(sorted(view_ids))}
+            "SELECT id, config FROM chart_configs WHERE id IN %(ids)s", params={"ids": tuple(sorted(view_ids))}
         )
         if view_ids
         else None
     )
-    view_cfg = {r["id"]: json.loads(r["full"] or "{}") for r in views.to_dict("records")} if views is not None else {}
+    view_cfg = {r["id"]: json.loads(r["config"] or "{}") for r in views.to_dict("records")} if views is not None else {}
     by_narrative = {str(r["id"]): json.loads(r["patch"] or "{}") for r in patches.to_dict("records")}
 
     out: dict[str, dict] = {}
