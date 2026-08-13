@@ -170,11 +170,16 @@ HTTP 200 whatever you pass:
   and nothing else.
 - An MDim slug with no params rendered its *default* view, which for `energy-mix` is a **map**
   (`No data`, `0 TWh`, … `20,000 TWh`).
-- **`tab=` does not survive into thumbnail mode on an MDim.** `income-share-top-1-…?tab=discrete-bar&time=latest`
-  rendered as dots on a time axis — one point per country, no bars, no entity names — where the same
-  `tab=discrete-bar` on a plain chart slug renders proper bars with labels. The skill already notes
-  that `tab=table` is silently ignored; treat every `tab=` on this route as a request, and check the
-  render rather than the URL.
+- **A dimension takes one value, and an invalid set renders *nothing*.** `quantile=richest_1pct` gives
+  one series; `quantile=richest_1pct~richest_0_1pct` and the comma form both return an **empty SVG —
+  zero text nodes — at HTTP 200**, and a repeated `quantile=` param is last-wins. So a chart comparing
+  two values of the same dimension (top 1% *vs* top 0.1%) **cannot** come from one MDim view; it needs
+  a standalone chart or a narrative chart. Nothing in the response says so.
+- **A `tab=` that the wrong slug can't honor degrades silently.** `tab=discrete-bar&time=latest` on
+  one MDim came back as dots on a time axis — one point per country, no bars, no names — while the
+  *same* params on the right slug produced a proper ranked bar with all seven names. The skill already
+  notes that `tab=table` is silently ignored; treat every `tab=` as a request, and check the render
+  rather than the URL before concluding anything about the route.
 
 So carry the view's full param set, and before building anything **assert the text count and the
 rendered tab against the view you asked for.**
@@ -213,22 +218,32 @@ Same chart, same size, two routes:
 So the y-axis, the interior year ticks and the legend are gone, and you get the first and last year
 plus an end value. That much is dependable.
 
-**What is not dependable is the series labels, and this is the thing to plan around.** Measured across
-the five reference charts, the thumbnail renderer labeled 1 of 2 series on a two-country line chart,
-2 of 3 on a three-series MDim, and **0 of 3** on the same MDim with `stackMode=relative` — and **0 of
-7** on a discrete-bar MDim, which emitted values with no entity names at all. It is not collision
-avoidance you can tune out: on the `stackMode=relative` chart the labels stayed absent at
-`imFontSize` 12, 14, 15 and 16 and at frame heights of 180, 250 and 300px. They are simply not
-emitted.
+**The series labels are where it varies, so check them per chart rather than assuming.** Measured
+across the five reference charts:
 
-Two more omissions in the same family: **only end values are labeled**, never the values at the start
-of a line (the reference charts label both ends), and an MDim's series names arrive in their raw form
-(`World - Richest decile`) rather than the reference's `Richest decile`.
+| Chart | Series labeled |
+|---|---|
+| Ranked discrete bar, 7 countries | **7 of 7**, each with its own observation year |
+| Two-country line chart | 1 of 2 |
+| Single-series line chart | 1 of 1 |
+| Three-series MDim (levels) | 2 of 3 |
+| The same MDim with `stackMode=relative` | **0 of 3** |
 
-So budget for **re-adding and renaming the series labels in Figma as the core Step 8 work on this
-route**, not as polish. GUIDELINES.md → Direct labeling has the placement rules; the reference renders
-in `assets/` show the target. What the thumbnail route buys you is the *stripping* — no legend to
-delete, no axis to remove, no rescale — not the labeling.
+A discrete bar labels every row; a line chart labels some and drops the rest; `stackMode=relative`
+suppresses them entirely. The last case is not collision avoidance you can tune out — the labels
+stayed absent at `imFontSize` 12, 14, 15 and 16 and at frame heights of 180, 250 and 300px.
+
+Two omissions are consistent across every type: **only end values are labeled**, never the values at
+the start of a line (the reference charts label both ends), and an MDim's series names arrive in their
+raw form (`World - Richest decile`) rather than the reference's `Richest decile`. Grapher also folds a
+per-row year into the value rather than stacking it — `25.8% in 2022` where the reference sets
+`Brazil` over `2022` in the label column.
+
+So the thumbnail route reliably buys you the *stripping* — no legend to delete, no axis to remove, no
+rescale. **Budget for re-adding the missing series labels and rewriting the raw names in Figma**;
+GUIDELINES.md → Direct labeling has the placement rules and the reference renders in `assets/` show
+the target. How much of that work there is depends on the chart type, so measure the export before
+estimating.
 
 ### Request the final pixel size directly
 
