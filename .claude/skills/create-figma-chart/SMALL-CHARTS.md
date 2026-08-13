@@ -328,6 +328,29 @@ added in Figma.
 `World - Richest decile`; the label should read `Richest decile`, since "World" is the only entity and
 therefore distinguishes nothing.
 
+### Round the values to the precision the story needs
+
+Grapher exports full precision; a 302px frame rarely wants it. The references round, and consistently
+within a chart:
+
+| Kind | Reference | Grapher gave |
+|---|---|---|
+| Percentages | `26%`, `21%`, `10%`, `+171%` | `25.8%`, `20.7%`, `9.9%`, `+171.7%` |
+| Currency | `$36.79`, `$9.65`, `$3.00` | same — 2 dp kept |
+| Index values | `0.39`, `0.30` | `0.39`, `0.3` — pad to a consistent 2 dp |
+
+So: **percentages to whole numbers, currency and index values to two decimals**, and never a mix of
+precisions within one chart (`$3` beside `$9.65` reads as a different kind of number). Keep a decimal
+only where dropping it would collapse two visibly different marks into the same label.
+
+This is the same house practice SKILL.md records for DI bar charts, and it carries the same
+obligation: the image now deliberately disagrees with the interactive chart it links to, so **record it
+as an accepted deviation** rather than leaving a later audit to find it.
+
+Each value label is a **haloed pair** — a white stroked copy under the colored one, both with the same
+characters — so rewriting one half leaves the halo showing the old digits behind the new. Rewrite both.
+(Bar-chart value labels sit on white and have no halo, so those are single nodes.)
+
 ### Value labels are centered on the mark they name
 
 **This applies everywhere in this skill, not only at 302px** — bar values on their bars, end-of-line
