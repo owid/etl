@@ -56,6 +56,13 @@ GDP_CATALOG_PATTERNS = {
     1108541: "grapher/ggdc/%/penn_world_table/penn_world_table#rgdpo_pc",
 }
 
+# Every GDP-per-capita variable we might meet on a source axis, current or superseded. Used
+# to spot a REVERSED source (GDP on its y instead of its x): the target query admits those,
+# but this script's y-oriented mirroring — y display.name, yAxis bounds, comparisonLines —
+# assumes the source's y is the non-GDP indicator, so on a reversed source it would copy
+# GDP-axis settings onto the target's unrelated indicator, and onto its other views too.
+ANY_GDP_VARIABLE_IDS = {1294305, 1204826, 900793, 1108541}
+
 CONTINENTS_ID = 900801
 POPULATION_ID = 953899  # "Population" — the default sizing indicator (-10000..2100)
 
@@ -227,6 +234,16 @@ def process_row(
     cfg = api.get_chart_config(tgt_id)
     src_cfg = api.get_chart_config(src_id)
 
+    # A reversed source plots GDP on y; its y-side settings describe the GDP axis, not the
+    # indicator the target charts, so they must not be mirrored.
+    src_y_dim = find_dim(src_cfg, "y")
+    src_y_is_gdp = (src_y_dim or {}).get("variableId") in ANY_GDP_VARIABLE_IDS
+    if src_y_is_gdp:
+        notes.append(
+            "WARN: source plots GDP on its y axis — skipping the y display.name, yAxis and "
+            "comparisonLines mirrors, which would otherwise describe the GDP axis"
+        )
+
     # 1) chartTypes
     existing_types = cfg.get("chartTypes")
     if not existing_types:
@@ -306,7 +323,7 @@ def process_row(
     # scaleType=log would also flip the line/bar views to log. Instead, when the source
     # scatter is log, we only enable the toggle (canChangeScaleType=True) and leave the
     # default linear — users can switch the scatter to log, line/bar stay linear.
-    src_ya = src_cfg.get("yAxis") or {}
+    src_ya = {} if src_y_is_gdp else (src_cfg.get("yAxis") or {})
     if src_ya.get("scaleType") == "log":
         ya = dict(cfg.get("yAxis") or {})
         if not ya.get("canChangeScaleType"):
@@ -342,7 +359,7 @@ def process_row(
     # 7) y display.name mirror
     src_y = find_dim(src_cfg, "y")
     tgt_y = find_dim(cfg, "y")
-    src_name = ((src_y or {}).get("display") or {}).get("name")
+    src_name = None if src_y_is_gdp else ((src_y or {}).get("display") or {}).get("name")
     if src_name and tgt_y is not None:
         tgt_display = dict(tgt_y.get("display") or {})
         prev = tgt_display.get("name")
@@ -357,7 +374,7 @@ def process_row(
     # chart it replaces. Only added when the target has none — never overwrite an existing
     # set, same rule as the dimensions. `comparisonLines` is global config, but a reference
     # line that is meaningful for the y indicator is meaningful on the line/bar views too.
-    src_lines = src_cfg.get("comparisonLines")
+    src_lines = None if src_y_is_gdp else src_cfg.get("comparisonLines")
     if src_lines and not cfg.get("comparisonLines"):
         safe = [ln for ln in src_lines if is_x_independent_line(ln)]
         skipped = [ln for ln in src_lines if ln not in safe]

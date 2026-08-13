@@ -39,9 +39,16 @@
    where a line comment would swallow the rest of the query. */
 
 WITH gdp_ids AS (
+  /* Identify GDP per capita by CANONICAL CATALOG PATH, not by short_name. `gdp_per_capita`
+     is a generic short name that other datasets use too (derived historical-GDP series in
+     this repo among them), and a false positive here is not cosmetic: the label CASE below
+     would call it Maddison, and the applier would then install Maddison's hardcoded variable
+     as the target's x, silently replacing the series the source actually plotted. */
   SELECT indicator_id
   FROM `prod_semantic.indicators`
-  WHERE lower(short_name) IN ('ny_gdp_pcap_pp_kd', 'gdp_per_capita', 'rgdpo_pc')
+  WHERE catalog_path LIKE 'grapher/worldbank_wdi/%/wdi/wdi#ny_gdp_pcap_pp_kd'
+     OR catalog_path LIKE 'grapher/ggdc/%/maddison_project_database/maddison_project_database#gdp_per_capita'
+     OR catalog_path LIKE 'grapher/ggdc/%/penn_world_table/penn_world_table#rgdpo_pc'
 ),
 
 chart_axes AS (
@@ -121,13 +128,16 @@ SELECT
   ca.x_catalog_path,
   ca.y_catalog_path,
   rc.reference_count,
+  /* Match the DATASET, not the bare short name: 'gdp_per_capita' alone would label any
+     indicator sharing that short name as Maddison. Whichever axis holds the GDP series is
+     checked, since a source may plot GDP on y. */
   CASE
-    WHEN STRPOS(lower(coalesce(ca.x_catalog_path, '')), 'ny_gdp_pcap_pp_kd') > 0 THEN 'World Bank'
-    WHEN STRPOS(lower(coalesce(ca.x_catalog_path, '')), 'rgdpo_pc')          > 0 THEN 'Penn World Table'
-    WHEN STRPOS(lower(coalesce(ca.x_catalog_path, '')), 'gdp_per_capita')    > 0 THEN 'Maddison Project Database'
-    WHEN STRPOS(lower(coalesce(ca.y_catalog_path, '')), 'ny_gdp_pcap_pp_kd') > 0 THEN 'World Bank'
-    WHEN STRPOS(lower(coalesce(ca.y_catalog_path, '')), 'rgdpo_pc')          > 0 THEN 'Penn World Table'
-    WHEN STRPOS(lower(coalesce(ca.y_catalog_path, '')), 'gdp_per_capita')    > 0 THEN 'Maddison Project Database'
+    WHEN STRPOS(lower(coalesce(ca.x_catalog_path, '')), 'worldbank_wdi/')          > 0 THEN 'World Bank'
+    WHEN STRPOS(lower(coalesce(ca.x_catalog_path, '')), 'penn_world_table')        > 0 THEN 'Penn World Table'
+    WHEN STRPOS(lower(coalesce(ca.x_catalog_path, '')), 'maddison_project_database') > 0 THEN 'Maddison Project Database'
+    WHEN STRPOS(lower(coalesce(ca.y_catalog_path, '')), 'worldbank_wdi/')          > 0 THEN 'World Bank'
+    WHEN STRPOS(lower(coalesce(ca.y_catalog_path, '')), 'penn_world_table')        > 0 THEN 'Penn World Table'
+    WHEN STRPOS(lower(coalesce(ca.y_catalog_path, '')), 'maddison_project_database') > 0 THEN 'Maddison Project Database'
     ELSE NULL
   END AS gdp_source,
   ca.non_gdp_indicator_id,

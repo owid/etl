@@ -515,7 +515,7 @@ async function importJSON(file) {
     const rows = JSON.parse(await file.text());
     if (!Array.isArray(rows)) throw new Error("expected a JSON array");
     const byId = new Map(RECORDS.map((r) => [String(r.id), r]));
-    let applied = 0, stale = 0, unknown = 0;
+    let applied = 0, stale = 0, unknown = 0, cleared = 0;
     for (const row of rows) {
       // Accept exports written before ids became "<src>-<tgt>": fall back to matching on
       // the pair, so a finished review is not thrown away by the key change.
@@ -526,7 +526,13 @@ async function importJSON(file) {
         rec = byId.get(id);
       }
       if (!rec) { unknown++; continue; }
-      if (!row.status && !row.note) continue;
+      // A row exported with no status and no note means "undecided". Skipping it would leave
+      // an older approval sitting in localStorage while the imported file says otherwise,
+      // so the restored counts would not match the file. Clear it instead.
+      if (!row.status && !row.note) {
+        if (decisions[id]) { delete decisions[id]; cleared++; }
+        continue;
+      }
       // Must stay in step with fp() — a shorter fingerprint here silently skips every row.
       const rowFp = (row.src_md5 || "") + "::" + (row.tgt_md5 || "") + "::" + (row.gdp_var_id || "");
       if (rowFp && rowFp !== fp(rec)) { stale++; continue; }
@@ -534,7 +540,7 @@ async function importJSON(file) {
       applied++;
     }
     persist(); render();
-    toast(`Imported ${applied} decision(s)` + (stale ? `, skipped ${stale} stale` : "") + (unknown ? `, ${unknown} unknown id(s)` : ""));
+    toast(`Imported ${applied} decision(s)` + (cleared ? `, cleared ${cleared} back to undecided` : "") + (stale ? `, skipped ${stale} stale` : "") + (unknown ? `, ${unknown} unknown id(s)` : ""));
   } catch (e) { toast("Import failed: " + e.message); }
 }
 
