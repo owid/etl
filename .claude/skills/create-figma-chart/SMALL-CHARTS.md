@@ -170,6 +170,11 @@ HTTP 200 whatever you pass:
   and nothing else.
 - An MDim slug with no params rendered its *default* view, which for `energy-mix` is a **map**
   (`No data`, `0 TWh`, … `20,000 TWh`).
+- **`tab=` does not survive into thumbnail mode on an MDim.** `income-share-top-1-…?tab=discrete-bar&time=latest`
+  rendered as dots on a time axis — one point per country, no bars, no entity names — where the same
+  `tab=discrete-bar` on a plain chart slug renders proper bars with labels. The skill already notes
+  that `tab=table` is silently ignored; treat every `tab=` on this route as a request, and check the
+  render rather than the URL.
 
 So carry the view's full param set, and before building anything **assert the text count and the
 rendered tab against the view you asked for.**
@@ -196,7 +201,7 @@ suitable for thumbnails. Less noisy visualization, but should be understandable 
 (`GrapherTypes.ts:851`). Dedicated renderers sit behind it: `LineChartThumbnail`,
 `SlopeChartThumbnail`, `StackedAreaChartThumbnail`, `MarimekkoChartThumbnail`.
 
-### It does most of the small-chart labeling for you
+### It strips the furniture for you — but it does not label the series
 
 Same chart, same size, two routes:
 
@@ -205,9 +210,25 @@ Same chart, same size, two routes:
 | `imType=uncaptioned` | 19 — `1880 · 1900 · 1920 · 1940 · 1960 · 1980 · 2000 · 2023`, `0 years` … `80 years`, `United States`, `China` |
 | **`imType=thumbnail`** | **8** — `1880 · 2023`, `United States`, `China`, `79.3` |
 
-Direct end-of-line entity labels, first and last year only, no y-axis, an end value. That is most of
-what Step 8 exists to do by hand on the larger formats, so on this route Step 8 is ordinary polish
-plus the palette binding — not the bulk of the work.
+So the y-axis, the interior year ticks and the legend are gone, and you get the first and last year
+plus an end value. That much is dependable.
+
+**What is not dependable is the series labels, and this is the thing to plan around.** Measured across
+the five reference charts, the thumbnail renderer labeled 1 of 2 series on a two-country line chart,
+2 of 3 on a three-series MDim, and **0 of 3** on the same MDim with `stackMode=relative` — and **0 of
+7** on a discrete-bar MDim, which emitted values with no entity names at all. It is not collision
+avoidance you can tune out: on the `stackMode=relative` chart the labels stayed absent at
+`imFontSize` 12, 14, 15 and 16 and at frame heights of 180, 250 and 300px. They are simply not
+emitted.
+
+Two more omissions in the same family: **only end values are labeled**, never the values at the start
+of a line (the reference charts label both ends), and an MDim's series names arrive in their raw form
+(`World - Richest decile`) rather than the reference's `Richest decile`.
+
+So budget for **re-adding and renaming the series labels in Figma as the core Step 8 work on this
+route**, not as polish. GUIDELINES.md → Direct labeling has the placement rules; the reference renders
+in `assets/` show the target. What the thumbnail route buys you is the *stripping* — no legend to
+delete, no axis to remove, no rescale — not the labeling.
 
 ### Request the final pixel size directly
 
