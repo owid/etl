@@ -53,12 +53,12 @@ tables:
       new_idps_under_18_conflict_violence:
         title: New internal displacements of children due to conflict
         description_short: |-
-          New [internal displacements](#dod:displacements) of children under 18 years old, due to conflict and violence. Internal displacement describes the movement of a child who is forced to leave their home due to conflict and violence but who remains within their country's borders. One child can be displaced multiple times within a calendar year and is then counted multiple times in this data.
+          New [internal displacements](#dod:displacements) of children under 18 years old, due to conflict and violence. Internal displacement describes the movement of a child who is forced to leave their home but who remains within their country's borders. One child can be displaced multiple times within a calendar year and is then counted multiple times in this data.
         description_from_producer: *internally_displaced
       new_idps_under_18_disaster:
         title: New internal displacements of children due to disasters
         description_short: |-
-          New [internal displacements](#dod:displacements) of children under 18 years old, due to disasters. Internal displacement describes the movement of a child who is forced to leave their home due to disasters but who remains within their country's borders. One child can be displaced multiple times within a calendar year and is then counted multiple times in this data.
+          New [internal displacements](#dod:displacements) of children under 18 years old, due to disasters. Internal displacement describes the movement of a child who is forced to leave their home but who remains within their country's borders. One child can be displaced multiple times within a calendar year and is then counted multiple times in this data.
         description_from_producer: *internally_displaced
       new_idps_under_18_total:
         title: New internal displacements of children
@@ -67,11 +67,11 @@ tables:
         description_from_producer: *internally_displaced
       refugees_under_18_asylum:
         title: Child refugees by country of asylum
-        description_short: Number of children under 18 years old who are [refugees](#dod:refugee) by the country of asylum. This number describes all refugees who are currently living in the asylum country, not only refugees arriving in this year.
+        description_short: Number of children under 18 years old who are [refugees](#dod:refugee) by the country of asylum. This counts all refugees who are currently living in the asylum country, not only refugees arriving in this year.
         description_from_producer: *refugee
       refugees_under_18_asylum_per_1000:
         title: Child refugees by country of asylum per 1000 inhabitants of all ages
-        description_short: Number of children under 18 years old who are [refugees](#dod:refugee) per 1000 inhabitants of the asylum country. This number describes all refugees who are currently living in the asylum country, not only refugees arriving in this year.
+        description_short: Number of children under 18 years old who are [refugees](#dod:refugee) per 1000 inhabitants of the asylum country. This counts all refugees who are currently living in the asylum country, not only refugees arriving in this year.
         description_from_producer: *refugee
         processing_level: major
         description_processing: |-
@@ -80,11 +80,11 @@ tables:
           numDecimalPlaces: 1
       refugees_under_18_origin:
         title: Child refugees by country of origin
-        description_short: Number of children under 18 years old who are [refugees](#dod:refugee) by their country of origin. This number describes all refugees who have left their origin country, not only refugees leaving in this year.
+        description_short: Number of children under 18 years old who are [refugees](#dod:refugee) by their country of origin. This counts all refugees who have left this country, not only refugees leaving in this year.
         description_from_producer: *refugee
       refugees_under_18_origin_per_1000:
         title: Child refugees by country of origin per 1000 inhabitants of all ages
-        description_short: Number of children under 18 years old who are [refugees](#dod:refugee) per 1000 inhabitants of the origin country. This number describes all refugees who have left their origin country, not only refugees leaving in this year.
+        description_short: Number of children under 18 years old who are [refugees](#dod:refugee) per 1000 inhabitants of the origin country. This counts all refugees who have left this country, not only refugees leaving in this year.
         description_from_producer: *refugee
         processing_level: major
         description_processing: |-
@@ -136,7 +136,7 @@ tables:
           numDecimalPlaces: 1
       new_idps_under_18_conflict_violence_per_1000:
         title: New internal displacements of children due to conflict per 1000 inhabitants of all ages
-        description_short: New [internal displacements](#dod:displacements) of children under 18 years old due to conflict and violence per 1000 inhabitants of the country. Internal displacement describes the movement of a child who is forced to leave their home due to conflict and violence but who remains within their country's borders. One child can be displaced multiple times within a calendar year and is then counted multiple times in this data.
+        description_short: New [internal displacements](#dod:displacements) of children under 18 years old due to conflict and violence per 1000 inhabitants of the country. Internal displacement describes the movement of a child who is forced to leave their home but who remains within their country's borders. One child can be displaced multiple times within a calendar year and is then counted multiple times in this data.
         description_from_producer: *internally_displaced
         processing_level: major
         description_processing: *population
@@ -144,7 +144,7 @@ tables:
           numDecimalPlaces: 1
       new_idps_under_18_disaster_per_1000:
         title: New internal displacements of children due to disasters per 1000 inhabitants of all ages
-        description_short: New [internal displacements](#dod:displacements) of children under 18 years old due to disasters per 1000 inhabitants of the country. Internal displacement describes the movement of a child who is forced to leave their home due to disaster but who remains within their country's borders. One child can be displaced multiple times within a calendar year and is then counted multiple times in this data.
+        description_short: New [internal displacements](#dod:displacements) of children under 18 years old due to disasters per 1000 inhabitants of the country. Internal displacement describes the movement of a child who is forced to leave their home but who remains within their country's borders. One child can be displaced multiple times within a calendar year and is then counted multiple times in this data.
         description_from_producer: *internally_displaced
         processing_level: major
         description_processing: *population
