@@ -91,6 +91,11 @@ BANDS = [
     ("height_percentile_10", "height_percentile_90", 0.74, "8-in-10-children"),
 ]
 
+# The encoding diagram names each band as a count of children, so the counts have to match the
+# percentiles above: the 0.1st to the 99.9th holds 99.8% of children, which is 998 in 1,000 -- not the
+# 999 that "almost all" rounds to -- and the 10th to the 90th holds 8 in 10.
+BAND_LABELS = ["998 in 1,000 children", "8 in 10 children"]
+
 # Percentiles drawn as lines on top of the bands, as (column, line width), so a specific centile
 # can be read off rather than only a range. Named in the encoding diagram, not on the line.
 QUANTILE_LINES = [
@@ -108,6 +113,10 @@ STUNTING_COLUMN = "height_sd_minus_2"
 GRID_COLOR = "#ddd"
 GRID_DASHES = (0, (4, 4))
 GRID_LINEWIDTH = 1.0
+
+# Height gridline spacing, in cm. The y limits are snapped out to whole steps of this, so the
+# outermost gridlines land exactly on the plot's edges -- see where the limits are set.
+HEIGHT_STEP = 20
 TEXT_COLOR = "#5b5b5b"
 MUTED_COLOR = "#777777"
 
@@ -407,13 +416,13 @@ def draw_encoding_diagram(
 
     # Nested brackets at the curve's right end: the big one around the whole band, the small one
     # around the middle 80%. Each label sits immediately right of its own bracket, with no leader --
-    # "Almost all children" level with the big bracket's top arm, "8 in 10 children" level with the
+    # the outer band's label level with the big bracket's top arm, the inner band's level with the
     # small bracket's middle. The big bracket is the *nearer* of the two, which is what lets both
     # labels sit against their own bracket: the top label then clears the small bracket entirely, and
     # the middle label starts to the right of both.
     for half_end, bracket_x, label_x, at_top, name, text in (
-        (outer[-1], right + 0.020, right + 0.035, True, "almost-all", "Almost all children"),
-        (inner[-1], right + 0.050, right + 0.065, False, "8-in-10", "8 in 10 children"),
+        (outer[-1], right + 0.020, right + 0.035, True, "almost-all", BAND_LABELS[0]),
+        (inner[-1], right + 0.050, right + 0.065, False, "8-in-10", BAND_LABELS[1]),
     ):
         ax.plot(
             [bracket_x - 0.012, bracket_x, bracket_x, bracket_x - 0.012],
@@ -561,6 +570,16 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
     facet_title_space_px = (1 + FACET_TITLE_PAD) * facet_fontsize / POINTS_PER_PIXEL
     age_max = float(tb["age_years"].max())
     height_max = float(tb["height_percentile_99_9"].max())
+    # Snap the height axis out to whole gridline steps, so the outermost gridlines sit exactly on the
+    # plot's top and bottom edges. That is how grapher avoids a gridline running a few pixels clear of
+    # an edge: its y domain is [lowest tick, highest tick], so there is only ever one line there. The
+    # bottom one coincides with the baseline, which draws it solid, so its gridline is suppressed
+    # below rather than dashed over the top of it.
+    height_ticks = np.arange(
+        np.floor(float(tb["height_percentile_0_1"].min()) / HEIGHT_STEP) * HEIGHT_STEP,
+        np.ceil(height_max / HEIGHT_STEP) * HEIGHT_STEP + 1,
+        HEIGHT_STEP,
+    )
 
     width_px, height_px = layout["size"]
     margin_px = layout["margin"]
@@ -657,7 +676,11 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         # The x range starts and ends on the outermost ticks, as grapher's does, so that those two
         # marks sit at the ends of the baseline and close it.
         ax.set_xlim(0, age_max)
-        ax.set_ylim(38, height_max + 4)
+        ax.set_ylim(height_ticks[0], height_ticks[-1])
+        ax.set_yticks(height_ticks)
+        # The baseline already draws a solid line at the lowest tick, so its gridline would be a
+        # dashed lighter stroke laid over the top of it.
+        ax.yaxis.get_gridlines()[0].set_visible(False)
         ticks = layout["age_ticks"]
         ax.set_xticks(ticks)
         labels = ax.set_xticklabels(["Birth" if tick == 0 else str(tick) for tick in ticks])
