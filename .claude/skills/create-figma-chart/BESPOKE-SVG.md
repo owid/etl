@@ -229,26 +229,45 @@ same as a grapher export: `Static Chart Template_Horizontal` (`5332:75`, 850×63
 `Static Chart Template_Vertical` (`5332:93`, 850×1095). Verified against the Templates page — don't go
 looking for one.
 
-**But check the component's natural aspect against the band before promising a format.** A bespoke
-component's proportions are the component's, not yours: there is no `imWidth`, and the one degree of
-freedom (container width) may not move the height at all. Worked example, the wine sankey:
+**Drive both dimensions of the container, and the component will fill whatever band you give it.**
+This is the part worth getting right, because the wrong conclusion is very easy to reach: render the
+wine sankey at its default height and it comes out 818 × 403, which fills 92% of the Horizontal band
+and only **45%** of the Vertical one — from which it looks as though a sankey is inherently landscape
+and cannot be made portrait. It isn't. Two knobs get you there:
 
-| Template | Band | Chart at full content width | Band filled |
-|---|---|---|---|
-| Horizontal 850×638 | 818 × 438 | 818 × 403 | **92%**, gaps 17px — good |
-| Vertical 850×1095 | 818 × 896 | 818 × 403 | **45%**, gaps 246px — unusable |
+1. **`--viz-height`.** These components size themselves from their container — the bilateral sankey via
+   `useParentSize()`, which reads height as well as width. Set the container's height and the layout
+   follows.
+2. **`--viz-css`, when a component pins its height in SCSS.** food-trade does:
+   `FoodTradeChart.scss` sets `.food-trade-captioned-chart__chart-area { height: 450px }`, and
+   everything below it is `height: 100%`. That single rule is why `--viz-height` alone changes nothing.
+   Override it in the Shadow DOM:
 
-A bilateral sankey is inherently landscape, so it cannot fill a portrait band. Scaling it up to fit
-would take every label with it (a 2.2× scale puts 12px labels at 26px), which is the same trap as
-rescaling a grapher export off its type ladder.
+```bash
+--viz-width 852 --viz-height 900 \
+--viz-css '.food-trade-captioned-chart__chart-area{height:869px!important}'
+```
 
-So when a portrait version is asked for, check what the component can actually do before building it.
-For food-trade specifically: `FoodTradeBilateralSankey` (the `All countries` view) only shortens its
-numbers and drops from 10 nodes to 8 below `MOBILE_BREAKPOINT` (500px) — it never stacks. The
-**single-country** view is different: `SplitFlowSankey` stacks its imports and exports halves
-vertically below 500px ("Below this width the two halves stack vertically"), which is genuinely
-portrait. So a portrait wine chart means changing the subject from world trade to one country's trade
-— an editorial decision to put to whoever asked, not a fit to force.
+That returned an **818 × 869** SVG — the Vertical band's exact content width, and 97% of its height with
+12px gaps, imported at **scale 1.0005**. Nothing was scaled, so every label stayed at its natural
+12/16px.
+
+**And a taller render is a better chart, not merely a bigger one.** The component labels what it has
+room to label: the 450px render emitted 33 text nodes, the 869px render **42** — Canada, Russia,
+Portugal and China gained their values (380,000 / 340,000 / 280,000 / 250,000 tonnes) because the
+bands were finally thick enough to caption. So don't scale a short render up to fill a tall band;
+re-render at the band's height and gain the labels.
+
+The workflow that follows: **measure the band first, then render to it.** Solve the container width for
+the content width (852 → 818 here; the SVG is `container − 34`) and set the container height to the
+band minus the gaps you want. Injected CSS re-lays out asynchronously through the component's
+ResizeObserver, so the script waits before serializing — without that pause you capture the old
+geometry.
+
+For the record on food-trade's other layouts: `FoodTradeBilateralSankey` (the `All countries` view)
+only shortens its numbers and drops from 10 nodes to 8 below `MOBILE_BREAKPOINT` (500px) — it never
+stacks. The **single-country** view is different: `SplitFlowSankey` stacks its imports and exports
+halves vertically below 500px, which is a genuinely different composition rather than a resize.
 
 ## What to check, and what to hand back
 

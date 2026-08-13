@@ -67,6 +67,11 @@ Options:
   --width <px>       viewport width  (default 1200) -- this is the aspect control
   --viz-width <px>   width of the mounted container (default: --width). These components lay
                      out from container width, so this is what shapes the export
+  --viz-height <px>  height of the mounted container. Components using useParentSize() take their
+                     height from it too -- but only if the component has no hard-coded height
+  --viz-css <css>    CSS injected into the Shadow DOM after mounting. The escape hatch for a
+                     component that pins its chart height in SCSS, e.g.
+                     '.food-trade-captioned-chart__chart-area{height:896px!important}'
   --config <json>    mount with this config instead of the demo's defaults (local route too)
   --height <px>      viewport height (default 800)
   --out <dir>        output directory (default .)
@@ -99,6 +104,8 @@ function parseArgs(argv) {
         "--chrome": "chrome",
         "--timeout": "timeout",
         "--viz-width": "vizWidth",
+        "--viz-height": "vizHeight",
+        "--viz-css": "vizCss",
     }
     for (let i = 0; i < argv.length; i++) {
         const arg = argv[i]
@@ -112,7 +119,7 @@ function parseArgs(argv) {
         const value = argv[++i]
         if (value === undefined) throw new Error(`${arg} needs a value`)
         opts[key] =
-            ["width", "height", "timeout", "vizWidth"].includes(key)
+            ["width", "height", "timeout", "vizWidth", "vizHeight"].includes(key)
                 ? Number(value)
                 : value
     }
@@ -311,13 +318,14 @@ async function runDemo(page, opts) {
     await page.waitForSelector(".variant", { timeout: opts.timeout })
     const selector = "#bespoke-svg-target";
     await page.evaluate(
-        async (sel, project, variant, cfg, hostWidth) => {
+        async (sel, project, variant, cfg, hostWidth, hostHeight, extraCss) => {
             const host = document.createElement("div")
             host.id = sel.replace("#", "")
             // Fixed width, not 100%: these components lay out from their container width, so the
             // page's own padding must not decide what the export looks like.
             host.style.cssText =
-                `position:relative;width:${hostWidth}px;background:#fff`
+                `position:relative;width:${hostWidth}px;background:#fff` +
+                (hostHeight ? `;height:${hostHeight}px` : "")
             document.body.insertBefore(host, document.body.firstChild)
             const root = host.attachShadow({ mode: "open" })
             const mountPoint = document.createElement("div")
@@ -327,14 +335,24 @@ async function runDemo(page, opts) {
                 variant: variant ?? mod.VARIANTS[0].name,
                 config: { ...cfg, urlSync: false },
             })
+            if (extraCss) {
+                const style = document.createElement("style")
+                style.textContent = extraCss
+                root.appendChild(style)
+            }
         },
         selector,
         opts.demo,
         opts.variant,
         JSON.parse(opts.config),
-        opts.vizWidth ?? opts.width
+        opts.vizWidth ?? opts.width,
+        opts.vizHeight,
+        opts.vizCss
     )
     await waitForViz(page, selector, 60, opts.timeout)
+    // Injected CSS changes the container size, so the component re-lays out asynchronously via its
+    // ResizeObserver. Give that a beat before serializing, or the old geometry is captured.
+    if (opts.vizCss) await new Promise((r) => setTimeout(r, 1200))
     return selector
 }
 
