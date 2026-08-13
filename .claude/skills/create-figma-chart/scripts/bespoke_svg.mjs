@@ -79,6 +79,9 @@ Options:
   --demo-url <url>   dev server base (default http://localhost:8089)
   --chrome <path>    Chrome executable
   --timeout <ms>     render wait budget (default 20000)
+  --block-index <n>  which bespoke component on the article to export, 0-based. Required when the
+                     page has more than one: the container exposes its size, not its bundle, so
+                     --bundle cannot disambiguate
   --keep-open        leave the browser open (debugging)
 `.trim()
 
@@ -106,6 +109,7 @@ function parseArgs(argv) {
         "--viz-width": "vizWidth",
         "--viz-height": "vizHeight",
         "--viz-css": "vizCss",
+        "--block-index": "blockIndex",
     }
     for (let i = 0; i < argv.length; i++) {
         const arg = argv[i]
@@ -119,7 +123,7 @@ function parseArgs(argv) {
         const value = argv[++i]
         if (value === undefined) throw new Error(`${arg} needs a value`)
         opts[key] =
-            ["width", "height", "timeout", "vizWidth", "vizHeight"].includes(key)
+            ["width", "height", "timeout", "vizWidth", "vizHeight", "blockIndex"].includes(key)
                 ? Number(value)
                 : value
     }
@@ -361,13 +365,34 @@ async function runArticle(page, opts) {
         waitUntil: "networkidle2",
         timeout: opts.timeout,
     })
-    const selector = "[class*=bespoke-component]"
-    await page.waitForSelector(selector, { timeout: opts.timeout })
-    await page.evaluate((sel) => {
-        document
-            .querySelector(sel)
-            ?.scrollIntoView({ block: "center", behavior: "instant" })
-    }, selector)
+    const baseSelector = "[class*=bespoke-component]"
+    await page.waitForSelector(baseSelector, { timeout: opts.timeout })
+
+    // An article can carry several bespoke components, and the container does NOT say which bundle
+    // it is: the class carries the block's *size* (`bespoke-component--<size>`), never its bundle.
+    // So --bundle cannot disambiguate, and taking the first match would silently export a different
+    // chart than the one asked for -- plausible-looking and wrong. Make the caller choose.
+    const blocks = await page.$$eval(baseSelector, (els) =>
+        els.map((el, i) => ({ i, className: el.className, text: (el.textContent ?? "").trim().slice(0, 60) }))
+    )
+    if (blocks.length > 1 && opts.blockIndex === undefined) {
+        const list = blocks.map(b => `  [${b.i}] class="${b.className}" text="${b.text}"`).join("\n")
+        throw new Error(
+            `This article has ${blocks.length} bespoke components and the container does not expose ` +
+            `its bundle, so --bundle cannot pick one.\nRe-run with --block-index <n>:\n${list}`
+        )
+    }
+    const index = opts.blockIndex ?? 0
+    if (index >= blocks.length)
+        throw new Error(`--block-index ${index} out of range: the article has ${blocks.length} bespoke component(s)`)
+
+    // Tag the chosen block so every later step addresses it and nothing else.
+    const selector = "#bespoke-svg-target"
+    await page.evaluate((base, i, id) => {
+        const el = document.querySelectorAll(base)[i]
+        el.id = id.replace("#", "")
+        el.scrollIntoView({ block: "center", behavior: "instant" })
+    }, baseSelector, index, selector)
 
     // The page may hydrate on its own. Only mount by hand if it doesn't.
     let rendered = true

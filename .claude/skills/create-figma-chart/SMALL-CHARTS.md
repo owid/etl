@@ -119,25 +119,31 @@ this skill where the source line is *not* the verbatim grapher footer string, so
 Step 6 rule that forbids re-deriving it — take the producer and the release year from
 `chart.citation` and drop the prefix.
 
-## Reference renders
+## Reference examples
 
-The design team's five worked examples lived on the Templates page and are expected to be deleted
-once this route reproduces them. They are harvested into `assets/` so this file stands on its own —
-**there are deliberately no live node ids in the run-time path.** They were drawn in matplotlib, so
-they are the visual target, not an artifact of this pipeline; SKILL.md's *"pointed at a finished page
-as the model"* mode applies for reading measurements off them, but not its re-render-and-diff half.
+Five worked examples sit beside the templates on the ` 📑 Templates` page. Read the one nearest your
+chart type before building — `get_design_context` for the measurements, plus a 4–8× crop for the
+detail. They were drawn in **matplotlib**, so SKILL.md's *"pointed at a finished page as the model"*
+mode applies for reading measurements off them, but not its re-render-and-diff half: there is no
+grapher export behind them to diff against.
 
-| Asset | Flavor | What it teaches |
+| Example (node) | Flavor | What it teaches |
 |---|---|---|
-| `assets/small-chart-example-line-two-series.png` | guided | two series, dots **and** value labels at both ends, entity label along each line, title + subtitle |
-| `assets/small-chart-example-lines-indexed.png` | guided | three series of indexed % change, end dots and end values only, two-line title, no subtitle |
-| `assets/small-chart-example-slope-thresholds.png` | guided | three bands between two time points, labels at both ends, shortest frame (221) |
-| `assets/small-chart-example-bar.png` | guided | 7-row ranked bar, entity name over year in a left label column, tallest frame (272), no axis at all |
-| `assets/small-chart-example-line-pull.png` | **pull** | the only pull example — line, four axis ticks with 4px tick marks, source row |
+| `small-chart-top01-line 1` (`25344:1277`) | guided | two series, dots **and** value labels at both ends, entity label along each line, title + subtitle |
+| `small-chart-income-pct-change 2` (`25344:1260`) | guided | three series of indexed % change, end dots and end values only, two-line title, no subtitle |
+| `small-chart-income-thresholds 1` (`25344:1237`) | guided | three bands between two time points, labels at both ends, shortest frame (221) |
+| `small-chart-top1-bar longer` (`25344:1298`) | guided | 7-row ranked bar, entity name over year in a left label column, tallest frame (272), no axis at all |
+| `small-chart-gini-line 1` (`25344:1323`) | **pull** | the only pull example — line, four axis ticks with 4px tick marks, source row |
+
+Ids as of 2026-08-13; re-verify with `get_metadata` on `798:54`, since this page gets edited.
 
 Two things to read off them rather than from prose: the axis treatment is **not** uniform (the pull
 example carries four labeled ticks with 4px marks; the others carry only the first and last year on a
 bare baseline), and the frame height moves with the content (221 / 233 / 234 / 272).
+
+Everything they teach that is *measurable* is already transcribed above, so the spec here does not
+depend on them surviving — but the node ids do, so treat a lookup failure as "re-find them", not as a
+missing dependency.
 
 ## Width is fixed; height is free
 
@@ -254,7 +260,7 @@ per-row year into the value rather than stacking it — `25.8% in 2022` where th
 
 So the thumbnail route reliably buys you the *stripping* — no legend to delete, no axis to remove, no
 rescale. **Budget for re-adding the missing series labels and rewriting the raw names in Figma**;
-GUIDELINES.md → Direct labeling has the placement rules and the reference renders in `assets/` show
+GUIDELINES.md → Direct labeling has the placement rules and the reference examples on the Templates page show
 the target. How much of that work there is depends on the chart type, so measure the export before
 estimating.
 
