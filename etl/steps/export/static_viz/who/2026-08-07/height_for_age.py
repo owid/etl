@@ -158,7 +158,7 @@ LAYOUTS = {
         "nrows": 1,
         "ncols": 2,
         "full_footer": True,
-        "age_ticks": [0, 2, 5, 10, 15, 19],
+        "age_ticks": [0, 5, 10, 15, 19],
         "diagram": "panel",
         "title_fontsize": 16,
         "body_fontsize": 10.5,
@@ -661,10 +661,9 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         ticks = layout["age_ticks"]
         ax.set_xticks(ticks)
         labels = ax.set_xticklabels(["Birth" if tick == 0 else str(tick) for tick in ticks])
-        # The last tick label is right-anchored, as grapher anchors its outermost labels inwards:
-        # centred, it crosses the frame's side margin, which is ink the templates keep clear. The
-        # first label stays centred -- it overhangs only into the space reserved for the y labels,
-        # and anchoring it left pushes it into the next tick.
+        # Grapher anchors its outermost tick labels inwards -- text-anchor start on the first, end on
+        # the last -- so both sit inside the plot instead of half-overhanging it.
+        labels[0].set_horizontalalignment("left")
         labels[-1].set_horizontalalignment("right")
         ax.yaxis.set_major_formatter(FuncFormatter(lambda value, _: f"{value:.0f} cm"))
         ax.tick_params(axis="y", length=0, labelsize=body_fontsize, labelcolor=TEXT_COLOR)

@@ -51,7 +51,7 @@ L 0 3.6
       </g>
      </g>
      <g id="text_1">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="53.28" y="531.575703" transform="rotate(-0 53.28 531.575703)">Birth</text>
+      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="53.28" y="531.575703" transform="rotate(-0 53.28 531.575703)">Birth</text>
      </g>
     </g>
     <g id="xtick_2">
@@ -8451,7 +8451,7 @@ z
       </g>
      </g>
      <g id="text_17">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="222.994286" y="531.575703" transform="rotate(-0 222.994286 531.575703)">Birth</text>
+      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="222.994286" y="531.575703" transform="rotate(-0 222.994286 531.575703)">Birth</text>
      </g>
     </g>
     <g id="xtick_7">
