@@ -16,6 +16,10 @@ dataset:
 
 
     Attribute the data as the "WHO COVID-19 Dashboard. Geneva: World Health Organization, 2020. Available online: https://data.who.int/dashboards/covid19/".
+  sources:
+  - name: World Health Organization
+    url: https://data.who.int/dashboards/covid19/
+    published_by: 'WHO COVID-19 Dashboard. Geneva: World Health Organization, 2020.'
 tables:
   cases_and_deaths_who:
     variables:

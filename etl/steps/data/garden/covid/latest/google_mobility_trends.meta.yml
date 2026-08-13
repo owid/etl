@@ -22,6 +22,10 @@ dataset:
     The 'Residential' category shows a change in duration-the other categories measure a change in total visitors.
 
     This index is smoothed to the rolling 7-day average.
+  sources:
+  - name: Google COVID-19 Community Mobility Trends - Last updated {TODAY}
+    url: https://www.google.com/covid19/mobility/
+    published_by: Google LLC "Google COVID-19 Community Mobility Reports".
 tables:
   google_mobility_trends:
     variables:

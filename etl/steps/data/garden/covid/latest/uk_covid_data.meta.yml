@@ -1,5 +1,9 @@
 dataset:
   title: uk_covid_data
+  sources:
+  - name: UK Government COVID-19 Dashboard – Last updated {TODAY}
+    url: https://coronavirus.data.gov.uk/details/download
+    published_by: Government of the United Kingdom
 tables:
   uk_covid_data:
     variables:

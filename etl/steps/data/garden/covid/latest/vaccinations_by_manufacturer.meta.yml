@@ -4,6 +4,10 @@ dataset:
     Data on COVID-19 vaccinations. We only rely on figures that are verifiable based on public official sources.
 
     You can download the full dataset here: https://github.com/owid/covid-19-data/tree/master/public/data/vaccinations
+  sources:
+  - name: Official data collated by Our World in Data
+    published_by: For source details see
+      https://github.com/owid/covid-19-data/tree/master/public/data/vaccinations/locations-manufacturer.csv
 tables:
   vaccinations_by_manufacturer:
     variables:

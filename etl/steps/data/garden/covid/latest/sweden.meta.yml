@@ -6,6 +6,10 @@ dataset:
 
 
     More information on this dataset and the reporting method is available in [our dedicated blog post](https://ourworldindata.org/covid-sweden-death-reporting).
+  sources:
+  - name: Swedish Public Health Agency – Last updated {TODAY}
+    url: https://www.folkhalsomyndigheten.se/smittskydd-beredskap/utbrott/aktuella-utbrott/covid-19/statistik-och-analyser/bekraftade-fall-i-sverige/
+    published_by: Swedish Public Health Agency – Last updated 28 October 2022
 tables:
   sweden:
     variables:
