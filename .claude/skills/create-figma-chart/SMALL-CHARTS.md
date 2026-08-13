@@ -328,6 +328,29 @@ added in Figma.
 `World - Richest decile`; the label should read `Richest decile`, since "World" is the only entity and
 therefore distinguishes nothing.
 
+### Expand the plot to the content box — the dots belong on the title box's edges
+
+Grapher reserves horizontal margin for labels it then places differently, so a thumbnail import
+typically spans less than the 278px content width and the plot reads as inset from the title above it.
+**Stretch it so the first and last marks land on x=12 and x=290**, flush with the title/subtitle box.
+Two shapes, two mechanisms — both already in this skill:
+
+- **Line, slope, area:** an **x-map** over the plot geometry. Take the line group's own x extent as the
+  source, map to `[12, 290]`, then `resize()` each `line__`/`outline__` vector's width and reposition
+  it, map each **dot centre** while leaving its size alone, stretch the baseline, and anchor the edge
+  tick labels inwards (first at 12, last right-aligned on 290) the way grapher does. Verified at
+  k = 1.373 and 1.328 on two charts, with dots landing exactly on 12 and 290.
+- **Ranked bar:** the closed-form reclaim in SKILL.md Step 8. It is not an optimisation at 302px, it is
+  the norm — grapher sized the label gutter for un-shortened names and the value column for unrounded
+  numbers, and you have since shortened and rounded both. Measured here: `k = 1.437`, taking the
+  longest row's bar-plus-value from 235 to exactly 290.
+
+**Once the dots sit on the box edges, the value labels have to move above or below them** — there is no
+longer room beside. Centre each on its dot, clamped inside `[12, 290]` so the edge labels stay in the
+box. **And check the header:** on a short frame, "above the first dot" can land in the subtitle, so flip
+to below when `y < headerBottom + 2`. That happened on the Gini chart's `0.39`, which wanted y=40
+against a header bottom of 44.
+
 ### Round the values to the precision the story needs
 
 Grapher exports full precision; a 302px frame rarely wants it. The references round, and consistently
@@ -379,10 +402,34 @@ fills the height.
 **There is no URL parameter for this.** `GrapherQueryParams` is `country`, `focus`, `tab`, `overlay`,
 `stackMode`, `zoomToSelection`, `xScale`, `yScale`, `time`, `region`, `endpointsOnly`, `facet`,
 `uniformYAxis`, … — and `yScale` is linear-vs-log, not bounds. The minimum lives in the chart config
-(`yAxis.min`), so it is **the chart author's to change**, exactly like sort order and entity selection
-(SKILL.md Step 8b). Two routes: ask for the chart config to change, or point a draft chart with
-`yAxis.min` set and export it through `by-uuid/<configId>.svg`. Do **not** fake it by cropping or
-stretching the imported plot — the image would stop matching the view its `url:` navigates to.
+(`yAxis.min`), so the *durable* fix is **the chart author's**, exactly like sort order and entity
+selection (SKILL.md Step 8b): change the chart config, or point a draft chart with `yAxis.min` set and
+export it through `by-uuid/<configId>.svg`.
+
+**When the decision is to fix it in Figma instead, do it as a scripted y-map — not a group stretch.**
+Stretching the chart group on one axis ovals the dots and is forbidden elsewhere in this skill. But on
+a thumbnail export the line paths and the dots are *separate nodes*, which makes the y-analogue of
+Step 8's sanctioned x-map safe:
+
+```js
+const k = (DST_BOTTOM - DST_TOP) / (srcBottom - srcTop);      // src = the band the data occupies
+const mapY = y => DST_TOP + (y - srcTop) * k;
+for (const n of chart.query("VECTOR[name^=line__], VECTOR[name^=outline__]").toArray()) {
+  const y = mapY(n.y);
+  n.resize(n.width, Math.max(0.01, n.height * k));            // strokeWeight is a property, so it survives
+  n.y = y;
+}
+for (const d of dots) d.y = mapY(d.y + d.height / 2) - d.height / 2;   // map the CENTRE, keep the size
+```
+
+Verified on the Gini chart: a 2.32× map took the data from a 51px band to 118px, with every stroke
+still 1.5px and every dot still 7px round. Record it as an accepted deviation — the image now shows a
+tighter axis than the view its `url:` navigates to.
+
+> **Re-anchor the value labels by identity afterwards, never by proximity.** The obvious move — snap
+> each label to its nearest dot — compares *pre-map* label positions against *post-map* dots, so two
+> labels collapse onto the same anchor and the numbers end up on the wrong marks. Take each series'
+> own first and last path point instead: `anchors = { "0.32": poly.at(0), "0.39": poly.at(-1) }`.
 
 ### Comparing two values of one dimension: two exports, one frame
 
