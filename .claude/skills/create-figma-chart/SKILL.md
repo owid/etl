@@ -256,7 +256,7 @@ await figma.setCurrentPageAsync(page)
 
 2. **Clone the template frame(s)** onto the new page: `(await figma.getNodeByIdAsync("<template-id>")).clone()`, then `page.appendChild(clone)` and position it.
 
-   For a **302-wide small or pull chart**, clone `25344:1357` (guided) or `25344:1391` (pull) — the choice is the Step 2 answer, not a judgement — then **delete the leftover `Group > Group > Vector` background** the templates carry from how their reference examples were drawn, or the import stacks on an opaque rectangle. A `chart-rows` block is 3–5 rows, so expect a *set* of frames on one page. SMALL-CHARTS.md → In Figma has the rest.
+   For a **302-wide small or pull chart**, clone `25344:1357` (guided) or `25344:1391` (pull) — the choice is the Step 2 answer, not a judgement. Those two templates keep their frame fill at `visible: false` and paint the background from a fixed 302×233 vector instead, so **turn the frame's own white fill on and remove the vector** — deleting the vector alone leaves a transparent frame, and keeping it under-covers a taller frame. A `chart-rows` block is 3–5 rows, so expect a *set* of frames on one page. SMALL-CHARTS.md → In Figma has the rest.
 
 3. **Import the original SVG with `upload_assets`** — never `createNodeFromSvg` (the `use_figma` code param caps at 50k chars; a grapher SVG is ~165 KB). `upload_assets` returns a single-use `submitUrl`; POST the file to it and keep the returned `placedOnNodeId`. **Only the original at this stage** — the embed has not been exported yet (Step 3), and it arrives in Step 7 once the band is measurable:
 

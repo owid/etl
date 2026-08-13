@@ -62,9 +62,23 @@ heading `"SMALL" Charts (featured on the OWID website as guided and PULL charts)
 | `small-chart-template-guided` | `25344:1357` | 302×233 | title `25344:1378`, optional subtitle `25344:1379` |
 | `small-chart-template-pull` | `25344:1391` | 302×233 | title `25344:1396`, optional subtitle `25344:1397`, **source `25344:1398`** |
 
-Both carry a leftover matplotlib background — `Group > Group > Vector` at 302×233 — from how the
-reference examples were drawn. **Delete that group when you clone**, or your imported chart stacks on
-top of an opaque rectangle.
+### The background is not where you expect it
+
+Both templates ship their frame fill as **white with `visible: false`**, and paint the background from
+a `Group > Group > Vector` — a white **302×233 rectangle** — instead. So:
+
+- **Do not just delete that group.** It is the only thing painting the background; remove it and the
+  frame is transparent, which shows up immediately as charts with no white card behind them.
+- **But do not keep it either**, because it is a *fixed* 302×233 rectangle and this format's height is
+  free. It under-covers a 272-tall frame and overhangs a 221-tall one.
+- **Enable the frame's own fill and drop the vector group**: `frame.fills = frame.fills.map(f => ({...f, visible: true}))`.
+  A fill follows the frame at any height, and it is what the designer's finished examples use — every
+  one of them has the frame fill visible and no full-size background vector.
+
+There is **no z-order hazard to avoid here.** `appendChild` puts the imported chart last, so it draws
+above the background whatever the background is. The "an opaque background paints over the template"
+warning belongs to the `static_viz` local-SVG route, where the opaque patch is *inside the imported
+SVG* — a different problem with a different fix (SKILL.md Step 7).
 
 ### Measured spec
 
@@ -172,9 +186,8 @@ HTTP 200 whatever you pass:
   (`No data`, `0 TWh`, … `20,000 TWh`).
 - **A dimension takes one value, and an invalid set renders *nothing*.** `quantile=richest_1pct` gives
   one series; `quantile=richest_1pct~richest_0_1pct` and the comma form both return an **empty SVG —
-  zero text nodes — at HTTP 200**, and a repeated `quantile=` param is last-wins. So a chart comparing
-  two values of the same dimension (top 1% *vs* top 0.1%) **cannot** come from one MDim view; it needs
-  a standalone chart or a narrative chart. Nothing in the response says so.
+  zero text nodes — at HTTP 200**, and a repeated `quantile=` param is last-wins. Nothing in the
+  response says so. See the composition note below for what to do about it.
 - **A `tab=` that the wrong slug can't honor degrades silently.** `tab=discrete-bar&time=latest` on
   one MDim came back as dots on a time axis — one point per country, no bars, no names — while the
   *same* params on the right slug produced a proper ranked bar with all seven names. The skill already
@@ -286,6 +299,35 @@ Two rules from SKILL.md Step 3 **do not apply here**, and both would cost a re-e
   exactly where the export put it. Elsewhere this skill goes to some length to avoid a rescale; here
   it is free.
 
+### Comparing two values of one dimension: two exports, one frame
+
+House practice for a chart like *"US income share: top 1% vs. top 0.1%"* is to export **each MDim view
+separately** and combine them in one frame — the dimension cannot carry both values, so there is no
+single view to ask for.
+
+**The catch is the y-scale, and it is not a detail.** Each export auto-scales to its own series, so the
+two arrive with different pixel-per-unit mappings and stacking them as-is misstates the gap between the
+series. Measured on the designer's finished reference, the two series *are* on one shared scale: pair
+each of the four labeled dots with its true value and every cross-series pair returns the same
+**−6.8 px per percentage point** (−6.79, −6.76, −6.87, −6.85), which two independently scaled exports
+would not produce.
+
+So a faithful composition has to reconcile the scales, and the obvious fix is barred: a vertical-only
+rescale ovals the dots and thickens the strokes unevenly, which SKILL.md forbids for exactly this
+reason. Three honest options, in order of preference:
+
+1. **Get a real two-series chart** — a standalone grapher chart or a narrative chart carrying both
+   indicators. Then it is an ordinary single export and everything else on this page applies.
+2. **Compose deliberately, and say so.** Place both exports, then reconcile by computing each series'
+   true data range (from `.csv?...&csvType=filtered`) and mapping both onto a common scale before
+   touching pixels. Record it as an accepted deviation — the image will not match either source view.
+3. **Ship them as two separate small charts.** A `chart-rows` block has several rows; two charts each
+   labeled with their own series is often clearer at 302px than one crowded composite.
+
+Whichever you pick, `.csv?...&csvType=filtered` is how you check the values — and note the CSV returns
+**every entity** unless `csvType=filtered` is present, so a naive `df[df.year == 1913]` silently reads
+some other country.
+
 ### `imFontSize` is in rendered pixels, at 0.75×
 
 `imFontSize` is a base; labels come out at **0.75 × the base**, in final rendered pixels. Measured at
@@ -320,9 +362,10 @@ entities and the values are the point. It is an editorial choice, so ask rather 
 Steps 5 and 7 of SKILL.md, reduced to what this format needs:
 
 1. Clone `25344:1357` (guided) or `25344:1391` (pull) onto the page.
-2. **Delete the leftover background group.** It is a **`GROUP`** named `Group` (holding another
-   `Group` → a 302×233 `Vector`), not a `FRAME` — `get_metadata` renders groups as `<frame …>`, so a
-   filter on `type === "FRAME"` silently matches nothing and leaves the opaque rectangle in place.
+2. **Fix the background:** set the clone's own white fill to `visible: true`, then remove the
+   `Group > Group > Vector` background rectangle (see above for why both halves are needed). That
+   group is a **`GROUP`**, not a `FRAME` — `get_metadata` renders groups as `<frame …>`, so a filter
+   on `type === "FRAME"` silently matches nothing and leaves it in place.
 3. Resize the clone to `H`. On a pull clone, move the source row to `y = H − 23`.
 4. Fill the text slots — title, optional subtitle, and the bare `Producer (Year)` source on a pull
    chart. Per SKILL.md Step 6, setting `characters` flattens mixed weights; these slots are
