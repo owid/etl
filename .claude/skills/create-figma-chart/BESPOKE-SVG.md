@@ -162,7 +162,11 @@ widths. `exportBox` reproduces each `viewBox` exactly.
 ### Sizing the export: the container decides, and height may not follow
 
 `--viz-width` sets the width of the mounted container, and **that** is what these components lay out
-from (`useContainerWidth`) — not the viewport. Measured on the food-trade sankey:
+from (`useContainerWidth`) — not the viewport. `--width`/`--height` size the browser window: the width
+reaches the component only indirectly, by changing how wide the demo page's own responsive grid mounts
+it when no `--viz-*` is passed (viewport 1200 → a 727px chart, viewport 800 → 590px), and **`--height`
+does not reach it at all** — `--height 400` still returned a 450px-tall sankey. Measured on the
+food-trade sankey:
 
 | container | SVG |
 |---|---|
@@ -215,7 +219,7 @@ anyone — and two of its steps are actively harmful when the destination is a F
 |---|---|
 | 1 | Nothing to resolve — the file *is* the export. Read the block's `bundle`/`variant`/`config` from the article's gdoc JSON, and the body text from it too if you want annotation content. |
 | 2 | Formats as usual. A wide viz (a sankey) wants Static Horizontal; a tall one, Vertical. |
-| 3 | No `imWidth`/`imHeight`/`imFontSize`. **The puppeteer viewport is the aspect control**, so measure the template band first (Step 7), then render at that aspect. Same ordering as the grapher route, different lever. |
+| 3 | No `imWidth`/`imHeight`/`imFontSize`. **The mounted container is the aspect control — not the viewport**: `--viz-width` and `--viz-height`, plus `--viz-css` when the component pins its height in SCSS. `--height` only resizes the browser window and leaves the chart alone, and a run with no `--viz-*` at all exports the demo grid's own mount at whatever width the page gives it. Measure the template band first (Step 7), then render at that aspect. Same ordering as the grapher route, different lever. |
 | 5 | Ordinary `upload_assets` + the `unwrap` helper. Two SVGs means two imports, positioned from the sidecar's `exportBox` (not `box` — see the viewBox widening above). |
 | 7 | **Fit the WIDTH, not the height** — the reverse of the grapher route. There, you fit height first and close the width with a scripted x-map; a sankey's bands cannot be x-mapped without distorting them, so the width is the constraint and the vertical gap falls out of it (17.3px each side on the wine chart). Expect **one correction after import**: Figma's unwrapped group measured **913** wide against the SVG's declared **889**, because a group's bbox includes stroke extents — so the aspect you solved against the SVG is a few percent off once it lands. Measure the group, then scale. |
 | 8 | Node names are the component's own, derived from its DOM. There is **no `connectors` group** to hide and no `horizontal-grid-lines`, so every named lookup in Steps 7–8 has to be re-derived: `grep -oE 'id="[^"]*"' <file>.svg \| sort -u`. |

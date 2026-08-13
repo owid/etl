@@ -76,10 +76,13 @@ error rather than a silent no-op.
                      '.food-trade-captioned-chart__chart-area{height:896px!important}'
 
 Options:
-  --width <px>       viewport width  (default 1200) -- this is the aspect control
+  --width <px>       viewport width (default 1200), and the default for --viz-width. NOT the
+                     aspect control -- the container above is. Without any --viz-*, this only
+                     changes how wide the demo page's own grid mounts the component
   --config <json>    mount with this config instead of the variant's own demoConfig. On --article
                      it applies only if the page does not hydrate itself
-  --height <px>      viewport height (default 800)
+  --height <px>      viewport height (default 800). Resizes the window only; it does NOT size the
+                     viz -- use --viz-height for that
   --out <dir>        output directory (default .)
   --base <name>      output filename stem (default derived from project/bundle + variant)
   --demo-url <url>   dev server base (default http://localhost:8089)
