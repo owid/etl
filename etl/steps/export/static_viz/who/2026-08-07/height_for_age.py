@@ -209,9 +209,12 @@ DIAGRAM_CHART_GAP = 0.8
 CHART_AREA_TOP = 118
 CHART_AREA_INSET = 14
 
-# Height reserved for the encoding diagram when it sits in the header rather than inside a panel,
-# in template pixels: the slab, plus the row of stunting text below it and the leader reaching it.
-HEADER_DIAGRAM_HEIGHT = 92
+# Height reserved for the encoding diagram when it sits in the header rather than inside a panel, in
+# template pixels: the curve, plus the row of stunting text below it and the leader reaching it. This
+# is a wide row, so the height is what decides whether the miniature reads as a growth curve or as a
+# flat smear -- it buys its extra height from the plot below, not from the frame, since the block's
+# top and bottom are both fixed.
+HEADER_DIAGRAM_HEIGHT = 112
 
 
 def run() -> None:
@@ -698,12 +701,12 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         draw_encoding_diagram(
             diagram_axes,
             body_fontsize - DIAGRAM_FONTSIZE_DROP,
-            left=0.30,
-            right=0.58,
-            middle=0.60,
-            outer_half=0.24,
-            rise=0.30,
-            label_gap=0.05,
+            left=0.33,
+            right=0.57,
+            middle=0.49,
+            outer_half=0.21,
+            rise=0.47,
+            label_gap=0.04,
         )
         chart_top_px = diagram_top_px + HEADER_DIAGRAM_HEIGHT
 
