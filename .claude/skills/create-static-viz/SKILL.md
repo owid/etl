@@ -270,16 +270,47 @@ matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"  # deterministic ids, cl
 - **seaborn** `set_style("ticks")` + `set_palette("deep")`, and reference colors by **palette
   position** (`palette[0]`, `palette[1]`) rather than pinned hexes, so the chart moves with the
   shared palette. seaborn is a `dev` dependency.
-- **Axis treatment follows grapher**, so a static chart reads like our interactive ones. These are
-  read from source, not guessed — `grapher/src/axis/AxisViews.tsx` and `axis/Axis.ts`:
+### Borrow grapher's design language, read from its source
 
-  | Property | Value |
-  |---|---|
-  | Gridlines | **dashed** `4,4`, color `#ddd` (`GRID_LINE_DASH_PATTERN`, `TICK_COLOR`) |
-  | Tick labels | `#5b5b5b` (`GRAPHER_DARK_TEXT` = `GRAY_80`) |
-  | Axis label | **bold** (`fontWeight: 700`) |
-  | Axis line | **none** — the gridlines carry the reading |
-  | x gridlines on a line chart | hidden (grapher sets `hideGridlines` on the x axis) |
+A static chart should read like our interactive ones, so take the axis, tick, facet and reference-line
+treatment from grapher rather than inventing one. Read it out of `owid-grapher`, don't recall it:
+`grapher/src/axis/AxisViews.tsx`, `axis/Axis.ts`, `facet/FacetChart.tsx`, `color/ColorConstants.ts`.
+
+| Property | Value | Source |
+|---|---|---|
+| Gridlines | **dashed** `4,4`, `#ddd` | `GRID_LINE_DASH_PATTERN`, `TICK_COLOR` |
+| Tick labels | `#5b5b5b` | `GRAPHER_DARK_TEXT` = `GRAY_80` |
+| Axis label | **bold** (`fontWeight: 700`) | `Axis.ts` |
+| x-axis tick marks | 5px long, 1px wide, `#999`, hanging below the axis | `HorizontalAxisComponent`; `LineChart` passes `showTickMarks={true}` |
+| Outermost tick labels | anchored **inwards** — `text-anchor` `start` on the first, `end` on the last | `HorizontalAxisComponent` |
+| y-axis line | **none** — the gridlines carry the reading | no component exists |
+| x gridlines on a line chart | hidden | grapher sets `hideGridlines` on the x axis |
+| Facet titles | **bold**, `GRAPHER_DARK_TEXT` (*not* the series color), above the panel, left-aligned with its content, half a line of padding beneath | `FACET_LABEL_FONT_WEIGHT = 700`, `labelPadding = 0.5 * facetLabelFontSize` |
+| Facet title size | about `1 / 0.9` of the tick size — one rank up, not a display size | `facetBaseFontSize = facetLabelFontSize / GRAPHER_FONT_SCALE_12 * 0.9` |
+
+**There is no x-axis-line component, and that is not the same as "grapher has no axis line".** What a
+reader sees along the bottom of a grapher line chart is `VerticalAxisZeroLine` — same `#999`, same
+1px, spanning the plot at y=0 — and the end tick marks continue from it, which is what makes it look
+like an axis closed off with elbows. On a chart whose y-axis does not reach zero there is nothing at
+y=0 to draw, so apply the same treatment to the **baseline** instead, and **pin the x range to the
+outermost ticks** (`set_xlim(first_tick, last_tick)`) so those two marks sit at the ends of the line
+and close it. Leave the y-axis lineless either way.
+
+**Check the source claim against a rendered SVG before you build on it.** Grepping for a component
+that doesn't exist is weak evidence about what the chart *looks like*: it told me grapher draws no
+axis line, when in fact every zero-crossing chart appears to have one. One fetch settles it —
+`curl` a grapher SVG and read the `horizontal-axis` group, which lists exactly `tick-marks` and
+`tick-labels` and nothing else:
+
+```bash
+curl -sL "https://ourworldindata.org/grapher/life-expectancy.svg?country=USA~CHN" -o /tmp/g.svg
+```
+
+**The x range and the label anchoring interact — set the range first.** Anchoring the first tick label
+left will collide with its neighbour while the range still carries padding, because padding compresses
+the left end; pinned to the ticks, the same anchoring has room (measured: 6.7px clear on desktop,
+25px on mobile). So when an anchor "doesn't fit", re-check it after any range change instead of
+concluding it can't be done — and measure the gap rather than eyeballing the render.
 
 - **Nested bands get precomputed flat tints, not alpha.** One `BAND_ALPHA` deepening where the bands
   overlap looks like it gives the fan for free, but an alpha fill has to composite onto *something*,
@@ -307,12 +338,29 @@ within a shape carries meaning — draw a miniature of the real thing and name i
 listing swatches. A legend asks the reader to carry a color across the frame and find the shape it
 belongs to; an exemplar shows the structure directly, in the order it appears.
 
+**Shape the miniature like the chart, not like a swatch.** A flat slab still asks the reader to map a
+rectangle onto a rising ribbon; a miniature that curves the way the real marks curve is recognised
+without that step. Draw it as a **schematic, not a data slice** — at the real proportions the marks
+are a few pixels apart where the labels have to attach (3–5px at the last age, on this chart), so widen
+the bands until the parts separate, and keep only the relationships that carry meaning (which band is
+inside which, and where the threshold falls between them).
+
 Conventions that make one legible:
 
 - **A span gets a bracket; a line gets a label.** A tick pointing at a band's boundary invites the
   reader to take that boundary as the thing being named. Bracket the band's full height instead.
+- **Nested brackets: put the *bigger* one nearer the marks.** Both bands share a midpoint, so the two
+  brackets sit at different x, and the labels have to clear whichever bracket is further out. With the
+  small bracket nearer, the label for it must start right of the big bracket — landing in the same
+  column as the other label, which is exactly what makes a reader think both point at one bracket.
+  Big-first, each label sits immediately beside its own bracket at its own x. Label the big bracket at
+  its **top arm** and the small one at its **middle**.
 - **A leader only where a label cannot sit next to the thing it names.** Adjacency reads faster
-  than a line to follow, and it is one less thing to route around.
+  than a line to follow, and it is one less thing to route around. A bracket plus a separate leader
+  reads as scaffolding — two lines meeting at a corner where the cap already turns the other way — so
+  if a leader is unavoidable, make it one continuous polyline with the bracket rather than a second
+  stroke, and take the geometry as the fix rather than the weight: "not clear enough" about a leader is
+  usually about its shape, and making it heavier makes it worse.
 - **Moving a label buys width.** Beside a shape a label is boxed in by whatever else is beside it;
   below the shape it usually has the full frame. That is often the difference between one row and
   three — and three rows of explanation reads as a paragraph, not a label.
@@ -337,12 +385,17 @@ a wide-and-short block fits there comfortably. Give it its own frameless axes
 (`fig.add_axes(...)`, `set_axis_off()`, `patch.set_visible(False)` so the transparent SVG stays
 transparent) and reuse the same drawing code.
 
-Two traps when the same drawing serves two hosts:
+Three traps when the same drawing serves two hosts:
 
 - **Fractional offsets do not survive a change of host.** A `0.03` gap is 10 px in a 347 px panel
   and 2 px in a 76 px strip. Any offset that has to look the same in both must be a parameter.
 - **Text does not scale with the box.** Shrinking a container shrinks its shapes but not its
   absolute-point-size labels, so a block that fits at one size overflows at another.
+- **A wide, short host flattens the drawing, and height is what fixes it.** The same miniature that
+  read as a curve in a near-square panel came out 142px wide against 72px of ink in a 92px header row
+  and lost the shape it exists to convey. Compare the host's aspect against the one the drawing was
+  tuned for, and buy the height from **inside** the block's own budget — where the block's top and
+  bottom are both fixed, a taller key costs plot height and leaves the frame's fit untouched.
 
 ### Text slots — take them from the template
 
