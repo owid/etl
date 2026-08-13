@@ -299,6 +299,68 @@ Two rules from SKILL.md Step 3 **do not apply here**, and both would cost a re-e
   exactly where the export put it. Elsewhere this skill goes to some length to avoid a rescale; here
   it is free.
 
+### The labeling policy — what gets a label, and what it says
+
+The rule underneath every case: **name whatever distinguishes the series, and nothing else.** If the
+series differ by entity, label the entity; if they differ by indicator, label the indicator's display
+name; if there is only one series, name nothing and let the values carry it. The entity name on a
+single-entity chart is pure overhead at 302px.
+
+| Chart | What distinguishes the series | Label with | `imMinimal` |
+|---|---|---|---|
+| Several entities, one indicator | the entity | entity name, **bold, in the line's own color** | `0` |
+| One entity, one indicator | nothing | no name at all — first and last **values** only | **`1`** |
+| One entity, several indicators | the indicator | the indicator's **display name**, placed away from the values | **`1`** |
+| Several entities *and* indicators | both | reconsider the chart — it is too much for 302px |
+
+`imMinimal=1` is the mechanism for rows two and three, and it does exactly the right thing: it drops
+the entity name **and** emits the first *and* last value per series. Verified —
+`imMinimal=0` on a single-country line gives `1913 | 2024 | United States | 9.9%`, while `imMinimal=1`
+gives `1913 | 2024 | 9.2% | 9.9%`. On the three-series MDim it replaces `World - Poorest decile` /
+`World - Richest decile` with `$1.22 | $36.79 | $3 | $9.65 | $55.51`. The display names then get added
+in Figma, positioned away from the value labels so the two roles stay legible.
+
+**Always label the first and last value of each line**, not just the last. `imMinimal=1` gives both;
+where you are on `imMinimal=0` (several entities) grapher labels only the end, so the start values are
+added in Figma.
+
+**Never carry grapher's `<name> - <indicator>` compound into the frame.** An MDim emits
+`World - Richest decile`; the label should read `Richest decile`, since "World" is the only entity and
+therefore distinguishes nothing.
+
+### Value labels are centered on the mark they name
+
+**This applies everywhere in this skill, not only at 302px** — bar values on their bars, end-of-line
+values on their dots, legend labels on their swatches. Grapher positions text by baseline, so an
+imported label sits high by construction and the drift is uniform, which makes it read as deliberate
+rather than wrong. The recipe is in SKILL.md Step 7: `leadingTrim = "CAP_HEIGHT"` to shrink the line
+box to the ink, then `label.y = markCenter − label.height / 2`. Step 8c's *Label alignment* check is
+the gate.
+
+### A ranked bar puts the year under the entity name, not after the value
+
+Grapher folds a per-row year into the value — `25.8% in 2022` — which spends horizontal space on
+repeated words and pushes the value column right. Split it: the **entity name** on one line with the
+**year beneath it** in the label column (Lato Bold 11px `#2d2e2d` over Lato Regular 11px `#5b5b5b`,
+right-aligned), and the bare value beside the bar. That is what the reference does, and the reclaimed
+width goes to the bars.
+
+### The y-axis minimum is not yours to set, and it matters here
+
+A zero-based axis compresses a narrow series into a corner of the frame, which is much more visible at
+302px than at 850. Measured on the Gini chart: pairing its labeled end dots with their values gives
+−347.8 px per unit, which puts value 0 at y≈145.5 against a plot bottom of ~148 — i.e. **zero-based**,
+with the whole 0.25–0.39 range squeezed into the top quarter. The reference uses a tight range and
+fills the height.
+
+**There is no URL parameter for this.** `GrapherQueryParams` is `country`, `focus`, `tab`, `overlay`,
+`stackMode`, `zoomToSelection`, `xScale`, `yScale`, `time`, `region`, `endpointsOnly`, `facet`,
+`uniformYAxis`, … — and `yScale` is linear-vs-log, not bounds. The minimum lives in the chart config
+(`yAxis.min`), so it is **the chart author's to change**, exactly like sort order and entity selection
+(SKILL.md Step 8b). Two routes: ask for the chart config to change, or point a draft chart with
+`yAxis.min` set and export it through `by-uuid/<configId>.svg`. Do **not** fake it by cropping or
+stretching the imported plot — the image would stop matching the view its `url:` navigates to.
+
 ### Comparing two values of one dimension: two exports, one frame
 
 House practice for a chart like *"US income share: top 1% vs. top 0.1%"* is to export **each MDim view
