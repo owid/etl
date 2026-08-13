@@ -45,6 +45,7 @@ The DI Charts Guidelines file (`8gxqkVmZ9x3MK3ky5oigrJ`) is the source of truth 
 ## Inputs
 
 - **A chart reference**, in any of the forms of the Step 1 table. If the user only describes the chart ("the life expectancy chart with just the US and China"), resolve candidates first and confirm.
+- **Or a local SVG already on disk** — typically `etl/steps/export/static_viz/<ns>/<version>/<name>.svg`, emitted by an `export://static_viz` step and handed over by [`/create-static-viz`](../create-static-viz/SKILL.md). Its texts are already baked in and its frame already matches a template, so Step 1's text sourcing and Step 3's export both fall away. See the local-SVG notes in those steps.
 - Optionally, **the DI/article text** the chart accompanies — the best source for annotation content. Ask for it if annotations are wanted and it exists.
 - Optionally, **a link to a finished page in the file to work like** (see below).
 - Everything else (formats, credit, slug, topic link) is collected once in Step 2.
@@ -89,6 +90,7 @@ Get an SVG URL for the chart, whatever form the reference takes:
 | Narrative chart (**admin link with a numeric id**, `/admin/narrative-charts/<id>/edit`) | **Try the direct lookup first** — `select id, name, chartConfigId from narrative_charts where id = <id>` on the public Datasette hands you the uuid outright (note the column is `chartConfigId`, not `configId`). Only when the id isn't mirrored yet do you need the guessing route below. |
 | … the same, when the id is **newer than the Datasette mirror** | there is no id→uuid endpoint, and the mirror lags production by days (it once stopped at 338 while 341 existed). Diff the live name-keyed map against `select name from narrative_charts` to get the unmirrored names, then order them by uuid — they are **uuidv7, so lexical order is creation order** — and count up from the mirror's highest id. That gives a *candidate*, not an answer: ids have gaps where charts were deleted. **Always render the candidate and have the user confirm it before building.** In practice the **name is a far stronger signal than the id arithmetic** — these are named after the piece they serve (`share-of-women-in-parliament-di`), so an unmirrored name matching the DI's topic, *and* carrying the highest uuid, is near-certain. Note the DI page itself is not a reliable route: an older published DI can have `linkedNarrativeCharts: {}` because it ships a hand-made PNG, so the narrative chart you were handed may be newer than the post. Its embedded JSON is still worth reading for `grapher-url`, `authors` and the body text you need in Step 2. |
 | Description only | find candidates via site search (`https://ourworldindata.org/search?q=...`) or a Datasette title match; show the candidates and confirm before proceeding |
+| **Local SVG on disk** (from an `export://static_viz` step) | nothing to resolve — the file *is* the export. Skip the whole texts table below: an ETL step bakes its title, subtitle, `Note:`, `Data source:` and license line into the SVG, building the source string from the indicator's `origins` rather than from `chart.citation`. Read the strings straight out of the file if you need them (`grep -o '<text[^>]*>[^<]*' <file>.svg`), and take the frame's target template from the step, which already sized the figure to it. |
 
 Then pull the chart's texts, which seed the template texts in Step 6. Read them from **`.metadata.json`**, not `.config.json`, and **keep the view's query params on the request** — `.../energy-mix.metadata.json?metric=per_capita&source=coal` resolves the selected MDim view exactly as the `.svg` request does:
 
@@ -150,6 +152,17 @@ One `AskUserQuestion` batch — don't drip-feed:
 7. **Slug** for the final frame — short, kebab-case (`child-mortality-asia-decline`). It becomes the PNG filename when the frame is exported for the website. Propose one; let the user override.
 
 ## Step 3 — Export the SVGs
+
+> **Local SVG on disk: there is nothing to export.** When the input is a file from an
+> `export://static_viz` step, skip this whole step. The step chose its own `figsize` to match a
+> template's proportions, so none of the `imType` / `imFontSize` / `imWidth` aspect solving below
+> applies, and there is no chart-only "embed" to export — the file already *is* the framed chart,
+> carrying its own title, subtitle, `Note:`, `Data source:` and license at that template's own slot
+> positions. So the two assets below come from the step's own output rather than from a `curl`: the
+> **PNG** it emits beside the SVG is the flat reference copy for the page, and the **SVG** is what
+> goes into the template clone. `upload_assets` takes a local path unchanged. Then follow the
+> local-SVG route in Steps 5 and 7 — it replaces the measure-solve-export-fit ordering entirely,
+> because a frame that already matches the template has nothing left to solve.
 
 Two exports per format family: the **original** (placed on the page as the reference copy) and the **embed** (chart area only, placed inside the template).
 
@@ -244,6 +257,15 @@ const unwrap = (imported, parent, name) => {        // parent = the page (origin
 };
 ```
 
+> **Local-SVG route.** Two imports, and neither is an embed: place the step's **PNG** on the page as
+> the left-hand reference copy, and unwrap the **SVG** straight into the template clone here in Step 5
+> rather than waiting for a band measurement in Step 7. Waiting buys nothing — the SVG's frame already
+> carries the template's *aspect*, so there is no aspect to solve against the header and footer. It
+> does not arrive at the template's *size*, though: Step 7 still owes it one uniform rescale to the
+> clone's width. Keep the clone, too: the SVG's text is matplotlib's, not in the file's bound
+> Lato/serif styles, so Step 6 still fills the template's own slots and Step 7 then drops the SVG's
+> duplicate text nodes.
+
 ## Step 6 — Fill the template texts
 
 Replace the lorem-ipsum text nodes in the cloned template. Source everything from the chart config (Step 1) and the user's answers (Step 2):
@@ -298,6 +320,51 @@ The chart spans the full content width, left-aligned with the title/subtitle/log
 
 **This is where the embed arrives.** The band's edges — `headerBottom` and `footerTop` — don't depend on the chart, so read them first, solve the export aspect against that band (Step 3), *then* export the embed, import it, and unwrap it into the template clone with the `unwrap` helper from Step 5. Fitting comes after. That ordering is the whole reason the embed waited this long.
 
+> **Local-SVG route: nothing is *fitted*, but it still has to be scaled.** The SVG came in at Step 5
+> and it is a full frame, not a chart area — importing it into the band would nest the whole
+> visualization, title and footer included, inside the template's chart slot. Align it to the clone's
+> own origin instead — `svg.x = 0; svg.y = 0`, since `unwrap` made the clone its parent and a child's
+> `x`/`y` are frame-relative (which is why the fit below reads `chart.x = header.x` and not a page
+> coordinate).
+>
+> **Its *proportions* come from `TEMPLATES.md`; its *size* does not — so scale it to the clone's width
+> before trusting any of it.** The `figsize = (width_px / 100, height_px / 100)` recipe fixes the
+> aspect ratio, not the canvas: matplotlib writes the root in **points**, and a template pixel is
+> 0.72 pt, so the 850 × 638 horizontal frame arrives as `width="612pt" height="459.36pt"`. Figma then
+> reads those points at the CSS 96 px per inch, so the import lands at 816 × 612.48 — the figure was
+> drawn at 100 template px to the inch and Figma renders it at 96, leaving every slot position and font
+> size 96% of target. One uniform rescale to the clone's width puts all of it right at once, and the
+> height lands on the clone's by construction because the ratio already matches:
+>
+> ```js
+> svg.rescale(clone.width / svg.width)          // 850 / 816 = 1.0417 = 100 / 96
+> // then assert the height, which is what proves the step used the template's ratio
+> console.assert(Math.abs(svg.height - clone.height) < 1, svg.height, clone.height);
+> ```
+>
+> A height that misses tells you the step cropped the canvas rather than that the scale went wrong —
+> send it back to `verify_static_viz.py --template`, which now measures the SVG root and not only the
+> PNG. What you *do* skip is the band measurement, the ladder pick and the x-map below: those exist to
+> reconcile an export whose proportions were chosen by grapher, and this one's were chosen from
+> `TEMPLATES.md`. The scale is the one piece of the fit the route still needs.
+>
+> What *does* happen here is stripping whatever the template already provides. **The background comes
+> first, and it is the one that ruins the page.** matplotlib fills the figure and axes patches white
+> unless the step turned them off, so the import can carry a frame-sized opaque rectangle (`patch_1`,
+> plus a plot-sized `patch_2`) that lands *above* the clone's cream background, logo and text and
+> hides all three. They are their own groups, so removing the duplicate text does not uncover them —
+> delete them explicitly, before anything else. A step written to the current contract emits
+> `fill: none`; an older one will not, so check rather than assume.
+>
+> **Then the duplicate text:** Step 6 filled the template's slots in the file's bound styles, so
+> delete the text groups the step named — `title`, `subtitle`, `note`, `data-source`, `tagline`,
+> `license`, whichever of them it emitted — leaving only the plotted marks and the in-chart labels.
+> **The footer rows are the easy ones to miss**, because the template's own license line sits under the
+> same ink: leave the step's behind and the page carries two, in matplotlib's font. Mobile emits fewer
+> of these groups (no `note`, no `tagline`) but still emits `license`. Verify both
+> deletions by name rather than by position; the template's own slots sit at the same coordinates, and
+> deleting the wrong one of an overlapping pair is invisible in a screenshot.
+
 **Measure that band; don't hardcode it.** The header's height depends on how many lines the title and subtitle take, so a fixed y is wrong as soon as the subtitle wraps — and centering inside a guessed band leaves a lopsided result (18px above, 6px below on the first run of this skill). Read the real edges instead:
 
 ```js
@@ -332,7 +399,7 @@ Then place the y tick labels at `plotLeft − 6 − t.width` and re-anchor each 
 
 **How much gap is right: 14px, and 12–16 is the comfortable band.** That's what the finished pages and grapher itself converge on, measured in 540-wide frames — grapher's own square export leaves 13px above the plot and 14px below; recent DI pages in the file sit at 14/19, 15/14 and 7/15. Below ~10px it reads cramped and the legend starts to look like part of the subtitle; above ~20px you are wasting space the plot could use. When the chart comes out a few pixels too tall, spend the slack down to 12px a side **before** shrinking it — that is usually enough, and it keeps the full content width, which matters more than the last pixel of gap.
 
-**The 12–16 band assumes the chart group still contains its axis furniture — once you measure the group tightly, the same picture reports a much bigger gap.** Trimming the dangling reference lines and hugging the label boxes to the ink (Step 8) removes ~10–25px of invisible slack from the group's bounding box without moving a single pixel of ink, and the gap number jumps: **20px** on a 14-row bar chart, **30px** on a 4-row one, both of which look wrong against the band and are in fact correct. The tell is that the equivalent measurement on the reference page agrees (17/19 and ~32/33 there). So on an axis-less chart — a discrete bar chart with every value labelled — measure the gap on the reference too and match *that*, and record the figure with a note that the group is tightly measured. Do not shrink a correct chart to force a number.
+**The 12–16 band assumes the chart group still contains its axis furniture — once you measure the group tightly, the same picture reports a much bigger gap.** Trimming the dangling reference lines and hugging the label boxes to the ink (Step 8) removes ~10–25px of invisible slack from the group's bounding box without moving a single pixel of ink, and the gap number jumps: **20px** on a 14-row bar chart, **30px** on a 4-row one, both of which look wrong against the band and are in fact correct. The tell is that the equivalent measurement on the reference page agrees (17/19 and ~32/33 there). So on an axis-less chart — a discrete bar chart with every value labeled — measure the gap on the reference too and match *that*, and record the figure with a note that the group is tightly measured. Do not shrink a correct chart to force a number.
 
 **A reference line wants a small overhang past the bars — bounded, and symmetric.** Grapher's plot area is taller than the bars it contains, so the inherited `vertical-zero-line` runs well past the last bar and reads as pointing at the footer; a reviewer described it as "going down and even overlapping the data source". But **trimming it flush to the bars is the other error** — the overhang is the design, and cutting it makes the baseline look clipped. Give it about **4px each way**, and let a guide line you add yourself lead in a little higher (~12px) so it reads as annotation rather than as part of the axis, ending level with the zero line:
 
@@ -349,7 +416,7 @@ Then state the clearance from the line's bottom to the source row in the report 
 
 **A GROUP's `x`/`y`/`width` are derived from its contents, so they move whenever you edit a label.** Rounding four value labels and dropping them from 15.75px to 14px silently walked a perfectly fitted chart from `x=16, w=508` to `x=18, w=505` — the group shrank around its narrower content and Figma re-origined it. So **assert the box after the last content edit, not after the fit**, and close any residual gap by re-laying out the plot (below), never by another `rescale()`, which would undo the font sizes you just set.
 
-**When the plot and its legend are separate elements, the gap between them is its own decision — and a minimal one is wrong.** A legend strip sitting 16px under a map reads as part of the graphic, a caption bar welded to the bottom edge, rather than as a key you consult; the coastline and the colour band start competing. **26px on a 540-wide frame** is what worked here. But don't take grapher's lead and over-correct: its own square export leaves ~57px, which detaches the legend and lets it drift toward the source line. The rule that settles it is **proximity as grouping — map→legend must stay clearly smaller than legend→footer** (26 against 45 here), so the key reads as belonging to the chart and the footer reads as separate.
+**When the plot and its legend are separate elements, the gap between them is its own decision — and a minimal one is wrong.** A legend strip sitting 16px under a map reads as part of the graphic, a caption bar welded to the bottom edge, rather than as a key you consult; the coastline and the color band start competing. **26px on a 540-wide frame** is what worked here. But don't take grapher's lead and over-correct: its own square export leaves ~57px, which detaches the legend and lets it drift toward the source line. The rule that settles it is **proximity as grouping — map→legend must stay clearly smaller than legend→footer** (26 against 45 here), so the key reads as belonging to the chart and the footer reads as separate.
 
 **And where the slack goes is a design decision, not a residue.** A chart that cannot fill the band — a wide map in a square frame — leaves a fixed surplus (≈116px here) to distribute across three gaps, and "centre the block and leave the middle minimal" is a choice you made by default rather than on purpose. Take an increase in the internal gap out of the **outer** gaps, never out of the chart: the plot keeps its full size and the frame stays symmetric.
 
@@ -549,7 +616,7 @@ The high-value edits to propose (include them in the Step 4 proposal):
 
   **On a map, also measure how much of each leader is visible before it hits a filled shape** — a 1px gray line over a mid-blue country is effectively invisible, and optimising for the *shortest* leader actively causes it, because the shortest position hugs the coast. The case to fix is the long-and-buried one: a 31px leader entirely over a continent, where pushing the label out to sea bought ~17px of visible line for 8px of extra length. A **short** leader reads fine even fully over land, because it starts at the label and lands immediately. Judge it; don't gate on it.
 
-  **But measure it on pixels, not on boxes — this is where the bbox model flips from safe to wrong.** The same subpath-bbox model is *conservative* for placement (it over-states land, so it never puts a label on a country) and therefore *false-alarming* for visibility (it reports a line as buried when it is over open water). A diagonal country is the killer: Mexico's bbox swallows a wedge of open Pacific off its west coast, so a leader crossing that ocean scored **0% visible** when the render shows **45%**. Get ground truth by sampling the rendered PNG — `get_screenshot` the frame, then read pixels **perpendicular** to the line (±2–3px for a 1px stroke, less for a hairline — the offset is derived below, and its job is to clear the leader's own stroke without answering for the next shape over) and count how many are the canvas colour:
+  **But measure it on pixels, not on boxes — this is where the bbox model flips from safe to wrong.** The same subpath-bbox model is *conservative* for placement (it over-states land, so it never puts a label on a country) and therefore *false-alarming* for visibility (it reports a line as buried when it is over open water). A diagonal country is the killer: Mexico's bbox swallows a wedge of open Pacific off its west coast, so a leader crossing that ocean scored **0% visible** when the render shows **45%**. Get ground truth by sampling the rendered PNG — `get_screenshot` the frame, then read pixels **perpendicular** to the line (±2–3px for a 1px stroke, less for a hairline — the offset is derived below, and its job is to clear the leader's own stroke without answering for the next shape over) and count how many are the canvas color:
 
   **Scale the coordinates into the raster first — the screenshot is usually not 1:1.** `get_screenshot` honours `maxDimension`, and the size worth exporting is well above the frame's own units (2160 for a 540 frame is 4×), so leader endpoints and the perpendicular offset are in *frame* units while `px` is indexed in *raster* pixels. Feed one to the other unconverted and you sample somewhere else entirely — which is the same false verdict this check exists to remove, arriving by a different route. Derive the factor from the image rather than assuming the one you asked for, and round: Pillow truncates a float index silently, so a half-pixel offset lands a pixel short on one side and not the other.
 
@@ -570,7 +637,7 @@ The high-value edits to propose (include them in the Step 4 proposal):
               for x, y in samples_along(sx * s, sy * s, tx * s, ty * s))
   ```
 
-  **Compare against the canvas colour with a tolerance, never `== CANVAS`.** This is the line that decides whether any of the rest works. The leader is antialiased, so the pixels beside it are blends of stroke and canvas, and exact equality reads them as "not canvas" — i.e. as land. Measured on a synthetic 4× render of a leader that is **71.4% over open canvas**: exact equality returns **41.5%**, a 30-point false *buried*. The same code with a tolerance of 8 per channel returns **71.6%**, and stays within a point of the truth at 1×, 2× and 4×. Tolerance also makes the result insensitive to the offset, which is what you want from a measurement.
+  **Compare against the canvas color with a tolerance, never `== CANVAS`.** This is the line that decides whether any of the rest works. The leader is antialiased, so the pixels beside it are blends of stroke and canvas, and exact equality reads them as "not canvas" — i.e. as land. Measured on a synthetic 4× render of a leader that is **71.4% over open canvas**: exact equality returns **41.5%**, a 30-point false *buried*. The same code with a tolerance of 8 per channel returns **71.6%**, and stays within a point of the truth at 1×, 2× and 4×. Tolerance also makes the result insensitive to the offset, which is what you want from a measurement.
 
   **Scale the perpendicular offset with `s` *and* with the stroke; a fixed constant fails silently at high `s`.** The offset exists to clear the leader's own stroke, and the stroke's rendered footprint grows with the raster — at 4× a 1px stroke covers 4px plus its antialiasing fringe, so an offset of 4px is still inside the line and reports it buried. `2.5 × s` clears a **1px** stroke at every scale tested — but that is `2.5 × w × s`, and the house map leader is **0.3px**, where the same number samples 2.5 frame units out into the map and, along a narrow coast or a small island, answers for different geography than the pixel under the line. Take `w` from the node. Floor it at ~2 *raster* pixels, which is roughly where the antialiasing fringe ends: an offset proportional to a sub-pixel stroke alone sits *inside* the fringe, which the tolerance paragraph below measures as a 30-point false *buried*. The 1px figures here are measured; the hairline floor is reasoned from them, so check one leader you can see on the render before trusting a sweep. Stepping matters less but is free: step `samples_along` one *raster* pixel, since one frame unit on a 4× raster reads every fourth pixel.
 
@@ -897,6 +964,12 @@ Two habits make the difference. **Assert, don't eyeball** — a 1.2px label drif
 - **A sweep over mixed node types must guard every property read.** `dashPattern`, `strokes` and `fills` don't exist on `GROUP`, so one un-guarded read aborts the whole script — and `use_figma` is atomic, so you lose the entire pass, not just that node. Wrap each read in its own `try`, and remember `fontSize`/`fontName`/`lineHeight` can come back as `figma.mixed` rather than a value.
 - **To draw a dashed leader or guide line, create a VECTOR with an explicit path** — `figma.createLine()` gives you a horizontal line you then have to rotate, which is fiddly to place. `v.vectorPaths = [{windingRule:"NONE", data:`M 0 0 L 0 ${len}`}]` then `v.dashPattern = [2,2]` is exact and needs no rotation math.
 - **The line-chart export's group names are `text-labels`, `connectors`, `lines`, `datapoints__<Entity>`, `outline__<Entity>`, `tick-marks`, `horizontal-grid-lines`** — worth knowing before you go hunting, and worth re-checking per chart type, since the tree is grapher's and it changes.
+- **A local SVG from an `export://static_viz` step has none of those names.** matplotlib names its own nodes `figure_1` / `axes_1` / `line2d_3`, and the step supplies meaningful ones through `gid=` — `<subject>__<role>`, e.g. `boys__median`, `girls__stunting-threshold`, plus `title` / `subtitle` / `note` / `data-source` / `tagline` / `license` on the text blocks. So every named-group lookup in Steps 7–8 needs the step's own scheme, which `/create-static-viz` hands over with the file; enumerate the ids from the SVG if it doesn't (`grep -oE 'id="[a-z0-9_-]+"'`). Two consequences: there is no `connectors` group to hide, because a matplotlib chart has no elbow leaders to begin with; and the x-map stretch in Step 7 is unnecessary, because the step already drew the frame at the template's aspect — though it still needs the single uniform rescale to the template's *size*, which the aspect does not give you (Step 7).
+- **Restyling an imported chart's text to Lato: enumerate the ranks, don't bucket by threshold.** A size map like `size > 13 ? 14 : 12` silently collapses two ranks into one — 16px facet titles landed at 14px alongside the tick labels, erasing a distinction grapher makes deliberately. Write the map from the ranks you expect to see (facet title / ticks / annotation), then assert the resulting size histogram has that many entries. Same for weight: a sweep that sets one `fontName` for every node strips bold from whatever had it (the facet titles and the axis label both), so drive it off a set of the strings that are bold rather than off a single default.
+- **Never patch a node's absolute `x`/`y` in a later call from anchors recorded before a fit.** Fitting moves the whole chart group, so anchors captured at import time are stale by that delta the moment the fit runs — reapplying them yanks those nodes back out of the group and the bbox explodes (a 635px chart reported 878px, and its band gap went negative). Re-anchor and fit **in one call**, in that order. If a later change is needed, rebuild the working copy from the untouched reference on the page rather than patching coordinates.
+- **Bind the series color as a library style; derive the band tints from it.** `setStrokeStyleIdAsync` for a line, `setFillStyleIdAsync` for a fill — and note the gid names an SVG **group**, not the vector, so descend to the `VECTOR` children first (`node.query('VECTOR')`) or the setter throws `no such property on GROUP`. The library carries no tints, so a banded chart's fills stay computed blends of the bound color towards white; record that as an accepted deviation from "every fill is a bound style", same as text fills.
+- **Choose between candidate palette pairs on grayscale separation, not ΔE alone — then ask whether it gates.** Every plausible two-color pair clears the ΔE 20 bar comfortably (70–100 here), so the number that actually differs between candidates is the grayscale seam: `Camel`/`Denim` 1.86:1 against `Copper`/`Blue` 1.18:1. But the seam only *gates* when the reader has to tell the colors apart. With the two series in separate, text-titled facets, nothing depends on it, which is why `Rusty Orange`/`Denim` at 1.14:1 is fine here. Report the figure either way.
+- **A step's desktop and mobile SVGs are meant to stay paired**, so a hand edit to one is almost always an edit to both. `/create-static-viz` builds them from one code path precisely so their explanatory blocks match — the `diagram__*` layers, the same label wording, the same conventions. Landing a wording or styling change in only one frame silently breaks the pairing, so make the change twice, then crop both frames side by side and compare. Anything worth doing to both is worth pushing back into the step instead.
 - **Raising `imFontSize` makes grapher drop labels it can no longer fit.** Bigger type means narrow segments lose their value entirely — Brazil's 7.3% fish label vanished between two exports, and a chart can come back with fewer labels than the one you measured. After changing the font size, check that the specific values an annotation or a recommendation relies on are still present.
 - **The Plugin API's shape is not uniform, and guessing costs a round trip.** `figma.getLocalVariableCollectionsAsync` does not exist — variables live under `figma.variables.*`, and this file has paint and text styles but **no color variables at all**, so a variables sweep comes back empty and means nothing. The range setters are **synchronous** (`setRangeFontName`, `setRangeFillStyleId`) while the node-level ones are async (`setFillStyleIdAsync`, `setTextStyleIdAsync`); `setRangeFontNameAsync` is not a method. Read the typings rather than pattern-matching the `Async` suffix.
 - **The SVG import renames nodes: spaces become hyphens.** A category displayed as "Beef and buffalo" is the node `Beef-and-buffalo`, so `query('[name=Beef and buffalo]')` finds nothing while the legend text still reads with spaces. Query by the hyphenated node name and map to the label text explicitly — that mismatch is also why the legend has to be paired by geometry rather than by name.
