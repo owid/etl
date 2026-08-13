@@ -617,9 +617,6 @@
                       "type": "string"
                     },
                     {
-                      "type": "null"
-                    },
-                    {
                       "type": "array",
                       "items": {
                         "oneOf": [
@@ -675,10 +672,7 @@
                 },
                 "description_processing": {
                   "title": "Indicator's processing description",
-                  "type": [
-                    "string",
-                    "null"
-                  ],
+                  "type": "string",
                   "description": "Relevant information about the processing of the indicator done by OWID.",
                   "requirement_level": "required (if applicable)",
                   "guidelines": [
@@ -708,10 +702,7 @@
                 },
                 "description_from_producer": {
                   "title": "Indicator's description given by the producer",
-                  "type": [
-                    "string",
-                    "null"
-                  ],
+                  "type": "string",
                   "description": "Description of the indicator written by the producer, if any was given.",
                   "requirement_level": "recommended (if existing)",
                   "guidelines": [

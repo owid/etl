@@ -23,6 +23,16 @@ TWH_TO_KWH = 1e9
 # Countries whose data have to be removed since they were identified as outliers.
 OUTLIERS = ["Gibraltar"]
 
+# Indicators that must not carry the producer's description, because it describes only one of the
+# inputs that go into them (see where this is applied, at the end of run()).
+COLUMNS_WITHOUT_PRODUCER_DESCRIPTION = [
+    "low_carbon_energy_annual_change_pct",
+    "low_carbon_energy_annual_change_twh",
+    "low_carbon_energy_per_capita_kwh",
+    "low_carbon_energy_twh",
+    "total_energy_supply_per_gdp_kwh_per_dollar",
+]
+
 # Base TES sources taken directly from the Statistical Review (SR garden column -> short source name).
 SR_SOURCES = {
     "coal_consumption_twh": "coal",
@@ -474,6 +484,12 @@ def run() -> None:
     # from this step's own meta.yml, which is applied on save.
     for column in tb.columns:
         tb[column].m.description_key = []
+
+    # For the same reason, drop the producer's description where it describes only one input:
+    # low-carbon energy sums nuclear and renewables, whose constituents the Statistical Review
+    # describes differently, and energy per GDP divides its energy by another producer's GDP.
+    for column in COLUMNS_WITHOUT_PRODUCER_DESCRIPTION:
+        tb[column].m.description_from_producer = None
 
     # Format table conveniently.
     tb = tb.format(sort_columns=True, short_name=paths.short_name)
