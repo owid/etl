@@ -1961,6 +1961,42 @@ def sanity_check_custom_units(tb_wide: Table, ds_garden: Dataset) -> None:
             )
 
 
+# FAOSTAT reports the USSR as a single entity until 1991, and its fifteen successor states separately from 1992.
+# In OWID region aggregates, the USSR is counted entirely inside Europe and Upper-middle-income countries, so the
+# aggregates of continents and income groups jump abruptly between 1991 and 1992, when its area is redistributed
+# among the successor states' regions.
+# Item codes in faostat_rl with USSR data (hence affected by this issue in their OWID region aggregates).
+USSR_BREAKUP_AFFECTED_ITEM_CODES_RL = {
+    # Items with USSR data from 1961 to 1991.
+    "00006600",  # Country area
+    "00006601",  # Land area
+    "00006602",  # Agriculture
+    "00006610",  # Agricultural land
+    "00006620",  # Cropland
+    "00006621",  # Arable land
+    "00006650",  # Permanent crops
+    "00006655",  # Permanent meadows and pastures
+    "00006680",  # Inland waters
+    "00006690",  # Land area equipped for irrigation
+    # Items with USSR data from 1990 to 1991 (the jump mostly affects income groups).
+    "00006646",  # Forest land
+    "00006670",  # Other land
+    "00006714",  # Primary forest
+    "00006716",  # Planted forest
+    "00006717",  # Naturally regenerating forest
+}
+# Annotations shown next to the affected entities in charts (only rendered when one of these entities is selected).
+USSR_BREAKUP_ENTITY_ANNOTATIONS = "\n".join(
+    [
+        "Europe: Includes all of the former USSR before 1992",
+        "Asia: Excludes all of the former USSR before 1992",
+        "High-income countries: Excludes the former USSR before 1992",
+        "Upper-middle-income countries: Includes all of the former USSR before 1992",
+        "Lower-middle-income countries: Excludes the former USSR before 1992",
+    ]
+)
+
+
 def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
     # Improve metadata in wide table (this, unfortunately, cannot easily be achieved in the long table).
     # def prepare_public_titles(item: str, element: str, unit: str) -> str:
@@ -2396,6 +2432,14 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             tb_wide[column].metadata.presentation.grapher_config = {
                 "note": "FAOSTAT applies a methodological change from the year 2010 onwards."
             }
+
+        if (
+            (dataset_short_name == "faostat_rl")
+            and (element_code in ["005110", "5110pc"])
+            and (item_code in USSR_BREAKUP_AFFECTED_ITEM_CODES_RL)
+        ):
+            # Annotate the region aggregates affected by the redistribution of the USSR among its successor states.
+            tb_wide[column].display["entityAnnotationsMap"] = USSR_BREAKUP_ENTITY_ANNOTATIONS
 
         # Update metadata.
         tb_wide[column].display["name"] = display_name
