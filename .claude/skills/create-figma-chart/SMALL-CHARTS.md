@@ -232,15 +232,34 @@ delete, no axis to remove, no rescale — not the labeling.
 
 ### Request the final pixel size directly
 
-`getThumbnailOptions` sets `staticBounds = Bounds(0, 0, imWidth / 4, imHeight / 4)`. So:
+`getThumbnailOptions` sets `staticBounds = Bounds(0, 0, imWidth / 4, imHeight / 4)`, so `imWidth`
+gives you the SVG **canvas** width exactly: `imWidth=1208&imHeight=664` returns
+`viewBox="0 0 302 166"`. Defaults with neither param are 1200×640 → a 300×160 SVG.
+
+**But target the content width, not the frame width — grapher insets the drawing inside the canvas.**
+Measured at `imFontSize=16`: a 302-wide canvas puts its ink at x 7.2 … 294.2, i.e. **~7.2px of padding
+per side**, which lands outside the template's 12 … 290 content box at both ends. Asking for the frame
+width and placing at `x=12` overflows the right margin; placing at `x=0` leaves a 7px margin where the
+template wants 12.
+
+So solve for the canvas whose *ink* is 278 wide:
 
 ```
-imWidth  = 4 × 302              # 1208 — the frame width, always
-imHeight = 4 × plotHeight       # whatever step 2 above chose
+imWidth  = 4 × (278 + 2 × 7.2)  ≈ 1170     # canvas 292.5 -> ink ~278
+imHeight = 4 × plotHeight                  # whatever the height step above chose
 ```
 
-Verified: `imWidth=1208&imHeight=664` returns `viewBox="0 0 302 166"`, exactly. Defaults with neither
-param are 1200×640 → a 300×160 SVG.
+Then, because `unwrap` leaves you a GROUP and a group's box hugs its contents, the imported chart
+*is* its ink — set `chart.x = 12` and it lands on the content box. Verified across five charts:
+widths came back 277.5, 277.3 and 277.0 against the 278 target, with right edges at 289.5, 289.3 and
+289.0 against 290.
+
+Two caveats. The 7.2px inset was measured at one font size, so **measure the import and expect one
+correction** — the skill's standing advice for the default route applies here too. And a chart whose
+ink does not fill the canvas comes back narrower regardless: on a discrete-bar MDim and a
+single-series line chart the groups measured 235.9 and 233.7, because grapher reserved horizontal
+space it then did not use. That is not a fit error to correct with a rescale (which would move the
+font sizes off the ladder) — it is the export telling you the chart does not fill 278px.
 
 Two rules from SKILL.md Step 3 **do not apply here**, and both would cost a re-export:
 
@@ -286,7 +305,9 @@ entities and the values are the point. It is an editorial choice, so ask rather 
 Steps 5 and 7 of SKILL.md, reduced to what this format needs:
 
 1. Clone `25344:1357` (guided) or `25344:1391` (pull) onto the page.
-2. **Delete the leftover background group** (`Group > Group > Vector` at 302×233).
+2. **Delete the leftover background group.** It is a **`GROUP`** named `Group` (holding another
+   `Group` → a 302×233 `Vector`), not a `FRAME` — `get_metadata` renders groups as `<frame …>`, so a
+   filter on `type === "FRAME"` silently matches nothing and leaves the opaque rectangle in place.
 3. Resize the clone to `H`. On a pull clone, move the source row to `y = H − 23`.
 4. Fill the text slots — title, optional subtitle, and the bare `Producer (Year)` source on a pull
    chart. Per SKILL.md Step 6, setting `characters` flattens mixed weights; these slots are

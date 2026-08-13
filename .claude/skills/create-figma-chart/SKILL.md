@@ -32,7 +32,7 @@ Each year gets a new file. For **2026** the file key is `s6Sv60bakebRRW2TxsMQbF`
 
 | What | Node | Size | Notes |
 |---|---|---|---|
-| Templates page | `798:54` | — | all templates + instruction frames live here |
+| Templates page | `798:54` | — | all templates + instruction frames live here. **The arrows, flags, animals, no-data and checklist ids below are *pages*, not nodes on this one** — they sit at page indices 2–7 |
 | InstagramPost_Template_English | `798:161` | 540×540 | two-row footer (`Frame 12` @ y=488): source, `OurWorldinData.org/[Topic]`, CC BY |
 | InstagramPost_Template_Portrait_English | `6689:8` | 560×700 | footer includes a Note line |
 | InstagramReel_template | `7336:8` | 616×1096 | has top/bottom no-go zones; contains a worked small-multiples example |
@@ -50,7 +50,7 @@ Each year gets a new file. For **2026** the file key is `s6Sv60bakebRRW2TxsMQbF`
 | Animals | `5336:5` | — | chicken, rooster, turkey, fish, cow, egg-laying hen, pig |
 | Good Data Viz Checklist | `20729:1027` | — | distilled in GUIDELINES.md |
 
-The last five did **not** appear in a `get_metadata` dump of `798:54` on 2026-08-13, though the call returned the page in full including hidden nodes — they have most likely moved to another page rather than been deleted. Locate them before relying on those ids.
+The last five ids are **pages of their own**, which is why they don't appear in a `get_metadata` dump of `798:54`: `↪️ Curvy Arrows` (index 2), `🌎 No data on maps and hashed pattern` (3), `🎌 Flags` (4), `🐖 Animals` (5), `✅ The Good Data Viz Checklist` (7). Reach them with `figma.root.children`, not by looking inside the Templates page. The dated chart pages start at index 9, immediately below the `-----------------------------------------` divider page at index 8.
 
 Shared styles in the file: text styles `Data Insights/Title` (Playfair Display SemiBold 25) and `Data Insights/Subtitle` (Lato 16); paint styles `Data Insights/Title` #2D2E2D, `Data Insights/Subtitle` #5B5B5B, `Data Insights/Source` #858585; color variables `Text/Gray 100` #2D2E2D, `Text/Gray 80` #5B5B5B, `Website/Text/Blue 100` #002147, `Instagram/Beige Background` #FBF9F3; plus the **Chart colors** library (see GUIDELINES.md → Colors). Note the text and paint styles share names — `Data Insights/Title` is both a 25px Playfair text style and a #2D2E2D fill.
 
