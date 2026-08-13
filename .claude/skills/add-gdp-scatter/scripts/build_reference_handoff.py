@@ -51,6 +51,7 @@ TARGET_KEYS = ("target_chart_admin_url", "target_chart_url")
 # Kept in step with TARGET_QUERY in redirect_to_scatter.py: every param stands in for an
 # adjustment a tab CLICK makes and a URL-supplied tab does not get.
 REDIRECT_QUERY = "tab=scatter&time=latest&country="
+REDIRECT_KEYS = {key for key, _ in parse_qsl(REDIRECT_QUERY, keep_blank_values=True)}
 SITE = "https://ourworldindata.org"
 
 MANUAL_SURFACES = {"explorer", "data insight", "static viz"}
@@ -112,6 +113,38 @@ def load_pairs(path: Path) -> dict[int, int]:
         return ref if isinstance(ref, int) else ids[ref]
 
     return {resolve(src): resolve(tgt) for src, tgt in refs}
+
+
+def params_cell(own_params: str) -> str:
+    """The reference's own params, flagging the ones that override the redirect's.
+
+    The merge is silent, so the collision is what has to be visible: a reference carrying
+    `tab=chart` wins over `tab=scatter` and lands the reader on a different tab than the
+    retirement intends. That row needs a decision, not a paste.
+    """
+    query = (own_params or "").lstrip("?")
+    if not query:
+        return "—"
+    shown = f"`{fr.cell(query, 40)}`"
+    clashing = sorted({key for key, _ in parse_qsl(query, keep_blank_values=True)} & REDIRECT_KEYS)
+    return f"⚠️ {shown} overrides {', '.join(clashing)}" if clashing else shown
+
+
+def open_links(r: dict, host: str, admin: str) -> str:
+    """The sweep's own "Open" composition, for the surfaces that are not Google Docs.
+
+    `preview_url` is the actionable one here: on an explorer row it is the explorer page —
+    the thing being re-pointed — while `admin_url` is the editor of the OLD chart the row
+    points at. Dropping the preview leaves an explorer row with no way to open the explorer.
+    """
+    parts = []
+    if r.get("admin_url"):
+        parts.append(f"[✎ chart admin]({r['admin_url']})")
+    if r.get("preview_url"):
+        parts.append(f"[👁 view]({r['preview_url']})")
+    elif r.get("where_path"):
+        parts.append(f"[🔗 open]({fr.admin_url(r['where_path'], host, admin)})")
+    return " · ".join(parts) or "—"
 
 
 def replacement_url(src_id: int, own_params: str, pairs: dict[int, int], slugs: dict[int, str]) -> str:
@@ -190,8 +223,8 @@ def main() -> int:
             "",
             blurb,
             "",
-            "| Chart | Article | Open | Find in the doc | Replace with |",
-            "|---|---|---|---|---|",
+            "| Chart | Article | Open | Find in the doc | Its params | Replace with |",
+            "|---|---|---|---|---|---|",
         ]
         for r in sorted(group, key=lambda r: (r["where"], r["subject"])):
             draft = "" if r["published"] else " ⚠️draft"
@@ -206,9 +239,10 @@ def main() -> int:
                 if r.get("preview_url")
                 else f"`{fr.cell(r['subject_label'], 44)}`"
             )
+            own_params = r.get("query_string", "")
             out.append(
                 f"| {subject} | {fr.cell(r['where'], 44)}{page_type}{draft} | {links} | {fr.search_hint(r)} | "
-                f"{replacement_url(r['subject_id'], r.get('query_string', ''), pairs, slugs)} |"
+                f"{params_cell(own_params)} | {replacement_url(r['subject_id'], own_params, pairs, slugs)} |"
             )
         out.append("")
 
@@ -251,8 +285,9 @@ def main() -> int:
             "|---|---|---|---|",
         ]
         for r in sorted(manual, key=lambda r: (r["surface"], r["where"])):
-            link = f"[✎ admin]({r['admin_url']})" if r.get("admin_url") else "—"
-            out.append(f"| {r['surface']} | {fr.cell(r['where'], 44)} | `{r['subject']}` | {link} |")
+            out.append(
+                f"| {r['surface']} | {fr.cell(r['where'], 44)} | `{r['subject']}` | {open_links(r, args.host, admin)} |"
+            )
         out.append("")
 
     narrative = [r for r in rows if r["surface"] == "narrative chart"]
@@ -283,10 +318,9 @@ def main() -> int:
             "|---|---|---|---|---|",
         ]
         for r in sorted(other, key=lambda r: (r["surface"], str(r["where"]))):
-            link = fr.admin_url(r.get("where_path", ""), args.host, admin)
             out.append(
                 f"| {r['surface']} | `{fr.cell(r['subject_label'], 44)}` | {fr.cell(r['where'], 44)} | "
-                f"{fr.cell(r.get('context', ''), 44)} | {f'[🔗 open]({link})' if link else '—'} |"
+                f"{fr.cell(r.get('context', ''), 44)} | {open_links(r, args.host, admin)} |"
             )
         out.append("")
 
@@ -302,8 +336,10 @@ def main() -> int:
         "still uses an old one). A `—` means there is nothing to search for.",
         "",
         "**Replace with** merges the redirect's stored params with the reference's own, and the "
-        "reference's win — so a row whose params column is not `—` needs a decision, not a "
-        "blind paste.",
+        "reference's win. **Its params** is what the reference already carries, so you can see "
+        f"what that merge did: a ⚠️ marks the ones overriding the retirement's own "
+        f"`{REDIRECT_QUERY}` — that row lands the reader on a different tab or time range and "
+        "needs a decision, not a blind paste.",
         "",
         "## Coverage boundary",
         "",

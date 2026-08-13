@@ -326,6 +326,7 @@ Those aids are the difference between a row someone can fix and a row that names
 - **👁 preview** — the article in the admin previewer, which renders unpublished drafts the public page won't show.
 - **🔗 page** — the published page, deep-linked with a scroll-to-text fragment when the reference has anchor text, so it opens *at* the reference.
 - **Find in the doc** — a copy-paste search string: the **link text** for a prose hyperlink, or the **chart slug** for a block embed (the doc holds a bare grapher URL there, and `posts_gdocs_links.target` keeps the slug as the author typed it, so it still matches when the doc uses an older one). `—` means there is nothing to search for.
+- **Its params** — the query string the reference already carries, because the replacement URL merges it over `tab=scatter&time=latest&country=` and **the reference's values win**. A ⚠️ marks the keys that override the retirement's own, which is the row that needs a decision rather than a paste: a reference carrying `tab=chart` lands the reader on a different tab than the retirement intends, and the merge is silent about it.
 
 **Import those formatters from `find-chart-references/scripts/find_references.py`; never reimplement them** — `doc_url`, `gdoc_preview_url`, `deep_link`, `search_hint`, `cell`. A second copy drifts, and the drift shows up as a handoff whose links quietly stop resolving. Strip the tailscale suffix from the admin root you pass them, so the links read like the sweep's own (which are already short).
 
