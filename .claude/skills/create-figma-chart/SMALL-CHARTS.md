@@ -72,8 +72,8 @@ a `Group > Group > Vector` — a white **302×233 rectangle** — instead. So:
 - **But do not keep it either**, because it is a *fixed* 302×233 rectangle and this format's height is
   free. It under-covers a 272-tall frame and overhangs a 221-tall one.
 - **Enable the frame's own fill and drop the vector group**: `frame.fills = frame.fills.map(f => ({...f, visible: true}))`.
-  A fill follows the frame at any height, and it is what the designer's finished examples use — every
-  one of them has the frame fill visible and no full-size background vector.
+  A fill follows the frame at any height, and it is what the designer's finished charts did — every
+  one of them had the frame fill visible and no full-size background vector.
 
 There is **no z-order hazard to avoid here.** `appendChild` puts the imported chart last, so it draws
 above the background whatever the background is. The "an opaque background paints over the template"
@@ -97,7 +97,7 @@ Geometry, all frame-local:
 - Content `x=12`, width **278**. Side margins are 12px, not the 16px of the 540-wide frames.
 - Header block `Frame 7` at `y=10`; title 19 + 2px gap + subtitle 13 = 34 tall, so
   `headerBottom = 44`. With no subtitle it is 19 tall and `headerBottom = 29`.
-- The header block **hugs its own text width** (206–278px across the examples). Unlike the 540-wide
+- The header block **hugs its own text width** (206–278px measured across five finished charts). Unlike the 540-wide
   templates, the plot may therefore legitimately rise into the space to its right — that is a design
   decision per chart, not a misfit.
 - Source (pull) sits at `y = H − 23`, height 13, leaving a 10px bottom margin. In the 233-tall
@@ -105,7 +105,7 @@ Geometry, all frame-local:
 - Band available to the chart: `44 → H − 10` (guided) or `44 → H − 23` (pull).
 
 Palette fills are **bound library styles** (`Default Palette/Midnight Blue #00295B`,
-`Default Palette/Rusty Orange #B13507` in the examples). GUIDELINES.md → Colors applies unchanged,
+`Default Palette/Rusty Orange #B13507`). GUIDELINES.md → Colors applies unchanged,
 including the `color_audit.py` pass.
 
 `Data Insights/Source` `#858585` is a paint style the rest of this skill doesn't otherwise use.
@@ -119,31 +119,27 @@ this skill where the source line is *not* the verbatim grapher footer string, so
 Step 6 rule that forbids re-deriving it — take the producer and the release year from
 `chart.citation` and drop the prefix.
 
-## Reference examples
+## Per-type conventions, as measured
 
-Five worked examples sit beside the templates on the ` 📑 Templates` page. Read the one nearest your
-chart type before building — `get_design_context` for the measurements, plus a 4–8× crop for the
-detail. They were drawn in **matplotlib**, so SKILL.md's *"pointed at a finished page as the model"*
-mode applies for reading measurements off them, but not its re-render-and-diff half: there is no
-grapher export behind them to diff against.
+The spec on this page was derived by measuring five worked examples the design team kept beside the
+templates. **Those examples have since been deleted** — deliberately, once this route could reproduce
+them — so this file is the record and there is nothing to go and look at. The templates are the only
+live reference.
 
-| Example (node) | Flavor | What it teaches |
-|---|---|---|
-| `small-chart-top01-line 1` (`25344:1277`) | guided | two series, dots **and** value labels at both ends, entity label along each line, title + subtitle |
-| `small-chart-income-pct-change 2` (`25344:1260`) | guided | three series of indexed % change, end dots and end values only, two-line title, no subtitle |
-| `small-chart-income-thresholds 1` (`25344:1237`) | guided | three bands between two time points, labels at both ends, shortest frame (221) |
-| `small-chart-top1-bar longer` (`25344:1298`) | guided | 7-row ranked bar, entity name over year in a left label column, tallest frame (272), no axis at all |
-| `small-chart-gini-line 1` (`25344:1323`) | **pull** | the only pull example — line, four axis ticks with 4px tick marks, source row |
+| Shape | Convention |
+|---|---|
+| Two-series line | dots **and** value labels at *both* ends; entity label along each line; title + subtitle |
+| Three-series indexed change | end dots and end values only; two-line title; no subtitle |
+| Bands between two time points | labels at both ends; the shortest frame of the set (221) |
+| Ranked bar | entity name over its year in a left label column; no axis at all; the tallest frame (272) |
+| Pull chart | the same, plus the source row — and four labeled axis ticks with 4px tick marks |
 
-Ids as of 2026-08-13; re-verify with `get_metadata` on `798:54`, since this page gets edited.
+Two facts worth keeping explicit, because they are the ones a single example would have taught:
 
-Two things to read off them rather than from prose: the axis treatment is **not** uniform (the pull
-example carries four labeled ticks with 4px marks; the others carry only the first and last year on a
-bare baseline), and the frame height moves with the content (221 / 233 / 234 / 272).
-
-Everything they teach that is *measurable* is already transcribed above, so the spec here does not
-depend on them surviving — but the node ids do, so treat a lookup failure as "re-find them", not as a
-missing dependency.
+- **The axis treatment is not uniform.** One example carried four labeled ticks with 4px marks; the
+  others carried only the first and last year on a bare baseline. Choose per chart; there is no
+  default to inherit.
+- **The frame height moves with the content** — 221 / 233 / 234 / 272 across the five.
 
 ## Width is fixed; height is free
 
@@ -155,7 +151,7 @@ chart is fitted into a measured band (SKILL.md Steps 3 and 7). Here **the frame 
 
 1. Decide the content — how many series or rows, axis or no axis. This is where a small chart is won;
    see GUIDELINES.md and the narrative the image serves.
-2. Pick the plot height. Calibration from the examples: a 2–3 series line chart sits at 150–170px of
+2. Pick the plot height. Measured calibration: a 2–3 series line chart sits at 150–170px of
    plot; a ranked bar chart is `rows × ~30px` of row pitch.
 3. `H = 44 (header) + gap + plotHeight + gap + (23 with a source row | 10 without)`.
 4. Export at that height (below). No aspect-ratio arithmetic.
@@ -238,7 +234,7 @@ So the y-axis, the interior year ticks and the legend are gone, and you get the 
 plus an end value. That much is dependable.
 
 **The series labels are where it varies, so check them per chart rather than assuming.** Measured
-across the five reference charts:
+across five real views:
 
 | Chart | Series labeled |
 |---|---|
@@ -260,7 +256,7 @@ per-row year into the value rather than stacking it — `25.8% in 2022` where th
 
 So the thumbnail route reliably buys you the *stripping* — no legend to delete, no axis to remove, no
 rescale. **Budget for re-adding the missing series labels and rewriting the raw names in Figma**;
-GUIDELINES.md → Direct labeling has the placement rules and the reference examples on the Templates page show
+GUIDELINES.md → Direct labeling has the placement rules, and the per-type conventions above give
 the target. How much of that work there is depends on the chart type, so measure the export before
 estimating.
 
