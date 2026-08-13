@@ -40,6 +40,7 @@ tables:
           title_public: Monthly spending on data center construction in the United States
         display:
           name: Data center construction
+          timeInterval: month
       general_office_construction_spending:
         title: Monthly spending on general office construction in the United States
         unit: US dollars
@@ -52,6 +53,7 @@ tables:
           title_public: Monthly spending on general office construction in the United States
         display:
           name: Office construction
+          timeInterval: month
       general_office_construction_spending_real:
         title: Monthly spending on general office construction in the United States (inflation-adjusted)
         unit: constant 2021 US$
@@ -69,6 +71,7 @@ tables:
 
         display:
           name: Office construction
+          timeInterval: month
       datacenter_construction_spending_real:
         title: Monthly spending on data center construction in the United States (inflation-adjusted)
         unit: constant 2021 US$
@@ -86,3 +89,4 @@ tables:
 
         display:
           name: Data center construction
+          timeInterval: month
