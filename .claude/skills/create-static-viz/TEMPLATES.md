@@ -111,6 +111,16 @@ mobile size) or about *what the chart claims* (must move into the subtitle inste
   calibrate so the two-line case reproduces 80 exactly.
 - **The title slot is two lines tall** in every template. A title that wraps to one line
   under-fills it; one that wraps to three overflows into the subtitle.
+- **The same reasoning applies to the `Note:` slot, which is also two lines tall** — and the two
+  desktop templates then diverge. `Static Chart Template_Vertical`'s footer (`Frame 8`) is
+  **auto-layout**, so a one-line note lets the rows below it reflow; `Static Chart
+  Template_Horizontal`'s footer rows are **absolutely positioned** and stay where they are, leaving
+  a 19.41px gap where the design has 5.41px. Measured 2026-08-13. Since the note's `y` is also the
+  chart band's bottom edge, a one-line note moves the band — so derive both from the actual slot
+  positions rather than from the table above.
+- **The two desktop templates disagree on subtitle size:** Horizontal is **16px**, Vertical is
+  **15px** (both Lato Regular). Measured 2026-08-13. Not a typo to correct in a clone — match
+  whichever template you cloned, and raise it with the design team if the pair should agree.
 
 ## Unit conversions
 

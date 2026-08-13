@@ -39,8 +39,8 @@ Each year gets a new file. For **2026** the file key is `s6Sv60bakebRRW2TxsMQbF`
 | DI_Template | `6799:1859` | 540×540 | **one**-row footer (`Frame 12` @ y=508): source + CC BY |
 | Static Chart Template_Mobile (example 1) | `24590:20` | 540×540 | **two**-row footer (`Frame 15` `25343:276` @ y=486, h=38): `Data source:` then `Licensed under CC-BY by the author […]`, both full width |
 | Static Chart Template_Mobile (example 2) | `24590:32` | 540×824 | taller variant — use when the chart needs vertical room. Same two-row `Frame 15` (`25343:275` @ y=770) |
-| Static Chart Template_Horizontal | `5332:75` | 850×638 | footer: Note, Data source, OWID tagline, "Licensed under CC-BY by the author [Name]" |
-| Static Chart Template_Vertical | `5332:93` | 850×1095 | |
+| Static Chart Template_Horizontal | `5332:75` | 850×638 | footer: Note, Data source, OWID tagline, "Licensed under CC-BY by the author [Name]". Footer rows are **absolutely positioned** — see the re-spacing rule in Step 6 |
+| Static Chart Template_Vertical | `5332:93` | 850×1095 | same slots; footer `Frame 8` is **auto-layout**, so its rows reflow. **Its subtitle is 15px where Horizontal's is 16px** — a template inconsistency, not something to "fix" in a clone; report it if the pair needs to match |
 | **`small-chart-template-guided`** | **`25344:1357`** | 302 × free | title + optional subtitle, no source row — see [SMALL-CHARTS.md](SMALL-CHARTS.md) |
 | **`small-chart-template-pull`** | **`25344:1391`** | 302 × free | the same plus a mandatory source row — see [SMALL-CHARTS.md](SMALL-CHARTS.md) |
 | `"SMALL" Charts` section heading | `25344:1235` | — | "featured on the OWID website as guided and PULL charts" |
@@ -324,6 +324,22 @@ Replace the lorem-ipsum text nodes in the cloned template. Source everything fro
 - **Note:** only in templates that carry a Note line, and only if the chart has one worth keeping. **DI images normally carry no note at all** — drop it, or, when it's genuinely load-bearing for understanding the chart, fold it into the subtitle as a bolded second line (only if the subtitle isn't already crowded).
 - **`OurWorldinData.org/[Topic]`** → the confirmed topic path (e.g. `OurWorldinData.org/child-mortality`).
 - **CC BY** stays on the DI and Instagram templates. The static templates — desktop **and mobile** — instead carry `Licensed under CC-BY by the author <Name>`, the author of the piece from Step 2, not the page-name credit. On static mobile that line is the second row of `Frame 15` and reads `Licensed under CC-BY by the author [Name of author]` in the template.
+
+**Changing a footer row's line count is a re-spacing job — and whether it happens for you depends on the template.** Tightening a two-line note to one line leaves the rows beneath it 14px too far away, and the two static templates behave differently:
+
+| Template | Footer | What happens when the note shrinks |
+|---|---|---|
+| Static Vertical (`5332:93`) | `Frame 8` is **auto-layout** | rows reflow on their own; the gap stays right |
+| Static Horizontal (`5332:75`) | rows are **absolutely positioned** | they stay put; the note→source gap opened from **5.41px to 19.41px** while source→tagline stayed 5.41 |
+
+So after any edit that changes a footer row's height, measure the gaps and re-space if needed. **Take the designed gap from a pair of rows you did not touch** — source → tagline here — rather than from the template's nominal `y` values, which encode the two-line assumption:
+
+```js
+const DESIGNED_GAP = tagline.y - (source.y + source.height);   // 5.41 in both static templates
+note.y = source.y - DESIGNED_GAP - note.height;
+```
+
+Then remember the knock-on: **the band's bottom is the note's `y`, so it just moved.** Re-fit the chart, and if the band grew by more than a few pixels, re-export to the new height rather than leaving an oversized gap — moving the note down 14px took one band from 456.6 to 470.6 and left a 402-tall chart floating with 34px gaps.
 
 **An orphan last line is a copy problem, not a layout problem — tighten the words.** When a string
 spills a word or two onto a new line, the fix is to rewrite it shorter so it finishes on the line
