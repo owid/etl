@@ -805,7 +805,13 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
             rise=0.47,
             label_gap=0.04,
         )
-        chart_top_px = diagram_top_px + HEADER_DIAGRAM_HEIGHT + facet_title_space_px
+        # The same gap the desktop layout leaves under its subtitle goes here, between the diagram's
+        # box and the facet titles below it. Without it the two blocks are separated only by whatever
+        # empty box the diagram happens to leave under its lowest label, and the titles read as part
+        # of the key rather than of the panels.
+        chart_top_px = (
+            diagram_top_px + HEADER_DIAGRAM_HEIGHT + DIAGRAM_CHART_GAP * px(body_fontsize) + facet_title_space_px
+        )
 
     # --- footer, in the slots the static-chart templates define ---
     # Desktop: Note -> Data source -> tagline and license sharing one row, left and right.
