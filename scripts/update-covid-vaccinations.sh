@@ -15,9 +15,9 @@ uv run etls covid/latest/vaccinations_global
 
 # Files this job owns. Several update-*.sh jobs run concurrently against this same
 # checkout, so we only ever stage and commit these - `git add .` would sweep in another
-# job's half-written snapshots.
+# job's half-written snapshots. Note this excludes vaccinations_global.csv.dvc, which the
+# same snapshot script only writes when given --path-to-file by hand.
 snapshot_files=(
-    snapshots/covid/latest/vaccinations_global.csv.dvc
     snapshots/covid/latest/vaccinations_global_who.csv.dvc
 )
 
