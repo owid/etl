@@ -63,8 +63,10 @@ Usage:
   bespoke_svg.mjs --demo <project> [--variant <name>] [options]
   bespoke_svg.mjs --article <url> --bundle <name> --variant <name> [--config <json>] [options]
 
-Options:
-  --width <px>       viewport width  (default 1200) -- this is the aspect control
+Sizing options -- --demo only. Passing any of them mounts our own container instead of reading
+the demo page's, so the geometry is ours rather than the page's. They cannot be honored on
+--article, which exports the page's own mount at the page's own size; passing one there is an
+error rather than a silent no-op.
   --viz-width <px>   width of the mounted container (default: --width). These components lay
                      out from container width, so this is what shapes the export
   --viz-height <px>  height of the mounted container. Components using useParentSize() take their
@@ -72,7 +74,11 @@ Options:
   --viz-css <css>    CSS injected into the Shadow DOM after mounting. The escape hatch for a
                      component that pins its chart height in SCSS, e.g.
                      '.food-trade-captioned-chart__chart-area{height:896px!important}'
-  --config <json>    mount with this config instead of the demo's defaults (local route too)
+
+Options:
+  --width <px>       viewport width  (default 1200) -- this is the aspect control
+  --config <json>    mount with this config instead of the variant's own demoConfig. On --article
+                     it applies only if the page does not hydrate itself
   --height <px>      viewport height (default 800)
   --out <dir>        output directory (default .)
   --base <name>      output filename stem (default derived from project/bundle + variant)
@@ -133,6 +139,25 @@ function parseArgs(argv) {
         throw new Error("--demo and --article are mutually exclusive")
     if (opts.article && !opts.bundle)
         throw new Error("--article needs --bundle (from the gdoc JSON)")
+    // The article route exports the page's own mount, whose container the page sizes. Honoring a
+    // sizing option there would mean re-mounting a component that may already have rendered, so
+    // reject the combination instead of accepting the flag and ignoring it -- a silently
+    // wrong-sized SVG is the failure this whole route is trying to avoid.
+    if (opts.article) {
+        const ignored = [
+            ["--viz-width", opts.vizWidth],
+            ["--viz-height", opts.vizHeight],
+            ["--viz-css", opts.vizCss],
+        ]
+            .filter(([, value]) => value !== undefined)
+            .map(([flag]) => flag)
+        if (ignored.length)
+            throw new Error(
+                `${ignored.join(", ")} cannot be honored on --article: the page owns the ` +
+                    `container, so the export comes out at the page's geometry.\n` +
+                    `To choose the size, check the project out and use --demo instead.`
+            )
+    }
     return opts
 }
 
@@ -236,11 +261,12 @@ function serializeInPage(rootSelector, minVizSize) {
         // viewBox to the union of the content's own bbox.
         const vb = source.getAttribute("viewBox")
         const rect = source.getBoundingClientRect()
-        let x0 = 0, y0 = 0, x1 = rect.width, y1 = rect.height
+        let vx0 = 0, vy0 = 0, vw = rect.width, vh = rect.height
         if (vb) {
-            const [vx, vy, vw, vh] = vb.trim().split(/[\s,]+/).map(Number)
-            x0 = vx; y0 = vy; x1 = vx + vw; y1 = vy + vh
+            const [vx, vy, w, h] = vb.trim().split(/[\s,]+/).map(Number)
+            vx0 = vx; vy0 = vy; vw = w; vh = h
         }
+        let x0 = vx0, y0 = vy0, x1 = vx0 + vw, y1 = vy0 + vh
         try {
             const bb = source.getBBox()          // user units, union of all rendered children
             const PAD = 2
@@ -255,20 +281,42 @@ function serializeInPage(rootSelector, minVizSize) {
         clone.setAttribute("width", `${x1 - x0}`)
         clone.setAttribute("height", `${y1 - y0}`)
 
-        return new XMLSerializer().serializeToString(clone)
+        // That widening moved the file's origin off the element's top-left and grew it past the
+        // element's rect -- by each viz's OWN label overhang, so by a different amount per part of
+        // a split viz. Report where the WRITTEN file sits, in page px, or placing the parts from
+        // their on-page rects shifts them relative to each other. Scale is per axis so a
+        // non-uniform mapping degrades gracefully; under the default uniform one both agree.
+        const scaleX = vw ? rect.width / vw : 1
+        const scaleY = vh ? rect.height / vh : 1
+        return {
+            markup: new XMLSerializer().serializeToString(clone),
+            offsetX: (x0 - vx0) * scaleX,
+            offsetY: (y0 - vy0) * scaleY,
+            width: (x1 - x0) * scaleX,
+            height: (y1 - y0) * scaleY,
+        }
     }
 
     return {
         container: { width: hostRect.width, height: hostRect.height },
         vizzes: svgs.map((svg) => {
             const rect = svg.getBoundingClientRect()
+            const out = serialize(svg)
             return {
-                markup: serialize(svg),
+                markup: out.markup,
+                // Where the element sits on the page, before the viewBox widening.
                 box: {
                     x: rect.x - hostRect.x,
                     y: rect.y - hostRect.y,
                     width: rect.width,
                     height: rect.height,
+                },
+                // Where the written SVG sits. Place a multi-part viz from THIS one.
+                exportBox: {
+                    x: rect.x - hostRect.x + out.offsetX,
+                    y: rect.y - hostRect.y + out.offsetY,
+                    width: out.width,
+                    height: out.height,
                 },
             }
         }),
@@ -305,9 +353,18 @@ async function runDemo(page, opts) {
     const url = `${opts.demoUrl.replace(/\/$/, "")}/${opts.demo}/demo`
     await page.goto(url, { waitUntil: "networkidle2", timeout: opts.timeout })
 
-    // Without --config, take the demo page's own mounts: it wraps each variant in
-    // div.variant#variant--<name> using that variant's demoConfig.
-    if (!opts.config) {
+    // The demo page mounts each variant itself, in div.variant#variant--<name>, at the width its
+    // own grid gives it. That is only usable when both the view AND the size it happens to render
+    // at are the ones we want -- so any of --config/--viz-* means we mount our own instead.
+    // Reading the page's mount while a sizing option was passed would export the page's geometry
+    // under the caller's numbers.
+    const ownMount =
+        opts.config !== undefined ||
+        opts.vizWidth !== undefined ||
+        opts.vizHeight !== undefined ||
+        opts.vizCss !== undefined
+
+    if (!ownMount) {
         const selector = opts.variant
             ? `#variant--${opts.variant}`
             : ".variant:first-of-type"
@@ -316,11 +373,11 @@ async function runDemo(page, opts) {
         return selector
     }
 
-    // With --config, the demo's defaults are the wrong view, so mount our own instance on the
-    // dev-server origin (same-origin, so the module and its CSS resolve) into our own Shadow DOM.
-    // The demo page is still the host because it carries the dev-only global stylesheet.
+    // Mount our own instance on the dev-server origin (same-origin, so the module and its CSS
+    // resolve) into our own Shadow DOM. The demo page is still the host because it carries the
+    // dev-only global stylesheet.
     await page.waitForSelector(".variant", { timeout: opts.timeout })
-    const selector = "#bespoke-svg-target";
+    const selector = "#bespoke-svg-target"
     await page.evaluate(
         async (sel, project, variant, cfg, hostWidth, hostHeight, extraCss) => {
             const host = document.createElement("div")
@@ -335,9 +392,24 @@ async function runDemo(page, opts) {
             const mountPoint = document.createElement("div")
             root.appendChild(mountPoint)
             const mod = await import(`/${project}/index.js`)
+            if (!mod.VARIANTS?.length)
+                throw new Error(
+                    `${project} exports no VARIANTS, so there is no variant to mount.`
+                )
+            const entry = variant
+                ? mod.VARIANTS.find((v) => v.name === variant)
+                : mod.VARIANTS[0]
+            if (!entry)
+                throw new Error(
+                    `Unknown variant "${variant}". ${project} has: ` +
+                        mod.VARIANTS.map((v) => v.name).join(", ")
+                )
+            // Without --config, reuse the variant's own demoConfig -- the exact view the demo page
+            // shows -- so a sizing-only run re-renders the same chart at our geometry rather than
+            // an empty config's default view.
             window.__bespokeUnmount = mod.mount(mountPoint, {
-                variant: variant ?? mod.VARIANTS[0].name,
-                config: { ...cfg, urlSync: false },
+                variant: entry.name,
+                config: { ...(cfg ?? entry.demoConfig ?? {}), urlSync: false },
             })
             if (extraCss) {
                 const style = document.createElement("style")
@@ -348,7 +420,7 @@ async function runDemo(page, opts) {
         selector,
         opts.demo,
         opts.variant,
-        JSON.parse(opts.config),
+        opts.config ? JSON.parse(opts.config) : null,
         opts.vizWidth ?? opts.width,
         opts.vizHeight,
         opts.vizCss
@@ -401,6 +473,14 @@ async function runArticle(page, opts) {
     } catch {
         rendered = false
     }
+
+    // --config only reaches a component we mount ourselves, and whether we do is the page's
+    // choice, not ours. Say so rather than leaving the caller to assume their config was applied.
+    if (rendered && opts.config)
+        console.warn(
+            "Note: the page hydrated the component itself, so --config was NOT applied -- " +
+                "this is the view the article publishes."
+        )
 
     if (!rendered) {
         // Mount into a Shadow DOM, as production does: each bundle injects its own CSS scoped to
@@ -469,7 +549,7 @@ async function main() {
             const name =
                 result.vizzes.length > 1 ? `${stem}-${i + 1}.svg` : `${stem}.svg`
             await writeFile(join(outDir, name), viz.markup, "utf8")
-            written.push({ file: name, box: viz.box })
+            written.push({ file: name, box: viz.box, exportBox: viz.exportBox })
         }
         await writeFile(
             join(outDir, `${stem}.boxes.json`),
@@ -484,9 +564,11 @@ async function main() {
         console.log(
             `Wrote ${written.length} SVG${written.length === 1 ? "" : "s"} to ${outDir}`
         )
-        for (const { file, box } of written)
+        // Report the written file's own box, not the element's: they differ by the viewBox widening,
+        // and it is the file that gets imported.
+        for (const { file, exportBox } of written)
             console.log(
-                `  ${file}  ${Math.round(box.width)}x${Math.round(box.height)} at (${Math.round(box.x)}, ${Math.round(box.y)})`
+                `  ${file}  ${Math.round(exportBox.width)}x${Math.round(exportBox.height)} at (${Math.round(exportBox.x)}, ${Math.round(exportBox.y)})`
             )
         console.log(`  ${stem}.boxes.json`)
     } finally {

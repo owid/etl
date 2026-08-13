@@ -53,7 +53,14 @@ for. So the button and the bare `--demo` route only help when the defaults happe
 
 For a specific view, pass `--config` **with** `--demo`: the script then loads the demo page (for its
 dev-only global CSS and same-origin module resolution) and mounts its *own* instance of the bundle,
-in its own Shadow DOM, with your config:
+in its own Shadow DOM, with your config.
+
+**Any `--viz-*` option takes that same own-mount path**, with or without `--config` — the demo page
+sizes its own mounts from its grid, so reading them while a sizing option was passed would export the
+page's geometry under your numbers. Without `--config` the own mount reuses the variant's
+`demoConfig` (`BespokeComponentVariantsEntry.demoConfig`, the field the demo page itself passes), so
+a sizing-only run re-renders **the view the demo shows**, at your size — not an empty config's
+default view.
 
 ```bash
 node scripts/bespoke_svg.mjs --demo food-trade --variant sankey \
@@ -105,6 +112,13 @@ window.__unmount = mod.mount(host, {
 
 Give it 1–3s to paint.
 
+**You cannot choose the size on this route, and that is the reason to prefer the demo one.** The
+article owns the container, so the export comes out at whatever width the published layout gives the
+block; `--viz-width`/`--viz-height`/`--viz-css` are rejected here rather than accepted and ignored.
+`--config` is conditional for the same reason — it only reaches a component *we* mount, so if the
+page hydrates on its own the script warns and exports the view the article publishes. When the aspect
+has to hit a template band, check the project out and use `--demo`.
+
 ## Serialize with the repo's own logic
 
 `bespoke/shared/exportSvg.ts` already solves the hard part, and `scripts/bespoke_svg.mjs` mirrors it
@@ -126,6 +140,12 @@ These components draw their side labels *outside* their own `<svg>` bounds and r
 clipping. A standalone SVG clips at its viewBox, so the outermost labels would be cut. The script
 unions `source.getBBox()` into the declared box and rewrites `viewBox`/`width`/`height`. On the wine
 sankey that widened 784 → 787px; on a component with longer labels it will matter more.
+
+That widening also moves the file's origin off the element's top-left, which is why the sidecar
+records **two** boxes per viz: `box`, where the element sat on the page, and `exportBox`, where the
+written file sits. **Position from `exportBox`.** Each part of a split viz overhangs by its own label
+lengths, so the two expansions differ, and placing the parts from their on-page rects shifts them
+relative to each other — the one job the sidecar exists to do.
 
 ### Sizing the export: the container decides, and height may not follow
 
@@ -172,7 +192,7 @@ anyone — and two of its steps are actively harmful when the destination is a F
   labeling is often the better answer anyway) or dropped.
 - **A split viz returns several SVGs.** The migration sankey is two (immigrants left, emigrants
   right), named `-1` and `-2`. The script writes a JSON sidecar with each one's frame-relative
-  bounding box so Step 5 can place them without re-measuring; grabbing "the biggest SVG" gives you
+  `exportBox` so Step 5 can place them without re-measuring; grabbing "the biggest SVG" gives you
   half the chart.
 - **This captures one state.** Whatever `config` selected — one country, one year, one direction. Say
   so, and re-run for another.
@@ -184,7 +204,7 @@ anyone — and two of its steps are actively harmful when the destination is a F
 | 1 | Nothing to resolve — the file *is* the export. Read the block's `bundle`/`variant`/`config` from the article's gdoc JSON, and the body text from it too if you want annotation content. |
 | 2 | Formats as usual. A wide viz (a sankey) wants Static Horizontal; a tall one, Vertical. |
 | 3 | No `imWidth`/`imHeight`/`imFontSize`. **The puppeteer viewport is the aspect control**, so measure the template band first (Step 7), then render at that aspect. Same ordering as the grapher route, different lever. |
-| 5 | Ordinary `upload_assets` + the `unwrap` helper. Two SVGs means two imports, positioned from the sidecar. |
+| 5 | Ordinary `upload_assets` + the `unwrap` helper. Two SVGs means two imports, positioned from the sidecar's `exportBox` (not `box` — see the viewBox widening above). |
 | 7 | **Fit the WIDTH, not the height** — the reverse of the grapher route. There, you fit height first and close the width with a scripted x-map; a sankey's bands cannot be x-mapped without distorting them, so the width is the constraint and the vertical gap falls out of it (17.3px each side on the wine chart). Expect **one correction after import**: Figma's unwrapped group measured **913** wide against the SVG's declared **889**, because a group's bbox includes stroke extents — so the aspect you solved against the SVG is a few percent off once it lands. Measure the group, then scale. |
 | 8 | Node names are the component's own, derived from its DOM. There is **no `connectors` group** to hide and no `horizontal-grid-lines`, so every named lookup in Steps 7–8 has to be re-derived: `grep -oE 'id="[^"]*"' <file>.svg \| sort -u`. |
 | 8c | Unchanged. Note the fills come from the component's own palette, not necessarily the Chart colors library, so expect the off-palette sweep to have findings — report them to the component's author rather than repainting in Figma. |
