@@ -21,10 +21,13 @@ Usage::
     .venv/bin/python .claude/skills/add-gdp-scatter/scripts/build_reference_handoff.py \\
         --references ai/<name>_references.json \\
         --pairs ai/<name>_part2_pairs.json \\
+        [--gaps ai/<name>_references_gaps.json] \\
         [--output ai/<name>_reference_handoff.md]
 
-`--references` is the `--json` output of `find_references.py`; `--pairs` is the applier's own
-JSON, so the replacement URLs are the ones the migration actually created.
+`--references` is the `--json` output of `find_references.py` and `--gaps` its `--gaps-json`,
+which carries that run's own coverage gaps. `--pairs` is the pair list of the rows actually
+being retired, so the replacement URLs are the ones the migration creates; either pair schema
+works — Part 1's table rows (admin URLs) or the Part 2 payload (public grapher URLs).
 """
 
 import argparse
@@ -37,6 +40,13 @@ from urllib.parse import parse_qsl, urlencode
 from etl.config import OWID_ENV
 
 TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
+ADMIN_CHART_ID_RE = re.compile(r"/charts/(\d+)")
+GRAPHER_SLUG_RE = re.compile(r"/grapher/([^/?#]+)")
+
+# Part 1's pasted table names charts by admin URL; the Part 2 payload the applier consumes
+# names them by public grapher URL. Both are valid pair lists for this handoff.
+SOURCE_KEYS = ("chart_admin_url", "grapher_url")
+TARGET_KEYS = ("target_chart_admin_url", "target_chart_url")
 
 # Kept in step with TARGET_QUERY in redirect_to_scatter.py: every param stands in for an
 # adjustment a tab CLICK makes and a URL-supplied tab does not get.
@@ -61,8 +71,47 @@ def _load_find_references():
 fr = _load_find_references()
 
 
-def chart_id(url: str) -> int:
-    return int(url.rstrip("/").split("/")[-2])
+def chart_ref(url: str) -> int | str:
+    """The chart id from an admin URL, or the slug from a public grapher URL."""
+    admin_match = ADMIN_CHART_ID_RE.search(url)
+    if admin_match:
+        return int(admin_match.group(1))
+    slug_match = GRAPHER_SLUG_RE.search(url)
+    if slug_match:
+        return slug_match.group(1)
+    raise SystemExit(f"Cannot read a chart id or slug from {url!r}")
+
+
+def pick(pair: dict, keys: tuple[str, ...]) -> str:
+    for key in keys:
+        if pair.get(key):
+            return str(pair[key])
+    raise SystemExit(f"Pair {pair} carries none of {keys}")
+
+
+def load_pairs(path: Path) -> dict[int, int]:
+    """Source chart id -> target chart id, from either pair schema.
+
+    Slugs are resolved against the DB, so this must run **before** Part 2 unpublishes the
+    sources — after that their slugs belong to `chart_slug_redirects`, not to a chart.
+    """
+    refs = [(chart_ref(pick(p, SOURCE_KEYS)), chart_ref(pick(p, TARGET_KEYS))) for p in json.loads(path.read_text())]
+    wanted = sorted({ref for pair in refs for ref in pair if isinstance(ref, str)})
+    ids: dict[str, int] = {}
+    if wanted:
+        df = OWID_ENV.read_sql(
+            "SELECT c.id, cc.slug FROM charts c JOIN chart_configs cc ON c.configId = cc.id WHERE cc.slug IN %(s)s",
+            params={"s": tuple(wanted)},
+        )
+        ids = {r["slug"]: int(r["id"]) for r in df.to_dict("records")}
+        missing = [slug for slug in wanted if slug not in ids]
+        if missing:
+            raise SystemExit(f"No chart on this server owns these slugs: {', '.join(missing)}")
+
+    def resolve(ref: int | str) -> int:
+        return ref if isinstance(ref, int) else ids[ref]
+
+    return {resolve(src): resolve(tgt) for src, tgt in refs}
 
 
 def replacement_url(src_id: int, own_params: str, pairs: dict[int, int], slugs: dict[int, str]) -> str:
@@ -83,16 +132,14 @@ def replacement_url(src_id: int, own_params: str, pairs: dict[int, int], slugs: 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Build the reference handoff for an add-gdp-scatter retirement.")
     ap.add_argument("--references", required=True, type=Path, help="--json output of find_references.py")
-    ap.add_argument("--pairs", required=True, type=Path, help="the applier's JSON pair list (Part 2 set)")
+    ap.add_argument("--pairs", required=True, type=Path, help="JSON pair list of the rows being retired")
+    ap.add_argument("--gaps", type=Path, default=None, help="--gaps-json output of find_references.py")
     ap.add_argument("--output", type=Path, default=None, help="output .md (default: alongside --references)")
     ap.add_argument("--host", default=SITE, help="public site host for page links")
     args = ap.parse_args()
 
     rows = json.loads(args.references.read_text())
-    pairs = {
-        chart_id(p["chart_admin_url"]): chart_id(p["target_chart_admin_url"])
-        for p in json.loads(args.pairs.read_text())
-    }
+    pairs = load_pairs(args.pairs)
     # The shared formatters expect an admin ROOT (".../admin"), while OWID_ENV.admin_api is
     # the API root (".../admin/api"). The tailscale suffix comes off so these links read the
     # same as the sweep's own `admin_url` values, which are already short.
@@ -114,6 +161,10 @@ def main() -> int:
         "",
     ]
 
+    # Every row a section below owns, by identity, so the catch-all at the end can list
+    # whatever no section claimed instead of dropping it.
+    placed: set[int] = set()
+
     for title, kind, blurb in [
         (
             "🔴 Embeds — a redirect does NOT fix these",
@@ -126,9 +177,14 @@ def main() -> int:
             "They keep working through the redirect; updating avoids a hop nobody will remember.",
         ),
     ]:
-        group = [r for r in rows if r["kind"] == kind]
+        # Google Doc surfaces only: the shared formatters read `surface_id` AS a Doc id, and
+        # on any other surface it is an explorer slug or a narrative-chart id, which would
+        # render as a Doc link that resolves to nothing. Those surfaces have their own
+        # sections below.
+        group = [r for r in rows if r["kind"] == kind and r["surface"] in fr.GDOC_SURFACES]
         if not group:
             continue
+        placed.update(id(r) for r in group)
         out += [
             f"## {title} ({len(group)})",
             "",
@@ -157,6 +213,7 @@ def main() -> int:
         out.append("")
 
     key_charts = [r for r in rows if r["surface"] == "key chart"]
+    placed.update(id(r) for r in key_charts)
     if key_charts:
         out += [
             f"## 🔴 Key-chart slots ({len(key_charts)}) — invisible to the Part 2 audit",
@@ -180,13 +237,15 @@ def main() -> int:
         out.append("")
 
     manual = [r for r in rows if r["surface"] in MANUAL_SURFACES]
+    placed.update(id(r) for r in manual)
     if manual:
         out += [
             f"## ⛔ Explorer / data-insight / static-viz references ({len(manual)}) — these BLOCK the row",
             "",
             "`redirect_to_scatter.py` converts these rows to `BLOCKED` before `--apply`, because they "
             "embed the old chart's config and no redirect covers them. Re-point them, then re-run with "
-            "`--allow-manual-refs`.",
+            "`--allow-manual-refs`. A data insight is itself a Google Doc, so it is listed in the table "
+            "above too — with the links that locate the reference inside it.",
             "",
             "| Surface | Where | Old chart | Open |",
             "|---|---|---|---|",
@@ -197,6 +256,7 @@ def main() -> int:
         out.append("")
 
     narrative = [r for r in rows if r["surface"] == "narrative chart"]
+    placed.update(id(r) for r in narrative)
     if narrative:
         out += [f"## ℹ️ Narrative charts ({len(narrative)}) — do not block", ""]
         for r in narrative:
@@ -204,6 +264,29 @@ def main() -> int:
                 f"- `{r['where']}` on `{r['subject']}` — params `{r.get('query_string') or '—'}`. Renders from "
                 f'its own materialized config, and its "Explore the data" href is covered by the redirect; '
                 f"its params override the stored ones."
+            )
+        out.append("")
+
+    # Anything no section above claimed — an old slug of the source, a site redirect, a
+    # surface the sweep gains later. Listed rather than dropped, so the handoff cannot go
+    # quiet about a reference the sweep did find.
+    other = [r for r in rows if id(r) not in placed]
+    if other:
+        out += [
+            f"## ❔ Other references ({len(other)}) — judge these by hand",
+            "",
+            "None of the sections above covers these. A `redirect` row is an old slug of the chart "
+            "itself, which the unpublish deletes — `redirect_to_scatter.py` re-points those unless "
+            "`--skip-alias-repoint` is passed.",
+            "",
+            "| Surface | Old chart | Where | Context | Open |",
+            "|---|---|---|---|---|",
+        ]
+        for r in sorted(other, key=lambda r: (r["surface"], str(r["where"]))):
+            link = fr.admin_url(r.get("where_path", ""), args.host, admin)
+            out.append(
+                f"| {r['surface']} | `{fr.cell(r['subject_label'], 44)}` | {fr.cell(r['where'], 44)} | "
+                f"{fr.cell(r.get('context', ''), 44)} | {f'[🔗 open]({link})' if link else '—'} |"
             )
         out.append("")
 
@@ -222,20 +305,43 @@ def main() -> int:
         "reference's win — so a row whose params column is not `—` needs a decision, not a "
         "blind paste.",
         "",
-        'This handoff covers only what the sweep found. Read its own "Not searched" section for the '
-        "coverage boundary — a short table is not by itself a clean result.",
+        "## Coverage boundary",
+        "",
+        "This handoff holds what the sweep *found*, which is not everything that exists — so a "
+        "short table is not by itself a clean result, and nothing below was checked. The "
+        "permanent limits are the sweep's own, restated here because this file is what gets "
+        "handed on:",
         "",
     ]
+    # Restated from `find_references.NOT_SEARCHED` rather than copied, for the same reason the
+    # formatters are imported: a second copy drifts, and the drift reads as coverage we have.
+    out += [f"- **Never swept:** {note}" for note in fr.NOT_SEARCHED]
+    if args.gaps is None:
+        out.append(
+            "- ⚠️ **This run's own gaps were not carried over.** Re-run the sweep with `--gaps-json` "
+            "and pass that file as `--gaps` to list them here — a surface that failed open (an "
+            "absent table, a subject that did not resolve) is the gap a reader has no other way "
+            "of knowing about."
+        )
+    else:
+        run_gaps = json.loads(args.gaps.read_text())
+        out += [f"- **Gap in this run:** {note}" for note in run_gaps]
+        if not run_gaps:
+            out.append("- The sweep reported no gaps of its own in this run.")
+    out.append("")
 
     output = args.output or args.references.with_name(
         args.references.stem.replace("_references", "") + "_reference_handoff.md"
     )
     output.write_text("\n".join(out))
-    counts = {k: len([r for r in rows if r["kind"] == k]) for k in ("embed", "link", "render")}
+    tabled = {
+        kind: len([r for r in rows if r["kind"] == kind and r["surface"] in fr.GDOC_SURFACES])
+        for kind in ("embed", "link")
+    }
     print(f"wrote {output}")
     print(
-        f"  embeds {counts['embed']}  links {counts['link']}  render {counts['render']}"
-        f"  (key charts {len(key_charts)}, manual {len(manual)}, narrative {len(narrative)})"
+        f"  {len(rows)} reference(s): article embeds {tabled['embed']}, article links {tabled['link']}, "
+        f"key charts {len(key_charts)}, manual {len(manual)}, narrative {len(narrative)}, other {len(other)}"
     )
     return 0
 

@@ -311,10 +311,14 @@ Pass the sweep's `--json` through `scripts/build_reference_handoff.py`, which ad
 
 ```bash
 .venv/bin/python .claude/skills/find-chart-references/scripts/find_references.py \
-  --chart-slugs '<slugs+aliases>' --json ai/<name>_references.json
+  --chart-slugs '<slugs+aliases>' --json ai/<name>_references.json \
+  --gaps-json ai/<name>_references_gaps.json
 .venv/bin/python .claude/skills/add-gdp-scatter/scripts/build_reference_handoff.py \
-  --references ai/<name>_references.json --pairs ai/<name>_part2_pairs.json
+  --references ai/<name>_references.json --pairs ai/<name>_part2_pairs.json \
+  --gaps ai/<name>_references_gaps.json
 ```
+
+`--gaps` is not optional in practice: it carries the sweep's run-specific coverage gaps into the handoff, next to the permanent ones the builder restates from the sweep's own `NOT_SEARCHED`. Without it the handoff says so in a ⚠️ line, because a reader who never opens the sweep would otherwise read a short table as a complete blast radius. `--pairs` takes either pair schema — Part 1's table rows (admin URLs) or the Part 2 payload (public grapher URLs, resolved against the DB) — so pass whichever list matches the rows actually being retired, and pass it **before** Part 2 unpublishes them.
 
 Those aids are the difference between a row someone can fix and a row that names an article and leaves them to hunt through it:
 
@@ -324,6 +328,8 @@ Those aids are the difference between a row someone can fix and a row that names
 - **Find in the doc** — a copy-paste search string: the **link text** for a prose hyperlink, or the **chart slug** for a block embed (the doc holds a bare grapher URL there, and `posts_gdocs_links.target` keeps the slug as the author typed it, so it still matches when the doc uses an older one). `—` means there is nothing to search for.
 
 **Import those formatters from `find-chart-references/scripts/find_references.py`; never reimplement them** — `doc_url`, `gdoc_preview_url`, `deep_link`, `search_hint`, `cell`. A second copy drifts, and the drift shows up as a handoff whose links quietly stop resolving. Strip the tailscale suffix from the admin root you pass them, so the links read like the sweep's own (which are already short).
+
+They only apply to Google Doc surfaces, though — `doc_url` and `gdoc_preview_url` read `surface_id` **as** a Doc id, and on an explorer or narrative-chart row that field holds a slug or a chart id, which renders as a Doc link resolving to nothing. So the two article tables are filtered to `GDOC_SURFACES`, every other surface gets the section that explains its own consequence (key charts, the blocking explorer/data-insight/static-viz set, narrative charts), and whatever no section claims lands in a catch-all table — a row the sweep found must never go missing here.
 
 ### Key-chart slots — the Part 2 audit cannot see them
 
