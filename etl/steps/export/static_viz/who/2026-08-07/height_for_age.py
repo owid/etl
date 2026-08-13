@@ -5,8 +5,8 @@ the -2 SD stunting threshold.
 
 Neither panel repeats the other sex's median. The two medians run within a few millimetres of each
 other from birth to about age 9, so a second line traces the panel's own median for two thirds of the
-range -- the same doubling that splitting the sexes into panels was meant to remove. The subtitle
-states the crossover instead, and it can be read off the two panels at a shared gridline.
+range -- the same doubling that splitting the sexes into panels was meant to remove. Where the two
+sexes differ can be read off the panels at a shared gridline.
 
 An encoding diagram names each part of the chart -- see `draw_encoding_diagram`. There is no legend
 in either version.
@@ -17,9 +17,9 @@ Two versions are emitted, following the static-chart templates:
   source, the OurWorldinData.org tagline and the license line.
 - mobile, 540x824: panels side by side in the portrait frame, diagram in the header, footer reduced
   to Data source plus the license, which is all that template has room for. It has no Note slot, so
-  the caveat that the two age ranges rest on different foundations sits in the subtitle instead --
-  see MOBILE_SUBTITLE. Its panels are 217px wide, which is why it carries five age ticks to the
-  desktop's six, and why the diagram cannot sit inside a panel.
+  the standards-versus-reference distinction appears only on desktop; the shared subtitle calls the
+  whole range a reference, which is what keeps mobile from over-claiming without it. Its panels are
+  217px wide, which is why the diagram cannot sit inside a panel.
 
 Both layouts put their panels side by side rather than stacked. Stacked in the portrait frame each
 panel is a 2:1 landscape box, about 222px of height for a 165 cm range, and the adolescent growth
@@ -46,10 +46,13 @@ the `chart` group in each frame; these are the steps done by hand around it:
 2. Delete the import's wrapper frame (it carries a white fill) and its `patch_1`, `title`,
    `subtitle`, `note`, `data-source`, `tagline` and `license` groups. The template's own slots carry
    those strings, so they are duplicated otherwise.
-3. Restyle the in-plot labels to Lato at 22/14/12, then re-anchor each on its mark: y ticks by their
-   right edge, x ticks by their centre except the last by its right edge, `Almost all children` by
-   its right edge, the median and `8 in 10 children` by their left, the stunting label by its centre.
-4. Centre the group in the band between the header's bottom and the footer's first row.
+3. Restyle the in-plot labels to Lato at 16/14/12 -- facet titles, ticks, diagram -- keeping the facet
+   titles and the axis label bold, then re-anchor each on its mark: y ticks by their right edge, the
+   first x tick by its left and the last by its right, the rest centred, the median by its right edge,
+   the band labels by their left, the stunting label by its centre.
+4. Bind the medians to `Default Palette/Rusty Orange` and `Default Palette/Denim`, and set each band's
+   fill to that colour blended 0.90 and 0.74 towards white -- the library carries no tints.
+5. Centre the group in the band between the header's bottom and the footer's first row.
 """
 
 import matplotlib
@@ -110,8 +113,8 @@ STUNTING_COLUMN = "height_sd_minus_2"
 # Axis treatment copied from grapher so the static chart reads like our interactive ones.
 # Values from owid-grapher: TICK_COLOR and GRID_LINE_DASH_PATTERN in
 # packages/@ourworldindata/grapher/src/axis/AxisViews.tsx, GRAPHER_DARK_TEXT (= GRAY_80) in
-# .../color/ColorConstants.ts. Grapher dashes its gridlines rather than drawing them solid,
-# labels axes in bold, and draws no axis line -- the gridlines carry the reading.
+# .../color/ColorConstants.ts. Grapher dashes its gridlines rather than drawing them solid and
+# labels axes in bold. The y axis carries no line: its gridlines carry the reading.
 GRID_COLOR = "#ddd"
 GRID_DASHES = (0, (4, 4))
 GRID_LINEWIDTH = 1.0
@@ -126,8 +129,8 @@ MUTED_COLOR = "#777777"
 # HorizontalAxisComponent (5px long, 1px wide, SOLID_TICK_COLOR, hanging below the axis, and
 # LineChart passes showTickMarks={true}). The line they hang from is not an axis line -- grapher has
 # no such component -- it is VerticalAxisZeroLine, the same colour and width, spanning the plot at
-# y=0. This chart's y axis starts at 38 cm, so there is no zero to draw; the same treatment is
-# applied to the baseline instead, which is what makes the end ticks close it like an elbow.
+# y=0. This chart's y axis does not reach zero, so there is no zero line to draw; the same treatment
+# is applied to the baseline instead, which is what makes the end ticks close it like an elbow.
 TICK_COLOR = "#999999"
 TICK_LENGTH = 5
 TICK_WIDTH = 1
@@ -199,15 +202,11 @@ LAYOUTS = {
     },
 }
 
-# The mobile template has no Note slot, and the standards-vs-reference caveat is about what the
-# chart claims rather than about a visual artifact, so it rides in the subtitle instead -- without it
-# the older half of the age range reads as an optimal-growth standard. Its two-line slot at the
-# template's type size is about 114 characters, which is the whole budget for both sentences, so
-# mobile states the crossover more briefly than desktop does.
-MOBILE_SUBTITLE = (
-    "Girls are taller than boys between ages {crossover_start:.0f} and {crossover_end:.0f}. "
-    "Ages 0–{splice:.0f} show healthy growth; {splice:.0f}–{age_max:.0f}, how an earlier sample grew."
-)
+# Both layouts share this, which is what lets the mobile template's two-line subtitle slot hold it:
+# it fits in about 114 characters at the template's type size. Calling the whole range a *reference*
+# is also what keeps mobile honest without a Note slot to put a caveat in -- it claims only that this
+# is how the reference population's heights are distributed, not that they are heights to aim for.
+SUBTITLE = "Global growth reference for infants, children and adolescents, as defined by the World Health Organization."
 
 # A template pixel in points: the figure is 100 template px per inch and there are 72 points
 # to the inch, so one pixel is 0.72pt. Used to convert the templates' geometry for text
@@ -299,24 +298,6 @@ def build_source_citation(tb: Table) -> str:
         if year and year not in seen:
             seen.append(year)
     return "; ".join(f"{producer} ({'; '.join(sorted(ys))})" for producer, ys in years.items())
-
-
-def find_crossover(tb: Table) -> tuple[float, float]:
-    """Return the age range, in years, over which girls are taller than boys on average.
-
-    The subtitle states this as one span, so check that it really is a single contiguous
-    stretch. Two separate windows would otherwise be reported as one wide range that
-    includes ages where boys are in fact taller.
-    """
-    medians = tb.pivot(index="age_years", columns="sex", values=MEDIAN_COLUMN).sort_index()
-    taller = np.flatnonzero((medians["Girls"] > medians["Boys"]).to_numpy())
-    assert len(taller) > 0, "Girls are never taller than boys, so the crossover sentence does not apply."
-    assert (np.diff(taller) == 1).all(), (
-        "Girls are taller than boys over more than one separate age range, which the subtitle "
-        "would collapse into a single span."
-    )
-    ages = medians.index.to_numpy()
-    return float(ages[taller[0]]), float(ages[taller[-1]])
 
 
 def find_discontinuities(tb: Table) -> list[float]:
@@ -519,28 +500,6 @@ def wrap_to_content_width(text: str, layout: dict, fontsize: float) -> str:
     return "\n".join(lines)
 
 
-def build_subtitle(tb: Table, breaks: list[float], layout: dict) -> str:
-    """Compose the subtitle, folding in the standards-vs-reference caveat on mobile.
-
-    It carries what the shapes say together, not how to read them: the encoding diagram names each
-    band where it is drawn, and repeating that here would cost the mobile template's whole slot.
-    """
-    crossover_start, crossover_end = find_crossover(tb)
-    if layout["full_footer"]:
-        text = (
-            "Girls are taller than boys, on average, between the ages of about "
-            f"{crossover_start:.0f} and {crossover_end:.0f}."
-        )
-    else:
-        text = MOBILE_SUBTITLE.format(
-            crossover_start=crossover_start,
-            crossover_end=crossover_end,
-            splice=breaks[1],
-            age_max=float(tb["age_years"].max()),
-        )
-    return wrap_to_content_width(text, layout, layout["body_fontsize"])
-
-
 def build_note(breaks: list[float], layout: dict) -> str:
     """Compose the Note row: the two source discontinuities and what each product is."""
     text = (
@@ -715,7 +674,7 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
     title_lines = title.count("\n") + 1
     subtitle_y = layout["title_y"] + title_lines * px(layout["title_fontsize"]) + TITLE_SUBTITLE_GAP
 
-    subtitle = build_subtitle(tb, breaks, layout)
+    subtitle = wrap_to_content_width(SUBTITLE, layout, body_fontsize)
     subtitle_lines = subtitle.count("\n") + 1
 
     fig.text(
