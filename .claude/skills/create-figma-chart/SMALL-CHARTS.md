@@ -328,6 +328,13 @@ added in Figma.
 `World - Richest decile`; the label should read `Richest decile`, since "World" is the only entity and
 therefore distinguishes nothing.
 
+**But leave the entity name itself exactly as grapher spells it.** Dropping a redundant "World" is a
+labeling decision; re-typesetting the entity is a *data* edit. Grapher renders `Cote d'Ivoire` without
+the accent and a designer reference may show `Côte d'Ivoire` — leave grapher's form, because the entity
+name is the canonical one in the regions dataset and a "corrected" one makes the image disagree with
+both the chart and the data. Same reasoning as shortening a category label (SKILL.md Step 8c): if the
+spelling should change, it changes upstream. Asked on this run, the decision was to keep grapher's.
+
 ### Order of operations — get this wrong and you place every label twice
 
 Each geometry change invalidates every label position, so **all the maps run before any label is
@@ -525,7 +532,12 @@ fills the height.
 selection (SKILL.md Step 8b): change the chart config, or point a draft chart with `yAxis.min` set and
 export it through `by-uuid/<configId>.svg`.
 
-**When the decision is to fix it in Figma instead, do it as a scripted y-map — not a group stretch.**
+**In practice the Figma fix is the one that gets taken, so treat it as the normal route and not a last
+resort.** Asked directly, the design owner chose to leave the rescale in the image rather than change
+`yAxis.min` on a chart that many other surfaces render. Record the deviation and move on; only push it
+upstream if the chart is one you own anyway.
+
+**Do it as a scripted y-map — not a group stretch.**
 Stretching the chart group on one axis ovals the dots and is forbidden elsewhere in this skill. But on
 a thumbnail export the line paths and the dots are *separate nodes*, which makes the y-analogue of
 Step 8's sanctioned x-map safe:
