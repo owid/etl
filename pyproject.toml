@@ -142,6 +142,7 @@ dev = [
     "sqlacodegen>=3.1.0",
     "codespell>=2.4.1",
     "playwright>=1.60.0",
+    "seaborn>=0.13.2",
 ]
 
 [project.optional-dependencies]

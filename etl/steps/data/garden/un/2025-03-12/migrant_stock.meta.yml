@@ -88,7 +88,7 @@ tables:
         unit: male emigrants
       # Emigrant share
       emigrants_share_of_total_population:
-        title: Share of the population born in this country but now living in another country
+        title: Share of the population born in this country but now living abroad
         unit: "%"
         short_unit: "%"
         description_short: The total number of people who have left the country, as a share of the current population.

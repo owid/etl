@@ -35,6 +35,7 @@ import subprocess
 import sys
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote, urlencode
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 sys.path.insert(0, str(REPO_ROOT))
@@ -109,14 +110,18 @@ def catalog_paths_from_anchor(anchor: str, meta_file: Path) -> list[str]:
         raise SystemExit(f"Anchor '{anchor}' is not referenced anywhere in {meta_file}")
 
     data = ruamel_load(meta_file)
-    # <ns>/<ver>/<ds> from etl/steps/data/garden/<ns>/<ver>/<ds>.meta.yml
+    # <ns>/<ver>/<ds> from etl/steps/data/<channel>/<ns>/<ver>/<ds>.meta.yml — the indicators are
+    # addressed under `grapher/` either way, so a grapher-channel meta.yml (which some datasets use
+    # to override text) resolves exactly like a garden one.
     parts = meta_file.resolve().parts
-    try:
-        i = parts.index("garden")
-    except ValueError:
-        raise SystemExit(f"--meta-file must be a garden .meta.yml (got {meta_file})")
+    i = next((parts.index(c) for c in ("garden", "grapher") if c in parts), None)
+    if i is None:
+        raise SystemExit(f"--meta-file must be a garden or grapher .meta.yml (got {meta_file})")
     ns, ver = parts[i + 1], parts[i + 2]
-    ds = meta_file.name.removesuffix(".meta.yml")
+    # `.meta.override.yml` is the manual-curation surface of auto-generated metadata (e.g. WDI);
+    # strip the longer suffix first, or the dataset name keeps a `.meta.override.yml` tail and every
+    # catalogPath misses.
+    ds = meta_file.name.removesuffix(".meta.override.yml").removesuffix(".meta.yml")
 
     # If the anchor is consumed inside definitions.common, every variable inherits it.
     common_block = re.search(r"^definitions:.*?(?=^\S)", text, re.S | re.M)
@@ -172,11 +177,15 @@ def sweep_charts(env: OWIDEnv, variable_ids: list[int], field: str | None) -> li
                c.isInheritanceEnabled AS inheritance_enabled,
                MAX(cd.property = 'y') AS affected_var_in_y,
                (SELECT COUNT(*) FROM chart_dimensions cd2
-                WHERE cd2.chartId = c.id AND cd2.property = 'y') AS n_y_dims
+                WHERE cd2.chartId = c.id AND cd2.property = 'y') AS n_y_dims,
+               GROUP_CONCAT(DISTINCT v.shortName ORDER BY v.shortName SEPARATOR ', ') AS via_indicators,
+               GROUP_CONCAT(DISTINCT IF(cd.property = 'y', v.shortName, NULL)
+                            ORDER BY IF(cd.property = 'y', v.shortName, NULL) SEPARATOR ', ') AS via_y_indicators
                {shielded_col}
         FROM chart_dimensions cd
         JOIN charts c ON c.id = cd.chartId
         JOIN chart_configs cc ON cc.id = c.configId
+        JOIN variables v ON v.id = cd.variableId
         WHERE cd.variableId IN ({clause})
         GROUP BY c.id, cc.slug, c.publishedAt, c.isInheritanceEnabled
         ORDER BY published DESC, cc.slug
@@ -192,14 +201,36 @@ def sweep_charts(env: OWIDEnv, variable_ids: list[int], field: str | None) -> li
                 c["no_inherit_reason"] = "several y series — grapher has no inheritance parent"
             elif not c["inheritance_enabled"]:
                 c["no_inherit_reason"] = "inheritance disabled on the chart"
+            else:
+                # The inheritance parent is the single y variable, so for chart text that y
+                # indicator alone carries the edit. An affected variable sitting in x/color/size
+                # on the same chart (e.g. a scatter whose two axes share the anchor) would be
+                # misattributed by the all-properties list — credit only the y one.
+                c["via_indicators"] = c["via_y_indicators"]
     return charts
 
 
 def sweep_mdim_views(env: OWIDEnv, variable_ids: list[int], catalog_paths: list[str]) -> list[dict]:
+    # Index every view's dimensions by its `fullConfigId`, which is what
+    # `multi_dim_x_chart_configs.chartConfigId` points at. Dimensions are what selects a view
+    # in a URL, and reading them out of the config avoids parsing `viewId`: that column holds
+    # `dim=choice` pairs joined by `__`, and a choice slug can itself contain `__` (and even a
+    # trailing space), so there is no safe way to split it back into dimensions.
+    all_mdims = env.read_sql("SELECT catalogPath, slug, published, config FROM multi_dim_data_pages")
+    parsed = []
+    dims_by_config_id: dict[str, dict] = {}
+    for row in all_mdims.to_dict(orient="records"):
+        config = json.loads(row["config"]) if isinstance(row["config"], str) else (row["config"] or {})
+        parsed.append((row, config))
+        for view in config.get("views", []):
+            if view.get("fullConfigId"):
+                dims_by_config_id[view["fullConfigId"]] = view.get("dimensions") or {}
+
     clause, params = _in_clause(variable_ids, "v")
     df = env.read_sql(
         f"""
-        SELECT md.catalogPath AS mdim_catalog_path, md.slug, md.published, mx.viewId, mx.id AS mx_id
+        SELECT md.catalogPath AS mdim_catalog_path, md.slug, md.published, mx.viewId, mx.id AS mx_id,
+               mx.chartConfigId
         FROM multi_dim_x_chart_configs mx
         JOIN multi_dim_data_pages md ON md.id = mx.multiDimId
         WHERE mx.variableId IN ({clause})
@@ -207,13 +238,13 @@ def sweep_mdim_views(env: OWIDEnv, variable_ids: list[int], catalog_paths: list[
         params=params,
     )
     views = df.to_dict(orient="records")
+    for v in views:
+        v["dims"] = dims_by_config_id.get(v["chartConfigId"], {})
     seen = {(v["mdim_catalog_path"], v["viewId"]) for v in views}
 
     # Client-side scan: mx.variableId only records one variable per view; multi-indicator views
     # carrying an affected variable in other y slots are found by scanning the configs.
-    all_mdims = env.read_sql("SELECT catalogPath, slug, published, config FROM multi_dim_data_pages")
-    for _, row in all_mdims.iterrows():
-        config = json.loads(row["config"]) if isinstance(row["config"], str) else row["config"]
+    for row, config in parsed:
         for view in config.get("views", []):
             y = view.get("indicators", {}).get("y", [])
             if not isinstance(y, list):
@@ -233,6 +264,8 @@ def sweep_mdim_views(env: OWIDEnv, variable_ids: list[int], catalog_paths: list[
                             "published": row["published"],
                             "viewId": json.dumps(view.get("dimensions", {})),
                             "mx_id": None,
+                            "chartConfigId": view.get("fullConfigId"),
+                            "dims": view.get("dimensions") or {},
                         }
                     )
     return views
@@ -360,12 +393,26 @@ def render_markdown(result: dict[str, Any], branch: str) -> str:
         f"{len(result['gdoc_refs'])} article references."
     )
     lines.append("")
+    # Per-indicator breakdown: which indicator carries the edited text onto how many charts. A bare
+    # total hides that one indicator drives most of the surfaces (and that some drive none).
+    if affected_charts:
+        per_indicator: dict[str, list[dict]] = {}
+        for c in affected_charts:
+            for name in str(c.get("via_indicators") or "?").split(", "):
+                per_indicator.setdefault(name, []).append(c)
+        lines.append("### Indicators carrying the edit")
+        for name, cs in sorted(per_indicator.items(), key=lambda kv: (-len(kv[1]), kv[0])):
+            n_pub = sum(1 for c in cs if c["published"])
+            lines.append(f"- `{name}` — {len(cs)} charts ({n_pub} published)")
+        lines.append("")
     if affected_charts:
         lines.append("### Charts")
         for c in affected_charts:
             pub = "" if c["published"] else " (unpublished)"
+            via = f" — via `{c['via_indicators']}`" if c.get("via_indicators") else ""
             lines.append(
-                f"- [{c['slug']}]({site}/grapher/{c['slug']}){pub} — [edit]({site}/admin/charts/{c['chart_id']}/edit)"
+                f"- [{c['slug']}]({site}/grapher/{c['slug']}){pub}{via} — "
+                f"[edit]({site}/admin/charts/{c['chart_id']}/edit)"
             )
         lines.append("")
     if shielded:
@@ -386,7 +433,18 @@ def render_markdown(result: dict[str, Any], branch: str) -> str:
     if result["mdim_views"]:
         lines.append("### MDim views")
         for v in result["mdim_views"]:
-            lines.append(f"- `{v['mdim_catalog_path']}` view `{v['viewId']}` (published: {bool(v['published'])})")
+            # A view is selected by its dimensions as URL query params, so the suffix is built
+            # from the view's own `dimensions` — NOT from `viewId`, which is a `__`-joined list
+            # of `dim=choice` pairs and lands on the default view if pasted after `?`. When the
+            # dimensions can't be resolved, link to the MDim itself rather than to a wrong view.
+            qs = urlencode(sorted((v.get("dims") or {}).items()))
+            suffix = f"?{qs}" if qs else ""
+            admin = f"{site}/admin/grapher/{quote(str(v['mdim_catalog_path']), safe='')}{suffix}"
+            links = f"[admin preview]({admin})"
+            if v["published"] and v.get("slug"):
+                links = f"[{v['slug']}{suffix}]({site}/grapher/{v['slug']}{suffix}) — " + links
+            pub = "" if v["published"] else " (unpublished)"
+            lines.append(f"- `{v['mdim_catalog_path']}` view `{v['viewId']}`{pub} — {links}")
         lines.append("")
     if result["explorers"]:
         lines.append("### Explorers")
@@ -402,7 +460,7 @@ def render_markdown(result: dict[str, Any], branch: str) -> str:
         lines.append("### Narrative charts")
         for n in result["narrative_charts"]:
             shield = " (shielded by own override)" if n.get("shielded") else ""
-            lines.append(f"- {n['name']} (id {n['id']}){shield}")
+            lines.append(f"- {n['name']} (id {n['id']}){shield} — [edit]({site}/admin/narrative-charts/{n['id']}/edit)")
         lines.append("")
     if result["gdoc_refs"]:
         lines.append("### Article references (informational — displayed text changes, embeds don't break)")
