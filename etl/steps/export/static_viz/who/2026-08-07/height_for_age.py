@@ -33,26 +33,86 @@ fixes is the structure: which text slots exist, in what order, and which share a
 
 Figma
 -----
-Page `20260812 Expected height of boys and girls, from birth to age 19 (Pablo A)` in `Charts (2026)`
-(file key `s6Sv60bakebRRW2TxsMQbF`), frames `expected-height-boys-girls` and
-`expected-height-boys-girls-mobile`, each beside a reference copy of this step's own render.
+The whole handoff, written out so it can be redone in a later session with nothing but this file.
 
-The frames take their prose, fonts, logo and background from the static-chart templates and only the
-plot and the encoding diagram from here. To carry a data update through, re-run this step and replace
-the `chart` group in each frame; these are the steps done by hand around it:
+**Target.** File `Charts (2026)`, key `s6Sv60bakebRRW2TxsMQbF`. Page
+`20260812 Expected height of boys and girls, from birth to age 19 (Pablo A)`, sitting at the top of
+the dated block -- insert after the `-----------` divider page, not at a counted index. Two frames,
+each named for the slug the website exports by, with a reference copy of this step's own render to
+their left:
 
-1. Rescale the import by 100/96 -- matplotlib declares points and Figma imports at 96px per inch,
-   while this figure is built at 100 template px per inch.
-2. Delete the import's wrapper frame (it carries a white fill) and its `patch_1`, `title`,
-   `subtitle`, `note`, `data-source`, `tagline` and `license` groups. The template's own slots carry
-   those strings, so they are duplicated otherwise.
-3. Restyle the in-plot labels to Lato at 16/14/12 -- facet titles, ticks, diagram -- keeping the facet
-   titles and the axis label bold, then re-anchor each on its mark: y ticks by their right edge, the
-   first x tick by its left and the last by its right, the rest centred, the median by its right edge,
-   the band labels by their left, the stunting label by its centre.
-4. Bind the medians to `Default Palette/Rusty Orange` and `Default Palette/Denim`, and set each band's
-   fill to that colour blended 0.90 and 0.74 towards white -- the library carries no tints.
-5. Centre the group in the band between the header's bottom and the footer's first row.
+| Frame | Cloned from | Size |
+|---|---|---|
+| `expected-height-boys-girls` | `5332:75` Static Chart Template_Horizontal | 850x638 |
+| `expected-height-boys-girls-mobile` | `24590:32` Static Chart Template_Mobile (example 2) | 540x824 |
+
+**Import.** Upload with `upload_assets` and POST the file to the returned `submitUrl`
+(`curl -F "file=@<path>"`); never `createNodeFromSvg`, which caps at 50k characters. The upload lands
+on whatever page Figma has open, so move it. Then:
+
+1. Move the import's children out of its wrapper FRAME and delete the frame: it carries a white fill
+   that would cover the template's background, and `resize()` on it rewraps every text node.
+2. `rescale(100 / 96)`. matplotlib declares the root in points, Figma imports at 96px per inch, and
+   this figure is built at 100 template px per inch. `rescale(clone.width / imported.width)` is the
+   same number and self-correcting.
+3. Keep that group as the reference copy; `clone()` it for the working copy and append the clone to
+   the template frame. Rebuild from the reference, never by patching the working copy.
+4. From the working copy delete `patch_1`, `title`, `subtitle`, `note`, `data-source`, `tagline` and
+   `license`. The template's own slots carry those strings; left in place they are duplicated.
+
+**Template text slots.** Fill them from this step's own constants, restoring the mixed weights the
+templates ship -- setting `characters` propagates the first character's style over the whole string:
+
+| Slot | Content | Weights |
+|---|---|---|
+| Title | `TITLE` | template's Playfair |
+| Subtitle | `SUBTITLE` | Lato Regular |
+| `Note:` (desktop only) | `build_note(...)` | `Note:` Bold, rest Regular |
+| `Data source:` | `Data source: ` + `build_source_citation(...)` | `Data source:` Bold, rest Regular |
+| Tagline (desktop) | leave the template's | -- |
+| License (desktop) | `Licensed under ` / `CC-BY` / ` by the author ` / `AUTHOR` | Medium / Bold / Medium / Bold |
+| `CC BY` (mobile) | leave the template's | -- |
+
+Two positions are derived rather than the template's fixed y, because the template pins them for a
+two-line title and a two-line subtitle:
+
+- `subtitle.y = 16.216 + title.height + 6`. Reset `title.y = 16.216` first -- the desktop header is
+  not an auto-layout frame, so Figma re-centres a title that shrinks to one line.
+- `note.y = 589.216 - 5.4 - note.height`, so a third line eats into the chart area rather than the
+  source row. Mobile's header is auto-layout and needs neither.
+
+**Colors.** Bind the medians to library styles and derive the bands from them; the library carries no
+tints. The gid names a group, so descend to its `VECTOR` children before calling the setter.
+
+| Layer | Treatment |
+|---|---|
+| `boys___50` | `setStrokeStyleIdAsync` -> `Default Palette/Rusty Orange`, key `65bab597d085689b1ea82a69f4d785cb9212c234` |
+| `girls___50` | `setStrokeStyleIdAsync` -> `Default Palette/Denim`, key `e1538d9330d7b22168f0c19fa562897aa8975f90` |
+| `<sex>__almost-all-children` | that style's color blended 0.90 towards white |
+| `<sex>__8-in-10-children` | blended 0.74 towards white |
+
+Rusty Orange and Denim separate by dE 70 at worst; their grayscale seam is 1.14:1, which does not gate
+here because the two series sit in separate, text-titled panels.
+
+**In-plot text.** Figma substitutes Inter for matplotlib's family, so restyle to Lato at three ranks
+and re-anchor every label on its mark. Do both in one call and in that order: the widths only settle
+on the next call, and a later coordinate patch would use anchors that the fit has already moved.
+
+| Rank | Size | Weight |
+|---|---|---|
+| Facet titles (`Boys`, `Girls`) | 16 | Bold |
+| Tick labels, `Age in years` | 14 | `Age in years` Bold, ticks Regular |
+| Diagram labels | 12 | Regular |
+
+Anchors: y ticks by their right edge; the first x tick by its left and the last by its right, the rest
+centred; `Median` by its right edge; the band labels by their left; the stunting label by its centre.
+
+**Fit.** Centre the group in the band between the header's bottom and the footer's first visible row
+(`footer.y + min(0, source.y)`). No rescale is needed -- this step sizes the plot to the template --
+and one would move every font off its rank.
+
+**Audit before showing it.** Expect sizes {16, 14, 12} only, Lato Regular and Bold only, both medians
+reporting a bound style, no ink outside 16..W-16, and gaps of about 14 on desktop and 20 on mobile.
 """
 
 import matplotlib
@@ -207,6 +267,15 @@ LAYOUTS = {
 # is also what keeps mobile honest without a Note slot to put a caveat in -- it claims only that this
 # is how the reference population's heights are distributed, not that they are heights to aim for.
 SUBTITLE = "Global growth reference for infants, children and adolescents, as defined by the World Health Organization."
+
+# The mobile template has no Note slot, so a condensed form of the note rides in the subtitle instead.
+# It says what causes the two visible steps, which is what a reader needs to know they are real rather
+# than drawing errors -- and the age-5 clause carries the standards-versus-reference distinction too,
+# since that switch is what the step at 5 is. Every line it adds comes out of the plot's height.
+MOBILE_NOTE = (
+    "The steps mark a switch from lying to standing measurement at age {first:.0f}, "
+    "and to an older-age reference at {second:.0f}."
+)
 
 # A template pixel in points: the figure is 100 template px per inch and there are 72 points
 # to the inch, so one pixel is 0.72pt. Used to convert the templates' geometry for text
@@ -674,7 +743,10 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
     title_lines = title.count("\n") + 1
     subtitle_y = layout["title_y"] + title_lines * px(layout["title_fontsize"]) + TITLE_SUBTITLE_GAP
 
-    subtitle = wrap_to_content_width(SUBTITLE, layout, body_fontsize)
+    subtitle = SUBTITLE
+    if not layout["full_footer"]:
+        subtitle = f"{subtitle} {MOBILE_NOTE.format(first=breaks[0], second=breaks[1])}"
+    subtitle = wrap_to_content_width(subtitle, layout, body_fontsize)
     subtitle_lines = subtitle.count("\n") + 1
 
     fig.text(
