@@ -330,13 +330,14 @@ The chart spans the full content width, left-aligned with the title/subtitle/log
 > **Its *proportions* come from `TEMPLATES.md`; its *size* does not — so scale it to the clone's width
 > before trusting any of it.** The `figsize = (width_px / 100, height_px / 100)` recipe fixes the
 > aspect ratio, not the canvas: matplotlib writes the root in **points**, and a template pixel is
-> 0.72 pt, so the 850 × 638 horizontal frame arrives as `width="612pt" height="459.36pt"` and imports
-> at 612 × 459.36 — every slot position and font size 72% of target. One uniform rescale to the
-> clone's width puts all of it right at once, and the height lands on the clone's by construction
-> because the ratio already matches:
+> 0.72 pt, so the 850 × 638 horizontal frame arrives as `width="612pt" height="459.36pt"`. Figma then
+> reads those points at the CSS 96 px per inch, so the import lands at 816 × 612.48 — the figure was
+> drawn at 100 template px to the inch and Figma renders it at 96, leaving every slot position and font
+> size 96% of target. One uniform rescale to the clone's width puts all of it right at once, and the
+> height lands on the clone's by construction because the ratio already matches:
 >
 > ```js
-> svg.rescale(clone.width / svg.width)          // 850 / 612 = 1.3889 = 1 / 0.72
+> svg.rescale(clone.width / svg.width)          // 850 / 816 = 1.0417 = 100 / 96
 > // then assert the height, which is what proves the step used the template's ratio
 > console.assert(Math.abs(svg.height - clone.height) < 1, svg.height, clone.height);
 > ```
