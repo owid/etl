@@ -534,9 +534,11 @@ To refresh: re-run this step, re-upload the SVG to the same page, and reapply th
 
 ## Step 9 — PR and the review chain
 
-The branch, worktree and draft PR already exist from Step 4. Commit the step plus its committed
-PNG/SVG, push, and fill in the PR body — then [`/pr-babysitter`](../pr-babysitter/SKILL.md) for the
-Codex round. **Brief the babysitter with the deliberate decisions** (see the last gotcha).
+The branch, worktree and draft PR already exist from Step 4. **Run `make check` before committing** —
+the step is ordinary ETL code and has to be formatted, linted and typechecked like any other. Then
+commit the step plus its committed PNG/SVG, push, and fill in the PR body — then
+[`/pr-babysitter`](../pr-babysitter/SKILL.md) for the Codex round. **Brief the babysitter with the
+deliberate decisions** (see the last gotcha).
 
 The code review is only the first of several. The project defines the rest, and they are people,
 not checks — from `#2459`'s workflow, with the parts this skill touches in bold:

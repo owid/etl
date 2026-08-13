@@ -10,7 +10,10 @@ plausible, and the problem only shows up once a designer opens the SVG:
   all (which artists *should* carry one is not knowable from the SVG — matplotlib emits a
   ``line2d_<n>`` group per tick mark just as it does for an unnamed data line)
 - a frame that no longer matches the template it targets, because something reintroduced
-  ``bbox_inches="tight"`` and cropped the canvas to its content
+  ``bbox_inches="tight"`` and cropped the canvas to its content. Checked on **both** the PNG and the
+  SVG: the contract asks for two separate ``export_fig`` calls (the PNG opaque, the SVG transparent),
+  so the two can be saved with different arguments and only one of them end up cropped — and the SVG
+  is the file Figma consumes.
 
 Usage:
     verify_static_viz.py <step-dir-or-file-stem> [--template horizontal|vertical|mobile|mobile-square]
@@ -67,6 +70,13 @@ FILENAME_TEMPLATE_HINTS = {
     "_horizontal": "horizontal",
 }
 
+# The saved SVG's own canvas, to check its proportions the way the PNG's are checked. matplotlib
+# writes the root as width="612pt" height="459.36pt" viewBox="0 0 612 459.36"; take the width/height
+# pair when it is there and fall back to the viewBox, since either alone pins the ratio.
+SVG_ROOT = re.compile(r"<svg\b[^>]*>")
+SVG_LENGTH = re.compile(r'\b(width|height)="([0-9.]+)(?:pt|px|mm|cm|in|pc)?"')
+SVG_VIEWBOX = re.compile(r'\bviewBox="\s*[-+0-9.eE]+[,\s]+[-+0-9.eE]+[,\s]+([0-9.eE+]+)[,\s]+([0-9.eE+]+)')
+
 
 def template_for(stem: str, default: str | None) -> str | None:
     """Template a given output should match, from its filename suffix, else the default."""
@@ -76,7 +86,36 @@ def template_for(stem: str, default: str | None) -> str | None:
     return default
 
 
-def check_svg(path: Path, expected_gids: list[str]) -> list[str]:
+def frame_failures(kind: str, width: float, height: float, template: str) -> list[str]:
+    """Return a failure if one saved frame's proportions do not match the template it targets."""
+    target_w, target_h = TEMPLATE_RATIOS[template]
+    actual, target = width / height, target_w / target_h
+    if abs(actual - target) > TOLERANCE:
+        return [
+            f"{kind} frame is {width:g}x{height:g} (ratio {actual:.4f}) but the {template} template "
+            f"is {target_w}x{target_h} (ratio {target:.4f}). Something cropped the canvas — most "
+            'likely bbox_inches="tight" was passed to export_fig.'
+        ]
+    return []
+
+
+def svg_frame_size(svg: str) -> tuple[float, float] | None:
+    """Canvas size of an SVG from its root element, or None when it declares neither form."""
+    root = SVG_ROOT.search(svg)
+    if root is None:
+        return None
+    lengths = {name: float(value) for name, value in SVG_LENGTH.findall(root.group())}
+    if "width" in lengths and "height" in lengths and lengths["width"] and lengths["height"]:
+        return lengths["width"], lengths["height"]
+    viewbox = SVG_VIEWBOX.search(root.group())
+    if viewbox is not None:
+        width, height = float(viewbox.group(1)), float(viewbox.group(2))
+        if width and height:
+            return width, height
+    return None
+
+
+def check_svg(path: Path, expected_gids: list[str], template: str | None) -> list[str]:
     """Return a list of contract failures for one SVG."""
     svg = path.read_text()
     failures = []
@@ -119,6 +158,16 @@ def check_svg(path: Path, expected_gids: list[str]) -> list[str]:
         if gid not in ids:
             failures.append(f"expected gid {gid!r} is not an id in the SVG")
 
+    if template is not None:
+        size = svg_frame_size(svg)
+        if size is None:
+            failures.append(
+                "the SVG root declares neither a width/height pair nor a viewBox, so its frame "
+                "proportion could not be checked"
+            )
+        else:
+            failures += frame_failures("SVG", size[0], size[1], template)
+
     return failures
 
 
@@ -129,18 +178,10 @@ def check_png(path: Path, template: str | None) -> list[str]:
     try:
         from PIL import Image
     except ImportError:
-        return ["Pillow is not available, so the frame proportion could not be checked"]
+        return ["Pillow is not available, so the PNG frame proportion could not be checked"]
 
     width, height = Image.open(path).size
-    target_w, target_h = TEMPLATE_RATIOS[template]
-    actual, target = width / height, target_w / target_h
-    if abs(actual - target) > TOLERANCE:
-        return [
-            f"frame is {width}x{height} (ratio {actual:.4f}) but the {template} template is "
-            f"{target_w}x{target_h} (ratio {target:.4f}). Something cropped the canvas — most "
-            'likely bbox_inches="tight" was passed to export_fig.'
-        ]
-    return []
+    return frame_failures("PNG", width, height, template)
 
 
 def main() -> int:
@@ -150,9 +191,9 @@ def main() -> int:
         "--template",
         choices=sorted(TEMPLATE_RATIOS),
         help=(
-            "template whose proportions the PNG must match. A filename suffix (_mobile, _vertical, "
-            "_square) wins over this, so a directory holding several frames checks each correctly; "
-            "omit to skip the frame check entirely."
+            "template whose proportions both saved formats must match. A filename suffix (_mobile, "
+            "_vertical, _square) wins over this, so a directory holding several frames checks each "
+            "correctly; omit to skip the frame check entirely."
         ),
     )
     parser.add_argument(
@@ -186,7 +227,7 @@ def main() -> int:
     failed = False
     for svg in svgs:
         template = template_for(svg.stem, args.template)
-        failures = check_svg(svg, args.expect_gid)
+        failures = check_svg(svg, args.expect_gid, template)
         png = svg.with_suffix(".png")
         if png.exists():
             failures += check_png(png, template)
