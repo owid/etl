@@ -33,22 +33,40 @@ which matters below.
 ### Local — the project is checked out (preferred)
 
 ```bash
-cd owid-grapher/bespoke && yarn install && yarn dev
+cd owid-grapher && yarn startBespokeDevServer     # NOT `yarn dev` in bespoke/ — there is no such script
 # then http://localhost:8089/<project>/demo
 ```
 
 The demo page mounts every variant of the project inside a Shadow DOM, matching production
 (`bespoke/readme.md:281`). Prefer it because:
 
-- **It mounts them for you** — no manual `mount()` call, so none of the failure modes below apply.
 - **It works before publication**, which is the common case when a viz is being built.
 - **You choose the render size**, which is how you hit the template band's aspect ratio without
   distorting anything.
 
 Each variant is wrapped in `div.variant#variant--<name>` and carries a **"Download SVGs"** button
 (`bespoke/server/component-demo.html`) that calls `downloadSvgs(shadowRoot, "<project>-<variant>")`.
-For a one-off, clicking that button *is* the export — no scripting needed. Use
-`scripts/bespoke_svg.mjs` when you want a specific viewport, or several variants, or repeatability.
+
+**But the demo page shows each variant's `demoConfig`, which is almost never the view you want.**
+`food-trade`'s sankey ships `demoConfig: {}` — that renders *Maize*, not the product you were asked
+for. So the button and the bare `--demo` route only help when the defaults happen to be right.
+
+For a specific view, pass `--config` **with** `--demo`: the script then loads the demo page (for its
+dev-only global CSS and same-origin module resolution) and mounts its *own* instance of the bundle,
+in its own Shadow DOM, with your config:
+
+```bash
+node scripts/bespoke_svg.mjs --demo food-trade --variant sankey \
+  --config '{"product":"Wine","country":"All countries","flow":"both","hideControls":"true"}' \
+  --viz-width 923 --base wine-world-trade --out .
+```
+
+**Read the config keys out of the project, not out of the gdoc.** `src/config.ts` has the parser —
+`food-trade` takes `product`, `country`, `flow` (`both|import|export`), `title`, `subtitle`,
+`hideControls`, `hideFlowSwitcher`, `urlSync`. Sentinel values live in `src/helpers.ts`: the global
+view is `country: "All countries"` (`ALL_COUNTRIES`), and there is **no `World` entity** in the data,
+so "worldwide" is that sentinel rather than an entity name. Set `hideControls: "true"` — the controls
+are HTML and would not serialize anyway, but they change the layout.
 
 ### Published article — the project isn't checked out *(unverified)*
 
@@ -103,6 +121,36 @@ inside `page.evaluate`:
 > built bundles, not `bespoke/shared/*.ts`, so there is nothing to import on the article route. If
 > `exportSvg.ts` changes (particularly its `STYLE_PROPS` list), re-copy it.
 
+**One thing the script adds on top of `exportSvg.ts`: it widens the viewBox to the content bbox.**
+These components draw their side labels *outside* their own `<svg>` bounds and rely on the page not
+clipping. A standalone SVG clips at its viewBox, so the outermost labels would be cut. The script
+unions `source.getBBox()` into the declared box and rewrites `viewBox`/`width`/`height`. On the wine
+sankey that widened 784 → 787px; on a component with longer labels it will matter more.
+
+### Sizing the export: the container decides, and height may not follow
+
+`--viz-width` sets the width of the mounted container, and **that** is what these components lay out
+from (`useContainerWidth`) — not the viewport. Measured on the food-trade sankey:
+
+| container | SVG |
+|---|---|
+| 700 | 666 × 450 |
+| 818 | 784 × 450 |
+| 874 | 840 × 450 |
+| 950 | 916 × 450 |
+
+So the SVG is `container − 34`, and **the height is fixed** — 450px, set by the node count, not by the
+width. That is the opposite of a grapher export, where you request an aspect. Here you get one degree
+of freedom, so solve the container width against the band you have to fill:
+
+```
+containerWidth = 34 + (bandWidth / bandHeight) × naturalHeight
+```
+
+For the Horizontal template's band minus 12px gaps (818 × 414) that gave 923 → an 889 × 450 SVG →
+scale 0.92 → 818 × 414. Check the natural height first: a component that *does* scale height with
+width needs a different sum.
+
 ### Two things the downloaded draft got wrong for this purpose
 
 The prose this file replaces described a different deliverable — a standalone SVG you could hand to
@@ -137,7 +185,7 @@ anyone — and two of its steps are actively harmful when the destination is a F
 | 2 | Formats as usual. A wide viz (a sankey) wants Static Horizontal; a tall one, Vertical. |
 | 3 | No `imWidth`/`imHeight`/`imFontSize`. **The puppeteer viewport is the aspect control**, so measure the template band first (Step 7), then render at that aspect. Same ordering as the grapher route, different lever. |
 | 5 | Ordinary `upload_assets` + the `unwrap` helper. Two SVGs means two imports, positioned from the sidecar. |
-| 7 | The ordinary band fit. Unlike the `static_viz` local-SVG route there is no template-aspect guarantee and no `rescale(100/96)` — this is a chart-only SVG at whatever size you rendered it. |
+| 7 | **Fit the WIDTH, not the height** — the reverse of the grapher route. There, you fit height first and close the width with a scripted x-map; a sankey's bands cannot be x-mapped without distorting them, so the width is the constraint and the vertical gap falls out of it (17.3px each side on the wine chart). Expect **one correction after import**: Figma's unwrapped group measured **913** wide against the SVG's declared **889**, because a group's bbox includes stroke extents — so the aspect you solved against the SVG is a few percent off once it lands. Measure the group, then scale. |
 | 8 | Node names are the component's own, derived from its DOM. There is **no `connectors` group** to hide and no `horizontal-grid-lines`, so every named lookup in Steps 7–8 has to be re-derived: `grep -oE 'id="[^"]*"' <file>.svg \| sort -u`. |
 | 8c | Unchanged. Note the fills come from the component's own palette, not necessarily the Chart colors library, so expect the off-palette sweep to have findings — report them to the component's author rather than repainting in Figma. |
 
@@ -162,3 +210,53 @@ ls "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
 ```
 
 The script tries the usual macOS and Linux paths and accepts `--chrome <path>` to override.
+
+**Run it from the directory where you installed `puppeteer-core`.** The script lives in the skill
+folder, which has no `node_modules`, so a bare `import "puppeteer-core"` resolves from *there* and
+fails with `Cannot find package`. It therefore resolves the dependency from `process.cwd()` — which
+only works if that is the scratchpad you installed into.
+
+**Rasterizing the result to eyeball it has two traps of its own.** Chrome loads a bare `.svg` as an
+SVG document, so `document.head` is `null` and you cannot inject CSS; and an exact-size viewport plus
+the browser's default body margin crops the right and bottom edges in a way that looks *exactly* like
+the SVG clipping itself — which sent me chasing a viewBox bug that did not exist. Wrap the markup in
+an HTML page with `margin:0` and screenshot the **element**, not the page.
+
+## Which template — and the shape problem
+
+**There is no bespoke-specific template.** A bespoke chart goes into the ordinary static templates,
+same as a grapher export: `Static Chart Template_Horizontal` (`5332:75`, 850×638) or
+`Static Chart Template_Vertical` (`5332:93`, 850×1095). Verified against the Templates page — don't go
+looking for one.
+
+**But check the component's natural aspect against the band before promising a format.** A bespoke
+component's proportions are the component's, not yours: there is no `imWidth`, and the one degree of
+freedom (container width) may not move the height at all. Worked example, the wine sankey:
+
+| Template | Band | Chart at full content width | Band filled |
+|---|---|---|---|
+| Horizontal 850×638 | 818 × 438 | 818 × 403 | **92%**, gaps 17px — good |
+| Vertical 850×1095 | 818 × 896 | 818 × 403 | **45%**, gaps 246px — unusable |
+
+A bilateral sankey is inherently landscape, so it cannot fill a portrait band. Scaling it up to fit
+would take every label with it (a 2.2× scale puts 12px labels at 26px), which is the same trap as
+rescaling a grapher export off its type ladder.
+
+So when a portrait version is asked for, check what the component can actually do before building it.
+For food-trade specifically: `FoodTradeBilateralSankey` (the `All countries` view) only shortens its
+numbers and drops from 10 nodes to 8 below `MOBILE_BREAKPOINT` (500px) — it never stacks. The
+**single-country** view is different: `SplitFlowSankey` stacks its imports and exports halves
+vertically below 500px ("Below this width the two halves stack vertically"), which is genuinely
+portrait. So a portrait wine chart means changing the subject from world trade to one country's trade
+— an editorial decision to put to whoever asked, not a fit to force.
+
+## What to check, and what to hand back
+
+The Step 8c pass applies, with one route-specific split: **the palette is the component's, not
+yours.** The wine sankey's ten series colors are OWID palette values (`#b13507` Rusty Orange,
+`#00295b` Midnight Blue, `#4c6a9c` Blue, …) and `color_audit.py --separated` reports a deuteranopia
+floor of **ΔE 7.6** (Chile/New Zealand), with Spain/Germany at 8.2 and Australia/Portugal at 9.4 —
+below the ΔE 20 bar. Do **not** repaint it in Figma: that would make the image disagree with the
+interactive component. Report it to the component's author, and note the mitigation when it applies —
+in a sankey every node carries a direct text label, so color is a secondary cue for identity and
+matters mainly for following a band across the crossing.

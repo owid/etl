@@ -21,7 +21,34 @@
  */
 
 import { access, mkdir, writeFile } from "node:fs/promises"
+import { createRequire } from "node:module"
 import { join, resolve } from "node:path"
+import { pathToFileURL } from "node:url"
+
+/**
+ * Load puppeteer-core from the CURRENT WORKING DIRECTORY, not from next to this file.
+ * The script lives in the skill directory (which has no node_modules) while the dependency is
+ * installed in a throwaway scratchpad, so a bare `import "puppeteer-core"` resolves from the
+ * script's own folder and fails. Run the script from wherever you installed it.
+ */
+async function loadPuppeteer() {
+    try {
+        const requireFromCwd = createRequire(
+            pathToFileURL(join(process.cwd(), "package.json"))
+        )
+        const entry = requireFromCwd.resolve("puppeteer-core")
+        return (await import(pathToFileURL(entry).href)).default
+    } catch (err) {
+        throw new Error(
+            "Could not load puppeteer-core from " +
+                process.cwd() +
+                "\nInstall it there first:  npm init -y && npm install puppeteer-core@23" +
+                "\n(original: " +
+                (err.message ?? err) +
+                ")"
+        )
+    }
+}
 
 const CHROME_PATHS = [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
@@ -38,6 +65,9 @@ Usage:
 
 Options:
   --width <px>       viewport width  (default 1200) -- this is the aspect control
+  --viz-width <px>   width of the mounted container (default: --width). These components lay
+                     out from container width, so this is what shapes the export
+  --config <json>    mount with this config instead of the demo's defaults (local route too)
   --height <px>      viewport height (default 800)
   --out <dir>        output directory (default .)
   --base <name>      output filename stem (default derived from project/bundle + variant)
@@ -68,6 +98,7 @@ function parseArgs(argv) {
         "--demo-url": "demoUrl",
         "--chrome": "chrome",
         "--timeout": "timeout",
+        "--viz-width": "vizWidth",
     }
     for (let i = 0; i < argv.length; i++) {
         const arg = argv[i]
@@ -81,7 +112,7 @@ function parseArgs(argv) {
         const value = argv[++i]
         if (value === undefined) throw new Error(`${arg} needs a value`)
         opts[key] =
-            key === "width" || key === "height" || key === "timeout"
+            ["width", "height", "timeout", "vizWidth"].includes(key)
                 ? Number(value)
                 : value
     }
@@ -188,10 +219,31 @@ function serializeInPage(rootSelector, minVizSize) {
             if (inline) dest.setAttribute("style", inline)
         }
         clone.setAttribute("xmlns", "http://www.w3.org/2000/svg")
-        if (!clone.getAttribute("viewBox")) {
-            const rect = source.getBoundingClientRect()
-            clone.setAttribute("viewBox", `0 0 ${rect.width} ${rect.height}`)
+
+        // These components draw side labels OUTSIDE their own <svg> bounds and rely on the page not
+        // clipping. A standalone SVG clips at its viewBox, so the labels would be cut. Widen the
+        // viewBox to the union of the content's own bbox.
+        const vb = source.getAttribute("viewBox")
+        const rect = source.getBoundingClientRect()
+        let x0 = 0, y0 = 0, x1 = rect.width, y1 = rect.height
+        if (vb) {
+            const [vx, vy, vw, vh] = vb.trim().split(/[\s,]+/).map(Number)
+            x0 = vx; y0 = vy; x1 = vx + vw; y1 = vy + vh
         }
+        try {
+            const bb = source.getBBox()          // user units, union of all rendered children
+            const PAD = 2
+            x0 = Math.min(x0, bb.x - PAD)
+            y0 = Math.min(y0, bb.y - PAD)
+            x1 = Math.max(x1, bb.x + bb.width + PAD)
+            y1 = Math.max(y1, bb.y + bb.height + PAD)
+        } catch {
+            // getBBox throws on a detached or empty tree; keep the declared box.
+        }
+        clone.setAttribute("viewBox", `${x0} ${y0} ${x1 - x0} ${y1 - y0}`)
+        clone.setAttribute("width", `${x1 - x0}`)
+        clone.setAttribute("height", `${y1 - y0}`)
+
         return new XMLSerializer().serializeToString(clone)
     }
 
@@ -241,11 +293,47 @@ async function waitForViz(page, selector, minVizSize, timeout) {
 async function runDemo(page, opts) {
     const url = `${opts.demoUrl.replace(/\/$/, "")}/${opts.demo}/demo`
     await page.goto(url, { waitUntil: "networkidle2", timeout: opts.timeout })
-    // The demo page wraps each variant in div.variant#variant--<name>.
-    const selector = opts.variant
-        ? `#variant--${opts.variant}`
-        : ".variant:first-of-type"
-    await page.waitForSelector(selector, { timeout: opts.timeout })
+
+    // Without --config, take the demo page's own mounts: it wraps each variant in
+    // div.variant#variant--<name> using that variant's demoConfig.
+    if (!opts.config) {
+        const selector = opts.variant
+            ? `#variant--${opts.variant}`
+            : ".variant:first-of-type"
+        await page.waitForSelector(selector, { timeout: opts.timeout })
+        await waitForViz(page, selector, 60, opts.timeout)
+        return selector
+    }
+
+    // With --config, the demo's defaults are the wrong view, so mount our own instance on the
+    // dev-server origin (same-origin, so the module and its CSS resolve) into our own Shadow DOM.
+    // The demo page is still the host because it carries the dev-only global stylesheet.
+    await page.waitForSelector(".variant", { timeout: opts.timeout })
+    const selector = "#bespoke-svg-target";
+    await page.evaluate(
+        async (sel, project, variant, cfg, hostWidth) => {
+            const host = document.createElement("div")
+            host.id = sel.replace("#", "")
+            // Fixed width, not 100%: these components lay out from their container width, so the
+            // page's own padding must not decide what the export looks like.
+            host.style.cssText =
+                `position:relative;width:${hostWidth}px;background:#fff`
+            document.body.insertBefore(host, document.body.firstChild)
+            const root = host.attachShadow({ mode: "open" })
+            const mountPoint = document.createElement("div")
+            root.appendChild(mountPoint)
+            const mod = await import(`/${project}/index.js`)
+            window.__bespokeUnmount = mod.mount(mountPoint, {
+                variant: variant ?? mod.VARIANTS[0].name,
+                config: { ...cfg, urlSync: false },
+            })
+        },
+        selector,
+        opts.demo,
+        opts.variant,
+        JSON.parse(opts.config),
+        opts.vizWidth ?? opts.width
+    )
     await waitForViz(page, selector, 60, opts.timeout)
     return selector
 }
@@ -306,7 +394,7 @@ async function main() {
     }
 
     const executablePath = await findChrome(opts.chrome)
-    const { default: puppeteer } = await import("puppeteer-core")
+    const puppeteer = await loadPuppeteer()
 
     const browser = await puppeteer.launch({
         executablePath,
