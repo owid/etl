@@ -29,8 +29,21 @@ implements that naming as `YYYYMMDD <Title> (<Creator>)`.
 
 Do not confuse the 540×540 mobile frame with `DI_Template` (`6799:1859`) or
 `InstagramPost_Template_English` (`798:161`), which are also 540×540. The tells, per
-`/create-figma-chart`: frame fill (`DI_Template` is `#ffffff`, static mobile is cream) and footer
-row count (Instagram carries two rows including `OurWorldinData.org/[Topic]`).
+`/create-figma-chart`: frame fill (`DI_Template` is `#ffffff`, static mobile is cream) and the
+license wording (`CC BY` on DI and Instagram, `Licensed under CC-BY by the author […]` on static).
+Footer row count no longer separates them — since 2026-08-13 static mobile carries two rows too.
+
+### Not a static-viz target: the "SMALL" Charts section
+
+The same Templates page also holds a `"SMALL" Charts` section (heading `25344:1235`) with
+`small-chart-template-guided` (`25344:1357`) and `small-chart-template-pull` (`25344:1391`), both
+302 px wide with a **free height**. Those are article thumbnails for the `chart-rows` and
+`pull-chart` gdoc blocks, and they are **not** built by an `export://static_viz` step — their
+geometry comes from a grapher `imType=thumbnail` export, handled entirely by
+[`/create-figma-chart`](../create-figma-chart/SMALL-CHARTS.md).
+
+So do not add a `"small"` entry to `scripts/verify_static_viz.py`'s `TEMPLATE_RATIOS`. It would be
+wrong twice: wrong pipeline, and a *ratio* check on a frame whose height is chosen per chart.
 
 ## Slot positions
 

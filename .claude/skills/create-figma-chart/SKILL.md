@@ -1,6 +1,6 @@
 ---
 name: create-figma-chart
-description: Turn an OWID grapher chart — given as a slug, a customized grapher link, an MDim view, an admin link, a narrative chart, or just a description — into a templated chart in the design team's yearly "Charts (YYYY)" Figma file. Exports the chart SVG, creates a new page named "YYYYMMDD Title (Creator)", places the original chart and an adapted template side by side, replicates title/subtitle/data source/note in the template's styles, fits the chart into the template, proposes better labeling (direct line/bar labels instead of legends) and annotations with the file's curvy arrows, and names the final frame with the kebab-case slug used for the website PNG. Trigger when the user asks to "create a figma chart", "make a static chart in Figma", "prepare this chart for Instagram / as a data insight image", "put this grapher chart into the Charts file", or pastes a grapher/admin/narrative-chart link asking for a designed static version.
+description: Turn an OWID chart — a grapher slug, a customized grapher link, an MDim view, an explorer view, an admin link, a narrative chart, a bespoke (client-rendered React) visualization, or just a description — into a templated chart in the design team's yearly "Charts (YYYY)" Figma file. Exports the chart SVG, creates a new page named "YYYYMMDD Title (Creator)", places the original chart and an adapted template side by side, replicates title/subtitle/data source/note in the template's styles, fits the chart into the template, proposes better labeling (direct line/bar labels instead of legends) and annotations with the file's curvy arrows, and names the final frame with the kebab-case slug used for the website PNG. Also builds the 302-wide "small" and "pull" chart thumbnails that sit in an article's chart-rows and pull-chart blocks, including inside a guided chart. Trigger when the user asks to "create a figma chart", "make a static chart in Figma", "prepare this chart for Instagram / as a data insight image", "put this grapher chart into the Charts file", "make a small chart / pull chart / chart thumbnail", "make a static chart from this bespoke viz", or pastes a grapher/admin/narrative-chart link asking for a designed static version.
 metadata:
   internal: true
 ---
@@ -15,30 +15,44 @@ This skill takes any OWID grapher chart and produces a designed static version i
 
 Read [GUIDELINES.md](GUIDELINES.md) (sibling file) before editing any chart — it distills the DI Charts Guidelines per chart type and the Good Data Viz Checklist.
 
+Two more sibling files own a route each, and both replace rather than supplement the steps below:
+
+| File | When |
+|---|---|
+| [SMALL-CHARTS.md](SMALL-CHARTS.md) | the output is a **302-wide small or pull chart** — an article thumbnail for a `chart-rows` or `pull-chart` block. Different templates, a free frame height, its own export mode, no fit, an 11px floor, a PNG-to-Cloudflare delivery. |
+| [BESPOKE-SVG.md](BESPOKE-SVG.md) | the input is a **bespoke visualization** — a client-rendered React viz with no `.svg` endpoint. Covers getting a chart-only SVG out of one; after that this page applies unchanged. |
+
 Three sibling skills do the text work this one depends on, and Step 8c calls them: **`/adversarial-data-review`** (is the FAUST true of the indicator, and is the data), **`/check-metadata-style`** (the Writing and Style Guide) and **`/check-metadata-typos`** (codespell). Anything they turn up is an upstream fix in the garden step, not a Figma edit.
 
 ## The yearly Charts file — node map (2026)
 
 Each year gets a new file. For **2026** the file key is `s6Sv60bakebRRW2TxsMQbF` ([Charts (2026)](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-)). **If the current year is not 2026, ask the user for that year's file link and re-verify every node id below** (the templates page is named " 📑 Templates" — note the leading space).
 
+**Last verified: 2026-08-13. Re-verify the geometry at the start of every run** rather than trusting this table — the design team edits these frames in place, and on 2026-08-13 both mobile templates replaced a single shared footer row with a two-row block, which moved the chart area's bottom edge. A page laid out against stale numbers still renders and still passes every check in Step 8c; it just doesn't match the frame it was cloned from.
+
 | What | Node | Size | Notes |
 |---|---|---|---|
 | Templates page | `798:54` | — | all templates + instruction frames live here |
-| InstagramPost_Template_English | `798:161` | 540×540 | footer: source + `OurWorldinData.org/[Topic]` + CC BY |
+| InstagramPost_Template_English | `798:161` | 540×540 | two-row footer (`Frame 12` @ y=488): source, `OurWorldinData.org/[Topic]`, CC BY |
 | InstagramPost_Template_Portrait_English | `6689:8` | 560×700 | footer includes a Note line |
 | InstagramReel_template | `7336:8` | 616×1096 | has top/bottom no-go zones; contains a worked small-multiples example |
-| DI_Template | `6799:1859` | 540×540 | one-line footer: source + CC BY |
-| Static Chart Template_Mobile (example 1) | `24590:20` | 540×540 | |
-| Static Chart Template_Mobile (example 2) | `24590:32` | 540×824 | taller variant — use when the chart needs vertical room |
+| DI_Template | `6799:1859` | 540×540 | **one**-row footer (`Frame 12` @ y=508): source + CC BY |
+| Static Chart Template_Mobile (example 1) | `24590:20` | 540×540 | **two**-row footer (`Frame 15` `25343:276` @ y=486, h=38): `Data source:` then `Licensed under CC-BY by the author […]`, both full width |
+| Static Chart Template_Mobile (example 2) | `24590:32` | 540×824 | taller variant — use when the chart needs vertical room. Same two-row `Frame 15` (`25343:275` @ y=770) |
 | Static Chart Template_Horizontal | `5332:75` | 850×638 | footer: Note, Data source, OWID tagline, "Licensed under CC-BY by the author [Name]" |
 | Static Chart Template_Vertical | `5332:93` | 850×1095 | |
+| **`small-chart-template-guided`** | **`25344:1357`** | 302 × free | title + optional subtitle, no source row — see [SMALL-CHARTS.md](SMALL-CHARTS.md) |
+| **`small-chart-template-pull`** | **`25344:1391`** | 302 × free | the same plus a mandatory source row — see [SMALL-CHARTS.md](SMALL-CHARTS.md) |
+| `"SMALL" Charts` section heading | `25344:1235` | — | "featured on the OWID website as guided and PULL charts" |
 | Curvy arrows | `798:773` | — | copy/paste into the chart; scaling rules in GUIDELINES.md |
 | "No data" hashed-pattern instructions | `4162:5` | — | Hero Patterns plugin (manual route). Scriptable instead — TILE `IMAGE` fill from `assets/no-data-hatch-tile.png`, see GUIDELINES.md → Flags, animals, no-data pattern |
 | Flags | `2654:5` | — | Flags **plugin** — manual; US flags provided in the file |
 | Animals | `5336:5` | — | chicken, rooster, turkey, fish, cow, egg-laying hen, pig |
 | Good Data Viz Checklist | `20729:1027` | — | distilled in GUIDELINES.md |
 
-Shared styles in the file: text styles `Data Insights/Title` (Playfair Display SemiBold 25) and `Data Insights/Subtitle` (Lato 16); color variables `Text/Gray 100` #2D2E2D, `Text/Gray 80` #5B5B5B, `Website/Text/Blue 100` #002147, `Instagram/Beige Background` #FBF9F3; plus the **Chart colors** library (see GUIDELINES.md → Colors).
+The last five did **not** appear in a `get_metadata` dump of `798:54` on 2026-08-13, though the call returned the page in full including hidden nodes — they have most likely moved to another page rather than been deleted. Locate them before relying on those ids.
+
+Shared styles in the file: text styles `Data Insights/Title` (Playfair Display SemiBold 25) and `Data Insights/Subtitle` (Lato 16); paint styles `Data Insights/Title` #2D2E2D, `Data Insights/Subtitle` #5B5B5B, `Data Insights/Source` #858585; color variables `Text/Gray 100` #2D2E2D, `Text/Gray 80` #5B5B5B, `Website/Text/Blue 100` #002147, `Instagram/Beige Background` #FBF9F3; plus the **Chart colors** library (see GUIDELINES.md → Colors). Note the text and paint styles share names — `Data Insights/Title` is both a 25px Playfair text style and a #2D2E2D fill.
 
 The DI Charts Guidelines file (`8gxqkVmZ9x3MK3ky5oigrJ`) is the source of truth behind GUIDELINES.md — six pages: line `0:1`, stacked area `130:35045`, bar/stacked bar `130:35046`, slope `130:35047`, scatter `130:35048`, map `130:35049`. Re-read the relevant page if GUIDELINES.md seems stale.
 
@@ -46,15 +60,18 @@ The DI Charts Guidelines file (`8gxqkVmZ9x3MK3ky5oigrJ`) is the source of truth 
 
 - **A chart reference**, in any of the forms of the Step 1 table. If the user only describes the chart ("the life expectancy chart with just the US and China"), resolve candidates first and confirm.
 - **Or a local SVG already on disk** — typically `etl/steps/export/static_viz/<ns>/<version>/<name>.svg`, emitted by an `export://static_viz` step and handed over by [`/create-static-viz`](../create-static-viz/SKILL.md). Its texts are already baked in and its frame already matches a template, so Step 1's text sourcing and Step 3's export both fall away. See the local-SVG notes in those steps.
+- **Or a bespoke visualization** — a client-rendered React viz from `owid-grapher`'s `bespoke/projects/*`, which has **no** `.svg` endpoint at all. [BESPOKE-SVG.md](BESPOKE-SVG.md) covers getting a chart-only SVG out of one; after that it behaves like grapher's `uncaptioned` embed and every step here applies.
 - Optionally, **the DI/article text** the chart accompanies — the best source for annotation content. Ask for it if annotations are wanted and it exists.
 - Optionally, **a link to a finished page in the file to work like** (see below).
 - Everything else (formats, credit, slug, topic link) is collected once in Step 2.
+
+**One output format has its own file.** A **small or pull chart** — the 302-wide thumbnail that sits in an article's `chart-rows` or `pull-chart` block — diverges from everything below at almost every step: a different pair of templates, a free frame height, its own export mode (`imType=thumbnail`), no fit, an 11px text floor and a PNG-to-Cloudflare delivery. Read [SMALL-CHARTS.md](SMALL-CHARTS.md) instead of improvising from this page, and take only the shared conventions (GUIDELINES.md, the Step 8c checks it doesn't override) from here.
 
 ### When you're pointed at a finished page as the model
 
 A designer's own page is a far better spec than this file, so read it before building rather than after. It answers the questions Step 2 would otherwise have to ask, and it answers them in measurements:
 
-- **Which template.** Don't guess from the size — the 540×540 candidates differ on two tells: the **frame fill** (`DI_Template` is `#ffffff`, the Static Chart Mobile templates are cream `#fffbf5`) and the **footer row count** (DI and static carry one row of source + CC BY; the Instagram ones carry two, with the `OurWorldinData.org/[Topic]` line). Whichever text styles the page's title and subtitle are *bound* to settles it.
+- **Which template.** Don't guess from the size — three of the candidates are 540×540. **Footer row count no longer separates them**, which it did before 2026-08-13: static mobile now carries *two* rows, DI *one*, and Instagram square *two*. The tells that still work are the **frame fill** (`DI_Template` is `#ffffff`, the Static Chart Mobile templates are cream `#fffbf5`), the **license wording** (`CC BY` on DI and Instagram, `Licensed under CC-BY by the author […]` on static), and the **`OurWorldinData.org/[Topic]` line**, which only Instagram has. Whichever text styles the page's title and subtitle are *bound* to settles it.
 - **Which export route.** The chart group's height, the span between its first and last gridline, and its font size together identify the export — compare them against a couple of candidate exports rather than reasoning about `imFontSize` from scratch. A gridline span that matches the square render and not the uncaptioned one is conclusive.
 - **What was done by hand.** Anything in the page that no export could produce is a design decision to carry over: a **bound library style** (an SVG import can never bind one), a color that isn't in the export, a hidden node, a moved label.
 
@@ -85,6 +102,8 @@ Get an SVG URL for the chart, whatever form the reference takes:
 | Slug or default grapher link | `https://ourworldindata.org/grapher/<slug>.svg` |
 | Customized grapher link (query params) | insert `.svg` before the `?`, keep the query verbatim: `https://ourworldindata.org/grapher/<slug>.svg?country=USA~CHN&time=1990..latest` — `country`, `time`, `tab`, `stackMode`, `region`, `focus`, … are all honored, and slug redirects work |
 | MDim view | same — the dimension params select the view: `.../energy-mix.svg?metric=per_capita&source=coal` |
+| **Explorer view** | `https://ourworldindata.org/explorers/<slug>.svg?<view params>` — `EXPLORER_DYNAMIC_THUMBNAIL_URL` in `settings/clientSettings.ts`. **Carry the view's full param set:** requested bare it returns an axis and nothing else, at HTTP 200 (2 texts, no series). Verified on the `imType=thumbnail` route; untested for the other `imType`s. |
+| **Bespoke component** (no slug, no `.svg`) | there is no endpoint — render and serialize the component yourself. See [BESPOKE-SVG.md](BESPOKE-SVG.md). |
 | Admin link `/admin/charts/<id>/edit` | **`/admin/charts/<id>.svg` does not exist** (it returns the admin SPA shell). Resolve the chart's `configId` — `SELECT configId FROM charts WHERE id = <id>` on the public Datasette (see the `query-grapher-db` skill), or `GET /admin/api/charts/<id>.config.json` — then use `https://ourworldindata.org/grapher/by-uuid/<configId>.svg`. Works for unpublished drafts too. |
 | Narrative chart (**name**) | name → uuid via the unauthenticated map `https://admin.owid.io/api/narrative-chart-map`, then `https://ourworldindata.org/grapher/by-uuid/<uuid>.svg` |
 | Narrative chart (**admin link with a numeric id**, `/admin/narrative-charts/<id>/edit`) | **Try the direct lookup first** — `select id, name, chartConfigId from narrative_charts where id = <id>` on the public Datasette hands you the uuid outright (note the column is `chartConfigId`, not `configId`). Only when the id isn't mirrored yet do you need the guessing route below. |
@@ -140,16 +159,18 @@ One `AskUserQuestion` batch — don't drip-feed:
    - Instagram post (square 540×540) or portrait (560×700)
    - Data insight image (DI_Template, 540×540)
    - Static chart — mobile/square (540×540 or 540×824) and/or desktop (Horizontal 850×638 / Vertical 850×1095; Vertical when the chart needs height — rankings, long bar lists)
+   - **Guided / `chart-rows` thumbnail** (302 wide, free height, no source row) or **pull chart** (302 wide, free height, mandatory source) — both go to [SMALL-CHARTS.md](SMALL-CHARTS.md), which owns the rest of the run. The answer picks the template, so ask which block the image is for rather than inferring it from the size.
 2. **Who is building the chart** — this is the page-name credit, and it is **not** the author of the DI or article the chart accompanies. Default to the user; don't infer it from the gdoc, which names the writer rather than whoever does the design work.
    - **First names only**, matching the file's existing pages: `(Charlie)`, `(Hannah)`, `(Bertha)`.
    - **Disambiguate a shared first name with the last initial** — `(Pablo A)` for Pablo Arriagada, `(Pablo R)` for Pablo Rosado. Both are in use, so a bare `(Pablo)` is ambiguous.
    - **Several people, comma-separated**: `(Bastian, Charlie)`.
    - An organization instead of a person when there is no individual: `(Our World in Data - Global Change Data Lab)`.
-3. **The author of the piece**, separately, and only when a **static desktop template** is among the formats — it is the one that carries a `Licensed under CC-BY by the author <Name>` line, and that name is the writer being credited for the work, which is often *not* the person building the chart. Skip the question entirely for DI and Instagram formats, whose footers have no author line.
+3. **The author of the piece**, separately, and only when a **static template — desktop *or* mobile** — is among the formats. Those carry a `Licensed under CC-BY by the author <Name>` line, and that name is the writer being credited for the work, which is often *not* the person building the chart. Mobile gained this line on 2026-08-13 along with its second footer row, so a mobile-only run needs the question too; skip it for DI and Instagram, whose footers say only `CC BY`, and for the 302-wide formats, which have no footer at all.
 4. **The DI's own title — or the claim the image is meant to make.** Ask for this whenever a DI or Instagram image is among the formats, and ask *independently of annotations*: grapher's descriptive title must not survive into those images (GUIDELINES.md → Titles), and the story is not yours to invent. If there's no title written yet, ask for the sentence the image supports and derive a candidate from it for approval in Step 4.
 5. **Annotations** — should the chart carry annotations replicating what the accompanying text says? If yes, ask for that text (DI draft, article paragraph).
-6. **Topic page** for the `OurWorldinData.org/[Topic]` footer line — default from the config's `originUrl`.
-7. **Slug** for the final frame — short, kebab-case (`child-mortality-asia-decline`). It becomes the PNG filename when the frame is exported for the website. Propose one; let the user override.
+6. **Topic page** for the `OurWorldinData.org/[Topic]` footer line — default from the config's `originUrl`. Instagram only; no other template carries the line.
+7. **Slug** for the final frame — short, kebab-case (`child-mortality-asia-decline`). It becomes the PNG filename when the frame is exported for the website. Propose one; let the user override. For a 302-wide thumbnail it is instead `<grapher-slug>-thumbnail`, which has to be unique across every OWID image — see SMALL-CHARTS.md → Delivery.
+8. **Entity names or values?** — 302-wide formats only. `imMinimal=1` replaces the entity labels with their values, which reads well when the surrounding prose already names the entities and badly when it doesn't. Default to keeping the names (SMALL-CHARTS.md → `imMinimal`).
 
 ## Step 3 — Export the SVGs
 
@@ -181,6 +202,8 @@ curl -sL "https://ourworldindata.org/grapher/<slug>.svg?<params>&imType=uncaptio
 ```
 
 `imWidth`/`imHeight` set the **aspect ratio only** — the server renormalizes the SVG to ~510k px², so you cannot request a bigger SVG (irrelevant: it's a vector; you scale it in Figma). Sanity-check what came back:
+
+> **This is true of the default and `uncaptioned` routes only.** `extractOptions` (`functions/_common/imageOptions.ts`) **returns early** for `imType=thumbnail` and `imType=square`, so neither the `MIN/MAX_ASPECT_RATIO` clamp nor the ~510k normalization runs on them. On the thumbnail route `imWidth`/`imHeight` set the size outright — `staticBounds` becomes `imWidth/4 × imHeight/4` — which is what lets a 302-wide small chart arrive at exactly 302px and skip the Figma rescale entirely (SMALL-CHARTS.md → The export).
 
 ```bash
 head -c 300 $DIR/embed.svg   # expect <svg ... width="..." height="...">, no <html
@@ -233,6 +256,8 @@ await figma.setCurrentPageAsync(page)
 
 2. **Clone the template frame(s)** onto the new page: `(await figma.getNodeByIdAsync("<template-id>")).clone()`, then `page.appendChild(clone)` and position it.
 
+   For a **302-wide small or pull chart**, clone `25344:1357` (guided) or `25344:1391` (pull) — the choice is the Step 2 answer, not a judgement — then **delete the leftover `Group > Group > Vector` background** the templates carry from how their reference examples were drawn, or the import stacks on an opaque rectangle. A `chart-rows` block is 3–5 rows, so expect a *set* of frames on one page. SMALL-CHARTS.md → In Figma has the rest.
+
 3. **Import the original SVG with `upload_assets`** — never `createNodeFromSvg` (the `use_figma` code param caps at 50k chars; a grapher SVG is ~165 KB). `upload_assets` returns a single-use `submitUrl`; POST the file to it and keep the returned `placedOnNodeId`. **Only the original at this stage** — the embed has not been exported yet (Step 3), and it arrives in Step 7 once the band is measurable:
 
 ```bash
@@ -274,7 +299,13 @@ Replace the lorem-ipsum text nodes in the cloned template. Source everything fro
 - **Subtitle** — the chart's subtitle, trimmed to what's necessary. When the chart shows a single year (or a narrow period the reader needs), the image has to state that year somewhere. Append **`Data for <YYYY>.`** here — *unless the title already carries the year*, which is the rule for a year-specific claim (GUIDELINES.md → Titles). One or the other, never both.
 
   **When the entities aren't all on the same year, state the span, not the exception.** A subtitle that names the odd one out — `Data for 2023, except Japan (2022).` — spends a clause on a caveat no reader acts on, and invites the same treatment for the next straggler. Append the range to the sentence with a comma instead: `Breakdown of meat supply in a given country by type, 2022–2023.` It is shorter, it is true of every entity, and it keeps the year where the single-year form puts it. Use an en dash.
-- **Data source:** `Data source: ` + `chart.citation` from Step 1 — that field *is* grapher's own footer line, so don't re-derive a `<producer> (<year>)` string by hand, and don't abbreviate it to save space. A long producer name overruns the CC BY text at x=468. **Give the source its own full line and move CC BY to the row beneath it** — the source stays one unbroken line, which reads better than a wrap, and the template's own two-row footers (the Instagram ones) already use exactly this geometry:
+- **Data source:** `Data source: ` + `chart.citation` from Step 1 — that field *is* grapher's own footer line, so don't re-derive a `<producer> (<year>)` string by hand, and don't abbreviate it to save space. A long producer name overruns the CC BY text at x=468.
+
+  > **First check whether the template already gives the source its own row — since 2026-08-13 the static mobile ones do.** `Frame 15` on both static mobile templates is a two-row block, 38px tall, with `Data source:` and the license each on their own full-width row at `x=0`. There is nothing to rearrange there, and running the manoeuvre below on one of those clones adds a **third** row. The recipe applies to the genuinely one-row footers — `DI_Template`'s `Frame 12` at y=508. The Instagram templates are already two-row for their own reasons (the `OurWorldinData.org/[Topic]` line).
+  >
+  > Step 7's `footerTop = footer.y + Math.min(0, source.y)` needs no change for the shipped two-row frame: `source.y` is 0 there, so it returns `footer.y`, which is correct. Don't "fix" it.
+
+  **Give the source its own full line and move CC BY to the row beneath it** — the source stays one unbroken line, which reads better than a wrap, and the template's own two-row footers already use exactly this geometry:
 
   ```js
   const W = footer.width, BOTTOM = footer.y + footer.height;   // read off the clone, before resizing
@@ -292,7 +323,7 @@ Replace the lorem-ipsum text nodes in the cloned template. Source everything fro
   **And know when *not* to spend the second row.** A source that overruns CC BY by only a few pixels is not worth 20px of chart: the full FAO name at the Source style's 14px measured 473px against CC BY starting at x=468 — a 2px overlap — and the finished page's answer was to set that one line to **13px** and keep the footer one row deep. Weigh the two costs explicitly (one off-ladder size on the least important text, versus a fifth of the gap budget and a re-export) and record whichever you pick.
 - **Note:** only in templates that carry a Note line, and only if the chart has one worth keeping. **DI images normally carry no note at all** — drop it, or, when it's genuinely load-bearing for understanding the chart, fold it into the subtitle as a bolded second line (only if the subtitle isn't already crowded).
 - **`OurWorldinData.org/[Topic]`** → the confirmed topic path (e.g. `OurWorldinData.org/child-mortality`).
-- **CC BY** stays; static desktop templates also carry `Licensed under CC-BY by the author <Name>` — the author of the piece from Step 2, not the page-name credit.
+- **CC BY** stays on the DI and Instagram templates. The static templates — desktop **and mobile** — instead carry `Licensed under CC-BY by the author <Name>`, the author of the piece from Step 2, not the page-name credit. On static mobile that line is the second row of `Frame 15` and reads `Licensed under CC-BY by the author [Name of author]` in the template.
 
 Rules: replace `characters`, and leave the node's **base** styling alone — the fonts, sizes, colors, and positions are the template's, not yours. `await figma.loadFontAsync(node.fontName)` before each text edit. If you need a *new* text block the template doesn't have, **clone the nearest template text node and edit it** — that inherits the correct shared style without hunting style ids.
 
@@ -426,11 +457,18 @@ Side margins and the footer edge are the template's, not yours: content starts a
 
 | Template | Content x / width | Header bottom → footer top (unwrapped subtitle) |
 |---|---|---|
-| 540-wide (IG square, DI, static mobile ex. 1) | x=16, w=508 | 118 → 508 (DI/static) or 488 (IG, 2-line footer) |
-| Static mobile example 2 (540×824) | x=16, w=508 | 118 → 792 |
+| DI_Template (540×540) | x=16, w=508 | 118 → 508 |
+| IG square (540×540) | x=16, w=508 | 118 → 488 (2-row footer) |
+| Static mobile example 1 (540×540) | x=16, w=508 | 118 → **486** (2-row `Frame 15`) |
+| Static mobile example 2 (540×824) | x=16, w=508 | 118 → **770** (2-row `Frame 15`) |
 | IG portrait (560×700) | x=26, w=508 | 135 → 640 |
 | Static Horizontal (850×638) | x=16, w=818 | 118 → 556 |
 | Static Vertical (850×1095) | x=16, w=818 | 116 → 997 |
+| Small / pull chart (302 × free) | **x=12, w=278** | 44 → `H − 10` (guided) or `H − 23` (pull) — see below |
+
+The two static mobile figures were 508 and 792 before 2026-08-13; the two-row footer took 22px off each. The row that used to lump DI together with static mobile is split above, because they no longer agree.
+
+**The 302-wide row is parametric, and its `H` is an output of this step rather than an input** — width is the only fixed dimension, the frame height is chosen from the content, and there is no fit to perform because the export already arrives at 278px wide. Its header block also hugs its own text width instead of spanning the content, so the plot may legitimately rise beside it. All of that is [SMALL-CHARTS.md](SMALL-CHARTS.md)'s; don't apply the fit below to it.
 
 Verify against the actual clone with `get_metadata` (the templates evolve; the geometry above is a 2026 snapshot). These are **frame-local** coordinates, and `x`/`y` are relative to a node's parent — so append the embed to the template clone **before** positioning it. Left parented to the page (where Step 5 puts imported nodes), the same numbers land it near the page origin, on top of the reference chart. One wrinkle in the same rule: **a GROUP is transparent for coordinates**, so once the imported chart is inside the template, its descendants report `x`/`y` in the *template frame's* space, not the group's — which is what makes the frame-local numbers above directly usable on the plot's internals.
 
@@ -797,6 +835,8 @@ If you genuinely have nothing to suggest, say that instead of inventing somethin
 
 Every one of these caught a real defect on this skill's first run, and none of them is visible by looking at the frame. Run them as a pass, and report the numbers rather than "looks fine".
 
+> **On a 302-wide small or pull chart, five of these bars are different**, and reporting the 540-wide figures there produces false failures — the text floor is **11px** (the template's own subtitle, source and year labels are 11px by design), the margins are **12 … 290**, the chart's width need not match the header box, and the gap rule doesn't apply as written. The table is in SMALL-CHARTS.md → Checks. Everything else below holds unchanged.
+
 | Check | How | Bar |
 |---|---|---|
 | Color-vision safety | `color_audit.py` | no pair under **ΔE 20** for deuteranopia or protanopia; tritanopia noted, never acted on alone. **Categorical fills only** — a sequential map ramp is exempt, see below |
@@ -928,7 +968,9 @@ Two habits make the difference. **Assert, don't eyeball** — a 1.2px label drif
 
    **When the user picks a variant, move the bare slug onto it in the same breath — never leave the rename as an open item.** It reads like a one-line loose end and it is not: the page ends up with a single finished frame still called `…-palette-a`, and the PNG the website gets is named after a trial. Renaming is free while the choice is being made and invisible afterwards.
 4. **Clear the rejected variants off the page.** Proposal frames accumulate fast — a palette trial, a labeling trial, a layout trial — and a page with four near-identical charts makes the reader work out which one is live. When the user picks, delete what they didn't pick and keep what they asked to keep; a variant kept deliberately is fine, one left behind by accident is not.
-5. Do **not** export a PNG by default — the designer usually keeps editing. On request: `get_screenshot` with `maxDimension` at the target size (DI images ship at 2160×2160, i.e. 4× the 540 frame), or let the user export from Figma.
+5. Do **not** export a PNG by default — the designer usually keeps editing. On request, let the user export from Figma, or use the admin's Figma endpoint below. **`get_screenshot` cannot do it:** `maxDimension` only ever *downscales* and clamps at the node's natural size, so a 540 frame returns 540px however large a number you pass, and a 302 frame returns 302px. There is no way to get the 4× (2160×2160) DI export through it.
+
+   For a **302-wide thumbnail** the export is part of the deliverable rather than optional, and it has its own route: `GET /api/figma/image?fileId=<key>&nodeId=<node>` on the OWID admin (`adminSiteServer/apiRoutes/figma.ts`) calls the Figma API at `scale: 3`, then `POST /api/images` uploads it to Cloudflare Images. PNG only — `ACCEPTED_IMG_TYPES` rejects SVG. See SMALL-CHARTS.md → Delivery for the naming rules and the retina reason for 3×.
 6. **Give the user a clickable link to the frame — once, when you first create it.** `https://www.figma.com/design/<fileKey>/<FileName>?node-id=<node-id>`, with the node id's colon written as a hyphen (`24977:6` → `node-id=24977-6`). Deep-link the **frame**, not the page: it opens with the chart on screen rather than wherever the canvas was last parked. A first delivery without the link is not delivered — making someone hunt for a page in a 180-page file is pure friction. But **don't repeat it on every iteration**: they already have the tab open, and a link at the top of every reply is noise. Re-send it only if the frame moves to a new page or they ask.
 7. Report what was created (page name, frames, edits made) and what remains manual: the Flags plugin if it was used, and any design review — **you cannot read Figma comments via MCP, so never report the design review as clean.** Deviations and open items go in the report and the handover doc; put them on the Figma page **only if the user asks** — an unrequested note is clutter in someone else's design file.
 
@@ -980,4 +1022,9 @@ Two habits make the difference. **Assert, don't eyeball** — a 1.2px label drif
 - **To re-centre after a block's height changes, translate everything by the same delta rather than re-solving the layout.** A shorter legend leaves the map+legend block off-centre; shifting the map, every annotation frame and every leader by one shared `dy` preserves all relative geometry exactly — labels stay over the same water, leaders stay valid, and no placement search has to run again. Verify afterwards that the leaders still end inside their countries; that check is cheap and catches a mistranslation immediately.
 - **`search_design_system` returns about 14 styles per query.** It cannot enumerate a library group in one call, so query each color by name (or query several times with different wording) and resolve hexes with `importStyleByKeyAsync`. Never conclude a group is small because one search returned few results.
 - **`get_screenshot` hands back a URL, not an image.** Download it with `curl` and open it with Read — an inline base64 response costs far more context for the same picture.
+- **`get_screenshot`'s `maxDimension` never upscales.** It clamps at the node's natural size, so a 540×540 frame comes back 540×540 whether you ask for 1024 or 65536. Any `@2x`/`@3x` export has to come from Figma's own export UI or the admin's `/api/figma/image?...` endpoint (which uses `scale: 3`).
+- **`imType=thumbnail` is a different renderer, not a smaller one.** It selects `GrapherVariant.Thumbnail` and its own per-type components (`LineChartThumbnail`, `SlopeChartThumbnail`, …), which emit direct labels and drop the y-axis on their own. Don't reason about it from the `uncaptioned` route's behaviour: `imWidth`/`imHeight` set the size outright rather than the aspect, `imFontSize` is in rendered pixels (15 → 11px, 16 → 12px at 302 wide; the default 14 gives 10px), and `imMinimal=1` swaps entity names for values rather than removing furniture.
+- **A thumbnail export emits every label twice.** Grapher paints a white halo behind each label, so `United States` appears as two text nodes. A text edit that touches one copy leaves the other in place, and a text-node count is double what the picture shows.
+- **A missing view param renders an axis-only chart at HTTP 200.** An explorer requested with no view params came back with two texts and no series; an MDim slug with no params rendered its *default* view (a map, for `energy-mix`). Nothing errors — assert the text count and the rendered tab against the view you asked for.
+- **A bespoke component mounted outside a Shadow DOM renders unstyled, silently.** Each bundle injects its own CSS scoped to `:host`, so those rules never match in a plain element — and because the serializer reads `getComputedStyle`, you get a structurally plausible SVG with the wrong paint, weights and geometry. BESPOKE-SVG.md has the correct mount.
 - **New year, new file** — ask for the link and re-verify every node id in the map above before the first run of a new year.
