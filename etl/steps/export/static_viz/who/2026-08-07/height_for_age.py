@@ -111,6 +111,24 @@ GRID_LINEWIDTH = 1.0
 TEXT_COLOR = "#5b5b5b"
 MUTED_COLOR = "#777777"
 
+# x-axis tick marks and baseline, both from AxisViews.tsx. The marks come from
+# HorizontalAxisComponent (5px long, 1px wide, SOLID_TICK_COLOR, hanging below the axis, and
+# LineChart passes showTickMarks={true}). The line they hang from is not an axis line -- grapher has
+# no such component -- it is VerticalAxisZeroLine, the same colour and width, spanning the plot at
+# y=0. This chart's y axis starts at 38 cm, so there is no zero to draw; the same treatment is
+# applied to the baseline instead, which is what makes the end ticks close it like an elbow.
+TICK_COLOR = "#999999"
+TICK_LENGTH = 5
+TICK_WIDTH = 1
+
+# Facet titles, from FacetChart.tsx: bold (FACET_LABEL_FONT_WEIGHT = 700), in GRAPHER_DARK_TEXT like
+# the tick labels rather than in the series colour, sitting above the panel and left-aligned with its
+# content, with half a line of padding under them (labelPadding = 0.5 * facetLabelFontSize). Grapher
+# derives its facet base font size as facetLabelFontSize / GRAPHER_FONT_SCALE_12 * 0.9, so the label
+# ends up about 1/0.9 of the tick size.
+FACET_TITLE_SCALE = 1 / 0.9
+FACET_TITLE_PAD = 0.5
+
 TITLE = "Expected height of boys and girls, from birth to age 19"
 
 # Credited as the author of the visualization on the license line, mirroring the slot the
@@ -145,10 +163,10 @@ LAYOUTS = {
         "title_fontsize": 16,
         "body_fontsize": 10.5,
         "footer_fontsize": 7.75,
-        # Space reserved inside the chart area for the y tick labels, and below the plot for
-        # the x tick labels plus the bold "Age in years" label.
+        # Space reserved inside the chart area for the y tick labels, and below the plot for the
+        # tick marks, the x tick labels and the bold "Age in years" label.
         "y_label_space": 58,
-        "x_label_space": 52,
+        "x_label_space": 60,
     },
     "height_for_age_mobile": {
         "size": (540, 824),
@@ -166,7 +184,7 @@ LAYOUTS = {
         "body_fontsize": 10.5,
         "footer_fontsize": 8.75,
         "y_label_space": 58,
-        "x_label_space": 52,
+        "x_label_space": 60,
     },
 }
 
@@ -538,6 +556,9 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
     palette = sns.color_palette("deep")
 
     body_fontsize = layout["body_fontsize"]
+    facet_fontsize = body_fontsize * FACET_TITLE_SCALE
+    # Room the facet titles need above each panel: one line plus grapher's half-line of padding.
+    facet_title_space_px = (1 + FACET_TITLE_PAD) * facet_fontsize / POINTS_PER_PIXEL
     age_max = float(tb["age_years"].max())
     height_max = float(tb["height_percentile_99_9"].max())
 
@@ -579,8 +600,12 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         # hideGridlines on the x axis of LineChart).
         ax.yaxis.grid(True, color=GRID_COLOR, linewidth=GRID_LINEWIDTH, linestyle=GRID_DASHES)
         ax.xaxis.grid(False)
-        for spine in ax.spines.values():
-            spine.set_visible(False)
+        # No spines except the baseline the tick marks hang from, in the zero line's own colour and
+        # weight. The y values are read off the gridlines, which is why that axis carries no line.
+        for name, spine in ax.spines.items():
+            spine.set_visible(name == "bottom")
+        ax.spines["bottom"].set_color(TICK_COLOR)
+        ax.spines["bottom"].set_linewidth(TICK_WIDTH * POINTS_PER_PIXEL)
 
         # --- nested percentile bands, widest first ---
         # gid becomes the SVG element id, so Figma shows named layers instead of "Path 41".
@@ -618,12 +643,20 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         if layout["diagram"] == "panel" and ax is axes[0]:
             draw_encoding_diagram(ax, body_fontsize - DIAGRAM_FONTSIZE_DROP)
 
-        # --- panel title, in the panel's own color ---
-        ax.text(
-            0.2, height_max, sex, fontsize=body_fontsize + 6, color=color, ha="left", va="top", gid=f"{slug}__label"
+        # --- panel title, above the plot and left-aligned with it, as grapher labels a facet ---
+        ax.set_title(
+            sex,
+            loc="left",
+            fontsize=facet_fontsize,
+            fontweight="bold",
+            color=TEXT_COLOR,
+            pad=FACET_TITLE_PAD * facet_fontsize,
         )
+        ax.title.set_gid(f"{slug}__label")
 
-        ax.set_xlim(-0.45, age_max + 0.45)
+        # The x range starts and ends on the outermost ticks, as grapher's does, so that those two
+        # marks sit at the ends of the baseline and close it.
+        ax.set_xlim(0, age_max)
         ax.set_ylim(38, height_max + 4)
         ticks = layout["age_ticks"]
         ax.set_xticks(ticks)
@@ -634,7 +667,16 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         # and anchoring it left pushes it into the next tick.
         labels[-1].set_horizontalalignment("right")
         ax.yaxis.set_major_formatter(FuncFormatter(lambda value, _: f"{value:.0f} cm"))
-        ax.tick_params(axis="both", length=0, labelsize=body_fontsize, labelcolor=TEXT_COLOR)
+        ax.tick_params(axis="y", length=0, labelsize=body_fontsize, labelcolor=TEXT_COLOR)
+        ax.tick_params(
+            axis="x",
+            length=TICK_LENGTH * POINTS_PER_PIXEL,
+            width=TICK_WIDTH * POINTS_PER_PIXEL,
+            color=TICK_COLOR,
+            direction="out",
+            labelsize=body_fontsize,
+            labelcolor=TEXT_COLOR,
+        )
         # Grapher renders axis labels bold (fontWeight 700 in Axis.ts). Both layouts put the
         # panels in one row, so each carries its own label; the axes[-1] arm keeps a stacked
         # layout correct (shared x axis, label on the bottom panel only) if one is ever added.
@@ -677,7 +719,7 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
     # starts below wherever the subtitle actually ends rather than at the template's fixed
     # chart-area top.
     subtitle_bottom_px = subtitle_y + subtitle_lines * px(body_fontsize) + px(body_fontsize) * SUBTITLE_GAP
-    chart_top_px = subtitle_bottom_px + DIAGRAM_CHART_GAP * px(body_fontsize)
+    chart_top_px = subtitle_bottom_px + DIAGRAM_CHART_GAP * px(body_fontsize) + facet_title_space_px
 
     if layout["diagram"] == "header":
         # A 217px-wide mobile panel cannot hold the diagram -- the two band labels alone are wider
@@ -708,7 +750,7 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
             rise=0.47,
             label_gap=0.04,
         )
-        chart_top_px = diagram_top_px + HEADER_DIAGRAM_HEIGHT
+        chart_top_px = diagram_top_px + HEADER_DIAGRAM_HEIGHT + facet_title_space_px
 
     # --- footer, in the slots the static-chart templates define ---
     # Desktop: Note -> Data source -> tagline and license sharing one row, left and right.
