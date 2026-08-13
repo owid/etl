@@ -550,9 +550,11 @@ rewrite it as "set X to Y, because Z": the reader wants to reproduce the state, 
 
 The branch, worktree and draft PR already exist from Step 4. **Run `make check` before committing** —
 the step is ordinary ETL code and has to be formatted, linted and typechecked like any other. Then
-commit the step plus its committed PNG/SVG, push, and fill in the PR body — then
-[`/pr-babysitter`](../pr-babysitter/SKILL.md) for the Codex round. **Brief the babysitter with the
-deliberate decisions** (see the last gotcha).
+commit the step plus its committed PNG/SVG, push, and fill in the PR body — whose **first line is the
+attribution blockquote**, `> _Written by Claude <model name> — @<handle> at the wheel._`, because the
+body goes out under a human's identity. It is required on every comment you post to the PR afterwards
+too, replies to the review included. Then [`/pr-babysitter`](../pr-babysitter/SKILL.md) for the Codex
+round. **Brief the babysitter with the deliberate decisions** (see the last gotcha).
 
 The code review is only the first of several. The project defines the rest, and they are people,
 not checks — from `#2459`'s workflow, with the parts this skill touches in bold:
