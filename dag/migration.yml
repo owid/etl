@@ -71,10 +71,12 @@ steps:
 
   export://multidim/migration/latest/asylum_seekers_and_refugees:
     - data://grapher/un/2025-07-03/refugee_data
+    - data://grapher/unicef/2026-01-07/child_migration
 
   export://multidim/migration/latest/internal_displacement:
     - data://grapher/idmc/2026-01-19/internal_displacement
     - data://grapher/un/2025-07-03/refugee_data
+    - data://grapher/unicef/2026-01-07/child_migration
 
   export://multidim/migration/latest/remittances:
     - data://grapher/worldbank_wdi/2026-07-27/wdi

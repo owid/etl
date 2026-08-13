@@ -13,6 +13,7 @@ default_dimensions:
   cause: total
   metric: idps
   unit: total
+  age: all_ages
 
 definitions:
   common_views:
@@ -29,10 +30,13 @@ definitions:
     Natural disasters in this context include, for example, hazards such as floods, droughts, landslides, storms – including cyclones and other storms –, wildfires and extreme temperatures as well as earthquakes, volcanic eruptions and landslides.
   description_key_idmc_criteria: A displaced person is included in this statistic if their displacement was forced/ involuntary, they have left their habitual residence and they have not crossed an international border.
   description_key_idmc_rounded: IDMC provides rounded numbers to reflect the inherent uncertainty in displacement data. Figures equal or lower than 100,000 are rounded to two significant digits while figures above 100,000 are rounded to the nearest thousand.
-
+  description_key_child_displaced: This only includes internally displaced people who are children, under the age of 18.
+  description_unicef_source: The data for internally displaced children (under 18) is published by [UNICEF](https://data.unicef.org/topic/child-migration-and-displacement/displacement/). They source their data from the Internal Displacement Monitoring Centre (IDMC).
   footnote_zero_idps: A value of 0 means that IDMC is not aware of any internally displaced people (IDPs) in that region at the time of reporting. It does not mean that IDMC has confirmed that there are no IDPs.
   footnote_zero_displacements: A value of 0 means that IDMC is not aware of any internal displacements in that region at the time of reporting. It does not mean that IDMC has confirmed that there are no displacements.
   footnote_return_calendar_year: The UNHCR only includes IDPs who returned during this calendar year in their statistics.
+  footnote_child_idps_per_capita: This shows the number of internally displaced children (under 18) per 1,000 total population of all ages.
+  footnote_child_displacements_per_capita: This shows the number of new internal displacements of children (under 18) per 1,000 total population of all ages.
 
 dimensions:
   - slug: cause
@@ -68,6 +72,15 @@ dimensions:
         name: Per capita
     presentation:
       type: radio
+  - slug: age
+    name: Age
+    choices:
+      - slug: all_ages
+        name: All ages
+      - slug: under_18
+        name: Under 18
+    presentation:
+      type: radio
 
 views:
   # All causes
@@ -75,6 +88,7 @@ views:
       cause: total
       metric: idps
       unit: total
+      age: all_ages
     indicators:
       y:
         - catalogPath: internal_displacement#total_displacement_rounded
@@ -96,6 +110,7 @@ views:
       cause: total
       metric: idps
       unit: per_capita
+      age: all_ages
     indicators:
       y:
         - catalogPath: internal_displacement#total_displacement_rounded_per_thousand
@@ -116,6 +131,7 @@ views:
       cause: total
       metric: displacements
       unit: total
+      age: all_ages
     indicators:
       y:
         - catalogPath: internal_displacement#total_new_displacement_rounded
@@ -137,6 +153,7 @@ views:
       cause: total
       metric: displacements
       unit: per_capita
+      age: all_ages
     indicators:
       y:
         - catalogPath: internal_displacement#total_new_displacement_rounded_per_thousand
@@ -159,6 +176,7 @@ views:
       cause: conflict
       metric: idps
       unit: total
+      age: all_ages
     indicators:
       y:
         - catalogPath: internal_displacement#conflict_total_displacement_rounded
@@ -181,6 +199,7 @@ views:
       cause: conflict
       metric: idps
       unit: per_capita
+      age: all_ages
     indicators:
       y:
         - catalogPath: internal_displacement#conflict_total_displacement_rounded_per_thousand
@@ -202,6 +221,7 @@ views:
       cause: conflict
       metric: displacements
       unit: total
+      age: all_ages
     indicators:
       y:
         - catalogPath: internal_displacement#conflict_new_displacement_rounded
@@ -225,6 +245,7 @@ views:
       cause: conflict
       metric: displacements
       unit: per_capita
+      age: all_ages
     indicators:
       y:
         - catalogPath: internal_displacement#conflict_new_displacement_rounded_per_thousand
@@ -248,6 +269,7 @@ views:
       cause: disaster
       metric: idps
       unit: total
+      age: all_ages
     indicators:
       y:
         - catalogPath: internal_displacement#disaster_total_displacement_rounded
@@ -270,6 +292,7 @@ views:
       cause: disaster
       metric: idps
       unit: per_capita
+      age: all_ages
     indicators:
       y:
         - catalogPath: internal_displacement#disaster_total_displacement_rounded_per_thousand
@@ -291,6 +314,7 @@ views:
       cause: disaster
       metric: displacements
       unit: total
+      age: all_ages
     indicators:
       y:
         - catalogPath: internal_displacement#disaster_new_displacement_rounded
@@ -314,6 +338,7 @@ views:
       cause: disaster
       metric: displacements
       unit: per_capita
+      age: all_ages
     indicators:
       y:
         - catalogPath: internal_displacement#disaster_new_displacement_rounded_per_thousand
@@ -337,6 +362,7 @@ views:
       cause: conflict
       metric: returned
       unit: total
+      age: all_ages
     indicators:
       y:
         - catalogPath: refugee_data_origin#returned_idps
@@ -352,6 +378,7 @@ views:
       cause: conflict
       metric: returned
       unit: per_capita
+      age: all_ages
     indicators:
       y:
         - catalogPath: refugee_data_origin#returned_idps_per_100k
@@ -362,3 +389,281 @@ views:
           baseColorScheme: BuGn
           binningStrategy: manual
           customNumericValues: [0, 30, 100, 300, 1000, 3000, 0]
+
+  # Internally displaced children (under 18)
+  - dimensions:
+      cause: total
+      metric: idps
+      unit: total
+      age: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#idps_under_18_total
+    config:
+      note: "{definitions.footnote_zero_idps}"
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 100, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 0]
+    metadata:
+      description_key:
+        - "{definitions.description_key_stock}"
+        - "{definitions.description_key_child_displaced}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_unicef_source}"
+
+  - dimensions:
+      cause: total
+      metric: idps
+      unit: per_capita
+      age: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#idps_under_18_total_per_1000
+    config:
+      note: "{definitions.footnote_child_idps_per_capita}"
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 0]
+    metadata:
+      description_key:
+        - "{definitions.description_key_stock}"
+        - "{definitions.description_key_child_displaced}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_unicef_source}"
+
+  - dimensions:
+      cause: total
+      metric: displacements
+      unit: total
+      age: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#new_idps_under_18_total
+    config:
+      note: "{definitions.footnote_zero_displacements}"
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 3000, 10000, 30000, 100000, 300000, 1000000, 0]
+    metadata:
+      description_key:
+        - "{definitions.description_key_flow}"
+        - "{definitions.description_key_flow_addendum}"
+        - "{definitions.description_key_child_displaced}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_unicef_source}"
+  - dimensions:
+      cause: total
+      metric: displacements
+      unit: per_capita
+      age: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#new_idps_under_18_total_per_1000
+    config:
+      note: "{definitions.footnote_child_displacements_per_capita}"
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 0]
+    metadata:
+      description_key:
+        - "{definitions.description_key_flow}"
+        - "{definitions.description_key_flow_addendum}"
+        - "{definitions.description_key_child_displaced}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_unicef_source}"
+
+  - dimensions:
+      cause: conflict
+      metric: idps
+      unit: total
+      age: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#idps_under_18_conflict_violence
+    config:
+      note: "{definitions.footnote_zero_idps}"
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 3000000, 0]
+    metadata:
+      description_key:
+        - "{definitions.description_key_stock}"
+        - "{definitions.description_key_conflict}"
+        - "{definitions.description_key_child_displaced}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_unicef_source}"
+
+  - dimensions:
+      cause: conflict
+      metric: idps
+      unit: per_capita
+      age: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#idps_under_18_conflict_violence_per_1000
+    config:
+      note: "{definitions.footnote_child_idps_per_capita}"
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 0]
+    metadata:
+      description_key:
+        - "{definitions.description_key_stock}"
+        - "{definitions.description_key_conflict}"
+        - "{definitions.description_key_child_displaced}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_unicef_source}"
+
+  - dimensions:
+      cause: conflict
+      metric: displacements
+      unit: total
+      age: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#new_idps_under_18_conflict_violence
+    config:
+      note: "{definitions.footnote_zero_displacements}"
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 3000, 10000, 30000, 100000, 300000, 1000000, 0]
+    metadata:
+      description_key:
+        - "{definitions.description_key_flow}"
+        - "{definitions.description_key_flow_addendum}"
+        - "{definitions.description_key_conflict}"
+        - "{definitions.description_key_child_displaced}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_unicef_source}"
+
+  - dimensions:
+      cause: conflict
+      metric: displacements
+      unit: per_capita
+      age: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#new_idps_under_18_conflict_violence_per_1000
+    config:
+      note: "{definitions.footnote_child_displacements_per_capita}"
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 0.2, 0.5, 1, 2, 5, 10, 20, 0]
+    metadata:
+      description_key:
+        - "{definitions.description_key_flow}"
+        - "{definitions.description_key_flow_addendum}"
+        - "{definitions.description_key_conflict}"
+        - "{definitions.description_key_child_displaced}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_unicef_source}"
+
+  - dimensions:
+      cause: disaster
+      metric: idps
+      unit: total
+      age: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#idps_under_18_disaster
+    config:
+      note: "{definitions.footnote_zero_idps}"
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 100, 300, 1000, 3000, 10000, 30000, 100000, 300000, 0]
+    metadata:
+      description_key:
+        - "{definitions.description_key_stock}"
+        - "{definitions.description_key_disaster}"
+        - "{definitions.description_key_child_displaced}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_unicef_source}"
+
+  - dimensions:
+      cause: disaster
+      metric: idps
+      unit: per_capita
+      age: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#idps_under_18_disaster_per_1000
+    config:
+      note: "{definitions.footnote_child_idps_per_capita}"
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 0.2, 0.5, 1, 2, 5, 10, 0]
+    metadata:
+      description_key:
+        - "{definitions.description_key_stock}"
+        - "{definitions.description_key_disaster}"
+        - "{definitions.description_key_child_displaced}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_unicef_source}"
+
+  - dimensions:
+      cause: disaster
+      metric: displacements
+      unit: total
+      age: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#new_idps_under_18_disaster
+    config:
+      note: "{definitions.footnote_zero_displacements}"
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 3000, 10000, 30000, 100000, 300000, 1000000, 0]
+    metadata:
+      description_key:
+        - "{definitions.description_key_flow}"
+        - "{definitions.description_key_flow_addendum}"
+        - "{definitions.description_key_disaster}"
+        - "{definitions.description_key_child_displaced}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_unicef_source}"
+
+  - dimensions:
+      cause: disaster
+      metric: displacements
+      unit: per_capita
+      age: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#new_idps_under_18_disaster_per_1000
+    config:
+      note: "{definitions.footnote_child_displacements_per_capita}"
+      map:
+        colorScale:
+          baseColorScheme: OrRd
+          binningStrategy: manual
+          customNumericValues: [0, 0.2, 0.5, 1, 2, 5, 10, 0]
+    metadata:
+      description_key:
+        - "{definitions.description_key_flow}"
+        - "{definitions.description_key_flow_addendum}"
+        - "{definitions.description_key_disaster}"
+        - "{definitions.description_key_child_displaced}"
+        - "{definitions.description_key_idmc_criteria}"
+        - "{definitions.description_unicef_source}"
