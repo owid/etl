@@ -147,6 +147,18 @@ written file sits. **Position from `exportBox`.** Each part of a split viz overh
 lengths, so the two expansions differ, and placing the parts from their on-page rects shifts them
 relative to each other — the one job the sidecar exists to do.
 
+Measured on the migration sankey at `--viz-width 923`, where both parts report an on-page rect of
+436.5px wide:
+
+| | `box` | `exportBox` | written file |
+|---|---|---|---|
+| part 1 | 436.50 × 428 at (17.00, 318.38) | 440.75 × 428 at (14.75, 318.38) | `viewBox="-2.254 0 440.754 428"` |
+| part 2 | 436.50 × 150 at (469.50, 318.38) | 438.50 × 151.39 at (467.50, 317.14) | `viewBox="-2 -1.234 438.5 151.402"` |
+
+The expansions differ by axis and by part — part 1 grows only leftward, part 2 both left and up — so
+`box` puts the two parts 0.25px and 1.23px out of true against each other, and understates both files'
+widths. `exportBox` reproduces each `viewBox` exactly.
+
 ### Sizing the export: the container decides, and height may not follow
 
 `--viz-width` sets the width of the mounted container, and **that** is what these components lay out
