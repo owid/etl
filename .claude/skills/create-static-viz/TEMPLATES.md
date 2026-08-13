@@ -50,9 +50,14 @@ margin is **16 px** on all four frames, so content width is `frame width − 32`
 | Tagline (left) | 609 | 467 | 13 |
 | License (right, x=571) | 609 | 263 | 13 |
 
+The slots are wrapped in two auto-layout frames mirroring Vertical: header block `25398:753`
+spans 0→134, footer block `25398:769` starts at 540. Each carries 16 px of inner padding on the
+chart side, so every slot y above is unchanged and the visual chart area is still 118 → 556 —
+`header.y + header.height` (134) is that edge plus the padding.
+
 ### Vertical — 850 × 1095
 
-Same slots and widths as Horizontal, wrapped in auto-layout frames. Header block `5332:94` is
+Same slots, widths, and auto-layout wrappers as Horizontal. Header block `5332:94` is
 0→116; footer block `5332:101` starts at 997. Absolute y: title 16, subtitle 82, chart area
 116 → 997, `Note:` 1013, `Data source:` 1046, tagline/license 1066.
 
