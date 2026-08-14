@@ -223,6 +223,30 @@ def replacement_url(
     return f"{SITE}/grapher/{slugs[tgt]}?{urlencode(merged)}"
 
 
+def create_from_url(src_id: int, pairs: dict[int, int], slugs: dict[int, str], log_sources: set[int]) -> str:
+    """Where to open the target before using its "Create narrative chart" control.
+
+    Deliberately the **scatter view** — the base proposal with no reference params merged in —
+    and NOT what `replacement_url` returns for this row. Two reasons, and both bite:
+
+    * The retirement is about the scatter. A narrative chart's `queryParamsForParentChart`
+      routinely carry `tab=chart`, and since the reference's params win the merge, using
+      `replacement_url` here would open the target's line/slope view and produce a replacement
+      of the wrong view entirely.
+    * Those params are the narrative chart's *"Explore the data"* href — where it sends readers
+      to the parent — not the view it renders. Its own view comes from a materialized config
+      (`configFull`). Merging them into a create-from URL conflates the two.
+
+    The old params still matter, which is why the table prints them in their own column: the
+    control parents to the view on screen, and authored FAUST and entity selection never
+    transfer, so the story has to be re-authored from them by hand.
+    """
+    tgt = pairs.get(src_id)
+    if not tgt or tgt not in slugs:
+        return "— no target —"
+    return f"{SITE}/grapher/{slugs[tgt]}?{urlencode(base_query(src_id, log_sources))}"
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Build the reference handoff for an add-gdp-scatter retirement.")
     ap.add_argument("--references", required=True, type=Path, help="--json output of find_references.py")
@@ -375,6 +399,13 @@ def main() -> int:
             "article(s)** to the new name, then **delete** the old one. Never delete first — a "
             "published post referencing the name blocks the delete.",
             "",
+            "The create-from URL is the target's **scatter view**, not the old chart's params "
+            "merged over it: the control parents to the view on screen, and it is the scatter "
+            "this retirement is about — several of these carry `tab=chart`, which would build a "
+            "replacement of the line or slope view instead. Their own params are in the column "
+            "beside it because authored FAUST and entity selection never transfer, so the story "
+            "has to be re-authored from them by hand.",
+            "",
             "| Narrative chart | On | Its params | Open | Create the replacement from |",
             "|---|---|---|---|---|",
         ]
@@ -384,7 +415,7 @@ def main() -> int:
                 f"| `{fr.cell(str(r['where']), 44)}` | `{r['subject']}` | "
                 f"{params_cell(own_params, set(base_query(r['subject_id'], log_sources)))} | "
                 f"{open_links(r, args.host, admin)} | "
-                f"{replacement_url(r['subject_id'], own_params, pairs, slugs, log_sources)} |"
+                f"{create_from_url(r['subject_id'], pairs, slugs, log_sources)} |"
             )
         out.append("")
 
