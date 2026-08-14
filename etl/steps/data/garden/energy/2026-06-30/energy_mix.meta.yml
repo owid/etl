@@ -4,11 +4,14 @@ definitions:
   # They clear the common note with the empty definition below.
   description_processing_smil_world: |-
     - For the World, data before 1965 (going back to 1800) comes from Vaclav Smil's historical estimates (2017).
+  # Same, for total energy supply per unit of GDP: Maddison's World GDP starts in 1820, not 1800.
+  description_processing_smil_world_from_1820: |-
+    - For the World, data before 1965 (going back to 1820) comes from Vaclav Smil's historical estimates (2017), divided by GDP from the Maddison Project Database, which starts in 1820.
   # Cleared processing description, for the indicators that no note applies to.
   description_processing_none: ""
   # The traditional biomass series itself, which is only reported for the World.
   description_processing_traditional_biomass: |-
-    - Traditional biomass comes from Vaclav Smil's historical estimates (2017), which cover the World only.
+    - Traditional biomass comes from Vaclav Smil's historical estimates (2017), which cover the World only, going back to 1800.
     - Smil's estimates end in 2015. For later years, we assume that traditional biomass stays at its 2015 value.
   # Denominator of the shares of primary energy including traditional biomass.
   description_processing_biomass_included: |-
@@ -780,7 +783,7 @@ tables:
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per international-$ of GDP.
         description_processing: |-
           {definitions.description_processing_eia}
-          {definitions.description_processing_smil_world}
+          {definitions.description_processing_smil_world_from_1820}
         presentation:
           title_public: '{tables.energy_mix.variables.total_energy_supply_per_gdp_kwh_per_dollar.title}'
       total_energy_supply_twh:
