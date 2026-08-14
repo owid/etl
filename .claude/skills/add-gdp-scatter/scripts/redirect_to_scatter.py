@@ -23,13 +23,32 @@ Mechanism notes:
 """
 
 import argparse
+import importlib.util
 import json
 import re
 import sys
+from pathlib import Path
 from typing import Any
 
 from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV
+
+
+def _load_sibling(name: str):
+    """Import a script from this skill's own scripts directory."""
+    path = Path(__file__).resolve().parent / f"{name}.py"
+    if not path.exists():
+        raise SystemExit(f"Cannot import {name}: {path} does not exist")
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+# The log-source question, and the reversed-source exclusion it depends on, are owned by the
+# applier so the two consumers cannot disagree.
+applier = _load_sibling("apply_scatter_defaults")
 
 SLUG_RE = re.compile(r"/grapher/([^/?#]+)")
 TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
@@ -49,8 +68,15 @@ TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
 #                unhighlighted instead of emphasising the target's line/bar selection
 TARGET_QUERY = "tab=scatter&time=latest&country="
 
-# Params on a referencing link that would override TARGET_QUERY at redirect time.
-OVERRIDING_PARAMS = ("tab=", "time=", "country=")
+# Appended for a source whose log y axis describes the non-GDP indicator. The applier leaves
+# the target's `yAxis` linear on purpose (it is global, so log would flip the line/bar views),
+# so without this a reader arriving by the retired slug gets a linear scatter where the old
+# chart was logarithmic — the shape the author chose log to show. `target_query_param` is
+# per-row, so unlike the rest of TARGET_QUERY this part can vary by row.
+Y_SCALE_LOG = "yScale=log"
+
+# Params on a referencing link that would override the stored query at redirect time.
+OVERRIDING_PARAMS = ("tab=", "time=", "country=", "yScale=")
 
 # Reference categories a redirect alone does NOT fix — these BLOCK the row.
 # narrativeCharts is deliberately not here: one parented to a chart owns a materialized full
@@ -222,6 +248,11 @@ def classify_api_error(exc: Exception) -> tuple[str, str]:
     return "ERROR", msg[:120]
 
 
+def row_query(src_id: int | None, log_sources: set[int]) -> str:
+    """The query this row stores on its redirect."""
+    return f"{TARGET_QUERY}&{Y_SCALE_LOG}" if src_id in log_sources else TARGET_QUERY
+
+
 def build_plan(api: AdminAPI, payload: list[dict], skip_aliases: bool) -> list[dict]:
     """Resolve every pair and decide what apply would do — all read-only.
 
@@ -242,6 +273,10 @@ def build_plan(api: AdminAPI, payload: list[dict], skip_aliases: bool) -> list[d
     ids = chart_ids_for_slugs(slugs)
     existing = chart_redirects_for_slugs(slugs)
     site_sources, mdim_sources = shadowing_sources(slugs)
+    # Which sources carry a log y axis on the indicator (reversed sources excluded).
+    log_sources = applier.log_y_axis_sources({ids[r["src"]] for r in rows if r["src"] in ids})
+    for rec in rows:
+        rec["query"] = row_query(ids.get(rec["src"]), log_sources)
 
     for rec in rows:
         if rec["status"] == "ERROR":
@@ -297,13 +332,13 @@ def build_plan(api: AdminAPI, payload: list[dict], skip_aliases: bool) -> list[d
         if prior and prior["chart_id"] != rec["tgt_id"]:
             rec |= {"status": "CONFLICT", "note": f"slug already redirects to chart {prior['chart_id']}"}
             continue
-        if prior and prior["param"] == TARGET_QUERY:
-            rec |= {"status": "EXISTS", "note": f"-> {tgt}?{TARGET_QUERY}"}
+        if prior and prior["param"] == rec["query"]:
+            rec |= {"status": "EXISTS", "note": f"-> {tgt}?{rec['query']}"}
         elif prior:
             was = prior["param"] or "(no params)"
-            rec |= {"status": "UPDATE", "note": f"param {was} -> {TARGET_QUERY}", "prior": prior}
+            rec |= {"status": "UPDATE", "note": f"param {was} -> {rec['query']}", "prior": prior}
         else:
-            rec |= {"status": "CREATE", "note": f"-> {tgt}?{TARGET_QUERY}"}
+            rec |= {"status": "CREATE", "note": f"-> {tgt}?{rec['query']}"}
 
         # Inbound aliases of the SOURCE. Unpublishing it deletes every one of them, so they
         # have to be re-pointed at the target or those URLs become hard 404s. Always read, even
@@ -321,7 +356,7 @@ def build_plan(api: AdminAPI, payload: list[dict], skip_aliases: bool) -> list[d
     return rows
 
 
-def repoint_alias(api: AdminAPI, alias: dict, src_id: int, tgt_id: int) -> tuple[str, str]:
+def repoint_alias(api: AdminAPI, alias: dict, src_id: int, tgt_id: int, query: str) -> tuple[str, str]:
     """Move one inbound alias from the source chart to the target, carrying TARGET_QUERY.
 
     The delete is mandatory, not a convenience: `chart_slug_redirects.slug` is UNIQUE, so the
@@ -334,7 +369,7 @@ def repoint_alias(api: AdminAPI, alias: dict, src_id: int, tgt_id: int) -> tuple
     except Exception as e:
         return "FAILED", f"delete: {classify_api_error(e)[1]}"
     try:
-        api.create_chart_redirect(tgt_id, alias["slug"], TARGET_QUERY)
+        api.create_chart_redirect(tgt_id, alias["slug"], query)
     except Exception as e:
         status, note = classify_api_error(e)
         try:
@@ -408,7 +443,7 @@ def apply_row(api: AdminAPI, rec: dict, skip_aliases: bool) -> dict:
             status, note = classify_api_error(e)
             return action | {"status": status, "note": note}
         try:
-            created_id = api.create_chart_redirect(tgt_id, src, TARGET_QUERY)["redirect"]["id"]
+            created_id = api.create_chart_redirect(tgt_id, src, rec["query"])["redirect"]["id"]
             action |= {"status": "UPDATED"}
         except Exception as e:
             status, note = classify_api_error(e)
@@ -422,7 +457,7 @@ def apply_row(api: AdminAPI, rec: dict, skip_aliases: bool) -> dict:
                 }
     elif rec["status"] == "CREATE":
         try:
-            created_id = api.create_chart_redirect(tgt_id, src, TARGET_QUERY)["redirect"]["id"]
+            created_id = api.create_chart_redirect(tgt_id, src, rec["query"])["redirect"]["id"]
             action |= {"status": "CREATED"}
         except Exception as e:
             status, note = classify_api_error(e)
@@ -432,7 +467,7 @@ def apply_row(api: AdminAPI, rec: dict, skip_aliases: bool) -> dict:
     # aliases under that flag, since the unpublish below would delete them.
     if not skip_aliases:
         for alias in rec["aliases"]:
-            status, note = repoint_alias(api, alias, src_id, tgt_id)
+            status, note = repoint_alias(api, alias, src_id, tgt_id, rec["query"])
             action["aliases"].append((alias["slug"], status, note))
         stuck = [slug for slug, status, _ in action["aliases"] if status != "REPOINTED"]
         if stuck:
@@ -587,7 +622,7 @@ def main() -> int:
     needs_bake = False
     for rec in plan:
         pair = f"{rec.get('src_id') or '-'}->{rec.get('tgt_id') or '-'}"
-        target = f"-> {rec['tgt']}?{TARGET_QUERY}"
+        target = f"-> {rec['tgt']}?{rec['query']}"
         if args.apply and rec["status"] in ACTIONABLE:
             action = apply_row(api, rec, skip_aliases=args.skip_alias_repoint)
             note = f"{action['note']}  [{action['unpublish']}]" if action["unpublish"] else action["note"]
@@ -623,7 +658,7 @@ def main() -> int:
         print("\nVERIFY once the bake finishes (the unpublish triggers it, or the explicit deploy):")
         for rec in applied[:3]:
             url = OWID_ENV.chart_site(rec["src"])
-            print(f"  curl -sI {url}   # 301 -> /grapher/{rec['tgt']}?{TARGET_QUERY}")
+            print(f"  curl -sI {url}   # 301 -> /grapher/{rec['tgt']}?{rec['query']}")
         print("  ...and re-run this script: every row should come back EXISTS.")
         if is_production:
             print("\n  This was production. Nothing else to do — chart_slug_redirects does not sync anywhere.")

@@ -69,11 +69,19 @@ SITE = "https://ourworldindata.org"
 MANUAL_SURFACES = {"explorer", "data insight", "static viz"}
 
 
+def _load_sibling(name: str):
+    """Import a script from this skill's own scripts directory."""
+    return _load_module(name, Path(__file__).resolve().parent / f"{name}.py")
+
+
 def _load_shared(name: str):
     """Import a find-chart-references module, so the reports share one presentation."""
-    path = Path(__file__).resolve().parents[2] / "find-chart-references" / "scripts" / f"{name}.py"
+    return _load_module(name, Path(__file__).resolve().parents[2] / "find-chart-references" / "scripts" / f"{name}.py")
+
+
+def _load_module(name: str, path: Path):
     if not path.exists():
-        raise SystemExit(f"Cannot find the shared formatters at {path}")
+        raise SystemExit(f"Cannot import {name}: {path} does not exist")
     spec = importlib.util.spec_from_file_location(name, path)
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
@@ -82,6 +90,9 @@ def _load_shared(name: str):
 
 
 fr = _load_shared("find_references")
+# The log-source question is owned by the applier, which also owns the reversed-source
+# exclusion it depends on — see `log_y_axis_sources`.
+applier = _load_sibling("apply_scatter_defaults")
 # Two of the aids have a second, corrected implementation in `reference_report.py`, and this
 # report takes each formatter from whichever module gets it right — copying either one here
 # would be the drift this script exists to avoid. See `page_link` and `find_hint`.
@@ -129,22 +140,6 @@ def load_pairs(path: Path) -> dict[int, int]:
         return ref if isinstance(ref, int) else ids[ref]
 
     return {resolve(src): resolve(tgt) for src, tgt in refs}
-
-
-def log_y_sources(source_ids: set[int]) -> set[int]:
-    """Of these source charts, the ones authored with a log y axis.
-
-    Read from the SOURCE, never the target: the target's own `yAxis.scaleType` is deliberately
-    left linear by the applier, so it can never tell you what the retiring chart looked like.
-    """
-    if not source_ids:
-        return set()
-    df = OWID_ENV.read_sql(
-        "SELECT c.id, cc.full ->> '$.yAxis.scaleType' AS scale_type "
-        "FROM charts c JOIN chart_configs cc ON c.configId = cc.id WHERE c.id IN %(i)s",
-        params={"i": tuple(sorted(source_ids))},
-    )
-    return {int(r["id"]) for r in df.to_dict("records") if r["scale_type"] == "log"}
 
 
 def base_query(src_id: int, log_sources: set[int]) -> dict[str, str]:
@@ -252,7 +247,7 @@ def main() -> int:
             params={"i": tuple(set(pairs.values()))},
         )
         slugs = {int(r["id"]): r["slug"] for r in df.to_dict("records")}
-    log_sources = log_y_sources(set(pairs))
+    log_sources = applier.log_y_axis_sources(set(pairs))
 
     out = [
         "# Reference handoff — retiring the old GDP scatters",
