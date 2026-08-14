@@ -34,7 +34,7 @@ Each year gets a new file. For **2026** the file key is `s6Sv60bakebRRW2TxsMQbF`
 |---|---|---|---|
 | Templates page | `798:54` | — | all templates + instruction frames live here. **The arrows, flags, animals, no-data and checklist ids below are *pages*, not nodes on this one** — they sit at page indices 2–7 |
 | InstagramPost_Template_English | `798:161` | 540×540 | two-row footer (`Frame 12` @ y=488): source, `OurWorldinData.org/[Topic]`, CC BY |
-| InstagramPost_Template_Portrait_English | `6689:8` | 560×700 | footer includes a Note line |
+| InstagramPost_Template_Portrait_English | `6689:8` | 560×700 | footer (`6689:9`) includes a Note line. Header `header` (`6913:14`) is a vertical auto-layout over a `title row`, matching the square's `Frame 14`/`Frame 13`; unlike the 850-wide pair its wrappers carry **no** inner padding, so its frame band and text band are the same number |
 | InstagramReel_template | `7336:8` | 616×1096 | has top/bottom no-go zones; contains a worked small-multiples example |
 | DI_Template | `6799:1859` | 540×540 | **one**-row footer (`Frame 12` @ y=508): source + CC BY |
 | Static Chart Template_Mobile (example 1) | `24590:20` | 540×540 | **two**-row footer (`Frame 15` `25343:276` @ y=486, h=38): `Data source:` then `Licensed under CC-BY by the author […]`, both full width |
@@ -433,7 +433,7 @@ The chart spans the full content width, left-aligned with the title/subtitle/log
 **Measure that band; don't hardcode it.** The header's height depends on how many lines the title and subtitle take, so a fixed y is wrong as soon as the subtitle wraps — and centering inside a guessed band leaves a lopsided result (18px above, 6px below on the first run of this skill). Read the real edges instead:
 
 ```js
-const headerBottom = header.y + header.height       // Frame 14: title + subtitle + logo
+const headerBottom = header.y + header.height       // header block: title + subtitle + logo
 const footerTop = footer.y + Math.min(0, source.y)  // the footer's first *visible* ink, not its frame top
 const gap = (footerTop - headerBottom - chart.height) / 2
 chart.x = header.x
@@ -508,9 +508,15 @@ The table gives one number per template — the band you fit a chart into — an
 
 **On the two 850-wide templates the band you read off the frames is not the band above.** Both wrap their header and footer in auto-layout frames whose 16px of inner padding falls on the chart side, so the frame band is the text band inset by 16px at each end — `header.y + header.height` returns 134 on the Horizontal and 136 on the Vertical, never the subtitle's own bottom edge. The table's Vertical row is already a frame band, its Horizontal row a text band, so the two rows are not directly comparable; the per-slot text positions behind them are `TEMPLATES.md`'s. Read the band off the frames and that breathing room comes for free; read it off the text and add your own.
 
+**Every template exposes header/footer frames, but only the 850-wide pair pads them.** On IG square, IG portrait, DI and both static mobile templates the wrappers carry zero padding, so there `header.y + header.height` *is* the text band — 118 on all four 540-wide frames, 135 on the portrait, exactly as tabled. Read the band off the frames everywhere; just don't port the 16px correction across, because it belongs to the two 850-wide templates alone.
+
+The footers are not uniform in the same way: static mobile's `Frame 15` and the 850-wide `Frame 8` are auto-layout and reflow, while IG square, IG portrait and DI position their footer rows absolutely inside a plain frame. That is what Step 6's structural check is for.
+
 Verify against the actual clone with `get_metadata` (the templates evolve; the geometry above is a 2026 snapshot). These are **frame-local** coordinates, and `x`/`y` are relative to a node's parent — so append the embed to the template clone **before** positioning it. Left parented to the page (where Step 5 puts imported nodes), the same numbers land it near the page origin, on top of the reference chart. One wrinkle in the same rule: **a GROUP is transparent for coordinates**, so once the imported chart is inside the template, its descendants report `x`/`y` in the *template frame's* space, not the group's — which is what makes the frame-local numbers above directly usable on the plot's internals.
 
-**The header reflows itself — don't reposition it.** `Frame 14` is a vertical auto-layout and `Frame 13` (title + logo) a horizontal one, so a title that grows from two lines to three pushes the subtitle down and grows the header on its own. Set `characters`, then **read the new `header.y + header.height` back** and measure the band from that; any y you computed before the text went in is stale.
+**The header reflows itself — don't reposition it.** Every template's header block is a vertical auto-layout wrapping a horizontal title row (title beside logo), so a title that grows from two lines to three pushes the subtitle down and grows the header on its own. Set `characters`, then **read the new `header.y + header.height` back** and measure the band from that; any y you computed before the text went in is stale. Measured on the portrait: a two-line title gives a 135 band bottom, three lines 199.
+
+**The logo sets a floor under that, so a short title doesn't buy all the room you'd expect.** The title row hugs the taller of its two children, and the logo is ~35px plus whatever the template offsets it by — so once the title drops to one line the *logo* drives the row height. On the portrait a one-line title takes the band bottom to 111.23, not the ~103 the title alone implies: the logo box is 40.23 against the title's 32. Read the band back rather than deriving it from line counts.
 
 **Prefer reaching the content width without `rescale()` at all.** `rescale()` multiplies font sizes along with geometry, so a 1.006× nudge to close a 3px gap silently moves every label from 15px to 15.09 — off the ladder, and the Step 8c "sizes are named styles" check then fails on a difference no one can see. When the width can be closed another way — the label reclaim above is the usual one — take that route and every size stays exactly where the export put it.
 
@@ -533,7 +539,12 @@ for (const t of annotations) { t.x = left; t.resize(right - left, t.height) }
 **Match the header box exactly — same left edge and same width.** A chart even a few pixels narrower than the title reads as a mistake. Read the target box off the header rather than off a constant, and do it *after* the frame is gone, so the group's bounding box is the plot's real extent and no export padding is baked into the width:
 
 ```js
-const header = clone.children.find(c => c.name === "Frame 14")   // title + subtitle + logo
+// Resolve the header structurally — the name differs per template ("Frame 14" on IG square,
+// DI and static mobile, "Frame 5" on the 850-wide pair, "header" on IG portrait). It is the
+// topmost vertical auto-layout child; the footer is the other one where there are two.
+const header = clone.children
+    .filter(c => "layoutMode" in c && c.layoutMode === "VERTICAL")
+    .sort((a, b) => a.y - b.y)[0]
 const contentX = header.x, contentW = header.width               // the box to match
 chart.rescale(TARGET_H / chart.height)                           // height-first; never resize()
 chart.x = contentX                                               // same left edge
