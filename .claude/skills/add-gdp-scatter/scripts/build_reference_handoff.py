@@ -191,10 +191,11 @@ def params_cell(own_params: str, base_keys: set[str]) -> str:
     they collide with, and non-colliding params ride along with the scatter view intact.
 
     Two serving-layer caveats bound where this grading applies. It describes the durable
-    404→301 function on PRODUCTION. Staging's redirect (batch-1 staging apply, 2026-08-14)
-    answers with the stored query and drops the visitor's params entirely, so staging cannot
-    validate it. And a fresh row's first-week static 302 (`_redirects`) is unverified either
-    way — spot-check it right after a production apply.
+    404→301 function on PRODUCTION. Staging's redirect AND a fresh row's first-week static
+    302 (`_redirects`) both answer with the stored query and drop the visitor's params
+    entirely (staging: batch-1 staging apply, 2026-08-14; the 302: verified on production
+    right after the batch-1 apply, same day). Merge semantics only start once the 302
+    expires, so neither layer can validate this docstring's transcript.
 
     `base_keys` is this row's proposal rather than the shared constant, because `yScale` is
     only proposed for a log source.

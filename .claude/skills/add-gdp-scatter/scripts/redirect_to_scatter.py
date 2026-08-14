@@ -20,9 +20,10 @@ Mechanism notes:
 - On production the redirect MERGES an incoming query over `target_query_param` key by key,
   the incoming side winning per key (distinguishing transcript in
   `build_reference_handoff.params_cell`), so a reference's params cost the reader exactly the
-  stored keys they collide with. Staging's serving layer instead answers with the stored query
-  and drops the visitor's params, and a fresh row's first-week static 302 is unverified — the
-  audits below grade by the production 301 behavior.
+  stored keys they collide with. Staging's serving layer and a fresh row's first-week static
+  302 instead answer with the stored query and drop the visitor's params (both verified live
+  2026-08-14) — the audits below grade by the production 301 behavior, which takes over when
+  the 302 expires.
 - `chart_slug_redirects` is per-environment and does NOT sync to production, so prod is a
   separate `--apply --allow-production` run once the scatter views ship there.
 """
