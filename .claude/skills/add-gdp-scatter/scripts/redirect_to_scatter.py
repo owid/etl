@@ -29,6 +29,7 @@ import re
 import sys
 from pathlib import Path
 from typing import Any
+from urllib.parse import parse_qsl
 
 from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV
@@ -74,9 +75,6 @@ TARGET_QUERY = "tab=scatter&time=latest&country="
 # chart was logarithmic — the shape the author chose log to show. `target_query_param` is
 # per-row, so unlike the rest of TARGET_QUERY this part can vary by row.
 Y_SCALE_LOG = "yScale=log"
-
-# Params on a referencing link that would override the stored query at redirect time.
-OVERRIDING_PARAMS = ("tab=", "time=", "country=", "yScale=")
 
 # Reference categories a redirect alone does NOT fix — these BLOCK the row.
 # narrativeCharts is deliberately not here: one parented to a chart owns a materialized full
@@ -189,7 +187,7 @@ def narrative_children(chart_ids: tuple[int, ...]) -> list[dict]:
     `queryParamsForParentChart` is a JSON object (not a query string) that the narrative
     chart's canonical "Explore the data" href merges over the parent slug
     (`GrapherState.canonicalUrlIfIsNarrativeChart`). Those params arrive as *incoming* params
-    on the redirect, so a stored `tab`/`time` there wins over TARGET_QUERY.
+    on the redirect, so a stored `tab`/`time` there wins over the row's stored query.
     """
     if not chart_ids:
         return []
@@ -212,7 +210,7 @@ def narrative_children(chart_ids: tuple[int, ...]) -> list[dict]:
                 "parent_id": int(r["parent_id"]),
                 "params": ", ".join(f"{k}={params[k]}" for k in sorted(params)) or "(none)",
                 "note": (
-                    f"opens the parent at {', '.join(overriding)} — overrides {TARGET_QUERY}"
+                    f"opens the parent at {', '.join(overriding)} — overrides the row's stored query"
                     if overriding
                     else "no tab/time of its own — the href will land on the scatter view"
                 ),
@@ -221,16 +219,28 @@ def narrative_children(chart_ids: tuple[int, ...]) -> list[dict]:
     return rows
 
 
-def param_notes(ref: dict) -> str:
-    """Why a given article reference won't land on the scatter view unaided."""
+def query_keys(query: str) -> set[str]:
+    """The param keys in a query string, blank values included — `country=` is a key."""
+    return {key for key, _ in parse_qsl(query.lstrip("?"), keep_blank_values=True)}
+
+
+def param_notes(ref: dict, stored_query: str) -> str:
+    """Why a given article reference won't land on the scatter view unaided.
+
+    The collision is checked against `stored_query` — the query THIS row stores on its redirect
+    — rather than a shared constant, because `yScale` is only stored for a log source. There a
+    reference's own `yScale=linear` wins over the stored `log` and the row needs a decision; on
+    every other row the redirect stores no `yScale` at all, so the reference's own value is
+    merely preserved and there is nothing to report. Same rule as the handoff report's ⚠️.
+    """
     notes = []
     if ref["kind"] == "embed":
         # `makeGrapherLinkedChart` builds resolvedUrl without a query string (unlike the
         # multi-dim path), so the target query param never reaches a gdoc-rendered chart.
         notes.append("embed renders the target's default tab")
-    overriding = [p.rstrip("=") for p in OVERRIDING_PARAMS if p in ref["query"]]
+    overriding = sorted(query_keys(ref["query"]) & query_keys(stored_query))
     if overriding:
-        notes.append(f"link sets {', '.join(overriding)} — overrides {TARGET_QUERY}")
+        notes.append(f"link sets {', '.join(overriding)} — overrides {stored_query}")
     return "; ".join(notes)
 
 
@@ -357,7 +367,7 @@ def build_plan(api: AdminAPI, payload: list[dict], skip_aliases: bool) -> list[d
 
 
 def repoint_alias(api: AdminAPI, alias: dict, src_id: int, tgt_id: int, query: str) -> tuple[str, str]:
-    """Move one inbound alias from the source chart to the target, carrying TARGET_QUERY.
+    """Move one inbound alias from the source chart to the target, carrying the row's query.
 
     The delete is mandatory, not a convenience: `chart_slug_redirects.slug` is UNIQUE, so the
     target-side row cannot exist while the source-side one does. An alias's own
@@ -594,22 +604,34 @@ def main() -> int:
         print("  The parent columns are INSERT-only (owid-grapher#6872, closed as not-planned), so a narrative")
         print("  chart cannot be re-pointed — it is replaced. Per parent, in this order:")
         for n in narratives:
-            tgt = by_id[n["parent_id"]]["tgt"]
-            print(f"    {n['name']}: create the replacement from {tgt}?{TARGET_QUERY} using that chart's")
+            # That parent row's own stored query, not the shared constant: a log source's
+            # replacement has to carry `yScale=log` too, or the new narrative chart is linear
+            # where the one it replaces was logarithmic — the shape the retirement preserves.
+            parent = by_id[n["parent_id"]]
+            print(f"    {n['name']}: create the replacement from {parent['tgt']}?{parent['query']} using that chart's")
             print("      'Create narrative chart' control, under a NEW kebab-case name; update the article(s)")
             print(f"      to reference it; then delete {n['id']}. Never delete first — the delete is refused")
             print("      while a published post references the name, and there is no rename.")
 
     # ---- ARTICLE LINKS THAT WON'T LAND ON THE SCATTER ----
-    # Aliases included: an article may well link the source chart's older slug.
-    referenced = {rec["src"] for rec in audited} | {a["slug"] for rec in audited for a in rec["aliases"]}
-    refs = [r for r in gdoc_references(tuple(sorted(referenced))) if param_notes(r)]
+    # Aliases included: an article may well link the source chart's older slug. Each slug maps to
+    # the query of the row it belongs to — an alias is re-pointed carrying that same query (see
+    # repoint_alias), so it has the same keys to collide with. Per-row, because only a log source
+    # stores a `yScale` there is anything to override.
+    query_by_slug = {
+        slug: rec["query"] for rec in audited for slug in (rec["src"], *(a["slug"] for a in rec["aliases"]))
+    }
+    refs = []
+    for r in gdoc_references(tuple(sorted(query_by_slug))):
+        note = param_notes(r, query_by_slug[r["slug"]])
+        if note:
+            refs.append((r, note))
     if refs:
         print("\nARTICLE REFERENCES NEEDING A HAND EDIT")
         print(f"{'src_slug':<48} {'article':<40} {'kind':<6} {'query':<28} note")
         print("-" * 165)
-        for r in refs:
-            print(f"{r['slug']:<48} {r['post']:<40} {r['kind']:<6} {r['query'][:28]:<28} {param_notes(r)}")
+        for r, note in refs:
+            print(f"{r['slug']:<48} {r['post']:<40} {r['kind']:<6} {r['query'][:28]:<28} {note}")
         print("\n  The redirect fires for readers, but these surfaces need editing: a gdoc embed resolves to")
         print("  the target chart and renders its DEFAULT tab (the target query param never reaches it), and")
         print("  a link's own tab=/time= params override the stored ones.")
