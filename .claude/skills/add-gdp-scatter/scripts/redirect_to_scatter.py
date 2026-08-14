@@ -623,18 +623,24 @@ def main() -> int:
         for n in narratives:
             print(f"{n['name']:<44} {n['id']:>5}  {n['params']:<30} {n['note']}")
         print("\n  These keep rendering after the unpublish — they own a materialized full config. Only their")
-        print("  'Explore the data' href uses the old slug, and the redirect covers it.")
+        print("  'Explore the data' href uses the old slug; the redirect covers the slug, and the notes above")
+        print("  say whether the stored view survives the narrative's own params.")
         print("  The parent columns are INSERT-only (owid-grapher#6872, closed as not-planned), so a narrative")
-        print("  chart cannot be re-pointed — it is replaced. Per parent, in this order:")
+        print("  chart cannot be re-pointed — a replacement, if made, is a new one. Per parent, in this order:")
         for n in narratives:
             # That parent row's own stored query, not the shared constant: a log source's
             # replacement has to carry `yScale=log` too, or the new narrative chart is linear
             # where the one it replaces was logarithmic — the shape the retirement preserves.
             parent = by_id[n["parent_id"]]
-            print(f"    {n['name']}: create the replacement from {parent['tgt']}?{parent['query']} using that chart's")
-            print("      'Create narrative chart' control, under a NEW kebab-case name; update the article(s)")
-            print(f"      to reference it; then delete {n['id']}. Never delete first — the delete is refused")
-            print("      while a published post references the name, and there is no rename.")
+            print(f"    {n['name']}: the replacement must reproduce {parent['tgt']}?{parent['query']}, under a NEW")
+            print("      kebab-case name; update the article(s) to reference it; then delete the old one last —")
+            print(f"      deleting {n['id']} is refused while a published post references the name, and there is")
+            print("      no rename.")
+        print("\n  Every target here is a plain chart, and a chart page has no 'Create narrative chart' control")
+        print("  (it exists only on MDIM views), so creating the replacement is not a UI task. Same options as")
+        print("  the handoff: leave the old one in place (it keeps rendering; only its 'Explore the data' link")
+        print("  degrades to the target's default view), ask a developer to create it via the API, or wait for")
+        print("  the target to become an MDIM. SKILL.md 'Narrative charts' has the mechanism and citations.")
 
     # ---- ARTICLE LINKS THAT WON'T LAND ON THE SCATTER ----
     # Aliases included: an article may well link the source chart's older slug. Each slug maps to
