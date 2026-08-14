@@ -1961,56 +1961,6 @@ def sanity_check_custom_units(tb_wide: Table, ds_garden: Dataset) -> None:
             )
 
 
-# FAOSTAT reports the USSR as a single entity until 1991, and its fifteen successor states separately from 1992.
-# In OWID region aggregates, the USSR is counted entirely inside Europe and Upper-middle-income countries, so the
-# aggregates of continents and income groups jump abruptly between 1991 and 1992, when its area is redistributed
-# among the successor states' regions.
-# Item codes in faostat_rl with USSR data (hence affected by this issue in their OWID region aggregates).
-USSR_BREAKUP_AFFECTED_ITEM_CODES_RL = {
-    # Items with USSR data from 1961 to 1991.
-    "00006600",  # Country area
-    "00006601",  # Land area
-    "00006602",  # Agriculture
-    "00006610",  # Agricultural land
-    "00006620",  # Cropland
-    "00006621",  # Arable land
-    "00006650",  # Permanent crops
-    "00006655",  # Permanent meadows and pastures
-    "00006680",  # Inland waters
-    "00006690",  # Land area equipped for irrigation
-    # Items with USSR data from 1990 to 1991 (the jump mostly affects income groups).
-    "00006646",  # Forest land
-    "00006670",  # Other land
-    "00006714",  # Primary forest
-    "00006716",  # Planted forest
-    "00006717",  # Naturally regenerating forest
-}
-# Element codes in faostat_rl affected by the same issue (the "Share in ..." elements are not affected, since they are
-# never aggregated by OWID).
-USSR_BREAKUP_AFFECTED_ELEMENT_CODES_RL = {
-    "005110",  # Area
-    "5110pc",  # Area per capita
-}
-# Explanation of the issue, shown in the "What you should know about this data" section.
-# NOTE: Entity annotations (defined below) only render on charts with entity-labeled series (e.g. line charts of one
-# indicator for multiple entities), so this point is the only visible explanation on other charts, e.g. stacked charts.
-USSR_BREAKUP_DESCRIPTION_KEY = (
-    "FAOSTAT reports the USSR as a single entity until 1991, and its successor states separately from 1992. "
-    "This causes an abrupt break between 1991 and 1992 in the aggregates for Europe, Asia, High-income countries, "
-    "Upper-middle-income countries, and Lower-middle-income countries."
-)
-# Annotations shown next to the affected entities in charts (only rendered when one of these entities is selected).
-USSR_BREAKUP_ENTITY_ANNOTATIONS = "\n".join(
-    [
-        "Europe: Break in 1992: the USSR's successors are split between Europe and Asia",
-        "Asia: Break in 1992: the USSR's successors are split between Europe and Asia",
-        "High-income countries: Break in 1992: the USSR's successors are split across income groups",
-        "Upper-middle-income countries: Break in 1992: the USSR's successors are split across income groups",
-        "Lower-middle-income countries: Break in 1992: the USSR's successors are split across income groups",
-    ]
-)
-
-
 def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
     # Improve metadata in wide table (this, unfortunately, cannot easily be achieved in the long table).
     # def prepare_public_titles(item: str, element: str, unit: str) -> str:
@@ -2446,16 +2396,6 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             tb_wide[column].metadata.presentation.grapher_config = {
                 "note": "FAOSTAT applies a methodological change from the year 2010 onwards."
             }
-
-        if (
-            (dataset_short_name == "faostat_rl")
-            and (element_code in USSR_BREAKUP_AFFECTED_ELEMENT_CODES_RL)
-            and (item_code in USSR_BREAKUP_AFFECTED_ITEM_CODES_RL)
-        ):
-            # Annotate the region aggregates affected by the redistribution of the USSR among its successor states.
-            tb_wide[column].display["entityAnnotationsMap"] = USSR_BREAKUP_ENTITY_ANNOTATIONS
-            assert tb_wide[column].metadata.description_key is None, "Unexpected description_key; merge manually."
-            tb_wide[column].metadata.description_key = USSR_BREAKUP_DESCRIPTION_KEY
 
         # Update metadata.
         tb_wide[column].display["name"] = display_name
