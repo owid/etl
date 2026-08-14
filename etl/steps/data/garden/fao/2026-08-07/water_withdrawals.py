@@ -45,11 +45,14 @@ def sanity_check_outputs(tb: Table) -> None:
     for column in VARIABLES.values():
         assert tb[column].notnull().sum() > 5500, f"Data points for {column} decreased unexpectedly."
 
-    # The sum of agricultural, industrial and municipal withdrawals across countries should recover the global total,
-    # which has hovered around 4 trillion m³/year in recent years (AQUASTAT's own "World" rows, dropped from this
-    # dataset, give 4.00 trillion m³ in 2015 and 4.03 trillion m³ in 2023).
-    global_total = tb[tb["year"] == 2023][COLUMNS_TO_CONVERT].sum().sum()
-    assert 3.5e12 < global_total < 4.5e12, "Global total withdrawals in 2023 outside the expected range."
+    # Global withdrawals have hovered around 4 trillion m³/year in recent years (4.03 trillion m³ in 2023).
+    world_total = tb[(tb["country"] == "World") & (tb["year"] == 2023)][COLUMNS_TO_CONVERT].sum().sum()
+    assert 3.5e12 < world_total < 4.5e12, "Global total withdrawals in 2023 outside the expected range."
+
+    # The sum of the three sectors across countries (excluding regional aggregates) should recover the World row.
+    mask_countries = ~tb["country"].str.endswith("(FAO)") & (tb["country"] != "World")
+    countries_total = tb[mask_countries & (tb["year"] == 2023)][COLUMNS_TO_CONVERT].sum().sum()
+    assert abs(countries_total / world_total - 1) < 0.02, "Countries do not add up to the World total."
 
     # Anchor values, to guard against unit regressions (values as published by AQUASTAT, checked against the
     # previous version of this dataset).
