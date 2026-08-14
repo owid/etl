@@ -42,7 +42,6 @@ from urllib.parse import parse_qsl, urlencode
 
 from etl.config import OWID_ENV
 
-TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
 ADMIN_CHART_ID_RE = re.compile(r"/charts/(\d+)")
 GRAPHER_SLUG_RE = re.compile(r"/grapher/([^/?#]+)")
 
@@ -235,10 +234,14 @@ def main() -> int:
 
     rows = json.loads(args.references.read_text())
     pairs = load_pairs(args.pairs)
-    # The shared formatters expect an admin ROOT (".../admin"), while OWID_ENV.admin_api is
-    # the API root (".../admin/api"). The tailscale suffix comes off so these links read the
-    # same as the sweep's own `admin_url` values, which are already short.
-    admin = TAILSCALE_SUFFIX_RE.sub("", OWID_ENV.admin_api).removesuffix("/api")
+    # `admin_site`, NOT `admin_api`. The two differ in more than a suffix: on production
+    # `admin_api` is the INTERNAL host (`owid-admin-prod.tail6e23.ts.net`), so deriving the
+    # root from it produced preview links nobody outside the tailnet can open, while
+    # `admin_site` is the public `https://admin.owid.io/admin`. Same expression the sweep uses
+    # for its own `admin_url` values, which is why those were right in the same report these
+    # were wrong in. On staging `admin_site` is already the short host, so no suffix stripping
+    # is needed either.
+    admin = (OWID_ENV.admin_site or "https://admin.owid.io/admin").rstrip("/")
 
     slugs = {}
     if pairs:
