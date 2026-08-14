@@ -63,7 +63,13 @@ USSR_BREAKUP_ENTITY_ANNOTATIONS = "\n".join(
 
 
 def add_ussr_breakup_annotations(tb: Table) -> None:
-    # Annotate the region aggregates affected by the redistribution of the USSR among its successor states.
+    """Annotate the region aggregates affected by the redistribution of the USSR among its successor states.
+
+    NOTE: Metadata is normally defined in the garden step, but these fields are deliberately added here instead:
+    derived datasets read the garden dataset, and variable operations (e.g. forest_area / country_area in
+    fra_forest_extent) carry description_key along, so a garden-level version leaked this text into indicators
+    where it does not apply. Charts and data pages read the grapher channel, so they still get both fields.
+    """
     for column in tb.columns:
         item, item_code, element, element_code, unit = sum(
             [[j.strip() for j in i.split("|")] for i in tb[column].metadata.title.split("||")], []
