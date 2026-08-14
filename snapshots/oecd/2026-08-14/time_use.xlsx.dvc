@@ -1,0 +1,25 @@
+meta:
+  origin:
+    producer: OECD
+    title: OECD Time Use Database
+    description: |-
+      The OECD Time Use Database documents how people allocate their time over different daily activities, based on national time-use surveys. It reports the average minutes per day (covering both weekdays and weekends) spent on paid work or study, unpaid work, personal care, leisure, and other activities, together with the detailed sub-activities that make up each of these categories (such as sleeping, eating and drinking, routine housework, shopping, child care, watching TV or listening to the radio, and visiting friends). Estimates are provided for the total population as well as for men and women separately.
+
+      Data are normalized to 1440 minutes per day: for countries where reported time use does not sum to 1440 minutes, the missing minutes are equally distributed across all activities.
+
+      The reference population covers people aged 15 to 64, with a few exceptions (Australia covers people aged 15 and over, China 15 to 74, and Lithuania 20 to 64). For several European countries, estimates for people aged 15-64 are calculated as the weighted average of time use estimates for the age brackets 15-19, 20-24, 25-44, and 45-64, weighted by each bracket's population share based on the Eurostat population database.
+
+      Survey years differ across countries; each country's estimates refer to its most recent available national time-use survey. Methodological documentation on the national time-use surveys used for the estimates is available in Miranda, V. (2011), "Cooking, Caring and Volunteering: Unpaid Work Around the World", OECD Social, Employment and Migration Working Papers, No. 116.
+    citation_full: OECD (2026). OECD Time Use Database. https://www.oecd.org/en/data/datasets/time-use-database.html
+    attribution_short: OECD
+    url_main: https://www.oecd.org/en/data/datasets/time-use-database.html
+    url_download: https://www.oecd.org/content/dam/oecd/en/data/datasets/time-use-database/OECD-time-use-database-updates.xlsx
+    date_accessed: '2026-08-14'
+    date_published: '2026-04-30'
+    license:
+      name: OECD Terms and Conditions
+      url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: fe7d069c2620fd091b311686607390cb
+    size: 376009
+    path: time_use.xlsx
