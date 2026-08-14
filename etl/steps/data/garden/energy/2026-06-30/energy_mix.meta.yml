@@ -1,7 +1,11 @@
 definitions:
-  # The long-run World series, which applies to every indicator in this dataset.
+  # The long-run World series. It does not apply to the annual-change indicators: Smil's years are
+  # decadal, and add_annual_change only keeps consecutive years, so those have no pre-1965 values.
+  # They clear the common note with the empty definition below.
   description_processing_smil_world: |-
     - For the World, data before 1965 (going back to 1800) comes from Vaclav Smil's historical estimates (2017).
+  # Cleared processing description, for the indicators that no note applies to.
+  description_processing_none: ""
   # The traditional biomass series itself, which is only reported for the World.
   description_processing_traditional_biomass: |-
     - Traditional biomass comes from Vaclav Smil's historical estimates (2017), which cover the World only.
@@ -50,6 +54,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Biofuels
         presentation:
@@ -59,6 +65,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Biofuels
         presentation:
@@ -107,6 +115,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Coal
         presentation:
@@ -116,6 +126,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Coal
         presentation:
@@ -164,6 +176,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Fossil fuels
         presentation:
@@ -173,6 +187,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Fossil fuels
         presentation:
@@ -209,6 +225,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Gas
         presentation:
@@ -218,6 +236,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Gas
         presentation:
@@ -266,6 +286,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Hydropower
         presentation:
@@ -275,6 +297,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Hydropower
         presentation:
@@ -323,6 +347,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Low-carbon energy
         presentation:
@@ -332,6 +358,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Low-carbon energy
         presentation:
@@ -368,6 +396,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Nuclear
         presentation:
@@ -377,6 +407,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Nuclear
         presentation:
@@ -425,6 +457,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Oil
         presentation:
@@ -434,6 +468,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Oil
         presentation:
@@ -482,6 +518,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Other renewables
         presentation:
@@ -491,6 +529,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Other renewables
         presentation:
@@ -539,6 +579,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Renewables
         presentation:
@@ -548,6 +590,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Renewables
         presentation:
@@ -584,6 +628,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Solar and wind
         presentation:
@@ -593,6 +639,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Solar and wind
         presentation:
@@ -629,6 +677,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Solar
         presentation:
@@ -638,6 +688,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Solar
         presentation:
@@ -689,6 +741,8 @@ tables:
         description_processing: |-
           {definitions.description_processing_eia}
           {definitions.description_processing_smil_world}
+        description_processing: |-
+          {definitions.description_processing_eia}
         display:
           name: Total energy supply
         presentation:
@@ -701,6 +755,8 @@ tables:
         description_processing: |-
           {definitions.description_processing_eia}
           {definitions.description_processing_smil_world}
+        description_processing: |-
+          {definitions.description_processing_eia}
         display:
           name: Total energy supply
         presentation:
@@ -759,6 +815,8 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Wind
         presentation:
@@ -768,6 +826,8 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_processing_none}
         display:
           name: Wind
         presentation:
