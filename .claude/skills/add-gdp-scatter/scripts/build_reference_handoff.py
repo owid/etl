@@ -53,7 +53,12 @@ TARGET_KEYS = ("target_chart_admin_url", "target_chart_url")
 # Kept in step with TARGET_QUERY in redirect_to_scatter.py: every param stands in for an
 # adjustment a tab CLICK makes and a URL-supplied tab does not get.
 REDIRECT_QUERY = "tab=scatter&time=latest&country="
-REDIRECT_KEYS = {key for key, _ in parse_qsl(REDIRECT_QUERY, keep_blank_values=True)}
+
+# The surface `find_references.sweep_articles_placing_narrative_charts` emits: an article that
+# places a narrative chart by name. Deliberately not one of `fr.GDOC_SURFACES` even though the
+# surface IS a gdoc — the embed/link sections filter on that tuple, and these rows reference the
+# narrative chart, not the chart being retired, so counting them there would overstate both.
+NARRATIVE_PLACEMENT_SURFACE = "gdoc (narrative chart)"
 
 # The one param that varies per row. The applier never forces `yAxis.scaleType: log` on a
 # target — `yAxis` is global, so it would flip the line/bar views too — it only enables the
@@ -150,21 +155,33 @@ def base_query(src_id: int, log_sources: set[int]) -> dict[str, str]:
 
 
 def params_cell(own_params: str, base_keys: set[str]) -> str:
-    """The reference's own params, flagging the ones that override the redirect's.
+    """The reference's own params, flagged because they defeat the redirect entirely.
 
-    The merge is silent, so the collision is what has to be visible: a reference carrying
-    `tab=chart` wins over `tab=scatter` and lands the reader on a different tab than the
-    retirement intends. That row needs a decision, not a paste. `base_keys` is this row's
-    proposal rather than the shared constant, because `yScale` is only proposed for a log
-    source — so a reference's `yScale=linear` is an override on those rows and merely its own
-    setting on every other.
+    Verified against a live redirect that carries `target_query_param` — production, 2026-08-14,
+    `global-forestry-area-1958-2014` → `forest-area-km?tab=line`:
+
+        ?tab=map&country=~FRA  ->  /grapher/forest-area-km?tab=map&country=%7EFRA
+        (no query string)      ->  /grapher/forest-area-km?tab=line
+
+    The incoming query string **replaces** `target_query_param` wholesale; it is not merged
+    key-by-key. So `target_query_param` only ever reaches a request that arrives with no query
+    string at all, and ANY params on a reference — not just ones colliding with `tab`/`time`/
+    `country` — mean the reader lands on the target's default view with the reference's own
+    params and none of the retirement's. Flagging only key collisions would read as "the rest
+    are fine", which is the opposite of what happens.
+
+    `base_keys` still distinguishes the two grades: a collision is wrong twice over (the param
+    is both lost and contradicted), while a non-colliding param is merely lost. It is this row's
+    proposal rather than the shared constant, because `yScale` is only proposed for a log source.
     """
     query = (own_params or "").lstrip("?")
     if not query:
-        return "—"
+        return "— _(redirect applies)_"
     shown = f"`{fr.cell(query, 40)}`"
     clashing = sorted({key for key, _ in parse_qsl(query, keep_blank_values=True)} & base_keys)
-    return f"⚠️ {shown} overrides {', '.join(clashing)}" if clashing else shown
+    if clashing:
+        return f"🔴 {shown} — kills the redirect's params, and contradicts {', '.join(clashing)}"
+    return f"⚠️ {shown} — kills the redirect's params"
 
 
 def page_link(r: dict, host: str, admin: str) -> str:
@@ -198,7 +215,10 @@ def open_links(r: dict, host: str, admin: str) -> str:
     """
     parts = []
     if r.get("admin_url"):
-        parts.append(f"[✎ chart admin]({r['admin_url']})")
+        # A narrative-chart row's `admin_url` is its OWN editor, not a chart's — labelling it
+        # "chart admin" sends the reader looking for a chart editor that is not what opens.
+        label = "narrative chart" if r["surface"] == "narrative chart" else "chart admin"
+        parts.append(f"[✎ {label}]({r['admin_url']})")
     if r.get("preview_url"):
         parts.append(f"[👁 view]({r['preview_url']})")
     elif r.get("where_path"):
@@ -223,28 +243,77 @@ def replacement_url(
     return f"{SITE}/grapher/{slugs[tgt]}?{urlencode(merged)}"
 
 
-def create_from_url(src_id: int, pairs: dict[int, int], slugs: dict[int, str], log_sources: set[int]) -> str:
-    """Where to open the target before using its "Create narrative chart" control.
+def view_to_reproduce(src_id: int, pairs: dict[int, int], slugs: dict[int, str], log_sources: set[int]) -> str:
+    """The target view a replacement narrative chart has to end up showing.
 
-    Deliberately the **scatter view** — the base proposal with no reference params merged in —
-    and NOT what `replacement_url` returns for this row. Two reasons, and both bite:
+    NOT a "create it from here" link, and deliberately not `replacement_url` either:
 
-    * The retirement is about the scatter. A narrative chart's `queryParamsForParentChart`
-      routinely carry `tab=chart`, and since the reference's params win the merge, using
-      `replacement_url` here would open the target's line/slope view and produce a replacement
-      of the wrong view entirely.
-    * Those params are the narrative chart's *"Explore the data"* href — where it sends readers
-      to the parent — not the view it renders. Its own view comes from a materialized config
-      (`configFull`). Merging them into a create-from URL conflates the two.
+    * There is no create-from control on a plain chart. `CreateNarrativeChartEditorPage`
+      returns `NotFoundPage` unless `type === "multiDim"`, and the site-side affordance is
+      gated on `manager.adminCreateNarrativeChartPath`, which only the MDIM components ever
+      set (`site/multiDim/MultiDim.tsx`, `MultiDimDataPageContent.tsx`). A chart page — which
+      is what every target here is — offers no such button, from the share menu or anywhere
+      else. See `narrative_chart_mechanism()` for what that leaves.
+    * It is the **scatter** view, with no reference params merged in. A narrative chart's
+      `queryParamsForParentChart` routinely carry `tab=chart`, so a merged URL would name the
+      target's line or slope view — the wrong view for a retirement that is about the scatter.
+      Those params are its *"Explore the data"* href, where it sends readers to the parent, not
+      what it renders; its own view comes from a materialized `configFull`.
 
-    The old params still matter, which is why the table prints them in their own column: the
-    control parents to the view on screen, and authored FAUST and entity selection never
-    transfer, so the story has to be re-authored from them by hand.
+    The old params are still printed in their own column, because nothing authored transfers to
+    a replacement — FAUST, entity selection and time pins all have to be re-created by hand.
     """
     tgt = pairs.get(src_id)
     if not tgt or tgt not in slugs:
         return "— no target —"
     return f"{SITE}/grapher/{slugs[tgt]}?{urlencode(base_query(src_id, log_sources))}"
+
+
+def narrative_chart_mechanism() -> list[str]:
+    """What a narrative chart does at retirement, and why replacing one is not a UI task.
+
+    Every claim here is read off the grapher source rather than inferred, because the obvious
+    guess — "open the target and use its Create narrative chart button" — is wrong, and shipped
+    in an earlier version of this report.
+    """
+    return [
+        "**Nothing breaks.** A narrative chart renders from its own materialized `configFull`, "
+        "written at creation, so unpublishing the parent does not change what readers see. It "
+        "also means it keeps showing the OLD view indefinitely.",
+        "",
+        "**Its \"Explore the data\" link degrades quietly.** That href is built from the parent "
+        "slug plus `queryParamsForParentChart`, so after retirement it resolves through the "
+        "redirect — but because it carries its own params, the redirect's "
+        f"`{REDIRECT_QUERY}` is dropped wholesale rather than merged, and the reader lands on "
+        "the target's default view instead of the scatter.",
+        "",
+        "**It cannot be re-pointed.** `updateNarrativeChart` reads `parentChartId` / "
+        "`parentMultiDimXChartConfigId` from the existing row, so neither parent column is "
+        "writable after creation — there is no re-parenting API to call.",
+        "",
+        "**And it cannot be re-created through the admin, because every target here is a plain "
+        "chart.** `CreateNarrativeChartEditorPage` returns `NotFoundPage` unless "
+        "`type === \"multiDim\"`, and the site-side control is gated on "
+        "`manager.adminCreateNarrativeChartPath`, which only `site/multiDim/MultiDim.tsx` and "
+        "`MultiDimDataPageContent.tsx` ever set. A chart page offers no such button — not in the "
+        "share menu, not anywhere. The POST route *does* accept "
+        '`{"type": "chart", "parentChartId": …}` (`createNarrativeChartFromChart`), so the '
+        "capability exists; there is simply no click-path to it.",
+        "",
+        "That leaves three honest options per narrative chart, and picking is the curator's call:",
+        "",
+        "1. **Leave it.** It renders correctly forever; only the \"Explore the data\" landing view "
+        "is off. Cheapest, and defensible when the story does not depend on that link.",
+        "2. **Ask a developer** to create the replacement against the target via the API, then do "
+        "the article edit and delete below.",
+        "3. **Wait for the target to become an MDIM** — several are headed that way — and then "
+        "create the replacement from the MDIM's own control, which does exist.",
+        "",
+        "If you do replace one, the order is fixed: **create** → **edit every article below to "
+        "the new name** → **delete the old one last**. A published post still referencing the "
+        "name blocks the delete. Nothing authored transfers to the replacement — FAUST, entity "
+        "selection and time pins all have to be re-created by hand from the params shown.",
+    ]
 
 
 def main() -> int:
@@ -295,9 +364,14 @@ def main() -> int:
             "These render the old chart's own config, so they break the moment it is unpublished.",
         ),
         (
-            "🟡 Links — the 301 covers them, but update the href",
+            "🟡 Links — the 301 keeps them working, but not necessarily on the scatter",
             "link",
-            "They keep working through the redirect; updating avoids a hop nobody will remember.",
+            "None of these break. But a link carrying **any** query string loses the redirect's "
+            "`tab=scatter&time=latest&country=` completely — the incoming query replaces "
+            "`target_query_param` rather than merging with it (verified on production; see the "
+            "Its-params column) — so those readers land on the target's default view, not the "
+            "scatter this retirement moved them to. Only a param-less link inherits the scatter. "
+            "Update the href and the question goes away, along with a hop nobody will remember.",
         ),
     ]:
         # Google Doc surfaces only: the shared formatters read `surface_id` AS a Doc id, and
@@ -341,30 +415,6 @@ def main() -> int:
             )
         out.append("")
 
-    key_charts = [r for r in rows if r["surface"] == "key chart"]
-    placed.update(id(r) for r in key_charts)
-    if key_charts:
-        out += [
-            f"## 🔴 Key-chart slots ({len(key_charts)}) — invisible to the Part 2 audit",
-            "",
-            "`redirect_to_scatter.py` never sees these: its audit counts wp/gdoc/explorer/narrative/"
-            "dataInsight/staticViz, and a key chart is a chart↔tag association "
-            "(`chart_tags.keyChartLevel`), not a row in any of them. Unpublishing the source 404s "
-            "nothing — the chart simply drops out of the topic page's key-chart list, silently. Move "
-            "each association to the target, same tag and same level.",
-            "",
-            "| Topic page | Old chart | Level | Move the association to |",
-            "|---|---|---|---|",
-        ]
-        for r in sorted(key_charts, key=lambda r: (r["where"], r["subject"])):
-            tgt = pairs.get(r["subject_id"])
-            level = (r.get("context") or "").replace("keyChartLevel=", "level ")
-            out.append(
-                f"| {fr.cell(r['where'], 44)} | `{r['subject']}` (#{r['subject_id']}) | {level} | "
-                f"#{tgt} `{slugs.get(tgt, '?')}` |"
-            )
-        out.append("")
-
     manual = [r for r in rows if r["surface"] in MANUAL_SURFACES]
     placed.update(id(r) for r in manual)
     if manual:
@@ -386,36 +436,86 @@ def main() -> int:
         out.append("")
 
     narrative = [r for r in rows if r["surface"] == "narrative chart"]
-    placed.update(id(r) for r in narrative)
+    placements = [r for r in rows if r["surface"] == NARRATIVE_PLACEMENT_SURFACE]
+    placed.update(id(r) for r in narrative + placements)
     if narrative:
         out += [
-            f"## ℹ️ Narrative charts ({len(narrative)}) — do not block, but still need replacing",
+            f"## ℹ️ Narrative charts ({len(narrative)}) — nothing breaks, and nothing can be rebuilt in the admin",
             "",
-            "Nothing breaks at retirement: each renders from its own materialized config, and its "
-            '"Explore the data" href is covered by the redirect. It keeps showing the OLD view '
-            "though, and the parent columns are INSERT-only, so there is no re-pointing API. "
-            "Replace each one, **in this order**: **create** the replacement from the URL below "
-            'using the target chart\'s own "Create narrative chart" control, **update the '
-            "article(s)** to the new name, then **delete** the old one. Never delete first — a "
-            "published post referencing the name blocks the delete.",
-            "",
-            "The create-from URL is the target's **scatter view**, not the old chart's params "
-            "merged over it: the control parents to the view on screen, and it is the scatter "
-            "this retirement is about — several of these carry `tab=chart`, which would build a "
-            "replacement of the line or slope view instead. Their own params are in the column "
-            "beside it because authored FAUST and entity selection never transfer, so the story "
-            "has to be re-authored from them by hand.",
-            "",
-            "| Narrative chart | On | Its params | Open | Create the replacement from |",
-            "|---|---|---|---|---|",
         ]
+        out += narrative_chart_mechanism()
         for r in sorted(narrative, key=lambda r: str(r["where"])):
             own_params = r.get("query_string", "")
+            mine = sorted(
+                (p for p in placements if str(p["subject"]) == str(r["where"])),
+                key=lambda p: str(p["where"]),
+            )
+            out += [
+                "",
+                f"### `{r['where']}` — on `{r['subject']}`",
+                "",
+                f"- **Reproduce this view:** {view_to_reproduce(r['subject_id'], pairs, slugs, log_sources)}",
+                f"- **Its \"Explore the data\" params:** {params_cell(own_params, set(base_query(r['subject_id'], log_sources)))}",
+                f"- **Open:** {open_links(r, args.host, admin)}",
+                "",
+            ]
+            if not mine:
+                # Not the same as "nothing to do": a narrative chart with no placement is
+                # either unused (delete it and stop) or placed somewhere the link table does
+                # not record, and saying which is not this report's job to guess.
+                out.append(
+                    "No article places it — `posts_gdocs_links` has no `narrative-chart` row for "
+                    "this name. Either it is unused, in which case the replacement collapses to a "
+                    "delete, or it is placed somewhere that table does not capture. Confirm before "
+                    "deleting."
+                )
+                continue
+            drafts = sum(1 for p in mine if not p["published"])
+            note = f" ({drafts} unpublished)" if drafts else ""
+            plural = f"{len(mine)} articles{note} — each one has" if len(mine) != 1 else f"1 article{note} — it has"
+            out += [
+                f"Placed in {plural} to be edited to the replacement's name:",
+                "",
+                "| Article | Open | Find in the doc |",
+                "|---|---|---|",
+            ]
+            for p in mine:
+                draft = "" if p["published"] else " ⚠️draft"
+                ptype = p["context"].split("(")[-1].rstrip(")") if "(" in p.get("context", "") else ""
+                page_type = f" _{ptype}_" if ptype else ""
+                links = f"[📄 doc]({fr.doc_url(p)})"
+                if p.get("surface_id"):
+                    links += f" · [👁 preview]({fr.gdoc_preview_url(p, admin)})"
+                page = page_link(p, args.host, admin)
+                if page:
+                    links += f" · [🔗 page]({page})"
+                out.append(f"| {fr.cell(p['where'], 44)}{page_type}{draft} | {links} | {find_hint(p)} |")
+        out.append("")
+
+    # Last of the actionable sections, and deliberately so: it is the only one whose rows are
+    # a tag association rather than a reference in a document, so it reads as a different kind
+    # of task and interrupts the doc-editing run if it sits in the middle of it.
+    key_charts = [r for r in rows if r["surface"] == "key chart"]
+    placed.update(id(r) for r in key_charts)
+    if key_charts:
+        out += [
+            f"## 🔴 Key-chart slots ({len(key_charts)}) — invisible to the Part 2 audit",
+            "",
+            "`redirect_to_scatter.py` never sees these: its audit counts wp/gdoc/explorer/narrative/"
+            "dataInsight/staticViz, and a key chart is a chart↔tag association "
+            "(`chart_tags.keyChartLevel`), not a row in any of them. Unpublishing the source 404s "
+            "nothing — the chart simply drops out of the topic page's key-chart list, silently. Move "
+            "each association to the target, same tag and same level.",
+            "",
+            "| Topic page | Old chart | Level | Move the association to |",
+            "|---|---|---|---|",
+        ]
+        for r in sorted(key_charts, key=lambda r: (r["where"], r["subject"])):
+            tgt = pairs.get(r["subject_id"])
+            level = (r.get("context") or "").replace("keyChartLevel=", "level ")
             out.append(
-                f"| `{fr.cell(str(r['where']), 44)}` | `{r['subject']}` | "
-                f"{params_cell(own_params, set(base_query(r['subject_id'], log_sources)))} | "
-                f"{open_links(r, args.host, admin)} | "
-                f"{create_from_url(r['subject_id'], pairs, slugs, log_sources)} |"
+                f"| {fr.cell(r['where'], 44)} | `{r['subject']}` (#{r['subject_id']}) | {level} | "
+                f"#{tgt} `{slugs.get(tgt, '?')}` |"
             )
         out.append("")
 
@@ -495,7 +595,8 @@ def main() -> int:
     print(f"wrote {output}")
     print(
         f"  {len(rows)} reference(s): article embeds {tabled['embed']}, article links {tabled['link']}, "
-        f"key charts {len(key_charts)}, manual {len(manual)}, narrative {len(narrative)}, other {len(other)}"
+        f"key charts {len(key_charts)}, manual {len(manual)}, narrative {len(narrative)} "
+        f"(placed in {len(placements)} article(s)), other {len(other)}"
     )
     return 0
 

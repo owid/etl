@@ -247,6 +247,65 @@ def sweep_gdoc_links(by_slug: dict[str, dict]) -> list[dict]:
     return out
 
 
+def sweep_articles_placing_narrative_charts(findings: list[dict]) -> list[dict]:
+    """The articles that place each narrative chart already found — its second hop.
+
+    A narrative-chart row says what has to change but not where the change lands: the chart
+    itself is not in an article, articles place it **by name** in a `{.narrative-chart}` block.
+    Replacing one therefore always includes an article edit, and without this hop the report
+    names a narrative chart and leaves the operator to find its usages by hand.
+
+    `posts_gdocs_links` records those placements with `linkType='narrative-chart'` and the name
+    in `target` — the same table and column the admin's own references endpoint reads
+    (`getNarrativeChartReferences` → `getPublishedLinksTo(…, ContentGraphLinkType.NarrativeChart)`).
+
+    Unpublished drafts are kept, unlike that endpoint, which filters `published = TRUE`. A draft
+    referencing the name does not affect readers but does affect the operator: it is the thing
+    that surprises you at delete time, and it is carried with `published` so a consumer can rank
+    it below the live ones rather than confuse the two.
+    """
+    names = sorted({str(f["where"]) for f in findings if f["surface"] == "narrative chart" and f.get("where")})
+    if not names:
+        return []
+    df = OWID_ENV.read_sql(
+        "SELECT pgl.target, pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, "
+        "       pg.published, pgl.componentType, pgl.text, pgl.queryString "
+        "FROM posts_gdocs_links pgl JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
+        "WHERE pgl.linkType = 'narrative-chart' AND pgl.target IN %(n)s ORDER BY pgl.target, pg.slug",
+        params={"n": tuple(names)},
+    )
+    by_name = {str(f["where"]): f for f in findings if f["surface"] == "narrative chart"}
+    out = []
+    for r in df.to_dict("records"):
+        parent = by_name[r["target"]]
+        out.append(
+            rec(
+                # The subject is the narrative chart, not the chart being retired: this row is
+                # only reachable because that chart is, and `subject` has to be the string an
+                # operator searches the doc for — which for a block placement is the name.
+                "narrative chart",
+                r["target"],
+                parent["surface_id"],
+                "gdoc (narrative chart)",
+                EMBED,
+                r["post_slug"],
+                f"/{r['post_slug']}",
+                surface_id=r["gdoc_id"],
+                # The parenthesized type is load-bearing: `reference_report.page_type` reads it
+                # to pick the public base, and a data insight or author page is not served at
+                # the site root the way an article is.
+                context=f"places narrative chart `{r['target']}` ({r['post_type']})",
+                query_string=r["queryString"],
+                # Deliberately left empty even when the column has something: a block placement
+                # has no visible anchor text, so `find_in_doc` must fall through to the name,
+                # which is what the ArchieML block actually spells out.
+                text="",
+                published=r["published"],
+            )  # fmt: skip
+        )
+    return out
+
+
 def unwrap_redirect(target: str) -> str:
     """The real URL behind a `google.com/url?…` wrapper, which is what a raw link often is.
 
@@ -1149,6 +1208,10 @@ def add_admin_urls(findings: list[dict]) -> None:
             f["admin_url"] = f"{admin}/narrative-charts/{f['surface_id']}/edit"
         elif f["surface"] == "chart" and f["surface_id"]:
             f["admin_url"] = f"{admin}/charts/{f['surface_id']}/edit"
+        elif f["subject_type"] == "narrative chart" and f["subject_id"]:
+            # An article placing a narrative chart: the editable object is the narrative
+            # chart, so `subject_id` is its id, not a chart's.
+            f["admin_url"] = f"{admin}/narrative-charts/{f['subject_id']}/edit"
         elif f["subject_type"] == "chart" and f["subject_id"]:
             # The row is a reference *to* a chart (article, explorer, static viz…).
             f["admin_url"] = f"{admin}/charts/{f['subject_id']}/edit"
@@ -1452,6 +1515,11 @@ def main() -> int:
             f"{len(all_charts)} auto-generated 'All charts' index entries on {', '.join(pages)} were "
             "excluded from the tables below (`--include-all-charts` keeps them)."
         )
+
+    # After the 'All charts' exclusion, so a narrative chart dropped from the run cannot leave
+    # its article placements behind, and before the enrichment passes so the new rows get the
+    # same admin/preview links as every other row.
+    findings += sweep_articles_placing_narrative_charts(findings)
 
     label_indicator_subjects(findings)
     add_admin_urls(findings)
