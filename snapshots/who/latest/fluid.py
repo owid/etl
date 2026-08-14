@@ -77,6 +77,14 @@ def _assert_not_corrupted(path: Path) -> None:
     of fields, which pandas refuses to tokenize, or it lands on a row boundary and instead
     duplicates and drops whole rows, which parses cleanly and would otherwise be published as
     silently wrong data. A correct body has no duplicate rows at all.
+
+    NOTE: this is a backstop, not the fix — the cache-busting URL above is what stops corrupted
+    bodies being served in the first place, since every observed splice came from a cache hit. It
+    cannot catch a hypothetical splice that only drops rows without duplicating any. Closing that
+    gap needs a second full download to compare against (there is no ETag, no Content-MD5, and
+    `$count` times out at the origin), which would double the load on an endpoint that already
+    returns 504s — a worse trade than the residual risk. If the parse or duplicate check ever fires
+    on a body that came back with a fresh cache key, that assumption needs revisiting.
     """
     size = path.stat().st_size
     if size < MIN_SIZE_BYTES:
