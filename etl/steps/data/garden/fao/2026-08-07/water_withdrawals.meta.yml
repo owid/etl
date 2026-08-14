@@ -18,25 +18,25 @@ tables:
     variables:
       agricultural_water_withdrawal:
         title: Agricultural water withdrawal
-        unit: cubic meters per year
+        unit: cubic meters
         short_unit: m³
         description_from_producer: |-
           Annual quantity of self-supplied water withdrawn for irrigation, livestock and aquaculture purposes. It can include water from primary renewable and secondary freshwater resources, as well as water from over-abstraction of renewable groundwater or withdrawal from fossil groundwater, direct use of agricultural drainage water, direct use of (treated) wastewater, and desalinated water. Water for the dairy and meat industries and industrial processing of harvested agricultural products is included under industrial water withdrawal.
       industrial_water_withdrawal:
         title: Industrial water withdrawal
-        unit: cubic meters per year
+        unit: cubic meters
         short_unit: m³
         description_from_producer: |-
           Annual quantity of self-supplied water withdrawn for industrial uses. It can include water from primary renewable and secondary freshwater resources, as well as water from over-abstraction of renewable groundwater or withdrawal from fossil groundwater, direct use of agricultural drainage water, direct use of (treated) wastewater, and desalinated water. This sector refers to self-supplied industries not connected to the public distribution network. The ratio between net consumption and withdrawal is estimated at less than 5%. It includes water for the cooling of thermoelectric and nuclear power plants, but it does not include hydropower. Water withdrawn by industries that are connected to the public supply network is generally included in municipal water withdrawal.
       municipal_water_withdrawal:
         title: Municipal water withdrawal
-        unit: cubic meters per year
+        unit: cubic meters
         short_unit: m³
         description_from_producer: |-
           Annual quantity of water withdrawn primarily for the direct use by the population. It can include water from primary renewable and secondary freshwater resources, as well as water from over-abstraction of renewable groundwater or withdrawal from fossil groundwater, direct use of agricultural drainage water, direct use of (treated) wastewater, and desalinated water. It is usually computed as the total water withdrawn by the public distribution network. It can include that part of the industries and urban agriculture, which is connected to the municipal network. The ratio between the net consumption and the water withdrawn can vary from 5 to 15% in urban areas and from 10 to 50% in rural areas.
       total_water_withdrawal_per_capita:
         title: Total water withdrawal per capita
-        unit: cubic meters per person per year
+        unit: cubic meters per person
         short_unit: m³
         # NOTE: This is FAO's definition of total water withdrawal (the numerator of this indicator).
         description_from_producer: |-
