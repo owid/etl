@@ -468,6 +468,21 @@ def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_i
                 )
                 return False
 
+        # collect the chart_configs rows that only these variables (and their mdim views) point at
+        rows = con.execute(
+            text(
+                """
+            SELECT grapherConfigIdETL FROM variables WHERE id IN :variable_ids AND grapherConfigIdETL IS NOT NULL
+            UNION
+            SELECT grapherConfigIdAdmin FROM variables WHERE id IN :variable_ids AND grapherConfigIdAdmin IS NOT NULL
+            UNION
+            SELECT chartConfigId FROM multi_dim_x_chart_configs WHERE variableId IN :variable_ids
+        """
+            ),
+            {"variable_ids": variable_ids_to_delete},
+        ).fetchall()
+        config_ids_to_delete = [row[0] for row in rows]
+
         # then variables themselves with related data in other tables
         # delete relationships
         con.execute(
@@ -527,6 +542,22 @@ def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_i
             ),
             {"dataset_id": dataset_id, "variable_ids": variable_ids_to_delete},
         )
+
+        # delete the now-unreferenced configs (the multi_dim_redirects guard is there because
+        # a redirect can point at an mdim view config)
+        if config_ids_to_delete:
+            con.execute(
+                text(
+                    """
+                DELETE FROM chart_configs
+                WHERE id IN :config_ids
+                  AND NOT EXISTS (
+                    SELECT 1 FROM multi_dim_redirects r WHERE r.viewConfigId = chart_configs.id
+                  )
+            """
+                ),
+                {"config_ids": config_ids_to_delete},
+            )
 
         con.commit()
 
