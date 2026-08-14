@@ -502,7 +502,7 @@ Side margins and the footer edge are the template's, not yours: content starts a
 | Static mobile example 2 (540×824) | x=16, w=508 | 118 → **770** (2-row `Frame 15`) |
 | IG portrait (560×700) | x=26, w=508 | 135 → 640 |
 | Static Horizontal (850×638) | x=16, w=818 | 118 → 556 |
-| Static Vertical (850×1095) | x=16, w=818 | 116 → 997 |
+| Static Vertical (850×1095) | x=16, w=818 | **136** → 997 |
 | Small / pull chart (302 × free) | **x=12, w=278** | 44 → `H − 10` (guided) or `H − 23` (pull) — see below |
 
 The two static mobile figures were 508 and 792 before 2026-08-13; the two-row footer took 22px off each. The row that used to lump DI together with static mobile is split above, because they no longer agree.
@@ -511,7 +511,7 @@ The table gives one number per template — the band you fit a chart into — an
 
 **The 302-wide row is parametric, and its `H` is an output of this step rather than an input** — width is the only fixed dimension, the frame height is chosen from the content, and there is no fit to perform because the export already arrives at 278px wide. Its header block also hugs its own text width instead of spanning the content, so the plot may legitimately rise beside it. All of that is [SMALL-CHARTS.md](SMALL-CHARTS.md)'s; don't apply the fit below to it.
 
-**On the two 850-wide templates the band you read off the frames is not the band above.** Both wrap their header and footer in auto-layout frames whose 16px of inner padding falls on the chart side, so the frame band is the text band inset by 16px at each end: `header.y + header.height` returns 134 on the Horizontal (subtitle bottom 118) and 116 on the Vertical (subtitle bottom 100), and the footer frames start at 540 and 997 (`Note:` at 556 and 1013). The table's Vertical row is already a frame band, its Horizontal row a text band. Read the band off the frames and that breathing room comes for free; read it off the text and add your own.
+**On the two 850-wide templates the band you read off the frames is not the band above.** Both wrap their header and footer in auto-layout frames whose 16px of inner padding falls on the chart side, so the frame band is the text band inset by 16px at each end — `header.y + header.height` returns 134 on the Horizontal and 136 on the Vertical, never the subtitle's own bottom edge. The table's Vertical row is already a frame band, its Horizontal row a text band, so the two rows are not directly comparable; the per-slot text positions behind them are `TEMPLATES.md`'s. Read the band off the frames and that breathing room comes for free; read it off the text and add your own.
 
 Verify against the actual clone with `get_metadata` (the templates evolve; the geometry above is a 2026 snapshot). These are **frame-local** coordinates, and `x`/`y` are relative to a node's parent — so append the embed to the template clone **before** positioning it. Left parented to the page (where Step 5 puts imported nodes), the same numbers land it near the page origin, on top of the reference chart. One wrinkle in the same rule: **a GROUP is transparent for coordinates**, so once the imported chart is inside the template, its descendants report `x`/`y` in the *template frame's* space, not the group's — which is what makes the frame-local numbers above directly usable on the plot's internals.
 
