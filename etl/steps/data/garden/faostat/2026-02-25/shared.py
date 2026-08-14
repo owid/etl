@@ -1988,11 +1988,11 @@ USSR_BREAKUP_AFFECTED_ITEM_CODES_RL = {
 # Annotations shown next to the affected entities in charts (only rendered when one of these entities is selected).
 USSR_BREAKUP_ENTITY_ANNOTATIONS = "\n".join(
     [
-        "Europe: Includes all of the former USSR before 1992",
-        "Asia: Excludes all of the former USSR before 1992",
-        "High-income countries: Excludes the former USSR before 1992",
-        "Upper-middle-income countries: Includes all of the former USSR before 1992",
-        "Lower-middle-income countries: Excludes the former USSR before 1992",
+        "Europe: Break in 1992: the USSR's successors are split between Europe and Asia",
+        "Asia: Break in 1992: the USSR's successors are split between Europe and Asia",
+        "High-income countries: Break in 1992: the USSR's successors are split across income groups",
+        "Upper-middle-income countries: Break in 1992: the USSR's successors are split across income groups",
+        "Lower-middle-income countries: Break in 1992: the USSR's successors are split across income groups",
     ]
 )
 

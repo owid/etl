@@ -57,10 +57,10 @@ tables:
           # The raw (non-adjusted) region entities carry an abrupt jump between 1991 and 1992, when the USSR's area is
           # redistributed among its successor states' regions.
           entityAnnotationsMap: |-
-            Europe: Includes all of the former USSR before 1992
-            Asia: Excludes all of the former USSR before 1992
-            High-income countries: Excludes the former USSR before 1992
-            Upper-middle-income countries: Includes all of the former USSR before 1992
-            Lower-middle-income countries: Excludes the former USSR before 1992
+            Europe: Break in 1992: the USSR's successors are split between Europe and Asia
+            Asia: Break in 1992: the USSR's successors are split between Europe and Asia
+            High-income countries: Break in 1992: the USSR's successors are split across income groups
+            Upper-middle-income countries: Break in 1992: the USSR's successors are split across income groups
+            Lower-middle-income countries: Break in 1992: the USSR's successors are split across income groups
         presentation:
           title_public: Land area used for agriculture

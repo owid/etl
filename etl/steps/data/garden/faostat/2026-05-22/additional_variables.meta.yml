@@ -14,19 +14,19 @@ definitions:
   # Upper-middle-income countries), and its fifteen successor states separately from 1992, causing an abrupt jump in
   # the aggregates of continents and income groups between 1991 and 1992.
   entity_annotations_ussr_breakup: &entity_annotations_ussr_breakup |-
-    Europe: Includes all of the former USSR before 1992
-    Asia: Excludes all of the former USSR before 1992
-    High-income countries: Excludes the former USSR before 1992
-    Upper-middle-income countries: Includes all of the former USSR before 1992
-    Lower-middle-income countries: Excludes the former USSR before 1992
+    Europe: Break in 1992: the USSR's successors are split between Europe and Asia
+    Asia: Break in 1992: the USSR's successors are split between Europe and Asia
+    High-income countries: Break in 1992: the USSR's successors are split across income groups
+    Upper-middle-income countries: Break in 1992: the USSR's successors are split across income groups
+    Lower-middle-income countries: Break in 1992: the USSR's successors are split across income groups
   # The decadal-change columns compare each year against ten years earlier, so their values for the affected entities
   # are distorted for the whole 1992 to 2001 window.
   entity_annotations_ussr_breakup_decadal_change: &entity_annotations_ussr_breakup_decadal_change |-
-    Europe: Values from 1992 to 2001 compare different country compositions due to the dissolution of the USSR
-    Asia: Values from 1992 to 2001 compare different country compositions due to the dissolution of the USSR
-    High-income countries: Values from 1992 to 2001 compare different country compositions due to the dissolution of the USSR
-    Upper-middle-income countries: Values from 1992 to 2001 compare different country compositions due to the dissolution of the USSR
-    Lower-middle-income countries: Values from 1992 to 2001 compare different country compositions due to the dissolution of the USSR
+    Europe: Values from 1992 to 2001 are affected by the break-up of the USSR
+    Asia: Values from 1992 to 2001 are affected by the break-up of the USSR
+    High-income countries: Values from 1992 to 2001 are affected by the break-up of the USSR
+    Upper-middle-income countries: Values from 1992 to 2001 are affected by the break-up of the USSR
+    Lower-middle-income countries: Values from 1992 to 2001 are affected by the break-up of the USSR
 
 tables:
   arable_land_per_crop_output:
