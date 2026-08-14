@@ -35,10 +35,11 @@ import re
 import sys
 from pathlib import Path
 from typing import Any
-from urllib.parse import parse_qsl
+from urllib.parse import parse_qsl, urlsplit
 
 from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV
+from etl.http import session as http_session
 
 
 def _load_sibling(name: str):
@@ -536,10 +537,75 @@ def apply_row(api: AdminAPI, rec: dict, skip_aliases: bool) -> dict:
     return action
 
 
+def verify_redirects(plan: list[dict]) -> int:
+    """The skill's closing report: does every redirect actually serve its target on the live site?
+
+    For each target in the plan, every `chart_slug_redirects` row pointing at it is an
+    expectation the site must meet: GET /grapher/<slug> answers 30x with a Location whose path
+    is the target's slug and whose query is that row's own stored query. That covers the batch's
+    old slugs, the aliases the apply re-pointed, and any pre-existing aliases of the target —
+    all under the same invariant. Location is compared parsed (path + key/value pairs), never
+    as a string, so percent-encoding and key order cannot produce false mismatches.
+
+    Grades: OK (30x to the expected view), NOT_LIVE (200 — the CDN still serves the cached
+    chart page; bake or purge pending), NOT_SERVED (404 — the row exists in the DB but nothing
+    serves it yet), MISMATCH (30x somewhere else; shown). Exits 1 unless every row is OK, so
+    the report is re-runnable until the bake lands and a wrapper can gate on it.
+    """
+    tgt_by_id = {rec["tgt_id"]: rec["tgt"] for rec in plan if rec.get("tgt_id")}
+    if not tgt_by_id:
+        print("Nothing to verify: no resolved targets in the plan.")
+        return 1
+    df = OWID_ENV.read_sql(
+        "SELECT slug, chart_id, target_query_param FROM chart_slug_redirects WHERE chart_id IN %(ids)s",
+        params={"ids": tuple(sorted(tgt_by_id))},
+    )
+    site = OWID_ENV.site.rstrip("/")
+    print(f"\nREDIRECT VERIFICATION against {site} ({len(df)} redirect row(s) on {len(tgt_by_id)} target(s))")
+    print(f"{'slug':<72} {'grade':<11} note")
+    print("-" * 165)
+    failures = 0
+    for r in sorted(df.to_dict("records"), key=lambda r: str(r["slug"])):
+        tgt_slug = tgt_by_id[int(r["chart_id"])]
+        stored = r["target_query_param"] or ""
+        expected = f"/grapher/{tgt_slug}" + (f"?{stored}" if stored else "")
+        try:
+            resp = http_session.get(f"{site}/grapher/{r['slug']}", allow_redirects=False, timeout=30)
+        except Exception as e:
+            failures += 1
+            print(f"{r['slug']:<72} {'ERROR':<11} {e}")
+            continue
+        if resp.status_code in (301, 302, 307, 308):
+            loc = urlsplit(resp.headers.get("Location", ""))
+            got_query = sorted(parse_qsl(loc.query, keep_blank_values=True))
+            want_query = sorted(parse_qsl(stored, keep_blank_values=True))
+            if loc.path == f"/grapher/{tgt_slug}" and got_query == want_query:
+                print(f"{r['slug']:<72} {'OK':<11} {resp.status_code} -> {expected}")
+            else:
+                failures += 1
+                print(f"{r['slug']:<72} {'MISMATCH':<11} {resp.status_code} -> {loc.path}?{loc.query}  (expected {expected})")
+        elif resp.status_code == 200:
+            failures += 1
+            print(f"{r['slug']:<72} {'NOT_LIVE':<11} 200 — CDN still serves the cached chart page; bake/purge pending")
+        elif resp.status_code == 404:
+            failures += 1
+            print(f"{r['slug']:<72} {'NOT_SERVED':<11} 404 — row in DB but nothing serves it yet (bake pending)")
+        else:
+            failures += 1
+            print(f"{r['slug']:<72} {'HTTP ' + str(resp.status_code):<11} unexpected answer")
+    print(f"\n{len(df) - failures}/{len(df)} OK" + (f" — {failures} not verified; re-run once the bake lands" if failures else " — every redirect serves its target"))
+    return 1 if failures else 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--apply", action="store_true", help="create redirects + unpublish sources (otherwise audit only)"
+    )
+    parser.add_argument(
+        "--verify",
+        action="store_true",
+        help="closing report: check every redirect row pointing at the batch's targets against the live site; exits non-zero until all serve",
     )
     parser.add_argument(
         "--skip-alias-repoint",
@@ -570,7 +636,14 @@ def main() -> int:
         print("\nREFUSED: --apply against production unpublishes live charts. Re-run with --allow-production.")
         return 2
 
+    if args.verify and args.apply:
+        print("\nREFUSED: --verify is the read-only closing report; run it without --apply.")
+        return 2
+
     plan = build_plan(api, payload, skip_aliases=args.skip_alias_repoint)
+
+    if args.verify:
+        return verify_redirects(plan)
 
     # ---- REFERENCES AUDIT (of the OLD source charts) ----
     audited = [r for r in plan if r.get("src_id")]

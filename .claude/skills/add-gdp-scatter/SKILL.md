@@ -427,6 +427,14 @@ Both failure directions are handled so no URL is ever left unserved. If any alia
 
 ### Verifying Part 2
 
+**Finalize every apply with the closing report.** Once the bake lands, run the same script in `--verify` mode and hand the user its table — the skill is not done until every row grades `OK`:
+
+```bash
+.venv/bin/python .claude/skills/add-gdp-scatter/scripts/redirect_to_scatter.py --verify < pairs.json
+```
+
+It reads every `chart_slug_redirects` row pointing at the batch's targets (the old slugs, the re-pointed aliases, and any pre-existing aliases of the targets — one invariant covers all three) and checks the live site serves each: a 30x whose Location matches that row's target and stored query, compared parsed so encoding and key order can't false-alarm. `NOT_LIVE` (cached 200) and `NOT_SERVED` (404) mean the bake or CDN purge hasn't landed — re-run until clean; it exits non-zero while anything fails. The manual checks below remain for what HTTP can't see.
+
 - `curl -sI <site>/grapher/<old-slug>` → 301 to `/grapher/<target-slug>?tab=scatter&time=latest&country=`.
 - `curl -sI '<site>/grapher/<old-slug>?tab=chart'` → `Location` keeps `tab=chart`, proving incoming params win.
 - `curl -s <site>/grapher/_grapherRedirects.json | jq '."<old-slug>"'` → `"<target-slug>?tab=scatter&time=latest&country="` (bare slugs on both sides — the baker passes an empty URL prefix).
