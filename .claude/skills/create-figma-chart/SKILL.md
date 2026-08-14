@@ -28,7 +28,7 @@ Three sibling skills do the text work this one depends on, and Step 8c calls the
 
 Each year gets a new file. For **2026** the file key is `s6Sv60bakebRRW2TxsMQbF` ([Charts (2026)](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-)). **If the current year is not 2026, ask the user for that year's file link and re-verify every node id below** (the templates page is named " 📑 Templates" — note the leading space).
 
-**Last verified: 2026-08-13. Re-verify the geometry at the start of every run** rather than trusting this table — the design team edits these frames in place, and on 2026-08-13 both mobile templates replaced a single shared footer row with a two-row block, which moved the chart area's bottom edge. A page laid out against stale numbers still renders and still passes every check in Step 8c; it just doesn't match the frame it was cloned from.
+**Last verified: 2026-08-14. Re-verify the geometry at the start of every run** rather than trusting this table — the design team edits these frames in place, and edits that move a chart area's edge have landed days apart. A page laid out against stale numbers still renders and still passes every check in Step 8c; it just doesn't match the frame it was cloned from.
 
 | What | Node | Size | Notes |
 |---|---|---|---|
@@ -71,7 +71,7 @@ The DI Charts Guidelines file (`8gxqkVmZ9x3MK3ky5oigrJ`) is the source of truth 
 
 A designer's own page is a far better spec than this file, so read it before building rather than after. It answers the questions Step 2 would otherwise have to ask, and it answers them in measurements:
 
-- **Which template.** Don't guess from the size — three of the candidates are 540×540. **Footer row count no longer separates them**, which it did before 2026-08-13: static mobile now carries *two* rows, DI *one*, and Instagram square *two*. The tells that still work are the **frame fill** (`DI_Template` is `#ffffff`, the Static Chart Mobile templates are cream `#fffbf5`), the **license wording** (`CC BY` on DI and Instagram, `Licensed under CC-BY by the author […]` on static), and the **`OurWorldinData.org/[Topic]` line**, which only Instagram has. Whichever text styles the page's title and subtitle are *bound* to settles it.
+- **Which template.** Don't guess from the size — three of the candidates are 540×540. **Footer row count doesn't separate them**: static mobile carries *two* rows, DI *one*, Instagram square *two*. The tells that do work are the **frame fill** (`DI_Template` is `#ffffff`, the Static Chart Mobile templates are cream `#fffbf5`), the **license wording** (`CC BY` on DI and Instagram, `Licensed under CC-BY by the author […]` on static), and the **`OurWorldinData.org/[Topic]` line**, which only Instagram has. Whichever text styles the page's title and subtitle are *bound* to settles it.
 - **Which export route.** The chart group's height, the span between its first and last gridline, and its font size together identify the export — compare them against a couple of candidate exports rather than reasoning about `imFontSize` from scratch. A gridline span that matches the square render and not the uncaptioned one is conclusive.
 - **What was done by hand.** Anything in the page that no export could produce is a design decision to carry over: a **bound library style** (an SVG import can never bind one), a color that isn't in the export, a hidden node, a moved label.
 
@@ -301,7 +301,7 @@ Replace the lorem-ipsum text nodes in the cloned template. Source everything fro
   **When the entities aren't all on the same year, state the span, not the exception.** A subtitle that names the odd one out — `Data for 2023, except Japan (2022).` — spends a clause on a caveat no reader acts on, and invites the same treatment for the next straggler. Append the range to the sentence with a comma instead: `Breakdown of meat supply in a given country by type, 2022–2023.` It is shorter, it is true of every entity, and it keeps the year where the single-year form puts it. Use an en dash.
 - **Data source:** `Data source: ` + `chart.citation` from Step 1 — that field *is* grapher's own footer line, so don't re-derive a `<producer> (<year>)` string by hand, and don't abbreviate it to save space. A long producer name overruns the CC BY text at x=468.
 
-  > **First check whether the template already gives the source its own row — since 2026-08-13 the static mobile ones do.** `Frame 15` on both static mobile templates is a two-row block, 38px tall, with `Data source:` and the license each on their own full-width row at `x=0`. There is nothing to rearrange there, and running the manoeuvre below on one of those clones adds a **third** row. The recipe applies to the genuinely one-row footers — `DI_Template`'s `Frame 12` at y=508. The Instagram templates are already two-row for their own reasons (the `OurWorldinData.org/[Topic]` line).
+  > **First check whether the template already gives the source its own row — the static mobile ones do.** `Frame 15` on both static mobile templates is a two-row block, 38px tall, with `Data source:` and the license each on their own full-width row at `x=0`. There is nothing to rearrange there, and running the manoeuvre below on one of those clones adds a **third** row. The recipe applies to the genuinely one-row footers — `DI_Template`'s `Frame 12` at y=508. The Instagram templates are already two-row for their own reasons (the `OurWorldinData.org/[Topic]` line).
   >
   > Step 7's `footerTop = footer.y + Math.min(0, source.y)` needs no change for the shipped two-row frame: `source.y` is 0 there, so it returns `footer.y`, which is correct. Don't "fix" it.
 
@@ -325,9 +325,9 @@ Replace the lorem-ipsum text nodes in the cloned template. Source everything fro
 - **`OurWorldinData.org/[Topic]`** → the confirmed topic path (e.g. `OurWorldinData.org/child-mortality`).
 - **CC BY** stays on the DI and Instagram templates. The static templates — desktop **and mobile** — instead carry `Licensed under CC-BY by the author <Name>`, the author of the piece from Step 2, not the page-name credit. On static mobile that line is the second row of `Frame 15` and reads `Licensed under CC-BY by the author [Name of author]` in the template.
 
-**Changing a footer row's line count moves the band — and on the current templates the re-spacing happens for you.** Both 850-wide templates now wrap their footer in a bottom-pinned auto-layout `Frame 8` (`constraints.vertical = "MAX"`, every child flowed), so tightening a two-line note to one line lets the rows beneath it close up on their own: measured on throwaway clones of both, the note→source gap held at 5.41 and the license kept its bottom edge, while the footer's top edge moved down 14px. Verified 2026-08-14.
+**Changing a footer row's line count moves the band, and on both 850-wide templates the re-spacing happens for you.** Their footers are bottom-pinned auto-layout `Frame 8`s (`constraints.vertical = "MAX"`, every child flowed), so tightening a two-line note to one line lets the rows beneath it close up on their own: measured on throwaway clones of both, the note→source gap held at 5.41 and the license kept its bottom edge, while the footer's top edge moved down 14px.
 
-**Check that structure rather than assuming it, because older clones don't have it.** The Horizontal's footer rows were loose children of the frame until 2026-08-14, and there a shrinking note left them put and opened the note→source gap from 5.41px to **19.41px** while source→tagline stayed 5.41. Any page cloned before that date still behaves that way. The tell is `footer.layoutMode === "NONE"`, or a child reporting `layoutPositioning === "ABSOLUTE"`; when you find one, re-space by hand and **take the designed gap from a pair of rows you did not touch** — source → tagline — rather than from the template's nominal `y` values, which encode the two-line assumption:
+**Check that structure rather than assuming it — a footer with loose children does not reflow.** The tell is `footer.layoutMode === "NONE"`, or a child reporting `layoutPositioning === "ABSOLUTE"`, and an old clone of a since-restructured template is the usual way to meet one. There a shrinking note leaves the rows put and opens the note→source gap to **19.41px** while source→tagline stays 5.41. When you find one, re-space by hand and **take the designed gap from a pair of rows you did not touch** — source → tagline — rather than from the template's nominal `y` values, which encode the two-line assumption:
 
 ```js
 const DESIGNED_GAP = tagline.y - (source.y + source.height);   // 5.41 in both static templates
@@ -493,14 +493,14 @@ Side margins and the footer edge are the template's, not yours: content starts a
 |---|---|---|
 | DI_Template (540×540) | x=16, w=508 | 118 → 508 |
 | IG square (540×540) | x=16, w=508 | 118 → 488 (2-row footer) |
-| Static mobile example 1 (540×540) | x=16, w=508 | 118 → **486** (2-row `Frame 15`) |
-| Static mobile example 2 (540×824) | x=16, w=508 | 118 → **770** (2-row `Frame 15`) |
+| Static mobile example 1 (540×540) | x=16, w=508 | 118 → 486 (2-row `Frame 15`) |
+| Static mobile example 2 (540×824) | x=16, w=508 | 118 → 770 (2-row `Frame 15`) |
 | IG portrait (560×700) | x=26, w=508 | 135 → 640 |
 | Static Horizontal (850×638) | x=16, w=818 | 118 → 556 |
-| Static Vertical (850×1095) | x=16, w=818 | **136** → 997 |
+| Static Vertical (850×1095) | x=16, w=818 | 136 → 997 |
 | Small / pull chart (302 × free) | **x=12, w=278** | 44 → `H − 10` (guided) or `H − 23` (pull) — see below |
 
-The two static mobile figures were 508 and 792 before 2026-08-13; the two-row footer took 22px off each. The row that used to lump DI together with static mobile is split above, because they no longer agree.
+DI and static mobile get their own rows above because their bands differ, even though both frames are 540×540.
 
 The table gives one number per template — the band you fit a chart into — and that is deliberately all it gives. **Per-slot geometry for the four static templates** (each text slot's own `y`/width/height, the derived positions, unit conversions, the exact footer strings) belongs to [`/create-static-viz`'s TEMPLATES.md](../create-static-viz/TEMPLATES.md), which needs it to place text without opening Figma. Read it there rather than re-measuring into this file: two copies of a measurement drift, and the copy a session happens to read then decides which one was right.
 

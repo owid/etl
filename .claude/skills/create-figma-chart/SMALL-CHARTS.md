@@ -5,7 +5,7 @@ two templates, one export route. Read this alongside [GUIDELINES.md](GUIDELINES.
 everything shared with the larger formats — colors, annotations, per-chart-type conventions, the Good
 Data Viz Checklist. This file only covers what is different at 302px.
 
-**Last verified: 2026-08-13.** Re-verify the template geometry at the start of every run
+**Last verified: 2026-08-14.** Re-verify the template geometry at the start of every run
 (`get_metadata` on `798:54`); the design team edits these frames in place.
 
 ## The two vocabularies

@@ -8,11 +8,9 @@ re-deriving it through Figma MCP calls every time.
 - **Re-verify with:** `get_metadata` on `798:54` for positions, `get_screenshot` on a frame for colors
 - **Last verified:** 2026-08-14
 
-The design team edits these frames in place, and they have moved twice in two days. **Re-verify the
-geometry at the start of every refresh** rather than trusting this file: on 2026-08-13 both mobile
-templates replaced a single shared footer row with a two-row block, and on 2026-08-14 the Vertical's
-subtitle grew to two lines — each time moving a chart area's edge, the second time by 20px. A step laid
-out against the stale numbers still renders and still passes every contract check — it just no longer
+The design team edits these frames in place, and edits that move a chart area's edge have landed days
+apart. **Re-verify the geometry at the start of every refresh** rather than trusting this file: a step
+laid out against stale numbers still renders and still passes every contract check — it just no longer
 matches the frame it gets pasted into.
 
 The page's own instructions frame (`798:151`) states the workflow: *"Copy/paste the template you
@@ -40,7 +38,7 @@ Do not confuse the 540×540 mobile frame with `DI_Template` (`6799:1859`) or
 `InstagramPost_Template_English` (`798:161`), which are also 540×540. The tells, per
 `/create-figma-chart`: frame fill (`DI_Template` is `#ffffff`, static mobile is cream) and the
 license wording (`CC BY` on DI and Instagram, `Licensed under CC-BY by the author […]` on static).
-Footer row count no longer separates them — since 2026-08-13 static mobile carries two rows too.
+Footer row count does not separate them: DI carries one row, static mobile and IG square two.
 
 ### Not a static-viz target: the "SMALL" Charts section
 
@@ -72,10 +70,9 @@ margin is **16 px** on all four frames, so content width is `frame width − 32`
 | Tagline (left) | 609 | 467 | 13 |
 | License (right, x=571) | 609 | 263 | 13 |
 
-The slots are wrapped in two auto-layout frames mirroring Vertical: header block `25398:753`
-spans 0→134, footer block `25398:769` starts at 540. Each carries 16 px of inner padding on the
-chart side, so every slot y above is unchanged and the visual chart area is still 118 → 556 —
-`header.y + header.height` (134) is that edge plus the padding.
+The slots sit in two auto-layout frames: header block `25398:753` spans 0→134, footer block
+`25398:769` starts at 540. Each carries 16 px of inner padding on the chart side, so the visual
+chart area is 118 → 556 while `header.y + header.height` reads 134 — that edge plus the padding.
 
 ### Vertical — 850 × 1095
 
@@ -83,11 +80,9 @@ Same slots, widths, and auto-layout wrappers as Horizontal. Header block `5332:9
 0→136; footer block `5332:101` starts at 997. Absolute y: title 16, subtitle 82, chart area
 136 → 997, `Note:` 1013, `Data source:` 1046, tagline/license 1066.
 
-Its subtitle became **two lines at 16 px** on 2026-08-14, where it had been one line at 15 px —
-which is what moved the header block from 0→116 to 0→136, so a stale 116 now lands inside the
-header rather than below it. Both desktop templates now carry the same subtitle style. Their
-titles still differ: 29 px line height on Horizontal against 30 px here, so 58 px against 60 px,
-which is the whole of the 134 vs 136 difference between the two header blocks.
+Its subtitle matches Horizontal's — 16 px Lato Regular over two lines, 38 tall. The **title** is what
+differs: 30 px line height here against 29 px, so 60 px against 58 px, which is the whole of the
+136 vs 134 difference between the two header blocks.
 
 ### Mobile — 540 × 540 (example 1) and 540 × 824 (example 2)
 
@@ -135,10 +130,9 @@ mobile size) or about *what the chart claims* (must move into the subtitle inste
   so a one-line note moves the band. Derive both from the actual slot positions rather than from the
   table above. (What that implies for *editing* a clone in Figma is `/create-figma-chart`'s Step 6, not
   this file's business.)
-- **A header block's height is derived from its two text slots, so it moves when either reflows.** That
-  is what the 2026-08-14 subtitle change did to the Vertical (recorded in its section above): the block
-  grew 20px without a single slot being repositioned. Read `header.y + header.height` back after setting
-  text rather than trusting a recorded band.
+- **A header block's height is derived from its two text slots, so it moves whenever either reflows** —
+  a slot gaining a line grows the block without anything being repositioned. Read
+  `header.y + header.height` back after setting text rather than trusting a recorded band.
 
 ## Unit conversions
 
