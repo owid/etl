@@ -146,6 +146,24 @@ def load_pairs(path: Path) -> dict[int, int]:
     return {resolve(src): resolve(tgt) for src, tgt in refs}
 
 
+def key_chart_target_status(rows: list[dict], pairs: dict[int, int]) -> dict[tuple[int, int], int | None]:
+    """keyChartLevel of each (tag, target) association the key-chart rows point at.
+
+    None means the target is not tagged on that topic page at all. This answers the one
+    question that decides whether a slot needs any work before the retirement: a target
+    already keyed on the page means there is nothing to move.
+    """
+    wanted = {(int(r["surface_id"]), pairs[r["subject_id"]]) for r in rows if r["subject_id"] in pairs}
+    if not wanted:
+        return {}
+    df = OWID_ENV.read_sql(
+        "SELECT tagId, chartId, keyChartLevel FROM chart_tags WHERE tagId IN %(t)s AND chartId IN %(c)s",
+        params={"t": tuple(sorted({t for t, _ in wanted})), "c": tuple(sorted({c for _, c in wanted}))},
+    )
+    found = {(int(r["tagId"]), int(r["chartId"])): int(r["keyChartLevel"]) for r in df.to_dict("records")}
+    return {k: found.get(k) for k in wanted}
+
+
 def base_query(src_id: int, log_sources: set[int]) -> dict[str, str]:
     """The params the replacement link proposes for this row, before the reference's own."""
     base = dict(parse_qsl(REDIRECT_QUERY, keep_blank_values=True))
@@ -473,25 +491,43 @@ def main() -> int:
     key_charts = [r for r in rows if r["surface"] == "key chart"]
     placed.update(id(r) for r in key_charts)
     if key_charts:
+        status = key_chart_target_status(key_charts, pairs)
         out += [
             f"## 🔴 Key-chart slots ({len(key_charts)}) — invisible to the Part 2 audit",
             "",
             "`redirect_to_scatter.py` never sees these: its audit counts wp/gdoc/explorer/narrative/"
             "dataInsight/staticViz, and a key chart is a chart↔tag association "
             "(`chart_tags.keyChartLevel`), not a row in any of them. Unpublishing the source 404s "
-            "nothing — the chart simply drops out of the topic page's key-chart list, silently. Move "
-            "each association to the target, same tag and same level.",
+            "nothing — the chart simply drops out of the topic page's key-chart list, silently.",
             "",
-            "| Topic page | Old chart | Level | Move the association to |",
-            "|---|---|---|---|",
+            "**Target on the page?** says whether the slot needs any work: ✅ the target is already "
+            "a key chart on that page (nothing to move — the old slot just drops out), 🟡 the target "
+            "is tagged on the page but has no key-chart level (set it), 🔴 the target is not on the "
+            "page at all (add the tag, then the level).",
+            "",
+            "| Topic page | Old chart | Level | Move the association to | Target on the page? |",
+            "|---|---|---|---|---|",
         ]
-        for r in sorted(key_charts, key=lambda r: (r["where"], r["subject"])):
+        # Most critical first: a missing target, then an untagged one, then one tagged but not
+        # keyed, then the rows where there is nothing to do — so the work reads top-down.
+        graded = []
+        for r in key_charts:
             tgt = pairs.get(r["subject_id"])
+            st = status.get((int(r["surface_id"]), tgt)) if tgt else None
+            if tgt is None:
+                rank, verdict = 0, "— no target —"
+            elif st is None:
+                rank, verdict = 1, "🔴 not tagged"
+            elif st == 0:
+                rank, verdict = 2, "🟡 tagged, no key-chart level"
+            else:
+                rank, verdict = 3, f"✅ key chart, level {st}"
+            graded.append((rank, r, tgt, verdict))
+        for rank, r, tgt, verdict in sorted(graded, key=lambda g: (g[0], g[1]["where"], g[1]["subject"])):
             level = (r.get("context") or "").replace("keyChartLevel=", "level ")
-            out.append(
-                f"| {fr.cell(r['where'], 44)} | `{r['subject']}` (#{r['subject_id']}) | {level} | "
-                f"#{tgt} `{slugs.get(tgt, '?')}` |"
-            )
+            old_cell = f"`{r['subject']}` ([#{r['subject_id']}]({r['admin_url']}))"
+            tgt_cell = f"[#{tgt}]({admin}/charts/{tgt}/edit) `{slugs.get(tgt, '?')}`" if tgt else "— no target —"
+            out.append(f"| {fr.cell(r['where'], 44)} | {old_cell} | {level} | {tgt_cell} | {verdict} |")
         out.append("")
 
     # Anything no section above claimed — an old slug of the source, a site redirect, a
