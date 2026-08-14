@@ -10,21 +10,37 @@ paths = PathFinder(__file__)
 # Variables to select from AQUASTAT, and how to rename them.
 VARIABLES = {
     "Agricultural water withdrawal": "agricultural_water_withdrawal",
+    "Agricultural water withdrawal as % of total water withdrawal": "agricultural_water_withdrawal_share",
     "Industrial water withdrawal": "industrial_water_withdrawal",
+    "Industrial water withdrawal as % of total water withdrawal": "industrial_water_withdrawal_share",
     "Municipal water withdrawal": "municipal_water_withdrawal",
+    "Municipal water withdrawal as % of total withdrawal": "municipal_water_withdrawal_share",
+    "Total water withdrawal": "total_water_withdrawal",
     "Total water withdrawal per capita": "total_water_withdrawal_per_capita",
 }
 
 # Expected original unit of each variable.
 UNITS_EXPECTED = {
     "Agricultural water withdrawal": "10^9 m3/year",
+    "Agricultural water withdrawal as % of total water withdrawal": "%",
     "Industrial water withdrawal": "10^9 m3/year",
+    "Industrial water withdrawal as % of total water withdrawal": "%",
     "Municipal water withdrawal": "10^9 m3/year",
+    "Municipal water withdrawal as % of total withdrawal": "%",
+    "Total water withdrawal": "10^9 m3/year",
     "Total water withdrawal per capita": "m3/inhab/year",
 }
 
+# Columns of sectoral withdrawals, which should add up to the total withdrawal.
+SECTORAL_COLUMNS = ["agricultural_water_withdrawal", "industrial_water_withdrawal", "municipal_water_withdrawal"]
+# Columns of shares of total withdrawal, which should add up to 100%.
+SHARE_COLUMNS = [
+    "agricultural_water_withdrawal_share",
+    "industrial_water_withdrawal_share",
+    "municipal_water_withdrawal_share",
+]
 # Columns originally given in billions of cubic meters per year, to be converted to cubic meters per year.
-COLUMNS_TO_CONVERT = ["agricultural_water_withdrawal", "industrial_water_withdrawal", "municipal_water_withdrawal"]
+COLUMNS_TO_CONVERT = SECTORAL_COLUMNS + ["total_water_withdrawal"]
 BILLION_CUBIC_METERS_TO_CUBIC_METERS = 1e9
 
 
@@ -46,13 +62,27 @@ def sanity_check_outputs(tb: Table) -> None:
         assert tb[column].notnull().sum() > 5500, f"Data points for {column} decreased unexpectedly."
 
     # Global withdrawals have hovered around 4 trillion m³/year in recent years (4.03 trillion m³ in 2023).
-    world_total = tb[(tb["country"] == "World") & (tb["year"] == 2023)][COLUMNS_TO_CONVERT].sum().sum()
+    world_total = tb.loc[(tb["country"] == "World") & (tb["year"] == 2023), "total_water_withdrawal"].item()
     assert 3.5e12 < world_total < 4.5e12, "Global total withdrawals in 2023 outside the expected range."
 
     # The sum of the three sectors across countries (excluding regional aggregates) should recover the World row.
     mask_countries = ~tb["country"].str.endswith("(FAO)") & (tb["country"] != "World")
-    countries_total = tb[mask_countries & (tb["year"] == 2023)][COLUMNS_TO_CONVERT].sum().sum()
+    countries_total = tb[mask_countries & (tb["year"] == 2023)][SECTORAL_COLUMNS].sum().sum()
     assert abs(countries_total / world_total - 1) < 0.02, "Countries do not add up to the World total."
+
+    # After filtering incomplete-coverage years, aggregate rows should be internally consistent.
+    mask_aggregates = tb["country"].str.endswith("(FAO)") | (tb["country"] == "World")
+    share_sum = tb.loc[mask_aggregates, SHARE_COLUMNS].sum(axis=1, min_count=3).dropna()
+    assert share_sum.between(98, 102).all(), "Aggregate sectoral shares do not add up to 100%."
+    for column in SHARE_COLUMNS:
+        assert tb[column].dropna().between(0, 101).all(), f"{column} outside the 0-100% range."
+
+    # For countries, the total should equal the sum of the three sectors in the vast majority of cases.
+    # NOTE: FAO's own data is inconsistent for a few country-years (e.g. Namibia 2020-2021, and North Macedonia in
+    # recent years, whose total far exceeds the sum of sectors).
+    complete = tb[~mask_aggregates].dropna(subset=SECTORAL_COLUMNS + ["total_water_withdrawal"])
+    ratio = complete[SECTORAL_COLUMNS].sum(axis=1) / complete["total_water_withdrawal"]
+    assert ((ratio - 1).abs() < 0.02).mean() > 0.97, "Too many countries where sectors do not add up to the total."
 
     # Anchor values, to guard against unit regressions (values as published by AQUASTAT, checked against the
     # previous version of this dataset).
@@ -94,8 +124,30 @@ def run() -> None:
     for column in COLUMNS_TO_CONVERT:
         tb[column] = (tb[column].astype("float64") * BILLION_CUBIC_METERS_TO_CUBIC_METERS).round()
 
-    # Harmonize country names, and drop FAO/SDG regional aggregates (which are excluded in the country mapping).
+    # Harmonize country names. AQUASTAT's regional aggregates are kept, mapped to the shared FAO SDG region
+    # entities; only special groups with no counterpart (LDCs, LLDCs, SIDS) are excluded in the country mapping.
     tb = paths.regions.harmonize_names(tb=tb)
+
+    # FAO's regional aggregates are sums over the countries reporting in each year, so in early years (when few
+    # countries had data) they reflect incomplete coverage rather than real levels (e.g. the World row gives a total
+    # withdrawal of 0.7 billion m³ in 1965, and sectoral shares adding up to 196% in 1972). Keep aggregate rows only
+    # in years where FAO's own sectoral shares add up to ~100%, which signals complete coverage (~1997 for World).
+    mask_aggregates = tb["country"].str.endswith("(FAO)") | (tb["country"] == "World")
+    share_sum = tb[SHARE_COLUMNS].sum(axis=1, min_count=3)
+    # NOTE: Aggregate rows missing any of the three shares also count as incomplete (fillna, since ~NA is NA).
+    mask_incomplete = mask_aggregates & ~share_sum.between(98, 102).fillna(False)
+    assert 400 < mask_incomplete.sum() < 900, "Unexpected number of incomplete-coverage aggregate rows."
+    tb = tb[~mask_incomplete].reset_index(drop=True)
+
+    # A few countries carry shares of total withdrawal above 100% (e.g. Brunei's municipal share in 2004-2023),
+    # where FAO's sectoral series are more recent than its (carried-forward) total series. A share of the total
+    # above 100% is internally inconsistent, so remove those values.
+    n_impossible = 0
+    for column in SHARE_COLUMNS:
+        mask_impossible = tb[column] > 100
+        n_impossible += mask_impossible.sum()
+        tb.loc[mask_impossible, column] = None
+    assert 20 < n_impossible < 60, "Unexpected number of shares above 100%."
 
     # Sanity checks.
     sanity_check_outputs(tb=tb)
