@@ -41,7 +41,7 @@ tables:
         title: Traditional biomass
         unit: terawatt-hours
         short_unit: TWh
-        description_short: Energy from traditional biomass (fuelwood, charcoal, crop residues, and dung), measured in [terawatt-hours](#dod:watt-hours). This is not part of total energy supply and is shown separately.
+        description_short: Energy from traditional biomass (fuelwood, charcoal, crop residues, and dung), measured in [terawatt-hours](#dod:watt-hours).
         # Not total energy supply, so the shared key points about how it is measured do not apply here.
         description_key:
           - Traditional biomass is fuelwood, charcoal, crop residues and dung. It is not part of total energy supply, which covers only fuels that are traded commercially.
