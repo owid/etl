@@ -405,6 +405,15 @@ def add_per_gdp(tb: Table, ds_gdp: Dataset) -> Table:
     return tb
 
 
+def drop_origin(tb: Table, columns: list[str], producer: str) -> Table:
+    """Remove a producer from the origins of the given columns, where it contributes no value."""
+    for column in columns:
+        origins = [origin for origin in tb[column].m.origins if origin.producer != producer]
+        assert len(origins) < len(tb[column].m.origins), f"{producer} is not an origin of {column}."
+        tb[column].m.origins = origins
+    return tb
+
+
 def sanity_check_outputs(tb: Table) -> None:
     # No fully-NaN columns.
     assert tb.columns[tb.isna().all()].empty, f"Fully-NaN columns: {list(tb.columns[tb.isna().all()])}"
@@ -490,6 +499,19 @@ def run() -> None:
     # describes differently, and energy per GDP divides its energy by another producer's GDP.
     for column in COLUMNS_WITHOUT_PRODUCER_DESCRIPTION:
         tb[column].m.description_from_producer = None
+
+    # Charts cite an indicator's origins, so an origin that contributes no value to it is a false
+    # citation. Two cases here, both created by deriving columns from a table that combines producers:
+    # - Annual change: Smil's World series is decadal before 1965 and add_annual_change keeps only
+    #   consecutive years, so no Smil value survives (these indicators start in 1965).
+    # - Biomass-inclusive shares: these are World-only, and the World total comes from the Statistical
+    #   Review (1965 onwards, with no gaps) or Smil before that, never from the EIA.
+    tb = drop_origin(tb, columns=[col for col in tb.columns if "annual_change" in col], producer="Smil")
+    tb = drop_origin(
+        tb,
+        columns=[col for col in tb.columns if col.endswith("_share_including_biomass_pct")],
+        producer="U.S. Energy Information Administration",
+    )
 
     # Format table conveniently.
     tb = tb.format(sort_columns=True, short_name=paths.short_name)
