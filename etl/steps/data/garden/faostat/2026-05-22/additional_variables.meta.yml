@@ -22,11 +22,11 @@ definitions:
   # The decadal-change columns compare each year against ten years earlier, so their values for the affected entities
   # are distorted for the whole 1992 to 2001 window.
   entity_annotations_ussr_breakup_decadal_change: &entity_annotations_ussr_breakup_decadal_change |-
-    Europe: Values from 1992 to 2001 are affected by the break-up of the USSR
-    Asia: Values from 1992 to 2001 are affected by the break-up of the USSR
-    High-income countries: Values from 1992 to 2001 are affected by the break-up of the USSR
-    Upper-middle-income countries: Values from 1992 to 2001 are affected by the break-up of the USSR
-    Lower-middle-income countries: Values from 1992 to 2001 are affected by the break-up of the USSR
+    Europe: Values from 1992 to 2001 are affected by the dissolution of the USSR
+    Asia: Values from 1992 to 2001 are affected by the dissolution of the USSR
+    High-income countries: Values from 1992 to 2001 are affected by the dissolution of the USSR
+    Upper-middle-income countries: Values from 1992 to 2001 are affected by the dissolution of the USSR
+    Lower-middle-income countries: Values from 1992 to 2001 are affected by the dissolution of the USSR
 
 tables:
   arable_land_per_crop_output:
