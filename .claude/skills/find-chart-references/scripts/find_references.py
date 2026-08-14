@@ -1139,6 +1139,13 @@ def summarize(findings: list[dict]) -> None:
 
 GDOC_SURFACES = ("gdoc", "gdoc (url link)", "data insight")
 
+# What `write_markdown` renders with the Google-Doc columns (doc edit link, admin preview,
+# find-in-doc hint). A narrative-chart placement lives in a gdoc too and exists precisely to
+# locate an article edit, so it needs those links — but it stays OUT of `GDOC_SURFACES`,
+# which consumers use to COUNT a subject's own article references: a placement references
+# the narrative chart, not the chart under audit, so counting it there would overstate both.
+GDOC_RENDERED_SURFACES = (*GDOC_SURFACES, "gdoc (narrative chart)")
+
 
 def gdoc_preview_url(f: dict, admin: str) -> str:
     """Admin preview of the article itself — renders the gdoc, including unpublished drafts."""
@@ -1273,7 +1280,9 @@ def search_hint(f: dict) -> str:
     A prose hyperlink has visible anchor text, so that phrase is the search term. A
     block embed has none — the doc holds a bare grapher URL — so the slug is. Use the
     slug exactly as recorded: `posts_gdocs_links.target` keeps what the author typed,
-    which may be an old slug, and that is what is actually in the document.
+    which may be an old slug, and that is what is actually in the document. A
+    narrative-chart placement's `{.narrative-chart}` block spells out the name, so for
+    those the name is the search term.
     """
     # The cell holds the search string and nothing else, so it can be copied straight
     # into the doc's find box. What each variant means is in the legend under the table.
@@ -1281,7 +1290,7 @@ def search_hint(f: dict) -> str:
     if anchor:
         safe = cell(anchor, 55).replace("`", "'")
         return f"`{safe}`"
-    if f["subject_type"] == "chart":
+    if f["subject_type"] in ("chart", "narrative chart"):
         return f"`{cell(f['subject'], 55)}`"
     return "—"
 
@@ -1341,9 +1350,10 @@ def write_markdown(findings: list[dict], path: str, host: str, admin: str, cavea
         for surface in sorted(by_surface):
             rows = by_surface[surface]
             lines += [f"### {surface} ({len(rows)})", ""]
-            if surface in GDOC_SURFACES:
+            if surface in GDOC_RENDERED_SURFACES:
+                subject_col = "Narrative chart" if surface == "gdoc (narrative chart)" else "Chart"
                 lines += [
-                    "| Chart | Article | Open | Find in the doc |",
+                    f"| {subject_col} | Article | Open | Find in the doc |",
                     "|---|---|---|---|",
                 ]
                 for f in rows:
@@ -1355,7 +1365,10 @@ def write_markdown(findings: list[dict], path: str, host: str, admin: str, cavea
                     preview = f" · [👁 preview]({gdoc_preview_url(f, admin)})" if f["surface_id"] else ""
                     links = f"[📄 doc]({doc_url(f)}){preview} · [🔗 page]({deep_link(f, host, admin)})"
                     if f["admin_url"]:
-                        links += f" · [✎ chart admin]({f['admin_url']})"
+                        # A placement row's editor opens the narrative chart, not a chart —
+                        # same mislabel `build_reference_handoff.open_links` already avoids.
+                        editor = "✎ narrative admin" if f["subject_type"] == "narrative chart" else "✎ chart admin"
+                        links += f" · [{editor}]({f['admin_url']})"
                     subject = (
                         f"[`{cell(f['subject_label'], 44)}`]({f['preview_url']})"
                         if f["preview_url"]
