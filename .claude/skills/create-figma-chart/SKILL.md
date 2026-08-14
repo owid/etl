@@ -40,7 +40,7 @@ Each year gets a new file. For **2026** the file key is `s6Sv60bakebRRW2TxsMQbF`
 | Static Chart Template_Mobile (example 1) | `24590:20` | 540×540 | **two**-row footer (`Frame 15` `25343:276` @ y=486, h=38): `Data source:` then `Licensed under CC-BY by the author […]`, both full width |
 | Static Chart Template_Mobile (example 2) | `24590:32` | 540×824 | taller variant — use when the chart needs vertical room. Same two-row `Frame 15` (`25343:275` @ y=770) |
 | Static Chart Template_Horizontal | `5332:75` | 850×638 | footer: Note, Data source, OWID tagline, "Licensed under CC-BY by the author [Name]" |
-| Static Chart Template_Vertical | `5332:93` | 850×1095 | same slots. The two desktop templates differ in ways that bite — footer re-spacing behavior (Step 6) and subtitle size (`TEMPLATES.md`) |
+| Static Chart Template_Vertical | `5332:93` | 850×1095 | same slots, same header/footer auto-layout wrappers, same 16px subtitle. The pair's one remaining difference is title line height — 30px here against 29px on Horizontal, which is the whole of the 136 vs 134 gap between their header bands |
 | **`small-chart-template-guided`** | **`25344:1357`** | 302 × free | title + optional subtitle, no source row — see [SMALL-CHARTS.md](SMALL-CHARTS.md) |
 | **`small-chart-template-pull`** | **`25344:1391`** | 302 × free | the same plus a mandatory source row — see [SMALL-CHARTS.md](SMALL-CHARTS.md) |
 | `"SMALL" Charts` section heading | `25344:1235` | — | "featured on the OWID website as guided and PULL charts" |
@@ -325,21 +325,16 @@ Replace the lorem-ipsum text nodes in the cloned template. Source everything fro
 - **`OurWorldinData.org/[Topic]`** → the confirmed topic path (e.g. `OurWorldinData.org/child-mortality`).
 - **CC BY** stays on the DI and Instagram templates. The static templates — desktop **and mobile** — instead carry `Licensed under CC-BY by the author <Name>`, the author of the piece from Step 2, not the page-name credit. On static mobile that line is the second row of `Frame 15` and reads `Licensed under CC-BY by the author [Name of author]` in the template.
 
-**Changing a footer row's line count is a re-spacing job — and whether it happens for you depends on the template.** Tightening a two-line note to one line leaves the rows beneath it 14px too far away, and the two static templates behave differently:
+**Changing a footer row's line count moves the band — and on the current templates the re-spacing happens for you.** Both 850-wide templates now wrap their footer in a bottom-pinned auto-layout `Frame 8` (`constraints.vertical = "MAX"`, every child flowed), so tightening a two-line note to one line lets the rows beneath it close up on their own: measured on throwaway clones of both, the note→source gap held at 5.41 and the license kept its bottom edge, while the footer's top edge moved down 14px. Verified 2026-08-14.
 
-| Template | Footer | What happens when the note shrinks |
-|---|---|---|
-| Static Vertical (`5332:93`) | `Frame 8` is **auto-layout** | rows reflow on their own; the gap stays right |
-| Static Horizontal (`5332:75`) | rows are **absolutely positioned** | they stay put; the note→source gap opened from **5.41px to 19.41px** while source→tagline stayed 5.41 |
-
-So after any edit that changes a footer row's height, measure the gaps and re-space if needed. **Take the designed gap from a pair of rows you did not touch** — source → tagline here — rather than from the template's nominal `y` values, which encode the two-line assumption:
+**Check that structure rather than assuming it, because older clones don't have it.** The Horizontal's footer rows were loose children of the frame until 2026-08-14, and there a shrinking note left them put and opened the note→source gap from 5.41px to **19.41px** while source→tagline stayed 5.41. Any page cloned before that date still behaves that way. The tell is `footer.layoutMode === "NONE"`, or a child reporting `layoutPositioning === "ABSOLUTE"`; when you find one, re-space by hand and **take the designed gap from a pair of rows you did not touch** — source → tagline — rather than from the template's nominal `y` values, which encode the two-line assumption:
 
 ```js
 const DESIGNED_GAP = tagline.y - (source.y + source.height);   // 5.41 in both static templates
 note.y = source.y - DESIGNED_GAP - note.height;
 ```
 
-Then remember the knock-on: **the band's bottom is the note's `y`, so it just moved.** Re-fit the chart, and if the band grew by more than a few pixels, re-export to the new height rather than leaving an oversized gap — moving the note down 14px took one band from 456.6 to 470.6 and left a 402-tall chart floating with 34px gaps.
+Either way the knock-on is the same: **the band's bottom edge is the footer's top, and it just moved.** Read it back off `footer.y` — not off the note, which stops bounding the band once the footer reflows — then re-fit the chart, and if the band grew by more than a few pixels, re-export to the new height rather than leaving an oversized gap. Moving the note down 14px took one band from 456.6 to 470.6 and left a 402-tall chart floating with 34px gaps.
 
 **An orphan last line is a copy problem, not a layout problem — tighten the words.** When a string
 spills a word or two onto a new line, the fix is to rewrite it shorter so it finishes on the line

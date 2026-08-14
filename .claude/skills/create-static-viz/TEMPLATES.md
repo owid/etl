@@ -6,13 +6,14 @@ re-deriving it through Figma MCP calls every time.
 - **File:** `Charts (2026)`, file key `s6Sv60bakebRRW2TxsMQbF`
 - **Page:** `📑 Templates`, node `798:54`
 - **Re-verify with:** `get_metadata` on `798:54` for positions, `get_screenshot` on a frame for colors
-- **Last verified:** 2026-08-13
+- **Last verified:** 2026-08-14
 
-The design team edits these frames in place. **Re-verify the geometry at the start of every refresh**
-rather than trusting this file: on 2026-08-13 both mobile templates replaced a single shared footer
-row with a two-row block, which moved the chart area's bottom edge and gave mobile a slot it had not
-had before. A step laid out against the stale numbers still renders and still passes every contract
-check — it just no longer matches the frame it gets pasted into.
+The design team edits these frames in place, and they have moved twice in two days. **Re-verify the
+geometry at the start of every refresh** rather than trusting this file: on 2026-08-13 both mobile
+templates replaced a single shared footer row with a two-row block, and on 2026-08-14 the Vertical's
+subtitle grew to two lines — each time moving a chart area's edge, the second time by 20px. A step laid
+out against the stale numbers still renders and still passes every contract check — it just no longer
+matches the frame it gets pasted into.
 
 The page's own instructions frame (`798:151`) states the workflow: *"Copy/paste the template you
 want to use and edit it in a new page"*, *"Page name: Date + Chart title"*. `/create-figma-chart`
@@ -130,13 +131,14 @@ mobile size) or about *what the chart claims* (must move into the subtitle inste
   calibrate so the two-line case reproduces 80 exactly.
 - **The title slot is two lines tall** in every template. A title that wraps to one line
   under-fills it; one that wraps to three overflows into the subtitle.
-- **The `Note:` slot is two lines tall too, and the chart band's bottom edge is the note's `y`** — so a
-  one-line note moves the band. Derive both from the actual slot positions rather than from the table
-  above. (What that implies for *editing* a clone in Figma — the two desktop templates re-space
-  differently — is `/create-figma-chart`'s Step 6, not this file's business.)
-- **The two desktop templates disagree on subtitle size:** Horizontal is **16px**, Vertical is
-  **15px** (both Lato Regular). Measured 2026-08-13. Not a typo to correct in a clone — match
-  whichever template you cloned, and raise it with the design team if the pair should agree.
+- **The `Note:` slot is two lines tall too, and the chart band's bottom edge is the footer block's `y`** —
+  so a one-line note moves the band. Derive both from the actual slot positions rather than from the
+  table above. (What that implies for *editing* a clone in Figma is `/create-figma-chart`'s Step 6, not
+  this file's business.)
+- **A header block's height is derived from its two text slots, so it moves when either reflows.** That
+  is what the 2026-08-14 subtitle change did to the Vertical (recorded in its section above): the block
+  grew 20px without a single slot being repositioned. Read `header.y + header.height` back after setting
+  text rather than trusting a recorded band.
 
 ## Unit conversions
 
