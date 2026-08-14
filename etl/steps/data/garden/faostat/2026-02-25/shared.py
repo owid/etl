@@ -1991,6 +1991,14 @@ USSR_BREAKUP_AFFECTED_ELEMENT_CODES_RL = {
     "005110",  # Area
     "5110pc",  # Area per capita
 }
+# Explanation of the issue, shown in the "What you should know about this data" section.
+# NOTE: Entity annotations (defined below) only render on charts with entity-labeled series (e.g. line charts of one
+# indicator for multiple entities), so this point is the only visible explanation on other charts, e.g. stacked charts.
+USSR_BREAKUP_DESCRIPTION_KEY = (
+    "FAOSTAT reports the USSR as a single entity until 1991, and its successor states separately from 1992. "
+    "This causes an abrupt break between 1991 and 1992 in the aggregates for Europe, Asia, High-income countries, "
+    "Upper-middle-income countries, and Lower-middle-income countries."
+)
 # Annotations shown next to the affected entities in charts (only rendered when one of these entities is selected).
 USSR_BREAKUP_ENTITY_ANNOTATIONS = "\n".join(
     [
@@ -2446,6 +2454,9 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
         ):
             # Annotate the region aggregates affected by the redistribution of the USSR among its successor states.
             tb_wide[column].display["entityAnnotationsMap"] = USSR_BREAKUP_ENTITY_ANNOTATIONS
+            tb_wide[column].metadata.description_key = (tb_wide[column].metadata.description_key or []) + [
+                USSR_BREAKUP_DESCRIPTION_KEY
+            ]
 
         # Update metadata.
         tb_wide[column].display["name"] = display_name
