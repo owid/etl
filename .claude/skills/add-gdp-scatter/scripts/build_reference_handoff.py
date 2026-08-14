@@ -55,6 +55,15 @@ TARGET_KEYS = ("target_chart_admin_url", "target_chart_url")
 # adjustment a tab CLICK makes and a URL-supplied tab does not get.
 REDIRECT_QUERY = "tab=scatter&time=latest&country="
 REDIRECT_KEYS = {key for key, _ in parse_qsl(REDIRECT_QUERY, keep_blank_values=True)}
+
+# The one param that varies per row. The applier never forces `yAxis.scaleType: log` on a
+# target — `yAxis` is global, so it would flip the line/bar views too — it only enables the
+# toggle and leaves the default linear. A source scatter that was authored on a log y axis
+# therefore becomes a LINEAR scatter on the target, and its shape changes: the relationship
+# the old chart was drawn to show is the reason the author chose log. `yScale=log` restores
+# it for this view only, exactly as `time=latest` and `country=` restore the other two
+# adjustments a URL-supplied tab does not get.
+Y_SCALE_KEY = "yScale"
 SITE = "https://ourworldindata.org"
 
 MANUAL_SURFACES = {"explorer", "data insight", "static viz"}
@@ -122,18 +131,45 @@ def load_pairs(path: Path) -> dict[int, int]:
     return {resolve(src): resolve(tgt) for src, tgt in refs}
 
 
-def params_cell(own_params: str) -> str:
+def log_y_sources(source_ids: set[int]) -> set[int]:
+    """Of these source charts, the ones authored with a log y axis.
+
+    Read from the SOURCE, never the target: the target's own `yAxis.scaleType` is deliberately
+    left linear by the applier, so it can never tell you what the retiring chart looked like.
+    """
+    if not source_ids:
+        return set()
+    df = OWID_ENV.read_sql(
+        "SELECT c.id, cc.full ->> '$.yAxis.scaleType' AS scale_type "
+        "FROM charts c JOIN chart_configs cc ON c.configId = cc.id WHERE c.id IN %(i)s",
+        params={"i": tuple(sorted(source_ids))},
+    )
+    return {int(r["id"]) for r in df.to_dict("records") if r["scale_type"] == "log"}
+
+
+def base_query(src_id: int, log_sources: set[int]) -> dict[str, str]:
+    """The params the replacement link proposes for this row, before the reference's own."""
+    base = dict(parse_qsl(REDIRECT_QUERY, keep_blank_values=True))
+    if src_id in log_sources:
+        base[Y_SCALE_KEY] = "log"
+    return base
+
+
+def params_cell(own_params: str, base_keys: set[str]) -> str:
     """The reference's own params, flagging the ones that override the redirect's.
 
     The merge is silent, so the collision is what has to be visible: a reference carrying
     `tab=chart` wins over `tab=scatter` and lands the reader on a different tab than the
-    retirement intends. That row needs a decision, not a paste.
+    retirement intends. That row needs a decision, not a paste. `base_keys` is this row's
+    proposal rather than the shared constant, because `yScale` is only proposed for a log
+    source — so a reference's `yScale=linear` is an override on those rows and merely its own
+    setting on every other.
     """
     query = (own_params or "").lstrip("?")
     if not query:
         return "—"
     shown = f"`{fr.cell(query, 40)}`"
-    clashing = sorted({key for key, _ in parse_qsl(query, keep_blank_values=True)} & REDIRECT_KEYS)
+    clashing = sorted({key for key, _ in parse_qsl(query, keep_blank_values=True)} & base_keys)
     return f"⚠️ {shown} overrides {', '.join(clashing)}" if clashing else shown
 
 
@@ -176,17 +212,19 @@ def open_links(r: dict, host: str, admin: str) -> str:
     return " · ".join(parts) or "—"
 
 
-def replacement_url(src_id: int, own_params: str, pairs: dict[int, int], slugs: dict[int, str]) -> str:
+def replacement_url(
+    src_id: int, own_params: str, pairs: dict[int, int], slugs: dict[int, str], log_sources: set[int]
+) -> str:
     """The target's scatter view, with the reference's own params layered on top.
 
     Incoming params beat the redirect's stored ones key by key, so a reference carrying its
-    own `tab`/`time`/`country` keeps them — which is a decision, not a merge, and why the
-    table prints the reference's params alongside.
+    own `tab`/`time`/`country`/`yScale` keeps them — which is a decision, not a merge, and why
+    the table prints the reference's params alongside.
     """
     tgt = pairs.get(src_id)
     if not tgt or tgt not in slugs:
         return "— no target —"
-    merged = dict(parse_qsl(REDIRECT_QUERY, keep_blank_values=True))
+    merged = base_query(src_id, log_sources)
     merged.update(dict(parse_qsl((own_params or "").lstrip("?"), keep_blank_values=True)))
     return f"{SITE}/grapher/{slugs[tgt]}?{urlencode(merged)}"
 
@@ -214,6 +252,7 @@ def main() -> int:
             params={"i": tuple(set(pairs.values()))},
         )
         slugs = {int(r["id"]): r["slug"] for r in df.to_dict("records")}
+    log_sources = log_y_sources(set(pairs))
 
     out = [
         "# Reference handoff — retiring the old GDP scatters",
@@ -272,9 +311,11 @@ def main() -> int:
                 else f"`{fr.cell(r['subject_label'], 44)}`"
             )
             own_params = r.get("query_string", "")
+            base_keys = set(base_query(r["subject_id"], log_sources))
             out.append(
                 f"| {subject} | {fr.cell(r['where'], 44)}{page_type}{draft} | {links} | {find_hint(r)} | "
-                f"{params_cell(own_params)} | {replacement_url(r['subject_id'], own_params, pairs, slugs)} |"
+                f"{params_cell(own_params, base_keys)} | "
+                f"{replacement_url(r['subject_id'], own_params, pairs, slugs, log_sources)} |"
             )
         out.append("")
 
@@ -342,9 +383,10 @@ def main() -> int:
         for r in sorted(narrative, key=lambda r: str(r["where"])):
             own_params = r.get("query_string", "")
             out.append(
-                f"| `{fr.cell(str(r['where']), 44)}` | `{r['subject']}` | {params_cell(own_params)} | "
+                f"| `{fr.cell(str(r['where']), 44)}` | `{r['subject']}` | "
+                f"{params_cell(own_params, set(base_query(r['subject_id'], log_sources)))} | "
                 f"{open_links(r, args.host, admin)} | "
-                f"{replacement_url(r['subject_id'], own_params, pairs, slugs)} |"
+                f"{replacement_url(r['subject_id'], own_params, pairs, slugs, log_sources)} |"
             )
         out.append("")
 
