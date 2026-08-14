@@ -52,6 +52,12 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
+      total_freshwater_withdrawal:
+        title: Total freshwater withdrawal
+        unit: cubic meters
+        short_unit: m³
+        description_from_producer: |-
+          This is the sum of surface water withdrawal and groundwater withdrawal.
       total_water_withdrawal:
         title: Total water withdrawal
         unit: cubic meters

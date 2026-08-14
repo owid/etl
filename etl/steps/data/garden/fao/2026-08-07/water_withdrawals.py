@@ -15,6 +15,7 @@ VARIABLES = {
     "Industrial water withdrawal as % of total water withdrawal": "industrial_water_withdrawal_share",
     "Municipal water withdrawal": "municipal_water_withdrawal",
     "Municipal water withdrawal as % of total withdrawal": "municipal_water_withdrawal_share",
+    "Total freshwater withdrawal": "total_freshwater_withdrawal",
     "Total water withdrawal": "total_water_withdrawal",
     "Total water withdrawal per capita": "total_water_withdrawal_per_capita",
 }
@@ -27,6 +28,7 @@ UNITS_EXPECTED = {
     "Industrial water withdrawal as % of total water withdrawal": "%",
     "Municipal water withdrawal": "10^9 m3/year",
     "Municipal water withdrawal as % of total withdrawal": "%",
+    "Total freshwater withdrawal": "10^9 m3/year",
     "Total water withdrawal": "10^9 m3/year",
     "Total water withdrawal per capita": "m3/inhab/year",
 }
@@ -40,7 +42,7 @@ SHARE_COLUMNS = [
     "municipal_water_withdrawal_share",
 ]
 # Columns originally given in billions of cubic meters per year, to be converted to cubic meters per year.
-COLUMNS_TO_CONVERT = SECTORAL_COLUMNS + ["total_water_withdrawal"]
+COLUMNS_TO_CONVERT = SECTORAL_COLUMNS + ["total_water_withdrawal", "total_freshwater_withdrawal"]
 BILLION_CUBIC_METERS_TO_CUBIC_METERS = 1e9
 
 
@@ -83,6 +85,13 @@ def sanity_check_outputs(tb: Table) -> None:
     complete = tb[~mask_aggregates].dropna(subset=SECTORAL_COLUMNS + ["total_water_withdrawal"])
     ratio = complete[SECTORAL_COLUMNS].sum(axis=1) / complete["total_water_withdrawal"]
     assert ((ratio - 1).abs() < 0.02).mean() > 0.97, "Too many countries where sectors do not add up to the total."
+
+    # Freshwater withdrawal (surface + groundwater only) should be roughly bounded by total withdrawal.
+    # NOTE: FAO compiles the two series separately, and freshwater slightly exceeds total in ~10% of rows (by more
+    # than 2% in ~9%, e.g. Yemen, Malaysia, Zambia); the loose bound below only guards against unit regressions.
+    complete = tb.dropna(subset=["total_freshwater_withdrawal", "total_water_withdrawal"])
+    ratio = complete["total_freshwater_withdrawal"] / complete["total_water_withdrawal"]
+    assert (ratio < 1.05).mean() > 0.90, "Too many rows where freshwater withdrawal exceeds total withdrawal."
 
     # Anchor values, to guard against unit regressions (values as published by AQUASTAT, checked against the
     # previous version of this dataset).
