@@ -181,20 +181,30 @@ def gdoc_references(slugs: tuple[str, ...]) -> list[dict]:
     return rows
 
 
-def narrative_children(chart_ids: tuple[int, ...]) -> list[dict]:
+def query_keys(query: str) -> set[str]:
+    """The param keys in a query string, blank values included — `country=` is a key."""
+    return {key for key, _ in parse_qsl(query.lstrip("?"), keep_blank_values=True)}
+
+
+def narrative_children(query_by_parent: dict[int, str]) -> list[dict]:
     """Narrative charts parented to these charts, with the params they open their parent at.
 
     `queryParamsForParentChart` is a JSON object (not a query string) that the narrative
     chart's canonical "Explore the data" href merges over the parent slug
     (`GrapherState.canonicalUrlIfIsNarrativeChart`). Those params arrive as *incoming* params
-    on the redirect, so a stored `tab`/`time` there wins over the row's stored query.
+    on the redirect, so any of them that the row's stored query also sets wins over it.
+
+    Which keys those are is read from the parent row's own stored query, not a fixed list: a
+    log source stores a `yScale` and every other row does not, so a narrative carrying
+    `yScale: linear` overrides the redirect on the former and merely sets its own on the
+    latter. Same rule as `param_notes` applies to article links.
     """
-    if not chart_ids:
+    if not query_by_parent:
         return []
     df = OWID_ENV.read_sql(
         "SELECT id, name, parentChartId AS parent_id, queryParamsForParentChart AS params "
         "FROM narrative_charts WHERE parentChartId IN %(ids)s ORDER BY name",
-        params={"ids": chart_ids},
+        params={"ids": tuple(sorted(query_by_parent))},
     )
     rows = []
     for r in df.to_dict("records"):
@@ -202,26 +212,22 @@ def narrative_children(chart_ids: tuple[int, ...]) -> list[dict]:
             params = json.loads(r["params"] or "{}")
         except (TypeError, ValueError):
             params = {}
-        overriding = [k for k in ("tab", "time") if k in params]
+        parent_id = int(r["parent_id"])
+        overriding = sorted(set(params) & query_keys(query_by_parent[parent_id]))
         rows.append(
             {
                 "id": int(r["id"]),
                 "name": r["name"],
-                "parent_id": int(r["parent_id"]),
+                "parent_id": parent_id,
                 "params": ", ".join(f"{k}={params[k]}" for k in sorted(params)) or "(none)",
                 "note": (
                     f"opens the parent at {', '.join(overriding)} — overrides the row's stored query"
                     if overriding
-                    else "no tab/time of its own — the href will land on the scatter view"
+                    else "sets none of the params the redirect stores — the href lands on the redirect's view"
                 ),
             }
         )
     return rows
-
-
-def query_keys(query: str) -> set[str]:
-    """The param keys in a query string, blank values included — `country=` is a key."""
-    return {key for key, _ in parse_qsl(query.lstrip("?"), keep_blank_values=True)}
 
 
 def param_notes(ref: dict, stored_query: str) -> str:
@@ -591,9 +597,11 @@ def main() -> int:
     print("  aliases = old slugs of the SOURCE chart; the unpublish deletes them, so they get re-pointed too.")
 
     # ---- NARRATIVE CHARTS PARENTED TO THE OLD CHARTS ----
-    narratives = narrative_children(tuple(sorted(rec["src_id"] for rec in audited)))
+    by_id = {rec["src_id"]: rec for rec in audited}
+    # Each parent's own stored query, so the override check knows whether this row stores a
+    # `yScale` for the narrative's own to beat.
+    narratives = narrative_children({src_id: rec["query"] for src_id, rec in by_id.items()})
     if narratives:
-        by_id = {rec["src_id"]: rec for rec in audited}
         print("\nNARRATIVE CHARTS ON THE OLD CHARTS (replace, don't re-point)")
         print(f"{'name':<44} {'id':>5}  {'parent params':<30} note")
         print("-" * 150)
