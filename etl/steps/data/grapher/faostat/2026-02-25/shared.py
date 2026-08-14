@@ -13,7 +13,8 @@ VERSION = CURRENT_DIR.name
 # FAOSTAT reports the USSR as a single entity until 1991, and its fifteen successor states separately from 1992.
 # In OWID region aggregates, the USSR is counted entirely inside Europe and Upper-middle-income countries, so the
 # aggregates of continents and income groups jump abruptly between 1991 and 1992, when its area is redistributed
-# among the successor states' regions.
+# among the successor states' regions. FAOSTAT's own continental aggregates break identically (e.g. land area in
+# "Europe (FAO)" falls by the same 455 million hectares as in "Europe"), so they get the same annotation.
 # NOTE: The following fields are added in this grapher step (and not in the garden step) so that they do not propagate
 # to datasets derived from the garden dataset, where they may not apply.
 # Item codes in faostat_rl with USSR data (hence affected by this issue in their OWID region aggregates).
@@ -54,7 +55,9 @@ USSR_BREAKUP_DESCRIPTION_KEY = (
 USSR_BREAKUP_ENTITY_ANNOTATIONS = "\n".join(
     [
         "Europe: Break in 1992: the USSR's successors are split between Europe and Asia",
+        "Europe (FAO): Break in 1992: the USSR's successors are split between Europe and Asia",
         "Asia: Break in 1992: the USSR's successors are split between Europe and Asia",
+        "Asia (FAO): Break in 1992: the USSR's successors are split between Europe and Asia",
         "High-income countries: Break in 1992: the USSR's successors are split across income groups",
         "Upper-middle-income countries: Break in 1992: the USSR's successors are split across income groups",
         "Lower-middle-income countries: Break in 1992: the USSR's successors are split across income groups",
