@@ -2454,9 +2454,8 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
         ):
             # Annotate the region aggregates affected by the redistribution of the USSR among its successor states.
             tb_wide[column].display["entityAnnotationsMap"] = USSR_BREAKUP_ENTITY_ANNOTATIONS
-            tb_wide[column].metadata.description_key = (tb_wide[column].metadata.description_key or []) + [
-                USSR_BREAKUP_DESCRIPTION_KEY
-            ]
+            assert tb_wide[column].metadata.description_key is None, "Unexpected description_key; merge manually."
+            tb_wide[column].metadata.description_key = USSR_BREAKUP_DESCRIPTION_KEY
 
         # Update metadata.
         tb_wide[column].display["name"] = display_name
