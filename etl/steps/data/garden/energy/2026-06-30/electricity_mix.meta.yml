@@ -29,9 +29,6 @@ definitions:
     presentation:
       topic_tags:
         - "Energy"
-    # Use the following common processing description for all variables in this dataset (which is almost all of them), and then rewrite the ones that have a different processing description.
-    description_processing: |-
-      {definitions.description_processing_electricity_generation_origins}
 
   # Indicators produced for both the annual and the monthly table. The monthly data is Ember-only, so the
   # combined-sources processing note is cleared for it in the monthly table's own `common` block below.
@@ -632,10 +629,11 @@ tables:
   electricity_mix:
     title: Electricity mix
     common:
-      # These series come from Ember from 2000 onwards, with the Statistical Review only covering the
-      # earlier years, so the Statistical Review's notes about its own series would be inherited here as
-      # if they described the whole series.
-      description_from_producer: null
+      # Nearly every series in this table combines Ember (2000 onwards) with the Statistical Review
+      # (earlier years); the few that are sourced differently override this below. The monthly table
+      # is Ember-only, so it deliberately does not inherit this note.
+      description_processing: |-
+        {definitions.description_processing_electricity_generation_origins}
     variables:
       <<: *shared_variables
       # Overrides of the shared blocks for the annual table only: the annual bioenergy vs
@@ -711,13 +709,11 @@ tables:
         unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
         description_processing: |-
-          {definitions.common.description_processing}
+          {definitions.description_processing_electricity_generation_origins}
           - The denominator is the Statistical Review's total energy supply, so this share is only available for the countries and regions it covers.
         display:
           name: Electricity
         presentation:
           title_public: Electricity generation as a share of primary energy
   electricity_mix_monthly:
-    common:
-      description_processing: null
     variables: *shared_variables

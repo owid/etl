@@ -298,9 +298,6 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
-        # Low-carbon energy sums nuclear and renewables, whose constituents the Statistical Review
-        # describes differently, so no single one of its notes describes this indicator.
-        description_from_producer: null
         display:
           name: Low-carbon energy
         presentation:
@@ -310,9 +307,6 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
-        # Low-carbon energy sums nuclear and renewables, whose constituents the Statistical Review
-        # describes differently, so no single one of its notes describes this indicator.
-        description_from_producer: null
         display:
           name: Low-carbon energy
         presentation:
@@ -322,9 +316,6 @@ tables:
         unit: kilowatt-hours per person
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per person.
-        # Low-carbon energy sums nuclear and renewables, whose constituents the Statistical Review
-        # describes differently, so no single one of its notes describes this indicator.
-        description_from_producer: null
         display:
           name: Low-carbon energy
         presentation:
@@ -343,9 +334,6 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Measured in [terawatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply).
-        # Low-carbon energy sums nuclear and renewables, whose constituents the Statistical Review
-        # describes differently, so no single one of its notes describes this indicator.
-        description_from_producer: null
         display:
           name: Low-carbon energy
         presentation:
@@ -688,9 +676,6 @@ tables:
         unit: kilowatt-hours per dollar
         short_unit: kWh
         description_short: Measured in [kilowatt-hours](#dod:watt-hours) of [total energy supply](#dod:total-energy-supply) per international-$ of GDP.
-        # This ratio divides the Statistical Review's energy by GDP from a different producer, so the
-        # Statistical Review's description of its own energy series does not describe it.
-        description_from_producer: null
         presentation:
           title_public: '{tables.energy_mix.variables.total_energy_supply_per_gdp_kwh_per_dollar.title}'
       total_energy_supply_twh:

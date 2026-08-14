@@ -135,6 +135,7 @@ def test_dataset_schemas():
 
     validator = Draft7Validator(DATASET_SCHEMA)
     validation_errors = []
+    validated_count = 0
     active_steps = get_active_steps()
 
     # Walk over all files in STEPS_DATA_DIR with *.meta.yml extension
@@ -142,9 +143,13 @@ def test_dataset_schemas():
         if not _should_validate(meta_file_path, changed_files):
             continue
 
-        # Skip files that are not part of the active DAG (archived steps)
+        # Skip files that are not part of the active DAG (archived steps). Match the whole step
+        # path: a prefix test against the version directory would also accept archived datasets
+        # that share it with an active one (`garden/covid/latest/ecdc` next to the active
+        # `garden/covid/latest/cases_deaths`). The `/` form covers steps whose files live in
+        # their own directory, e.g. `garden/owid/latest/key_indicators/key_indicators.meta.yml`.
         rel = str(meta_file_path.relative_to(STEPS_DATA_DIR)).rsplit(".meta.yml", 1)[0]
-        if not any(s.startswith(rel) for s in active_steps):
+        if not any(rel == step or rel.startswith(step + "/") for step in active_steps):
             continue
 
         # extract version from path
@@ -192,10 +197,20 @@ def test_dataset_schemas():
                     _strip_jinja_templated_values(gc)
 
         # Validate the loaded data against the schema
+        validated_count += 1
         try:
             validator.validate(data)
         except ValidationError as e:
             validation_errors.append((meta_file_path, e))
+
+    # A full scan must reach the validator, otherwise a broken filter makes this test a no-op that
+    # passes for three months (#6572). The branch fast path is exempt: a PR may legitimately touch
+    # only files that every other filter then skips.
+    if changed_files is None:
+        assert validated_count > 0, (
+            "test_dataset_schemas validated 0 files on a full scan — the active-DAG filter is "
+            "skipping everything, so this test is not checking any metadata."
+        )
 
     # If there are validation errors, log summary and raise the first one
     if validation_errors:

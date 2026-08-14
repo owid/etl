@@ -813,6 +813,12 @@ def run() -> None:
 
     combined = combined.format(sort_columns=True, short_name=paths.short_name)
 
+    # These series come from Ember from 2000 onwards, with the Statistical Review only covering the
+    # earlier years, so the Statistical Review's notes about its own series must not be inherited
+    # here as if they described the whole series.
+    for column in combined.columns:
+        combined[column].m.description_from_producer = None
+
     # Build the Ember-only monthly table (a parallel frequency; the annual data above is untouched).
     tb_monthly = build_monthly_electricity_mix()
 
