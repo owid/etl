@@ -242,14 +242,18 @@ means UNKNOWN, not "nothing references it".
   `site/multiDim/MultiDim.tsx` and `MultiDimDataPageContent.tsx`. The POST route does
   accept `{"type": "chart", "parentChartId": …}`, so for a chart parent the API is the
   only path — there is no click-path to it at all.
-- **A chart redirect's `target_query_param` loses to *any* incoming query string.**
-  Not key-by-key: the incoming query **replaces** it wholesale, so the target's params
-  reach only requests that arrive bare. Verified on production 2026-08-14 —
-  `global-forestry-area-1958-2014` → `forest-area-km?tab=line` sends
-  `?tab=map&country=~FRA` on to `?tab=map&country=%7EFRA`, with `tab=line` gone, while
-  a bare request gets `?tab=line`. Do not generalize from
-  `functions/_common/redirectTools.ts`: its *explorer* path does the opposite
-  (`params.set` per key, target wins), and reading it is what produces the wrong model.
+- **A chart redirect's `target_query_param` merges with the incoming query key by key,
+  the incoming side winning per key.** A reference's params cost the reader exactly the
+  stored keys they collide with. Verified on production 2026-08-14 with a distinguishing
+  pair — `global-forestry-area-1958-2014` → `forest-area-km?tab=line` sends a bare
+  `?country=~FRA` on to `?tab=line&country=%7EFRA` (stored `tab=line` SURVIVES), and
+  `?tab=map&country=~FRA` on to `?tab=map&country=%7EFRA` (incoming `tab` wins). A test
+  whose query sets every stored key cannot tell merge from wholesale replacement — an
+  earlier version of this note concluded "wholesale" from exactly that. Staging's serving
+  layer behaves differently (stored query wins, visitor params dropped), and a fresh row's
+  first-week static 302 is unverified. Do not generalize from
+  `functions/_common/redirectTools.ts`: its *explorer* path also merges per key but with
+  the TARGET winning — the opposite winner, and a different code path.
   MDIM dimension collisions are the same question — compare each reference's
   `query_string` against the target's dimension slugs — but the answer is stronger than
   "the reference overrides that one key": it discards the target's whole query.

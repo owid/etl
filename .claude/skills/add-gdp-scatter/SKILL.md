@@ -332,23 +332,24 @@ Those aids are the difference between a row someone can fix and a row that names
 
 Read the flag from the **source**, never the target: the target's `yAxis.scaleType` is deliberately left linear, so it cannot tell you what the retiring chart looked like. Because the param is per-row, the ⚠️ collision check is against *that row's* proposal rather than a shared constant — so a reference's own `yScale=linear` is an override on a log row and merely its own setting everywhere else. (2026-08-14, batch 1: 3 of 14 sources were log — 6045, 663, 3740 — and one article link on 663 already carried `yScale=linear`, which wins and is flagged.)
 
-**The Part 2 redirect carries it too**, so the two paths agree *for a bare slug*: a reader arriving at a retired slug with no query string gets the same log scatter as someone following a hand-updated article link. (With a query string they get neither — see the next section.) `chart_slug_redirects.target_query_param` is per-row, so `redirect_to_scatter.py` appends `yScale=log` to that row's stored query — the one part of `TARGET_QUERY` that varies by row. Everything Part 2 prints about that row quotes the same per-row query rather than the constant: the collision grading, and the narrative-chart "reproduce this view" URL (so a replacement built for a log source keeps the log axis).
+**The Part 2 redirect carries it too**, so the two paths agree *for a bare slug*: a reader arriving at a retired slug with no query string gets the same log scatter as someone following a hand-updated article link. (A query string keeps every stored key it doesn't override — see the next section.) `chart_slug_redirects.target_query_param` is per-row, so `redirect_to_scatter.py` appends `yScale=log` to that row's stored query — the one part of `TARGET_QUERY` that varies by row. Everything Part 2 prints about that row quotes the same per-row query rather than the constant: the collision grading, and the narrative-chart "reproduce this view" URL (so a replacement built for a log source keeps the log axis).
 
-### A reference's own params defeat the redirect entirely
+### A reference's own params override the redirect's, key by key
 
-Not key-by-key — **wholesale**. The incoming query string replaces `target_query_param`; it does not merge with it. Verified on production against a live redirect that carries one (2026-08-14, `global-forestry-area-1958-2014` → `forest-area-km?tab=line`):
+The production redirect **MERGES** the visitor's query over `target_query_param`, the visitor winning per key. Establishing this needs a *distinguishing* pair: a test whose query sets a stored key (`?tab=map` against stored `tab=line`) produces the same URL under merge and under wholesale replacement, and this section shipped a wrong "wholesale" conclusion for a day on exactly that evidence. The case that separates the models is a query that does NOT mention a stored key (production, 2026-08-14, `global-forestry-area-1958-2014` → `forest-area-km?tab=line`):
 
 ```
-?tab=map&country=~FRA  ->  /grapher/forest-area-km?tab=map&country=%7EFRA   (tab=line GONE)
+?country=~FRA          ->  /grapher/forest-area-km?tab=line&country=%7EFRA   (tab=line SURVIVES)
+?tab=map&country=~FRA  ->  /grapher/forest-area-km?tab=map&country=%7EFRA   (incoming tab wins)
 (no query string)      ->  /grapher/forest-area-km?tab=line
 ```
 
-Consequences to carry into every report, because the intuitive model — "the retirement's params apply, except where the reference overrides a key" — is wrong in the direction that flatters the migration:
+Consequences to carry into every report:
 
-- `tab=scatter&time=latest&country=` reaches **only** readers who arrive with no query string at all. Every other arrival lands on the target's **default view**.
-- So a reference carrying even a harmless-looking `country=~FRA` loses the scatter, not just the `country` pin. `params_cell` therefore grades two ways — 🔴 for params that also *contradict* the retirement's keys, ⚠️ for params that merely erase them — and never prints a bare "fine" for a non-empty query string.
-- This is also why hand-updating a link is worth doing even though "the 301 covers it": the 301 covers the *slug*, not the *view*.
-- Re-verify this if grapher changes how chart redirects are baked. The behavior lives in the baked redirect layer, not in `functions/_common/redirectTools.ts` — that file's explorer path does the opposite (`params.set` per key, target wins), so reading it is what produces the wrong mental model.
+- A reference's params cost the reader exactly the stored keys they collide with: a link carrying only `country=~FRA` keeps `tab=scatter&time=latest` (and a log row's `yScale=log`) and just pins the country. `params_cell` flags ⚠️ with the overridden keys and prints a non-colliding query as fine.
+- Hand-updating a link still matters when its params override `tab` or `time` — those land the reader off the scatter view.
+- This describes the PRODUCTION 404→301 function. Two other layers behave differently: **staging's** serving layer answers with the stored query and drops the visitor's params entirely (batch-1 staging apply, 2026-08-14), so staging cannot validate this section; and a fresh row's first-week static **302** (`_redirects`) is unverified either way — spot-check it right after a production apply.
+- Re-verify with a distinguishing pair (a query that *omits* a stored key) if grapher changes how chart redirects are baked or served. `functions/_common/redirectTools.ts`'s explorer path also merges per key but with the TARGET winning — a different code path; don't generalize from it in either direction.
 
 Both consumers get the log set from **`apply_scatter_defaults.log_y_axis_sources`**, which owns the reversed-source exclusion — do not re-derive it. A reversed source (GDP on its `y`) must be **excluded**: its `scaleType` describes the *GDP* axis, while the target's `y` is the non-GDP indicator, so proposing log there would make the wrong axis logarithmic. That is the same reason `process_row` skips its y-oriented mirrors for a reversed source, and getting it right in one script while forgetting it in another is exactly how this went wrong once.
 
@@ -374,7 +375,7 @@ This is the concrete reason step 11 says not to trust a quiet Part 2 audit: on 2
 
 **They do not block the retirement.** A narrative chart parented to a chart owns a materialized full config and renders from it, so unpublishing the parent leaves it intact (`isPublished` is in `NARRATIVE_CHART_PROPS_TO_OMIT`). Its only use of the parent slug is the "Explore the data" href, which `GrapherState.canonicalUrlIfIsNarrativeChart` builds as `/grapher/<parent-slug>` + `queryParamsForParentChart`, and the redirect resolves that slug. `narrativeCharts` is therefore counted but deliberately **not** part of the `MANUAL` gate.
 
-What the redirect does **not** do is deliver the scatter to it, and the reason generalizes past narrative charts — see "A reference's own params defeat the redirect entirely" below. A narrative chart always has params, so its "Explore the data" link always lands on the target's default view.
+What the redirect does **not** guarantee is delivering the scatter to it — see "A reference's own params override the redirect's, key by key" below. A narrative chart always has params, and they routinely include `tab` (its own view's tab), which overrides the stored `tab=scatter`; stored keys its params don't mention survive the hop.
 
 **Do not tell anyone to use the chart's "Create narrative chart" control — a plain chart has no such control.** An earlier version of this skill did, and it is wrong in a way that is easy to believe because MDIMs *do* have it:
 

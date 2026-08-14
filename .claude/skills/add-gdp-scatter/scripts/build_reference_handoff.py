@@ -173,24 +173,31 @@ def base_query(src_id: int, log_sources: set[int]) -> dict[str, str]:
 
 
 def params_cell(own_params: str, base_keys: set[str]) -> str:
-    """The reference's own params, flagged because they defeat the redirect entirely.
+    """The reference's own params, graded by which of the row's proposed keys they override.
 
-    Verified against a live redirect that carries `target_query_param` — production, 2026-08-14,
-    `global-forestry-area-1958-2014` → `forest-area-km?tab=line`:
+    The production redirect MERGES the visitor's query over the stored one, key by key, the
+    visitor winning per key. Established with a distinguishing pair against a live redirect
+    that carries `target_query_param` — production, 2026-08-14, `global-forestry-area-1958-2014`
+    → `forest-area-km?tab=line`:
 
+        ?country=~FRA          ->  /grapher/forest-area-km?tab=line&country=%7EFRA
         ?tab=map&country=~FRA  ->  /grapher/forest-area-km?tab=map&country=%7EFRA
         (no query string)      ->  /grapher/forest-area-km?tab=line
 
-    The incoming query string **replaces** `target_query_param` wholesale; it is not merged
-    key-by-key. So `target_query_param` only ever reaches a request that arrives with no query
-    string at all, and ANY params on a reference — not just ones colliding with `tab`/`time`/
-    `country` — mean the reader lands on the target's default view with the reference's own
-    params and none of the retirement's. Flagging only key collisions would read as "the rest
-    are fine", which is the opposite of what happens.
+    The first case is the one that separates the models: the stored `tab=line` SURVIVES a query
+    that does not mention `tab`. An earlier version of this docstring concluded wholesale
+    replacement from the second case alone — which cannot distinguish replace from merge, since
+    `tab` appears on both sides. So a reference's params cost the reader exactly the stored keys
+    they collide with, and non-colliding params ride along with the scatter view intact.
 
-    `base_keys` still distinguishes the two grades: a collision is wrong twice over (the param
-    is both lost and contradicted), while a non-colliding param is merely lost. It is this row's
-    proposal rather than the shared constant, because `yScale` is only proposed for a log source.
+    Two serving-layer caveats bound where this grading applies. It describes the durable
+    404→301 function on PRODUCTION. Staging's redirect (batch-1 staging apply, 2026-08-14)
+    answers with the stored query and drops the visitor's params entirely, so staging cannot
+    validate it. And a fresh row's first-week static 302 (`_redirects`) is unverified either
+    way — spot-check it right after a production apply.
+
+    `base_keys` is this row's proposal rather than the shared constant, because `yScale` is
+    only proposed for a log source.
     """
     query = (own_params or "").lstrip("?")
     if not query:
@@ -198,8 +205,8 @@ def params_cell(own_params: str, base_keys: set[str]) -> str:
     shown = f"`{fr.cell(query, 40)}`"
     clashing = sorted({key for key, _ in parse_qsl(query, keep_blank_values=True)} & base_keys)
     if clashing:
-        return f"🔴 {shown} — kills the redirect's params, and contradicts {', '.join(clashing)}"
-    return f"⚠️ {shown} — kills the redirect's params"
+        return f"⚠️ {shown} — overrides {', '.join(clashing)}"
+    return f"{shown} — merges in; the proposed view survives"
 
 
 def page_link(r: dict, host: str, admin: str) -> str:
@@ -303,7 +310,7 @@ def narrative_chart_mechanism() -> list[str]:
         "",
         "- **Plain chart (every target here):** a chart page has no \"Create narrative chart\" "
         "control — ask a developer to create it via the API, or leave the old one in place "
-        "(only its \"Explore the data\" link degrades to the target's default view).",
+        "(only the stored keys its \"Explore the data\" params override are lost on that hop).",
         "- **MDIM:** create it yourself, from the \"Create narrative chart\" control on the "
         "target view.",
     ]
@@ -359,12 +366,11 @@ def main() -> int:
         (
             "🟡 Links — the 301 keeps them working, but not necessarily on the scatter",
             "link",
-            "None of these break. But a link carrying **any** query string loses the redirect's "
-            "`tab=scatter&time=latest&country=` completely — the incoming query replaces "
-            "`target_query_param` rather than merging with it (verified on production; see the "
-            "Its-params column) — so those readers land on the target's default view, not the "
-            "scatter this retirement moved them to. Only a param-less link inherits the scatter. "
-            "Update the href and the question goes away, along with a hop nobody will remember.",
+            "None of these break. The redirect merges a link's own query over its stored "
+            "`tab=scatter&time=latest&country=` key by key, the link winning per key (see the "
+            "Its-params column) — so a link keeps the scatter unless its params override `tab` "
+            "or `time`. The ⚠️ rows are the ones that do. Update the href and the question goes "
+            "away, along with a hop nobody will remember.",
         ),
     ]:
         # Google Doc surfaces only: the shared formatters read `surface_id` AS a Doc id, and

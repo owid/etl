@@ -17,10 +17,12 @@ Mechanism notes:
   every bail-out rolls the row back: a row touched in the last week is ALSO written into
   `_redirects` as an unconditional 302 to defeat the CDN cache, so a fresh row on a slug whose
   chart is still published does fire.
-- The stored params reach ONLY visitors arriving with no query string of their own: an incoming
-  query REPLACES `target_query_param` wholesale, it is not merged key by key (verified on
-  production; see `build_reference_handoff.params_cell` for the transcript). The audits below
-  grade every reference that carries params accordingly.
+- On production the redirect MERGES an incoming query over `target_query_param` key by key,
+  the incoming side winning per key (distinguishing transcript in
+  `build_reference_handoff.params_cell`), so a reference's params cost the reader exactly the
+  stored keys they collide with. Staging's serving layer instead answers with the stored query
+  and drops the visitor's params, and a fresh row's first-week static 302 is unverified — the
+  audits below grade by the production 301 behavior.
 - `chart_slug_redirects` is per-environment and does NOT sync to production, so prod is a
   separate `--apply --allow-production` run once the scatter views ship there.
 """
@@ -194,16 +196,15 @@ def narrative_children(query_by_parent: dict[int, str]) -> list[dict]:
 
     `queryParamsForParentChart` is a JSON object (not a query string) that the narrative
     chart's canonical "Explore the data" href appends to the parent slug
-    (`GrapherState.canonicalUrlIfIsNarrativeChart`). Those params arrive as the *entire*
-    incoming query on the redirect, which replaces the row's stored query wholesale — so ANY
-    non-empty params object drops the scatter/time/country settings, not only one that sets
-    the same keys.
+    (`GrapherState.canonicalUrlIfIsNarrativeChart`). On production the redirect merges those
+    params over the row's stored query KEY BY KEY, the incoming side winning per key (see
+    `build_reference_handoff.params_cell` for the distinguishing transcript) — so the href
+    costs the reader exactly the stored keys the narrative's params collide with, and keys
+    the params don't mention (e.g. a stored `yScale=log`) survive the hop.
 
-    The parent row's own stored query is still consulted, but only to grade the note: a
-    narrative whose params also set a stored key (e.g. `yScale: linear` under a log source)
-    contradicts the retirement on top of erasing it. Read per-row rather than from a fixed
-    list because only a log source stores a `yScale`. Same grading as `param_notes` applies
-    to article links.
+    The intersection with the parent row's own stored query is therefore the whole note: it is
+    read per-row rather than from a fixed list because only a log source stores a `yScale`.
+    Same grading as `param_notes` applies to article links.
     """
     if not query_by_parent:
         return []
@@ -223,9 +224,9 @@ def narrative_children(query_by_parent: dict[int, str]) -> list[dict]:
         if not params:
             note = "no params of its own — the href lands on the redirect's view"
         elif contradicting:
-            note = f"its params kill the row's stored query, and contradict {', '.join(contradicting)}"
+            note = f"its params override {', '.join(contradicting)} in the row's stored query"
         else:
-            note = "its params kill the row's stored query — the href drops the scatter view"
+            note = "its params merge over the stored query without touching it — the href keeps the redirect's view"
         rows.append(
             {
                 "id": int(r["id"]),
@@ -239,16 +240,15 @@ def narrative_children(query_by_parent: dict[int, str]) -> list[dict]:
 
 
 def param_notes(ref: dict, stored_query: str) -> str:
-    """Why a given article reference won't land on the scatter view unaided.
+    """Which parts of the stored query a given article reference's own params override.
 
-    ANY non-empty query on the reference defeats the redirect's stored query wholesale — the
-    incoming string replaces `target_query_param`, it is not merged key by key (verified on
-    production; see `build_reference_handoff.params_cell` for the transcript). So every
-    reference carrying params is reported. The intersection with `stored_query` — the query
-    THIS row stores, because only a log source stores a `yScale` — only grades the note: a
-    colliding param is wrong twice over (the stored value is both lost and contradicted),
-    while a non-colliding one merely erases the stored query. Same grading as the handoff
-    report's 🔴/⚠️.
+    On production the redirect merges the incoming query over `target_query_param` key by key,
+    the incoming side winning per key (see `build_reference_handoff.params_cell` for the
+    distinguishing transcript — an earlier version of this audit concluded wholesale
+    replacement from a test that could not tell the two models apart). So only collisions with
+    `stored_query` — the query THIS row stores, because only a log source stores a `yScale` —
+    cost the reader anything; non-colliding params ride along with the stored view intact.
+    Same grading as the handoff report's ⚠️.
     """
     notes = []
     if ref["kind"] == "embed":
@@ -259,9 +259,7 @@ def param_notes(ref: dict, stored_query: str) -> str:
     if keys:
         contradicting = sorted(keys & query_keys(stored_query))
         if contradicting:
-            notes.append(f"link's own params kill {stored_query}, and contradict {', '.join(contradicting)}")
-        else:
-            notes.append(f"link's own params kill {stored_query}")
+            notes.append(f"link's own params override {', '.join(contradicting)} in {stored_query}")
     return "; ".join(notes)
 
 
@@ -638,8 +636,8 @@ def main() -> int:
             print("      no rename.")
         print("\n  Every target here is a plain chart, and a chart page has no 'Create narrative chart' control")
         print("  (it exists only on MDIM views), so creating the replacement is not a UI task. Same options as")
-        print("  the handoff: leave the old one in place (it keeps rendering; only its 'Explore the data' link")
-        print("  degrades to the target's default view), ask a developer to create it via the API, or wait for")
+        print("  the handoff: leave the old one in place (it keeps rendering; its 'Explore the data' link")
+        print("  loses only the stored keys its params override), ask a developer to create it via the API, or wait for")
         print("  the target to become an MDIM. SKILL.md 'Narrative charts' has the mechanism and citations.")
 
     # ---- ARTICLE LINKS THAT WON'T LAND ON THE SCATTER ----
@@ -663,7 +661,7 @@ def main() -> int:
             print(f"{r['slug']:<48} {r['post']:<40} {r['kind']:<6} {r['query'][:28]:<28} {note}")
         print("\n  The redirect fires for readers, but these surfaces need editing: a gdoc embed resolves to")
         print("  the target chart and renders its DEFAULT tab (the target query param never reaches it), and")
-        print("  a link's own params — ANY params — replace the stored query wholesale, dropping the scatter view.")
+        print("  a link's own params override the stored keys they collide with (non-colliding params merge in).")
 
     # ---- PLAN / ACTIONS ----
     print(f"\n{'REDIRECT ACTIONS' if args.apply else 'PLAN (what --apply would do)'}")
