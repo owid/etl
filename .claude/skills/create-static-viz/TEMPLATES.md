@@ -58,14 +58,20 @@ chart side, so every slot y above is unchanged and the visual chart area is stil
 ### Vertical — 850 × 1095
 
 Same slots, widths, and auto-layout wrappers as Horizontal. Header block `5332:94` is
-0→116; footer block `5332:101` starts at 997. Absolute y: title 16, subtitle 82, chart area
-116 → 997, `Note:` 1013, `Data source:` 1046, tagline/license 1066.
+0→136; footer block `5332:101` starts at 997. Absolute y: title 16, subtitle 82, chart area
+136 → 997, `Note:` 1013, `Data source:` 1046, tagline/license 1066.
+
+Its subtitle became **two lines at 16 px** on 2026-08-14, where it had been one line at 15 px —
+which is what moved the header block from 0→116 to 0→136, so a stale 116 now lands inside the
+header rather than below it. Both desktop templates now carry the same subtitle style. Their
+titles still differ: 29 px line height on Horizontal against 30 px here, so 58 px against 60 px,
+which is the whole of the 134 vs 136 difference between the two header blocks.
 
 ### Mobile — 540 × 540 (example 1) and 540 × 824 (example 2)
 
 | Slot | y (540×540) | y (540×824) | Width |
 |---|---|---|---|
-| Title | 16 | 16 | 428 (**two lines**; logo sits beside it at x=444) |
+| Title | 16 | 16 | 428 (**two lines**; logo sits beside it at x=460) |
 | Subtitle | 80 | 80 | 508 |
 | *chart area* | *118 → 486* | *118 → 770* | 508 |
 | `Data source:` | 486 | 770 | 508 |
