@@ -2,11 +2,6 @@ definitions:
   # The long-run World series, which applies to every indicator in this dataset.
   description_processing_smil_world: |-
     - For the World, data before 1965 (going back to 1800) comes from Vaclav Smil's historical estimates (2017).
-  # Only for indicators whose subject is the total: the total itself, and the shares measured against it.
-  # It says nothing about a single source, so it must not go in the common block (on a chart that stacks
-  # traditional biomass next to the other sources, it reads as if biomass had been left out).
-  description_processing_biomass_excluded: |-
-    - The Statistical Review of World Energy does not include data on traditional biomass, so it is not part of total energy supply. We report traditional biomass separately.
   # The traditional biomass series itself, which is only reported for the World.
   description_processing_traditional_biomass: |-
     - Traditional biomass comes from Vaclav Smil's historical estimates (2017), which cover the World only.
@@ -94,9 +89,6 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
-        description_processing: |-
-          {definitions.description_processing_smil_world}
-          {definitions.description_processing_biomass_excluded}
         display:
           name: Biofuels
         presentation:
@@ -154,9 +146,6 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
-        description_processing: |-
-          {definitions.description_processing_smil_world}
-          {definitions.description_processing_biomass_excluded}
         display:
           name: Coal
         presentation:
@@ -202,9 +191,6 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
-        description_processing: |-
-          {definitions.description_processing_smil_world}
-          {definitions.description_processing_biomass_excluded}
         display:
           name: Fossil fuels
         presentation:
@@ -262,9 +248,6 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
-        description_processing: |-
-          {definitions.description_processing_smil_world}
-          {definitions.description_processing_biomass_excluded}
         display:
           name: Gas
         presentation:
@@ -322,9 +305,6 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
-        description_processing: |-
-          {definitions.description_processing_smil_world}
-          {definitions.description_processing_biomass_excluded}
         display:
           name: Hydropower
         presentation:
@@ -370,9 +350,6 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
-        description_processing: |-
-          {definitions.description_processing_smil_world}
-          {definitions.description_processing_biomass_excluded}
         display:
           name: Low-carbon energy
         presentation:
@@ -430,9 +407,6 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
-        description_processing: |-
-          {definitions.description_processing_smil_world}
-          {definitions.description_processing_biomass_excluded}
         display:
           name: Nuclear
         presentation:
@@ -490,9 +464,6 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
-        description_processing: |-
-          {definitions.description_processing_smil_world}
-          {definitions.description_processing_biomass_excluded}
         display:
           name: Oil
         presentation:
@@ -550,9 +521,6 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
-        description_processing: |-
-          {definitions.description_processing_smil_world}
-          {definitions.description_processing_biomass_excluded}
         display:
           name: Other renewables
         presentation:
@@ -598,9 +566,6 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
-        description_processing: |-
-          {definitions.description_processing_smil_world}
-          {definitions.description_processing_biomass_excluded}
         display:
           name: Renewables
         presentation:
@@ -646,9 +611,6 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
-        description_processing: |-
-          {definitions.description_processing_smil_world}
-          {definitions.description_processing_biomass_excluded}
         display:
           name: Solar and wind
         presentation:
@@ -706,9 +668,6 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
-        description_processing: |-
-          {definitions.description_processing_smil_world}
-          {definitions.description_processing_biomass_excluded}
         display:
           name: Solar
         presentation:
@@ -730,7 +689,6 @@ tables:
         description_processing: |-
           {definitions.description_processing_eia}
           {definitions.description_processing_smil_world}
-          {definitions.description_processing_biomass_excluded}
         display:
           name: Total energy supply
         presentation:
@@ -743,7 +701,6 @@ tables:
         description_processing: |-
           {definitions.description_processing_eia}
           {definitions.description_processing_smil_world}
-          {definitions.description_processing_biomass_excluded}
         display:
           name: Total energy supply
         presentation:
@@ -756,7 +713,6 @@ tables:
         description_processing: |-
           {definitions.description_processing_eia}
           {definitions.description_processing_smil_world}
-          {definitions.description_processing_biomass_excluded}
         display:
           name: Total energy supply
         presentation:
@@ -769,7 +725,6 @@ tables:
         description_processing: |-
           {definitions.description_processing_eia}
           {definitions.description_processing_smil_world}
-          {definitions.description_processing_biomass_excluded}
         presentation:
           title_public: '{tables.energy_mix.variables.total_energy_supply_per_gdp_kwh_per_dollar.title}'
       total_energy_supply_twh:
@@ -780,7 +735,6 @@ tables:
         description_processing: |-
           {definitions.description_processing_eia}
           {definitions.description_processing_smil_world}
-          {definitions.description_processing_biomass_excluded}
         display:
           name: Total energy supply
         presentation:
@@ -844,9 +798,6 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: Measured as a percentage of [total energy supply](#dod:total-energy-supply).
-        description_processing: |-
-          {definitions.description_processing_smil_world}
-          {definitions.description_processing_biomass_excluded}
         display:
           name: Wind
         presentation:
