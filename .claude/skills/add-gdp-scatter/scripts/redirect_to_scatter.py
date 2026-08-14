@@ -547,10 +547,20 @@ def verify_redirects(plan: list[dict]) -> int:
     all under the same invariant. Location is compared parsed (path + key/value pairs), never
     as a string, so percent-encoding and key order cannot produce false mismatches.
 
-    Grades: OK (30x to the expected view), NOT_LIVE (200 — the CDN still serves the cached
-    chart page; bake or purge pending), NOT_SERVED (404 — the row exists in the DB but nothing
-    serves it yet), MISMATCH (30x somewhere else; shown). Exits 1 unless every row is OK, so
-    the report is re-runnable until the bake lands and a wrapper can gate on it.
+    The DB rows alone are the batch as the DB currently HOLDS it, not as PLANNED: a planned
+    redirect that was deleted, or never created, is simply absent from the query, so a report
+    built on the rows alone would certify whatever is left — `0/0 OK` in the worst case, or
+    only the target's pre-existing aliases. The plan is the other half of the gate. build_plan
+    just re-graded every payload row against the live DB, and a completed batch leaves each one
+    at EXISTS (the planned row, storing the planned query); any other status fails the report
+    as NOT_APPLIED and names its own reason — CREATE/UPDATE: the row is missing or stores a
+    stale query; BLOCKED/CONFLICT/CHAINED/SKIPPED/ERROR: the apply never covered the row.
+
+    Grades: OK (30x to the expected view), NOT_APPLIED (a payload row the DB does not hold as
+    planned), NOT_LIVE (200 — the CDN still serves the cached chart page; bake or purge
+    pending), NOT_SERVED (404 — the row exists in the DB but nothing serves it yet), MISMATCH
+    (30x somewhere else; shown). Exits 1 unless every row is OK, so the report is re-runnable
+    until the bake lands and a wrapper can gate on it.
     """
     tgt_by_id = {rec["tgt_id"]: rec["tgt"] for rec in plan if rec.get("tgt_id")}
     if not tgt_by_id:
@@ -560,11 +570,17 @@ def verify_redirects(plan: list[dict]) -> int:
         "SELECT slug, chart_id, target_query_param FROM chart_slug_redirects WHERE chart_id IN %(ids)s",
         params={"ids": tuple(sorted(tgt_by_id))},
     )
+    in_db = {str(r["slug"]) for r in df.to_dict("records")}
+    unmet = [rec for rec in plan if rec.get("status") != "EXISTS" or rec["src"] not in in_db]
     site = OWID_ENV.site.rstrip("/")
     print(f"\nREDIRECT VERIFICATION against {site} ({len(df)} redirect row(s) on {len(tgt_by_id)} target(s))")
     print(f"{'slug':<72} {'grade':<11} note")
     print("-" * 165)
     failures = 0
+    for rec in unmet:
+        failures += 1
+        why = f"plan row at {rec['status'] or 'UNRESOLVED'}" + (f" ({rec['note']})" if rec.get("note") else "")
+        print(f"{rec['src']:<72} {'NOT_APPLIED':<11} {why} — the DB does not hold this planned redirect")
     for r in sorted(df.to_dict("records"), key=lambda r: str(r["slug"])):
         tgt_slug = tgt_by_id[int(r["chart_id"])]
         stored = r["target_query_param"] or ""
@@ -593,7 +609,8 @@ def verify_redirects(plan: list[dict]) -> int:
         else:
             failures += 1
             print(f"{r['slug']:<72} {'HTTP ' + str(resp.status_code):<11} unexpected answer")
-    print(f"\n{len(df) - failures}/{len(df)} OK" + (f" — {failures} not verified; re-run once the bake lands" if failures else " — every redirect serves its target"))
+    total = len(df) + len(unmet)
+    print(f"\n{total - failures}/{total} OK" + (f" — {failures} not verified; re-run once the bake lands" if failures else " — every redirect serves its target"))
     return 1 if failures else 0
 
 
