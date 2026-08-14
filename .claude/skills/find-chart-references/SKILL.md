@@ -130,9 +130,14 @@ references written before a rename point at the old one):
 | articles | `posts_gdocs_links` (`grapher`, `guided-chart`) + `linkType='url'` scan | `embed` or `link` by `componentType` |
 | explorers | `explorer_charts` (by chart id) | `embed` |
 | narrative charts | `narrative_charts.parentChartId` | `link` (renders its own config) |
+| ↳ its placements | `posts_gdocs_links` where `linkType='narrative-chart'`, `target` = the name | `embed`, surface `gdoc (narrative chart)` |
 | data insights | `posts_gdocs.content->>'$."grapher-url"'` | `embed` |
 | static viz | `static_viz.grapherSlug` | `embed` |
 | key charts | `chart_tags` where `keyChartLevel > 0` | `render` |
+
+**Narrative charts get a second hop, always** (`sweep_articles_placing_narrative_charts`, run over the findings after every sweep — it needs no `--transitive`). A narrative chart is not itself in an article; articles place it **by name** in a `{.narrative-chart}` block. So a narrative-chart row alone says what has to change and not where the change lands, and every fix for one includes an article edit. Same table and column the admin's own references endpoint reads (`getNarrativeChartReferences` → `getPublishedLinksTo(…, ContentGraphLinkType.NarrativeChart)`), with one deliberate difference: unpublished drafts are **kept**, because a draft referencing the name is exactly what surprises you at delete time. `published` rides along so a consumer can rank it below the live ones.
+
+The placement rows carry the narrative chart as `subject` (not the chart that reached it), because `find_in_doc` falls through to `subject` when there is no anchor text — and the name is precisely what the ArchieML block spells out, so the search string comes out right for free. `text` is forced empty for the same reason.
 
 WordPress (`posts` / `posts_links`) is **not** swept, and adding it back would be a
 regression. Every published post there that links a chart 404s on the live site, and none
@@ -225,14 +230,33 @@ means UNKNOWN, not "nothing references it".
   `link`, not an `embed`, and a redirect covers it — don't gate a migration on it.
   Do check the href's query params, which ride along to the target.
   There is still **no API to repoint a narrative chart**
-  (`parentChartId`/`parentMultiDimXChartConfigId` are written only at creation), so
-  the *parent pointer* stays stale. That matters for a narrative chart pinned to an
-  **MDIM view** — that one is a genuine `embed`, and it can block the MDIM's next
-  re-publish via an unguarded FK.
-- **Query-param collisions matter for redirects.** Grapher merges the incoming
-  URL's params *over* the redirect target's, so a link carrying `?metric=…` will
-  override an MDIM dimension of the same name. If you build replacement URLs,
-  compare each reference's `query_string` against the target's dimension slugs.
+  (`parentChartId`/`parentMultiDimXChartConfigId` are written only at creation —
+  `updateNarrativeChart` reads both off the existing row), so the *parent pointer*
+  stays stale. That matters for a narrative chart pinned to an **MDIM view** — that
+  one is a genuine `embed`, and it can block the MDIM's next re-publish via an
+  unguarded FK.
+- **Only an MDIM can spawn a narrative chart through the UI.** Never tell anyone to
+  use a chart's "Create narrative chart" control: `CreateNarrativeChartEditorPage`
+  returns `NotFoundPage` unless `type === "multiDim"`, and the site-side affordance
+  is gated on `manager.adminCreateNarrativeChartPath`, set only by
+  `site/multiDim/MultiDim.tsx` and `MultiDimDataPageContent.tsx`. The POST route does
+  accept `{"type": "chart", "parentChartId": …}`, so for a chart parent the API is the
+  only path — there is no click-path to it at all.
+- **A chart redirect's `target_query_param` merges with the incoming query key by key,
+  the incoming side winning per key.** A reference's params cost the reader exactly the
+  stored keys they collide with. Verified on production 2026-08-14 with a distinguishing
+  pair — `global-forestry-area-1958-2014` → `forest-area-km?tab=line` sends a bare
+  `?country=~FRA` on to `?tab=line&country=%7EFRA` (stored `tab=line` SURVIVES), and
+  `?tab=map&country=~FRA` on to `?tab=map&country=%7EFRA` (incoming `tab` wins). A test
+  whose query sets every stored key cannot tell merge from wholesale replacement — an
+  earlier version of this note concluded "wholesale" from exactly that. Staging's serving
+  layer behaves differently (stored query wins, visitor params dropped), and a fresh row's
+  first-week static 302 is unverified. Do not generalize from
+  `functions/_common/redirectTools.ts`: its *explorer* path also merges per key but with
+  the TARGET winning — the opposite winner, and a different code path.
+  MDIM dimension collisions are the same question — compare each reference's
+  `query_string` against the target's dimension slugs — but the answer is stronger than
+  "the reference overrides that one key": it discards the target's whole query.
 - **Cost control**: keep sweeps subject-scoped rather than site-wide, prefer the
   aggregate counts this script already returns over per-view rows, and treat a
   failed lookup as *unknown*, never as *none*.

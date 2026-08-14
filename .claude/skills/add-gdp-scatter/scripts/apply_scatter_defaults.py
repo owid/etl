@@ -27,6 +27,7 @@ overrides.
 import json
 import re
 import sys
+from collections.abc import Iterable
 from typing import Any
 
 from apps.chart_sync.admin_api import AdminAPI
@@ -217,6 +218,38 @@ def is_x_independent_line(line: dict) -> bool:
     if not isinstance(y, str) or not y.strip():
         return False  # omitted/blank => "x"
     return "x" not in y.lower()
+
+
+def log_y_axis_sources(chart_ids: Iterable[int]) -> set[int]:
+    """Of these SOURCE scatters, those whose log y axis describes the NON-GDP indicator.
+
+    Carrying a source's log y axis onto the target is only meaningful when the two y axes are
+    the same indicator. A **reversed** source — GDP on its y — is therefore excluded: its
+    `scaleType` describes the GDP axis, and the target's y is the non-GDP indicator, so
+    proposing `yScale=log` there would make the wrong axis logarithmic. Same reason
+    `process_row` skips the y-oriented mirrors for a reversed source.
+
+    Lives here, and is imported by the handoff builder and the redirect script, because the
+    exclusion is easy to get right in one place and forget in another.
+    """
+    ids = tuple(sorted(set(chart_ids)))
+    if not ids:
+        return set()
+    df = OWID_ENV.read_sql(
+        "SELECT c.id, cc.full ->> '$.yAxis.scaleType' AS scale_type, cc.full AS full_config "
+        "FROM charts c JOIN chart_configs cc ON c.configId = cc.id WHERE c.id IN %(i)s",
+        params={"i": ids},
+    )
+    log_sources = set()
+    for row in df.to_dict("records"):
+        if row["scale_type"] != "log":
+            continue
+        cfg = row["full_config"] if isinstance(row["full_config"], dict) else json.loads(row["full_config"])
+        y_dim = find_dim(cfg, "y") or {}
+        if y_dim.get("variableId") in ANY_GDP_VARIABLE_IDS:
+            continue  # reversed source: the log axis is the GDP one
+        log_sources.add(int(row["id"]))
+    return log_sources
 
 
 def process_row(

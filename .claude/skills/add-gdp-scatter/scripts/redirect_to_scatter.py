@@ -17,19 +17,44 @@ Mechanism notes:
   every bail-out rolls the row back: a row touched in the last week is ALSO written into
   `_redirects` as an unconditional 302 to defeat the CDN cache, so a fresh row on a slug whose
   chart is still published does fire.
-- The stored params are only a base: the visitor's own query params override them key by key.
+- On production the redirect MERGES an incoming query over `target_query_param` key by key,
+  the incoming side winning per key (distinguishing transcript in
+  `build_reference_handoff.params_cell`), so a reference's params cost the reader exactly the
+  stored keys they collide with. Staging's serving layer instead answers with the stored query
+  and drops the visitor's params, and a fresh row's first-week static 302 is unverified — the
+  audits below grade by the production 301 behavior.
 - `chart_slug_redirects` is per-environment and does NOT sync to production, so prod is a
   separate `--apply --allow-production` run once the scatter views ship there.
 """
 
 import argparse
+import importlib.util
 import json
 import re
 import sys
+from pathlib import Path
 from typing import Any
+from urllib.parse import parse_qsl
 
 from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV
+
+
+def _load_sibling(name: str):
+    """Import a script from this skill's own scripts directory."""
+    path = Path(__file__).resolve().parent / f"{name}.py"
+    if not path.exists():
+        raise SystemExit(f"Cannot import {name}: {path} does not exist")
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+# The log-source question, and the reversed-source exclusion it depends on, are owned by the
+# applier so the two consumers cannot disagree.
+applier = _load_sibling("apply_scatter_defaults")
 
 SLUG_RE = re.compile(r"/grapher/([^/?#]+)")
 TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
@@ -49,8 +74,12 @@ TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
 #                unhighlighted instead of emphasising the target's line/bar selection
 TARGET_QUERY = "tab=scatter&time=latest&country="
 
-# Params on a referencing link that would override TARGET_QUERY at redirect time.
-OVERRIDING_PARAMS = ("tab=", "time=", "country=")
+# Appended for a source whose log y axis describes the non-GDP indicator. The applier leaves
+# the target's `yAxis` linear on purpose (it is global, so log would flip the line/bar views),
+# so without this a reader arriving by the retired slug gets a linear scatter where the old
+# chart was logarithmic — the shape the author chose log to show. `target_query_param` is
+# per-row, so unlike the rest of TARGET_QUERY this part can vary by row.
+Y_SCALE_LOG = "yScale=log"
 
 # Reference categories a redirect alone does NOT fix — these BLOCK the row.
 # narrativeCharts is deliberately not here: one parented to a chart owns a materialized full
@@ -157,20 +186,32 @@ def gdoc_references(slugs: tuple[str, ...]) -> list[dict]:
     return rows
 
 
-def narrative_children(chart_ids: tuple[int, ...]) -> list[dict]:
+def query_keys(query: str) -> set[str]:
+    """The param keys in a query string, blank values included — `country=` is a key."""
+    return {key for key, _ in parse_qsl(query.lstrip("?"), keep_blank_values=True)}
+
+
+def narrative_children(query_by_parent: dict[int, str]) -> list[dict]:
     """Narrative charts parented to these charts, with the params they open their parent at.
 
     `queryParamsForParentChart` is a JSON object (not a query string) that the narrative
-    chart's canonical "Explore the data" href merges over the parent slug
-    (`GrapherState.canonicalUrlIfIsNarrativeChart`). Those params arrive as *incoming* params
-    on the redirect, so a stored `tab`/`time` there wins over TARGET_QUERY.
+    chart's canonical "Explore the data" href appends to the parent slug
+    (`GrapherState.canonicalUrlIfIsNarrativeChart`). On production the redirect merges those
+    params over the row's stored query KEY BY KEY, the incoming side winning per key (see
+    `build_reference_handoff.params_cell` for the distinguishing transcript) — so the href
+    costs the reader exactly the stored keys the narrative's params collide with, and keys
+    the params don't mention (e.g. a stored `yScale=log`) survive the hop.
+
+    The intersection with the parent row's own stored query is therefore the whole note: it is
+    read per-row rather than from a fixed list because only a log source stores a `yScale`.
+    Same grading as `param_notes` applies to article links.
     """
-    if not chart_ids:
+    if not query_by_parent:
         return []
     df = OWID_ENV.read_sql(
         "SELECT id, name, parentChartId AS parent_id, queryParamsForParentChart AS params "
         "FROM narrative_charts WHERE parentChartId IN %(ids)s ORDER BY name",
-        params={"ids": chart_ids},
+        params={"ids": tuple(sorted(query_by_parent))},
     )
     rows = []
     for r in df.to_dict("records"):
@@ -178,33 +219,47 @@ def narrative_children(chart_ids: tuple[int, ...]) -> list[dict]:
             params = json.loads(r["params"] or "{}")
         except (TypeError, ValueError):
             params = {}
-        overriding = [k for k in ("tab", "time") if k in params]
+        parent_id = int(r["parent_id"])
+        contradicting = sorted(set(params) & query_keys(query_by_parent[parent_id]))
+        if not params:
+            note = "no params of its own — the href lands on the redirect's view"
+        elif contradicting:
+            note = f"its params override {', '.join(contradicting)} in the row's stored query"
+        else:
+            note = "its params merge over the stored query without touching it — the href keeps the redirect's view"
         rows.append(
             {
                 "id": int(r["id"]),
                 "name": r["name"],
-                "parent_id": int(r["parent_id"]),
+                "parent_id": parent_id,
                 "params": ", ".join(f"{k}={params[k]}" for k in sorted(params)) or "(none)",
-                "note": (
-                    f"opens the parent at {', '.join(overriding)} — overrides {TARGET_QUERY}"
-                    if overriding
-                    else "no tab/time of its own — the href will land on the scatter view"
-                ),
+                "note": note,
             }
         )
     return rows
 
 
-def param_notes(ref: dict) -> str:
-    """Why a given article reference won't land on the scatter view unaided."""
+def param_notes(ref: dict, stored_query: str) -> str:
+    """Which parts of the stored query a given article reference's own params override.
+
+    On production the redirect merges the incoming query over `target_query_param` key by key,
+    the incoming side winning per key (see `build_reference_handoff.params_cell` for the
+    distinguishing transcript — an earlier version of this audit concluded wholesale
+    replacement from a test that could not tell the two models apart). So only collisions with
+    `stored_query` — the query THIS row stores, because only a log source stores a `yScale` —
+    cost the reader anything; non-colliding params ride along with the stored view intact.
+    Same grading as the handoff report's ⚠️.
+    """
     notes = []
     if ref["kind"] == "embed":
         # `makeGrapherLinkedChart` builds resolvedUrl without a query string (unlike the
         # multi-dim path), so the target query param never reaches a gdoc-rendered chart.
         notes.append("embed renders the target's default tab")
-    overriding = [p.rstrip("=") for p in OVERRIDING_PARAMS if p in ref["query"]]
-    if overriding:
-        notes.append(f"link sets {', '.join(overriding)} — overrides {TARGET_QUERY}")
+    keys = query_keys(ref["query"])
+    if keys:
+        contradicting = sorted(keys & query_keys(stored_query))
+        if contradicting:
+            notes.append(f"link's own params override {', '.join(contradicting)} in {stored_query}")
     return "; ".join(notes)
 
 
@@ -220,6 +275,11 @@ def classify_api_error(exc: Exception) -> tuple[str, str]:
         # raw MySQL error on `chart_slug_redirects.slug`'s UNIQUE key.
         return "DUPLICATE", f"slug taken since the pre-check: {msg[:90]}"
     return "ERROR", msg[:120]
+
+
+def row_query(src_id: int | None, log_sources: set[int]) -> str:
+    """The query this row stores on its redirect."""
+    return f"{TARGET_QUERY}&{Y_SCALE_LOG}" if src_id in log_sources else TARGET_QUERY
 
 
 def build_plan(api: AdminAPI, payload: list[dict], skip_aliases: bool) -> list[dict]:
@@ -242,6 +302,10 @@ def build_plan(api: AdminAPI, payload: list[dict], skip_aliases: bool) -> list[d
     ids = chart_ids_for_slugs(slugs)
     existing = chart_redirects_for_slugs(slugs)
     site_sources, mdim_sources = shadowing_sources(slugs)
+    # Which sources carry a log y axis on the indicator (reversed sources excluded).
+    log_sources = applier.log_y_axis_sources({ids[r["src"]] for r in rows if r["src"] in ids})
+    for rec in rows:
+        rec["query"] = row_query(ids.get(rec["src"]), log_sources)
 
     for rec in rows:
         if rec["status"] == "ERROR":
@@ -297,13 +361,13 @@ def build_plan(api: AdminAPI, payload: list[dict], skip_aliases: bool) -> list[d
         if prior and prior["chart_id"] != rec["tgt_id"]:
             rec |= {"status": "CONFLICT", "note": f"slug already redirects to chart {prior['chart_id']}"}
             continue
-        if prior and prior["param"] == TARGET_QUERY:
-            rec |= {"status": "EXISTS", "note": f"-> {tgt}?{TARGET_QUERY}"}
+        if prior and prior["param"] == rec["query"]:
+            rec |= {"status": "EXISTS", "note": f"-> {tgt}?{rec['query']}"}
         elif prior:
             was = prior["param"] or "(no params)"
-            rec |= {"status": "UPDATE", "note": f"param {was} -> {TARGET_QUERY}", "prior": prior}
+            rec |= {"status": "UPDATE", "note": f"param {was} -> {rec['query']}", "prior": prior}
         else:
-            rec |= {"status": "CREATE", "note": f"-> {tgt}?{TARGET_QUERY}"}
+            rec |= {"status": "CREATE", "note": f"-> {tgt}?{rec['query']}"}
 
         # Inbound aliases of the SOURCE. Unpublishing it deletes every one of them, so they
         # have to be re-pointed at the target or those URLs become hard 404s. Always read, even
@@ -321,8 +385,8 @@ def build_plan(api: AdminAPI, payload: list[dict], skip_aliases: bool) -> list[d
     return rows
 
 
-def repoint_alias(api: AdminAPI, alias: dict, src_id: int, tgt_id: int) -> tuple[str, str]:
-    """Move one inbound alias from the source chart to the target, carrying TARGET_QUERY.
+def repoint_alias(api: AdminAPI, alias: dict, src_id: int, tgt_id: int, query: str) -> tuple[str, str]:
+    """Move one inbound alias from the source chart to the target, carrying the row's query.
 
     The delete is mandatory, not a convenience: `chart_slug_redirects.slug` is UNIQUE, so the
     target-side row cannot exist while the source-side one does. An alias's own
@@ -334,7 +398,7 @@ def repoint_alias(api: AdminAPI, alias: dict, src_id: int, tgt_id: int) -> tuple
     except Exception as e:
         return "FAILED", f"delete: {classify_api_error(e)[1]}"
     try:
-        api.create_chart_redirect(tgt_id, alias["slug"], TARGET_QUERY)
+        api.create_chart_redirect(tgt_id, alias["slug"], query)
     except Exception as e:
         status, note = classify_api_error(e)
         try:
@@ -408,7 +472,7 @@ def apply_row(api: AdminAPI, rec: dict, skip_aliases: bool) -> dict:
             status, note = classify_api_error(e)
             return action | {"status": status, "note": note}
         try:
-            created_id = api.create_chart_redirect(tgt_id, src, TARGET_QUERY)["redirect"]["id"]
+            created_id = api.create_chart_redirect(tgt_id, src, rec["query"])["redirect"]["id"]
             action |= {"status": "UPDATED"}
         except Exception as e:
             status, note = classify_api_error(e)
@@ -422,7 +486,7 @@ def apply_row(api: AdminAPI, rec: dict, skip_aliases: bool) -> dict:
                 }
     elif rec["status"] == "CREATE":
         try:
-            created_id = api.create_chart_redirect(tgt_id, src, TARGET_QUERY)["redirect"]["id"]
+            created_id = api.create_chart_redirect(tgt_id, src, rec["query"])["redirect"]["id"]
             action |= {"status": "CREATED"}
         except Exception as e:
             status, note = classify_api_error(e)
@@ -432,7 +496,7 @@ def apply_row(api: AdminAPI, rec: dict, skip_aliases: bool) -> dict:
     # aliases under that flag, since the unpublish below would delete them.
     if not skip_aliases:
         for alias in rec["aliases"]:
-            status, note = repoint_alias(api, alias, src_id, tgt_id)
+            status, note = repoint_alias(api, alias, src_id, tgt_id, rec["query"])
             action["aliases"].append((alias["slug"], status, note))
         stuck = [slug for slug, status, _ in action["aliases"] if status != "REPOINTED"]
         if stuck:
@@ -546,38 +610,58 @@ def main() -> int:
     print("  aliases = old slugs of the SOURCE chart; the unpublish deletes them, so they get re-pointed too.")
 
     # ---- NARRATIVE CHARTS PARENTED TO THE OLD CHARTS ----
-    narratives = narrative_children(tuple(sorted(rec["src_id"] for rec in audited)))
+    by_id = {rec["src_id"]: rec for rec in audited}
+    # Each parent's own stored query, so the grading knows whether this row stores a
+    # `yScale` for the narrative's own params to contradict on top of erasing.
+    narratives = narrative_children({src_id: rec["query"] for src_id, rec in by_id.items()})
     if narratives:
-        by_id = {rec["src_id"]: rec for rec in audited}
         print("\nNARRATIVE CHARTS ON THE OLD CHARTS (replace, don't re-point)")
         print(f"{'name':<44} {'id':>5}  {'parent params':<30} note")
         print("-" * 150)
         for n in narratives:
             print(f"{n['name']:<44} {n['id']:>5}  {n['params']:<30} {n['note']}")
         print("\n  These keep rendering after the unpublish — they own a materialized full config. Only their")
-        print("  'Explore the data' href uses the old slug, and the redirect covers it.")
+        print("  'Explore the data' href uses the old slug; the redirect covers the slug, and the notes above")
+        print("  say whether the stored view survives the narrative's own params.")
         print("  The parent columns are INSERT-only (owid-grapher#6872, closed as not-planned), so a narrative")
-        print("  chart cannot be re-pointed — it is replaced. Per parent, in this order:")
+        print("  chart cannot be re-pointed — a replacement, if made, is a new one. Per parent, in this order:")
         for n in narratives:
-            tgt = by_id[n["parent_id"]]["tgt"]
-            print(f"    {n['name']}: create the replacement from {tgt}?{TARGET_QUERY} using that chart's")
-            print("      'Create narrative chart' control, under a NEW kebab-case name; update the article(s)")
-            print(f"      to reference it; then delete {n['id']}. Never delete first — the delete is refused")
-            print("      while a published post references the name, and there is no rename.")
+            # That parent row's own stored query, not the shared constant: a log source's
+            # replacement has to carry `yScale=log` too, or the new narrative chart is linear
+            # where the one it replaces was logarithmic — the shape the retirement preserves.
+            parent = by_id[n["parent_id"]]
+            print(f"    {n['name']}: the replacement must reproduce {parent['tgt']}?{parent['query']}, under a NEW")
+            print("      kebab-case name; update the article(s) to reference it; then delete the old one last —")
+            print(f"      deleting {n['id']} is refused while a published post references the name, and there is")
+            print("      no rename.")
+        print("\n  Every target here is a plain chart, and a chart page has no 'Create narrative chart' control")
+        print("  (it exists only on MDIM views), so creating the replacement is not a UI task. Same options as")
+        print("  the handoff: leave the old one in place (it keeps rendering; its 'Explore the data' link")
+        print("  loses only the stored keys its params override), ask a developer to create it via the API, or wait for")
+        print("  the target to become an MDIM. SKILL.md 'Narrative charts' has the mechanism and citations.")
 
     # ---- ARTICLE LINKS THAT WON'T LAND ON THE SCATTER ----
-    # Aliases included: an article may well link the source chart's older slug.
-    referenced = {rec["src"] for rec in audited} | {a["slug"] for rec in audited for a in rec["aliases"]}
-    refs = [r for r in gdoc_references(tuple(sorted(referenced))) if param_notes(r)]
+    # Aliases included: an article may well link the source chart's older slug. Each slug maps to
+    # the query of the row it belongs to — an alias is re-pointed carrying that same query (see
+    # repoint_alias), so it has the same keys to collide with. Per-row, because only a log source
+    # stores a `yScale` for a reference's own params to contradict.
+    query_by_slug = {
+        slug: rec["query"] for rec in audited for slug in (rec["src"], *(a["slug"] for a in rec["aliases"]))
+    }
+    refs = []
+    for r in gdoc_references(tuple(sorted(query_by_slug))):
+        note = param_notes(r, query_by_slug[r["slug"]])
+        if note:
+            refs.append((r, note))
     if refs:
         print("\nARTICLE REFERENCES NEEDING A HAND EDIT")
         print(f"{'src_slug':<48} {'article':<40} {'kind':<6} {'query':<28} note")
         print("-" * 165)
-        for r in refs:
-            print(f"{r['slug']:<48} {r['post']:<40} {r['kind']:<6} {r['query'][:28]:<28} {param_notes(r)}")
+        for r, note in refs:
+            print(f"{r['slug']:<48} {r['post']:<40} {r['kind']:<6} {r['query'][:28]:<28} {note}")
         print("\n  The redirect fires for readers, but these surfaces need editing: a gdoc embed resolves to")
         print("  the target chart and renders its DEFAULT tab (the target query param never reaches it), and")
-        print("  a link's own tab=/time= params override the stored ones.")
+        print("  a link's own params override the stored keys they collide with (non-colliding params merge in).")
 
     # ---- PLAN / ACTIONS ----
     print(f"\n{'REDIRECT ACTIONS' if args.apply else 'PLAN (what --apply would do)'}")
@@ -587,7 +671,7 @@ def main() -> int:
     needs_bake = False
     for rec in plan:
         pair = f"{rec.get('src_id') or '-'}->{rec.get('tgt_id') or '-'}"
-        target = f"-> {rec['tgt']}?{TARGET_QUERY}"
+        target = f"-> {rec['tgt']}?{rec['query']}"
         if args.apply and rec["status"] in ACTIONABLE:
             action = apply_row(api, rec, skip_aliases=args.skip_alias_repoint)
             note = f"{action['note']}  [{action['unpublish']}]" if action["unpublish"] else action["note"]
@@ -623,7 +707,7 @@ def main() -> int:
         print("\nVERIFY once the bake finishes (the unpublish triggers it, or the explicit deploy):")
         for rec in applied[:3]:
             url = OWID_ENV.chart_site(rec["src"])
-            print(f"  curl -sI {url}   # 301 -> /grapher/{rec['tgt']}?{TARGET_QUERY}")
+            print(f"  curl -sI {url}   # 301 -> /grapher/{rec['tgt']}?{rec['query']}")
         print("  ...and re-run this script: every row should come back EXISTS.")
         if is_production:
             print("\n  This was production. Nothing else to do — chart_slug_redirects does not sync anywhere.")
