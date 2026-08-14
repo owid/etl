@@ -219,10 +219,10 @@ What it adds over the mdim reviewer, because the asymmetry here is different: on
 
 The right pane toggles (or press `v`) between the two states a URL can produce:
 
-- **Redirect view** — `?tab=scatter&time=latest&country=`, exactly what a reader following the retired slug gets.
+- **Redirect view** — `?tab=scatter&time=latest&country=`, exactly what a reader following the retired slug gets, `&yScale=log` included on a log row. The query comes from `redirect_to_scatter.row_query`, the function that writes it, rather than a constant of its own — one part of it is per-row, so a local copy would put a view nobody gets in front of the reviewer.
 - **Default view** — what a reader opening the target sees first.
 
-The third state — after a reader *clicks* the scatter tab — no URL can reproduce (see "`adjustStateForTab` fires on a tab CLICK only"). Open the Default view and click the scatter tab **inside the frame**: it should match the Redirect view. That comparison is the practical check that the redirect's `time=`/`country=` params really stand in for the click, which is the one thing about Part 2 that has never been verified live.
+The third state — after a reader *clicks* the scatter tab — no URL can reproduce (see "`adjustStateForTab` fires on a tab CLICK only"). Open the Default view and click the scatter tab **inside the frame**: it should match the Redirect view. That comparison is the practical check that the redirect's `time=`/`country=` params really stand in for the click, which is the one thing about Part 2 that has never been verified live. On a **log row the two differ by design** — the click leaves the target's linear `yAxis` alone while the redirect forces `log` — so the pane's own hint says so rather than letting a correct row read as a defect.
 
 Per-row flags are split so the "With warnings" filter stays worth using. **Warnings** are possible defects — no `ScatterPlot` tab, scatter as the primary type, `hideTimeline` with a time range, `stackMode: relative`, source `excludedEntityNames` that the target will not carry. **Context** is expected-but-needed-to-read-the-panes, e.g. that the target selects N entities which both routes should clear — so if you *do* see highlighting, one of the two mechanisms failed. Keep new checks on the right side of that line; a warning on every row is the same as no warnings.
 
