@@ -84,9 +84,9 @@ SVG* — a different problem with a different fix (SKILL.md Step 7).
 
 | Element | Font | Size | Color | Style |
 |---|---|---|---|---|
-| Title | Playfair Display **Bold** | 16px / 19px line height | `#2d2e2d` | `Data Insights/Title` |
-| Subtitle (optional) | Lato Regular | 11px | `#5b5b5b` | `Data Insights/Subtitle` |
-| Source (pull only) | Lato Regular | 11px | `#858585` | `Data Insights/Source` |
+| Title | Playfair Display **Bold** | 16px / 19px line height | `#2d2e2d` | **none — raw fill.** The value equals `Data Insights/Title`, but the node is not bound to it, so don't expect a style to read back |
+| Subtitle (optional) | Lato Regular | 11px | `#5b5b5b` | `Data Insights/Subtitle` (fill only) |
+| Source (pull only) | Lato Regular | 11px | `#858585` | `Data Insights/Source` (fill only) |
 | In-plot entity labels | Lato **Bold** | 11–12px | the series color | bound palette style |
 | In-plot value labels | Lato **Medium** | 11–12px | the series color, or `#2d2e2d` on a bar | — |
 | Axis year labels | Lato Regular | 11px | `#5b5b5b` | `Data Insights/Subtitle` |
