@@ -375,8 +375,10 @@ def add_biomass_inclusive_shares(tb: Table) -> Table:
 def add_annual_change(tb: Table) -> Table:
     """Add annual change (absolute and percentage) for each source and the total.
 
-    Only consecutive-year changes are kept: the World long-run series (Smil) is decadal before 1900,
-    so a naive row-to-row change there would be a multi-year change mislabeled as an annual change.
+    Only consecutive-year changes are kept: the World long-run series (Smil) is decadal all the way
+    from 1800 to 1960, so a naive row-to-row change there would be a multi-year change mislabeled as an
+    annual change. As a result these indicators have no pre-1965 values at all, which is why drop_origin
+    removes Smil from them at the end of run().
     """
     tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
     is_consecutive = tb.groupby("country", observed=True)["year"].diff() == 1

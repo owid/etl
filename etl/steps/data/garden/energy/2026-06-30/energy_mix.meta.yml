@@ -743,9 +743,6 @@ tables:
         description_short: Percentage change in [total energy supply](#dod:total-energy-supply) relative to the previous year.
         description_processing: |-
           {definitions.description_processing_eia}
-          {definitions.description_processing_smil_world}
-        description_processing: |-
-          {definitions.description_processing_eia}
         display:
           name: Total energy supply
         presentation:
@@ -755,9 +752,6 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
         description_short: Change in [total energy supply](#dod:total-energy-supply) relative to the previous year, measured in [terawatt-hours](#dod:watt-hours).
-        description_processing: |-
-          {definitions.description_processing_eia}
-          {definitions.description_processing_smil_world}
         description_processing: |-
           {definitions.description_processing_eia}
         display:
