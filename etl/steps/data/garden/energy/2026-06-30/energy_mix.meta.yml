@@ -12,7 +12,7 @@ definitions:
     - Smil's estimates end in 2015. For later years, we assume that traditional biomass stays at its 2015 value.
   # Denominator of the shares of primary energy including traditional biomass.
   description_processing_biomass_included: |-
-    - Traditional biomass is not part of total energy supply, since the Statistical Review does not cover it. To include it here, we add Vaclav Smil's estimates of traditional biomass (2017) to total energy supply, and use that as the denominator.
+    - The Statistical Review of World Energy does not include data on traditional biomass. We add Vaclav Smil's estimates of traditional biomass to total energy supply.
     - Smil's estimates end in 2015. For later years, we assume that traditional biomass stays at its 2015 value.
   # Total energy supply and the indicators derived from it. This does not apply to the by-source
   # indicators: the EIA is only used to extend the total, and adds no breakdown by source.
