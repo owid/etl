@@ -270,49 +270,24 @@ def view_to_reproduce(src_id: int, pairs: dict[int, int], slugs: dict[int, str],
 
 
 def narrative_chart_mechanism() -> list[str]:
-    """What a narrative chart does at retirement, and why replacing one is not a UI task.
-
-    Every claim here is read off the grapher source rather than inferred, because the obvious
-    guess — "open the target and use its Create narrative chart button" — is wrong, and shipped
-    in an earlier version of this report.
+    """The short how-to-replace intro. The full mechanism — why none of this is a UI task on a
+    chart parent, with the grapher-source citations — lives in SKILL.md ("Narrative charts");
+    the handoff states only what to do, because its reader is the curator, not the next agent.
     """
     return [
-        "**Nothing breaks.** A narrative chart renders from its own materialized `configFull`, "
-        "written at creation, so unpublishing the parent does not change what readers see. It "
-        "also means it keeps showing the OLD view indefinitely.",
+        "A narrative chart keeps rendering its old view from its own materialized config, so "
+        "retirement breaks nothing — but it cannot be re-pointed, so each one is replaced by "
+        "hand: **create the new narrative chart → edit every article below to its name → delete "
+        "the old one last** (a published post still using the name blocks the delete). FAUST, "
+        "entity selection and time pins do not transfer; re-create them from the params shown.",
         "",
-        "**Its \"Explore the data\" link degrades quietly.** That href is built from the parent "
-        "slug plus `queryParamsForParentChart`, so after retirement it resolves through the "
-        "redirect — but because it carries its own params, the redirect's "
-        f"`{REDIRECT_QUERY}` is dropped wholesale rather than merged, and the reader lands on "
-        "the target's default view instead of the scatter.",
+        "How to create it depends on the target:",
         "",
-        "**It cannot be re-pointed.** `updateNarrativeChart` reads `parentChartId` / "
-        "`parentMultiDimXChartConfigId` from the existing row, so neither parent column is "
-        "writable after creation — there is no re-parenting API to call.",
-        "",
-        "**And it cannot be re-created through the admin, because every target here is a plain "
-        "chart.** `CreateNarrativeChartEditorPage` returns `NotFoundPage` unless "
-        "`type === \"multiDim\"`, and the site-side control is gated on "
-        "`manager.adminCreateNarrativeChartPath`, which only `site/multiDim/MultiDim.tsx` and "
-        "`MultiDimDataPageContent.tsx` ever set. A chart page offers no such button — not in the "
-        "share menu, not anywhere. The POST route *does* accept "
-        '`{"type": "chart", "parentChartId": …}` (`createNarrativeChartFromChart`), so the '
-        "capability exists; there is simply no click-path to it.",
-        "",
-        "That leaves three honest options per narrative chart, and picking is the curator's call:",
-        "",
-        "1. **Leave it.** It renders correctly forever; only the \"Explore the data\" landing view "
-        "is off. Cheapest, and defensible when the story does not depend on that link.",
-        "2. **Ask a developer** to create the replacement against the target via the API, then do "
-        "the article edit and delete below.",
-        "3. **Wait for the target to become an MDIM** — several are headed that way — and then "
-        "create the replacement from the MDIM's own control, which does exist.",
-        "",
-        "If you do replace one, the order is fixed: **create** → **edit every article below to "
-        "the new name** → **delete the old one last**. A published post still referencing the "
-        "name blocks the delete. Nothing authored transfers to the replacement — FAUST, entity "
-        "selection and time pins all have to be re-created by hand from the params shown.",
+        "- **Plain chart (every target here):** a chart page has no \"Create narrative chart\" "
+        "control — ask a developer to create it via the API, or leave the old one in place "
+        "(only its \"Explore the data\" link degrades to the target's default view).",
+        "- **MDIM:** create it yourself, from the \"Create narrative chart\" control on the "
+        "target view.",
     ]
 
 
@@ -440,7 +415,7 @@ def main() -> int:
     placed.update(id(r) for r in narrative + placements)
     if narrative:
         out += [
-            f"## ℹ️ Narrative charts ({len(narrative)}) — nothing breaks, and nothing can be rebuilt in the admin",
+            f"## ℹ️ Narrative charts ({len(narrative)}) — replace by hand; nothing breaks meanwhile",
             "",
         ]
         out += narrative_chart_mechanism()
@@ -454,7 +429,7 @@ def main() -> int:
                 "",
                 f"### `{r['where']}` — on `{r['subject']}`",
                 "",
-                f"- **Reproduce this view:** {view_to_reproduce(r['subject_id'], pairs, slugs, log_sources)}",
+                f"- **Replace with a narrative chart of:** {view_to_reproduce(r['subject_id'], pairs, slugs, log_sources)}",
                 f"- **Its \"Explore the data\" params:** {params_cell(own_params, set(base_query(r['subject_id'], log_sources)))}",
                 f"- **Open:** {open_links(r, args.host, admin)}",
                 "",
