@@ -10,23 +10,6 @@ definitions:
       topic_tags:
         - Agricultural Production
       attribution_short: FAO
-  # FAOSTAT reports the USSR as a single entity until 1991 (which OWID counts entirely inside Europe and
-  # Upper-middle-income countries), and its fifteen successor states separately from 1992, causing an abrupt jump in
-  # the aggregates of continents and income groups between 1991 and 1992.
-  entity_annotations_ussr_breakup: &entity_annotations_ussr_breakup |-
-    Europe: Break in 1992: the USSR's successors are split between Europe and Asia
-    Asia: Break in 1992: the USSR's successors are split between Europe and Asia
-    High-income countries: Break in 1992: the USSR's successors are split across income groups
-    Upper-middle-income countries: Break in 1992: the USSR's successors are split across income groups
-    Lower-middle-income countries: Break in 1992: the USSR's successors are split across income groups
-  # The decadal-change columns compare each year against ten years earlier, so their values for the affected entities
-  # are distorted for the whole 1992 to 2001 window.
-  entity_annotations_ussr_breakup_decadal_change: &entity_annotations_ussr_breakup_decadal_change |-
-    Europe: Values from 1992 to 2001 are affected by the dissolution of the USSR
-    Asia: Values from 1992 to 2001 are affected by the dissolution of the USSR
-    High-income countries: Values from 1992 to 2001 are affected by the dissolution of the USSR
-    Upper-middle-income countries: Values from 1992 to 2001 are affected by the dissolution of the USSR
-    Lower-middle-income countries: Values from 1992 to 2001 are affected by the dissolution of the USSR
 
 tables:
   arable_land_per_crop_output:
@@ -248,8 +231,6 @@ tables:
         unit: hectares
         short_unit: ha
         description_short: Surface area of cropland, which corresponds to the sum of arable land and permanent crops.
-        display:
-          entityAnnotationsMap: *entity_annotations_ussr_breakup
       nitrogen_use:
         title: Nitrogen use
         unit: tonnes
@@ -560,8 +541,6 @@ tables:
         short_unit: ha
         description_short: |
           Surface area devoted to agriculture on a given year.
-        display:
-          entityAnnotationsMap: *entity_annotations_ussr_breakup
       agriculture_area_one_decade_back:
         title: Area used for agriculture one decade back
         unit: hectares
@@ -574,8 +553,6 @@ tables:
         short_unit: ha
         description_short: |
           Surface area devoted to croplands on a given year.
-        display:
-          entityAnnotationsMap: *entity_annotations_ussr_breakup
       cropland_area_one_decade_back:
         title: Area used for croplands one decade back
         unit: hectares
@@ -588,8 +565,6 @@ tables:
         short_unit: ha
         description_short: |
           Surface area devoted to pastures on a given year.
-        display:
-          entityAnnotationsMap: *entity_annotations_ussr_breakup
       pasture_area_one_decade_back:
         title: Area used for pastures one decade back
         unit: hectares
@@ -611,8 +586,6 @@ tables:
         description_processing: &agricultural_land_use_description_processing |
           - Assessing this by looking at annual land use data is difficult because there can be significant year-to-year variability. That land use for one or two years was lower than previous years would be insufficient to conclude that a country had peaked. For this reason we look at decadal changes in agricultural land. We look at land use in the latest year relative to 10 years before.
           - If land use is lower in the latest year then we suggest that land use may have peaked. If land use it the same or higher than a decade back, we suggest that it hasn't, or this is uncertain.
-        display:
-          entityAnnotationsMap: *entity_annotations_ussr_breakup_decadal_change
       cropland_area_change:
         title: Change in cropland area with respect to one decade back
         unit: "%"
@@ -620,8 +593,6 @@ tables:
         description_short: |
           Percentage change in surface area devoted to croplands with respect to 10 years before. Negative values imply that surface area has decreased with respect to the previous decade. This data is used to assess which countries may have already peaked in their agricultural land use.
         description_processing: *agricultural_land_use_description_processing
-        display:
-          entityAnnotationsMap: *entity_annotations_ussr_breakup_decadal_change
       pasture_area_change:
         title: Change in pasture area with respect to one decade back
         unit: "%"
@@ -629,8 +600,6 @@ tables:
         description_short: |
           Percentage change in surface area devoted to pastures with respect to 10 years before. Negative values imply that surface area has decreased with respect to the previous decade. This data is used to assess which countries may have already peaked in their agricultural land use.
         description_processing: *agricultural_land_use_description_processing
-        display:
-          entityAnnotationsMap: *entity_annotations_ussr_breakup_decadal_change
   hypothetical_meat_consumption:
     variables:
       global_population:
