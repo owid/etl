@@ -406,9 +406,12 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     # Space above the bars: the category band, or the whole listed header on mobile.
     if layout["category_side"] == "above":
         category_placements = solve_category_layout(top_spans, layout)
-        category_rows = max(placement["row"] for placement in category_placements)
-        header_px = CATEGORY_GAP + CATEGORY_TICK + CATEGORY_LABEL_GAP
-        header_px += (category_rows + 1) * line_px(layout["header_fontsize"])
+        # The tallest name decides the band: its row, plus however many lines it wrapped onto.
+        tallest = max(
+            placement["row"] * TIER_HEIGHT + len(placement["lines"]) * line_px(layout["header_fontsize"])
+            for placement in category_placements
+        )
+        header_px = CATEGORY_GAP + CATEGORY_TICK + CATEGORY_LABEL_GAP + tallest
     else:
         category_placements = None
         header_px = listed_px
@@ -616,17 +619,19 @@ def draw_category_brackets(ax, category_placements: list[dict], palette, px_per_
                 solid_capstyle="butt",
                 gid=f"category__{slug}-stem",
             )
-        ax.text(
-            placement["center"] / px_per_min,
-            rows_above(label_px),
-            placement["name"],
-            ha="center",
-            va="bottom",
-            fontsize=layout["header_fontsize"],
-            fontweight="bold",
-            color=header_text_color(placement["color"], palette),
-            gid=f"category__{slug}",
-        )
+        # Lines stack upwards from the bracket, so the name reads top-down beside it.
+        for index, line in enumerate(reversed(placement["lines"])):
+            ax.text(
+                placement["center"] / px_per_min,
+                rows_above(label_px + index * line_px(layout["header_fontsize"])),
+                line,
+                ha="center",
+                va="bottom",
+                fontsize=layout["header_fontsize"],
+                fontweight="bold",
+                color=header_text_color(placement["color"], palette),
+                gid=f"category__{slug}" if index == len(placement["lines"]) - 1 else f"category__{slug}-line{index}",
+            )
 
 
 def draw_listed_header(fig, listed_lines, palette, top_px: float, margin_px: float, layout: dict, fx, fy) -> None:
@@ -869,35 +874,82 @@ def pick_leader_x(start: float, end: float, tier: int, occupied: dict) -> float 
 
 
 def solve_category_layout(spans: dict, layout: dict) -> list[dict]:
-    """Place the category names over their brackets, stacking those that would collide.
+    """Place the category names over their brackets, wrapping before stacking.
 
     A category name is often wider than the run of bars it covers — "Unpaid work & other" spans
-    67px of a desktop frame — so names are centred on their bracket, pulled inside the plot, and
-    moved to a further row when the one below is taken.
+    67px of a desktop frame — so a name that would crowd its neighbour wraps onto a second line
+    first, and only takes a row of its own if wrapping is not enough. Wrapping keeps every name
+    beside its own bracket; stacking pushes one away from the bars and needs a stem to explain
+    which bracket it belongs to.
+
+    A name is only allowed a wide form if the narrowest form of every category still to its right
+    would still fit beside it. Without that one-step lookahead the widest name takes the room and
+    its neighbour is the one that gets bumped, which is the wrong way round: the wide name is the
+    one that should give.
     """
     right_edge = spans[GROUPS[-1]["column"]][1]
-    placed: list[tuple[tuple[float, float], int]] = []
-    placements = []
-    for category in CATEGORIES:
+
+    def geometry(category: dict, lines: list[str]) -> tuple[float, tuple[float, float]]:
         start = spans[category["columns"][0]][0]
         end = spans[category["columns"][-1]][1]
-        width = text_width_px(category["name"], layout["header_fontsize"], bold=True)
+        width = max(text_width_px(line, layout["header_fontsize"], bold=True) for line in lines)
         center = min(max((start + end) / 2, width / 2), right_edge - width / 2)
-        label_span = (center - width / 2, center + width / 2)
-        row = 0
-        while any(other_row == row and overlaps(label_span, other, HEADER_MIN_GAP) for other, other_row in placed):
-            row += 1
-        placed.append((label_span, row))
+        return center, (center - width / 2, center + width / 2)
+
+    placed: list[tuple[tuple[float, float], int]] = []
+    placements = []
+    for index, category in enumerate(CATEGORIES):
+        variants = category_variants(category["name"], layout)
+        remaining = CATEGORIES[index + 1 :]
+        placement = None
+        for row in range(3):
+            for lines in variants:
+                center, label_span = geometry(category, lines)
+                if any(other_row == row and overlaps(label_span, other, HEADER_MIN_GAP) for other, other_row in placed):
+                    continue
+                # Would this form leave a later category nowhere to sit on this row?
+                if row == 0 and any(
+                    overlaps(
+                        label_span, geometry(later, category_variants(later["name"], layout)[-1])[1], HEADER_MIN_GAP
+                    )
+                    for later in remaining
+                ):
+                    continue
+                placement = {"lines": lines, "center": center, "row": row}
+                break
+            if placement:
+                break
+        assert placement, f"Could not place the category name {category['name']}."
+
+        placed.append(((placement["center"] - 0.5, placement["center"] + 0.5), placement["row"]))
+        placed[-1] = (geometry(category, placement["lines"])[1], placement["row"])
         placements.append(
             {
                 "name": category["name"],
+                "lines": placement["lines"],
                 "color": category["color"],
-                "bracket": (start, end),
-                "center": center,
-                "row": row,
+                "bracket": (spans[category["columns"][0]][0], spans[category["columns"][-1]][1]),
+                "center": placement["center"],
+                "row": placement["row"],
             }
         )
     return placements
+
+
+def category_variants(name: str, layout: dict) -> list[list[str]]:
+    """A category name on one line, then wrapped over two — widest form first."""
+    variants = [[name]]
+    words = name.split()
+    if len(words) > 1:
+        best = min(
+            range(1, len(words)),
+            key=lambda i: abs(
+                text_width_px(" ".join(words[:i]), layout["header_fontsize"], bold=True)
+                - text_width_px(" ".join(words[i:]), layout["header_fontsize"], bold=True)
+            ),
+        )
+        variants.append([" ".join(words[:best]), " ".join(words[best:])])
+    return variants
 
 
 def layout_listed_header(layout: dict, available_px: float) -> list[list[tuple]]:

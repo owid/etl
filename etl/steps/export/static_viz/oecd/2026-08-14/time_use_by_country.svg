@@ -2857,11 +2857,6 @@ L 546.895556 90.95
 L 546.895556 93.83 
 " style="fill: none; stroke: #bbbbbb; stroke-width: 0.8"/>
    </g>
-   <g id="category__leisure-stem">
-    <path d="M 505.947842 77.99 
-L 505.947842 90.95 
-" style="fill: none; stroke: #bbbbbb; stroke-width: 0.8"/>
-   </g>
    <g id="japan__label">
     <text style="font-size: 9px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="103.040684" y="106.736321" transform="rotate(-0 103.040684 106.736321)">Japan (2021)</text>
    </g>
@@ -3969,11 +3964,14 @@ L 505.947842 90.95
    <g id="category__personal-care">
     <text style="font-weight: 700; font-size: 9.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #8c8c8c" x="318.258135" y="86.915234" transform="rotate(-0 318.258135 86.915234)">Personal care</text>
    </g>
+   <g id="category__unpaid-work-other-line0">
+    <text style="font-weight: 700; font-size: 9.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #937860" x="440.340167" y="86.915234" transform="rotate(-0 440.340167 86.915234)">&amp; other</text>
+   </g>
    <g id="category__unpaid-work-other">
-    <text style="font-weight: 700; font-size: 9.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #937860" x="440.340167" y="86.915234" transform="rotate(-0 440.340167 86.915234)">Unpaid work &amp; other</text>
+    <text style="font-weight: 700; font-size: 9.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #937860" x="440.340167" y="74.565234" transform="rotate(-0 440.340167 74.565234)">Unpaid work</text>
    </g>
    <g id="category__leisure">
-    <text style="font-weight: 700; font-size: 9.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #4c72b0" x="505.947842" y="76.115234" transform="rotate(-0 505.947842 76.115234)">Leisure</text>
+    <text style="font-weight: 700; font-size: 9.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #4c72b0" x="505.947842" y="86.915234" transform="rotate(-0 505.947842 86.915234)">Leisure</text>
    </g>
    <g id="header__total-leisure">
     <text style="font-weight: 700; font-size: 9.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #333333" transform="translate(554.4 81.920563)">Total</text>
