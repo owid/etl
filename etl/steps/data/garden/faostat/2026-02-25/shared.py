@@ -1985,6 +1985,12 @@ USSR_BREAKUP_AFFECTED_ITEM_CODES_RL = {
     "00006716",  # Planted forest
     "00006717",  # Naturally regenerating forest
 }
+# Element codes in faostat_rl affected by the same issue (the "Share in ..." elements are not affected, since they are
+# never aggregated by OWID).
+USSR_BREAKUP_AFFECTED_ELEMENT_CODES_RL = {
+    "005110",  # Area
+    "5110pc",  # Area per capita
+}
 # Annotations shown next to the affected entities in charts (only rendered when one of these entities is selected).
 USSR_BREAKUP_ENTITY_ANNOTATIONS = "\n".join(
     [
@@ -2435,7 +2441,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
 
         if (
             (dataset_short_name == "faostat_rl")
-            and (element_code in ["005110", "5110pc"])
+            and (element_code in USSR_BREAKUP_AFFECTED_ELEMENT_CODES_RL)
             and (item_code in USSR_BREAKUP_AFFECTED_ITEM_CODES_RL)
         ):
             # Annotate the region aggregates affected by the redistribution of the USSR among its successor states.
