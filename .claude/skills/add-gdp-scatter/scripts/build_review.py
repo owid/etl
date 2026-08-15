@@ -12,8 +12,10 @@ not its main view** — unlike the old chart, where the scatter *was* the whole 
 every row shows the target's full tab list with its default marked, a SECONDARY badge
 naming the tab readers actually land on, and a toggle between:
 
-  * **Redirect view** — `?tab=scatter&time=latest&country=`, exactly what a reader
-    following the retired slug will get.
+  * **Redirect view** — `?tab=scatter&time=latest&country=`, plus `&yScale=log` on a row
+    whose retiring chart had a log y axis: exactly what a reader following that retired
+    slug will get. The query comes from `redirect_to_scatter.row_query`, the function that
+    writes it, so the pane cannot review a view the redirect does not serve.
   * **Default view** — what a reader opening the target normally sees first.
 
 Those two are the states a URL can produce. A third exists and cannot be reached by URL:
@@ -34,6 +36,7 @@ Usage::
 """
 
 import argparse
+import importlib.util
 import json
 import re
 import sys
@@ -44,10 +47,26 @@ from etl.config import OWID_ENV
 CHART_ID_RE = re.compile(r"/charts/(\d+)")
 TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
 
-# Stored query params of the part-2 redirect. Kept in step with TARGET_QUERY in
-# redirect_to_scatter.py — the point of the left/right comparison is to review the URL
-# readers will actually land on, so a drift here reviews the wrong thing.
-REDIRECT_QUERY = "tab=scatter&time=latest&country="
+
+def _load_sibling(name: str):
+    """Import a script from this skill's own scripts directory."""
+    path = Path(__file__).resolve().parent / f"{name}.py"
+    if not path.exists():
+        raise SystemExit(f"Cannot import {name}: {path} does not exist")
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+# The stored query of the part-2 redirect is taken from the script that writes it, rather than
+# kept in step by hand: the whole point of the left/right comparison is to review the URL
+# readers will actually land on, and one part of that query is per-row (`yScale=log` for a
+# source authored on a log y axis), so a local copy would review a view nobody gets. The
+# log-source predicate, with its reversed-source exclusion, is owned one level further down by
+# `apply_scatter_defaults.log_y_axis_sources`.
+redirect = _load_sibling("redirect_to_scatter")
 
 # Grapher's `tab` config option -> the tab a reader lands on. Anything unrecognised is
 # shown verbatim; `chart` means "the first entry in chartTypes".
@@ -117,7 +136,7 @@ def default_tab_label(cfg: dict) -> str:
     return TAB_LABELS.get(tab, tab)
 
 
-def row_flags(src_cfg: dict, tgt_cfg: dict) -> tuple[list[str], list[str]]:
+def row_flags(src_cfg: dict, tgt_cfg: dict, is_log: bool) -> tuple[list[str], list[str]]:
     """(warnings, context) for one pair, computed from the two configs.
 
     The split is what keeps the "With warnings" filter worth using. **Warnings** are things
@@ -170,6 +189,15 @@ def row_flags(src_cfg: dict, tgt_cfg: dict) -> tuple[list[str], list[str]]:
     if tgt_cfg.get("minTime") == tgt_cfg.get("maxTime") and tgt_cfg.get("minTime") is not None:
         context.append(f"time is pinned in the config to {tgt_cfg.get('minTime')!r} for every view")
 
+    # Context, not a warning: it is the intended behavior. On screen because the pane is
+    # logarithmic while the target's own default is linear, and without saying so the reviewer
+    # reads that as the migration having changed the target's axis for everyone.
+    if is_log:
+        context.append(
+            "the retiring chart had a LOG y axis, so the redirect carries yScale=log and the Redirect "
+            "view is logarithmic — the target's own default stays linear for its other tabs"
+        )
+
     return warns, context
 
 
@@ -177,6 +205,10 @@ def build_records(pairs: list[dict]) -> list[dict]:
     ids = [chart_id_from_url(p["chart_admin_url"]) for p in pairs]
     ids += [chart_id_from_url(p["target_chart_admin_url"]) for p in pairs]
     charts = load_charts(sorted(set(ids)))
+    # The same set the redirect script and the handoff resolve, read from the SOURCE charts:
+    # the target's yAxis is deliberately left linear, so it cannot tell you what the retiring
+    # chart looked like.
+    log_sources = redirect.applier.log_y_axis_sources(chart_id_from_url(p["chart_admin_url"]) for p in pairs)
 
     records = []
     for p in pairs:
@@ -190,7 +222,7 @@ def build_records(pairs: list[dict]) -> list[dict]:
         src, tgt = charts[src_id], charts[tgt_id]
         types = tgt["cfg"].get("chartTypes") or ["LineChart", "DiscreteBar"]
         scatter_pos = types.index("ScatterPlot") + 1 if "ScatterPlot" in types else 0
-        warns, context = row_flags(src["cfg"], tgt["cfg"])
+        warns, context = row_flags(src["cfg"], tgt["cfg"], is_log=src_id in log_sources)
 
         records.append(
             {
@@ -209,8 +241,11 @@ def build_records(pairs: list[dict]) -> list[dict]:
                 "tgt_title": tgt["title"],
                 "tgt_md5": tgt["md5"],
                 # The two URL-reachable states of the target, per the module docstring.
-                "redirect_path": f"/grapher/{tgt['slug']}?{REDIRECT_QUERY}",
+                "redirect_path": f"/grapher/{tgt['slug']}?{redirect.row_query(src_id, log_sources)}",
                 "default_path": f"/grapher/{tgt['slug']}",
+                # Drives the two panes' hints: for a log row the tab-click state does NOT match
+                # the Redirect view (the click leaves the target's linear yAxis alone).
+                "is_log": src_id in log_sources,
                 "chart_types": types,
                 "default_tab": default_tab_label(tgt["cfg"]),
                 "scatter_pos": scatter_pos,
@@ -712,8 +747,10 @@ function render() {
   document.getElementById("tgt-hint").textContent = viewMode === "redirect"
     ? "Exactly what a reader following the retired slug gets. time=latest and country= stand in for the "
       + "adjustments a tab CLICK would make — a URL-supplied tab does not get them."
+      + (rec.is_log ? " yScale=log restores the retiring chart's log y axis, which no tab click would." : "")
     : "What a reader opening this chart sees first. Click the Scatter tab inside the frame to see the "
-      + "tab-click state, which no URL can reproduce — it should match the Redirect view.";
+      + "tab-click state, which no URL can reproduce — it should match the Redirect view"
+      + (rec.is_log ? ", except the y axis: the click leaves it linear, the redirect makes it log." : ".");
   setFrame("tgt-frame", tU, rec.id + "|" + viewMode);
 
   document.getElementById("note").value = dec.note || "";

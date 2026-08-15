@@ -219,10 +219,10 @@ What it adds over the mdim reviewer, because the asymmetry here is different: on
 
 The right pane toggles (or press `v`) between the two states a URL can produce:
 
-- **Redirect view** — `?tab=scatter&time=latest&country=`, exactly what a reader following the retired slug gets.
+- **Redirect view** — `?tab=scatter&time=latest&country=`, exactly what a reader following the retired slug gets, `&yScale=log` included on a log row. The query comes from `redirect_to_scatter.row_query`, the function that writes it, rather than a constant of its own — one part of it is per-row, so a local copy would put a view nobody gets in front of the reviewer.
 - **Default view** — what a reader opening the target sees first.
 
-The third state — after a reader *clicks* the scatter tab — no URL can reproduce (see "`adjustStateForTab` fires on a tab CLICK only"). Open the Default view and click the scatter tab **inside the frame**: it should match the Redirect view. That comparison is the practical check that the redirect's `time=`/`country=` params really stand in for the click, which is the one thing about Part 2 that has never been verified live.
+The third state — after a reader *clicks* the scatter tab — no URL can reproduce (see "`adjustStateForTab` fires on a tab CLICK only"). Open the Default view and click the scatter tab **inside the frame**: it should match the Redirect view. That comparison is the practical check that the redirect's `time=`/`country=` params really stand in for the click, which is the one thing about Part 2 that has never been verified live. On a **log row the two differ by design** — the click leaves the target's linear `yAxis` alone while the redirect forces `log` — so the pane's own hint says so rather than letting a correct row read as a defect.
 
 Per-row flags are split so the "With warnings" filter stays worth using. **Warnings** are possible defects — no `ScatterPlot` tab, scatter as the primary type, `hideTimeline` with a time range, `stackMode: relative`, source `excludedEntityNames` that the target will not carry. **Context** is expected-but-needed-to-read-the-panes, e.g. that the target selects N entities which both routes should clear — so if you *do* see highlighting, one of the two mechanisms failed. Keep new checks on the right side of that line; a warning on every row is the same as no warnings.
 
@@ -303,7 +303,7 @@ The script's own table covers only gdoc links and embeds — enough to spot the 
   --chart-slugs '<old-slug-1>,<old-slug-2>' --markdown ai/scatter-references.md
 ```
 
-Include the sources' **aliases** in `--chart-slugs`: an article may well link an even older slug. The sweep catches what `get_chart_references` counts but doesn't locate — explorers, data insights, static viz, narrative charts, key-chart slots, WordPress posts — and it reports its own **gaps**, so a surface it couldn't check is visible rather than silently absent. Triage it the way that skill does: an **embed** is 🔴 and blocks the row (it breaks the moment the source is unpublished), a **link** is 🟡 (the 301 covers it; update the href anyway), and an unpublished or draft page is ℹ️.
+Include the sources' **aliases** in `--chart-slugs`: an article may well link an even older slug. The sweep catches what `get_chart_references` counts but doesn't locate — explorers, data insights, static viz, narrative charts, key-chart slots, WordPress posts — and it reports its own **gaps**, so a surface it couldn't check is visible rather than silently absent. Triage it the way that skill does: an **embed** is 🔴 and blocks the row (it breaks the moment the source is unpublished), a **link** is 🟡 (the 301 keeps it working, and stored keys its params don't mention survive the hop — but a `tab=` or `time=` of its own overrides the scatter view, so update the href anyway), and an unpublished or draft page is ℹ️.
 
 ### The handoff must keep find-chart-references' presentation
 
@@ -326,11 +326,42 @@ Those aids are the difference between a row someone can fix and a row that names
 - **👁 preview** — the article in the admin previewer, which renders unpublished drafts the public page won't show.
 - **🔗 page** — the published page, deep-linked with a scroll-to-text fragment when the reference has anchor text, so it opens *at* the reference. The **page type decides the base**: a data insight is served under `/data-insights/` and an author page under `/team/`, while the sweep records `where_path` as `/<slug>` for every gdoc type — and a text fragment attached to the wrong base makes a 404 look like a working link.
 - **Find in the doc** — a copy-paste search string: the **link text** for a prose hyperlink, or the **chart slug** for a block embed (the doc holds a bare grapher URL there, and `posts_gdocs_links.target` keeps the slug as the author typed it, so it still matches when the doc uses an older one). A long one is cut short but **stays literal** — no `…`, which is not a character in the document and would make the paste find nothing.
-- **Its params** — the query string the reference already carries, because the replacement URL merges it over `tab=scatter&time=latest&country=` and **the reference's values win**. A ⚠️ marks the keys that override the retirement's own, which is the row that needs a decision rather than a paste: a reference carrying `tab=chart` lands the reader on a different tab than the retirement intends, and the merge is silent about it.
+- **Its params** — the query string the reference already carries. Both consumers follow the same rule: the **replacement URL** merges it over the proposed params with **the reference's values winning** — an editorial choice: an article that pinned a country or a year meant to, and a paste should not silently discard that — and the **redirect** merges the same way, key by key (see "A reference's own params override the redirect's, key by key" below). So the cell grades collisions only: ⚠️ names the proposed keys the reference overrides — a reference carrying `tab=chart` lands the reader on a different tab than the retirement intends, and that row needs a decision rather than a paste — while a non-colliding query merges in with the proposed view intact.
+
+**`yScale=log` when the retiring chart had a log y axis.** The applier never forces `yAxis.scaleType: log` on a target — `yAxis` is global, so it would flip the line/bar views too — it only enables the toggle and leaves the default **linear**. A source authored on a log y axis therefore becomes a *linear* scatter on the target, and its shape changes: the author chose log because that is the shape the relationship has. So the replacement link proposes `yScale=log` for exactly those rows, restoring it for that view alone, on the same principle as `time=latest` and `country=` — each stands in for something a URL-supplied tab does not get.
+
+Read the flag from the **source**, never the target: the target's `yAxis.scaleType` is deliberately left linear, so it cannot tell you what the retiring chart looked like. Because the param is per-row, the ⚠️ collision check is against *that row's* proposal rather than a shared constant — so a reference's own `yScale=linear` is an override on a log row and merely its own setting everywhere else. (2026-08-14, batch 1: 3 of 14 sources were log — 6045, 663, 3740 — and one article link on 663 already carried `yScale=linear`, which wins and is flagged.)
+
+**The Part 2 redirect carries it too**, so the two paths agree *for a bare slug*: a reader arriving at a retired slug with no query string gets the same log scatter as someone following a hand-updated article link. (A query string keeps every stored key it doesn't override — see the next section.) `chart_slug_redirects.target_query_param` is per-row, so `redirect_to_scatter.py` appends `yScale=log` to that row's stored query — the one part of `TARGET_QUERY` that varies by row. Everything Part 2 prints about that row quotes the same per-row query rather than the constant: the collision grading, and the narrative-chart "reproduce this view" URL (so a replacement built for a log source keeps the log axis).
+
+### A reference's own params override the redirect's, key by key
+
+The production redirect **MERGES** the visitor's query over `target_query_param`, the visitor winning per key. Establishing this needs a *distinguishing* pair: a test whose query sets a stored key (`?tab=map` against stored `tab=line`) produces the same URL under merge and under wholesale replacement, and this section shipped a wrong "wholesale" conclusion for a day on exactly that evidence. The case that separates the models is a query that does NOT mention a stored key (production, 2026-08-14, `global-forestry-area-1958-2014` → `forest-area-km?tab=line`):
+
+```
+?country=~FRA          ->  /grapher/forest-area-km?tab=line&country=%7EFRA   (tab=line SURVIVES)
+?tab=map&country=~FRA  ->  /grapher/forest-area-km?tab=map&country=%7EFRA   (incoming tab wins)
+(no query string)      ->  /grapher/forest-area-km?tab=line
+```
+
+Consequences to carry into every report:
+
+- A reference's params cost the reader exactly the stored keys they collide with: a link carrying only `country=~FRA` keeps `tab=scatter&time=latest` (and a log row's `yScale=log`) and just pins the country. `params_cell` flags ⚠️ with the overridden keys and prints a non-colliding query as fine.
+- Hand-updating a link still matters when its params override `tab` or `time` — those land the reader off the scatter view.
+- This describes the PRODUCTION 404→301 function. Two other layers behave differently, and both the same way: **staging's** serving layer and a fresh row's first-week static **302** (`_redirects`) each answer with the stored query and drop the visitor's params entirely (staging: batch-1 staging apply, 2026-08-14; the 302: verified on production right after the batch-1 apply, same day, held to this section's own standard — non-colliding `?foo=bar` and `?xScale=log` were dropped, which a stored-side-wins merge would have kept, and colliding `?country=~CHL` / `?tab=chart` landed on the stored query too, on a log and a plain row both). So for its first week a fresh redirect sends every arrival to the stored view; the per-key merge only starts once the 302 expires and the 301 function takes over. Neither layer can validate this section's merge claim.
+- Re-verify with a distinguishing pair (a query that *omits* a stored key) if grapher changes how chart redirects are baked or served. `functions/_common/redirectTools.ts`'s explorer path also merges per key but with the TARGET winning — a different code path; don't generalize from it in either direction.
+
+Both consumers get the log set from **`apply_scatter_defaults.log_y_axis_sources`**, which owns the reversed-source exclusion — do not re-derive it. A reversed source (GDP on its `y`) must be **excluded**: its `scaleType` describes the *GDP* axis, while the target's `y` is the non-GDP indicator, so proposing log there would make the wrong axis logarithmic. That is the same reason `process_row` skips its y-oriented mirrors for a reversed source, and getting it right in one script while forgetting it in another is exactly how this went wrong once.
+
+One limit remains: a reference that forces a **non-scatter** tab still receives the proposal, since the source's log was a global setting — but it is being applied to a view the author's choice was not about, so treat those rows as a judgment call.
 
 **Import those formatters from the `find-chart-references` scripts; never reimplement them** — a second copy drifts, and the drift shows up as a handoff whose links quietly stop resolving. Take each one from whichever module gets it right: `doc_url`, `gdoc_preview_url` and `cell` from `find_references.py`, and the **page link** plus the **search string** from `reference_report.py` (`page_deep_link`, `find_in_doc`, and its `cell(..., marker="")`), which is the module that handles the page-type routes and the literal truncation. Strip the tailscale suffix from the admin root you pass them, so the links read like the sweep's own (which are already short).
 
-They only apply to Google Doc surfaces, though — `doc_url` and `gdoc_preview_url` read `surface_id` **as** a Doc id, and on an explorer or narrative-chart row that field holds a slug or a chart id, which renders as a Doc link resolving to nothing. So the two article tables are filtered to `GDOC_SURFACES`, every other surface gets the section that explains its own consequence (key charts, the blocking explorer/data-insight/static-viz set, narrative charts), and whatever no section claims lands in a catch-all table — a row the sweep found must never go missing here.
+They only apply to Google Doc surfaces, though — `doc_url` and `gdoc_preview_url` read `surface_id` **as** a Doc id, and on an explorer or narrative-chart row that field holds a slug or a chart id, which renders as a Doc link resolving to nothing. So the two article tables are filtered to `GDOC_SURFACES`, every other surface gets the section that explains its own consequence, and whatever no section claims lands in a catch-all table — a row the sweep found must never go missing here.
+
+**Section order: embeds → links → explorer/DI/static-viz → narrative charts → key charts → catch-all.** It is roughly by urgency, but the tail is ordered by *kind of task* instead: a key-chart row is a tag association, not a reference in a document, so it wants the admin rather than Google Docs. Putting it last keeps the doc-editing run uninterrupted rather than splitting it in two.
+
+The narrative-chart section is the one place a **placement** table appears: `gdoc (narrative chart)` rows, which name the articles that place each narrative chart by name. They are deliberately excluded from `GDOC_SURFACES` — the surface is a gdoc, but the row references the *narrative chart*, not the chart being retired, so counting it among the article embeds would overstate both. Nest them under their narrative chart instead, with the same Doc / previewer / page links and search string the embed and link tables get, since the article edit is a step of the replacement.
 
 ### Key-chart slots — the Part 2 audit cannot see them
 
@@ -342,17 +373,33 @@ This is the concrete reason step 11 says not to trust a quiet Part 2 audit: on 2
 
 ### Narrative charts
 
-**They do not block the retirement.** A narrative chart parented to a chart owns a materialized full config and renders from it, so unpublishing the parent leaves it intact (`isPublished` is in `NARRATIVE_CHART_PROPS_TO_OMIT`). Its only use of the parent slug is the "Explore the data" href, which `GrapherState.canonicalUrlIfIsNarrativeChart` builds as `/grapher/<parent-slug>` + `queryParamsForParentChart` — so the redirect covers it. `narrativeCharts` is therefore counted but deliberately **not** part of the `MANUAL` gate.
+**They do not block the retirement.** A narrative chart parented to a chart owns a materialized full config and renders from it, so unpublishing the parent leaves it intact (`isPublished` is in `NARRATIVE_CHART_PROPS_TO_OMIT`). Its only use of the parent slug is the "Explore the data" href, which `GrapherState.canonicalUrlIfIsNarrativeChart` builds as `/grapher/<parent-slug>` + `queryParamsForParentChart`, and the redirect resolves that slug. `narrativeCharts` is therefore counted but deliberately **not** part of the `MANUAL` gate.
 
-The one thing to check is those params: they arrive as *incoming* params on the redirect, so a narrative chart with its own `tab` or `time` overrides `tab=scatter&time=latest&country=`. The script lists every narrative chart on the sources with its params and says which way each will land.
+What the redirect does **not** guarantee is delivering the scatter to it — see "A reference's own params override the redirect's, key by key" below. A narrative chart always has params, and they routinely include `tab` (its own view's tab), which overrides the stored `tab=scatter`; stored keys its params don't mention survive the hop.
 
-**To actually fix one, replace it — the parent columns are INSERT-only, so there is no re-pointing API and never will be** (owid/owid-grapher#6872, closed as not-planned). Order matters, because `create` rejects a duplicate name, `delete` is refused while a **published** post references the name, and `update` writes only query params — there is no rename:
+**Do not tell anyone to use the chart's "Create narrative chart" control — a plain chart has no such control.** An earlier version of this skill did, and it is wrong in a way that is easy to believe because MDIMs *do* have it:
 
-1. **Create** the replacement from `/grapher/<target-slug>?tab=scatter&time=latest&country=` using that chart's own **"Create narrative chart"** control, under a new kebab-case name. Use the control, not a bare create link — it parents to the view on screen. Entity selection and other controls open at the target's defaults and authored FAUST never transfers, so redo those by hand.
-2. **Update the article(s)** to reference the new name.
+- `CreateNarrativeChartEditorPage` returns `NotFoundPage` unless `type === "multiDim"`, so `/admin/narrative-charts/create` cannot be reached for a chart parent at all.
+- The site-side affordance is gated on `manager.adminCreateNarrativeChartPath` (`GrapherState.createNarrativeChartUrl`), and only `site/multiDim/MultiDim.tsx` and `MultiDimDataPageContent.tsx` ever set it. Not the share menu, not the chart page, nowhere.
+- The POST route *does* accept `{"type": "chart", "parentChartId": …}` (`createNarrativeChartFromChart`), so the capability exists with no click-path to it.
+
+Since every target in this migration is a plain chart, the API is the **only** way to create a replacement. Re-pointing is not an alternative: `updateNarrativeChart` reads both parent columns off the existing row, so they are INSERT-only and always will be (owid/owid-grapher#6872, closed as not-planned).
+
+So present three options and let the curator choose, rather than prescribing a rebuild:
+
+1. **Leave it.** It renders correctly forever; only the "Explore the data" landing view is off. Often the right call.
+2. **Ask a developer** to create the replacement via the API.
+3. **Wait for the target to become an MDIM**, then use the MDIM's own control, which does exist.
+
+**Keep the handoff's narrative section short.** The mechanism above is for you, not the curator: the handoff states only which narrative chart to replace and how, and the how is keyed by what the target is — a plain chart (developer/API, or leave it) vs. an MDIM (the target view's own "Create narrative chart" control). `narrative_chart_mechanism()` is that intro; don't grow it back into the citations.
+
+If they choose to replace it, order matters — `create` rejects a duplicate name, `delete` is refused while a **published** post references the name, and `update` writes only query params, so there is no rename:
+
+1. **Create** it against the target, reproducing `/grapher/<target-slug>?tab=scatter&time=latest&country=` plus `&yScale=log` on a log row (which is why the script prints that row's own stored query, not the constant). The handoff labels this column **"Replace with a narrative chart of"** and builds it with `view_to_reproduce`, not `replacement_url`: a narrative chart's `queryParamsForParentChart` routinely carry `tab=chart`, so merging them would name the target's line or slope view and you would rebuild the wrong one. Those params are its *"Explore the data"* href, not what it renders — its view comes from its own `configFull`. They still belong on the page in their own column, because nothing authored transfers: FAUST, entity selection and time pins are what you re-author the story from.
+2. **Update every article that places it** to the new name. The handoff lists them per narrative chart with the Doc, previewer and page links, and the search string to paste — the placements come from `find_references.sweep_articles_placing_narrative_charts`. A narrative chart is not itself in an article, so this hop is the only thing that says where the edit lands.
 3. **Delete** the old one — now unreferenced, so it succeeds. **Never delete first.**
 
-If you must script it, `POST {admin_api}/narrative-charts` takes `{"type": "chart", "name": "<kebab-case>", "parentChartId": <target chart id>, "config": <the OLD narrative chart's rendered full config>}` and `DELETE {admin_api}/narrative-charts/<id>` removes the old. Get `config` from `AdminAPI.get_narrative_chart(<old id>)["configFull"]` — the endpoint derives the patch by diffing against the new parent, so pass the rendered full config, not the old patch. `AdminAPI` has no create/delete for narrative charts, so scripting means hand-rolled HTTP; prefer the UI.
+`POST {admin_api}/narrative-charts` takes `{"type": "chart", "name": "<kebab-case>", "parentChartId": <target chart id>, "config": <the OLD narrative chart's rendered full config>}` and `DELETE {admin_api}/narrative-charts/<id>` removes the old. Get `config` from `AdminAPI.get_narrative_chart(<old id>)["configFull"]` — the endpoint derives the patch by diffing against the new parent, so pass the rendered full config, not the old patch. `AdminAPI` has no create/delete for narrative charts, so this is hand-rolled HTTP.
 
 ### Apply, in this order
 
@@ -379,6 +426,14 @@ Both failure directions are handled so no URL is ever left unserved. If any alia
 - The reference queries union a chart's own slug with its `chart_slug_redirects` slugs, so afterwards the old chart's referrers show up under the **target's** Refs tab.
 
 ### Verifying Part 2
+
+**Finalize every apply with the closing report.** Once the bake lands, run the same script in `--verify` mode and hand the user its table — the skill is not done until every row grades `OK`:
+
+```bash
+.venv/bin/python .claude/skills/add-gdp-scatter/scripts/redirect_to_scatter.py --verify < pairs.json
+```
+
+It reads every `chart_slug_redirects` row pointing at the batch's targets (the old slugs, the re-pointed aliases, and any pre-existing aliases of the targets — one invariant covers all three) and checks the live site serves each: a 30x whose Location matches that row's target and stored query, compared parsed so encoding and key order can't false-alarm. The DB rows alone can't close the gate, though — a planned redirect that was deleted or never created is simply absent from them, and a report built on rows alone would certify the leftovers. So the report also requires every payload row to stand at `EXISTS` in the same run's plan and fails the rest as `NOT_APPLIED`, naming the reason. `NOT_LIVE` (cached 200) and `NOT_SERVED` (404) mean the bake or CDN purge hasn't landed — re-run until clean; it exits non-zero while anything fails. The manual checks below remain for what HTTP can't see.
 
 - `curl -sI <site>/grapher/<old-slug>` → 301 to `/grapher/<target-slug>?tab=scatter&time=latest&country=`.
 - `curl -sI '<site>/grapher/<old-slug>?tab=chart'` → `Location` keeps `tab=chart`, proving incoming params win.
