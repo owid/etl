@@ -12,7 +12,7 @@ meta:
     producer: Food and Agriculture Organization of the United Nations
     citation_full: |-
       FAO. 2026. AQUASTAT - FAO's Global Information System on Water and Agriculture. Rome. https://data.apps.fao.org/aquastat
-    attribution_short: FAO
+    attribution: Food and Agriculture Organization of the United Nations - AQUASTAT (2026)
 
     # Files
     url_main: https://data.apps.fao.org/aquastat/
