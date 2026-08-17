@@ -45,6 +45,10 @@ SHARE_COLUMNS = [
 COLUMNS_TO_CONVERT = SECTORAL_COLUMNS + ["total_water_withdrawal", "total_freshwater_withdrawal"]
 BILLION_CUBIC_METERS_TO_CUBIC_METERS = 1e9
 
+# First year for which FAO's regional aggregates are kept (coverage is complete from then on, asserted in run).
+# NOTE: In 2000 itself, the share series of a few aggregates still lag (sums of 72-86%), hence 2001.
+AGGREGATES_MIN_YEAR = 2001
+
 
 def sanity_check_inputs(tb: Table) -> None:
     assert set(tb["variable"]) == set(VARIABLES), "Expected AQUASTAT variables not found; check their names."
@@ -72,10 +76,12 @@ def sanity_check_outputs(tb: Table) -> None:
     countries_total = tb[mask_countries & (tb["year"] == 2023)][SECTORAL_COLUMNS].sum().sum()
     assert abs(countries_total / world_total - 1) < 0.02, "Countries do not add up to the World total."
 
-    # After filtering incomplete-coverage years, aggregate rows should be internally consistent.
+    # After dropping incomplete-coverage years, aggregate rows should be roughly internally consistent.
+    # NOTE: FAO's own aggregate shares carry mild inconsistencies even in recent years (sums between ~90 and ~108,
+    # e.g. Latin America and the Caribbean in 2000-2005), since its sectoral and total series have different vintages.
     mask_aggregates = tb["country"].str.endswith("(FAO)") | (tb["country"] == "World")
     share_sum = tb.loc[mask_aggregates, SHARE_COLUMNS].sum(axis=1, min_count=3).dropna()
-    assert share_sum.between(98, 102).all(), "Aggregate sectoral shares do not add up to 100%."
+    assert share_sum.between(88, 110).all(), "Aggregate sectoral shares far from 100%."
     for column in SHARE_COLUMNS:
         assert tb[column].dropna().between(0, 101).all(), f"{column} outside the 0-100% range."
 
@@ -137,16 +143,15 @@ def run() -> None:
     # entities; only special groups with no counterpart (LDCs, LLDCs, SIDS) are excluded in the country mapping.
     tb = paths.regions.harmonize_names(tb=tb)
 
-    # FAO's regional aggregates are sums over the countries reporting in each year, so in early years (when few
-    # countries had data) they reflect incomplete coverage rather than real levels (e.g. the World row gives a total
-    # withdrawal of 0.7 billion m³ in 1965, and sectoral shares adding up to 196% in 1972). Keep aggregate rows only
-    # in years where FAO's own sectoral shares add up to ~100%, which signals complete coverage (~1997 for World).
+    # FAO's regional aggregates are sums over the countries reporting in each year, so in early years they reflect
+    # incomplete coverage rather than real levels (in 1965, the "World" row is 0.68 billion m³ — the sum of the only
+    # two reporting countries, Uruguay and Barbados). Keep aggregate rows only from a year with complete coverage.
     mask_aggregates = tb["country"].str.endswith("(FAO)") | (tb["country"] == "World")
-    share_sum = tb[SHARE_COLUMNS].sum(axis=1, min_count=3)
-    # NOTE: Aggregate rows missing any of the three shares also count as incomplete (fillna, since ~NA is NA).
-    mask_incomplete = mask_aggregates & ~share_sum.between(98, 102).fillna(False)
-    assert 400 < mask_incomplete.sum() < 900, "Unexpected number of incomplete-coverage aggregate rows."
-    tb = tb[~mask_incomplete].reset_index(drop=True)
+    n_countries = (
+        tb[~mask_aggregates & (tb["year"] >= AGGREGATES_MIN_YEAR)].groupby("year")["total_water_withdrawal"].count()
+    )
+    assert (n_countries > 150).all(), "Incomplete country coverage in years where aggregates are kept."
+    tb = tb[~(mask_aggregates & (tb["year"] < AGGREGATES_MIN_YEAR))].reset_index(drop=True)
 
     # A few countries carry shares of total withdrawal above 100% (e.g. Brunei's municipal share in 2004-2023),
     # where FAO's sectoral series are more recent than its (carried-forward) total series. A share of the total
