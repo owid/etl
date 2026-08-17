@@ -1,6 +1,14 @@
 ---
 name: data-updates-comms
-description: Draft answers for OWID's data-updates-comms Slack template using snapshot DVC + garden metadata + staging DB queries. Use when the user wants to fill the "Message about new data update" form, announce a dataset update to the internal #data-updates-comms channel, or generate the FAQ-style Slack post after an ETL update. Mechanical fields (producer, dates, coverage, chart count, search URL) are filled directly; editorial fields (why it matters, caveats, what's interesting about this update) get prompts seeded with extracted context for the user to refine. This is the INTERNAL Slack form only — for the public reader-facing "Data update" post on ourworldindata.org/latest, use /data-update-announcement instead.
+description: >-
+  Draft answers for OWID's data-updates-comms Slack template using snapshot DVC + garden metadata
+  + staging DB queries. Use when the user wants to fill the "Message about new data update" form,
+  announce a dataset update to the internal #data-updates-comms channel, or generate the FAQ-style
+  Slack post after an ETL update. Mechanical fields (producer, dates, coverage, chart count,
+  search URL) are filled directly; editorial fields (why it matters, caveats, what's interesting
+  about this update) get prompts seeded with extracted context for the user to refine. This is the
+  INTERNAL Slack form only — for the public reader-facing "Data update" post on
+  ourworldindata.org/latest, use /data-update-announcement instead.
 metadata:
   internal: true
 ---
