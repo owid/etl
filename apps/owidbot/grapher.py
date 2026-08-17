@@ -1,3 +1,4 @@
+import datetime as dt
 import json
 from pathlib import Path
 
@@ -12,6 +13,9 @@ SVG_TESTER_SUITES = ("graphers", "grapher-views", "mdims", "thumbnails")
 
 # Written by devTools/svgTester/verify-graphs.ts, one per suite
 VERIFY_RESULTS_FILENAME = "verify-results.json"
+
+# Mirrors SVG_TESTER_HEARTBEAT_STALE_MS in owid-grapher
+HEARTBEAT_STALE_SECONDS = 90
 
 
 def run(branch: str, head_sha: str | None = None) -> str:
@@ -89,10 +93,15 @@ def make_freshness_note(results_by_suite: dict[str, dict | None], head_sha: str 
     if not head_sha:
         return ""
 
-    commits = {results.get("grapherCommit") for results in results_by_suite.values() if results}
+    # An unreadable file carries no commit
+    readable = [results for results in results_by_suite.values() if results and results.get("status") != "unreadable"]
+
+    commits = {results.get("grapherCommit") for results in readable}
+    if not commits:
+        return ""
 
     if commits == {head_sha}:
-        if any(results.get("status") == "running" for results in results_by_suite.values() if results):
+        if any(results.get("status") == "running" and not is_stalled(results) for results in readable):
             return f"_⏳ Still running on the current commit `{head_sha[:7]}`._"
         return f"_Results are for the current commit `{head_sha[:7]}`._"
 
@@ -110,15 +119,20 @@ def make_suite_line(results: dict | None, container_name: str, suite: str) -> st
     if status == "unreadable":
         return "⚠️ no result (results file unreadable)"
 
-    if status == "running":
-        # verify-graphs.ts writes this before its first render and overwrites it at the end
-        return "_running_ (or killed mid-run)"
-
     counts = results.get("counts", {})
+    report = f" ([report]({make_report_url(container_name, suite=suite)}))"
+
+    if status == "running":
+        # verify-graphs.ts writes this before its first render and rewrites it every few
+        # seconds after. owidbot only reads the file once the SVG tester step is over, so
+        # a heartbeat that stopped means the run was killed
+        label = "⚠️ stopped mid-run" if is_stalled(results) else "⏳ running"
+        return f"{label}, {describe_progress(counts)}{report}"
+
     num_differences = counts.get("differences", 0)
     num_errors = counts.get("errors", 0)
 
-    if not num_differences and not num_errors:
+    if status == "ok":
         return "✅ no differences"
 
     notes = []
@@ -127,7 +141,32 @@ def make_suite_line(results: dict | None, container_name: str, suite: str) -> st
     if num_errors:
         notes.append(f"⚠️ {num_errors} error{'s' if num_errors != 1 else ''}")
 
-    return f"{', '.join(notes)} ([report]({make_report_url(container_name, suite=suite)}))"
+    return f"{', '.join(notes)}{report}"
+
+
+def is_stalled(results: dict) -> bool:
+    """Whether a running suite's heartbeat has stopped, meaning the run itself has."""
+    updated_at = results.get("updatedAt")
+    try:
+        heartbeat = dt.datetime.fromisoformat(updated_at)
+    except (TypeError, ValueError):
+        return True
+
+    return (dt.datetime.now(dt.timezone.utc) - heartbeat).total_seconds() > HEARTBEAT_STALE_SECONDS
+
+
+def describe_progress(counts: dict) -> str:
+    """How far a run that hasn't reported yet has got."""
+    total = counts.get("total", 0)
+    num_differences = counts.get("differences", 0)
+
+    # Until the run has enumerated its jobs, `total` is a zeroed placeholder.
+    if not total:
+        return "no charts checked yet"
+
+    done = counts.get("ok", 0) + num_differences + counts.get("errors", 0)
+    progress = f"{done:,} of {total:,} charts checked"
+    return f"{progress}, {num_differences:,} differences so far" if num_differences else progress
 
 
 def make_report_url(container_name: str, suite: str | None = None) -> str:
