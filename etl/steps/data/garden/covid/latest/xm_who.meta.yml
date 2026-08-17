@@ -6,6 +6,7 @@ definitions:
         - COVID-19
     display:
       numDecimalPlaces: 2
+      timeInterval: month
 
 
 # Learn more about the available fields:

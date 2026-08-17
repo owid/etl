@@ -10,20 +10,30 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **`dag/archive/*.yml` is a generated record** — it is reconstructed from git history by `etl archive-dag`, so never hand-edit it. It lists steps that were once active (with the commit where they were last active) purely for recovery; to bring one back, `git checkout` that commit.
 - **Never delete a step without archiving it.** Removing or superseding an active step (new version, retirement, replacement) obligates you to archive it — deleting the files alone is a bug. Procedure: remove its `dag/*.yml` entry and delete its files → **commit** → run `etl archive-dag` (it reads *committed* history, so the removal must be committed first) → commit the regenerated `dag/archive/*.yml`. If `archive-dag` sweeps in unrelated steps others left un-archived, `git checkout` those files to keep your PR scoped (never hand-edit the archive). For a migrated/backport dataset, also delete its now-orphaned `snapshots/backport/latest/dataset_<id>_*` mirror files.
 - **Ask the user** if unsure - don't guess
+- **Say what's left open.** Multi-step work rarely ends with everything closed, so close the report (and the PR body) by saying what's still pending, who owns it, and what nobody checked. No fixed format — `.claude/docs/open-items.md` lists what tends to get dropped.
 - **Always run `make check` before committing** (format, lint, typecheck on changed files). Run the test suite with `make unittest` (or `make test` for checks + tests + version-tracker); `lib/*` packages have their own venv and Makefile — run it from inside that directory.
 - If not told otherwise, save outputs to `ai/` directory.
 - **Notebooks**: Always create AND execute immediately using `uv run jupyter nbconvert --to notebook --execute --inplace <path>`
 - **Skills**: When creating new skills in `.claude/skills/`, always include `metadata: { internal: true }` in the SKILL.md frontmatter unless the user explicitly asks for the skill to be public. This prevents external skill indexes from crawling and listing our internal skills.
 
-## Close every report with what's still open
+## Start from a skill
 
-Multi-step work — updates, audits, reviews, migrations — rarely ends with everything closed. End the report (and the PR body, when there is one) with an explicit open-items block; never make the user ask "what's left?". Keep three buckets separate:
+Most recurring work here has a skill that runs it end to end. Reach for it **before** hand-rolling from the sections below — those document the underlying mechanics (`etls`, `etlr`, `etl pr`) that the skills already orchestrate, not a procedure to follow in parallel with one. Full descriptions live in `.claude/skills/`; this is just the entry-point index.
 
-- **Handed off** — waiting on someone else. Name who acts and what the ask is, and include a locator (link, file, id) — an item the next person must re-derive is not handed off.
-- **Proposed** — waiting on sign-off. State the exact change so "yes" is a complete answer.
-- **Unverified** — nobody checked it: skipped or failed checks, surfaces left uncovered, capped or truncated sweeps. Silence here reads as "clean", which is the one wrong signal a report can send.
+| Task | Skill |
+|------|-------|
+| Refresh an existing dataset to a new version | `/update-dataset` |
+| Brand-new dataset from a file or link the user provides | `/create-dataset` |
+| Add a new snapshot (`.dvc`, plus a script only if needed) | `/create-snapshot` |
+| Scaffold meadow/garden/grapher steps for a snapshot that already exists | `/create-etl-steps` — the primitive `/create-dataset` calls; don't run it standalone unless scaffolding really is all you need |
+| Bring a legacy (no-catalogPath) dataset into ETL | `/migrate-dataset` |
+| Change user-facing chart/indicator text — title, subtitle, footnote, units, `description_short`, WYSK/`description_key`, entity selection | `/edit-faust-metadata` |
+| Check that text against the Writing and Style Guide | `/check-metadata-style` |
+| Build a multi-dim indicator, or an explorer | `/create-multidim`, `/create-explorer` |
+| Review a dataset-update PR | `/review-data-pr` |
+| Announce a finished update | `/data-updates-comms` |
 
-Re-state the whole block every time the work is revisited — carry open items forward rather than reporting only the delta, and say explicitly when an item clears instead of dropping it silently.
+One that's easy to skip and shouldn't be: `/edit-faust-metadata` owns **every** user-facing-text edit — it routes each field to the right layer (garden `.meta.yml` vs MDim yaml vs chart config on staging) and reports the blast radius on other charts before touching shared metadata.
 
 ## Team
 
@@ -143,7 +153,7 @@ catalog. `✅ No differences found` is itself a result worth reporting.
 ```
 
 **Important:**
-- **Snapshot scripts need no `__main__` guard** — the `etls` CLI imports the module and invokes its click command `run` directly, so don't add `if __name__ == "__main__":` boilerplate. Many old scripts still carry it; don't copy them.
+- **Snapshot scripts need no `__main__` guard and no `click` decorators** — the `etls` CLI imports the module and calls its `run()` function itself, so don't add `if __name__ == "__main__":` boilerplate or `@click.command()` / `@click.option(...)`. New scripts should match the shape the wizard's cookiecutter emits: a plain `def run(upload: bool = True) -> None:`. Most existing scripts still carry both — they keep working, because `etl/snapshot_command.py` also accepts a click command — but don't copy them.
 - **Avoid `--force`** — `etlr` has built-in change detection and re-runs steps whose **code, dag entries, or data** changed. Editing a step's `.py`/`.yml` or its dag dependency line is enough to trigger a rebuild — don't add `--force`. Reserve `--force --only` for the narrow case where nothing in the repo changed but you still need to re-run (e.g., upstream data was patched out-of-band). Never use `--force` alone.
 - **`--only` requires deps on disk.** It skips dep resolution and won't download missing deps — even with `PREFER_DOWNLOAD=1`. If you hit a `FileNotFoundError` on a dep's `index.json`, drop `--only` and let etlr resolve the chain.
 - **`PREFER_DOWNLOAD=1`** — Download already-built datasets from the OWID catalog instead of recomputing locally. Useful when verifying a downstream step still works after a dag edit (the upstream deps get fetched, not rebuilt). Doesn't help if you've edited the dataset's own code. It also **fails with `AccessDenied` when the target version isn't in the catalog yet** (e.g. a version you just created) — use it only to fetch already-published upstream deps, never for the new step you're building locally.
@@ -314,6 +324,7 @@ See `.claude/docs/` for:
 - `debugging.md` - Data quality debugging approach
 - `pipeline-stages.md` - Pipeline architecture details
 - `cloud-sandbox.md` - Claude Code on the web: what a cloud session can and can't do
+- `open-items.md` - What tends to be left open at the end of multi-step work
 
 If you are running in a Claude Code cloud sandbox (`CLAUDE_CODE_REMOTE=true`), read
 `.claude/docs/cloud-sandbox.md` **before starting work** — it covers the pre-created

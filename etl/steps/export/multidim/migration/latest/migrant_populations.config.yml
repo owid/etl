@@ -1,0 +1,123 @@
+title:
+  title: Immigrants and emigrant populations
+  title_variant: ""
+
+default_selection:
+  - World
+  - United States
+  - Germany
+  - India
+  - Mexico
+
+default_dimensions:
+  metric: immigrants
+  unit: number
+
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        tab: map
+        chartTypes: ["LineChart"]
+        yAxis:
+          min: 0
+  definition_migrant_un: The UN defines an international migrant as someone who has been living for one year or longer in a country other than their country of birth.
+  definition_immigrants: This chart shows the total number of immigrants in each country. For example, if you are looking at the United States, the number of immigrants is the number of people living in the United States who were born in another country.
+  definition_immigrants_share: This chart shows the share of immigrants in each country. For example, if you are looking at the United States, the percentage you see is the share of people living in the United States who were born in another country, out of the total population of the United States.
+  definition_emigrants: This chart shows the total number of emigrants in each country. For example, if you are looking at the United States, the number of emigrants is the number of people who were born in the United States but now live in another country.
+  definition_emigrants_share: This chart shows the share of emigrants in each country. For example, if you are looking at the United States, the percentage you see is the share of people who were born in the United States but now live in another country, out of the total population of the United States.
+  definition_migrant_un_2: For the majority of countries the UN defines immigrants or emigrants on the basis of country of birth. Someone who lives in a country other than the one in which they were born is considered an immigrant, even if they have acquired citizenship of the country in which they live. For countries where data on place of birth is not available, the UN uses citizenship instead.
+
+
+dimensions:
+  - slug: metric
+    name: Metric
+    choices:
+      - slug: immigrants
+        name: Immigrants
+        description: People living in a country who were born abroad.
+      - slug: emigrants
+        name: Emigrants
+        description: People born in a country who now live abroad.
+  - slug: unit
+    name: Unit
+    choices:
+      - slug: number
+        name: Number of people
+      - slug: share
+        name: Share of population
+    presentation:
+      type: radio
+
+views:
+  - dimensions:
+      metric: immigrants
+      unit: number
+    indicators:
+      y:
+        - catalogPath: migrant_stock#immigrants_all
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          binningStrategy: manual
+          customNumericValues: [0, 100000, 200000, 500000, 1000000, 2000000, 5000000, 10000000, 20000000]
+    metadata:
+      description_key:
+        - "{definitions.definition_migrant_un}"
+        - "{definitions.definition_immigrants}"
+        - "{definitions.definition_migrant_un_2}"
+
+  - dimensions:
+      metric: immigrants
+      unit: share
+    indicators:
+      y:
+        - catalogPath: migrant_stock#immigrant_share_of_dest_population_all
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          binningStrategy: manual
+          customNumericValues: [0, 1, 2, 5, 10, 20, 50]
+    metadata:
+      description_key:
+        - "{definitions.definition_migrant_un}"
+        - "{definitions.definition_immigrants_share}"
+        - "{definitions.definition_migrant_un_2}"
+
+  - dimensions:
+      metric: emigrants
+      unit: number
+    indicators:
+      y:
+        - catalogPath: migrant_stock#emigrants_all
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          binningStrategy: manual
+          customNumericValues: [0, 100000, 200000, 500000, 1000000, 2000000, 5000000, 10000000, 0]
+    metadata:
+      description_key:
+        - "{definitions.definition_migrant_un}"
+        - "{definitions.definition_emigrants}"
+        - "{definitions.definition_migrant_un_2}"
+
+  - dimensions:
+      metric: emigrants
+      unit: share
+    indicators:
+      y:
+        - catalogPath: migrant_stock#emigrants_share_of_total_population
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          binningStrategy: manual
+          customNumericValues: [0, 1, 2, 5, 10, 20, 50]
+    metadata:
+      description_key:
+        - "{definitions.definition_migrant_un}"
+        - "{definitions.definition_emigrants_share}"
+        - "{definitions.definition_migrant_un_2}"

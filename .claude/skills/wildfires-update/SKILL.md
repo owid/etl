@@ -200,11 +200,18 @@ GWIS reports 7-day bins anchored at 1 January, **labelled by their last day**: b
 A closed bin keeps being revised **upwards** for one to two weeks as burnt-area detections are
 reprocessed. Measured on the 2026 season:
 
-| Bin read | Age at read | Shortfall vs settled value |
+| Bin read | Age at read | Shortfall vs value at a later read |
 |---|---|---|
 | closing 07-08, read 07-10 | 2 days | −5.2% |
 | closing 07-22, read 07-27 | 5 days | −8.6% |
-| closing 07-15 and earlier | ≥12 days | 0.0% (identical across reads) |
+| closing 08-05, read 08-14 | 9 days | −9.2% |
+| closing 07-29, read 08-07 | 16 days | −2.8% |
+| closing 07-22, read 08-07 | 23 days | −2.5% |
+| closing 07-15 and earlier, read 08-14 | ≥30 days | 0.0% (identical across reads) |
+
+Don't read the older rows as a settled floor: they are lower bounds against the *next* read, not
+against a final value, and each was still moving. Three-plus weeks is the first age at which a bin
+has been observed not to move at all.
 
 So the newest point on every wildfire chart is an undercount of roughly 5-10% until a later
 update fills it in. **Never quote the latest week as a finished number** in an announcement, a

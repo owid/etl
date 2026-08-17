@@ -26,6 +26,7 @@ tables:
           name: |-
             Birth rate
 
+          timeInterval: month
       birth_rate_per_day:
         title: Birth rate per day, on a monthly basis
         unit: births per million people
@@ -35,6 +36,7 @@ tables:
           name: |-
             Birth rate, per day
 
+          timeInterval: month
       birth_rate_lead_9months:
         title: Birth rate, on a monthly basis, by estimated month of conception
         unit: births per 1,000 people
@@ -44,6 +46,7 @@ tables:
           name: |-
             Birth rate
 
+          timeInterval: month
       birth_rate_per_day_lead_9months:
         title: Birth rate per day, on a monthly basis, by estimated month of conception
         unit: births per 1,000 people
@@ -53,6 +56,7 @@ tables:
           name: |-
             Birth rate, per day
 
+          timeInterval: month
   birth_rate_month:
     variables:
       birth_rate:

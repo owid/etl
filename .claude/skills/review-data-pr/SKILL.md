@@ -309,9 +309,9 @@ Structure the review with:
 6. **🟡 Suggestions** — nice-to-have
 7. **🟢 Informational** — observations, no action needed
 8. **Workflow gaps from /update-dataset** — PR description, Codex review, indicator upgrade, downstream deps, etc. (The Slack + `/latest` drafts live in `workbench/`, not the PR — don't expect them here.)
-9. **What's still open** — carried forward from the PR body, using the open-items buckets defined in CLAUDE.md ("Close every report with what's still open") plus the update workflow's fourth bucket (**deferred to a follow-up PR** — downstream repoints, old-version archiving). Re-state the full list on every re-review, not just the delta, and mark what cleared since last time.
+9. **What's still open** — carried forward from the PR body, covering the categories in `.claude/docs/open-items.md` plus the update workflow's fourth one (**deferred to a follow-up PR** — downstream repoints, old-version archiving). Re-state the full list on every re-review, not just the delta, and mark what cleared since last time.
 
-**Check the PR body actually carries that block** (CLAUDE.md requires it). A PR whose description lists only what was done, while the session left content edits pending, audits unrun, or a follow-up PR's scope undefined, is missing the one artifact that survives after the chat is gone — flag it 🟡. Findings that were deliberately handed off need a locator in the body too, not just a description: an item the next person can't act on without redoing the analysis isn't handed off.
+**Check the PR body doesn't leave pending work unmentioned.** A PR whose description lists only what was done, while the session left content edits pending, audits unrun, or a follow-up PR's scope undefined, is missing the one artifact that survives after the chat is gone — flag it 🟡. Judge it on whether a reader can tell what's outstanding, not on whether it uses any particular headings or wording. Work that was deliberately handed off needs a locator in the body too, not just a description: an item the next person can't act on without redoing the analysis isn't handed off.
 
 ## Severity rubric
 

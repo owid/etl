@@ -52,3 +52,4 @@ tables:
           - Lithium iron phosphate (LFP) and lithium nickel manganese cobalt oxide (NMC) are two types of rechargeable batteries commonly used in electric vehicles and renewable energy storage.
         display:
           numDecimalPlaces: 2
+          timeInterval: quarter

@@ -7,7 +7,7 @@ definitions:
         - Economic Inequality
       attribution_short: Alvaredo, Atkinson and Morelli
     description_key:
-      - Wealth refers to marketable (net) personal wealth: the value of the assets individuals own, minus their debts.
+      - "Wealth refers to marketable (net) personal wealth: the value of the assets individuals own, minus their debts."
       - Most of the estimates are based on estate data — the wealth recorded when people die — scaled up to represent the living population using the "estate multiplier" method, in which the deceased are re-weighted by mortality rates that vary with age, sex and wealth.
       - The series is linked with earlier investment-income and administrative sources so that it can be extended back to 1895, covering more than a century.
       - Definitions of wealth and of the reference population change somewhat over this long period; the source paper documents these breaks in detail.

@@ -23,6 +23,16 @@ TWH_TO_KWH = 1e9
 # Countries whose data have to be removed since they were identified as outliers.
 OUTLIERS = ["Gibraltar"]
 
+# Indicators that must not carry the producer's description, because it describes only one of the
+# inputs that go into them (see where this is applied, at the end of run()).
+COLUMNS_WITHOUT_PRODUCER_DESCRIPTION = [
+    "low_carbon_energy_annual_change_pct",
+    "low_carbon_energy_annual_change_twh",
+    "low_carbon_energy_per_capita_kwh",
+    "low_carbon_energy_twh",
+    "total_energy_supply_per_gdp_kwh_per_dollar",
+]
+
 # Base TES sources taken directly from the Statistical Review (SR garden column -> short source name).
 SR_SOURCES = {
     "coal_consumption_twh": "coal",
@@ -365,8 +375,10 @@ def add_biomass_inclusive_shares(tb: Table) -> Table:
 def add_annual_change(tb: Table) -> Table:
     """Add annual change (absolute and percentage) for each source and the total.
 
-    Only consecutive-year changes are kept: the World long-run series (Smil) is decadal before 1900,
-    so a naive row-to-row change there would be a multi-year change mislabeled as an annual change.
+    Only consecutive-year changes are kept: the World long-run series (Smil) is decadal all the way
+    from 1800 to 1960, so a naive row-to-row change there would be a multi-year change mislabeled as an
+    annual change. As a result these indicators have no pre-1965 values at all, which is why drop_origin
+    removes Smil from them at the end of run().
     """
     tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
     is_consecutive = tb.groupby("country", observed=True)["year"].diff() == 1
@@ -392,6 +404,15 @@ def add_per_gdp(tb: Table, ds_gdp: Dataset) -> Table:
     tb = add_gdp_to_table(tb=tb, ds_gdp=ds_gdp, gdp_col="gdp")
     tb["total_energy_supply_per_gdp_kwh_per_dollar"] = tb["total_energy_supply_twh"] / tb["gdp"] * TWH_TO_KWH
     tb = tb.drop(columns=["gdp"], errors="raise")
+    return tb
+
+
+def drop_origin(tb: Table, columns: list[str], producer: str) -> Table:
+    """Remove a producer from the origins of the given columns, where it contributes no value."""
+    for column in columns:
+        origins = [origin for origin in tb[column].m.origins if origin.producer != producer]
+        assert len(origins) < len(tb[column].m.origins), f"{producer} is not an origin of {column}."
+        tb[column].m.origins = origins
     return tb
 
 
@@ -474,6 +495,25 @@ def run() -> None:
     # from this step's own meta.yml, which is applied on save.
     for column in tb.columns:
         tb[column].m.description_key = []
+
+    # For the same reason, drop the producer's description where it describes only one input:
+    # low-carbon energy sums nuclear and renewables, whose constituents the Statistical Review
+    # describes differently, and energy per GDP divides its energy by another producer's GDP.
+    for column in COLUMNS_WITHOUT_PRODUCER_DESCRIPTION:
+        tb[column].m.description_from_producer = None
+
+    # Charts cite an indicator's origins, so an origin that contributes no value to it is a false
+    # citation. Two cases here, both created by deriving columns from a table that combines producers:
+    # - Annual change: Smil's World series is decadal before 1965 and add_annual_change keeps only
+    #   consecutive years, so no Smil value survives (these indicators start in 1965).
+    # - Biomass-inclusive shares: these are World-only, and the World total comes from the Statistical
+    #   Review (1965 onwards, with no gaps) or Smil before that, never from the EIA.
+    tb = drop_origin(tb, columns=[col for col in tb.columns if "annual_change" in col], producer="Smil")
+    tb = drop_origin(
+        tb,
+        columns=[col for col in tb.columns if col.endswith("_share_including_biomass_pct")],
+        producer="U.S. Energy Information Administration",
+    )
 
     # Format table conveniently.
     tb = tb.format(sort_columns=True, short_name=paths.short_name)
