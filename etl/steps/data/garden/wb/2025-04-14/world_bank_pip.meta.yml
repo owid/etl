@@ -1351,7 +1351,7 @@ tables:
         title: Share ({definitions.percentiles_avg_share}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
-        description_short: Share of <<welfare_type>> {definitions.welfare_type_verb} by the {definitions.percentiles_avg_share} (tenth of the population)
+        description_short: Share of <<welfare_type>> {definitions.welfare_type_verb} by the {definitions.percentiles_avg_share} (tenth of the population).
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"

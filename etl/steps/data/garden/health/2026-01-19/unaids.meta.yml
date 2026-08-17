@@ -1352,7 +1352,7 @@ tables:
         title: "Attitudes towards violence against women - Age: <<age>> - Sex: <<sex>>"
         unit: "%"
         description_short: |-
-          Percentage of << "women" if sex == "female" else "men" if sex == "male" else "men and women" >> aged <<age if age != "total" else "15-49">> years who believe that a husband is justified in hitting or beating his wife for
+          Percentage of << "women" if sex == "female" else "men" if sex == "male" else "men and women" >> aged <<age if age != "total" else "15-49">> years who believe that a husband is justified in hitting or beating his wife for.
         description_from_producer: |-
           Gender inequality continues to stand in the way of global goals to end AIDS by 2030. Inequitable gender norms that confine women and men to specific roles in society - together with gender disparities in education and employment - greatly limit HIV prevention strategies among women, girls, and gender and sexual minorities. Fear, experiences of violence and power imbalances in relationships also increase vulnerability to HIV among these groups, limiting their access to HIV services and reducing their adherence to HIV prevention or treatment technologies. This leaves them disproportionately affected by HIV. Scaling up programmes to increase gender equity and intensifying efforts to achieve gender equality is therefore critical for ending AIDS as a global public health threat by 2030.
 
