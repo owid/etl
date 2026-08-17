@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Population and Migration Estimates
+    description: |-
+      Annual estimates of the population and the components of population change — births, deaths, immigration, emigration, and net migration — for Ireland, published by the Central Statistics Office. Each figure refers to the year ending in April.
+
+      This table (PEA15, "Annual Population Change") gives net migration for every year from 1951, and immigration and emigration from 1987. The Central Statistics Office estimates the years between censuses from the census results and annual data on births, deaths, and migration, and revises them after each new census.
+    date_published: "2025-08-26"
+    version_producer: April 2025
+
+    # Citation
+    producer: Central Statistics Office, Ireland
+    citation_full: |-
+      Central Statistics Office, Ireland (2025). Population and Migration Estimates, April 2025. Table PEA15: Annual Population Change.
+
+    # Files
+    url_main: https://data.cso.ie/table/PEA15
+    url_download: https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset/PEA15/JSON-stat/2.0/en
+    date_accessed: "2026-08-05"
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.cso.ie/en/aboutus/whoweare/copyrightpolicy/
+outs:
+  - md5: 49386ad4b1ab1adbd0563ffd06a4f5bf
+    size: 7321
+    path: ireland_population_change.json
