@@ -35,8 +35,6 @@ definitions:
   footnote_zero_idps: A value of 0 means that IDMC is not aware of any internally displaced people (IDPs) in that region at the time of reporting. It does not mean that IDMC has confirmed that there are no IDPs.
   footnote_zero_displacements: A value of 0 means that IDMC is not aware of any internal displacements in that region at the time of reporting. It does not mean that IDMC has confirmed that there are no displacements.
   footnote_return_calendar_year: The UNHCR only includes IDPs who returned during this calendar year in their statistics.
-  footnote_child_idps_per_capita: This shows the number of internally displaced children (under 18) per 1,000 total population of all ages.
-  footnote_child_displacements_per_capita: This shows the number of new internal displacements of children (under 18) per 1,000 total population of all ages.
 
 dimensions:
   - slug: cause
@@ -400,7 +398,6 @@ views:
       y:
         - catalogPath: child_migration#idps_under_18_total
     config:
-      note: "{definitions.footnote_zero_idps}"
       map:
         colorScale:
           baseColorScheme: OrRd
@@ -422,7 +419,6 @@ views:
       y:
         - catalogPath: child_migration#idps_under_18_total_per_1000
     config:
-      note: "{definitions.footnote_child_idps_per_capita}"
       map:
         colorScale:
           baseColorScheme: OrRd
@@ -444,7 +440,6 @@ views:
       y:
         - catalogPath: child_migration#new_idps_under_18_total
     config:
-      note: "{definitions.footnote_zero_displacements}"
       map:
         colorScale:
           baseColorScheme: OrRd
@@ -466,7 +461,6 @@ views:
       y:
         - catalogPath: child_migration#new_idps_under_18_total_per_1000
     config:
-      note: "{definitions.footnote_child_displacements_per_capita}"
       map:
         colorScale:
           baseColorScheme: OrRd
@@ -489,7 +483,6 @@ views:
       y:
         - catalogPath: child_migration#idps_under_18_conflict_violence
     config:
-      note: "{definitions.footnote_zero_idps}"
       map:
         colorScale:
           baseColorScheme: OrRd
@@ -512,7 +505,6 @@ views:
       y:
         - catalogPath: child_migration#idps_under_18_conflict_violence_per_1000
     config:
-      note: "{definitions.footnote_child_idps_per_capita}"
       map:
         colorScale:
           baseColorScheme: OrRd
@@ -535,7 +527,6 @@ views:
       y:
         - catalogPath: child_migration#new_idps_under_18_conflict_violence
     config:
-      note: "{definitions.footnote_zero_displacements}"
       map:
         colorScale:
           baseColorScheme: OrRd
@@ -559,7 +550,6 @@ views:
       y:
         - catalogPath: child_migration#new_idps_under_18_conflict_violence_per_1000
     config:
-      note: "{definitions.footnote_child_displacements_per_capita}"
       map:
         colorScale:
           baseColorScheme: OrRd
@@ -583,7 +573,6 @@ views:
       y:
         - catalogPath: child_migration#idps_under_18_disaster
     config:
-      note: "{definitions.footnote_zero_idps}"
       map:
         colorScale:
           baseColorScheme: OrRd
@@ -606,7 +595,6 @@ views:
       y:
         - catalogPath: child_migration#idps_under_18_disaster_per_1000
     config:
-      note: "{definitions.footnote_child_idps_per_capita}"
       map:
         colorScale:
           baseColorScheme: OrRd
@@ -629,7 +617,6 @@ views:
       y:
         - catalogPath: child_migration#new_idps_under_18_disaster
     config:
-      note: "{definitions.footnote_zero_displacements}"
       map:
         colorScale:
           baseColorScheme: OrRd
@@ -653,7 +640,6 @@ views:
       y:
         - catalogPath: child_migration#new_idps_under_18_disaster_per_1000
     config:
-      note: "{definitions.footnote_child_displacements_per_capita}"
       map:
         colorScale:
           baseColorScheme: OrRd

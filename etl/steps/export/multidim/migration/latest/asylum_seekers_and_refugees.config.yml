@@ -38,7 +38,6 @@ definitions:
   footnote_asylum: This data includes all asylum-seekers, not just those who fled or applied for asylum that year.
   footnote_refugees_asylum: This data includes all refugees who live in this country, not just those who arrived that year.
   footnote_asylum_asylum: This data includes all asylum-seekers who live in this country, not just those who arrived or applied for asylum that year.
-  footnote_child_per_capita: This shows the number of child refugees (under 18) per 1,000 total population of all ages.
 
 dimensions:
   - slug: metric
@@ -357,7 +356,6 @@ views:
       y:
         - catalogPath: child_migration#refugees_under_18_origin_per_1000
     config:
-      note: "{definitions.footnote_child_per_capita}"
       map:
         colorScale:
           baseColorScheme: YlOrRd
@@ -400,7 +398,6 @@ views:
       y:
         - catalogPath: child_migration#refugees_under_18_asylum_per_1000
     config:
-      note: "{definitions.footnote_child_per_capita}"
       map:
         colorScale:
           baseColorScheme: YlGnBu
