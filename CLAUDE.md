@@ -300,6 +300,15 @@ Two different descriptions, two different jobs. Don't mix them:
 
 If the same sentence could fit in both, it belongs in garden — not in `.dvc`. Don't repeat producer-side facts in `description_processing`, and don't put OWID-side transformations in the `.dvc`.
 
+### Two rules for every subtitle you write
+
+These apply to `description_short` and `presentation.grapher_config.subtitle` alike — both feed a chart's subtitle through grapher inheritance (`grapher_config.subtitle` wins; `description_short` is the fallback) — and to `subtitle` in MDim and explorer configs:
+
+- **Don't open with "The" when the next word works just as well.** ❌ `The estimated number of deaths from drowning among children under 5.` ✅ `Estimated number of deaths from drowning among children under 5.` Keep "The" only when dropping it breaks the grammar — the text is a sentence whose subject is that noun phrase (`The Gini coefficient measures inequality…`, `The Augmented Human Development Index (AHDI) is a summary measure…`) — or when it's part of a proper name (`The Gambia`, `The Internet`).
+- **Always end with punctuation, normally a period.** ❌ `Estimated number of deaths from drowning among children under 5` ✅ `Estimated number of deaths from drowning among children under 5.`
+
+Full guide (synced from Notion every two weeks) in `.claude/skills/check-metadata-style/STYLE_GUIDE.md`; `/check-metadata-style` audits a dataset against it.
+
 ## Sanity checks
 
 Silent data corruption is one of the easier bugs to miss: a step can run cleanly, pass type checks, and ship wrong numbers to staging. Every garden step that does more than a straight load-and-format asserts its assumptions about its inputs and its output — and so does any snapshot that parses non-trivially (PDF tables, custom binary formats, scraping). Where they go, what they look like, and which categories are worth checking are in `.claude/rules/sanity-checks.md`, which loads on its own when you open a step or snapshot script.
