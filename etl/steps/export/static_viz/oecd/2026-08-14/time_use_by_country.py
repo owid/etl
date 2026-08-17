@@ -84,6 +84,11 @@ MINUTES_PER_DAY = 1440
 
 # The OECD's top-level categories, in bar order. Each carries a seaborn "deep" palette position;
 # its member groups are that hue at decreasing saturation, so a family reads as one category.
+#
+# Seaborn on purpose: OWID's own palette and fonts are applied in Figma, where the Chart colors
+# library and Lato actually live. Setting them here would also be unreproducible — matplotlib on this
+# machine has neither Lato nor Playfair Display, so a step that asked for them would silently fall
+# back and emit different type depending on which machine built it.
 # `Unpaid work & other` is named for what it holds: the OECD's unpaid-work category plus its small
 # "other" category (religious and civic activities, and uncategorized time), which garden folds
 # into the same group.
@@ -138,6 +143,13 @@ GROUPS = [
 
 TOTAL_LEISURE_COLUMN = "total_leisure"
 
+# Between two names in a listed header. Drawn as its own run in `MUTED_COLOR` rather than appended to
+# the name before it, so it neither takes that name's color nor fades out after a pale tint. The space
+# that precedes it belongs to the name's run: `TextPath` measures ink, so a *leading* space is lost
+# from a run's advance (a trailing one is recovered by the sentinel in `text_advance_px`), and a run
+# starting with a space would draw one space further right than the layout accounted for.
+SEPARATOR = "· "
+
 # A group's values are drawn only where this share of countries can hold one; otherwise none of them
 # are. A number on a handful of rows reads as a fact about those countries rather than as the rest
 # being too narrow to print — education fitted on 1 of 35 rows, and that one number said nothing.
@@ -176,6 +188,10 @@ TITLE_SUBTITLE_GAP = 6
 # Vertical rhythm between the subtitle and the header, in text lines.
 SUBTITLE_GAP = 0.8
 
+# Clearance between the plot's own ink and the template's text above and below it, in template px.
+# The design asks for 12-16 on these frames; 14 is the middle of that.
+BAND_INSET = 14
+
 # Horizontal breathing room, in template pixels: between a country label and its bar, between the
 # bars and the total-leisure column, and inside a segment around its value.
 COUNTRY_LABEL_PAD = 8
@@ -213,6 +229,12 @@ LAYOUTS = {
         "margin": 16,
         "title_y": 16,
         "chart_bottom_y": 997,
+        # The template's own text edges (create-static-viz TEMPLATES.md): the subtitle's ink
+        # bottom and the Note's ink top. Both are ink, not frames — the footer frame starts 14px
+        # above its Note, so using the frame edge here would inset twice. The plot is laid inside
+        # this, inset by BAND_INSET, so the clearance is right against the template's own text
+        # rather than against this step's smaller copies of it.
+        "band": (118, 1015.81),
         "note_y": 1013,
         "source_y": 1046,
         "footer_y": 1066,
@@ -242,6 +264,8 @@ LAYOUTS = {
         # The template's chart area ends at the source row (y=770); a small inset keeps the last
         # bar off it.
         "chart_bottom_y": 758,
+        # Mobile has no Note row, so the band ends at the Data source row.
+        "band": (118, 770),
         "note_y": None,
         "source_y": 770,
         "footer_y": 791,
@@ -506,8 +530,14 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     header_px = max(band_px("above"), 2 * line_px(layout["header_fontsize"]) + LEADER_GAP)
     below_px = band_px("below")
 
-    chart_top_px = subtitle_bottom_px + header_px
-    chart_bottom_px = layout["chart_bottom_y"] - below_px
+    # The plot sits inside the *template's* chart area, not inside whatever room this step's own text
+    # happens to leave. The step draws its footer at 7.75pt and its subtitle at 10.5pt, both smaller
+    # than the template's 12px and 16px, so a band derived from them puts the header ink flush under
+    # this step's subtitle and only ~7px under the template's — below the 12-16px the design asks for.
+    # `band` comes from create-static-viz's TEMPLATES.md; `BAND_INSET` is the clearance at each end.
+    band_top, band_bottom = layout["band"]
+    chart_top_px = max(subtitle_bottom_px, band_top + BAND_INSET) + header_px
+    chart_bottom_px = min(layout["chart_bottom_y"], band_bottom - BAND_INSET) - below_px
 
     n_rows = len(tb)
     row_pitch_px = (chart_bottom_px - chart_top_px) / n_rows
@@ -550,12 +580,12 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     elif layout["group_labels"] in ("below_listed", "below_flow"):
         draw_listed_header(fig, listed_lines, palette, chart_bottom_px + LEADER_GAP, margin_px, layout, fx, fy)
 
-    # Total-leisure column header, over its own column.
+    # Total-leisure column header, right-aligned on the content edge with its own column's values.
     ax.text(
-        MINUTES_PER_DAY + TOTAL_COLUMN_GAP / px_per_min,
+        content_right_min(layout, px_per_min),
         rows_above(LEADER_GAP),
         "Total\nleisure",
-        ha="left",
+        ha="right",
         va="bottom",
         fontsize=layout["header_fontsize"],
         fontweight="bold",
@@ -657,10 +687,10 @@ def draw_bars(
         total_leisure = round(float(country_row[TOTAL_LEISURE_COLUMN]))
         total_label = f"{total_leisure} mins" if layout["with_mins_suffix"] else f"{total_leisure}"
         ax.text(
-            MINUTES_PER_DAY + TOTAL_COLUMN_GAP / px_per_min,
+            content_right_min(layout, px_per_min),
             y_center,
             total_label,
-            ha="left",
+            ha="right",
             va="center",
             fontsize=layout["value_fontsize"],
             color=TEXT_COLOR,
@@ -836,6 +866,17 @@ def draw_footer(fig, tb: Table, ages: dict[str, str], source_citation: str, layo
 # ---------------------------------------------------------------------------
 
 
+def content_right_min(layout: dict, px_per_min: float) -> float:
+    """The content box's right edge, in the axes' minute units.
+
+    Everything in the frame lines up on two verticals: the content's left edge, where the subtitle and
+    note start and where the widest country label begins, and its right edge, which is where the logo
+    ends. The bars stop at 1440 minutes, so the total-leisure column past them is what has to reach
+    this edge — right-aligned on it, rather than left-aligned at a fixed gap and stopping short.
+    """
+    return MINUTES_PER_DAY + layout["total_column_px"] / px_per_min
+
+
 def segment_spans(row, px_per_min: float) -> dict[str, tuple[float, float]]:
     """Each group's (start, end) in template pixels, for one row of the chart."""
     spans = {}
@@ -985,8 +1026,10 @@ def layout_flowed_names(layout: dict, available_px: float) -> list[list[tuple]]:
     step. The category names are not repeated: the brackets above the bars carry them, and the colors
     tie each name back to its own segment.
     """
-    runs = [(group["label"] + (" · " if index < len(GROUPS) - 1 else ""), group) for index, group in enumerate(GROUPS)]
-    widths = [text_advance_px(text, layout["header_fontsize"], False) for text, _ in runs]
+    # One item per group, each carrying the separator that follows it: the break search below needs a
+    # width per item, and a line may not begin with punctuation. The separator is drawn as its own run.
+    items = [(group, " " + SEPARATOR if index < len(GROUPS) - 1 else "") for index, group in enumerate(GROUPS)]
+    widths = [text_advance_px(group["label"] + sep, layout["header_fontsize"], False) for group, sep in items]
 
     # How many lines the names need, packed as tightly as the width allows.
     lines_needed = 1
@@ -1009,17 +1052,23 @@ def layout_flowed_names(layout: dict, available_px: float) -> list[list[tuple]]:
 
     lines: list[list[tuple]] = [[]]
     x = 0.0
-    for index, ((text, group), width) in enumerate(zip(runs, widths)):
+    for index, ((group, sep), width) in enumerate(zip(items, widths)):
         if index in breaks:
             lines.append([])
             x = 0.0
-        lines[-1].append((x, text, group["color"], False, f"header__{slugify(group['column'])}"))
+        slug = slugify(group["column"])
+        # The space before the separator rides with the name, so neither run begins with one.
+        name = group["label"] + (" " if sep else "")
+        lines[-1].append((x, name, group["color"], False, f"header__{slug}"))
+        if sep:
+            name_px = text_advance_px(name, layout["header_fontsize"], False)
+            lines[-1].append((x + name_px, SEPARATOR, ("literal", MUTED_COLOR), False, f"header__{slug}-separator"))
         x += width
 
     # A separator that ends a line has nothing to separate it from.
     for line in lines:
-        offset, text, spec, bold, gid = line[-1]
-        line[-1] = (offset, text.rstrip(" ·"), spec, bold, gid)
+        if line[-1][4].endswith("-separator"):
+            line.pop()
     return lines
 
 
@@ -1031,8 +1080,16 @@ def layout_listed_header(layout: dict, available_px: float) -> list[list[tuple]]
         runs = [(f"{category['name']}: ", category["color"], True, f"category__{slugify(category['name'])}")]
         members = [group for group in GROUPS if group["column"] in category["columns"]]
         for index, group in enumerate(members):
-            text = label_in_context(group) + (" · " if index < len(members) - 1 else "")
-            runs.append((text, group["color"], False, f"header__{slugify(group['column'])}"))
+            slug = slugify(group["column"])
+            last = index == len(members) - 1
+            # The space before a separator rides with the name; see SEPARATOR on why a run may not
+            # begin with one.
+            runs.append((label_in_context(group) + ("" if last else " "), group["color"], False, f"header__{slug}"))
+            if not last:
+                # Its own run, in one neutral color: appended to the name before it, the separator
+                # inherits that name's fill, so it changes color down the list and all but vanishes
+                # after a pale tint. It is punctuation, not data.
+                runs.append((SEPARATOR, ("literal", MUTED_COLOR), False, f"header__{slug}-separator"))
 
         def advance(text: str, bold: bool) -> float:
             return text_advance_px(text, layout["header_fontsize"], bold)
@@ -1078,8 +1135,14 @@ def resolve_color(spec: tuple, palette) -> tuple[float, float, float]:
 
 
 def header_text_color(spec: tuple, palette) -> tuple[float, float, float]:
-    """A pale group's own fill is unreadable as text on the light background, so its header
-    label keeps the hue at a much shallower tint."""
+    """The text form of a fill: a pale group's own fill is unreadable as a name on the light
+    background, so it keeps the hue at a much shallower tint.
+
+    A ("literal", color) spec passes through unchanged, which is how punctuation between names avoids
+    taking either name's color.
+    """
+    if spec[0] == "literal":
+        return to_rgb(spec[1])
     if spec[0] == "tint":
         return tint(palette[spec[1]], spec[2] * 0.4)
     return palette[spec[1]]
