@@ -814,7 +814,9 @@ def draw_footer(fig, tb: Table, ages: dict[str, str], source_citation: str, layo
             color="#888888",
             gid="tagline",
         )
-    license_text = f"Licensed under CC-BY by the authors {AUTHORS}"
+    # "by <names>", not the template's "by the author <name>": with two names those two words are
+    # what pushes the line past the tagline it shares a row with (263px slot, 11px, ~50 characters).
+    license_text = f"Licensed under CC-BY by {AUTHORS}"
     if shares_tagline_row:
         license_text = wrap_to_width(license_text, 263, footer_fontsize)
     fig.text(
@@ -843,12 +845,6 @@ def segment_spans(row, px_per_min: float) -> dict[str, tuple[float, float]]:
         spans[group["column"]] = (cumulative * px_per_min, (cumulative + minutes) * px_per_min)
         cumulative += minutes
     return spans
-
-
-# Widths a header label may be wrapped to, in template pixels, when its natural width does not
-# fit over its own segment. Narrower blocks take less of the crowded zone above the bars and leave
-# corridors for their neighbours' leaders, at the cost of one tier each.
-LABEL_WRAP_WIDTHS = [115, 90, 70]
 
 
 def solve_category_layout(spans: dict, layout: dict) -> list[dict]:
