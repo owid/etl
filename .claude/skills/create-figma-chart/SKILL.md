@@ -28,19 +28,21 @@ Three sibling skills do the text work this one depends on, and Step 8c calls the
 
 Each year gets a new file. For **2026** the file key is `s6Sv60bakebRRW2TxsMQbF` ([Charts (2026)](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-)). **If the current year is not 2026, ask the user for that year's file link and re-verify every node id below** (the templates page is named " 📑 Templates" — note the leading space).
 
-**Last verified: 2026-08-14. Re-verify the geometry at the start of every run** rather than trusting this table — the design team edits these frames in place, and edits that move a chart area's edge have landed days apart. A page laid out against stale numbers still renders and still passes every check in Step 8c; it just doesn't match the frame it was cloned from.
+**Last verified: 2026-08-17. Re-verify the geometry at the start of every run** rather than trusting this table — the design team edits these frames in place, and edits that move a chart area's edge have landed days apart. A page laid out against stale numbers still renders and still passes every check in Step 8c; it just doesn't match the frame it was cloned from. Three days was enough for both Instagram footers to be rebuilt as auto-layout under new ids, so re-verify **structure**, not only numbers.
+
+Run [`scripts/verify_templates.js`](scripts/verify_templates.js) through `use_figma` — it measures every template in the table below in one call (size, frame fill, content box, header band, footer id/name/`layoutMode`/rows) and is what the notes here were last written from. Diff its output against this table before you clone anything.
 
 | What | Node | Size | Notes |
 |---|---|---|---|
 | Templates page | `798:54` | — | all templates + instruction frames live here. **The arrows, flags, animals, no-data and checklist ids below are *pages*, not nodes on this one** — they sit at page indices 2–7 |
-| InstagramPost_Template_English | `798:161` | 540×540 | two-row footer (`Frame 12` @ y=488): source, `OurWorldinData.org/[Topic]`, CC BY |
-| InstagramPost_Template_Portrait_English | `6689:8` | 560×700 | footer (`6689:9`) includes a Note line. Header `header` (`6913:14`) is a vertical auto-layout over a `title row`, matching the square's `Frame 14`/`Frame 13`; unlike the 850-wide pair its wrappers carry **no** inner padding, so its frame band and text band are the same number |
+| InstagramPost_Template_English | `798:161` | 540×540 | two-row footer, **`Frame 17` (`25518:14`)** @ y=488, h=36 — source (y=0, h=16) then `Frame 16` (y=20) carrying `OurWorldinData.org/[Topic]` and CC BY. **Rebuilt as VERTICAL auto-layout on 2026-08-17**, replacing the plain `Frame 12` this table used to name |
+| InstagramPost_Template_Portrait_English | `6689:8` | 560×700 | footer **`Frame 19` (`25518:16`)** @ y=640, h=36 — a Note row (y=0, h=17) then `Frame 18` (y=20); **also rebuilt as VERTICAL auto-layout on 2026-08-17**, replacing `6689:9`. Header `header` (`6913:14`) is a vertical auto-layout over a `title row`, matching the square's `Frame 14`/`Frame 13`; unlike the 850-wide pair its wrappers carry **no** inner padding, so its frame band and text band are the same number |
 | InstagramReel_template | `7336:8` | 616×1096 | has top/bottom no-go zones; contains a worked small-multiples example |
 | DI_Template | `6799:1859` | 540×540 | **one**-row footer (`Frame 12` @ y=508): source + CC BY |
 | Static Chart Template_Mobile (example 1) | `24590:20` | 540×540 | **two**-row footer (`Frame 15` `25343:276` @ y=486, h=38): `Data source:` then `Licensed under CC-BY by the author […]`, both full width |
 | Static Chart Template_Mobile (example 2) | `24590:32` | 540×824 | taller variant — use when the chart needs vertical room. Same two-row `Frame 15` (`25343:275` @ y=770) |
-| Static Chart Template_Horizontal | `5332:75` | 850×638 | footer: Note, Data source, OWID tagline, "Licensed under CC-BY by the author [Name]" |
-| Static Chart Template_Vertical | `5332:93` | 850×1095 | same slots, same header/footer auto-layout wrappers, same 16px subtitle. The pair's one remaining difference is title line height — 30px here against 29px on Horizontal, which is the whole of the 136 vs 134 gap between their header bands |
+| Static Chart Template_Horizontal | `5332:75` | 850×638 | footer `Frame 8` (**`25398:769`**) @ y=542.62, h=95.22: Note (y=16, h=28), Data source (y=48, h=14), then `Frame 7` (y=66) carrying the OWID tagline and "Licensed under CC-BY by the author [Name]" |
+| Static Chart Template_Vertical | `5332:93` | 850×1095 | same slots and the same `Frame 8` structure (`5332:101` @ y=999.81), same header/footer auto-layout wrappers, same 16px subtitle. **The pair's header bands are now identical at 134.22** — the 30px-vs-29px title line height that used to make this one 136 is gone, so don't expect a Vertical/Horizontal difference there any more |
 | **`small-chart-template-guided`** | **`25344:1357`** | 302 × free | title + optional subtitle, no source row — see [SMALL-CHARTS.md](SMALL-CHARTS.md) |
 | **`small-chart-template-pull`** | **`25344:1391`** | 302 × free | the same plus a mandatory source row — see [SMALL-CHARTS.md](SMALL-CHARTS.md) |
 | `"SMALL" Charts` section heading | `25344:1235` | — | "featured on the OWID website as guided and PULL charts" |
@@ -49,6 +51,22 @@ Each year gets a new file. For **2026** the file key is `s6Sv60bakebRRW2TxsMQbF`
 | Flags | `2654:5` | — | Flags **plugin** — manual; US flags provided in the file |
 | Animals | `5336:5` | — | chicken, rooster, turkey, fish, cow, egg-laying hen, pig |
 | Good Data Viz Checklist | `20729:1027` | — | distilled in GUIDELINES.md |
+
+### Slot sizes per family, measured 2026-08-17
+
+The per-slot *positions* for the four static templates live in [`/create-static-viz`'s TEMPLATES.md](../create-static-viz/TEMPLATES.md); these are the type sizes you are filling into, which Step 6 needs and which no other file records for the non-static families. They do **not** move together — the same row is 14px on one family and 11px on another, so read the family you are filling rather than carrying a number across.
+
+| Family | Title | Subtitle | Note | Source | Tagline | License / CC BY |
+|---|---|---|---|---|---|---|
+| Static Horizontal / Vertical (850) | 25 | 16 | **12** | **12** | **11** | **11** (263px slot at x=571) |
+| Static mobile 1 & 2 (540) | 25 | 16 | — | 14 | — | 14 (own row, full 508) |
+| DI (540) | 25 | 16 | — | 14 | — | 14 |
+| IG square (540) | 25 | 16 | — | 14 | 14 | 14 |
+| IG portrait (560) | **28** | **18** | 14 | 14 | — | 14 |
+| IG reel (616) | 28 | 18 | — | 15 | — | 15 |
+| Small guided / pull (302) | **16** | **11** | — | 11 (pull only) | — | — |
+
+Two traps in that table. The 850-wide pair's **12px note and source** are the smallest body text of any family, so a source line that overruns there cannot be fixed by dropping a size the way a 14px one can. And its **license shares a row with the 467px tagline inside 818px** — the slot holds roughly fifty characters, so a two-author credit overruns the tagline and prints on top of it; the phrasing gives (`by <names>` rather than `by the authors <names>`), never the names. TEMPLATES.md carries the measured widths.
 
 **Two Spanish Instagram post templates sit beside the English ones on that page. They are no longer used and may be deleted** — never target one, and don't read their absence from this table as an omission to fix.
 
@@ -500,8 +518,8 @@ Side margins and the footer edge are the template's, not yours: content starts a
 | Static mobile example 1 (540×540) | x=16, w=508 | 118 → 486 (2-row `Frame 15`) |
 | Static mobile example 2 (540×824) | x=16, w=508 | 118 → 770 (2-row `Frame 15`) |
 | IG portrait (560×700) | x=26, w=508 | 135 → 640 |
-| Static Horizontal (850×638) | x=16, w=818 | 118 → 556 |
-| Static Vertical (850×1095) | x=16, w=818 | 136 → 997 |
+| Static Horizontal (850×638) | x=16, w=818 | **134.22 → 542.62** (frame band; the 118 → 556 this row used to give was the text band) |
+| Static Vertical (850×1095) | x=16, w=818 | **134.22 → 999.81** (frame band; was documented as 136 → 997) |
 | Small / pull chart (302 × free) | **x=12, w=278** | 44 → `H − 10` (guided) or `H − 23` (pull) — see below |
 
 DI and static mobile get their own rows above because their bands differ, even though both frames are 540×540.
@@ -510,11 +528,11 @@ The table gives one number per template — the band you fit a chart into — an
 
 **The 302-wide row is parametric, and its `H` is an output of this step rather than an input** — width is the only fixed dimension, the frame height is chosen from the content, and there is no fit to perform because the export already arrives at 278px wide. Its header block also hugs its own text width instead of spanning the content, so the plot may legitimately rise beside it. All of that is [SMALL-CHARTS.md](SMALL-CHARTS.md)'s; don't apply the fit below to it.
 
-**On the two 850-wide templates the band you read off the frames is not the band above.** Both wrap their header and footer in auto-layout frames whose 16px of inner padding falls on the chart side, so the frame band is the text band inset by 16px at each end — `header.y + header.height` returns 134 on the Horizontal and 136 on the Vertical, never the subtitle's own bottom edge. The table's Vertical row is already a frame band, its Horizontal row a text band, so the two rows are not directly comparable; the per-slot text positions behind them are `TEMPLATES.md`'s. Read the band off the frames and that breathing room comes for free; read it off the text and add your own.
+**On the two 850-wide templates the band you read off the frames is not the same as the text's own edges.** Both wrap their header and footer in auto-layout frames whose 16px of inner padding falls on the chart side, so the frame band is the text band inset by 16px at each end — `header.y + header.height` returns **134.22 on both** (they no longer differ), never the subtitle's own bottom edge. Both rows above are now frame bands, so they are directly comparable; the per-slot text positions behind them are `TEMPLATES.md`'s. Read the band off the frames and that breathing room comes for free; read it off the text and add your own.
 
 **Every template exposes header/footer frames, but only the 850-wide pair pads them.** On IG square, IG portrait, DI and both static mobile templates the wrappers carry zero padding, so there `header.y + header.height` *is* the text band — 118 on all four 540-wide frames, 135 on the portrait, exactly as tabled. Read the band off the frames everywhere; just don't port the 16px correction across, because it belongs to the two 850-wide templates alone.
 
-The footers are not uniform in the same way: static mobile's `Frame 15` and the 850-wide `Frame 8` are auto-layout and reflow, while IG square, IG portrait and DI position their footer rows absolutely inside a plain frame. That is what Step 6's structural check is for.
+The footers are not uniform in the same way, and **as of 2026-08-17 only DI is still the absolute kind**: static mobile's `Frame 15`, the 850-wide `Frame 8`, and now both Instagram footers (`25518:14` square, `25518:16` portrait, rebuilt from the plain `Frame 12` / `6689:9` this file used to describe) are auto-layout and reflow. DI's `Frame 12` @ y=508 reports `layoutMode: "NONE"` and does not. That is what Step 6's structural check is for — run it rather than reading the split off this paragraph, since it is exactly the sentence that went stale.
 
 Verify against the actual clone with `get_metadata` (the templates evolve; the geometry above is a 2026 snapshot). These are **frame-local** coordinates, and `x`/`y` are relative to a node's parent — so append the embed to the template clone **before** positioning it. Left parented to the page (where Step 5 puts imported nodes), the same numbers land it near the page origin, on top of the reference chart. One wrinkle in the same rule: **a GROUP is transparent for coordinates**, so once the imported chart is inside the template, its descendants report `x`/`y` in the *template frame's* space, not the group's — which is what makes the frame-local numbers above directly usable on the plot's internals.
 

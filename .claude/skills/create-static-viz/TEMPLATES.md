@@ -57,42 +57,60 @@ wrong twice: wrong pipeline, and a *ratio* check on a frame whose height is chos
 All values in template pixels, y measured **from the top edge** as Figma reports it. Content
 margin is **16 px** on all four frames, so content width is `frame width − 32`.
 
+Font sizes are in template px, measured off the live templates on **2026-08-17**. They matter to a
+step twice over: the emitted SVG should read like the template it is sized to, and `/create-figma-chart`
+fills these same slots when the SVG is imported.
+
 ### Horizontal — 850 × 638
 
-| Slot | y | Width | Height |
-|---|---|---|---|
-| Title | 16 | 738 | 58 (**two lines**) |
-| Logo | 16 | 64 | 35 (top-right, x=770) |
-| Subtitle | 80 | 818 | 38 (two lines) |
-| *chart area* | *118 → 556* | 818 | 438 |
-| `Note:` | 556 | 818 | 28 (two lines) |
-| `Data source:` | 589 | 818 | 14 |
-| Tagline (left) | 609 | 467 | 13 |
-| License (right, x=571) | 609 | 263 | 13 |
+| Slot | y | Width | Height | Size |
+|---|---|---|---|---|
+| Title | 16.22 | 737.84 | 58 (**two lines**) | 25 |
+| Logo | 16 | 64 | 35 (top-right, x=770) | — |
+| Subtitle | 80.22 | 817.57 | 38 (two lines) | 16 |
+| *chart area* | *118 → 558.6* | 818 | ~440 | — |
+| `Note:` | 558.62 | 818 | 28 (two lines) | **12** |
+| `Data source:` | 590.62 | 818 | 14 | **12** |
+| Tagline (left) | 608.62 | 467 | 13 | **11** |
+| License (right, x=571) | 608.62 | 263 | 13 | **11** |
 
-The slots sit in two auto-layout frames: header block `25398:753` spans 0→134, footer block
-`25398:769` starts at 540. Each carries 16 px of inner padding on the chart side, so the visual
-chart area is 118 → 556 while `header.y + header.height` reads 134 — that edge plus the padding.
+The slots sit in two auto-layout frames: header block `25398:753` spans 0→134.22, footer block
+`25398:769` starts at 542.62. Each carries 16 px of inner padding on the chart side, so the visual
+chart area starts at 118 while `header.y + header.height` reads 134.22 — that edge plus the padding.
 
 ### Vertical — 850 × 1095
 
-Same slots, widths, and auto-layout wrappers as Horizontal. Header block `5332:94` is
-0→136; footer block `5332:101` starts at 997. Absolute y: title 16, subtitle 82, chart area
-136 → 997, `Note:` 1013, `Data source:` 1046, tagline/license 1066.
+Same slots, widths, sizes and auto-layout wrappers as Horizontal. Header block `5332:94` is
+**0→134.22**; footer block `5332:101` starts at **999.81**. Absolute y: title 16.22, subtitle 80.22,
+chart area 118 → 1001.8, `Note:` 1015.81, `Data source:` 1047.81, tagline/license 1065.81.
 
-Its subtitle matches Horizontal's — 16 px Lato Regular over two lines, 38 tall. The **title** is what
-differs: 30 px line height here against 29 px, so 60 px against 58 px, which is the whole of the
-136 vs 134 difference between the two header blocks.
+**The two header blocks are now identical at 134.22.** They used to differ — 136 here against 134,
+from a 30 px title line height against 29 — and that difference is gone, so don't reintroduce a
+Vertical-specific header offset.
+
+### The license slot holds about fifty characters
+
+263 px at 11 px, and it **shares its row with the 467 px tagline** inside 818 px of content. The
+template's own `Licensed under CC-BY by the author [Name of author]` fits; two names do not —
+`Licensed under CC-BY by the authors Esteban Ortiz-Ospina and Pablo Arriagada` measures **387 px**,
+overruns the tagline by 36 px, and prints on top of it. Drop the two words `the authors`
+(`Licensed under CC-BY by <names>`, 329 px) and it clears by 22 px.
+
+Never shorten a name to make it fit; the phrasing is what gives. Mobile is immune — its footer rows
+are stacked and full width, so the same string has 508 px to itself.
 
 ### Mobile — 540 × 540 (example 1) and 540 × 824 (example 2)
 
-| Slot | y (540×540) | y (540×824) | Width |
-|---|---|---|---|
-| Title | 16 | 16 | 428 (**two lines**; logo sits beside it at x=460) |
-| Subtitle | 80 | 80 | 508 |
-| *chart area* | *118 → 486* | *118 → 770* | 508 |
-| `Data source:` | 486 | 770 | 508 |
-| License | 507 | 791 | 508 |
+| Slot | y (540×540) | y (540×824) | Width | Size |
+|---|---|---|---|---|
+| Title | 16 | 16 | 428 (**two lines**; logo sits beside it at x=460) | 25 |
+| Subtitle | 80 | 80 | 508 | 16 |
+| *chart area* | *118 → 486* | *118 → 770* | 508 | — |
+| `Data source:` | 486 | 770 | 508 | 14 |
+| License | 507 | 791 | 508 | 14 |
+
+Note the mobile footer rows are **14 px** where the 850-wide pair's are 12 and 11 — mobile has one
+row per string and can afford the larger type, so don't copy sizes across the two families.
 
 The footer is one auto-layout block (`Frame 15`, `25343:276` and `25343:275`), 38 px tall, 16 px
 above the frame's bottom edge: two full-width rows, 21 px apart.
