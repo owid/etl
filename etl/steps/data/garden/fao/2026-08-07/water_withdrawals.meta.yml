@@ -7,7 +7,7 @@ definitions:
     display:
       numDecimalPlaces: 0
   description_processing_aggregates: &description_processing_aggregates |-
-    Aggregates for continents, income groups, and the World were calculated by Our World in Data by summing the values of the member countries, in years where at least 70% of countries have data. Sectoral shares for these aggregates were computed from the aggregated withdrawals.
+    Aggregates for continents and income groups were calculated by Our World in Data by summing the values of the member countries, in years where at least 70% of countries have data. Sectoral shares for these aggregates were computed from the aggregated withdrawals. Values for the World and for FAO's own regional groupings are taken directly from FAO.
 
 dataset:
   update_period_days: 365

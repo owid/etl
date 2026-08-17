@@ -45,7 +45,7 @@ SHARE_COLUMNS = [
 COLUMNS_TO_CONVERT = SECTORAL_COLUMNS + ["total_water_withdrawal", "total_freshwater_withdrawal"]
 BILLION_CUBIC_METERS_TO_CUBIC_METERS = 1e9
 
-# Columns aggregated (by summing member countries) for regions, income groups and World.
+# Columns aggregated (by summing member countries) for continents and income groups.
 LEVEL_COLUMNS = SECTORAL_COLUMNS + ["total_water_withdrawal", "total_freshwater_withdrawal"]
 REGIONS = [
     "Africa",
@@ -54,7 +54,6 @@ REGIONS = [
     "North America",
     "South America",
     "Oceania",
-    "World",
     "Low-income countries",
     "Lower-middle-income countries",
     "Upper-middle-income countries",
@@ -62,8 +61,10 @@ REGIONS = [
 ]
 # Minimum fraction of a region's (ever-informed) countries that must have data for an aggregate to be created.
 MIN_FRAC_COUNTRIES_INFORMED = 0.7
+# Maximum accepted deviation between FAO's published World row and the same aggregate computed from countries.
+WORLD_MAX_DEVIATION = 0.02
 
-# First year for which FAO's own regional aggregate rows (the "(FAO)" SDG groupings) are kept. They are progressive
+# First year for which FAO's own aggregate rows (World and the "(FAO)" SDG groupings) are kept. They are progressive
 # sums over the countries reporting in each year, so early years reflect incomplete coverage rather than real levels
 # (in 1965, FAO's "World" row is 0.68 billion m³ — the sum of the only two reporting countries, Uruguay and Barbados).
 # NOTE: In 2000 itself, the share series of a few FAO aggregates still lag (sums of 72-86%), hence 2001.
@@ -81,6 +82,21 @@ def sanity_check_inputs(tb: Table) -> None:
     assert not tb.duplicated(subset=["country", "variable", "year"]).any(), "Duplicated country-variable-year rows."
 
 
+def sanity_check_world(tb: Table) -> None:
+    """Check FAO's published World row against the same aggregate computed by summing countries."""
+    mask_countries = ~tb["country"].isin(REGIONS + ["World"]) & ~tb["country"].str.endswith("(FAO)")
+    computed = tb[mask_countries].groupby("year", as_index=False)[LEVEL_COLUMNS].sum(min_count=1)
+    published = tb[tb["country"] == "World"]
+    comparison = published.merge(computed, on="year", suffixes=("_published", "_computed"))
+    assert len(comparison) > 20, "Not enough years to compare FAO's World row with the computed aggregate."
+    for column in LEVEL_COLUMNS:
+        deviation = (comparison[f"{column}_computed"] / comparison[f"{column}_published"] - 1).abs()
+        assert deviation.max() < WORLD_MAX_DEVIATION, (
+            f"FAO's World row for {column} deviates from the sum of countries by more than "
+            f"{WORLD_MAX_DEVIATION:.0%} (max {deviation.max():.1%})."
+        )
+
+
 def sanity_check_outputs(tb: Table) -> None:
     assert tb["country"].nunique() >= 180, "Number of countries decreased unexpectedly."
     # NOTE: In the 2026-08-07 version, each variable had 6,000-6,500 data points after dropping regional aggregates.
@@ -96,22 +112,22 @@ def sanity_check_outputs(tb: Table) -> None:
     mask_aggregates = tb["country"].isin(REGIONS)
     share_sum = tb.loc[mask_aggregates, SHARE_COLUMNS].sum(axis=1, min_count=3).dropna()
     assert share_sum.between(95, 105).all(), "Aggregate sectoral shares far from 100%."
-    # World aggregates should start once country coverage is high, not in the sparse early years.
+    # FAO's World row is kept only from the coverage cutoff.
     world_years = tb.loc[(tb["country"] == "World") & tb["total_water_withdrawal"].notnull(), "year"]
-    assert 1985 <= world_years.min() <= 2005, "World aggregate starts in a year with unexpected coverage."
+    assert world_years.min() == FAO_AGGREGATES_MIN_YEAR, "FAO's World row starts in an unexpected year."
     for column in SHARE_COLUMNS:
         assert tb[column].dropna().between(0, 102).all(), f"{column} outside the 0-100% range."
 
     # FAO's own regional rows carry mild inconsistencies even in recent years (share sums between ~88 and ~110),
     # since its sectoral and total series have different vintages.
-    fao_share_sum = tb.loc[tb["country"].str.endswith("(FAO)"), SHARE_COLUMNS].sum(axis=1, min_count=3).dropna()
+    mask_fao_aggregates = tb["country"].str.endswith("(FAO)") | (tb["country"] == "World")
+    fao_share_sum = tb.loc[mask_fao_aggregates, SHARE_COLUMNS].sum(axis=1, min_count=3).dropna()
     assert fao_share_sum.between(88, 110).all(), "FAO aggregate sectoral shares far from 100%."
 
     # For countries, the total should equal the sum of the three sectors in the vast majority of cases.
     # NOTE: FAO's own data is inconsistent for a few country-years (e.g. Namibia 2020-2021, and North Macedonia in
     # recent years, whose total far exceeds the sum of sectors).
-    mask_fao_regions = tb["country"].str.endswith("(FAO)")
-    complete = tb[~tb["country"].isin(REGIONS) & ~mask_fao_regions].dropna(
+    complete = tb[~tb["country"].isin(REGIONS) & ~mask_fao_aggregates].dropna(
         subset=SECTORAL_COLUMNS + ["total_water_withdrawal"]
     )
     ratio = complete[SECTORAL_COLUMNS].sum(axis=1) / complete["total_water_withdrawal"]
@@ -164,20 +180,20 @@ def run() -> None:
     for column in COLUMNS_TO_CONVERT:
         tb[column] = (tb[column].astype("float64") * BILLION_CUBIC_METERS_TO_CUBIC_METERS).round()
 
-    # Harmonize country names. FAO's SDG regional groupings are kept, mapped to the shared "(FAO)" region entities;
-    # FAO's own "World" row (replaced by the aggregate computed below) and the special groups with no counterpart in
-    # the regions dataset (LDCs, LLDCs, SIDS) are excluded in the country mapping.
+    # Harmonize country names. FAO's own aggregate rows are kept: its World row as "World", and its SDG regional
+    # groupings as the shared "(FAO)" region entities. Only the special groups with no counterpart in the regions
+    # dataset (LDCs, LLDCs, SIDS) are excluded in the country mapping.
     tb = paths.regions.harmonize_names(tb=tb)
 
-    # Keep FAO's regional rows only from a year with complete coverage (see FAO_AGGREGATES_MIN_YEAR note).
-    mask_fao_regions = tb["country"].str.endswith("(FAO)")
+    # Keep FAO's aggregate rows only from a year with complete coverage (see FAO_AGGREGATES_MIN_YEAR note).
+    mask_fao_aggregates = tb["country"].str.endswith("(FAO)") | (tb["country"] == "World")
     n_countries = (
-        tb[~mask_fao_regions & (tb["year"] >= FAO_AGGREGATES_MIN_YEAR)]
+        tb[~mask_fao_aggregates & (tb["year"] >= FAO_AGGREGATES_MIN_YEAR)]
         .groupby("year")["total_water_withdrawal"]
         .count()
     )
     assert (n_countries > 150).all(), "Incomplete country coverage in years where FAO's aggregates are kept."
-    tb = tb[~(mask_fao_regions & (tb["year"] < FAO_AGGREGATES_MIN_YEAR))].reset_index(drop=True)
+    tb = tb[~(mask_fao_aggregates & (tb["year"] < FAO_AGGREGATES_MIN_YEAR))].reset_index(drop=True)
 
     # A few countries carry shares of total withdrawal above 100% (e.g. Brunei's municipal share in 2004-2023),
     # where FAO's sectoral series are more recent than its (carried-forward) total series. A share of the total
@@ -189,14 +205,18 @@ def run() -> None:
         tb.loc[mask_impossible, column] = None
     assert 20 < n_impossible < 60, "Unexpected number of shares above 100%."
 
-    # Add aggregates for continents, income groups and World, by summing member countries, only where at least
-    # 70% of each region's (ever-informed) countries have data.
+    # Add aggregates for continents and income groups, by summing member countries, only where at least 70% of each
+    # region's (ever-informed) countries have data.
+    # NOTE: World is not aggregated here; FAO's own published World row is kept instead (checked right below).
     tb = paths.regions.add_aggregates(
         tb=tb,
         regions=REGIONS,
         aggregations={column: "sum" for column in LEVEL_COLUMNS},
         min_frac_countries_informed=MIN_FRAC_COUNTRIES_INFORMED,
     )
+
+    # Sanity check: FAO's published World row should agree with the same aggregate computed from country data.
+    sanity_check_world(tb=tb)
 
     # For aggregate rows, compute the sectoral shares from the aggregated levels (FAO's shares are country-level).
     mask_regions = tb["country"].isin(REGIONS)
