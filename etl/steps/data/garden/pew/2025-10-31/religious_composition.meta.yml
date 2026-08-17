@@ -105,7 +105,7 @@ tables:
           <% if religion == "religiously_unaffiliated" -%>
           Difference in the share of of people who are religiously unaffiliated between 2010 and 2020.
           <% elif religion == "other_religions" -%>
-          Difference in the share of of people who are affiliated to other religions between 2010 and 2020. {{definitions.others.other_religions}}
+          Difference in the share of of people who are affiliated to other religions between 2010 and 2020. {definitions.others.other_religions}
           <% elif religion == "any_religion" %>
           Difference in the share of of people who are affiliated to any religion between 2010 and 2020.
           <% else -%>

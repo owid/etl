@@ -26,12 +26,12 @@ tables:
           <% if age != 'All ages' %>
           Share of cancer deaths of individuals aged << age >> from << cause.lower() >>
           <% elif age == 'All ages' %>
-          Share of cancer deaths that are from << cause.lower() >>.
+          Share of cancer deaths that are from << cause.lower() >>
           <%- endif -%>
 
         description_short: |-
           <% if age != 'All ages' %>
-            Share of cancer deaths of individuals aged << age >> from << cause.lower() >>
+            Share of cancer deaths of individuals aged << age >> from << cause.lower() >>.
           <% elif age == 'All ages' %>
             Share of cancer deaths that are from << cause.lower() >>.
           <%- endif -%>

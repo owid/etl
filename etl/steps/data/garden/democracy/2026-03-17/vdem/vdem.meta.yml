@@ -3145,7 +3145,7 @@ tables:
           <%- endif -%>
         description_short: |-
           <%- if category == '-1' -%>
-          People living in countries where it is unclear if national elections were held in the given year
+          People living in countries where it is unclear if national elections were held in the given year.
           <%- else -%>
           People living in countries that << category >> in the given year.
           <%- endif -%>
