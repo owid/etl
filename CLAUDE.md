@@ -130,11 +130,12 @@ Internal terms that recur across this guide, the skills, and the codebase:
 ```bash
 .venv/bin/etlr namespace/version/dataset --private      # Run step
 .venv/bin/etlr namespace/version/dataset --grapher      # Upload to grapher
+.venv/bin/etlr export://.../dataset --export             # Run an export:// step (mdim, explorer, static_viz, ...)
 .venv/bin/etlr namespace/version/dataset --dry-run      # Preview
 .venv/bin/etlr namespace/version/dataset --force --only # Force re-run
 ```
 
-Key flags: `--grapher/-g` (upload), `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
+Key flags: `--grapher/-g` (upload), `--export` (required for any `export://...` step — mdims, explorers, static viz; omitting it makes `etlr` report "No steps matched" even though the step is in the DAG), `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
 
 **"The step completed" is not "the data is right".** After running a step for
 someone, report what came out of it: row count, year range, entities, and a few

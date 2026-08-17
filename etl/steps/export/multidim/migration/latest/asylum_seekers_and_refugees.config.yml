@@ -20,7 +20,7 @@ definitions:
     - config:
         hasMapTab: true
         tab: map
-        chartTypes: ["LineChart"]
+        chartTypes: ["LineChart", "DiscreteBar"]
   # Description bullets for refugees/ asylum-seekers
   description_key_refugee: A refugee is a person in need of international protection. They had to flee their home country because of serious threats against which the authorities of their home country cannot or will not protect them.
   description_key_asylum: An asylum-seeker is a person who has fled their home country because of serious threats against which the authorities of their home country cannot or will not protect them. A person is considered an asylum-seeker if they have applied for asylum in another country and are waiting for a decision on their application.
