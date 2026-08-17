@@ -64,7 +64,7 @@ Slack permalink timestamps convert as `p1234567890123456` → `1234567890.123456
 4. Paste your chosen chart here in the chat so that I can use it to draft versions of the announcement
 ````
 
-*Mode B*: **stop here** and don't draft until the image arrives. *Mode A*: post the block, fill the `filename:` slot from the convention, and keep going — the user can swap the chart later.
+*Mode B*: **stop here** and don't draft the post until the image arrives. The gate is on the post, not on the skill — a partial ask the chart has no bearing on (the CTA `url:` and `text:`, a Doc title, a check on an existing draft) gets answered straight away; the description invites those. *Mode A*: post the block, fill the `filename:` slot from the convention, and keep going — the user can swap the chart later.
 
 **3. Read the golden examples. There are two kinds.**
 
