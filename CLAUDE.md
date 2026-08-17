@@ -31,7 +31,8 @@ Most recurring work here has a skill that runs it end to end. Reach for it **bef
 | Check that text against the Writing and Style Guide | `/check-metadata-style` |
 | Build a multi-dim indicator, or an explorer | `/create-multidim`, `/create-explorer` |
 | Review a dataset-update PR | `/review-data-pr` |
-| Announce a finished update | `/data-updates-comms` |
+| Announce a finished update, internally | `/data-updates-comms` — the #data-updates-comms Slack form |
+| Announce a finished update, to readers | `/data-update-announcement` — the "Data update" post on ourworldindata.org/latest |
 
 One that's easy to skip and shouldn't be: `/edit-faust-metadata` owns **every** user-facing-text edit — it routes each field to the right layer (garden `.meta.yml` vs MDim yaml vs chart config on staging) and reports the blast radius on other charts before touching shared metadata.
 
