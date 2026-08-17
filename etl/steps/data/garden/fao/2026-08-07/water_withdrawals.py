@@ -115,6 +115,11 @@ def sanity_check_outputs(tb: Table) -> None:
         deviation = (complete[share] - 100 * complete[sector] / complete["total_water_withdrawal"]).abs()
         assert deviation.max() < 0.01, f"{share} is not consistent with {sector} divided by the total."
 
+    # No sector can withdraw more than the total. The known cases are handled by the corrections file, so any
+    # remaining one is a new inconsistency in the source, to be added there.
+    for column in SHARE_COLUMNS:
+        assert tb[column].max() <= 100, f"{column} above 100%; declare the new cases in the corrections file."
+
 
 def run() -> None:
     #
