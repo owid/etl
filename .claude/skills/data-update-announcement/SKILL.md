@@ -135,6 +135,8 @@ filename: YYYY-MM-data-update-[short-topic].png
 
 `type` is always `announcement`; `kicker` is always `data-update`, lowercase and hyphenated. Content inside `:skip` / `:endskip` doesn't publish — use it for internal notes.
 
+**Two mechanics in the static-viz example (#7, population growth) are not the house pattern — don't copy them.** It carries a `featured-image:` line between `excerpt:` and `type:`; we don't use that field, and the five frontmatter fields above are the complete set. Its image is `world_population_growth.png`; ours is always `YYYY-MM-data-update-<slug>.png`, static-viz refreshes included. Everything *else* about that post is a good model — the "We've refreshed" title, the plural voice, the paragraph on why the pipeline work matters — which is why it's in the examples file.
+
 The comms person running this workflow (Charlie Giattino) never appears in `authors`.
 
 ## The CTA link

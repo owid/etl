@@ -42,6 +42,7 @@ filename: YYYY-MM-data-update-<slug>.png
 ```
 
 - `excerpt` is the social-media preview text — that's what the template Doc's own placeholder says it's for.
+- **The five frontmatter fields above are the whole set, and `filename:` always uses the date pattern.** One post in `examples.md` (the static-viz refresh) adds a `featured-image:` line and names its image `world_population_growth.png`; neither is the house pattern, so don't reproduce them.
 - `[+body]` and `[]` are **plain brackets** — never add backslash escapes. Backslashes showing up in a `read_file_content` dump are an artifact of that markdown rendering, not the real Doc content.
 - The top `:skip` / `preview` / `:endskip` block is **optional**. The team's own template Doc does not have one, but some published docs carry it to park the admin GDoc preview URL. Include it only if the author asks; if you do, keep the literal word `preview` as the placeholder they replace once the doc is registered.
 - A `:skip` … `:endskip` block *after* `[]` is where a human parks paragraphs they cut. Don't generate one; mention it only if asked.
