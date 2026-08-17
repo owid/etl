@@ -460,6 +460,31 @@ the doubling that splitting the panels was meant to remove. Prefer stating the f
 letting the reader compare panels at a shared gridline. Check any "for context" series this way: plot
 the two and measure where they actually diverge before deciding it earns its ink.
 
+### Labelling a chart with many categories
+
+Four decisions, each settled by measuring rather than by taste:
+
+- **A value label belongs to a category, not to a row.** Print one wherever it happens to fit and the
+  categories that fit on only a few rows read as facts about *those* rows rather than as "the others
+  were too narrow". Draw a category's values only where some share of rows can hold one, and otherwise
+  none of them. Measure the share per frame — a narrower frame drops more categories.
+- **Put each category's names inside its own bracket, one per line.** Every name then sits over the run
+  it belongs to, and a residual bucket can shorten to `Other` because the bracket already supplies the
+  category. Derive that short form rather than renaming the groups, so the full name survives for
+  layouts where a group stands alone. Stack them all even where one would fit on a single line; a
+  mixture reads as several different treatments.
+- **Labelling every segment in place, with leaders, is rarely worth what it costs — and whether it is
+  even possible is a property of the data.** The row you point at decides it, and no amount of vertical
+  room rescues a row whose narrowest segment leaves no corridor, because the obstruction is horizontal.
+  If you attempt it, place the hardest label first and expect the dataset's narrowest segment to be the
+  binding constraint. (Built in full for the time-use refresh, then deleted: it read no better than
+  brackets.)
+- **Rank rows by something the reader can verify.** A key whose segment is a few pixels wide cannot be
+  checked against the chart, ties a large share of rows once rounded, and imports whatever survey
+  artifact that category carries. Rank by a wide category, keep the key in one constant so the
+  alternative is a one-line change at review, and make the sort **stable** so tied rows hold their order
+  instead of churning the output between runs.
+
 ### Assertions
 
 Assert the claims the chart makes, not only the schema. If the subtitle states a range as one
@@ -623,6 +648,15 @@ claim about human intent that an automated flow should not be making.
 - **Measure text width, don't estimate it.** Estimating from font size (a character ≈ half its
   point size) under-fills by about a tenth; a hardcoded character count was 27% short. Wrap
   greedily against `TextPath((0, 0), line, prop=FontProperties(size=fs)).get_extents().width`.
+- **No text run may begin with a space.** `TextPath` measures ink, so a leading space adds nothing to a
+  run's advance while matplotlib still draws it — lay runs out by summed advances and that run lands a
+  space right of where the layout accounted for it. Keep the space on the end of the previous run; a
+  *trailing* one is recovered by `text_advance_px`'s sentinel glyph.
+- **A measurement harness must reproduce the chart's own font stack, or its numbers are fiction.**
+  `sns.set_style(...)` inside the render function resets `font.family`, so a harness that imports the
+  step without calling it measures a different typeface — enough of a width difference to make a
+  placement solver "prove" a layout that does not fit. Apply the same style setup, and cross-check one
+  number against a real build before trusting a sweep.
 - **Panel aspect ratio decides whether a trend is legible.** Two panels stacked in a portrait
   frame give each a 2:1 landscape box, and a growth curve in that box looks flat. Turning them
   portrait gave 2.4× the vertical resolution and the shape appeared. Compute the panel box

@@ -152,6 +152,50 @@ mobile size) or about *what the chart claims* (must move into the subtitle inste
   a slot gaining a line grows the block without anything being repositioned. Read
   `header.y + header.height` back after setting text rather than trusting a recorded band.
 
+## Lay the plot inside the template's band, not inside your own text's leftovers
+
+A step draws its own copies of the title, subtitle and footer so its PNG stands alone, and it draws them
+smaller than the template does. So a band derived from the step's own text metrics is too generous: the
+plot's ink sits flush under the step's subtitle, and once the frame carries the template's larger text
+the clearance falls below the 12–16 px the design asks for. Take the band from this file and inset it:
+
+```python
+band_top, band_bottom = layout["band"]                                  # the template's own text edges
+chart_top_px = max(subtitle_bottom_px, band_top + BAND_INSET) + header_px
+chart_bottom_px = min(layout["chart_bottom_y"], band_bottom - BAND_INSET) - below_px
+```
+
+**Both band values must be ink edges, not frame edges.** The footer *frame* starts 14 px above its
+`Note:` ink, so insetting from the frame's `y` insets twice and leaves a visibly loose bottom (28 px
+against a 14 px target). For the Vertical template that means `(118, 1015.81)` — the subtitle's ink
+bottom and the note's ink top — not `(118, 1001.8)`.
+
+## Align to the content box on both sides
+
+Everything in the frame lines up on two verticals: the left edge where the subtitle and note start,
+and the right edge where the **logo** ends. Both are the content box, `16 … frame − 16`.
+
+- The left comes free if the country labels are right-aligned against the bars: the widest one starts
+  exactly at the margin.
+- The right does **not** come free. A total column drawn left-aligned at a fixed gap past the bars
+  stops wherever its longest number happens to end, short of the logo. Right-align it on the content
+  edge instead — `MINUTES_PER_DAY + total_column_px / px_per_min`, `ha="right"` — and the column, the
+  logo and the note all share one edge.
+
+## Two rules for laying out coloured text runs
+
+Both of these produced defects that survived a full visual check and were caught by a reader:
+
+- **A run may not begin with a space.** `TextPath` measures ink, so a *leading* space contributes
+  nothing to a run's advance — while matplotlib still draws it. Lay out `["Sleep", " · ", "Eating"]`
+  by summed advances and the separator is drawn one space further right than the layout accounted
+  for: the gap lands before the dot and vanishes after it (`Sleep ·Eating`). A *trailing* space is
+  fine, because `text_advance_px` recovers it with a sentinel glyph. So the space rides with the name:
+  `["Sleep ", "· ", "Eating"]`.
+- **Punctuation between coloured names needs its own run, in one neutral colour.** Appended to the
+  name before it, a separator inherits that name's fill — so it changes colour down the list and all
+  but disappears after a pale tint. It is punctuation, not data.
+
 ## Unit conversions
 
 - A template pixel is **0.72 pt** (100 template px per inch ÷ 72 pt per inch).

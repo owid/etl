@@ -383,7 +383,7 @@ line that is 38% full, which is a real line of text; the test is the fill, not t
 
 Rules: replace `characters`, and leave the node's **base** styling alone — the fonts, sizes, colors, and positions are the template's, not yours. `await figma.loadFontAsync(node.fontName)` before each text edit. If you need a *new* text block the template doesn't have, **clone the nearest template text node and edit it** — that inherits the correct shared style without hunting style ids.
 
-**Watch for template text that is already mixed-weight, and restore it after writing.** Setting `characters` propagates the *first character's* style over the whole new string, so any node whose label is bolder than its content comes out uniformly bold. The source line is the one that bites — the templates ship `Data source:` in Bold and the attribution in Regular — so write the string, then push Regular back over the tail:
+**Watch for template text that is already mixed-weight, and restore it after writing.** Setting `characters` propagates the *first character's* style over the whole new string, so any node whose label is bolder than its content comes out uniformly bold. **Two slots ship that way, not one** — `Data source:` and, on the templates that carry it, `Note:`. Fixing only the source line leaves a wholly bold note, which reads as deliberate emphasis on a caveat and was spotted on a finished frame rather than in review. Write the string, then push Regular back over the tail:
 
 ```js
 const PREFIX = "Data source:";
@@ -451,6 +451,39 @@ The chart spans the full content width, left-aligned with the title/subtitle/log
 > of these groups (no `note`, no `tagline`) but still emits `license`. Verify both
 > deletions by name rather than by position; the template's own slots sit at the same coordinates, and
 > deleting the wrong one of an overlapping pair is invisible in a screenshot.
+>
+> **Delete that text BEFORE the rescale, not after.** matplotlib's glyph boxes overhang the figure
+> canvas, so while they are present the group's bbox is wider than the SVG and `clone.width /
+> chart.width` solves against the overhang instead of the frame. Once they are gone the bbox *is* the
+> canvas, and one rescale lands the height on the template's to `delta 0` — the assertion worth keeping.
+
+### Restyling a local-SVG import to OWID's fonts and colors
+
+An `export://static_viz` step deliberately does **not** set them: the machine building it may have
+neither Lato nor Playfair Display (this one has 436 font families and neither), so a step that asked
+for them would fall back silently and emit different type depending on where it ran. Colors are the
+same story — the Chart colors library lives in Figma, not in matplotlib. So the step owns the data,
+the geometry and the proportions, and **this page owns the type and the palette**. The template's own
+slots cover the title, subtitle, note, source and license; everything *inside* the plot arrives in
+matplotlib's fallback stack and seaborn's palette, and needs an explicit pass:
+
+- **Read each label's role off its PARENT group, never off the text node's name.** The import names a
+  TEXT node after its own content, while the step's `gid` sits on the wrapping group. A role test
+  written against `t.name` matches *nothing*, so every label falls to the default anchor and the
+  columns come out ragged — it looks like a font problem and it is a selector problem.
+- **Take column edges from geometry a text pass cannot inflate** — a column's own marks, or the frame's
+  content box — never from the text boxes. Pad those once and a later pass reads the padded width back
+  and walks the column off the frame.
+- **Hold each label with `textAlignHorizontal` and a box ending on its anchor**, rather than hugging and
+  re-reading the width, which does not settle inside the same call. Right-aligned columns get `x = 0`
+  and a box ending on the shared edge; centred labels get a small pad each side. Keep pads small: a
+  GROUP's bbox derives from its children, so a generous pad grows the group past the frame.
+- **Re-derive tints rather than mapping them.** Where a step computes member fills as `tint(base, w)`,
+  invert that per channel to recover `w` and re-apply it to the new color, and each family keeps its own
+  internal steps. A flat hex→hex table catches only the base colors and leaves every tint behind.
+- **Everything above is lost on re-import**, along with the rest of Step 8 — see the re-export
+  section. Keep the pass as one script you re-run, because a frame that has quietly reverted to
+  matplotlib's type looks finished.
 
 **Measure that band; don't hardcode it.** The header's height depends on how many lines the title and subtitle take, so a fixed y is wrong as soon as the subtitle wraps — and centering inside a guessed band leaves a lopsided result (18px above, 6px below on the first run of this skill). Read the real edges instead:
 
@@ -1068,6 +1101,7 @@ Two habits make the difference. **Assert, don't eyeball** — a 1.2px label drif
 - **`rescale()`, never `resize()`** on imported charts — `resize` crops instead of scaling children.
 - **Figma plugins can't be run from here — but the no-data hatch no longer needs one.** Imported no-data shapes arrive with an **empty `fills` array**, and the hatch the design team applies by hand is just an `IMAGE` fill, `scaleMode: "TILE"`, `scalingFactor ≈ 0.5` from a 12×12 tile. Reproduce it by copying `fills` from a shape that already has it, or rebuild it from `assets/no-data-hatch-tile.png` via `figma.createImage(bytes)` — and apply it to **every** no-data shape *and* the legend's "No data" pill, never a flat `#C9C9C9` (GUIDELINES.md → Flags, animals, no-data pattern). The Flags plugin (`2654:5`) is still manual.
 - **Fonts**: every text edit needs `loadFontAsync` first; the templates use Playfair Display and Lato — if a font is missing in the user's Figma, text edits throw.
+- **Before blaming a stale width, check that your setter changed anything.** Assigning a property the value it already holds is a no-op, and the unchanged geometry then looks exactly like the staleness below — so the diagnosis goes to the wrong place while the real cause sits untouched. Read the property back (`getStyledTextSegments(['fontSize', 'fontName'])` for text) and compare against what you meant to set.
 - **A text node's `width` is stale for the rest of the script that set its `characters`.** Read it back and you get the *old* width, so any layout computed from it lands wrong — twice in a row, because re-running the same arithmetic in a second script reads the same stale number when the real cause is elsewhere. **This silently invalidates a placement search**, which is the worst version of it: the candidate rectangles are built from the wrong widths, every collision test passes, and the script reports `forced: 0` while the labels sit on top of each other on the canvas. A search that returns a suspiciously clean result on a crowded chart is the tell. Create the text in one call; measure and place in the next. Two separate things bite here: SVG-imported text arrives at a **fixed** width (the clone of a `22px` value label stays 22px wide and wraps "Poultry" onto two lines), so set `textAutoResize = "WIDTH_AND_HEIGHT"` first; and even then the new width only settles on the **next** `use_figma` call. Write the text and the sizing mode in one call, measure and position in the next.
 - **`imType=square` and `imType=uncaptioned` don't render the same chart.** The square re-layout drops per-segment value labels that the uncaptioned crop keeps (and the uncaptioned crop keeps the legend, which is inside the chart area, not the header). Export both and look before deciding which one to embed.
 - **`/admin/charts/<id>.svg` doesn't exist**; narrative charts have no public slug — both go through `by-uuid/<uuid>.svg`.

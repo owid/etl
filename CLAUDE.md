@@ -134,7 +134,9 @@ Internal terms that recur across this guide, the skills, and the codebase:
 .venv/bin/etlr namespace/version/dataset --force --only # Force re-run
 ```
 
-Key flags: `--grapher/-g` (upload), `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
+Key flags: `--grapher/-g` (upload), `--export` (run `export://` steps), `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
+
+**An `export://` step needs `--export`, and without it the error misleads.** `etlr export://...` without the flag prints `No steps matched` and then lists your exact step among the "closest matches" — which reads as a typo you cannot find. It is the missing flag, every time.
 
 **"The step completed" is not "the data is right".** After running a step for
 someone, report what came out of it: row count, year range, entities, and a few
