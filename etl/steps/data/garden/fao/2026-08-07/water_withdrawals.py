@@ -138,14 +138,10 @@ def run() -> None:
     tb = tb.rename(columns=VARIABLES, errors="raise")
 
     # Convert withdrawals from billions of cubic meters per year to cubic meters per year.
-    # NOTE: Convert in float64 and round to whole cubic meters, to avoid float32 precision artifacts
-    # (e.g. 688000008192 instead of 688000000000).
     for column in COLUMNS_TO_CONVERT:
         tb[column] = (tb[column].astype("float64") * BILLION_CUBIC_METERS_TO_CUBIC_METERS).round()
 
-    # Harmonize country names. FAO's own aggregate rows are kept: its World row as "World", and its SDG regional
-    # groupings as the shared "(FAO)" region entities. Only the special groups with no counterpart in the regions
-    # dataset (LDCs, LLDCs, SIDS) are excluded in the country mapping.
+    # Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb)
 
     # Keep FAO's aggregate rows only from a year with complete coverage (see FAO_AGGREGATES_MIN_YEAR note).
@@ -160,18 +156,11 @@ def run() -> None:
 
     # FAO compiles the sectoral series and the total series separately, so they do not always agree: for about 2%
     # of country-years the three sectors do not add up to the total (e.g. North Macedonia, whose total is several
-    # times the sum of its sectors). Those values are published as they are. But where a single sector exceeds the
-    # total, the resulting share is above 100%, which is impossible, so those shares are removed.
-    n_impossible = 0
-    for column in SHARE_COLUMNS:
-        mask_impossible = tb[column] > 100
-        n_impossible += mask_impossible.sum()
-        tb.loc[mask_impossible, column] = None
-    assert 20 < n_impossible < 60, "Unexpected number of shares above 100%."
+    # times the sum of its sectors). Those values are published as they are. The cases where this makes a share
+    # exceed 100% of the total, which is impossible, are declared in the corrections file.
+    tb = paths.apply_corrections(tb)
 
-    # Add aggregates for continents and income groups, by summing member countries, only where at least 70% of each
-    # region's (ever-informed) countries have data.
-    # NOTE: World is not aggregated here; FAO's own published World row is kept instead (checked right below).
+    # Add region aggregates.
     tb = paths.regions.add_aggregates(
         tb=tb,
         regions=REGIONS,
