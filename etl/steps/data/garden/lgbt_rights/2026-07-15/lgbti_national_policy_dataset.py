@@ -165,6 +165,14 @@ def _pair_map(*, key_a, key_b, both_label, a_only_label, b_only_label, neither_l
     }
 
 
+# (law, status) sources whose enforcement refinement was retired because the source no longer
+# codes them with Evidence_of_Enforcement == 0. Maps each to the indicator that used to carry it.
+# `_check_retired_enforcement_refinements` asserts they stay empty.
+RETIRED_ENFORCEMENT_REFINEMENTS = {
+    ("lgb_military", "illegal"): "lgb_military_join",
+    ("transgender_military", "illegal"): "transgender_military",
+}
+
 # Per-indicator config for combined-categorical indicators.
 # Each entry says which (law, status) proportion columns feed the bucket key,
 # which label each bucket gets via the bucket-key string, and the final category map.
@@ -202,7 +210,8 @@ COMBINED_CONFIGS = [
     # ("Banned but not enforced") against the March 2026 release, where their illegal directions
     # had Evidence_of_Enforcement == 0 rows (e.g. the US transgender ban during the injunction
     # period). The 2026-06-12 revision's five-anchor EoE recode removed all EoE=0 rows from both
-    # illegal directions, so the refinements were dropped — re-audit on each release.
+    # illegal directions, so the refinements were dropped — RETIRED_ENFORCEMENT_REFINEMENTS +
+    # _check_retired_enforcement_refinements re-audit this automatically on each release.
     {
         "short_name": "lgb_military_join",
         "sources": [
@@ -687,6 +696,9 @@ def run() -> None:
     # Warn on country-years coded fully legal AND fully illegal at once (see _binary_map docstring).
     _warn_on_simultaneous_legal_illegal(tb)
 
+    # Fail if the source reintroduces enforcement data where a refinement was retired.
+    _check_retired_enforcement_refinements(tb)
+
     # Country-level table — drop the requirement and enforcement columns here; they're
     # only used to build combined indicators and aren't published as per-row long-table
     # indicators.
@@ -843,6 +855,30 @@ def _detect_structural_placeholders(tb):
         f"Version 2.2, though the codebook prose still says 17); found {len(placeholders)}."
     )
     return placeholders
+
+
+def _check_retired_enforcement_refinements(tb):
+    """Fail if the source reintroduces EoE == 0 rows where an enforcement refinement was retired.
+
+    `lgb_military_join` and `transgender_military` used to split "Banned" into "Banned but not
+    enforced" via `enforcement_refinement`. The 2026-06-12 revision left their illegal directions
+    with no `Evidence_of_Enforcement == 0` rows, so both refinements (and the corresponding
+    metadata blocks) were dropped. Without this check, a release that reintroduces such rows would
+    silently publish them as plain "Banned" — the enforcement information would be discarded with
+    nothing in the build to show for it, and `lgbt_military` would stay a duplicate of
+    `lgbt_military_no_enforcement`. Restore the refinement (and its metadata) when this fires.
+    """
+    reintroduced = {}
+    for (law, status), indicator in RETIRED_ENFORCEMENT_REFINEMENTS.items():
+        n = int(((tb["law"] == law) & (tb["status"] == status) & (tb["evidence_of_enforcement"] == 0)).sum())
+        if n:
+            reintroduced[f"{law}/{status} (indicator {indicator})"] = n
+    assert not reintroduced, (
+        f"Evidence_of_Enforcement == 0 rows reappeared where the enforcement refinement was retired: "
+        f"{reintroduced}. Restore the 'but not enforced' refinement on the affected COMBINED_CONFIGS "
+        f"entry and add its metadata block, or drop the entry from RETIRED_ENFORCEMENT_REFINEMENTS if "
+        f"the topic owner decides not to surface the distinction."
+    )
 
 
 def _warn_on_simultaneous_legal_illegal(tb):
