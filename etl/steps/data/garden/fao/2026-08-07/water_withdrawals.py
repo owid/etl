@@ -10,43 +10,27 @@ paths = PathFinder(__file__)
 # Variables to select from AQUASTAT, and how to rename them.
 VARIABLES = {
     "Agricultural water withdrawal": "agricultural_water_withdrawal",
-    "Agricultural water withdrawal as % of total water withdrawal": "agricultural_water_withdrawal_share",
     "Industrial water withdrawal": "industrial_water_withdrawal",
-    "Industrial water withdrawal as % of total water withdrawal": "industrial_water_withdrawal_share",
     "Municipal water withdrawal": "municipal_water_withdrawal",
-    "Municipal water withdrawal as % of total withdrawal": "municipal_water_withdrawal_share",
-    "Total freshwater withdrawal": "total_freshwater_withdrawal",
-    "Total water withdrawal": "total_water_withdrawal",
     "Total water withdrawal per capita": "total_water_withdrawal_per_capita",
 }
 
 # Expected original unit of each variable.
 UNITS_EXPECTED = {
     "Agricultural water withdrawal": "10^9 m3/year",
-    "Agricultural water withdrawal as % of total water withdrawal": "%",
     "Industrial water withdrawal": "10^9 m3/year",
-    "Industrial water withdrawal as % of total water withdrawal": "%",
     "Municipal water withdrawal": "10^9 m3/year",
-    "Municipal water withdrawal as % of total withdrawal": "%",
-    "Total freshwater withdrawal": "10^9 m3/year",
-    "Total water withdrawal": "10^9 m3/year",
     "Total water withdrawal per capita": "m3/inhab/year",
 }
 
-# Columns of sectoral withdrawals, which should add up to the total withdrawal.
+# Columns of sectoral withdrawals, given in billions of cubic meters per year, to be converted to cubic meters.
 SECTORAL_COLUMNS = ["agricultural_water_withdrawal", "industrial_water_withdrawal", "municipal_water_withdrawal"]
-# Columns of shares of total withdrawal, which should add up to 100%.
-SHARE_COLUMNS = [
-    "agricultural_water_withdrawal_share",
-    "industrial_water_withdrawal_share",
-    "municipal_water_withdrawal_share",
-]
-# Columns originally given in billions of cubic meters per year, to be converted to cubic meters per year.
-COLUMNS_TO_CONVERT = SECTORAL_COLUMNS + ["total_water_withdrawal", "total_freshwater_withdrawal"]
+COLUMNS_TO_CONVERT = SECTORAL_COLUMNS
 BILLION_CUBIC_METERS_TO_CUBIC_METERS = 1e9
 
 # Columns aggregated (by summing member countries) for continents and income groups.
-LEVEL_COLUMNS = SECTORAL_COLUMNS + ["total_water_withdrawal", "total_freshwater_withdrawal"]
+# NOTE: Withdrawal per capita is not aggregated, since it cannot be summed.
+LEVEL_COLUMNS = SECTORAL_COLUMNS
 REGIONS = [
     "Africa",
     "Asia",
@@ -99,29 +83,12 @@ def sanity_check_outputs(tb: Table) -> None:
 
     # Magnitude anchors, to catch unit regressions in the two different units of this dataset.
     # NOTE: Global withdrawals have hovered around 4 trillion m³/year in recent years.
-    world_total = tb.loc[(tb["country"] == "World") & (tb["year"] == 2023), "total_water_withdrawal"].item()
+    world_total = tb.loc[(tb["country"] == "World") & (tb["year"] == 2023), SECTORAL_COLUMNS].sum().sum()
     assert 3.5e12 < world_total < 4.5e12, "Global total withdrawals in 2023 outside the expected range."
     us_2010 = tb.loc[
         (tb["country"] == "United States") & (tb["year"] == 2010), "total_water_withdrawal_per_capita"
     ].item()
     assert 1400 < us_2010 < 1700, "US total water withdrawal per capita in 2010 differs from expected ~1557."
-
-    # In FAO's own rows (countries and its regional groupings), each share is its sector divided by the total, so
-    # any deviation means columns got misaligned somewhere.
-    # NOTE: FAO's sectors do not always add up to its total (see the note in run), so the three shares of a given
-    # country and year do not always add up to 100%. The regions we aggregate ourselves are excluded here, since
-    # their shares come from a weighted mean over the countries reporting each sector.
-    complete = tb[~tb["country"].isin(REGIONS)].dropna(
-        subset=SECTORAL_COLUMNS + SHARE_COLUMNS + ["total_water_withdrawal"]
-    )
-    for sector, share in zip(SECTORAL_COLUMNS, SHARE_COLUMNS):
-        deviation = (complete[share] - 100 * complete[sector] / complete["total_water_withdrawal"]).abs()
-        assert deviation.max() < 0.01, f"{share} is not consistent with {sector} divided by the total."
-
-    # No sector can withdraw more than the total. The known cases are handled by the corrections file, so any
-    # remaining one is a new inconsistency in the source, to be added there.
-    for column in SHARE_COLUMNS:
-        assert tb[column].max() <= 100, f"{column} above 100%; declare the new cases in the corrections file."
 
 
 def run() -> None:
@@ -156,27 +123,17 @@ def run() -> None:
     mask_fao_aggregates = tb["country"].str.endswith("(FAO)") | (tb["country"] == "World")
     n_countries = (
         tb[~mask_fao_aggregates & (tb["year"] >= FAO_AGGREGATES_MIN_YEAR)]
-        .groupby("year")["total_water_withdrawal"]
+        .groupby("year")["agricultural_water_withdrawal"]
         .count()
     )
     assert (n_countries > 150).all(), "Incomplete country coverage in years where FAO's aggregates are kept."
     tb = tb[~(mask_fao_aggregates & (tb["year"] < FAO_AGGREGATES_MIN_YEAR))].reset_index(drop=True)
 
-    # FAO compiles the sectoral series and the total series separately, so they do not always agree: for about 2%
-    # of country-years the three sectors do not add up to the total (e.g. North Macedonia, whose total is several
-    # times the sum of its sectors). Those values are published as they are. The cases where this makes a share
-    # exceed 100% of the total, which is impossible, are declared in the corrections file.
-    tb = paths.apply_corrections(tb)
-
     # Add region aggregates.
-    # NOTE: Each share is aggregated as a mean of the countries' shares weighted by their total withdrawal, which
-    # is the region's sector divided by the region's total, using only the countries that report both.
-    aggregations = {column: "sum" for column in LEVEL_COLUMNS}
-    aggregations.update({column: "mean_weighted_by_total_water_withdrawal" for column in SHARE_COLUMNS})
     tb = paths.regions.add_aggregates(
         tb=tb,
         regions=REGIONS,
-        aggregations=aggregations,
+        aggregations={column: "sum" for column in LEVEL_COLUMNS},
         min_frac_countries_informed=MIN_FRAC_COUNTRIES_INFORMED,
     )
 

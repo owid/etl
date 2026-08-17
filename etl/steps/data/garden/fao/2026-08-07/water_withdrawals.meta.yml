@@ -7,7 +7,7 @@ definitions:
     display:
       numDecimalPlaces: 0
   description_processing_aggregates: &description_processing_aggregates |-
-    Aggregates for continents and income groups were calculated by Our World in Data by summing the values of the member countries. Sectoral shares for these aggregates were calculated as an average of the shares of the member countries, weighted by their total water withdrawal, over the countries that report both. An aggregate is only shown for a year in which at least 70% of the countries that ever report that indicator in the region have data. Values for the World and for FAO's own regional groupings are taken directly from FAO.
+    Aggregates for continents and income groups were calculated by Our World in Data by summing the values of the member countries. An aggregate is only shown for a year in which at least 70% of the countries that ever report that indicator in the region have data. Values for the World and for FAO's own regional groupings are taken directly from FAO.
 
 dataset:
   update_period_days: 365
@@ -25,13 +25,6 @@ tables:
         short_unit: m³
         description_from_producer: |-
           Annual quantity of self-supplied water withdrawn for irrigation, livestock and aquaculture purposes.
-      agricultural_water_withdrawal_share:
-        description_processing: *description_processing_aggregates
-        title: Agricultural water withdrawal as a share of total water withdrawal
-        unit: "%"
-        short_unit: "%"
-        display:
-          numDecimalPlaces: 1
       industrial_water_withdrawal:
         description_processing: *description_processing_aggregates
         title: Industrial water withdrawal
@@ -39,13 +32,6 @@ tables:
         short_unit: m³
         description_from_producer: |-
           Annual quantity of self-supplied water withdrawn for industrial uses.
-      industrial_water_withdrawal_share:
-        description_processing: *description_processing_aggregates
-        title: Industrial water withdrawal as a share of total water withdrawal
-        unit: "%"
-        short_unit: "%"
-        display:
-          numDecimalPlaces: 1
       municipal_water_withdrawal:
         description_processing: *description_processing_aggregates
         title: Municipal water withdrawal
@@ -53,27 +39,6 @@ tables:
         short_unit: m³
         description_from_producer: |-
           Annual quantity of water withdrawn primarily for the direct use by the population. It includes renewable freshwater resources as well as potential over-abstraction of renewable groundwater or withdrawal of fossil groundwater and the potential use of desalinated water or treated wastewater. It is usually computed as the total water withdrawn by the public distribution network. It can include that part of the industries, which is connected to the municipal network. The ratio between the net consumption and the water withdrawn can vary from 5 to 15% in urban areas and from 10 to 50% in rural areas.
-      municipal_water_withdrawal_share:
-        description_processing: *description_processing_aggregates
-        title: Municipal water withdrawal as a share of total water withdrawal
-        unit: "%"
-        short_unit: "%"
-        display:
-          numDecimalPlaces: 1
-      total_freshwater_withdrawal:
-        description_processing: *description_processing_aggregates
-        title: Total freshwater withdrawal
-        unit: cubic meters
-        short_unit: m³
-        description_from_producer: |-
-          This is the sum of surface water withdrawal and groundwater withdrawal.
-      total_water_withdrawal:
-        description_processing: *description_processing_aggregates
-        title: Total water withdrawal
-        unit: cubic meters
-        short_unit: m³
-        description_from_producer: |-
-          Annual quantity of water withdrawn for agricultural, industrial and municipal purposes.
       total_water_withdrawal_per_capita:
         title: Total water withdrawal per capita
         processing_level: minor
