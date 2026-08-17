@@ -163,12 +163,17 @@ SORT_BY = "paid_work"
 
 TITLE = "How do people spend their time?"
 
-# Credited on the license line: the original chart's author, and this refresh's.
-AUTHORS = "Esteban Ortiz-Ospina and Pablo Arriagada"
+# Credited on the license line: the original chart's author, and this refresh's. Named one by one
+# because the line sets them in bold, as it does the license itself.
+AUTHORS = ["Esteban Ortiz-Ospina", "Pablo Arriagada"]
 
 TAGLINE = "OurWorldinData.org — Research and data to make progress against the world's largest problems."
 
+# The greys the templates set on their own text slots, so a render reads like the frame it feeds.
+# Every other colour here is a placeholder that Figma replaces.
+TITLE_COLOR = "#2d2e2d"
 TEXT_COLOR = "#5b5b5b"
+FOOTER_COLOR = "#858585"
 MUTED_COLOR = "#777777"
 CATEGORY_RULE_COLOR = "#bbbbbb"
 # In-bar values are white on saturated fills and dark on light tints; the switch is on luminance.
@@ -181,22 +186,35 @@ POINTS_PER_PIXEL = 0.72
 # Template pixels per inch: the figure is sized so the saved image keeps the template proportions.
 PIXELS_PER_INCH = 100
 
-# Gap between the title block and the subtitle, calibrated so a two-line title puts the subtitle
-# at the templates' own y=80.
-TITLE_SUBTITLE_GAP = 6
-
-# Vertical rhythm between the subtitle and the header, in text lines.
-SUBTITLE_GAP = 0.8
+# Least clearance between the tagline and the license, which share the desktop footer's last row.
+LICENSE_TAGLINE_GAP = 8
 
 # Clearance between the plot's own ink and the template's text above and below it, in template px.
 # The design asks for 12-16 on these frames; 14 is the middle of that.
 BAND_INSET = 14
+
+# The template sets its slots in Lato and Playfair Display, neither of which is installed here, so
+# this step predicts their wrapping with its own font and a measured allowance. Measured in Figma on
+# 2026-08-17, at the same pixel size: Lato sets these strings 2-3% narrower than this step's font,
+# Playfair Display 3% wider. The allowance is what keeps the render's line breaks the frame's — a
+# blanket "wrap early to be safe" broke both footer rows onto second lines the frame does not have.
+TEMPLATE_LATO_SLACK = 1.03
+TEMPLATE_SERIF_SLACK = 0.97
+
+# A title line, in template px, in every one of these templates. Their titles set line height
+# explicitly where every other slot leaves it automatic, which is why this is a constant and the
+# other line heights are per-slot.
+TEMPLATE_TITLE_LINE_PX = 29
 
 # Horizontal breathing room, in template pixels: between a country label and its bar, between the
 # bars and the total-leisure column, and inside a segment around its value.
 COUNTRY_LABEL_PAD = 8
 TOTAL_COLUMN_GAP = 10
 VALUE_PAD = 3
+
+# Most of the frame the total-leisure column may take before its unit is dropped to give the bars
+# their room back.
+TOTAL_COLUMN_MAX_SHARE = 0.12
 
 # Header geometry, in template pixels. A tier holds one line of header text, which is what a wrapped
 # category name stacks in; `LEADER_GAP` is the clearance between the header and the bars, and
@@ -222,31 +240,47 @@ BAR_FRACTION = 0.8
 # The two layouts, taken from the static-chart template frames. Geometry is in template pixels,
 # y measured from the top edge as Figma reports it. `full_footer` separates desktop (Note and
 # tagline rows) from mobile (neither). Row positions come from "Static Chart Template_Vertical"
-# (850x1095) and "Static Chart Template_Mobile (example 2)" (540x824).
+# (850x1095) and "Static Chart Template_Mobile (example 2)" (540x824), re-measured 2026-08-17.
 LAYOUTS = {
     "time_use_by_country": {
         "size": (850, 1095),
-        "margin": 16,
-        "title_y": 16,
-        "chart_bottom_y": 997,
-        # The template's own text edges (create-static-viz TEMPLATES.md): the subtitle's ink
-        # bottom and the Note's ink top. Both are ink, not frames — the footer frame starts 14px
-        # above its Note, so using the frame edge here would inset twice. The plot is laid inside
-        # this, inset by BAND_INSET, so the clearance is right against the template's own text
-        # rather than against this step's smaller copies of it.
-        "band": (118, 1015.81),
-        "note_y": 1013,
-        "source_y": 1046,
-        "footer_y": 1066,
+        "margin": 16.216,
+        # Every text slot the template defines, at the size and line height the template gives it,
+        # so this step draws the same text the frame will and the render previews the frame instead
+        # of only its proportions. The plot's band comes from these too: the header is a top-anchored
+        # auto-layout and the footer a bottom-anchored one, so the room between them moves a line at
+        # a time as the slots wrap, and recording one case as a constant left dead space above the
+        # plot whenever a slot came in shorter than it.
+        "template_text": {
+            # Header: a title row hugging whichever is taller, the title or the logo beside it, then
+            # a 6px auto-layout gap, then the subtitle. `origin_y` is where the row starts — the
+            # header block's own top padding here, and the block's y on mobile.
+            "origin_y": 16.216,
+            "logo_px": 41.26,
+            "title_slot_px": 737.84,
+            "title_px": 25,
+            "header_gap_px": 6,
+            "subtitle_slot_px": 817.57,
+            "subtitle_px": 16,
+            "subtitle_line_px": 19,
+            # Footer. Its rows are pinned to the frame's bottom margin, so the Note's ink bottom is
+            # fixed and its top rises as it wraps.
+            "note_px": 12,
+            "note_line_px": 14,
+            "note_slot_px": 818,
+            "note_bottom_px": 1043.81,
+            "source_y": 1047.81,
+            "source_px": 12,
+            "tagline_y": 1065.81,
+            "tagline_slot_px": 467,
+            "license_y": 1065.81,
+            "license_px": 11,
+        },
         "full_footer": True,
-        "title_fontsize": 16,
-        "body_fontsize": 10.5,
-        "footer_fontsize": 7.75,
         "country_fontsize": 9,
         "value_fontsize": 8.75,
         "header_fontsize": 9.5,
         # Width reserved for the total-leisure column, in template pixels.
-        "total_column_px": 74,
         "with_mins_suffix": True,
         # Where each half of the header goes. The category brackets span the top row from above, and
         # each category's own member names are stacked inside its bracket, one per line
@@ -260,23 +294,31 @@ LAYOUTS = {
     "time_use_by_country_mobile": {
         "size": (540, 824),
         "margin": 16,
-        "title_y": 16,
-        # The template's chart area ends at the source row (y=770); a small inset keeps the last
-        # bar off it.
-        "chart_bottom_y": 758,
-        # Mobile has no Note row, so the band ends at the Data source row.
-        "band": (118, 770),
-        "note_y": None,
-        "source_y": 770,
-        "footer_y": 791,
+        "template_text": {
+            # Mobile's header block carries no padding of its own and its logo is shorter, so its
+            # title row hugs a one-line title less tightly than the 850-wide pair's does.
+            "origin_y": 16,
+            "logo_px": 35.23,
+            "title_slot_px": 428,
+            "title_px": 25,
+            "header_gap_px": 6,
+            "subtitle_slot_px": 508,
+            "subtitle_px": 16,
+            "subtitle_line_px": 19,
+            # No Note row, so the Data source row's ink top bounds the band and nothing below the
+            # plot reflows. Both footer rows are a size larger than the 850-wide pair's.
+            "note_px": None,
+            "footer_top_px": 770,
+            "source_y": 770,
+            "source_px": 14,
+            "tagline_slot_px": None,
+            "license_y": 791,
+            "license_px": 14,
+        },
         "full_footer": False,
-        "title_fontsize": 16,
-        "body_fontsize": 10.5,
-        "footer_fontsize": 8.75,
         "country_fontsize": 7.5,
         "value_fontsize": 7.5,
         "header_fontsize": 8,
-        "total_column_px": 46,
         "with_mins_suffix": False,
         "category_side": "listed_above",
         "group_labels": "listed_above",
@@ -393,7 +435,7 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
 
     width_px, height_px = layout["size"]
     margin_px = layout["margin"]
-    body_fontsize = layout["body_fontsize"]
+    template = layout["template_text"]
 
     def fx(x_px: float) -> float:
         return x_px / width_px
@@ -404,42 +446,32 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     fig = plt.figure(figsize=(width_px / PIXELS_PER_INCH, height_px / PIXELS_PER_INCH))
     fig.patch.set_facecolor("white")
 
-    # --- header: title, then subtitle directly beneath it ---
-    title = wrap_to_width(TITLE, width_px - 2 * margin_px, layout["title_fontsize"])
-    title_lines = title.count("\n") + 1
-    subtitle_y = layout["title_y"] + title_lines * line_px(layout["title_fontsize"]) + TITLE_SUBTITLE_GAP
+    # --- header: the template's title row, then its subtitle ---
+    title = wrap_to_slot(TITLE, template["title_slot_px"], template["title_px"], TEMPLATE_SERIF_SLACK)
+    subtitle_text = SUBTITLE if layout["full_footer"] else f"{SUBTITLE} {MOBILE_NOTE}"
+    subtitle = wrap_to_slot(subtitle_text, template["subtitle_slot_px"], template["subtitle_px"])
+    title_row_px = max(lines_in(title) * TEMPLATE_TITLE_LINE_PX, template["logo_px"])
+    subtitle_y = template["origin_y"] + title_row_px + template["header_gap_px"]
 
-    subtitle = SUBTITLE if layout["full_footer"] else f"{SUBTITLE} {MOBILE_NOTE}"
-    subtitle = wrap_to_width(subtitle, width_px - 2 * margin_px, body_fontsize)
-    subtitle_lines = subtitle.count("\n") + 1
-
-    fig.text(
-        fx(margin_px),
-        fy(layout["title_y"]),
-        title,
-        ha="left",
-        va="top",
-        fontsize=layout["title_fontsize"],
-        color="#111111",
-        gid="title",
+    draw_slot(
+        fig, fx(margin_px), fy(template["origin_y"]), title, template["title_px"], TEMPLATE_TITLE_LINE_PX, "title"
     )
-    fig.text(
+    draw_slot(
+        fig,
         fx(margin_px),
         fy(subtitle_y),
         subtitle,
-        ha="left",
-        va="top",
-        fontsize=body_fontsize,
-        color="#555555",
-        gid="subtitle",
+        template["subtitle_px"],
+        template["subtitle_line_px"],
+        "subtitle",
+        color=TEXT_COLOR,
     )
 
     # --- footer, in the slots the static-chart templates define ---
-    draw_footer(fig, tb, ages, source_citation, layout, fx, fy)
+    note = build_note(tb, ages, layout) if layout["full_footer"] else None
+    draw_footer(fig, note, source_citation, layout, fx, fy)
 
     # --- the chart band: the category header, then the bar rows ---
-    subtitle_bottom_px = subtitle_y + subtitle_lines * line_px(body_fontsize) + SUBTITLE_GAP * line_px(body_fontsize)
-
     country_labels = [f"{country} ({year})" for country, year in zip(tb["country"].tolist(), tb["year"].tolist())]
     country_space_px = (
         max(text_width_px(label, layout["country_fontsize"]) for label in country_labels) + COUNTRY_LABEL_PAD
@@ -447,7 +479,8 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
 
     plot_left_px = margin_px + country_space_px
     plot_width_px = (width_px - margin_px) - plot_left_px
-    bar_width_px = plot_width_px - layout["total_column_px"]
+    total_column_px, total_with_mins = total_column(tb, layout)
+    bar_width_px = plot_width_px - total_column_px
     px_per_min = bar_width_px / MINUTES_PER_DAY
 
     # Category brackets attach to the row they touch: the top row above the bars. Group labels
@@ -463,7 +496,7 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     if layout["group_labels"] in ("listed_above", "below_listed", "below_flow"):
         listed_available_px = width_px - 2 * margin_px
         if layout["group_labels"] == "listed_above":
-            listed_available_px -= layout["total_column_px"] + TOTAL_COLUMN_GAP
+            listed_available_px -= total_column_px + TOTAL_COLUMN_GAP
         if layout["group_labels"] == "below_flow":
             listed_lines = layout_flowed_names(layout, listed_available_px)
         else:
@@ -530,14 +563,18 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     header_px = max(band_px("above"), 2 * line_px(layout["header_fontsize"]) + LEADER_GAP)
     below_px = band_px("below")
 
-    # The plot sits inside the *template's* chart area, not inside whatever room this step's own text
-    # happens to leave. The step draws its footer at 7.75pt and its subtitle at 10.5pt, both smaller
-    # than the template's 12px and 16px, so a band derived from them puts the header ink flush under
-    # this step's subtitle and only ~7px under the template's — below the 12-16px the design asks for.
-    # `band` comes from create-static-viz's TEMPLATES.md; `BAND_INSET` is the clearance at each end.
-    band_top, band_bottom = layout["band"]
-    chart_top_px = max(subtitle_bottom_px, band_top + BAND_INSET) + header_px
-    chart_bottom_px = min(layout["chart_bottom_y"], band_bottom - BAND_INSET) - below_px
+    # The plot sits between the subtitle's ink and the footer's, inset by BAND_INSET at each end.
+    # Both are ink rather than frame edges: the footer frame already starts 16px above its Note, so
+    # insetting from the frame would inset twice.
+    band_top = subtitle_y + lines_in(subtitle) * template["subtitle_line_px"]
+    band_bottom = (
+        template["note_bottom_px"] - lines_in(note) * template["note_line_px"]
+        if note is not None
+        else template["footer_top_px"]
+    )
+    content_top_px = band_top + BAND_INSET
+    chart_top_px = content_top_px + header_px
+    chart_bottom_px = band_bottom - BAND_INSET - below_px
 
     n_rows = len(tb)
     row_pitch_px = (chart_bottom_px - chart_top_px) / n_rows
@@ -565,7 +602,18 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
 
     group_colors = {group["column"]: resolve_color(group["color"], palette) for group in GROUPS}
 
-    draw_bars(ax, tb, country_labels, group_colors, px_per_min, layout, value_label_columns(tb, px_per_min, layout))
+    draw_bars(
+        ax,
+        tb,
+        country_labels,
+        group_colors,
+        px_per_min,
+        row_pitch_px,
+        total_column_px,
+        total_with_mins,
+        layout,
+        value_label_columns(tb, px_per_min, layout),
+    )
 
     if category_placements is not None:
         rows_out = rows_above if category_at == "above" else rows_below
@@ -576,22 +624,34 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
         rows_out = rows_above if category_at == "above" else rows_below
         draw_bracketed_names(ax, bracketed_blocks, palette, px_per_min, rows_out, layout, bracketed_px)
     if layout["group_labels"] == "listed_above":
-        draw_listed_header(fig, listed_lines, palette, subtitle_bottom_px, margin_px, layout, fx, fy)
+        draw_listed_header(fig, listed_lines, palette, content_top_px, margin_px, layout, fx, fy)
     elif layout["group_labels"] in ("below_listed", "below_flow"):
         draw_listed_header(fig, listed_lines, palette, chart_bottom_px + LEADER_GAP, margin_px, layout, fx, fy)
 
-    # Total-leisure column header, right-aligned on the content edge with its own column's values.
-    ax.text(
-        content_right_min(layout, px_per_min),
-        rows_above(LEADER_GAP),
-        "Total\nleisure",
-        ha="right",
-        va="bottom",
-        fontsize=layout["header_fontsize"],
-        fontweight="bold",
-        color="#333333",
-        gid="header__total-leisure",
+    # Total-leisure column header, centred over the numbers it heads — which is the column minus the
+    # gap that separates it from the bars, since the values are right-aligned on the content edge.
+    #
+    # One `ax.text` per line, rather than one call with a newline in it: matplotlib bakes a
+    # multi-line label's alignment into each line's own offset and emits no `text-anchor` at all, so
+    # the lines arrive in Figma as independent left-aligned boxes and lose both their centring on the
+    # column and on each other the moment the font changes.
+    values_centre_min = content_right_min(total_column_px, px_per_min) - (
+        (total_column_px - TOTAL_COLUMN_GAP) / 2 / px_per_min
     )
+    header_lines = ["Total", "leisure"]
+    for index, line in enumerate(header_lines):
+        depth_px = LEADER_GAP + (len(header_lines) - 1 - index) * line_px(layout["header_fontsize"])
+        ax.text(
+            values_centre_min,
+            rows_above(depth_px),
+            line,
+            ha="center",
+            va="bottom",
+            fontsize=layout["header_fontsize"],
+            fontweight="bold",
+            color="#333333",
+            gid="header__total-leisure" if index == 0 else f"header__total-leisure-line{index}",
+        )
 
     # Drop clipping everywhere so labels outside the axes survive into the SVG whole.
     for artist in fig.findobj():
@@ -628,10 +688,24 @@ def draw_bars(
     country_labels: list[str],
     group_colors: dict,
     px_per_min: float,
+    row_pitch_px: float,
+    total_column_px: float,
+    total_with_mins: bool,
     layout: dict,
     value_columns: set[str],
 ) -> None:
     """One stacked row per country: the country label, the ten segments, and the leisure total."""
+
+    def baseline(fontsize: float) -> float:
+        """Where to put a row's baseline so its ink is centred on the bar, in row units.
+
+        `va="center"` centres the font's whole line box, which reserves room for descenders the
+        digits never use — so a value label sits a tenth of a bar high, and text with descenders
+        ("Japan") lands on a different baseline from text without ("269 mins"). Placing the baseline
+        explicitly at half a cap-height below the bar's centre fixes both.
+        """
+        return 0.5 + cap_height_px(fontsize) / 2 / row_pitch_px
+
     for row in range(len(tb)):
         country_row = tb.iloc[row]
         slug = slugify(str(country_row["country"]))
@@ -639,10 +713,10 @@ def draw_bars(
 
         ax.text(
             -COUNTRY_LABEL_PAD / px_per_min,
-            y_center,
+            row + baseline(layout["country_fontsize"]),
             country_labels[row],
             ha="right",
-            va="center",
+            va="baseline",
             fontsize=layout["country_fontsize"],
             color=TEXT_COLOR,
             gid=f"{slug}__label",
@@ -674,10 +748,10 @@ def draw_bars(
             if label:
                 ax.text(
                     left + minutes / 2,
-                    y_center,
+                    row + baseline(layout["value_fontsize"]),
                     label,
                     ha="center",
-                    va="center",
+                    va="baseline",
                     fontsize=layout["value_fontsize"],
                     color="white" if luminance(color) < LUMINANCE_THRESHOLD else DARK_VALUE_COLOR,
                     gid=f"{slug}__{slugify(column)}-value",
@@ -685,13 +759,13 @@ def draw_bars(
             left += minutes
 
         total_leisure = round(float(country_row[TOTAL_LEISURE_COLUMN]))
-        total_label = f"{total_leisure} mins" if layout["with_mins_suffix"] else f"{total_leisure}"
+        total_label = f"{total_leisure} mins" if total_with_mins else f"{total_leisure}"
         ax.text(
-            content_right_min(layout, px_per_min),
-            y_center,
+            content_right_min(total_column_px, px_per_min),
+            row + baseline(layout["value_fontsize"]),
             total_label,
             ha="right",
-            va="center",
+            va="baseline",
             fontsize=layout["value_fontsize"],
             color=TEXT_COLOR,
             gid=f"{slug}__total-leisure",
@@ -762,6 +836,12 @@ def draw_bracketed_names(
 
     Every block starts at the same distance out from the bars — directly under the bracket rule — so
     the four of them line up however many lines each one needed.
+
+    Each run is anchored on the centre of its own slot rather than on its left edge. It draws in the
+    same place either way, but the anchor is what survives Figma: a left-anchored run re-rendered in
+    the template's narrower font shrinks away from its centre and pushes nothing back, so a line of
+    them creeps out of its bracket. One name per line is the normal case, and a middle anchor pins
+    it to the bracket's centre exactly.
     """
     fontsize = layout["header_fontsize"]
     for block in blocks:
@@ -771,29 +851,35 @@ def draw_bracketed_names(
             width = sum(text_advance_px(text, fontsize) for text, _ in line)
             offset = centre - width / 2
             for text, group in line:
+                drawn, ink_px, step_px = place_run(text, fontsize)
                 ax.text(
-                    offset / px_per_min,
+                    (offset + ink_px / 2) / px_per_min,
                     rows_out(LEADER_GAP + height_px - index * line_px(fontsize)),
-                    text,
-                    ha="left",
+                    drawn,
+                    ha="center",
                     va="top",
                     fontsize=fontsize,
                     color=header_text_color(group["color"], palette),
                     gid=f"header__{slugify(group['column'])}",
                 )
-                offset += text_advance_px(text, fontsize)
+                offset += step_px
 
 
 def draw_listed_header(fig, listed_lines, palette, top_px: float, margin_px: float, layout: dict, fx, fy) -> None:
-    """Draw the category-grouped name list used where the frame is too narrow to label in place."""
+    """Draw the category-grouped name list used where the frame is too narrow to label in place.
+
+    Runs are anchored on their own centres, for the reason `draw_bracketed_names` gives: left-anchored
+    runs re-rendered in a narrower font leave the gaps between the names growing down the line.
+    """
     for index, line in enumerate(listed_lines):
         y_px = top_px + index * (line_px(layout["header_fontsize"]) + FLOW_LINE_PAD)
         for x_offset, text, spec, bold, gid in line:
+            drawn, ink_px, _ = place_run(text, layout["header_fontsize"], bold)
             fig.text(
-                fx(margin_px + x_offset),
+                fx(margin_px + x_offset + ink_px / 2),
                 fy(y_px),
-                text,
-                ha="left",
+                drawn,
+                ha="center",
                 va="top",
                 fontsize=layout["header_fontsize"],
                 fontweight="bold" if bold else "normal",
@@ -802,62 +888,75 @@ def draw_listed_header(fig, listed_lines, palette, top_px: float, margin_px: flo
             )
 
 
-def draw_footer(fig, tb: Table, ages: dict[str, str], source_citation: str, layout: dict, fx, fy) -> None:
-    """Fill the template's footer slots: Note, Data source, tagline and license."""
+def draw_footer(fig, note: str | None, source_citation: str, layout: dict, fx, fy) -> None:
+    """Fill the template's footer slots: Note, Data source, tagline and license.
+
+    The footer is bottom-anchored, so the rows below the Note keep their y whatever the Note does and
+    the Note itself grows upward from a fixed ink bottom.
+    """
     width_px = layout["size"][0]
     margin_px = layout["margin"]
-    footer_fontsize = layout["footer_fontsize"]
+    template = layout["template_text"]
 
-    if layout["full_footer"]:
-        fig.text(
-            fx(margin_px),
-            fy(layout["note_y"]),
-            build_note(tb, ages, layout),
-            ha="left",
-            va="top",
-            fontsize=footer_fontsize,
-            color=MUTED_COLOR,
-            gid="note",
+    if note is not None:
+        note_top = template["note_bottom_px"] - lines_in(note) * template["note_line_px"]
+        draw_slot(
+            fig, fx(margin_px), fy(note_top), note, template["note_px"], template["note_line_px"], "note", FOOTER_COLOR
         )
-    fig.text(
+    draw_slot(
+        fig,
         fx(margin_px),
-        fy(layout["source_y"]),
+        fy(template["source_y"]),
         f"Data source: {source_citation}",
-        ha="left",
-        va="top",
-        fontsize=footer_fontsize,
-        color="#888888",
-        gid="data-source",
+        template["source_px"],
+        None,
+        "data-source",
+        FOOTER_COLOR,
     )
 
-    # Desktop's tagline and license share one row, so each wraps within its template slot width
-    # (467px and 263px) rather than running into the other. Mobile stacks its rows full-width.
+    # Desktop's tagline and license share one row; mobile stacks its two rows full-width.
     shares_tagline_row = layout["full_footer"]
+    row_px = template["license_px"]
     if shares_tagline_row:
-        fig.text(
+        # Nothing wraps this row — the tagline's wording is fixed and a name is never shortened — so
+        # instead the row is drawn a hair smaller when this step's font would collide the two, which
+        # the template's narrower Lato would not. The assert is the real limit: past it the row does
+        # not fit even once the template sets it, and the wording has to give.
+        content_px = width_px - 2 * margin_px
+        needed_px = (
+            text_advance_px(TAGLINE, row_px * POINTS_PER_PIXEL)
+            + LICENSE_TAGLINE_GAP
+            + run_row_width(license_runs(), row_px)
+        )
+        assert fits_slot(needed_px, content_px), (
+            f"The tagline and license need {needed_px:.0f}px of the footer's {content_px:.0f}px row. "
+            f"Shorten the license's wording — never a name."
+        )
+        row_px *= min(1.0, content_px / needed_px)
+        draw_slot(
+            fig,
             fx(margin_px),
-            fy(layout["footer_y"]),
-            wrap_to_width(TAGLINE, 467, footer_fontsize),
-            ha="left",
-            va="top",
-            fontsize=footer_fontsize,
-            color="#888888",
-            gid="tagline",
+            fy(template["tagline_y"]),
+            wrap_to_slot(TAGLINE, template["tagline_slot_px"], row_px),
+            row_px,
+            None,
+            "tagline",
+            FOOTER_COLOR,
         )
     # "by <names>", not the template's "by the author <name>": with two names those two words are
-    # what pushes the line past the tagline it shares a row with (263px slot, 11px, ~50 characters).
-    license_text = f"Licensed under CC-BY by {AUTHORS}"
-    if shares_tagline_row:
-        license_text = wrap_to_width(license_text, 263, footer_fontsize)
-    fig.text(
-        fx(width_px - margin_px if shares_tagline_row else margin_px),
-        fy(layout["footer_y"]),
-        license_text,
-        ha="right" if shares_tagline_row else "left",
-        va="top",
-        fontsize=footer_fontsize,
-        color="#888888",
-        gid="license",
+    # what pushes the line past the tagline it shares a row with. The license and the names it credits
+    # are set in bold, as the templates set their own CC-BY, which is why the row is laid out as runs
+    # rather than written as one string.
+    draw_run_row(
+        fig,
+        license_runs(),
+        row_px,
+        margin_px if not shares_tagline_row else width_px - margin_px,
+        template["license_y"],
+        "license",
+        fx,
+        fy,
+        align="right" if shares_tagline_row else "left",
     )
 
 
@@ -866,7 +965,25 @@ def draw_footer(fig, tb: Table, ages: dict[str, str], source_citation: str, layo
 # ---------------------------------------------------------------------------
 
 
-def content_right_min(layout: dict, px_per_min: float) -> float:
+def total_column(tb: Table, layout: dict) -> tuple[float, bool]:
+    """Width of the total-leisure column, and whether its values carry the unit.
+
+    Only as wide as its widest value plus one gap: the column *is* the distance between those numbers
+    and the bars they belong to, so slack in it reads as the numbers drifting off the chart. The unit
+    is spelled out where that still leaves the column a small share of the frame, and dropped where it
+    would not — on a narrow frame the bars need the room more than the reader needs "mins" repeated.
+    """
+    widest = max(round(float(value)) for value in tb[TOTAL_LEISURE_COLUMN])
+    budget_px = TOTAL_COLUMN_MAX_SHARE * (layout["size"][0] - 2 * layout["margin"])
+    for with_mins in (True, False):
+        label = f"{widest} mins" if with_mins else f"{widest}"
+        width_px = text_width_px(label, layout["value_fontsize"]) + TOTAL_COLUMN_GAP
+        if width_px <= budget_px:
+            return width_px, with_mins
+    raise AssertionError(f"The total-leisure column needs more than {budget_px:.0f}px, the frame's share of it.")
+
+
+def content_right_min(total_column_px: float, px_per_min: float) -> float:
     """The content box's right edge, in the axes' minute units.
 
     Everything in the frame lines up on two verticals: the content's left edge, where the subtitle and
@@ -874,7 +991,7 @@ def content_right_min(layout: dict, px_per_min: float) -> float:
     ends. The bars stop at 1440 minutes, so the total-leisure column past them is what has to reach
     this edge — right-aligned on it, rather than left-aligned at a fixed gap and stopping short.
     """
-    return MINUTES_PER_DAY + layout["total_column_px"] / px_per_min
+    return MINUTES_PER_DAY + total_column_px / px_per_min
 
 
 def segment_spans(row, px_per_min: float) -> dict[str, tuple[float, float]]:
@@ -1168,6 +1285,108 @@ def text_width_px(text: str, fontsize: float, bold: bool = False) -> float:
     return points / POINTS_PER_PIXEL
 
 
+def cap_height_px(fontsize: float) -> float:
+    """Height of a digit's ink above the baseline, in template pixels."""
+    prop = FontProperties(size=fontsize)
+    return TextPath((0, 0), "0", prop=prop).get_extents().ymax / POINTS_PER_PIXEL
+
+
+def draw_slot(
+    fig, x, y, text: str, size_px: float, line_height_px: float | None, gid: str, color=TITLE_COLOR, ha="left"
+):
+    """Fill one of the template's text slots, at the size and line height the template gives it."""
+    fig.text(
+        x,
+        y,
+        text,
+        ha=ha,
+        va="top",
+        fontsize=size_px * POINTS_PER_PIXEL,
+        linespacing=(line_height_px / size_px) if line_height_px else 1.2,
+        color=color,
+        gid=gid,
+    )
+
+
+def license_runs() -> list[tuple[str, bool]]:
+    """The license row, as (text, bold) runs: the license itself and each name it credits are bold.
+
+    Every space rides at the *end* of a run, never at the start: a leading space is invisible to
+    `TextPath`, so a run beginning with one gets laid out flush against the run before it.
+    """
+    runs: list[tuple[str, bool]] = [("Licensed under ", False), ("CC-BY ", True), ("by ", False)]
+    for index, author in enumerate(AUTHORS):
+        last = index == len(AUTHORS) - 1
+        if index:
+            runs.append(("and " if last else ", ", False))
+        runs.append((author if last else f"{author} ", True))
+    return runs
+
+
+def run_row_width(runs: list[tuple[str, bool]], size_px: float) -> float:
+    """Width of a row of runs: every run's step, but only the last one's ink."""
+    fontsize = size_px * POINTS_PER_PIXEL
+    placements = [place_run(text, fontsize, bold) for text, bold in runs]
+    return sum(step for _, _, step in placements[:-1]) + placements[-1][1]
+
+
+def fits_slot(measured_px: float, slot_px: float) -> bool:
+    """Whether text this step measures at `measured_px` fits `slot_px` once the template sets it."""
+    return measured_px <= slot_px * TEMPLATE_LATO_SLACK
+
+
+def draw_run_row(
+    fig, runs: list[tuple[str, bool]], size_px: float, x_px: float, y_px: float, gid: str, fx, fy, align="left"
+) -> None:
+    """Draw one row of mixed-weight runs, laid out left to right from `x_px` (or back from it).
+
+    matplotlib has no rich text, so a row that changes weight mid-line is several text objects — which
+    is also what Figma wants, since a single node whose weight varies has to be re-ranged by hand.
+    """
+    fontsize = size_px * POINTS_PER_PIXEL
+    placements = [place_run(text, fontsize, bold) for text, bold in runs]
+    cursor = x_px - run_row_width(runs, size_px) if align == "right" else x_px
+    for index, (drawn, ink_px, step_px) in enumerate(placements):
+        fig.text(
+            fx(cursor + ink_px / 2),
+            fy(y_px),
+            drawn,
+            ha="center",
+            va="top",
+            fontsize=fontsize,
+            fontweight="bold" if runs[index][1] else "normal",
+            color=FOOTER_COLOR,
+            gid=f"{gid}-{index}",
+        )
+        cursor += step_px
+
+
+def wrap_to_slot(text: str, slot_px: float, size_px: float, slack: float = TEMPLATE_LATO_SLACK) -> str:
+    """Wrap text into one of the template's slots, at the template's own size.
+
+    `slack` converts the slot into this step's font, which measures a few percent away from the
+    template's in either direction depending on the face — so a serif slot passes the serif figure.
+    """
+    return wrap_to_width(text, slot_px * slack, size_px * POINTS_PER_PIXEL)
+
+
+def lines_in(text: str) -> int:
+    """Line count of already-wrapped text."""
+    return text.count("\n") + 1
+
+
+def place_run(text: str, fontsize: float, bold: bool = False) -> tuple[str, float, float]:
+    """A run's drawn text, the width to centre it on, and the step to the next run.
+
+    A run's trailing space belongs to the layout, not to its glyphs — so it is dropped from the text
+    and kept in the step. Centring the space along with the ink puts the ink half a space off, which
+    is invisible here but not in Figma: it trims trailing space out of a text box, so a separator dot
+    ends up hugging the name after it.
+    """
+    drawn = text.strip()
+    return drawn, text_advance_px(drawn, fontsize, bold), text_advance_px(text, fontsize, bold)
+
+
 def text_advance_px(text: str, fontsize: float, bold: bool = False) -> float:
     """Width of text *including* any trailing space, in template pixels.
 
@@ -1245,7 +1464,10 @@ def build_note(tb: Table, ages: dict[str, str], layout: dict) -> str:
         f"Estimates cover people aged 15 to 64, except in {exceptions}. "
         f"{contents[0].upper()}{contents[1:]}."
     )
-    max_px = layout["size"][0] - 2 * layout["margin"]
-    wrapped = wrap_to_width(text, max_px, layout["footer_fontsize"])
-    assert wrapped.count("\n") + 1 <= 2, "Note exceeds the template's two-line slot."
+    template = layout["template_text"]
+    wrapped = wrap_to_slot(text, template["note_slot_px"], template["note_px"])
+    # The Note's slot is two lines tall, and the footer's auto-layout grows upward past that rather
+    # than clipping — but every line it gains is a line the chart loses, so cap it. Three is what the
+    # template's 12px takes for this Note where this step's older, smaller footer took two.
+    assert lines_in(wrapped) <= 3, f"The Note wraps to {lines_in(wrapped)} lines in its slot — shorten it."
     return wrapped
