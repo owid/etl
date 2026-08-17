@@ -79,8 +79,7 @@ tables:
         processing_level: minor
         unit: cubic meters per person
         short_unit: m³
-        # NOTE: This is FAO's definition of total water withdrawal (the numerator of this indicator).
         description_from_producer: |-
-          Annual quantity of water withdrawn for agricultural, industrial and municipal purposes.
+          Total annual amount of water withdrawn per capita.
         display:
           numDecimalPlaces: 1
