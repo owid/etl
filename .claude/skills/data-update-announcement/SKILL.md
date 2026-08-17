@@ -35,7 +35,7 @@ What follows is only what neither set of examples can tell you.
 
 - `workbench/<short_name>/update-context.yml` — `dataset.title`, `dataset.producer`, `source.url_main`, `source.citation_full`, `coverage.*`, `charts.published_count`, `charts.selected_views`, and the `editorial_context.*` snippet lists.
 - `workbench/<short_name>/slack-announcement.md` — the Slack draft from step 9. Its editorial framing is the closest cousin to this post; read it before drafting.
-- Author is the git user (`git config user.name`), resolved to a canonical OWID name through `etl.owners.resolve_owner`. If that returns `None`, **ask who the post is by** rather than writing the raw git name — `authors:` is a public byline, and a checkout's commit identity can be an automation account or a spelling the site doesn't know.
+- Author is the git user (`git config user.name`), resolved to a canonical OWID name through `etl.owners.resolve_owner`. If that returns `None`, **ask who the post is by** rather than writing the raw git name — `authors:` is a public byline, and a checkout's commit identity can be an automation account or a spelling the site doesn't know. Nothing in the Mode A context records collaborators, so name the byline you resolved when you hand over the drafts and ask whether anyone else should be credited — updates are often joint work, and `authors:` takes a comma-separated list.
 
 Skip step 1. Don't gate on the chart image (step 2) — a mid-pipeline dataset update shouldn't stall on a screenshot. Anything the post needs that isn't in the YAML, gather it (snapshot `.dvc`, garden `.meta.yml`, `url_main`) and **persist it back** so the next consumer doesn't redo the work.
 
@@ -106,7 +106,7 @@ excerpt:
 
 type: announcement
 
-authors: [in Mode B, from the Slack "Message from:" line, comma-separated]
+authors: [Mode A: the resolved git user, plus anyone else credited; Mode B: the Slack "Message from:" line — comma-separated]
 
 kicker: data-update
 
