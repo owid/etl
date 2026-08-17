@@ -73,17 +73,17 @@ tables:
       # Emigrant stock
       emigrants_all:
         title: Total number of emigrants
-        description_short: People who were born in a country but now live in another country.
+        description_short: People who were born in a country but now live abroad.
         description_from_producer: "{definitions.description_un.migrant_stock}"
         unit: emigrants
       emigrants_female:
         title: Total number of emigrants - female
-        description_short: Women who were born in this country but now live in another country.
+        description_short: Women who were born in this country but now live abroad.
         description_from_producer: "{definitions.description_un.migrant_stock}"
         unit: female emigrants
       emigrants_male:
         title: Total number of emigrants - male
-        description_short: Men who were born in this country but now live in another country.
+        description_short: Men who were born in this country but now live abroad.
         description_from_producer: "{definitions.description_un.migrant_stock}"
         unit: male emigrants
       # Emigrant share

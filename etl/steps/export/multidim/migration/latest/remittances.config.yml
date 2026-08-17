@@ -47,7 +47,7 @@ views:
         - catalogPath: wdi#bx_trf_pwkr_dt_gd_zs
     config:
       title: Remittances as a share of GDP
-      subtitle: Remittances include money sent by migrants to their home countries and the salaries of employees employed by foreign companies. This received sum is given as a share of gross domestic product (GDP).
+      subtitle: Remittances include money sent by migrants to their home countries and the salaries of employees employed by foreign companies. This received sum is given as a share of [gross domestic product](#dod:gdp) (GDP).
       map:
         colorScale:
           baseColorScheme: BuPu
