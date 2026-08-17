@@ -407,7 +407,7 @@ tables:
         title: Government expenditure ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
-        description_short: The total amount of money the general government spends. {definitions.short_description_unit}
+        description_short: Total amount of money the general government spends. {definitions.short_description_unit}
         description_key:
           - "{definitions.key_government_expenditure}"
           - "{definitions.key_general_government}"
@@ -421,7 +421,7 @@ tables:
         title: Government expenditure per capita ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
-        description_short: The total amount of money the general government spends per capita. {definitions.short_description_unit}
+        description_short: Total amount of money the general government spends per capita. {definitions.short_description_unit}
         description_key:
           - "{definitions.key_government_expenditure}"
           - "{definitions.key_general_government}"
@@ -435,7 +435,7 @@ tables:
         title: Government fiscal balance ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
-        description_short: "The difference between general government revenues and expenditure. {definitions.short_description_unit}"
+        description_short: "Difference between general government revenues and expenditure. {definitions.short_description_unit}"
         description_key:
           - "{definitions.key_government_expenditure}"
           - "{definitions.key_government_revenue}"
@@ -451,7 +451,7 @@ tables:
         title: Government gross debt ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
-        description_short: The total amount of money that a country's government has borrowed. {definitions.short_description_unit}
+        description_short: Total amount of money that a country's government has borrowed. {definitions.short_description_unit}
         description_key:
           - "{definitions.key_gross_debt}"
           - "{definitions.key_general_government}"
@@ -465,7 +465,7 @@ tables:
         title: Government gross debt per capita ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
-        description_short: The total amount of money that a country's government has borrowed per capita. {definitions.short_description_unit}
+        description_short: Total amount of money that a country's government has borrowed per capita. {definitions.short_description_unit}
         description_key:
           - "{definitions.key_gross_debt}"
           - "{definitions.key_general_government}"
@@ -479,7 +479,7 @@ tables:
         title: Government gross debt (Maastricht definition) ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
-        description_short: The total amount of money that a country's government has borrowed according to the Maastricht definition. {definitions.short_description_unit}
+        description_short: Total amount of money that a country's government has borrowed according to the Maastricht definition. {definitions.short_description_unit}
         description_key:
           - "{definitions.key_gross_debt}"
           - "{definitions.key_gross_debt_maastricht_definition}"

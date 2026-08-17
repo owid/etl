@@ -90,7 +90,7 @@ tables:
         title: Population
         unit: people
         description_short: |-
-          The total population, measured on 1 July of the year shown. {definitions.global.dimensions.description_short}
+          Total population, measured on 1 July of the year shown. {definitions.global.dimensions.description_short}
         description_processing: |-
           The UN publishes population by single year of age. We aggregate these into the broader age groups shown here (e.g. 0–14, 15–64, 65+, 18+, 15–49). Our continental aggregates (Africa, Asia, Europe, North America, South America, Oceania) are computed by summing across countries, and may differ slightly from regional aggregates the UN publishes directly, which use a different country grouping.
         display:
@@ -156,7 +156,7 @@ tables:
         unit: people per square kilometer
         short_unit: people/km²
         description_short: |-
-          The number of people per square kilometre of land area. {definitions.global.dimensions.description_short}
+          Number of people per square kilometre of land area. {definitions.global.dimensions.description_short}
         display:
           isProjection: *projection
           roundingMode: significantFigures
@@ -228,7 +228,7 @@ tables:
         short_unit: "%"
         unit: "%"
         description_short: |-
-          The annual rate at which the population is growing, expressed as a percentage. {definitions.global.dimensions.description_short}
+          Annual rate at which the population is growing, expressed as a percentage. {definitions.global.dimensions.description_short}
         description_key:
           - |-
             The growth rate combines births, deaths, and net migration. The [natural population growth rate](https://ourworldindata.org/grapher/natural-population-growth) reflects only the balance of births and deaths.
@@ -331,7 +331,7 @@ tables:
       fertility_rate:
         title: "Fertility rate, by age - Year: << year_as_dimension >>"
         description_short: |-
-          The average number of children a woman would have at each age if she experienced the fertility rates of year << year_as_dimension >>.
+          Average number of children a woman would have at each age if she experienced the fertility rates of year << year_as_dimension >>.
         unit: "births per woman"
 
   migration:
@@ -340,7 +340,7 @@ tables:
         title: Net migration
         unit: migrants
         description_short: |-
-          The number of immigrants minus the number of emigrants. Positive values mean more people moved into the country than left it. {definitions.global.dimensions.description_short}
+          Number of immigrants minus the number of emigrants. Positive values mean more people moved into the country than left it. {definitions.global.dimensions.description_short}
         description_key:
           - |-
             Net migration is the most uncertain component of population change — flows are volatile and historical data is patchy. The UN adjusts country values so the global net migration each year sums to zero.
@@ -364,7 +364,7 @@ tables:
         title: Annual net migration rate
         unit: migrants per 1,000 people
         description_short: |-
-          The number of immigrants minus the number of emigrants, per 1,000 people in the population. Positive values mean more people moved into the country than left it. {definitions.global.dimensions.description_short}
+          Number of immigrants minus the number of emigrants, per 1,000 people in the population. Positive values mean more people moved into the country than left it. {definitions.global.dimensions.description_short}
         description_key:
           - |-
             Net migration is the most uncertain component of population change — flows are volatile and historical data is patchy. The UN balances country values so global net migration each year sums to zero.
@@ -387,7 +387,7 @@ tables:
         title: Deaths
         unit: deaths
         description_short: |-
-          The number of deaths in a calendar year. {definitions.global.dimensions.description_short}
+          Number of deaths in a calendar year. {definitions.global.dimensions.description_short}
         display:
           isProjection: *projection
           roundingMode: significantFigures
@@ -413,7 +413,7 @@ tables:
         title: Death rate
         unit: deaths per 1,000 people
         description_short: |-
-          The number of deaths in a year per 1,000 people in the population. {definitions.global.dimensions.description_short}
+          Number of deaths in a year per 1,000 people in the population. {definitions.global.dimensions.description_short}
         description_key:
           - |-
             This is a *crude* death rate — it is not adjusted for differences in age structure between countries. Even when two countries have similar mortality at each age, the country with an older population will report a higher crude death rate.
@@ -433,7 +433,7 @@ tables:
         title: Births
         unit: births
         description_short: |-
-          The number of live births in a calendar year. {definitions.global.dimensions.description_short_births}
+          Number of live births in a calendar year. {definitions.global.dimensions.description_short_births}
         display:
           isProjection: *projection
           roundingMode: significantFigures
@@ -455,7 +455,7 @@ tables:
         title: Birth rate
         unit: births per 1,000 people
         description_short: |-
-          The number of live births in a year per 1,000 people in the population. {definitions.global.dimensions.description_short}
+          Number of live births in a year per 1,000 people in the population. {definitions.global.dimensions.description_short}
         description_key:
           - |-
             This is a *crude* birth rate — it is not adjusted for differences in age structure, so countries with younger populations tend to show higher rates even when individual women have the same number of children.
@@ -476,7 +476,7 @@ tables:
         title: Median age
         unit: years
         description_short: |-
-          The age that divides the population into two halves of equal size — half are younger and half are older. {definitions.global.dimensions.description_short}
+          Age that divides the population into two halves of equal size — half are younger and half are older. {definitions.global.dimensions.description_short}
         description_key:
           - |-
             Median age tends to rise as people live longer and as fewer children are born. It is a common way to describe how "old" or "young" a country's population is.
@@ -496,7 +496,7 @@ tables:
         title: Mean age at childbearing
         unit: years
         description_short: |-
-          The average age at which women give birth, calculated from a single year's age-specific fertility rates. {definitions.global.dimensions.description_short}
+          Average age at which women give birth, calculated from a single year's age-specific fertility rates. {definitions.global.dimensions.description_short}
         description_key:
           - |-
             This figure is calculated from a single year's [age-specific fertility rates](#dod:age-specific-fertility-rate) — it does not track real groups of women through their lives.

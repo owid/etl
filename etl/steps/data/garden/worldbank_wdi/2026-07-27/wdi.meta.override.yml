@@ -632,7 +632,7 @@ tables:
         unit: '% of children under 5'
         short_unit: '%'
         description_short: |-
-          The share of children younger than five years old whose growth is stunted.
+          Share of children younger than five years old whose growth is stunted.
         description_key:
           - Stunting is when a child is significantly shorter than the average for their age.
           - Stunted growth is a consequence of poor nutrition and/or repeated infection.
@@ -659,7 +659,7 @@ tables:
           grapher_config:
             title: 'Malnutrition: Share of children who are stunted'
             subtitle: >-
-              The share of children younger than five years old that are defined as stunted.
+              Share of children younger than five years old that are defined as stunted.
               [Stunting](#dod:stunting) is when a child is significantly shorter than the
               average for their age. It is a consequence of poor nutrition and/or repeated
               infection.
@@ -720,7 +720,7 @@ tables:
         unit: '% of children under 5'
         short_unit: '%'
         description_short: |-
-          The share of children younger than five years old whose growth is stunted.
+          Share of children younger than five years old whose growth is stunted.
         description_key:
           - Stunting is when a child is significantly shorter than the average for their age.
           - Stunted growth is a consequence of poor nutrition and/or repeated infection.
@@ -747,7 +747,7 @@ tables:
           grapher_config:
             title: 'Malnutrition: Share of children who are stunted'
             subtitle: >-
-              The share of children younger than five years old that are defined as stunted.
+              Share of children younger than five years old that are defined as stunted.
               [Stunting](#dod:stunting) is when a child is significantly shorter than the
               average for their age. It is a consequence of poor nutrition and/or repeated
               infection.

@@ -26,14 +26,14 @@ tables:
         title: |-
           Number of new << cancer.lower() >> cases attributable to << agent.lower() >> among {definitions.sex}
         description_short: |-
-          The estimated number of new << cancer.lower() >> cases attributable to << agent.lower() >> among {definitions.sex}
+          Estimated number of new << cancer.lower() >> cases attributable to << agent.lower() >> among {definitions.sex}
         unit: cases
 
       asir_att:
         title: |-
           Age-standardized incidence rate of << cancer.lower() >> attributable to << agent.lower() >> among {definitions.sex}
         description_short: |-
-          The estimated age-standardized incidence rate of << cancer.lower() >> attributable to << agent.lower() >> among {definitions.sex}
+          Estimated age-standardized incidence rate of << cancer.lower() >> attributable to << agent.lower() >> among {definitions.sex}
         unit: per 100,000 people
         presentation:
           grapher_config:
@@ -51,7 +51,7 @@ tables:
         title: |-
           Age-standardized incidence rate of << cancer.lower() >> among {definitions.sex}
         description_short: |-
-          The estimated age-standardized incidence rate of << cancer.lower() >> among {definitions.sex}
+          Estimated age-standardized incidence rate of << cancer.lower() >> among {definitions.sex}
         unit: per 100,000 people
         presentation:
           grapher_config:
@@ -68,5 +68,5 @@ tables:
         title: |-
           Number of new << cancer.lower() >> cases among {definitions.sex}
         description_short: |-
-          The estimated number of new << cancer.lower() >> cases among {definitions.sex}
+          Estimated number of new << cancer.lower() >> cases among {definitions.sex}
         unit: cases

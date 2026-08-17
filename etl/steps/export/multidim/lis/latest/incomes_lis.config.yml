@@ -108,7 +108,7 @@ views:
             name: "Poorest 50%"
     config:
       title: Distribution of income across richer and poorer groups (after tax)
-      subtitle: The share of income received by different income groups. Income here is measured after taxes and benefits.
+      subtitle: Share of income received by different income groups. Income here is measured after taxes and benefits.
       note: ""
       hasMapTab: false
       chartTypes: ["StackedArea", "StackedDiscreteBar"]
@@ -118,7 +118,7 @@ views:
       selectedFacetStrategy: entity
       baseColorScheme: OwidCategoricalE
     metadata:
-      description_short: "The share of income received by different income groups: the richest 10%, the poorest 50% and the 40% in the middle. Income here is measured after taxes and benefits."
+      description_short: "Share of income received by different income groups: the richest 10%, the poorest 50% and the 40% in the middle. Income here is measured after taxes and benefits."
 
   - dimensions:
       indicator: share
@@ -138,7 +138,7 @@ views:
             name: "Poorest 50%"
     config:
       title: Distribution of income across richer and poorer groups (before tax)
-      subtitle: The share of income received by different income groups. Income here is measured before taxes and benefits.
+      subtitle: Share of income received by different income groups. Income here is measured before taxes and benefits.
       note: ""
       hasMapTab: false
       chartTypes: ["StackedArea", "StackedDiscreteBar"]
@@ -148,4 +148,4 @@ views:
       selectedFacetStrategy: entity
       baseColorScheme: OwidCategoricalE
     metadata:
-      description_short: "The share of income received by different income groups: the richest 10%, the poorest 50% and the 40% in the middle. Income here is measured before taxes and benefits."
+      description_short: "Share of income received by different income groups: the richest 10%, the poorest 50% and the 40% in the middle. Income here is measured before taxes and benefits."

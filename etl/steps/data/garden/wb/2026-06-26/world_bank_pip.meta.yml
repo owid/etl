@@ -2150,7 +2150,7 @@ tables:
         title: Number of surveys in the past decade
         unit: "surveys"
         short_unit: ""
-        description_short: The number of income or consumption surveys available in the past decade. Each decade comprises the current year and the nine years before.
+        description_short: Number of income or consumption surveys available in the past decade. Each decade comprises the current year and the nine years before.
         description_key:
           - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_surveys_past_decade}"
@@ -2167,7 +2167,7 @@ tables:
         title: Average (percentile <<percentile>>, <<ppp_version>> prices, <<welfare_type>>, <<reporting_level>>)
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
-        description_short: The mean <<welfare_type>> per day within the percentile <<percentile>> of the population.
+        description_short: Mean <<welfare_type>> per day within the percentile <<percentile>> of the population.
         description_key:
           - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
@@ -2181,7 +2181,7 @@ tables:
         title: Share (percentile <<percentile>>, <<ppp_version>> prices, <<welfare_type>>, <<reporting_level>>)
         unit: "%"
         short_unit: "%"
-        description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the percentile <<percentile>> of the population.
+        description_short: Share of <<welfare_type>> {definitions.welfare_type_verb} by the percentile <<percentile>> of the population.
         description_key:
           - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"
@@ -2194,7 +2194,7 @@ tables:
         title: Threshold (percentile <<percentile>>, <<ppp_version>> prices, <<welfare_type>>, <<reporting_level>>)
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
-        description_short: The level of <<welfare_type>> per day below which the <<percentile>>% of the population falls.
+        description_short: Level of <<welfare_type>> per day below which the <<percentile>>% of the population falls.
         description_key:
           - "{definitions.description_key_source_world_bank}"
           - "{definitions.description_key_not_market_income}"

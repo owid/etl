@@ -1312,7 +1312,7 @@ tables:
         title: Average ({definitions.percentiles_avg_share}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
-        description_short: The mean <<welfare_type>> per day within the {definitions.percentiles_avg_share} (tenth of the population).
+        description_short: Mean <<welfare_type>> per day within the {definitions.percentiles_avg_share} (tenth of the population).
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
@@ -1332,7 +1332,7 @@ tables:
         presentation:
           grapher_config:
             title: Mean <<welfare_type>> per day within the {definitions.percentiles_avg_share}.lower()
-            subtitle: The mean <<welfare_type>> per day within the {definitions.percentiles_avg_share} (tenth of the population). {definitions.ppp_adjustment_subtitle}
+            subtitle: Mean <<welfare_type>> per day within the {definitions.percentiles_avg_share} (tenth of the population). {definitions.ppp_adjustment_subtitle}
             note: "{definitions.note_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1351,7 +1351,7 @@ tables:
         title: Share ({definitions.percentiles_avg_share}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
-        description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the {definitions.percentiles_avg_share} (tenth of the population)
+        description_short: Share of <<welfare_type>> {definitions.welfare_type_verb} by the {definitions.percentiles_avg_share} (tenth of the population)
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
@@ -1371,7 +1371,7 @@ tables:
         presentation:
           grapher_config:
             title: <<welfare_type.capitalize()>> share of the {definitions.percentiles_avg_share}.lower()
-            subtitle: The share of <<welfare_type>> {definitions.welfare_type_verb} by the {definitions.percentiles_avg_share} (tenth of the population).
+            subtitle: Share of <<welfare_type>> {definitions.welfare_type_verb} by the {definitions.percentiles_avg_share} (tenth of the population).
             note: "{definitions.note_without_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1388,7 +1388,7 @@ tables:
         title: Threshold ({definitions.percentiles_thr}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
-        description_short: The level of <<welfare_type>> per day below which <<decile>>0% of the population falls.
+        description_short: Level of <<welfare_type>> per day below which <<decile>>0% of the population falls.
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
@@ -1408,7 +1408,7 @@ tables:
         presentation:
           grapher_config:
             title: "{definitions.threshold_title}"
-            subtitle: The level of <<welfare_type>> per person per day below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle}
+            subtitle: Level of <<welfare_type>> per person per day below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle}
             note: "{definitions.note_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1427,7 +1427,7 @@ tables:
         title: Share (bottom 50%, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
-        description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the poorest 50% of the population.
+        description_short: Share of <<welfare_type>> {definitions.welfare_type_verb} by the poorest 50% of the population.
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
@@ -1447,7 +1447,7 @@ tables:
         title: Share (middle 40%, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
-        description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the middle 40% of the population. The middle 40% is the share of the population whose <<welfare_type>> lies between the poorest 50% and the richest 10%.
+        description_short: Share of <<welfare_type>> {definitions.welfare_type_verb} by the middle 40% of the population. The middle 40% is the share of the population whose <<welfare_type>> lies between the poorest 50% and the richest 10%.
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
@@ -1467,7 +1467,7 @@ tables:
         title: Share (top 1%, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
-        description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the richest 1% of the population.
+        description_short: Share of <<welfare_type>> {definitions.welfare_type_verb} by the richest 1% of the population.
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
@@ -1487,7 +1487,7 @@ tables:
         title: Share (between 90th and 99th percentiles, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
-        description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the population between the 90th and 99th percentiles.
+        description_short: Share of <<welfare_type>> {definitions.welfare_type_verb} by the population between the 90th and 99th percentiles.
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
@@ -1508,7 +1508,7 @@ tables:
         title: Threshold (top 1%, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
-        description_short: The level of <<welfare_type>> per day below which 99% of the population falls.
+        description_short: Level of <<welfare_type>> per day below which 99% of the population falls.
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
@@ -1530,7 +1530,7 @@ tables:
         title: Average (top 1%, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
-        description_short: The mean <<welfare_type>> per day within the richest 1% of the population.
+        description_short: Mean <<welfare_type>> per day within the richest 1% of the population.
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
@@ -1553,7 +1553,7 @@ tables:
         title: Number of surveys in the past decade{definitions.short_title}
         unit: "surveys"
         short_unit: ""
-        description_short: The number of income or consumption surveys available in the past decade. Each decade comprises the current year and the nine years before.
+        description_short: Number of income or consumption surveys available in the past decade. Each decade comprises the current year and the nine years before.
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
@@ -1585,7 +1585,7 @@ tables:
         title: Average (percentile <<percentile>>, <<ppp_version>> prices, <<welfare_type>>, <<reporting_level>>)
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
-        description_short: The mean <<welfare_type>> per day within the percentile <<percentile>> of the population.
+        description_short: Mean <<welfare_type>> per day within the percentile <<percentile>> of the population.
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
@@ -1599,7 +1599,7 @@ tables:
         title: Share (percentile <<percentile>>, <<ppp_version>> prices, <<welfare_type>>, <<reporting_level>>)
         unit: "%"
         short_unit: "%"
-        description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the percentile <<percentile>> of the population.
+        description_short: Share of <<welfare_type>> {definitions.welfare_type_verb} by the percentile <<percentile>> of the population.
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
@@ -1612,7 +1612,7 @@ tables:
         title: Threshold (percentile <<percentile>>, <<ppp_version>> prices, <<welfare_type>>, <<reporting_level>>)
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
-        description_short: The level of <<welfare_type>> per day below which the <<percentile>>% of the population falls.
+        description_short: Level of <<welfare_type>> per day below which the <<percentile>>% of the population falls.
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"

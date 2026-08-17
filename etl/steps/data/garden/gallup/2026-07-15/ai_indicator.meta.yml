@@ -29,7 +29,7 @@ tables:
         title: &daily_title Share of US employees who use AI at work daily
         unit: "%"
         short_unit: "%"
-        description_short: The share of US employees who say they use artificial intelligence at work every day.
+        description_short: Share of US employees who say they use artificial intelligence at work every day.
         description_key:
           - *desc_key_question
           - Daily AI users are employees who say they use artificial intelligence in their role daily.
@@ -45,7 +45,7 @@ tables:
         title: &frequent_title Share of US employees who use AI at work a few times a week or more
         unit: "%"
         short_unit: "%"
-        description_short: The share of US employees who say they use artificial intelligence at work a few times a week or more.
+        description_short: Share of US employees who say they use artificial intelligence at work a few times a week or more.
         description_key:
           - *desc_key_question
           - Frequent AI users are employees who say they use artificial intelligence in their role at least a few times a week. This includes employees who say they use it daily or a few times a week.
@@ -61,7 +61,7 @@ tables:
         title: &total_title Share of US employees who use AI at work a few times a year or more
         unit: "%"
         short_unit: "%"
-        description_short: The share of US employees who say they use artificial intelligence at work a few times a year or more.
+        description_short: Share of US employees who say they use artificial intelligence at work a few times a year or more.
         description_key:
           - *desc_key_question
           - Total AI users are employees who say they use artificial intelligence in their role at least a few times a year. This includes employees who say they use it daily, a few times a week, a few times a month, or a few times a year.

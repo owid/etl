@@ -34,7 +34,7 @@ tables:
         short_unit: "%"
         unit: "%"
         description_short: |-
-          The ratio of the number of children (under 15 years old) to the working-age population (15-64 years old).
+          Ratio of the number of children (under 15 years old) to the working-age population (15-64 years old).
         description_key:
           - It is expressed as number of dependants per 100 persons of working age (aged 15-64).
       dependency_ratio_old:
@@ -42,7 +42,7 @@ tables:
         short_unit: "%"
         unit: "%"
         description_short: |-
-          The ratio of the number of older persons (65 years or over) to the working-age population (15-64 years old).
+          Ratio of the number of older persons (65 years or over) to the working-age population (15-64 years old).
         description_key:
           - It is expressed as number of dependants per 100 persons of working age (aged 15-64).
       dependency_ratio_total:
@@ -50,14 +50,14 @@ tables:
         short_unit: "%"
         unit: "%"
         description_short: |-
-          The ratio of the dependents (either children aged 0-14 years, or older populations aged over 64 years) to the working-age population (15-64 years old).
+          Ratio of the dependents (either children aged 0-14 years, or older populations aged over 64 years) to the working-age population (15-64 years old).
         description_key:
           - It is expressed as number of dependants per 100 persons of working age (aged 15-64).
       fertility_rate:
         title: Fertility rate
         unit: live births per woman
         description_short: |-
-          The average number of live births a hypothetical cohort of women would have at the end of their reproductive period if they were subject during their whole lives to the fertility rates of a given period and if they were not subject to mortality.
+          Average number of live births a hypothetical cohort of women would have at the end of their reproductive period if they were subject during their whole lives to the fertility rates of a given period and if they were not subject to mortality.
         description_key:
           - |-
             It is expressed as live births per woman. For age-specific fertility rates, it measuresmber of births to women in a particular age group, divided by the number of women in that age group. The age groups used are: 15-19, 20-24, ..., 45-49. The data refer to annual civil calendar years from 1 January to 31 December.
@@ -132,7 +132,7 @@ tables:
       net_migration_rate:
         title: Net migration rate
         unit: migrants per 1,000 population
-        description_short: The number of immigrants minus the number of emigrants over a period, divided by the person-years lived by the population of the receiving country over that period.
+        description_short: Number of immigrants minus the number of emigrants over a period, divided by the person-years lived by the population of the receiving country over that period.
       population:
         title: Population
         unit: persons

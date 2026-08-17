@@ -74,7 +74,7 @@ tables:
           - "Other Religions"
           - "Religiously Unaffiliated"
         title: Most popular religion in a country
-        description_short: The most popular religion in each country and year, based on share of population.
+        description_short: Most popular religion in each country and year, based on share of population.
         unit: ""
         presentation:
           grapher_config:

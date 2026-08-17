@@ -203,7 +203,7 @@ tables:
         title: Number of ongoing wars per state
         unit: wars per state
         description_short: |-
-          The number of wars divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
+          Number of wars divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
         description_key: *description_key_ongoing
         display:
           numDecimalPlaces: 3
@@ -212,7 +212,7 @@ tables:
         title: Number of ongoing wars per state-pair
         unit: wars per state-pair
         description_short: |-
-          The number of wars divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
+          Number of wars divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
         description_key: *description_key_ongoing
         display:
           numDecimalPlaces: 5

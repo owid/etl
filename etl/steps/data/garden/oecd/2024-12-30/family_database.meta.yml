@@ -24,7 +24,7 @@ tables:
         title: Child poverty rate
         unit: "%"
         short_unit: "%"
-        description_short: The percentage of children under 18 living in households with incomes below the poverty line.
+        description_short: Percentage of children under 18 living in households with incomes below the poverty line.
         description_from_producer: The child relative income poverty rate, defined as the percentage of children (0-17 year-olds) with an equivalised household disposable income (i.e. an income after taxes and transfers adjusted for household size) below the poverty threshold. The poverty threshold is set here at 50% of the median disposable income in each country.
 
 
@@ -47,40 +47,40 @@ tables:
         title: Employment rates (%), for all mothers (15-64 year-olds) with at least one child under 15
         unit: "%"
         short_unit: "%"
-        description_short: The percentage of mothers aged 15-64 with at least one child under 15 who are employed.
+        description_short: Percentage of mothers aged 15-64 with at least one child under 15 who are employed.
 
       employment_rates__pct__for_partnered_mothers__15_64_year_olds__with_at_least_one_child_under_15:
         title: Employment rates (%), for partnered mothers (15-64 year-olds) with at least one child under 15
         unit: "%"
         short_unit: "%"
-        description_short: The percentage of partnered mothers aged 15-64 with at least one child under 15 who are employed.
+        description_short: Percentage of partnered mothers aged 15-64 with at least one child under 15 who are employed.
         description_from_producer: *description_producer_empl
 
       employment_rates__pct__for_sole_parent_mothers__15_64_year_olds__with_at_least_one_child_under_15:
         title: Employment rates (%), for sole parent mothers (15-64 year-olds) with at least one child under 15
         unit: "%"
         short_unit: "%"
-        description_short: The percentage of sole parent mothers aged 15-64 with at least one child under 15 who are employed.
+        description_short: Percentage of sole parent mothers aged 15-64 with at least one child under 15 who are employed.
         description_from_producer: *description_producer_empl
 
       length_of_paid_maternity__parental_and_home_care_leave_available_to_mothers_in_weeks:
         title: Length of paid maternity, parental and home care leave available to mothers
         unit: "weeks"
         short_unit: ""
-        description_short: The number of weeks of paid maternity, parental and home care leave available to mothers.
+        description_short: Number of weeks of paid maternity, parental and home care leave available to mothers.
 
 
       length_of_paid_paternity_and_parental_leave_reserved_for_fathers_in_weeks:
         title: Length of paid paternity and parental leave reserved for fathers
         unit: "weeks"
         short_unit: ""
-        description_short: The number of weeks of paid paternity and parental leave reserved for fathers.
+        description_short: Number of weeks of paid paternity and parental leave reserved for fathers.
 
       proportion__pct__of_children__aged_0_14__that_live_in_households_where_all_adults_are_in_employment__working:
         title: Proportion of children aged 0-14 that live in households where all adults are in employment
         unit: "%"
         short_unit: "%"
-        description_short: The percentage of children aged 0-14 that live in households where all adults are in employment.
+        description_short: Percentage of children aged 0-14 that live in households where all adults are in employment.
 
       proportion__pct__of_children__aged_0_17__living_in_other_types_of_household:
         title: Proportion of children aged 0-17 living in other types of household
@@ -96,7 +96,7 @@ tables:
         title: Proportion of children aged 0-17 living with a single parent
         unit: "%"
         short_unit: "%"
-        description_short: The percentage of children aged 0-17 living with a single parent.
+        description_short: Percentage of children aged 0-17 living with a single parent.
         presentation:
           title_public: Share of children living with a single parent.
         display:
@@ -106,7 +106,7 @@ tables:
         title: Proportion of children aged 0-17 living with two parents
         unit: "%"
         short_unit: "%"
-        description_short: The percentage of children aged 0-17 living with two parents.
+        description_short: Percentage of children aged 0-17 living with two parents.
         presentation:
           title_public: Share of children living with two parents.
         display:
@@ -116,14 +116,14 @@ tables:
         title: Proportion of children aged 0-2 enrolled in formal childcare and pre-school
         unit: "%"
         short_unit: "%"
-        description_short: The proportion of children under 3 enrolled in formal childcare or pre-school.
+        description_short: Proportion of children under 3 enrolled in formal childcare or pre-school.
 
 
       share_of_births_outside_of_marriage__pct_of_all_births:
         title: Share of births outside of marriage (% of all births)
         unit: "%"
         short_unit: "%"
-        description_short: The percentage of births that occur outside of marriage.
+        description_short: Percentage of births that occur outside of marriage.
 
       total_public_social_expenditure_on_families_as_a_pct_of_gdp:
         title: Total public social expenditure on families as a % of GDP

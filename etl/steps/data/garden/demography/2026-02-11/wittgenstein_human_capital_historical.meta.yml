@@ -175,7 +175,7 @@ tables:
           {definitions.others.title}
         unit: years
         description_short: |-
-          The difference between female and male mean years of schooling for the population over 15 years of age. {definitions.others.projections}. Negative values indicate that women spent fewer years in school.
+          Difference between female and male mean years of schooling for the population over 15 years of age. {definitions.others.projections}. Negative values indicate that women spent fewer years in school.
         display:
           numDecimalPlaces: 0
         presentation:
@@ -187,7 +187,7 @@ tables:
           {definitions.others.title}
         unit: years
         description_short: |-
-          The difference between female and male mean years of schooling for population over 25 years of age. {definitions.others.projections}. Negative values indicate that women spent fewer years in school.
+          Difference between female and male mean years of schooling for population over 25 years of age. {definitions.others.projections}. Negative values indicate that women spent fewer years in school.
         display:
           numDecimalPlaces: 0
         presentation:
@@ -236,7 +236,7 @@ tables:
           {definitions.others.title}
         unit: "%"
         description_short: |-
-          The ratio of the youth (0-14) and elderly (65+) population over the working age (15-64) population. {definitions.others.projections}.
+          Ratio of the youth (0-14) and elderly (65+) population over the working age (15-64) population. {definitions.others.projections}.
         description_processing: |-
           The source gives the values as the number of young and elderly persons per person of working age. We have scaled the figures to have percentages instead.
         presentation:
@@ -248,7 +248,7 @@ tables:
           {definitions.others.title}
         unit: "%"
         description_short: |-
-          The ratio of the youth (0-14) population over the working age (15-64) population. {definitions.others.projections}.
+          Ratio of the youth (0-14) population over the working age (15-64) population. {definitions.others.projections}.
         description_processing: |-
           The source gives the values as the number of young persons per person of working age. We have scaled the figures to have percentages instead.
         presentation:
@@ -261,7 +261,7 @@ tables:
           {definitions.others.title}
         unit: "%"
         description_short: |-
-          The ratio of the elderly (65+) population over the working age (15-64) population. {definitions.others.projections}.
+          Ratio of the elderly (65+) population over the working age (15-64) population. {definitions.others.projections}.
         description_processing: |-
           The source gives the values as the number of elderly persons per person of working age. We have scaled the figures to have percentages instead.
         presentation:
@@ -344,7 +344,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          The difference between the proportion of females and the proportion of males in the population over 15 years of age achieving education level "{definitions.others.education}". {definitions.others.projections}.
+          Difference between the proportion of females and the proportion of males in the population over 15 years of age achieving education level "{definitions.others.education}". {definitions.others.projections}.
         presentation:
           topic_tags:
             - Global Education
@@ -355,7 +355,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          The difference between the proportion of females and the proportion of males in the population over 25 years of age achieving education level "{definitions.others.education}". {definitions.others.projections}.
+          Difference between the proportion of females and the proportion of males in the population over 25 years of age achieving education level "{definitions.others.education}". {definitions.others.projections}.
         presentation:
           topic_tags:
             - Global Education

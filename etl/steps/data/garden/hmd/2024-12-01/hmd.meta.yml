@@ -66,7 +66,7 @@ tables:
       central_death_rate:
         title: Central death rate
         description_short: |-
-          The death rate, calculated as the number of deaths divided by the average number of people alive during the interval.
+          Death rate, calculated as the number of deaths divided by the average number of people alive during the interval.
         description_key:
           - "The death rate is measured using the number of person-years lived during the interval."
           - "Person-years refers to the combined total time that a group of people has lived. For example, if 10 people each live for 2 years, they collectively contribute 20 person-years."
@@ -88,7 +88,7 @@ tables:
         title: Probability of death
         unit: "%"
         description_short: |-
-          The probability of dying in a given interval, among people who survived to the start of that interval.
+          Probability of dying in a given interval, among people who survived to the start of that interval.
         description_key:
           - "For example, the probability of death for a 50 year old in a given year is found by: dividing the number of deaths in 50 year olds that year, by the number of people alive at the age of 50 at the start of the year."
         processing_level: minor
@@ -212,7 +212,7 @@ tables:
       exposure:
         title: Exposure-to-risk
         unit: person-years
-        description_short: The total number of person-years lived within a given interval.
+        description_short: Total number of person-years lived within a given interval.
         description_key:
           - It is equivalent to the average number of people living in that age group during the period.
         description_from_producer: |-
@@ -344,7 +344,7 @@ tables:
         title: Central death rate ratio (m/f)
         unit: ""
         description_short: |-
-          The ratio of the << type >> central death rate (males to females) at age << age >>.
+          Ratio of the << type >> central death rate (males to females) at age << age >>.
         processing_level: major
         display:
           name: |-
@@ -362,7 +362,7 @@ tables:
         short_unit: years
         unit: years
         description_short: |-
-          The difference in the << type >> life expectancy (females - males) at age << age >>.
+          Difference in the << type >> life expectancy (females - males) at age << age >>.
         processing_level: major
         description_key:
           - Higher values indicate longer life expectancy among females than males.
@@ -386,7 +386,7 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |-
-          The ratio of the << type >> life expectancy (females to males) at age << age >>.
+          Ratio of the << type >> life expectancy (females to males) at age << age >>.
         processing_level: major
         description_key:
           - Higher values indicate longer life expectancy among females than males.

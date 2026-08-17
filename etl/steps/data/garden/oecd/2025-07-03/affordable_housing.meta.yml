@@ -60,7 +60,7 @@ tables:
       hc_share:
         title: Housing Cost Share
         description_short: |
-          The percentage of overall consumption that households spend on housing costs. This includes rent, bills such as electricity, gas and water and maintenance and repair costs.
+          Percentage of overall consumption that households spend on housing costs. This includes rent, bills such as electricity, gas and water and maintenance and repair costs.
         description_from_producer: "Housing expenditure as share of final consumption expenditure of households"
         unit: "%"
         short_unit: "%"

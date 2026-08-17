@@ -133,7 +133,7 @@ tables:
       source:
         title: Source of life expectancy at birth data
         description_short: |-
-          The source of the life expectancy at birth data.
+          Source of the life expectancy at birth data.
         description_key:
           - |-
             The source of the life expectancy at birth data used for each country and year.
@@ -147,7 +147,7 @@ tables:
       source_url:
         title: Source URL of life expectancy at birth data
         description_short: |-
-          The source URL of the life expectancy at birth data.
+          Source URL of the life expectancy at birth data.
         description_key:
           - |-
             The source URL of the life expectancy at birth data used for each country and year.

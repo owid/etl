@@ -688,7 +688,7 @@ tables:
 
       wom_parl_vdem_cat: # wom_parl_gr_vdem_owid
         title: Women in parliament (category)
-        description_short: Categorisation of women's political representation in parliament
+        description_short: Categorisation of women's political representation in parliament.
         unit: ""
 
       ## Other regime indicators

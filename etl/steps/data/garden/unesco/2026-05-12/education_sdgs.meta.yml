@@ -373,7 +373,7 @@ tables:
           tolerance: 10
       educational_attainment_rate__completed_post_secondary_non_tertiary_education_or_higher__population_25plus_years__both_sexes__pct__ea_4t8_ag25t99:
         title: Share of the population with post-secondary education or higher (25+)
-        description_short: The share of adults aged 25 and older who have completed [post-secondary](#dod:post-secondary-education) or [tertiary](#dod:tertiary-education) education.
+        description_short: Share of adults aged 25 and older who have completed [post-secondary](#dod:post-secondary-education) or [tertiary](#dod:tertiary-education) education.
         unit: "%"
         short_unit: "%"
         description_key:
@@ -393,7 +393,7 @@ tables:
           tolerance: 10
       educational_attainment_rate__completed_lower_secondary_education_or_higher__population_25plus_years__both_sexes__pct__ea_2t8_ag25t99:
         title: Share of the population with lower secondary education (25+)
-        description_short: The share of adults aged 25 and older who have completed [lower secondary](#dod:lower-secondary-education) education or higher.
+        description_short: Share of adults aged 25 and older who have completed [lower secondary](#dod:lower-secondary-education) education or higher.
         unit: "%"
         short_unit: "%"
         description_key:
@@ -689,7 +689,7 @@ tables:
           tolerance: 10
       gross_enrolment_ratio_for_tertiary_education__both_sexes__pct__ger_5t8:
         title: Gross enrollment ratio in tertiary education
-        description_short: The number of people, regardless of age, enrolled in [tertiary](#dod:tertiary-education) education, expressed as a percentage of the population of typical tertiary education age (around 18–22 years old).
+        description_short: Number of people, regardless of age, enrolled in [tertiary](#dod:tertiary-education) education, expressed as a percentage of the population of typical tertiary education age (around 18–22 years old).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger
@@ -703,7 +703,7 @@ tables:
           tolerance: 10
       gross_enrolment_ratio_for_tertiary_education__female__pct__ger_5t8_f:
         title: Gross enrollment ratio in tertiary education among women
-        description_short: The number of women, regardless of age, enrolled in [tertiary](#dod:tertiary-education) education, expressed as a percentage of the population of women of typical tertiary education age (around 18–22 years old).
+        description_short: Number of women, regardless of age, enrolled in [tertiary](#dod:tertiary-education) education, expressed as a percentage of the population of women of typical tertiary education age (around 18–22 years old).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger
@@ -717,7 +717,7 @@ tables:
           tolerance: 10
       gross_enrolment_ratio_for_tertiary_education__male__pct__ger_5t8_m:
         title: Gross enrollment ratio in tertiary education among men
-        description_short: The number of men, regardless of age, enrolled in [tertiary](#dod:tertiary-education) education, expressed as a percentage of the population of men of typical tertiary education age (around 18–22 years old).
+        description_short: Number of men, regardless of age, enrolled in [tertiary](#dod:tertiary-education) education, expressed as a percentage of the population of men of typical tertiary education age (around 18–22 years old).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger
@@ -731,7 +731,7 @@ tables:
           tolerance: 10
       net_enrolment_rate__pre_primary__both_sexes__pct__ner_02_cp:
         title: Net enrollment rate in pre-primary education
-        description_short: The share of children of [pre-primary](#dod:pre-primary-education) school age (typically 3–5 years old) who are enrolled in pre-primary education.
+        description_short: Share of children of [pre-primary](#dod:pre-primary-education) school age (typically 3–5 years old) who are enrolled in pre-primary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
@@ -745,7 +745,7 @@ tables:
           tolerance: 10
       net_enrolment_rate__pre_primary__female__pct__ner_02_f_cp:
         title: Net enrollment rate in pre-primary education among girls
-        description_short: The share of girls of [pre-primary](#dod:pre-primary-education) school age (typically 3–5 years old) who are enrolled in pre-primary education.
+        description_short: Share of girls of [pre-primary](#dod:pre-primary-education) school age (typically 3–5 years old) who are enrolled in pre-primary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
@@ -759,7 +759,7 @@ tables:
           tolerance: 10
       net_enrolment_rate__pre_primary__male__pct__ner_02_m_cp:
         title: Net enrollment rate in pre-primary education among boys
-        description_short: The share of boys of [pre-primary](#dod:pre-primary-education) school age (typically 3–5 years old) who are enrolled in pre-primary education.
+        description_short: Share of boys of [pre-primary](#dod:pre-primary-education) school age (typically 3–5 years old) who are enrolled in pre-primary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
@@ -777,7 +777,7 @@ tables:
           tolerance: 10
       completion_rate__primary_education__both_sexes__pct__modelled_data__cr_mod_1:
         title: Completion rate in primary education
-        description_short: The share of children who are three to five years older than the official age for the last grade of [primary](#dod:primary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
+        description_short: Share of children who are three to five years older than the official age for the last grade of [primary](#dod:primary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
@@ -791,7 +791,7 @@ tables:
           tolerance: 10
       completion_rate__lower_secondary_education__both_sexes__pct__modelled_data__cr_mod_2:
         title: Completion rate in lower secondary education
-        description_short: The share of children who are three to five years older than the official age for the last grade of [lower secondary](#dod:lower-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
+        description_short: Share of children who are three to five years older than the official age for the last grade of [lower secondary](#dod:lower-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
@@ -805,7 +805,7 @@ tables:
           tolerance: 10
       completion_rate__upper_secondary_education__both_sexes__pct__modelled_data__cr_mod_3:
         title: Completion rate in upper secondary education
-        description_short: The share of children who are three to five years older than the official age for the last grade of [upper secondary](#dod:upper-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
+        description_short: Share of children who are three to five years older than the official age for the last grade of [upper secondary](#dod:upper-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
@@ -819,7 +819,7 @@ tables:
           tolerance: 10
       completion_rate__lower_secondary_education__female__pct__modelled_data__cr_mod_2_f:
         title: Completion rate in lower secondary education among girls
-        description_short: The share of girls who are three to five years older than the official age for the last grade of [lower secondary](#dod:lower-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
+        description_short: Share of girls who are three to five years older than the official age for the last grade of [lower secondary](#dod:lower-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
@@ -833,7 +833,7 @@ tables:
           tolerance: 10
       completion_rate__primary_education__female__pct__modelled_data__cr_mod_1_f:
         title: Completion rate in primary education among girls
-        description_short: The share of girls who are three to five years older than the official age for the last grade of [primary](#dod:primary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
+        description_short: Share of girls who are three to five years older than the official age for the last grade of [primary](#dod:primary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
@@ -847,7 +847,7 @@ tables:
           tolerance: 10
       completion_rate__upper_secondary_education__female__pct__modelled_data__cr_mod_3_f:
         title: Completion rate in upper secondary education among girls
-        description_short: The share of girls who are three to five years older than the official age for the last grade of [upper secondary](#dod:upper-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
+        description_short: Share of girls who are three to five years older than the official age for the last grade of [upper secondary](#dod:upper-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
@@ -861,7 +861,7 @@ tables:
           tolerance: 10
       completion_rate__lower_secondary_education__male__pct__modelled_data__cr_mod_2_m:
         title: Completion rate in lower secondary education among boys
-        description_short: The share of boys who are three to five years older than the official age for the last grade of [lower secondary](#dod:lower-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
+        description_short: Share of boys who are three to five years older than the official age for the last grade of [lower secondary](#dod:lower-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
@@ -875,7 +875,7 @@ tables:
           tolerance: 10
       completion_rate__primary_education__male__pct__modelled_data__cr_mod_1_m:
         title: Completion rate in primary education among boys
-        description_short: The share of boys who are three to five years older than the official age for the last grade of [primary](#dod:primary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
+        description_short: Share of boys who are three to five years older than the official age for the last grade of [primary](#dod:primary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
@@ -889,7 +889,7 @@ tables:
           tolerance: 10
       completion_rate__upper_secondary_education__male__pct__modelled_data__cr_mod_3_m:
         title: Completion rate in upper secondary education among boys
-        description_short: The share of boys who are three to five years older than the official age for the last grade of [upper secondary](#dod:upper-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
+        description_short: Share of boys who are three to five years older than the official age for the last grade of [upper secondary](#dod:upper-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
@@ -1088,7 +1088,7 @@ tables:
 
       proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_mathematics__both_sexes__pct__prepfuture_2_math:
         title: Share of children achieving minimum math proficiency by the end of lower secondary age
-        description_short: The share of children who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data accounts for school completion rates to estimate skills for all children, not just those in school.
+        description_short: Share of children who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data accounts for school completion rates to estimate skills for all children, not just those in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1102,7 +1102,7 @@ tables:
 
       proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_mathematics__female__pct__prepfuture_2_math_f:
         title: Share of girls achieving minimum math proficiency by the end of lower secondary age
-        description_short: The share of girls who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data accounts for school completion rates to estimate skills for all girls, not just those in school.
+        description_short: Share of girls who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data accounts for school completion rates to estimate skills for all girls, not just those in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1116,7 +1116,7 @@ tables:
 
       proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_mathematics__male__pct__prepfuture_2_math_m:
         title: Share of boys achieving minimum math proficiency by the end of lower secondary age
-        description_short: The share of boys who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data accounts for school completion rates to estimate skills for all boys, not just those in school.
+        description_short: Share of boys who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data accounts for school completion rates to estimate skills for all boys, not just those in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1130,7 +1130,7 @@ tables:
 
       proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_reading__both_sexes__pct__prepfuture_2_read:
         title: Share of children achieving minimum reading proficiency by the end of lower secondary age
-        description_short: The share of children who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data accounts for school completion rates to estimate skills for all children, not just those in school.
+        description_short: Share of children who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data accounts for school completion rates to estimate skills for all children, not just those in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1144,7 +1144,7 @@ tables:
 
       proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_reading__female__pct__prepfuture_2_read_f:
         title: Share of girls achieving minimum reading proficiency by the end of lower secondary age
-        description_short: The share of girls who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data accounts for school completion rates to estimate skills for all girls, not just those in school.
+        description_short: Share of girls who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data accounts for school completion rates to estimate skills for all girls, not just those in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1158,7 +1158,7 @@ tables:
 
       proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_reading__male__pct__prepfuture_2_read_m:
         title: Share of boys achieving minimum reading proficiency by the end of lower secondary age
-        description_short: The share of boys who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data accounts for school completion rates to estimate skills for all boys, not just those in school.
+        description_short: Share of boys who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data accounts for school completion rates to estimate skills for all boys, not just those in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1172,7 +1172,7 @@ tables:
 
       proportion_of_children_young_people_at_the_age_of_primary_education_prepared_for_the_future_in_mathematics__both_sexes__pct__prepfuture_1_math:
         title: Share of children achieving minimum math proficiency by the end of primary age
-        description_short: The share of children who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate skills for all children, not just those in school.
+        description_short: Share of children who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate skills for all children, not just those in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1186,7 +1186,7 @@ tables:
 
       proportion_of_children_young_people_at_the_age_of_primary_education_prepared_for_the_future_in_mathematics__female__pct__prepfuture_1_math_f:
         title: Share of girls achieving minimum math proficiency by the end of primary age
-        description_short: The share of girls who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate skills for all girls, not just those in school.
+        description_short: Share of girls who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate skills for all girls, not just those in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1200,7 +1200,7 @@ tables:
 
       proportion_of_children_young_people_at_the_age_of_primary_education_prepared_for_the_future_in_mathematics__male__pct__prepfuture_1_math_m:
         title: Share of boys achieving minimum math proficiency by the end of primary age
-        description_short: The share of boys who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate skills for all boys, not just those in school.
+        description_short: Share of boys who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate skills for all boys, not just those in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1214,7 +1214,7 @@ tables:
 
       proportion_of_children_young_people_at_the_age_of_primary_education_prepared_for_the_future_in_reading__both_sexes__pct__prepfuture_1_read:
         title: Share of children achieving minimum reading proficiency by the end of primary age
-        description_short: The share of children who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate skills for all children, not just those in school.
+        description_short: Share of children who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate skills for all children, not just those in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1228,7 +1228,7 @@ tables:
 
       proportion_of_children_young_people_at_the_age_of_primary_education_prepared_for_the_future_in_reading__female__pct__prepfuture_1_read_f:
         title: Share of girls achieving minimum reading proficiency by the end of primary age
-        description_short: The share of girls who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate skills for all girls, not just those in school.
+        description_short: Share of girls who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate skills for all girls, not just those in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1242,7 +1242,7 @@ tables:
 
       proportion_of_children_young_people_at_the_age_of_primary_education_prepared_for_the_future_in_reading__male__pct__prepfuture_1_read_m:
         title: Share of boys achieving minimum reading proficiency by the end of primary age
-        description_short: The share of boys who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate skills for all boys, not just those in school.
+        description_short: Share of boys who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data accounts for school completion rates to estimate skills for all boys, not just those in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1260,7 +1260,7 @@ tables:
 
       proportion_of_students_at_the_end_of_lower_secondary_education_achieving_at_least_a_minimum_proficiency_level_in_mathematics__both_sexes__pct__math_lowersec:
         title: Share of students at the end of lower secondary education with minimum math skills
-        description_short: The share of students who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data includes only students enrolled in school.
+        description_short: Share of students who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data includes only students enrolled in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1274,7 +1274,7 @@ tables:
 
       proportion_of_students_at_the_end_of_lower_secondary_education_achieving_at_least_a_minimum_proficiency_level_in_mathematics__female__pct__math_lowersec_f:
         title: Share of female students at the end of lower secondary education with minimum math skills
-        description_short: The share of female students who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data includes only students enrolled in school.
+        description_short: Share of female students who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data includes only students enrolled in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1288,7 +1288,7 @@ tables:
 
       proportion_of_students_at_the_end_of_lower_secondary_education_achieving_at_least_a_minimum_proficiency_level_in_mathematics__male__pct__math_lowersec_m:
         title: Share of male students at the end of lower secondary education with minimum math skills
-        description_short: The share of male students who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data includes only students enrolled in school.
+        description_short: Share of male students who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data includes only students enrolled in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1302,7 +1302,7 @@ tables:
 
       proportion_of_students_at_the_end_of_lower_secondary_education_achieving_at_least_a_minimum_proficiency_level_in_reading__both_sexes__pct__read_lowersec:
         title: Share of students at the end of lower secondary education with minimum reading skills
-        description_short: The share of students who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data includes only students enrolled in school.
+        description_short: Share of students who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data includes only students enrolled in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1316,7 +1316,7 @@ tables:
 
       proportion_of_students_at_the_end_of_lower_secondary_education_achieving_at_least_a_minimum_proficiency_level_in_reading__female__pct__read_lowersec_f:
         title: Share of female students at the end of lower secondary education with minimum reading skills
-        description_short: The share of female students who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data includes only students enrolled in school.
+        description_short: Share of female students who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data includes only students enrolled in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1330,7 +1330,7 @@ tables:
 
       proportion_of_students_at_the_end_of_lower_secondary_education_achieving_at_least_a_minimum_proficiency_level_in_reading__male__pct__read_lowersec_m:
         title: Share of male students at the end of lower secondary education with minimum reading skills
-        description_short: The share of male students who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data includes only students enrolled in school.
+        description_short: Share of male students who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [lower secondary](#dod:lower-secondary-education) education. This data includes only students enrolled in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1344,7 +1344,7 @@ tables:
 
       proportion_of_students_at_the_end_of_primary_education_achieving_at_least_a_minimum_proficiency_level_in_mathematics__both_sexes__pct__math_primary:
         title: Share of students with minimum math skills by the end of primary school
-        description_short: The share of students who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data includes only students enrolled in school.
+        description_short: Share of students who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data includes only students enrolled in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1358,7 +1358,7 @@ tables:
 
       proportion_of_students_at_the_end_of_primary_education_achieving_at_least_a_minimum_proficiency_level_in_mathematics__female__pct__math_primary_f:
         title: Share of female students with minimum math skills by the end of primary school
-        description_short: The share of female students who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data includes only students enrolled in school.
+        description_short: Share of female students who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data includes only students enrolled in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1372,7 +1372,7 @@ tables:
 
       proportion_of_students_at_the_end_of_primary_education_achieving_at_least_a_minimum_proficiency_level_in_mathematics__male__pct__math_primary_m:
         title: Share of male students with minimum math skills by the end of primary school
-        description_short: The share of male students who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data includes only students enrolled in school.
+        description_short: Share of male students who achieve minimum [math](#dod:math-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data includes only students enrolled in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1386,7 +1386,7 @@ tables:
 
       proportion_of_students_at_the_end_of_primary_education_achieving_at_least_a_minimum_proficiency_level_in_reading__both_sexes__pct__read_primary:
         title: Share of students with minimum reading skills by the end of primary school
-        description_short: The share of students who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data includes only students enrolled in school.
+        description_short: Share of students who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data includes only students enrolled in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1400,7 +1400,7 @@ tables:
 
       proportion_of_students_at_the_end_of_primary_education_achieving_at_least_a_minimum_proficiency_level_in_reading__female__pct__read_primary_f:
         title: Share of female students with minimum reading skills by the end of primary school
-        description_short: The share of female students who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data includes only students enrolled in school.
+        description_short: Share of female students who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data includes only students enrolled in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1414,7 +1414,7 @@ tables:
 
       proportion_of_students_at_the_end_of_primary_education_achieving_at_least_a_minimum_proficiency_level_in_reading__male__pct__read_primary_m:
         title: Share of male students with minimum reading skills by the end of primary school
-        description_short: The share of male students who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data includes only students enrolled in school.
+        description_short: Share of male students who achieve minimum [reading](#dod:reading-proficiency) proficiency by the end of [primary](#dod:primary-education) education. This data includes only students enrolled in school.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_prof
@@ -1494,7 +1494,7 @@ tables:
 
       completion_rate__primary_education__both_sexes__pct__cr_1:
         title: Completion rate in primary education (survey-based)
-        description_short: The share of children who are three to five years older than the official age for the last grade of [primary](#dod:primary-education) education who have successfully completed it.
+        description_short: Share of children who are three to five years older than the official age for the last grade of [primary](#dod:primary-education) education who have successfully completed it.
         unit: "%"
         short_unit: "%"
         display:
@@ -1503,7 +1503,7 @@ tables:
           tolerance: 10
       completion_rate__lower_secondary_education__both_sexes__pct__cr_2:
         title: Completion rate in lower secondary education (survey-based)
-        description_short: The share of children who are three to five years older than the official age for the last grade of [lower secondary](#dod:lower-secondary-education) education who have successfully completed it.
+        description_short: Share of children who are three to five years older than the official age for the last grade of [lower secondary](#dod:lower-secondary-education) education who have successfully completed it.
         unit: "%"
         short_unit: "%"
         display:
@@ -1512,7 +1512,7 @@ tables:
           tolerance: 10
       completion_rate__upper_secondary_education__both_sexes__pct__cr_3:
         title: Completion rate in upper secondary education (survey-based)
-        description_short: The share of children who are three to five years older than the official age for the last grade of [upper secondary](#dod:upper-secondary-education) education who have successfully completed it.
+        description_short: Share of children who are three to five years older than the official age for the last grade of [upper secondary](#dod:upper-secondary-education) education who have successfully completed it.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
@@ -1525,7 +1525,7 @@ tables:
           tolerance: 10
       completion_rate__upper_secondary_education__female__pct__cr_3_f:
         title: Completion rate in upper secondary education among girls (survey-based)
-        description_short: The share of girls who are three to five years older than the official age for the last grade of [upper secondary](#dod:upper-secondary-education) education who have successfully completed it.
+        description_short: Share of girls who are three to five years older than the official age for the last grade of [upper secondary](#dod:upper-secondary-education) education who have successfully completed it.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
@@ -1538,7 +1538,7 @@ tables:
           tolerance: 10
       completion_rate__upper_secondary_education__male__pct__cr_3_m:
         title: Completion rate in upper secondary education among boys (survey-based)
-        description_short: The share of boys who are three to five years older than the official age for the last grade of [upper secondary](#dod:upper-secondary-education) education who have successfully completed it.
+        description_short: Share of boys who are three to five years older than the official age for the last grade of [upper secondary](#dod:upper-secondary-education) education who have successfully completed it.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate

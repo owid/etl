@@ -303,7 +303,7 @@ tables:
         title: "Deaths averted due to antiretroviral therapy - <<estimate.title()>> estimate"
         unit: deaths
         description_short: |-
-          The number of deaths prevented as a direct result of Antiretroviral Therapy (ART) among people living with HIV. It is calculated by comparing the observed mortality rates in individuals receiving ART to the estimated mortality rates in the absence of such treatment. This is the <<estimate.lower() >> estimate.
+          Number of deaths prevented as a direct result of Antiretroviral Therapy (ART) among people living with HIV. It is calculated by comparing the observed mortality rates in individuals receiving ART to the estimated mortality rates in the absence of such treatment. This is the <<estimate.lower() >> estimate.
         description_key:
           - "{definitions.art_description}"
           - Antiretroviral therapy (ART) has significantly reduced the number of AIDS-related deaths since its introduction in 1996.
@@ -398,7 +398,7 @@ tables:
         title: "Mother-to-child HIV transmission rate - <<estimate.title()>> estimate"
         unit: "infected children per 1,000 children"
         description_short: |-
-          The number of children born to HIV-positive mothers who acquire HIV during pregnancy, labor, delivery, or breastfeeding, per 1,000 children. This is the <<estimate.lower() >> estimate.
+          Number of children born to HIV-positive mothers who acquire HIV during pregnancy, labor, delivery, or breastfeeding, per 1,000 children. This is the <<estimate.lower() >> estimate.
         description_from_producer: |-
           The mother-to-child transmission probability differs with the antiretroviral drug regimen received and infant-feeding practices. The transmission can be calculated by using the Spectrum model.
 
@@ -470,7 +470,7 @@ tables:
         title: "New HIV Infections - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
         unit: "infections"
         description_short: |-
-          The number of {definitions.people_dimension} newly infected with HIV in the last 12 months. This is the <<estimate.lower() >> estimate.
+          Number of {definitions.people_dimension} newly infected with HIV in the last 12 months. This is the <<estimate.lower() >> estimate.
         description_key:
           - Also known as "HIV incidence", help health organizations assess whether prevention efforts are successfully reducing HIV transmission rates or if emerging challenges are creating new infection pathways.
           - According to the [WHO 2022 Consolidated guidelines](https://web.archive.org/web/20250201130605/https://www.who.int/publications/i/item/9789240055315), the main goal of the global AIDS response is to reduce new HIV infections to below 200,000 by 2030. Monitoring the rate of new infections over time is essential to assess progress towards this target.
@@ -498,7 +498,7 @@ tables:
         title: "HIV incidence-to-mortality ratio - <<estimate.title()>> estimate"
         unit: ""
         description_short: |-
-          The ratio of new HIV infections to AIDS-related deaths within a specific time frame. This is the <<estimate.lower() >> estimate.
+          Ratio of new HIV infections to AIDS-related deaths within a specific time frame. This is the <<estimate.lower() >> estimate.
         description_key:
           - An Incidence-to-Mortality Ratio (IMR) below 1.0 indicates that the number of new HIV infections is less than the number of deaths among people living with HIV, suggesting a declining epidemic.
           - The IMR is used to assess the progress towards controlling the HIV epidemic and is considered alongside other metrics such as the incidence-prevalence ratio.
@@ -510,7 +510,7 @@ tables:
         title: "HIV incidence-to-prevalence ratio - <<estimate.title()>> estimate"
         unit: ""
         description_short: |-
-          The ratio of new HIV infections (incidence) to the total number of people living with HIV (prevalence) within a specific time frame. This is the <<estimate.lower() >> estimate.
+          Ratio of new HIV infections (incidence) to the total number of people living with HIV (prevalence) within a specific time frame. This is the <<estimate.lower() >> estimate.
         description_key:
           - A declining incidence-to-prevalence ratio indicates progress in controlling the HIV epidemic, as it reflects a decrease in new infections relative to the existing number of people living with HIV.
         presentation:
@@ -574,7 +574,7 @@ tables:
         title: "Share of adults (15+) with unsuppressed viral load - Sex: <<sex>>"
         unit: "%"
         description_short: |-
-          The share of {definitions.people_dimension} living with HIV whose viral load remains detectable above the suppression threshold, indicating ongoing challenges in maintaining effective HIV treatment and potential risks of disease progression and transmission. This is the <<estimate.lower() >> estimate.
+          Share of {definitions.people_dimension} living with HIV whose viral load remains detectable above the suppression threshold, indicating ongoing challenges in maintaining effective HIV treatment and potential risks of disease progression and transmission. This is the <<estimate.lower() >> estimate.
         presentation:
           title_public: "Share of adults with unsuppressed viral load"
 
@@ -582,7 +582,7 @@ tables:
         title: "Share of people living with HIV who have suppressed viral loads - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
         unit: "%"
         description_short: |-
-          The share of {definitions.people_dimension} living with HIV who have achieved viral suppression, representing the proportion of patients successfully managing their HIV through effective antiretroviral therapy. This is the <<estimate.lower() >> estimate.
+          Share of {definitions.people_dimension} living with HIV who have achieved viral suppression, representing the proportion of patients successfully managing their HIV through effective antiretroviral therapy. This is the <<estimate.lower() >> estimate.
         description_key:
           - Viral suppression represents the third and final 90 of the global target, aiming to ensure that patients on ART achieve and maintain viral suppression. This minimizes their risk of disease progression and HIV transmission. Achieving viral suppression is crucial for service quality, as an unsuppressed viral load may indicate suboptimal treatment adherence and the potential for developing and spreading drug resistance.
         presentation:
@@ -592,7 +592,7 @@ tables:
         title: "Share of people on ART who achieve viral suppression - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
         unit: "%"
         description_short: |-
-          The share of {definitions.people_dimension} receiving antiretroviral therapy (ART) who successfully achieve viral suppression, measuring the clinical efficacy of HIV treatment at the individual patient level. This is the <<estimate.lower() >> estimate.
+          Share of {definitions.people_dimension} receiving antiretroviral therapy (ART) who successfully achieve viral suppression, measuring the clinical efficacy of HIV treatment at the individual patient level. This is the <<estimate.lower() >> estimate.
         presentation:
           title_public: "Share of {definitions.people_term} on ART who achieve viral suppression"
 
@@ -915,7 +915,7 @@ tables:
         title: Condoms distributed and sold per 1,000 population
         unit: "condoms per 1,000 people"
         description_short: |-
-          The number of condoms distributed and sold per 1,000 people in a given year, including free public-sector distribution, subsidized from non-governmental organizations, and commercial sales.
+          Number of condoms distributed and sold per 1,000 people in a given year, including free public-sector distribution, subsidized from non-governmental organizations, and commercial sales.
         display:
           numDecimalPlaces: 0
         description_from_producer: |-
@@ -1276,7 +1276,7 @@ tables:
       hiv_self_tests:
         title: HIV self-tests - <<group>>
         description_short: |-
-          The number of HIV tests <<group>> in the calendar year.
+          Number of HIV tests <<group>> in the calendar year.
           <%- if group == "procured" %>
            Procured self-test kits represent the total number of self-test kits purchased within a year by the national government, including those funded by donors. Kits procured through other channels, such as the private sector, are excluded.
           <%- else %>
@@ -1909,7 +1909,7 @@ tables:
         # title: Safe injecting practices among people who inject drugs
         unit: tests
         description_short: |-
-          The number of HIV tests conducted (testing volume) to
+          Number of HIV tests conducted (testing volume) to
           <%- if group == "TB-patients" %>
            <<sex if sex != "total">>TB patients
           <%- else %>

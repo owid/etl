@@ -150,7 +150,7 @@ tables:
         title: Number of states involved in conflicts
         unit: "states"
         description_short: |-
-          The number of countries that participated in a conflict (of a specific kind) in a given year and region.
+          Number of countries that participated in a conflict (of a specific kind) in a given year and region.
 
   # MAIN INDICATORS
   prio_v31:
