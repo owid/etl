@@ -27,9 +27,9 @@ tables:
           <% elif tenure_type == "Rent (private and subsidized)" %>
             Share of disposable income that the median renters (private and subsidized) in << quintile.lower() >> spend on rent.
           <% elif tenure_type == "Rent (private)" %>
-            The share of disposable income that the median renters (on the private market) in << quintile.lower() >> spend on rent.
+            Share of disposable income that the median renters (on the private market) in << quintile.lower() >> spend on rent.
           <% elif tenure_type == "Rent (subsidized)" %>
-            The share of disposable income that the median renters with subsidized housing costs (e.g. in social housing) spend on rent.
+            Share of disposable income that the median renters with subsidized housing costs (e.g. in social housing) spend on rent.
           <% elif tenure_type == "Owner with mortgage" %>
             Share of disposable income that the median homeowners in << quintile.lower() >> spend on their mortgage payments, including interest and principal repayments.
           <% endif %>

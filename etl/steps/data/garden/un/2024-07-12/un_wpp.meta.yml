@@ -317,7 +317,7 @@ tables:
               <%- elif age == '10-14' %>
               [Age-specific fertility rate](#dod:age-specific-fertility-rate) for girls aged << age|replace('-', ' to ') >>, measured as the number of live births per 1,000 girls in this age group.
               <%- elif age == '15-19' %>
-              The [age-specific fertility rate](#dod:age-specific-fertility-rate) for adolescent girls aged 15 to 19, measured as the number of live births per 1,000 girls in this age group.
+              [age-specific fertility rate](#dod:age-specific-fertility-rate) for adolescent girls aged 15 to 19, measured as the number of live births per 1,000 girls in this age group.
               <%- else %>
               [Age-specific fertility rate](#dod:age-specific-fertility-rate) for women aged << age|replace('-', ' to ') >>, measured as the number of live births per 1,000 women in this age group.
               <%- endif %> {definitions.global.projections}
@@ -649,9 +649,9 @@ tables:
           <%- if age == "total" -%>
           Number of children (under 15) and people aged 65 and over per 100 working-age people (aged 15 to 64).
           <%- elif age == "youth" -%>
-          The number of children under 15 per 100 working-age people (aged 15 to 64).
+          Number of children under 15 per 100 working-age people (aged 15 to 64).
           <%- else -%>
-          The number of people aged 65 and over per 100 working-age people (aged 15 to 64).
+          Number of people aged 65 and over per 100 working-age people (aged 15 to 64).
           <%- endif -%>
         description_key:
           - |-

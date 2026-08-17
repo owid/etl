@@ -239,7 +239,7 @@ tables:
           <% if sex == 'total' %>
           Total number of deaths at age << age >> in a given year.
           <%- else %>
-          The total number of << sex >> deaths at age << age >> in a given year.
+          Total number of << sex >> deaths at age << age >> in a given year.
           <%- endif %>
         display:
           name: |-
@@ -261,7 +261,7 @@ tables:
         description_short: |-
           <% if age == 'total' %>
           <%- if sex == 'total' %>
-          The total number of people living in a country.
+          Total number of people living in a country.
           <%- else %>
           Total number of << sex + 's' >> living in a country.
           <%- endif %>

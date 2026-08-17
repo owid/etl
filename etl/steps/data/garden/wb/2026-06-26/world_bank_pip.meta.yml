@@ -1954,7 +1954,7 @@ tables:
               <% if survey_comparability == "No spells" %>
               Level of <<welfare_type>> per person {definitions.per_period} below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}
               <%- else %>
-              The level of income or consumption per person {definitions.per_period} below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}
+              Level of income or consumption per person {definitions.per_period} below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}
               <%- endif %>
             note: "{definitions.note_ppp}"
             hasMapTab: "{definitions.hasmaptab}"

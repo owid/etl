@@ -85,15 +85,15 @@ definitions:
     <% elif indicator == "Deaths age 5 to 9" %>
     Estimated number of deaths of {definitions.sex} children aged between 5 and 9 {definitions.wealth_quintile}.
     <% elif indicator == "Post-neonatal deaths" %>
-    The estimated number of deaths of {definitions.sex} children aged between 28 days and 1 year {definitions.wealth_quintile}.
+    Estimated number of deaths of {definitions.sex} children aged between 28 days and 1 year {definitions.wealth_quintile}.
     <% elif indicator == "Mortality rate age 1-11 months" %>
     Estimated number of deaths of {definitions.sex} babies aged between 1 days and 11 months per 100 babies aged 1 month {definitions.wealth_quintile}.
     <% elif indicator == "Deaths age 1-11 months" %>
     Estimated number of deaths of {definitions.sex} babies aged between 1 days and 11 months {definitions.wealth_quintile}.
     <% elif indicator == "Under-fifteen deaths" %>
-    The estimated number of deaths of children aged under fifteen years.
+    Estimated number of deaths of children aged under fifteen years.
     <% elif indicator == "Under-fifteen mortality rate" %>
-    The estimated number of deaths of children aged under fifteen years, per 100 live births.
+    Estimated number of deaths of children aged under fifteen years, per 100 live births.
     <%- endif -%>
   title: |-
     <% set indicator = indicator | default('') %>

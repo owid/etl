@@ -26,14 +26,14 @@ tables:
         title: |-
           Number of new << cancer.lower() >> cases attributable to << agent.lower() >> among {definitions.sex}
         description_short: |-
-          Estimated number of new << cancer.lower() >> cases attributable to << agent.lower() >> among {definitions.sex}
+          Estimated number of new << cancer.lower() >> cases attributable to << agent.lower() >> among {definitions.sex}.
         unit: cases
 
       asir_att:
         title: |-
           Age-standardized incidence rate of << cancer.lower() >> attributable to << agent.lower() >> among {definitions.sex}
         description_short: |-
-          Estimated age-standardized incidence rate of << cancer.lower() >> attributable to << agent.lower() >> among {definitions.sex}
+          Estimated age-standardized incidence rate of << cancer.lower() >> attributable to << agent.lower() >> among {definitions.sex}.
         unit: per 100,000 people
         presentation:
           grapher_config:
@@ -43,7 +43,7 @@ tables:
         title: |-
           Proportion of << cancer.lower() >> cases among {definitions.sex} attributable to << agent.lower() >>
         description_short: |-
-          Proportion of << cancer.lower() >> cases among {definitions.sex} attributable to << agent.lower() >>
+          Proportion of << cancer.lower() >> cases among {definitions.sex} attributable to << agent.lower() >>.
         unit: '%'
         short_unit: '%'
 
@@ -51,7 +51,7 @@ tables:
         title: |-
           Age-standardized incidence rate of << cancer.lower() >> among {definitions.sex}
         description_short: |-
-          Estimated age-standardized incidence rate of << cancer.lower() >> among {definitions.sex}
+          Estimated age-standardized incidence rate of << cancer.lower() >> among {definitions.sex}.
         unit: per 100,000 people
         presentation:
           grapher_config:
@@ -61,12 +61,12 @@ tables:
         title: |-
           Share of new << cancer.lower() >> cases among {definitions.sex} attributable to << agent.lower() >>
         description_short: |-
-          Share of new << cancer.lower() >> cases among {definitions.sex} attributable to << agent.lower() >>
+          Share of new << cancer.lower() >> cases among {definitions.sex} attributable to << agent.lower() >>.
         unit: '%'
         short_unit: '%'
       cases:
         title: |-
           Number of new << cancer.lower() >> cases among {definitions.sex}
         description_short: |-
-          Estimated number of new << cancer.lower() >> cases among {definitions.sex}
+          Estimated number of new << cancer.lower() >> cases among {definitions.sex}.
         unit: cases

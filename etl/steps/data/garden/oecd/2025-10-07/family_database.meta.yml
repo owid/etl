@@ -106,7 +106,7 @@ tables:
           <% elif indicator == "Two cohabiting parents" %>
           Percentage of children aged 0-17 living with two cohabiting parents.
           <% elif indicator == "Living with a single parent" %>
-          The percentage of children aged 0-17 living with a single parent.
+          Percentage of children aged 0-17 living with a single parent.
           <% elif indicator == "Other" %>
           Percentage of children aged 0-17 in other family arrangements.
           <% endif %>

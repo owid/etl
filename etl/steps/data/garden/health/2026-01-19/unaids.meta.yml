@@ -1128,7 +1128,7 @@ tables:
       population:
         title: Population of <<group>>
         unit: people
-        description_short: "Estimates of the size of the population of <<group>>"
+        description_short: "Estimates of the size of the population of <<group>>."
         description_from_producer: |-
           Programme planning for key populations can be more efficient if the size of these populations can be accurately estimated. The figures enable national AIDS programmes, health ministries, donors and not-for-profit and multilateral organizations to efficiently allocate resources to adequately meet the prevention needs of specific populations at higher risk. Size estimates are also important for modelling the HIV epidemic.
 

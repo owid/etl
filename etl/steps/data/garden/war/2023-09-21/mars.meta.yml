@@ -52,7 +52,7 @@ definitions:
       <%- elif conflict_type == "others (non-civil)" %>
       << estimate | capitalize >> estimate of the number of deaths<< per_capita >> in ongoing conventional interstate wars that year
       <%- elif conflict_type == "civil war" %>
-      The << estimate >> estimate of the number of deaths<< per_capita >> in ongoing conventional civil wars that year
+      << estimate >> estimate of the number of deaths<< per_capita >> in ongoing conventional civil wars that year.
       <%- endif %>
     description_short_per_capita: <% set per_capita = " per 100,000 people" %> {definitions.number_deaths.description_short}
     description_key: &description_key_deaths

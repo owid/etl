@@ -254,7 +254,7 @@ tables:
           {definitions.others.title}
         description_short: |-
           <% if birth_order == 'total' %>
-          The average number of children born to women in the 30-years-ago cohort over their lifetime.
+          Average number of children born to women in the 30-years-ago cohort over their lifetime.
           <%- else %>
           Average number of{definitions.others.bo_1} children born to women in a specific cohort over their lifetime.
           <%- endif %>

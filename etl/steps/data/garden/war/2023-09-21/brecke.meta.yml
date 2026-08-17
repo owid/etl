@@ -36,7 +36,7 @@ definitions:
     description_short: |-
       <% set per_capita = "" %>
       <%- if conflict_type == "all" -%>
-      The estimated number of deaths<< per_capita >> in ongoing armed conflicts that year.
+      Estimated number of deaths<< per_capita >> in ongoing armed conflicts that year.
 
       <%- else -%>
       Estimated number of deaths<< per_capita >> in ongoing << conflict_type >> conflicts that year.

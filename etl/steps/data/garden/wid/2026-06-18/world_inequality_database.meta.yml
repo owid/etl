@@ -895,7 +895,7 @@ tables:
         short_unit: "$"
         description_short: |-
           {macros}
-          The mean {definitions.concept_welfare_type}{definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
+          Mean {definitions.concept_welfare_type}{definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
         description_key:
           - "{definitions.description_key_avg}"
           - "{definitions.description_key_source_wid}"
@@ -917,7 +917,7 @@ tables:
               Mean {definitions.concept_welfare_type}{definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>>{definitions.concept_welfare_type_for_title}
             subtitle: |-
               {macros}
-              The mean {definitions.concept_welfare_type}{definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_ppp} {definitions.subtitle_welfare_type}
+              Mean {definitions.concept_welfare_type}{definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_ppp} {definitions.subtitle_welfare_type}
             note: "{definitions.note_ppp_before_tax}"
             hasMapTab: true
             tab: map
@@ -938,7 +938,7 @@ tables:
         short_unit: "%"
         description_short: |-
           {macros}
-          The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
+          Share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
         description_key:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_source_wid}"
@@ -958,7 +958,7 @@ tables:
               {definitions.concept_welfare_type_capitalized} share of the <<quantiles_avg_share(quantile) | lower>>{definitions.concept_welfare_type_for_title}
             subtitle: |-
               {macros}
-              The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
+              Share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
             note: "{definitions.note_before_tax}"
             hasMapTab: true
             tab: map
