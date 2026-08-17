@@ -7,7 +7,7 @@ REGION_PATH = "regions#owid_region"
 
 # Tiny territories whose stock is negligible next to other countries; excluded from every
 # chart type in this mdim (not just Marimekko), since excludedEntityNames is a view-wide setting.
-EXCLUDED_ENTITIES = ["Niue", "Bonaire Sint Eustatius and Saba"]
+EXCLUDED_ENTITIES = ["Niue", "Bonaire Sint Eustatius and Saba", "Wallis and Futuna", "Cook Islands"]
 
 
 def run() -> None:
