@@ -1530,9 +1530,9 @@ tables:
         short_unit: "%"
         description_short: |-
           <% if survey_comparability == "No spells" %>
-          The share of <<welfare_type>> {definitions.welfare_type_verb} by the poorest 50% of the population.
+          Share of <<welfare_type>> {definitions.welfare_type_verb} by the poorest 50% of the population.
           <% else %>
-          The share of income or consumption {definitions.welfare_type_verb} by the poorest 50% of the population.
+          Share of income or consumption {definitions.welfare_type_verb} by the poorest 50% of the population.
           <% endif %>
         description_key:
           - "{definitions.description_key_share_groups}"
@@ -1563,9 +1563,9 @@ tables:
         short_unit: "%"
         description_short: |-
           <% if survey_comparability == "No spells" %>
-          The share of <<welfare_type>> {definitions.welfare_type_verb} by the middle 40% of the population. The middle 40% is the share of the population whose <<welfare_type>> lies between the poorest 50% and the richest 10%.
+          Share of <<welfare_type>> {definitions.welfare_type_verb} by the middle 40% of the population. The middle 40% is the share of the population whose <<welfare_type>> lies between the poorest 50% and the richest 10%.
           <% else %>
-          The share of income or consumption {definitions.welfare_type_verb} by the middle 40% of the population. The middle 40% is the share of the population whose income or consumption lies between the poorest 50% and the richest 10%.
+          Share of income or consumption {definitions.welfare_type_verb} by the middle 40% of the population. The middle 40% is the share of the population whose income or consumption lies between the poorest 50% and the richest 10%.
           <% endif %>
         description_key:
           - "{definitions.description_key_share_groups}"
@@ -1596,9 +1596,9 @@ tables:
         short_unit: "%"
         description_short: |-
           <% if survey_comparability == "No spells" %>
-          The share of <<welfare_type>> {definitions.welfare_type_verb} by the richest 1% of the population.
+          Share of <<welfare_type>> {definitions.welfare_type_verb} by the richest 1% of the population.
           <% else %>
-          The share of income or consumption {definitions.welfare_type_verb} by the richest 1% of the population.
+          Share of income or consumption {definitions.welfare_type_verb} by the richest 1% of the population.
           <% endif %>
         description_key:
           - "{definitions.description_key_share_groups}"
@@ -1629,9 +1629,9 @@ tables:
         short_unit: "%"
         description_short: |-
           <% if survey_comparability == "No spells" %>
-          The share of <<welfare_type>> {definitions.welfare_type_verb} by the population between the 90th and 99th percentiles.
+          Share of <<welfare_type>> {definitions.welfare_type_verb} by the population between the 90th and 99th percentiles.
           <% else %>
-          The share of income or consumption {definitions.welfare_type_verb} by the population between the 90th and 99th percentiles.
+          Share of income or consumption {definitions.welfare_type_verb} by the population between the 90th and 99th percentiles.
           <% endif %>
         description_key:
           - "{definitions.description_key_share_groups}"
@@ -1784,9 +1784,9 @@ tables:
         description_short: |-
           {macros}
           <% if survey_comparability == "No spells" %>
-          The mean <<welfare_type>> {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
+          Mean <<welfare_type>> {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
           <% else %>
-          The mean income or consumption {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
+          Mean income or consumption {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
           <% endif %>
         description_key:
           - "{definitions.description_key_avg}"
@@ -1825,9 +1825,9 @@ tables:
             subtitle: |-
               {macros}
               <% if survey_comparability == "No spells" %>
-              The mean <<welfare_type>> {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}
+              Mean <<welfare_type>> {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}
               <%- else %>
-              The mean income or consumption {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}
+              Mean income or consumption {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}
               <%- endif %>
             note: "{definitions.note_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
@@ -1852,9 +1852,9 @@ tables:
         description_short: |-
           {macros}
           <% if survey_comparability == "No spells" %>
-          The share of <<welfare_type>> {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
+          Share of <<welfare_type>> {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
           <% else %>
-          The share of income or consumption {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
+          Share of income or consumption {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
           <% endif %>
         description_key:
           - "{definitions.description_key_share}"
@@ -1893,9 +1893,9 @@ tables:
             subtitle: |-
               {macros}
               <% if survey_comparability == "No spells" %>
-              The share of <<welfare_type>> {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).{definitions.spells_subtitle}
+              Share of <<welfare_type>> {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).{definitions.spells_subtitle}
               <%- else %>
-              The share of income or consumption received by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).{definitions.spells_subtitle}
+              Share of income or consumption received by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).{definitions.spells_subtitle}
               <%- endif %>
             note: "{definitions.note_without_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
@@ -1917,9 +1917,9 @@ tables:
         short_unit: $
         description_short: |-
           <% if survey_comparability == "No spells" %>
-          The level of <<welfare_type>> {definitions.per_period} below which <<decile>>0% of the population falls.
+          Level of <<welfare_type>> {definitions.per_period} below which <<decile>>0% of the population falls.
           <% else %>
-          The level of income or consumption {definitions.per_period} below which <<decile>>0% of the population falls.
+          Level of income or consumption {definitions.per_period} below which <<decile>>0% of the population falls.
           <% endif %>
         description_key:
           - "{definitions.description_key_thr}"
@@ -1952,7 +1952,7 @@ tables:
             title: "{definitions.threshold_title}"
             subtitle: |-
               <% if survey_comparability == "No spells" %>
-              The level of <<welfare_type>> per person {definitions.per_period} below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}
+              Level of <<welfare_type>> per person {definitions.per_period} below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}
               <%- else %>
               The level of income or consumption per person {definitions.per_period} below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle}{definitions.spells_subtitle}
               <%- endif %>
@@ -1976,9 +1976,9 @@ tables:
         short_unit: $
         description_short: |-
           <% if survey_comparability == "No spells" %>
-          The level of <<welfare_type>> {definitions.per_period} below which 99% of the population falls.
+          Level of <<welfare_type>> {definitions.per_period} below which 99% of the population falls.
           <% else %>
-          The level of income or consumption {definitions.per_period} below which 99% of the population falls.
+          Level of income or consumption {definitions.per_period} below which 99% of the population falls.
           <% endif %>
         description_key:
           - "{definitions.description_key_source_world_bank}"
@@ -2011,9 +2011,9 @@ tables:
         short_unit: $
         description_short: |-
           <% if survey_comparability == "No spells" %>
-          The mean <<welfare_type>> {definitions.per_period} within the richest 1% of the population.
+          Mean <<welfare_type>> {definitions.per_period} within the richest 1% of the population.
           <% else %>
-          The mean income or consumption {definitions.per_period} within the richest 1% of the population.
+          Mean income or consumption {definitions.per_period} within the richest 1% of the population.
           <% endif %>
         description_key:
           - "{definitions.description_key_source_world_bank}"

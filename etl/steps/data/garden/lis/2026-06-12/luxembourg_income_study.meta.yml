@@ -861,7 +861,7 @@ tables:
         short_unit: "$"
         description_short: |-
           {macros}
-          The mean income {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
+          Mean income {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
         description_key:
           - "{definitions.description_key_avg}"
           - "{definitions.description_key_lis}"
@@ -881,7 +881,7 @@ tables:
               Mean income {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> ({definitions.welfare_type})
             subtitle: |-
               {macros}
-              The mean income {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
+              Mean income {definitions.per_period} within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle} {definitions.subtitle_welfare_type}
             note: |-
               <% set poverty_line = "" %>
               {definitions.note_ppp_equivalence_scale}
@@ -906,7 +906,7 @@ tables:
         short_unit: "%"
         description_short: |-
           {macros}
-          The share of income received by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
+          Share of income received by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
         description_key:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_lis}"
@@ -925,7 +925,7 @@ tables:
               Income share of the <<percentiles_avg_share(decile) | lower>> ({definitions.welfare_type})
             subtitle: |-
               {macros}
-              The share of income received by the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.subtitle_welfare_type}
+              Share of income received by the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.subtitle_welfare_type}
             note: "{definitions.note_equivalence_scale}"
             hasMapTab: true
             tab: chart
@@ -946,7 +946,7 @@ tables:
         short_unit: "$"
         description_short: |-
           {macros}
-          The level of income {definitions.per_period} below which <<decile>>0% of the population falls.
+          Level of income {definitions.per_period} below which <<decile>>0% of the population falls.
         description_key:
           - "{definitions.description_key_thr}"
           - "{definitions.description_key_lis}"

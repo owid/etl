@@ -39,7 +39,7 @@ definitions:
       The estimated number of deaths<< per_capita >> in ongoing armed conflicts that year.
 
       <%- else -%>
-      The estimated number of deaths<< per_capita >> in ongoing << conflict_type >> conflicts that year.
+      Estimated number of deaths<< per_capita >> in ongoing << conflict_type >> conflicts that year.
 
       <%- endif -%>
     description_short_per_capita: |-

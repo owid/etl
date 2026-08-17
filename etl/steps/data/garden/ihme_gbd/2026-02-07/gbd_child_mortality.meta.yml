@@ -30,11 +30,11 @@ macros: |-
 
   <% macro description_short(metric, age, cause, sex, unit) %>
       <% if metric == "Number" %>
-          The estimated number of << unit >> from << cause >> among << sex >> aged << age >>.
+          Estimated number of << unit >> from << cause >> among << sex >> aged << age >>.
       <% elif metric == "Rate" %>
-          The estimated number of << unit >> from << cause >> among << sex >> aged << age >>, per 100,000 people.
+          Estimated number of << unit >> from << cause >> among << sex >> aged << age >>, per 100,000 people.
       <% elif metric == "Percent" %>
-          The estimated share of << unit >> from << cause >> among << sex >> aged << age >>.
+          Estimated share of << unit >> from << cause >> among << sex >> aged << age >>.
       <% endif %>
   <% endmacro %>
 

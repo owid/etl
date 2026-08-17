@@ -138,15 +138,15 @@ tables:
         description_short: |-
           <%- if age == '0' -%>
           <%- if sex == 'both' -%>
-          The << type >> life expectancy at birth, in a given year.
+          << type | capitalize >> life expectancy at birth, in a given year.
           <%- else -%>
-          The << type >> life expectancy at birth among << sex + 's' >>, in a given year.
+          << type | capitalize >> life expectancy at birth among << sex + 's' >>, in a given year.
           <%- endif -%>
           <%- else -%>
           <%- if sex == 'both' -%>
-          The remaining << type >> life expectancy at age << age >>, in a given year.
+          Remaining << type >> life expectancy at age << age >>, in a given year.
           <%- else -%>
-          The remaining << type >> life expectancy at age << age >> among << sex + 's' >>, in a given year.
+          Remaining << type >> life expectancy at age << age >> among << sex + 's' >>, in a given year.
           <%- endif -%>
           <%- endif -%>
         description_key:

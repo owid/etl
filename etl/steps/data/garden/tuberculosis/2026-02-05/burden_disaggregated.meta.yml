@@ -27,13 +27,13 @@ definitions:
       <%- endif -%>
     description_short_absolute: |-
       <% if risk_factor != "all" and age_group == "all" %>
-      The estimated incidence of tuberculosis cases attributed to {definitions.risk_factor} in {definitions.sex}.
+      Estimated incidence of tuberculosis cases attributed to {definitions.risk_factor} in {definitions.sex}.
       <% elif risk_factor != "all" and age_group != "all" %>
-      The estimated incidence of tuberculosis cases attributed to {definitions.risk_factor} in {definitions.sex} aged {definitions.age_group}.
+      Estimated incidence of tuberculosis cases attributed to {definitions.risk_factor} in {definitions.sex} aged {definitions.age_group}.
       <% elif risk_factor == "all" and age_group == "all" %>
-      The estimated incidence of tuberculosis cases in {definitions.sex}.
+      Estimated incidence of tuberculosis cases in {definitions.sex}.
       <% elif risk_factor == "all" and age_group != "all" %>
-      The estimated incidence of tuberculosis cases in {definitions.sex} aged {definitions.age_group}.
+      Estimated incidence of tuberculosis cases in {definitions.sex} aged {definitions.age_group}.
       <%- endif -%>
     presentation_title_rate: |-
       <% if risk_factor != "all" and age_group == "all" %>
@@ -51,9 +51,9 @@ definitions:
       <% elif risk_factor != "all" and age_group != "all" %>
       The estimated incidence rate of tuberculosis cases attributed to {definitions.risk_factor} in {definitions.sex} aged {definitions.age_group}, per 100,000 people.
       <% elif risk_factor == "all" and age_group == "all" %>
-      The estimated incidence rate of tuberculosis cases in {definitions.sex}, per 100,000 people.
+      Estimated incidence rate of tuberculosis cases in {definitions.sex}, per 100,000 people.
       <% elif risk_factor == "all" and age_group != "all" %>
-      The estimated incidence rate of tuberculosis cases in {definitions.sex} aged {definitions.age_group}, per 100,000 people.
+      Estimated incidence rate of tuberculosis cases in {definitions.sex} aged {definitions.age_group}, per 100,000 people.
       <%- endif -%>
 dataset:
   title: Global Tuberculosis Report - Disaggregated Burden Estimates

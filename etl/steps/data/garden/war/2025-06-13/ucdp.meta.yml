@@ -73,25 +73,25 @@ definitions:
     description_short: |-
       <% set per_capita = "" %>
       <%- if conflict_type == "all" -%>
-      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in interstate, intrastate, extrasystemic, non-state conflicts, and one-sided violence that were ongoing that year<< per_capita >>.
+      << estimate | capitalize >> estimate of the number of deaths of combatants and civilians due to fighting in interstate, intrastate, extrasystemic, non-state conflicts, and one-sided violence that were ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "state-based" -%>
-      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in interstate, intrastate, and extrasystemic conflicts that were ongoing that year<< per_capita >>.
+      << estimate | capitalize >> estimate of the number of deaths of combatants and civilians due to fighting in interstate, intrastate, and extrasystemic conflicts that were ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "intrastate (internationalized)" -%>
-      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
+      << estimate | capitalize >> estimate of the number of deaths of combatants and civilians due to fighting in internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "intrastate (non-internationalized)" -%>
-      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in non-internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
+      << estimate | capitalize >> estimate of the number of deaths of combatants and civilians due to fighting in non-internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "one-sided violence" -%>
-      The << estimate >> estimate of the number of deaths of civilians from one-sided violence that was ongoing that year<< per_capita >>.
+      << estimate | capitalize >> estimate of the number of deaths of civilians from one-sided violence that was ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "non-state conflict" -%>
-      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in non-state conflicts that were ongoing that year<< per_capita >>.
+      << estimate | capitalize >> estimate of the number of deaths of combatants and civilians due to fighting in non-state conflicts that were ongoing that year<< per_capita >>.
 
       <%- else -%>
-      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in << conflict_type >> conflicts that were ongoing that year<< per_capita >>.
+      << estimate | capitalize >> estimate of the number of deaths of combatants and civilians due to fighting in << conflict_type >> conflicts that were ongoing that year<< per_capita >>.
 
       <%- endif -%>
     description_short_per_capita: <% set per_capita = ", per 100,000 people" %> {definitions.number_deaths.description_short}
@@ -134,25 +134,25 @@ definitions:
     description_short: |-
       <% set per_capita = "" %>
       <%- if conflict_type == "all" -%>
-      The best estimate of the number of deaths of << people_type >> in interstate, intrastate, extrasystemic, non-state conflicts, and one-sided violence that were ongoing that year<< per_capita >>.
+      Best estimate of the number of deaths of << people_type >> in interstate, intrastate, extrasystemic, non-state conflicts, and one-sided violence that were ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "state-based" -%>
-      The best estimate of the number of deaths of << people_type >> in interstate, intrastate, and extrasystemic conflicts that were ongoing that year<< per_capita >>.
+      Best estimate of the number of deaths of << people_type >> in interstate, intrastate, and extrasystemic conflicts that were ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "intrastate (internationalized)" -%>
-      The best estimate of the number of deaths of << people_type >> in internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
+      Best estimate of the number of deaths of << people_type >> in internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "intrastate (non-internationalized)" -%>
-      The best estimate of the number of deaths of << people_type >> in non-internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
+      Best estimate of the number of deaths of << people_type >> in non-internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "one-sided violence" -%>
-      The << estimate | default('') >> estimate of the number of deaths of << people_type >> from one-sided violence that was ongoing that year<< per_capita >>.
+      << (estimate | default('')) | capitalize >> estimate of the number of deaths of << people_type >> from one-sided violence that was ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "non-state conflict" -%>
-      The best estimate of the number of deaths of << people_type >> in non-state conflicts that were ongoing that year<< per_capita >>.
+      Best estimate of the number of deaths of << people_type >> in non-state conflicts that were ongoing that year<< per_capita >>.
 
       <%- else -%>
-      The best estimate of the number of deaths of << people_type >> in << conflict_type >> conflicts that were ongoing that year<< per_capita >>.
+      Best estimate of the number of deaths of << people_type >> in << conflict_type >> conflicts that were ongoing that year<< per_capita >>.
 
       <%- endif -%>
     description_short_per_capita: <% set per_capita = ", per 100,000 people" %> {definitions.number_deaths_type.description_short}

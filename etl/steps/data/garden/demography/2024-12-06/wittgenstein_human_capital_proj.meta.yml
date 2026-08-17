@@ -312,9 +312,9 @@ tables:
         unit: "males per 100 females"
         description_short: |-
           <% if age == "total" %>
-          The number of male population per 100 female population. {definitions.others.projections}.
+          Number of male population per 100 female population. {definitions.others.projections}.
           <%- else %>
-          The number of male population per 100 female population (aged << age >>). {definitions.others.projections}.
+          Number of male population per 100 female population (aged << age >>). {definitions.others.projections}.
           <%- endif %>
         presentation:
           topic_tags:
@@ -335,7 +335,7 @@ tables:
           <% if sex == "total" %>
           The number of years a newborn is expected to live. {definitions.others.projections}.
           <%- else %>
-          The number of years a << sex >> newborn is expected to live. {definitions.others.projections}.
+          Number of years a << sex >> newborn is expected to live. {definitions.others.projections}.
           <% endif %>
         presentation:
           topic_tags:
@@ -349,7 +349,7 @@ tables:
           <% if sex == "total" %>
           The age of a person in a population when remaining life expectancy is 15 years. {definitions.others.projections}.
           <%- else %>
-          The age of a << sex >> person in a population when remaining life expectancy is 15 years. {definitions.others.projections}.
+          Age of a << sex >> person in a population when remaining life expectancy is 15 years. {definitions.others.projections}.
           <%- endif %>
         description_processing: |-
           Source: [Lutz et al. 2008](https://previous.iiasa.ac.at/web/home/research/researchPrograms/WorldPopulation/PublicationsMediaCoverage/POPNETNewsletter/popnet39.pdf#page=4)
@@ -424,9 +424,9 @@ tables:
         unit: "births per woman in last 5 years"
         description_short: |-
           <% if education == "total" %>
-          The average number of children born in the last 5-year period to the women of reproductive age (15-49).
+          Average number of children born in the last 5-year period to the women of reproductive age (15-49).
           <%- else %>
-          The average number of children born in the last 5-year period to the women of reproductive age (15-49). Data for people with education level "{definitions.others.education}". {definitions.others.projections}.
+          Average number of children born in the last 5-year period to the women of reproductive age (15-49). Data for people with education level "{definitions.others.education}". {definitions.others.projections}.
           <%- endif %>
         presentation:
           topic_tags:
@@ -438,7 +438,7 @@ tables:
         unit: "people"
         description_short: |-
           <% if education == "total" %>
-          The number of immigrants minus the number of emigrants over the last five-year period. {definitions.others.projections}.
+          Number of immigrants minus the number of emigrants over the last five-year period. {definitions.others.projections}.
           <%- else %>
           The number of immigrants minus the number of emigrants over the last five-year period. Data for migrants with education level "{definitions.others.education}". {definitions.others.projections}.
           <%- endif %>

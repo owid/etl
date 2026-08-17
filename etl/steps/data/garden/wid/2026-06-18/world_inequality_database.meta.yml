@@ -979,7 +979,7 @@ tables:
         short_unit: "$"
         description_short: |-
           {macros}
-          The level of {definitions.concept_welfare_type}{definitions.per_period} below which <<quantiles_thr_percentage(quantile)>>% of the population falls. {definitions.subtitle_welfare_type}
+          Level of {definitions.concept_welfare_type}{definitions.per_period} below which <<quantiles_thr_percentage(quantile)>>% of the population falls. {definitions.subtitle_welfare_type}
         description_key:
           - "{definitions.description_key_thr}"
           - "{definitions.description_key_source_wid}"
@@ -1000,7 +1000,7 @@ tables:
               {definitions.title_threshold}
             subtitle: |-
               {macros}
-              The level of {definitions.concept_welfare_type}{definitions.per_period} below which <<quantiles_thr_percentage(quantile)>>% of the population falls. {definitions.subtitle_ppp} {definitions.subtitle_welfare_type}
+              Level of {definitions.concept_welfare_type}{definitions.per_period} below which <<quantiles_thr_percentage(quantile)>>% of the population falls. {definitions.subtitle_ppp} {definitions.subtitle_welfare_type}
             note: "{definitions.note_ppp_before_tax}"
             hasMapTab: true
             tab: map

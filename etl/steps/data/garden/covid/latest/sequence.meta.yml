@@ -28,7 +28,7 @@ tables:
           <% elif variant == 'other' %>
           The number of analyzed sequences in the preceding two weeks that correspond to non-categorised variant groups. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
           <% else %>
-          The number of analyzed sequences in the preceding two weeks that correspond to variant group '<< variant >>'. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
+          Number of analyzed sequences in the preceding two weeks that correspond to variant group '<< variant >>'. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
           <%- endif -%>
         unit: "sequenced genomes"
         display:
@@ -50,7 +50,7 @@ tables:
           <% elif variant == 'other' %>
           The share of analyzed sequences in the preceding two weeks that correspond to non-categorised variant groups. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
           <% else %>
-          The share of analyzed sequences in the preceding two weeks that correspond to variant group '<< variant >>'. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
+          Share of analyzed sequences in the preceding two weeks that correspond to variant group '<< variant >>'. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
           <%- endif -%>
         unit: "%"
         short_unit: "%"

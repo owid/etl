@@ -277,11 +277,11 @@ tables:
           <%- endif %>
         description_short: |-
           <% if age == 'all' %>
-          The [total fertility rate](#dod:fertility-rate): the average number of children a woman would have if she experienced the year's age-specific birth rates throughout her childbearing years. {definitions.global.dimensions.description_short}
+          [Total fertility rate](#dod:fertility-rate): the average number of children a woman would have if she experienced the year's age-specific birth rates throughout her childbearing years. {definitions.global.dimensions.description_short}
           <%- elif age in ('10-14', '15-19') %>
-          The [age-specific fertility rate](#dod:age-specific-fertility-rate) for girls aged << age|replace('-', ' to ') >>: the annual number of live births in this age group per 1,000 girls.
+          [Age-specific fertility rate](#dod:age-specific-fertility-rate) for girls aged << age|replace('-', ' to ') >>: the annual number of live births in this age group per 1,000 girls.
           <%- else %>
-          The [age-specific fertility rate](#dod:age-specific-fertility-rate) for women aged << age|replace('-', ' to ') >>: the annual number of live births in this age group per 1,000 women.
+          [Age-specific fertility rate](#dod:age-specific-fertility-rate) for women aged << age|replace('-', ' to ') >>: the annual number of live births in this age group per 1,000 women.
           <%- endif %>
         description_key:
           - |-
@@ -315,11 +315,11 @@ tables:
               <% if age == 'all' %>
               The [total fertility rate](#dod:fertility-rate) summarizes the total number of births a woman would have if she experienced the birth rates seen in women of each age group in one particular year across her childbearing years.
               <%- elif age == '10-14' %>
-              The [age-specific fertility rate](#dod:age-specific-fertility-rate) for girls aged << age|replace('-', ' to ') >>, measured as the number of live births per 1,000 girls in this age group.
+              [Age-specific fertility rate](#dod:age-specific-fertility-rate) for girls aged << age|replace('-', ' to ') >>, measured as the number of live births per 1,000 girls in this age group.
               <%- elif age == '15-19' %>
               The [age-specific fertility rate](#dod:age-specific-fertility-rate) for adolescent girls aged 15 to 19, measured as the number of live births per 1,000 girls in this age group.
               <%- else %>
-              The [age-specific fertility rate](#dod:age-specific-fertility-rate) for women aged << age|replace('-', ' to ') >>, measured as the number of live births per 1,000 women in this age group.
+              [Age-specific fertility rate](#dod:age-specific-fertility-rate) for women aged << age|replace('-', ' to ') >>, measured as the number of live births per 1,000 women in this age group.
               <%- endif %> {definitions.global.projections}
             # note: |-
             #   <% if age == 'all' %>
@@ -573,11 +573,11 @@ tables:
         unit: "males per 100 females"
         description_short: |-
           <% if age == '0' %>
-          The number of male births per 100 female births.
+          Number of male births per 100 female births.
           <%- elif age == 'all' %>
-          The number of males per 100 females in the population.
+          Number of males per 100 females in the population.
           <%- else %>
-          The number of males per 100 females at age << age >>.
+          Number of males per 100 females at age << age >>.
           <%- endif %> {definitions.global.projections}
         description_key:
           - |-
@@ -647,7 +647,7 @@ tables:
         unit: "%"
         description_short: |-
           <%- if age == "total" -%>
-          The number of children (under 15) and people aged 65 and over per 100 working-age people (aged 15 to 64).
+          Number of children (under 15) and people aged 65 and over per 100 working-age people (aged 15 to 64).
           <%- elif age == "youth" -%>
           The number of children under 15 per 100 working-age people (aged 15 to 64).
           <%- else -%>
@@ -713,9 +713,9 @@ tables:
           <%- endif %>
         description_short: |-
           <% if age == '0' %>
-          The share of newborns who die before reaching the age of one.
+          Share of newborns who die before reaching the age of one.
           <%- else %>
-          The share of children who die before reaching the age of 5.
+          Share of children who die before reaching the age of 5.
           <%- endif %> {definitions.global.projections}
         description_key:
           - |-
