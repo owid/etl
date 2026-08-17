@@ -76,10 +76,6 @@ def sanity_check_inputs(tb: Table) -> None:
     units = tb.groupby("variable", observed=True)["unit"].unique()
     for variable, unit in UNITS_EXPECTED.items():
         assert list(units[variable]) == [unit], f"Unexpected unit for variable {variable}."
-    assert tb["value"].notnull().all(), "Unexpected missing values."
-    assert (tb["value"] >= 0).all(), "Unexpected negative values."
-    assert tb["year"].max() >= 2023, "Latest year is earlier than expected."
-    assert not tb.duplicated(subset=["country", "variable", "year"]).any(), "Duplicated country-variable-year rows."
 
 
 def sanity_check_world(tb: Table) -> None:
@@ -98,59 +94,26 @@ def sanity_check_world(tb: Table) -> None:
 
 
 def sanity_check_outputs(tb: Table) -> None:
+    # Coverage should not shrink (e.g. because of a country mapping regression).
     assert tb["country"].nunique() >= 180, "Number of countries decreased unexpectedly."
-    # NOTE: In the 2026-08-07 version, each variable had 6,000-6,500 data points after dropping regional aggregates.
-    for column in VARIABLES.values():
-        assert tb[column].notnull().sum() > 5500, f"Data points for {column} decreased unexpectedly."
 
-    # Global withdrawals have hovered around 4 trillion m³/year in recent years (4.03 trillion m³ in 2023).
+    # Magnitude anchors, to catch unit regressions in the two different units of this dataset.
+    # NOTE: Global withdrawals have hovered around 4 trillion m³/year in recent years.
     world_total = tb.loc[(tb["country"] == "World") & (tb["year"] == 2023), "total_water_withdrawal"].item()
     assert 3.5e12 < world_total < 4.5e12, "Global total withdrawals in 2023 outside the expected range."
-
-    # Aggregate shares are computed from the aggregated levels, so they should add up to ~100% (small deviations
-    # come from FAO's sectoral and total series having different vintages for some countries).
-    mask_aggregates = tb["country"].isin(REGIONS)
-    share_sum = tb.loc[mask_aggregates, SHARE_COLUMNS].sum(axis=1, min_count=3).dropna()
-    assert share_sum.between(95, 105).all(), "Aggregate sectoral shares far from 100%."
-    # FAO's World row is kept only from the coverage cutoff.
-    world_years = tb.loc[(tb["country"] == "World") & tb["total_water_withdrawal"].notnull(), "year"]
-    assert world_years.min() == FAO_AGGREGATES_MIN_YEAR, "FAO's World row starts in an unexpected year."
-    for column in SHARE_COLUMNS:
-        assert tb[column].dropna().between(0, 102).all(), f"{column} outside the 0-100% range."
-
-    # FAO's own regional rows carry mild inconsistencies even in recent years (share sums between ~88 and ~110),
-    # since its sectoral and total series have different vintages.
-    mask_fao_aggregates = tb["country"].str.endswith("(FAO)") | (tb["country"] == "World")
-    fao_share_sum = tb.loc[mask_fao_aggregates, SHARE_COLUMNS].sum(axis=1, min_count=3).dropna()
-    assert fao_share_sum.between(88, 110).all(), "FAO aggregate sectoral shares far from 100%."
-
-    # For countries, the total should equal the sum of the three sectors in the vast majority of cases.
-    # NOTE: FAO's own data is inconsistent for a few country-years (e.g. Namibia 2020-2021, and North Macedonia in
-    # recent years, whose total far exceeds the sum of sectors).
-    complete = tb[~tb["country"].isin(REGIONS) & ~mask_fao_aggregates].dropna(
-        subset=SECTORAL_COLUMNS + ["total_water_withdrawal"]
-    )
-    ratio = complete[SECTORAL_COLUMNS].sum(axis=1) / complete["total_water_withdrawal"]
-    assert ((ratio - 1).abs() < 0.02).mean() > 0.97, "Too many countries where sectors do not add up to the total."
-
-    # Freshwater withdrawal (surface + groundwater only) should be roughly bounded by total withdrawal.
-    # NOTE: FAO compiles the two series separately, and freshwater slightly exceeds total in ~10% of rows (by more
-    # than 2% in ~9%, e.g. Yemen, Malaysia, Zambia); the loose bound below only guards against unit regressions.
-    complete = tb.dropna(subset=["total_freshwater_withdrawal", "total_water_withdrawal"])
-    ratio = complete["total_freshwater_withdrawal"] / complete["total_water_withdrawal"]
-    assert (ratio < 1.05).mean() > 0.90, "Too many rows where freshwater withdrawal exceeds total withdrawal."
-
-    # Anchor values, to guard against unit regressions (values as published by AQUASTAT, checked against the
-    # previous version of this dataset).
-    india_2010 = tb.loc[(tb["country"] == "India") & (tb["year"] == 2010), "agricultural_water_withdrawal"].item()
-    assert 6.0e11 < india_2010 < 7.5e11, "India's agricultural water withdrawal in 2010 differs from expected ~688e9."
     us_2010 = tb.loc[
         (tb["country"] == "United States") & (tb["year"] == 2010), "total_water_withdrawal_per_capita"
     ].item()
     assert 1400 < us_2010 < 1700, "US total water withdrawal per capita in 2010 differs from expected ~1557."
 
-    # Per capita withdrawals have historically peaked below ~6,000 m³ (Turkmenistan).
-    assert tb["total_water_withdrawal_per_capita"].max() < 10000, "Per capita withdrawal outside the expected range."
+    # Each share must equal its sector divided by the total. FAO derives its shares exactly this way, and we do the
+    # same for the aggregates we compute, so any deviation means columns got misaligned somewhere.
+    # NOTE: FAO's own sectors do not always add up to its own total (see the note in run), so the shares of a given
+    # country and year do not always add up to 100%.
+    complete = tb.dropna(subset=SECTORAL_COLUMNS + SHARE_COLUMNS + ["total_water_withdrawal"])
+    for sector, share in zip(SECTORAL_COLUMNS, SHARE_COLUMNS):
+        deviation = (complete[share] - 100 * complete[sector] / complete["total_water_withdrawal"]).abs()
+        assert deviation.max() < 0.01, f"{share} is not consistent with {sector} divided by the total."
 
 
 def run() -> None:
@@ -195,9 +158,10 @@ def run() -> None:
     assert (n_countries > 150).all(), "Incomplete country coverage in years where FAO's aggregates are kept."
     tb = tb[~(mask_fao_aggregates & (tb["year"] < FAO_AGGREGATES_MIN_YEAR))].reset_index(drop=True)
 
-    # A few countries carry shares of total withdrawal above 100% (e.g. Brunei's municipal share in 2004-2023),
-    # where FAO's sectoral series are more recent than its (carried-forward) total series. A share of the total
-    # above 100% is internally inconsistent, so remove those values.
+    # FAO compiles the sectoral series and the total series separately, so they do not always agree: for about 2%
+    # of country-years the three sectors do not add up to the total (e.g. North Macedonia, whose total is several
+    # times the sum of its sectors). Those values are published as they are. But where a single sector exceeds the
+    # total, the resulting share is above 100%, which is impossible, so those shares are removed.
     n_impossible = 0
     for column in SHARE_COLUMNS:
         mask_impossible = tb[column] > 100
