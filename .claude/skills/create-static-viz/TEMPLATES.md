@@ -169,6 +169,26 @@ header bottoms out at 82.47 however short the title gets. And the footer's rows 
 frame's bottom margin, so a Note gaining a line does not push the source row down — it eats the
 chart's height instead.
 
+### A one-line title leaves a gap the templates were never exercised for
+
+That first point has a visible consequence, not just an arithmetic one. Because the title row hugs the
+taller of the title and the logo, and both are top-aligned, the logo's surplus height lands *between
+the title and the subtitle*: 12.25 px on the 850-wide pair, on top of the 6 px auto-layout gap. Every
+finished page in the Charts file shows **6 px** there — they all have two-line titles, taller than the
+logo — so a one-line title is the only case that looks wrong, and it looks wrong by a factor of three.
+
+The fix is in Figma, not in the step: set the logo to `layoutPositioning = "ABSOLUTE"` in the title
+row, which keeps it exactly where it is and stops it padding the block. Then set the step's `logo_px`
+to 0 for that frame so the derived band follows the header up.
+
+**Check one thing before doing it, per frame.** With the header raised, the subtitle's first line now
+runs at the logo's height, and the subtitle slot is full-width in every template. So it is safe only
+where that line's ink stops short of the logo's left edge — on the 850-wide frame it ended at x=588
+against a logo at 770, comfortably clear; on the 540-wide one it reached x=493 against a logo at 476,
+so the logo has to stay in the flow and that frame keeps the wider gap. Measure the first line rather
+than eyeballing it (the recipe below), and expect the answer to differ between the two frames of the
+same chart.
+
 Calibrate any implementation against both ends: the templates' own two-line/two-line case must
 reproduce **118.22**, and a one-line/one-line clone **82.47**.
 

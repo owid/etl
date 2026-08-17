@@ -457,6 +457,27 @@ The chart spans the full content width, left-aligned with the title/subtitle/log
 > chart.width` solves against the overhang instead of the frame. Once they are gone the bbox *is* the
 > canvas, and one rescale lands the height on the template's to `delta 0` — the assertion worth keeping.
 
+### Bind what has a style; name what doesn't
+
+The palette lives in the **Chart colors** library, and the design team's own pages bind chart *marks*
+to it (`OWID Distinct/*`, `Chart/*`) while leaving in-chart text on raw fills. Import a style by key
+and assign it — `node.fillStyleId = (await figma.importStyleByKeyAsync(key)).id` — after which the
+frame follows the library instead of a hex someone typed. To learn the keys, read them off a page that
+already uses them (`Plugin / Bar charts` and `Plugin / Line charts` enumerate most of the palette).
+
+Two things this exercise is good for beyond tidiness:
+
+- **The house styles for text are `Text/Gray 100` (#2d2e2d) and `Text/Gray 80` (#5b5b5b)** — the same
+  two the templates bind their title and subtitle to. Any other grey in a chart is ad-hoc: an
+  imported step's `#333333` header and `#444444` in-bar labels are just matplotlib defaults nobody
+  chose.
+- **A colour with no style is a finding, not a leftover.** Binding by exact match tells you which of
+  a chart's colours are actually house colours. On one chart three of four categories landed exactly
+  on palette entries and the fourth did not — it had come from seaborn's grey rather than the palette,
+  which is a question for design, not something to bind to the nearest neighbour. Report the
+  unmatched colours with counts, and say which are *derived* (tints of a bound base, legibility
+  variants) versus genuinely off-palette.
+
 ### Restyling a local-SVG import to OWID's fonts and colors
 
 An `export://static_viz` step deliberately does **not** set them: the machine building it may have
