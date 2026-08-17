@@ -252,11 +252,18 @@ LAYOUTS = {
         # a time as the slots wrap, and recording one case as a constant left dead space above the
         # plot whenever a slot came in shorter than it.
         "template_text": {
-            # Header: a title row hugging whichever is taller, the title or the logo beside it, then
-            # a 6px auto-layout gap, then the subtitle. `origin_y` is where the row starts — the
-            # header block's own top padding here, and the block's y on mobile.
+            # Header: a title row, a 6px auto-layout gap, then the subtitle. `origin_y` is where the
+            # row starts — the header block's own top padding here, and the block's y on mobile.
+            #
+            # `logo_px` is the height the logo beside the title forces on that row, since the row
+            # hugs whichever of the two is taller. It is 0 here because the frame takes the logo out
+            # of the auto-layout instead: with a one-line title the logo would otherwise set the row's
+            # height and drop the subtitle 12px, where every other page in the Charts file — all of
+            # them two-line titles, taller than the logo — shows a 6px gap. That is safe on this frame
+            # because the subtitle's first line ends at x=588 and the logo starts at 770; on mobile it
+            # is not, which is why mobile keeps the logo in the flow.
             "origin_y": 16.216,
-            "logo_px": 41.26,
+            "logo_px": 0,
             "title_slot_px": 737.84,
             "title_px": 25,
             "header_gap_px": 6,
@@ -295,8 +302,11 @@ LAYOUTS = {
         "size": (540, 824),
         "margin": 16,
         "template_text": {
-            # Mobile's header block carries no padding of its own and its logo is shorter, so its
-            # title row hugs a one-line title less tightly than the 850-wide pair's does.
+            # Mobile's header block carries no padding of its own and its logo is shorter. The logo
+            # stays in the flow here — unlike the 850-wide frame — because this subtitle runs the full
+            # 508px and its first line reaches x=493 against a logo starting at 476, so a header that
+            # came up past the logo would print the subtitle under it. The cost is a 12px title-to-
+            # subtitle gap where desktop gets 6.
             "origin_y": 16,
             "logo_px": 35.23,
             "title_slot_px": 428,
