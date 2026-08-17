@@ -1921,6 +1921,70 @@ class Anomaly(Base):
             self.dfReduced = new_df
 
 
+class Inspection(Base):
+    """Findings from the content inspector (typos and semantic issues in public-facing text).
+
+    Like ``anomalies``, this table is created dynamically on staging servers via
+    ``Inspection.create_table(engine, if_exists="skip")`` — it does not exist in production and
+    needs no owid-grapher migration. Findings are deduplicated by ``fingerprint``: re-running the
+    inspector updates ``lastSeenAt`` on known findings instead of inserting duplicates, and
+    dismissed findings stay dismissed while the inspected text (``contentHash``) is unchanged.
+    """
+
+    __tablename__ = "inspections"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
+    # hash(origin, field, category, normalized context) — the dedup key across runs.
+    fingerprint: Mapped[str] = mapped_column(VARCHAR(64), unique=True)
+    # chart | multidim | explorer | post
+    contentType: Mapped[str] = mapped_column(VARCHAR(32))
+    slug: Mapped[str] = mapped_column(VARCHAR(255))
+    # Field name within the content object, e.g. "title", "descriptionKey[2]".
+    field: Mapped[str] = mapped_column(VARCHAR(255), default="")
+    # Stable id of the text's source, e.g. "variable:123", "chart:456", "multidim:energy/view:gas".
+    originId: Mapped[str] = mapped_column(VARCHAR(511), default="")
+    # typo | grammar | semantic-mismatch | unit-mismatch | nonsense-combination | stale-text |
+    # formatting-artifact | style
+    category: Mapped[str] = mapped_column(VARCHAR(64), default="")
+    # high | medium | low
+    severity: Mapped[str] = mapped_column(VARCHAR(16), default="medium")
+    # lint | agent
+    source: Mapped[str] = mapped_column(VARCHAR(16), default="agent")
+    context: Mapped[str | None] = mapped_column(TEXT, default=None)
+    explanation: Mapped[str | None] = mapped_column(TEXT, default=None)
+    suggestedFix: Mapped[str | None] = mapped_column(TEXT, default=None)
+    # View URLs affected by this finding (when it originates in shared text used by many views).
+    affectedViews: Mapped[list | None] = mapped_column(JSON, default=None)
+    url: Mapped[str | None] = mapped_column(VARCHAR(1023), default=None)
+    # Where an editor fixes it: ETL catalogPath, admin URL, or gdoc edit link.
+    fixLocation: Mapped[str | None] = mapped_column(VARCHAR(1023), default=None)
+    # Hash of the inspected content at detection time; a dismissal expires when this changes.
+    contentHash: Mapped[str | None] = mapped_column(VARCHAR(64), default=None)
+    # open | dismissed | fixed | stale
+    status: Mapped[str] = mapped_column(VARCHAR(16), default="open")
+    dismissedBy: Mapped[str | None] = mapped_column(VARCHAR(255), default=None)
+    dismissReason: Mapped[str | None] = mapped_column(TEXT, default=None)
+    lastSeenAt: Mapped[datetime | None] = mapped_column(DateTime, default=None)
+
+    @classmethod
+    def load_inspections(cls, session: Session, status: str | None = None) -> list["Inspection"]:
+        try:
+            query = select(cls)
+            if status:
+                query = query.where(cls.status == status)
+            return list(session.scalars(query).all())
+        except ProgrammingError as e:
+            # inspections table does not exist yet (error code 1146); it gets created dynamically
+            # when the first findings are stored.
+            if "1146" in str(e):
+                return []
+            raise
+
+
 class Explorer(Base):
     __tablename__ = "explorers"
 
