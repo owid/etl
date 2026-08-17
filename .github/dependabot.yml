@@ -25,6 +25,11 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    # Don't adopt a release the moment it appears: if an action's publishing
+    # account is compromised, the malicious version is usually yanked within
+    # days. Long enough to matter, short enough that pins still move.
+    cooldown:
+      default-days: 7
     groups:
       github-actions:
         patterns:
