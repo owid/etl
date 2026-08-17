@@ -6,7 +6,8 @@ re-deriving it through Figma MCP calls every time.
 - **File:** `Charts (2026)`, file key `s6Sv60bakebRRW2TxsMQbF`
 - **Page:** `📑 Templates`, node `798:54`
 - **Re-verify with:** `get_metadata` on `798:54` for positions, `get_screenshot` on a frame for colors
-- **Last verified:** 2026-08-14
+- **Last verified:** 2026-08-17 (Vertical and Mobile example 2 measured in full, including the
+  header/footer auto-layout structure, every slot's line height and face, and the frame fill)
 
 The design team edits these frames in place, and edits that move a chart area's edge have landed days
 apart. **Re-verify the geometry at the start of every refresh** rather than trusting this file: a step
@@ -136,39 +137,62 @@ caveat whether it is about a *visual artifact* (safe to drop when the artifact i
 mobile size) or about *what the chart claims* (must move into the subtitle instead). See the
 `Note:` guidance in `SKILL.md`.
 
-## Two positions that are derived, not arbitrary
+## Every position in the table above is one text length away from being wrong
 
-- **`subtitle_y = 80` assumes a two-line title.** It is `16 + 2 × 29`, where 29 px is one line at
-  the template's title size. Pin a one-line title to y=16 and leave the subtitle at 80 and you
-  get a dead line of whitespace. Derive `subtitle_y` from the title's actual line count, and
-  calibrate so the two-line case reproduces 80 exactly.
-- **The title slot is two lines tall** in every template. A title that wraps to one line
-  under-fills it; one that wraps to three overflows into the subtitle.
-- **The `Note:` slot is two lines tall too, and the chart band's bottom edge is the footer block's `y`** —
-  so a one-line note moves the band. Derive both from the actual slot positions rather than from the
-  table above. (What that implies for *editing* a clone in Figma is `/create-figma-chart`'s Step 6, not
-  this file's business.)
-- **A header block's height is derived from its two text slots, so it moves whenever either reflows** —
-  a slot gaining a line grows the block without anything being repositioned. Read
-  `header.y + header.height` back after setting text rather than trusting a recorded band.
+**The table records the templates as shipped — two-line title, two-line subtitle, two-line Note — and
+almost no real chart has all three.** Header and footer are auto-layout blocks: the header grows
+*down* from the title, the footer grows *up* from the frame's bottom margin, so a slot that comes in
+shorter than the placeholder moves every edge below (or above) it, including the chart band's. A step
+that hard-codes any of these numbers is right for one string length and silently wrong for the rest —
+this is what leaves a line of dead space above a plot, and it survives every contract check.
 
-## Lay the plot inside the template's band, not inside your own text's leftovers
+So derive them, from this rhythm:
 
-A step draws its own copies of the title, subtitle and footer so its PNG stands alone, and it draws them
-smaller than the template does. So a band derived from the step's own text metrics is too generous: the
-plot's ink sits flush under the step's subtitle, and once the frame carries the template's larger text
-the clearance falls below the 12–16 px the design asks for. Take the band from this file and inset it:
-
-```python
-band_top, band_bottom = layout["band"]                                  # the template's own text edges
-chart_top_px = max(subtitle_bottom_px, band_top + BAND_INSET) + header_px
-chart_bottom_px = min(layout["chart_bottom_y"], band_bottom - BAND_INSET) - below_px
+```
+title_row   = max(title_lines × 29, logo_px) + row_pad_px     # the row hugs the taller of the two
+subtitle_y  = origin_y + title_row + 6                        # 6 px auto-layout gap
+band_top    = subtitle_y + subtitle_lines × 19                # the subtitle's ink bottom
+band_bottom = note_ink_bottom − note_lines × 14               # the Note's ink top, growing upward
 ```
 
-**Both band values must be ink edges, not frame edges.** The footer *frame* starts 14 px above its
-`Note:` ink, so insetting from the frame's `y` insets twice and leaves a visibly loose bottom (28 px
-against a 14 px target). For the Vertical template that means `(118, 1015.81)` — the subtitle's ink
-bottom and the note's ink top — not `(118, 1001.8)`.
+| | 850-wide pair | Mobile (both) |
+|---|---|---|
+| `origin_y` (block top / its own top padding) | 16.22 | 16 |
+| `logo_px` (the logo's row, not the logo) | 41.26 | 35.23 |
+| `row_pad_px` (title row's top padding) | 16.22 | 0 |
+| `note_ink_bottom` | 1043.81 (Vertical) | — (no Note row) |
+| footer row spacing / block top padding | 4 / 16 | 4 / 0 |
+
+**Two things here are counter-intuitive and both cost a round to find.** A one-line title does *not*
+shrink the header by a line: below `logo_px` the **logo** sets the row's height, so the 850-wide
+header bottoms out at 82.47 however short the title gets. And the footer's rows are pinned to the
+frame's bottom margin, so a Note gaining a line does not push the source row down — it eats the
+chart's height instead.
+
+Calibrate any implementation against both ends: the templates' own two-line/two-line case must
+reproduce **118.22**, and a one-line/one-line clone **82.47**.
+
+## Lay the plot inside the template's band, and draw the slots at the template's own sizes
+
+The band is the room between the subtitle's ink and the footer's, inset at each end (the design asks
+for 12–16 px; 14 is the middle):
+
+```python
+band_top, band_bottom = ...            # derived, per the rhythm above
+chart_top_px = band_top + BAND_INSET + header_px
+chart_bottom_px = band_bottom - BAND_INSET - below_px
+```
+
+**Both edges are ink, not frame.** The footer *frame* starts 16 px above its `Note:` ink, so insetting
+from the frame's `y` insets twice and leaves a visibly loose bottom.
+
+**Draw the step's own copies of these slots at the sizes in the table, not at sizes that merely look
+right.** It is tempting to set the step's title and subtitle a size or two smaller — nothing in the
+frame uses them, since the import drops them. But then the render's spacing is *not* the frame's: the
+band is correct for the frame while the step's smaller subtitle ends 20 px higher, so the PNG shows a
+hole that the frame does not have. Whoever reviews the PNG reports it as a bug, correctly. Matching
+the sizes, line heights and slot positions costs nothing and makes the render a preview rather than a
+proportion sketch — which is most of what the render is for.
 
 ## Align to the content box on both sides
 
@@ -196,6 +220,42 @@ Both of these produced defects that survived a full visual check and were caught
   name before it, a separator inherits that name's fill — so it changes colour down the list and all
   but disappears after a pale tint. It is punctuation, not data.
 
+## Predicting the template's line breaks from a step that has neither font
+
+A step decides its layout from strings it measures in its own font, and the template sets those same
+strings in Playfair Display and Lato. So every line count it predicts is an estimate, and the error
+does not point one way:
+
+| At the same pixel size | vs. a step measuring in Arial/DejaVu |
+|---|---|
+| Lato, 11 px | **2.4 % narrower** |
+| Lato, 16 px | 0.8 % narrower |
+| Playfair Display SemiBold, 25 px | **3.2 % wider** |
+
+**Do not "wrap a bit early to be safe".** It reads as prudent and it is not: the footer rows are sized
+so the template just fits them, so wrapping 6 % early broke both onto second lines the frame does not
+have — a render that looks broken while the frame is fine. Give a Lato slot the few percent it actually
+has, take the same few percent off a serif slot, and keep the two directions as separate named
+constants so neither gets applied backwards.
+
+**Measure, don't assume — the templates are in Figma and so are the fonts.** One `use_figma` call
+settles both the width and the line count for a string:
+
+```js
+const node = figma.createText();                    // inside a temp frame you remove afterwards
+node.fontName = { family: "Lato", style: "Regular" };
+node.fontSize = 16;
+node.characters = subtitle;
+node.textAutoResize = "WIDTH_AND_HEIGHT";
+const naturalWidth = node.width;                    // what the string wants
+node.textAutoResize = "HEIGHT";
+node.resize(slotWidth, node.height);
+const lines = node.height / lineHeight;             // what the slot gives it
+```
+
+That is how the three ratios above were measured, and how the Note was confirmed to take **three**
+lines at 12 px where a step's smaller footer took two.
+
 ## Unit conversions
 
 - A template pixel is **0.72 pt** (100 template px per inch ÷ 72 pt per inch).
@@ -218,10 +278,28 @@ against the template it targets.
 
 | Element | Color |
 |---|---|
-| Frame background | `#fbf9f3` (warm off-white, **not** pure white) |
+| Frame background | `#fffbf5` (warm off-white, **not** pure white) |
 | Title ink | `#2d2e2d` (serif) |
 | Subtitle | `#5b5b5b` |
-| All footer rows | `#858585`, with bold labels on `Note:`, `Data source:`, `OurWorldinData.org`, `CC-BY` |
+| All footer rows | `#858585` |
+
+## Weights, which are not "regular and bold"
+
+| Slot | Face |
+|---|---|
+| Title | Playfair Display SemiBold |
+| Subtitle | Lato Regular |
+| Footer rows | **Lato Medium**, with Lato Bold on the labels |
+
+The footer's body is Medium, not Regular — swapping it for Regular is a visible flattening of the
+whole block. Bold marks `Note:`, `Data source:`, `OurWorldinData.org`, `CC-BY` **and the author's
+name**: the license row's placeholder reads `Licensed under `(Medium)` CC-BY `(Bold)` by the author `
+(Medium)` [Name of author]`(Bold), so bolding a real name is the template's own convention rather than
+a request to argue with.
+
+A step cannot reproduce this — matplotlib has no rich text, so a mixed-weight row is several text
+objects, and its font may have no Medium at all. Emit the row as runs (`SKILL.md`) and set the faces
+in Figma.
 
 ## Exact strings the templates use
 

@@ -485,6 +485,68 @@ matplotlib's fallback stack and seaborn's palette, and needs an explicit pass:
   section. Keep the pass as one script you re-run, because a frame that has quietly reverted to
   matplotlib's type looks finished.
 
+#### Changing a font moves every label. Put them back.
+
+This is the single most consequential thing on this page, because it is invisible in the script's
+output and unmistakable to the person looking at the frame. A text node's box does not re-centre
+itself when you change its face: the glyphs re-measure, the box grows or shrinks from its left edge,
+and **the label drifts by half of whatever its width changed** — 10 to 24 px per label on a real
+restyle, which is enough to walk a name clean out of the bracket it names.
+
+So bracket the font pass with an anchor pass, on the node's *own* alignment:
+
+```js
+const before = texts.map((t) => {                  // BEFORE touching any face
+  const b = t.absoluteBoundingBox;
+  return { t, align: t.textAlignHorizontal, left: b.x, right: b.x + b.width, center: b.x + b.width / 2 };
+});
+// ... set faces ...
+for (const r of before) {                          // AFTER
+  const b = r.t.absoluteBoundingBox;
+  const target = r.align === "CENTER" ? r.center - b.width / 2
+               : r.align === "RIGHT"  ? r.right - b.width
+               :                        r.left;
+  r.t.x += target - b.x;
+}
+```
+
+Two notes that make this work in practice. The import **does** preserve `text-anchor` as
+`textAlignHorizontal`, so the node itself tells you which edge to hold — no name-based guessing. And
+report the count of nodes you moved: on the pair of frames here it was 174 and 145, which is the
+difference between "the restyle worked" and "the restyle worked and nothing moved".
+
+#### A line built from several runs needs re-flowing, not just re-anchoring
+
+Where a line is several independent text nodes — a legend of coloured names, a mixed-weight footer row —
+holding each run's own anchor still leaves the *gaps* between them wrong, because a narrower face has
+to leave its slack somewhere. Lay the line out again instead: group the runs by y, sort by x, and place
+each one a measured space after the last.
+
+```js
+probe.characters = "nn"; const tight = probe.width;      // measure the space in the new face,
+probe.characters = "n n"; const space = probe.width - tight;   // rather than assuming an em fraction
+```
+
+On the run here that took the separator gaps from 4.6-before/1.2-after to exactly 3 and 3.
+
+#### Re-importing a corrected SVG: dump the styling first
+
+When the step's geometry changes, the chart group has to be replaced and every colour and face on it
+is lost. Don't reconstruct them from the step or from memory of the palette — **read them off the frame
+you are about to replace**, keyed by node name (`japan__sleep` → fill, one row is enough since a column
+shares its colour), then replay that map onto the fresh import. The rest of the recipe:
+
+1. Rescale the import — it arrives as a FRAME sized to the SVG's canvas (0.96× the template), so the
+   factor is exact and does not depend on the ink's bbox. Do this *before* deleting anything.
+2. Delete the step's own copies of the template's text slots — **by prefix, not by exact name**. A slot
+   the step had to emit as runs is `license-0 … license-5`, and an exact-name match silently leaves all
+   six behind to print over the template's own row.
+3. Paint, set faces, restore anchors, re-flow multi-run lines.
+4. Append into the target frame at (0,0) with `clipsContent = false`, then remove the old group.
+
+Keep it as one script per frame: the pass is run more than once, always after a step change, and the
+only thing that varies is which frame.
+
 **Measure that band; don't hardcode it.** The header's height depends on how many lines the title and subtitle take, so a fixed y is wrong as soon as the subtitle wraps — and centering inside a guessed band leaves a lopsided result (18px above, 6px below on the first run of this skill). Read the real edges instead:
 
 ```js

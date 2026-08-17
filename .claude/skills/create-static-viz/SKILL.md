@@ -485,6 +485,37 @@ Four decisions, each settled by measuring rather than by taste:
   alternative is a one-line change at review, and make the sort **stable** so tied rows hold their order
   instead of churning the output between runs.
 
+### Anchor and baseline every label the way it has to survive Figma
+
+A step's labels are placed once, in matplotlib, and then re-rendered a second time in Figma in a
+different font. Three habits decide whether they survive that, and none of them shows up in the
+step's own render:
+
+- **Anchor a label where it must stay, never where it happens to start.** `text-anchor: middle` and
+  `end` survive the re-render; a left-anchored run does not — its box keeps its x while the glyphs
+  shrink, so the label creeps out of the thing it labels and the gaps after it grow. Centre what is
+  centred (a value in its segment, a name over its bracket), right-anchor what lines up on an edge.
+  The step draws them in the same place either way, so this costs nothing at the time and is
+  invisible until someone re-renders.
+- **A run's trailing space belongs to the layout, not to its glyphs.** Advance the cursor by the full
+  advance, but centre and draw the *stripped* text: SVG (and Figma) centre the trimmed ink, so a run
+  centred with its space lands half a space off — which is how a separator dot ends up hugging the
+  name after it. (And a run may never *begin* with a space; see TEMPLATES.md.)
+- **Put a row's text on an explicit baseline, not on `va="center"`.** Centring uses the font's whole
+  line box, which reserves room for descenders that digits never use, so a value sits about a tenth
+  of a bar high — small enough to survive review and plainly visible once someone looks for it. Place
+  the baseline half a cap-height below the row's centre (`TextPath((0,0), "0").get_extents().ymax`),
+  which also puts labels with and without descenders on one line.
+
+### Size a value column from its content, not from a round number
+
+A column of numbers beside the bars is separated from them by exactly the slack in its width, so a
+column sized generously reads as the numbers drifting away from the chart. Derive it: widest label
+plus one gap. Spell the unit out where that still leaves the column a small share of the frame, and
+drop it where it would not — on a narrow frame the bars need the room more than the reader needs the
+unit on every row. Deriving it also deletes a per-layout constant that nobody would have thought to
+re-check.
+
 ### Assertions
 
 Assert the claims the chart makes, not only the schema. If the subtitle states a range as one
