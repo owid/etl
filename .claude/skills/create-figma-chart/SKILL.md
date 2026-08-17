@@ -482,6 +482,10 @@ unedited copy of the same SVG** next to it — rescaled to the template's size, 
 also makes a font or palette pass reviewable by someone who wasn't watching it happen. Two uploads of
 the same file per frame costs nothing; deleting the reference costs the next reviewer an import.
 
+**Put it to the LEFT of the frame**, so the page reads original → edited in reading order. To the
+right it reads as an afterthought and the eye reaches the raw export last, when it is the thing being
+compared against.
+
 ### Bind what has a style; name what doesn't
 
 The palette lives in the **Chart colors** library, and the design team's own pages bind chart *marks*

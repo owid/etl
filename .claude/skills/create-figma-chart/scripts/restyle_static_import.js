@@ -105,10 +105,12 @@ for (const job of CONFIG.jobs) {
 
   const scale = job.frameWidth / job.canvasWidth;
 
-  // The untouched import, parked beside the frame so every later edit stays comparable.
+  // The untouched import, parked to the LEFT of the frame so the page reads original → edited in
+  // reading order. (To its right it reads as an afterthought, and the eye lands on the raw export
+  // last, when it is the thing you are comparing against.)
   reference.rescale(scale);
   reference.name = `${frame.name} — original SVG (unstyled)`;
-  reference.x = frame.x + frame.width + job.referenceGap;
+  reference.x = frame.x - reference.width - job.referenceGap;
   reference.y = frame.y;
 
   styled.rescale(scale);
