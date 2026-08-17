@@ -15,8 +15,16 @@
 # Other ecosystems are intentionally left out. Dependabot security updates
 # already cover pip and npm without any config, and blanket version updates
 # across this repo's dependency tree were removed in 2022 (c7d5ad0c0d) for
-# being too noisy. Grouping every action into a single monthly PR keeps this
-# to roughly one review a month.
+# being too noisy. Grouping every action into a single PR keeps the volume
+# low regardless of interval — there are only ~10 actions here, and they
+# release a couple of times a month between them.
+#
+# Weekly rather than monthly, because for actions these version updates are
+# also the de facto *security* mechanism. Dependabot's real security updates
+# ignore this schedule and fire on advisory publication, but actions almost
+# never get advisories, so nothing else will ever move these pins. Combined
+# with the cooldown below, weekly caps worst-case adoption of a fix at about
+# two weeks; monthly would have stretched it past five.
 version: 2
 updates:
   - package-ecosystem: github-actions
@@ -24,7 +32,7 @@ updates:
     # would each need their own entry — there are none today.
     directory: /
     schedule:
-      interval: monthly
+      interval: weekly
     # Don't adopt a release the moment it appears: if an action's publishing
     # account is compromised, the malicious version is usually yanked within
     # days. Long enough to matter, short enough that pins still move.
