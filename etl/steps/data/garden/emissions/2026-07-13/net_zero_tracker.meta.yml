@@ -23,7 +23,7 @@ tables:
       net_zero_status:
         title: Status of net-zero carbon emissions targets
         description_short: |-
-          The status of each country's commitment to 'net-zero' emissions. The specifics of this commitment can vary, with some countries pledging to reach net-zero greenhouse gas emissions, while others define this as carbon emissions only. Countries assessed as having no net-zero target are shown as "No target".
+          Status of each country's commitment to 'net-zero' emissions. The specifics of this commitment can vary, with some countries pledging to reach net-zero greenhouse gas emissions, while others define this as carbon emissions only. Countries assessed as having no net-zero target are shown as "No target".
         processing_level: minor
         # Order the legend from least to most firmly established commitment. Only categories present in
         # the data are listed; listing an absent one (e.g. "Achieved (externally validated)") would add

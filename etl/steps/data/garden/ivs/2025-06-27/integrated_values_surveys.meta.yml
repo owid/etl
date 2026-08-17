@@ -1208,7 +1208,7 @@ tables:
 
       environment_env_ec:
         title: "Environment vs economic growth: Environment"
-        description_short: '% of respondents choosing option A when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent"'
+        description_short: '% of respondents choosing option A when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent".'
         display:
           name: "Environment vs economic growth: Environment"
           <<: *common-display
@@ -1217,7 +1217,7 @@ tables:
 
       economy_env_ec:
         title: "Environment vs economic growth: Economic growth"
-        description_short: '% of respondents choosing option B when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent"'
+        description_short: '% of respondents choosing option B when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent".'
         display:
           name: "Environment vs economic growth: Economic growth"
           <<: *common-display
@@ -1226,7 +1226,7 @@ tables:
 
       other_answer_env_ec:
         title: "Environment vs economic growth: Other answer"
-        description_short: '% of respondents choosing "Other answer" when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent"'
+        description_short: '% of respondents choosing "Other answer" when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent".'
         display:
           name: "Environment vs economic growth: Other answer"
           <<: *common-display
@@ -1235,7 +1235,7 @@ tables:
 
       dont_know_env_ec:
         title: "Environment vs economic growth: Don't know"
-        description_short: '% of respondents choosing "don''t know" when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent"'
+        description_short: '% of respondents choosing "don''t know" when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent".'
         display:
           name: "Environment vs economic growth: Don't know"
           <<: *common-display
@@ -1244,7 +1244,7 @@ tables:
 
       no_answer_env_ec:
         title: "Environment vs economic growth: No answer"
-        description_short: '% of answers classified as "No answer" for the question "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent"'
+        description_short: '% of answers classified as "No answer" for the question "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent".'
         display:
           name: "Environment vs economic growth: No answer"
           <<: *common-display
@@ -2278,49 +2278,49 @@ tables:
 
       poverty_most_serious:
         title: "Most serious problem: Poverty"
-        description_short: '% of respondents replying "People living in poverty and need" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution"'
+        description_short: '% of respondents replying "People living in poverty and need" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution".'
         display:
           name: "Most serious problem: Poverty"
           <<: *common-display
 
       women_discr_most_serious:
         title: "Most serious problem: Discrimination against women"
-        description_short: '% of respondents replying "Discrimination against girls and women" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution"'
+        description_short: '% of respondents replying "Discrimination against girls and women" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution".'
         display:
           name: "Most serious problem: Discrimination against women"
           <<: *common-display
 
       sanitation_most_serious:
         title: "Most serious problem: Poor sanitation and infectious diseases"
-        description_short: '% of respondents replying "Poor sanitation and infectious diseases" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution"'
+        description_short: '% of respondents replying "Poor sanitation and infectious diseases" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution".'
         display:
           name: "Most serious problem: Poor sanitation and infectious diseases"
           <<: *common-display
 
       education_most_serious:
         title: "Most serious problem: Inadequate education"
-        description_short: '% of respondents replying "Inadequate education" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution"'
+        description_short: '% of respondents replying "Inadequate education" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution".'
         display:
           name: "Most serious problem: Inadequate education"
           <<: *common-display
 
       pollution_most_serious:
         title: "Most serious problem: Environmental pollution"
-        description_short: '% of respondents replying "Environmental pollution" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution"'
+        description_short: '% of respondents replying "Environmental pollution" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution".'
         display:
           name: "Most serious problem: Environmental pollution"
           <<: *common-display
 
       dont_know_most_serious:
         title: "Most serious problem: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution"'
+        description_short: '% of respondents replying "don''t know" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution".'
         display:
           name: "Most serious problem: Don't know"
           <<: *common-display
 
       no_answer_most_serious:
         title: "Most serious problem: No answer"
-        description_short: '% of answers classified as "No answer" for the question "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution"'
+        description_short: '% of answers classified as "No answer" for the question "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution".'
         display:
           name: "Most serious problem: No answer"
           <<: *common-display
