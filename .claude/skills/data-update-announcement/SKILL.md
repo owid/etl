@@ -97,6 +97,8 @@ Read for framing and register, not for facts to lift: which aspect OWID leads wi
 
 ## Template
 
+Which fields the post carries, and in what order. This is the **drafting** shape — spaced out for reading in the chat, the way `references/examples.md` displays the published posts:
+
 ```
 title:
 
@@ -109,6 +111,8 @@ authors: [in Mode B, from the Slack "Message from:" line, comma-separated]
 kicker: data-update
 
 [+body]
+
+[body paragraphs, blank line between them]
 
 {.cta}
 
@@ -126,6 +130,8 @@ filename: YYYY-MM-data-update-[short-topic].png
 
 []
 ```
+
+**The Google Doc is not spaced like this.** Drop every blank line except the ones between body paragraphs, between the body and `{.cta}`, and between `{.cta}` and `{.image}`; frontmatter fields and the insides of the `{.cta}` / `{.image}` blocks go on consecutive lines. [`references/gdoc-format.md`](references/gdoc-format.md) is the authority on the Doc layout — build the upload from it, not from the block above. A blank line that survives into the upload becomes an empty Google Docs paragraph, and the Drive MCP can't edit it back out.
 
 `type` is always `announcement`; `kicker` is always `data-update`, lowercase and hyphenated. Content inside `:skip` / `:endskip` doesn't publish — use it for internal notes.
 

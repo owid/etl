@@ -51,6 +51,8 @@ filename: YYYY-MM-data-update-<slug>.png
 
 The finished Doc is **compact** — every line is its own paragraph, with no empty spacer paragraphs. Google Docs makes a paragraph per Enter, so blank lines in the upload become empty paragraphs the user has to delete.
 
+The block above, not the SKILL's spaced "Template" section or the posts in `examples.md`, is what the upload has to reproduce. Those two space the fields out for reading; copying that spacing into the HTML is what produces the spacer paragraphs.
+
 ## Styling
 
 The OWID GDocs Add-on (Extensions menu in the Doc) is the team's canonical formatter, and it can't be driven through the API. You can reproduce its output directly on `create_file` by uploading `contentMimeType: "text/html"` with inline styles — verified: Google Docs' HTML import preserves colors, `margin-left` indents, and hyperlinks.
