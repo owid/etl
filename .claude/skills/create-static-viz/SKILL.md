@@ -506,6 +506,12 @@ step's own render:
   of a bar high — small enough to survive review and plainly visible once someone looks for it. Place
   the baseline half a cap-height below the row's centre (`TextPath((0,0), "0").get_extents().ymax`),
   which also puts labels with and without descenders on one line.
+- **Draw a multi-line label as one call per line.** A `"Total\nleisure"` passed to a single `ax.text`
+  gets no `text-anchor` at all: matplotlib centres each line by baking a different `translate` into
+  it, using its own metrics. So the lines arrive as independent left-anchored boxes that lose their
+  centring on each other *and* on whatever they label as soon as the font changes — the one case the
+  anchor rule above cannot rescue, because there is no anchor to preserve. Grep an emitted SVG for
+  `text-anchor` and any label missing one is this.
 
 ### Size a value column from its content, not from a round number
 

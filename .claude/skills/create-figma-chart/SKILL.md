@@ -515,6 +515,12 @@ Two notes that make this work in practice. The import **does** preserve `text-an
 report the count of nodes you moved: on the pair of frames here it was 174 and 145, which is the
 difference between "the restyle worked" and "the restyle worked and nothing moved".
 
+**A label the step drew as one multi-line call has no anchor to hold**, so this pass silently treats it
+as left-aligned and it drifts anyway. The fix belongs upstream — one call per line, see
+[`/create-static-viz`](../create-static-viz/SKILL.md) — but you are the one who will see it, so check
+the emitted SVG for `<text>` elements carrying a `transform="translate(...)"` and no `text-anchor`
+before assuming an import is anchor-safe.
+
 #### A line built from several runs needs re-flowing, not just re-anchoring
 
 Where a line is several independent text nodes — a legend of coloured names, a mixed-weight footer row —
