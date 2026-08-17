@@ -65,6 +65,7 @@ steps:
   # Migration multidims
   export://multidim/migration/latest/migrant_populations:
     - data://grapher/un/2025-03-12/migrant_stock
+    - data://grapher/demography/2024-07-15/population
     - data://grapher/regions/2023-01-01/regions
 
   export://multidim/migration/latest/net_migration:
@@ -73,12 +74,14 @@ steps:
   export://multidim/migration/latest/asylum_seekers_and_refugees:
     - data://grapher/un/2025-07-03/refugee_data
     - data://grapher/unicef/2026-01-07/child_migration
+    - data://grapher/demography/2024-07-15/population
     - data://grapher/regions/2023-01-01/regions
 
   export://multidim/migration/latest/internal_displacement:
     - data://grapher/idmc/2026-01-19/internal_displacement
     - data://grapher/un/2025-07-03/refugee_data
     - data://grapher/unicef/2026-01-07/child_migration
+    - data://grapher/demography/2024-07-15/population
     - data://grapher/regions/2023-01-01/regions
 
   export://multidim/migration/latest/remittances:
