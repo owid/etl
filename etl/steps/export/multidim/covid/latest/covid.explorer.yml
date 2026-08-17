@@ -741,7 +741,7 @@ views:
         - variants#perc_sequences__variant_non_relevant
     config:
       title: SARS-CoV-2 sequences by variant
-      subtitle: The share of analyzed sequences in the preceding two weeks that correspond to each variant group.
+      subtitle: Share of analyzed sequences in the preceding two weeks that correspond to each variant group.
       hasMapTab: false
       hideTotalValueLabel: true
       chartTypes:

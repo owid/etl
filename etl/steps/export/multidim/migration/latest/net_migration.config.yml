@@ -1,0 +1,79 @@
+title:
+  title: Net migration
+  title_variant: ""
+
+default_selection:
+  - World
+  - United States
+  - Germany
+  - India
+  - Syria
+
+default_dimensions:
+  metric: net_migration
+
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        tab: map
+        chartTypes: ["LineChart"]
+
+  definition_migrant_un: The UN defines an international migrant as someone who has been living for one year or longer in a country other than the one in which they were born. Similarly an emigrant is someone who has left their country of birth to live in another country for one year or longer.
+  definition_net_migration: Net migration is calculated by subtracting the number of emigrants from the number of immigrants for each country. Net migration larger than zero means that more people are moving into a country than leaving it, while a negative net migration indicates that more people are leaving the country than moving in.
+  definition_net_migration_rate: Net migration rate is calculated by subtracting the number of emigrants from the number of immigrants for each country, dividing that number by the total population of the country and multiplying the result by 1,000.
+  definition_net_migration_rate_2: Net migration rate is given as the net number of migrants per 1,000 population. It answers the question "Per 1000 people living in a country, how much does the population increase or decrease due to migration?"
+  definition_net_migration_rate_3: A positive net migration rate means that more people are moving into a country than leaving it, while a negative net migration rate indicates that more people are leaving the country than moving in.
+
+
+dimensions:
+  - slug: metric
+    name: Metric
+    choices:
+      - slug: net_migration
+        name: Net migration
+        description: The total number of immigrants minus the number of emigrants.
+      - slug: net_migration_rate
+        name: Net migration rate
+        description: Net migration per 1,000 people in the population.
+    presentation:
+      type: radio
+
+views:
+  - dimensions:
+      metric: net_migration
+    indicators:
+      y:
+        - catalogPath: un_wpp/migration#net_migration__sex_all__age_all__variant_estimates
+    config:
+      title: Net migration
+      subtitle: Total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country).
+      map:
+        colorScale:
+          baseColorScheme: PuOr
+          binningStrategy: manual
+          customNumericValues: [-1000000, -300000, -100000, -30000, -10000, 0, 10000, 30000, 100000, 300000, 1000000]
+    metadata:
+      description_key:
+        - "{definitions.definition_migrant_un}"
+        - "{definitions.definition_net_migration}"
+
+  - dimensions:
+      metric: net_migration_rate
+    indicators:
+      y:
+        - catalogPath: un_wpp/migration#net_migration_rate__sex_all__age_all__variant_estimates
+    config:
+      title: Net migration rate
+      subtitle: Total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country), per 1,000 people in the population.
+      map:
+        colorScale:
+          baseColorScheme: PuOr
+          binningStrategy: manual
+          customNumericValues: [-10, -5, -2, -1, -0.5, -0.2, 0, 0.2, 0.5, 1, 2, 5, 10, 20]
+    metadata:
+      description_key:
+        - "{definitions.definition_migrant_un}"
+        - "{definitions.definition_net_migration_rate}"
+        - "{definitions.definition_net_migration_rate_2}"
+        - "{definitions.definition_net_migration_rate_3}"

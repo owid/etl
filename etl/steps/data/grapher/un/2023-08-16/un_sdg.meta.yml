@@ -14,7 +14,7 @@ tables:
         title: 6.2.1 - Proportion of population using safely managed sanitation services, by urban/rural (%) - SH_SAN_SAFE - All areas
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of the total population using safely managed sanitation services
+        description_short: Proportion of the total population using safely managed sanitation services.
         description_key:
           - Safely managed sanitation is improved facilities which are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.
           - "Further information available at: https://unstats.un.org/sdgs/metadata/files/Metadata-06-02-01a.pdf and https://unstats.un.org/sdgs/metadata/files/Metadata-06-02-01b.pdf"

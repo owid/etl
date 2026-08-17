@@ -71,27 +71,27 @@ macros: |-
 
       <% if metric == "Number" %>
           <% if age != 'Age-standardized' and age != 'All ages' %>
-              The estimated number of << unit >> from << cause >><< attrText >> in << sex >> aged << age >>.
+              Estimated number of << unit >> from << cause >><< attrText >> in << sex >> aged << age >>.
           <% elif age == 'Age-standardized' %>
-              The estimated number of age-standardized << unit >> from << cause >> in << sex >><< attrText >>.
+              Estimated number of age-standardized << unit >> from << cause >> in << sex >><< attrText >>.
           <% elif age == 'All ages' %>
-              The estimated number of << unit >> from << cause >> in << sex >><< attrText >>.
+              Estimated number of << unit >> from << cause >> in << sex >><< attrText >>.
           <% endif %>
       <% elif metric == "Rate" %>
           <% if age != 'Age-standardized' and age != 'All ages' %>
-              The estimated number of << unit >> from << cause >><< attrText >> in << sex >> aged << age >>, per 100,000 people.
+              Estimated number of << unit >> from << cause >><< attrText >> in << sex >> aged << age >>, per 100,000 people.
           <% elif age == 'Age-standardized' %>
-              The estimated number of age-standardized << unit >> from << cause >> in << sex >><< attrText >>, per 100,000 people.
+              Estimated number of age-standardized << unit >> from << cause >> in << sex >><< attrText >>, per 100,000 people.
           <% elif age == 'All ages' %>
-              The estimated number of << unit >> from << cause >> in << sex >> << attrText >>, per 100,000 people.
+              Estimated number of << unit >> from << cause >> in << sex >> << attrText >>, per 100,000 people.
           <% endif %>
       <% elif metric == "Percent" %>
           <% if age != 'Age-standardized' and age != 'All ages' %>
-              The estimated share of << unit >> from << cause >><< attrText >> in << sex >> aged << age >>.
+              Estimated share of << unit >> from << cause >><< attrText >> in << sex >> aged << age >>.
           <% elif age == 'Age-standardized' %>
-              The estimated share of age-standardized << unit >> from << cause >> in << sex >><< attrText >>.
+              Estimated share of age-standardized << unit >> from << cause >> in << sex >><< attrText >>.
           <% elif age == 'All ages' %>
-              The estimated share of << unit >> from << cause >> in << sex >><< attrText >>.
+              Estimated share of << unit >> from << cause >> in << sex >><< attrText >>.
           <% endif %>
       <% endif %>
   <% endmacro %>

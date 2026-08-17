@@ -18,7 +18,7 @@ tables:
         short_unit: "km²"
         unit: "square kilometers"
         description_short: |
-          The yearly maximum daily ozone hole area.
+          Yearly maximum daily ozone hole area.
         description_key:
           - The ozone hole area is determined from total ozone satellite measurements. It is defined to be that region of ozone values below 220 Dobson Units (DU) located south of 40°S. Values below 220 DU represent anthropogenic ozone losses over Antarctica.
 
@@ -32,7 +32,7 @@ tables:
         short_unit: "DU"
         unit: "Dobson Units (DU)"
         description_short: |
-          The yearly minimum daily minimum ozone.
+          Yearly minimum daily minimum ozone.
 
         description_key:
           - The minimum ozone is found from total ozone satellite measurements south of 40°S. No interpolation of missing values is performed. This means that the actual minimum value on a day may be estimated too high, especially in the polar night region.

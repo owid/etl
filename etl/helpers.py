@@ -197,6 +197,28 @@ def get_metadata_path(dest_dir: str) -> Path:
     return N.metadata_path
 
 
+def end_with_punctuation(text: str | None) -> str | None:
+    """Append a period to text that doesn't already end with punctuation.
+
+    Our style guide requires chart subtitles — and `description_short`, which Grapher
+    falls back to for the subtitle — to end with punctuation. Use this on text taken
+    verbatim from a producer, where we relay their wording but still want the sentence
+    to close properly. Don't use it on text we author ourselves: write the period.
+
+    A closing quote or bracket after the punctuation counts as ending with it, so
+    `… agree with?"` and `… (per 100,000 people).` are both left alone.
+    """
+    if not text:
+        return text
+    stripped = text.rstrip()
+    if not stripped:
+        return text
+    # a trailing quote/bracket may sit after the punctuation mark
+    if stripped.rstrip("\"'”’)]")[-1:] in {".", "!", "?"}:
+        return text
+    return stripped + "."
+
+
 def render_yaml_metadata(ds: catalog.Dataset) -> None:
     """Render Jinja templates in metadata for all tables in a dataset.
 

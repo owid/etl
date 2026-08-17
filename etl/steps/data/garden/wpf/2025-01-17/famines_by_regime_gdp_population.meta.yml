@@ -28,7 +28,7 @@ tables:
         title: Population growth rate 20 years prior to famine
         unit: '%'
         short_unit: '%'
-        description_short: The average annual population growth rate in the 20 years before the famine.
+        description_short: Average annual population growth rate in the 20 years before the famine.
         description_processing: |-
           The population growth rate was calculated by taking the population in the year of the famine and dividing it by the population 20 years prior, subtracting 1, and multiplying by 100.
 
