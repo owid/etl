@@ -106,11 +106,14 @@ def sanity_check_outputs(tb: Table) -> None:
     ].item()
     assert 1400 < us_2010 < 1700, "US total water withdrawal per capita in 2010 differs from expected ~1557."
 
-    # Each share must equal its sector divided by the total. FAO derives its shares exactly this way, and we do the
-    # same for the aggregates we compute, so any deviation means columns got misaligned somewhere.
-    # NOTE: FAO's own sectors do not always add up to its own total (see the note in run), so the shares of a given
-    # country and year do not always add up to 100%.
-    complete = tb.dropna(subset=SECTORAL_COLUMNS + SHARE_COLUMNS + ["total_water_withdrawal"])
+    # In FAO's own rows (countries and its regional groupings), each share is its sector divided by the total, so
+    # any deviation means columns got misaligned somewhere.
+    # NOTE: FAO's sectors do not always add up to its total (see the note in run), so the three shares of a given
+    # country and year do not always add up to 100%. The regions we aggregate ourselves are excluded here, since
+    # their shares come from a weighted mean over the countries reporting each sector.
+    complete = tb[~tb["country"].isin(REGIONS)].dropna(
+        subset=SECTORAL_COLUMNS + SHARE_COLUMNS + ["total_water_withdrawal"]
+    )
     for sector, share in zip(SECTORAL_COLUMNS, SHARE_COLUMNS):
         deviation = (complete[share] - 100 * complete[sector] / complete["total_water_withdrawal"]).abs()
         assert deviation.max() < 0.01, f"{share} is not consistent with {sector} divided by the total."
@@ -166,30 +169,19 @@ def run() -> None:
     tb = paths.apply_corrections(tb)
 
     # Add region aggregates.
+    # NOTE: Each share is aggregated as a mean of the countries' shares weighted by their total withdrawal, which
+    # is the region's sector divided by the region's total, using only the countries that report both.
+    aggregations = {column: "sum" for column in LEVEL_COLUMNS}
+    aggregations.update({column: "mean_weighted_by_total_water_withdrawal" for column in SHARE_COLUMNS})
     tb = paths.regions.add_aggregates(
         tb=tb,
         regions=REGIONS,
-        aggregations={column: "sum" for column in LEVEL_COLUMNS},
+        aggregations=aggregations,
         min_frac_countries_informed=MIN_FRAC_COUNTRIES_INFORMED,
     )
 
     # Sanity check: FAO's published World row should agree with the same aggregate computed from country data.
     sanity_check_world(tb=tb)
-
-    # For aggregate rows, compute the sectoral shares from the aggregated levels (FAO's shares are country-level).
-    mask_regions = tb["country"].isin(REGIONS)
-    for sector, share in zip(SECTORAL_COLUMNS, SHARE_COLUMNS):
-        tb.loc[mask_regions, share] = (
-            100 * tb.loc[mask_regions, sector] / tb.loc[mask_regions, "total_water_withdrawal"]
-        )
-
-    # In a few region-years, the countries informing the sectors cover only part of those informing the total, making
-    # the shares misleading (e.g. in Africa in 1990, sectors add up to 58% of the total). Keep aggregate shares only
-    # where the sectoral breakdown is consistent with the total.
-    share_sum = tb.loc[mask_regions, SHARE_COLUMNS].sum(axis=1, min_count=3)
-    inconsistent = share_sum.notnull() & ~share_sum.between(95, 105)
-    assert 10 < inconsistent.sum() < 60, "Unexpected number of region-years with inconsistent sectoral shares."
-    tb.loc[inconsistent[inconsistent].index, SHARE_COLUMNS] = None
 
     # Sanity checks.
     sanity_check_outputs(tb=tb)
