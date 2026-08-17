@@ -146,7 +146,7 @@ definitions:
       Best estimate of the number of deaths of << people_type >> in non-internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "one-sided violence" -%>
-      << (estimate | default('')) | capitalize >> estimate of the number of deaths of << people_type >> from one-sided violence that was ongoing that year<< per_capita >>.
+      Best estimate of the number of deaths of << people_type >> from one-sided violence that was ongoing that year<< per_capita >>.
 
       <%- elif conflict_type == "non-state conflict" -%>
       Best estimate of the number of deaths of << people_type >> in non-state conflicts that were ongoing that year<< per_capita >>.

@@ -47,9 +47,9 @@ definitions:
       <%- endif -%>
     description_short_rate: |-
       <% if risk_factor != "all" and age_group == "all" %>
-      The estimated incidence rate of tuberculosis cases attributed to {definitions.risk_factor} in {definitions.sex}, per 100,000 people.
+      Estimated incidence rate of tuberculosis cases attributed to {definitions.risk_factor} in {definitions.sex}, per 100,000 people.
       <% elif risk_factor != "all" and age_group != "all" %>
-      The estimated incidence rate of tuberculosis cases attributed to {definitions.risk_factor} in {definitions.sex} aged {definitions.age_group}, per 100,000 people.
+      Estimated incidence rate of tuberculosis cases attributed to {definitions.risk_factor} in {definitions.sex} aged {definitions.age_group}, per 100,000 people.
       <% elif risk_factor == "all" and age_group == "all" %>
       Estimated incidence rate of tuberculosis cases in {definitions.sex}, per 100,000 people.
       <% elif risk_factor == "all" and age_group != "all" %>
