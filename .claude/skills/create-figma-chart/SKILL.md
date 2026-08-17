@@ -457,6 +457,31 @@ The chart spans the full content width, left-aligned with the title/subtitle/log
 > chart.width` solves against the overhang instead of the frame. Once they are gone the bbox *is* the
 > canvas, and one rescale lands the height on the template's to `delta 0` — the assertion worth keeping.
 
+### An upload lands on the file's *current* page — which is not your page
+
+`upload_assets` places the import on whatever page the file currently has open, and page context is
+not what your last `use_figma` call set. On a real run that meant SVG imports quietly piling up on the
+file's **Cover** page, in a shared file, until someone noticed.
+
+So treat the returned `placedOnNodeId` as the only reliable handle: fetch it with
+`getNodeByIdAsync`, `appendChild` it onto the page you meant, and **check the page it came from is
+left clean**. Two habits that make this cheap:
+
+- Walk up from the imported node to its `PAGE` ancestor and log it, so a wrong landing is visible in
+  the tool result rather than discovered later.
+- Before finishing, list the landing page's children and remove anything of yours still sitting there.
+  An import you uploaded but did not consume (a spare, a superseded round) is litter in someone else's
+  file.
+
+### Keep the untouched import beside the edited frame
+
+Standing practice, not clutter: after the styled chart is swapped into its frame, place a **second,
+unedited copy of the same SVG** next to it — rescaled to the template's size, named
+`<frame name> — original SVG (unstyled)`. Every later question ("did the restyle move that label?",
+"was that gap in the export or did we add it?") is then answered by looking, not by re-importing. It
+also makes a font or palette pass reviewable by someone who wasn't watching it happen. Two uploads of
+the same file per frame costs nothing; deleting the reference costs the next reviewer an import.
+
 ### Bind what has a style; name what doesn't
 
 The palette lives in the **Chart colors** library, and the design team's own pages bind chart *marks*
@@ -555,6 +580,17 @@ probe.characters = "n n"; const space = probe.width - tight;   // rather than as
 ```
 
 On the run here that took the separator gaps from 4.6-before/1.2-after to exactly 3 and 3.
+
+#### Don't hand-write this pass — it is a script
+
+[`scripts/restyle_static_import.js`](scripts/restyle_static_import.js) is the whole thing: place the
+import, drop the step's slot copies by prefix, derive each family's tints from its base, set Lato,
+restore every anchor, bind the library styles, swap it into the frame, re-flow flowed lines, and park
+an unstyled copy beside the frame. Fill in its `CONFIG` block and paste it as one `use_figma` call.
+
+It exists because this pass was hand-written six times in one session and each rewrite lost one of the
+details above. Edit `CONFIG`, not the body; when you learn something new, change the script so the next
+run inherits it.
 
 #### Re-importing a corrected SVG: dump the styling first
 
