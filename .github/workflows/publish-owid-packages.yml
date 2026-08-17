@@ -121,7 +121,12 @@ jobs:
         rm -rf dist
         uv build
 
+    # Published with uv rather than pypa/gh-action-pypi-publish so the release
+    # path carries no third-party action (and no twine frozen inside one).
+    # Authentication is still PyPI trusted publishing over OIDC, using the
+    # id-token permission and the `pypi` environment declared on this job, so
+    # the existing publisher configuration on PyPI applies unchanged.
     - name: Publish ${{ matrix.name }} to PyPI
-      uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33  # v1.14.2
-      with:
-        packages-dir: ${{ matrix.path }}/dist
+      run: |
+        cd ${{ matrix.path }}
+        uv publish --trusted-publishing always

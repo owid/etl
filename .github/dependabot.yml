@@ -1,0 +1,33 @@
+# Dependabot version updates.
+#
+# Deliberately scoped to GitHub Actions only.
+#
+# Actions must be pinned to immutable commit SHAs (see
+# .github/instructions/github-actions.instructions.md). Pinning is a
+# supply-chain control we want to keep, but it freezes each action until
+# somebody bumps it by hand — and actions almost never receive security
+# advisories, so Dependabot's *security* updates (which run without any config)
+# never touch them. Without the version updates below, a pin is never updated
+# at all, and eventually a stale one breaks a workflow: hatchling 1.32.0 began
+# emitting `Metadata-Version: 2.5`, which the twine bundled in a long-frozen
+# pypa/gh-action-pypi-publish pin refused to parse, breaking the PyPI release.
+#
+# Other ecosystems are intentionally left out. Dependabot security updates
+# already cover pip and npm without any config, and blanket version updates
+# across this repo's dependency tree were removed in 2022 (c7d5ad0c0d) for
+# being too noisy. Grouping every action into a single monthly PR keeps this
+# to roughly one review a month.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    # "/" covers .github/workflows. Composite actions under .github/actions
+    # would each need their own entry — there are none today.
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "⬆️"
