@@ -127,8 +127,8 @@ GROUPS = [
         "color": ("tint", 3, 0.45),
     },
     {"column": "sleep", "label": "Sleep", "color": ("deep", 7)},
-    {"column": "eating_and_drinking", "label": "Eating & drinking", "color": ("tint", 7, 0.4)},
-    {"column": "personal_care", "label": "Other personal care", "color": ("tint", 7, 0.65)},
+    {"column": "eating_and_drinking", "label": "Eating & drinking", "color": ("tint", 7, 0.3)},
+    {"column": "personal_care", "label": "Other personal care", "color": ("tint", 7, 0.68)},
     {"column": "housework_and_shopping", "label": "Housework & shopping", "color": ("deep", 5)},
     {
         "column": "other_unpaid_work",
@@ -137,8 +137,8 @@ GROUPS = [
         "color": ("tint", 5, 0.45),
     },
     {"column": "tv_and_radio", "label": "TV & Radio", "color": ("deep", 0)},
-    {"column": "seeing_friends", "label": "Seeing friends", "color": ("tint", 0, 0.35)},
-    {"column": "other_leisure", "label": "Other leisure", "color": ("tint", 0, 0.6)},
+    {"column": "seeing_friends", "label": "Seeing friends", "color": ("tint", 0, 0.42)},
+    {"column": "other_leisure", "label": "Other leisure", "color": ("tint", 0, 0.78)},
 ]
 
 TOTAL_LEISURE_COLUMN = "total_leisure"
@@ -162,6 +162,11 @@ VALUE_LABEL_COVERAGE = 0.75
 SORT_BY = "paid_work"
 
 TITLE = "How do people spend their time?"
+
+# The row labels set the width of the column they sit in, so the two longest names are shortened to
+# the forms the style guide sanctions (no periods). It buys the bars 15px on desktop and 13px on
+# mobile, which is the gap between these two names and the next-longest, "New Zealand".
+SHORT_COUNTRY_NAMES = {"United Kingdom": "UK", "United States": "US"}
 
 # Credited on the license line: the original chart's author, and this refresh's. Named one by one
 # because the line sets them in bold, as it does the license itself.
@@ -482,7 +487,10 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     draw_footer(fig, note, source_citation, layout, fx, fy)
 
     # --- the chart band: the category header, then the bar rows ---
-    country_labels = [f"{country} ({year})" for country, year in zip(tb["country"].tolist(), tb["year"].tolist())]
+    country_labels = [
+        f"{SHORT_COUNTRY_NAMES.get(country, country)} ({year})"
+        for country, year in zip(tb["country"].tolist(), tb["year"].tolist())
+    ]
     country_space_px = (
         max(text_width_px(label, layout["country_fontsize"]) for label in country_labels) + COUNTRY_LABEL_PAD
     )
