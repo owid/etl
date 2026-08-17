@@ -2841,9 +2841,6 @@ z
    <g id="japan__eating-and-drinking-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="245.916316" y="149.342153" transform="rotate(-0 245.916316 149.342153)">91</text>
    </g>
-   <g id="japan__personal-care-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="261.405577" y="149.342153" transform="rotate(-0 261.405577 149.342153)">87</text>
-   </g>
    <g id="japan__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="277.85204" y="149.342153" transform="rotate(-0 277.85204 149.342153)">102</text>
    </g>
@@ -2919,9 +2916,6 @@ z
    <g id="mexico__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="277.135401" y="183.981867" transform="rotate(-0 277.135401 183.981867)">200</text>
    </g>
-   <g id="mexico__other-unpaid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="301.691577" y="183.981867" transform="rotate(-0 301.691577 183.981867)">82</text>
-   </g>
    <g id="mexico__other-leisure-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="336.36411" y="183.981867" transform="rotate(-0 336.36411 183.981867)">90</text>
    </g>
@@ -2967,9 +2961,6 @@ z
    <g id="canada__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="276.038333" y="207.07501" transform="rotate(-0 276.038333 207.07501)">111</text>
    </g>
-   <g id="canada__other-unpaid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="296.558166" y="207.07501" transform="rotate(-0 296.558166 207.07501)">124</text>
-   </g>
    <g id="canada__tv-and-radio-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="314.630201" y="207.07501" transform="rotate(-0 314.630201 207.07501)">83</text>
    </g>
@@ -2994,9 +2985,6 @@ z
    <g id="croatia__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="273.540029" y="218.621581" transform="rotate(-0 273.540029 218.621581)">116</text>
    </g>
-   <g id="croatia__other-unpaid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="292.091469" y="218.621581" transform="rotate(-0 292.091469 218.621581)">97</text>
-   </g>
    <g id="croatia__tv-and-radio-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="308.643981" y="218.621581" transform="rotate(-0 308.643981 218.621581)">93</text>
    </g>
@@ -3018,14 +3006,8 @@ z
    <g id="south-korea__eating-and-drinking-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="245.70301" y="230.168153" transform="rotate(-0 245.70301 230.168153)">117</text>
    </g>
-   <g id="south-korea__personal-care-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="263.672004" y="230.168153" transform="rotate(-0 263.672004 230.168153)">90</text>
-   </g>
    <g id="south-korea__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="279.247284" y="230.168153" transform="rotate(-0 279.247284 230.168153)">89</text>
-   </g>
-   <g id="south-korea__other-unpaid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="293.121486" y="230.168153" transform="rotate(-0 293.121486 230.168153)">70</text>
    </g>
    <g id="south-korea__tv-and-radio-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="308.089228" y="230.168153" transform="rotate(-0 308.089228 230.168153)">102</text>
@@ -3048,14 +3030,8 @@ z
    <g id="india__eating-and-drinking-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="244.097344" y="241.714724" transform="rotate(-0 244.097344 241.714724)">84</text>
    </g>
-   <g id="india__personal-care-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="257.96359" y="241.714724" transform="rotate(-0 257.96359 241.714724)">75</text>
-   </g>
    <g id="india__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="278.453159" y="241.714724" transform="rotate(-0 278.453159 241.714724)">160</text>
-   </g>
-   <g id="india__seeing-friends-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="317.022445" y="241.714724" transform="rotate(-0 317.022445 241.714724)">73</text>
    </g>
    <g id="india__other-leisure-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="333.778596" y="241.714724" transform="rotate(-0 333.778596 241.714724)">119</text>
@@ -3077,9 +3053,6 @@ z
    </g>
    <g id="estonia__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="268.903872" y="253.261296" transform="rotate(-0 268.903872 253.261296)">121</text>
-   </g>
-   <g id="estonia__other-unpaid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="285.608153" y="253.261296" transform="rotate(-0 285.608153 253.261296)">71</text>
    </g>
    <g id="estonia__tv-and-radio-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="301.419768" y="253.261296" transform="rotate(-0 301.419768 253.261296)">111</text>
@@ -3104,9 +3077,6 @@ z
    </g>
    <g id="sweden__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="264.309244" y="264.807867" transform="rotate(-0 264.309244 264.807867)">131</text>
-   </g>
-   <g id="sweden__other-unpaid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="281.942553" y="264.807867" transform="rotate(-0 281.942553 264.807867)">72</text>
    </g>
    <g id="sweden__tv-and-radio-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="298.068575" y="264.807867" transform="rotate(-0 298.068575 264.807867)">113</text>
@@ -3177,9 +3147,6 @@ z
    <g id="united-states__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="268.748809" y="299.447581" transform="rotate(-0 268.748809 299.447581)">129</text>
    </g>
-   <g id="united-states__other-unpaid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="287.70936" y="299.447581" transform="rotate(-0 287.70936 299.447581)">89</text>
-   </g>
    <g id="united-states__tv-and-radio-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="306.810273" y="299.447581" transform="rotate(-0 306.810273 299.447581)">130</text>
    </g>
@@ -3231,9 +3198,6 @@ z
    <g id="norway__tv-and-radio-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="291.402418" y="322.540724" transform="rotate(-0 291.402418 322.540724)">102</text>
    </g>
-   <g id="norway__seeing-friends-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="306.693982" y="322.540724" transform="rotate(-0 306.693982 322.540724)">74</text>
-   </g>
    <g id="norway__other-leisure-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="328.649899" y="322.540724" transform="rotate(-0 328.649899 322.540724)">178</text>
    </g>
@@ -3254,9 +3218,6 @@ z
    </g>
    <g id="new-zealand__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="264.973328" y="334.087296" transform="rotate(-0 264.973328 334.087296)">134</text>
-   </g>
-   <g id="new-zealand__other-unpaid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="284.204377" y="334.087296" transform="rotate(-0 284.204377 334.087296)">87</text>
    </g>
    <g id="new-zealand__tv-and-radio-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="302.565243" y="334.087296" transform="rotate(-0 302.565243 334.087296)">124</text>
@@ -3306,9 +3267,6 @@ z
    <g id="united-kingdom__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="263.056566" y="357.180439" transform="rotate(-0 263.056566 357.180439)">133</text>
    </g>
-   <g id="united-kingdom__other-unpaid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="282.809705" y="357.180439" transform="rotate(-0 282.809705 357.180439)">94</text>
-   </g>
    <g id="united-kingdom__tv-and-radio-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="302.587629" y="357.180439" transform="rotate(-0 302.587629 357.180439)">133</text>
    </g>
@@ -3332,9 +3290,6 @@ z
    </g>
    <g id="ireland__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="256.451217" y="368.72701" transform="rotate(-0 256.451217 368.72701)">118</text>
-   </g>
-   <g id="ireland__other-unpaid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="278.276586" y="368.72701" transform="rotate(-0 278.276586 368.72701)">132</text>
    </g>
    <g id="ireland__tv-and-radio-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="297.214668" y="368.72701" transform="rotate(-0 297.214668 368.72701)">85</text>
@@ -3411,9 +3366,6 @@ z
    <g id="netherlands__tv-and-radio-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="299.171028" y="403.366724" transform="rotate(-0 299.171028 403.366724)">113</text>
    </g>
-   <g id="netherlands__seeing-friends-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="315.276786" y="403.366724" transform="rotate(-0 315.276786 403.366724)">73</text>
-   </g>
    <g id="netherlands__other-leisure-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="332.875474" y="403.366724" transform="rotate(-0 332.875474 403.366724)">130</text>
    </g>
@@ -3434,9 +3386,6 @@ z
    </g>
    <g id="turkey__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="267.068649" y="414.913296" transform="rotate(-0 267.068649 414.913296)">138</text>
-   </g>
-   <g id="turkey__other-unpaid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="286.750997" y="414.913296" transform="rotate(-0 286.750997 414.913296)">88</text>
    </g>
    <g id="turkey__tv-and-radio-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="305.230568" y="414.913296" transform="rotate(-0 305.230568 414.913296)">124</text>
@@ -3462,9 +3411,6 @@ z
    <g id="australia__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="263.437955" y="426.459867" transform="rotate(-0 263.437955 426.459867)">161</text>
    </g>
-   <g id="australia__other-unpaid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="286.339678" y="426.459867" transform="rotate(-0 286.339678 426.459867)">102</text>
-   </g>
    <g id="australia__tv-and-radio-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="307.412745" y="426.459867" transform="rotate(-0 307.412745 426.459867)">140</text>
    </g>
@@ -3488,9 +3434,6 @@ z
    </g>
    <g id="finland__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="259.190219" y="438.006439" transform="rotate(-0 259.190219 438.006439)">134</text>
-   </g>
-   <g id="finland__other-unpaid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="278.803404" y="438.006439" transform="rotate(-0 278.803404 438.006439)">91</text>
    </g>
    <g id="finland__tv-and-radio-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="297.686051" y="438.006439" transform="rotate(-0 297.686051 438.006439)">126</text>
@@ -3516,9 +3459,6 @@ z
    <g id="poland__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="265.147365" y="449.55301" transform="rotate(-0 265.147365 449.55301)">180</text>
    </g>
-   <g id="poland__other-unpaid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="289.77355" y="449.55301" transform="rotate(-0 289.77355 449.55301)">103</text>
-   </g>
    <g id="poland__tv-and-radio-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="309.700745" y="449.55301" transform="rotate(-0 309.700745 449.55301)">126</text>
    </g>
@@ -3540,17 +3480,11 @@ z
    <g id="south-africa__eating-and-drinking-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="237.982064" y="461.099581" transform="rotate(-0 237.982064 461.099581)">72</text>
    </g>
-   <g id="south-africa__personal-care-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="250.333195" y="461.099581" transform="rotate(-0 250.333195 461.099581)">70</text>
-   </g>
    <g id="south-africa__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="268.54935" y="461.099581" transform="rotate(-0 268.54935 461.099581)">140</text>
    </g>
    <g id="south-africa__tv-and-radio-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="302.385845" y="461.099581" transform="rotate(-0 302.385845 461.099581)">132</text>
-   </g>
-   <g id="south-africa__seeing-friends-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="320.997396" y="461.099581" transform="rotate(-0 320.997396 461.099581)">82</text>
    </g>
    <g id="south-africa__other-leisure-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="336.152811" y="461.099581" transform="rotate(-0 336.152811 461.099581)">92</text>
@@ -3573,14 +3507,8 @@ z
    <g id="denmark__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="260.791424" y="472.646153" transform="rotate(-0 260.791424 472.646153)">154</text>
    </g>
-   <g id="denmark__other-unpaid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="280.542781" y="472.646153" transform="rotate(-0 280.542781 472.646153)">73</text>
-   </g>
    <g id="denmark__tv-and-radio-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="297.629928" y="472.646153" transform="rotate(-0 297.629928 472.646153)">123</text>
-   </g>
-   <g id="denmark__seeing-friends-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="315.411715" y="472.646153" transform="rotate(-0 315.411715 472.646153)">81</text>
    </g>
    <g id="denmark__other-leisure-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="333.326265" y="472.646153" transform="rotate(-0 333.326265 472.646153)">124</text>
@@ -3599,9 +3527,6 @@ z
    </g>
    <g id="hungary__eating-and-drinking-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="231.745502" y="484.192724" transform="rotate(-0 231.745502 484.192724)">101</text>
-   </g>
-   <g id="hungary__personal-care-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="247.168843" y="484.192724" transform="rotate(-0 247.168843 484.192724)">76</text>
    </g>
    <g id="hungary__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="268.512749" y="484.192724" transform="rotate(-0 268.512749 484.192724)">169</text>
@@ -3678,9 +3603,6 @@ z
    <g id="spain__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="261.396594" y="518.832439" transform="rotate(-0 261.396594 518.832439)">141</text>
    </g>
-   <g id="spain__other-unpaid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="281.424184" y="518.832439" transform="rotate(-0 281.424184 518.832439)">89</text>
-   </g>
    <g id="spain__tv-and-radio-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="300.419557" y="518.832439" transform="rotate(-0 300.419557 518.832439)">129</text>
    </g>
@@ -3701,9 +3623,6 @@ z
    </g>
    <g id="france__eating-and-drinking-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="229.908131" y="530.37901" transform="rotate(-0 229.908131 530.37901)">133</text>
-   </g>
-   <g id="france__personal-care-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="250.729171" y="530.37901" transform="rotate(-0 250.729171 530.37901)">107</text>
    </g>
    <g id="france__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="273.103332" y="530.37901" transform="rotate(-0 273.103332 530.37901)">151</text>
@@ -3731,9 +3650,6 @@ z
    </g>
    <g id="italy__housework-and-shopping-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="261.622391" y="541.925581" transform="rotate(-0 261.622391 541.925581)">162</text>
-   </g>
-   <g id="italy__other-unpaid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="281.830142" y="541.925581" transform="rotate(-0 281.830142 541.925581)">70</text>
    </g>
    <g id="italy__tv-and-radio-value">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="296.924324" y="541.925581" transform="rotate(-0 296.924324 541.925581)">104</text>
@@ -3782,7 +3698,7 @@ z
    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #9e9e9e" x="96.933594" y="107.61375" transform="rotate(-0 96.933594 107.61375)">Eating &amp; drinking · </text>
   </g>
   <g id="header__personal-care">
-   <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #aaaaaa" x="164.625938" y="107.61875" transform="rotate(-0 164.625938 107.61875)">Other personal care</text>
+   <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #aaaaaa" x="164.625938" y="107.51625" transform="rotate(-0 164.625938 107.51625)">Other</text>
   </g>
   <g id="category__unpaid-work-other">
    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #937860" x="11.52" y="120.89375" transform="rotate(-0 11.52 120.89375)">Unpaid work &amp; other: </text>
@@ -3791,7 +3707,7 @@ z
    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #937860" x="94.747031" y="120.89375" transform="rotate(-0 94.747031 120.89375)">Housework &amp; shopping · </text>
   </g>
   <g id="header__other-unpaid-work">
-   <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #a6907d" x="184.219688" y="120.89875" transform="rotate(-0 184.219688 120.89875)">Other unpaid work</text>
+   <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #a6907d" x="184.219688" y="120.79625" transform="rotate(-0 184.219688 120.79625)">Other</text>
   </g>
   <g id="category__leisure">
    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #4c72b0" x="11.52" y="134.07625" transform="rotate(-0 11.52 134.07625)">Leisure: </text>
@@ -3803,7 +3719,7 @@ z
    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #6586bb" x="93.500625" y="134.17375" transform="rotate(-0 93.500625 134.17375)">Seeing friends · </text>
   </g>
   <g id="header__other-leisure">
-   <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #7794c3" x="152.129531" y="134.07625" transform="rotate(-0 152.129531 134.07625)">Other leisure</text>
+   <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #7794c3" x="152.129531" y="134.07625" transform="rotate(-0 152.129531 134.07625)">Other</text>
   </g>
  </g>
 </svg>

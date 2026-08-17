@@ -1,8 +1,8 @@
 """Recreate the 'How do people spend their time?' stacked-bar chart from the OECD Time Use Database.
 
-One row per country, each splitting the 1440 minutes of a day into ten activity groups, sorted by
-time spent on paid work. A column right of the bars totals the leisure groups, as the original
-chart by Esteban Ortiz-Ospina did. The groups come precomputed from the garden step
+One row per country, each splitting the 1440 minutes of a day into ten activity groups, ranked by
+`SORT_BY` — time spent on paid work, as the original chart by Esteban Ortiz-Ospina ranked it. A
+column right of the bars totals the leisure groups, as the original did too. The groups come precomputed from the garden step
 (`time_use_chart_groups`), where the regrouping of the OECD's detailed activities is documented
 and asserted; this step only lays them out.
 
@@ -18,23 +18,38 @@ a residual "other" group always comes last — asserted in `load_chart_groups`, 
 bucket sitting mid-category reads as a thing in its own right. So: sleep, eating and drinking,
 then other personal care; housework and shopping, then other unpaid work.
 
-Values are written inside segments wide enough to hold them, sleep as hours and minutes. Survey
+Values are written inside segments wide enough to hold them, sleep as hours and minutes — but only
+for groups that fit on most rows (`VALUE_LABEL_COVERAGE`), so no group carries numbers on just a few
+countries. That drops education and seeing friends here, and two more groups on mobile. Survey
 years differ by country (1999-2024), so each country label carries its year — the original's
 surveys spanned a narrower window and it named none of them.
 
-The header is split across the bars, and that split is what keeps it readable: category names
-bracket the bars from above, group names are listed by category below them. Ten group names and
-four category names cannot share one strip — the contiguous ordering packs six group names into
-the right third of the bar, where their labels are several times wider than the segments they
-name. Both halves are placed by measurement, and `LAYOUTS` can put the group names back above the
-bars, or over the bottom row's segments with leaders, by changing `group_labels`; `solve_header_layout`
-still solves that placement (tiers, wrapping, nudges and leader corridors, with collisions
-asserted) for whichever side it is drawn on.
+The whole header sits above the bars, in two layers that both point at the top row: four category
+brackets span their runs of segments, and inside each bracket its own member names, stacked one per
+line, so every name stands over the bars it belongs to. The blocks hang from their brackets,
+top-aligned, so they line up however deep each one had to go — three lines here.
+
+Two things keep that band shallow. Inside a bracket the category's name is already given, so the
+residual buckets are just "Other" rather than "Other personal care" and the like
+(`label_in_context`); and a name still wider than its span is wrapped to it, which at 68px only
+"Housework & shopping" needs. Centring each block in its own span is what makes the width binding —
+the names cannot borrow the empty width over sleep without ceasing to be inside their bracket — so
+`blocks_collide` asserts that no block reaches into its neighbour's, since wrapping cannot save a
+single word wider than its span.
+
+`LAYOUTS` assigns each half a side. `category_side` takes "above" or "below"; `group_labels` takes
+"bracketed" (the layout above), "below_flow" (one list in bar order under the bars, its line breaks
+evened out), or "below_listed" / "listed_above" (the names grouped under their category names, as
+mobile lists them). Labelling each group over its own segment instead, with a leader back to it, was
+tried and dropped: the top row is Japan's, whose "Seeing friends" is the dataset's narrowest segment
+at 4px, and threading ten names past each other there needed elbow leaders, a search over placement
+orders, and a budget for how many leaders may cross — for a header no easier to read than this one.
 
 Two versions are emitted, following the static-chart templates:
 
-- desktop, 850x1095 (vertical template): category brackets above, grouped name list below, all
-  footer rows present. The Note carries the survey-year span and the age-of-reference exceptions.
+- desktop, 850x1095 (vertical template): category brackets above with each category's member names
+  stacked inside its bracket, all footer rows present. The Note carries the survey-year span, the
+  age-of-reference exceptions, and what the two groups whose names do not say it themselves contain.
 - mobile, 540x824: no Note slot, so the age caveat and the survey-year reference fold into the
   subtitle. Its bars are too narrow to bracket — "Unpaid work & other" spans 38px there — so both
   halves of the header become one grouped list above the chart. Both versions name the same
@@ -45,6 +60,8 @@ step fixes is the data, the structure (which text slots exist, in what order), t
 and the row layout. Segment colors are seaborn "deep" positions, one hue family per top-level
 category, so the chart moves with the shared palette.
 """
+
+import itertools
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -90,15 +107,18 @@ CATEGORIES = [
 ]
 
 # The ten groups, in bar order, which must match the categories' column order above (asserted).
-# `sublabel` is a smaller second line. The group under "Personal care" is named "Other personal
-# care" rather than "Personal care": the category bracket above it already carries that name, and
-# two identical names at different levels would read as the same thing.
+# `contents` says what a group holds where its name does not; it is written into the Note rather
+# than under the name, because a second line over a 25px segment costs several tiers of wrapping
+# (see `place_header_labels`) and the Note has room for the same words. `label` is the name for a
+# group standing on its own; wherever its category's name is beside it, the three residual buckets
+# shorten to "Other" (see `label_in_context`), which is why they are named "Other <category>" here
+# rather than repeating the category outright.
 GROUPS = [
     {"column": "paid_work", "label": "Paid work", "color": ("deep", 3)},
     {
         "column": "education",
         "label": "Education",
-        "sublabel": "In school & study",
+        "contents": "time in school and studying",
         "color": ("tint", 3, 0.45),
     },
     {"column": "sleep", "label": "Sleep", "color": ("deep", 7)},
@@ -108,7 +128,7 @@ GROUPS = [
     {
         "column": "other_unpaid_work",
         "label": "Other unpaid work",
-        "sublabel": "Care work, volunteering",
+        "contents": "care work and volunteering",
         "color": ("tint", 5, 0.45),
     },
     {"column": "tv_and_radio", "label": "TV & Radio", "color": ("deep", 0)},
@@ -117,6 +137,17 @@ GROUPS = [
 ]
 
 TOTAL_LEISURE_COLUMN = "total_leisure"
+
+# A group's values are drawn only where this share of countries can hold one; otherwise none of them
+# are. A number on a handful of rows reads as a fact about those countries rather than as the rest
+# being too narrow to print — education fitted on 1 of 35 rows, and that one number said nothing.
+VALUE_LABEL_COVERAGE = 0.75
+
+# Countries are ranked by this group or category, most minutes at the top. A GROUPS column ranks by
+# that group alone; a CATEGORIES name ranks by the sum of its groups. Asserted in load_chart_groups.
+# Paid work is the original chart's ranking, and the one column education cannot distort: education
+# time is depressed wherever the survey's age floor excludes teenagers (Lithuania, 20-64).
+SORT_BY = "paid_work"
 
 TITLE = "How do people spend their time?"
 
@@ -127,7 +158,6 @@ TAGLINE = "OurWorldinData.org — Research and data to make progress against the
 
 TEXT_COLOR = "#5b5b5b"
 MUTED_COLOR = "#777777"
-LEADER_COLOR = "#999999"
 CATEGORY_RULE_COLOR = "#bbbbbb"
 # In-bar values are white on saturated fills and dark on light tints; the switch is on luminance.
 DARK_VALUE_COLOR = "#444444"
@@ -152,18 +182,12 @@ COUNTRY_LABEL_PAD = 8
 TOTAL_COLUMN_GAP = 10
 VALUE_PAD = 3
 
-# Positional header geometry, in template pixels. A tier holds one line of header text; a
-# two-line label occupies two tiers, its first line on top. `HEADER_NUDGES` are the horizontal
-# offsets the solver may apply, smallest first, when a label does not fit centred on its segment.
+# Header geometry, in template pixels. A tier holds one line of header text, which is what a wrapped
+# category name stacks in; `LEADER_GAP` is the clearance between the header and the bars, and
+# `HEADER_MIN_GAP` the least space two neighbouring names may leave between them.
 TIER_HEIGHT = 15
 LEADER_GAP = 3
 HEADER_MIN_GAP = 8
-LEADER_CLEARANCE = 4
-HEADER_NUDGES = [0, 5, -5, 10, -10, 15, -15, 20, -20, 26, -26, 32, -32, 40, -40, 48, -48, 56, -56]
-MAX_TIERS = 8
-# A label on tier 0 carries no leader, so it may only drift as far as its own segment: past that
-# it would name the wrong bar. Labels on higher tiers have a leader pointing back at the truth.
-TIER_ZERO_DRIFT = 12
 
 # Category bracket: the gap above the tallest group label, the bracket's end ticks, and the gap
 # between the bracket and its name.
@@ -199,16 +223,17 @@ LAYOUTS = {
         "country_fontsize": 9,
         "value_fontsize": 8.75,
         "header_fontsize": 9.5,
-        "subheader_fontsize": 8.25,
         # Width reserved for the total-leisure column, in template pixels.
         "total_column_px": 74,
         "with_mins_suffix": True,
-        # Where each half of the header goes. Categories bracket the bars from above; the group
-        # names sit below them, either placed over the bottom row's segments ("positional") or
-        # listed by category ("listed"). Keeping the two halves on opposite sides of the bars is
-        # what stops ten group names and four category names competing for the same strip.
+        # Where each half of the header goes. The category brackets span the top row from above, and
+        # each category's own member names are stacked inside its bracket, one per line
+        # ("bracketed") — so the header reads category, then its members, then the data, with every
+        # name over the run of bars it belongs to.
+        # Alternatives for the names: "below_flow" (one list in bar order under the bars) or
+        # "below_listed" (grouped under their category names, as mobile lists them).
         "category_side": "above",
-        "group_labels": "below_listed",
+        "group_labels": "bracketed",
     },
     "time_use_by_country_mobile": {
         "size": (540, 824),
@@ -227,7 +252,6 @@ LAYOUTS = {
         "country_fontsize": 7.5,
         "value_fontsize": 7.5,
         "header_fontsize": 8,
-        "subheader_fontsize": 7,
         "total_column_px": 46,
         "with_mins_suffix": False,
         "category_side": "listed_above",
@@ -266,13 +290,22 @@ def run() -> None:
 
 
 def load_chart_groups() -> tuple[Table, dict[str, str]]:
-    """Load the precomputed chart groups (total population), sorted by paid work.
+    """Load the precomputed chart groups (total population), ranked by `SORT_BY`.
 
     Returns the table plus the age-of-reference exceptions (country -> age range) for the note.
     """
     ds = paths.load_dataset("time_use")
     tb = ds.read("time_use_chart_groups")
-    tb = tb[tb["sex"] == "total"].drop(columns=["sex"]).sort_values("paid_work", ascending=False)
+    tb = tb[tb["sex"] == "total"].drop(columns=["sex"])
+
+    group_columns = [group["column"] for group in GROUPS]
+    assert not set(group_columns + [TOTAL_LEISURE_COLUMN]) - set(tb.columns), "Chart group columns changed."
+    # A category name ranks by the sum of its groups; a group column ranks by itself.
+    sort_columns = next((list(c["columns"]) for c in CATEGORIES if c["name"] == SORT_BY), [SORT_BY])
+    assert not set(sort_columns) - set(group_columns), f"{SORT_BY} is not a group or category of the chart."
+    # Stable, so tied countries (Norway and New Zealand at 241, Belgium and Greece at 194) keep the
+    # source's order instead of swapping between runs and churning the SVG.
+    tb = tb.loc[tb[sort_columns].sum(axis=1).sort_values(ascending=False, kind="stable").index]
 
     detail = ds.read("time_use")
     detail = detail[detail["sex"] == "total"]
@@ -282,8 +315,6 @@ def load_chart_groups() -> tuple[Table, dict[str, str]]:
         if str(row["age_of_reference"]) != "15-64"
     }
 
-    group_columns = [group["column"] for group in GROUPS]
-    assert not set(group_columns + [TOTAL_LEISURE_COLUMN]) - set(tb.columns), "Chart group columns changed."
     assert len(tb) >= 35, "Country coverage shrank."
     assert tb["country"].is_unique, "One row per country expected."
     # The category brackets span contiguous runs of segments, which only holds if the bar order
@@ -400,34 +431,80 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     top_spans = segment_spans(tb.iloc[0], px_per_min)
     bottom_spans = segment_spans(tb.iloc[-1], px_per_min)
 
-    listed_lines = layout_listed_header(layout, width_px - 2 * margin_px)
-    listed_px = len(listed_lines) * (line_px(layout["header_fontsize"]) + FLOW_LINE_PAD)
-
-    # Space above the bars: the category band, or the whole listed header on mobile.
-    if layout["category_side"] == "above":
-        category_placements = solve_category_layout(top_spans, layout)
-        # The tallest name decides the band: its row, plus however many lines it wrapped onto.
-        tallest = max(
-            placement["row"] * TIER_HEIGHT + len(placement["lines"]) * line_px(layout["header_fontsize"])
-            for placement in category_placements
+    # The name list, for the layouts that use one. Drawn in the band above the bars it shares that
+    # band with the two-line "Total leisure" column header, so it stops short of that column; drawn
+    # below the chart it has the whole frame.
+    listed_lines: list[list[tuple]] = []
+    listed_px = 0.0
+    if layout["group_labels"] in ("listed_above", "below_listed", "below_flow"):
+        listed_available_px = width_px - 2 * margin_px
+        if layout["group_labels"] == "listed_above":
+            listed_available_px -= layout["total_column_px"] + TOTAL_COLUMN_GAP
+        if layout["group_labels"] == "below_flow":
+            listed_lines = layout_flowed_names(layout, listed_available_px)
+        else:
+            listed_lines = layout_listed_header(layout, listed_available_px)
+        listed_px = len(listed_lines) * (line_px(layout["header_fontsize"]) + FLOW_LINE_PAD)
+        # `layout_listed_header` keeps a category and its members together on one line, so a single
+        # block wider than what it was given still overruns — into the total-leisure header, where
+        # the two would be printed over each other.
+        widest_px = max(
+            offset + text_advance_px(text, layout["header_fontsize"], bold)
+            for line in listed_lines
+            for offset, text, _, bold, _ in line
         )
-        header_px = CATEGORY_GAP + CATEGORY_TICK + CATEGORY_LABEL_GAP + tallest
-    else:
-        category_placements = None
-        header_px = listed_px
-    # Room for the two-line "Total leisure" column header, which sits above the first bar.
-    header_px = max(header_px, 2 * line_px(layout["header_fontsize"]) + LEADER_GAP)
+        assert widest_px <= listed_available_px, (
+            f"A line of the listed header is {widest_px:.0f}px wide, over the {listed_available_px:.0f}px it "
+            f"has: it would run into the total-leisure column."
+        )
 
-    # Space below the bars, for whichever half of the header goes there.
-    if layout["group_labels"] == "below_positional":
-        placements = solve_header_layout(bottom_spans, bar_width_px, layout)
-        below_px = LEADER_GAP + max(p["tier"] + p["height"] for p in placements) * TIER_HEIGHT
-    elif layout["group_labels"] == "below_listed":
-        placements = None
-        below_px = LEADER_GAP + listed_px
-    else:
-        placements = None
-        below_px = 0.0
+    # Which side each half of the header is drawn on. Both halves point at the row they touch, so a
+    # half placed above works off the top row's segments and one placed below off the bottom row's.
+    category_at = {"above": "above", "below": "below", "listed_above": "above"}[layout["category_side"]]
+    group_at = {"below_listed": "below", "below_flow": "below"}.get(layout["group_labels"], "above")
+    assert layout["group_labels"] in {"bracketed", "below_flow", "below_listed", "listed_above"}, (
+        f"Unknown group_labels {layout['group_labels']!r}."
+    )
+
+    category_placements = None
+    if layout["category_side"] in ("above", "below"):
+        category_placements = solve_category_layout(top_spans if category_at == "above" else bottom_spans, layout)
+
+    # The member names drawn inside each bracket sit between the rule and the bars, so the rule moves
+    # out by their height: category first, its own members under it, then the data.
+    bracketed_blocks = None
+    bracketed_px = 0.0
+    if layout["group_labels"] == "bracketed":
+        bracketed_blocks = layout_bracketed_names(top_spans if category_at == "above" else bottom_spans, layout)
+        collision = blocks_collide(bracketed_blocks, layout)
+        assert not collision, (
+            f"The names inside the {collision} brackets would touch. Their category spans this row too "
+            f"narrowly to hold them — list the names beyond the chart instead ('below_listed')."
+        )
+        deepest = max(len(block["lines"]) for block in bracketed_blocks)
+        bracketed_px = deepest * line_px(layout["header_fontsize"])
+    category_base_px = CATEGORY_GAP + (LEADER_GAP + bracketed_px if bracketed_blocks else 0.0)
+
+    def band_px(side: str) -> float:
+        """The room the header needs on one side of the bars."""
+        room = 0.0
+        if category_at == side and category_placements is not None:
+            # The tallest name decides the band: its row, plus however many lines it wrapped onto.
+            tallest = max(
+                placement["row"] * TIER_HEIGHT + len(placement["lines"]) * line_px(layout["header_fontsize"])
+                for placement in category_placements
+            )
+            room = max(room, category_base_px + CATEGORY_TICK + CATEGORY_LABEL_GAP + tallest)
+        if group_at == side and layout["group_labels"] in ("below_listed", "below_flow"):
+            room = max(room, LEADER_GAP + listed_px)
+        if side == "above" and "listed_above" in (layout["category_side"], layout["group_labels"]):
+            room = max(room, listed_px)
+        return room
+
+    # Room above for whichever half goes there, and never less than the two-line "Total leisure"
+    # column header, which sits above the first bar.
+    header_px = max(band_px("above"), 2 * line_px(layout["header_fontsize"]) + LEADER_GAP)
+    below_px = band_px("below")
 
     chart_top_px = subtitle_bottom_px + header_px
     chart_bottom_px = layout["chart_bottom_y"] - below_px
@@ -458,15 +535,19 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
 
     group_colors = {group["column"]: resolve_color(group["color"], palette) for group in GROUPS}
 
-    draw_bars(ax, tb, country_labels, group_colors, px_per_min, layout)
+    draw_bars(ax, tb, country_labels, group_colors, px_per_min, layout, value_label_columns(tb, px_per_min, layout))
 
     if category_placements is not None:
-        draw_category_brackets(ax, category_placements, palette, px_per_min, rows_above, layout)
-    if placements is not None:
-        draw_positional_labels(ax, placements, palette, px_per_min, rows_below, layout)
+        rows_out = rows_above if category_at == "above" else rows_below
+        draw_category_brackets(
+            ax, category_placements, palette, px_per_min, rows_out, layout, category_at, category_base_px
+        )
+    if bracketed_blocks is not None:
+        rows_out = rows_above if category_at == "above" else rows_below
+        draw_bracketed_names(ax, bracketed_blocks, palette, px_per_min, rows_out, layout, bracketed_px)
     if layout["group_labels"] == "listed_above":
         draw_listed_header(fig, listed_lines, palette, subtitle_bottom_px, margin_px, layout, fx, fy)
-    elif layout["group_labels"] == "below_listed":
+    elif layout["group_labels"] in ("below_listed", "below_flow"):
         draw_listed_header(fig, listed_lines, palette, chart_bottom_px + LEADER_GAP, margin_px, layout, fx, fy)
 
     # Total-leisure column header, over its own column.
@@ -489,7 +570,37 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     return fig
 
 
-def draw_bars(ax, tb: Table, country_labels: list[str], group_colors: dict, px_per_min: float, layout: dict) -> None:
+def value_label_columns(tb: Table, px_per_min: float, layout: dict) -> set[str]:
+    """The groups whose value is drawn: those that fit on at least `VALUE_LABEL_COVERAGE` of rows.
+
+    Per frame, since the mobile bars are little over half as wide.
+    """
+    labelled = set()
+    for group in GROUPS:
+        column = group["column"]
+        fits = sum(
+            1
+            for minutes in tb[column].astype(float)
+            if fit_text(
+                value_candidates(column, minutes, layout["with_mins_suffix"]),
+                minutes * px_per_min,
+                layout["value_fontsize"],
+            )
+        )
+        if fits >= VALUE_LABEL_COVERAGE * len(tb):
+            labelled.add(column)
+    return labelled
+
+
+def draw_bars(
+    ax,
+    tb: Table,
+    country_labels: list[str],
+    group_colors: dict,
+    px_per_min: float,
+    layout: dict,
+    value_columns: set[str],
+) -> None:
     """One stacked row per country: the country label, the ten segments, and the leisure total."""
     for row in range(len(tb)):
         country_row = tb.iloc[row]
@@ -521,10 +632,14 @@ def draw_bars(ax, tb: Table, country_labels: list[str], group_colors: dict, px_p
                 linewidth=0,
                 gid=f"{slug}__{slugify(column)}",
             )
-            label = fit_text(
-                value_candidates(column, minutes, layout["with_mins_suffix"]),
-                minutes * px_per_min,
-                layout["value_fontsize"],
+            label = (
+                fit_text(
+                    value_candidates(column, minutes, layout["with_mins_suffix"]),
+                    minutes * px_per_min,
+                    layout["value_fontsize"],
+                )
+                if column in value_columns
+                else None
             )
             if label:
                 ax.text(
@@ -553,55 +668,30 @@ def draw_bars(ax, tb: Table, country_labels: list[str], group_colors: dict, px_p
         )
 
 
-def draw_positional_labels(ax, placements: list[dict], palette, px_per_min: float, rows_below, layout: dict) -> None:
-    """Draw the solved group labels below the bars, each with a leader up to its segment."""
-    for placement in placements:
-        group = placement["group"]
-        slug = slugify(group["column"])
-        color = header_text_color(group["color"], palette)
-        # A block below the bars reads downwards from the bars: its first line sits on the tier
-        # nearest them, so the block occupies exactly the tiers the solver reserved for it.
-        for index, (text, fontsize, bold) in enumerate(placement["lines"]):
-            tier = placement["tier"] + index
-            ax.text(
-                placement["center"] / px_per_min,
-                rows_below(LEADER_GAP + tier * TIER_HEIGHT),
-                text,
-                ha="center",
-                va="top",
-                fontsize=fontsize,
-                fontweight="bold" if bold else "normal",
-                color=color,
-                gid=f"header__{slug}" if index == 0 else f"header__{slug}-line{index}",
-            )
-        if placement["tier"] > 0:
-            leader_x = placement["leader_x"]
-            ax.plot(
-                [leader_x / px_per_min, leader_x / px_per_min],
-                [rows_below(LEADER_GAP + placement["tier"] * TIER_HEIGHT - LEADER_GAP), rows_below(1.0)],
-                color=LEADER_COLOR,
-                linewidth=0.7,
-                solid_capstyle="butt",
-                gid=f"header__{slug}-leader",
-            )
+def draw_category_brackets(
+    ax, category_placements: list[dict], palette, px_per_min: float, rows_out, layout, side: str, base_px: float
+) -> None:
+    """Bracket each category's run of bars, with its name beside the bracket.
 
-
-def draw_category_brackets(ax, category_placements: list[dict], palette, px_per_min: float, rows_above, layout) -> None:
-    """Bracket each category's run of bars from above, with its name over the bracket."""
-    rule_px = CATEGORY_GAP
+    Mirrors like the group labels: `rows_out` measures distance out from the bars, so the end ticks
+    turn back towards the segments they enclose on either side, and only the name's stacking flips.
+    `base_px` is how far out the bracket rule sits, which grows when the group names are listed
+    between the brackets and the bars.
+    """
+    rule_px = base_px
     for placement in category_placements:
         slug = slugify(placement["name"])
         start, end = placement["bracket"]
         label_px = rule_px + CATEGORY_LABEL_GAP + placement["row"] * TIER_HEIGHT
-        # A bracket, not a plain rule: the end ticks turn down towards the segments they enclose,
-        # so the span reads as "these bars" rather than as a divider.
+        # A bracket, not a plain rule: the end ticks turn back towards the segments they enclose, so
+        # the span reads as "these bars" rather than as a divider.
         ax.plot(
             [start / px_per_min, start / px_per_min, end / px_per_min, end / px_per_min],
             [
-                rows_above(rule_px - CATEGORY_TICK),
-                rows_above(rule_px),
-                rows_above(rule_px),
-                rows_above(rule_px - CATEGORY_TICK),
+                rows_out(rule_px - CATEGORY_TICK),
+                rows_out(rule_px),
+                rows_out(rule_px),
+                rows_out(rule_px - CATEGORY_TICK),
             ],
             color=CATEGORY_RULE_COLOR,
             linewidth=0.8,
@@ -609,29 +699,59 @@ def draw_category_brackets(ax, category_placements: list[dict], palette, px_per_
             gid=f"category__{slug}-bracket",
         )
         if placement["row"]:
-            # A name on an upper row needs a stem back to its own bracket, or it reads as the
+            # A name on an outer row needs a stem back to its own bracket, or it reads as the
             # neighbour's.
             ax.plot(
                 [placement["center"] / px_per_min] * 2,
-                [rows_above(label_px), rows_above(rule_px)],
+                [rows_out(label_px), rows_out(rule_px)],
                 color=CATEGORY_RULE_COLOR,
                 linewidth=0.8,
                 solid_capstyle="butt",
                 gid=f"category__{slug}-stem",
             )
-        # Lines stack upwards from the bracket, so the name reads top-down beside it.
-        for index, line in enumerate(reversed(placement["lines"])):
+        # Lines stack away from the bracket, so the name reads top-down beside it.
+        for index, line in enumerate(placement["lines"]):
+            offset = len(placement["lines"]) - 1 - index if side == "above" else index
             ax.text(
                 placement["center"] / px_per_min,
-                rows_above(label_px + index * line_px(layout["header_fontsize"])),
+                rows_out(label_px + offset * line_px(layout["header_fontsize"])),
                 line,
                 ha="center",
-                va="bottom",
+                va="bottom" if side == "above" else "top",
                 fontsize=layout["header_fontsize"],
                 fontweight="bold",
                 color=header_text_color(placement["color"], palette),
-                gid=f"category__{slug}" if index == len(placement["lines"]) - 1 else f"category__{slug}-line{index}",
+                gid=f"category__{slug}" if index == 0 else f"category__{slug}-line{index}",
             )
+
+
+def draw_bracketed_names(
+    ax, blocks: list[dict], palette, px_per_min: float, rows_out, layout: dict, height_px: float
+) -> None:
+    """Draw each category's member names inside its bracket, centred and reading top-down.
+
+    Every block starts at the same distance out from the bars — directly under the bracket rule — so
+    the four of them line up however many lines each one needed.
+    """
+    fontsize = layout["header_fontsize"]
+    for block in blocks:
+        start, end = block["span"]
+        centre = (start + end) / 2
+        for index, line in enumerate(block["lines"]):
+            width = sum(text_advance_px(text, fontsize) for text, _ in line)
+            offset = centre - width / 2
+            for text, group in line:
+                ax.text(
+                    offset / px_per_min,
+                    rows_out(LEADER_GAP + height_px - index * line_px(fontsize)),
+                    text,
+                    ha="left",
+                    va="top",
+                    fontsize=fontsize,
+                    color=header_text_color(group["color"], palette),
+                    gid=f"header__{slugify(group['column'])}",
+                )
+                offset += text_advance_px(text, fontsize)
 
 
 def draw_listed_header(fig, listed_lines, palette, top_px: float, margin_px: float, layout: dict, fx, fy) -> None:
@@ -725,152 +845,10 @@ def segment_spans(row, px_per_min: float) -> dict[str, tuple[float, float]]:
     return spans
 
 
-def solve_header_layout(spans: dict, bar_width_px: float, layout: dict) -> list[dict]:
-    """Place every group label on a tier above the bars, without collisions.
-
-    Labels are placed in bar order, each at the lowest tier where it fits. A label may be split
-    over two lines and nudged sideways; a label above tier 0 drops a leader to its segment. Three
-    things must hold, and are checked at placement rather than assumed:
-
-    1. Two labels on the same tier keep `HEADER_MIN_GAP` between them.
-    2. A leader does not pass through a label on a tier below its own.
-    3. A label does not sit on top of a leader already dropped from a tier above it.
-
-    Solving this rather than hand-placing each label is what lets the header survive a data update
-    that reorders the top row or changes its proportions — with 35 countries and ten groups, the
-    top row's segment widths are not stable between OECD releases.
-    """
-    # tier -> spans occupied by labels, and the leaders already dropped (x, bottom-most tier).
-    occupied: dict[int, list[tuple[float, float]]] = {}
-    leaders: list[tuple[float, int]] = []
-    placements: list[dict] = []
-
-    for index, group in enumerate(GROUPS):
-        start, end = spans[group["column"]]
-        mid = (start + end) / 2
-        unplaced = [other["column"] for other in GROUPS[index + 1 :]]
-        placement = None
-        for tier in range(MAX_TIERS):
-            for lines in label_variants(group, layout, end - start):
-                width = block_width(lines)
-                if width > bar_width_px:
-                    continue
-                height = len(lines)
-                drift = TIER_ZERO_DRIFT + (end - start) / 2 if tier == 0 else max(HEADER_NUDGES)
-                for nudge in HEADER_NUDGES:
-                    if abs(nudge) > drift:
-                        continue
-                    center = min(max(mid + nudge, width / 2), bar_width_px - width / 2)
-                    label_span = (center - width / 2, center + width / 2)
-                    tiers = range(tier, tier + height)
-                    if any(overlaps(label_span, other, HEADER_MIN_GAP) for t in tiers for other in occupied.get(t, [])):
-                        continue
-                    # A label that blankets a not-yet-placed group's segment leaves that group's
-                    # leader nowhere to come down: every x it could use is under this label.
-                    # Groups already placed are unaffected — their leaders run below this tier.
-                    if any(covers(label_span, spans[column], LEADER_CLEARANCE) for column in unplaced):
-                        continue
-                    # A leader from above must not be covered by this label.
-                    if any(
-                        leader_tier > tier + height - 1 and inside(leader_x, label_span, LEADER_CLEARANCE)
-                        for leader_x, leader_tier in leaders
-                    ):
-                        continue
-                    leader_x = pick_leader_x(start, end, tier, occupied) if tier > 0 else None
-                    if tier > 0 and leader_x is None:
-                        continue
-                    placement = {
-                        "group": group,
-                        "tier": tier,
-                        "height": height,
-                        "lines": lines,
-                        "center": center,
-                        "span": label_span,
-                        "leader_x": leader_x,
-                    }
-                    break
-                if placement:
-                    break
-            if placement:
-                break
-        assert placement, f"Could not place the header label for {group['column']} in {MAX_TIERS} tiers."
-
-        for t in range(placement["tier"], placement["tier"] + placement["height"]):
-            occupied.setdefault(t, []).append(placement["span"])
-        if placement["leader_x"] is not None:
-            leaders.append((placement["leader_x"], placement["tier"]))
-        placements.append(placement)
-
-    return placements
-
-
 # Widths a header label may be wrapped to, in template pixels, when its natural width does not
 # fit over its own segment. Narrower blocks take less of the crowded zone above the bars and leave
 # corridors for their neighbours' leaders, at the cost of one tier each.
 LABEL_WRAP_WIDTHS = [115, 90, 70]
-
-
-def label_variants(group: dict, layout: dict, segment_width: float) -> list[list[tuple[str, float, bool]]]:
-    """A group's label as blocks of (text, size, bold) lines, shortest block first.
-
-    A label wider than the segment it names has to be threaded past its neighbours, and a wide
-    one-liner both takes the room they need and blocks their leaders — so wrapped forms are kept
-    as fallbacks. A sublabel wraps too: it is often the widest line of the block.
-    """
-    header_fontsize = layout["header_fontsize"]
-    subheader_fontsize = layout["subheader_fontsize"]
-
-    def block(max_px: float) -> list[tuple[str, float, bool]]:
-        lines = [
-            (line, header_fontsize, True)
-            for line in wrap_to_width(group["label"], max_px, header_fontsize, bold=True).split("\n")
-        ]
-        if group.get("sublabel"):
-            lines += [
-                (line, subheader_fontsize, False)
-                for line in wrap_to_width(group["sublabel"], max_px, subheader_fontsize).split("\n")
-            ]
-        return lines
-
-    variants = [block(float("inf"))]
-    for max_px in sorted(LABEL_WRAP_WIDTHS, reverse=True):
-        candidate = block(max_px)
-        if candidate not in variants:
-            variants.append(candidate)
-
-    # Shortest block first, narrowest to break ties: every extra line costs a tier, and a header
-    # that grows upwards eats the chart. Narrower forms are a fallback for a crowded neighbourhood,
-    # not a default — `segment_width` decides only how hard that fallback is likely to be needed.
-    variants.sort(key=lambda lines: (len(lines), block_width(lines) > segment_width))
-    return variants
-
-
-def block_width(lines: list[tuple[str, float, bool]]) -> float:
-    """The widest line of a label block, in template pixels."""
-    return max(text_width_px(text, size, bold) for text, size, bold in lines)
-
-
-def pick_leader_x(start: float, end: float, tier: int, occupied: dict) -> float | None:
-    """An x inside the segment where a leader can reach it without crossing a lower label.
-
-    Searched from the segment's middle outwards, so a leader stays as central as it can: the
-    corridor left between two labels is often only a few pixels wide.
-    """
-    middle = (start + end) / 2
-    steps = 12
-    candidates = [middle]
-    for index in range(1, steps + 1):
-        offset = index * (end - start) / (2 * steps)
-        candidates.extend([middle + offset, middle - offset])
-    for candidate in candidates:
-        if not start <= candidate <= end:
-            continue
-        if any(
-            inside(candidate, other, LEADER_CLEARANCE) for lower in range(tier) for other in occupied.get(lower, [])
-        ):
-            continue
-        return candidate
-    return None
 
 
 def solve_category_layout(spans: dict, layout: dict) -> list[dict]:
@@ -952,6 +930,103 @@ def category_variants(name: str, layout: dict) -> list[list[str]]:
     return variants
 
 
+def label_in_context(group: dict) -> str:
+    """A group's name for use where its category's name is already beside it.
+
+    The residual buckets become just "Other": "Other unpaid work" set inside the "Unpaid work &
+    other" bracket repeats the bracket, and at 68px wraps onto three lines to do it. Where a group
+    stands on its own — a flat list, or a label over its own segment — `label` is used instead.
+    """
+    return "Other" if group["label"].startswith("Other ") else group["label"]
+
+
+def layout_bracketed_names(spans: dict, layout: dict) -> list[dict]:
+    """Each category's member names laid out inside its own bracket's span, one per line.
+
+    All four brackets stack their names, rather than setting the ones that would fit on a single line
+    horizontally: a mixture reads as four different treatments, and only the two widest brackets
+    could have taken a row anyway. A name wider than its span is wrapped to it, so a block never
+    spills into the neighbouring category's; `blocks_collide` checks what is left.
+
+    Returns one block per category: lines of (text, group) runs, and the span to centre them in.
+    """
+    fontsize = layout["header_fontsize"]
+    blocks = []
+    for category in CATEGORIES:
+        start = spans[category["columns"][0]][0]
+        end = spans[category["columns"][-1]][1]
+        members = [group for group in GROUPS if group["column"] in category["columns"]]
+        lines = [
+            [(text, group)]
+            for group in members
+            for text in wrap_to_width(label_in_context(group), end - start, fontsize).split("\n")
+        ]
+        blocks.append({"name": category["name"], "lines": lines, "span": (start, end)})
+    return blocks
+
+
+def blocks_collide(blocks: list[dict], layout: dict) -> str | None:
+    """The first pair of neighbouring name blocks that touch, or None if they all clear each other."""
+    extents = []
+    for block in blocks:
+        start, end = block["span"]
+        widest = max(
+            sum(text_advance_px(text, layout["header_fontsize"]) for text, _ in line) for line in block["lines"]
+        )
+        centre = (start + end) / 2
+        extents.append((block["name"], (centre - widest / 2, centre + widest / 2)))
+    for (left_name, left), (right_name, right) in zip(extents, extents[1:]):
+        if overlaps(left, right, HEADER_MIN_GAP):
+            return f"{left_name} and {right_name}"
+    return None
+
+
+def layout_flowed_names(layout: dict, available_px: float) -> list[list[tuple]]:
+    """Wrap the group names, in bar order, into lines of (x, text, color spec, bold, gid).
+
+    One name after another for as long as the width allows, then onto the next line — so a wide frame
+    lists them in a row, a narrow one ends up with a column, and there is no second layout to keep in
+    step. The category names are not repeated: the brackets above the bars carry them, and the colors
+    tie each name back to its own segment.
+    """
+    runs = [(group["label"] + (" · " if index < len(GROUPS) - 1 else ""), group) for index, group in enumerate(GROUPS)]
+    widths = [text_advance_px(text, layout["header_fontsize"], False) for text, _ in runs]
+
+    # How many lines the names need, packed as tightly as the width allows.
+    lines_needed = 1
+    x = 0.0
+    for width in widths:
+        if x > 0 and x + width > available_px:
+            lines_needed += 1
+            x = 0.0
+        x += width
+
+    # Then the breaks that make those lines as even as possible. Tight packing leaves the last line
+    # holding one or two names under a full one, which reads as a mistake rather than as a list;
+    # minimising the widest line spreads them out instead. Ten names over at most a few lines, so
+    # this is a few dozen combinations.
+    def widest(points: tuple[int, ...]) -> float:
+        return max(sum(widths[start:end]) for start, end in zip((0, *points), (*points, len(widths))))
+
+    breaks = min(itertools.combinations(range(1, len(widths)), lines_needed - 1), key=widest)
+    assert widest(breaks) <= available_px, "The flowed name list does not fit the frame at any break."
+
+    lines: list[list[tuple]] = [[]]
+    x = 0.0
+    for index, ((text, group), width) in enumerate(zip(runs, widths)):
+        if index in breaks:
+            lines.append([])
+            x = 0.0
+        lines[-1].append((x, text, group["color"], False, f"header__{slugify(group['column'])}"))
+        x += width
+
+    # A separator that ends a line has nothing to separate it from.
+    for line in lines:
+        offset, text, spec, bold, gid = line[-1]
+        line[-1] = (offset, text.rstrip(" ·"), spec, bold, gid)
+    return lines
+
+
 def layout_listed_header(layout: dict, available_px: float) -> list[list[tuple]]:
     """Wrap the category-grouped name list into lines of (x, text, color spec, bold, gid)."""
     lines: list[list[tuple]] = [[]]
@@ -960,7 +1035,7 @@ def layout_listed_header(layout: dict, available_px: float) -> list[list[tuple]]
         runs = [(f"{category['name']}: ", category["color"], True, f"category__{slugify(category['name'])}")]
         members = [group for group in GROUPS if group["column"] in category["columns"]]
         for index, group in enumerate(members):
-            text = group["label"] + (" · " if index < len(members) - 1 else "")
+            text = label_in_context(group) + (" · " if index < len(members) - 1 else "")
             runs.append((text, group["color"], False, f"header__{slugify(group['column'])}"))
 
         def advance(text: str, bold: bool) -> float:
@@ -986,16 +1061,6 @@ def layout_listed_header(layout: dict, available_px: float) -> list[list[tuple]]
 def overlaps(a: tuple[float, float], b: tuple[float, float], gap: float) -> bool:
     """Whether two spans come within `gap` of each other."""
     return a[0] - gap < b[1] and b[0] - gap < a[1]
-
-
-def inside(x: float, span: tuple[float, float], clearance: float) -> bool:
-    """Whether x falls within `clearance` of a span."""
-    return span[0] - clearance <= x <= span[1] + clearance
-
-
-def covers(outer: tuple[float, float], inner: tuple[float, float], clearance: float) -> bool:
-    """Whether `outer` swallows `inner` whole, leaving no clear x on either side of it."""
-    return outer[0] - clearance <= inner[0] and inner[1] <= outer[1] + clearance
 
 
 def line_px(points: float) -> float:
@@ -1111,10 +1176,15 @@ def build_note(tb: Table, ages: dict[str, str], layout: dict) -> str:
         "20-64": "20 to 64",
     }
     exceptions = ", ".join(f"{country} ({described.get(age, age)})" for country, age in sorted(ages.items()))
+    # What the groups whose names do not say it themselves contain, in bar order.
+    contents = "; ".join(
+        f"{group['label'].lower()} covers {group['contents']}" for group in GROUPS if group.get("contents")
+    )
     text = (
         f"Note: Each country's most recent time-use survey is shown, with its year in brackets; "
         f"survey years range from {tb['year'].min()} to {tb['year'].max()}. "
-        f"Estimates cover people aged 15 to 64, except in {exceptions}."
+        f"Estimates cover people aged 15 to 64, except in {exceptions}. "
+        f"{contents[0].upper()}{contents[1:]}."
     )
     max_px = layout["size"][0] - 2 * layout["margin"]
     wrapped = wrap_to_width(text, max_px, layout["footer_fontsize"])
