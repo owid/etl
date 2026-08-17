@@ -112,6 +112,8 @@ views:
     indicators:
       y:
         - catalogPath: internal_displacement#total_displacement_rounded_per_thousand
+          display:
+            numDecimalPlaces: 1
     config:
       note: "{definitions.footnote_zero_idps}"
       map:
@@ -155,6 +157,8 @@ views:
     indicators:
       y:
         - catalogPath: internal_displacement#total_new_displacement_rounded_per_thousand
+          display:
+            numDecimalPlaces: 1
     config:
       note: "{definitions.footnote_zero_displacements}"
       map:
@@ -201,6 +205,8 @@ views:
     indicators:
       y:
         - catalogPath: internal_displacement#conflict_total_displacement_rounded_per_thousand
+          display:
+            numDecimalPlaces: 1
     config:
       note: "{definitions.footnote_zero_idps}"
       map:
@@ -247,6 +253,8 @@ views:
     indicators:
       y:
         - catalogPath: internal_displacement#conflict_new_displacement_rounded_per_thousand
+          display:
+            numDecimalPlaces: 1
     config:
       note: "{definitions.footnote_zero_displacements}"
       map:
@@ -294,6 +302,8 @@ views:
     indicators:
       y:
         - catalogPath: internal_displacement#disaster_total_displacement_rounded_per_thousand
+          display:
+            numDecimalPlaces: 1
     config:
       note: "{definitions.footnote_zero_idps}"
       map:
@@ -340,6 +350,8 @@ views:
     indicators:
       y:
         - catalogPath: internal_displacement#disaster_new_displacement_rounded_per_thousand
+          display:
+            numDecimalPlaces: 1
     config:
       note: "{definitions.footnote_zero_displacements}"
       map:
@@ -380,6 +392,8 @@ views:
     indicators:
       y:
         - catalogPath: refugee_data_origin#returned_idps_per_100k
+          display:
+            numDecimalPlaces: 1
     config:
       note: "{definitions.footnote_return_calendar_year}"
       map:
@@ -418,6 +432,8 @@ views:
     indicators:
       y:
         - catalogPath: child_migration#idps_under_18_total_per_1000
+          display:
+            numDecimalPlaces: 1
     config:
       map:
         colorScale:
@@ -460,6 +476,8 @@ views:
     indicators:
       y:
         - catalogPath: child_migration#new_idps_under_18_total_per_1000
+          display:
+            numDecimalPlaces: 1
     config:
       map:
         colorScale:
@@ -504,6 +522,8 @@ views:
     indicators:
       y:
         - catalogPath: child_migration#idps_under_18_conflict_violence_per_1000
+          display:
+            numDecimalPlaces: 1
     config:
       map:
         colorScale:
@@ -549,6 +569,8 @@ views:
     indicators:
       y:
         - catalogPath: child_migration#new_idps_under_18_conflict_violence_per_1000
+          display:
+            numDecimalPlaces: 1
     config:
       map:
         colorScale:
@@ -594,6 +616,8 @@ views:
     indicators:
       y:
         - catalogPath: child_migration#idps_under_18_disaster_per_1000
+          display:
+            numDecimalPlaces: 1
     config:
       map:
         colorScale:
@@ -639,6 +663,8 @@ views:
     indicators:
       y:
         - catalogPath: child_migration#new_idps_under_18_disaster_per_1000
+          display:
+            numDecimalPlaces: 1
     config:
       map:
         colorScale:

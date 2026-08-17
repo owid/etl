@@ -114,6 +114,8 @@ views:
     indicators:
       y:
         - catalogPath: refugee_data_origin#refugees_per_1000
+          display:
+            numDecimalPlaces: 1
     config:
       note: "{definitions.footnote_refugees}"
       map:
@@ -153,6 +155,8 @@ views:
     indicators:
       y:
         - catalogPath: refugee_data_asylum#refugees_per_1000
+          display:
+            numDecimalPlaces: 1
     config:
       note: "{definitions.footnote_refugees_asylum}"
       map:
@@ -194,6 +198,8 @@ views:
     indicators:
       y:
         - catalogPath: refugee_data_origin#asylum_seekers_per_100k
+          display:
+            numDecimalPlaces: 1
     config:
       note: "{definitions.footnote_asylum}"
       map:
@@ -233,6 +239,8 @@ views:
     indicators:
       y:
         - catalogPath: refugee_data_asylum#asylum_seekers_per_100k
+          display:
+            numDecimalPlaces: 1
     config:
       note: "{definitions.footnote_asylum_asylum}"
       map:
@@ -314,6 +322,8 @@ views:
     indicators:
       y:
         - catalogPath: refugee_data_asylum#stateless_per_100k
+          display:
+            numDecimalPlaces: 1
     config:
       map:
         colorScale:
@@ -355,6 +365,8 @@ views:
     indicators:
       y:
         - catalogPath: child_migration#refugees_under_18_origin_per_1000
+          display:
+            numDecimalPlaces: 1
     config:
       map:
         colorScale:
@@ -397,6 +409,8 @@ views:
     indicators:
       y:
         - catalogPath: child_migration#refugees_under_18_asylum_per_1000
+          display:
+            numDecimalPlaces: 1
     config:
       map:
         colorScale:
