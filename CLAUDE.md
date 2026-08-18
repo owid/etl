@@ -130,11 +130,12 @@ Internal terms that recur across this guide, the skills, and the codebase:
 ```bash
 .venv/bin/etlr namespace/version/dataset --private      # Run step
 .venv/bin/etlr namespace/version/dataset --grapher      # Upload to grapher
+.venv/bin/etlr export://.../dataset --export             # Run an export:// step (mdim, explorer, static_viz, ...)
 .venv/bin/etlr namespace/version/dataset --dry-run      # Preview
 .venv/bin/etlr namespace/version/dataset --force --only # Force re-run
 ```
 
-Key flags: `--grapher/-g` (upload), `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
+Key flags: `--grapher/-g` (upload), `--export` (required for any `export://...` step — mdims, explorers, static viz; omitting it makes `etlr` report "No steps matched" even though the step is in the DAG), `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
 
 **"The step completed" is not "the data is right".** After running a step for
 someone, report what came out of it: row count, year range, entities, and a few
@@ -299,6 +300,15 @@ Two different descriptions, two different jobs. Don't mix them:
 - **Garden `description_processing`** describes what **OWID** does to that data — aggregation, relabeling, deduplication, derivations, date conversion.
 
 If the same sentence could fit in both, it belongs in garden — not in `.dvc`. Don't repeat producer-side facts in `description_processing`, and don't put OWID-side transformations in the `.dvc`.
+
+### Two rules for every subtitle you write
+
+These apply to `description_short` and `presentation.grapher_config.subtitle` alike — both feed a chart's subtitle through grapher inheritance (`grapher_config.subtitle` wins; `description_short` is the fallback) — and to `subtitle` in MDim and explorer configs:
+
+- **Don't open with "The" when the next word works just as well.** ❌ `The estimated number of deaths from drowning among children under 5.` ✅ `Estimated number of deaths from drowning among children under 5.` Keep "The" only when dropping it breaks the grammar — the text is a sentence whose subject is that noun phrase (`The Gini coefficient measures inequality…`, `The Augmented Human Development Index (AHDI) is a summary measure…`) — or when it's part of a proper name (`The Gambia`, `The Internet`).
+- **Always end with punctuation, normally a period.** ❌ `Estimated number of deaths from drowning among children under 5` ✅ `Estimated number of deaths from drowning among children under 5.`
+
+Full guide (synced from Notion every two weeks) in `.claude/skills/check-metadata-style/STYLE_GUIDE.md`; `/check-metadata-style` audits a dataset against it.
 
 ## Sanity checks
 

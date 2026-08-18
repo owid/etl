@@ -42,7 +42,7 @@ tables:
         processing_level: major
       num_causes_of_stockout:
         title: How many causes of stock-out were there?
-        description_short: The number of causes of [stock-out](#dod:vaccine-stockout).
+        description_short: Number of causes of [stock-out](#dod:vaccine-stockout).
         unit: ""
         processing_level: major
   reason_for_stockout:

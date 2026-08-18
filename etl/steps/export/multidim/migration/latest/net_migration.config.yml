@@ -17,7 +17,7 @@ definitions:
     - config:
         hasMapTab: true
         tab: map
-        chartTypes: ["LineChart"]
+        chartTypes: ["LineChart", "DiscreteBar"]
 
   definition_migrant_un: The UN defines an international migrant as someone who has been living for one year or longer in a country other than the one in which they were born. Similarly an emigrant is someone who has left their country of birth to live in another country for one year or longer.
   definition_net_migration: Net migration is calculated by subtracting the number of emigrants from the number of immigrants for each country. Net migration larger than zero means that more people are moving into a country than leaving it, while a negative net migration indicates that more people are leaving the country than moving in.
@@ -47,7 +47,7 @@ views:
         - catalogPath: un_wpp/migration#net_migration__sex_all__age_all__variant_estimates
     config:
       title: Net migration
-      subtitle: The total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country).
+      subtitle: Total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country).
       map:
         colorScale:
           baseColorScheme: PuOr
@@ -65,7 +65,7 @@ views:
         - catalogPath: un_wpp/migration#net_migration_rate__sex_all__age_all__variant_estimates
     config:
       title: Net migration rate
-      subtitle: The total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country), per 1,000 people in the population.
+      subtitle: Total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country), per 1,000 people in the population.
       map:
         colorScale:
           baseColorScheme: PuOr
