@@ -383,55 +383,72 @@ class AdminAPI:
             raise AdminAPIError({"error": js.get("error"), "narrative_chart_id": narrative_chart_id, "config": config})
         return js
 
-    def upsert_variables(self, dataset_id: int, variables: list[dict]) -> dict:
-        """Upsert a chunk of a dataset's variables and get their published metadata back.
+    def put_dataset(self, catalog_path: str, metadata: dict, indicator_paths: list[str]) -> dict:
+        """Declare what a dataset is and what it should contain.
 
-        Grapher owns the metadata now: it writes the variable rows, the origins and the
-        tag/FAQ links, then assembles `<id>.metadata.json` from what it just wrote instead of
-        reading it back. ETL still owns the values — it infers `type` from them, sends the
-        distinct entity ids and years the JSON needs, and uploads both R2 files itself.
+        `indicator_paths` is authoritative: anything Grapher holds for this dataset and not on
+        the list is removed, along with its link rows and chart configs. Indicators a chart
+        still uses come back in `blocked` instead — deciding whether that should fail the run
+        depends on which environment we're in, so it stays ours.
 
-        Keyed on `catalogPath`, so re-sending a chunk after a lost response is safe.
-
-        Args:
-            dataset_id: Grapher ID of the dataset
-            variables: One entry per variable; see `_variable_upsert_payload`
+        Never call this from a partial run (SUBSET, INSTANT): a truncated list reads as "this
+        dataset should contain less" and deletes real indicators.
 
         Returns:
-            {"variables": {catalog_path: {"id": int, "metadata": {...}}}}
+            {"removed": [catalog_path], "blocked": [{"catalogPath", "charts": [...]}]}
         """
         # Retry in case we're restarting Admin on staging server.
-        resp = requests_with_retry().post(
-            f"{self.owid_env.admin_api}/datasets/{dataset_id}/variables",
+        resp = requests_with_retry().put(
+            f"{self.owid_env.admin_api}/datasets/by-catalog-path/{quote(catalog_path, safe='')}",
             headers=self._headers(),
-            json={"variables": variables},
+            json={**metadata, "indicators": indicator_paths},
             timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)
         if not js.get("success", True):
-            raise AdminAPIError({"error": js.get("error"), "dataset_id": dataset_id})
+            raise AdminAPIError({"error": js.get("error"), "catalog_path": catalog_path})
         return js
 
-    def set_variable_checksums(self, dataset_id: int, checksums: dict[str, dict[str, str]]) -> dict:
-        """Record the data and metadata checksums for variables ETL has finished publishing.
+    def put_indicators(self, catalog_path: str, indicators: list[dict]) -> dict:
+        """Upsert a chunk of a dataset's indicators and publish the metadata they describe.
 
-        Separate from `upsert_variables` on purpose: a checksum means MySQL and both R2 files
-        agree, which isn't true until the uploads have gone through.
+        Grapher writes the rows, renders `<id>.metadata.json`, uploads it, and records its
+        checksum — all in this one call. It also compares the `dataChecksum` we send and tells
+        us which data files still need uploading, and where to put them.
 
-        Args:
-            dataset_id: Grapher ID of the dataset
-            checksums: {catalog_path: {"dataChecksum": ..., "metadataChecksum": ...}}
+        Returns:
+            {"indicators": {catalog_path: {"dataPath": str, "uploadData": bool}}}
         """
         # Retry in case we're restarting Admin on staging server.
-        resp = requests_with_retry().post(
-            f"{self.owid_env.admin_api}/datasets/{dataset_id}/variables/checksums",
+        resp = requests_with_retry().put(
+            f"{self.owid_env.admin_api}/datasets/by-catalog-path/{quote(catalog_path, safe='')}/indicators",
             headers=self._headers(),
-            json={"checksums": checksums},
+            json={"indicators": indicators},
             timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)
         if not js.get("success", True):
-            raise AdminAPIError({"error": js.get("error"), "dataset_id": dataset_id})
+            raise AdminAPIError({"error": js.get("error"), "catalog_path": catalog_path})
+        return js
+
+    def put_dataset_checksum(self, catalog_path: str, source_checksum: str, published_data: dict[str, str]) -> dict:
+        """Report the data files we published, and record the step's source checksum.
+
+        This is the only thing that writes `dataChecksum`, and it runs after the uploads it
+        describes. Only ever pass indicators whose upload actually succeeded: claiming one that
+        didn't would leave Grapher believing a stale file is current, which nothing would
+        notice.
+        """
+        # Retry in case we're restarting Admin on staging server.
+        resp = requests_with_retry().put(
+            f"{self.owid_env.admin_api}/datasets/by-catalog-path/{quote(catalog_path, safe='')}/checksum",
+            headers=self._headers(),
+            json={"sourceChecksum": source_checksum, "publishedData": published_data},
+            timeout=TIMEOUT,
+        )
+        js = self._json_from_response(resp)
+        if not js.get("success", True):
+            raise AdminAPIError({"error": js.get("error"), "catalog_path": catalog_path})
         return js
 
     def cleanup_ghost_variables(self, dataset_id: int, keep_variable_ids: list[int]) -> dict:
