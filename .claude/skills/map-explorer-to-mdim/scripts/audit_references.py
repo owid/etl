@@ -41,6 +41,7 @@ from etl.config import OWID_ENV
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "find-chart-references" / "scripts"))
+from find_references import featured_metric_rows  # noqa: E402
 from redirect_rules import build_source_rules, choice_values, payload_digest, resolve_explorer_url  # noqa: E402
 from reference_report import (  # noqa: E402
     INFO,
@@ -422,6 +423,17 @@ def write_markdown(out: Path, runs: dict[str, dict], rows: list[dict], gaps: lis
             lines.append("")
 
     if featured:
+        # One slot per (URL, tag, income group): two featured explorer views resolving to the same
+        # MDIM view under the same tag+group are ONE add, not two. Rendering one action per source
+        # row asked the operator to create a row that cannot exist twice, and left the surviving
+        # ranking and boost state unstated. Income group comes from the row via `surface_id`
+        # (= `featured_metrics.id`), not from the rendered `context`.
+        fm_by_id = {int(row["id"]): row for row in featured_metric_rows()}
+        groups: dict[tuple, list[tuple]] = defaultdict(list)
+        for r in featured:
+            row = fm_by_id.get(int(r["surface_id"])) if r.get("surface_id") else None
+            groups[(r["where"], (row or {}).get("incomeGroup", ""), r["replacement_url"])].append((r, row))
+        collapsed = sum(1 for members in groups.values() if len(members) > 1)
         lines += [
             f"## ⭐ Featured metrics ({len(featured)}) — swap these BEFORE the redirect",
             "",
@@ -437,13 +449,28 @@ def write_markdown(out: Path, runs: dict[str, dict], rows: list[dict], gaps: lis
             "ranking, delete the old row, then re-apply *boost in search* if it was on (it does not "
             "carry over). Full procedure: `docs/guides/data-work/redirect-to-mdims.md`.",
             "",
-            "| Topic tag | Slot | Explorer view it features | Add this instead |",
-            "|---|---|---|---|",
         ]
-        for r in sorted(featured, key=lambda g: (g["where"], g["context"])):
-            lines.append(
-                f"| {r['where']} | {r['context']} | [{r['explorer']}]({r['old_url']}) | {r['replacement_url']} |"
-            )
+        if collapsed:
+            lines += [
+                f"**{collapsed} replacement(s) below stand in for more than one old slot.** Only one row "
+                "per (URL, tag, income group) can exist — add it once, give it the **lowest** of the old "
+                "rankings (named in the row), then delete every old slot listed.",
+                "",
+            ]
+        lines += [
+            "| Topic tag | Income group | Old slot(s) | Explorer view(s) it features | Add this instead |",
+            "|---|---|---|---|---|",
+        ]
+        for tag, group, replacement in sorted(groups):
+            members = groups[(tag, group, replacement)]
+            rankings = sorted(int(row["ranking"]) for _, row in members if row)
+            slot = ", ".join(f"ranking={n}" for n in rankings) or "—"
+            if len(rankings) > 1:
+                slot += f" → keep {rankings[0]}"
+            if any((row or {}).get("boostInSearch") for _, row in members):
+                slot += " · re-apply boost"
+            views = ", ".join(f"[{r['explorer']}]({r['old_url']})" for r, _ in members)
+            lines.append(f"| {cell(tag, 36)} | {group or '—'} | {slot} | {views} | {replacement} |")
         lines += [
             "",
             "The replacement is the bare MDIM view. Do not paste a redirect target instead — the admin "

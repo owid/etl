@@ -45,6 +45,7 @@ from etl.config import OWID_ENV
 # consumer at once. `replacement_url()` below is deliberately NOT among them: its merge
 # semantics are chart-specific.
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "find-chart-references" / "scripts"))
+from find_references import featured_metric_rows  # noqa: E402
 from reference_report import (  # noqa: E402
     INFO,
     RED,
@@ -645,9 +646,17 @@ def write_markdown(
         lines.append("")
 
     if featured:
-        by_tag = defaultdict(list)
+        # One slot per (URL, tag, income group), so several source charts mapping to the same view
+        # under the same tag+group collapse into ONE add. An add per source row told the operator
+        # to create a row that already exists, and said nothing about which ranking or boost state
+        # to keep. Income group is read from the row itself, via the finding's `surface_id`
+        # (= `featured_metrics.id`), never parsed back out of the rendered `context`.
+        fm_by_id = {int(row["id"]): row for row in featured_metric_rows()}
+        groups: dict[tuple, list[tuple]] = defaultdict(list)
         for f in featured:
-            by_tag[f["where"]].append(f)
+            row = fm_by_id.get(int(f["surface_id"])) if f.get("surface_id") else None
+            groups[(f["where"], (row or {}).get("incomeGroup", ""), f["replacement_url"])].append((f, row))
+        collapsed = sum(1 for members in groups.values() if len(members) > 1)
         lines += [
             f"## ⭐ Featured metrics ({len(featured)}) — swap these BEFORE the CLI runs",
             "",
@@ -666,14 +675,28 @@ def write_markdown(
             "params on paste and never validates the dimension params, so a redirect target is accepted "
             "and then fails silently.",
             "",
-            "| Topic tag | Slot | Old chart | Add this instead |",
-            "|---|---|---|---|",
         ]
-        for tag in sorted(by_tag):
-            for f in sorted(by_tag[tag], key=lambda g: g["context"]):
-                lines.append(
-                    f"| {tag} | {f['context']} | [{f['source_chart_slug']}]({f['old_url']}) | {f['replacement_url']} |"
-                )
+        if collapsed:
+            lines += [
+                f"**{collapsed} replacement(s) below stand in for more than one old slot.** Only one row "
+                "per (URL, tag, income group) can exist — add it once, give it the **lowest** of the old "
+                "rankings (named in the row), then delete every old slot listed.",
+                "",
+            ]
+        lines += [
+            "| Topic tag | Income group | Old slot(s) | Old chart(s) | Add this instead |",
+            "|---|---|---|---|---|",
+        ]
+        for tag, group, replacement in sorted(groups):
+            members = groups[(tag, group, replacement)]
+            rankings = sorted(int(row["ranking"]) for _, row in members if row)
+            slot = ", ".join(f"ranking={r}" for r in rankings) or "—"
+            if len(rankings) > 1:
+                slot += f" → keep {rankings[0]}"
+            if any((row or {}).get("boostInSearch") for _, row in members):
+                slot += " · re-apply boost"
+            charts = ", ".join(f"[{f['source_chart_slug']}]({f['old_url']})" for f, _ in members)
+            lines.append(f"| {cell(tag, 40)} | {group or '—'} | {slot} | {charts} | {replacement} |")
         lines += ["", f"Edit them at [{admin}/featured-metrics]({admin}/featured-metrics).", ""]
 
     if other:

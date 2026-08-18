@@ -1181,17 +1181,27 @@ def sweep_containers_for_articles(mdim_rows: list[dict], explorer_rows: list[dic
     and carries the same `country=`/`time=` pins the downstream audits grade — so walk
     the containers too. Rows keep their container as the subject: the reference is to
     the page, not to any one indicator inside it.
+
+    Article surfaces AND the containers' featured-metric slots are kept. The narrative-chart
+    and redirect rows these sweeps also return are dropped, because the indicator path emits
+    those itself and keeping them here would double-count.
     """
     mdims = sorted({f["where_path"].rsplit("/", 1)[-1] for f in mdim_rows if f["where_path"]})
     explorers = sorted({f["surface_id"] for f in explorer_rows if f["surface_id"]})
     if not mdims and not explorers:
         return []
     print(f"  transitive: sweeping articles for {len(mdims)} MDIM(s) and {len(explorers)} explorer(s)")
+    # Featured metrics ride along with the article surfaces. The filter exists to drop the
+    # narrative-chart and redirect rows these sweeps also return, because the indicator path
+    # emits those elsewhere and they would double-count — but nothing else emits a CONTAINER's
+    # featured-metric rows, so filtering them out left an indicator reachable only through a
+    # featured MDIM/explorer view reporting a false clean.
+    kept = (*GDOC_SURFACES, "featured metric")
     out = []
     for slug in mdims:
-        out += [f for f in sweep_mdim_subject(slug) if f["surface"] in GDOC_SURFACES]
+        out += [f for f in sweep_mdim_subject(slug) if f["surface"] in kept]
     for slug in explorers:
-        out += [f for f in sweep_explorer_subject(slug) if f["surface"] in GDOC_SURFACES]
+        out += [f for f in sweep_explorer_subject(slug) if f["surface"] in kept]
     return out
 
 
