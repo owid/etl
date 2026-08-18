@@ -51,10 +51,23 @@ EIA_SOURCES = {
     "wind": "electricity_from_wind",
 }
 
-# Tolerance for the World reconciliation in sanity_check_outputs, and the first year EIA covers (before
-# it, the countries the Statistical Review omits have no data, so the sum is expected to fall short).
+# Tolerances for the reconciliations in sanity_check_outputs.
 MAX_WORLD_DEVIATION_PCT = 10
-EIA_FIRST_YEAR = 1980
+MAX_REGION_DEVIATION_PCT = 5
+# Regions whose countries come largely from EIA reach ~1.2%, since EIA's by-source values run slightly
+# above its own total.
+MAX_SHARE_SUM_DEVIATION_PCT = 2
+
+# Regions the Statistical Review reports itself, used to check the combined data against its own totals.
+EI_REGIONS = [
+    "Africa (EI)",
+    "Asia Pacific (EI)",
+    "CIS (EI)",
+    "Europe (EI)",
+    "Middle East (EI)",
+    "North America (EI)",
+    "South and Central America (EI)",
+]
 
 # Predecessor and successor entities that the sources report side by side without double-counting: EIA
 # reports Aruba separately from 1986 while keeping the old name for the rest of the Netherlands Antilles,
@@ -469,7 +482,12 @@ def add_per_gdp(tb: Table, ds_gdp: Dataset) -> Table:
     return tb
 
 
-def sanity_check_outputs(tb: Table) -> None:
+def sanity_check_outputs(tb: Table, eia_years: tuple[int, int]) -> None:
+    """Check the output, comparing against the Statistical Review's own totals where possible.
+
+    The reconciliations are restricted to the years EIA covers: outside them the countries the
+    Statistical Review omits have no data, so the sums are expected to fall short.
+    """
     # No fully-NaN columns.
     assert tb.columns[tb.isna().all()].empty, f"Fully-NaN columns: {list(tb.columns[tb.isna().all()])}"
     # Shares should be within [0, 100] (allowing a small tolerance).
@@ -477,6 +495,17 @@ def sanity_check_outputs(tb: Table) -> None:
         col = f"{source}_share_pct"
         valid = tb[col].dropna()
         assert (valid >= -0.01).all() and (valid <= 100.01).all(), f"{col} out of [0, 100]."
+
+    # Wherever the exclusive sources are all reported, their shares must add up to ~100%. This is what
+    # catches a share whose numerator and denominator cover different countries.
+    exclusive = [f"{source}_share_pct" for source in SR_SOURCES.values()]
+    complete = tb[exclusive].notna().all(axis=1)
+    share_sum = tb.loc[complete, exclusive].sum(axis=1)
+    off = tb.loc[complete][(share_sum - 100).abs() > MAX_SHARE_SUM_DEVIATION_PCT]
+    assert off.empty, "Shares of the exclusive sources do not add up to ~100%: " + "; ".join(
+        f"{country} ({group['year'].min()}-{group['year'].max()})"
+        for country, group in off.groupby("country", observed=True)
+    )
     # World total energy supply for the latest year should be in a plausible range (~600 EJ ~= 167000 TWh).
     world_latest = tb[(tb["country"] == "World")].sort_values("year").iloc[-1]
     assert 140000 < world_latest["total_energy_supply_twh"] < 200000, (
@@ -491,12 +520,27 @@ def sanity_check_outputs(tb: Table) -> None:
     countries_sum = tb[~not_a_country].groupby("year", observed=True)["total_energy_supply_twh"].sum(min_count=1)
     world = tb[tb["country"] == "World"].set_index("year")["total_energy_supply_twh"]
     deviation = (100 * (countries_sum - world) / world).dropna()
-    deviation = deviation[deviation.index >= EIA_FIRST_YEAR]
+    deviation = deviation[(deviation.index >= eia_years[0]) & (deviation.index <= eia_years[1])]
     off = deviation[deviation.abs() > MAX_WORLD_DEVIATION_PCT]
     assert len(off) == 0, (
         "The combined country-level data does not add up to the Statistical Review's World total: "
         + "; ".join(f"{year}: {value:+.1f}%" for year, value in off.items())
     )
+
+    # Same check per region: summing each region's members must recover the total the Statistical Review
+    # publishes for it, which covers the same countries whether or not it attributes them individually.
+    for region, members in paths.regions.get_regions(EI_REGIONS, only_subregions=True).items():
+        ours = (
+            tb[tb["country"].isin(members)].groupby("year", observed=True)["total_energy_supply_twh"].sum(min_count=1)
+        )
+        theirs = tb[tb["country"] == region].set_index("year")["total_energy_supply_twh"]
+        deviation = (100 * (ours - theirs) / theirs).dropna()
+        deviation = deviation[(deviation.index >= eia_years[0]) & (deviation.index <= eia_years[1])]
+        off = deviation[deviation.abs() > MAX_REGION_DEVIATION_PCT]
+        assert len(off) == 0, (
+            f"The combined countries of {region} do not add up to the total the Statistical Review reports "
+            "for it: " + "; ".join(f"{year}: {value:+.1f}%" for year, value in off.items())
+        )
 
 
 def run() -> None:
@@ -525,6 +569,8 @@ def run() -> None:
     tb = get_statistical_review_data(tb_review=tb_review)
 
     # Extend the total and each source to the countries the Statistical Review does not report.
+    eia_informed = tb_eia.loc[tb_eia["total_energy_consumption"].notna(), "year"]
+    eia_years = (int(eia_informed.min()), int(eia_informed.max()))
     tb = combine_with_eia(tb=tb, tb_eia=tb_eia)
 
     # Build the OWID region aggregates from the combined country-level data.
@@ -555,7 +601,7 @@ def run() -> None:
     tb = tb[~tb["country"].isin(OUTLIERS)].reset_index(drop=True)
 
     # Sanity checks.
-    sanity_check_outputs(tb=tb)
+    sanity_check_outputs(tb=tb, eia_years=eia_years)
 
     # Derived indicators must not inherit key points from a single input (e.g. EI's oil-consumption
     # notes on the fossil aggregate, or Maddison boilerplate on energy per GDP). Key points come only
