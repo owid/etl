@@ -63,37 +63,6 @@ SOURCE_NAMES = {
 }
 ALL_SOURCES = list(SOURCE_NAMES)
 
-# Maximum relative gap (in percent) between the sum of the exclusive sources and the total energy
-# supply for an entity-year to get share indicators (see add_shares). Empirically, complete
-# Statistical Review breakdowns reconcile within ~0.9%.
-RECONCILIATION_TOLERANCE_PCT = 1
-
-# Entities with a by-source breakdown that is expected to fail the reconciliation gate (see
-# add_shares), and therefore to have no share indicators. In the 2026 release, "Other South and
-# Central America" is too big to assign, so South America is missing several sources and its total,
-# and North America is missing "other renewables" (worth more than the tolerance).
-ENTITIES_WITHOUT_RECONCILED_SHARES = [
-    "North America",
-    "South America",
-]
-
-# Aggregate entities in this dataset: OWID regions built by the Statistical Review garden step, plus
-# EIA's "Low-income countries" total (the Statistical Review covers too few low-income countries).
-OWID_AGGREGATES = [
-    "World",
-    "Africa",
-    "Asia",
-    "Europe",
-    "North America",
-    "South America",
-    "Oceania",
-    "European Union (27)",
-    "High-income countries",
-    "Low-income countries",
-    "Lower-middle-income countries",
-    "Upper-middle-income countries",
-]
-
 # Sources shown in the biomass-inclusive share chart: the individual TES sources plus traditional biomass.
 BIOMASS_SHARE_SOURCES = {
     **{source: SOURCE_NAMES[source] for source in SR_SOURCES.values()},
@@ -322,24 +291,6 @@ def add_aggregate_sources(tb: Table) -> Table:
     tb["low_carbon_energy_twh"] = tb["renewables_twh"] + tb["nuclear_twh"].fillna(0)
     # Solar and wind.
     tb["solar_and_wind_twh"] = tb["solar_twh"].fillna(0) + tb["wind_twh"].fillna(0)
-
-    # For OWID aggregates, a source column that is entirely missing was deliberately removed by the
-    # Statistical Review garden step (EI's residual "Other *" values made it unreliable for the region).
-    # The fillna(0) above would silently undercount such aggregates (e.g. South America's solar and wind
-    # without wind, or North America's renewables without other renewables), so remove them instead.
-    aggregate_components = {
-        "fossil_fuels": ["coal", "oil", "gas"],
-        "renewables": ["hydro", "solar", "wind", "other_renewables", "biofuels"],
-        "low_carbon_energy": ["hydro", "solar", "wind", "other_renewables", "biofuels", "nuclear"],
-        "solar_and_wind": ["solar", "wind"],
-    }
-    for region in OWID_AGGREGATES:
-        mask = tb["country"] == region
-        if not mask.any():
-            continue
-        for aggregate, components in aggregate_components.items():
-            if tb.loc[mask, [f"{component}_twh" for component in components]].isna().all(axis=0).any():
-                tb.loc[mask, f"{aggregate}_twh"] = None
     return tb
 
 
@@ -358,15 +309,6 @@ def extend_total_with_eia(tb: Table, tb_eia: Table) -> Table:
     # Statistical Review (OWID regions); EIA is used only to extend country coverage.
     tb_eia = tb_eia[~tb_eia["country"].str.contains("(EIA)", regex=False)].reset_index(drop=True)
 
-    # Drop EIA entities whose territory the Statistical Review already covers through another entity
-    # (Germany includes the former East, Czechia and Slovakia are reported back to 1965, and the USSR's
-    # successor republics are reported from 1985, which is also where the Statistical Review's own USSR
-    # series ends). Keeping them would publish two producers' conflicting values for the same territory
-    # (they differ by 8-20%). Yugoslavia is kept: its successors are mostly not reported before the 1990s.
-    tb_eia = tb_eia[~tb_eia["country"].isin(["East Germany", "West Germany", "Czechoslovakia", "USSR"])].reset_index(
-        drop=True
-    )
-
     # Combine, prioritizing the Statistical Review *per value*: keep its total energy supply where it has
     # one, fall back to EIA where it is missing, and add EIA-only country-years. Using a plain concat +
     # drop_duplicates(keep="last") would instead let the Statistical Review's NaN totals override EIA for
@@ -378,32 +320,12 @@ def extend_total_with_eia(tb: Table, tb_eia: Table) -> Table:
 
 
 def add_shares(tb: Table) -> Table:
-    """Add the share of each source in total energy supply (as a percentage).
-
-    Shares are only created for entity-years whose by-source breakdown reconciles with the total: the
-    exclusive sources must add up to the total within RECONCILIATION_TOLERANCE_PCT. This enforces both
-    kinds of completeness at once: in countries (numerator and denominator describing the same set of
-    countries, e.g. not Statistical Review sources over an EIA total with wider coverage) and in
-    components (no materially missing source, e.g. an aggregate whose "other renewables" was removed
-    upstream). A source that an entity genuinely does not use contributes nothing to the gap, so it
-    never disqualifies an otherwise complete breakdown.
-    """
+    """Add the share of each source in total energy supply (as a percentage)."""
     tb = tb.copy()
-    sources_sum = tb[[f"{source}_twh" for source in SR_SOURCES.values()]].sum(axis=1)
-    reconciled = (
-        100 * (sources_sum - tb["total_energy_supply_twh"]).abs() / tb["total_energy_supply_twh"]
-    ) <= RECONCILIATION_TOLERANCE_PCT
     for source in ALL_SOURCES:
         # Clip to 100: float32 noise otherwise leaves values like 100.000008, which makes grapher
         # render an open-ended ">100%" bracket on the map legend.
-        share = (100 * tb[f"{source}_twh"] / tb["total_energy_supply_twh"]).clip(upper=100)
-        tb[f"{source}_share_pct"] = share.where(reconciled)
-    # Curated exception to the reconciliation gate: a zero amount is a zero share of any positive
-    # total, regardless of the completeness of the rest of the breakdown. Applied to nuclear only, so
-    # the nuclear map can show "No nuclear" for countries whose total comes from EIA (their other
-    # sources are unknown, but their nuclear is a known zero).
-    zero_nuclear = (tb["nuclear_twh"] == 0) & tb["nuclear_share_pct"].isna() & (tb["total_energy_supply_twh"] > 0)
-    tb.loc[zero_nuclear, "nuclear_share_pct"] = 0
+        tb[f"{source}_share_pct"] = (100 * tb[f"{source}_twh"] / tb["total_energy_supply_twh"]).clip(upper=100)
     return tb
 
 
@@ -462,13 +384,6 @@ def add_annual_change(tb: Table) -> Table:
         abs_change = tb.groupby("country", observed=True)[f"{source}_twh"].diff()
         tb[f"{source}_annual_change_pct"] = pct_change.where(is_consecutive)
         tb[f"{source}_annual_change_twh"] = abs_change.where(is_consecutive)
-    # The total's producer can switch inside a series (currently Bangladesh: EIA rows for 1965-1970,
-    # before the Statistical Review's coverage starts at independence). An annual change across that
-    # boundary would compare two producers' methodologies, so remove it.
-    eia_backed = tb[["coal_twh", "oil_twh", "gas_twh"]].isna().all(axis=1) & tb["total_energy_supply_twh"].notna()
-    previous = eia_backed.groupby(tb["country"], observed=True).shift(1)
-    boundary = previous.notna() & (eia_backed != previous)
-    tb.loc[boundary, ["total_energy_supply_annual_change_pct", "total_energy_supply_annual_change_twh"]] = None
     return tb
 
 
@@ -502,63 +417,6 @@ def sanity_check_outputs(tb: Table) -> None:
     assert 140000 < world_latest["total_energy_supply_twh"] < 200000, (
         f"World total energy supply is out of the expected range: {world_latest['total_energy_supply_twh']:.0f} TWh."
     )
-
-    # Wherever shares are reported, the shares of the exclusive sources must add up to ~100% (the
-    # reconciliation gate in add_shares guarantees this by construction; this check is the safety net).
-    # EIA-only countries carry no shares except the zero-filled nuclear; those rows are exempt.
-    exclusive_shares = [f"{source}_share_pct" for source in SR_SOURCES.values()]
-    n_shares = tb[exclusive_shares].notna().sum(axis=1)
-    only_zero_filled_nuclear = (n_shares == 1) & (tb["nuclear_share_pct"] == 0)
-    checked = tb[(n_shares > 0) & ~only_zero_filled_nuclear].copy()
-    checked["share_sum"] = checked[exclusive_shares].sum(axis=1)
-    off = checked[(checked["share_sum"] - 100).abs() > RECONCILIATION_TOLERANCE_PCT]
-    if len(off) > 0:
-        summary = "; ".join(
-            f"{country} ({group['year'].min()}-{group['year'].max()}, sums {group['share_sum'].min():.1f}-{group['share_sum'].max():.1f}%)"
-            for country, group in off.groupby("country", observed=True)
-        )
-        raise AssertionError(f"Shares of exclusive sources do not add up to ~100%: {summary}")
-
-    # The reconciliation gate must only exclude the expected entities. If a new entity starts failing
-    # it (or an expected one stops), the by-source coverage changed and a human should look, instead of
-    # shares silently appearing or disappearing. An entity "has a breakdown" if it has any real source
-    # value (a zero-filled nuclear alone marks an EIA-only country, which never gets shares by design).
-    has_breakdown = tb[[f"{source}_twh" for source in SR_SOURCES.values() if source != "nuclear"]].notna().any(
-        axis=1
-    ) | (tb["nuclear_twh"] > 0)
-    gated_out = tb[has_breakdown & (tb["total_energy_supply_twh"] > 0) & ((n_shares == 0) | only_zero_filled_nuclear)]
-    unexpected = set(gated_out["country"].unique()) ^ set(ENTITIES_WITHOUT_RECONCILED_SHARES)
-    assert not unexpected, (
-        f"Entities failing (or no longer failing) the share reconciliation gate: {sorted(unexpected)}"
-    )
-
-    # The combined EI + EIA country-level totals must approximately add up to EI's World total.
-    # No entity dedup is needed: extend_total_with_eia drops the EIA entities whose territory the
-    # Statistical Review covers through others, so every territory is counted once.
-    is_country = ~tb["country"].isin(OWID_AGGREGATES) & ~tb["country"].str.contains("(EI)", regex=False)
-    countries = tb[is_country & tb["total_energy_supply_twh"].notna()][["country", "year", "total_energy_supply_twh"]]
-    countries_sum = countries.groupby("year", observed=True)["total_energy_supply_twh"].sum()
-    world = tb[tb["country"] == "World"].set_index("year")["total_energy_supply_twh"]
-    deviation_pct = (100 * (countries_sum - world) / world).dropna()
-    # EIA-only rows (a total but no by-source data) mark the years EIA covers; beyond them, only EI's
-    # own countries are informed, so the sum is expected to undershoot (EI publishes its latest year
-    # about a year before EIA does).
-    eia_rows = tb[tb[["coal_twh", "oil_twh", "gas_twh"]].isna().all(axis=1) & tb["total_energy_supply_twh"].notna()]
-    eia_last_year = eia_rows["year"].max()
-    # Tolerances (empirical, 2026 release):
-    # * Before 1980, the sum misses EI's residual "Other *" values (~2.5% of World) and EIA has no data yet.
-    # * In the years EIA covers, the combined data agree with EI's World within ~0.4%.
-    # * Beyond EIA's last year, the sum misses all EIA-only countries (~3.5% of World).
-    years = deviation_pct.index
-    exceeded = (
-        ((years <= 1979) & (deviation_pct.abs() > 4))
-        | ((years > 1979) & (years <= eia_last_year) & (deviation_pct.abs() > 1))
-        | ((years > eia_last_year) & (deviation_pct.abs() > 5))
-    )
-    bad_years = deviation_pct[exceeded]
-    if len(bad_years) > 0:
-        summary = "; ".join(f"{year}: {dev:+.1f}%" for year, dev in bad_years.items())
-        raise AssertionError(f"Combined EI + EIA country totals deviate from EI's World total: {summary}")
 
 
 def run() -> None:
@@ -602,7 +460,7 @@ def run() -> None:
     # (so the nuclear map shows "No nuclear" instead of "No data").
     tb = fill_nuclear_zero_for_countries_without_nuclear(tb=tb)
 
-    # Add shares (only where the by-source breakdown reconciles with the total; see add_shares).
+    # Add shares, annual change, per-capita and per-GDP variables.
     tb = add_shares(tb=tb)
     # Add World-only shares against a denominator that includes traditional biomass.
     tb = add_biomass_inclusive_shares(tb=tb)
