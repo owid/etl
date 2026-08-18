@@ -8,7 +8,6 @@ import json
 from datetime import datetime, timezone
 from typing import Any
 
-import pandas as pd
 from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
 from structlog import get_logger
@@ -143,19 +142,6 @@ def set_scope(engine: Engine, catalog_path: str, change_key: str, scope: str, au
         )
 
 
-def _metadata_signature(row: dict[str, Any] | None) -> tuple:
-    """The user-visible metadata of one indicator, normalized for comparison across environments."""
-    if row is None:
-        return ()
-
-    def norm(value: Any) -> str:
-        if value is None or (isinstance(value, float) and value != value):
-            return ""
-        return str(value).strip()
-
-    return tuple(norm(row.get(key)) for key in ["name", *METADATA_FIELDS])
-
-
 def _load_configs(engine: Engine) -> dict[str, dict[str, Any]]:
     """Every MDIM's config, keyed by catalogPath.
 
@@ -176,77 +162,6 @@ def _load_configs(engine: Engine) -> dict[str, dict[str, Any]]:
         if isinstance(parsed, dict):
             configs[str(record["catalogPath"])] = parsed
     return configs
-
-
-def _mdims_with_changed_indicators(
-    source_engine: Engine, target_engine: Engine, configs: dict[str, dict[str, Any]]
-) -> set[str]:
-    """MDIMs at least one of whose indicators' metadata differs between the environments.
-
-    A metadata text usually changes *without* touching the MDIM config — it lives in the indicator,
-    authored in the garden step. Flagging config changes alone therefore misses the common case (and
-    flags MDIMs whose config moved but whose texts didn't), so we compare the indicator layer too.
-
-    Cheap in practice: there are a few dozen MDIMs referencing ~1k distinct indicators in total, so
-    this is two chunked `variables` lookups, not a per-MDIM query.
-    """
-    from apps.wizard.app_pages.metadata_diff.usage import _indicator_ids_in_mdim_config
-
-    ids_by_mdim = {cp: _indicator_ids_in_mdim_config(cfg) for cp, cfg in configs.items()}
-    all_ids = sorted({i for ids in ids_by_mdim.values() for i in ids})
-    if not all_ids:
-        return set()
-
-    source_rows = fetch_variable_rows(source_engine, all_ids)
-    target_rows = fetch_variable_rows(target_engine, all_ids)
-
-    changed_ids = {
-        i
-        for i in all_ids
-        # An id absent from the baseline is a new indicator — that is a change to show, not to skip.
-        if _metadata_signature(source_rows.get(i)) != _metadata_signature(target_rows.get(i))
-    }
-    return {cp for cp, ids in ids_by_mdim.items() if ids & changed_ids}
-
-
-def get_mdim_changes(source_engine: Engine, target_engine: Engine) -> pd.DataFrame:
-    """All MDIMs on the staging server, flagging those that differ from the baseline.
-
-    Two independent signals, because either can change the texts a reader sees:
-    - `config_changed`: the MDIM's own config (view definitions, view-level metadata overrides).
-    - `indicator_changed`: the metadata of an indicator the MDIM uses. This is where most text edits
-      land (they are authored in the garden step), and it moves without touching the config at all.
-
-    `has_changes` is the union — what the selection list marks. Neither flag is used to skip diffing.
-    """
-    # Keep `config` OUT of this query: it is a large JSON blob, and selecting it alongside
-    # `order by updatedAt` makes MySQL sort rows carrying those blobs, which overruns the server's
-    # sort buffer ("Out of sort memory"). The configs are fetched separately, unordered.
-    q = """
-    select catalogPath, configMd5, published, slug
-    from multi_dim_data_pages
-    where catalogPath is not null
-    order by updatedAt desc
-    """
-    df_source = read_sql(q, engine=source_engine)
-    df_target = read_sql(q, engine=target_engine)
-
-    df = pd.merge(df_source, df_target, on="catalogPath", suffixes=("_source", "_target"), how="left")
-    df["is_new"] = df["configMd5_target"].isnull()
-    df["config_changed"] = df["configMd5_source"] != df["configMd5_target"]
-
-    try:
-        changed = _mdims_with_changed_indicators(source_engine, target_engine, _load_configs(source_engine))
-    except Exception as e:
-        # Never let the marker break the page: fall back to the config-only signal and say so.
-        log.warning("metadata_diff.indicator_change_check_failed", error=str(e))
-        changed = set()
-        df["indicator_check_failed"] = True
-    else:
-        df["indicator_check_failed"] = False
-    df["indicator_changed"] = df["catalogPath"].isin(changed)
-    df["has_changes"] = df["is_new"] | df["config_changed"] | df["indicator_changed"]
-    return df.set_index("catalogPath")
 
 
 def load_mdim_config(engine: Engine, catalog_path: str) -> dict[str, Any] | None:
@@ -294,6 +209,29 @@ def fetch_variable_rows(engine: Engine, variable_ids: list[int]) -> dict[int, di
         for record in df.to_dict("records"):
             # to_dict returns Hashable keys; our columns are all strings.
             rows[int(record["id"])] = {str(k): v for k, v in record.items()}
+    return rows
+
+
+def fetch_variable_rows_by_path(engine: Engine, catalog_paths: list[str]) -> dict[str, dict[str, Any]]:
+    """Same columns as `fetch_variable_rows`, but keyed by catalogPath.
+
+    catalogPath is the only identifier that is stable across environments: a version-bumped grapher step
+    mints fresh variable ids on staging, so an id-keyed comparison against production reports every
+    indicator of that dataset as changed.
+    """
+    if not catalog_paths:
+        return {}
+    columns = ["id", "name", "catalogPath"] + list(METADATA_FIELDS)
+    rows: dict[str, dict[str, Any]] = {}
+    for chunk in _chunked(sorted(set(catalog_paths))):
+        placeholders = ", ".join(["%s"] * len(chunk))
+        df = read_sql(
+            f"select {', '.join(columns)} from variables where catalogPath in ({placeholders})",
+            engine=engine,
+            params=tuple(chunk),
+        )
+        for record in df.to_dict("records"):
+            rows[str(record["catalogPath"])] = {str(k): v for k, v in record.items()}
     return rows
 
 

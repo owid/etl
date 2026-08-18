@@ -117,7 +117,7 @@ sections:
       - title: "Metadata Diff"
         alias: metadata-diff
         entrypoint: app_pages/metadata_diff/app.py
-        description: Review metadata text changes across MDim views (blast radius)
+        description: Review the metadata texts this branch changes, on charts, MDims and explorers
         maintainer: "@joe"
         icon: ":material/manage_search:"
         image_url: "https://cdn.pixabay.com/photo/2017/01/10/03/54/icon-1968247_960_720.png"

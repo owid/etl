@@ -374,6 +374,39 @@ class ChangeGroup:
     catalog_paths: set[str] = field(default_factory=set)
 
 
+def dims_str(dims: dict[str, str]) -> str:
+    return ", ".join(f"{k}={v}" for k, v in dims.items()) or "(default view)"
+
+
+def as_plaintext(val: Any) -> str:
+    """A field value flattened to one line, for the Markdown outputs."""
+    if isinstance(val, list):
+        return " · ".join(str(x) for x in val)
+    if val in (None, ""):
+        return "—"
+    return str(val)
+
+
+def group_usage(g: "ChangeGroup", usage: dict[int, dict[str, list[Any]]]) -> dict[str, list[Any]]:
+    """Union the blast radius over *every* indicator the change touches, deduped.
+
+    A shared definition renders into many indicators, so "apply to all" reaches the union of all their
+    charts and MDims. Reading only the group's first indicator (`usage[g.indicator_id]`) undercounts
+    that reach — for a shared-definition edit, badly. We aggregate over `g.indicator_ids` (falling back
+    to the single `indicator_id` for older groups), deduping charts by chartId and MDims by catalogPath.
+    """
+    ids = g.indicator_ids or ({g.indicator_id} if g.indicator_id is not None else set())
+    charts: dict[int, dict[str, Any]] = {}
+    mdims: dict[str, dict[str, Any]] = {}
+    for iid in ids:
+        imp = usage.get(iid, {})
+        for c in imp.get("charts", []):
+            charts.setdefault(c["chartId"], c)
+        for m in imp.get("mdims", []):
+            mdims.setdefault(m["catalogPath"], m)
+    return {"charts": list(charts.values()), "mdims": list(mdims.values())}
+
+
 def group_changes(view_diffs: list[ViewDiff]) -> list[ChangeGroup]:
     """Collapse per-view field changes into distinct (field, old→new) groups, ranked by reach (views)."""
     groups: dict[tuple[str, str, str], ChangeGroup] = {}

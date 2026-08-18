@@ -5,7 +5,9 @@ indicator metadata (propagates to charts / other MDIMs) vs. one that comes from 
 override (contained to the MDIM).
 """
 
+from apps.wizard.app_pages.metadata_diff.brief import decision
 from apps.wizard.app_pages.metadata_diff.core import (
+    ChangeGroup,
     ViewDiff,
     build_view_bundle,
     change_group_identity,
@@ -16,6 +18,19 @@ from apps.wizard.app_pages.metadata_diff.core import (
     parse_catalog_path,
     yaml_field_snippet,
 )
+from apps.wizard.app_pages.metadata_diff.datapage import ordered_slots
+from apps.wizard.app_pages.metadata_diff.discovery import (
+    BranchScope,
+    ExplorerChanges,
+    _count_fields,
+    _dataset_of,
+    compare_explorer_views,
+    compare_indicator_texts,
+    mdim_short_name,
+    narrow_to_branch,
+    split_mdim_groups,
+)
+from apps.wizard.app_pages.metadata_diff.review_state import surface_key
 from apps.wizard.app_pages.metadata_diff.usage import _indicator_ids_in_mdim_config
 
 
@@ -257,21 +272,245 @@ def test_indicator_ids_in_mdim_config_scans_all_axes():
     assert _indicator_ids_in_mdim_config(config) == {1, 2, 3, 4, 5}
 
 
-def test_metadata_signature_detects_text_change_and_ignores_nulls():
-    """The MDim list's ✏️ marker compares this signature across environments.
+# --- Discovery: what did this branch change? -----------------------------------------------------
 
-    A text edit usually lands in indicator metadata without touching the MDim config, so comparing
-    configs alone would leave the edited MDim unmarked. NULL/NaN/"" must normalize to the same thing,
-    or every indicator with an empty optional field would look changed.
+
+def _row(path="grapher/ns/2026-01-01/ds/tb#v", id=1, short="s", key=None, name="V"):
+    """A `variables` row as the DB hands it back."""
+    return {
+        "id": id,
+        "name": name,
+        "catalogPath": path,
+        "titlePublic": None,
+        "descriptionShort": short,
+        "descriptionKey": key,
+        "descriptionProcessing": None,
+        "descriptionFromProducer": None,
+    }
+
+
+def test_indicator_comparison_is_keyed_by_catalog_path():
+    """Matching indicators by id would report a whole version-bumped dataset as changed.
+
+    A grapher step bumped to a new version mints fresh variable ids on staging, so the ids simply do not
+    exist in the baseline. catalogPath is the identifier that survives, and a differing id behind the
+    same path is not a change to any text a reader sees.
     """
-    from apps.wizard.app_pages.metadata_diff.data import _metadata_signature
+    path = "grapher/ns/2026-01-01/ds/tb#v"
+    source = {path: _row(id=9999, short="Same text.")}
+    target = {path: _row(id=1, short="Same text.")}
+    assert compare_indicator_texts(source, target).diffs == {}
+    # The staging id is still recorded — it is what the blast-radius lookup needs.
+    assert compare_indicator_texts(source, target).ids == {path: 9999}
 
-    base = {"name": "V", "titlePublic": None, "descriptionShort": "s", "descriptionKey": '["a"]'}
-    assert _metadata_signature(base) == _metadata_signature(dict(base))
-    # A changed WYSK must change the signature.
-    assert _metadata_signature(base) != _metadata_signature({**base, "descriptionKey": '["b"]'})
-    # None, NaN, "" and surrounding whitespace are all the same absence of text.
-    assert _metadata_signature(base) == _metadata_signature({**base, "titlePublic": float("nan")})
-    assert _metadata_signature(base) == _metadata_signature({**base, "titlePublic": "  "})
-    # A missing indicator (absent from the baseline) is a change, not a match.
-    assert _metadata_signature(None) != _metadata_signature(base)
+    changed = compare_indicator_texts({path: _row(short="New text.")}, {path: _row(short="Old text.")})
+    assert list(changed.diffs) == [path]
+    assert changed.diffs[path].fields["descriptionShort"] == {"old": "Old text.", "new": "New text."}
+    assert changed.diffs[path].catalog_path == path
+
+
+def test_indicator_comparison_ignores_empty_variants_and_flags_new():
+    """NULL / NaN / "" / whitespace are the same absence of text; a path absent from the baseline is new."""
+    path = "grapher/ns/2026-01-01/ds/tb#v"
+    source = {path: _row(short=None)}
+    assert compare_indicator_texts(source, {path: _row(short=float("nan"))}).diffs == {}
+    assert compare_indicator_texts(source, {path: _row(short="   ")}).diffs == {}
+
+    result = compare_indicator_texts(source, {})
+    assert result.new_paths == {path}
+    # A new indicator has no old text to diff, so it is not reported as a text change.
+    assert result.diffs == {}
+
+
+def test_narrow_to_branch_keeps_only_this_branch_datasets():
+    """Without narrowing, a branch lagging master reports master's edits as its own."""
+    paths = [
+        "grapher/mine/2026-01-01/ds/tb#a",
+        "grapher/theirs/2026-01-01/ds/tb#b",
+    ]
+    narrowed, applied = narrow_to_branch(paths, ["grapher/mine/2026-01-01/ds"])
+    assert narrowed == ["grapher/mine/2026-01-01/ds/tb#a"]
+    assert applied is True
+
+    # git unavailable: keep everything, but say so, so the UI can warn instead of quietly over-reporting.
+    unnarrowed, applied = narrow_to_branch(paths, None)
+    assert unnarrowed == paths
+    assert applied is False
+
+
+def _explorer_row(dims, title="T", subtitle="S", note=None):
+    return {"dimensions": dims, "title": title, "subtitle": subtitle, "note": note}
+
+
+def test_explorer_views_compared_per_view_id():
+    """Explorer views are matched on (slug, viewId) — the key that is stable across environments."""
+    source = {
+        ("co2", "v1"): _explorer_row({"Metric": "Total"}, title="New title"),
+        ("co2", "v2"): _explorer_row({"Metric": "Per capita"}),
+    }
+    target = {
+        ("co2", "v1"): _explorer_row({"Metric": "Total"}, title="Old title"),
+        ("co2", "v2"): _explorer_row({"Metric": "Per capita"}),
+    }
+    changed = compare_explorer_views(source, target)
+    # Only the view whose text moved is reported; the identical one is not.
+    assert list(changed) == ["co2"]
+    assert len(changed["co2"]) == 1
+    assert changed["co2"][0].fields["chart.title"] == {"old": "Old title", "new": "New title"}
+    assert changed["co2"][0].dimensions == {"Metric": "Total"}
+
+
+def test_explorer_view_missing_in_baseline_is_new():
+    source = {("co2", "v1"): _explorer_row({"Metric": "Total"})}
+    changed = compare_explorer_views(source, {})
+    assert changed["co2"][0].is_new is True
+
+
+def test_summary_field_counts_group_identical_changes():
+    """The owidbot line counts *distinct* changes, so one reworded bullet on 50 indicators counts once."""
+    diffs = [
+        ViewDiff(dimensions={"d": "a"}, fields={"descriptionKey": {"old": ["x"], "new": ["y"]}}),
+        ViewDiff(dimensions={"d": "b"}, fields={"descriptionKey": {"old": ["x"], "new": ["y"]}}),
+        ViewDiff(dimensions={"d": "c"}, fields={"chart.subtitle": {"old": "p", "new": "q"}}),
+    ]
+    counts: dict[str, int] = {}
+    _count_fields(counts, diffs)
+    assert counts == {"WYSK": 1, "Chart subtitle": 1}
+
+
+# --- Data-page layout (Ed's review-view request) --------------------------------------------------
+
+
+def test_ordered_slots_follow_the_data_page():
+    """Fields are shown where the reader meets them, not in field-name order."""
+    slots = ordered_slots({"descriptionKey", "titlePublic"})
+    labels = [s.label for s in slots]
+    assert labels.index("Title") < labels.index("What you should know about this data")
+    # The footnote sits under the chart; everything above it is above the chart.
+    assert [s.region for s in slots if s.label == "Footnote"] == ["under"]
+    changed = {s.label for s in slots if s.changed}
+    assert changed == {"Title", "What you should know about this data"}
+
+    # Only-changed mode drops the placeholders for untouched slots.
+    assert all(s.changed for s in ordered_slots({"titlePublic"}, include_unchanged=False))
+
+
+def test_ordered_slots_keep_an_unplaced_field_visible():
+    """A field with no slot yet must still be rendered — dropping a change is the one unacceptable bug."""
+    slots = ordered_slots({"someNewField"})
+    assert [s.label for s in slots if s.changed] == ["someNewField"]
+
+
+# --- Reviewed/unreviewed bookkeeping --------------------------------------------------------------
+
+
+def test_list_review_surfaces_cannot_collide_with_sign_off():
+    """A list tick and an Approve/Flag sign-off must never write the same row.
+
+    The Review page keys sign-off on the bare catalogPath (MDims) or `chart:<slug>`; the list toggles are
+    namespaced under `list:`, so the two stay independent even for the same change.
+    """
+    assert surface_key("mdim", "grapher/ns/latest/ds") == "list:mdim:grapher/ns/latest/ds"
+    assert surface_key("chart", "daily-mean-income") != "chart:daily-mean-income"
+    assert surface_key("explorer", "co2").startswith("list:")
+
+
+def test_review_mark_is_bound_to_the_text():
+    """Editing the text again in the same PR must reopen the change — a tick is never carried over."""
+    group = ChangeGroup(field="descriptionKey", old=["a"], new=["b"], view_dims=[{"d": "x"}])
+    surface = surface_key("mdim", "grapher/ns/latest/ds")
+    change_key, content_hash = change_group_identity(surface, group)
+
+    edited = ChangeGroup(field="descriptionKey", old=["a"], new=["c"], view_dims=[{"d": "x"}])
+    edited_key, edited_hash = change_group_identity(surface, edited)
+    # Same slot (so the stored row is found), different content (so it reads as stale).
+    assert edited_key == change_key
+    assert edited_hash != content_hash
+
+
+# --- PR brief routing ------------------------------------------------------------------------------
+
+
+def test_brief_decision_routes_from_resolved_rows():
+    """The brief builders are pure now: the decision comes in on the row, not out of session state."""
+    assert decision({"stale": False, "label": "✅ Approve", "seed_label": "⏳ Pending"}) == "approved"
+    assert decision({"stale": False, "label": "🚩 Flag", "seed_label": "⏳ Pending"}) == "flagged"
+    assert decision({"stale": False, "label": None, "seed_label": "⏳ Pending"}) == "pending"
+    # A change edited since it was reviewed is never treated as approved.
+    assert decision({"stale": True, "label": "✅ Approve", "seed_label": "✅ Approve"}) == "stale"
+
+
+# --- Attribution: this branch's change, or the baseline moving on? --------------------------------
+
+
+def test_branch_scope_separates_data_steps_from_export_recipes():
+    """`export://` URIs identify a changed MDim/explorer recipe; everything else is a dataset path."""
+    scope = BranchScope(
+        dataset_paths={"garden/wid/2026-06-18/world_inequality_database"},
+        export_shorts={"incomes_wid"},
+    )
+    assert scope.covers_indicator("grapher/wid/2026-06-18/world_inequality_database/tb#share_top_1")
+    assert not scope.covers_indicator("grapher/wb/2026-06-26/world_bank_pip/tb#gini")
+    assert scope.covers_export("incomes_wid")
+    assert not scope.covers_export("poverty_pip")
+
+
+def test_mdim_short_name_from_catalog_path():
+    assert mdim_short_name("grapher/wid/latest/incomes_wid#incomes_wid") == "incomes_wid"
+    assert mdim_short_name("wid/latest/incomes_wid") == "incomes_wid"
+
+
+def test_split_mdim_groups_keeps_config_changes_only_for_our_own_recipe():
+    """An MDim we touched is not a licence to attribute *everything* in it to this PR.
+
+    Its view configs are rewritten whenever master rebuilds it, so on an older staging server they differ
+    wholesale. Unless the branch changed the MDim's recipe, only indicator-layer changes are ours.
+    """
+    indicator_change = ViewDiff(
+        dimensions={"d": "a"},
+        fields={"descriptionKey": {"old": ["x"], "new": ["y"]}},
+        indicator_changed_fields={"descriptionKey"},
+    )
+    config_change = ViewDiff(dimensions={"d": "b"}, fields={"chart.title": {"old": "p", "new": "q"}})
+
+    scope = BranchScope(dataset_paths=set(), export_shorts=set())
+    ours, other = split_mdim_groups("grapher/ns/latest/mine#mine", [indicator_change, config_change], scope)
+    assert [g.field for g in ours] == ["descriptionKey"]
+    assert [g.field for g in other] == ["chart.title"]
+
+    # When the branch edits the MDim's own recipe, its config-level edits are exactly the point.
+    scope_with_recipe = BranchScope(dataset_paths=set(), export_shorts={"mine"})
+    ours, other = split_mdim_groups("grapher/ns/latest/mine#mine", [indicator_change, config_change], scope_with_recipe)
+    assert {g.field for g in ours} == {"descriptionKey", "chart.title"}
+    assert other == []
+
+
+def test_split_mdim_groups_reports_everything_when_git_is_unavailable():
+    """No narrowing signal means no attribution — show it all rather than guess it away."""
+    config_change = ViewDiff(dimensions={"d": "b"}, fields={"chart.title": {"old": "p", "new": "q"}})
+    ours, other = split_mdim_groups("grapher/ns/latest/mine#mine", [config_change], BranchScope(available=False))
+    assert len(ours) == 1
+    assert other == []
+
+
+def test_explorer_changes_split_branch_from_lag():
+    """The section shows this branch's explorers; the rest stay visible but separate."""
+    changes = ExplorerChanges(
+        views={"mine": [ViewDiff(dimensions={})], "theirs": [ViewDiff(dimensions={})]},
+        in_branch={"mine"},
+    )
+    assert list(changes.branch_views()) == ["mine"]
+    assert list(changes.other_views()) == ["theirs"]
+
+    # Without narrowing, nothing is claimed as lag.
+    unnarrowed = ExplorerChanges(views={"a": [ViewDiff(dimensions={})]}, in_branch=set(), narrowed=False)
+    assert list(unnarrowed.branch_views()) == ["a"]
+    assert unnarrowed.other_views() == {}
+
+
+def test_dataset_of_indicator_path_matches_datasets_table():
+    """`datasets.catalogPath` has no channel prefix and stops at the dataset."""
+    assert _dataset_of("grapher/wid/2026-06-18/world_inequality_database/tb#share_top_1") == (
+        "wid/2026-06-18/world_inequality_database"
+    )
+    assert _dataset_of("garden/wb/2026-06-26/world_bank_pip/poverty#headcount") == "wb/2026-06-26/world_bank_pip"
