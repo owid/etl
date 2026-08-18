@@ -454,10 +454,17 @@ The chart spans the full content width, left-aligned with the title/subtitle/log
 > deletions by name rather than by position; the template's own slots sit at the same coordinates, and
 > deleting the wrong one of an overlapping pair is invisible in a screenshot.
 >
-> **Delete that text BEFORE the rescale, not after.** matplotlib's glyph boxes overhang the figure
-> canvas, so while they are present the group's bbox is wider than the SVG and `clone.width /
-> chart.width` solves against the overhang instead of the frame. Once they are gone the bbox *is* the
-> canvas, and one rescale lands the height on the template's to `delta 0` — the assertion worth keeping.
+> **Whether this has to happen before the rescale depends on what you are rescaling.** An
+> `upload_assets` import arrives as a **FRAME whose size is the SVG canvas**, so its scale factor is
+> `frame width / canvas width` — exact, and independent of what the children's ink does. Rescale first
+> and delete after; that is the order `scripts/restyle_static_import.js` uses.
+>
+> A **GROUP** is the other case, and the one this warning was written for: a group's bbox is its
+> children's ink, and matplotlib's glyph boxes overhang the figure canvas, so while the text is present
+> `clone.width / chart.width` solves against the overhang instead of the frame (848.36 against an 816
+> canvas on the run that found it). If you are rescaling a group — a hand-made selection, or a frame
+> you have already unwrapped — delete the text first, after which the bbox *is* the canvas and one
+> rescale lands the height on the template's to `delta 0`.
 
 ### An upload lands on the file's *current* page — which is not your page
 
