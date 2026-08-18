@@ -57,11 +57,11 @@ FUELS = ["coal", "oil", "gas"]
 # aggregated in add_region_aggregates, but only these are bounded by the two producers' shared years.
 ENERGY_COLUMNS = [f"{fuel}_{metric}_twh" for fuel in FUELS for metric in ("production", "consumption")]
 
-# Reserves get no region aggregates. EIA reports the USSR's until 1991 and Russia's only from 1997, so any
-# regional sum for Europe loses 89% of its gas reserves in 1992 and recovers it in 1997. No coverage rule
-# catches that: 39 of Europe's 47 countries report in 1992, and the one missing holds nine tenths of the
-# reserves. They stay country-level, which is how the fossil fuels collection shows them anyway.
-COLUMNS_WITHOUT_REGION_AGGREGATES = ["coal_reserves_tonnes", "oil_reserves_m3", "gas_reserves_m3"]
+# Reserves are aggregated on their own, requiring Russia for Europe. EIA reports the USSR's until 1991 and
+# Russia's only from 1997, and Russia holds about nine tenths of Europe's, so without that condition Europe
+# appears to lose 89% of its gas reserves in 1992 and recover them in 1997.
+RESERVES_COLUMNS = ["coal_reserves_tonnes", "oil_reserves_m3", "gas_reserves_m3"]
+COUNTRIES_THAT_MUST_HAVE_RESERVES = {"Europe": ["Russia"]}
 
 CONTINENTS = ["Africa", "Asia", "Europe", "North America", "Oceania", "South America"]
 
@@ -267,18 +267,21 @@ def add_region_aggregates(tb: Table, tb_review: Table, eia_years: tuple[int, int
     )
     countries = tb[is_country].reset_index(drop=True)
     other_columns = [
-        column
-        for column in countries.columns
-        if column not in ENERGY_COLUMNS + COLUMNS_WITHOUT_REGION_AGGREGATES + ["country", "year"]
+        column for column in countries.columns if column not in ENERGY_COLUMNS + RESERVES_COLUMNS + ["country", "year"]
     ]
 
-    def aggregate(columns: list[str], europe_by_count: bool, must_have_data: dict[str, list[str]] | None) -> Table:
+    def aggregate(
+        columns: list[str],
+        europe_by_count: bool,
+        must_have_data: dict[str, list[str]] | None,
+        accepted_overlaps: list[dict[int, set[str]]] | None,
+    ) -> Table:
         result = paths.regions.add_aggregates(
             countries[["country", "year"] + columns],
             regions={region: {} for region in REGIONS},
             aggregations={column: "sum" for column in columns},
             min_num_values_per_year=1,
-            accepted_overlaps=ACCEPTED_OVERLAPS_ENERGY if europe_by_count else ACCEPTED_OVERLAPS,
+            accepted_overlaps=accepted_overlaps,
             ignore_overlaps_of_zeros=True,
             # Only the energy columns are gated. The rest are EIA's own, with coverage that varies by
             # column and region however EIA happens to report it, so a threshold on them only trades
@@ -293,8 +296,22 @@ def add_region_aggregates(tb: Table, tb_review: Table, eia_years: tuple[int, int
         )
         return result[result["country"].isin(REGIONS)].reset_index(drop=True)
 
-    tb_energy = aggregate(ENERGY_COLUMNS, europe_by_count=True, must_have_data=COUNTRIES_THAT_MUST_HAVE_DATA)
-    tb_other = aggregate(other_columns, europe_by_count=False, must_have_data=None)
+    # Each call gets the overlaps its own columns actually contain, so that add_aggregates only warns when
+    # something is wrong: the Statistical Review's Yugoslavia pair exists in the energy columns, Aruba's in
+    # everything EIA reports by country, and neither in the reserves.
+    tb_energy = aggregate(
+        ENERGY_COLUMNS,
+        europe_by_count=True,
+        must_have_data=COUNTRIES_THAT_MUST_HAVE_DATA,
+        accepted_overlaps=ACCEPTED_OVERLAPS_ENERGY,
+    )
+    tb_other = aggregate(other_columns, europe_by_count=False, must_have_data=None, accepted_overlaps=ACCEPTED_OVERLAPS)
+    tb_reserves = aggregate(
+        RESERVES_COLUMNS,
+        europe_by_count=False,
+        must_have_data=COUNTRIES_THAT_MUST_HAVE_RESERVES,
+        accepted_overlaps=None,
+    )
 
     # Clip the energy columns to the years both producers cover. The three fuels of a metric share one
     # window, so that a region's coal + oil + gas total is always the sum of all three: coal production
@@ -307,7 +324,7 @@ def add_region_aggregates(tb: Table, tb_review: Table, eia_years: tuple[int, int
         outside = ~tb_energy["year"].between(first_year, eia_years[1])
         tb_energy.loc[outside, columns] = float("nan")
 
-    tb_aggregates = pr.merge(tb_energy, tb_other, on=["country", "year"], how="outer")
+    tb_aggregates = pr.multi_merge([tb_energy, tb_other, tb_reserves], on=["country", "year"], how="outer")
     value_columns = [c for c in tb_aggregates.columns if c not in ("country", "year")]
     tb_aggregates = tb_aggregates.dropna(subset=value_columns, how="all").reset_index(drop=True)
 
