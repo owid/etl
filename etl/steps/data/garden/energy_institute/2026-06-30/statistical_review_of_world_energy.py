@@ -299,6 +299,38 @@ REGIONS_NOT_ASSIGNED_TO_OTHER_REGIONS = [
     "South and Central America (EI)",
 ]
 
+# Provider regions dropped from the output (after being used as inputs to our region aggregates).
+# They are either residual buckets of EI's own table layout ("Other Western Africa") or regional
+# slices with no definition in our regions dataset. Crucially, the residual buckets have no fixed
+# composition: "Other Europe" can mean a different set of countries for each indicator, so the same
+# entity name would quietly mean different things on different charts.
+# Deliberately kept in the output: the defined "(EI)" regions (they have a stable composition and are
+# used by the by-region charts) and self-explanatory organizations (OECD, OPEC).
+EXCLUDED_PROVIDER_REGIONS = [
+    "Central America (EI)",
+    "Eastern Africa (EI)",
+    "Middle Africa (EI)",
+    "Middle East and Africa (EI)",
+    "Non-OECD (EI)",
+    "Non-OPEC (EI)",
+    "Other Africa (EI)",
+    "Other Asia Pacific (EI)",
+    "Other CIS (EI)",
+    "Other Caribbean (EI)",
+    "Other Eastern Africa (EI)",
+    "Other Europe (EI)",
+    "Other Middle Africa (EI)",
+    "Other Middle East (EI)",
+    "Other North America (EI)",
+    "Other Northern Africa (EI)",
+    "Other South America (EI)",
+    "Other South and Central America (EI)",
+    "Other Southern Africa (EI)",
+    "Other Western Africa (EI)",
+    "Rest of World (EI)",
+    "Western Africa (EI)",
+]
+
 
 def create_additional_variables(tb: Table) -> Table:
     tb = tb.copy()
@@ -880,6 +912,10 @@ def run() -> None:
 
     # Sanity-check the output data.
     sanity_check_outputs(tb=tb)
+
+    # Remove residual and undefined provider regions (inputs to our aggregates above, but with no
+    # stable meaning for readers; see EXCLUDED_PROVIDER_REGIONS). The meadow table keeps them all.
+    tb = tb[~tb["country"].isin(EXCLUDED_PROVIDER_REGIONS)].reset_index(drop=True)
 
     # Convert gas reserves from trillion cubic meters to cubic meters. Done here rather than in the
     # grapher step because it changes the values, and it is the unit every consumer wants: the
