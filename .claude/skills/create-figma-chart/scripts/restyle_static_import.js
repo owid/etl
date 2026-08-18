@@ -70,18 +70,24 @@ const rgbOf = (h) => {
   return { r, g, b };
 };
 
-// The node-level paint-style setters are the async ones, per the Plugin API note in SKILL.md. A plain
-// `fillStyleId =` assignment throws in the dynamic-page access mode this script already depends on for
-// `getNodeByIdAsync`, and `use_figma` is atomic, so that loses the whole pass at the first bound mark.
+// Style binding goes through the async setters because that is the form SKILL.md's API note
+// prescribes, and it is valid in every access mode. Measured in this file, on a bound mark, both forms
+// work: `fillStyleId =` returned and read back correctly, and so did `setFillStyleIdAsync`. So prefer
+// the async one on principle, not out of fear — if you see a pass die at its first bound mark, the
+// cause is somewhere else.
+//
+// The stroke branch is for a member whose mark carries its color in `strokes` rather than `fills` —
+// matplotlib writes line marks as `fill:none; stroke:…`, and such a node is invisible to a fills-only
+// pass. Note it does not apply to `category__…-line1`, which is the *second line of a wrapped category
+// name* (a TEXT node with fills), nor to the bracket rules: those are stroke-only VECTORs, but they are
+// a neutral rule rather than a category color and are deliberately never selected here.
 async function paint(node, hexColor, styleId) {
   const apply = async (n) => {
     if ("fills" in n && n.fills !== figma.mixed && Array.isArray(n.fills) && n.fills.length) {
       n.fills = [{ ...n.fills[0], type: "SOLID", color: rgbOf(hexColor) }];
       if (styleId) await n.setFillStyleIdAsync(styleId);
     } else if ("strokes" in n && n.strokes !== figma.mixed && Array.isArray(n.strokes) && n.strokes.length) {
-      // A line mark carries its color in `strokes`, not `fills` — matplotlib writes it as
-      // `fill:none; stroke:…` — so a fills-only pass silently skips the `category__…-line` nodes
-      // selected below. Second in the chain, not alongside, so a filled bar keeps its own edge.
+      // Second in the chain, not alongside, so a filled bar keeps its own edge.
       n.strokes = [{ ...n.strokes[0], type: "SOLID", color: rgbOf(hexColor) }];
       if (styleId) await n.setStrokeStyleIdAsync(styleId);
     }

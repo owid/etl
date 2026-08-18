@@ -158,10 +158,17 @@ band_bottom = note_ink_bottom − note_lines × 14               # the Note's in
 | | 850-wide pair | Mobile (both) |
 |---|---|---|
 | `origin_y` (the header block's own top edge) | 0 | 16 |
-| `logo_px` (the logo's row, not the logo) | 41.26 | 35.23 |
+| `logo_px` (the logo's **row**, not the logo) | 35.26 (Horizontal) / 41.26 (Vertical) | 35.23 |
 | `row_pad_px` (the title row's own top padding) | 16.22 | 0 |
 | `note_ink_bottom` | 586.62 (Horizontal) / 1043.81 (Vertical) | — (no Note row) |
 | footer row spacing / block top padding | 4 / 16 | 4 / 0 |
+
+**`logo_px` is per template, including within the 850-wide pair.** All three frames hold the same
+logo instance (35.18 px), but the wrapper around it does not: Vertical's `Frame 1` (`5332:97`) adds
+6.08 px of top padding, making its row **41.26**, while Horizontal's (`25398:755`) adds 0.08 and comes
+to **35.26**. So the logo sits 6 px lower on Vertical, and any figure derived from `logo_px` differs
+between the two by that much. Note also that the Horizontal slot table above records the logo as `35`
+— that is the *instance*, not the row, and it is the row that sets the header's height.
 
 **`origin_y` and `row_pad_px` never both carry the 16 px.** The two families put that padding in
 different places, and the tables above are the only place that shows it: on the 850-wide pair the
@@ -171,18 +178,19 @@ a two-line title puts the subtitle at 96.44 against the measured 80.22, dropping
 16.22 px.
 
 **Two things here are counter-intuitive and both cost a round to find.** A one-line title does *not*
-shrink the header by a line: below `logo_px` the **logo** sets the row's height, so the 850-wide
-header bottoms out at 82.47 however short the title gets. And the footer's rows are pinned to the
-frame's bottom margin, so a Note gaining a line does not push the source row down — it eats the
-chart's height instead.
+shrink the header by a line: below `logo_px` the **logo** sets the row's height, so the header bottoms
+out at **82.48 on Vertical** and **76.48 on Horizontal** however short the title gets. And the
+footer's rows are pinned to the frame's bottom margin, so a Note gaining a line does not push the
+source row down — it eats the chart's height instead.
 
 ### A one-line title leaves a gap the templates were never exercised for
 
 That first point has a visible consequence, not just an arithmetic one. Because the title row hugs the
 taller of the title and the logo, and both are top-aligned, the logo's surplus height lands *between
-the title and the subtitle*: 12.25 px on the 850-wide pair, on top of the 6 px auto-layout gap. Every
-finished page in the Charts file shows **6 px** there — they all have two-line titles, taller than the
-logo — so a one-line title is the only case that looks wrong, and it looks wrong by a factor of three.
+the title and the subtitle*: **12.26 px on Vertical, 6.26 on Horizontal**, on top of the 6 px
+auto-layout gap. Every finished page in the Charts file shows **6 px** there — they all have two-line
+titles, taller than the logo — so a one-line title is the only case that looks wrong, and on Vertical
+it looks wrong by a factor of three.
 
 The fix is in Figma, not in the step: set the logo to `layoutPositioning = "ABSOLUTE"` in the title
 row, which keeps it exactly where it is and stops it padding the block. Then set the step's `logo_px`
@@ -190,14 +198,15 @@ to 0 for that frame so the derived band follows the header up.
 
 **Check one thing before doing it, per frame.** With the header raised, the subtitle's first line now
 runs at the logo's height, and the subtitle slot is full-width in every template. So it is safe only
-where that line's ink stops short of the logo's left edge — on the 850-wide frame it ended at x=588
+where that line's ink stops short of the logo's left edge — on the Vertical frame it ended at x=588
 against a logo at 770, comfortably clear; on the 540-wide one it reached x=493 against a logo at 476,
 so the logo has to stay in the flow and that frame keeps the wider gap. Measure the first line rather
 than eyeballing it (the recipe below), and expect the answer to differ between the two frames of the
 same chart.
 
 Calibrate any implementation against both ends: the templates' own two-line/two-line case must
-reproduce **118.22**, and a one-line/one-line clone **82.47**.
+reproduce **118.22** on either 850-wide frame, and a one-line/one-line clone **82.48** on Vertical
+(the live clone measured 82.47) or **76.48** on Horizontal.
 
 ## Lay the plot inside the template's band, and draw the slots at the template's own sizes
 
