@@ -383,6 +383,36 @@ class AdminAPI:
             raise AdminAPIError({"error": js.get("error"), "narrative_chart_id": narrative_chart_id, "config": config})
         return js
 
+    def cleanup_ghost_variables(self, dataset_id: int, keep_variable_ids: list[int], dry_run: bool = False) -> dict:
+        """Delete a dataset's variables that weren't upserted by the grapher step.
+
+        Grapher owns the delete because it owns the schema around it: the tables holding a
+        `variableId` foreign key, and the `chart_configs` rows (and their R2 objects) that
+        a variable leaves behind. It deletes what it safely can and reports the rest back;
+        deciding whether a variable still used by a chart should fail the run is left to
+        the caller, which is why nothing here raises on `blocked`.
+
+        Args:
+            dataset_id: Grapher ID of the dataset being cleaned up
+            keep_variable_ids: Variables the grapher step upserted; everything else in the
+                dataset is a ghost
+            dry_run: Report what would be deleted without deleting it
+
+        Returns:
+            {"deleted": [variable_id], "deletable": [variable_id],
+             "blocked": [{"variableId": int, "chartIds": [int]}]}
+        """
+        resp = http_session.post(
+            f"{self.owid_env.admin_api}/datasets/{dataset_id}/cleanupGhostVariables",
+            headers=self._headers(),
+            json={"keepVariableIds": keep_variable_ids, "dryRun": dry_run},
+            timeout=TIMEOUT,
+        )
+        js = self._json_from_response(resp)
+        if not js.get("success", True):
+            raise AdminAPIError({"error": js.get("error"), "dataset_id": dataset_id})
+        return js
+
     def set_dataset_archived(self, dataset_id: int, is_archived: bool, user_id: int | None = None) -> dict:
         """Set the archived status of a dataset.
 

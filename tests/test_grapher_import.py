@@ -1,4 +1,5 @@
 import pandas as pd
+import pytest
 from owid.catalog import Origin, VariableMeta, VariablePresentationMeta
 
 import etl.grapher.to_db as db
@@ -104,3 +105,68 @@ def test_get_timespan_subyearly_is_empty():
     df = pd.DataFrame({"year": [0, 28, 59]})
     for interval in ("day", "week", "month", "quarter"):
         assert db._get_timespan(df, VariableMeta(display={"timeInterval": interval})) == ""
+
+
+class _FakeAdminAPI:
+    """Records the calls a cleanup makes and replays canned Admin API responses."""
+
+    def __init__(self, responses: list[dict]) -> None:
+        self._responses = list(responses)
+        self.calls: list[dict] = []
+
+    def cleanup_ghost_variables(self, dataset_id: int, keep_variable_ids: list[int], dry_run: bool = False) -> dict:
+        self.calls.append({"dataset_id": dataset_id, "keep": keep_variable_ids, "dry_run": dry_run})
+        return self._responses.pop(0)
+
+
+def _response(deletable=(), deleted=(), blocked=()) -> dict:
+    return {"deletable": list(deletable), "deleted": list(deleted), "blocked": list(blocked)}
+
+
+def test_cleanup_ghost_variables_deletes_after_dry_run():
+    admin_api = _FakeAdminAPI(
+        [
+            _response(deletable=[7]),
+            _response(deletable=[7], deleted=[7]),
+        ]
+    )
+
+    assert db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
+
+    assert [call["dry_run"] for call in admin_api.calls] == [True, False]
+    assert all(call["keep"] == [5] for call in admin_api.calls)
+
+
+def test_cleanup_ghost_variables_skips_second_call_when_nothing_to_delete():
+    admin_api = _FakeAdminAPI([_response()])
+
+    assert db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
+
+    assert len(admin_api.calls) == 1
+
+
+def test_cleanup_ghost_variables_does_not_delete_when_a_chart_still_uses_one(monkeypatch):
+    """A blocked variable leaves the whole dataset alone, so the delete call is never made."""
+    monkeypatch.setattr(db.config, "ENV", "production")
+    admin_api = _FakeAdminAPI([_response(deletable=[7], blocked=[{"variableId": 8, "chartIds": [100, 101]}])])
+
+    assert not db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
+
+    assert [call["dry_run"] for call in admin_api.calls] == [True]
+
+
+def test_cleanup_ghost_variables_raises_outside_production(monkeypatch):
+    monkeypatch.setattr(db.config, "ENV", "dev")
+    admin_api = _FakeAdminAPI([_response(deletable=[7], blocked=[{"variableId": 8, "chartIds": [100]}])])
+
+    with pytest.raises(ValueError, match="Variables used in charts"):
+        db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
+
+
+def test_cleanup_ghost_variables_can_be_skipped(monkeypatch):
+    monkeypatch.setattr(db.config, "SKIP_GHOST_VARIABLE_CLEANUP", True)
+    admin_api = _FakeAdminAPI([])
+
+    assert db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
+
+    assert admin_api.calls == []

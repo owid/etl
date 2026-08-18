@@ -97,7 +97,7 @@ def upsert_dataset(dataset: OwlDataset, *, workers: int | None = None) -> int:
     with Session(engine) as session:
         upserted_variable_ids = list(gm.Variable.catalog_paths_to_variable_ids(session, catalog_paths).values())
 
-    cleanup_ok = db.cleanup_ghost_variables(engine, dataset_upsert_result.dataset_id, upserted_variable_ids)
+    cleanup_ok = db.cleanup_ghost_variables(admin_api, dataset_upsert_result.dataset_id, upserted_variable_ids)
     db.set_dataset_checksum_and_editedAt(
         dataset_upsert_result.dataset_id, ds.checksum() if cleanup_ok else "to_be_rerun"
     )
