@@ -875,7 +875,11 @@ def main() -> int:
     for f in findings:
         counts[f["severity"]] += 1
     n_allcharts = sum(1 for f in findings if f["surface"] == "key chart")
-    print(f"\nreferences: {len(findings)}  (needs manual work: {counts[RED]} | "
+    # Featured metrics are RED, so they sit inside counts[RED]; report them separately or the
+    # embed count is overstated and the one irreversible step never gets named on stdout.
+    n_featured = sum(1 for f in findings if f["surface"] == "featured metric")
+    print(f"\nreferences: {len(findings)}  (needs manual work: {counts[RED] - n_featured} | "
+          f"featured metrics to swap: {n_featured} | "
           f"links to update: {counts[YELLOW]} | no action (all-charts blocks): {n_allcharts} | "
           f"drafts: {counts[INFO] - n_allcharts})")  # fmt: skip
     if gaps:

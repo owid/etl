@@ -481,6 +481,23 @@ def write_markdown(out: Path, runs: dict[str, dict], rows: list[dict], gaps: lis
         lines += _bullets(drafts)
         lines.append("")
 
+    # Every collection that must be dealt with BEFORE applying gets its own sentence. Featured
+    # metrics belong here: the ⭐ section and the rollup both demand a swap, so a footer branching
+    # only on blockers/embeds said "No blocker and no embed needs migrating" on a featured-only run
+    # and buried the one step that cannot be undone afterwards.
+    before_parts = []
+    if blockers:
+        before_parts.append(f"{len(blockers)} site redirect(s) to repoint")
+    if breaks:
+        before_parts.append(f"{len(breaks)} embed(s) to migrate")
+    if featured:
+        before_parts.append(f"{len(featured)} featured metric(s) to swap (irreversible once applied)")
+    before_applying = (
+        f"{', '.join(before_parts)} — all before anything is applied. Each names the surface and the replacement URL."
+        if before_parts
+        else "Nothing needs migrating before applying."
+    )
+
     lines += [
         "---",
         "",
@@ -492,12 +509,7 @@ def write_markdown(out: Path, runs: dict[str, dict], rows: list[dict], gaps: lis
         "**Lands on** is computed with grapher's own matching rules, so it is where the reader "
         "actually ends up once the redirect exists.",
         "",
-        (
-            f"{len(blockers)} site redirect(s) to repoint and {len(breaks)} embed(s) to migrate, both before "
-            "anything is applied. Each names the surface and the replacement URL."
-            if blockers or breaks
-            else "No blocker and no embed needs migrating before applying."
-        ),
+        before_applying,
         "",
         (
             f"The 302 already covers {len(links)} link(s), worth updating to skip the hop"
@@ -574,8 +586,13 @@ def main() -> int:
     for row in rows:
         counts[row["severity"]] += 1
     blockers = sum(1 for r in rows if r["surface"] == "site redirect")
+    # Featured metrics are RED but they are not embeds: subtract them here too, or the
+    # break-on-redirect count absorbs them and the swap goes unmentioned on stdout.
+    n_featured = sum(1 for r in rows if r["surface"] == "featured metric")
     print(
-        f"\nreferences: {len(rows)}  (blockers: {blockers} | break on redirect: {counts[RED] - blockers} | "
+        f"\nreferences: {len(rows)}  (blockers: {blockers} | "
+        f"break on redirect: {counts[RED] - blockers - n_featured} | "
+        f"featured metrics to swap: {n_featured} | "
         f"links: {counts[YELLOW]} | drafts: {counts[INFO]})"
     )
     wrong = [r for r in rows if r["stale_params"] or "partial" in r["match"]]
