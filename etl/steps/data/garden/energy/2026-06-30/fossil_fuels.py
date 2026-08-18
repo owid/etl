@@ -72,16 +72,13 @@ REGIONS = CONTINENTS + [
     "Upper-middle-income countries",
 ]
 
-# Years each region's aggregate covers, per column (see add_region_aggregates). Coal production starts a
-# year later than the rest because the Statistical Review only reports it from 1981. Asserted in
-# sanity_check_region_aggregates, so that a change has to be acknowledged here rather than found on a chart.
+# Years each region's aggregate covers, per column (see add_region_aggregates). Production starts a year
+# later than consumption because the Statistical Review only reports coal production from 1981, and the
+# three fuels are held to one window. Asserted in sanity_check_region_aggregates, so that a change has to
+# be acknowledged here rather than found on a chart.
 EXPECTED_AGGREGATE_YEARS: dict[str, tuple[int, int]] = {
-    "coal_production_twh": (1981, 2024),
-    "coal_consumption_twh": (1980, 2024),
-    "oil_production_twh": (1980, 2024),
-    "oil_consumption_twh": (1980, 2024),
-    "gas_production_twh": (1980, 2024),
-    "gas_consumption_twh": (1980, 2024),
+    **{f"{fuel}_production_twh": (1981, 2024) for fuel in FUELS},
+    **{f"{fuel}_consumption_twh": (1980, 2024) for fuel in FUELS},
 }
 
 # Minimum fraction of a region's reporting countries that must report an indicator in a given year, for
@@ -299,12 +296,16 @@ def add_region_aggregates(tb: Table, tb_review: Table, eia_years: tuple[int, int
     tb_energy = aggregate(ENERGY_COLUMNS, europe_by_count=True, must_have_data=COUNTRIES_THAT_MUST_HAVE_DATA)
     tb_other = aggregate(other_columns, europe_by_count=False, must_have_data=None)
 
-    # Clip the energy columns to the years both producers cover.
-    for column in ENERGY_COLUMNS:
-        review_years = tb_review.loc[tb_review[column].notna(), "year"]
-        assert not review_years.empty, f"The Statistical Review reports no {column}."
-        first_year = max(int(review_years.min()), eia_years[0])
-        tb_energy.loc[~tb_energy["year"].between(first_year, eia_years[1]), column] = float("nan")
+    # Clip the energy columns to the years both producers cover. The three fuels of a metric share one
+    # window, so that a region's coal + oil + gas total is always the sum of all three: coal production
+    # starts in 1981 and the other two in 1980, and a two-fuel total understates Africa's by 900 TWh.
+    for metric in ("production", "consumption"):
+        columns = [f"{fuel}_{metric}_twh" for fuel in FUELS]
+        review_years = [tb_review.loc[tb_review[column].notna(), "year"] for column in columns]
+        assert all(not years.empty for years in review_years), f"The Statistical Review reports no {metric}."
+        first_year = max(eia_years[0], *(int(years.min()) for years in review_years))
+        outside = ~tb_energy["year"].between(first_year, eia_years[1])
+        tb_energy.loc[outside, columns] = float("nan")
 
     tb_aggregates = pr.merge(tb_energy, tb_other, on=["country", "year"], how="outer")
     value_columns = [c for c in tb_aggregates.columns if c not in ("country", "year")]
