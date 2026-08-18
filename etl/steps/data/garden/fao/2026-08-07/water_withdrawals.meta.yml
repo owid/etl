@@ -6,6 +6,9 @@ definitions:
         - Water Use & Stress
     display:
       numDecimalPlaces: 0
+  description_key_reported: &description_key_reported
+    - Most values are not officially reported by countries. FAO estimates or imputes them, for example by carrying a value forward or interpolating between reported years.
+    - Countries report with a lag, so the most recent years rely more heavily on these estimates.
   description_processing_aggregates: &description_processing_aggregates |-
     Aggregates for continents and income groups were calculated by Our World in Data by summing the values of the member countries. An aggregate is only shown for a year in which at least 70% of the countries that ever report that indicator in the region have data. Values for the World and for FAO's own regional groupings are taken directly from FAO.
 
@@ -19,25 +22,28 @@ tables:
   water_withdrawals:
     variables:
       agricultural_water_withdrawal:
-        description_processing: *description_processing_aggregates
         title: Agricultural water withdrawal
         description_short: Water withdrawn each year for irrigation, livestock, and aquaculture.
+        description_key: *description_key_reported
+        description_processing: *description_processing_aggregates
         unit: cubic meters
         short_unit: m³
         description_from_producer: |-
           Annual quantity of self-supplied water withdrawn for irrigation, livestock and aquaculture purposes.
       industrial_water_withdrawal:
-        description_processing: *description_processing_aggregates
         title: Industrial water withdrawal
         description_short: Water withdrawn each year by self-supplied industries.
+        description_key: *description_key_reported
+        description_processing: *description_processing_aggregates
         unit: cubic meters
         short_unit: m³
         description_from_producer: |-
           Annual quantity of self-supplied water withdrawn for industrial uses.
       municipal_water_withdrawal:
-        description_processing: *description_processing_aggregates
         title: Municipal water withdrawal
         description_short: Water withdrawn each year for direct use by the population, usually measured as the total supplied by the public distribution network.
+        description_key: *description_key_reported
+        description_processing: *description_processing_aggregates
         unit: cubic meters
         short_unit: m³
         description_from_producer: |-
@@ -45,6 +51,8 @@ tables:
       total_water_withdrawal_per_capita:
         title: Total water withdrawal per capita
         description_short: Water withdrawn each year for agriculture, industry, and municipal uses, divided by the population.
+        description_key:
+          - This is not collected from countries. FAO calculates it by dividing total water withdrawal by population.
         processing_level: minor
         unit: cubic meters per person
         short_unit: m³

@@ -23,14 +23,14 @@ UNITS_EXPECTED = {
     "Total water withdrawal per capita": "m3/inhab/year",
 }
 
-# Columns of sectoral withdrawals, given in billions of cubic meters per year, to be converted to cubic meters.
+# Columns of sectoral withdrawals. They are given in billions of cubic meters per year (to be converted to cubic
+# meters), and they are the only ones aggregated (by summing member countries) for continents and income groups.
+# NOTE: Withdrawal per capita is neither converted nor aggregated, since it is already in cubic meters and cannot be
+# summed.
 SECTORAL_COLUMNS = ["agricultural_water_withdrawal", "industrial_water_withdrawal", "municipal_water_withdrawal"]
-COLUMNS_TO_CONVERT = SECTORAL_COLUMNS
 BILLION_CUBIC_METERS_TO_CUBIC_METERS = 1e9
 
-# Columns aggregated (by summing member countries) for continents and income groups.
-# NOTE: Withdrawal per capita is not aggregated, since it cannot be summed.
-LEVEL_COLUMNS = SECTORAL_COLUMNS
+# Regions to create aggregates for.
 REGIONS = [
     "Africa",
     "Asia",
@@ -65,11 +65,11 @@ def sanity_check_inputs(tb: Table) -> None:
 def sanity_check_world(tb: Table) -> None:
     """Check FAO's published World row against the same aggregate computed by summing countries."""
     mask_countries = ~tb["country"].isin(REGIONS + ["World"]) & ~tb["country"].str.endswith("(FAO)")
-    computed = tb[mask_countries].groupby("year", as_index=False)[LEVEL_COLUMNS].sum(min_count=1)
+    computed = tb[mask_countries].groupby("year", as_index=False)[SECTORAL_COLUMNS].sum(min_count=1)
     published = tb[tb["country"] == "World"]
     comparison = published.merge(computed, on="year", suffixes=("_published", "_computed"))
     assert len(comparison) > 20, "Not enough years to compare FAO's World row with the computed aggregate."
-    for column in LEVEL_COLUMNS:
+    for column in SECTORAL_COLUMNS:
         deviation = (comparison[f"{column}_computed"] / comparison[f"{column}_published"] - 1).abs()
         assert deviation.max() < WORLD_MAX_DEVIATION, (
             f"FAO's World row for {column} deviates from the sum of countries by more than "
@@ -113,7 +113,7 @@ def run() -> None:
     tb = tb.rename(columns=VARIABLES, errors="raise")
 
     # Convert withdrawals from billions of cubic meters per year to cubic meters per year.
-    for column in COLUMNS_TO_CONVERT:
+    for column in SECTORAL_COLUMNS:
         tb[column] = (tb[column].astype("float64") * BILLION_CUBIC_METERS_TO_CUBIC_METERS).round()
 
     # Harmonize country names.
@@ -133,7 +133,7 @@ def run() -> None:
     tb = paths.regions.add_aggregates(
         tb=tb,
         regions=REGIONS,
-        aggregations={column: "sum" for column in LEVEL_COLUMNS},
+        aggregations={column: "sum" for column in SECTORAL_COLUMNS},
         min_frac_countries_informed=MIN_FRAC_COUNTRIES_INFORMED,
     )
 
