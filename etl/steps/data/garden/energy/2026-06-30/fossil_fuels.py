@@ -63,6 +63,12 @@ ENERGY_COLUMNS = [f"{fuel}_{metric}_twh" for fuel in FUELS for metric in ("produ
 RESERVES_COLUMNS = ["coal_reserves_tonnes", "oil_reserves_m3", "gas_reserves_m3"]
 COUNTRIES_THAT_MUST_HAVE_RESERVES = {"Europe": ["Russia"]}
 
+# Entities EIA reports whose territory the Statistical Review covers at the same time under another name:
+# East and West Germany against Germany over 1980-1990, and Czechoslovakia against Czechia and Slovakia
+# over 1980-1992. Their own series are worth keeping, so they stay in the dataset, but they are left out of
+# the region aggregates, where they would count the same territory twice.
+DUPLICATED_TERRITORIES = ["East Germany", "West Germany", "Czechoslovakia"]
+
 CONTINENTS = ["Africa", "Asia", "Europe", "North America", "Oceania", "South America"]
 
 REGIONS = CONTINENTS + [
@@ -166,12 +172,7 @@ def prepare_eia_data(tb_eia: Table) -> Table:
     # three incompatible levels into one series and show jumps that are source seams, not history.
     # The USSR therefore ends where the Statistical Review ends it, in 1984; Russia starts in 1985 as
     # its own (smaller) entity, which is the Statistical Review's own convention.
-    #
-    # East Germany, West Germany and Czechoslovakia go for a different reason: the Statistical Review
-    # already covers their territory as Germany, Czechia and Slovakia over the same years (1980-1990 and
-    # 1980-1992), so keeping EIA's would count it twice. It did no harm while region aggregates came
-    # ready-made from the Statistical Review, but they are now built from these countries.
-    tb = tb[~tb["country"].isin(["USSR", "East Germany", "West Germany", "Czechoslovakia"])].reset_index(drop=True)
+    tb = tb[tb["country"] != "USSR"].reset_index(drop=True)
     return tb
 
 
@@ -269,7 +270,7 @@ def add_region_aggregates(tb: Table, tb_review: Table, eia_years: tuple[int, int
     coverage already bounds them.
     """
     is_country = ~tb["country"].str.contains("(EI)", regex=False) & ~tb["country"].isin(
-        REGIONS + ["World", "European Union (27)"]
+        REGIONS + ["World", "European Union (27)"] + DUPLICATED_TERRITORIES
     )
     countries = tb[is_country].reset_index(drop=True)
     other_columns = [
