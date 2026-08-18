@@ -224,7 +224,7 @@ STATISTICAL_REVIEW_FIRST_YEAR = 1965
 
 def get_statistical_review_data(tb_review: Table) -> Table:
     """Select the TES-by-source columns and the total from the Statistical Review."""
-    tb = tb_review.reset_index()[["country", "year", "total_energy_supply_twh"] + list(SR_SOURCES)]
+    tb = tb_review[["country", "year", "total_energy_supply_twh"] + list(SR_SOURCES)]
     tb = tb.rename(columns={col: f"{name}_twh" for col, name in SR_SOURCES.items()}, errors="raise")
     return tb
 
@@ -300,7 +300,7 @@ def extend_total_with_eia(tb: Table, tb_eia: Table) -> Table:
     The Statistical Review is prioritized on overlapping country-years; EIA adds rows for countries and
     years the Statistical Review does not cover (those rows have no by-source breakdown).
     """
-    tb_eia = tb_eia.reset_index()[["country", "year", "total_energy_consumption"]].rename(
+    tb_eia = tb_eia[["country", "year", "total_energy_consumption"]].rename(
         columns={"total_energy_consumption": "total_energy_supply_twh"}, errors="raise"
     )
     tb_eia = tb_eia.dropna(subset=["total_energy_supply_twh"]).reset_index(drop=True)
@@ -425,11 +425,11 @@ def run() -> None:
     #
     # Load the Statistical Review dataset and read its main table.
     ds_review = paths.load_dataset("statistical_review_of_world_energy")
-    tb_review = ds_review.read("statistical_review_of_world_energy", reset_index=False)
+    tb_review = ds_review.read("statistical_review_of_world_energy")
 
     # Load the EIA International Energy dataset and read its main table.
     ds_eia = paths.load_dataset("international_energy")
-    tb_eia = ds_eia.read("international_energy", reset_index=False)
+    tb_eia = ds_eia.read("international_energy")
 
     # Load the Maddison GDP dataset.
     ds_gdp = paths.load_dataset("maddison_project_database")
