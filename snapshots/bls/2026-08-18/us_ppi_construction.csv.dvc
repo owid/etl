@@ -11,12 +11,12 @@ meta:
     citation_full: U.S. Bureau of Labor Statistics
     url_main: |-
       https://www.bls.gov/ppi/factsheets/producer-price-index-data-for-nonresidential-building-construction-sector-new-office-building-construction-naics-236223.htm
-    date_accessed: '2026-07-20'
+    date_accessed: '2026-08-18'
     date_published: '2026'
     license:
       name: Public domain
       url: https://www.bls.gov/opub/copyright-information.htm
 outs:
-  - md5: 3c6569cd8eb096745c367336be2323af
-    size: 25042
+  - md5: 2a5571bdffd01f8665c8e416e50a5df7
+    size: 25150
     path: us_ppi_construction.csv
