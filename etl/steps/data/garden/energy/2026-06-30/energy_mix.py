@@ -6,6 +6,7 @@ extended to countries not covered by the Statistical Review with EIA data, and a
 added (Maddison). Traditional biomass (Smil, World only) is kept separate from TES.
 """
 
+import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table, Variable
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
@@ -281,9 +282,13 @@ STATISTICAL_REVIEW_FIRST_YEAR = 1965
 
 
 def get_statistical_review_data(tb_review: Table) -> Table:
-    """Select the TES-by-source columns and the total from the Statistical Review."""
+    """Select the TES-by-source columns and the total, dropping the region aggregates (see REGIONS).
+
+    The producer's own regions, the World and the European Union are kept: it reports them directly.
+    """
     tb = tb_review[["country", "year", "total_energy_supply_twh"] + list(SR_SOURCES)]
     tb = tb.rename(columns={col: f"{name}_twh" for col, name in SR_SOURCES.items()}, errors="raise")
+    tb = tb[~tb["country"].isin(REGIONS)].reset_index(drop=True)
     return tb
 
 
@@ -317,16 +322,10 @@ def combine_with_eia(tb: Table, tb_eia: Table) -> Table:
     return tb
 
 
-def add_region_aggregates(tb: Table, eia_years: Variable) -> Table:
-    """Fill the gaps in the Statistical Review's region aggregates by summing the combined countries.
-
-    Its own aggregates are used wherever it publishes them: they include the energy it cannot attribute to
-    any country, so they are complete and span its full range. Only the ones it removes for not being
-    representative (South America's total, for instance) are rebuilt here, and only within the years EIA
-    covers, since outside them the countries it omits have no data and the sum would step mid-series.
-    """
+def add_region_aggregates(tb: Table) -> Table:
+    """Build the region aggregates from the combined country-level data."""
     is_country = ~tb["country"].str.contains("(EI)", regex=False) & ~tb["country"].isin(
-        REGIONS + ["World", "European Union (27)"]
+        ["World", "European Union (27)"]
     )
     tb_aggregates = paths.regions.add_aggregates(
         tb[is_country].reset_index(drop=True),
@@ -335,12 +334,8 @@ def add_region_aggregates(tb: Table, eia_years: Variable) -> Table:
         accepted_overlaps=ACCEPTED_OVERLAPS,
         ignore_overlaps_of_zeros=True,
     )
-    tb_aggregates = tb_aggregates[
-        tb_aggregates["country"].isin(REGIONS)
-        & tb_aggregates["year"].between(int(eia_years.min()), int(eia_years.max()))
-    ].reset_index(drop=True)
-    tb = combine_two_overlapping_dataframes(df1=tb, df2=tb_aggregates, index_columns=["country", "year"])
-    return tb.sort_values(["country", "year"]).reset_index(drop=True)
+    tb_aggregates = tb_aggregates[tb_aggregates["country"].isin(REGIONS)].reset_index(drop=True)
+    return pr.concat([tb, tb_aggregates], ignore_index=True).sort_values(["country", "year"]).reset_index(drop=True)
 
 
 def add_smil_world_long_run(tb: Table, tb_smil: Table) -> Table:
@@ -576,11 +571,10 @@ def run() -> None:
     tb = get_statistical_review_data(tb_review=tb_review)
 
     # Extend the total and each source to the countries the Statistical Review does not report.
-    eia_years = tb_eia.loc[tb_eia["total_energy_consumption"].notna(), "year"]
     tb = combine_with_eia(tb=tb, tb_eia=tb_eia)
 
-    # Fill the gaps in the Statistical Review's region aggregates.
-    tb = add_region_aggregates(tb=tb, eia_years=eia_years)
+    # Build the OWID region aggregates from the combined country-level data.
+    tb = add_region_aggregates(tb=tb)
 
     # Extend the World series back to 1800 with Smil (2017).
     tb = add_smil_world_long_run(tb=tb, tb_smil=tb_smil)
@@ -607,7 +601,7 @@ def run() -> None:
     tb = tb[~tb["country"].isin(OUTLIERS)].reset_index(drop=True)
 
     # Sanity checks.
-    sanity_check_outputs(tb=tb, eia_years=eia_years)
+    sanity_check_outputs(tb=tb, eia_years=tb_eia.loc[tb_eia["total_energy_consumption"].notna(), "year"])
 
     # Derived indicators must not inherit key points from a single input (e.g. EI's oil-consumption
     # notes on the fossil aggregate, or Maddison boilerplate on energy per GDP). Key points come only
