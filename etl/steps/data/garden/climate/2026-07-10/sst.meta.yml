@@ -34,7 +34,7 @@ tables:
       nino_classification:
         title: El Niño or La Niña according to Oceanic Niño Index (ONI)
         unit: ""
-        description_short: The classification of the El Niño-Southern Oscillation (ENSO) state based on the Oceanic Niño Index (ONI).
+        description_short: Classification of the El Niño-Southern Oscillation (ENSO) state based on the Oceanic Niño Index (ONI).
         display:
           numDecimalPlaces: 0
       oni_anomaly:

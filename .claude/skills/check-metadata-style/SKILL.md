@@ -11,7 +11,7 @@ Audit a dataset's user-facing text against OWID's Writing and Style Guide. Flags
 
 The text itself is usually authored in the **garden** `.meta.yml` (`description_key`/WYSK, `description_short`, `title`, `display.name`) and inherited by grapher; a smaller share is set or overridden in the grapher step. This skill reads the **resolved** metadata off the built grapher dataset, so it covers both — you point it at the grapher step, and any fix it proposes goes back to whichever layer authored the field.
 
-Rules live in [STYLE_GUIDE.md](STYLE_GUIDE.md) next to this file — a committed snapshot of the [OWID Notion page](https://app.notion.com/p/owid/Writing-and-style-guide-d51a3739ff8542ca90297fa8de40437c). The file records a `Last synced from Notion` date in its header; the skill checks that date on every run and refreshes the snapshot from Notion when it is more than two months old (see step 1). Refreshes are committed via a PR.
+Rules live in [STYLE_GUIDE.md](STYLE_GUIDE.md) next to this file — a committed snapshot of the [OWID Notion page](https://app.notion.com/p/owid/Writing-and-style-guide-d51a3739ff8542ca90297fa8de40437c). The file records a `Last synced from Notion` date in its header; the skill checks that date on every run and refreshes the snapshot from Notion when it is more than two weeks old (see step 1). Refreshes are committed via a PR.
 
 ## When to use
 
@@ -33,8 +33,8 @@ Read the **grapher** step even when the edit was to a garden `.meta.yml` (e.g. y
 
 Read the `> Last synced from Notion: YYYY-MM-DD` line in the header of [STYLE_GUIDE.md](STYLE_GUIDE.md).
 
-- If the date is **less than two months** before today, skip to step 2 — no fetch needed.
-- If the line is missing or the date is **two months old or more**, refresh the snapshot, trying in order:
+- If the date is **less than two weeks** before today, skip to step 2 — no fetch needed.
+- If the line is missing or the date is **two weeks old or more**, refresh the snapshot, trying in order:
 
 1. **Notion MCP.** Load the Notion tools with `ToolSearch` (query `+notion fetch`) and fetch the [Notion page](https://app.notion.com/p/owid/Writing-and-style-guide-d51a3739ff8542ca90297fa8de40437c). Use the result only if it looks complete: all sections present (Branding, Capitalization, Grammar and syntax, Short citations for charts, Writing in GDoc, Descriptions, Dates, Punctuation, Spelling) with the ❌/✅ examples intact. Note: authorizing the connector **mid-session doesn't help** — MCP tool lists are fixed at session start (subagents inherit the same registry, and resuming the session doesn't refresh it either), so a newly authorized connector is only reachable from a brand-new session.
 2. **Manual export.** If the Notion MCP is unavailable or unauthenticated, or the fetched content is incomplete or mangled, ask the user to download a markdown export of the page (open the Notion link → `•••` menu → **Export** → format **Markdown & CSV**) and provide the file path.
@@ -208,6 +208,6 @@ After fixes:
 
 - **No persistent output.** Analysis results stay in-conversation: no report `.md`, no scripts under `scripts/`. The only persistent file tied to this skill is `STYLE_GUIDE.md` (the committed rulebook).
 - **Current step only.** If the user asks to audit the whole catalog, say the skill is scoped to one step and suggest running it per dataset.
-- **Keep `STYLE_GUIDE.md` in sync with Notion.** The header's `Last synced from Notion` date is checked on every run (step 1); when it is more than two months old the skill refreshes the snapshot — Notion MCP first, manual markdown export as fallback — and the refresh is committed via a PR. Between syncs the skill stays deterministic and offline-capable by always auditing against the committed file.
+- **Keep `STYLE_GUIDE.md` in sync with Notion.** The header's `Last synced from Notion` date is checked on every run (step 1); when it is more than two weeks old the skill refreshes the snapshot — Notion MCP first, manual markdown export as fallback — and the refresh is committed via a PR. Between syncs the skill stays deterministic and offline-capable by always auditing against the committed file.
 - **Archive-aware.** If the provided step path is under `dag/archive/*.yml`, point that out and confirm the user still wants to check it.
 - **Don't hallucinate rules.** If `STYLE_GUIDE.md` doesn't say something, don't flag it. Prefer false negatives over false positives.

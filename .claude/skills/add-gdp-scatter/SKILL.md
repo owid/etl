@@ -348,7 +348,7 @@ Consequences to carry into every report:
 
 - A reference's params cost the reader exactly the stored keys they collide with: a link carrying only `country=~FRA` keeps `tab=scatter&time=latest` (and a log row's `yScale=log`) and just pins the country. `params_cell` flags ⚠️ with the overridden keys and prints a non-colliding query as fine.
 - Hand-updating a link still matters when its params override `tab` or `time` — those land the reader off the scatter view.
-- This describes the PRODUCTION 404→301 function. Two other layers behave differently: **staging's** serving layer answers with the stored query and drops the visitor's params entirely (batch-1 staging apply, 2026-08-14), so staging cannot validate this section; and a fresh row's first-week static **302** (`_redirects`) is unverified either way — spot-check it right after a production apply.
+- This describes the PRODUCTION 404→301 function. Two other layers behave differently, and both the same way: **staging's** serving layer and a fresh row's first-week static **302** (`_redirects`) each answer with the stored query and drop the visitor's params entirely (staging: batch-1 staging apply, 2026-08-14; the 302: verified on production right after the batch-1 apply, same day, held to this section's own standard — non-colliding `?foo=bar` and `?xScale=log` were dropped, which a stored-side-wins merge would have kept, and colliding `?country=~CHL` / `?tab=chart` landed on the stored query too, on a log and a plain row both). So for its first week a fresh redirect sends every arrival to the stored view; the per-key merge only starts once the 302 expires and the 301 function takes over. Neither layer can validate this section's merge claim.
 - Re-verify with a distinguishing pair (a query that *omits* a stored key) if grapher changes how chart redirects are baked or served. `functions/_common/redirectTools.ts`'s explorer path also merges per key but with the TARGET winning — a different code path; don't generalize from it in either direction.
 
 Both consumers get the log set from **`apply_scatter_defaults.log_y_axis_sources`**, which owns the reversed-source exclusion — do not re-derive it. A reversed source (GDP on its `y`) must be **excluded**: its `scaleType` describes the *GDP* axis, while the target's `y` is the non-GDP indicator, so proposing log there would make the wrong axis logarithmic. That is the same reason `process_row` skips its y-oriented mirrors for a reversed source, and getting it right in one script while forgetting it in another is exactly how this went wrong once.
@@ -426,6 +426,14 @@ Both failure directions are handled so no URL is ever left unserved. If any alia
 - The reference queries union a chart's own slug with its `chart_slug_redirects` slugs, so afterwards the old chart's referrers show up under the **target's** Refs tab.
 
 ### Verifying Part 2
+
+**Finalize every apply with the closing report.** Once the bake lands, run the same script in `--verify` mode and hand the user its table — the skill is not done until every row grades `OK`:
+
+```bash
+.venv/bin/python .claude/skills/add-gdp-scatter/scripts/redirect_to_scatter.py --verify < pairs.json
+```
+
+It reads every `chart_slug_redirects` row pointing at the batch's targets (the old slugs, the re-pointed aliases, and any pre-existing aliases of the targets — one invariant covers all three) and checks the live site serves each: a 30x whose Location matches that row's target and stored query, compared parsed so encoding and key order can't false-alarm. The DB rows alone can't close the gate, though — a planned redirect that was deleted or never created is simply absent from them, and a report built on rows alone would certify the leftovers. So the report also requires every payload row to stand at `EXISTS` in the same run's plan and fails the rest as `NOT_APPLIED`, naming the reason. `NOT_LIVE` (cached 200) and `NOT_SERVED` (404) mean the bake or CDN purge hasn't landed — re-run until clean; it exits non-zero while anything fails. The manual checks below remain for what HTTP can't see.
 
 - `curl -sI <site>/grapher/<old-slug>` → 301 to `/grapher/<target-slug>?tab=scatter&time=latest&country=`.
 - `curl -sI '<site>/grapher/<old-slug>?tab=chart'` → `Location` keeps `tab=chart`, proving incoming params win.

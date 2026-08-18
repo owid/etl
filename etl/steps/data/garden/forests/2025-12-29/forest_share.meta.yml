@@ -37,7 +37,7 @@ tables:
     variables:
       forest_share:
         title: Share of land covered by forest
-        description_short: "The share of land area covered by forest, including both natural forests and forest plantations."
+        description_short: "Share of land area covered by forest, including both natural forests and forest plantations."
         unit: "%"
         short_unit: "%"
         presentation:

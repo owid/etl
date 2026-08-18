@@ -17,7 +17,7 @@ definitions:
     - config:
         hasMapTab: true
         tab: map
-        chartTypes: ["LineChart"]
+        chartTypes: ["LineChart", "DiscreteBar"]
   definition_remittances: Remittances include personal transfers sent by migrants to their home countries as well as compensation of workers who are employed in an economy where they are not resident. This includes temporary migrant workers (e.g. seasonal workers working in another country) and residents of the country employed by foreign employers (such as embassies or transnational companies).
   definition_remittances_share_of_gdp: This chart shows the share of GDP that is made up of the sum of all remittances sent to this country. If this share is high, it means that remittances are an important source of income in this country.
   definition_remittances_cost_of_sending: This chart shows the average transaction cost as a percentage of total remittances sent from this country to abroad, for a single transaction of USD 200. It is calculated by averaging over the cost of all remittance flows from this country.
@@ -47,7 +47,7 @@ views:
         - catalogPath: wdi#bx_trf_pwkr_dt_gd_zs
     config:
       title: Remittances as a share of GDP
-      subtitle: Remittances include money sent by migrants to their home countries and the salaries of employees employed by foreign companies. This received sum is given as a share of gross domestic product (GDP).
+      subtitle: Remittances include money sent by migrants to their home countries and the salaries of employees employed by foreign companies. This received sum is given as a share of [gross domestic product](#dod:gdp) (GDP).
       map:
         colorScale:
           baseColorScheme: BuPu

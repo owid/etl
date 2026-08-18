@@ -250,8 +250,8 @@ means UNKNOWN, not "nothing references it".
   `?tab=map&country=~FRA` on to `?tab=map&country=%7EFRA` (incoming `tab` wins). A test
   whose query sets every stored key cannot tell merge from wholesale replacement — an
   earlier version of this note concluded "wholesale" from exactly that. Staging's serving
-  layer behaves differently (stored query wins, visitor params dropped), and a fresh row's
-  first-week static 302 is unverified. Do not generalize from
+  layer and a fresh row's first-week static 302 both behave differently (stored query wins,
+  visitor params dropped — both verified live 2026-08-14). Do not generalize from
   `functions/_common/redirectTools.ts`: its *explorer* path also merges per key but with
   the TARGET winning — the opposite winner, and a different code path.
   MDIM dimension collisions are the same question — compare each reference's

@@ -109,9 +109,6 @@ steps:
   data-private://grapher/economics/2018/global_preferences_survey__gps__falk__becker__dohmen__enke__huffman__and_sunde__2018:
     - data-private://garden/economics/2018/global_preferences_survey__gps__falk__becker__dohmen__enke__huffman__and_sunde__2018:
         - snapshot-private://economics/2018/global_preferences_survey__gps__falk__becker__dohmen__enke__huffman__and_sunde__2018.feather
-  data://grapher/agriculture/2017/water_withdrawals_and_consumption__aquastat:
-    - data://garden/agriculture/2017/water_withdrawals_and_consumption__aquastat:
-        - snapshot://agriculture/2017/water_withdrawals_and_consumption__aquastat.feather
   data://grapher/journalism/2022/world_press_freedom_index__reporters_sans_frontieres__2022:
     - data://garden/journalism/2022/world_press_freedom_index__reporters_sans_frontieres__2022:
         - snapshot://journalism/2022/world_press_freedom_index__reporters_sans_frontieres__2022.feather

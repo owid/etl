@@ -305,7 +305,7 @@ views:
             type: Numeric
     config:
       title: Global average temperature increase relative to the pre-industrial era
-      subtitle: The global average temperature increase relative to the pre-industrial era, which is taken to be the year
+      subtitle: Global average temperature increase relative to the pre-industrial era, which is taken to be the year
         1750.
   - dimensions:
       rate: na

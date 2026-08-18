@@ -403,6 +403,10 @@ steps:
   data://grapher/clio_infra/2017-09-09/clio_infra__human_capital:
     - data://garden/clio_infra/2017-09-09/clio_infra__human_capital:
       - snapshot://clio_infra/2017-09-09/clio_infra__human_capital.feather
+  # archived; last active in f30989546af9 on 2026-08-07
+  data://grapher/agriculture/2017/water_withdrawals_and_consumption__aquastat:
+    - data://garden/agriculture/2017/water_withdrawals_and_consumption__aquastat:
+      - snapshot://agriculture/2017/water_withdrawals_and_consumption__aquastat.feather
   # archived; last active in c00f21eb665a on 2026-08-14
   data-private://grapher/oecd/2020-11-05/time_use_across_activities__oecd_gender_data__2020:
     - data-private://garden/oecd/2020-11-05/time_use_across_activities__oecd_gender_data__2020:

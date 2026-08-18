@@ -27,7 +27,7 @@ definitions:
     - The data provider is presently engaged in a global accuracy assessment and acknowledged that they might be underestimating the genuine impact of wildfires, primarily due to constraints imposed by the spatial resolution of the sensors they employ.
   desc_update: The {year} data is incomplete and was last updated {date_accessed}.
   description_short_wildires_cumulative: &description_short_wildires_cumulative  |-
-    The cumulative area burnt by [wildfires](#dod:wildfires) in hectares. {definitions.desc_update}
+    Cumulative area burnt by [wildfires](#dod:wildfires) in hectares. {definitions.desc_update}
   description_short_share_wildfires_cumulative: &description_short_share_wildfires_cumulative |-
     Cumulative share of the total land area burnt by [wildfires](#dod:wildfires). The total area consumed by wildfires is recorded for each fire event, even if fires occur in the same location multiple times. {definitions.desc_update}
   description_short_co2_cumulative: &description_short_co2_cumulative |-

@@ -74,7 +74,7 @@ tables:
           - "Other Religions"
           - "Religiously Unaffiliated"
         title: Most popular religion in a country
-        description_short: The most popular religion in each country and year, based on share of population.
+        description_short: Most popular religion in each country and year, based on share of population.
         unit: ""
         presentation:
           grapher_config:
@@ -103,13 +103,13 @@ tables:
           <% endif -%>
         description_short: |-
           <% if religion == "religiously_unaffiliated" -%>
-          The difference in the share of of people who are religiously unaffiliated between 2010 and 2020.
+          Difference in the share of of people who are religiously unaffiliated between 2010 and 2020.
           <% elif religion == "other_religions" -%>
-          The difference in the share of of people who are affiliated to other religions between 2010 and 2020. {{definitions.others.other_religions}}
+          Difference in the share of of people who are affiliated to other religions between 2010 and 2020. {definitions.others.other_religions}
           <% elif religion == "any_religion" %>
-          The difference in the share of of people who are affiliated to any religion between 2010 and 2020.
+          Difference in the share of of people who are affiliated to any religion between 2010 and 2020.
           <% else -%>
-          The difference in the share of of people who are <<religion.title()>> between 2010 and 2020.
+          Difference in the share of of people who are <<religion.title()>> between 2010 and 2020.
           <% endif -%>
         unit: "%"
         short_unit: "%"
