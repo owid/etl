@@ -705,18 +705,22 @@ def write_markdown(
     # (the embeds a redirect cannot save) and then what the sweep did not reach. The counts
     # restate the sections above on purpose — the coverage note is the part a reader cannot
     # infer from them, and silence there would read as "everything was checked".
-    must_act = (
-        (
-            f"{len(featured)} featured metric(s) need swapping before the CLI runs (the window closes with it). "
-            if featured
-            else ""
+    # Built as a list, not as one conditional expression: a trailing `if embeds else ...` binds to
+    # the WHOLE concatenation, so a run with featured metrics but no embeds printed "No reference
+    # needs manual migration" and dropped the featured sentence — contradicting the ⭐ section that
+    # says the window shuts with the CLI. Each collection now speaks for itself.
+    must_act_parts = []
+    if featured:
+        must_act_parts.append(
+            f"{len(featured)} featured metric(s) need swapping before the CLI runs (the window closes with it)."
         )
-        + f"{len(embeds)} embedded reference(s) need a manual edit before the charts are unpublished — see every "
-        "🔴 section above, each naming the surface that holds it and the replacement URL to put there. A redirect "
-        "does not cover an embed. `preflight.py` gates on this same set."
-        if embeds
-        else "No reference needs manual migration before the charts are unpublished."
-    )
+    if embeds:
+        must_act_parts.append(
+            f"{len(embeds)} embedded reference(s) need a manual edit before the charts are unpublished — see every "
+            "🔴 section above, each naming the surface that holds it and the replacement URL to put there. A "
+            "redirect does not cover an embed. `preflight.py` gates on this same set."
+        )
+    must_act = " ".join(must_act_parts) or "No reference needs manual migration before the charts are unpublished."
     covered_by_redirect = (
         f"The 301 keeps the {len(links)} link-kind reference(s) in the 🟡 sections working"
         + (f", including {len(narrative)} narrative chart(s) to recreate" if narrative else "")
