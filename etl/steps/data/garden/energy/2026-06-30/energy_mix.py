@@ -6,7 +6,6 @@ extended to countries not covered by the Statistical Review with EIA data, and a
 added (Maddison). Traditional biomass (Smil, World only) is kept separate from TES.
 """
 
-import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 from shared import EXCLUDED_PROVIDER_REGIONS
@@ -519,8 +518,12 @@ def sanity_check_outputs(tb: Table) -> None:
     # * In the years EIA covers, the combined data agree with EI's World within ~0.4%.
     # * Beyond EIA's last year, the sum misses all EIA-only countries (~3.5% of World).
     years = deviation_pct.index
-    tolerance = pd.Series(4.0, index=years).where(years <= 1979, 1.0).where(years <= eia_last_year, 5.0)
-    bad_years = deviation_pct[deviation_pct.abs() > tolerance]
+    exceeded = (
+        ((years <= 1979) & (deviation_pct.abs() > 4))
+        | ((years > 1979) & (years <= eia_last_year) & (deviation_pct.abs() > 1))
+        | ((years > eia_last_year) & (deviation_pct.abs() > 5))
+    )
+    bad_years = deviation_pct[exceeded]
     if len(bad_years) > 0:
         summary = "; ".join(f"{year}: {dev:+.1f}%" for year, dev in bad_years.items())
         raise AssertionError(f"Combined EI + EIA country totals deviate from EI's World total: {summary}")
