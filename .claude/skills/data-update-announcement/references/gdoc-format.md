@@ -91,7 +91,7 @@ After creating the doc, list every dod the body uses in the handoff and ask the 
 
 Verify the fix from the **exported HTML** (`download_file_content(exportMimeType="text/html")`, grep for `href="#dod:…"`). Do not judge it from `read_file_content` — its markdown rendering resolves the fragment against the doc's own URL and makes a correct link look broken.
 
-**`copy_file` sometimes fails silently or returns a quota error.** Retry once with identical parameters before reporting it. (Same for `create_file`.)
+**`copy_file` and `create_file` sometimes fail silently or return a quota error.** A silent failure is ambiguous — the Doc may already exist server-side — and a blind retry with identical parameters leaves a second, orphaned Doc that the MCP has no tool to delete. Before retrying, search for the title you asked for (`title contains '<the exact doc title>'`, per the search fallback below) and retry only once that comes back empty. If the search finds the Doc, the first call worked: use it and don't recreate.
 
 **Drive `parentId` search often returns nothing** for this shared drive. To read existing docs in the folder, fall back to `fullText contains 'datasetProducts'` (matches the search-URL CTA) or `title contains '<recent dataset>'`, then `read_file_content` each.
 
