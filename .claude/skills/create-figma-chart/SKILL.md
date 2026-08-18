@@ -28,19 +28,21 @@ Three sibling skills do the text work this one depends on, and Step 8c calls the
 
 Each year gets a new file. For **2026** the file key is `s6Sv60bakebRRW2TxsMQbF` ([Charts (2026)](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-)). **If the current year is not 2026, ask the user for that year's file link and re-verify every node id below** (the templates page is named " 📑 Templates" — note the leading space).
 
-**Last verified: 2026-08-14. Re-verify the geometry at the start of every run** rather than trusting this table — the design team edits these frames in place, and edits that move a chart area's edge have landed days apart. A page laid out against stale numbers still renders and still passes every check in Step 8c; it just doesn't match the frame it was cloned from.
+**Last verified: 2026-08-17. Re-verify the geometry at the start of every run** rather than trusting this table — the design team edits these frames in place, and edits that move a chart area's edge have landed days apart. A page laid out against stale numbers still renders and still passes every check in Step 8c; it just doesn't match the frame it was cloned from. Three days was enough for both Instagram footers to be rebuilt as auto-layout under new ids, so re-verify **structure**, not only numbers.
+
+Run [`scripts/verify_templates.js`](scripts/verify_templates.js) through `use_figma` — it measures every template in the table below in one call (size, frame fill, content box, header band, footer id/name/`layoutMode`/rows) and is what the notes here were last written from. Diff its output against this table before you clone anything.
 
 | What | Node | Size | Notes |
 |---|---|---|---|
 | Templates page | `798:54` | — | all templates + instruction frames live here. **The arrows, flags, animals, no-data and checklist ids below are *pages*, not nodes on this one** — they sit at page indices 2–7 |
-| InstagramPost_Template_English | `798:161` | 540×540 | two-row footer (`Frame 12` @ y=488): source, `OurWorldinData.org/[Topic]`, CC BY |
-| InstagramPost_Template_Portrait_English | `6689:8` | 560×700 | footer (`6689:9`) includes a Note line. Header `header` (`6913:14`) is a vertical auto-layout over a `title row`, matching the square's `Frame 14`/`Frame 13`; unlike the 850-wide pair its wrappers carry **no** inner padding, so its frame band and text band are the same number |
+| InstagramPost_Template_English | `798:161` | 540×540 | two-row footer, **`Frame 17` (`25518:14`)** @ y=488, h=36 — source (y=0, h=16) then `Frame 16` (y=20) carrying `OurWorldinData.org/[Topic]` and CC BY. **Rebuilt as VERTICAL auto-layout on 2026-08-17**, replacing the plain `Frame 12` this table used to name |
+| InstagramPost_Template_Portrait_English | `6689:8` | 560×700 | footer **`Frame 19` (`25518:16`)** @ y=640, h=36 — a Note row (y=0, h=17) then `Frame 18` (y=20); **also rebuilt as VERTICAL auto-layout on 2026-08-17**, replacing `6689:9`. Header `header` (`6913:14`) is a vertical auto-layout over a `title row`, matching the square's `Frame 14`/`Frame 13`; unlike the 850-wide pair its wrappers carry **no** inner padding, so its frame band and text band are the same number |
 | InstagramReel_template | `7336:8` | 616×1096 | has top/bottom no-go zones; contains a worked small-multiples example |
 | DI_Template | `6799:1859` | 540×540 | **one**-row footer (`Frame 12` @ y=508): source + CC BY |
 | Static Chart Template_Mobile (example 1) | `24590:20` | 540×540 | **two**-row footer (`Frame 15` `25343:276` @ y=486, h=38): `Data source:` then `Licensed under CC-BY by the author […]`, both full width |
 | Static Chart Template_Mobile (example 2) | `24590:32` | 540×824 | taller variant — use when the chart needs vertical room. Same two-row `Frame 15` (`25343:275` @ y=770) |
-| Static Chart Template_Horizontal | `5332:75` | 850×638 | footer: Note, Data source, OWID tagline, "Licensed under CC-BY by the author [Name]" |
-| Static Chart Template_Vertical | `5332:93` | 850×1095 | same slots, same header/footer auto-layout wrappers, same 16px subtitle. The pair's one remaining difference is title line height — 30px here against 29px on Horizontal, which is the whole of the 136 vs 134 gap between their header bands |
+| Static Chart Template_Horizontal | `5332:75` | 850×638 | footer `Frame 8` (**`25398:769`**) @ y=542.62, h=95.22: Note (y=16, h=28), Data source (y=48, h=14), then `Frame 7` (y=66) carrying the OWID tagline and "Licensed under CC-BY by the author [Name]" |
+| Static Chart Template_Vertical | `5332:93` | 850×1095 | same slots and the same `Frame 8` structure (`5332:101` @ y=999.81), same header/footer auto-layout wrappers, same 16px subtitle. **The pair's header bands are now identical at 134.22** — the 30px-vs-29px title line height that used to make this one 136 is gone, so don't expect a Vertical/Horizontal difference there any more |
 | **`small-chart-template-guided`** | **`25344:1357`** | 302 × free | title + optional subtitle, no source row — see [SMALL-CHARTS.md](SMALL-CHARTS.md) |
 | **`small-chart-template-pull`** | **`25344:1391`** | 302 × free | the same plus a mandatory source row — see [SMALL-CHARTS.md](SMALL-CHARTS.md) |
 | `"SMALL" Charts` section heading | `25344:1235` | — | "featured on the OWID website as guided and PULL charts" |
@@ -49,6 +51,22 @@ Each year gets a new file. For **2026** the file key is `s6Sv60bakebRRW2TxsMQbF`
 | Flags | `2654:5` | — | Flags **plugin** — manual; US flags provided in the file |
 | Animals | `5336:5` | — | chicken, rooster, turkey, fish, cow, egg-laying hen, pig |
 | Good Data Viz Checklist | `20729:1027` | — | distilled in GUIDELINES.md |
+
+### Slot sizes per family, measured 2026-08-17
+
+The per-slot *positions* for the four static templates live in [`/create-static-viz`'s TEMPLATES.md](../create-static-viz/TEMPLATES.md); these are the type sizes you are filling into, which Step 6 needs and which no other file records for the non-static families. They do **not** move together — the same row is 14px on one family and 11px on another, so read the family you are filling rather than carrying a number across.
+
+| Family | Title | Subtitle | Note | Source | Tagline | License / CC BY |
+|---|---|---|---|---|---|---|
+| Static Horizontal / Vertical (850) | 25 | 16 | **12** | **12** | **11** | **11** (263px slot at x=571) |
+| Static mobile 1 & 2 (540) | 25 | 16 | — | 14 | — | 14 (own row, full 508) |
+| DI (540) | 25 | 16 | — | 14 | — | 14 |
+| IG square (540) | 25 | 16 | — | 14 | 14 | 14 |
+| IG portrait (560) | **28** | **18** | 14 | 14 | — | 14 |
+| IG reel (616) | 28 | 18 | — | 15 | — | 15 |
+| Small guided / pull (302) | **16** | **11** | — | 11 (pull only) | — | — |
+
+Two traps in that table. The 850-wide pair's **12px note and source** are the smallest body text of any family, so a source line that overruns there cannot be fixed by dropping a size the way a 14px one can. And its **license shares a row with the 467px tagline inside 818px** — the slot holds roughly fifty characters, so a two-author credit overruns the tagline and prints on top of it; the phrasing gives (`by <names>` rather than `by the authors <names>`), never the names. TEMPLATES.md carries the measured widths.
 
 **Two Spanish Instagram post templates sit beside the English ones on that page. They are no longer used and may be deleted** — never target one, and don't read their absence from this table as an omission to fix.
 
@@ -357,15 +375,17 @@ const lastFill = lines === 1 ? 1 : (unwrapped - (lines - 1) * slotW) / slotW;
 const orphan = lines > 1 && lastFill < 0.2;    // last line under a fifth full
 ```
 
-Widths settle on the *next* `use_figma` call, so probe in one call and read in the next, then delete
-the probes. A deliberate two-line title is not an orphan — the wine chart's title runs to a second
+A width settles **inside the same call**, as long as the node is in an auto-resizing mode — so probe
+and read in one call, then delete the probes. What does *not* move is a node still pinned to a fixed
+width (see Gotchas): set `textAutoResize = "WIDTH_AND_HEIGHT"` before reading, not after.
+A deliberate two-line title is not an orphan — the wine chart's title runs to a second
 line that is 38% full, which is a real line of text; the test is the fill, not the line count.
 
 **The placeholder text tells you the intended line count — match it.** Every template ships "This is a title on **two lines**, lorem ipsum…" against a slot two lines tall, and "This is a subtitle or description on **one line**…" against a one-line slot. That is a shape instruction, and it is easy to invert: a one-line title with a two-line subtitle fills the same box and reads wrong, because the title stops carrying the weight and the subtitle starts. So give the title enough substance to run to two lines, keep the subtitle to one, and push any reading instruction ("each band is the volume traded between a pair of countries") down into the **Note**, which is where an instruction belongs. Check it by reading the heights back: on the Horizontal template a correct pair measures title `h=58`, subtitle `h=19`.
 
 Rules: replace `characters`, and leave the node's **base** styling alone — the fonts, sizes, colors, and positions are the template's, not yours. `await figma.loadFontAsync(node.fontName)` before each text edit. If you need a *new* text block the template doesn't have, **clone the nearest template text node and edit it** — that inherits the correct shared style without hunting style ids.
 
-**Watch for template text that is already mixed-weight, and restore it after writing.** Setting `characters` propagates the *first character's* style over the whole new string, so any node whose label is bolder than its content comes out uniformly bold. The source line is the one that bites — the templates ship `Data source:` in Bold and the attribution in Regular — so write the string, then push Regular back over the tail:
+**Watch for template text that is already mixed-weight, and restore it after writing.** Setting `characters` propagates the *first character's* style over the whole new string, so any node whose label is bolder than its content comes out uniformly bold. **Two slots ship that way, not one** — `Data source:` and, on the templates that carry it, `Note:`. Fixing only the source line leaves a wholly bold note, which reads as deliberate emphasis on a caveat and was spotted on a finished frame rather than in review. Write the string, then push Regular back over the tail:
 
 ```js
 const PREFIX = "Data source:";
@@ -433,6 +453,182 @@ The chart spans the full content width, left-aligned with the title/subtitle/log
 > of these groups (no `note`, no `tagline`) but still emits `license`. Verify both
 > deletions by name rather than by position; the template's own slots sit at the same coordinates, and
 > deleting the wrong one of an overlapping pair is invisible in a screenshot.
+>
+> **Whether this has to happen before the rescale depends on what you are rescaling.** An
+> `upload_assets` import arrives as a **FRAME whose size is the SVG canvas**, so its scale factor is
+> `frame width / canvas width` — exact, and independent of what the children's ink does. Rescale first
+> and delete after; that is the order `scripts/restyle_static_import.js` uses.
+>
+> A **GROUP** is the other case, and the one this warning was written for: a group's bbox is its
+> children's ink, and matplotlib's glyph boxes overhang the figure canvas, so while the text is present
+> `clone.width / chart.width` solves against the overhang instead of the frame (848.36 against an 816
+> canvas on the run that found it). If you are rescaling a group — a hand-made selection, or a frame
+> you have already unwrapped — delete the text first, after which the bbox *is* the canvas and one
+> rescale lands the height on the template's to `delta 0`.
+
+### An upload lands on the file's *current* page — which is not your page
+
+`upload_assets` places the import on whatever page the file currently has open, and page context is
+not what your last `use_figma` call set. On a real run that meant SVG imports quietly piling up on the
+file's **Cover** page, in a shared file, until someone noticed.
+
+So treat the returned `placedOnNodeId` as the only reliable handle: fetch it with
+`getNodeByIdAsync`, `appendChild` it onto the page you meant, and **check the page it came from is
+left clean**. Two habits that make this cheap:
+
+- Walk up from the imported node to its `PAGE` ancestor and log it, so a wrong landing is visible in
+  the tool result rather than discovered later.
+- Before finishing, list the landing page's children and remove anything of yours still sitting there.
+  An import you uploaded but did not consume (a spare, a superseded round) is litter in someone else's
+  file.
+
+### Keep the untouched import beside the edited frame
+
+Standing practice, not clutter: after the styled chart is swapped into its frame, place a **second,
+unedited copy of the same SVG** next to it — rescaled to the template's size, named
+`<frame name> — original SVG (unstyled)`. Every later question ("did the restyle move that label?",
+"was that gap in the export or did we add it?") is then answered by looking, not by re-importing. It
+also makes a font or palette pass reviewable by someone who wasn't watching it happen. Two uploads of
+the same file per frame costs nothing; deleting the reference costs the next reviewer an import.
+
+**Put it to the LEFT of the frame**, so the page reads original → edited in reading order. To the
+right it reads as an afterthought and the eye reaches the raw export last, when it is the thing being
+compared against.
+
+### Bind what has a style; name what doesn't
+
+The palette lives in the **Chart colors** library, and the design team's own pages bind chart *marks*
+to it (`OWID Distinct/*`, `Chart/*`) while leaving in-chart text on raw fills. Import a style by key
+and bind it — `await node.setFillStyleIdAsync((await figma.importStyleByKeyAsync(key)).id)` — after
+which the frame follows the library instead of a hex someone typed. To learn the keys, read them off a page that
+already uses them (`Plugin / Bar charts` and `Plugin / Line charts` enumerate most of the palette).
+
+Two things this exercise is good for beyond tidiness:
+
+- **The house styles for text are `Text/Gray 100` (#2d2e2d) and `Text/Gray 80` (#5b5b5b)** — the same
+  two the templates bind their title and subtitle to. Any other grey in a chart is ad-hoc: an
+  imported step's `#333333` header and `#444444` in-bar labels are just matplotlib defaults nobody
+  chose.
+- **A colour with no style is a finding, not a leftover.** Binding by exact match tells you which of
+  a chart's colours are actually house colours. On one chart three of four categories landed exactly
+  on palette entries and the fourth did not — it had come from seaborn's grey rather than the palette,
+  which is a question for design, not something to bind to the nearest neighbour. Report the
+  unmatched colours with counts, and say which are *derived* (tints of a bound base, legibility
+  variants) versus genuinely off-palette.
+
+### Restyling a local-SVG import to OWID's fonts and colors
+
+An `export://static_viz` step deliberately does **not** set them: the machine building it may have
+neither Lato nor Playfair Display (this one has 436 font families and neither), so a step that asked
+for them would fall back silently and emit different type depending on where it ran. Colors are the
+same story — the Chart colors library lives in Figma, not in matplotlib. So the step owns the data,
+the geometry and the proportions, and **this page owns the type and the palette**. The template's own
+slots cover the title, subtitle, note, source and license; everything *inside* the plot arrives in
+matplotlib's fallback stack and seaborn's palette, and needs an explicit pass:
+
+- **Read each label's role off its PARENT group, never off the text node's name.** The import names a
+  TEXT node after its own content, while the step's `gid` sits on the wrapping group. A role test
+  written against `t.name` matches *nothing*, so every label falls to the default anchor and the
+  columns come out ragged — it looks like a font problem and it is a selector problem.
+- **Take column edges from geometry a text pass cannot inflate** — a column's own marks, or the frame's
+  content box — never from the text boxes. Pad those once and a later pass reads the padded width back
+  and walks the column off the frame.
+- **Hold each label with `textAlignHorizontal` and a box ending on its anchor**, rather than hugging and
+  re-reading the width. Not because the width is slow to settle — it is not, see Gotchas — but because a
+  hugged box becomes the geometry the *next* pass reads back and pads again, which is the feedback the
+  bullet above is about. Right-aligned columns get `x = 0`
+  and a box ending on the shared edge; centred labels get a small pad each side. Keep pads small: a
+  GROUP's bbox derives from its children, so a generous pad grows the group past the frame.
+- **Re-derive tints rather than mapping them.** Where a step computes member fills as `tint(base, w)`,
+  invert that per channel to recover `w` and re-apply it to the new color, and each family keeps its own
+  internal steps. A flat hex→hex table catches only the base colors and leaves every tint behind.
+- **Everything above is lost on re-import**, along with the rest of Step 8 — see the re-export
+  section. Keep the pass as one script you re-run, because a frame that has quietly reverted to
+  matplotlib's type looks finished.
+
+#### Changing a font moves every label. Put them back.
+
+This is the single most consequential thing on this page, because it is invisible in the script's
+output and unmistakable to the person looking at the frame. A text node's box does not re-centre
+itself when you change its face: the glyphs re-measure, the box grows or shrinks from its left edge,
+and **the label drifts by half of whatever its width changed** — 10 to 24 px per label on a real
+restyle, which is enough to walk a name clean out of the bracket it names.
+
+So bracket the font pass with an anchor pass, on the node's *own* alignment:
+
+```js
+const before = texts.map((t) => {                  // BEFORE touching any face
+  const b = t.absoluteBoundingBox;
+  return { t, align: t.textAlignHorizontal, left: b.x, right: b.x + b.width, center: b.x + b.width / 2 };
+});
+// ... set faces ...
+for (const r of before) {                          // AFTER
+  const b = r.t.absoluteBoundingBox;
+  const target = r.align === "CENTER" ? r.center - b.width / 2
+               : r.align === "RIGHT"  ? r.right - b.width
+               :                        r.left;
+  r.t.x += target - b.x;
+}
+```
+
+Two notes that make this work in practice. The import **does** preserve `text-anchor` as
+`textAlignHorizontal`, so the node itself tells you which edge to hold — no name-based guessing. And
+report the count of nodes you moved: on the pair of frames here it was 174 and 145, which is the
+difference between "the restyle worked" and "the restyle worked and nothing moved".
+
+**A label the step drew as one multi-line call has no anchor to hold**, so this pass silently treats it
+as left-aligned and it drifts anyway. The fix belongs upstream — one call per line, see
+[`/create-static-viz`](../create-static-viz/SKILL.md) — but you are the one who will see it, so check
+the emitted SVG for `<text>` elements carrying a `transform="translate(...)"` and no `text-anchor`
+before assuming an import is anchor-safe.
+
+#### A line built from several runs needs re-flowing, not just re-anchoring
+
+Where a line is several independent text nodes — a legend of coloured names, a mixed-weight footer row —
+holding each run's own anchor still leaves the *gaps* between them wrong, because a narrower face has
+to leave its slack somewhere. Lay the line out again instead: group the runs by y, sort by x, and place
+each one a measured space after the last.
+
+```js
+probe.characters = "nn"; const tight = probe.width;      // measure the space in the new face,
+probe.characters = "n n"; const space = probe.width - tight;   // rather than assuming an em fraction
+```
+
+On the run here that took the separator gaps from 4.6-before/1.2-after to exactly 3 and 3.
+
+Both reads sit in the **same** call, which is safe because the probe is created auto-resizing rather
+than imported at a fixed width (see Gotchas). Measured 2026-08-18 at 12 px Lato: `"nn"` comes back
+**14**, `"n n"` **17**, so `space` is **3** — the same 3 the finished gaps show.
+
+#### Don't hand-write this pass — it is a script
+
+[`scripts/restyle_static_import.js`](scripts/restyle_static_import.js) is the whole thing: place the
+import, strip an opaque background patch, drop the step's slot copies by prefix, derive each family's
+tints from its base, set Lato,
+restore every anchor, bind the library styles, swap it into the frame, re-flow flowed lines, and park
+an unstyled copy beside the frame. Fill in its `CONFIG` block and paste it as one `use_figma` call.
+
+It exists because this pass was hand-written six times in one session and each rewrite lost one of the
+details above. Edit `CONFIG`, not the body; when you learn something new, change the script so the next
+run inherits it.
+
+#### Re-importing a corrected SVG: dump the styling first
+
+When the step's geometry changes, the chart group has to be replaced and every colour and face on it
+is lost. Don't reconstruct them from the step or from memory of the palette — **read them off the frame
+you are about to replace**, keyed by node name (`japan__sleep` → fill, one row is enough since a column
+shares its colour), then replay that map onto the fresh import. The rest of the recipe:
+
+1. Rescale the import — it arrives as a FRAME sized to the SVG's canvas (0.96× the template), so the
+   factor is exact and does not depend on the ink's bbox. Do this *before* deleting anything.
+2. Delete the step's own copies of the template's text slots — **by prefix, not by exact name**. A slot
+   the step had to emit as runs is `license-0 … license-5`, and an exact-name match silently leaves all
+   six behind to print over the template's own row.
+3. Paint, set faces, restore anchors, re-flow multi-run lines.
+4. Append into the target frame at (0,0) with `clipsContent = false`, then remove the old group.
+
+Keep it as one script per frame: the pass is run more than once, always after a step change, and the
+only thing that varies is which frame.
 
 **Measure that band; don't hardcode it.** The header's height depends on how many lines the title and subtitle take, so a fixed y is wrong as soon as the subtitle wraps — and centering inside a guessed band leaves a lopsided result (18px above, 6px below on the first run of this skill). Read the real edges instead:
 
@@ -500,8 +696,8 @@ Side margins and the footer edge are the template's, not yours: content starts a
 | Static mobile example 1 (540×540) | x=16, w=508 | 118 → 486 (2-row `Frame 15`) |
 | Static mobile example 2 (540×824) | x=16, w=508 | 118 → 770 (2-row `Frame 15`) |
 | IG portrait (560×700) | x=26, w=508 | 135 → 640 |
-| Static Horizontal (850×638) | x=16, w=818 | 118 → 556 |
-| Static Vertical (850×1095) | x=16, w=818 | 136 → 997 |
+| Static Horizontal (850×638) | x=16, w=818 | **134.22 → 542.62** (frame band; the 118 → 556 this row used to give was the text band) |
+| Static Vertical (850×1095) | x=16, w=818 | **134.22 → 999.81** (frame band; was documented as 136 → 997) |
 | Small / pull chart (302 × free) | **x=12, w=278** | 44 → `H − 10` (guided) or `H − 23` (pull) — see below |
 
 DI and static mobile get their own rows above because their bands differ, even though both frames are 540×540.
@@ -510,11 +706,11 @@ The table gives one number per template — the band you fit a chart into — an
 
 **The 302-wide row is parametric, and its `H` is an output of this step rather than an input** — width is the only fixed dimension, the frame height is chosen from the content, and there is no fit to perform because the export already arrives at 278px wide. Its header block also hugs its own text width instead of spanning the content, so the plot may legitimately rise beside it. All of that is [SMALL-CHARTS.md](SMALL-CHARTS.md)'s; don't apply the fit below to it.
 
-**On the two 850-wide templates the band you read off the frames is not the band above.** Both wrap their header and footer in auto-layout frames whose 16px of inner padding falls on the chart side, so the frame band is the text band inset by 16px at each end — `header.y + header.height` returns 134 on the Horizontal and 136 on the Vertical, never the subtitle's own bottom edge. The table's Vertical row is already a frame band, its Horizontal row a text band, so the two rows are not directly comparable; the per-slot text positions behind them are `TEMPLATES.md`'s. Read the band off the frames and that breathing room comes for free; read it off the text and add your own.
+**On the two 850-wide templates the band you read off the frames is not the same as the text's own edges.** Both wrap their header and footer in auto-layout frames whose 16px of inner padding falls on the chart side, so the frame band is the text band inset by 16px at each end — `header.y + header.height` returns **134.22 on both** (they no longer differ), never the subtitle's own bottom edge. Both rows above are now frame bands, so they are directly comparable; the per-slot text positions behind them are `TEMPLATES.md`'s. Read the band off the frames and that breathing room comes for free; read it off the text and add your own.
 
 **Every template exposes header/footer frames, but only the 850-wide pair pads them.** On IG square, IG portrait, DI and both static mobile templates the wrappers carry zero padding, so there `header.y + header.height` *is* the text band — 118 on all four 540-wide frames, 135 on the portrait, exactly as tabled. Read the band off the frames everywhere; just don't port the 16px correction across, because it belongs to the two 850-wide templates alone.
 
-The footers are not uniform in the same way: static mobile's `Frame 15` and the 850-wide `Frame 8` are auto-layout and reflow, while IG square, IG portrait and DI position their footer rows absolutely inside a plain frame. That is what Step 6's structural check is for.
+The footers are not uniform in the same way, and **as of 2026-08-17 only DI is still the absolute kind**: static mobile's `Frame 15`, the 850-wide `Frame 8`, and now both Instagram footers (`25518:14` square, `25518:16` portrait, rebuilt from the plain `Frame 12` / `6689:9` this file used to describe) are auto-layout and reflow. DI's `Frame 12` @ y=508 reports `layoutMode: "NONE"` and does not. That is what Step 6's structural check is for — run it rather than reading the split off this paragraph, since it is exactly the sentence that went stale.
 
 Verify against the actual clone with `get_metadata` (the templates evolve; the geometry above is a 2026 snapshot). These are **frame-local** coordinates, and `x`/`y` are relative to a node's parent — so append the embed to the template clone **before** positioning it. Left parented to the page (where Step 5 puts imported nodes), the same numbers land it near the page origin, on top of the reference chart. One wrinkle in the same rule: **a GROUP is transparent for coordinates**, so once the imported chart is inside the template, its descendants report `x`/`y` in the *template frame's* space, not the group's — which is what makes the frame-local numbers above directly usable on the plot's internals.
 
@@ -1050,7 +1246,8 @@ Two habits make the difference. **Assert, don't eyeball** — a 1.2px label drif
 - **`rescale()`, never `resize()`** on imported charts — `resize` crops instead of scaling children.
 - **Figma plugins can't be run from here — but the no-data hatch no longer needs one.** Imported no-data shapes arrive with an **empty `fills` array**, and the hatch the design team applies by hand is just an `IMAGE` fill, `scaleMode: "TILE"`, `scalingFactor ≈ 0.5` from a 12×12 tile. Reproduce it by copying `fills` from a shape that already has it, or rebuild it from `assets/no-data-hatch-tile.png` via `figma.createImage(bytes)` — and apply it to **every** no-data shape *and* the legend's "No data" pill, never a flat `#C9C9C9` (GUIDELINES.md → Flags, animals, no-data pattern). The Flags plugin (`2654:5`) is still manual.
 - **Fonts**: every text edit needs `loadFontAsync` first; the templates use Playfair Display and Lato — if a font is missing in the user's Figma, text edits throw.
-- **A text node's `width` is stale for the rest of the script that set its `characters`.** Read it back and you get the *old* width, so any layout computed from it lands wrong — twice in a row, because re-running the same arithmetic in a second script reads the same stale number when the real cause is elsewhere. **This silently invalidates a placement search**, which is the worst version of it: the candidate rectangles are built from the wrong widths, every collision test passes, and the script reports `forced: 0` while the labels sit on top of each other on the canvas. A search that returns a suspiciously clean result on a crowded chart is the tell. Create the text in one call; measure and place in the next. Two separate things bite here: SVG-imported text arrives at a **fixed** width (the clone of a `22px` value label stays 22px wide and wraps "Poultry" onto two lines), so set `textAutoResize = "WIDTH_AND_HEIGHT"` first; and even then the new width only settles on the **next** `use_figma` call. Write the text and the sizing mode in one call, measure and position in the next.
+- **Before blaming a stale width, check that your setter changed anything.** Assigning a property the value it already holds is a no-op, and the unchanged geometry then looks exactly like the pinning below — so the diagnosis goes to the wrong place while the real cause sits untouched. Read the property back (`getStyledTextSegments(['fontSize', 'fontName'])` for text) and compare against what you meant to set.
+- **A text node pinned to a fixed width does not resize when you set its `characters`, and that reads exactly like a stale width.** SVG-imported text arrives **fixed** — the clone of a `22px` value label stays 22px wide and wraps "Poultry" onto two lines — so every width you read back is the old one and any layout computed from them lands wrong. **This silently invalidates a placement search**, which is the worst version of it: the candidate rectangles are built from the wrong widths, every collision test passes, and the script reports `forced: 0` while the labels sit on top of each other on the canvas. A search that returns a suspiciously clean result on a crowded chart is the tell. **The fix is the sizing mode, not a second call:** set `textAutoResize = "WIDTH_AND_HEIGHT"` *before* measuring. Measured 2026-08-18 on both a fresh node and a clone of an imported one: while a node is auto-resizing, `characters` → `width` reads true in the **same** call, on every ordering and across repeated reassignment (`71 → 233 → 12`), and releasing a pinned node's sizing mode updates it in that same call too (`71 → 233`). A node left at `textAutoResize = "NONE"` holds its 71 px however long the string gets — that is the pinning, not a cache, so don't spend a second call waiting for it to settle.
 - **`imType=square` and `imType=uncaptioned` don't render the same chart.** The square re-layout drops per-segment value labels that the uncaptioned crop keeps (and the uncaptioned crop keeps the legend, which is inside the chart area, not the header). Export both and look before deciding which one to embed.
 - **`/admin/charts/<id>.svg` doesn't exist**; narrative charts have no public slug — both go through `by-uuid/<uuid>.svg`.
 - **Texts come from `.metadata.json`, not `.config.json`** — the latter has no source attribution, omits inherited subtitles/notes, and 404s on MDim slugs. Carry the view's query params on the request.

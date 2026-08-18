@@ -13,11 +13,11 @@ meta:
     citation_full: U.S. Census Bureau, Value of Construction Put in Place Survey (VIP), Private Construction Spending Time Series
     url_main: https://www.census.gov/construction/c30/historical_data.html
     url_download: https://www.census.gov/construction/c30/xlsx/privtime.xlsx
-    date_accessed: '2026-07-20'
-    date_published: '2026-07-01'
+    date_accessed: '2026-08-18'
+    date_published: '2026-08-03'
     license:
       name: Public Domain
 outs:
-  - md5: b3fa97d41f53616c20f17e24e71ad4df
-    size: 173413
+  - md5: 1d545b9e4267e75e40321294c1c560c1
+    size: 173684
     path: datacenter_construction.xlsx
