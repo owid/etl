@@ -544,9 +544,16 @@ def main() -> int:
     featured = [r for r in rows if r["surface"] == "featured metric"]
     placed.update(id(r) for r in featured)
     if featured:
+        # Slots are distinct per (url, tag, incomeGroup), so the target's slot only replaces the
+        # source's when the income group matches too. Keyed by tag alone, a target featured for a
+        # DIFFERENT group graded ✅ and told the operator to delete a row nothing was replacing.
+        # The source row's own group is read from its `featured_metrics.id` (the finding's
+        # `surface_id`) rather than parsed back out of the rendered `context` string.
         fm_by_key = defaultdict(list)
+        fm_by_id = {}
         for row in fr.featured_metric_rows():
-            fm_by_key[(fr.url_pathname(row["url"]), row["tag"])].append(row)
+            fm_by_key[(fr.url_pathname(row["url"]), row["tag"], row["incomeGroup"])].append(row)
+            fm_by_id[int(row["id"])] = row
         out += [
             f"## ⭐ Featured metrics ({len(featured)}) — invisible to the Part 2 audit, and NOT a mechanical swap",
             "",
@@ -568,8 +575,9 @@ def main() -> int:
             "feature something else, or drop the slot. The topic's owner decides — and it has to "
             "happen **before** the unpublish, since adding a row requires a *published* slug.",
             "",
-            "**Target already featured?** ✅ the target already holds a slot on that tag (just delete "
-            "the old row), 🔴 it does not.",
+            "**Target already featured?** ✅ the target holds a slot on that tag *and* income group "
+            "(just delete the old row), 🟡 it holds one on that tag but for other income groups only "
+            "(add one for this group first), 🔴 it holds none on that tag.",
             "",
             "| Topic tag | Slot | Old chart | Target chart | Target already featured? |",
             "|---|---|---|---|---|",
@@ -578,9 +586,27 @@ def main() -> int:
         for r in featured:
             tgt = pairs.get(r["subject_id"])
             tgt_slug = slugs.get(tgt) if tgt else None
-            already = bool(fm_by_key.get((f"/grapher/{tgt_slug}", r["where"]))) if tgt_slug else False
-            rank = 2 if already else (0 if tgt is None else 1)
-            graded.append((rank, r, tgt, tgt_slug, "✅ yes" if already else "🔴 no"))
+            source = fm_by_id.get(int(r["surface_id"])) if r.get("surface_id") else None
+            group = source["incomeGroup"] if source else None
+            if tgt is None:
+                rank, verdict = 0, "— no target —"
+            elif tgt_slug and group and fm_by_key.get((f"/grapher/{tgt_slug}", r["where"], group)):
+                rank, verdict = 3, "✅ yes"
+            else:
+                # Any group the target IS featured for on this tag, so the operator can see the
+                # slot exists but sits elsewhere rather than reading a bare "no".
+                others = sorted(
+                    {
+                        key[2]
+                        for key in fm_by_key
+                        if tgt_slug and key[0] == f"/grapher/{tgt_slug}" and key[1] == r["where"]
+                    }
+                )
+                if others:
+                    rank, verdict = 1, f"🟡 only for {', '.join(others)}"
+                else:
+                    rank, verdict = 2, "🔴 no"
+            graded.append((rank, r, tgt, tgt_slug, verdict))
         for rank, r, tgt, tgt_slug, verdict in sorted(graded, key=lambda g: (g[0], g[1]["where"], g[1]["subject"])):
             old_cell = f"`{r['subject']}` ([#{r['subject_id']}]({admin}/charts/{r['subject_id']}/edit))"
             tgt_cell = f"[#{tgt}]({admin}/charts/{tgt}/edit) `{tgt_slug or '?'}`" if tgt else "— no target —"
