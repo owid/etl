@@ -420,10 +420,9 @@ def cleanup_ghost_variables(admin_api: AdminAPI, dataset_id: int, upserted_varia
     Raise an error if we try to delete variable used by any chart.
 
     The delete itself is done by the Grapher admin API, which owns the tables that hang off
-    `variables` and the chart configs a variable leaves behind in MySQL and R2. We ask it
-    first what it would delete, apply our own policy to anything still used by a chart, and
-    only then let it delete — so a blocked variable leaves the dataset untouched, the same
-    way it did when this ran as direct SQL.
+    `variables` and the chart configs a variable leaves behind in MySQL and R2. It deletes
+    what it safely can and hands back the variables a chart still uses; deciding whether
+    those should fail the run is ours.
 
     :param admin_api: Grapher admin API client
     :param dataset_id: ID of the dataset
@@ -432,7 +431,7 @@ def cleanup_ghost_variables(admin_api: AdminAPI, dataset_id: int, upserted_varia
     :return: True if successful
     """
     try:
-        plan = admin_api.cleanup_ghost_variables(dataset_id, upserted_variable_ids, dry_run=True)
+        result = admin_api.cleanup_ghost_variables(dataset_id, upserted_variable_ids)
     except requests.exceptions.ConnectionError:
         # Working locally without a running Grapher admin. Leaving the ghost variables behind
         # is harmless there, so warn instead of failing the step — but report the cleanup as
@@ -445,44 +444,17 @@ def cleanup_ghost_variables(admin_api: AdminAPI, dataset_id: int, upserted_varia
         )
         return False
 
-    if not _cleanup_is_allowed(plan["blocked"]):
-        return False
+    if result["deleted"]:
+        log.warning(
+            "cleanup_ghost_variables.end",
+            size=len(result["deleted"]),
+            variables=result["deleted"],
+        )
 
-    if not plan["deletable"]:
+    if not result["blocked"]:
         return True
 
-    log.info("cleanup_ghost_variables.start", size=len(plan["deletable"]))
-
-    result = admin_api.cleanup_ghost_variables(dataset_id, upserted_variable_ids)
-
-    # A chart could have started using one of these variables between the two calls. Grapher
-    # skips those, so let ETL re-run the step rather than reporting a clean sweep.
-    if not _cleanup_is_allowed(result["blocked"]):
-        return False
-
-    log.warning(
-        "cleanup_ghost_variables.end",
-        size=len(result["deleted"]),
-        variables=result["deleted"],
-    )
-
-    return True
-
-
-def _cleanup_is_allowed(blocked: list[dict[str, Any]]) -> bool:
-    """Decide what to do about ghost variables the Admin API refused to delete because a chart
-    still uses them. Returns True if cleanup should go ahead."""
-    if not blocked:
-        return True
-
-    rows = pd.DataFrame(
-        [
-            {"chartId": chart_id, "variableId": entry["variableId"]}
-            for entry in blocked
-            for chart_id in entry["chartIds"]
-        ],
-        columns=["chartId", "variableId"],
-    )
+    rows = pd.DataFrame(result["blocked"], columns=["variableId", "variableName", "chartId", "chartSlug"])
 
     message = "Variables used in charts will not be deleted automatically. Ignore this if your PR doesn't affect the problematic variables."
 
@@ -490,11 +462,7 @@ def _cleanup_is_allowed(blocked: list[dict[str, Any]]) -> bool:
         raise ValueError(f"{message}:\n{rows}")
 
     # otherwise show a warning
-    log.warning(
-        message,
-        rows=rows,
-        variables=sorted({entry["variableId"] for entry in blocked}),
-    )
+    log.warning(message, rows=rows)
     return False
 
 

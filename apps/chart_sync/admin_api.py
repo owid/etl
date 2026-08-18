@@ -383,7 +383,7 @@ class AdminAPI:
             raise AdminAPIError({"error": js.get("error"), "narrative_chart_id": narrative_chart_id, "config": config})
         return js
 
-    def cleanup_ghost_variables(self, dataset_id: int, keep_variable_ids: list[int], dry_run: bool = False) -> dict:
+    def cleanup_ghost_variables(self, dataset_id: int, keep_variable_ids: list[int]) -> dict:
         """Delete a dataset's variables that weren't upserted by the grapher step.
 
         Grapher owns the delete because it owns the schema around it: the tables holding a
@@ -396,16 +396,15 @@ class AdminAPI:
             dataset_id: Grapher ID of the dataset being cleaned up
             keep_variable_ids: Variables the grapher step upserted; everything else in the
                 dataset is a ghost
-            dry_run: Report what would be deleted without deleting it
 
         Returns:
-            {"deleted": [variable_id], "deletable": [variable_id],
-             "blocked": [{"variableId": int, "chartIds": [int]}]}
+            {"deleted": [variable_id],
+             "blocked": [{"variableId", "variableName", "chartId", "chartSlug"}]}
         """
         resp = http_session.post(
             f"{self.owid_env.admin_api}/datasets/{dataset_id}/cleanupGhostVariables",
             headers=self._headers(),
-            json={"keepVariableIds": keep_variable_ids, "dryRun": dry_run},
+            json={"keepVariableIds": keep_variable_ids},
             timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)

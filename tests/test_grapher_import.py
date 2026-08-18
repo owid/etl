@@ -122,55 +122,54 @@ class _FakeAdminAPI:
         self._responses = list(responses)
         self.calls: list[dict] = []
 
-    def cleanup_ghost_variables(self, dataset_id: int, keep_variable_ids: list[int], dry_run: bool = False) -> dict:
-        self.calls.append({"dataset_id": dataset_id, "keep": keep_variable_ids, "dry_run": dry_run})
+    def cleanup_ghost_variables(self, dataset_id: int, keep_variable_ids: list[int]) -> dict:
+        self.calls.append({"dataset_id": dataset_id, "keep": keep_variable_ids})
         response = self._responses.pop(0)
         if isinstance(response, Exception):
             raise response
         return response
 
 
-def _response(deletable=(), deleted=(), blocked=()) -> dict:
-    return {"deletable": list(deletable), "deleted": list(deleted), "blocked": list(blocked)}
+def _blocked(variable_id: int, chart_id: int) -> dict:
+    return {
+        "variableId": variable_id,
+        "variableName": f"Variable {variable_id}",
+        "chartId": chart_id,
+        "chartSlug": f"chart-{chart_id}",
+    }
 
 
-def test_cleanup_ghost_variables_deletes_after_dry_run():
-    admin_api = _FakeAdminAPI(
-        [
-            _response(deletable=[7]),
-            _response(deletable=[7], deleted=[7]),
-        ]
-    )
+def _response(deleted=(), blocked=()) -> dict:
+    return {"deleted": list(deleted), "blocked": list(blocked)}
+
+
+def test_cleanup_ghost_variables_deletes_in_one_call():
+    admin_api = _FakeAdminAPI([_response(deleted=[7])])
 
     assert db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
 
-    assert [call["dry_run"] for call in admin_api.calls] == [True, False]
-    assert all(call["keep"] == [5] for call in admin_api.calls)
+    assert admin_api.calls == [{"dataset_id": 1, "keep": [5]}]
 
 
-def test_cleanup_ghost_variables_skips_second_call_when_nothing_to_delete():
+def test_cleanup_ghost_variables_is_a_no_op_when_there_are_no_ghosts():
     admin_api = _FakeAdminAPI([_response()])
 
     assert db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
 
-    assert len(admin_api.calls) == 1
 
-
-def test_cleanup_ghost_variables_does_not_delete_when_a_chart_still_uses_one(monkeypatch):
-    """A blocked variable leaves the whole dataset alone, so the delete call is never made."""
+def test_cleanup_ghost_variables_warns_in_production_when_a_chart_still_uses_one(monkeypatch):
     monkeypatch.setattr(db.config, "ENV", "production")
-    admin_api = _FakeAdminAPI([_response(deletable=[7], blocked=[{"variableId": 8, "chartIds": [100, 101]}])])
+    admin_api = _FakeAdminAPI([_response(deleted=[7], blocked=[_blocked(8, 100), _blocked(8, 101)])])
 
+    # Not successful, so the checksum stays unset and the next run tries again.
     assert not db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
-
-    assert [call["dry_run"] for call in admin_api.calls] == [True]
 
 
 def test_cleanup_ghost_variables_raises_outside_production(monkeypatch):
     monkeypatch.setattr(db.config, "ENV", "dev")
-    admin_api = _FakeAdminAPI([_response(deletable=[7], blocked=[{"variableId": 8, "chartIds": [100]}])])
+    admin_api = _FakeAdminAPI([_response(blocked=[_blocked(8, 100)])])
 
-    with pytest.raises(ValueError, match="Variables used in charts"):
+    with pytest.raises(ValueError, match="chart-100"):
         db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
 
 
