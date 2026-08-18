@@ -21,6 +21,8 @@
 //     page it came from is left clean;
 //   - the import arrives as a FRAME sized to the SVG canvas (0.96x the template), so the rescale
 //     factor is exact and independent of the ink's bbox;
+//   - an opaque matplotlib figure/axes patch is stripped BEFORE anything else, because it is
+//     frame-sized and hides the clone's background, logo and footer;
 //   - the step's own copies of the template's text slots are dropped BY PREFIX, because a slot the
 //     step had to emit as runs is `license-0 … license-5`;
 //   - tints are derived from each family's base rather than listed, so a family keeps its internal
@@ -58,6 +60,9 @@ const CONFIG = {
   bodyTextParent: /__(label|total-leisure)$/,
   darkTextParent: /^header__total-leisure/,
   slots: ["title", "subtitle", "note", "data-source", "tagline", "license"],
+  // matplotlib's figure and axes patches. A step on the current contract emits them as `fill: none`,
+  // so this finds nothing; an older export fills them white and they land opaque over the template.
+  backgroundPatch: /^patch_\d+$/,
 };
 
 // ---------------------------------------------------------------------------
@@ -129,6 +134,20 @@ for (const job of CONFIG.jobs) {
   reference.y = frame.y;
 
   styled.rescale(scale);
+
+  // The background goes first, because it is the one that ruins the page: an opaque figure patch is
+  // frame-sized and lands *above* the clone's cream background, logo and footer, hiding all three.
+  // The patches are their own groups, so dropping the duplicate text below does not uncover them.
+  // Only a patch that actually paints is removed, so a `fill: none` export is left alone.
+  const strippedPatches = [];
+  for (const node of styled.findAll((n) => CONFIG.backgroundPatch.test(n.name))) {
+    const paints = "fills" in node && node.fills !== figma.mixed && Array.isArray(node.fills) ? node.fills : [];
+    if (paints.some((f) => f.visible !== false && (f.opacity === undefined || f.opacity > 0))) {
+      strippedPatches.push(node.name);
+      node.remove();
+    }
+  }
+
   for (const slot of CONFIG.slots) {
     for (const node of styled.findAll((n) => n.name === slot || n.name.startsWith(slot + "-"))) node.remove();
   }
@@ -241,6 +260,7 @@ for (const job of CONFIG.jobs) {
   report.push({
     frame: frame.name,
     size: [round(styled.width), round(styled.height)],
+    strippedPatches,
     recentred,
     reflowed,
     reference: reference.name,

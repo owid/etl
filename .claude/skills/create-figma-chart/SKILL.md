@@ -527,7 +527,9 @@ matplotlib's fallback stack and seaborn's palette, and needs an explicit pass:
   content box — never from the text boxes. Pad those once and a later pass reads the padded width back
   and walks the column off the frame.
 - **Hold each label with `textAlignHorizontal` and a box ending on its anchor**, rather than hugging and
-  re-reading the width, which does not settle inside the same call. Right-aligned columns get `x = 0`
+  re-reading the width. Not because the width is slow to settle — it is not, see Gotchas — but because a
+  hugged box becomes the geometry the *next* pass reads back and pads again, which is the feedback the
+  bullet above is about. Right-aligned columns get `x = 0`
   and a box ending on the shared edge; centred labels get a small pad each side. Keep pads small: a
   GROUP's bbox derives from its children, so a generous pad grows the group past the frame.
 - **Re-derive tints rather than mapping them.** Where a step computes member fills as `tint(base, w)`,
@@ -594,7 +596,8 @@ than imported at a fixed width (see Gotchas). Measured 2026-08-18 at 12 px Lato:
 #### Don't hand-write this pass — it is a script
 
 [`scripts/restyle_static_import.js`](scripts/restyle_static_import.js) is the whole thing: place the
-import, drop the step's slot copies by prefix, derive each family's tints from its base, set Lato,
+import, strip an opaque background patch, drop the step's slot copies by prefix, derive each family's
+tints from its base, set Lato,
 restore every anchor, bind the library styles, swap it into the frame, re-flow flowed lines, and park
 an unstyled copy beside the frame. Fill in its `CONFIG` block and paste it as one `use_figma` call.
 

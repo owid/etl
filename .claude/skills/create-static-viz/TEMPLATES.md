@@ -278,6 +278,7 @@ constants so neither gets applied backwards.
 settles both the width and the line count for a string:
 
 ```js
+await figma.loadFontAsync({ family: "Lato", style: "Regular" });   // or the assignment below throws
 const node = figma.createText();                    // inside a temp frame you remove afterwards
 node.fontName = { family: "Lato", style: "Regular" };
 node.fontSize = 16;
