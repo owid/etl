@@ -77,7 +77,10 @@ GDOC_SURFACES = ("gdoc", "gdoc (url link)", "data insight")
 # The sweep's `key chart` surface is a chart_tags row with a keyChartLevel — what it feeds
 # on the site is the topic page's "All charts" block ordering, so name it by what the
 # reader loses, not by the DB mechanism.
-SURFACE_LABELS = {"key chart": "all-charts block (topic page)"}
+SURFACE_LABELS = {
+    "key chart": "all-charts block (topic page)",
+    "featured metric": "featured metric (topic page + search)",
+}
 
 # Reader-facing section names for the ArchieML component tokens — "chart" and "span-link"
 # mean nothing to someone who doesn't write ArchieML. The raw token stays in the CSV's
@@ -101,6 +104,10 @@ FIXES = {
     # gdoc-authoring change, not part of this migration.
     "key chart": "no action — the entry drops out of the All charts block automatically, and the "
     "block cannot list MDIMs (it is built from charts only), so there is no replacement to add",
+    # Unlike the All charts block, this one does NOT heal itself: the row keeps pointing at a
+    # URL that no longer resolves to a published record, so the slot silently empties.
+    "featured metric": "add a featured metric for the MDIM view under the same tag and income group, "
+    "then delete this row — BEFORE the CLI runs, because an unpublished chart can no longer be re-added",
 }
 # Gdoc-backed references: the fix depends on the ArchieML component being edited (and for
 # chart blocks, on whether the block embeds the chart or merely stores its URL).
@@ -525,8 +532,12 @@ def write_markdown(
     # the topic-page All charts blocks need no action at all (verified: the block lists
     # only published charts) and collapse to a per-page summary.
     allcharts = [f for f in findings if f["surface"] == "key chart"]
+    # Featured metrics are actionable but they are not embeds and they do not block the CLI, so
+    # they get their own section and stay out of the embed/link partitions below — otherwise the
+    # blocking count in the header would grow by rows preflight rightly never gates on.
+    featured = [f for f in findings if f["surface"] == "featured metric"]
     drafts = [f for f in findings if f["severity"] == INFO and f["surface"] != "key chart"]
-    actionable = [f for f in findings if f["severity"] in (RED, YELLOW)]
+    actionable = [f for f in findings if f["severity"] in (RED, YELLOW) and f["surface"] != "featured metric"]
     doc_edits = [f for f in actionable if f["doc_edit_url"]]
     narrative = [f for f in actionable if f["surface"] == "narrative chart"]
     other = [f for f in actionable if not f["doc_edit_url"] and f["surface"] != "narrative chart"]
@@ -545,7 +556,13 @@ def write_markdown(
         f"redirected whose source chart is still published. **{len(embeds)} embedded reference(s) break "
         f"when the charts are unpublished** and must be migrated before the CLI runs (every 🔴 section "
         f"below, doc-backed or not); {len(links)} link(s) keep working via the 301 but belong in the same "
-        "editing pass. Topic-page All charts blocks update themselves — summarized below, no action needed.",
+        "editing pass. Topic-page All charts blocks update themselves — summarized below, no action needed."
+        + (
+            f" **{len(featured)} featured metric(s)** hold one of these charts: those do not block the CLI, "
+            "but the window to swap them closes when it runs — see the ⭐ section."
+            if featured
+            else ""
+        ),
         "",
         "Replacement URLs merge each reference's own query string over the MDIM view's dimensions, "
         "the same way grapher's redirect handler does.",
@@ -627,6 +644,38 @@ def write_markdown(
             lines.append(f"| {page} | {len(by_page[page])} |")
         lines.append("")
 
+    if featured:
+        by_tag = defaultdict(list)
+        for f in featured:
+            by_tag[f["where"]].append(f)
+        lines += [
+            f"## ⭐ Featured metrics ({len(featured)}) — swap these BEFORE the CLI runs",
+            "",
+            "Editorial slots on a topic page and the top of that topic's search results. **A redirect "
+            "does not cover them**: the row holds a URL, matched — pathname *and* exact params — only "
+            "when Algolia indexes, against published records. Unpublishing empties the slot silently; "
+            'the one signal is an *"Algolia Featured Metric Indexing Failures"* post in Slack after the '
+            "next index. And the window closes when the CLI runs, since adding a row requires a "
+            "*published* slug — afterwards the old URL is refused and the ranking is lost.",
+            "",
+            "Per row: add the replacement under the **same tag and income group**, drag it to the old "
+            "ranking, delete the old row, then re-apply *boost in search* if it was on (it does not "
+            "carry over). Full procedure: `docs/guides/data-work/redirect-to-mdims.md`.",
+            "",
+            "**The replacement below is the bare view, not a redirect target.** The admin strips reader "
+            "params on paste and never validates the dimension params, so a redirect target is accepted "
+            "and then fails silently.",
+            "",
+            "| Topic tag | Slot | Old chart | Add this instead |",
+            "|---|---|---|---|",
+        ]
+        for tag in sorted(by_tag):
+            for f in sorted(by_tag[tag], key=lambda g: g["context"]):
+                lines.append(
+                    f"| {tag} | {f['context']} | [{f['source_chart_slug']}]({f['old_url']}) | {f['replacement_url']} |"
+                )
+        lines += ["", f"Edit them at [{admin}/featured-metrics]({admin}/featured-metrics).", ""]
+
     if other:
         by_surface = defaultdict(list)
         for f in other:
@@ -657,7 +706,12 @@ def write_markdown(
     # restate the sections above on purpose — the coverage note is the part a reader cannot
     # infer from them, and silence there would read as "everything was checked".
     must_act = (
-        f"{len(embeds)} embedded reference(s) need a manual edit before the charts are unpublished — see every "
+        (
+            f"{len(featured)} featured metric(s) need swapping before the CLI runs (the window closes with it). "
+            if featured
+            else ""
+        )
+        + f"{len(embeds)} embedded reference(s) need a manual edit before the charts are unpublished — see every "
         "🔴 section above, each naming the surface that holds it and the replacement URL to put there. A redirect "
         "does not cover an embed. `preflight.py` gates on this same set."
         if embeds
@@ -739,6 +793,14 @@ def main() -> int:
             # Verified no-action: the All charts block only lists published charts, so the
             # entry disappears on its own when the CLI unpublishes the source.
             severity = INFO
+        elif ref["surface"] == "featured metric":
+            # `render`, so the generic rule above would call it 301-covered. It is not: the row
+            # is matched by exact URL when Algolia indexes, against published records only, and
+            # nothing there follows a redirect. Unpublishing the chart empties the slot, and the
+            # window to re-add it closes at the same moment. RED — but it is partitioned out of
+            # the embed count in `write_markdown`, because it does not block the CLI (like the
+            # All charts block, it is a topic-page slot, not a rendered copy of the config).
+            severity = RED
         is_gdoc = ref["surface"] in GDOC_SURFACES and ref.get("surface_id")
         component = archie_component(ref) if is_gdoc else ""
         if ref["surface"] == "narrative chart":

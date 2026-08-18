@@ -90,6 +90,10 @@ COMPONENT_FIXES = {
     "front-matter": "update the grapher-url in the front matter before the redirect is created",
     "span-link": "update the href (the 302 covers it meanwhile)",
     "explorer-tiles": "re-point the tile at the MDIM: it keeps working, but advertises a retired explorer",
+    "featured metric": (
+        "add a featured metric for the MDIM view under the same tag and income group, then delete this "
+        "row — BEFORE the redirect is created, because a retired explorer can no longer be re-added"
+    ),
 }
 REDIRECT_FIX = (
     "BLOCKER — repoint or delete this site redirect first. Repoint unless it is a vanity path "
@@ -164,6 +168,14 @@ def severity_of(ref: dict, component: str) -> str:
     """RED / YELLOW / INFO from what the redirect actually does to this surface."""
     if ref["surface"] == "site redirect":
         return RED  # a blocker regardless of the referencing page's state
+    if ref["surface"] == "featured metric":
+        # The one surface where this skill's usual "a link survives the 302" reasoning inverts.
+        # Its kind is `render`, so the rule below would call it YELLOW, but a featured metric is
+        # resolved only when Algolia indexes — matching pathname AND exact params against
+        # published records, following no redirect. Once the explorer is retired the slot matches
+        # nothing and empties silently, and it cannot be re-added afterwards because creating a
+        # row validates that the slug resolves to something published. RED.
+        return RED
     if not ref["published"]:
         return INFO
     if component in SURVIVES_REDIRECT:
@@ -307,14 +319,18 @@ def gdoc_table(group: list[dict]) -> list[str]:
 def rollup(runs: dict[str, dict], rows: list[dict]) -> list[str]:
     """Per-explorer go/no-go: is this one safe to redirect yet?"""
     lines = [
-        "| Explorer | refs | 🔴 breaks | 🟡 links | → view | → catch-all | ⚠️ wrong view | inbound redirects | verdict |",
-        "|---|---|---|---|---|---|---|---|---|",
+        "| Explorer | refs | 🔴 breaks | 🟡 links | ⭐ FMs | → view | → catch-all | ⚠️ wrong view "
+        "| inbound redirects | verdict |",
+        "|---|---|---|---|---|---|---|---|---|---|",
     ]
     for slug in sorted(runs):
         mine = [r for r in rows if r["explorer"] == slug]
-        breaks = [r for r in mine if r["severity"] == RED and r["surface"] != "site redirect"]
+        # A featured metric is RED but not an embed, so it must not land in `breaks` — that count
+        # drives the "migrate N embed(s) first" verdict, and a slot needs a swap, not a doc edit.
+        featured = [r for r in mine if r["surface"] == "featured metric"]
+        breaks = [r for r in mine if r["severity"] == RED and r["surface"] not in ("site redirect", "featured metric")]
         inbound = [r for r in mine if r["surface"] == "site redirect"]
-        links = [r for r in mine if r["severity"] == YELLOW]
+        links = [r for r in mine if r["severity"] == YELLOW and r["surface"] != "featured metric"]
         to_view = [r for r in mine if r["match"] == "view"]
         to_catch = [r for r in mine if r["match"].startswith("catch-all")]
         wrong = [r for r in mine if r["stale_params"] or "partial" in r["match"]]
@@ -324,10 +340,12 @@ def rollup(runs: dict[str, dict], rows: list[dict]) -> list[str]:
             verdict = f"migrate {len(breaks)} embed(s) first"
         elif wrong:
             verdict = "review the ⚠️ rows, then go"
+        elif featured:
+            verdict = f"swap {len(featured)} FM(s) first"
         else:
             verdict = "✅ no blockers"
         lines.append(
-            f"| `{slug}` | {len(mine)} | {len(breaks)} | {len(links)} | {len(to_view)} | "
+            f"| `{slug}` | {len(mine)} | {len(breaks)} | {len(links)} | {len(featured)} | {len(to_view)} | "
             f"{len(to_catch)} | {len(wrong)} | {len(inbound)} | {verdict} |"
         )
     return lines
@@ -336,9 +354,13 @@ def rollup(runs: dict[str, dict], rows: list[dict]) -> list[str]:
 def write_markdown(out: Path, runs: dict[str, dict], rows: list[dict], gaps: list[str]) -> Path:
     path = out / "references.md"
     blockers = [r for r in rows if r["surface"] == "site redirect"]
-    breaks = [r for r in rows if r["severity"] == RED and r["surface"] != "site redirect"]
-    links = [r for r in rows if r["severity"] == YELLOW]
-    drafts = [r for r in rows if r["severity"] == INFO]
+    # Featured metrics are neither a doc edit nor a blocker: they get their own section, so they
+    # stay out of every partition below (the component fallback would otherwise file them under
+    # "Google Doc edits", where they have no doc to edit).
+    featured = [r for r in rows if r["surface"] == "featured metric"]
+    breaks = [r for r in rows if r["severity"] == RED and r["surface"] not in ("site redirect", "featured metric")]
+    links = [r for r in rows if r["severity"] == YELLOW and r["surface"] != "featured metric"]
+    drafts = [r for r in rows if r["severity"] == INFO and r["surface"] != "featured metric"]
     wrong = [r for r in rows if r["stale_params"] or "partial" in r["match"]]
 
     lines = [
@@ -346,7 +368,13 @@ def write_markdown(out: Path, runs: dict[str, dict], rows: list[dict], gaps: lis
         "",
         f"{len(runs)} explorer(s) · {len(rows)} reference(s). **{len(breaks)} break the moment the "
         f"redirect exists**, {len(links)} are links the 302 covers, {len(wrong)} would land on the "
-        "wrong view.",
+        "wrong view."
+        + (
+            f" **{len(featured)} featured metric(s)** point at these explorers: those must be swapped "
+            "*before* the redirect, and cannot be recovered after it — see the ⭐ section."
+            if featured
+            else ""
+        ),
         "",
         "> [!WARNING]",
         "> **Creating the redirect darkens a live explorer immediately.** An explorer redirect is "
@@ -370,7 +398,9 @@ def write_markdown(out: Path, runs: dict[str, dict], rows: list[dict], gaps: lis
         lines += gdoc_table(blockers) if all(r["doc_edit_url"] for r in blockers) else _bullets(blockers)
         lines.append("")
 
-    doc_rows = [r for r in rows if r["severity"] in (RED, YELLOW) and r["surface"] != "site redirect"]
+    doc_rows = [
+        r for r in rows if r["severity"] in (RED, YELLOW) and r["surface"] not in ("site redirect", "featured metric")
+    ]
     if doc_rows:
         lines += [
             f"## 📝 Google Doc edits ({len(doc_rows)})",
@@ -390,6 +420,37 @@ def write_markdown(out: Path, runs: dict[str, dict], rows: list[dict], gaps: lis
             lines += [f"### {emoji} {COMPONENT_LABELS.get(comp, comp)} ({len(group)})", ""]
             lines += gdoc_table(group) if all(r["doc_edit_url"] for r in group) else _bullets(group)
             lines.append("")
+
+    if featured:
+        lines += [
+            f"## ⭐ Featured metrics ({len(featured)}) — swap these BEFORE the redirect",
+            "",
+            "Editorial slots on a topic page and the top of that topic's search results. **The 302 "
+            "does not cover them**, unlike every other link here: the row holds a URL, matched — "
+            "pathname *and* exact params — only when Algolia indexes, against published records. "
+            'Retiring the explorer empties the slot silently; the one signal is an *"Algolia Featured '
+            'Metric Indexing Failures"* post in Slack after the next index. And it cannot be recovered: '
+            "adding a row requires a *published* slug, so afterwards the old URL is refused and the "
+            "ranking is lost.",
+            "",
+            "Per row: add the replacement under the **same tag and income group**, drag it to the old "
+            "ranking, delete the old row, then re-apply *boost in search* if it was on (it does not "
+            "carry over). Full procedure: `docs/guides/data-work/redirect-to-mdims.md`.",
+            "",
+            "| Topic tag | Slot | Explorer view it features | Add this instead |",
+            "|---|---|---|---|",
+        ]
+        for r in sorted(featured, key=lambda g: (g["where"], g["context"])):
+            lines.append(
+                f"| {r['where']} | {r['context']} | [{r['explorer']}]({r['old_url']}) | {r['replacement_url']} |"
+            )
+        lines += [
+            "",
+            "The replacement is the bare MDIM view. Do not paste a redirect target instead — the admin "
+            "strips reader params and never validates the dimension params, so a wrong set is accepted "
+            "and then fails silently at the next index.",
+            "",
+        ]
 
     if wrong:
         lines += [
