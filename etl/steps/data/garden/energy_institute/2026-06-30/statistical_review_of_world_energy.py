@@ -281,10 +281,8 @@ REGIONS = {
     "High-income countries": {},
 }
 
-# Sources whose total energy supply is their gross electricity generation. Under the physical energy
-# content method no thermal efficiency is applied to them, unlike nuclear and other renewables (where
-# the heat input is estimated at ~33% efficiency) or the fossil fuels (where the supply is the fuel
-# burned, not the electricity produced).
+# Sources whose total energy supply is their gross electricity generation, since the physical energy
+# content method applies no thermal efficiency to them (unlike nuclear and other renewables, at ~33%).
 SOURCES_WITH_SUPPLY_EQUAL_TO_GENERATION = ["hydro", "solar", "wind"]
 
 # Sources that add up to the total energy supply (in exajoules).
@@ -448,13 +446,10 @@ def prepare_prices_index_table(tb_prices: Table) -> Table:
 def fill_missing_total_energy_supply(tb: Table) -> Table:
     """Fill missing total energy supply by source with zeros, where the total confirms they are zero.
 
-    The Statistical Review omits coal, oil, gas and biofuels for country-years where they are zero,
-    unlike hydro, solar, wind and other renewables, which it always reports explicitly. Its own total
-    confirms the omissions: wherever the total is informed, it equals the sum of the reported sources,
-    leaving no room for the missing ones.
+    The source omits coal, oil, gas and biofuels where they are zero, but its total still accounts for
+    every reported source, leaving no room for the missing ones.
     """
-    # NOTE: A total of exactly zero satisfies the assertion below for free (e.g. USSR 1985-1991, where
-    # the Statistical Review reports zeros across the board), so those rows are excluded.
+    # A total of exactly zero would satisfy the assertion for free (e.g. USSR 1985-1991, all zeros).
     informed = tb["total_energy_supply_ej"].fillna(0) > 0
     total = tb.loc[informed, "total_energy_supply_ej"]
     error = (
@@ -472,10 +467,8 @@ def fill_missing_total_energy_supply(tb: Table) -> Table:
 def fill_missing_electricity_generation(tb: Table) -> Table:
     """Fill missing electricity generation with total energy supply, where they are the same quantity.
 
-    For hydro, solar and wind, the total energy supply *is* the gross electricity generation (see
-    SOURCES_WITH_SUPPLY_EQUAL_TO_GENERATION), so the two columns hold the same number. The Statistical
-    Review nevertheless leaves gaps in the generation columns where it reports the supply, and those
-    gaps can be filled exactly rather than inferred.
+    See SOURCES_WITH_SUPPLY_EQUAL_TO_GENERATION. The source leaves gaps in the generation columns where
+    it reports the supply, so those can be filled exactly rather than inferred.
     """
     for source in SOURCES_WITH_SUPPLY_EQUAL_TO_GENERATION:
         supply, generation = f"{source}_consumption_twh", f"{source}_electricity_generation_twh"
