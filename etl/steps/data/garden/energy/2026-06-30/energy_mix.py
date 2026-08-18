@@ -65,8 +65,11 @@ EIA_SOURCES = {
 }
 
 # Minimum fraction of a region's reporting countries that must report an indicator in a given year, for
-# that region-year to be published. See add_region_aggregates.
-MIN_FRAC_COUNTRIES_INFORMED = 0.65
+# that region-year to be published. See add_region_aggregates. Kept well below the observed minimum
+# (Europe, 31 of 46 in 1980) because the denominator counts successor states that do not exist in the
+# early years: Europe's territory is fully covered in 1980, as the USSR and Yugoslavia, but its count
+# only reaches today's level once they split.
+MIN_FRAC_COUNTRIES_INFORMED = 0.6
 
 # The largest energy consumer of each region must be present, so that a region cannot lose a quarter of
 # its energy to a producer dropping a country. Russia is deliberately absent: before 1985 the entity in

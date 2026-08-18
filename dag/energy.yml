@@ -132,6 +132,9 @@ steps:
     - data://garden/papers/2026-06-30/etemad_luciani:
       - data://meadow/papers/2026-06-30/etemad_luciani:
         - snapshot://papers/2026-06-30/etemad_luciani.csv
+    # Used to build the OWID region aggregates from the combined country-level data.
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2026-07-01/income_groups
   data://grapher/energy/2026-06-30/fossil_fuels:
     - data://garden/energy/2026-06-30/fossil_fuels
   export://multidim/energy/latest/fossil_fuels:
