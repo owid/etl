@@ -460,6 +460,68 @@ the doubling that splitting the panels was meant to remove. Prefer stating the f
 letting the reader compare panels at a shared gridline. Check any "for context" series this way: plot
 the two and measure where they actually diverge before deciding it earns its ink.
 
+### Labelling a chart with many categories
+
+Four decisions, each settled by measuring rather than by taste:
+
+- **A value label belongs to a category, not to a row.** Print one wherever it happens to fit and the
+  categories that fit on only a few rows read as facts about *those* rows rather than as "the others
+  were too narrow". Draw a category's values only where some share of rows can hold one, and otherwise
+  none of them. Measure the share per frame — a narrower frame drops more categories.
+- **Put each category's names inside its own bracket, one per line.** Every name then sits over the run
+  it belongs to, and a residual bucket can shorten to `Other` because the bracket already supplies the
+  category. Derive that short form rather than renaming the groups, so the full name survives for
+  layouts where a group stands alone. Stack them all even where one would fit on a single line; a
+  mixture reads as several different treatments.
+- **Labelling every segment in place, with leaders, is rarely worth what it costs — and whether it is
+  even possible is a property of the data.** The row you point at decides it, and no amount of vertical
+  room rescues a row whose narrowest segment leaves no corridor, because the obstruction is horizontal.
+  If you attempt it, place the hardest label first and expect the dataset's narrowest segment to be the
+  binding constraint. (Built in full for the time-use refresh, then deleted: it read no better than
+  brackets.)
+- **Rank rows by something the reader can verify.** A key whose segment is a few pixels wide cannot be
+  checked against the chart, ties a large share of rows once rounded, and imports whatever survey
+  artifact that category carries. Rank by a wide category, keep the key in one constant so the
+  alternative is a one-line change at review, and make the sort **stable** so tied rows hold their order
+  instead of churning the output between runs.
+
+### Anchor and baseline every label the way it has to survive Figma
+
+A step's labels are placed once, in matplotlib, and then re-rendered a second time in Figma in a
+different font. Three habits decide whether they survive that, and none of them shows up in the
+step's own render:
+
+- **Anchor a label where it must stay, never where it happens to start.** `text-anchor: middle` and
+  `end` survive the re-render; a left-anchored run does not — its box keeps its x while the glyphs
+  shrink, so the label creeps out of the thing it labels and the gaps after it grow. Centre what is
+  centred (a value in its segment, a name over its bracket), right-anchor what lines up on an edge.
+  The step draws them in the same place either way, so this costs nothing at the time and is
+  invisible until someone re-renders.
+- **A run's trailing space belongs to the layout, not to its glyphs.** Advance the cursor by the full
+  advance, but centre and draw the *stripped* text: SVG (and Figma) centre the trimmed ink, so a run
+  centred with its space lands half a space off — which is how a separator dot ends up hugging the
+  name after it. (And a run may never *begin* with a space; see TEMPLATES.md.)
+- **Put a row's text on an explicit baseline, not on `va="center"`.** Centring uses the font's whole
+  line box, which reserves room for descenders that digits never use, so a value sits about a tenth
+  of a bar high — small enough to survive review and plainly visible once someone looks for it. Place
+  the baseline half a cap-height below the row's centre (`TextPath((0,0), "0").get_extents().ymax`),
+  which also puts labels with and without descenders on one line.
+- **Draw a multi-line label as one call per line.** A `"Total\nleisure"` passed to a single `ax.text`
+  gets no `text-anchor` at all: matplotlib centres each line by baking a different `translate` into
+  it, using its own metrics. So the lines arrive as independent left-anchored boxes that lose their
+  centring on each other *and* on whatever they label as soon as the font changes — the one case the
+  anchor rule above cannot rescue, because there is no anchor to preserve. Grep an emitted SVG for
+  `text-anchor` and any label missing one is this.
+
+### Size a value column from its content, not from a round number
+
+A column of numbers beside the bars is separated from them by exactly the slack in its width, so a
+column sized generously reads as the numbers drifting away from the chart. Derive it: widest label
+plus one gap. Spell the unit out where that still leaves the column a small share of the frame, and
+drop it where it would not — on a narrow frame the bars need the room more than the reader needs the
+unit on every row. Deriving it also deletes a per-layout constant that nobody would have thought to
+re-check.
+
 ### Assertions
 
 Assert the claims the chart makes, not only the schema. If the subtitle states a range as one
@@ -623,6 +685,15 @@ claim about human intent that an automated flow should not be making.
 - **Measure text width, don't estimate it.** Estimating from font size (a character ≈ half its
   point size) under-fills by about a tenth; a hardcoded character count was 27% short. Wrap
   greedily against `TextPath((0, 0), line, prop=FontProperties(size=fs)).get_extents().width`.
+- **No text run may begin with a space.** `TextPath` measures ink, so a leading space adds nothing to a
+  run's advance while matplotlib still draws it — lay runs out by summed advances and that run lands a
+  space right of where the layout accounted for it. Keep the space on the end of the previous run; a
+  *trailing* one is recovered by `text_advance_px`'s sentinel glyph.
+- **A measurement harness must reproduce the chart's own font stack, or its numbers are fiction.**
+  `sns.set_style(...)` inside the render function resets `font.family`, so a harness that imports the
+  step without calling it measures a different typeface — enough of a width difference to make a
+  placement solver "prove" a layout that does not fit. Apply the same style setup, and cross-check one
+  number against a real build before trusting a sweep.
 - **Panel aspect ratio decides whether a trend is legible.** Two panels stacked in a portrait
   frame give each a 2:1 landscape box, and a growth curve in that box looks flat. Turning them
   portrait gave 2.4× the vertical resolution and the shape appeared. Compute the panel box
