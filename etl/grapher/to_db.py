@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from typing import Any, cast
 
 import pandas as pd
+import requests
 import structlog
 from owid import catalog
 from owid.catalog import Table, Variable, VariableMeta, utils
@@ -430,15 +431,19 @@ def cleanup_ghost_variables(admin_api: AdminAPI, dataset_id: int, upserted_varia
 
     :return: True if successful
     """
-    if config.SKIP_GHOST_VARIABLE_CLEANUP:
+    try:
+        plan = admin_api.cleanup_ghost_variables(dataset_id, upserted_variable_ids, dry_run=True)
+    except requests.exceptions.ConnectionError:
+        # Working locally without a running Grapher admin. Leaving the ghost variables behind
+        # is harmless there, so warn instead of failing the step — but report the cleanup as
+        # unsuccessful, so the checksum stays unset and a later run against a reachable admin
+        # picks them up rather than recording a sweep that never happened.
         log.warning(
-            "cleanup_ghost_variables.skipped",
-            reason="SKIP_GHOST_VARIABLE_CLEANUP is set",
+            "cleanup_ghost_variables.admin_api_unreachable",
+            admin_api=admin_api.owid_env.admin_api,
             dataset_id=dataset_id,
         )
-        return True
-
-    plan = admin_api.cleanup_ghost_variables(dataset_id, upserted_variable_ids, dry_run=True)
+        return False
 
     if not _cleanup_is_allowed(plan["blocked"]):
         return False

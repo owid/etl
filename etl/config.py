@@ -259,11 +259,6 @@ FORCE_UPLOAD = env.get("FORCE_UPLOAD") in ("True", "true", "1")
 # if set, export steps will not upload/commit files (e.g. S3, GitHub)
 DRY_RUN = env.get("DRY_RUN", "0") in ("True", "true", "1")
 
-# if set, don't clean up ghost variables after a grapher step. Cleanup goes through the Grapher
-# admin API, so this is an escape hatch for working locally without a running admin server.
-# Leftover variables are harmless locally and the next run against a real admin removes them.
-SKIP_GHOST_VARIABLE_CLEANUP = env.get("SKIP_GHOST_VARIABLE_CLEANUP", "0") in ("True", "true", "1")
-
 # Filter to speed up development - works as regex for both data processing and grapher upload
 # - In data steps: filters data rows by matching against relevant columns (e.g. causes, indicators)
 #                  this has to be implemented manually

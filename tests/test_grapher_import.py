@@ -1,5 +1,8 @@
+from types import SimpleNamespace
+
 import pandas as pd
 import pytest
+import requests
 from owid.catalog import Origin, VariableMeta, VariablePresentationMeta
 
 import etl.grapher.to_db as db
@@ -108,15 +111,23 @@ def test_get_timespan_subyearly_is_empty():
 
 
 class _FakeAdminAPI:
-    """Records the calls a cleanup makes and replays canned Admin API responses."""
+    """Records the calls a cleanup makes and replays canned Admin API responses.
 
-    def __init__(self, responses: list[dict]) -> None:
+    A response may be an exception instance, which is raised instead of returned.
+    """
+
+    owid_env = SimpleNamespace(admin_api="http://localhost:3030/admin/api")
+
+    def __init__(self, responses: list[dict | Exception]) -> None:
         self._responses = list(responses)
         self.calls: list[dict] = []
 
     def cleanup_ghost_variables(self, dataset_id: int, keep_variable_ids: list[int], dry_run: bool = False) -> dict:
         self.calls.append({"dataset_id": dataset_id, "keep": keep_variable_ids, "dry_run": dry_run})
-        return self._responses.pop(0)
+        response = self._responses.pop(0)
+        if isinstance(response, Exception):
+            raise response
+        return response
 
 
 def _response(deletable=(), deleted=(), blocked=()) -> dict:
@@ -163,10 +174,15 @@ def test_cleanup_ghost_variables_raises_outside_production(monkeypatch):
         db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
 
 
-def test_cleanup_ghost_variables_can_be_skipped(monkeypatch):
-    monkeypatch.setattr(db.config, "SKIP_GHOST_VARIABLE_CLEANUP", True)
-    admin_api = _FakeAdminAPI([])
+def test_cleanup_ghost_variables_warns_when_admin_api_is_unreachable():
+    """Working locally without a running admin: warn and let a later run clean up."""
+    admin_api = _FakeAdminAPI([requests.exceptions.ConnectionError("connection refused")])
 
-    assert db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
+    assert not db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
 
-    assert admin_api.calls == []
+
+def test_cleanup_ghost_variables_does_not_swallow_other_admin_api_errors():
+    admin_api = _FakeAdminAPI([requests.exceptions.HTTPError("500 Server Error")])
+
+    with pytest.raises(requests.exceptions.HTTPError):
+        db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
