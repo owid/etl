@@ -6,6 +6,7 @@ extended to countries not covered by the Statistical Review with EIA data, and a
 added (Maddison). Traditional biomass (Smil, World only) is kept separate from TES.
 """
 
+import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
@@ -21,6 +22,66 @@ TWH_TO_KWH = 1e9
 
 # Countries whose data have to be removed since they were identified as outliers.
 OUTLIERS = ["Gibraltar"]
+
+# OWID region aggregates that the Statistical Review garden step builds from the countries it reports.
+# They are dropped here and rebuilt from the combined Statistical Review + EIA data, because the
+# Statistical Review cannot attribute part of each region to any country (its "Other *" residuals), which
+# leaves its own aggregates incomplete, and removed altogether wherever the residual is too large.
+REGIONS = [
+    "Africa",
+    "Asia",
+    "Europe",
+    "North America",
+    "Oceania",
+    "South America",
+    "High-income countries",
+    "Low-income countries",
+    "Lower-middle-income countries",
+    "Upper-middle-income countries",
+]
+
+# EIA columns that measure the same quantity as the Statistical Review's total energy supply by source,
+# on the same basis and in the same units, used to extend each source to the countries the Statistical
+# Review does not report. Verified against overlapping country-years: the median EIA/EI ratio is 1.00 for
+# wind, 0.99 for hydro and solar, 1.01 for coal, 0.96 for nuclear, 1.07 for oil and 1.11 for gas.
+# NOTE: "other_renewables" and "biofuels" are deliberately absent. EIA reports geothermal and biomass as
+# electricity generated, which is a third of the heat input the Statistical Review reports (the measured
+# ratio is 0.328), so matching them would mean modelling a thermal efficiency; and EIA has no biofuels
+# column at all. Both therefore stay Statistical-Review-only.
+EIA_SOURCES = {
+    "coal": "energy_consumption_from_coal",
+    "oil": "energy_consumption_from_petroleum",
+    "gas": "energy_consumption_from_natural_gas",
+    "nuclear": "energy_consumption_from_nuclear",
+    "hydro": "electricity_from_hydro",
+    "solar": "electricity_from_solar",
+    "wind": "electricity_from_wind",
+}
+
+# Maximum relative gap (in percent) between the World built from the combined country-level data and the
+# Statistical Review's own World total (see sanity_check_outputs).
+MAX_WORLD_DEVIATION_PCT = 10
+# First year EIA covers, from which that comparison is meaningful.
+EIA_FIRST_YEAR = 1980
+
+# Aruba left the Netherlands Antilles in 1986, and EIA reports the two as separate territories from then
+# on, keeping the old name for the remaining islands. So they never overlap in reality and both belong in
+# the North America aggregate, even though the regions dataset lists Aruba as a successor of the
+# Netherlands Antilles.
+# NOTE: Curacao overlaps with it too, because the Statistical Review switches names at the 2010 dissolution
+# (Netherlands Antilles until 2011, Curacao from 2012) while EIA keeps the old name until 2024. That
+# overlap is harmless rather than accepted: the Statistical Review reports only zeros for Curacao, so
+# ignore_overlaps_of_zeros below covers it, and it would start failing if that ever stopped being true.
+# The Statistical Review also reports Yugoslavia alongside three of its successors in 1990-1991. Nothing is
+# double-counted there either: its own total energy supply is zero in both years, while the successors carry
+# the real values (187 TWh in 1990).
+ACCEPTED_OVERLAPS = [
+    {year: {"Aruba", "Netherlands Antilles"} for year in range(1986, 2025)},
+    *(
+        {year: {"Yugoslavia", successor} for year in (1990, 1991)}
+        for successor in ("Croatia", "North Macedonia", "Slovenia")
+    ),
+]
 
 # Indicators that must not carry the producer's description, because it describes only one of the
 # inputs that go into them (see where this is applied, at the end of run()).
@@ -223,10 +284,70 @@ STATISTICAL_REVIEW_FIRST_YEAR = 1965
 
 
 def get_statistical_review_data(tb_review: Table) -> Table:
-    """Select the TES-by-source columns and the total from the Statistical Review."""
+    """Select the TES-by-source columns and the total from the Statistical Review.
+
+    The OWID region aggregates are dropped: the Statistical Review builds them from the countries it
+    reports, which leaves them incomplete (see REGIONS). They are rebuilt from the combined data in
+    add_region_aggregates. The producer's own regions, the World and the European Union are kept as they
+    are, since the producer reports them directly and they are complete.
+    """
     tb = tb_review[["country", "year", "total_energy_supply_twh"] + list(SR_SOURCES)]
     tb = tb.rename(columns={col: f"{name}_twh" for col, name in SR_SOURCES.items()}, errors="raise")
+    tb = tb[~tb["country"].isin(REGIONS)].reset_index(drop=True)
     return tb
+
+
+def combine_with_eia(tb: Table, tb_eia: Table) -> Table:
+    """Extend the total and each source to the countries the Statistical Review does not report.
+
+    The Statistical Review is prioritized per value, so a country it reports keeps its numbers and only
+    the countries it omits come from EIA. No country's series therefore mixes the two producers, though a
+    region aggregate necessarily sums across them (see EIA_SOURCES for why the two are comparable).
+    """
+    columns = {"total_energy_consumption": "total_energy_supply_twh"} | {
+        eia_column: f"{source}_twh" for source, eia_column in EIA_SOURCES.items()
+    }
+    tb_eia = tb_eia[["country", "year"] + list(columns)].rename(columns=columns, errors="raise")
+    tb_eia = tb_eia.dropna(subset=list(columns.values()), how="all").reset_index(drop=True)
+
+    # Drop every aggregate from EIA, keeping only countries: its own regions (marked with an "(EIA)"
+    # suffix), and the OWID regions its garden step builds, which would otherwise be counted twice, once
+    # from EIA here and once when they are rebuilt in add_region_aggregates.
+    is_aggregate = tb_eia["country"].str.contains("(EIA)", regex=False) | tb_eia["country"].isin(
+        REGIONS + ["World", "European Union (27)"]
+    )
+    tb_eia = tb_eia[~is_aggregate].reset_index(drop=True)
+
+    # Drop EIA entities whose territory the Statistical Review already covers through another entity
+    # (Germany includes the former East, Czechia and Slovakia are reported back to 1965, and the USSR's
+    # successor republics are reported from 1985, which is also where the Statistical Review's own USSR
+    # series ends). Keeping them would double-count that territory in the region aggregates, and publish
+    # two producers' conflicting values for it (they differ by 8-20%). Yugoslavia is kept: its successors
+    # are mostly not reported before the 1990s.
+    tb_eia = tb_eia[~tb_eia["country"].isin(["East Germany", "West Germany", "Czechoslovakia", "USSR"])].reset_index(
+        drop=True
+    )
+
+    tb = combine_two_overlapping_dataframes(df1=tb, df2=tb_eia, index_columns=["country", "year"])
+    tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
+    return tb
+
+
+def add_region_aggregates(tb: Table) -> Table:
+    """Build the OWID region aggregates from the combined country-level data."""
+    # The producer's own regions and the World would otherwise be counted as if they were countries.
+    is_country = ~tb["country"].str.contains("(EI)", regex=False) & ~tb["country"].isin(
+        ["World", "European Union (27)"]
+    )
+    tb_aggregates = paths.regions.add_aggregates(
+        tb[is_country].reset_index(drop=True),
+        regions={region: {} for region in REGIONS},
+        min_num_values_per_year=1,
+        accepted_overlaps=ACCEPTED_OVERLAPS,
+        ignore_overlaps_of_zeros=True,
+    )
+    tb_aggregates = tb_aggregates[tb_aggregates["country"].isin(REGIONS)].reset_index(drop=True)
+    return pr.concat([tb, tb_aggregates], ignore_index=True).sort_values(["country", "year"]).reset_index(drop=True)
 
 
 def add_smil_world_long_run(tb: Table, tb_smil: Table) -> Table:
@@ -291,31 +412,6 @@ def add_aggregate_sources(tb: Table) -> Table:
     tb["low_carbon_energy_twh"] = tb[renewables + ["nuclear_twh"]].sum(axis=1, min_count=len(renewables) + 1)
     # Solar and wind.
     tb["solar_and_wind_twh"] = tb[["solar_twh", "wind_twh"]].sum(axis=1, min_count=2)
-    return tb
-
-
-def extend_total_with_eia(tb: Table, tb_eia: Table) -> Table:
-    """Extend the total energy supply with EIA data, to cover countries not in the Statistical Review.
-
-    The Statistical Review is prioritized on overlapping country-years; EIA adds rows for countries and
-    years the Statistical Review does not cover (those rows have no by-source breakdown).
-    """
-    tb_eia = tb_eia[["country", "year", "total_energy_consumption"]].rename(
-        columns={"total_energy_consumption": "total_energy_supply_twh"}, errors="raise"
-    )
-    tb_eia = tb_eia.dropna(subset=["total_energy_supply_twh"]).reset_index(drop=True)
-
-    # Drop EIA's own regional aggregates (marked with an "(EIA)" suffix): region totals come from the
-    # Statistical Review (OWID regions); EIA is used only to extend country coverage.
-    tb_eia = tb_eia[~tb_eia["country"].str.contains("(EIA)", regex=False)].reset_index(drop=True)
-
-    # Combine, prioritizing the Statistical Review *per value*: keep its total energy supply where it has
-    # one, fall back to EIA where it is missing, and add EIA-only country-years. Using a plain concat +
-    # drop_duplicates(keep="last") would instead let the Statistical Review's NaN totals override EIA for
-    # countries it lists for other fuels but not for total energy supply (e.g. Nigeria, Angola, Libya),
-    # silently dropping them from the map.
-    tb = combine_two_overlapping_dataframes(df1=tb, df2=tb_eia, index_columns=["country", "year"])
-    tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
     return tb
 
 
@@ -418,6 +514,24 @@ def sanity_check_outputs(tb: Table) -> None:
         f"World total energy supply is out of the expected range: {world_latest['total_energy_supply_twh']:.0f} TWh."
     )
 
+    # The combined country-level data must add up to the Statistical Review's own World total. This is what
+    # licenses building the region aggregates from it: if a chunk of the world were missing from the
+    # countries, or double-counted between them, the regions built the same way would be wrong too.
+    not_a_country = tb["country"].str.contains("(EI)", regex=False) | tb["country"].isin(
+        REGIONS + ["World", "European Union (27)"]
+    )
+    countries_sum = tb[~not_a_country].groupby("year", observed=True)["total_energy_supply_twh"].sum(min_count=1)
+    world = tb[tb["country"] == "World"].set_index("year")["total_energy_supply_twh"]
+    deviation = (100 * (countries_sum - world) / world).dropna()
+    # Only from the year EIA starts: before it, the countries the Statistical Review omits have no data at
+    # all, so the sum is expected to fall short of the World total.
+    deviation = deviation[deviation.index >= EIA_FIRST_YEAR]
+    off = deviation[deviation.abs() > MAX_WORLD_DEVIATION_PCT]
+    assert len(off) == 0, (
+        "The combined country-level data does not add up to the Statistical Review's World total: "
+        + "; ".join(f"{year}: {value:+.1f}%" for year, value in off.items())
+    )
+
 
 def run() -> None:
     #
@@ -441,17 +555,20 @@ def run() -> None:
     #
     # Process data.
     #
-    # Select TES-by-source data from the Statistical Review.
+    # Select TES-by-source data from the Statistical Review (without its own OWID region aggregates).
     tb = get_statistical_review_data(tb_review=tb_review)
+
+    # Extend the total and each source to the countries the Statistical Review does not report.
+    tb = combine_with_eia(tb=tb, tb_eia=tb_eia)
+
+    # Build the OWID region aggregates from the combined country-level data.
+    tb = add_region_aggregates(tb=tb)
 
     # Extend the World series back to 1800 with Smil (2017).
     tb = add_smil_world_long_run(tb=tb, tb_smil=tb_smil)
 
     # Create aggregate sources (fossil fuels, renewables, low-carbon energy, solar and wind).
     tb = add_aggregate_sources(tb=tb)
-
-    # Extend the total energy supply with EIA data (for countries not covered by the Statistical Review).
-    tb = extend_total_with_eia(tb=tb, tb_eia=tb_eia)
 
     # Add World traditional biomass (Smil), kept separate from the TES total, for biomass-inclusive charts.
     tb = add_traditional_biomass(tb=tb, tb_smil=tb_smil)
