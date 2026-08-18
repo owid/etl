@@ -34,7 +34,7 @@ definitions:
           - Indoor, or household, pollution is usually generated from burning wood, other biomass, or charcoal for cooking and heating. This is common in lower-income countries where people do not have alternative, cleaner fuels.
           - Outdoor air pollution is often generated from burning fossil fuels for electricity production, emissions from industry, or tailpipe emissions from vehicles.
           - These estimates of premature deaths come from the Institute for Health Metrics and Evaluation's Global Burden of Disease study.
-          - Premature deaths are modelled based on estimates of peoples' exposure to air pollution, and epidemiological models of how this increases the risk of various diseases.
+          - Premature deaths are modeled based on estimates of peoples' exposure to air pollution, and epidemiological models of how this increases the risk of various diseases.
     - dimensions:
         metric: number
       config:

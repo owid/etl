@@ -3,11 +3,11 @@ meta:
     producer: OECD
     title: OECD Health Expenditure and Financing Database
     description: |-
-      A System of Health Accounts 2011 provides an updated and systematic description of the financial flows related to the consumption of healthcare goods and services. As demands for information increase and more countries implement and institutionalise health accounts according to the system, the data produced are expected to be more comparable, more detailed and more policy relevant.
+      A System of Health Accounts 2011 provides an updated and systematic description of the financial flows related to the consumption of healthcare goods and services. As demands for information increase and more countries implement and institutionalize health accounts according to the system, the data produced are expected to be more comparable, more detailed and more policy relevant.
 
       It builds on the original OECD Manual, published in 2000 to create a single global framework for producing health expenditure accounts that can help track resource flows from sources to uses.
 
-      It is the result of a collaborative effort between the OECD, WHO and the European Commission, and sets out in more detail the boundaries, the definitions and the concepts – responding to healthcare systems around the globe – from the simplest to the more complicated. The accounting framework is organised around a tri-axial system for the recording of healthcare expenditure, namely classifications of the functions of healthcare (ICHA-HC), healthcare provision (ICHA-HP), and financing schemes (ICHA-HF).
+      It is the result of a collaborative effort between the OECD, WHO and the European Commission, and sets out in more detail the boundaries, the definitions and the concepts – responding to healthcare systems around the globe – from the simplest to the more complicated. The accounting framework is organized around a tri-axial system for the recording of healthcare expenditure, namely classifications of the functions of healthcare (ICHA-HC), healthcare provision (ICHA-HP), and financing schemes (ICHA-HF).
     citation_full: OECD (2026), Health Expenditure and Financing Database, https://data-explorer.oecd.org/
     attribution_short: OECD
     url_main: https://data-explorer.oecd.org/vis?df%5Bds%5D=DisseminateFinalDMZ&df%5Bid%5D=DSD_SHA%40DF_SHA&df%5Bag%5D=OECD.ELS.HD
