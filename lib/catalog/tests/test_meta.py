@@ -338,3 +338,32 @@ def test_update_variable_metadata():
     # Check empty FAQs were pruned
     assert len(updated.presentation.faqs) == 1
     assert updated.presentation.faqs[0].gdoc_id == "456"
+
+
+def test_rejects_short_character_explosion_below_the_cap():
+    """A short string exploded into characters stays under the 50-bullet cap.
+
+    Raised by Codex on #6649: a plain string assembled as a dict never passes through
+    `Markdown`, so the type cannot help and the cap alone would accept it.
+    """
+    exploded = list("Data unavailable.")  # 16 non-empty items, under the cap
+    assert len(exploded) < meta.DESCRIPTION_KEY_MAX_ITEMS
+
+    with pytest.raises(ValueError, match="single character"):
+        meta.validate_description_key_list(exploded)
+
+    # The conversion itself refuses too, so paths that stringify before reaching a
+    # write-path guard are covered — e.g. combining two indicators with different keys.
+    with pytest.raises(ValueError, match="single character"):
+        meta.description_key_to_string(exploded)
+
+
+def test_character_explosion_check_has_no_threshold_to_tune():
+    # Every item exactly one character is the exact signature of `list(some_string)`.
+    with pytest.raises(ValueError, match="single character"):
+        meta.description_key_to_string(list("ab"))
+
+    # Real content is never all single characters, however short the bullets are.
+    assert meta.description_key_to_string(["No", "Yes"]) == "- No\n- Yes"
+    assert meta.description_key_to_string(["a"]) == "a"  # a single item is prose, not a list
+    meta.validate_description_key_list(["No", "Yes", "Maybe", "Unknown", "Not applicable"])

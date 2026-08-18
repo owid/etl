@@ -434,6 +434,24 @@ def _collapse_description_key_item(item: str) -> str:
 DESCRIPTION_KEY_MAX_ITEMS = 50
 
 
+_CHARACTER_EXPLOSION_HINT = (
+    "The most likely cause is a markdown string that was split into its characters, e.g. "
+    "`list(description_key)`. Pass the value through unchanged when it is already a string, "
+    "instead of rebuilding it as a list."
+)
+
+
+def _is_character_explosion(bullets: list[str]) -> bool:
+    """Whether a bullet list is in fact a string that was iterated character by character.
+
+    This is an exact signature rather than a heuristic: `list(some_string)` yields items that
+    are *every one* a single character, so there is no threshold to tune and nothing to judge.
+    Real content never looks like this — a "bullet list" whose every bullet is one character
+    carries no text either way.
+    """
+    return len(bullets) >= 2 and all(len(bullet) == 1 for bullet in bullets)
+
+
 def _reject_metadata_value(field_name: str, problem: str, context: str | None, hint: str) -> NoReturn:
     """Raise for a metadata value that fails one of the sanity bounds above."""
     where = f" of {context}" if context else ""
@@ -460,14 +478,22 @@ def validate_description_key_list(items: list[str], context: str | None = None) 
     """
     bullets = [str(item).strip() for item in items if item and str(item).strip()]
 
+    # Corruption below the cap: a short string exploded into characters (e.g. a 16-character
+    # value assembled as a plain dict, which never passes through `Markdown`).
+    if _is_character_explosion(bullets):
+        _reject_metadata_value(
+            "description_key",
+            f"all {len(bullets)} of its bullets are a single character",
+            context,
+            _CHARACTER_EXPLOSION_HINT,
+        )
+
     if len(bullets) > DESCRIPTION_KEY_MAX_ITEMS:
         _reject_metadata_value(
             "description_key",
             f"{len(bullets)} bullets, far more than the {DESCRIPTION_KEY_MAX_ITEMS} a real list ever has",
             context,
-            "The most likely cause is a markdown string that was split into its characters, e.g. "
-            "`list(description_key)`. Pass the value through unchanged when it is already a string, "
-            "instead of rebuilding it as a list. If the bullets really are content, raise "
+            f"{_CHARACTER_EXPLOSION_HINT} If the bullets really are content, raise "
             "`DESCRIPTION_KEY_MAX_ITEMS`.",
         )
 
@@ -514,6 +540,19 @@ def description_key_to_string(items: list[str]) -> str | None:
     list with line breaks inside items flattened.
     """
     cleaned = [item.strip() for item in items if item and item.strip()]
+
+    # Every list -> string conversion passes through here, including paths that never reach a
+    # write-path guard: `get_unique_description_key_points_from_indicators` stringifies when it
+    # combines two indicators with different keys, so the result arrives downstream already a
+    # str. Rejecting the exploded shape here covers those, and any conversion path added later.
+    if _is_character_explosion(cleaned):
+        _reject_metadata_value(
+            "description_key",
+            f"all {len(cleaned)} of its bullets are a single character",
+            None,
+            _CHARACTER_EXPLOSION_HINT,
+        )
+
     if not cleaned:
         return None
     if len(cleaned) == 1:
