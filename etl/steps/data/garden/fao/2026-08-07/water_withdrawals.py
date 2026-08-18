@@ -45,14 +45,28 @@ REGIONS = [
 ]
 # Minimum fraction of a region's (ever-informed) countries that must have data for an aggregate to be created.
 MIN_FRAC_COUNTRIES_INFORMED = 0.7
+# The largest withdrawers of each region must have data, otherwise the aggregate is not comparable over time.
+# Percentages are each country's share of its region's total withdrawal in the latest informed year.
+COUNTRIES_THAT_MUST_HAVE_DATA = {
+    "Africa": ["Egypt", "Madagascar", "Sudan"],  # 30%, 11%, 10%
+    "Asia": ["India", "China", "Indonesia"],  # 29%, 23%, 8%
+    "Europe": ["Russia", "Italy", "Spain"],  # 24%, 12%, 11%
+    "North America": ["United States", "Mexico", "Canada"],  # 73%, 15%, 6%
+    "South America": ["Brazil", "Argentina", "Chile"],  # 28%, 16%, 14%
+    "Oceania": ["Australia", "New Zealand", "Papua New Guinea"],  # 75%, 22%, 2%
+    "Low-income countries": ["Madagascar", "Sudan", "Afghanistan"],  # 22%, 20%, 15%
+    "Lower-middle-income countries": ["India", "Pakistan", "Egypt"],  # 60%, 15%, 6%
+    "Upper-middle-income countries": ["China", "Indonesia", "Iran"],  # 36%, 13%, 6%
+    "High-income countries": ["United States", "Japan", "Russia"],  # 47%, 8%, 7%
+}
 # Maximum accepted deviation between FAO's published World row and the same aggregate computed from countries.
 WORLD_MAX_DEVIATION = 0.02
 
-# First year for which FAO's own aggregate rows (World and the "(FAO)" SDG groupings) are kept. They are progressive
-# sums over the countries reporting in each year, so early years reflect incomplete coverage rather than real levels
-# (in 1965, FAO's "World" row is 0.68 billion m³ — the sum of the only two reporting countries, Uruguay and Barbados).
-# NOTE: In 2000 itself, the share series of a few FAO aggregates still lag (sums of 72-86%), hence 2001.
-FAO_AGGREGATES_MIN_YEAR = 2001
+# First year for which aggregates are kept, both FAO's own rows (World and the "(FAO)" SDG groupings) and the ones we
+# build. Aggregates are sums over the countries reporting in each year, so early years reflect incomplete coverage
+# rather than real levels (in 1965, FAO's "World" row is 0.68 billion m³ — the sum of the only two reporting countries,
+# Uruguay and Barbados).
+AGGREGATES_MIN_YEAR = 2001
 
 
 def sanity_check_inputs(tb: Table) -> None:
@@ -119,15 +133,15 @@ def run() -> None:
     # Harmonize country names.
     tb = paths.regions.harmonize_names(tb=tb)
 
-    # Keep FAO's aggregate rows only from a year with complete coverage (see FAO_AGGREGATES_MIN_YEAR note).
+    # Keep FAO's aggregate rows only from a year with complete coverage (see AGGREGATES_MIN_YEAR note).
     mask_fao_aggregates = tb["country"].str.endswith("(FAO)") | (tb["country"] == "World")
     n_countries = (
-        tb[~mask_fao_aggregates & (tb["year"] >= FAO_AGGREGATES_MIN_YEAR)]
+        tb[~mask_fao_aggregates & (tb["year"] >= AGGREGATES_MIN_YEAR)]
         .groupby("year")["agricultural_water_withdrawal"]
         .count()
     )
     assert (n_countries > 150).all(), "Incomplete country coverage in years where FAO's aggregates are kept."
-    tb = tb[~(mask_fao_aggregates & (tb["year"] < FAO_AGGREGATES_MIN_YEAR))].reset_index(drop=True)
+    tb = tb[~(mask_fao_aggregates & (tb["year"] < AGGREGATES_MIN_YEAR))].reset_index(drop=True)
 
     # Add region aggregates.
     tb = paths.regions.add_aggregates(
@@ -135,7 +149,11 @@ def run() -> None:
         regions=REGIONS,
         aggregations={column: "sum" for column in SECTORAL_COLUMNS},
         min_frac_countries_informed=MIN_FRAC_COUNTRIES_INFORMED,
+        countries_that_must_have_data=COUNTRIES_THAT_MUST_HAVE_DATA,
     )
+
+    # Apply the same year cut to our own aggregates (see AGGREGATES_MIN_YEAR note).
+    tb = tb[~(tb["country"].isin(REGIONS) & (tb["year"] < AGGREGATES_MIN_YEAR))].reset_index(drop=True)
 
     # Sanity check: FAO's published World row should agree with the same aggregate computed from country data.
     sanity_check_world(tb=tb)

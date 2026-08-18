@@ -10,7 +10,7 @@ definitions:
     - Most values are not officially reported by countries. FAO estimates or imputes them, for example by carrying a value forward or interpolating between reported years.
     - Countries report with a lag, so the most recent years rely more heavily on these estimates.
   description_processing_aggregates: &description_processing_aggregates |-
-    Aggregates for continents and income groups were calculated by Our World in Data by summing the values of the member countries. An aggregate is only shown for a year in which at least 70% of the countries that ever report that indicator in the region have data. Values for the World and for FAO's own regional groupings are taken directly from FAO.
+    Aggregates for continents and income groups were calculated by Our World in Data by summing the values of the member countries. Countries enter FAO's data in different years, so an aggregate is only shown for years in which the largest water withdrawers of the region report data. Earlier years are excluded, because their changes would reflect which countries were covered rather than how much water was withdrawn. Values for the World and for FAO's own regional groupings are taken directly from FAO.
 
 dataset:
   update_period_days: 365
