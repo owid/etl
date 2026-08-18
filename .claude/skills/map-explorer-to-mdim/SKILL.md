@@ -134,6 +134,11 @@ It also writes **`mapping.json`** — the machine record — and
 **`admin_bulk_payload.json`**, which is what you actually apply. The API exists:
 `POST {admin}/api/multi-dim-redirects/bulk` (`handleBulkCreateMultiDimRedirects`), also
 reachable from the *Bulk-create redirects from JSON* button on `/admin/multi-dim-redirects`.
+This endpoint is the **only** way to apply an explorer redirect: the CSV CLI that
+`map-charts-to-mdim` hands over (`createMultiDimRedirectsFromCsv`) accepts an
+`/explorers/` source, but it writes no `sourceQueryParams` — so the row bakes as one
+unconditional rule and every view of the explorer 302s to a single MDIM view,
+per-view routing gone.
 Its Zod schema deliberately mirrors this file's `catchAll` + `redirects` shape, ignores keys
 it doesn't know (`sourceViewId`, `viewId`, `mdim`, `stats`, `targets`), and reports
 `target: null` entries as `skipped`.

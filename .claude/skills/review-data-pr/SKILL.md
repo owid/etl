@@ -56,7 +56,7 @@ When it's a restructure:
 - **Don't expect the auto-Indicator-Upgrader to have remapped charts.** When short_names differ entirely, the upgrader has nothing to match on. Look for a hand-curated v1 title → v2 title mapping table in the PR description (or a follow-up PR thread). 🟡 if charts on the old chain are still published but no mapping plan exists.
 - **Don't expect a `.py` step copy from the old version.** Step files should be authored from scratch, not produced by `etl update` rename. If the new step files look mechanically renamed (same logic, just version-bumped strings), flag 🟡 — the author may have skipped restructure-specific decisions.
 - **A chart remapped onto a successor indicator needs a config-vs-shape check.** Verify its pinned `selectedEntityNames` exist in the successor's data (v1 regional aggregates often don't — expect the garden step to rebuild them, mirroring the retired step's method), that pinned `yAxis` bounds don't clip the new range, and that the subtitle doesn't still describe the old construction. Any of the three broken: 🔴 (the default view renders empty, clipped, or mislabeled).
-- **Slack + `/latest` drafts are not expected in the PR body at all.** `/update-dataset` keeps them in the author's `workbench/` (steps 9 / 9b), so their absence from the PR is correct — don't flag it.
+- **Slack + `/latest` drafts are not expected in the PR body at all.** `/update-dataset` keeps them in the author's `workbench/` (steps 9 / 9b, owned by `/data-updates-comms` and `/data-update-announcement`), so their absence from the PR is correct — don't flag it.
 
 ### 4. Run the full pipeline end-to-end
 
@@ -213,7 +213,11 @@ Run `/check-metadata-typos`, `/check-metadata-spacing`, `/check-metadata-style` 
 
 Also grep the metadata **prose** for numbers carried over from the previous release (country counts, category counts, year ranges in `description_key`/descriptions): validated fields are covered by checks, prose numbers are not — a panel-composition change (dropped country, new category set) silently strands them (see `/update-dataset` Guardrails, "Grep metadata prose"). Stale prose count: 🟡.
 
-Three further prose checks from `/update-dataset` § 6b that the skills don't automate:
+Five further prose checks from `/update-dataset` § 6b that the skills don't automate:
+
+- **Redundant user-facing text.** Read each indicator's `description_key` as the reader gets it, together with `description_short` and the chart title: a bullet that restates another bullet, or the short line, at the same level of detail is padding — 🟡, with a proposed merge into the bullet that already covers it. Unpacking `description_short` (full definition, how it's measured, what's included) is not redundancy and must not be flagged. Watch new bullets added by this PR against the ones already there, and Jinja variants that restate the shared bullet for only some dimension values.
+
+- **Dimensional text that only holds for one breakdown.** For indicators templated over a dimension (or sharing a `definitions:` key across variants), read each rendered variant, not just one: a caveat that the data doesn't control for X is wrong on the variant grouped **by** X, a scope word like "all employees" overclaims on a variant filtered to a subgroup, and a sentence about a toggle is wrong on views that exist for only one choice of that dimension. Text that misdescribes the population on some variants: 🟡 (🔴 when it contradicts what the view actually shows). Author side: `/update-dataset` § 6b dimension sweep.
 
 - **Methodology-attribution claims** ("following guidance from <agency>…"): open the cited link and confirm it actually says that — agencies revise methodology, and a stale claim survives every link check (real case: metadata cited BEA guidance for an office-PPI deflator after BEA had switched that category to a different composite). A claim the cited page doesn't support: 🔴 (it's factually wrong reader-facing text).
 - **Scope qualifiers in the origin title** (private-only, adults-only, market-exchange-rates-only) must surface in `description_short`/`description_key`, not only in the citation. Missing: 🟡.
@@ -305,9 +309,9 @@ Structure the review with:
 6. **🟡 Suggestions** — nice-to-have
 7. **🟢 Informational** — observations, no action needed
 8. **Workflow gaps from /update-dataset** — PR description, Codex review, indicator upgrade, downstream deps, etc. (The Slack + `/latest` drafts live in `workbench/`, not the PR — don't expect them here.)
-9. **What's still open** — carried forward from the PR body, using the open-items buckets defined in CLAUDE.md ("Close every report with what's still open") plus the update workflow's fourth bucket (**deferred to a follow-up PR** — downstream repoints, old-version archiving). Re-state the full list on every re-review, not just the delta, and mark what cleared since last time.
+9. **What's still open** — carried forward from the PR body, covering the categories in `.claude/docs/open-items.md` plus the update workflow's fourth one (**deferred to a follow-up PR** — downstream repoints, old-version archiving). Re-state the full list on every re-review, not just the delta, and mark what cleared since last time.
 
-**Check the PR body actually carries that block** (CLAUDE.md requires it). A PR whose description lists only what was done, while the session left content edits pending, audits unrun, or a follow-up PR's scope undefined, is missing the one artifact that survives after the chat is gone — flag it 🟡. Findings that were deliberately handed off need a locator in the body too, not just a description: an item the next person can't act on without redoing the analysis isn't handed off.
+**Check the PR body doesn't leave pending work unmentioned.** A PR whose description lists only what was done, while the session left content edits pending, audits unrun, or a follow-up PR's scope undefined, is missing the one artifact that survives after the chat is gone — flag it 🟡. Judge it on whether a reader can tell what's outstanding, not on whether it uses any particular headings or wording. Work that was deliberately handed off needs a locator in the body too, not just a description: an item the next person can't act on without redoing the analysis isn't handed off.
 
 ## Severity rubric
 

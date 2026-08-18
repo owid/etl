@@ -85,7 +85,7 @@ ARCHIVE_HOST = "archive.ourworldindata.org"
 # Surfaces this run could NOT sweep, and subjects that did not resolve. An empty result for
 # any of these means UNKNOWN, not "nothing references it", so they must survive past stdout:
 # they go into the `--markdown` report's "Not searched" section, and `--gaps-json` hands them
-# to whatever wraps this script (audit_references.py puts them in its own Unverified bucket).
+# to whatever wraps this script (audit_references.py lists them under "What this sweep didn't cover").
 # Otherwise a truncated sweep reads as a complete audit.
 COVERAGE_GAPS: list[str] = []
 
@@ -241,6 +241,65 @@ def sweep_gdoc_links(by_slug: dict[str, dict]) -> list[dict]:
                 context=f"{component or 'unknown'} ({r['post_type']})",
                 query_string=r["queryString"],
                 text=r["text"],
+                published=r["published"],
+            )  # fmt: skip
+        )
+    return out
+
+
+def sweep_articles_placing_narrative_charts(findings: list[dict]) -> list[dict]:
+    """The articles that place each narrative chart already found — its second hop.
+
+    A narrative-chart row says what has to change but not where the change lands: the chart
+    itself is not in an article, articles place it **by name** in a `{.narrative-chart}` block.
+    Replacing one therefore always includes an article edit, and without this hop the report
+    names a narrative chart and leaves the operator to find its usages by hand.
+
+    `posts_gdocs_links` records those placements with `linkType='narrative-chart'` and the name
+    in `target` — the same table and column the admin's own references endpoint reads
+    (`getNarrativeChartReferences` → `getPublishedLinksTo(…, ContentGraphLinkType.NarrativeChart)`).
+
+    Unpublished drafts are kept, unlike that endpoint, which filters `published = TRUE`. A draft
+    referencing the name does not affect readers but does affect the operator: it is the thing
+    that surprises you at delete time, and it is carried with `published` so a consumer can rank
+    it below the live ones rather than confuse the two.
+    """
+    names = sorted({str(f["where"]) for f in findings if f["surface"] == "narrative chart" and f.get("where")})
+    if not names:
+        return []
+    df = OWID_ENV.read_sql(
+        "SELECT pgl.target, pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, "
+        "       pg.published, pgl.componentType, pgl.text, pgl.queryString "
+        "FROM posts_gdocs_links pgl JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
+        "WHERE pgl.linkType = 'narrative-chart' AND pgl.target IN %(n)s ORDER BY pgl.target, pg.slug",
+        params={"n": tuple(names)},
+    )
+    by_name = {str(f["where"]): f for f in findings if f["surface"] == "narrative chart"}
+    out = []
+    for r in df.to_dict("records"):
+        parent = by_name[r["target"]]
+        out.append(
+            rec(
+                # The subject is the narrative chart, not the chart being retired: this row is
+                # only reachable because that chart is, and `subject` has to be the string an
+                # operator searches the doc for — which for a block placement is the name.
+                "narrative chart",
+                r["target"],
+                parent["surface_id"],
+                "gdoc (narrative chart)",
+                EMBED,
+                r["post_slug"],
+                f"/{r['post_slug']}",
+                surface_id=r["gdoc_id"],
+                # The parenthesized type is load-bearing: `reference_report.page_type` reads it
+                # to pick the public base, and a data insight or author page is not served at
+                # the site root the way an article is.
+                context=f"places narrative chart `{r['target']}` ({r['post_type']})",
+                query_string=r["queryString"],
+                # Deliberately left empty even when the column has something: a block placement
+                # has no visible anchor text, so `find_in_doc` must fall through to the name,
+                # which is what the ArchieML block actually spells out.
+                text="",
                 published=r["published"],
             )  # fmt: skip
         )
@@ -1080,6 +1139,13 @@ def summarize(findings: list[dict]) -> None:
 
 GDOC_SURFACES = ("gdoc", "gdoc (url link)", "data insight")
 
+# What `write_markdown` renders with the Google-Doc columns (doc edit link, admin preview,
+# find-in-doc hint). A narrative-chart placement lives in a gdoc too and exists precisely to
+# locate an article edit, so it needs those links — but it stays OUT of `GDOC_SURFACES`,
+# which consumers use to COUNT a subject's own article references: a placement references
+# the narrative chart, not the chart under audit, so counting it there would overstate both.
+GDOC_RENDERED_SURFACES = (*GDOC_SURFACES, "gdoc (narrative chart)")
+
 
 def gdoc_preview_url(f: dict, admin: str) -> str:
     """Admin preview of the article itself — renders the gdoc, including unpublished drafts."""
@@ -1149,6 +1215,10 @@ def add_admin_urls(findings: list[dict]) -> None:
             f["admin_url"] = f"{admin}/narrative-charts/{f['surface_id']}/edit"
         elif f["surface"] == "chart" and f["surface_id"]:
             f["admin_url"] = f"{admin}/charts/{f['surface_id']}/edit"
+        elif f["subject_type"] == "narrative chart" and f["subject_id"]:
+            # An article placing a narrative chart: the editable object is the narrative
+            # chart, so `subject_id` is its id, not a chart's.
+            f["admin_url"] = f"{admin}/narrative-charts/{f['subject_id']}/edit"
         elif f["subject_type"] == "chart" and f["subject_id"]:
             # The row is a reference *to* a chart (article, explorer, static viz…).
             f["admin_url"] = f"{admin}/charts/{f['subject_id']}/edit"
@@ -1210,7 +1280,9 @@ def search_hint(f: dict) -> str:
     A prose hyperlink has visible anchor text, so that phrase is the search term. A
     block embed has none — the doc holds a bare grapher URL — so the slug is. Use the
     slug exactly as recorded: `posts_gdocs_links.target` keeps what the author typed,
-    which may be an old slug, and that is what is actually in the document.
+    which may be an old slug, and that is what is actually in the document. A
+    narrative-chart placement's `{.narrative-chart}` block spells out the name, so for
+    those the name is the search term.
     """
     # The cell holds the search string and nothing else, so it can be copied straight
     # into the doc's find box. What each variant means is in the legend under the table.
@@ -1218,7 +1290,7 @@ def search_hint(f: dict) -> str:
     if anchor:
         safe = cell(anchor, 55).replace("`", "'")
         return f"`{safe}`"
-    if f["subject_type"] == "chart":
+    if f["subject_type"] in ("chart", "narrative chart"):
         return f"`{cell(f['subject'], 55)}`"
     return "—"
 
@@ -1278,9 +1350,10 @@ def write_markdown(findings: list[dict], path: str, host: str, admin: str, cavea
         for surface in sorted(by_surface):
             rows = by_surface[surface]
             lines += [f"### {surface} ({len(rows)})", ""]
-            if surface in GDOC_SURFACES:
+            if surface in GDOC_RENDERED_SURFACES:
+                subject_col = "Narrative chart" if surface == "gdoc (narrative chart)" else "Chart"
                 lines += [
-                    "| Chart | Article | Open | Find in the doc |",
+                    f"| {subject_col} | Article | Open | Find in the doc |",
                     "|---|---|---|---|",
                 ]
                 for f in rows:
@@ -1292,7 +1365,10 @@ def write_markdown(findings: list[dict], path: str, host: str, admin: str, cavea
                     preview = f" · [👁 preview]({gdoc_preview_url(f, admin)})" if f["surface_id"] else ""
                     links = f"[📄 doc]({doc_url(f)}){preview} · [🔗 page]({deep_link(f, host, admin)})"
                     if f["admin_url"]:
-                        links += f" · [✎ chart admin]({f['admin_url']})"
+                        # A placement row's editor opens the narrative chart, not a chart —
+                        # same mislabel `build_reference_handoff.open_links` already avoids.
+                        editor = "✎ narrative admin" if f["subject_type"] == "narrative chart" else "✎ chart admin"
+                        links += f" · [{editor}]({f['admin_url']})"
                     subject = (
                         f"[`{cell(f['subject_label'], 44)}`]({f['preview_url']})"
                         if f["preview_url"]
@@ -1452,6 +1528,11 @@ def main() -> int:
             f"{len(all_charts)} auto-generated 'All charts' index entries on {', '.join(pages)} were "
             "excluded from the tables below (`--include-all-charts` keeps them)."
         )
+
+    # After the 'All charts' exclusion, so a narrative chart dropped from the run cannot leave
+    # its article placements behind, and before the enrichment passes so the new rows get the
+    # same admin/preview links as every other row.
+    findings += sweep_articles_placing_narrative_charts(findings)
 
     label_indicator_subjects(findings)
     add_admin_urls(findings)

@@ -1,6 +1,6 @@
 ---
 name: add-provider-regions
-description: Add an external provider's regional aggregation (e.g. World Bank, WHO, Maddison, WID, ILO) to OWID's regions dataset — definitions in regions.yml, per-provider grapher map indicators, and metadata — then register it in owid-grapher, including proposing each region's chart color (ContinentColors) and map color (MapContinentColors) for design sign-off. First checks whether the provider's dataset already encodes the regions and their country composition; if not, asks the user for a reference (link/doc) to derive it from. Trigger when the user wants to add/define a provider's world regions, expose "{Provider} regions" on a map, pick or fix the colors of a provider's regions, or migrate an in-dataset region variable to the shared regions dataset.
+description: Add an external provider's regional aggregation (e.g. World Bank, WHO, Maddison, WID, ILO) to OWID's regions dataset — definitions in regions.yml, per-provider grapher map indicators, and metadata — then register it in owid-grapher, including proposing each region's chart color (ContinentColors) and map color (MapContinentColors) for design sign-off and recording the agreed palette on the design team's Figma board. First checks whether the provider's dataset already encodes the regions and their country composition; if not, asks the user for a reference (link/doc) to derive it from. Trigger when the user wants to add/define a provider's world regions, expose "{Provider} regions" on a map, pick or fix the colors of a provider's regions, or migrate an in-dataset region variable to the shared regions dataset.
 metadata:
   internal: true
 ---
@@ -390,7 +390,7 @@ When a Grapher chart plots a region entity (e.g. `"Sub-Saharan Africa (ILO)"`) a
 - **It is NOT tied to any published chart** and renders entirely from `regions.data.ts` + the registries — you don't need to publish a chart for hovers to work. The `descriptions` text *does* link into the `world-region-map-definitions` article (an anchor), so **add the matching section to that article (Step 10)** or the link lands on the page top. The tooltip itself renders regardless.
 - **It only exists for full-definition providers.** `TooltipKey = RegionDataProvider | "incomeGroups" | "continents"`, so suffix-only providers (`AdditionalRegionDataProvider`) get no tooltip — to give one, add the provider's definitions to `regions.data.ts`.
 - **The mini-map's configuration is computed in code, not taken from your ETL metadata or the chart's `customCategoryColors`:**
-  - *Membership* (which country → which region) comes from `regions.data.ts` (`getCountriesByRegion`); no-data countries fall back to grey.
+  - *Membership* (which country → which region) comes from `regions.data.ts` (`getCountriesByRegion`); no-data countries fall back to gray.
   - *Geometry* is owid-grapher's bundled world geojson (`getGeoFeaturesForMap`).
   - *Colors* come from `getRegionsForKey`, which looks up **`MapContinentColors[regionName]` first** and only falls back to `CategoricalMapPalette17[index]` for regions that aren't pinned (where `index` is the region's position in **`customRegionDisplayOrder[<provider>]`** in `RegionTooltipData.ts` — or alphabetical if you omit it). Pin the provider's regions (next section) and the hover follows automatically.
 - **So for a full-definition provider the hover is two required hand-edits in `RegionTooltipData.ts`** — `descriptions[<provider>]` (text + article link) and optionally `customRegionDisplayOrder[<provider>]` (left-to-right map order, which fixes the legend order and the fallback palette assignment) — **plus the color step below.** You can't set the hover's colors from the ETL side (it ignores the chart's `customCategoryColors`); they come from `MapContinentColors` in `CustomSchemes.ts`.
@@ -398,7 +398,7 @@ When a Grapher chart plots a region entity (e.g. `"Sub-Saharan Africa (ILO)"`) a
 
 > **Shared-region caveat (multi-tier providers).** A region that exists in two tiers carries a *single* `defined_by`, so its hover only ever shows that one tier's map — the indicator-level back-fill (Step 3 / Step 6c) populates the *other* tier's map indicator but does **not** give the entity a second `defined_by` in `regions.data.ts`. Concrete consequence: in a chart built on the level-2 indicator, the shared region hovers to the level-1 map while its level-2 siblings hover to the level-2 map. It's not wrong (the level-1 map still highlights it), but the "belongs to a set of N regions" framing differs for that one entity. There's no way to make it show *both* — tagging it the other tier just flips which map it shows. (e.g. ILO's Arab States, tagged `ilo_1`, always hovers to the 5-region broad map.)
 
-> **And it leaves a grey hole in the *other* tier's hover map — fix with a frontend back-fill.** Because the shared region is absent from the other tier's provider set in `regions.data.ts` (`getAggregatesByProvider` filters by exact `definedBy`), its member countries are unmapped there and render grey (no-data) whenever you hover *another* region of that tier. Concretely: hovering any `ilo_2` subregion greys out the 12 Arab States countries, and the legend shows 10 regions instead of 11 — even though the ETL `ilo_2_region` *indicator* (and its published map) shows Arab States colored, because the ETL back-fill never reaches `regions.data.ts`. Mirror that back-fill **centrally**, in `getAggregatesByProvider` (`regionsUtils.ts`), via a data-driven map — `PROVIDER_REGION_BACKFILLS = { ilo_2: ["Arab States (ILO)"] }`, appended to the direct `definedBy` matches. Do it *there*, not in `getRegionsForKey` — `getAggregatesByProvider` feeds *every* consumer of the sub-tier (the hover **and** the admin entity presets, …), so a fix in `getRegionsForKey` alone leaves the presets still dropping the region (a real Codex catch). Add the shared region to `customRegionDisplayOrder[<tier>]` for a stable legend slot. Then that tier's hover is a complete partition matching the published map. (The shared region itself still hovers to its home tier — this only fills the hole the *other* regions' map would otherwise have.)
+> **And it leaves a gray hole in the *other* tier's hover map — fix with a frontend back-fill.** Because the shared region is absent from the other tier's provider set in `regions.data.ts` (`getAggregatesByProvider` filters by exact `definedBy`), its member countries are unmapped there and render gray (no-data) whenever you hover *another* region of that tier. Concretely: hovering any `ilo_2` subregion grays out the 12 Arab States countries, and the legend shows 10 regions instead of 11 — even though the ETL `ilo_2_region` *indicator* (and its published map) shows Arab States colored, because the ETL back-fill never reaches `regions.data.ts`. Mirror that back-fill **centrally**, in `getAggregatesByProvider` (`regionsUtils.ts`), via a data-driven map — `PROVIDER_REGION_BACKFILLS = { ilo_2: ["Arab States (ILO)"] }`, appended to the direct `definedBy` matches. Do it *there*, not in `getRegionsForKey` — `getAggregatesByProvider` feeds *every* consumer of the sub-tier (the hover **and** the admin entity presets, …), so a fix in `getRegionsForKey` alone leaves the presets still dropping the region (a real Codex catch). Add the shared region to `customRegionDisplayOrder[<tier>]` for a stable legend slot. Then that tier's hover is a complete partition matching the published map. (The shared region itself still hovers to its home tier — this only fills the hole the *other* regions' map would otherwise have.)
 
 ### Region colors — two dictionaries, two jobs
 
@@ -447,6 +447,9 @@ Colors are looked up **by region name**, not by legend position (`ColorScale.ts`
 - **No two regions of one provider may share a color.** Where the table would collide, move to a neighboring hue or an extended map color, and prefer keeping the *broadest* region on the canonical hue. Precedents: UN M49 pushes `South-eastern Asia` to `DarkOrange`/`LightOrange` to clear `Eastern Asia`'s green; Maddison's `East Asia` is `Copper`/`LightCherry` because its greens are taken by `South and South East Asia`.
 - **Multi-tier providers get pinned too.** Because colors are name-keyed, a region shared across tiers (e.g. `Arab States (ILO)`, tagged `ilo_1` but back-filled into the `ilo_2` map) carries *one* color that is correct in both tiers. Pin every region of every tier; check the tiers for collisions independently, since each tier is its own legend.
 - Use the **named constants**, never raw hex — `"<Region> (<Provider>)": OwidDistinctColors.Peach` / `OwidMapColors.SoftOrange`. `OwidMapColors` is declared above both dictionaries, so it's available to each.
+- **Keep the comments to labels.** These dictionaries are dense lists, and their section headings are one line naming the block — `// FAO subregions (level 2)`, `// UN M49 regions (level 3)` — phrased like the headings already around them, tier number included. Resist explaining the choices in the file: why this provider mirrors that one, which region is listed in a different block, how many hues a continent's split needed. That reasoning is real and worth writing, but it belongs in the PR description and the commit message, where it is read once by a reviewer, not in a file that is read whenever someone adds a region. A review of a first attempt at this cut four-line rationales back to single-line labels, and the file is better for it.
+- **The one comment worth keeping is the one that stops a future edit going wrong** — e.g. that new colors are deliberately outside the `CategoricalMapPalette` sets. Even that is a clause, not a paragraph.
+- **New palette colors go after the existing groups**, at the end of `OwidMapColors`, never inserted between the named ones. Slotting a color next to *Extended* or *Main* implies it belongs to the positional palette sets those groups feed, which is exactly what it must not do.
 
 ### Check the colors on the region-maps test page
 
@@ -470,11 +473,102 @@ Confirm the provider appears in `regionGroupLabels` and the relevant label recor
 Colors are a design call, and what the skill produces is a **first stab** — it always goes to a human. All of this happens on the **owid-grapher** PR, not the ETL one:
 
 1. **Open the PR** (above) with the proposed colors in the body: a `region → chart color → map color` table (constant names *and* hex), the provider you mirrored, and the link to **this branch's** test page — `http://<container-name>/admin/test-region-maps`, with `<container-name>` derived as above. Wait for the staging server to build before sharing the link; open it yourself first.
-2. **Ask Marwa** — draft a Slack message to `@mrwbkrm` with that same table and link, asking her to look at the rendered maps on the test page (point at the *"Providers with hard-coded region colors"* section). Don't request the code review yet.
-3. **Apply her changes**, push, and only then **request review from Sophia** — `gh pr edit <n> --add-reviewer sophiamersmann`.
-4. Both the PR body and the Slack message carry the attribution blockquote (`CLAUDE.md` → Team).
+
+   **Don't name or `@`-tag the designer anywhere in the PR** — not in the body, not in a comment, not as a reviewer. `owid-grapher` is public, and a handle in a public thread both pings someone who was never asked there and puts who-reviews-what on the open internet (`CLAUDE.md` → Team). Say that a design pass is pending and leave it unattributed; the request itself goes over Slack in the next step. The same goes for reporting back: describe what the design pass concluded, never who concluded it.
+2. **Put the map on the Figma board and review it there** — see below. The board is where the design review happens, not the test page: it's the designer's own surface, it shows the new provider beside every provider already curated, and — the part that makes it work — a color changed there can be read straight back out of the file. Adding the row is therefore step *two*, not a formality after sign-off.
+3. **Ask for the design pass over Slack**, pointing at the board row. Slack is the right surface for the request precisely because it isn't public. Don't request the code review yet.
+4. **Pick up her changes from the board**, apply them in `CustomSchemes.ts`, push.
+5. **Then request review from Sophia** — `gh pr edit <n> --add-reviewer sophiamersmann`.
+6. Both the PR body and the Slack message carry the attribution blockquote (`CLAUDE.md` → Team).
 
 > **You can start this before the ETL PR merges** — the color review only needs `regions.data.ts` to know the new provider, and the `ETL_REGIONS_URL` preview gives you that from your ETL branch's staging catalog. What you must **not** do is merge the grapher PR on a staging-derived `regions.data.ts`: re-run `yarn runRegionsUpdater` against prod once the regions are live there, and push that regeneration as the last commit. The colors don't change in that regeneration — only the region data does.
+
+### Review the palette on the Figma board
+
+The design team keeps every provider's regions, rendered under the map palette, on **Frame 99** (node `1733:1130`) of the *"New Categorical Palette for Maps"* page in the [Color Explorations](https://www.figma.com/design/EpWbE8AkTYWxK8FECGhoHj/Color-Explorations?node-id=1733-1130) file. Put the new provider there **for the design review**, not after it — the board doubles as the review surface and the permanent record.
+
+**Propose it; don't just write it.** This is a shared design file that other people are working in — show the user exactly what you intend to add (which rows, which maps) and get an explicit go-ahead before touching it. Reading it to check the conventions needs no permission.
+
+> **What you need is all below — but the low-level Figma mechanics are shared with `create-figma-chart`**, which drives the same tools for a much more involved job. Only the plumbing is common (`upload_assets` over `createNodeFromSvg`, `rescale()` over `resize()`, plugins and comments being out of reach); its templates, text styles and labeling rules have nothing to do with this task, so don't go reading that skill to do this one. The one thing to carry across: if you learn something new about driving Figma from here, add it to that skill's *Gotchas* too, so the plumbing stays documented in one place.
+
+How the board is laid out — match it rather than inventing a spot:
+
+- Frame 99 is **absolutely positioned** (`layoutMode: NONE`), one **row per provider tier**, so `fao_1` and `fao_2` are separate rows exactly as `ilo_1`/`ilo_2` already are.
+- Each row is a **594×419 map export**: the **BEFORE** column at `x = 1751`, the **AFTER** column at `x = 2420`, with a text note in the right-hand column at `x ≈ 3043` listing the changes as `Region: OldColor → NewColor`.
+- Rows run down the frame on a **481 px pitch**. Add yours below the last existing row and grow Frame 99's height to fit — don't overlap the bottom edge.
+- **A fresh provider fills the AFTER column only**, and needs no note: there is no "before" when the regions were never colored. The BEFORE column and the note column are for *recolors* of already-published regions (see *Renaming existing regions*), where the point is the change.
+- Name the frame `<provider-full-name-slug>-regions-<defined_by>` — e.g. `food-and-agriculture-organization-regions-fao_2`, `united-nations-regions-un_m49_3`. (On the older paired rows a trailing ` 1`/` 2` distinguishes before/after; don't imitate it for a single new frame.)
+
+The maps are grapher's own SVG export, which is why each one still carries its country vectors and a `categorical-color-legend` group. Pull the SVG from **your branch's** staging server so the colors are the agreed ones, naming the file exactly what the layer should be called — the upload uses the filename as the layer name, so this is also how you get the naming convention for free:
+
+```bash
+curl -s "http://<container-name>/grapher/<chart-slug>.svg?tab=map" \
+  -o "<provider-full-name-slug>-regions-<defined_by>.svg"
+```
+
+**Get it into the file with `upload_assets`, not `createNodeFromSvg`.** The latter looks like the obvious tool and cannot work here: the plugin sandbox has no `fetch`, so the SVG would have to be inlined into `use_figma`'s `code`, which caps at **50,000 characters** — a grapher map SVG is ~165 KB and minifies to ~162 KB, since it is nearly all path data. `upload_assets` imports an `image/svg+xml` as an editable vector tree with no size problem (10 MB cap):
+
+```bash
+# count: 1 returns a single-use submitUrl, valid 10 minutes
+curl -s -X POST "<submitUrl>" \
+  -F "file=@<provider-full-name-slug>-regions-<defined_by>.svg;type=image/svg+xml"
+# → {"success":true, ..., "placedOnNodeId":"<id>"}   ← keep this id
+```
+
+Then place it with `use_figma` (**load the `figma-use` skill first** — hard prerequisite for that tool). Three things bite, in this order:
+
+- **It lands on whatever page is open in the desktop app**, not the page you last set with `setCurrentPageAsync` — in practice the file's cover page. Never search for it by page; take `placedOnNodeId` from the POST response and reparent explicitly.
+- **It imports at the SVG's natural size** (850×600 for a grapher map), not the board's row size. Use `node.rescale(594 / node.width)` — **never `resize()`**, which does not scale children at all: it stretches them through their constraints, so a grapher export comes out with its country paths distorted and every text box rewrapped (grapher sizes labels to their glyphs with no slack, so even a small change makes "Brazil" wrap to "Bra zil"). If you ever do scale a node carrying grapher text, sweep it afterwards setting each `TEXT` to `textAutoResize = "WIDTH_AND_HEIGHT"` and restoring its alignment anchor.
+- **The upload wraps the SVG in a FRAME with a white fill.** Harmless on the board, where each row sits on white anyway — but if the frame ends up larger than its content it will paint over whatever it overlaps. Clear `node.fills = []` if you see a neighboring row disappear.
+- **Grow Frame 99's height before positioning the row.** A row placed past the old height is clipped and looks like the import silently failed.
+
+```js
+const page = figma.root.children.find((p) => p.id === "1627:409")
+await figma.setCurrentPageAsync(page)
+const node = await figma.getNodeByIdAsync("<placedOnNodeId>")
+const frame99 = await figma.getNodeByIdAsync("1733:1130")
+
+const lastRow = frame99.children
+    .filter((c) => c.type === "FRAME" && c.width > 500)
+    .reduce((a, b) => (b.y > a.y ? b : a))
+const newY = Math.round(lastRow.y + 481)          // row pitch
+
+node.rescale(594 / node.width)                    // 850x600 -> 594x419
+frame99.resize(frame99.width, Math.max(frame99.height, newY + node.height + 60))
+frame99.appendChild(node)                         // x/y are parent-relative AFTER this
+node.x = 2420                                     // AFTER column
+node.y = newY
+return { mutatedNodeIds: [node.id, frame99.id], placedAt: { x: node.x, y: node.y } }
+```
+
+Finish by screenshotting the row (`get_screenshot` on the node, or `await node.screenshot()`) and showing it to the user. Do this even when the numbers came back right: a wrong scale or a row sitting on top of its neighbor is obvious in a picture and invisible in a node list. The screenshot doubles as the first honest look at the palette on a real map — legend labels included, so it also catches a missing `customCategoryLabels` entry leaving one region with its `(Provider)` suffix.
+
+If the provider has no published region chart to export, there is nothing to upload — build the chart first (Step 7) or skip the board and say so, rather than hand-drawing an approximation of a map.
+
+> **Trial runs are cheap; leaving debris is not.** This whole flow was validated by inserting a row and removing it again. If you do that, restore what you touched in the same breath — `node.remove()` **and** `frame99.resize(frame99.width, <original height>)`, since growing the board is a mutation the row's deletion doesn't undo. Record the original height before you change it.
+
+#### Reading the designer's changes back out
+
+The row is reviewable *and* machine-readable: the imported legend is a group of one vector per region, each **named after the region** and carrying a solid fill. So when the designer recolors a swatch on the board, you read the new hex straight out of the file instead of transcribing it from a message.
+
+```js
+const row = await figma.getNodeByIdAsync("<row node id>")
+const hex = (c) => "#" + [c.r, c.g, c.b].map((v) => Math.round(v * 255).toString(16).padStart(2, "0")).join("").toUpperCase()
+return row.query("[name=swatches] VECTOR").map((s) => ({
+    region: s.name,                                   // "South-eastern-Asia" — spaces are hyphens
+    fill: s.fills[0]?.type === "SOLID" ? hex(s.fills[0].color) : null,
+}))
+```
+
+Region names come back hyphenated and **without** the `(Provider)` suffix, exactly as the legend renders them, so map them back with `name.replaceAll("-", " ") + " (<Provider>)"` before diffing against your proposal. Diff, don't assume: report only the regions whose fill actually moved. The country shapes under `[name=countries-with-data]` are named and readable the same way, so a recolored *country* is legible too.
+
+Turning a returned hex into code is its own small step, and it is where a change quietly goes wrong:
+
+- **If the hex matches an existing `OwidMapColors` constant, use that constant.** Never write the raw hex into the dictionary — the whole file is constants, and a literal hides that two regions now share a color.
+- **If it matches nothing, it's a new palette color** and needs a name in `OwidMapColors` alongside the existing ones (see the note on where new colors go, above). Say so explicitly when reporting back; adding to the shared vocabulary is a bigger deal than reassigning within it.
+- **Re-run the per-tier collision check afterwards.** A designer changing one region to a color another region already has is easy to do and invisible until the map renders.
+
+**What you cannot read: Figma comment threads.** None of the Figma tools available here expose comments, so a note typed into a comment bubble is invisible to you — you will not know it exists. Ask for feedback *as a recolor on the board*, and for anything that can't be expressed that way (a hue that needs inventing, a "these two are too close" judgement) ask for it in Slack. Never report a review as clean on the strength of unchanged fills alone: unchanged fills mean nothing was recolored, which is not the same as nothing being said.
 
 ### Renaming existing regions (not a fresh add)
 
@@ -511,5 +605,5 @@ The [world-region-map-definitions](https://ourworldindata.org/world-region-map-d
 - **owid-grapher is a separate repo and a separate PR**, done *after* the ETL regions are merged & on the prod catalog. `regions.data.ts` is auto-generated (`yarn runRegionsUpdater`) — never hand-edit it; the hand-maintained parts are the label/description registries and the two color dictionaries.
 - **Region colors are keyed by name, not by legend position.** A map without `baseColorScheme: OwidCategoricalMap` falls back to `BuGn`, and any `customCategoryColors` block overrides the name lookup entirely — both silently, with a chart that still renders.
 - **`MapContinentColors` spreads `ContinentColors`**, so a region added to only one dictionary looks right on the test page's line chart and wrong on its map (strong chart color where a muted one belongs). Add both.
-- **Colors always go to a human** (`@mrwbkrm` for the design call, `@sophiamersmann` for the code review) — the skill's proposal is a first stab, never the final word.
+- **Colors always go to a human** (`@mrwbkrm` for the design call, `@sophiamersmann` for the code review) — the skill's proposal is a first stab, never the final word. The agreed result then goes on **Frame 99** of the Color Explorations Figma file, one row per tier — and that write to a shared design file needs the user's explicit go-ahead.
 - The grapher `RegionDataProvider` / `RegionGroupKey` / `TooltipKey` types are exhaustive `Record<…>` unions, so a forgotten label is a **typecheck error**, not a silent gap — run `yarn typecheck` to find them.

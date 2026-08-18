@@ -1,0 +1,82 @@
+title:
+  title: "Fossil fuels"
+  title_variant: ""
+default_selection:
+  - "World"
+# Default to an individual fuel (coal) rather than the "Total" aggregate: several metrics (imports,
+# exports, net imports, reserves) only exist per fuel, and defaulting to the aggregate hides them.
+default_dimensions:
+  fuel: "coal"
+  metric: "production"
+  per_capita: "total"
+topic_tags:
+  - "Energy"
+  - "Fossil Fuels"
+definitions:
+  common_views:
+    - config:
+        originUrl: "https://ourworldindata.org/fossil-fuels"
+dimensions:
+  - slug: "fuel"
+    name: "Fuel"
+    choices:
+      - slug: "total"
+        name: "Total"
+        description: "All fossil fuels (coal, oil, and gas)"
+        group: "Aggregates"
+      - slug: "coal"
+        name: "Coal"
+        group: "Individual fuels"
+      - slug: "oil"
+        name: "Oil"
+        group: "Individual fuels"
+      - slug: "gas"
+        name: "Gas"
+        group: "Individual fuels"
+  - slug: "metric"
+    name: "Metric"
+    choices:
+      - slug: "production"
+        name: "Energy production"
+        description: "Production in terawatt-hours"
+      - slug: "consumption"
+        name: "Energy consumption"
+        description: "Consumption in terawatt-hours"
+      - slug: "production_physical"
+        name: "Amount produced"
+        description: "Production in tonnes (coal) or cubic meters (oil and gas)"
+      - slug: "consumption_physical"
+        name: "Amount consumed"
+        description: "Consumption in tonnes (coal) or cubic meters (oil and gas)"
+      - slug: "imports"
+        name: "Imports"
+        description: "Imports in tonnes (coal) or cubic meters (oil and gas)"
+      - slug: "exports"
+        name: "Exports"
+        description: "Exports in tonnes (coal) or cubic meters (oil and gas)"
+      - slug: "net_imports"
+        name: "Net imports"
+        description: "Imports minus exports; negative values mean net exports"
+      - slug: "reserves"
+        name: "Reserves"
+        description: "Proven reserves in tonnes (coal) or cubic meters (oil and gas)"
+      - slug: "production_by_fuel"
+        name: "Energy production by fuel"
+        description: "Fossil fuel production broken down by fuel"
+      - slug: "consumption_by_fuel"
+        name: "Energy consumption by fuel"
+        description: "Fossil fuel consumption broken down by fuel"
+# NOTE: Once grapher supports checkbox dimensions in multidims, rename this dimension to
+# "Per capita" and add: presentation: {type: checkbox, choice_slug_true: per_capita}.
+  - slug: "per_capita"
+    name: "Measure"
+    choices:
+      # Not "Total" (already used for the all-fuels aggregate and in "total energy supply") and not
+      # "Per country" (entities include World and regions, which are not countries).
+      - slug: "total"
+        name: "Total"
+      - slug: "per_capita"
+        name: "Per capita"
+views:
+  # Views are generated programmatically in the step.
+  []

@@ -20,7 +20,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          The cumulative percentage of marriages that have ended in divorce by the anniversary year of marriage.
+          Cumulative percentage of marriages that have ended in divorce by the anniversary year of marriage.
         description_key:
           - Data covers divorces legally registered in England and Wales, including marriages that took place abroad if one party had a permanent home in England and Wales.
           - Divorce statistics do not include married couples who separate but do not divorce.

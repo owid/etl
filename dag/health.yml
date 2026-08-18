@@ -772,6 +772,18 @@ steps:
   #export://multidim/who/latest/share_overweight_adults:
   #  - data://grapher/who/2026-05-22/gho
 
+  # WHO growth reference standards for height-for-age (0-19 years)
+  data://garden/who/2026-08-07/height_for_age:
+    - data://meadow/who/2026-08-07/height_for_age:
+        - snapshot://who/2026-08-07/height_for_age_percentiles_boys_under_5.xlsx
+        - snapshot://who/2026-08-07/height_for_age_percentiles_girls_under_5.xlsx
+        - snapshot://who/2026-08-07/height_for_age_zscores_boys_under_5.xlsx
+        - snapshot://who/2026-08-07/height_for_age_zscores_girls_under_5.xlsx
+        - snapshot://who/2026-08-07/height_for_age_percentiles_boys_5_to_19.xlsx
+        - snapshot://who/2026-08-07/height_for_age_percentiles_girls_5_to_19.xlsx
+        - snapshot://who/2026-08-07/height_for_age_zscores_boys_5_to_19.xlsx
+        - snapshot://who/2026-08-07/height_for_age_zscores_girls_5_to_19.xlsx
+
   # Drug approvals - FDA (CDER Approvals & Purple Book (CBER Approvals))
   data://grapher/health/2025-07-16/drug_approvals:
     - data://garden/health/2025-07-16/drug_approvals:

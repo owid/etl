@@ -169,6 +169,14 @@ migrates their old slugs in one transaction.
     CLI is the only route — and it is what repoints them, so hand-unpublishing a chart first
     turns its old URLs into 404s.
 
+!!! note "The CSV takes bare chart paths only — no query strings, no explorer sources"
+    A source is `/grapher/<slug>` and stops there. A query string is everything from the `?`
+    onward, which on a chart URL is what picks the view (`?tab=map`, `?country=~FRA`); a
+    source carrying one validates and then never matches an incoming URL, so the redirect
+    silently never fires. Sending different parameters to different views would need a change
+    to the script (ask a Grapher developer). An `/explorers/` source also validates, then
+    sends *every* view of the explorer to one MDIM view — use the explorer route above.
+
 ## Why the two differ
 
 | | Explorers | Charts |
