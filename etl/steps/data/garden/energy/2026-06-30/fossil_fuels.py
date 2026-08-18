@@ -114,15 +114,15 @@ COUNTRIES_THAT_MUST_HAVE_DATA = {
     "Upper-middle-income countries": ["China"],
 }
 
-# Predecessor and successor entities the sources report side by side without double-counting (EIA reports
-# Aruba separately from 1986 while keeping the old name for the rest of the Netherlands Antilles), and
-# the Statistical Review's Yugoslavia, which is zero in the two years it overlaps its successors.
-ACCEPTED_OVERLAPS = [
-    {year: {"Aruba", "Netherlands Antilles"} for year in range(1986, 2025)},
-    *(
-        {year: {"Yugoslavia", successor} for year in (1990, 1991)}
-        for successor in ("Croatia", "North Macedonia", "Slovenia")
-    ),
+# Predecessors and successors the sources report side by side without double-counting. EIA reports Aruba
+# separately from 1986 while keeping the old name for the rest of the Netherlands Antilles, in every column.
+# The Statistical Review's Yugoslavia overlaps three of its successors in 1990 and 1991, so that pair only
+# arises in the energy columns. Every other predecessor ends where its successors begin, which
+# add_aggregates verifies on each run.
+ACCEPTED_OVERLAPS = [{year: {"Aruba", "Netherlands Antilles"} for year in range(1986, 2025)}]
+ACCEPTED_OVERLAPS_ENERGY = ACCEPTED_OVERLAPS + [
+    {year: {"Yugoslavia", successor} for year in (1990, 1991)}
+    for successor in ("Croatia", "North Macedonia", "Slovenia")
 ]
 
 
@@ -281,7 +281,7 @@ def add_region_aggregates(tb: Table, tb_review: Table, eia_years: tuple[int, int
             regions={region: {} for region in REGIONS},
             aggregations={column: "sum" for column in columns},
             min_num_values_per_year=1,
-            accepted_overlaps=ACCEPTED_OVERLAPS,
+            accepted_overlaps=ACCEPTED_OVERLAPS_ENERGY if europe_by_count else ACCEPTED_OVERLAPS,
             ignore_overlaps_of_zeros=True,
             # Only the energy columns are gated. The rest are EIA's own, with coverage that varies by
             # column and region however EIA happens to report it, so a threshold on them only trades
