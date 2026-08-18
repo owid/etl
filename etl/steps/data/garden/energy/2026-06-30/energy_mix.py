@@ -275,22 +275,22 @@ def add_traditional_biomass(tb: Table, tb_smil: Table) -> Table:
 
 
 def add_aggregate_sources(tb: Table) -> Table:
-    """Create aggregate sources (fossil fuels, renewables, low-carbon energy, solar and wind)."""
+    """Create aggregate sources (fossil fuels, renewables, low-carbon energy, solar and wind).
+
+    Every component is required. The Statistical Review garden step fills in the zeros the producer
+    omits, so a component still missing here is either genuinely unknown or was removed upstream for
+    not being representative of its region, and treating it as zero would undercount the aggregate.
+    """
     tb = tb.copy()
+    renewables = ["hydro_twh", "solar_twh", "wind_twh", "other_renewables_twh", "biofuels_twh"]
     # Fossil fuels.
     tb["fossil_fuels_twh"] = tb[["coal_twh", "oil_twh", "gas_twh"]].sum(axis=1, min_count=3)
-    # Renewables (hydro is the anchor; other renewable sources are often missing in early years, filled with zeros).
-    tb["renewables_twh"] = (
-        tb["hydro_twh"]
-        + tb["solar_twh"].fillna(0)
-        + tb["wind_twh"].fillna(0)
-        + tb["other_renewables_twh"].fillna(0)
-        + tb["biofuels_twh"].fillna(0)
-    )
+    # Renewables.
+    tb["renewables_twh"] = tb[renewables].sum(axis=1, min_count=len(renewables))
     # Low-carbon energy (renewables plus nuclear).
-    tb["low_carbon_energy_twh"] = tb["renewables_twh"] + tb["nuclear_twh"].fillna(0)
+    tb["low_carbon_energy_twh"] = tb[renewables + ["nuclear_twh"]].sum(axis=1, min_count=len(renewables) + 1)
     # Solar and wind.
-    tb["solar_and_wind_twh"] = tb["solar_twh"].fillna(0) + tb["wind_twh"].fillna(0)
+    tb["solar_and_wind_twh"] = tb[["solar_twh", "wind_twh"]].sum(axis=1, min_count=2)
     return tb
 
 
