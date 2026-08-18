@@ -60,9 +60,11 @@ const CONFIG = {
   bodyTextParent: /__(label|total-leisure)$/,
   darkTextParent: /^header__total-leisure/,
   slots: ["title", "subtitle", "note", "data-source", "tagline", "license"],
-  // matplotlib's figure and axes patches. A step on the current contract emits them as `fill: none`,
-  // so this finds nothing; an older export fills them white and they land opaque over the template.
+  // matplotlib's figure and axes background patches: the FIRST `patch_N` inside each of these
+  // parents. A step on the current contract emits them as `fill: none`, so this finds nothing; an
+  // older export fills them white and they land opaque over the template.
   backgroundPatch: /^patch_\d+$/,
+  backgroundPatchParent: /^(figure|axes)_\d+$/,
 };
 
 // ---------------------------------------------------------------------------
@@ -138,14 +140,27 @@ for (const job of CONFIG.jobs) {
   // The background goes first, because it is the one that ruins the page: an opaque figure patch is
   // frame-sized and lands *above* the clone's cream background, logo and footer, hiding all three.
   // The patches are their own groups, so dropping the duplicate text below does not uncover them.
-  // Only a patch that actually paints is removed, so a `fill: none` export is left alone.
+  //
+  // Three things this has to get right, and each was wrong in an earlier version:
+  //   - matplotlib writes a patch as `<g id="patch_1"><path/></g>`, so it imports as a GROUP, which
+  //     has no `fills` of its own (see SKILL.md → Gotchas). The paint is on the descendant vector, so
+  //     that is what decides whether the patch covers anything.
+  //   - only a *fill* counts. The spine group is a `patch_N` too and is stroke-only, so testing fills
+  //     rather than any paint leaves it alone.
+  //   - the number says nothing: a bar chart's rectangles are `patch_N` groups parented to the axes
+  //     just like the background is. What identifies the background is position — matplotlib emits the
+  //     figure and axes patch *before* any data artist — so only the first patch of `figure_N`/`axes_N`
+  //     is a candidate. Match on the number alone and a pass deletes the chart's marks.
   const strippedPatches = [];
-  for (const node of styled.findAll((n) => CONFIG.backgroundPatch.test(n.name))) {
-    const paints = "fills" in node && node.fills !== figma.mixed && Array.isArray(node.fills) ? node.fills : [];
-    if (paints.some((f) => f.visible !== false && (f.opacity === undefined || f.opacity > 0))) {
-      strippedPatches.push(node.name);
-      node.remove();
-    }
+  const fillsOf = (n) => ("fills" in n && n.fills !== figma.mixed && Array.isArray(n.fills) ? n.fills : []);
+  const painted = (n) =>
+    fillsOf(n).some((f) => f.visible !== false && (f.opacity === undefined || f.opacity > 0)) ||
+    ("children" in n && n.children.some(painted));
+  for (const parent of styled.findAll((n) => CONFIG.backgroundPatchParent.test(n.name))) {
+    const first = ("children" in parent ? parent.children : []).find((c) => CONFIG.backgroundPatch.test(c.name));
+    if (!first || first.removed || !painted(first)) continue;
+    strippedPatches.push(`${parent.name}/${first.name}`);
+    first.remove();
   }
 
   for (const slot of CONFIG.slots) {
