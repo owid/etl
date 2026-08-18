@@ -120,3 +120,11 @@ Rarer case — when the web team publishes a new schema version instead of mutat
 2. Update every `$ref` in `schemas/multidim-schema.json` and `schemas/explorer-schema.json`: `sed -i 's/grapher-schema.NNN.json/grapher-schema.MMM.json/g' schemas/multidim-schema.json schemas/explorer-schema.json`.
 3. `.venv/bin/python scripts/generate_schema_types.py --refresh` (vendors the new version — the filename follows `DEFAULT_GRAPHER_SCHEMA`), then `git rm` the old vendored file.
 4. Continue from step 1's diff review above (diff old vendored vs new: `git diff --no-index schemas/grapher-schema.NNN.json schemas/grapher-schema.MMM.json`).
+
+### Don't bump the `grapher_schema` pins in MDIM configs
+
+Every multidim config pins `grapher_schema: "NNN"` (enforced by `test_multidim_configs_pin_grapher_schema`). **Leave those pins at their old version.** They record what each config was authored against, which is what lets grapher migrate them to `MMM` on upsert. Bumping them would tell grapher the configs are already current and skip the migration — the exact failure the pins exist to prevent.
+
+The one thing to check: step 2 repoints multidim view-config validation at the new version, so a config that is no longer valid under `MMM` will now fail `Collection.validate_schema()`. Fix the config *and* bump only that config's pin, since at that point it genuinely was re-authored against `MMM`.
+
+Views can also carry their own `$schema` inside a `config` block (grep `etl/steps/export/multidim` for `\$schema`), which overrides the collection-level pin. Same rule applies.

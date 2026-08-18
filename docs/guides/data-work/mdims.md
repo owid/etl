@@ -47,6 +47,7 @@ MDIMs can be crafted in various ways, going from totally manual to fully automat
 Below is a simple MDIM configuration file (modified for demo purposes):
 
 ```yaml title="etl/steps/export/multidim/covid/latest/covid.deaths.yml"
+grapher_schema: "011"
 title:
   title: COVID-19 confirmed deaths
   title_variant: ""
@@ -105,6 +106,22 @@ def run() -> None:
 As you can see, there are top-level fields (`title`, `default_selection`, `topic_tags`) which define the MDIM name and other details, and then we have `dimensions` and `views` fields. The `dimensions` field defines the selectors, and the `views` field defines the views for the selection. Each view has a reference to the dimensions it represents.
 
 In this example, we note that we can group together indicators from any dataset. While we may present them as "dimensional", the underlying data structure may not be.
+
+!!! important "Always pin `grapher_schema`"
+    `grapher_schema` records the version of the [Grapher chart-config schema](https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema) that this MDIM's view configs were written against. Grapher uses it as the `$schema` of every view config, and migrates outdated configs forward to the current version when it upserts the MDIM.
+
+    Two forms are accepted — the short version, or the full URL:
+
+    ```yaml
+    grapher_schema: "011"
+    grapher_schema: https://files.ourworldindata.org/schemas/grapher-schema.011.json
+    ```
+
+    **Quote the short form.** YAML parses a bare `011` as an octal number, so it would silently resolve to a different version (ETL rejects it rather than guessing).
+
+    Omitting the field falls back to `DEFAULT_GRAPHER_SCHEMA` (`etl/config.py`), which tells Grapher the configs are already current — so the next breaking schema change would skip the migration for those views. Once set, leave the pin alone: it is a record of what the config was authored against, which is exactly what lets Grapher migrate it later.
+
+    This field is MDIM-only. Explorers reach Grapher through the legacy TSV path, which has no equivalent.
 
 !!! tip "Learn more about the structure of MDIMs in [:fontawesome-brands-github: their schema](https://github.com/owid/etl/blob/master/schemas/multidim-schema.json)"
     There are more options available in the schema that are not covered here. E.g. you can set chart configurations for each view (`.config`), or indicator-level display settings (`.display`). You can even tweak the presentation fields like `description_key` for a specific view (`.metadata`).

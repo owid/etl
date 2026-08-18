@@ -35,6 +35,7 @@ from etl.collection.utils import (
     get_complete_dimensions_filter,
     get_tables_by_name_mapping,
     map_indicator_path_to_id,
+    resolve_grapher_schema,
     unique_records,
     validate_indicators_in_db,
 )
@@ -125,6 +126,11 @@ class Collection(MDIMBase):
 
     dependencies: set[str] = field(default_factory=set)
     topic_tags: list[str] | None = None
+    # Grapher chart-config schema version that this collection's view configs were authored
+    # against. Short ("011") or full URL form; see `resolve_grapher_schema`. Grapher uses it as the
+    # `$schema` of every view config, and skips config migrations entirely when it is missing — so
+    # pin it explicitly rather than relying on the `DEFAULT_GRAPHER_SCHEMA` fallback.
+    grapher_schema: str | None = None
     _default_dimensions: dict[str, str] | None = None
 
     # Internal use. For save() method.
@@ -159,6 +165,9 @@ class Collection(MDIMBase):
         if isinstance(self.dependencies, list):
             # Convert list to set
             self.dependencies = set(self.dependencies)
+
+        # Fail at authoring time on a malformed pin, rather than at upsert time
+        resolve_grapher_schema(self.grapher_schema)
 
     @property
     def definitions(self) -> Definitions:
@@ -301,6 +310,12 @@ class Collection(MDIMBase):
         # description_key is a markdown string; a YAML list is authoring sugar
         # and gets converted before the config is stored.
         _convert_description_key_lists(config)
+
+        # Grapher expects the resolved schema URL under its own key (`grapherConfigSchema`), which
+        # it injects as the `$schema` of every view config before migrating it to the latest
+        # version. Always send it: without it, Grapher skips those migrations.
+        config.pop("grapher_schema", None)
+        config["grapherConfigSchema"] = resolve_grapher_schema(self.grapher_schema)
 
         # Convert config from snake_case to camelCase
         config = camelize(config, exclude_keys={"dimensions"})
