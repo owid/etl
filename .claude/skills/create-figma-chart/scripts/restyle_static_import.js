@@ -75,6 +75,12 @@ function paint(node, hexColor, styleId) {
     if ("fills" in n && n.fills !== figma.mixed && Array.isArray(n.fills) && n.fills.length) {
       n.fills = [{ ...n.fills[0], type: "SOLID", color: rgbOf(hexColor) }];
       if (styleId) n.fillStyleId = styleId;
+    } else if ("strokes" in n && n.strokes !== figma.mixed && Array.isArray(n.strokes) && n.strokes.length) {
+      // A line mark carries its color in `strokes`, not `fills` — matplotlib writes it as
+      // `fill:none; stroke:…` — so a fills-only pass silently skips the `category__…-line` nodes
+      // selected below. Second in the chain, not alongside, so a filled bar keeps its own edge.
+      n.strokes = [{ ...n.strokes[0], type: "SOLID", color: rgbOf(hexColor) }];
+      if (styleId) n.strokeStyleId = styleId;
     }
     if ("children" in n) n.children.forEach(apply);
   };

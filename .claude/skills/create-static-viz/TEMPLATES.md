@@ -160,7 +160,7 @@ band_bottom = note_ink_bottom − note_lines × 14               # the Note's in
 | `origin_y` (the header block's own top edge) | 0 | 16 |
 | `logo_px` (the logo's row, not the logo) | 41.26 | 35.23 |
 | `row_pad_px` (the title row's own top padding) | 16.22 | 0 |
-| `note_ink_bottom` | 1043.81 (Vertical) | — (no Note row) |
+| `note_ink_bottom` | 586.62 (Horizontal) / 1043.81 (Vertical) | — (no Note row) |
 | footer row spacing / block top padding | 4 / 16 | 4 / 0 |
 
 **`origin_y` and `row_pad_px` never both carry the 16 px.** The two families put that padding in
