@@ -88,13 +88,10 @@ EXPECTED_AGGREGATE_YEARS: dict[str, tuple[int, int]] = {
 # that region-year to be published.
 MIN_FRAC_COUNTRIES_INFORMED = 0.6
 
-# For the energy columns, Europe is held to a minimum count instead. A fraction misjudges it there,
-# because the denominator counts the USSR's and Yugoslavia's successors in years where those two are still
-# one entity each: Europe reports 28 of the 47 countries that ever report oil production in 1980 and 39 by
-# 1992, though its territory is covered throughout. A floor of 28 still catches it losing a third of its
-# countries. Europe keeps the fraction for the remaining columns, where the shortfall is real rather than a
-# matter of naming: EIA reports the USSR's gas reserves until 1991 and Russia's only from 1997, so a looser
-# rule would publish a Europe that loses 89% of its reserves in 1992.
+# Europe is held to a minimum count instead. A fraction misjudges it, because the denominator counts the
+# USSR's and Yugoslavia's successors in years where those two are still one entity each: Europe reports 28
+# of the 47 countries that ever report oil production in 1980 and 39 by 1992, though its territory is
+# covered throughout. A floor of 28 still catches it losing a third of its countries.
 MIN_NUM_COUNTRIES_INFORMED_EUROPE = 28
 
 # Tolerance for the continents-against-World reconciliation in sanity_check_region_aggregates. Every
@@ -286,11 +283,14 @@ def add_region_aggregates(tb: Table, tb_review: Table, eia_years: tuple[int, int
             min_num_values_per_year=1,
             accepted_overlaps=ACCEPTED_OVERLAPS,
             ignore_overlaps_of_zeros=True,
-            min_frac_countries_informed={
-                region: MIN_FRAC_COUNTRIES_INFORMED
-                for region in REGIONS
-                if not (europe_by_count and region == "Europe")
-            },
+            # Only the energy columns are gated. The rest are EIA's own, with coverage that varies by
+            # column and region however EIA happens to report it, so a threshold on them only trades
+            # ragged starts for gaps; they are summed over whichever countries report.
+            min_frac_countries_informed=(
+                {region: MIN_FRAC_COUNTRIES_INFORMED for region in REGIONS if region != "Europe"}
+                if europe_by_count
+                else None
+            ),
             min_num_countries_informed={"Europe": MIN_NUM_COUNTRIES_INFORMED_EUROPE} if europe_by_count else None,
             countries_that_must_have_data=must_have_data,
         )
