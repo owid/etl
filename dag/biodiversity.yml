@@ -104,3 +104,12 @@ steps:
   data://garden/biodiversity/2026-05-29/long_run_whaling:
     - data://garden/biodiversity/2026-05-29/historic_whaling
     - data://garden/iwc/2026-05-29/whaling_total_catches
+
+  # EU wild bird populations (Eurostat)
+  data://grapher/eurostat/2026-07-29/eu_wild_bird_populations:
+    - data://garden/eurostat/2026-07-29/eu_wild_bird_populations:
+        - data://meadow/eurostat/2026-07-29/eu_wild_bird_populations:
+            - snapshot://eurostat/2026-07-29/eu_wild_bird_populations.gz
+        - data://meadow/eurostat/2026-07-29/farmland_bird_index:
+            - snapshot://eurostat/2026-07-29/farmland_bird_index.gz
+
