@@ -493,8 +493,7 @@ def validate_description_key_list(items: list[str], context: str | None = None) 
             "description_key",
             f"{len(bullets)} bullets, far more than the {DESCRIPTION_KEY_MAX_ITEMS} a real list ever has",
             context,
-            f"{_CHARACTER_EXPLOSION_HINT} If the bullets really are content, raise "
-            "`DESCRIPTION_KEY_MAX_ITEMS`.",
+            f"{_CHARACTER_EXPLOSION_HINT} If the bullets really are content, raise `DESCRIPTION_KEY_MAX_ITEMS`.",
         )
 
 

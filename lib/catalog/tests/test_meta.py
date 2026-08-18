@@ -367,3 +367,29 @@ def test_character_explosion_check_has_no_threshold_to_tune():
     assert meta.description_key_to_string(["No", "Yes"]) == "- No\n- Yes"
     assert meta.description_key_to_string(["a"]) == "a"  # a single item is prose, not a list
     meta.validate_description_key_list(["No", "Yes", "Maybe", "Unknown", "Not applicable"])
+
+
+def test_combined_description_key_survives_as_markdown():
+    """Combining two indicators with different keys joins their text, and `str.join` returns a
+    plain str even when every part is a `Markdown`.
+
+    Raised by Codex on #6649: the combined value is assigned to metadata after construction,
+    where `__post_init__` cannot re-wrap it, so it has to be wrapped where it is produced.
+    """
+    from owid.catalog.core.indicators import Indicator, get_unique_description_key_points_from_indicators
+
+    def indicator_with(name, description_key):
+        ind = Indicator([1.0], name=name)
+        ind.metadata = meta.VariableMeta(description_key=description_key)
+        return ind
+
+    combined = get_unique_description_key_points_from_indicators(
+        [indicator_with("a", ["Point one.", "Point two."]), indicator_with("b", ["Something else entirely."])]
+    )
+    assert isinstance(combined, meta.Markdown)
+    with pytest.raises(TypeError, match="not a list of bullets"):
+        list(combined)
+
+    # The single-key case returns its input, which must be wrapped too.
+    single = get_unique_description_key_points_from_indicators([indicator_with("c", "- Already a string.")])
+    assert isinstance(single, meta.Markdown)
