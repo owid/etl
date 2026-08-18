@@ -1314,3 +1314,9 @@ steps:
       - data://garden/bls/2026-03-24/us_ppi_construction
       - data://meadow/us_census_bureau/2026-03-24/datacenter_construction:
         - snapshot://us_census_bureau/2026-03-24/datacenter_construction.xlsx
+  # archived; last active in 8b30eb0a0898 on 2026-08-18
+  data://grapher/us_census_bureau/2026-07-20/datacenter_construction:
+    - data://garden/us_census_bureau/2026-07-20/datacenter_construction:
+      - data://garden/bls/2026-07-20/us_ppi_construction
+      - data://meadow/us_census_bureau/2026-07-20/datacenter_construction:
+        - snapshot://us_census_bureau/2026-07-20/datacenter_construction.xlsx
