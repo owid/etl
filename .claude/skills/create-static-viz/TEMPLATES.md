@@ -83,7 +83,7 @@ chart area starts at 118 while `header.y + header.height` reads 134.22 — that 
 
 Same slots, widths, sizes and auto-layout wrappers as Horizontal. Header block `5332:94` is
 **0→134.22**; footer block `5332:101` starts at **999.81**. Absolute y: title 16.22, subtitle 80.22,
-chart area 118 → 1001.8, `Note:` 1015.81, `Data source:` 1047.81, tagline/license 1065.81.
+chart area 118 → 1015.81, `Note:` 1015.81, `Data source:` 1047.81, tagline/license 1065.81.
 
 **The two header blocks are now identical at 134.22.** They used to differ — 136 here against 134,
 from a 30 px title line height against 29 — and that difference is gone, so don't reintroduce a
@@ -157,11 +157,18 @@ band_bottom = note_ink_bottom − note_lines × 14               # the Note's in
 
 | | 850-wide pair | Mobile (both) |
 |---|---|---|
-| `origin_y` (block top / its own top padding) | 16.22 | 16 |
+| `origin_y` (the header block's own top edge) | 0 | 16 |
 | `logo_px` (the logo's row, not the logo) | 41.26 | 35.23 |
-| `row_pad_px` (title row's top padding) | 16.22 | 0 |
+| `row_pad_px` (the title row's own top padding) | 16.22 | 0 |
 | `note_ink_bottom` | 1043.81 (Vertical) | — (no Note row) |
 | footer row spacing / block top padding | 4 / 16 | 4 / 0 |
+
+**`origin_y` and `row_pad_px` never both carry the 16 px.** The two families put that padding in
+different places, and the tables above are the only place that shows it: on the 850-wide pair the
+header block starts at the frame's own top edge (`y = 0`) and the *title row* holds the 16.22 px,
+while on mobile the block starts at `y = 16` and its title row holds none. Count it on both rows and
+a two-line title puts the subtitle at 96.44 against the measured 80.22, dropping the whole band by
+16.22 px.
 
 **Two things here are counter-intuitive and both cost a round to find.** A one-line title does *not*
 shrink the header by a line: below `logo_px` the **logo** sets the row's height, so the 850-wide
