@@ -51,8 +51,9 @@ EIA_SOURCES = {
     "wind": "electricity_from_wind",
 }
 
-# Tolerances for the reconciliations in sanity_check_outputs.
-MAX_WORLD_DEVIATION_PCT = 10
+# Tolerances for the reconciliations in sanity_check_outputs. The World sum lands within 0.4%; a region
+# reaches 3.5% (Africa, where the Statistical Review itemizes only 4 of its 58 countries).
+MAX_WORLD_DEVIATION_PCT = 1
 MAX_REGION_DEVIATION_PCT = 5
 # Regions whose countries come largely from EIA reach ~1.2%, since EIA's by-source values run slightly
 # above its own total.
