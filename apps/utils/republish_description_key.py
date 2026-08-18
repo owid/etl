@@ -26,21 +26,69 @@ from typing import Any
 
 import click
 import structlog
+from botocore.exceptions import EndpointConnectionError, SSLError
 from owid.catalog import s3_utils
 from owid.catalog.core.meta import description_key_to_string
+from tenacity import Retrying
+from tenacity.retry import retry_if_exception_type
+from tenacity.stop import stop_after_attempt
+from tenacity.wait import wait_exponential
 
 from etl import config
-from etl.http import session
 
 log = structlog.get_logger()
 
 
-def _metadata_url(variable_id: int) -> str:
-    return f"{config.DATA_API_URL}/{variable_id}.metadata.json"
+def _s3_bucket_key(variable_id: int) -> tuple[str, str]:
+    return s3_utils.s3_bucket_key(f"{config.BAKED_VARIABLES_PATH}/{variable_id}.metadata.json")
 
 
-def _s3_path(variable_id: int) -> str:
-    return f"{config.BAKED_VARIABLES_PATH}/{variable_id}.metadata.json"
+def _retrying() -> Retrying:
+    """Transient R2 errors are expected across tens of thousands of objects."""
+    return Retrying(
+        wait=wait_exponential(min=1, max=30),
+        stop=stop_after_attempt(5),
+        retry=retry_if_exception_type((EndpointConnectionError, SSLError)),
+    )
+
+
+def _read_metadata(variable_id: int) -> tuple[dict[str, Any], str]:
+    """Read a metadata file straight from R2, with its ETag.
+
+    Deliberately not `config.DATA_API_URL`: that goes through the CDN, which serves objects
+    long after their stated s-maxage and does not revalidate. Reading a stale copy and writing
+    it back would revert a file that ETL had already republished with fresher data.
+    """
+    bucket, key = _s3_bucket_key(variable_id)
+    for attempt in _retrying():
+        with attempt:
+            obj = s3_utils.connect_r2_cached().get_object(Bucket=bucket, Key=key)  # ty: ignore[unresolved-attribute]
+            body = obj["Body"].read()
+            if obj.get("ContentEncoding") == "gzip":
+                body = gzip.decompress(body)
+            return json.loads(body), obj["ETag"]
+    raise RuntimeError("unreachable: Retrying either returns or raises")
+
+
+def _write_metadata(variable_id: int, metadata: dict[str, Any], etag: str) -> None:
+    """Write the file back, but only if it has not changed since we read it.
+
+    An ETL upsert republishing the same variable mid-run would otherwise be clobbered by
+    whatever we read moments earlier. R2 rejects the write with PreconditionFailed instead,
+    and a later rerun picks the variable up again.
+    """
+    bucket, key = _s3_bucket_key(variable_id)
+    body = gzip.compress(json.dumps(metadata, default=str).encode())
+    for attempt in _retrying():
+        with attempt:
+            s3_utils.connect_r2_cached().put_object(  # ty: ignore[unresolved-attribute]
+                Bucket=bucket,
+                Body=body,
+                Key=key,
+                ContentEncoding="gzip",
+                ContentType="application/json",
+                IfMatch=etag,
+            )
 
 
 def _candidate_ids(cutoff: str | None, limit: int | None) -> list[int]:
@@ -66,12 +114,10 @@ def _candidate_ids(cutoff: str | None, limit: int | None) -> list[int]:
 def _rewrite_one(variable_id: int, execute: bool) -> str:
     """Return the outcome for one variable: rewritten, already-string, missing, or failed."""
     try:
-        response = session.get(_metadata_url(variable_id), timeout=60)
-        if response.status_code == 404:
-            return "missing"
-        response.raise_for_status()
-        metadata: dict[str, Any] = response.json()
+        metadata, etag = _read_metadata(variable_id)
     except Exception as e:
+        if getattr(e, "response", {}).get("Error", {}).get("Code") in ("NoSuchKey", "404"):
+            return "missing"
         log.error("republish.fetch_failed", variable_id=variable_id, error=str(e))
         return "failed"
 
@@ -91,16 +137,13 @@ def _rewrite_one(variable_id: int, execute: bool) -> str:
         return "would-rewrite"
 
     try:
-        body = gzip.compress(json.dumps(metadata, default=str).encode())
-        bucket, key = s3_utils.s3_bucket_key(_s3_path(variable_id))
-        s3_utils.connect_r2_cached().put_object(  # ty: ignore[unresolved-attribute]
-            Bucket=bucket,
-            Body=body,
-            Key=key,
-            ContentEncoding="gzip",
-            ContentType="application/json",
-        )
+        _write_metadata(variable_id, metadata, etag)
     except Exception as e:
+        code = getattr(e, "response", {}).get("Error", {}).get("Code", "")
+        if code == "PreconditionFailed":
+            # Someone republished this variable while we held it; a rerun will handle it.
+            log.warning("republish.changed_underneath", variable_id=variable_id)
+            return "changed-underneath"
         log.error("republish.upload_failed", variable_id=variable_id, error=str(e))
         return "failed"
 
@@ -176,6 +219,11 @@ def cli(
     log.info("republish.done", **outcomes)
     if not execute and outcomes["would-rewrite"]:
         log.info("republish.dry_run", message=f"pass --execute to rewrite {outcomes['would-rewrite']} files")
+    if outcomes["changed-underneath"]:
+        log.info(
+            "republish.rerun_needed",
+            message=f"{outcomes['changed-underneath']} variables were republished mid-run; rerun to pick them up",
+        )
     if outcomes["failed"]:
         raise click.ClickException(f"{outcomes['failed']} variables failed — rerun to retry them")
 
