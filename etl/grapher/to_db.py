@@ -22,7 +22,6 @@ import structlog
 from owid import catalog
 from owid.catalog import Table, Variable, VariableMeta, utils
 from owid.catalog.core.meta import update_variable_metadata
-from owid.catalog.core.paths import CatalogPath
 from owid.catalog.core.utils import hash_any
 from sqlalchemy import select, update
 from sqlalchemy.engine.base import Engine
@@ -173,22 +172,34 @@ def load_dataset_variables(dataset_id: int, engine: Engine) -> dict[int | str, A
     )
 
 
-def upsert_table(
-    engine: Engine,
-    admin_api: AdminAPI,
+@dataclass
+class PreparedVariable:
+    """A variable ready to be sent to the Admin API, with what ETL needs afterwards."""
+
+    catalog_path: str
+    payload: dict[str, Any]
+    df: pd.DataFrame
+    checksum_data: str
+    checksum_metadata: str
+    data_changed: bool
+    grapher_config: dict[str, Any] | None
+    payload_bytes: int
+
+
+def prepare_variable(
     table: Table,
     dataset_upsert_result: DatasetUpsertResult,
     catalog_path: str,
     checksums: dict,
-    db_origins: list[gm.Origin],
     dimensions: gm.Dimensions | None = None,
     verbose: bool = True,
-) -> None:
-    """This function is used to put one ready to go formatted Table (i.e.
-    in the format (year, entityId, value)) into mysql. The metadata
-    of the variable is used to fill the required fields.
-    """
+) -> PreparedVariable | None:
+    """Turn one single-column Table into an Admin API payload, or None if nothing changed.
 
+    Only the parts that need the values happen here: the checksums, the inferred `type`, the
+    timespan, and the distinct entities and years the published JSON lists. Everything else is
+    metadata, and Grapher does it.
+    """
     # We sometimes get a warning, but it's unclear where it is coming from
     # Passing a BlockManager to Table is deprecated and will raise in a future version. Use public APIs instead.
     warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -218,40 +229,115 @@ def upsert_table(
     if checksums.get("dataChecksum") == checksum_data and checksums.get("metadataChecksum") == checksum_metadata:
         if verbose:
             log.debug("upsert_table.skipped_no_changes", size=len(df), catalog_path=catalog_path)
-        return
+        return None
 
-    with Session(engine) as session:
-        # Upsert & upload metadata
-        if checksums.get("metadataChecksum") != checksum_metadata:
-            db_variable = upsert_metadata(
-                session=session,
-                df=df,
-                variable_meta=variable_meta,
-                column_name=column_name,
-                dataset_upsert_result=dataset_upsert_result,
-                db_origins=db_origins,
-                catalog_path=catalog_path,
-                dimensions=dimensions,
-                admin_api=admin_api,
-            )
-            upload_metadata(session, db_variable.id, df, db_variable.s3_metadata_path())
-        else:
-            db_variable = gm.Variable.from_catalog_path(session, catalog_path)
+    # grapher_config has side effects on inheriting charts, so it keeps going through its own
+    # Admin API call rather than riding along in the variable payload.
+    grapher_config = None
+    if variable_meta.presentation and variable_meta.presentation.grapher_config:
+        grapher_config = variable_meta.presentation.grapher_config
+        variable_meta.presentation.grapher_config = None
 
-        # Upload data
-        if checksums.get("dataChecksum") != checksum_data:
-            upload_data(df, db_variable.s3_data_path())
+    payload = _variable_payload(
+        variable_meta=variable_meta,
+        df=df,
+        column_name=column_name,
+        catalog_path=catalog_path,
+        dimensions=dimensions,
+    )
 
-        # Update checksums
-        db_variable.dataChecksum = checksum_data
-        db_variable.metadataChecksum = checksum_metadata
+    return PreparedVariable(
+        catalog_path=catalog_path,
+        payload=payload,
+        df=df,
+        checksum_data=checksum_data,
+        checksum_metadata=checksum_metadata,
+        data_changed=checksums.get("dataChecksum") != checksum_data,
+        grapher_config=grapher_config,
+        payload_bytes=len(json.dumps(payload, default=str)),
+    )
 
-        # Commit new checksums
-        session.add(db_variable)
-        session.commit()
 
-        if verbose:
-            log.info("upsert_table.uploaded_to_s3", size=len(df), indicator=CatalogPath.from_str(catalog_path).variable)
+def _variable_payload(
+    variable_meta: VariableMeta,
+    df: pd.DataFrame,
+    column_name: str,
+    catalog_path: str,
+    dimensions: gm.Dimensions | None,
+) -> dict[str, Any]:
+    """The wire format of one variable.
+
+    Entities go as ids only — Grapher resolves names and codes from its own `entities` table.
+    `descriptionKey` goes as a markdown string; Grapher never sees the legacy list form.
+    """
+    assert variable_meta.origins, f"Variable `{column_name}` must have at least one origin"
+
+    presentation = variable_meta.presentation
+    description_key = variable_meta.description_key
+    if description_key is not None:
+        assert isinstance(description_key, str), "descriptionKey should be a markdown string"
+
+    return {
+        "catalogPath": catalog_path,
+        "shortName": column_name,
+        "name": variable_meta.title,
+        "unit": variable_meta.unit,
+        "shortUnit": variable_meta.short_unit,
+        "description": variable_meta.description,
+        "descriptionShort": variable_meta.description_short,
+        "descriptionFromProducer": variable_meta.description_from_producer,
+        "descriptionKey": description_key,
+        "descriptionProcessing": variable_meta.description_processing,
+        "titlePublic": presentation.title_public if presentation else None,
+        "titleVariant": presentation.title_variant if presentation else None,
+        "attribution": presentation.attribution if presentation else None,
+        "attributionShort": presentation.attribution_short if presentation else None,
+        "coverage": "",
+        "timespan": _get_timespan(df, variable_meta),
+        "display": variable_meta.display or {},
+        "dimensions": dimensions,
+        "schemaVersion": variable_meta.schema_version,
+        "processingLevel": variable_meta.processing_level,
+        "license": variable_meta.license.to_dict() if variable_meta.license else None,
+        "licenses": [license.to_dict() for license in variable_meta.licenses] if variable_meta.licenses else None,
+        "sort": variable_meta.sort,
+        # Inferred from the values, which Grapher never receives.
+        "type": variable_meta.type or gm.Variable.infer_type(df["value"]),
+        "origins": [_origin_payload(origin) for origin in variable_meta.origins],
+        "topicTags": presentation.topic_tags if presentation and presentation.topic_tags else [],
+        "faqs": [{"gdocId": faq.gdoc_id, "fragmentId": faq.fragment_id} for faq in presentation.faqs]
+        if presentation and presentation.faqs
+        else [],
+        "entityIds": sorted(df["entityId"].unique().tolist()),
+        "years": sorted(df["year"].unique().tolist()),
+    }
+
+
+def _origin_payload(origin: catalog.Origin) -> dict[str, Any]:
+    return {
+        "title": origin.title,
+        "titleSnapshot": origin.title_snapshot,
+        "description": origin.description,
+        "descriptionSnapshot": origin.description_snapshot,
+        "producer": origin.producer,
+        "citationFull": origin.citation_full,
+        "attribution": origin.attribution,
+        "attributionShort": origin.attribution_short,
+        "versionProducer": origin.version_producer,
+        "urlMain": origin.url_main,
+        "urlDownload": origin.url_download,
+        "dateAccessed": str(origin.date_accessed) if origin.date_accessed else None,
+        "datePublished": origin.date_published,
+        "license": origin.license.to_dict() if origin.license else None,
+    }
+
+
+def _s3_data_path(variable_id: int) -> str:
+    return f"{config.BAKED_VARIABLES_PATH}/{variable_id}.data.json"
+
+
+def _s3_metadata_path(variable_id: int) -> str:
+    return f"{config.BAKED_VARIABLES_PATH}/{variable_id}.metadata.json"
 
 
 def upload_data(df: pd.DataFrame, s3_data_path: str) -> None:
@@ -261,86 +347,51 @@ def upload_data(df: pd.DataFrame, s3_data_path: str) -> None:
     upload_gzip_string(var_data_str, s3_data_path)
 
 
-def upload_metadata(session: Session, variable_id: int, df: pd.DataFrame, s3_metadata_path: str) -> None:
-    # get metadata from MySQL
-    var_metadata = dm.variable_metadata(session, variable_id, df)
-
-    # upload metadata to R2
-    var_metadata_str = json.dumps(var_metadata, default=str)
-    upload_gzip_string(var_metadata_str, s3_metadata_path)
-
-
-def upsert_origins(session: Session, table: Table) -> dict[catalog.Origin, gm.Origin]:
-    db_origins = {}
-    for col in table.columns:
-        for origin in table[col].m.origins:
-            if origin not in db_origins:
-                db_origins[origin] = gm.Origin.from_origin(origin).upsert(session)
-    session.commit()
-    return db_origins
-
-
-def upsert_metadata(
-    session: Session,
-    df: pd.DataFrame,
-    variable_meta: VariableMeta,
-    column_name: str,
-    dataset_upsert_result: DatasetUpsertResult,
-    db_origins: list[gm.Origin],
-    catalog_path: str,
-    dimensions: gm.Dimensions | None,
+def flush_variable_batch(
+    engine: Engine,
     admin_api: AdminAPI,
-) -> gm.Variable:
-    timespan = _get_timespan(df, variable_meta)
+    dataset_id: int,
+    batch: list[PreparedVariable],
+    verbose: bool = True,
+) -> None:
+    """Send a chunk of variables to the Admin API, then publish their files.
 
-    assert variable_meta.origins, f"Variable `{column_name}` must have at least one origin"
+    Order matters and mirrors what this did as direct SQL: MySQL first, then R2, and only then
+    the checksums — so a failure anywhere leaves the variable to be redone rather than recorded
+    as published.
+    """
+    if not batch:
+        return
 
-    # pop grapher_config from variable metadata, later we send it to Admin API
-    if variable_meta.presentation and variable_meta.presentation.grapher_config:
-        grapher_config = variable_meta.presentation.grapher_config
-        variable_meta.presentation.grapher_config = None
-    else:
-        grapher_config = None
+    response = admin_api.upsert_variables(dataset_id, [prepared.payload for prepared in batch])
+    upserted = response["variables"]
 
-    db_variable = gm.Variable.from_variable_metadata(
-        variable_meta,
-        short_name=column_name,
-        timespan=timespan,
-        dataset_id=dataset_upsert_result.dataset_id,
-        source_id=None,
-        catalog_path=catalog_path,
-        dimensions=dimensions,
-    ).upsert(session)
-    db_variable_id = db_variable.id
-    assert db_variable_id
+    checksums = {}
+    for prepared in batch:
+        result = upserted[prepared.catalog_path]
+        variable_id = result["id"]
 
-    # TODO: `type` is part of metadata, but not part of checksum!
-    if not db_variable.type:
-        db_variable.type = db_variable.infer_type(df["value"])
+        # Grapher assembled this from the rows it just wrote; we only publish it.
+        upload_gzip_string(
+            json.dumps(result["metadata"], default=str),
+            _s3_metadata_path(variable_id),
+        )
 
-    # update links, we need to do it after we commit deleted relationships above
-    db_variable.update_links(
-        session,
-        db_origins,
-        faqs=variable_meta.presentation.faqs if variable_meta.presentation else [],
-        tag_names=variable_meta.presentation.topic_tags if variable_meta.presentation else [],
-    )
-    session.add(db_variable)
+        if prepared.data_changed:
+            upload_data(prepared.df, _s3_data_path(variable_id))
 
-    # we need to commit changes because `dm.variable_metadata` pulls all data from MySQL
-    # and sends it to R2
-    # NOTE: we could optimize this by evading pulling from MySQL and instead constructing JSON files from objects
-    #   we have available
-    session.commit()
+        if prepared.grapher_config:
+            admin_api.put_grapher_config(variable_id, prepared.grapher_config)
 
-    # grapher_config needs to be sent to Admin API because it has side effects
-    if grapher_config:
-        admin_api.put_grapher_config(db_variable_id, grapher_config)
-    # grapher_config does not exist, but it's still in the database -> delete it
-    elif not grapher_config and db_variable.grapherConfigIdETL:
-        admin_api.delete_grapher_config(db_variable_id)
+        checksums[prepared.catalog_path] = {
+            "dataChecksum": prepared.checksum_data,
+            "metadataChecksum": prepared.checksum_metadata,
+        }
 
-    return db_variable
+    admin_api.set_variable_checksums(dataset_id, checksums)
+
+    if verbose:
+        log.info("upsert_table.uploaded_to_s3", size=len(batch))
 
 
 def calculate_checksum_metadata(variable_meta: VariableMeta, df: pd.DataFrame, dataset_metadata: dict[str, Any]) -> str:

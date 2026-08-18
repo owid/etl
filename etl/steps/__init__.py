@@ -1027,6 +1027,8 @@ class GrapherStep(Step):
             futures = []
             verbose = True
             i = 0
+            batch: list[db.PreparedVariable] = []
+            batch_bytes = 0
 
             # Get checksums for all variables in a dataset
             preloaded_checksums = db.load_dataset_variables(dataset_upsert_results.dataset_id, engine)
@@ -1070,10 +1072,6 @@ class GrapherStep(Step):
                 # Validation
                 db.check_table(table)
 
-                # Upsert origins
-                with Session(engine, expire_on_commit=False) as session:
-                    db_origins = db.upsert_origins(session, table)
-
                 for t in gh._yield_wide_table(table, na_action="drop"):
                     i += 1
                     assert len(t.columns) == 1
@@ -1086,20 +1084,46 @@ class GrapherStep(Step):
                         log.info("showing only the first 20 logs")
 
                     # generate table with entity_id, year and value for every column
-                    futures.append(
-                        thread_pool.submit(
-                            db.upsert_table,
-                            engine,
-                            admin_api,
-                            t,
-                            dataset_upsert_results,
-                            catalog_path=catalog_path,
-                            dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
-                            checksums=preloaded_checksums.get(catalog_path, {}),
-                            db_origins=[db_origins[origin] for origin in t.iloc[:, 0].origins],
-                            verbose=verbose,
-                        )
+                    prepared = db.prepare_variable(
+                        t,
+                        dataset_upsert_results,
+                        catalog_path=catalog_path,
+                        dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
+                        checksums=preloaded_checksums.get(catalog_path, {}),
+                        verbose=verbose,
                     )
+                    if prepared is None:
+                        continue
+
+                    # Chunk by payload size rather than variable count: a variable's metadata
+                    # can be a few hundred bytes or tens of kilobytes depending on how much
+                    # description it carries.
+                    batch.append(prepared)
+                    batch_bytes += prepared.payload_bytes
+                    if batch_bytes >= config.GRAPHER_UPSERT_BATCH_BYTES:
+                        futures.append(
+                            thread_pool.submit(
+                                db.flush_variable_batch,
+                                engine,
+                                admin_api,
+                                dataset_upsert_results.dataset_id,
+                                batch,
+                                verbose,
+                            )
+                        )
+                        batch, batch_bytes = [], 0
+
+            if batch:
+                futures.append(
+                    thread_pool.submit(
+                        db.flush_variable_batch,
+                        engine,
+                        admin_api,
+                        dataset_upsert_results.dataset_id,
+                        batch,
+                        verbose,
+                    )
+                )
 
             # wait for all tables to be inserted
             [future.result() for future in as_completed(futures)]

@@ -58,14 +58,13 @@ def upsert_dataset(dataset: OwlDataset, *, workers: int | None = None) -> int:
         futures = []
         verbose = True
         count = 0
+        batch: list[db.PreparedVariable] = []
+        batch_bytes = 0
 
         for table in tqdm(ds):
             assert not table.empty, f"table {table.metadata.short_name} is empty"
             table = gh._adapt_table_for_grapher(table, engine)
             db.check_table(table)
-
-            with Session(engine, expire_on_commit=False) as session:
-                db_origins = db.upsert_origins(session, table)
 
             for one_variable_table in gh._yield_wide_table(table, na_action="drop"):
                 count += 1
@@ -77,20 +76,43 @@ def upsert_dataset(dataset: OwlDataset, *, workers: int | None = None) -> int:
                 if count > 20 and verbose:
                     verbose = False
 
-                futures.append(
-                    thread_pool.submit(
-                        db.upsert_table,
-                        engine,
-                        admin_api,
-                        one_variable_table,
-                        dataset_upsert_result,
-                        catalog_path=catalog_path,
-                        dimensions=(one_variable_table.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
-                        checksums=preloaded_checksums.get(catalog_path, {}),
-                        db_origins=[db_origins[origin] for origin in one_variable_table.iloc[:, 0].origins],
-                        verbose=verbose,
-                    )
+                prepared = db.prepare_variable(
+                    one_variable_table,
+                    dataset_upsert_result,
+                    catalog_path=catalog_path,
+                    dimensions=(one_variable_table.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
+                    checksums=preloaded_checksums.get(catalog_path, {}),
+                    verbose=verbose,
                 )
+                if prepared is None:
+                    continue
+
+                batch.append(prepared)
+                batch_bytes += prepared.payload_bytes
+                if batch_bytes >= config.GRAPHER_UPSERT_BATCH_BYTES:
+                    futures.append(
+                        thread_pool.submit(
+                            db.flush_variable_batch,
+                            engine,
+                            admin_api,
+                            dataset_upsert_result.dataset_id,
+                            batch,
+                            verbose,
+                        )
+                    )
+                    batch, batch_bytes = [], 0
+
+        if batch:
+            futures.append(
+                thread_pool.submit(
+                    db.flush_variable_batch,
+                    engine,
+                    admin_api,
+                    dataset_upsert_result.dataset_id,
+                    batch,
+                    verbose,
+                )
+            )
 
         [future.result() for future in as_completed(futures)]
 

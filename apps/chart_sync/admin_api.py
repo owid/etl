@@ -383,6 +383,57 @@ class AdminAPI:
             raise AdminAPIError({"error": js.get("error"), "narrative_chart_id": narrative_chart_id, "config": config})
         return js
 
+    def upsert_variables(self, dataset_id: int, variables: list[dict]) -> dict:
+        """Upsert a chunk of a dataset's variables and get their published metadata back.
+
+        Grapher owns the metadata now: it writes the variable rows, the origins and the
+        tag/FAQ links, then assembles `<id>.metadata.json` from what it just wrote instead of
+        reading it back. ETL still owns the values — it infers `type` from them, sends the
+        distinct entity ids and years the JSON needs, and uploads both R2 files itself.
+
+        Keyed on `catalogPath`, so re-sending a chunk after a lost response is safe.
+
+        Args:
+            dataset_id: Grapher ID of the dataset
+            variables: One entry per variable; see `_variable_upsert_payload`
+
+        Returns:
+            {"variables": {catalog_path: {"id": int, "metadata": {...}}}}
+        """
+        # Retry in case we're restarting Admin on staging server.
+        resp = requests_with_retry().post(
+            f"{self.owid_env.admin_api}/datasets/{dataset_id}/variables",
+            headers=self._headers(),
+            json={"variables": variables},
+            timeout=TIMEOUT,
+        )
+        js = self._json_from_response(resp)
+        if not js.get("success", True):
+            raise AdminAPIError({"error": js.get("error"), "dataset_id": dataset_id})
+        return js
+
+    def set_variable_checksums(self, dataset_id: int, checksums: dict[str, dict[str, str]]) -> dict:
+        """Record the data and metadata checksums for variables ETL has finished publishing.
+
+        Separate from `upsert_variables` on purpose: a checksum means MySQL and both R2 files
+        agree, which isn't true until the uploads have gone through.
+
+        Args:
+            dataset_id: Grapher ID of the dataset
+            checksums: {catalog_path: {"dataChecksum": ..., "metadataChecksum": ...}}
+        """
+        # Retry in case we're restarting Admin on staging server.
+        resp = requests_with_retry().post(
+            f"{self.owid_env.admin_api}/datasets/{dataset_id}/variables/checksums",
+            headers=self._headers(),
+            json={"checksums": checksums},
+            timeout=TIMEOUT,
+        )
+        js = self._json_from_response(resp)
+        if not js.get("success", True):
+            raise AdminAPIError({"error": js.get("error"), "dataset_id": dataset_id})
+        return js
+
     def cleanup_ghost_variables(self, dataset_id: int, keep_variable_ids: list[int]) -> dict:
         """Delete a dataset's variables that weren't upserted by the grapher step.
 

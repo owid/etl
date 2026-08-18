@@ -1,9 +1,10 @@
+import json
 from types import SimpleNamespace
 
 import pandas as pd
 import pytest
 import requests
-from owid.catalog import Origin, VariableMeta, VariablePresentationMeta
+from owid.catalog import Origin, Table, VariableMeta, VariablePresentationMeta
 
 import etl.grapher.to_db as db
 
@@ -196,3 +197,78 @@ def test_cleanup_ghost_variables_does_not_swallow_other_admin_api_errors():
 
     with pytest.raises(requests.exceptions.HTTPError):
         db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
+
+
+def _variable_table() -> Table:
+    tb = Table(
+        {
+            "entityId": [1, 1, 3],
+            "entityCode": ["FRA", "FRA", "DEU"],
+            "entityName": ["France", "France", "Germany"],
+            "year": [2000, 2001, 2000],
+            "gdp": [1.0, 2.0, 3.0],
+        }
+    )
+    tb["gdp"].metadata = VariableMeta(  # ty: ignore[unresolved-attribute]
+        title="GDP",
+        unit="US$",
+        description_key="- A point\n- Another point",
+        origins=[Origin(title="Title", producer="Producer", date_accessed="2026-01-01")],  # ty: ignore[invalid-argument-type]
+        presentation=VariablePresentationMeta(title_public="Title public", topic_tags=["Energy"]),
+    )
+    return tb.set_index(["entityId", "entityCode", "entityName", "year"])
+
+
+def test_variable_payload_sends_entity_ids_not_names():
+    """Grapher resolves entity names and codes itself, so the payload carries ids only."""
+    prepared = db.prepare_variable(
+        _variable_table(),
+        db.DatasetUpsertResult(1, _get_dataset_metadata()),
+        catalog_path="grapher/ns/2026-01-01/ds/tb#gdp",
+        checksums={},
+    )
+    assert prepared is not None
+
+    assert prepared.payload["entityIds"] == [1, 3]
+    assert prepared.payload["years"] == [2000, 2001]
+    assert "entityName" not in json.dumps(prepared.payload)
+
+
+def test_variable_payload_carries_the_inferred_type():
+    """Grapher never sees the values, so it can't work the type out for itself."""
+    prepared = db.prepare_variable(
+        _variable_table(),
+        db.DatasetUpsertResult(1, _get_dataset_metadata()),
+        catalog_path="grapher/ns/2026-01-01/ds/tb#gdp",
+        checksums={},
+    )
+    assert prepared is not None
+    assert prepared.payload["type"]
+
+
+def test_variable_payload_sends_description_key_as_a_string():
+    prepared = db.prepare_variable(
+        _variable_table(),
+        db.DatasetUpsertResult(1, _get_dataset_metadata()),
+        catalog_path="grapher/ns/2026-01-01/ds/tb#gdp",
+        checksums={},
+    )
+    assert prepared is not None
+    assert prepared.payload["descriptionKey"] == "- A point\n- Another point"
+
+
+def test_prepare_variable_skips_when_both_checksums_match():
+    args = (
+        _variable_table(),
+        db.DatasetUpsertResult(1, _get_dataset_metadata()),
+    )
+    kwargs = {"catalog_path": "grapher/ns/2026-01-01/ds/tb#gdp"}
+    first = db.prepare_variable(*args, checksums={}, **kwargs)
+    assert first is not None
+
+    again = db.prepare_variable(
+        *args,
+        checksums={"dataChecksum": first.checksum_data, "metadataChecksum": first.checksum_metadata},
+        **kwargs,
+    )
+    assert again is None

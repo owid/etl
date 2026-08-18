@@ -244,6 +244,11 @@ DIRTY_STEPS_WORKERS = int(env.get("DIRTY_STEPS_WORKERS", 5))
 # --workers is higher than 1, this will be divided among them
 GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 40))
 
+# Variables are sent to the Grapher admin API in chunks of roughly this many bytes of JSON.
+# Sized by payload rather than variable count because metadata size varies by an order of
+# magnitude between a bare indicator and one with a long description_key.
+GRAPHER_UPSERT_BATCH_BYTES = int(env.get("GRAPHER_UPSERT_BATCH_BYTES", 5_000_000))
+
 # if a step in ETL fails, keep running the rest of the steps and raise an exception at the end
 # (steps with failing step as dependency won't be run)
 # NOTE: This is potentially useful for nightly builds and for more efficient retries, but if we end up
