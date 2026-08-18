@@ -94,8 +94,12 @@ def _write_metadata(variable_id: int, metadata: dict[str, Any], etag: str) -> No
 def _candidate_ids(cutoff: str | None, limit: int | None) -> list[int]:
     """Variable ids to inspect, newest dataset first so a partial run covers the visible ones.
 
-    The cutoff is only a way to skip variables whose file is already known to be fresh — the
-    file itself is always what decides whether a rewrite happens.
+    The cutoff only skips work; the file's own content always decides whether it is rewritten.
+    It is a poor filter and is off by default: `datasets.dataEditedAt` says when the dataset was
+    touched, not when a given variable's file was written, and `upsert_table` skips variables
+    whose checksums did not change. A date-only cutoff is worse still — the first production run
+    used `< '2026-07-21'` and missed 211 files whose datasets were edited that same morning,
+    hours before the migration landed at 13:06 UTC.
     """
     where = "v.descriptionKey IS NOT NULL AND v.descriptionKey != ''"
     if cutoff:
@@ -155,8 +159,10 @@ def _rewrite_one(variable_id: int, execute: bool) -> str:
 @click.option(
     "--cutoff",
     default=None,
-    help="Only inspect variables whose dataset was last edited before this date (e.g. 2026-07-21). "
-    "Skips files already known to be fresh; omit to inspect every variable.",
+    help="Only inspect variables whose dataset was last edited before this timestamp (e.g. "
+    "'2026-07-21 13:06:56'). A speed optimisation that can MISS files: the dataset's edit time "
+    "is only a proxy for the file's age, and a dataset re-run does not rewrite variables whose "
+    "checksums are unchanged. Prefer omitting it — the file's own content is the sound test.",
 )
 @click.option("--limit", type=int, default=None, help="Only inspect this many variables.")
 @click.option("--workers", type=int, default=16, show_default=True, help="Concurrent requests.")
