@@ -7,7 +7,7 @@ added (Maddison). Traditional biomass (Smil, World only) is kept separate from T
 """
 
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset, Table, Variable
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
 from etl.data_helpers.geo import add_gdp_to_table
@@ -483,12 +483,13 @@ def add_per_gdp(tb: Table, ds_gdp: Dataset) -> Table:
     return tb
 
 
-def sanity_check_outputs(tb: Table, eia_years: tuple[int, int]) -> None:
+def sanity_check_outputs(tb: Table, eia_years: Variable) -> None:
     """Check the output, comparing against the Statistical Review's own totals where possible.
 
     The reconciliations are restricted to the years EIA covers: outside them the countries the
-    Statistical Review omits have no data, so the sums are expected to fall short.
+    Statistical Review omits have no data, so the sums fall short by up to 40%.
     """
+    first_year, last_year = int(eia_years.min()), int(eia_years.max())
     # No fully-NaN columns.
     assert tb.columns[tb.isna().all()].empty, f"Fully-NaN columns: {list(tb.columns[tb.isna().all()])}"
     # Shares should be within [0, 100] (allowing a small tolerance).
@@ -521,7 +522,7 @@ def sanity_check_outputs(tb: Table, eia_years: tuple[int, int]) -> None:
     countries_sum = tb[~not_a_country].groupby("year", observed=True)["total_energy_supply_twh"].sum(min_count=1)
     world = tb[tb["country"] == "World"].set_index("year")["total_energy_supply_twh"]
     deviation = (100 * (countries_sum - world) / world).dropna()
-    deviation = deviation[(deviation.index >= eia_years[0]) & (deviation.index <= eia_years[1])]
+    deviation = deviation[(deviation.index >= first_year) & (deviation.index <= last_year)]
     off = deviation[deviation.abs() > MAX_WORLD_DEVIATION_PCT]
     assert len(off) == 0, (
         "The combined country-level data does not add up to the Statistical Review's World total: "
@@ -536,7 +537,7 @@ def sanity_check_outputs(tb: Table, eia_years: tuple[int, int]) -> None:
         )
         theirs = tb[tb["country"] == region].set_index("year")["total_energy_supply_twh"]
         deviation = (100 * (ours - theirs) / theirs).dropna()
-        deviation = deviation[(deviation.index >= eia_years[0]) & (deviation.index <= eia_years[1])]
+        deviation = deviation[(deviation.index >= first_year) & (deviation.index <= last_year)]
         off = deviation[deviation.abs() > MAX_REGION_DEVIATION_PCT]
         assert len(off) == 0, (
             f"The combined countries of {region} do not add up to the total the Statistical Review reports "
@@ -570,8 +571,6 @@ def run() -> None:
     tb = get_statistical_review_data(tb_review=tb_review)
 
     # Extend the total and each source to the countries the Statistical Review does not report.
-    eia_informed = tb_eia.loc[tb_eia["total_energy_consumption"].notna(), "year"]
-    eia_years = (int(eia_informed.min()), int(eia_informed.max()))
     tb = combine_with_eia(tb=tb, tb_eia=tb_eia)
 
     # Build the OWID region aggregates from the combined country-level data.
@@ -602,7 +601,7 @@ def run() -> None:
     tb = tb[~tb["country"].isin(OUTLIERS)].reset_index(drop=True)
 
     # Sanity checks.
-    sanity_check_outputs(tb=tb, eia_years=eia_years)
+    sanity_check_outputs(tb=tb, eia_years=tb_eia.loc[tb_eia["total_energy_consumption"].notna(), "year"])
 
     # Derived indicators must not inherit key points from a single input (e.g. EI's oil-consumption
     # notes on the fossil aggregate, or Maddison boilerplate on energy per GDP). Key points come only
