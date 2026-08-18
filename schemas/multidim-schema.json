@@ -94,9 +94,11 @@
                 [
                     "11",
                     "0.11",
-                    "latest",
+                    "latest"
+                ],
+                [
                     "grapher-schema.011.json",
-                    "http://invalid-url.com/schema.json"
+                    "https://files.ourworldindata.org/schemas/grapher-schema.latest.json"
                 ]
             ]
         },
