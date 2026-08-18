@@ -52,7 +52,7 @@ tables:
           title: Annual area burnt per wildfire
           unit: hectares
           short_unit: ha
-          description_short: The average area burnt per [wildfire](#dod:wildfires), in hectares. {definitions.desc_update}
+          description_short: Average area burnt per [wildfire](#dod:wildfires), in hectares. {definitions.desc_update}
           description_processing: The area burnt per wildfire is calculated by dividing the area burnt by wildfires by the number of fires.
           description_key: *desc_wildfires
 

@@ -20,7 +20,7 @@ definitions:
     - config:
         hasMapTab: true
         tab: map
-        chartTypes: ["LineChart"]
+        chartTypes: ["LineChart", "DiscreteBar"]
         yAxis:
           min: 0
   definition_migrant_un: The UN defines an international migrant as someone who has been living for one year or longer in a country other than their country of birth.

@@ -111,7 +111,7 @@ views:
             name: "Poorest 50%"
     config:
       title: Distribution of income across richer and poorer groups
-      subtitle: The share of income received by different income groups.
+      subtitle: Share of income received by different income groups.
       note: Depending on the country and year, the data relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
       hasMapTab: false
       chartTypes: ["StackedArea", "StackedDiscreteBar"]
@@ -121,4 +121,4 @@ views:
       selectedFacetStrategy: entity
       baseColorScheme: OwidCategoricalE
     metadata:
-      description_short: "The share of income received by different income groups: the richest 10%, the poorest 50% and the 40% in the middle."
+      description_short: "Share of income received by different income groups: the richest 10%, the poorest 50% and the 40% in the middle."

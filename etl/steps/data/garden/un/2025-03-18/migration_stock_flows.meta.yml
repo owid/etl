@@ -12,7 +12,7 @@ definitions:
       Men who moved from another country to << country_select >>
       <%- endif %>
     description_short: |-
-      The number of {definitions.people_label} who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year, not the annual flow of immigrants.
+      Number of {definitions.people_label} who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year, not the annual flow of immigrants.
   emigrants:
     title: |-
       <% if gender == "all" %>
@@ -23,7 +23,7 @@ definitions:
       Men who moved from << country_select >> to another country
       <%- endif %>
     description_short: |-
-      The number of {definitions.people_label} who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year, not the annual flow of emigrants.
+      Number of {definitions.people_label} who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year, not the annual flow of emigrants.
   common:
     display:
       numDecimalPlaces: 0

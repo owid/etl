@@ -1,6 +1,11 @@
 ---
 name: create-dataset
-description: Create a brand-new OWID dataset in ETL from a data file the user provides — a local CSV/Excel, a downloaded file, or a web link to data (snapshot → meadow → garden → grapher → PR → staging server). Use when someone has data they want in ETL so they can build charts. Designed for non-technical "Cloud co-work" users: infer aggressively, build a working dataset first, then ask the person to review and correct.
+description: >-
+  Create a brand-new OWID dataset in ETL from a data file the user provides — a local
+  CSV/Excel, a downloaded file, or a web link to data (snapshot → meadow → garden →
+  grapher → PR → staging server). Use when someone has data they want in ETL so they can
+  build charts. Designed for non-technical "Cloud co-work" users: infer aggressively,
+  build a working dataset first, then ask the person to review and correct.
 metadata:
   internal: true
 ---

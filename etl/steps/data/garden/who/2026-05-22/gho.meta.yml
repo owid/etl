@@ -52,7 +52,7 @@ tables:
       population_without_primary_reliance_on_clean_fuels_and_technologies_for_cooking__in_millions:
         title: Population without primary reliance on clean fuels and technologies for cooking (in millions)
         description_short: |-
-          The population who are not able to rely on clean fuels and technologies as the primary source of domestic energy for cooking.
+          Population who are not able to rely on clean fuels and technologies as the primary source of domestic energy for cooking.
         description_from_producer: |-
           #### Rationale
           The use of solid fuels and kerosene in households is associated with increased mortality from acute lower respiratory, chronic obstructive pulmonary disease, stroke, ischaemic heart disease, and lung cancer.
@@ -97,7 +97,7 @@ tables:
         unit: '% of children under 5'
         short_unit: '%'
         description_short: |-
-          The share of children younger than five years old whose growth is stunted.
+          Share of children younger than five years old whose growth is stunted.
         description_key:
           - Stunting is when a child is significantly shorter than the average for their age.
           - Stunted growth is a consequence of poor nutrition and/or repeated infection.
@@ -119,7 +119,7 @@ tables:
           grapher_config:
             title: 'Malnutrition: share of children who are stunted'
             subtitle: >-
-              The share of children younger than five years old that are defined as stunted.
+              Share of children younger than five years old that are defined as stunted.
               [Stunting](#dod:stunting) is when a child is significantly shorter than the
               average for their age. It is a consequence of poor nutrition and/or repeated
               infection.

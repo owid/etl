@@ -15,13 +15,14 @@ default_dimensions:
   metric: refugees
   direction: asylum
   unit: total
+  age: all_ages
 
 definitions:
   common_views:
     - config:
         hasMapTab: true
         tab: map
-        chartTypes: ["LineChart"]
+        chartTypes: ["LineChart", "DiscreteBar"]
   # Description bullets for refugees/ asylum-seekers
   description_key_refugee: A refugee is a person in need of international protection. They had to flee their home country because of serious threats against which the authorities of their home country cannot or will not protect them.
   description_key_asylum: An asylum-seeker is a person who has fled their home country because of serious threats against which the authorities of their home country cannot or will not protect them. A person is considered an asylum-seeker if they have applied for asylum in another country and are waiting for a decision on their application.
@@ -30,6 +31,10 @@ definitions:
   description_returned_statistics: The UNHCR only includes refugees who returned during this calendar year in their statistics, although in practice, operations may assist returnees for longer periods.
   description_stateless: Stateless persons are people who are not considered a citizen of any country. A person can be stateless for many reasons, including (among others) unknown parentage, discrimination or complex nationality laws. You can read more about this on the [UNHCR's website](https://www.unhcr.org/about-unhcr/who-we-protect/stateless-people).
   description_stateless_problems: Stateless persons often struggle to obtain documentation and proof of their legal identities. Because of this, they face difficulties accessing basic rights and services, such as education, healthcare, employment, and freedom of movement. They may also be at risk of detention or deportation.
+  description_key_child_refugee: This only includes refugees who are children, under the age of 18.
+  description_unicef_source: The data on child refugees (under 18) is published by UNICEF, and is based on UNHCR's Refugee Statistics data.
+
+
   # Footnotes
   footnote_refugees: This data includes all refugees, not just those who fled that year.
   footnote_asylum: This data includes all asylum-seekers, not just those who fled or applied for asylum that year.
@@ -72,6 +77,15 @@ dimensions:
         name: Per capita
     presentation:
       type: radio
+  - slug: age
+    name: Age
+    choices:
+      - slug: all_ages
+        name: All ages
+      - slug: under_18
+        name: Under 18
+    presentation:
+      type: radio
 
 views:
   # Refugees
@@ -79,6 +93,7 @@ views:
       metric: refugees
       direction: origin
       unit: total
+      age: all_ages
     indicators:
       y:
         - catalogPath: refugee_data_origin#refugees
@@ -97,9 +112,12 @@ views:
       metric: refugees
       direction: origin
       unit: per_capita
+      age: all_ages
     indicators:
       y:
         - catalogPath: refugee_data_origin#refugees_per_1000
+          display:
+            numDecimalPlaces: 1
     config:
       note: "{definitions.footnote_refugees}"
       map:
@@ -116,6 +134,7 @@ views:
       metric: refugees
       direction: asylum
       unit: total
+      age: all_ages
     indicators:
       y:
         - catalogPath: refugee_data_asylum#refugees
@@ -134,9 +153,12 @@ views:
       metric: refugees
       direction: asylum
       unit: per_capita
+      age: all_ages
     indicators:
       y:
         - catalogPath: refugee_data_asylum#refugees_per_1000
+          display:
+            numDecimalPlaces: 1
     config:
       note: "{definitions.footnote_refugees_asylum}"
       map:
@@ -154,6 +176,7 @@ views:
       metric: asylum_seekers
       direction: origin
       unit: total
+      age: all_ages
     indicators:
       y:
         - catalogPath: refugee_data_origin#asylum_seekers
@@ -173,9 +196,12 @@ views:
       metric: asylum_seekers
       direction: origin
       unit: per_capita
+      age: all_ages
     indicators:
       y:
         - catalogPath: refugee_data_origin#asylum_seekers_per_100k
+          display:
+            numDecimalPlaces: 1
     config:
       note: "{definitions.footnote_asylum}"
       map:
@@ -192,6 +218,7 @@ views:
       metric: asylum_seekers
       direction: asylum
       unit: total
+      age: all_ages
     indicators:
       y:
         - catalogPath: refugee_data_asylum#asylum_seekers
@@ -210,9 +237,12 @@ views:
       metric: asylum_seekers
       direction: asylum
       unit: per_capita
+      age: all_ages
     indicators:
       y:
         - catalogPath: refugee_data_asylum#asylum_seekers_per_100k
+          display:
+            numDecimalPlaces: 1
     config:
       note: "{definitions.footnote_asylum_asylum}"
       map:
@@ -230,6 +260,7 @@ views:
       metric: returned_refugees
       direction: origin
       unit: total
+      age: all_ages
     indicators:
       y:
         - catalogPath: refugee_data_origin#returned_refugees
@@ -249,6 +280,7 @@ views:
       metric: returned_refugees
       direction: asylum
       unit: total
+      age: all_ages
     indicators:
       y:
         - catalogPath: refugee_data_asylum#returned_refugees
@@ -269,6 +301,7 @@ views:
       metric: stateless
       direction: asylum
       unit: total
+      age: all_ages
     indicators:
       y:
         - catalogPath: refugee_data_asylum#stateless
@@ -287,9 +320,12 @@ views:
       metric: stateless
       direction: asylum
       unit: per_capita
+      age: all_ages
     indicators:
       y:
         - catalogPath: refugee_data_asylum#stateless_per_100k
+          display:
+            numDecimalPlaces: 1
     config:
       map:
         colorScale:
@@ -300,4 +336,93 @@ views:
       description_key:
         - "{definitions.description_stateless}"
         - "{definitions.description_stateless_problems}"
+
+  # Child refugees (under 18)
+  - dimensions:
+      metric: refugees
+      direction: origin
+      unit: total
+      age: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#refugees_under_18_origin
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          binningStrategy: manual
+          customNumericValues: [0, 10, 100, 1000, 10000, 100000, 1000000, 0]
+    metadata:
+      description_key:
+        - "{definitions.description_key_refugee}"
+        - "{definitions.description_key_child_refugee}"
+        - "{definitions.description_diff_refugee_asylum}"
+        - "{definitions.description_unicef_source}"
+
+  - dimensions:
+      metric: refugees
+      direction: origin
+      unit: per_capita
+      age: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#refugees_under_18_origin_per_1000
+          display:
+            numDecimalPlaces: 1
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlOrRd
+          binningStrategy: manual
+          customNumericValues: [0, 0.1, 0.3, 1, 3, 10, 30, 100, 0]
+    metadata:
+      description_key:
+        - "{definitions.description_key_refugee}"
+        - "{definitions.description_key_child_refugee}"
+        - "{definitions.description_diff_refugee_asylum}"
+        - "{definitions.description_unicef_source}"
+
+  - dimensions:
+      metric: refugees
+      direction: asylum
+      unit: total
+      age: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#refugees_under_18_asylum
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          binningStrategy: manual
+          customNumericValues: [0, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 0]
+    metadata:
+      description_key:
+        - "{definitions.description_key_refugee}"
+        - "{definitions.description_key_child_refugee}"
+        - "{definitions.description_diff_refugee_asylum}"
+        - "{definitions.description_unicef_source}"
+
+  - dimensions:
+      metric: refugees
+      direction: asylum
+      unit: per_capita
+      age: under_18
+    indicators:
+      y:
+        - catalogPath: child_migration#refugees_under_18_asylum_per_1000
+          display:
+            numDecimalPlaces: 1
+    config:
+      map:
+        colorScale:
+          baseColorScheme: YlGnBu
+          binningStrategy: manual
+          customNumericValues: [0, 0.2, 0.5, 1, 2, 5, 10, 20, 0]
+    metadata:
+      description_key:
+        - "{definitions.description_key_refugee}"
+        - "{definitions.description_key_child_refugee}"
+        - "{definitions.description_diff_refugee_asylum}"
+        - "{definitions.description_unicef_source}"
 

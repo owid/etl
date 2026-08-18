@@ -588,7 +588,7 @@ tables:
           tolerance: 10
       official_entrance_age_to_pre_primary_education__years:
         title: Official entrance age to pre-primary education
-        description_short: The official entry age at which children are expected to start [pre-primary education](#dod:pre-primary-education) according to national legislation or policies.
+        description_short: Official entry age at which children are expected to start [pre-primary education](#dod:pre-primary-education) according to national legislation or policies.
         unit: "years"
         description_key:
           - Children begin their education journeys at different ages around the world — this indicator shows the age at which they are officially expected to start pre-primary education in a given country.
@@ -604,7 +604,7 @@ tables:
           tolerance: 10
       theoretical_duration_of_pre_primary_education__years:
         title: Theoretical duration of pre-primary education
-        description_short: The average number of years that a child is expected to spend in [pre-primary](#dod:pre-primary-education) education, defined by country's official educational regulations or laws.
+        description_short: Average number of years that a child is expected to spend in [pre-primary](#dod:pre-primary-education) education, defined by country's official educational regulations or laws.
         unit: "years"
         description_key:
           - The theoretical duration of pre-primary education refers to the number of years that children are expected to attend pre-primary education, as defined by national laws or regulations.
@@ -747,7 +747,7 @@ tables:
 
       total_net_enrolment_rate__primary__both_sexes__pct:
         title: Net enrollment rate in primary education
-        description_short: The share of children of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
+        description_short: Share of children of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
@@ -761,7 +761,7 @@ tables:
           tolerance: 10
       total_net_enrolment_rate__primary__male__pct:
         title: Net enrollment rate in primary education among boys
-        description_short: The share of boys of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
+        description_short: Share of boys of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
@@ -775,7 +775,7 @@ tables:
           tolerance: 10
       total_net_enrolment_rate__primary__female__pct:
         title: Net enrollment rate in primary education among girls
-        description_short: The share of girls of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
+        description_short: Share of girls of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
@@ -789,7 +789,7 @@ tables:
           tolerance: 10
       total_net_enrolment_rate__lower_secondary__both_sexes__pct:
         title: Net enrollment rate in lower secondary education
-        description_short: The share of children of [lower secondary](#dod:lower-secondary-education) school age (typically 12–14 years) who are enrolled in lower secondary education.
+        description_short: Share of children of [lower secondary](#dod:lower-secondary-education) school age (typically 12–14 years) who are enrolled in lower secondary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
@@ -803,7 +803,7 @@ tables:
           tolerance: 10
       total_net_enrolment_rate__lower_secondary__male__pct:
         title: Net enrollment rate in lower secondary education among boys
-        description_short: The share of boys of [lower secondary](#dod:lower-secondary-education) school age (typically 12–14 years) who are enrolled in lower secondary education.
+        description_short: Share of boys of [lower secondary](#dod:lower-secondary-education) school age (typically 12–14 years) who are enrolled in lower secondary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
@@ -817,7 +817,7 @@ tables:
           tolerance: 10
       total_net_enrolment_rate__lower_secondary__female__pct:
         title: Net enrollment rate in lower secondary education among girls
-        description_short: The share of girls of [lower secondary](#dod:lower-secondary-education) school age (typically 12–14 years) who are enrolled in lower secondary education.
+        description_short: Share of girls of [lower secondary](#dod:lower-secondary-education) school age (typically 12–14 years) who are enrolled in lower secondary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
@@ -831,7 +831,7 @@ tables:
           tolerance: 10
       total_net_enrolment_rate__upper_secondary__both_sexes__pct:
         title: Net enrollment rate in upper secondary education
-        description_short: The share of children of [upper secondary](#dod:upper-secondary-education) school age (typically 15–17 years) who are enrolled in upper secondary education.
+        description_short: Share of children of [upper secondary](#dod:upper-secondary-education) school age (typically 15–17 years) who are enrolled in upper secondary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
@@ -845,7 +845,7 @@ tables:
           tolerance: 10
       total_net_enrolment_rate__upper_secondary__male__pct:
         title: Net enrollment rate in upper secondary education among boys
-        description_short: The share of boys of [upper secondary](#dod:upper-secondary-education) school age (typically 15–17 years) who are enrolled in upper secondary education.
+        description_short: Share of boys of [upper secondary](#dod:upper-secondary-education) school age (typically 15–17 years) who are enrolled in upper secondary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
@@ -859,7 +859,7 @@ tables:
           tolerance: 10
       total_net_enrolment_rate__upper_secondary__female__pct:
         title: Net enrollment rate in upper secondary education among girls
-        description_short: The share of girls of [upper secondary](#dod:upper-secondary-education) school age (typically 15–17 years) who are enrolled in upper secondary education.
+        description_short: Share of girls of [upper secondary](#dod:upper-secondary-education) school age (typically 15–17 years) who are enrolled in upper secondary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
@@ -1394,7 +1394,7 @@ tables:
 
       net_enrolment_rate__primary__both_sexes__pct__combined_historical:
         title: Net enrollment rate in primary education (combined historical)
-        description_short: The share of children of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
+        description_short: Share of children of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr_historical
@@ -1409,7 +1409,7 @@ tables:
           tolerance: 10
       net_enrolment_rate__primary__female__pct__combined_historical:
         title: Net enrollment rate in primary education among girls (combined historical)
-        description_short: The share of girls of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
+        description_short: Share of girls of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr_historical
@@ -1424,7 +1424,7 @@ tables:
           tolerance: 10
       net_enrolment_rate__primary__male__pct__combined_historical:
         title: Net enrollment rate in primary education among boys (combined historical)
-        description_short: The share of boys of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
+        description_short: Share of boys of [primary](#dod:primary-education) school age (typically 6–11 years) who are enrolled in primary education.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr_historical
