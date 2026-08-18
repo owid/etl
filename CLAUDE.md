@@ -14,7 +14,7 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **Always run `make check` before committing** (format, lint, typecheck on changed files). Run the test suite with `make unittest` (or `make test` for checks + tests + version-tracker); `lib/*` packages have their own venv and Makefile — run it from inside that directory.
 - If not told otherwise, save outputs to `ai/` directory.
 - **Notebooks**: Always create AND execute immediately using `uv run jupyter nbconvert --to notebook --execute --inplace <path>`
-- **Skills**: When creating new skills in `.claude/skills/`, always include `metadata: { internal: true }` in the SKILL.md frontmatter unless the user explicitly asks for the skill to be public. This prevents external skill indexes from crawling and listing our internal skills.
+- **Skills**: When creating new skills in `.claude/skills/`, always include `metadata: { internal: true }` in the SKILL.md frontmatter unless the user explicitly asks for the skill to be public. This prevents external skill indexes from crawling and listing our internal skills. Write the `description` as a folded block scalar (`>-`) whenever it contains a `:` or a `#`: in a plain scalar a `: ` makes the **whole frontmatter block** fail to parse, and a ` #` silently truncates the value at that point. Claude Code's own loader is lenient enough to hide both, so verify by parsing the file and comparing the parsed `description` against the text you intended — not merely by checking that parsing didn't raise. (Two skills shipped broken this way: one truncated mid-sentence, one with no parseable `name`, `description` or `internal` flag at all.)
 
 ## Start from a skill
 
@@ -31,7 +31,8 @@ Most recurring work here has a skill that runs it end to end. Reach for it **bef
 | Check that text against the Writing and Style Guide | `/check-metadata-style` |
 | Build a multi-dim indicator, or an explorer | `/create-multidim`, `/create-explorer` |
 | Review a dataset-update PR | `/review-data-pr` |
-| Announce a finished update | `/data-updates-comms` |
+| Announce a finished update, internally | `/data-updates-comms` — the #data-updates-comms Slack form |
+| Announce a finished update, to readers | `/data-update-announcement` — the "Data update" post on ourworldindata.org/latest |
 
 One that's easy to skip and shouldn't be: `/edit-faust-metadata` owns **every** user-facing-text edit — it routes each field to the right layer (garden `.meta.yml` vs MDim yaml vs chart config on staging) and reports the blast radius on other charts before touching shared metadata.
 
@@ -130,13 +131,12 @@ Internal terms that recur across this guide, the skills, and the codebase:
 ```bash
 .venv/bin/etlr namespace/version/dataset --private      # Run step
 .venv/bin/etlr namespace/version/dataset --grapher      # Upload to grapher
+.venv/bin/etlr export://.../dataset --export             # Run an export:// step (mdim, explorer, static_viz, ...)
 .venv/bin/etlr namespace/version/dataset --dry-run      # Preview
 .venv/bin/etlr namespace/version/dataset --force --only # Force re-run
 ```
 
-Key flags: `--grapher/-g` (upload), `--export` (run `export://` steps), `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
-
-**An `export://` step needs `--export`, and without it the error misleads.** `etlr export://...` without the flag prints `No steps matched` and then lists your exact step among the "closest matches" — which reads as a typo you cannot find. It is the missing flag, every time.
+Key flags: `--grapher/-g` (upload), `--export` (required for any `export://...` step — mdims, explorers, static viz; omitting it makes `etlr` report "No steps matched" and then list your exact step among the "closest matches", even though it is in the DAG), `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
 
 **"The step completed" is not "the data is right".** After running a step for
 someone, report what came out of it: row count, year range, entities, and a few
@@ -233,6 +233,7 @@ Only universally understood abbreviations are fine (`gdp`, `co2`, `un_wpp`-style
 - **`Table.format(keys, short_name=paths.short_name)`** sets the index, sorts, verifies integrity, and sets `short_name` in one call — use it in data steps. It takes an explicit key list; if `keys` is None (default) it uses `country` + `year`, but it is not limited to those. For a year-only table use `tb.format(["year"], short_name=paths.short_name)`. Don't hand-roll `set_index` + `tb.metadata.short_name`.
 - **`*.meta.yml`**: the `dataset:` block carries only `update_period_days` and `owners` — everything else is inherited from origin. Always make sure `owners` is set (new dataset: the user; update: append the user if missing) — first entry is the accountable owner; canonical names per the `schemas/dataset-schema.json` enum, resolved via `etl.owners.resolve_owner`.
 - **`grapher_config`: omit `$schema:`** — pinning a specific schema version ages badly. The default in `etl/config.py:DEFAULT_GRAPHER_SCHEMA` is applied automatically by `_validate_grapher_config`.
+- **`description_key` is a list *or* a markdown string — check, never assume.** A YAML list survives garden so per-item Jinja can render, and is joined into markdown by `update_variable_metadata`, which runs when a step renders dimensions (`_yield_wide_table` / `_metadata_for_dimensions`) and again at the DB write (`etl/grapher/to_db.py`). A `data://grapher/...` dataset on disk therefore holds a string for some datasets and a list for others — MySQL is string-only, the grapher channel is not. Steps reading one — mdim and explorer `export://` steps especially — must handle both and pass the value through rather than rebuild it. Never `list()` it: that yields one bullet *per character*, which every write path used to rejoin into valid-looking markdown, and it shipped ~2,900 one-character WYSK bullets to readers (#6647). The string form is now an `owid.catalog.core.meta.Markdown` — a `str` that raises `TypeError` on iteration, so the mistake fails on the line that writes it.
 
 ### Performance
 

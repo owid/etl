@@ -31,7 +31,7 @@ import pandas as pd
 import structlog
 from deprecated import deprecated
 from owid import catalog
-from owid.catalog.core.meta import VARIABLE_TYPE
+from owid.catalog.core.meta import VARIABLE_TYPE, validate_description_key_list
 from owid.catalog.core.paths import CatalogPath
 from pyarrow import feather
 from sqlalchemy import (
@@ -1186,6 +1186,11 @@ class Variable(Base):
         presentation_dict.pop("faqs", None)
 
         if metadata.description_key:
+            if isinstance(metadata.description_key, list):
+                # A list should have been converted by `update_variable_metadata` long
+                # before this point. Run the sanity check anyway, so a corrupted value
+                # reports its likely cause instead of the bare assert below.
+                validate_description_key_list(metadata.description_key, context=catalog_path)
             assert isinstance(metadata.description_key, str), "descriptionKey should be a markdown string"
 
         return cls(
