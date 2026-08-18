@@ -121,6 +121,8 @@ In this example, we note that we can group together indicators from any dataset.
 
     Omitting the field falls back to `DEFAULT_GRAPHER_SCHEMA` (`etl/config.py`), which tells Grapher the configs are already current — so the next breaking schema change would skip the migration for those views. Once set, leave the pin alone: it is a record of what the config was authored against, which is exactly what lets Grapher migrate it later.
 
+    The one exception is a pin that **contradicts the config body** — e.g. pinned `005` while the config uses `chartTypes`, a field that only exists from `006` onwards (the 005→006 migration is what creates it). That is a stale pin rather than a record, and leaving it means Grapher runs migrations over a config they were never meant to touch. Correct such a pin to the version the config is actually written against.
+
     This field is MDIM-only. Explorers reach Grapher through the legacy TSV path, which has no equivalent.
 
 !!! tip "Learn more about the structure of MDIMs in [:fontawesome-brands-github: their schema](https://github.com/owid/etl/blob/master/schemas/multidim-schema.json)"
