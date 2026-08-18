@@ -3954,9 +3954,9 @@ L 558.006106 80.90552
    <text style="font-size: 11.52px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="11.67552" y="45.26172" transform="rotate(-0 11.67552 45.26172)">Averages of minutes per day from time-use diaries for people between 15 and 64.</text>
   </g>
   <g id="note">
-   <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #858585" transform="translate(11.67552 727.59285)">Note: Each country's most recent time-use survey is shown, with its year in brackets; survey years range from 1999 to 2024. Estimates cover people aged 15</text>
-   <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #858585" transform="translate(11.67552 736.749225)">to 64, except in Australia (15 and over), China (15 to 74), Lithuania (20 to 64). Education covers time in school and studying; other unpaid work covers care</text>
-   <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #858585" transform="translate(11.67552 745.78275)">work and volunteering.</text>
+   <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #858585" transform="translate(11.67552 727.59285)">Note: Each country's most recent time-use survey is shown, with its year in brackets; survey years range from 1999 to 2024. Estimates cover people aged</text>
+   <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #858585" transform="translate(11.67552 736.749225)">15 to 64, except in Australia (15 and over), China (15 to 74), Lithuania (20 to 64). Education covers time in school and studying; other unpaid work covers</text>
+   <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #858585" transform="translate(11.67552 745.78275)">care work and volunteering.</text>
   </g>
   <g id="data-source">
    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #858585" x="11.67552" y="760.71825" transform="rotate(-0 11.67552 760.71825)">Data source: OECD (2026)</text>

@@ -157,6 +157,57 @@ VALUE_LABEL_COVERAGE = 0.75
 
 # Countries are ranked by this group or category, most minutes at the top. A GROUPS column ranks by
 # that group alone; a CATEGORIES name ranks by the sum of its groups. Asserted in load_chart_groups.
+# The alternative chart draws the four categories as single segments and nothing below them. The case
+# for it is in `ai/time_use_comparability/`: the residual buckets *inside* each category vary two- to
+# threefold across countries (other unpaid work runs 39-132 minutes, other leisure 78-179) while the
+# categories themselves vary far less (personal care is 665 +/- 31), so most of what the ten-segment
+# split resolves at that level is where each survey drew its coding lines rather than how people
+# differ. Aggregating takes the mean coefficient of variation across the segments from 0.22 to 0.12.
+#
+# `contents` is deliberately terse here: all four are aggregates, so the Note has to say what each one
+# holds, and it has three lines to do it in.
+MAIN_CATEGORY_GROUPS = [
+    {
+        "column": "main_paid_work_or_study",
+        "compact": True,
+        "label": "Paid work or study",
+        "color": ("deep", 3),
+        "as_hours": True,
+    },
+    {
+        "column": "main_personal_care",
+        "label": "Personal care",
+        "color": ("deep", 7),
+        "as_hours": True,
+        # Compact like the rest, though it has room for the spelled-out form. One category set
+        # differently from its neighbours reads as a difference in kind, and the only difference is
+        # that this segment is wider.
+        "compact": True,
+        "contents": "sleep, eating and other personal care",
+    },
+    {
+        "column": "main_unpaid_work_and_other",
+        "compact": True,
+        "as_hours": True,
+        "label": "Unpaid work & other",
+        "color": ("deep", 5),
+        "contents": "housework, shopping, care work, volunteering and civic activities",
+    },
+    {
+        "column": "main_leisure",
+        "compact": True,
+        "as_hours": True,
+        "label": "Leisure",
+        "color": ("deep", 0),
+        "contents": "TV and radio, seeing friends and other leisure",
+    },
+]
+
+# One category per segment, so the header machinery names each segment instead of bracketing a run.
+MAIN_CATEGORIES = [
+    {"name": group["label"], "color": group["color"], "columns": [group["column"]]} for group in MAIN_CATEGORY_GROUPS
+]
+
 # Paid work is the original chart's ranking, and the one column education cannot distort: education
 # time is depressed wherever the survey's age floor excludes teenagers (Lithuania, 20-64).
 SORT_BY = "paid_work"
@@ -300,6 +351,10 @@ LAYOUTS = {
         # name over the run of bars it belongs to.
         # Alternatives for the names: "below_flow" (one list in bar order under the bars) or
         # "below_listed" (grouped under their category names, as mobile lists them).
+        "groups": GROUPS,
+        "categories": CATEGORIES,
+        "category_rule": True,
+        "total_column": True,
         "category_side": "above",
         "group_labels": "bracketed",
     },
@@ -335,9 +390,32 @@ LAYOUTS = {
         "value_fontsize": 7.5,
         "header_fontsize": 8,
         "with_mins_suffix": False,
+        "groups": GROUPS,
+        "categories": CATEGORIES,
+        "category_rule": True,
+        "total_column": True,
         "category_side": "listed_above",
         "group_labels": "listed_above",
     },
+}
+
+# The alternative shares the desktop frame exactly — same template, same type, same row order — so that
+# comparing the two charts is comparing the segmentation and nothing else.
+LAYOUTS["time_use_by_country_main_categories"] = {
+    **LAYOUTS["time_use_by_country"],
+    "groups": MAIN_CATEGORY_GROUPS,
+    "categories": MAIN_CATEGORIES,
+    # Each category is one segment, so a bracket would only underline a name that already stands over
+    # it, and there is no member layer left to list.
+    "category_rule": False,
+    "group_labels": None,
+    # Leisure is a segment here and carries its own value, so the column would repeat it.
+    "total_column": False,
+    # The values are hours and minutes here, so the subtitle has to say so.
+    "subtitle": "Averages of hours and minutes per day from time-use diaries for people between 15 and 64.",
+    # With one segment per category, a name that overhangs its own bar reads as pointing at its
+    # neighbour too — so wrap it rather than only wrapping to avoid a collision.
+    "wrap_overhanging_names": True,
 }
 
 # Both layouts share the original chart's subtitle; mobile appends what its missing Note slot
@@ -349,13 +427,14 @@ MOBILE_NOTE = "Ages differ in a few countries, and each country's survey year is
 def run() -> None:
     """Load data, render and save both versions of the chart."""
     tb, ages = load_chart_groups()
+    tb = add_main_category_totals(tb)
     paths.log.info(f"Loaded {len(tb)} countries, surveys {tb['year'].min()}-{tb['year'].max()}")
 
     source_citation = build_source_citation(tb)
     paths.log.info(f"Source citation: {source_citation}")
 
     for short_name, layout in LAYOUTS.items():
-        fig = create_visualization(tb, ages, source_citation, layout)
+        fig = create_visualization(sort_rows(tb, layout), ages, source_citation, layout)
         # No bbox_inches="tight": cropping to content would change the proportions the template
         # fixes. The PNG keeps an opaque canvas (it is what a human reviews, often on a dark
         # editor background); the SVG is saved transparent so the Figma template's background,
@@ -368,6 +447,38 @@ def run() -> None:
 # ---------------------------------------------------------------------------
 # Data loading
 # ---------------------------------------------------------------------------
+
+
+def sort_rows(tb: Table, layout: dict) -> Table:
+    """Rank rows by the layout's own leading segment, descending.
+
+    A chart whose first column is not in order reads as unsorted, and the four-category version leads
+    with paid work *plus* study where the detailed one leads with paid work alone — so the two orders
+    differ by a few places, and each chart is right about itself. Stable, so tied rows keep the
+    source's order between runs.
+    """
+    column = layout["groups"][0]["column"]
+    return tb.loc[tb[column].sort_values(ascending=False, kind="stable").index]
+
+
+def add_main_category_totals(tb: Table) -> Table:
+    """Add each top-level category's total as its own column, for the four-category chart.
+
+    This is a chart-side sum of this step's own display groups, which is why it lives here rather than
+    in garden: garden owns the mapping from the OECD's 30 activities into the ten groups, and
+    `CATEGORIES` is how *this* step groups those ten. If the four-category version is the one that
+    ships, promote the sums to garden so the aggregate is in the catalog too.
+    """
+    assert [group["label"] for group in MAIN_CATEGORY_GROUPS] == [category["name"] for category in CATEGORIES], (
+        "The four-category groups must stay in the same order as CATEGORIES, since they are its totals."
+    )
+    for group, category in zip(MAIN_CATEGORY_GROUPS, CATEGORIES):
+        tb[group["column"]] = tb[list(category["columns"])].sum(axis=1)
+    totals = tb[[group["column"] for group in MAIN_CATEGORY_GROUPS]].sum(axis=1)
+    assert totals.between(MINUTES_PER_DAY - 1, MINUTES_PER_DAY + 1).all(), (
+        f"The four categories must still spend the whole day: got {totals.min():.1f}-{totals.max():.1f}."
+    )
+    return tb
 
 
 def load_chart_groups() -> tuple[Table, dict[str, str]]:
@@ -463,7 +574,9 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
 
     # --- header: the template's title row, then its subtitle ---
     title = wrap_to_slot(TITLE, template["title_slot_px"], template["title_px"], TEMPLATE_SERIF_SLACK)
-    subtitle_text = SUBTITLE if layout["full_footer"] else f"{SUBTITLE} {MOBILE_NOTE}"
+    subtitle_text = layout.get("subtitle", SUBTITLE)
+    if not layout["full_footer"]:
+        subtitle_text = f"{subtitle_text} {MOBILE_NOTE}"
     subtitle = wrap_to_slot(subtitle_text, template["subtitle_slot_px"], template["subtitle_px"])
     title_row_px = max(lines_in(title) * TEMPLATE_TITLE_LINE_PX, template["logo_px"])
     subtitle_y = template["origin_y"] + title_row_px + template["header_gap_px"]
@@ -497,14 +610,14 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
 
     plot_left_px = margin_px + country_space_px
     plot_width_px = (width_px - margin_px) - plot_left_px
-    total_column_px, total_with_mins = total_column(tb, layout)
+    total_column_px, total_with_mins = total_column(tb, layout) if layout["total_column"] else (0.0, False)
     bar_width_px = plot_width_px - total_column_px
     px_per_min = bar_width_px / MINUTES_PER_DAY
 
     # Category brackets attach to the row they touch: the top row above the bars. Group labels
     # placed below attach to the bottom row, for the same reason.
-    top_spans = segment_spans(tb.iloc[0], px_per_min)
-    bottom_spans = segment_spans(tb.iloc[-1], px_per_min)
+    top_spans = segment_spans(tb.iloc[0], px_per_min, layout["groups"])
+    bottom_spans = segment_spans(tb.iloc[-1], px_per_min, layout["groups"])
 
     # The name list, for the layouts that use one. Drawn in the band above the bars it shares that
     # band with the two-line "Total leisure" column header, so it stops short of that column; drawn
@@ -537,7 +650,7 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     # half placed above works off the top row's segments and one placed below off the bottom row's.
     category_at = {"above": "above", "below": "below", "listed_above": "above"}[layout["category_side"]]
     group_at = {"below_listed": "below", "below_flow": "below"}.get(layout["group_labels"], "above")
-    assert layout["group_labels"] in {"bracketed", "below_flow", "below_listed", "listed_above"}, (
+    assert layout["group_labels"] in {"bracketed", "below_flow", "below_listed", "listed_above", None}, (
         f"Unknown group_labels {layout['group_labels']!r}."
     )
 
@@ -577,8 +690,9 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
         return room
 
     # Room above for whichever half goes there, and never less than the two-line "Total leisure"
-    # column header, which sits above the first bar.
-    header_px = max(band_px("above"), 2 * line_px(layout["header_fontsize"]) + LEADER_GAP)
+    # column header, which sits above the first bar — on a frame that has one.
+    total_header_px = 2 * line_px(layout["header_fontsize"]) + LEADER_GAP if layout["total_column"] else 0.0
+    header_px = max(band_px("above"), total_header_px)
     below_px = band_px("below")
 
     # The plot sits between the subtitle's ink and the footer's, inset by BAND_INSET at each end.
@@ -618,7 +732,7 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
         """A depth below the axes' bottom edge, in row units."""
         return n_rows + px_below / row_pitch_px
 
-    group_colors = {group["column"]: resolve_color(group["color"], palette) for group in GROUPS}
+    group_colors = {group["column"]: resolve_color(group["color"], palette) for group in layout["groups"]}
 
     draw_bars(
         ax,
@@ -656,7 +770,7 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     values_centre_min = content_right_min(total_column_px, px_per_min) - (
         (total_column_px - TOTAL_COLUMN_GAP) / 2 / px_per_min
     )
-    header_lines = ["Total", "leisure"]
+    header_lines = ["Total", "leisure"] if layout["total_column"] else []
     for index, line in enumerate(header_lines):
         depth_px = LEADER_GAP + (len(header_lines) - 1 - index) * line_px(layout["header_fontsize"])
         ax.text(
@@ -679,24 +793,34 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
 
 
 def value_label_columns(tb: Table, px_per_min: float, layout: dict) -> set[str]:
-    """The groups whose value is drawn: those that fit on at least `VALUE_LABEL_COVERAGE` of rows.
+    """Which groups carry a value, and in which form — `{column: index into value_candidates}`.
 
     Per frame, since the mobile bars are little over half as wide.
     """
-    labelled = set()
-    for group in GROUPS:
+    labelled = {}
+    for group in layout["groups"]:
         column = group["column"]
-        fits = sum(
-            1
-            for minutes in tb[column].astype(float)
-            if fit_text(
-                value_candidates(column, minutes, layout["with_mins_suffix"]),
-                minutes * px_per_min,
-                layout["value_fontsize"],
+        forms = value_candidates(group, float(tb[column].iloc[0]), layout["with_mins_suffix"])
+        # A column is one unit, so it takes one form: the longest that fits on `VALUE_LABEL_COVERAGE`
+        # of the rows, used on all of them. Choosing per row instead reads as a mistake — three rows
+        # saying "2h 42m" among thirty saying "2 hours 42 mins" looks like the label ran out of room,
+        # which it did, but the reader sees an inconsistency rather than a constraint.
+        #
+        # A group marked `compact` starts one form down, so the search picks "4h 29m" over
+        # "4 hours 29 mins" even where the long form would fit.
+        for index in range(1 if group.get("compact") else 0, len(forms)):
+            fits = sum(
+                1
+                for minutes in tb[column].astype(float)
+                if fit_text(
+                    value_candidates(group, minutes, layout["with_mins_suffix"])[index:],
+                    minutes * px_per_min,
+                    layout["value_fontsize"],
+                )
             )
-        )
-        if fits >= VALUE_LABEL_COVERAGE * len(tb):
-            labelled.add(column)
+            if fits >= VALUE_LABEL_COVERAGE * len(tb):
+                labelled[column] = index
+                break
     return labelled
 
 
@@ -710,7 +834,7 @@ def draw_bars(
     total_column_px: float,
     total_with_mins: bool,
     layout: dict,
-    value_columns: set[str],
+    value_columns: dict[str, int],
 ) -> None:
     """One stacked row per country: the country label, the ten segments, and the leisure total."""
 
@@ -741,7 +865,7 @@ def draw_bars(
         )
 
         left = 0.0
-        for group in GROUPS:
+        for group in layout["groups"]:
             column = group["column"]
             minutes = float(country_row[column])
             color = group_colors[column]
@@ -756,7 +880,7 @@ def draw_bars(
             )
             label = (
                 fit_text(
-                    value_candidates(column, minutes, layout["with_mins_suffix"]),
+                    value_candidates(group, minutes, layout["with_mins_suffix"])[value_columns[column] :],
                     minutes * px_per_min,
                     layout["value_fontsize"],
                 )
@@ -775,6 +899,9 @@ def draw_bars(
                     gid=f"{slug}__{slugify(column)}-value",
                 )
             left += minutes
+
+        if not layout["total_column"]:
+            continue
 
         total_leisure = round(float(country_row[TOTAL_LEISURE_COLUMN]))
         total_label = f"{total_leisure} mins" if total_with_mins else f"{total_leisure}"
@@ -805,6 +932,11 @@ def draw_category_brackets(
         slug = slugify(placement["name"])
         start, end = placement["bracket"]
         label_px = rule_px + CATEGORY_LABEL_GAP + placement["row"] * TIER_HEIGHT
+        if not layout["category_rule"]:
+            # Where each category is a single segment, its name already stands over the run it names
+            # and a bracket only underlines it.
+            draw_category_name(ax, placement, palette, px_per_min, rows_out, layout, side, label_px)
+            continue
         # A bracket, not a plain rule: the end ticks turn back towards the segments they enclose, so
         # the span reads as "these bars" rather than as a divider.
         ax.plot(
@@ -845,6 +977,25 @@ def draw_category_brackets(
                 color=header_text_color(placement["color"], palette),
                 gid=f"category__{slug}" if index == 0 else f"category__{slug}-line{index}",
             )
+
+
+def draw_category_name(ax, placement, palette, px_per_min, rows_out, layout, side: str, label_px: float) -> None:
+    """A category's name, stacked away from the bars, with no rule under it."""
+    for index, line in enumerate(placement["lines"]):
+        offset = len(placement["lines"]) - 1 - index if side == "above" else index
+        ax.text(
+            placement["center"] / px_per_min,
+            rows_out(label_px + offset * line_px(layout["header_fontsize"])),
+            line,
+            ha="center",
+            va="bottom" if side == "above" else "top",
+            fontsize=layout["header_fontsize"],
+            fontweight="bold",
+            color=header_text_color(placement["color"], palette),
+            gid=f"category__{slugify(placement['name'])}"
+            if index == 0
+            else f"category__{slugify(placement['name'])}-line{index}",
+        )
 
 
 def draw_bracketed_names(
@@ -1012,11 +1163,11 @@ def content_right_min(total_column_px: float, px_per_min: float) -> float:
     return MINUTES_PER_DAY + total_column_px / px_per_min
 
 
-def segment_spans(row, px_per_min: float) -> dict[str, tuple[float, float]]:
+def segment_spans(row, px_per_min: float, groups: list[dict]) -> dict[str, tuple[float, float]]:
     """Each group's (start, end) in template pixels, for one row of the chart."""
     spans = {}
     cumulative = 0.0
-    for group in GROUPS:
+    for group in groups:
         minutes = float(row[group["column"]])
         spans[group["column"]] = (cumulative * px_per_min, (cumulative + minutes) * px_per_min)
         cumulative += minutes
@@ -1037,7 +1188,7 @@ def solve_category_layout(spans: dict, layout: dict) -> list[dict]:
     its neighbour is the one that gets bumped, which is the wrong way round: the wide name is the
     one that should give.
     """
-    right_edge = spans[GROUPS[-1]["column"]][1]
+    right_edge = spans[layout["groups"][-1]["column"]][1]
 
     def geometry(category: dict, lines: list[str]) -> tuple[float, tuple[float, float]]:
         start = spans[category["columns"][0]][0]
@@ -1048,9 +1199,20 @@ def solve_category_layout(spans: dict, layout: dict) -> list[dict]:
 
     placed: list[tuple[tuple[float, float], int]] = []
     placements = []
-    for index, category in enumerate(CATEGORIES):
+    for index, category in enumerate(layout["categories"]):
         variants = category_variants(category["name"], layout)
-        remaining = CATEGORIES[index + 1 :]
+        if layout.get("wrap_overhanging_names"):
+            # Collision with a neighbour is not the only reason to wrap. Where each category is a
+            # single segment, a name can clear its neighbours and still overhang its own bar by half
+            # its length, which reads as pointing at both. Prefer any form that fits inside the span
+            # it names; `sorted` is stable, so the widest-first order survives within each group.
+            span_px = spans[category["columns"][-1]][1] - spans[category["columns"][0]][0]
+            variants = sorted(
+                variants,
+                key=lambda lines: max(text_width_px(line, layout["header_fontsize"], bold=True) for line in lines)
+                > span_px,
+            )
+        remaining = layout["categories"][index + 1 :]
         placement = None
         for row in range(3):
             for lines in variants:
@@ -1124,10 +1286,10 @@ def layout_bracketed_names(spans: dict, layout: dict) -> list[dict]:
     """
     fontsize = layout["header_fontsize"]
     blocks = []
-    for category in CATEGORIES:
+    for category in layout["categories"]:
         start = spans[category["columns"][0]][0]
         end = spans[category["columns"][-1]][1]
-        members = [group for group in GROUPS if group["column"] in category["columns"]]
+        members = [group for group in layout["groups"] if group["column"] in category["columns"]]
         lines = [
             [(text, group)]
             for group in members
@@ -1163,7 +1325,8 @@ def layout_flowed_names(layout: dict, available_px: float) -> list[list[tuple]]:
     """
     # One item per group, each carrying the separator that follows it: the break search below needs a
     # width per item, and a line may not begin with punctuation. The separator is drawn as its own run.
-    items = [(group, " " + SEPARATOR if index < len(GROUPS) - 1 else "") for index, group in enumerate(GROUPS)]
+    groups = layout["groups"]
+    items = [(group, " " + SEPARATOR if index < len(groups) - 1 else "") for index, group in enumerate(groups)]
     widths = [text_advance_px(group["label"] + sep, layout["header_fontsize"], False) for group, sep in items]
 
     # How many lines the names need, packed as tightly as the width allows.
@@ -1211,9 +1374,9 @@ def layout_listed_header(layout: dict, available_px: float) -> list[list[tuple]]
     """Wrap the category-grouped name list into lines of (x, text, color spec, bold, gid)."""
     lines: list[list[tuple]] = [[]]
     x = 0.0
-    for category in CATEGORIES:
+    for category in layout["categories"]:
         runs = [(f"{category['name']}: ", category["color"], True, f"category__{slugify(category['name'])}")]
-        members = [group for group in GROUPS if group["column"] in category["columns"]]
+        members = [group for group in layout["groups"] if group["column"] in category["columns"]]
         for index, group in enumerate(members):
             slug = slugify(group["column"])
             last = index == len(members) - 1
@@ -1432,8 +1595,8 @@ def wrap_to_width(text: str, max_px: float, fontsize: float, bold: bool = False)
     return "\n".join(lines)
 
 
-def format_sleep(minutes: float) -> list[str]:
-    """Sleep value candidates, longest first: '8 hours 28 mins', '8h 28m', '508'."""
+def format_hours(minutes: float) -> list[str]:
+    """Hours-and-minutes candidates, longest first: '8 hours 28 mins', '8h 28m', '508'."""
     hours, mins = divmod(round(minutes), 60)
     hours_word = "hour" if hours == 1 else "hours"
     if mins == 0:
@@ -1442,11 +1605,15 @@ def format_sleep(minutes: float) -> list[str]:
     return [f"{hours} {hours_word} {mins} {mins_word}", f"{hours}h {mins}m", f"{round(minutes)}"]
 
 
-def value_candidates(column: str, minutes: float, with_suffix: bool) -> list[str]:
-    """In-bar label candidates for a segment, longest first."""
-    if column == "sleep":
-        return format_sleep(minutes)
-    if column == "paid_work" and with_suffix:
+def value_candidates(group: dict, minutes: float, with_suffix: bool) -> list[str]:
+    """In-bar label candidates for a segment, longest first.
+
+    A segment worth hours rather than minutes says so — sleep on the detailed chart, personal care on
+    the four-category one — and the leftmost segment carries the unit for the row.
+    """
+    if group.get("as_hours") or group["column"] == "sleep":
+        return format_hours(minutes)
+    if with_suffix and group.get("unit_suffix", group["column"] == "paid_work"):
         return [f"{round(minutes)} mins", f"{round(minutes)}"]
     return [f"{round(minutes)}"]
 
@@ -1474,7 +1641,7 @@ def build_note(tb: Table, ages: dict[str, str], layout: dict) -> str:
     exceptions = ", ".join(f"{country} ({described.get(age, age)})" for country, age in sorted(ages.items()))
     # What the groups whose names do not say it themselves contain, in bar order.
     contents = "; ".join(
-        f"{group['label'].lower()} covers {group['contents']}" for group in GROUPS if group.get("contents")
+        f"{group['label'].lower()} covers {group['contents']}" for group in layout["groups"] if group.get("contents")
     )
     text = (
         f"Note: Each country's most recent time-use survey is shown, with its year in brackets; "
@@ -1482,8 +1649,12 @@ def build_note(tb: Table, ages: dict[str, str], layout: dict) -> str:
         f"Estimates cover people aged 15 to 64, except in {exceptions}. "
         f"{contents[0].upper()}{contents[1:]}."
     )
+    # Wrapped against the content width itself, with no font slack: the slack exists to predict how
+    # many lines the *template's* narrower Lato takes, and applying it to text this step actually draws
+    # lets a full line print past the frame's edge. Erring the other way only costs a line of band.
     template = layout["template_text"]
-    wrapped = wrap_to_slot(text, template["note_slot_px"], template["note_px"])
+    content_px = layout["size"][0] - 2 * layout["margin"]
+    wrapped = wrap_to_slot(text, min(template["note_slot_px"], content_px), template["note_px"], slack=1.0)
     # The Note's slot is two lines tall, and the footer's auto-layout grows upward past that rather
     # than clipping — but every line it gains is a line the chart loses, so cap it. Three is what the
     # template's 12px takes for this Note where this step's older, smaller footer took two.
