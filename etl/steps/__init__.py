@@ -34,8 +34,6 @@ from owid import catalog
 from owid.catalog import s3_utils
 from owid.catalog.api.utils import DEFAULT_CATALOG_URL
 from owid.catalog.core.datasets import DEFAULT_FORMATS
-from sqlalchemy.engine import Engine
-from sqlalchemy.orm import Session
 from tqdm import tqdm
 
 from apps.chart_sync.admin_api import AdminAPI
@@ -43,7 +41,6 @@ from etl import config, files, git_helpers, paths
 from etl.config import OWID_ENV, TLS_VERIFY
 from etl.db import get_engine
 from etl.grapher import helpers as gh
-from etl.grapher import model as gm
 from etl.helpers import get_metadata_path
 from etl.snapshot import Snapshot
 
@@ -1011,122 +1008,94 @@ class GrapherStep(Step):
         admin_api = AdminAPI(OWID_ENV)
 
         assert dataset.metadata.namespace
-        dataset_upsert_results = db.upsert_dataset(
-            engine,
-            dataset,
-            dataset.metadata.namespace,
-        )
 
         # We sometimes get a warning, but it's unclear where it is coming from
         # Passing a BlockManager to Table is deprecated and will raise in a future version. Use public APIs instead.
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-        catalog_paths = []
+        # Prepare every indicator this run accounts for before talking to Grapher. The list we
+        # declare below is authoritative — anything Grapher holds and we don't name gets
+        # removed — so it has to be complete, which is why a filtered run never declares.
+        prepared_by_path: dict[str, db.PreparedIndicator] = {}
+        for table in tqdm(dataset):
+            assert not table.empty, f"table {table.metadata.short_name} is empty"
+            table = gh._adapt_table_for_grapher(table, engine)
+            db.check_table(table)
+            for t in gh._yield_wide_table(table, na_action="drop"):
+                assert len(t.columns) == 1
+                catalog_path = f"{self.path}/{table.metadata.short_name}#{t.columns[0]}"
+                prepared_by_path[catalog_path] = db.prepare_indicator(
+                    t,
+                    catalog_path=catalog_path,
+                    dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
+                )
 
+        # A filtered run only touches some indicators, so its list isn't the dataset's full
+        # membership and must never be declared — that would delete everything it left out.
+        partial_run = bool(config.SUBSET or INSTANT_METADATA_DIFF)
+
+        if partial_run:
+            prepared = [prepared_by_path[path] for path in self._filter_indicators(dataset, prepared_by_path)]
+        else:
+            declared = admin_api.put_dataset(
+                self.path,
+                gh._dataset_metadata_payload(dataset.metadata),
+                list(prepared_by_path),
+            )
+            if declared["removed"]:
+                log.warning(
+                    "grapher.removed_indicators",
+                    size=len(declared["removed"]),
+                    indicators=declared["removed"],
+                )
+            if not db.blocked_indicators_allow_run(declared["blocked"]):
+                # Indicators a chart still uses would have had to go. Leave the checksum unset
+                # so the next run tries again, once chart-sync has remapped them.
+                return
+            prepared = list(prepared_by_path.values())
+
+        published: dict[str, str] = {}
         with ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as thread_pool:
             futures = []
-            verbose = True
-            i = 0
+            batch: list[db.PreparedIndicator] = []
+            batch_bytes = 0
 
-            # Get checksums for all variables in a dataset
-            preloaded_checksums = db.load_dataset_variables(dataset_upsert_results.dataset_id, engine)
+            for i, item in enumerate(prepared):
+                # Chunk by payload size rather than indicator count: metadata is a few hundred
+                # bytes for a bare indicator and tens of kilobytes for one carrying a long
+                # description_key.
+                batch.append(item)
+                batch_bytes += item.payload_bytes
+                if batch_bytes >= config.GRAPHER_UPSERT_BATCH_BYTES:
+                    futures.append(thread_pool.submit(db.flush_indicator_batch, admin_api, self.path, batch, i < 20))
+                    batch, batch_bytes = [], 0
 
-            # NOTE: multiple tables will be saved under a single dataset, this could cause problems if someone
-            # is fetching the whole dataset from data-api as they would receive all tables merged in a single
-            # table. This won't be a problem after we introduce the concept of "tables"
-            for table in tqdm(dataset):
-                assert not table.empty, f"table {table.metadata.short_name} is empty"
+            if batch:
+                futures.append(thread_pool.submit(db.flush_indicator_batch, admin_api, self.path, batch, True))
 
-                # if SUBSET is set, only upsert matching variables
-                if config.SUBSET:
-                    cols_regex = config.SUBSET
-                # if INSTANT is set, only upsert variables with changed metadata
-                elif config.INSTANT:
-                    dataset_name = dataset.m.short_name
-                    table_name = table.metadata.short_name
+            for future in as_completed(futures):
+                published.update(future.result())
 
-                    # dataset wasn't run with instant, rerun it
-                    if dataset_name not in INSTANT_METADATA_DIFF:
-                        cols_regex = None
-                    else:
-                        instant_variables = INSTANT_METADATA_DIFF[dataset_name].get(table_name)
-                        if not instant_variables:
-                            # no changes in table, skip it
-                            continue
-                        else:
-                            cols_regex = "|".join(instant_variables)
-                else:
-                    cols_regex = None
+        # A partial run says nothing about the dataset as a whole, so it doesn't get to record
+        # that the step is done.
+        if partial_run:
+            return
 
-                if cols_regex:
-                    cols = table.filter(regex=cols_regex).columns.tolist()
-                    if not cols:
-                        continue
-                    cols += [c for c in table.columns if c in {"year", "date", "country"} and c not in cols]
-                    table = table.loc[:, cols]
+        # Only now, with the data files uploaded, is it true that MySQL and R2 agree.
+        admin_api.put_dataset_checksum(self.path, self.checksum_input(), published)
 
-                table = gh._adapt_table_for_grapher(table, engine)
+    @staticmethod
+    def _filter_indicators(dataset, prepared_by_path: dict) -> list[str]:
+        """Which indicators a SUBSET or INSTANT run should send."""
+        if config.SUBSET:
+            return [path for path in prepared_by_path if re.search(config.SUBSET, path.split("#")[-1])]
 
-                # Validation
-                db.check_table(table)
-
-                # Upsert origins
-                with Session(engine, expire_on_commit=False) as session:
-                    db_origins = db.upsert_origins(session, table)
-
-                for t in gh._yield_wide_table(table, na_action="drop"):
-                    i += 1
-                    assert len(t.columns) == 1
-                    catalog_path = f"{self.path}/{table.metadata.short_name}#{t.columns[0]}"
-                    catalog_paths.append(catalog_path)
-
-                    # stop logging to stop cluttering logs
-                    if i > 20 and verbose:
-                        verbose = False
-                        log.info("showing only the first 20 logs")
-
-                    # generate table with entity_id, year and value for every column
-                    futures.append(
-                        thread_pool.submit(
-                            db.upsert_table,
-                            engine,
-                            admin_api,
-                            t,
-                            dataset_upsert_results,
-                            catalog_path=catalog_path,
-                            dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
-                            checksums=preloaded_checksums.get(catalog_path, {}),
-                            db_origins=[db_origins[origin] for origin in t.iloc[:, 0].origins],
-                            verbose=verbose,
-                        )
-                    )
-
-            # wait for all tables to be inserted
-            [future.result() for future in as_completed(futures)]
-
-        # If INSTANT flag is set, don't clean ghost variables, but update the checksum (with _instant suffix)
-        if INSTANT_METADATA_DIFF:
-            db.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.checksum_input())
-
-        # If filtering is on, don't set checksum. Allow the next ETL run to set it
-        elif config.SUBSET:
-            pass
-
-        # Otherwise, clean up ghost resources and set checksum
-        else:
-            # cleaning up ghost resources could be unsuccessful if someone renamed short_name of a variable
-            # and remapped it in chart-sync. In that case, we cannot delete old variables because they are still
-            # needed for remapping. However, we can delete it on next ETL run
-            success = self._cleanup_ghost_resources(engine, admin_api, dataset_upsert_results, catalog_paths)
-
-            # set checksum and updatedAt timestamps after all data got inserted
-            if success:
-                checksum = self.checksum_input()
-            # if cleanup was not successful, don't set checksum and let ETL rerun it on its next try
-            else:
-                checksum = "to_be_rerun"
-
-            db.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, checksum)
+        keep = []
+        for table_name, variables in INSTANT_METADATA_DIFF.get(dataset.m.short_name, {}).items():
+            for path in prepared_by_path:
+                if f"/{table_name}#" in path and path.split("#")[-1] in variables:
+                    keep.append(path)
+        return keep
 
     def checksum_input(self) -> str:
         return self.data_step.checksum_input()
@@ -1134,38 +1103,6 @@ class GrapherStep(Step):
     def checksum_output(self) -> str:
         """Checksum of a grapher step is the same as checksum of the underyling data://grapher step."""
         return self.data_step.checksum_input()
-
-    @classmethod
-    def _cleanup_ghost_resources(
-        cls,
-        engine: Engine,
-        admin_api: AdminAPI,
-        dataset_upsert_results,
-        catalog_paths: list[str],
-    ) -> bool:
-        """
-        Cleanup all ghost variables that weren't upserted
-        NOTE: we can't just remove all dataset variables before starting this step because
-        there could be charts that use them and we can't remove and recreate with a new ID
-
-        Return True if cleanup was successfull, False otherwise.
-        """
-        import etl.grapher.to_db as db
-
-        # convert catalog_paths to variable_ids
-        with Session(engine) as session:
-            upserted_variable_ids = list(gm.Variable.catalog_paths_to_variable_ids(session, catalog_paths).values())
-
-        # Try to cleanup ghost variables, but make sure to raise an error if they are used
-        # in any chart
-        success = db.cleanup_ghost_variables(
-            admin_api,
-            dataset_upsert_results.dataset_id,
-            upserted_variable_ids,
-        )
-
-        # TODO: cleanup origins that are not used by any variable. We can do it in batch
-        return success
 
 
 class ExportStep(DataStep):

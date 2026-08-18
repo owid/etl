@@ -801,3 +801,16 @@ def _validate_ordinal_variables(tab: Table, col: str) -> None:
         assert not extra_values, (
             f"Ordinal variable `{col}` has extra values that are not defined in field `sort`: {extra_values}"
         )
+
+
+def _dataset_metadata_payload(metadata: catalog.DatasetMeta) -> dict:
+    """The dataset fields the Admin API needs to create or update a dataset row."""
+    return {
+        "name": metadata.title,
+        "namespace": metadata.namespace,
+        "version": metadata.version,
+        "description": metadata.description or "",
+        "isPrivate": not metadata.is_public,
+        "nonRedistributable": metadata.non_redistributable,
+        "updatePeriodDays": metadata.update_period_days,
+    }
