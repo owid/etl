@@ -173,11 +173,22 @@ def test_cleanup_ghost_variables_raises_outside_production(monkeypatch):
         db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
 
 
-def test_cleanup_ghost_variables_warns_when_admin_api_is_unreachable():
+def test_cleanup_ghost_variables_warns_when_admin_api_is_unreachable(monkeypatch):
     """Working locally without a running admin: warn and let a later run clean up."""
+    monkeypatch.setattr(db.config, "ENV", "dev")
     admin_api = _FakeAdminAPI([requests.exceptions.ConnectionError("connection refused")])
 
     assert not db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
+
+
+@pytest.mark.parametrize("env", ["staging", "production"])
+def test_cleanup_ghost_variables_raises_when_a_deployed_admin_is_unreachable(monkeypatch, env):
+    """A deployed environment always has an admin, so an unreachable one is an outage."""
+    monkeypatch.setattr(db.config, "ENV", env)
+    admin_api = _FakeAdminAPI([requests.exceptions.ConnectionError("connection refused")])
+
+    with pytest.raises(requests.exceptions.ConnectionError):
+        db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
 
 
 def test_cleanup_ghost_variables_does_not_swallow_other_admin_api_errors():

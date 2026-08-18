@@ -401,7 +401,9 @@ class AdminAPI:
             {"deleted": [variable_id],
              "blocked": [{"variableId", "variableName", "chartId", "chartSlug"}]}
         """
-        resp = http_session.post(
+        # Retry in case we're restarting Admin on staging server. This call is now made by
+        # every grapher step, so a restart would otherwise fail steps with nothing to clean.
+        resp = requests_with_retry().post(
             f"{self.owid_env.admin_api}/datasets/{dataset_id}/cleanupGhostVariables",
             headers=self._headers(),
             json={"keepVariableIds": keep_variable_ids},
@@ -449,7 +451,15 @@ def requests_with_retry() -> requests.Session:
     # grapher-build's DB migrations run concurrently with this build (see owid/ops#540).
     # `read=1` keeps a hung server from multiplying TIMEOUT by the full retry budget; the
     # status retries are the ones worth spending.
-    retries = Retry(total=5, read=1, backoff_factor=1, status_forcelist=[401, 500, 502, 503, 504])
+    # POST is not retryable by default because urllib3 can't know whether a POST is safe to
+    # repeat. Ours are: only route an idempotent POST through this session.
+    retries = Retry(
+        total=5,
+        read=1,
+        backoff_factor=1,
+        status_forcelist=[401, 500, 502, 503, 504],
+        allowed_methods=Retry.DEFAULT_ALLOWED_METHODS | {"POST"},
+    )
     # One adapter for both schemes: pool_maxsize covers the upsert thread pool that calls
     # put_grapher_config concurrently, so threads don't discard each other's connections.
     adapter = HTTPAdapter(max_retries=retries, pool_maxsize=20)

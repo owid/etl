@@ -433,6 +433,10 @@ def cleanup_ghost_variables(admin_api: AdminAPI, dataset_id: int, upserted_varia
     try:
         result = admin_api.cleanup_ghost_variables(dataset_id, upserted_variable_ids)
     except requests.exceptions.ConnectionError:
+        # Deployed environments always have an admin server, so failing to reach one there is
+        # an outage, not a workflow: let it fail rather than quietly skipping cleanup.
+        if config.ENV in ("staging", "production"):
+            raise
         # Working locally without a running Grapher admin. Leaving the ghost variables behind
         # is harmless there, so warn instead of failing the step — but report the cleanup as
         # unsuccessful, so the checksum stays unset and a later run against a reachable admin
