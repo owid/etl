@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 from owid.catalog import Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
-from shared import EXCLUDED_PROVIDER_REGIONS
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -390,8 +389,6 @@ def add_share_variables(combined: Table) -> Table:
 
 
 def fix_discrepancies_in_aggregate_regions(tb_review: Table, tb_ember: Table, combined: Table) -> Table:
-    # Firstly, remove "Other * (EI)" regions. They come from the Statistical Review, to include data that is not accounted for in any country. They needed to be included to be able to create region aggregates. But Ember doesn't have these regions. If we keep them, they lead to inconsistencies, e.g. electricity shares larger than 100%.
-    combined = combined[~combined["country"].str.contains(r"Other.*\(EI\)", regex=True)].reset_index(drop=True)
 
     # Define the maximum median relative error between Statistical Review and Ember (for a given region and indicator).
     # If the error is larger than this, we will only take Ember data.
@@ -807,10 +804,6 @@ def run() -> None:
     combined = add_share_variables(combined=combined)
 
     # Format table conveniently.
-    # Remove residual and undefined provider regions (kept in the Statistical Review garden as
-    # aggregation inputs, but meaningless to readers).
-    combined = combined[~combined["country"].isin(EXCLUDED_PROVIDER_REGIONS)].reset_index(drop=True)
-
     combined = combined.format(sort_columns=True, short_name=paths.short_name)
 
     # These series come from Ember from 2000 onwards, with the Statistical Review only covering the

@@ -31,6 +31,19 @@ THOUSAND_BTU_TO_KWH = 0.2930710701722222
 SHORT_TON_TO_TONNE = 0.9071847  # 1 short ton = 0.907 metric tonnes.
 TCF_TO_TCM = 0.02831685  # 1 trillion cubic feet = 0.0283168 trillion cubic metres (TCM).
 
+# Efficiencies the IEA's physical energy content method assumes when converting non-fossil
+# electricity generation back to heat input: 10% for geothermal, 33% for other thermal sources.
+# https://www.iea.org/statistics-questionnaires-faq
+GEOTHERMAL_EFFICIENCY = 0.10
+THERMAL_EFFICIENCY = 0.33
+
+# Generation columns that make up "other renewables", and the efficiency each is converted with.
+OTHER_RENEWABLES_COMPONENTS = {
+    "electricity_from_geothermal": GEOTHERMAL_EFFICIENCY,
+    "electricity_from_biomass": THERMAL_EFFICIENCY,
+    "electricity_from_tide_and_wave": THERMAL_EFFICIENCY,
+}
+
 # Curated indicators: (eia_variable, eia_unit, output_column, factor, output_unit, output_short_unit, title).
 # The pair (eia_variable, eia_unit) selects one row family in the meadow long table; the value is
 # multiplied by `factor` and written to the output column.
@@ -99,6 +112,16 @@ INDICATORS: list[tuple[str, str, str, float, str, str, str]] = [
         "terawatt-hours",
         "TWh",
         "Energy consumption from renewables and other",
+    ),
+    # Biofuels are combustible, so the energy they contain is their total energy supply directly.
+    (
+        "Biofuels consumption",
+        "terajoules",
+        "energy_consumption_from_biofuels",
+        TJ_TO_TWH,
+        "terawatt-hours",
+        "TWh",
+        "Energy consumption from biofuels",
     ),
     # Energy production by source.
     (
@@ -710,6 +733,67 @@ def attach_indicator_metadata(tb: Table) -> Table:
     return tb
 
 
+def add_other_renewables(tb: Table) -> Table:
+    """Estimate total energy supply from other renewables (geothermal, biomass and waste, tide and wave).
+
+    EIA reports total energy supply for renewables only as a single lump, and not on the physical
+    energy content basis: it does not inflate electricity to heat input, so it sits about 36% below
+    the Statistical Review's equivalent and cannot be split into sources. The individual sources are
+    therefore built from generation, using the efficiencies in OTHER_RENEWABLES_COMPONENTS.
+    """
+    missing = [column for column in OTHER_RENEWABLES_COMPONENTS if column not in tb.columns]
+    assert not missing, f"Missing generation columns needed for other renewables: {missing}"
+
+    scaled = tb[list(OTHER_RENEWABLES_COMPONENTS)].copy()
+    for column, efficiency in OTHER_RENEWABLES_COMPONENTS.items():
+        scaled[column] = scaled[column] / efficiency
+    tb["energy_consumption_from_other_renewables"] = scaled.sum(axis=1, min_count=1)
+
+    informed = tb["energy_consumption_from_other_renewables"].notna()
+    assert informed.any(), "Other renewables came out empty for every country and year."
+    assert (tb.loc[informed, "energy_consumption_from_other_renewables"] >= 0).all(), (
+        "Other renewables cannot be negative."
+    )
+    # Where every component is zero, the estimate must be zero too (not a spurious positive).
+    all_zero = (tb[list(OTHER_RENEWABLES_COMPONENTS)].fillna(0) == 0).all(axis=1) & informed
+    assert (tb.loc[all_zero, "energy_consumption_from_other_renewables"] == 0).all(), (
+        "Other renewables is nonzero where all its components are zero."
+    )
+
+    tb["energy_consumption_from_other_renewables"].metadata.title = "Energy consumption from other renewables"
+    tb["energy_consumption_from_other_renewables"].metadata.unit = "terawatt-hours"
+    tb["energy_consumption_from_other_renewables"].metadata.short_unit = "TWh"
+    tb["energy_consumption_from_other_renewables"].metadata.description_processing = (
+        "This is an OWID estimate, not a figure the producer publishes. EIA reports electricity "
+        "generation from geothermal, biomass and waste, and tide and wave, but its total energy "
+        "supply for renewables is published only as one lump and on a different basis. We convert "
+        "each generation figure to heat input using the efficiencies the IEA's physical energy "
+        "content method assumes: 10% for geothermal and 33% for the combustible sources."
+    )
+    return tb
+
+
+def fill_trailing_zeros_in_biofuels(tb: Table) -> Table:
+    """Continue at zero the biofuels series that EIA stopped publishing after 2019.
+
+    Until 2019 EIA reported an explicit zero for the ~145 countries that consume no biofuels; from
+    2020 it publishes only the ~70 countries that do, leaving the rest empty. Where a country's
+    series ends in zero, the later years are filled with zero. Where it ends in a positive value
+    (Belarus, Hong Kong) the gap is real and is left alone.
+    """
+    column = "energy_consumption_from_biofuels"
+    informed = tb.loc[tb[column].notna(), ["country", "year", column]].sort_values("year")
+    last_value = informed.groupby("country", observed=True)[column].last()
+    last_year = informed.groupby("country", observed=True)["year"].max()
+
+    ends_in_zero = set(last_value.index[last_value == 0])
+    to_fill = tb["country"].isin(ends_in_zero) & tb[column].isna() & (tb["year"] > tb["country"].map(last_year))
+    assert to_fill.sum() > 0, "Expected trailing gaps in EIA's biofuels series, found none."
+    tb.loc[to_fill, column] = 0
+
+    return tb
+
+
 def run() -> None:
     #
     # Load data.
@@ -742,6 +826,12 @@ def run() -> None:
 
     # Attach indicator-level metadata before adding regions, so aggregates inherit it.
     tb = attach_indicator_metadata(tb)
+
+    # Estimate total energy supply from other renewables, which EIA does not report on its own.
+    tb = add_other_renewables(tb)
+
+    # Continue at zero the biofuels series EIA stopped publishing after 2019.
+    tb = fill_trailing_zeros_in_biofuels(tb)
 
     # Add region aggregates. Only sum extensive indicators; intensive ones (per capita, per GDP) stay country-level.
     extensive_columns = [c for c in tb.columns if c not in {"country", "year"} and c not in INTENSIVE_INDICATORS]

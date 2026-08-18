@@ -281,6 +281,23 @@ REGIONS = {
     "High-income countries": {},
 }
 
+# Sources whose total energy supply is their gross electricity generation, since the physical energy
+# content method applies no thermal efficiency to them (unlike nuclear and other renewables, at ~33%).
+SOURCES_WITH_SUPPLY_EQUAL_TO_GENERATION = ["hydro", "solar", "wind"]
+
+# Sources that add up to the total energy supply (in exajoules).
+TES_SOURCES_EJ = [
+    "coal_consumption_ej",
+    "oil_consumption_ej",
+    "gas_consumption_ej",
+    "nuclear_consumption_ej",
+    "hydro_consumption_ej",
+    "solar_consumption_ej",
+    "wind_consumption_ej",
+    "other_renewables_consumption_ej",
+    "biofuels_consumption_ej",
+]
+
 # Regions that don't need to be included as part of other region aggregates (unlike, e.g. "Other Africa (EI)", which needs to be added to "Africa").
 REGIONS_NOT_ASSIGNED_TO_OTHER_REGIONS = [
     "Africa (EI)",
@@ -297,6 +314,38 @@ REGIONS_NOT_ASSIGNED_TO_OTHER_REGIONS = [
     "Other South and Central America (EI)",
     "Rest of World (EI)",
     "South and Central America (EI)",
+]
+
+# Provider regions dropped from the output (after being used as inputs to our region aggregates).
+# They are either residual buckets of EI's own table layout ("Other Western Africa") or regional
+# slices with no definition in our regions dataset. Crucially, the residual buckets have no fixed
+# composition: "Other Europe" can mean a different set of countries for each indicator, so the same
+# entity name would quietly mean different things on different charts.
+# Deliberately kept in the output: the defined "(EI)" regions (they have a stable composition and are
+# used by the by-region charts) and self-explanatory organizations (OECD, OPEC).
+EXCLUDED_PROVIDER_REGIONS = [
+    "Central America (EI)",
+    "Eastern Africa (EI)",
+    "Middle Africa (EI)",
+    "Middle East and Africa (EI)",
+    "Non-OECD (EI)",
+    "Non-OPEC (EI)",
+    "Other Africa (EI)",
+    "Other Asia Pacific (EI)",
+    "Other CIS (EI)",
+    "Other Caribbean (EI)",
+    "Other Eastern Africa (EI)",
+    "Other Europe (EI)",
+    "Other Middle Africa (EI)",
+    "Other Middle East (EI)",
+    "Other North America (EI)",
+    "Other Northern Africa (EI)",
+    "Other South America (EI)",
+    "Other South and Central America (EI)",
+    "Other Southern Africa (EI)",
+    "Other Western Africa (EI)",
+    "Rest of World (EI)",
+    "Western Africa (EI)",
 ]
 
 
@@ -392,6 +441,44 @@ def prepare_prices_index_table(tb_prices: Table) -> Table:
     tb_prices_index.metadata.short_name = "statistical_review_of_world_energy_price_index"
 
     return tb_prices_index
+
+
+def fill_missing_total_energy_supply(tb: Table) -> Table:
+    """Fill missing total energy supply by source with zeros, where the total confirms they are zero.
+
+    The source omits coal, oil, gas and biofuels where they are zero, but its total still accounts for
+    every reported source, leaving no room for the missing ones.
+    """
+    # A total of exactly zero would satisfy the assertion for free (e.g. USSR 1985-1991, all zeros).
+    informed = tb["total_energy_supply_ej"].fillna(0) > 0
+    total = tb.loc[informed, "total_energy_supply_ej"]
+    error = (
+        "Total energy supply is no longer the sum of its sources, so a missing source can no longer be "
+        "assumed to be zero."
+    )
+    assert ((total - tb.loc[informed, TES_SOURCES_EJ].sum(axis=1)).abs() <= 0.01 * total).all(), error
+
+    for source in TES_SOURCES_EJ:
+        tb.loc[informed & tb[source].isna(), source] = 0
+
+    return tb
+
+
+def fill_missing_electricity_generation(tb: Table) -> Table:
+    """Fill missing electricity generation with total energy supply, where they are the same quantity.
+
+    See SOURCES_WITH_SUPPLY_EQUAL_TO_GENERATION. The source leaves gaps in the generation columns where
+    it reports the supply, so those can be filled exactly rather than inferred.
+    """
+    for source in SOURCES_WITH_SUPPLY_EQUAL_TO_GENERATION:
+        supply, generation = f"{source}_consumption_twh", f"{source}_electricity_generation_twh"
+        informed = tb[supply].notna() & tb[generation].notna()
+        error = f"Total energy supply of {source} is no longer identical to its electricity generation."
+        deviation = (tb.loc[informed, supply] - tb.loc[informed, generation]).abs()
+        assert (deviation <= 1e-3 * tb.loc[informed, supply].abs()).all(), error
+        tb[generation] = tb[generation].fillna(tb[supply])
+
+    return tb
 
 
 def fix_missing_nuclear_energy_data(tb: Table) -> Table:
@@ -869,8 +956,14 @@ def run() -> None:
     # Fill spurious nans in nuclear energy data with zeros.
     tb = fix_missing_nuclear_energy_data(tb=tb)
 
+    # Fill missing total energy supply by source with zeros, where the total confirms they are zero.
+    tb = fill_missing_total_energy_supply(tb=tb)
+
     # Create additional variables (e.g. energy given in exajoules, also converted to terawatt-hours).
     tb = create_additional_variables(tb=tb)
+
+    # Fill missing electricity generation with total energy supply, where they are the same quantity.
+    tb = fill_missing_electricity_generation(tb=tb)
 
     # Create region aggregates and fix various related issues.
     tb = create_region_aggregates(tb=tb)
@@ -880,6 +973,10 @@ def run() -> None:
 
     # Sanity-check the output data.
     sanity_check_outputs(tb=tb)
+
+    # Remove residual and undefined provider regions (inputs to our aggregates above, but with no
+    # stable meaning for readers; see EXCLUDED_PROVIDER_REGIONS). The meadow table keeps them all.
+    tb = tb[~tb["country"].isin(EXCLUDED_PROVIDER_REGIONS)].reset_index(drop=True)
 
     # Convert gas reserves from trillion cubic meters to cubic meters. Done here rather than in the
     # grapher step because it changes the values, and it is the unit every consumer wants: the

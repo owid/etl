@@ -25,6 +25,8 @@ tables:
       energy_consumption_from_petroleum: {}
       energy_consumption_from_nuclear: {}
       energy_consumption_from_renewables: {}
+      energy_consumption_from_biofuels: {}
+      energy_consumption_from_other_renewables: {}
       energy_production_from_coal: {}
       energy_production_from_natural_gas: {}
       energy_production_from_petroleum: {}

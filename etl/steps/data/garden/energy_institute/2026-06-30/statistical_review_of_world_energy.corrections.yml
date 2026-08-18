@@ -34,3 +34,56 @@
     country values.
   provider: Energy Institute
   status: open
+
+- indicator: hydro_consumption_ej
+  entity: USSR
+  years: [1972]
+  action: override
+  value: 0.442436
+  expect: {gt: 0.5}
+  reason: >-
+    The USSR's hydro total energy supply for 1972 is reported as 0.7008 EJ (194.65 TWh), while its
+    hydro electricity generation for the same year is 122.90 TWh. Under the physical energy content
+    method these two are the same quantity, and they are identical for every other country-year in the
+    dataset. Two independent routes agree that the generation figure is the correct one: it makes the
+    two columns consistent, and it closes the gap between the USSR's reported total energy supply
+    (34.1059 EJ) and the sum of its sources, which is otherwise 0.2583 EJ (0.76%) too large and becomes
+    exact. Left uncorrected, the error also propagates into the aggregates for Europe and
+    upper-middle-income countries, which are built from the country values.
+  provider: Energy Institute
+  status: open
+
+- indicator: hydro_consumption_ej
+  entity: Iran
+  years: [2021]
+  action: override
+  value: 0.049777
+  expect: {lt: 0.01}
+  reason: >-
+    Iran's hydro total energy supply for 2021 is reported as zero, while its hydro electricity
+    generation for the same year is 13.83 TWh. Under the physical energy content method these two are
+    the same quantity, so the zero is spurious and understates Iran's hydro. Two independent routes
+    agree on 0.0498 EJ: it is the generation figure converted to exajoules, and it closes the gap
+    between Iran's reported total energy supply (12.0669 EJ) and the sum of its sources, which is
+    otherwise 0.0498 EJ (0.41%) too small and becomes exact. Left uncorrected, the error also
+    propagates into the aggregates for Asia and upper-middle-income countries.
+  provider: Energy Institute
+  status: open
+
+- indicator: wind_consumption_ej
+  entity: Other Asia Pacific (EI)
+  years: [1997]
+  action: override
+  value: 0.0000177015
+  expect: {lt: 0.000001}
+  reason: >-
+    The wind total energy supply of "Other Asia Pacific" for 1997 is reported as zero, while its wind
+    electricity generation for the same year is 0.00492 TWh. Under the physical energy content method
+    these two are the same quantity, so the zero is spurious. Two independent routes agree on
+    0.0000177 EJ: it is the generation figure converted to exajoules, and it is the gap between this
+    region's reported total energy supply (1.3363 EJ) and the sum of its sources, which matches to four
+    significant figures. The neighboring years support it as well (0.000006 EJ in 1996 and 0.000021 EJ
+    in 1998). This region is dropped from the output, but it feeds the Asia aggregate, where the error
+    otherwise makes wind supply and wind generation disagree.
+  provider: Energy Institute
+  status: open
