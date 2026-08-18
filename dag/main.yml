@@ -628,8 +628,8 @@ steps:
 
 
   # USA PPI New Office Construction (US Bureau of Labor Statistics)
-  data://garden/bls/2026-07-20/us_ppi_construction:
-    - snapshot://bls/2026-07-20/us_ppi_construction.csv
+  data://garden/bls/2026-08-18/us_ppi_construction:
+    - snapshot://bls/2026-08-18/us_ppi_construction.csv
 
   #
   # World Airlines Traffic and Capacity
