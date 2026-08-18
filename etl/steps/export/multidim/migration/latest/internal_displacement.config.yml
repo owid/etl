@@ -20,7 +20,7 @@ definitions:
     - config:
         hasMapTab: true
         tab: map
-        chartTypes: ["LineChart"]
+        chartTypes: ["LineChart", "DiscreteBar"]
 
   description_key_stock: This chart shows the total number of internally displaced people living in a region at the end of the year.
   description_key_flow: This chart shows the total number of internal displacements that occurred during the year. A displacement occurs every time a person is forced to leave their home but remains within their country's borders.

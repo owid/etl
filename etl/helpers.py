@@ -207,8 +207,12 @@ def end_with_punctuation(text: str | None) -> str | None:
 
     A closing quote or bracket after the punctuation counts as ending with it, so
     `… agree with?"` and `… (per 100,000 people).` are both left alone.
+
+    Text taken straight out of a table column can be a pandas missing value rather
+    than `None` (`pd.NA` raises on `bool()`), so anything that isn't a string is
+    handed back untouched.
     """
-    if not text:
+    if not isinstance(text, str) or not text:
         return text
     stripped = text.rstrip()
     if not stripped:
