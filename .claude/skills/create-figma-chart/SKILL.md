@@ -490,8 +490,8 @@ compared against.
 
 The palette lives in the **Chart colors** library, and the design team's own pages bind chart *marks*
 to it (`OWID Distinct/*`, `Chart/*`) while leaving in-chart text on raw fills. Import a style by key
-and assign it — `node.fillStyleId = (await figma.importStyleByKeyAsync(key)).id` — after which the
-frame follows the library instead of a hex someone typed. To learn the keys, read them off a page that
+and bind it — `await node.setFillStyleIdAsync((await figma.importStyleByKeyAsync(key)).id)` — after
+which the frame follows the library instead of a hex someone typed. To learn the keys, read them off a page that
 already uses them (`Plugin / Bar charts` and `Plugin / Line charts` enumerate most of the palette).
 
 Two things this exercise is good for beyond tidiness:

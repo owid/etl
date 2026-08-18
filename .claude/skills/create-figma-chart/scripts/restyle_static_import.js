@@ -70,21 +70,24 @@ const rgbOf = (h) => {
   return { r, g, b };
 };
 
-function paint(node, hexColor, styleId) {
-  const apply = (n) => {
+// The node-level paint-style setters are the async ones, per the Plugin API note in SKILL.md. A plain
+// `fillStyleId =` assignment throws in the dynamic-page access mode this script already depends on for
+// `getNodeByIdAsync`, and `use_figma` is atomic, so that loses the whole pass at the first bound mark.
+async function paint(node, hexColor, styleId) {
+  const apply = async (n) => {
     if ("fills" in n && n.fills !== figma.mixed && Array.isArray(n.fills) && n.fills.length) {
       n.fills = [{ ...n.fills[0], type: "SOLID", color: rgbOf(hexColor) }];
-      if (styleId) n.fillStyleId = styleId;
+      if (styleId) await n.setFillStyleIdAsync(styleId);
     } else if ("strokes" in n && n.strokes !== figma.mixed && Array.isArray(n.strokes) && n.strokes.length) {
       // A line mark carries its color in `strokes`, not `fills` — matplotlib writes it as
       // `fill:none; stroke:…` — so a fills-only pass silently skips the `category__…-line` nodes
       // selected below. Second in the chain, not alongside, so a filled bar keeps its own edge.
       n.strokes = [{ ...n.strokes[0], type: "SOLID", color: rgbOf(hexColor) }];
-      if (styleId) n.strokeStyleId = styleId;
+      if (styleId) await n.setStrokeStyleIdAsync(styleId);
     }
-    if ("children" in n) n.children.forEach(apply);
+    if ("children" in n) for (const child of n.children) await apply(child);
   };
-  apply(node);
+  await apply(node);
 }
 
 const page = figma.root.children.find((p) => p.id === CONFIG.pageId);
@@ -129,16 +132,16 @@ for (const job of CONFIG.jobs) {
       const fill = weight ? tint(family.base, weight) : family.base;
       const label = weight ? tint(family.base, weight * CONFIG.labelTintFactor) : family.base;
       for (const node of styled.findAll((n) => n.name.endsWith("__" + column) && !/^(header|category)__/.test(n.name))) {
-        paint(node, fill, weight ? null : styleIds[family.base]);
+        await paint(node, fill, weight ? null : styleIds[family.base]);
       }
       for (const node of styled.findAll((n) => n.name === "header__" + column)) {
-        paint(node, label, weight ? null : styleIds[family.base]);
+        await paint(node, label, weight ? null : styleIds[family.base]);
       }
     }
     for (const node of styled.findAll(
       (n) => n.name === "category__" + family.category || n.name.startsWith("category__" + family.category + "-line")
     )) {
-      paint(node, family.base, styleIds[family.base]);
+      await paint(node, family.base, styleIds[family.base]);
     }
   }
 
@@ -178,7 +181,7 @@ for (const job of CONFIG.jobs) {
     const parent = node.parent ? node.parent.name : "";
     if (CONFIG.bodyTextParent.test(parent) || CONFIG.darkTextParent.test(parent)) {
       const dark = CONFIG.darkTextParent.test(parent);
-      node.fillStyleId = styleIds[dark ? "dark" : "body"];
+      await node.setFillStyleIdAsync(styleIds[dark ? "dark" : "body"]);
     }
   }
 
@@ -190,7 +193,10 @@ for (const job of CONFIG.jobs) {
   styled.y = 0;
   if (old) old.remove();
 
-  // A flowed line of runs needs laying out again, one measured space apart.
+  // A flowed line of runs needs laying out again, one measured space apart. Rows are keyed on y
+  // alone because each run of one line sits under its own `header__…`/`category__…` parent, so
+  // keying on the parent would put every run in a row of its own and reflow nothing. That makes
+  // "the selected runs form one line per y" a precondition, which is why this is per-job opt-in.
   let reflowed = 0;
   if (job.reflowLegend) {
     const runs = styled.findAll(
