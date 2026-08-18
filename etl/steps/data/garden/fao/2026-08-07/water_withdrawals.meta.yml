@@ -51,8 +51,6 @@ tables:
       total_water_withdrawal_per_capita:
         title: Total water withdrawal per capita
         description_short: Water withdrawn each year for agriculture, industry, and municipal uses, divided by the population.
-        description_key:
-          - This is not collected from countries. FAO calculates it by dividing total water withdrawal by population.
         processing_level: minor
         unit: cubic meters per person
         short_unit: m³
