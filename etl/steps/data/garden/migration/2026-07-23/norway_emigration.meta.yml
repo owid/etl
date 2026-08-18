@@ -1,0 +1,30 @@
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+definitions: {}
+
+dataset:
+  update_period_days: 0
+  owners:
+    - Edouard Mathieu
+
+tables:
+  norway_emigration:
+    variables:
+      overseas_emigration_share:
+        title: Annual share of Norway's population emigrating outside Europe
+        unit: "%"
+        short_unit: "%"
+        description_short: Only emigration to overseas destinations outside Europe is counted — mostly to North America. People moving to other European countries are not included.
+        description_key: |-
+          This data counts people who left Norway for overseas countries outside Europe — [overwhelmingly North America](https://www.ssb.no/a/histstat/nos/nos_vii_025.pdf).
+
+          From 1867, they were registered by the police when departing on emigrant ships from Norwegian ports; earlier figures were compiled from reports by parish priests. People moving to other European countries were not recorded, and some overseas emigrants were also missed, for example those who traveled via ports in other countries.
+
+          There is no data for most years before 1836, when records were sparse, and none for 1941–1945, during the German occupation of Norway.
+
+          The series ends in 1950, because from 1951 onward Statistics Norway counted all emigration rather than only emigration to overseas countries.
+        description_processing: |-
+          We calculated this indicator by dividing the number of emigrations by the population of Norway at the start of the same year, reported in the same source table.
+        processing_level: minor
+        display:
+          numDecimalPlaces: 1
