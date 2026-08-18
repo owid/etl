@@ -1209,8 +1209,9 @@ def solve_category_layout(spans: dict, layout: dict) -> list[dict]:
             span_px = spans[category["columns"][-1]][1] - spans[category["columns"][0]][0]
             variants = sorted(
                 variants,
-                key=lambda lines: max(text_width_px(line, layout["header_fontsize"], bold=True) for line in lines)
-                > span_px,
+                key=lambda lines: (
+                    max(text_width_px(line, layout["header_fontsize"], bold=True) for line in lines) > span_px
+                ),
             )
         remaining = layout["categories"][index + 1 :]
         placement = None
