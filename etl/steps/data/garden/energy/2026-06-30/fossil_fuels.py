@@ -72,14 +72,20 @@ REGIONS = CONTINENTS + [
     "Upper-middle-income countries",
 ]
 
-# Years each region's aggregate covers, per column (see add_region_aggregates). Production starts a year
+# Year each region's aggregate starts, per column (see add_region_aggregates). Production starts a year
 # later than consumption because the Statistical Review only reports coal production from 1981, and the
-# three fuels are held to one window. Asserted in sanity_check_region_aggregates, so that a change has to
-# be acknowledged here rather than found on a chart.
-EXPECTED_AGGREGATE_YEARS: dict[str, tuple[int, int]] = {
-    **{f"{fuel}_production_twh": (1981, 2024) for fuel in FUELS},
-    **{f"{fuel}_consumption_twh": (1980, 2024) for fuel in FUELS},
+# three fuels of a metric are held to one start year. Asserted in sanity_check_region_aggregates, so that a
+# change has to be acknowledged here rather than found on a chart.
+EXPECTED_AGGREGATE_FIRST_YEAR: dict[str, int] = {
+    **{f"{fuel}_production_twh": 1981 for fuel in FUELS},
+    **{f"{fuel}_consumption_twh": 1980 for fuel in FUELS},
 }
+
+# Years an aggregate may end in. The Statistical Review publishes a year ahead of EIA, so Europe and
+# high-income countries reach that year on consumption; the countries EIA has yet to publish are worth
+# 0.6-5.8% of their totals, which is within the spread between the two producers. Every other region
+# stops where EIA does.
+EXPECTED_AGGREGATE_LAST_YEARS = (2024, 2025)
 
 # Minimum fraction of a region's reporting countries that must report an indicator in a given year, for
 # that region-year to be published.
@@ -313,16 +319,16 @@ def add_region_aggregates(tb: Table, tb_review: Table, eia_years: tuple[int, int
         accepted_overlaps=None,
     )
 
-    # Clip the energy columns to the years both producers cover. The three fuels of a metric share one
-    # window, so that a region's coal + oil + gas total is always the sum of all three: coal production
-    # starts in 1981 and the other two in 1980, and a two-fuel total understates Africa's by 900 TWh.
+    # The three fuels of a metric start in the same year, so that a region's coal + oil + gas total is
+    # always the sum of all three: coal production begins in 1981 and the other two in 1980, and a
+    # two-fuel total understates Africa's by 900 TWh. Nothing is cut at the recent end; the last year is
+    # left to the coverage conditions.
     for metric in ("production", "consumption"):
         columns = [f"{fuel}_{metric}_twh" for fuel in FUELS]
         review_years = [tb_review.loc[tb_review[column].notna(), "year"] for column in columns]
         assert all(not years.empty for years in review_years), f"The Statistical Review reports no {metric}."
         first_year = max(eia_years[0], *(int(years.min()) for years in review_years))
-        outside = ~tb_energy["year"].between(first_year, eia_years[1])
-        tb_energy.loc[outside, columns] = float("nan")
+        tb_energy.loc[tb_energy["year"] < first_year, columns] = float("nan")
 
     tb_aggregates = pr.multi_merge([tb_energy, tb_other, tb_reserves], on=["country", "year"], how="outer")
     value_columns = [c for c in tb_aggregates.columns if c not in ("country", "year")]
@@ -531,12 +537,15 @@ def sanity_check_region_aggregates(tb: Table) -> None:
     continents missing one of them cannot equal the World), the years it covers are asserted instead, so
     a change in coverage fails rather than passing silently.
     """
-    for column, expected in EXPECTED_AGGREGATE_YEARS.items():
+    for column, expected_first_year in EXPECTED_AGGREGATE_FIRST_YEAR.items():
         for region in REGIONS:
             years = sorted(tb.loc[(tb["country"] == region) & tb[column].notna(), "year"].unique())
             assert years, f"{region} has no {column} at all."
-            assert (int(years[0]), int(years[-1])) == expected, (
-                f"{region}'s {column} spans {years[0]}-{years[-1]}, not the expected {expected[0]}-{expected[1]}."
+            assert int(years[0]) == expected_first_year, (
+                f"{region}'s {column} starts in {years[0]}, not the expected {expected_first_year}."
+            )
+            assert int(years[-1]) in EXPECTED_AGGREGATE_LAST_YEARS, (
+                f"{region}'s {column} ends in {years[-1]}, not one of {EXPECTED_AGGREGATE_LAST_YEARS}."
             )
             missing = sorted(set(range(years[0], years[-1] + 1)) - set(years))
             assert not missing, f"{region}'s {column} is missing {missing}."
