@@ -5,7 +5,8 @@ definitions:
       topic_tags:
         - Energy
     description_processing: |-
-      - The total energy supply is extended to countries not covered by the Statistical Review using the U.S. Energy Information Administration's (EIA) total energy consumption. The Statistical Review is prioritized where both sources are available.
+      - Countries the Statistical Review does not cover are added from the U.S. Energy Information Administration (EIA), source by source, and their total energy supply is the sum of those sources. EIA's own total is measured differently — it counts electricity as consumed rather than as generated, and does not convert geothermal and bioenergy into the heat needed to produce them — so using it would put those countries on a different basis from the rest.
+      - Continents and income groups are calculated by Our World in Data by adding up the countries in each. They are shown only for years where enough of a region's countries report, so that a region's trend is not driven by countries entering or leaving the data.
       - The World series is extended back to 1800 using Vaclav Smil's historical estimates (2017), for years before the Statistical Review begins (1965). Only commercially-traded energy sources are included (traditional biomass, which Smil reports but the Statistical Review does not, is excluded so the series stays on a single basis with no step at the splice).
 
 dataset:

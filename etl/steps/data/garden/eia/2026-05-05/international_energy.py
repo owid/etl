@@ -764,11 +764,11 @@ def add_other_renewables(tb: Table) -> Table:
     tb["energy_consumption_from_other_renewables"].metadata.unit = "terawatt-hours"
     tb["energy_consumption_from_other_renewables"].metadata.short_unit = "TWh"
     tb["energy_consumption_from_other_renewables"].metadata.description_processing = (
-        "This is an OWID estimate, not a figure the producer publishes. EIA reports electricity "
-        "generation from geothermal, biomass and waste, and tide and wave, but its total energy "
-        "supply for renewables is published only as one lump and on a different basis. We convert "
-        "each generation figure to heat input using the efficiencies the IEA's physical energy "
-        "content method assumes: 10% for geothermal and 33% for the combustible sources."
+        "This is our own estimate, not a figure the producer publishes. The producer reports how much "
+        "electricity comes from geothermal, biomass and waste, and tide and wave, but not the energy "
+        "supply behind it. We convert each to the heat that would be needed to produce that electricity, "
+        "using the efficiencies the International Energy Agency assumes: 10% for geothermal and 33% for "
+        "the combustible sources."
     )
     return tb
 
@@ -791,6 +791,12 @@ def fill_trailing_zeros_in_biofuels(tb: Table) -> Table:
     assert to_fill.sum() > 0, "Expected trailing gaps in EIA's biofuels series, found none."
     tb.loc[to_fill, column] = 0
 
+    tb[column].metadata.description_processing = (
+        "Until 2019 the producer reported an explicit zero for the many countries that consume no "
+        "biofuels, and from 2020 it publishes only the countries that do. Where a country's series ends "
+        "in zero we continue it at zero; where it ends in a positive value we leave the gap, since there "
+        "the recent figures are genuinely unknown."
+    )
     return tb
 
 
