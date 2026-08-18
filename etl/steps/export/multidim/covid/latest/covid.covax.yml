@@ -1,3 +1,5 @@
+grapher_schema: "011"
+
 definitions:
   common_views:
     - config_base:

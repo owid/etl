@@ -15,7 +15,7 @@ from yaml.loader import SafeLoader
 from etl.config import DEFAULT_GRAPHER_SCHEMA
 from etl.dag_helpers import get_active_snapshots, get_active_steps
 from etl.files import read_json_schema
-from etl.paths import BASE_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR, STEPS_DATA_DIR
+from etl.paths import BASE_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR, STEP_DIR, STEPS_DATA_DIR
 
 log = structlog.get_logger()
 
@@ -347,6 +347,34 @@ def test_snapshot_license_lives_under_origin():
         "These snapshots set a top-level license (`meta.license` / `meta.license_name` / "
         "`meta.license_url`) on an origin-based snapshot. Move it under `meta.origin.license`:\n  "
         + "\n  ".join(sorted(violations))
+    )
+
+
+def test_multidim_configs_pin_grapher_schema():
+    """Guardrail: every multidim collection config must pin `grapher_schema`.
+
+    Grapher injects the collection's `grapherConfigSchema` as the `$schema` of each view config and
+    migrates outdated configs forward. When no version is given, ETL falls back to
+    `DEFAULT_GRAPHER_SCHEMA`, i.e. it tells Grapher the configs are already current — so a breaking
+    schema change upstream would silently skip the migration for those views.
+
+    Pinning records the version the config was actually authored against. See
+    `etl.collection.utils.resolve_grapher_schema` for the accepted forms.
+    """
+    missing = []
+    for config_path in sorted(Path(STEP_DIR / "export" / "multidim").glob("**/*.yml")):
+        config = yaml.safe_load(config_path.read_text()) or {}
+        # Only collection configs are in scope; the directory also holds plain data yaml
+        # (e.g. un/latest/map_brackets.yml).
+        if not isinstance(config, dict) or not {"dimensions", "views"} <= set(config):
+            continue
+        if "grapher_schema" not in config:
+            missing.append(str(config_path.relative_to(BASE_DIR)))
+
+    assert not missing, (
+        "These multidim configs don't pin `grapher_schema`. Add the current version as a "
+        f'**quoted** string (an unquoted `011` is parsed as octal) — `grapher_schema: "'
+        f'{DEFAULT_GRAPHER_SCHEMA.rsplit(".", 2)[1]}"`:\n  ' + "\n  ".join(missing)
     )
 
 

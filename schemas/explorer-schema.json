@@ -8,10 +8,6 @@
             "description": "Definitions with anchors that are reused in other parts of the metadata",
             "additionalProperties": true
         },
-        "grapherConfigSchema": {
-            "description": "URL of a JSON schema for the grapher config.",
-            "type": "string"
-        },
         "title": {
             "type": "object",
             "properties": {
