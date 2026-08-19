@@ -829,20 +829,39 @@ def test_a_stale_dataset_outranks_every_other_verdict():
 
 
 def test_stale_datasets_are_those_this_server_built_earlier_than_the_baseline(monkeypatch):
-    """Only "we are behind" counts — being ahead is the normal state of a branch that changed something."""
+    """Only "we are behind" counts — being ahead is the normal state of a branch that changed something.
+
+    And only for a dataset this server actually rebuilt. One it never rebuilt is older here for the
+    ordinary reason (the baseline moved on after the fork), which no rebuild of ours fixes — counting it
+    would flag most long-lived servers as broken.
+    """
     from datetime import datetime
 
     from apps.wizard.app_pages.metadata_diff import discovery
 
+    created = datetime(2026, 8, 5, 9, 0)
     behind = datetime(2026, 8, 5, 13, 54)
     ahead = datetime(2026, 8, 19, 9, 29)
     baseline = datetime(2026, 8, 17, 18, 2)
+    never_built_here = datetime(2026, 7, 1, 10, 0)  # predates the fork: cloned from the baseline, untouched
 
     times = {
-        "here": {"ns/v/stale": behind, "ns/v/ours": ahead, "ns/v/same": baseline, "ns/v/only_here": ahead},
-        "there": {"ns/v/stale": baseline, "ns/v/ours": baseline, "ns/v/same": baseline},
+        "here": {
+            "ns/v/stale": behind,
+            "ns/v/ours": ahead,
+            "ns/v/same": baseline,
+            "ns/v/only_here": ahead,
+            "ns/v/untouched": never_built_here,
+        },
+        "there": {
+            "ns/v/stale": baseline,
+            "ns/v/ours": baseline,
+            "ns/v/same": baseline,
+            "ns/v/untouched": baseline,  # the baseline rebuilt it after the fork — not our staleness
+        },
     }
     monkeypatch.setattr(discovery, "dataset_edit_times", lambda engine: times[engine])
+    monkeypatch.setattr(discovery, "_staging_creation_time", lambda engine: created)
 
     stale = discovery.stale_datasets("here", "there")
     assert set(stale) == {"ns/v/stale"}

@@ -332,19 +332,29 @@ UNKNOWN = "unknown"  # master's environment was unavailable, so the two could no
 
 
 def stale_datasets(source_engine: Engine, target_engine: Engine) -> dict[str, tuple[Any, Any]]:
-    """Datasets whose build on THIS server is older than the baseline's: dataset -> (here, baseline).
+    """Datasets this server built and has since fallen behind the baseline on: dataset -> (here, baseline).
 
     The failure this exists for, seen on a real branch: a staging build only rebuilds steps that differ
     from master, so the moment a branch's edit to a dataset is reverted, that dataset stops being selected
     and the server keeps serving its old build indefinitely — including the reverted edit. The tool then
     shows text nobody on the branch wrote, as though the branch had written it. Nothing else notices.
+
+    "Built here" is what separates that from the baseline merely moving on. A dataset this server never
+    rebuilt is older here for the ordinary reason — the baseline rebuilt it after the fork — and no
+    rebuild of ours would change that, so counting it would put a 🚧 and a pointless rebuild command on
+    every server that has been up for a while. It cannot be narrowed by the git scope instead: a reverted
+    edit leaves the branch's diff, so the very datasets this exists for are out of scope by then.
     """
+    created = _staging_creation_time(source_engine)
     source_times = dataset_edit_times(source_engine)
     target_times = dataset_edit_times(target_engine)
     out: dict[str, tuple[Any, Any]] = {}
     for dataset, here in source_times.items():
         there = target_times.get(dataset)
-        if here is not None and there is not None and here < there:
+        if here is None or there is None:
+            continue
+        # `here >= created` is "this server rebuilt it after it was forked" — as in datasets_built_here.
+        if here >= created and here < there:
             out[dataset] = (here, there)
     return out
 
