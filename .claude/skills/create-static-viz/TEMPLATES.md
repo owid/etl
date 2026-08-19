@@ -75,19 +75,29 @@ fills these same slots when the SVG is imported.
 | Tagline (left) | 608.62 | 467 | 13 | **11** |
 | License (right, x=571) | 608.62 | 263 | 13 | **11** |
 
-The slots sit in two auto-layout frames: header block `25398:753` spans 0→134.22, footer block
-`25398:769` starts at 542.62. Each carries 16 px of inner padding on the chart side, so the visual
-chart area starts at 118 while `header.y + header.height` reads 134.22 — that edge plus the padding.
+The slots sit in two auto-layout frames: a header block (`Frame 20` at last check) spanning **0→118**,
+and footer block **`Frame 22` (`25808:13`)** starting at **559**. **Neither wrapper carries inner
+padding** — `header.y + header.height` *is* the chart area's top edge at 118, and the footer's own `y`
+is the `Note:` row. Resolve both structurally (topmost/bottommost auto-layout child) rather than by
+name or id: the design team renames and re-ids these frames in place.
 
 ### Vertical — 850 × 1095
 
-Same slots, widths, sizes and auto-layout wrappers as Horizontal. Header block `5332:94` is
-**0→134.22**; footer block `5332:101` starts at **999.81**. Absolute y: title 16.22, subtitle 80.22,
-chart area 118 → 1015.81, `Note:` 1015.81, `Data source:` 1047.81, tagline/license 1065.81.
+Same slots, widths, sizes and auto-layout wrappers as Horizontal. The header block (`Frame 23`) is
+**0→118**; footer block **`Frame 25` (`25808:16`)** starts at **1015.81**. Absolute y: title 16.22,
+subtitle 80.22, chart area 118 → 1015.81, `Note:` 1015.81, `Data source:` 1047.81, tagline/license
+1065.81.
 
-**The two header blocks are now identical at 134.22.** They used to differ — 136 here against 134,
-from a 30 px title line height against 29 — and that difference is gone, so don't reintroduce a
-Vertical-specific header offset.
+**The two header blocks are identical at 118**, so don't reintroduce a Vertical-specific header
+offset. They used to differ (136 against 134, from a 30 px title line height against 29), and before
+that both read 134.22 — an edge that only existed because the wrappers were padded 16 px on the chart
+side. Both the padding and that difference are gone.
+
+> **Wrapper figures re-verified 2026-08-19; the slot table above was not.** The wrapper ids, the 118
+> header bottom and the removal of the padding come from the same measurement pass as
+> `/create-figma-chart`'s node map. The per-slot `y` values still date from 2026-08-17 and sit within
+> ~0.4 px of it (the footer rows derive as 559 / 591 / 609 against the tabled 558.62 / 590.62 /
+> 608.62) — immaterial for emitting an SVG, but re-measure before trusting them for anything tighter.
 
 ### The license slot holds about fifty characters
 
@@ -219,8 +229,11 @@ chart_top_px = band_top + BAND_INSET + header_px
 chart_bottom_px = band_bottom - BAND_INSET - below_px
 ```
 
-**Both edges are ink, not frame.** The footer *frame* starts 16 px above its `Note:` ink, so insetting
-from the frame's `y` insets twice and leaves a visibly loose bottom.
+**Both edges are ink, not frame — and on the current templates the footer frame's own `y` *is* its
+first row's ink** (Horizontal's footer starts at 559, which is the `Note:` row). So inset once, from
+that edge. This used to need a correction: the footer frame started 16 px above its `Note:` ink, and
+insetting from the frame's `y` then inset twice and left a visibly loose bottom. If you measure that
+gap again, the wrappers have been re-padded — re-verify before compensating for it.
 
 **Draw the step's own copies of these slots at the sizes in the table, not at sizes that merely look
 right.** It is tempting to set the step's title and subtitle a size or two smaller — nothing in the

@@ -62,18 +62,20 @@ heading `"SMALL" Charts (featured on the OWID website as guided and PULL charts)
 | `small-chart-template-guided` | `25344:1357` | 302×233 | title `25344:1378`, optional subtitle `25344:1379` |
 | `small-chart-template-pull` | `25344:1391` | 302×233 | title `25344:1396`, optional subtitle `25344:1397`, **source `25344:1398`** |
 
-### The background is not where you expect it
+### The background — check it, but expect nothing to repair
 
-Both templates ship their frame fill as **white with `visible: false`**, and paint the background from
-a `Group > Group > Vector` — a white **302×233 rectangle** — instead. So:
+**Both templates now carry a real visible white frame fill and no background vector**, so a clone is
+ready to use as-is. Assert that rather than assume it, because the shape of the old defect is what
+makes a regression recognizable:
 
-- **Do not just delete that group.** It is the only thing painting the background; remove it and the
-  frame is transparent, which shows up immediately as charts with no white card behind them.
-- **But do not keep it either**, because it is a *fixed* 302×233 rectangle and this format's height is
-  free. It under-covers a 272-tall frame and overhangs a 221-tall one.
-- **Enable the frame's own fill and drop the vector group**: `frame.fills = frame.fills.map(f => ({...f, visible: true}))`.
-  A fill follows the frame at any height, and it is what the designer's finished charts did — every
-  one of them had the frame fill visible and no full-size background vector.
+- They used to ship the frame fill as **white with `visible: false`** and paint the background from a
+  `Group > Group > Vector` — a white **302×233 rectangle**. If you meet that again, enable the frame's
+  own fill and drop the vector group: `frame.fills = frame.fills.map(f => ({...f, visible: true}))`.
+- **Neither half of that repair works alone.** Deleting the group leaves a transparent frame — charts
+  with no white card behind them. Keeping it leaves a *fixed* 302×233 rectangle in a format whose
+  height is free, so it under-covers a 272-tall frame and overhangs a 221-tall one. A frame fill
+  follows the frame at any height, which is why it is the right answer and what the designer's
+  finished charts all use.
 
 There is **no z-order hazard to avoid here.** `appendChild` puts the imported chart last, so it draws
 above the background whatever the background is. The "an opaque background paints over the template"
@@ -626,10 +628,11 @@ entities and the values are the point. It is an editorial choice, so ask rather 
 Steps 5 and 7 of SKILL.md, reduced to what this format needs:
 
 1. Clone `25344:1357` (guided) or `25344:1391` (pull) onto the page.
-2. **Fix the background:** set the clone's own white fill to `visible: true`, then remove the
-   `Group > Group > Vector` background rectangle (see above for why both halves are needed). That
-   group is a **`GROUP`**, not a `FRAME` — `get_metadata` renders groups as `<frame …>`, so a filter
-   on `type === "FRAME"` silently matches nothing and leaves it in place.
+2. **Check the background, don't fix it:** the clone should already have a visible white frame fill
+   and no background vector. Only if it does not, apply the repair above — set the clone's own white
+   fill to `visible: true` *and* remove the `Group > Group > Vector` rectangle, both halves. When
+   hunting for that group, note it is a **`GROUP`**, not a `FRAME` — `get_metadata` renders groups as
+   `<frame …>`, so a filter on `type === "FRAME"` silently matches nothing and leaves it in place.
 3. Resize the clone to `H`. On a pull clone, move the source row to `y = H − 23`.
 4. Fill the text slots — title, optional subtitle, and the bare `Producer (Year)` source on a pull
    chart. Per SKILL.md Step 6, setting `characters` flattens mixed weights; these slots are
