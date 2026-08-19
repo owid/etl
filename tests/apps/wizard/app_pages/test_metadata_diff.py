@@ -1347,3 +1347,54 @@ def test_a_draft_mdim_is_reported_but_not_counted_as_reader_facing():
     # A draft never inflates the reader-facing MDim count.
     both = Summary(n_mdims=2, n_draft_mdims=3)
     assert "MDims: 2" in format_metadata_diff(both)
+
+
+def test_a_branch_owned_draft_is_not_also_reported_as_baseline_lag():
+    """A draft this branch changed belongs to the branch, so it is not a difference someone else caused.
+
+    `n_other_mdims` was every changed MDim minus the *published* in-branch ones, which left the branch's own
+    drafts in the baseline-lag bucket: the PR comment then reported the same MDim twice, once as
+    "Unpublished MDims changed" and once as "a further difference ... not this branch". The MDims list had
+    always used the right set (`has_changes & ~in_branch`); only the counter disagreed with it.
+    """
+    import pandas as pd
+
+    from apps.wizard.app_pages.metadata_diff import discovery
+
+    df = pd.DataFrame(
+        {
+            "has_changes": [True, True, True],
+            "in_branch": [True, True, False],
+            "is_draft": [False, True, False],
+        },
+        index=["ours/published", "ours/draft", "master/rebuilt"],
+    )
+    reader_facing = df["in_branch"] & ~df["is_draft"]
+    flagged = list(df.index[reader_facing])
+    # Only the MDim nobody in the branch touched is baseline lag — not the branch's own draft.
+    assert int((df["has_changes"] & ~df["in_branch"]).sum()) == 1
+    # The old arithmetic counted the draft as well, which is what double-reported it.
+    assert int(df["has_changes"].sum()) - len(flagged) == 2
+    assert list(df.index[df["has_changes"] & ~df["in_branch"]]) == ["master/rebuilt"]
+    assert discovery.Summary(n_other_mdims=1).n_other == 1
+
+
+def test_too_many_draft_mdims_reports_a_ceiling_instead_of_a_truncated_count():
+    """Resolving drafts is capped, and a capped count must say it is a ceiling.
+
+    The published path already reports `len(flagged)` and sets `mdims_resolved = False` when it cannot diff
+    view by view. The draft path instead sliced to the first `MAX_MDIMS_RESOLVED` and reported whatever it
+    found there as exact — an undercount with nothing to signal it. The flag is separate from the published
+    one, so overflowing drafts never mislabel a reader-facing count that resolved fine.
+    """
+    from apps.owidbot.metadata_diff import format_metadata_diff
+    from apps.wizard.app_pages.metadata_diff.discovery import MAX_MDIMS_RESOLVED, Summary
+
+    capped = Summary(n_mdims=2, n_draft_mdims=MAX_MDIMS_RESOLVED + 9, draft_mdims_resolved=False)
+    body = format_metadata_diff(capped)
+    assert f"Unpublished MDims changed: {MAX_MDIMS_RESOLVED + 9} (flagged; too many to resolve view by view)" in body
+    # The reader-facing count resolved cleanly, so it carries no ceiling qualifier of its own.
+    assert "MDims: 2</li>" in body
+
+    # And the usual case stays unqualified.
+    assert "Unpublished MDims changed: 3 — no reader sees them yet" in format_metadata_diff(Summary(n_draft_mdims=3))

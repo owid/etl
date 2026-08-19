@@ -985,6 +985,7 @@ class Summary:
     stale: dict[str, tuple[Any, Any]] = field(default_factory=dict)
     n_distinct_changes: int = 0  # distinct texts changed, counted once across all surfaces
     mdims_resolved: bool = True  # False when there were too many flagged MDims to diff view by view
+    draft_mdims_resolved: bool = True  # False when there were too many draft MDims to diff view by view
     narrowed: bool = True
     warnings: list[str] = field(default_factory=list)
 
@@ -1109,7 +1110,10 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
         flagged = [str(cp) for cp in df_mdims.index[reader_facing]]
         drafts = [str(cp) for cp in df_mdims.index[df_mdims["in_branch"] & df_mdims["is_draft"]]]
         summary.n_mdims_flagged = len(flagged)
-        summary.n_other_mdims = int(df_mdims["has_changes"].sum()) - len(flagged)
+        # Baseline lag only. Subtracting `flagged` alone left this branch's own drafts in here, so the same
+        # MDim was reported twice — once as "Unpublished MDims changed", once as a difference the branch is
+        # not responsible for. This is the set the MDims list already shows under "other differences".
+        summary.n_other_mdims = int((df_mdims["has_changes"] & ~df_mdims["in_branch"]).sum())
         if len(flagged) > MAX_MDIMS_RESOLVED:
             # Too many to diff view by view here; report the flag count and say the number is a ceiling.
             summary.mdims_resolved = False
@@ -1124,11 +1128,19 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
                     summary.n_mdim_changes += len(ours)
                     _collect_changes(seen, ours)
         # Drafts are counted only where they actually have changed text, same test as the rest.
-        scope_for_drafts = branch_scope()
-        for cp in drafts[:MAX_MDIMS_RESOLVED]:
-            view_diffs = [v for v in mdim_text_changes(source_engine, target_engine, cp) if v.changed]
-            if split_mdim_groups(cp, view_diffs, scope_for_drafts)[0]:
-                summary.n_draft_mdims += 1
+        if len(drafts) > MAX_MDIMS_RESOLVED:
+            # Too many to diff view by view. Report the flag count as a ceiling and say so, rather than
+            # resolve the first 25 and present the truncated number as exact — that is the silent
+            # under-report this tool exists to catch. The flag is the drafts' own: an overflow here says
+            # nothing about whether the reader-facing count above could be resolved.
+            summary.draft_mdims_resolved = False
+            summary.n_draft_mdims = len(drafts)
+        else:
+            scope_for_drafts = branch_scope()
+            for cp in drafts:
+                view_diffs = [v for v in mdim_text_changes(source_engine, target_engine, cp) if v.changed]
+                if split_mdim_groups(cp, view_diffs, scope_for_drafts)[0]:
+                    summary.n_draft_mdims += 1
     except Exception as e:  # noqa: BLE001
         log.warning("metadata_diff.mdim_discovery_failed", error=str(e))
         summary.warnings.append(f"MDim discovery failed: {e}")

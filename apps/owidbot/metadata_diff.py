@@ -83,7 +83,12 @@ def format_metadata_diff(summary: Summary) -> str:
         items.append(f"<li>MDims: {summary.n_mdims}{qualifier}</li>")
     if summary.n_draft_mdims:
         # Not reader-facing yet, so not in the MDims count — but the text ships the moment it is published.
-        items.append(f"<li>Unpublished MDims changed: {summary.n_draft_mdims} — no reader sees them yet</li>")
+        # Its own ceiling qualifier: the drafts can overflow the view-by-view budget while the count above
+        # resolved cleanly, and vice versa.
+        qualifier = "" if summary.draft_mdims_resolved else " (flagged; too many to resolve view by view)"
+        items.append(
+            f"<li>Unpublished MDims changed: {summary.n_draft_mdims}{qualifier} — no reader sees them yet</li>"
+        )
     if summary.n_explorers:
         items.append(f"<li>Explorers: {summary.n_explorers} ({summary.n_explorer_views} views)</li>")
     if summary.fields:
