@@ -169,6 +169,7 @@ VALUE_LABEL_COVERAGE = 0.75
 MAIN_CATEGORY_GROUPS = [
     {
         "column": "main_paid_work_or_study",
+        "members": ["Paid work", "Commuting", "School or classes", "Homework"],
         "compact": True,
         "label": "Paid work or study",
         "color": ("deep", 3),
@@ -176,6 +177,7 @@ MAIN_CATEGORY_GROUPS = [
     },
     {
         "column": "main_personal_care",
+        "members": ["Sleep", "Eating & drinking", "Other personal care"],
         "label": "Personal care",
         "color": ("deep", 7),
         "as_hours": True,
@@ -183,29 +185,36 @@ MAIN_CATEGORY_GROUPS = [
         # differently from its neighbours reads as a difference in kind, and the only difference is
         # that this segment is wider.
         "compact": True,
-        "contents": "sleep, eating and other personal care",
     },
     {
         "column": "main_unpaid_work_and_other",
+        "members": ["Housework", "Childcare", "Shopping", "Volunteering", "Other"],
         "compact": True,
         "as_hours": True,
         "label": "Unpaid work & other",
         "color": ("deep", 5),
-        "contents": "housework, shopping, care work, volunteering and civic activities",
     },
     {
         "column": "main_leisure",
+        "members": ["TV & radio", "Seeing friends", "Sports", "Events", "Other leisure"],
         "compact": True,
         "as_hours": True,
         "label": "Leisure",
         "color": ("deep", 0),
-        "contents": "TV and radio, seeing friends and other leisure",
     },
 ]
 
 # One category per segment, so the header machinery names each segment instead of bracketing a run.
 MAIN_CATEGORIES = [
-    {"name": group["label"], "color": group["color"], "columns": [group["column"]]} for group in MAIN_CATEGORY_GROUPS
+    {
+        "name": group["label"],
+        "color": group["color"],
+        "columns": [group["column"]],
+        # What the segment holds, listed under its name — the same names the detailed chart sets inside
+        # each bracket, so a reader moving between the two versions recognises them.
+        "members": group["members"],
+    }
+    for group in MAIN_CATEGORY_GROUPS
 ]
 
 # Paid work is the original chart's ranking, and the one column education cannot distort: education
@@ -213,6 +222,19 @@ MAIN_CATEGORIES = [
 SORT_BY = "paid_work"
 
 TITLE = "How do people spend their time?"
+
+# Countries whose most recent survey predates this are left out. The source gives one survey per
+# country, so this drops countries rather than years, and 2010 is where that costs least: six
+# countries sit on 2010 itself, so the cut lands on a cluster instead of slicing mid-run, and it buys
+# eleven years of recency for nine countries. It also happens to remove every age-of-reference
+# exception — Australia (15+), China (15-74) and Lithuania (20-64) are all pre-2010 — so what is left
+# is 15-to-64 throughout.
+#
+# What it costs is India and China, and with them most of the coverage outside high-income Europe.
+# Worth knowing when weighing that: survey year does not tilt the ranking. The correlation between a
+# country's survey year and any of the four categories is +0.09 at most (ai/time_use_comparability).
+# Set to None to draw all 35.
+EARLIEST_SURVEY_YEAR = 2010
 
 # The row labels set the width of the column they sit in, so the two longest names are shortened to
 # the forms the style guide sanctions (no periods). It buys the bars 15px on desktop and 13px on
@@ -284,6 +306,12 @@ HEADER_MIN_GAP = 8
 CATEGORY_GAP = 7
 CATEGORY_TICK = 4
 CATEGORY_LABEL_GAP = 3
+
+# Extra air between a category's name and the list under it, where the name sits directly on its own
+# list rather than above a bracket rule. In lines of that list: half a line is enough to read as a
+# heading, and a full line pushes the name far enough from its own list to start looking detached
+# again — which is the problem this gap exists to solve.
+CATEGORY_NAME_GAP_LINES = 0.5
 
 # Listed header geometry (mobile), in template pixels: the gap between categories on a line and
 # the extra leading between lines.
@@ -408,20 +436,28 @@ LAYOUTS["time_use_by_country_main_categories"] = {
     # Each category is one segment, so a bracket would only underline a name that already stands over
     # it, and there is no member layer left to list.
     "category_rule": False,
-    "group_labels": None,
+    "group_labels": "bracketed",
     # Leisure is a segment here and carries its own value, so the column would repeat it.
     "total_column": False,
     # The values are hours and minutes here, so the subtitle has to say so.
-    "subtitle": "Averages of hours and minutes per day from time-use diaries for people between 15 and 64.",
+    # "Average", not "Averages of": measured in Lato, the longer opening put the line at 826px against
+    # an 817.57px slot, so the frame wrapped a subtitle this step had drawn on one line. A slot filled
+    # past ~97% is a coin flip between the two fonts — leave a few percent, or measure in Figma.
+    "subtitle": "Average hours and minutes per day, from time-use surveys run between {years}, for people aged 15 to 64.",
     # With one segment per category, a name that overhangs its own bar reads as pointing at its
     # neighbour too — so wrap it rather than only wrapping to avoid a collision.
     "wrap_overhanging_names": True,
+    # Hang each category's list off the bars rather than off the top of the band, so a short list does
+    # not end two lines short of the plot.
+    "names_bottom_aligned": True,
 }
 
 # Both layouts share the original chart's subtitle; mobile appends what its missing Note slot
 # would have carried — the age caveat is about what the chart claims, so it cannot be dropped.
-SUBTITLE = "Averages of minutes per day from time-use diaries for people between 15 and 64."
-MOBILE_NOTE = "Ages differ in a few countries, and each country's survey year is shown in brackets."
+# `{years}` is filled from the data, so the window a reader is told about cannot drift from the window
+# the chart draws — the Note repeated it before, but a subtitle-only reader saw no date at all.
+SUBTITLE = "Averages of minutes per day, from time-use surveys run between {years}, for people aged 15 to 64."
+MOBILE_NOTE = "Each country's survey year is shown in brackets."
 
 
 def run() -> None:
@@ -490,6 +526,16 @@ def load_chart_groups() -> tuple[Table, dict[str, str]]:
     tb = ds.read("time_use_chart_groups")
     tb = tb[tb["sex"] == "total"].drop(columns=["sex"])
 
+    if EARLIEST_SURVEY_YEAR is not None:
+        dropped = sorted(
+            (str(row["country"]), int(row["year"])) for _, row in tb[tb["year"] < EARLIEST_SURVEY_YEAR].iterrows()
+        )
+        tb = tb[tb["year"] >= EARLIEST_SURVEY_YEAR]
+        paths.log.info(
+            f"Surveys before {EARLIEST_SURVEY_YEAR} left out: "
+            + ", ".join(f"{country} ({year})" for country, year in dropped)
+        )
+
     group_columns = [group["column"] for group in GROUPS]
     assert not set(group_columns + [TOTAL_LEISURE_COLUMN]) - set(tb.columns), "Chart group columns changed."
     # A category name ranks by the sum of its groups; a group column ranks by itself.
@@ -507,7 +553,8 @@ def load_chart_groups() -> tuple[Table, dict[str, str]]:
         if str(row["age_of_reference"]) != "15-64"
     }
 
-    assert len(tb) >= 35, "Country coverage shrank."
+    expected_countries = 26 if EARLIEST_SURVEY_YEAR == 2010 else 35
+    assert len(tb) == expected_countries, f"Expected {expected_countries} countries, got {len(tb)}."
     assert tb["country"].is_unique, "One row per country expected."
     # The category brackets span contiguous runs of segments, which only holds if the bar order
     # is the categories' column order concatenated.
@@ -525,7 +572,19 @@ def load_chart_groups() -> tuple[Table, dict[str, str]]:
     # The groups partition the day (asserted strictly in garden; re-checked here at the source's
     # own rounding tolerance so a broken load cannot draw bars that misrepresent shares).
     assert ((tb[group_columns].sum(axis=1) - MINUTES_PER_DAY).abs() < 2.0).all(), "Rows do not sum to 24 hours."
-    assert set(ages) == {"Australia", "China", "Lithuania"}, "Age-of-reference exceptions changed at the source."
+    # The source's three exceptions are all pre-2010 surveys, so a 2010 cutoff removes them; without a
+    # cutoff all three are in. Either way, assert which ones survive rather than trusting the filter.
+    ages = {country: age for country, age in ages.items() if country in set(tb["country"])}
+    expected_ages: set[str] = (
+        set()
+        if EARLIEST_SURVEY_YEAR and EARLIEST_SURVEY_YEAR > 2006
+        else {
+            "Australia",
+            "China",
+            "Lithuania",
+        }
+    )
+    assert set(ages) == expected_ages, f"Age-of-reference exceptions changed: {sorted(ages)}."
 
     return tb, ages
 
@@ -574,7 +633,8 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
 
     # --- header: the template's title row, then its subtitle ---
     title = wrap_to_slot(TITLE, template["title_slot_px"], template["title_px"], TEMPLATE_SERIF_SLACK)
-    subtitle_text = layout.get("subtitle", SUBTITLE)
+    years = f"{tb['year'].min()} and {tb['year'].max()}"
+    subtitle_text = layout.get("subtitle", SUBTITLE).format(years=years)
     if not layout["full_footer"]:
         subtitle_text = f"{subtitle_text} {MOBILE_NOTE}"
     subtitle = wrap_to_slot(subtitle_text, template["subtitle_slot_px"], template["subtitle_px"])
@@ -682,7 +742,12 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
                 placement["row"] * TIER_HEIGHT + len(placement["lines"]) * line_px(layout["header_fontsize"])
                 for placement in category_placements
             )
-            room = max(room, category_base_px + CATEGORY_TICK + CATEGORY_LABEL_GAP + tallest)
+            name_gap = (
+                CATEGORY_NAME_GAP_LINES * line_px(layout["header_fontsize"])
+                if layout.get("names_bottom_aligned")
+                else 0.0
+            )
+            room = max(room, category_base_px + CATEGORY_TICK + CATEGORY_LABEL_GAP + name_gap + tallest)
         if group_at == side and layout["group_labels"] in ("below_listed", "below_flow"):
             room = max(room, LEADER_GAP + listed_px)
         if side == "above" and "listed_above" in (layout["category_side"], layout["group_labels"]):
@@ -749,8 +814,22 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
 
     if category_placements is not None:
         rows_out = rows_above if category_at == "above" else rows_below
+        # Each category's own list depth, so a name can follow its list rather than sit at the band's top.
+        block_depths = (
+            {block["name"]: len(block["lines"]) * line_px(layout["header_fontsize"]) for block in bracketed_blocks}
+            if bracketed_blocks and layout.get("names_bottom_aligned")
+            else None
+        )
         draw_category_brackets(
-            ax, category_placements, palette, px_per_min, rows_out, layout, category_at, category_base_px
+            ax,
+            category_placements,
+            palette,
+            px_per_min,
+            rows_out,
+            layout,
+            category_at,
+            category_base_px,
+            block_depths,
         )
     if bracketed_blocks is not None:
         rows_out = rows_above if category_at == "above" else rows_below
@@ -918,7 +997,15 @@ def draw_bars(
 
 
 def draw_category_brackets(
-    ax, category_placements: list[dict], palette, px_per_min: float, rows_out, layout, side: str, base_px: float
+    ax,
+    category_placements: list[dict],
+    palette,
+    px_per_min: float,
+    rows_out,
+    layout,
+    side: str,
+    base_px: float,
+    block_depths: dict[str, float] | None = None,
 ) -> None:
     """Bracket each category's run of bars, with its name beside the bracket.
 
@@ -935,7 +1022,8 @@ def draw_category_brackets(
         if not layout["category_rule"]:
             # Where each category is a single segment, its name already stands over the run it names
             # and a bracket only underlines it.
-            draw_category_name(ax, placement, palette, px_per_min, rows_out, layout, side, label_px)
+            depth_px = block_depths.get(placement["name"]) if block_depths else None
+            draw_category_name(ax, placement, palette, px_per_min, rows_out, layout, side, label_px, depth_px)
             continue
         # A bracket, not a plain rule: the end ticks turn back towards the segments they enclose, so
         # the span reads as "these bars" rather than as a divider.
@@ -979,8 +1067,17 @@ def draw_category_brackets(
             )
 
 
-def draw_category_name(ax, placement, palette, px_per_min, rows_out, layout, side: str, label_px: float) -> None:
-    """A category's name, stacked away from the bars, with no rule under it."""
+def draw_category_name(
+    ax, placement, palette, px_per_min, rows_out, layout, side: str, label_px: float, depth_px: float | None = None
+) -> None:
+    """A category's name, stacked away from the bars, with no rule under it.
+
+    `depth_px` is how deep this category's own list reaches. Passed, the name sits directly above that
+    list rather than at the band's top, so a short list keeps its heading and the four names end up
+    bottom-aligned as a group.
+    """
+    if depth_px is not None:
+        label_px = depth_px + CATEGORY_LABEL_GAP + CATEGORY_NAME_GAP_LINES * line_px(layout["header_fontsize"])
     for index, line in enumerate(placement["lines"]):
         offset = len(placement["lines"]) - 1 - index if side == "above" else index
         ax.text(
@@ -1016,6 +1113,11 @@ def draw_bracketed_names(
     for block in blocks:
         start, end = block["span"]
         centre = (start + end) / 2
+        # Top-aligned, every list starts level with the deepest one and a short list ends well short of
+        # the bars — two lines of air under "Personal care" while "Leisure" reaches down to them.
+        # Bottom-aligned, every list ends the same distance above the bars and the air moves under the
+        # category name, where it reads as space beneath a heading instead of a detached list.
+        depth_px = len(block["lines"]) * line_px(fontsize) if layout.get("names_bottom_aligned") else height_px
         for index, line in enumerate(block["lines"]):
             width = sum(text_advance_px(text, fontsize) for text, _ in line)
             offset = centre - width / 2
@@ -1023,7 +1125,7 @@ def draw_bracketed_names(
                 drawn, ink_px, step_px = place_run(text, fontsize)
                 ax.text(
                     (offset + ink_px / 2) / px_per_min,
-                    rows_out(LEADER_GAP + height_px - index * line_px(fontsize)),
+                    rows_out(LEADER_GAP + depth_px - index * line_px(fontsize)),
                     drawn,
                     ha="center",
                     va="top",
@@ -1290,7 +1392,14 @@ def layout_bracketed_names(spans: dict, layout: dict) -> list[dict]:
     for category in layout["categories"]:
         start = spans[category["columns"][0]][0]
         end = spans[category["columns"][-1]][1]
-        members = [group for group in layout["groups"] if group["column"] in category["columns"]]
+        if len(category["columns"]) == 1 and category.get("members"):
+            # One segment per category: the members are names rather than groups, and they all take the
+            # category's own color — there are no tints here to match them to.
+            members = [
+                {"column": slugify(name), "label": name, "color": category["color"]} for name in category["members"]
+            ]
+        else:
+            members = [group for group in layout["groups"] if group["column"] in category["columns"]]
         lines = [
             [(text, group)]
             for group in members
@@ -1640,16 +1749,28 @@ def build_note(tb: Table, ages: dict[str, str], layout: dict) -> str:
         "20-64": "20 to 64",
     }
     exceptions = ", ".join(f"{country} ({described.get(age, age)})" for country, age in sorted(ages.items()))
+    ages_sentence = (
+        f"Estimates cover people aged 15 to 64, except in {exceptions}. "
+        if exceptions
+        else "Estimates cover people aged 15 to 64. "
+    )
     # What the groups whose names do not say it themselves contain, in bar order.
     contents = "; ".join(
         f"{group['label'].lower()} covers {group['contents']}" for group in layout["groups"] if group.get("contents")
     )
     text = (
         f"Note: Each country's most recent time-use survey is shown, with its year in brackets; "
-        f"survey years range from {tb['year'].min()} to {tb['year'].max()}. "
-        f"Estimates cover people aged 15 to 64, except in {exceptions}. "
-        f"{contents[0].upper()}{contents[1:]}."
+        f"survey years range from {tb['year'].min()} to {tb['year'].max()}. " + ages_sentence
     )
+    if contents:
+        text += f"{contents[0].upper()}{contents[1:]}."
+    else:
+        # Where the legend names a category's activities, the Note's job is the caveat instead: not
+        # every country reports every activity separately, and those minutes stay inside the category.
+        text += (
+            "Not every country reports each activity separately; where one does not, its minutes stay "
+            "within the same category."
+        )
     # Wrapped against the content width itself, with no font slack: the slack exists to predict how
     # many lines the *template's* narrower Lato takes, and applying it to text this step actually draws
     # lets a full line print past the frame's edge. Erring the other way only costs a line of band.
