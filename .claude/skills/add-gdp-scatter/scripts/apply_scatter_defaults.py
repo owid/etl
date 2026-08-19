@@ -258,11 +258,20 @@ def grade_exclusion(
     # alone, which is a span ratio and so sign-agnostic.
     above = hi_y > 0 and y > hi_y * Y_PACK_FACTOR
     below = lo_y > 0 and 0 < y < lo_y / Y_PACK_FACTOR
-    if stretch >= Y_STRETCH_FACTOR or above or below:
+    # Zero or negative against a wholly positive pack is the LIMITING case of `below` — infinitely
+    # far below the lowest — but it cannot be expressed as a ratio, so `below`'s own `0 < y` guard
+    # excludes it. Without this it fell through to the GDP branch and could come back benign, even
+    # though the stretch test does not cover it either: a broad pack absorbs the extra span (y=0
+    # against 1..100 stretches the axis 1.01x). That is exactly the shape `below` exists for —
+    # chart 1131's Cape Verde is caught by `below` alone, its stretch being only 1.04x.
+    below_zero = y <= 0 < lo_y
+    if stretch >= Y_STRETCH_FACTOR or above or below or below_zero:
         why = f"y={y:,.4g} against the other {len(others_y)} at {lo_y:,.4g}-{hi_y:,.4g}"
         if above or below:
             factor = y / hi_y if above else lo_y / y
             why += f" — {factor:,.1f}x {'above the highest' if above else 'below the lowest'}"
+        elif below_zero:
+            why += " — at or below zero while every one of them is positive"
         if math.isinf(stretch):
             why += (
                 "; they all sit on one value, so it turns a zero-width y axis into a real range, and yAxis.max "

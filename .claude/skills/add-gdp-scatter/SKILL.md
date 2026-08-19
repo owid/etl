@@ -157,6 +157,14 @@ they only run against a positive bound. On an indicator whose values are negativ
 topping out at exactly `0` would divide by zero. Those indicators are graded on the span stretch
 alone, which is sign-agnostic and still catches a genuine outlier.
 
+**One case needs its own test rather than a ratio:** an excluded value at or **below zero while
+every peer is positive**. That is the limiting case of "below the lowest" — infinitely far below —
+so no ratio expresses it, and the span stretch does not cover it either, because a broad pack
+absorbs the extra width (y=0 against a pack of 1–100 stretches the axis only 1.01×). It is graded
+`y-OUTLIER` on the sign alone. This matters because the pack tests, not the stretch, are what catch
+this whole shape of case: chart 1131's Cape Verde is caught by "below the lowest" alone, its stretch
+being just 1.04×.
+
 Both sides of that comparison are read at the **same year**. An entity with no value at the
 target's default year is graded at its latest year with both indicators instead, and the peer
 pack is rebuilt at *that* year rather than held at the default one — otherwise a trending
@@ -398,7 +406,10 @@ travel at all, which depends on **both the loss and the surface**:
   the only handle a `featured_metrics` row carries is a URL, and `LIKE '%/grapher/foo%'` cannot
   tell `foo` from `foo-bar`. That sweep runs **after** the aliases are resolved and is fed every
   one of the source's slugs, because a slot may name an inbound alias rather than the current
-  slug — and the unpublish deletes the aliases too, so such a slot empties just the same.
+  slug — and the unpublish deletes the aliases too, so such a slot empties just the same. The count
+  is per **slot**, not per topic: one pathname can hold several slots under a single tag (different
+  `incomeGroup` rows), each a separate row to re-point, so repeated tags are shown with a
+  multiplicity (`Agriculture x3`) rather than collapsed into one.
 
 Both reference counts cover **all three** ways an article can hold a chart: a prose link, a block
 embed, and a raw pasted `/grapher/…` URL. The last is stored as `linkType='url'`, which

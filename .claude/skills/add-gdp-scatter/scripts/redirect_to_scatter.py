@@ -430,7 +430,14 @@ def print_reconsider(plan: list[dict]) -> None:
             ("featured metric", featured, "a chart's TAB cannot be featured at all"),
         ):
             if names:
-                shown = ", ".join(names[:4]) + (f", +{len(names) - 4} more" if len(names) > 4 else "")
+                # The count is per slot while the names are per topic, and one topic can hold
+                # several slots — so repeats are collapsed with a multiplicity rather than printed
+                # twice, and `len(names)` stays the true number of rows to re-point.
+                tally: dict[str, int] = {}
+                for n in names:
+                    tally[n] = tally.get(n, 0) + 1
+                labels = [n if c == 1 else f"{n} x{c}" for n, c in tally.items()]
+                shown = ", ".join(labels[:4]) + (f", +{len(labels) - 4} more" if len(labels) > 4 else "")
                 print(f"    CANNOT carry the fix: {len(names)} {label}(s) — {shown} ({why})")
         if excl_lost:
             print("    NOTHING carries an exclusion back: the target never re-applies them, so every reference")
@@ -593,12 +600,15 @@ def build_plan(api: AdminAPI, payload: list[dict], skip_aliases: bool) -> list[d
     featured = featured_metric_slots(
         slug for rec in rows for slug in (rec["src"], *(a["slug"] for a in rec["aliases"])) if slug and slug != "-"
     )
+    # One entry per SLOT, not per tag. A pathname can hold several slots under one topic tag —
+    # different `incomeGroup` rows, say — and each is a separate row someone has to re-point, so
+    # de-duplicating by tag name understated the count `print_reconsider` prints. There is nothing
+    # to de-duplicate anyway: the sweep visits each `featured_metrics` row once and matches it to a
+    # single pathname, and a slug appears once across a row's src plus its aliases.
     for rec in rows:
         slots: list[str] = []
         for slug in (rec["src"], *(a["slug"] for a in rec["aliases"])):
-            for tag in featured.get(slug, []):
-                if tag not in slots:
-                    slots.append(tag)
+            slots.extend(featured.get(slug, []))
         rec["featured_metrics"] = slots
     return rows
 
