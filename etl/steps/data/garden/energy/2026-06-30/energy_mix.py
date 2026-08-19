@@ -444,6 +444,27 @@ def add_aggregate_sources(tb: Table) -> Table:
     return tb
 
 
+def complete_or_drop_mixes(tb: Table) -> Table:
+    """Leave every row reporting either the whole mix or none of it.
+
+    A total needs all nine sources, so a row without one has an incomplete mix. Most carry nothing but a
+    zero left by one of the fills (Angola has nuclear before the Statistical Review covers it, Afghanistan
+    has nuclear and biofuels in 2025), and the rest would read as a complete mix in a stacked chart:
+    Tuvalu's oil would be all of its energy, and Reunion's three zeros would make it look like it consumes
+    nothing at all. Those rows lose their sources.
+
+    Where the total is zero the mix is complete by arithmetic, since energy cannot be negative, so the
+    unreported sources are set to zero instead. The Statistical Review carries such rows for the years
+    before a country exists, Bangladesh before 1971 among them.
+    """
+    columns = [f"{source}_twh" for source in ALL_SOURCES]
+    total = tb["total_energy_supply_twh"]
+    tb.loc[total.isna(), columns] = float("nan")
+    for column in columns:
+        tb.loc[(total == 0) & tb[column].isna(), column] = 0
+    return tb
+
+
 def add_shares(tb: Table) -> Table:
     """Add the share of each source in total energy supply (as a percentage)."""
     tb = tb.copy()
@@ -554,6 +575,14 @@ def sanity_check_outputs(tb: Table) -> None:
         f"{country} ({group['year'].min()}-{group['year'].max()})"
         for country, group in off.groupby("country", observed=True)
     )
+    # A row reports either every source or none, so a stacked chart cannot show part of a mix as the whole.
+    sources = [f"{source}_twh" for source in SR_SOURCES.values()]
+    partial = tb[sources].notna().any(axis=1) & ~tb[sources].notna().all(axis=1)
+    assert not partial.any(), "Some rows report only part of the mix: " + "; ".join(
+        f"{country} ({group['year'].min()}-{group['year'].max()})"
+        for country, group in tb[partial].groupby("country", observed=True)
+    )
+
     # Wherever all nine sources are reported, they must add up to the total. This is the same defect as
     # above seen from the other side: a total that covers different countries from its components.
     sources = [f"{source}_twh" for source in SR_SOURCES.values()]
@@ -671,6 +700,9 @@ def run() -> None:
     # For EIA-only countries confirmed to have no nuclear power, fill their missing nuclear with zero
     # (so the nuclear map shows "No nuclear" instead of "No data").
     tb = fill_nuclear_zero_for_countries_without_nuclear(tb=tb)
+
+    # Leave every row with either the whole mix or none of it, so no chart shows part of one as the whole.
+    tb = complete_or_drop_mixes(tb=tb)
 
     # Add shares, annual change, per-capita and per-GDP variables.
     tb = add_shares(tb=tb)
