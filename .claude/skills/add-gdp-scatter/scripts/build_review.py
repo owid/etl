@@ -85,18 +85,18 @@ def load_charts(chart_ids: list[int]) -> dict[int, dict]:
     if not chart_ids:
         return {}
     df = OWID_ENV.read_sql(
-        "SELECT c.id, cc.slug, cc.full, cc.fullMd5 FROM charts c "
+        "SELECT c.id, cc.slug, cc.config, cc.configMd5 FROM charts c "
         "JOIN chart_configs cc ON c.configId = cc.id WHERE c.id IN %(ids)s",
         params={"ids": tuple(chart_ids)},
     )
     out = {}
     for r in df.to_dict("records"):
-        cfg = r["full"] if isinstance(r["full"], dict) else json.loads(r["full"])
+        cfg = r["config"] if isinstance(r["config"], dict) else json.loads(r["config"])
         out[int(r["id"])] = {
             "slug": r["slug"],
             "title": cfg.get("title") or "",
             "cfg": cfg,
-            "md5": r["fullMd5"],
+            "md5": r["configMd5"],
         }
     return out
 
