@@ -1229,3 +1229,31 @@ def test_reviewed_toggle_key_is_bound_to_the_text_it_ticked():
     before = ReviewMark(group=group, change_key=key, content_hash=content_hash, reviewed=True, stale=False)
     after = ReviewMark(group=edited, change_key=key_after, content_hash=hash_after, reviewed=False, stale=True)
     assert reviewed_toggle_key("surface", before) != reviewed_toggle_key("surface", after)
+
+
+def test_indicator_identity_ignores_only_the_version():
+    """A version bump is the same indicator; another dataset's same-named indicator is not.
+
+    Short names are unique only within a dataset, and the common ones (`gini`, `population`, `share`) are
+    common exactly where repointing an MDim view between sources is plausible — so comparing the
+    `#short_name` tail alone would call a replacement an edit and report garden metadata nobody touched.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import _same_indicator
+
+    bumped_old = "grapher/un/2026-05-01/wpp/tbl#population"
+    bumped_new = "grapher/un/2026-08-19/wpp/tbl#population"
+    assert _same_indicator(bumped_old, bumped_new)
+
+    # Same short name, different dataset: a replacement, not an edit.
+    assert not _same_indicator(
+        "grapher/wb/2026-06-26/world_bank_pip/inequality#gini",
+        "grapher/wid/2026-06-18/world_inequality_database/wid#gini",
+    )
+    # Same dataset and version, different indicator.
+    assert not _same_indicator(
+        "grapher/wb/2026-06-26/world_bank_pip/poverty#headcount",
+        "grapher/wb/2026-06-26/world_bank_pip/poverty#headcount_ratio",
+    )
+    # A channel prefix must not affect identity, and an unknown path stays comparable.
+    assert _same_indicator("garden/un/2026-05-01/wpp/tbl#population", bumped_new)
+    assert _same_indicator(None, bumped_new)

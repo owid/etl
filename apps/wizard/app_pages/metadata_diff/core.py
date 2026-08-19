@@ -277,10 +277,15 @@ def _same_indicator(src_path: str | None, target_path: str | None) -> bool:
     indicator edit — sending the reviewer to change garden metadata on an indicator nobody touched, and
     counting every other chart that uses it as blast radius.
 
-    Identity is tested on the `#short_name` tail, because that is the part a version bump leaves alone: a
-    bump moves `grapher/un/2026-05-01/wpp/tbl#population` to `grapher/un/2026-08-19/wpp/tbl#population`
-    without changing which indicator it is, and demanding equal paths would report no indicator-layer
-    change at all for the update the tool exists to review.
+    Identity is everything about the path except the **version**, because the version is the only segment
+    a bump changes: it moves `grapher/un/2026-05-01/wpp/tbl#population` to
+    `grapher/un/2026-08-19/wpp/tbl#population` without changing which indicator that is, and demanding
+    equal paths would report no indicator-layer change at all for the update the tool exists to review.
+
+    Comparing the `#short_name` tail alone would be simpler and is not enough: short names are only unique
+    within a dataset, and the common ones are common precisely where a repoint is plausible — an MDim view
+    moved from one source's `gini` or `population` to another's would compare as the same indicator, which
+    is the case this function exists to reject.
 
     Nothing is lost by skipping a replacement: a view's indicator can only change because the MDim's own
     config did, so `covers_mdim` is true for whoever changed it and `split_mdim_groups` reports the view's
@@ -289,7 +294,19 @@ def _same_indicator(src_path: str | None, target_path: str | None) -> bool:
     """
     if not src_path or not target_path:
         return True
-    return src_path.partition("#")[2] == target_path.partition("#")[2]
+    return _indicator_identity(src_path) == _indicator_identity(target_path)
+
+
+def _indicator_identity(catalog_path: str) -> tuple[str, ...]:
+    """Everything that names an indicator except which version of the dataset it came from."""
+    left, _, short_name = catalog_path.partition("#")
+    parts = left.strip("/").split("/")
+    if parts and parts[0] in ("grapher", "garden", "meadow", "snapshot"):
+        parts = parts[1:]
+    # parts is `namespace / version / dataset [/ table]` — drop the version, keep the rest.
+    if len(parts) >= 2:
+        parts = parts[:1] + parts[2:]
+    return (*parts, short_name)
 
 
 def field_label(field_name: str) -> str:
