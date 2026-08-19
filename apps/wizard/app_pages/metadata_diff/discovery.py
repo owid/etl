@@ -181,9 +181,10 @@ def branch_scope() -> BranchScope:
         return BranchScope(available=False)
 
     datasets = {p for p in paths if not p.startswith("export://")} | _shared_step_file_datasets(files_changed)
-    exports = {(_export_kind(p), name) for p in changed_export_uris for name in _export_scope_names(p)}
+    export_uris = set(changed_export_uris) | _shared_export_recipe_uris(files_changed)
+    exports = {(_export_kind(p), name) for p in export_uris for name in _export_scope_names(p)}
     namespaces: dict[tuple[str, str], set[str]] = {}
-    for uri in changed_export_uris:
+    for uri in export_uris:
         namespace = _export_namespace(uri)
         for name in _export_scope_names(uri):
             namespaces.setdefault((_export_kind(uri), name), set()).add(namespace)
@@ -227,6 +228,40 @@ def _shared_step_file_datasets(files_changed: dict[str, Any]) -> set[str]:
         if own in dag_steps or folder.count("/") != 2:
             continue
         out |= {s for s in dag_steps if s.startswith(f"{folder}/")}
+    return out
+
+
+def _shared_export_recipe_uris(files_changed: dict[str, Any]) -> set[str]:
+    """`export://` URIs of the recipes a changed *shared* file in an export folder feeds.
+
+    The export mirror of `_shared_step_file_datasets`, and the same blind spot: a recipe's helpers are not
+    recipes. `explorers/un/latest/un_wpp.py` imports its siblings `utils.py` and `view_edits.py`, and
+    reads `map_brackets.yml`; none of the three is a step, so `get_directly_changed_export_uris` derives
+    `export://explorers/un/latest/utils` — a recipe that exists in no DAG and publishes nothing. The
+    explorer's own text then belongs to nobody in this branch, and the review files every difference in it
+    as baseline lag: the one bucket where a reviewer will not look for their own edit.
+
+    Config companions are already handled upstream (`un_wpp.sex_ratio.config.yml` resolves to the sibling
+    `un_wpp.py`), so those name a real step here and expand to nothing extra.
+    """
+    from etl.dag_helpers import load_dag
+
+    dag_uris = {s for s in load_dag() if s.startswith("export://")}
+    out: set[str] = set()
+    for file_path in files_changed:
+        path = Path(file_path)
+        if path.suffix not in (".py", ".yml", ".yaml"):
+            continue
+        try:
+            rel = (BASE_DIR / path).relative_to(STEP_DIR / "export")
+        except ValueError:
+            continue
+        own = f"export://{(rel.parent / rel.name.split('.')[0]).as_posix()}"
+        folder = rel.parent.as_posix()
+        # Only a `kind/namespace/version` folder has sibling recipes to credit.
+        if own in dag_uris or folder.count("/") != 2:
+            continue
+        out |= {u for u in dag_uris if u.startswith(f"export://{folder}/")}
     return out
 
 

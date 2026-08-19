@@ -1114,6 +1114,31 @@ def test_export_scope_is_per_namespace_not_just_per_name():
     )
 
 
+def test_shared_export_helper_credits_its_sibling_recipes():
+    """A recipe's helpers are not recipes — the export mirror of the shared-metadata blind spot.
+
+    `explorers/un/latest/un_wpp.py` imports its siblings `utils.py` and `view_edits.py` and reads
+    `map_brackets.yml`. None is a step, so the changed-export scan derives `.../utils`, a recipe that
+    exists in no DAG, and the explorer's own text differences get filed as baseline lag instead.
+    """
+    from apps.wizard.app_pages.metadata_diff.discovery import _export_scope_names, _shared_export_recipe_uris
+
+    for helper in ("utils.py", "view_edits.py", "map_brackets.yml"):
+        reached = _shared_export_recipe_uris({f"etl/steps/export/explorers/un/latest/{helper}": "M"})
+        assert reached == {"export://explorers/un/latest/un_wpp"}, helper
+
+    # And the recipe it credits answers to the slug the explorer actually publishes under.
+    assert "population-and-demography" in _export_scope_names("export://explorers/un/latest/un_wpp")
+
+    # A file that *is* a recipe, and a config companion resolving to one, need no expansion.
+    assert _shared_export_recipe_uris({"etl/steps/export/explorers/un/latest/un_wpp.py": "M"}) == set()
+    assert (
+        _shared_export_recipe_uris({"etl/steps/export/explorers/un/latest/un_wpp.sex_ratio.config.yml": "M"}) == set()
+    )
+    # Files outside an export folder are not ours to expand.
+    assert _shared_export_recipe_uris({"apps/wizard/app_pages/metadata_diff/core.py": "M"}) == set()
+
+
 def test_export_scope_without_recorded_namespaces_still_matches_on_name():
     """Narrowing must not get *stricter* by accident: unknown namespace means fall back to the name."""
     scope = BranchScope(export_products={(MDIM_EXPORT_KIND, "mine")})
