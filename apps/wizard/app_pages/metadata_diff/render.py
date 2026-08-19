@@ -331,29 +331,77 @@ def render_author_scope(
 
 
 def st_origin_caption(catalog_paths: set[str] | list[str], attribution: dict[str, str]) -> None:
-    """Say when a difference is not (only) this branch's work, so a count is never over-read.
+    """Say where a difference came from — and say nothing at all when it is plainly this branch's.
 
-    Two environments can differ on a dataset neither of them is wrong about: whichever rebuilt it more
-    recently holds the newer text. When this server rebuilt a dataset that master has also edited since
-    the server was created, the rebuild materializes master's edits here first, and they show up
-    alongside the branch's own — indistinguishable by text alone. Naming that is the honest option;
-    measured on this branch, it was the difference between 44 reported changes and 2 real ones.
+    A caption on every change is a caption nobody reads. The previous version hedged whenever master had
+    also touched the dataset, which on a normal branch is most of them: it fired on all ten changes of a
+    PR whose ten changes were all its own. Now the text is compared against master's own environment, so
+    "this is yours" is a real verdict and passes in silence; only the cases that need action speak.
     """
-    from apps.wizard.app_pages.metadata_diff.discovery import BASELINE_NEWER, MIXED, OURS
+    from apps.wizard.app_pages.metadata_diff.discovery import MASTER, STALE, UNKNOWN
 
     origins = {attribution.get(p) for p in catalog_paths}
-    if BASELINE_NEWER in origins and not (origins & {OURS, MIXED}):
+    if STALE in origins:
         st.caption(
-            f"🕓 {BASELINE_NAME.capitalize()} rebuilt this dataset after this staging server was created, "
-            "and this branch has not touched it — so this difference is **not yours**. It clears when this "
-            "server rebuilds the dataset."
+            "🚧 **This server holds an older build of this dataset than "
+            f"{BASELINE_NAME}**, so this diff reads backwards — the “new” side is *older* text. Rebuild the "
+            "dataset here before reviewing it (see the banner at the top of the page)."
         )
-    elif MIXED in origins:
+    elif MASTER in origins:
         st.caption(
-            "⚠️ This server rebuilt this dataset **and** master edited it since the server was created, so "
-            f"part of this difference is master's work that {BASELINE_NAME} has not rebuilt yet. Check it "
-            "against the edits you actually made before treating it as yours."
+            f"🕓 This text is **master's, not this branch's** — it matches master's own server, and "
+            f"{BASELINE_NAME} simply has not rebuilt the dataset yet. Nothing to review here."
         )
+    elif UNKNOWN in origins:
+        st.caption(
+            "❔ Could not reach master's server to check whether this text is yours or an edit master made "
+            f"that {BASELINE_NAME} has not rebuilt yet. Compare it against the edits you actually made."
+        )
+
+
+def _stamp(value: Any) -> str:
+    """A build time as `YYYY-MM-DD HH:MM`, tolerating whatever the DB hands back.
+
+    These come out of `datasets.metadataEditedAt`, so they are normally datetimes — but this banner is
+    the one thing standing between a reviewer and a silently inverted diff, and it is not worth crashing
+    the page over an unexpected NaT or string.
+    """
+    try:
+        return f"{value:%Y-%m-%d %H:%M}"
+    except (TypeError, ValueError):
+        return str(value)
+
+
+def st_stale_server_banner(stale: dict[str, tuple[Any, Any]]) -> None:
+    """Warn that this server, not the branch, is what the numbers below are wrong about.
+
+    A staging build only rebuilds steps that differ from master, so a dataset drops out of the build the
+    moment a branch's edit to it is reverted — and the server then keeps serving the old build, edit
+    included, indefinitely. Every diff involving it is inverted: the branch appears to have written text
+    it removed, or to have reverted text it never touched. It is silent, it survives further pushes, and
+    on a real branch it accounted for 33 of 44 reported changes before anyone noticed by hand.
+
+    So this leads with the remedy: the exact commands that make the server tell the truth again.
+    """
+    if not stale:
+        return
+    commands = "\n".join(
+        f"ssh owid@{SOURCE.name} 'cd etl && .venv/bin/etlr grapher://grapher/{d} --grapher'" for d in sorted(stale)
+    )
+    rows = "\n".join(
+        f"- `{d}` — here **{_stamp(here)}**, {BASELINE_NAME} **{_stamp(there)}**"
+        for d, (here, there) in sorted(stale.items())
+    )
+    st.error(
+        f"🚧 **This staging server is behind {BASELINE_NAME} on "
+        f"{len(stale)} dataset{'s' if len(stale) != 1 else ''}** — every difference involving them reads "
+        "backwards, showing their *older* text as this branch's change.\n\n"
+        f"{rows}\n\n"
+        "This happens on its own: the staging build only rebuilds steps that differ from master, so a "
+        "dataset stops being rebuilt as soon as your edit to it is reverted, and the server keeps the old "
+        "build. Rebuild them here, then reload:"
+    )
+    st.code(commands, language="bash")
 
 
 def markdown_output(text: str, filename: str, key: str) -> None:

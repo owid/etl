@@ -324,45 +324,90 @@ def dataset_edit_times(engine: Engine) -> dict[str, Any]:
     return {str(r["catalogPath"]): r["metadataEditedAt"] for r in df.to_dict("records")}
 
 
-# How a difference on an indicator came about. Only OURS is unambiguously this branch's work.
-OURS = "ours"
-BASELINE_NEWER = "baseline_newer"
-MIXED = "mixed"
-UNKNOWN = "unknown"
+# Where a difference came from. Only OURS is this branch's own text; the others each need saying out loud.
+OURS = "ours"  # differs from the baseline AND from master's own environment — nobody else has this text
+MASTER = "master"  # identical to master's environment — master's edit the baseline has not rebuilt yet
+STALE = "stale"  # this server's build of the dataset predates the baseline's, so the diff reads backwards
+UNKNOWN = "unknown"  # master's environment was unavailable, so the two could not be told apart
+
+
+def stale_datasets(source_engine: Engine, target_engine: Engine) -> dict[str, tuple[Any, Any]]:
+    """Datasets whose build on THIS server is older than the baseline's: dataset -> (here, baseline).
+
+    The failure this exists for, seen on a real branch: a staging build only rebuilds steps that differ
+    from master, so the moment a branch's edit to a dataset is reverted, that dataset stops being selected
+    and the server keeps serving its old build indefinitely — including the reverted edit. The tool then
+    shows text nobody on the branch wrote, as though the branch had written it. Nothing else notices.
+    """
+    source_times = dataset_edit_times(source_engine)
+    target_times = dataset_edit_times(target_engine)
+    out: dict[str, tuple[Any, Any]] = {}
+    for dataset, here in source_times.items():
+        there = target_times.get(dataset)
+        if here is not None and there is not None and here < there:
+            out[dataset] = (here, there)
+    return out
+
+
+def classify_origins(
+    catalog_paths: list[str],
+    identical_to_master: set[str],
+    stale: dict[str, tuple[Any, Any]],
+    master_checked: bool,
+) -> dict[str, str]:
+    """Pure classification of each changed indicator's difference.
+
+    Precedence is deliberate. STALE first, because a stale build makes the whole comparison read backwards
+    and no other label is worth acting on until it is fixed. Then MASTER, which is decisive when it holds:
+    text identical to master's own environment cannot be this branch's invention. What remains is OURS —
+    and unlike the dataset-level guess this replaces, that verdict is per text, so a change the branch
+    really did make no longer gets hedged just because master also touched the same dataset.
+    """
+    out: dict[str, str] = {}
+    for path in catalog_paths:
+        if _dataset_of(path) in stale:
+            out[path] = STALE
+        elif not master_checked:
+            out[path] = UNKNOWN
+        elif path in identical_to_master:
+            out[path] = MASTER
+        else:
+            out[path] = OURS
+    return out
 
 
 def attribute_indicator_changes(
     source_engine: Engine,
     target_engine: Engine,
     catalog_paths: list[str],
+    master_engine: Engine | None = None,
 ) -> dict[str, str]:
-    """Say, per changed indicator, whether the difference is this branch's or the baseline moving on.
+    """Say, per changed indicator, where its difference came from.
 
-    Comparing a staging server against production mixes two things: what this branch edited, and what
-    master edited in the same dataset *after* the server was forked. The second reads backwards — the
-    branch appears to have reverted text it never touched. Dataset edit timestamps separate them: if the
-    baseline's dataset was edited after this server was created, at least part of the difference is theirs.
+    `master_engine` is master's own staging server, and it is what makes the answer decisive rather than
+    circumstantial: if our text matches master's, master wrote it and the baseline simply has not rebuilt
+    yet. Pass None (or the baseline itself, which would answer trivially) and every change falls back to
+    UNKNOWN rather than being guessed at.
     """
     if not catalog_paths:
         return {}
-    created = _staging_creation_time(source_engine)
-    source_times = dataset_edit_times(source_engine)
-    target_times = dataset_edit_times(target_engine)
 
-    out: dict[str, str] = {}
-    for path in catalog_paths:
-        dataset = _dataset_of(path)
-        edited_here = (t := source_times.get(dataset)) is not None and t >= created
-        edited_there = (t := target_times.get(dataset)) is not None and t >= created
-        if edited_here and edited_there:
-            out[path] = MIXED
-        elif edited_here:
-            out[path] = OURS
-        elif edited_there:
-            out[path] = BASELINE_NEWER
-        else:
-            out[path] = UNKNOWN
-    return out
+    stale = stale_datasets(source_engine, target_engine)
+
+    identical_to_master: set[str] = set()
+    master_checked = False
+    if master_engine is not None and master_engine is not target_engine:
+        try:
+            result = compare_indicator_texts(
+                fetch_variable_rows_by_path(source_engine, catalog_paths),
+                fetch_variable_rows_by_path(master_engine, catalog_paths),
+            )
+            identical_to_master = set(catalog_paths) - set(result.diffs) - result.new_paths
+            master_checked = True
+        except Exception as e:  # noqa: BLE001 — no master server is a reason to say "unknown", not to fail
+            log.warning("metadata_diff.master_comparison_failed", error=str(e))
+
+    return classify_origins(catalog_paths, identical_to_master, stale, master_checked)
 
 
 def charts_affected(source_engine: Engine, changed: IndicatorChanges) -> dict[int, list[dict[str, Any]]]:
@@ -714,8 +759,11 @@ class Summary:
     n_other_mdims: int = 0  # differ from the baseline, but not attributable to this branch
     n_other_explorers: int = 0
     fields: dict[str, int] = field(default_factory=dict)  # field label -> distinct changes
-    # Indicator changes by origin: ours / mixed / baseline_newer (see attribute_indicator_changes).
+    # Indicator changes by origin: ours / master / stale / unknown (see classify_origins).
     attribution: dict[str, int] = field(default_factory=dict)
+    # Datasets this server holds an older build of than the baseline: dataset -> (here, baseline).
+    # Their differences read backwards, so this is a defect in the server, not in the branch.
+    stale: dict[str, tuple[Any, Any]] = field(default_factory=dict)
     n_distinct_changes: int = 0  # distinct texts changed, counted once across all surfaces
     mdims_resolved: bool = True  # False when there were too many flagged MDims to diff view by view
     narrowed: bool = True
@@ -778,8 +826,12 @@ def _count_fields(counts: dict[str, int], diffs: list[ViewDiff]) -> None:
         counts[label] = counts.get(label, 0) + 1
 
 
-def summarize(source_engine: Engine, target_engine: Engine) -> Summary:
+def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engine | None = None) -> Summary:
     """Everything the section badges and the owidbot comment need, in one pass.
+
+    `master_engine` (master's own staging server) is optional but worth passing: without it, a change
+    cannot be told from an edit master made that the baseline has not rebuilt yet, and everything lands
+    under UNKNOWN.
 
     Each surface is wrapped: one failing (a table missing on an old staging server, say) must not blank
     the whole page or the PR comment, so it degrades to a warning the UI shows.
@@ -799,8 +851,11 @@ def summarize(source_engine: Engine, target_engine: Engine) -> Summary:
         _collect_changes(seen, chart_groups)
         usage = charts_affected(source_engine, changed)
         summary.n_charts = len(charts_reached(chart_groups, usage))
-        for origin in attribute_indicator_changes(source_engine, target_engine, changed.paths).values():
+        for origin in attribute_indicator_changes(source_engine, target_engine, changed.paths, master_engine).values():
             summary.attribution[origin] = summary.attribution.get(origin, 0) + 1
+        # Report every stale dataset, not only ones behind a reported change: a stale build can also
+        # *hide* a change, and then there is nothing in the lists to hang the warning off.
+        summary.stale = stale_datasets(source_engine, target_engine)
     except Exception as e:  # noqa: BLE001 — a broken surface must not blank the whole report
         log.warning("metadata_diff.chart_discovery_failed", error=str(e))
         summary.warnings.append(f"Chart discovery failed: {e}")

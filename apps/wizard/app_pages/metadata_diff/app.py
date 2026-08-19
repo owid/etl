@@ -21,7 +21,7 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines
 from apps.wizard.app_pages.metadata_diff import cached, charts_section, explorers_section, mdims_section
-from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME
+from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, st_stale_server_banner
 from apps.wizard.utils.components import st_title_with_expert, url_persist
 from etl.config import OWID_ENV
 
@@ -79,6 +79,9 @@ what ships is what you meant, and to see how far each change reaches.
     }
     for warning in summary.warnings:
         st.warning(warning)
+
+    # Before any count: if this server is behind on a dataset, the counts below are about that, not the branch.
+    st_stale_server_banner(summary.stale)
 
     if not summary.has_changes and not summary.warnings:
         st.success(f"**No metadata text changes** on this staging server against `{BASELINE_NAME}`.")

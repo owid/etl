@@ -14,16 +14,40 @@ from typing import Any
 import pandas as pd
 import streamlit as st
 from sqlalchemy.engine.base import Engine
+from structlog import get_logger
 
+from apps.wizard.app_pages.chart_diff.utils import TARGET
 from apps.wizard.app_pages.metadata_diff import discovery
 from apps.wizard.app_pages.metadata_diff.core import ViewDiff
 from apps.wizard.app_pages.metadata_diff.usage import charts_using_indicators, mdims_using_indicators
+from etl.config import OWIDEnv
+
+log = get_logger()
+
+
+@st.cache_resource
+def master_engine() -> Engine | None:
+    """Master's own staging server, or None when it cannot be reached.
+
+    It answers the one question dataset timestamps cannot: is this text the branch's, or an edit master
+    made that the baseline has not rebuilt yet? Cached as a resource because it is a connection pool, and
+    optional because a review must still work when that server is down.
+    """
+    try:
+        env = OWIDEnv.from_staging("master")
+        if env.name == TARGET.name:
+            # The baseline already *is* master's server, so cross-checking against it answers trivially.
+            return None
+        return env.get_engine()
+    except Exception as e:  # noqa: BLE001 — no master server means "unknown", not a broken page
+        log.warning("metadata_diff.master_engine_unavailable", error=str(e))
+        return None
 
 
 @st.cache_data(ttl=300, show_spinner="Looking for metadata changes on this staging server…")
 def summary(_source_engine: Engine, _target_engine: Engine, cache_key: str = "") -> discovery.Summary:
     """Counts behind the section badges (and the same numbers owidbot reports)."""
-    return discovery.summarize(_source_engine, _target_engine)
+    return discovery.summarize(_source_engine, _target_engine, master_engine())
 
 
 @st.cache_data(ttl=300, show_spinner="Checking which MDims changed…")
@@ -60,8 +84,8 @@ def indicator_attribution(
     catalog_paths: tuple[str, ...],
     cache_key: str = "",
 ) -> dict[str, str]:
-    """Per changed indicator: is the difference this branch's, the baseline's, or both?"""
-    return discovery.attribute_indicator_changes(_source_engine, _target_engine, list(catalog_paths))
+    """Per changed indicator: is the difference this branch's, master's, or a stale build here?"""
+    return discovery.attribute_indicator_changes(_source_engine, _target_engine, list(catalog_paths), master_engine())
 
 
 @st.cache_data(ttl=300, show_spinner="Finding explorer views whose text changed…")

@@ -787,3 +787,87 @@ def test_candidate_selection_without_git_still_requires_a_rebuild_here():
     assert selected == [ours]
     # False so the UI can say the list is not narrowed to the branch.
     assert narrowed is False
+
+
+# --- Where a difference came from -----------------------------------------------------------------
+
+
+def test_origins_call_a_change_ours_only_when_master_does_not_have_it():
+    """The verdict is per text, so a real change is no longer hedged just because master touched the dataset.
+
+    The previous rule was dataset-level: "this server rebuilt it AND master edited it" meant every change
+    in that dataset got a warning. On a normal branch that is most of them — it fired on all ten changes
+    of a PR whose ten changes were all its own. Comparing against master's own server answers it directly.
+    """
+    from apps.wizard.app_pages.metadata_diff.discovery import MASTER, OURS, classify_origins
+
+    mine = "grapher/wb/2026-06-26/world_bank_pip/poverty#headcount"
+    theirs = "grapher/wb/2026-06-26/world_bank_pip/poverty#headcount_ratio"
+
+    origins = classify_origins([mine, theirs], identical_to_master={theirs}, stale={}, master_checked=True)
+    assert origins[mine] == OURS
+    assert origins[theirs] == MASTER
+
+
+def test_origins_are_unknown_when_master_cannot_be_reached():
+    """No master server is a reason to say so, not to guess — and never to claim the change is ours."""
+    from apps.wizard.app_pages.metadata_diff.discovery import UNKNOWN, classify_origins
+
+    path = "grapher/wb/2026-06-26/world_bank_pip/poverty#headcount"
+    assert classify_origins([path], set(), {}, master_checked=False) == {path: UNKNOWN}
+
+
+def test_a_stale_dataset_outranks_every_other_verdict():
+    """A stale build inverts the diff, so nothing else about that change is worth acting on first."""
+    from apps.wizard.app_pages.metadata_diff.discovery import STALE, classify_origins
+
+    path = "grapher/wid/2026-06-18/world_inequality_database/tb#share_top_1"
+    stale = {"wid/2026-06-18/world_inequality_database": ("2026-08-05", "2026-08-17")}
+    # Identical to master AND stale: still STALE, because the rebuild has to happen before the rest means anything.
+    origins = classify_origins([path], identical_to_master={path}, stale=stale, master_checked=True)
+    assert origins[path] == STALE
+
+
+def test_stale_datasets_are_those_this_server_built_earlier_than_the_baseline(monkeypatch):
+    """Only "we are behind" counts — being ahead is the normal state of a branch that changed something."""
+    from datetime import datetime
+
+    from apps.wizard.app_pages.metadata_diff import discovery
+
+    behind = datetime(2026, 8, 5, 13, 54)
+    ahead = datetime(2026, 8, 19, 9, 29)
+    baseline = datetime(2026, 8, 17, 18, 2)
+
+    times = {
+        "here": {"ns/v/stale": behind, "ns/v/ours": ahead, "ns/v/same": baseline, "ns/v/only_here": ahead},
+        "there": {"ns/v/stale": baseline, "ns/v/ours": baseline, "ns/v/same": baseline},
+    }
+    monkeypatch.setattr(discovery, "dataset_edit_times", lambda engine: times[engine])
+
+    stale = discovery.stale_datasets("here", "there")
+    assert set(stale) == {"ns/v/stale"}
+    assert stale["ns/v/stale"] == (behind, baseline)
+
+
+def test_owidbot_leads_with_a_stale_server_and_flags_it_in_the_icon():
+    """A stale server makes every count below it untrustworthy, so it cannot be a footnote."""
+    from apps.owidbot.metadata_diff import format_metadata_diff, status_icon
+    from apps.wizard.app_pages.metadata_diff.discovery import Summary
+
+    clean = Summary(n_charts=3, n_indicators=2, fields={"WYSK": 1})
+    assert status_icon(clean) == "✏️"
+    assert "behind on" not in format_metadata_diff(clean)
+
+    stale = Summary(
+        n_charts=3,
+        n_indicators=2,
+        fields={"WYSK": 1},
+        stale={"wid/2026-06-18/world_inequality_database": ("2026-08-05", "2026-08-17")},
+    )
+    assert status_icon(stale) == "🚧"
+    body = format_metadata_diff(stale)
+    assert "behind on 1 dataset" in body
+    assert body.index("behind on") < body.index("Charts:")  # it leads
+
+    # And it survives the no-changes path, where a stale build may be the reason there are none.
+    assert "behind on 1 dataset" in format_metadata_diff(Summary(stale=stale.stale))

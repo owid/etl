@@ -10,6 +10,7 @@ nothing on merge — unlike chart-diff approvals, which gate `etl chart-sync` �
 be noise rather than a signal.
 """
 
+from sqlalchemy.engine.base import Engine
 from structlog import get_logger
 
 from apps.wizard.app_pages.metadata_diff.discovery import Summary, summarize
@@ -23,10 +24,30 @@ def call_metadata_diff(branch: str) -> Summary:
     """Compare the branch's staging server against production (or master, when production is unavailable)."""
     source_engine = OWIDEnv.from_staging(branch).get_engine()
     target_engine = production_or_master_engine()
-    return summarize(source_engine, target_engine)
+    return summarize(source_engine, target_engine, _master_engine(target_engine))
+
+
+def _master_engine(target_engine: Engine) -> Engine | None:
+    """Master's own staging server, which is what tells this branch's edits from master's.
+
+    None when it is unreachable, or when the baseline already is that server — cross-checking a server
+    against itself answers nothing. Attribution then reports "unknown" rather than guessing.
+    """
+    try:
+        env = OWIDEnv.from_staging("master")
+        engine = env.get_engine()
+        if engine.url == target_engine.url:
+            return None
+        return engine
+    except Exception as e:  # noqa: BLE001 — a missing master server must not stop the comment
+        log.warning("owidbot.metadata_diff.master_engine_unavailable", error=str(e))
+        return None
 
 
 def status_icon(summary: Summary) -> str:
+    # A stale server outranks the change count: until it is rebuilt, that count is about the wrong thing.
+    if summary.stale:
+        return "🚧"
     if summary.warnings:
         return "⚠️"
     return "✏️" if summary.has_changes else "✅"
@@ -34,14 +55,25 @@ def status_icon(summary: Summary) -> str:
 
 def format_metadata_diff(summary: Summary) -> str:
     """The body of the comment section: what changed, and how far it reaches."""
+    # Lead with a stale server. Its differences read backwards — the branch appears to have written text
+    # it removed — so every number below it is untrustworthy until the datasets are rebuilt.
+    stale = ""
+    if summary.stale:
+        names = ", ".join(f"<code>{d}</code>" for d in sorted(summary.stale))
+        stale = (
+            f"<li>🚧 <b>This staging server is behind on {len(summary.stale)} dataset(s)</b> ({names}) — "
+            "their differences below show older text as this branch's change. Rebuild them on the server "
+            "(<code>etlr grapher://grapher/&lt;dataset&gt; --grapher</code>) and re-run.</li>"
+        )
+
     if summary.warnings and not summary.has_changes:
-        items = "".join(f"<li>{w}</li>" for w in summary.warnings)
+        items = stale + "".join(f"<li>{w}</li>" for w in summary.warnings)
         return f"<ul>{items}</ul>"
 
     if not summary.has_changes:
-        return "No metadata text changes."
+        return f"<ul>{stale}</ul>" if stale else "No metadata text changes."
 
-    items = []
+    items = [stale] if stale else []
     if summary.n_charts or summary.n_indicators:
         indicators = f" (from {summary.n_indicators} indicator{'s' if summary.n_indicators != 1 else ''})"
         items.append(f"<li>Charts: {summary.n_charts}{indicators}</li>")
@@ -61,12 +93,18 @@ def format_metadata_diff(summary: Summary) -> str:
             f"<li>New indicators: {summary.n_new_indicators} — absent from the baseline, so their text "
             "has no diff and is unreviewed</li>"
         )
-    # A difference in a dataset master also edited after this server was forked is not purely this PR's.
-    shared = summary.attribution.get("mixed", 0) + summary.attribution.get("baseline_newer", 0)
-    if shared:
+    # Changes that match master's own server are master's work the baseline has not rebuilt yet.
+    from_master = summary.attribution.get("master", 0)
+    if from_master:
         items.append(
-            f"<li>⚠️ {shared} of them are in datasets master also changed since this server was created, so "
-            "part of that is master's work the baseline has not rebuilt yet</li>"
+            f"<li>{from_master} of the changed indicators match master's server — master's edits the "
+            "baseline has not rebuilt yet, not this branch's</li>"
+        )
+    unknown = summary.attribution.get("unknown", 0)
+    if unknown:
+        items.append(
+            f"<li>❔ {unknown} could not be attributed (master's server was unreachable), so some of them "
+            "may be master's rather than this branch's</li>"
         )
     if summary.n_other:
         items.append(
