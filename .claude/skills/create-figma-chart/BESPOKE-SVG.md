@@ -201,6 +201,39 @@ anyone — and two of its steps are actively harmful when the destination is a F
   without Playfair Display and Lato installed. Figma resolves both by name, and the embed adds
   ~100 KB per weight to a file you are about to discard the text from anyway.
 
+## Changing what the component is given, when its config can't express it
+
+Some asks are not reachable through `config` at all. The one that comes up is the **"Other" bucket**:
+`selectTopEntities` folds every entity past `maxNodes` into a single `Other` node per side, and nothing
+in `SankeyVariantConfig` turns that off. The two obvious routes are both wrong — deleting the grey
+nodes in Figma leaves links terminating in mid-air, and patching the component makes the image
+unreproducible.
+
+The route that works is to **serve the component a filtered dataset**, by intercepting its data request
+in the render browser. It needs no repo change: the component still does its own layout, labelling and
+formatting, so the output is something the component genuinely produces, just from fewer rows. With
+only 10 entities per side and `maxNodes = 10`, no bucket forms.
+
+```js
+// in the render script, right after `browser.newPage()`
+const [needle, file] = process.env.BESPOKE_INTERCEPT.split("::")
+const body = await readFile(file, "utf8")
+await page.setRequestInterception(true)
+page.on("request", (req) =>
+    req.url().includes(needle)
+        ? req.respond({ status: 200, contentType: "application/json",
+                        headers: { "access-control-allow-origin": "*" }, body })
+        : req.continue())
+```
+
+**Say what it costs, in numbers, before you do it — this is a data decision wearing a styling
+costume.** Restricting the avocado sankey to its top 10 exporters × top 10 importers dropped **900,068 t,
+25.5% of world trade** and 1,745 of 1,821 flows; every node's total fell (Netherlands −37%, Kenya −35%,
+the US −0.0%), the exporter column **reordered**, and because the palette is assigned by rank several
+countries changed colour. The title, subtitle and note all had to be rewritten, and the percentages
+became shares of the subset rather than of world trade. None of that is visible in the rendered image,
+which is exactly why it has to be stated and signed off rather than quietly applied.
+
 ## Caveats to state to the user
 
 - **Only SVG content comes through.** Anything the component draws in HTML — legends, controls,
@@ -324,10 +357,26 @@ A natural width 0.4px short of the content box is invisible; a 1.0005 rescale th
 to 12.01 is a check failure. Re-render rather than nudge. After that both frames audited clean — a
 4-rung ladder of 25 / 16 (15 on Vertical) / 12 / 11, nothing off it, no chart label below 12.
 
-**Measure the band from the real slots, not the template's nominal numbers.** The Horizontal band is
-documented as 118 → 556, but that assumes a two-line subtitle; with a one-line subtitle the header
-bottom is 99, so the band is **456.6**, not 438. Read `subtitle.y + subtitle.height` and `note.y` off
-the clone after the texts are in.
+**Measure the band from the real slots, not the template's nominal numbers.** Read the header's and
+footer's own edges off the clone after the texts are in; the tabled figures assume the placeholder
+copy and are a way to pick a template, not an input to the fit.
+
+**And solve the render size against the imported GROUP, not against the SVG canvas — they are not the
+same box.** The component draws its ink inset from the canvas it declares, so the group Figma gives you
+is smaller than the file's `width`/`height`, and it is the group that has to fill the band. Measured on
+the food-trade sankey, the inset was **3.44px on the width and 12px on the height**, stable across both
+frame sizes, which made the whole thing predictable:
+
+```
+group width  = container - 34.4        (the SVG canvas is container - 31)
+group height = cssChartAreaHeight - 12
+```
+
+Fit against the canvas instead and the gaps come out ~6px wide on each side of target — 20.2px where
+14 was wanted, on both frames, because the error is a constant rather than a ratio. **The inset is
+chart-dependent**, though: removing the "Other" node changed the vertical figure from 12 to ~7, so
+derive it once per chart from a first import rather than carrying the number across. One import, one
+measurement, one corrected render.
 
 ## What to check, and what to hand back
 

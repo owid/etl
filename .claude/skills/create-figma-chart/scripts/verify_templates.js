@@ -12,10 +12,17 @@
 //                   comes back 0/850 because their header wrapper spans the frame and pads 16px
 //                   inward; the content box there is 16/818. That is expected, not drift.
 //   headerBottom  — the band's top edge, after the header's own auto-layout has settled
-//   footer        — id, name, y, height, layoutMode and rows. `layoutMode` is the one Step 6's
-//                   structural check turns on: VERTICAL reflows when a row's line count changes,
-//                   NONE does not. Both Instagram footers changed from NONE to VERTICAL (and to
-//                   new ids) between 2026-08-14 and 2026-08-17, so check structure, not just numbers.
+//   headerSizing  — `primaryAxisSizingMode` plus each child's sizing. AUTO + HUG means the header
+//                   reflows when the text gets shorter; FIXED + a FILL/grow child means it does
+//                   NOT, and a short subtitle silently inflates its own box instead (the 850-wide
+//                   pair). This is the single most consequential property on the frame and it is
+//                   invisible until you fill the texts.
+//   footer        — id, name, y, height, layoutMode, constraints and rows. `layoutMode` says
+//                   whether the rows reflow; `constraints.vertical` says which way the footer
+//                   grows when they do — MAX keeps the bottom (grows into the band), MIN keeps
+//                   the top (grows out of the frame, off the artboard).
+//   logo          — the logo is a SIBLING of the header, so it does not affect header height.
+//                   Reported so a future move back inside a title row is visible immediately.
 //
 // The band to fit a chart into is `headerBottom → footerTop`, where footerTop is
 // `footer.y + Math.min(0, sourceRow.y)` — a source row raised inside its footer lifts the band.
@@ -58,6 +65,10 @@ for (const [label, id] of Object.entries(TEMPLATES)) {
   const autos = n.children.filter((c) => "layoutMode" in c && c.layoutMode === "VERTICAL").sort((a, b) => a.y - b.y);
   const header = autos[0] || null;
   const footer = autos.length > 1 ? autos[autos.length - 1] : null;
+  // The logo is a sibling of the header, not a child — so it never matches the auto-layout
+  // filter above, and it contributes nothing to headerBottom. Reported so a move back inside
+  // a title row is visible immediately.
+  const logo = n.children.find((c) => /^logo/i.test(c.name) || /^Logos\//.test(c.name)) || null;
   out[label] = {
     id: n.id,
     name: n.name,
@@ -66,13 +77,34 @@ for (const [label, id] of Object.entries(TEMPLATES)) {
     contentX: header ? r(header.x) : null,
     contentW: header ? r(header.width) : null,
     headerBottom: header ? r(header.y + header.height) : null,
+    // AUTO + HUG children => the header reflows when the text is shorter. FIXED + a FILL/grow
+    // child => it does not, and the slack silently inflates that child's box instead.
+    headerSizing: header
+      ? {
+          primaryAxisSizingMode: header.primaryAxisSizingMode,
+          reflows: header.primaryAxisSizingMode === "AUTO",
+          children: header.children.map((c) => ({
+            n: c.name.slice(0, 24),
+            ar: c.textAutoResize || null,
+            lsV: c.layoutSizingVertical,
+            grow: c.layoutGrow,
+            h: r(c.height),
+          })),
+        }
+      : null,
+    logo: logo ? { name: logo.name, type: logo.type, x: r(logo.x), y: r(logo.y), w: r(logo.width), h: r(logo.height) } : "NOT A SIBLING — check whether it moved back inside the header",
     footer: footer
       ? {
           id: footer.id,
           name: footer.name,
           y: r(footer.y),
           h: r(footer.height),
+          bottom: r(footer.y + footer.height),
           layoutMode: footer.layoutMode,
+          // MAX keeps the bottom edge (grows up into the band); MIN keeps the top edge and
+          // grows down, out of the frame. Almost all of them are MIN — re-pin by hand.
+          constraintV: footer.constraints.vertical,
+          growsOutOfFrame: footer.constraints.vertical === "MIN",
           rows: footer.children.map((c) => ({ name: c.name.slice(0, 30), y: r(c.y), h: r(c.height), w: r(c.width) })),
         }
       : null,
