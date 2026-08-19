@@ -45,6 +45,8 @@ def run() -> None:
         }
     )
 
+    combined_origins = tb["cholera_deaths"].metadata.origins + tb_gho["cholera_deaths"].metadata.origins
+
     #
     # Process data.
     #
@@ -67,6 +69,11 @@ def run() -> None:
     tb = paths.regions.add_aggregates(tb=tb, regions=REGIONS, min_num_values_per_year=2, aggregations=agg)
 
     tb["cholera_case_fatality_rate"] = (tb["cholera_deaths"] / tb["cholera_reported_cases"]) * 100
+
+    # assign origins to the merged columns
+    tb["cholera_reported_cases"].metadata.origins = combined_origins
+    tb["cholera_deaths"].metadata.origins = combined_origins
+    tb["cholera_case_fatality_rate"].metadata.origins = combined_origins
 
     # Improve table format.
     tb = tb.format(["country", "year"])

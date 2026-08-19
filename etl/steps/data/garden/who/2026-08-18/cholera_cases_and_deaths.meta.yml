@@ -4,6 +4,7 @@ definitions:
     processing_level: major
     presentation:
       attribution_short: WHO
+      attribution: World Health Organization (2026)
       topic_tags:
         - Global Health
         - Diarrheal Diseases
@@ -12,7 +13,7 @@ definitions:
       - This dataset is compiled from two sources published by the World Health Organization (WHO):
         - Data from 1949-1999 comes from the WHO Global Health Observatory (GHO).
         - Between 2000-2016 data from the GHO is supplemented with data from the WHO Cholera Dashboard.
-        - Data from 2017-2024 comes from the (WHO Cholera Dashboard)[https://worldhealthorg.shinyapps.io/Cholera/]
+        - Data from 2017-2024 comes from the [WHO Cholera Dashboard](https://worldhealthorg.shinyapps.io/Cholera/).
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
