@@ -60,21 +60,26 @@ def test_model_missing_from_the_registry_falls_back_to_its_version_string():
 def test_sanity_check_rejects_two_models_with_one_name():
     step = load_step_module()
 
-    def output(names):
-        return Table(
-            pd.DataFrame(
-                {
-                    "model_version": ["claude-opus-4-6_max", "claude-opus-4-8_max"],
-                    "model_name": names,
-                    "mean_score": [40.7, 47.2],
-                }
-            )
+    with pytest.raises(AssertionError, match="share a name"):
+        step.sanity_check_names(
+            {"claude-opus-4-6_max": "Claude Opus 4, max", "claude-opus-4-8_max": "Claude Opus 4, max"}
         )
 
-    with pytest.raises(AssertionError, match="share a name"):
-        step.sanity_check_outputs(output(["Claude Opus 4, max", "Claude Opus 4, max"]))
+    step.sanity_check_names(
+        {"claude-opus-4-6_max": "Claude Opus 4.6, max", "claude-opus-4-8_max": "Claude Opus 4.8, max"}
+    )
 
-    step.sanity_check_outputs(output(["Claude Opus 4.6, max", "Claude Opus 4.8, max"]))
+
+def test_build_model_names_covers_every_version():
+    step = load_step_module()
+    epoch_names = {"claude-opus-4-6_max": "Claude Opus 4.6", "claude-opus-4-8_max": "Claude Opus 4.8"}
+    names = step.build_model_names(epoch_names, epoch_names, {})
+    assert names == {
+        "claude-opus-4-6_max": "Claude Opus 4.6, max",
+        "claude-opus-4-8_max": "Claude Opus 4.8, max",
+    }
+    # A version the registry has never heard of still gets an entry, so nothing silently drops out.
+    assert step.build_model_names(["mystery-model"], epoch_names, {}) == {"mystery-model": "mystery-model"}
 
 
 def test_sanity_check_rejects_scores_that_are_no_longer_fractions():

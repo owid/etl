@@ -6,11 +6,12 @@ the benchmark itself and covers every model version Epoch publishes a benchmark 
 """
 
 import re
+from collections import defaultdict
+from collections.abc import Iterable
 from datetime import datetime
 
 import pandas as pd
 from owid.catalog import Table
-from owid.catalog import processing as pr
 from structlog import get_logger
 
 from etl.files import ruamel_load
@@ -68,8 +69,13 @@ def build_model_name(model_version: str, epoch_name: str | None, overrides: dict
     return f"{epoch_name}{date}{setting_suffix(model_version)}"
 
 
+def build_model_names(model_versions: Iterable[str], epoch_names: dict, overrides: dict[str, str]) -> dict[str, str]:
+    """Map every model version in the benchmark to the name it is shown under."""
+    return {version: build_model_name(version, epoch_names.get(version), overrides) for version in model_versions}
+
+
 def sanity_check_inputs(tb: Table, tb_registry: Table) -> None:
-    """Check the benchmark table and the model registry before joining them."""
+    """Check the benchmark table and the model registry before using them."""
     assert not tb[["model_version", "release_date"]].isna().any().any(), "Benchmark rows are missing a key."
     assert not tb_registry.duplicated("model_version").any(), "Model registry lists a version twice."
     # Scores are published as fractions. If Epoch ever switched to percentages, multiplying by 100 below
@@ -77,13 +83,21 @@ def sanity_check_inputs(tb: Table, tb_registry: Table) -> None:
     assert tb["mean_score"].between(0, 1).all(), "Scores outside 0-1: are they still published as fractions?"
 
 
-def sanity_check_outputs(tb: Table) -> None:
-    """Check that no two models were given the same name, and that the scores survived processing."""
-    models = tb[["model_version", "model_name"]].drop_duplicates()
-    collisions = models[models.duplicated("model_name", keep=False)].sort_values("model_name")
+def sanity_check_names(names: dict[str, str]) -> None:
+    """Check that no two models were given the same name."""
+    versions_by_name = defaultdict(list)
+    for version, name in names.items():
+        versions_by_name[name].append(version)
+    collisions = {name: versions for name, versions in versions_by_name.items() if len(versions) > 1}
     # Two models sharing a name become one entity holding several observations, which grapher renders as a
     # single connected series instead of separate points. Pin one of them in the overrides file.
-    assert collisions.empty, f"Distinct models share a name:\n{collisions.to_string(index=False)}"
+    assert not collisions, "Distinct models share a name:\n" + "\n".join(
+        f"  {name!r} <- {versions}" for name, versions in sorted(collisions.items())
+    )
+
+
+def sanity_check_outputs(tb: Table) -> None:
+    """Check that the scores survived processing."""
     assert tb["mean_score"].between(0, 100).all(), "Scores outside 0-100%."
     assert tb.columns[tb.isna().all()].empty, "Output has a fully empty column."
 
@@ -111,23 +125,18 @@ def run() -> None:
     #
     tb["mean_score"] = tb["mean_score"] * 100
 
-    # Name each evaluation from Epoch's registry.
-    evaluations = len(tb)
-    tb = pr.merge(tb, tb_registry, on="model_version", how="left")
-    assert len(tb) == evaluations, "The registry join changed the number of evaluations."
+    # Rename each model version to the name Epoch gives it in its registry.
+    epoch_names = tb_registry.set_index("model_version")["model_name"].to_dict()
+    names = build_model_names(tb["model_version"].unique(), epoch_names, overrides)
+    sanity_check_names(names)
 
-    unnamed = sorted(set(tb.loc[tb["model_name"].isna(), "model_version"]))
+    unnamed = sorted(version for version in names if pd.isna(epoch_names.get(version)))
     if unnamed:
         log.warning(f"Not in Epoch's model registry, falling back to the version string: {unnamed}")
 
-    tb["model_name"] = [
-        build_model_name(version, name, overrides) for version, name in zip(tb["model_version"], tb["model_name"])
-    ]
+    tb["model_version"] = tb["model_version"].map(names)
 
     sanity_check_outputs(tb)
-
-    tb["model_version"] = tb["model_name"]
-    tb = tb.drop(columns=["model_name"])
 
     tb = tb.format(["release_date", "model_version"])
     #
