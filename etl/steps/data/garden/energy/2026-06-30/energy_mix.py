@@ -71,14 +71,16 @@ EIA_SOURCES = {
 }
 
 # Tolerances for the reconciliations in sanity_check_outputs.
-# Every region family must add up to the Statistical Review's own World total, in every energy column
-# (see sanity_check_outputs). A year has to breach both tolerances to fail. The relative one carries the
-# check wherever the quantity is large; the absolute one is what makes it usable on a source that starts
-# from almost nothing, where the producer leaves a few terawatt-hours unattributed to any country and a
-# percentage would be enormous while the discrepancy is trivial. The largest relative deviation measured
-# is 2.2% (renewables in 1988) and the largest absolute one 378 TWh (0.2% of the total, in 2005); the
-# only column that needs the absolute allowance is biofuels, which peaks at 39.9% and 15 TWh in 1980.
+# Every region family must add up to the Statistical Review's own World total, in every energy column. A
+# year has to breach both tolerances to fail, because a percentage alone is meaningless on a source that
+# starts from almost nothing. Biofuels is the only column that breaches the relative one, by up to 13.5%
+# (15 TWh) in 1991, which is 0.009% of world total energy supply. It does so in both directions, and for
+# two reasons that are the producer's rather than ours: EI leaves the Caribbean's biofuels in a residual
+# bucket that belongs to no country, so our sum falls short, and its World total excludes the US ethanol
+# the EIA measures, so from 1984 to 1989 our sum instead runs over. Every other column stays within 2.2%.
 MAX_WORLD_DEVIATION_PCT = 3
+# Kept a few terawatt-hours above the 15 TWh measured above, so an ordinary revision to a small source
+# does not trip the check. It can only ever apply where the relative tolerance is already breached.
 MAX_WORLD_DEVIATION_TWH = 20
 MAX_SOURCES_DEVIATION_PCT = 2
 MAX_SHARE_SUM_DEVIATION_PCT = 2
