@@ -63,26 +63,42 @@
                 ]
             ]
         },
-        "grapherConfigSchema": {
+        "grapher_schema": {
             "type": "string",
-            "title": "Grapher config schema URL",
-            "description": "URL pointing to the JSON schema that validates the grapher configuration.",
-            "requirement_level": "optional",
+            "pattern": "^(\\d{3}|https://files\\.ourworldindata\\.org/schemas/grapher-schema\\.\\d{3}\\.json)$",
+            "title": "Grapher config schema version",
+            "description": "Version of the OWID Grapher chart-config schema that this collection's view configs were authored against. Grapher uses it as the `$schema` of every view config, and migrates outdated configs forward to the current version.",
+            "requirement_level": "recommended",
             "guidelines": [
                 [
-                    "Should point to the current version of the OWID Grapher schema."
+                    "Pin the version explicitly. When it is omitted, Grapher is told the configs already match the version this repo vendors (`DEFAULT_GRAPHER_SCHEMA`), so a breaking schema change would skip the migration."
                 ],
                 [
-                    "Used for validation of chart configuration objects."
+                    "Two forms are accepted: the short three-digit version (`\"011\"`) or the full schema URL."
+                ],
+                [
+                    "**Quote the short form.** YAML parses a bare `011` as an octal number, which silently resolves to a different version."
+                ],
+                [
+                    "Leave the pin alone once set — it records what the config was authored against, which is what lets Grapher migrate it after a breaking change."
+                ],
+                [
+                    "The exception is a pin that contradicts the config body (e.g. pinned `005` while using `chartTypes`, which only exists from `006`). That is a stale pin, not a record: Grapher would run migrations over a config they were never meant to touch. Correct it to the version the config is actually written against."
                 ]
             ],
             "examples": [
+                "011",
                 "https://files.ourworldindata.org/schemas/grapher-schema.011.json"
             ],
             "examples_bad": [
                 [
-                    "http://invalid-url.com/schema.json",
-                    "grapher-schema.011.json"
+                    "11",
+                    "0.11",
+                    "latest"
+                ],
+                [
+                    "grapher-schema.011.json",
+                    "https://files.ourworldindata.org/schemas/grapher-schema.latest.json"
                 ]
             ]
         },
