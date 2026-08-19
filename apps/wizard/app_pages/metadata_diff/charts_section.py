@@ -17,6 +17,7 @@ from sqlalchemy.engine.base import Engine
 from apps.wizard.app_pages.metadata_diff import cached, datapage, mdim_pages
 from apps.wizard.app_pages.metadata_diff.core import (
     ChangeGroup,
+    distinct_garden_datasets,
     distinct_indicator_short_names,
     field_label,
     group_changes,
@@ -119,7 +120,13 @@ def _render_change(
     """One distinct text change: what changed, where it appears, and what it reaches."""
     g: ChangeGroup = mark.group
     imp = group_usage(g, usage)
-    charts, mdims = imp["charts"], imp["mdims"]
+    mdims = imp["mdims"]
+    # Same split as the section total: every chart using the indicator is affected, but a data-page-only
+    # field (WYSK, processing note, producer description) is invisible on a multi-indicator chart. Counting
+    # those here would contradict the total and claim an audience that cannot see the edit; they are still
+    # named below, because a chart the author might expect in the list must not vanish without a word.
+    charts = [c for c in imp["charts"] if renders_change(g, c)]
+    no_data_page = [c for c in imp["charts"] if not renders_change(g, c)]
 
     with st.container(border=True):
         head = f"{mark.icon} **{field_label(g.field)}** · {len(charts)} chart{'s' if len(charts) != 1 else ''}"
@@ -140,6 +147,7 @@ def _render_change(
         with col_charts:
             with st.popover(f"📊 {len(charts)} affected chart{'s' if len(charts) != 1 else ''}", width="stretch"):
                 render_chart_list(charts)
+                _no_data_page_note(no_data_page)
                 if mdims:
                     verb = "use" if len(mdims) != 1 else "uses"
                     st.markdown(f"**{len(mdims)} MDim{'s' if len(mdims) != 1 else ''}** also {verb} these indicators:")
@@ -147,6 +155,25 @@ def _render_change(
                 _open_chart_buttons(charts, mark.change_key)
         with col_review:
             st_reviewed_toggle(source_engine, SURFACE, mark)
+
+
+def _no_data_page_note(charts: list[dict[str, Any]]) -> None:
+    """Name the charts left out of the count — they use the indicator but cannot show this field.
+
+    Left out of the reach count, not hidden: an author looking for a chart they know uses the indicator
+    has to find it here, with the reason it is not counted.
+    """
+    if not charts:
+        return
+    n = len(charts)
+    slugs = ", ".join(
+        f"`{c.get('slug') or c.get('chartId')}`" for c in sorted(charts, key=lambda c: str(c.get("slug") or ""))
+    )
+    st.caption(
+        f"⚠️ {n} further chart{'s' if n != 1 else ''} use{'' if n != 1 else 's'} these indicators but "
+        f"ha{'ve' if n != 1 else 's'} no data page (multi-indicator charts), so this text is **not shown to "
+        f"readers** there and is not counted above: {slugs}"
+    )
 
 
 def _group_paths(g: ChangeGroup) -> set[str]:
@@ -162,7 +189,17 @@ def _where_line(g: ChangeGroup) -> str:
     on many dimensional variants of ONE indicator (`thr__welfare_type_income…`, ×8) is equally a template,
     and naming `tables.<t>.variables.thr` as the target there sends the author to edit a field whose value
     is a `{definitions.*}` reference — the exact mistake this tool exists to prevent.
+
+    Both shapes assume one garden dataset. When the identical text was edited in several, it is that many
+    separate edits — no definition is shared across datasets — so those are named instead of one file.
     """
+    garden_dirs = distinct_garden_datasets(g.catalog_paths)
+    if len(garden_dirs) > 1:
+        files = ", ".join(f"`{d}.meta.yml`" for d in garden_dirs[:4]) + (" …" if len(garden_dirs) > 4 else "")
+        return (
+            f"✂️ The identical text was edited in {len(garden_dirs)} separate garden datasets ({files}) — no "
+            "`definitions.*` block is shared across datasets, so this is that many edits. Edit each file."
+        )
     shared_names = distinct_indicator_short_names(g.catalog_paths)
     if len(shared_names) > 1:
         preview = ", ".join(f"`{n}`" for n in shared_names[:5]) + (" …" if len(shared_names) > 5 else "")

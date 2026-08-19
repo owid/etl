@@ -6,13 +6,15 @@ override (contained to the MDIM).
 """
 
 from apps.owidbot.metadata_diff import format_metadata_diff, status_icon
-from apps.wizard.app_pages.metadata_diff.brief import decision
+from apps.wizard.app_pages.metadata_diff.brief import decision, garden_location_lines, ship_section
+from apps.wizard.app_pages.metadata_diff.charts_section import _where_line
 from apps.wizard.app_pages.metadata_diff.core import (
     ChangeGroup,
     ViewDiff,
     build_view_bundle,
     change_group_identity,
     diff_views,
+    distinct_garden_datasets,
     distinct_indicator_short_names,
     group_changes,
     override_snippet,
@@ -35,6 +37,7 @@ from apps.wizard.app_pages.metadata_diff.discovery import (
     narrow_to_branch,
     split_mdim_groups,
 )
+from apps.wizard.app_pages.metadata_diff.mdim_pages import _scope_label
 from apps.wizard.app_pages.metadata_diff.review_state import surface_key
 from apps.wizard.app_pages.metadata_diff.usage import _indicator_ids_in_mdim_config
 
@@ -576,6 +579,61 @@ def test_only_the_json_backed_field_is_json_decoded():
     assert bundle.metadata["descriptionShort"] == "null"
     # The one JSON column is still decoded, or every WYSK diff would compare raw JSON strings.
     assert bundle.metadata["descriptionKey"] == ["a", "b"]
+
+
+def test_scope_label_reads_every_indicator_in_the_group():
+    """A shared definition renders into many indicators; the scope decision must see all of their charts.
+
+    Reading only the group's first indicator can say "nothing else changes" while a second indicator in
+    the same group is on charts that do change — the one claim a scope decision must not get wrong.
+    """
+    usage = {
+        1: {"charts": [], "mdims": []},
+        2: {"charts": [{"chartId": 9, "slug": "s"}], "mdims": []},
+    }
+    g = ChangeGroup(
+        field="descriptionShort", old="a", new="b", affects_indicator=True, indicator_id=1, indicator_ids={1, 2}
+    )
+    label = _scope_label("all", g, usage)
+    assert "nothing else changes" not in label
+    assert "1 chart" in label
+
+
+def test_group_spanning_two_datasets_names_both_files_and_rebuilds():
+    """One group can span two garden datasets: it is keyed on the text, and identical edits collapse.
+
+    Naming only the first dataset would send the author to fix half the change, and leave the second
+    dataset unbuilt on staging.
+    """
+    paths = {
+        "grapher/ns_a/2026-01-01/ds_a/ds_a#gdp",
+        "grapher/ns_b/2026-01-01/ds_b/ds_b#gdp",
+    }
+    assert distinct_garden_datasets(paths) == [
+        "etl/steps/data/garden/ns_a/2026-01-01/ds_a",
+        "etl/steps/data/garden/ns_b/2026-01-01/ds_b",
+    ]
+
+    g = ChangeGroup(
+        field="descriptionShort",
+        old="a",
+        new="b",
+        affects_indicator=True,
+        catalog_path=sorted(paths)[0],
+        catalog_paths=paths,
+    )
+    where = "\n".join(garden_location_lines(g, "2 charts"))
+    assert "ds_a.meta.yml" in where and "ds_b.meta.yml" in where
+    # Two files cannot share a `definitions.*` block, so that claim must not be made here.
+    assert "shared definition" not in where
+
+    ship = "\n".join(ship_section([g], "production"))
+    assert "garden/ns_a/2026-01-01/ds_a" in ship and "garden/ns_b/2026-01-01/ds_b" in ship
+
+    # The Charts section's "where to edit" caption says the same thing.
+    where_caption = _where_line(g)
+    assert "2 separate garden datasets" in where_caption
+    assert "ds_a.meta.yml" in where_caption and "ds_b.meta.yml" in where_caption
 
 
 def test_explorer_attribution_is_per_view_not_per_slug():

@@ -135,10 +135,15 @@ _STATUS_FROM_DB = {"approved": "✅ Approve", "flagged": "🚩 Flag"}
 
 
 def _scope_label(scope: str, g: Any, usage: dict[int, dict[str, list[dict[str, Any]]]]) -> str:
-    """The blast-radius consequence of the author's scope decision, shown by each change in the review."""
+    """The blast-radius consequence of the author's scope decision, shown by each change in the review.
+
+    Over *every* indicator carrying the change, not just the group's first: a shared definition renders
+    into many indicators, and reading one of them can report "nothing else changes" while another is on
+    hundreds of charts — the one claim a scope decision must not get wrong.
+    """
     if not g.affects_indicator:
         return "🔒 MDim override — local to this view; no other charts or MDims are affected."
-    imp = usage.get(g.indicator_id, {}) if g.indicator_id is not None else {}
+    imp = group_usage(g, usage)
     n_c, n_m = len(imp.get("charts", [])), len(imp.get("mdims", []))
     if not n_c and not n_m:
         return "🔗 Shared indicator metadata — no other charts or MDims use it, so nothing else changes."

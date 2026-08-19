@@ -15,6 +15,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     as_bullets,
     as_plaintext,
     dims_str,
+    distinct_garden_datasets,
     distinct_indicator_short_names,
     field_label,
     group_usage,
@@ -101,10 +102,25 @@ def garden_location_lines(g: ChangeGroup, reach: str) -> list[str]:
     If it lands on *several* indicators (the fingerprint of a shared `definitions.*`/anchor — one Jinja
     template renders into many variables), point at the definition instead of guessing a variable, and
     flag the diff-observed reach as a floor. The single-variable key is a wrong, misleading target for a
-    shared-definition edit, which is exactly the mistake this tool exists to prevent."""
+    shared-definition edit, which is exactly the mistake this tool exists to prevent.
+
+    A third case sits on top of both: the group is keyed on the text, so the same edit made in two
+    different garden datasets arrives as one group. Naming only the first dataset's file would send the
+    author to fix half the change, so every dataset carrying it is named and the shared-definition claim
+    is dropped — separate files cannot share a `definitions.*` block."""
     parsed = parse_catalog_path(g.catalog_path)
+    garden_dirs = distinct_garden_datasets(g.catalog_paths) or ([parsed[0]] if parsed else [])
     garden_dir = parsed[0] if parsed else None
     table = parsed[1] if parsed else None
+    if len(garden_dirs) > 1:
+        files = ", ".join(f"`{d}.meta.yml`" for d in garden_dirs)
+        return [
+            f"- **Files ({len(garden_dirs)} datasets):** {files} — or their `.meta.override.yml`",
+            f"- **The identical text was edited in {len(garden_dirs)} separate garden datasets**, so this is "
+            "that many edits, not one: no `definitions.*` block is shared across datasets. Make the change "
+            "in each file, and rebuild each dataset.",
+            f"- **Reach (observed in this diff):** {reach}.",
+        ]
     file_line = (
         f"- **File (best guess):** `{garden_dir}.meta.yml` — or `{garden_dir}.meta.override.yml`"
         if garden_dir
@@ -251,11 +267,16 @@ def ship_section(approved_groups: list[ChangeGroup], baseline_name: str) -> list
     checks, staging rebuild + verify, Codex) plus a ready-to-paste PR description — so the copied brief is a
     complete, rigorous spec for opening the PR, not just a list of edits."""
     # Distinct garden datasets touched by shared-indicator edits, for concrete rebuild/upsert commands.
+    # Every dataset in the group, not the group's first: one group can span two datasets (it is keyed on
+    # the text), and a rebuild list missing one of them leaves that edit unpublished on staging.
     datasets: list[str] = []
     for g in approved_groups:
-        parsed = parse_catalog_path(g.catalog_path)
-        if parsed:
-            ds = parsed[0].replace("etl/steps/data/garden/", "")
+        dirs = distinct_garden_datasets(g.catalog_paths)
+        if not dirs:
+            parsed = parse_catalog_path(g.catalog_path)
+            dirs = [parsed[0]] if parsed else []
+        for d in dirs:
+            ds = d.replace("etl/steps/data/garden/", "")
             if ds not in datasets:
                 datasets.append(ds)
     if datasets:

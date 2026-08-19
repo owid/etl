@@ -482,6 +482,22 @@ def distinct_indicator_short_names(catalog_paths: Iterable[str]) -> list[str]:
     return sorted(names)
 
 
+def distinct_garden_datasets(catalog_paths: Iterable[str]) -> list[str]:
+    """Distinct garden step dirs (`etl/steps/data/garden/<ns>/<version>/<dataset>`) among indicator paths.
+
+    Groups are keyed on the text, so an identical edit made in two different garden datasets lands in one
+    group. That is the right review unit — the reviewer judges the text once — but the *edit* is then two
+    edits in two files, and both rebuilds are needed. Anything that names a file or a build command reads
+    this rather than the group's first path, so neither dataset is silently dropped.
+    """
+    dirs: list[str] = []
+    for cp in catalog_paths:
+        parsed = parse_catalog_path(cp)
+        if parsed and parsed[0] not in dirs:
+            dirs.append(parsed[0])
+    return sorted(dirs)
+
+
 def text_change_key(catalog_path: str, field: str, old: Any, new: Any) -> str:
     """View-agnostic, content-bound key for one distinct text change (the AUTHOR's scope decision).
 
