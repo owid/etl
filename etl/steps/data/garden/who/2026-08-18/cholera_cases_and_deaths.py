@@ -58,8 +58,15 @@ def run() -> None:
     # Merge the two series, preferring GHO wherever it has data.
     tb = merge_with_gho(tb, tb_gho)
 
+    agg = {
+        "cholera_reported_cases": "sum",
+        "cholera_deaths": "sum",
+    }
+
     # calculate region totals:
-    tb = paths.regions.add_aggregates(tb=tb, regions=REGIONS, min_num_values_per_year=2)
+    tb = paths.regions.add_aggregates(tb=tb, regions=REGIONS, min_num_values_per_year=2, aggregations=agg)
+
+    tb["cholera_case_fatality_rate"] = (tb["cholera_deaths"] / tb["cholera_reported_cases"]) * 100
 
     # Improve table format.
     tb = tb.format(["country", "year"])

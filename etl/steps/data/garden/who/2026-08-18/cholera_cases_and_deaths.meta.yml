@@ -27,7 +27,7 @@ tables:
     variables:
       cholera_case_fatality_rate:
         title: Cholera case fatality rate
-        description_short: Percentage of reported cholera cases that result in death.
+        description_short: Percentage of reported [cholera](#dod:cholera) cases that result in death. Testing and reporting is limited in many countries.
         description_key:
           - WHO calculates case fatality rates based on the numbers of cases and deaths as reported by national authorities.
           - The case fatality rate is the number of reported deaths, divided by the number of reported cases, shown as a percentage.
@@ -37,17 +37,20 @@ tables:
           numDecimalPlaces: 2
       cholera_reported_cases:
         title: Reported cholera cases
-        description_short: Number of cholera cases which have been reported to the WHO by local authorities. As not every case is reported to the WHO, these numbers are likely to be an underestimate of the true number of cholera cases.
+        description_short: Number of [cholera](#dod:cholera) cases which have been reported to the WHO by local authorities. As testing and reporting is limited in many countries, this is likely to be an underestimate of the true number of cholera cases.
         description_key:
-          - These statistics include Cholera cases confirmed clinically, epidemiologically, or by laboratory investigation.
-          - As not every case of Cholera is confirmed and reported to the WHO, these numbers are likely to be an underestimate of the true number of cholera cases.
+          - These statistics include cholera cases confirmed clinically, epidemiologically, or by laboratory investigation.
+          - As not every case of cholera is confirmed and reported to the WHO, these numbers are likely to be an underestimate of the true number of cholera cases.
           - In outbreak situations, cases of acute watery diarrhea caused by other pathogens may be reported as cholera cases when laboratory confirmation is not available or feasible for all suspected cases.
         unit: reported cases
         display:
           numDecimalPlaces: 0
       cholera_deaths:
         title: Reported cholera deaths
-        description_short: Number of deaths from cholera reported to WHO. As not every death is reported or attributed to cholera, these numbers are likely an underestimate of the true number of deaths from cholera.
+        description_short: Number of deaths from [cholera](#dod:cholera) reported to the WHO. As testing and reporting is limited in many countries, this is likely to be an underestimate of the true number of deaths from cholera.
+        description_key:
+          - As not every death from cholera is confirmed and reported to the WHO, these numbers are likely to be an underestimate of the true number of deaths from cholera.
+          - In outbreak situations, deaths from acute watery diarrhea caused by other pathogens may be reported as cholera deaths when laboratory confirmation is not available or feasible for all suspected cases.
         unit: reported deaths
         display:
           numDecimalPlaces: 0
