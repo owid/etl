@@ -14,6 +14,7 @@ definitions:
         - Data from 1949-1999 comes from the WHO Global Health Observatory (GHO).
         - Between 2000-2016 data from the GHO is supplemented with data from the WHO Cholera Dashboard.
         - Data from 2017-2024 comes from the [WHO Cholera Dashboard](https://worldhealthorg.shinyapps.io/Cholera/).
+      - The regional aggregates are calculated by Our World in Data by summing the country-level data for all countries in the region. Cholera case fatality rates are calculated by dividing the number of reported deaths by the number of reported cases.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
