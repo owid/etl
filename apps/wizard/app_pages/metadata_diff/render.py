@@ -113,7 +113,14 @@ def render_text_html(value: Any, other: Any, side: str, changed_only: bool = Fal
     if isinstance(value, list) or isinstance(other, list):
         value_list = value if isinstance(value, list) else ([value] if value else [])
         other_list = other if isinstance(other, list) else ([other] if other else [])
-        if changed_only:
+        # A reorder changes no bullet's text, so membership sees nothing while the lists genuinely differ.
+        # Hiding on that basis would print "(no changes here)" for a change the tool itself detected, and
+        # the reviewer could sign it off without ever seeing what moved — so fall through to the full,
+        # positional list, where the new order is visible.
+        reordered = [str(x).strip() for x in value_list if x] != [str(x).strip() for x in other_list if x] and sorted(
+            str(x).strip() for x in value_list if x
+        ) == sorted(str(x).strip() for x in other_list if x)
+        if changed_only and not reordered:
             # Only bullets not present (unchanged) on the other side: additions/edits on the new side,
             # removals/edits on the old side. Unchanged bullets are hidden.
             unchanged = {str(x).strip() for x in other_list if x}

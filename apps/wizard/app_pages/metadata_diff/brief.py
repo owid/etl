@@ -181,19 +181,31 @@ def changed_text_lines(g: ChangeGroup) -> list[str]:
     Jinja branches for every other dimension. What the executor needs is the one line to find and
     replace inside the definition, so we emit only the changed bullet(s) as a diff."""
     old, new = as_bullets(g.old), as_bullets(g.new)
+    reordered = False
     if isinstance(old, list) and isinstance(new, list):
         old_set = {str(x).strip() for x in old}
         new_set = {str(x).strip() for x in new}
         removed = [str(x) for x in old if str(x).strip() not in new_set]
         added = [str(x) for x in new if str(x).strip() not in old_set]
+        # A reorder edits no bullet, so membership finds nothing to show. Emitting nothing would leave the
+        # executor a detected change with no instruction, so both orders go in and the note says which.
+        if not removed and not added and [str(x).strip() for x in old] != [str(x).strip() for x in new]:
+            reordered = True
+            removed, added = [str(x) for x in old], [str(x) for x in new]
     else:
         removed = [str(old)] if str(old).strip() else []
         added = [str(new)] if str(new).strip() else []
     if not removed and not added:
         return []
+    lead = (
+        "- **The bullets were reordered** — no bullet's text changed, so reorder them to match the new "
+        "order below (in the definition, not in a variable):"
+        if reordered
+        else "- **The text that changed** — find this inside the definition and replace it "
+        "(do not paste a rendered value into a variable, it would break the Jinja branches):"
+    )
     out = [
-        "- **The text that changed** — find this inside the definition and replace it "
-        "(do not paste a rendered value into a variable, it would break the Jinja branches):",
+        lead,
         "```diff",
     ]
     out += [f"- {t}" for t in removed]

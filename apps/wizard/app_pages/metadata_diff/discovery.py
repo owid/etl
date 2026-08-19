@@ -54,6 +54,11 @@ log = get_logger()
 # config/indicator flag instead. Real PRs touch a handful; a regions or FAOSTAT update can flag many.
 MAX_MDIMS_RESOLVED = 25
 
+# The `export://<kind>/...` segments that publish the two products this tool reviews. A recipe name is
+# only unique within its kind, so every scope test names the kind it is asking about.
+MDIM_EXPORT_KIND = "multidim"
+EXPLORER_EXPORT_KIND = "explorers"
+
 
 @dataclass
 class IndicatorChanges:
@@ -108,7 +113,10 @@ class BranchScope:
     """
 
     dataset_paths: set[str] = field(default_factory=set)  # dataset-level catalog paths (channel/ns/ver/ds)
-    export_shorts: set[str] = field(default_factory=set)  # short names of changed export steps
+    # `(export kind, name)` of what each changed export recipe publishes — the kind included because a
+    # name is only unique within one: `migration/latest/migration_flows.py` exists under both `multidim`
+    # and `explorers`, so a name-only set would let an edit to either recipe vouch for both products.
+    export_products: set[tuple[str, str]] = field(default_factory=set)
     available: bool = True  # False when git could not tell us (then nothing is narrowed)
 
     @property
@@ -119,8 +127,9 @@ class BranchScope:
     def covers_indicator(self, catalog_path: str) -> bool:
         return _dataset_of(catalog_path) in self.dataset_keys
 
-    def covers_export(self, short_name: str) -> bool:
-        return short_name in self.export_shorts
+    def covers_export(self, kind: str, short_name: str) -> bool:
+        """Did this branch change the recipe that publishes this `kind` of product under this name?"""
+        return (kind, short_name) in self.export_products
 
 
 def branch_scope() -> BranchScope:
@@ -132,8 +141,13 @@ def branch_scope() -> BranchScope:
         return BranchScope(available=False)
 
     datasets = {p for p in paths if not p.startswith("export://")}
-    exports = {name for p in paths if p.startswith("export://") for name in _export_scope_names(p)}
-    return BranchScope(dataset_paths=datasets, export_shorts=exports, available=True)
+    exports = {(_export_kind(p), name) for p in paths if p.startswith("export://") for name in _export_scope_names(p)}
+    return BranchScope(dataset_paths=datasets, export_products=exports, available=True)
+
+
+def _export_kind(export_uri: str) -> str:
+    """The product an export recipe publishes, from its URI: `export://multidim/...` -> `multidim`."""
+    return export_uri[len("export://") :].lstrip("/").split("/")[0]
 
 
 # Where a collection recipe names what it publishes: `paths.create_collection(short_name=...)`, or the
@@ -438,12 +452,25 @@ def mdim_changes_df(source_engine: Engine, target_engine: Engine) -> pd.DataFram
     if scope.available:
         # An MDim's own recipe changing (`export://multidim/.../<short>`) is the other way this branch can
         # move its texts, so a config change counts when the recipe is ours.
-        own_recipe = df["catalogPath"].map(lambda cp: scope.covers_export(str(cp).split("#")[0].split("/")[-1]))
-        df["in_branch"] = df["is_new"] | df["indicator_changed"] | (df["config_changed"] & own_recipe)
+        own_recipe = df["catalogPath"].map(lambda cp: scope.covers_export(MDIM_EXPORT_KIND, mdim_short_name(str(cp))))
+        df["in_branch"] = mdim_in_branch(df, own_recipe)
     else:
         df["in_branch"] = df["has_changes"]
     df["scope_available"] = scope.available
     return df.set_index("catalogPath")
+
+
+def mdim_in_branch(df: pd.DataFrame, own_recipe: pd.Series) -> pd.Series:
+    """Which flagged MDims are this branch's work rather than the baseline having moved on.
+
+    An indicator-layer change is already narrowed to indicators this server rebuilt from this branch's
+    files. Everything else about an MDim lives in its config, so it counts only when this branch changed
+    the recipe that publishes it — and that includes *being new*: a staging server materializes master's
+    rebuilds too, so an MDim master added after the baseline was published arrives here with nobody in
+    this PR having touched it. Nothing is dropped either way; `has_changes` still carries it into the
+    "not this branch" bucket the page and the PR comment report separately.
+    """
+    return df["indicator_changed"] | ((df["is_new"] | df["config_changed"]) & own_recipe)
 
 
 def flagged_mdims(source_engine: Engine, target_engine: Engine, in_branch_only: bool = True) -> list[str]:
@@ -471,7 +498,7 @@ def split_mdim_groups(
     """
     scope = scope if scope is not None else branch_scope()
     groups = group_changes([v for v in view_diffs if v.changed])
-    if not scope.available or scope.covers_export(mdim_short_name(catalog_path)):
+    if not scope.available or scope.covers_export(MDIM_EXPORT_KIND, mdim_short_name(catalog_path)):
         return groups, []
     return [g for g in groups if g.affects_indicator], [g for g in groups if not g.affects_indicator]
 
@@ -629,7 +656,7 @@ def changed_explorer_views(source_engine: Engine, target_engine: Engine) -> Expl
     # builds" is too loose: an explorer master rebuilt last week differs in every view, and one of its
     # datasets being in scope would then credit all of it to this PR. Per view rather than per slug for
     # the same reason: one qualifying view must not vouch for the other hundreds in the same explorer.
-    own_recipe = {slug for slug in views if scope.covers_export(slug)}
+    own_recipe = {slug for slug in views if scope.covers_export(EXPLORER_EXPORT_KIND, slug)}
     ids_by_view: dict[tuple[str, str], set[int]] = {}
     for key in detailed:
         if key[0] in own_recipe:

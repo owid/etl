@@ -5,8 +5,12 @@ indicator metadata (propagates to charts / other MDIMs) vs. one that comes from 
 override (contained to the MDIM).
 """
 
+import re
+
+import pandas as pd
+
 from apps.owidbot.metadata_diff import format_metadata_diff, status_icon
-from apps.wizard.app_pages.metadata_diff.brief import decision, garden_location_lines, ship_section
+from apps.wizard.app_pages.metadata_diff.brief import changed_text_lines, decision, garden_location_lines, ship_section
 from apps.wizard.app_pages.metadata_diff.charts_section import _where_line
 from apps.wizard.app_pages.metadata_diff.core import (
     ChangeGroup,
@@ -23,6 +27,8 @@ from apps.wizard.app_pages.metadata_diff.core import (
 )
 from apps.wizard.app_pages.metadata_diff.datapage import ordered_slots
 from apps.wizard.app_pages.metadata_diff.discovery import (
+    EXPLORER_EXPORT_KIND,
+    MDIM_EXPORT_KIND,
     BranchScope,
     ExplorerChanges,
     Summary,
@@ -30,14 +36,17 @@ from apps.wizard.app_pages.metadata_diff.discovery import (
     _count_fields,
     _dataset_of,
     _emitted_collection_names,
+    _export_kind,
     charts_reached,
     compare_explorer_views,
     compare_indicator_texts,
+    mdim_in_branch,
     mdim_short_name,
     narrow_to_branch,
     split_mdim_groups,
 )
 from apps.wizard.app_pages.metadata_diff.mdim_pages import _scope_label
+from apps.wizard.app_pages.metadata_diff.render import render_text_html
 from apps.wizard.app_pages.metadata_diff.review_state import surface_key
 from apps.wizard.app_pages.metadata_diff.usage import _indicator_ids_in_mdim_config
 
@@ -455,12 +464,27 @@ def test_branch_scope_separates_data_steps_from_export_recipes():
     """`export://` URIs identify a changed MDim/explorer recipe; everything else is a dataset path."""
     scope = BranchScope(
         dataset_paths={"garden/wid/2026-06-18/world_inequality_database"},
-        export_shorts={"incomes_wid"},
+        export_products={(MDIM_EXPORT_KIND, "incomes_wid")},
     )
     assert scope.covers_indicator("grapher/wid/2026-06-18/world_inequality_database/tb#share_top_1")
     assert not scope.covers_indicator("grapher/wb/2026-06-26/world_bank_pip/tb#gini")
-    assert scope.covers_export("incomes_wid")
-    assert not scope.covers_export("poverty_pip")
+    assert scope.covers_export(MDIM_EXPORT_KIND, "incomes_wid")
+    assert not scope.covers_export(MDIM_EXPORT_KIND, "poverty_pip")
+
+
+def test_export_scope_is_per_kind_not_per_name():
+    """A recipe name is only unique within its export kind, and `migration_flows` exists in both.
+
+    `export/multidim/migration/latest/migration_flows.py` and
+    `export/explorers/migration/latest/migration_flows.py` both exist, so a name-only scope would let an
+    edit to the MDim recipe vouch for every differing view of the unrelated explorer.
+    """
+    assert _export_kind("export://multidim/migration/latest/migration_flows") == MDIM_EXPORT_KIND
+    assert _export_kind("export://explorers/migration/latest/migration_flows") == EXPLORER_EXPORT_KIND
+
+    scope = BranchScope(export_products={(MDIM_EXPORT_KIND, "migration_flows")})
+    assert scope.covers_export(MDIM_EXPORT_KIND, "migration_flows")
+    assert not scope.covers_export(EXPLORER_EXPORT_KIND, "migration_flows")
 
 
 def test_mdim_short_name_from_catalog_path():
@@ -481,13 +505,13 @@ def test_split_mdim_groups_keeps_config_changes_only_for_our_own_recipe():
     )
     config_change = ViewDiff(dimensions={"d": "b"}, fields={"chart.title": {"old": "p", "new": "q"}})
 
-    scope = BranchScope(dataset_paths=set(), export_shorts=set())
+    scope = BranchScope(dataset_paths=set(), export_products=set())
     ours, other = split_mdim_groups("grapher/ns/latest/mine#mine", [indicator_change, config_change], scope)
     assert [g.field for g in ours] == ["descriptionKey"]
     assert [g.field for g in other] == ["chart.title"]
 
     # When the branch edits the MDim's own recipe, its config-level edits are exactly the point.
-    scope_with_recipe = BranchScope(dataset_paths=set(), export_shorts={"mine"})
+    scope_with_recipe = BranchScope(dataset_paths=set(), export_products={(MDIM_EXPORT_KIND, "mine")})
     ours, other = split_mdim_groups("grapher/ns/latest/mine#mine", [indicator_change, config_change], scope_with_recipe)
     assert {g.field for g in ours} == {"descriptionKey", "chart.title"}
     assert other == []
@@ -533,9 +557,15 @@ def test_export_recipe_scope_reads_the_name_it_publishes():
     assert _emitted_collection_names("c = paths.create_collection(config=config)") == set()
 
     # The resolved names are what `covers_export` is asked about — either spelling has to answer yes.
-    scope = BranchScope(dataset_paths=set(), export_shorts={"ipcc_scenarios", "ipcc-scenarios"})
-    assert scope.covers_export("ipcc-scenarios")
-    assert scope.covers_export("ipcc_scenarios")
+    scope = BranchScope(
+        dataset_paths=set(),
+        export_products={
+            (EXPLORER_EXPORT_KIND, "ipcc_scenarios"),
+            (EXPLORER_EXPORT_KIND, "ipcc-scenarios"),
+        },
+    )
+    assert scope.covers_export(EXPLORER_EXPORT_KIND, "ipcc-scenarios")
+    assert scope.covers_export(EXPLORER_EXPORT_KIND, "ipcc_scenarios")
 
 
 def test_multi_collection_recipe_names_come_from_its_config_files():
@@ -636,6 +666,55 @@ def test_group_spanning_two_datasets_names_both_files_and_rebuilds():
     assert "ds_a.meta.yml" in where_caption and "ds_b.meta.yml" in where_caption
 
 
+def test_reordered_wysk_bullets_are_shown_not_hidden():
+    """A reorder edits no bullet, so a membership filter finds nothing while the lists genuinely differ.
+
+    Rendering "(no changes here)" for a change the tool itself detected lets a reviewer sign off without
+    ever seeing what moved, so a reorder falls through to the full, positional list.
+    """
+    old, new = ["alpha", "beta", "gamma"], ["gamma", "alpha", "beta"]
+
+    def _bullets(html: str) -> list[str]:
+        return [re.sub(r"<[^>]+>", "", li.split("</li>")[0]) for li in html.split("<li>")[1:]]
+
+    # Each side shows its own full order, so what moved is visible on both.
+    assert _bullets(render_text_html(new, old, side="new", changed_only=True)) == new
+    assert _bullets(render_text_html(old, new, side="old", changed_only=True)) == old
+
+    # A genuine no-op still says so, rather than printing the whole list for nothing.
+    assert "(no changes here)" in render_text_html(["a", "b"], ["a", "b"], side="new", changed_only=True)
+
+    # The brief has to hand the executor an instruction too, not an empty diff block.
+    g = ChangeGroup(field="descriptionKey", old=old, new=new)
+    lines = "\n".join(changed_text_lines(g))
+    assert "reordered" in lines
+    assert "- alpha\n- beta\n- gamma" in lines and "+ gamma\n+ alpha\n+ beta" in lines
+
+
+def test_new_mdim_needs_a_branch_signal_too():
+    """Absent from the baseline is not by itself this branch's work.
+
+    A staging server materializes master's rebuilds as well, so an MDim master added after the baseline
+    was published shows up here untouched by this PR. It needs the same recipe signal a config change
+    needs — and either way it stays in `has_changes`, so nothing is dropped from the page.
+    """
+    df = pd.DataFrame(
+        {
+            "catalogPath": ["grapher/ns/latest/mine#mine", "grapher/ns/latest/theirs#theirs"],
+            "is_new": [True, True],
+            "config_changed": [False, False],
+            "indicator_changed": [False, False],
+        }
+    )
+    scope = BranchScope(export_products={(MDIM_EXPORT_KIND, "mine")})
+    own_recipe = df["catalogPath"].map(lambda cp: scope.covers_export(MDIM_EXPORT_KIND, mdim_short_name(str(cp))))
+    assert list(mdim_in_branch(df, own_recipe)) == [True, False]
+
+    # An indicator-layer change is already branch-narrowed, so it stands on its own.
+    df["indicator_changed"] = [False, True]
+    assert list(mdim_in_branch(df, own_recipe)) == [True, True]
+
+
 def test_explorer_attribution_is_per_view_not_per_slug():
     """One qualifying view must not vouch for the rest of a lagging explorer's views.
 
@@ -687,7 +766,7 @@ def test_candidate_selection_needs_both_git_scope_and_a_rebuild_here():
 
     scope = BranchScope(
         dataset_paths={"garden/wb/2026-06-26/world_bank_pip", "garden/un/2026-01-01/un_wpp"},
-        export_shorts=set(),
+        export_products=set(),
     )
     built = {"wb/2026-06-26/world_bank_pip", "covid/latest/cases"}
 
