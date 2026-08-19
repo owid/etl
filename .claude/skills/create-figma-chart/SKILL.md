@@ -676,15 +676,21 @@ Then place the y tick labels at `plotLeft − 6 − t.width` and re-anchor each 
 
 **Whatever figure you pick, the chart group's *box* and its *ink* must be the same thing, or you will be asked about it — and both of your answers will be right.** These two are not the same measurement, and each is what somebody trusts: **box gaps** are what Figma's inspector shows a designer who clicks the chart, and **ink gaps** are what a reader sees. Two things routinely pull them apart on a 540 frame — a **peak dot parented as a sibling** of the chart group (its 5px overhang sits outside the box) and **untrimmed tick-label boxes** (~3.5px of leading below digits that have no descenders). Centre the boxes and the ink comes out lopsided; centre the ink and Figma shows something like **18.77 above / 8.77 below**, which reads as sloppy work in the file even though the render is right.
 
-Don't choose between them — make the box equal the ink, then one centring satisfies both:
+Don't choose between them — make the box equal the ink, then one centring satisfies both. **This takes three `use_figma` calls, and collapsing them is the mistake to avoid:** setting `leadingTrim` does not update `height` within the call that sets it, so a label repositioned in the same call is placed off its pre-trim height, and a `chart.height` read in the same call is the untrimmed group's. Same rule as the value-label recipe in Step 8 — trim in one call, position in the next.
 
 ```js
-for (const t of tickLabels) {                      // boxes stop overhanging their own digits
-  const cy = t.y + t.height / 2;                   // pre-trim box is ~symmetric about the ink,
-  t.leadingTrim = "CAP_HEIGHT";                    // so preserving the centre keeps the label put
-  t.y = cy - t.height / 2;
+// Call 1 — trim, and bring the dots inside the group. Heights do not settle within this call.
+for (const t of tickLabels) t.leadingTrim = "CAP_HEIGHT";   // boxes stop overhanging their own digits
+for (const d of dots) chart.appendChild(d);                 // dots inside the group: box now includes them
+
+// Call 2 — heights have settled. Anchor each label on its own mark rather than on a
+// remembered pre-trim centre (see "Re-anchor to the marks, not to a remembered box width"):
+for (const t of tickLabels) {
+  const mark = gridlineFor(t);                    // horizontal-grid-lines carries one vector per tick
+  t.y = mark.y - t.height / 2;
 }
-for (const d of dots) chart.appendChild(d);        // dots inside the group: box now includes them
+
+// Call 3 — only now does chart.height report the trimmed group, so only now can it be centred.
 chart.y = BAND_TOP + (BAND_BOTTOM - BAND_TOP - chart.height) / 2;
 ```
 
