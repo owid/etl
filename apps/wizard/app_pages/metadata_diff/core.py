@@ -106,7 +106,12 @@ def _is_nan(value: Any) -> bool:
 
 
 def _parse_json_maybe(value: Any) -> Any:
-    """`variables.descriptionKey` comes back from MySQL as a JSON string."""
+    """`variables.descriptionKey` comes back from MySQL as a JSON string.
+
+    Only for that column. Every other field is plain text, and decoding those would rewrite a text
+    that happens to be valid JSON into something the reader never sees — a title of `false` becoming
+    the boolean, a description of `null` becoming empty.
+    """
     if _is_nan(value):
         return None
     if isinstance(value, str):
@@ -115,6 +120,10 @@ def _parse_json_maybe(value: Any) -> Any:
         except (ValueError, TypeError):
             return value
     return value
+
+
+# The only JSON-backed column among METADATA_FIELDS.
+JSON_METADATA_FIELDS = {"descriptionKey"}
 
 
 def _flatten_metadata_override(override: dict[str, Any]) -> dict[str, Any]:
@@ -150,7 +159,8 @@ def build_view_bundle(
     indicator_id: int | None = None
     if variable_row:
         for key in METADATA_FIELDS:
-            base[key] = _parse_json_maybe(variable_row.get(key))
+            value = variable_row.get(key)
+            base[key] = _parse_json_maybe(value) if key in JSON_METADATA_FIELDS else (None if _is_nan(value) else value)
         # The site falls back to the internal name when no public title is set.
         if not base.get("titlePublic"):
             base["titlePublic"] = variable_row.get("name")
@@ -405,6 +415,23 @@ def group_usage(g: "ChangeGroup", usage: dict[int, dict[str, list[Any]]]) -> dic
         for m in imp.get("mdims", []):
             mdims.setdefault(m["catalogPath"], m)
     return {"charts": list(charts.values()), "mdims": list(mdims.values())}
+
+
+# Fields that only ever render on the indicator's own data page. Grapher gives a data page only to a
+# single-indicator chart, so on a chart combining several indicators an edit to one of these reaches
+# nobody — the title and the short description, by contrast, feed the chart itself.
+DATA_PAGE_ONLY_FIELDS = {"descriptionKey", "descriptionProcessing", "descriptionFromProducer"}
+
+
+def renders_change(g: "ChangeGroup", chart: dict[str, Any]) -> bool:
+    """Whether a reader of this chart can see this change at all.
+
+    `usage` flags multi-indicator charts as `wysk_shown=False`: they have no data page. Counting them
+    in the reach of a WYSK edit claims an audience that does not exist.
+    """
+    if g.field not in DATA_PAGE_ONLY_FIELDS:
+        return True
+    return bool(chart.get("wysk_shown", True))
 
 
 def group_changes(view_diffs: list[ViewDiff]) -> list[ChangeGroup]:

@@ -22,6 +22,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     group_changes,
     group_usage,
     parse_catalog_path,
+    renders_change,
 )
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
@@ -69,7 +70,9 @@ def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -
         return
 
     marks = resolve_marks(source_engine, SURFACE, groups)
-    n_charts = len({c["chartId"] for g in groups for c in group_usage(g, usage)["charts"]})
+    # Charts that *show* the changed field, not merely charts using the indicator: a WYSK edit is
+    # invisible on a multi-indicator chart, which has no data page.
+    n_charts = len({c["chartId"] for g in groups for c in group_usage(g, usage)["charts"] if renders_change(g, c)})
     st.markdown(
         f"**{len(groups)} text change{'s' if len(groups) != 1 else ''}** on "
         f"**{len(changed.diffs)} indicator{'s' if len(changed.diffs) != 1 else ''}**, reaching "

@@ -33,6 +33,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     diff_views,
     field_label,
     group_changes,
+    renders_change,
 )
 from apps.wizard.app_pages.metadata_diff.data import (
     _load_configs,
@@ -157,12 +158,27 @@ def _export_scope_names(export_uri: str) -> set[str]:
     """
     rel = export_uri[len("export://") :].rstrip("/")
     names = {rel.split("/")[-1]}
+    step_file = STEP_DIR / "export" / f"{rel}.py"
     try:
-        names |= _emitted_collection_names((STEP_DIR / "export" / f"{rel}.py").read_text())
+        names |= _emitted_collection_names(step_file.read_text())
     except OSError:
         # A deleted or renamed recipe: the file name is all we have, and is still worth matching on.
-        pass
+        return names
+    # A recipe publishing *several* collections names them from its own config files instead of from
+    # literals — `multidim/covid/latest/covid.py` turns `covid.cases.yml` into `covid_cases` — so the
+    # literals above find none of them. The `<recipe>.<key>[.config].yml` companion convention
+    # reconstructs those names, and a name no collection answers to simply never matches anything.
+    for config_file in step_file.parent.glob(f"{step_file.stem}.*.y*ml"):
+        names.add(_config_file_collection_name(config_file.name))
     return names
+
+
+def _config_file_collection_name(file_name: str) -> str:
+    """The collection a `<recipe>.<key>[.config].yml` companion file stands for.
+
+    `covid.cases.yml` -> `covid_cases`, `democracy.eiu.config.yml` -> `democracy_eiu`.
+    """
+    return "_".join(p for p in file_name.split(".")[:-1] if p != "config")
 
 
 def _branch_catalog_paths() -> list[str] | None:
@@ -698,6 +714,21 @@ class Summary:
         return bool(self.n_charts or self.n_mdims or self.n_explorers or self.n_new_indicators)
 
 
+def charts_reached(groups: list[ChangeGroup], usage: dict[int, list[dict[str, Any]]]) -> set[int]:
+    """Chart ids where at least one of these changes is actually visible to a reader.
+
+    Every chart using the indicator is *affected*; not every one *shows* the field that changed. A WYSK
+    edit reaches only the charts with a data page, so counting the rest would have the PR comment claim
+    an audience that cannot see the edit.
+    """
+    reached: set[int] = set()
+    for g in groups:
+        ids = g.indicator_ids or ({g.indicator_id} if g.indicator_id is not None else set())
+        for iid in ids:
+            reached.update(int(c["chartId"]) for c in usage.get(iid, []) if renders_change(g, c))
+    return reached
+
+
 def change_identity(g: ChangeGroup) -> tuple[str, str]:
     """A distinct text change, independent of which surface renders it."""
     return (g.field, json.dumps([g.old, g.new], sort_keys=True, default=str))
@@ -740,7 +771,7 @@ def summarize(source_engine: Engine, target_engine: Engine) -> Summary:
         summary.n_chart_changes = len(chart_groups)
         _collect_changes(seen, chart_groups)
         usage = charts_affected(source_engine, changed)
-        summary.n_charts = len({c["chartId"] for charts in usage.values() for c in charts})
+        summary.n_charts = len(charts_reached(chart_groups, usage))
         for origin in attribute_indicator_changes(source_engine, target_engine, changed.paths).values():
             summary.attribution[origin] = summary.attribution.get(origin, 0) + 1
     except Exception as e:  # noqa: BLE001 — a broken surface must not blank the whole report

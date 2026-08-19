@@ -24,9 +24,11 @@ from apps.wizard.app_pages.metadata_diff.discovery import (
     BranchScope,
     ExplorerChanges,
     Summary,
+    _config_file_collection_name,
     _count_fields,
     _dataset_of,
     _emitted_collection_names,
+    charts_reached,
     compare_explorer_views,
     compare_indicator_texts,
     mdim_short_name,
@@ -531,6 +533,49 @@ def test_export_recipe_scope_reads_the_name_it_publishes():
     scope = BranchScope(dataset_paths=set(), export_shorts={"ipcc_scenarios", "ipcc-scenarios"})
     assert scope.covers_export("ipcc-scenarios")
     assert scope.covers_export("ipcc_scenarios")
+
+
+def test_multi_collection_recipe_names_come_from_its_config_files():
+    """A recipe publishing several collections derives their names, so no literal is there to read.
+
+    `multidim/covid/latest/covid.py` builds one collection per `covid.<key>.yml` companion file, naming
+    each after the file. Without that, an edit to one of those configs would look like baseline lag.
+    """
+    assert _config_file_collection_name("covid.cases.yml") == "covid_cases"
+    assert _config_file_collection_name("covid.xm_models.yml") == "covid_xm_models"
+    # `.config.yml` companions carry the same meaning without the marker segment.
+    assert _config_file_collection_name("democracy.eiu.config.yml") == "democracy_eiu"
+
+
+def test_wysk_reach_counts_only_charts_that_show_it():
+    """WYSK renders on the data page, which a multi-indicator chart does not have."""
+    usage = {7: [{"chartId": 1, "wysk_shown": True}, {"chartId": 2, "wysk_shown": False}]}
+    wysk = ChangeGroup(field="descriptionKey", old=["a"], new=["b"], indicator_ids={7})
+    assert charts_reached([wysk], usage) == {1}
+
+    # A title or short description feeds the chart itself, so every chart using it is reached.
+    title = ChangeGroup(field="titlePublic", old="Old", new="New", indicator_ids={7})
+    assert charts_reached([title], usage) == {1, 2}
+
+
+def test_only_the_json_backed_field_is_json_decoded():
+    """Every field but WYSK is plain text; decoding one that happens to be valid JSON rewrites it."""
+    row = {
+        "id": 1,
+        "name": "Internal name",
+        "titlePublic": "false",
+        "descriptionShort": "null",
+        "descriptionKey": '["a", "b"]',
+        "descriptionProcessing": None,
+        "descriptionFromProducer": None,
+    }
+    bundle = build_view_bundle({"dimensions": {}}, None, row, None)
+
+    # Decoded, these became the boolean False (so the internal name replaced it) and None.
+    assert bundle.metadata["titlePublic"] == "false"
+    assert bundle.metadata["descriptionShort"] == "null"
+    # The one JSON column is still decoded, or every WYSK diff would compare raw JSON strings.
+    assert bundle.metadata["descriptionKey"] == ["a", "b"]
 
 
 def test_explorer_attribution_is_per_view_not_per_slug():
