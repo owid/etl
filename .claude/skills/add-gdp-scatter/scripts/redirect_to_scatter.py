@@ -502,13 +502,11 @@ def build_plan(api: AdminAPI, payload: list[dict], skip_aliases: bool) -> list[d
     loss = applier.source_lossiness({ids[r["src"]] for r in rows if r["src"] in ids})
     log_sources = {i for i, v in loss.items() if v["log"]}
     key_charts = key_chart_slots(loss.keys())
-    featured = featured_metric_slots(r["src"] for r in rows)
     for rec in rows:
         src_id = ids.get(rec["src"])
         rec["query"] = row_query(src_id, log_sources)
         rec["loss"] = loss.get(src_id, {})
         rec["key_charts"] = key_charts.get(src_id, [])
-        rec["featured_metrics"] = featured.get(rec["src"], [])
 
     for rec in rows:
         if rec["status"] == "ERROR":
@@ -586,6 +584,22 @@ def build_plan(api: AdminAPI, payload: list[dict], skip_aliases: bool) -> list[d
                 "status": "BLOCKED",
                 "note": f"--skip-alias-repoint, but the unpublish would delete {len(rec['aliases'])} alias(es) of the source",
             }
+
+    # Featured metrics LAST, because they are matched by literal pathname and a slot may well name
+    # an inbound alias rather than the current slug — the aliases are only known once the loop
+    # above has read them. Unpublishing the source deletes every alias too, so a slot on an old
+    # slug empties just the same, and missing it would let RECONSIDER report no parameterless
+    # surface for a retirement that silently empties one.
+    featured = featured_metric_slots(
+        slug for rec in rows for slug in (rec["src"], *(a["slug"] for a in rec["aliases"])) if slug and slug != "-"
+    )
+    for rec in rows:
+        slots: list[str] = []
+        for slug in (rec["src"], *(a["slug"] for a in rec["aliases"])):
+            for tag in featured.get(slug, []):
+                if tag not in slots:
+                    slots.append(tag)
+        rec["featured_metrics"] = slots
     return rows
 
 
@@ -891,11 +905,27 @@ def main() -> int:
     rec_by_slug = {slug: rec for rec in audited for slug in (rec["src"], *(a["slug"] for a in rec["aliases"]))}
     query_by_slug = {slug: rec["query"] for slug, rec in rec_by_slug.items()}
     gdoc_rows = gdoc_references(tuple(sorted(query_by_slug)))
-    for row in gdoc_rows:
-        owner = rec_by_slug.get(row["slug"])
+
+    def count_ref(slug: str, kind: str) -> None:
+        owner = rec_by_slug.get(slug)
         if owner is not None:
-            key = "gdoc_links" if row["kind"] == "link" else "gdoc_embeds"
+            key = "gdoc_links" if kind == "link" else "gdoc_embeds"
             owner[key] = owner.get(key, 0) + 1
+
+    for row in gdoc_rows:
+        count_ref(row["slug"], row["kind"])
+
+    # Raw pasted URLs too. `gdoc_references` reads only `linkType IN ('grapher','guided-chart')`,
+    # so an author who pasted a full `/grapher/...` URL (stored as `linkType='url'`) is invisible
+    # to it — and since the carrier count is now the link/embed split rather than the aggregate
+    # `postsGdocs`, such a reference would otherwise be counted nowhere at all. Delegated to the
+    # sweep's own reader, which already unwraps Google redirect wrappers and skips archive hosts.
+    try:
+        url_rows = fr.sweep_gdoc_url_links({slug: {"id": rec.get("src_id")} for slug, rec in rec_by_slug.items()})
+        for row in url_rows:
+            count_ref(str(row["subject"]), "link" if row["kind"] == fr.LINK else "embed")
+    except Exception as e:
+        print(f"\n  (raw-URL gdoc sweep failed, link/embed counts may understate: {e!s:.80})")
 
     print("\nREFERENCES AUDIT (of the OLD source chart)")
     print(f"{'src_slug':<58} {'src':>5} {'tgt':>5} {'manual':>7} {'lossy':>6} {'keych':>6} {'aliases':>7}  counts")

@@ -351,11 +351,14 @@ def classify_exclusions(
     for name in excluded:
         y, x, used, exact = y_at.get(name), x_at.get(name), year, True
         if y is None or x is None:
-            shared = _latest_shared_year(y_all, x_all, name)
+            shared = _latest_shared_year(y_all, x_all, name, tolerance)
             if shared is not None:
+                # Read with the same tolerance the year was found under: at a non-zero tolerance
+                # `shared` can be a timeline year whose actual observation sits a year or two off,
+                # and a tolerance-0 read would then come back empty.
                 used, exact = shared, False
-                y = values_at_year(y_var_id, shared, 0, engine).get(name)
-                x = values_at_year(gdp_var_id, shared, 0, engine).get(name)
+                y = values_at_year(y_var_id, shared, tolerance, engine).get(name)
+                x = values_at_year(gdp_var_id, shared, tolerance, engine).get(name)
             else:
                 y = x = None
         others_y, others_x = pack_at(used) if y is not None and x is not None else ([], [])
@@ -364,13 +367,24 @@ def classify_exclusions(
     return rows
 
 
-def _latest_shared_year(y_df, x_df, entity: str) -> int | None:
+def _latest_shared_year(y_df, x_df, entity: str, tolerance: int = 0) -> int | None:
+    """Latest timeline year where BOTH indicators resolve for this entity, tolerance included.
+
+    Not a raw-year intersection: with a non-zero tolerance Grapher pairs a y value with a GDP
+    value from a neighbouring year, so demanding the same year understated which entities the
+    reader can actually reach by dragging the timeline — and an entity wrongly found absent
+    graded as a benign `no data` and dropped out of the warning entirely.
+    """
     if y_df is None or x_df is None or y_df.empty or x_df.empty:
         return None
-    ys = set(y_df.loc[y_df["entityName"] == entity, "year"])
-    xs = set(x_df.loc[x_df["entityName"] == entity, "year"])
-    shared = ys & xs
-    return int(max(shared)) if shared else None
+    ys = {int(v) for v in y_df.loc[y_df["entityName"] == entity, "year"]}
+    xs = {int(v) for v in x_df.loc[x_df["entityName"] == entity, "year"]}
+    if not ys or not xs:
+        return None
+    for yr in sorted(ys | xs, reverse=True):
+        if any(abs(y - yr) <= tolerance for y in ys) and any(abs(x - yr) <= tolerance for x in xs):
+            return yr
+    return None
 
 
 def coverage_warning(y_min_year: int, gdp_var_id: int) -> str | None:

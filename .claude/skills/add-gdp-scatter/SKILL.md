@@ -163,6 +163,13 @@ pack is rebuilt at *that* year rather than held at the default one — otherwise
 indicator has the point and the pack drifting apart, and the verdict measures the trend rather
 than the entity. The measured year is printed whenever it is not the default.
 
+That fallback year honours the target's **tolerance**, and is not a raw-year intersection: at a
+non-zero tolerance Grapher pairs a y value with a GDP value from a neighbouring year, so an entity
+whose two observations never share a year can still be a point the reader meets by dragging the
+timeline. Requiring the same year graded it a benign `no data` and dropped it out of the warning
+altogether. The value is then read back at that same tolerance, since the observation itself may
+sit a year or two off the timeline year it was found under.
+
 (2026-08-19, production: of 22 published GDP scatters carrying `excludedEntityNames`, 8 exclude
 `World` or another OWID aggregate — the single commonest case, which is why `aggregate` is its
 own class, detected by the `OWID_` prefix on `entityCode` rather than by a name list. Charts 1131
@@ -377,7 +384,16 @@ travel at all, which depends on **both the loss and the surface**:
   all). The latter two are named, not counted, so the topic owner can see whose pages they are.
   Featured metrics are matched by `find_references.sweep_featured_metrics`, not a local `LIKE`:
   the only handle a `featured_metrics` row carries is a URL, and `LIKE '%/grapher/foo%'` cannot
-  tell `foo` from `foo-bar`.
+  tell `foo` from `foo-bar`. That sweep runs **after** the aliases are resolved and is fed every
+  one of the source's slugs, because a slot may name an inbound alias rather than the current
+  slug — and the unpublish deletes the aliases too, so such a slot empties just the same.
+
+Both reference counts cover **all three** ways an article can hold a chart: a prose link, a block
+embed, and a raw pasted `/grapher/…` URL. The last is stored as `linkType='url'`, which
+`gdoc_references` does not read, so it comes from `find_references.sweep_gdoc_url_links` — which
+also unwraps Google redirect wrappers and skips archived hosts. Since the carrier count is the
+link/embed split rather than the aggregate `postsGdocs`, a raw-URL reference left out of both
+would be counted nowhere at all.
 - **NOTHING carries it** — an **exclusion** loss. The target never re-applies exclusions, so no
   href, on any surface, brings the entity back off the scatter. An exclusion-only row therefore
   reports no "fixable by hand" count at all; the only question it poses is whether the chart
