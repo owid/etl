@@ -247,8 +247,13 @@ def grade_exclusion(
         # nothing (1.0), any other value turns a zero-width axis into a real one (unbounded).
         # Without the first case an entity sitting exactly on the pack graded `y-OUTLIER`.
         stretch = 1.0 if y == hi_y else float("inf")
-    above = y > hi_y * Y_PACK_FACTOR
-    below = 0 < y < lo_y / Y_PACK_FACTOR
+    # The two pack tests are RATIOS, so they only mean anything against a positive bound: on a
+    # negative pack `hi_y * 2` sits BELOW the pack, which made an ordinary in-range value (y=-7
+    # against -10..-5) read as "above the highest", and a pack topping out at exactly 0 divided
+    # by zero in the factor below. Indicators with negative or zero values are graded on `stretch`
+    # alone, which is a span ratio and so sign-agnostic.
+    above = hi_y > 0 and y > hi_y * Y_PACK_FACTOR
+    below = lo_y > 0 and 0 < y < lo_y / Y_PACK_FACTOR
     if stretch >= Y_STRETCH_FACTOR or above or below:
         why = f"y={y:,.4g} against the other {len(others_y)} at {lo_y:,.4g}-{hi_y:,.4g}"
         if above or below:

@@ -151,6 +151,12 @@ drawn in rather than testing for statistical outlierness — a symmetric IQR fen
 indicators badly wrong (chart 1131: Cape Verde's 40.3 kg/ha cereal yield sits well inside a
 ±3·IQR fence while being **14.3x below the lowest** of the other 88 countries).
 
+The two pack tests (`Y_PACK_FACTOR`, "N× above the highest / below the lowest") are **ratios**, so
+they only run against a positive bound. On an indicator whose values are negative, `hi_y × 2` sits
+*below* the pack, which would make an ordinary in-range value read as an outlier, and a pack
+topping out at exactly `0` would divide by zero. Those indicators are graded on the span stretch
+alone, which is sign-agnostic and still catches a genuine outlier.
+
 Both sides of that comparison are read at the **same year**. An entity with no value at the
 target's default year is graded at its latest year with both indicators instead, and the peer
 pack is rebuilt at *that* year rather than held at the default one — otherwise a trending
@@ -361,14 +367,24 @@ A row is `RECONSIDER` when the retirement costs the reader something the redirec
 back: the source's **log y axis**, or an **exclusion whose return changes the chart** (the two
 losses in "A log y axis and an exclusion list are the two things the migration cannot carry").
 The block prints, per row, what is lost and where the loss lands — split by whether the fix can
-travel at all:
+travel at all, which depends on **both the loss and the surface**:
 
-- **fixable by hand** — article links and embeds, which can be re-pointed with the params.
-- **CANNOT carry the fix** — key-chart slots (no query string) and featured metrics (a chart's
-  tab cannot be featured at all). Named, not counted, so the topic owner can see whose pages
-  they are. Featured metrics are matched by `find_references.sweep_featured_metrics`, not a local
-  `LIKE`: the only handle a `featured_metrics` row carries is a URL, and `LIKE '%/grapher/foo%'`
-  cannot tell `foo` from `foo-bar`.
+- **fixable by hand** — prose links (gdoc `span-*` rows and the legacy WordPress ones), and only
+  for a **log** loss: a link's href can be given `yScale=log`.
+- **CANNOT carry the fix** — gdoc **embeds** (an embed resolves the chart and renders its
+  *default* tab, so no query string reaches it — the same fact the hand-edit table below reports),
+  key-chart slots (no query string), and featured metrics (a chart's tab cannot be featured at
+  all). The latter two are named, not counted, so the topic owner can see whose pages they are.
+  Featured metrics are matched by `find_references.sweep_featured_metrics`, not a local `LIKE`:
+  the only handle a `featured_metrics` row carries is a URL, and `LIKE '%/grapher/foo%'` cannot
+  tell `foo` from `foo-bar`.
+- **NOTHING carries it** — an **exclusion** loss. The target never re-applies exclusions, so no
+  href, on any surface, brings the entity back off the scatter. An exclusion-only row therefore
+  reports no "fixable by hand" count at all; the only question it poses is whether the chart
+  still reads correctly with the entity present.
+
+Getting that split wrong is not cosmetic: counting embeds as fixable, or offering a hand-edit for
+an exclusion, makes an unrecoverable row look solved.
 
 **It is warn-only on purpose, and that is a deliberate departure from how `MANUAL` is handled.**
 A `MANUAL` reference is turned into `BLOCKED` because the unpublish would *break* an explorer or

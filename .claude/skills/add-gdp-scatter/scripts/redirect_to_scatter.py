@@ -341,7 +341,7 @@ def featured_metric_slots(slugs: Iterable[str]) -> dict[str, list[str]]:
     return out
 
 
-def lossy_reasons(loss: dict, tgt_cfg: dict, engine) -> list[str]:
+def lossy_reasons(loss: dict, tgt_cfg: dict, engine) -> list[dict]:
     """Why retiring this source loses something, in the reader's terms — or [] if it does not.
 
     Only the losses that survive Part 2 count. A log y axis and the source's exclusions both do:
@@ -349,10 +349,15 @@ def lossy_reasons(loss: dict, tgt_cfg: dict, engine) -> list[str]:
     clicks the scatter tab or for a surface with no query string, and the exclusions are never
     reinstated anywhere. The exclusion grading is the applier's, so this agrees with what Part 1
     printed instead of second-guessing it.
+
+    Each reason carries its `kind`, because the two have different recovery channels and
+    `print_reconsider` has to split the blast radius on that: a log axis travels on any URL that
+    keeps its params, while an exclusion travels on nothing at all. Reporting them together as
+    one "fixable" count overstated what editing an href achieves.
     """
-    reasons = []
+    reasons: list[dict] = []
     if loss.get("log"):
-        reasons.append("log y axis (the target's scatter tab opens linear)")
+        reasons.append({"kind": "log", "text": "log y axis (the target's scatter tab opens linear)"})
     excluded = loss.get("excluded") or []
     if excluded:
         try:
@@ -369,10 +374,14 @@ def lossy_reasons(loss: dict, tgt_cfg: dict, engine) -> list[str]:
             bad = [g for g in graded if g["cls"] in applier.EXCLUSION_WARN_CLASSES]
             if bad:
                 reasons.append(
-                    f"{len(bad)} exclusion(s) that matter: " + ", ".join(f"{g['entity']} {g['cls']}" for g in bad)
+                    {
+                        "kind": "exclusions",
+                        "text": f"{len(bad)} exclusion(s) that matter: "
+                        + ", ".join(f"{g['entity']} {g['cls']}" for g in bad),
+                    }
                 )
         except Exception as e:
-            reasons.append(f"{len(excluded)} exclusion(s), ungraded ({e!s:.60})")
+            reasons.append({"kind": "exclusions", "text": f"{len(excluded)} exclusion(s), ungraded ({e!s:.60})"})
     return reasons
 
 
@@ -385,9 +394,11 @@ def print_reconsider(plan: list[dict]) -> None:
     waiver flag — roughly a fifth of a batch is logarithmic (2026-08-14, batch 1: 3 of 14). A
     column would be missed; a block with the blast radius next to it has to be answered.
 
-    The blast radius is split by whether the fix can travel: an article link or embed can be
-    hand-edited to carry `yScale=log`, while a key-chart slot cannot carry a query string at all
-    and a featured metric cannot even name a chart's tab.
+    The blast radius is split by whether the fix can travel, and that depends on BOTH the loss
+    and the surface. Only a log axis has a recovery channel at all — `yScale=log` on a URL — and
+    only a prose link keeps it: an embed drops the query string, a key-chart slot has nowhere to
+    put one, and a featured metric cannot even name a chart's tab. An exclusion has no channel
+    anywhere, so for that loss every surface is unfixable and none of them counts as "by hand".
     """
     rows = [r for r in plan if r.get("lossy")]
     if not rows:
@@ -397,14 +408,23 @@ def print_reconsider(plan: list[dict]) -> None:
     print("  topic owner before --apply — keeping the standalone chart is a legitimate outcome.")
     for rec in rows:
         refs = rec.get("refs") or {}
-        fixable = sum(refs.get(k, 0) for k in ("postsGdocs", "postsWordpress"))
+        kinds = {r["kind"] for r in rec["lossy"]}
+        log_lost, excl_lost = "log" in kinds, "exclusions" in kinds
+        links, embeds = rec.get("gdoc_links", 0), rec.get("gdoc_embeds", 0)
+        # WordPress rows are prose links on the legacy mirror, so they group with the links.
+        carriers = links + refs.get("postsWordpress", 0)
         key_charts = rec.get("key_charts") or []
         featured = rec.get("featured_metrics") or []
         print(f"\n  {rec['src']}  ({rec.get('src_id') or '-'} -> {rec.get('tgt_id') or '-'})")
         for reason in rec["lossy"]:
-            print(f"    loses: {reason}")
-        if fixable:
-            print(f"    fixable by hand: {fixable} article reference(s) — update the href to carry the params")
+            print(f"    loses: {reason['text']}")
+        if log_lost and carriers:
+            print(f"    fixable by hand: {carriers} prose link(s) — add yScale=log to the href")
+        if embeds:
+            print(
+                f"    CANNOT carry the fix: {embeds} gdoc embed(s) (an embed renders the target's DEFAULT tab; "
+                f"no query string reaches it)"
+            )
         for label, names, why in (
             ("key-chart slot", key_charts, "a chart_tags row has nowhere to put a query string"),
             ("featured metric", featured, "a chart's TAB cannot be featured at all"),
@@ -412,22 +432,33 @@ def print_reconsider(plan: list[dict]) -> None:
             if names:
                 shown = ", ".join(names[:4]) + (f", +{len(names) - 4} more" if len(names) > 4 else "")
                 print(f"    CANNOT carry the fix: {len(names)} {label}(s) — {shown} ({why})")
-        if not fixable and not key_charts and not featured:
+        if excl_lost:
+            print("    NOTHING carries an exclusion back: the target never re-applies them, so every reference")
+            print("    above meets the returning entity however its href is written")
+        if not (carriers or embeds or key_charts or featured):
             print("    no references found, so the loss is confined to readers who arrive by the old slug")
-        unfixable = len(key_charts) + len(featured)
-        verdict = (
-            "the loss lands on pages no query string reaches — decide before applying"
-            if unfixable
-            else "weigh it against the references above"
-        )
+        # An embed is as unfixable as a key-chart slot — it was previously counted as "fixable",
+        # which is what made an embed-only log row look solved.
+        unfixable = embeds + len(key_charts) + len(featured)
+        if excl_lost:
+            verdict = "an exclusion cannot be restored anywhere — decide whether the scatter reads correctly with the entity back"
+        elif unfixable:
+            verdict = "the loss lands on pages no query string reaches — decide before applying"
+        elif carriers:
+            verdict = "every affected surface can carry the params — weigh the edit against keeping the chart"
+        else:
+            verdict = "the redirect carries yScale=log for old-slug arrivals; only a reader who clicks the target's scatter tab sees it linear"
         print(f"    -> {verdict}")
         # Also on the row itself, so a reader of the PLAN table alone cannot miss it. Appended the
         # same way --allow-manual-refs appends, so a BLOCKED note keeps its own explanation.
-        summary = "; ".join(rec["lossy"])
-        if unfixable:
-            parts = [f"{len(key_charts)} key-chart slot(s)"] if key_charts else []
-            parts += [f"{len(featured)} featured metric(s)"] if featured else []
+        summary = "; ".join(r["text"] for r in rec["lossy"])
+        parts = [f"{embeds} gdoc embed(s)"] if embeds else []
+        parts += [f"{len(key_charts)} key-chart slot(s)"] if key_charts else []
+        parts += [f"{len(featured)} featured metric(s)"] if featured else []
+        if parts:
             summary += f"; {' + '.join(parts)} cannot carry the fix"
+        if excl_lost:
+            summary += "; no surface can carry an exclusion back"
         rec["note"] = (rec["note"] + "  " if rec["note"] else "") + f"[RECONSIDER: {summary}]"
 
 
@@ -450,6 +481,8 @@ def build_plan(api: AdminAPI, payload: list[dict], skip_aliases: bool) -> list[d
             "loss": {},
             "lossy": [],
             "tgt_cfg": {},
+            "gdoc_links": 0,
+            "gdoc_embeds": 0,
         }
         try:
             rec |= {"src": slug_from_url(row["grapher_url"]), "tgt": slug_from_url(row["target_chart_url"])}
@@ -851,6 +884,19 @@ def main() -> int:
     for rec in audited:
         rec["lossy"] = lossy_reasons(rec.get("loss") or {}, rec.get("tgt_cfg") or {}, engine)
 
+    # Article references, split link vs embed, because RECONSIDER's blast radius turns on that:
+    # a prose link can be given `yScale=log`, an embed renders the target's default tab whatever
+    # its href says. Read once here and reused by the hand-edit table below. Aliases count too —
+    # an article linking an older slug lands on the same target.
+    rec_by_slug = {slug: rec for rec in audited for slug in (rec["src"], *(a["slug"] for a in rec["aliases"]))}
+    query_by_slug = {slug: rec["query"] for slug, rec in rec_by_slug.items()}
+    gdoc_rows = gdoc_references(tuple(sorted(query_by_slug)))
+    for row in gdoc_rows:
+        owner = rec_by_slug.get(row["slug"])
+        if owner is not None:
+            key = "gdoc_links" if row["kind"] == "link" else "gdoc_embeds"
+            owner[key] = owner.get(key, 0) + 1
+
     print("\nREFERENCES AUDIT (of the OLD source chart)")
     print(f"{'src_slug':<58} {'src':>5} {'tgt':>5} {'manual':>7} {'lossy':>6} {'keych':>6} {'aliases':>7}  counts")
     print("-" * 155)
@@ -923,15 +969,13 @@ def main() -> int:
         print("  the target to become an MDIM. SKILL.md 'Narrative charts' has the mechanism and citations.")
 
     # ---- ARTICLE LINKS THAT WON'T LAND ON THE SCATTER ----
-    # Aliases included: an article may well link the source chart's older slug. Each slug maps to
-    # the query of the row it belongs to — an alias is re-pointed carrying that same query (see
-    # repoint_alias), so it has the same keys to collide with. Per-row, because only a log source
-    # stores a `yScale` for a reference's own params to contradict.
-    query_by_slug = {
-        slug: rec["query"] for rec in audited for slug in (rec["src"], *(a["slug"] for a in rec["aliases"]))
-    }
+    # `gdoc_rows` and `query_by_slug` were read above for RECONSIDER's link/embed split. Aliases
+    # are included there: an article may well link the source chart's older slug, and an alias is
+    # re-pointed carrying that same query (see repoint_alias), so it has the same keys to collide
+    # with. Per-row, because only a log source stores a `yScale` for a reference's own params to
+    # contradict.
     refs = []
-    for r in gdoc_references(tuple(sorted(query_by_slug))):
+    for r in gdoc_rows:
         note = param_notes(r, query_by_slug[r["slug"]])
         if note:
             refs.append((r, note))
