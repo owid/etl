@@ -26,6 +26,7 @@ from apps.wizard.app_pages.metadata_diff.discovery import (
     Summary,
     _count_fields,
     _dataset_of,
+    _emitted_collection_names,
     compare_explorer_views,
     compare_indicator_texts,
     mdim_short_name,
@@ -508,6 +509,28 @@ def test_explorer_changes_split_branch_from_lag():
     unnarrowed = ExplorerChanges(views={"a": [ViewDiff(dimensions={})]}, in_branch=set(), narrowed=False)
     assert list(unnarrowed.branch_views()) == ["a"]
     assert unnarrowed.other_views() == {}
+
+
+def test_export_recipe_scope_reads_the_name_it_publishes():
+    """A recipe's file name is not always the collection it publishes, and the slug is what we match on.
+
+    `explorers/emissions/latest/ipcc_scenarios.py` publishes `ipcc-scenarios`; `multidim/un/latest/
+    un_wpp.py` publishes `population-and-demography`. Matching the file name alone would file a recipe
+    edit of either as baseline lag and drop it from the review.
+    """
+    assert _emitted_collection_names(
+        'explorer = paths.create_collection(config=config, short_name="ipcc-scenarios", explorer=True)'
+    ) == {"ipcc-scenarios"}
+    assert _emitted_collection_names('    collection_name="population-and-demography",') == {
+        "population-and-demography"
+    }
+    # A recipe that names nothing publishes under its own file name, which is matched anyway.
+    assert _emitted_collection_names("c = paths.create_collection(config=config)") == set()
+
+    # The resolved names are what `covers_export` is asked about — either spelling has to answer yes.
+    scope = BranchScope(dataset_paths=set(), export_shorts={"ipcc_scenarios", "ipcc-scenarios"})
+    assert scope.covers_export("ipcc-scenarios")
+    assert scope.covers_export("ipcc_scenarios")
 
 
 def test_explorer_attribution_is_per_view_not_per_slug():

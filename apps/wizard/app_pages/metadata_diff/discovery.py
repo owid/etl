@@ -16,6 +16,7 @@ mints fresh ids on staging, so id-matching would report every indicator of that 
 """
 
 import json
+import re
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -44,6 +45,7 @@ from apps.wizard.app_pages.metadata_diff.usage import _indicator_ids_in_mdim_con
 from etl.db import read_sql
 from etl.git_helpers import get_changed_files
 from etl.io import get_all_changed_catalog_paths
+from etl.paths import STEP_DIR
 
 log = get_logger()
 
@@ -129,10 +131,38 @@ def branch_scope() -> BranchScope:
         return BranchScope(available=False)
 
     datasets = {p for p in paths if not p.startswith("export://")}
-    # An export URI is `export://explorers/<ns>/<version>/<short>` — the short name is what an explorer
-    # slug or an MDim's catalogPath tail is built from.
-    exports = {p.rstrip("/").split("/")[-1] for p in paths if p.startswith("export://")}
+    exports = {name for p in paths if p.startswith("export://") for name in _export_scope_names(p)}
     return BranchScope(dataset_paths=datasets, export_shorts=exports, available=True)
+
+
+# Where a collection recipe names what it publishes: `paths.create_collection(short_name=...)`, or the
+# `collection_name=` a later call passes.
+_COLLECTION_NAME_RE = re.compile(r"""(?:short_name|collection_name)\s*=\s*["']([^"']+)["']""")
+
+
+def _emitted_collection_names(source: str) -> set[str]:
+    """The collection names an export recipe's source publishes."""
+    return set(_COLLECTION_NAME_RE.findall(source))
+
+
+def _export_scope_names(export_uri: str) -> set[str]:
+    """What an `export://` URI can be matched against — its step file name *and* what it publishes.
+
+    An export URI is `export://explorers/<ns>/<version>/<short>`, whose tail is the recipe's **file
+    name**. That is usually also the explorer slug or the MDim catalogPath tail, but not always:
+    `explorers/emissions/latest/ipcc_scenarios.py` publishes `ipcc-scenarios`, and
+    `multidim/un/latest/un_wpp.py` publishes `population-and-demography`. Matching on the file name
+    alone files a recipe edit of those as baseline lag and drops it from the review, so read the names
+    the recipe emits and accept either.
+    """
+    rel = export_uri[len("export://") :].rstrip("/")
+    names = {rel.split("/")[-1]}
+    try:
+        names |= _emitted_collection_names((STEP_DIR / "export" / f"{rel}.py").read_text())
+    except OSError:
+        # A deleted or renamed recipe: the file name is all we have, and is still worth matching on.
+        pass
+    return names
 
 
 def _branch_catalog_paths() -> list[str] | None:
