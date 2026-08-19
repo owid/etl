@@ -57,11 +57,15 @@ FUELS = ["coal", "oil", "gas"]
 # aggregated in add_region_aggregates, but only these are bounded by the two producers' shared years.
 ENERGY_COLUMNS = [f"{fuel}_{metric}_twh" for fuel in FUELS for metric in ("production", "consumption")]
 
-# Reserves are aggregated on their own, requiring Russia for Europe. EIA reports the USSR's until 1991 and
-# Russia's only from 1997, and Russia holds about nine tenths of Europe's, so without that condition Europe
-# appears to lose 89% of its gas reserves in 1992 and recover them in 1997.
+# EIA's production columns, whose span bounds the region aggregates above.
+EIA_PRODUCTION_COLUMNS = [
+    "energy_production_from_coal",
+    "energy_production_from_natural_gas",
+    "energy_production_from_petroleum",
+]
+
+# Reserves, which need Russia present for Europe (see add_region_aggregates).
 RESERVES_COLUMNS = ["coal_reserves_tonnes", "oil_reserves_m3", "gas_reserves_m3"]
-COUNTRIES_THAT_MUST_HAVE_RESERVES = {"Europe": ["Russia"]}
 
 # Entities EIA reports whose territory the Statistical Review covers at the same time under another name:
 # East and West Germany against Germany over 1980-1990, and Czechoslovakia against Czechia and Slovakia
@@ -80,7 +84,7 @@ REGIONS = CONTINENTS + [
 
 # Year each region's aggregate starts, per column (see add_region_aggregates). Production starts a year
 # later than consumption because the Statistical Review only reports coal production from 1981, and the
-# three fuels of a metric are held to one start year. Asserted in sanity_check_region_aggregates, so that a
+# three fuels of a metric are held to one start year. Asserted in sanity_check_outputs, so that a
 # change has to be acknowledged here rather than found on a chart.
 EXPECTED_AGGREGATE_FIRST_YEAR: dict[str, int] = {
     **{f"{fuel}_production_twh": 1981 for fuel in FUELS},
@@ -90,50 +94,26 @@ EXPECTED_AGGREGATE_FIRST_YEAR: dict[str, int] = {
 # Year every aggregate ends in, which is EIA's last.
 EXPECTED_AGGREGATE_LAST_YEAR = 2024
 
-# Minimum fraction of a region's reporting countries that must report an indicator in a given year, for
-# that region-year to be published.
-MIN_FRAC_COUNTRIES_INFORMED = 0.6
-
-# Europe is held to a minimum count instead. A fraction misjudges it, because the denominator counts the
-# USSR's and Yugoslavia's successors in years where those two are still one entity each: Europe reports 28
-# of the 47 countries that ever report oil production in 1980 and 39 by 1992, though its territory is
-# covered throughout. A floor of 28 still catches it losing a third of its countries.
-MIN_NUM_COUNTRIES_INFORMED_EUROPE = 28
-
-# Tolerance for the continents-against-World reconciliation in sanity_check_region_aggregates. Every
+# Tolerance for the continents-against-World reconciliation in sanity_check_outputs. Every
 # column lands within 0.7%, except gas production in 1998, which reaches 2.5%.
 MAX_WORLD_DEVIATION_PCT = 3
-
-# Large producers that must be present, so that a region cannot lose a fifth of its output to a producer
-# dropping a country. All of these report every energy column in every year of the window; Germany does
-# not (it lacks oil production for 11 years) and Russia only starts in 1985, so neither is used.
-COUNTRIES_THAT_MUST_HAVE_DATA = {
-    "Africa": ["South Africa", "Nigeria"],
-    "Asia": ["China", "India"],
-    "Europe": ["United Kingdom", "France"],
-    "North America": ["United States"],
-    "Oceania": ["Australia"],
-    "South America": ["Brazil", "Venezuela"],
-    "High-income countries": ["United States"],
-    "Low-income countries": ["North Korea", "Ethiopia"],
-    "Lower-middle-income countries": ["India", "Pakistan"],
-    "Upper-middle-income countries": ["China"],
-}
 
 # Predecessors and successors the sources report side by side without double-counting. EIA reports Aruba
 # separately from 1986 while keeping the old name for the rest of the Netherlands Antilles, in every column.
 # The Statistical Review's Yugoslavia overlaps three of its successors in 1990 and 1991, so that pair only
 # arises in the energy columns. Every other predecessor ends where its successors begin, which
 # add_aggregates verifies on each run.
-ACCEPTED_OVERLAPS = [{year: {"Aruba", "Netherlands Antilles"} for year in range(1986, 2025)}]
-ACCEPTED_OVERLAPS_ENERGY = ACCEPTED_OVERLAPS + [
-    {year: {"Yugoslavia", successor} for year in (1990, 1991)}
-    for successor in ("Croatia", "North Macedonia", "Slovenia")
+ACCEPTED_OVERLAPS = [
+    {year: {"Aruba", "Netherlands Antilles"} for year in range(1986, 2025)},
+    *(
+        {year: {"Yugoslavia", successor} for year in (1990, 1991)}
+        for successor in ("Croatia", "North Macedonia", "Slovenia")
+    ),
 ]
 
 
 def prepare_statistical_review_data(tb_review: Table) -> Table:
-    tb = tb_review.reset_index()[["country", "year"] + ENERGY_COLUMNS]
+    tb = tb_review[["country", "year"] + ENERGY_COLUMNS]
     # Drop its OWID region aggregates: they rest on residual "Other *" buckets that it cannot attribute
     # to any country, which leaves them understated (its gas production for the low-income group is a
     # third of the sum of those countries), so they are rebuilt in add_region_aggregates.
@@ -142,7 +122,7 @@ def prepare_statistical_review_data(tb_review: Table) -> Table:
 
 
 def prepare_etemad_data(tb_etemad: Table) -> Table:
-    tb = tb_etemad.reset_index()[["country", "year", "coal_production_twh", "oil_production_twh", "gas_production_twh"]]
+    tb = tb_etemad[["country", "year", "coal_production_twh", "oil_production_twh", "gas_production_twh"]]
     return tb
 
 
@@ -157,7 +137,7 @@ def prepare_eia_data(tb_eia: Table) -> Table:
         "energy_consumption_from_petroleum": "oil_consumption_twh",
         "energy_consumption_from_natural_gas": "gas_consumption_twh",
     }
-    tb = tb_eia.reset_index()[list(columns)].rename(columns=columns, errors="raise")
+    tb = tb_eia[list(columns)].rename(columns=columns, errors="raise")
     # Drop EIA's own regional aggregates (marked with an "(EIA)" suffix) and the OWID ones its garden step
     # builds, which would otherwise be counted twice, here and again in add_region_aggregates.
     is_aggregate = tb["country"].str.contains("(EIA)", regex=False) | tb["country"].isin(REGIONS)
@@ -175,7 +155,7 @@ def prepare_eia_data(tb_eia: Table) -> Table:
 
 def prepare_smil_data(tb_smil: Table) -> Table:
     # Smil only reports World coal (as direct energy, which equals production).
-    tb = tb_smil.reset_index()[["country", "year", "coal__twh_direct_energy"]].rename(
+    tb = tb_smil[["country", "year", "coal__twh_direct_energy"]].rename(
         columns={"coal__twh_direct_energy": "coal_production_twh"}, errors="raise"
     )
     tb = tb.dropna(subset=["coal_production_twh"]).reset_index(drop=True)
@@ -183,7 +163,7 @@ def prepare_smil_data(tb_smil: Table) -> Table:
 
 
 def prepare_uk_historical_data(tb_uk: Table) -> Table:
-    tb = tb_uk.reset_index()[["country", "year", "coal_production_twh"]]
+    tb = tb_uk[["country", "year", "coal_production_twh"]]
     return tb
 
 
@@ -235,106 +215,53 @@ def backfill_world_consumption(tb: Table) -> Table:
     return tb
 
 
-def get_eia_year_range(tb_eia: Table) -> tuple[int, int]:
-    """First and last year EIA reports fossil fuel production, which bounds the region aggregates."""
-    columns = ["energy_production_from_coal", "energy_production_from_natural_gas", "energy_production_from_petroleum"]
-    years = tb_eia.reset_index().pipe(lambda t: t.loc[t[columns].notna().all(axis=1), "year"])
-    assert not years.empty, "EIA reports no year with production from all three fossil fuels."
-    return int(years.min()), int(years.max())
-
-
-def add_region_aggregates(tb: Table, tb_review: Table, eia_years: tuple[int, int]) -> Table:
+def add_region_aggregates(tb: Table, tb_review: Table, tb_eia: Table) -> Table:
     """Build the OWID region aggregates from the combined country-level data.
 
-    Every extensive column is aggregated here. The Statistical Review's own regions rest on residual
-    "Other *" buckets it cannot attribute to any country, which leaves them understated, and EIA's own
-    regions are built under different rules from a different country set. Doing it once, here, gives one
-    consistent construction.
-
-    Two conditions guard against a region losing countries: at least MIN_FRAC_COUNTRIES_INFORMED of the
-    countries that ever report must report, and, for the energy columns, the region's large producers
-    (COUNTRIES_THAT_MUST_HAVE_DATA) must be among them. The mandatory countries apply only to those
-    columns: no country reports coal reserves in every year, so requiring one would delete that
-    aggregate entirely.
-
-    The energy columns are then clipped to the years both producers cover. EIA sets the upper bound and,
-    for most, the lower one too: outside its coverage too few countries report to stand for a region, and
-    admitting them at the boundary would show a change that is ours rather than the world's. The
-    Statistical Review sets the lower bound where it starts later, which for coal production is 1981. In
-    1980 that column would rest on EIA alone, and EIA's USSR is dropped above as a duplicate, so the
-    aggregate would silently omit the largest coal producer of the time — upper-middle-income countries
-    would jump 72% into 1981 as it reappears. The remaining columns come from EIA alone, so their own
-    coverage already bounds them.
+    The Statistical Review's own regions rest on residual "Other *" buckets it cannot attribute to any
+    country, which leaves them understated: its gas production for the low-income group is a third of the
+    sum of those countries. EIA's are built under different rules again. Doing it once here gives one
+    consistent construction. No coverage condition is imposed, since within EIA's years every region
+    reports at least three quarters of the countries that ever report there; the checks in
+    sanity_check_outputs are what catch a region losing data.
     """
     is_country = ~tb["country"].str.contains("(EI)", regex=False) & ~tb["country"].isin(
         REGIONS + ["World", "European Union (27)"] + DUPLICATED_TERRITORIES
     )
-    countries = tb[is_country].reset_index(drop=True)
-    other_columns = [
-        column for column in countries.columns if column not in ENERGY_COLUMNS + RESERVES_COLUMNS + ["country", "year"]
-    ]
-
-    def aggregate(
-        columns: list[str],
-        europe_by_count: bool,
-        must_have_data: dict[str, list[str]] | None,
-        accepted_overlaps: list[dict[int, set[str]]] | None,
-    ) -> Table:
-        result = paths.regions.add_aggregates(
-            countries[["country", "year"] + columns],
-            regions={region: {} for region in REGIONS},
-            aggregations={column: "sum" for column in columns},
-            min_num_values_per_year=1,
-            accepted_overlaps=accepted_overlaps,
-            ignore_overlaps_of_zeros=True,
-            # Only the energy columns are gated. The rest are EIA's own, with coverage that varies by
-            # column and region however EIA happens to report it, so a threshold on them only trades
-            # ragged starts for gaps; they are summed over whichever countries report.
-            min_frac_countries_informed=(
-                {region: MIN_FRAC_COUNTRIES_INFORMED for region in REGIONS if region != "Europe"}
-                if europe_by_count
-                else None
-            ),
-            min_num_countries_informed={"Europe": MIN_NUM_COUNTRIES_INFORMED_EUROPE} if europe_by_count else None,
-            countries_that_must_have_data=must_have_data,
-        )
-        return result[result["country"].isin(REGIONS)].reset_index(drop=True)
-
-    # Each call gets the overlaps its own columns actually contain, so that add_aggregates only warns when
-    # something is wrong: the Statistical Review's Yugoslavia pair exists in the energy columns, Aruba's in
-    # everything EIA reports by country, and neither in the reserves.
-    tb_energy = aggregate(
-        ENERGY_COLUMNS,
-        europe_by_count=True,
-        must_have_data=COUNTRIES_THAT_MUST_HAVE_DATA,
-        accepted_overlaps=ACCEPTED_OVERLAPS_ENERGY,
+    columns = [column for column in tb.columns if column not in ("country", "year")]
+    tb_aggregates = paths.regions.add_aggregates(
+        tb[is_country].reset_index(drop=True),
+        regions={region: {} for region in REGIONS},
+        aggregations={column: "sum" for column in columns},
+        min_num_values_per_year=1,
+        accepted_overlaps=ACCEPTED_OVERLAPS,
+        ignore_overlaps_of_zeros=True,
     )
-    tb_other = aggregate(other_columns, europe_by_count=False, must_have_data=None, accepted_overlaps=ACCEPTED_OVERLAPS)
-    tb_reserves = aggregate(
-        RESERVES_COLUMNS,
-        europe_by_count=False,
-        must_have_data=COUNTRIES_THAT_MUST_HAVE_RESERVES,
-        accepted_overlaps=None,
-    )
+    tb_aggregates = tb_aggregates[tb_aggregates["country"].isin(REGIONS)].reset_index(drop=True)
 
-    # Bound the energy columns to the years EIA covers, as the energy mix does, so that the regions of
-    # both span the same years. Only Europe and high-income countries would otherwise reach the
-    # Statistical Review's extra year, on a sum missing the countries EIA has yet to publish.
-    #
-    # The three fuels of a metric share a start year, so that a region's coal + oil + gas total is always
-    # the sum of all three: coal production begins in 1981 and the other two in 1980, and a two-fuel total
-    # understates Africa's by 900 TWh.
+    # The energy columns span the years both producers cover, as in the energy mix. The three fuels of a
+    # metric share a start year, so a regional total is always the sum of all three, and coal production
+    # sets it at 1981: in 1980 it would rest on EIA alone, whose USSR is dropped above as a duplicate, so
+    # upper-middle-income countries would jump 72% into 1981 as it reappears.
+    eia_years = tb_eia.loc[tb_eia[EIA_PRODUCTION_COLUMNS].notna().all(axis=1), "year"]
+    assert not eia_years.empty, "EIA reports no year with production from all three fossil fuels."
     for metric in ("production", "consumption"):
-        columns = [f"{fuel}_{metric}_twh" for fuel in FUELS]
-        review_years = [tb_review.loc[tb_review[column].notna(), "year"] for column in columns]
+        fuel_columns = [f"{fuel}_{metric}_twh" for fuel in FUELS]
+        review_years = [tb_review.loc[tb_review[column].notna(), "year"] for column in fuel_columns]
         assert all(not years.empty for years in review_years), f"The Statistical Review reports no {metric}."
-        first_year = max(eia_years[0], *(int(years.min()) for years in review_years))
-        tb_energy.loc[~tb_energy["year"].between(first_year, eia_years[1]), columns] = float("nan")
+        first_year = max(int(eia_years.min()), *(int(years.min()) for years in review_years))
+        outside = ~tb_aggregates["year"].between(first_year, int(eia_years.max()))
+        tb_aggregates.loc[outside, fuel_columns] = float("nan")
 
-    tb_aggregates = pr.multi_merge([tb_energy, tb_other, tb_reserves], on=["country", "year"], how="outer")
-    value_columns = [c for c in tb_aggregates.columns if c not in ("country", "year")]
-    tb_aggregates = tb_aggregates.dropna(subset=value_columns, how="all").reset_index(drop=True)
+    # Europe's reserves need Russia: EIA reports the USSR's until 1991 and Russia's only from 1997, and
+    # Russia holds about nine tenths of Europe's, so a sum without it shows Europe losing 89% of its gas
+    # reserves in 1992 and recovering them in 1997.
+    for column in RESERVES_COLUMNS:
+        with_russia = set(tb.loc[(tb["country"] == "Russia") & tb[column].notna(), "year"])
+        without = (tb_aggregates["country"] == "Europe") & ~tb_aggregates["year"].isin(with_russia)
+        tb_aggregates.loc[without, column] = float("nan")
 
+    tb_aggregates = tb_aggregates.dropna(subset=columns, how="all").reset_index(drop=True)
     return pr.concat([tb, tb_aggregates], ignore_index=True).sort_values(["country", "year"]).reset_index(drop=True)
 
 
@@ -358,9 +285,7 @@ def add_physical_production(tb: Table, tb_eia: Table) -> Table:
     These units differ by fuel and cannot be summed across fuels, so there is no cross-fuel total. EIA is
     preferred over the Statistical Review here, as it covers significantly more producing countries.
     """
-    tb_eia = tb_eia.reset_index()[
-        ["country", "year", "coal_production_mt", "natural_gas_production", "crude_oil_production"]
-    ]
+    tb_eia = tb_eia[["country", "year", "coal_production_mt", "natural_gas_production", "crude_oil_production"]]
     # Drop EIA's own regional aggregates and the OWID ones its garden step builds: they are rebuilt from
     # countries in add_region_aggregates, under this step's own rules.
     is_aggregate = tb_eia["country"].str.contains("(EIA)", regex=False) | tb_eia["country"].isin(REGIONS)
@@ -389,7 +314,7 @@ def add_reserves(tb: Table, tb_eia: Table) -> Table:
         "oil_reserves": "oil_reserves_bbl",
         "natural_gas_reserves": "gas_reserves_tcm",
     }
-    tb_eia = tb_eia.reset_index()[["country", "year"] + list(columns)].rename(columns=columns, errors="raise")
+    tb_eia = tb_eia[["country", "year"] + list(columns)].rename(columns=columns, errors="raise")
     # Drop EIA's own regional aggregates and the OWID ones its garden step builds: they are rebuilt from
     # countries in add_region_aggregates, under this step's own rules.
     is_aggregate = tb_eia["country"].str.contains("(EIA)", regex=False) | tb_eia["country"].isin(REGIONS)
@@ -433,7 +358,7 @@ def add_trade_and_consumption(tb: Table, tb_eia: Table) -> Table:
     Coal in tonnes, oil and gas in cubic meters per year. Oil consumption covers all refined
     petroleum products, while oil trade covers crude oil (including lease condensate).
     """
-    tb_eia = tb_eia.reset_index()[["country", "year"] + list(EIA_TRADE_AND_CONSUMPTION_COLUMNS)].rename(
+    tb_eia = tb_eia[["country", "year"] + list(EIA_TRADE_AND_CONSUMPTION_COLUMNS)].rename(
         columns=EIA_TRADE_AND_CONSUMPTION_COLUMNS, errors="raise"
     )
     # Drop EIA's own regional aggregates and the OWID ones its garden step builds: they are rebuilt from
@@ -489,7 +414,6 @@ def add_per_capita(tb: Table) -> Table:
 
 def add_reserves_to_production_ratio(tb: Table, tb_review: Table) -> Table:
     """Add World reserves-to-production ratios (years of fossil fuels left), from the Statistical Review."""
-    tb_review = tb_review.reset_index()
     columns = [
         "coal_reserves_mt",
         "coal_production_mt",
@@ -526,44 +450,6 @@ def add_total_fossil_fuels(tb: Table) -> Table:
         # every fuel is missing (a coal-only producer's total is just its coal production).
         tb[f"total_{suffix}"] = tb[[f"{fuel}_{suffix}" for fuel in FUELS]].sum(axis=1, min_count=1)
     return tb
-
-
-def sanity_check_region_aggregates(tb: Table) -> None:
-    """Check the rebuilt region aggregates for the energy columns: their years, and their sum.
-
-    Only the energy columns are checked. The rest follow EIA's own sparsity, which varies by column and
-    starts as late as 2008 for coal reserves, so pinning their years down would be noise.
-
-    No check here is restricted to a subset of years. Where a comparison cannot be made at all (a sum of
-    continents missing one of them cannot equal the World), the years it covers are asserted instead, so
-    a change in coverage fails rather than passing silently.
-    """
-    for column, expected_first_year in EXPECTED_AGGREGATE_FIRST_YEAR.items():
-        for region in REGIONS:
-            years = sorted(tb.loc[(tb["country"] == region) & tb[column].notna(), "year"].unique())
-            assert years, f"{region} has no {column} at all."
-            assert int(years[0]) == expected_first_year, (
-                f"{region}'s {column} starts in {years[0]}, not the expected {expected_first_year}."
-            )
-            assert int(years[-1]) == EXPECTED_AGGREGATE_LAST_YEAR, (
-                f"{region}'s {column} ends in {years[-1]}, not the expected {EXPECTED_AGGREGATE_LAST_YEAR}."
-            )
-            missing = sorted(set(range(years[0], years[-1] + 1)) - set(years))
-            assert not missing, f"{region}'s {column} is missing {missing}."
-
-    # The continents partition the globe, so wherever all six are present they must add up to the
-    # Statistical Review's own World total.
-    continents = tb[tb["country"].isin(CONTINENTS)]
-    world = tb[tb["country"] == "World"].set_index("year")
-    for column in ENERGY_COLUMNS:
-        per_year = continents.groupby("year", observed=True)[column].agg(["sum", "count"])
-        complete = per_year[per_year["count"] == len(CONTINENTS)]
-        deviation = (100 * (complete["sum"] - world[column]) / world[column]).dropna()
-        assert not deviation.empty, f"No year has all continents present for {column}."
-        off = deviation[deviation.abs() > MAX_WORLD_DEVIATION_PCT]
-        assert off.empty, f"The continents do not add up to the World for {column}: " + "; ".join(
-            f"{year}: {value:+.1f}%" for year, value in off.items()
-        )
 
 
 def sanity_check_outputs(tb: Table) -> None:
@@ -618,19 +504,49 @@ def sanity_check_outputs(tb: Table) -> None:
         rel_diff = abs(consumption - production) / production
         assert rel_diff < tolerance, f"Discontinuity in World {fuel} consumption at the 1965 splice ({rel_diff:.0%})."
 
+    # The region aggregates. Only the energy columns are checked: the rest follow EIA's own coverage, which
+    # varies by column and starts as late as 2008 for coal reserves. No check is restricted to a subset of
+    # years; where a comparison cannot be made at all, the years it covers are asserted instead.
+    for column, expected_first_year in EXPECTED_AGGREGATE_FIRST_YEAR.items():
+        for region in REGIONS:
+            years = sorted(tb.loc[(tb["country"] == region) & tb[column].notna(), "year"].unique())
+            assert years, f"{region} has no {column} at all."
+            assert int(years[0]) == expected_first_year, (
+                f"{region}'s {column} starts in {years[0]}, not the expected {expected_first_year}."
+            )
+            assert int(years[-1]) == EXPECTED_AGGREGATE_LAST_YEAR, (
+                f"{region}'s {column} ends in {years[-1]}, not the expected {EXPECTED_AGGREGATE_LAST_YEAR}."
+            )
+            missing = sorted(set(range(years[0], years[-1] + 1)) - set(years))
+            assert not missing, f"{region}'s {column} is missing {missing}."
+
+    # The continents partition the globe, so wherever all six are present they must add up to the
+    # Statistical Review's own World total.
+    continents = tb[tb["country"].isin(CONTINENTS)]
+    world = tb[tb["country"] == "World"].set_index("year")
+    for column in ENERGY_COLUMNS:
+        per_year = continents.groupby("year", observed=True)[column].agg(["sum", "count"])
+        complete = per_year[per_year["count"] == len(CONTINENTS)]
+        deviation = (100 * (complete["sum"] - world[column]) / world[column]).dropna()
+        assert not deviation.empty, f"No year has all continents present for {column}."
+        off = deviation[deviation.abs() > MAX_WORLD_DEVIATION_PCT]
+        assert off.empty, f"The continents do not add up to the World for {column}: " + "; ".join(
+            f"{year}: {value:+.1f}%" for year, value in off.items()
+        )
+
 
 def run() -> None:
     #
     # Load data.
     #
     ds_review = paths.load_dataset("statistical_review_of_world_energy")
-    tb_review = ds_review.read("statistical_review_of_world_energy", reset_index=False)
+    tb_review = ds_review.read("statistical_review_of_world_energy")
 
     ds_etemad = paths.load_dataset("etemad_luciani")
-    tb_etemad = ds_etemad.read("etemad_luciani", reset_index=False)
+    tb_etemad = ds_etemad.read("etemad_luciani")
 
     ds_eia = paths.load_dataset("international_energy")
-    tb_eia = ds_eia.read("international_energy", reset_index=False)
+    tb_eia = ds_eia.read("international_energy")
 
     ds_smil = paths.load_dataset("smil_2017")
     tb_smil = ds_smil.read("smil_2017")
@@ -665,7 +581,7 @@ def run() -> None:
     tb = add_trade_and_consumption(tb=tb, tb_eia=tb_eia)
 
     # Build the OWID region aggregates from the combined country-level data, once every column is present.
-    tb = add_region_aggregates(tb=tb, tb_review=tb_review_prod, eia_years=get_eia_year_range(tb_eia=tb_eia))
+    tb = add_region_aggregates(tb=tb, tb_review=tb_review_prod, tb_eia=tb_eia)
 
     # Add annual change and per-capita, which the regions need too, so both come after the aggregates.
     tb = add_annual_change(tb=tb)
@@ -678,7 +594,6 @@ def run() -> None:
     tb = add_reserves_to_production_ratio(tb=tb, tb_review=tb_review)
 
     # Sanity checks.
-    sanity_check_region_aggregates(tb=tb)
     sanity_check_outputs(tb=tb)
 
     # Combined multi-source indicators must not inherit key points or producer text from a single

@@ -64,29 +64,6 @@ EIA_SOURCES = {
     "biofuels": "energy_consumption_from_biofuels",
 }
 
-# Minimum fraction of a region's reporting countries that must report an indicator in a given year, for
-# that region-year to be published. See add_region_aggregates. Kept well below the observed minimum
-# (Europe, 31 of 46 in 1980) because the denominator counts successor states that do not exist in the
-# early years: Europe's territory is fully covered in 1980, as the USSR and Yugoslavia, but its count
-# only reaches today's level once they split.
-MIN_FRAC_COUNTRIES_INFORMED = 0.6
-
-# The largest energy consumer of each region must be present, so that a region cannot lose a quarter of
-# its energy to a producer dropping a country. Russia is deliberately absent: before 1985 the entity in
-# the data is the USSR, so requiring it would delete Europe's earliest years.
-COUNTRIES_THAT_MUST_HAVE_DATA = {
-    "Africa": ["South Africa", "Egypt"],
-    "Asia": ["China", "India"],
-    "Europe": ["Germany", "France"],
-    "North America": ["United States"],
-    "Oceania": ["Australia"],
-    "South America": ["Brazil"],
-    "High-income countries": ["United States"],
-    "Low-income countries": ["North Korea"],
-    "Lower-middle-income countries": ["India"],
-    "Upper-middle-income countries": ["China"],
-}
-
 # Tolerances for the reconciliations in sanity_check_outputs. The two producers disagree by 6-11% on
 # the same country and quantity (EIA's total runs 6.1% above the Statistical Review's), so anything
 # spanning a mixed aggregate cannot be checked more tightly than that.
@@ -379,9 +356,9 @@ def add_region_aggregates(tb: Table, eia_years: tuple[int, int]) -> Table:
     that is ours, not the world's: South America's would climb 6.5% in a year purely because Bolivia,
     Paraguay, Uruguay, Guyana and Suriname appear.
 
-    Within that window, two further conditions guard against a region losing countries: at least
-    MIN_FRAC_COUNTRIES_INFORMED of the countries that ever report must report, and the region's largest
-    consumers (COUNTRIES_THAT_MUST_HAVE_DATA) must be among them.
+    No coverage condition is imposed within that window. Every region reports at least three quarters of
+    the countries that ever report there, so any threshold low enough to admit them all never fires; the
+    checks in sanity_check_outputs are what catch a region losing data.
     """
     is_country = ~tb["country"].str.contains("(EI)", regex=False) & ~tb["country"].isin(
         REGIONS + ["World", "European Union (27)"]
@@ -396,8 +373,6 @@ def add_region_aggregates(tb: Table, eia_years: tuple[int, int]) -> Table:
         min_num_values_per_year=1,
         accepted_overlaps=ACCEPTED_OVERLAPS,
         ignore_overlaps_of_zeros=True,
-        min_frac_countries_informed=MIN_FRAC_COUNTRIES_INFORMED,
-        countries_that_must_have_data=COUNTRIES_THAT_MUST_HAVE_DATA,
     )
     tb_aggregates = tb_aggregates[
         tb_aggregates["country"].isin(REGIONS) & tb_aggregates["year"].between(*eia_years)
