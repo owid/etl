@@ -323,6 +323,8 @@ Replace the lorem-ipsum text nodes in the cloned template. Source everything fro
   **When the entities aren't all on the same year, state the span, not the exception.** A subtitle that names the odd one out — `Data for 2023, except Japan (2022).` — spends a clause on a caveat no reader acts on, and invites the same treatment for the next straggler. Append the range to the sentence with a comma instead: `Breakdown of meat supply in a given country by type, 2022–2023.` It is shorter, it is true of every entity, and it keeps the year where the single-year form puts it. Use an en dash.
 - **Data source:** `Data source: ` + `chart.citation` from Step 1 — that field *is* grapher's own footer line, so don't re-derive a `<producer> (<year>)` string by hand, and don't abbreviate it to save space. A long producer name overruns the CC BY text at x=468.
 
+  **The one sanctioned edit: dropping a producer that contributes nothing to the window the image shows — and only after verifying it against that producer's own series.** `chart.citation` credits every source behind the *whole indicator*, which for a spliced long-run series can span centuries; an image cropped with `time=` may draw entirely from one of them. Crediting a producer whose data is not in the picture is its own inaccuracy, and the check is cheap: fetch the single-producer chart's `csvType=full` CSV and diff it against the displayed window point by point. On this run all **220** points of a 1970–2024 window matched UN IGME exactly (0 mismatches, coverage from 1956) while the citation also named Gapminder (1800–2015) — so the footer credits UN IGME alone. Do **not** do this from the indicator's prose: `descriptionKey` said Gapminder covers 1800–2015 and UN IGME "some countries from 1932", which sounds like both contribute and does not tell you which wins where. Record it as a deliberate deviation, note that the interactive chart's footer will still list both, and re-measure the footer afterwards — a shorter line can collapse a planned two-row footer back to the template's single row, which is worth ~20px of chart.
+
   > **First check whether the template already gives the source its own row — the static mobile ones do.** `Frame 15` on both static mobile templates is a two-row block, 38px tall, with `Data source:` and the license each on their own full-width row at `x=0`. There is nothing to rearrange there, and running the manoeuvre below on one of those clones adds a **third** row. The recipe applies to the genuinely one-row footers — `DI_Template`'s `Frame 12` at y=508. The Instagram templates are already two-row for their own reasons (the `OurWorldinData.org/[Topic]` line).
   >
   > Step 7's `footerTop = footer.y + Math.min(0, source.y)` needs no change for the shipped two-row frame: `source.y` is 0 there, so it returns `footer.y`, which is correct. Don't "fix" it.
@@ -664,6 +666,36 @@ Then place the y tick labels at `plotLeft − 6 − t.width` and re-anchor each 
 
 **How much gap is right: 14px, and 12–16 is the comfortable band.** That's what the finished pages and grapher itself converge on, measured in 540-wide frames — grapher's own square export leaves 13px above the plot and 14px below; recent DI pages in the file sit at 14/19, 15/14 and 7/15. Below ~10px it reads cramped and the legend starts to look like part of the subtitle; above ~20px you are wasting space the plot could use. When the chart comes out a few pixels too tall, spend the slack down to 12px a side **before** shrinking it — that is usually enough, and it keeps the full content width, which matters more than the last pixel of gap.
 
+**Whatever figure you pick, the chart group's *box* and its *ink* must be the same thing, or you will be asked about it — and both of your answers will be right.** These two are not the same measurement, and each is what somebody trusts: **box gaps** are what Figma's inspector shows a designer who clicks the chart, and **ink gaps** are what a reader sees. Two things routinely pull them apart on a 540 frame — a **peak dot parented as a sibling** of the chart group (its 5px overhang sits outside the box) and **untrimmed tick-label boxes** (~3.5px of leading below digits that have no descenders). Centre the boxes and the ink comes out lopsided; centre the ink and Figma shows something like **18.77 above / 8.77 below**, which reads as sloppy work in the file even though the render is right.
+
+Don't choose between them — make the box equal the ink, then one centring satisfies both:
+
+```js
+for (const t of tickLabels) {                      // boxes stop overhanging their own digits
+  const cy = t.y + t.height / 2;                   // pre-trim box is ~symmetric about the ink,
+  t.leadingTrim = "CAP_HEIGHT";                    // so preserving the centre keeps the label put
+  t.y = cy - t.height / 2;
+}
+for (const d of dots) chart.appendChild(d);        // dots inside the group: box now includes them
+chart.y = BAND_TOP + (BAND_BOTTOM - BAND_TOP - chart.height) / 2;
+```
+
+Then verify on **both** scales — node boxes *and* a pixel scan of the render for the topmost/bottommost ink row — and report both numbers. On this run that landed box 13.02/13.02 with ink 13/14.
+
+**A residual asymmetry of a few pixels is the template's, not yours, and it is predictable per family.** Once the chart's box equals its ink, what is left is the *template's* own leading: the header's box bottom sits close to the subtitle's real ink (most subtitles end in a descender, which fills the lower leading), while the footer's box top sits a few pixels *above* the source line's cap. So **ink-below reads larger than ink-above by roughly the source row's leading**. Measured 2026-08-19, per side, as `(line box − CAP_HEIGHT box) / 2`:
+
+| Family | Subtitle | Source | Note | Expect ink-below − ink-above |
+|---|---|---|---|---|
+| DI / IG square (540) | 16px → 4 | 14px → 3 | — | ~2–3px |
+| Static mobile 1 & 2 (540) | 16px → 4 | 14px → 3.5 | — | ~3px |
+| IG portrait (560) | 18px → 4.5 | 14px → 3 | 14px → 3.5 | ~2–3px |
+| Static Horizontal / Vertical (850) | 16px → 4 | **12px → 2.5** | 12px → 2.5 | ~2px |
+| Small guided / pull (302) | 11px → 2.5 | 11px → 2.5 | — | ~2px |
+
+Read that table as a prediction, not a correction to apply: **optimise the boxes and let the ink land 2–4px asymmetric**, because a 1–4px ink difference is imperceptible while unequal numbers in Figma's inspector read as sloppy work in a shared file. If someone asks for ink-equal instead, shift the block down by half the difference and say plainly that the box numbers are now unequal by that much — one or the other, and state which you chose. What you must not do is "fix" it by moving the template's own text boxes.
+
+Two by-products worth having: a CAP_HEIGHT-trimmed tick label can be centred *exactly* on its gridline (delta 0.00 rather than the documented ~1px), and dots inside the group can no longer be left behind by a later re-centring.
+
 **The 12–16 band assumes the chart group still contains its axis furniture — once you measure the group tightly, the same picture reports a much bigger gap.** Trimming the dangling reference lines and hugging the label boxes to the ink (Step 8) removes ~10–25px of invisible slack from the group's bounding box without moving a single pixel of ink, and the gap number jumps: **20px** on a 14-row bar chart, **30px** on a 4-row one, both of which look wrong against the band and are in fact correct. The tell is that the equivalent measurement on the reference page agrees (17/19 and ~32/33 there). So on an axis-less chart — a discrete bar chart with every value labeled — measure the gap on the reference too and match *that*, and record the figure with a note that the group is tightly measured. Do not shrink a correct chart to force a number.
 
 **A reference line wants a small overhang past the bars — bounded, and symmetric.** Grapher's plot area is taller than the bars it contains, so the inherited `vertical-zero-line` runs well past the last bar and reads as pointing at the footer; a reviewer described it as "going down and even overlapping the data source". But **trimming it flush to the bars is the other error** — the overhang is the design, and cutting it makes the baseline look clipped. Give it about **4px each way**, and let a guide line you add yourself lead in a little higher (~12px) so it reads as annotation rather than as part of the axis, ending level with the zero line:
@@ -701,6 +733,20 @@ Side margins and the footer edge are the template's, not yours: content starts a
 | Small / pull chart (302 × free) | **x=12, w=278** | 44 → `H − 10` (guided) or `H − 23` (pull) — see below |
 
 DI and static mobile get their own rows above because their bands differ, even though both frames are 540×540.
+
+**Every number in that column is the band of a template still carrying its *placeholder* subtitle — and every placeholder wraps to two lines, so on any frame whose real subtitle is one line the header reflows and the true band is bigger than the table says.** The gain is not a DI quirk; it is **every** template except the 302-wide pair, measured 2026-08-19 on throwaway clones by swapping in a one-line subtitle:
+
+| Template | Placeholder subtitle | Band as tabled | One-line subtitle | **True band bottom** | Gain |
+|---|---|---|---|---|---|
+| DI (540) | 38 (2 lines) | 118 | 19 | **99** | 19 |
+| IG square (540) | 38 | 118 | 19 | **99** | 19 |
+| Static mobile 1 & 2 (540) | 38 | 118 | 19 | **99** | 19 |
+| IG portrait (560) | 44 | 135 | 22 | **113** | 22 |
+| Static Horizontal (850) | 38 | 134.22 | 19 | **115.22** | 19 |
+| Static Vertical (850) | 38 | 134.22 | 19 | **115.22** | 19 |
+| Small guided / pull (302) | 13 (1 line) | 44 | 13 | 44 | **0** |
+
+So ~19px of free chart on almost every frame (22 on the portrait), and it is invisible if you fit against the table — `118` reads like a template constant. The 302-wide pair is the only exception, because its placeholder is already one line. This is the same reflow the header rule above describes, but it bites *before* you would think to look. **Treat the table as a way to choose a template, never as an input to the fit:** fill the texts, then read the band back off the frames. And note the two effects compound — a one-line *title* also lowers the band (down to the logo's floor, see above), so a frame with a one-line title and a one-line subtitle is a long way from the tabled figure.
 
 The table gives one number per template — the band you fit a chart into — and that is deliberately all it gives. **Per-slot geometry for the four static templates** (each text slot's own `y`/width/height, the derived positions, unit conversions, the exact footer strings) belongs to [`/create-static-viz`'s TEMPLATES.md](../create-static-viz/TEMPLATES.md), which needs it to place text without opening Figma. Read it there rather than re-measuring into this file: two copies of a measurement drift, and the copy a session happens to read then decides which one was right.
 
@@ -1102,6 +1148,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Direct labels readable as text | `contrast(labelHex, "#ffffff")` for every category label drawn on the background | **4.5:1**. The same color must also clear 4.5:1 against the white value label inside its bar — a palette that only clears one of the two has to move (Step 8) |
 | Text size | read `fontSize` off every text node | nothing below **12px**; annotations on the named ladder |
 | Mark weight | read `strokeWeight` off **every** line and halo, after the last scale | on a highlight treatment: context **1px** (the settled value — GUIDELINES.md → Highlighting; 1.5px is the reference-page treatment this skill tells you not to copy), protagonist **3px**, halo 2× (or line+1 where nothing crosses). Read it even when you never set it — and especially *because* you never set it: `rescale()` multiplies stroke weight, so fitting a chart to the band took grapher's 2.5px lines down to **0.88px** hairlines on a frame that otherwise measured perfect. Set the weights explicitly *after* the final scale, never before |
+| Furniture weight | read `strokeWeight` **and `dashPattern`** off the gridlines, the zero line and the tick marks | all **1px**, dash **[4, 4]** — grapher's own values at these frame sizes. `rescale()` thins these too, and they are the easiest properties in the frame to miss because you never touch them and "don't restyle the grid" reads as "don't look at it": a 0.7× height fit left every gridline at **0.7px with a [2.81, 2.81] dash**, i.e. a visibly fainter, finer grid than any OWID chart ships. Restore them in the same pass as the series weights |
 | Label-on-fill contrast | `contrast(labelHex, barHex)` for every in-bar label | **4.5:1** at 13.5px regular — the 3:1 large-text allowance does not apply |
 | Text hierarchy | list every distinct `fontSize` with what it belongs to, **and its rank** | title > subtitle ≥ annotations > supporting text ≥ labels. Sizes may vary inside the plot by rank; a lead annotation may *equal* the subtitle (Annotation XL 16) but nothing may exceed it, and same-rank items must share a size |
 | Sizes are named styles | every size matches a style in the file | no arbitrary sizes left over from scaling the export (13.7, 16.8). Choose from the ladder by rank rather than by element type — see GUIDELINES.md → Subtitles and notes |
@@ -1165,6 +1212,8 @@ That took the same four frames to **one** finding, which was real. And the same 
 
 **Filter the fill sweep to what actually paints, or it invents failures.** Two kinds of phantom show up and both look exactly like a real off-palette color in a listing. **Hidden ancestors:** `visible` is per-node, so the children of a group you hid are still individually `visible: true` — walk up to the frame and skip anything with a hidden ancestor, or a hidden `connectors` group reports a dozen stray colors. **Zero-area vectors:** grapher's exported tick marks are zero-width stroked paths that carry a default black `fill` which can never paint, so an unfiltered sweep reports twelve `#000000` fills on a chart that has none. With both filters the same chart went from 4 apparent off-palette colors to the 2 real ones.
 
+**But apply that second filter to `fills` only — a stroke sweep needs the opposite rule.** A gridline is a zero-*height* node and a tick mark a zero-*width* one, and their strokes are the most visible furniture in the chart. Requiring nonzero area on both properties silently drops every axis line: one sweep came back with three stroke colors on a chart that has five, reporting no gridline stroke at all and — worse — reading as a clean result. So: fills need `width > 0 && height > 0`, strokes need `width > 0 || height > 0`. A stroke inventory that lists no `#dddddd` on a chart with visible gridlines is the tell.
+
 ```js
 const paints = n => { let m = n; while (m && m !== clone) { if (!m.visible) return false; m = m.parent } return true }
 // ...and ignore `fills` on nodes whose width or height rounds to 0
@@ -1227,6 +1276,8 @@ Two habits make the difference. **Assert, don't eyeball** — a 1.2px label drif
 
 ## Gotchas
 
+- **`page.children` on a page you have NOT switched to is lazily loaded, and returns a short list without erroring.** This is the nastiest read in the skill, because it looks like evidence and it is used for exactly the check that matters: "did I leave litter on someone else's page?" The same page reported **4 children while it was current and 2 later without a switch** — which read as "I deleted two of a colleague's frames" in a shared design file. Nothing had been deleted. So: any claim about a page's contents needs `await figma.setCurrentPageAsync(page)` first (that is what loads it), and since a script may switch pages only once, checking N pages means N calls, fanned out in parallel. Never report a page as clean *or* as damaged from an unswitched read — and if you catch yourself about to tell the user you removed something, re-read it properly first.
+- **`get_screenshot` on a PAGE id can include nodes from other pages.** A page render came back 2860px wide for a page whose two nodes span 1149px, with a neighbouring page's frames in the image. Screenshot the frames you care about individually and compose the comparison yourself; use the page render only for a rough look, and never to decide what a page contains (see the previous point for the reliable way).
 - **`get_metadata` page listing lies** — it returned only "Cover" for both the Charts and Guidelines files. Enumerate pages via `use_figma` → `figma.root.children`; access known nodes directly by id.
 - **And its node tree is lossy: a childless-looking frame usually isn't.** Every bar segment whose group held only a fill vector and no value label came back as an empty `<frame …/>`, while segments with both were listed in full — so reading the XML alone would say the small segments have no bar drawn at all. The tell is in the ids: consecutive siblings numbered `…494` and `…496` have a `495` that was dropped. Use it for structure and names, and confirm anything you intend to *assert* (a missing label, an unpainted mark) with a `use_figma` read.
 - **An empty `fills` array is NOT a reliable marker for "no-data shape".** It is the marker the no-data hatch rule leans on, and it over-matches: grapher's map export also contains an invisible `swatch-hit-areas` group — full-size rectangles over each legend bin, with no fill, there for mouse targeting. A blanket "every empty-fill vector gets the hatch" pass therefore painted diagonal stripes across all three legend bins while correctly hatching one country. Scope the sweep by parent instead — `countries-without-data` for the map and the legend's own `swatches` group for the key — and hide `swatch-hit-areas` outright, since a static image has nothing to target.
