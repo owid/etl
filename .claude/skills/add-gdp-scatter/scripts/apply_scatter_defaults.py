@@ -239,7 +239,14 @@ def grade_exclusion(
 
     lo_y, hi_y = min(others_y), max(others_y)
     span = hi_y - lo_y
-    stretch = (max(hi_y, y) - min(lo_y, y)) / span if span > 0 else float("inf")
+    if span > 0:
+        stretch = (max(hi_y, y) - min(lo_y, y)) / span
+    else:
+        # A pack with no spread at all — every other entity on the same value. Stretch is then a
+        # ratio over zero, so it is only meaningful as a yes/no: an entity ON that value changes
+        # nothing (1.0), any other value turns a zero-width axis into a real one (unbounded).
+        # Without the first case an entity sitting exactly on the pack graded `y-OUTLIER`.
+        stretch = 1.0 if y == hi_y else float("inf")
     above = y > hi_y * Y_PACK_FACTOR
     below = 0 < y < lo_y / Y_PACK_FACTOR
     if stretch >= Y_STRETCH_FACTOR or above or below:
@@ -247,7 +254,12 @@ def grade_exclusion(
         if above or below:
             factor = y / hi_y if above else lo_y / y
             why += f" — {factor:,.1f}x {'above the highest' if above else 'below the lowest'}"
-        if stretch >= Y_STRETCH_FACTOR:
+        if math.isinf(stretch):
+            why += (
+                "; they all sit on one value, so it turns a zero-width y axis into a real range, and yAxis.max "
+                "is global so the scatter cannot cap it alone"
+            )
+        elif stretch >= Y_STRETCH_FACTOR:
             why += f"; stretches the y axis {stretch:.1f}x, and yAxis.max is global so the scatter cannot cap it alone"
         return "y-OUTLIER", why
 
@@ -303,12 +315,27 @@ def classify_exclusions(
     `log_y_axis_sources` does: getting it right in one script and forgetting it in another is
     exactly how this went wrong once.
     """
+    codes = {**entity_codes(gdp_var_id, engine), **entity_codes(y_var_id, engine)}
+    packs: dict[int, tuple[list[float], list[float]]] = {}
+
+    def pack_at(yr: int) -> tuple[list[float], list[float]]:
+        """The peer distribution as the chart draws it at `yr`, memoized per year.
+
+        Rebuilt per year rather than computed once, because an entity graded at a fallback year
+        has to be compared against the pack AT THAT YEAR: for a trending indicator, holding the
+        pack at the default year while moving the point measures the trend instead of the
+        entity, which flips the verdict either way. Cheap — `values_at_year` reads the frame
+        `load_var_data` already holds, so no extra query.
+        """
+        if yr not in packs:
+            ys = values_at_year(y_var_id, yr, tolerance, engine)
+            xs = values_at_year(gdp_var_id, yr, tolerance, engine)
+            names = sorted((set(ys) & set(xs)) - set(excluded))
+            packs[yr] = ([ys[n] for n in names], [xs[n] for n in names])
+        return packs[yr]
+
     y_at = values_at_year(y_var_id, year, tolerance, engine)
     x_at = values_at_year(gdp_var_id, year, tolerance, engine)
-    codes = {**entity_codes(gdp_var_id, engine), **entity_codes(y_var_id, engine)}
-    pack = sorted((set(y_at) & set(x_at)) - set(excluded))
-    others_y = [y_at[n] for n in pack]
-    others_x = [x_at[n] for n in pack]
 
     # An entity absent at the default year may still be an outlier the reader meets by dragging
     # the timeline, so fall back to its latest year with both values rather than calling it moot.
@@ -326,6 +353,7 @@ def classify_exclusions(
                 x = values_at_year(gdp_var_id, shared, 0, engine).get(name)
             else:
                 y = x = None
+        others_y, others_x = pack_at(used) if y is not None and x is not None else ([], [])
         cls, why = grade_exclusion(y, x, others_y, others_x, codes.get(name))
         rows.append({"entity": name, "cls": cls, "why": why, "year": used if y is not None else None, "exact": exact})
     return rows
@@ -755,7 +783,7 @@ def print_exclusion_table(results: list[dict]) -> None:
         print(f"{r['chart']:>6}  {e['entity'][:26]:<26}  {e['cls']:<18}  {e['why']}{year}")
     print()
     print(
-        "  y-OUTLIER / aggregate / unclear / ungradeable want a decision; high-GDP and no data are benign "
+        f"  {' / '.join(sorted(EXCLUSION_WARN_CLASSES))} want a decision; high-GDP and no data are benign "
         "(the target's x axis is log, and matchingEntitiesOnly hides an entity with no pair)."
     )
 

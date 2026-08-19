@@ -97,7 +97,7 @@ That second case is what **Part 2's redirect produces**, so a reader arriving by
 7. Emits warnings (no action) for:
    - Target has no `selectedEntityNames` — line/bar/slope views will fall back to Grapher defaults.
    - Target `stackMode: relative` — on scatter this is the "Display average annual change" mode; we want the toggle available but **off by default**, so a relative default is flagged for review.
-   - Source `excludedEntityNames` — never applied to the target (they would hide the entity from all views, not just the scatter), so each one **reappears** on the migrated scatter. Graded per entity by `classify_exclusions` into `y-OUTLIER` / `aggregate` / `unclear` / `ungradeable` (a decision is needed) vs `high-GDP` / `no data` (benign), with the numbers in the **EXCLUDED ENTITIES** table. Only the first group makes the note a `WARN`.
+   - Source `excludedEntityNames` — never applied to the target (they would hide the entity from all views, not just the scatter), so each one **reappears** on the migrated scatter. Graded per entity by `classify_exclusions` into `y-OUTLIER` / `aggregate` / `high-GDP-material` / `unclear` / `ungradeable` (a decision is needed) vs `high-GDP` / `no data` (benign), with the numbers in the **EXCLUDED ENTITIES** table. Only the first group makes the note a `WARN` — the group *is* `EXCLUSION_WARN_CLASSES`, which the table's own footer prints, so the two cannot drift. Note that a high GDP per capita is benign only while it stays inside `X_MATERIAL_DECADES`; past that it grades `high-GDP-material` and warns like the rest.
    - Source y axis is **log** — the target's scatter tab opens linear, and only a URL carrying `yScale=log` restores it. See "A log y axis and an exclusion list are the two things the migration cannot carry".
    - GDP coverage mismatch — if y-indicator's earliest year predates the chosen GDP's coverage (WDI≈1990, PWT≈1950, Maddison≈year 1), suggest a deeper-history alternative.
    - Few entities on default scatter view — counts entities with both a y- and an x-value within tolerance at the default time; if fewer than ~15 AND source uses higher tolerance, recommends bumping target's y `display.tolerance`.
@@ -150,6 +150,12 @@ scatter cannot cap it alone. That is why `grade_exclusion` measures each axis in
 drawn in rather than testing for statistical outlierness — a symmetric IQR fence gets skewed
 indicators badly wrong (chart 1131: Cape Verde's 40.3 kg/ha cereal yield sits well inside a
 ±3·IQR fence while being **14.3x below the lowest** of the other 88 countries).
+
+Both sides of that comparison are read at the **same year**. An entity with no value at the
+target's default year is graded at its latest year with both indicators instead, and the peer
+pack is rebuilt at *that* year rather than held at the default one — otherwise a trending
+indicator has the point and the pack drifting apart, and the verdict measures the trend rather
+than the entity. The measured year is printed whenever it is not the default.
 
 (2026-08-19, production: of 22 published GDP scatters carrying `excludedEntityNames`, 8 exclude
 `World` or another OWID aggregate — the single commonest case, which is why `aggregate` is its
@@ -282,7 +288,7 @@ The third state — after a reader *clicks* the scatter tab — no URL can repro
 
 Per-row flags are split so the "With warnings" filter stays worth using. **Warnings** are possible defects — no `ScatterPlot` tab, scatter as the primary type, `hideTimeline` with a time range, `stackMode: relative`, an exclusion whose return actually changes the chart, and the log-axis question. **Context** is expected-but-needed-to-read-the-panes, e.g. that the target selects N entities which both routes should clear — so if you *do* see highlighting, one of the two mechanisms failed. Keep new checks on the right side of that line; a warning on every row is the same as no warnings.
 
-The two lossy checks are the reason that split has to be computed rather than assumed. A log source produces **both**: a context line (the two panes differ by design — see below) and a warning (whether a *linear* scatter still shows the relationship the author chose log for). That is a judgment nobody else in the workflow makes, and the reviewer is the only person looking at both shapes at once. Exclusions are graded by the applier's `classify_exclusions`, and the classes decide the box: `y-OUTLIER` / `aggregate` / `unclear` are warnings carrying their measurement, while a benign `high-GDP` or `no data` is context ("back on the scatter, but harmless"). Importing the applier's `EXCLUSION_WARN_CLASSES` rather than re-deriving the split is what keeps the reviewer saying the same thing the applier's run said.
+The two lossy checks are the reason that split has to be computed rather than assumed. A log source produces **both**: a context line (the two panes differ by design — see below) and a warning (whether a *linear* scatter still shows the relationship the author chose log for). That is a judgment nobody else in the workflow makes, and the reviewer is the only person looking at both shapes at once. Exclusions are graded by the applier's `classify_exclusions`, and the classes decide the box: every class in `EXCLUSION_WARN_CLASSES` (`y-OUTLIER`, `aggregate`, `high-GDP-material`, `unclear`, `ungradeable`) is a warning carrying its measurement, while a benign `high-GDP` or `no data` is context ("back on the scatter, but harmless"). Importing the applier's `EXCLUSION_WARN_CLASSES` rather than re-deriving the split is what keeps the reviewer saying the same thing the applier's run said.
 
 Decisions are fingerprinted on both configs' `fullMd5` plus the GDP variable id, so a re-run of the applier (which rewrites the target) invalidates stale approvals instead of silently keeping them.
 
