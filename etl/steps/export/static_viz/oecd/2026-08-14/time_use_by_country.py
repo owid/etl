@@ -166,20 +166,62 @@ VALUE_LABEL_COVERAGE = 0.75
 #
 # `contents` is deliberately terse here: all four are aggregates, so the Note has to say what each one
 # holds, and it has three lines to do it in.
+#
+# These four name Chart colors library colors outright rather than the seaborn placeholders the ten-group
+# version uses: the reason for placeholders is that the fonts cannot be reproduced here, and colors can,
+# so a render that shows the real ones is simply a truer preview of the frame. Figma still binds each to
+# its library style — the hex is the preview, the binding is the artifact.
+#
+# Why not the detailed chart's Coral, Denim, Copper and Dark Olive Green: both of that set's problems
+# appear only once ten segments become four. Its neighbours merge in grayscale without the tints that
+# used to sit between them (1.21:1 and 1.20:1 against a 1.6:1 floor), and Coral and Copper are the two
+# most saturated entries in the palette, which is loud across segments this wide.
+#
+# Two constraints shape what is left, and the second one is easy to miss:
+#   - Touching fills need a grayscale seam of 1.6:1, which forces the stack to alternate light and dark.
+#     No all-light set exists: everything light in the palette sits at L 60-65, where two of them have
+#     no seam at all.
+#   - A category's color is also the color its legend name and member list are printed in, at 11px on
+#     cream. Camel, Turquoise and Light Teal — the colors a reader would call soft — measure under 3:1
+#     as text. The library's answer is its "Line and Slope Charts" group, a darker variant of each light
+#     fill for thin marks; every one of them measures exactly 4.4:1 on this cream, which is the tier to
+#     hold text to. So a light fill is fine as long as its name is set in that variant, which is the
+#     three-part color spec below.
+# The Default Palette's first four — Denim, Rusty Orange, Camel, Light Teal — with the middle two
+# swapped so that touching segments differ in lightness. The library's own order puts two same-lightness
+# pairs side by side (Denim beside Rusty Orange at 1.14:1, Camel beside Light Teal at 1.08:1, against a
+# 1.6:1 floor), which reads fine in color and vanishes in black and white; swapping costs no color and
+# takes the opaque seams to 1.86 / 2.12 / 2.28. Which category carries which color is free — the CVD
+# numbers are identical for any arrangement of the same four.
+#
+# THREE ACCEPTED DEVIATIONS, all measured at the opacity the bars are actually drawn with (0.8 over the
+# canvas, `SEGMENT_ALPHA`), because that composite is what a reader sees:
+#   - Seams come out 1.57 / 1.86 / 1.95. The first is 2% under the floor: compositing lightens Denim and
+#     Camel unevenly and closes the gap that is 1.86 opaque. Swapping Camel and Light Teal (Denim, Light
+#     Teal, Rusty Orange, Camel) is the arrangement that clears all three at 0.8 — 1.66 / 1.95 / 1.86.
+#   - In-bar labels: the best available color measures 3.74:1 on Denim and 4.30:1 on Rusty Orange, under
+#     the 4.5:1 these labels need. This is the cost of the opacity, not of the palette — at full opacity
+#     both clear it (5.46 and 6.21 in white). Grapher can afford 0.8 because it puts no labels inside its
+#     stacked segments; this chart does.
+#   - Camel against Light Teal: dE 19.2 opaque, 15.3 composited, against a floor of 20 — the palette's
+#     warm-versus-light-green weak spot, made worse by everything moving towards the canvas. Fixing this
+#     one needs a different color, not a different order.
 MAIN_CATEGORY_GROUPS = [
     {
         "column": "main_paid_work_or_study",
         "members": ["Paid work", "Commuting", "School or classes", "Homework"],
         "compact": True,
         "label": "Paid work or study",
-        "color": ("deep", 3),
+        # Denim, legible as its own text at 5.3:1.
+        "color": ("hex", "#4c6a9c"),
         "as_hours": True,
     },
     {
         "column": "main_personal_care",
         "members": ["Sleep", "Eating & drinking", "Other personal care"],
         "label": "Personal care",
-        "color": ("deep", 7),
+        # Camel, with Camel* for the name: the fill itself measures 2.8:1 as text.
+        "color": ("hex", "#bc8e5a", "#996d39"),
         "as_hours": True,
         # Compact like the rest, though it has room for the spelled-out form. One category set
         # differently from its neighbours reads as a difference in kind, and the only difference is
@@ -192,7 +234,8 @@ MAIN_CATEGORY_GROUPS = [
         "compact": True,
         "as_hours": True,
         "label": "Unpaid work & other",
-        "color": ("deep", 5),
+        # Rusty Orange, legible as its own text at 6.0:1.
+        "color": ("hex", "#b13507"),
     },
     {
         "column": "main_leisure",
@@ -200,7 +243,8 @@ MAIN_CATEGORY_GROUPS = [
         "compact": True,
         "as_hours": True,
         "label": "Leisure",
-        "color": ("deep", 0),
+        # Light Teal, with Light Teal* for the name: the fill itself measures 2.6:1 as text.
+        "color": ("hex", "#58ac8c", "#2c8465"),
     },
 ]
 
@@ -254,9 +298,28 @@ TEXT_COLOR = "#5b5b5b"
 FOOTER_COLOR = "#858585"
 MUTED_COLOR = "#777777"
 CATEGORY_RULE_COLOR = "#bbbbbb"
-# In-bar values are white on saturated fills and dark on light tints; the switch is on luminance.
-DARK_VALUE_COLOR = "#444444"
-LUMINANCE_THRESHOLD = 0.55
+# Bar fills carry grapher's own default, GRAPHER_AREA_OPACITY_DEFAULT = 0.8 (GrapherConstants.ts), which
+# both the stacked and the discrete bar chart apply to every bar; grapher leaves its labels at 1, and so
+# does this. It changes every measured number, because what a reader sees is the fill composited over the
+# canvas rather than the library hex — see `composite_on_background`, which is what the label colours and
+# the recorded seams are measured against.
+SEGMENT_ALPHA = 0.8
+
+# In-bar values are white on saturated fills and dark on light ones, whichever reads better *measured*
+# against the fill — a luminance cutoff picked white on Dark Orange at 4.48:1 where the dark scores
+# 4.68:1, and the 4.5:1 bar is exactly what these labels have to clear. The dark is Text/Gray 100, the
+# style the frame binds them to, so the render and the frame agree.
+DARK_VALUE_COLOR = "#2d2e2d"
+
+# The templates' own canvas, which the transparent SVG sits on. A category's name and member list are
+# printed in that category's colour, so this is what they have to stand out against.
+BACKGROUND_COLOR = "#fffbf5"
+# The tier the Chart colors library itself targets: each of its "Line and Slope Charts" variants — the
+# darker form of a light fill, meant for thin marks and text — measures exactly 4.4:1 on this cream.
+# A fill lighter than that is darkened for text here, which is the same pairing, derived rather than
+# hardcoded: the frame binds the library's variant, and this keeps the local render showing the same
+# relationship instead of printing a name nobody could read.
+TEXT_CONTRAST_MIN = 4.4
 
 # A template pixel in points (100 template px per inch over 72 points per inch).
 POINTS_PER_PIXEL = 0.72
@@ -272,12 +335,25 @@ LICENSE_TAGLINE_GAP = 8
 BAND_INSET = 14
 
 # The template sets its slots in Lato and Playfair Display, neither of which is installed here, so
-# this step predicts their wrapping with its own font and a measured allowance. Measured in Figma on
-# 2026-08-17, at the same pixel size: Lato sets these strings 2-3% narrower than this step's font,
-# Playfair Display 3% wider. The allowance is what keeps the render's line breaks the frame's — a
-# blanket "wrap early to be safe" broke both footer rows onto second lines the frame does not have.
-TEMPLATE_LATO_SLACK = 1.03
-TEMPLATE_SERIF_SLACK = 0.97
+# this step measures in DejaVu Sans (matplotlib's fallback) and wraps against the slot as that font
+# sets it. DejaVu is the wider of the two rulers, measured in Figma on 2026-08-19 by setting this
+# chart's own strings in the real faces at the real sizes: DejaVu runs 1.15x Lato Regular (four
+# strings at 11, 12 and 16px, spread 1.150-1.159), 1.26x Lato Bold, and 1.10x Playfair Display
+# SemiBold. So a line that fits the slot here fits it in the frame with room to spare.
+#
+# Which ruler applies depends on what is being asked, and one constant used to answer both:
+#   - *Wrapping* text the step draws is judged in DejaVu, at the slot itself. Anything wider overruns
+#     the margin of the PNG a reviewer looks at, and going the other way — letting a line use the Lato
+#     room — hands Figma a baked line too wide for its box, which it re-wraps into a line the step
+#     never drew. The cost is a wrap the frame would not have needed: one line of band.
+#   - *Whether a design fits the template* is a fact about the frame, so it is judged in Lato, by
+#     dividing out the ratio below. The footer's tagline-and-license row is the case that matters: it
+#     needs 838px of an 818px row in DejaVu and 792px of it in Lato, so measuring it in the step's own
+#     font rejects a row that sets correctly in the frame.
+# (An earlier pair of 1.03/0.97 recorded the ratio as 2-3%, from a measurement I could not reproduce.
+# These come from probe nodes set in the Charts file itself.)
+DEJAVU_OVER_LATO = 1.15
+DEJAVU_OVER_PLAYFAIR = 1.10
 
 # A title line, in template px, in every one of these templates. Their titles set line height
 # explicitly where every other slot leaves it automatic, which is why this is a constant and the
@@ -343,11 +419,18 @@ LAYOUTS = {
             # hugs whichever of the two is taller. It is 0 here because the frame takes the logo out
             # of the auto-layout instead: with a one-line title the logo would otherwise set the row's
             # height and drop the subtitle 12px, where every other page in the Charts file — all of
-            # them two-line titles, taller than the logo — shows a 6px gap. That is safe on this frame
-            # because the subtitle's first line ends at x=588 and the logo starts at 770; on mobile it
-            # is not, which is why mobile keeps the logo in the flow.
+            # them two-line titles, taller than the logo — shows a 6px gap. On mobile it stays in the
+            # flow, which is why that template's `logo_px` is its real height.
+            #
+            # Out of the flow, the logo hangs into the subtitle's own band — it runs to y=57.5 where
+            # the subtitle's line box starts at 51.2 — so the subtitle has to stop short of it
+            # sideways instead. `logo_reserve_px` is the logo's width plus a gap, and it is why the
+            # subtitle wraps against less than its slot. A note used to record that this was "safe
+            # because the subtitle ends at x=588", which held for the detailed chart's subtitle and
+            # not for the four-category one: at 801px in Lato it ran 47px under the logo.
             "origin_y": 16.216,
             "logo_px": 0,
+            "logo_reserve_px": 73.5,
             "title_slot_px": 737.84,
             "title_px": 25,
             "header_gap_px": 6,
@@ -397,6 +480,8 @@ LAYOUTS = {
             # subtitle gap where desktop gets 6.
             "origin_y": 16,
             "logo_px": 35.23,
+            # In the flow, so the subtitle already sits below it and needs no side clearance.
+            "logo_reserve_px": 0,
             "title_slot_px": 428,
             "title_px": 25,
             "header_gap_px": 6,
@@ -443,7 +528,9 @@ LAYOUTS["time_use_by_country_main_categories"] = {
     # "Average", not "Averages of": measured in Lato, the longer opening put the line at 826px against
     # an 817.57px slot, so the frame wrapped a subtitle this step had drawn on one line. A slot filled
     # past ~97% is a coin flip between the two fonts — leave a few percent, or measure in Figma.
-    "subtitle": "Average hours and minutes per day, from time-use surveys run between {years}, for people aged 15 to 64.",
+    # No age clause: it has to clear the logo hanging at the end of this line (see `logo_reserve_px`),
+    # and the Note already says who the estimates cover.
+    "subtitle": "Average hours and minutes per day, from time-use surveys run between {years}.",
     # With one segment per category, a name that overhangs its own bar reads as pointing at its
     # neighbour too — so wrap it rather than only wrapping to avoid a collision.
     "wrap_overhanging_names": True,
@@ -456,8 +543,10 @@ LAYOUTS["time_use_by_country_main_categories"] = {
 # would have carried — the age caveat is about what the chart claims, so it cannot be dropped.
 # `{years}` is filled from the data, so the window a reader is told about cannot drift from the window
 # the chart draws — the Note repeated it before, but a subtitle-only reader saw no date at all.
-SUBTITLE = "Averages of minutes per day, from time-use surveys run between {years}, for people aged 15 to 64."
-MOBILE_NOTE = "Each country's survey year is shown in brackets."
+SUBTITLE = "Average minutes per day, from time-use surveys run between {years}."
+# Mobile has no Note row, so anything the desktop Note carries and mobile readers still need has to
+# ride here — the ages among them, now that the subtitle no longer states them.
+MOBILE_NOTE = "Estimates cover people aged 15 to 64, and each country's survey year is shown in brackets."
 
 
 def run() -> None:
@@ -632,12 +721,16 @@ def create_visualization(tb: Table, ages: dict[str, str], source_citation: str, 
     fig.patch.set_facecolor("white")
 
     # --- header: the template's title row, then its subtitle ---
-    title = wrap_to_slot(TITLE, template["title_slot_px"], template["title_px"], TEMPLATE_SERIF_SLACK)
+    title = wrap_to_slot(TITLE, template["title_slot_px"], template["title_px"])
     years = f"{tb['year'].min()} and {tb['year'].max()}"
     subtitle_text = layout.get("subtitle", SUBTITLE).format(years=years)
     if not layout["full_footer"]:
         subtitle_text = f"{subtitle_text} {MOBILE_NOTE}"
-    subtitle = wrap_to_slot(subtitle_text, template["subtitle_slot_px"], template["subtitle_px"])
+    # Where the logo hangs beside the subtitle rather than above it, the subtitle's own slot is that
+    # much narrower — every line of it, not only the first, since a second line costs a line of band
+    # and nothing else.
+    subtitle_slot_px = template["subtitle_slot_px"] - template["logo_reserve_px"]
+    subtitle = wrap_to_slot(subtitle_text, subtitle_slot_px, template["subtitle_px"])
     title_row_px = max(lines_in(title) * TEMPLATE_TITLE_LINE_PX, template["logo_px"])
     subtitle_y = template["origin_y"] + title_row_px + template["header_gap_px"]
 
@@ -954,6 +1047,7 @@ def draw_bars(
                 left=left,
                 height=BAR_FRACTION,
                 color=color,
+                alpha=SEGMENT_ALPHA,
                 linewidth=0,
                 gid=f"{slug}__{slugify(column)}",
             )
@@ -974,7 +1068,7 @@ def draw_bars(
                     ha="center",
                     va="baseline",
                     fontsize=layout["value_fontsize"],
-                    color="white" if luminance(color) < LUMINANCE_THRESHOLD else DARK_VALUE_COLOR,
+                    color=value_label_color(composite_on_background(color)),
                     gid=f"{slug}__{slugify(column)}-value",
                 )
             left += minutes
@@ -1536,7 +1630,14 @@ def tint(color, weight: float) -> tuple[float, float, float]:
 
 
 def resolve_color(spec: tuple, palette) -> tuple[float, float, float]:
-    """Resolve a ("deep", i) palette position or ("tint", i, w) blend into an RGB color."""
+    """Resolve a color spec into RGB.
+
+    ("deep", i) is a seaborn palette position and ("tint", i, w) a blend of one towards white — both
+    placeholders for a color Figma sets. ("hex", fill) and ("hex", fill, text) name a library color
+    outright, the second form pairing a light fill with the darker variant its text uses.
+    """
+    if spec[0] == "hex":
+        return to_rgb(spec[1])
     if spec[0] == "deep":
         return palette[spec[1]]
     return tint(palette[spec[1]], spec[2])
@@ -1551,15 +1652,54 @@ def header_text_color(spec: tuple, palette) -> tuple[float, float, float]:
     """
     if spec[0] == "literal":
         return to_rgb(spec[1])
+    if spec[0] == "hex":
+        # A three-part spec names the library's own darker variant of this fill; two parts leave it to
+        # be derived, which is the same rule applied by measurement.
+        return to_rgb(spec[2]) if len(spec) > 2 else readable_on_background(spec[1])
     if spec[0] == "tint":
         return tint(palette[spec[1]], spec[2] * 0.4)
-    return palette[spec[1]]
+    return readable_on_background(palette[spec[1]])
 
 
-def luminance(color) -> float:
-    """Relative luminance, for choosing white or dark text on a fill."""
+def readable_on_background(color) -> tuple[float, float, float]:
+    """The same hue, darkened just far enough to be read as text on the template's canvas.
+
+    Returns the colour untouched when it already clears the bar, so this only bites on fills light
+    enough to need it.
+    """
+    shaded = to_rgb(color)
+    while contrast_ratio(shaded, BACKGROUND_COLOR) < TEXT_CONTRAST_MIN:
+        shaded = shade(shaded, 0.02)
+    return shaded
+
+
+def shade(color, weight: float) -> tuple[float, float, float]:
+    """Blend a color towards black. weight=0 keeps it, weight=1 turns it black."""
     r, g, b = to_rgb(color)
-    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+    return (r * (1 - weight), g * (1 - weight), b * (1 - weight))
+
+
+def contrast_ratio(first, second) -> float:
+    """WCAG contrast ratio between two colors."""
+    light, dark = sorted((relative_luminance(first), relative_luminance(second)), reverse=True)
+    return (light + 0.05) / (dark + 0.05)
+
+
+def relative_luminance(color) -> float:
+    """WCAG relative luminance: sRGB channels linearised, then weighted."""
+    channels = [c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in to_rgb(color)]
+    return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2]
+
+
+def value_label_color(fill) -> str:
+    """White or dark for a value sitting on `fill`, whichever has the higher contrast against it."""
+    return "white" if contrast_ratio("white", fill) >= contrast_ratio(DARK_VALUE_COLOR, fill) else DARK_VALUE_COLOR
+
+
+def composite_on_background(color, alpha: float = SEGMENT_ALPHA) -> tuple[float, float, float]:
+    """A fill as it lands on the canvas once its opacity is applied — the color a label sits on."""
+    fill, canvas = to_rgb(color), to_rgb(BACKGROUND_COLOR)
+    return tuple(alpha * f + (1 - alpha) * c for f, c in zip(fill, canvas))
 
 
 def text_width_px(text: str, fontsize: float, bold: bool = False) -> float:
@@ -1621,9 +1761,13 @@ def run_row_width(runs: list[tuple[str, bool]], size_px: float) -> float:
     return sum(step for _, _, step in placements[:-1]) + placements[-1][1]
 
 
-def fits_slot(measured_px: float, slot_px: float) -> bool:
-    """Whether text this step measures at `measured_px` fits `slot_px` once the template sets it."""
-    return measured_px <= slot_px * TEMPLATE_LATO_SLACK
+def fits_slot(measured_px: float, slot_px: float, ratio: float = DEJAVU_OVER_LATO) -> bool:
+    """Whether text this step measures at `measured_px` fits `slot_px` once the template sets it.
+
+    The question is about the frame, so the step's own width is divided by how much wider its font is
+    than the template's.
+    """
+    return measured_px <= slot_px * ratio
 
 
 def draw_run_row(
@@ -1652,13 +1796,13 @@ def draw_run_row(
         cursor += step_px
 
 
-def wrap_to_slot(text: str, slot_px: float, size_px: float, slack: float = TEMPLATE_LATO_SLACK) -> str:
+def wrap_to_slot(text: str, slot_px: float, size_px: float) -> str:
     """Wrap text into one of the template's slots, at the template's own size.
 
-    `slack` converts the slot into this step's font, which measures a few percent away from the
-    template's in either direction depending on the face — so a serif slot passes the serif figure.
+    Judged in the step's own font against the slot itself, so a line that fits here fits the frame with
+    room to spare — see the ratios above for why that is the safe direction.
     """
-    return wrap_to_width(text, slot_px * slack, size_px * POINTS_PER_PIXEL)
+    return wrap_to_width(text, slot_px, size_px * POINTS_PER_PIXEL)
 
 
 def lines_in(text: str) -> int:
@@ -1771,12 +1915,11 @@ def build_note(tb: Table, ages: dict[str, str], layout: dict) -> str:
             "Not every country reports each activity separately; where one does not, its minutes stay "
             "within the same category."
         )
-    # Wrapped against the content width itself, with no font slack: the slack exists to predict how
-    # many lines the *template's* narrower Lato takes, and applying it to text this step actually draws
-    # lets a full line print past the frame's edge. Erring the other way only costs a line of band.
+    # Against the narrower of the Note's own slot and the content width — the slot is the template's,
+    # but a mobile frame's content is narrower than it.
     template = layout["template_text"]
     content_px = layout["size"][0] - 2 * layout["margin"]
-    wrapped = wrap_to_slot(text, min(template["note_slot_px"], content_px), template["note_px"], slack=1.0)
+    wrapped = wrap_to_slot(text, min(template["note_slot_px"], content_px), template["note_px"])
     # The Note's slot is two lines tall, and the footer's auto-layout grows upward past that rather
     # than clipping — but every line it gains is a line the chart loses, so cap it. Three is what the
     # template's 12px takes for this Note where this step's older, smaller footer took two.

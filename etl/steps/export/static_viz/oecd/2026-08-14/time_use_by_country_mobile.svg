@@ -35,7 +35,7 @@ L 143.736844 146.979732
 L 143.736844 159.252791 
 L 84.39123 159.252791 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="japan__education">
     <path d="M 143.736844 146.979732 
@@ -43,7 +43,7 @@ L 149.778014 146.979732
 L 149.778014 159.252791 
 L 143.736844 159.252791 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="japan__sleep">
     <path d="M 149.778014 146.979732 
@@ -51,7 +51,7 @@ L 231.866857 146.979732
 L 231.866857 159.252791 
 L 149.778014 159.252791 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="japan__eating-and-drinking">
     <path d="M 231.866857 146.979732 
@@ -59,7 +59,7 @@ L 248.035872 146.979732
 L 248.035872 159.252791 
 L 231.866857 159.252791 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="japan__personal-care">
     <path d="M 248.035872 146.979732 
@@ -67,7 +67,7 @@ L 263.49416 146.979732
 L 263.49416 159.252791 
 L 248.035872 159.252791 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="japan__housework-and-shopping">
     <path d="M 263.49416 146.979732 
@@ -75,7 +75,7 @@ L 281.617671 146.979732
 L 281.617671 159.252791 
 L 263.49416 159.252791 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="japan__other-unpaid-work">
     <path d="M 281.617671 146.979732 
@@ -83,7 +83,7 @@ L 292.27856 146.979732
 L 292.27856 159.252791 
 L 281.617671 159.252791 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="japan__tv-and-radio">
     <path d="M 292.27856 146.979732 
@@ -91,7 +91,7 @@ L 306.493078 146.979732
 L 306.493078 159.252791 
 L 292.27856 159.252791 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="japan__seeing-friends">
     <path d="M 306.493078 146.979732 
@@ -99,7 +99,7 @@ L 308.269893 146.979732
 L 308.269893 159.252791 
 L 306.493078 159.252791 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="japan__other-leisure">
     <path d="M 308.269893 146.979732 
@@ -107,7 +107,7 @@ L 340.074877 146.979732
 L 340.074877 159.252791 
 L 308.269893 159.252791 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="mexico__paid-work">
     <path d="M 84.39123 162.321055 
@@ -115,7 +115,7 @@ L 139.269278 162.321055
 L 139.269278 174.594114 
 L 84.39123 174.594114 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="mexico__education">
     <path d="M 139.269278 162.321055 
@@ -123,7 +123,7 @@ L 146.384761 162.321055
 L 146.384761 174.594114 
 L 139.269278 174.594114 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="mexico__sleep">
     <path d="M 146.384761 162.321055 
@@ -131,7 +131,7 @@ L 229.969125 162.321055
 L 229.969125 174.594114 
 L 146.384761 174.594114 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="mexico__eating-and-drinking">
     <path d="M 229.969125 162.321055 
@@ -139,7 +139,7 @@ L 243.394575 162.321055
 L 243.394575 174.594114 
 L 229.969125 174.594114 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="mexico__personal-care">
     <path d="M 243.394575 162.321055 
@@ -147,7 +147,7 @@ L 254.071817 162.321055
 L 254.071817 174.594114 
 L 243.394575 174.594114 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="mexico__housework-and-shopping">
     <path d="M 254.071817 162.321055 
@@ -155,7 +155,7 @@ L 289.57672 162.321055
 L 289.57672 174.594114 
 L 254.071817 174.594114 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="mexico__other-unpaid-work">
     <path d="M 289.57672 162.321055 
@@ -163,7 +163,7 @@ L 304.212725 162.321055
 L 304.212725 174.594114 
 L 289.57672 174.594114 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="mexico__tv-and-radio">
     <path d="M 304.212725 162.321055 
@@ -171,7 +171,7 @@ L 316.240066 162.321055
 L 316.240066 174.594114 
 L 304.212725 174.594114 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="mexico__seeing-friends">
     <path d="M 316.240066 162.321055 
@@ -179,7 +179,7 @@ L 324.334246 162.321055
 L 324.334246 174.594114 
 L 316.240066 174.594114 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="mexico__other-leisure">
     <path d="M 324.334246 162.321055 
@@ -187,7 +187,7 @@ L 340.252553 162.321055
 L 340.252553 174.594114 
 L 324.334246 174.594114 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="canada__paid-work">
     <path d="M 84.39123 177.662378 
@@ -195,7 +195,7 @@ L 137.562743 177.662378
 L 137.562743 189.935437 
 L 84.39123 189.935437 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="canada__education">
     <path d="M 137.562743 177.662378 
@@ -203,7 +203,7 @@ L 144.262355 177.662378
 L 144.262355 189.935437 
 L 137.562743 189.935437 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="canada__sleep">
     <path d="M 144.262355 177.662378 
@@ -211,7 +211,7 @@ L 237.84422 177.662378
 L 237.84422 189.935437 
 L 144.262355 189.935437 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="canada__eating-and-drinking">
     <path d="M 237.84422 177.662378 
@@ -219,7 +219,7 @@ L 251.668814 177.662378
 L 251.668814 189.935437 
 L 237.84422 189.935437 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="canada__personal-care">
     <path d="M 251.668814 177.662378 
@@ -227,7 +227,7 @@ L 260.814323 177.662378
 L 260.814323 189.935437 
 L 251.668814 189.935437 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="canada__housework-and-shopping">
     <path d="M 260.814323 177.662378 
@@ -235,7 +235,7 @@ L 280.594127 177.662378
 L 280.594127 189.935437 
 L 260.814323 189.935437 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="canada__other-unpaid-work">
     <path d="M 280.594127 177.662378 
@@ -243,7 +243,7 @@ L 302.713478 177.662378
 L 302.713478 189.935437 
 L 280.594127 189.935437 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="canada__tv-and-radio">
     <path d="M 302.713478 177.662378 
@@ -251,7 +251,7 @@ L 317.49516 177.662378
 L 317.49516 189.935437 
 L 302.713478 189.935437 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="canada__seeing-friends">
     <path d="M 317.49516 177.662378 
@@ -259,7 +259,7 @@ L 326.321632 177.662378
 L 326.321632 189.935437 
 L 317.49516 189.935437 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="canada__other-leisure">
     <path d="M 326.321632 177.662378 
@@ -267,7 +267,7 @@ L 340.252567 177.662378
 L 340.252567 189.935437 
 L 326.321632 189.935437 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="croatia__paid-work">
     <path d="M 84.39123 193.003702 
@@ -275,7 +275,7 @@ L 136.334698 193.003702
 L 136.334698 205.27676 
 L 84.39123 205.27676 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="croatia__education">
     <path d="M 136.334698 193.003702 
@@ -283,7 +283,7 @@ L 141.508279 193.003702
 L 141.508279 205.27676 
 L 136.334698 205.27676 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="croatia__sleep">
     <path d="M 141.508279 193.003702 
@@ -291,7 +291,7 @@ L 229.047418 193.003702
 L 229.047418 205.27676 
 L 141.508279 205.27676 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="croatia__eating-and-drinking">
     <path d="M 229.047418 193.003702 
@@ -299,7 +299,7 @@ L 247.665148 193.003702
 L 247.665148 205.27676 
 L 229.047418 205.27676 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="croatia__personal-care">
     <path d="M 247.665148 193.003702 
@@ -307,7 +307,7 @@ L 257.851191 193.003702
 L 257.851191 205.27676 
 L 247.665148 205.27676 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="croatia__housework-and-shopping">
     <path d="M 257.851191 193.003702 
@@ -315,7 +315,7 @@ L 278.456007 193.003702
 L 278.456007 205.27676 
 L 257.851191 205.27676 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="croatia__other-unpaid-work">
     <path d="M 278.456007 193.003702 
@@ -323,7 +323,7 @@ L 295.731113 193.003702
 L 295.731113 205.27676 
 L 278.456007 205.27676 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="croatia__tv-and-radio">
     <path d="M 295.731113 193.003702 
@@ -331,7 +331,7 @@ L 312.254349 193.003702
 L 312.254349 205.27676 
 L 295.731113 205.27676 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="croatia__seeing-friends">
     <path d="M 312.254349 193.003702 
@@ -339,7 +339,7 @@ L 318.645243 193.003702
 L 318.645243 205.27676 
 L 312.254349 205.27676 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="croatia__other-leisure">
     <path d="M 318.645243 193.003702 
@@ -347,7 +347,7 @@ L 340.25255 193.003702
 L 340.25255 205.27676 
 L 318.645243 205.27676 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="south-korea__paid-work">
     <path d="M 84.39123 208.345025 
@@ -355,7 +355,7 @@ L 135.491861 208.345025
 L 135.491861 220.618083 
 L 84.39123 220.618083 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="south-korea__education">
     <path d="M 135.491861 208.345025 
@@ -363,7 +363,7 @@ L 145.594034 208.345025
 L 145.594034 220.618083 
 L 135.491861 220.618083 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="south-korea__sleep">
     <path d="M 145.594034 208.345025 
@@ -371,7 +371,7 @@ L 229.34433 208.345025
 L 229.34433 220.618083 
 L 145.594034 220.618083 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="south-korea__eating-and-drinking">
     <path d="M 229.34433 208.345025 
@@ -379,7 +379,7 @@ L 250.122854 208.345025
 L 250.122854 220.618083 
 L 229.34433 220.618083 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="south-korea__personal-care">
     <path d="M 250.122854 208.345025 
@@ -387,7 +387,7 @@ L 266.034964 208.345025
 L 266.034964 220.618083 
 L 250.122854 220.618083 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="south-korea__housework-and-shopping">
     <path d="M 266.034964 208.345025 
@@ -395,7 +395,7 @@ L 281.925798 208.345025
 L 281.925798 220.618083 
 L 266.034964 220.618083 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="south-korea__other-unpaid-work">
     <path d="M 281.925798 208.345025 
@@ -403,7 +403,7 @@ L 294.364499 208.345025
 L 294.364499 220.618083 
 L 281.925798 220.618083 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="south-korea__tv-and-radio">
     <path d="M 294.364499 208.345025 
@@ -411,7 +411,7 @@ L 312.488219 208.345025
 L 312.488219 220.618083 
 L 294.364499 220.618083 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="south-korea__seeing-friends">
     <path d="M 312.488219 208.345025 
@@ -419,7 +419,7 @@ L 319.989206 208.345025
 L 319.989206 220.618083 
 L 312.488219 220.618083 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="south-korea__other-leisure">
     <path d="M 319.989206 208.345025 
@@ -427,7 +427,7 @@ L 340.252552 208.345025
 L 340.252552 220.618083 
 L 319.989206 220.618083 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="estonia__paid-work">
     <path d="M 84.39123 223.686348 
@@ -435,7 +435,7 @@ L 131.130243 223.686348
 L 131.130243 235.959406 
 L 84.39123 235.959406 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="estonia__education">
     <path d="M 131.130243 223.686348 
@@ -443,7 +443,7 @@ L 136.462875 223.686348
 L 136.462875 235.959406 
 L 131.130243 235.959406 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="estonia__sleep">
     <path d="M 136.462875 223.686348 
@@ -451,7 +451,7 @@ L 228.682154 223.686348
 L 228.682154 235.959406 
 L 136.462875 235.959406 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="estonia__eating-and-drinking">
     <path d="M 228.682154 223.686348 
@@ -459,7 +459,7 @@ L 243.268468 223.686348
 L 243.268468 235.959406 
 L 228.682154 235.959406 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="estonia__personal-care">
     <path d="M 243.268468 223.686348 
@@ -467,7 +467,7 @@ L 252.634819 223.686348
 L 252.634819 235.959406 
 L 243.268468 235.959406 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="estonia__housework-and-shopping">
     <path d="M 252.634819 223.686348 
@@ -475,7 +475,7 @@ L 274.205874 223.686348
 L 274.205874 235.959406 
 L 252.634819 235.959406 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="estonia__other-unpaid-work">
     <path d="M 274.205874 223.686348 
@@ -483,7 +483,7 @@ L 286.743054 223.686348
 L 286.743054 235.959406 
 L 274.205874 235.959406 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="estonia__tv-and-radio">
     <path d="M 286.743054 223.686348 
@@ -491,7 +491,7 @@ L 306.491387 223.686348
 L 306.491387 235.959406 
 L 286.743054 235.959406 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="estonia__seeing-friends">
     <path d="M 306.491387 223.686348 
@@ -499,7 +499,7 @@ L 313.223888 223.686348
 L 313.223888 235.959406 
 L 306.491387 235.959406 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="estonia__other-leisure">
     <path d="M 313.223888 223.686348 
@@ -507,7 +507,7 @@ L 340.252552 223.686348
 L 340.252552 235.959406 
 L 313.223888 235.959406 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="sweden__paid-work">
     <path d="M 84.39123 239.027671 
@@ -515,7 +515,7 @@ L 130.977028 239.027671
 L 130.977028 251.300729 
 L 84.39123 251.300729 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="sweden__education">
     <path d="M 130.977028 239.027671 
@@ -523,7 +523,7 @@ L 136.524196 239.027671
 L 136.524196 251.300729 
 L 130.977028 251.300729 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="sweden__sleep">
     <path d="M 136.524196 239.027671 
@@ -531,7 +531,7 @@ L 222.291221 239.027671
 L 222.291221 251.300729 
 L 136.524196 251.300729 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="sweden__eating-and-drinking">
     <path d="M 222.291221 239.027671 
@@ -539,7 +539,7 @@ L 236.956271 239.027671
 L 236.956271 251.300729 
 L 222.291221 251.300729 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="sweden__personal-care">
     <path d="M 236.956271 239.027671 
@@ -547,7 +547,7 @@ L 247.125505 239.027671
 L 247.125505 251.300729 
 L 236.956271 251.300729 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="sweden__housework-and-shopping">
     <path d="M 247.125505 239.027671 
@@ -555,7 +555,7 @@ L 270.333483 239.027671
 L 270.333483 251.300729 
 L 247.125505 251.300729 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="sweden__other-unpaid-work">
     <path d="M 270.333483 239.027671 
@@ -563,7 +563,7 @@ L 283.130709 239.027671
 L 283.130709 251.300729 
 L 270.333483 251.300729 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="sweden__tv-and-radio">
     <path d="M 283.130709 239.027671 
@@ -571,7 +571,7 @@ L 303.260979 239.027671
 L 303.260979 251.300729 
 L 283.130709 251.300729 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="sweden__seeing-friends">
     <path d="M 303.260979 239.027671 
@@ -579,7 +579,7 @@ L 312.62536 239.027671
 L 312.62536 251.300729 
 L 303.260979 251.300729 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="sweden__other-leisure">
     <path d="M 312.62536 239.027671 
@@ -587,7 +587,7 @@ L 340.252561 239.027671
 L 340.252561 251.300729 
 L 312.62536 251.300729 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="bulgaria__paid-work">
     <path d="M 84.39123 254.368994 
@@ -595,7 +595,7 @@ L 130.914578 254.368994
 L 130.914578 266.642052 
 L 84.39123 266.642052 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="bulgaria__education">
     <path d="M 130.914578 254.368994 
@@ -603,7 +603,7 @@ L 134.483892 254.368994
 L 134.483892 266.642052 
 L 130.914578 266.642052 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="bulgaria__sleep">
     <path d="M 134.483892 254.368994 
@@ -611,7 +611,7 @@ L 229.045478 254.368994
 L 229.045478 266.642052 
 L 134.483892 266.642052 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="bulgaria__eating-and-drinking">
     <path d="M 229.045478 254.368994 
@@ -619,7 +619,7 @@ L 253.470486 254.368994
 L 253.470486 266.642052 
 L 229.045478 266.642052 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="bulgaria__personal-care">
     <path d="M 253.470486 254.368994 
@@ -627,7 +627,7 @@ L 262.957003 254.368994
 L 262.957003 266.642052 
 L 253.470486 266.642052 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="bulgaria__housework-and-shopping">
     <path d="M 262.957003 254.368994 
@@ -635,7 +635,7 @@ L 287.981434 254.368994
 L 287.981434 266.642052 
 L 262.957003 266.642052 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="bulgaria__other-unpaid-work">
     <path d="M 287.981434 254.368994 
@@ -643,7 +643,7 @@ L 297.435761 254.368994
 L 297.435761 266.642052 
 L 287.981434 266.642052 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="bulgaria__tv-and-radio">
     <path d="M 297.435761 254.368994 
@@ -651,7 +651,7 @@ L 316.538397 254.368994
 L 316.538397 266.642052 
 L 297.435761 266.642052 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="bulgaria__seeing-friends">
     <path d="M 316.538397 254.368994 
@@ -659,7 +659,7 @@ L 326.474644 254.368994
 L 326.474644 266.642052 
 L 316.538397 266.642052 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="bulgaria__other-leisure">
     <path d="M 326.474644 254.368994 
@@ -667,7 +667,7 @@ L 340.252552 254.368994
 L 340.252552 266.642052 
 L 326.474644 266.642052 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="united-states__paid-work">
     <path d="M 84.39123 269.710317 
@@ -675,7 +675,7 @@ L 128.530952 269.710317
 L 128.530952 281.983375 
 L 84.39123 281.983375 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="united-states__education">
     <path d="M 128.530952 269.710317 
@@ -683,7 +683,7 @@ L 133.823477 269.710317
 L 133.823477 281.983375 
 L 128.530952 281.983375 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="united-states__sleep">
     <path d="M 133.823477 269.710317 
@@ -691,7 +691,7 @@ L 230.003207 269.710317
 L 230.003207 281.983375 
 L 133.823477 281.983375 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="united-states__eating-and-drinking">
     <path d="M 230.003207 269.710317 
@@ -699,7 +699,7 @@ L 241.631224 269.710317
 L 241.631224 281.983375 
 L 230.003207 281.983375 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="united-states__personal-care">
     <path d="M 241.631224 269.710317 
@@ -707,7 +707,7 @@ L 251.811917 269.710317
 L 251.811917 281.983375 
 L 241.631224 281.983375 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="united-states__housework-and-shopping">
     <path d="M 251.811917 269.710317 
@@ -715,7 +715,7 @@ L 274.712157 269.710317
 L 274.712157 281.983375 
 L 251.811917 281.983375 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="united-states__other-unpaid-work">
     <path d="M 274.712157 269.710317 
@@ -723,7 +723,7 @@ L 290.527197 269.710317
 L 290.527197 281.983375 
 L 274.712157 281.983375 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="united-states__tv-and-radio">
     <path d="M 290.527197 269.710317 
@@ -731,7 +731,7 @@ L 313.714041 269.710317
 L 313.714041 281.983375 
 L 290.527197 281.983375 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="united-states__seeing-friends">
     <path d="M 313.714041 269.710317 
@@ -739,7 +739,7 @@ L 321.221637 269.710317
 L 321.221637 281.983375 
 L 313.714041 281.983375 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="united-states__other-leisure">
     <path d="M 321.221637 269.710317 
@@ -747,7 +747,7 @@ L 340.252558 269.710317
 L 340.252558 281.983375 
 L 321.221637 281.983375 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="luxembourg__paid-work">
     <path d="M 84.39123 285.05164 
@@ -755,7 +755,7 @@ L 128.318616 285.05164
 L 128.318616 297.324698 
 L 84.39123 297.324698 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="luxembourg__education">
     <path d="M 128.318616 285.05164 
@@ -763,7 +763,7 @@ L 134.975039 285.05164
 L 134.975039 297.324698 
 L 128.318616 297.324698 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="luxembourg__sleep">
     <path d="M 134.975039 285.05164 
@@ -771,7 +771,7 @@ L 227.044844 285.05164
 L 227.044844 297.324698 
 L 134.975039 297.324698 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="luxembourg__eating-and-drinking">
     <path d="M 227.044844 285.05164 
@@ -779,7 +779,7 @@ L 246.984673 285.05164
 L 246.984673 297.324698 
 L 227.044844 297.324698 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="luxembourg__personal-care">
     <path d="M 246.984673 285.05164 
@@ -787,7 +787,7 @@ L 256.805581 285.05164
 L 256.805581 297.324698 
 L 246.984673 297.324698 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="luxembourg__housework-and-shopping">
     <path d="M 256.805581 285.05164 
@@ -795,7 +795,7 @@ L 280.074908 285.05164
 L 280.074908 297.324698 
 L 256.805581 297.324698 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="luxembourg__other-unpaid-work">
     <path d="M 280.074908 285.05164 
@@ -803,7 +803,7 @@ L 291.137024 285.05164
 L 291.137024 297.324698 
 L 280.074908 297.324698 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="luxembourg__tv-and-radio">
     <path d="M 291.137024 285.05164 
@@ -811,7 +811,7 @@ L 311.761103 285.05164
 L 311.761103 297.324698 
 L 291.137024 297.324698 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="luxembourg__seeing-friends">
     <path d="M 311.761103 285.05164 
@@ -819,7 +819,7 @@ L 317.500439 285.05164
 L 317.500439 297.324698 
 L 311.761103 297.324698 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="luxembourg__other-leisure">
     <path d="M 317.500439 285.05164 
@@ -827,7 +827,7 @@ L 340.245645 285.05164
 L 340.245645 297.324698 
 L 317.500439 297.324698 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="norway__paid-work">
     <path d="M 84.39123 300.392963 
@@ -835,7 +835,7 @@ L 127.259609 300.392963
 L 127.259609 312.666022 
 L 84.39123 312.666022 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="norway__education">
     <path d="M 127.259609 300.392963 
@@ -843,7 +843,7 @@ L 133.325423 300.392963
 L 133.325423 312.666022 
 L 127.259609 312.666022 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="norway__sleep">
     <path d="M 133.325423 300.392963 
@@ -851,7 +851,7 @@ L 222.877344 300.392963
 L 222.877344 312.666022 
 L 133.325423 312.666022 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="norway__eating-and-drinking">
     <path d="M 222.877344 300.392963 
@@ -859,7 +859,7 @@ L 235.534207 300.392963
 L 235.534207 312.666022 
 L 222.877344 312.666022 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="norway__personal-care">
     <path d="M 235.534207 300.392963 
@@ -867,7 +867,7 @@ L 242.30348 300.392963
 L 242.30348 312.666022 
 L 235.534207 312.666022 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="norway__housework-and-shopping">
     <path d="M 242.30348 300.392963 
@@ -875,7 +875,7 @@ L 266.0101 300.392963
 L 266.0101 312.666022 
 L 242.30348 312.666022 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="norway__other-unpaid-work">
     <path d="M 266.0101 300.392963 
@@ -883,7 +883,7 @@ L 277.35906 300.392963
 L 277.35906 312.666022 
 L 266.0101 312.666022 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="norway__tv-and-radio">
     <path d="M 277.35906 300.392963 
@@ -891,7 +891,7 @@ L 295.421098 300.392963
 L 295.421098 312.666022 
 L 277.35906 312.666022 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="norway__seeing-friends">
     <path d="M 295.421098 300.392963 
@@ -899,7 +899,7 @@ L 308.582688 300.392963
 L 308.582688 312.666022 
 L 295.421098 312.666022 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="norway__other-leisure">
     <path d="M 308.582688 300.392963 
@@ -907,7 +907,7 @@ L 340.252573 300.392963
 L 340.252573 312.666022 
 L 308.582688 312.666022 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="new-zealand__paid-work">
     <path d="M 84.39123 315.734286 
@@ -915,7 +915,7 @@ L 127.212467 315.734286
 L 127.212467 328.007345 
 L 84.39123 328.007345 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="new-zealand__education">
     <path d="M 127.212467 315.734286 
@@ -923,7 +923,7 @@ L 132.365229 315.734286
 L 132.365229 328.007345 
 L 127.212467 328.007345 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="new-zealand__sleep">
     <path d="M 132.365229 315.734286 
@@ -931,7 +931,7 @@ L 225.825687 315.734286
 L 225.825687 328.007345 
 L 132.365229 328.007345 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="new-zealand__eating-and-drinking">
     <path d="M 225.825687 315.734286 
@@ -939,7 +939,7 @@ L 240.040205 315.734286
 L 240.040205 328.007345 
 L 225.825687 328.007345 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="new-zealand__personal-care">
     <path d="M 240.040205 315.734286 
@@ -947,7 +947,7 @@ L 247.502827 315.734286
 L 247.502827 328.007345 
 L 240.040205 328.007345 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="new-zealand__housework-and-shopping">
     <path d="M 247.502827 315.734286 
@@ -955,7 +955,7 @@ L 271.312145 315.734286
 L 271.312145 328.007345 
 L 247.502827 328.007345 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="new-zealand__other-unpaid-work">
     <path d="M 271.312145 315.734286 
@@ -963,7 +963,7 @@ L 286.770434 315.734286
 L 286.770434 328.007345 
 L 271.312145 328.007345 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="new-zealand__tv-and-radio">
     <path d="M 286.770434 315.734286 
@@ -971,7 +971,7 @@ L 308.802937 315.734286
 L 308.802937 328.007345 
 L 286.770434 328.007345 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="new-zealand__seeing-friends">
     <path d="M 308.802937 315.734286 
@@ -979,7 +979,7 @@ L 321.062959 315.734286
 L 321.062959 328.007345 
 L 308.802937 328.007345 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="new-zealand__other-leisure">
     <path d="M 321.062959 315.734286 
@@ -987,7 +987,7 @@ L 340.252559 315.734286
 L 340.252559 328.007345 
 L 321.062959 328.007345 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="austria__paid-work">
     <path d="M 84.39123 331.075609 
@@ -995,7 +995,7 @@ L 126.731561 331.075609
 L 126.731561 343.348668 
 L 84.39123 343.348668 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="austria__education">
     <path d="M 126.731561 331.075609 
@@ -1003,7 +1003,7 @@ L 131.5906 331.075609
 L 131.5906 343.348668 
 L 126.731561 343.348668 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="austria__sleep">
     <path d="M 131.5906 331.075609 
@@ -1011,7 +1011,7 @@ L 223.24391 331.075609
 L 223.24391 343.348668 
 L 131.5906 343.348668 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="austria__eating-and-drinking">
     <path d="M 223.24391 331.075609 
@@ -1019,7 +1019,7 @@ L 240.250013 331.075609
 L 240.250013 343.348668 
 L 223.24391 343.348668 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="austria__personal-care">
     <path d="M 240.250013 331.075609 
@@ -1027,7 +1027,7 @@ L 250.221737 331.075609
 L 250.221737 343.348668 
 L 240.250013 343.348668 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="austria__housework-and-shopping">
     <path d="M 250.221737 331.075609 
@@ -1035,7 +1035,7 @@ L 274.442624 331.075609
 L 274.442624 343.348668 
 L 250.221737 343.348668 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="austria__other-unpaid-work">
     <path d="M 274.442624 331.075609 
@@ -1043,7 +1043,7 @@ L 285.727246 331.075609
 L 285.727246 343.348668 
 L 274.442624 343.348668 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="austria__tv-and-radio">
     <path d="M 285.727246 331.075609 
@@ -1051,7 +1051,7 @@ L 306.291594 331.075609
 L 306.291594 343.348668 
 L 285.727246 343.348668 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="austria__seeing-friends">
     <path d="M 306.291594 331.075609 
@@ -1059,7 +1059,7 @@ L 311.822825 331.075609
 L 311.822825 343.348668 
 L 306.291594 343.348668 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="austria__other-leisure">
     <path d="M 311.822825 331.075609 
@@ -1067,7 +1067,7 @@ L 340.252561 331.075609
 L 340.252561 343.348668 
 L 311.822825 343.348668 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="united-kingdom__paid-work">
     <path d="M 84.39123 346.416932 
@@ -1075,7 +1075,7 @@ L 126.234017 346.416932
 L 126.234017 358.689991 
 L 84.39123 358.689991 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="united-kingdom__education">
     <path d="M 126.234017 346.416932 
@@ -1083,7 +1083,7 @@ L 130.990848 346.416932
 L 130.990848 358.689991 
 L 126.234017 358.689991 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="united-kingdom__sleep">
     <path d="M 130.990848 346.416932 
@@ -1091,7 +1091,7 @@ L 221.272684 346.416932
 L 221.272684 358.689991 
 L 130.990848 358.689991 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="united-kingdom__eating-and-drinking">
     <path d="M 221.272684 346.416932 
@@ -1099,7 +1099,7 @@ L 235.354328 346.416932
 L 235.354328 358.689991 
 L 221.272684 358.689991 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="united-kingdom__personal-care">
     <path d="M 235.354328 346.416932 
@@ -1107,7 +1107,7 @@ L 245.63171 346.416932
 L 245.63171 358.689991 
 L 235.354328 358.689991 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="united-kingdom__housework-and-shopping">
     <path d="M 245.63171 346.416932 
@@ -1115,7 +1115,7 @@ L 269.269452 346.416932
 L 269.269452 358.689991 
 L 245.63171 358.689991 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="united-kingdom__other-unpaid-work">
     <path d="M 269.269452 346.416932 
@@ -1123,7 +1123,7 @@ L 285.965366 346.416932
 L 285.965366 358.689991 
 L 269.269452 358.689991 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="united-kingdom__tv-and-radio">
     <path d="M 285.965366 346.416932 
@@ -1131,7 +1131,7 @@ L 309.653716 346.416932
 L 309.653716 358.689991 
 L 285.965366 358.689991 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="united-kingdom__seeing-friends">
     <path d="M 309.653716 346.416932 
@@ -1139,7 +1139,7 @@ L 318.080849 346.416932
 L 318.080849 358.689991 
 L 309.653716 358.689991 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="united-kingdom__other-leisure">
     <path d="M 318.080849 346.416932 
@@ -1147,7 +1147,7 @@ L 340.252557 346.416932
 L 340.252557 358.689991 
 L 318.080849 358.689991 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="germany__paid-work">
     <path d="M 84.39123 361.758255 
@@ -1155,7 +1155,7 @@ L 123.311852 361.758255
 L 123.311852 374.031314 
 L 84.39123 374.031314 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="germany__education">
     <path d="M 123.311852 361.758255 
@@ -1163,7 +1163,7 @@ L 127.753904 361.758255
 L 127.753904 374.031314 
 L 123.311852 374.031314 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="germany__sleep">
     <path d="M 127.753904 361.758255 
@@ -1171,7 +1171,7 @@ L 218.744454 361.758255
 L 218.744454 374.031314 
 L 127.753904 374.031314 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="germany__eating-and-drinking">
     <path d="M 218.744454 361.758255 
@@ -1179,7 +1179,7 @@ L 235.226076 361.758255
 L 235.226076 374.031314 
 L 218.744454 374.031314 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="germany__personal-care">
     <path d="M 235.226076 361.758255 
@@ -1187,7 +1187,7 @@ L 244.597673 361.758255
 L 244.597673 374.031314 
 L 235.226076 374.031314 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="germany__housework-and-shopping">
     <path d="M 244.597673 361.758255 
@@ -1195,7 +1195,7 @@ L 267.753404 361.758255
 L 267.753404 374.031314 
 L 244.597673 374.031314 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="germany__other-unpaid-work">
     <path d="M 267.753404 361.758255 
@@ -1203,7 +1203,7 @@ L 279.68398 361.758255
 L 279.68398 374.031314 
 L 267.753404 374.031314 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="germany__tv-and-radio">
     <path d="M 279.68398 361.758255 
@@ -1211,7 +1211,7 @@ L 301.057574 361.758255
 L 301.057574 374.031314 
 L 279.68398 374.031314 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="germany__seeing-friends">
     <path d="M 301.057574 361.758255 
@@ -1219,7 +1219,7 @@ L 313.293414 361.758255
 L 313.293414 374.031314 
 L 301.057574 374.031314 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="germany__other-leisure">
     <path d="M 313.293414 361.758255 
@@ -1227,7 +1227,7 @@ L 340.252549 361.758255
 L 340.252549 374.031314 
 L 313.293414 374.031314 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="netherlands__paid-work">
     <path d="M 84.39123 377.099578 
@@ -1235,7 +1235,7 @@ L 123.060114 377.099578
 L 123.060114 389.372637 
 L 84.39123 389.372637 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="netherlands__education">
     <path d="M 123.060114 377.099578 
@@ -1243,7 +1243,7 @@ L 127.529989 377.099578
 L 127.529989 389.372637 
 L 123.060114 389.372637 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="netherlands__sleep">
     <path d="M 127.529989 377.099578 
@@ -1251,7 +1251,7 @@ L 216.864026 377.099578
 L 216.864026 389.372637 
 L 127.529989 389.372637 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="netherlands__eating-and-drinking">
     <path d="M 216.864026 377.099578 
@@ -1259,7 +1259,7 @@ L 237.174474 377.099578
 L 237.174474 389.372637 
 L 216.864026 389.372637 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="netherlands__personal-care">
     <path d="M 237.174474 377.099578 
@@ -1267,7 +1267,7 @@ L 248.636021 377.099578
 L 248.636021 389.372637 
 L 237.174474 389.372637 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="netherlands__housework-and-shopping">
     <path d="M 248.636021 377.099578 
@@ -1275,7 +1275,7 @@ L 272.292858 377.099578
 L 272.292858 389.372637 
 L 248.636021 389.372637 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="netherlands__other-unpaid-work">
     <path d="M 272.292858 377.099578 
@@ -1283,7 +1283,7 @@ L 284.324774 377.099578
 L 284.324774 389.372637 
 L 272.292858 389.372637 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="netherlands__tv-and-radio">
     <path d="M 284.324774 377.099578 
@@ -1291,7 +1291,7 @@ L 304.317997 377.099578
 L 304.317997 389.372637 
 L 284.324774 389.372637 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="netherlands__seeing-friends">
     <path d="M 304.317997 377.099578 
@@ -1299,7 +1299,7 @@ L 317.210895 377.099578
 L 317.210895 389.372637 
 L 304.317997 389.372637 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="netherlands__other-leisure">
     <path d="M 317.210895 377.099578 
@@ -1307,7 +1307,7 @@ L 340.252508 377.099578
 L 340.252508 389.372637 
 L 317.210895 389.372637 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="turkey__paid-work">
     <path d="M 84.39123 392.440902 
@@ -1315,7 +1315,7 @@ L 122.996894 392.440902
 L 122.996894 404.71396 
 L 84.39123 404.71396 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="turkey__education">
     <path d="M 122.996894 392.440902 
@@ -1323,7 +1323,7 @@ L 128.15702 392.440902
 L 128.15702 404.71396 
 L 122.996894 404.71396 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="turkey__sleep">
     <path d="M 128.15702 392.440902 
@@ -1331,7 +1331,7 @@ L 219.588661 392.440902
 L 219.588661 404.71396 
 L 128.15702 404.71396 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="turkey__eating-and-drinking">
     <path d="M 219.588661 392.440902 
@@ -1339,7 +1339,7 @@ L 240.480752 392.440902
 L 240.480752 404.71396 
 L 219.588661 404.71396 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="turkey__personal-care">
     <path d="M 240.480752 392.440902 
@@ -1347,7 +1347,7 @@ L 249.299663 392.440902
 L 249.299663 404.71396 
 L 240.480752 404.71396 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="turkey__housework-and-shopping">
     <path d="M 249.299663 392.440902 
@@ -1355,7 +1355,7 @@ L 273.793715 392.440902
 L 273.793715 404.71396 
 L 249.299663 404.71396 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="turkey__other-unpaid-work">
     <path d="M 273.793715 392.440902 
@@ -1363,7 +1363,7 @@ L 289.488772 392.440902
 L 289.488772 404.71396 
 L 273.793715 404.71396 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="turkey__tv-and-radio">
     <path d="M 289.488772 392.440902 
@@ -1371,7 +1371,7 @@ L 311.52689 392.440902
 L 311.52689 404.71396 
 L 289.488772 404.71396 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="turkey__seeing-friends">
     <path d="M 311.52689 392.440902 
@@ -1379,7 +1379,7 @@ L 323.630581 392.440902
 L 323.630581 404.71396 
 L 311.52689 404.71396 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="turkey__other-leisure">
     <path d="M 323.630581 392.440902 
@@ -1387,7 +1387,7 @@ L 340.257833 392.440902
 L 340.257833 404.71396 
 L 323.630581 404.71396 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="finland__paid-work">
     <path d="M 84.39123 407.782225 
@@ -1395,7 +1395,7 @@ L 121.318846 407.782225
 L 121.318846 420.055283 
 L 84.39123 420.055283 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="finland__education">
     <path d="M 121.318846 407.782225 
@@ -1403,7 +1403,7 @@ L 127.053896 407.782225
 L 127.053896 420.055283 
 L 121.318846 420.055283 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="finland__sleep">
     <path d="M 127.053896 407.782225 
@@ -1411,7 +1411,7 @@ L 217.219433 407.782225
 L 217.219433 420.055283 
 L 127.053896 420.055283 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="finland__eating-and-drinking">
     <path d="M 217.219433 407.782225 
@@ -1419,7 +1419,7 @@ L 232.823892 407.782225
 L 232.823892 420.055283 
 L 217.219433 420.055283 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="finland__personal-care">
     <path d="M 232.823892 407.782225 
@@ -1427,7 +1427,7 @@ L 241.60415 407.782225
 L 241.60415 420.055283 
 L 232.823892 420.055283 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="finland__housework-and-shopping">
     <path d="M 241.60415 407.782225 
@@ -1435,7 +1435,7 @@ L 265.402373 407.782225
 L 265.402373 420.055283 
 L 241.60415 420.055283 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="finland__other-unpaid-work">
     <path d="M 265.402373 407.782225 
@@ -1443,7 +1443,7 @@ L 281.652035 407.782225
 L 281.652035 420.055283 
 L 265.402373 420.055283 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="finland__tv-and-radio">
     <path d="M 281.652035 407.782225 
@@ -1451,7 +1451,7 @@ L 303.958583 407.782225
 L 303.958583 420.055283 
 L 281.652035 420.055283 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="finland__seeing-friends">
     <path d="M 303.958583 407.782225 
@@ -1459,7 +1459,7 @@ L 312.379344 407.782225
 L 312.379344 420.055283 
 L 303.958583 420.055283 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="finland__other-leisure">
     <path d="M 312.379344 407.782225 
@@ -1467,7 +1467,7 @@ L 340.252562 407.782225
 L 340.252562 420.055283 
 L 312.379344 420.055283 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="poland__paid-work">
     <path d="M 84.39123 423.123548 
@@ -1475,7 +1475,7 @@ L 120.815933 423.123548
 L 120.815933 435.396606 
 L 84.39123 435.396606 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="poland__education">
     <path d="M 120.815933 423.123548 
@@ -1483,7 +1483,7 @@ L 122.415067 423.123548
 L 122.415067 435.396606 
 L 120.815933 435.396606 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="poland__sleep">
     <path d="M 122.415067 423.123548 
@@ -1491,7 +1491,7 @@ L 213.921028 423.123548
 L 213.921028 435.396606 
 L 122.415067 435.396606 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="poland__eating-and-drinking">
     <path d="M 213.921028 423.123548 
@@ -1499,7 +1499,7 @@ L 231.689176 423.123548
 L 231.689176 435.396606 
 L 213.921028 435.396606 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="poland__personal-care">
     <path d="M 231.689176 423.123548 
@@ -1507,7 +1507,7 @@ L 243.593835 423.123548
 L 243.593835 435.396606 
 L 231.689176 435.396606 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="poland__housework-and-shopping">
     <path d="M 243.593835 423.123548 
@@ -1515,7 +1515,7 @@ L 275.576501 423.123548
 L 275.576501 435.396606 
 L 243.593835 435.396606 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="poland__other-unpaid-work">
     <path d="M 275.576501 423.123548 
@@ -1523,7 +1523,7 @@ L 293.877693 423.123548
 L 293.877693 435.396606 
 L 275.576501 435.396606 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="poland__tv-and-radio">
     <path d="M 293.877693 423.123548 
@@ -1531,7 +1531,7 @@ L 316.265559 423.123548
 L 316.265559 435.396606 
 L 293.877693 435.396606 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="poland__seeing-friends">
     <path d="M 316.265559 423.123548 
@@ -1539,7 +1539,7 @@ L 323.017455 423.123548
 L 323.017455 435.396606 
 L 316.265559 435.396606 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="poland__other-leisure">
     <path d="M 323.017455 423.123548 
@@ -1547,7 +1547,7 @@ L 340.252559 423.123548
 L 340.252559 435.396606 
 L 323.017455 435.396606 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="south-africa__paid-work">
     <path d="M 84.39123 438.464871 
@@ -1555,7 +1555,7 @@ L 120.241207 438.464871
 L 120.241207 450.737929 
 L 84.39123 450.737929 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="south-africa__education">
     <path d="M 120.241207 438.464871 
@@ -1563,7 +1563,7 @@ L 127.137143 438.464871
 L 127.137143 450.737929 
 L 120.241207 450.737929 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="south-africa__sleep">
     <path d="M 127.137143 438.464871 
@@ -1571,7 +1571,7 @@ L 225.420182 438.464871
 L 225.420182 450.737929 
 L 127.137143 450.737929 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="south-africa__eating-and-drinking">
     <path d="M 225.420182 438.464871 
@@ -1579,7 +1579,7 @@ L 238.28171 438.464871
 L 238.28171 450.737929 
 L 225.420182 450.737929 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="south-africa__personal-care">
     <path d="M 238.28171 438.464871 
@@ -1587,7 +1587,7 @@ L 250.639781 438.464871
 L 250.639781 450.737929 
 L 238.28171 450.737929 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="south-africa__housework-and-shopping">
     <path d="M 250.639781 438.464871 
@@ -1595,7 +1595,7 @@ L 275.47702 438.464871
 L 275.47702 450.737929 
 L 250.639781 450.737929 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="south-africa__other-unpaid-work">
     <path d="M 275.47702 438.464871 
@@ -1603,7 +1603,7 @@ L 285.900123 438.464871
 L 285.900123 450.737929 
 L 275.47702 450.737929 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="south-africa__tv-and-radio">
     <path d="M 285.900123 438.464871 
@@ -1611,7 +1611,7 @@ L 309.306938 438.464871
 L 309.306938 450.737929 
 L 285.900123 450.737929 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="south-africa__seeing-friends">
     <path d="M 309.306938 438.464871 
@@ -1619,7 +1619,7 @@ L 323.902786 438.464871
 L 323.902786 450.737929 
 L 309.306938 450.737929 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="south-africa__other-leisure">
     <path d="M 323.902786 438.464871 
@@ -1627,7 +1627,7 @@ L 340.252566 438.464871
 L 340.252566 450.737929 
 L 323.902786 450.737929 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="hungary__paid-work">
     <path d="M 84.39123 453.806194 
@@ -1635,7 +1635,7 @@ L 119.829226 453.806194
 L 119.829226 466.079252 
 L 84.39123 466.079252 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="hungary__education">
     <path d="M 119.829226 453.806194 
@@ -1643,7 +1643,7 @@ L 126.610836 453.806194
 L 126.610836 466.079252 
 L 119.829226 466.079252 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="hungary__sleep">
     <path d="M 126.610836 453.806194 
@@ -1651,7 +1651,7 @@ L 216.499308 453.806194
 L 216.499308 466.079252 
 L 126.610836 466.079252 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="hungary__eating-and-drinking">
     <path d="M 216.499308 453.806194 
@@ -1659,7 +1659,7 @@ L 234.468236 453.806194
 L 234.468236 466.079252 
 L 216.499308 466.079252 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="hungary__personal-care">
     <path d="M 234.468236 453.806194 
@@ -1667,7 +1667,7 @@ L 247.992011 453.806194
 L 247.992011 466.079252 
 L 234.468236 466.079252 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="hungary__housework-and-shopping">
     <path d="M 247.992011 453.806194 
@@ -1675,7 +1675,7 @@ L 278.050056 453.806194
 L 278.050056 466.079252 
 L 247.992011 466.079252 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="hungary__other-unpaid-work">
     <path d="M 278.050056 453.806194 
@@ -1683,7 +1683,7 @@ L 290.261927 453.806194
 L 290.261927 466.079252 
 L 278.050056 466.079252 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="hungary__tv-and-radio">
     <path d="M 290.261927 453.806194 
@@ -1691,7 +1691,7 @@ L 314.053066 453.806194
 L 314.053066 466.079252 
 L 290.261927 466.079252 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="hungary__seeing-friends">
     <path d="M 314.053066 453.806194 
@@ -1699,7 +1699,7 @@ L 320.295622 453.806194
 L 320.295622 466.079252 
 L 314.053066 466.079252 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="hungary__other-leisure">
     <path d="M 320.295622 453.806194 
@@ -1707,7 +1707,7 @@ L 340.252558 453.806194
 L 340.252558 466.079252 
 L 320.295622 466.079252 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="belgium__paid-work">
     <path d="M 84.39123 469.147517 
@@ -1715,7 +1715,7 @@ L 118.946092 469.147517
 L 118.946092 481.420575 
 L 84.39123 481.420575 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="belgium__education">
     <path d="M 118.946092 469.147517 
@@ -1723,7 +1723,7 @@ L 126.280281 469.147517
 L 126.280281 481.420575 
 L 118.946092 481.420575 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="belgium__sleep">
     <path d="M 126.280281 469.147517 
@@ -1731,7 +1731,7 @@ L 217.406044 469.147517
 L 217.406044 481.420575 
 L 126.280281 481.420575 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="belgium__eating-and-drinking">
     <path d="M 217.406044 469.147517 
@@ -1739,7 +1739,7 @@ L 234.910586 469.147517
 L 234.910586 481.420575 
 L 217.406044 481.420575 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="belgium__personal-care">
     <path d="M 234.910586 469.147517 
@@ -1747,7 +1747,7 @@ L 244.269013 469.147517
 L 244.269013 481.420575 
 L 234.910586 481.420575 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="belgium__housework-and-shopping">
     <path d="M 244.269013 469.147517 
@@ -1755,7 +1755,7 @@ L 270.767632 469.147517
 L 270.767632 481.420575 
 L 244.269013 481.420575 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="belgium__other-unpaid-work">
     <path d="M 270.767632 469.147517 
@@ -1763,7 +1763,7 @@ L 279.990354 469.147517
 L 279.990354 481.420575 
 L 270.767632 481.420575 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="belgium__tv-and-radio">
     <path d="M 279.990354 469.147517 
@@ -1771,7 +1771,7 @@ L 303.189844 469.147517
 L 303.189844 481.420575 
 L 279.990354 481.420575 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="belgium__seeing-friends">
     <path d="M 303.189844 469.147517 
@@ -1779,7 +1779,7 @@ L 312.158537 469.147517
 L 312.158537 481.420575 
 L 303.189844 481.420575 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="belgium__other-leisure">
     <path d="M 312.158537 469.147517 
@@ -1787,7 +1787,7 @@ L 340.286592 469.147517
 L 340.286592 481.420575 
 L 312.158537 481.420575 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="greece__paid-work">
     <path d="M 84.39123 484.48884 
@@ -1795,7 +1795,7 @@ L 118.861437 484.48884
 L 118.861437 496.761898 
 L 84.39123 496.761898 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="greece__education">
     <path d="M 118.861437 484.48884 
@@ -1803,7 +1803,7 @@ L 125.25797 484.48884
 L 125.25797 496.761898 
 L 118.861437 496.761898 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="greece__sleep">
     <path d="M 125.25797 484.48884 
@@ -1811,7 +1811,7 @@ L 214.098709 484.48884
 L 214.098709 496.761898 
 L 125.25797 496.761898 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="greece__eating-and-drinking">
     <path d="M 214.098709 484.48884 
@@ -1819,7 +1819,7 @@ L 236.841938 484.48884
 L 236.841938 496.761898 
 L 214.098709 496.761898 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="greece__personal-care">
     <path d="M 236.841938 484.48884 
@@ -1827,7 +1827,7 @@ L 246.969783 484.48884
 L 246.969783 496.761898 
 L 236.841938 496.761898 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="greece__housework-and-shopping">
     <path d="M 246.969783 484.48884 
@@ -1835,7 +1835,7 @@ L 268.646923 484.48884
 L 268.646923 496.761898 
 L 246.969783 496.761898 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="greece__other-unpaid-work">
     <path d="M 268.646923 484.48884 
@@ -1843,7 +1843,7 @@ L 280.729264 484.48884
 L 280.729264 496.761898 
 L 268.646923 496.761898 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="greece__tv-and-radio">
     <path d="M 280.729264 484.48884 
@@ -1851,7 +1851,7 @@ L 304.005537 484.48884
 L 304.005537 496.761898 
 L 280.729264 496.761898 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="greece__seeing-friends">
     <path d="M 304.005537 484.48884 
@@ -1859,7 +1859,7 @@ L 313.9557 484.48884
 L 313.9557 496.761898 
 L 304.005537 496.761898 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="greece__other-leisure">
     <path d="M 313.9557 484.48884 
@@ -1867,7 +1867,7 @@ L 340.252559 484.48884
 L 340.252559 496.761898 
 L 313.9557 496.761898 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="spain__paid-work">
     <path d="M 84.39123 499.830163 
@@ -1875,7 +1875,7 @@ L 115.622025 499.830163
 L 115.622025 512.103222 
 L 84.39123 512.103222 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="spain__education">
     <path d="M 115.622025 499.830163 
@@ -1883,7 +1883,7 @@ L 120.28373 499.830163
 L 120.28373 512.103222 
 L 115.622025 512.103222 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="spain__sleep">
     <path d="M 120.28373 499.830163 
@@ -1891,7 +1891,7 @@ L 211.907304 499.830163
 L 211.907304 512.103222 
 L 120.28373 512.103222 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="spain__eating-and-drinking">
     <path d="M 211.907304 499.830163 
@@ -1899,7 +1899,7 @@ L 234.21667 499.830163
 L 234.21667 512.103222 
 L 211.907304 512.103222 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="spain__personal-care">
     <path d="M 234.21667 499.830163 
@@ -1907,7 +1907,7 @@ L 243.20243 499.830163
 L 243.20243 512.103222 
 L 234.21667 512.103222 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="spain__housework-and-shopping">
     <path d="M 243.20243 499.830163 
@@ -1915,7 +1915,7 @@ L 268.30926 499.830163
 L 268.30926 512.103222 
 L 243.20243 512.103222 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="spain__other-unpaid-work">
     <path d="M 268.30926 499.830163 
@@ -1923,7 +1923,7 @@ L 284.096483 499.830163
 L 284.096483 512.103222 
 L 268.30926 512.103222 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="spain__tv-and-radio">
     <path d="M 284.096483 499.830163 
@@ -1931,7 +1931,7 @@ L 307.095644 499.830163
 L 307.095644 512.103222 
 L 284.096483 512.103222 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="spain__seeing-friends">
     <path d="M 307.095644 499.830163 
@@ -1939,7 +1939,7 @@ L 316.120708 499.830163
 L 316.120708 512.103222 
 L 307.095644 512.103222 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="spain__other-leisure">
     <path d="M 316.120708 499.830163 
@@ -1947,7 +1947,7 @@ L 340.252581 499.830163
 L 340.252581 512.103222 
 L 316.120708 512.103222 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="france__paid-work">
     <path d="M 84.39123 515.171486 
@@ -1955,7 +1955,7 @@ L 114.607856 515.171486
 L 114.607856 527.444545 
 L 84.39123 527.444545 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="france__education">
     <path d="M 114.607856 515.171486 
@@ -1963,7 +1963,7 @@ L 120.667595 515.171486
 L 120.667595 527.444545 
 L 114.607856 527.444545 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="france__sleep">
     <path d="M 120.667595 515.171486 
@@ -1971,7 +1971,7 @@ L 211.813681 515.171486
 L 211.813681 527.444545 
 L 120.667595 527.444545 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="france__eating-and-drinking">
     <path d="M 211.813681 515.171486 
@@ -1979,7 +1979,7 @@ L 235.402161 515.171486
 L 235.402161 527.444545 
 L 211.813681 527.444545 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="france__personal-care">
     <path d="M 235.402161 515.171486 
@@ -1987,7 +1987,7 @@ L 254.327868 515.171486
 L 254.327868 527.444545 
 L 235.402161 527.444545 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="france__housework-and-shopping">
     <path d="M 254.327868 515.171486 
@@ -1995,7 +1995,7 @@ L 281.087643 515.171486
 L 281.087643 527.444545 
 L 254.327868 527.444545 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="france__other-unpaid-work">
     <path d="M 281.087643 515.171486 
@@ -2003,7 +2003,7 @@ L 288.095464 515.171486
 L 288.095464 527.444545 
 L 281.087643 527.444545 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="france__tv-and-radio">
     <path d="M 288.095464 515.171486 
@@ -2011,7 +2011,7 @@ L 308.324306 515.171486
 L 308.324306 527.444545 
 L 288.095464 527.444545 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="france__seeing-friends">
     <path d="M 308.324306 515.171486 
@@ -2019,7 +2019,7 @@ L 318.132515 515.171486
 L 318.132515 527.444545 
 L 308.324306 527.444545 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="france__other-leisure">
     <path d="M 318.132515 515.171486 
@@ -2027,7 +2027,7 @@ L 340.252553 515.171486
 L 340.252553 527.444545 
 L 318.132515 527.444545 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="italy__paid-work">
     <path d="M 84.39123 530.512809 
@@ -2035,7 +2035,7 @@ L 110.847036 530.512809
 L 110.847036 542.785868 
 L 84.39123 542.785868 
 z
-" style="fill: #c44e52"/>
+" style="fill: #c44e52; opacity: 0.8"/>
    </g>
    <g id="italy__education">
     <path d="M 110.847036 530.512809 
@@ -2043,7 +2043,7 @@ L 115.789159 530.512809
 L 115.789159 542.785868 
 L 110.847036 542.785868 
 z
-" style="fill: #df9ea0"/>
+" style="fill: #df9ea0; opacity: 0.8"/>
    </g>
    <g id="italy__sleep">
     <path d="M 115.789159 530.512809 
@@ -2051,7 +2051,7 @@ L 206.996768 530.512809
 L 206.996768 542.785868 
 L 115.789159 542.785868 
 z
-" style="fill: #8c8c8c"/>
+" style="fill: #8c8c8c; opacity: 0.8"/>
    </g>
    <g id="italy__eating-and-drinking">
     <path d="M 206.996768 530.512809 
@@ -2059,7 +2059,7 @@ L 229.557848 530.512809
 L 229.557848 542.785868 
 L 206.996768 542.785868 
 z
-" style="fill: #aeaeae"/>
+" style="fill: #aeaeae; opacity: 0.8"/>
    </g>
    <g id="italy__personal-care">
     <path d="M 229.557848 530.512809 
@@ -2067,7 +2067,7 @@ L 241.553571 530.512809
 L 241.553571 542.785868 
 L 229.557848 542.785868 
 z
-" style="fill: #dadada"/>
+" style="fill: #dadada; opacity: 0.8"/>
    </g>
    <g id="italy__housework-and-shopping">
     <path d="M 241.553571 530.512809 
@@ -2075,7 +2075,7 @@ L 270.419171 530.512809
 L 270.419171 542.785868 
 L 241.553571 542.785868 
 z
-" style="fill: #937860"/>
+" style="fill: #937860; opacity: 0.8"/>
    </g>
    <g id="italy__other-unpaid-work">
     <path d="M 270.419171 530.512809 
@@ -2083,7 +2083,7 @@ L 282.815492 530.512809
 L 282.815492 542.785868 
 L 270.419171 542.785868 
 z
-" style="fill: #c4b5a8"/>
+" style="fill: #c4b5a8; opacity: 0.8"/>
    </g>
    <g id="italy__tv-and-radio">
     <path d="M 282.815492 530.512809 
@@ -2091,7 +2091,7 @@ L 301.239767 530.512809
 L 301.239767 542.785868 
 L 282.815492 542.785868 
 z
-" style="fill: #4c72b0"/>
+" style="fill: #4c72b0; opacity: 0.8"/>
    </g>
    <g id="italy__seeing-friends">
     <path d="M 301.239767 530.512809 
@@ -2099,7 +2099,7 @@ L 312.852533 530.512809
 L 312.852533 542.785868 
 L 301.239767 542.785868 
 z
-" style="fill: #97add1"/>
+" style="fill: #97add1; opacity: 0.8"/>
    </g>
    <g id="italy__other-leisure">
     <path d="M 312.852533 530.512809 
@@ -2107,28 +2107,28 @@ L 340.252559 530.512809
 L 340.252559 542.785868 
 L 312.852533 542.785868 
 z
-" style="fill: #d8e0ee"/>
+" style="fill: #d8e0ee; opacity: 0.8"/>
    </g>
    <g id="japan__label">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="155.811574" transform="rotate(-0 78.63123 155.811574)">Japan (2021)</text>
    </g>
    <g id="japan__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="114.064037" y="155.811574" transform="rotate(-0 114.064037 155.811574)">334</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="114.064037" y="155.811574" transform="rotate(-0 114.064037 155.811574)">334</text>
    </g>
    <g id="japan__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="190.822436" y="155.811574" transform="rotate(-0 190.822436 155.811574)">7 hours 42 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="190.822436" y="155.811574" transform="rotate(-0 190.822436 155.811574)">7 hours 42 mins</text>
    </g>
    <g id="japan__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="239.951364" y="155.811574" transform="rotate(-0 239.951364 155.811574)">91</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="239.951364" y="155.811574" transform="rotate(-0 239.951364 155.811574)">91</text>
    </g>
    <g id="japan__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="272.555916" y="155.811574" transform="rotate(-0 272.555916 155.811574)">102</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="272.555916" y="155.811574" transform="rotate(-0 272.555916 155.811574)">102</text>
    </g>
    <g id="japan__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="299.385819" y="155.811574" transform="rotate(-0 299.385819 155.811574)">80</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="299.385819" y="155.811574" transform="rotate(-0 299.385819 155.811574)">80</text>
    </g>
    <g id="japan__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="324.172385" y="155.811574" transform="rotate(-0 324.172385 155.811574)">179</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="324.172385" y="155.811574" transform="rotate(-0 324.172385 155.811574)">179</text>
    </g>
    <g id="japan__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="155.811574" transform="rotate(-0 377.28 155.811574)">269 mins</text>
@@ -2137,19 +2137,19 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="171.152897" transform="rotate(-0 78.63123 171.152897)">Mexico (2024)</text>
    </g>
    <g id="mexico__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="111.830254" y="171.152897" transform="rotate(-0 111.830254 171.152897)">309</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="111.830254" y="171.152897" transform="rotate(-0 111.830254 171.152897)">309</text>
    </g>
    <g id="mexico__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="188.176943" y="171.152897" transform="rotate(-0 188.176943 171.152897)">7 hours 50 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="188.176943" y="171.152897" transform="rotate(-0 188.176943 171.152897)">7 hours 50 mins</text>
    </g>
    <g id="mexico__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="236.68185" y="171.152897" transform="rotate(-0 236.68185 171.152897)">76</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="236.68185" y="171.152897" transform="rotate(-0 236.68185 171.152897)">76</text>
    </g>
    <g id="mexico__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="271.824269" y="171.152897" transform="rotate(-0 271.824269 171.152897)">200</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="271.824269" y="171.152897" transform="rotate(-0 271.824269 171.152897)">200</text>
    </g>
    <g id="mexico__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="332.2934" y="171.152897" transform="rotate(-0 332.2934 171.152897)">90</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="332.2934" y="171.152897" transform="rotate(-0 332.2934 171.152897)">90</text>
    </g>
    <g id="mexico__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="171.152897" transform="rotate(-0 377.28 171.152897)">203 mins</text>
@@ -2158,22 +2158,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="186.49422" transform="rotate(-0 78.63123 186.49422)">Canada (2022)</text>
    </g>
    <g id="canada__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="110.976987" y="186.49422" transform="rotate(-0 110.976987 186.49422)">299</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="110.976987" y="186.49422" transform="rotate(-0 110.976987 186.49422)">299</text>
    </g>
    <g id="canada__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="191.053287" y="186.49422" transform="rotate(-0 191.053287 186.49422)">8 hours 47 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="191.053287" y="186.49422" transform="rotate(-0 191.053287 186.49422)">8 hours 47 mins</text>
    </g>
    <g id="canada__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="244.756517" y="186.49422" transform="rotate(-0 244.756517 186.49422)">78</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="244.756517" y="186.49422" transform="rotate(-0 244.756517 186.49422)">78</text>
    </g>
    <g id="canada__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="270.704225" y="186.49422" transform="rotate(-0 270.704225 186.49422)">111</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="270.704225" y="186.49422" transform="rotate(-0 270.704225 186.49422)">111</text>
    </g>
    <g id="canada__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="310.104319" y="186.49422" transform="rotate(-0 310.104319 186.49422)">83</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="310.104319" y="186.49422" transform="rotate(-0 310.104319 186.49422)">83</text>
    </g>
    <g id="canada__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="333.2871" y="186.49422" transform="rotate(-0 333.2871 186.49422)">78</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="333.2871" y="186.49422" transform="rotate(-0 333.2871 186.49422)">78</text>
    </g>
    <g id="canada__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="186.49422" transform="rotate(-0 377.28 186.49422)">211 mins</text>
@@ -2182,22 +2182,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="201.835543" transform="rotate(-0 78.63123 201.835543)">Croatia (2023)</text>
    </g>
    <g id="croatia__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="110.362964" y="201.835543" transform="rotate(-0 110.362964 201.835543)">292</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="110.362964" y="201.835543" transform="rotate(-0 110.362964 201.835543)">292</text>
    </g>
    <g id="croatia__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="185.277848" y="201.835543" transform="rotate(-0 185.277848 201.835543)">8 hours 13 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="185.277848" y="201.835543" transform="rotate(-0 185.277848 201.835543)">8 hours 13 mins</text>
    </g>
    <g id="croatia__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="238.356283" y="201.835543" transform="rotate(-0 238.356283 201.835543)">105</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="238.356283" y="201.835543" transform="rotate(-0 238.356283 201.835543)">105</text>
    </g>
    <g id="croatia__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="268.153599" y="201.835543" transform="rotate(-0 268.153599 201.835543)">116</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="268.153599" y="201.835543" transform="rotate(-0 268.153599 201.835543)">116</text>
    </g>
    <g id="croatia__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="303.992731" y="201.835543" transform="rotate(-0 303.992731 201.835543)">93</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="303.992731" y="201.835543" transform="rotate(-0 303.992731 201.835543)">93</text>
    </g>
    <g id="croatia__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="329.448897" y="201.835543" transform="rotate(-0 329.448897 201.835543)">122</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="329.448897" y="201.835543" transform="rotate(-0 329.448897 201.835543)">122</text>
    </g>
    <g id="croatia__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="201.835543" transform="rotate(-0 377.28 201.835543)">251 mins</text>
@@ -2206,22 +2206,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="217.176866" transform="rotate(-0 78.63123 217.176866)">South Korea (2014)</text>
    </g>
    <g id="south-korea__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="109.941546" y="217.176866" transform="rotate(-0 109.941546 217.176866)">288</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="109.941546" y="217.176866" transform="rotate(-0 109.941546 217.176866)">288</text>
    </g>
    <g id="south-korea__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="187.469182" y="217.176866" transform="rotate(-0 187.469182 217.176866)">7 hours 51 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="187.469182" y="217.176866" transform="rotate(-0 187.469182 217.176866)">7 hours 51 mins</text>
    </g>
    <g id="south-korea__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="239.733592" y="217.176866" transform="rotate(-0 239.733592 217.176866)">117</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="239.733592" y="217.176866" transform="rotate(-0 239.733592 217.176866)">117</text>
    </g>
    <g id="south-korea__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="273.980381" y="217.176866" transform="rotate(-0 273.980381 217.176866)">89</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="273.980381" y="217.176866" transform="rotate(-0 273.980381 217.176866)">89</text>
    </g>
    <g id="south-korea__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="303.426359" y="217.176866" transform="rotate(-0 303.426359 217.176866)">102</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="303.426359" y="217.176866" transform="rotate(-0 303.426359 217.176866)">102</text>
    </g>
    <g id="south-korea__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="330.120879" y="217.176866" transform="rotate(-0 330.120879 217.176866)">114</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="330.120879" y="217.176866" transform="rotate(-0 330.120879 217.176866)">114</text>
    </g>
    <g id="south-korea__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="217.176866" transform="rotate(-0 377.28 217.176866)">258 mins</text>
@@ -2230,22 +2230,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="232.518189" transform="rotate(-0 78.63123 232.518189)">Estonia (2021)</text>
    </g>
    <g id="estonia__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="107.760737" y="232.518189" transform="rotate(-0 107.760737 232.518189)">263</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="107.760737" y="232.518189" transform="rotate(-0 107.760737 232.518189)">263</text>
    </g>
    <g id="estonia__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="182.572515" y="232.518189" transform="rotate(-0 182.572515 232.518189)">8 hours 39 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="182.572515" y="232.518189" transform="rotate(-0 182.572515 232.518189)">8 hours 39 mins</text>
    </g>
    <g id="estonia__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="235.975311" y="232.518189" transform="rotate(-0 235.975311 232.518189)">82</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="235.975311" y="232.518189" transform="rotate(-0 235.975311 232.518189)">82</text>
    </g>
    <g id="estonia__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="263.420347" y="232.518189" transform="rotate(-0 263.420347 232.518189)">121</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="263.420347" y="232.518189" transform="rotate(-0 263.420347 232.518189)">121</text>
    </g>
    <g id="estonia__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="296.617221" y="232.518189" transform="rotate(-0 296.617221 232.518189)">111</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="296.617221" y="232.518189" transform="rotate(-0 296.617221 232.518189)">111</text>
    </g>
    <g id="estonia__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="326.73822" y="232.518189" transform="rotate(-0 326.73822 232.518189)">152</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="326.73822" y="232.518189" transform="rotate(-0 326.73822 232.518189)">152</text>
    </g>
    <g id="estonia__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="232.518189" transform="rotate(-0 377.28 232.518189)">301 mins</text>
@@ -2254,22 +2254,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="247.859512" transform="rotate(-0 78.63123 247.859512)">Sweden (2010)</text>
    </g>
    <g id="sweden__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="107.684129" y="247.859512" transform="rotate(-0 107.684129 247.859512)">262</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="107.684129" y="247.859512" transform="rotate(-0 107.684129 247.859512)">262</text>
    </g>
    <g id="sweden__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="179.407709" y="247.859512" transform="rotate(-0 179.407709 247.859512)">8 hours 3 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="179.407709" y="247.859512" transform="rotate(-0 179.407709 247.859512)">8 hours 3 mins</text>
    </g>
    <g id="sweden__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="229.623746" y="247.859512" transform="rotate(-0 229.623746 247.859512)">83</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="229.623746" y="247.859512" transform="rotate(-0 229.623746 247.859512)">83</text>
    </g>
    <g id="sweden__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="258.729494" y="247.859512" transform="rotate(-0 258.729494 247.859512)">131</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="258.729494" y="247.859512" transform="rotate(-0 258.729494 247.859512)">131</text>
    </g>
    <g id="sweden__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="293.195844" y="247.859512" transform="rotate(-0 293.195844 247.859512)">113</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="293.195844" y="247.859512" transform="rotate(-0 293.195844 247.859512)">113</text>
    </g>
    <g id="sweden__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="326.43896" y="247.859512" transform="rotate(-0 326.43896 247.859512)">155</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="326.43896" y="247.859512" transform="rotate(-0 326.43896 247.859512)">155</text>
    </g>
    <g id="sweden__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="247.859512" transform="rotate(-0 377.28 247.859512)">321 mins</text>
@@ -2278,22 +2278,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="263.200836" transform="rotate(-0 78.63123 263.200836)">Bulgaria (2020)</text>
    </g>
    <g id="bulgaria__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="107.652904" y="263.200836" transform="rotate(-0 107.652904 263.200836)">262</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="107.652904" y="263.200836" transform="rotate(-0 107.652904 263.200836)">262</text>
    </g>
    <g id="bulgaria__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="181.764685" y="263.200836" transform="rotate(-0 181.764685 263.200836)">8 hours 52 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="181.764685" y="263.200836" transform="rotate(-0 181.764685 263.200836)">8 hours 52 mins</text>
    </g>
    <g id="bulgaria__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="241.257982" y="263.200836" transform="rotate(-0 241.257982 263.200836)">137</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="241.257982" y="263.200836" transform="rotate(-0 241.257982 263.200836)">137</text>
    </g>
    <g id="bulgaria__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="275.469218" y="263.200836" transform="rotate(-0 275.469218 263.200836)">141</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="275.469218" y="263.200836" transform="rotate(-0 275.469218 263.200836)">141</text>
    </g>
    <g id="bulgaria__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="306.987079" y="263.200836" transform="rotate(-0 306.987079 263.200836)">108</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="306.987079" y="263.200836" transform="rotate(-0 306.987079 263.200836)">108</text>
    </g>
    <g id="bulgaria__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="333.363598" y="263.200836" transform="rotate(-0 333.363598 263.200836)">78</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="333.363598" y="263.200836" transform="rotate(-0 333.363598 263.200836)">78</text>
    </g>
    <g id="bulgaria__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="263.200836" transform="rotate(-0 377.28 263.200836)">241 mins</text>
@@ -2302,19 +2302,19 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="278.542159" transform="rotate(-0 78.63123 278.542159)">US (2024)</text>
    </g>
    <g id="united-states__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="106.461091" y="278.542159" transform="rotate(-0 106.461091 278.542159)">248</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="106.461091" y="278.542159" transform="rotate(-0 106.461091 278.542159)">248</text>
    </g>
    <g id="united-states__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="181.913342" y="278.542159" transform="rotate(-0 181.913342 278.542159)">9 hours 1 min</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="181.913342" y="278.542159" transform="rotate(-0 181.913342 278.542159)">9 hours 1 min</text>
    </g>
    <g id="united-states__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="263.262037" y="278.542159" transform="rotate(-0 263.262037 278.542159)">129</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="263.262037" y="278.542159" transform="rotate(-0 263.262037 278.542159)">129</text>
    </g>
    <g id="united-states__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="302.120619" y="278.542159" transform="rotate(-0 302.120619 278.542159)">130</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="302.120619" y="278.542159" transform="rotate(-0 302.120619 278.542159)">130</text>
    </g>
    <g id="united-states__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="330.737097" y="278.542159" transform="rotate(-0 330.737097 278.542159)">107</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="330.737097" y="278.542159" transform="rotate(-0 330.737097 278.542159)">107</text>
    </g>
    <g id="united-states__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="278.542159" transform="rotate(-0 377.28 278.542159)">280 mins</text>
@@ -2323,22 +2323,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="293.883482" transform="rotate(-0 78.63123 293.883482)">Luxembourg (2013)</text>
    </g>
    <g id="luxembourg__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="106.354923" y="293.883482" transform="rotate(-0 106.354923 293.883482)">247</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="106.354923" y="293.883482" transform="rotate(-0 106.354923 293.883482)">247</text>
    </g>
    <g id="luxembourg__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="181.009942" y="293.883482" transform="rotate(-0 181.009942 293.883482)">8 hours 38 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="181.009942" y="293.883482" transform="rotate(-0 181.009942 293.883482)">8 hours 38 mins</text>
    </g>
    <g id="luxembourg__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="237.014759" y="293.883482" transform="rotate(-0 237.014759 293.883482)">112</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="237.014759" y="293.883482" transform="rotate(-0 237.014759 293.883482)">112</text>
    </g>
    <g id="luxembourg__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="268.440245" y="293.883482" transform="rotate(-0 268.440245 293.883482)">131</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="268.440245" y="293.883482" transform="rotate(-0 268.440245 293.883482)">131</text>
    </g>
    <g id="luxembourg__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="301.449063" y="293.883482" transform="rotate(-0 301.449063 293.883482)">116</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="301.449063" y="293.883482" transform="rotate(-0 301.449063 293.883482)">116</text>
    </g>
    <g id="luxembourg__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="328.873042" y="293.883482" transform="rotate(-0 328.873042 293.883482)">128</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="328.873042" y="293.883482" transform="rotate(-0 328.873042 293.883482)">128</text>
    </g>
    <g id="luxembourg__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="293.883482" transform="rotate(-0 377.28 293.883482)">276 mins</text>
@@ -2347,22 +2347,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="309.224805" transform="rotate(-0 78.63123 309.224805)">Norway (2022)</text>
    </g>
    <g id="norway__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="105.82542" y="309.224805" transform="rotate(-0 105.82542 309.224805)">241</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="105.82542" y="309.224805" transform="rotate(-0 105.82542 309.224805)">241</text>
    </g>
    <g id="norway__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="178.101384" y="309.224805" transform="rotate(-0 178.101384 309.224805)">8 hours 24 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="178.101384" y="309.224805" transform="rotate(-0 178.101384 309.224805)">8 hours 24 mins</text>
    </g>
    <g id="norway__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="229.205776" y="309.224805" transform="rotate(-0 229.205776 309.224805)">71</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="229.205776" y="309.224805" transform="rotate(-0 229.205776 309.224805)">71</text>
    </g>
    <g id="norway__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="254.15679" y="309.224805" transform="rotate(-0 254.15679 309.224805)">133</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="254.15679" y="309.224805" transform="rotate(-0 254.15679 309.224805)">133</text>
    </g>
    <g id="norway__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="286.390079" y="309.224805" transform="rotate(-0 286.390079 309.224805)">102</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="286.390079" y="309.224805" transform="rotate(-0 286.390079 309.224805)">102</text>
    </g>
    <g id="norway__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="324.41763" y="309.224805" transform="rotate(-0 324.41763 309.224805)">178</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="324.41763" y="309.224805" transform="rotate(-0 324.41763 309.224805)">178</text>
    </g>
    <g id="norway__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="309.224805" transform="rotate(-0 377.28 309.224805)">354 mins</text>
@@ -2371,22 +2371,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="324.566128" transform="rotate(-0 78.63123 324.566128)">New Zealand (2010)</text>
    </g>
    <g id="new-zealand__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="105.801849" y="324.566128" transform="rotate(-0 105.801849 324.566128)">241</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="105.801849" y="324.566128" transform="rotate(-0 105.801849 324.566128)">241</text>
    </g>
    <g id="new-zealand__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="179.095458" y="324.566128" transform="rotate(-0 179.095458 324.566128)">8 hours 46 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="179.095458" y="324.566128" transform="rotate(-0 179.095458 324.566128)">8 hours 46 mins</text>
    </g>
    <g id="new-zealand__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="232.932946" y="324.566128" transform="rotate(-0 232.932946 324.566128)">80</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="232.932946" y="324.566128" transform="rotate(-0 232.932946 324.566128)">80</text>
    </g>
    <g id="new-zealand__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="259.407486" y="324.566128" transform="rotate(-0 259.407486 324.566128)">134</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="259.407486" y="324.566128" transform="rotate(-0 259.407486 324.566128)">134</text>
    </g>
    <g id="new-zealand__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="297.786685" y="324.566128" transform="rotate(-0 297.786685 324.566128)">124</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="297.786685" y="324.566128" transform="rotate(-0 297.786685 324.566128)">124</text>
    </g>
    <g id="new-zealand__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="330.657759" y="324.566128" transform="rotate(-0 330.657759 324.566128)">108</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="330.657759" y="324.566128" transform="rotate(-0 330.657759 324.566128)">108</text>
    </g>
    <g id="new-zealand__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="324.566128" transform="rotate(-0 377.28 324.566128)">301 mins</text>
@@ -2395,22 +2395,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="339.907451" transform="rotate(-0 78.63123 339.907451)">Austria (2022)</text>
    </g>
    <g id="austria__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="105.561396" y="339.907451" transform="rotate(-0 105.561396 339.907451)">238</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="105.561396" y="339.907451" transform="rotate(-0 105.561396 339.907451)">238</text>
    </g>
    <g id="austria__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="177.417255" y="339.907451" transform="rotate(-0 177.417255 339.907451)">8 hours 36 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="177.417255" y="339.907451" transform="rotate(-0 177.417255 339.907451)">8 hours 36 mins</text>
    </g>
    <g id="austria__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="231.746962" y="339.907451" transform="rotate(-0 231.746962 339.907451)">96</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="231.746962" y="339.907451" transform="rotate(-0 231.746962 339.907451)">96</text>
    </g>
    <g id="austria__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="262.33218" y="339.907451" transform="rotate(-0 262.33218 339.907451)">136</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="262.33218" y="339.907451" transform="rotate(-0 262.33218 339.907451)">136</text>
    </g>
    <g id="austria__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="296.00942" y="339.907451" transform="rotate(-0 296.00942 339.907451)">116</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="296.00942" y="339.907451" transform="rotate(-0 296.00942 339.907451)">116</text>
    </g>
    <g id="austria__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="326.037693" y="339.907451" transform="rotate(-0 326.037693 339.907451)">160</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="326.037693" y="339.907451" transform="rotate(-0 326.037693 339.907451)">160</text>
    </g>
    <g id="austria__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="339.907451" transform="rotate(-0 377.28 339.907451)">307 mins</text>
@@ -2419,22 +2419,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="355.248774" transform="rotate(-0 78.63123 355.248774)">UK (2015)</text>
    </g>
    <g id="united-kingdom__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="105.312624" y="355.248774" transform="rotate(-0 105.312624 355.248774)">235</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="105.312624" y="355.248774" transform="rotate(-0 105.312624 355.248774)">235</text>
    </g>
    <g id="united-kingdom__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="176.131766" y="355.248774" transform="rotate(-0 176.131766 355.248774)">8 hours 28 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="176.131766" y="355.248774" transform="rotate(-0 176.131766 355.248774)">8 hours 28 mins</text>
    </g>
    <g id="united-kingdom__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="228.313506" y="355.248774" transform="rotate(-0 228.313506 355.248774)">79</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="228.313506" y="355.248774" transform="rotate(-0 228.313506 355.248774)">79</text>
    </g>
    <g id="united-kingdom__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="257.450581" y="355.248774" transform="rotate(-0 257.450581 355.248774)">133</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="257.450581" y="355.248774" transform="rotate(-0 257.450581 355.248774)">133</text>
    </g>
    <g id="united-kingdom__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="297.809541" y="355.248774" transform="rotate(-0 297.809541 355.248774)">133</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="297.809541" y="355.248774" transform="rotate(-0 297.809541 355.248774)">133</text>
    </g>
    <g id="united-kingdom__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="329.166703" y="355.248774" transform="rotate(-0 329.166703 355.248774)">125</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="329.166703" y="355.248774" transform="rotate(-0 329.166703 355.248774)">125</text>
    </g>
    <g id="united-kingdom__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="355.248774" transform="rotate(-0 377.28 355.248774)">306 mins</text>
@@ -2443,22 +2443,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="370.590097" transform="rotate(-0 78.63123 370.590097)">Germany (2022)</text>
    </g>
    <g id="germany__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="103.851541" y="370.590097" transform="rotate(-0 103.851541 370.590097)">219</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="103.851541" y="370.590097" transform="rotate(-0 103.851541 370.590097)">219</text>
    </g>
    <g id="germany__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="173.249179" y="370.590097" transform="rotate(-0 173.249179 370.590097)">8 hours 32 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="173.249179" y="370.590097" transform="rotate(-0 173.249179 370.590097)">8 hours 32 mins</text>
    </g>
    <g id="germany__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="226.985265" y="370.590097" transform="rotate(-0 226.985265 370.590097)">93</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="226.985265" y="370.590097" transform="rotate(-0 226.985265 370.590097)">93</text>
    </g>
    <g id="germany__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="256.175538" y="370.590097" transform="rotate(-0 256.175538 370.590097)">130</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="256.175538" y="370.590097" transform="rotate(-0 256.175538 370.590097)">130</text>
    </g>
    <g id="germany__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="290.370777" y="370.590097" transform="rotate(-0 290.370777 370.590097)">120</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="290.370777" y="370.590097" transform="rotate(-0 290.370777 370.590097)">120</text>
    </g>
    <g id="germany__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="326.772981" y="370.590097" transform="rotate(-0 326.772981 370.590097)">152</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="326.772981" y="370.590097" transform="rotate(-0 326.772981 370.590097)">152</text>
    </g>
    <g id="germany__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="370.590097" transform="rotate(-0 377.28 370.590097)">341 mins</text>
@@ -2467,22 +2467,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="385.93142" transform="rotate(-0 78.63123 385.93142)">Netherlands (2016)</text>
    </g>
    <g id="netherlands__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="103.725672" y="385.93142" transform="rotate(-0 103.725672 385.93142)">218</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="103.725672" y="385.93142" transform="rotate(-0 103.725672 385.93142)">218</text>
    </g>
    <g id="netherlands__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="172.197008" y="385.93142" transform="rotate(-0 172.197008 385.93142)">8 hours 23 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="172.197008" y="385.93142" transform="rotate(-0 172.197008 385.93142)">8 hours 23 mins</text>
    </g>
    <g id="netherlands__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="227.01925" y="385.93142" transform="rotate(-0 227.01925 385.93142)">114</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="227.01925" y="385.93142" transform="rotate(-0 227.01925 385.93142)">114</text>
    </g>
    <g id="netherlands__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="260.46444" y="385.93142" transform="rotate(-0 260.46444 385.93142)">133</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="260.46444" y="385.93142" transform="rotate(-0 260.46444 385.93142)">133</text>
    </g>
    <g id="netherlands__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="294.321386" y="385.93142" transform="rotate(-0 294.321386 385.93142)">113</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="294.321386" y="385.93142" transform="rotate(-0 294.321386 385.93142)">113</text>
    </g>
    <g id="netherlands__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="328.731702" y="385.93142" transform="rotate(-0 328.731702 385.93142)">130</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="328.731702" y="385.93142" transform="rotate(-0 328.731702 385.93142)">130</text>
    </g>
    <g id="netherlands__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="385.93142" transform="rotate(-0 377.28 385.93142)">315 mins</text>
@@ -2491,22 +2491,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="401.272743" transform="rotate(-0 78.63123 401.272743)">Turkey (2015)</text>
    </g>
    <g id="turkey__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="103.694062" y="401.272743" transform="rotate(-0 103.694062 401.272743)">217</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="103.694062" y="401.272743" transform="rotate(-0 103.694062 401.272743)">217</text>
    </g>
    <g id="turkey__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="173.87284" y="401.272743" transform="rotate(-0 173.87284 401.272743)">8 hours 35 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="173.87284" y="401.272743" transform="rotate(-0 173.87284 401.272743)">8 hours 35 mins</text>
    </g>
    <g id="turkey__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="230.034707" y="401.272743" transform="rotate(-0 230.034707 401.272743)">118</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="230.034707" y="401.272743" transform="rotate(-0 230.034707 401.272743)">118</text>
    </g>
    <g id="turkey__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="261.546689" y="401.272743" transform="rotate(-0 261.546689 401.272743)">138</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="261.546689" y="401.272743" transform="rotate(-0 261.546689 401.272743)">138</text>
    </g>
    <g id="turkey__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="300.507831" y="401.272743" transform="rotate(-0 300.507831 401.272743)">124</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="300.507831" y="401.272743" transform="rotate(-0 300.507831 401.272743)">124</text>
    </g>
    <g id="turkey__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="331.944207" y="401.272743" transform="rotate(-0 331.944207 401.272743)">94</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="331.944207" y="401.272743" transform="rotate(-0 331.944207 401.272743)">94</text>
    </g>
    <g id="turkey__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="401.272743" transform="rotate(-0 377.28 401.272743)">286 mins</text>
@@ -2515,22 +2515,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="416.614066" transform="rotate(-0 78.63123 416.614066)">Finland (2021)</text>
    </g>
    <g id="finland__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="102.855038" y="416.614066" transform="rotate(-0 102.855038 416.614066)">208</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="102.855038" y="416.614066" transform="rotate(-0 102.855038 416.614066)">208</text>
    </g>
    <g id="finland__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="172.136665" y="416.614066" transform="rotate(-0 172.136665 416.614066)">8 hours 27 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="172.136665" y="416.614066" transform="rotate(-0 172.136665 416.614066)">8 hours 27 mins</text>
    </g>
    <g id="finland__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="225.021662" y="416.614066" transform="rotate(-0 225.021662 416.614066)">88</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="225.021662" y="416.614066" transform="rotate(-0 225.021662 416.614066)">88</text>
    </g>
    <g id="finland__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="253.503262" y="416.614066" transform="rotate(-0 253.503262 416.614066)">134</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="253.503262" y="416.614066" transform="rotate(-0 253.503262 416.614066)">134</text>
    </g>
    <g id="finland__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="292.805309" y="416.614066" transform="rotate(-0 292.805309 416.614066)">126</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="292.805309" y="416.614066" transform="rotate(-0 292.805309 416.614066)">126</text>
    </g>
    <g id="finland__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="326.315953" y="416.614066" transform="rotate(-0 326.315953 416.614066)">157</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="326.315953" y="416.614066" transform="rotate(-0 326.315953 416.614066)">157</text>
    </g>
    <g id="finland__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="416.614066" transform="rotate(-0 377.28 416.614066)">330 mins</text>
@@ -2539,22 +2539,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="431.955389" transform="rotate(-0 78.63123 431.955389)">Poland (2023)</text>
    </g>
    <g id="poland__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="102.603582" y="431.955389" transform="rotate(-0 102.603582 431.955389)">205</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="102.603582" y="431.955389" transform="rotate(-0 102.603582 431.955389)">205</text>
    </g>
    <g id="poland__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="168.168047" y="431.955389" transform="rotate(-0 168.168047 431.955389)">8 hours 35 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="168.168047" y="431.955389" transform="rotate(-0 168.168047 431.955389)">8 hours 35 mins</text>
    </g>
    <g id="poland__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="222.805102" y="431.955389" transform="rotate(-0 222.805102 431.955389)">100</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="222.805102" y="431.955389" transform="rotate(-0 222.805102 431.955389)">100</text>
    </g>
    <g id="poland__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="259.585168" y="431.955389" transform="rotate(-0 259.585168 431.955389)">180</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="259.585168" y="431.955389" transform="rotate(-0 259.585168 431.955389)">180</text>
    </g>
    <g id="poland__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="305.071626" y="431.955389" transform="rotate(-0 305.071626 431.955389)">126</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="305.071626" y="431.955389" transform="rotate(-0 305.071626 431.955389)">126</text>
    </g>
    <g id="poland__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="331.635007" y="431.955389" transform="rotate(-0 331.635007 431.955389)">97</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="331.635007" y="431.955389" transform="rotate(-0 331.635007 431.955389)">97</text>
    </g>
    <g id="poland__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="431.955389" transform="rotate(-0 377.28 431.955389)">261 mins</text>
@@ -2563,22 +2563,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="447.296713" transform="rotate(-0 78.63123 447.296713)">South Africa (2010)</text>
    </g>
    <g id="south-africa__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="102.316219" y="447.296713" transform="rotate(-0 102.316219 447.296713)">202</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="102.316219" y="447.296713" transform="rotate(-0 102.316219 447.296713)">202</text>
    </g>
    <g id="south-africa__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="176.278662" y="447.296713" transform="rotate(-0 176.278662 447.296713)">9 hours 13 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="176.278662" y="447.296713" transform="rotate(-0 176.278662 447.296713)">9 hours 13 mins</text>
    </g>
    <g id="south-africa__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="231.850946" y="447.296713" transform="rotate(-0 231.850946 447.296713)">72</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="231.850946" y="447.296713" transform="rotate(-0 231.850946 447.296713)">72</text>
    </g>
    <g id="south-africa__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="263.058401" y="447.296713" transform="rotate(-0 263.058401 447.296713)">140</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="263.058401" y="447.296713" transform="rotate(-0 263.058401 447.296713)">140</text>
    </g>
    <g id="south-africa__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="297.603531" y="447.296713" transform="rotate(-0 297.603531 447.296713)">132</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="297.603531" y="447.296713" transform="rotate(-0 297.603531 447.296713)">132</text>
    </g>
    <g id="south-africa__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="332.077676" y="447.296713" transform="rotate(-0 332.077676 447.296713)">92</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="332.077676" y="447.296713" transform="rotate(-0 332.077676 447.296713)">92</text>
    </g>
    <g id="south-africa__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="447.296713" transform="rotate(-0 377.28 447.296713)">306 mins</text>
@@ -2587,22 +2587,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="462.638036" transform="rotate(-0 78.63123 462.638036)">Hungary (2010)</text>
    </g>
    <g id="hungary__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="102.110228" y="462.638036" transform="rotate(-0 102.110228 462.638036)">199</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="102.110228" y="462.638036" transform="rotate(-0 102.110228 462.638036)">199</text>
    </g>
    <g id="hungary__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="171.555072" y="462.638036" transform="rotate(-0 171.555072 462.638036)">8 hours 26 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="171.555072" y="462.638036" transform="rotate(-0 171.555072 462.638036)">8 hours 26 mins</text>
    </g>
    <g id="hungary__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="225.483772" y="462.638036" transform="rotate(-0 225.483772 462.638036)">101</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="225.483772" y="462.638036" transform="rotate(-0 225.483772 462.638036)">101</text>
    </g>
    <g id="hungary__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="263.021033" y="462.638036" transform="rotate(-0 263.021033 462.638036)">169</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="263.021033" y="462.638036" transform="rotate(-0 263.021033 462.638036)">169</text>
    </g>
    <g id="hungary__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="302.157496" y="462.638036" transform="rotate(-0 302.157496 462.638036)">134</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="302.157496" y="462.638036" transform="rotate(-0 302.157496 462.638036)">134</text>
    </g>
    <g id="hungary__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="330.27409" y="462.638036" transform="rotate(-0 330.27409 462.638036)">112</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="330.27409" y="462.638036" transform="rotate(-0 330.27409 462.638036)">112</text>
    </g>
    <g id="hungary__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="462.638036" transform="rotate(-0 377.28 462.638036)">281 mins</text>
@@ -2611,22 +2611,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="477.979359" transform="rotate(-0 78.63123 477.979359)">Belgium (2013)</text>
    </g>
    <g id="belgium__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="101.668661" y="477.979359" transform="rotate(-0 101.668661 477.979359)">194</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="101.668661" y="477.979359" transform="rotate(-0 101.668661 477.979359)">194</text>
    </g>
    <g id="belgium__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="171.843163" y="477.979359" transform="rotate(-0 171.843163 477.979359)">8 hours 33 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="171.843163" y="477.979359" transform="rotate(-0 171.843163 477.979359)">8 hours 33 mins</text>
    </g>
    <g id="belgium__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="226.158315" y="477.979359" transform="rotate(-0 226.158315 477.979359)">99</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="226.158315" y="477.979359" transform="rotate(-0 226.158315 477.979359)">99</text>
    </g>
    <g id="belgium__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="257.518322" y="477.979359" transform="rotate(-0 257.518322 477.979359)">149</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="257.518322" y="477.979359" transform="rotate(-0 257.518322 477.979359)">149</text>
    </g>
    <g id="belgium__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="291.590099" y="477.979359" transform="rotate(-0 291.590099 477.979359)">131</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="291.590099" y="477.979359" transform="rotate(-0 291.590099 477.979359)">131</text>
    </g>
    <g id="belgium__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="326.222564" y="477.979359" transform="rotate(-0 326.222564 477.979359)">158</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="326.222564" y="477.979359" transform="rotate(-0 326.222564 477.979359)">158</text>
    </g>
    <g id="belgium__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="477.979359" transform="rotate(-0 377.28 477.979359)">339 mins</text>
@@ -2635,22 +2635,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="493.320682" transform="rotate(-0 78.63123 493.320682)">Greece (2014)</text>
    </g>
    <g id="greece__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="101.626334" y="493.320682" transform="rotate(-0 101.626334 493.320682)">194</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="101.626334" y="493.320682" transform="rotate(-0 101.626334 493.320682)">194</text>
    </g>
    <g id="greece__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="169.67834" y="493.320682" transform="rotate(-0 169.67834 493.320682)">8 hours 20 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="169.67834" y="493.320682" transform="rotate(-0 169.67834 493.320682)">8 hours 20 mins</text>
    </g>
    <g id="greece__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="225.470324" y="493.320682" transform="rotate(-0 225.470324 493.320682)">128</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="225.470324" y="493.320682" transform="rotate(-0 225.470324 493.320682)">128</text>
    </g>
    <g id="greece__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="257.808353" y="493.320682" transform="rotate(-0 257.808353 493.320682)">122</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="257.808353" y="493.320682" transform="rotate(-0 257.808353 493.320682)">122</text>
    </g>
    <g id="greece__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="292.3674" y="493.320682" transform="rotate(-0 292.3674 493.320682)">131</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="292.3674" y="493.320682" transform="rotate(-0 292.3674 493.320682)">131</text>
    </g>
    <g id="greece__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="327.104129" y="493.320682" transform="rotate(-0 327.104129 493.320682)">148</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="327.104129" y="493.320682" transform="rotate(-0 327.104129 493.320682)">148</text>
    </g>
    <g id="greece__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="493.320682" transform="rotate(-0 377.28 493.320682)">335 mins</text>
@@ -2659,22 +2659,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="508.662005" transform="rotate(-0 78.63123 508.662005)">Spain (2010)</text>
    </g>
    <g id="spain__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="100.006628" y="508.662005" transform="rotate(-0 100.006628 508.662005)">176</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="100.006628" y="508.662005" transform="rotate(-0 100.006628 508.662005)">176</text>
    </g>
    <g id="spain__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="166.095517" y="508.662005" transform="rotate(-0 166.095517 508.662005)">8 hours 36 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="166.095517" y="508.662005" transform="rotate(-0 166.095517 508.662005)">8 hours 36 mins</text>
    </g>
    <g id="spain__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="223.061987" y="508.662005" transform="rotate(-0 223.061987 508.662005)">126</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="223.061987" y="508.662005" transform="rotate(-0 223.061987 508.662005)">126</text>
    </g>
    <g id="spain__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="255.755845" y="508.662005" transform="rotate(-0 255.755845 508.662005)">141</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="255.755845" y="508.662005" transform="rotate(-0 255.755845 508.662005)">141</text>
    </g>
    <g id="spain__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="295.596063" y="508.662005" transform="rotate(-0 295.596063 508.662005)">129</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="295.596063" y="508.662005" transform="rotate(-0 295.596063 508.662005)">129</text>
    </g>
    <g id="spain__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="328.186644" y="508.662005" transform="rotate(-0 328.186644 508.662005)">136</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="328.186644" y="508.662005" transform="rotate(-0 328.186644 508.662005)">136</text>
    </g>
    <g id="spain__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="508.662005" transform="rotate(-0 377.28 508.662005)">316 mins</text>
@@ -2683,22 +2683,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="524.003328" transform="rotate(-0 78.63123 524.003328)">France (2010)</text>
    </g>
    <g id="france__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="99.499543" y="524.003328" transform="rotate(-0 99.499543 524.003328)">170</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="99.499543" y="524.003328" transform="rotate(-0 99.499543 524.003328)">170</text>
    </g>
    <g id="france__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="166.240638" y="524.003328" transform="rotate(-0 166.240638 524.003328)">8 hours 33 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="166.240638" y="524.003328" transform="rotate(-0 166.240638 524.003328)">8 hours 33 mins</text>
    </g>
    <g id="france__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="223.607921" y="524.003328" transform="rotate(-0 223.607921 524.003328)">133</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="223.607921" y="524.003328" transform="rotate(-0 223.607921 524.003328)">133</text>
    </g>
    <g id="france__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="267.707756" y="524.003328" transform="rotate(-0 267.707756 524.003328)">151</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="267.707756" y="524.003328" transform="rotate(-0 267.707756 524.003328)">151</text>
    </g>
    <g id="france__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="298.209885" y="524.003328" transform="rotate(-0 298.209885 524.003328)">114</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="298.209885" y="524.003328" transform="rotate(-0 298.209885 524.003328)">114</text>
    </g>
    <g id="france__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="329.192534" y="524.003328" transform="rotate(-0 329.192534 524.003328)">124</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="329.192534" y="524.003328" transform="rotate(-0 329.192534 524.003328)">124</text>
    </g>
    <g id="france__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="524.003328" transform="rotate(-0 377.28 524.003328)">294 mins</text>
@@ -2707,22 +2707,22 @@ z
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="78.63123" y="539.344651" transform="rotate(-0 78.63123 539.344651)">Italy (2014)</text>
    </g>
    <g id="italy__paid-work-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="97.619133" y="539.344651" transform="rotate(-0 97.619133 539.344651)">149</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="97.619133" y="539.344651" transform="rotate(-0 97.619133 539.344651)">149</text>
    </g>
    <g id="italy__sleep-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="161.392964" y="539.344651" transform="rotate(-0 161.392964 539.344651)">8 hours 33 mins</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="161.392964" y="539.344651" transform="rotate(-0 161.392964 539.344651)">8 hours 33 mins</text>
    </g>
    <g id="italy__eating-and-drinking-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="218.277308" y="539.344651" transform="rotate(-0 218.277308 539.344651)">127</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="218.277308" y="539.344651" transform="rotate(-0 218.277308 539.344651)">127</text>
    </g>
    <g id="italy__housework-and-shopping-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="255.986371" y="539.344651" transform="rotate(-0 255.986371 539.344651)">162</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="255.986371" y="539.344651" transform="rotate(-0 255.986371 539.344651)">162</text>
    </g>
    <g id="italy__tv-and-radio-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="292.027629" y="539.344651" transform="rotate(-0 292.027629 539.344651)">104</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="292.027629" y="539.344651" transform="rotate(-0 292.027629 539.344651)">104</text>
    </g>
    <g id="italy__other-leisure-value">
-    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #444444" x="326.552546" y="539.344651" transform="rotate(-0 326.552546 539.344651)">154</text>
+    <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #2d2e2d" x="326.552546" y="539.344651" transform="rotate(-0 326.552546 539.344651)">154</text>
    </g>
    <g id="italy__total-leisure">
     <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="377.28" y="539.344651" transform="rotate(-0 377.28 539.344651)">323 mins</text>
@@ -2738,9 +2738,9 @@ z
    <text style="font-size: 18px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #2d2e2d" x="11.52" y="24.623438" transform="rotate(-0 11.52 24.623438)">How do people spend their time?</text>
   </g>
   <g id="subtitle">
-   <text style="font-size: 11.52px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #5b5b5b" transform="translate(11.52 49.5918)">Averages of minutes per day, from time-use surveys run between 2010</text>
-   <text style="font-size: 11.52px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #5b5b5b" transform="translate(11.52 61.975013)">and 2024, for people aged 15 to 64. Each country's survey year is shown</text>
-   <text style="font-size: 11.52px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #5b5b5b" transform="translate(11.52 74.1915)">in brackets.</text>
+   <text style="font-size: 11.52px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #5b5b5b" transform="translate(11.52 49.5918)">Average minutes per day, from time-use surveys run between 2010 and</text>
+   <text style="font-size: 11.52px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #5b5b5b" transform="translate(11.52 61.8489)">2024. Estimates cover people aged 15 to 64, and each country's survey</text>
+   <text style="font-size: 11.52px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #5b5b5b" transform="translate(11.52 74.065388)">year is shown in brackets.</text>
   </g>
   <g id="data-source">
    <text style="font-size: 10.08px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="561.744225" transform="rotate(-0 11.52 561.744225)">Data source: OECD (2026)</text>
@@ -2776,10 +2776,10 @@ z
    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #cf6e71" x="148.081172" y="98.05185" transform="rotate(-0 148.081172 98.05185)">Education</text>
   </g>
   <g id="category__personal-care">
-   <text style="font-weight: 700; font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #8c8c8c" x="39.142813" y="111.33185" transform="rotate(-0 39.142813 111.33185)">Personal care:</text>
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #757575" x="39.142813" y="111.33185" transform="rotate(-0 39.142813 111.33185)">Personal care:</text>
   </g>
   <g id="header__sleep">
-   <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #8c8c8c" x="79.40625" y="111.42935" transform="rotate(-0 79.40625 111.42935)">Sleep</text>
+   <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #757575" x="79.40625" y="111.42935" transform="rotate(-0 79.40625 111.42935)">Sleep</text>
   </g>
   <g id="header__sleep-separator">
    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #777777" x="93.281406" y="111.33185" transform="rotate(-0 93.281406 111.33185)">·</text>
@@ -2794,10 +2794,10 @@ z
    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #ababab" x="174.414219" y="111.33185" transform="rotate(-0 174.414219 111.33185)">Other</text>
   </g>
   <g id="category__unpaid-work-other">
-   <text style="font-weight: 700; font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #937860" x="52.022188" y="124.70935" transform="rotate(-0 52.022188 124.70935)">Unpaid work &amp; other:</text>
+   <text style="font-weight: 700; font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #8a715a" x="52.022188" y="124.70935" transform="rotate(-0 52.022188 124.70935)">Unpaid work &amp; other:</text>
   </g>
   <g id="header__housework-and-shopping">
-   <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #937860" x="135.928672" y="124.70935" transform="rotate(-0 135.928672 124.70935)">Housework &amp; shopping</text>
+   <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #8a715a" x="135.928672" y="124.70935" transform="rotate(-0 135.928672 124.70935)">Housework &amp; shopping</text>
   </g>
   <g id="header__housework-and-shopping-separator">
    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #777777" x="180.5675" y="124.61185" transform="rotate(-0 180.5675 124.61185)">·</text>
