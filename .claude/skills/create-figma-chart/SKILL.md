@@ -28,21 +28,25 @@ Three sibling skills do the text work this one depends on, and Step 8c calls the
 
 Each year gets a new file. For **2026** the file key is `s6Sv60bakebRRW2TxsMQbF` ([Charts (2026)](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-)). **If the current year is not 2026, ask the user for that year's file link and re-verify every node id below** (the templates page is named " 📑 Templates" — note the leading space).
 
-**Last verified: 2026-08-17. Re-verify the geometry at the start of every run** rather than trusting this table — the design team edits these frames in place, and edits that move a chart area's edge have landed days apart. A page laid out against stale numbers still renders and still passes every check in Step 8c; it just doesn't match the frame it was cloned from. Three days was enough for both Instagram footers to be rebuilt as auto-layout under new ids, so re-verify **structure**, not only numbers.
+**Last verified: 2026-08-19. Re-verify the geometry at the start of every run** rather than trusting this table — the design team edits these frames in place, and edits that move a chart area's edge have landed days apart. A page laid out against stale numbers still renders and still passes every check in Step 8c; it just doesn't match the frame it was cloned from. Three days was enough for both Instagram footers to be rebuilt as auto-layout under new ids, so re-verify **structure**, not only numbers.
+
+**The header is a flat auto-layout of `[title, subtitle]`, and the logo is its SIBLING, not its child** — a `logo` FRAME on the 540-wide set and Instagram, a `Logos/Our World in Data/36px` INSTANCE on the 850-wide pair. So the logo does **not** contribute to the header's height, and the band moves with the text alone. What still keeps the title clear of it is the title node's own width: it is sized narrower than the content box (**737.84** on Static Vertical, **428** on the 540-wide set, against content widths of 818 and 508). Measure a candidate title against *that* number, never against the content width — see the orphan rule in Step 6.
+
+**Resolve the header and footer structurally — topmost/bottommost auto-layout child — never by name.** Frame names here are not stable across design edits; a whole generation of them (`Frame 14`, `Frame 5`, `header`) has already been replaced by `Frame 20`/`23`/`26`/`27`/`28`/`29`/`36`. The structural resolver in `verify_templates.js` and in the Step 7 snippet is immune to that; every name-based lookup silently returns `null` and takes a `cannot read property of null` with it.
 
 Run [`scripts/verify_templates.js`](scripts/verify_templates.js) through `use_figma` — it measures every template in the table below in one call (size, frame fill, content box, header band, footer id/name/`layoutMode`/rows) and is what the notes here were last written from. Diff its output against this table before you clone anything.
 
 | What | Node | Size | Notes |
 |---|---|---|---|
 | Templates page | `798:54` | — | all templates + instruction frames live here. **The arrows, flags, animals, no-data and checklist ids below are *pages*, not nodes on this one** — they sit at page indices 2–7 |
-| InstagramPost_Template_English | `798:161` | 540×540 | two-row footer, **`Frame 17` (`25518:14`)** @ y=488, h=36 — source (y=0, h=16) then `Frame 16` (y=20) carrying `OurWorldinData.org/[Topic]` and CC BY. **Rebuilt as VERTICAL auto-layout on 2026-08-17**, replacing the plain `Frame 12` this table used to name |
-| InstagramPost_Template_Portrait_English | `6689:8` | 560×700 | footer **`Frame 19` (`25518:16`)** @ y=640, h=36 — a Note row (y=0, h=17) then `Frame 18` (y=20); **also rebuilt as VERTICAL auto-layout on 2026-08-17**, replacing `6689:9`. Header `header` (`6913:14`) is a vertical auto-layout over a `title row`, matching the square's `Frame 14`/`Frame 13`; unlike the 850-wide pair its wrappers carry **no** inner padding, so its frame band and text band are the same number |
+| InstagramPost_Template_English | `798:161` | 540×540 | two-row footer, **`Frame 17` (`25518:14`)** @ y=488, h=36 — source (y=0, h=16) then `Frame 16` (y=20) carrying `OurWorldinData.org/[Topic]` and CC BY. VERTICAL auto-layout. Header `Frame 28` |
+| InstagramPost_Template_Portrait_English | `6689:8` | 560×700 | footer **`Frame 19` (`25518:16`)** @ y=640, h=36 — a Note row (y=0, h=17) then `Frame 18` (y=20), VERTICAL auto-layout. Header `Frame 29`, h=114, hugs its text |
 | InstagramReel_template | `7336:8` | 616×1096 | has top/bottom no-go zones; contains a worked small-multiples example |
-| DI_Template | `6799:1859` | 540×540 | **one**-row footer (`Frame 12` @ y=508): source + CC BY |
+| DI_Template | `6799:1859` | 540×540 | **one**-row footer, **`Frame 37`** @ y=508, h=16: source + CC BY. HORIZONTAL auto-layout |
 | Static Chart Template_Mobile (example 1) | `24590:20` | 540×540 | **two**-row footer (`Frame 15` `25343:276` @ y=486, h=38): `Data source:` then `Licensed under CC-BY by the author […]`, both full width |
 | Static Chart Template_Mobile (example 2) | `24590:32` | 540×824 | taller variant — use when the chart needs vertical room. Same two-row `Frame 15` (`25343:275` @ y=770) |
-| Static Chart Template_Horizontal | `5332:75` | 850×638 | footer `Frame 8` (**`25398:769`**) @ y=542.62, h=95.22: Note (y=16, h=28), Data source (y=48, h=14), then `Frame 7` (y=66) carrying the OWID tagline and "Licensed under CC-BY by the author [Name]" |
-| Static Chart Template_Vertical | `5332:93` | 850×1095 | same slots and the same `Frame 8` structure (`5332:101` @ y=999.81), same header/footer auto-layout wrappers, same 16px subtitle. **The pair's header bands are now identical at 134.22** — the 30px-vs-29px title line height that used to make this one 136 is gone, so don't expect a Vertical/Horizontal difference there any more |
+| Static Chart Template_Horizontal | `5332:75` | 850×638 | header `Frame 20`; footer **`Frame 22` (`25808:13`)** @ y=559, **h=63**: Note (y=0, h=28), Data source (y=32, h=14), then `Frame 21` (y=50, h=13) carrying the OWID tagline and "Licensed under CC-BY by the author [Name]". No inner padding on either wrapper |
+| Static Chart Template_Vertical | `5332:93` | 850×1095 | header `Frame 23`; footer **`Frame 25` (`25808:16`)** @ y=1015.81, h=63, same three rows. Header bands identical to the Horizontal at **118**. Note its header is **817.57** wide against the footer's **818** — a 0.43px mismatch in the template, so an ink-span check reports a 0.43px right-hand breach that is not yours |
 | **`small-chart-template-guided`** | **`25344:1357`** | 302 × free | title + optional subtitle, no source row — see [SMALL-CHARTS.md](SMALL-CHARTS.md) |
 | **`small-chart-template-pull`** | **`25344:1391`** | 302 × free | the same plus a mandatory source row — see [SMALL-CHARTS.md](SMALL-CHARTS.md) |
 | `"SMALL" Charts` section heading | `25344:1235` | — | "featured on the OWID website as guided and PULL charts" |
@@ -51,6 +55,20 @@ Run [`scripts/verify_templates.js`](scripts/verify_templates.js) through `use_fi
 | Flags | `2654:5` | — | Flags **plugin** — manual; US flags provided in the file |
 | Animals | `5336:5` | — | chicken, rooster, turkey, fish, cow, egg-laying hen, pig |
 | Good Data Viz Checklist | `20729:1027` | — | distilled in GUIDELINES.md |
+
+### Header sizing, and the one property that decides whether the band moves
+
+**Every template's header hugs its text** — `primaryAxisSizingMode: "AUTO"`, with both the title and the subtitle at `textAutoResize: "HEIGHT"` and `layoutSizingVertical: "HUG"`. So the band's top edge tracks the copy you write, and a one-line title plus a one-line subtitle takes Static Vertical's `headerBottom` from the placeholder's 118 down to **70**.
+
+Check that rather than assume it, because the failure mode is silent and costs a lot of chart. A header left at `FIXED` with a `FILL` / `layoutGrow: 1` child does **not** reflow: `headerBottom` stays at the placeholder's value however short the copy is, and the slack is absorbed by the flexible child's *box* instead — a one-line title leaves the subtitle's box 67px tall for 19px of ink, and fitting to the frame band then buries ~48px of dead air under the subtitle. Nothing renders wrong, so it survives a screenshot; the tell is a subtitle whose `height` is much larger than its line count justifies.
+
+```js
+// what a hugging header reports — assert this on the clone before measuring the band
+header.primaryAxisSizingMode === "AUTO"
+header.children.every(c => c.layoutSizingVertical === "HUG" && c.textAutoResize === "HEIGHT")
+```
+
+`verify_templates.js` reports this as `headerSizing.reflows`, which is the cheapest place to catch it: a `false` there means the band you are about to fit into is a constant, not a measurement. If you meet one, fix your **clone** (set the three properties above), never the shared template, and say so in your report.
 
 ### Slot sizes per family, measured 2026-08-17
 
@@ -66,7 +84,9 @@ The per-slot *positions* for the four static templates live in [`/create-static-
 | IG reel (616) | 28 | 18 | — | 15 | — | 15 |
 | Small guided / pull (302) | **16** | **11** | — | 11 (pull only) | — | — |
 
-Two traps in that table. The 850-wide pair's **12px note and source** are the smallest body text of any family, so a source line that overruns there cannot be fixed by dropping a size the way a 14px one can. And its **license shares a row with the 467px tagline inside 818px** — the slot holds roughly fifty characters, so a two-author credit overruns the tagline and prints on top of it; the phrasing gives (`by <names>` rather than `by the authors <names>`), never the names. TEMPLATES.md carries the measured widths.
+Two traps in that table. The 850-wide pair's **12px note and source** are the smallest body text of any family, so a source line that overruns there cannot be fixed by dropping a size the way a 14px one can. And its **license shares a row with the 467px tagline inside 818px** — the slot holds roughly fifty characters, so a two-author credit overruns the tagline and prints on top of it; the phrasing gives (`by <names>` rather than `by the authors <names>`), never the names. When even that overruns, break the line yourself with `\n` after `by` rather than letting it wrap or dropping a size — the wrap point is then a decision instead of an accident, and both lines carry real content. TEMPLATES.md carries the measured widths.
+
+**In that credit, bold the names and nothing else.** The template ships one bold run (`[Name of author]`), so writing several names into it bolds the connectives too and the line reads as `Pablo Arriagada, Hannah Ritchie **and** Pablo Rosado`. Set the joining word back to an unbolded weight, the same way `Licensed under` and `by` are unbolded — the bold is doing one job, marking who is credited, and a bold `and` makes it look like part of a name.
 
 **Two Spanish Instagram post templates sit beside the English ones on that page. They are no longer used and may be deleted** — never target one, and don't read their absence from this table as an omission to fix.
 
@@ -112,6 +132,16 @@ Use the vector read for *what* (weights, colors, caps, which nodes exist) and th
 **Assume the page is stale, because on a five-page run every one of them was.** Six weeks was enough for: revised values (`$1,394 → $1,331`, `$357 → $330`), a **rounded label that flips** (`0.849%` now prints `0.8%` where the page says `0.9%`), and tick labels grapher has since started dropping at that width. Most importantly, **a claim can go stale, not just a number** — "spend around 60 times as much" was 59× when the page was made and is **62.9×** now, so a faithful recreation reproduces a sentence that is no longer true. Diff the fresh export's texts and values against the page *before* the Step 4 proposal, list what moved, and put any claim that no longer holds in front of the user as a decision rather than quietly copying it.
 
 **When a designer reworks a page you shipped, that rework is the next version of this file.** It is the only feedback on this skill that comes with the answer attached, and it is cheap to read: the page keeps just the surviving frame, so diff it against what you left. Do it with a `use_figma` property dump, not a screenshot — at 540px the changes that matter are invisible. Six classes are worth checking every time, and on one page five of them had moved: **nodes that disappeared** (a whole legend group), **nodes that appeared** (leader arrows), **text content** (a restored category name, a shortened entity, a rewritten subtitle), **fills and their bound styles** (a color moved from the `Default Palette` group to the darker `Line and Slope Charts` one), **sizes and text styles**, and **the frame name**. For each delta ask what constraint the designer was solving, not what they preferred — that is the part that generalizes to the next chart. Then write it here.
+
+**Feedback also arrives as loose nodes on your own page, and it is easy to walk straight past.** A designer will duplicate your frame, edit the copy, and drop a bare TEXT node beside it rather than open a comment — which means it is invisible to `get_screenshot` on the frame you are working on, and invisible to any check scoped to that frame. **So list the page's children at the start of every resumed run**, and read anything that is not yours as feedback: a second frame with your slug, a stray TEXT block, a rearranged copy. Two things follow from finding one:
+
+- **A duplicate frame carrying your slug is an export-filename collision** (Step 9's "exactly one frame carries the bare slug"). Rename theirs rather than deleting it — it is their work — and ask before removing it.
+- **The reworked copy is a more precise spec than the note beside it.** A note saying "remove the smaller values to declutter" does not say where the line is; diffing the copy showed the cut was exactly at 110,000 t, and that every country *name* was kept while only the values went. Read the rule off the geometry, then state the rule back when you report, so it can be corrected if you inferred it wrong.
+
+**Two mechanical consequences of shortening or deleting labels, both of which the designer's own copy will usually still have:**
+
+- **A shortened label shrinks the chart group, and the fix is a wider render, not a rescale.** Abbreviating `1.3 million tonnes` to `1.3M t` across a sankey took the group from 817.6 to 758.6 — 59px, and the same 59px on the 540-wide frame, because the saving is a text width and does not scale with the frame. The chart then no longer spans the content box. Re-render with the container widened by exactly that measured deficit (852 → 911 here) and re-apply the edits; the extra width goes to the plot, since the label columns are sized by their text. Scaling the group up instead would take every label off the 12px ladder.
+- **Deleting one half of a two-line label leaves the survivor off-centre.** Grapher and these components centre a `name` + `value` pair as a block, so each line sits ~7.5px either side of the mark's centre. Remove the value and the name keeps its offset, hanging above the node with nothing to balance it — uniform across every affected row, which is exactly why it reads as deliberate and survives a screenshot. Re-centre any label left alone on its mark, and leave the surviving pairs untouched.
 
 **Hand-rounded value labels are house practice on a DI bar chart — expect them and reproduce them.** Both bar-chart references replace grapher's precision with story precision (`1.03% → 1%`, `$7,298 → $7,300`, `$116 → $120`), which means the image deliberately disagrees with the interactive chart. Keep the rounding consistent within a chart, keep a second digit only where 1 dp would collapse two visibly different bars into the same label (`0.35%` beside `0.3%`), and record it as an accepted deviation — it is the kind of thing a later audit reads as an error.
 
@@ -278,7 +308,7 @@ await figma.setCurrentPageAsync(page)
 
 2. **Clone the template frame(s)** onto the new page: `(await figma.getNodeByIdAsync("<template-id>")).clone()`, then `page.appendChild(clone)` and position it.
 
-   For a **302-wide small or pull chart**, clone `25344:1357` (guided) or `25344:1391` (pull) — the choice is the Step 2 answer, not a judgement. Those two templates keep their frame fill at `visible: false` and paint the background from a fixed 302×233 vector instead, so **turn the frame's own white fill on and remove the vector** — deleting the vector alone leaves a transparent frame, and keeping it under-covers a taller frame. A `chart-rows` block is 3–5 rows, so expect a *set* of frames on one page. SMALL-CHARTS.md → In Figma has the rest.
+   For a **302-wide small or pull chart**, clone `25344:1357` (guided) or `25344:1391` (pull) — the choice is the Step 2 answer, not a judgement. Both now carry a real visible white frame fill and no background vector, so there is nothing to repair before you start; check that still holds rather than assuming, since a hidden fill plus a fixed-size backing vector is exactly what a taller frame under-covers. A `chart-rows` block is 3–5 rows, so expect a *set* of frames on one page. SMALL-CHARTS.md → In Figma has the rest.
 
 3. **Import the original SVG with `upload_assets`** — never `createNodeFromSvg` (the `use_figma` code param caps at 50k chars; a grapher SVG is ~165 KB). `upload_assets` returns a single-use `submitUrl`; POST the file to it and keep the returned `placedOnNodeId`. **Only the original at this stage** — the embed has not been exported yet (Step 3), and it arrives in Step 7 once the band is measurable:
 
@@ -333,7 +363,7 @@ Replace the lorem-ipsum text nodes in the cloned template. Source everything fro
 
   Do **not** do any of this from the indicator's prose: `descriptionKey` said Gapminder covers 1800–2015 and UN IGME "some countries from 1932", which sounds like both contribute and does not tell you which wins where. Record the drop as a deliberate deviation, note that the interactive chart's footer will still list both, and re-measure the footer afterwards — a shorter line can collapse a planned two-row footer back to the template's single row, which is worth ~20px of chart.
 
-  > **First check whether the template already gives the source its own row — the static mobile ones do.** `Frame 15` on both static mobile templates is a two-row block, 38px tall, with `Data source:` and the license each on their own full-width row at `x=0`. There is nothing to rearrange there, and running the manoeuvre below on one of those clones adds a **third** row. The recipe applies to the genuinely one-row footers — `DI_Template`'s `Frame 12` at y=508. The Instagram templates are already two-row for their own reasons (the `OurWorldinData.org/[Topic]` line).
+  > **First check whether the template already gives the source its own row — the static mobile ones do.** `Frame 15` on both static mobile templates is a two-row block, 38px tall, with `Data source:` and the license each on their own full-width row at `x=0`. There is nothing to rearrange there, and running the manoeuvre below on one of those clones adds a **third** row. The recipe applies to the genuinely one-row footers — `DI_Template`'s `Frame 37` at y=508. The Instagram templates are already two-row for their own reasons (the `OurWorldinData.org/[Topic]` line).
   >
   > Step 7's `footerTop = footer.y + Math.min(0, source.y)` needs no change for the shipped two-row frame: `source.y` is 0 there, so it returns `footer.y`, which is correct. Don't "fix" it.
 
@@ -357,7 +387,17 @@ Replace the lorem-ipsum text nodes in the cloned template. Source everything fro
 - **`OurWorldinData.org/[Topic]`** → the confirmed topic path (e.g. `OurWorldinData.org/child-mortality`).
 - **CC BY** stays on the DI and Instagram templates. The static templates — desktop **and mobile** — instead carry `Licensed under CC-BY by the author <Name>`, the author of the piece from Step 2, not the page-name credit. On static mobile that line is the second row of `Frame 15` and reads `Licensed under CC-BY by the author [Name of author]` in the template.
 
-**Changing a footer row's line count moves the band, and on both 850-wide templates the re-spacing happens for you.** Their footers are bottom-pinned auto-layout `Frame 8`s (`constraints.vertical = "MAX"`, every child flowed), so tightening a two-line note to one line lets the rows beneath it close up on their own: measured on throwaway clones of both, the note→source gap held at 5.41 and the license kept its bottom edge, while the footer's top edge moved down 14px.
+**Changing a footer row's line count moves the band, and the re-spacing happens for you — but the growth direction does not.** Every footer is auto-layout with its children flowed, so tightening a two-line note to one line lets the rows beneath it close up on their own. Which edge stays put is `constraints.vertical`, and **almost every footer is `MIN`** — it keeps its *top* and grows **downward, out of the frame**, so a note that gains a line or a license that wraps to two simply renders below the artboard. Nothing errors and nothing clips. Measured 2026-08-19: `MIN` on IG square, IG portrait, DI, static mobile 2 and both 850-wide templates; **`MAX` on static mobile 1 alone**. Do not infer it from the family — read it.
+
+So re-pin the bottom by hand after any edit that changes a footer's height:
+
+```js
+const FOOTER_BOTTOM = footer.y + footer.height;   // read BEFORE editing the rows
+// ... edit the note / license ...
+footer.y = FOOTER_BOTTOM - footer.height;         // keep the designed bottom edge
+```
+
+Read `FOOTER_BOTTOM` off the clone rather than typing it — it is 1078.81 on Static Vertical and 622 on Static Horizontal, both ~16px above the frame's own bottom edge. It is harmless to apply on a `MAX` footer (there it is a no-op), so make it unconditional rather than branching on the constraint.
 
 **Check that structure rather than assuming it — a footer with loose children does not reflow.** The tell is `footer.layoutMode === "NONE"`, or a child reporting `layoutPositioning === "ABSOLUTE"`, and an old clone of a since-restructured template is the usual way to meet one. There a shrinking note leaves the rows put and opens the note→source gap to **19.41px** while source→tagline stays 5.41. When you find one, re-space by hand and **take the designed gap from a pair of rows you did not touch** — source → tagline — rather than from the template's nominal `y` values, which encode the two-line assumption:
 
@@ -746,8 +786,8 @@ Side margins and the footer edge are the template's, not yours: content starts a
 | Static mobile example 1 (540×540) | x=16, w=508 | 118 → 486 (2-row `Frame 15`) |
 | Static mobile example 2 (540×824) | x=16, w=508 | 118 → 770 (2-row `Frame 15`) |
 | IG portrait (560×700) | x=26, w=508 | 135 → 640 |
-| Static Horizontal (850×638) | x=16, w=818 | **134.22 → 542.62** (frame band; the 118 → 556 this row used to give was the text band) |
-| Static Vertical (850×1095) | x=16, w=818 | **134.22 → 999.81** (frame band; was documented as 136 → 997) |
+| Static Horizontal (850×638) | x=16, w=818 | **118 → 559** |
+| Static Vertical (850×1095) | x=16, w=**817.57** (header) / 818 (footer) | **118 → 1015.81** |
 | Small / pull chart (302 × free) | **x=12, w=278** | 44 → `H − 10` (guided) or `H − 23` (pull) — see below |
 
 DI and static mobile get their own rows above because their bands differ, even though both frames are 540×540.
@@ -760,29 +800,29 @@ DI and static mobile get their own rows above because their bands differ, even t
 | IG square (540) | 38 | 118 | 19 | **99** | 19 |
 | Static mobile 1 & 2 (540) | 38 | 118 | 19 | **99** | 19 |
 | IG portrait (560) | 44 | 135 | 22 | **113** | 22 |
-| Static Horizontal (850) | 38 | 134.22 | 19 | **115.22** | 19 |
-| Static Vertical (850) | 38 | 134.22 | 19 | **115.22** | 19 |
+| Static Horizontal (850) | 38 | 118 | 19 | **99** | 19 |
+| Static Vertical (850) | 38 | 118 | 19 | **99** | 19 |
 | Small guided / pull (302) | 13 (1 line) | 44 | 13 | 44 | **0** |
 
 So ~19px of free chart on almost every frame (22 on the portrait), and it is invisible if you fit against the table — `118` reads like a template constant. The 302-wide pair is the only exception, because its placeholder is already one line.
 
-**Which figure is the baseline, so the two tables never look like they disagree:** the first table's numbers are the **as-shipped placeholder geometry** — what an untouched template measures — and `scripts/verify_templates.js` measures templates untouched, so its output will keep reporting `118` / `135` / `134.22`. That agreement is the script working, not a discrepancy to chase. The `99` / `113` / `115.22` figures are the **true bands once a one-line subtitle is in place**, which is the state you actually fit into. So: expect the tabled figures from the script and before Step 6, expect the reflowed figures after it — and in either case re-read the band off the filled clone rather than trusting either table. This is the same reflow the header rule above describes, but it bites *before* you would think to look. **Treat the table as a way to choose a template, never as an input to the fit:** fill the texts, then read the band back off the frames. And note the two effects compound — a one-line *title* also lowers the band (down to the logo's floor, see above), so a frame with a one-line title and a one-line subtitle is a long way from the tabled figure.
+**Which figure is the baseline, so the two tables never look like they disagree:** the first table's numbers are the **as-shipped placeholder geometry** — what an untouched template measures — and `scripts/verify_templates.js` measures templates untouched, so its output will keep reporting `118` / `135`. That agreement is the script working, not a discrepancy to chase. The `99` / `113` figures are the **true bands once a one-line subtitle is in place**, which is the state you actually fit into. So: expect the tabled figures from the script and before Step 6, expect the reflowed figures after it — and in either case re-read the band off the filled clone rather than trusting either table. This is the same reflow the header rule above describes, but it bites *before* you would think to look. **Treat the table as a way to choose a template, never as an input to the fit:** fill the texts, then read the band back off the frames. And note the two effects compound — a one-line *title* lowers the band further still, so a frame with a one-line title and a one-line subtitle is a long way from the tabled figure: on Static Vertical, `118` becomes **70** once the header is made to hug.
 
 The table gives one number per template — the band you fit a chart into — and that is deliberately all it gives. **Per-slot geometry for the four static templates** (each text slot's own `y`/width/height, the derived positions, unit conversions, the exact footer strings) belongs to [`/create-static-viz`'s TEMPLATES.md](../create-static-viz/TEMPLATES.md), which needs it to place text without opening Figma. Read it there rather than re-measuring into this file: two copies of a measurement drift, and the copy a session happens to read then decides which one was right.
 
 **The 302-wide row is parametric, and its `H` is an output of this step rather than an input** — width is the only fixed dimension, the frame height is chosen from the content, and there is no fit to perform because the export already arrives at 278px wide. Its header block also hugs its own text width instead of spanning the content, so the plot may legitimately rise beside it. All of that is [SMALL-CHARTS.md](SMALL-CHARTS.md)'s; don't apply the fit below to it.
 
-**On the two 850-wide templates the band you read off the frames is not the same as the text's own edges.** Both wrap their header and footer in auto-layout frames whose 16px of inner padding falls on the chart side, so the frame band is the text band inset by 16px at each end — `header.y + header.height` returns **134.22 on both** (they no longer differ), never the subtitle's own bottom edge. Both rows above are now frame bands, so they are directly comparable; the per-slot text positions behind them are `TEMPLATES.md`'s. Read the band off the frames and that breathing room comes for free; read it off the text and add your own.
+**No template's wrappers carry inner padding any more, so the frame band and the text band are the same number everywhere.** `header.y + header.height` is the subtitle's own bottom edge, and `contentX`/`contentW` read 16/818 directly on the 850-wide pair rather than 0/850. There is no per-family padding correction to apply — if you find yourself adding 16px to a band you read off a frame, you are working from a stale note. The per-slot text positions behind these bands are `TEMPLATES.md`'s.
 
 **Every template exposes header/footer frames, but only the 850-wide pair pads them.** On IG square, IG portrait, DI and both static mobile templates the wrappers carry zero padding, so there `header.y + header.height` *is* the text band — 118 on all four 540-wide frames, 135 on the portrait, matching the first table exactly, because that table and this claim both describe the template still carrying its two-line placeholder subtitle. Fill in a one-line subtitle and the same frames report the reflowed bands instead (99 and 113 — see the reflow table above); the point here is only that no padding correction sits between the frame and the text, at either subtitle length. Read the band off the frames everywhere; just don't port the 16px correction across, because it belongs to the two 850-wide templates alone.
 
-The footers are not uniform in the same way, and **as of 2026-08-17 only DI is still the absolute kind**: static mobile's `Frame 15`, the 850-wide `Frame 8`, and now both Instagram footers (`25518:14` square, `25518:16` portrait, rebuilt from the plain `Frame 12` / `6689:9` this file used to describe) are auto-layout and reflow. DI's `Frame 12` @ y=508 reports `layoutMode: "NONE"` and does not. That is what Step 6's structural check is for — run it rather than reading the split off this paragraph, since it is exactly the sentence that went stale.
+**Every footer is auto-layout and reflows** — static mobile's `Frame 15`, the 850-wide `Frame 22`/`Frame 25`, both Instagram footers (`25518:14` square, `25518:16` portrait) and DI's `Frame 37`, the last one to be converted. What still differs between them is the *direction* they grow — see the `constraints.vertical` rule in Step 6, since almost all of them grow out of the frame rather than into the band. Run Step 6's structural check rather than reading either fact off this paragraph; the split it used to draw between auto-layout and absolute footers is exactly the sentence that went stale last time.
 
 Verify against the actual clone with `get_metadata` (the templates evolve; the geometry above is a 2026 snapshot). These are **frame-local** coordinates, and `x`/`y` are relative to a node's parent — so append the embed to the template clone **before** positioning it. Left parented to the page (where Step 5 puts imported nodes), the same numbers land it near the page origin, on top of the reference chart. One wrinkle in the same rule: **a GROUP is transparent for coordinates**, so once the imported chart is inside the template, its descendants report `x`/`y` in the *template frame's* space, not the group's — which is what makes the frame-local numbers above directly usable on the plot's internals.
 
 **The header reflows itself — don't reposition it.** Every template's header block is a vertical auto-layout wrapping a horizontal title row (title beside logo), so a title that grows from two lines to three pushes the subtitle down and grows the header on its own. Set `characters`, then **read the new `header.y + header.height` back** and measure the band from that; any y you computed before the text went in is stale. Measured on the portrait: a two-line title gives a 135 band bottom, three lines 199.
 
-**The logo sets a floor under that, so a short title doesn't buy all the room you'd expect.** The title row hugs the taller of its two children, and the logo is ~35px plus whatever the template offsets it by — so once the title drops to one line the *logo* drives the row height. On the portrait a one-line title takes the band bottom to 111.23, not the ~103 the title alone implies: the logo box is 40.23 against the title's 32. Read the band back rather than deriving it from line counts.
+**The logo no longer sets a floor under that** — it is a sibling of the header, not a child, so it contributes nothing to the header's height and a one-line title buys the full reduction. What the logo still constrains is *width*: the title node is sized narrower than the content box to clear it (737.84 against 818 on Static Vertical, 428 against 508 on the 540-wide set), which is the number a title has to be measured against. Read the band back rather than deriving it from line counts either way.
 
 **Prefer reaching the content width without `rescale()` at all.** `rescale()` multiplies font sizes along with geometry, so a 1.006× nudge to close a 3px gap silently moves every label from 15px to 15.09 — off the ladder, and the Step 8c "sizes are named styles" check then fails on a difference no one can see. When the width can be closed another way — the label reclaim above is the usual one — take that route and every size stays exactly where the export put it.
 
@@ -805,9 +845,10 @@ for (const t of annotations) { t.x = left; t.resize(right - left, t.height) }
 **Match the header box exactly — same left edge and same width.** A chart even a few pixels narrower than the title reads as a mistake. Read the target box off the header rather than off a constant, and do it *after* the frame is gone, so the group's bounding box is the plot's real extent and no export padding is baked into the width:
 
 ```js
-// Resolve the header structurally — the name differs per template ("Frame 14" on IG square,
-// DI and static mobile, "Frame 5" on the 850-wide pair, "header" on IG portrait). It is the
-// topmost vertical auto-layout child; the footer is the other one where there are two.
+// Resolve the header structurally — never by name. Names differ per template and are
+// renamed wholesale by design edits; the shape does not. It is the topmost VERTICAL
+// auto-layout child; the footer is the bottommost where there are two. (The logo is a
+// sibling, so it is never the match — it is a plain FRAME/INSTANCE with no layoutMode.)
 const header = clone.children
     .filter(c => "layoutMode" in c && c.layoutMode === "VERTICAL")
     .sort((a, b) => a.y - b.y)[0]
