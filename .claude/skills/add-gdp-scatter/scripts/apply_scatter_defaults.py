@@ -230,10 +230,14 @@ def grade_exclusion(
     The question is not whether the point is a statistical outlier but whether putting it back
     changes what the reader sees — so each axis is measured in the units it is drawn in.
     """
-    if (code or "").startswith(AGGREGATE_CODE_PREFIX):
-        return "aggregate", f"{code} is an OWID aggregate — it renders as one point among the countries"
+    # Missing data comes FIRST, including for an aggregate: `aggregate`'s claim is that the entity
+    # "renders as one point among the countries", and an entity with no y/GDP pair renders nowhere
+    # — `matchingEntitiesOnly` hides it. Testing the code first turned such an aggregate into a
+    # warning, and so into a RECONSIDER row, on the strength of a sentence that was not true of it.
     if y is None or x is None:
         return "no data", "no year has both a y and a GDP value, so matchingEntitiesOnly hides it regardless"
+    if (code or "").startswith(AGGREGATE_CODE_PREFIX):
+        return "aggregate", f"{code} is an OWID aggregate — it renders as one point among the countries"
     if not others_y or not others_x:
         return "ungradeable", "no other entity has both values here, so there is no pack to compare against"
 
@@ -377,11 +381,17 @@ def _latest_shared_year(y_df, x_df, entity: str, tolerance: int = 0) -> int | No
     """
     if y_df is None or x_df is None or y_df.empty or x_df.empty:
         return None
-    ys = {int(v) for v in y_df.loc[y_df["entityName"] == entity, "year"]}
-    xs = {int(v) for v in x_df.loc[x_df["entityName"] == entity, "year"]}
+    ys = {int(v) for v in y_df.loc[y_df["entityName"] == entity, "year"].unique()}
+    xs = {int(v) for v in x_df.loc[x_df["entityName"] == entity, "year"].unique()}
     if not ys or not xs:
         return None
-    for yr in sorted(ys | xs, reverse=True):
+    # Candidates are every year the two variables cover, not just this entity's own observation
+    # years: the year that PAIRS them can be one where the entity itself has neither. y in 2000
+    # and GDP in 2002 at tolerance 1 meet at 2001 — on the timeline because other entities have
+    # data there, and a year the reader reaches by dragging the handle. Searching only {2000, 2002}
+    # found nothing and sent the entity back as a benign `no data`.
+    timeline = {int(v) for v in y_df["year"].unique()} | {int(v) for v in x_df["year"].unique()}
+    for yr in sorted(timeline, reverse=True):
         if any(abs(y - yr) <= tolerance for y in ys) and any(abs(x - yr) <= tolerance for x in xs):
             return yr
     return None

@@ -170,6 +170,18 @@ timeline. Requiring the same year graded it a benign `no data` and dropped it ou
 altogether. The value is then read back at that same tolerance, since the observation itself may
 sit a year or two off the timeline year it was found under.
 
+The candidates for that year are **every year the two variables cover**, not just the entity's own
+observation years, because the year that pairs them can be one where the entity has neither: y in
+2000 and GDP in 2002 at tolerance 1 meet at **2001**, a year on the timeline because other entities
+have data there and a year the reader reaches by dragging the handle. Searching only the entity's
+own years missed it and sent the entity back as a benign `no data`.
+
+`no data` is also checked **before** the `OWID_` code, so an excluded aggregate that has no
+pairable year is `no data` rather than `aggregate`. The `aggregate` note claims the entity "renders
+as one point among the countries"; an entity with no pair renders nowhere, since
+`matchingEntitiesOnly` hides it. Testing the code first raised a warning — and a `RECONSIDER` row —
+on the strength of a sentence that was not true of that entity.
+
 (2026-08-19, production: of 22 published GDP scatters carrying `excludedEntityNames`, 8 exclude
 `World` or another OWID aggregate — the single commonest case, which is why `aggregate` is its
 own class, detected by the `OWID_` prefix on `entityCode` rather than by a name list. Charts 1131
