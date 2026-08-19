@@ -67,6 +67,14 @@ def test_force_replaces_existing_id(tmp_path):
     assert _load_config(path)["chart_config_id"] == UUID_B
 
 
+def test_same_id_in_different_case_is_rewritten_canonical_without_force(tmp_path):
+    # An upper-case UUID names the same chart, so this is not an identity change —
+    # the file is healed to the canonical lower-case form validation requires.
+    path = _write(tmp_path, f"chart_config_id: {UUID_A.upper()}\n{SINGLE_CHART_YAML}")
+    _write_field(path, _load_config(path), UUID_A, force=False)
+    assert _load_config(path)["chart_config_id"] == UUID_A
+
+
 def test_rewriting_the_same_id_is_a_noop(tmp_path):
     path = _write(tmp_path, f"chart_config_id: {UUID_A}\n{SINGLE_CHART_YAML}")
     before = path.read_text()

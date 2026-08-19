@@ -17,6 +17,7 @@ from apps.wizard.app_pages.chart_diff.chart_diff import (
     ChartDiffsLoader,
     configs_are_equal,
     get_deleted_charts,
+    same_config_uuid,
     tags_are_equal,
 )
 from apps.wizard.utils import get_staging_creation_time
@@ -255,7 +256,7 @@ def cli(
                         # Target row was matched by config UUID or catalogPath
                         # rather than numeric id (production minted its own row).
                         cross_env_twin = diff.source_chart.id != diff.target_chart.id and (
-                            diff.source_chart.configId == diff.target_chart.configId
+                            same_config_uuid(diff.source_chart.configId, diff.target_chart.configId)
                             or (
                                 diff.source_chart.catalogPath
                                 and diff.source_chart.catalogPath == diff.target_chart.catalogPath
