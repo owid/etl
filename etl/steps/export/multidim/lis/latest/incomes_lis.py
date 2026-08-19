@@ -1,6 +1,6 @@
 """Multidim export for LIS incomes across the distribution."""
 
-from etl.collection import drop_dimension_keeping_single_value
+from etl.collection import filter_columns_by_dimension_choices
 from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
@@ -35,7 +35,7 @@ def run() -> None:
     tb = ds.read("incomes", load_data=False)
 
     # Filter to "square root" equivalence_scale and remove that dimension
-    tb = drop_dimension_keeping_single_value(tb, dimension="equivalence_scale", value=EQUIVALENCE_SCALE)
+    tb = filter_columns_by_dimension_choices(tb, {"equivalence_scale": EQUIVALENCE_SCALE})
 
     # Convert integer decile values to clean strings (e.g. 1 -> "1", not "1.0")
     for column in tb.columns:

@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.collection import drop_dimension_keeping_single_value
+from etl.collection import filter_columns_by_dimension_choices
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -53,7 +53,7 @@ def run() -> None:
     tb = ds.read("incomes", load_data=False)
 
     # Keep only indicators for a specific PPP year, and drop that dimension.
-    tb = drop_dimension_keeping_single_value(tb, dimension="ppp_version", value=PPP_YEAR)
+    tb = filter_columns_by_dimension_choices(tb, {"ppp_version": PPP_YEAR})
 
     # Remove dimensions that are not needed.
     for column in tb.columns:
