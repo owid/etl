@@ -243,6 +243,13 @@ def _shared_export_recipe_uris(files_changed: dict[str, Any]) -> set[str]:
 
     Config companions are already handled upstream (`un_wpp.sex_ratio.config.yml` resolves to the sibling
     `un_wpp.py`), so those name a real step here and expand to nothing extra.
+
+    Only the siblings that actually *use* the helper get credited, unlike the data-step mirror. There,
+    erring broad is free because `select_candidates` still has to see the dataset rebuilt on this server,
+    and the master cross-check labels whatever the branch did not write. An export recipe has no such
+    second gate: `covers_mdim` alone decides, and it makes `split_mdim_groups` hand over *every*
+    config-level difference in that MDim. So crediting a folder wholesale would report an untouched
+    sibling's baseline lag — a whole MDim's worth of it — as this branch's work.
     """
     from etl.dag_helpers import load_dag
 
@@ -261,7 +268,35 @@ def _shared_export_recipe_uris(files_changed: dict[str, Any]) -> set[str]:
         # Only a `kind/namespace/version` folder has sibling recipes to credit.
         if own in dag_uris or folder.count("/") != 2:
             continue
-        out |= {u for u in dag_uris if u.startswith(f"export://{folder}/")}
+        siblings = {u for u in dag_uris if u.startswith(f"export://{folder}/")}
+        out |= _recipes_using(rel.name, siblings) or siblings
+    return out
+
+
+def _recipes_using(file_name: str, recipe_uris: set[str]) -> set[str]:
+    """Which of `recipe_uris` reach the helper `file_name` — empty when none of them names it.
+
+    A helper is reached by name whether it is imported or read: `un_wpp.py` does `from utils import
+    MDIMCreator` and `paths.side_file("map_brackets.yml")`, so match an import of the module *and* a
+    literal mention of the file. Its siblings `child_labor.py` and `hazardous_work.py` name neither, and
+    stay out of scope.
+
+    Empty means "cannot tell", not "nobody": a helper reached only through another helper names no recipe
+    directly, and the caller then falls back to the whole folder rather than to nothing — the direction
+    that keeps a reviewer's own edit visible.
+    """
+    stem = file_name.split(".")[0]
+    imported = re.compile(rf"^\s*(?:from|import)\s+\.*{re.escape(stem)}\b", re.MULTILINE)
+    mentioned = re.compile(rf"""["']{re.escape(file_name)}["']""")
+    out: set[str] = set()
+    for uri in recipe_uris:
+        try:
+            source = (STEP_DIR / "export" / f"{uri[len('export://') :]}.py").read_text()
+        except OSError:
+            # A recipe whose file we cannot read tells us nothing either way; leave it to the fallback.
+            continue
+        if imported.search(source) or mentioned.search(source):
+            out.add(uri)
     return out
 
 

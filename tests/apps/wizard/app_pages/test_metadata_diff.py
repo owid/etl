@@ -1139,6 +1139,27 @@ def test_shared_export_helper_credits_its_sibling_recipes():
     assert _shared_export_recipe_uris({"apps/wizard/app_pages/metadata_diff/core.py": "M"}) == set()
 
 
+def test_shared_export_helper_credits_only_the_recipes_that_use_it():
+    """A folder is not a consumer list: an untouched sibling must not be credited.
+
+    `multidim/un/latest` holds three recipes, and only `un_wpp.py` reaches the helpers — by import
+    (`utils`, `view_edits`) and by name (`map_brackets.yml`). Crediting `child_labor` and
+    `hazardous_work` too would flip `covers_mdim` for them, and that alone makes `split_mdim_groups`
+    hand over every config difference in those MDims as this branch's work. Unlike the data-step mirror
+    there is no second gate to catch it: no rebuilt-here check, no master cross-check.
+    """
+    from apps.wizard.app_pages.metadata_diff.discovery import _recipes_using, _shared_export_recipe_uris
+
+    for helper in ("utils.py", "view_edits.py", "map_brackets.yml"):
+        reached = _shared_export_recipe_uris({f"etl/steps/export/multidim/un/latest/{helper}": "M"})
+        assert reached == {"export://multidim/un/latest/un_wpp"}, helper
+
+    # "No recipe names it" means "cannot tell" — a helper reached only via another helper falls back to
+    # the whole folder, keeping the reviewer's own edit visible rather than dropping it.
+    siblings = {"export://multidim/un/latest/child_labor", "export://multidim/un/latest/hazardous_work"}
+    assert _recipes_using("utils.py", siblings) == set()
+
+
 def test_export_scope_without_recorded_namespaces_still_matches_on_name():
     """Narrowing must not get *stricter* by accident: unknown namespace means fall back to the name."""
     scope = BranchScope(export_products={(MDIM_EXPORT_KIND, "mine")})
