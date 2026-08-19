@@ -113,6 +113,14 @@ Use the vector read for *what* (weights, colors, caps, which nodes exist) and th
 
 **When a designer reworks a page you shipped, that rework is the next version of this file.** It is the only feedback on this skill that comes with the answer attached, and it is cheap to read: the page keeps just the surviving frame, so diff it against what you left. Do it with a `use_figma` property dump, not a screenshot — at 540px the changes that matter are invisible. Six classes are worth checking every time, and on one page five of them had moved: **nodes that disappeared** (a whole legend group), **nodes that appeared** (leader arrows), **text content** (a restored category name, a shortened entity, a rewritten subtitle), **fills and their bound styles** (a color moved from the `Default Palette` group to the darker `Line and Slope Charts` one), **sizes and text styles**, and **the frame name**. For each delta ask what constraint the designer was solving, not what they preferred — that is the part that generalizes to the next chart. Then write it here.
 
+**A rework may come as a *replica beside* your frame rather than an edit of it — and that changes what you read and what you clean up.** Three consequences, all seen on one page:
+
+- **Where a written note and the executed frame disagree, the note is the rule.** A note asking for the end label at "a 16px margin" came with a frame whose label ended 14px from the edge — 2px of ink outside the content band, which this skill's own margin check would flag. Implement the stated intent, not the measured slip, and say which you followed.
+- **A replica inherits your frame name, so the page now has two frames carrying the export slug.** Two frames with the same name export two files with the same name (Step 9). Whichever frame is shipping keeps the bare slug; rename the other (`-designer-rework`, `-v1`) as part of reading the rework, not later.
+- **Your grouping does not survive.** The `chart` GROUP this skill builds gets ungrouped, leaving `horizontal-axis`, `vertical-axis`, `horizontal-grid-lines` and `lines` as direct frame children — so `chart.height`, which Step 7 measures the band gap from, no longer exists. Any script you re-enter a reworked page with must resolve the plot from those named subgroups, not from a wrapper you created.
+
+**Read a reworked plot's geometry, not just its styling — a hand-stretch drifts in ways a script doesn't.** Dragging a selection wider scales *text boxes* along with the marks: on one rework every y-axis tick label came back 1.072× wider (`0.2` at 22.5px against 21), the same factor as the plot's own stretch, which for right-aligned labels walks their ink rightward. The glyphs are unharmed (Figma doesn't scale letterforms) so it is invisible at a glance and harmless in a one-off, but it is why Step 8's x-map skips TEXT and re-anchors each label on its own mark — copy the designer's *intent* (a wider plot) with the scripted map, not their method.
+
 **Hand-rounded value labels are house practice on a DI bar chart — expect them and reproduce them.** Both bar-chart references replace grapher's precision with story precision (`1.03% → 1%`, `$7,298 → $7,300`, `$116 → $120`), which means the image deliberately disagrees with the interactive chart. Keep the rounding consistent within a chart, keep a second digit only where 1 dp would collapse two visibly different bars into the same label (`0.35%` beside `0.3%`), and record it as an accepted deviation — it is the kind of thing a later audit reads as an error.
 
 ## Step 1 — Resolve the chart and gather its text
@@ -894,6 +902,7 @@ The high-value edits to propose (include them in the Step 4 proposal):
 
   1. **Re-place each label against its line's endpoint, which the connectors encode.** Each connector's bounding box spans *line end → label center*, so the end **further** from the label's current center is the line end — that is your target, and it is the only place the endpoint is recoverable from, since a path's bbox won't tell you which corner the line arrives at. Then de-collide with a **minimum pitch of the font size × 1.33** (20px at 15px labels) by relaxing overlaps half-and-half until stable; that converges on minimum total drift, and it reproduced a designer's hand-placement of the same chart to within a pixel (worst label 8.9px off its line against their 9.5px).
   2. **Reclaim the freed right margin — and note that the *longest label* is what caps the reclaim, so shortening the longest labels is the lever, not deleting the elbows.** Grapher sizes the margin to fit its widest label, so on a chart where "United Kingdom" is present the label block cannot move right at all; shortening that one and "United States" to **UK** and **US** made "Switzerland" the constraint and bought 30px of plot. The arithmetic is exact: `LABEL_X = content_right − max(label widths)`, then `plot_right = LABEL_X − 5`, and the chart's own width comes out equal to the header's for free.
+     - **With one series there is a better move: take the label out of the margin entirely.** Put it *below* the last point instead of beside it, right-aligned on the content edge, and the margin stops existing — `plot_right = content_right − dotRadius`, so the end dot's own edge lands on the content edge and the label sits under it. Measured on a 540 frame, that took the plot from **485** to **518.6**: +31.9px, **7% more plot**, against the 39px the beside-the-line placement had reserved for a 34px label. The dot carries the attachment, so nothing is lost. Only for a single series — with several lines the labels must stay beside their own ends to stay distinguishable, and then the arithmetic above is the right one. See GUIDELINES.md → Line charts.
 
   **Placing direct labels is a constrained search, not an offset — and "clear of its own line" is not the test.** Putting each label at a fixed offset from its anchor (say `startX + 5`, centered) reads fine in a node listing and lands labels **on top of other entities' lines**, which is the first thing a reviewer sees. Make it a search instead: per label, generate candidate slots and accept the first that passes every acceptance test, with the polyline test (Step 8c) doing the real work.
 
@@ -1006,43 +1015,52 @@ The high-value edits to propose (include them in the Step 4 proposal):
 
   **Two fit tests, not one, because the edge labels are anchored differently.** Interior labels are centered on their tick, so they need `pitch ≥ labelWidth + ~8px`. The **first** label is left-aligned *at* its tick and the **last** right-aligned *at* its tick — grapher does this to keep them inside the plot — so each spends a full label width on its inward side, and the two slots next to them need roughly `1.5 × labelWidth + gutter`. Miss that and the arithmetic says yes while the render overlaps: on one chart a 50.3px pitch cleared the 43px interior requirement, added 1995 and 2020, and left both of them 2.2px *inside* the edge labels. Measure the neighbor gaps after adding and revert if any is negative — the honest outcome is often that grapher's axis was already right, and the years it dropped were exactly the edge-adjacent ones.
 
-- **Annotations replicating the accompanying text** (12–16px; 12–14px on maps): text color = the annotated object's color, `Text/Gray 80` #5B5B5B, or a mix; bold the key phrase; and each one wrapped in its **own white (canvas-colored) auto-layout frame, hugging the text on both axes** and appended last so it sits above the chart — see GUIDELINES.md → Annotations for why hugging is the part that matters and when a white outside stroke is the fallback instead.
+- **Annotations replicating the accompanying text** (12–16px; 12–14px on maps): text color = the annotated object's color, `Text/Gray 80` #5B5B5B, or a mix; bold the key phrase; append last so it sits above the chart. **The annotation is a bare TEXT node — no wrapping frame** — and it gets a knockout only if it actually crosses chart ink, in which case that knockout is a **3px outside stroke in the template's canvas color**. GUIDELINES.md → Annotations has the three tiers and why the stroke beats a frame wherever it suffices.
 
   ```js
-  const box = figma.createAutoLayout("HORIZONTAL");         // real API — see the note below
-  box.name = "annotation__<what>";
-  clone.appendChild(box);                                   // parent before setting HUG
-  box.fills = clone.fills.map(f => ({...f}));               // the template's canvas, not white
-  box.clipsContent = false;                                 // else the trim below cuts every descender
-  txt.leadingTrim = "CAP_HEIGHT";                           // hug the ink, not the line box
-  const lastSize = txt.getRangeFontSize(txt.characters.length - 1, txt.characters.length);
-  box.paddingLeft = box.paddingRight = box.paddingTop = 0;  // hug the glyph box on three sides
-  box.paddingBottom = Math.round(0.22 * lastSize);          // ≈3px at 14px: fill reaches under descenders
-  box.appendChild(txt);
-  txt.layoutSizingHorizontal = txt.layoutSizingVertical = "HUG";
-  box.layoutSizingHorizontal = box.layoutSizingVertical = "HUG";
+  const txt = figma.createText();
+  clone.appendChild(txt);                                   // last child => above the chart
+  txt.name = "annotation__<what>";
+  txt.fontName = { family: "Lato", style: "Regular" };
+  txt.fontSize = 15;                                        // a ladder value: XL 16 / L 15 / M 14 / S 13 / XS 12
+  txt.textAutoResize = "WIDTH_AND_HEIGHT";                  // hug the longest line; cannot re-wrap later
+  txt.characters = lines.join("\n");                        // explicit breaks: never split a quantity
+  await txt.setFillStyleIdAsync(ANNOT_FILL);                // Data Insights/Annotations — LOCAL id, not a key
+  txt.setRangeFontName(at, at + phrase.length, { family: "Lato", style: "Bold" });
+  txt.leadingTrim = "CAP_HEIGHT";                           // box = ink, in every tier
+
+  // Tier 2 only — add the halo when, and only when, the block crosses furniture.
+  if (crossesChartInk) {
+    txt.strokes = clone.fills.map(f => ({ ...f }));          // the TEMPLATE's canvas, not hardcoded white
+    txt.strokeWeight = 3;                                    // set explicitly — see the note below
+    txt.strokeAlign = "OUTSIDE";                             // halo the letterforms, don't deform them
+  }
   ```
 
-  > **`clipsContent = false` and `paddingBottom` are one fix in two halves; neither works alone.**
-  > Unclipping brings the cut glyphs back; the padding puts opaque fill *behind* them, so a gridline
-  > crossing below the baseline doesn't show through the recovered letterform. See
-  > GUIDELINES.md → Annotations for the reasoning, and for the `y` nudge the trim needs (the box
-  > shrinks around the ink, so move it up by half the height lost). Read the size off the **last**
-  > character rather than `txt.fontSize`: a two-line label steps the ladder down between its lines,
-  > so `fontSize` is `figma.mixed` there, and it is the bottom line whose descenders hang out.
+  > **Set `strokeWeight` explicitly; never inherit it.** A text node that has been through `rescale()`
+  > carries a *scaled* stroke weight even though it had no strokes — 0.65 after a 0.652 height-fit — so
+  > assigning `strokes` without the weight gives a sub-pixel halo indistinguishable from none. Read it
+  > back and assert 3.
 
-  > **Take the fill from the template, never hardcode white.** The DI and static templates are white,
-  > but the Instagram ones sit on `Instagram/Beige Background` `#FBF9F3` — a white frame there is a
-  > visible rectangle behind the text, which is exactly the background box the guidelines forbid.
-  > Copying `clone.fills` makes the knockout invisible on whichever template was chosen, and keeps
-  > working if a future template introduces another canvas color.
+  > **Take the color from the template, never hardcode white.** The DI and static templates are white,
+  > but the Instagram ones sit on `Instagram/Beige Background` `#FBF9F3` — a white halo there is a
+  > visible outline around every letter. Copying `clone.fills` works on whichever template was chosen,
+  > and keeps working if a future template introduces another canvas color. Same rule for a tier-3
+  > frame's fill.
 
-  > **`figma.createAutoLayout()` is a real API — do not "fix" this to `createFrame()`.** It is declared
-  > in the official plugin typings (`createAutoLayout(direction?: 'HORIZONTAL' | 'VERTICAL'): FrameNode`)
-  > and the `figma-use` skill's rule 12a says to prefer it *over* `figma.createFrame()` with absolute
-  > coordinates. A review pass on this branch asserted it did not exist and the snippet was rewritten to
-  > `createFrame()` + `layoutMode`; that swap is the anti-pattern rule 12a names, and it was reverted.
-  > If a reviewer flags it again, check `references/plugin-api-standalone.d.ts` before changing anything.
+  > **Decide `crossesChartInk` by measurement, per annotation — not per chart.** Run the sampled-polyline
+  > and gridline test from Step 8c against the annotation's rect: cross nothing and it needs no
+  > treatment at all. A rework of a page built by this skill did exactly this — the annotation over two
+  > gridlines got the 3px stroke, the one sitting in open canvas got no stroke and no frame — and the
+  > note that came with it was "add a white outside stroke of 3px **when it overlaps** on chart
+  > elements". Blanket-treating every annotation is the thing to avoid.
+
+  > **If you do need tier 3** (text over a filled area, or ink too dense for a halo), the frame recipe
+  > and its two traps — `clipsContent = false` and `paddingBottom ≈ 0.22 × the last line's font size` —
+  > are in GUIDELINES.md → Annotations. Note `figma.createAutoLayout()` **is** a real API (declared in
+  > `references/plugin-api-standalone.d.ts`; the `figma-use` skill's rule 12a prefers it over
+  > `createFrame()` + absolute coordinates) — a review pass once asserted otherwise and the rewrite to
+  > `createFrame()` had to be reverted. Check the typings before changing it.
 - **Arrows**: copy curvy arrows from node `798:773` — 1px stroke, arrowhead and line the same color as each other and consistent across the chart. Never scale a whole arrow (it distorts the head): Shift-resize the line segment only, then reposition the head. If a curvy arrow gets messy, use a straight thin line. **Maps: never curvy and never an arrowhead — the hairline leaders of GUIDELINES.md → Maps (`#2d2e2d` at 0.3px, filled dot at the country end), or values inside country shapes.** The 1px stroke above is for arrows on a plot; at 1px a leader on a map reads as a border.
 - **Drop the axis and gridlines when every data point is already labeled.** The checklist says so outright, and it is the cheapest space you will ever find: deleting `horizontal-axis`, `vertical-grid-lines` and `vertical-zero-line` from the imported group frees ~25px — usually the difference between text at the 12px floor and text at a comfortable 13–14px. It applies most obviously to a **100% stacked bar**, where every bar spans 0–100% and the axis tells the reader nothing they can't read off the segment values. Don't do it where the reader still has to estimate: a line chart's y-axis, or any chart whose points are mostly unlabeled.
 - **Dropping entities does not buy vertical space — it buys thicker bars.** Easy to get wrong: the export canvas is a fixed size, so grapher redistributes the freed rows into the remaining ones and the chart comes back exactly as tall. Measured: eleven countries and ten countries both returned a 346px chart, with the row pitch going from ~28 to ~31px. So cut entities to reduce clutter or to make bars more readable, never to make something fit. **The lever for fit is the export's aspect ratio** (`imWidth`/`imHeight`, which set the shape the layout is computed for) or removing furniture like the axis — not the entity list. Either way the selection belongs to the chart's author: surface it, don't decide it.
@@ -1172,7 +1190,8 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Label-on-fill contrast | `contrast(labelHex, barHex)` for every in-bar label | **4.5:1** at 13.5px regular — the 3:1 large-text allowance does not apply |
 | Text hierarchy | list every distinct `fontSize` with what it belongs to, **and its rank** | title > subtitle ≥ annotations > supporting text ≥ labels. Sizes may vary inside the plot by rank; a lead annotation may *equal* the subtitle (Annotation XL 16) but nothing may exceed it, and same-rank items must share a size |
 | Sizes are named styles | every size matches a style in the file | no arbitrary sizes left over from scaling the export (13.7, 16.8). Choose from the ladder by rank rather than by element type — see GUIDELINES.md → Subtitles and notes |
-| Annotation knockouts cover only furniture | for each `annotation__*` frame, test its rect against every line's **sampled polyline** (not bboxes — see below) | gridlines, empty space or a muted context line — never a highlighted line, a dot, a value label or a bar segment carrying a number |
+| Annotations cover only furniture | for each `annotation__*` node, test its rect against every line's **sampled polyline** (not bboxes — see below), and against the dots and value labels | gridlines, empty space or a muted context line — never a highlighted line, a dot, a value label or a bar segment carrying a number |
+| Knockout tier matches what it crosses | the same test decides the tier: compare each annotation's crossings against whether it carries a stroke | an annotation crossing furniture has a **3px** `OUTSIDE` stroke in the template's canvas color; one crossing nothing has **no** stroke and no frame. A sub-pixel weight (0.65) means the stroke was assigned without setting the weight after a `rescale()` — see Step 8 |
 | Label alignment | compare each label's center against its mark | bar values centered on bars, legend labels on swatches |
 | Box alignment | compare the chart's left/right against the header frame | identical to the subtitle box, to the pixel |
 | Gap | `(footerTop - headerBottom - chart.height) / 2`, with `footerTop = footer.y + Math.min(0, source.y)` — a source row raised inside the footer lifts the band's bottom (Step 7) | equal top and bottom, at the band figure of **the template you filled**: **12–16px** on the 540-wide frames, **30px** on the IG portrait (see Step 7). **Exception — a tightly measured group:** on an axis-less chart whose furniture was trimmed and label boxes hugged (Step 8), the band no longer applies as written; the figure to match is the one the **reference page** measures the same way, typically **20–30px**. Measure it there, record yours with a note that the group is tightly measured, and do not shrink a correct chart to force the band |
@@ -1311,7 +1330,8 @@ Two habits make the difference. **Assert, don't eyeball** — a 1.2px label drif
 - **A comma in the upload filename silently loses the asset.** `upload_assets` names the layer from the multipart filename, and a POST of `…(original, with World).svg` returned `{"success":true}` with a `placedOnNodeId` — but no such node existed and only the *other* upload had landed. Keep upload filenames free of commas (parentheses are fine), then rename the node in Figma. And **verify after every batch**: list the page's children and count them, rather than trusting N success responses.
 - **Local file styles cannot be imported by key; library styles cannot be applied by id.** The two kinds look identical in a harvest and need opposite handling. `Data Insights/*` and `Instagram/*` are **local** to the Charts file — `importStyleByKeyAsync` throws `Style with key "…" not found`, and you apply them by passing the id straight through (`"S:e06b99…,"`, note the trailing comma). `Default Palette/*` and `Line and Slope Charts/*` come from the **[Chart Colors] Library** and must be imported by key first. Tell them apart by the id shape: a library style's id carries a node suffix (`S:28466fa…,2401:49`), a local one ends at the comma. Get every local id in one call with `figma.getLocalPaintStylesAsync()` / `getLocalTextStylesAsync()`; get library keys from `search_design_system` — and note that a query for the *group* name (`"Default Palette"`, `"Line and Slope Charts"`) is far cheaper than one query per color, **but it is a partial harvest, not an enumeration**: the call caps at ~14 results (gotcha below) while the Default Palette alone runs to 24 fills plus `Gray` (GUIDELINES.md → Colors). Take what it returns, then query the colors still missing by name.
 - **Load the fonts you are about to *write*, not only the ones already on the node.** Scanning `getStyledTextSegments(['fontName'])` over the imported chart loads what the export used — and then `label.fontName = {family:"Lato", style:"Bold"}` throws, because nothing in the chart was bold. Two variants of the same trap: `set_fontSize` also throws on a node that merely *contains* an unloaded weight (a template's `Data source:` line is Bold + Regular), so a size sweep over template text needs both weights loaded. Load `Lato Regular`, `Lato Bold` and `Playfair Display SemiBold` unconditionally at the top of any script that touches text.
-- **A hugging annotation frame clips its own descenders.** Frames have `clipsContent = true` by default, and `leadingTrim = "CAP_HEIGHT"` puts the baseline *at* the box bottom — so every descender is cut and "today" renders as "todav", "very" as "verv". It is invisible in a node listing and easy to miss in a thumbnail. Set `box.clipsContent = false` on every annotation frame you create; keep the trim (it is what keeps the knockout tight). Clipping is only half of it — the opaque fill still stops at the baseline, so pair it with `paddingBottom ≈ 0.22 × the last line's font size` or the recovered descenders sit outside their own knockout. Both lines are in the Step 8 construction snippet; take them from there rather than patching a frame after the fact.
+- **A text node carries a *scaled* `strokeWeight` after `rescale()`, even with no strokes.** So adding the tier-2 white outside stroke to an annotation on a chart you height-fitted gives a 0.65px halo unless you set the weight — and a sub-pixel halo is indistinguishable from none, which reads as "the knockout didn't work" rather than "the weight is wrong". Set `strokeWeight = 3` explicitly and read it back.
+- **A hugging annotation frame clips its own descenders — a tier-3-only trap, and a reason to prefer tier 2.** Frames have `clipsContent = true` by default, and `leadingTrim = "CAP_HEIGHT"` puts the baseline *at* the box bottom — so every descender is cut and "today" renders as "todav", "very" as "verv". It is invisible in a node listing and easy to miss in a thumbnail. Set `box.clipsContent = false` on every annotation frame you create; keep the trim. Clipping is only half of it — the opaque fill still stops at the baseline, so pair it with `paddingBottom ≈ 0.22 × the last line's font size` or the recovered descenders sit outside their own knockout. A bare text node with an outside stroke has neither failure, which is most of why GUIDELINES.md → Annotations makes the stroke the default.
 - **`entity-labels` children are not always TEXT.** When a bar's entity name wraps, grapher groups the two lines, so `node.fontSize = 14` throws `no such property 'fontSize' on GROUP` — and because `use_figma` is atomic you lose the whole pass. Iterate `group.query("TEXT")` for styling and `group.children` for per-row layout.
 - **`upload_assets`, never `createNodeFromSvg`** — the plugin sandbox has no `fetch`, and inlining an SVG into `use_figma` blows the 50k-char cap. `upload_assets` handles up to 10 MB and yields an editable vector tree.
 - **`rescale()`, never `resize()`** on imported charts — `resize` crops instead of scaling children.
@@ -1342,7 +1362,7 @@ Two habits make the difference. **Assert, don't eyeball** — a 1.2px label drif
 - **Figma deletes a group the moment it becomes empty, so never touch it afterwards.** Moving the last child out and then reading `group.children.length` throws `The node with id … does not exist` — and because `use_figma` is atomic you lose the whole script, not just that line. Drain the group and simply don't refer to it again.
 - **A mixed-weight text node cannot hold a text-style binding.** The annotation ladder is all Lato Regular, so the moment you bold the country name Figma drops `textStyleId` — `setTextStyleIdAsync` then reads back as unbound, before *and* after. That is expected, not a failure to fix: take the **size** from the ladder value and bind the **fill** style (which does survive), and don't chase the text-style binding. Report it that way rather than as a defect.
 - **`insertCharacters`/`deleteCharacters` need every font on the node loaded, not just the one you're writing.** Editing a mixed-weight note throws `Cannot write to node with unloaded font "Lato Bold"` even when the inserted text is Regular. Loop `getStyledTextSegments(['fontName'])` and load each before any character surgery.
-- **To re-centre after a block's height changes, translate everything by the same delta rather than re-solving the layout.** A shorter legend leaves the map+legend block off-centre; shifting the map, every annotation frame and every leader by one shared `dy` preserves all relative geometry exactly — labels stay over the same water, leaders stay valid, and no placement search has to run again. Verify afterwards that the leaders still end inside their countries; that check is cheap and catches a mistranslation immediately.
+- **To re-centre after a block's height changes, translate everything by the same delta rather than re-solving the layout.** A shorter legend leaves the map+legend block off-centre; shifting the map, every annotation and every leader by one shared `dy` preserves all relative geometry exactly — labels stay over the same water, leaders stay valid, and no placement search has to run again. Verify afterwards that the leaders still end inside their countries; that check is cheap and catches a mistranslation immediately.
 - **`search_design_system` returns about 14 styles per query.** It cannot enumerate a library group in one call, so query each color by name (or query several times with different wording) and resolve hexes with `importStyleByKeyAsync`. Never conclude a group is small because one search returned few results.
 - **`get_screenshot` hands back a URL, not an image.** Download it with `curl` and open it with Read — an inline base64 response costs far more context for the same picture.
 - **`get_screenshot`'s `maxDimension` never upscales.** It clamps at the node's natural size, so a 540×540 frame comes back 540×540 whether you ask for 1024 or 65536. Any `@2x`/`@3x` export has to come from Figma's own export UI or the admin's `/api/figma/image?...` endpoint (which uses `scale: 3`).
