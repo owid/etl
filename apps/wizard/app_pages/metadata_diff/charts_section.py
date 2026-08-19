@@ -152,7 +152,14 @@ def _group_paths(g: ChangeGroup) -> set[str]:
 
 
 def _where_line(g: ChangeGroup) -> str:
-    """Where to edit this text — a shared definition is called out, because a per-variable edit is wrong there."""
+    """Where to edit this text — never presenting a variable key as the target when a definition is likelier.
+
+    Two shapes of sharing, and only one used to be caught. Several *differently named* indicators carrying
+    the identical text can only have got it from a shared `definitions.*` entry. But the same text landing
+    on many dimensional variants of ONE indicator (`thr__welfare_type_income…`, ×8) is equally a template,
+    and naming `tables.<t>.variables.thr` as the target there sends the author to edit a field whose value
+    is a `{definitions.*}` reference — the exact mistake this tool exists to prevent.
+    """
     shared_names = distinct_indicator_short_names(g.catalog_paths)
     if len(shared_names) > 1:
         preview = ", ".join(f"`{n}`" for n in shared_names[:5]) + (" …" if len(shared_names) > 5 else "")
@@ -161,8 +168,18 @@ def _where_line(g: ChangeGroup) -> str:
             "`definitions.*` / `shared.meta.yml` entry, not a per-variable field. Edit the definition."
         )
     parsed = parse_catalog_path(g.catalog_path)
+    if len(g.catalog_paths) > 1:
+        where = f"`{parsed[0]}.meta.yml`" if parsed else "the indicator's garden `.meta.yml`"
+        return (
+            f"🔗 The identical text renders on {len(g.catalog_paths)} dimensional variants of "
+            f"`{parsed[2] if parsed else 'this indicator'}` — so it comes from a template, not a literal "
+            f"value. Grep {where} for the changed text and edit the `definitions.*` entry it resolves to."
+        )
     if parsed:
-        return f"Authored in `{parsed[0]}.meta.yml` → `tables.{parsed[1]}.variables.{parsed[2]}`"
+        return (
+            f"Authored in `{parsed[0]}.meta.yml` → `tables.{parsed[1]}.variables.{parsed[2]}` — if that "
+            "field holds a `{definitions.*}` reference, edit the definition rather than the field."
+        )
     return "Authored in the indicator's garden `.meta.yml`"
 
 

@@ -315,25 +315,28 @@ def render_author_scope(
 
 
 def st_origin_caption(catalog_paths: set[str] | list[str], attribution: dict[str, str]) -> None:
-    """Warn when the baseline moved on too, so a difference is not read as this branch's alone.
+    """Say when a difference is not (only) this branch's work, so a count is never over-read.
 
-    A staging server keeps each dataset as it was when the branch built it. If master edited the same
-    dataset afterwards, production now holds *newer* text and the diff shows this branch appearing to
-    revert an edit it never made. Rebuilding the branch on master is what actually resolves it.
+    Two environments can differ on a dataset neither of them is wrong about: whichever rebuilt it more
+    recently holds the newer text. When this server rebuilt a dataset that master has also edited since
+    the server was created, the rebuild materializes master's edits here first, and they show up
+    alongside the branch's own — indistinguishable by text alone. Naming that is the honest option;
+    measured on this branch, it was the difference between 44 reported changes and 2 real ones.
     """
     from apps.wizard.app_pages.metadata_diff.discovery import BASELINE_NEWER, MIXED, OURS
 
     origins = {attribution.get(p) for p in catalog_paths}
     if BASELINE_NEWER in origins and not (origins & {OURS, MIXED}):
         st.caption(
-            f"🕓 {BASELINE_NAME.capitalize()}'s version of this dataset was rebuilt after this staging "
-            "server was created, and this branch has not edited it — so this difference is **not yours**. "
-            "Rebuild this branch on master to clear it."
+            f"🕓 {BASELINE_NAME.capitalize()} rebuilt this dataset after this staging server was created, "
+            "and this branch has not touched it — so this difference is **not yours**. It clears when this "
+            "server rebuilds the dataset."
         )
     elif MIXED in origins:
         st.caption(
-            "⚠️ This dataset was edited **both here and on master** since this server was created, so part "
-            "of this difference may not be yours. Rebuild on master to separate them."
+            "⚠️ This server rebuilt this dataset **and** master edited it since the server was created, so "
+            f"part of this difference is master's work that {BASELINE_NAME} has not rebuilt yet. Check it "
+            "against the edits you actually made before treating it as yours."
         )
 
 

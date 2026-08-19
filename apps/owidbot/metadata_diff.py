@@ -65,8 +65,8 @@ def format_metadata_diff(summary: Summary) -> str:
     shared = summary.attribution.get("mixed", 0) + summary.attribution.get("baseline_newer", 0)
     if shared:
         items.append(
-            f"<li>⚠️ {shared} of them are in datasets the baseline also changed since this server was "
-            "created — rebuild on master to tell them apart</li>"
+            f"<li>⚠️ {shared} of them are in datasets master also changed since this server was created, so "
+            "part of that is master's work the baseline has not rebuilt yet</li>"
         )
     if summary.n_other:
         items.append(

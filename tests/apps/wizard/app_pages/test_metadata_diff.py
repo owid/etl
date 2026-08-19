@@ -5,6 +5,7 @@ indicator metadata (propagates to charts / other MDIMs) vs. one that comes from 
 override (contained to the MDIM).
 """
 
+from apps.owidbot.metadata_diff import format_metadata_diff, status_icon
 from apps.wizard.app_pages.metadata_diff.brief import decision
 from apps.wizard.app_pages.metadata_diff.core import (
     ChangeGroup,
@@ -22,6 +23,7 @@ from apps.wizard.app_pages.metadata_diff.datapage import ordered_slots
 from apps.wizard.app_pages.metadata_diff.discovery import (
     BranchScope,
     ExplorerChanges,
+    Summary,
     _count_fields,
     _dataset_of,
     compare_explorer_views,
@@ -508,9 +510,75 @@ def test_explorer_changes_split_branch_from_lag():
     assert unnarrowed.other_views() == {}
 
 
+def test_explorer_attribution_is_per_view_not_per_slug():
+    """One qualifying view must not vouch for the rest of a lagging explorer's views.
+
+    A master rebuild moves every view of an explorer. If a single view of it renders an indicator this
+    branch edited, only that view is this branch's — the others are lag, and are reported as such.
+    """
+    ours, lag = ViewDiff(dimensions={"v": "1"}), ViewDiff(dimensions={"v": "2"})
+    changes = ExplorerChanges(
+        views={"mixed": [ours, lag]},
+        in_branch={"mixed"},
+        branch_view_diffs={"mixed": [ours]},
+        other_view_diffs={"mixed": [lag]},
+    )
+    assert changes.branch_views() == {"mixed": [ours]}
+    assert changes.other_views() == {"mixed": [lag]}
+
+
+def test_summary_counts_new_indicators_as_something_to_review():
+    """A version bump gives every indicator a fresh catalog path, so nothing has a baseline to diff."""
+    assert not Summary().has_changes
+    assert Summary(n_new_indicators=3).has_changes
+    assert status_icon(Summary(n_new_indicators=3)) == "✏️"
+    # ... and the report says so, instead of returning "No metadata text changes." before that line.
+    assert "New indicators: 3" in format_metadata_diff(Summary(n_new_indicators=3))
+
+
 def test_dataset_of_indicator_path_matches_datasets_table():
     """`datasets.catalogPath` has no channel prefix and stops at the dataset."""
     assert _dataset_of("grapher/wid/2026-06-18/world_inequality_database/tb#share_top_1") == (
         "wid/2026-06-18/world_inequality_database"
     )
     assert _dataset_of("garden/wb/2026-06-26/world_bank_pip/poverty#headcount") == "wb/2026-06-26/world_bank_pip"
+
+
+def test_candidate_selection_needs_both_git_scope_and_a_rebuild_here():
+    """Attribution needs both signals; either alone credits other people's work to this branch.
+
+    A changed file expands into its whole downstream subgraph, so the git scope is far wider than what the
+    branch touched — measured on a one-line metadata edit: 118 datasets in scope, 9 actually rebuilt on
+    the server. Attributing on scope alone put 526 differences from an unrelated data page in this
+    branch's list. "Rebuilt here" alone is not enough either: an automatic job can refresh a dataset on
+    this server without the branch asking for it.
+    """
+    from apps.wizard.app_pages.metadata_diff.discovery import BranchScope, select_candidates
+
+    ours = "grapher/wb/2026-06-26/world_bank_pip/poverty#headcount"
+    downstream = "grapher/un/2026-01-01/un_wpp/tb#population"  # in scope via the DAG, never rebuilt here
+    automatic = "grapher/covid/latest/cases/tb#cases"  # rebuilt here by a job, not in this branch's scope
+
+    scope = BranchScope(
+        dataset_paths={"garden/wb/2026-06-26/world_bank_pip", "garden/un/2026-01-01/un_wpp"},
+        export_shorts=set(),
+    )
+    built = {"wb/2026-06-26/world_bank_pip", "covid/latest/cases"}
+
+    selected, narrowed = select_candidates([ours, downstream, automatic], scope, built)
+    assert selected == [ours]
+    assert narrowed is True
+
+
+def test_candidate_selection_without_git_still_requires_a_rebuild_here():
+    """With no git signal the scope filter is skipped, but "rebuilt here" still applies."""
+    from apps.wizard.app_pages.metadata_diff.discovery import BranchScope, select_candidates
+
+    ours = "grapher/wb/2026-06-26/world_bank_pip/poverty#headcount"
+    theirs = "grapher/un/2026-01-01/un_wpp/tb#population"
+    selected, narrowed = select_candidates(
+        [ours, theirs], BranchScope(available=False), {"wb/2026-06-26/world_bank_pip"}
+    )
+    assert selected == [ours]
+    # False so the UI can say the list is not narrowed to the branch.
+    assert narrowed is False

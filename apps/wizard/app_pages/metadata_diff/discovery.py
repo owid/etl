@@ -149,6 +149,45 @@ def narrow_to_branch(paths: list[str], branch_paths: list[str] | None) -> tuple[
     return [p for p in paths if _dataset_of(p) in allowed], True
 
 
+def datasets_built_here(source_engine: Engine) -> set[str]:
+    """Datasets whose metadata this staging server rebuilt after it was created.
+
+    The decisive "we did this" signal, and much tighter than the git scope: changed *files* expand into
+    their whole downstream subgraph, so a one-line edit to one dataset's metadata put 118 datasets in
+    scope on this branch while 9 had actually been rebuilt here. Attributing on scope alone therefore
+    credited 526 differences in an unrelated UN WPP data page to this branch.
+    """
+    created = _staging_creation_time(source_engine)
+    df = read_sql(
+        "select catalogPath, metadataEditedAt from datasets where catalogPath is not null",
+        engine=source_engine,
+    )
+    return {
+        str(r["catalogPath"])
+        for r in df.to_dict("records")
+        if r["metadataEditedAt"] is not None and r["metadataEditedAt"] >= created
+    }
+
+
+def select_candidates(paths: list[str], scope: BranchScope, built: set[str]) -> tuple[list[str], bool]:
+    """The pure selection: in the git scope AND rebuilt on this server. Returns (paths, narrowed).
+
+    Both conditions are needed and neither suffices. The git scope alone is far too broad — changed files
+    expand into their whole downstream subgraph — while "rebuilt here" alone would also match a dataset
+    an automatic job refreshed on this server without the branch asking for it.
+    """
+    narrowed_paths, narrowed = narrow_to_branch(paths, sorted(scope.dataset_paths) if scope.available else None)
+    return [p for p in narrowed_paths if _dataset_of(p) in built], narrowed
+
+
+def candidate_paths(
+    source_engine: Engine, paths: list[str], scope: BranchScope | None = None
+) -> tuple[list[str], bool]:
+    """`select_candidates`, reading the scope from git and the rebuilt-here set from the server."""
+    scope = scope if scope is not None else branch_scope()
+    return select_candidates(paths, scope, datasets_built_here(source_engine))
+
+
 def charted_indicator_paths(source_engine: Engine) -> list[str]:
     """Catalog paths of indicators used by a published chart, whose dataset was edited on this server.
 
@@ -331,7 +370,7 @@ def mdim_changes_df(source_engine: Engine, target_engine: Engine) -> pd.DataFram
     try:
         paths_by_mdim = mdim_indicator_paths(source_engine, _load_configs(source_engine))
         all_paths = sorted({p for paths in paths_by_mdim.values() for p in paths})
-        narrowed_paths, _ = narrow_to_branch(all_paths, _branch_catalog_paths())
+        narrowed_paths, _ = candidate_paths(source_engine, all_paths)
         changed_paths: set[str] = set()
         if narrowed_paths:
             result = compare_indicator_texts(
@@ -503,17 +542,26 @@ class ExplorerChanges:
     """
 
     views: dict[str, list[ViewDiff]] = field(default_factory=dict)  # slug -> changed views
-    in_branch: set[str] = field(default_factory=set)  # slugs this branch is responsible for
+    in_branch: set[str] = field(default_factory=set)  # slugs with at least one view this branch changed
     narrowed: bool = True
+    # Attribution is per *view*, not per slug: a lagging explorer differs in every one of its views, and
+    # one of them carrying this branch's edit must not drag the other hundreds along. Set together by
+    # `changed_explorer_views`; left None by hand-built instances, which fall back to whole slugs.
+    branch_view_diffs: dict[str, list[ViewDiff]] | None = None
+    other_view_diffs: dict[str, list[ViewDiff]] | None = None
 
     def branch_views(self) -> dict[str, list[ViewDiff]]:
         if not self.narrowed:
             return self.views
+        if self.branch_view_diffs is not None:
+            return self.branch_view_diffs
         return {slug: diffs for slug, diffs in self.views.items() if slug in self.in_branch}
 
     def other_views(self) -> dict[str, list[ViewDiff]]:
         if not self.narrowed:
             return {}
+        if self.other_view_diffs is not None:
+            return self.other_view_diffs
         return {slug: diffs for slug, diffs in self.views.items() if slug not in self.in_branch}
 
 
@@ -530,22 +578,24 @@ def changed_explorer_views(source_engine: Engine, target_engine: Engine) -> Expl
     if not scope.available or not views:
         return ExplorerChanges(views=views, in_branch=set(views), narrowed=scope.available)
 
-    # An explorer is this branch's if its own export recipe changed, or if the text of an indicator behind
-    # one of its *changed* views actually changed. "Uses a dataset this branch builds" is too loose: an
-    # explorer master rebuilt last week differs in every view, and one of its datasets being in scope
-    # would then credit all of it to this PR.
-    in_branch = {slug for slug in views if scope.covers_export(slug)}
-    ids_by_slug: dict[str, set[int]] = {}
-    for slug, view_id in detailed:
-        if slug in in_branch:
+    # A *view* is this branch's if the explorer's own export recipe changed (then every view of it is),
+    # or if the text of an indicator that view renders actually changed. "Uses a dataset this branch
+    # builds" is too loose: an explorer master rebuilt last week differs in every view, and one of its
+    # datasets being in scope would then credit all of it to this PR. Per view rather than per slug for
+    # the same reason: one qualifying view must not vouch for the other hundreds in the same explorer.
+    own_recipe = {slug for slug in views if scope.covers_export(slug)}
+    ids_by_view: dict[tuple[str, str], set[int]] = {}
+    for key in detailed:
+        if key[0] in own_recipe:
             continue
-        ids_by_slug.setdefault(slug, set()).update(source_rows.get((slug, view_id), {}).get("indicator_ids") or set())
+        ids_by_view[key] = set(source_rows.get(key, {}).get("indicator_ids") or set())
 
-    all_ids = sorted({i for ids in ids_by_slug.values() for i in ids})
+    all_ids = sorted({i for ids in ids_by_view.values() for i in ids})
     rows = fetch_variable_rows(source_engine, all_ids) if all_ids else {}
     paths_by_id = {i: str(r["catalogPath"]) for i, r in rows.items() if r.get("catalogPath")}
-    # Only indicators from datasets this branch builds can carry one of its edits — compare just those.
-    candidates = sorted({p for p in paths_by_id.values() if scope.covers_indicator(p)})
+    # Only indicators this branch actually rebuilt here can carry one of its edits — compare just those.
+    candidates, _ = candidate_paths(source_engine, sorted(set(paths_by_id.values())), scope)
+    candidates = sorted(set(candidates))
     changed_paths: set[str] = set()
     if candidates:
         result = compare_indicator_texts(
@@ -553,11 +603,23 @@ def changed_explorer_views(source_engine: Engine, target_engine: Engine) -> Expl
             fetch_variable_rows_by_path(target_engine, candidates),
         )
         changed_paths = set(result.diffs) | result.new_paths
-    for slug, ids in ids_by_slug.items():
-        if any(paths_by_id.get(i) in changed_paths for i in ids):
-            in_branch.add(slug)
 
-    return ExplorerChanges(views=views, in_branch=in_branch, narrowed=True)
+    ours_keys = {key for key in detailed if key[0] in own_recipe}
+    ours_keys |= {key for key, ids in ids_by_view.items() if any(paths_by_id.get(i) in changed_paths for i in ids)}
+
+    branch: dict[str, list[ViewDiff]] = {}
+    other: dict[str, list[ViewDiff]] = {}
+    for key, diff in detailed.items():
+        bucket = branch if key in ours_keys else other
+        bucket.setdefault(key[0], []).append(diff)
+
+    return ExplorerChanges(
+        views=views,
+        in_branch=set(branch),
+        narrowed=True,
+        branch_view_diffs=branch,
+        other_view_diffs=other,
+    )
 
 
 # --- One summary for the section badges and the owidbot comment ----------------------------------
@@ -597,7 +659,13 @@ class Summary:
 
     @property
     def has_changes(self) -> bool:
-        return bool(self.n_charts or self.n_mdims or self.n_explorers)
+        """Whether there is reader-facing text here that nobody has reviewed yet.
+
+        New indicators count. A version bump replaces every catalog path, so nothing has a baseline
+        counterpart to diff against — and reporting that as "no metadata text changes" would wave
+        through a whole dataset's worth of new text.
+        """
+        return bool(self.n_charts or self.n_mdims or self.n_explorers or self.n_new_indicators)
 
 
 def change_identity(g: ChangeGroup) -> tuple[str, str]:
