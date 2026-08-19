@@ -520,19 +520,22 @@ def sanity_check_outputs(tb: Table) -> None:
             missing = sorted(set(range(years[0], years[-1] + 1)) - set(years))
             assert not missing, f"{region}'s {column} is missing {missing}."
 
-    # The continents partition the globe, so wherever all six are present they must add up to the
-    # Statistical Review's own World total.
-    continents = tb[tb["country"].isin(CONTINENTS)]
+    # The continents partition the globe, and so do the income groups, so wherever a family is complete it
+    # must add up to the Statistical Review's own World total, in every energy column.
     world = tb[tb["country"] == "World"].set_index("year")
-    for column in ENERGY_COLUMNS:
-        per_year = continents.groupby("year", observed=True)[column].agg(["sum", "count"])
-        complete = per_year[per_year["count"] == len(CONTINENTS)]
-        deviation = (100 * (complete["sum"] - world[column]) / world[column]).dropna()
-        assert not deviation.empty, f"No year has all continents present for {column}."
-        off = deviation[deviation.abs() > MAX_WORLD_DEVIATION_PCT]
-        assert off.empty, f"The continents do not add up to the World for {column}: " + "; ".join(
-            f"{year}: {value:+.1f}%" for year, value in off.items()
-        )
+    families = {"continents": CONTINENTS, "income groups": [region for region in REGIONS if region not in CONTINENTS]}
+    for family, regions in families.items():
+        members = tb[tb["country"].isin(regions)]
+        for column in ENERGY_COLUMNS:
+            per_year = members.groupby("year", observed=True)[column].agg(["sum", "count"])
+            complete = per_year[per_year["count"] == len(regions)]
+            gap = (complete["sum"] - world[column]).dropna()
+            assert not gap.empty, f"No year has all {family} present for {column}."
+            deviation = 100 * gap / world[column][gap.index]
+            off = gap[deviation.abs() > MAX_WORLD_DEVIATION_PCT]
+            assert off.empty, f"The {family} do not add up to the World for {column}: " + "; ".join(
+                f"{year}: {deviation[year]:+.1f}% ({value:+.0f} TWh)" for year, value in off.items()
+            )
 
 
 def run() -> None:

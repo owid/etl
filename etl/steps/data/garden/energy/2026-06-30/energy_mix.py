@@ -70,10 +70,16 @@ EIA_SOURCES = {
     "biofuels": "energy_consumption_from_biofuels",
 }
 
-# Tolerances for the reconciliations in sanity_check_outputs. The two producers disagree by 6-11% on
-# the same country and quantity (EIA's total runs 6.1% above the Statistical Review's), so anything
-# spanning a mixed aggregate cannot be checked more tightly than that.
-MAX_WORLD_DEVIATION_PCT = 5
+# Tolerances for the reconciliations in sanity_check_outputs.
+# Every region family must add up to the Statistical Review's own World total, in every energy column
+# (see sanity_check_outputs). A year has to breach both tolerances to fail. The relative one carries the
+# check wherever the quantity is large; the absolute one is what makes it usable on a source that starts
+# from almost nothing, where the producer leaves a few terawatt-hours unattributed to any country and a
+# percentage would be enormous while the discrepancy is trivial. The largest relative deviation measured
+# is 2.2% (renewables in 1988) and the largest absolute one 378 TWh (0.2% of the total, in 2005); the
+# only column that needs the absolute allowance is biofuels, which peaks at 39.9% and 15 TWh in 1980.
+MAX_WORLD_DEVIATION_PCT = 3
+MAX_WORLD_DEVIATION_TWH = 20
 MAX_SOURCES_DEVIATION_PCT = 2
 MAX_SHARE_SUM_DEVIATION_PCT = 2
 
@@ -642,18 +648,25 @@ def sanity_check_outputs(tb: Table) -> None:
             gaps[region] = missing
     assert not gaps, f"Region aggregates have unexpected missing values: {gaps}"
 
-    # Wherever every continent is published, the continents partition the globe, so they must add up to
-    # the Statistical Review's own World total.
-    continents = tb[tb["country"].isin(CONTINENTS)]
-    per_year = continents.groupby("year", observed=True)["total_energy_supply_twh"].agg(["sum", "count"])
-    complete_years = per_year[per_year["count"] == len(CONTINENTS)]
-    world = tb[tb["country"] == "World"].set_index("year")["total_energy_supply_twh"]
-    deviation = (100 * (complete_years["sum"] - world) / world).dropna()
-    off = deviation[deviation.abs() > MAX_WORLD_DEVIATION_PCT]
-    assert len(off) == 0, "The continents do not add up to the Statistical Review's World total: " + "; ".join(
-        f"{year}: {value:+.1f}%" for year, value in off.items()
-    )
-    assert not deviation.empty, "No year has all continents published, so they were never reconciled."
+    # The continents partition the globe, and so do the income groups, so wherever a family is complete it
+    # must add up to the Statistical Review's own World total. This is checked for every energy column, not
+    # just the total: a region built from a country set that does not cover the world shows up here, which
+    # is the defect that made South America's shares mix two producers.
+    world = tb[tb["country"] == "World"].set_index("year")
+    families = {"continents": CONTINENTS, "income groups": [region for region in REGIONS if region not in CONTINENTS]}
+    for family, regions in families.items():
+        members = tb[tb["country"].isin(regions)]
+        for column in [f"{source}_twh" for source in ALL_SOURCES] + ["total_energy_supply_twh"]:
+            per_year = members.groupby("year", observed=True)[column].agg(["sum", "count"])
+            complete_years = per_year[per_year["count"] == len(regions)]
+            gap = (complete_years["sum"] - world[column]).dropna()
+            assert not gap.empty, f"No year has all {family} published for {column}."
+            deviation = 100 * gap / world[column][gap.index]
+            off = gap[(deviation.abs() > MAX_WORLD_DEVIATION_PCT) & (gap.abs() > MAX_WORLD_DEVIATION_TWH)]
+            assert off.empty, (
+                f"The {family} do not add up to the Statistical Review's World total for {column}: "
+                + "; ".join(f"{year}: {deviation[year]:+.1f}% ({value:+.0f} TWh)" for year, value in off.items())
+            )
 
 
 def run() -> None:
