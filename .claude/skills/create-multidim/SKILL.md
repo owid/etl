@@ -123,6 +123,8 @@ The ETL has built-in change detection — if you modify the config, it will auto
 # (etl/config.py) when authoring a new MDIM, then leave it alone: Grapher migrates outdated
 # configs forward, but skips migration entirely when no version is given.
 grapher_schema: "011"
+# Never put `$schema` inside a view's `config` block: Grapher lets the view value override this
+# collection-level pin, so the two silently disagree. ETL warns when that happens.
 
 title:
   title: "Chart Title"
