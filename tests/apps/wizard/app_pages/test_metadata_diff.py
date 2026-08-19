@@ -1398,3 +1398,45 @@ def test_too_many_draft_mdims_reports_a_ceiling_instead_of_a_truncated_count():
 
     # And the usual case stays unqualified.
     assert "Unpublished MDims changed: 3 — no reader sees them yet" in format_metadata_diff(Summary(n_draft_mdims=3))
+
+
+def test_a_retired_export_recipe_does_not_claim_the_live_product():
+    """A recipe file left in the tree after its DAG entry moved on publishes nothing — and must vouch for nothing.
+
+    `etl/steps/export/explorers/wash/2024-02-15/water_and_sanitation.py` is in no DAG; only
+    `export://explorers/wash/latest/water_and_sanitation` is. The derived URI still reads like the live
+    product, because the scope names are taken from the recipe's own source, so editing the retired file put
+    `water-and-sanitation` in scope and filed the live explorer's baseline lag as this branch's work — the
+    one bucket a reviewer will not search for their own edit in.
+
+    Erring narrow is right on the export side: `covers_export` has no second gate, and a dropped URI is
+    still reported under "other differences" rather than lost.
+    """
+    from apps.wizard.app_pages.metadata_diff.discovery import _active_export_uris, _export_scope_names
+
+    active = _active_export_uris()
+    assert "export://explorers/wash/latest/water_and_sanitation" in active
+    retired = "export://explorers/wash/2024-02-15/water_and_sanitation"
+    assert retired not in active
+    # The retired recipe really does still answer to the live explorer's name — hence the filter.
+    assert "water-and-sanitation" in _export_scope_names(retired)
+
+
+def test_filtering_to_active_export_recipes_drops_no_real_recipe():
+    """The filter must not narrow away a recipe the branch legitimately edited.
+
+    Every export step file that names an active DAG step has to survive it, or a real recipe edit would be
+    misfiled as baseline lag — the failure this whole scope exists to prevent, in the other direction.
+    """
+    from apps.wizard.app_pages.metadata_diff.discovery import _active_export_uris
+    from etl.paths import STEP_DIR
+
+    active = _active_export_uris()
+    derived = set()
+    for path in (STEP_DIR / "export").rglob("*.py"):
+        if path.name == "__init__.py":
+            continue
+        derived.add("export://" + path.relative_to(STEP_DIR / "export").with_suffix("").as_posix())
+    # Every active step is reachable from a file in the tree, so the filter keeps all of them.
+    assert active <= derived
+    assert active & derived == active

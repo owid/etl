@@ -181,7 +181,15 @@ def branch_scope() -> BranchScope:
         return BranchScope(available=False)
 
     datasets = {p for p in paths if not p.startswith("export://")} | _shared_step_file_datasets(files_changed)
-    export_uris = set(changed_export_uris) | _shared_export_recipe_uris(files_changed)
+    # Only recipes the DAG still builds. A retired recipe left in the tree derives a URI that publishes
+    # nothing, yet still *reads* like the product it used to build, and `_export_scope_names` takes the
+    # names out of its source: `explorers/wash/2024-02-15/water_and_sanitation.py` is in no DAG but still
+    # emits `water-and-sanitation`, so editing it claimed the live `wash/latest` explorer and filed that
+    # explorer's baseline lag as this branch's work. Erring narrow is the right direction on the export
+    # side — `covers_export` has no second gate and hands over every config difference in the product it
+    # matches — and a dropped URI is still reported, under "other differences".
+    active_exports = _active_export_uris()
+    export_uris = {u for u in changed_export_uris if u in active_exports} | _shared_export_recipe_uris(files_changed)
     exports = {(_export_kind(p), name) for p in export_uris for name in _export_scope_names(p)}
     namespaces: dict[tuple[str, str], set[str]] = {}
     for uri in export_uris:
@@ -257,6 +265,13 @@ def _shared_step_file_datasets(files_changed: dict[str, Any]) -> set[str]:
     return out
 
 
+def _active_export_uris() -> set[str]:
+    """The `export://` steps the DAG actually builds."""
+    from etl.dag_helpers import load_dag
+
+    return {s for s in load_dag() if s.startswith("export://")}
+
+
 def _shared_export_recipe_uris(files_changed: dict[str, Any]) -> set[str]:
     """`export://` URIs of the recipes a changed *shared* file in an export folder feeds.
 
@@ -277,9 +292,7 @@ def _shared_export_recipe_uris(files_changed: dict[str, Any]) -> set[str]:
     config-level difference in that MDim. So crediting a folder wholesale would report an untouched
     sibling's baseline lag — a whole MDim's worth of it — as this branch's work.
     """
-    from etl.dag_helpers import load_dag
-
-    dag_uris = {s for s in load_dag() if s.startswith("export://")}
+    dag_uris = _active_export_uris()
     out: set[str] = set()
     for file_path in files_changed:
         path = Path(file_path)
