@@ -37,6 +37,7 @@ import argparse
 import importlib.util
 import json
 import re
+from collections import defaultdict
 from pathlib import Path
 from urllib.parse import parse_qsl, urlencode
 
@@ -309,11 +310,10 @@ def narrative_chart_mechanism() -> list[str]:
         "",
         "How to create it depends on the target:",
         "",
-        "- **Plain chart (every target here):** a chart page has no \"Create narrative chart\" "
+        '- **Plain chart (every target here):** a chart page has no "Create narrative chart" '
         "control — ask a developer to create it via the API, or leave the old one in place "
-        "(only the stored keys its \"Explore the data\" params override are lost on that hop).",
-        "- **MDIM:** create it yourself, from the \"Create narrative chart\" control on the "
-        "target view.",
+        '(only the stored keys its "Explore the data" params override are lost on that hop).',
+        '- **MDIM:** create it yourself, from the "Create narrative chart" control on the target view.',
     ]
 
 
@@ -455,7 +455,7 @@ def main() -> int:
                 f"### `{r['where']}` — on `{r['subject']}`",
                 "",
                 f"- **Replace with a narrative chart of:** {view_to_reproduce(r['subject_id'], pairs, slugs, log_sources)}",
-                f"- **Its \"Explore the data\" params:** {params_cell(own_params, set(base_query(r['subject_id'], log_sources)))}",
+                f'- **Its "Explore the data" params:** {params_cell(own_params, set(base_query(r["subject_id"], log_sources)))}',
                 f"- **Open:** {open_links(r, args.host, admin)}",
                 "",
             ]
@@ -537,6 +537,90 @@ def main() -> int:
             out.append(f"| {fr.cell(r['where'], 44)} | {old_cell} | {level} | {tgt_cell} | {verdict} |")
         out.append("")
 
+    # Also invisible to the Part 2 audit, and for the same reason as a key chart: a row keyed
+    # by URL, in no reference table. Kept next to the key-chart section because both are
+    # admin work rather than doc editing, and after it because this one cannot be resolved
+    # mechanically — see the note in the section body.
+    featured = [r for r in rows if r["surface"] == "featured metric"]
+    placed.update(id(r) for r in featured)
+    if featured:
+        # Slots are distinct per (url, tag, incomeGroup), so the target's slot only replaces the
+        # source's when the income group matches too. Keyed by tag alone, a target featured for a
+        # DIFFERENT group graded ✅ and told the operator to delete a row nothing was replacing.
+        # The source row's own group is read from its `featured_metrics.id` (the finding's
+        # `surface_id`) rather than parsed back out of the rendered `context` string.
+        fm_by_key = defaultdict(list)
+        fm_by_id = {}
+        for row in fr.featured_metric_rows():
+            fm_by_key[(fr.url_pathname(row["url"]), row["tag"], row["incomeGroup"])].append(row)
+            fm_by_id[int(row["id"])] = row
+        out += [
+            f"## ⭐ Featured metrics ({len(featured)}) — invisible to the Part 2 audit, and NOT a mechanical swap",
+            "",
+            "Same blind spot as the key charts above: a row in `featured_metrics` keyed by URL, so "
+            "`get_chart_references` counts none of them. It feeds a topic page's featured rail and "
+            "the top of that topic's search results. **A redirect does not carry the slot over** — "
+            "the row is resolved only when Algolia indexes, matching pathname *and* exact params "
+            "against published records. Unpublishing empties the slot silently; the one signal is an "
+            '*"Algolia Featured Metric Indexing Failures"* post in Slack after the next index.',
+            "",
+            "> [!WARNING]",
+            "> **The scatter view cannot be featured.** A featured metric names a chart, an MDIM view",
+            "> or an explorer view — never a chart's *tab*. `tab=` is a reader param: the admin strips",
+            "> it on paste, and a chart's Algolia record carries no query params, so a URL keeping",
+            "> `tab=scatter` matches nothing and fails to index.",
+            "",
+            "So each row is an editorial decision, not a swap: feature the **target chart's default "
+            "view** (a different chart from the retired scatter — say so when you hand it over), "
+            "feature something else, or drop the slot. The topic's owner decides — and it has to "
+            "happen **before** the unpublish, since adding a row requires a *published* slug.",
+            "",
+            "**Target already featured?** ✅ the target holds a slot on that tag *and* income group "
+            "(just delete the old row), 🟡 it holds one on that tag but for other income groups only "
+            "(add one for this group first), 🔴 it holds none on that tag.",
+            "",
+            "| Topic tag | Slot | Old chart | Target chart | Target already featured? |",
+            "|---|---|---|---|---|",
+        ]
+        graded = []
+        for r in featured:
+            tgt = pairs.get(r["subject_id"])
+            tgt_slug = slugs.get(tgt) if tgt else None
+            source = fm_by_id.get(int(r["surface_id"])) if r.get("surface_id") else None
+            group = source["incomeGroup"] if source else None
+            if tgt is None:
+                rank, verdict = 0, "— no target —"
+            elif tgt_slug and group and fm_by_key.get((f"/grapher/{tgt_slug}", r["where"], group)):
+                rank, verdict = 3, "✅ yes"
+            else:
+                # Any group the target IS featured for on this tag, so the operator can see the
+                # slot exists but sits elsewhere rather than reading a bare "no".
+                others = sorted(
+                    {
+                        key[2]
+                        for key in fm_by_key
+                        if tgt_slug and key[0] == f"/grapher/{tgt_slug}" and key[1] == r["where"]
+                    }
+                )
+                if others:
+                    rank, verdict = 1, f"🟡 only for {', '.join(others)}"
+                else:
+                    rank, verdict = 2, "🔴 no"
+            graded.append((rank, r, tgt, tgt_slug, verdict))
+        for rank, r, tgt, tgt_slug, verdict in sorted(graded, key=lambda g: (g[0], g[1]["where"], g[1]["subject"])):
+            old_cell = f"`{r['subject']}` ([#{r['subject_id']}]({admin}/charts/{r['subject_id']}/edit))"
+            tgt_cell = f"[#{tgt}]({admin}/charts/{tgt}/edit) `{tgt_slug or '?'}`" if tgt else "— no target —"
+            out.append(
+                f"| {fr.cell(r['where'], 40)} | {fr.cell(r.get('context', ''), 40)} | {old_cell} "
+                f"| {tgt_cell} | {verdict} |"
+            )
+        out += [
+            "",
+            f"Edit them at [{admin}/featured-metrics]({admin}/featured-metrics). Full procedure: "
+            "`docs/guides/data-work/redirect-to-mdims.md`.",
+            "",
+        ]
+
     # Anything no section above claimed — an old slug of the source, a site redirect, a
     # surface the sweep gains later. Listed rather than dropped, so the handoff cannot go
     # quiet about a reference the sweep did find.
@@ -613,7 +697,8 @@ def main() -> int:
     print(f"wrote {output}")
     print(
         f"  {len(rows)} reference(s): article embeds {tabled['embed']}, article links {tabled['link']}, "
-        f"key charts {len(key_charts)}, manual {len(manual)}, narrative {len(narrative)} "
+        f"key charts {len(key_charts)}, featured metrics {len(featured)}, manual {len(manual)}, "
+        f"narrative {len(narrative)} "
         f"(placed in {len(placements)} article(s)), other {len(other)}"
     )
     return 0

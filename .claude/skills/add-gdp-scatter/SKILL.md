@@ -121,7 +121,7 @@ The canonical items, in order:
 8. Apply the reviewer's flagged notes; regenerate the HTML and re-import their JSON.
 9. Chart-diff sign-off on staging, then merge.
 10. **Confirm the scatter views actually reached production.** A merged PR is not evidence that they did: chart-sync only carries chart edits whose diffs were **approved** in Chart Diff, so a PR can merge green with every row ✅ on staging and leave production untouched. An abandoned first attempt (PR #6173, merged 2026-06-24) left production untouched on all seven of its pairs — deliberately: the `target_query_param` needed for Part 2 did not exist yet, so it was dropped and the migration restarted from scratch rather than left half-done. Whatever the reason, check production directly rather than inferring it from the merge.
-11. **Reference sweep on the old charts** — `find-chart-references` over each source slug *and its aliases*, then `scripts/build_reference_handoff.py` to turn it into the handoff (it keeps the sweep's 📄 doc / 👁 preview / 🔗 page links and its "Find in the doc" search string — see below). Re-point embeds and links at the target's scatter view **before** retiring anything: an embed is never fixed by a redirect, and a link that works only via a 301 outlives everyone's memory of why. **Do not skip this because the Part 2 audit reports few references** — it counts a narrower set; see the key-chart trap below.
+11. **Reference sweep on the old charts** — `find-chart-references` over each source slug *and its aliases*, then `scripts/build_reference_handoff.py` to turn it into the handoff (it keeps the sweep's 📄 doc / 👁 preview / 🔗 page links and its "Find in the doc" search string — see below). Re-point embeds and links at the target's scatter view **before** retiring anything: an embed is never fixed by a redirect, and a link that works only via a 301 outlives everyone's memory of why. **Do not skip this because the Part 2 audit reports few references** — it counts a narrower set; see the key-chart and featured-metric traps below. Settle the ⭐ featured-metric rows in the same pass: they are the only ones that cannot be repaired after the unpublish.
 12. Narrative charts on the sources: replace where the parent is being retired (create → re-point articles → delete; never delete first).
 13. **Part 2 audit** — `redirect_to_scatter.py` with no `--apply`. Read every verdict.
 14. Part 2 `--apply` on staging, then the browser checks in "Verifying Part 2".
@@ -359,7 +359,7 @@ One limit remains: a reference that forces a **non-scatter** tab still receives 
 
 They only apply to Google Doc surfaces, though — `doc_url` and `gdoc_preview_url` read `surface_id` **as** a Doc id, and on an explorer or narrative-chart row that field holds a slug or a chart id, which renders as a Doc link resolving to nothing. So the two article tables are filtered to `GDOC_SURFACES`, every other surface gets the section that explains its own consequence, and whatever no section claims lands in a catch-all table — a row the sweep found must never go missing here.
 
-**Section order: embeds → links → explorer/DI/static-viz → narrative charts → key charts → catch-all.** It is roughly by urgency, but the tail is ordered by *kind of task* instead: a key-chart row is a tag association, not a reference in a document, so it wants the admin rather than Google Docs. Putting it last keeps the doc-editing run uninterrupted rather than splitting it in two.
+**Section order: embeds → links → explorer/DI/static-viz → narrative charts → key charts → featured metrics → catch-all.** It is roughly by urgency, but the tail is ordered by *kind of task* instead: a key-chart row is a tag association, not a reference in a document, so it wants the admin rather than Google Docs. Putting it last keeps the doc-editing run uninterrupted rather than splitting it in two.
 
 The narrative-chart section is the one place a **placement** table appears: `gdoc (narrative chart)` rows, which name the articles that place each narrative chart by name. They are deliberately excluded from `GDOC_SURFACES` — the surface is a gdoc, but the row references the *narrative chart*, not the chart being retired, so counting it among the article embeds would overstate both. Nest them under their narrative chart instead, with the same Doc / previewer / page links and search string the embed and link tables get, since the article edit is a step of the replacement.
 
@@ -370,6 +370,14 @@ The narrative-chart section is the one place a **placement** table appears: `gdo
 Unpublishing the source does not break a link here; it removes the chart from the topic page's key-chart list. So the loss is silent, on pages nobody is looking at during the migration. **Move each association to the target chart** (same tag, same `keyChartLevel`) as part of step 11.
 
 This is the concrete reason step 11 says not to trust a quiet Part 2 audit: on 2026-08-04 the audit's own tables held 6 embeds + 3 links, while the full sweep found **15 key-chart slots across 13 topic pages** — the largest single category, and entirely invisible to Part 2.
+
+### Featured metrics — invisible to Part 2 too, and the scatter view cannot hold one
+
+Same blind spot, same reason: a featured metric is a row in `featured_metrics` keyed by **URL**, so it is in none of the tables `get_chart_references` counts. It feeds a topic page's featured rail and the top of that topic's search results. And unlike a key chart it does not heal itself — the row is resolved only when Algolia indexes, matching pathname *and* exact params against **published** records, so unpublishing empties the slot silently. The one signal is an *"Algolia Featured Metric Indexing Failures"* post in Slack after the next index.
+
+**The scatter view cannot be featured at all.** A featured metric names a chart, an MDIM view or an explorer view — never a chart's *tab*. `tab=` is a reader param: the admin strips it on paste, and a chart's Algolia record carries no query params, so a URL keeping `tab=scatter` matches nothing and fails to index.
+
+So each row is an editorial decision, not a swap: feature the **target chart's default view** (a different chart from the retired scatter — say so when you hand it over), feature something else, or drop the slot. The topic's owner decides, and it has to happen **before** the unpublish, since adding a row requires a *published* slug. This is the one item in Part 2 that is unrecoverable rather than merely broken. The handoff's ⭐ section grades whether the target already holds a slot on that tag — where it does, only the old row needs deleting.
 
 ### Narrative charts
 
@@ -407,7 +415,8 @@ The order is forced by which calls trigger a bake:
 
 1. **Create** (or delete-then-recreate) the redirect on the target. There is no update endpoint, so wrong query params mean delete + create; if the create fails the original row is put back, and if that restore also fails the row reports `CRITICAL` with the repair.
 2. **Re-point the source's own old slugs** at the target. Unpublishing a chart deletes every `chart_slug_redirects` row pointing at it, so without this step those URLs become hard 404s. Each alias is deleted and re-created on the target — the UNIQUE constraint on `slug` leaves no other way. An alias's own query params are *not* carried over (they were written for the old chart) but are reported.
-3. **Unpublish the source.** This is both what makes the redirect fire (it only resolves on a 404) and what triggers the static build.
+3. **Settle any featured-metric slots** the handoff's ⭐ section lists, at `/admin/featured-metrics`. Last chance: step 4 unpublishes the source, and a featured metric can only be added for a *published* slug. See "Featured metrics" above — the scatter view itself cannot be featured, so this is a decision for the topic's owner rather than a swap.
+4. **Unpublish the source.** This is both what makes the redirect fire (it only resolves on a 404) and what triggers the static build.
 
 Both failure directions are handled so no URL is ever left unserved. If any alias fails to move, it is restored on the source and **the unpublish is skipped** — otherwise the unpublish would delete the restored row and create exactly the 404 step 2 exists to prevent. If the unpublish itself fails, the source is likewise left published. Either way the row reports `CRITICAL` with what to do.
 
