@@ -21,6 +21,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     group_usage,
     override_snippet,
     parse_catalog_path,
+    rendering_charts,
     yaml_field_snippet,
 )
 
@@ -60,7 +61,7 @@ def review_markdown(
         scope = "shared indicator metadata" if g.affects_indicator else "MDim override"
         reach = f"{len(g.view_dims)} view(s)"
         if g.affects_indicator:
-            n_charts = len(group_usage(g, usage).get("charts", []))
+            n_charts = len(rendering_charts(g, usage))
             if n_charts:
                 reach += f", {n_charts} chart(s)"
         lines.append(f"## {field_label(g.field)} — {status}")
@@ -425,7 +426,7 @@ def pr_brief_markdown(
             lines += surface_lines(g, usage, "scoped")
         else:
             imp = group_usage(g, usage)
-            n_c, n_m = len(imp.get("charts", [])), len(imp.get("mdims", []))
+            n_c, n_m = len(rendering_charts(g, usage)), len(imp.get("mdims", []))
             reach = f"{n_c} chart(s)" + (f" · {n_m} other MDim(s)" if n_m else "") + f" · {len(g.view_dims)} view(s)"
             lines += garden_location_lines(g, reach)
             # Applying to all means these specific charts change — name them, so the author can check.
@@ -500,7 +501,7 @@ def chart_pr_brief_markdown(
             lines.append(f"- **Set to:** {as_plaintext(g.new)}")
         elif g.affects_indicator:
             imp = group_usage(g, usage)
-            n_c, n_m = len(imp.get("charts", [])), len(imp.get("mdims", []))
+            n_c, n_m = len(rendering_charts(g, usage)), len(imp.get("mdims", []))
             reach = f"{n_c} other chart(s)" + (f" · {n_m} MDim(s)" if n_m else "") or "no other surface"
             lines += garden_location_lines(g, reach)
             lines += surface_lines(g, usage, "all")

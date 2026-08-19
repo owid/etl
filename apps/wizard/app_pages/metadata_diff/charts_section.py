@@ -23,6 +23,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     group_changes,
     group_usage,
     parse_catalog_path,
+    rendering_charts,
     renders_change,
 )
 from apps.wizard.app_pages.metadata_diff.render import (
@@ -62,18 +63,15 @@ def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -
         )
 
     if not groups:
-        st.success(
-            f"**No indicator text changes** against {BASELINE_NAME} — no chart's inherited title, subtitle "
-            "or *What you should know* text differs here."
-        )
+        all_clear, message = _empty_diff_notice(changed)
+        (st.success if all_clear else st.info)(message)
         _extra_notes(changed)
         _lookup_expander(source_engine, target_engine)
         return
 
     marks = resolve_marks(source_engine, SURFACE, groups)
-    # Charts that *show* the changed field, not merely charts using the indicator: a WYSK edit is
-    # invisible on a multi-indicator chart, which has no data page.
-    n_charts = len({c["chartId"] for g in groups for c in group_usage(g, usage)["charts"] if renders_change(g, c)})
+    # Charts that *show* the changed field, not merely charts using the indicator — see rendering_charts.
+    n_charts = len({c["chartId"] for g in groups for c in rendering_charts(g, usage)})
     st.markdown(
         f"**{len(groups)} text change{'s' if len(groups) != 1 else ''}** on "
         f"**{len(changed.diffs)} indicator{'s' if len(changed.diffs) != 1 else ''}**, reaching "
@@ -95,6 +93,28 @@ def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -
         pagination.show_controls(position="bottom")
 
     _lookup_expander(source_engine, target_engine)
+
+
+def _empty_diff_notice(changed) -> tuple[bool, str]:
+    """Whether an empty diff is genuinely all clear, and what to say about it.
+
+    Green means "nothing here needs your eyes", and an empty comparison does not establish that. A version
+    bump replaces every catalog path, so nothing has a baseline counterpart and the diff comes back empty
+    while a whole dataset's worth of reader-facing text has never been read. `Summary.has_changes` counts
+    new indicators for that reason; this section has to agree, or the page says all clear right above a
+    caption admitting a hundred indicators went unreviewed.
+    """
+    if changed.new_paths:
+        n = len(changed.new_paths)
+        return False, (
+            f"**Nothing to diff, and {n} indicator{'s' if n != 1 else ''} unreviewed** — no indicator's "
+            f"text *differs* from {BASELINE_NAME}, but {n} {'are' if n != 1 else 'is'} new on this server, "
+            "so there is no old text to compare against. A version bump lands exactly here."
+        )
+    return True, (
+        f"**No indicator text changes** against {BASELINE_NAME} — no chart's inherited title, subtitle "
+        "or *What you should know* text differs here."
+    )
 
 
 def _extra_notes(changed) -> None:

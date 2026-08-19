@@ -23,6 +23,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     field_label,
     group_changes,
     group_usage,
+    rendering_charts,
     text_change_key,
 )
 from apps.wizard.app_pages.metadata_diff.data import (
@@ -144,7 +145,8 @@ def _scope_label(scope: str, g: Any, usage: dict[int, dict[str, list[dict[str, A
     if not g.affects_indicator:
         return "🔒 MDim override — local to this view; no other charts or MDims are affected."
     imp = group_usage(g, usage)
-    n_c, n_m = len(imp.get("charts", [])), len(imp.get("mdims", []))
+    # Charts that cannot show the change are not a consequence of applying it — see rendering_charts.
+    n_c, n_m = len(rendering_charts(g, usage)), len(imp.get("mdims", []))
     if not n_c and not n_m:
         return "🔗 Shared indicator metadata — no other charts or MDims use it, so nothing else changes."
     also = f"{n_c} chart{'s' if n_c != 1 else ''}" + (f" and {n_m} other MDim{'s' if n_m != 1 else ''}" if n_m else "")

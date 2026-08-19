@@ -591,6 +591,51 @@ def test_wysk_reach_counts_only_charts_that_show_it():
     assert charts_reached([title], usage) == {1, 2}
 
 
+def test_every_reach_count_excludes_charts_that_cannot_show_the_change():
+    """One change must not report two different reaches depending on which page you opened.
+
+    The Charts section has always filtered by whether a reader can see the change; the MDim card, the
+    scope label and the PR brief read the same usage and so have to filter identically.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import rendering_charts
+
+    usage = {
+        7: {
+            "charts": [
+                {"chartId": 1, "slug": "a", "wysk_shown": True},
+                {"chartId": 2, "slug": "b", "wysk_shown": False},
+            ],
+            "mdims": [],
+        }
+    }
+    wysk = ChangeGroup(field="descriptionKey", old=["a"], new=["b"], affects_indicator=True, indicator_ids={7})
+    assert [c["chartId"] for c in rendering_charts(wysk, usage)] == [1]
+
+    # A title or short description feeds the chart itself, so no chart drops out.
+    title = ChangeGroup(field="titlePublic", old="Old", new="New", affects_indicator=True, indicator_ids={7})
+    assert [c["chartId"] for c in rendering_charts(title, usage)] == [1, 2]
+
+    # The scope consequence — "N charts also use this indicator, all will change" — counts the same way.
+    assert "1 chart" in _scope_label("all", wysk, usage)
+
+
+def test_an_empty_diff_is_not_all_clear_when_indicators_are_new():
+    """A version bump replaces every catalog path, so the comparison is empty and nothing is reviewed.
+
+    Green there would wave through a whole dataset's worth of reader-facing text — the same trap
+    `Summary.has_changes` closes for the page as a whole.
+    """
+    from apps.wizard.app_pages.metadata_diff.charts_section import _empty_diff_notice
+    from apps.wizard.app_pages.metadata_diff.discovery import IndicatorChanges
+
+    all_clear, message = _empty_diff_notice(IndicatorChanges())
+    assert all_clear and "No indicator text changes" in message
+
+    all_clear, message = _empty_diff_notice(IndicatorChanges(new_paths={"grapher/ns/v/d/t#a", "grapher/ns/v/d/t#b"}))
+    assert not all_clear
+    assert "2 indicators unreviewed" in message
+
+
 def test_only_the_json_backed_field_is_json_decoded():
     """Every field but WYSK is plain text; decoding one that happens to be valid JSON rewrites it."""
     row = {

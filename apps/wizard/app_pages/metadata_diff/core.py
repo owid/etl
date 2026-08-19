@@ -434,6 +434,17 @@ def renders_change(g: "ChangeGroup", chart: dict[str, Any]) -> bool:
     return bool(chart.get("wysk_shown", True))
 
 
+def rendering_charts(g: "ChangeGroup", usage: dict[int, dict[str, list[Any]]]) -> list[dict[str, Any]]:
+    """The charts from `group_usage` whose readers can actually see this change.
+
+    Every surface that reports a *count* of reach has to filter this way, or one change reports two
+    different reaches depending on which page you opened. Surfaces that *list* charts by name keep the
+    unfiltered set and flag the non-rendering ones instead: a chart the edit lands on is worth naming
+    even when its readers will not see the text.
+    """
+    return [c for c in group_usage(g, usage).get("charts", []) if renders_change(g, c)]
+
+
 def group_changes(view_diffs: list[ViewDiff]) -> list[ChangeGroup]:
     """Collapse per-view field changes into distinct (field, old→new) groups, ranked by reach (views)."""
     groups: dict[tuple[str, str, str], ChangeGroup] = {}
