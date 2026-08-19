@@ -617,18 +617,17 @@ def charts_affected(source_engine: Engine, changed: IndicatorChanges) -> dict[in
 # --- MDims --------------------------------------------------------------------------------------
 
 
-def mdim_list(engine: Engine, published_only: bool = False) -> pd.DataFrame:
+def mdim_list(engine: Engine) -> pd.DataFrame:
     """Every MDim with its config hash, publication state and slug (most recently updated first).
 
     `config` is deliberately excluded: it is a large JSON blob, and selecting it alongside
     `order by updatedAt` makes MySQL sort rows carrying those blobs, which overruns the sort buffer.
     """
-    published_filter = "and published = 1" if published_only else ""
     return read_sql(
-        f"""
+        """
         select catalogPath, configMd5, published, slug
         from multi_dim_data_pages
-        where catalogPath is not null {published_filter}
+        where catalogPath is not null
         order by updatedAt desc
         """,
         engine=engine,
@@ -648,7 +647,7 @@ def mdim_indicator_paths(source_engine: Engine, configs: dict[str, dict[str, Any
 
 
 def mdim_changes_df(source_engine: Engine, target_engine: Engine) -> pd.DataFrame:
-    """Every published MDim on this server, flagged against the baseline. Indexed by catalogPath.
+    """Every MDim on this server, flagged against the baseline. Indexed by catalogPath.
 
     Two independent signals, because either changes what a reader sees:
     - `config_changed`: the MDim's own config (view definitions, view-level metadata overrides).
@@ -670,7 +669,10 @@ def mdim_changes_df(source_engine: Engine, target_engine: Engine) -> pd.DataFram
     # The *baseline* list stays unfiltered on purpose: an MDim this branch publishes is a draft there, and
     # filtering it out of the baseline would leave no row to join against, reporting a brand-new MDim
     # where the branch only changed its publication state.
-    df_source = mdim_list(source_engine, published_only=True)
+    # Drafts are kept, and marked. They show nothing to readers, so they do not belong in the
+    # reader-facing count — but they are also the text that goes live the moment `published` flips, and
+    # dropping them from the query would hide them from the list and the "other differences" section too.
+    df_source = mdim_list(source_engine)
     df_target = mdim_list(target_engine)
 
     df = pd.merge(df_source, df_target, on="catalogPath", suffixes=("_source", "_target"), how="left")
@@ -708,6 +710,7 @@ def mdim_changes_df(source_engine: Engine, target_engine: Engine) -> pd.DataFram
     else:
         df["in_branch"] = df["has_changes"]
     df["scope_available"] = scope.available
+    df["is_draft"] = df["published_source"] != 1
     return df.set_index("catalogPath")
 
 
@@ -969,6 +972,7 @@ class Summary:
     n_mdims: int = 0  # MDims whose view texts changed
     n_mdim_changes: int = 0
     n_mdims_flagged: int = 0  # config or indicator metadata differs (a superset of n_mdims)
+    n_draft_mdims: int = 0  # changed by this branch, but unpublished — no reader sees them yet
     n_explorers: int = 0
     n_explorer_views: int = 0
     n_other_mdims: int = 0  # differ from the baseline, but not attributable to this branch
@@ -995,7 +999,12 @@ class Summary:
 
     @property
     def has_changes(self) -> bool:
-        """Whether there is reader-facing text here that nobody has reviewed yet.
+        """Whether this branch changed any metadata text that nobody has reviewed yet.
+
+        Not the same question as "does a reader see it". An unpublished MDim shows nothing to readers, so
+        it stays out of the reader-facing counts — but a branch whose only change is a draft MDim has
+        still changed text, and answering "No metadata text changes" there would hide the very edit the
+        PR exists to make. Drafts are counted here and labelled where they are reported.
 
         Counted on the *changes*, never on their audience. `n_charts` is filtered to charts a reader can
         actually see the change on, which is the right number to report as reach but the wrong one to
@@ -1014,6 +1023,7 @@ class Summary:
             or self.n_mdims
             or self.n_explorers
             or self.n_new_indicators
+            or self.n_draft_mdims
         )
 
 
@@ -1095,7 +1105,9 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
             summary.warnings.append(
                 "Could not compare indicator metadata for MDims — the count reflects config changes only."
             )
-        flagged = [str(cp) for cp in df_mdims.index[df_mdims["in_branch"]]]
+        reader_facing = df_mdims["in_branch"] & ~df_mdims["is_draft"]
+        flagged = [str(cp) for cp in df_mdims.index[reader_facing]]
+        drafts = [str(cp) for cp in df_mdims.index[df_mdims["in_branch"] & df_mdims["is_draft"]]]
         summary.n_mdims_flagged = len(flagged)
         summary.n_other_mdims = int(df_mdims["has_changes"].sum()) - len(flagged)
         if len(flagged) > MAX_MDIMS_RESOLVED:
@@ -1111,6 +1123,12 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
                     summary.n_mdims += 1
                     summary.n_mdim_changes += len(ours)
                     _collect_changes(seen, ours)
+        # Drafts are counted only where they actually have changed text, same test as the rest.
+        scope_for_drafts = branch_scope()
+        for cp in drafts[:MAX_MDIMS_RESOLVED]:
+            view_diffs = [v for v in mdim_text_changes(source_engine, target_engine, cp) if v.changed]
+            if split_mdim_groups(cp, view_diffs, scope_for_drafts)[0]:
+                summary.n_draft_mdims += 1
     except Exception as e:  # noqa: BLE001
         log.warning("metadata_diff.mdim_discovery_failed", error=str(e))
         summary.warnings.append(f"MDim discovery failed: {e}")

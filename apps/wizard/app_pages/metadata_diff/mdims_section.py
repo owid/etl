@@ -57,7 +57,9 @@ def st_show_mdim_metadata_diffs(source_engine: Engine, target_engine: Engine) ->
         _render_selected(source_engine, target_engine, df, str(selected))
         return
 
-    flagged = [str(cp) for cp in df.index[df["in_branch"]]]
+    reader_facing = df["in_branch"] & ~df["is_draft"]
+    flagged = [str(cp) for cp in df.index[reader_facing]]
+    drafts = [str(cp) for cp in df.index[df["in_branch"] & df["is_draft"]]]
     others = [str(cp) for cp in df.index[df["has_changes"] & ~df["in_branch"]]]
 
     if not bool(df["scope_available"].all()):
@@ -67,7 +69,11 @@ def st_show_mdim_metadata_diffs(source_engine: Engine, target_engine: Engine) ->
         )
 
     if not flagged:
-        st.success(f"**No MDim's texts changed on this branch** (against {BASELINE_NAME}).")
+        message = f"**No published MDim's texts changed on this branch** (against {BASELINE_NAME})."
+        if drafts:
+            st.info(message + f" {len(drafts)} unpublished one(s) did — see below.")
+        else:
+            st.success(message)
     else:
         st.markdown(
             f"**{len(flagged)} of {len(df)} MDims** changed by this branch.",
@@ -83,7 +89,28 @@ def st_show_mdim_metadata_diffs(source_engine: Engine, target_engine: Engine) ->
         if len(flagged) > MDIMS_PER_PAGE:
             pagination.show_controls(position="bottom")
 
+    _render_drafts(source_engine, target_engine, df, drafts)
     _render_other(others)
+
+
+def _render_drafts(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, drafts: list[str]) -> None:
+    """MDims this branch changed that no reader can see yet, because they are unpublished.
+
+    Kept out of the count above — the badge answers "what changes for readers" — but not out of the
+    review: this is the text that goes live the moment `published` flips, so the PR that publishes an
+    MDim is exactly the one whose reviewer needs to read it.
+    """
+    if not drafts:
+        return
+    with st.expander(f"📝 {len(drafts)} unpublished MDim(s) this branch changed — no reader sees them yet"):
+        st.caption(
+            "Their `published` flag is false, so they are not counted above. They are still worth reading "
+            "if this PR is the one that publishes them."
+        )
+        for catalog_path in drafts[:MDIMS_PER_PAGE]:
+            _render_card(source_engine, target_engine, df, catalog_path)
+        if len(drafts) > MDIMS_PER_PAGE:
+            st.caption(f"… and {len(drafts) - MDIMS_PER_PAGE} more; open one from its catalogPath above.")
 
 
 def _render_other(others: list[str]) -> None:

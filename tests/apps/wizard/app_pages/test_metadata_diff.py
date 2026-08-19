@@ -1107,43 +1107,26 @@ def test_shared_metadata_file_credits_its_sibling_steps():
     assert _shared_step_file_datasets({"apps/wizard/app_pages/metadata_diff/core.py": "M"}) == set()
 
 
-def test_only_published_mdims_are_counted_as_reader_facing_changes(monkeypatch):
+def test_a_draft_mdim_is_marked_rather_than_filtered_away(monkeypatch):
     """Grapher serves an MDim only when `published = 1`, so a draft's text reaches no reader.
 
-    38 of the 78 MDims on this branch's staging server are drafts — and one of the two MDims the branch
-    changes is among them, so the section header and the PR comment reported twice the reader-facing MDim
-    work that exists. Charts (`publishedAt is not null`) and explorer views (`isPublished = 1`) were
-    already filtered at the query; MDims were the outlier.
+    38 of the 78 MDims on this branch's staging server are drafts, and one of the two the branch changes is
+    among them — so counting drafts reported twice the reader-facing work that exists. But filtering them
+    out of the query removed them from the list and the "other differences" section as well, and a branch
+    whose only change is a draft MDim then read as "no metadata text changes". They are kept and marked, so
+    the count stays reader-facing while the review still sees them.
     """
     import pandas as pd
 
     from apps.wizard.app_pages.metadata_diff import discovery
 
-    queries: list[str] = []
-
-    def fake_read_sql(sql, engine=None):
-        queries.append(sql)
-        return pd.DataFrame(columns=["catalogPath", "configMd5", "published", "slug"])
-
-    monkeypatch.setattr(discovery, "read_sql", fake_read_sql)
-    discovery.mdim_list("engine", published_only=True)
-    discovery.mdim_list("engine")
-    assert "published = 1" in queries[0]
-    assert "published = 1" not in queries[1]
-
-    # The baseline list stays unfiltered: an MDim this branch *publishes* is still a draft there, and
-    # dropping it from the baseline would leave nothing to join against — reporting a brand-new MDim
-    # where the branch only changed its publication state.
-    calls: list[tuple[str, bool]] = []
-
-    def fake_mdim_list(engine, published_only=False):
-        calls.append((engine, published_only))
+    def fake_mdim_list(engine):
         return pd.DataFrame(
             {
-                "catalogPath": ["ns/latest/mdim#mdim"],
-                "configMd5": ["here" if engine == "source" else "there"],
-                "published": [1],
-                "slug": ["mdim"],
+                "catalogPath": ["ns/latest/live#live", "ns/latest/draft#draft"],
+                "configMd5": ["here" if engine == "source" else "there"] * 2,
+                "published": [1, 0],
+                "slug": ["live", "draft"],
             }
         )
 
@@ -1155,9 +1138,12 @@ def test_only_published_mdims_are_counted_as_reader_facing_changes(monkeypatch):
     monkeypatch.setattr(discovery, "branch_scope", lambda: discovery.BranchScope(available=False))
 
     df = discovery.mdim_changes_df("source", "target")
-    assert calls == [("source", True), ("target", False)]
-    assert not bool(df.loc["ns/latest/mdim#mdim", "is_new"])
-    assert bool(df.loc["ns/latest/mdim#mdim", "config_changed"])
+    # Both are present — nothing is dropped at the query — and only the unpublished one is marked.
+    assert set(df.index) == {"ns/latest/live#live", "ns/latest/draft#draft"}
+    assert not bool(df.loc["ns/latest/live#live", "is_draft"])
+    assert bool(df.loc["ns/latest/draft#draft", "is_draft"])
+    # Both still register as changed against the baseline, which is what puts them in front of a reviewer.
+    assert bool(df.loc["ns/latest/draft#draft", "config_changed"])
 
 
 def test_package_step_files_credit_the_step_they_live_in():
@@ -1339,3 +1325,25 @@ def test_indicator_identity_ignores_only_the_version():
     # A channel prefix must not affect identity, and an unknown path stays comparable.
     assert _same_indicator("garden/un/2026-05-01/wpp/tbl#population", bumped_new)
     assert _same_indicator(None, bumped_new)
+
+
+def test_a_draft_mdim_is_reported_but_not_counted_as_reader_facing():
+    """An unpublished MDim shows readers nothing — but the branch still changed its text.
+
+    Filtering drafts out of the query removed them from the list, the counts and the "other differences"
+    section at once, so a PR whose only change was a draft MDim read as "No metadata text changes". They
+    are now counted separately and labelled, the same way every other not-reader-facing case is.
+    """
+    from apps.owidbot.metadata_diff import format_metadata_diff, status_icon
+    from apps.wizard.app_pages.metadata_diff.discovery import Summary
+
+    draft_only = Summary(n_draft_mdims=1)
+    assert draft_only.has_changes
+    assert status_icon(draft_only) == "✏️"
+    body = format_metadata_diff(draft_only)
+    assert "Unpublished MDims changed: 1" in body
+    assert "No metadata text changes" not in body
+
+    # A draft never inflates the reader-facing MDim count.
+    both = Summary(n_mdims=2, n_draft_mdims=3)
+    assert "MDims: 2" in format_metadata_diff(both)
