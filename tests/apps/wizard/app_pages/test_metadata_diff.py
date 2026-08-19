@@ -1107,6 +1107,59 @@ def test_shared_metadata_file_credits_its_sibling_steps():
     assert _shared_step_file_datasets({"apps/wizard/app_pages/metadata_diff/core.py": "M"}) == set()
 
 
+def test_only_published_mdims_are_counted_as_reader_facing_changes(monkeypatch):
+    """Grapher serves an MDim only when `published = 1`, so a draft's text reaches no reader.
+
+    38 of the 78 MDims on this branch's staging server are drafts — and one of the two MDims the branch
+    changes is among them, so the section header and the PR comment reported twice the reader-facing MDim
+    work that exists. Charts (`publishedAt is not null`) and explorer views (`isPublished = 1`) were
+    already filtered at the query; MDims were the outlier.
+    """
+    import pandas as pd
+
+    from apps.wizard.app_pages.metadata_diff import discovery
+
+    queries: list[str] = []
+
+    def fake_read_sql(sql, engine=None):
+        queries.append(sql)
+        return pd.DataFrame(columns=["catalogPath", "configMd5", "published", "slug"])
+
+    monkeypatch.setattr(discovery, "read_sql", fake_read_sql)
+    discovery.mdim_list("engine", published_only=True)
+    discovery.mdim_list("engine")
+    assert "published = 1" in queries[0]
+    assert "published = 1" not in queries[1]
+
+    # The baseline list stays unfiltered: an MDim this branch *publishes* is still a draft there, and
+    # dropping it from the baseline would leave nothing to join against — reporting a brand-new MDim
+    # where the branch only changed its publication state.
+    calls: list[tuple[str, bool]] = []
+
+    def fake_mdim_list(engine, published_only=False):
+        calls.append((engine, published_only))
+        return pd.DataFrame(
+            {
+                "catalogPath": ["ns/latest/mdim#mdim"],
+                "configMd5": ["here" if engine == "source" else "there"],
+                "published": [1],
+                "slug": ["mdim"],
+            }
+        )
+
+    def no_db(engine):
+        raise RuntimeError("no database in this test")
+
+    monkeypatch.setattr(discovery, "mdim_list", fake_mdim_list)
+    monkeypatch.setattr(discovery, "_load_configs", no_db)
+    monkeypatch.setattr(discovery, "branch_scope", lambda: discovery.BranchScope(available=False))
+
+    df = discovery.mdim_changes_df("source", "target")
+    assert calls == [("source", True), ("target", False)]
+    assert not bool(df.loc["ns/latest/mdim#mdim", "is_new"])
+    assert bool(df.loc["ns/latest/mdim#mdim", "config_changed"])
+
+
 def test_package_step_files_credit_the_step_they_live_in():
     """A step implemented as a package keeps its metadata *inside* the step folder, not beside it.
 

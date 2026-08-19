@@ -617,17 +617,18 @@ def charts_affected(source_engine: Engine, changed: IndicatorChanges) -> dict[in
 # --- MDims --------------------------------------------------------------------------------------
 
 
-def mdim_list(engine: Engine) -> pd.DataFrame:
+def mdim_list(engine: Engine, published_only: bool = False) -> pd.DataFrame:
     """Every MDim with its config hash, publication state and slug (most recently updated first).
 
     `config` is deliberately excluded: it is a large JSON blob, and selecting it alongside
     `order by updatedAt` makes MySQL sort rows carrying those blobs, which overruns the sort buffer.
     """
+    published_filter = "and published = 1" if published_only else ""
     return read_sql(
-        """
+        f"""
         select catalogPath, configMd5, published, slug
         from multi_dim_data_pages
-        where catalogPath is not null
+        where catalogPath is not null {published_filter}
         order by updatedAt desc
         """,
         engine=engine,
@@ -647,7 +648,7 @@ def mdim_indicator_paths(source_engine: Engine, configs: dict[str, dict[str, Any
 
 
 def mdim_changes_df(source_engine: Engine, target_engine: Engine) -> pd.DataFrame:
-    """Every MDim on this server, flagged against the baseline. Indexed by catalogPath.
+    """Every published MDim on this server, flagged against the baseline. Indexed by catalogPath.
 
     Two independent signals, because either changes what a reader sees:
     - `config_changed`: the MDim's own config (view definitions, view-level metadata overrides).
@@ -661,7 +662,15 @@ def mdim_changes_df(source_engine: Engine, target_engine: Engine) -> pd.DataFram
     the rest under "other differences". `indicator_check_failed` says the second signal could not be
     computed, so the caller can warn instead of silently showing fewer changes.
     """
-    df_source = mdim_list(source_engine)
+    # Only MDims this server actually serves. Grapher renders an MDim only when `published = 1`, and 38
+    # of the 78 here are drafts — counting one as a reader-facing change inflates the section header and
+    # the PR comment with work no reader can see, which the brief's own wording rules out. `charts_using_
+    # indicators` and `explorer_view_rows` already filter their surfaces this way; MDims were the outlier.
+    #
+    # The *baseline* list stays unfiltered on purpose: an MDim this branch publishes is a draft there, and
+    # filtering it out of the baseline would leave no row to join against, reporting a brand-new MDim
+    # where the branch only changed its publication state.
+    df_source = mdim_list(source_engine, published_only=True)
     df_target = mdim_list(target_engine)
 
     df = pd.merge(df_source, df_target, on="catalogPath", suffixes=("_source", "_target"), how="left")
