@@ -502,7 +502,12 @@ def chart_pr_brief_markdown(
         elif g.affects_indicator:
             imp = group_usage(g, usage)
             n_c, n_m = len(rendering_charts(g, usage)), len(imp.get("mdims", []))
-            reach = f"{n_c} other chart(s)" + (f" · {n_m} MDim(s)" if n_m else "") or "no other surface"
+            # `"..." or "no other surface"` never reached the fallback — a non-empty f-string is truthy, so
+            # a change reaching nothing else read as "0 other chart(s)". Say it in words instead.
+            if n_c or n_m:
+                reach = f"{n_c} other chart(s)" + (f" · {n_m} MDim(s)" if n_m else "")
+            else:
+                reach = "no other surface"
             lines += garden_location_lines(g, reach)
             lines += surface_lines(g, usage, "all")
             # The changed line is always the safe, minimal edit. The full rendered field is kept for

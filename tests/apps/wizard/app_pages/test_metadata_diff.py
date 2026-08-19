@@ -935,3 +935,27 @@ def test_owidbot_leads_with_a_stale_server_and_flags_it_in_the_icon():
 
     # And it survives the no-changes path, where a stale build may be the reason there are none.
     assert "behind on 1 dataset" in format_metadata_diff(Summary(stale=stale.stale))
+
+
+def test_chart_brief_says_no_other_surface_in_words():
+    """A change reaching nothing else used to read "0 other chart(s)".
+
+    The old expression was `f"{n_c} other chart(s)" + (...) or "no other surface"`, and a non-empty
+    f-string is always truthy, so the fallback was unreachable.
+    """
+    from apps.wizard.app_pages.metadata_diff.brief import chart_pr_brief_markdown
+
+    group = ChangeGroup(
+        field="descriptionKey",
+        old=["a"],
+        new=["b"],
+        view_dims=[{}],
+        affects_indicator=True,
+        indicator_id=1,
+        catalog_path="grapher/ns/2026-01-01/ds/tb#var",
+        catalog_paths={"grapher/ns/2026-01-01/ds/tb#var"},
+    )
+    resolved = [{"g": group, "stale": False, "label": "✅ Approve", "seed_label": "✅ Approve", "charts": []}]
+    brief = chart_pr_brief_markdown({"slug": "some-chart"}, "production", resolved, {}, "chart:some-chart")
+    assert "no other surface" in brief
+    assert "0 other chart(s)" not in brief
