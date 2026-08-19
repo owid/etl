@@ -83,6 +83,9 @@
                     "Leave the pin alone once set — it records what the config was authored against, which is what lets Grapher migrate it after a breaking change."
                 ],
                 [
+                    "Pin here and nowhere else. A `$schema` inside a view's `config` overrides this field (grapher spreads the view config last) while being much less visible, so the two silently disagree. ETL logs a warning when a view shadows this pin."
+                ],
+                [
                     "The exception is a pin that contradicts the config body (e.g. pinned `005` while using `chartTypes`, which only exists from `006`). That is a stale pin, not a record: Grapher would run migrations over a config they were never meant to touch. Correct it to the version the config is actually written against."
                 ]
             ],

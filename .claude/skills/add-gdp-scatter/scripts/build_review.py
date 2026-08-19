@@ -36,6 +36,7 @@ Usage::
 """
 
 import argparse
+import html
 import importlib.util
 import json
 import re
@@ -43,6 +44,7 @@ import sys
 from pathlib import Path
 
 from etl.config import OWID_ENV
+from etl.db import get_engine
 
 CHART_ID_RE = re.compile(r"/charts/(\d+)")
 TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
@@ -136,7 +138,50 @@ def default_tab_label(cfg: dict) -> str:
     return TAB_LABELS.get(tab, tab)
 
 
-def row_flags(src_cfg: dict, tgt_cfg: dict, is_log: bool) -> tuple[list[str], list[str]]:
+def esc(text: object) -> str:
+    """Escape config-derived text: the warning and context lists are injected with innerHTML."""
+    return html.escape(str(text), quote=False)
+
+
+def graded_exclusions(src_cfg: dict, tgt_cfg: dict) -> list[dict]:
+    """The source's exclusions, graded by the applier against the view this reviewer shows.
+
+    Graded here rather than re-derived: the classes and the warning/context split belong to
+    `apply_scatter_defaults`, so the reviewer says the same thing the applier's run said. A
+    failure degrades to one ungraded warning — better than a silent empty list, which would read
+    as "this chart excluded nothing".
+    """
+    excluded = src_cfg.get("excludedEntityNames") or []
+    if not excluded:
+        return []
+    applier = redirect.applier
+    try:
+        tgt_y = applier.find_dim(tgt_cfg, "y") or {}
+        y_var_id = tgt_y.get("variableId")
+        gdp_var_id = (applier.find_dim(tgt_cfg, "x") or {}).get("variableId")
+        if y_var_id is None or gdp_var_id is None:
+            raise ValueError("target has no y or no x dimension")
+        tol = int((tgt_y.get("display") or {}).get("tolerance") or 0)
+        engine = get_engine()
+        year = applier.resolve_default_year(tgt_cfg, int(y_var_id), int(gdp_var_id), engine)
+        if year is None:
+            raise ValueError("no year where both indicators have data")
+        return applier.classify_exclusions(list(excluded), int(y_var_id), int(gdp_var_id), year, tol, engine)
+    except Exception as e:
+        return [
+            {
+                "entity": ", ".join(str(x) for x in excluded),
+                "cls": "ungradeable",
+                "why": f"could not grade these ({e!s:.90})",
+                "year": None,
+                "exact": True,
+            }
+        ]
+
+
+def row_flags(
+    src_cfg: dict, tgt_cfg: dict, is_log: bool, exclusions: list[dict] | None = None
+) -> tuple[list[str], list[str]]:
     """(warnings, context) for one pair, computed from the two configs.
 
     The split is what keeps the "With warnings" filter worth using. **Warnings** are things
@@ -146,6 +191,7 @@ def row_flags(src_cfg: dict, tgt_cfg: dict, is_log: bool) -> tuple[list[str], li
     """
     warns: list[str] = []
     context: list[str] = []
+    exclusions = exclusions or []
     types = tgt_cfg.get("chartTypes") or ["LineChart", "DiscreteBar"]
 
     if "ScatterPlot" not in types:
@@ -167,11 +213,18 @@ def row_flags(src_cfg: dict, tgt_cfg: dict, is_log: bool) -> tuple[list[str], li
     if tgt_cfg.get("stackMode") == "relative":
         warns.append("stackMode=relative — the scatter opens on 'average annual change'")
 
-    excluded = src_cfg.get("excludedEntityNames") or []
-    if excluded:
-        warns.append(
-            f"old chart excluded {', '.join(excluded)} — NOT carried to the target, so they reappear on the scatter"
-        )
+    # Graded, because the two usual reasons for an exclusion have opposite consequences here: a
+    # y outlier's return is a real defect, while a merely very high GDP per capita is harmless on
+    # the target's log x axis. Grading them apart is what keeps this warning worth reading — an
+    # unclassified list of names fires on every row that has one and decides nothing. The classes
+    # and the warning/context split are the applier's (`EXCLUSION_WARN_CLASSES`).
+    for e in exclusions:
+        where = "" if e["exact"] or e["year"] is None else f" (measured at {e['year']}, its latest year with both)"
+        line = f"old chart excluded <b>{esc(e['entity'])}</b> — {e['cls']}: {esc(e['why'])}{where}"
+        if e["cls"] in redirect.applier.EXCLUSION_WARN_CLASSES:
+            warns.append(f"{line}. The target never inherits exclusions, so it is back on this scatter")
+        else:
+            context.append(f"{line} — back on the scatter, but harmless")
 
     # Expected-and-handled, so context rather than a warning: both routes to the scatter
     # clear the selection (a tab click via ensureEntitySelectionIsSensibleForTab, the
@@ -189,13 +242,20 @@ def row_flags(src_cfg: dict, tgt_cfg: dict, is_log: bool) -> tuple[list[str], li
     if tgt_cfg.get("minTime") == tgt_cfg.get("maxTime") and tgt_cfg.get("minTime") is not None:
         context.append(f"time is pinned in the config to {tgt_cfg.get('minTime')!r} for every view")
 
-    # Context, not a warning: it is the intended behavior. On screen because the pane is
-    # logarithmic while the target's own default is linear, and without saying so the reviewer
-    # reads that as the migration having changed the target's axis for everyone.
     if is_log:
+        # Two separate statements, which is why one is context and one is a warning. That the two
+        # panes differ is intended and only needs explaining (context). Whether a LINEAR scatter
+        # still tells the story the author chose a log axis for is a judgment nobody else in the
+        # workflow makes — and the reviewer is the one person looking at both shapes at once.
         context.append(
             "the retiring chart had a LOG y axis, so the redirect carries yScale=log and the Redirect "
             "view is logarithmic — the target's own default stays linear for its other tabs"
+        )
+        warns.append(
+            "the retiring chart's LOG y axis does not transfer: yAxis is global, so a reader who CLICKS "
+            "the scatter tab gets it linear, and a key-chart slot (no query string) can never get the log "
+            "at all. Compare the shapes — if linear misreads the relationship, flag the row: keeping the "
+            "standalone chart is a legitimate outcome"
         )
 
     return warns, context
@@ -222,7 +282,8 @@ def build_records(pairs: list[dict]) -> list[dict]:
         src, tgt = charts[src_id], charts[tgt_id]
         types = tgt["cfg"].get("chartTypes") or ["LineChart", "DiscreteBar"]
         scatter_pos = types.index("ScatterPlot") + 1 if "ScatterPlot" in types else 0
-        warns, context = row_flags(src["cfg"], tgt["cfg"], is_log=src_id in log_sources)
+        exclusions = graded_exclusions(src["cfg"], tgt["cfg"])
+        warns, context = row_flags(src["cfg"], tgt["cfg"], is_log=src_id in log_sources, exclusions=exclusions)
 
         records.append(
             {

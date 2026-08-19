@@ -33,7 +33,6 @@ METRIC_TYPE_DESCRIPTION_KEY = [
 
 
 MULTIDIM_CONFIG = {
-    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json",
     "hasMapTab": True,
     "tab": "map",
     "originUrl": "ourworldindata.org/education",
