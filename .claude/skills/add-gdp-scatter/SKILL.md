@@ -97,11 +97,65 @@ That second case is what **Part 2's redirect produces**, so a reader arriving by
 7. Emits warnings (no action) for:
    - Target has no `selectedEntityNames` — line/bar/slope views will fall back to Grapher defaults.
    - Target `stackMode: relative` — on scatter this is the "Display average annual change" mode; we want the toggle available but **off by default**, so a relative default is flagged for review.
-   - Source `excludedEntityNames` — would apply across all views, not just scatter.
+   - Source `excludedEntityNames` — never applied to the target (they would hide the entity from all views, not just the scatter), so each one **reappears** on the migrated scatter. Graded per entity by `classify_exclusions` into `y-OUTLIER` / `aggregate` / `unclear` / `ungradeable` (a decision is needed) vs `high-GDP` / `no data` (benign), with the numbers in the **EXCLUDED ENTITIES** table. Only the first group makes the note a `WARN`.
+   - Source y axis is **log** — the target's scatter tab opens linear, and only a URL carrying `yScale=log` restores it. See "A log y axis and an exclusion list are the two things the migration cannot carry".
    - GDP coverage mismatch — if y-indicator's earliest year predates the chosen GDP's coverage (WDI≈1990, PWT≈1950, Maddison≈year 1), suggest a deeper-history alternative.
    - Few entities on default scatter view — counts entities with both a y- and an x-value within tolerance at the default time; if fewer than ~15 AND source uses higher tolerance, recommends bumping target's y `display.tolerance`.
 
 Push uses `apps.chart_sync.admin_api.AdminAPI.update_chart(id, cfg)`.
+
+### A log y axis and an exclusion list are the two things the migration cannot carry
+
+Everything else on the source is either mirrored onto the target or left behind for a reason that
+holds. These two are different — they are *lost*, and the only channel that gives either back is
+a query string:
+
+- **A log y axis** stays behind because `yAxis` is global (step 5). Part 2's redirect and a
+  hand-updated article link carry `yScale=log`; a reader who **clicks** the scatter tab does not,
+  and neither does any surface that has no URL of its own.
+- **`excludedEntityNames`** is never applied to the target (exclusions are global too, so they
+  would hide the entity from its line/bar/map views), so every excluded entity **reappears** on
+  the migrated scatter. Nothing, anywhere, puts it back.
+
+The surfaces with no query string are what decide whether the retirement is worth doing, and
+there are three:
+
+- a **key-chart slot** has nowhere to put one — `GdocPost.loadRelatedCharts` selects only
+  `chartId, slug, title, variantName, keyChartLevel`, and `RelatedCharts` renders
+  `<GrapherWithFallback slug={activeChartSlug}>`;
+- a gdoc **embed** resolves the chart itself and renders its default tab
+  (`makeGrapherLinkedChart` builds no query string);
+- a **featured metric** is worse still: it names a chart, an MDIM view or an explorer view and
+  never a chart's *tab*, so the scatter view cannot be featured at all (see "Featured metrics").
+
+On a featured or embedded source, a log axis is therefore gone for good and no amount of
+re-pointing recovers it. That is what makes "is this migration worth doing?" a real question
+rather than a formality, and why the answer depends on how the old chart is referenced.
+
+**Leaving the standalone chart alone is a legitimate outcome.** The skill reports the loss and
+the topic owner decides: the applier `WARN`s on a log source, the reviewer HTML asks the question
+with both shapes side by side, and Part 2's audit prints a `RECONSIDER` block weighing the loss
+against the blast radius. None of them blocks — see "RECONSIDER" in Part 2 for why not.
+
+Exclusions are **graded**, not listed, because the two usual reasons for one have opposite
+consequences here. The target's x axis is log, so a very high GDP per capita — the classic
+Ireland / Luxembourg / Qatar exclusion — costs almost nothing: on chart 6305, Ireland's $131,338
+against a pack topping out at $95,173 is **+0.14 of a decade** of extra axis width, i.e.
+invisible — though "benign" there is a claim about the *axis*, and the note says so: a very high
+GDP per capita can also be excluded because the figure itself is distorted (Ireland's profit
+shifting, a Gulf state's expat denominator), which a log axis does not fix. A y outlier is the
+opposite: on chart 5029, Australia's 3,243 ha average farm size
+against a pack of 0.35–582.5 **stretches the y axis 5.6x**, and `yAxis.max` is global so the
+scatter cannot cap it alone. That is why `grade_exclusion` measures each axis in the units it is
+drawn in rather than testing for statistical outlierness — a symmetric IQR fence gets skewed
+indicators badly wrong (chart 1131: Cape Verde's 40.3 kg/ha cereal yield sits well inside a
+±3·IQR fence while being **14.3x below the lowest** of the other 88 countries).
+
+(2026-08-19, production: of 22 published GDP scatters carrying `excludedEntityNames`, 8 exclude
+`World` or another OWID aggregate — the single commonest case, which is why `aggregate` is its
+own class, detected by the `OWID_` prefix on `entityCode` rather than by a name list. Charts 1131
+and 5029, both of which exclude a genuine y outlier, are **also key charts** on their topic pages
+— the compound case where the loss lands where no query string reaches.)
 
 ## Run this as a checklist in the chat
 
@@ -123,7 +177,7 @@ The canonical items, in order:
 10. **Confirm the scatter views actually reached production.** A merged PR is not evidence that they did: chart-sync only carries chart edits whose diffs were **approved** in Chart Diff, so a PR can merge green with every row ✅ on staging and leave production untouched. An abandoned first attempt (PR #6173, merged 2026-06-24) left production untouched on all seven of its pairs — deliberately: the `target_query_param` needed for Part 2 did not exist yet, so it was dropped and the migration restarted from scratch rather than left half-done. Whatever the reason, check production directly rather than inferring it from the merge.
 11. **Reference sweep on the old charts** — `find-chart-references` over each source slug *and its aliases*, then `scripts/build_reference_handoff.py` to turn it into the handoff (it keeps the sweep's 📄 doc / 👁 preview / 🔗 page links and its "Find in the doc" search string — see below). Re-point embeds and links at the target's scatter view **before** retiring anything: an embed is never fixed by a redirect, and a link that works only via a 301 outlives everyone's memory of why. **Do not skip this because the Part 2 audit reports few references** — it counts a narrower set; see the key-chart and featured-metric traps below. Settle the ⭐ featured-metric rows in the same pass: they are the only ones that cannot be repaired after the unpublish.
 12. Narrative charts on the sources: replace where the parent is being retired (create → re-point articles → delete; never delete first).
-13. **Part 2 audit** — `redirect_to_scatter.py` with no `--apply`. Read every verdict.
+13. **Part 2 audit** — `redirect_to_scatter.py` with no `--apply`. Read every verdict, **and resolve every `RECONSIDER` row with the topic owner before item 14**. That block is the one verdict here that does not block on its own (a lossy retirement is an editorial call, not a broken page), so it is the one that gets applied past if nobody answers it.
 14. Part 2 `--apply` on staging, then the browser checks in "Verifying Part 2".
 15. Part 2 `--apply --allow-production` once the scatter views are live on production, then the same checks against the live site.
 
@@ -152,12 +206,13 @@ Keep the list alive across turns: carry the untouched items forward rather than 
    echo '<JSON>' | .venv/bin/python .claude/skills/add-gdp-scatter/scripts/apply_scatter_defaults.py
    ```
 
-   Output: two stdout tables.
+   Output: three stdout tables.
 
    - **PER-ROW ACTIONS** — `chart`, `src`, `gdp_source`, `status`, `notes`. Statuses: `OK`, `SKIPPED` (e.g. stacked-family chart), `FAIL`, `ERR_PUT`, `ERROR`.
+   - **EXCLUDED ENTITIES** — one row per entity the source excluded, with its class and the measurement behind it. Printed only when some source has exclusions. The `notes` column is one joined line, so this is where the evidence for "this entity's return is a defect" lives.
    - **Y-DIM DISPLAY NAMES** — `chart`, `varId`, manual `display.name` (on chart), ETL `display.name` (from `variables.display`), catalog `variable.name`. Only populated for `OK` rows.
 
-4. **Show both tables to the user** verbatim (or formatted as markdown).
+4. **Show all three tables to the user** verbatim (or formatted as markdown).
 
 5. **Follow up on display names — and do it LAST.** Where a target ended up with a manual `display.name` but the ETL variable already defines a reasonable one (or `variable.name` is clean), use `AskUserQuestion` to let the user pick which manual overrides to drop. Then run a small inline Python block to delete the `name` key from `display` on each chosen chart (preserving `unit`/`shortUnit`/etc.), via the same `AdminAPI.update_chart` flow.
 
@@ -191,7 +246,8 @@ print(read_analytics(open('.claude/skills/add-gdp-scatter/scripts/find_targets.s
 ```
 
 It uses `/* */` comments deliberately: `read_analytics` flattens the SQL onto one line, where a `--` comment would swallow the rest of the query and fail with a misleading `Unexpected end of statement`. As of 2026-08-04 it returns 167 GDP scatters — 124 with a target, 43 without.
-- **Source has `excludedEntityNames`** → warning only. Exclusions on the target would also hide those entities from line/bar/map views, which is rarely intended.
+- **Source has `excludedEntityNames`** → warning only, and graded: exclusions on the target would also hide those entities from line/bar/map views, which is rarely intended, so each excluded entity comes back on the scatter and the skill says whether that matters.
+- **Source y axis is log** → warning only; the target keeps a linear default, because `yAxis` is global.
 - **GDP coverage mismatch** → warning only; the user picks per chart whether to switch sources.
 - **Sparse scatter view** → warning only; tolerance affects all views, not just scatter.
 
@@ -224,7 +280,9 @@ The right pane toggles (or press `v`) between the two states a URL can produce:
 
 The third state — after a reader *clicks* the scatter tab — no URL can reproduce (see "`adjustStateForTab` fires on a tab CLICK only"). Open the Default view and click the scatter tab **inside the frame**: it should match the Redirect view. That comparison is the practical check that the redirect's `time=`/`country=` params really stand in for the click, which is the one thing about Part 2 that has never been verified live. On a **log row the two differ by design** — the click leaves the target's linear `yAxis` alone while the redirect forces `log` — so the pane's own hint says so rather than letting a correct row read as a defect.
 
-Per-row flags are split so the "With warnings" filter stays worth using. **Warnings** are possible defects — no `ScatterPlot` tab, scatter as the primary type, `hideTimeline` with a time range, `stackMode: relative`, source `excludedEntityNames` that the target will not carry. **Context** is expected-but-needed-to-read-the-panes, e.g. that the target selects N entities which both routes should clear — so if you *do* see highlighting, one of the two mechanisms failed. Keep new checks on the right side of that line; a warning on every row is the same as no warnings.
+Per-row flags are split so the "With warnings" filter stays worth using. **Warnings** are possible defects — no `ScatterPlot` tab, scatter as the primary type, `hideTimeline` with a time range, `stackMode: relative`, an exclusion whose return actually changes the chart, and the log-axis question. **Context** is expected-but-needed-to-read-the-panes, e.g. that the target selects N entities which both routes should clear — so if you *do* see highlighting, one of the two mechanisms failed. Keep new checks on the right side of that line; a warning on every row is the same as no warnings.
+
+The two lossy checks are the reason that split has to be computed rather than assumed. A log source produces **both**: a context line (the two panes differ by design — see below) and a warning (whether a *linear* scatter still shows the relationship the author chose log for). That is a judgment nobody else in the workflow makes, and the reviewer is the only person looking at both shapes at once. Exclusions are graded by the applier's `classify_exclusions`, and the classes decide the box: `y-OUTLIER` / `aggregate` / `unclear` are warnings carrying their measurement, while a benign `high-GDP` or `no data` is context ("back on the scatter, but harmless"). Importing the applier's `EXCLUSION_WARN_CLASSES` rather than re-deriving the split is what keeps the reviewer saying the same thing the applier's run said.
 
 Decisions are fingerprinted on both configs' `fullMd5` plus the GDP variable id, so a re-run of the applier (which rewrites the target) invalidates stale approvals instead of silently keeping them.
 
@@ -281,10 +339,43 @@ All read-only, so the audit reports the verdict `--apply` will act on:
 
 `get_chart_references` counts (`wp/gdoc/expl/narr/ins/sviz`), flagging `MANUAL` when explorers / dataInsights / staticViz is non-zero — **a redirect alone does not fix those** (they embed the old chart's config directly). Those rows are turned into `BLOCKED` **before** the apply loop runs, so `--apply` cannot unpublish them: the loop gates purely on `status`, and leaving a MANUAL row at `CREATE` meant the audit flagged the breakage and then caused it anyway. Re-point the dependents, then re-run with `--allow-manual-refs`.
 
+Two columns come from outside `get_chart_references`, because it cannot see either:
+
+- **`keych`** — key-chart slots, from `chart_tags` directly (`key_chart_slots`). See "Key-chart slots" below.
+- **`lossy`** — whether the migrated scatter will look like the chart it replaces, from `source_lossiness` plus the applier's exclusion grading. Detailed in the `RECONSIDER` block, which also counts featured-metric slots (`featured_metric_slots`, via the sweep's own reader).
+
 Plus a table of **article references that need a hand edit**, from `posts_gdocs_links`:
 
 - an **embed** (any `componentType` that isn't `span-*`) resolves to the target chart but renders the target's **default tab** — `makeGrapherLinkedChart` builds its URL without a query string, so `tab=scatter` never reaches it;
 - a **link** carrying its own `tab=` or `time=` keeps those values, because the visitor's params override the stored ones.
+
+### RECONSIDER — when the answer is to not retire the chart at all
+
+A row is `RECONSIDER` when the retirement costs the reader something the redirect cannot give
+back: the source's **log y axis**, or an **exclusion whose return changes the chart** (the two
+losses in "A log y axis and an exclusion list are the two things the migration cannot carry").
+The block prints, per row, what is lost and where the loss lands — split by whether the fix can
+travel at all:
+
+- **fixable by hand** — article links and embeds, which can be re-pointed with the params.
+- **CANNOT carry the fix** — key-chart slots (no query string) and featured metrics (a chart's
+  tab cannot be featured at all). Named, not counted, so the topic owner can see whose pages
+  they are. Featured metrics are matched by `find_references.sweep_featured_metrics`, not a local
+  `LIKE`: the only handle a `featured_metrics` row carries is a URL, and `LIKE '%/grapher/foo%'`
+  cannot tell `foo` from `foo-bar`.
+
+**It is warn-only on purpose, and that is a deliberate departure from how `MANUAL` is handled.**
+A `MANUAL` reference is turned into `BLOCKED` because the unpublish would *break* an explorer or
+a data insight, and no editorial view changes that. A lossy retirement breaks nothing — the chart
+still renders, on a linear axis, with an extra dot on it — so whether it is acceptable is a
+judgment about the chart, not a fact about the database. Roughly a fifth of a batch is
+logarithmic (2026-08-14, batch 1: 3 of 14), so blocking those would mean a waiver flag on every
+run, and a flag passed every run stops being read. Hence: the verdict gets its own printed block
+**and** a `[RECONSIDER: …]` suffix on the row's note in the PLAN table, and checklist item 13
+requires each one to be answered before the apply — but `--apply` will not stop for it.
+
+The corollary is that a quiet block is informative: a batch with no `RECONSIDER` rows means every
+retirement in it is a faithful swap, which is worth saying in the report.
 
 ### Re-point every reference at the new scatter view
 
@@ -328,7 +419,7 @@ Those aids are the difference between a row someone can fix and a row that names
 - **Find in the doc** — a copy-paste search string: the **link text** for a prose hyperlink, or the **chart slug** for a block embed (the doc holds a bare grapher URL there, and `posts_gdocs_links.target` keeps the slug as the author typed it, so it still matches when the doc uses an older one). A long one is cut short but **stays literal** — no `…`, which is not a character in the document and would make the paste find nothing.
 - **Its params** — the query string the reference already carries. Both consumers follow the same rule: the **replacement URL** merges it over the proposed params with **the reference's values winning** — an editorial choice: an article that pinned a country or a year meant to, and a paste should not silently discard that — and the **redirect** merges the same way, key by key (see "A reference's own params override the redirect's, key by key" below). So the cell grades collisions only: ⚠️ names the proposed keys the reference overrides — a reference carrying `tab=chart` lands the reader on a different tab than the retirement intends, and that row needs a decision rather than a paste — while a non-colliding query merges in with the proposed view intact.
 
-**`yScale=log` when the retiring chart had a log y axis.** The applier never forces `yAxis.scaleType: log` on a target — `yAxis` is global, so it would flip the line/bar views too — it only enables the toggle and leaves the default **linear**. A source authored on a log y axis therefore becomes a *linear* scatter on the target, and its shape changes: the author chose log because that is the shape the relationship has. So the replacement link proposes `yScale=log` for exactly those rows, restoring it for that view alone, on the same principle as `time=latest` and `country=` — each stands in for something a URL-supplied tab does not get.
+**`yScale=log` when the retiring chart had a log y axis.** The applier never forces `yAxis.scaleType: log` on a target — `yAxis` is global, so it would flip the line/bar views too — it only enables the toggle and leaves the default **linear**. A source authored on a log y axis therefore becomes a *linear* scatter on the target, and its shape changes: the author chose log because that is the shape the relationship has. So the replacement link proposes `yScale=log` for exactly those rows, restoring it for that view alone, on the same principle as `time=latest` and `country=` — each stands in for something a URL-supplied tab does not get. That is the whole recovery channel, though: it only reaches surfaces that have a URL, which is why a log row is also a `RECONSIDER` row rather than a solved problem.
 
 Read the flag from the **source**, never the target: the target's `yAxis.scaleType` is deliberately left linear, so it cannot tell you what the retiring chart looked like. Because the param is per-row, the ⚠️ collision check is against *that row's* proposal rather than a shared constant — so a reference's own `yScale=linear` is an override on a log row and merely its own setting everywhere else. (2026-08-14, batch 1: 3 of 14 sources were log — 6045, 663, 3740 — and one article link on 663 already carried `yScale=linear`, which wins and is flagged.)
 
@@ -351,7 +442,7 @@ Consequences to carry into every report:
 - This describes the PRODUCTION 404→301 function. Two other layers behave differently, and both the same way: **staging's** serving layer and a fresh row's first-week static **302** (`_redirects`) each answer with the stored query and drop the visitor's params entirely (staging: batch-1 staging apply, 2026-08-14; the 302: verified on production right after the batch-1 apply, same day, held to this section's own standard — non-colliding `?foo=bar` and `?xScale=log` were dropped, which a stored-side-wins merge would have kept, and colliding `?country=~CHL` / `?tab=chart` landed on the stored query too, on a log and a plain row both). So for its first week a fresh redirect sends every arrival to the stored view; the per-key merge only starts once the 302 expires and the 301 function takes over. Neither layer can validate this section's merge claim.
 - Re-verify with a distinguishing pair (a query that *omits* a stored key) if grapher changes how chart redirects are baked or served. `functions/_common/redirectTools.ts`'s explorer path also merges per key but with the TARGET winning — a different code path; don't generalize from it in either direction.
 
-Both consumers get the log set from **`apply_scatter_defaults.log_y_axis_sources`**, which owns the reversed-source exclusion — do not re-derive it. A reversed source (GDP on its `y`) must be **excluded**: its `scaleType` describes the *GDP* axis, while the target's `y` is the non-GDP indicator, so proposing log there would make the wrong axis logarithmic. That is the same reason `process_row` skips its y-oriented mirrors for a reversed source, and getting it right in one script while forgetting it in another is exactly how this went wrong once.
+All three consumers get the log set from **`apply_scatter_defaults.log_y_axis_sources`**, which owns the reversed-source exclusion — do not re-derive it. It is now a one-line wrapper over **`source_lossiness`**, which reads the log flag and `excludedEntityNames` off the same single config query so Part 2 can grade a retirement without fetching every source config a second time; take the log set from the wrapper and the pair of losses from `source_lossiness`, never by re-reading `yAxis.scaleType` locally. A reversed source (GDP on its `y`) must be **excluded**: its `scaleType` describes the *GDP* axis, while the target's `y` is the non-GDP indicator, so proposing log there would make the wrong axis logarithmic. That is the same reason `process_row` skips its y-oriented mirrors for a reversed source, and getting it right in one script while forgetting it in another is exactly how this went wrong once.
 
 One limit remains: a reference that forces a **non-scatter** tab still receives the proposal, since the source's log was a global setting — but it is being applied to a view the author's choice was not about, so treat those rows as a judgment call.
 
@@ -363,17 +454,19 @@ They only apply to Google Doc surfaces, though — `doc_url` and `gdoc_preview_u
 
 The narrative-chart section is the one place a **placement** table appears: `gdoc (narrative chart)` rows, which name the articles that place each narrative chart by name. They are deliberately excluded from `GDOC_SURFACES` — the surface is a gdoc, but the row references the *narrative chart*, not the chart being retired, so counting it among the article embeds would overstate both. Nest them under their narrative chart instead, with the same Doc / previewer / page links and search string the embed and link tables get, since the article edit is a step of the replacement.
 
-### Key-chart slots — the Part 2 audit cannot see them
+### Key-chart slots — no query string reaches them
 
-`get_chart_references` counts `postsWordpress`, `postsGdocs`, `explorers`, `narrativeCharts`, `dataInsights` and `staticViz`. **Key charts are none of those** — a key chart is a chart↔tag association (`chart_tags.keyChartLevel`), not a row in any reference table — so `redirect_to_scatter.py` reports nothing for them and its verdicts look clean while topic pages quietly depend on the chart you are about to unpublish.
+`get_chart_references` counts `postsWordpress`, `postsGdocs`, `explorers`, `narrativeCharts`, `dataInsights` and `staticViz`. **Key charts are none of those** — a key chart is a chart↔tag association (`chart_tags.keyChartLevel`), not a row in any reference table. `redirect_to_scatter.py` therefore queries `chart_tags` itself (`key_chart_slots`) for its `keych` column; before it did, its verdicts looked clean while topic pages quietly depended on the chart being unpublished.
 
 Unpublishing the source does not break a link here; it removes the chart from the topic page's key-chart list. So the loss is silent, on pages nobody is looking at during the migration. **Move each association to the target chart** (same tag, same `keyChartLevel`) as part of step 11.
 
-This is the concrete reason step 11 says not to trust a quiet Part 2 audit: on 2026-08-04 the audit's own tables held 6 embeds + 3 links, while the full sweep found **15 key-chart slots across 13 topic pages** — the largest single category, and entirely invisible to Part 2.
+**But a moved slot renders the target's DEFAULT view, not the scatter.** `GdocPost.loadRelatedCharts` selects only `chartId, slug, title, variantName, keyChartLevel`, and `RelatedCharts` renders `<GrapherWithFallback slug={activeChartSlug}>` — there is nowhere to put a query string, so neither `tab=scatter` nor a log row's `yScale=log` can travel here. Where the page was featuring the chart *because* it was a scatter, moving the association is not an equivalent swap; that is what makes a key-chart slot the surface that can turn a `RECONSIDER` row into "keep the standalone chart". Tell the topic owner rather than moving it quietly.
 
-### Featured metrics — invisible to Part 2 too, and the scatter view cannot hold one
+Step 11 still says not to trust a quiet Part 2 audit, because the `keych` column counts slots and the full sweep *locates* them: on 2026-08-04 the audit's own tables held 6 embeds + 3 links, while the sweep found **15 key-chart slots across 13 topic pages** — the largest single category.
 
-Same blind spot, same reason: a featured metric is a row in `featured_metrics` keyed by **URL**, so it is in none of the tables `get_chart_references` counts. It feeds a topic page's featured rail and the top of that topic's search results. And unlike a key chart it does not heal itself — the row is resolved only when Algolia indexes, matching pathname *and* exact params against **published** records, so unpublishing empties the slot silently. The one signal is an *"Algolia Featured Metric Indexing Failures"* post in Slack after the next index.
+### Featured metrics — the scatter view cannot hold one
+
+Same blind spot as key charts, same reason: a featured metric is a row in `featured_metrics` keyed by **URL**, so it is in none of the tables `get_chart_references` counts. Part 2 reads them itself for the `RECONSIDER` block (`featured_metric_slots`), but only for the rows that block reports — the ⭐ handoff section is still where every slot is listed and settled. It feeds a topic page's featured rail and the top of that topic's search results. And unlike a key chart it does not heal itself — the row is resolved only when Algolia indexes, matching pathname *and* exact params against **published** records, so unpublishing empties the slot silently. The one signal is an *"Algolia Featured Metric Indexing Failures"* post in Slack after the next index.
 
 **The scatter view cannot be featured at all.** A featured metric names a chart, an MDIM view or an explorer view — never a chart's *tab*. `tab=` is a reader param: the admin strips it on paste, and a chart's Algolia record carries no query params, so a URL keeping `tab=scatter` matches nothing and fails to index.
 
