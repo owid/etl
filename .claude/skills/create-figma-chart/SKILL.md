@@ -820,13 +820,13 @@ The table gives one number per template — the band you fit a chart into — an
 
 **No template's wrappers carry inner padding any more, so the frame band and the text band are the same number everywhere.** `header.y + header.height` is the subtitle's own bottom edge, and `contentX`/`contentW` read 16/818 directly on the 850-wide pair rather than 0/850. There is no per-family padding correction to apply — if you find yourself adding 16px to a band you read off a frame, you are working from a stale note. The per-slot text positions behind these bands are `TEMPLATES.md`'s.
 
-**Every template exposes header/footer frames, but only the 850-wide pair pads them.** On IG square, IG portrait, DI and both static mobile templates the wrappers carry zero padding, so there `header.y + header.height` *is* the text band — 118 on all four 540-wide frames, 135 on the portrait, matching the first table exactly, because that table and this claim both describe the template still carrying its two-line placeholder subtitle. Fill in a one-line subtitle and the same frames report the reflowed bands instead (99 and 113 — see the reflow table above); the point here is only that no padding correction sits between the frame and the text, at either subtitle length. Read the band off the frames everywhere; just don't port the 16px correction across, because it belongs to the two 850-wide templates alone.
+**Every template exposes header/footer frames, and on all of them `header.y + header.height` *is* the text band** — 118 on all four 540-wide frames, 135 on the portrait, matching the first table exactly, because that table and this claim both describe the template still carrying its two-line placeholder subtitle. Fill in a one-line subtitle and the same frames report the reflowed bands instead (99 and 113 — see the reflow table above); the point here is only that no padding correction sits between the frame and the text, at either subtitle length and on any family. Read the band off the frames everywhere.
 
 **Every footer is auto-layout and reflows** — static mobile's `Frame 15`, the 850-wide `Frame 22`/`Frame 25`, both Instagram footers (`25518:14` square, `25518:16` portrait) and DI's `Frame 37`, the last one to be converted. What still differs between them is the *direction* they grow — see the `constraints.vertical` rule in Step 6, since almost all of them grow out of the frame rather than into the band. Run Step 6's structural check rather than reading either fact off this paragraph; the split it used to draw between auto-layout and absolute footers is exactly the sentence that went stale last time.
 
 Verify against the actual clone with `get_metadata` (the templates evolve; the geometry above is a 2026 snapshot). These are **frame-local** coordinates, and `x`/`y` are relative to a node's parent — so append the embed to the template clone **before** positioning it. Left parented to the page (where Step 5 puts imported nodes), the same numbers land it near the page origin, on top of the reference chart. One wrinkle in the same rule: **a GROUP is transparent for coordinates**, so once the imported chart is inside the template, its descendants report `x`/`y` in the *template frame's* space, not the group's — which is what makes the frame-local numbers above directly usable on the plot's internals.
 
-**The header reflows itself — don't reposition it.** Every template's header block is a vertical auto-layout wrapping a horizontal title row (title beside logo), so a title that grows from two lines to three pushes the subtitle down and grows the header on its own. Set `characters`, then **read the new `header.y + header.height` back** and measure the band from that; any y you computed before the text went in is stale. Measured on the portrait: a two-line title gives a 135 band bottom, three lines 199.
+**The header reflows itself — don't reposition it.** Every template's header block is a flat vertical auto-layout of `[title, subtitle]` (the logo is a sibling, not a child — see the node map), so a title that grows from two lines to three pushes the subtitle down and grows the header on its own. Set `characters`, then **read the new `header.y + header.height` back** and measure the band from that; any y you computed before the text went in is stale. Measured on the portrait: a two-line title gives a 135 band bottom, three lines 199.
 
 **The logo no longer sets a floor under that** — it is a sibling of the header, not a child, so it contributes nothing to the header's height and a one-line title buys the full reduction. What the logo still constrains is *width*: the title node is sized narrower than the content box to clear it (737.84 against 818 on Static Vertical, 428 against 508 on the 540-wide set), which is the number a title has to be measured against. Read the band back rather than deriving it from line counts either way.
 
@@ -852,12 +852,15 @@ for (const t of annotations) { t.x = left; t.resize(right - left, t.height) }
 
 ```js
 // Resolve the header structurally — never by name. Names differ per template and are
-// renamed wholesale by design edits; the shape does not. It is the topmost VERTICAL
-// auto-layout child; the footer is the bottommost where there are two. (The logo is a
-// sibling, so it is never the match — it is a plain FRAME/INSTANCE with no layoutMode.)
-const header = clone.children
-    .filter(c => "layoutMode" in c && c.layoutMode === "VERTICAL")
-    .sort((a, b) => a.y - b.y)[0]
+// renamed wholesale by design edits; the shape does not. The header is the topmost
+// auto-layout child, the footer the bottommost. Match ANY direction: DI's footer is
+// HORIZONTAL, so a VERTICAL-only filter drops it. Exclude the logo — it is a sibling
+// of the header, and an INSTANCE carries its own auto-layout.
+const isLogo = c => /^logo/i.test(c.name) || /^Logos\//.test(c.name)
+const autos = clone.children
+    .filter(c => "layoutMode" in c && c.layoutMode !== "NONE" && !isLogo(c))
+    .sort((a, b) => a.y - b.y)
+const header = autos[0]
 const contentX = header.x, contentW = header.width               // the box to match
 chart.rescale(TARGET_H / chart.height)                           // height-first; never resize()
 chart.x = contentX                                               // same left edge

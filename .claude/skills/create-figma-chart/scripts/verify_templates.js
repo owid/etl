@@ -8,9 +8,9 @@
 // What it reports per template, and why each field is here:
 //   size          — the frame, which is what picks the template in the first place
 //   fill          — one of the "which template is this?" tells (DI white, static cream, IG beige)
-//   contentX/W    — the box the chart and any annotation must match. On the 850-wide pair this
-//                   comes back 0/850 because their header wrapper spans the frame and pads 16px
-//                   inward; the content box there is 16/818. That is expected, not drift.
+//   contentX/W    — the box the chart and any annotation must match. No wrapper carries inner
+//                   padding any more, so this reads the content box directly — 16/818 on the
+//                   850-wide pair. A 0/850 here means a wrapper was re-padded to span the frame.
 //   headerBottom  — the band's top edge, after the header's own auto-layout has settled
 //   headerSizing  — `primaryAxisSizingMode` plus each child's sizing. AUTO + HUG means the header
 //                   reflows when the text gets shorter; FIXED + a FILL/grow child means it does
@@ -60,15 +60,19 @@ for (const [label, id] of Object.entries(TEMPLATES)) {
     out[label] = { missing: id };
     continue;
   }
-  // Resolve header and footer structurally: the topmost and bottommost vertical auto-layout
-  // children. Names differ per template ("Frame 14", "Frame 5", "header"), ids change.
-  const autos = n.children.filter((c) => "layoutMode" in c && c.layoutMode === "VERTICAL").sort((a, b) => a.y - b.y);
+  // The logo is a sibling of the header, not a child, so it contributes nothing to headerBottom.
+  // Resolved first so the header/footer filter can exclude it — an INSTANCE carries its own
+  // auto-layout. Reported so a move back inside a title row is visible immediately.
+  const logo = n.children.find((c) => /^logo/i.test(c.name) || /^Logos\//.test(c.name)) || null;
+  // Resolve header and footer structurally: the topmost and bottommost auto-layout children.
+  // Names differ per template ("Frame 14", "Frame 5", "header"), ids change. Match ANY direction —
+  // DI's footer is HORIZONTAL, so a VERTICAL-only filter drops it, leaves `footer` null, and
+  // silently skips every footer check below.
+  const autos = n.children
+    .filter((c) => "layoutMode" in c && c.layoutMode !== "NONE" && c !== logo)
+    .sort((a, b) => a.y - b.y);
   const header = autos[0] || null;
   const footer = autos.length > 1 ? autos[autos.length - 1] : null;
-  // The logo is a sibling of the header, not a child — so it never matches the auto-layout
-  // filter above, and it contributes nothing to headerBottom. Reported so a move back inside
-  // a title row is visible immediately.
-  const logo = n.children.find((c) => /^logo/i.test(c.name) || /^Logos\//.test(c.name)) || null;
   out[label] = {
     id: n.id,
     name: n.name,
@@ -108,7 +112,7 @@ for (const [label, id] of Object.entries(TEMPLATES)) {
           rows: footer.children.map((c) => ({ name: c.name.slice(0, 30), y: r(c.y), h: r(c.height), w: r(c.width) })),
         }
       : null,
-    // Everything at the top level, so a footer that is NOT auto-layout (DI's `Frame 12`) still shows up.
+    // Everything at the top level, so a footer left with no auto-layout at all still shows up.
     topLevel: n.children.map((c) => ({
       name: c.name.slice(0, 26),
       type: c.type,
