@@ -298,6 +298,14 @@ TES_SOURCES_EJ = [
     "biofuels_consumption_ej",
 ]
 
+# Biofuels is left out of the zero-filling below, even though the total confirms it like any other source.
+# The producer's total omits the biofuels it had not started tracking: it reports no US biofuels at all
+# until 1990, and its World total for the 1980s is Brazil plus one Caribbean bucket, while the EIA measured
+# 2-21 TWh a year in the US over 1981-1989. A zero derived from that total would therefore contradict a
+# measurement, and it would win, since the Statistical Review takes priority when the two are combined. The
+# energy mix fills biofuels itself, after both producers are in.
+SOURCE_NOT_FILLED_WITH_ZEROS = "biofuels_consumption_ej"
+
 # Regions that don't need to be included as part of other region aggregates (unlike, e.g. "Other Africa (EI)", which needs to be added to "Africa").
 REGIONS_NOT_ASSIGNED_TO_OTHER_REGIONS = [
     "Africa (EI)",
@@ -446,8 +454,9 @@ def prepare_prices_index_table(tb_prices: Table) -> Table:
 def fill_missing_total_energy_supply(tb: Table) -> Table:
     """Fill missing total energy supply by source with zeros, where the total confirms they are zero.
 
-    The source omits coal, oil, gas and biofuels where they are zero, but its total still accounts for
-    every reported source, leaving no room for the missing ones.
+    The source omits coal, oil and gas where they are zero, but its total still accounts for every
+    reported source, leaving no room for the missing ones. Biofuels is excluded, for the reason given
+    where SOURCE_NOT_FILLED_WITH_ZEROS is defined.
     """
     # A total of exactly zero would satisfy the assertion for free (e.g. USSR 1985-1991, all zeros).
     informed = tb["total_energy_supply_ej"].fillna(0) > 0
@@ -459,6 +468,8 @@ def fill_missing_total_energy_supply(tb: Table) -> Table:
     assert ((total - tb.loc[informed, TES_SOURCES_EJ].sum(axis=1)).abs() <= 0.01 * total).all(), error
 
     for source in TES_SOURCES_EJ:
+        if source == SOURCE_NOT_FILLED_WITH_ZEROS:
+            continue
         tb.loc[informed & tb[source].isna(), source] = 0
 
     return tb

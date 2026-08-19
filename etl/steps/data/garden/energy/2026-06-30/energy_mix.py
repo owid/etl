@@ -350,6 +350,24 @@ def combine_with_eia(tb: Table, tb_eia: Table) -> Table:
     return tb
 
 
+def fill_missing_biofuels(tb: Table) -> Table:
+    """Fill missing biofuels with zero, where the total leaves no room for it.
+
+    The Statistical Review fills its other sources this way itself, but not biofuels, because its total
+    omits the biofuels it had not started tracking (it reports none for the United States until 1990, while
+    the EIA measured 2-21 TWh a year there over 1981-1989). Filling it here, once both producers are in,
+    keeps a zero we derived from outranking a value someone measured.
+    """
+    others = [f"{source}_twh" for source in SR_SOURCES.values() if source != "biofuels"]
+    total = tb["total_energy_supply_twh"]
+    # A total of exactly zero is handled in complete_or_drop_mixes, where energy cannot be negative.
+    accounted = tb[others].sum(axis=1, min_count=len(others))
+    to_fill = tb["biofuels_twh"].isna() & (total > 0) & ((total - accounted).abs() <= 0.01 * total)
+    assert to_fill.any(), "The producer's total no longer confirms any missing biofuels as zero."
+    tb.loc[to_fill, "biofuels_twh"] = 0
+    return tb
+
+
 def get_eia_year_range(tb_eia: Table) -> tuple[int, int]:
     """First and last year EIA reports every source, which bounds the region aggregates."""
     years = tb_eia.loc[tb_eia[list(EIA_SOURCES.values())].notna().all(axis=1), "year"]
@@ -697,6 +715,9 @@ def run() -> None:
     # Extend the total and each source to the countries the Statistical Review does not report.
     eia_years = get_eia_year_range(tb_eia=tb_eia)
     tb = combine_with_eia(tb=tb, tb_eia=tb_eia)
+
+    # Now that both producers are in, fill the biofuels the Statistical Review leaves out with zeros.
+    tb = fill_missing_biofuels(tb=tb)
 
     # Build the OWID region aggregates from the combined country-level data, over EIA's years.
     tb = add_region_aggregates(tb=tb, eia_years=eia_years)
