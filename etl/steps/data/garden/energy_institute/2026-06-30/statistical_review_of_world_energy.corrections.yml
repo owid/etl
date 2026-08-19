@@ -87,3 +87,32 @@
     otherwise makes wind supply and wind generation disagree.
   provider: Energy Institute
   status: open
+
+- indicator: total_energy_supply_ej
+  entity: Bangladesh
+  years: [1965, 1966, 1967, 1968, 1969, 1970]
+  action: override
+  value: null
+  expect: {eq: 0}
+  reason: >-
+    Bangladesh is reported with a total energy supply of exactly zero from 1965 to 1970, and with real
+    figures from 1971, the year it became independent. The territory was East Pakistan until then and
+    certainly used energy, so the zeros stand in for years the producer does not cover rather than
+    describing them. Publishing them makes Bangladesh appear to have consumed no energy at all for six
+    years. This is the only entity the Statistical Review gives an exactly-zero total.
+  provider: Energy Institute
+  status: open
+
+- indicator: hydro_consumption_ej
+  entity: Bangladesh
+  years: [1965, 1966, 1967, 1968, 1969, 1970]
+  action: override
+  value: null
+  expect: {eq: 0}
+  reason: >-
+    The same six placeholder years report zero hydropower, which is demonstrably wrong: the Karnaphuli
+    (Kaptai) dam has been generating since 1962, and the producer reports 0.175 TWh for 1971, the first
+    year it covers. The zeros for solar, wind and nuclear in those years are left alone, since those are
+    true.
+  provider: Energy Institute
+  status: open
