@@ -123,12 +123,20 @@ def _render_diff_body(
             st.markdown(render_text_html(change["new"], change["old"], side="new"), unsafe_allow_html=True)
 
 
-def _review_status_key(catalog_path: str, change_key: str) -> str:
-    return f"rev-status::{catalog_path}::{change_key}"
+# The widget keys carry the content hash, not just the change slot. `change_key` deliberately identifies
+# the slot (this MDim, this field, these views) and survives an edit to the text, so keying widgets on it
+# alone let a sign-off outlive the text it signed off: the DB row went stale and the row was labelled
+# stale, but `st.session_state` still held "✅ Approve", and the next `_save()` — triggered by something
+# as innocent as typing a comment — wrote that approval back against the *new* content hash. The stale
+# warning then vanished and text nobody had approved read as approved. Binding the widget to the content
+# hash gives session state the same lock-in the stored review has: edited text is a new key, which seeds
+# from the (pending) DB state instead of inheriting the old answer.
+def _review_status_key(catalog_path: str, change_key: str, content_hash: str) -> str:
+    return f"rev-status::{catalog_path}::{change_key}::{content_hash}"
 
 
-def _review_comment_key(catalog_path: str, change_key: str) -> str:
-    return f"rev-comment::{catalog_path}::{change_key}"
+def _review_comment_key(catalog_path: str, change_key: str, content_hash: str) -> str:
+    return f"rev-comment::{catalog_path}::{change_key}::{content_hash}"
 
 
 _REVIEW_STATUSES = ["⏳ Pending", "✅ Approve", "🚩 Flag"]
@@ -227,7 +235,8 @@ def render_review_page(
 
     # Seed widget state from the DB before any widget is created — so a fresh session shows stored reviews.
     for r in resolved:
-        sk, ck = _review_status_key(catalog_path, r["change_key"]), _review_comment_key(catalog_path, r["change_key"])
+        sk = _review_status_key(catalog_path, r["change_key"], r["content_hash"])
+        ck = _review_comment_key(catalog_path, r["change_key"], r["content_hash"])
         if sk not in st.session_state:
             st.session_state[sk] = r["seed_label"]
         if ck not in st.session_state:
@@ -236,7 +245,9 @@ def render_review_page(
     def _effective(r: dict[str, Any]) -> str:
         if r["stale"]:
             return "stale"
-        label = st.session_state.get(_review_status_key(catalog_path, r["change_key"]), r["seed_label"])
+        label = st.session_state.get(
+            _review_status_key(catalog_path, r["change_key"], r["content_hash"]), r["seed_label"]
+        )
         return _STATUS_TO_DB.get(label, "pending")
 
     states = [_effective(r) for r in resolved]
@@ -270,7 +281,8 @@ def render_review_page(
     )
 
     def _make_save(change_key: str, content_hash: str):
-        sk, ck = _review_status_key(catalog_path, change_key), _review_comment_key(catalog_path, change_key)
+        sk = _review_status_key(catalog_path, change_key, content_hash)
+        ck = _review_comment_key(catalog_path, change_key, content_hash)
 
         def _save() -> None:
             label = st.session_state.get(sk, "⏳ Pending")
@@ -288,7 +300,8 @@ def render_review_page(
     for r in resolved:
         g = r["g"]
         change_key = r["change_key"]
-        sk, ck = _review_status_key(catalog_path, change_key), _review_comment_key(catalog_path, change_key)
+        sk = _review_status_key(catalog_path, change_key, r["content_hash"])
+        ck = _review_comment_key(catalog_path, change_key, r["content_hash"])
         status = st.session_state.get(sk, r["seed_label"])
         comment = (st.session_state.get(ck) or "").strip()
         stale = r["stale"]
@@ -345,8 +358,12 @@ def render_review_page(
     # The Markdown builders are pure, so hand them the live widget state rather than have them
     # reach into session state themselves.
     for r in resolved:
-        r["label"] = st.session_state.get(_review_status_key(catalog_path, r["change_key"]), r["seed_label"])
-        r["comment"] = (st.session_state.get(_review_comment_key(catalog_path, r["change_key"])) or "").strip()
+        r["label"] = st.session_state.get(
+            _review_status_key(catalog_path, r["change_key"], r["content_hash"]), r["seed_label"]
+        )
+        r["comment"] = (
+            st.session_state.get(_review_comment_key(catalog_path, r["change_key"], r["content_hash"])) or ""
+        ).strip()
 
     st.divider()
     st.markdown("**Outputs** — copy either as Markdown:")
@@ -539,14 +556,16 @@ def render_chart_review(
         )
 
     for r in resolved:
-        sk = _review_status_key(catalog_root, r["change_key"])
+        sk = _review_status_key(catalog_root, r["change_key"], r["content_hash"])
         if sk not in st.session_state:
             st.session_state[sk] = r["seed_label"]
 
     def _eff(r: dict[str, Any]) -> str:
         if r["stale"]:
             return "stale"
-        label = st.session_state.get(_review_status_key(catalog_root, r["change_key"]), r["seed_label"])
+        label = st.session_state.get(
+            _review_status_key(catalog_root, r["change_key"], r["content_hash"]), r["seed_label"]
+        )
         return _STATUS_TO_DB.get(label, "pending")
 
     states = [_eff(r) for r in resolved]
@@ -574,7 +593,7 @@ def render_chart_review(
         st.info(f"Review pending — {', '.join(bits)} of {n}.")
 
     def _make_save(change_key: str, content_hash: str):
-        sk = _review_status_key(catalog_root, change_key)
+        sk = _review_status_key(catalog_root, change_key, content_hash)
 
         def _save() -> None:
             db_status = _STATUS_TO_DB.get(st.session_state.get(sk, "⏳ Pending"))
@@ -587,7 +606,7 @@ def render_chart_review(
 
     for r in resolved:
         g = r["g"]
-        sk = _review_status_key(catalog_root, r["change_key"])
+        sk = _review_status_key(catalog_root, r["change_key"], r["content_hash"])
         eff = _eff(r)
         stale = r["stale"]
         status = st.session_state.get(sk, r["seed_label"])
@@ -615,7 +634,9 @@ def render_chart_review(
                 st.caption(f"Signed off by **{r['reviewer']}**{when}")
 
     for r in resolved:
-        r["label"] = st.session_state.get(_review_status_key(catalog_root, r["change_key"]), r["seed_label"])
+        r["label"] = st.session_state.get(
+            _review_status_key(catalog_root, r["change_key"], r["content_hash"]), r["seed_label"]
+        )
 
     st.divider()
     with st.expander("🔀 PR brief — changes to execute"):

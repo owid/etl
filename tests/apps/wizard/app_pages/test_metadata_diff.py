@@ -1019,3 +1019,68 @@ def test_export_products_only_covers_recipes_the_branch_edited():
     ]
     # A branch touching only a data step claims no export recipe at all.
     assert get_directly_changed_export_uris({data_step: "M"}) == []
+
+
+def test_a_change_with_no_visible_chart_reach_still_counts_as_a_change():
+    """`n_charts` is reach, not existence — and a real change can legitimately reach nobody.
+
+    A WYSK edit on an indicator that only feeds multi-indicator charts has a blast radius of zero
+    readers, but the Charts section still renders it as a change to review. Keying the verdict off the
+    filtered reach put "No metadata text changes" and a green all-clear over exactly that.
+    """
+    assert Summary(n_charts=0, n_indicators=1, n_chart_changes=1).has_changes
+    # Nothing anywhere is still nothing.
+    assert not Summary().has_changes
+    # And the pre-existing reasons to speak up are unaffected.
+    assert Summary(n_charts=3).has_changes
+    assert Summary(n_new_indicators=2).has_changes
+    assert Summary(n_mdims=1).has_changes
+    assert Summary(n_explorers=1).has_changes
+
+
+def test_shared_metadata_file_credits_its_sibling_steps():
+    """`shared.meta.yml` is merged into every sibling step, but is itself no step at all.
+
+    It resolves to a `.../shared` path that is in no DAG, so the scope came back empty — and an empty
+    scope narrows away every rebuilt indicator, reporting "no metadata text changes" for an edit that
+    rewrote text across every dataset in the folder.
+    """
+    from apps.wizard.app_pages.metadata_diff.discovery import _shared_step_file_datasets
+
+    reached = _shared_step_file_datasets({"etl/steps/data/garden/ihme_gbd/2026-02-07/shared.meta.yml": "M"})
+    assert len(reached) > 1
+    assert "garden/ihme_gbd/2026-02-07/gbd_cause_deaths" in reached
+    assert all(p.startswith("garden/ihme_gbd/2026-02-07/") for p in reached)
+    # `shared` is not a step, so it must not be credited as one.
+    assert "garden/ihme_gbd/2026-02-07/shared" not in reached
+
+    # A file that *is* a step needs no expansion — the subgraph walk already covers it.
+    assert (
+        _shared_step_file_datasets({"etl/steps/data/garden/ihme_gbd/2026-02-07/gbd_cause_deaths.meta.yml": "M"})
+        == set()
+    )
+    # Files outside a step folder are not ours to expand.
+    assert _shared_step_file_datasets({"apps/wizard/app_pages/metadata_diff/core.py": "M"}) == set()
+
+
+def test_review_widget_state_is_bound_to_the_text_it_signed_off():
+    """An edit must not inherit the previous sign-off through the reviewer's open session.
+
+    `change_key` identifies the slot and deliberately survives an edit, so widget state keyed on it alone
+    kept "✅ Approve" in session across the edit. The next save wrote that approval back against the new
+    content hash, the stale warning disappeared, and text nobody approved read as approved.
+    """
+    from apps.wizard.app_pages.metadata_diff.mdim_pages import _review_comment_key, _review_status_key
+
+    group = ChangeGroup(field="titlePublic", old="Old", new="New", view_dims=[{"sex": "female"}])
+    edited = ChangeGroup(field="titlePublic", old="Old", new="New, revised", view_dims=[{"sex": "female"}])
+
+    key, content_hash = change_group_identity("grapher/ns/latest/mine#mine", group)
+    key_after, hash_after = change_group_identity("grapher/ns/latest/mine#mine", edited)
+
+    # The slot is the same; only the content moved. That is the whole trap.
+    assert key_after == key
+    assert hash_after != content_hash
+
+    for make_key in (_review_status_key, _review_comment_key):
+        assert make_key("cp", key, content_hash) != make_key("cp", key_after, hash_after)

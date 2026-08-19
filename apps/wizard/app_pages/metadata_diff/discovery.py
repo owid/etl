@@ -18,6 +18,7 @@ mints fresh ids on staging, so id-matching would report every indicator of that 
 import json
 import re
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 import git
@@ -46,7 +47,7 @@ from apps.wizard.app_pages.metadata_diff.usage import _indicator_ids_in_mdim_con
 from etl.db import read_sql
 from etl.git_helpers import get_changed_files
 from etl.io import get_all_changed_catalog_paths, get_directly_changed_export_uris
-from etl.paths import STEP_DIR
+from etl.paths import BASE_DIR, STEP_DIR
 
 log = get_logger()
 
@@ -147,9 +148,49 @@ def branch_scope() -> BranchScope:
         log.warning("metadata_diff.git_narrowing_unavailable", error=str(e))
         return BranchScope(available=False)
 
-    datasets = {p for p in paths if not p.startswith("export://")}
+    datasets = {p for p in paths if not p.startswith("export://")} | _shared_step_file_datasets(files_changed)
     exports = {(_export_kind(p), name) for p in changed_export_uris for name in _export_scope_names(p)}
     return BranchScope(dataset_paths=datasets, export_products=exports, available=True)
+
+
+def _shared_step_file_datasets(files_changed: dict[str, Any]) -> set[str]:
+    """Datasets reached by a changed *shared* file in a step folder, which names no step of its own.
+
+    `shared.meta.yml` is merged into every sibling `<step>.meta.yml` by the catalog loader, and a
+    `shared.py` helper is imported by its siblings — neither is a step. `get_all_changed_catalog_paths`
+    resolves them to a `.../shared` path that appears in no DAG, so the subgraph expansion returns
+    nothing and the scope comes back **empty**. An empty scope narrows every rebuilt indicator away, and
+    the tool then reports "no metadata text changes" for an edit that rewrote reader-facing text across
+    every dataset in the folder (`ihme_gbd/2026-02-07` has eleven).
+
+    So when a changed step file is not itself a step, credit every DAG step in its folder. Erring broad
+    is the safe direction here: this is a narrowing filter, and `datasets_built_here` still has to agree
+    before anything counts as ours.
+
+    Note this only repairs *this* tool's scope. The same blind spot sits in
+    `get_all_changed_catalog_paths` itself, so chart-diff, datadiff and `etl run --modified` still miss a
+    shared-metadata edit; fixing it there is a separate change with a much wider blast radius.
+    """
+    from etl.dag_helpers import load_dag
+
+    dag_steps = {s.split("://", 1)[1] for s in load_dag() if s.startswith(("data://", "data-private://"))}
+    out: set[str] = set()
+    for file_path in files_changed:
+        path = Path(file_path)
+        if path.suffix not in (".py", ".yml", ".yaml"):
+            continue
+        try:
+            rel = (BASE_DIR / path).relative_to(STEP_DIR / "data")
+        except ValueError:
+            continue
+        # `shared.meta.yml` -> `shared`; the same stripping `get_all_changed_catalog_paths` does.
+        own = (rel.parent / rel.name.split(".")[0]).as_posix()
+        folder = rel.parent.as_posix()
+        # Only a `channel/namespace/version` folder has sibling steps to credit.
+        if own in dag_steps or folder.count("/") != 2:
+            continue
+        out |= {s for s in dag_steps if s.startswith(f"{folder}/")}
+    return out
 
 
 def _export_kind(export_uri: str) -> str:
@@ -799,11 +840,24 @@ class Summary:
     def has_changes(self) -> bool:
         """Whether there is reader-facing text here that nobody has reviewed yet.
 
-        New indicators count. A version bump replaces every catalog path, so nothing has a baseline
+        Counted on the *changes*, never on their audience. `n_charts` is filtered to charts a reader can
+        actually see the change on, which is the right number to report as reach but the wrong one to
+        exist by: a WYSK edit whose indicator only feeds multi-indicator charts reaches nobody, so
+        `n_charts` is 0 while the Charts section still renders a real, reviewable change. Keying off it
+        put a green all-clear and a "No metadata text changes" comment over exactly that.
+
+        New indicators count too. A version bump replaces every catalog path, so nothing has a baseline
         counterpart to diff against — and reporting that as "no metadata text changes" would wave
         through a whole dataset's worth of new text.
         """
-        return bool(self.n_charts or self.n_mdims or self.n_explorers or self.n_new_indicators)
+        return bool(
+            self.n_chart_changes
+            or self.n_indicators
+            or self.n_charts
+            or self.n_mdims
+            or self.n_explorers
+            or self.n_new_indicators
+        )
 
 
 def charts_reached(groups: list[ChangeGroup], usage: dict[int, list[dict[str, Any]]]) -> set[int]:
