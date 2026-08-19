@@ -87,11 +87,8 @@ EXPECTED_AGGREGATE_FIRST_YEAR: dict[str, int] = {
     **{f"{fuel}_consumption_twh": 1980 for fuel in FUELS},
 }
 
-# Years an aggregate may end in. The Statistical Review publishes a year ahead of EIA, so Europe and
-# high-income countries reach that year on consumption; the countries EIA has yet to publish are worth
-# 0.6-5.8% of their totals, which is within the spread between the two producers. Every other region
-# stops where EIA does.
-EXPECTED_AGGREGATE_LAST_YEARS = (2024, 2025)
+# Year every aggregate ends in, which is EIA's last.
+EXPECTED_AGGREGATE_LAST_YEAR = 2024
 
 # Minimum fraction of a region's reporting countries that must report an indicator in a given year, for
 # that region-year to be published.
@@ -320,16 +317,19 @@ def add_region_aggregates(tb: Table, tb_review: Table, eia_years: tuple[int, int
         accepted_overlaps=None,
     )
 
-    # The three fuels of a metric start in the same year, so that a region's coal + oil + gas total is
-    # always the sum of all three: coal production begins in 1981 and the other two in 1980, and a
-    # two-fuel total understates Africa's by 900 TWh. Nothing is cut at the recent end; the last year is
-    # left to the coverage conditions.
+    # Bound the energy columns to the years EIA covers, as the energy mix does, so that the regions of
+    # both span the same years. Only Europe and high-income countries would otherwise reach the
+    # Statistical Review's extra year, on a sum missing the countries EIA has yet to publish.
+    #
+    # The three fuels of a metric share a start year, so that a region's coal + oil + gas total is always
+    # the sum of all three: coal production begins in 1981 and the other two in 1980, and a two-fuel total
+    # understates Africa's by 900 TWh.
     for metric in ("production", "consumption"):
         columns = [f"{fuel}_{metric}_twh" for fuel in FUELS]
         review_years = [tb_review.loc[tb_review[column].notna(), "year"] for column in columns]
         assert all(not years.empty for years in review_years), f"The Statistical Review reports no {metric}."
         first_year = max(eia_years[0], *(int(years.min()) for years in review_years))
-        tb_energy.loc[tb_energy["year"] < first_year, columns] = float("nan")
+        tb_energy.loc[~tb_energy["year"].between(first_year, eia_years[1]), columns] = float("nan")
 
     tb_aggregates = pr.multi_merge([tb_energy, tb_other, tb_reserves], on=["country", "year"], how="outer")
     value_columns = [c for c in tb_aggregates.columns if c not in ("country", "year")]
@@ -545,8 +545,8 @@ def sanity_check_region_aggregates(tb: Table) -> None:
             assert int(years[0]) == expected_first_year, (
                 f"{region}'s {column} starts in {years[0]}, not the expected {expected_first_year}."
             )
-            assert int(years[-1]) in EXPECTED_AGGREGATE_LAST_YEARS, (
-                f"{region}'s {column} ends in {years[-1]}, not one of {EXPECTED_AGGREGATE_LAST_YEARS}."
+            assert int(years[-1]) == EXPECTED_AGGREGATE_LAST_YEAR, (
+                f"{region}'s {column} ends in {years[-1]}, not the expected {EXPECTED_AGGREGATE_LAST_YEAR}."
             )
             missing = sorted(set(range(years[0], years[-1] + 1)) - set(years))
             assert not missing, f"{region}'s {column} is missing {missing}."

@@ -764,11 +764,11 @@ def add_other_renewables(tb: Table) -> Table:
     tb["energy_consumption_from_other_renewables"].metadata.unit = "terawatt-hours"
     tb["energy_consumption_from_other_renewables"].metadata.short_unit = "TWh"
     tb["energy_consumption_from_other_renewables"].metadata.description_processing = (
-        "This is our own estimate, not a figure the producer publishes. The producer reports how much "
-        "electricity comes from geothermal, biomass and waste, and tide and wave, but not the energy "
-        "supply behind it. We convert each to the heat that would be needed to produce that electricity, "
-        "using the efficiencies the International Energy Agency assumes: 10% for geothermal and 33% for "
-        "the combustible sources."
+        "The producer reports how much electricity comes from geothermal, biomass and waste, and tide and "
+        "wave, but not the energy supply behind it. For consistency with our other energy datasets, which "
+        "measure energy supply as the heat that would be needed to produce that electricity, we convert "
+        "each source using the efficiencies the International Energy Agency assumes: 10% for geothermal "
+        "and 33% for the combustible sources."
     )
     return tb
 
