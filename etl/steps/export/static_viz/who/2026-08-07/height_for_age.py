@@ -95,14 +95,23 @@ two-line title and a two-line subtitle:
 - `note.y = 589.216 - 5.4 - note.height`, so a third line eats into the chart area rather than the
   source row. Mobile's header is auto-layout and needs neither.
 
-**Colors.** Bind the medians to library styles and derive the bands from them; the library carries no
-tints. The gid names a group, so descend to its `VECTOR` children before calling the setter.
+**Colors.** Bind each panel's median *and its threshold* to the library style, and derive that panel's
+bands from it; the library carries no tints. The gid names a group, so descend to its `VECTOR` children
+before calling the setter.
+
+The threshold has to be bound too, and to the same style as the median beside it. The step draws both
+in the panel's own colour on purpose -- colour says which panel a mark belongs to, style says which mark
+it is -- so binding only the median splits the pair in Figma: the median moves to the library colour
+while the threshold keeps matplotlib's `#dd8452` / `#4c72b0`. Binding a paint style leaves
+`dashPattern` alone, so the dash survives the binding. The encoding diagram's marks are not in this
+table: they stay the step's grey, which is what marks the diagram as a key rather than as data.
 
 | Layer | Treatment |
 |---|---|
 | `boys___50` | `setStrokeStyleIdAsync` -> `Default Palette/Rusty Orange`, key `65bab597d085689b1ea82a69f4d785cb9212c234` |
 | `girls___50` | `setStrokeStyleIdAsync` -> `Default Palette/Denim`, key `e1538d9330d7b22168f0c19fa562897aa8975f90` |
-| `<sex>__almost-all-children` | that style's color blended 0.90 towards white |
+| `<sex>__stunting-threshold` | the same style as `<sex>___50` |
+| `<sex>__19-in-20-children` | that style's color blended 0.90 towards white |
 | `<sex>__8-in-10-children` | blended 0.74 towards white |
 
 Rusty Orange and Denim separate by dE 70 at worst; their grayscale seam is 1.14:1, which does not gate
@@ -126,7 +135,9 @@ centred; `Median` by its right edge; the band labels by their left; the stunting
 and one would move every font off its rank.
 
 **Audit before showing it.** Expect sizes {16, 14, 12} only, Lato Regular and Bold only, both medians
-reporting a bound style, no ink outside 16..W-16, and gaps of about 14 on desktop and 20 on mobile.
+*and both thresholds* reporting a bound style -- and each threshold reporting the same colour as its
+own median, which is the check that catches a stale band or threshold selector -- no ink outside
+16..W-16, and gaps of about 14 on desktop and 20 on mobile.
 """
 
 import matplotlib
