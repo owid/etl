@@ -259,13 +259,37 @@ def diff_views(
         # two environments. A field that changed *here* propagates to every chart / other MDIM that
         # uses this indicator. A field that changed only in the merged text (an MDIM override) does
         # not. We skip new views: a brand-new MDIM view does not, by itself, change any indicator.
-        if target is not None:
+        # And we skip a view whose indicator was *replaced* — see `_same_indicator`.
+        if target is not None and _same_indicator(src.catalog_path, target.catalog_path):
             for key in METADATA_FIELDS:
                 if _normalize(src.base.get(key)) != _normalize(target.base.get(key)):
                     view_diff.indicator_changed_fields.add(key)
 
         diffs.append(view_diff)
     return diffs
+
+
+def _same_indicator(src_path: str | None, target_path: str | None) -> bool:
+    """Do two catalog paths name the same indicator, ignoring which version it came from?
+
+    A view repointed to a *different* indicator is a replacement, not an edit. Its `base` metadata then
+    describes two unrelated indicators, and every field they disagree on would be reported as a shared
+    indicator edit — sending the reviewer to change garden metadata on an indicator nobody touched, and
+    counting every other chart that uses it as blast radius.
+
+    Identity is tested on the `#short_name` tail, because that is the part a version bump leaves alone: a
+    bump moves `grapher/un/2026-05-01/wpp/tbl#population` to `grapher/un/2026-08-19/wpp/tbl#population`
+    without changing which indicator it is, and demanding equal paths would report no indicator-layer
+    change at all for the update the tool exists to review.
+
+    Nothing is lost by skipping a replacement: a view's indicator can only change because the MDim's own
+    config did, so `covers_mdim` is true for whoever changed it and `split_mdim_groups` reports the view's
+    text difference either way. An unknown path on either side stays comparable — "cannot tell" errs
+    toward reporting, since a spurious shared-edit flag is visible and arguable while a dropped one is not.
+    """
+    if not src_path or not target_path:
+        return True
+    return src_path.partition("#")[2] == target_path.partition("#")[2]
 
 
 def field_label(field_name: str) -> str:

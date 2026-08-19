@@ -104,6 +104,48 @@ def test_mdim_override_change_is_not_shared():
     assert diff.indicator_changed_fields == set()
 
 
+def test_view_repointed_to_another_indicator_is_not_a_shared_edit():
+    """Replacing a view's indicator is not an edit to the replacement's metadata.
+
+    The two `base` bundles then describe two unrelated indicators, and every field they disagree on
+    would be reported as a shared indicator edit — sending the reviewer to change garden metadata on an
+    indicator nobody touched, and counting every other chart using it as blast radius. The view's own
+    text difference is still reported; only the shared-edit claim is withheld.
+    """
+    dims = {"metric": "mean"}
+    src_var = _var(10, description_short="Deaths from drowning") | {
+        "catalogPath": "grapher/un/2026-08-19/wpp/tbl#deaths"
+    }
+    tgt_var = _var(7, description_short="Population") | {"catalogPath": "grapher/un/2026-08-19/wpp/tbl#population"}
+
+    [diff] = diff_views(
+        [build_view_bundle(_view(dims), None, src_var, None)], [build_view_bundle(_view(dims), None, tgt_var, None)]
+    )
+
+    assert diff.changed  # the view's text really did change...
+    assert "descriptionShort" in diff.fields
+    assert not diff.affects_indicator  # ...but nobody edited `deaths`
+    assert diff.indicator_changed_fields == set()
+
+
+def test_version_bump_is_still_the_same_indicator():
+    """A version bump moves the catalogPath without changing which indicator it is.
+
+    The counterweight to the test above: demanding equal paths would report no indicator-layer change at
+    all for a re-versioned dataset — the update this tool exists to review.
+    """
+    dims = {"metric": "mean"}
+    src_var = _var(10, description_short="New text") | {"catalogPath": "grapher/un/2026-08-19/wpp/tbl#population"}
+    tgt_var = _var(7, description_short="Old text") | {"catalogPath": "grapher/un/2026-05-01/wpp/tbl#population"}
+
+    [diff] = diff_views(
+        [build_view_bundle(_view(dims), None, src_var, None)], [build_view_bundle(_view(dims), None, tgt_var, None)]
+    )
+
+    assert diff.affects_indicator
+    assert "descriptionShort" in diff.indicator_changed_fields
+
+
 def test_chart_field_change_is_never_shared():
     """Chart title/subtitle/note are MDIM-local and never count as an indicator change."""
     dims = {"metric": "mean"}

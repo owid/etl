@@ -99,18 +99,23 @@ def _indicator_ids_in_mdim_config(config: dict[str, Any]) -> set[int]:
 def mdims_using_indicators(
     engine: Engine, indicator_ids: list[int], exclude_catalog_path: str | None = None
 ) -> dict[int, list[dict[str, Any]]]:
-    """indicator id -> *other* MDIMs that use it (catalogPath, slug).
+    """indicator id -> *other* published MDIMs that use it (catalogPath, slug).
 
     Indicator refs live inside each MDIM's JSON config, so we scan the configs in Python rather
     than in SQL — the config shape (`views[].indicators.y[]` as ids or objects) is more robustly
     handled here than with JSON path queries.
+
+    Unpublished MDims are excluded, the same way `charts_using_indicators` excludes unpublished charts:
+    this is the reader-facing blast radius the brief reports, and grapher only serves an MDim with
+    `published = 1`. Counting a draft would tell a reviewer that applying a shared metadata edit reaches
+    readers it cannot reach.
     """
     wanted = {int(i) for i in indicator_ids}
     result: dict[int, list[dict[str, Any]]] = {i: [] for i in wanted}
     if not wanted:
         return result
     df = read_sql(
-        "select catalogPath, slug, config from multi_dim_data_pages where catalogPath is not null",
+        "select catalogPath, slug, config from multi_dim_data_pages where catalogPath is not null and published = 1",
         engine=engine,
     )
     for record in df.to_dict("records"):
