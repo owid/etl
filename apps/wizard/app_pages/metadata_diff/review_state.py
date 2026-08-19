@@ -104,9 +104,22 @@ def n_reviewed(marks: list[ReviewMark]) -> int:
     return sum(1 for m in marks if m.reviewed)
 
 
+def reviewed_toggle_key(surface: str, mark: ReviewMark, key_suffix: str = "") -> str:
+    """Session-state key for one Reviewed toggle, carrying the content hash and not just the slot.
+
+    `change_key` deliberately identifies the slot and survives an edit to the text, so a key without the
+    hash left the tick showing "Reviewed" in an open session after the text moved underneath it:
+    `mark.reviewed` and the stale caption both said unreviewed, while the widget the reviewer actually
+    reads said the opposite, and clearing it took a toggle off and back on. The toggle's help text
+    promises this resets itself; the hash is what keeps that promise, because edited text is a new key
+    that seeds from `mark.reviewed`.
+    """
+    return f"mdd-reviewed::{surface}::{mark.change_key}::{mark.content_hash}{key_suffix}"
+
+
 def st_reviewed_toggle(engine: Engine, surface: str, mark: ReviewMark, key_suffix: str = "") -> None:
     """The per-change Reviewed toggle, persisting straight to the staging DB on change."""
-    widget_key = f"mdd-reviewed::{surface}::{mark.change_key}{key_suffix}"
+    widget_key = reviewed_toggle_key(surface, mark, key_suffix)
     if widget_key not in st.session_state:
         st.session_state[widget_key] = mark.reviewed
 

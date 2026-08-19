@@ -97,10 +97,18 @@ def _dataset_of(catalog_path: str) -> str:
     `grapher/wid/2026-06-18/wid/table#short` and `garden/wid/2026-06-18/wid` both give
     `wid/2026-06-18/wid` — which is also how `datasets.catalogPath` stores it.
     """
+    return "/".join(_catalog_path_parts(catalog_path)[:3])
+
+
+_CHANNEL_PREFIXES = ("grapher", "garden", "meadow", "snapshot", "export")
+
+
+def _catalog_path_parts(catalog_path: str) -> list[str]:
+    """`namespace/version/short/...` of a catalog path, with any channel prefix dropped."""
     parts = catalog_path.split("#")[0].strip("/").split("/")
-    if parts and parts[0] in ("grapher", "garden", "meadow", "snapshot", "export"):
+    if parts and parts[0] in _CHANNEL_PREFIXES:
         parts = parts[1:]
-    return "/".join(parts[:3])
+    return parts
 
 
 @dataclass
@@ -121,6 +129,12 @@ class BranchScope:
     # export downstream of it, and claiming those would hand the branch a hundred config-level texts
     # nobody in the PR wrote — exactly what `split_mdim_groups` and `mdim_in_branch` exist to prevent.
     export_products: set[tuple[str, str]] = field(default_factory=set)
+    # `(kind, name)` -> the namespaces of the edited recipes publishing under that name. A name is not
+    # unique within a kind either: `multidim/emissions/latest/air_pollution.py` and
+    # `multidim/ihme_gbd/latest/air_pollution.py` both publish an `air_pollution` MDim, so kind+name alone
+    # let an edit to one vouch for the other's lagging views. Empty for a hand-built scope, which then
+    # keeps matching on kind+name alone.
+    export_namespaces: dict[tuple[str, str], set[str]] = field(default_factory=dict)
     available: bool = True  # False when git could not tell us (then nothing is narrowed)
 
     @property
@@ -131,9 +145,27 @@ class BranchScope:
     def covers_indicator(self, catalog_path: str) -> bool:
         return _dataset_of(catalog_path) in self.dataset_keys
 
-    def covers_export(self, kind: str, short_name: str) -> bool:
-        """Did this branch change the recipe that publishes this `kind` of product under this name?"""
-        return (kind, short_name) in self.export_products
+    def covers_export(self, kind: str, short_name: str, namespace: str | None = None) -> bool:
+        """Did this branch change the recipe that publishes this `kind` of product under this name?
+
+        `namespace` disambiguates the two recipes of one kind that share a file name. Pass it whenever the
+        product's own identity carries a namespace — an MDim catalogPath does; an explorer slug does not.
+        """
+        if (kind, short_name) not in self.export_products:
+            return False
+        if namespace is None:
+            return True
+        owners = self.export_namespaces.get((kind, short_name))
+        # No recorded namespace means a hand-built scope, so kind+name is all there is to go on.
+        return namespace in owners if owners else True
+
+    def covers_mdim(self, catalog_path: str) -> bool:
+        """Did this branch change the recipe that publishes this MDim?
+
+        `paths.create_collection` builds the catalogPath from the recipe's own namespace, version and
+        short name, so both halves of the comparison come from the same place.
+        """
+        return self.covers_export(MDIM_EXPORT_KIND, mdim_short_name(catalog_path), mdim_namespace(catalog_path))
 
 
 def branch_scope() -> BranchScope:
@@ -150,7 +182,12 @@ def branch_scope() -> BranchScope:
 
     datasets = {p for p in paths if not p.startswith("export://")} | _shared_step_file_datasets(files_changed)
     exports = {(_export_kind(p), name) for p in changed_export_uris for name in _export_scope_names(p)}
-    return BranchScope(dataset_paths=datasets, export_products=exports, available=True)
+    namespaces: dict[tuple[str, str], set[str]] = {}
+    for uri in changed_export_uris:
+        namespace = _export_namespace(uri)
+        for name in _export_scope_names(uri):
+            namespaces.setdefault((_export_kind(uri), name), set()).add(namespace)
+    return BranchScope(dataset_paths=datasets, export_products=exports, export_namespaces=namespaces, available=True)
 
 
 def _shared_step_file_datasets(files_changed: dict[str, Any]) -> set[str]:
@@ -191,6 +228,12 @@ def _shared_step_file_datasets(files_changed: dict[str, Any]) -> set[str]:
             continue
         out |= {s for s in dag_steps if s.startswith(f"{folder}/")}
     return out
+
+
+def _export_namespace(export_uri: str) -> str:
+    """The namespace an export recipe lives in: `export://multidim/ihme_gbd/latest/x` -> `ihme_gbd`."""
+    parts = export_uri[len("export://") :].lstrip("/").split("/")
+    return parts[1] if len(parts) > 1 else ""
 
 
 def _export_kind(export_uri: str) -> str:
@@ -555,7 +598,7 @@ def mdim_changes_df(source_engine: Engine, target_engine: Engine) -> pd.DataFram
     if scope.available:
         # An MDim's own recipe changing (`export://multidim/.../<short>`) is the other way this branch can
         # move its texts, so a config change counts when the recipe is ours.
-        own_recipe = df["catalogPath"].map(lambda cp: scope.covers_export(MDIM_EXPORT_KIND, mdim_short_name(str(cp))))
+        own_recipe = df["catalogPath"].map(lambda cp: scope.covers_mdim(str(cp)))
         df["in_branch"] = mdim_in_branch(df, own_recipe)
     else:
         df["in_branch"] = df["has_changes"]
@@ -588,6 +631,15 @@ def mdim_short_name(catalog_path: str) -> str:
     return catalog_path.split("#")[0].rstrip("/").split("/")[-1]
 
 
+def mdim_namespace(catalog_path: str) -> str | None:
+    """The namespace an MDim's catalogPath sits in (`grapher/wid/latest/incomes_wid#…` -> `wid`).
+
+    None when the path is too short to carry one, so a bare short name still matches on name alone.
+    """
+    parts = _catalog_path_parts(catalog_path)
+    return parts[0] if len(parts) >= 3 else None
+
+
 def split_mdim_groups(
     catalog_path: str, view_diffs: list[ViewDiff], scope: BranchScope | None = None
 ) -> tuple[list[ChangeGroup], list[ChangeGroup]]:
@@ -601,7 +653,7 @@ def split_mdim_groups(
     """
     scope = scope if scope is not None else branch_scope()
     groups = group_changes([v for v in view_diffs if v.changed])
-    if not scope.available or scope.covers_export(MDIM_EXPORT_KIND, mdim_short_name(catalog_path)):
+    if not scope.available or scope.covers_mdim(catalog_path):
         return groups, []
     return [g for g in groups if g.affects_indicator], [g for g in groups if not g.affects_indicator]
 

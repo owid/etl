@@ -37,10 +37,12 @@ from apps.wizard.app_pages.metadata_diff.discovery import (
     _dataset_of,
     _emitted_collection_names,
     _export_kind,
+    _export_namespace,
     charts_reached,
     compare_explorer_views,
     compare_indicator_texts,
     mdim_in_branch,
+    mdim_namespace,
     mdim_short_name,
     narrow_to_branch,
     split_mdim_groups,
@@ -1084,3 +1086,58 @@ def test_review_widget_state_is_bound_to_the_text_it_signed_off():
 
     for make_key in (_review_status_key, _review_comment_key):
         assert make_key("cp", key, content_hash) != make_key("cp", key_after, hash_after)
+
+
+def test_export_scope_is_per_namespace_not_just_per_name():
+    """A recipe file name is not unique within one export kind either.
+
+    `multidim/emissions/latest/air_pollution.py` and `multidim/ihme_gbd/latest/air_pollution.py` both
+    publish an MDim whose catalogPath ends in `air_pollution`, so matching on kind+name alone let an edit
+    to one vouch for the other. On a lagging staging server that presents a whole MDim's worth of
+    config-level text nobody in the PR wrote as this branch's work.
+    """
+    assert _export_namespace("export://multidim/ihme_gbd/latest/air_pollution") == "ihme_gbd"
+    assert mdim_namespace("grapher/ihme_gbd/latest/air_pollution#air_pollution") == "ihme_gbd"
+
+    scope = BranchScope(
+        export_products={(MDIM_EXPORT_KIND, "air_pollution")},
+        export_namespaces={(MDIM_EXPORT_KIND, "air_pollution"): {"emissions"}},
+    )
+    assert scope.covers_mdim("grapher/emissions/latest/air_pollution#air_pollution")
+    assert not scope.covers_mdim("grapher/ihme_gbd/latest/air_pollution#air_pollution")
+    # A different name is no match either way.
+    assert not scope.covers_mdim("grapher/emissions/latest/ceds#ceds")
+
+    # An explorer slug carries no namespace, so it keeps matching on kind and name alone.
+    assert BranchScope(export_products={(EXPLORER_EXPORT_KIND, "ipcc-scenarios")}).covers_export(
+        EXPLORER_EXPORT_KIND, "ipcc-scenarios"
+    )
+
+
+def test_export_scope_without_recorded_namespaces_still_matches_on_name():
+    """Narrowing must not get *stricter* by accident: unknown namespace means fall back to the name."""
+    scope = BranchScope(export_products={(MDIM_EXPORT_KIND, "mine")})
+    assert scope.covers_mdim("grapher/ns/latest/mine#mine")
+    # A path too short to carry a namespace resolves to None, which also falls back to the name.
+    assert mdim_namespace("mine") is None
+    assert scope.covers_export(MDIM_EXPORT_KIND, "mine", mdim_namespace("mine"))
+
+
+def test_reviewed_toggle_key_is_bound_to_the_text_it_ticked():
+    """The list toggle is the same stale-state trap the sign-off widgets had.
+
+    `change_key` survives an edit, so a key without the content hash kept the tick reading "Reviewed" in
+    an open session while the stored mark and the stale caption both said unreviewed.
+    """
+    from apps.wizard.app_pages.metadata_diff.review_state import ReviewMark, reviewed_toggle_key
+
+    group = ChangeGroup(field="titlePublic", old="Old", new="New", view_dims=[{"sex": "female"}])
+    edited = ChangeGroup(field="titlePublic", old="Old", new="New, revised", view_dims=[{"sex": "female"}])
+    key, content_hash = change_group_identity("grapher/ns/latest/mine#mine", group)
+    key_after, hash_after = change_group_identity("grapher/ns/latest/mine#mine", edited)
+
+    # Same slot, moved content — exactly the case the key has to tell apart.
+    assert key_after == key
+    before = ReviewMark(group=group, change_key=key, content_hash=content_hash, reviewed=True, stale=False)
+    after = ReviewMark(group=edited, change_key=key_after, content_hash=hash_after, reviewed=False, stale=True)
+    assert reviewed_toggle_key("surface", before) != reviewed_toggle_key("surface", after)
