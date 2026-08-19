@@ -39,7 +39,7 @@ from etl.collection.utils import (
     unique_records,
     validate_indicators_in_db,
 )
-from etl.config import OWID_ENV, OWIDEnv
+from etl.config import DEFAULT_GRAPHER_SCHEMA, OWID_ENV, OWIDEnv
 from etl.files import yaml_dump
 from etl.paths import EXPORT_DIR, SCHEMAS_DIR
 
@@ -288,6 +288,9 @@ class Collection(MDIMBase):
 
         # Warn about view configs that shadow the collection-level schema pin
         self.warn_on_view_schema_overrides()
+
+        # Warn when no version is pinned and we fall back to the vendored default
+        self.warn_if_grapher_schema_unpinned()
 
         # Sort views based on dimension order
         self.sort_views_based_on_dimensions()
@@ -680,6 +683,21 @@ class Collection(MDIMBase):
                 f"({schema}), which overrides the collection-level `grapher_schema` "
                 f"({resolve_grapher_schema(self.grapher_schema)}). Remove it and pin the whole "
                 "collection with the top-level `grapher_schema` field instead."
+            )
+
+    def warn_if_grapher_schema_unpinned(self):
+        """Warn when the collection pins no schema version and the default is used.
+
+        The fallback is `DEFAULT_GRAPHER_SCHEMA`, so grapher is told the config already matches the
+        version this repo vendors. That is usually true, but it means a config authored against an
+        older schema would skip migration. It also makes "pinned" and "defaulted" indistinguishable
+        in the database while the two happen to agree — so say so out loud instead.
+        """
+        if self.grapher_schema is None:
+            log.warning(
+                f"Collection '{self.catalog_path}' pins no `grapher_schema`; falling back to "
+                f"{DEFAULT_GRAPHER_SCHEMA}. Add a top-level `grapher_schema` to the config YAML "
+                "recording the version its view configs were authored against."
             )
 
     def validate_description_keys(self):

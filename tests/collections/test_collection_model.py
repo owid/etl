@@ -2437,3 +2437,18 @@ def test_warn_on_view_schema_overrides(capsys):
     # A view without its own `$schema` stays quiet.
     Collection.from_dict(_make_minimal_config(grapher_schema="011")).warn_on_view_schema_overrides()
     assert capsys.readouterr().out == ""
+
+
+def test_warn_if_grapher_schema_unpinned(capsys):
+    """
+    Test Collection.warn_if_grapher_schema_unpinned - an unpinned collection says so.
+
+    Without this, a config that silently relies on the DEFAULT_GRAPHER_SCHEMA fallback is
+    indistinguishable in the database from one that pins the same version deliberately.
+    """
+    Collection.from_dict(_make_minimal_config()).warn_if_grapher_schema_unpinned()
+    out = capsys.readouterr().out
+    assert "pins no `grapher_schema`" in out
+
+    Collection.from_dict(_make_minimal_config(grapher_schema="011")).warn_if_grapher_schema_unpinned()
+    assert capsys.readouterr().out == ""
