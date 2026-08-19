@@ -920,11 +920,24 @@ def main() -> int:
     # to it — and since the carrier count is now the link/embed split rather than the aggregate
     # `postsGdocs`, such a reference would otherwise be counted nowhere at all. Delegated to the
     # sweep's own reader, which already unwraps Google redirect wrappers and skips archive hosts.
+    # A failure here must not authorise the unpublish. `gdoc_references` above is unguarded and so
+    # already fails closed; guarding this one and continuing would have made the pair inconsistent
+    # — a reference sweep that could not run leaves the blast radius unknown, and `--apply` is
+    # exactly the step that acts on it. So: read-only runs report what they did gather and say the
+    # counts are short, while `--apply` refuses outright rather than unpublishing against a partial
+    # audit. There is deliberately no waiver flag: retry it, do not wave it through.
     try:
         url_rows = fr.sweep_gdoc_url_links({slug: {"id": rec.get("src_id")} for slug, rec in rec_by_slug.items()})
         for row in url_rows:
             count_ref(str(row["subject"]), "link" if row["kind"] == fr.LINK else "embed")
     except Exception as e:
+        if args.apply:
+            print(
+                f"\nREFUSED: the raw-URL gdoc reference sweep failed ({e!s:.80}). The references audit is "
+                f"incomplete, so --apply would unpublish sources whose links and embeds were never counted. "
+                f"Re-run without --apply to see the partial audit, then retry once it succeeds."
+            )
+            return 2
         print(f"\n  (raw-URL gdoc sweep failed, link/embed counts may understate: {e!s:.80})")
 
     print("\nREFERENCES AUDIT (of the OLD source chart)")

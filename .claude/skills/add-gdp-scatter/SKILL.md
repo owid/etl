@@ -406,6 +406,13 @@ embed, and a raw pasted `/grapher/…` URL. The last is stored as `linkType='url
 also unwraps Google redirect wrappers and skips archived hosts. Since the carrier count is the
 link/embed split rather than the aggregate `postsGdocs`, a raw-URL reference left out of both
 would be counted nowhere at all.
+
+**A reference sweep that fails blocks `--apply`.** `gdoc_references` is unguarded, so it fails
+closed on its own; the raw-URL sweep is guarded only so that a read-only audit still prints what it
+did gather, and under `--apply` it `REFUSED`s with a non-zero exit instead. An incomplete references
+audit must never authorise the unpublish — that is the same principle that turns a `MANUAL` row into
+`BLOCKED`, applied to the case where the count is missing rather than alarming. There is
+deliberately no waiver flag: retry the sweep, do not wave it through.
 - **NOTHING carries it** — an **exclusion** loss. The target never re-applies exclusions, so no
   href, on any surface, brings the entity back off the scatter. An exclusion-only row therefore
   reports no "fixable by hand" count at all; the only question it poses is whether the chart
