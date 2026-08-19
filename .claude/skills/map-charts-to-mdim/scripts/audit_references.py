@@ -871,6 +871,11 @@ def main() -> int:
                 "doc_edit_url": f"https://docs.google.com/document/d/{ref['surface_id']}/edit" if is_gdoc else "",
                 "doc_preview_url": f"{admin}/gdocs/{ref['surface_id']}/preview" if is_gdoc else "",
                 "find_in_doc": find_in_doc(ref) if is_gdoc else "",
+                # The surface's own id, kept for every row. A featured metric's is its
+                # `featured_metrics.id`, which is how the ⭐ grouping recovers that slot's income
+                # group and ranking; dropping it here silently collapsed every slot into one
+                # empty-income-group bucket with no rankings to report.
+                "surface_id": ref["surface_id"],
                 # Narrative rows carry the ids their own section needs: the narrative chart
                 # to open/delete, and the target view to parent the replacement to.
                 "narrative_id": ref["surface_id"] if ref["surface"] == "narrative chart" else "",

@@ -221,6 +221,9 @@ def build_rows(runs: dict[str, dict], raw: list[dict], host: str, admin: str) ->
                 "where_url": _where_url(ref, host, admin),
                 "doc_edit_url": f"https://docs.google.com/document/d/{ref['surface_id']}/edit" if is_gdoc else "",
                 "doc_preview_url": f"{admin}/gdocs/{ref['surface_id']}/preview" if is_gdoc else "",
+                # As in the chart audit: the ⭐ grouping reads a featured metric's
+                # `featured_metrics.id` from here to recover its income group and ranking.
+                "surface_id": ref["surface_id"],
                 "find_in_doc": find_in_doc(ref) if is_gdoc else "",
                 "context": ref["context"],
                 "old_url": old_url,
