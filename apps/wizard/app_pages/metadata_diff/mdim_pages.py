@@ -25,6 +25,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     group_usage,
     rendering_charts,
     text_change_key,
+    view_rendering_charts,
 )
 from apps.wizard.app_pages.metadata_diff.data import (
     build_chart_bundle,
@@ -420,7 +421,9 @@ def render_view_diff_page(
             # 🟢 once reviewed, 🟡 not yet.
             marker = "🟢" if int(i) in visited else "🟡"
             charts, _ = view_impact(cv, usage)
-            suffix = f"  —  ↗ {len(charts)} charts" if charts else ""
+            # Only charts that can show the change — same count as everywhere else on the page.
+            shown = view_rendering_charts(cv, charts)
+            suffix = f"  —  ↗ {len(shown)} charts" if shown else ""
             return f"{marker} {view_label(cv, dimensions)}{suffix}"
 
         jump_col, nav_col, _spacer = st.columns([2, 1, 2], vertical_alignment="bottom")

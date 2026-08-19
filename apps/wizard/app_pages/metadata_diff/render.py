@@ -28,7 +28,9 @@ from apps.wizard.app_pages.metadata_diff.core import (
     diff_preview_html,
     field_label,
     inline_diff_html,
+    renders_fields,
     text_change_key,
+    view_rendering_charts,
 )
 from apps.wizard.app_pages.metadata_diff.data import set_scope
 from apps.wizard.app_pages.metadata_diff.tree import render_affected_charts_html
@@ -168,7 +170,11 @@ def orange_banner(html_msg: str) -> None:
 
 
 def view_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any]]]]) -> tuple[list, list]:
-    """(charts, other_mdims) affected by this view's indicator-layer change; empty if MDim-only."""
+    """(charts, other_mdims) affected by this view's indicator-layer change; empty if MDim-only.
+
+    The *unfiltered* set, for the surfaces that list charts by name. Anything reporting a count has to
+    put the charts through `view_rendering_charts` first.
+    """
     if not (view.affects_indicator and view.indicator_id is not None):
         return [], []
     entry = usage.get(view.indicator_id, {})
@@ -184,7 +190,7 @@ def impact_counts(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any]
     if not view.changed:
         return {"charts": 0, "mdims": 0}
     charts, mdims = view_impact(view, usage)
-    return {"charts": len(charts), "mdims": len(mdims)}
+    return {"charts": len(view_rendering_charts(view, charts)), "mdims": len(mdims)}
 
 
 def render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any]]]], unit: str = "view") -> None:
@@ -204,30 +210,54 @@ def render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any]
         return
 
     charts, mdims = view_impact(view, usage)
-    n_c, n_m = len(charts), len(mdims)
+    # The banner states *reach*, so it counts only the charts that can show this change. The popover
+    # below lists the full set and flags the rest, so a chart the author expects never simply vanishes.
+    shown = view_rendering_charts(view, charts)
+    n_c, n_m, n_hidden = len(shown), len(mdims), len(charts) - len(shown)
     parts = []
     if n_c:
         parts.append(f"<b>{n_c}</b> chart{'s' if n_c != 1 else ''}")
     if n_m:
         parts.append(f"<b>{n_m}</b> other MDim{'s' if n_m != 1 else ''}")
 
-    banner = (
-        "This change is in the <b>shared indicator metadata</b> — it also affects "
-        + " and ".join(parts)
-        + " that use this indicator."
-        if parts
-        else "This change is in the <b>shared indicator metadata</b>, but no published charts or other "
-        "MDims currently use this indicator — so nothing else is affected."
-    )
-    reach_short = f"{n_c} chart{'s' if n_c != 1 else ''}" + (f" · {n_m} other MDim{'s' if n_m else ''}" if n_m else "")
+    if parts:
+        banner = (
+            "This change is in the <b>shared indicator metadata</b> — it also affects "
+            + " and ".join(parts)
+            + " that use this indicator."
+        )
+    elif n_hidden:
+        # Not the same thing as "nothing uses this indicator", and the difference is the whole point of
+        # the filter: charts do use it, but none of them has a data page to show this field on.
+        verb = (
+            "combines several indicators, so it renders"
+            if n_hidden == 1
+            else "combine several indicators, so they render"
+        )
+        banner = (
+            "This change is in the <b>shared indicator metadata</b>, but the "
+            f"<b>{n_hidden}</b> chart{'s' if n_hidden != 1 else ''} using this indicator {verb} no data "
+            "page — so no reader sees this text outside this MDim."
+        )
+    else:
+        banner = (
+            "This change is in the <b>shared indicator metadata</b>, but no published charts or other "
+            "MDims currently use this indicator — so nothing else is affected."
+        )
+
+    # The button describes what the list holds (every chart), not the reach the banner just stated.
+    n_listed = len(charts)
+    listed = [f"{n_listed} chart{'s' if n_listed != 1 else ''}"] if n_listed else []
+    if n_m:
+        listed.append(f"{n_m} other MDim{'s' if n_m != 1 else ''}")
 
     # Banner + a peek popover (a clean window) to see the affected charts / MDims on demand.
     col_msg, col_btn = st.columns([5, 2], vertical_alignment="center")
     with col_msg:
         orange_banner(banner)
     with col_btn:
-        if n_c or n_m:
-            with st.popover(f"📊 Show {reach_short}", use_container_width=True):
+        if listed:
+            with st.popover(f"📊 Show {' · '.join(listed)}", use_container_width=True):
                 render_affected_lists(view, charts, mdims)
 
 
@@ -290,7 +320,10 @@ def render_author_scope(
     they don't set it. `multi` prefixes the field name when a view has several shared changes."""
     key = text_change_key(catalog_path, field_name, change["old"], change["new"])
     imp = usage.get(view_diff.indicator_id, {}) if view_diff.indicator_id is not None else {}
-    n_c, n_m = len(imp.get("charts", [])), len(imp.get("mdims", []))
+    # "Apply to all" is a decision about who sees the change, so it has to be offered against the reach
+    # readers actually get — the same count the Charts section and the MDim cards report.
+    n_c = len([c for c in imp.get("charts", []) if renders_fields({field_name}, c)])
+    n_m = len(imp.get("mdims", []))
     reach = f"{n_c} chart{'s' if n_c != 1 else ''}"
     if n_m:
         reach += f" · {n_m} other MDim{'s' if n_m != 1 else ''}"

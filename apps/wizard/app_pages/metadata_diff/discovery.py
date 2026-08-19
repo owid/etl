@@ -45,7 +45,7 @@ from apps.wizard.app_pages.metadata_diff.data import (
 from apps.wizard.app_pages.metadata_diff.usage import _indicator_ids_in_mdim_config, charts_using_indicators
 from etl.db import read_sql
 from etl.git_helpers import get_changed_files
-from etl.io import get_all_changed_catalog_paths
+from etl.io import get_all_changed_catalog_paths, get_directly_changed_export_uris
 from etl.paths import STEP_DIR
 
 log = get_logger()
@@ -113,9 +113,12 @@ class BranchScope:
     """
 
     dataset_paths: set[str] = field(default_factory=set)  # dataset-level catalog paths (channel/ns/ver/ds)
-    # `(export kind, name)` of what each changed export recipe publishes — the kind included because a
-    # name is only unique within one: `migration/latest/migration_flows.py` exists under both `multidim`
-    # and `explorers`, so a name-only set would let an edit to either recipe vouch for both products.
+    # `(export kind, name)` of what each export recipe this branch *edited* publishes — the kind
+    # included because a name is only unique within one: `migration/latest/migration_flows.py` exists
+    # under both `multidim` and `explorers`, so a name-only set would let an edit to either recipe vouch
+    # for both products. Only recipes edited here belong in it: a data-step edit expands into every
+    # export downstream of it, and claiming those would hand the branch a hundred config-level texts
+    # nobody in the PR wrote — exactly what `split_mdim_groups` and `mdim_in_branch` exist to prevent.
     export_products: set[tuple[str, str]] = field(default_factory=set)
     available: bool = True  # False when git could not tell us (then nothing is narrowed)
 
@@ -135,13 +138,17 @@ class BranchScope:
 def branch_scope() -> BranchScope:
     """Read this branch's changed steps from git (data steps and export recipes alike)."""
     try:
-        paths = get_all_changed_catalog_paths(get_changed_files(), include_export=True)
+        files_changed = get_changed_files()
+        paths = get_all_changed_catalog_paths(files_changed, include_export=True)
+        # Only the recipes this branch *edited*. `paths` also carries every export downstream of a
+        # changed data step, and taking those as ours is what `export_products` must not do.
+        changed_export_uris = get_directly_changed_export_uris(files_changed)
     except (git.exc.GitCommandError, git.exc.InvalidGitRepositoryError) as e:
         log.warning("metadata_diff.git_narrowing_unavailable", error=str(e))
         return BranchScope(available=False)
 
     datasets = {p for p in paths if not p.startswith("export://")}
-    exports = {(_export_kind(p), name) for p in paths if p.startswith("export://") for name in _export_scope_names(p)}
+    exports = {(_export_kind(p), name) for p in changed_export_uris for name in _export_scope_names(p)}
     return BranchScope(dataset_paths=datasets, export_products=exports, available=True)
 
 

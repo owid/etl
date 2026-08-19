@@ -959,3 +959,63 @@ def test_chart_brief_says_no_other_surface_in_words():
     brief = chart_pr_brief_markdown({"slug": "some-chart"}, "production", resolved, {}, "chart:some-chart")
     assert "no other surface" in brief
     assert "0 other chart(s)" not in brief
+
+
+def test_view_level_reach_counts_also_exclude_charts_that_cannot_show_the_change():
+    """The per-view counts ask the same question as the per-group ones, so they need the same answer.
+
+    The tree markers, the blast-radius banner and the author's "apply to all" label all read the raw
+    usage entry. Left unfiltered, a WYSK-only view claimed multi-indicator charts that have no data page
+    to show it on — and the scope decision was offered against that inflated number.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import view_rendering_charts
+    from apps.wizard.app_pages.metadata_diff.render import impact_counts, view_impact
+
+    charts = [
+        {"chartId": 1, "slug": "a", "wysk_shown": True},
+        {"chartId": 2, "slug": "b", "wysk_shown": False},
+    ]
+    wysk_only = ViewDiff(
+        dimensions={},
+        fields={"descriptionKey": {"old": ["a"], "new": ["b"]}},
+        indicator_id=7,
+        indicator_changed_fields={"descriptionKey"},
+    )
+    assert [c["chartId"] for c in view_rendering_charts(wysk_only, charts)] == [1]
+
+    # A view that also changed a title reaches every chart: the title renders on the chart itself.
+    with_title = ViewDiff(
+        dimensions={},
+        fields={"descriptionKey": {"old": ["a"], "new": ["b"]}, "titlePublic": {"old": "O", "new": "N"}},
+        indicator_id=7,
+        indicator_changed_fields={"descriptionKey", "titlePublic"},
+    )
+    assert [c["chartId"] for c in view_rendering_charts(with_title, charts)] == [1, 2]
+
+    # The tree markers report the filtered count.
+    usage = {7: {"charts": charts, "mdims": []}}
+    assert impact_counts(wysk_only, usage)["charts"] == 1
+    assert impact_counts(with_title, usage)["charts"] == 2
+
+    # The unfiltered list stays available, so the popover can still name every chart and flag the rest.
+    assert [c["chartId"] for c in view_impact(wysk_only, usage)[0]] == [1, 2]
+
+
+def test_export_products_only_covers_recipes_the_branch_edited():
+    """A data-step edit expands into every export downstream of it, none of whose configs we wrote.
+
+    `covers_export` is what lets config-level MDim and explorer text count as this branch's work. Fed
+    the whole downstream subgraph, one garden metadata edit would vouch for every MDim built on that
+    dataset, and `split_mdim_groups` would hand the reviewer a wholesale config diff nobody authored —
+    the exact failure that split exists to prevent.
+    """
+    from etl.io import get_directly_changed_export_uris
+
+    data_step = "etl/steps/data/garden/wb/2026-06-26/world_bank_pip.meta.yml"
+    recipe = "etl/steps/export/multidim/wb/latest/poverty_pip.py"
+
+    assert get_directly_changed_export_uris({data_step: "M", recipe: "M"}) == [
+        "export://multidim/wb/latest/poverty_pip"
+    ]
+    # A branch touching only a data step claims no export recipe at all.
+    assert get_directly_changed_export_uris({data_step: "M"}) == []
