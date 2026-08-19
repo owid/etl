@@ -205,9 +205,22 @@ def _shared_step_file_datasets(files_changed: dict[str, Any]) -> set[str]:
     is the safe direction here: this is a narrowing filter, and `datasets_built_here` still has to agree
     before anything counts as ours.
 
-    Note this only repairs *this* tool's scope. The same blind spot sits in
+    A step implemented as a *package* fails the same way for the opposite reason: its files sit one level
+    **below** the sibling layout, inside the step folder. `garden/democracy/2026-03-17/vdem` keeps 200 kB
+    of reader-facing text in `.../vdem/vdem.meta.yml`, which strips to `.../vdem/vdem` — again a path in
+    no DAG, again an empty scope, again a false all-clear on an edit that rewrote a whole dataset's text.
+    Six active steps are packages. So resolve a nested file to the nearest *ancestor* folder that names a
+    step, and only fall back to the folder-wide credit when no ancestor does.
+
+    Note this only repairs *this* tool's scope. Both blind spots sit in
     `get_all_changed_catalog_paths` itself, so chart-diff, datadiff and `etl run --modified` still miss a
-    shared-metadata edit; fixing it there is a separate change with a much wider blast radius.
+    shared-metadata edit and a package step's own files; fixing it there is a separate change with a much
+    wider blast radius.
+
+    Still out of scope: a helper at the *namespace* level (`garden/democracy/shared.py`, the only one
+    today) has no version folder to fall back to, and crediting every version of the namespace is a
+    broader call than either case above needs. It carries no metadata text — there is no `.meta.yml`
+    above a version folder anywhere in the tree.
     """
     from etl.dag_helpers import load_dag
 
@@ -223,11 +236,24 @@ def _shared_step_file_datasets(files_changed: dict[str, Any]) -> set[str]:
             continue
         # `shared.meta.yml` -> `shared`; the same stripping `get_all_changed_catalog_paths` does.
         own = (rel.parent / rel.name.split(".")[0]).as_posix()
-        folder = rel.parent.as_posix()
-        # Only a `channel/namespace/version` folder has sibling steps to credit.
-        if own in dag_steps or folder.count("/") != 2:
+        if own in dag_steps:
             continue
-        out |= {s for s in dag_steps if s.startswith(f"{folder}/")}
+        folders = [rel.parent, *rel.parent.parents]
+        # A step implemented as a *package* keeps its files inside the step folder, so its step is an
+        # ancestor of the file rather than a sibling: `.../vdem/vdem.meta.yml` is the step `.../vdem`.
+        # The nearest such ancestor wins, so a package file credits its own step and not the whole
+        # version folder (`who/latest/monkeypox` shares its folder with three unrelated steps).
+        step_ancestor = next((f.as_posix() for f in folders if f.as_posix() in dag_steps), None)
+        if step_ancestor is not None:
+            out.add(step_ancestor)
+            continue
+        # Otherwise credit every step in the `channel/namespace/version` folder the file sits under. A
+        # helper nested in its own sub-package (`demography/2024-01-25/utils/`) serves the same siblings
+        # a flat `shared.py` would.
+        version_folder = next((f.as_posix() for f in folders if f.as_posix().count("/") == 2), None)
+        if version_folder is None:
+            continue
+        out |= {s for s in dag_steps if s.startswith(f"{version_folder}/")}
     return out
 
 

@@ -1107,6 +1107,35 @@ def test_shared_metadata_file_credits_its_sibling_steps():
     assert _shared_step_file_datasets({"apps/wizard/app_pages/metadata_diff/core.py": "M"}) == set()
 
 
+def test_package_step_files_credit_the_step_they_live_in():
+    """A step implemented as a package keeps its metadata *inside* the step folder, not beside it.
+
+    `garden/democracy/2026-03-17/vdem` is one of six active steps that are packages, and its 200 kB of
+    reader-facing text sits in `.../vdem/vdem.meta.yml` — one level below the sibling layout. That strips
+    to `.../vdem/vdem`, a path in no DAG, so the scope came back empty; and an empty scope narrows away
+    every rebuilt indicator, reporting "no metadata text changes" for an edit that rewrote a whole
+    dataset's text.
+    """
+    from apps.wizard.app_pages.metadata_diff.discovery import _shared_step_file_datasets
+
+    step = "garden/democracy/2026-03-17/vdem"
+    assert _shared_step_file_datasets({f"etl/steps/data/{step}/vdem.meta.yml": "M"}) == {step}
+    # The package's own module names no step of its own either, so it needs the same resolution.
+    assert _shared_step_file_datasets({f"etl/steps/data/{step}/__init__.py": "M"}) == {step}
+
+    # The *nearest* ancestor wins: a package file credits its own step, not every step in the version
+    # folder. `who/latest/monkeypox` shares its folder with three unrelated steps that it must not claim.
+    assert _shared_step_file_datasets({"etl/steps/data/garden/who/latest/monkeypox/__init__.py": "M"}) == {
+        "garden/who/latest/monkeypox"
+    }
+
+    # A file nested in a folder that names *no* step falls back to the folder-wide credit, exactly as a
+    # flat `shared.py` does — a helper sub-package serves the same siblings.
+    reached = _shared_step_file_datasets({"etl/steps/data/garden/owid/latest/key_indicators/table_population.py": "M"})
+    assert reached
+    assert all(p.startswith("garden/owid/latest/") for p in reached)
+
+
 def test_review_widget_state_is_bound_to_the_text_it_signed_off():
     """An edit must not inherit the previous sign-off through the reviewer's open session.
 
