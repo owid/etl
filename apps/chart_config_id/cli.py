@@ -69,7 +69,10 @@ def _write_field(path: Path, config: CommentedMap, chart_config_id: str, force: 
     if existing == chart_config_id:
         console.print(f"[yellow]{path} already has `{FIELD}: {existing}` — nothing to do.[/yellow]")
         return
-    if existing and not force:
+    # Same UUID in a different case is the same chart — rewriting it to the canonical
+    # lower-case form (the only form `validate_chart_config_id` accepts) needs no --force.
+    same_chart = isinstance(existing, str) and existing.lower() == chart_config_id.lower()
+    if existing and not same_chart and not force:
         raise click.ClickException(
             f"{path} already declares `{FIELD}: {existing}`. That UUID is the identity of an existing "
             f"chart — replacing it makes the next push abandon that chart and create a new one. "
@@ -178,4 +181,6 @@ def lookup(config_file: Path, slug: str | None, chart_id: int | None, env_name: 
 
     row = rows[0]
     console.print(f"Found chart {row.id} → {row.configId} ({owid_env.admin_site}/charts/{row.id}/edit)")
-    _write_field(config_file, config, str(row.configId), force)
+    # Canonicalize: UUIDs are case-insensitive and the DB may hold an upper-case one,
+    # but the config YAML declares the identity in canonical lower-case dashed form.
+    _write_field(config_file, config, str(row.configId).lower(), force)

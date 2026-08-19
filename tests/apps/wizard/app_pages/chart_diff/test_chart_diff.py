@@ -42,6 +42,26 @@ def test_config_uuid_identifies_chart_twins():
     assert diff.chart_id == source.id
 
 
+def test_config_uuid_matching_ignores_case():
+    from apps.wizard.app_pages.chart_diff.chart_diff import (
+        _is_cross_env_twin,
+        _same_chart_across_envs,
+        same_config_uuid,
+    )
+
+    # UUIDs are case-insensitive, and the grapher admin accepts a caller-supplied
+    # UUID in any case — so the same chart may be stored upper-case in one
+    # environment and lower-case in another.
+    source = _chart(100, datetime(2026, 1, 1), config_id="0198C0E8-0000-7000-8000-000000000000")
+    target = _chart(200, datetime(2026, 1, 2), config_id="0198c0e8-0000-7000-8000-000000000000")
+
+    assert same_config_uuid(source.configId, target.configId)
+    assert not same_config_uuid(source.configId, None)
+    assert not same_config_uuid(None, None)
+    assert _same_chart_across_envs(source, target)
+    assert _is_cross_env_twin(source, target)
+
+
 def test_catalog_path_identifies_etl_chart_twins(monkeypatch):
     from apps.wizard.app_pages.chart_diff.chart_diff import (
         ChartDiff,

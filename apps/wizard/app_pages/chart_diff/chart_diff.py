@@ -167,12 +167,22 @@ def _target_has_etl_columns(target_chart: gm.Chart | None) -> bool:
     return _charts_table_has_etl_columns(getattr(bind, "engine", bind))
 
 
+def same_config_uuid(a: str | None, b: str | None) -> bool:
+    """Compare two config UUIDs (`charts.configId`) case-insensitively.
+
+    UUIDs are case-insensitive identifiers, and the grapher admin accepts a
+    caller-supplied one in any case, so DB values may differ in case across
+    environments while naming the same chart.
+    """
+    return bool(a) and bool(b) and a.lower() == b.lower()  # type: ignore[union-attr]
+
+
 def _same_chart_across_envs(source_chart: gm.Chart, target_chart: gm.Chart) -> bool:
     """Return true when source and target refer to the same logical chart."""
     # The config UUID (charts.configId) is the chart's stable identity: rows
     # copied from production keep it, and chart-sync carries it along when
     # creating a chart on production. It's the strongest signal we have.
-    if source_chart.configId == target_chart.configId:
+    if same_config_uuid(source_chart.configId, target_chart.configId):
         return True
     if (
         _target_has_etl_columns(target_chart)
@@ -190,7 +200,7 @@ def _is_cross_env_twin(source_chart: gm.Chart, target_chart: gm.Chart | None) ->
     a staging chart — matched by config UUID or catalogPath instead."""
     if target_chart is None or source_chart.id == target_chart.id:
         return False
-    if source_chart.configId == target_chart.configId:
+    if same_config_uuid(source_chart.configId, target_chart.configId):
         return True
     if not _target_has_etl_columns(target_chart):
         return False
