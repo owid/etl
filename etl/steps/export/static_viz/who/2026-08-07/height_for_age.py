@@ -1,7 +1,18 @@
 """Recreate the 'Expected height of boys and girls' growth-curve chart.
 
-Each panel shows nested percentile bands from the WHO growth reference standards, the median, and
-the -2 SD stunting threshold.
+Each panel shows two nested bands from the WHO growth reference standards and the median. The outer
+band runs from -2 SD to +2 SD, so its lower edge is the stunting threshold: the boundary a reader has
+to find carries two encodings at once -- where the tint stops and a dashed line -- and everything below
+the shaded area is the stunted region.
+
+Both bands are symmetric about the median, and both edges of the outer one are the same kind of cut.
+An earlier version ran the threshold as a faint dotted line *inside* a band spanning the 0.1st to the
+99.9th percentile, which put two near-parallel boundaries a few pixels apart at the bottom of each
+panel -- one a labelled band edge, one an unlabelled line -- and gave the reader no cue as to which
+side of the line was 'too short'. Cutting the band at the threshold removed the competing edge; making
+the far edge +2 SD rather than the 99.9th percentile then removed the asymmetry that replaced it, where
+one edge of a band was a standard deviation and the other a percentile. The cost is the tall upper
+tail: the band now tops out around 191 cm rather than 199, which the 200 cm axis still contains.
 
 Neither panel repeats the other sex's median. The two medians run within a few millimetres of each
 other from birth to about age 9, so a second line traces the panel's own median for two thirds of the
@@ -141,11 +152,32 @@ paths = PathFinder(__file__)
 # chart shifts with the shared palette instead of pinning its own.
 PANEL_COLOR_INDEX = {"Boys": 1, "Girls": 0}
 
-# Color for reference lines and their labels.
-REFERENCE_LINE_COLOR = "#6c7a89"
+# The stunting threshold's stroke. It carries no colour of its own: in a panel it takes that panel's
+# colour, and in the encoding diagram it takes the diagram's grey, so colour says which panel a mark
+# belongs to and style says which mark it is. A neutral slate here instead read as chart furniture --
+# gridlines and annotation are grey -- which is the wrong rank for the chart's most important idea.
+#
+# Dashed rather than dotted, at a weight that puts it third behind the median (2.6pt) and ahead of the
+# gridlines (1.0pt), and that survives both print and the 217px mobile panel. At 0.8pt dotted it was
+# the faintest stroke in the chart.
+#
+# The pattern is in multiples of the line's own width, NOT points: matplotlib multiplies a dash
+# sequence by the linewidth (`rcParams["lines.scale_dashes"]`, on by default), so a pattern written in
+# points comes out `linewidth` times longer than intended. At 1.4pt this draws a 4.5pt dash with a
+# 2.8pt gap -- the SVG carries `stroke-dasharray: 4.48,2.8`, which is what to check against. Reading
+# the same numbers as points shipped a 7pt dash on a 1.4pt stroke, five times the stroke width, which
+# reads as stretched at any size and looked like a Figma import defect rather than a step one.
+STUNTING_LINEWIDTH = 1.4
+STUNTING_DASHES = (0, (3.2, 2.0))
 
-# Neutral grey for the encoding diagram's bands and median. Grey is what marks the diagram as a
-# key rather than as data.
+# What the threshold is called in the encoding diagram. It leads with the direction because the mark
+# it names is the region below the line rather than the line itself, and it keeps the plain-language
+# gloss rather than deferring it to the Note, which the mobile template has no room for.
+STUNTING_LABEL = "Stunted: below this line, too short for their age"
+
+# Neutral grey for the encoding diagram's bands, median and threshold. Grey is what marks the diagram
+# as a key rather than as data, and it is why the diagram has to separate the median from the threshold
+# by style alone -- solid against dashed -- which is the distinction the panels rely on too.
 DIAGRAM_COLOR = "#666666"
 
 # Nested percentile bands, drawn widest first, as (lower column, upper column, how far the fill is
@@ -153,16 +185,32 @@ DIAGRAM_COLOR = "#666666"
 # composites onto whatever is behind it, and the SVG is saved transparent for the Figma template to
 # supply the background. A tint renders the same on any backdrop and gives Figma one flat fill each.
 BANDS = [
-    ("height_percentile_0_1", "height_percentile_99_9", 0.90, "almost-all-children"),
+    ("height_sd_minus_2", "height_sd_plus_2", 0.90, "19-in-20-children"),
     ("height_percentile_10", "height_percentile_90", 0.74, "8-in-10-children"),
 ]
 
-# The encoding diagram names each band by the share of children inside it, and a percentile is a cut
-# point rather than a share: the 0.1st percentile has 0.1% of children below it and the 99.9th has
-# 0.1% above it, so the band between them holds 99.9 - 0.1 = 99.8%. Labelling it 99.9% would count
-# everyone below the upper edge, including the 0.1% who are below the lower edge and so outside the
-# band. The inner band runs from the 10th to the 90th, holding 80%.
-BAND_LABELS = ["99.8% of children", "80% of children"]
+# What 2 SD is worth as a percentile: the share of children beyond the threshold at either end. The
+# note states it and the outer band's label is derived from it, so the two can't drift apart. Carried
+# to seven figures rather than rounded, because both derived strings are printed to one decimal and
+# 2.275 would round the band's label up to 95.5%.
+#
+# The conversion is exact rather than approximate, which is what lets a band bounded in standard
+# deviations be labelled as a share at all: WHO's height-for-age standard sets the LMS skewness
+# parameter L to 1 at every age, so the distribution is normal and -2 SD is the 2.275th percentile
+# rather than an age-varying centile. `assert_threshold_is_a_fixed_percentile` checks L is still 1 in
+# the data before the label ships.
+STUNTED_SHARE = 2.2750132
+
+# The encoding diagram names each band by the share of children inside it, and a cut point is not a
+# share: 2.3% of children fall below -2 SD and the same share above +2 SD, so the band between them
+# holds 100 - 2 x 2.3 = 95.4%. The inner band runs from the 10th percentile to the 90th, holding 80%.
+BAND_LABELS = [f"{100 - 2 * STUNTED_SHARE:.1f}% of children", "80% of children"]
+
+# The inner band's half-width as a share of the outer's, for the encoding diagram's schematic. Both
+# bands are fixed multiples of the standard deviation -- the 10th and 90th percentiles sit at -+1.2816
+# SD -- so the ratio is 1.2816 / 2 and holds at every age rather than being eyeballed. Under the old
+# asymmetric band it was an approximation (0.42) fitted to one end of the range.
+DIAGRAM_INNER_RATIO = 1.2816 / 2
 
 # Percentiles drawn as lines on top of the bands, as (column, line width), so a specific centile
 # can be read off rather than only a range. Named in the encoding diagram, not on the line.
@@ -324,6 +372,8 @@ def run() -> None:
     tb = load_growth_reference()
     paths.log.info(f"Loaded {len(tb)} rows covering ages {tb['age_years'].min():.1f}-{tb['age_years'].max():.1f}")
 
+    assert_threshold_is_a_fixed_percentile(tb)
+
     source_citation = build_source_citation(tb)
     paths.log.info(f"Source citation: {source_citation}")
 
@@ -344,6 +394,44 @@ def run() -> None:
         paths.export_fig(fig, short_name, ["png"], dpi=300)
         paths.export_fig(fig, short_name, ["svg"], transparent=True)
         plt.close(fig)
+
+
+def assert_threshold_is_a_fixed_percentile(tb: Table) -> None:
+    """Check the premise behind the outer band's label.
+
+    The band is labelled as a *share of children* while its lower edge is defined in *standard
+    deviations*, and that conversion only holds because WHO's height-for-age standard sets the LMS
+    skewness parameter L to 1 at every age, making the distribution normal. If a future revision
+    introduced skewness, -2 SD would become an age-varying centile and the label would silently start
+    overstating or understating how many children the band holds -- a wrong number on a published
+    chart, with nothing else in the step to catch it.
+    """
+    skewness = tb["lms_l_skewness"].unique()
+    assert set(skewness) == {1}, (
+        f"Height-for-age is no longer a normal distribution (L = {skewness}), so -2 SD is no longer "
+        f"the {STUNTED_SHARE}th percentile and BAND_LABELS overstates the outer band."
+    )
+
+    # The same claim checked against the percentile columns rather than the parameter: 2.275 sits
+    # between the 1st and the 3rd, so the threshold must too, at every age and for both sexes.
+    outside = (tb["height_sd_minus_2"] <= tb["height_percentile_1"]) | (
+        tb["height_sd_minus_2"] >= tb["height_percentile_3"]
+    )
+    assert not outside.any(), (
+        f"-2 SD escapes the 1st-3rd percentile range in {int(outside.sum())} rows, so it is not the "
+        f"{STUNTED_SHARE}th percentile the band label assumes."
+    )
+
+    # The outer band is drawn as symmetric about the median and labelled with one share doubled, so the
+    # two thresholds have to be equidistant from it. They are by construction under L = 1, which makes
+    # this a check on the columns rather than on the maths.
+    lower_gap = tb["height_percentile_50"] - tb["height_sd_minus_2"]
+    upper_gap = tb["height_sd_plus_2"] - tb["height_percentile_50"]
+    skew = (lower_gap - upper_gap).abs().max()
+    assert skew < 0.01, (
+        f"-+2 SD are not equidistant from the median (worst gap {skew:.3f} cm), so the outer band is "
+        "not symmetric and BAND_LABELS cannot double one tail's share."
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -410,13 +498,13 @@ def draw_encoding_diagram(
     middle: float = 0.24,
     outer_half: float = 0.105,
     rise: float = 0.12,
-    label_gap: float = 0.03,
+    label_gap: float = 0.05,
 ) -> None:
     """Draw a miniature growth curve carrying the encoding, with each part named beside it.
 
-    Shaped like the chart it explains rather than as a flat block: a rising median with the two bands
-    widening around it and the -2 SD line running below, so the reader recognises the marks by their
-    shape and not only by their colour. It is a schematic, not a data slice -- the bands are drawn
+    Shaped like the chart it explains rather than as a flat block: a rising median with both bands
+    widening symmetrically around it, the outer one's lower edge being the -2 SD line, so the reader
+    recognises the marks by their shape and not only by their colour. It is a schematic, not a data slice -- the bands are drawn
     wider than the real ones so the four labelled marks separate at the curve's right-hand end, where
     the labels attach.
 
@@ -429,7 +517,9 @@ def draw_encoding_diagram(
       nest outwards and their labels attach to the top cap, which is what keeps the inner label from
       having to cross the outer bracket -- the panel is too narrow for it to clear.
     - The median's label sits at the line's left end, and the stunting label below the curve with a
-      short leader. A leader is drawn only where a label cannot sit against the thing it names.
+      short leader. A leader is drawn only where a label cannot sit against the thing it names. The
+      stunting label is the wider of the two and runs beneath the median's, so `label_gap` has to hold
+      it a clear line below rather than merely below.
 
     Geometry is in axes fractions of whatever `ax` it is given, so the same drawing serves both
     layouts: the empty triangle below the growth curve on desktop, and its own axes across the header
@@ -441,12 +531,11 @@ def draw_encoding_diagram(
     median = middle - rise / 2 + rise * t**0.55
     # The bands widen with age in the data, so they widen along the schematic too.
     outer = outer_half * (0.35 + 0.65 * t)
-    # The inner band is the middle 80%, the outer the middle 99.8%, so it is about 0.42 as tall.
-    inner = outer * 0.42
-    # -2 SD inside the schematic: the outer band's edge is the 99.9th percentile, at about z = 3.09,
-    # so 2 SD sits at 2/3.09 of the half-width. That ratio is what puts the stunting line inside the
-    # outer band and below the inner one, as it is in the data.
-    minus_2sd = median - outer * 2 / 3.09
+    # Both bands are symmetric about the median, as the chart's are, and the outer band's own lower
+    # edge is the -2 SD threshold -- so the schematic shows the same single boundary at its foot that
+    # the panels do, with nothing else running near it.
+    inner = outer * DIAGRAM_INNER_RATIO
+    minus_2sd = median - outer
 
     for half, weight, name in ((outer, 0.90, "outer-band"), (inner, 0.74, "inner-band")):
         ax.fill_between(
@@ -463,9 +552,10 @@ def draw_encoding_diagram(
     ax.plot(
         x,
         minus_2sd,
-        color=REFERENCE_LINE_COLOR,
-        linestyle=":",
-        linewidth=0.8,
+        color=DIAGRAM_COLOR,
+        linestyle=STUNTING_DASHES,
+        linewidth=STUNTING_LINEWIDTH,
+        dash_capstyle="butt",
         transform=ax.transAxes,
         zorder=8,
         gid="diagram__stunting-threshold",
@@ -478,7 +568,7 @@ def draw_encoding_diagram(
     # labels sit against their own bracket: the top label then clears the small bracket entirely, and
     # the middle label starts to the right of both.
     for half_end, bracket_x, label_x, at_top, name, text in (
-        (outer[-1], right + 0.020, right + 0.035, True, "almost-all", BAND_LABELS[0]),
+        (outer[-1], right + 0.020, right + 0.035, True, "19-in-20", BAND_LABELS[0]),
         (inner[-1], right + 0.050, right + 0.065, False, "8-in-10", BAND_LABELS[1]),
     ):
         ax.plot(
@@ -518,10 +608,13 @@ def draw_encoding_diagram(
         gid="diagram__label-median",
     )
 
-    # The stunting label sits below the curve, where there is room for one line, with a leader
-    # dropping from the dotted line at the curve's midpoint.
+    # The stunting label sits below the curve, where there is room for one line, with a leader dropping
+    # from the threshold at the curve's midpoint. The threshold is now the band's own lower edge, so
+    # the leader starts on that edge and crosses nothing on its way down -- it used to start inside the
+    # band and cross its lower boundary, which left it pointing at two marks at once. The label says
+    # *below this line* because the mark it names is a region, not a line: everything under the band.
     mid = len(t) // 2
-    label_y = float((median - outer).min()) - label_gap
+    label_y = float(minus_2sd.min()) - label_gap
     ax.plot(
         [x[mid]] * 2,
         [minus_2sd[mid], label_y],
@@ -535,7 +628,7 @@ def draw_encoding_diagram(
     ax.text(
         x[mid],
         label_y,
-        "Stunted: too short for their age",
+        STUNTING_LABEL,
         transform=ax.transAxes,
         fontsize=fontsize,
         color=TEXT_COLOR,
@@ -580,7 +673,9 @@ def build_note(breaks: list[float], layout: dict) -> str:
         f"Note: The curves step down slightly at age {breaks[0]:.0f}, where height starts being measured standing "
         f"up rather than lying down, and at age {breaks[1]:.0f}, where WHO's standards for under-fives give way to "
         "its reference for older children. The under-fives standards show how children grow in good conditions; the "
-        "reference for older children describes how an earlier sample did grow."
+        "reference for older children describes how an earlier sample did grow. A child is stunted if they are more "
+        "than 2 standard deviations shorter than the median for their age, which is the shaded area's lower edge: "
+        f"{STUNTED_SHARE:.1f}% of the reference population falls below it."
     )
     return wrap_to_content_width(text, layout, layout["footer_fontsize"])
 
@@ -589,7 +684,9 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
     """Build one version of the two-panel growth-curve chart.
 
     Layout notes:
-    - One panel per sex, sharing a y-axis, each with two nested percentile bands as flat tints
+    - One panel per sex, sharing a y-axis, each with two nested bands as flat tints, both symmetric
+      about the median
+    - The outer band runs -+2 SD, so its lower edge is the stunting threshold, dashed over the tint edge
     - Median drawn solid on top of the bands
     - The median, the -2 SD stunting threshold and both bands are named in the encoding diagram
     - No spines; light horizontal gridlines carry the height reading
@@ -604,14 +701,17 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
     # Room the facet titles need above each panel: one line plus grapher's half-line of padding.
     facet_title_space_px = (1 + FACET_TITLE_PAD) * facet_fontsize / POINTS_PER_PIXEL
     age_max = float(tb["age_years"].max())
-    height_max = float(tb["height_percentile_99_9"].max())
+    # The outermost band decides both ends of the height axis, so a change to what is drawn cannot
+    # leave the axis sized for a series the chart no longer shows.
+    band_lower, band_upper = BANDS[0][0], BANDS[0][1]
+    height_max = float(tb[band_upper].max())
     # Snap the height axis out to whole gridline steps, so the outermost gridlines sit exactly on the
     # plot's top and bottom edges. That is how grapher avoids a gridline running a few pixels clear of
     # an edge: its y domain is [lowest tick, highest tick], so there is only ever one line there. The
     # bottom one coincides with the baseline, which draws it solid, so its gridline is suppressed
     # below rather than dashed over the top of it.
     height_ticks = np.arange(
-        np.floor(float(tb["height_percentile_0_1"].min()) / HEIGHT_STEP) * HEIGHT_STEP,
+        np.floor(float(tb[band_lower].min()) / HEIGHT_STEP) * HEIGHT_STEP,
         np.ceil(height_max / HEIGHT_STEP) * HEIGHT_STEP + 1,
         HEIGHT_STEP,
     )
@@ -676,16 +776,18 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
                 gid=f"{slug}__{band_name}",
             )
 
-        # --- stunting threshold; named in the encoding diagram where there is one, and otherwise
-        # under the line around mid-childhood, where the panel is empty (at the right-hand end the
-        # bands and medians all converge) ---
+        # --- stunting threshold, drawn over the outer band's lower edge, which is the same series.
+        # Doubling the boundary as a tint edge and a dashed stroke is what makes it findable without a
+        # label in the panel: the tint stops there, and the region below it is the stunted one. It is
+        # named in the encoding diagram. ---
         stunting = tb_sex[STUNTING_COLUMN].to_numpy()
         ax.plot(
             age,
             stunting,
-            color=REFERENCE_LINE_COLOR,
-            linestyle=":",
-            linewidth=0.8,
+            color=color,
+            linestyle=STUNTING_DASHES,
+            linewidth=STUNTING_LINEWIDTH,
+            dash_capstyle="butt",
             zorder=4,
             gid=f"{slug}__stunting-threshold",
         )
