@@ -2,6 +2,23 @@
 
 Companion reference for the `create-figma-chart` skill. Distilled from the design team's **DI Charts Guidelines and Cheat Sheets** Figma file (`8gxqkVmZ9x3MK3ky5oigrJ`; pages: line `0:1`, stacked area `130:35045`, bar/stacked bar `130:35046`, slope `130:35047`, scatter `130:35048`, map `130:35049`) and the **Good Data Viz Checklist** (Charts 2026 file, node `20729:1027`). The Figma files are the source of truth — re-read the relevant page when in doubt or when this file looks stale.
 
+A second, different source is the design team's **DI Chart Library** (`pltrHXyVLg2XaNq4AvxPaK`) — an archive of ~283 *finished, shipped* charts filed by type. The Cheat Sheets file says what the team intends; the Chart Library shows what they actually ship, and where the two diverge the divergence is noted in place below. **It is read-only: never write to that file key.** Pages, with chart counts as of 2026-08-19:
+
+| Page | Node | Charts |
+|---|---|---|
+| Line Charts | `1:2` | ~130 |
+| Bar Charts | `1:3` | 52 |
+| Stacked Bar | `1:6` | 24 |
+| Maps | `1:1190` | 21 |
+| Stacked Areas | `1:4` | 18 |
+| Slope Charts | `1:1657` | 17 |
+| Scatter Plots | `0:1` | 7 |
+| Combination Charts | `201:336` | 4 |
+| Marimekkos | `1:5` | 3 |
+| Misc | `222:718` | 3 |
+
+Each chart is a component; `get_screenshot` on its node id renders it. Before designing a chart of a given type, open three or four of that page's charts — the exemplars named at the end of each subsection below are a starting set.
+
 ## Hands off — never change in the grapher export
 
 - Text colors of the title, subtitle, axis labels, source, note, CC BY.
@@ -23,6 +40,8 @@ Companion reference for the `create-figma-chart` skill. Distilled from the desig
 - **If the claim is the kind that changes from year to year, put the year in the title itself — and use the past tense.** Counts, rankings, superlatives and threshold-crossings ("Five countries had more women than men in parliament in 2025", "X became the largest producer") are true of one year, not of the world; next year's data can falsify them outright. A static image has no update path and will be read long after it was made, so the sentence has to carry its own date: `Data for <YYYY>.` in the subtitle reads as provenance and is easy to skip, and the claim on its own then looks like a standing fact. Prefer the year inside the sentence and drop it from the subtitle — don't state it twice. Durable descriptive titles ("Death rate in the United States") need no year and shouldn't carry one.
   - This is also the cue to check **when within the year** the claim became true, because a threshold-crossing often has a date. One of the five countries in that example only crossed 50% at an election partway through the year, so the claim is true of the year's end and false of its start — worth a note in the accompanying text even when the title's year is correct.
 - **Highlight the entity or category the chart is about by coloring that word in the title**, using the exact color of the marks it refers to — e.g. "**Four** developed countries met the UN's target…" in the same coral as the four highlighted bars. One highlight per title; it must match a color actually used in the chart.
+  - **"One highlight" means one *per series*, not one per title.** The Cheat Sheets say a single colored word; the shipped charts routinely color every series the title names — `222:386` colors *China*, *European Union* and *United States*; `201:335` colors *electricity and heating* and *transport*; `519:38`, `186:185`, `545:78` and `575:114` do the same for two. The rule that actually holds is that **every colored word matches a mark's color**. One word is right when the title picks one entity out of a field; one per series is right when the title names the whole cast.
+  - **A question title has nothing to color, so it keeps its legend.** `1:5861`, `448:572`, `606:263` and `609:461` all ask a question and all carry a legend — see Maps.
 
 ### Subtitles and notes
 
@@ -37,6 +56,8 @@ Companion reference for the `create-figma-chart` skill. Distilled from the desig
 - Keep text horizontal — title, subtitle, annotations, data labels. If labels end up vertical, change the chart's orientation instead (e.g. horizontal bars).
 - Text hierarchy by font size: title > subtitle > source ≈ annotations ≈ labels. All fonts readable, especially the smallest.
 - **Check the hierarchy on the numbers, and expect the export to arrive with it broken.** Grapher's square export renders **legend labels at 16.8px against a 16px subtitle** — the least important text in the chart ends up the second-largest thing on it. List every distinct size with what it belongs to and confirm the sequence is non-increasing; anything inside the plot that outranks the subtitle is a defect to fix, not a size to preserve. Bringing that legend to 14px reads as a *correction*, not a compromise: it restores the order and sits with the bar values at 13.7px. This is why "don't change font sizes" carries the exception it does — the rule protects the export's *relative* type scale, and where the export's own scale is wrong, matching the template's hierarchy wins.
+- **Axis titles are horizontal and sit at the ends of their axes** — the y-axis title stacked above the axis top-left, never rotated; the x-axis title at bottom-right or centered under the axis. Every chart on the Scatter page does this (`1:3615`, `91:1118`, `210:710`, `80:382`), and it is what "keep text horizontal" means in practice for an axis.
+- **Emphasize the one axis tick the title's claim rests on.** `99:723` bolds `50%` for "nearly half"; `178:263` bolds `50%` for "more than half". The other ticks stay regular.
 
 ## Annotations
 
@@ -57,6 +78,9 @@ Companion reference for the `create-figma-chart` skill. Distilled from the desig
 - **Annotations placed outside the plot are part of the plot block, and owe the template's own gaps.** Once a chart's annotations sit in bands above and below the plot (the usual arrangement on a map), the reader sees one content block, and its outer edges — not the plot's — are what has to clear the subtitle and the source line. Measure the gap the template itself uses and apply it to the block: on the 540×540 pages that is **27px under the header frame and 27px above the footer**, with ~15px between an annotation and the plot. Spacing the *plot* correctly and letting the annotations drift into that clearance is the same defect as an unspaced plot, and it looks like a mistake rather than a choice.
 - **On a full-width chart, make room by opening a gap rather than overlaying.** A 100%-stacked bar has no free margin, so an annotation has nowhere to go — but dropping a few entities and re-exporting at a flatter aspect ratio frees a band, and a gap of about one row-and-a-half opened *directly beneath the bar being annotated* puts the text where no leader line is needed at all. Shift every row below the gap down by the same amount, then re-center. Beware the export arithmetic: a flatter aspect ratio means a bigger downscale to reach the same width, so the base font has to rise with it — at 2:1 the labels came back 8px until `imFontSize` went to 35. And size the export **backwards from the gap rule**: the plot plus the annotation gaps should come to the band minus 28px, so that a 14px gap falls out at each end. Padding a short plot with 33px gaps instead is the visible symptom of having exported the wrong height — retune `imHeight` and re-export rather than living with it.
 - Annotate important values directly: write out the values of the **first and last data points** and any point the text mentions.
+- **Inside a filled area, the annotation text *and* its arrow are white** — not the `#5B5B5B` annotation gray, which is for text on the white canvas. `71:511` and `596:474` (white text, white arrows on stacked areas), `185:76`, `1:1656`. Outside the fill the annotation instead takes **the color of the band or bar it is about** — `230:201`, `1:4786`, `572:70`.
+- **An annotation does not always need a leader.** Where the target is unambiguous at that distance, the archive sets the sentence beside it with nothing joining them — `327:235` (beside its country, in the country's color), `540:5`, `701:347`, `644:564`. Reach for a leader when the reader could plausibly attach the text to the wrong mark, not by default.
+- **Bracket a group of marks and annotate the bracket.** A thin square bracket gathering several rows, bands or endpoints, with one sentence beside it, is the house device for "these ones, collectively" — `668:54`, `341:82`, `169:1167`, `323:216`, `445:80`, `99:723`, `636:144`.
 
 ## Arrows
 
@@ -148,6 +172,9 @@ v.x = mnx; v.y = mny;
 - If a legend must stay: **squares**, not circles or rectangles; consider moving it into empty chart space (stacked bars often have some) rather than under the subtitle.
 - **Get the legend onto one row — shortening the labels is the lever, not shrinking the type.** Grapher wraps to two rows because its labels are verbose, and the second row costs ~15px of plot. Trim to the shortest wording that is still unambiguous *in this chart's context*: "Other meats" → **"Other"** and "Beef and buffalo" → **"Beef"** on a chart entirely about meat. That freed 65px here, which bought the legend back up to 14px — squeezing the type to 12px to fit the long labels had been the alternative, and it reads worse. Keep the legend in **stack order** so the eye maps it left-to-right onto the bars. Note the knock-on: collapsing a row makes the plot shorter, so re-export ~15px taller or the gap drifts above the band.
 - **A residual category goes last.** "Other meats", "Other", "Rest of the world" and the like belong at the end of a stacked order and at the end of the legend — they are the leftover, so putting them mid-stack breaks the reading order and pushes the named categories apart. Fix this **in the chart** (the dimension's column order), not by moving vectors in Figma, so the image and the interactive chart agree.
+- **Tied values share one label, joined by a curly brace.** Repeating the same number down a ranked list reads as noise; one brace and one value reads as a fact. `169:1167` (five countries at 0.12%), `201:164`, `203:108`, `341:82`, `468:287`, `668:54`. The same brace also replaces a run of empty bars — `201:164` writes "Slovakia, Luxembourg, Hungary and Australia did not report aid costs for refugees" where four zeros would have gone.
+- **In a set of small multiples, name the series only in the first panel.** The reader carries the mapping across; repeating it in every panel is clutter. `201:335` (slopes, with the title's words colored to match), `162:110` and `293:57` (bars). Axis labels likewise go only on the outermost panels.
+- **When endpoint or in-mark labels collide beyond rescue, give up on them and build a bracketed column beside the plot** carrying `Name` over its value(s) — `323:216` and `445:80` (slopes, `63% → 43%` on one line), `603:844` and `633:1417` (ranked bars, numbered `1.`–`5.`).
 
 ## Colors
 
@@ -202,6 +229,11 @@ Two things follow that a later run will otherwise try to "fix":
 The general rule underneath: **on a muted series, light and thin beats compliant.** These marks and words are context, and a context layer that passes every threshold has stopped being context.
 
 **Don't run the color-vision audit on a chart like this.** One categorical color against neutral grays has no pair to check, and reporting "no failures" from a two-color audit reads as coverage you don't have. Say that the palette reduces to one highlight plus grays, and check the two things that *are* live: the highlight's contrast against the background, and whether the highlight still separates from the grays in black and white.
+**Keep a reference row, and color it differently from everything else.** A ranked chart of entities almost always carries a `World` / `Global average` / `Global share` row left in rank position and drawn in its own color, so the reader can see which side of the average each entity falls. `364:129` (World blue among magenta), `450:638` (Global share navy among red), `535:350` (Global average tan, label bolded), `625:44`, `342:141` (gray, between a green top group and an orange bottom group), `643:517`, and on other pages `99:723` and `687:203`. It is what turns a league table into a claim, and it costs one row.
+
+**Muting drops saturation, not identity.** Context series keep their labels, set in the same gray as their line — `213:896` and `80:1158` label every muted slope. Deleting the labels along with the color leaves the reader unable to say what the gray lines are.
+
+**Line weight is a second highlight channel.** `397:50` gives the protagonist a ~3px stroke against ~1px for the context, on top of the color difference.
 
 ## Named styles in the Charts file
 
@@ -249,6 +281,8 @@ Two mechanics to get right. Applying a text style **overwrites the font and clea
     }
     ```
   - **Never flatten it to a solid `#C9C9C9`.** A flat grey reads as a real category rather than absence, and it will not match the shapes the designer has already patterned. Group the no-data shapes by fill signature (`imageHash` + `scaleMode` + `scalingFactor`) to confirm a single canonical value; two groups means the file has drifted, and the designer's version is the one to spread.
+**The same hatch means "not observed", not only "no data".** The archive reuses it for projections and preliminary periods — `511:159` (a 2040 projection column), `355:154` (a remaining carbon budget), `223:5` (a decade with only partial years). In those uses it is the category's own color hatched, with a **dashed outline** rather than a solid one, and the note says why.
+
 
 ## Per chart type
 
@@ -265,6 +299,27 @@ Two mechanics to get right. Applying a text style **overwrites the font and clea
 - **A sparse time axis is worth a second look after you widen the plot** — grapher thins tick labels for the width it rendered at, so a reclaimed margin can leave room for the missing years. Add them only when the gaps measure out (the first and last labels sit *at* their ticks rather than centered on them, so the two slots beside them need half a label more room than the rest); otherwise keep grapher's axis untouched.
 - **When a line's shape has a cause, mark the moment rather than describing it.** A thin dashed vertical guide at the year, a single marker where it meets the line, and one annotation line ending just short of the guide says "this is when it changed" with almost no ink — and it lets you delete the marker on every other year, which a focused line arrives carrying.
 
+**Projections are the same line continued dotted, in the same color** — `1:3948`, `213:1023`, `645:147`, `678:490`, `660:188`, `651:115`; a series that is projection throughout is dotted end to end (`1:4864`, `1:4941`). Mark the boundary with a thin vertical rule labeled `Projections →` (`323:298`), or dot the projected point and italicize `2025 projection` on the axis (`354:64`). This is the line-chart twin of the hatched bar.
+
+**Reference lines, event rules and shaded periods — four distinct devices, don't mix them up:**
+
+- A **labeled horizontal reference line**: `135:141` ("Half of all deaths" at 50%), `1:5500` (a dashed 3% goal reached by a curved arrow), `47:131` / `358:45` (a zero line named "No change").
+- A **named gridline instead of a number**, where the chart is indexed — `80:1223` ("Doubled", "Tripled" beside the % values), `358:45`.
+- A **thin vertical event rule labeled at the top of the plot** — `347:69` carries three (Franco-Prussian War, Spanish Flu, WWII), `486:51`, `589:211`, `514:60`.
+- A **pale tinted vertical band for a *period*** rather than a moment — `349:167` ("Global financial crisis", "COVID pandemic"), `541:217` ("Great Leap Forward"), `222:504` (a data-completeness caveat, its annotation set inside the band in the band's color).
+
+**Recolor the stretch of line the story is about.** Rather than annotating around a period, the archive changes the line's own color across it: `1:4716` (navy to 2013, red after), `202:831` (red where democracy eroded, navy elsewhere, consistently across four panels), `1:1465` (a red overlay on the famine years). `678:490` takes it further and labels the phases of a single line in-plot — "Before", "Peak", "After" — instead of naming the series at all.
+
+**End-of-line labels can carry more than a name**: value over name (`1:3352`), name over value (`222:1105`), the series' definition (`1:1585` — `<$20/day ($7,300/yr)`), or name + value + change on three lines (`354:64`). Where the ends converge, a **bracket gathers them** (`467:195`, `1:4941`), and `661:511` is the worked example of the start-anchor rule above — labels at each line's first point, including a late-arriving series labeled at its own start.
+
+**Milestone ladders are the house form for "how did we get here"**: several dots along one line, each with its value and a short sentence — `222:133`, `366:245`, `228:63`, `359:111`, `241:131`. For a gap between two lines, a **double-headed vertical arrow labeled with the ratio** — `250:120` ("six times").
+
+**An uncertainty band is a pale gray ribbon with rotated gray labels riding its edges** — `1:4220` ("Upper estimate" / "Lower estimate"). **Ordinal series take shades of one hue, not distinct hues** — `178:138` (five navies for 1st–5th birth, with an orange "Overall" protagonist). **Short colored dashes at the right edge** work as inline reference levels — `579:97`.
+
+**Composite layouts worth knowing, all on taller frames:** a hero panel over a small-multiple grid (`334:151`, 540×1262); an eight-panel indicator dashboard for one subject sharing one event rule (`469:456`); small multiples grouped into tinted bands by narrative direction, each band with a trend arrow (`201:5`, 540×658); and panels titled with their own signed value, sorted and tinted by sign (`216:110`, 540×675). And for a seasonal series, **one line per year with the protagonist year bold against a pale field** — `324:71`, labeling only the extremes of the pale set.
+
+Exemplars: `323:298` (projection boundary), `347:69` (named event rules), `1:4220` (uncertainty ribbon), `661:511` (start-anchored labels), `201:5` (small multiples grouped by direction), `1:4716` (segment recoloring).
+
 ### Stacked area charts
 - Labels inside the areas or in a legend row above the chart; white text over dark fills, ≥12px, strong contrast.
 - White-outlined dots for highlighted points; a dot in the chart needs an outline to stand out against the fill.
@@ -274,6 +329,16 @@ Two mechanics to get right. Applying a text style **overwrites the font and clea
 - **A very tall band takes its label near the top, not centered.** Centering is right for a thin band, but in a band covering half the plot the label drifts into empty space and the middle is exactly where the annotation wants to go. Put it ~14px under the band's top edge and leave the middle free.
 - **Fold the value into the in-area label when the chart has only two or three series.** A 100%-stacked chart of two categories needs no axis reading: `Overfished: 36%` as a bold 16px line with a 14px explanatory line under it — white, right-aligned, in an auto-layout block inside the band — says more than a legend plus a y-axis. Round so the parts sum to 100 (64.5 and 35.5 become 64 and 36), and note that this makes the label a claim to verify, not decoration.
 
+**Labeling is decided per band, not per chart — and one chart normally does both.** Thick bands take a white bold label *inside*; a band too thin for one takes its label *outside* in the band's own color, tied back by a thin leader or a bracket. `375:304`, `562:70`, `572:70`, `585:105`, `604:909`, `651:169` — six witnesses, all mixing the two. The outside labels are not a legend row: they are a stacked column at the right or above, one leader each.
+
+- **On a pale band the inside label goes dark, not white** — `1:1656`, `70:439`. Contrast decides.
+- **When every band is thin, move all the labels out** — `72:583` stacks six colored labels above the plot with curved leaders; `295:139` puts them down the left margin and **moves the y-axis to the right** to make room. Direct labels outrank the axis for margin space.
+- **A sliver band at the very bottom is labeled below the axis** in its own color — `70:439`.
+- **Frame the story with a start and an end annotation** — `1:4786` runs one sentence across the plot: "From **2 billion** in 1990…" at the left, "…to almost **700 million** in 2024" at the right.
+- Endpoint dots carry their value outside the plot in the series color, white-ringed — `651:169`, `70:438`, `185:76`.
+
+Exemplars: `375:304` (both labeling treatments in one chart), `72:583` (all labels out), `295:139` (labels left, axis right), `613:59` (value folded into the band label), `596:474` (white in-fill annotations).
+
 ### Bar / stacked bar charts
 - **Spell out the unit in the chart area**, not only in the subtitle.
 - Values to the right of the bars by default; inside the bars when space is tight (contrast + ≥12px rules).
@@ -282,6 +347,23 @@ Two mechanics to get right. Applying a text style **overwrites the font and clea
 - Don't cram many entities into a limited height — **stretch the frame vertically instead** (static charts don't have to be square; the 540×824 mobile template exists for this).
 - Legend: squares only; move it into empty chart space if there is some. On a **100% stacked** bar, prefer no legend at all — colored category labels above the reference row, tiered and wrapped, with a thin arrow onto any segment too narrow to sit under its own label (SKILL.md → Step 8). That is what the finished pages do, and it holds for six categories, not just three.
 
+**Value labels go inside the bar when it is long enough and outside when it is not — decided per bar, within one chart.** `1:4005`, `1:4366`, `364:129`, `644:564`, `545:78`. And **spell the unit out on the longest bar only**, then use bare numbers: `1:4005` runs "23.5 deaths/100,000 people" on the top bar and `12.4`, `11.2` beneath. In a very long bar the label can absorb the whole sentence — `160:41`: "97% of all countries had universal voting rights".
+
+- **A dashed separator plus a recolored top group marks "the ones that qualify"** — `169:1167`, `203:108`, `342:141`. A **dotted threshold line labeled in place** does the same job against a stated target — `676:351` ("UN's target: 0.7% of national income"), with the qualifying bars recolored and the title's "Four" in that color.
+- **A tinted band behind a run of rows** highlights a group without recoloring its bars — `341:82`.
+- **Bar color can encode the bar's own value**, with labeled dashed rules at the thresholds — `54:73`.
+- **Or color bars by narrative role rather than category** — `137:341` (gray "before", orange pivot year, green "after", each group annotated in its own color).
+- **Diverging change charts color by sign and put the signed value outside in the bar's color** — `584:45` (`+636 TWh` green, `−67` orange).
+- **Butterfly bars around a central category column** are the house form for two quantities per entity: a colored header per side matching the title's colored words, a directional arrow, values inside the long bars and outside the short ones, and italics for non-numeric entries. `545:78`, `575:114`, `59:294`, `178:319` (pictograms as the central axis).
+- **Two stacked panels sharing an x-axis, each with its own colored panel title**, is the answer to a second y-axis — `59:232`.
+- **A dashed red box around one bar marks an exception**, with an asterisked footnote — `57:578`.
+- **Flag icons beside country labels** on league tables — `21:447`, `80:944`, `149:15`, `258:1551`, `531:703`.
+- Taller frames carry long tables: 540×824 (`137:528`), 540×795 (`201:164`), 540×753 (`169:1167`).
+
+On **stacked** bars specifically: label only the segment the title is about (`135:1424`, `330:323`); a category that never gets a header can be named inside the one bar where it is widest (`596:346`); totals sit outside the bar in dark gray past the last segment (`323:119`, `283:316`, `27:1027`); an ordinal category axis gets an explicit direction cue (`269:77`, "Richer countries →"); and one bar among plain ones may be stacked to break out the comparison (`596:405`). A 100%-stacked bar can also be turned on its side into a **labeled list** — `378:104`, one full-width row per category, name and value in white inside, an explanatory sentence to the right in that segment's color.
+
+Exemplars: `364:129` (reference row), `169:1167` (braced ties + qualifying group), `545:78` (butterfly), `676:351` (threshold line), `687:203` (tiered headers over a reference row), `378:104` (stacked bar as a list).
+
 ### Slope charts
 - Narrower is better — the slope reads more strongly in a narrow frame.
 - Stretching distorts the endpoint circles; if you stretch, fix the circles manually afterwards.
@@ -289,11 +371,29 @@ Two mechanics to get right. Applying a text style **overwrites the font and clea
 - Consider a dotted line to mark the 0 baseline.
 - Small multiples sharing x/y units: put the unit labels only on the outermost charts.
 
+- **Label both ends `Name value`, the name bold in the series color and the value in the same color but not bold** — `1:3079`, `89:70`, `89:125`, `303:56`, `377:54`, `363:42`. Left labels right-aligned to the axis, right labels left-aligned from it. Use two lines (name over value) only when horizontal room is tight (`222:386`).
+- **Two thin vertical gray rules mark the two time points and there are no horizontal gridlines**, with a faint dashed rule joining their feet. Years label the rules at the bottom (`89:70`, `377:54`) or across the top with an arrow between them — `1984 —— to ——▶ 2022` (`299:266`, `80:1158`).
+- **A common origin turns a slope chart into a % change chart** — `80:1158` starts every slope at one 0% point, so only the endpoints need labels.
+- **Non-time slopes get a bold lead-in word and an explanatory sentence over each column** — `1:3079`: "**Perception:** What share… do people *think*…" against "**Reality:** …actually are…".
+- **Equal values share a row** rather than stacking — `1:3079` sets "Poland 2%  Japan 2%" side by side.
+- **An endpoint annotation sits under the value as a block**: value large, bold, colored, then a gray sentence with the entity name colored — `519:38`.
+
+Exemplars: `89:70` (canonical both-ends labeling), `323:216` (bracketed column when endpoints collide), `213:896` (protagonist against muted-but-labeled context), `201:335` (small multiples), `80:1158` (common origin).
+
 ### Scatter plots
 - Ask whether the continent color-coding adds anything; if not, one color for all dots, then highlight the countries the story needs — different color and/or a circle drawn around them.
 - Grapher's auto-chosen labels are cluttered and hard to attach to dots: prune to the entities that matter, give kept labels the white outside stroke.
 - If you stretch the chart, dots deform — select all circles in the layers panel and set equal width/height in one edit.
 - For binary/divided axes, annotate the two sides ("countries above this line …") so the divider explains itself.
+
+- **Annotate a parity or divider line on *both* sides, with the text rotated parallel to the line and a small arrow pointing away from it** — `1:3615`, `91:1118`, `210:710`. That is the form; horizontal callouts are not what the archive does here.
+- **If one side of the divider is empty, say so.** `210:710`: "No dots are on this side of the line: there are no countries with reported data where female suicides are more common." Without the sentence a reader assumes the dots were cropped.
+- **Highlight = saturated dot plus a bold label in the same color; context = pale muted dots.** `80:382`, `205:275`, `210:710`, `89:344`. This, not the continent palette, is the default — and a **ring around the dot** is the second channel when several highlighted dots must also be told apart (`89:344`, which additionally recolors the protagonist).
+- **Keep the continent legend only when "it holds across every continent" is the claim** — `91:1118` is the one chart on the page that does.
+- Annotations name the entity bold in its highlight color and carry the values inline — `205:275`.
+- `186:185` is the page's outlier and worth a look: a five-step diverging ramp shown as a horizontal gradient bar with the category names above it, the title's words colored to match, and paired dots joined by a vertical line with a curved arrow showing the year-on-year move.
+
+Exemplars: `210:710` (divider annotated both sides, empty side stated), `80:382` (highlight vs muted field), `89:344` (ringed dots), `91:1118` (the one kept legend), `186:185` (ramp legend, change arrows).
 
 ### Maps
 - **On a two-bin categorical map, delete the legend and let the title's colored words be the key.** "Countries with fertility rates **above** or **below** replacement level" with those two words in the two bin colors is a complete legend, sitting where the reader already is; grapher's legend strip then costs ~36px of height and repeats the title. Keeping it was the single biggest thing wrong with a first attempt here — it squeezed the map to 214px and pushed the annotations into the subtitle. Removing it gave the map the full width and freed the band above and below for annotations over the ocean, which is how the finished pages are built. (Three or more bins usually still need the strip.)
@@ -347,6 +447,53 @@ Two mechanics to get right. Applying a text style **overwrites the font and clea
 - **Prefer one row of labels for an ordered ramp; the wording has to earn it.** A sequential legend is a *sequence*, and a single line of labels reads it in one sweep where stacked two-line labels read as a grid of cells to be parsed individually. The constraint is arithmetic: equal bins must be at least as wide as the widest label, so `widest × 5 + no-data key + gap ≤ content width` — miss it and one label wraps to three lines and the row is ruined. If it doesn't fit, shorten the labels *before* stacking them, and re-check the vertical balance afterwards, since a shorter legend leaves the map+legend block off-centre.
 - Tidy grapher's default legend: labels 12–14px, swatch square sized to the font, label color dark gray `#2D2E2D` instead of pure black, group items of similar length into columns.
 - No-data pattern: see above — scriptable, no plugin needed.
+
+Further map notes from the archive:
+
+- **A question title keeps its legend**, because there are no key-words to color — `1:5861`, `448:572`, `606:263`, `609:461`. The delete-the-legend rule above is really "don't repeat what the title already names".
+- **The cheapest two-bin alternative to both: colored category labels above the map, each with a short down-arrow into it** — `609:461` ("More births than deaths ↓" blue beside "More deaths than births ↓" orange). Keeps the title free for a question and costs less height than a legend strip. `327:235` goes further and labels the background category *in the ocean* in its own pale color.
+- **Mark a ramp's open-ended bin with an arrowhead on that end of the gradient bar** — `185:379`, `232:253` (high end), `479:248` (low end, "Before 1900").
+- **Two ways to label a binned ramp, both in use**: labels *between* the swatches at the boundaries (`375:541`, `351:435`, `22:708`, `695:251`) or range labels *inside* each swatch (`232:253` "under 2% / 2–4% / …", `375:235`). Inside-the-swatch is what makes a single row fit when boundary labels would collide; stacking labels into two rows (`22:708`, `259:200`) is the fallback.
+- **Legend above the map when it is small, below when it is large** — above: `1:5861` (2 items), `383:253`, `695:251` (5), `375:235` and `448:572` (7); below: `26:971` (12), `22:708`, `232:253`, `259:200`.
+- **Values written inside countries take whichever color reads against the fill** — white on dark bins (`259:200`), the category's own color on pale ones (`606:263`).
+- **Exclude the subject of the map from its own scale** — `375:235` grays out China and labels it, because China has no rank among its own import partners.
+- **A leader's country end does not always carry a dot.** The filled-dot terminal documented above is the treatment for landing inside a *small* country; the archive also uses a plain hairline with no terminal (`351:435`, `185:379`, `115:258`) and a short perpendicular tick (`259:200`).
+- A regional map may carry a graticule and a non-rectangular projection (`259:200`, `383:253`), and a bordered legend box can be overlaid on an empty corner (`383:253`).
+
+Exemplars: `569:975` (two-bin, title as legend — the worked example above), `609:461` (labeled down-arrows instead of a legend), `606:263` (values in-country, eight categories), `232:253` (range labels inside the swatches), `327:235` (no leaders, background category labeled in the ocean).
+
+### Marimekkos
+
+The page is really **ranked many-entity bar charts** (grapher's marimekko / variable-width discrete bar), and all three share one problem: far too many bars to label.
+
+- **Number the top few and call them out in a list** — `1. Tajikistan 48%`, rank and name and value on one line, name and value in the entity's category color, tied to its bar by a hairline leader or a bracket. `603:844` (top 5), `633:1417` (top 4).
+- **Keep the category legend only when color encodes a category.** `603:844` and `633:1417` keep the continent legend because 150 bars cannot be direct-labeled. `99:723` drops it: there color marks the extremes (teal top block, red bottom block, everything else gray) and the colored entity labels down the left are the key.
+- **Rotate and category-color the x-axis labels, and sample them** — `603:844`, `633:1417`. With ~150 categorical bars there is no horizontal option; this is a deliberate exception to "keep text horizontal".
+- **A bracket ties a block of named entities to a range of bars** — `99:723` gathers the five named top countries and the three named bottom ones.
+- Keep a reference entity as a full-width rule in its own color — `99:723` draws "World" as a tan bar cutting across the gray stack.
+
+Exemplars: `99:723`, `603:844`, `633:1417`.
+
+### Combination charts
+
+The type is **a data chart combined with geography**, in one of two arrangements:
+
+- **A circular inset locator map dropped into the plot's dead space** — `279:125` (line chart, map lower-right), `384:489` (horizontal bars left, map upper-right). A pale silhouette clipped to a circle with a faint outline; the countries in play filled with **the same colors as their series** and labeled in those colors inside the map. It answers "where are these?" without a legend and without leaving the frame.
+- **The map as the layout substrate** — `502:456` (one small-multiple glyph per region, placed over that region on a very pale world map, annotations round the edges), `201:592` (map above, a bar panel below in a tinted stroked rounded panel, joined by a vertical hairline leader).
+
+Also from these four: a **dashed horizontal reference line** carried from a highlighted bar across to its comparison (`201:592`), annotation year-words colored to match the bars they name, and a slope drawn as a **filled trapezoid** between two dots with values at both ends — plain at the start, bold with the unit at the end (`502:456`).
+
+Exemplars: `279:125`, `384:489`, `201:592`, `502:456`.
+
+### Misc — treemaps, arrow charts, dot-and-interval
+
+Three forms with no other home:
+
+- **Treemap** (`229:192`, 540×800). Category legend as a row of **colored bold words, no swatches**. In-box labels white: name bold ~16px, share beneath at ~12px, and large boxes carry an extra absolute line ("210,000 annual deaths") above the share. Boxes too small for a label take an abbreviated hyphen-wrapped one. No axes — and the subtitle must explain the encoding ("The size of each box is proportional to…").
+- **Arrow chart on a log axis** (`263:377`). Horizontal arrows from a `1x` baseline to each value, sorted descending, each labeled at the arrowhead in the series color. Log ticks `1x 2x 4x 8x 16x`, no legend, no gridlines.
+- **Dot chart with uncertainty bars** (`222:825`). Dots direct-labeled with the entity name, vertical whiskers for the interval, and the subtitle saying so ("The bars show uncertainty in the estimates").
+
+Exemplars: `229:192`, `263:377`, `222:825`.
 
 ## Final pass — the Good Data Viz Checklist (condensed)
 
