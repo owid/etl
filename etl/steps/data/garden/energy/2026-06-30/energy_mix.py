@@ -39,6 +39,12 @@ CONTINENTS = [
     "South America",
 ]
 
+# Entities EIA reports whose territory the Statistical Review covers at the same time under another name:
+# East and West Germany against Germany over 1980-1990, and Czechoslovakia against Czechia and Slovakia
+# over 1980-1992. Their own series are kept, but they are left out of the region aggregates, where they
+# would count the same territory twice.
+DUPLICATED_TERRITORIES = ["East Germany", "West Germany", "Czechoslovakia"]
+
 REGIONS = CONTINENTS + [
     "High-income countries",
     "Low-income countries",
@@ -328,12 +334,10 @@ def combine_with_eia(tb: Table, tb_eia: Table) -> Table:
     )
     tb_eia = tb_eia[~is_aggregate].reset_index(drop=True)
 
-    # Entities whose territory the Statistical Review already covers through another one (Germany, Czechia
-    # and Slovakia, and the USSR's successors from 1985). Yugoslavia is kept: its successors are mostly not
-    # reported before the 1990s.
-    tb_eia = tb_eia[~tb_eia["country"].isin(["East Germany", "West Germany", "Czechoslovakia", "USSR"])].reset_index(
-        drop=True
-    )
+    # EIA's USSR is dropped: the Statistical Review covers it to 1984 and its successors from 1985, so
+    # keeping EIA's would overlap them. East and West Germany and Czechoslovakia are kept — their own
+    # series are worth publishing — and are left out of the aggregates instead, in add_region_aggregates.
+    tb_eia = tb_eia[tb_eia["country"] != "USSR"].reset_index(drop=True)
 
     tb = combine_two_overlapping_dataframes(df1=tb, df2=tb_eia, index_columns=["country", "year"])
     tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
@@ -361,7 +365,7 @@ def add_region_aggregates(tb: Table, eia_years: tuple[int, int]) -> Table:
     checks in sanity_check_outputs are what catch a region losing data.
     """
     is_country = ~tb["country"].str.contains("(EI)", regex=False) & ~tb["country"].isin(
-        REGIONS + ["World", "European Union (27)"]
+        REGIONS + ["World", "European Union (27)"] + DUPLICATED_TERRITORIES
     )
     # A country contributes only where it has a total. Otherwise it would add to the sources while
     # adding nothing to their denominator, and the shares would exceed 100%: EIA reports Afghanistan's

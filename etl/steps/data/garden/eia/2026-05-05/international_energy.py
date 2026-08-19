@@ -773,29 +773,31 @@ def add_other_renewables(tb: Table) -> Table:
     return tb
 
 
-def fill_trailing_zeros_in_biofuels(tb: Table) -> Table:
-    """Continue at zero the biofuels series that EIA stopped publishing after 2019.
+def fill_zero_gaps_in_biofuels(tb: Table) -> Table:
+    """Fill the gaps in EIA's biofuels series that sit between reported zeros.
 
-    Until 2019 EIA reported an explicit zero for the ~145 countries that consume no biofuels; from
-    2020 it publishes only the ~70 countries that do, leaving the rest empty. Where a country's
-    series ends in zero, the later years are filled with zero. Where it ends in a positive value
-    (Belarus, Hong Kong) the gap is real and is left alone.
+    Until 2019 EIA reported an explicit zero for the ~145 countries that consume no biofuels; from 2020 it
+    publishes only the ~70 countries that do. So a series that ends in zero continues at zero, and the
+    handful of interior gaps with a zero on either side are zero too (Kenya reports zero to 1982, nothing
+    to 1993, then zero again). Where a series ends in a positive value, or a gap separates a zero from a
+    positive value, the figure is genuinely unknown and the gap is left: Cuba starts consuming biofuels
+    somewhere in the two years it does not report.
     """
     column = "energy_consumption_from_biofuels"
-    informed = tb.loc[tb[column].notna(), ["country", "year", column]].sort_values("year")
-    last_value = informed.groupby("country", observed=True)[column].last()
-    last_year = informed.groupby("country", observed=True)["year"].max()
+    tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
+    grouped = tb.groupby("country", observed=True)[column]
+    previous, following = grouped.ffill(), grouped.bfill()
 
-    ends_in_zero = set(last_value.index[last_value == 0])
-    to_fill = tb["country"].isin(ends_in_zero) & tb[column].isna() & (tb["year"] > tb["country"].map(last_year))
-    assert to_fill.sum() > 0, "Expected trailing gaps in EIA's biofuels series, found none."
+    to_fill = tb[column].isna() & (previous == 0) & (following.isna() | (following == 0))
+    assert to_fill.sum() > 0, "Expected gaps between zeros in EIA's biofuels series, found none."
     tb.loc[to_fill, column] = 0
 
     tb[column].metadata.description_processing = (
         "Until 2019 the producer reported an explicit zero for the many countries that consume no "
-        "biofuels, and from 2020 it publishes only the countries that do. Where a country's series ends "
-        "in zero we continue it at zero; where it ends in a positive value we leave the gap, since there "
-        "the recent figures are genuinely unknown."
+        "biofuels, and from 2020 it publishes only the countries that do. Where a country reports zero on "
+        "either side of a gap, or before one that runs to the present, we read the gap as zero too. Where "
+        "a gap separates a zero from a positive figure, or follows one, we leave it: there the recent "
+        "figures are genuinely unknown."
     )
     return tb
 
@@ -836,8 +838,8 @@ def run() -> None:
     # Estimate total energy supply from other renewables, which EIA does not report on its own.
     tb = add_other_renewables(tb)
 
-    # Continue at zero the biofuels series EIA stopped publishing after 2019.
-    tb = fill_trailing_zeros_in_biofuels(tb)
+    # Read the gaps between reported zeros in the biofuels series as zeros.
+    tb = fill_zero_gaps_in_biofuels(tb)
 
     # Add region aggregates. Only sum extensive indicators; intensive ones (per capita, per GDP) stay country-level.
     extensive_columns = [c for c in tb.columns if c not in {"country", "year"} and c not in INTENSIVE_INDICATORS]
