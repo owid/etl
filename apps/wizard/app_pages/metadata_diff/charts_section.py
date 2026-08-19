@@ -146,7 +146,7 @@ def _render_change(
         col_charts, col_review = st.columns([3, 1])
         with col_charts:
             with st.popover(f"📊 {len(charts)} affected chart{'s' if len(charts) != 1 else ''}", width="stretch"):
-                render_chart_list(charts)
+                render_chart_list(charts, n_excluded=len(no_data_page))
                 _no_data_page_note(no_data_page)
                 if mdims:
                     verb = "use" if len(mdims) != 1 else "uses"

@@ -246,14 +246,23 @@ def render_affected_lists(view: ViewDiff, charts: list[dict], mdims: list[dict])
             st.markdown(f"- `{m.get('catalogPath')}`")
 
 
-def render_chart_list(charts: list[dict[str, Any]], verb: str = "render this text") -> None:
+def render_chart_list(charts: list[dict[str, Any]], verb: str = "render this text", n_excluded: int = 0) -> None:
     """Name the charts a change lands on — a count is not something an author can check.
 
     Flags any chart with no data page: grapher renders one only for single-indicator charts, so a WYSK
-    edit is invisible to readers of a scatter or multi-series chart.
+    edit is invisible to readers of a scatter or multi-series chart. `n_excluded` is how many charts were
+    filtered out for that reason, so the empty case can say which of two very different things happened:
+    no chart uses these indicators at all, or charts use them but none of them shows this field.
     """
     if not charts:
-        st.caption("No published chart uses these indicators.")
+        if n_excluded:
+            st.caption(
+                f"No chart **shows** this text: the {n_excluded} chart"
+                f"{'s' if n_excluded != 1 else ''} using these indicators combine several indicators, so "
+                "they render no data page."
+            )
+        else:
+            st.caption("No published chart uses these indicators.")
         return
     st.markdown(f"**{len(charts)} chart{'s' if len(charts) != 1 else ''} {verb}:**")
     lines = []
