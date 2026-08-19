@@ -30,11 +30,11 @@ tables:
         title: << indicator >> in bribery cases (<< unit_of_measurement.lower() >>)
         description_short: |-
           <% if indicator == "Persons convicted" %>
-          The number of people found guilty of crimes by the courts, as reported by national authorities. Bribery cases include those involving attempts to influence public or private sector decision-making through undue advantages.
+          Number of people found guilty of crimes by the courts, as reported by national authorities. Bribery cases include those involving attempts to influence public or private sector decision-making through undue advantages.
           <% elif indicator == "Persons prosecuted" %>
-          The number of people formally charged with crimes, as reported by national authorities. Bribery cases include those involving attempts to influence public or private sector decision-making through undue advantages.
+          Number of people formally charged with crimes, as reported by national authorities. Bribery cases include those involving attempts to influence public or private sector decision-making through undue advantages.
           <% elif indicator == "Persons arrested/cautioned/suspected" %>
-          The number of people arrested, given formal warnings, or identified as suspects, as reported by national authorities. Bribery cases include those involving attempts to influence public or private sector decision-making through undue advantages.
+          Number of people arrested, given formal warnings, or identified as suspects, as reported by national authorities. Bribery cases include those involving attempts to influence public or private sector decision-making through undue advantages.
           <%- endif -%>
         unit: |-
           <%- if unit_of_measurement.lower() == "counts" %>

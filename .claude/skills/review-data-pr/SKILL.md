@@ -56,7 +56,7 @@ When it's a restructure:
 - **Don't expect the auto-Indicator-Upgrader to have remapped charts.** When short_names differ entirely, the upgrader has nothing to match on. Look for a hand-curated v1 title → v2 title mapping table in the PR description (or a follow-up PR thread). 🟡 if charts on the old chain are still published but no mapping plan exists.
 - **Don't expect a `.py` step copy from the old version.** Step files should be authored from scratch, not produced by `etl update` rename. If the new step files look mechanically renamed (same logic, just version-bumped strings), flag 🟡 — the author may have skipped restructure-specific decisions.
 - **A chart remapped onto a successor indicator needs a config-vs-shape check.** Verify its pinned `selectedEntityNames` exist in the successor's data (v1 regional aggregates often don't — expect the garden step to rebuild them, mirroring the retired step's method), that pinned `yAxis` bounds don't clip the new range, and that the subtitle doesn't still describe the old construction. Any of the three broken: 🔴 (the default view renders empty, clipped, or mislabeled).
-- **Slack + `/latest` drafts are not expected in the PR body at all.** `/update-dataset` keeps them in the author's `workbench/` (steps 9 / 9b), so their absence from the PR is correct — don't flag it.
+- **Slack + `/latest` drafts are not expected in the PR body at all.** `/update-dataset` keeps them in the author's `workbench/` (steps 9 / 9b, owned by `/data-updates-comms` and `/data-update-announcement`), so their absence from the PR is correct — don't flag it.
 
 ### 4. Run the full pipeline end-to-end
 
@@ -309,9 +309,9 @@ Structure the review with:
 6. **🟡 Suggestions** — nice-to-have
 7. **🟢 Informational** — observations, no action needed
 8. **Workflow gaps from /update-dataset** — PR description, Codex review, indicator upgrade, downstream deps, etc. (The Slack + `/latest` drafts live in `workbench/`, not the PR — don't expect them here.)
-9. **What's still open** — carried forward from the PR body, using the open-items buckets defined in CLAUDE.md ("Close every report with what's still open") plus the update workflow's fourth bucket (**deferred to a follow-up PR** — downstream repoints, old-version archiving). Re-state the full list on every re-review, not just the delta, and mark what cleared since last time.
+9. **What's still open** — carried forward from the PR body, covering the categories in `.claude/docs/open-items.md` plus the update workflow's fourth one (**deferred to a follow-up PR** — downstream repoints, old-version archiving). Re-state the full list on every re-review, not just the delta, and mark what cleared since last time.
 
-**Check the PR body actually carries that block** (CLAUDE.md requires it). A PR whose description lists only what was done, while the session left content edits pending, audits unrun, or a follow-up PR's scope undefined, is missing the one artifact that survives after the chat is gone — flag it 🟡. Findings that were deliberately handed off need a locator in the body too, not just a description: an item the next person can't act on without redoing the analysis isn't handed off.
+**Check the PR body doesn't leave pending work unmentioned.** A PR whose description lists only what was done, while the session left content edits pending, audits unrun, or a follow-up PR's scope undefined, is missing the one artifact that survives after the chat is gone — flag it 🟡. Judge it on whether a reader can tell what's outstanding, not on whether it uses any particular headings or wording. Work that was deliberately handed off needs a locator in the body too, not just a description: an item the next person can't act on without redoing the analysis isn't handed off.
 
 ## Severity rubric
 

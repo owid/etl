@@ -23,8 +23,10 @@ DIMENSIONS_CONFIG = {
 PPP_ADJUSTMENT_SUBTITLE = "This data is adjusted for inflation and differences in living costs between countries."
 
 # Set x (population) and color (region) indicators needed by the Marimekko tab.
-POPULATION_PATH = "grapher/demography/2024-07-15/population/historical#population_historical"
-REGION_PATH = "grapher/regions/2023-01-01/regions/regions#owid_region"
+# Given in short form (`table#column`); `Collection.save` resolves them against the step's
+# dependencies, so the dataset versions are not hardcoded here.
+POPULATION_PATH = "historical#population_historical"
+REGION_PATH = "regions#owid_region"
 
 # Grouped views (all deciles, P10/P50/P90, richer/poorer groups) exist only in the "No spells"
 # variant — they expose no "show breaks in the data" toggle. So the two breaks-dependent garden

@@ -93,7 +93,7 @@ tables:
       number_of_ai_related_bills_passed_into_law:
         title: Cumulative AI-related bills passed into law since 2016, as of 2025
         unit: 'bills'
-        description_short: The total number of AI-related laws enacted in Group of Twenty (G20) countries between 2016 and 2025.
+        description_short: Total number of AI-related laws enacted in Group of Twenty (G20) countries between 2016 and 2025.
         description_key:
           - AI-related laws are identified through automated searches of legislative websites, combined with AI-based analysis of legal texts and manual checks.
           - The system searches for terms such as “artificial intelligence” and “machine learning” to identify relevant laws.
@@ -112,7 +112,7 @@ tables:
       number_of_ai_incidents:
         title: Annual reported artificial intelligence incidents and controversies
         unit: 'incidents'
-        description_short: The number of reported incidents where AI systems caused or nearly caused harm.
+        description_short: Number of reported incidents where AI systems caused or nearly caused harm.
         description_key:
           - The AI Incident Database (AIID) collects reports of cases where AI systems have caused or nearly caused harm.
           - Incidents include a wide range of harms, such as harmful AI-generated content, deepfake impersonation, biased facial recognition leading to wrongful arrests, and accidents involving AI systems.

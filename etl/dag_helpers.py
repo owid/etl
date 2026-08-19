@@ -766,6 +766,12 @@ def get_active_snapshots() -> set[str]:
 
 
 def get_active_steps() -> set[str]:
+    """Return the full path of every non-snapshot step in the active DAG.
+
+    Paths keep the dataset name (``garden/who/2026-05-22/gho``). They used to be truncated at
+    the version, which made callers unable to tell an active dataset from an archived one
+    sitting in the same directory — see the regression in #6572.
+    """
     DAG = load_dag()
 
     active_steps = set()
@@ -774,5 +780,4 @@ def get_active_steps() -> set[str]:
         if not s.startswith("snapshot"):
             active_steps.add(s.split("://")[1])
 
-    # Strip dataset name after version
-    return {s.rsplit("/", 1)[0] for s in active_steps}
+    return active_steps

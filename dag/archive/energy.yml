@@ -1446,3 +1446,39 @@ steps:
   # archived; last active in 2d1bc62c69d3 on 2026-01-08
   data-private://garden/energy/2025-11-19/historical_battery_costs:
     - data-private://meadow/energy/2025-11-19/historical_battery_costs
+  # archived; last active in fd8915db4e75 on 2026-07-16
+  data://garden/energy/2026-06-30/uk_historical_electricity:
+    - data://garden/energy/2026-06-30/electricity_mix
+    - data://garden/uk_beis/2023-12-12/uk_historical_electricity
+  # archived; last active in fd8915db4e75 on 2026-07-16
+  data://grapher/energy/2026-06-30/uk_historical_electricity:
+    - data://garden/energy/2026-06-30/uk_historical_electricity
+  # archived; last active in f93fe5ee7636 on 2026-07-31
+  data://garden/energy/2026-04-24/global_historical_electricity:
+    - data://meadow/energy/2026-02-06/global_historical_electricity
+    - data://garden/ember/2026-04-24/yearly_electricity
+  # archived; last active in f93fe5ee7636 on 2026-07-31
+  data://grapher/energy/2026-04-24/global_historical_electricity_scaling:
+    - data://garden/energy/2026-04-24/global_historical_electricity_scaling
+  # archived; last active in f93fe5ee7636 on 2026-07-31
+  data://garden/energy/2026-04-24/global_historical_electricity_scaling:
+    - data://garden/energy/2026-04-24/global_historical_electricity
+  # archived; last active in f93fe5ee7636 on 2026-07-31
+  data://grapher/energy/2026-04-24/uk_historical_electricity:
+    - data://garden/energy/2026-04-24/uk_historical_electricity
+  # archived; last active in f93fe5ee7636 on 2026-07-31
+  data://garden/energy/2026-04-24/uk_historical_electricity:
+    - data://garden/energy/2026-04-24/electricity_mix
+    - data://garden/uk_beis/2023-12-12/uk_historical_electricity
+  # archived; last active in 2a47d03292a9 on 2026-08-05
+  data://grapher/energy/2026-05-05/fossil_fuels:
+    - data://garden/energy/2026-05-05/fossil_fuels
+  # archived; last active in 2a47d03292a9 on 2026-08-05
+  data://garden/energy/2026-05-05/fossil_fuels:
+    - data://garden/eia/2026-05-05/international_energy
+    - data://garden/demography/2024-07-15/population
+    - data://garden/wb/2026-07-01/income_groups
+    - data://garden/regions/2023-01-01/regions
+  # archived; last active in 2a47d03292a9 on 2026-08-05
+  export://explorers/energy/latest/fossil_fuels:
+    - data://grapher/energy/2026-05-05/fossil_fuels

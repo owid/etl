@@ -266,8 +266,6 @@ def test_drop_dimension_keeping_single_value_errors():
     """
     Test drop_dimension_keeping_single_value error cases - unknown dimension and unknown value.
     """
-    import pytest
-
     from etl.collection.utils import drop_dimension_keeping_single_value
 
     tb = _create_table_with_dimensions()
@@ -290,3 +288,52 @@ def test_drop_dimension_keeping_single_value_errors():
     )
     with pytest.raises(ValueError, match="have dimensions, but not 'equivalence_scale'"):
         drop_dimension_keeping_single_value(tb, dimension="equivalence_scale", value="square root")
+
+
+def test_resolve_grapher_schema_accepted_forms():
+    """
+    Test resolve_grapher_schema - both authoring forms resolve to a full schema URL.
+
+    Short form "011" expands to the published URL; a full URL passes through unchanged;
+    None falls back to the version this repo vendors (DEFAULT_GRAPHER_SCHEMA).
+    """
+    from etl.collection.utils import resolve_grapher_schema
+    from etl.config import DEFAULT_GRAPHER_SCHEMA
+
+    assert resolve_grapher_schema("011") == "https://files.ourworldindata.org/schemas/grapher-schema.011.json"
+    # An older pin is preserved — that is the point of pinning: Grapher migrates it forward.
+    assert resolve_grapher_schema("008") == "https://files.ourworldindata.org/schemas/grapher-schema.008.json"
+
+    full = "https://files.ourworldindata.org/schemas/grapher-schema.010.json"
+    assert resolve_grapher_schema(full) == full
+
+    assert resolve_grapher_schema(None) == DEFAULT_GRAPHER_SCHEMA
+
+
+def test_resolve_grapher_schema_rejects_unquoted_yaml_version():
+    """
+    Test resolve_grapher_schema - a bare YAML version is rejected with a quoting hint.
+
+    YAML 1.1 parses `grapher_schema: 011` as octal, so it arrives as 9 (or "9" once the dataclass
+    coerces it to str). Silently zero-padding that back to "009" would pin the wrong version, so we
+    raise and point at the missing quotes.
+    """
+    from etl.collection.utils import resolve_grapher_schema
+
+    for value in (9, "9", 11, "11"):
+        with pytest.raises(ValueError, match="Quote it"):
+            resolve_grapher_schema(value)
+
+
+def test_resolve_grapher_schema_rejects_malformed_values():
+    """
+    Test resolve_grapher_schema - anything that isn't a 3-digit version or a schema URL is rejected.
+
+    Example: "latest" and a bare filename both fail, since Grapher keys its config migrations on a
+    concrete version.
+    """
+    from etl.collection.utils import resolve_grapher_schema
+
+    for value in ("latest", "0.11", "grapher-schema.011.json", "https://example.com/schema.json", ""):
+        with pytest.raises(ValueError, match="Invalid `grapher_schema` value"):
+            resolve_grapher_schema(value)

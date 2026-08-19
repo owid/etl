@@ -368,7 +368,7 @@ tables:
       urban_pop_estimates:
         title: Population of the capital city
         unit: people
-        description_short: The total number of people living in the country's capital city. {definitions.desc_cities_definition}
+        description_short: Total number of people living in the country's capital city. {definitions.desc_cities_definition}
         description_key:
           - Estimated total population living in the country's capital city, based on satellite imagery and census data.
           - *desc_key_common
@@ -408,7 +408,7 @@ tables:
         title: Population density of the capital city
         unit: people per km²
         short_unit: per km²
-        description_short: The number of people per km² of land area in the country's capital city. {definitions.desc_cities_definition}
+        description_short: Number of people per km² of land area in the country's capital city. {definitions.desc_cities_definition}
         description_key:
           - Estimated population density of the country's capital city, based on satellite imagery and census data.
           - *desc_key_common
@@ -449,7 +449,7 @@ tables:
       urban_pop_top_100_estimates:
         title: Population of the top 100 most populous cities
         unit: people
-        description_short: The total number of people living in cities ranked among the top 100 most populous in 2020. {definitions.desc_cities_definition}
+        description_short: Total number of people living in cities ranked among the top 100 most populous in 2020. {definitions.desc_cities_definition}
         description_key:
           - Estimated total population living in each of the world's 100 most populous cities (as ranked in 2020), based on satellite imagery and census data.
           - *desc_key_common
@@ -484,7 +484,7 @@ tables:
         title: Population density of the top 100 most populous cities
         unit: people per km²
         short_unit: per km²
-        description_short: The number of people per km² of land area for cities ranked among the top 100 most populous in 2020. {definitions.desc_cities_definition}
+        description_short: Number of people per km² of land area for cities ranked among the top 100 most populous in 2020. {definitions.desc_cities_definition}
         description_key:
           - Estimated population density of each of the world's 100 most populous cities (as ranked in 2020), based on satellite imagery and census data.
           - *desc_key_common
@@ -1165,7 +1165,7 @@ tables:
         title: Annual growth rate of the share of population in cities with 300,000 or more people (projected)
         unit: "%"
         short_unit: "%"
-        description_short: The expected average annual growth in the share of population living in cities with at least 300,000 people, calculated over five-year periods. {definitions.desc_cities_definition}
+        description_short: Expected average annual growth in the share of population living in cities with at least 300,000 people, calculated over five-year periods. {definitions.desc_cities_definition}
         description_key:
           - Projected annual growth rate of the share of the population living in cities with 300,000 or more people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common

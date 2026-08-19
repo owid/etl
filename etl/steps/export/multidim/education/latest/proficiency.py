@@ -21,7 +21,6 @@ COLOR_STUDENTS = "#4C6A9C"
 
 # Common configuration for all charts
 MULTIDIM_CONFIG = {
-    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json",
     "originUrl": "ourworldindata.org/education",
     "hideAnnotationFieldsInTitle": {"time": True},
     "yAxis": {"min": 0, "max": 100},
