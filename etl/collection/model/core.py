@@ -286,6 +286,9 @@ class Collection(MDIMBase):
         # Check that no view carries a corrupted description_key
         self.validate_description_keys()
 
+        # Warn about view configs that shadow the collection-level schema pin
+        self.warn_on_view_schema_overrides()
+
         # Sort views based on dimension order
         self.sort_views_based_on_dimensions()
 
@@ -655,6 +658,29 @@ class Collection(MDIMBase):
         for view in self.views:
             if view.is_grouped:
                 sanity_check_grouped_view(view)
+
+    def warn_on_view_schema_overrides(self):
+        """Warn when a view config carries its own `$schema`, shadowing `grapher_schema`.
+
+        Grapher applies the collection pin as `{$schema: grapherConfigSchema, **view.config}`, so a
+        view's own `$schema` wins — and it is far less visible than the collection pin on line 1 of
+        the config YAML. That combination has bitten us before: a config pinned at an old version
+        while its body used fields from a newer one, so Grapher ran migrations over a config they
+        were never meant to touch. Pin the collection instead.
+        """
+        overrides = defaultdict(int)
+        for view in self.views:
+            config = view.config
+            if isinstance(config, dict) and "$schema" in config:
+                overrides[config["$schema"]] += 1
+
+        for schema, n_views in sorted(overrides.items()):
+            log.warning(
+                f"Collection '{self.catalog_path}': {n_views} view(s) set `$schema` in their config "
+                f"({schema}), which overrides the collection-level `grapher_schema` "
+                f"({resolve_grapher_schema(self.grapher_schema)}). Remove it and pin the whole "
+                "collection with the top-level `grapher_schema` field instead."
+            )
 
     def validate_description_keys(self):
         """Fail on a view whose `description_key` list cannot be real content.

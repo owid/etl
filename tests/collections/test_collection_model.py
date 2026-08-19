@@ -2407,3 +2407,33 @@ def test_explorer_rejects_grapher_schema():
 
     with pytest.raises(ValueError, match="only supported for multidim collections"):
         Explorer.from_dict(_make_minimal_config(grapher_schema="011", config={"explorerTitle": "T"}))
+
+
+def test_warn_on_view_schema_overrides(capsys):
+    """
+    Test Collection.warn_on_view_schema_overrides - a view `$schema` shadowing the collection pin
+    is surfaced, since Grapher lets the view value win and it is much less visible.
+
+    structlog writes to stdout rather than through stdlib logging, hence capsys not caplog.
+    """
+    collection = Collection.from_dict(
+        _make_minimal_config(
+            grapher_schema="011",
+            views=[
+                {
+                    "dimensions": {"metric": "total"},
+                    "indicators": {"y": [{"catalogPath": "grapher/ns/2024-01-01/ds/tb#ind"}]},
+                    "config": {"$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json"},
+                }
+            ],
+        )
+    )
+    collection.warn_on_view_schema_overrides()
+    out = capsys.readouterr().out
+    assert "grapher-schema.008.json" in out
+    assert "grapher-schema.011.json" in out
+    assert "grapher_schema" in out
+
+    # A view without its own `$schema` stays quiet.
+    Collection.from_dict(_make_minimal_config(grapher_schema="011")).warn_on_view_schema_overrides()
+    assert capsys.readouterr().out == ""

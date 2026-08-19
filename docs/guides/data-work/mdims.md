@@ -123,6 +123,8 @@ In this example, we note that we can group together indicators from any dataset.
 
     The one exception is a pin that **contradicts the config body** — e.g. pinned `005` while the config uses `chartTypes`, a field that only exists from `006` onwards (the 005→006 migration is what creates it). That is a stale pin rather than a record, and leaving it means Grapher runs migrations over a config they were never meant to touch. Correct such a pin to the version the config is actually written against.
 
+    **Pin it in one place only.** A view's own `config` may also carry a `$schema`, and Grapher lets that value *win* over the collection pin — while being far less visible, since it usually sits in a Python dict rather than on line 1 of the YAML. ETL logs a warning when a view shadows the collection pin; don't add new ones. If you need to know what version an MDIM actually declares, the collection pin is the answer unless that warning fires.
+
     This field is MDIM-only. Explorers reach Grapher through the legacy TSV path, which has no equivalent.
 
 !!! tip "Learn more about the structure of MDIMs in [:fontawesome-brands-github: their schema](https://github.com/owid/etl/blob/master/schemas/multidim-schema.json)"
