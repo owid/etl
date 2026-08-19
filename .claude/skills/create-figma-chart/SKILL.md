@@ -684,15 +684,19 @@ for (const t of tickLabels) t.leadingTrim = "CAP_HEIGHT";   // boxes stop overha
 for (const d of dots) chart.appendChild(d);                 // dots inside the group: box now includes them
 
 // Call 2 — heights have settled. Anchor each label on its own mark rather than on a
-// remembered pre-trim centre (see "Re-anchor to the marks, not to a remembered box width"):
+// remembered pre-trim centre (see "Re-anchor to the marks, not to a remembered box width"),
+// keeping grapher's by-construction axis offset — Step 8 audits for it, so don't trim it to 0:
+const AXIS_DY = 1.2;                              // ink sits ~1.2px above its gridline on an axis
 for (const t of tickLabels) {
   const mark = gridlineFor(t);                    // horizontal-grid-lines carries one vector per tick
-  t.y = mark.y - t.height / 2;
+  t.y = mark.y - t.height / 2 - AXIS_DY;
 }
 
 // Call 3 — only now does chart.height report the trimmed group, so only now can it be centred.
 chart.y = BAND_TOP + (BAND_BOTTOM - BAND_TOP - chart.height) / 2;
 ```
+
+**The trim here is for the group's box, not for the axis's alignment** — that is the whole reason it keeps the offset. What it removes is the ~3.5px of empty leading below each digit, which was inflating the *group's* bounding box past its ink; where the label sits relative to its gridline is Step 8's call, and Step 8 keeps grapher's ~1.2px. Exact centring on the mark is the rule for a label naming a **mark** (a bar, a dot, a segment), not for an axis tick — so don't let this pass drive the axis offset to 0.00 and don't record 0.00 as the target for it.
 
 Then verify on **both** scales — node boxes *and* a pixel scan of the render for the topmost/bottommost ink row — and report both numbers. On this run that landed box 13.02/13.02 with ink 13/14.
 
@@ -845,7 +849,7 @@ Make this a habit rather than a reaction to someone noticing: **after any scale,
 
 **Re-anchor to the marks, not to a remembered box width.** The snippet above is the fallback for when nothing addressable is nearby; wherever the export gives you the mark, drive off it, because then no amount of re-hugging or stretching can accumulate error. On an axis every anchor is already in the tree: the `tick-marks` group carries one zero-width vector per tick named after its value, and `horizontal-grid-lines` one per gridline, so tick labels align on their mark (grapher **left**-aligns the first and **right**-aligns the last to keep them inside the plot, everything between centered) and value labels right-align on the axis edge. Verified that way, all six tick deltas come back exactly 0 rather than approximately 0.
 
-**On an axis, expect a uniform ~1px vertical offset and leave it — but know the bound, because a *large* uniform offset is a real defect.** Grapher positions text by baseline, and digit-only labels have no descenders, so an axis label's visual center sits slightly below its box center: ~1.2px above its gridline, by construction. Uniform and small is fine; uniformity alone is not the test. Bar labels measured **5.46px** above their bars' centers on every row of a 14-row chart — perfectly uniform, and visibly high on the render, which is what a reviewer noticed first.
+**On an axis, expect a uniform ~1px vertical offset and leave it — but know the bound, because a *large* uniform offset is a real defect.** Grapher positions text by baseline, and digit-only labels have no descenders, so an axis label's visual center sits slightly below its box center: ~1.2px above its gridline, by construction. **Step 7's box-equals-ink pass trims these labels but deliberately preserves this offset**, so it survives into the audit and ~1.2px stays the expectation here, not 0.00. Uniform and small is fine; uniformity alone is not the test. Bar labels measured **5.46px** above their bars' centers on every row of a 14-row chart — perfectly uniform, and visibly high on the render, which is what a reviewer noticed first.
 
 **The fix, and the rule for anything labeling a mark rather than an axis: trim the box to the ink, then center on the mark.** `leadingTrim = "CAP_HEIGHT"` drops the line box's leading (a 14px label went from 18px tall to 10px — the 8px of leading was the whole error), after which box center *is* ink center and `label.y = markCenter − label.height/2` lands at exactly 0.00 on every row. Do it for the value labels **and** the entity labels, since both read against the same bar:
 
