@@ -74,22 +74,24 @@ def st_show_explorer_metadata_diffs(source_engine: Engine, target_engine: Engine
 
 
 def _render_other(other: dict[str, list[ViewDiff]]) -> None:
-    """Explorers that differ from the baseline but not because of this branch — listed, never hidden.
+    """Explorer views that differ from the baseline but not because of this branch — listed, never hidden.
 
-    Almost always master having rebuilt them after this staging server was created. They are not the
-    reviewer's job, but "there are other differences" is still worth being able to see.
+    Almost always master having rebuilt the explorer after this staging server was created. They are not
+    the reviewer's job, but "there are other differences" is still worth being able to see. Attribution is
+    per view, so an explorer with a handful of our views and hundreds of lagging ones appears in both
+    lists — with only its own views counted above.
     """
     if not other:
         return
     n_views = sum(len(v) for v in other.values())
-    with st.expander(f"🕓 {len(other)} other explorer(s) differ from {BASELINE_NAME} — not from this branch"):
+    with st.expander(f"🕓 {n_views} other explorer view(s) differ from {BASELINE_NAME} — not from this branch"):
         st.caption(
-            "Their views differ, but neither their export recipe nor the datasets behind the changed views "
+            "These views differ, but neither their explorer's export recipe nor the indicators they render "
             "are touched by this branch — normally master having moved on since this server was created. "
             "Listed for completeness."
         )
         st.markdown("\n".join(f"- `{slug}` — {len(diffs)} view(s)" for slug, diffs in sorted(other.items())))
-        st.caption(f"{n_views} views in total.")
+        st.caption(f"Across {len(other)} explorer(s).")
 
 
 def _scope_caption() -> None:

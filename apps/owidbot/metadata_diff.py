@@ -55,7 +55,12 @@ def format_metadata_diff(summary: Summary) -> str:
         fields = ", ".join(f"{label} ({n})" for label, n in sorted(summary.fields.items()))
         items.append(f"<li>Fields: {fields}</li>")
     if summary.n_new_indicators:
-        items.append(f"<li>New indicators (no baseline text): {summary.n_new_indicators}</li>")
+        # A version bump makes every indicator new, so there is nothing to diff — and nothing has been
+        # read either. Say that, rather than let an empty diff pass for an empty change.
+        items.append(
+            f"<li>New indicators: {summary.n_new_indicators} — absent from the baseline, so their text "
+            "has no diff and is unreviewed</li>"
+        )
     # A difference in a dataset master also edited after this server was forked is not purely this PR's.
     shared = summary.attribution.get("mixed", 0) + summary.attribution.get("baseline_newer", 0)
     if shared:

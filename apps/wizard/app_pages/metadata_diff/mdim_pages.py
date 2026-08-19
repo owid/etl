@@ -14,7 +14,7 @@ import streamlit as st
 from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET
-from apps.wizard.app_pages.metadata_diff import brief, cached
+from apps.wizard.app_pages.metadata_diff import brief, cached, discovery
 from apps.wizard.app_pages.metadata_diff.core import (
     CHART_FIELD_PREFIX,
     ViewDiff,
@@ -160,10 +160,25 @@ def render_review_page(
     Flag) + comment, the AUTHOR's scope decision shown for context, a lock-in gate, and a punch-list.
     The reviewer accepts or rejects; the scope decision is the author's (set on the View diff)."""
     st.markdown(DIFF_CSS, unsafe_allow_html=True)
-    groups = group_changes(view_diffs)
+    # Same branch-scope split the change list applies: an MDim master rebuilt after this server was
+    # created differs in every view's config, and signing those off here would put edits nobody in this
+    # PR wrote into the PR brief.
+    groups, other_groups = discovery.split_mdim_groups(catalog_path, view_diffs)
     if not groups:
-        st.success("No metadata changes in any view of this MDim — nothing to review.")
+        if other_groups:
+            st.info(
+                f"The {len(other_groups)} difference(s) in this MDim's view configs are not from this branch "
+                "(its recipe is untouched), so there is nothing here to review — the config diff is in Chart "
+                "Diff's MDIMs section."
+            )
+        else:
+            st.success("No metadata changes in any view of this MDim — nothing to review.")
         return
+    if other_groups:
+        st.caption(
+            f"🕓 {len(other_groups)} further difference(s) in this MDim's view configs are not from this "
+            "branch (its recipe is untouched) and are left out of this review."
+        )
 
     baseline_slug = mdim_row.get("slug_target") if mdim_row.get("published_target") == 1 else None
     reviews = load_reviews(source_engine, catalog_path)
