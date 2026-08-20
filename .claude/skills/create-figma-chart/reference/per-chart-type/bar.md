@@ -8,7 +8,7 @@
 - Values to the right of the bars by default; inside the bars when space is tight (contrast + ≥12px rules).
 - Highlight the entity the DI is about with a different bar color; mute the rest.
 - Group bars meaningfully (delineate blocks) when it helps reading.
-- Don't cram many entities into a limited height — **stretch the frame vertically instead** (static charts don't have to be square; the 540×824 mobile template exists for this).
+- Don't cram many entities into a limited height — stretch the frame vertically (GUIDELINES.md → Direct labeling).
 - Legend: squares only; move it into empty chart space if there is some. On a **100% stacked** bar, prefer no legend at all — colored category labels above the reference row, tiered and wrapped, with a thin arrow onto any segment too narrow to sit under its own label (SKILL.md → Step 8). That is what the finished pages do, and it holds for six categories, not just three.
 
 **Ranked bars — everything from here to the stacked-bar paragraph assumes a plain ranked chart.**

@@ -59,3 +59,26 @@
 - **A missing view param renders an axis-only chart at HTTP 200.** An explorer requested with no view params came back with two texts and no series; an MDim slug with no params rendered its *default* view (a map, for `energy-mix`). Nothing errors — assert the text count and the rendered tab against the view you asked for.
 - **A bespoke component mounted outside a Shadow DOM renders unstyled, silently.** Each bundle injects its own CSS scoped to `:host`, so those rules never match in a plain element — and because the serializer reads `getComputedStyle`, you get a structurally plausible SVG with the wrong paint, weights and geometry. BESPOKE-SVG.md has the correct mount.
 - **New year, new file** — ask for the link and re-verify every node id in the map above before the first run of a new year.
+
+**Four mechanics below were each found on one chart type and bite on all of them.** They are here,
+not in the type file, for that reason — the worked examples stay in `reference/per-chart-type/`.
+
+- **`rescale()` multiplies every stroke width.** A 0.22px hairline becomes 0.9px after a 4× scale, and
+  a 1px annotation stroke becomes 4px — so **set every stroke after the final scale, never before**.
+  Found on maps (`reference/per-chart-type/maps.md`, where the whole treatment is hairlines), but it
+  applies to any chart whose group is scaled into a band, which is all of them in Step 7.
+- **Text widths only settle on the next `use_figma` call.** Same class as the `leadingTrim` rule in
+  the Round-trip budget: bolding a label, changing its font, or editing its characters does not
+  update `width` within the call that does it. Any placement search that runs in the same call is
+  searching against the pre-edit width. Bold first, measure next call, then place.
+- **The API exposes no per-line width for a multi-line text node, and a probe clone cannot answer
+  it.** Setting `characters` on a clone resets the bold ranges, and bold is wider, so the
+  measurement comes back short — which puts anything you anchor to it on top of a glyph. Measure the
+  line's *ink* off the render instead: screenshot the frame and scan that line's row band for the
+  rightmost non-canvas pixel (`sum(abs(c - 255) for c in px[x, y]) > 36` against a white canvas).
+- **A label moved on top of a fill can be invisible with nothing wrong in the node tree.** grapher
+  orders its `text-labels` group *before* the fills, which is harmless while the labels sit in a
+  reserved margin and fatal the moment you move one into the plot — the area paints over it.
+  Re-append the label to the chart group after moving it (`chart.appendChild(label)`), and **check
+  the render, not the node list**: the tree looks correct either way. Found on stacked areas, and it
+  is the same failure as a map leader hidden by the annotation it starts from.

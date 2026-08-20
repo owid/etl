@@ -133,3 +133,17 @@ The chart's text is not yours — you transcribed it from the indicator's metada
 **Check the properties you didn't change, not just the ones you did.** A verification pass naturally retraces the edits — it measures the colors because you set colors, the positions because you moved things — and that is exactly how an inherited value survives it. The context lines on this chart stayed at the export's 2px through a full pass that confirmed their color, because nothing in the pass ever asked what weight they were. Derive the check from **what the finished frame is supposed to look like**, property by property, rather than from your own edit history; anything the treatment specifies gets read back, whether or not you believe you touched it.
 
 Two habits make the difference. **Assert, don't eyeball** — a 1.2px label drift, a 1.18:1 grayscale pair and a scrambled legend all looked perfectly fine in a screenshot. And **re-run the affected checks after every change**, because they interact: applying a text style resets range colors, rescaling rewraps text and shifts label centers, adding an annotation changes the group's width, and swapping one color moves the safety floor to a different pair.
+
+**Two pixel-probe mechanics that decide whether any of the render-sampling checks above are telling
+you the truth.** Both were found on map leaders and both apply to every probe on this page —
+including the arrow probe.
+
+- **A canvas coordinate of `N.0` is the seam between pixels `N-1` and `N`, so sample
+  `floor(coord − 0.5)`.** Reading `int(coord)` checks the neighbouring pixel, which reports a
+  correctly placed mark as misplaced. That cost two rounds of "fixing" placement that was already
+  right — and it is the same off-by-one whichever probe you are running.
+- **Match a fill strictly — summed `|ΔRGB| ≤ ~9`, not `~40`.** A loose tolerance admits the
+  antialiased edge, where each pixel is a blend of the mark and the background, so the "interior"
+  you are testing against silently includes the boundary. A `#e8f1f9` sample is within 18 of
+  `#deebf7` and is half background; that tolerance is what let a dot in open water pass a pixel
+  check.
