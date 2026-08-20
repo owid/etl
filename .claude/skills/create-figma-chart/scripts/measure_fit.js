@@ -16,10 +16,11 @@
 //                118 to 70.
 //     groupId  — optional; the imported chart group, once it exists. Give it and you also get the
 //                group's bbox, its content aspect, and the scale needed to fit the band.
-//     hideIds  — optional; nodes to EXCLUDE from the group's measured bbox (grapher's `connectors`
-//                and year markers extend past the plot). This computes the bbox as if they were
-//                hidden, WITHOUT hiding them — so the aspect you get is the one you will actually
-//                fit, and the file is untouched. reference/FITTING.md: hiding the elbows moved a
+//     hideIds  — optional; nodes to EXCLUDE from the group's measured bbox AND from the font-size
+//                histogram (grapher's `connectors` and year markers extend past the plot). This
+//                computes both as if they were hidden, WITHOUT hiding them — so the aspect you get
+//                is the one you will actually fit, the histogram covers only text that survives,
+//                and the file is untouched. reference/FITTING.md: hiding the elbows moved a
 //                measured aspect from 1.6026 to 1.5558, turning a 14px gap into 9.5px.
 //
 // The `nextPass` field in the output is the finished second-pass command — run it as printed. Do
@@ -137,8 +138,14 @@ const blocksReflow = (c) => {
   }
   if ("layoutGrow" in c && c.layoutGrow) return "layoutGrow";
   if ("layoutSizingVertical" in c && c.layoutSizingVertical === "FIXED") return "layoutSizingVertical FIXED";
-  if (c.type === "TEXT" && (c.textAutoResize === "NONE" || c.textAutoResize === "TRUNCATE")) {
-    return `textAutoResize ${c.textAutoResize}`;
+  // HEIGHT exactly, which is the invariant reference/NODE-MAP.md documents and verify_templates.js
+  // already enforces (`textAutoResize ${ar} != HEIGHT`). Listing the modes that block instead lets
+  // WIDTH_AND_HEIGHT through, and that one is not reflow-safe: the box hugs the text on BOTH axes, so
+  // a long title grows sideways on one line instead of wrapping to a second. The header height then
+  // does not track the copy at all — the failure this predicate exists to catch — and the title runs
+  // toward the logo and the frame edge while the band keeps its placeholder value.
+  if (c.type === "TEXT" && c.textAutoResize !== "HEIGHT") {
+    return `textAutoResize ${c.textAutoResize} (not HEIGHT)`;
   }
   return null;
 };
@@ -189,9 +196,15 @@ if (groupNode) {
   collect(g);
   const unmatched = hideIds.filter((id) => !seen.has(id));
 
+  // The font histogram is collected in THIS traversal, not a second findAllWithCriteria pass. A
+  // separate pass sees neither the hideIds subtrees nor an invisible ancestor — `visible` is a local
+  // flag, so a text inside a hidden group still reads as visible — and would report label sizes for
+  // text the fitted chart will not contain, which is the histogram's whole job to get right.
+  const visibleTexts = [];
   const walk = (n) => {
     if (hide.has(n.id)) return;
     if ("visible" in n && !n.visible) return;
+    if (n.type === "TEXT") visibleTexts.push(n);
     if ("children" in n && n.children.length) {
       n.children.forEach(walk);
       return;
@@ -253,11 +266,10 @@ if (groupNode) {
     }
   }
 
-  // font-size histogram, and what each size becomes once scaled in
+  // font-size histogram, and what each size becomes once scaled in. Built from the bbox traversal's
+  // own text nodes, so it describes exactly the labels the measured aspect was taken over.
   const sizes = {};
-  const texts = g.findAllWithCriteria ? g.findAllWithCriteria({ types: ["TEXT"] }) : [];
-  for (const t of texts) {
-    if (!t.visible) continue;
+  for (const t of visibleTexts) {
     const fs = typeof t.fontSize === "number" ? t.fontSize : "mixed";
     sizes[fs] = (sizes[fs] || 0) + 1;
   }
