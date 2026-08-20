@@ -171,6 +171,213 @@ def test_records_to_dictionary_and_unique_records():
     ]
 
 
+def _create_table_with_dimensions():
+    """Create a table with two indicators over dimensions sex and equivalence_scale.
+
+    Mirrors the shape that motivates filter_columns_by_dimension_choices: a table where only one
+    value of a dimension (equivalence_scale="square root") is wanted in a collection.
+    """
+    from owid.catalog import Table, Variable
+    from owid.catalog.core.meta import VariableMeta
+
+    data = {
+        "country": ["USA", "CAN"],
+        "year": [2020, 2020],
+        "income__sex_male__scale_sqrt": [1, 2],
+        "income__sex_female__scale_sqrt": [3, 4],
+        "income__sex_male__scale_none": [5, 6],
+        "income__sex_female__scale_none": [7, 8],
+    }
+    tb = Table(data, short_name="test_table")
+    for col in data:
+        if col in ("country", "year"):
+            continue
+        tb[col] = Variable(
+            tb[col],
+            name=col,
+            metadata=VariableMeta(
+                original_short_name="income",
+                dimensions={
+                    "sex": "female" if "female" in col else "male",
+                    "equivalence_scale": "square root" if "sqrt" in col else "none",
+                },
+            ),
+        )
+    tb.metadata.dimensions = [
+        {"slug": "sex", "name": "Sex"},
+        {"slug": "equivalence_scale", "name": "Equivalence scale"},
+    ]
+    return tb
+
+
+def test_filter_columns_by_dimension_choices():
+    """
+    Test filter_columns_by_dimension_choices - filters indicators to one dimension choice and
+    removes the dimension from column-level and table-level metadata.
+    """
+    from etl.collection.utils import filter_columns_by_dimension_choices
+
+    tb = _create_table_with_dimensions()
+
+    result = filter_columns_by_dimension_choices(tb, {"equivalence_scale": "square root"})
+
+    # Only the matching indicators are kept; non-dimensional columns (country, year) too.
+    assert sorted(result.columns) == [
+        "country",
+        "income__sex_female__scale_sqrt",
+        "income__sex_male__scale_sqrt",
+        "year",
+    ]
+
+    # The dimension is dropped from the metadata of the kept indicators; other dimensions remain.
+    assert result["income__sex_male__scale_sqrt"].m.dimensions == {"sex": "male"}
+    assert result["income__sex_female__scale_sqrt"].m.dimensions == {"sex": "female"}
+
+    # The dimension is dropped from the table-level metadata.
+    assert result.metadata.dimensions == [{"slug": "sex", "name": "Sex"}]
+
+    # The input table is not modified.
+    assert "income__sex_male__scale_none" in tb.columns
+    assert tb["income__sex_male__scale_sqrt"].m.dimensions == {"sex": "male", "equivalence_scale": "square root"}
+    assert len(tb.metadata.dimensions) == 2
+
+
+def test_filter_columns_by_dimension_choices_expands_without_the_dimension():
+    """
+    Test that a table processed with filter_columns_by_dimension_choices expands into a collection
+    config without the dropped dimension (the motivating use case, see issue #5670).
+    """
+    from etl.collection import expand_config
+    from etl.collection.utils import filter_columns_by_dimension_choices
+
+    tb = _create_table_with_dimensions()
+
+    result = filter_columns_by_dimension_choices(tb, {"equivalence_scale": "square root"})
+    config = expand_config(result, indicator_names="income")
+
+    # Only the sex dimension is left, so no single-option dropdown is rendered.
+    assert [dim["slug"] for dim in config["dimensions"]] == ["sex"]
+    assert len(config["views"]) == 2
+    for view in config["views"]:
+        assert "equivalence_scale" not in view["dimensions"]
+
+
+def test_filter_columns_by_dimension_choices_errors():
+    """
+    Test filter_columns_by_dimension_choices error cases - unknown dimension and unknown choice.
+    """
+    from etl.collection.utils import filter_columns_by_dimension_choices
+
+    tb = _create_table_with_dimensions()
+
+    with pytest.raises(ValueError, match="Dimension 'welfare' not found"):
+        filter_columns_by_dimension_choices(tb, {"welfare": "income"})
+
+    with pytest.raises(ValueError, match="Available choices"):
+        filter_columns_by_dimension_choices(tb, {"equivalence_scale": "oecd"})
+
+    # An indicator that has dimensions but not the one being filtered cannot be filtered, and keeping it
+    # would add views for choices the caller excluded. It must fail instead.
+    from owid.catalog import Variable
+    from owid.catalog.core.meta import VariableMeta
+
+    tb["income__sex_male"] = Variable(
+        tb["income__sex_male__scale_sqrt"],
+        name="income__sex_male",
+        metadata=VariableMeta(original_short_name="income", dimensions={"sex": "male"}),
+    )
+    with pytest.raises(ValueError, match="have dimensions, but not 'equivalence_scale'"):
+        filter_columns_by_dimension_choices(tb, {"equivalence_scale": "square root"})
+
+
+def test_filter_columns_by_dimension_choices_keeps_several_choices():
+    """
+    Test filter_columns_by_dimension_choices with a list of choices - a dimension that keeps more
+    than one choice is not dropped, since its dropdown still has something to choose from.
+    """
+    from etl.collection.utils import filter_columns_by_dimension_choices
+
+    tb = _create_table_with_dimensions()
+
+    result = filter_columns_by_dimension_choices(tb, {"sex": ["male", "female"]})
+
+    # Nothing is filtered out, since both choices of sex are kept.
+    assert sorted(result.columns) == sorted(tb.columns)
+
+    # sex is kept (two choices), equivalence_scale too (also two choices).
+    assert result["income__sex_male__scale_sqrt"].m.dimensions == {"sex": "male", "equivalence_scale": "square root"}
+    assert [dim["slug"] for dim in result.metadata.dimensions or []] == ["sex", "equivalence_scale"]
+
+
+def test_filter_columns_by_dimension_choices_several_dimensions():
+    """
+    Test filter_columns_by_dimension_choices with more than one dimension - a column is kept only if
+    it matches every given dimension, and both dimensions end up with a single choice, so both go.
+    """
+    from etl.collection.utils import filter_columns_by_dimension_choices
+
+    tb = _create_table_with_dimensions()
+
+    result = filter_columns_by_dimension_choices(tb, {"sex": "female", "equivalence_scale": "square root"})
+
+    assert sorted(result.columns) == ["country", "income__sex_female__scale_sqrt", "year"]
+    assert result["income__sex_female__scale_sqrt"].m.dimensions == {}
+    assert result.metadata.dimensions == []
+
+
+def test_filter_columns_by_dimension_choices_without_dropping_dimensions():
+    """
+    Test filter_columns_by_dimension_choices with drop_single_choice_dimensions=False - the columns
+    are filtered, but the dimension is left in the metadata.
+    """
+    from etl.collection.utils import filter_columns_by_dimension_choices
+
+    tb = _create_table_with_dimensions()
+
+    result = filter_columns_by_dimension_choices(
+        tb, {"equivalence_scale": "square root"}, drop_single_choice_dimensions=False
+    )
+
+    assert sorted(result.columns) == [
+        "country",
+        "income__sex_female__scale_sqrt",
+        "income__sex_male__scale_sqrt",
+        "year",
+    ]
+    assert result["income__sex_male__scale_sqrt"].m.dimensions == {"sex": "male", "equivalence_scale": "square root"}
+    assert [dim["slug"] for dim in result.metadata.dimensions or []] == ["sex", "equivalence_scale"]
+
+
+def test_filter_columns_by_dimension_choices_with_non_string_choices():
+    """
+    Test filter_columns_by_dimension_choices with integer choices - dimension choices are not always
+    strings (e.g. ppp_version=2021 in the World Bank PIP collections).
+    """
+    from owid.catalog import Table, Variable
+    from owid.catalog.core.meta import VariableMeta
+
+    from etl.collection.utils import filter_columns_by_dimension_choices
+
+    tb = Table(
+        {"country": ["USA"], "year": [2020], "poverty__ppp_2017": [1], "poverty__ppp_2021": [2]},
+        short_name="test_table",
+    )
+    for ppp_version in [2017, 2021]:
+        column = f"poverty__ppp_{ppp_version}"
+        tb[column] = Variable(
+            tb[column],
+            name=column,
+            metadata=VariableMeta(original_short_name="poverty", dimensions={"ppp_version": ppp_version}),
+        )
+    tb.metadata.dimensions = [{"slug": "ppp_version", "name": "PPP version"}]
+
+    result = filter_columns_by_dimension_choices(tb, {"ppp_version": 2021})
+
+    assert sorted(result.columns) == ["country", "poverty__ppp_2021", "year"]
+    assert result["poverty__ppp_2021"].m.dimensions == {}
+    assert result.metadata.dimensions == []
+
+
 def test_resolve_grapher_schema_accepted_forms():
     """
     Test resolve_grapher_schema - both authoring forms resolve to a full schema URL.
