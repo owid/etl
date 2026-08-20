@@ -11,10 +11,35 @@ Joins the three halves of a static-viz refresh that are otherwise separate: gett
 ETL at a current vintage, drawing it in an `export://static_viz` step whose SVG a designer can
 actually pick up, and getting that SVG into the Charts file.
 
-> **Paired skill — keep in sync.** [`/create-figma-chart`](../create-figma-chart/SKILL.md) owns
-> everything that happens inside Figma, and this skill hands off to it at Step 7. If you change
-> what the ETL step emits — node naming, frame proportions, which text slots it fills — check
-> whether that skill's Step 1/3/7 notes on local SVGs still hold.
+> **Paired skill — an update here may oblige an update there, and the reverse.**
+> [`/create-figma-chart`](../create-figma-chart/SKILL.md) owns everything that happens inside Figma,
+> and this skill hands off to it at Step 7. The two share a contract that lives half in each file, so
+> **when you change something on this list, check the other skill in the same session and update it
+> too — or state explicitly that you checked and no change was needed.** Neither side may drift
+> silently; a stale cross-skill fact is how a later run re-derives geometry by trial and error.
+>
+> | Shared fact | Owner | Consumed by |
+> |---|---|---|
+> | Template geometry — node ids, sizes, band top, footer starts | [`TEMPLATES.md`](TEMPLATES.md) | both |
+> | The content box and the band a chart is fitted into | TEMPLATES.md | both |
+> | Node naming (`gid`s) this step emits, and frame proportions | this skill | that skill's Steps 1/3/7–8 |
+> | Which text slots this step fills vs. leaves to the template | this skill | that skill's Step 6 |
+> | Type and palette — this step sets neither | that skill | this skill defers to it |
+> | The design vocabulary (per chart type, labeling, colors) | that skill's [`GUIDELINES.md`](../create-figma-chart/GUIDELINES.md) | both |
+>
+> The asymmetry worth remembering: **this skill owns the data, the geometry and the proportions; that
+> one owns the type and the palette.** A change that crosses that line belongs in both files. In
+> particular, if you change what the step emits — node naming, frame proportions, which text slots it
+> fills — check whether that skill's Step 1/3/7 notes on local SVGs still hold.
+>
+> Its **[`GUIDELINES.md`](../create-figma-chart/GUIDELINES.md)** is where the visual vocabulary this
+> skill defers to actually lives — the per-chart-type rules, direct labeling in place of legends, the
+> OWID palette, the annotation and reference-line conventions. Read the section for your chart type
+> before choosing a form or deciding what to label: the point is not to style anything here, it is to
+> avoid emitting a structure the Figma pass then has to undo (a legend that should have been direct
+> labels, a category count that cannot be labeled in place). That file also indexes the design team's
+> **DI Chart Library** (`pltrHXyVLg2XaNq4AvxPaK`, **read-only**) — 272 finished charts filed by chart
+> type, which is the closest thing to precedent for whatever you are about to draw.
 
 Two companions in this directory:
 

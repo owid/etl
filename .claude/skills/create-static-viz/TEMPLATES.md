@@ -5,9 +5,16 @@ re-deriving it through Figma MCP calls every time.
 
 - **File:** `Charts (2026)`, file key `s6Sv60bakebRRW2TxsMQbF`
 - **Page:** `📑 Templates`, node `798:54`
-- **Re-verify with:** `get_metadata` on `798:54` for positions, `get_screenshot` on a frame for colors
-- **Last verified:** 2026-08-17 (Vertical and Mobile example 2 measured in full, including the
-  header/footer auto-layout structure, every slot's line height and face, and the frame fill)
+- **Re-verify with:** `/create-figma-chart`'s [`scripts/verify_templates.js`](../create-figma-chart/scripts/verify_templates.js)
+  — it checks the shared geometry (sizes, content box, header band, footer position and growth) for all
+  ten templates and returns an `ok`/`DRIFT` verdict. Use `get_metadata` on `798:54` for the per-slot
+  positions it does not cover, and `get_screenshot` on a frame for colors. **Run it every refresh —
+  the date below never licenses skipping it.** A `DRIFT` verdict stops the refresh and gets reported.
+- **Last verified:** 2026-08-20 — the rhythm parameters and the Horizontal, Vertical and Mobile
+  example 1 header/footer structure re-measured live; the script returned `ok` on all ten templates.
+  The date is provenance, for judging a drift report. If the script *cannot* run, verify by hand with
+  `get_metadata` anyway, and let the date say how far to distrust this file meanwhile: **two weeks or
+  older, treat every number here as suspect.**
 
 The design team edits these frames in place, and edits that move a chart area's edge have landed days
 apart. **Re-verify the geometry at the start of every refresh** rather than trusting this file: a step
@@ -68,26 +75,36 @@ fills these same slots when the SVG is imported.
 |---|---|---|---|---|
 | Title | 16.22 | 737.84 | 58 (**two lines**) | 25 |
 | Logo | 16 | 64 | 35 (top-right, x=770) | — |
-| Subtitle | 80.22 | 817.57 | 38 (two lines) | 16 |
+| Subtitle | 80 | 818 | 38 (two lines) | 16 |
 | *chart area* | *118 → 558.6* | 818 | ~440 | — |
 | `Note:` | 558.62 | 818 | 28 (two lines) | **12** |
 | `Data source:` | 590.62 | 818 | 14 | **12** |
 | Tagline (left) | 608.62 | 467 | 13 | **11** |
 | License (right, x=571) | 608.62 | 263 | 13 | **11** |
 
-The slots sit in two auto-layout frames: header block `25398:753` spans 0→134.22, footer block
-`25398:769` starts at 542.62. Each carries 16 px of inner padding on the chart side, so the visual
-chart area starts at 118 while `header.y + header.height` reads 134.22 — that edge plus the padding.
+The slots sit in two auto-layout frames: a header block (`Frame 20` at last check) spanning **0→118**,
+and footer block **`Frame 22` (`25808:13`)** starting at **559**. **Neither wrapper carries inner
+padding** — `header.y + header.height` *is* the chart area's top edge at 118, and the footer's own `y`
+is the `Note:` row. Resolve both structurally (topmost/bottommost auto-layout child) rather than by
+name or id: the design team renames and re-ids these frames in place.
 
 ### Vertical — 850 × 1095
 
-Same slots, widths, sizes and auto-layout wrappers as Horizontal. Header block `5332:94` is
-**0→134.22**; footer block `5332:101` starts at **999.81**. Absolute y: title 16.22, subtitle 80.22,
-chart area 118 → 1015.81, `Note:` 1015.81, `Data source:` 1047.81, tagline/license 1065.81.
+Same slots, widths, sizes and auto-layout wrappers as Horizontal. The header block (`Frame 23`) is
+**0→118**; footer block **`Frame 25` (`25808:16`)** starts at **1015.81**. Absolute y: title 16.22,
+subtitle 80.22, chart area 118 → 1015.81, `Note:` 1015.81, `Data source:` 1047.81, tagline/license
+1065.81.
 
-**The two header blocks are now identical at 134.22.** They used to differ — 136 here against 134,
-from a 30 px title line height against 29 — and that difference is gone, so don't reintroduce a
-Vertical-specific header offset.
+**The two header blocks are identical at 118**, so don't reintroduce a Vertical-specific header
+offset. They used to differ (136 against 134, from a 30 px title line height against 29), and before
+that both read 134.22 — an edge that only existed because the wrappers were padded 16 px on the chart
+side. Both the padding and that difference are gone.
+
+> **Wrapper figures re-verified 2026-08-19; the slot table above was not.** The wrapper ids, the 118
+> header bottom and the removal of the padding come from the same measurement pass as
+> `/create-figma-chart`'s node map. The per-slot `y` values still date from 2026-08-17 and sit within
+> ~0.4 px of it (the footer rows derive as 559 / 591 / 609 against the tabled 558.62 / 590.62 /
+> 608.62) — immaterial for emitting an SVG, but re-measure before trusting them for anything tighter.
 
 ### The license slot holds about fifty characters
 
@@ -149,7 +166,7 @@ this is what leaves a line of dead space above a plot, and it survives every con
 So derive them, from this rhythm:
 
 ```
-title_row   = max(title_lines × 29, logo_px) + row_pad_px     # the row hugs the taller of the two
+title_row   = title_lines × 29 + row_pad_px                   # no max(): the logo is a SIBLING, see below
 subtitle_y  = origin_y + title_row + 6                        # 6 px auto-layout gap
 band_top    = subtitle_y + subtitle_lines × 19                # the subtitle's ink bottom
 band_bottom = note_ink_bottom − note_lines × 14               # the Note's ink top, growing upward
@@ -157,18 +174,46 @@ band_bottom = note_ink_bottom − note_lines × 14               # the Note's in
 
 | | 850-wide pair | Mobile (both) |
 |---|---|---|
-| `origin_y` (the header block's own top edge) | 0 | 16 |
-| `logo_px` (the logo's **row**, not the logo) | 35.26 (Horizontal) / 41.26 (Vertical) | 35.23 |
-| `row_pad_px` (the title row's own top padding) | 16.22 | 0 |
-| `note_ink_bottom` | 586.62 (Horizontal) / 1043.81 (Vertical) | — (no Note row) |
-| footer row spacing / block top padding | 4 / 16 | 4 / 0 |
+| `origin_y` (the header block's own top edge) | 16 | 16 |
+| `logo_px` (the logo's **row**, not the logo) | 0 — the logo is a sibling | 0 — the logo is a sibling |
+| `row_pad_px` (the title row's own top padding) | 0 | 0 |
+| `note_ink_bottom` | 587 (Horizontal) / 1043.81 (Vertical) | — (no Note row) |
+| footer row spacing / block top padding | 4 / 0 | 4 / 0 |
 
-**`logo_px` is per template, including within the 850-wide pair.** All three frames hold the same
-logo instance (35.18 px), but the wrapper around it does not: Vertical's `Frame 1` (`5332:97`) adds
-6.08 px of top padding, making its row **41.26**, while Horizontal's (`25398:755`) adds 0.08 and comes
-to **35.26**. So the logo sits 6 px lower on Vertical, and any figure derived from `logo_px` differs
+**Re-measured live on 2026-08-20** off `5332:93`, `5332:75` and `24590:20`. The headline is that **the
+rebuild unified the two families' header rhythm** — both now sit at `origin_y = 16` with no row
+padding, where the old padded generation had the 850-wide pair spanning the frame at `origin_y = 0`
+and carrying the 16.22 px inside `row_pad_px`. The line steps survived the rebuild unchanged: title
+**29**/line, subtitle **19**/line, a **6** px gap between them, and **4** px between footer rows.
+
+The rhythm now reproduces both templates exactly, which is the check that matters:
+
+| Case | Derivation | Live |
+|---|---|---|
+| Placeholder (2-line title, 2-line subtitle) | `16 + 58 + 6 + 38` | **118** ✓ |
+| One-line title, one-line subtitle | `16 + 29 + 6 + 19` | **70** ✓ |
+
+That second row is the one that used to disagree: the stale `origin_y = 0` / `row_pad_px = 16.22` pair
+derived **82.48** against a measured 70, and the 12.48 px gap between them was the whole error. Both
+figures now fall out of the same formula.
+
+> **The header is a flat auto-layout of `[title, subtitle]` with the logo as a SIBLING**, not a child
+> of a title row (`/create-figma-chart`'s SKILL.md → node map). A sibling contributes nothing to the
+> header's height, so `logo_px` is 0, the `max(…, logo_px)` cap does not apply, a one-line title *does*
+> shrink the header by a line, and there is no logo surplus to land between the title and the subtitle.
+> The logo constrains **width** instead: the title node is sized narrower than the content box to clear
+> it — 737.84 against 818 on the 850-wide pair, 428 against 508 on mobile.
+>
+> Everything below this note describes the **superseded nested-logo generation** and is kept only so a
+> regression stays recognizable. Its arithmetic no longer applies; the table above is the live one.
+
+**`logo_px` was per template, including within the 850-wide pair.** All three frames held the same
+logo instance (35.18 px), but the wrapper around it did not: Vertical's `Frame 1` (`5332:97`) added
+6.08 px of top padding, making its row **41.26**, while Horizontal's (`25398:755`) added 0.08 and came
+to **35.26**. So the logo sat 6 px lower on Vertical, and any figure derived from `logo_px` differed
 between the two by that much. Note also that the Horizontal slot table above records the logo as `35`
-— that is the *instance*, not the row, and it is the row that sets the header's height.
+— that is the *instance*, not the row, and in that generation it was the row that set the header's
+height.
 
 **`origin_y` and `row_pad_px` never both carry the 16 px.** The two families put that padding in
 different places, and the tables above are the only place that shows it: on the 850-wide pair the
@@ -177,36 +222,46 @@ while on mobile the block starts at `y = 16` and its title row holds none. Count
 a two-line title puts the subtitle at 96.44 against the measured 80.22, dropping the whole band by
 16.22 px.
 
-**Two things here are counter-intuitive and both cost a round to find.** A one-line title does *not*
-shrink the header by a line: below `logo_px` the **logo** sets the row's height, so the header bottoms
-out at **82.48 on Vertical** and **76.48 on Horizontal** however short the title gets. And the
-footer's rows are pinned to the frame's bottom margin, so a Note gaining a line does not push the
-source row down — it eats the chart's height instead.
+**Two things here were counter-intuitive and both cost a round to find.** The first no longer holds:
+while the logo capped the title row, a one-line title did *not* shrink the header by a line — below
+`logo_px` the **logo** set the row's height, so the header bottomed out at **82.48 on Vertical** and
+**76.48 on Horizontal** however short the title got. With the logo now a sibling that cap is gone and
+a one-line title does shrink the header (see the note above). The second still holds: the footer's
+rows are pinned to the frame's bottom margin, so a Note gaining a line does not push the source row
+down — it eats the chart's height instead.
 
-### A one-line title leaves a gap the templates were never exercised for
+### A one-line title left a gap the templates were never exercised for — and the fix has shipped
 
-That first point has a visible consequence, not just an arithmetic one. Because the title row hugs the
-taller of the title and the logo, and both are top-aligned, the logo's surplus height lands *between
-the title and the subtitle*: **12.26 px on Vertical, 6.26 on Horizontal**, on top of the 6 px
+That first point had a visible consequence, not just an arithmetic one. Because the title row hugged
+the taller of the title and the logo, and both were top-aligned, the logo's surplus height landed
+*between the title and the subtitle*: **12.26 px on Vertical, 6.26 on Horizontal**, on top of the 6 px
 auto-layout gap. Every finished page in the Charts file shows **6 px** there — they all have two-line
-titles, taller than the logo — so a one-line title is the only case that looks wrong, and on Vertical
-it looks wrong by a factor of three.
+titles, taller than the logo — so a one-line title was the only case that looked wrong, and on
+Vertical it looked wrong by a factor of three.
 
-The fix is in Figma, not in the step: set the logo to `layoutPositioning = "ABSOLUTE"` in the title
-row, which keeps it exactly where it is and stops it padding the block. Then set the step's `logo_px`
-to 0 for that frame so the derived band follows the header up.
+**The templates have since been rebuilt with the logo outside the header, which is that fix.** There
+is no longer a title row to take the logo out of, so do **not** go looking for one to set
+`layoutPositioning = "ABSOLUTE"` on — the step-side half is all that is left: keep `logo_px` at 0 so
+the derived band follows the header up. Kept here because the gap is what a regression would look
+like: if a one-line title ever comes back with 12 px above its subtitle, the logo has been moved back
+inside the header.
 
-**Check one thing before doing it, per frame.** With the header raised, the subtitle's first line now
-runs at the logo's height, and the subtitle slot is full-width in every template. So it is safe only
-where that line's ink stops short of the logo's left edge — on the Vertical frame it ended at x=588
-against a logo at 770, comfortably clear; on the 540-wide one it reached x=493 against a logo at 476,
-so the logo has to stay in the flow and that frame keeps the wider gap. Measure the first line rather
-than eyeballing it (the recipe below), and expect the answer to differ between the two frames of the
-same chart.
+**Check one thing per frame, since the header now sits raised by default.** The subtitle's first line
+runs at the logo's height, and the subtitle slot is full-width in every template. So the raised header
+is safe only where that line's ink stops short of the logo's left edge — on the Vertical frame it
+ended at x=588 against a logo at 770, comfortably clear; on the 540-wide one it reached x=493 against
+a logo at 476, which collides. **Keeping the logo in the header's flow is no longer one of the
+remedies** — it is a sibling on every family now, so the gap it used to buy is gone. Where the first
+line reaches the logo, shorten or wrap the subtitle instead. Measure that line rather than eyeballing
+it (the recipe below), and expect the answer to differ between the two frames of the same chart.
 
-Calibrate any implementation against both ends: the templates' own two-line/two-line case must
-reproduce **118.22** on either 850-wide frame, and a one-line/one-line clone **82.48** on Vertical
-(the live clone measured 82.47) or **76.48** on Horizontal.
+Calibrate any implementation against both ends — **but not against the figures below until they are
+re-measured.** They are the padded, logo-capped generation's: two-line/two-line reproducing **118.22**
+on either 850-wide frame (the current templates measure **118**), and a one-line/one-line clone
+**82.48** on Vertical (the live clone of the day measured 82.47) or **76.48** on Horizontal, where the
+current structure puts Static Vertical at **70**. Take the two-line/two-line end from
+`/create-figma-chart`'s node map, and measure the one-line/one-line end on a live clone before
+calibrating against it.
 
 ## Lay the plot inside the template's band, and draw the slots at the template's own sizes
 
@@ -219,8 +274,11 @@ chart_top_px = band_top + BAND_INSET + header_px
 chart_bottom_px = band_bottom - BAND_INSET - below_px
 ```
 
-**Both edges are ink, not frame.** The footer *frame* starts 16 px above its `Note:` ink, so insetting
-from the frame's `y` insets twice and leaves a visibly loose bottom.
+**Both edges are ink, not frame — and on the current templates the footer frame's own `y` *is* its
+first row's ink** (Horizontal's footer starts at 559, which is the `Note:` row). So inset once, from
+that edge. This used to need a correction: the footer frame started 16 px above its `Note:` ink, and
+insetting from the frame's `y` then inset twice and left a visibly loose bottom. If you measure that
+gap again, the wrappers have been re-padded — re-verify before compensating for it.
 
 **Draw the step's own copies of these slots at the sizes in the table, not at sizes that merely look
 right.** It is tempting to set the step's title and subtitle a size or two smaller — nothing in the
