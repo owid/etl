@@ -270,6 +270,33 @@ curl -sL "https://ourworldindata.org/grapher/<slug>.svg?<params>&imType=uncaptio
 head -c 300 $DIR/embed.svg   # expect <svg ... width="..." height="...">, no <html
 ```
 
+> **[`scripts/solve_export.py`](scripts/solve_export.py) does this arithmetic — don't do it by hand.**
+> Run it from the repo root through the venv — `.venv/bin/python .claude/skills/create-figma-chart/scripts/solve_export.py …`;
+> it is committed non-executable like the rest of that directory.
+> `--band 508x371 --slug <slug>` returns the solved `imFontSize`, the `imWidth`/`imHeight` to
+> request, the predicted content box, the **height-first** scale into the band, the leftover width
+> the x-map has to close, the final label size, and the finished `curl`. Two things to read it by:
+> it reports the leftover width rather than a predicted gap, because the gap is exact by
+> construction once you fit the height (Step 7) — that leftover is the same quantity
+> `measure_fit.js` reports as `xMapShortfall`, and it is the aspect miss expressed in px; and every
+> number comes from the **rounded** `imFontSize`, since that is what the URL carries, so the label
+> size quoted is the one the `curl` will actually produce (it prints the ideal font alongside when
+> rounding moves it). It also carries the model's own self-test (`--self-test`, which reproduces
+> both worked examples below to within 1.4px, round-trips the band arithmetic exactly, and checks
+> that a reflected second pass still lands its `--target-label`) and the `--thumbnail` route for a
+> 302-wide chart.
+>
+> **It solves for `band − 2×--gap`, not for the band** — the gap below is a requirement of the fit,
+> so a solve that ignores it lands the chart edge to edge and you re-export. `--gap` defaults to 14
+> and takes 30 for the Instagram portrait. For a 508×371 band that makes the target 508×343, and the
+> solve returns `imFontSize=29, imWidth=1448`, predicting an 818.8×552.8 content box that scales to
+> 508×343 — 14px at each end. Verified end to end at `--gap 0` (i.e. filling the band, which is what
+> this script did before the gap was reserved): it solved `imFontSize=28, imWidth=1346` and predicted
+> 828×616, and grapher returned **829×616** with `font-size="21"`, landing labels at exactly 13.5px —
+> so the canvas model is confirmed against the real renderer; it is the target fed into it that the
+> gap changes. After you have measured a real import, run the `nextPass` command that
+> `measure_fit.js` prints rather than passing the measured aspect back yourself — see Step 7.
+
 **The aspect you request is the *canvas*, not the chart — solve for the padding or you will re-export every page.** Grapher insets the drawing inside the SVG it hands back, so the group Figma imports is smaller than the declared size, and it is the *group* that has to fill the template band. Measured on this file's charts, the inset is close to **1.4 × `imFontSize` on each axis** (at `imFontSize=32`: declared 901×566 → content 857×520; at 30: 862×591 → 818.9×550). So don't request the aspect you want — request the aspect that *yields* it, by solving
 
 ```

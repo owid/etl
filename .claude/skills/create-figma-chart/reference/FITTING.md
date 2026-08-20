@@ -370,6 +370,47 @@ The table gives one number per template — the band you fit a chart into — an
 
 Verify against the actual clone with `get_metadata` (the templates evolve; the geometry above is a 2026 snapshot). These are **frame-local** coordinates, and `x`/`y` are relative to a node's parent — so append the embed to the template clone **before** positioning it. Left parented to the page (where Step 5 puts imported nodes), the same numbers land it near the page origin, on top of the reference chart. One wrinkle in the same rule: **a GROUP is transparent for coordinates**, so once the imported chart is inside the template, its descendants report `x`/`y` in the *template frame's* space, not the group's — which is what makes the frame-local numbers above directly usable on the plot's internals.
 
+> **[`scripts/measure_fit.js`](../scripts/measure_fit.js) returns every number in this step in one
+> read-only `use_figma` call** — the band off the *filled* clone, the content box, the header's
+> sizing (including whether it actually `reflows`), and, given the imported group, its measured
+> bbox, content aspect, the **height-first** scale this step fits with (`TARGET_H / chart.height`,
+> as `fitScaleToBandH`) and the leftover width the x-map has to close (`xMapShortfall`). It reports
+> the height-first factor deliberately: the gap comes out right by construction once you fit the
+> height, so the leftover width — not the gap — is what tells you the aspect still needs a pass. It
+> resolves header and footer with the same structural rule as `verify_templates.js`, so a renamed
+> frame cannot silently return `null`.
+>
+> Three things it does that hand-probing tends to get wrong. It reports **rendered** line counts
+> (height ÷ lineHeight) rather than counting `\n`, because a *wrapped* title has no newline in it
+> and an explicit-break count reports a two-line title as one. `hideIds` computes the group's
+> bbox **as if** `connectors` and the year markers were hidden, without hiding them — so the aspect
+> you get is the one you will actually fit, with the file untouched. And it takes the content box
+> from the **header** (`header.x`/`header.width`, as `verify_templates.js` does) rather than from a
+> union over `frame.children`: by this step the chart is already appended to the clone, so a union
+> would include the not-yet-fitted group, inflate the box to the group's own width, and report a
+> scale of ≈1 — "nothing to do" — which is the one answer the script exists to produce. The union is
+> still reported as `contentBoxFromRows` for cross-checking, with the group excluded.
+>
+> **Run the `nextPass` command it prints; do not feed the measured aspect back yourself.** The
+> second pass has to aim at the *reflection* of the measured aspect about the target
+> (`2×target − measured`), not at the measured aspect itself — solving for what you already got moves
+> the next export further off, by about the same margin again. On the case recorded above (target
+> 1.4810 on a 508×371 band, group measured 1.4342) passing the measured aspect back lands a 2.4px
+> gap where 14 was wanted, and the reflection lands 14.0. `nextPass` carries the band, the `--gap`,
+> the `--target-label` and the corrected aspect already — set `targetGap` and `targetLabel` in its
+> `CONFIG` to whatever the first export used, or a portrait solved for 15px labels comes back at 13.5
+> purely from re-solving the aspect. When the measurement is more than 15% off the target it drops the
+> correction and tells you to solve fresh, because that far out is a wrong export or leftover
+> furniture, not a near-miss.
+>
+> It also reports `excluded` as `{requested, matched, unmatched}` rather than a count, and warns on
+> any `hideIds` entry that names nothing under the group: an id copied from another page excludes
+> nothing, and a bare count would report that as a success while the aspect still carried the
+> connectors.
+>
+> Cross-checked read-only against three live templates; every field matched `verify_templates.js`'s
+> expected geometry, Static Vertical's `1015.81` footer included.
+
 **The header reflows itself — don't reposition it.** Every template's header block is a flat vertical auto-layout of `[title, subtitle]` (the logo is a sibling, not a child — see the node map), so a title that grows from two lines to three pushes the subtitle down and grows the header on its own. Set `characters`, then **read the new `header.y + header.height` back** and measure the band from that; any y you computed before the text went in is stale. Measured on the portrait: a two-line title gives a 135 band bottom, three lines 199.
 
 **The logo no longer sets a floor under that** — it is a sibling of the header, not a child, so it contributes nothing to the header's height and a one-line title buys the full reduction. What the logo still constrains is *width*: the title node is sized narrower than the content box to clear it (737.84 against 818 on Static Vertical, 428 against 508 on the 540-wide set), which is the number a title has to be measured against. Read the band back rather than deriving it from line counts either way.
