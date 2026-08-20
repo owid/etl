@@ -26,6 +26,10 @@ tables:
       energy_consumption_from_nuclear: {}
       energy_consumption_from_renewables: {}
       energy_consumption_from_biofuels: {}
+      energy_production_from_biofuels:
+        description_key:
+          - The producer counts biofuels as renewable primary energy, so this is already included in its
+            energy production from renewables and other, and the two should not be added together.
       energy_consumption_from_other_renewables: {}
       energy_production_from_coal: {}
       energy_production_from_natural_gas: {}
@@ -43,6 +47,11 @@ tables:
       natural_gas_exports: {}
       petroleum_consumption: {}
       biofuels_consumption: {}
+      biofuels_production:
+        description_key:
+          - The producer defines petroleum and other liquids to include biofuels, so this is already
+            included in its petroleum and other liquids production, and the two should not be added
+            together.
       petroleum_production: {}
       crude_oil_production: {}
       electricity_generation: {}

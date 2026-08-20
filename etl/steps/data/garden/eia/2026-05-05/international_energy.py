@@ -122,6 +122,17 @@ INDICATORS: list[tuple[str, str, str, float, str, str, str]] = [
         "TWh",
         "Energy consumption from biofuels",
     ),
+    # The producer books biofuels output as renewable primary energy, so this is already part of
+    # energy_production_from_renewables and the two must not be added together.
+    (
+        "Biofuels production",
+        "terajoules",
+        "energy_production_from_biofuels",
+        TJ_TO_TWH,
+        "terawatt-hours",
+        "TWh",
+        "Energy production from biofuels",
+    ),
     # Energy production by source.
     (
         "Total energy production from coal",
@@ -247,6 +258,17 @@ INDICATORS: list[tuple[str, str, str, float, str, str, str]] = [
         "thousand barrels per day",
         "kb/d",
         "Biofuels consumption",
+    ),
+    # Unlike its consumption counterpart above, this one is already part of petroleum_production, which
+    # keeps the producer's own "petroleum and other liquids" definition.
+    (
+        "Biofuels production",
+        "thousand barrels per day",
+        "biofuels_production",
+        1.0,
+        "thousand barrels per day",
+        "kb/d",
+        "Biofuels production",
     ),
     (
         "Petroleum and other liquids production",
