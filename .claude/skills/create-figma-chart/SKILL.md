@@ -97,6 +97,12 @@ What is independent, and today is not batched:
 - **The Step 8c property sweeps** — font sizes, stroke weights, dash patterns, fills, polylines. Those are reads of a single page, so they collapse into *one* `use_figma` returning one JSON. `scripts/verify_templates.js` already does exactly this for ten templates.
 - **The arrow probe's baseline render.** Only the FULL render is shared across arrows: the other three states of the four-render protocol (no-arrow, no-target, both-hidden) each hide *that pair's* nodes, so they are pair-specific and cannot be reused. N arrows cost `3N + 1` screenshots, not `4N` — and not `N + 2`, which under-collects and produces masks containing another pair's target.
 
+**Measured on one template, end to end: 18 Figma calls.** Of those, 3 went on the footer-conversion
+bug now fixed in TEXTS.md and 1 on a wrong guess about the footer's layout, so the same build now
+costs ~14 — against ~21 per template on the previous run and 124–188 for a whole chart before any of
+this. The two-pass export is where the saving is concentrated: it replaces "export, eyeball, re-export"
+with one probe and one solved re-export.
+
 **What is serial for a reason — don't collapse these:**
 
 | Sequence | Why |

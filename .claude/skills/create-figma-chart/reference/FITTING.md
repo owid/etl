@@ -64,11 +64,32 @@ The chart spans the full content width, left-aligned with the title/subtitle/log
 > you have already unwrapped — delete the text first, after which the bbox *is* the canvas and one
 > rescale lands the height on the template's to `delta 0`.
 
+### The two-pass export, measured end to end
+
+Validated on a live run rather than argued from the model, so the numbers are the claim:
+
+| | pass 1 (model inset) | pass 2 (measured inset) |
+|---|---|---|
+| `imFontSize` | 29 (solved for 13.5px labels) | 29 (carried — the inset is only valid at its own font) |
+| declared, predicted → returned | 849×601 → **849×601** | 869×587 → **868×587** |
+| inset used | 40.6 / 40.6 (symmetric model) | **69.75 / 33.72** (measured) |
+| `xMapShortfall` | **24.47px** | **0.15px** |
+
+Two things worth taking from it. The probe's canvas prediction was *exact* (849×601 to the pixel), so
+a pass-1 miss is never the canvas arithmetic — it is the inset, and only the inset. And the inset read
+**identically** on both imports (69.75/33.72 against declared sizes 20px apart), which is the
+stability the second pass depends on: measured drift 0.00px, against the ~2px the docs claim. One
+`nextPass` command, run as printed, landed the fit with **no correction** — 14px gap top, 13.91
+bottom, right edge 523.96 against a 524 content box.
+
 ### An upload lands on the file's *current* page — which is not your page
 
 `upload_assets` places the import on whatever page the file currently has open, and page context is
-not what your last `use_figma` call set. On a real run that meant SVG imports quietly piling up on the
-file's **Cover** page, in a shared file, until someone noticed.
+not what your last `use_figma` call set. It landed on the file's **Cover** page on three consecutive
+uploads in one run — including immediately after a `use_figma` call that had switched to the working
+page — so treat this as the invariant, not a hazard you might dodge: **every** upload needs the
+reparent below, and the `placedOnNodeId`'s PAGE ancestor is worth logging every time so a wrong
+landing is visible in the tool result rather than discovered later.
 
 So treat the returned `placedOnNodeId` as the only reliable handle: fetch it with
 `getNodeByIdAsync`, `appendChild` it onto the page you meant, and **check the page it came from is

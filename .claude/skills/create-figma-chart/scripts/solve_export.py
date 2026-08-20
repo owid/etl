@@ -38,13 +38,21 @@ Why the model is only a probe: the `1.4 * imFontSize` figure is symmetric, and t
 Measured on an `imType=uncaptioned` line chart that reserves a right margin for a direct entity
 label:
 
-    imFontSize 30 -> insetX 64.1, insetY 29.0   (model predicts 42.0 / 42.0)
-    imFontSize 21 -> insetX 70.6, insetY 40.8   (model predicts 29.4 / 29.4)
+    imFontSize 30 -> insetX 64.1, insetY 29.0   (model predicts 42.0 / 42.0)   democracy index
+    imFontSize 21 -> insetX 70.6, insetY 40.8   (model predicts 29.4 / 29.4)   democracy index
+    imFontSize 29 -> insetX 69.8, insetY 33.7   (model predicts 40.6 / 40.6)   CO2 per capita
 
 The model is right for the charts it was measured on — the recorded examples come out ~44/46 at
 imFontSize 32 — and wrong by 2x on the horizontal axis for this class. Note also that insetY got
-*larger* as the font got *smaller*: the inset is not a simple function of imFontSize, so don't try to
-fit one from a couple of runs. Measure it. And the measured inset pins the font — pass 2 keeps the
+*larger* as the font got *smaller*, and that the third row above sits at a *higher* insetX than the
+first despite a lower font: the inset is a property of the CHART (how much right margin its direct
+labels reserve, how wide its axis ticks are), not a function of imFontSize. Don't try to fit one from
+a few runs. Measure it.
+
+What IS stable — and is the whole reason pass 2 works — is the inset at a FIXED imFontSize across the
+aspect change pass 2 makes. Measured live on the CO2 chart: pass 1 declared 849x601 and pass 2
+declared 868x587, and the inset read 69.75/33.72 on both, i.e. **0.00px of drift**. The x-map leftover
+went from 24.47px on the probe to 0.15px on the measured pass — sub-pixel, no correction needed. And the measured inset pins the font — pass 2 keeps the
 imFontSize the inset was measured at rather than re-bisecting for a label target, because changing
 the font invalidates the measurement.
 
@@ -220,6 +228,10 @@ def self_test() -> int:
     for label_, bw, bh, ix, iy, dw, dh in [
         ("square", 508.0, 409.0, 64.08, 29.04, 837.0, 609.0),
         ("desktop", 818.0, 521.0, 70.60, 40.80, 921.0, 554.0),
+        # Measured end to end on a live run: probe at imFontSize 29 declared 849x601 and inked
+        # 779.25x567.28 (inset 69.75/33.72); the pass-2 solve below predicted 869x587 and grapher
+        # returned 868x587, landing the x-map leftover at 0.15px.
+        ("co2 DI", 508.0, 380.0, 69.75, 33.72, 868.0, 587.0),
     ]:
         a = target_aspect(bw, bh, DEFAULT_GAP)
         w, h = solve_canvas(a, ix, iy)
