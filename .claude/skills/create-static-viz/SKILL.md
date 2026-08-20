@@ -296,12 +296,12 @@ Then, in this order:
        --template <name> --expect-gid <data-layer> [--expect-gid <data-layer> ...]
    ```
 2. **Read the PNG.** The verifier cannot see a collision, a widow, or a label sitting on a curve.
-   Every layout bug in this skill's Gotchas was found by looking.
+   Every layout bug in [this skill's Gotchas](reference/GOTCHAS.md) was found by looking.
 
 ## Step 6 — Iterate with the user
 
 Show the render. When a design choice is genuinely open, **measure the options and offer the
-numbers**, not adjectives — see the panel-aspect gotcha below for why.
+numbers**, not adjectives — see the [panel-aspect gotcha](reference/GOTCHAS.md) under Layout for why.
 
 ## Step 7 — Hand off to `/create-figma-chart`
 
@@ -358,7 +358,7 @@ commit the step plus its committed PNG/SVG, push, and fill in the PR body — wh
 attribution blockquote**, `> _Written by Claude <model name> — @<handle> at the wheel._`, because the
 body goes out under a human's identity. It is required on every comment you post to the PR afterwards
 too, replies to the review included. Then [`/pr-babysitter`](../pr-babysitter/SKILL.md) for the Codex
-round. **Brief the babysitter with the deliberate decisions** (see the last gotcha).
+round. **Brief the babysitter with the deliberate decisions** (see the [babysitter gotcha](reference/GOTCHAS.md) under Workflow).
 
 The code review is only the first of several. The project defines the rest, and they are people,
 not checks — from `#2459`'s workflow, with the parts this skill touches in bold:
