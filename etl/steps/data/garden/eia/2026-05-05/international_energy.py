@@ -31,17 +31,14 @@ THOUSAND_BTU_TO_KWH = 0.2930710701722222
 SHORT_TON_TO_TONNE = 0.9071847  # 1 short ton = 0.907 metric tonnes.
 TCF_TO_TCM = 0.02831685  # 1 trillion cubic feet = 0.0283168 trillion cubic metres (TCM).
 
-# Efficiencies the IEA's physical energy content method assumes when converting non-fossil
-# electricity generation back to heat input: 10% for geothermal, 33% for other thermal sources.
-# https://www.iea.org/statistics-questionnaires-faq
-GEOTHERMAL_EFFICIENCY = 0.10
-THERMAL_EFFICIENCY = 0.33
-
-# Generation columns that make up "other renewables", and the efficiency each is converted with.
+# Generation columns that make up "other renewables", and the efficiency each is converted with, taken
+# from the Statistical Review's own methodology table. Only the sources whose primary energy input is
+# heat are inflated: geothermal at 10% and the combustion of biomass at 33%. Tide and wave enter the
+# energy balance as the gross electrical output itself, at 100%, like hydro, solar PV and wind.
 OTHER_RENEWABLES_COMPONENTS = {
-    "electricity_from_geothermal": GEOTHERMAL_EFFICIENCY,
-    "electricity_from_biomass": THERMAL_EFFICIENCY,
-    "electricity_from_tide_and_wave": THERMAL_EFFICIENCY,
+    "electricity_from_geothermal": 0.10,
+    "electricity_from_biomass": 0.33,
+    "electricity_from_tide_and_wave": 1.00,
 }
 
 # Curated indicators: (eia_variable, eia_unit, output_column, factor, output_unit, output_short_unit, title).
@@ -765,10 +762,11 @@ def add_other_renewables(tb: Table) -> Table:
     tb["energy_consumption_from_other_renewables"].metadata.short_unit = "TWh"
     tb["energy_consumption_from_other_renewables"].metadata.description_processing = (
         "The producer reports how much electricity comes from geothermal, biomass and waste, and tide and "
-        "wave, but not the energy supply behind it. For consistency with our other energy datasets, which "
-        "measure energy supply as the heat that would be needed to produce that electricity, we convert "
-        "each source using the efficiencies the International Energy Agency assumes: 10% for geothermal "
-        "and 33% for the combustible sources."
+        "wave, but not the energy supply behind it. For consistency with our other energy datasets, we "
+        "measure each source the way the Energy Institute's Statistical Review does. Geothermal and the "
+        "combustion of biomass are measured as the heat needed to generate that electricity, estimated "
+        "at efficiencies of 10% and 33% respectively, while tide and wave are measured as the "
+        "electricity itself."
     )
     return tb
 
