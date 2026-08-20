@@ -156,6 +156,16 @@ const collect = (n, insidePlot, inFurniture) => {
   // the whole series (measured: 210x114 and 401x290 on a two-line chart), so testing against it would
   // flag every annotation placed anywhere over the plot. So take the name from the group and a box per
   // marker from its leaf descendants.
+  // Filled DATA MARKS — a bar segment, a stacked band, a map shape. CHECKS.md forbids an annotation
+  // covering "a bar segment carrying a number", and a strokeless filled rect appears in neither the
+  // stroke inventory nor the dot/value one, so on a segmented bar an annotation could cover a coloured
+  // segment while missing its `value__*` text and the row still returned ok. Anything inside the plot
+  // that carries a visible solid fill, is not furniture, and is not text is a mark the reader sees.
+  if (insidePlot && !inFurniture && n.type !== "TEXT" && !(("children" in n) && n.children.length)) {
+    const mb0 = rel(n);
+    const filled = Array.isArray(n.fills) && n.fills.some((f) => f.type === "SOLID" && f.visible !== false);
+    if (filled && mb0 && mb0.w > 0 && mb0.h > 0) markBoxes.push({ name: n.name, box: mb0, why: "a filled data mark", insidePlot });
+  }
   if (/^datapoints__|^dot__|^value__/.test(n.name)) {
     const why = /^value__/.test(n.name) ? "a value label" : "a dot";
     const pushLeafBoxes = (m) => {

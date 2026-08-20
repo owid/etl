@@ -98,6 +98,9 @@ function buildFrame(opts = {}) {
       vectorNetwork: { vertices: [{ x: 0, y: 0 }, { x: 0, y: 6 }], segments: [{ start: 0, end: 1 }] } })] }));
   // A map: every country is a stroked non-series plot node at 0.22px by design. Nested under NO
   // axis/grid group, so the furniture rule must not reach it.
+  // A segmented bar: a filled rect with NO stroke and NO value label of its own.
+  if (opts.barSegment) kids.push(node({ type: "RECTANGLE", name: "bar__A", x: 100, y: 380, width: 160, height: 40,
+    fills: solid("#4c6a9c") }));
   if (opts.mapCountries) kids.push(node({ name: "countries", x: 40, y: 160, width: 400, height: 200, children: [
     node({ type: "VECTOR", name: "country__FRA", x: 40, y: 160, width: 60, height: 40, strokeWeight: 0.22,
            strokes: solid("#ffffff"), dashPattern: [], fills: solid("#4c6a9c"),
@@ -335,6 +338,18 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     check("20 block-gap SKIPPED on 302", row(out, "annotation-block-gap").status === "SKIPPED", row(out, "annotation-block-gap").detail);
     const big = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, stroke: "#ffffff", strokeWeight: 3 }) }), {});
     check("20 540-wide still checks block-gap", row(big, "annotation-block-gap").status !== "SKIPPED", row(big, "annotation-block-gap").detail);
+  }
+
+  // 21 — an annotation covering a filled bar segment, with no value label to catch it.
+  {
+    const out = await run(buildFrame({ barSegment: true,
+      annotation: annotation({ x: 120, y: 390, w: 80, h: 16, stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    const d = row(out, "annotation-overlap").detail;
+    check("21 covering a bar segment FAILS", row(out, "annotation-overlap").status === "FAIL", d);
+    check("21 names the segment", /bar__A/.test(d), d);
+    const clear = await run(buildFrame({ barSegment: true,
+      annotation: annotation({ x: 120, y: 150, w: 80, h: 16, stroke: null, strokeWeight: 0 }) }), {});
+    check("21 an annotation clear of it passes", !/bar__A/.test(row(clear, "annotation-overlap").detail), row(clear, "annotation-overlap").detail);
   }
 
   const bad = results.filter((x) => !x.ok);
