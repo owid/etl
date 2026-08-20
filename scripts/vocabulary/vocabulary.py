@@ -31,6 +31,7 @@ import tempfile
 from pathlib import Path
 
 import click
+import httpx
 from dotenv import load_dotenv  # ty: ignore
 from google import genai  # ty: ignore
 from google.genai import errors as genai_errors  # ty: ignore
@@ -53,6 +54,19 @@ DEFAULT_MODEL = "gemini-3.7-flash"
 # before letting it fail.
 LLM_MAX_ATTEMPTS = 4
 LLM_RETRY_BACKOFF_SECONDS = 4
+
+# Phase 2 asks the site's own search API what each candidate term actually
+# returns, so phase 3 can judge the shortlist on real results rather than on how
+# the terms read. This is the same Algolia index the all-charts block searches,
+# filtered to the same topic, so "what would a reader see if they clicked this
+# chip" is answered directly instead of guessed at.
+DEFAULT_SEARCH_API = "https://ourworldindata.org/api/search"
+# How many results define a term's destination. A suggestion is a shortcut to
+# the top of a result list, not to all of it — two terms whose first few charts
+# are identical are duplicates however long their tails are.
+SEARCH_API_TOP_N = 3
+SEARCH_API_CONCURRENCY = 8
+SEARCH_API_TIMEOUT_SECONDS = 30
 
 # Gemini pricing per million tokens, for the cost estimate the CLI prints.
 # Models absent from here still run; their cost is simply reported as unknown,
@@ -248,8 +262,161 @@ never pad the list with variations to reach a number):
         raise RuntimeError(f"LLM extraction failed for {topic_name}: {e}")
 
 
-async def process_topics(topic_slugs: list[str], api_key: str, model: str) -> tuple[list[dict], list[str]]:
+async def fetch_term_results(
+    client: httpx.AsyncClient,
+    api_base: str,
+    topic_name: str,
+    term: str,
+    semaphore: asyncio.Semaphore,
+) -> list[str] | None:
+    """Titles of the first few charts the site's search returns for a term, within a topic.
+
+    Returns: chart titles, best match first; [] when the term genuinely finds
+    nothing, and None when the search could not be performed at all. The two
+    must not be conflated: "no results" is evidence against a term, whereas
+    "unmeasurable" is no evidence either way, and treating the second as the
+    first deletes perfectly good terms.
+
+    Today the API conflates them itself: a topic-filtered search that finds
+    nothing 400s if the topic is outside the 100 commonest of our ~140 topic
+    tags, claiming the topic doesn't exist (owid/owid-grapher#7026 fixes this).
+    Until that ships, terms in those topics come back unmeasurable and keep
+    their place unjudged, which is the safe direction. Afterwards an empty
+    result set arrives as a 200 and counts as evidence, as it should.
+    """
+    params = {"q": term, "topics": topic_name, "hitsPerPage": str(SEARCH_API_TOP_N)}
+    async with semaphore:
+        for attempt in range(1, LLM_MAX_ATTEMPTS + 1):
+            try:
+                response = await client.get(api_base, params=params, timeout=SEARCH_API_TIMEOUT_SECONDS)
+                response.raise_for_status()
+                results = response.json().get("results") or []
+                return [r["title"] for r in results[:SEARCH_API_TOP_N] if r.get("title")]
+            except httpx.HTTPStatusError as e:
+                # A rejected topic or query will be rejected identically on a
+                # retry; only server-side trouble is worth another go.
+                if e.response.status_code < 500:
+                    return None
+                if attempt == LLM_MAX_ATTEMPTS:
+                    return None
+                await asyncio.sleep(LLM_RETRY_BACKOFF_SECONDS * attempt)
+            except (httpx.HTTPError, KeyError, ValueError):
+                if attempt == LLM_MAX_ATTEMPTS:
+                    return None
+                await asyncio.sleep(LLM_RETRY_BACKOFF_SECONDS * attempt)
+    return None
+
+
+async def measure_coverage(
+    api_base: str, topic_name: str, terms: list[str], semaphore: asyncio.Semaphore
+) -> dict[str, list[str] | None]:
+    """What each candidate term actually returns, per the site's search API.
+
+    Returns: term -> titles of its top results, or None where it couldn't be measured
+    """
+    async with httpx.AsyncClient() as client:
+        tasks = [fetch_term_results(client, api_base, topic_name, term, semaphore) for term in terms]
+        results = await asyncio.gather(*tasks)
+    return dict(zip(terms, results, strict=True))
+
+
+async def refine_keywords_with_llm(
+    topic_name: str,
+    candidates: list[str],
+    coverage: dict[str, list[str] | None],
+    api_key: str,
+    model_id: str,
+) -> tuple[list[str], int, int]:
+    """Re-pick the shortlist now that each candidate's real results are known.
+
+    Only terms whose results could actually be measured are put to the model.
+    Unmeasured ones are appended afterwards, unjudged, so a search that couldn't
+    answer never costs a term its place.
+
+    Returns: (keywords, input_tokens, output_tokens)
+    """
+    client = genai.Client(api_key=api_key)
+
+    measured = [c for c in candidates if coverage.get(c) is not None]
+    unmeasured = [c for c in candidates if coverage.get(c) is None]
+    if not measured:
+        return candidates, 0, 0
+
+    lines = []
+    for term in measured:
+        titles = coverage[term] or []
+        shown = "; ".join(titles) if titles else "NOTHING"
+        lines.append(f'- "{term}" → {shown}')
+    findings = "\n".join(lines)
+
+    prompt = f"""These are candidate search terms for the Our World in Data topic
+"{topic_name}", each followed by the charts our site's search actually returns for
+it, within this topic, best match first:
+
+{findings}
+
+They are offered to a reader as a short line of suggestions under a search box:
+"Suggested: term, term, term…". Only the first few are shown. A term is worth a
+slot only if clicking it takes the reader somewhere the earlier terms didn't.
+
+Return the terms worth keeping, best first, applying what the results above show:
+
+1. Drop a term whose results are the same charts an earlier kept term already
+   returns. Keep whichever of them is the more natural thing to type.
+2. Drop a term that returned NOTHING.
+3. Drop a term whose results are unrelated to it — that means our search doesn't
+   understand the term, so the reader would get nonsense. Acronyms often fail
+   this way: check the titles actually concern the term's subject.
+4. Order them so each adds a subject the ones before it didn't, most central to
+   "{topic_name}" first.
+5. Keep every term that earns its slot; don't trim to a round number, and don't
+   invent terms that weren't offered above.
+
+Output JSON:
+{{
+  "keywords": ["term1", "term2", ...]
+}}"""
+
+    response = None
+    for attempt in range(1, LLM_MAX_ATTEMPTS + 1):
+        try:
+            response = await client.aio.models.generate_content(model=model_id, contents=prompt)
+            break
+        except (genai_errors.ServerError, genai_errors.ClientError) as e:
+            retriable = getattr(e, "code", None) == 429 or isinstance(e, genai_errors.ServerError)
+            if not retriable or attempt == LLM_MAX_ATTEMPTS:
+                raise
+            await asyncio.sleep(LLM_RETRY_BACKOFF_SECONDS * attempt)
+    assert response is not None
+
+    result_text = response.text.strip()
+    if "```json" in result_text:
+        result_text = result_text.split("```json")[1].split("```")[0].strip()
+    elif "```" in result_text:
+        result_text = result_text.split("```")[1].split("```")[0].strip()
+    parsed = json.loads(result_text)
+
+    usage = response.usage_metadata
+    input_tokens = int(getattr(usage, "prompt_token_count", 0) or 0)
+    output_tokens = int(getattr(usage, "candidates_token_count", 0) or 0)
+
+    # Never let the refinement introduce a term that wasn't measured.
+    allowed = {c.lower(): c for c in measured}
+    keywords = [allowed[k.lower()] for k in parsed.get("keywords", []) if k.lower() in allowed]
+    return keywords + unmeasured, input_tokens, output_tokens
+
+
+async def process_topics(
+    topic_slugs: list[str],
+    api_key: str,
+    model: str,
+    search_api: str | None,
+) -> tuple[list[dict], list[str]]:
     """Process multiple topics in parallel using asyncio.gather.
+
+    When `search_api` is set, each topic's candidates go through two more
+    phases: ask that API what each candidate actually returns, then ask the
+    model to re-pick the shortlist knowing the real results.
 
     Returns: (results, slugs that failed)
     """
@@ -288,6 +455,60 @@ async def process_topics(topic_slugs: list[str], api_key: str, model: str) -> tu
             final_results.append(result)
             click.secho(f"✓ {result['topic_name']}: Extracted {len(result['keywords'])} keywords", fg="green")
 
+    if search_api and final_results:
+        click.echo(f"\nChecking what each candidate returns via {search_api} ...")
+        semaphore = asyncio.Semaphore(SEARCH_API_CONCURRENCY)
+        coverages = await asyncio.gather(
+            *(measure_coverage(search_api, r["topic_name"], r["keywords"], semaphore) for r in final_results)
+        )
+
+        click.echo("Re-picking each shortlist from those results ...")
+        refinements = await asyncio.gather(
+            *(
+                refine_keywords_with_llm(r["topic_name"], r["keywords"], coverage, api_key, model)
+                for r, coverage in zip(final_results, coverages, strict=True)
+            ),
+            return_exceptions=True,
+        )
+
+        unmeasurable = [
+            r["topic_name"]
+            for r, coverage in zip(final_results, coverages, strict=True)
+            if coverage and all(c is None for c in coverage.values())
+        ]
+        if unmeasurable:
+            click.secho(
+                f"! {len(unmeasurable)} topics could not be measured and keep their unrefined "
+                f"candidates: {', '.join(unmeasurable)}",
+                fg="yellow",
+            )
+
+        for result, coverage, refinement in zip(final_results, coverages, refinements, strict=True):
+            if isinstance(refinement, BaseException):
+                # Keep the unrefined shortlist rather than losing the topic; say
+                # so, since it is measurably weaker than the refined ones.
+                click.secho(f"! {result['topic_name']}: refinement failed, keeping candidates ({refinement})", fg="yellow")
+                result["stats"]["refined"] = False
+                continue
+            keywords, input_tokens, output_tokens = refinement
+            if not keywords:
+                click.secho(f"! {result['topic_name']}: refinement returned nothing, keeping candidates", fg="yellow")
+                result["stats"]["refined"] = False
+                continue
+            dropped = [k for k in result["keywords"] if k not in keywords]
+            result["keywords"] = keywords
+            result["stats"]["refined"] = True
+            result["stats"]["num_keywords"] = len(keywords)
+            result["stats"]["input_tokens"] += input_tokens
+            result["stats"]["output_tokens"] += output_tokens
+            result["stats"]["terms_measured"] = sum(1 for c in coverage.values() if c is not None)
+            result["stats"]["terms_returning_nothing"] = sum(1 for c in coverage.values() if c == [])
+            click.secho(
+                f"✓ {result['topic_name']}: kept {len(keywords)}"
+                + (f", dropped {', '.join(dropped)}" if dropped else ""),
+                fg="green",
+            )
+
     return final_results, failed
 
 
@@ -312,8 +533,29 @@ async def process_topics(topic_slugs: list[str], api_key: str, model: str) -> tu
         "overwriting production, e.g. --upload-path topic_vocabulary/my-branch.json"
     ),
 )
+@click.option(
+    "--search-api",
+    default=DEFAULT_SEARCH_API,
+    help=(
+        f"Search API used to check what each candidate term actually returns (default: {DEFAULT_SEARCH_API}). "
+        "Point it at a staging server to measure against that branch's index."
+    ),
+)
+@click.option(
+    "--no-refine",
+    is_flag=True,
+    help="Skip the search-API check and the second LLM pass; keep the first set of candidates as-is.",
+)
 @click.option("--no-upload", is_flag=True, help="Skip uploading to R2 (useful for testing)")
-def main(topic: tuple[str, ...], output: str | None, model: str, upload_path: str, no_upload: bool):
+def main(
+    topic: tuple[str, ...],
+    output: str | None,
+    model: str,
+    upload_path: str,
+    search_api: str,
+    no_refine: bool,
+    no_upload: bool,
+):
     """Extract vocabulary for topics using LLM (simple approach).
 
     Takes all chart titles and subtitles for topics and asks an LLM to extract
@@ -344,12 +586,15 @@ def main(topic: tuple[str, ...], output: str | None, model: str, upload_path: st
     click.echo(f"Model: {model}")
     upload_target = "skipped" if no_upload else f"s3://{S3_BUCKET_NAME}/{upload_path}"
     click.echo(f"Upload: {upload_target}")
+    click.echo(f"Refine: {'skipped' if no_refine else search_api}")
     click.echo("=" * 80)
     click.echo()
 
     # Extract chart texts and process with LLM
     click.echo("Extracting chart titles and subtitles from database...")
-    results, failed_slugs = asyncio.run(process_topics(topic_slugs, api_key, model))
+    results, failed_slugs = asyncio.run(
+        process_topics(topic_slugs, api_key, model, None if no_refine else search_api)
+    )
 
     if not results:
         click.secho("\n✗ No results generated", fg="red")
