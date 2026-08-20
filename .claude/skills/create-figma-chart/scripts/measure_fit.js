@@ -34,9 +34,14 @@ const CONFIG = {
   groupId: null, // the imported chart group, or null
   hideIds: [], // e.g. ["I123:4;5:6"] for connectors / year markers
   targetGap: 14, // px per end the fit aims for; 12-16 on 540-wide frames, 30 on the IG portrait
+  targetLabel: 13.5, // final label px the first export was solved for; the portrait ladder uses 15
 };
 
+// Normalized CONFIG reads, so deleting a line from the block above degrades to the house default
+// rather than emitting `undefined` into the command this script prints.
 const hideIds = CONFIG.hideIds || [];
+const targetGap = CONFIG.targetGap ?? 14;
+const targetLabel = CONFIG.targetLabel ?? 13.5;
 
 const r = (v) => (v === null || v === undefined ? null : Math.round(v * 100) / 100);
 
@@ -119,10 +124,17 @@ const rowsW = rows.length ? r(Math.max(...rows.map((c) => c.x + c.width)) - rows
 // Every property that can pin the height has to be in the predicate, not just the parent's sizing
 // mode: a child that is vertically FIXED, or a TEXT that does not auto-resize its height, keeps its
 // box whatever the copy does, so an AUTO parent still hugs a constant. Reporting `reflows: true`
-// there suppresses the warning in exactly the case it exists for. An ABSOLUTE child is out of the
-// auto-layout flow entirely and cannot pin anything, so it is skipped rather than counted against.
+// there suppresses the warning in exactly the case it exists for.
+//
+// ABSOLUTE splits by type, and the distinction is the whole question this predicate answers — "does
+// the band move with the copy?". An absolutely positioned TEXT is out of the auto-layout flow, so
+// editing it cannot grow the header at all: the band stops tracking that copy entirely, which is
+// worse than a pinned height, not safer. Any other absolute child is decoration that cannot pin the
+// parent either way, so it is skipped rather than counted against.
 const blocksReflow = (c) => {
-  if ("layoutPositioning" in c && c.layoutPositioning === "ABSOLUTE") return null;
+  if ("layoutPositioning" in c && c.layoutPositioning === "ABSOLUTE") {
+    return c.type === "TEXT" ? "layoutPositioning ABSOLUTE (text out of the flow)" : null;
+  }
   if ("layoutGrow" in c && c.layoutGrow) return "layoutGrow";
   if ("layoutSizingVertical" in c && c.layoutSizingVertical === "FIXED") return "layoutSizingVertical FIXED";
   if (c.type === "TEXT" && (c.textAutoResize === "NONE" || c.textAutoResize === "TRUNCATE")) {
@@ -166,6 +178,17 @@ if (groupNode) {
     y0 = Infinity,
     x1 = -Infinity,
     y1 = -Infinity;
+  // Which hideIds actually named a node under this group. A mistyped or copied-from-another-page id
+  // excludes nothing, and reporting the requested count as `excluded` would then hide the one clue
+  // that the aspect still contains the connectors — a silent no-op dressed up as a success.
+  const seen = new Set();
+  const collect = (n) => {
+    seen.add(n.id);
+    if ("children" in n) n.children.forEach(collect);
+  };
+  collect(g);
+  const unmatched = hideIds.filter((id) => !seen.has(id));
+
   const walk = (n) => {
     if (hide.has(n.id)) return;
     if ("visible" in n && !n.visible) return;
@@ -192,7 +215,7 @@ if (groupNode) {
     name: g.name,
     declared: raw ? { w: r(raw.width), h: r(raw.height), aspect: r(raw.width / raw.height) } : null,
     measured: { w: r(w), h: r(h), aspect: r(w / h) },
-    excluded: hideIds.length,
+    excluded: { requested: hideIds.length, matched: hideIds.length - unmatched.length, unmatched },
     // What Step 7 actually asks for: the uniform factor that makes the group span the content
     // width. rescale(), never resize() — resize stretches children through their constraints and
     // silently rewraps every text box in the chart.
@@ -204,12 +227,16 @@ if (groupNode) {
   // The second pass, solved rather than guessed. `target` is the aspect the group has to have for
   // the gap to come out at targetGap; `measured` is what it actually came back as; the export to
   // request next is the one solved for the reflection of the measured aspect about the target.
-  const gap = CONFIG.targetGap;
+  const gap = targetGap;
   const usable = band ? band.height - 2 * gap : null;
   if (contentW && usable > 0) {
     const target = contentW / usable;
     const measured = w / h;
-    const cmd = `scripts/solve_export.py --band ${contentW}x${r(band.height)} --gap ${gap}`;
+    // --target-label has to travel with the correction: solve_export.py defaults to 13.5, so a
+    // portrait solved at 15 would come back with smaller text purely from re-solving the aspect.
+    const cmd =
+      `scripts/solve_export.py --band ${contentW}x${r(band.height)} --gap ${gap}` +
+      ` --target-label ${targetLabel}`;
     group.target = { aspect: r(target), gap, usableHeight: r(usable) };
     // The reflection only cancels a small model error. A group that is far off the target is not a
     // near-miss to correct but something else — the wrong export, or furniture still in the bbox —
@@ -261,8 +288,11 @@ return {
     CONFIG.groupId && hideIds.length === 0
       ? "hideIds is empty — if the chart has `connectors` or year markers, the measured aspect includes them and will move once you hide them. Pass their ids."
       : null,
-    group && group.gapPerEnd !== null && Math.abs(group.gapPerEnd - CONFIG.targetGap) > 2
-      ? `gapPerEnd ${group.gapPerEnd} is more than 2px off the ${CONFIG.targetGap}px target — re-export with the \`nextPass\` command above (read \`nextPassNote\` first if it is set).`
+    group && group.excluded.unmatched.length
+      ? `hideIds NOT FOUND under the group: ${group.excluded.unmatched.join(", ")}. Nothing was excluded for them, so the measured aspect still contains whatever they were meant to remove. Re-read the ids off this group — an id from another page or another chart looks identical and excludes nothing.`
+      : null,
+    group && group.gapPerEnd !== null && Math.abs(group.gapPerEnd - targetGap) > 2
+      ? `gapPerEnd ${group.gapPerEnd} is more than 2px off the ${targetGap}px target — re-export with the \`nextPass\` command above (read \`nextPassNote\` first if it is set).`
       : null,
   ].filter(Boolean),
 };

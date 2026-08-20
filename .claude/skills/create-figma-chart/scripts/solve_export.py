@@ -49,6 +49,7 @@ INSET_PER_FONT = 1.4  # inset on each axis, as a multiple of imFontSize
 LABEL_RATIO = 0.75  # segment values / entity names, as a multiple of the base font
 MIN_LABEL = 12.0  # the floor the guidelines set for a full-size chart
 DEFAULT_GAP = 14.0  # px at each end of the band; 12-16 is the house range on 540-wide frames
+DEFAULT_TARGET_LABEL = 13.5  # final label px on a 540-wide frame; the portrait ladder uses 15
 
 # 302-wide thumbnail route (SMALL-CHARTS.md). imType=thumbnail returns early from extractOptions, so
 # imWidth/imHeight are the canvas outright — but grapher still insets the ink inside that canvas, so
@@ -155,7 +156,7 @@ def main() -> int:
     ap.add_argument(
         "--target-label",
         type=float,
-        help=f"desired final label px (default 13.5, or {THUMB_TARGET_LABEL:g} on --thumbnail)",
+        help=f"desired final label px (default {DEFAULT_TARGET_LABEL:g}, or {THUMB_TARGET_LABEL:g} on --thumbnail)",
     )
     ap.add_argument("--placed-width", type=float, help="width the export is placed at (default: band width)")
     ap.add_argument("--slug", help="grapher slug, to emit a ready curl")
@@ -199,7 +200,8 @@ def main() -> int:
         ap.error(f"--content-aspect must be positive, got {args.content_aspect:g}")
 
     placed_w = args.placed_width or bw
-    target_label = args.target_label if args.target_label is not None else (THUMB_TARGET_LABEL if args.thumbnail else 13.5)
+    default_label = THUMB_TARGET_LABEL if args.thumbnail else DEFAULT_TARGET_LABEL
+    target_label = args.target_label if args.target_label is not None else default_label
 
     if args.thumbnail:
         # Target the ink, not the frame: a 302-wide canvas puts its ink at 7.2 ... 294.2, which

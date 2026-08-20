@@ -393,10 +393,17 @@ Verify against the actual clone with `get_metadata` (the templates evolve; the g
 > (`2×target − measured`), not at the measured aspect itself — solving for what you already got moves
 > the next export further off, by about the same margin again. On the case recorded above (target
 > 1.4810 on a 508×371 band, group measured 1.4342) passing the measured aspect back lands a 2.4px
-> gap where 14 was wanted, and the reflection lands 14.0. `nextPass` carries the band, the `--gap`
-> and the corrected aspect already; when the measurement is more than 15% off the target it drops the
+> gap where 14 was wanted, and the reflection lands 14.0. `nextPass` carries the band, the `--gap`,
+> the `--target-label` and the corrected aspect already — set `targetGap` and `targetLabel` in its
+> `CONFIG` to whatever the first export used, or a portrait solved for 15px labels comes back at 13.5
+> purely from re-solving the aspect. When the measurement is more than 15% off the target it drops the
 > correction and tells you to solve fresh, because that far out is a wrong export or leftover
 > furniture, not a near-miss.
+>
+> It also reports `excluded` as `{requested, matched, unmatched}` rather than a count, and warns on
+> any `hideIds` entry that names nothing under the group: an id copied from another page excludes
+> nothing, and a bare count would report that as a success while the aspect still carried the
+> connectors.
 >
 > Cross-checked read-only against three live templates; every field matched `verify_templates.js`'s
 > expected geometry, Static Vertical's `1015.81` footer included.
