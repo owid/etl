@@ -54,8 +54,6 @@ DIFF_CSS = """
             margin: 10px 0 2px; }
 .mdd-slot-unchanged { font-size: 0.78rem; color: #adb5bd; border-left: 3px solid #e9ecef;
                       padding-left: 8px; margin: 6px 0; }
-.mdd-chart-slot { border: 1px dashed #ced4da; border-radius: 6px; color: #adb5bd; text-align: center;
-                  padding: 22px 0; margin: 8px 0; font-size: 0.85rem; letter-spacing: 0.06em; }
 </style>
 """
 

@@ -1,9 +1,12 @@
 """Show a diff the way the reader meets it: in data-page order, labelled by slot.
 
-Ed's point on the review UI was that a list of field names (`descriptionShort`, `titlePublic`) makes a
-reviewer translate before they can judge. So each changed text is placed where it appears on the page —
-title and subtitle above the chart, footnote under it, "What you should know" below — with an empty
-rectangle standing in for the chart itself.
+A list of field names (`descriptionShort`, `titlePublic`) makes a reviewer translate before they can
+judge, so each changed text is placed where it appears on the page instead — title and subtitle first,
+then the footnote that sits under the chart, then "What you should know" and the notes below it.
+
+Order and slot labels are the whole of it. An earlier version also drew a dashed "DATA HERE" rectangle
+where the chart goes; on a page of changes it repeated on both sides of every one of them and competed
+with the diff it was supposed to frame.
 
 Deliberately *not* a facsimile of the data page. A convincing mock would imply a fidelity it cannot
 have (per-chart shielding, dimension branching, inheritance), and it would crowd out the blast radius,
@@ -33,8 +36,6 @@ SLOTS: list[tuple[str, str, str]] = [
     ("descriptionProcessing", "How we process data at Our World in Data", "below"),
     ("descriptionFromProducer", "About this data (from the producer)", "below"),
 ]
-
-CHART_PLACEHOLDER = '<div class="mdd-chart-slot">DATA HERE</div>'
 
 
 @dataclass
@@ -100,12 +101,11 @@ def st_datapage_diff(
 
 
 def _side_html(slots: list[Slot], fields: dict[str, dict[str, Any]], side: str, changed_only: bool) -> str:
-    """One column: the page's slots in order, with the chart placeholder between title and footnote."""
+    """One column: the page's slots, in the order the page shows them."""
     parts: list[str] = []
+    # `region` still orders the slots the way the page does — title and subtitle, then the footnote that
+    # sits under the chart, then what follows further down. It no longer draws the chart itself.
     for region in ("above", "under", "below"):
-        if region == "under":
-            # The chart sits below the title/subtitle and above the footnote.
-            parts.append(CHART_PLACEHOLDER)
         for slot in (s for s in slots if s.region == region):
             if not slot.changed:
                 parts.append(f'<div class="mdd-slot-unchanged">{slot.label} — unchanged</div>')

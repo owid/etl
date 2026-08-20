@@ -153,6 +153,7 @@ def _render_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame,
         if n_views:
             head += f" :small[:gray[{n_views} of {len(view_diffs)} views]]"
         st.markdown(head)
+        _mode_buttons(catalog_path)
 
         if not groups:
             st.caption(
@@ -165,7 +166,7 @@ def _render_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame,
             for mark in marks[:MAX_INLINE_CHANGES]:
                 _render_change(source_engine, catalog_path, mark, usage, attribution)
             if len(marks) > MAX_INLINE_CHANGES:
-                st.caption(f"… and {len(marks) - MAX_INLINE_CHANGES} more — open **View diff** below.")
+                st.caption(f"… and {len(marks) - MAX_INLINE_CHANGES} more — open **View diff** above.")
 
         if other_groups:
             # This MDim's own view configs also differ, without the branch touching its recipe — almost
@@ -174,8 +175,6 @@ def _render_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame,
                 f"🕓 {len(other_groups)} further difference(s) in this MDim's view configs are not from this "
                 "branch (its recipe is untouched) — see Chart Diff's MDIMs section."
             )
-
-        _mode_buttons(catalog_path)
 
 
 def _render_change(source_engine: Engine, catalog_path: str, mark, usage: dict, attribution: dict[str, str]) -> None:
