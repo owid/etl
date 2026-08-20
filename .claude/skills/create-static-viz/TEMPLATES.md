@@ -6,13 +6,15 @@ re-deriving it through Figma MCP calls every time.
 - **File:** `Charts (2026)`, file key `s6Sv60bakebRRW2TxsMQbF`
 - **Page:** `📑 Templates`, node `798:54`
 - **Re-verify with:** `/create-figma-chart`'s [`scripts/verify_templates.js`](../create-figma-chart/scripts/verify_templates.js)
-  — it gates the shared geometry (sizes, content box, header band, footer position and growth) for all
+  — it checks the shared geometry (sizes, content box, header band, footer position and growth) for all
   ten templates and returns an `ok`/`DRIFT` verdict. Use `get_metadata` on `798:54` for the per-slot
-  positions it does not cover, and `get_screenshot` on a frame for colors.
+  positions it does not cover, and `get_screenshot` on a frame for colors. **Run it every refresh —
+  the date below never licenses skipping it.** A `DRIFT` verdict stops the refresh and gets reported.
 - **Last verified:** 2026-08-20 — the rhythm parameters and the Horizontal, Vertical and Mobile
   example 1 header/footer structure re-measured live; the script returned `ok` on all ten templates.
-  **If that date is two weeks or older and you cannot run the script, treat every number here as
-  suspect** and measure the template you are about to lay out against.
+  The date is provenance, for judging a drift report. If the script *cannot* run, verify by hand with
+  `get_metadata` anyway, and let the date say how far to distrust this file meanwhile: **two weeks or
+  older, treat every number here as suspect.**
 
 The design team edits these frames in place, and edits that move a chart area's edge have landed days
 apart. **Re-verify the geometry at the start of every refresh** rather than trusting this file: a step
