@@ -3,6 +3,7 @@
 import inspect
 import json
 import re
+import uuid
 from collections import defaultdict
 from collections.abc import Callable
 from copy import deepcopy
@@ -119,10 +120,18 @@ class Collection(MDIMBase):
     dimensions: list[Dimension]
     views: list[View]
     catalog_path: str
-    title: dict[str, str]
-    default_selection: list[str]
 
     _definitions: Definitions
+
+    # Optional for single-chart collections (`dimensions: []`) and map-only mdims.
+    # See `validate_required_fields()` for the per-collection-type rules.
+    title: dict[str, str] | None = None
+    default_selection: list[str] | None = None
+
+    # The chart's stable identity (`charts.configId` in grapher). Required for — and only
+    # valid on — single-chart collections (`dimensions: []`); mdims are identified by
+    # their catalog path instead. See `validate_chart_config_id()`.
+    chart_config_id: str | None = None
 
     dependencies: set[str] = field(default_factory=set)
     topic_tags: list[str] | None = None
@@ -280,6 +289,14 @@ class Collection(MDIMBase):
         # Disabled as it is not really necessary? This fails on CI/CD for explorers
         # self.validate_topic_tags()
 
+        # Top-level title / default_selection are required only for mdims (and only conditionally
+        # for default_selection). Single-chart collections (`dimensions: []`) ignore both.
+        self.validate_title()
+        self.validate_default_selection()
+
+        # Single charts must declare their grapher identity (`chart_config_id`); mdims must not.
+        self.validate_chart_config_id()
+
         # Run sanity checks on grouped views
         self.validate_grouped_views()
 
@@ -312,6 +329,34 @@ class Collection(MDIMBase):
         self.upsert_to_db(owid_env)
 
     def upsert_to_db(self, owid_env: OWIDEnv):
+        # Single-chart case: no multi-dim page, so we push to the charts table via
+        # the chart admin endpoint instead of `/multi-dims/`. The charts/mdims split
+        # is legacy — the longer-term goal is one table with grapher handling both
+        # (see #6069). Chart mode is decided by the *declared* identity
+        # (`chart_config_id`, which `validate_chart_config_id` ties to declared
+        # `dimensions: []`), not by `self.dimensions` here: `prune_dimensions()` may
+        # have emptied the dimension list of a genuine mdim whose dimensions all had
+        # a single choice in use, and such an mdim must not be reclassified.
+        if self.chart_config_id is not None:
+            if len(self.views) != 1:
+                raise ValueError(
+                    f"Collection '{self.catalog_path}' declares `chart_config_id` but has "
+                    f"{len(self.views)} views. A single-chart collection must have exactly one view."
+                )
+            from etl.collection.chart_upsert import upsert_collection_as_chart
+
+            upsert_collection_as_chart(self, owid_env)
+            return
+
+        if len(self.dimensions) == 0:
+            raise ValueError(
+                f"Collection '{self.catalog_path}' has no dimensions left but does not declare "
+                f"`chart_config_id`. If this is a multidim whose dimensions were dropped because "
+                f"each had a single choice in use, pass `prune_dimensions=False` to `save()` to "
+                f"keep them. If it is meant to be a single chart, declare `chart_config_id` "
+                f"(see `etl chart-config-id --help`)."
+            )
+
         # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
         # TODO: I think we could move this to the Grapher side.
         config = replace_catalog_paths_with_ids(self.to_dict())
@@ -655,6 +700,127 @@ class Collection(MDIMBase):
             raise ValueError(
                 f"Collection '{self.catalog_path}' must have at least one topic tag. "
                 "Add 'topic_tags' to your config YAML."
+            )
+
+    def validate_title(self):
+        """`title.title` is required for mdim collections (the data page renders empty `<h1>` otherwise)."""
+        # Only multidims render a data page that needs a top-level title. Explorers manage their
+        # own title, and single-chart collections (`dimensions: []`) have no data page.
+        if self._collection_type != "multidim":
+            return
+        if not self.dimensions:
+            return
+        if not self.title or not self.title.get("title"):
+            raise ValueError(
+                f"Collection '{self.catalog_path}' is a multidim (has dimensions) but is missing "
+                "a top-level `title.title`. Add it to your config YAML."
+            )
+
+    def validate_chart_config_id(self):
+        """`chart_config_id` is required for — and only valid on — single-chart collections.
+
+        A single chart's identity in grapher is its config UUID (`charts.configId`), and the
+        ETL config YAML has to declare it: for a chart that already exists, look up its UUID;
+        for a new chart, mint one. Without it we couldn't tell "push this config to that chart"
+        apart from "create yet another chart".
+        """
+        # Only multidims can be single charts (`dimensions: []`); explorers are always multi-view.
+        if self._collection_type != "multidim":
+            return
+
+        if self.dimensions:
+            # An mdim is identified by its catalog path (`multi_dim_data_pages.catalogPath`).
+            if self.chart_config_id:
+                raise ValueError(
+                    f"Collection '{self.catalog_path}' declares `chart_config_id` but has dimensions. "
+                    "That field identifies a single chart; mdims are identified by their catalog path. "
+                    "Remove it."
+                )
+            return
+
+        if not self.chart_config_id:
+            raise ValueError(
+                f"Collection '{self.catalog_path}' is a single chart (`dimensions: []`) but is missing "
+                "a top-level `chart_config_id`. It is the chart's identity in grapher (`charts.configId`) "
+                "and must be declared in the config YAML:\n"
+                "  - for a chart that already exists, use its config UUID (see `charts.configId`, e.g. "
+                "`SELECT c.configId FROM charts c JOIN chart_configs cf ON cf.id = c.configId "
+                "WHERE cf.slug = '<slug>'`);\n"
+                "  - for a brand-new chart, mint one with "
+                "`python -c 'from etl.collection.chart_upsert import new_chart_config_id; "
+                "print(new_chart_config_id())'`."
+            )
+
+        # The UUID is used verbatim as the lookup key in
+        # `PUT /charts/by-config/:uuid/etlConfig` and stored as a CHAR(36), so it has to be
+        # in canonical lower-case dashed form. `uuid.UUID()` alone is too lenient — it happily
+        # parses '{...}', 'urn:uuid:...', undashed hex and upper case, none of which would
+        # match the chart we mean to target: the endpoint would create a *new* chart instead.
+        if not isinstance(self.chart_config_id, str):
+            raise ValueError(
+                f"Collection '{self.catalog_path}' has an invalid `chart_config_id` "
+                f"({self.chart_config_id!r}): expected a UUID string, got {type(self.chart_config_id).__name__}. "
+                "Quote it in the config YAML."
+            )
+        try:
+            parsed = uuid.UUID(self.chart_config_id)
+        except ValueError:
+            raise ValueError(
+                f"Collection '{self.catalog_path}' has an invalid `chart_config_id` "
+                f"('{self.chart_config_id}'): expected a UUID."
+            ) from None
+        if str(parsed) != self.chart_config_id:
+            raise ValueError(
+                f"Collection '{self.catalog_path}' has a non-canonical `chart_config_id` "
+                f"('{self.chart_config_id}'). Grapher stores and matches it as a lower-case dashed "
+                f"UUID, so write it exactly as '{parsed}'."
+            )
+        if parsed.version != 7:
+            # Every chart config UUID grapher has ever generated is a UUIDv7, so a different
+            # version means the value probably didn't come from grapher (or from
+            # `new_chart_config_id`). Not fatal — the upsert would just create a new chart —
+            # but almost always a sign the wrong UUID was pasted in.
+            log.warning(
+                "collection.chart_config_id.not_uuid7",
+                catalog_path=self.catalog_path,
+                chart_config_id=self.chart_config_id,
+                version=parsed.version,
+                message=(
+                    "`chart_config_id` is not a UUIDv7. Grapher generates v7 UUIDs for chart "
+                    "configs — double-check this is the intended chart's `charts.configId`."
+                ),
+            )
+
+    def validate_default_selection(self):
+        """Warn per-view when a non-map-only view has no entity-selection fallback.
+
+        Top-level `default_selection` and per-view `selectedEntityNames` are independent
+        fallbacks; a view is only ill-defined when neither is set AND the view actually
+        renders a chart tab (line/bar/scatter/etc.) where the selection matters.
+        """
+        # Explorers manage their own entity selection; this fallback check is mdim-only.
+        if self._collection_type != "multidim":
+            return
+        if not self.dimensions:
+            return
+        if self.default_selection:
+            return
+        for view in self.views:
+            view_config = view.config or {}
+            chart_types = view_config.get("chartTypes")
+            is_map_only = chart_types == [] and view_config.get("tab") == "map"
+            if is_map_only:
+                continue
+            if view_config.get("selectedEntityNames"):
+                continue
+            log.warning(
+                "collection.missing_default_selection",
+                catalog_path=self.catalog_path,
+                view_dimensions=view.dimensions,
+                message=(
+                    "View has chart tabs but no entity selection — set `default_selection` "
+                    "at the collection level or `selectedEntityNames` on this view."
+                ),
             )
 
     def validate_grouped_views(self):
