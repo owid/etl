@@ -9,45 +9,71 @@
 //
 // USAGE
 //   Fill in CONFIG and paste the whole file as one `use_figma` call.
-//     frameId  — the TEMPLATE CLONE, after Step 6 has filled its texts. Measuring an unfilled
-//                clone gives you the placeholder band, which is the mistake reference/NODE-MAP.md
-//                warns about: the header hugs its text, so the band moves when the real title
-//                lands. A one-line title + one-line subtitle takes Static Vertical's band from
-//                118 to 70.
-//     groupId  — optional; the imported chart group, once it exists. Give it and you also get the
-//                group's bbox, its content aspect, and the scale needed to fit the band.
-//     hideIds  — optional; nodes to EXCLUDE from the group's measured bbox AND from the font-size
-//                histogram (grapher's `connectors` and year markers extend past the plot). This
-//                computes both as if they were hidden, WITHOUT hiding them — so the aspect you get
-//                is the one you will actually fit, the histogram covers only text that survives,
-//                and the file is untouched. reference/FITTING.md: hiding the elbows moved a
-//                measured aspect from 1.6026 to 1.5558, turning a 14px gap into 9.5px.
-//     slug     — optional, but needed for a runnable second pass: the grapher slug the first export
-//     params     came from, plus any query params it carried (a country selection, an MDim view).
-//                solve_export.py prints its `curl` only when it gets `--slug`, so without these
-//                `nextPass` solves the numbers and leaves you to rebuild the request by hand — which
-//                is where a selection or a view param gets dropped and the re-export quietly comes
-//                back with different data.
+//     frameId    — the TEMPLATE CLONE, after Step 6 has filled its texts. Measuring an unfilled
+//                  clone gives you the placeholder band, which is the mistake reference/NODE-MAP.md
+//                  warns about: the header hugs its text, so the band moves when the real title
+//                  lands. A one-line title + one-line subtitle takes Static Vertical's band from
+//                  118 to 70.
+//     groupId    — optional; the imported chart group, once it exists. Give it and you also get the
+//                  group's bbox, its ink aspect, and the scale needed to fit the band.
+//     hideNames  — name patterns to treat as hidden furniture. Prefer this to hideIds: on a fresh
+//                  import you do not have the ids yet, and grapher's names for these are stable
+//                  where its node ids are not. `datapoints__<Entity>` is one marker per year (76 on
+//                  a 1950-2025 line chart) — the pattern hides the container, not each child; the
+//                  story dots are added by hand in Step 8.
+//     hideIds    — extra ids to EXCLUDE from the measured bbox AND the font-size histogram, if
+//                  something needs excluding that the names above don't catch. Both exclusions are
+//                  computed as if the nodes were hidden, WITHOUT hiding them — the aspect you get is
+//                  the one you will actually fit, and the file is untouched. reference/FITTING.md:
+//                  hiding the elbows moved a measured aspect from 1.6026 to 1.5558, turning a 14px
+//                  gap into 9.5px.
+//     declared   — the probe export's declared SVG size, from
+//                    grep -oE 'width="[0-9]+" height="[0-9]+"' embed.svg | head -1
+//                  Give it (with imFontSize) and this returns the per-axis inset and the finished
+//                  `solve_export.py` pass-2 command as `nextPass` — the export that lands exactly.
+//     imFontSize — the imFontSize that probe was requested at, e.g. 30. The inset is only valid at
+//                  that font, so the pass-2 command carries it.
+//     slug       — optional, but needed for a runnable second pass: the slug the probe came from,
+//     params       plus any query params it carried (a country selection, an MDim view). For an
+//                  EXPLORER view pass the site-relative path (e.g. "explorers/natural-disasters"):
+//                  solve_export.py routes a bare slug to /grapher/ and a path-carrying one as-is,
+//                  because explorer views export from /explorers/<slug>.svg, a different endpoint.
+//                  solve_export.py prints its `curl` only when it gets `--slug`, so without these
+//                  `nextPass` solves the numbers and leaves you to rebuild the request by hand —
+//                  which is where a selection or a view param gets dropped and the re-export quietly
+//                  comes back with different data.
+//     originalGroupId — the untouched reference import of the SAME format, left on the page beside
+//                  the frame. Given it, this checks stroke widths: `rescale()` multiplies them, so
+//                  a fitted chart's data line comes out thinner than grapher shipped it (measured
+//                  1.32px against an original 4px) and reads as a weaker chart with nothing visibly
+//                  broken. The reference DETECTS the change; the target is the house 3/4 (line 3,
+//                  halo 4), not the export's own numbers — `imType=square` ships 4/5 where
+//                  `uncaptioned` ships 2/3, and neither is what a finished frame carries.
 //
-// The `nextPass` field in the output is the finished second-pass command — run it as printed. Do
-// NOT hand-build it by feeding the measured aspect back as `--content-aspect`: the solve would then
-// aim at the aspect you already got, which moves the export further from the target rather than onto
-// it. `nextPass` passes the REFLECTION `2*target - measured` instead, so the same model error that
-// put the group off-target cancels. Worked through on the docs' own case (solved 1.6026, measured
-// 1.5558): feeding 1.5558 back doubles the error, the reflection lands on the target.
+// The `nextPass` field in the output is the finished second-pass command — run it as printed. It
+// feeds solve_export.py the MEASURED per-axis inset (`--declared`/`--ink`/`--im-font-size`), which
+// is what makes the second export exact instead of another guess: the `1.4 * imFontSize` model is
+// symmetric and the real inset is not (64.1/29.0 measured at imFontSize 30 against the model's
+// 42/42). Without CONFIG.declared there is nothing to compute the inset from, so `nextPass` falls
+// back to a fresh probe solve and a note tells you what to set.
 
 const CONFIG = {
   frameId: "5332:75", // the template clone
   groupId: null, // the imported chart group, or null
-  hideIds: [], // e.g. ["I123:4;5:6"] for connectors / year markers
+  hideNames: [/^connectors$/, /^datapoints__/], // furniture, matched by stable grapher names
+  hideIds: [], // extra ids, e.g. ["I123:4;5:6"], for what the names above don't catch
+  declared: null, // the probe's declared SVG size, e.g. [791, 645]
+  imFontSize: null, // the imFontSize the probe was requested at, e.g. 30
   targetGap: 14, // px per end the fit aims for; 12-16 on 540-wide frames, 30 on the IG portrait
-  targetLabel: 13.5, // final label px the first export was solved for; the portrait ladder uses 15
-  slug: "", // grapher slug the first export came from, e.g. "life-expectancy"
-  params: "", // the first export's extra query params, e.g. "country=USA~CHN" or an MDim view
+  targetLabel: 13.5, // final label px the probe was solved for; the portrait ladder uses 15
+  slug: "", // slug the probe came from, e.g. "life-expectancy"; an explorer view needs its path, "explorers/<slug>"
+  params: "", // the probe's extra query params, e.g. "country=USA~CHN" or an MDim view
+  originalGroupId: null, // the untouched reference import of the same format, for stroke checks
 };
 
 // Normalized CONFIG reads, so deleting a line from the block above degrades to the house default
 // rather than emitting `undefined` into the command this script prints.
+const hideNames = CONFIG.hideNames || [];
 const hideIds = CONFIG.hideIds || [];
 const targetGap = CONFIG.targetGap ?? 14;
 const targetLabel = CONFIG.targetLabel ?? 13.5;
@@ -56,7 +82,7 @@ const params = CONFIG.params || "";
 
 const r = (v) => (v === null || v === undefined ? null : Math.round(v * 100) / 100);
 // Aspects and scale factors need more than 2dp: `rescale(1.14)` where 1.1433 was meant lands a
-// 343px band height ~1px short, and the docs and `--content-aspect` both speak in 4dp aspects.
+// 343px band height ~1px short, and the docs speak in 4dp aspects.
 const r4 = (v) => (v === null || v === undefined ? null : Math.round(v * 10000) / 10000);
 
 // How many lines a TEXT node actually renders on. `lineHeight` may be AUTO or a percentage, so
@@ -208,25 +234,31 @@ if (groupNode) {
   const g = groupNode;
   const hide = new Set(hideIds);
 
-  // Union the bboxes of visible leaves, skipping the hideIds subtrees. Doing it from leaves is what
+  // Union the bboxes of visible leaves, skipping the excluded subtrees. Doing it from leaves is what
   // lets us answer "what would the aspect be with the connectors hidden" without hiding anything.
   let x0 = Infinity,
     y0 = Infinity,
     x1 = -Infinity,
     y1 = -Infinity;
-  // Which hideIds actually named a node under this group. A mistyped or copied-from-another-page id
-  // excludes nothing, and reporting the requested count as `excluded` would then hide the one clue
-  // that the aspect still contains the connectors — a silent no-op dressed up as a success.
+  // Resolve the name patterns to ids in one walk, and record which hideIds actually named a node
+  // under this group. A mistyped or copied-from-another-page id excludes nothing, and reporting the
+  // requested count as `excluded` would then hide the one clue that the aspect still contains the
+  // connectors — a silent no-op dressed up as a success.
   const seen = new Set();
+  const hiddenByName = [];
   const collect = (n) => {
     seen.add(n.id);
+    if (hideNames.some((re) => re.test(n.name))) {
+      hide.add(n.id);
+      hiddenByName.push(n.name);
+    }
     if ("children" in n) n.children.forEach(collect);
   };
   collect(g);
   const unmatched = hideIds.filter((id) => !seen.has(id));
 
   // The font histogram is collected in THIS traversal, not a second findAllWithCriteria pass. A
-  // separate pass sees neither the hideIds subtrees nor an invisible ancestor — `visible` is a local
+  // separate pass sees neither the excluded subtrees nor an invisible ancestor — `visible` is a local
   // flag, so a text inside a hidden group still reads as visible — and would report label sizes for
   // text the fitted chart will not contain, which is the histogram's whole job to get right.
   const visibleTexts = [];
@@ -272,7 +304,7 @@ if (groupNode) {
     name: g.name,
     declared: raw ? { w: r(raw.width), h: r(raw.height), aspect: r4(raw.width / raw.height) } : null,
     measured: { w: r(w), h: r(h), aspect: r4(w / h) },
-    excluded: { requested: hideIds.length, matched: hideIds.length - unmatched.length, unmatched },
+    excluded: { byName: hiddenByName, requested: hideIds.length, matched: hideIds.length - unmatched.length, unmatched },
     fitScaleToBandH: r4(fitScale),
     // The height fit lands the targetGap per end BY CONSTRUCTION, so the gap is no longer the
     // diagnostic — the leftover width is. `xMapShortfall` is what the closed-form x-map has to
@@ -281,37 +313,105 @@ if (groupNode) {
     xMapShortfall: fitScale === null || !contentW ? null : r(contentW - w * fitScale),
   };
 
-  // The second pass, solved rather than guessed. `target` is the aspect the group has to have for
-  // the gap to come out at targetGap; `measured` is what it actually came back as; the export to
-  // request next is the one solved for the reflection of the measured aspect about the target.
-  const gap = targetGap;
-  const usable = targetH;
-  if (contentW && usable > 0) {
-    const target = contentW / usable;
-    const measured = w / h;
-    // --target-label has to travel with the correction: solve_export.py defaults to 13.5, so a
-    // portrait solved at 15 would come back with smaller text purely from re-solving the aspect.
-    // --slug/--params travel for the same reason one step further out: solve_export.py emits its
-    // curl only with --slug, and rebuilding the URL by hand is where a country selection or an MDim
-    // view param gets dropped and the re-export silently returns different data.
-    // Runnable as printed, from the repo root: these scripts are committed non-executable like every
-    // other script in this directory, and the repo rule is that Python goes through the venv.
+  // The second pass, solved rather than guessed: the per-axis inset, which is what makes the SECOND
+  // export exact instead of another probe. `1.4 * imFontSize` is symmetric and the real inset is not
+  // — 64.1/29.0 measured at imFontSize 30 on an uncaptioned line chart against the model's 42/42.
+  // --slug/--params travel with the command because solve_export.py emits its curl only with --slug,
+  // and rebuilding the URL by hand is where a country selection or an MDim view param gets dropped
+  // and the re-export silently returns different data. Runnable as printed, from the repo root:
+  // these scripts are committed non-executable like every other script in this directory, and the
+  // repo rule is that Python goes through the venv.
+  if (band && contentW) {
+    const carry = (slug ? ` --slug ${slug}` : "") + (params ? ` --params '${params}'` : "");
     const cmd =
       ".venv/bin/python .claude/skills/create-figma-chart/scripts/solve_export.py" +
-      ` --band ${contentW}x${r(band.height)} --gap ${gap} --target-label ${targetLabel}` +
-      (slug ? ` --slug ${slug}` : "") +
-      (params ? ` --params '${params}'` : "");
-    group.target = { aspect: r4(target), gap, usableHeight: r(usable) };
-    // The reflection only cancels a small model error. A group that is far off the target is not a
-    // near-miss to correct but something else — the wrong export, or furniture still in the bbox —
-    // and reflecting it would ask for an absurd aspect, so fall back to a plain first-pass solve.
-    if (Math.abs(measured - target) / target <= 0.15) {
-      group.nextPass = `${cmd} --content-aspect ${(2 * target - measured).toFixed(4)}`;
+      ` --band ${contentW}x${r(band.height)} --gap ${targetGap}`;
+    if (CONFIG.declared) {
+      const [dw, dh] = CONFIG.declared;
+      const insetX = r(dw - w);
+      const insetY = r(dh - h);
+      // The inset is only meaningful on a group still at its NATURAL size. Run this after the fit
+      // and you are subtracting a rescaled width from the probe's declared one, which yields a large
+      // plausible-looking number (282.95 against a true 64.08, measured) and would send the next
+      // export badly wrong. A real inset is a small fraction of the canvas, so bound it.
+      const rescaled = insetX <= 0 || insetY <= 0 || insetX > 0.25 * dw || insetY > 0.25 * dh;
+      if (rescaled) {
+        group.inset = {
+          unusable:
+            `inset would be ${insetX} / ${insetY} against a declared ${dw}x${dh} — implausible, so this ` +
+            "group is not at its natural size (already rescaled, or CONFIG.declared belongs to a " +
+            "different export). Measure the inset on the freshly-imported probe, before the fit.",
+        };
+        group.nextPass = `${cmd} --target-label ${targetLabel}${carry}`;
+        group.nextPassNote =
+          "the inset was unusable (see group.inset), so this is a fresh PROBE solve, not the exact " +
+          "second pass. Re-import the probe at its natural size and re-run.";
+      } else {
+        group.inset = {
+          x: insetX,
+          y: insetY,
+          modelWouldSay: CONFIG.imFontSize ? r(1.4 * CONFIG.imFontSize) : null,
+        };
+        group.nextPass =
+          `${cmd} --declared ${dw}x${dh} --ink ${r(w)}x${r(h)}` +
+          (CONFIG.imFontSize ? ` --im-font-size ${CONFIG.imFontSize}` : " --im-font-size <the one you exported at>") +
+          carry;
+        if (!CONFIG.imFontSize) {
+          group.nextPassNote =
+            "CONFIG.imFontSize is unset — fill in the imFontSize the probe was requested at before " +
+            "running nextPass; the inset is only valid at that font.";
+        }
+      }
     } else {
-      group.nextPass = cmd;
+      group.nextPass = `${cmd} --target-label ${targetLabel}${carry}`;
       group.nextPassNote =
-        `measured aspect ${r(measured)} is more than 15% off the ${r(target)} target, too far for a ` +
-        "one-step correction — solve it fresh (command above), and check the export and the hideIds first.";
+        "CONFIG.declared is unset, so no inset was computed and this is a fresh PROBE solve. For the " +
+        "exact second pass, read the declared size off the probe SVG " +
+        "(grep -oE 'width=\"[0-9]+\" height=\"[0-9]+\"' embed.svg | head -1) and re-run with " +
+        "CONFIG.declared and CONFIG.imFontSize set.";
+    }
+  }
+
+  // Stroke widths against the untouched reference import: rescale() multiplied them, and the data
+  // line is the one that matters. Compare by node NAME, since the two groups are separate imports.
+  if (CONFIG.originalGroupId) {
+    const orig = await figma.getNodeByIdAsync(CONFIG.originalGroupId);
+    if (!orig) {
+      group.strokes = { error: `originalGroupId ${CONFIG.originalGroupId} not found` };
+    } else {
+      const widths = (node) => {
+        const m = {};
+        for (const n of node.findAll(() => true)) {
+          if (/^(line|outline)__/.test(n.name) && "strokeWeight" in n && typeof n.strokeWeight === "number") {
+            m[n.name] = r(n.strokeWeight);
+          }
+        }
+        return m;
+      };
+      const o = widths(orig);
+      const f = widths(g);
+      // The reference tells you the rescale CHANGED a stroke. It does not tell you the target:
+      // imType=square ships 4/5 and uncaptioned ships 2/3, and the house weight is 3 with a 4px halo
+      // — neither of them (reference/GOTCHAS.md). So the comparison detects, and the HOUSE value is
+      // what the repair sets, after the scale.
+      const house = (k) => (/^outline__/.test(k) ? 4 : 3);
+      const strokeRows = Object.keys(o).map((k) => ({
+        name: k,
+        reference: o[k],
+        fitted: f[k] ?? null,
+        house: house(k),
+        ok: f[k] != null && Math.abs(f[k] - house(k)) < 0.05,
+      }));
+      group.strokes = {
+        rows: strokeRows,
+        verdict: strokeRows.every((x) => x.ok)
+          ? "ok — strokes sit at the house 3/4"
+          : "STROKES ARE OFF THE HOUSE 3/4 — set them after the scale: " +
+            strokeRows.filter((x) => !x.ok).map((x) => `${x.name} ${x.fitted} -> ${x.house}`).join(", ") +
+            ". The reference column only shows what the export shipped (square 4/5, uncaptioned 2/3) " +
+            "— it is the detector, not the target; the house weight is 3 with a 4px halo regardless " +
+            "of frame width (reference/GOTCHAS.md).",
+      };
     }
   }
 
@@ -349,8 +449,8 @@ return {
     contentW !== null && rowsW !== null && Math.abs(contentW - rowsW) > 1
       ? `contentBox from the header (${contentX}/${contentW}) disagrees with the union of the template's other rows (${rowsX}/${rowsW}). The header is the one to trust on any template with a fit step; a difference here means either a header that hugs its text (the 302-wide small templates do, and they have no fit step) or a row that has been moved — look before you scale.`
       : null,
-    CONFIG.groupId && hideIds.length === 0
-      ? "hideIds is empty — if the chart has `connectors` or year markers, the measured aspect includes them and will move once you hide them. Pass their ids."
+    group && group.excluded.byName.length === 0 && group.excluded.matched === 0
+      ? "Nothing was excluded — if this chart has `connectors` or per-year markers, the measured aspect includes them and will move once you hide them. Check the names in the tree against CONFIG.hideNames."
       : null,
     group && group.excluded.unmatched.length
       ? `hideIds NOT FOUND under the group: ${group.excluded.unmatched.join(", ")}. Nothing was excluded for them, so the measured aspect still contains whatever they were meant to remove. Re-read the ids off this group — an id from another page or another chart looks identical and excludes nothing.`
@@ -362,7 +462,13 @@ return {
       ? `the height-fitted group lands ${group.xMapShortfall}px off the ${contentW}px content width — that leftover IS the aspect miss in px, and it is more than the x-map should be asked to close. Re-export with the \`nextPass\` command above (read \`nextPassNote\` first if it is set). The ${targetGap}px gap per end is already correct by construction, so do not judge this fit by the gap.`
       : null,
     group && group.nextPass && !slug
-      ? "CONFIG.slug is empty, so `nextPass` solves the numbers but prints no curl — solve_export.py emits the re-export command only with `--slug`. Set `slug` (and `params`, for a country selection or an MDim view) to what the first export used, so the second pass runs as printed instead of being rebuilt by hand."
+      ? "CONFIG.slug is empty, so `nextPass` solves the numbers but prints no curl — solve_export.py emits the re-export command only with `--slug`. Set `slug` (and `params`, for a country selection or an MDim view) to what the probe used, so the second pass runs as printed instead of being rebuilt by hand."
+      : null,
+    group && !CONFIG.originalGroupId
+      ? "originalGroupId is unset, so stroke widths were not checked against the reference import. The rescale thins them and the render still looks fine — pass it."
+      : null,
+    group && group.strokes && group.strokes.verdict && !group.strokes.verdict.startsWith("ok")
+      ? group.strokes.verdict
       : null,
   ].filter(Boolean),
 };

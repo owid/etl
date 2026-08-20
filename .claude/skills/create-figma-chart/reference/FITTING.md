@@ -391,17 +391,18 @@ Verify against the actual clone with `get_metadata` (the templates evolve; the g
 > scale of ≈1 — "nothing to do" — which is the one answer the script exists to produce. The union is
 > still reported as `contentBoxFromRows` for cross-checking, with the group excluded.
 >
-> **Run the `nextPass` command it prints; do not feed the measured aspect back yourself.** The
-> second pass has to aim at the *reflection* of the measured aspect about the target
-> (`2×target − measured`), not at the measured aspect itself — solving for what you already got moves
-> the next export further off, by about the same margin again. On the case recorded above (target
-> 1.4810 on a 508×371 band, group measured 1.4342) passing the measured aspect back lands a 2.4px
-> gap where 14 was wanted, and the reflection lands 14.0. `nextPass` carries the band, the `--gap`,
-> the `--target-label` and the corrected aspect already — set `targetGap` and `targetLabel` in its
-> `CONFIG` to whatever the first export used, or a portrait solved for 15px labels comes back at 13.5
-> purely from re-solving the aspect. When the measurement is more than 15% off the target it drops the
-> correction and tells you to solve fresh, because that far out is a wrong export or leftover
-> furniture, not a near-miss.
+> **Run the `nextPass` command it prints; do not rebuild the second pass yourself.** With
+> `CONFIG.declared` and `CONFIG.imFontSize` set to what the probe export used, `nextPass` is the
+> **measured-inset** pass 2 (`--declared`/`--ink`/`--im-font-size`): the script subtracts the
+> measured ink from the declared size to get the true per-axis inset, and the re-solve with that
+> inset is exact rather than another guess — the `1.4 × imFontSize` model is symmetric and the real
+> inset is not (64.1/29.0 measured at imFontSize 30 against the model's 42/42). The inset is only
+> meaningful on a group still at its natural size, so it bounds the value (≤25% of the declared
+> canvas per axis) and refuses with `inset.unusable` when the group has already been rescaled or
+> `declared` belongs to a different export — falling back to a fresh probe solve with
+> `--target-label` carried, so a portrait solved for 15px labels does not come back at 13.5. Set
+> `targetGap`, `slug` and `params` in its `CONFIG` to whatever the probe used: the command carries
+> them so the re-export keeps the country selection or MDim view instead of being rebuilt by hand.
 >
 > It also reports `excluded` as `{requested, matched, unmatched}` rather than a count, and warns on
 > any `hideIds` entry that names nothing under the group: an id copied from another page excludes
@@ -410,6 +411,55 @@ Verify against the actual clone with `get_metadata` (the templates evolve; the g
 >
 > Cross-checked read-only against three live templates; every field matched `verify_templates.js`'s
 > expected geometry, Static Vertical's `1015.81` footer included.
+
+> **Portrait bands are fine, and `contentX` is not always 16.** One chart taken into all nine
+> in-scope templates spanned target ink aspects from **0.79 to 1.42**, and grapher returned every
+> canvas at exactly the requested size — the `MIN/MAX_ASPECT_RATIO` clamp never fired, so a tall band
+> (mobile 2 at 0.76, Static Vertical at 0.86, IG portrait at 0.97) needs no special handling. What
+> does need handling: **IG portrait insets its content at `contentX` 26, not 16**, and its band top is
+> 135 with a 28px title against everyone else's 25. Read the content box per template; don't carry 16
+> across.
+>
+> **A title rewrite after the fit invalidates it — in BOTH directions.** Rewording moved band tops by
+> **+29px** where the title grew to three lines and **−29 and −32px** where it shrank to one and two,
+> so a *shorter* title breaks the fit just as surely by growing the band. Three of five frames
+> survived a rewrite; two needed a fresh export. Re-measure the band after any text change, and if it
+> moved, re-solve — but re-solve from the **inset you already measured**: it holds across a band
+> change at the same `imFontSize`, so the new export lands first time with no second probe.
+>
+> **The aspect solve is TWO passes, and the second one is exact. Don't try to land it in one.**
+>
+> The `1.4 × imFontSize` inset in Step 3 is **symmetric, and the real inset is not.** Measured on an
+> `imType=uncaptioned` line chart that reserves a right margin for a direct entity label:
+>
+> | `imFontSize` | inset X | inset Y | what `1.4 × F` predicts |
+> |---|---|---|---|
+> | 30 | 64.1 | 29.0 | 42.0 / 42.0 |
+> | 21 | 70.6 | 40.8 | 29.4 / 29.4 |
+>
+> The model is right for the charts it was measured on — the recorded examples come out ~44/46 at
+> `imFontSize` 32 — and wrong by 2× on the horizontal axis for this class. Note also that inset Y got
+> *larger* as the font got *smaller*, so it is not a simple function of `imFontSize`: don't fit one.
+>
+> So treat the first export as a **probe**, not an attempt:
+>
+> 1. `solve_export.py --band WxH --target-label 15` → export, import, hide the furniture, measure.
+> 2. `inset = declared − ink`, per axis. `scripts/measure_fit.js` returns it, and the ready pass-2
+>    command with it, if you give it `CONFIG.declared` and `CONFIG.imFontSize`.
+> 3. `solve_export.py --band WxH --declared … --ink … --im-font-size …` → export, import, fit.
+>
+> The inset is stable to ~2px across an aspect change at the same font, and `insetX − insetY` was
+> *exactly* constant per chart across both passes (35.04 and 29.80), which is what makes pass 2 land
+> rather than being another guess. Measured errors: pass 1 predicted the canvas to 1.2–1.4px, pass 2
+> to **0.4–0.5px**.
+>
+> **And solve for the gap, not for the band.** `--gap` defaults to 14 because the target is 12–16px at
+> *each end*; solving for the band's own aspect asks the chart to fill it edge to edge and leaves
+> nothing. On a 508×409 band that is the difference between a target ink aspect of 1.2421 and 1.3333.
+>
+> **Don't try to measure the ink from the SVG to skip the first import.** Text ink depends on font
+> metrics that are not in the file; parsing every coordinate in one came out 13–33px wide of what
+> Figma measured.
 
 **The header reflows itself — don't reposition it.** Every template's header block is a flat vertical auto-layout of `[title, subtitle]` (the logo is a sibling, not a child — see the node map), so a title that grows from two lines to three pushes the subtitle down and grows the header on its own. Set `characters`, then **read the new `header.y + header.height` back** and measure the band from that; any y you computed before the text went in is stale. Measured on the portrait: a two-line title gives a 135 band bottom, three lines 199.
 

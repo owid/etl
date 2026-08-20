@@ -11,6 +11,11 @@ This skill takes any OWID grapher chart and produces a designed static version i
 
 **The defining principle:** the template is law. You adapt the chart's content *into* the template — you never restyle what the template provides (fonts, colors, spacing, logo, footer layout). Anything you add on top (annotations, direct labels, arrows) uses the file's shared text styles and the Chart colors library, nothing else.
 
+**Model check, before anything else:** the session context names the running model. On **Fable**,
+stop before the first Figma call and recommend re-running on **Opus** (or **Sonnet** for a
+mechanical re-export or a single text fix); continue only on the user's say-so — this skill is long
+chains of design judgment, and a build on the wrong model wastes the shared file's review cycle.
+
 **The single checkpoint rule:** the Charts file is a shared design file other people work in. Nothing is written to it before the user has seen the full proposal (page name, template choice, texts, planned label/annotation edits) and explicitly approved. Reading the file to check conventions needs no permission.
 
 Read [GUIDELINES.md](GUIDELINES.md) (sibling file) before editing any chart — it distills the DI Charts Guidelines per chart type and the Good Data Viz Checklist.
@@ -76,7 +81,7 @@ Three sibling skills do the text work this one depends on, and Step 8c calls the
 
 ## Round-trip budget
 
-Every Figma MCP call is a network hop to Figma's hosted connector: **7–10 s for `use_figma`, ~10 s for `get_screenshot`**, flat regardless of how big the script is. A run makes 120–190 of them. So the round trips are where the wall-clock goes — not the SVG exports (0.24 s each, under 2 s for a whole run) and not the response payloads (~1.5 KB per `use_figma`). Measured across five sessions: **16–28 minutes of pure MCP latency per chart**, with every single call issued on its own.
+Every Figma MCP call is a network hop to Figma's hosted connector: **7–10 s for `use_figma`, ~10 s for `get_screenshot`**, flat regardless of how big the script is. A run makes 120–190 of them. So the round trips are where the wall-clock goes — not the SVG exports (0.24 s each, under 2 s for a whole run) and not the response payloads (~1.5 KB per `use_figma`). Measured across five sessions by sweeping each one's call intervals for peak simultaneous in-flight calls: **two sessions never batched at all** (peak 1, nothing overlapping) and two more barely did (peak 2 and 5, 1–9% of calls overlapping), which is **16–28 minutes of pure serial round trips per chart**. One batched heavily — and paid for it; see the ceiling below.
 
 **Fan out independent calls — one message, 4–6 at a time.** The connector serves them concurrently: eight screenshots issued together came back **4.1× faster** than serially (79.7 s of work in 19.4 s of wall clock). It admits about four or five at once, and per-call latency inflates past that — 8.2 s for the first of eight, 13.2 s for the last — so **4–6 per message is the sweet spot and more just queues.** This is the `figma-use` skill's own instruction too: issue the N calls in one message, and don't await one before issuing the next.
 
@@ -87,9 +92,10 @@ What is independent, and today is not batched:
 - **The palette harvest.** `search_design_system` caps at ~14 results against a 24-fill palette, so it takes one group query plus ~11 by-name queries. Every one of them is independent.
 - **Screenshots of different frames or pages.** Issue them together, then `curl` all the returned URLs in one bash call, then Read each. A screenshot is otherwise three tool calls, and a run takes 14–70 of them.
 - **Every format in a multi-format run**, and every frame of a `chart-rows` set — separate pages and frames, so the writes fan out as well as the reads.
-- **Any survey of N nodes.** The pass that wrote GUIDELINES.md screenshotted 272 chart-library nodes one at a time: 2.7 hours, every call an independent read.
+- **Any survey of N nodes** — but at 4–6, not more. The pass that wrote GUIDELINES.md screenshotted 272 chart-library nodes at **peak 14 in flight**, and its calls averaged **35.5 s** against ~10 s everywhere else. That is the ceiling being exceeded, not the connector being slow: 8.2 s at one in flight, 13.2 s at eight queued, 35.5 s at fourteen.
+- **`upload_assets` takes a `count`.** One call returns N single-use `submitUrl`s and the POSTs parallelize, so a two-format run uploads both originals in one call rather than two — and both embeds in one more.
 - **The Step 8c property sweeps** — font sizes, stroke weights, dash patterns, fills, polylines. Those are reads of a single page, so they collapse into *one* `use_figma` returning one JSON. `scripts/verify_templates.js` already does exactly this for ten templates.
-- **The arrow probe's baseline render.** The both-hidden picture is the same for every arrow on the frame: take it once, then one hide-render per shape. N arrows costs `N + 2` screenshots instead of `4N`.
+- **The arrow probe's baseline render.** Only the FULL render is shared across arrows: the other three states of the four-render protocol (no-arrow, no-target, both-hidden) each hide *that pair's* nodes, so they are pair-specific and cannot be reused. N arrows cost `3N + 1` screenshots, not `4N` — and not `N + 2`, which under-collects and produces masks containing another pair's target.
 
 **What is serial for a reason — don't collapse these:**
 
@@ -100,6 +106,8 @@ What is independent, and today is not batched:
 | one page per `use_figma` call | `page.children` on a page you have not switched to returns a short list *without erroring* (Gotchas) |
 
 And a bigger batch is a bigger loss: `use_figma` is atomic, so a script that throws on its last line reverts the whole pass. Stay inside the plugin's ~10-logical-operations-per-call guidance.
+
+**Measuring whether any of this happened: use interval overlap, never a calls-per-message count.** The transcript writes one entry per tool call whether or not the calls were batched, so a calls-per-assistant-message histogram reports `{1: N}` for a provably concurrent run — checked against an 8-call probe that measured 4.12×, which the histogram scored as eight singletons. Sweep `tool_use` → `tool_result` timestamps for peak simultaneous in-flight calls instead, and count how many calls start before the previous one finished.
 
 ## Inputs
 
@@ -281,21 +289,21 @@ head -c 300 $DIR/embed.svg   # expect <svg ... width="..." height="...">, no <ht
 > `measure_fit.js` reports as `xMapShortfall`, and it is the aspect miss expressed in px; and every
 > number comes from the **rounded** `imFontSize`, since that is what the URL carries, so the label
 > size quoted is the one the `curl` will actually produce (it prints the ideal font alongside when
-> rounding moves it). It also carries the model's own self-test (`--self-test`, which reproduces
-> both worked examples below to within 1.4px, round-trips the band arithmetic exactly, and checks
-> that a reflected second pass still lands its `--target-label`) and the `--thumbnail` route for a
-> 302-wide chart.
+> rounding moves it). It is a TWO-PASS tool: `--band` alone is pass 1, a probe under the symmetric
+> `1.4 × imFontSize` inset model; pass 2 re-runs with `--declared`/`--ink`/`--im-font-size` measured
+> off the probe's import and is exact, because the real inset is per-axis, not symmetric (see Step 7
+> and reference/FITTING.md). It also carries its own `--self-test` (the worked examples, the band
+> round-trip, and a real run's two measured-inset passes) and the `--thumbnail` route for a 302-wide
+> chart.
 >
 > **It solves for `band − 2×--gap`, not for the band** — the gap below is a requirement of the fit,
 > so a solve that ignores it lands the chart edge to edge and you re-export. `--gap` defaults to 14
-> and takes 30 for the Instagram portrait. For a 508×371 band that makes the target 508×343, and the
-> solve returns `imFontSize=29, imWidth=1448`, predicting an 818.8×552.8 content box that scales to
-> 508×343 — 14px at each end. Verified end to end at `--gap 0` (i.e. filling the band, which is what
-> this script did before the gap was reserved): it solved `imFontSize=28, imWidth=1346` and predicted
-> 828×616, and grapher returned **829×616** with `font-size="21"`, landing labels at exactly 13.5px —
-> so the canvas model is confirmed against the real renderer; it is the target fed into it that the
-> gap changes. After you have measured a real import, run the `nextPass` command that
-> `measure_fit.js` prints rather than passing the measured aspect back yourself — see Step 7.
+> and takes 30 for the Instagram portrait; a 508×371 band makes the target 508×343, 14px at each
+> end. The canvas model is confirmed against the real renderer — a `--gap 0` solve predicted 828×616
+> and grapher returned **829×616**, landing labels at exactly 13.5px — so it is the target fed into
+> it that the gap changes. After you have measured a real import, run the `nextPass` command that
+> `measure_fit.js` prints — with its `CONFIG.declared` and `CONFIG.imFontSize` set from the probe,
+> it is the exact measured-inset second pass rather than another guess — see Step 7.
 
 **The aspect you request is the *canvas*, not the chart — solve for the padding or you will re-export every page.** Grapher insets the drawing inside the SVG it hands back, so the group Figma imports is smaller than the declared size, and it is the *group* that has to fill the template band. Measured on this file's charts, the inset is close to **1.4 × `imFontSize` on each axis** (at `imFontSize=32`: declared 901×566 → content 857×520; at 30: 862×591 → 818.9×550). So don't request the aspect you want — request the aspect that *yields* it, by solving
 
@@ -326,6 +334,11 @@ Caveats: `?tab=table` is silently ignored (renders the default tab); `imSquareSi
 
 ## Step 4 — Propose, then get the go-ahead
 
+> **If the title changes later, rename the page too.** The page name carries the *final* title, and a
+> title that gets corrected mid-run — because it misread the data, or because it wrapped to a line too
+> many — leaves the page still asserting the superseded claim. It is the one place the old wording
+> survives a retitle, since nothing renders it.
+
 Before touching the file, show the user in one message: the page name **`YYYYMMDD <Title> (<Creator>)`** (today's date, the *final* — possibly rewritten — title), the chosen template(s), every text that will go into the template, the labeling changes you propose (Step 8), and the annotations with their content. **Wait for explicit approval.** This is the single checkpoint; after it, iterate freely on the same page without re-asking.
 
 ## Step 5 — Create the page and place the pieces
@@ -348,7 +361,7 @@ await figma.setCurrentPageAsync(page)
 
    For a **302-wide small or pull chart**, clone `25344:1357` (guided) or `25344:1391` (pull) — the choice is the Step 2 answer, not a judgement. Both now carry a real visible white frame fill and no background vector, so there is nothing to repair before you start; check that still holds rather than assuming, since a hidden fill plus a fixed-size backing vector is exactly what a taller frame under-covers. A `chart-rows` block is 3–5 rows, so expect a *set* of frames on one page. SMALL-CHARTS.md → In Figma has the rest.
 
-3. **Import the original SVG with `upload_assets`** — never `createNodeFromSvg` (the `use_figma` code param caps at 50k chars; a grapher SVG is ~165 KB). `upload_assets` returns a single-use `submitUrl`; POST the file to it and keep the returned `placedOnNodeId`. **Only the original at this stage** — the embed has not been exported yet (Step 3), and it arrives in Step 7 once the band is measurable:
+3. **Import the original SVG with `upload_assets`** — never `createNodeFromSvg` (the `use_figma` code param caps at 50k chars; a grapher SVG is ~165 KB). `upload_assets` takes a **`count`** and returns that many single-use `submitUrl`s — pass `count: 2` for a two-format run and POST both in parallel. Keep each returned `placedOnNodeId`. **Only the original at this stage** — the embed has not been exported yet (Step 3), and it arrives in Step 7 once the band is measurable:
 
 ```bash
 curl -s -X POST "<submitUrl>" -F "file=@$DIR/original.svg;type=image/svg+xml"

@@ -1,5 +1,153 @@
 # Step 8 — Improve the labeling and annotate
 
+## Before placing an arrow: does the note point at a POINT?
+
+An arrow aimed at one dot asserts "this value, here". If the sentence is about a **span of time or
+several events**, that is the wrong device, and the recipe below will happily execute it anyway —
+which is the trap. "Four military coups between 1955 and 1976 cut short democratic rule" was given a
+single arrow to the deepest trough: the note describes 21 years and four events, the arrow claimed one
+year and one value.
+
+`reference/per-chart-type/line.md` already carries the devices for this. Pick by what the note is
+about:
+
+| The note is about | Device | Archive |
+|---|---|---|
+| A period | a **pale tinted vertical band** across it, annotation set inside the band | `349:167` ("Global financial crisis", "COVID pandemic"), `541:217` ("Great Leap Forward"), `222:504` (annotation inside, in the band's colour) |
+| A period, told through the line itself | **recolour the stretch** the story is about | `202:831` (red where democracy eroded, navy elsewhere), `1:4716`, `1:1465`; `678:490` labels the phases in-plot |
+| Several discrete events | a **milestone ladder** — a dot per event, each with its value and short sentence | `222:133`, `366:245`, `228:63`, `359:111`, `241:131` |
+| A moment | a **thin vertical event rule** labelled at the top of the plot | `347:69` (three of them), `486:51`, `589:211` |
+| One value | an arrow, per the recipe below | — |
+| A gap between two lines | a **double-headed arrow labelled with the ratio** | `250:120` ("six times") |
+
+Read that table before the recipe, not after. The arrow mechanics are long and specific, and the
+detail is exactly what makes "point at the nearest dot" feel like the answer.
+
+### Building the period band
+
+There is **no library style for it** — `search_design_system` for a pale tint returns nothing — so take
+it from the archive. Read off `349:167` and `541:217` (the Great Leap Forward band), which agree:
+
+- a **RECTANGLE**, fill **`#dddddd` at 50% fill opacity** (`fills[0].opacity`, not the node's)
+- spanning the **plot**, not the frame: use the `horizontal-grid-lines` group's bbox, which is the
+  drawing area without the axis-label rows
+- inserted at **`clone.insertChild(0, band)`** so the line, dots and labels all draw over it
+- and **no arrow**. The band is the pointer; adding one re-asserts the single point the band exists to
+  avoid.
+
+Set the band's own x from the line's vertices at the first and last year of the period, the same way
+dots are placed — not from the axis ticks, which are sampled and may not include your years.
+
+**The annotation goes inside the band** (`222:504`), padded ~10px from its top-left, with its width set
+to the band's width less that padding on both sides. If the text does not fit the band's width at a
+readable size, the band is too narrow for an in-band label — put the note beside it instead of
+shrinking the type.
+
+## Placing an arrow
+
+An arrow has two ends and both are load-bearing: the tip has to point at the thing it names, and the
+tail has to read as leaving the annotation. Bounding boxes get neither right — the group's box is
+mostly tail, and the head's box has the tip in a corner.
+
+**Measure the library once.** Every arrow on the `↪️ Curvy Arrows` page has a natural tail→tip
+**span** — a length and an angle. Measured 2026-08-20:
+
+| Arrow | box | span | angle |
+|---|---|---|---|
+| `Group 18` `6086:565` | 14.6×43 | 41.5 | −87.9° |
+| `Group 3` `4937:94` | 56.3×43.9 | 63.4 | 135.1° |
+| `Group 5` `4937:96` | 56.3×43.9 | 63.4 | −142.1° |
+| `Group 19` `6086:568` | 70.4×25.7 | 72.6 | −8.1° |
+| `Group 4` `4937:95` | 68.8×51.8 | 74.7 | 148.5° |
+| `Group 1` `4937:92` | 68.8×51.8 | 74.7 | −148.5° |
+| `Group 8` `6373:161` | 29.8×76.1 | 81.4 | 110.6° |
+| `Group 7` `4941:61` | 95.4×69.4 | 117.6 | 144.1° |
+| `Group 6` `4941:42` | 162.9×42.4 | 165.2 | −170.5° |
+
+To get a span: the **head** is the smallest-area vector child and the **tail** the largest; read each
+one's real vertices by parsing `vectorPaths` and pushing every pair through its `absoluteTransform`
+(`x' = a·x + c·y + e`, `y' = b·x + d·y + f` for `[[a,c,e],[b,d,f]]`). The head's **apex** is its vertex
+farthest from its own centroid; the tail point is the tail vector's vertex farthest from that apex.
+
+**Then, per arrow:**
+
+1. **Place the annotation first**, at the position the design wants.
+2. **Anchor** = where the arrow should leave it — the bottom edge for a downward arrow, the left edge
+   at first-line height (`+ lineHeight/2`) for a sideways one.
+3. **Target** = `dotCentre − unit(dotCentre − anchor) × (radius + gap)`. This is what makes the arrow
+   point *through* the dot's centre along its own angle, so a diagonal arrow arrives diagonally —
+   which aligning the tip on one axis does not achieve. 5px of gap off a 10px dot reads well.
+4. **Pick the arrow whose span length is closest to `|target − anchor|`.** Length is what decides
+   whether the tail reaches the block; the library spans 41–165px, so something usually fits. Do not
+   scale one to fit — that distorts the head.
+5. **Rotate**: `rotation = natural − required`, because Figma's rotation is counter-clockwise against
+   y-down angles. Then re-measure and correct by `(achieved − required)`; one iteration is exact.
+6. **Translate** so the apex lands on the target.
+7. **Nudge the annotation** so its anchor edge sits 3–5px off the tail. The arrow is fixed-length, so
+   the block moves, never the arrow — moving the arrow loses the tip.
+
+**Check all four, they are one subtraction each:** the tip is `radius + gap` from the dot centre; the
+cross product of the heading with `(dotCentre − tip)` is **0**; the arrow's box does not overlap the
+annotation's; and the annotation is still inside the content box — pushing a block sideways to meet a
+tail is how it ends up hanging off the frame.
+
+**A tail that stops short of the block reads as two unrelated objects.** Sitting 4px *above* an
+annotation's top edge is not connected; the tail has to be within the block's vertical span, level
+with a line of text.
+
+**The value label and the arrow want the same spot, so place the label opposite the approach.** An
+arrow aimed at a dot arrives along its own heading, and a value centred *above* that dot lands right
+under the tip — measured on all five templates of one chart. Put the value diagonally opposite the
+arrow's approach instead: the restoration arrow came in from the upper right, so its value went
+up-**left** of the dot, bottom-right corner near the dot's top-left.
+
+**Check the label against the line on BOTH axes, not just the one you were thinking about.** The
+trough value was placed above its dot, clear of the flat trough line it sat over — and straight
+across the 1975→1976 **vertical** drop, which the "is it above the line?" check never looked at. It
+moved left of the dot, where the descending line is far above and the plot is empty. A steep segment
+is as much of an obstacle as a flat one and is easier to forget.
+
+**A bbox overlap between a long arrow and a label is usually empty — confirm on the render.** Three
+of five frames reported the arrow's box overlapping the value label after the fix, and all three were
+clear in the render: the long library arrows (117–165px) have large boxes around a thin curve, so most
+of the box is air. Treat the box test as a screen that tells you where to look, never as the verdict.
+
+**Selection across templates is real work, not a formality.** Ten placements of the same two
+annotations across five templates drew **five different library arrows** — `Group 3`, `Group 8`,
+`Group 6`, `Group 19` and `Group 7` — because the required spans ran from 62px to 202px as the band
+changed shape. Picking one arrow and reusing it would have missed by up to 100px.
+
+> **The knockout stroke matches whatever is DIRECTLY BEHIND the text — usually the frame, but not
+> always.** Text sitting inside a period band has the band behind it, so the stroke is the band
+> composited onto the frame: `bandFill × opacity + frameFill × (1 − opacity)`. Measured here that is
+> `#ecebe8` on the beige templates and `#eeece9` on the cream ones, where the frame alone would have
+> given `#fbf9f3` and `#fffbf5` — close enough to look deliberate and wrong enough to see. The rule
+> below is the common case, not the whole rule.
+>
+> **The knockout stroke is the FRAME'S OWN BACKGROUND — read it off the frame, never hardcode white.**
+> Only two of the nine templates are white. Measured: the IG pair is **`#fbf9f3`** (beige), the static
+> trio **`#fffbf5`** (cream), and only DI and the 302-wide pair are `#ffffff`. A white halo on a cream
+> frame draws a visible outline round every line of annotation text — it reads as a deliberate stroke,
+> not as a knockout, and it is the first thing a designer sees. `scripts/verify_templates.js` already
+> reports each frame's `fill` for exactly this reason ("DI white, static cream, IG beige"): take the
+> colour from `frame.fills[0]` and copy its channels into the stroke. It is also assertable —
+> every annotation's stroke should equal its frame's fill, which is one comparison per node.
+>
+> **A value label that lands on the line gets MOVED, not masked.** The white knockout stroke is for
+> an annotation that has to cross chart ink to sit where the reader needs it — not a licence to park
+> a number on a line and mask it. The house preference is that labels stay off the ink. On the Chile
+> chart the trough value sat on the flat `0.03` segment; the fix is 6px above its dot, in the empty
+> plot the drop and the rise leave behind, and no stroke at all. Reach for the knockout only when
+> there is genuinely nowhere clear to go.
+>
+> **A direct end label centred on the last point collides with a dot placed there.** grapher's own
+> layout starts the entity label about 2.6px after the final data point, so the moment you add an
+> endpoint dot the two overlap — measured 3.4px on the square and 2.4px on the desktop, and you
+> cannot fix it by sliding the label right because it is already on its 16px margin. Put the label
+> **below** the dot (6px clear, right edge still on the margin), which is also the single-series move
+> this file recommends further down for reclaiming the right margin.
+
+
 > Read at Step 8. Also covers Step 8b and re-exporting after a change to the chart itself.  Part of [`/create-figma-chart`](../SKILL.md); the spine has the step order.
 
 

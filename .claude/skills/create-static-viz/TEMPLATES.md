@@ -204,9 +204,10 @@ figures now fall out of the same formula.
 > The logo constrains **width** instead: the title node is sized narrower than the content box to clear
 > it — 737.84 against 818 on the 850-wide pair, 428 against 508 on mobile.
 >
-> Everything below this note describes the **superseded nested-logo generation** and is kept only so a
-> regression stays recognizable. Its arithmetic no longer applies; the table above is the live one.
-> It has moved to [reference/SUPERSEDED-LOGO-GENERATION.md](reference/SUPERSEDED-LOGO-GENERATION.md) so a run does not load it.
+> The **superseded nested-logo generation** lives in
+> [reference/SUPERSEDED-LOGO-GENERATION.md](reference/SUPERSEDED-LOGO-GENERATION.md), kept only so a
+> regression stays recognizable — its arithmetic no longer applies; the table above is the live one.
+> Everything below THIS note is current guidance.
 
 ## Lay the plot inside the template's band, and draw the slots at the template's own sizes
 

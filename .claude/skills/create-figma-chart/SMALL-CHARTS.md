@@ -261,6 +261,30 @@ GUIDELINES.md → Direct labeling has the placement rules, and the per-type conv
 the target. How much of that work there is depends on the chart type, so measure the export before
 estimating.
 
+### The frame height is an output, and the frame must be resized BEFORE the chart goes in
+
+The shipped 302-wide templates measure 302×233, but that height is a placeholder: grapher returns
+whatever ink the chart needs and reserves the rest. Measured on a single-series line chart at
+`imFontSize=16`: **122.7px of ink in a 183.5px canvas** for the guided variant and 110.9 in 166.5 for
+the pull one — roughly 60px and 56px of vertical space grapher asked for and then did not use. Forcing
+that ink to fill a 233px frame would need a rescale, which this route forbids because it moves the
+font sizes off the 11/12px ladder.
+
+So compute the frame height from the ink: `44 + inkHeight + 12` for the guided variant, and
+`44 + inkHeight + 6 + sourceRowHeight + 12` for the pull one, whose source row sits below the chart.
+That gave 179 and 184 against the shipped 233.
+
+**A resize displaces everything already in the frame, so re-pin afterwards.** Two things broke on one
+`clone.resize()`. The chart, placed before it, was squashed 122.7px → 94.26px — non-uniformly, through
+the group's top-and-bottom constraint, and reported as though that were its real height. And the
+**header moved and was clipped**: these templates constrain it `vertical: CENTER` (pull) and `SCALE`
+(guided), so shrinking 233 → 184 put the pull header at **y = −15** and `clipsContent` sliced the title
+off. Placing the chart after the resize fixes the first; only re-pinning fixes the second, because the
+header ships inside the template.
+
+So the order is: **resize → re-pin the header to `y = 10` → place the chart at `y = 44` → place the
+source row** — then assert no child has a negative `y`, because a clipping frame hides exactly this.
+
 ### Request the final pixel size directly
 
 `getThumbnailOptions` sets `staticBounds = Bounds(0, 0, imWidth / 4, imHeight / 4)`, so `imWidth`
@@ -315,6 +339,13 @@ single-entity chart is pure overhead at 302px.
 | One entity, one indicator | nothing | no name at all — first and last **values** only | **`1`** |
 | One entity, several indicators | the indicator | the indicator's **display name**, placed away from the values | **`1`** |
 | Several entities *and* indicators | both | reconsider the chart — it is too much for 302px |
+
+**This is easy to skip, and the default is the wrong one.** Omitting `imMinimal` gives you `0`, which
+on a single-entity line chart puts the country's name inside a 278px plot — measured on Argentina, the
+export's texts were `1950 | 2025 | Argentina | 0.52`, with "Argentina" sitting in the left of the plot
+where the first value should be. Passing `imMinimal=1` returned `1950 | 2025 | 0.19 | 0.52`: name gone,
+first value gained. Pass it explicitly for rows two and three of the table rather than relying on the
+default.
 
 `imMinimal=1` is the mechanism for rows two and three, and it does exactly the right thing: it drops
 the entity name **and** emits the first *and* last value per series. Verified —
@@ -450,7 +481,7 @@ of label → series possible:
 
 Two Figma mechanics that bite here: **`leadingTrim` heights only settle on the next `use_figma` call**,
 so trim in one call and centre in the next; and a text node's **width is stale in the call that set its
-characters**, which silently invalidates any placement search built from it (SKILL.md → Gotchas).
+characters**, which silently invalidates any placement search built from it (reference/GOTCHAS.md).
 
 ### Expand the plot to the content box — the dots belong on the title box's edges
 
