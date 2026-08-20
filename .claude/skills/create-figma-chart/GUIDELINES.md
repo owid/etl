@@ -202,7 +202,14 @@ v.x = mnx; v.y = mny;
 - **Label the identity of every mark; label the value of only the ones worth reading.** A chart that labels all of everything turns its plot into a wall of type, and the labels it can least afford are the ones on the smallest marks — a number nobody can act on, printed beside a sliver, competing with the numbers that carry the story. So keep the **name** on every mark, and drop the **value** below a cut-off. Pick the cut-off on the marks, not on the numbers: read down the sorted list and cut where the marks stop being distinguishable from each other. State the rule you used when you report, so it can be corrected if you inferred it wrong.
   - Two things to get right afterwards. **The cut-off is one number applied to both sides** of a two-column chart, or the two columns disagree about what counts as small. And **a label that loses its partner has to be re-centred** — see SKILL.md, where the mechanics live.
   - On the avocado sankey the cut fell at 110,000 t (≈4% of the total shown), dropping 9 of 20 values and keeping all 20 names.
-- **Tied values share one label, joined by a curly brace.** Repeating the same number down a ranked list reads as noise; one brace and one value reads as a fact. `169:1167` (five countries at 0.12%), `201:164`, `203:108`, `341:82`, `468:287`, `668:54`. The same brace also replaces a run of empty bars — `201:164` writes "Slovakia, Luxembourg, Hungary and Australia did not report aid costs for refugees" where four zeros would have gone.
+- **Tied values share one label, joined by a curly brace.**
+- **Shorten a label only when it is one of the longest.** The longest label is what caps the plot's
+  width, so "United States" → **US** buys nothing while "Switzerland" is still there. Shortening the
+  top one or two is a space edit; shortening the rest is just inconsistency.
+- **Too many entities for the height is a frame problem, not a labeling problem.** Don't cram them
+  in or drop below the font floor — **stretch the frame vertically**. Static charts don't have to be
+  square, and the 540×824 mobile template exists for exactly this.
+ Repeating the same number down a ranked list reads as noise; one brace and one value reads as a fact. `169:1167` (five countries at 0.12%), `201:164`, `203:108`, `341:82`, `468:287`, `668:54`. The same brace also replaces a run of empty bars — `201:164` writes "Slovakia, Luxembourg, Hungary and Australia did not report aid costs for refugees" where four zeros would have gone.
 - **In a set of small multiples, name the series only in the first panel.** The reader carries the mapping across; repeating it in every panel is clutter. `201:335` (slopes, with the title's words colored to match), `162:110` and `293:57` (bars). Axis labels likewise go only on the outermost panels.
 - **When endpoint or in-mark labels collide beyond rescue, give up on them and build a bracketed column beside the plot** carrying `Name` over its value(s) — `323:216` and `445:80` (slopes, `63% → 43%` on one line), `603:844` and `633:1417` (ranked bars, numbered `1.`–`5.`).
 
@@ -213,6 +220,23 @@ v.x = mnx; v.y = mny;
 The hexes recorded here are for **identification and auditing** — telling you which color a node already carries, letting `color_audit.py` match an imported fill against the palette, and letting you spot an off-palette value. They are not values to assign. A hardcoded hex looks identical on the day you write it and then silently stops tracking the library: when design revises a swatch, every bound node moves and every typed hex stays behind, with nothing in the file or the render to show which is which. That is also why the handover doc asks for **every color as its style name and key** — "a hex alone is unreproducible, nobody can tell whether it came from the palette."
 
 The same rule governs type: apply the **named text style**, don't set `fontSize`/`fontName` to match one. See Named styles below.
+
+**Darken a color in HSL — lightness × 0.6, hue and saturation untouched — not with an RGB multiply.**
+The RGB route is what you reach for first and it only works on saturated fills: on a pale color it
+slides toward grey. This is general to any darkened variant you need — a mark's own outline, a title
+word that has to stay legible, a hover-free emphasis — and the worked numbers are in
+`reference/per-chart-type/maps.md`.
+
+**The categorical palette runs out at six categories, however you choose them — and direct labeling
+is what makes that survivable.** Grapher's own six-color assignment routinely fails the color-vision
+audit (measured: deuteranopia ΔE **9.2** on one pair, 14.6 and 17.7 on two more), and no
+recombination fixes it, because six is past what the palette can separate. What rescues the chart is
+that **no reader has to match a color to a key**: with every mark named in place, the colors
+*distinguish* rather than *encode*, and a failing ΔE stops being a legibility bug. So on any chart
+above about four categories, report the audit numbers, note that the marks are directly labeled, and
+leave the repaint to the chart's author — rather than repainting toward a palette that cannot hold
+them. `color_audit.py` is the tool; `reference/per-chart-type/line.md` has the measured case.
+
 
 - Only the OWID palette — the **[Chart Colors] Library**, a shared Figma library, not a local style set (select an object → Fill → the four-circles library icon → Chart colors). It is the source of truth; `scripts/color_audit.py` carries a copy read off the cheat-sheet swatches, verified against `OwidDistinctColors` in owid-grapher. Re-read the library rather than trusting either copy if they ever disagree.
 - **The fill list below is also the assignment *order*.** Cross-checked against the Cheat Sheets' "Revised Line Chart Color Order" (2026-08-20): that sequence is identical to the list below, so assigning series in list order is what the design team recommends for maximum separation between adjacent colors. Take them in order rather than picking by eye, and see the Line and Slope Charts group below for the darkened variants to use on thin marks.
