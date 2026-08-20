@@ -674,10 +674,50 @@ def fix_missing_nuclear_energy_data(tb: Table) -> Table:
     return tb
 
 
+# Finer residual regions that "Other South and Central America (EI)" is a rollup of, and that REGIONS
+# above already assigns: "Other South America (EI)" to South America, and "Other Caribbean (EI)" and
+# "Central America (EI)" to North America. The Statistical Review publishes both levels side by side, and
+# for most columns the rollup is exactly their sum, in which case every country it covers is already in one
+# of the two aggregates and there is nothing for fix_issues_with_other_regions to catch. Where the finer
+# regions are absent (the reserves columns) or fall short of the rollup (electricity generation by fuel,
+# biodiesel consumption), the difference is genuinely unassigned and the check does apply.
+ROLLUP_COMPONENTS = {
+    "Other South and Central America (EI)": [
+        "Other South America (EI)",
+        "Other Caribbean (EI)",
+        "Central America (EI)",
+    ],
+}
+# How close the rollup and the sum of its components must be, as a fraction of the rollup's largest value
+# in the column, to count as the same thing. They agree to floating-point precision where they agree at all.
+ROLLUP_TOLERANCE = 1e-4
+# Column the rollup must decompose in. It is the Statistical Review's headline series, so a vintage that
+# stops publishing the finer regions fails here instead of quietly deleting region aggregates again.
+ROLLUP_MUST_DECOMPOSE_IN = "total_energy_supply_ej"
+
+
+def find_columns_covered_by_finer_regions(tb: Table, rollup: str) -> set[str]:
+    """Columns where a rollup "Other *" region is exactly the sum of the finer ones we already assign."""
+    components = ROLLUP_COMPONENTS.get(rollup)
+    if not components:
+        return set()
+    tb_rollup = tb[tb["country"] == rollup].set_index("year")
+    tb_components = tb[tb["country"].isin(components)].groupby("year", observed=True).sum(min_count=1)
+    covered = set()
+    for column in tb.drop(columns=["country", "year"]).columns:
+        values = tb_rollup[column].dropna()
+        if values.empty:
+            continue
+        parts = tb_components[column].reindex(values.index).fillna(0)
+        if (values - parts).abs().max() <= ROLLUP_TOLERANCE * values.abs().max():
+            covered.add(column)
+    return covered
+
+
 def fix_issues_with_other_regions(tb: Table) -> Table:
     tb = tb.copy()
     # Dictionary of "Other *" regions, and the OWID regions with which they may overlap.
-    # For example, "Other South and Central America (EI)" could be assigned to either "South America" or "North America" (which, according to OWID region definitions, includes Central America).
+    # For example, "Other South and Central America (EI)" could be assigned to either "South America" or "North America" (which, according to OWID region definitions, includes Central America). Where the Statistical Review also publishes the finer regions that rollup is made of, we assign those instead and skip the column here (see ROLLUP_COMPONENTS).
     # This function will check how big the contribution of the "Other *" region is with respect to the overlapping OWID regions; if too big, the OWID region aggregate will be removed for that indicator.
     # We do this to avoid creating region aggregates that significantly underestimates the true value for the region.
     # To justify this correction, note that for some indicators (e.g. oil electricity generation), "Other South and Central America (EI)" is actually larger than "South America".
@@ -694,10 +734,16 @@ def fix_issues_with_other_regions(tb: Table) -> Table:
     max_percentage_deviation = 15
     # Remove aggregates in columns for which an overlapping "Other *" region has a significant contribution, compared to the aggregate.
     for other_region, owid_regions in ei_regions_and_overlapping_owid_regions.items():
+        covered = find_columns_covered_by_finer_regions(tb=tb, rollup=other_region)
+        if other_region in ROLLUP_COMPONENTS:
+            error = f"{other_region} no longer decomposes into the finer regions in {ROLLUP_MUST_DECOMPOSE_IN}."
+            assert ROLLUP_MUST_DECOMPOSE_IN in covered, error
         tb_other = tb[(tb["country"] == other_region)].fillna(0).reset_index(drop=True)
         for continent in owid_regions:
             tb_continent = tb[(tb["country"] == continent)].fillna(0).reset_index(drop=True)
             for column in tb.drop(columns=["country", "year"]).columns:
+                if column in covered:
+                    continue
                 remove_aggregate = False
                 # Define the minimum magnitude of values that we care about (the indicator's range in the continent divided by fraction_of_range).
                 min_range = (tb_continent[column].max() - tb_continent[column].min()) / fraction_of_range
