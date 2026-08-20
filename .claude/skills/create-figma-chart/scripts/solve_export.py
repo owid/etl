@@ -19,15 +19,22 @@ Substituting W = 510000/H into (W - 1.4F)/(H - 1.4F) = A gives a quadratic in H:
 which this solves in closed form. F is then found by bisection, because the content width that sets
 the final label size itself depends on F.
 
+The band is not the target. Step 7 fits the chart to `band - 2*gap`, not to the band itself, so the
+aspect to solve for is `bandW / (bandH - 2*gap)`. Solving for the band's own aspect lands the chart
+edge to edge with a zero-pixel gap, which `measure_fit.js` then flags and you re-export. The gap is
+14 by default with 12-16 the comfortable range on the 540-wide frames, but it is a flag because the
+Instagram portrait runs at 30 (reference/FITTING.md).
+
 Accurate to a few px, which is what the docs claim ("expect at most one correction"). Passing a
 --content-aspect measured off a real import removes even that.
 
 Usage:
     solve_export.py --band 508x371 --slug life-expectancy
-    solve_export.py --band 508x371 --target-label 15 --params "country=USA~CHN&tab=chart"
+    solve_export.py --band 508x371 --gap 30 --target-label 15 --params "country=USA~CHN"
     solve_export.py --band 302x220 --thumbnail --slug life-expectancy
 
-Self-test (validates the model against the two worked examples in the docs):
+Self-test (validates the model against the worked examples in the docs, and round-trips the band
+arithmetic — the solved content, scaled into the band, must leave exactly --gap at each end):
     solve_export.py --self-test
 """
 
@@ -41,6 +48,15 @@ CANVAS_AREA = 510_000.0  # px^2 the server renormalizes an uncaptioned/default e
 INSET_PER_FONT = 1.4  # inset on each axis, as a multiple of imFontSize
 LABEL_RATIO = 0.75  # segment values / entity names, as a multiple of the base font
 MIN_LABEL = 12.0  # the floor the guidelines set for a full-size chart
+DEFAULT_GAP = 14.0  # px at each end of the band; 12-16 is the house range on 540-wide frames
+
+# 302-wide thumbnail route (SMALL-CHARTS.md). imType=thumbnail returns early from extractOptions, so
+# imWidth/imHeight are the canvas outright — but grapher still insets the ink inside that canvas, so
+# the canvas has to be solved from the *content* width, not the frame width.
+THUMB_MARGIN = 12.0  # side margin of the 302-wide templates: content box is 12 ... 290
+THUMB_INK_INSET = 7.2  # measured ink padding per side at imFontSize=16
+THUMB_TARGET_LABEL = 12.0  # top of the format's range; imFontSize=16 lands here on both types
+THUMB_MIN_LABEL = 11.0  # the format's floor — the templates' own labels are 11px by design
 
 
 def solve_canvas(content_aspect: float, font: float) -> tuple[float, float]:
@@ -94,6 +110,28 @@ def self_test() -> int:
         print(f"      inset check: content {pcw:.1f}x{pch:.1f} vs observed {cw:.1f}x{ch:.1f}")
     print(f"\nworst canvas error: {worst:.1f}px — docs state the model is approximate (+-3px)")
     ok = worst <= 3.0
+
+    # The band arithmetic, round-tripped: solve for band - 2*gap, scale the solved content to the
+    # band width, and the leftover must be exactly gap at each end. A zero-gap solve here is the
+    # regression this covers — it is what a chart crowding the header and footer looks like.
+    print(f"\n{'band':>12} {'gap':>5} {'F':>4} {'content':>15} {'scaled h':>9} {'gap/end':>8} {'err':>6}")
+    worst_gap = 0.0
+    for bw, bh, gap, target in [(508.0, 371.0, 14.0, 13.5), (508.0, 371.0, 12.0, 13.5), (508.0, 552.0, 30.0, 15.0)]:
+        usable = bh - 2.0 * gap
+        font = solve_font(bw / usable, bw, target)
+        w, h = solve_canvas(bw / usable, font)
+        cw, ch = content_box(w, h, font)
+        scaled_h = ch * (bw / cw)
+        got = (bh - scaled_h) / 2.0
+        err = abs(got - gap)
+        worst_gap = max(worst_gap, err)
+        print(
+            f"{f'{bw:g}x{bh:g}':>12} {gap:5.0f} {font:4.0f} {f'{cw:.1f}x{ch:.1f}':>15} "
+            f"{scaled_h:9.1f} {got:8.2f} {err:6.3f}"
+        )
+    print(f"\nworst gap error: {worst_gap:.3f}px — the band round-trip is exact arithmetic (<0.01px)")
+    ok = ok and worst_gap < 0.01
+
     print("PASS" if ok else "FAIL")
     return 0 if ok else 1
 
@@ -107,7 +145,18 @@ def main() -> int:
         help="measured content aspect of a real import — overrides the band's own aspect. "
         "Use this for the one correction: hide connectors and year markers first, then re-read it.",
     )
-    ap.add_argument("--target-label", type=float, default=13.5, help="desired final label px (default 13.5)")
+    ap.add_argument(
+        "--gap",
+        type=float,
+        default=DEFAULT_GAP,
+        help=f"px to leave at each end of the band (default {DEFAULT_GAP:g}; 12-16 on the 540-wide "
+        "frames, 30 on the Instagram portrait). The solve targets band height - 2*gap.",
+    )
+    ap.add_argument(
+        "--target-label",
+        type=float,
+        help=f"desired final label px (default 13.5, or {THUMB_TARGET_LABEL:g} on --thumbnail)",
+    )
     ap.add_argument("--placed-width", type=float, help="width the export is placed at (default: band width)")
     ap.add_argument("--slug", help="grapher slug, to emit a ready curl")
     ap.add_argument("--params", default="", help="extra grapher query params, e.g. 'country=USA~CHN'")
@@ -115,7 +164,22 @@ def main() -> int:
         "--thumbnail",
         action="store_true",
         help="302-wide route: imType=thumbnail takes the size outright (staticBounds = imWidth/4 x "
-        "imHeight/4), so no aspect solve and no rescale. See SMALL-CHARTS.md.",
+        "imHeight/4), so no aspect solve and no rescale. Solves the canvas from the content width "
+        "and the ink inset, so the group lands on the template's content box. See SMALL-CHARTS.md.",
+    )
+    ap.add_argument(
+        "--margin",
+        type=float,
+        default=THUMB_MARGIN,
+        help=f"--thumbnail only: side margin of the template (default {THUMB_MARGIN:g}, giving a "
+        "278px content box on a 302-wide frame)",
+    )
+    ap.add_argument(
+        "--ink-inset",
+        type=float,
+        default=THUMB_INK_INSET,
+        help=f"--thumbnail only: ink padding per side inside the canvas (default {THUMB_INK_INSET:g}, "
+        "measured at imFontSize=16 — measure the import and expect one correction)",
     )
     ap.add_argument("--self-test", action="store_true", help="validate the model against the docs")
     args = ap.parse_args()
@@ -129,31 +193,59 @@ def main() -> int:
         bw, bh = (float(x) for x in args.band.lower().split("x"))
     except ValueError:
         ap.error("--band must look like 508x371")
+    if bw <= 0 or bh <= 0:
+        ap.error(f"--band must be positive on both axes, got {bw:g}x{bh:g}")
+    if args.content_aspect is not None and args.content_aspect <= 0:
+        ap.error(f"--content-aspect must be positive, got {args.content_aspect:g}")
 
     placed_w = args.placed_width or bw
+    target_label = args.target_label if args.target_label is not None else (THUMB_TARGET_LABEL if args.thumbnail else 13.5)
 
     if args.thumbnail:
-        print("thumbnail route — request the pixel size directly, no solve needed:")
-        print(f"  imWidth={int(round(bw * 4))}&imHeight={int(round(bh * 4))}   (staticBounds = imWidth/4 x imHeight/4)")
-        print(f"  imFontSize: aim for {args.target_label:.0f} at 0.75x base -> ~{args.target_label / LABEL_RATIO:.0f}")
+        # Target the ink, not the frame: a 302-wide canvas puts its ink at 7.2 ... 294.2, which
+        # overflows the template's 12 ... 290 content box at both ends (SMALL-CHARTS.md).
+        content_w = bw - 2.0 * args.margin
+        if content_w <= 0:
+            ap.error(f"--margin {args.margin:g} leaves no content width in a {bw:g}px frame")
+        canvas_w = content_w + 2.0 * args.ink_inset
+        im_w, im_h = int(round(canvas_w * 4)), int(round(bh * 4))
+        font = target_label / LABEL_RATIO
+        print("thumbnail route — the canvas is taken outright, so no aspect solve and no rescale:")
+        print(f"  frame           {bw:g} x {bh:g}")
+        print(f"  content box     {content_w:g} wide  (margin {args.margin:g} per side)")
+        print(f"  canvas          {canvas_w:.1f} wide  (+{args.ink_inset:g} ink inset per side) -> ink ~{content_w:g}")
+        print(f"  imWidth/Height  {im_w}/{im_h}   (staticBounds = imWidth/4 x imHeight/4)")
+        print(f"  imFontSize      {font:.0f}   ({target_label:g}px labels at {LABEL_RATIO}x base)")
+        if target_label < THUMB_MIN_LABEL:
+            print(f"  *** {target_label:g}px is under this format's {THUMB_MIN_LABEL:g}px floor")
         if args.slug:
             p = f"{args.params}&" if args.params else ""
             print(
                 f'\ncurl -sL "https://ourworldindata.org/grapher/{args.slug}.svg'
-                f"?{p}imType=thumbnail&imWidth={int(round(bw * 4))}&imHeight={int(round(bh * 4))}"
-                f'&imFontSize={args.target_label / LABEL_RATIO:.0f}&nocache" -o thumb.svg'
+                f"?{p}imType=thumbnail&imWidth={im_w}&imHeight={im_h}"
+                f'&imFontSize={font:.0f}&nocache" -o thumb.svg'
             )
+        print(f"\nThe group is its own ink, so set chart.x = {args.margin:g} after import — no rescale.")
+        print("The ink inset was measured at one font size: measure the import and expect one correction.")
         return 0
 
-    aspect = args.content_aspect if args.content_aspect else bw / bh
-    font = solve_font(aspect, placed_w, args.target_label)
+    usable_h = bh - 2.0 * args.gap
+    if usable_h <= 0:
+        ap.error(f"--gap {args.gap:g} leaves no height in a {bh:g}px band (2*gap >= band height)")
+
+    aspect = args.content_aspect if args.content_aspect else bw / usable_h
+    font = solve_font(aspect, placed_w, target_label)
     w, h = solve_canvas(aspect, font)
     cw, ch = content_box(w, h, font)
     label = label_at(font, cw, placed_w)
     im_w = int(round(w / h * 1000))
 
-    src = "measured content aspect" if args.content_aspect else "band aspect"
+    scale = placed_w / cw
+    gap_each_end = (bh - ch * scale) / 2.0
+
+    src = "measured content aspect" if args.content_aspect else "band minus gaps"
     print(f"band            {bw:g} x {bh:g}   (aspect {bw / bh:.4f})")
+    print(f"usable          {bw:g} x {usable_h:g}   (aspect {bw / usable_h:.4f}, {args.gap:g}px gap per end)")
     print(f"solving for     {aspect:.4f}  [{src}]")
     print(f"placed at       {placed_w:g}px wide")
     print()
@@ -161,7 +253,12 @@ def main() -> int:
     print(f"imWidth/Height  {im_w}/1000        (aspect ratio only — the server renormalizes)")
     print(f"declared        {w:.0f} x {h:.0f}   ({w * h:,.0f} px^2)")
     print(f"content         {cw:.1f} x {ch:.1f}   (aspect {cw / ch:.4f})")
-    print(f"scale into band {placed_w / cw:.4f}")
+    print(f"scale into band {scale:.4f}")
+    print(f"predicted gap   {gap_each_end:.1f}px per end", end="")
+    if gap_each_end < 0:
+        print("   *** the chart overflows the band — raise --gap or re-check --content-aspect")
+    else:
+        print()
     print(f"final labels    {label:.1f}px", end="")
     if label < MIN_LABEL:
         print(f"   *** under the {MIN_LABEL:g}px floor — raise --target-label or cut entities")

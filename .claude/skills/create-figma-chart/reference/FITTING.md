@@ -377,12 +377,26 @@ Verify against the actual clone with `get_metadata` (the templates evolve; the g
 > resolves header and footer with the same structural rule as `verify_templates.js`, so a renamed
 > frame cannot silently return `null`.
 >
-> Two things it does that hand-probing tends to get wrong. It reports **rendered** line counts
+> Three things it does that hand-probing tends to get wrong. It reports **rendered** line counts
 > (height ÷ lineHeight) rather than counting `\n`, because a *wrapped* title has no newline in it
-> and an explicit-break count reports a two-line title as one. And `hideIds` computes the group's
+> and an explicit-break count reports a two-line title as one. `hideIds` computes the group's
 > bbox **as if** `connectors` and the year markers were hidden, without hiding them — so the aspect
-> you get is the one you will actually fit, with the file untouched. Feed that `contentAspect`
-> straight into `solve_export.py --content-aspect`.
+> you get is the one you will actually fit, with the file untouched. And it takes the content box
+> from the **header** (`header.x`/`header.width`, as `verify_templates.js` does) rather than from a
+> union over `frame.children`: by this step the chart is already appended to the clone, so a union
+> would include the not-yet-fitted group, inflate the box to the group's own width, and report a
+> scale of ≈1 — "nothing to do" — which is the one answer the script exists to produce. The union is
+> still reported as `contentBoxFromRows` for cross-checking, with the group excluded.
+>
+> **Run the `nextPass` command it prints; do not feed the measured aspect back yourself.** The
+> second pass has to aim at the *reflection* of the measured aspect about the target
+> (`2×target − measured`), not at the measured aspect itself — solving for what you already got moves
+> the next export further off, by about the same margin again. On the case recorded above (target
+> 1.4810 on a 508×371 band, group measured 1.4342) passing the measured aspect back lands a 2.4px
+> gap where 14 was wanted, and the reflection lands 14.0. `nextPass` carries the band, the `--gap`
+> and the corrected aspect already; when the measurement is more than 15% off the target it drops the
+> correction and tells you to solve fresh, because that far out is a wrong export or leftover
+> furniture, not a near-miss.
 >
 > Cross-checked read-only against three live templates; every field matched `verify_templates.js`'s
 > expected geometry, Static Vertical's `1015.81` footer included.
