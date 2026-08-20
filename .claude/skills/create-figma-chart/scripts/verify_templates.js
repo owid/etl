@@ -55,14 +55,24 @@ const TEMPLATES = {
 // child is a source row rather than a footer, so footer fields don't apply.
 const VERIFIED = "2026-08-20";
 const EXPECT = {
-  "IG square":        { size: [540, 540],   contentX: 16, contentW: 508, headerBottom: 118,    reflows: true,  footerY: 488,     footerMode: "VERTICAL",   footerConstraintV: "MIN" },
-  "IG portrait":      { size: [560, 700],   contentX: 26, contentW: 508, headerBottom: 135,    reflows: true,  footerY: 640,     footerMode: "VERTICAL",   footerConstraintV: "MIN" },
-  "IG reel":          { size: [616, 1096],  contentX: null, contentW: null, headerBottom: null, reflows: null,  footerY: null,    footerMode: null,         footerConstraintV: null },
-  DI:                 { size: [540, 540],   contentX: 16, contentW: 508, headerBottom: 118,    reflows: true,  footerY: 508,     footerMode: "HORIZONTAL", footerConstraintV: "MIN" },
-  "static mobile 1":  { size: [540, 540],   contentX: 16, contentW: 508, headerBottom: 118,    reflows: true,  footerY: 486,     footerMode: "VERTICAL",   footerConstraintV: "MAX" },
-  "static mobile 2":  { size: [540, 824],   contentX: 16, contentW: 508, headerBottom: 118,    reflows: true,  footerY: 770,     footerMode: "VERTICAL",   footerConstraintV: "MIN" },
-  "static horizontal":{ size: [850, 638],   contentX: 16, contentW: 818, headerBottom: 118,    reflows: true,  footerY: 559,     footerMode: "VERTICAL",   footerConstraintV: "MIN" },
-  "static vertical":  { size: [850, 1095],  contentX: 16, contentW: 818, headerBottom: 118,    reflows: true,  footerY: 1015.81, footerMode: "VERTICAL",   footerConstraintV: "MIN" },
+  "IG square":        { size: [540, 540],   contentX: 16, contentW: 508, headerBottom: 118,    reflows: true,  footerY: 488,     footerMode: "VERTICAL",   footerConstraintV: "MIN", footerH: 36, footerRows: 2 },
+  "IG portrait":      { size: [560, 700],   contentX: 26, contentW: 508, headerBottom: 135,    reflows: true,  footerY: 640,     footerMode: "VERTICAL",   footerConstraintV: "MIN", footerH: 36, footerRows: 2 },
+  // IG reel is OUT OF SCOPE and its nulls are deliberate, not an oversight. It is structurally
+  // unlike the rest and nothing in this skill bands it: the Step 7 band table and the reflow table
+  // both list nine templates and omit it. Measured 2026-08-20, for anyone tempted to gate it: its
+  // header (`7336:148`) and footer (`7336:12`) are nested inside an `overall_chart_area` GROUP
+  // rather than being direct children, so the structural resolver below cannot reach them at all;
+  // its footer is `layoutMode: "NONE"` (the only non-auto-layout footer left); and it has its own
+  // type scale (32px title lines against 29 everywhere else). Gating it means teaching the resolver
+  // to descend a wrapper — don't, until the reel is actually in scope.
+  "IG reel":          { size: [616, 1096],  contentX: null, contentW: null, headerBottom: null, reflows: null,  footerY: null,    footerMode: null,         footerConstraintV: null, noLogo: true },
+  // DI's footerH 16 is the SHIPPED one-row height. Step 6's recipe converts a *clone* to VERTICAL
+  // and it grows — that is the clone, not the template, so do not "fix" this to 36.
+  DI:                 { size: [540, 540],   contentX: 16, contentW: 508, headerBottom: 118,    reflows: true,  footerY: 508,     footerMode: "HORIZONTAL", footerConstraintV: "MIN", footerH: 16, footerRows: 2 },
+  "static mobile 1":  { size: [540, 540],   contentX: 16, contentW: 508, headerBottom: 118,    reflows: true,  footerY: 486,     footerMode: "VERTICAL",   footerConstraintV: "MAX", footerH: 38, footerRows: 2 },
+  "static mobile 2":  { size: [540, 824],   contentX: 16, contentW: 508, headerBottom: 118,    reflows: true,  footerY: 770,     footerMode: "VERTICAL",   footerConstraintV: "MIN", footerH: 38, footerRows: 2 },
+  "static horizontal":{ size: [850, 638],   contentX: 16, contentW: 818, headerBottom: 118,    reflows: true,  footerY: 559,     footerMode: "VERTICAL",   footerConstraintV: "MIN", footerH: 63, footerRows: 3 },
+  "static vertical":  { size: [850, 1095],  contentX: 16, contentW: 818, headerBottom: 118,    reflows: true,  footerY: 1015.81, footerMode: "VERTICAL",   footerConstraintV: "MIN", footerH: 63, footerRows: 3 },
   // The 302-wide pair carries no logo and its bottom-most auto-layout child is a source row, not a
   // footer — so `logo` and every footer field are skipped rather than expected.
   "small guided":     { size: [302, null],  contentX: 12, contentW: 278, headerBottom: 44,     reflows: true,  footerY: null,    footerMode: null,         footerConstraintV: null, noLogo: true },
@@ -119,6 +129,7 @@ for (const [label, id] of Object.entries(TEMPLATES)) {
           children: header.children.map((c) => ({
             n: c.name.slice(0, 24),
             ar: c.textAutoResize || null,
+            pos: c.layoutPositioning,
             lsV: c.layoutSizingVertical,
             grow: c.layoutGrow,
             h: r(c.height),
@@ -192,6 +203,9 @@ for (const [label, e] of Object.entries(EXPECT)) {
         if (c.ar !== "HEIGHT") d.push(`header child "${c.n}" textAutoResize ${c.ar} != HEIGHT`);
         if (c.lsV !== "HUG") d.push(`header child "${c.n}" layoutSizingVertical ${c.lsV} != HUG`);
         if (c.grow !== 0) d.push(`header child "${c.n}" layoutGrow ${c.grow} != 0`);
+        // Same failure mode as an ABSOLUTE footer row: excluded from the parent's flow, so the
+        // header stops tracking it while every other property still reads normal.
+        if (c.pos === "ABSOLUTE") d.push(`header child "${c.n}" is ABSOLUTE — excluded from the header's flow`);
       }
     }
   }
@@ -201,6 +215,16 @@ for (const [label, e] of Object.entries(EXPECT)) {
       if (!near(g.footer.y, e.footerY, LOOSE)) d.push(`footer.y ${g.footer.y} != ${e.footerY}`);
       if (e.footerMode && g.footer.layoutMode !== e.footerMode) d.push(`footer.layoutMode ${g.footer.layoutMode} != ${e.footerMode}`);
       if (e.footerConstraintV && g.footer.constraintV !== e.footerConstraintV) d.push(`footer.constraintV ${g.footer.constraintV} != ${e.footerConstraintV}`);
+      // Gate the row SET, not just the surviving rows. `footer.y` alone cannot catch a deleted row:
+      // every footer but static mobile 1 is constrained MIN, so it keeps its top edge and only
+      // `height` collapses — footerY, footerMode and footerConstraintV all still pass while an
+      // image ships a row short. Height + count is the encoding; row NAMES deliberately are not,
+      // because names here are not stable across design edits (see the node map) and that is the
+      // whole reason header and footer are resolved structurally.
+      if (e.footerH != null && !near(g.footer.h, e.footerH, LOOSE)) d.push(`footer.height ${g.footer.h} != ${e.footerH}`);
+      if (e.footerRows != null && g.footer.rows.length !== e.footerRows) {
+        d.push(`footer row count ${g.footer.rows.length} != ${e.footerRows}`);
+      }
       for (const row of g.footer.rows) {
         if (row.pos === "ABSOLUTE") d.push(`footer row "${row.name}" is ABSOLUTE — that footer no longer reflows`);
       }
