@@ -25,17 +25,23 @@ edge to edge with a zero-pixel gap, which `measure_fit.js` then flags and you re
 14 by default with 12-16 the comfortable range on the 540-wide frames, but it is a flag because the
 Instagram portrait runs at 30 (reference/FITTING.md).
 
-Accurate to a few px, which is what the docs claim ("expect at most one correction"). Passing a
---content-aspect measured off a real import removes even that.
+Accurate to a few px, which is what the docs claim ("expect at most one correction"). To spend that
+correction, take the `nextPass` command `measure_fit.js` prints — do NOT pass the aspect you measured
+off the import back in as --content-aspect. Solving for the aspect you already got aims at the miss
+instead of at the target and roughly doubles it; the correction has to be the reflection of the
+measured aspect about the target, `2*target - measured`, which is what `nextPass` carries.
 
-Usage:
-    solve_export.py --band 508x371 --slug life-expectancy
-    solve_export.py --band 508x371 --gap 30 --target-label 15 --params "country=USA~CHN"
-    solve_export.py --band 302x220 --thumbnail --slug life-expectancy
+Usage — from the repo root, through the venv (this file is committed non-executable, like every
+other script in this directory):
+
+    S=.claude/skills/create-figma-chart/scripts/solve_export.py
+    .venv/bin/python $S --band 508x371 --slug life-expectancy
+    .venv/bin/python $S --band 508x371 --gap 30 --target-label 15 --params "country=USA~CHN"
+    .venv/bin/python $S --band 302x220 --thumbnail --slug life-expectancy
 
 Self-test (validates the model against the worked examples in the docs, and round-trips the band
 arithmetic — the solved content, scaled into the band, must leave exactly --gap at each end):
-    solve_export.py --self-test
+    .venv/bin/python $S --self-test
 """
 
 from __future__ import annotations
@@ -143,8 +149,10 @@ def main() -> int:
     ap.add_argument(
         "--content-aspect",
         type=float,
-        help="measured content aspect of a real import — overrides the band's own aspect. "
-        "Use this for the one correction: hide connectors and year markers first, then re-read it.",
+        help="the content aspect to solve for, bypassing the band/gap derivation. This is the "
+        "TARGET, not the measurement: pass the reflected value from measure_fit.js's `nextPass` "
+        "(2*target - measured), never the aspect you just measured off the import, which aims the "
+        "solve at the miss and doubles it.",
     )
     ap.add_argument(
         "--gap",
@@ -245,7 +253,7 @@ def main() -> int:
     scale = placed_w / cw
     gap_each_end = (bh - ch * scale) / 2.0
 
-    src = "measured content aspect" if args.content_aspect else "band minus gaps"
+    src = "explicit target aspect" if args.content_aspect else "band minus gaps"
     print(f"band            {bw:g} x {bh:g}   (aspect {bw / bh:.4f})")
     print(f"usable          {bw:g} x {usable_h:g}   (aspect {bw / usable_h:.4f}, {args.gap:g}px gap per end)")
     print(f"solving for     {aspect:.4f}  [{src}]")
@@ -279,8 +287,10 @@ def main() -> int:
         print("  grep -oE 'font-size=\"[0-9.]+\"' embed.svg | sort | uniq -c | sort -rn | head -3")
     print(
         "\nHide connectors and year markers BEFORE measuring the group — they extend past the plot,"
-        "\nso hiding them narrows it and makes it relatively taller. Re-run with --content-aspect"
-        "\nfrom the group you are actually going to fit."
+        "\nso hiding them narrows it and makes it relatively taller. Then measure with"
+        "\nscripts/measure_fit.js and run the `nextPass` command it prints: it reflects the measured"
+        "\naspect about the target for you. Passing the measured aspect straight back to"
+        "\n--content-aspect solves for the miss and doubles it."
     )
     return 0
 

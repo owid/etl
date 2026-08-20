@@ -271,6 +271,8 @@ head -c 300 $DIR/embed.svg   # expect <svg ... width="..." height="...">, no <ht
 ```
 
 > **[`scripts/solve_export.py`](scripts/solve_export.py) does this arithmetic — don't do it by hand.**
+> Run it from the repo root through the venv — `.venv/bin/python .claude/skills/create-figma-chart/scripts/solve_export.py …`;
+> it is committed non-executable like the rest of that directory.
 > `--band 508x371 --slug <slug>` returns the solved `imFontSize`, the `imWidth`/`imHeight` to
 > request, the predicted content box, the scale into the band, the gap it predicts at each end, the
 > final label size, and the finished `curl`. It also carries the model's own self-test

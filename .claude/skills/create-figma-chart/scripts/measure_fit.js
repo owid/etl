@@ -234,9 +234,11 @@ if (groupNode) {
     const measured = w / h;
     // --target-label has to travel with the correction: solve_export.py defaults to 13.5, so a
     // portrait solved at 15 would come back with smaller text purely from re-solving the aspect.
+    // Runnable as printed, from the repo root: these scripts are committed non-executable like every
+    // other script in this directory, and the repo rule is that Python goes through the venv.
     const cmd =
-      `scripts/solve_export.py --band ${contentW}x${r(band.height)} --gap ${gap}` +
-      ` --target-label ${targetLabel}`;
+      ".venv/bin/python .claude/skills/create-figma-chart/scripts/solve_export.py" +
+      ` --band ${contentW}x${r(band.height)} --gap ${gap} --target-label ${targetLabel}`;
     group.target = { aspect: r(target), gap, usableHeight: r(usable) };
     // The reflection only cancels a small model error. A group that is far off the target is not a
     // near-miss to correct but something else — the wrong export, or furniture still in the bbox —
