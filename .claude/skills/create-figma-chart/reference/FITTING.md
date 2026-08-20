@@ -370,6 +370,23 @@ The table gives one number per template — the band you fit a chart into — an
 
 Verify against the actual clone with `get_metadata` (the templates evolve; the geometry above is a 2026 snapshot). These are **frame-local** coordinates, and `x`/`y` are relative to a node's parent — so append the embed to the template clone **before** positioning it. Left parented to the page (where Step 5 puts imported nodes), the same numbers land it near the page origin, on top of the reference chart. One wrinkle in the same rule: **a GROUP is transparent for coordinates**, so once the imported chart is inside the template, its descendants report `x`/`y` in the *template frame's* space, not the group's — which is what makes the frame-local numbers above directly usable on the plot's internals.
 
+> **[`scripts/measure_fit.js`](../scripts/measure_fit.js) returns every number in this step in one
+> read-only `use_figma` call** — the band off the *filled* clone, the content box, the header's
+> sizing (including whether it actually `reflows`), and, given the imported group, its measured
+> bbox, content aspect, the uniform scale to the content width and the resulting gap per end. It
+> resolves header and footer with the same structural rule as `verify_templates.js`, so a renamed
+> frame cannot silently return `null`.
+>
+> Two things it does that hand-probing tends to get wrong. It reports **rendered** line counts
+> (height ÷ lineHeight) rather than counting `\n`, because a *wrapped* title has no newline in it
+> and an explicit-break count reports a two-line title as one. And `hideIds` computes the group's
+> bbox **as if** `connectors` and the year markers were hidden, without hiding them — so the aspect
+> you get is the one you will actually fit, with the file untouched. Feed that `contentAspect`
+> straight into `solve_export.py --content-aspect`.
+>
+> Cross-checked read-only against three live templates; every field matched `verify_templates.js`'s
+> expected geometry, Static Vertical's `1015.81` footer included.
+
 **The header reflows itself — don't reposition it.** Every template's header block is a flat vertical auto-layout of `[title, subtitle]` (the logo is a sibling, not a child — see the node map), so a title that grows from two lines to three pushes the subtitle down and grows the header on its own. Set `characters`, then **read the new `header.y + header.height` back** and measure the band from that; any y you computed before the text went in is stale. Measured on the portrait: a two-line title gives a 135 band bottom, three lines 199.
 
 **The logo no longer sets a floor under that** — it is a sibling of the header, not a child, so it contributes nothing to the header's height and a one-line title buys the full reduction. What the logo still constrains is *width*: the title node is sized narrower than the content box to clear it (737.84 against 818 on Static Vertical, 428 against 508 on the 540-wide set), which is the number a title has to be measured against. Read the band back rather than deriving it from line counts either way.

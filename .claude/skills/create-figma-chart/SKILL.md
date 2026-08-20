@@ -270,6 +270,16 @@ curl -sL "https://ourworldindata.org/grapher/<slug>.svg?<params>&imType=uncaptio
 head -c 300 $DIR/embed.svg   # expect <svg ... width="..." height="...">, no <html
 ```
 
+> **[`scripts/solve_export.py`](scripts/solve_export.py) does this arithmetic — don't do it by hand.**
+> `--band 508x371 --target-label 13.5 --slug <slug>` returns the solved `imFontSize`, the
+> `imWidth`/`imHeight` to request, the predicted content box, the scale into the band, the final
+> label size, and the finished `curl`. It also carries the model's own self-test
+> (`--self-test`, which reproduces both worked examples below to within 1.4px) and the
+> `--thumbnail` route for a 302-wide chart. Verified end to end: for a 508×371 band it solved
+> `imFontSize=28, imWidth=1346` and predicted 828×616 — grapher returned **829×616** with
+> `font-size="21"`, landing labels at exactly 13.5px. After you have measured a real import, feed
+> `--content-aspect` back in for the one correction.
+
 **The aspect you request is the *canvas*, not the chart — solve for the padding or you will re-export every page.** Grapher insets the drawing inside the SVG it hands back, so the group Figma imports is smaller than the declared size, and it is the *group* that has to fill the template band. Measured on this file's charts, the inset is close to **1.4 × `imFontSize` on each axis** (at `imFontSize=32`: declared 901×566 → content 857×520; at 30: 862×591 → 818.9×550). So don't request the aspect you want — request the aspect that *yields* it, by solving
 
 ```
