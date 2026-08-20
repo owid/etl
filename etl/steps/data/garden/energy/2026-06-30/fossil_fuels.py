@@ -96,6 +96,13 @@ REGIONS = CONTINENTS + INCOME_GROUPS
 # 1970. The income groups follow the years both producers share, where production starts a year later
 # than consumption because the three fuels of a metric are held to one start year. Asserted in
 # sanity_check_outputs, so that a change has to be acknowledged here rather than found on a chart.
+# Region-column pairs the Statistical Review publishes no aggregate for, so neither do we. It names at
+# most two Oceanian countries for an energy indicator and only one for production, so its coverage gate
+# drops Oceania where the aggregate would be Australia alone. Rebuilding those two from countries instead
+# is not an option: New Zealand's and Papua New Guinea's production sits in the residual region the
+# Statistical Review folds into Asia, so it would be counted twice.
+AGGREGATES_NOT_PUBLISHED: dict[str, list[str]] = {"Oceania": ["oil_production_twh", "gas_production_twh"]}
+
 EXPECTED_AGGREGATE_YEARS: dict[str, dict[str, tuple[int, int]]] = {
     "continents": {
         "coal_production_twh": (1981, 2025),
@@ -539,6 +546,9 @@ def sanity_check_outputs(tb: Table) -> None:
         for column, (expected_first, expected_last) in expected.items():
             for region in CONTINENTS if family == "continents" else INCOME_GROUPS:
                 years = sorted(tb.loc[(tb["country"] == region) & tb[column].notna(), "year"].unique())
+                if column in AGGREGATES_NOT_PUBLISHED.get(region, []):
+                    assert not years, f"{region} now has {column}, which was expected to be absent."
+                    continue
                 assert years, f"{region} has no {column} at all."
                 assert (int(years[0]), int(years[-1])) == (expected_first, expected_last), (
                     f"{region}'s {column} spans {years[0]}-{years[-1]}, not the expected "
@@ -554,6 +564,10 @@ def sanity_check_outputs(tb: Table) -> None:
     for family, regions in families.items():
         members = tb[tb["country"].isin(regions)]
         for column in ENERGY_COLUMNS:
+            # A family with a member that has no aggregate in this column cannot be summed against the
+            # World. The other family still covers the column, so the check is not lost entirely.
+            if any(column in AGGREGATES_NOT_PUBLISHED.get(region, []) for region in regions):
+                continue
             per_year = members.groupby("year", observed=True)[column].agg(["sum", "count"])
             complete = per_year[per_year["count"] == len(regions)]
             gap = (complete["sum"] - world[column]).dropna()

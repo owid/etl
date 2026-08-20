@@ -313,6 +313,16 @@ TES_SOURCES_EJ = [
 # energy mix fills biofuels itself, after both producers are in.
 SOURCE_NOT_FILLED_WITH_ZEROS = "biofuels_consumption_ej"
 
+# Minimum number of countries that must report an indicator for a region's aggregate to be published.
+# A coverage condition only means something for a region with no residual "Other *" region of its own,
+# since elsewhere that region stands for exactly the countries a count would treat as missing: the
+# Statistical Review names only a handful of African countries, and "Other Africa (EI)" is the rest of the
+# continent. Oceania is the one continent in that position, because its residual region is folded into
+# Asia (see REGIONS), so its aggregate is only the countries named, and at most two of them are ever named
+# for an energy indicator. Requiring two keeps the aggregate where New Zealand is reported and drops it
+# where it would be Australia alone, which is the case for every production indicator.
+MIN_NUM_COUNTRIES_INFORMED = {"Oceania": 2}
+
 # Regions that don't need to be included as part of other region aggregates (unlike, e.g. "Other Africa (EI)", which needs to be added to "Africa").
 REGIONS_NOT_ASSIGNED_TO_OTHER_REGIONS = [
     "Africa (EI)",
@@ -825,6 +835,7 @@ def create_region_aggregates(tb: Table) -> Table:
         tb,
         regions=REGIONS,
         min_num_values_per_year=1,
+        min_num_countries_informed=MIN_NUM_COUNTRIES_INFORMED,
         ignore_overlaps_of_zeros=True,
         accepted_overlaps=KNOWN_OVERLAPS,
     )
