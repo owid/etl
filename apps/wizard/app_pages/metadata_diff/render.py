@@ -9,6 +9,7 @@ Metadata Diff used to offer a "Compare against" choice, which asked reviewers a 
 other diffs ask, and which they had to get right for the numbers to mean anything.
 """
 
+import difflib
 import html
 import json
 import urllib.parse
@@ -96,6 +97,72 @@ def chart_datapage_url(env, chart_id: int) -> str:
     return f"{env.admin_site}/charts/{chart_id}/preview?forceDatapage=true"
 
 
+def _norm_bullet(bullet: Any) -> str:
+    return str(bullet).strip() if bullet else ""
+
+
+# How alike two bullets must be to count as the same bullet edited, rather than one removed and another
+# added. Low enough that a rewritten sentence inside a long bullet still pairs, high enough that two
+# unrelated bullets sharing boilerplate ("For more details, see the documentation") do not.
+_BULLET_MATCH_RATIO = 0.4
+
+
+def pair_bullets(old_list: list[Any], new_list: list[Any]) -> list[tuple[Any | None, Any | None]]:
+    """Line bullets up across the two sides: (old, new), with None where a bullet exists on one side only.
+
+    Deterministic on purpose. Each column of the diff is rendered by its own call, so the two calls must
+    reach the same pairing from the same pair of lists, or the columns would disagree about which bullet
+    is which. Nothing here depends on which side is being drawn.
+
+    Identical bullets pair first, so an edit is never matched to a bullet that survived untouched. What is
+    left pairs by similarity, most-alike first, which is what lets a reworded bullet diff against its own
+    earlier wording. Below the threshold a bullet is a genuine addition or removal and pairs with None.
+    """
+    old_norm = [_norm_bullet(b) for b in old_list]
+    new_norm = [_norm_bullet(b) for b in new_list]
+    pairs: dict[int, int] = {}  # new index -> the old index it came from
+    used_old: set[int] = set()
+
+    # Identical text first.
+    for n_i, n_text in enumerate(new_norm):
+        for o_i, o_text in enumerate(old_norm):
+            if o_i not in used_old and o_text == n_text:
+                pairs[n_i] = o_i
+                used_old.add(o_i)
+                break
+
+    # Then the most similar remaining candidates, highest ratio first. Ties break on position, so the
+    # result cannot depend on dictionary ordering.
+    candidates = [
+        (difflib.SequenceMatcher(None, old_norm[o_i], new_norm[n_i]).ratio(), -n_i, -o_i, n_i, o_i)
+        for n_i in range(len(new_norm))
+        if n_i not in pairs
+        for o_i in range(len(old_norm))
+        if o_i not in used_old
+    ]
+    for ratio, _, _, n_i, o_i in sorted(candidates, reverse=True):
+        if ratio < _BULLET_MATCH_RATIO or n_i in pairs or o_i in used_old:
+            continue
+        pairs[n_i] = o_i
+        used_old.add(o_i)
+
+    # Emit in the new side's order — the one a reviewer reads. A removed bullet keeps its old place,
+    # ahead of whichever surviving bullet used to follow it, instead of drifting to the end of the list.
+    removals = [o_i for o_i in range(len(old_list)) if o_i not in used_old]
+    out: list[tuple[Any | None, Any | None]] = []
+    emitted: set[int] = set()
+    for n_i in range(len(new_list)):
+        o_i = pairs.get(n_i)
+        if o_i is not None:
+            for dropped in removals:
+                if dropped < o_i and dropped not in emitted:
+                    out.append((old_list[dropped], None))
+                    emitted.add(dropped)
+        out.append((old_list[o_i] if o_i is not None else None, new_list[n_i]))
+    out += [(old_list[o_i], None) for o_i in removals if o_i not in emitted]
+    return out
+
+
 def render_text_html(value: Any, other: Any, side: str, changed_only: bool = False) -> str:
     """One side of the side-by-side diff, with word-level highlights against the other side.
 
@@ -120,18 +187,28 @@ def render_text_html(value: Any, other: Any, side: str, changed_only: bool = Fal
         reordered = [str(x).strip() for x in value_list if x] != [str(x).strip() for x in other_list if x] and sorted(
             str(x).strip() for x in value_list if x
         ) == sorted(str(x).strip() for x in other_list if x)
-        if changed_only and not reordered:
-            # Only bullets not present (unchanged) on the other side: additions/edits on the new side,
-            # removals/edits on the old side. Unchanged bullets are hidden.
-            unchanged = {str(x).strip() for x in other_list if x}
-            items = [
-                f"<li>{(_one('', v) if side == 'new' else _one(v, ''))}</li>"
-                for v in value_list
-                if v and str(v).strip() not in unchanged
-            ]
+        if not reordered:
+            # Pair each bullet with its counterpart on the other side, so an edited bullet is diffed
+            # against its own earlier wording and only the words that moved light up. Matching by
+            # membership instead — "is this exact bullet on the other side?" — could only answer yes or
+            # no, so an edited bullet was diffed against the empty string and every word of it read as
+            # inserted: a one-sentence addition rendered as a wholly rewritten paragraph, which is the
+            # opposite of what a reviewer needs to see.
+            old_list, new_list = (other_list, value_list) if side == "new" else (value_list, other_list)
+            items = []
+            for old_bullet, new_bullet in pair_bullets(old_list, new_list):
+                unchanged = _norm_bullet(old_bullet) == _norm_bullet(new_bullet)
+                if changed_only and unchanged:
+                    continue
+                # A pair with nothing on this side is an insertion (or deletion) the other column shows.
+                if (new_bullet if side == "new" else old_bullet) is None:
+                    continue
+                items.append(f"<li>{_one(old_bullet, new_bullet)}</li>")
             if not items:
                 return '<div class="mdd-text mdd-empty">(no changes here)</div>'
             return f'<div class="mdd-text"><ul>{"".join(items)}</ul></div>'
+        # A reorder: every bullet's text survives, so pairing finds no change at all. Show the full list
+        # positionally, which is where the new order is visible.
         items = []
         for i in range(max(len(value_list), len(other_list))):
             v = value_list[i] if i < len(value_list) else ""

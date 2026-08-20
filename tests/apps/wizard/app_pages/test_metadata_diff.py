@@ -1440,3 +1440,92 @@ def test_filtering_to_active_export_recipes_drops_no_real_recipe():
     # Every active step is reachable from a file in the tree, so the filter keeps all of them.
     assert active <= derived
     assert active & derived == active
+
+
+# --- Bullet-level diffing -------------------------------------------------------------------------
+
+
+def _highlighted(html: str) -> list[str]:
+    """The text inside <ins>/<del> spans — what a reviewer's eye is drawn to."""
+    import re
+
+    return re.findall(r"<(?:ins|del)[^>]*>(.*?)</(?:ins|del)>", html)
+
+
+def test_an_edited_bullet_highlights_only_the_words_that_changed():
+    """A one-sentence insertion must not read as a rewritten paragraph.
+
+    Matching bullets by membership could only answer "is this exact text on the other side?", so an
+    edited bullet was diffed against the empty string and every word of it came back highlighted —
+    both columns solid colour, with no way to see what actually moved.
+    """
+    from apps.wizard.app_pages.metadata_diff.render import render_text_html
+
+    old = ["Estimates are extrapolated using growth forecasts. See the documentation for the methodology."]
+    new = [
+        "Estimates are extrapolated using growth forecasts. The most recent years are therefore "
+        "projections. See the documentation for the methodology."
+    ]
+
+    new_side = _highlighted(render_text_html(new, old, side="new", changed_only=True))
+    assert new_side == ["The most recent years are therefore projections. "]
+    # Nothing was removed, so the old column has no highlight at all.
+    assert _highlighted(render_text_html(old, new, side="old", changed_only=True)) == []
+
+
+def test_an_added_bullet_is_highlighted_whole_and_a_removed_one_shows_on_the_old_side():
+    """A bullet with no counterpart is an addition or a removal, and reads as one."""
+    from apps.wizard.app_pages.metadata_diff.render import render_text_html
+
+    old = ["Kept exactly as it was."]
+    new = ["Kept exactly as it was.", "An entirely new point about the data."]
+
+    assert _highlighted(render_text_html(new, old, side="new", changed_only=True)) == [
+        "An entirely new point about the data."
+    ]
+    # The addition has nothing on the old side, and the surviving bullet is unchanged, so nothing shows.
+    assert "(no changes here)" in render_text_html(old, new, side="old", changed_only=True)
+
+    # And the reverse: a removal is highlighted on the old side.
+    assert _highlighted(render_text_html(old, new[1:], side="old", changed_only=True)) != []
+
+
+def test_unrelated_bullets_are_not_paired_as_an_edit():
+    """Below the similarity threshold, two bullets are a removal and an addition, not one rewrite.
+
+    Otherwise boilerplate shared between unrelated bullets ("see the documentation") would pair them and
+    present a wholesale replacement as a small edit.
+    """
+    from apps.wizard.app_pages.metadata_diff.render import pair_bullets
+
+    pairs = pair_bullets(
+        ["Income is measured after taxes. See the documentation."],
+        ["Wealth counts non-financial assets held by households, minus debts."],
+    )
+    assert sorted((o is None, n is None) for o, n in pairs) == [(False, True), (True, False)]
+
+
+def test_pairing_is_identical_whichever_column_asks():
+    """Each column renders in its own call, so both must reach the same pairing or they disagree."""
+    from apps.wizard.app_pages.metadata_diff.render import pair_bullets
+
+    old = ["First point.", "Second point, later reworded a bit.", "Third point."]
+    new = ["First point.", "Second point, reworded a bit later on.", "A fourth point."]
+    assert pair_bullets(old, new) == pair_bullets(old, new)
+    # The edited bullet pairs with its own earlier wording, not with the survivor or the newcomer.
+    assert (old[1], new[1]) in pair_bullets(old, new)
+
+
+def test_a_reordered_list_still_shows_every_bullet():
+    """Pairing finds no textual change in a reorder, so the positional view has to take over."""
+    from apps.wizard.app_pages.metadata_diff.render import render_text_html
+
+    old = ["Alpha point.", "Beta point."]
+    new = ["Beta point.", "Alpha point."]
+    import re
+
+    html = render_text_html(new, old, side="new", changed_only=True)
+    assert "(no changes here)" not in html
+    # Tags wrap the words that moved, so compare the text with markup stripped.
+    text = re.sub(r"<[^>]+>", "", html)
+    assert "Alpha point." in text and "Beta point." in text
