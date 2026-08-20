@@ -823,17 +823,12 @@ def remove_biofuels_from_oil_consumption(tb: Table) -> Table:
     own, and every other energy dataset we publish treats oil as a fossil fuel, so they are subtracted
     here, from the energy series and from the barrel-denominated one alike.
 
-    The producer's petroleum production series behave differently and are left alone: the energy one
-    already excludes biofuels, and the barrel-denominated one includes them but keeps the producer's own
-    name, since nothing downstream reads it as oil.
+    Production needs no such correction. The producer books biofuels output as renewable primary energy,
+    so its energy production series already excludes them, and we publish no biofuels production column
+    for them to overlap. Its barrel-denominated production series does include biofuels, but it keeps the
+    producer's own name, since nothing downstream reads it as oil.
 
     Where biofuels consumption is unknown there is nothing to subtract and oil is left as reported.
-
-    Note the asymmetry this leaves between the two sides of the dataset, which is the producer's, not
-    ours. On the consumption side biofuels are their own component, so a total is coal + gas + oil +
-    nuclear + renewables + biofuels. On the production side the producer books biofuels inside
-    renewables, so a total is coal + gas + oil + nuclear + renewables, and adding biofuels to that
-    double counts them.
     """
     pairs = [
         ("energy_consumption_from_petroleum", "energy_consumption_from_biofuels"),
