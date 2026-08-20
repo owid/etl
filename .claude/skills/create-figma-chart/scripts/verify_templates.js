@@ -14,9 +14,11 @@
 //   headerBottom  — the band's top edge, after the header's own auto-layout has settled
 //   headerSizing  — `primaryAxisSizingMode` plus each child's sizing. AUTO + HUG means the header
 //                   reflows when the text gets shorter; FIXED + a FILL/grow child means it does
-//                   NOT, and a short subtitle silently inflates its own box instead (the 850-wide
-//                   pair). This is the single most consequential property on the frame and it is
-//                   invisible until you fill the texts.
+//                   NOT, and a short subtitle silently inflates its own box instead. As of
+//                   2026-08-20 all nine templates are AUTO + HUG; the 850-wide pair used to be the
+//                   FIXED case and the design team has since converted it, so a `false` here is now
+//                   a regression rather than a shipped state. This is the single most consequential
+//                   property on the frame and it is invisible until you fill the texts.
 //   footer        — id, name, y, height, layoutMode, constraints and rows. `layoutMode` says
 //                   whether the rows reflow; `constraints.vertical` says which way the footer
 //                   grows when they do — MAX keeps the bottom (grows into the band), MIN keeps
@@ -38,6 +40,33 @@ const TEMPLATES = {
   "static vertical": "5332:93",
   "small guided": "25344:1357",
   "small pull": "25344:1391",
+};
+
+// The load-bearing geometry, as this skill records it. Mirrors SKILL.md's node map and the Step 7
+// band table, so a DRIFT verdict means EITHER the design team moved the frame OR this skill's table
+// is wrong — both are stop-and-report, and you cannot tell which without looking.
+//
+// `VERIFIED` is provenance, not a gate: it says when these numbers were last measured, which is what
+// lets you judge a drift report (a day-old table plus a mismatch is probably your error; a
+// three-month-old one plus a mismatch is probably the design team). The gate is this script's own
+// verdict. Update both together — a stale expectation with a fresh date is worse than no date.
+//
+// `null` means "don't check": the 302-wide pair has a free height, and its bottom-most auto-layout
+// child is a source row rather than a footer, so footer fields don't apply.
+const VERIFIED = "2026-08-20";
+const EXPECT = {
+  "IG square":        { size: [540, 540],   contentX: 16, contentW: 508, headerBottom: 118,    reflows: true,  footerY: 488,     footerMode: "VERTICAL",   footerConstraintV: "MIN" },
+  "IG portrait":      { size: [560, 700],   contentX: 26, contentW: 508, headerBottom: 135,    reflows: true,  footerY: 640,     footerMode: "VERTICAL",   footerConstraintV: "MIN" },
+  "IG reel":          { size: [616, 1096],  contentX: null, contentW: null, headerBottom: null, reflows: null,  footerY: null,    footerMode: null,         footerConstraintV: null },
+  DI:                 { size: [540, 540],   contentX: 16, contentW: 508, headerBottom: 118,    reflows: true,  footerY: 508,     footerMode: "HORIZONTAL", footerConstraintV: "MIN" },
+  "static mobile 1":  { size: [540, 540],   contentX: 16, contentW: 508, headerBottom: 118,    reflows: true,  footerY: 486,     footerMode: "VERTICAL",   footerConstraintV: "MAX" },
+  "static mobile 2":  { size: [540, 824],   contentX: 16, contentW: 508, headerBottom: 118,    reflows: true,  footerY: 770,     footerMode: "VERTICAL",   footerConstraintV: "MIN" },
+  "static horizontal":{ size: [850, 638],   contentX: 16, contentW: 818, headerBottom: 118,    reflows: true,  footerY: 559,     footerMode: "VERTICAL",   footerConstraintV: "MIN" },
+  "static vertical":  { size: [850, 1095],  contentX: 16, contentW: 818, headerBottom: 118,    reflows: true,  footerY: 1015.81, footerMode: "VERTICAL",   footerConstraintV: "MIN" },
+  // The 302-wide pair carries no logo and its bottom-most auto-layout child is a source row, not a
+  // footer — so `logo` and every footer field are skipped rather than expected.
+  "small guided":     { size: [302, null],  contentX: 12, contentW: 278, headerBottom: 44,     reflows: true,  footerY: null,    footerMode: null,         footerConstraintV: null, noLogo: true },
+  "small pull":       { size: [302, null],  contentX: 12, contentW: 278, headerBottom: 44,     reflows: true,  footerY: null,    footerMode: null,         footerConstraintV: null, noLogo: true },
 };
 
 const templatesPage = figma.root.children.find((p) => p.id === "798:54");
@@ -122,4 +151,53 @@ for (const [label, id] of Object.entries(TEMPLATES)) {
     })),
   };
 }
-return out;
+
+// Compare against EXPECT. Tolerance 0.5px: the templates carry sub-pixel values (1015.81, 35.23)
+// and a rounding difference is not drift.
+const near = (a, b) => typeof a === "number" && typeof b === "number" && Math.abs(a - b) < 0.5;
+const drifted = [];
+for (const [label, e] of Object.entries(EXPECT)) {
+  const g = out[label];
+  if (!g) continue;
+  if (g.missing) {
+    g.verdict = "MISSING";
+    drifted.push(label);
+    continue;
+  }
+  const d = [];
+  if (e.size) {
+    if (!near(g.size[0], e.size[0])) d.push(`width ${g.size[0]} != ${e.size[0]}`);
+    if (e.size[1] !== null && !near(g.size[1], e.size[1])) d.push(`height ${g.size[1]} != ${e.size[1]}`);
+  }
+  if (e.contentX !== null && !near(g.contentX, e.contentX)) d.push(`contentX ${g.contentX} != ${e.contentX}`);
+  if (e.contentW !== null && !near(g.contentW, e.contentW)) d.push(`contentW ${g.contentW} != ${e.contentW}`);
+  if (e.headerBottom !== null && !near(g.headerBottom, e.headerBottom)) d.push(`headerBottom ${g.headerBottom} != ${e.headerBottom}`);
+  if (e.reflows !== null && g.headerSizing && g.headerSizing.reflows !== e.reflows) {
+    d.push(`reflows ${g.headerSizing.reflows} != ${e.reflows} (primaryAxisSizingMode ${g.headerSizing.primaryAxisSizingMode})`);
+  }
+  if (e.footerY !== null) {
+    if (!g.footer) d.push("footer not resolved");
+    else {
+      if (!near(g.footer.y, e.footerY)) d.push(`footer.y ${g.footer.y} != ${e.footerY}`);
+      if (e.footerMode && g.footer.layoutMode !== e.footerMode) d.push(`footer.layoutMode ${g.footer.layoutMode} != ${e.footerMode}`);
+      if (e.footerConstraintV && g.footer.constraintV !== e.footerConstraintV) d.push(`footer.constraintV ${g.footer.constraintV} != ${e.footerConstraintV}`);
+    }
+  }
+  if (!e.noLogo && typeof g.logo === "string") d.push(g.logo);
+  g.verdict = d.length ? "DRIFT" : "ok";
+  if (d.length) {
+    g.drift = d;
+    drifted.push(label);
+  }
+}
+
+return {
+  summary: {
+    expectationsVerified: VERIFIED,
+    verdict: drifted.length
+      ? `DRIFT on ${drifted.length} template(s) — STOP and report before cloning: ${drifted.join(", ")}`
+      : "ok — every checked template matches the recorded geometry",
+    drifted,
+  },
+  templates: out,
+};

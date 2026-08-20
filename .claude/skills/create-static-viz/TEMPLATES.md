@@ -5,9 +5,14 @@ re-deriving it through Figma MCP calls every time.
 
 - **File:** `Charts (2026)`, file key `s6Sv60bakebRRW2TxsMQbF`
 - **Page:** `📑 Templates`, node `798:54`
-- **Re-verify with:** `get_metadata` on `798:54` for positions, `get_screenshot` on a frame for colors
-- **Last verified:** 2026-08-17 (Vertical and Mobile example 2 measured in full, including the
-  header/footer auto-layout structure, every slot's line height and face, and the frame fill)
+- **Re-verify with:** `/create-figma-chart`'s [`scripts/verify_templates.js`](../create-figma-chart/scripts/verify_templates.js)
+  — it gates the shared geometry (sizes, content box, header band, footer position and growth) for all
+  ten templates and returns an `ok`/`DRIFT` verdict. Use `get_metadata` on `798:54` for the per-slot
+  positions it does not cover, and `get_screenshot` on a frame for colors.
+- **Last verified:** 2026-08-20 — the rhythm parameters and the Horizontal, Vertical and Mobile
+  example 1 header/footer structure re-measured live; the script returned `ok` on all ten templates.
+  **If that date is two weeks or older and you cannot run the script, treat every number here as
+  suspect** and measure the template you are about to lay out against.
 
 The design team edits these frames in place, and edits that move a chart area's edge have landed days
 apart. **Re-verify the geometry at the start of every refresh** rather than trusting this file: a step
@@ -68,7 +73,7 @@ fills these same slots when the SVG is imported.
 |---|---|---|---|---|
 | Title | 16.22 | 737.84 | 58 (**two lines**) | 25 |
 | Logo | 16 | 64 | 35 (top-right, x=770) | — |
-| Subtitle | 80.22 | 817.57 | 38 (two lines) | 16 |
+| Subtitle | 80 | 818 | 38 (two lines) | 16 |
 | *chart area* | *118 → 558.6* | 818 | ~440 | — |
 | `Note:` | 558.62 | 818 | 28 (two lines) | **12** |
 | `Data source:` | 590.62 | 818 | 14 | **12** |
