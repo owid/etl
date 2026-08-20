@@ -15,6 +15,15 @@ actually pick up, and getting that SVG into the Charts file.
 > everything that happens inside Figma, and this skill hands off to it at Step 7. If you change
 > what the ETL step emits — node naming, frame proportions, which text slots it fills — check
 > whether that skill's Step 1/3/7 notes on local SVGs still hold.
+>
+> Its **[`GUIDELINES.md`](../create-figma-chart/GUIDELINES.md)** is where the visual vocabulary this
+> skill defers to actually lives — the per-chart-type rules, direct labeling in place of legends, the
+> OWID palette, the annotation and reference-line conventions. Read the section for your chart type
+> before choosing a form or deciding what to label: the point is not to style anything here, it is to
+> avoid emitting a structure the Figma pass then has to undo (a legend that should have been direct
+> labels, a category count that cannot be labeled in place). That file also indexes the design team's
+> **DI Chart Library** (`pltrHXyVLg2XaNq4AvxPaK`, **read-only**) — 272 finished charts filed by chart
+> type, which is the closest thing to precedent for whatever you are about to draw.
 
 Two companions in this directory:
 
