@@ -383,35 +383,33 @@ class AdminAPI:
             raise AdminAPIError({"error": js.get("error"), "narrative_chart_id": narrative_chart_id, "config": config})
         return js
 
-    def cleanup_ghost_variables(self, dataset_id: int, keep_variable_ids: list[int]) -> dict:
-        """Delete a dataset's variables that weren't upserted by the grapher step.
+    def delete_variables(self, variable_ids: list[int]) -> dict:
+        """Delete variables, leaving alone any a chart still uses.
 
         Grapher owns the delete because it owns the schema around it: the tables holding a
-        `variableId` foreign key, and the `chart_configs` rows (and their R2 objects) that
-        a variable leaves behind. It deletes what it safely can and reports the rest back;
-        deciding whether a variable still used by a chart should fail the run is left to
-        the caller, which is why nothing here raises on `blocked`.
+        `variableId` foreign key, and the `chart_configs` rows (and their R2 objects) that a
+        variable leaves behind. It deletes what it safely can and reports the rest back;
+        deciding whether a variable still used by a chart should fail the run is left to the
+        caller, which is why nothing here raises on `blocked`.
 
         Args:
-            dataset_id: Grapher ID of the dataset being cleaned up
-            keep_variable_ids: Variables the grapher step upserted; everything else in the
-                dataset is a ghost
+            variable_ids: The variables to remove
 
         Returns:
             {"deleted": [variable_id],
              "blocked": [{"variableId", "variableName", "chartId", "chartSlug"}]}
         """
-        # Retry in case we're restarting Admin on staging server. This call is now made by
-        # every grapher step, so a restart would otherwise fail steps with nothing to clean.
+        # Retry in case we're restarting Admin on staging server. This is idempotent — a
+        # variable already gone stays gone — so repeating it is safe.
         resp = requests_with_retry().post(
-            f"{self.owid_env.admin_api}/datasets/{dataset_id}/cleanupGhostVariables",
+            f"{self.owid_env.admin_api}/variables/delete",
             headers=self._headers(),
-            json={"keepVariableIds": keep_variable_ids},
+            json={"variableIds": variable_ids},
             timeout=TIMEOUT,
         )
         js = self._json_from_response(resp)
         if not js.get("success", True):
-            raise AdminAPIError({"error": js.get("error"), "dataset_id": dataset_id})
+            raise AdminAPIError({"error": js.get("error"), "variable_ids": variable_ids})
         return js
 
     def set_dataset_archived(self, dataset_id: int, is_archived: bool, user_id: int | None = None) -> dict:

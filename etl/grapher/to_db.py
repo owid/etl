@@ -414,24 +414,29 @@ def set_dataset_checksum_and_editedAt(dataset_id: int, checksum: str) -> None:
         session.commit()
 
 
-def cleanup_ghost_variables(admin_api: AdminAPI, dataset_id: int, upserted_variable_ids: list[int]) -> bool:
-    """Remove all leftover variables that didn't get upserted into DB during grapher step.
-    This could happen when you rename or delete a variable in ETL.
-    Raise an error if we try to delete variable used by any chart.
+def delete_ghost_variables(admin_api: AdminAPI, ghost_variable_ids: list[int]) -> bool:
+    """Remove the leftover variables a grapher step no longer produces.
 
-    The delete itself is done by the Grapher admin API, which owns the tables that hang off
-    `variables` and the chart configs a variable leaves behind in MySQL and R2. It deletes
-    what it safely can and hands back the variables a chart still uses; deciding whether
-    those should fail the run is ours.
+    This happens when a variable is renamed or dropped in ETL. Working out *which* variables
+    those are is a set difference we can do ourselves — the dataset's variables minus the ones
+    we just upserted. What hangs off them is not: the tables carrying a `variableId` foreign
+    key, and the chart configs a variable leaves behind in MySQL and R2, are Grapher's schema.
+    So Grapher does the delete and hands back anything a chart still uses.
+
+    We send the variables to remove rather than the ones to keep, deliberately. If our view of
+    the dataset is ever incomplete, a ghost we failed to spot just lingers until the next run;
+    the other way round, a variable we failed to mention would be destroyed.
 
     :param admin_api: Grapher admin API client
-    :param dataset_id: ID of the dataset
-    :param upserted_variable_ids: variables upserted in grapher step
+    :param ghost_variable_ids: variables in the dataset that this run didn't upsert
 
     :return: True if successful
     """
+    if not ghost_variable_ids:
+        return True
+
     try:
-        result = admin_api.cleanup_ghost_variables(dataset_id, upserted_variable_ids)
+        result = admin_api.delete_variables(ghost_variable_ids)
     except requests.exceptions.ConnectionError:
         # Deployed environments always have an admin server, so failing to reach one there is
         # an outage, not a workflow: let it fail rather than quietly skipping cleanup.
@@ -442,15 +447,14 @@ def cleanup_ghost_variables(admin_api: AdminAPI, dataset_id: int, upserted_varia
         # unsuccessful, so the checksum stays unset and a later run against a reachable admin
         # picks them up rather than recording a sweep that never happened.
         log.warning(
-            "cleanup_ghost_variables.admin_api_unreachable",
+            "delete_ghost_variables.admin_api_unreachable",
             admin_api=admin_api.owid_env.admin_api,
-            dataset_id=dataset_id,
         )
         return False
 
     if result["deleted"]:
         log.warning(
-            "cleanup_ghost_variables.end",
+            "delete_ghost_variables.end",
             size=len(result["deleted"]),
             variables=result["deleted"],
         )
@@ -484,7 +488,7 @@ def _raise_error_for_deleted_variables(rows: pd.DataFrame) -> bool:
         return bool(set(modified_charts.index) & set(rows.chartId))
     # Only show a warning in production. We can't raise an error because if someone merges changes to ETL
     # with renamed variables and valid chart-sync, the ETL deploy would fail. It would fail because ETL (and this part) runs
-    # before chart-sync. If we only show a warning, the function `cleanup_ghost_variables` returns False, and ETL will
+    # before chart-sync. If we only show a warning, `delete_ghost_variables` returns False, and ETL will
     # re-run the step on the next deploy and delete those ghost variables.
     # See https://github.com/owid/etl/issues/4099 for more details.
     elif config.ENV == "production":

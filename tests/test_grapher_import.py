@@ -122,8 +122,8 @@ class _FakeAdminAPI:
         self._responses = list(responses)
         self.calls: list[dict] = []
 
-    def cleanup_ghost_variables(self, dataset_id: int, keep_variable_ids: list[int]) -> dict:
-        self.calls.append({"dataset_id": dataset_id, "keep": keep_variable_ids})
+    def delete_variables(self, variable_ids: list[int]) -> dict:
+        self.calls.append({"variable_ids": variable_ids})
         response = self._responses.pop(0)
         if isinstance(response, Exception):
             raise response
@@ -143,56 +143,58 @@ def _response(deleted=(), blocked=()) -> dict:
     return {"deleted": list(deleted), "blocked": list(blocked)}
 
 
-def test_cleanup_ghost_variables_deletes_in_one_call():
+def test_delete_ghost_variables_sends_the_ids_to_remove():
     admin_api = _FakeAdminAPI([_response(deleted=[7])])
 
-    assert db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
+    assert db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]
 
-    assert admin_api.calls == [{"dataset_id": 1, "keep": [5]}]
-
-
-def test_cleanup_ghost_variables_is_a_no_op_when_there_are_no_ghosts():
-    admin_api = _FakeAdminAPI([_response()])
-
-    assert db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
+    assert admin_api.calls == [{"variable_ids": [7]}]
 
 
-def test_cleanup_ghost_variables_warns_in_production_when_a_chart_still_uses_one(monkeypatch):
+def test_delete_ghost_variables_does_not_call_out_when_there_are_no_ghosts():
+    admin_api = _FakeAdminAPI([])
+
+    assert db.delete_ghost_variables(admin_api, ghost_variable_ids=[])  # ty: ignore[invalid-argument-type]
+
+    assert admin_api.calls == []
+
+
+def test_delete_ghost_variables_warns_in_production_when_a_chart_still_uses_one(monkeypatch):
     monkeypatch.setattr(db.config, "ENV", "production")
     admin_api = _FakeAdminAPI([_response(deleted=[7], blocked=[_blocked(8, 100), _blocked(8, 101)])])
 
     # Not successful, so the checksum stays unset and the next run tries again.
-    assert not db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
+    assert not db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]
 
 
-def test_cleanup_ghost_variables_raises_outside_production(monkeypatch):
+def test_delete_ghost_variables_raises_outside_production(monkeypatch):
     monkeypatch.setattr(db.config, "ENV", "dev")
     admin_api = _FakeAdminAPI([_response(blocked=[_blocked(8, 100)])])
 
     with pytest.raises(ValueError, match="chart-100"):
-        db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
+        db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]
 
 
-def test_cleanup_ghost_variables_warns_when_admin_api_is_unreachable(monkeypatch):
+def test_delete_ghost_variables_warns_when_admin_api_is_unreachable(monkeypatch):
     """Working locally without a running admin: warn and let a later run clean up."""
     monkeypatch.setattr(db.config, "ENV", "dev")
     admin_api = _FakeAdminAPI([requests.exceptions.ConnectionError("connection refused")])
 
-    assert not db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
+    assert not db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]
 
 
 @pytest.mark.parametrize("env", ["staging", "production"])
-def test_cleanup_ghost_variables_raises_when_a_deployed_admin_is_unreachable(monkeypatch, env):
+def test_delete_ghost_variables_raises_when_a_deployed_admin_is_unreachable(monkeypatch, env):
     """A deployed environment always has an admin, so an unreachable one is an outage."""
     monkeypatch.setattr(db.config, "ENV", env)
     admin_api = _FakeAdminAPI([requests.exceptions.ConnectionError("connection refused")])
 
     with pytest.raises(requests.exceptions.ConnectionError):
-        db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
+        db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]
 
 
-def test_cleanup_ghost_variables_does_not_swallow_other_admin_api_errors():
+def test_delete_ghost_variables_does_not_swallow_other_admin_api_errors():
     admin_api = _FakeAdminAPI([requests.exceptions.HTTPError("500 Server Error")])
 
     with pytest.raises(requests.exceptions.HTTPError):
-        db.cleanup_ghost_variables(admin_api, dataset_id=1, upserted_variable_ids=[5])  # ty: ignore[invalid-argument-type]
+        db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]
