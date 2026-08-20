@@ -197,6 +197,23 @@ def test_source_citation_can_key_on_attribution_short():
     assert source_citation(col, key="attribution_short") == "WHO (2006)"
 
 
+def test_source_citation_falls_back_to_producer_without_a_short_attribution():
+    """`attribution_short` is optional on Origin, so a column can carry a mix.
+
+    The origin that lacks it must still reach the footer under its producer — dropping it
+    under-attributes the chart, and nothing in the rendered image shows a source went missing.
+    """
+    col = _Col(
+        [
+            _Origin("World Health Organization", "2006-04-27", attribution_short="WHO"),
+            _Origin("Institute for Health Metrics and Evaluation", "2024-05-16"),
+        ]
+    )
+    assert source_citation(col, key="attribution_short") == (
+        "Institute for Health Metrics and Evaluation (2024); WHO (2006)"
+    )
+
+
 def test_source_citation_takes_a_prefix():
     col = _Col([_Origin("WHO", "2006-04-27")])
     assert source_citation(col, prefix="Data sources: ") == "Data sources: WHO (2006)"
@@ -221,6 +238,26 @@ def test_nice_year_ticks_span_the_range_and_are_evenly_spaced(lo, hi):
     assert all(lo <= t <= hi for t in ticks)
     steps = {b - a for a, b in zip(ticks, ticks[1:])}
     assert len(steps) == 1, f"uneven spacing for {lo}..{hi}: {ticks}"
+
+
+def test_nice_year_ticks_respects_max_ticks_when_both_endpoints_align():
+    """1700..2100 is the trap: a 50-year step cuts the span into exactly 8 intervals — 9 ticks.
+
+    Testing the interval count instead of the tick count let a `max_ticks=8` request return nine,
+    and put a 400-year span on half-centuries rather than the centuries the docstring promises.
+    """
+    ticks = nice_year_ticks(1700, 2100)
+    assert ticks == [1700, 1800, 1900, 2000, 2100]
+    assert len(ticks) <= 8
+
+
+@pytest.mark.parametrize(
+    "lo,hi,max_ticks",
+    [(1700, 2100, 8), (1900, 2020, 5), (1990, 2024, 4), (-10000, 2100, 6), (2000, 2005, 8)],
+)
+def test_nice_year_ticks_never_exceeds_the_requested_limit(lo, hi, max_ticks):
+    ticks = nice_year_ticks(lo, hi, max_ticks=max_ticks)
+    assert len(ticks) <= max_ticks, f"{lo}..{hi} with max_ticks={max_ticks} returned {ticks}"
 
 
 def test_nice_year_ticks_degenerate_range():

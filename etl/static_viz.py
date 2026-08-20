@@ -178,7 +178,8 @@ def source_citation(
 
     :param columns: the indicator columns whose origins to cite, e.g. ``tb["population"]``.
     :param key: origin field to group by — ``"producer"`` (grapher's convention) or
-        ``"attribution_short"`` when the short form is the one readers know.
+        ``"attribution_short"`` when the short form is the one readers know. Origins that do not
+        carry the requested field fall back to their producer, never to being dropped.
     :param prefix: prepended verbatim, e.g. ``"Data sources: "``. Default empty, so the caller can
         put the label in the template's own slot instead.
     """
@@ -187,6 +188,12 @@ def source_citation(
         origins: Iterable[Any] = getattr(col.metadata, "origins", []) or []
         for origin in origins:
             name = getattr(origin, key, None)
+            if not name and key != "producer":
+                # `attribution_short` is optional on Origin, so one column can mix origins that
+                # carry it with origins that don't. Cite the ones that don't under their producer:
+                # dropping them would under-attribute the chart, and a footer missing a source
+                # looks exactly like a footer that never had one.
+                name = getattr(origin, "producer", None)
             if not name:
                 continue
             year = (origin.date_published or "").split("-")[0] if origin.date_published else ""
@@ -200,18 +207,20 @@ def source_citation(
 def nice_year_ticks(year_min: int, year_max: int, *, max_ticks: int = 8) -> list[int]:
     """Round year ticks spanning [year_min, year_max], on a 1-2-5 x power-of-ten step.
 
-    Picks the coarsest step that still yields at least three ticks, so a 400-year span gets
-    centuries and a 40-year span gets decades without the caller choosing.
+    Picks the finest step whose tick count still fits `max_ticks`, and never fewer than three
+    ticks, so a 400-year span gets centuries and a 40-year span gets decades without the caller
+    choosing.
     """
     if year_max <= year_min:
         return [year_min]
-    span = year_max - year_min
     for mag in range(0, 6):
         for mult in (1, 2, 5):
             step = mult * 10**mag
-            if span / step <= max_ticks:
-                first = -(-year_min // step) * step  # ceil to a multiple of step
-                ticks = list(range(int(first), year_max + 1, step))
-                if len(ticks) >= 3:
-                    return ticks
+            first = -(-year_min // step) * step  # ceil to a multiple of step
+            ticks = list(range(int(first), year_max + 1, step))
+            # Count the ticks, not the intervals between them. When both endpoints land on a
+            # multiple of `step` there is one more tick than interval, which is how a `max_ticks=8`
+            # request came back with nine ticks for 1700..2100.
+            if 3 <= len(ticks) <= max_ticks:
+                return ticks
     return [year_min, year_max]
