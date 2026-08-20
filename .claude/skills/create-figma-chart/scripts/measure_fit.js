@@ -22,6 +22,12 @@
 //                is the one you will actually fit, the histogram covers only text that survives,
 //                and the file is untouched. reference/FITTING.md: hiding the elbows moved a
 //                measured aspect from 1.6026 to 1.5558, turning a 14px gap into 9.5px.
+//     slug     — optional, but needed for a runnable second pass: the grapher slug the first export
+//     params     came from, plus any query params it carried (a country selection, an MDim view).
+//                solve_export.py prints its `curl` only when it gets `--slug`, so without these
+//                `nextPass` solves the numbers and leaves you to rebuild the request by hand — which
+//                is where a selection or a view param gets dropped and the re-export quietly comes
+//                back with different data.
 //
 // The `nextPass` field in the output is the finished second-pass command — run it as printed. Do
 // NOT hand-build it by feeding the measured aspect back as `--content-aspect`: the solve would then
@@ -36,6 +42,8 @@ const CONFIG = {
   hideIds: [], // e.g. ["I123:4;5:6"] for connectors / year markers
   targetGap: 14, // px per end the fit aims for; 12-16 on 540-wide frames, 30 on the IG portrait
   targetLabel: 13.5, // final label px the first export was solved for; the portrait ladder uses 15
+  slug: "", // grapher slug the first export came from, e.g. "life-expectancy"
+  params: "", // the first export's extra query params, e.g. "country=USA~CHN" or an MDim view
 };
 
 // Normalized CONFIG reads, so deleting a line from the block above degrades to the house default
@@ -43,8 +51,13 @@ const CONFIG = {
 const hideIds = CONFIG.hideIds || [];
 const targetGap = CONFIG.targetGap ?? 14;
 const targetLabel = CONFIG.targetLabel ?? 13.5;
+const slug = CONFIG.slug || "";
+const params = CONFIG.params || "";
 
 const r = (v) => (v === null || v === undefined ? null : Math.round(v * 100) / 100);
+// Aspects and scale factors need more than 2dp: `rescale(1.14)` where 1.1433 was meant lands a
+// 343px band height ~1px short, and the docs and `--content-aspect` both speak in 4dp aspects.
+const r4 = (v) => (v === null || v === undefined ? null : Math.round(v * 10000) / 10000);
 
 // How many lines a TEXT node actually renders on. `lineHeight` may be AUTO or a percentage, so
 // resolve it to px first; fall back to 1.2x the font size, which is Figma's AUTO factor.
@@ -92,8 +105,8 @@ const band = bandTop !== null && footerTop !== null ? { top: bandTop, bottom: r(
 // --- content box: taken from the HEADER, exactly as verify_templates.js does it (`header.x` /
 // `header.width`), because by Step 7 the imported chart is already a child of this frame — the docs
 // require appending it before positioning — and a union over `frame.children` would then include the
-// not-yet-fitted group. That inflates the box to the group's own width and `scaleToContentW` comes
-// out near 1, i.e. "no scaling needed", which is the one answer this script exists to produce.
+// not-yet-fitted group. That inflates the box to the group's own width, so `xMapShortfall` comes out
+// near 0, i.e. "nothing left to close", which is the one answer this script exists to produce.
 const contentX = header ? r(header.x) : null;
 const contentW = header ? r(header.width) : null;
 
@@ -223,36 +236,56 @@ if (groupNode) {
   const raw = g.absoluteBoundingBox;
   const w = x1 - x0,
     h = y1 - y0;
+
+  // What Step 7 actually asks for is the HEIGHT-first factor. reference/FITTING.md: "Fit to the
+  // band's height, then map x to fill the width — not the other way round", and again in Step 8's
+  // recipe, `chart.rescale(TARGET_H / chart.height)  // height-first; never resize()`. The
+  // width-first `contentW / w` is the move those lines open by rejecting — it locks the width and
+  // leaves the height wherever the export's aspect fell — so this reports TARGET_H / h instead. On
+  // the docs' own near-miss (measured 1.4342 against a 1.4810 target) width-first comes out 3.3%
+  // large, which would also land in every fontSizes.afterScale below: about 0.5px at 15px, enough
+  // to pick the wrong rung off Step 8c's ladder.
+  //
+  // rescale(), never resize() — resize stretches children through their constraints and silently
+  // rewraps every text box in the chart.
+  const targetH = band ? band.height - 2 * targetGap : null;
+  const fitScale = targetH !== null && targetH > 0 ? targetH / h : null;
+
   group = {
     id: g.id,
     name: g.name,
-    declared: raw ? { w: r(raw.width), h: r(raw.height), aspect: r(raw.width / raw.height) } : null,
-    measured: { w: r(w), h: r(h), aspect: r(w / h) },
+    declared: raw ? { w: r(raw.width), h: r(raw.height), aspect: r4(raw.width / raw.height) } : null,
+    measured: { w: r(w), h: r(h), aspect: r4(w / h) },
     excluded: { requested: hideIds.length, matched: hideIds.length - unmatched.length, unmatched },
-    // What Step 7 actually asks for: the uniform factor that makes the group span the content
-    // width. rescale(), never resize() — resize stretches children through their constraints and
-    // silently rewraps every text box in the chart.
-    scaleToContentW: contentW ? r(contentW / w) : null,
-    heightAtThatScale: contentW ? r((h * contentW) / w) : null,
-    gapPerEnd: contentW && band ? r((band.height - (h * contentW) / w) / 2) : null,
+    fitScaleToBandH: r4(fitScale),
+    // The height fit lands the targetGap per end BY CONSTRUCTION, so the gap is no longer the
+    // diagnostic — the leftover width is. `xMapShortfall` is what the closed-form x-map has to
+    // close, and it IS the aspect miss expressed in px; a value far from 0 means re-export.
+    widthAtFitScale: fitScale === null ? null : r(w * fitScale),
+    xMapShortfall: fitScale === null || !contentW ? null : r(contentW - w * fitScale),
   };
 
   // The second pass, solved rather than guessed. `target` is the aspect the group has to have for
   // the gap to come out at targetGap; `measured` is what it actually came back as; the export to
   // request next is the one solved for the reflection of the measured aspect about the target.
   const gap = targetGap;
-  const usable = band ? band.height - 2 * gap : null;
+  const usable = targetH;
   if (contentW && usable > 0) {
     const target = contentW / usable;
     const measured = w / h;
     // --target-label has to travel with the correction: solve_export.py defaults to 13.5, so a
     // portrait solved at 15 would come back with smaller text purely from re-solving the aspect.
+    // --slug/--params travel for the same reason one step further out: solve_export.py emits its
+    // curl only with --slug, and rebuilding the URL by hand is where a country selection or an MDim
+    // view param gets dropped and the re-export silently returns different data.
     // Runnable as printed, from the repo root: these scripts are committed non-executable like every
     // other script in this directory, and the repo rule is that Python goes through the venv.
     const cmd =
       ".venv/bin/python .claude/skills/create-figma-chart/scripts/solve_export.py" +
-      ` --band ${contentW}x${r(band.height)} --gap ${gap} --target-label ${targetLabel}`;
-    group.target = { aspect: r(target), gap, usableHeight: r(usable) };
+      ` --band ${contentW}x${r(band.height)} --gap ${gap} --target-label ${targetLabel}` +
+      (slug ? ` --slug ${slug}` : "") +
+      (params ? ` --params '${params}'` : "");
+    group.target = { aspect: r4(target), gap, usableHeight: r(usable) };
     // The reflection only cancels a small model error. A group that is far off the target is not a
     // near-miss to correct but something else — the wrong export, or furniture still in the bbox —
     // and reflecting it would ask for an absurd aspect, so fall back to a plain first-pass solve.
@@ -278,7 +311,8 @@ if (groupNode) {
     .map(([size, n]) => ({
       size: size === "mixed" ? "mixed" : Number(size),
       count: n,
-      afterScale: size === "mixed" || !group.scaleToContentW ? null : r(Number(size) * group.scaleToContentW),
+      // the height-first fit factor, so these are the sizes Step 8c actually picks its rung from
+      afterScale: size === "mixed" || fitScale === null ? null : r(Number(size) * fitScale),
     }));
 }
 
@@ -305,8 +339,14 @@ return {
     group && group.excluded.unmatched.length
       ? `hideIds NOT FOUND under the group: ${group.excluded.unmatched.join(", ")}. Nothing was excluded for them, so the measured aspect still contains whatever they were meant to remove. Re-read the ids off this group — an id from another page or another chart looks identical and excludes nothing.`
       : null,
-    group && group.gapPerEnd !== null && Math.abs(group.gapPerEnd - targetGap) > 2
-      ? `gapPerEnd ${group.gapPerEnd} is more than 2px off the ${targetGap}px target — re-export with the \`nextPass\` command above (read \`nextPassNote\` first if it is set).`
+    // 6px of leftover width is the old "2px off the target gap" threshold re-expressed for the
+    // height-first fit: |gap error| = |xMapShortfall| / (2 x measured aspect), so at the aspects
+    // these templates run (~1.4-1.6) the two trip at very nearly the same aspect miss.
+    group && group.xMapShortfall !== null && Math.abs(group.xMapShortfall) > 6
+      ? `the height-fitted group lands ${group.xMapShortfall}px off the ${contentW}px content width — that leftover IS the aspect miss in px, and it is more than the x-map should be asked to close. Re-export with the \`nextPass\` command above (read \`nextPassNote\` first if it is set). The ${targetGap}px gap per end is already correct by construction, so do not judge this fit by the gap.`
+      : null,
+    group && group.nextPass && !slug
+      ? "CONFIG.slug is empty, so `nextPass` solves the numbers but prints no curl — solve_export.py emits the re-export command only with `--slug`. Set `slug` (and `params`, for a country selection or an MDim view) to what the first export used, so the second pass runs as printed instead of being rebuilt by hand."
       : null,
   ].filter(Boolean),
 };

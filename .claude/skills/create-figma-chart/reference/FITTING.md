@@ -373,7 +373,10 @@ Verify against the actual clone with `get_metadata` (the templates evolve; the g
 > **[`scripts/measure_fit.js`](../scripts/measure_fit.js) returns every number in this step in one
 > read-only `use_figma` call** — the band off the *filled* clone, the content box, the header's
 > sizing (including whether it actually `reflows`), and, given the imported group, its measured
-> bbox, content aspect, the uniform scale to the content width and the resulting gap per end. It
+> bbox, content aspect, the **height-first** scale this step fits with (`TARGET_H / chart.height`,
+> as `fitScaleToBandH`) and the leftover width the x-map has to close (`xMapShortfall`). It reports
+> the height-first factor deliberately: the gap comes out right by construction once you fit the
+> height, so the leftover width — not the gap — is what tells you the aspect still needs a pass. It
 > resolves header and footer with the same structural rule as `verify_templates.js`, so a renamed
 > frame cannot silently return `null`.
 >
