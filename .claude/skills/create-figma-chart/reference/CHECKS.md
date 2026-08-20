@@ -18,11 +18,20 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > declared gap in coverage, never a pass — which is the whole reason to read the list rather than
 > the verdict.
 >
-> Validated by planting defects and confirming each row **fails**: 11 planted, 11 caught. That pass
-> is also what found the script's own first bug — annotations are appended to the **frame**, so a
-> walk over only [chart, header, footer] left `annotations` empty on every real page and four rows
-> reporting "no annotation__* nodes" forever. **A check that cannot fail is worse than no check**, so
-> when you extend this script, extend the planted-defect pass with it.
+> Validated by planting defects and confirming each row **fails**, twice over: 11 planted in Figma and
+> 11 caught, then a stubbed-figma harness ([`scripts/test_verify_page.js`](../scripts/test_verify_page.js),
+> `node` it after any edit) covering 34 assertions including the rows that are awkward to plant on a
+> real page. **A check that cannot fail is worse than no check**, so when you extend this script,
+> extend both passes with it.
+>
+> Between them those passes found six bugs in the script itself, five of which were rows that could
+> not fail: annotations are appended to the **frame**, so a walk over only [chart, header, footer] left
+> `annotations` empty on every real page; the 12px floor rejected the 302-wide format's legitimate 11px
+> text; the ladder row judged only *bound* nodes, so a rescaled export's arbitrary 13.36px labels
+> passed as "imported, expected"; the knockout row judged only annotations that already had a stroke,
+> certifying a **missing** one; both 4.5:1 contrast rows were neither computed nor declared; and the
+> muted-context classification read each node's own weight, so the 2px halo of a legally-crossed 1px
+> context line was reported as a protagonist.
 
 > **On a 302-wide small or pull chart, five of these bars are different**, and reporting the 540-wide figures there produces false failures — the text floor is **11px** (the template's own subtitle, source and year labels are 11px by design), the margins are **12 … 290**, the chart's width need not match the header box, and the gap rule doesn't apply as written. The table is in SMALL-CHARTS.md → Checks. Everything else below holds unchanged.
 

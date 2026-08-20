@@ -21,8 +21,13 @@
 //                     hugged (Step 8). CHECKS.md's gap row does not apply as written there; the row
 //                     reports SKIPPED with the reason rather than failing a correct chart.
 //     highlightTreatment — true when the chart uses the muting-gray highlight treatment, which
-//                     changes the mark-weight bar (context 1px, protagonist 3px, halo 2x) and makes
-//                     the muting grays a standing palette exception.
+//                     changes the mark-weight bar (context 1px, protagonist 3px, halo 2x), makes
+//                     the muting grays a standing palette exception, and makes a muted CONTEXT line
+//                     legal to cross with an annotation (CHECKS.md allows exactly that).
+//     textFloor     — px. Left null it is derived from the frame width: the 302-wide small and pull
+//                     templates run an 11px floor, because their own subtitle, source and year text
+//                     is 11px by design (SMALL-CHARTS.md overrides it) — a pull chart ALWAYS carries
+//                     an 11px source line, so the 12px bar reports every one of them as broken.
 //
 // WHAT IT DOES NOT COVER, and never silently passes: every row it cannot judge is returned as
 // SKIPPED with the reason and the tool that owns it. Colour-vision and grayscale seams are
@@ -38,17 +43,24 @@ const CONFIG = {
   gapTarget: null,
   tightlyMeasured: false,
   highlightTreatment: false,
+  textFloor: null,
 };
 
-const LADDER = [12, 13, 14, 15, 16]; // Annotation XS..XL; the ceiling is L 15, XL only when the
-const LADDER_CEILING = 15;           // annotation IS the message (GUIDELINES.md -> Annotations)
-const TEXT_FLOOR = 12;
+const LADDER_FULL = [12, 13, 14, 15, 16]; // Annotation XS..XL; the ceiling is L 15, XL only when
+const LADDER_CEILING = 15;                // the annotation IS the message (GUIDELINES.md)
+const SMALL_FRAME_W = 302;                // the small/pull templates, whose floor is 11 not 12
 const HOUSE_LINE = 3, HOUSE_HALO = 4;
 const FURNITURE_W = 1, FURNITURE_DASH = [4, 4];
 const BLOCK_CLEARANCE = 27;          // annotation block vs header/footer on the 540x540 pages
 const GRAPHER_RESIDUAL = "#585c64";  // emitted for residual categories; in no library group
 
 const r = (v) => (v === null || v === undefined ? null : Math.round(v * 100) / 100);
+// WCAG relative luminance and contrast, so the "direct labels readable as text" row is computed
+// rather than declared unchecked. Pure function of two hexes; no geometry needed.
+const lin = (c) => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
+const lum = (hex) => { const n = parseInt(hex.slice(1), 16); const R = ((n >> 16) & 255) / 255, G = ((n >> 8) & 255) / 255, B = (n & 255) / 255;
+  return 0.2126 * lin(R) + 0.7152 * lin(G) + 0.0722 * lin(B); };
+const contrast = (a, b) => { const la = lum(a), lb = lum(b); return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05); };
 const rows = [];
 const add = (name, status, detail, extra) => rows.push({ check: name, status, detail, ...(extra || {}) });
 const skip = (name, why, owner) => add(name, "SKIPPED", why, owner ? { ownedBy: owner } : null);
@@ -60,6 +72,12 @@ while (page && page.type !== "PAGE") page = page.parent;
 if (page && figma.currentPage !== page) await figma.setCurrentPageAsync(page);
 
 const fb = frame.absoluteBoundingBox;
+const isSmall = fb ? Math.round(fb.width) <= SMALL_FRAME_W : false;
+const TEXT_FLOOR = CONFIG.textFloor !== null && CONFIG.textFloor !== undefined ? CONFIG.textFloor : (isSmall ? 11 : 12);
+const LADDER = isSmall ? [11, ...LADDER_FULL] : LADDER_FULL;
+const frameFill = (() => { const f = frame.fills && frame.fills[0];
+  if (!f || f.type !== "SOLID" || f.visible === false) return null;
+  return "#" + [f.color.r, f.color.g, f.color.b].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join(""); })();
 const rel = (n) => {
   const b = n.absoluteBoundingBox;
   return b ? { l: b.x - fb.x, t: b.y - fb.y, rr: b.x - fb.x + b.width, bb: b.y - fb.y + b.height, w: b.width, h: b.height } : null;
@@ -92,8 +110,11 @@ const texts = [], stroked = [], fills = [], leaves = [], annotations = [], vecto
 const collect = (n, insidePlot) => {
   if ("visible" in n && !n.visible) return;
   if (n.type === "TEXT" && typeof n.fontSize === "number") {
+    const tf = Array.isArray(n.fills) && n.fills[0] && n.fills[0].type === "SOLID" && n.fills[0].visible !== false
+      ? "#" + [n.fills[0].color.r, n.fills[0].color.g, n.fills[0].color.b].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join("")
+      : null;
     texts.push({ node: n, name: n.name, chars: (n.characters || "").slice(0, 30), size: n.fontSize,
-                 styleId: n.textStyleId || "", box: rel(n), insidePlot });
+                 styleId: n.textStyleId || "", box: rel(n), insidePlot, fill: tf });
   }
   if (/^annotation__/.test(n.name)) annotations.push({ node: n, name: n.name, box: rel(n), type: n.type });
   if ("strokeWeight" in n && typeof n.strokeWeight === "number" && n.strokes && n.strokes.length) {
@@ -124,8 +145,9 @@ for (const child of frame.children) {
 {
   const under = texts.filter((t) => t.size < TEXT_FLOOR - 0.01);
   add("text-floor", under.length ? "FAIL" : "ok",
-      under.length ? `${under.length} text node(s) below ${TEXT_FLOOR}px: ` + under.map((t) => `"${t.chars}" ${r(t.size)}px`).join(", ")
-                   : `all ${texts.length} text nodes at or above ${TEXT_FLOOR}px`);
+      (under.length ? `${under.length} text node(s) below ${TEXT_FLOOR}px: ` + under.map((t) => `"${t.chars}" ${r(t.size)}px`).join(", ")
+                    : `all ${texts.length} text nodes at or above ${TEXT_FLOOR}px`) +
+      ` (floor ${TEXT_FLOOR}px, ${CONFIG.textFloor != null ? "from CONFIG" : isSmall ? "302-wide format — SMALL-CHARTS.md overrides 12 to 11" : "540/850-wide format"})`);
 }
 
 // Annotation ladder + ceiling. Only annotation__* nodes are ours; an imported chart's label sizes
@@ -141,8 +163,27 @@ for (const child of frame.children) {
   }
 }
 
-// Named styles. An SVG import can never carry a style id, so this row judges OUR nodes only and
-// reports the imported ones as context rather than failing them.
+// Sizes are named styles — CHECKS.md's bar is "no arbitrary sizes left over from scaling the export
+// (13.7, 16.8)", which is about the NUMBER, not about carrying a Figma style id. An SVG import can
+// never carry an id, so judging only bound nodes lets exactly the defect this row exists for through:
+// a fitted chart's labels land wherever the rescale puts them (13.36 measured on a live run) and the
+// row still reported ok. So check the numeric size of every plot and annotation text against the
+// ladder, and keep the style-id question as its own row below.
+{
+  const subject = texts.filter((t) => t.insidePlot || /^annotation__/.test(t.name));
+  if (!subject.length) skip("ladder-sizes", "no plot or annotation text to size");
+  else {
+    const off = subject.filter((t) => !LADDER.some((L) => Math.abs(t.size - L) < 0.01));
+    const distinct = [...new Set(off.map((t) => r(t.size)))].sort((a, b) => a - b);
+    add("ladder-sizes", off.length ? "FAIL" : "ok",
+        off.length ? `${off.length} of ${subject.length} text node(s) off the ${LADDER.join("/")} ladder: ${distinct.join(", ")}px. A rescaled export leaves arbitrary sizes — set them to the nearest rung by rank.`
+                   : `all ${subject.length} plot/annotation text node(s) on the ${LADDER.join("/")} ladder`,
+        { offLadderSizes: distinct });
+  }
+}
+
+// Style BINDING, separately from the numbers above. An SVG import cannot carry a style id, so this
+// row judges OUR nodes only and reports the imported ones as context.
 {
   const ann = texts.filter((t) => /^annotation__/.test(t.name));
   const unbound = ann.filter((t) => !t.styleId);
@@ -266,21 +307,134 @@ for (const child of frame.children) {
   }
 }
 
-// Annotation knockout tier, and the sub-pixel tell.
+// ---- Crossings, computed BEFORE the two rows that read them. Vertices are LOCAL to their node, so
+// map them through absoluteTransform — a bbox is not a substitute for a line (CHECKS.md), and an
+// untransformed read puts the geometry somewhere else entirely (reference/GOTCHAS.md).
+//
+// What an annotation may sit on is a CLASSIFICATION, not a yes/no: gridlines, empty space and a
+// muted context line are legal; a protagonist line, a dot and a value label are not. Failing every
+// intersection alike reports a correct highlighted chart as broken, because crossing the muted
+// context is exactly what the treatment is for.
+let crossings = null;
+{
+  const map = (n, pt) => { const m = n.absoluteTransform; return { x: m[0][0] * pt.x + m[0][1] * pt.y + m[0][2] - fb.x, y: m[1][0] * pt.x + m[1][1] * pt.y + m[1][2] - fb.y }; };
+  const segHitsRect = (p, q, b) => {
+    const inside = (pt) => pt[0] >= b.l && pt[0] <= b.rr && pt[1] >= b.t && pt[1] <= b.bb;
+    if (inside(p) || inside(q)) return true;
+    const cr = (ax, ay, bx, by) => ax * by - ay * bx;
+    const edges = [[[b.l, b.t], [b.rr, b.t]], [[b.rr, b.t], [b.rr, b.bb]], [[b.rr, b.bb], [b.l, b.bb]], [[b.l, b.bb], [b.l, b.t]]];
+    for (const [e0, e1] of edges) {
+      const d1 = cr(q[0] - p[0], q[1] - p[1], e0[0] - p[0], e0[1] - p[1]);
+      const d2 = cr(q[0] - p[0], q[1] - p[1], e1[0] - p[0], e1[1] - p[1]);
+      const d3 = cr(e1[0] - e0[0], e1[1] - e0[1], p[0] - e0[0], p[1] - e0[1]);
+      const d4 = cr(e1[0] - e0[0], e1[1] - e0[1], q[0] - e0[0], q[1] - e0[1]);
+      if (((d1 > 0) !== (d2 > 0)) && ((d3 > 0) !== (d4 > 0))) return true;
+    }
+    return false;
+  };
+  const overlaps = (a, b) => a.l < b.rr && a.rr > b.l && a.t < b.bb && a.bb > b.t;
+
+  // Muted-or-not is a property of the SERIES, not of the node. Under the highlight treatment a 1px
+  // `line__X` is the muted context — and so is its halo, `outline__X`, which sits at 2x (CHECKS.md:
+  // "halo 2x, or line+1 where nothing crosses"). Classifying each node by its own weight therefore
+  // reports the halo of a legally-crossed context line as a protagonist. So read the weight of each
+  // series' `line__` node and let its `outline__` inherit the verdict.
+  const lineWeightBySeries = {};
+  for (const v of vectors) {
+    const m = /^line__(.+)$/.exec(v.name);
+    if (m && typeof v.strokeWeight === "number") lineWeightBySeries[m[1]] = v.strokeWeight;
+  }
+  const polylines = [];
+  for (const v of vectors) {
+    const m = /^(line|outline)__(.+)$/.exec(v.name);
+    if (!m) continue;
+    let net = null;
+    try { net = v.vectorNetwork; } catch (e) { net = null; }
+    if (!net || !net.vertices || !net.vertices.length) continue;
+    const w = typeof v.strokeWeight === "number" ? v.strokeWeight : null;
+    const seriesW = lineWeightBySeries[m[2]];
+    const muted = CONFIG.highlightTreatment && seriesW !== undefined && Math.abs(seriesW - 1) < 0.05;
+    polylines.push({ name: v.name, muted, w, seriesLineW: seriesW === undefined ? null : r(seriesW),
+                     points: net.vertices.map((pt) => { const q = map(v, pt); return [r(q.x), r(q.y)]; }) });
+  }
+  if (!polylines.length) skip("polylines", "no line__*/outline__* VECTOR carried a readable vectorNetwork");
+  else add("polylines", "ok", `${polylines.length} series polyline(s) sampled, ${polylines.reduce((s, p) => s + p.points.length, 0)} vertices total, in frame coordinates` +
+        (CONFIG.highlightTreatment ? `; ${polylines.filter((p) => p.muted).length} classified as muted context (legal to cross)` : ""),
+        { polylines: polylines.map((p) => ({ name: p.name, n: p.points.length, muted: p.muted, first: p.points[0], last: p.points[p.points.length - 1] })) });
+
+  // Furniture and forbidden marks, by bbox. A gridline, axis or tick is axis-aligned, so its bbox IS
+  // its geometry; dots and value labels are small and compact, so a bbox is right for them too.
+  const furnitureBoxes = stroked.filter((s) => s.insidePlot && !/^(line|outline)__/.test(s.name))
+    .map((s) => ({ name: s.name, box: rel(s.node) })).filter((x) => x.box);
+  const forbiddenBoxes = [
+    ...leaves.filter((x) => x.insidePlot && /^datapoints__|^dot__/.test(x.name)).map((x) => ({ name: x.name, box: x.box, why: "a dot" })),
+    ...texts.filter((x) => x.insidePlot && /^value__/.test(x.name) && x.box).map((x) => ({ name: x.name, box: x.box, why: "a value label" })),
+  ];
+
+  if (!annotations.length) { skip("annotation-overlap", "no annotation__* nodes on this frame"); }
+  else if (!polylines.length && !furnitureBoxes.length) { skip("annotation-overlap", "nothing to test against: no readable polylines and no furniture"); }
+  else {
+    crossings = {};
+    const illegal = [];
+    for (const a of annotations) {
+      if (!a.box) continue;
+      const hits = [];
+      for (const pl of polylines) {
+        for (let i = 1; i < pl.points.length; i++) {
+          if (segHitsRect(pl.points[i - 1], pl.points[i], a.box)) {
+            hits.push(pl.name);
+            if (!pl.muted) illegal.push(`${a.name} crosses ${pl.name}` + (CONFIG.highlightTreatment ? ` (its series line is ${pl.seriesLineW}px — protagonist, not the 1px muted context)` : ""));
+            break;
+          }
+        }
+      }
+      for (const f of furnitureBoxes) if (overlaps(a.box, f.box)) hits.push(f.name);
+      for (const f of forbiddenBoxes) if (overlaps(a.box, f.box)) { hits.push(f.name); illegal.push(`${a.name} covers ${f.name} — ${f.why}`); }
+      crossings[a.name] = [...new Set(hits)];
+    }
+    const uniq = [...new Set(illegal)];
+    add("annotation-overlap", uniq.length ? "FAIL" : "ok",
+        uniq.length ? uniq.join("; ") + ". Gridlines, empty space and a muted context line are legal; a protagonist line, a dot or a value label is not."
+                    : `no annotation covers a prohibited mark (${annotations.length} annotation(s) vs ${polylines.length} line(s), ${furnitureBoxes.length} furniture node(s), ${forbiddenBoxes.length} dot/value node(s))`,
+        { crossingsPerAnnotation: crossings, approximate: "segment-vs-rect on sampled vertices; a near-miss is settled by CHECKS.md's four-render pixel probe." });
+  }
+}
+
+// Annotation knockout tier. The TIER IS DECIDED BY WHAT IS CROSSED, so this row cannot be a
+// property check alone: an annotation crossing a gridline with NO stroke is a missing knockout, and
+// judging only the nodes that already have one certifies exactly that defect. Crossings are computed
+// below (furniture bboxes + series polylines) and this row reads them.
 {
   if (!annotations.length) skip("annotation-knockout", "no annotation__* nodes on this frame");
+  else if (!crossings) skip("annotation-knockout", "crossings not computed (no furniture and no readable polylines) — cannot decide the tier, so not judging the strokes either");
   else {
     const bad = [];
     for (const a of annotations) {
       const n = a.node;
       if (!("strokeWeight" in n) || typeof n.strokeWeight !== "number") continue;
       const hasStroke = n.strokes && n.strokes.length && n.strokeWeight > 0;
+      const crosses = crossings[a.name] || [];
+      if (crosses.length && !hasStroke) {
+        bad.push(`${a.name} crosses ${crosses.length} thing(s) (${crosses.slice(0, 3).join(", ")}) but carries NO knockout — CHECKS.md requires a 3px OUTSIDE stroke whenever furniture is crossed`);
+        continue;
+      }
+      if (!crosses.length && hasStroke) {
+        bad.push(`${a.name} crosses nothing yet carries a ${r(n.strokeWeight)}px knockout — an annotation over empty space takes no stroke and no frame`);
+        continue;
+      }
       if (hasStroke && Math.abs(n.strokeWeight - 3) >= 0.05) {
         bad.push(`${a.name} knockout ${r(n.strokeWeight)}px (want 3)` + (n.strokeWeight < 1 ? " — sub-pixel means the stroke was set before a rescale()" : ""));
       }
       if (hasStroke && n.strokeAlign !== "OUTSIDE") bad.push(`${a.name} strokeAlign ${n.strokeAlign} (want OUTSIDE)`);
+      if (hasStroke && frameFill) {
+        const sf = n.strokes[0];
+        if (sf.type === "SOLID") {
+          const hex = "#" + [sf.color.r, sf.color.g, sf.color.b].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join("");
+          if (hex.toLowerCase() !== frameFill.toLowerCase()) bad.push(`${a.name} knockout is ${hex}, not the frame's own ${frameFill} — read the colour off the frame, never hardcode white`);
+        }
+      }
     }
-    add("annotation-knockout", bad.length ? "FAIL" : "ok", bad.length ? bad.join(", ") : `all ${annotations.length} annotation(s) carry a 3px OUTSIDE knockout or none at all`);
+    add("annotation-knockout", bad.length ? "FAIL" : "ok", bad.length ? bad.join("; ") : `all ${annotations.length} annotation(s) carry the tier their crossings require`);
   }
 }
 
@@ -297,55 +451,17 @@ for (const child of frame.children) {
   }
 }
 
-// Polylines, for the annotations-cover-only-furniture row. Vertices are LOCAL to their node, so map
-// them through absoluteTransform — a bbox is not a substitute (CHECKS.md), and an untransformed read
-// puts the geometry in the wrong place entirely (reference/GOTCHAS.md).
+// Direct labels readable as text — computed, not declared. CHECKS.md wants 4.5:1 against the
+// background for every category label drawn on it; that is a pure function of two hexes.
 {
-  const map = (n, p) => { const m = n.absoluteTransform; return { x: m[0][0] * p.x + m[0][1] * p.y + m[0][2] - fb.x, y: m[1][0] * p.x + m[1][1] * p.y + m[1][2] - fb.y }; };
-  const polylines = [];
-  for (const v of vectors) {
-    if (!/^(line|outline)__/.test(v.name)) continue;
-    let net = null;
-    try { net = v.vectorNetwork; } catch (e) { net = null; }
-    if (!net || !net.vertices || !net.vertices.length) continue;
-    polylines.push({ name: v.name, points: net.vertices.map((pt) => { const q = map(v, pt); return [r(q.x), r(q.y)]; }) });
-  }
-  if (!polylines.length) skip("polylines", "no line__*/outline__* VECTOR carried a readable vectorNetwork");
-  else add("polylines", "ok", `${polylines.length} series polyline(s) sampled, ${polylines.reduce((s, p) => s + p.points.length, 0)} vertices total, in frame coordinates`,
-           { polylines: polylines.map((p) => ({ name: p.name, n: p.points.length, first: p.points[0], last: p.points[p.points.length - 1] })) });
-
-  // Annotations cover only furniture — segment-vs-rect, using those polylines.
-  if (!annotations.length) skip("annotation-overlap", "no annotation__* nodes on this frame");
-  else if (!polylines.length) skip("annotation-overlap", "no polylines available to test against");
+  const onBg = texts.filter((t) => t.insidePlot && t.fill && /^(label|annotation)__/.test(t.name));
+  if (!frameFill) skip("label-contrast-on-background", "frame carries no solid fill to measure against");
+  else if (!onBg.length) skip("label-contrast-on-background", "no label__*/annotation__* text with a solid fill");
   else {
-    const hits = [];
-    const segHitsRect = (p, q, b) => {
-      const inside = (pt) => pt[0] >= b.l && pt[0] <= b.rr && pt[1] >= b.t && pt[1] <= b.bb;
-      if (inside(p) || inside(q)) return true;
-      const cross = (ax, ay, bx, by) => ax * by - ay * bx;
-      const edges = [[[b.l, b.t], [b.rr, b.t]], [[b.rr, b.t], [b.rr, b.bb]], [[b.rr, b.bb], [b.l, b.bb]], [[b.l, b.bb], [b.l, b.t]]];
-      for (const [e0, e1] of edges) {
-        const d1 = cross(q[0] - p[0], q[1] - p[1], e0[0] - p[0], e0[1] - p[1]);
-        const d2 = cross(q[0] - p[0], q[1] - p[1], e1[0] - p[0], e1[1] - p[1]);
-        const d3 = cross(e1[0] - e0[0], e1[1] - e0[1], p[0] - e0[0], p[1] - e0[1]);
-        const d4 = cross(e1[0] - e0[0], e1[1] - e0[1], q[0] - e0[0], q[1] - e0[1]);
-        if (((d1 > 0) !== (d2 > 0)) && ((d3 > 0) !== (d4 > 0))) return true;
-      }
-      return false;
-    };
-    for (const a of annotations) {
-      if (!a.box) continue;
-      for (const pl of polylines) {
-        for (let i = 1; i < pl.points.length; i++) {
-          if (segHitsRect(pl.points[i - 1], pl.points[i], a.box)) { hits.push(`${a.name} crosses ${pl.name}`); i = pl.points.length; }
-        }
-      }
-    }
-    const uniq = [...new Set(hits)];
-    add("annotation-overlap", uniq.length ? "FAIL" : "ok",
-        uniq.length ? uniq.join(", ") + ". A highlighted line, a dot or a value label is never acceptable under an annotation; a muted context line or a gridline is."
-                    : `no annotation rect crosses any series polyline (${annotations.length} annotation(s) vs ${polylines.length} line(s))`,
-        { approximate: "segment-vs-rect on sampled vertices. For a near-miss, CHECKS.md's four-render pixel probe is the arbiter." });
+    const bad = onBg.map((t) => ({ t, c: contrast(t.fill, frameFill) })).filter((x) => x.c < 4.5);
+    add("label-contrast-on-background", bad.length ? "FAIL" : "ok",
+        bad.length ? bad.map((x) => `"${x.t.chars}" ${x.t.fill} on ${frameFill} = ${r(x.c)}:1 (want 4.5)`).join(", ")
+                   : `all ${onBg.length} label(s) clear 4.5:1 against ${frameFill} (lowest ${r(Math.min(...onBg.map((t) => contrast(t.fill, frameFill))))}:1)`);
   }
 }
 
@@ -358,6 +474,11 @@ skip("entities-all-render", "needs the EFFECTIVE selection (URL country=, or the
 skip("year-stated-not-stale", "a single-time image must name its year; a time series must not gain a caption", "/check-hardcoded-years");
 skip("legend-agreement", "swatch->label pairing by geometry; not attempted here because a direct-labelled chart has no legend — run it by hand if this frame has one");
 skip("direct-label-pairing", "each category label's fill and x against the segment it names, in the reference row");
+// The OTHER 4.5:1 row. Declared rather than computed because it needs the label->segment pairing the
+// row above owns: the bar's own fill is the background here, and picking it by geometry is that
+// pairing problem. The contrast arithmetic is already in this file (see label-contrast-on-background)
+// and can be reused the moment pairing exists.
+skip("label-contrast-on-fill", "4.5:1 for every label drawn INSIDE a fill, at 13.5px regular — the 3:1 large-text allowance does not apply. Needs label->segment pairing to know which fill is behind each label", "CHECKS.md + the direct-label-pairing row");
 skip("arrow-clearance", "arrow pixels vs target pixels; needs 3N+1 renders (the four-render protocol, pair-specific)", "CHECKS.md");
 skip("leader-on-map", "terminal vertex against the country's PIXELS, not its bounding box", "CHECKS.md + per-chart-type/maps.md");
 
