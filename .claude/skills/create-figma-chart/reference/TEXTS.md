@@ -33,16 +33,39 @@ Replace the lorem-ipsum text nodes in the cloned template. Source everything fro
   const BOTTOM = footer.y + footer.height;       // read off the clone, before anything moves
   source.textAutoResize = "WIDTH_AND_HEIGHT";    // one line, its natural width
   footer.layoutMode = "VERTICAL";                // the actual operation — not a y assignment
+  footer.primaryAxisSizingMode = "AUTO";         // REQUIRED — see below; without it the row overflows
   footer.itemSpacing = 4;                        // the row pitch both shipped two-row footers use
   footer.counterAxisAlignItems = "MIN";          // left-align, so CC BY sits under the source
-  footer.y = BOTTOM - footer.height;             // re-pin the designed bottom edge after it grows
+  // Re-pin in a LATER call, or from the rows' own extent — footer.height is stale in this one:
+  footer.y = BOTTOM - Math.max(...footer.children.map((c) => c.y + c.height));
   ```
 
-  The frame hugs its own height on the new axis, so there is no `resize` to do — and re-read `footer.height` afterwards rather than assuming 36, since it now falls out of the rows.
+  **`primaryAxisSizingMode = "AUTO"` is not optional, and leaving it out fails silently.** On a
+  VERTICAL auto-layout the *primary* axis is the vertical one, so height is governed by
+  `primaryAxisSizingMode` — not `counterAxisSizingMode`, and not `layoutSizingHorizontal`. DI's
+  `Frame 37` ships **`FIXED`** (measured 2026-08-20, alongside `layoutSizingVertical: "FIXED"`), so
+  turning the axis alone leaves the box at its one-row **16px** while the second row renders *below*
+  it: CC BY sits at `y: 20, h: 16` inside a frame whose `height` still reads 16. Nothing errors, both
+  rows draw, and every geometry read — `footer.height`, the band bottom, the gap — is wrong by 20px
+  in the direction that makes the chart look fine and the footer overhang the artboard.
+
+  **And `footer.height` does not settle inside the call that changed `layoutMode`.** Re-pinning with
+  `BOTTOM - footer.height` in that same call therefore subtracts the *old* height and moves the footer
+  nowhere. Pin from `Math.max(...children.map(c => c.y + c.height))`, which is live, or split the
+  re-pin into the next call. Verified on this template: content extent 36, `footer.y` 488, bottom
+  landing exactly on the clone's 524.
 
   **Take `BOTTOM` from the clone rather than typing it.** It is 524 in a 540-wide template, and the footer edge differs in every template (Step 7's table) — hardcoding the square template's value lifts the footer off the bottom everywhere else. Then re-fit the chart into what's left (Step 7). Only if the source is too long even for a full line — beyond the template's content width — wrap it with `textAutoResize = "HEIGHT"` at a width that breaks after the organization's name, and top-align CC BY with its first line. Either way CC BY is **left-aligned** once it has its own row — it only sits at x=468 while it shares the source's line.
 
   **The `source.y = -20` variant only works on a footer whose children are NOT flowed.** It leaves the footer's own geometry untouched — nothing else in the template shifts — and the band's real bottom becomes `footer.y + source.y`, which is the number to feed Step 7. But it is a `y` assignment, so auto-layout discards it on every current template: check `layoutPositioning` on the child first (`"ABSOLUTE"` means it will hold, `"AUTO"` means it won't). It is recorded here because the file's own older finished pages use it, from when those footers were absolute.
+
+  **Diagnose the overrun by measuring the source's own width, not by reasoning about the layout.**
+  DI's `Frame 37` is already `primaryAxisAlignItems: "SPACE_BETWEEN"` and already FIXED at 508, which
+  makes its `itemSpacing: 220` inert — so "the fixed spacing is pushing CC BY off" is a plausible
+  story that costs a wasted write to disprove. Read `source.width`: on this run it was **535** against
+  the 508 content box, i.e. the line genuinely does not fit, and CC BY's `x: 535` was just the source's
+  own right edge. The arithmetic that decides the fix is then one division — 508/535 needs a **0.949**
+  factor, so 14px must drop to 13 (13.5 leaves it at 516, still over).
 
   **And know when *not* to spend the second row.** A source that overruns CC BY by only a few pixels is not worth 20px of chart: the full FAO name at the Source style's 14px measured 473px against CC BY starting at x=468 — a 2px overlap — and the finished page's answer was to set that one line to **13px** and keep the footer one row deep. Weigh the two costs explicitly (one off-ladder size on the least important text, versus a fifth of the gap budget and a re-export) and record whichever you pick.
 - **Note:** only in templates that carry a Note line, and only if the chart has one worth keeping. **DI images normally carry no note at all** — drop it, or, when it's genuinely load-bearing for understanding the chart, fold it into the subtitle as a bolded second line (only if the subtitle isn't already crowded).

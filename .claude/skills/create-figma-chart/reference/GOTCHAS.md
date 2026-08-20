@@ -133,10 +133,13 @@ not in the type file, for that reason — the worked examples stay in `reference
     Vertical fits at **1.30x**, an upscale, so the same multiplier *thickens*: its line arrived at 2.61
     and its halo at 3.91 and both had to come **down** to 2/3. So the rule is not "restore what the
     rescale thinned" but "set every stroke after the scale, whichever way the scale went".
-  - **The reference tells you the rescale changed it. It does not tell you the target.** `imType=square`
-    ships 4/5 and `uncaptioned` ships 2/3 — and the house weight is **3 with a 4px halo**, i.e. neither
-    of them. Use the comparison to *notice*, then set the house value, keeping the halo one px above
-    the line.
+  - **The reference tells you the rescale changed it. It does not tell you the target.** The two export
+    routes ship different weights, and neither is a reliable stand-in for the house value — measured on
+    one chart, `imType=square` came back **line 3 / outline 4** and `imType=uncaptioned` **line 1.5 /
+    outline 2.5**, before any fit. So the square route happens to arrive at the house weight and the
+    uncaptioned route at 40% of it: read the fitted frame and set **3 with a 4px halo** explicitly.
+    Use the comparison to *notice*, never to source the number — and note that a square reference will
+    agree with the house value and so cannot tell you whether the repair ran.
   - **3/4 holds across the static and IG templates regardless of frame width.** I set the 850-wide
     Static Vertical to 2/3 on a rule I invented — "a wider plot wants a relatively thinner line" — and
     on a 1095-tall frame it read thin. Don't derive a weight from the frame size; 3/4 is the value.
