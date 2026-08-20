@@ -2,11 +2,11 @@
 
 Companion reference for the `create-figma-chart` skill. Distilled from the design team's **DI Charts Guidelines and Cheat Sheets** Figma file (`8gxqkVmZ9x3MK3ky5oigrJ`; pages: line `0:1`, stacked area `130:35045`, bar/stacked bar `130:35046`, slope `130:35047`, scatter `130:35048`, map `130:35049`) and the **Good Data Viz Checklist** (Charts 2026 file, node `20729:1027`). The Figma files are the source of truth — re-read the relevant page when in doubt or when this file looks stale.
 
-A second, different source is the design team's **DI Chart Library** (`pltrHXyVLg2XaNq4AvxPaK`) — an archive of ~283 *finished, shipped* charts filed by type. The Cheat Sheets file says what the team intends; the Chart Library shows what they actually ship, and where the two diverge the divergence is noted in place below. **It is read-only: never write to that file key.** Pages, with chart counts as of 2026-08-19:
+A second, different source is the design team's **DI Chart Library** (`pltrHXyVLg2XaNq4AvxPaK`) — an archive of **272** *finished, shipped* charts filed by type. The Cheat Sheets file says what the team intends; the Chart Library shows what they actually ship, and where the two diverge the divergence is noted in place below. **It is read-only: never write to that file key.** Pages, with chart counts as of 2026-08-19:
 
 | Page | Node | Charts |
 |---|---|---|
-| Line Charts | `1:2` | ~130 |
+| Line Charts | `1:2` | 123 |
 | Bar Charts | `1:3` | 52 |
 | Stacked Bar | `1:6` | 24 |
 | Maps | `1:1190` | 21 |
@@ -71,7 +71,9 @@ Each chart is a component; `get_screenshot` on its node id renders it. Before de
 - **A knockout is earned, not automatic, and the default form is a stroke on the text — not a frame behind it.** Three tiers, cheapest first; pick per annotation, not per chart:
   1. **No knockout at all** when the annotation crosses no chart ink. Most annotations placed in genuinely empty plot space need nothing, and adding a treatment there is pure maintenance cost.
   2. **A 3px outside stroke on the text node, in the template's canvas color** — the default whenever the annotation crosses *furniture* (gridlines, the axis rule, a muted context line). `txt.strokes = [canvas]`, `txt.strokeWeight = 3`, `txt.strokeAlign = "OUTSIDE"`. Outside, so it haloes the letterforms without deforming them.
-  3. **An opaque canvas-colored auto-layout frame, hugging the text on both axes** — the fallback for text that a 3px halo cannot carry: sitting on a filled area, or on ink dense enough that a halo still leaves the words unreadable. Its mechanics are below, and its cost is real, so reach for it last.
+  3. **An opaque canvas-colored auto-layout frame, hugging the text on both axes** — the fallback for text on **canvas** that a 3px halo cannot carry, i.e. ink dense enough that a halo still leaves the words unreadable. Its mechanics are below, and its cost is real, so reach for it last.
+
+  **Never on a filled area — that is a different treatment, not tier 3.** A canvas-colored frame over a colored band punches a canvas-colored hole straight through the fill, and the annotation there is *white* (see the filled-area rule below), so an opaque canvas box behind it also erases the words. Inside a fill, use white text with a white elbowed leader; a pale band takes dark text instead, per the stacked-area rule — contrast decides, but the frame never enters it.
 
   **Why the stroke beats the frame wherever it suffices:** the stroke is a per-glyph halo, so it interrupts what is behind it only where letters actually are; the frame is a rectangle sized to the *longest* line, so it erases a block-shaped hole in whatever it covers — including alongside every shorter line, where there is no text at all. Measured on the same annotation over a dashed gridline: with a stroke the gridline runs continuously up to each letterform and resumes; with a hugging frame it stops dead at the block's left edge and restarts at its right. The stroke also removes this section's whole trap list in one go — no clipping, no descender allowance, no parent-before-HUG ordering.
 
