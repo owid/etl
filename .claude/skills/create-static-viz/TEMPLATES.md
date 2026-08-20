@@ -167,26 +167,38 @@ band_bottom = note_ink_bottom − note_lines × 14               # the Note's in
 
 | | 850-wide pair | Mobile (both) |
 |---|---|---|
-| `origin_y` (the header block's own top edge) | 0 | 16 |
-| `logo_px` (the logo's **row**, not the logo) | 35.26 (Horizontal) / 41.26 (Vertical) | 35.23 |
-| `row_pad_px` (the title row's own top padding) | 16.22 | 0 |
-| `note_ink_bottom` | 586.62 (Horizontal) / 1043.81 (Vertical) | — (no Note row) |
-| footer row spacing / block top padding | 4 / 16 | 4 / 0 |
+| `origin_y` (the header block's own top edge) | 16 | 16 |
+| `logo_px` (the logo's **row**, not the logo) | 0 — the logo is a sibling | 0 — the logo is a sibling |
+| `row_pad_px` (the title row's own top padding) | 0 | 0 |
+| `note_ink_bottom` | 587 (Horizontal) / 1043.81 (Vertical) | — (no Note row) |
+| footer row spacing / block top padding | 4 / 0 | 4 / 0 |
 
-> **`logo_px` and everything derived from it describe the superseded nested-logo generation.** The
-> 2026-08-19 pass measured the header as a **flat auto-layout of `[title, subtitle]` with the logo as
-> a SIBLING of the header, not a child of a title row** (`/create-figma-chart`'s SKILL.md → node map).
-> A sibling contributes nothing to the header's height, so on the current templates the `max(…,
-> logo_px)` cap does not apply, a one-line title *does* shrink the header by a line, and there is no
-> logo surplus to land between the title and the subtitle. `/create-figma-chart` measures the
-> one-line/one-line case on Static Vertical at **70**, against the 82.48 derived below.
+**Re-measured live on 2026-08-20** off `5332:93`, `5332:75` and `24590:20`. The headline is that **the
+rebuild unified the two families' header rhythm** — both now sit at `origin_y = 16` with no row
+padding, where the old padded generation had the 850-wide pair spanning the frame at `origin_y = 0`
+and carrying the 16.22 px inside `row_pad_px`. The line steps survived the rebuild unchanged: title
+**29**/line, subtitle **19**/line, a **6** px gap between them, and **4** px between footer rows.
+
+The rhythm now reproduces both templates exactly, which is the check that matters:
+
+| Case | Derivation | Live |
+|---|---|---|
+| Placeholder (2-line title, 2-line subtitle) | `16 + 58 + 6 + 38` | **118** ✓ |
+| One-line title, one-line subtitle | `16 + 29 + 6 + 19` | **70** ✓ |
+
+That second row is the one that used to disagree: the stale `origin_y = 0` / `row_pad_px = 16.22` pair
+derived **82.48** against a measured 70, and the 12.48 px gap between them was the whole error. Both
+figures now fall out of the same formula.
+
+> **The header is a flat auto-layout of `[title, subtitle]` with the logo as a SIBLING**, not a child
+> of a title row (`/create-figma-chart`'s SKILL.md → node map). A sibling contributes nothing to the
+> header's height, so `logo_px` is 0, the `max(…, logo_px)` cap does not apply, a one-line title *does*
+> shrink the header by a line, and there is no logo surplus to land between the title and the subtitle.
+> The logo constrains **width** instead: the title node is sized narrower than the content box to clear
+> it — 737.84 against 818 on the 850-wide pair, 428 against 508 on mobile.
 >
-> **Set `logo_px = 0` and drop the cap** — that much follows from the structure. The rest of this
-> section's arithmetic (`row_pad_px`, the 29/19 line steps, the calibration figures) still dates from
-> the padded generation and is *not* re-derived here, because these numbers feed SVG-emitting code and
-> need real measurements rather than inference. Re-measure them in Figma before trusting them; that
-> task is tracked as open on the PR that wrote this note. What follows is kept for the shape of the
-> old model, so a regression stays recognizable.
+> Everything below this note describes the **superseded nested-logo generation** and is kept only so a
+> regression stays recognizable. Its arithmetic no longer applies; the table above is the live one.
 
 **`logo_px` was per template, including within the 850-wide pair.** All three frames held the same
 logo instance (35.18 px), but the wrapper around it did not: Vertical's `Frame 1` (`5332:97`) added
