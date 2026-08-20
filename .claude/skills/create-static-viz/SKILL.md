@@ -48,6 +48,13 @@ Two companions in this directory:
 - **`scripts/verify_static_viz.py`** — mechanical check that the emitted files honor the Figma
   handoff contract. Run it before showing anyone the chart.
 
+**When you do make a Figma MCP call, batch it.** Every call is a ~7–10 s network hop to the hosted
+connector, so a handful issued one at a time is the difference between seconds and minutes. The
+connector serves concurrent calls — eight screenshots in one message measured 4.1× faster than
+serially — and admits about four or five at once, so **put independent calls in one message, 4–6 at
+a time.** Reads always; writes only when they target different pages. `/create-figma-chart` →
+**Round-trip budget** has the full rule and the list of what is genuinely serial.
+
 **What this skill does not decide:** colors, fonts, background, the logo, and any visual treatment
 the template provides. Those are applied in Figma. The ETL step owns the *data*, the *structure*
 (which text slots exist, in what order), the *proportions*, and the *axis conventions*. Setting a

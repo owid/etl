@@ -30,6 +30,7 @@ Read [GUIDELINES.md](GUIDELINES.md) (sibling file) before editing any chart — 
 > | Which text slots the step fills vs. leaves to the template | `/create-static-viz` | this skill's Step 6 |
 > | Type and palette — the step sets neither, this page owns both | this skill | `/create-static-viz` defers to it |
 > | The design vocabulary (per chart type, labeling, colors) | [GUIDELINES.md](GUIDELINES.md) | both |
+> | How Figma MCP calls are batched, and what is serial | this skill (**Round-trip budget**) | both |
 >
 > The asymmetry worth remembering: **that skill owns the data, the geometry and the proportions; this
 > one owns the type and the palette.** A change that crosses that line belongs in both files.
@@ -42,6 +43,33 @@ Two more sibling files own a route each, and both replace rather than supplement
 | [BESPOKE-SVG.md](BESPOKE-SVG.md) | the input is a **bespoke visualization** — a client-rendered React viz with no `.svg` endpoint. Covers getting a chart-only SVG out of one; after that this page applies unchanged. |
 
 Three sibling skills do the text work this one depends on, and Step 8c calls them: **`/adversarial-data-review`** (is the FAUST true of the indicator, and is the data), **`/check-metadata-style`** (the Writing and Style Guide) and **`/check-metadata-typos`** (codespell). Anything they turn up is an upstream fix in the garden step, not a Figma edit.
+
+## Round-trip budget
+
+Every Figma MCP call is a network hop to Figma's hosted connector: **7–10 s for `use_figma`, ~10 s for `get_screenshot`**, flat regardless of how big the script is. A run makes 120–190 of them. So the round trips are where the wall-clock goes — not the SVG exports (0.24 s each, under 2 s for a whole run) and not the response payloads (~1.5 KB per `use_figma`). Measured across five sessions: **16–28 minutes of pure MCP latency per chart**, with every single call issued on its own.
+
+**Fan out independent calls — one message, 4–6 at a time.** The connector serves them concurrently: eight screenshots issued together came back **4.1× faster** than serially (79.7 s of work in 19.4 s of wall clock). It admits about four or five at once, and per-call latency inflates past that — 8.2 s for the first of eight, 13.2 s for the last — so **4–6 per message is the sweet spot and more just queues.** This is the `figma-use` skill's own instruction too: issue the N calls in one message, and don't await one before issuing the next.
+
+Reads fan out freely. **Writes only when they target different pages** — a script may switch pages only once, so two `use_figma` writes aimed at the same page in one message race each other.
+
+What is independent, and today is not batched:
+
+- **The palette harvest.** `search_design_system` caps at ~14 results against a 24-fill palette, so it takes one group query plus ~11 by-name queries. Every one of them is independent.
+- **Screenshots of different frames or pages.** Issue them together, then `curl` all the returned URLs in one bash call, then Read each. A screenshot is otherwise three tool calls, and a run takes 14–70 of them.
+- **Every format in a multi-format run**, and every frame of a `chart-rows` set — separate pages and frames, so the writes fan out as well as the reads.
+- **Any survey of N nodes.** The pass that wrote GUIDELINES.md screenshotted 272 chart-library nodes one at a time: 2.7 hours, every call an independent read.
+- **The Step 8c property sweeps** — font sizes, stroke weights, dash patterns, fills, polylines. Those are reads of a single page, so they collapse into *one* `use_figma` returning one JSON. `scripts/verify_templates.js` already does exactly this for ten templates.
+- **The arrow probe's baseline render.** The both-hidden picture is the same for every arrow on the frame: take it once, then one hide-render per shape. N arrows costs `N + 2` screenshots instead of `4N`.
+
+**What is serial for a reason — don't collapse these:**
+
+| Sequence | Why |
+|---|---|
+| trim → position → read height | `leadingTrim` does not update `height` within the call that sets it (Step 7) |
+| original → clone → fill texts → measure band → export embed → fit | the band is not knowable until the real title and subtitle have reflowed the header (Step 3) |
+| one page per `use_figma` call | `page.children` on a page you have not switched to returns a short list *without erroring* (Gotchas) |
+
+And a bigger batch is a bigger loss: `use_figma` is atomic, so a script that throws on its last line reverts the whole pass. Stay inside the plugin's ~10-logical-operations-per-call guidance.
 
 ## The yearly Charts file — node map (2026)
 
