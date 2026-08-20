@@ -28,8 +28,10 @@ TWH_TO_KWH = 1e9
 # Countries whose data have to be removed since they were identified as outliers.
 OUTLIERS = ["Gibraltar"]
 
-# Region aggregates, rebuilt here from the combined data. The Statistical Review's own are incomplete,
-# since it cannot attribute part of each region to any country.
+# Continents are taken from the Statistical Review, which assigns every one of its undisclosed residual
+# regions to one of them, so they cover the whole globe and reach back to 1965. Rebuilding them from the
+# combined country data instead was measured to move them by under 2%, at the cost of the years before EIA
+# begins, so it is not done.
 CONTINENTS = [
     "Africa",
     "Asia",
@@ -45,16 +47,26 @@ CONTINENTS = [
 # would count the same territory twice.
 DUPLICATED_TERRITORIES = ["East Germany", "West Germany", "Czechoslovakia"]
 
-REGIONS = CONTINENTS + [
+# Income groups are rebuilt here from the combined country data, because the Statistical Review assigns
+# none of its residual regions to them: summed, its own income groups reach only 91-99% of its World total,
+# it reports nothing at all for the low-income group, and a residual region cannot be assigned to one of
+# them even in principle (the countries "Other South America" stands for span three income groups).
+INCOME_GROUPS = [
     "High-income countries",
     "Low-income countries",
     "Lower-middle-income countries",
     "Upper-middle-income countries",
 ]
 
-# Years each region's aggregate covers, which is EIA's own range (see add_region_aggregates). Asserted in
-# sanity_check_outputs so that a change has to be acknowledged here rather than found on a chart.
-EXPECTED_REGION_YEARS: dict[str, tuple[int, int]] = {region: (1980, 2024) for region in REGIONS}
+REGIONS = CONTINENTS + INCOME_GROUPS
+
+# Years each region's aggregate covers: the Statistical Review's own range for the continents, and EIA's
+# for the income groups we build (see add_region_aggregates). Asserted in sanity_check_outputs so that a
+# change has to be acknowledged here rather than found on a chart.
+EXPECTED_REGION_YEARS: dict[str, tuple[int, int]] = {
+    **{region: (1965, 2025) for region in CONTINENTS},
+    **{region: (1980, 2024) for region in INCOME_GROUPS},
+}
 
 # EIA columns measuring the same quantity as each Statistical Review source, in the same units. Other
 # renewables is the estimate the EIA garden step builds from geothermal, biomass and tide generation.
@@ -306,13 +318,14 @@ STATISTICAL_REVIEW_FIRST_YEAR = 1965
 
 
 def get_statistical_review_data(tb_review: Table) -> Table:
-    """Select the TES-by-source columns and the total, dropping the region aggregates (see REGIONS).
+    """Select the TES-by-source columns and the total, dropping only the income-group aggregates.
 
-    The producer's own regions, the World and the European Union are kept: it reports them directly.
+    The continents are kept, along with the producer's own regions, the World and the European Union: it
+    reports them all directly. The income groups are dropped and rebuilt in add_region_aggregates.
     """
     tb = tb_review[["country", "year", "total_energy_supply_twh"] + list(SR_SOURCES)]
     tb = tb.rename(columns={col: f"{name}_twh" for col, name in SR_SOURCES.items()}, errors="raise")
-    tb = tb[~tb["country"].isin(REGIONS)].reset_index(drop=True)
+    tb = tb[~tb["country"].isin(INCOME_GROUPS)].reset_index(drop=True)
     return tb
 
 
@@ -378,17 +391,18 @@ def get_eia_year_range(tb_eia: Table) -> tuple[int, int]:
 
 
 def add_region_aggregates(tb: Table, eia_years: tuple[int, int]) -> Table:
-    """Build the region aggregates from the combined country-level data.
+    """Build the income-group aggregates from the combined country-level data.
 
-    Aggregates are published only for the years EIA covers, because most of the countries in them come
-    from EIA. Outside that window the Statistical Review itemizes too few countries to stand for a
-    region (4 of Africa's 57, home to 23% of the continent), and adding them at 1980 would show a rise
-    that is ours, not the world's: South America's would climb 6.5% in a year purely because Bolivia,
-    Paraguay, Uruguay, Guyana and Suriname appear.
+    Only the income groups: the continents come from the Statistical Review (see CONTINENTS), which
+    assigns its undisclosed residual regions to them but none to an income group.
 
-    No coverage condition is imposed within that window. Every region reports at least three quarters of
+    They are published only for the years EIA covers, because most of the countries in them come from
+    EIA. Outside that window the Statistical Review itemizes too few countries to stand for a group, and
+    adding them at 1980 would show a rise that is ours, not the world's.
+
+    No coverage condition is imposed within that window. Every group reports at least three quarters of
     the countries that ever report there, so any threshold low enough to admit them all never fires; the
-    checks in sanity_check_outputs are what catch a region losing data.
+    checks in sanity_check_outputs are what catch a group losing data.
     """
     is_country = ~tb["country"].str.contains("(EI)", regex=False) & ~tb["country"].isin(
         REGIONS + ["World", "European Union (27)"] + DUPLICATED_TERRITORIES
@@ -399,13 +413,13 @@ def add_region_aggregates(tb: Table, eia_years: tuple[int, int]) -> Table:
     has_total = tb["total_energy_supply_twh"].notna()
     tb_aggregates = paths.regions.add_aggregates(
         tb[is_country & has_total].reset_index(drop=True),
-        regions={region: {} for region in REGIONS},
+        regions={region: {} for region in INCOME_GROUPS},
         min_num_values_per_year=1,
         accepted_overlaps=ACCEPTED_OVERLAPS,
         ignore_overlaps_of_zeros=True,
     )
     tb_aggregates = tb_aggregates[
-        tb_aggregates["country"].isin(REGIONS) & tb_aggregates["year"].between(*eia_years)
+        tb_aggregates["country"].isin(INCOME_GROUPS) & tb_aggregates["year"].between(*eia_years)
     ].reset_index(drop=True)
     return pr.concat([tb, tb_aggregates], ignore_index=True).sort_values(["country", "year"]).reset_index(drop=True)
 
@@ -673,7 +687,7 @@ def sanity_check_outputs(tb: Table) -> None:
     # just the total: a region built from a country set that does not cover the world shows up here, which
     # is the defect that made South America's shares mix two producers.
     world = tb[tb["country"] == "World"].set_index("year")
-    families = {"continents": CONTINENTS, "income groups": [region for region in REGIONS if region not in CONTINENTS]}
+    families = {"continents": CONTINENTS, "income groups": INCOME_GROUPS}
     for family, regions in families.items():
         members = tb[tb["country"].isin(regions)]
         for column in [f"{source}_twh" for source in ALL_SOURCES] + ["total_energy_supply_twh"]:
