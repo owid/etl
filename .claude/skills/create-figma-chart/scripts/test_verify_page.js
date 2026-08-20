@@ -74,10 +74,10 @@ function buildFrame(opts = {}) {
   const footer = node({ name: "footer", layoutMode: "VERTICAL", x: 16, y: 488, width: contentW, height: 36, children: [src] });
   const logo = node({ name: "logo", x: W - 80, y: 16, width: 64, height: 35 });
 
+  const grid = node({ name: "horizontal-grid-lines", x: 16, y: 200, width: contentW, height: 260,
+    children: [gridline("grid-1", 200, true), gridline("grid-2", 300, true), gridline("zero", 460, false)] });
   const kids = [
-    gridline("grid-1", 200, true),
-    gridline("grid-2", 300, true),
-    gridline("zero", 460, false),
+    grid,
     line("line__A", [[40, 440], [200, 300], [440, 260]], lineWeight),
     line("outline__A", [[40, 440], [200, 300], [440, 260]], lineWeight + 1),
     text("label__A", "Country A", labelSize, 450, 250, 60, 16, opts.labelFill || "#4c6a9c"),
@@ -91,10 +91,20 @@ function buildFrame(opts = {}) {
                       node({ type: "ELLIPSE", name: "dp2", x: 60, y: 262, width: 8, height: 8 })] }),
   ];
   if (opts.extraLine) kids.push(line("line__B", [[40, 420], [200, 340], [440, 300]], opts.extraLine));
-  if (opts.zeroAreaTick) kids.push(node({ type: "VECTOR", name: "tick-0", x: 40, y: 470, width: 0, height: 6,
-    strokeWeight: 1, strokes: solid("#dddddd"), dashPattern: [], strokeAlign: "CENTER", fills: solid("#000000"),
-    absoluteTransform: [[1, 0, 40], [0, 1, 470]],
-    vectorNetwork: { vertices: [{ x: 0, y: 0 }, { x: 0, y: 6 }], segments: [{ start: 0, end: 1 }] } }));
+  if (opts.zeroAreaTick) kids.push(node({ name: "horizontal-axis", x: 40, y: 470, width: 400, height: 6, children: [
+    node({ type: "VECTOR", name: "tick-0", x: 40, y: 470, width: 0, height: 6,
+      strokeWeight: 1, strokes: solid("#dddddd"), dashPattern: [], strokeAlign: "CENTER", fills: solid("#000000"),
+      absoluteTransform: [[1, 0, 40], [0, 1, 470]],
+      vectorNetwork: { vertices: [{ x: 0, y: 0 }, { x: 0, y: 6 }], segments: [{ start: 0, end: 1 }] } })] }));
+  // A map: every country is a stroked non-series plot node at 0.22px by design. Nested under NO
+  // axis/grid group, so the furniture rule must not reach it.
+  if (opts.mapCountries) kids.push(node({ name: "countries", x: 40, y: 160, width: 400, height: 200, children: [
+    node({ type: "VECTOR", name: "country__FRA", x: 40, y: 160, width: 60, height: 40, strokeWeight: 0.22,
+           strokes: solid("#ffffff"), dashPattern: [], fills: solid("#4c6a9c"),
+           absoluteTransform: [[1, 0, 40], [0, 1, 160]], vectorNetwork: { vertices: [{ x: 0, y: 0 }, { x: 60, y: 40 }], segments: [{ start: 0, end: 1 }] } }),
+    node({ type: "VECTOR", name: "country__DEU", x: 120, y: 160, width: 60, height: 40, strokeWeight: 0.33,
+           strokes: solid("#ffffff"), dashPattern: [], fills: solid("#b13507"),
+           absoluteTransform: [[1, 0, 120], [0, 1, 160]], vectorNetwork: { vertices: [{ x: 0, y: 0 }, { x: 60, y: 40 }], segments: [{ start: 0, end: 1 }] } })] }));
   if (opts.gappedLine) kids.push(node({ type: "VECTOR", name: "line__G", x: 40, y: 200, width: 400, height: 100,
     strokeWeight: 3, strokes: solid("#b13507"), dashPattern: [], strokeAlign: "CENTER",
     absoluteTransform: [[1, 0, 0], [0, 1, 0]],
@@ -271,6 +281,60 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     check("11 17px annotation off-ladder", row(out, "annotation-ladder").status === "FAIL", row(out, "annotation-ladder").detail);
     check("11 17px exceeds the 16px subtitle", row(out, "text-hierarchy").status === "FAIL", row(out, "text-hierarchy").detail);
     check("11 subtitle resolved as the header's 2nd TEXT", /16px/.test(row(out, "text-hierarchy").detail), row(out, "text-hierarchy").detail);
+  }
+
+  // 15 — a map's country strokes are NOT furniture (0.22px by design, per-chart-type/maps.md).
+  {
+    const out = await run(buildFrame({ mapCountries: true }), {});
+    const d = row(out, "furniture-weight").detail;
+    check("15 map country strokes not judged as furniture", row(out, "furniture-weight").status === "ok" && !/0\.22|0\.33/.test(d), d);
+  }
+
+  // 16 — the highlight bar is a RELATIONSHIP, not a set of allowed numbers.
+  {
+    const ok1 = await run(buildFrame({ lineWeight: 1 }), { highlightTreatment: true });   // 1px line, 2px halo
+    check("16 1px context with its 2px halo passes", row(ok1, "series-weight").status === "ok", row(ok1, "series-weight").detail);
+    const ok3 = await run(buildFrame({ lineWeight: 3 }), { highlightTreatment: true });   // 3px line, 4px halo (line+1)
+    check("16 3px protagonist with a 4px halo passes", row(ok3, "series-weight").status === "ok", row(ok3, "series-weight").detail);
+    const bad = await run(buildFrame({ lineWeight: 4 }), { highlightTreatment: true });   // 4px line — never valid
+    check("16 a 4px series line FAILS", row(bad, "series-weight").status === "FAIL", row(bad, "series-weight").detail);
+  }
+
+  // 17 — XL 16 is legal only when declared.
+  {
+    const undeclared = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, size: 16, stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    check("17 undeclared 16px annotation FAILS", row(undeclared, "annotation-ladder").status === "FAIL", row(undeclared, "annotation-ladder").detail);
+    const declared = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, size: 16, stroke: "#ffffff", strokeWeight: 3 }) }), { xlAnnotations: true });
+    check("17 declared XL passes", row(declared, "annotation-ladder").status === "ok", row(declared, "annotation-ladder").detail);
+  }
+
+  // 18 — a mixed-weight annotation legitimately has no node-level style id.
+  {
+    const mixedAnn = annotation({ x: 100, y: 195, stroke: "#ffffff", strokeWeight: 3, styleId: "" });
+    mixedAnn.getStyledTextSegments = () => [{ fontName: { family: "Lato", style: "Regular" } }, { fontName: { family: "Lato", style: "Bold" } }];
+    const out = await run(buildFrame({ annotation: mixedAnn }), {});
+    check("18 mixed-weight annotation exempt from binding", row(out, "named-styles").status === "ok", row(out, "named-styles").detail);
+    check("18 and says why", /mixed-weight/.test(row(out, "named-styles").detail), row(out, "named-styles").detail);
+    const single = annotation({ x: 100, y: 195, stroke: "#ffffff", strokeWeight: 3, styleId: "" });
+    single.getStyledTextSegments = () => [{ fontName: { family: "Lato", style: "Regular" } }];
+    const out2 = await run(buildFrame({ annotation: single }), {});
+    check("18 single-weight unbound still FAILS", row(out2, "named-styles").status === "FAIL", row(out2, "named-styles").detail);
+  }
+
+  // 19 — the unimplemented half of the hierarchy is declared, not certified.
+  {
+    const out = await run(buildFrame(), {});
+    check("19 text-hierarchy says CEILING ONLY", /CEILING ONLY/.test(row(out, "text-hierarchy").detail), row(out, "text-hierarchy").detail);
+    check("19 ranks row declared SKIPPED", row(out, "text-hierarchy-ranks") && row(out, "text-hierarchy-ranks").status === "SKIPPED", "row missing");
+  }
+
+  // 20 — the small-format annotation clearance scales rather than applying the 540 constant.
+  {
+    const out = await run(buildFrame({ frameW: 302, frameH: 400, labelSize: 11,
+      annotation: annotation({ x: 20, y: 130, w: 80, h: 14, size: 11, stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    check("20 block-gap SKIPPED on 302", row(out, "annotation-block-gap").status === "SKIPPED", row(out, "annotation-block-gap").detail);
+    const big = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    check("20 540-wide still checks block-gap", row(big, "annotation-block-gap").status !== "SKIPPED", row(big, "annotation-block-gap").detail);
   }
 
   const bad = results.filter((x) => !x.ok);

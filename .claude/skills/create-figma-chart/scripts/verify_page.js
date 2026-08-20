@@ -24,6 +24,10 @@
 //                     changes the mark-weight bar (context 1px, protagonist 3px, halo 2x), makes
 //                     the muting grays a standing palette exception, and makes a muted CONTEXT line
 //                     legal to cross with an annotation (CHECKS.md allows exactly that).
+//     xlAnnotations — true when a lead annotation deliberately carries the message and takes
+//                     Annotation XL 16, level with the subtitle. That is the documented ceiling, spent
+//                     only when the annotation IS the message — so it has to be declared rather than
+//                     inferred, and left false a 16px annotation is a defect.
 //     textFloor     — px. Left null it is derived from the frame width: the 302-wide small and pull
 //                     templates run an 11px floor, because their own subtitle, source and year text
 //                     is 11px by design (SMALL-CHARTS.md overrides it) — a pull chart ALWAYS carries
@@ -44,6 +48,7 @@ const CONFIG = {
   tightlyMeasured: false,
   highlightTreatment: false,
   textFloor: null,
+  xlAnnotations: false,
 };
 
 const LADDER_FULL = [12, 13, 14, 15, 16]; // Annotation XS..XL; the ceiling is L 15, XL only when
@@ -107,20 +112,28 @@ const chartResolvedBy = chart ? `name "${CONFIG.chartName}"` : plotRoots.length 
 // four rows report "no annotation__* nodes" forever, which reads as "nothing to check" rather than
 // "I never looked". Caught by planting an annotation and watching the rows stay silent.
 const texts = [], stroked = [], fills = [], leaves = [], annotations = [], vectors = [], markBoxes = [];
-const collect = (n, insidePlot) => {
+// Grapher groups its axis furniture under stable container names. Identifying furniture as
+// "stroked and not a series line" instead is wrong the moment the chart is not a line chart: on a
+// map EVERY country vector is a stroked non-series plot node, so the prescribed 0.22px borders and
+// 0.3-0.35px highlight outlines (per-chart-type/maps.md) all report as rescale defects.
+const FURNITURE_GROUPS = /^(horizontal|vertical)-(axis|grid-lines)$|^grid|^axis|^ticks?$/i;
+const collect = (n, insidePlot, inFurniture) => {
   if ("visible" in n && !n.visible) return;
+  if (FURNITURE_GROUPS.test(n.name)) inFurniture = true;
   if (n.type === "TEXT" && typeof n.fontSize === "number") {
     const tf = Array.isArray(n.fills) && n.fills[0] && n.fills[0].type === "SOLID" && n.fills[0].visible !== false
       ? "#" + [n.fills[0].color.r, n.fills[0].color.g, n.fills[0].color.b].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join("")
       : null;
+    let mixedWeight = false;
+    try { mixedWeight = n.getStyledTextSegments(["fontName"]).length > 1; } catch (e) { mixedWeight = false; }
     texts.push({ node: n, name: n.name, chars: (n.characters || "").slice(0, 30), size: n.fontSize,
-                 styleId: n.textStyleId || "", box: rel(n), insidePlot, fill: tf });
+                 styleId: n.textStyleId || "", box: rel(n), insidePlot, fill: tf, mixedWeight });
   }
   if (/^annotation__/.test(n.name)) annotations.push({ node: n, name: n.name, box: rel(n), type: n.type });
   if ("strokeWeight" in n && typeof n.strokeWeight === "number" && n.strokes && n.strokes.length) {
     stroked.push({ node: n, name: n.name, type: n.type, w: n.strokeWeight,
                    dash: "dashPattern" in n && n.dashPattern ? [...n.dashPattern] : [],
-                   align: n.strokeAlign, insidePlot });
+                   align: n.strokeAlign, insidePlot, inFurniture });
   }
   // Zero-area nodes are EXCLUDED from the fill inventory and KEPT for the stroke rows (CHECKS.md).
   // A grapher import's tick vectors are zero-width and carry a default black fill that paints no
@@ -154,13 +167,13 @@ const collect = (n, insidePlot) => {
     pushLeafBoxes(n);
   }
   if (n.type === "VECTOR" && insidePlot) vectors.push(n);
-  if ("children" in n && n.children.length) { n.children.forEach((c) => collect(c, insidePlot)); return; }
+  if ("children" in n && n.children.length) { n.children.forEach((c) => collect(c, insidePlot, inFurniture)); return; }
   const b = rel(n);
   if (b && b.w > 0 && b.h > 0) leaves.push({ name: n.name, type: n.type, box: b, insidePlot });
 };
 for (const child of frame.children) {
   if (child === logo) continue;
-  collect(child, plotRoots.indexOf(child) !== -1);
+  collect(child, plotRoots.indexOf(child) !== -1, false);
 }
 
 // ---------------------------------------------------------------- rows
@@ -179,10 +192,15 @@ for (const child of frame.children) {
   const ann = texts.filter((t) => /^annotation__/.test(t.name));
   if (!ann.length) skip("annotation-ladder", "no annotation__* text nodes on this frame");
   else {
+    // The ceiling is L 15, and XL 16 is legal only when the annotation IS the message — a deliberate
+    // choice, so it is declared via CONFIG rather than inferred from the number being present.
+    const ceiling = CONFIG.xlAnnotations ? 16 : LADDER_CEILING;
     const off = ann.filter((t) => !LADDER.some((L) => Math.abs(t.size - L) < 0.01));
-    const over = ann.filter((t) => t.size > LADDER_CEILING + 0.01);
-    const bad = [...off.map((t) => `"${t.chars}" ${r(t.size)}px off-ladder`), ...over.map((t) => `"${t.chars}" ${r(t.size)}px above the L${LADDER_CEILING} ceiling`)];
-    add("annotation-ladder", bad.length ? "FAIL" : "ok", bad.length ? bad.join(", ") : `all ${ann.length} annotation(s) on the ladder and at or below ${LADDER_CEILING}`);
+    const over = ann.filter((t) => t.size > ceiling + 0.01);
+    const bad = [...off.map((t) => `"${t.chars}" ${r(t.size)}px off-ladder`),
+                 ...over.map((t) => `"${t.chars}" ${r(t.size)}px above the ${CONFIG.xlAnnotations ? "XL 16" : "L " + LADDER_CEILING} ceiling` + (CONFIG.xlAnnotations ? "" : " — set CONFIG.xlAnnotations if this annotation IS the message"))];
+    add("annotation-ladder", bad.length ? "FAIL" : "ok",
+        bad.length ? bad.join(", ") : `all ${ann.length} annotation(s) on the ladder and at or below ${ceiling}` + (CONFIG.xlAnnotations ? " (XL declared)" : ""));
   }
 }
 
@@ -209,12 +227,19 @@ for (const child of frame.children) {
 // row judges OUR nodes only and reports the imported ones as context.
 {
   const ann = texts.filter((t) => /^annotation__/.test(t.name));
-  const unbound = ann.filter((t) => !t.styleId);
+  // An annotation that bolds its key phrase — the prescribed recipe — is MIXED-WEIGHT, and Figma
+  // drops the node-level textStyleId when it is (reference/GOTCHAS.md says so and says not to treat
+  // it as a defect). Failing those means a correctly-built annotation can never pass, so they are
+  // judged on their ladder size instead, which the ladder-sizes row above already enforces.
+  const unbound = ann.filter((t) => !t.styleId && !t.mixedWeight);
+  const mixed = ann.filter((t) => t.mixedWeight);
   const importedRaw = texts.filter((t) => t.insidePlot && !/^annotation__/.test(t.name) && !t.styleId).length;
   if (!ann.length) skip("named-styles", "no annotation__* text nodes; an imported chart's text cannot carry a style id");
   else add("named-styles", unbound.length ? "FAIL" : "ok",
            (unbound.length ? `${unbound.length} annotation(s) with no textStyleId — setting fontSize looks like the ladder and is not it: ` + unbound.map((t) => `"${t.chars}"`).join(", ")
-                           : `all ${ann.length} annotation(s) bound to a text style`) + `. ${importedRaw} imported chart text node(s) are raw, which is expected.`);
+                           : `all ${ann.length - mixed.length} single-weight annotation(s) bound to a text style`) +
+           (mixed.length ? ` ${mixed.length} mixed-weight annotation(s) exempted — Figma drops the node-level style id when a phrase is bolded, which is the prescribed recipe (GOTCHAS.md); their sizes are covered by ladder-sizes.` : "") +
+           ` ${importedRaw} imported chart text node(s) are raw, which is expected.`);
 }
 
 // Text hierarchy: nothing may exceed the subtitle (CHECKS.md row 26).
@@ -228,8 +253,9 @@ for (const child of frame.children) {
   else {
     const over = texts.filter((t) => (t.insidePlot || /^annotation__/.test(t.name)) && t.size > subtitle.size + 0.01);
     add("text-hierarchy", over.length ? "FAIL" : "ok",
-        over.length ? `${over.length} in-plot text node(s) exceed the subtitle's ${r(subtitle.size)}px: ` + over.map((t) => `"${t.chars}" ${r(t.size)}px`).join(", ")
-                    : `nothing in the plot exceeds the subtitle's ${r(subtitle.size)}px`,
+        (over.length ? `${over.length} in-plot text node(s) exceed the subtitle's ${r(subtitle.size)}px: ` + over.map((t) => `"${t.chars}" ${r(t.size)}px`).join(", ")
+                    : `nothing in the plot exceeds the subtitle's ${r(subtitle.size)}px`) +
+        ". CEILING ONLY — the rest of CHECKS.md's hierarchy (annotations outranking supporting text and labels, same-rank items sharing a size) needs a rank per node, which nothing here supplies, so an inverted lower order is NOT covered. See text-hierarchy-ranks.",
         { distinctPlotSizes: [...new Set(texts.filter((t) => t.insidePlot).map((t) => r(t.size)))].sort((a, b) => a - b) });
   }
 }
@@ -239,10 +265,26 @@ for (const child of frame.children) {
   const series = stroked.filter((s) => /^(line|outline)__/.test(s.name));
   if (!series.length) skip("series-weight", "no line__*/outline__* nodes found in the plot");
   else if (CONFIG.highlightTreatment) {
-    const bad = series.filter((s) => !(Math.abs(s.w - 1) < 0.05 || Math.abs(s.w - HOUSE_LINE) < 0.05 || Math.abs(s.w - HOUSE_HALO) < 0.05));
+    // A shared set of allowed numbers is the wrong shape: it rejects a valid 1px context line whose
+    // halo is the required 2px, and accepts nonsense like a 4px `line__` beside a 1px `outline__`.
+    // The bar is a RELATIONSHIP — context 1, protagonist 3, halo 2x (or line+1 where nothing crosses).
+    const lineW = {};
+    for (const s of series) { const m = /^line__(.+)$/.exec(s.name); if (m) lineW[m[1]] = s.w; }
+    const bad = [];
+    for (const s of series) {
+      const m = /^(line|outline)__(.+)$/.exec(s.name);
+      if (!m) continue;
+      if (m[1] === "line") {
+        if (!(Math.abs(s.w - 1) < 0.05 || Math.abs(s.w - HOUSE_LINE) < 0.05)) bad.push(`${s.name} ${r(s.w)} — a series line is 1 (muted context) or ${HOUSE_LINE} (protagonist)`);
+      } else {
+        const lw = lineW[m[2]];
+        if (lw === undefined) { bad.push(`${s.name} has no paired line__${m[2]} to size its halo against`); continue; }
+        const ok = Math.abs(s.w - lw * 2) < 0.05 || Math.abs(s.w - (lw + 1)) < 0.05;
+        if (!ok) bad.push(`${s.name} ${r(s.w)} against a ${r(lw)}px line — a halo is 2x (${r(lw * 2)}) or line+1 (${r(lw + 1)})`);
+      }
+    }
     add("series-weight", bad.length ? "FAIL" : "ok",
-        bad.length ? `highlight treatment allows 1 (context) / ${HOUSE_LINE} (protagonist) / ${HOUSE_HALO} (halo); off-bar: ` + bad.map((s) => `${s.name} ${r(s.w)}`).join(", ")
-                   : `all ${series.length} series stroke(s) on the highlight-treatment bar (1 / ${HOUSE_LINE} / ${HOUSE_HALO})`);
+        bad.length ? bad.join("; ") : `all ${series.length} series stroke(s) hold the highlight relationship (line 1 or ${HOUSE_LINE}; halo 2x or line+1)`);
   } else {
     const bad = series.filter((s) => Math.abs(s.w - (/^outline__/.test(s.name) ? HOUSE_HALO : HOUSE_LINE)) >= 0.05);
     add("series-weight", bad.length ? "FAIL" : "ok",
@@ -253,8 +295,8 @@ for (const child of frame.children) {
 
 // Furniture weight and dash — the two rows that are easiest to miss because you never set them.
 {
-  const furn = stroked.filter((s) => s.insidePlot && !/^(line|outline)__/.test(s.name));
-  if (!furn.length) skip("furniture-weight", "no stroked non-series nodes in the plot");
+  const furn = stroked.filter((s) => s.insidePlot && s.inFurniture && !/^(line|outline)__/.test(s.name));
+  if (!furn.length) skip("furniture-weight", "no stroked node sits under an axis/gridline group (" + FURNITURE_GROUPS + ") — the 1px rule covers gridlines, zero lines and tick marks only, so it is not applied to whatever else this chart draws (a map's country borders run 0.22px by design)");
   else {
     const bad = furn.filter((s) => Math.abs(s.w - FURNITURE_W) >= 0.05);
     add("furniture-weight", bad.length ? "FAIL" : "ok",
@@ -477,6 +519,7 @@ let crossings = null;
 // Annotation block gap — the block's outer edges, not the plot's.
 {
   if (!annotations.length) skip("annotation-block-gap", "no annotation__* nodes on this frame");
+  else if (isSmall) skip("annotation-block-gap", "302-wide format: SMALL-CHARTS.md replaces the 27px constant with 'scale to the frame', so the 540x540 figure would reject a valid scaled layout. Measure it against that page's own rule and record the number");
   else if (bandTop === null || footerTop === null) skip("annotation-block-gap", "band not resolved");
   else {
     const all = [...annotations.map((a) => a.box), ...plotRoots.map(rel)].filter(Boolean);
@@ -509,6 +552,7 @@ skip("text-true-of-indicator", "every claim in every string checked against the 
 skip("entities-all-render", "needs the EFFECTIVE selection (URL country=, or the MDim view's resolved list from the DB) — never the SVG's own labels, which makes the check unable to fail", "Step 1's table + /query-grapher-db");
 skip("year-stated-not-stale", "a single-time image must name its year; a time series must not gain a caption", "/check-hardcoded-years");
 skip("legend-agreement", "swatch->label pairing by geometry; not attempted here because a direct-labelled chart has no legend — run it by hand if this frame has one");
+skip("text-hierarchy-ranks", "annotations must outrank supporting text and labels, and same-rank items must share a size. Needs a rank per text node; the ceiling half is enforced by text-hierarchy above", "CHECKS.md");
 skip("direct-label-pairing", "each category label's fill and x against the segment it names, in the reference row");
 // The OTHER 4.5:1 row. Declared rather than computed because it needs the label->segment pairing the
 // row above owns: the bar's own fill is the background here, and picking it by geometry is that
