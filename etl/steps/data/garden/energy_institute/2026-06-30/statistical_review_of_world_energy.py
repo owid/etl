@@ -235,8 +235,8 @@ REGIONS = {
     ####################################################################################################################
     "Asia": {
         "additional_members": [
-            # The region 'Other Asia Pacific (EI)' may include countries of both Oceania and Asia (according to OWID definitions). Unfortunately, the Statistical Review does not define "Oceania" explicitly in their "Definitions" sheet. However, it seems reasonable to expect that the main (and possibly only) country in "Other Asia Pacific" that belongs to OWID's Oceania would be Papua New Guinea. Other Oceanic countries like Samoa, Kiribati, or Vanuatu, are probably not included, or contributing minimally to the continent, for all indicators. We assume that Papua New Guinea is a small fraction of both Oceania, and Asia. Therefore, we include "Other Asia Pacific (EI)" under "Asia".
-            # This means that we might be underestimating Oceania, and overestimating Asia, but not by a significant amount.
+            # The region 'Other Asia Pacific (EI)' covers countries of both Oceania and Asia (according to OWID definitions), and the Statistical Review does not define "Oceania" explicitly in their "Definitions" sheet. Pricing the countries it must stand for with EIA's data puts it at 93% Asian and 7% Oceanian, in 2000 and in 2023 alike: the Asian side is led by Hong Kong, North Korea, Myanmar, Laos, Cambodia and Mongolia, the Oceanian side by Papua New Guinea, New Caledonia and Fiji. So it is assigned to Asia.
+            # That understates Oceania by around 5% of its total energy supply and overstates Asia by a fraction of a percent. Assigning it to Oceania instead would inflate Oceania by about half.
             # We correct for this issue in Asia. To do so, we remove the aggregate for Asia on any indicators where "Other Asia Pacific (EI)" exceeds a certain fraction.
             # Note that the same correction cannot be done for Oceania. If we did, we would unnecessarily lose Oceania in many indicators (because the contribution of Asian countries in "Other Asia Pacific (EI)" would be significant).
             "Other Asia Pacific (EI)",
