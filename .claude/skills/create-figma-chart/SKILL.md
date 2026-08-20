@@ -274,10 +274,17 @@ head -c 300 $DIR/embed.svg   # expect <svg ... width="..." height="...">, no <ht
 > Run it from the repo root through the venv — `.venv/bin/python .claude/skills/create-figma-chart/scripts/solve_export.py …`;
 > it is committed non-executable like the rest of that directory.
 > `--band 508x371 --slug <slug>` returns the solved `imFontSize`, the `imWidth`/`imHeight` to
-> request, the predicted content box, the scale into the band, the gap it predicts at each end, the
-> final label size, and the finished `curl`. It also carries the model's own self-test
-> (`--self-test`, which reproduces both worked examples below to within 1.4px and round-trips the
-> band arithmetic exactly) and the `--thumbnail` route for a 302-wide chart.
+> request, the predicted content box, the **height-first** scale into the band, the leftover width
+> the x-map has to close, the final label size, and the finished `curl`. Two things to read it by:
+> it reports the leftover width rather than a predicted gap, because the gap is exact by
+> construction once you fit the height (Step 7) — that leftover is the same quantity
+> `measure_fit.js` reports as `xMapShortfall`, and it is the aspect miss expressed in px; and every
+> number comes from the **rounded** `imFontSize`, since that is what the URL carries, so the label
+> size quoted is the one the `curl` will actually produce (it prints the ideal font alongside when
+> rounding moves it). It also carries the model's own self-test (`--self-test`, which reproduces
+> both worked examples below to within 1.4px, round-trips the band arithmetic exactly, and checks
+> that a reflected second pass still lands its `--target-label`) and the `--thumbnail` route for a
+> 302-wide chart.
 >
 > **It solves for `band − 2×--gap`, not for the band** — the gap below is a requirement of the fit,
 > so a solve that ignores it lands the chart edge to edge and you re-export. `--gap` defaults to 14

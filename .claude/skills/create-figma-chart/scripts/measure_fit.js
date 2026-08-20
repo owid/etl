@@ -118,11 +118,27 @@ const contentW = header ? r(header.width) : null;
 // (reference/FITTING.md), so the header box is the right primary everywhere this script is used.
 const groupNode = CONFIG.groupId ? await figma.getNodeByIdAsync(CONFIG.groupId) : null;
 if (CONFIG.groupId && !groupNode) throw new Error(`groupId ${CONFIG.groupId} not found`);
+// The group has to be INSIDE this frame, and failing to reach it is an error rather than a null to
+// carry on from. Step 2 puts the original grapher chart on the page beside the template clone, so the
+// page always holds at least two chart groups whose ids are copied by hand off `get_metadata` — and
+// measuring the reference chart against the clone's band produces no error, no empty result and no
+// visible clue: a plausible aspect, a plausible scale, and a `nextPass` that re-exports at the wrong
+// aspect. Everything below this point measures against `frame`, so a group from anywhere else makes
+// every number a mismatched pair.
 let groupAncestor = null;
 if (groupNode) {
   let n = groupNode;
   while (n && n.parent && n.parent !== frame) n = n.parent;
   groupAncestor = n && n.parent === frame ? n : null;
+  if (!groupAncestor) {
+    throw new Error(
+      `groupId ${CONFIG.groupId} ("${groupNode.name}") is not inside frameId ${CONFIG.frameId} ` +
+        `("${frame.name}") — walking up its parents never reached that frame, so the band, the ` +
+        `content box and the fit scale would all describe a different node than the group. Check ` +
+        `you did not copy the id of the ORIGINAL chart sitting beside the clone, or of a group on ` +
+        `another page.`,
+    );
+  }
 }
 const rows = frame.children.filter(
   (c) => c !== logo && c !== groupAncestor && "absoluteBoundingBox" in c && c.absoluteBoundingBox,

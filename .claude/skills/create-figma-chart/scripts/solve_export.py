@@ -24,8 +24,13 @@ Substituting W = 510000/H into (W - 1.4F)/(H - 1.4F) = A gives a quadratic in H:
 
     A*H^2 + 1.4*F*(1 - A)*H - 510000 = 0
 
-which this solves in closed form. F is then found by bisection, because the content width that sets
-the final label size itself depends on F.
+which this solves in closed form. F is then found by bisection, because the content height that
+sets the final label size itself depends on F -- and is then ROUNDED, because `imFontSize` travels in
+the URL as an integer. Every number reported is recomputed from that integer, so the predicted label
+size is the one the emitted `curl` will actually produce rather than the one the ideal font would
+have: at 508x371 with the reflected aspect 1.5279 the ideal font is 28.6 and the request carries 29,
+which lands labels at 13.7px, not the 13.5px asked for. The aspect is unaffected -- the canvas solve
+enforces it at any font -- so the gap and the x-map leftover stay exact.
 
 The band is not the target. Step 7 fits the chart to `band - 2*gap`, not to the band itself, so the
 aspect to solve for is `bandW / (bandH - 2*gap)`. Solving for the band's own aspect lands the chart
@@ -65,6 +70,9 @@ LABEL_RATIO = 0.75  # segment values / entity names, as a multiple of the base f
 MIN_LABEL = 12.0  # the floor the guidelines set for a full-size chart
 DEFAULT_GAP = 14.0  # px at each end of the band; 12-16 is the house range on 540-wide frames
 DEFAULT_TARGET_LABEL = 13.5  # final label px on a 540-wide frame; the portrait ladder uses 15
+# How far an INTEGER imFontSize can leave the final label from --target-label: half a font step,
+# 0.5 * target / F, which is ~0.25px at the 13.5px/F=29 and 15px/F=27 the templates run.
+ROUNDING_TOLERANCE = 0.25
 
 # 302-wide thumbnail route (SMALL-CHARTS.md). imType=thumbnail returns early from extractOptions, so
 # imWidth/imHeight are the canvas outright — but grapher still insets the ink inside that canvas, so
@@ -138,57 +146,78 @@ def self_test() -> int:
     # at each end, land the full band width (nothing for the x-map to close) and hit target_label.
     # A zero-gap solve here is one regression this covers — it is what a chart crowding the header
     # and footer looks like.
+    # `F` is the ideal bisection result and `emit` the integer the URL carries; `label` is measured
+    # against `emit`, because that is the export you actually get. ROUNDING_TOLERANCE bounds how far
+    # an integer imFontSize can leave the label from its target (half a font step, ~0.5*target/F).
     bands = [(508.0, 371.0, 14.0, 13.5), (508.0, 371.0, 12.0, 13.5), (508.0, 552.0, 30.0, 15.0)]
-    print(f"\n{'band':>12} {'gap':>5} {'F':>4} {'content':>15} {'gap/end':>8} {'x-map':>7} {'label':>7}")
+    print(
+        f"\n{'band':>12} {'gap':>5} {'F':>7} {'emit':>5} {'content':>15} "
+        f"{'gap/end':>8} {'x-map':>7} {'label':>7} {'err':>6}"
+    )
     worst_gap = 0.0
     worst_xmap = 0.0
+    worst_ideal = 0.0
     worst_label = 0.0
     for bw, bh, gap, target in bands:
         usable = bh - 2.0 * gap
-        font = solve_font(bw / usable, usable, target)
+        font_exact = solve_font(bw / usable, usable, target)
+        font = float(round(font_exact))
         w, h = solve_canvas(bw / usable, font)
         cw, ch = content_box(w, h, font)
         scale = usable / ch
         got_gap = (bh - ch * scale) / 2.0
         xmap = bw - cw * scale
         label = label_at(font, ch, usable)
+        _, ch_exact = content_box(*solve_canvas(bw / usable, font_exact), font_exact)
         worst_gap = max(worst_gap, abs(got_gap - gap))
         worst_xmap = max(worst_xmap, abs(xmap))
+        worst_ideal = max(worst_ideal, abs(label_at(font_exact, ch_exact, usable) - target))
         worst_label = max(worst_label, abs(label - target))
         print(
-            f"{f'{bw:g}x{bh:g}':>12} {gap:5.0f} {font:4.0f} {f'{cw:.1f}x{ch:.1f}':>15} "
-            f"{got_gap:8.2f} {xmap:7.3f} {label:7.2f}"
+            f"{f'{bw:g}x{bh:g}':>12} {gap:5.0f} {font_exact:7.3f} {font:5.0f} "
+            f"{f'{cw:.1f}x{ch:.1f}':>15} {got_gap:8.2f} {xmap:7.3f} {label:7.2f} {label - target:+6.3f}"
         )
     print(
-        f"\nworst gap error {worst_gap:.3f}px, worst x-map leftover {worst_xmap:.3f}px, "
-        f"worst label error {worst_label:.3f}px — all exact arithmetic (<0.01px)"
+        f"\nworst gap error {worst_gap:.3f}px and x-map leftover {worst_xmap:.3f}px — exact (<0.01px), "
+        f"rounding does not touch the aspect.\nideal-font label error {worst_ideal:.3f}px (<0.01px); "
+        f"emitted-font label error {worst_label:.3f}px (<{ROUNDING_TOLERANCE:g}px, the integer bound)"
     )
-    ok = ok and worst_gap < 0.01 and worst_xmap < 0.01 and worst_label < 0.01
+    ok = ok and worst_gap < 0.01 and worst_xmap < 0.01
+    ok = ok and worst_ideal < 0.01 and worst_label < ROUNDING_TOLERANCE
 
     # A reflected SECOND pass must still land its --target-label. The reflection is deliberately off
     # the band's own aspect, which is exactly where a width-first label scale stops agreeing with the
     # height-first fit: on the docs' 508x371 case measured at 1.4342 it asked for imFontSize 29 and
     # promised 13.5px labels the height fit renders at 13.93px, and across the miss range it picked a
     # font up to 4px off. Reflections come from measure_fit.js's `nextPass`.
-    print(f"\n{'band':>12} {'measured':>9} {'reflected':>10} {'F':>4} {'label':>7} {'want':>6} {'err':>6}")
+    print(
+        f"\n{'band':>12} {'measured':>9} {'reflected':>10} {'F':>7} {'emit':>5} "
+        f"{'ideal':>7} {'emitted':>8} {'want':>6}"
+    )
     worst_refl = 0.0
+    worst_refl_emit = 0.0
     for (bw, bh, gap, target), measured_frac in zip(bands, [-0.0316, 0.05, -0.10]):
         usable = bh - 2.0 * gap
         band_aspect = bw / usable
         measured = band_aspect * (1.0 + measured_frac)
         reflected = 2.0 * band_aspect - measured
-        font = solve_font(reflected, usable, target)
-        w, h = solve_canvas(reflected, font)
-        _, ch = content_box(w, h, font)
-        label = label_at(font, ch, usable)
-        err = abs(label - target)
-        worst_refl = max(worst_refl, err)
+        font_exact = solve_font(reflected, usable, target)
+        font = float(round(font_exact))
+        _, ch_exact = content_box(*solve_canvas(reflected, font_exact), font_exact)
+        _, ch = content_box(*solve_canvas(reflected, font), font)
+        ideal = label_at(font_exact, ch_exact, usable)
+        emitted = label_at(font, ch, usable)
+        worst_refl = max(worst_refl, abs(ideal - target))
+        worst_refl_emit = max(worst_refl_emit, abs(emitted - target))
         print(
-            f"{f'{bw:g}x{bh:g}':>12} {measured:9.4f} {reflected:10.4f} {font:4.0f} "
-            f"{label:7.2f} {target:6.1f} {err:6.3f}"
+            f"{f'{bw:g}x{bh:g}':>12} {measured:9.4f} {reflected:10.4f} {font_exact:7.3f} "
+            f"{font:5.0f} {ideal:7.2f} {emitted:8.2f} {target:6.1f}"
         )
-    print(f"\nworst reflected-pass label error: {worst_refl:.3f}px — the second pass keeps --target-label")
-    ok = ok and worst_refl < 0.01
+    print(
+        f"\nreflected pass: ideal-font label error {worst_refl:.3f}px (<0.01px), emitted-font "
+        f"{worst_refl_emit:.3f}px (<{ROUNDING_TOLERANCE:g}px) — the second pass keeps --target-label"
+    )
+    ok = ok and worst_refl < 0.01 and worst_refl_emit < ROUNDING_TOLERANCE
 
     print("PASS" if ok else "FAIL")
     return 0 if ok else 1
@@ -276,15 +305,22 @@ def main() -> int:
             ap.error(f"--margin {args.margin:g} leaves no content width in a {bw:g}px frame")
         canvas_w = content_w + 2.0 * args.ink_inset
         im_w, im_h = int(round(canvas_w * 4)), int(round(bh * 4))
-        font = target_label / LABEL_RATIO
+        # Rounded for the same reason as the main route: imFontSize is an integer in the URL, so the
+        # label size to report is the one that integer yields, not the one the target asked for.
+        font = float(round(target_label / LABEL_RATIO))
+        label = LABEL_RATIO * font
         print("thumbnail route — the canvas is taken outright, so no aspect solve and no rescale:")
         print(f"  frame           {bw:g} x {bh:g}")
         print(f"  content box     {content_w:g} wide  (margin {args.margin:g} per side)")
         print(f"  canvas          {canvas_w:.1f} wide  (+{args.ink_inset:g} ink inset per side) -> ink ~{content_w:g}")
         print(f"  imWidth/Height  {im_w}/{im_h}   (staticBounds = imWidth/4 x imHeight/4)")
-        print(f"  imFontSize      {font:.0f}   ({target_label:g}px labels at {LABEL_RATIO}x base)")
-        if target_label < THUMB_MIN_LABEL:
-            print(f"  *** {target_label:g}px is under this format's {THUMB_MIN_LABEL:g}px floor")
+        print(f"  imFontSize      {font:.0f}   ({label:g}px labels at {LABEL_RATIO}x base)", end="")
+        if abs(label - target_label) > 0.05:
+            print(f"   (asked for {target_label:g}; imFontSize is an integer)")
+        else:
+            print()
+        if label < THUMB_MIN_LABEL:
+            print(f"  *** {label:g}px is under this format's {THUMB_MIN_LABEL:g}px floor")
         if args.slug:
             p = f"{args.params}&" if args.params else ""
             print(
@@ -301,7 +337,13 @@ def main() -> int:
         ap.error(f"--gap {args.gap:g} leaves no height in a {bh:g}px band (2*gap >= band height)")
 
     aspect = args.content_aspect if args.content_aspect is not None else placed_w / usable_h
-    font = solve_font(aspect, usable_h, target_label)
+    # Solve, then round: imFontSize goes into the URL as an integer, so the integer is what the
+    # export will actually use. Recompute the canvas, the content box and the label from it —
+    # reporting the ideal font's label beside an `imFontSize` one step away promises a size the
+    # request cannot deliver. The aspect survives rounding untouched, because solve_canvas enforces
+    # it at whatever font it is given, so the gap and the x-map leftover below are still exact.
+    font_exact = solve_font(aspect, usable_h, target_label)
+    font = float(round(font_exact))
     w, h = solve_canvas(aspect, font)
     cw, ch = content_box(w, h, font)
     label = label_at(font, ch, usable_h)
@@ -323,7 +365,11 @@ def main() -> int:
     print(f"solving for     {aspect:.4f}  [{src}]")
     print(f"fitting to      {placed_w:g}px wide, height-first")
     print()
-    print(f"imFontSize      {font:.0f}")
+    print(f"imFontSize      {font:.0f}", end="")
+    if abs(font - font_exact) > 0.05:
+        print(f"   (ideal {font_exact:.1f}, rounded — the URL carries an integer)")
+    else:
+        print()
     print(f"imWidth/Height  {im_w}/1000        (aspect ratio only — the server renormalizes)")
     print(f"declared        {w:.0f} x {h:.0f}   ({w * h:,.0f} px^2)")
     print(f"content         {cw:.1f} x {ch:.1f}   (aspect {cw / ch:.4f})")
@@ -339,6 +385,8 @@ def main() -> int:
     print(f"final labels    {label:.1f}px", end="")
     if label < MIN_LABEL:
         print(f"   *** under the {MIN_LABEL:g}px floor — raise --target-label or cut entities")
+    elif abs(label - target_label) > 0.05:
+        print(f"   (asked for {target_label:g}; imFontSize {font:.0f} is the closest integer)")
     else:
         print()
 
