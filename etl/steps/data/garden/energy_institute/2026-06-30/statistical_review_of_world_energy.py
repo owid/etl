@@ -245,7 +245,7 @@ REGIONS = {
             # Data for Belarus and Russia are usually informed explicitly in the data (under CIS countries).
             # Hence, the only European country that could be included in "Other CIS (EI)" is Moldova (which is likely a small fraction). The rest of "Other CIS (EI)" are countries that are assigned to Asia in OWID's definitions.
             # Therefore, it's safe to assign "Other CIS (EI)" to the Asian aggregate.
-            # Still, for safety, remove the aggregate for Europe and Asia on indicators where "Other CIS (EI)" is a significant fraction of the aggregate. In practice (at least as of the 2025 release), "Other CIS (EI)" is never a significant fraction of "Asia" and it is only a significant (>15%) fraction of "Europe" in the case of electricity from gas.
+            # Still, for safety, remove the aggregate for Europe and Asia on indicators where "Other CIS (EI)" is a significant fraction of the aggregate. In practice it rarely is: as of the 2026 release it does not reach the threshold for either region, on any indicator.
             "Other CIS (EI)",
             # Countries defined by EI in 'Middle East' are fully included in OWID's definition of Asia.
             "Other Middle East (EI)",
@@ -257,13 +257,15 @@ REGIONS = {
             "Other Europe (EI)",
         ],
     },
-    # NOTE: There is also "Other S. & Cent. America" (renamed "Other South and Central America (EI)"). This cannot be mapped to either North America or South America. We simply keep it as a separate entity. This means we may be underestimating South America and North America, but not by a significant amount. To correct for this issue, on indicators where "Other South and Central America (EI)" becomes significant compared to South America, we remove the aggregate for South America (and idem for North America).
+    # NOTE: There is also "Other S. & Cent. America" (renamed "Other South and Central America (EI)"), which spans both OWID regions and so is assigned to neither. For most indicators it is exactly the sum of the three finer residual regions listed below, which are assigned, so nothing it covers is missing from either aggregate; find_columns_covered_by_finer_regions detects those indicators and fix_issues_with_other_regions skips them. Where the finer regions are absent (the reserves columns) or fall short of it (electricity generation by fuel, biodiesel consumption), the difference is genuinely unassigned, and there we do underestimate South America and North America; on those indicators the aggregate is removed when the rollup is large compared to it.
     "South America": {
         "additional_members": [
             "Other South America (EI)",
         ],
     },
-    # NOTE: See caveat about "Other South and Central America (EI)" explained above.
+    # NOTE: See the note on "Other South and Central America (EI)" above. "Central America (EI)" is the
+    # Statistical Review's total for Central America, which is also its residual there, since it itemizes no
+    # Central American country.
     "North America": {
         "additional_members": [
             "Other Caribbean (EI)",
@@ -271,10 +273,15 @@ REGIONS = {
             "Central America (EI)",
         ],
     },
-    # Given that 'Other Asia and Pacific (EI)' is often similar or even larger than Oceania, we avoid including it in Oceania (and include it in Asia, see comment above).
-    # This means that we may be underestimating Oceania by a significant amount, but EI does not provide unambiguous data to avoid this.
+    # Given that "Other Asia Pacific (EI)" is often similar to or even larger than Oceania, we avoid including it in Oceania (and include it in Asia, see comment above).
+    # This means that we may be underestimating Oceania by a significant amount, but EI does not provide unambiguous data to avoid this. The Statistical Review also reports no oil or gas production for New Zealand and nothing at all for Papua New Guinea, so Oceania's production aggregates are Australia alone.
     "Oceania": {},
-    # Income groups.
+    # Income groups. Unlike the continents, these get no "Other *" region at all: a residual region's
+    # membership is undisclosed and varies by indicator, and even its plausible membership spans income
+    # groups ("Other South America" alone covers Uruguay, Paraguay, Suriname and Bolivia, which sit in three
+    # different ones). So these aggregates cover only the countries the Statistical Review itemizes, and are
+    # understated by whatever the residual regions hold: summed, they reach 91-99% of its own World total,
+    # depending on the indicator, and it reports nothing at all for the low-income group.
     "Low-income countries": {},
     "Lower-middle-income countries": {},
     "Upper-middle-income countries": {},
