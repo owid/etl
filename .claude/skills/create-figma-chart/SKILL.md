@@ -15,6 +15,25 @@ This skill takes any OWID grapher chart and produces a designed static version i
 
 Read [GUIDELINES.md](GUIDELINES.md) (sibling file) before editing any chart — it distills the DI Charts Guidelines per chart type and the Good Data Viz Checklist.
 
+> **Paired skill — an update here may oblige an update there, and the reverse.**
+> [`/create-static-viz`](../create-static-viz/SKILL.md) writes the `export://static_viz` matplotlib
+> step whose SVG this skill picks up, so the two share a contract that lives half in each file. **When
+> you change something on this list, check the other skill in the same session and update it too —
+> or state explicitly that you checked and no change was needed.** Neither side is allowed to drift
+> silently; a stale cross-skill fact is how a run re-derives geometry by trial and error.
+>
+> | Shared fact | Owner | Consumed by |
+> |---|---|---|
+> | Template geometry — node ids, sizes, band top, footer starts | [`TEMPLATES.md`](../create-static-viz/TEMPLATES.md) | both |
+> | The content box and the band a chart is fitted into | TEMPLATES.md, re-verified here each run | both |
+> | Node naming (`gid`s) the step emits, and frame proportions | `/create-static-viz` | this skill's Steps 1/3/7–8 |
+> | Which text slots the step fills vs. leaves to the template | `/create-static-viz` | this skill's Step 6 |
+> | Type and palette — the step sets neither, this page owns both | this skill | `/create-static-viz` defers to it |
+> | The design vocabulary (per chart type, labeling, colors) | [GUIDELINES.md](GUIDELINES.md) | both |
+>
+> The asymmetry worth remembering: **that skill owns the data, the geometry and the proportions; this
+> one owns the type and the palette.** A change that crosses that line belongs in both files.
+
 Two more sibling files own a route each, and both replace rather than supplement the steps below:
 
 | File | When |
