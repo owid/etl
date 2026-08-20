@@ -42,6 +42,7 @@ tables:
       natural_gas_imports: {}
       natural_gas_exports: {}
       petroleum_consumption: {}
+      biofuels_consumption: {}
       petroleum_production: {}
       crude_oil_production: {}
       electricity_generation: {}

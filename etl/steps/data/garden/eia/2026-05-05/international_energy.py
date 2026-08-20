@@ -83,6 +83,8 @@ INDICATORS: list[tuple[str, str, str, float, str, str, str]] = [
         "TWh",
         "Energy consumption from natural gas",
     ),
+    # The producer counts biofuels inside this series; remove_biofuels_from_oil_consumption takes them
+    # out, hence the title.
     (
         "Total energy consumption from petroleum and other liquids",
         "quadrillion Btu",
@@ -90,7 +92,7 @@ INDICATORS: list[tuple[str, str, str, float, str, str, str]] = [
         QUAD_BTU_TO_TWH,
         "terawatt-hours",
         "TWh",
-        "Energy consumption from petroleum and other liquids",
+        "Energy consumption from oil",
     ),
     (
         "Total energy consumption from nuclear",
@@ -225,6 +227,9 @@ INDICATORS: list[tuple[str, str, str, float, str, str, str]] = [
         "Natural gas exports",
     ),
     # Petroleum and oil.
+    # As with the energy series above, the producer counts biofuels inside petroleum consumption;
+    # remove_biofuels_from_oil_consumption takes them out, hence the title. Production keeps the
+    # producer's own name and figures, since nothing downstream reads it as oil.
     (
         "Petroleum and other liquids consumption",
         "thousand barrels per day",
@@ -232,7 +237,16 @@ INDICATORS: list[tuple[str, str, str, float, str, str, str]] = [
         1.0,
         "thousand barrels per day",
         "kb/d",
-        "Petroleum and other liquids consumption",
+        "Oil consumption",
+    ),
+    (
+        "Biofuels consumption",
+        "thousand barrels per day",
+        "biofuels_consumption",
+        1.0,
+        "thousand barrels per day",
+        "kb/d",
+        "Biofuels consumption",
     ),
     (
         "Petroleum and other liquids production",
@@ -800,6 +814,45 @@ def fill_zero_gaps_in_biofuels(tb: Table) -> Table:
     return tb
 
 
+def remove_biofuels_from_oil_consumption(tb: Table) -> Table:
+    """Take biofuels out of the producer's petroleum consumption series.
+
+    The producer defines "petroleum and other liquids" as "all petroleum including crude oil and products
+    of petroleum refining, natural gas liquids, biofuels, and liquids derived from other hydrocarbon
+    sources", so its consumption series count biofuels as oil. We report biofuels as a source of their
+    own, and every other energy dataset we publish treats oil as a fossil fuel, so they are subtracted
+    here, from the energy series and from the barrel-denominated one alike.
+
+    The producer's petroleum production series behave differently and are left alone: the energy one
+    already excludes biofuels, and the barrel-denominated one includes them but keeps the producer's own
+    name, since nothing downstream reads it as oil.
+
+    Where biofuels consumption is unknown there is nothing to subtract and oil is left as reported.
+
+    Note the asymmetry this leaves between the two sides of the dataset, which is the producer's, not
+    ours. On the consumption side biofuels are their own component, so a total is coal + gas + oil +
+    nuclear + renewables + biofuels. On the production side the producer books biofuels inside
+    renewables, so a total is coal + gas + oil + nuclear + renewables, and adding biofuels to that
+    double counts them.
+    """
+    pairs = [
+        ("energy_consumption_from_petroleum", "energy_consumption_from_biofuels"),
+        ("petroleum_consumption", "biofuels_consumption"),
+    ]
+    for oil, biofuels in pairs:
+        corrected = tb[oil] - tb[biofuels].fillna(0)
+        changed = (corrected != tb[oil]) & tb[oil].notna()
+        assert changed.sum() > 0, f"The producer reports no biofuels to subtract from {oil}."
+        error = f"Subtracting biofuels leaves {oil} negative, so the two are not on the same basis."
+        assert (corrected.dropna() >= 0).all(), error
+        tb[oil] = corrected
+        tb[oil].metadata.description_processing = (
+            "The producer counts biofuels within petroleum and other liquids. We subtract its biofuels "
+            "figures, so that this indicator covers oil alone."
+        )
+    return tb
+
+
 def run() -> None:
     #
     # Load data.
@@ -838,6 +891,9 @@ def run() -> None:
 
     # Read the gaps between reported zeros in the biofuels series as zeros.
     tb = fill_zero_gaps_in_biofuels(tb)
+
+    # Take biofuels out of oil consumption, before the region aggregates are summed from it.
+    tb = remove_biofuels_from_oil_consumption(tb)
 
     # Add region aggregates. Only sum extensive indicators; intensive ones (per capita, per GDP) stay country-level.
     extensive_columns = [c for c in tb.columns if c not in {"country", "year"} and c not in INTENSIVE_INDICATORS]
