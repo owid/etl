@@ -1,8 +1,10 @@
 # Gotchas
 
-> Read on an error, or grep it by symptom.  Part of [`/create-static-viz`](../SKILL.md); the spine has the step order.
+> **Data is a required read at Step 1** — those checks fail silently, so no error ever sends you
+> here. Layout and Workflow: read on an error, or grep by symptom.  Part of
+> [`/create-static-viz`](../SKILL.md); the spine has the step order.
 
-**Data**
+**Data** — required at Step 1, before any column is used. Nothing below raises an exception.
 
 - **Verify what a column *means*, numerically. Never trust its name.** WHO's `P01` is the 0.1st
   percentile, not the 1st; reading it as "1st" is wrong by a wide margin at the tails. Reproduce

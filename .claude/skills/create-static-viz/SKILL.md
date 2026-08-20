@@ -53,7 +53,7 @@ The step-by-step detail lives in [`reference/`](reference/) and is read *at* tha
 | Read | When | Covers |
 |---|---|---|
 | [reference/WRITING-THE-STEP.md](reference/WRITING-THE-STEP.md) | Step 4 | The handoff contract, grapher's axis and tick treatment, encoding diagrams, desktop/mobile pairing, text slots, labelling many categories, Figma-surviving anchors, the assertions to write. |
-| [reference/GOTCHAS.md](reference/GOTCHAS.md) | On an error, or grep by symptom | Data, layout and workflow pitfalls. |
+| [reference/GOTCHAS.md](reference/GOTCHAS.md) | Its **Data** section at Step 1, before any column is used; the rest on an error, or grep by symptom | Data, layout and workflow pitfalls. |
 
 **Size budget: keep this spine under 30 KB and TEMPLATES.md under 25 KB.** Both are read on every
 run, so a paragraph added here costs every future viz — new detail belongs in the reference file for
@@ -172,6 +172,12 @@ The project tracks which viz is claimed, parked or already done in a shared trac
 skill deliberately does not read or write it — **ask instead**. If the user has not already said
 where this viz stands, ask before doing any work: a viz someone else is mid-way through, or one
 already finished, is worth an interruption rather than a duplicate.
+
+**Read [reference/GOTCHAS.md](reference/GOTCHAS.md) → Data before you use a single column.** Those
+checks are pre-flight, not post-mortem: a column whose name means something other than what it
+holds, an unasserted splice, a framing that stops holding partway through a series, and an
+over-claim repeated across the metadata each render as a plausible chart with nothing to grep for.
+They are how a run that raises no exception still publishes wrong numbers.
 
 Then report what you found: which dataset, which version, and how many charts use it.
 
