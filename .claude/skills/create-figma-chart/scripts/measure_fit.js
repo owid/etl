@@ -7,6 +7,9 @@
 // Read-only. It sets no property and creates no node, so it needs no approval to run against the
 // shared Charts file (the skill's checkpoint rule covers writes).
 //
+// TESTED by scripts/test_measure_fit.js — a stubbed-figma harness, since this file executes only
+// inside Figma. Run it after any edit here:  node .claude/skills/create-figma-chart/scripts/test_measure_fit.js
+//
 // USAGE
 //   Fill in CONFIG and paste the whole file as one `use_figma` call.
 //     frameId    — the TEMPLATE CLONE, after Step 6 has filled its texts. Measuring an unfilled
