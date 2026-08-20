@@ -42,9 +42,14 @@ from owid.catalog import s3_utils  # ty: ignore
 from etl.config import OWID_ENV  # ty: ignore
 
 S3_BUCKET_NAME = "owid-public"
-S3_VOCABULARY_PATH = "topic_vocabulary.json"
+DEFAULT_S3_VOCABULARY_PATH = "topic_vocabulary.json"
 
-# Gemini pricing (as of Feb 2025)
+DEFAULT_MODEL = "gemini-3.7-flash"
+
+# Gemini pricing per million tokens, for the cost estimate the CLI prints.
+# Models absent from here still run; their cost is simply reported as unknown,
+# so this list going out of date can't stop a regeneration (the whole run costs
+# a couple of cents either way).
 PRICING = {
     "gemini-2.5-flash-lite": {"input": 0.015, "output": 0.06},
     "gemini-3-flash-preview": {"input": 0.0375, "output": 0.15},
@@ -116,7 +121,7 @@ def extract_chart_texts(topic_slug: str) -> tuple[str, list[str]]:
 
 
 async def extract_keywords_with_llm(
-    topic_slug: str, topic_name: str, texts: list[str], api_key: str, model_id: str = "gemini-3-flash-preview"
+    topic_slug: str, topic_name: str, texts: list[str], api_key: str, model_id: str = DEFAULT_MODEL
 ) -> dict:
     """Use Gemini to extract good keywords/phrases from chart texts.
 
@@ -239,12 +244,20 @@ async def process_topics(topic_slugs: list[str], api_key: str, model: str) -> li
 @click.option("--output", help="Output JSON file path (optional, prints to console if not provided)")
 @click.option(
     "--model",
-    default="gemini-3-flash-preview",
-    type=click.Choice(["gemini-2.5-flash-lite", "gemini-3-flash-preview"], case_sensitive=False),
-    help="Gemini model to use (default: gemini-3-flash-preview)",
+    default=DEFAULT_MODEL,
+    help=f"Gemini model to use (default: {DEFAULT_MODEL}). Any model id the API accepts works.",
+)
+@click.option(
+    "--upload-path",
+    default=DEFAULT_S3_VOCABULARY_PATH,
+    help=(
+        f"Key to upload to inside the {S3_BUCKET_NAME} bucket (default: {DEFAULT_S3_VOCABULARY_PATH}, "
+        "the one the site reads). Use another key to try a vocabulary on a staging server without "
+        "overwriting production, e.g. --upload-path topic_vocabulary/my-branch.json"
+    ),
 )
 @click.option("--no-upload", is_flag=True, help="Skip uploading to R2 (useful for testing)")
-def main(topic: tuple[str, ...], output: str | None, model: str, no_upload: bool):
+def main(topic: tuple[str, ...], output: str | None, model: str, upload_path: str, no_upload: bool):
     """Extract vocabulary for topics using LLM (simple approach).
 
     Takes all chart titles and subtitles for topics and asks an LLM to extract
@@ -273,6 +286,8 @@ def main(topic: tuple[str, ...], output: str | None, model: str, no_upload: bool
     click.echo("SIMPLE LLM-BASED VOCABULARY EXTRACTION")
     click.echo(f"Topics: {len(topic_slugs)}")
     click.echo(f"Model: {model}")
+    upload_target = "skipped" if no_upload else f"s3://{S3_BUCKET_NAME}/{upload_path}"
+    click.echo(f"Upload: {upload_target}")
     click.echo("=" * 80)
     click.echo()
 
@@ -285,19 +300,20 @@ def main(topic: tuple[str, ...], output: str | None, model: str, no_upload: bool
         sys.exit(1)
 
     # Calculate total costs
-    pricing = PRICING[model]
+    pricing = PRICING.get(model)
     total_input_tokens = sum(r["stats"]["input_tokens"] for r in results)
     total_output_tokens = sum(r["stats"]["output_tokens"] for r in results)
-    total_input_cost = (total_input_tokens / 1_000_000) * pricing["input"]
-    total_output_cost = (total_output_tokens / 1_000_000) * pricing["output"]
-    total_cost = total_input_cost + total_output_cost
+    if pricing:
+        total_input_cost = (total_input_tokens / 1_000_000) * pricing["input"]
+        total_output_cost = (total_output_tokens / 1_000_000) * pricing["output"]
+        total_cost = total_input_cost + total_output_cost
 
-    # Add cost to each result
-    for result in results:
-        stats = result["stats"]
-        input_cost = (stats["input_tokens"] / 1_000_000) * pricing["input"]
-        output_cost = (stats["output_tokens"] / 1_000_000) * pricing["output"]
-        stats["total_cost_usd"] = round(input_cost + output_cost, 6)
+        # Add cost to each result
+        for result in results:
+            stats = result["stats"]
+            input_cost = (stats["input_tokens"] / 1_000_000) * pricing["input"]
+            output_cost = (stats["output_tokens"] / 1_000_000) * pricing["output"]
+            stats["total_cost_usd"] = round(input_cost + output_cost, 6)
 
     # Output results
     click.echo()
@@ -326,9 +342,12 @@ def main(topic: tuple[str, ...], output: str | None, model: str, no_upload: bool
     click.echo(f"Output tokens: {total_output_tokens:,}")
     click.echo(f"Total tokens:  {total_input_tokens + total_output_tokens:,}")
     click.echo()
-    click.echo(f"Input cost:  ${total_input_cost:.6f}")
-    click.echo(f"Output cost: ${total_output_cost:.6f}")
-    click.echo(f"Total cost:  ${total_cost:.6f}")
+    if pricing:
+        click.echo(f"Input cost:  ${total_input_cost:.6f}")
+        click.echo(f"Output cost: ${total_output_cost:.6f}")
+        click.echo(f"Total cost:  ${total_cost:.6f}")
+    else:
+        click.secho(f"Cost: unknown — no pricing recorded for {model} (add it to PRICING)", fg="yellow")
 
     # Build output data
     if len(results) == 1:
@@ -343,10 +362,17 @@ def main(topic: tuple[str, ...], output: str | None, model: str, no_upload: bool
             tmp_path = f.name
 
         try:
-            s3_url = f"s3://{S3_BUCKET_NAME}/{S3_VOCABULARY_PATH}"
+            s3_url = f"s3://{S3_BUCKET_NAME}/{upload_path}"
             s3_utils.upload(s3_url, tmp_path, public=True)
             click.echo()
-            click.secho(f"✓ Uploaded to: https://{S3_BUCKET_NAME}.owid.io/{S3_VOCABULARY_PATH}", fg="green")
+            # files.ourworldindata.org is the worker in front of this bucket; it
+            # is what the site reads, because it adds CORS and an edge cache.
+            click.secho(f"✓ Uploaded to: https://files.ourworldindata.org/{upload_path}", fg="green")
+            if upload_path != DEFAULT_S3_VOCABULARY_PATH:
+                click.secho(
+                    "  (not the key the site reads by default — point TOPIC_VOCABULARY_URL at it to try it out)",
+                    fg="yellow",
+                )
         finally:
             os.unlink(tmp_path)
 
