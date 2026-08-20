@@ -52,7 +52,7 @@ Each chart is a component; `get_screenshot` on its node id renders it. Before de
 ### General
 
 - Consider replacing "World" with "Global average".
-- No abbreviations the audience may not know; write the full word. Plain language throughout.
+- No abbreviations the audience may not know; write the full word. Plain language throughout. (Units are the exception — see the next bullet.)
 - **Units are the exception, and the split runs between labels and prose.** Inside the plot, where a unit repeats on every mark, abbreviate it to its symbol and abbreviate the magnitude with it: `1.3 million tonnes (48%)` becomes **`1.3M t (48%)`**. In prose — title, subtitle, note, source — spell it out, because there it is read once and as language: the note still says "flows smaller than 26,000 tonnes". This is not a contradiction of the bullet above; `t`, `M`, `km`, `%` are read by everyone, and it is *domain* abbreviations that need spelling out. Keep the digit groups as digits (`560,000 t`, not `560K t`) — abbreviating the magnitude only pays where it replaces a whole word.
   - It is worth real space: on a sankey whose labels run down both sides, that one substitution took **59px** off the width of the label columns, on both a 850-wide and a 540-wide frame. Give the saving back to the plot (SKILL.md → the re-render, not a rescale), rather than leaving the chart narrower than its title.
 - Keep text horizontal — title, subtitle, annotations, data labels. If labels end up vertical, change the chart's orientation instead (e.g. horizontal bars).

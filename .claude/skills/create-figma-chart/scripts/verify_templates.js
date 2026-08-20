@@ -15,7 +15,7 @@
 //   headerSizing  — `primaryAxisSizingMode` plus each child's sizing. AUTO + HUG means the header
 //                   reflows when the text gets shorter; FIXED + a FILL/grow child means it does
 //                   NOT, and a short subtitle silently inflates its own box instead. As of
-//                   2026-08-20 all nine templates are AUTO + HUG; the 850-wide pair used to be the
+//                   2026-08-20 every template with a header is AUTO + HUG; the 850-wide pair used to be the
 //                   FIXED case and the design team has since converted it, so a `false` here is now
 //                   a regression rather than a shipped state. This is the single most consequential
 //                   property on the frame and it is invisible until you fill the texts.
@@ -138,7 +138,10 @@ for (const [label, id] of Object.entries(TEMPLATES)) {
           // grows down, out of the frame. Almost all of them are MIN — re-pin by hand.
           constraintV: footer.constraints.vertical,
           growsOutOfFrame: footer.constraints.vertical === "MIN",
-          rows: footer.children.map((c) => ({ name: c.name.slice(0, 30), y: r(c.y), h: r(c.height), w: r(c.width) })),
+          // `layoutPositioning` is the tell for a footer that does NOT reflow: an ABSOLUTE child is
+          // ignored by the parent's flow, so the rows stay put while layoutMode/y/constraintV all
+          // still read normal. All rows are AUTO as of 2026-08-20.
+          rows: footer.children.map((c) => ({ name: c.name.slice(0, 30), y: r(c.y), h: r(c.height), w: r(c.width), pos: c.layoutPositioning })),
         }
       : null,
     // Everything at the top level, so a footer left with no auto-layout at all still shows up.
@@ -152,9 +155,14 @@ for (const [label, id] of Object.entries(TEMPLATES)) {
   };
 }
 
-// Compare against EXPECT. Tolerance 0.5px: the templates carry sub-pixel values (1015.81, 35.23)
-// and a rounding difference is not drift.
-const near = (a, b) => typeof a === "number" && typeof b === "number" && Math.abs(a - b) < 0.5;
+// Compare against EXPECT with a PER-FIELD tolerance. A single 0.5px bar cannot work here: the one
+// content-box regression this skill tells you to watch for — Static Vertical's header coming back
+// 817.57 instead of 818 — is 0.43px, so a 0.5px tolerance would pass the exact thing it is meant to
+// catch. Frame and content dimensions are authored values and compare tight; footer positions carry
+// genuine sub-pixel values (1015.81) and get the loose bar.
+const TIGHT = 0.05;
+const LOOSE = 0.5;
+const near = (a, b, tol) => typeof a === "number" && typeof b === "number" && Math.abs(a - b) < tol;
 const drifted = [];
 for (const [label, e] of Object.entries(EXPECT)) {
   const g = out[label];
@@ -166,21 +174,36 @@ for (const [label, e] of Object.entries(EXPECT)) {
   }
   const d = [];
   if (e.size) {
-    if (!near(g.size[0], e.size[0])) d.push(`width ${g.size[0]} != ${e.size[0]}`);
-    if (e.size[1] !== null && !near(g.size[1], e.size[1])) d.push(`height ${g.size[1]} != ${e.size[1]}`);
+    if (!near(g.size[0], e.size[0], TIGHT)) d.push(`width ${g.size[0]} != ${e.size[0]}`);
+    if (e.size[1] !== null && !near(g.size[1], e.size[1], TIGHT)) d.push(`height ${g.size[1]} != ${e.size[1]}`);
   }
-  if (e.contentX !== null && !near(g.contentX, e.contentX)) d.push(`contentX ${g.contentX} != ${e.contentX}`);
-  if (e.contentW !== null && !near(g.contentW, e.contentW)) d.push(`contentW ${g.contentW} != ${e.contentW}`);
-  if (e.headerBottom !== null && !near(g.headerBottom, e.headerBottom)) d.push(`headerBottom ${g.headerBottom} != ${e.headerBottom}`);
-  if (e.reflows !== null && g.headerSizing && g.headerSizing.reflows !== e.reflows) {
-    d.push(`reflows ${g.headerSizing.reflows} != ${e.reflows} (primaryAxisSizingMode ${g.headerSizing.primaryAxisSizingMode})`);
+  if (e.contentX !== null && !near(g.contentX, e.contentX, TIGHT)) d.push(`contentX ${g.contentX} != ${e.contentX}`);
+  if (e.contentW !== null && !near(g.contentW, e.contentW, TIGHT)) d.push(`contentW ${g.contentW} != ${e.contentW}`);
+  if (e.headerBottom !== null && !near(g.headerBottom, e.headerBottom, TIGHT)) d.push(`headerBottom ${g.headerBottom} != ${e.headerBottom}`);
+  // A hugging header is THREE properties, not one — AUTO on the frame plus HEIGHT + HUG on every
+  // child. Checking only primaryAxisSizingMode passes a child regressed to textAutoResize "NONE",
+  // which stops the band tracking the copy exactly as a FIXED frame would.
+  if (e.reflows !== null && g.headerSizing) {
+    if (g.headerSizing.reflows !== e.reflows) {
+      d.push(`reflows ${g.headerSizing.reflows} != ${e.reflows} (primaryAxisSizingMode ${g.headerSizing.primaryAxisSizingMode})`);
+    }
+    if (e.reflows === true) {
+      for (const c of g.headerSizing.children) {
+        if (c.ar !== "HEIGHT") d.push(`header child "${c.n}" textAutoResize ${c.ar} != HEIGHT`);
+        if (c.lsV !== "HUG") d.push(`header child "${c.n}" layoutSizingVertical ${c.lsV} != HUG`);
+        if (c.grow !== 0) d.push(`header child "${c.n}" layoutGrow ${c.grow} != 0`);
+      }
+    }
   }
   if (e.footerY !== null) {
     if (!g.footer) d.push("footer not resolved");
     else {
-      if (!near(g.footer.y, e.footerY)) d.push(`footer.y ${g.footer.y} != ${e.footerY}`);
+      if (!near(g.footer.y, e.footerY, LOOSE)) d.push(`footer.y ${g.footer.y} != ${e.footerY}`);
       if (e.footerMode && g.footer.layoutMode !== e.footerMode) d.push(`footer.layoutMode ${g.footer.layoutMode} != ${e.footerMode}`);
       if (e.footerConstraintV && g.footer.constraintV !== e.footerConstraintV) d.push(`footer.constraintV ${g.footer.constraintV} != ${e.footerConstraintV}`);
+      for (const row of g.footer.rows) {
+        if (row.pos === "ABSOLUTE") d.push(`footer row "${row.name}" is ABSOLUTE — that footer no longer reflows`);
+      }
     }
   }
   if (!e.noLogo && typeof g.logo === "string") d.push(g.logo);

@@ -85,7 +85,7 @@ Run [`scripts/verify_templates.js`](scripts/verify_templates.js) through `use_fi
 
 ### Header sizing, and the one property that decides whether the band moves
 
-**A header that hugs its text moves the band with the copy you write** — `primaryAxisSizingMode: "AUTO"`, with both the title and the subtitle at `textAutoResize: "HEIGHT"` and `layoutSizingVertical: "HUG"`. **All nine templates ship that way**, verified 2026-08-20: on both 850-wide frames the header is `AUTO`, `itemSpacing: 6`, zero padding, and both children `HUG` + `HEIGHT` with `layoutGrow: 0`. So a one-line title plus a one-line subtitle takes Static Vertical's `headerBottom` from the placeholder's 118 down to **70** with no preparation at all.
+**A header that hugs its text moves the band with the copy you write** — `primaryAxisSizingMode: "AUTO"`, with both the title and the subtitle at `textAutoResize: "HEIGHT"` and `layoutSizingVertical: "HUG"`. **Every template with a header ships that way** — all ten in the node map, verified 2026-08-20: on both 850-wide frames the header is `AUTO`, `itemSpacing: 6`, zero padding, and both children `HUG` + `HEIGHT` with `layoutGrow: 0`. So a one-line title plus a one-line subtitle takes Static Vertical's `headerBottom` from the placeholder's 118 down to **70** with no preparation at all.
 
 **That is a change, and it resolves a documented open question.** The 850-wide pair previously shipped `FIXED` with a `layoutGrow: 1` child, which this file recorded as a trap and worked around by making the clone hug. The design team has since converted them, so **the workaround is gone — do not apply it.** If you find yourself setting `primaryAxisSizingMode = "AUTO"` on a clone, stop and re-verify, because that is now either a regression in the file or a stale note.
 
@@ -404,20 +404,24 @@ Replace the lorem-ipsum text nodes in the cloned template. Source everything fro
   >
   > Step 7's `footerTop = footer.y + Math.min(0, source.y)` needs no change for the shipped two-row frame: `source.y` is 0 there, so it returns `footer.y`, which is correct. Don't "fix" it.
 
-  **Give the source its own full line and move CC BY to the row beneath it** — the source stays one unbroken line, which reads better than a wrap, and the template's own two-row footers already use exactly this geometry:
+  **Give the source its own full line and move CC BY to the row beneath it** — the source stays one unbroken line, which reads better than a wrap, and the template's own two-row footers already use exactly this geometry.
+
+  **Do it by changing the footer's `layoutMode`, not by assigning `y`.** DI's `Frame 37` is a **HORIZONTAL** auto-layout (`itemSpacing: 220`) whose two children are both `layoutPositioning: "AUTO"` — flowed, verified 2026-08-20. Auto-layout owns the position of a flowed child, so `source.y = 0; ccby.y = 20` is silently discarded and the rows stay side by side. Turn the axis instead:
 
   ```js
-  const W = footer.width, BOTTOM = footer.y + footer.height;   // read off the clone, before resizing
-  source.textAutoResize = "WIDTH_AND_HEIGHT";   // one line, its natural width
-  source.x = 0; source.y = 0;
-  ccby.x = 0;  ccby.y = 20;                     // left-aligned under the source, template row pitch
-  footer.resize(W, 36);
-  footer.y = BOTTOM - footer.height;            // grow upward; the template's bottom margin is untouched
+  const BOTTOM = footer.y + footer.height;       // read off the clone, before anything moves
+  source.textAutoResize = "WIDTH_AND_HEIGHT";    // one line, its natural width
+  footer.layoutMode = "VERTICAL";                // the actual operation — not a y assignment
+  footer.itemSpacing = 4;                        // the row pitch both shipped two-row footers use
+  footer.counterAxisAlignItems = "MIN";          // left-align, so CC BY sits under the source
+  footer.y = BOTTOM - footer.height;             // re-pin the designed bottom edge after it grows
   ```
 
-  **Take `W` and `BOTTOM` from the clone rather than typing them.** They are 508 and 524 in a 540-wide template, but the content is 818 wide in the 850-wide ones and the footer edge differs in every template (Step 7's table) — hardcoding the square template's pair narrows the content and lifts the footer off the bottom everywhere else. Then re-fit the chart into what's left (Step 7). Only if the source is too long even for a full line — beyond the template's content width — wrap it with `textAutoResize = "HEIGHT"` at a width that breaks after the organization's name, and top-align CC BY with its first line. Either way CC BY is **left-aligned** once it has its own row — it only sits at x=468 while it shares the source's line.
+  The frame hugs its own height on the new axis, so there is no `resize` to do — and re-read `footer.height` afterwards rather than assuming 36, since it now falls out of the rows.
 
-  **Simpler still: move the source *up* by one row pitch instead of resizing the footer** — `source.y = -20` inside the untouched footer frame, CC BY left at `y = 0`. The footer keeps its own geometry (so nothing else in the template shifts), and the band's real bottom becomes `footer.y + source.y`, which is the number to feed Step 7. That is how the file's own finished pages do it.
+  **Take `BOTTOM` from the clone rather than typing it.** It is 524 in a 540-wide template, and the footer edge differs in every template (Step 7's table) — hardcoding the square template's value lifts the footer off the bottom everywhere else. Then re-fit the chart into what's left (Step 7). Only if the source is too long even for a full line — beyond the template's content width — wrap it with `textAutoResize = "HEIGHT"` at a width that breaks after the organization's name, and top-align CC BY with its first line. Either way CC BY is **left-aligned** once it has its own row — it only sits at x=468 while it shares the source's line.
+
+  **The `source.y = -20` variant only works on a footer whose children are NOT flowed.** It leaves the footer's own geometry untouched — nothing else in the template shifts — and the band's real bottom becomes `footer.y + source.y`, which is the number to feed Step 7. But it is a `y` assignment, so auto-layout discards it on every current template: check `layoutPositioning` on the child first (`"ABSOLUTE"` means it will hold, `"AUTO"` means it won't). It is recorded here because the file's own older finished pages use it, from when those footers were absolute.
 
   **And know when *not* to spend the second row.** A source that overruns CC BY by only a few pixels is not worth 20px of chart: the full FAO name at the Source style's 14px measured 473px against CC BY starting at x=468 — a 2px overlap — and the finished page's answer was to set that one line to **13px** and keep the footer one row deep. Weigh the two costs explicitly (one off-ladder size on the least important text, versus a fifth of the gap budget and a re-export) and record whichever you pick.
 - **Note:** only in templates that carry a Note line, and only if the chart has one worth keeping. **DI images normally carry no note at all** — drop it, or, when it's genuinely load-bearing for understanding the chart, fold it into the subtitle as a bolded second line (only if the subtitle isn't already crowded).
@@ -1130,7 +1134,7 @@ The high-value edits to propose (include them in the Step 4 proposal):
   > note that came with it was "add a white outside stroke of 3px **when it overlaps** on chart
   > elements". Blanket-treating every annotation is the thing to avoid.
 
-  > **If you do need tier 3** (text over a filled area, or ink too dense for a halo), the frame recipe
+  > **If you do need tier 3** (ink too dense on the canvas for a halo — never a filled area, see GUIDELINES.md), the frame recipe
   > and its two traps — `clipsContent = false` and `paddingBottom ≈ 0.22 × the last line's font size` —
   > are in GUIDELINES.md → Annotations. Note `figma.createAutoLayout()` **is** a real API (declared in
   > `references/plugin-api-standalone.d.ts`; the `figma-use` skill's rule 12a prefers it over
@@ -1231,7 +1235,7 @@ Worth looking for, roughly in order of how often it pays:
   Reordering rows changes what the image shows relative to the interactive chart, so treat it as a trial and mirror it in the chart if it's kept.
 - **Near-duplicate entities.** Two countries with near-identical profiles spend a row each to say one thing. Dropping one gives the rest thicker bars (not more space — see Step 7) — worth flagging even though it isn't your call.
 - **Entities the accompanying text names.** Darkening just those labels (`Text/Gray 100` #2D2E2D against the default #5B5B5B) points the reader at them and costs no space — the fallback worth proposing when a chart is too full for annotations.
-- **Wording the guidelines already cover** — "World" → "Global average", units spelled out in the chart area, a title that describes rather than tells (GUIDELINES.md → Titles).
+- **Wording the guidelines already cover** — "World" → "Global average", units abbreviated to their symbol inside the plot and spelled out in prose (GUIDELINES.md → General), a title that describes rather than tells (GUIDELINES.md → Titles).
 - **Anything the checklist flags** that you can't fix yourself.
 
 Split what you find in two, and be explicit about which is which:
