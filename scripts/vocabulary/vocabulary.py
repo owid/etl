@@ -33,6 +33,7 @@ from pathlib import Path
 import click
 from dotenv import load_dotenv  # ty: ignore
 from google import genai  # ty: ignore
+from google.genai import errors as genai_errors  # ty: ignore
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -45,6 +46,13 @@ S3_BUCKET_NAME = "owid-public"
 DEFAULT_S3_VOCABULARY_PATH = "topic_vocabulary.json"
 
 DEFAULT_MODEL = "gemini-3.7-flash"
+
+# A whole-vocabulary run fires one request per topic at once, which draws the
+# occasional 503/429 out of the API. Those are transient, but a topic that
+# gives up is a topic missing from the upload, so retry each one a few times
+# before letting it fail.
+LLM_MAX_ATTEMPTS = 4
+LLM_RETRY_BACKOFF_SECONDS = 4
 
 # Gemini pricing per million tokens, for the cost estimate the CLI prints.
 # Models absent from here still run; their cost is simply reported as unknown,
@@ -67,6 +75,7 @@ def get_all_topic_slugs() -> list[str]:
         JOIN chart_tags ct ON t.id = ct.tagId
         JOIN charts c ON ct.chartId = c.id
         WHERE c.publishedAt IS NOT NULL
+          AND t.slug IS NOT NULL
         ORDER BY t.slug
     """
     df = OWID_ENV.read_sql(query)
@@ -132,29 +141,73 @@ async def extract_keywords_with_llm(
     # Combine all texts
     combined_text = "\n".join(texts)
 
-    prompt = f"""Extract search keywords for the topic "{topic_name}" from these chart titles and subtitles:
+    prompt = f"""Below are the titles and subtitles of every chart Our World in Data
+publishes on the topic "{topic_name}":
 
 {combined_text}
 
-Rules:
-1. Extract ONLY modern, currently-relevant terms for "{topic_name}"
-2. Keep: specific technologies, energy sources, or concepts people search for TODAY
-   - Good: "solar panels", "fossil fuels", "coal", "wind turbines", "nuclear power"
-   - Bad: "muscle energy", "firewood", "water engines" (historical, not searchable)
-3. Remove generic words from phrases:
-   - "oil prices" → "oil"
-   - "energy consumption" → skip (both words generic)
-4. Skip ALL terms containing: consumption, production, prices, investment, trade, access, growth, change, demand, supply, emissions, generation, reserves, intensity, transition, costs, spending
-5. Skip measurements: percentage, per capita, share, rate, level, annual, total, average
-6. Skip historical/obsolete terms unless still relevant today
+Give me search terms for this topic. They are offered to a reader on the topic's
+page, under a search box that filters exactly the charts listed above, as a short
+line of suggestions: "Suggested: term, term, term…". Only the first few are ever
+shown, so put the ones you would most want a reader to see first.
 
-Output JSON (up to 30 terms, but fewer is fine if not enough relevant ones):
+What makes this list good is that each term takes the reader somewhere *different*.
+
+1. Cover the range of what these charts are about. Read the whole list above and
+   work out which distinct subjects it spans, then give at least one term for
+   each. A topic's charts usually cover several: charts about sex ratios AND
+   about unemployment AND about mental health all belong to "Gender Ratio", so a
+   list that only describes the sex-ratio charts has missed most of the topic.
+2. One term per subject. Do not give near-synonyms or variations on the same
+   phrase — they land the reader on the same charts and waste the line. Pick the
+   single most natural form and move on.
+   - Bad: "sex ratio", "sex ratio at birth", "sex ratio by age", "sex ratio at age 5"
+     (one subject, four terms)
+   - Bad: "missing women", "sex-selective abortion", "excess female mortality"
+     (all three lead to the same two charts)
+   - Good: "sex ratio", "missing women", "life expectancy", "unemployment", "judiciary"
+     (five terms, five different parts of the chart list)
+3. Order the list so that each term adds something the ones before it did not.
+4. Terms should be things a reader would plausibly type: specific subjects,
+   technologies, diseases, materials, policies, groups.
+5. Skip anything too broad to narrow the list down: a bare "men", "women",
+   "children", "countries", "population", or the topic's own name.
+6. Never name a place. No countries, regions, continents or income groups —
+   not "United States", "Ukraine", "China", "low-income countries". The charts
+   above mention them constantly and they are searched for separately.
+7. Skip measurement and units language: percentage, per capita, share, rate,
+   level, annual, total, average, "GDP per capita", and terms that are only a
+   generic process word, such as "energy consumption" or "oil prices" (prefer
+   "oil"). "GDP" on its own is only a term for a topic that is actually about
+   GDP.
+8. Skip historical or obsolete terms unless they are still what people search for.
+
+Output JSON (up to 30 terms; far fewer is right when the topic is narrow —
+never pad the list with variations to reach a number):
 {{
   "keywords": ["term1", "term2", ...]
 }}"""
 
     try:
-        response = await client.aio.models.generate_content(model=model_id, contents=prompt)
+        response = None
+        for attempt in range(1, LLM_MAX_ATTEMPTS + 1):
+            try:
+                response = await client.aio.models.generate_content(model=model_id, contents=prompt)
+                break
+            except (genai_errors.ServerError, genai_errors.ClientError) as e:
+                # 429 (rate limited) and 5xx are worth another go; anything else
+                # (a bad model id, a rejected prompt) will fail again identically.
+                retriable = getattr(e, "code", None) == 429 or isinstance(e, genai_errors.ServerError)
+                if not retriable or attempt == LLM_MAX_ATTEMPTS:
+                    raise
+                delay = LLM_RETRY_BACKOFF_SECONDS * attempt
+                click.secho(
+                    f"  {topic_name}: {getattr(e, 'code', '?')} from the API, retrying in {delay}s "
+                    f"(attempt {attempt}/{LLM_MAX_ATTEMPTS - 1})",
+                    fg="yellow",
+                )
+                await asyncio.sleep(delay)
+        assert response is not None
         result_text = response.text.strip()
 
         # Extract token counts
@@ -195,12 +248,13 @@ Output JSON (up to 30 terms, but fewer is fine if not enough relevant ones):
         raise RuntimeError(f"LLM extraction failed for {topic_name}: {e}")
 
 
-async def process_topics(topic_slugs: list[str], api_key: str, model: str) -> list[dict]:
+async def process_topics(topic_slugs: list[str], api_key: str, model: str) -> tuple[list[dict], list[str]]:
     """Process multiple topics in parallel using asyncio.gather.
 
-    Returns: list of results (one per topic)
+    Returns: (results, slugs that failed)
     """
     # Extract chart texts for all topics first
+    failed: list[str] = []
     topic_data = []
     for topic_slug in topic_slugs:
         try:
@@ -209,9 +263,10 @@ async def process_topics(topic_slugs: list[str], api_key: str, model: str) -> li
             click.secho(f"✓ {topic_name}: Found {len(texts)} texts", fg="green")
         except ValueError as e:
             click.secho(f"✗ {topic_slug}: {e}", fg="red")
+            failed.append(topic_slug)
 
     if not topic_data:
-        return []
+        return [], failed
 
     # Extract keywords for all topics in parallel
     click.echo(f"\nExtracting keywords using LLM for {len(topic_data)} topics in parallel...")
@@ -228,11 +283,12 @@ async def process_topics(topic_slugs: list[str], api_key: str, model: str) -> li
         if isinstance(result, Exception):
             topic_slug = topic_data[i][0]
             click.secho(f"✗ {topic_slug}: {result}", fg="red")
+            failed.append(topic_slug)
         else:
             final_results.append(result)
             click.secho(f"✓ {result['topic_name']}: Extracted {len(result['keywords'])} keywords", fg="green")
 
-    return final_results
+    return final_results, failed
 
 
 @click.command()
@@ -293,7 +349,7 @@ def main(topic: tuple[str, ...], output: str | None, model: str, upload_path: st
 
     # Extract chart texts and process with LLM
     click.echo("Extracting chart titles and subtitles from database...")
-    results = asyncio.run(process_topics(topic_slugs, api_key, model))
+    results, failed_slugs = asyncio.run(process_topics(topic_slugs, api_key, model))
 
     if not results:
         click.secho("\n✗ No results generated", fg="red")
@@ -354,6 +410,24 @@ def main(topic: tuple[str, ...], output: str | None, model: str, upload_path: st
         output_data = results[0]
     else:
         output_data = {r["topic_slug"]: r for r in results}
+
+    # Refuse to publish a vocabulary that is missing topics. A run fans out one
+    # request per topic, so a transient API failure used to mean those topics
+    # quietly vanished from the file — and uploading that over a complete
+    # vocabulary loses their suggestions until someone notices. Keep the result
+    # (--output still writes it) but make publishing it a deliberate choice.
+    if failed_slugs and not no_upload:
+        click.echo()
+        click.secho(
+            f"✗ {len(failed_slugs)} of {len(topic_slugs)} topics failed: {', '.join(failed_slugs)}",
+            fg="red",
+        )
+        click.secho(
+            "  Not uploading a partial vocabulary over a complete one. Re-run (optionally with "
+            f"{' '.join('--topic ' + s for s in failed_slugs)}) or pass --no-upload to keep the partial result.",
+            fg="red",
+        )
+        sys.exit(1)
 
     # Upload to R2
     if not no_upload:
