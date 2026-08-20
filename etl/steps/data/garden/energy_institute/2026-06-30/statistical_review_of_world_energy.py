@@ -689,36 +689,54 @@ def fix_missing_nuclear_energy_data(tb: Table) -> Table:
 # regions are absent (the reserves columns) or fall short of the rollup (electricity generation by fuel,
 # biodiesel consumption), the difference is genuinely unassigned and the check does apply.
 ROLLUP_COMPONENTS = {
-    "Other South and Central America (EI)": [
-        "Other South America (EI)",
-        "Other Caribbean (EI)",
-        "Central America (EI)",
-    ],
+    "Other South and Central America (EI)": {
+        "South America": ["Other South America (EI)"],
+        "North America": ["Other Caribbean (EI)", "Central America (EI)"],
+    },
 }
-# How close the rollup and the sum of its components must be, as a fraction of the rollup's largest value
-# in the column, to count as the same thing. They agree to floating-point precision where they agree at all.
+# How close the rollup and the sum of all its components must be, as a fraction of the rollup's largest
+# value in the column, to count as the same thing. They agree to floating-point precision where they agree.
 ROLLUP_TOLERANCE = 1e-4
 # Column the rollup must decompose in. It is the Statistical Review's headline series, so a vintage that
 # stops publishing the finer regions fails here instead of quietly deleting region aggregates again.
 ROLLUP_MUST_DECOMPOSE_IN = "total_energy_supply_ej"
 
 
-def find_columns_covered_by_finer_regions(tb: Table, rollup: str) -> set[str]:
-    """Columns where a rollup "Other *" region is exactly the sum of the finer ones we already assign."""
-    components = ROLLUP_COMPONENTS.get(rollup)
+def find_columns_covered_by_finer_regions(tb: Table, rollup: str, region: str) -> set[str]:
+    """Columns where the part of a rollup "Other *" region belonging to `region` is already assigned to it.
+
+    A region is covered in a column whenever every finer residual region we assign to it is reported
+    there. What the rollup holds beyond those belongs to the other region, not to this one, so it says
+    nothing about whether this aggregate is complete.
+    """
+    components = ROLLUP_COMPONENTS.get(rollup, {}).get(region)
     if not components:
         return set()
-    tb_rollup = tb[tb["country"] == rollup].set_index("year")
-    tb_components = tb[tb["country"].isin(components)].groupby("year", observed=True).sum(min_count=1)
+    tb_components = tb[tb["country"].isin(components)]
     covered = set()
     for column in tb.drop(columns=["country", "year"]).columns:
-        values = tb_rollup[column].dropna()
-        if values.empty:
-            continue
-        parts = tb_components[column].reindex(values.index).fillna(0)
-        if (values - parts).abs().max() <= ROLLUP_TOLERANCE * values.abs().max():
+        reported = tb_components.groupby("country", observed=True)[column].apply(lambda x: x.notna().any())
+        if len(reported) == len(components) and reported.all():
             covered.add(column)
     return covered
+
+
+def check_rollup_still_decomposes(tb: Table, rollup: str) -> None:
+    """Fail if a rollup "Other *" region is no longer the sum of the finer regions it is made of.
+
+    Only checked in one column, the headline series, since the point is to catch a vintage that stops
+    publishing the finer regions altogether rather than to police every column.
+    """
+    components = [region for regions in ROLLUP_COMPONENTS[rollup].values() for region in regions]
+    values = tb[tb["country"] == rollup].set_index("year")[ROLLUP_MUST_DECOMPOSE_IN].dropna()
+    parts = (
+        tb[tb["country"].isin(components)]
+        .groupby("year", observed=True)[ROLLUP_MUST_DECOMPOSE_IN]
+        .sum(min_count=1)
+        .reindex(values.index)
+    )
+    error = f"{rollup} is no longer the sum of {components} in {ROLLUP_MUST_DECOMPOSE_IN}."
+    assert not values.empty and (values - parts).abs().max() <= ROLLUP_TOLERANCE * values.abs().max(), error
 
 
 def fix_issues_with_other_regions(tb: Table) -> Table:
@@ -741,12 +759,11 @@ def fix_issues_with_other_regions(tb: Table) -> Table:
     max_percentage_deviation = 15
     # Remove aggregates in columns for which an overlapping "Other *" region has a significant contribution, compared to the aggregate.
     for other_region, owid_regions in ei_regions_and_overlapping_owid_regions.items():
-        covered = find_columns_covered_by_finer_regions(tb=tb, rollup=other_region)
         if other_region in ROLLUP_COMPONENTS:
-            error = f"{other_region} no longer decomposes into the finer regions in {ROLLUP_MUST_DECOMPOSE_IN}."
-            assert ROLLUP_MUST_DECOMPOSE_IN in covered, error
+            check_rollup_still_decomposes(tb=tb, rollup=other_region)
         tb_other = tb[(tb["country"] == other_region)].fillna(0).reset_index(drop=True)
         for continent in owid_regions:
+            covered = find_columns_covered_by_finer_regions(tb=tb, rollup=other_region, region=continent)
             tb_continent = tb[(tb["country"] == continent)].fillna(0).reset_index(drop=True)
             for column in tb.drop(columns=["country", "year"]).columns:
                 if column in covered:
