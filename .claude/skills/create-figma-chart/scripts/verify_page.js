@@ -106,7 +106,7 @@ const chartResolvedBy = chart ? `name "${CONFIG.chartName}"` : plotRoots.length 
 // so they are none of those three — `annotations` then comes back empty on every real page and its
 // four rows report "no annotation__* nodes" forever, which reads as "nothing to check" rather than
 // "I never looked". Caught by planting an annotation and watching the rows stay silent.
-const texts = [], stroked = [], fills = [], leaves = [], annotations = [], vectors = [];
+const texts = [], stroked = [], fills = [], leaves = [], annotations = [], vectors = [], markBoxes = [];
 const collect = (n, insidePlot) => {
   if ("visible" in n && !n.visible) return;
   if (n.type === "TEXT" && typeof n.fontSize === "number") {
@@ -122,13 +122,36 @@ const collect = (n, insidePlot) => {
                    dash: "dashPattern" in n && n.dashPattern ? [...n.dashPattern] : [],
                    align: n.strokeAlign, insidePlot });
   }
-  if ("fills" in n && Array.isArray(n.fills)) {
+  // Zero-area nodes are EXCLUDED from the fill inventory and KEPT for the stroke rows (CHECKS.md).
+  // A grapher import's tick vectors are zero-width and carry a default black fill that paints no
+  // pixels, so counting them reports phantom #000000 and sends a reviewer to bind a mark that is not
+  // there. Their strokes are real, which is why the exclusion is per-row rather than per-node.
+  const areaBox = rel(n);
+  const hasArea = areaBox && areaBox.w > 0 && areaBox.h > 0;
+  if (hasArea && "fills" in n && Array.isArray(n.fills)) {
     for (const f of n.fills) {
       if (f.type === "SOLID" && f.visible !== false) {
         const hex = "#" + [f.color.r, f.color.g, f.color.b].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join("");
         fills.push({ name: n.name, type: n.type, hex, styleId: n.fillStyleId || "", insidePlot });
       }
     }
+  }
+  // Marker groups and value labels. The NAME is on the group and the GEOMETRY is on its children, and
+  // both halves matter. `collect` returns after descending, so a GROUP is never a leaf — and grapher's
+  // stable marker name sits on the `datapoints__<Entity>` GROUP while its descendants are unnamed, so
+  // filtering leaves by name matches nothing and the dot rule never fires. But the group's own bbox is
+  // the whole series (measured: 210x114 and 401x290 on a two-line chart), so testing against it would
+  // flag every annotation placed anywhere over the plot. So take the name from the group and a box per
+  // marker from its leaf descendants.
+  if (/^datapoints__|^dot__|^value__/.test(n.name)) {
+    const why = /^value__/.test(n.name) ? "a value label" : "a dot";
+    const pushLeafBoxes = (m) => {
+      if ("visible" in m && !m.visible) return;
+      if ("children" in m && m.children.length) { m.children.forEach(pushLeafBoxes); return; }
+      const b = rel(m);
+      if (b && b.w > 0 && b.h > 0) markBoxes.push({ name: n.name, box: b, why, insidePlot });
+    };
+    pushLeafBoxes(n);
   }
   if (n.type === "VECTOR" && insidePlot) vectors.push(n);
   if ("children" in n && n.children.length) { n.children.forEach((c) => collect(c, insidePlot)); return; }
@@ -251,7 +274,8 @@ for (const child of frame.children) {
 // Box alignment — the chart's edges against the header box, to the pixel.
 {
   const boxes = plotRoots.map(rel).filter(Boolean);
-  if (!boxes.length || contentL === null) skip("box-alignment", "chart or header box not resolved");
+  if (isSmall) skip("box-alignment", "302-wide format: the header HUGS its own text (206-278 against a 278 content box), so the chart's width is not meant to match it — SMALL-CHARTS.md");
+  else if (!boxes.length || contentL === null) skip("box-alignment", "chart or header box not resolved");
   else {
     const l = Math.min(...boxes.map((b) => b.l)), rr = Math.max(...boxes.map((b) => b.rr));
     const dl = l - contentL, dr = rr - contentR;
@@ -265,7 +289,8 @@ for (const child of frame.children) {
 {
   const boxes = plotRoots.map(rel).filter(Boolean);
   const target = CONFIG.gapTarget || (fb && Math.round(fb.width) === 560 ? [30, 30] : [12, 16]);
-  if (CONFIG.tightlyMeasured) skip("gap", "tightlyMeasured: CHECKS.md's band figure does not apply to a trimmed, hugged group — match the reference page's own measurement (typically 20-30px) and record it");
+  if (isSmall) skip("gap", "302-wide format: free frame height and no fit step, so the 12-16px band rule does not apply as written — SMALL-CHARTS.md");
+  else if (CONFIG.tightlyMeasured) skip("gap", "tightlyMeasured: CHECKS.md's band figure does not apply to a trimmed, hugged group — match the reference page's own measurement (typically 20-30px) and record it");
   else if (!boxes.length || bandTop === null || footerTop === null) skip("gap", "band or chart not resolved");
   else {
     const t = Math.min(...boxes.map((b) => b.t)) - bandTop;
@@ -279,12 +304,18 @@ for (const child of frame.children) {
 
 // Nothing in the margins.
 {
-  if (contentL === null) skip("margins", "content box not resolved");
+  // On the 302-wide format the header hugs its text, so a header-derived right edge would reject ink
+  // that is legitimately inside the format's own 12..290 content box. Take the bounds from the FORMAT
+  // there and from the header everywhere else (SMALL-CHARTS.md -> Checks).
+  const marginL = isSmall ? 12 : contentL;
+  const marginR = isSmall && fb ? fb.width - 12 : contentR;
+  if (marginL === null || marginR === null) skip("margins", "content box not resolved");
   else {
-    const out = leaves.filter((x) => (x.insidePlot || /^annotation__/.test(x.name)) && (x.box.l < contentL - 0.5 || x.box.rr > contentR + 0.5));
+    const out = leaves.filter((x) => (x.insidePlot || /^annotation__/.test(x.name)) && (x.box.l < marginL - 0.5 || x.box.rr > marginR + 0.5));
     add("margins", out.length ? "FAIL" : "ok",
-        out.length ? `${out.length} mark(s) outside ${r(contentL)}..${r(contentR)}: ` + out.slice(0, 6).map((x) => `${x.name} at ${r(x.box.l)}..${r(x.box.rr)}`).join(", ")
-                   : `no ink outside ${r(contentL)}..${r(contentR)} across ${leaves.filter((x) => x.insidePlot).length} plot leaves`);
+        (out.length ? `${out.length} mark(s) outside ${r(marginL)}..${r(marginR)}: ` + out.slice(0, 6).map((x) => `${x.name} at ${r(x.box.l)}..${r(x.box.rr)}`).join(", ")
+                    : `no ink outside ${r(marginL)}..${r(marginR)} across ${leaves.filter((x) => x.insidePlot).length} plot leaves`) +
+        ` (bounds from ${isSmall ? "the 302-wide FORMAT, not its hugging header" : "the header box"})`);
   }
 }
 
@@ -354,11 +385,19 @@ let crossings = null;
     const w = typeof v.strokeWeight === "number" ? v.strokeWeight : null;
     const seriesW = lineWeightBySeries[m[2]];
     const muted = CONFIG.highlightTreatment && seriesW !== undefined && Math.abs(seriesW - 1) < 0.05;
+    const pts = net.vertices.map((pt) => { const q = map(v, pt); return [r(q.x), r(q.y)]; });
+    // Connectivity lives in `segments`, NOT in vertex order. A series with a gap (a missing interval
+    // in a time range) has disconnected subpaths, and joining consecutive vertices invents a stroke
+    // across the gap — which then reports an annotation sitting in that empty space as crossing the
+    // line, and demands a knockout for it. Fall back to vertex order only when segments are absent.
+    const segs = Array.isArray(net.segments) && net.segments.length
+      ? net.segments.filter((s) => pts[s.start] && pts[s.end]).map((s) => [pts[s.start], pts[s.end]])
+      : pts.slice(1).map((q, i) => [pts[i], q]);
     polylines.push({ name: v.name, muted, w, seriesLineW: seriesW === undefined ? null : r(seriesW),
-                     points: net.vertices.map((pt) => { const q = map(v, pt); return [r(q.x), r(q.y)]; }) });
+                     points: pts, segments: segs, fromSegments: !!(Array.isArray(net.segments) && net.segments.length) });
   }
   if (!polylines.length) skip("polylines", "no line__*/outline__* VECTOR carried a readable vectorNetwork");
-  else add("polylines", "ok", `${polylines.length} series polyline(s) sampled, ${polylines.reduce((s, p) => s + p.points.length, 0)} vertices total, in frame coordinates` +
+  else add("polylines", "ok", `${polylines.length} series polyline(s) sampled, ${polylines.reduce((s, p) => s + p.points.length, 0)} vertices and ${polylines.reduce((s, p) => s + p.segments.length, 0)} segments (connectivity ${polylines.every((p) => p.fromSegments) ? "from vectorNetwork.segments" : "PARTLY from vertex order — a gapped series may report a phantom crossing"}), in frame coordinates` +
         (CONFIG.highlightTreatment ? `; ${polylines.filter((p) => p.muted).length} classified as muted context (legal to cross)` : ""),
         { polylines: polylines.map((p) => ({ name: p.name, n: p.points.length, muted: p.muted, first: p.points[0], last: p.points[p.points.length - 1] })) });
 
@@ -366,10 +405,7 @@ let crossings = null;
   // its geometry; dots and value labels are small and compact, so a bbox is right for them too.
   const furnitureBoxes = stroked.filter((s) => s.insidePlot && !/^(line|outline)__/.test(s.name))
     .map((s) => ({ name: s.name, box: rel(s.node) })).filter((x) => x.box);
-  const forbiddenBoxes = [
-    ...leaves.filter((x) => x.insidePlot && /^datapoints__|^dot__/.test(x.name)).map((x) => ({ name: x.name, box: x.box, why: "a dot" })),
-    ...texts.filter((x) => x.insidePlot && /^value__/.test(x.name) && x.box).map((x) => ({ name: x.name, box: x.box, why: "a value label" })),
-  ];
+  const forbiddenBoxes = markBoxes.filter((x) => x.insidePlot);
 
   if (!annotations.length) { skip("annotation-overlap", "no annotation__* nodes on this frame"); }
   else if (!polylines.length && !furnitureBoxes.length) { skip("annotation-overlap", "nothing to test against: no readable polylines and no furniture"); }
@@ -380,8 +416,8 @@ let crossings = null;
       if (!a.box) continue;
       const hits = [];
       for (const pl of polylines) {
-        for (let i = 1; i < pl.points.length; i++) {
-          if (segHitsRect(pl.points[i - 1], pl.points[i], a.box)) {
+        for (const [p, q] of pl.segments) {
+          if (segHitsRect(p, q, a.box)) {
             hits.push(pl.name);
             if (!pl.muted) illegal.push(`${a.name} crosses ${pl.name}` + (CONFIG.highlightTreatment ? ` (its series line is ${pl.seriesLineW}px — protagonist, not the 1px muted context)` : ""));
             break;
@@ -395,7 +431,7 @@ let crossings = null;
     const uniq = [...new Set(illegal)];
     add("annotation-overlap", uniq.length ? "FAIL" : "ok",
         uniq.length ? uniq.join("; ") + ". Gridlines, empty space and a muted context line are legal; a protagonist line, a dot or a value label is not."
-                    : `no annotation covers a prohibited mark (${annotations.length} annotation(s) vs ${polylines.length} line(s), ${furnitureBoxes.length} furniture node(s), ${forbiddenBoxes.length} dot/value node(s))`,
+                    : `no annotation covers a prohibited mark (${annotations.length} annotation(s) vs ${polylines.length} line(s), ${furnitureBoxes.length} furniture node(s), ${forbiddenBoxes.length} individual dot/value mark(s))`,
         { crossingsPerAnnotation: crossings, approximate: "segment-vs-rect on sampled vertices; a near-miss is settled by CHECKS.md's four-render pixel probe." });
   }
 }

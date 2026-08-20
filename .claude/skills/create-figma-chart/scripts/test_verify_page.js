@@ -49,13 +49,15 @@ const line = (name, pts, weight) => node({
   height: Math.max(...pts.map((p) => p[1])) - Math.min(...pts.map((p) => p[1])) || 1,
   strokeWeight: weight, strokes: solid("#4c6a9c"), dashPattern: [], strokeAlign: "CENTER",
   absoluteTransform: [[1, 0, 0], [0, 1, 0]],
-  vectorNetwork: { vertices: pts.map(([x, y]) => ({ x, y })) },
+  vectorNetwork: { vertices: pts.map(([x, y]) => ({ x, y })),
+                   segments: pts.slice(1).map((_, i) => ({ start: i, end: i + 1 })) },
 });
 
 const gridline = (name, y, dashed) => node({
   type: "VECTOR", name, x: 16, y, width: 508, height: 1,
   strokeWeight: 1, strokes: solid("#dddddd"), dashPattern: dashed ? [4, 4] : [], strokeAlign: "CENTER",
-  absoluteTransform: [[1, 0, 16], [0, 1, y]], vectorNetwork: { vertices: [{ x: 0, y: 0 }, { x: 508, y: 0 }] },
+  absoluteTransform: [[1, 0, 16], [0, 1, y]],
+  vectorNetwork: { vertices: [{ x: 0, y: 0 }, { x: 508, y: 0 }], segments: [{ start: 0, end: 1 }] },
 });
 
 function buildFrame(opts = {}) {
@@ -79,10 +81,26 @@ function buildFrame(opts = {}) {
     line("line__A", [[40, 440], [200, 300], [440, 260]], lineWeight),
     line("outline__A", [[40, 440], [200, 300], [440, 260]], lineWeight + 1),
     text("label__A", "Country A", labelSize, 450, 250, 60, 16, opts.labelFill || "#4c6a9c"),
-    node({ name: "datapoints__A", x: 430, y: 250, width: 10, height: 10,
-           children: [node({ type: "ELLIPSE", name: "dp", x: 430, y: 250, width: 8, height: 8 })] }),
+    // grapher's stable marker name is on the GROUP; its descendants are unnamed. A leaf-only filter
+    // never sees it, which is what let the dot rule sit inert.
+    // Deliberately WIDE group with two small dots inside, mirroring grapher: the group's bbox spans
+    // the series (measured 210x114 live) while each marker is ~8px. Testing the group's box would
+    // flag any annotation over the plot, so this shape is what keeps that regression visible.
+    node({ name: "datapoints__A", x: 60, y: 150, width: 250, height: 120,
+           children: [node({ type: "ELLIPSE", name: "dp1", x: 300, y: 150, width: 8, height: 8 }),
+                      node({ type: "ELLIPSE", name: "dp2", x: 60, y: 262, width: 8, height: 8 })] }),
   ];
   if (opts.extraLine) kids.push(line("line__B", [[40, 420], [200, 340], [440, 300]], opts.extraLine));
+  if (opts.zeroAreaTick) kids.push(node({ type: "VECTOR", name: "tick-0", x: 40, y: 470, width: 0, height: 6,
+    strokeWeight: 1, strokes: solid("#dddddd"), dashPattern: [], strokeAlign: "CENTER", fills: solid("#000000"),
+    absoluteTransform: [[1, 0, 40], [0, 1, 470]],
+    vectorNetwork: { vertices: [{ x: 0, y: 0 }, { x: 0, y: 6 }], segments: [{ start: 0, end: 1 }] } }));
+  if (opts.gappedLine) kids.push(node({ type: "VECTOR", name: "line__G", x: 40, y: 200, width: 400, height: 100,
+    strokeWeight: 3, strokes: solid("#b13507"), dashPattern: [], strokeAlign: "CENTER",
+    absoluteTransform: [[1, 0, 0], [0, 1, 0]],
+    // two disconnected subpaths with a wide gap between vertex 1 and vertex 2
+    vectorNetwork: { vertices: [{ x: 40, y: 200 }, { x: 120, y: 220 }, { x: 380, y: 280 }, { x: 440, y: 300 }],
+                     segments: [{ start: 0, end: 1 }, { start: 2, end: 3 }] } }));
   const chart = node({ name: "chart", type: "GROUP", x: 16, y: 122, width: contentW, height: 352, children: kids });
 
   const children = [header, footer, logo, chart];
@@ -182,10 +200,53 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     check("7 without the treatment, any series crossing FAILS", row(plain, "annotation-overlap").status === "FAIL", row(plain, "annotation-overlap").detail);
   }
 
-  // 8 — covering a dot is never legal.
+  // 8 — covering a dot is never legal, WITHOUT also crossing the line. The earlier version of this
+  // case put the annotation over both and asserted /a dot/, which matched the row's stock explanatory
+  // suffix ("...a dot or a value label is not") rather than a finding — a vacuous assertion in the
+  // harness built to catch vacuous checks. Assert on the NODE NAME instead.
   {
-    const out = await run(buildFrame({ annotation: annotation({ x: 425, y: 245, w: 40, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {});
-    check("8 covering a dot FAILS", row(out, "annotation-overlap").status === "FAIL" && /a dot/.test(row(out, "annotation-overlap").detail), row(out, "annotation-overlap").detail);
+    const out = await run(buildFrame({ annotation: annotation({ x: 298, y: 148, w: 16, h: 14, stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    const d = row(out, "annotation-overlap").detail;
+    check("8 covering a marker group FAILS", row(out, "annotation-overlap").status === "FAIL", d);
+    check("8 names datapoints__A specifically", /covers datapoints__A/.test(d), d);
+    // and the group's own wide bbox must NOT be the test surface: an annotation inside the group's
+    // box but away from every marker is legal.
+    const inGroupBoxOnly = await run(buildFrame({ annotation: annotation({ x: 150, y: 190, w: 60, h: 16, stroke: null, strokeWeight: 0 }) }), {});
+    const d2 = row(inGroupBoxOnly, "annotation-overlap").detail;
+    check("8 group bbox is not the test surface", !/datapoints__A/.test(d2), d2);
+  }
+
+  // 12 — a gapped series must not invent a stroke across the gap (segments, not vertex order).
+  {
+    const inGap = await run(buildFrame({ gappedLine: true, annotation: annotation({ x: 200, y: 240, w: 120, h: 18, stroke: null, strokeWeight: 0 }) }), {});
+    const d = row(inGap, "annotation-overlap").detail;
+    check("12 annotation inside the gap does NOT cross line__G", !/crosses line__G/.test(d), d);
+    check("12 connectivity came from segments", /from vectorNetwork\.segments/.test(row(inGap, "polylines").detail), row(inGap, "polylines").detail);
+    // and it must still be caught when it genuinely sits on a drawn subpath
+    const onPath = await run(buildFrame({ gappedLine: true, annotation: annotation({ x: 60, y: 200, w: 70, h: 18, stroke: null, strokeWeight: 0 }) }), {});
+    check("12 annotation on a drawn subpath DOES cross", /crosses line__G/.test(row(onPath, "annotation-overlap").detail), row(onPath, "annotation-overlap").detail);
+  }
+
+  // 13 — a zero-area tick's default black fill must not appear as an off-palette colour.
+  {
+    const out = await run(buildFrame({ zeroAreaTick: true }), {});
+    const d = row(out, "off-palette").detail;
+    check("13 phantom #000000 excluded from fills", !/#000000/.test(d), d);
+    const without = await run(buildFrame(), {});
+    const n = (x) => Number(/all (\d+) furniture/.exec(row(x, "furniture-weight").detail)[1]);
+    check("13 the tick's STROKE is still counted", n(out) === n(without) + 1, `${n(without)} -> ${n(out)} furniture strokes`);
+  }
+
+  // 14 — the rest of the 302-wide geometry, not just the text floor.
+  {
+    const out = await run(buildFrame({ frameW: 302, frameH: 400, labelSize: 11 }), {});
+    check("14 box-alignment SKIPPED on 302", row(out, "box-alignment").status === "SKIPPED", row(out, "box-alignment").detail);
+    check("14 gap SKIPPED on 302", row(out, "gap").status === "SKIPPED", row(out, "gap").detail);
+    check("14 margins use the FORMAT bounds", /from the 302-wide FORMAT/.test(row(out, "margins").detail), row(out, "margins").detail);
+    const big = await run(buildFrame(), {});
+    check("14 540-wide still checks box-alignment", row(big, "box-alignment").status !== "SKIPPED", row(big, "box-alignment").detail);
+    check("14 540-wide still checks gap", row(big, "gap").status !== "SKIPPED", row(big, "gap").detail);
+    check("14 540-wide margins use the header box", /from the header box/.test(row(big, "margins").detail), row(big, "margins").detail);
   }
 
   // 9 — the computed contrast row.
