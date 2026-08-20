@@ -101,6 +101,31 @@ function buildFrame(opts = {}) {
   // A segmented bar: a filled rect with NO stroke and NO value label of its own.
   if (opts.barSegment) kids.push(node({ type: "RECTANGLE", name: "bar__A", x: 100, y: 380, width: 160, height: 40,
     fills: solid("#4c6a9c") }));
+  // A scatter: `outline__<Entity>` is the RING around a point, with no paired series line — it runs
+  // 3.5-4.1px by design and must not be judged against a line halo's bar.
+  if (opts.scatterRings) kids.push(node({ name: "points", x: 100, y: 200, width: 200, height: 100, children: [
+    node({ type: "ELLIPSE", name: "outline__India", x: 100, y: 200, width: 20, height: 20, strokeWeight: 4.09,
+           strokes: solid("#ffffff"), dashPattern: [], fills: solid("#4c6a9c") }),
+    node({ type: "ELLIPSE", name: "outline__China", x: 200, y: 250, width: 18, height: 18, strokeWeight: 3.53,
+           strokes: solid("#ffffff"), dashPattern: [], fills: solid("#b13507") })] }));
+  // A slope chart names its series `slope__<Entity>`, not `line__<Entity>`.
+  // Grapher's real slope shape, measured live: `slope__<Entity>` and `outline__<Entity>` are GROUPS of
+  // {start-point, end-point, line}, and the only stroked node is called plain `line`. Matching the
+  // stroked node's own name finds nothing here.
+  if (opts.slopeSeries) {
+    const seg = (w) => node({ type: "VECTOR", name: "line", x: 60, y: 200, width: 340, height: 150, strokeWeight: w,
+      strokes: solid("#4c6a9c"), dashPattern: [], absoluteTransform: [[1, 0, 0], [0, 1, 0]],
+      vectorNetwork: { vertices: [{ x: 60, y: 200 }, { x: 400, y: 350 }], segments: [{ start: 0, end: 1 }] } });
+    kids.push(node({ name: "slopes", x: 60, y: 200, width: 340, height: 150, children: [
+      node({ name: "outline__USA", x: 60, y: 200, width: 340, height: 150, children: [
+        node({ type: "VECTOR", name: "start-point", x: 60, y: 200, width: 6, height: 6 }), seg(opts.slopeHalo || 4)] }),
+      node({ name: "slope__USA", x: 60, y: 200, width: 340, height: 150, children: [
+        node({ type: "VECTOR", name: "end-point", x: 400, y: 350, width: 6, height: 6 }), seg(opts.slopeWeight || 3)] })] }));
+  }
+  // A discrete bar's only furniture is a top-level zero line, inside no axis or grid container.
+  if (opts.zeroLineOnly) kids.push(node({ type: "VECTOR", name: "vertical-zero-line", x: 40, y: 160, width: 1, height: 300,
+    strokeWeight: opts.zeroLineOnly, strokes: solid("#333333"), dashPattern: [], strokeAlign: "CENTER",
+    absoluteTransform: [[1, 0, 40], [0, 1, 160]], vectorNetwork: { vertices: [{ x: 0, y: 0 }, { x: 0, y: 300 }], segments: [{ start: 0, end: 1 }] } }));
   if (opts.mapCountries) kids.push(node({ name: "countries", x: 40, y: 160, width: 400, height: 200, children: [
     node({ type: "VECTOR", name: "country__FRA", x: 40, y: 160, width: 60, height: 40, strokeWeight: 0.22,
            strokes: solid("#ffffff"), dashPattern: [], fills: solid("#4c6a9c"),
@@ -350,6 +375,33 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const clear = await run(buildFrame({ barSegment: true,
       annotation: annotation({ x: 120, y: 150, w: 80, h: 16, stroke: null, strokeWeight: 0 }) }), {});
     check("21 an annotation clear of it passes", !/bar__A/.test(row(clear, "annotation-overlap").detail), row(clear, "annotation-overlap").detail);
+  }
+
+  // 22 — a scatter's point rings are not line halos (found by the all-chart-types sweep).
+  {
+    const out = await run(buildFrame({ scatterRings: true }), {});
+    const d = row(out, "series-weight").detail;
+    check("22 unpaired outline__ not judged as a halo", !/outline__India|outline__China/.test(d), d);
+    check("22 and the exclusion is reported", /unpaired|point rings/.test(d), d);
+  }
+
+  // 23 — a slope chart's series is slope__X, and its paired halo still applies.
+  {
+    const out = await run(buildFrame({ slopeSeries: true }), {});
+    const d = row(out, "series-weight").detail;
+    check("23 slope__ series recognised", row(out, "series-weight").status !== "SKIPPED", d);
+    check("23 slope at 3 with a 4 halo passes", row(out, "series-weight").status === "ok", d);
+    const bad2 = await run(buildFrame({ slopeSeries: true, slopeWeight: 0.98 }), {});
+    check("23 a thinned slope FAILS and names the series", row(bad2, "series-weight").status === "FAIL" && /slope__USA/.test(row(bad2, "series-weight").detail), row(bad2, "series-weight").detail);
+    check("23 identity read from the GROUP, not the node", !/\bline\b 0\.98/.test(row(bad2, "series-weight").detail), row(bad2, "series-weight").detail);
+  }
+
+  // 24 — a top-level zero line is furniture (a discrete bar's only furniture).
+  {
+    const ok = await run(buildFrame({ zeroLineOnly: 1 }), {});
+    check("24 zero line counted as furniture", row(ok, "furniture-weight").status === "ok" && !/no stroked node/.test(row(ok, "furniture-weight").detail), row(ok, "furniture-weight").detail);
+    const bad3 = await run(buildFrame({ zeroLineOnly: 0.64 }), {});
+    check("24 a thinned zero line FAILS", row(bad3, "furniture-weight").status === "FAIL" && /0\.64/.test(row(bad3, "furniture-weight").detail), row(bad3, "furniture-weight").detail);
   }
 
   const bad = results.filter((x) => !x.ok);
