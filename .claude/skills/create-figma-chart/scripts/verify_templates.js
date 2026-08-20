@@ -15,7 +15,8 @@
 //   headerSizing  — `primaryAxisSizingMode` plus each child's sizing. AUTO + HUG means the header
 //                   reflows when the text gets shorter; FIXED + a FILL/grow child means it does
 //                   NOT, and a short subtitle silently inflates its own box instead. As of
-//                   2026-08-20 every template with a header is AUTO + HUG; the 850-wide pair used to be the
+//                   2026-08-20 every IN-SCOPE template with a header is AUTO + HUG (the reel has
+//                   one too, but it is out of scope and unreachable — see its EXPECT row); the 850-wide pair used to be the
 //                   FIXED case and the design team has since converted it, so a `false` here is now
 //                   a regression rather than a shipped state. This is the single most consequential
 //                   property on the frame and it is invisible until you fill the texts.
@@ -67,7 +68,9 @@ const EXPECT = {
   // to descend a wrapper — don't, until the reel is actually in scope.
   "IG reel":          { size: [616, 1096],  contentX: null, contentW: null, headerBottom: null, reflows: null,  footerY: null,    footerMode: null,         footerConstraintV: null, noLogo: true },
   // DI's footerH 16 is the SHIPPED one-row height. Step 6's recipe converts a *clone* to VERTICAL
-  // and it grows — that is the clone, not the template, so do not "fix" this to 36.
+  // and it grows — that is the clone, not the template, so do not "fix" this to 36. And footerRows
+  // counts footer CHILDREN, not visual rows: DI's two children sit side by side in a HORIZONTAL
+  // footer, so one visual row is legitimately 2 here. Do not "fix" that to 1 either.
   DI:                 { size: [540, 540],   contentX: 16, contentW: 508, headerBottom: 118,    reflows: true,  footerY: 508,     footerMode: "HORIZONTAL", footerConstraintV: "MIN", footerH: 16, footerRows: 2 },
   "static mobile 1":  { size: [540, 540],   contentX: 16, contentW: 508, headerBottom: 118,    reflows: true,  footerY: 486,     footerMode: "VERTICAL",   footerConstraintV: "MAX", footerH: 38, footerRows: 2 },
   "static mobile 2":  { size: [540, 824],   contentX: 16, contentW: 508, headerBottom: 118,    reflows: true,  footerY: 770,     footerMode: "VERTICAL",   footerConstraintV: "MIN", footerH: 38, footerRows: 2 },
@@ -221,8 +224,12 @@ for (const [label, e] of Object.entries(EXPECT)) {
       // image ships a row short. Height + count is the encoding; row NAMES deliberately are not,
       // because names here are not stable across design edits (see the node map) and that is the
       // whole reason header and footer are resolved structurally.
-      if (e.footerH != null && !near(g.footer.h, e.footerH, LOOSE)) d.push(`footer.height ${g.footer.h} != ${e.footerH}`);
-      if (e.footerRows != null && g.footer.rows.length !== e.footerRows) {
+      // `!== undefined` rather than `!== null`: these two keys are absent (not null) on the rows
+      // that skip them, and every other guard here compares against null. Both forms are also
+      // nested under `e.footerY !== null`, so a future row carrying footerH with footerY: null
+      // would skip the height check — add it outside this block if that case ever arises.
+      if (e.footerH !== undefined && !near(g.footer.h, e.footerH, LOOSE)) d.push(`footer.height ${g.footer.h} != ${e.footerH}`);
+      if (e.footerRows !== undefined && g.footer.rows.length !== e.footerRows) {
         d.push(`footer row count ${g.footer.rows.length} != ${e.footerRows}`);
       }
       for (const row of g.footer.rows) {
