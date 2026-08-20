@@ -41,7 +41,40 @@ This tool uses a direct LLM approach to extract searchable, domain-specific keyw
 
 - `--topic SLUG` - Topic slug(s) to extract (can be specified multiple times). If not provided, extracts for all topics.
 - `--output PATH` - Output JSON file path (optional, prints to console if not provided)
-- `--model MODEL` - Gemini model to use: `gemini-3-flash-preview` (default) or `gemini-2.5-flash-lite`
+- `--model MODEL` - Gemini model to use (default: `gemini-3.7-flash`). Any model id the API accepts works; models missing from `PRICING` just report their cost as unknown.
+- `--upload-path KEY` - Key to write inside the `owid-public` bucket (default: `topic_vocabulary.json`)
+- `--no-upload` - Generate without writing to R2
+
+## Where the vocabulary goes, and how to try one out
+
+The result is uploaded to the `owid-public` R2 bucket and served through
+`files.ourworldindata.org`, whose worker adds CORS and a 5-minute edge cache.
+The site reads the default key directly from the browser:
+
+    https://files.ourworldindata.org/topic_vocabulary.json
+
+**A plain run overwrites the vocabulary the live site uses.** To try a new one
+without doing that, upload it under a different key — the worker serves the
+whole bucket, so any key works:
+
+```bash
+python scripts/vocabulary/vocabulary.py \
+    --upload-path topic_vocabulary/my-branch.json
+```
+
+then point a staging server at it (see `TOPIC_VOCABULARY_URL` in owid-grapher's
+`settings/clientSettings.ts`):
+
+```
+TOPIC_VOCABULARY_URL=https://files.ourworldindata.org/topic_vocabulary/my-branch.json
+```
+
+Suggestions fall back to the production vocabulary if that key isn't there, so
+a half-finished experiment leaves the page looking normal.
+
+Keywords are consumed by the all-charts block's "Suggested:" line on topic
+pages. It shows the leading few terms per topic, so ordering within a topic
+matters: the terms it lists first are the ones most likely to be shown.
 
 ## How It Works
 
