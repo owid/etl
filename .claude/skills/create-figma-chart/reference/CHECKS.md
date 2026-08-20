@@ -5,6 +5,25 @@
 
 Every one of these caught a real defect on this skill's first run, and none of them is visible by looking at the frame. Run them as a pass, and report the numbers rather than "looks fine".
 
+> **[`scripts/verify_page.js`](../scripts/verify_page.js) runs the MECHANICAL rows in ONE read-only
+> `use_figma` call** — text floor, annotation ladder, named styles, text hierarchy, series and
+> furniture weights, dash patterns, box alignment, gap, margins, unbound fills, annotation knockout
+> tier, annotation block gap, and the series polylines the annotation-overlap row needs. Done one at
+> a time those are a dozen round trips at ~8-10s each.
+>
+> **Every row it cannot judge comes back `SKIPPED` with the reason and the tool that owns it** —
+> colour-vision and grayscale (`color_audit.py`), spelling (`codespell`), the data-truth row
+> (`/adversarial-data-review`), entity completeness (needs the *effective* selection from outside
+> Figma), and the arrow and leader-on-map rows (they need rendered pixels). A `SKIPPED` row is a
+> declared gap in coverage, never a pass — which is the whole reason to read the list rather than
+> the verdict.
+>
+> Validated by planting defects and confirming each row **fails**: 11 planted, 11 caught. That pass
+> is also what found the script's own first bug — annotations are appended to the **frame**, so a
+> walk over only [chart, header, footer] left `annotations` empty on every real page and four rows
+> reporting "no annotation__* nodes" forever. **A check that cannot fail is worse than no check**, so
+> when you extend this script, extend the planted-defect pass with it.
+
 > **On a 302-wide small or pull chart, five of these bars are different**, and reporting the 540-wide figures there produces false failures — the text floor is **11px** (the template's own subtitle, source and year labels are 11px by design), the margins are **12 … 290**, the chart's width need not match the header box, and the gap rule doesn't apply as written. The table is in SMALL-CHARTS.md → Checks. Everything else below holds unchanged.
 
 | Check | How | Bar |
