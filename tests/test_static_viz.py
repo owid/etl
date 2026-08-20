@@ -131,6 +131,32 @@ def test_export_frame_rejects_a_figsize_that_is_not_the_template(tmp_path):
     assert paths.calls == [], "nothing may be written once the aspect check fails"
 
 
+def test_export_frame_rejects_the_right_ratio_at_the_wrong_scale(tmp_path):
+    """The subtle one: the aspect is exact, only the scale is off.
+
+    A ratio-only check passes this, and the SVG then needs a uniform rescale into the template
+    frame — which divides every point-denominated font size by that same factor, so the type
+    hierarchy lands off the template's with nothing in the rendered image to show it.
+    """
+    paths = _Paths(tmp_path)
+    t = TEMPLATES["horizontal"]
+    fig = plt.figure(figsize=(t.figsize[0] * 2, t.figsize[1] * 2))
+    assert fig.get_figwidth() / fig.get_figheight() == pytest.approx(t.ratio), "aspect must be exact"
+    with pytest.raises(AssertionError, match="does not match template"):
+        export_frame(paths, fig, "chart", template="horizontal")
+    plt.close(fig)
+    assert paths.calls == [], "nothing may be written once the size check fails"
+
+
+def test_export_frame_accepts_the_exact_template_figsize(tmp_path):
+    for key, t in TEMPLATES.items():
+        paths = _Paths(tmp_path)
+        fig = plt.figure(figsize=t.figsize)
+        export_frame(paths, fig, "chart", template=key)
+        plt.close(fig)
+        assert len(paths.calls) == 2, key
+
+
 def test_export_frame_rejects_an_unknown_template(tmp_path):
     paths = _Paths(tmp_path)
     fig = plt.figure(figsize=(8.5, 6.38))

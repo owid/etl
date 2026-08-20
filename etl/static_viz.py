@@ -129,8 +129,8 @@ def export_frame(
     Both come out reproducible — `PathFinder.export_fig` strips matplotlib's version stamp — so a
     byte diff on a committed output means the picture changed, not that matplotlib was upgraded.
 
-    `template` is optional and only validates: it asserts the figure's aspect matches that template,
-    catching a `figsize` typo or a stray `bbox_inches="tight"` before the file is written.
+    `template` is optional and only validates: it asserts the figure's `figsize` matches that
+    template, catching a `figsize` typo or a stray `bbox_inches="tight"` before the file is written.
     """
     if unclip_first:
         unclip(fig)
@@ -138,13 +138,19 @@ def export_frame(
     if template is not None:
         if template not in TEMPLATES:
             raise ValueError(f"unknown template {template!r}; expected one of {sorted(TEMPLATES)}")
-        want = TEMPLATES[template].ratio
-        got = fig.get_figwidth() / fig.get_figheight()
-        # `verify_static_viz.py` uses 0.002 on the saved file; match it here so the two agree.
-        if abs(got - want) / want > 0.002:
+        want = TEMPLATES[template].figsize
+        got = (fig.get_figwidth(), fig.get_figheight())
+        # Both dimensions, not just their ratio: a figure at the template's aspect but twice its
+        # scale needs a uniform rescale on the way into the frame, and that divides every
+        # point-denominated font size by the same factor — the whole type hierarchy lands off the
+        # template's, invisibly. `verify_static_viz.py` can only compare the ratio, because a saved
+        # file no longer carries the figsize it was built at; here the figure is still in hand, so
+        # check the thing that actually has to hold. Tolerance matches the verifier's 0.002.
+        if any(abs(g - w) / w > 0.002 for g, w in zip(got, want)):
             raise AssertionError(
-                f"figure aspect {got:.4f} does not match template {template!r} ({want:.4f}). "
-                f"Expected figsize {TEMPLATES[template].figsize}. "
+                f"figure size {got[0]:.4f}x{got[1]:.4f} does not match template {template!r}. "
+                f"Expected figsize {want} — the aspect and the scale both have to match, because "
+                f"the figure is built at {PIXELS_PER_INCH} template px per inch. "
                 'A `bbox_inches="tight"` on save also breaks this — it crops to the ink.'
             )
 
