@@ -10,7 +10,15 @@ The model, from `reference/FITTING.md` and Step 3:
     inset       ~= 1.4 * imFontSize on each axis
     canvas       : W * H ~= 510000 px^2   (the server renormalizes to this)
     content      : (W - 1.4F) x (H - 1.4F)
-    label size   ~= 0.75 * F, then scaled by (placed width / content width)
+    label size   ~= 0.75 * F, then scaled by (usable band height / content height)
+
+The label scale is the HEIGHT-first factor, because that is the only rescale Step 7 spends. From
+`reference/FITTING.md`: "Fit to the band's height, then map x to fill the width", and the x-map that
+follows "takes the plot out to the full content width without touching a single font size" (L243,
+L450, L456). The width-first `placed width / content width` agrees with it exactly whenever the
+solved aspect IS the band's usable aspect, so it reads as equivalent on a first pass -- and stops
+being equivalent the moment --content-aspect carries the reflected aspect of a second pass, which is
+deliberately off the band's own. There it asked for a font up to 4px away from the right one.
 
 Substituting W = 510000/H into (W - 1.4F)/(H - 1.4F) = A gives a quadratic in H:
 
@@ -39,8 +47,9 @@ other script in this directory):
     .venv/bin/python $S --band 508x371 --gap 30 --target-label 15 --params "country=USA~CHN"
     .venv/bin/python $S --band 302x220 --thumbnail --slug life-expectancy
 
-Self-test (validates the model against the worked examples in the docs, and round-trips the band
-arithmetic — the solved content, scaled into the band, must leave exactly --gap at each end):
+Self-test (validates the model against the worked examples in the docs, round-trips the band
+arithmetic — the height-fitted content must leave exactly --gap at each end and no width for the
+x-map to close — and checks that a reflected second pass still lands its --target-label):
     .venv/bin/python $S --self-test
 """
 
@@ -79,19 +88,25 @@ def content_box(w: float, h: float, font: float) -> tuple[float, float]:
     return w - INSET_PER_FONT * font, h - INSET_PER_FONT * font
 
 
-def label_at(font: float, content_w: float, placed_w: float) -> float:
-    """Final on-page label size once the export is scaled to placed_w."""
-    return LABEL_RATIO * font * (placed_w / content_w)
+def label_at(font: float, content_h: float, fitted_h: float) -> float:
+    """Final on-page label size once the export is HEIGHT-fitted to fitted_h.
+
+    Height-first because that is the only rescale Step 7 spends: the x-map that follows closes the
+    width without touching a font size (reference/FITTING.md L243/L450/L456). Identical to the
+    width-first factor when the solved aspect is the band's usable aspect; not identical, and not
+    interchangeable, once --content-aspect carries a second pass's reflected aspect.
+    """
+    return LABEL_RATIO * font * (fitted_h / content_h)
 
 
-def solve_font(content_aspect: float, placed_w: float, target_label: float) -> float:
-    """Bisect for the imFontSize whose labels land on target_label at placed_w."""
+def solve_font(content_aspect: float, usable_h: float, target_label: float) -> float:
+    """Bisect for the imFontSize whose labels land on target_label after the height fit."""
     lo, hi = 8.0, 200.0
     for _ in range(200):
         mid = (lo + hi) / 2.0
         w, h = solve_canvas(content_aspect, mid)
-        cw, _ = content_box(w, h, mid)
-        if label_at(mid, cw, placed_w) < target_label:
+        _, ch = content_box(w, h, mid)
+        if label_at(mid, ch, usable_h) < target_label:
             lo = mid
         else:
             hi = mid
@@ -118,26 +133,62 @@ def self_test() -> int:
     print(f"\nworst canvas error: {worst:.1f}px — docs state the model is approximate (+-3px)")
     ok = worst <= 3.0
 
-    # The band arithmetic, round-tripped: solve for band - 2*gap, scale the solved content to the
-    # band width, and the leftover must be exactly gap at each end. A zero-gap solve here is the
-    # regression this covers — it is what a chart crowding the header and footer looks like.
-    print(f"\n{'band':>12} {'gap':>5} {'F':>4} {'content':>15} {'scaled h':>9} {'gap/end':>8} {'err':>6}")
+    # The band arithmetic, round-tripped through the HEIGHT-first fit Step 7 actually performs:
+    # solve for band - 2*gap, rescale by usable_h / content_h, and the result must leave exactly gap
+    # at each end, land the full band width (nothing for the x-map to close) and hit target_label.
+    # A zero-gap solve here is one regression this covers — it is what a chart crowding the header
+    # and footer looks like.
+    bands = [(508.0, 371.0, 14.0, 13.5), (508.0, 371.0, 12.0, 13.5), (508.0, 552.0, 30.0, 15.0)]
+    print(f"\n{'band':>12} {'gap':>5} {'F':>4} {'content':>15} {'gap/end':>8} {'x-map':>7} {'label':>7}")
     worst_gap = 0.0
-    for bw, bh, gap, target in [(508.0, 371.0, 14.0, 13.5), (508.0, 371.0, 12.0, 13.5), (508.0, 552.0, 30.0, 15.0)]:
+    worst_xmap = 0.0
+    worst_label = 0.0
+    for bw, bh, gap, target in bands:
         usable = bh - 2.0 * gap
-        font = solve_font(bw / usable, bw, target)
+        font = solve_font(bw / usable, usable, target)
         w, h = solve_canvas(bw / usable, font)
         cw, ch = content_box(w, h, font)
-        scaled_h = ch * (bw / cw)
-        got = (bh - scaled_h) / 2.0
-        err = abs(got - gap)
-        worst_gap = max(worst_gap, err)
+        scale = usable / ch
+        got_gap = (bh - ch * scale) / 2.0
+        xmap = bw - cw * scale
+        label = label_at(font, ch, usable)
+        worst_gap = max(worst_gap, abs(got_gap - gap))
+        worst_xmap = max(worst_xmap, abs(xmap))
+        worst_label = max(worst_label, abs(label - target))
         print(
             f"{f'{bw:g}x{bh:g}':>12} {gap:5.0f} {font:4.0f} {f'{cw:.1f}x{ch:.1f}':>15} "
-            f"{scaled_h:9.1f} {got:8.2f} {err:6.3f}"
+            f"{got_gap:8.2f} {xmap:7.3f} {label:7.2f}"
         )
-    print(f"\nworst gap error: {worst_gap:.3f}px — the band round-trip is exact arithmetic (<0.01px)")
-    ok = ok and worst_gap < 0.01
+    print(
+        f"\nworst gap error {worst_gap:.3f}px, worst x-map leftover {worst_xmap:.3f}px, "
+        f"worst label error {worst_label:.3f}px — all exact arithmetic (<0.01px)"
+    )
+    ok = ok and worst_gap < 0.01 and worst_xmap < 0.01 and worst_label < 0.01
+
+    # A reflected SECOND pass must still land its --target-label. The reflection is deliberately off
+    # the band's own aspect, which is exactly where a width-first label scale stops agreeing with the
+    # height-first fit: on the docs' 508x371 case measured at 1.4342 it asked for imFontSize 29 and
+    # promised 13.5px labels the height fit renders at 13.93px, and across the miss range it picked a
+    # font up to 4px off. Reflections come from measure_fit.js's `nextPass`.
+    print(f"\n{'band':>12} {'measured':>9} {'reflected':>10} {'F':>4} {'label':>7} {'want':>6} {'err':>6}")
+    worst_refl = 0.0
+    for (bw, bh, gap, target), measured_frac in zip(bands, [-0.0316, 0.05, -0.10]):
+        usable = bh - 2.0 * gap
+        band_aspect = bw / usable
+        measured = band_aspect * (1.0 + measured_frac)
+        reflected = 2.0 * band_aspect - measured
+        font = solve_font(reflected, usable, target)
+        w, h = solve_canvas(reflected, font)
+        _, ch = content_box(w, h, font)
+        label = label_at(font, ch, usable)
+        err = abs(label - target)
+        worst_refl = max(worst_refl, err)
+        print(
+            f"{f'{bw:g}x{bh:g}':>12} {measured:9.4f} {reflected:10.4f} {font:4.0f} "
+            f"{label:7.2f} {target:6.1f} {err:6.3f}"
+        )
+    print(f"\nworst reflected-pass label error: {worst_refl:.3f}px — the second pass keeps --target-label")
+    ok = ok and worst_refl < 0.01
 
     print("PASS" if ok else "FAIL")
     return 0 if ok else 1
@@ -166,7 +217,13 @@ def main() -> int:
         type=float,
         help=f"desired final label px (default {DEFAULT_TARGET_LABEL:g}, or {THUMB_TARGET_LABEL:g} on --thumbnail)",
     )
-    ap.add_argument("--placed-width", type=float, help="width the export is placed at (default: band width)")
+    ap.add_argument(
+        "--placed-width",
+        type=float,
+        help="width the height-fitted group is placed at (default: band width). Sets the aspect to "
+        "solve for and the width the x-map has to reach — NOT the label scale, which follows the "
+        "height fit.",
+    )
     ap.add_argument("--slug", help="grapher slug, to emit a ready curl")
     ap.add_argument("--params", default="", help="extra grapher query params, e.g. 'country=USA~CHN'")
     ap.add_argument(
@@ -243,30 +300,40 @@ def main() -> int:
     if usable_h <= 0:
         ap.error(f"--gap {args.gap:g} leaves no height in a {bh:g}px band (2*gap >= band height)")
 
-    aspect = args.content_aspect if args.content_aspect else bw / usable_h
-    font = solve_font(aspect, placed_w, target_label)
+    aspect = args.content_aspect if args.content_aspect is not None else placed_w / usable_h
+    font = solve_font(aspect, usable_h, target_label)
     w, h = solve_canvas(aspect, font)
     cw, ch = content_box(w, h, font)
-    label = label_at(font, cw, placed_w)
+    label = label_at(font, ch, usable_h)
     im_w = int(round(w / h * 1000))
 
-    scale = placed_w / cw
-    gap_each_end = (bh - ch * scale) / 2.0
+    # Height-first, exactly as Step 7 fits: `chart.rescale(TARGET_H / chart.height)`. The gap is then
+    # --gap at each end by construction, so it is no longer the diagnostic — the leftover width the
+    # x-map has to close is, and it IS the aspect miss expressed in px (measure_fit.js reports the
+    # same quantity as `xMapShortfall`).
+    scale = usable_h / ch
+    fitted_w = cw * scale
+    shortfall = placed_w - fitted_w
+    if abs(shortfall) < 0.05:
+        shortfall = 0.0  # so an exact band solve prints 0.0 rather than float noise's -0.0
 
-    src = "explicit target aspect" if args.content_aspect else "band minus gaps"
+    src = "explicit target aspect" if args.content_aspect is not None else "band minus gaps"
     print(f"band            {bw:g} x {bh:g}   (aspect {bw / bh:.4f})")
     print(f"usable          {bw:g} x {usable_h:g}   (aspect {bw / usable_h:.4f}, {args.gap:g}px gap per end)")
     print(f"solving for     {aspect:.4f}  [{src}]")
-    print(f"placed at       {placed_w:g}px wide")
+    print(f"fitting to      {placed_w:g}px wide, height-first")
     print()
     print(f"imFontSize      {font:.0f}")
     print(f"imWidth/Height  {im_w}/1000        (aspect ratio only — the server renormalizes)")
     print(f"declared        {w:.0f} x {h:.0f}   ({w * h:,.0f} px^2)")
     print(f"content         {cw:.1f} x {ch:.1f}   (aspect {cw / ch:.4f})")
-    print(f"scale into band {scale:.4f}")
-    print(f"predicted gap   {gap_each_end:.1f}px per end", end="")
-    if gap_each_end < 0:
-        print("   *** the chart overflows the band — raise --gap or re-check --content-aspect")
+    print(f"scale into band {scale:.4f}   (height-first: usable height / content height)")
+    print(f"gap per end     {args.gap:g}px   (exact — the height fit sets it by construction)")
+    print(f"x-map closes    {shortfall:.1f}px of the {placed_w:g}px width", end="")
+    if args.content_aspect is not None:
+        print("   (a reflected second pass over-corrects on purpose, so expect this to be non-zero)")
+    elif abs(shortfall) > 1.0:
+        print("   *** should be ~0 on a band solve — re-check --band and --gap")
     else:
         print()
     print(f"final labels    {label:.1f}px", end="")
@@ -286,6 +353,7 @@ def main() -> int:
         print("  head -c 300 embed.svg")
         print("  grep -oE 'font-size=\"[0-9.]+\"' embed.svg | sort | uniq -c | sort -rn | head -3")
     print(
+        "\nFit the height, then x-map the width — never a second rescale (reference/FITTING.md)."
         "\nHide connectors and year markers BEFORE measuring the group — they extend past the plot,"
         "\nso hiding them narrows it and makes it relatively taller. Then measure with"
         "\nscripts/measure_fit.js and run the `nextPass` command it prints: it reflects the measured"
