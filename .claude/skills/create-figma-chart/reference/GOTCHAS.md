@@ -60,6 +60,63 @@
 - **A bespoke component mounted outside a Shadow DOM renders unstyled, silently.** Each bundle injects its own CSS scoped to `:host`, so those rules never match in a plain element — and because the serializer reads `getComputedStyle`, you get a structurally plausible SVG with the wrong paint, weights and geometry. BESPOKE-SVG.md has the correct mount.
 - **New year, new file** — ask for the link and re-verify every node id in the map above before the first run of a new year.
 
+- **Once the chart is fitted it is a frame child, so measuring the content box from "all children" includes it.** The chart lands 508.05px wide against a 508px content box, so a content-box measurement taken after the fit reports 508.05 — it drifts the very number the chart was fitted to, and each re-fit compounds it. Exclude the chart group (and the logo) when reading `contentX`/`contentW`; `scripts/measure_fit.js` does.
+- **An inset computed against an already-rescaled group is garbage that looks plausible.** `declared − ink` is only the inset while the import is at its natural size. Run it after the fit and you subtract a rescaled width from the probe's declared one: measured 282.95 / 264.28 against a true 64.08 / 29.04, which would send the next export badly wrong. A real inset is a small fraction of the canvas — `measure_fit.js` bounds it at 25% and reports `unusable` rather than a number.
+- **Never place a curvy arrow by any bounding box — neither the group's nor the head's.** These arrows
+  are a long curved tail plus a small arrowhead, so the group's box is mostly tail and the head's box
+  has the tip in one corner. Aiming the group's box left the heads **13–21px off their dots**; aiming
+  the head's box centre put one tip *inside* its dot and another 5.3px off-axis. **The full recipe is
+  in [LABELING.md](LABELING.md) → Placing an arrow**; it works from the head's real vertices, picks
+  the arrow whose span fits, and checks both ends.
+- **Resizing a template clone displaces EVERY child it already holds, each by its own constraint —
+  and nothing in the response says so.** Two distinct failures from one `clone.resize()`:
+  - **The chart got squashed non-uniformly**, 122.7px to **94.26px** with its width untouched, through
+    the group's top-and-bottom constraint. A **GROUP has no `constraints` property** (`node.constraints:
+    no such property on GROUP`), so it cannot be pinned — it must be placed *after* the resize.
+  - **The header moved, and the frame clipped it.** The 302-wide headers are constrained
+    `vertical: CENTER` on the pull template and `SCALE` on the guided one — neither is `MIN` — so
+    shrinking the frame 233 → 184 put the pull header at **y = −15**, with its title sliced off by
+    `clipsContent`. Ordering cannot help here: the header is in the template before you touch it.
+
+  So: resize first, then **re-pin every child** to its designed position (the 302-wide header belongs
+  at `y = 10`, bottom flush with the 44px band top), and assert nothing has a negative `y` — a
+  clipping frame hides the evidence.
+- **`curl -F "file=@..."` fails with exit 26 on a path containing spaces or non-ASCII** — and since
+  the upload filename becomes the Figma layer name, the temptation is to name the file exactly what
+  you want the layer called. Don't: use a plain ASCII filename and rename the node in Figma.
+- **Route parallel uploads by declared size, never by response order.** Two POSTs fired concurrently
+  come back in arbitrary order, so pairing the *n*th response with the *n*th target silently swaps
+  them. Match each import to its target by dimensions and assert no two route to the same
+  destination — the sizes differ per template, so it is exact.
+- **`resize()` resets a text node's sizing to FIXED, so `textAutoResize` must come AFTER it — and
+  getting that backwards makes the node lie about its height while rendering perfectly.** Setting
+  `textAutoResize = "HEIGHT"` and *then* `resize(w, 10)` left four annotations with **10px-tall boxes
+  around 38–76px of ink**. Figma text overflows rather than clipping, so the render was correct and
+  nothing errored — but every gap, centring and overlap test computed against those boxes was
+  meaningless and each one silently "passed". The tell is a text node whose `height` is far smaller
+  than its line count justifies. Order it `resize()` → `textAutoResize`, and read the height back on
+  the *next* call before positioning anything against it.
+- **Figma's `rotation` is counter-clockwise, while screen angles from `atan2(dy, dx)` are y-down.** So
+  for a node you are rotating to a computed heading, `achieved = natural − rotation`, and the value to
+  set is `natural − required`. Getting the sign wrong put an arrow at 29° when 173° was wanted, with
+  no error and a plausible-looking number in the response. Always set, re-measure, and correct by
+  `(achieved − required)` — one iteration converges exactly.
+- **A chart's node id does not survive a re-import — resolve it by NAME.** Every corrected export
+  replaces the group, so an id captured earlier goes stale and `getNodeByIdAsync` returns `null`; the
+  next `.findAll` throws `cannot read property 'findAll' of null`. On a run with two refitted frames
+  out of five, three ids were still good and two were dead, which is the worst version of this. Use
+  `clone.children.find((c) => c.name === "chart")`.
+- **A PAGE does not resolve through `getNodeByIdAsync` — use `figma.root.children`.** It returns
+  `null`, and passing that to `setCurrentPageAsync` throws `cannot read property 'id' of null` rather
+  than anything mentioning pages. Find pages with
+  `figma.root.children.find((p) => p.id === "…")`, and search by name when an id may be stale — a page
+  someone has deleted looks identical to a page id you got wrong.
+- **One `setCurrentPageAsync` per call, including in read-only loops.** Iterating two pages to compare
+  them throws on the second switch. Split it into one call per page — and since these are reads, emit
+  them in the same message so they run concurrently.
+- **`x`/`y` on a frame child are PARENT-relative, while `absoluteBoundingBox` is not.** After `clone.appendChild(chart)`, setting `chart.x = clone.x + contentX` sends the chart off-canvas by exactly the frame's own page offset — 1590px on a real run, which reads as the import having vanished. Read absolute geometry from `absoluteBoundingBox`, but *write* `x`/`y` in the parent's coordinates: `chart.x = contentX`. The tell is a reported right edge far outside the content box.
+- **Removing a footer row leaves the footer stranded, because every footer but one is constrained `MIN`.** MIN keeps the *top* edge, so deleting the `Note:` row from a Static Horizontal clone collapsed the footer 63 → 31 but left `y` at 559: its bottom rose from 622 to 590 and the frame gained 48px of dead space against its own 16px margin. Nothing errors and the band bottom does not move, so it survives a band measurement. Re-pin with `footer.y = frame.height − bottomMargin − footer.height`, and do it **before** measuring the band.
+
 **Four mechanics below were each found on one chart type and bite on all of them.** They are here,
 not in the type file, for that reason — the worked examples stay in `reference/per-chart-type/`.
 
@@ -67,6 +124,24 @@ not in the type file, for that reason — the worked examples stay in `reference
   a 1px annotation stroke becomes 4px — so **set every stroke after the final scale, never before**.
   Found on maps (`reference/per-chart-type/maps.md`, where the whole treatment is hairlines), but it
   applies to any chart whose group is scaled into a band, which is all of them in Step 7.
+  - **It also thins the data line, which is the case you will actually ship.** Fitting a square DI
+    chart scaled by 0.657 left `line__Chile` at **1.32px** and its white halo at 1.98. Nothing looks
+    broken — it reads as a weaker chart than grapher's own, and a designer spots it before you do.
+    `scripts/measure_fit.js` detects it when given `CONFIG.originalGroupId`, comparing the fitted
+    strokes against the untouched reference import of the same format.
+  - **It goes the other way too, on any template whose band is WIDER than the export.** Static
+    Vertical fits at **1.30x**, an upscale, so the same multiplier *thickens*: its line arrived at 2.61
+    and its halo at 3.91 and both had to come **down** to 2/3. So the rule is not "restore what the
+    rescale thinned" but "set every stroke after the scale, whichever way the scale went".
+  - **The reference tells you the rescale changed it. It does not tell you the target.** `imType=square`
+    ships 4/5 and `uncaptioned` ships 2/3 — and the house weight is **3 with a 4px halo**, i.e. neither
+    of them. Use the comparison to *notice*, then set the house value, keeping the halo one px above
+    the line.
+  - **3/4 holds across the static and IG templates regardless of frame width.** I set the 850-wide
+    Static Vertical to 2/3 on a rule I invented — "a wider plot wants a relatively thinner line" — and
+    on a 1095-tall frame it read thin. Don't derive a weight from the frame size; 3/4 is the value.
+  - This entry existed before the run that hit it. Documenting a multiplier is not enough; the check is
+    what catches it — and a check that asserts the wrong target is its own bug.
 - **Text widths only settle on the next `use_figma` call.** Same class as the `leadingTrim` rule in
   the Round-trip budget: bolding a label, changing its font, or editing its characters does not
   update `width` within the call that does it. Any placement search that runs in the same call is

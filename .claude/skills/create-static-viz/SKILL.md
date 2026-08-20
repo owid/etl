@@ -11,6 +11,10 @@ Joins the three halves of a static-viz refresh that are otherwise separate: gett
 ETL at a current vintage, drawing it in an `export://static_viz` step whose SVG a designer can
 actually pick up, and getting that SVG into the Charts file.
 
+**Model check:** the session context names the running model. On **Fable**, recommend re-running on
+**Opus** (or **Sonnet** for a mechanical re-render) before starting, and continue only on the user's
+say-so — same rule as `/create-figma-chart`.
+
 > **Paired skill — an update here may oblige an update there, and the reverse.**
 > [`/create-figma-chart`](../create-figma-chart/SKILL.md) owns everything that happens inside Figma,
 > and this skill hands off to it at Step 7. The two share a contract that lives half in each file, so
