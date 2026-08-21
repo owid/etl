@@ -269,6 +269,33 @@ const check = (name, ok, detail) => results.push({ name, ok: !!ok, detail: ok ? 
     check("13 while an absent bindAxis defaults to the height", noneGiven.fit.bindAxis === "height" && noneGiven.result.edgesExact, JSON.stringify(noneGiven.fit));
   }
 
+  // 16 — an edit that never got APPLIED reaches the verdict too. A re-import is exactly when a
+  //      configured name stops matching, and these were recorded in `plan` only: a run whose geometry
+  //      landed could return "wrote every edit" with a hide, a trim or the legend simply missing.
+  {
+    const miss = await run(build({ connectors: true }), { hide: [/^connectors$/, "does-not-exist"] });
+    check("16 a hide target that matched nothing makes the verdict INCOMPLETE",
+          /^INCOMPLETE/.test(miss.verdict) && /were NOT applied/.test(miss.verdict) && /does-not-exist/.test(miss.verdict), miss.verdict);
+
+    const refused = await run(build({ subpathNode: true }), { trimSubpaths: [{ node: "United-States", keepRightOf: 1000 }] });
+    check("16 a refused subpath cut does too", /^INCOMPLETE/.test(refused.verdict) && /REFUSED/.test(refused.verdict), refused.verdict);
+
+    const noTarget = await run(build(), { trimToExtentOf: [{ node: "vertical-zero-line", matchExtentOf: "bars", axis: "y" }] });
+    check("16 and a trim target that is not on the frame", /^INCOMPLETE/.test(noTarget.verdict) && /not found/.test(noTarget.verdict), noTarget.verdict);
+
+    const noLegend = await run(build({ mapBody: true }), { legend: { name: /color-legend$/, plot: "map", gapToPlot: 16, centreOnContent: true } });
+    check("16 an unresolvable legend is reported as incomplete, not as a note",
+          /^INCOMPLETE/.test(noLegend.verdict) && /legend/.test(noLegend.verdict), noLegend.verdict);
+
+    const ok = await run(build({ connectors: true, subpathNode: true }), { hide: [/^connectors$/], trimSubpaths: [{ node: "United-States", keepRightOf: 130 }] });
+    check("16 while a run whose edits all applied still reads as a clean success",
+          !/^INCOMPLETE/.test(ok.verdict) && ok.result.problems.length === 0, `${ok.verdict} | ${JSON.stringify(ok.result.problems)}`);
+    // an already-trimmed node is a benign note, not an unapplied edit
+    const already = await run(build({ subpathNode: true }), { trimSubpaths: [{ node: "United-States", keepRightOf: 0 }] });
+    check("16 and 'already trimmed' is not counted as an unapplied edit",
+          !/were NOT applied/.test(already.verdict), `${already.verdict} | ${JSON.stringify(already.plan)}`);
+  }
+
   // 14 — the series identity is on an ANCESTOR on a slope export, so the configured house weights have
   //      to reach a stroked node called plain `line`. Read off the leaf name alone they never did, and
   //      the script reported a completed replay over grapher's own 1.1/1.7px.

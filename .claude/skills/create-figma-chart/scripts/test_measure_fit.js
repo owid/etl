@@ -297,6 +297,59 @@ const check = (name, cond, detail) => {
       JSON.stringify(out.group.strokes),
     );
     check("5 stroke verdict in notes", out.notes.some((n) => n.includes("OFF THE HOUSE")), "");
+
+    // 5b — a SLOPE export puts `slope__<Entity>`/`outline__<Entity>` on GROUPS and calls the stroked
+    // vector plain `line`. Matched on the node's own name that inventory is EMPTY, and `[].every()` is
+    // true — so this reported "ok — strokes sit at the house 3/4" without inspecting a single stroke.
+    const slopeGroup = (id, w) => {
+      const seg = (weight) => mkNode({ type: "VECTOR", name: "line", x: 710, y: 120, width: 700, height: 0.001, strokeWeight: weight });
+      const g = mkGroup(id);
+      g.children = g.children.filter((c) => c.name !== "line__chile");
+      const wrap = (nm, weight) => {
+        const n = mkNode({ name: nm, x: 710, y: 120, width: 700, height: 10, children: [
+          mkNode({ type: "VECTOR", name: "start-point", x: 710, y: 120, width: 6, height: 6 }), seg(weight)] });
+        n.children.forEach((c) => { c.parent = n; });
+        return n;
+      };
+      g.children.push(wrap("slope__chile", w), wrap("outline__chile", w + 0.4));
+      g.children.forEach((c) => { c.parent = g; });
+      return g;
+    };
+    const slopeFrame = mkFrame().frame;
+    const fitted = slopeGroup("G:5b", 1.1);
+    slopeFrame.children.push(fitted);
+    fitted.parent = slopeFrame;
+    const slopeOut = await run(
+      { frameId: "F:1", groupId: "G:5b", hideNames: [/^connectors$/, /^datapoints__/], hideIds: [],
+        declared: null, imFontSize: null, originalGroupId: "G:5borig" },
+      { frame: slopeFrame, extraNodes: [slopeGroup("G:5borig", 1.4)] },
+    );
+    check("5b a slope's ancestor-named series is inventoried at all",
+          slopeOut.group.strokes && slopeOut.group.strokes.rows.length === 2 &&
+          slopeOut.group.strokes.rows.every((x) => /^(slope|outline)__chile$/.test(x.name)),
+          JSON.stringify(slopeOut.group.strokes));
+    check("5b and its off-house weights are reported, not passed vacuously",
+          /OFF THE HOUSE 3\/4/.test(slopeOut.group.strokes.verdict) &&
+          /slope__chile 1\.1 -> 3/.test(slopeOut.group.strokes.verdict) &&
+          /outline__chile 1\.5 -> 4/.test(slopeOut.group.strokes.verdict),
+          slopeOut.group.strokes.verdict);
+
+    // 5c — and an inventory that comes back empty says so, instead of `[].every()` reading as a pass.
+    const bareFrame = mkFrame().frame;
+    const bare = mkGroup("G:5c");
+    bare.children = bare.children.filter((c) => c.name !== "line__chile");
+    bareFrame.children.push(bare);
+    bare.parent = bareFrame;
+    const bareOrig = mkGroup("G:5corig");
+    bareOrig.children = bareOrig.children.filter((c) => c.name !== "line__chile");
+    const bareOut = await run(
+      { frameId: "F:1", groupId: "G:5c", hideNames: [/^connectors$/, /^datapoints__/], hideIds: [],
+        declared: null, imFontSize: null, originalGroupId: "G:5corig" },
+      { frame: bareFrame, extraNodes: [bareOrig] },
+    );
+    check("5c an empty stroke inventory is NOT CHECKED, not ok",
+          /^NOT CHECKED/.test(bareOut.group.strokes.verdict) && !/^ok/.test(bareOut.group.strokes.verdict),
+          bareOut.group.strokes.verdict);
   }
 
   // Case 6: bad hideIds reported as unmatched (round 2 guard preserved).

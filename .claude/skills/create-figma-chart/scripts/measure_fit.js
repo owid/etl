@@ -391,13 +391,24 @@ if (groupNode) {
     if (!orig) {
       group.strokes = { error: `originalGroupId ${CONFIG.originalGroupId} not found` };
     } else {
-      const widths = (node) => {
+      // The series identity can sit on an ANCESTOR rather than on the stroked node. On a slope export
+      // `slope__<Entity>` and `outline__<Entity>` are GROUPS of {start-point, end-point, line} and the
+      // only stroked node is called plain `line` — so matching the node's own name found nothing, BOTH
+      // inventories came back empty, and `[].every(...)` is true: the verdict read "strokes sit at the
+      // house 3/4" without a single stroke inspected. The old pattern did not even list `slope__`.
+      // So carry the nearest naming ancestor down the walk, the way verify_page.js and
+      // replay_chart_edits.js do. Where one series group holds several stroked children, the THICKEST
+      // is the series stroke — the others are its end-point marks.
+      const SERIES_ANY = /^(line|slope|outline)__(.+)$/;
+      const widths = (root) => {
         const m = {};
-        for (const n of node.findAll(() => true)) {
-          if (/^(line|outline)__/.test(n.name) && "strokeWeight" in n && typeof n.strokeWeight === "number") {
-            m[n.name] = r(n.strokeWeight);
+        (function walk(n, named) {
+          if (SERIES_ANY.test(n.name)) named = n.name;
+          if (named && "strokeWeight" in n && typeof n.strokeWeight === "number") {
+            m[named] = Math.max(m[named] === undefined ? 0 : m[named], r(n.strokeWeight));
           }
-        }
+          if ("children" in n) n.children.forEach((c) => walk(c, named));
+        })(root, null);
         return m;
       };
       const o = widths(orig);
@@ -416,7 +427,13 @@ if (groupNode) {
       }));
       group.strokes = {
         rows: strokeRows,
-        verdict: strokeRows.every((x) => x.ok)
+        // An EMPTY inventory is a gap in coverage, not a pass. `[].every()` is true, so this reported
+        // "ok — strokes sit at the house 3/4" on any import whose series names it could not find.
+        verdict: !strokeRows.length
+          ? "NOT CHECKED — no line__/slope__/outline__ series found in the reference import, so nothing " +
+            "was compared. Check what the export actually named its series (a slope's stroked node is " +
+            "called plain `line`, with the identity on its group) rather than reading this as a pass."
+          : strokeRows.every((x) => x.ok)
           ? "ok — strokes sit at the house 3/4"
           : "STROKES ARE OFF THE HOUSE 3/4 — set them after the scale: " +
             strokeRows.filter((x) => !x.ok).map((x) => `${x.name} ${x.fitted} -> ${x.house}`).join(", ") +

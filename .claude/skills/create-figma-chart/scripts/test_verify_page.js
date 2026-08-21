@@ -517,9 +517,16 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const dr = row(restyled, "furniture-dash").detail;
     check("26 a zero line restyled to [4,4] FAILS", row(restyled, "furniture-dash").status === "FAIL", dr);
     check("26 and is named as a should-be-solid node", /should be solid but are dashed/.test(dr) && /vertical-zero-line/.test(dr), dr);
-    // the deliberate decision: a slope's native [3,2] zero line stays [3,2]
-    const slopeZero = await run(buildFrame({ zeroLineOnly: 1, zeroLineDash: [3, 2] }), {});
-    check("26 a native [3,2] zero line passes", row(slopeZero, "furniture-dash").status === "ok", row(slopeZero, "furniture-dash").detail);
+    // the deliberate decision: a slope's native [3,2] zero line stays [3,2]. "A SLOPE chart's native
+    // zero line" is two conditions, and this fixture used to assert only the node — it carried no
+    // slope__* series at all, so it was really asserting that ANY chart may dash its zero line [3,2].
+    const slopeZero = await run(buildFrame({ zeroLineOnly: 1, zeroLineDash: [3, 2], slopeSeries: true }), {});
+    check("26 a SLOPE chart's native [3,2] zero line passes", row(slopeZero, "furniture-dash").status === "ok", row(slopeZero, "furniture-dash").detail);
+    // ...and on any other chart type the same dash is a restyle
+    const barZero32 = await run(buildFrame({ zeroLineOnly: 1, zeroLineDash: [3, 2] }), {});
+    check("26 but the same [3,2] on a chart with no slope series FAILS",
+          row(barZero32, "furniture-dash").status === "FAIL" && /no slope__\* series was found/.test(row(barZero32, "furniture-dash").detail),
+          row(barZero32, "furniture-dash").detail);
 
     // grapher names each gridline after its TICK VALUE, so its zero line arrives as "0%" and matches
     // none of the zero/tick/axis words. Judged against [4,4] it reported a cleared dash on five of

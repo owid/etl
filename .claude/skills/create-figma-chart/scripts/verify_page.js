@@ -501,8 +501,14 @@ const checkFrame = async (frameId) => {
       // as a blanket allowance it also accepted an ordinary tick or axis line dashed [3,2], which
       // CHECKS.md does not permit anywhere. Anything else on furniture meant to be solid is the restyle
       // this row exists to catch.
+      // And it is gated on the CHART TYPE as well as the node, because "a slope chart's native zero
+      // line" is two conditions and identity alone is one of them: a zero line on a line or bar chart
+      // dashed [3,2] is a restyle, and it passed. The slope is detected the way the series-weight row
+      // detects one — a `slope__<Entity>` naming ancestor carried onto a stroked node — never from the
+      // dash, which would be the same circularity again.
       const isZeroLine = (s) => /zero/i.test(s.name) || /zero/i.test(s.furnitureGroup || "") || ZERO_TICK(s.name);
-      const badNative = native.filter((s) => !matches(s.dash, []) && !(isZeroLine(s) && matches(s.dash, [3, 2])));
+      const isSlopeChart = stroked.some((s) => s.seriesKind === "slope");
+      const badNative = native.filter((s) => !matches(s.dash, []) && !(isSlopeChart && isZeroLine(s) && matches(s.dash, [3, 2])));
       const badTotal = badDash.length + badNative.length;
       add("furniture-dash", badTotal ? "FAIL" : "ok",
           badTotal
@@ -514,7 +520,9 @@ const checkFrame = async (frameId) => {
                badNative.length
                  ? `${badNative.length} zero-line/tick/axis node(s) should be solid but are dashed: ` +
                    badNative.map((s) => `${s.name} ${JSON.stringify(s.dash.map(r))}`).join(", ") +
-                   `. CHECKS.md keeps these at an EMPTY pattern; the [3,2] exception is a slope chart's native ZERO line only, so a tick or axis line carrying it is a restyle too`
+                   `. CHECKS.md keeps these at an EMPTY pattern; the [3,2] exception is a SLOPE chart's native ZERO line only` +
+                   (isSlopeChart ? ` (a slope IS detected here, so a zero line at [3,2] would be exempt — a tick or axis line still is not)`
+                                 : ` and no slope__* series was found on this frame, so nothing here is exempt`)
                  : ""].filter(Boolean).join(". ")
             : `all ${grids.length} gridline(s) at [${FURNITURE_DASH}]; all ${native.length} zero-line/tick/axis node(s) solid or at the slope's native [3,2] (` +
               (native.length ? [...new Set(native.map((s) => (s.dash.length ? JSON.stringify(s.dash.map(r)) : "solid")))].join(", ") : "none") + ")",

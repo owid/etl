@@ -32,7 +32,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > its text — and it separates the one API limitation that is *not* a defect (a bolded `Data source:`
 > prefix cannot be both bold and style-bound through the plugin API, so it reports as `halfBound`; see
 > [TEXTS.md](TEXTS.md)) from real drift. Its harness is
-> [`scripts/test_diff_against_template.js`](../scripts/test_diff_against_template.js) (**46**
+> [`scripts/test_diff_against_template.js`](../scripts/test_diff_against_template.js) (**49**
 > assertions), which found four defects in the script that review had not: a header that lost a row
 > reported as matching, five fingerprinted footer properties never actually compared, and a
 > `TypeError` that killed the whole diff when a row changed type. A fifth, from review: the text
@@ -41,7 +41,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 >
 > Validated by planting defects and confirming each row **fails**, twice over: 11 planted in Figma and
 > 11 caught, then a stubbed-figma harness ([`scripts/test_verify_page.js`](../scripts/test_verify_page.js),
-> `node` it after any edit) covering **127** assertions including the rows that are awkward to plant on a
+> `node` it after any edit) covering **128** assertions including the rows that are awkward to plant on a
 > real page. **A check that cannot fail is worse than no check**, so when you extend this script,
 > extend both passes with it.
 >

@@ -146,6 +146,14 @@ const cmpText = (label, got, want, push) => {
   if (got.lsV !== want.lsV) push(`${label} layoutSizingVertical ${got.lsV} != ${want.lsV}`);
   if (vals(got.segFonts).join("+") !== vals(want.segFonts).join("+")) push(`${label} weights ${vals(got.segFonts).join("+")} != ${vals(want.segFonts).join("+")}`);
   if (vals(got.segFamilies || []).join("+") !== vals(want.segFamilies || []).join("+")) push(`${label} font family ${vals(got.segFamilies || []).join("+")} != ${vals(want.segFamilies || []).join("+")}`);
+  // Where the runs START is drift too, and the value sequence alone cannot see it: `Bold` over 0-12 and
+  // `Bold` over 0-14 both reduce to "Bold+Regular", so a bold range that MOVED — the prefix gaining or
+  // losing a bolded character — read as matching. Compare the starts, not the whole {v,start,end}: the
+  // last run's `end` is the character count, and text CONTENT is excluded by design, so every clone
+  // rewrites the source line and comparing that end would report drift on every frame — a row that
+  // always fails carries no information. The starts are independent of the total length.
+  const starts = (list) => (list || []).map((s) => s.start).join(",");
+  if (starts(got.segFonts) !== starts(want.segFonts)) push(`${label} font run boundaries ${starts(got.segFonts)} != ${starts(want.segFonts)} — same run values, but a run starts elsewhere (a moved bold range)`);
   // width is only law where the template FIXES it; a FILL row's width follows its parent
   if (want.lsH === "FIXED" && got.w !== want.w) push(`${label} width ${got.w} != ${want.w}`);
   // Style bindings are compared PER SEGMENT, never by the node-level value alone. `textStyleId` is

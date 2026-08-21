@@ -128,7 +128,11 @@ not in the type file, for that reason — the worked examples stay in `reference
     chart scaled by 0.657 left `line__Chile` at **1.32px** and its white halo at 1.98. Nothing looks
     broken — it reads as a weaker chart than grapher's own, and a designer spots it before you do.
     `scripts/measure_fit.js` detects it when given `CONFIG.originalGroupId`, comparing the fitted
-    strokes against the untouched reference import of the same format.
+    strokes against the untouched reference import of the same format. **It reads the series identity
+    from the naming ANCESTOR** — on a slope export `slope__<Entity>` and `outline__<Entity>` are groups
+    and the stroked vector is called plain `line`, so matching the node's own name inventoried *nothing*
+    and `[].every()` reported "strokes sit at the house 3/4" without inspecting one. An empty inventory
+    now reports `NOT CHECKED`, because an empty comparison is a gap in coverage and not a pass.
   - **It goes the other way too, on any template whose band is WIDER than the export.** Static
     Vertical fits at **1.30x**, an upscale, so the same multiplier *thickens*: its line arrived at 2.61
     and its halo at 3.91 and both had to come **down** to 2/3. So the rule is not "restore what the

@@ -276,8 +276,17 @@ const edgesExact = Math.abs(b.x - fb.x - CONFIG.contentL) < 0.005 && Math.abs(b.
 // refused squeeze leaves the chart overflowing the content box and `edgesExact` false, and the verdict
 // still said "wrote every edit" whenever no text happened to rewrap — a prominent success line over a
 // broken layout, which the caller has to go digging in `fit.widthNote` to disbelieve.
+// And an edit that never got APPLIED is the other half. The whole point of this script is to restore
+// the chart-local edits a re-import destroys, and a re-import is exactly when a configured name stops
+// matching — so "hide: NO MATCH", a trim target that is not there, a refused subpath cut and an
+// unresolvable legend are the expected failures, not exotic ones. They were recorded in `plan` only, so
+// a run whose geometry happened to land could still return "wrote every edit" with an edit missing.
 const problems = [];
 if (!CONFIG.dryRun) {
+  const unapplied = plan.filter((p) => /NO MATCH|REFUSED|not found|carries no vectorPaths/.test(p.detail));
+  if (unapplied.length) problems.push(`${unapplied.length} configured edit(s) were NOT applied: ` +
+    unapplied.map((p) => `${p.step} "${p.what}" — ${p.detail}`).join("; "));
+  if (legendNote && /not found/.test(legendNote)) problems.push(`the legend was configured but could not be resolved (${legendNote})`);
   if (rewrapped) problems.push(`${rewrapped} text node(s) changed height — a label rewrapped`);
   if (/^REFUSED/.test(widthNote)) problems.push(`the width fit was refused (${widthNote})`);
   if (/^OVERFLOWS/.test(heightNote)) problems.push(heightNote.replace(/^OVERFLOWS/, "the chart overflows"));

@@ -191,6 +191,19 @@ const has = (res, re) => drift(res).some((d) => re.test(d));
     check("6 and the identical style runs are NOT reported as a weight change", !has(fam, /footer\[0\] weights/), JSON.stringify(drift(fam)));
     const sameFam = await run(buildFrame({ name: "tpl" }), buildFrame({ name: "clone" }));
     check("6 while a clone in the template's own family reports no family drift", !has(sameFam, /font family/), JSON.stringify(drift(sameFam)));
+
+    // A MOVED bold range leaves the value sequence identical — "Bold+Regular" either way — so only the
+    // run boundaries can see it.
+    const moved = await run(buildFrame({ name: "tpl", footerRows: [tplSource()] }),
+                            buildFrame({ name: "clone", footerRows: [txt("source", { size: 13, fontSegs: [["Bold", 0, 14], ["Regular", 14, 40]] })] }));
+    check("6 a bold range that MOVED is DRIFT", has(moved, /footer\[0\] font run boundaries 0,14 != 0,12/), JSON.stringify(drift(moved)));
+    check("6 and the identical run values are not what caught it", !has(moved, /footer\[0\] weights/), JSON.stringify(drift(moved)));
+    // ...but a longer source line is CONTENT, which is excluded by design: the last run's end is the
+    // character count, so comparing it would report drift on every clone.
+    const longer = await run(buildFrame({ name: "tpl", footerRows: [tplSource()] }),
+                             buildFrame({ name: "clone", footerRows: [txt("source", { size: 13, fontSegs: [["Bold", 0, 12], ["Regular", 12, 96]] })] }));
+    check("6 while a longer source line with the same boundaries is NOT drift",
+          !has(longer, /font run boundaries/) && drift(longer).length === 0, JSON.stringify(drift(longer)));
   }
 
   // 7 — a DETACHED text style is the defect (assigning `characters` drops the binding); it must not be
