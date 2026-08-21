@@ -51,8 +51,11 @@ def test_wide_table_keeps_columns_a_single_view_cannot_distinguish():
             return_value={"poverty": tb.set_index(["country", "year"])},
         ),
     ):
-        wide, column_to_dimensions = build_wide_table_for_collection(collection=None)  # ty: ignore[invalid-argument-type]
+        result = build_wide_table_for_collection(collection=None)  # ty: ignore[invalid-argument-type]
 
+    wide, column_to_dimensions = result.table, result.column_to_dimensions
+    assert not result.is_stacked, "one time axis, so no frequency column"
+    assert result.time_header == "Year"
     assert list(column_to_dimensions) == list(used), "one entry per indicator, in first-seen order"
     assert not wide.columns.duplicated().any(), "duplicate column names would break the CSV and Parquet"
     # Both indicators keep their own values. Rows are sorted by (country, year).
@@ -117,3 +120,88 @@ def test_table_mixing_offsets_and_years_is_refused():
 
     with pytest.raises(MixedTimeGranularityError, match="mixes sub-yearly and yearly"):
         _resolve_time_column(tb)
+
+
+def _annual_and_monthly_tables():
+    """Two tables of the same metric at two resolutions, as electricity_mix stores them."""
+    annual = Table({"country": ["Spain", "Spain"], "year": [2024, 2025], "generation": [280.9, 287.9]})
+    annual["generation"].metadata.display = {"timeInterval": "year"}
+    monthly = Table({"country": ["Spain", "Spain"], "date": ["2026-05-01", "2026-06-01"], "generation": [20.1, 22.2]})
+    monthly["generation"].metadata.display = {"timeInterval": "month"}
+    return annual, monthly
+
+
+def test_mixed_frequencies_stack_with_a_frequency_key():
+    """Test build_wide_table_for_collection - two time axes become rows, not columns.
+
+    An integer year and a calendar date cannot share a time column without stamping the
+    annual figures with a month and a day they do not have. Stacking keeps it to one
+    table and one column per metric, with the resolution carried per row -- which also
+    avoids the 50 duplicate column names electricity_mix would otherwise produce, since
+    the same metric has the same name at both frequencies.
+    """
+    annual, monthly = _annual_and_monthly_tables()
+    used = {
+        "grapher/energy/latest/em/annual#generation": [{"frequency": "annual"}],
+        "grapher/energy/latest/em/monthly#generation": [{"frequency": "monthly"}],
+    }
+    datasets = {
+        "annual": annual.set_index(["country", "year"]),
+        "monthly": monthly.set_index(["country", "date"]),
+    }
+
+    with (
+        patch("etl.collection.download_package._used_indicators", return_value=used),
+        patch("etl.collection.download_package.CatalogDataset", return_value=datasets),
+    ):
+        result = build_wide_table_for_collection(collection=None)  # ty: ignore[invalid-argument-type]
+
+    assert result.is_stacked
+    assert result.time_header == "Time"
+    assert result.key_columns == ["country", "frequency", "time"]
+    # Labels are written at the resolution the data has -- no padded-out days.
+    assert sorted(result.table["time"]) == ["2024", "2025", "2026-05", "2026-06"]
+    assert sorted(set(result.table["frequency"])) == ["annual", "monthly"]
+    assert result.column_to_frequency == {
+        "grapher/energy/latest/em/annual#generation": "annual",
+        "grapher/energy/latest/em/monthly#generation": "monthly",
+    }
+    # Every row belongs to exactly one frequency, so the metric columns never overlap.
+    paths = list(used)
+    both = result.table[paths[0]].notna() & result.table[paths[1]].notna()
+    assert not both.any()
+
+
+def test_same_metric_at_two_frequencies_merges_into_one_column():
+    """Test _merge_columns_by_name - one column, rows distinguished by frequency.
+
+    Merging is only safe because the rows are disjoint; the helper asserts that rather
+    than trusting it, since quietly keeping one of two overlapping values is exactly the
+    failure this module has produced before.
+    """
+    from etl.collection.download_package import _merge_columns_by_name
+
+    annual, monthly = _annual_and_monthly_tables()
+    used = {
+        "grapher/energy/latest/em/annual#generation": [{"frequency": "annual"}],
+        "grapher/energy/latest/em/monthly#generation": [{"frequency": "monthly"}],
+    }
+    datasets = {
+        "annual": annual.set_index(["country", "year"]),
+        "monthly": monthly.set_index(["country", "date"]),
+    }
+    with (
+        patch("etl.collection.download_package._used_indicators", return_value=used),
+        patch("etl.collection.download_package.CatalogDataset", return_value=datasets),
+    ):
+        result = build_wide_table_for_collection(collection=None)  # ty: ignore[invalid-argument-type]
+
+    col = type("C", (), {"meta": {"name": "Electricity generation - TWh"}})()
+    indicators = [(path, "Electricity generation - TWh", i, col) for i, path in enumerate(used)]
+    merged = _merge_columns_by_name(result.table, indicators, result.column_to_dimensions)
+
+    assert len(merged) == 1, "one metric, one column"
+    assert merged[0].name == "Electricity generation - TWh"
+    assert merged[0].values.notna().sum() == 4, "all four observations survive the merge"
+    # Both views are reported, so a consumer can still see it spans two frequencies.
+    assert merged[0].combinations == [{"frequency": "annual"}, {"frequency": "monthly"}]

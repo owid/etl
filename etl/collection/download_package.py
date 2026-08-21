@@ -109,7 +109,11 @@ class DuplicateColumnNameError(Exception):
     """Raised when two wide-table columns resolve to the same display name."""
 
 
-def _check_column_names_unique(page_slug: str, columns: list[tuple[str, str, int, IndicatorColumn]]) -> None:
+def _check_column_names_unique(
+    page_slug: str,
+    columns: list[tuple[str, str, int, IndicatorColumn]],
+    column_to_frequency: dict[str, str],
+) -> None:
     """Refuse to publish a package whose columns don't have distinct names.
 
     `_long_column_name` is used three times over -- as the CSV header, as the
@@ -136,13 +140,21 @@ def _check_column_names_unique(page_slug: str, columns: list[tuple[str, str, int
     rather than a generated `_1` suffix, which is exactly the unhelpful thing
     DuckDB already does on its own.
     """
-    seen: dict[str, list[str]] = defaultdict(list)
+    # Keyed by (name, frequency): two indicators sharing a name at *different*
+    # frequencies are the same metric at two resolutions, which the stacked shape merges
+    # into one column told apart by its rows. Sharing a name at the *same* frequency is
+    # the real collision -- two series that would occupy one column with no way to tell
+    # which is which.
+    seen: dict[tuple[str, str], list[str]] = defaultdict(list)
     for catalog_path, long_name, _variable_id, _col in columns:
-        seen[long_name].append(catalog_path)
-    collisions = {name: cols for name, cols in seen.items() if len(cols) > 1}
+        seen[(long_name, column_to_frequency.get(catalog_path, ""))].append(catalog_path)
+    collisions = {key: cols for key, cols in seen.items() if len(cols) > 1}
     if not collisions:
         return
-    detail = "; ".join(f"{name!r} <- {sorted(cols)}" for name, cols in sorted(collisions.items()))
+    detail = "; ".join(
+        f"{name!r} at {freq or 'unknown'} frequency <- {sorted(cols)}"
+        for (name, freq), cols in sorted(collisions.items())
+    )
     raise DuplicateColumnNameError(
         f"Download package for {page_slug} has {len(collisions)} duplicate column "
         f"name(s): {detail}. See _check_column_names_unique in "
@@ -211,6 +223,60 @@ def _check_package_size(
     )
 
 
+# Frequency labels and time-label formats, both keyed off `display.timeInterval`.
+# That field exists for exactly this ("Resolution at which the time values should be
+# interpreted and formatted"), so nothing here is inferred from the spacing of the data.
+FREQUENCY_LABELS = {
+    "day": "daily",
+    "week": "weekly",
+    "month": "monthly",
+    "quarter": "quarterly",
+    "year": "annual",
+    "decade": "decadal",
+}
+
+
+def _format_time_labels(values: pd.Series, interval: str) -> pd.Series:
+    """Render a time column as the labels a reader sees in the mixed-frequency shape.
+
+    Each label is written at the resolution the data actually has -- "2026" for a year,
+    "2026-06" for a month, "2026-Q2" for a quarter -- rather than padded out to a full
+    date. A monthly figure printed as "2026-06-01" invites someone to read it as the 1st
+    of June, so quarters and weeks get their own notation instead of a stand-in day.
+    """
+    if interval in ("year", "decade"):
+        return values.astype("int64").astype(str)
+    dates = pd.to_datetime(values)
+    if interval == "month":
+        return dates.dt.strftime("%Y-%m")
+    if interval == "quarter":
+        return dates.dt.year.astype(str) + "-Q" + dates.dt.quarter.astype(str)
+    if interval == "week":
+        # ISO week-numbering year, which is not always the calendar year at the edges.
+        return dates.dt.strftime("%G-W%V")
+    return dates.dt.strftime("%Y-%m-%d")
+
+
+def _table_time_interval(tb: Table, axis: str) -> str:
+    """The interval declared by a table's value columns, as one value.
+
+    Grapher's own fallback: a date-based table with nothing declared is daily, a
+    year-based one is annual (`adapt_table_with_dates_to_grapher`, and the schema's
+    default). A table whose columns disagree has no single answer, and every caller
+    here needs one, so say so rather than pick.
+    """
+    value_cols = [c for c in tb.columns if c not in ("country", "year", "date")]
+    declared = {(getattr(tb[c].metadata, "display", None) or {}).get("timeInterval") for c in value_cols} - {None}
+    if len(declared) > 1:
+        raise ValueError(
+            f"Table declares several display.timeInterval values ({sorted(declared)}); "
+            "it needs splitting before it can be labelled with one frequency."
+        )
+    if declared:
+        return declared.pop()  # ty: ignore[invalid-return-type]
+    return "day" if axis == "date" else "year"
+
+
 def _time_column(tb: Table) -> str:
     candidates = [c for c in TIME_COLUMN_CANDIDATES if c in tb.columns]
     if len(candidates) != 1:
@@ -277,18 +343,46 @@ def _resolve_time_column(tb: Table) -> tuple[Table, str]:
 
 
 def _outer_join_on_key(tables: list[Table]) -> Table:
+    """Outer-join tables that share a time axis. Callers group by axis first: two
+    different axes are stacked as rows, not joined as columns."""
     time_cols = {_time_column(tb) for tb in tables}
-    if len(time_cols) > 1:
-        raise MixedTimeGranularityError(
-            f"Tables use different time columns ({sorted(time_cols)}) -- can't outer-join "
-            "annual and daily data without a resampling decision."
-        )
+    assert len(time_cols) == 1, f"callers must group by axis first, got {sorted(time_cols)}"
     key = ["country", time_cols.pop()]
     wide = None
     for tb in tables:
         wide = tb if wide is None else pr.merge(wide, tb, on=key, how="outer")
     assert wide is not None, "no tables to join"
     return wide.sort_values(key).reset_index(drop=True)
+
+
+@dataclass
+class WideTable:
+    """The joined data plus what the output layer needs to lay its key columns out.
+
+    Two shapes come out of here. A collection whose indicators all share one time axis
+    gets the familiar one: a `country` + `year`/`date` key, and no frequency column. A
+    collection that mixes axes -- an integer-year series and a calendar-date one, which
+    cannot share a column without inventing precision -- gets its frequencies stacked
+    instead: one row per (entity, frequency, time), with `frequency` as an ordinary key
+    column. That keeps it to one file and one column per metric, since the same metric at
+    two frequencies is one column distinguished by a row value rather than two columns
+    that would collide on their name.
+    """
+
+    table: Table
+    time_column: str
+    time_header: str
+    frequency_column: str | None
+    column_to_dimensions: dict[str, list[dict]]
+    column_to_frequency: dict[str, str]
+
+    @property
+    def key_columns(self) -> list[str]:
+        return ["country"] + ([self.frequency_column] if self.frequency_column else []) + [self.time_column]
+
+    @property
+    def is_stacked(self) -> bool:
+        return self.frequency_column is not None
 
 
 def _used_indicators(collection: Collection) -> dict[str, list[dict]]:
@@ -332,13 +426,17 @@ def _split_catalog_path(catalog_path: str) -> tuple[str, str, str]:
     return "/".join(dataset_segments), table_name, column
 
 
-def build_wide_table_for_collection(collection: Collection) -> tuple[Table, dict[str, list[dict]]]:
+def build_wide_table_for_collection(collection: Collection) -> WideTable:
     """Resolves the indicator list and their dimension values from the
     collection's own views, and loads each underlying table fresh from the
-    on-disk catalog (no dependency on any script's in-memory tables). Returns
-    (wide_table, {catalog_path: dimension_combinations}) -- the second both
-    enumerates the columns in first-seen order and carries what metadata.json
-    needs to report each one's dimension structure.
+    on-disk catalog (no dependency on any script's in-memory tables).
+
+    Tables are grouped by time axis before joining. Within an axis they are
+    outer-joined into one wide table, as before. Across axes they are *stacked*:
+    an integer-year series and a calendar-date series cannot share a time column
+    without stamping the annual figures with a month and a day they do not have,
+    so frequency becomes a key column and each row carries its own resolution.
+    See `WideTable` for what that buys.
 
     **The wide table's columns are named by catalog path**, which is the one name
     guaranteed to be unique: it is the key `_used_indicators` returns, so one
@@ -366,13 +464,16 @@ def build_wide_table_for_collection(collection: Collection) -> tuple[Table, dict
         by_table[(dataset_dir, table_name)].append((column, combinations))
 
     dataset_cache: dict[str, CatalogDataset] = {}
-    renamed_tables = []
+    by_axis: dict[str, list[Table]] = defaultdict(list)
+    axis_intervals: dict[str, set[str]] = defaultdict(set)
     column_to_dimensions: dict[str, list[dict]] = {}
+    column_to_frequency: dict[str, str] = {}
     for (dataset_dir, table_name), cols in by_table.items():
         if dataset_dir not in dataset_cache:
             dataset_cache[dataset_dir] = CatalogDataset(DATA_DIR / dataset_dir)
         tb = dataset_cache[dataset_dir][table_name].reset_index()
         tb, time_col = _resolve_time_column(tb)
+        interval = _table_time_interval(tb, time_col)
 
         rename = {}
         keep = ["country", time_col]
@@ -388,10 +489,50 @@ def build_wide_table_for_collection(collection: Collection) -> tuple[Table, dict
             catalog_path = f"{dataset_dir}/{table_name}#{column}"
             rename[column] = catalog_path
             column_to_dimensions[catalog_path] = combinations
+            column_to_frequency[catalog_path] = FREQUENCY_LABELS[interval]
             keep.append(column)
-        renamed_tables.append(tb[keep].rename(columns=rename))
+        by_axis[time_col].append(tb[keep].rename(columns=rename))
+        axis_intervals[time_col].add(interval)
 
-    return _outer_join_on_key(renamed_tables), column_to_dimensions
+    if len(by_axis) == 1:
+        axis, tables = next(iter(by_axis.items()))
+        return WideTable(
+            table=_outer_join_on_key(tables),
+            time_column=axis,
+            time_header="Day" if axis == "date" else "Year",
+            frequency_column=None,
+            column_to_dimensions=column_to_dimensions,
+            column_to_frequency=column_to_frequency,
+        )
+
+    # Mixed axes: join within each, label it, then stack. Each axis needs one label, so
+    # an axis carrying several intervals (daily and monthly on one date column) has no
+    # answer -- it has never happened, and guessing one is worse than saying so.
+    frames = []
+    for axis, tables in by_axis.items():
+        intervals = axis_intervals[axis]
+        if len(intervals) > 1:
+            raise ValueError(
+                f"The {axis!r} axis carries several time intervals ({sorted(intervals)}), so its rows "
+                "cannot be labelled with one frequency. Splitting them needs a decision about how the "
+                "resolutions relate."
+            )
+        interval = intervals.pop()
+        joined = _outer_join_on_key(tables)
+        joined["frequency"] = FREQUENCY_LABELS[interval]
+        joined["time"] = _format_time_labels(joined[axis], interval)
+        frames.append(joined.drop(columns=[axis]))
+
+    stacked = pr.concat(frames, ignore_index=True)
+    key = ["country", "frequency", "time"]
+    return WideTable(
+        table=stacked.sort_values(key).reset_index(drop=True),
+        time_column="time",
+        time_header="Time",
+        frequency_column="frequency",
+        column_to_dimensions=column_to_dimensions,
+        column_to_frequency=column_to_frequency,
+    )
 
 
 def resolve_variable_ids(catalog_paths: list[str]) -> dict[str, int]:
@@ -550,8 +691,7 @@ def _long_column_name(col: IndicatorColumn) -> str:
 
 def _write_parquet(
     keys: pd.DataFrame,
-    wide: Table,
-    columns: list[tuple[str, str, int, IndicatorColumn]],
+    columns: list[OutputColumn],
     path: Path,
 ) -> None:
     """Write the wide table as Parquet, dtypes chosen by `repack_frame`.
@@ -580,7 +720,7 @@ def _write_parquet(
     # One concat rather than N column assignments, for the reason given where the
     # CSV frame is built.
     df = pd.concat(
-        [keys] + [pd.Series(wide[catalog_path].values, name=long_name) for catalog_path, long_name, _, _ in columns],
+        [keys] + [pd.Series(column.values.values, name=column.name) for column in columns],
         axis=1,
     )
     pq.write_table(
@@ -722,6 +862,59 @@ class DownloadPackageResult:
         }
 
 
+@dataclass
+class OutputColumn:
+    """One column as a reader sees it: a name, its values, and the views it belongs to."""
+
+    name: str
+    values: pd.Series
+    variable_id: int
+    col: IndicatorColumn
+    combinations: list[dict]
+
+
+def _merge_columns_by_name(
+    wide: Table,
+    indicators: list[tuple[str, str, int, IndicatorColumn]],
+    column_to_dimensions: dict[str, list[dict]],
+) -> list[OutputColumn]:
+    """Collapse indicators that share a display name into one output column.
+
+    This is what makes the stacked shape work. electricity-mix carries the same 50
+    metrics annually and monthly, and both carry the same name -- "Coal - % electricity"
+    is "Coal - % electricity" whichever resolution it was measured at. As separate
+    columns they would collide; stacked, they are one column whose rows say which
+    frequency they came from.
+
+    Their rows are disjoint by construction (a row belongs to exactly one frequency), so
+    combining them cannot drop a value -- asserted rather than assumed, because silently
+    keeping one of two overlapping values is the failure this whole area has already
+    produced once.
+    """
+    by_name: dict[str, list[tuple[str, int, IndicatorColumn]]] = defaultdict(list)
+    for catalog_path, long_name, variable_id, col in indicators:
+        by_name[long_name].append((catalog_path, variable_id, col))
+
+    merged = []
+    for long_name, entries in by_name.items():
+        (first_path, variable_id, col) = entries[0]
+        values = wide[first_path]
+        combinations = list(column_to_dimensions[first_path])
+        for path, _, _ in entries[1:]:
+            other = wide[path]
+            both = values.notna() & other.notna()
+            assert not both.any(), (
+                f"{long_name!r} has {int(both.sum())} rows where two of its indicators both have a "
+                f"value ({first_path} and {path}); merging them would discard one."
+            )
+            values = values.fillna(other)
+            combinations.extend(column_to_dimensions[path])
+        merged.append(
+            OutputColumn(name=long_name, values=values, variable_id=variable_id, col=col, combinations=combinations)
+        )
+    return merged
+
+
 def build_download_package_for_collection(
     collection: Collection,
     dest_dir: Path,
@@ -751,7 +944,8 @@ def build_download_package_for_collection(
         )
     page_url = f"https://ourworldindata.org/grapher/{page_slug}"
 
-    wide, column_to_dimensions = build_wide_table_for_collection(collection)
+    wide_table = build_wide_table_for_collection(collection)
+    wide, column_to_dimensions = wide_table.table, wide_table.column_to_dimensions
 
     catalog_paths = list(column_to_dimensions)
     variable_ids = resolve_variable_ids(catalog_paths)
@@ -764,13 +958,18 @@ def build_download_package_for_collection(
 
     # One name per column -- the CSV header, the Parquet field name and
     # metadata.json's column key, so none of the three can drift from the
-    # others, and all three need it to be unique. The wide table itself is keyed
-    # by catalog path; this is the name a reader sees.
-    columns: list[tuple[str, str, int, IndicatorColumn]] = []
+    # others. The wide table itself is keyed by catalog path; this is the name a
+    # reader sees.
+    indicators: list[tuple[str, str, int, IndicatorColumn]] = []
     for catalog_path, variable_id in resolved:
         col = IndicatorColumn(metadata_by_id[variable_id])
-        columns.append((catalog_path, _long_column_name(col), variable_id, col))
-    _check_column_names_unique(page_slug, columns)
+        indicators.append((catalog_path, _long_column_name(col), variable_id, col))
+    _check_column_names_unique(page_slug, indicators, wide_table.column_to_frequency)
+
+    # Indicators that share a name are the same metric at different frequencies -- the
+    # stacked shape exists so they can be one column, told apart by the frequency of the
+    # row rather than by a suffix on the name.
+    columns = _merge_columns_by_name(wide, indicators, column_to_dimensions)
 
     dimension_definitions = _dimension_definitions(collection)
 
@@ -781,7 +980,8 @@ def build_download_package_for_collection(
     metadata_columns = {}
     readme_sections = []
     attributions = set()
-    for catalog_path, long_name, variable_id, col in columns:
+    for column in columns:
+        long_name, col, variable_id = column.name, column.col, column.variable_id
         attributions.add(get_attribution(col))
         metadata_columns[long_name] = {
             # MDIM-only. A single-chart download has no dimension structure, so
@@ -789,7 +989,7 @@ def build_download_package_for_collection(
             # -- an intended divergence from that format, not drift. Emitted
             # first so they're the first thing visible under a column key, above
             # the long description fields.
-            **_view_fields(column_to_dimensions[catalog_path], page_url),
+            **_view_fields(column.combinations, page_url),
             **metadata_column_entry(
                 col,
                 variable_id,
@@ -821,28 +1021,29 @@ def build_download_package_for_collection(
     # The CSV, in its final downloadable shape: Entity/Code/Year, long
     # display-name headers, JS-style number formatting.
     #
-    time_col = _time_column(wide)
-    time_header = "Day" if time_col == "date" else "Year"
     entity_codes = _resolve_entity_codes(wide["country"].unique().tolist())
 
-    keys = pd.DataFrame(
-        {
-            "Entity": wide["country"],
-            # .astype(str) first -- "country" is often a categorical column,
-            # and .map() on a Categorical can return a Categorical whose
-            # .fillna("") then fails ("new category") if "" isn't already
-            # one of its categories.
-            "Code": wide["country"].astype(str).map(entity_codes).fillna(""),
-            time_header: wide[time_col],
-        }
-    )
+    key_values = {
+        "Entity": wide["country"],
+        # .astype(str) first -- "country" is often a categorical column,
+        # and .map() on a Categorical can return a Categorical whose
+        # .fillna("") then fails ("new category") if "" isn't already
+        # one of its categories.
+        "Code": wide["country"].astype(str).map(entity_codes).fillna(""),
+    }
+    # Only a collection that actually mixes frequencies gets a Frequency column. Adding
+    # a column with one value everywhere to the other 66 would churn every package to
+    # say nothing, and would cost them their typed Year for a string Time.
+    if wide_table.frequency_column:
+        key_values["Frequency"] = wide[wide_table.frequency_column]
+    key_values[wide_table.time_header] = wide[wide_table.time_column]
+    keys = pd.DataFrame(key_values)
     # Concatenated in one go rather than assigned column by column: each
     # assignment into a DataFrame copies its block layout, so inserting N
     # columns one at a time is quadratic. poverty_pip has 306 of them, which is
     # enough for pandas to start warning about a fragmented frame.
     final = pd.concat(
-        [keys]
-        + [_format_numeric_series(wide[catalog_path]).rename(long_name) for catalog_path, long_name, _, _ in columns],
+        [keys] + [_format_numeric_series(column.values).rename(column.name) for column in columns],
         axis=1,
     )
 
@@ -856,7 +1057,7 @@ def build_download_package_for_collection(
     # numbers are the one thing a typed columnar format should not carry.
     #
     parquet_path = dest_dir / f"{page_slug}.parquet"
-    _write_parquet(keys, wide, columns, parquet_path)
+    _write_parquet(keys, columns, parquet_path)
 
     #
     # Zip it. Entry order and names mirror a single-chart download.
