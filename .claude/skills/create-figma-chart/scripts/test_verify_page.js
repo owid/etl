@@ -74,8 +74,11 @@ function buildFrame(opts = {}) {
   const footer = node({ name: "footer", layoutMode: "VERTICAL", x: 16, y: 488, width: contentW, height: 36, children: [src] });
   const logo = node({ name: "logo", x: W - 80, y: 16, width: 64, height: 35 });
 
+  // `clearedGrid` drops the dash off the gridlines while leaving everything else alone — the shape a
+  // rescale-and-repair pass produces when it resets weights and forgets the pattern.
+  const gridDashed = !opts.clearedGrid;
   const grid = node({ name: "horizontal-grid-lines", x: 16, y: 200, width: contentW, height: 260,
-    children: [gridline("grid-1", 200, true), gridline("grid-2", 300, true), gridline("zero", 460, false)] });
+    children: [gridline("grid-1", 200, gridDashed), gridline("grid-2", 300, gridDashed), gridline("zero", 460, false)] });
   const kids = [
     grid,
     line("line__A", [[40, 440], [200, 300], [440, 260]], lineWeight),
@@ -123,8 +126,10 @@ function buildFrame(opts = {}) {
         node({ type: "VECTOR", name: "end-point", x: 400, y: 350, width: 6, height: 6 }), seg(opts.slopeWeight || 3)] })] }));
   }
   // A discrete bar's only furniture is a top-level zero line, inside no axis or grid container.
+  // `zeroLineDash` stands in for a slope chart's NATIVE [3,2] zero line, which must not be pulled to
+  // the gridline target.
   if (opts.zeroLineOnly) kids.push(node({ type: "VECTOR", name: "vertical-zero-line", x: 40, y: 160, width: 1, height: 300,
-    strokeWeight: opts.zeroLineOnly, strokes: solid("#333333"), dashPattern: [], strokeAlign: "CENTER",
+    strokeWeight: opts.zeroLineOnly, strokes: solid("#333333"), dashPattern: opts.zeroLineDash || [], strokeAlign: "CENTER",
     absoluteTransform: [[1, 0, 40], [0, 1, 160]], vectorNetwork: { vertices: [{ x: 0, y: 0 }, { x: 0, y: 300 }], segments: [{ start: 0, end: 1 }] } }));
   // Fiji: split across the antimeridian, so its BOX spans the plot at ~4px tall while its ink is two
   // small clusters. It must be excluded from the margins row or it breaches on every map.
@@ -428,6 +433,55 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     mapg.children[1].absoluteBoundingBox = { x: 480, y: 340, width: 80, height: 60 };
     const bad4 = await run(f, {});
     check("25 a real overflow still FAILS", row(bad4, "margins").status === "FAIL" && /Brazil/.test(row(bad4, "margins").detail), row(bad4, "margins").detail);
+  }
+
+  // 26 — a gridline whose dash was CLEARED. The target has to be derived from what a node is (its name
+  // or its furniture container) and never from the dash it currently carries: classifying by the current
+  // pattern put a cleared gridline in the "solid, nothing to compare" bucket, so the row returned ok on
+  // precisely the defect it exists to catch.
+  {
+    const out = await run(buildFrame({ clearedGrid: true }), {});
+    const d = row(out, "furniture-dash").detail;
+    check("26 a cleared gridline dash FAILS", row(out, "furniture-dash").status === "FAIL", d);
+    check("26 and names the gridline", /grid-1/.test(d), d);
+    check("26 and calls out the empty pattern", /NO dash at all/.test(d), d);
+    const clean = await run(buildFrame(), {});
+    const dc = row(clean, "furniture-dash").detail;
+    check("26 a solid zero line is NOT dragged to the grid target", row(clean, "furniture-dash").status === "ok", dc);
+    check("26 and is reported as native, not as a pass against [4,4]", /native pattern/.test(dc), dc);
+    // the deliberate decision: a slope's native [3,2] zero line stays [3,2]
+    const slopeZero = await run(buildFrame({ zeroLineOnly: 1, zeroLineDash: [3, 2] }), {});
+    check("26 a native [3,2] zero line passes", row(slopeZero, "furniture-dash").status === "ok", row(slopeZero, "furniture-dash").detail);
+  }
+
+  // 27 — a slope chart's stroked vector is called plain `line` and the series identity sits on its
+  // `slope__<Entity>` group. The polyline filter read the node's own name only, so every slope segment
+  // was absent from `polylines` and annotation-overlap could never fail on a slope.
+  {
+    const out = await run(buildFrame({ slopeSeries: true }), {});
+    const pl = row(out, "polylines");
+    const names = (pl.polylines || []).map((p) => p.name);
+    check("27 slope segments sampled", pl.status === "ok", pl.detail);
+    check("27 slope__USA reached polylines", names.indexOf("slope__USA") !== -1, names.join(","));
+    check("27 its halo outline__USA too", names.indexOf("outline__USA") !== -1, names.join(","));
+    check("27 point markers NOT sampled as series strokes", !names.some((n) => /point/.test(n)), names.join(","));
+    const hit = await run(buildFrame({ slopeSeries: true,
+      annotation: annotation({ x: 200, y: 250, w: 80, h: 18, stroke: null, strokeWeight: 0 }) }), {});
+    const dh = row(hit, "annotation-overlap").detail;
+    check("27 an annotation crossing a slope now FAILS", row(hit, "annotation-overlap").status === "FAIL", dh);
+    check("27 and names the slope it crosses", /slope__USA/.test(dh), dh);
+  }
+
+  // 28 — a map country's BBOX IS NOT ITS INK (maps.md). Inventorying map shapes as filled data marks
+  // reported an annotation over open ocean as covering a mark. Excluded and DECLARED, not silently
+  // dropped — and a non-map filled mark (test 21) must still fail.
+  {
+    const out = await run(buildFrame({ mapCountries: true,
+      annotation: annotation({ x: 50, y: 170, w: 40, h: 16, stroke: null, strokeWeight: 0 }) }), {});
+    const d = row(out, "annotation-overlap").detail;
+    check("28 a map shape is not judged as a covered mark", row(out, "annotation-overlap").status === "ok", d);
+    check("28 no country reported as covered", !/covers country__FRA/.test(d), d);
+    check("28 and the exclusion is DECLARED", /map shape\(s\) NOT judged/.test(d), d);
   }
 
   const bad = results.filter((x) => !x.ok);

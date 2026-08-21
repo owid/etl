@@ -13,8 +13,14 @@
 // USAGE
 //   Fill in CONFIG and paste the whole file as one `use_figma` call.
 //     templateId — the template the clones came from (reference/NODE-MAP.md has the ids).
-//     frameIds   — the finished clones. All must be on ONE page: a script may switch pages only once,
-//                  and this one spends its single switch on the TEMPLATE page, then on the clones'.
+//     frameIds   — the finished clones. All must be on ONE page: a script may switch pages only once
+//                  (GOTCHAS.md), and this one spends its single switch on the CLONES' page.
+//
+// RUN IT WITH THE TEMPLATE'S PAGE OPEN. That is a precondition, not a detail. Both halves need their
+// page current — an unswitched page's contents load lazily and come back short without erroring
+// (GOTCHAS.md) — and the connector allows exactly one `setCurrentPageAsync` per call. Starting on the
+// template's page costs zero switches to fingerprint it and leaves the one switch for the clones;
+// starting anywhere else needs two, and the second throws, so the script says so up front instead.
 //     expected   — drift you have decided on, as an array of substrings. A footer converted to
 //                  VERTICAL to give a long source its own row is a deliberate change, not a defect, so
 //                  it belongs here and is reported as `accepted` instead of `DRIFT`. Anything not
@@ -87,15 +93,20 @@ const fingerprint = (frame) => {
   };
 };
 
-// --- the template's own fingerprint. One page switch.
+// --- the template's own fingerprint. NO page switch: the template's page must already be current.
 const tpl = await figma.getNodeByIdAsync(CONFIG.templateId);
 if (!tpl) throw new Error(`templateId ${CONFIG.templateId} not found — new yearly file? ask for the link`);
 let tplPage = tpl;
 while (tplPage && tplPage.type !== "PAGE") tplPage = tplPage.parent;
-if (tplPage && figma.currentPage !== tplPage) await figma.setCurrentPageAsync(tplPage);
+if (tplPage && figma.currentPage !== tplPage)
+  throw new Error(
+    `open the template's page ("${tplPage.name}") in Figma, then re-run. Currently on "${figma.currentPage.name}". ` +
+    `Only ONE setCurrentPageAsync is allowed per call and this one is spent on the clones' page, so the template ` +
+    `must already be current — a fingerprint read off an unswitched page comes back short without erroring. ` +
+    `(If the clones are on the template's own page, no switch is needed at all.)`);
 const T = fingerprint(tpl);
 
-// --- the clones. The second and last page switch.
+// --- the clones. The one and only page switch.
 const first = await figma.getNodeByIdAsync(CONFIG.frameIds[0]);
 if (!first) throw new Error(`frameIds[0] ${CONFIG.frameIds[0]} not found`);
 let clonePage = first;

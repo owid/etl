@@ -143,10 +143,13 @@ const checkFrame = async (frameId) => {
   // far larger than the 12-16px band rule by construction.
   const MAP_GROUPS = /^(map|countries|countries-without-data)$/i;
   let isMap = false;
-  const collect = (n, insidePlot, inFurniture, seriesOf) => {
+  const collect = (n, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap) => {
     if ("visible" in n && !n.visible) return;
-    if (FURNITURE_GROUPS.test(n.name)) inFurniture = true;
-    if (insidePlot && MAP_GROUPS.test(n.name)) isMap = true;
+    // The furniture CONTAINER name is carried, not just the boolean: the dash target is decided by what
+    // a node IS (a gridline vs a zero line vs a tick), and deciding it from the node's own current dash
+    // instead makes a cleared gridline dash self-justifying. See the furniture-dash row.
+    if (FURNITURE_GROUPS.test(n.name)) { inFurniture = true; furnitureGroup = n.name; }
+    if (insidePlot && MAP_GROUPS.test(n.name)) { isMap = true; insideMap = true; }
     const sm = SERIES_ANY.exec(n.name);
     if (sm) seriesOf = { kind: sm[1], series: sm[2] };
     if (n.type === "TEXT" && typeof n.fontSize === "number") {
@@ -162,7 +165,7 @@ const checkFrame = async (frameId) => {
     if ("strokeWeight" in n && typeof n.strokeWeight === "number" && n.strokes && n.strokes.length) {
       stroked.push({ node: n, name: n.name, type: n.type, w: n.strokeWeight,
                      dash: "dashPattern" in n && n.dashPattern ? [...n.dashPattern] : [],
-                     align: n.strokeAlign, insidePlot, inFurniture,
+                     align: n.strokeAlign, insidePlot, inFurniture, furnitureGroup: furnitureGroup || null, insideMap: !!insideMap,
                      seriesKind: seriesOf ? seriesOf.kind : null, seriesName: seriesOf ? seriesOf.series : null });
     }
     // Zero-area nodes are EXCLUDED from the fill inventory and KEPT for the stroke rows (CHECKS.md).
@@ -194,7 +197,11 @@ const checkFrame = async (frameId) => {
     if (insidePlot && !inFurniture && n.type !== "TEXT" && !(("children" in n) && n.children.length)) {
       const mb0 = rel(n);
       const filled = Array.isArray(n.fills) && n.fills.some((f) => f.type === "SOLID" && f.visible !== false);
-      if (filled && mb0 && mb0.w > 0 && mb0.h > 0) markBoxes.push({ name: n.name, box: mb0, why: "a filled data mark", insidePlot });
+      // `fromMap` is carried because a MAP SHAPE's bbox is not its ink: per-chart-type/maps.md, a
+      // country split across the antimeridian has a box spanning almost the whole map, so an annotation
+      // over open ocean falls inside it. Counting those as covered marks reports a FAIL that is not
+      // there, so the annotation row drops them and says so rather than judging them by bbox.
+      if (filled && mb0 && mb0.w > 0 && mb0.h > 0) markBoxes.push({ name: n.name, box: mb0, why: "a filled data mark", insidePlot, fromMap: !!insideMap });
     }
     if (/^datapoints__|^dot__|^value__/.test(n.name)) {
       const why = /^value__/.test(n.name) ? "a value label" : "a dot";
@@ -202,18 +209,22 @@ const checkFrame = async (frameId) => {
         if ("visible" in m && !m.visible) return;
         if ("children" in m && m.children.length) { m.children.forEach(pushLeafBoxes); return; }
         const b = rel(m);
-        if (b && b.w > 0 && b.h > 0) markBoxes.push({ name: n.name, box: b, why, insidePlot });
+        if (b && b.w > 0 && b.h > 0) markBoxes.push({ name: n.name, box: b, why, insidePlot, fromMap: false });
       };
       pushLeafBoxes(n);
     }
-    if (n.type === "VECTOR" && insidePlot) vectors.push(n);
-    if ("children" in n && n.children.length) { n.children.forEach((c) => collect(c, insidePlot, inFurniture, seriesOf)); return; }
+    // The series identity must travel WITH the vector. On a slope chart the stroked vector is called
+    // plain `line` and the identity is on its `slope__<Entity>` / `outline__<Entity>` group (the shape
+    // the fixture models), so a bare node here loses it and the name-only filter below matches nothing —
+    // every slope segment silently absent from `polylines`, and annotation-overlap unable to fail.
+    if (n.type === "VECTOR" && insidePlot) vectors.push({ node: n, seriesOf });
+    if ("children" in n && n.children.length) { n.children.forEach((c) => collect(c, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap)); return; }
     const b = rel(n);
     if (b && b.w > 0 && b.h > 0) leaves.push({ name: n.name, type: n.type, box: b, insidePlot });
   };
   for (const child of frame.children) {
     if (child === logo) continue;
-    collect(child, plotRoots.indexOf(child) !== -1, false, null);
+    collect(child, plotRoots.indexOf(child) !== -1, false, null, null, false);
   }
 
   // ---------------------------------------------------------------- rows
@@ -353,14 +364,28 @@ const checkFrame = async (frameId) => {
       add("furniture-weight", bad.length ? "FAIL" : "ok",
           bad.length ? `${bad.length} of ${furn.length} furniture stroke(s) off ${FURNITURE_W}px (rescale() thinned them): ` + [...new Set(bad.map((s) => r(s.w)))].join(", ") + `px seen`
                      : `all ${furn.length} furniture stroke(s) at ${FURNITURE_W}px`);
-      // Dash target is PER NODE TYPE: a node that already had a dash keeps [4,4]; the zero line and
-      // tick marks are solid and must keep an EMPTY pattern. One blanket target restyles the grid.
-      const dashed = furn.filter((s) => s.dash.length);
-      const solid = furn.filter((s) => !s.dash.length);
-      const badDash = dashed.filter((s) => s.dash.length !== FURNITURE_DASH.length || s.dash.some((v, i) => Math.abs(v - FURNITURE_DASH[i]) >= 0.05));
+      // Dash target is PER NODE TYPE (CHECKS.md): the gridlines are [4,4], while the zero line and the
+      // tick marks are solid. Which target applies must be derived from what the node IS — its name or
+      // its furniture container — and NOT from the dash it currently carries. Classifying by the current
+      // pattern is circular: a gridline whose dashPattern was cleared falls into the "solid" bucket, is
+      // never compared to anything, and the row returns ok on the exact defect it exists to catch.
+      // Zero lines and ticks are reported, not forced: a slope chart's native zero line ships [3,2] and
+      // must NOT be pulled to the gridline target (per-chart-type/slope-charts.md).
+      const SOLID_BY_DESIGN = /zero-line|zero|tick|axis/i;
+      const isSolidByDesign = (s) => SOLID_BY_DESIGN.test(s.name) || SOLID_BY_DESIGN.test(s.furnitureGroup || "");
+      const isGrid = (s) => !isSolidByDesign(s) && (/grid/i.test(s.name) || /grid/i.test(s.furnitureGroup || ""));
+      const grids = furn.filter(isGrid);
+      const native = furn.filter((s) => !isGrid(s));
+      const offTarget = (s) => s.dash.length !== FURNITURE_DASH.length || s.dash.some((v, i) => Math.abs(v - FURNITURE_DASH[i]) >= 0.05);
+      const badDash = grids.filter(offTarget);
+      const cleared = badDash.filter((s) => !s.dash.length);
       add("furniture-dash", badDash.length ? "FAIL" : "ok",
-          badDash.length ? `${badDash.length} dashed node(s) off [${FURNITURE_DASH}]: ` + [...new Set(badDash.map((s) => JSON.stringify(s.dash.map(r))))].join(", ")
-                         : `${dashed.length} dashed node(s) at [${FURNITURE_DASH}], ${solid.length} solid node(s) keeping an empty pattern`);
+          badDash.length
+            ? `${badDash.length} of ${grids.length} gridline(s) off [${FURNITURE_DASH}]: ` +
+              [...new Set(badDash.map((s) => JSON.stringify(s.dash.map(r))))].join(", ") +
+              (cleared.length ? `. ${cleared.length} of them carry NO dash at all (${cleared.map((s) => s.name).join(", ")}) — a cleared pattern is a restyled grid, not a solid node by design` : "")
+            : `all ${grids.length} gridline(s) at [${FURNITURE_DASH}]; ${native.length} zero-line/tick/axis node(s) left at their native pattern (` +
+              (native.length ? [...new Set(native.map((s) => (s.dash.length ? JSON.stringify(s.dash.map(r)) : "solid")))].join(", ") : "none") + ")");
     }
   }
 
@@ -476,22 +501,35 @@ const checkFrame = async (frameId) => {
     // "halo 2x, or line+1 where nothing crosses"). Classifying each node by its own weight therefore
     // reports the halo of a legally-crossed context line as a protagonist. So read the weight of each
     // series' `line__` node and let its `outline__` inherit the verdict.
+    // Identity comes from the node's OWN name when it has one, and otherwise from the naming ancestor
+    // `collect` carried down — a slope's stroked vector is called plain `line` under a `slope__<Entity>`
+    // group, so a name-only read here finds no slope segment at all.
+    // The fallback is deliberately narrow — the ancestor's name is only inherited by the child grapher
+    // actually calls `line`. A `slope__<Entity>` group also holds `start-point` and `end-point` VECTORs,
+    // and letting those inherit it would sample a 6px marker as if it were the series stroke and report
+    // a phantom crossing against it.
+    const identify = (v) => {
+      const m = /^(line|slope|outline)__(.+)$/.exec(v.node.name);
+      if (m) return { kind: m[1], series: m[2], label: v.node.name };
+      if (v.seriesOf && /^line$/i.test(v.node.name)) return { kind: v.seriesOf.kind, series: v.seriesOf.series, label: `${v.seriesOf.kind}__${v.seriesOf.series}` };
+      return null;
+    };
     const lineWeightBySeries = {};
     for (const v of vectors) {
-      const m = /^(line|slope)__(.+)$/.exec(v.name);
-      if (m && typeof v.strokeWeight === "number") lineWeightBySeries[m[2]] = v.strokeWeight;
+      const id = identify(v);
+      if (id && id.kind !== "outline" && typeof v.node.strokeWeight === "number") lineWeightBySeries[id.series] = v.node.strokeWeight;
     }
     const polylines = [];
     for (const v of vectors) {
-      const m = /^(line|slope|outline)__(.+)$/.exec(v.name);
-      if (!m) continue;
+      const id = identify(v);
+      if (!id) continue;
       let net = null;
-      try { net = v.vectorNetwork; } catch (e) { net = null; }
+      try { net = v.node.vectorNetwork; } catch (e) { net = null; }
       if (!net || !net.vertices || !net.vertices.length) continue;
-      const w = typeof v.strokeWeight === "number" ? v.strokeWeight : null;
-      const seriesW = lineWeightBySeries[m[2]];
+      const w = typeof v.node.strokeWeight === "number" ? v.node.strokeWeight : null;
+      const seriesW = lineWeightBySeries[id.series];
       const muted = CONFIG.highlightTreatment && seriesW !== undefined && Math.abs(seriesW - 1) < 0.05;
-      const pts = net.vertices.map((pt) => { const q = map(v, pt); return [r(q.x), r(q.y)]; });
+      const pts = net.vertices.map((pt) => { const q = map(v.node, pt); return [r(q.x), r(q.y)]; });
       // Connectivity lives in `segments`, NOT in vertex order. A series with a gap (a missing interval
       // in a time range) has disconnected subpaths, and joining consecutive vertices invents a stroke
       // across the gap — which then reports an annotation sitting in that empty space as crossing the
@@ -499,7 +537,7 @@ const checkFrame = async (frameId) => {
       const segs = Array.isArray(net.segments) && net.segments.length
         ? net.segments.filter((s) => pts[s.start] && pts[s.end]).map((s) => [pts[s.start], pts[s.end]])
         : pts.slice(1).map((q, i) => [pts[i], q]);
-      polylines.push({ name: v.name, muted, w, seriesLineW: seriesW === undefined ? null : r(seriesW),
+      polylines.push({ name: id.label, muted, w, seriesLineW: seriesW === undefined ? null : r(seriesW),
                        points: pts, segments: segs, fromSegments: !!(Array.isArray(net.segments) && net.segments.length) });
     }
     if (!polylines.length) skip("polylines", "no line__*/outline__* VECTOR carried a readable vectorNetwork");
@@ -511,7 +549,13 @@ const checkFrame = async (frameId) => {
     // its geometry; dots and value labels are small and compact, so a bbox is right for them too.
     const furnitureBoxes = stroked.filter((s) => s.insidePlot && !/^(line|outline)__/.test(s.name))
       .map((s) => ({ name: s.name, box: rel(s.node) })).filter((x) => x.box);
-    const forbiddenBoxes = markBoxes.filter((x) => x.insidePlot);
+    // A MAP SHAPE is inventoried by nobody here: per-chart-type/maps.md, a country's bounding box is not
+    // its painted geometry — an antimeridian straddler's box spans almost the whole map — so an
+    // annotation over open ocean inside that box would be reported as covering a filled mark. Same
+    // reason the margins row excludes straddlers and the gap row skips maps. Declared, not silently
+    // dropped: the row says how many were left to the pixel probe.
+    const mapMarks = markBoxes.filter((x) => x.insidePlot && x.fromMap);
+    const forbiddenBoxes = markBoxes.filter((x) => x.insidePlot && !x.fromMap);
 
     if (!annotations.length) { skip("annotation-overlap", "no annotation__* nodes on this frame"); }
     else if (!polylines.length && !furnitureBoxes.length) { skip("annotation-overlap", "nothing to test against: no readable polylines and no furniture"); }
@@ -536,8 +580,9 @@ const checkFrame = async (frameId) => {
       }
       const uniq = [...new Set(illegal)];
       add("annotation-overlap", uniq.length ? "FAIL" : "ok",
-          uniq.length ? uniq.join("; ") + ". Gridlines, empty space and a muted context line are legal; a protagonist line, a dot or a value label is not."
-                      : `no annotation covers a prohibited mark (${annotations.length} annotation(s) vs ${polylines.length} line(s), ${furnitureBoxes.length} furniture node(s), ${forbiddenBoxes.length} individual dot/value mark(s))`,
+          (uniq.length ? uniq.join("; ") + ". Gridlines, empty space and a muted context line are legal; a protagonist line, a dot or a value label is not."
+                       : `no annotation covers a prohibited mark (${annotations.length} annotation(s) vs ${polylines.length} line(s), ${furnitureBoxes.length} furniture node(s), ${forbiddenBoxes.length} individual dot/value mark(s))`) +
+          (mapMarks.length ? ` — ${mapMarks.length} map shape(s) NOT judged here: a country's bbox is not its ink (maps.md), so an annotation over ocean inside it would read as covering it. Whether an annotation sits on land is the rendered-pixel probe's call.` : ""),
           { crossingsPerAnnotation: crossings, approximate: "segment-vs-rect on sampled vertices; a near-miss is settled by CHECKS.md's four-render pixel probe." });
     }
   }
