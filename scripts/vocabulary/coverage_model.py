@@ -399,6 +399,7 @@ class TopicSelection:
     # terms are. Reported rather than subtracted: the coverage number stays a
     # plain share of the topic, and this says how much of it was reachable.
     topic_name_share: float = 0.0
+    covered: frozenset[str] = frozenset()
 
     @property
     def covered_weight(self) -> float:
@@ -406,32 +407,23 @@ class TopicSelection:
 
 
 def offerable_candidates(candidates: list[str], topic_name: str) -> list[str]:
-    """Drop the candidates the site would refuse to show anyway.
+    """Drop the candidates that could never be worth a slot: places.
 
-    Two rules, both copied from rankSuggestedKeywords in owid-grapher: a term the
-    topic's own name already contains narrows nothing for a reader already on
-    that page, and places are never suggested. Applying them here rather than
-    only there matters because the site drops them *after* truncating to five, so
-    a term it will discard otherwise costs a slot and shortens the line.
-
-    Deliberately no rule against a term merely resembling the topic name.
-    "Child mortality" on "Child & Infant Mortality" is that topic's single most
-    important term — it names the charts holding half its traffic — and only the
-    exact-containment test above can be trusted to remove a term that truly
-    narrows nothing.
+    Nothing else. A term the topic's own name contains used to be dropped here
+    too, which cost the topics whose charts are simply called after them —
+    Religion reached 39% of its traffic without being allowed to say "religious".
+    Whether a term is too blunt to suggest turns out not to be answerable from
+    its text at all: "religious" is not a substring of "Religion" and covers 81%
+    of it, while "poverty line" contains the whole of "Poverty" and covers 12%.
+    It is answerable from what the term covers, which is what
+    select_terms_by_coverage does with BROAD_TERM_SHARE.
     """
-    lower_topic = topic_name.lower()
-    return [
-        candidate
-        for candidate in candidates
-        if candidate.lower() not in lower_topic and not _is_place_name(candidate)
-    ]
+    return [candidate for candidate in candidates if not _is_place_name(candidate)]
 
 
-# Region names are the site's business, and it filters them itself; here we only
-# need the obvious ones out of the way so they don't win a slot on coverage. The
-# site's check (getRegionByNameOrVariantName) knows every variant name, so this is
-# a cheap first pass rather than a replacement for it.
+# Region names are the site's business, and it filters them itself with the
+# lookup that knows every variant name; this is a cheap first pass so an obvious
+# one can't win a slot on coverage alone.
 _COMMON_PLACE_WORDS = frozenset(
     {"world", "africa", "asia", "europe", "america", "oceania", "antarctica"}
 )
@@ -439,6 +431,23 @@ _COMMON_PLACE_WORDS = frozenset(
 
 def _is_place_name(term: str) -> bool:
     return term.strip().lower() in _COMMON_PLACE_WORDS
+
+
+# When one term covers more than this share of a topic, it is a blunt
+# instrument: a reader clicking it is shown most of the page they are already on.
+# Such a term is held back and used only when the sharper terms together cannot
+# reach this same share — the case for a topic whose charts are all named after
+# it, where nothing else reaches them at all.
+#
+# Used for both halves on purpose, so there is one number rather than two: "a
+# term covering more than half the topic is blunt, and a blunt one is worth it
+# only if the rest cannot reach half". Both halves are reported per topic, so the
+# number can be judged from output rather than taste.
+#
+# It buys a great deal. Allowed everywhere, blunt terms lift median coverage from
+# 90% to 98% but collapse fifteen topics to a single chip — Poverty's 250 charts
+# reduced to "poverty". Held back entirely, thirty topics under-cover badly.
+BROAD_TERM_SHARE = 0.5
 
 
 def select_terms_by_coverage(
@@ -474,11 +483,49 @@ def select_terms_by_coverage(
         return sum(weight_of.get(identity, 0.0) for identity in identities)
 
     self_named = match_identities(universe, universe.topic_name)
+    # Blunt terms — ones that alone reveal most of the topic — are set aside and
+    # only brought back if the rest cannot do the job. See BROAD_TERM_SHARE.
+    blunt = {
+        term
+        for term, identities in matches.items()
+        if total_weight and weight(identities) / total_weight > BROAD_TERM_SHARE
+    }
+    sharp = [term for term in candidates if term not in blunt]
+
+    selection = _greedy(
+        universe, sharp, matches, weight, max_terms, min_marginal_share
+    )
+    if (
+        blunt
+        and total_weight
+        and selection.covered_weight / total_weight <= BROAD_TERM_SHARE
+    ):
+        # The sharp terms can't reach half the topic, so its charts really are
+        # only findable by the name they share with it.
+        selection = _greedy(
+            universe, candidates, matches, weight, max_terms, min_marginal_share
+        )
+    selection.topic_name_share = (
+        weight(self_named) / total_weight if total_weight else 0.0
+    )
+    selection.uncovered = _uncovered(universe, selection, matches)
+    return selection
+
+
+def _greedy(
+    universe: WeightedUniverse,
+    candidates: list[str],
+    matches: dict[str, frozenset[str]],
+    weight,
+    max_terms: int,
+    min_marginal_share: float,
+) -> TopicSelection:
+    """One pass of greedy weighted maximum coverage over `candidates`."""
+    total_weight = universe.total_weight
     selection = TopicSelection(
         topic_name=universe.topic_name,
         total_weight=total_weight,
-        total_count=total_count,
-        topic_name_share=(weight(self_named) / total_weight if total_weight else 0.0),
+        total_count=len(universe.records),
     )
     covered: set[str] = set()
     remaining = list(candidates)
@@ -555,12 +602,24 @@ def select_terms_by_coverage(
             )
         )
 
-    selection.uncovered = sorted(
+    selection.covered = frozenset(covered)
+    return selection
+
+
+def _uncovered(
+    universe: WeightedUniverse,
+    selection: TopicSelection,
+    matches: dict[str, frozenset[str]],
+) -> list[tuple[str, float]]:
+    """The records no selected term reaches, most-viewed first."""
+    covered: set[str] = set()
+    for term in selection.selected:
+        covered |= matches.get(term.term, frozenset())
+    return sorted(
         (
-            (universe.records[identity].get("title") or identity, weight_of[identity])
+            (universe.records[identity].get("title") or identity, universe.weights[identity])
             for identity in universe.records
             if identity not in covered
         ),
         key=lambda pair: -pair[1],
     )
-    return selection

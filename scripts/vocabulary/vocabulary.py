@@ -208,10 +208,16 @@ What makes this list good is that each term takes the reader somewhere *differen
    call their subject is the term readers want, even when it repeats the topic's
    name almost exactly. On "Child & Infant Mortality", whose biggest charts are
    titled "Child mortality rate", give "child mortality". On "Electricity Mix",
-   give "electricity production". Offer them first. Don't worry about a term
-   being too close to the topic's name — anything that genuinely narrows nothing
-   is dropped afterwards, so the cost of including it is zero and the cost of
-   leaving it out is the topic's most important term.
+   give "electricity production". Offer them first.
+
+   This includes the topic's own name, and the bare root of it. On "Religion",
+   "religion" and "religious" are allowed and are probably the best first
+   suggestions, because a third of that topic's traffic is one chart called
+   "Share of the population who are religious" and nothing narrower reaches it.
+   Include the short form as well as the compounds: give "religious" as well as
+   "religious affiliation", "mortality" as well as "child mortality". The short
+   one brings up everything the long one does and more, and if it turns out to
+   add nothing it is dropped, so it costs nothing to offer.
 7. Skip anything too broad to narrow the list down: a bare "men", "women",
    "children", "countries", "population".
 8. Never name a place. No countries, regions, continents or income groups —
