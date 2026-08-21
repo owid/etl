@@ -198,57 +198,46 @@ What makes this list good is that each term takes the reader somewhere *differen
    about unemployment AND about mental health all belong to "Gender Ratio", so a
    list that only describes the sex-ratio charts has missed most of the topic.
 2. One term per subject. Do not give near-synonyms or variations on the same
-   phrase — they land the reader on the same charts and waste the line. Pick the
-   single most natural form and move on.
-   - Bad: "sex ratio", "sex ratio at birth", "sex ratio by age", "sex ratio at age 5"
-     (one subject, four terms)
-   - Bad: "missing women", "sex-selective abortion", "excess female mortality"
-     (all three lead to the same two charts)
+   phrase — they land the reader on the same charts and waste the line.
+   - Bad: "sex ratio", "sex ratio at birth", "sex ratio by age" (one subject, three terms)
    - Good: "sex ratio", "missing women", "life expectancy", "unemployment", "judiciary"
      (five terms, five different parts of the chart list)
 3. Order the list so that each term adds something the ones before it did not.
-4. Terms should be things a reader would plausibly type: specific subjects,
-   technologies, diseases, materials, policies, groups.
-5. Prefer the shortest form of a term that still names its subject. A reader
-   clicking "sex ratio" is shown every chart about it; "sex ratio at birth"
-   hides most of them for no gain. Give the broad form, not the specific one.
-6. Words from the topic's own name are not just allowed, they are usually
-   required. Look at the most-viewed charts at the top of the list: whatever they
-   call their subject is the term readers want, even when it repeats the topic's
-   name almost exactly. On "Child & Infant Mortality", whose biggest charts are
-   titled "Child mortality rate", give "child mortality". On "Electricity Mix",
-   give "electricity production". Offer them first.
+4. Give the shortest form that still names the subject. A reader clicking "sex
+   ratio" is shown every chart about it; "sex ratio at birth" hides most of them
+   for no gain.
+5. Every term must name **what a chart is about** — its subject. That is the
+   whole test, and everything below follows from it rather than being a separate
+   rule to remember:
+   - Not how a number is expressed. A measurement's shape is not a subject, and
+     a reader looking for one is not looking for charts. Prefer "oil" to "oil
+     prices", "electricity" to "electricity consumption". Never on its own, and
+     never as the head of a phrase: per capita, GDP per capita, share, rate,
+     death rate, total, annual, average, level, index, projections, reported,
+     confirmed, vital registration. (This list is spelled out because it is the
+     rule most often broken: asked only for the principle, the model offered
+     "gdp per capita" as the first suggestion on Poverty.)
+   - Not a place. Countries, regions and income groups say *who* rather than
+     *what*; these charts mention them constantly and readers search for them
+     separately.
+   - Not a word that was only ever true of the past, unless people still search
+     for it.
+   Say the term out loud as a thing a reader wants to see charts of. If that
+   doesn't work — "annual", "vital registration", "reported" — leave it out.
 
-   This includes the topic's own name, and the bare root of it. On "Religion",
-   "religion" and "religious" are allowed and are probably the best first
-   suggestions, because a third of that topic's traffic is one chart called
-   "Share of the population who are religious" and nothing narrower reaches it.
-   Include the short form as well as the compounds: give "religious" as well as
-   "religious affiliation", "mortality" as well as "child mortality". The short
-   one brings up everything the long one does and more, and if it turns out to
-   add nothing it is dropped, so it costs nothing to offer.
-7. Skip a bare "men", "women", "children", "countries" or "population" — each
-   is too broad to narrow anything. This applies to the word alone, not to
-   compounds built from it: on Gender Ratio, "female population" names the chart
-   "Share of the population that is female", which is a fifth of that topic's
-   traffic, and skipping it leaves that chart unreachable. If a big chart's
-   subject can only be said with one of these words, say it with two.
-8. Never name a place. No countries, regions, continents or income groups —
-   not "United States", "Ukraine", "China", "low-income countries". The charts
-   above mention them constantly and they are searched for separately.
-9. Skip measurement and units language: percentage, per capita, share, rate,
-   level, annual, total, average, "GDP per capita", and terms that are only a
-   generic process word, such as "energy consumption" or "oil prices" (prefer
-   "oil"). "GDP" on its own is only a term for a topic that is actually about
-   GDP.
-10. Skip historical or obsolete terms unless they are still what people search for.
+Do not worry about whether a term is too broad, or too close to the topic's own
+name. That is measured afterwards against the chart list, far more reliably than
+either of us can guess: a term that turns out to reveal most of the topic is set
+aside unless nothing narrower reaches those charts. So offer the obvious central
+terms — "child mortality" on Child & Infant Mortality, "religious" on Religion,
+"female population" on Gender Ratio — including the topic's own name and the bare
+root of it. Withholding them is how a topic ends up with no way to reach the very
+charts it exists for; offering one that turns out too blunt costs nothing.
 
-Give a generous list — the more real candidates you offer, the better the final
-selection can be. Terms are scored by how many of the charts above they actually
-bring up, so favour the words those titles really use. Only a handful are shown to the reader, and they are chosen
-from your list by measuring how much of the chart list above each one actually
-brings up, so a term that is right but not obvious costs nothing to include and
-a term that duplicates another costs nothing to leave out.
+Give a generous list — only a handful are ever shown, and they are picked from
+yours by measuring how much of the chart list above each one actually brings up.
+So favour the words those titles really use, and include a term that is right but
+not obvious: it costs nothing if it loses, and it is the only way it can win.
 
 Output JSON (up to 40 terms; far fewer is right when the topic is narrow —
 never pad the list with variations to reach a number):

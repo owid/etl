@@ -433,8 +433,16 @@ def _is_place_name(term: str) -> bool:
     return term.strip().lower() in _COMMON_PLACE_WORDS
 
 
-# When one term covers more than this share of a topic, it is a blunt
-# instrument: a reader clicking it is shown most of the page they are already on.
+# When one term covers more than this share of a topic — of its views *or* of its
+# charts — it is a blunt instrument: a reader clicking it is shown most of the
+# page they are already on.
+#
+# Both measures are needed. On Tuberculosis the term "tuberculosis" reaches 50 of
+# the topic's 52 charts but only 47% of its views, because the two most-viewed are
+# about causes of death generally. Judged on views alone it looked specific enough
+# to keep, and taking it made every real term — drug resistance, treatment, BCG —
+# a subset of it that added nothing, so coverage hit 100% with three blunt terms
+# and stopped.
 # Such a term is held back and used only when the sharper terms together cannot
 # reach this same share — the case for a topic whose charts are all named after
 # it, where nothing else reaches them at all.
@@ -488,7 +496,8 @@ def select_terms_by_coverage(
     blunt = {
         term
         for term, identities in matches.items()
-        if total_weight and weight(identities) / total_weight > BROAD_TERM_SHARE
+        if (total_weight and weight(identities) / total_weight > BROAD_TERM_SHARE)
+        or (total_count and len(identities) / total_count > BROAD_TERM_SHARE)
     }
     sharp = [term for term in candidates if term not in blunt]
 
