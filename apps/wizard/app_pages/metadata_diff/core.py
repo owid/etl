@@ -309,6 +309,35 @@ def _indicator_identity(catalog_path: str) -> tuple[str, ...]:
     return (*parts, short_name)
 
 
+def surface_key(kind: str, ident: str) -> str:
+    """Namespaced key for the reviewed-state rows of one surface (`list:chart:<slug>`, ...).
+
+    The `list:` prefix keeps these separate from the Approve/Flag sign-off rows, which key on the bare
+    catalogPath (MDims) or `chart:<slug>` (the per-chart review).
+    """
+    return f"list:{kind}:{ident}"
+
+
+def mark_identity(surface: str, group: "ChangeGroup") -> tuple[str, str]:
+    """(slot key, content hash) for one change on one surface.
+
+    The slot has to name *where* the change is, not just which field it is: chart-side changes carry no
+    view dimensions at all (an indicator is a view with none), so keying on field + dimensions alone —
+    the way the MDim review page can — would give every `description_short` change on the page the same
+    key, and they would share a single row. Including the indicators the change lands on separates them.
+
+    The hash covers only the text, so the slot survives an edit while the mark goes stale.
+    """
+    where = sorted(group.catalog_paths) or ([group.catalog_path] if group.catalog_path else [])
+    slot = json.dumps(
+        [surface, group.field, where, sorted(json.dumps(d, sort_keys=True) for d in group.view_dims)],
+        sort_keys=True,
+    )
+    change_key = hashlib.sha256(slot.encode()).hexdigest()
+    content_hash = hashlib.sha256(json.dumps([group.old, group.new], sort_keys=True, default=str).encode()).hexdigest()
+    return change_key, content_hash
+
+
 def field_label(field_name: str) -> str:
     if field_name.startswith(CHART_FIELD_PREFIX):
         return CHART_FIELDS[field_name[len(CHART_FIELD_PREFIX) :]]

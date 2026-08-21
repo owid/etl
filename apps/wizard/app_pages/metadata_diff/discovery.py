@@ -35,10 +35,12 @@ from apps.wizard.app_pages.metadata_diff.core import (
     field_label,
     group_changes,
     renders_change,
+    surface_key,
 )
 from apps.wizard.app_pages.metadata_diff.data import (
     _load_configs,
     build_env_bundles,
+    count_reviewed,
     fetch_variable_rows,
     fetch_variable_rows_by_path,
     load_mdim_config,
@@ -993,6 +995,8 @@ class Summary:
     fields: dict[str, int] = field(default_factory=dict)  # field label -> distinct changes
     # Indicator changes by origin: ours / master / stale / unknown (see classify_origins).
     attribution: dict[str, int] = field(default_factory=dict)
+    # Section -> (changes ticked off, changes in total). What the badges count down.
+    review_progress: dict[str, tuple[int, int]] = field(default_factory=dict)
     # Datasets this server holds an older build of than the baseline: dataset -> (here, baseline).
     # Their differences read backwards, so this is a defect in the server, not in the branch.
     stale: dict[str, tuple[Any, Any]] = field(default_factory=dict)
@@ -1103,6 +1107,10 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
         _collect_changes(seen, chart_groups)
         usage = charts_affected(source_engine, changed)
         summary.n_charts = len(charts_reached(chart_groups, usage))
+        summary.review_progress["charts"] = (
+            count_reviewed(source_engine, surface_key("charts", "indicators"), chart_groups),
+            len(chart_groups),
+        )
         for origin in attribute_indicator_changes(source_engine, target_engine, changed.paths, master_engine).values():
             summary.attribution[origin] = summary.attribution.get(origin, 0) + 1
         # Report every stale dataset, not only ones behind a reported change: a stale build can also
@@ -1140,6 +1148,11 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
                     summary.n_mdims += 1
                     summary.n_mdim_changes += len(ours)
                     _collect_changes(seen, ours)
+                    done, total = summary.review_progress.get("mdims", (0, 0))
+                    summary.review_progress["mdims"] = (
+                        done + count_reviewed(source_engine, surface_key("mdim", cp), ours),
+                        total + len(ours),
+                    )
         # Drafts are counted only where they actually have changed text, same test as the rest.
         if len(drafts) > MAX_MDIMS_RESOLVED:
             # Too many to diff view by view. Report the flag count as a ceiling and say so, rather than
@@ -1165,8 +1178,14 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
         summary.n_explorers = len(branch_views)
         summary.n_explorer_views = sum(len(v) for v in branch_views.values())
         summary.n_other_explorers = len(explorers.other_views())
-        for diffs in branch_views.values():
-            _collect_changes(seen, group_changes(diffs))
+        for slug, diffs in branch_views.items():
+            explorer_groups = group_changes(diffs)
+            _collect_changes(seen, explorer_groups)
+            done, total = summary.review_progress.get("explorers", (0, 0))
+            summary.review_progress["explorers"] = (
+                done + count_reviewed(source_engine, surface_key("explorer", slug), explorer_groups),
+                total + len(explorer_groups),
+            )
     except Exception as e:  # noqa: BLE001
         log.warning("metadata_diff.explorer_discovery_failed", error=str(e))
         summary.warnings.append(f"Explorer discovery failed: {e}")

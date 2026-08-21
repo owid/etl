@@ -12,7 +12,7 @@ from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
 from structlog import get_logger
 
-from apps.wizard.app_pages.metadata_diff.core import METADATA_FIELDS, ViewBundle, build_view_bundle
+from apps.wizard.app_pages.metadata_diff.core import METADATA_FIELDS, ViewBundle, build_view_bundle, mark_identity
 from etl.db import read_sql
 
 log = get_logger()
@@ -53,6 +53,30 @@ def load_reviews(engine: Engine, catalog_path: str) -> dict[str, dict[str, Any]]
         params={"cp": catalog_path},
     )
     return {str(r["changeKey"]): {str(k): v for k, v in r.to_dict().items()} for _, r in df.iterrows()}
+
+
+# Stored status for a change the reviewer has ticked off in a list. Distinct from the Review page's
+# "approved"/"flagged", so a list tick is never mistaken for a sign-off.
+REVIEWED = "reviewed"
+
+
+def count_reviewed(engine: Engine, surface: str, groups: list) -> int:
+    """How many of these changes are ticked off, counting only ticks the text has not outgrown.
+
+    A stored mark carries the content hash it was made against, so an edit since then leaves the row in
+    place but no longer reviewed — the same rule the toggles apply, applied here so a progress count and
+    the toggles beside it can never disagree.
+    """
+    if not groups:
+        return 0
+    stored = load_reviews(engine, surface)
+    done = 0
+    for group in groups:
+        change_key, content_hash = mark_identity(surface, group)
+        row = stored.get(change_key)
+        if row and row.get("status") == REVIEWED and row.get("contentHash") == content_hash:
+            done += 1
+    return done
 
 
 def upsert_review(

@@ -41,11 +41,19 @@ SECTIONS = {
 }
 
 
-def _section_label(section: str, counts: dict[str, int]) -> str:
-    """Section label with its change count — the count is the point, so it is never hidden."""
+def _section_label(section: str, progress: dict[str, tuple[int, int]]) -> str:
+    """Section label carrying its review progress, so "anything left?" is answerable without clicking.
+
+    `reviewed/total` while anything is outstanding, and a tick once the section is done — a bare total
+    cannot distinguish "nothing to review" from "nothing reviewed yet", which is the whole question.
+    """
     icon, name = SECTIONS[section]
-    n = counts.get(section, 0)
-    return f"{icon} {name} ({n})"
+    done, total = progress.get(section, (0, 0))
+    if not total:
+        return f"{icon} {name} (0)"
+    if done == total:
+        return f"{icon} {name} ({total} ✓)"
+    return f"{icon} {name} ({done}/{total})"
 
 
 def main() -> None:
@@ -72,11 +80,6 @@ what ships is what you meant, and to see how far each change reaches.
         st.warning("- " + "\n\n- ".join(WARN_MSG))
 
     summary = cached.summary(source_engine, target_engine)
-    counts = {
-        "charts": summary.n_charts,
-        "mdims": summary.n_mdims,
-        "explorers": summary.n_explorers,
-    }
     for warning in summary.warnings:
         st.warning(warning)
 
@@ -89,7 +92,7 @@ what ships is what you meant, and to see how far each change reaches.
     section = url_persist(st.segmented_control)(
         label="Section",
         options=list(SECTIONS),
-        format_func=lambda s: _section_label(s, counts),
+        format_func=lambda s: _section_label(s, summary.review_progress),
         key="diff-type",
         value="charts",
         label_visibility="collapsed",

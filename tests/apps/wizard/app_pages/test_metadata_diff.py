@@ -1529,3 +1529,46 @@ def test_a_reordered_list_still_shows_every_bullet():
     # Tags wrap the words that moved, so compare the text with markup stripped.
     text = re.sub(r"<[^>]+>", "", html)
     assert "Alpha point." in text and "Beta point." in text
+
+
+# --- Section badges -------------------------------------------------------------------------------
+
+
+def test_section_badges_answer_whether_anything_is_left_to_review():
+    """A bare total cannot tell "nothing to review" from "nothing reviewed yet" — the whole question."""
+    from apps.wizard.app_pages.metadata_diff.app import _section_label
+
+    assert "(0/10)" in _section_label("charts", {"charts": (0, 10)})
+    assert "(3/10)" in _section_label("charts", {"charts": (3, 10)})
+    # Done reads as done, not as "10/10" the eye has to compare.
+    assert "(10 ✓)" in _section_label("charts", {"charts": (10, 10)})
+
+    # A section with nothing in it stays a plain zero rather than "0/0". (The icon name has a slash of
+    # its own, so look only at the counter.)
+    def counter(label: str) -> str:
+        return label.rsplit("(", 1)[1].rstrip(")")
+
+    assert counter(_section_label("explorers", {})) == "0"
+    assert counter(_section_label("explorers", {"explorers": (0, 0)})) == "0"
+
+
+def test_a_tick_only_counts_while_the_text_it_was_made_against_stands(monkeypatch):
+    """The progress count applies the same content-hash rule as the toggles, or the two would disagree."""
+    from apps.wizard.app_pages.metadata_diff.core import mark_identity, surface_key
+    from apps.wizard.app_pages.metadata_diff.data import REVIEWED, count_reviewed
+
+    group = ChangeGroup(field="descriptionKey", old=["a"], new=["b"], view_dims=[{"d": "x"}])
+    edited = ChangeGroup(field="descriptionKey", old=["a"], new=["c"], view_dims=[{"d": "x"}])
+    surface = surface_key("mdim", "grapher/ns/latest/ds")
+    change_key, content_hash = mark_identity(surface, group)
+
+    stored = {change_key: {"status": REVIEWED, "contentHash": content_hash}}
+
+    from apps.wizard.app_pages.metadata_diff import data as data_module
+
+    monkeypatch.setattr(data_module, "load_reviews", lambda engine, catalog_path: stored)
+
+    assert count_reviewed("engine", surface, [group]) == 1
+    # Same slot, text moved on: the tick no longer counts.
+    assert count_reviewed("engine", surface, [edited]) == 0
+    assert count_reviewed("engine", surface, []) == 0

@@ -14,29 +14,14 @@ surface keys in the MDim Review page. These list toggles use `list:`-prefixed su
 never overwrite each other.
 """
 
-import hashlib
-import json
 from dataclasses import dataclass
 from typing import Any
 
 import streamlit as st
 from sqlalchemy.engine.base import Engine
 
-from apps.wizard.app_pages.metadata_diff.core import ChangeGroup
-from apps.wizard.app_pages.metadata_diff.data import delete_review, load_reviews, upsert_review
-
-# Stored status for a change the reviewer has looked at. Distinct from the Review page's
-# "approved"/"flagged", so a list tick is never mistaken for a sign-off.
-REVIEWED = "reviewed"
-
-
-def surface_key(kind: str, ident: str) -> str:
-    """Namespaced key for the reviewed-state rows of one surface (`list:chart:<slug>`, ...).
-
-    The `list:` prefix keeps these separate from the Approve/Flag sign-off rows, which key on the bare
-    catalogPath (MDims) or `chart:<slug>` (the per-chart review).
-    """
-    return f"list:{kind}:{ident}"
+from apps.wizard.app_pages.metadata_diff.core import ChangeGroup, mark_identity, surface_key  # noqa: F401
+from apps.wizard.app_pages.metadata_diff.data import REVIEWED, delete_review, load_reviews, upsert_review
 
 
 @dataclass
@@ -56,26 +41,6 @@ class ReviewMark:
         if self.stale:
             return "⚠️"
         return "✅" if self.reviewed else "🟡"
-
-
-def mark_identity(surface: str, group: ChangeGroup) -> tuple[str, str]:
-    """(slot key, content hash) for one change on one surface.
-
-    The slot has to name *where* the change is, not just which field it is: chart-side changes carry no
-    view dimensions at all (an indicator is a view with none), so keying on field + dimensions alone —
-    the way the MDim review page can — would give every `description_short` change on the page the same
-    key, and they would share a single row. Including the indicators the change lands on separates them.
-
-    The hash covers only the text, so the slot survives an edit while the mark goes stale.
-    """
-    where = sorted(group.catalog_paths) or ([group.catalog_path] if group.catalog_path else [])
-    slot = json.dumps(
-        [surface, group.field, where, sorted(json.dumps(d, sort_keys=True) for d in group.view_dims)],
-        sort_keys=True,
-    )
-    change_key = hashlib.sha256(slot.encode()).hexdigest()
-    content_hash = hashlib.sha256(json.dumps([group.old, group.new], sort_keys=True, default=str).encode()).hexdigest()
-    return change_key, content_hash
 
 
 def resolve_marks(engine: Engine, surface: str, groups: list[ChangeGroup]) -> list[ReviewMark]:
