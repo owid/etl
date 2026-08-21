@@ -344,6 +344,35 @@ const check = (name, cond, detail) => {
     );
   }
 
+  // Case 8: a ZERO-WIDTH stroked line is ink. Grapher draws a single-entity stacked discrete bar's
+  // vertical zero line at 1.54x the bar height, so an ink walk that drops zero-area nodes measures
+  // only the bars and the fit leaves the rest of the stroke hanging off the artboard. The line here
+  // is 200px taller than every other leaf, so if it were dropped the measured height would be 640.
+  {
+    const { frame } = mkFrame();
+    const group = mkGroup("G:8");
+    group.children.push(
+      mkNode({ type: "VECTOR", name: "vertical-zero-line", x: 760, y: 60, width: 0, height: 840,
+               strokeWeight: 0.5, strokes: [{ type: "SOLID", visible: true }] }),
+    );
+    // and a zero-area node with NO stroke stays excluded — it paints nothing
+    group.children.push(
+      mkNode({ type: "VECTOR", name: "phantom", x: 100, y: 60, width: 0, height: 2000, strokes: [] }),
+    );
+    frame.children.push(group);
+    group.parent = frame;
+    const out = await run(
+      { frameId: "F:1", groupId: "G:8", hideNames: [/^connectors$/, /^datapoints__/], hideIds: [],
+        declared: null, imFontSize: null, originalGroupId: null },
+      { frame },
+    );
+    const h = out.group.measured.h;
+    check("8 zero-width stroked line counts as ink", Math.abs(h - 840) < 0.5, `measured h=${h}, expected 840`);
+    const l = out.group.measured.x0 !== undefined ? out.group.measured.x0 : null;
+    check("8 zero-area node with no stroke stays excluded", h < 2000 && (l === null || l > 100),
+          `measured=${JSON.stringify(out.group.measured)}`);
+  }
+
   const bad = results.filter((x) => !x.ok);
   for (const x of results) console.log(`${x.ok ? "PASS" : "FAIL"}  ${x.name}${x.ok ? "" : "  " + x.detail}`);
   console.log(bad.length ? `\n${bad.length} FAILURES` : "\nALL PASS");

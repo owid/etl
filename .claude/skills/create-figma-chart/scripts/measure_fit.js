@@ -274,7 +274,16 @@ if (groupNode) {
       return;
     }
     const b = n.absoluteBoundingBox;
-    if (!b || b.width === 0 || b.height === 0) return;
+    if (!b) return;
+    // A zero-AREA node is still ink when it carries a visible stroke. A vertical zero line and a
+    // tick mark both have width 0 and paint a real line, and dropping them under-measures the group:
+    // grapher draws a single-entity stacked discrete bar's zero line at 1.54x the bar height (checked
+    // at four canvas sizes), so a fit computed without it left 440px of stroke hanging 31px past the
+    // artboard and straight through the source line. Zero-area nodes stay excluded from the FILL
+    // inventory for the opposite reason — see the same distinction in verify_page.js.
+    const strokedInk =
+      "strokes" in n && Array.isArray(n.strokes) && n.strokes.some((s) => s && s.visible !== false);
+    if ((b.width === 0 || b.height === 0) && !strokedInk) return;
     x0 = Math.min(x0, b.x);
     y0 = Math.min(y0, b.y);
     x1 = Math.max(x1, b.x + b.width);

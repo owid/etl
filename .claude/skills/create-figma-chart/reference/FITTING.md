@@ -110,6 +110,26 @@ before and after, since a rewrap shows up there and nowhere else.
   the chart lands off by whatever the group carries beyond it — measured **7.71px** on a discrete bar,
   and **63px** on a stacked bar whose group holds a layer the ink walk excludes. Scale on the ink, then
   correct position by the ink's own offset inside the group.
+- **A zero-AREA node is still ink when it carries a stroke, and missing that overflows the artboard.**
+  A vertical zero line has width **0** and a tick mark has one zero dimension too, so the "skip
+  degenerate geometry" filter every ink walk needs will silently drop them. Measured cost: grapher draws
+  a single-entity stacked discrete bar's zero line at **1.54× the bar height** — checked at four canvas
+  sizes (1000/700/520/420 all give 1.54, so it is structural and no re-export fixes it) — and the fit,
+  computed from the bars alone, left **440px of stroke** hanging 31px past the frame and straight
+  through the source line. `measure_fit.js` now keeps a zero-area node when any of its strokes is
+  visible; `test_measure_fit.js` case 8 is the regression. Note the asymmetry with `verify_page.js`,
+  which excludes zero-area nodes from the **fill** inventory for the opposite reason (a tick's default
+  black fill paints nothing and reports a phantom `#000000`). Same nodes, opposite treatment, because
+  one row is about strokes and the other about fills — so the exclusion belongs per-row, never per-node.
+- **Align on the group's own bbox, because that is what the canvas reports.** A GROUP's box hugs its
+  children's rendered content, so for an imported chart it *is* the ink — and it is the number the user
+  reads in the properties panel. A fit that measured leaves with `absoluteRenderBounds` while the user
+  read the group's box came out 0.12px apart on a scatter (523.878 against a 524 target): invisible in a
+  render, but a real miss when someone selects the node and checks. Stretch to make the **group box**
+  exactly the content width, then set `x` from the group box. `absoluteRenderBounds` stays the right
+  tool for the *gap* checks, where stroke overhang and text leading are exactly what you are measuring —
+  but note it is **clipped by an ancestor frame**, so it cannot measure a group that overflows, which is
+  the case the previous bullet is about. Bbox to fit, render bounds to verify.
 - **Equal box gaps are not equal VISIBLE gaps — centre on the ink.** The text box carries half its
   leading, and the amount differs above (subtitle) and below (source), so a chart placed at 14/14 from
   the box edges reads as 15.6 above and 15.0 below. Place the chart's ink midway between the subtitle's
