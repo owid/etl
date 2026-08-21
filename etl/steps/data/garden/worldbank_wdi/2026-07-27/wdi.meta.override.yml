@@ -627,6 +627,50 @@ tables:
               - Latin America and Caribbean (WB)
               - World
 
+      it_net_user_zs_number:
+        title: Individuals using the Internet (number of people)
+        unit: 'people'
+        short_unit: ''
+        description_short: Number of people who used the Internet in the last three months.
+        description_processing: We calculated the number of Internet users by multiplying the share of the population using the Internet by the total population, both published in the World Development Indicators.
+        description_key:
+          - An Internet user is defined by the International Telecommunication Union as anyone who has accessed the Internet from any location in the last three months.
+          - This can be from any type of device, including a computer, mobile phone, personal digital assistant, games machine, digital TV, and other technological devices.
+          - The World Bank publishes the share of the population using the Internet, not the number of people. We calculate the number from that share and the World Bank's own population figures, so the regional and global values follow the World Bank's definitions of those groups.
+        processing_level: major
+        display:
+          name: Number of people using the Internet
+          numDecimalPlaces: 0
+          tolerance: 5
+        presentation:
+          title_public: Number of people using the Internet
+          title_variant: International Telecommunication Union
+          attribution_short: World Bank
+          topic_tags:
+            - Internet
+            - Technological Change
+          grapher_config:
+            title: Number of people using the Internet
+            subtitle: 'Number of people who [used the Internet](#dod:internetuser) in the last three months.'
+            timelineMinTime: 1990
+            originUrl: https://ourworldindata.org/internet
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            hasMapTab: true
+            map:
+              timeTolerance: 5
+            selectedEntityNames:
+              - South Asia (WB)
+              - North America (WB)
+              - Sub-Saharan Africa (WB)
+              - East Asia and Pacific (WB)
+              - Middle East, North Africa, Afghanistan and Pakistan (WB)
+              - Europe and Central Asia (WB)
+              - Latin America and Caribbean (WB)
+              - World
+
       sh_sta_stnt_zs:
         title: Share of children who are stunted
         unit: '% of children under 5'
