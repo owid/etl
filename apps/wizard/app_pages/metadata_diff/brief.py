@@ -15,6 +15,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     affected_charts,
     as_bullets,
     as_plaintext,
+    charts_in_reading_order,
     dims_str,
     distinct_garden_datasets,
     distinct_indicator_short_names,
@@ -231,7 +232,7 @@ def surface_lines(g: ChangeGroup, usage: dict[int, dict[str, list[dict[str, Any]
     out: list[str] = []
     if charts:
         out.append(f"- **Charts that {verb} ({len(charts)}):**")
-        for c in sorted(charts, key=lambda c: str(c.get("slug") or "")):
+        for c in charts_in_reading_order(charts, {g.field}):
             slug = c.get("slug") or f"chart {c.get('chartId')}"
             note = (
                 ""

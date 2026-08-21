@@ -512,6 +512,26 @@ def charts_behind_drawer(fields: Iterable[str], charts: list[dict[str, Any]]) ->
     return [c for c in charts if behind_sources_drawer(fields, c)]
 
 
+def charts_in_reading_order(charts: list[dict[str, Any]], fields: Iterable[str] | None = None) -> list[dict[str, Any]]:
+    """Charts ordered the way a reviewer wants to read them: most prominent first, then by slug.
+
+    A chart with a data page lays the changed text out on the page; one without shows it behind "Learn
+    more about this data". Both are affected, but the first group is where the change actually meets a
+    reader, so it goes first — and a long list stays scannable because the split is visible rather than
+    interleaved. `fields` decides what counts as prominent; without it, fall back to whether the chart has
+    a data page at all.
+    """
+
+    def key(chart: dict[str, Any]) -> tuple[bool, str]:
+        if fields is not None:
+            behind = behind_sources_drawer(fields, chart)
+        else:
+            behind = not chart.get("has_data_page", True)
+        return (behind, str(chart.get("slug") or ""))
+
+    return sorted(charts, key=key)
+
+
 def affected_charts(g: "ChangeGroup", usage: dict[int, dict[str, list[Any]]]) -> list[dict[str, Any]]:
     """Every published chart this change reaches — the one reach number, wherever it is reported."""
     return list(group_usage(g, usage).get("charts", []))

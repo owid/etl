@@ -19,6 +19,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     ChangeGroup,
     affected_charts,
     charts_behind_drawer,
+    charts_in_reading_order,
     distinct_garden_datasets,
     distinct_indicator_short_names,
     field_label,
@@ -247,7 +248,7 @@ def _open_chart_buttons(charts: list[dict[str, Any]], change_key: str) -> None:
     if not charts:
         return
     st.caption("Open one of them in the full per-chart review:")
-    for c in sorted(charts, key=lambda c: str(c.get("slug") or ""))[:8]:
+    for c in charts_in_reading_order(charts)[:8]:
         slug = str(c.get("slug") or "")
         if not slug:
             continue

@@ -1552,3 +1552,28 @@ def test_a_tick_only_counts_while_the_text_it_was_made_against_stands(monkeypatc
     # Same slot, text moved on: the tick no longer counts.
     assert count_reviewed("engine", surface, [edited]) == 0
     assert count_reviewed("engine", surface, []) == 0
+
+
+def test_charts_are_listed_most_prominent_first():
+    """Charts whose page shows the change come before the ones that keep it behind the drawer.
+
+    Both are affected, so both are listed — but the first group is where the change actually meets a
+    reader, and grouping them keeps a long list scannable instead of interleaving the two.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import charts_in_reading_order
+
+    charts = [
+        {"chartId": 1, "slug": "zebra", "has_data_page": True},
+        {"chartId": 2, "slug": "alpha", "has_data_page": False},
+        {"chartId": 3, "slug": "beta", "has_data_page": True},
+    ]
+
+    # WYSK: the data-page charts lead, each group alphabetical within itself.
+    order = [c["slug"] for c in charts_in_reading_order(charts, {"descriptionKey"})]
+    assert order == ["beta", "zebra", "alpha"]
+
+    # A field the chart renders itself is equally prominent everywhere, so slug order is all that is left.
+    assert [c["slug"] for c in charts_in_reading_order(charts, {"titlePublic"})] == ["alpha", "beta", "zebra"]
+
+    # Without a field to judge by, fall back to whether the chart has a data page at all.
+    assert [c["slug"] for c in charts_in_reading_order(charts)] == ["beta", "zebra", "alpha"]

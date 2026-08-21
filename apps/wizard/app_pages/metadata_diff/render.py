@@ -27,6 +27,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     ViewDiff,
     as_bullets,
     behind_sources_drawer,
+    charts_in_reading_order,
     diff_preview_html,
     field_label,
     inline_diff_html,
@@ -361,7 +362,7 @@ def render_chart_list(charts: list[dict[str, Any]], verb: str = "render this tex
         return
     st.markdown(f"**{len(charts)} chart{'s' if len(charts) != 1 else ''} {verb}:**")
     lines = []
-    for c in sorted(charts, key=lambda c: str(c.get("slug") or "")):
+    for c in charts_in_reading_order(charts, fields):
         slug = c.get("slug") or f"chart {c.get('chartId')}"
         drawer = fields is not None and behind_sources_drawer(fields, c)
         flag = " :gray-badge[:small[via *Learn more about this data*]]" if drawer else ""
@@ -420,7 +421,7 @@ def render_author_scope(
     # check, so name every chart here, at the moment of the decision (and again in the PR brief).
     if st.session_state.get(sk) == "all" and (n_c or n_m):
         rows = []
-        for c in sorted(imp.get("charts", []), key=lambda c: str(c.get("slug") or "")):
+        for c in charts_in_reading_order(imp.get("charts", []), {field_name}):
             slug = c.get("slug") or f"chart {c.get('chartId')}"
             flag = "" if c.get("has_data_page", True) else " — via *Learn more about this data* (no data page)"
             rows.append(f"- [`{slug}`]({SOURCE.site}/grapher/{slug}){flag}")
