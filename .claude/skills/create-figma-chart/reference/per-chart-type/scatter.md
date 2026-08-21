@@ -17,15 +17,29 @@
 
 Exemplars: `210:710` (divider annotated both sides, empty side stated), `80:382` (highlight vs muted field), `89:344` (ringed dots), `91:1118` (the one kept legend), `186:185` (ramp legend, change arrows).
 
-## The bubble-size legend does not survive a downscale — hide it
+## The bubble-size legend does not survive a downscale — and it is a decoder, not decoration
 
 Grapher sizes the `size-legend` block ("Circles sized by / Population / 1.4B / 600M") as a fraction of
 the export canvas, so a 0.6x fit takes its type to **6.96px and 5.99px** against a 12px floor — a third
 of the minimum, and the only text on the frame that broke it. It cannot be enlarged in place without
-colliding with the circles it annotates, and it is the one element of a scatter carrying no data, so
-hide the whole `size-legend` group. On the measured frame it sat well inside the plot, so the chart's
-box did not change and no refit was needed — check that rather than assuming it, and refit if the group
-did set an extreme.
+colliding with the circles it annotates.
+
+**But it is not "the one element carrying no data" — it is the key to one.** Circle area encodes a
+second variable, and that block is the only thing on the frame telling a reader what the areas mean.
+Hiding it leaves visibly different bubbles with nothing to read them by, which is a worse defect than
+the small type was. So the question is which chart you have:
+
+- **The size dimension is part of the claim** — then the legend stays, and it has to become legible.
+  It cannot grow in place, so rebuild it *outside* the plot: retype its labels at a ladder size and sit
+  it under the chart the way a map's legend does (see maps.md), keeping map→legend clearly tighter than
+  legend→footer so it reads as belonging to the chart.
+- **The size dimension is irrelevant to the claim** — then the bubbles should not be sized by it at all.
+  Re-export without the size encoding rather than hiding its key; equal-area dots and no legend is
+  honest, differently sized dots and no legend is not.
+
+Only hide the whole `size-legend` group once you have established the second case. When you do: on the
+measured frame it sat well inside the plot, so the chart's box did not change and no refit was needed —
+check that rather than assuming it, and refit if the group did set an extreme.
 
 **Find it by lowest common ancestor, never by walking up from one text.** Walking up from the
 "Circles sized by" node until the parent is the chart lands on a `Clip path group` holding the *entire*

@@ -206,9 +206,18 @@ function buildFrame(opts = {}) {
                 fills: solid(opts.frameFill || "#ffffff"), children });
 }
 
+// `strokeVisible: false` / `strokeOpacity: 0` model a knockout paint that is PRESENT but renders
+// nothing — `strokes.length` counts it either way. `decoyStroke` puts such a paint in FRONT of the real
+// one, which is what makes reading `strokes[0]` the wrong paint rather than merely a redundant one.
 const annotation = (o) => text("annotation__test", o.chars || "Note", o.size || 14, o.x, o.y, o.w || 100, o.h || 18,
   o.fill || "#2d2e2d", {
-    strokes: o.stroke ? solid(o.stroke) : [],
+    strokes: o.stroke
+      ? (o.decoyStroke
+          ? [Object.assign(solid(o.decoyStroke)[0], { visible: false }), solid(o.stroke)[0]]
+          : [Object.assign(solid(o.stroke)[0],
+              Object.assign({}, o.strokeVisible === false ? { visible: false } : {},
+                                o.strokeOpacity !== undefined ? { opacity: o.strokeOpacity } : {}))])
+      : [],
     strokeWeight: o.strokeWeight !== undefined ? o.strokeWeight : 0,
     strokeAlign: o.strokeAlign || "OUTSIDE",
     textStyleId: o.styleId === undefined ? "S:abc" : o.styleId,
@@ -292,6 +301,53 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const out = await run(buildFrame({ annotation: annotation({ x: 60, y: 140, w: 90, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {});
     check("5 needless knockout FAILS", row(out, "annotation-knockout").status === "FAIL", row(out, "annotation-knockout").detail);
     check("5 says crosses nothing", /crosses nothing/.test(row(out, "annotation-knockout").detail), row(out, "annotation-knockout").detail);
+  }
+
+  // 6b — a knockout paint that is PRESENT but renders nothing is a missing knockout. `strokes.length`
+  //      counts a paint switched off or made transparent, so the row passed the weight, alignment and
+  //      colour checks on an annotation whose knockout paints no pixels at all.
+  {
+    const off = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3, strokeVisible: false }) }), {});
+    check("6b an invisible knockout paint counts as NO knockout",
+          row(off, "annotation-knockout").status === "FAIL" && /carries NO knockout/.test(row(off, "annotation-knockout").detail),
+          row(off, "annotation-knockout").detail);
+    const clear = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3, strokeOpacity: 0 }) }), {});
+    check("6b and so does a fully transparent one",
+          row(clear, "annotation-knockout").status === "FAIL" && /carries NO knockout/.test(row(clear, "annotation-knockout").detail),
+          row(clear, "annotation-knockout").detail);
+    // ...and the COLOUR check must read the paint that renders, not strokes[0]
+    const decoy = await run(buildFrame({ frameFill: "#fffbf5", annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#fffbf5", strokeWeight: 3, decoyStroke: "#ffffff" }) }), {});
+    check("6b an invisible paint in front does not become the colour that is judged",
+          row(decoy, "annotation-knockout").status === "ok", row(decoy, "annotation-knockout").detail);
+    const visible = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    check("6b while a real visible knockout still passes", row(visible, "annotation-knockout").status === "ok", row(visible, "annotation-knockout").detail);
+  }
+
+  // 6c — a text node whose sizes cannot be READ must not leave text-floor at a clean `ok`. It is
+  //      recorded in the detail, but the status came from `under.length` alone — which is 0 when the
+  //      only suspect node is the one nobody could measure, so the frame certified with an
+  //      uninspected range on it.
+  {
+    const f = buildFrame();
+    const chart = f.children.find((c) => c.name === "chart");
+    // MIXED fontSize and NO declared segments: the mock has no getStyledTextSegments, so the read
+    // throws and sizeRanges() returns [] — exactly the swallow being tested.
+    chart.children.push(text("label__unreadable", "?", MIXED, 300, 240, 40, 16, "#4c6a9c", { fontSize: MIXED }));
+    chart.children[chart.children.length - 1].parent = chart;
+    const out = await run(f, {});
+    check("6c an unreadable text node makes text-floor REVIEW, not ok",
+          row(out, "text-floor").status === "REVIEW", row(out, "text-floor").detail);
+    check("6c and it is named in the detail",
+          /NOT judged/.test(row(out, "text-floor").detail) && /label__unreadable/.test(row(out, "text-floor").detail),
+          row(out, "text-floor").detail);
+    // and it has to reach the FRAME verdict, not just the row: the top line is what gets read.
+    check("6c and the frame verdict counts it among the rows to review",
+          /no mechanical row failed \(\d+ to review/.test(out.verdict) && out.rows.filter((x) => x.status === "REVIEW").length >= 1,
+          out.verdict);
+    // a real breach still outranks it, and a clean frame is still ok
+    check("6c a clean frame is still ok", row(await run(buildFrame(), {}), "text-floor").status === "ok", "");
+    const under = await run(buildFrame({ labelSize: 8 }), {});
+    check("6c and a genuine breach still FAILS", row(under, "text-floor").status === "FAIL", row(under, "text-floor").detail);
   }
 
   // 6 — knockout colour must be the frame's own fill, never hardcoded white.
@@ -683,6 +739,55 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const even = buildFrame();
     even.children.find((c) => c.name === "chart").absoluteBoundingBox = { x: 16, y: 122, width: 508, height: 352 };
     check("31 a symmetric 14/14 still passes", row(await run(even, {}), "gap").status === "ok", row(await run(even, {}), "gap").detail);
+  }
+
+  // 32 — a text node whose SIZES COULD NOT BE READ is not a pass. `sizeRanges` catches a throwing or
+  // non-numeric segment read and returns [], so the node contributes no ranges at all and `under.length`
+  // stays 0 — the row said "ok" and the frame verdict read "no mechanical row failed" with an unmeasured
+  // range sitting on it. The count was already in the detail; it was the STATUS that certified the frame.
+  {
+    // over empty space and strokeless, so this isolates the text rows: the knockout row must stay ok
+    const unreadable = text("annotation__opaque", "Note nobody could measure", MIXED, 60, 140, 90, 18, "#2d2e2d", {
+      fontSize: MIXED, strokes: [], strokeWeight: 0, textStyleId: "S:abc",
+      // fontName only: asking for fontSize throws, exactly as an unsupported field would
+      segments: { fontName: [["Regular", 0, 25]] },
+    });
+    const out = await run(buildFrame({ annotation: unreadable }), {});
+    const tf = row(out, "text-floor");
+    check("32 an unmeasurable text node is not certified ok", tf.status === "REVIEW", tf.status + " " + tf.detail);
+    check("32 and the node is named as NOT judged", /NOT judged/.test(tf.detail) && /annotation__opaque/.test(tf.detail), tf.detail);
+    const clean = await run(buildFrame(), {});
+    const nrev = (o) => o.rows.filter((x) => x.status === "REVIEW").length;
+    check("32 it adds a row to review on an otherwise identical frame", nrev(out) === nrev(clean) + 1, `${nrev(out)} vs ${nrev(clean)}`);
+    check("32 the same frame with readable text is still a clean ok", row(clean, "text-floor").status === "ok", row(clean, "text-floor").detail);
+    // and a REAL breach still outranks it — FAIL is not softened to REVIEW
+    const both = await run(buildFrame({ labelSize: 9, annotation: unreadable }), {});
+    check("32 a genuine sub-floor range still FAILS", row(both, "text-floor").status === "FAIL", row(both, "text-floor").detail);
+  }
+
+  // 33 — a knockout paint that RENDERS NOTHING. `strokes.length` counts a paint switched off or at zero
+  // opacity, so an annotation crossing a gridline with a disabled stroke passed the weight, alignment and
+  // colour rows: the row certified the missing knockout it exists to catch. Fills are read this way
+  // everywhere above (`visible !== false`); strokes were not.
+  {
+    const off = annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 });
+    off.strokes = [Object.assign({}, off.strokes[0], { visible: false })];
+    const out = await run(buildFrame({ annotation: off }), {});
+    const d = row(out, "annotation-knockout").detail;
+    check("33 a switched-off knockout paint FAILS", row(out, "annotation-knockout").status === "FAIL", d);
+    check("33 and is reported as NO knockout", /carries NO knockout/.test(d), d);
+    const clear = annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 });
+    clear.strokes = [Object.assign({}, clear.strokes[0], { opacity: 0 })];
+    check("33 a fully transparent one FAILS by the same route",
+          row(await run(buildFrame({ annotation: clear }), {}), "annotation-knockout").status === "FAIL",
+          row(await run(buildFrame({ annotation: clear }), {}), "annotation-knockout").detail);
+    // the COLOUR is read off the paint that renders, never off strokes[0]: an invisible white in front
+    // of the frame's own cream used to be reported as a hardcoded-white knockout
+    const layered = annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 });
+    layered.strokes = [Object.assign({}, layered.strokes[0], { visible: false }), solid("#fffbf5")[0]];
+    const lay = await run(buildFrame({ frameFill: "#fffbf5", annotation: layered }), {});
+    check("33 an invisible paint in front does not mask the real colour",
+          row(lay, "annotation-knockout").status === "ok", row(lay, "annotation-knockout").detail);
   }
 
   const bad = results.filter((x) => !x.ok);

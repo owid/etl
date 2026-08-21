@@ -269,7 +269,12 @@ const checkFrame = async (frameId) => {
   // Text floor (CHECKS.md: nothing below 12px)
   {
     const under = texts.filter((t) => t.size < TEXT_FLOOR - 0.01);
-    add("text-floor", under.length ? "FAIL" : "ok",
+    // A node whose sizes could not be READ is not a pass. `sizeRanges` swallows a throwing or
+    // non-numeric segment read and returns [], so the node contributes no ranges at all — and the
+    // status was decided by `under.length` alone, which is 0 when the only suspect node is the one
+    // nobody could measure. The frame then certified with an uninspected range on it. It is recorded
+    // in the detail, so REVIEW rather than FAIL: some text was judged, some could not be.
+    add("text-floor", under.length ? "FAIL" : unreadableText.length ? "REVIEW" : "ok",
         (under.length ? `${under.length} text range(s) below ${TEXT_FLOOR}px: ` + under.map((t) => `"${t.chars}"${t.sizeRange ? ` chars ${t.sizeRange}` : ""} ${r(t.size)}px`).join(", ")
                       : `all ${texts.length} text range(s) at or above ${TEXT_FLOOR}px`) +
         ` (floor ${TEXT_FLOOR}px, ${CONFIG.textFloor != null ? "from CONFIG" : isSmall ? "302-wide format — SMALL-CHARTS.md overrides 12 to 11" : "540/850-wide format"})` +
@@ -766,7 +771,13 @@ const checkFrame = async (frameId) => {
       for (const a of annotations) {
         const n = a.node;
         if (!("strokeWeight" in n) || typeof n.strokeWeight !== "number") continue;
-        const hasStroke = n.strokes && n.strokes.length && n.strokeWeight > 0;
+        // Presence is decided by a paint that actually RENDERS. `strokes.length` counts a paint that
+        // has been switched off (`visible: false`) or made transparent (`opacity: 0`), so an annotation
+        // whose knockout paints nothing passed the weight, alignment and colour checks — the row
+        // certified the missing knockout it exists to catch. And the colour check read `strokes[0]`
+        // unconditionally, which is the wrong paint the moment an invisible one sits in front of it.
+        const paint = (n.strokes || []).find((s) => s && s.visible !== false && (s.opacity === undefined || s.opacity > 0.01));
+        const hasStroke = !!paint && n.strokeWeight > 0;
         const crosses = crossings[a.name] || [];
         if (crosses.length && !hasStroke) {
           bad.push(`${a.name} crosses ${crosses.length} thing(s) (${crosses.slice(0, 3).join(", ")}) but carries NO knockout — CHECKS.md requires a 3px OUTSIDE stroke whenever furniture is crossed`);
@@ -781,7 +792,7 @@ const checkFrame = async (frameId) => {
         }
         if (hasStroke && n.strokeAlign !== "OUTSIDE") bad.push(`${a.name} strokeAlign ${n.strokeAlign} (want OUTSIDE)`);
         if (hasStroke && frameFill) {
-          const sf = n.strokes[0];
+          const sf = paint;
           if (sf.type === "SOLID") {
             const hex = "#" + [sf.color.r, sf.color.g, sf.color.b].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join("");
             if (hex.toLowerCase() !== frameFill.toLowerCase()) bad.push(`${a.name} knockout is ${hex}, not the frame's own ${frameFill} — read the colour off the frame, never hardcode white`);

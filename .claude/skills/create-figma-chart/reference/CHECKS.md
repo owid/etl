@@ -41,7 +41,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 >
 > Validated by planting defects and confirming each row **fails**, twice over: 11 planted in Figma and
 > 11 caught, then a stubbed-figma harness ([`scripts/test_verify_page.js`](../scripts/test_verify_page.js),
-> `node` it after any edit) covering **128** assertions including the rows that are awkward to plant on a
+> `node` it after any edit) covering **137** assertions including the rows that are awkward to plant on a
 > real page. **A check that cannot fail is worse than no check**, so when you extend this script,
 > extend both passes with it.
 >
