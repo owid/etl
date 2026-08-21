@@ -125,9 +125,80 @@ Rules: replace `characters`, and leave the node's **base** styling alone — the
 ```js
 const PREFIX = "Data source:";
 src.characters = PREFIX + " " + citation;
+// REQUIRED, and missing from this recipe until it was measured: assigning `characters` DETACHES the
+// node's text style. Re-bind before touching weights, with the FULL style id.
+await src.setTextStyleIdAsync(SOURCE_STYLE_ID);   // resets range weights — so the bold goes after
+await figma.loadFontAsync(src.getStyledTextSegments(["fontName"])[0].fontName);
 src.setRangeFontName(0, PREFIX.length, {family:"Lato", style:"Bold"});
-src.setRangeFontName(PREFIX.length, src.characters.length, {family:"Lato", style:"Regular"});
+// and do NOT re-set the tail to Regular: the style already provides it. The prefix range loses its
+// style binding here and cannot get it back — see below; the tail keeps it.
 ```
+
+**Only three of the nine templates bind their source to a style at all — read the clone, never assume.**
+Measured across every in-scope template:
+
+| template | title | subtitle | source |
+|---|---|---|---|
+| IG square, IG portrait, DI | `Instagram/Title` (portrait: `…(portrait)` 28) | `Instagram/Subtitle` (portrait 18) | **`Instagram/Source` 14** |
+| static mobile 1 & 2 | `Instagram/Title` 25 | `Instagram/Subtitle` 16 | **no style**, 14 |
+| static horizontal & vertical | **`Data Insights/Title`** 25 | **`Data Insights/Subtitle`** 16 | **no style**, **12** |
+| small guided & pull | **no style**, 16 **Bold** | **no style**, 11 | — (no footer) |
+
+Three consequences, all of which a DI-only fix gets wrong:
+
+- **The re-bind below applies to IG square, IG portrait and DI only.** On the static and 302-wide
+  templates the source ships with no style id, so an unbound source there is the template's own state
+  and not a defect — the template is law, and matching it means leaving it unbound.
+- **The 850-wide pair uses the `Data Insights/` family while DI itself uses `Instagram/`.** That is
+  counterintuitive enough to check rather than infer from the template's name, and their source runs
+  **12px** against mobile's 14.
+- **The footer carries weights the annotation ladder does not mention.** static mobile's license line
+  is `Regular+Bold+Regular+Bold` (four segments) and the 850-wide pair's is `Medium+Bold+Medium+Bold`,
+  with its Note at `Bold+Medium+Regular`. So a mixed-weight restore that assumes Bold-then-Regular
+  will flatten a **Medium** run on those templates. Read the segments before writing, and put back
+  what was there.
+
+**Assigning `characters` detaches the text style, and the bold prefix cannot be re-bound. Know which
+of the two reachable states you are shipping.** Measured step by step on a filled clone:
+
+1. The node starts node-level `Instagram/Source` with `Bold + Regular` segments — **both** segments
+   carry the style. That is the template's state.
+2. `src.characters = …` alone drops it to **unbound**, segments collapsed to the first character's
+   style. This is the bug: a recipe that writes the string and fixes the weights produces a
+   correct-*looking* footer whose source carries no style at all. Eight of eight on one run.
+3. `setTextStyleIdAsync(fullId)` re-binds the whole node, at the style's uniform Regular.
+4. `setRangeFontName(0, PREFIX.length, Bold)` then **strips the style from that range**: the prefix
+   goes `Bold | unbound`, the tail stays `Regular | BOUND`, and `node.textStyleId` becomes
+   `figma.mixed`.
+5. `setRangeTextStyleIdAsync` on the prefix re-binds it — and resets it to Regular, losing the bold.
+   Re-bolding strips it again. **The loop does not close.**
+
+So the template's Bold-and-bound state is reachable in Figma's UI and **not** through
+`setRangeFontName`. Pick deliberately:
+
+| ship | node reads | trade |
+|---|---|---|
+| prefix Bold, tail bound *(default)* | `figma.mixed` | matches the template visually; the 12-character label stops tracking the style, the citation still does |
+| whole line bound, no bold prefix | the style id | tracks a design revision completely; loses the house bold convention |
+
+Take the first unless someone says otherwise, and **do not report the source as unstyled when it
+reads `figma.mixed`** — check the segments, not the node. Which is also why a truthiness test is the
+wrong check here: `figma.mixed` is a **Symbol**, so `node.textStyleId ? "bound" : "none"` says
+"bound" for a node that is only half bound, and `=== styleId` says "none" for the same node. Both
+readings are wrong in opposite directions; read `getStyledTextSegments(["textStyleId"])`.
+
+Three details the fix depends on:
+
+- **The full style id, not a prefix.** These are 43 characters and end in a comma
+  (`S:2fea779e2ca5d1ff32c496ab104a86a7942f51dc,`). `setTextStyleIdAsync` with a truncated id fails
+  *silently* — the call returns and `textStyleId` stays `(NONE)`, which reads exactly like the bug
+  you are trying to fix. Read the id off the template node, or off
+  `figma.getLocalTextStylesAsync()`.
+- **Load fonts AFTER applying the style, not before.** The style can introduce a font the node did
+  not carry, and the next `setRangeFontName` then throws `Cannot write to node with unloaded font`.
+- **The DI template binds `Instagram/Source`**, not `Data Insights/Source`, even though both exist
+  at 14px. Read the binding off the clone rather than assuming the family matches the template's
+  name.
 
 Read the segments back (`getStyledTextSegments(['fontName'])`) and compare against the untouched template node — a wholly-bold source line looks deliberate enough that nobody catches it in a screenshot.
 

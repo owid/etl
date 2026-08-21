@@ -43,6 +43,14 @@
   node.x += want.x0 - (b.x - fb.x); node.y += want.y0 - (b.y - fb.y);
   ```
 
+- **ASK before trimming the fringe — it is a visibility decision, not a fit detail.** Trimming buys
+  real map size, and it does it by removing real places: Hawaii, and the Pacific islands east of Fiji.
+  So put the trade-off to the user rather than deciding it: *"I can gain about 6% of the map's width
+  (29.6px of 490 on a 540 frame) by trimming the Pacific fringe — Hawaii and the islands east of Fiji
+  would stop being visible. Trim, or keep them and accept the smaller map?"* Quote the measured
+  numbers for the chart in hand, name what disappears, and default to keeping them if there is no
+  answer. A map that silently loses islands is the kind of edit a reader notices and nobody approved.
+
 - **The fringe is worth ~6% of the map's width, measured.** On a live 540-wide frame the map group's raw
   bbox ran 490.06px while the straddler-excluded union ran 481.76 and the mainland began 29.57px in — so
   Fiji's box costs **8.29px** and the Tonga/Samoa/Kiribati specks another **21.28px**, which is the

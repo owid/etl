@@ -64,6 +64,65 @@ The chart spans the full content width, left-aligned with the title/subtitle/log
 > you have already unwrapped — delete the text first, after which the bbox *is* the canvas and one
 > rescale lands the height on the template's to `delta 0`.
 
+### The x-map is not optional, and it is what makes the right edge land on 0
+
+The height-first fit sets the scale from the height, so the width lands on the content box only if the
+achieved ink aspect equals the target *exactly*. It never does: `imFontSize` is an integer, `imWidth`
+is an integer ratio, and grapher rounds the declared size when it renormalizes to ~510,000 px². That
+leaves 0.1–0.4% of aspect error, which is **0.5–2px of width** — visible as a chart whose right edge
+does not line up with the subtitle's. Measured across seven chart types the residual ran 0.13 to 1.27px
+before the map and **0.01 to 0.05px after**, so this step is the difference between "nearly aligned"
+and aligned.
+
+**One `resize` on the group does it — and it must be a STRETCH.** Scale the group so the *ink* lands on
+the content width, then align the ink's left edge:
+
+```js
+const f = contentW / inkW;                 // must be >= 1; see below
+chart.resize(chart.width * f, chart.height);
+chart.x += CONTENT_X - ink().x0;           // align on the INK, not the group's bbox
+```
+
+`resize()` and not `rescale()`: resize leaves `strokeWeight` alone, which is the point — this must not
+re-thin the strokes you just set. Measured on eight frames this lands the ink at **508.000 ± 0.001px**
+with the left edge exactly on 16, in one operation.
+
+**The direction matters, and this is the part to get right.** Grapher's exported labels hug their
+glyphs with no slack, so squeezing the group rewraps them — measured on an 80-label scatter:
+
+| factor | labels rewrapped |
+|---|---|
+| 1.0003 (the real correction) | **0** |
+| 0.999 | 5 |
+| 0.995 | 25 |
+| 0.99 | 78 |
+| 0.95 | 78 |
+
+So a **stretch** of a fraction of a percent is clean, and even a 0.1% **squeeze** starts breaking
+labels — which is the concrete form of the `resize()` warning in Step 5. Two consequences: always
+solve so the ink comes back *narrower* than the box and close the gap by stretching, and if the ink is
+ever wider, re-export rather than squeeze. Assert it either way — compare every text node's height
+before and after, since a rewrap shows up there and nowhere else.
+
+**Two other things that make the edges lie, both measured here:**
+
+- **A group's bbox is not its ink, so position by the ink.** Fit by the ink and then set `chart.y` and
+  the chart lands off by whatever the group carries beyond it — measured **7.71px** on a discrete bar,
+  and **63px** on a stacked bar whose group holds a layer the ink walk excludes. Scale on the ink, then
+  correct position by the ink's own offset inside the group.
+- **Equal box gaps are not equal VISIBLE gaps — centre on the ink.** The text box carries half its
+  leading, and the amount differs above (subtitle) and below (source), so a chart placed at 14/14 from
+  the box edges reads as 15.6 above and 15.0 below. Place the chart's ink midway between the subtitle's
+  ink bottom and the source's ink top instead, and the visible gaps come out **equal to 0.00px** — at
+  the cost of box gaps that read 13.7/14.3, which is the right trade because the reader sees ink. Both
+  are inside the 12–16 target and inside the 1.5px symmetry tolerance the gap check allows.
+- **The gap you measure box-to-box is not the gap the reader sees.** A text box carries half its
+  leading above and below the glyphs, so the visual gap runs about **1.6px larger above** and **1px
+  larger below** than the header/footer box edges suggest. A box-measured 14 is ~15.6 visually — still
+  inside 12–16, but a box-measured 16 is outside it. Measure ink-to-ink when the number matters.
+
+### Some chart types are letterboxed, and their aspect will not follow the canvas
+
 ### Height-first is the rule for a chart whose aspect you control — and a map's you do not
 
 The fit below is height-first because the solve makes the export's aspect match the band's, so the
