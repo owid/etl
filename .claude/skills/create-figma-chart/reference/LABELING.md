@@ -405,7 +405,20 @@ chart.x = header.x
 chart.y = header.y + header.height + (band - chart.height) / 2
 ```
 
-**Everything that lived inside the old chart goes out with it — replay it, from a list.** That pass restores only the furniture removal, the scale and the text re-hug. Every other Step 8 edit was parented under the group you just removed: the hidden `connectors`, the cloned direct labels and their placement, the added ticks, the bound stroke and fill styles, and the whole highlight treatment (gray context lines at 1px, the palette color on the protagonist, the widened halo, the hidden markers). Only the annotations survive, because they are parented to the template clone rather than to the chart. Keep the chart-local edits as **one scripted function you re-run after the import**, or as an explicit list you work down — memory is not enough, because a frame that has quietly reverted to grapher's raw rendering looks finished. Then re-run Step 8c on the new chart; the earlier pass certified an object that no longer exists.
+**Everything that lived inside the old chart goes out with it — replay it, from a list.** That pass restores only the furniture removal, the scale and the text re-hug. Every other Step 8 edit was parented under the group you just removed: the hidden `connectors`, the cloned direct labels and their placement, the added ticks, the bound stroke and fill styles, and the whole highlight treatment (gray context lines at 1px, the palette color on the protagonist, the widened halo, the hidden markers). Only the annotations survive, because they are parented to the template clone rather than to the chart. Keep the chart-local edits as **one scripted function you re-run after the import**, or as an explicit list you work down — memory is not enough, because a frame that has quietly reverted to grapher's raw rendering looks finished.
+
+  **[`scripts/replay_chart_edits.js`](../scripts/replay_chart_edits.js) is that function.** Fill in a
+  `CONFIG` saying *what* the frame needs — nodes to hide, subpaths to trim, furniture to shorten to the
+  data's extent, the furniture weight, a map legend to re-centre — and it owns the **order**, which is
+  the part that is easy to get wrong and expensive to debug: hide and trim *before* measuring (they
+  change the group's proportions), fit with one `rescale`, close the width residual, and set strokes
+  **last**, because `rescale` multiplies `strokeWeight` and setting them first is the most repeated
+  mistake in this skill's history. It runs `dryRun: true` by default and returns the plan; read that
+  before letting it write. It also refuses a width squeeze beyond 0.5% rather than silently rewrapping
+  labels, and reports a rewrap by **line count** (`height / fontSize`) rather than raw height, since a
+  uniform rescale changes every height in proportion and a raw-height check cries wolf on all of them.
+  Harness: [`scripts/test_replay_chart_edits.js`](../scripts/test_replay_chart_edits.js) (23
+  assertions, mostly asserting the ordering rather than the arithmetic). Then re-run Step 8c on the new chart; the earlier pass certified an object that no longer exists.
 
 Keep the export URL — same `imFontSize`, same `imType`, same params — so the only thing that changes is what the chart author changed. And re-check the category order and the entity list against what you were told changed: a reorder can move more than the category you asked about.
 
