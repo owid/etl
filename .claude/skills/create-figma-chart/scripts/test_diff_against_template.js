@@ -50,7 +50,9 @@ const txt = (name, o) => {
     width: opt.w || 508, height: 19,
     getStyledTextSegments: (fields) =>
       (fields.indexOf("fontName") !== -1
-        ? fonts.map(([v, start, end]) => ({ fontName: { style: v }, start, end }))
+        // A font segment is [style, start, end, family?]; the family defaults to the templates' Lato, so
+        // a case can retype one row in another family without touching every other fixture.
+        ? fonts.map(([v, start, end, family]) => ({ fontName: { family: family || "Lato", style: v }, start, end }))
         : styles.map(([v, start, end]) => ({ textStyleId: v, start, end }))),
   });
 };
@@ -179,6 +181,16 @@ const has = (res, re) => drift(res).some((d) => re.test(d));
                           buildFrame({ name: "clone", footerRows: [txt("source", { size: 11, lsV: "FIXED" })] }));
     check("6 a shrunken source line is DRIFT", has(res, /footer\[0\] size 11 != 13/), JSON.stringify(drift(res)));
     check("6 a FIXED row where the template HUGs is DRIFT", has(res, /layoutSizingVertical FIXED != HUG/), JSON.stringify(drift(res)));
+
+    // The FAMILY is drift too, and it is the half that was never compared. Arial Regular and Lato
+    // Regular have the same style runs, so a fingerprint holding only `style` reported a retyped row as
+    // matching the template.
+    const fam = await run(buildFrame({ name: "tpl" }),
+                          buildFrame({ name: "clone", footerRows: [txt("source", { size: 13, fontSegs: [["Regular", 0, 40, "Arial"]] })] }));
+    check("6 a row retyped in another FAMILY is DRIFT", has(fam, /footer\[0\] font family Arial != Lato/), JSON.stringify(drift(fam)));
+    check("6 and the identical style runs are NOT reported as a weight change", !has(fam, /footer\[0\] weights/), JSON.stringify(drift(fam)));
+    const sameFam = await run(buildFrame({ name: "tpl" }), buildFrame({ name: "clone" }));
+    check("6 while a clone in the template's own family reports no family drift", !has(sameFam, /font family/), JSON.stringify(drift(sameFam)));
   }
 
   // 7 — a DETACHED text style is the defect (assigning `characters` drops the binding); it must not be

@@ -67,6 +67,22 @@ function build(opts = {}) {
     kids.push(node({ type: "VECTOR", name: "United-States", x: 100, y: 200, width: 200, height: 100, fills: solid(),
       vectorPaths: [{ windingRule: "NONZERO", data: "M0 80L2 80L2 82L0 82Z M4 84L6 84L6 86L4 86Z M8 88L10 88L10 90L8 90Z M60 0L200 0L200 100L60 100Z M70 10L120 10L120 40L70 40Z M130 20L180 20L180 50L130 50Z" }] }));
   }
+  // Grapher's real slope shape: `slope__<Entity>` and `outline__<Entity>` are GROUPS of
+  // {start-point, end-point, line}, and the only stroked node is called plain `line`. Matching the
+  // stroked node's own name finds no series here, which is why the identity has to travel down the walk.
+  if (opts.slopeSeries) {
+    const seg = (w) => node({ type: "VECTOR", name: "line", x: 100, y: 200, width: 300, height: 150,
+      strokeWeight: w, strokes: solid(), dashPattern: [] });
+    kids.push(node({ name: "slopes", x: 100, y: 200, width: 300, height: 150, children: [
+      node({ name: "outline__USA", x: 100, y: 200, width: 300, height: 150, children: [
+        node({ type: "VECTOR", name: "start-point", x: 100, y: 200, width: 6, height: 6 }), seg(opts.slopeHalo || 1.7)] }),
+      node({ name: "slope__USA", x: 100, y: 200, width: 300, height: 150, children: [
+        node({ type: "VECTOR", name: "end-point", x: 400, y: 350, width: 6, height: 6 }), seg(opts.slopeLine || 1.1)] })] }));
+  }
+  // A gridline nested one level deeper than its container — the parent-only check never saw it.
+  if (opts.nestedGrid) kids.push(node({ name: "horizontal-grid-lines", x: 100, y: 200, width: 500, height: 300, children: [
+    node({ name: "inner", x: 100, y: 200, width: 500, height: 300, children: [
+      node({ type: "VECTOR", name: "gN", x: 100, y: 250, width: 500, height: 1, strokeWeight: 0.4, strokes: solid(), dashPattern: [4, 4] })] })] }));
   if (opts.legend) kids.push(node({ name: "numeric-color-legend", x: 200, y: 520, width: 300, height: 30, children: [txt("0 t", 200, 520, 20, 12, 12)] }));
   if (opts.mapBody) kids.push(node({ name: "map", x: 100, y: 200, width: 500, height: 250, children: [node({ type: "VECTOR", name: "France", x: 100, y: 200, width: 500, height: 250, fills: solid() })] }));
 
@@ -251,6 +267,38 @@ const check = (name, ok, detail) => results.push({ name, ok: !!ok, detail: ok ? 
     check("13 a mistyped bindAxis throws", threw && /bindAxis must be "height" or "width"/.test(threw), String(threw));
     const noneGiven = await run(build(), { bindAxis: undefined });
     check("13 while an absent bindAxis defaults to the height", noneGiven.fit.bindAxis === "height" && noneGiven.result.edgesExact, JSON.stringify(noneGiven.fit));
+  }
+
+  // 14 — the series identity is on an ANCESTOR on a slope export, so the configured house weights have
+  //      to reach a stroked node called plain `line`. Read off the leaf name alone they never did, and
+  //      the script reported a completed replay over grapher's own 1.1/1.7px.
+  {
+    const f = build({ slopeSeries: true });
+    const out = await run(f, { seriesWeights: { line: 3, outline: 4 } });
+    const slopeLine = f.findOne((n) => n.name === "slope__USA").children.find((c) => c.name === "line");
+    const haloLine = f.findOne((n) => n.name === "outline__USA").children.find((c) => c.name === "line");
+    check("14 a slope's series line reaches the house 3px", Math.abs(slopeLine.strokeWeight - 3) < 0.001, `strokeWeight ${slopeLine.strokeWeight}`);
+    check("14 and its halo the house 4px", Math.abs(haloLine.strokeWeight - 4) < 0.001, `strokeWeight ${haloLine.strokeWeight}`);
+    check("14 and both are reported with the reason", out.strokeFixes.filter((x) => x.why === "house series weight").length === 2, JSON.stringify(out.strokeFixes));
+    // a series is never furniture, whatever container it sits in
+    check("14 a series node is not dragged to the furniture 1px", !out.strokeFixes.some((x) => x.name === "line" && x.to === 1), JSON.stringify(out.strokeFixes));
+    // with no seriesWeights configured, grapher's own weight is restored rather than thinned by the fit
+    const f2 = build({ slopeSeries: true });
+    const left = await run(f2, {});
+    const leftLine = f2.findOne((n) => n.name === "slope__USA").children.find((c) => c.name === "line");
+    check("14 with no seriesWeights the export's own weight is restored, not thinned",
+          Math.abs(leftLine.strokeWeight - 1.1) < 0.001 && left.strokeFixes.some((x) => x.name === "line" && x.why === "un-thin to grapher's own"),
+          `strokeWeight ${leftLine.strokeWeight} | ${JSON.stringify(left.strokeFixes)}`);
+  }
+
+  // 15 — the furniture container is carried too. Checking only the immediate parent left a gridline one
+  //      level deeper at the export's own weight, which verify_page.js then fails.
+  {
+    const f = build({ nestedGrid: true });
+    const out = await run(f, {});
+    const gN = f.findOne((n) => n.name === "gN");
+    check("15 a gridline nested below its container still reaches 1px", Math.abs(gN.strokeWeight - 1) < 0.001, `strokeWeight ${gN.strokeWeight}`);
+    check("15 and is reported as furniture", out.strokeFixes.some((x) => x.name === "gN" && x.why === "furniture 1px"), JSON.stringify(out.strokeFixes));
   }
 
   for (const x of results) console.log(`${x.ok ? "PASS" : "FAIL"}  ${x.name}${x.ok ? "" : "  >> " + x.detail}`);

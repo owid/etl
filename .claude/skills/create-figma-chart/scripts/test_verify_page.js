@@ -197,7 +197,9 @@ function buildFrame(opts = {}) {
                      segments: [{ start: 0, end: 1 }, { start: 2, end: 3 }] } }));
   const chart = node({ name: "chart", type: "GROUP", x: 16, y: 122, width: contentW, height: 352, children: kids });
 
-  const children = [header, footer, logo, chart];
+  // `ungrouped` models the documented rework case: the chart GROUP is gone and its subgroups sit as
+  // direct frame children, so CONFIG.chartName resolves nothing and the fallback has to find the plot.
+  const children = opts.ungrouped ? [header, footer, logo, ...kids] : [header, footer, logo, chart];
   if (opts.annotation) children.push(opts.annotation);
 
   return node({ id: "F:1", name: "test frame", x: 0, y: 0, width: W, height: opts.frameH || 540,
@@ -560,6 +562,32 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
           row(tick32, "furniture-dash").detail);
     const tickSolid = await run(buildFrame({ zeroAreaTick: true }), {});
     check("26 while a solid tick still passes", row(tickSolid, "furniture-dash").status === "ok", row(tickSolid, "furniture-dash").detail);
+  }
+
+  // 32 — the UNGROUPED fallback has to find the whole plot, not the line-chart-shaped subset of it. A
+  // whitelist of axis/grid/lines container names missed a map's `map`, a bar's `bars` and a scatter's
+  // point container, which were then walked with insidePlot=false. That does not fail a row, it EMPTIES
+  // one — and an empty row skips with a reason that is false: "no solid fills found in the plot" on a
+  // map full of them, no marks for either annotation row, and `isMap` never set.
+  {
+    const grouped = await run(buildFrame({ mapCountries: true }), {});
+    const ungrouped = await run(buildFrame({ mapCountries: true, ungrouped: true }), {});
+    check("32 the ungrouped fallback names what it resolved",
+          /ungrouped frame child\(ren\)/.test(ungrouped.resolved.chartBy) && /map/.test(ungrouped.resolved.chartBy),
+          ungrouped.resolved.chartBy);
+    check("32 an ungrouped map's fills reach off-palette instead of a false skip",
+          row(ungrouped, "off-palette").status !== "SKIPPED" && row(ungrouped, "off-palette").status === row(grouped, "off-palette").status,
+          `${row(ungrouped, "off-palette").status}: ${row(ungrouped, "off-palette").detail}`);
+    check("32 and the map is still detected as a map",
+          /^map:/.test(row(ungrouped, "gap").detail) && row(ungrouped, "gap").status === "SKIPPED",
+          row(ungrouped, "gap").detail);
+    check("32 the header, footer and logo are NOT taken for plot content",
+          !/header|footer|logo/.test(ungrouped.resolved.chartBy), ungrouped.resolved.chartBy);
+    const withAnn = await run(buildFrame({ mapCountries: true, ungrouped: true,
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    check("32 nor is one of our own annotations",
+          !/annotation__/.test(withAnn.resolved.chartBy) && withAnn.rows.some((x) => x.check === "annotation-overlap" && x.status !== "SKIPPED"),
+          withAnn.resolved.chartBy);
   }
 
   // 27 — a slope chart's stroked vector is called plain `line` and the series identity sits on its

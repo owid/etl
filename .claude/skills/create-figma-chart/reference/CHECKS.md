@@ -32,14 +32,16 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > its text — and it separates the one API limitation that is *not* a defect (a bolded `Data source:`
 > prefix cannot be both bold and style-bound through the plugin API, so it reports as `halfBound`; see
 > [TEXTS.md](TEXTS.md)) from real drift. Its harness is
-> [`scripts/test_diff_against_template.js`](../scripts/test_diff_against_template.js) (**43**
+> [`scripts/test_diff_against_template.js`](../scripts/test_diff_against_template.js) (**46**
 > assertions), which found four defects in the script that review had not: a header that lost a row
 > reported as matching, five fingerprinted footer properties never actually compared, and a
-> `TypeError` that killed the whole diff when a row changed type.
+> `TypeError` that killed the whole diff when a row changed type. A fifth, from review: the text
+> fingerprint held each range's font **style** but not its **family**, so a row retyped in Arial
+> Regular read as the template's Lato Regular and the clone reported as matching. Both are compared now.
 >
 > Validated by planting defects and confirming each row **fails**, twice over: 11 planted in Figma and
 > 11 caught, then a stubbed-figma harness ([`scripts/test_verify_page.js`](../scripts/test_verify_page.js),
-> `node` it after any edit) covering **122** assertions including the rows that are awkward to plant on a
+> `node` it after any edit) covering **127** assertions including the rows that are awkward to plant on a
 > real page. **A check that cannot fail is worse than no check**, so when you extend this script,
 > extend both passes with it.
 >
@@ -218,6 +220,20 @@ mock, and both changes make a row *less* red on purpose. Read them before treati
   `[3,2]` allowance belongs to a slope chart's native **zero line**, not to the whole solid-by-design
   bucket: granted in bulk it also accepted an ordinary tick or axis line dashed `[3,2]`, which this
   document permits nowhere.
+
+## A skip with a false reason is the failure mode, not a wrong number
+
+Worth stating on its own, because it has now bitten in three different rows. When `CONFIG.chartName`
+finds nothing — the documented case where a designer has **ungrouped** the chart — the plot has to be
+resolved from the frame's children, and doing that from a list of container names was line-chart-shaped:
+it knew the axis, grid and lines groups and missed a map's `map`, a bar's `bars`, a scatter's point
+container and a slope's `slopes`. Those children were then walked as *not* in the plot, which does not
+make a row fail — it **empties** one. `off-palette` then reported "no solid fills found in the plot" on
+a map full of them, both annotation rows found no marks to test against, and `isMap` was never set, so
+the map was judged by the band rule written for a chart whose aspect we control. The resolution is
+structural now: everything that is not the header, the footer, the logo or one of our own annotations is
+plot content, and the row records what it resolved. **When you extend either script, ask what a row says
+when it finds nothing — not only what it says when it finds a defect.**
 - **`ladder-sizes` reports imported text instead of failing it.** Judged strictly it failed on **8 of
   8**, i.e. on every fitted import that can exist, and a row that always fails carries no information.
   The cause is a real three-way conflict: text metrics help set the group's width, so snapping labels to

@@ -150,14 +150,27 @@ for (const spec of CONFIG.trimToExtentOf) {
 
 // ---------------------------------------------------------------- record pre-scale stroke state
 // Captured AFTER hiding and trimming, BEFORE any scale — these values are what step 5 restores.
+// Both identities travel DOWN the walk, because on some chart types neither is on the stroked node.
+// On a SLOPE export `slope__<Entity>` and `outline__<Entity>` are GROUPS of {start-point, end-point,
+// line} and the only stroked node is called plain `line` — so matching the leaf name finds no series at
+// all, `CONFIG.seriesWeights` is silently not applied, and the script reports a completed replay over
+// grapher's own weights. verify_page.js carries the naming ancestor for exactly this reason. The
+// furniture container is carried for the same reason: checking only the immediate parent misses a
+// gridline nested more than one level under its container, which is then left un-un-thinned.
 const strokeState = [];
-(function collect(n) {
+const SERIES_ANY = /^(line|slope|outline)__/;
+const FURNITURE_ANY = /grid|axis|tick|zero-line/i;
+(function collect(n, seriesOf, furnitureGroup) {
   if (n.visible === false) return;
+  const sm = SERIES_ANY.exec(n.name);
+  if (sm) seriesOf = sm[1];
+  if (FURNITURE_ANY.test(n.name)) furnitureGroup = n.name;
   if ("strokeWeight" in n && typeof n.strokeWeight === "number" && n.strokes && n.strokes.length) {
-    strokeState.push({ node: n, name: n.name, w: n.strokeWeight, dash: n.dashPattern ? [...n.dashPattern] : [] });
+    strokeState.push({ node: n, name: n.name, w: n.strokeWeight, dash: n.dashPattern ? [...n.dashPattern] : [],
+                       seriesKind: seriesOf || null, furnitureGroup: furnitureGroup || null });
   }
-  if ("children" in n) n.children.forEach(collect);
-})(chart);
+  if ("children" in n) n.children.forEach((c) => collect(c, seriesOf, furnitureGroup));
+})(chart, null, null);
 
 // ---------------------------------------------------------------- 3. fit, and 4. width
 const box0 = chart.absoluteBoundingBox;
@@ -208,15 +221,21 @@ const rewrapped = hBefore.filter((h, i) => h !== hAfter[i]).length;
 // ---------------------------------------------------------------- 5. strokes — after the LAST scale
 const strokeFixes = [];
 for (const s of strokeState) {
-  const isFurniture = /gridline|grid-lines|zero-line|^ticks?$|^tick|^axis/i.test(s.name) ||
-                      (s.node.parent && /grid|axis|tick/i.test(s.node.parent.name));
-  const seriesKind = (/^(line|slope|outline)__/.exec(s.name) || [])[1];
-  let want = null;
-  if (isFurniture) want = CONFIG.furnitureWeight;
-  else if (seriesKind && CONFIG.seriesWeights) want = seriesKind === "outline" ? CONFIG.seriesWeights.outline : CONFIG.seriesWeights.line;
-  else want = s.w; // leave grapher's own weight, un-thinned
+  // A node we can name as a SERIES is never furniture, whatever container it sits in: the identity on
+  // its own group is more specific than a container name inherited from an ancestor.
+  const seriesKind = s.seriesKind;
+  const isFurniture = !seriesKind &&
+                      (/gridline|grid-lines|zero-line|^ticks?$|^tick|^axis/i.test(s.name) ||
+                       (s.furnitureGroup !== null && FURNITURE_ANY.test(s.furnitureGroup)));
+  // `why` is decided by the branch actually taken, not re-derived afterwards: read off `seriesKind`
+  // alone it labelled a series left at grapher's own weight (because no seriesWeights were configured)
+  // as "house series weight", which is the one thing that did not happen.
+  let want = null, why = "";
+  if (isFurniture) { want = CONFIG.furnitureWeight; why = "furniture 1px"; }
+  else if (seriesKind && CONFIG.seriesWeights) { want = seriesKind === "outline" ? CONFIG.seriesWeights.outline : CONFIG.seriesWeights.line; why = "house series weight"; }
+  else { want = s.w; why = "un-thin to grapher's own"; } // leave grapher's own weight, un-thinned
   if (want !== null && Math.abs((CONFIG.dryRun ? s.w : s.node.strokeWeight) - want) > 0.01) {
-    strokeFixes.push({ name: s.name, now: r(CONFIG.dryRun ? s.w : s.node.strokeWeight), to: r(want), why: isFurniture ? "furniture 1px" : seriesKind ? "house series weight" : "un-thin to grapher's own" });
+    strokeFixes.push({ name: s.name, now: r(CONFIG.dryRun ? s.w : s.node.strokeWeight), to: r(want), why });
     if (!CONFIG.dryRun) s.node.strokeWeight = want;
   }
   // Only re-dash a node that HAD a dash: assigning one to a solid zero line or tick restyles the

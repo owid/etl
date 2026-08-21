@@ -424,11 +424,17 @@ chart.y = header.y + header.height + (band - chart.height) / 2
   map fits width-first and is centred in the band with the larger gaps that leaves. A value that is
   neither `"height"` nor `"width"` throws rather than quietly fitting the wrong axis.
 
+  **It reads the series identity from the naming ANCESTOR, not the stroked node.** On a slope export
+  `slope__<Entity>` and `outline__<Entity>` are groups and the only stroked node is called plain `line`,
+  so a leaf-name match found no series at all and `seriesWeights` was silently never applied — a
+  completed replay over grapher's own 1.1/1.7px. The furniture container is carried the same way, since
+  checking only the immediate parent left a gridline nested one level deeper un-un-thinned.
+
   **And read the `verdict`, which now carries every way the run can be incomplete** — a refused width
   fit, a map taller than the band, a box that missed the content edges, asymmetric gaps — not just a
   rewrap. It used to say "wrote every edit" whenever no text happened to rewrap, which put a success
   line over a chart hanging off the content box; `result.problems` lists the same facts.
-  Harness: [`scripts/test_replay_chart_edits.js`](../scripts/test_replay_chart_edits.js) (36
+  Harness: [`scripts/test_replay_chart_edits.js`](../scripts/test_replay_chart_edits.js) (43
   assertions, mostly asserting the ordering rather than the arithmetic). Then re-run Step 8c on the new chart; the earlier pass certified an object that no longer exists.
 
 Keep the export URL — same `imFontSize`, same `imType`, same params — so the only thing that changes is what the chart author changed. And re-check the category order and the entity list against what you were told changed: a reorder can move more than the category you asked about.

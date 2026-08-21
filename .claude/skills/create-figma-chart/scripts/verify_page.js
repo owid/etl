@@ -123,9 +123,28 @@ const checkFrame = async (frameId) => {
 
   // The chart, by NAME. A designer's rework ungroups it, leaving the plot subgroups as direct frame
   // children — so fall back to those rather than reporting nothing.
+  //
+  // That fallback has to be STRUCTURAL, not a list of group names. A whitelist of the axis/grid/lines
+  // containers was line-chart-shaped: it missed a map's `map`, a bar's `bars`, a scatter's point
+  // container and a slope's `slopes` outright. Those children were then walked with `insidePlot` false,
+  // which does not fail a row — it EMPTIES one, and an empty row skips with a reason that is not true:
+  // `off-palette` reported "no solid fills found in the plot" on a chart full of them, the mark
+  // inventory both annotation rows test against came back empty, and `isMap` never set means a map was
+  // judged by the rules for a chart whose aspect we control. A skip with a false reason is exactly the
+  // confident silence this script exists to remove.
+  //
+  // So: everything that is not the header, the footer, the logo or one of OUR annotations is plot
+  // content. Annotations are excluded because they are ours rather than the chart's — they have their
+  // own four rows, and counting their fills among the plot's invents off-palette entries.
   let chart = CONFIG.chartName ? frame.children.find((c) => c.name === CONFIG.chartName) : null;
-  let plotRoots = chart ? [chart] : frame.children.filter((c) => /^(horizontal-axis|vertical-axis|horizontal-grid-lines|vertical-labels|lines)$/.test(c.name));
-  const chartResolvedBy = chart ? `name "${CONFIG.chartName}"` : plotRoots.length ? `plot subgroups (${plotRoots.length}) — the group looks ungrouped` : "NOT RESOLVED";
+  let plotRoots = chart
+    ? [chart]
+    : frame.children.filter((c) => c !== header && c !== footer && c !== logo && !/^annotation__/.test(c.name));
+  const chartResolvedBy = chart
+    ? `name "${CONFIG.chartName}"`
+    : plotRoots.length
+      ? `${plotRoots.length} ungrouped frame child(ren) — the chart group looks ungrouped: ${plotRoots.map((c) => c.name).join(", ")}`
+      : "NOT RESOLVED — no frame child left after the header, footer, logo and annotations";
 
   // --- one traversal collects everything the rows below read.
   // ONE walk over the whole frame, with `insidePlot` set by which top-level child we descended from.

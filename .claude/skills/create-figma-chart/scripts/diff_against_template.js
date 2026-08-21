@@ -74,6 +74,12 @@ const textRow = (n) => ({
   style: sid(n.textStyleId),
   segStyles: segs(n, "textStyleId", (s) => sid(s.textStyleId)),
   segFonts: segs(n, "fontName", (s) => s.fontName.style),
+  // The FAMILY is its own fingerprint, from the same call and therefore the same segmentation.
+  // Capturing only `style` left the family uncompared: a row retyped in Arial Regular reads as the
+  // template's Lato Regular — identical "Regular" runs — and the diff reported the clone as matching
+  // while the font treatment was wrong. Kept separate from `segFonts` rather than folded into it so the
+  // bold-range test below still reads a style, not a concatenation.
+  segFamilies: segs(n, "fontName", (s) => s.fontName.family),
   fill: firstFill(n),
   autoResize: n.textAutoResize,
   lsH: n.layoutSizingHorizontal,
@@ -139,6 +145,7 @@ const cmpText = (label, got, want, push) => {
   if (got.lsH !== want.lsH) push(`${label} layoutSizingHorizontal ${got.lsH} != ${want.lsH}`);
   if (got.lsV !== want.lsV) push(`${label} layoutSizingVertical ${got.lsV} != ${want.lsV}`);
   if (vals(got.segFonts).join("+") !== vals(want.segFonts).join("+")) push(`${label} weights ${vals(got.segFonts).join("+")} != ${vals(want.segFonts).join("+")}`);
+  if (vals(got.segFamilies || []).join("+") !== vals(want.segFamilies || []).join("+")) push(`${label} font family ${vals(got.segFamilies || []).join("+")} != ${vals(want.segFamilies || []).join("+")}`);
   // width is only law where the template FIXES it; a FILL row's width follows its parent
   if (want.lsH === "FIXED" && got.w !== want.w) push(`${label} width ${got.w} != ${want.w}`);
   // Style bindings are compared PER SEGMENT, never by the node-level value alone. `textStyleId` is
