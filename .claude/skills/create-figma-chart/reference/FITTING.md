@@ -238,12 +238,25 @@ left clean**. Two habits that make this cheap:
 
 ### Keep the untouched import beside the edited frame
 
-Standing practice, not clutter: after the styled chart is swapped into its frame, place a **second,
+Practice **when imported text or geometry survives into the finished frame**: place a **second,
 unedited copy of the same SVG** next to it — rescaled to the template's size, named
 `<frame name> — original SVG (unstyled)`. Every later question ("did the restyle move that label?",
 "was that gap in the export or did we add it?") is then answered by looking, not by re-importing. It
 also makes a font or palette pass reviewable by someone who wasn't watching it happen. Two uploads of
 the same file per frame costs nothing; deleting the reference costs the next reviewer an import.
+
+**But it is conditional, and this used to read as unconditional.** The copy exists to answer questions
+about *what the restyle did to the export's own content* — so where none of that content survives, it
+answers nothing and is simply a second full-size chart on a page that needs one. The clear case is a
+highlight map: the legend is deleted, every label is authored from scratch, and the restyle is fills
+and strokes only, so there is no imported label whose position could have moved. On one such page the
+reference was worse than neutral — it put the export's *own* legend/map collision on display beside a
+clean frame, and a reviewer read the page as "a lot of unused maps on top of each other." Decide it by
+asking what question the copy would answer; if you cannot name one, don't place it. In
+`scripts/restyle_static_import.js` that decision is the job's `reference` field: omit it, with
+`referenceGap`, and the pass places no copy — a *wrong* id there is still an error, so a typo cannot
+pass itself off as this decision. The `original — <slug>` reference from Step 5 stays either way —
+that is the before/after comparison, and it is a different artifact.
 
 **Put it to the LEFT of the frame**, so the page reads original → edited in reading order. To the
 right it reads as an afterthought and the eye reaches the raw export last, when it is the thing being

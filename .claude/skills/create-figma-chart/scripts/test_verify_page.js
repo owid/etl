@@ -252,7 +252,20 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     // the fifth review finding: BOTH contrast rows must exist, one computed and one declared
     check("1 label-contrast-on-background present", !!row(out, "label-contrast-on-background"), "row missing");
     check("1 label-contrast-on-fill DECLARED", row(out, "label-contrast-on-fill") && row(out, "label-contrast-on-fill").status === "SKIPPED", "row missing");
-    check("1 no row silently absent", out.rows.length >= 24, `${out.rows.length} rows`);
+    // Every row CHECKS.md prescribes has to EXIST, even where it is not computed — a prescribed check
+    // with no row is how a run reports "no mechanical row failed" and means "nobody looked".
+    check("1 page-census DECLARED", row(out, "page-census") && row(out, "page-census").status === "SKIPPED", "row missing");
+    check("1 page-census says COUNT, not overlap",
+          /count the plot-bearing objects/i.test(row(out, "page-census").detail) && /overlap test/i.test(row(out, "page-census").detail),
+          row(out, "page-census").detail);
+    // leader-on-map is declared, but it must declare the VECTOR test as the method and pixels as the
+    // fallback. Named backwards it sends the reader past a one-call exact check.
+    check("1 leader-on-map DECLARED", row(out, "leader-on-map") && row(out, "leader-on-map").status === "SKIPPED", "row missing");
+    check("1 leader-on-map prescribes vectors first",
+          /VECTORS first/.test(row(out, "leader-on-map").detail) && /FALLBACK/.test(row(out, "leader-on-map").detail),
+          row(out, "leader-on-map").detail);
+    check("1 leader-on-map does not call the bbox the target", /not its bounding box/.test(row(out, "leader-on-map").detail), row(out, "leader-on-map").detail);
+    check("1 no row silently absent", out.rows.length >= 26, `${out.rows.length} rows`);
   }
 
   // 2 — the 302-wide floor. 11px text is legitimate there (SMALL-CHARTS.md), a failure on a 540.
@@ -482,6 +495,104 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     single.getStyledTextSegments = () => [{ fontName: { family: "Lato", style: "Regular" } }];
     const out2 = await run(buildFrame({ annotation: single }), {});
     check("18 single-weight unbound still FAILS", row(out2, "named-styles").status === "FAIL", row(out2, "named-styles").detail);
+  }
+
+  // 18b — a WHOLLY BOLD annotation is unbindable for the same reason a mixed-weight one is: the ladder is
+  // all Lato Regular, so applying the style strips the bold. GUIDELINES.md prescribes size-without-binding
+  // for bold country names, and the design team's own finished highlight map (`273:320`) ships nine of them
+  // at 12px Lato Bold with an empty textStyleId. Before this exemption the row fired on all nine.
+  {
+    const boldAnn = annotation({ x: 100, y: 195, stroke: "#ffffff", strokeWeight: 3, styleId: "" });
+    boldAnn.getStyledTextSegments = () => [{ fontName: { family: "Lato", style: "Bold" } }];
+    const out = await run(buildFrame({ annotation: boldAnn }), {});
+    check("18b wholly-bold unbound annotation is exempt", row(out, "named-styles").status === "ok", row(out, "named-styles").detail);
+    check("18b and says why, naming the weight", /wholly-bold/.test(row(out, "named-styles").detail) && /Bold/.test(row(out, "named-styles").detail),
+          row(out, "named-styles").detail);
+    // and the exemption must not swallow the defect it sits next to
+    const regularAnn = annotation({ x: 100, y: 195, stroke: "#ffffff", strokeWeight: 3, styleId: "" });
+    regularAnn.getStyledTextSegments = () => [{ fontName: { family: "Lato", style: "Regular" } }];
+    const still = await run(buildFrame({ annotation: regularAnn }), {});
+    check("18b an unbound REGULAR annotation still FAILS", row(still, "named-styles").status === "FAIL", row(still, "named-styles").detail);
+    check("18b and the message says REGULAR", /REGULAR/.test(row(still, "named-styles").detail), row(still, "named-styles").detail);
+    // A heavier bold-family face is the same case as Bold, and exempt for the same reason.
+    const semiAnn = annotation({ x: 100, y: 195, stroke: "#ffffff", strokeWeight: 3, styleId: "" });
+    semiAnn.getStyledTextSegments = () => [{ fontName: { family: "Lato", style: "Semibold" } }];
+    const semi = await run(buildFrame({ annotation: semiAnn }), {});
+    check("18b Semibold is exempt too", row(semi, "named-styles").status === "ok", row(semi, "named-styles").detail);
+  }
+
+  // 18b-2 — the exemption is keyed on the weight being BOLD, not on it merely being "not Regular".
+  // Written the loose way (`weights[0] !== "Regular"`) it swallowed every other single-weight face —
+  // Light, Medium, Italic — none of which GUIDELINES.md licenses, and reported them back to the reader
+  // as "wholly-bold", which is a false statement about the page. Binding is a real defect there.
+  {
+    for (const weight of ["Light", "Medium", "Italic"]) {
+      const ann = annotation({ x: 100, y: 195, stroke: "#ffffff", strokeWeight: 3, styleId: "" });
+      ann.getStyledTextSegments = () => [{ fontName: { family: "Lato", style: weight } }];
+      const out = await run(buildFrame({ annotation: ann }), {});
+      check(`18b-2 an unbound ${weight} annotation FAILS`, row(out, "named-styles").status === "FAIL",
+            row(out, "named-styles").detail);
+      check(`18b-2 ${weight} is NOT called wholly-bold`, !/wholly-bold/.test(row(out, "named-styles").detail),
+            row(out, "named-styles").detail);
+      check(`18b-2 ${weight} is named in the message`, new RegExp(weight).test(row(out, "named-styles").detail),
+            row(out, "named-styles").detail);
+    }
+  }
+
+  // 18c — label-contrast-on-background used to require `insidePlot`, which made it DEAD: annotations are
+  // appended to the FRAME, so insidePlot is false for every one and `insidePlot && /^annotation__/` is a
+  // contradiction. A nine-label map reported SKIPPED "no annotation text with a solid fill" while carrying
+  // nine filled annotations. Same can't-fail family as the `annotations` walk this file already fixed.
+  {
+    const dark = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, fill: "#2d2e2d", stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    check("18c a frame-level annotation IS judged", row(dark, "label-contrast-on-background").status === "ok",
+          row(dark, "label-contrast-on-background").detail);
+    check("18c and the row is not skipped", row(dark, "label-contrast-on-background").status !== "SKIPPED",
+          row(dark, "label-contrast-on-background").detail);
+    const pale = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, fill: "#bbbbbb", stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    check("18c a pale annotation on white FAILS 4.5:1", row(pale, "label-contrast-on-background").status === "FAIL",
+          row(pale, "label-contrast-on-background").detail);
+    // A label in the frame's own colour is AMBIGUOUS, not settled: white-on-a-dark-mark is a correct
+    // label (GUIDELINES.md → maps) and measuring it against a white frame reports 1:1, but white text
+    // that landed on the white FRAME is unreadable and a real defect. Matching colours are no evidence
+    // either way. It must not be routed to label-contrast-on-fill, which is a DECLARED gap — anything
+    // sent there is reported by nobody, so an invisible annotation would leave no row at all.
+    const onMark = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, fill: "#ffffff", stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    check("18c a label in the frame's own colour is not failed", row(onMark, "label-contrast-on-background").status !== "FAIL",
+          row(onMark, "label-contrast-on-background").detail);
+    check("18c nor silently dropped — it is REVIEW", row(onMark, "label-contrast-on-background").status === "REVIEW",
+          row(onMark, "label-contrast-on-background").status);
+    check("18c and names both readings", /inside a darker mark/.test(row(onMark, "label-contrast-on-background").detail)
+          && /invisible text/.test(row(onMark, "label-contrast-on-background").detail),
+          row(onMark, "label-contrast-on-background").detail);
+    check("18c and tells the reader to check by eye", /by eye/.test(row(onMark, "label-contrast-on-background").detail),
+          row(onMark, "label-contrast-on-background").detail);
+    // a real contrast failure elsewhere still outranks the ambiguity
+    check("18c a measurable failure still FAILS rather than REVIEWs", row(pale, "label-contrast-on-background").status === "FAIL",
+          row(pale, "label-contrast-on-background").status);
+  }
+
+  // 18d — colour is only ONE of the two ways a label can be unjudgeable against the frame. The other is
+  // GEOMETRY: an annotation sitting on a MAP SHAPE has a country's fill behind it, not the frame's, and a
+  // country's bbox is deliberately not judged by annotation-overlap (a bbox is not its ink, maps.md) — so
+  // dark text on a dark country was measured against the WHITE FRAME, scored well over 4.5:1 and passed,
+  // with no other row looking. Over a NON-map mark the position is already illegal and annotation-overlap
+  // FAILs it, so ordinary charts keep an informative ok/FAIL here instead of a blanket REVIEW.
+  {
+    // `mapCountries` puts France (#4c6a9c) at 40-100 x 160-200; the annotation is placed over it.
+    const onCountry = await run(buildFrame({
+      mapCountries: true,
+      annotation: annotation({ x: 45, y: 165, w: 50, h: 16, fill: "#2d2e2d", stroke: "#ffffff", strokeWeight: 3 }),
+    }), {});
+    const rowA = row(onCountry, "label-contrast-on-background");
+    check("18d a label over a map shape is not certified ok", rowA.status === "REVIEW", rowA.status + " " + rowA.detail);
+    check("18d and the map shape it overlaps is named", /map shape/.test(rowA.detail), rowA.detail);
+    check("18d and the country is identified", /country__FRA/.test(rowA.detail), rowA.detail);
+    check("18d and the ratio against that fill is given", /#4c6a9c = /.test(rowA.detail), rowA.detail);
+    // no map shape under it: the row stays informative rather than reviewing everything
+    const clear = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, fill: "#2d2e2d", stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    check("18d a label clear of every mark is still judged ok", row(clear, "label-contrast-on-background").status === "ok",
+          row(clear, "label-contrast-on-background").detail);
   }
 
   // 19 — the unimplemented half of the hierarchy is declared, not certified.

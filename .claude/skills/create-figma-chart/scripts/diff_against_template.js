@@ -20,11 +20,12 @@
 //                  it belongs here and is reported as `accepted` instead of `DRIFT`. Anything not
 //                  listed is drift you did not choose.
 //
-// RUN IT WITH THE TEMPLATE'S PAGE OPEN. That is a precondition, not a detail. Both halves need their
-// page current — an unswitched page's contents load lazily and come back short without erroring
-// (GOTCHAS.md) — and the connector allows exactly one `setCurrentPageAsync` per call. Starting on the
-// template's page costs zero switches to fingerprint it and leaves the one switch for the clones;
-// starting anywhere else needs two, and the second throws, so the script says so up front instead.
+// NO PAGE IS REQUIRED TO BE OPEN. Two pages are read and the connector allows exactly one
+// `setCurrentPageAsync` per call, so the switch is spent on the CLONES and the template is read from
+// wherever the call happens to start — `figma.currentPage` resets to the file's first page every call,
+// so demanding a particular one is unsatisfiable anyway (GOTCHAS.md). The template's page is loaded
+// without a switch instead (`PageNode.loadAsync`), and the read is gated on being complete, because an
+// unloaded page's contents come back short without erroring.
 //
 // Two readings this deliberately gets right, because both were wrong in an earlier hand-rolled pass:
 //   - `textStyleId` is `figma.mixed` (a SYMBOL) on any node with a per-range style override. A
@@ -111,18 +112,54 @@ const fingerprint = (frame) => {
   };
 };
 
-// --- the template's own fingerprint. NO page switch: the template's page must already be current.
+// --- the template's own fingerprint, read WITHOUT a page switch.
+//
+// `figma.currentPage` RESETS to the file's first page at the start of every `use_figma` call and does
+// not persist between calls. Measured 2026-08-21: a call ending in `setCurrentPageAsync(<working
+// page>)` was followed by one reporting `figma.currentPage.name === "Cover"`. An earlier version of
+// this script threw unless the template's page was already current, telling you to open that page and
+// re-run — which a session cannot arrange, so the script could never run at all. Only a human
+// clicking in the desktop app could satisfy it, and that is not who runs this.
+//
+// Reading it unswitched is sound because the failure the old guard feared is specific: a fingerprint
+// read off an unloaded page comes back SHORT (children missing), not plausible-but-wrong — and short
+// is detectable.
+//
+// But detecting short is a fallback, not the plan, and it is an INFERENCE: GOTCHAS.md's first entry is a
+// short list that was NONEMPTY (a page read 4 children while current and 2 later), so "the header
+// resolved with rows in it" does not by itself prove the whole subtree arrived. So make the read
+// complete rather than infer it. `PageNode.loadAsync()` loads a page's contents WITHOUT switching to it
+// — exactly the half of `setCurrentPageAsync` that matters here, and the half a script is free to spend
+// on a second page. Feature-detected, because it exists only under dynamic-page document access; where
+// it is absent the gate below is the whole defence, so the gate stays either way and the result says
+// which of the two applied. Completeness, not specific numbers, so this holds for any of the ten
+// templates; `verify_templates.js` owns the numbers.
 const tpl = await figma.getNodeByIdAsync(CONFIG.templateId);
 if (!tpl) throw new Error(`templateId ${CONFIG.templateId} not found — new yearly file? ask for the link`);
 let tplPage = tpl;
 while (tplPage && tplPage.type !== "PAGE") tplPage = tplPage.parent;
-if (tplPage && figma.currentPage !== tplPage)
-  throw new Error(
-    `open the template's page ("${tplPage.name}") in Figma, then re-run. Currently on "${figma.currentPage.name}". ` +
-    `Only ONE setCurrentPageAsync is allowed per call and this one is spent on the clones' page, so the template ` +
-    `must already be current — a fingerprint read off an unswitched page comes back short without erroring. ` +
-    `(If the clones are on the template's own page, no switch is needed at all.)`);
+let tplPageLoaded = false;
+if (tplPage && typeof tplPage.loadAsync === "function") {
+  await tplPage.loadAsync();
+  tplPageLoaded = true;
+}
+// Sampled HERE, not in the result below: the clones' switch happens in between, so a value read at the
+// end reports `false` for a fingerprint that was in fact taken on the current page — which inverts the
+// diagnostic exactly where it matters, a complete current-page read reported as an inferred off-page one.
+const tplPageWasCurrent = !!(tplPage && figma.currentPage === tplPage);
 const T = fingerprint(tpl);
+const shortRead = [];
+if (!T.size || typeof T.size[0] !== "number" || typeof T.size[1] !== "number") shortRead.push("frame size unreadable");
+if (!T.header) shortRead.push("header did not resolve");
+else if (!T.header.rowCount) shortRead.push("header resolved with no rows");
+if (shortRead.length)
+  throw new Error(
+    `the template fingerprint read SHORT from page "${tplPage ? tplPage.name : "?"}" (${shortRead.join("; ")}). ` +
+    `Every comparison below would be against a partial template, so this is a stop, not a diff. ` +
+    `Re-check that ${CONFIG.templateId} is still a frame with a header` +
+    (tplPageLoaded ? ", because the page's contents were loaded and it still read short." : ". The page could not be loaded without a switch (no PageNode.loadAsync here), so a lazy read is also possible — re-run once."));
+// The footer is deliberately NOT in that gate: the 302-wide pair has no footer (its bottom-most
+// auto-layout child is a source row), so a null there is a template shape, not a short read.
 
 // --- the clones. The one and only page switch.
 const first = await figma.getNodeByIdAsync(CONFIG.frameIds[0]);
@@ -247,10 +284,33 @@ const totalDrift = results.reduce((s, x) => s + (x.drift ? x.drift.length : 0), 
 // group and the id captured earlier returns null (GOTCHAS.md) — so it is the likely case, not the exotic
 // one, and counting only drift let it pass as a clean run.
 const missing = results.filter((x) => x.error);
+// No gate can fully exclude a partial template read, but its signature is specific: EVERY clone reports
+// the SAME STRUCTURAL difference, because what is wrong is the baseline, not the frames. Unanimity is
+// worth naming — otherwise one bad read reads as N independent frames each missing the same band, and the
+// reader "fixes" correct clones. Only meaningful with more than one frame to be unanimous about.
+const resolved = results.filter((x) => !x.error);
+const structural = (d) => /present\/absent differs|rowCount /.test(d);
+const unanimous = resolved.length > 1
+  ? [...new Set(resolved[0].drift.filter(structural))].filter((d) => resolved.every((x) => x.drift.indexOf(d) !== -1))
+  : [];
 return {
+  templateFingerprintRead: {
+    fromPage: tplPage ? tplPage.name : null,
+    pageWasCurrent: tplPageWasCurrent,
+    pageLoadedWithoutSwitch: tplPageLoaded,
+    footerResolved: !!T.footer,
+    note: (tplPageLoaded
+            ? "read with no page switch, after PageNode.loadAsync() loaded the page's contents — so the read is complete, not inferred complete"
+            : tplPageWasCurrent
+              ? "read with no page switch and PageNode.loadAsync() unavailable, but the template's page happened to be CURRENT when the fingerprint was taken, which loads it — complete for this run, and not something a script can arrange"
+              : "read with no page switch, PageNode.loadAsync() unavailable and the template's page not current, so completeness is INFERRED from the short-read gate above; treat structural drift shared by every frame as a suspect baseline") +
+          " — figma.currentPage resets to the first page every call, so requiring the template's page to be current is unsatisfiable from a session",
+  },
   template: { id: CONFIG.templateId, name: tpl.name, size: T.size, fill: T.fill },
   verdict: (totalDrift ? `${totalDrift} unintended difference(s) across ${results.length} frame(s)` : `all ${results.length - missing.length} resolved frame(s) match the template`) +
-           (missing.length ? ` — ${missing.length} of ${results.length} frame(s) NOT CHECKED, id not found: ${missing.map((x) => x.frame).join(", ")}. Resolve the clone by NAME, not by a captured id (GOTCHAS.md).` : ""),
+           (missing.length ? ` — ${missing.length} of ${results.length} frame(s) NOT CHECKED, id not found: ${missing.map((x) => x.frame).join(", ")}. Resolve the clone by NAME, not by a captured id (GOTCHAS.md).` : "") +
+           (unanimous.length ? ` — SUSPECT BASELINE: all ${resolved.length} frame(s) report the same structural difference (${unanimous.join("; ")}). Either every frame is wrong in the same way, or the TEMPLATE was read short; re-read the template before changing any frame.` : ""),
+  unanimousStructuralDrift: unanimous,
   unchecked: missing.length,
   note: "text CONTENT and any added chart are excluded by design; `accepted` is drift declared in CONFIG.expected; `halfBound` is the API limitation on a bolded prefix, not a defect",
   frames: results,

@@ -40,9 +40,11 @@
 // SKIPPED with the reason and the tool that owns it. Colour-vision and grayscale seams are
 // `scripts/color_audit.py`; spelling is `codespell`; "the text is true of the indicator" is
 // `/adversarial-data-review`; the entity-completeness row needs the EFFECTIVE selection from
-// outside Figma (Step 1's table); the arrow and leader-on-map rows need rendered pixels (CHECKS.md's
-// four-render protocol). A check that cannot fail is worse than no check, so those are reported as
-// gaps in coverage, not as passes.
+// outside Figma (Step 1's table); the arrow row needs rendered pixels (CHECKS.md's four-render
+// protocol); leader-on-map is a VECTOR ray-cast against the country's rings, with the pixel mask only
+// as its fallback; and the page census is a page-level count, where this script is handed frames. A
+// check that cannot fail is worse than no check, so those are reported as gaps in coverage, not as
+// passes.
 
 const CONFIG = {
   frameId: "26000:6",
@@ -70,6 +72,9 @@ const lin = (c) => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4
 const lum = (hex) => { const n = parseInt(hex.slice(1), 16); const R = ((n >> 16) & 255) / 255, G = ((n >> 8) & 255) / 255, B = (n & 255) / 255;
   return 0.2126 * lin(R) + 0.7152 * lin(G) + 0.0722 * lin(B); };
 const contrast = (a, b) => { const la = lum(a), lb = lum(b); return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05); };
+const hexOf = (f) => (f && f.type === "SOLID"
+  ? "#" + [f.color.r, f.color.g, f.color.b].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join("")
+  : null);
 let rows = [];
 const add = (name, status, detail, extra) => rows.push({ check: name, status, detail, ...(extra || {}) });
 const skip = (name, why, owner) => add(name, "SKIPPED", why, owner ? { ownedBy: owner } : null);
@@ -188,15 +193,22 @@ const checkFrame = async (frameId) => {
       const tf = Array.isArray(n.fills) && n.fills[0] && n.fills[0].type === "SOLID" && n.fills[0].visible !== false
         ? "#" + [n.fills[0].color.r, n.fills[0].color.g, n.fills[0].color.b].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join("")
         : null;
-      let mixedWeight = false;
-      try { mixedWeight = n.getStyledTextSegments(["fontName"]).length > 1; } catch (e) { mixedWeight = false; }
+      // The WEIGHTS, not just whether they differ: a uniformly non-Regular node is style-unbindable
+      // for the same API reason a mixed-weight one is, and named-styles has to know the difference
+      // between "bold throughout" (prescribed) and "Regular and unbound" (a defect).
+      let mixedWeight = false, weights = [];
+      try {
+        const fsegs = n.getStyledTextSegments(["fontName"]);
+        mixedWeight = fsegs.length > 1;
+        weights = [...new Set(fsegs.map((s) => s.fontName && s.fontName.style).filter(Boolean))];
+      } catch (e) { mixedWeight = false; weights = []; }
       const ranges = sizeRanges(n);
       // A node whose size cannot be read at all is DECLARED, never dropped on the floor.
       if (!ranges.length) unreadableText.push(n.name || n.type);
       for (const sr of ranges) {
         texts.push({ node: n, name: n.name, chars: (n.characters || "").slice(0, 30), size: sr.size,
                      sizeRange: sr.range, mixedSize: ranges.length > 1,
-                     styleId: n.textStyleId || "", box: rel(n), insidePlot, fill: tf, mixedWeight });
+                     styleId: n.textStyleId || "", box: rel(n), insidePlot, fill: tf, mixedWeight, weights });
       }
     }
     if (/^annotation__/.test(n.name)) annotations.push({ node: n, name: n.name, box: rel(n), type: n.type });
@@ -214,10 +226,7 @@ const checkFrame = async (frameId) => {
     const hasArea = areaBox && areaBox.w > 0 && areaBox.h > 0;
     if (hasArea && "fills" in n && Array.isArray(n.fills)) {
       for (const f of n.fills) {
-        if (f.type === "SOLID" && f.visible !== false) {
-          const hex = "#" + [f.color.r, f.color.g, f.color.b].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join("");
-          fills.push({ name: n.name, type: n.type, hex, styleId: n.fillStyleId || "", insidePlot });
-        }
+        if (f.type === "SOLID" && f.visible !== false) fills.push({ name: n.name, type: n.type, hex: hexOf(f), styleId: n.fillStyleId || "", insidePlot });
       }
     }
     // Marker groups and value labels. The NAME is on the group and the GEOMETRY is on its children, and
@@ -234,12 +243,15 @@ const checkFrame = async (frameId) => {
     // that carries a visible solid fill, is not furniture, and is not text is a mark the reader sees.
     if (insidePlot && !inFurniture && n.type !== "TEXT" && !(("children" in n) && n.children.length)) {
       const mb0 = rel(n);
-      const filled = Array.isArray(n.fills) && n.fills.some((f) => f.type === "SOLID" && f.visible !== false);
+      // The mark's own COLOUR travels with its box. Without it, a label sitting on a mark can only ever be
+      // measured against the frame, which is not what is behind it (see label-contrast-on-background).
+      const markPaint = Array.isArray(n.fills) ? n.fills.find((f) => f.type === "SOLID" && f.visible !== false) : null;
+      const filled = !!markPaint;
       // `fromMap` is carried because a MAP SHAPE's bbox is not its ink: per-chart-type/maps.md, a
       // country split across the antimeridian has a box spanning almost the whole map, so an annotation
       // over open ocean falls inside it. Counting those as covered marks reports a FAIL that is not
       // there, so the annotation row drops them and says so rather than judging them by bbox.
-      if (filled && mb0 && mb0.w > 0 && mb0.h > 0) markBoxes.push({ name: n.name, box: mb0, why: "a filled data mark", insidePlot, fromMap: !!insideMap });
+      if (filled && mb0 && mb0.w > 0 && mb0.h > 0) markBoxes.push({ name: n.name, box: mb0, why: "a filled data mark", insidePlot, fromMap: !!insideMap, hex: hexOf(markPaint) });
     }
     if (/^datapoints__|^dot__|^value__/.test(n.name)) {
       const why = /^value__/.test(n.name) ? "a value label" : "a dot";
@@ -350,18 +362,45 @@ const checkFrame = async (frameId) => {
   // row judges OUR nodes only and reports the imported ones as context.
   {
     const ann = texts.filter((t) => /^annotation__/.test(t.name));
-    // An annotation that bolds its key phrase — the prescribed recipe — is MIXED-WEIGHT, and Figma
-    // drops the node-level textStyleId when it is (reference/GOTCHAS.md says so and says not to treat
-    // it as a defect). Failing those means a correctly-built annotation can never pass, so they are
-    // judged on their ladder size instead, which the ladder-sizes row above already enforces.
-    const unbound = ann.filter((t) => !t.styleId && !t.mixedWeight);
+    // TWO exemptions, both the same API limitation, and both prescribed rather than tolerated.
+    //
+    // 1. An annotation that bolds its key phrase — the house convention — is MIXED-WEIGHT, and Figma
+    //    drops the node-level textStyleId when it is (reference/GOTCHAS.md).
+    // 2. An annotation that is bold THROUGHOUT is equally unbindable, because the whole ladder is Lato
+    //    Regular: applying the style would strip the bold, so GUIDELINES.md → Named styles tells you
+    //    outright to "set fontSize to the ladder value and leave the weight alone rather than binding
+    //    the style and losing the bold". Confirmed against the design team's own finished highlight map
+    //    (Chart Library `273:320`), whose nine country labels ship 12px Lato Bold with an EMPTY
+    //    textStyleId. Before this exemption existed the row fired on nine correctly-built labels.
+    //
+    // Both are judged on their ladder size instead, which ladder-sizes above already enforces. What is
+    // still a real defect: Regular text that is unbound — there the binding was simply not applied.
+    //
+    // The exemption is keyed on the weight being BOLD, not merely on it being "not Regular". Written the
+    // loose way it swallowed every other single-weight face too — an annotation left in Lato Light,
+    // Medium or Italic is not the prescribed exception, nothing in GUIDELINES.md licenses it, and it was
+    // being waved through AND reported back as "wholly-bold", which is a false statement about the page.
+    const BOLD_WEIGHT = /bold|black/i;   // Bold, Semibold, Extrabold, Black, and their italics
+    const boldThroughout = (t) => t.weights && t.weights.length === 1 && BOLD_WEIGHT.test(t.weights[0]);
+    const unbound = ann.filter((t) => !t.styleId && !t.mixedWeight && !boldThroughout(t));
     const mixed = ann.filter((t) => t.mixedWeight);
+    const bold = ann.filter((t) => !t.mixedWeight && boldThroughout(t));
     const importedRaw = texts.filter((t) => t.insidePlot && !/^annotation__/.test(t.name) && !t.styleId).length;
+    // An unbound node is reported in the weight it actually carries. Calling a Lato Light node "REGULAR"
+    // sends the reader looking for a missing binding on text whose weight is the real problem.
+    const weightOf = (t) => (t.weights && t.weights.length === 1 ? t.weights[0] : "mixed");
+    const named = (t) => `"${t.chars}"`;
+    const unboundRegular = unbound.filter((t) => !t.weights || !t.weights.length || weightOf(t) === "Regular");
+    const unboundOther = unbound.filter((t) => unboundRegular.indexOf(t) === -1);
     if (!ann.length) skip("named-styles", "no annotation__* text nodes; an imported chart's text cannot carry a style id");
     else add("named-styles", unbound.length ? "FAIL" : "ok",
-             (unbound.length ? `${unbound.length} annotation(s) with no textStyleId — setting fontSize looks like the ladder and is not it: ` + unbound.map((t) => `"${t.chars}"`).join(", ")
-                             : `all ${ann.length - mixed.length} single-weight annotation(s) bound to a text style`) +
-             (mixed.length ? ` ${mixed.length} mixed-weight annotation(s) exempted — Figma drops the node-level style id when a phrase is bolded, which is the prescribed recipe (GOTCHAS.md); their sizes are covered by ladder-sizes.` : "") +
+             (unbound.length
+                ? [unboundRegular.length ? `${unboundRegular.length} REGULAR annotation(s) with no textStyleId — setting fontSize looks like the ladder and is not it: ` + unboundRegular.map(named).join(", ") : "",
+                   unboundOther.length ? `${unboundOther.length} annotation(s) unbound in a weight the ladder does not prescribe (${[...new Set(unboundOther.map(weightOf))].join(", ")}) — the exemption covers BOLD only, so either bind the style or make the emphasis bold on purpose: ` + unboundOther.map(named).join(", ") : ""].filter(Boolean).join(". ")
+                : `all ${ann.length - mixed.length - bold.length} regular-weight annotation(s) bound to a text style`) +
+             (mixed.length ? ` ${mixed.length} mixed-weight annotation(s) exempted — Figma drops the node-level style id when a phrase is bolded, which is the prescribed recipe (GOTCHAS.md).` : "") +
+             (bold.length ? ` ${bold.length} wholly-bold annotation(s) exempted — the ladder is all Lato Regular, so binding a style would strip the bold; GUIDELINES.md prescribes size-without-binding here and the finished pages ship it (weights seen: ${[...new Set(bold.flatMap((t) => t.weights))].join(", ")}).` : "") +
+             ((mixed.length || bold.length) ? " Their sizes are covered by ladder-sizes." : "") +
              ` ${importedRaw} imported chart text node(s) are raw, which is expected.`);
   }
 
@@ -819,15 +858,59 @@ const checkFrame = async (frameId) => {
 
   // Direct labels readable as text — computed, not declared. CHECKS.md wants 4.5:1 against the
   // background for every category label drawn on it; that is a pure function of two hexes.
+  //
+  // This row used to require `insidePlot`, which made it DEAD on every correctly-built page: annotations
+  // are appended to the FRAME (GOTCHAS.md), so `insidePlot` is false for all of them, and
+  // `insidePlot && /^annotation__/` is a contradiction. Same can't-fail bug this file already fixed once
+  // for the `annotations` walk, in a second row, unnoticed until a nine-label map reported SKIPPED with
+  // "no annotation text with a solid fill" while carrying nine filled annotations. So: annotations are
+  // judged against the FRAME's fill, which is what is actually behind them; `label__*` nodes stay gated
+  // on insidePlot because what is behind those is a mark, not the frame.
   {
-    const onBg = texts.filter((t) => t.insidePlot && t.fill && /^(label|annotation)__/.test(t.name));
+    const candidates = texts.filter((t) => t.fill && (/^annotation__/.test(t.name) || (t.insidePlot && /^label__/.test(t.name))));
+    // Two ways a label can be UNJUDGEABLE against the frame, and neither may be dropped: the on-fill row
+    // is a DECLARED gap below (it needs label->mark pairing, which nothing here has), so anything routed
+    // to it is reported by NOBODY, and a defect that leaves no row is worse than a row a human looks at.
+    // Both go to REVIEW.
+    //
+    // The first is COLOUR. A label in the frame's own colour reads either as the prescribed
+    // white-on-dark-mark label (GUIDELINES.md → maps: "values written inside countries take whichever
+    // colour reads against the fill"), which measured against the frame reports 1:1 and fails correct
+    // work, or as an annotation accidentally given the frame's colour — invisible text. Matching colours
+    // are no evidence either way.
+    //
+    // The second way in is GEOMETRY. An annotation over a MAP SHAPE is the case: in-country labels are
+    // prescribed there, and a country's bbox is deliberately not judged by annotation-overlap (a bbox is
+    // not a country's ink, maps.md), so nothing else looks at it either — black text on a dark country
+    // would be measured against the white FRAME, score 21:1 and pass. Over a NON-map mark the position
+    // is already illegal and annotation-overlap FAILs it, so those need no second opinion here and the
+    // row keeps its information value on ordinary charts.
+    const overlaps = (a, b) => a.l < b.rr && a.rr > b.l && a.t < b.bb && a.bb > b.t;
+    const mapShapes = markBoxes.filter((x) => x.insidePlot && x.fromMap && x.hex);
+    const marksUnder = (t) => (t.box ? mapShapes.filter((m) => overlaps(t.box, m.box)) : []);
+    const ambiguous = candidates.filter((t) =>
+      (frameFill && t.fill.toLowerCase() === frameFill.toLowerCase()) || marksUnder(t).length);
+    const onBg = candidates.filter((t) => ambiguous.indexOf(t) === -1);
+    // Named per label, with the arithmetic where it exists: against a map shape's own fill the ratio IS
+    // computable, it is just not certain to be the fill behind the text.
+    const why = (t) => {
+      const over = marksUnder(t);
+      const worst = over.length ? over.reduce((a, m) => (contrast(t.fill, m.hex) < contrast(t.fill, a.hex) ? m : a)) : null;
+      return `"${t.chars}" ${t.fill}` +
+             (frameFill && t.fill.toLowerCase() === frameFill.toLowerCase() ? " — the frame's own colour, so either inside a darker mark (correct) or invisible text on the frame" : "") +
+             (worst ? ` — overlaps ${over.length} map shape(s), worst ${worst.name} ${worst.hex} = ${r(contrast(t.fill, worst.hex))}:1` : "");
+    };
+    const review = (n) => `${n} label(s) cannot be judged against the frame — a bbox overlap is not proof of what is behind the text, and no geometry here pairs a label with its mark, so check these by eye: ` +
+                          ambiguous.slice(0, 8).map(why).join("; ");
     if (!frameFill) skip("label-contrast-on-background", "frame carries no solid fill to measure against");
-    else if (!onBg.length) skip("label-contrast-on-background", "no label__*/annotation__* text with a solid fill");
+    else if (!onBg.length && !ambiguous.length) skip("label-contrast-on-background", "no label__*/annotation__* text sits on the frame's own background");
+    else if (!onBg.length) add("label-contrast-on-background", "REVIEW", `nothing measurable against the background — all ${review(ambiguous.length)}`);
     else {
       const bad = onBg.map((t) => ({ t, c: contrast(t.fill, frameFill) })).filter((x) => x.c < 4.5);
-      add("label-contrast-on-background", bad.length ? "FAIL" : "ok",
-          bad.length ? bad.map((x) => `"${x.t.chars}" ${x.t.fill} on ${frameFill} = ${r(x.c)}:1 (want 4.5)`).join(", ")
-                     : `all ${onBg.length} label(s) clear 4.5:1 against ${frameFill} (lowest ${r(Math.min(...onBg.map((t) => contrast(t.fill, frameFill))))}:1)`);
+      add("label-contrast-on-background", bad.length ? "FAIL" : ambiguous.length ? "REVIEW" : "ok",
+          (bad.length ? bad.map((x) => `"${x.t.chars}" ${x.t.fill} on ${frameFill} = ${r(x.c)}:1 (want 4.5)`).join(", ")
+                     : `all ${onBg.length} label(s) clear 4.5:1 against ${frameFill} (lowest ${r(Math.min(...onBg.map((t) => contrast(t.fill, frameFill))))}:1)`) +
+          (ambiguous.length ? `. Plus ${review(ambiguous.length)}` : ""));
     }
   }
 
@@ -845,9 +928,22 @@ const checkFrame = async (frameId) => {
   // row above owns: the bar's own fill is the background here, and picking it by geometry is that
   // pairing problem. The contrast arithmetic is already in this file (see label-contrast-on-background)
   // and can be reused the moment pairing exists.
-  skip("label-contrast-on-fill", "4.5:1 for every label drawn INSIDE a fill, at 13.5px regular — the 3:1 large-text allowance does not apply. Needs label->segment pairing to know which fill is behind each label", "CHECKS.md + the direct-label-pairing row");
+  skip("label-contrast-on-fill", "4.5:1 for every label drawn INSIDE a fill, at 13.5px regular — the 3:1 large-text allowance does not apply. Needs label->segment pairing to know which fill is behind each label. Because this row is not computed, label-contrast-on-background does NOT route the ambiguous cases here and drop them: a label carrying the frame's own colour is reported there as REVIEW", "CHECKS.md + the direct-label-pairing row");
   skip("arrow-clearance", "arrow pixels vs target pixels; needs 3N+1 renders (the four-render protocol, pair-specific)", "CHECKS.md");
-  skip("leader-on-map", "terminal vertex against the country's PIXELS, not its bounding box", "CHECKS.md + per-chart-type/maps.md");
+  // Vector-first, because that is what CHECKS.md now prescribes and it is the CHEAP half: the old
+  // wording named the PIXEL mask as the method, which sent a reader following this output straight
+  // past a one-call exact test and into a multi-render fallback.
+  skip("leader-on-map", "terminal vertex against the country's own GEOMETRY, not its bounding box. Do it in VECTORS first: transform the terminal into the country's local space through the inverse of its `absoluteTransform`, parse `vectorPaths` into rings, ray-cast. Exact, and one call. The PIXEL mask (hide the country vector, diff the renders, require the dot within ~1px of that pixel set) is the FALLBACK, for the cases the ray-cast cannot answer — a country a few pixels across whose ring is smaller than the dot, or a fill rule that makes the cast ambiguous", "CHECKS.md + per-chart-type/maps.md");
+  // CHECKS.md -> "How much is on the page" prescribes this, so it gets a row: a prescribed check with
+  // no row at all is how a run returns "no mechanical row failed" while the reader is looking at a
+  // pile of near-identical maps. Declared rather than computed for two reasons, and only the first is
+  // fixable here. This script is handed FRAME ids and never a page, and `page.children` on a page
+  // nobody switched to comes back SHORT without erroring (GOTCHAS.md) — so an undercount would read
+  // as "clean", which is the exact failure the row exists to catch. `PageNode.loadAsync()` would
+  // settle that half (diff_against_template.js does it). The other half does not go away: the target
+  // is one object per INTENDED item, and how many reference copies were meant to be left on the page
+  // is not a property of the file.
+  skip("page-census", "count the plot-bearing objects ANYWHERE on the page — `countries-with-data` groups on a map, the equivalent plot group otherwise — and name what each one is for. One per intended item: the deliverable plus the reference copies you meant to place; a spare is clutter. Do NOT substitute an overlap test between top-level children — three maps at three distinct positions pass it while the reader sees a pile. And do not key the census on a SHORTENED node name, which merges `<slug>` with `<slug> — original SVG (unstyled)` into one bucket", "CHECKS.md -> How much is on the page");
 
   const fails = rows.filter((x) => x.status === "FAIL");
   const review = rows.filter((x) => x.status === "REVIEW");
