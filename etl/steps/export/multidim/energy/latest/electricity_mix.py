@@ -210,10 +210,7 @@ METRIC_UNIT_PHRASE = {
 # column, which lumps pre-2000 bioenergy into "other renewables" for countries that can't be split that far
 # back, so they get the extended note with the caveat.
 OTHER_RENEWABLES_NOTE = "Other renewables include geothermal, wave, and tidal."
-OTHER_RENEWABLES_STACKED_NOTE = (
-    "Other renewables include geothermal, wave, and tidal; bioenergy may be included prior to 2000 due to "
-    "limited data availability."
-)
+OTHER_RENEWABLES_STACKED_NOTE = "Other renewables include geothermal, wave, and tidal."
 SOURCE_COMPOSITION = {
     "fossil": "Fossil fuels include coal, oil, and gas.",
     "renewables": "Renewables include solar, wind, hydropower, bioenergy, geothermal, wave, and tidal.",
@@ -326,16 +323,16 @@ def add_decomposition_views(c) -> None:
                     view = single_views.get((constituent, base_metric, frequency))
                     if view is not None and view.indicators.y:
                         for indicator in deepcopy(view.indicators.y):
-                            # Swap the standalone (clean) columns for the gap-filled ones so the stack keeps
-                            # full history; the clean columns stay on the standalone source views.
-                            if constituent == "bioenergy":
-                                indicator.catalogPath = indicator.catalogPath.replace(
-                                    "bioenergy_generation", "bioenergy_stacked_generation"
-                                )
-                            elif constituent == "other_renewables":
-                                indicator.catalogPath = indicator.catalogPath.replace(
-                                    "other_renewables_excluding_bioenergy_generation", "other_renewables_generation"
-                                )
+                            # Swap the standalone columns for the censored chart-specific ones, which the
+                            # grapher step guarantees can never show part of a mix as though it were the
+                            # whole: a row there reports either every source or none, and its sum matches
+                            # the total. The standalone columns stay on the standalone source views.
+                            # Monthly views keep the standalone columns: they are Ember-only and complete.
+                            if frequency == "annual":
+                                if base_metric == "generation":
+                                    indicator.catalogPath += "_chart_electricity_production_by_source"
+                                elif base_metric == "per_capita":
+                                    indicator.catalogPath += "_chart_per_capita_electricity_source_stacked"
                             color = SOURCE_COLORS.get(constituent)
                             if color:
                                 indicator.update_display({"color": color})
@@ -347,8 +344,8 @@ def add_decomposition_views(c) -> None:
                     "title": _with_frequency(_decomposition_title(source, base_metric), frequency),
                     "subtitle": METRIC_UNIT_PHRASE[base_metric],
                 }
-                # The stacked "other renewables" band uses the coalesced column, so it needs the extended
-                # footnote flagging that pre-2000 bioenergy may be lumped in.
+                # The stacked views only reach back to where the full split exists, so the coalesced-column
+                # footnote no longer applies; keep the standard note for the "other renewables" band.
                 if "other_renewables" in constituents:
                     config["note"] = OTHER_RENEWABLES_STACKED_NOTE
                 new_view = View(
