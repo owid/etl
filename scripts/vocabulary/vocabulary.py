@@ -31,20 +31,72 @@ import tempfile
 from pathlib import Path
 
 import click
+import httpx
 from dotenv import load_dotenv  # ty: ignore
 from google import genai  # ty: ignore
+from google.genai import types as genai_types  # ty: ignore
+from google.genai import errors as genai_errors  # ty: ignore
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from owid.catalog import s3_utils  # ty: ignore
 
+from coverage_model import (  # ty: ignore
+    DEFAULT_VIEWS_COLUMN,
+    EmptyAnalyticsError,
+    TopicSelection,
+    ViewAnalytics,
+    WeightedUniverse,
+    fetch_topic_universe,
+    load_mdim_view_config_ids,
+    load_view_analytics,
+    select_terms_by_coverage,
+    weigh_universe,
+)
+from coverage_report import (  # ty: ignore
+    render_html_report,
+    render_run_summary,
+    render_topic_table,
+)
 from etl.config import OWID_ENV  # ty: ignore
 
 S3_BUCKET_NAME = "owid-public"
-S3_VOCABULARY_PATH = "topic_vocabulary.json"
+DEFAULT_S3_VOCABULARY_PATH = "topic_vocabulary.json"
 
-# Gemini pricing (as of Feb 2025)
+DEFAULT_MODEL = "gemini-3.7-flash"
+
+# Ask for the same candidates every time. Left at the model's defaults, two runs
+# of identical code disagreed on almost every topic — Gender Ratio came back
+# covering 30% of its traffic in one run and 79% in the next — which makes a
+# prompt improvement indistinguishable from luck, and this prompt has been
+# iterated on a lot. Deterministic sampling doesn't make the candidates better,
+# it makes a change in them attributable.
+LLM_SAMPLING = {"temperature": 0.0, "seed": 1}
+
+# A whole-vocabulary run fires one request per topic at once, which draws the
+# occasional 503/429 out of the API. Those are transient, but a topic that
+# gives up is a topic missing from the upload, so retry each one a few times
+# before letting it fail.
+LLM_MAX_ATTEMPTS = 4
+LLM_RETRY_BACKOFF_SECONDS = 4
+
+# How many topics' record sets to fetch at once.
+SEARCH_CONCURRENCY = 8
+
+# How many terms to publish. The site shows five, then drops any that name a place
+# or repeat the topic's own name, so a couple of spares keep the line full.
+DEFAULT_MAX_TERMS = 8
+
+# A term revealing less than this share of a topic's views is not worth one of
+# five slots on a single line. Terms just below it are reported as near misses so
+# the floor can be judged from the output.
+DEFAULT_MIN_MARGINAL_SHARE = 0.01
+
+# Gemini pricing per million tokens, for the cost estimate the CLI prints.
+# Models absent from here still run; their cost is simply reported as unknown,
+# so this list going out of date can't stop a regeneration (the whole run costs
+# a couple of cents either way).
 PRICING = {
     "gemini-2.5-flash-lite": {"input": 0.015, "output": 0.06},
     "gemini-3-flash-preview": {"input": 0.0375, "output": 0.15},
@@ -62,61 +114,60 @@ def get_all_topic_slugs() -> list[str]:
         JOIN chart_tags ct ON t.id = ct.tagId
         JOIN charts c ON ct.chartId = c.id
         WHERE c.publishedAt IS NOT NULL
+          AND t.slug IS NOT NULL
         ORDER BY t.slug
     """
     df = OWID_ENV.read_sql(query)
     return df["slug"].tolist()
 
 
-def extract_chart_texts(topic_slug: str) -> tuple[str, list[str]]:
-    """Extract all chart titles and subtitles for a topic.
+def get_topic_names(topic_slugs: list[str]) -> dict[str, str]:
+    """Map topic slugs to the tag names the search index and gdocs use.
 
-    Returns: (topic_name, list_of_texts)
+    One query for every topic rather than one per topic: OWID_ENV.read_sql opens a
+    connection per call, and the old per-topic version spent most of a run's
+    wall-clock on 125 of them.
     """
-    query = """
-        SELECT DISTINCT
-            t.name as topic_name,
-            t.slug as topic_slug,
-            cc.full->'$.title' as chart_title,
-            cc.full->'$.subtitle' as chart_subtitle
-        FROM charts c
-        JOIN chart_configs cc ON c.configId = cc.id
-        JOIN chart_tags ct ON c.id = ct.chartId
-        JOIN tags t ON ct.tagId = t.id
-        WHERE c.publishedAt IS NOT NULL
-          AND t.slug = %s
+    placeholders = ", ".join(["%s"] * len(topic_slugs))
+    rows = OWID_ENV.read_sql(
+        f"SELECT slug, name FROM tags WHERE slug IN ({placeholders})",
+        params=tuple(topic_slugs),
+    )
+    return {row.slug: row.name for row in rows.itertuples(index=False)}
+
+
+def texts_for_prompt(universe: WeightedUniverse, limit: int = 200) -> list[str]:
+    """The topic's chart texts to show the model, most-viewed first.
+
+    Taken from the topic's *rendered* record set rather than from the `charts`
+    table, which was the old source and a real hole: multi-dim and explorer views
+    never reached the model, so on a topic like Climate Change it was proposing
+    terms having seen 67 of 714 records. Since selection now scores terms on how
+    much of that list they cover, the model has to be shown the list it is
+    being scored against.
+
+    Ordered by views and cut at `limit` rather than sampled at random, so the
+    terms proposed are the ones describing what people actually look at, and two
+    runs see the same input.
     """
-
-    df = OWID_ENV.read_sql(query, params=(topic_slug,))
-
-    if df.empty:
-        raise ValueError(f"No charts found for topic '{topic_slug}'")
-
-    topic_name = df["topic_name"].iloc[0]
-
-    # Collect all non-null titles and subtitles
-    texts = []
-    for _, row in df.iterrows():
-        if row["chart_title"]:
-            texts.append(str(row["chart_title"]))
-        if row["chart_subtitle"]:
-            texts.append(str(row["chart_subtitle"]))
-
-    # Deduplicate texts (many charts have similar/identical titles)
-    unique_texts = list(set(texts))
-
-    # If still too many, take a representative sample
-    if len(unique_texts) > 200:
-        import random
-
-        random.seed(42)  # Reproducible sampling
-        unique_texts = random.sample(unique_texts, 200)
-
-    return topic_name, unique_texts
-
+    ordered = sorted(
+        universe.records.items(),
+        key=lambda item: -universe.weights.get(item[0], 0.0),
+    )
+    texts: list[str] = []
+    seen: set[str] = set()
+    for _, record in ordered:
+        for text in (record.get("title"), record.get("subtitle")):
+            if not text or text in seen:
+                continue
+            seen.add(text)
+            texts.append(str(text))
+        if len(texts) >= limit:
+            break
+    return texts[:limit]
 
 async def extract_keywords_with_llm(
-    topic_slug: str, topic_name: str, texts: list[str], api_key: str, model_id: str = "gemini-3-flash-preview"
+    topic_slug: str, topic_name: str, texts: list[str], api_key: str, model_id: str = DEFAULT_MODEL
 ) -> dict:
     """Use Gemini to extract good keywords/phrases from chart texts.
 
@@ -127,29 +178,103 @@ async def extract_keywords_with_llm(
     # Combine all texts
     combined_text = "\n".join(texts)
 
-    prompt = f"""Extract search keywords for the topic "{topic_name}" from these chart titles and subtitles:
+    prompt = f"""Below are the titles and subtitles of the charts Our World in Data publishes on
+the topic "{topic_name}", most-viewed first. They include the individual views of
+its multi-dimensional charts and its explorers, which is what the topic page
+actually lists:
 
 {combined_text}
 
-Rules:
-1. Extract ONLY modern, currently-relevant terms for "{topic_name}"
-2. Keep: specific technologies, energy sources, or concepts people search for TODAY
-   - Good: "solar panels", "fossil fuels", "coal", "wind turbines", "nuclear power"
-   - Bad: "muscle energy", "firewood", "water engines" (historical, not searchable)
-3. Remove generic words from phrases:
-   - "oil prices" → "oil"
-   - "energy consumption" → skip (both words generic)
-4. Skip ALL terms containing: consumption, production, prices, investment, trade, access, growth, change, demand, supply, emissions, generation, reserves, intensity, transition, costs, spending
-5. Skip measurements: percentage, per capita, share, rate, level, annual, total, average
-6. Skip historical/obsolete terms unless still relevant today
+Give me search terms for this topic. They are offered to a reader on the topic's
+page, under a search box that filters exactly the charts listed above, as a short
+line of suggestions: "Suggested: term, term, term…". Only the first few are ever
+shown, so put the ones you would most want a reader to see first.
 
-Output JSON (up to 30 terms, but fewer is fine if not enough relevant ones):
+What makes this list good is that each term takes the reader somewhere *different*.
+
+1. Cover the range of what these charts are about. Read the whole list above and
+   work out which distinct subjects it spans, then give at least one term for
+   each. A topic's charts usually cover several: charts about sex ratios AND
+   about unemployment AND about mental health all belong to "Gender Ratio", so a
+   list that only describes the sex-ratio charts has missed most of the topic.
+2. One term per subject. Do not give near-synonyms or variations on the same
+   phrase — they land the reader on the same charts and waste the line.
+   - Bad: "sex ratio", "sex ratio at birth", "sex ratio by age" (one subject, three terms)
+   - Good: "sex ratio", "missing women", "life expectancy", "unemployment", "judiciary"
+     (five terms, five different parts of the chart list)
+3. Order the list so that each term adds something the ones before it did not.
+4. Give the shortest form that still names the subject. A reader clicking "sex
+   ratio" is shown every chart about it; "sex ratio at birth" hides most of them
+   for no gain.
+5. Every term must name **what a chart is about** — its subject. That is the
+   whole test, and everything below follows from it rather than being a separate
+   rule to remember:
+   - Not how a number is expressed. A measurement's shape is not a subject, and
+     a reader looking for one is not looking for charts. Prefer "oil" to "oil
+     prices", "electricity" to "electricity consumption". These are never a term
+     on their own and never the head of a phrase: per capita, share, rate, death
+     rate, total, annual, average, level, index, projections, reported,
+     confirmed, vital registration. The list is spelled out because it is the
+     rule most often broken.
+
+     **Unless a chart above is actually called that.** Then it is a subject, by
+     definition — someone named a chart after it. "GDP per capita" reads like a
+     unit and is one of the charts on the Poverty topic, worth a third of its
+     traffic; refusing it leaves that chart with nothing pointing at it. The test
+     is the titles in front of you, not how the words sound: if one of them is
+     essentially just this term, give it.
+   - Not a place. Countries, regions and income groups say *who* rather than
+     *what*; these charts mention them constantly and readers search for them
+     separately.
+   - Not a word that was only ever true of the past, unless people still search
+     for it.
+   Say the term out loud as a thing a reader wants to see charts of. If that
+   doesn't work — "annual", "vital registration", "reported" — leave it out.
+
+Do not worry about whether a term is too broad, or too close to the topic's own
+name. That is measured afterwards against the chart list, far more reliably than
+either of us can guess: a term that turns out to reveal most of the topic is set
+aside unless nothing narrower reaches those charts. So offer the obvious central
+terms — "child mortality" on Child & Infant Mortality, "religious" on Religion,
+"female population" on Gender Ratio — including the topic's own name and the bare
+root of it. Withholding them is how a topic ends up with no way to reach the very
+charts it exists for; offering one that turns out too blunt costs nothing.
+
+Give a generous list — only a handful are ever shown, and they are picked from
+yours by measuring how much of the chart list above each one actually brings up.
+So favour the words those titles really use, and include a term that is right but
+not obvious: it costs nothing if it loses, and it is the only way it can win.
+
+Output JSON (up to 40 terms; far fewer is right when the topic is narrow —
+never pad the list with variations to reach a number):
 {{
   "keywords": ["term1", "term2", ...]
 }}"""
 
     try:
-        response = await client.aio.models.generate_content(model=model_id, contents=prompt)
+        response = None
+        for attempt in range(1, LLM_MAX_ATTEMPTS + 1):
+            try:
+                response = await client.aio.models.generate_content(
+                    model=model_id,
+                    contents=prompt,
+                    config=genai_types.GenerateContentConfig(**LLM_SAMPLING),
+                )
+                break
+            except (genai_errors.ServerError, genai_errors.ClientError) as e:
+                # 429 (rate limited) and 5xx are worth another go; anything else
+                # (a bad model id, a rejected prompt) will fail again identically.
+                retriable = getattr(e, "code", None) == 429 or isinstance(e, genai_errors.ServerError)
+                if not retriable or attempt == LLM_MAX_ATTEMPTS:
+                    raise
+                delay = LLM_RETRY_BACKOFF_SECONDS * attempt
+                click.secho(
+                    f"  {topic_name}: {getattr(e, 'code', '?')} from the API, retrying in {delay}s "
+                    f"(attempt {attempt}/{LLM_MAX_ATTEMPTS - 1})",
+                    fg="yellow",
+                )
+                await asyncio.sleep(delay)
+        assert response is not None
         result_text = response.text.strip()
 
         # Extract token counts
@@ -190,44 +315,181 @@ Output JSON (up to 30 terms, but fewer is fine if not enough relevant ones):
         raise RuntimeError(f"LLM extraction failed for {topic_name}: {e}")
 
 
-async def process_topics(topic_slugs: list[str], api_key: str, model: str) -> list[dict]:
-    """Process multiple topics in parallel using asyncio.gather.
+async def build_topic_universe(
+    client: httpx.AsyncClient,
+    topic_slug: str,
+    topic_name: str,
+    analytics: ViewAnalytics | None,
+    mdim_config_ids: dict,
+    semaphore: asyncio.Semaphore,
+) -> WeightedUniverse:
+    """Fetch and weight everything the all-charts block lists for one topic."""
+    records = await fetch_topic_universe(client, topic_name, semaphore)
+    if not records:
+        raise ValueError(f"no charts indexed for topic '{topic_slug}'")
+    return weigh_universe(topic_name, records, analytics, mdim_config_ids)
 
-    Returns: list of results (one per topic)
+
+async def process_topics(
+    topic_slugs: list[str],
+    api_key: str,
+    model: str,
+    weighting: str,
+    views_column: str,
+    max_terms: int,
+    min_marginal_share: float,
+) -> tuple[list[dict], list[str], dict[str, WeightedUniverse], list[TopicSelection]]:
+    """Generate a vocabulary for each topic and choose its terms by coverage.
+
+    Four phases. The first three are shared setup and one request per topic; only
+    the LLM call is per topic and expensive.
+
+    1. Load, once: topic names, chart view counts, and the multi-dim view →
+       config id map that lets a view's own popularity be found.
+    2. Per topic, fetch the record set the all-charts block lists and weight each
+       record by its views.
+    3. Ask the model for candidate terms, having shown it that record set.
+    4. Choose the terms that cover the most of it — see select_terms_by_coverage.
+
+    There used to be a second LLM pass here, re-picking the shortlist from what
+    the search returned for each candidate. Coverage subsumes it: a term whose
+    rows are already covered adds nothing and is not chosen, and a term the block
+    would show nothing for covers nothing and cannot be chosen at all.
+
+    Returns: (results, failed slugs, universes by topic name, selections)
     """
-    # Extract chart texts for all topics first
-    topic_data = []
-    for topic_slug in topic_slugs:
-        try:
-            topic_name, texts = extract_chart_texts(topic_slug)
-            topic_data.append((topic_slug, topic_name, texts))
-            click.secho(f"✓ {topic_name}: Found {len(texts)} texts", fg="green")
-        except ValueError as e:
-            click.secho(f"✗ {topic_slug}: {e}", fg="red")
+    failed: list[str] = []
 
-    if not topic_data:
-        return []
+    click.echo("Loading topic names, chart views and multi-dim views...")
+    names_by_slug = get_topic_names(topic_slugs)
+    analytics = None if weighting == "uniform" else load_view_analytics(views_column)
+    mdim_config_ids = load_mdim_view_config_ids() if analytics else {}
+    if analytics:
+        click.secho(
+            f"✓ {len(analytics.by_slug):,} charts and {len(analytics.by_config_id):,} "
+            f"views have {views_column}; {len(mdim_config_ids):,} multi-dim views mapped",
+            fg="green",
+        )
+    else:
+        click.secho(
+            "! --weighting uniform: every chart counts the same, popularity is ignored",
+            fg="yellow",
+        )
 
-    # Extract keywords for all topics in parallel
-    click.echo(f"\nExtracting keywords using LLM for {len(topic_data)} topics in parallel...")
-    tasks = [
-        extract_keywords_with_llm(topic_slug, topic_name, texts, api_key, model)
-        for topic_slug, topic_name, texts in topic_data
-    ]
+    semaphore = asyncio.Semaphore(SEARCH_CONCURRENCY)
+    universes: dict[str, WeightedUniverse] = {}
+    prompt_inputs: list[tuple[str, str, list[str]]] = []
 
-    results = await asyncio.gather(*tasks, return_exceptions=True)
+    click.echo(f"\nFetching the chart list for {len(topic_slugs)} topics...")
+    async with httpx.AsyncClient() as client:
+        async def load(topic_slug: str):
+            topic_name = names_by_slug.get(topic_slug)
+            if not topic_name:
+                raise ValueError(f"no tag named for topic '{topic_slug}'")
+            return topic_slug, topic_name, await build_topic_universe(
+                client, topic_slug, topic_name, analytics, mdim_config_ids, semaphore
+            )
 
-    # Handle any exceptions
-    final_results = []
-    for i, result in enumerate(results):
-        if isinstance(result, Exception):
-            topic_slug = topic_data[i][0]
-            click.secho(f"✗ {topic_slug}: {result}", fg="red")
-        else:
-            final_results.append(result)
-            click.secho(f"✓ {result['topic_name']}: Extracted {len(result['keywords'])} keywords", fg="green")
+        for outcome in await asyncio.gather(
+            *(load(slug) for slug in topic_slugs), return_exceptions=True
+        ):
+            if isinstance(outcome, BaseException):
+                click.secho(f"✗ {outcome}", fg="red")
+                continue
+            topic_slug, topic_name, universe = outcome
+            universes[topic_name] = universe
+            prompt_inputs.append((topic_slug, topic_name, texts_for_prompt(universe)))
+            click.secho(
+                f"✓ {topic_name}: {len(universe.records)} records, "
+                f"{universe.total_weight:,.0f} views",
+                fg="green",
+            )
 
-    return final_results
+    # Any topic whose record set didn't load can't be generated at all.
+    loaded = {slug for slug, _, _ in prompt_inputs}
+    failed.extend(slug for slug in topic_slugs if slug not in loaded)
+
+    if not prompt_inputs:
+        return [], failed, universes, []
+
+    click.echo(f"\nAsking for candidate terms for {len(prompt_inputs)} topics...")
+    candidate_results = await asyncio.gather(
+        *(
+            extract_keywords_with_llm(topic_slug, topic_name, texts, api_key, model)
+            for topic_slug, topic_name, texts in prompt_inputs
+        ),
+        return_exceptions=True,
+    )
+
+    click.echo("\nChoosing the terms that cover the most of each topic...")
+    results: list[dict] = []
+    selections: list[TopicSelection] = []
+    for (topic_slug, topic_name, _), candidates in zip(
+        prompt_inputs, candidate_results, strict=True
+    ):
+        if isinstance(candidates, BaseException):
+            click.secho(f"✗ {topic_slug}: {candidates}", fg="red")
+            failed.append(topic_slug)
+            continue
+
+        universe = universes[topic_name]
+        offered = list(candidates["keywords"])
+        selection = select_terms_by_coverage(
+            universe,
+            candidates["keywords"],
+            max_terms=max_terms,
+            min_marginal_share=min_marginal_share,
+        )
+        selections.append(selection)
+
+        total = selection.total_weight
+        candidates["keywords"] = [term.term for term in selection.selected]
+        candidates["stats"].update(
+            {
+                "num_keywords": len(selection.selected),
+                "num_candidates": len(offered),
+                "num_records": selection.total_count,
+                "weighted_coverage": round(
+                    selection.covered_weight / total if total else 0.0, 4
+                ),
+                "chart_coverage": round(
+                    (selection.total_count - len(selection.uncovered))
+                    / selection.total_count
+                    if selection.total_count
+                    else 0.0,
+                    4,
+                ),
+                "topic_name_share": round(selection.topic_name_share, 4),
+                "weighting": weighting,
+                "views_column": views_column,
+                "selection": "coverage",
+                # The consumer keys "trust this order" off `refined`; the order is
+                # now measured rather than guessed, so it still holds. See
+                # rankSuggestedKeywords in owid-grapher.
+                "refined": True,
+            }
+        )
+        candidates["keyword_stats"] = [
+            {
+                "term": term.term,
+                "own_share": round(term.own_share(total), 4),
+                "own_records": term.own_count,
+                "marginal_share": round(term.marginal_share(total), 4),
+                "marginal_records": term.marginal_count,
+                "cumulative_share": round(term.cumulative_share(total), 4),
+            }
+            for term in selection.selected
+        ]
+        results.append(candidates)
+
+        share = selection.covered_weight / total if total else 0.0
+        click.secho(
+            f"✓ {topic_name}: {len(selection.selected)} terms cover {share:.0%} of views "
+            f"— {', '.join(term.term for term in selection.selected) or '(none)'}",
+            fg="green" if share >= 0.35 else "yellow",
+        )
+
+    return results, failed, universes, selections
 
 
 @click.command()
@@ -239,17 +501,70 @@ async def process_topics(topic_slugs: list[str], api_key: str, model: str) -> li
 @click.option("--output", help="Output JSON file path (optional, prints to console if not provided)")
 @click.option(
     "--model",
-    default="gemini-3-flash-preview",
-    type=click.Choice(["gemini-2.5-flash-lite", "gemini-3-flash-preview"], case_sensitive=False),
-    help="Gemini model to use (default: gemini-3-flash-preview)",
+    default=DEFAULT_MODEL,
+    help=f"Gemini model to use (default: {DEFAULT_MODEL}). Any model id the API accepts works.",
+)
+@click.option(
+    "--upload-path",
+    default=DEFAULT_S3_VOCABULARY_PATH,
+    help=(
+        f"Key to upload to inside the {S3_BUCKET_NAME} bucket (default: {DEFAULT_S3_VOCABULARY_PATH}, "
+        "the one the site reads). Use another key to try a vocabulary on a staging server without "
+        "overwriting production, e.g. --upload-path topic_vocabulary/my-branch.json"
+    ),
+)
+@click.option(
+    "--report",
+    "report_path",
+    type=click.Path(dir_okay=False, writable=True),
+    help="Write an HTML coverage report here: per term, what it reveals and what it adds.",
+)
+@click.option(
+    "--weighting",
+    type=click.Choice(["views", "uniform"]),
+    default="views",
+    help="Weight charts by how much they are viewed (default), or count them equally.",
+)
+@click.option(
+    "--views-column",
+    type=click.Choice(["views_7d", "views_14d", "views_365d"]),
+    default=DEFAULT_VIEWS_COLUMN,
+    help=(
+        f"Which view window to weight by (default: {DEFAULT_VIEWS_COLUMN}). A vocabulary is "
+        "read for weeks, so the year is steadier than the week."
+    ),
+)
+@click.option(
+    "--max-terms",
+    default=DEFAULT_MAX_TERMS,
+    show_default=True,
+    help="Most terms to publish per topic.",
+)
+@click.option(
+    "--min-marginal-share",
+    default=DEFAULT_MIN_MARGINAL_SHARE,
+    show_default=True,
+    help="Stop once the next term would reveal less than this share of a topic's views.",
 )
 @click.option("--no-upload", is_flag=True, help="Skip uploading to R2 (useful for testing)")
-def main(topic: tuple[str, ...], output: str | None, model: str, no_upload: bool):
-    """Extract vocabulary for topics using LLM (simple approach).
+def main(
+    topic: tuple[str, ...],
+    output: str | None,
+    model: str,
+    upload_path: str,
+    report_path: str | None,
+    weighting: str,
+    views_column: str,
+    max_terms: int,
+    min_marginal_share: float,
+    no_upload: bool,
+):
+    """Build the OWID topic vocabulary: the suggested search terms per topic.
 
-    Takes all chart titles and subtitles for topics and asks an LLM to extract
-    characteristic keywords/phrases. Processes multiple topics in parallel.
-    Shows API cost by default.
+    For each topic, fetches the chart list its all-charts block shows, weights
+    every chart by how much it is viewed, asks an LLM for candidate search terms,
+    and then picks the terms covering the most of that list — most-revealing
+    first, each next one adding the most that is still uncovered.
     """
     # Load .env file from project root
     env_path = Path(__file__).parent.parent.parent / ".env"
@@ -269,35 +584,75 @@ def main(topic: tuple[str, ...], output: str | None, model: str, no_upload: bool
         click.echo("No topics specified, extracting for all topics...")
         topic_slugs = get_all_topic_slugs()
 
+    # A run over some of the topics cannot be published to the key the site
+    # reads: the file *replaces* the vocabulary rather than merging into it, so
+    # every topic the run skipped would lose its suggestions. Retrying a handful
+    # of topics is still useful — point --upload-path at another key to look at
+    # the result, or --no-upload --output to keep it locally — but publishing
+    # takes a run over every topic. Checked before the first API call, so the
+    # mistake costs nothing.
+    if topic and not no_upload and upload_path == DEFAULT_S3_VOCABULARY_PATH:
+        click.secho(
+            f"✗ Refusing to publish a {len(topic_slugs)}-topic run to {DEFAULT_S3_VOCABULARY_PATH}, "
+            "the key the site reads: it would drop every other topic's suggestions.",
+            fg="red",
+        )
+        click.secho(
+            "  Drop --topic to cover every topic, or keep this run out of production with "
+            "--no-upload (optionally with --output) or --upload-path.",
+            fg="red",
+        )
+        sys.exit(1)
+
     click.echo("=" * 80)
-    click.echo("SIMPLE LLM-BASED VOCABULARY EXTRACTION")
-    click.echo(f"Topics: {len(topic_slugs)}")
-    click.echo(f"Model: {model}")
+    click.echo("OWID TOPIC VOCABULARY")
+    click.echo(f"Topics:    {len(topic_slugs)}")
+    click.echo(f"Model:     {model}")
+    click.echo(
+        f"Weighting: {'every chart equally' if weighting == 'uniform' else views_column}"
+    )
+    click.echo(f"Terms:     at most {max_terms}, stopping below {min_marginal_share:.1%}")
+    upload_target = "skipped" if no_upload else f"s3://{S3_BUCKET_NAME}/{upload_path}"
+    click.echo(f"Upload:    {upload_target}")
     click.echo("=" * 80)
     click.echo()
 
-    # Extract chart texts and process with LLM
-    click.echo("Extracting chart titles and subtitles from database...")
-    results = asyncio.run(process_topics(topic_slugs, api_key, model))
+    try:
+        results, failed_slugs, universes, selections = asyncio.run(
+            process_topics(
+                topic_slugs,
+                api_key,
+                model,
+                weighting=weighting,
+                views_column=views_column,
+                max_terms=max_terms,
+                min_marginal_share=min_marginal_share,
+            )
+        )
+    except EmptyAnalyticsError as e:
+        click.echo()
+        click.secho(f"✗ {e}", fg="red")
+        sys.exit(1)
 
     if not results:
         click.secho("\n✗ No results generated", fg="red")
         sys.exit(1)
 
     # Calculate total costs
-    pricing = PRICING[model]
+    pricing = PRICING.get(model)
     total_input_tokens = sum(r["stats"]["input_tokens"] for r in results)
     total_output_tokens = sum(r["stats"]["output_tokens"] for r in results)
-    total_input_cost = (total_input_tokens / 1_000_000) * pricing["input"]
-    total_output_cost = (total_output_tokens / 1_000_000) * pricing["output"]
-    total_cost = total_input_cost + total_output_cost
+    if pricing:
+        total_input_cost = (total_input_tokens / 1_000_000) * pricing["input"]
+        total_output_cost = (total_output_tokens / 1_000_000) * pricing["output"]
+        total_cost = total_input_cost + total_output_cost
 
-    # Add cost to each result
-    for result in results:
-        stats = result["stats"]
-        input_cost = (stats["input_tokens"] / 1_000_000) * pricing["input"]
-        output_cost = (stats["output_tokens"] / 1_000_000) * pricing["output"]
-        stats["total_cost_usd"] = round(input_cost + output_cost, 6)
+        # Add cost to each result
+        for result in results:
+            stats = result["stats"]
+            input_cost = (stats["input_tokens"] / 1_000_000) * pricing["input"]
+            output_cost = (stats["output_tokens"] / 1_000_000) * pricing["output"]
+            stats["total_cost_usd"] = round(input_cost + output_cost, 6)
 
     # Output results
     click.echo()
@@ -306,15 +661,23 @@ def main(topic: tuple[str, ...], output: str | None, model: str, no_upload: bool
     click.echo("=" * 80)
     click.echo()
 
-    for result in results:
-        click.echo(f"Topic: {result['topic_name']}")
-        click.echo(f"Keywords extracted: {len(result['keywords'])}")
+    # A run covers every topic, so the per-term arithmetic only goes to the
+    # terminal when few enough topics were asked for to read it; otherwise it is
+    # one line each, worst-covered first, and the detail goes to --report.
+    if len(selections) <= 3:
+        for selection in selections:
+            click.echo(render_topic_table(selection, universes[selection.topic_name]))
+            click.echo()
+    else:
+        click.echo(render_run_summary(selections))
         click.echo()
-        click.echo("Keywords:")
-        for i, kw in enumerate(result["keywords"], 1):
-            click.echo(f"  {i:2d}. {kw}")
-        click.echo()
-        click.echo("-" * 80)
+
+    if report_path:
+        Path(report_path).write_text(
+            render_html_report(selections, universes, weighting, views_column),
+            encoding="utf-8",
+        )
+        click.secho(f"✓ Coverage report: {report_path}", fg="green")
         click.echo()
 
     # Output total cost
@@ -326,15 +689,43 @@ def main(topic: tuple[str, ...], output: str | None, model: str, no_upload: bool
     click.echo(f"Output tokens: {total_output_tokens:,}")
     click.echo(f"Total tokens:  {total_input_tokens + total_output_tokens:,}")
     click.echo()
-    click.echo(f"Input cost:  ${total_input_cost:.6f}")
-    click.echo(f"Output cost: ${total_output_cost:.6f}")
-    click.echo(f"Total cost:  ${total_cost:.6f}")
-
-    # Build output data
-    if len(results) == 1:
-        output_data = results[0]
+    if pricing:
+        click.echo(f"Input cost:  ${total_input_cost:.6f}")
+        click.echo(f"Output cost: ${total_output_cost:.6f}")
+        click.echo(f"Total cost:  ${total_cost:.6f}")
     else:
-        output_data = {r["topic_slug"]: r for r in results}
+        click.secho(f"Cost: unknown — no pricing recorded for {model} (add it to PRICING)", fg="yellow")
+
+    # Always keyed by topic slug, single-topic runs included: the site reads the
+    # file as a mapping of topics, and a bare entry object indexes to nothing at
+    # all rather than to one topic.
+    output_data = {r["topic_slug"]: r for r in results}
+
+    # Written before the guard below, so a run that ends up refusing to publish
+    # still leaves behind whatever it did manage to produce.
+    if output:
+        with open(output, "w") as f:
+            json.dump(output_data, f, indent=2)
+        click.echo()
+        click.secho(f"✓ Saved results to: {output}", fg="green")
+
+    # Refuse to publish a vocabulary that is missing topics. A run fans out one
+    # request per topic, so a transient API failure used to mean those topics
+    # quietly vanished from the file — and uploading that over a complete
+    # vocabulary loses their suggestions until someone notices.
+    if failed_slugs and not no_upload:
+        click.echo()
+        click.secho(
+            f"✗ {len(failed_slugs)} of {len(topic_slugs)} topics failed: {', '.join(failed_slugs)}",
+            fg="red",
+        )
+        click.secho(
+            "  Not uploading a partial vocabulary over a complete one. Re-run over every topic to "
+            "publish — re-running just these few can't be, since the file replaces the whole "
+            "vocabulary. Pass --no-upload to keep this partial result.",
+            fg="red",
+        )
+        sys.exit(1)
 
     # Upload to R2
     if not no_upload:
@@ -343,19 +734,19 @@ def main(topic: tuple[str, ...], output: str | None, model: str, no_upload: bool
             tmp_path = f.name
 
         try:
-            s3_url = f"s3://{S3_BUCKET_NAME}/{S3_VOCABULARY_PATH}"
+            s3_url = f"s3://{S3_BUCKET_NAME}/{upload_path}"
             s3_utils.upload(s3_url, tmp_path, public=True)
             click.echo()
-            click.secho(f"✓ Uploaded to: https://{S3_BUCKET_NAME}.owid.io/{S3_VOCABULARY_PATH}", fg="green")
+            # files.ourworldindata.org is the worker in front of this bucket; it
+            # is what the site reads, because it adds CORS and an edge cache.
+            click.secho(f"✓ Uploaded to: https://files.ourworldindata.org/{upload_path}", fg="green")
+            if upload_path != DEFAULT_S3_VOCABULARY_PATH:
+                click.secho(
+                    "  (not the key the site reads by default — point TOPIC_VOCABULARY_URL at it to try it out)",
+                    fg="yellow",
+                )
         finally:
             os.unlink(tmp_path)
-
-    # Save to local file if requested
-    if output:
-        with open(output, "w") as f:
-            json.dump(output_data, f, indent=2)
-        click.echo()
-        click.secho(f"✓ Saved results to: {output}", fg="green")
 
 
 if __name__ == "__main__":
