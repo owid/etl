@@ -45,8 +45,13 @@ const txt = (name, x, y, w, h, size) => node({ type: "TEXT", name, x, y, w: unde
 function build(opts = {}) {
   const header = node({ name: "header", layoutMode: "VERTICAL", x: 16, y: 16, width: 508, height: 92,
     children: [txt("title", 16, 16, 400, 30, 24), txt("subtitle", 16, 52, 508, 56, 17)] });
-  const footer = node({ name: "footer", layoutMode: "VERTICAL", x: 16, y: 488, width: 508, height: 36,
-    children: [txt("source", 16, 488, 300, 16, 13)] });
+  // `footerLift` models the real shape the band edge has to respect: a footer child sitting ABOVE its
+  // own container's origin. verify_page.js and measure_fit.js both lift the band's bottom edge by the
+  // most negative child offset, and replay_chart_edits.js used the raw box origin until this was caught.
+  const srcY = opts.footerLift ? 488 - opts.footerLift : 488;
+  const footer = node({ name: "footer", layoutMode: "VERTICAL", x: 16, y: srcY, width: 508, height: 36,
+    children: [txt("source", 16, srcY, 300, 16, 13)] });
+  if (opts.footerLift) footer.children[0].y = -opts.footerLift;
   const logo = node({ name: "logo", x: 460, y: 16, width: 64, height: 35 });
 
   const bars = node({ name: "bars", x: 100, y: 200, width: 500, height: 300,
@@ -205,6 +210,25 @@ const check = (name, ok, detail) => results.push({ name, ok: !!ok, detail: ok ? 
     check("9 the legend is centred on the content box", Math.abs(left - right) < 0.01, `left ${left}, right ${right}`);
     check("9 and sits the stated gap under the map", Math.abs(legend.y - (map.y + map.height + 16)) < 0.01, `${legend.y} vs ${map.y + map.height + 16}`);
     check("9 and it is reported", /centred/.test(out.legendNote || ""), out.legendNote);
+  }
+
+  // 9b — the band's bottom edge is the footer's topmost INK, not its box origin. Centring against the
+  // box while the verifiers measure the lifted edge is a disagreement the script cannot see, because its
+  // own `symmetric` verdict reads the same edge it centred on — it certifies its own mistake.
+  {
+    const lift = 10;
+    const f = build({ footerLift: lift });
+    const out = await run(f, {});
+    const footer = f.children.find((n) => n.name === "footer");
+    const chart = f.children.find((n) => n.name === "chart");
+    const lifted = footer.y + Math.min(0, Math.min(...footer.children.map((c) => c.y)));
+    const gapBelow = lifted - (chart.y + chart.height);
+    check("9b the gap is measured to the footer's lifted edge", Math.abs(gapBelow - out.result.gapBelow) < 0.01,
+          `script says ${out.result.gapBelow}, lifted edge gives ${gapBelow}`);
+    check("9b and the chart clears that edge", chart.y + chart.height <= lifted + 0.01,
+          `chart bottom ${chart.y + chart.height} vs lifted edge ${lifted}`);
+    check("9b still symmetric against the lifted edge", out.result.symmetric,
+          `${out.result.gapAbove} / ${out.result.gapBelow}`);
   }
 
   // 10 — a renamed chart group is a hard error, not a silent no-op. A re-import is exactly when the

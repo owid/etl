@@ -281,8 +281,14 @@ if (groupNode) {
     // at four canvas sizes), so a fit computed without it left 440px of stroke hanging 31px past the
     // artboard and straight through the source line. Zero-area nodes stay excluded from the FILL
     // inventory for the opposite reason — see the same distinction in verify_page.js.
-    const strokedInk =
-      "strokes" in n && Array.isArray(n.strokes) && n.strokes.some((s) => s && s.visible !== false);
+    // "Has a stroke" is not "paints a stroke". A paint switched off (`visible: false`) or made
+    // transparent (`opacity: 0`) renders nothing, and counting it here widens the measured bounds, which
+    // is worse than it sounds: these bounds set the fit AND the second-pass export parameters, so one
+    // invisible stroke on a zero-area node biases every number downstream. Same predicate as
+    // verify_page.js's knockout row — one rule for "does this paint render", not three call sites that
+    // drifted apart.
+    const paints = (s) => s && s.visible !== false && (s.opacity === undefined || s.opacity > 0.01);
+    const strokedInk = "strokes" in n && Array.isArray(n.strokes) && n.strokes.some(paints);
     if ((b.width === 0 || b.height === 0) && !strokedInk) return;
     x0 = Math.min(x0, b.x);
     y0 = Math.min(y0, b.y);

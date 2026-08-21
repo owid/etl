@@ -424,6 +424,27 @@ const check = (name, cond, detail) => {
     const l = out.group.measured.x0 !== undefined ? out.group.measured.x0 : null;
     check("8 zero-area node with no stroke stays excluded", h < 2000 && (l === null || l > 100),
           `measured=${JSON.stringify(out.group.measured)}`);
+
+    // 8b — "has a stroke" is not "paints a stroke". A paint switched off or made transparent renders
+    // nothing, and these bounds set the fit AND the second-pass export parameters, so counting one
+    // biases every number downstream.
+    const f2 = mkFrame().frame;
+    const g2 = mkGroup("G:8b");
+    g2.children.push(mkNode({ type: "VECTOR", name: "invisible-paint", x: 760, y: 60, width: 0, height: 3000,
+                              strokeWeight: 1, strokes: [{ type: "SOLID", visible: false }] }));
+    g2.children.push(mkNode({ type: "VECTOR", name: "transparent-paint", x: 100, y: 60, width: 0, height: 3000,
+                              strokeWeight: 1, strokes: [{ type: "SOLID", opacity: 0 }] }));
+    f2.children.push(g2);
+    g2.parent = f2;
+    const out2 = await run(
+      { frameId: "F:1", groupId: "G:8b", hideNames: [/^connectors$/, /^datapoints__/], hideIds: [],
+        declared: null, imFontSize: null, originalGroupId: null },
+      { frame: f2 },
+    );
+    check("8b a stroke paint that is invisible does not count as ink", out2.group.measured.h < 3000,
+          `measured h=${out2.group.measured.h}, a 3000px invisible stroke was counted`);
+    check("8b nor does a fully transparent one", out2.group.measured.h < 3000,
+          `measured h=${out2.group.measured.h}`);
   }
 
   const bad = results.filter((x) => !x.ok);

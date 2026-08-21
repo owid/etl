@@ -105,7 +105,9 @@ const fingerprint = (frame) => {
           constraintV: footer.constraints.vertical, bottom: r(footer.y + footer.height),
           rows: footer.children.map((c) => (c.type === "TEXT" ? textRow(c) : { nonText: c.type })) }
       : null,
-    logo: logo ? { x: r(logo.x), y: r(logo.y), w: r(logo.width), h: r(logo.height) } : null,
+    // `visible` belongs in the fingerprint: geometry alone cannot tell a logo that is there from one
+    // switched off, and a frame shipping without its logo is exactly the drift this script is for.
+    logo: logo ? { x: r(logo.x), y: r(logo.y), w: r(logo.width), h: r(logo.height), visible: logo.visible !== false } : null,
   };
 };
 
@@ -198,6 +200,11 @@ for (const id of CONFIG.frameIds) {
   if (String(G.size) !== String(T.size)) push(`frame size ${G.size} != ${T.size}`);
   if (G.fill !== T.fill) push(`frame fill ${G.fill} != ${T.fill}`);
   if (!!G.logo !== !!T.logo) push("logo present/absent differs");
+  // A logo switched off keeps every coordinate it had, so no geometry test can see it. This is the
+  // second defect on this element — the first was an uncompared height — and both were the same
+  // mistake: fingerprinting a property and then not comparing it.
+  else if (G.logo && G.logo.visible !== T.logo.visible)
+    push(`logo visible ${G.logo.visible} != template's ${T.logo.visible} — a hidden logo keeps its geometry, so nothing else here can detect it`);
   // Height included: a logo resized vertically while keeping its x, y and width is a DISTORTED logo, and
   // leaving `h` out of the comparison reported that as matching the template.
   else if (G.logo && (G.logo.x !== T.logo.x || G.logo.y !== T.logo.y || G.logo.w !== T.logo.w || G.logo.h !== T.logo.h))

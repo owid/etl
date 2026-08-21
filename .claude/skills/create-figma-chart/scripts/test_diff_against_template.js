@@ -304,6 +304,15 @@ const has = (res, re) => drift(res).some((d) => re.test(d));
     // a logo that has not moved or resized is still clean
     const same = await run(buildFrame({ name: "tpl" }), buildFrame({ name: "clone" }));
     check("13 an untouched logo is not drift", !has(same, /logo/), JSON.stringify(drift(same)));
+
+    // 13b — a logo switched OFF keeps every coordinate, so no geometry test can see it. Same mistake
+    // as the uncompared height above: fingerprinted, then not compared.
+    const tpl2 = buildFrame({ name: "tpl" });
+    const off = buildFrame({ name: "clone" });
+    off.children.find((c) => c.name === "logo").visible = false;
+    const res2 = await run(tpl2, off);
+    check("13b a hidden logo is DRIFT", has(res2, /logo visible false/), JSON.stringify(drift(res2)));
+    check("13b and says geometry cannot detect it", has(res2, /keeps its geometry/), JSON.stringify(drift(res2)));
   }
 
   const bad = results.filter((x) => !x.ok);

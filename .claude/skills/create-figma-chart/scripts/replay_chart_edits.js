@@ -80,7 +80,16 @@ const autos = frame.children.filter((c) => "layoutMode" in c && c.layoutMode !==
 if (autos.length < 2) throw new Error("could not resolve a header and a footer (need two auto-layout children)");
 const header = autos[0], footer = autos[autos.length - 1];
 const headerB = header.absoluteBoundingBox.y + header.height;
-const footerT = footer.absoluteBoundingBox.y;
+// The band's bottom edge is the footer's TOPMOST INK, not its box origin: a footer child may sit above
+// its own container's y (grapher's source row does), and `verify_page.js` and `measure_fit.js` both lift
+// the edge by the most negative child offset. This script used the raw box origin, so it centred the
+// chart against one edge while the two scripts that check it measured another — and because its own
+// `symmetric` verdict reads the same edge it centred on, it certified its own disagreement. Three
+// scripts, one rule.
+const footerLift = footer.children && footer.children.length
+  ? Math.min(0, Math.min(...footer.children.map((c) => c.y)))
+  : 0;
+const footerT = footer.absoluteBoundingBox.y + footerLift;
 const bandH = footerT - headerB;
 const targetH = bandH - 2 * CONFIG.gap;
 
