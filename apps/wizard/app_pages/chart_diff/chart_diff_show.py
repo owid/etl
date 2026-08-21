@@ -305,6 +305,9 @@ class ChartDiffShow:
             if undecided:
                 st.caption("Choose an environment for: " + ", ".join(f"`{field}`" for field in undecided) + ".")
 
+            # Why the last attempt wrote nothing, if it wrote nothing.
+            resolver.show_error()
+
             # Recovery path for a failed write: the error message points at this button.
             if st.session_state.get(f"conflict-write-failed-{self.diff.chart_id}"):
                 st.button(
@@ -837,26 +840,23 @@ class ChartDiffShow:
                 case gm.ChartStatus.PENDING.value:
                     st.toast(f"**Resetting** state for chart {self.diff.chart_id}.", icon=":material/restart_alt:")
 
-    def _show_conflict_resolver_message(self) -> None:
+    def _show_conflict_resolver_toast(self) -> None:
         """Show the outcome of a conflict resolution.
 
-        `resolve_conflicts` runs as a callback and the popover it lives in is gone by the time the
-        conflict is resolved, so the message is deferred to session state and drawn here instead.
+        As a toast: it floats, so it pushes no content down, and the outcome of a resolve is not
+        something to keep on screen. `resolve_conflicts` runs as a callback, and the popover it lives
+        in is gone by the time the conflict is resolved, so the message is deferred to session state
+        and drawn here instead (drawing it from the callback duplicates it).
         """
-        message = st.session_state.pop(f"conflict-resolver-msg-{self.diff.chart_id}", None)
-        if message is None:
-            return
-        kind, text = message
-        if kind == "success":
-            st.success(text)
-        else:
-            st.error(text)
+        message = st.session_state.pop(f"conflict-toast-{self.diff.chart_id}", None)
+        if message is not None:
+            st.toast(message, icon=":material/merge:")
 
     @st.fragment
     def show(self):
         """Show chart diff."""
         # Outcome of a conflict resolution (shown even if the diff itself is gone afterwards)
-        self._show_conflict_resolver_message()
+        self._show_conflict_resolver_toast()
 
         # Chart diff no longer exists (e.g. after a refresh found no differences)
         if st.session_state.pop(f"chart-diff-gone-{self.diff.chart_id}", False):

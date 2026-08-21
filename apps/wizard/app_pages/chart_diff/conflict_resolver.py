@@ -1,5 +1,6 @@
 import ast
 import json
+from collections import Counter
 from copy import deepcopy
 from typing import Any
 
@@ -180,6 +181,27 @@ class ChartDiffConflictResolver:
             self.diff.source_chart.config,
         )
 
+    @property
+    def toast_key(self) -> str:
+        """Outcome of a resolve, shown once as a toast. Toasts float, so they push no content down."""
+        return f"conflict-toast-{self.diff.chart_id}"
+
+    @property
+    def error_key(self) -> str:
+        """Why a resolve wrote nothing. Stays next to the form until the next attempt."""
+        return f"conflict-error-{self.diff.chart_id}"
+
+    def _fail(self, message: str) -> None:
+        """Record that nothing was written, both next to the form and as a toast."""
+        st.session_state[self.error_key] = message
+        st.session_state[self.toast_key] = f"Chart {self.diff.chart_id}: nothing was written"
+
+    def show_error(self) -> None:
+        """Show why the last attempt wrote nothing, if it did not."""
+        message = st.session_state.get(self.error_key)
+        if message is not None:
+            st.error(message)
+
     def _radio_key(self, field_key: str) -> str:
         return f"conflict-radio-{field_key}-{self.diff.chart_id}"
 
@@ -311,21 +333,34 @@ class ChartDiffConflictResolver:
             )
         return resolutions
 
-    def _summary(self, resolutions: dict[str, Any]) -> str:
-        """One line per field saying where its value came from."""
-        lines = []
+    def _decisions(self, resolutions: dict[str, Any]) -> dict[str, str]:
+        """Where each field's value came from. For the log, not for the screen."""
+        decisions = {}
         for field in self.config_compare:
             field_key = field["key"]
             choice = st.session_state[self._radio_key(field_key)]
             origin = ENVIRONMENT_IDS[choice]
             if resolutions[field_key] is None:
-                note = " (field removed)"
+                origin += " (removed)"
             elif resolutions[field_key] != field[f"raw{choice}"]:
-                note = " (edited)"
-            else:
-                note = ""
-            lines.append(f"- `{field_key}`: {origin}{note}")
-        return "\n".join(lines)
+                origin += " (edited)"
+            decisions[field_key] = origin
+        return decisions
+
+    def _summary_line(self, resolutions: dict[str, Any]) -> str:
+        """One line fit for a toast: a per-field list runs to dozens of lines on a real conflict."""
+        counts = Counter(
+            ENVIRONMENT_IDS[st.session_state[self._radio_key(field["key"])]] for field in self.config_compare
+        )
+        parts = []
+        for choice in (STAGING, PRODUCTION):
+            env = ENVIRONMENT_IDS[choice]
+            if counts[env]:
+                parts.append(f"{counts[env]} from {env.lower()}")
+        removed = sum(1 for value in resolutions.values() if value is None)
+        if removed:
+            parts.append(f"{removed} removed")
+        return ", ".join(parts)
 
     def resolve_conflicts(self, rerun: bool = False):
         """Gather all resolved conflicts and update chart config in staging.
@@ -333,34 +368,30 @@ class ChartDiffConflictResolver:
         Runs as a button callback, so messages are deferred to session state instead of being drawn
         here (drawing elements from a callback inside a fragment duplicates them).
         """
-        message_key = f"conflict-resolver-msg-{self.diff.chart_id}"
+        # Every attempt starts from a clean slate, so a stale error never lingers next to the form.
+        st.session_state.pop(self.error_key, None)
 
         undecided = self.fields_undecided
         if undecided:
-            st.session_state[message_key] = (
-                "error",
-                "Nothing was written: no environment chosen yet for " + ", ".join(f"`{f}`" for f in undecided) + ".",
+            self._fail(
+                "Nothing was written: no environment chosen yet for " + ", ".join(f"`{f}`" for f in undecided) + "."
             )
             return
 
         try:
             resolutions = self._resolutions()
         except FieldParseError as e:
-            st.session_state[message_key] = (
-                "error",
+            self._fail(
                 f"Nothing was written: could not read the value typed for `{e.field_key}` ({e}). "
-                "It must be valid JSON, matching the type of the field.",
+                "It must be valid JSON, matching the type of the field."
             )
             return
 
-        summary = self._summary(resolutions)
+        summary = self._summary_line(resolutions)
         log.info(
             "chart_diff.resolve_conflicts",
             chart_id=self.diff.chart_id,
-            resolutions={
-                field["key"]: ENVIRONMENT_IDS[st.session_state[self._radio_key(field["key"])]]
-                for field in self.config_compare
-            },
+            decisions=self._decisions(resolutions),
         )
 
         with st.spinner("Updating chart on staging..."):
@@ -373,9 +404,8 @@ class ChartDiffConflictResolver:
             if config == build_resolved_config(self.diff.source_chart.config, {}):
                 self.diff.set_conflict_to_resolved(self.session)
                 st.session_state.pop(f"conflict-write-failed-{self.diff.chart_id}", None)
-                st.session_state[message_key] = (
-                    "success",
-                    f"Chart {self.diff.chart_id} left as it is on staging, conflict marked as resolved:\n\n{summary}",
+                st.session_state[self.toast_key] = (
+                    f"Chart {self.diff.chart_id} left as it is on staging, conflict resolved ({summary})"
                 )
                 return
 
@@ -391,10 +421,7 @@ class ChartDiffConflictResolver:
                 validate_chart_config_and_set_defaults(config, schema=get_schema_from_url(config["$schema"]))
             except Exception as e:
                 log.error(e)
-                st.session_state[message_key] = (
-                    "error",
-                    f"Nothing was written: the resolved config is not valid. \n\n {e}",
-                )
+                self._fail(f"Nothing was written: the resolved config is not valid. \n\n {e}")
                 return
 
             # User who last edited the chart
@@ -412,18 +439,14 @@ class ChartDiffConflictResolver:
             except HTTPError as e:
                 log.error(e)
                 st.session_state[f"conflict-write-failed-{self.diff.chart_id}"] = True
-                st.session_state[message_key] = (
-                    "error",
-                    f"An error occurred while updating the chart in staging. Please report this to #proj-new-data-workflow. If you are in a rush, you can manually integrate the changes in production [here]({SOURCE.chart_admin_site(self.diff.chart_id)}), and then click on the 'Mark as resolved' button below. \n\n {e}",
+                self._fail(
+                    f"An error occurred while updating the chart in staging. Please report this to #proj-new-data-workflow. If you are in a rush, you can manually integrate the changes in production [here]({SOURCE.chart_admin_site(self.diff.chart_id)}), and then click on the 'Mark as resolved' button below. \n\n {e}"
                 )
             else:
                 # Set conflict as resolved
                 st.session_state.pop(f"conflict-write-failed-{self.diff.chart_id}", None)
                 self.diff.set_conflict_to_resolved(self.session)
-                # Signal user that everything went well, and with which value each field ended up
-                st.session_state[message_key] = (
-                    "success",
-                    f"Chart {self.diff.chart_id} updated on staging:\n\n{summary}",
-                )
+                # Signal user that everything went well, and where the values came from
+                st.session_state[self.toast_key] = f"Chart {self.diff.chart_id} updated on staging ({summary})"
         if rerun:
             st.rerun()

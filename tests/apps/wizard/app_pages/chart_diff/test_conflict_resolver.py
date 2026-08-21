@@ -255,9 +255,12 @@ def _resolve_app():
         resolver.show_field_resolver(field)
     st.button("Resolve conflicts", disabled=bool(resolver.fields_undecided), on_click=resolver.resolve_conflicts)
 
-    message = st.session_state.get("conflict-resolver-msg-42")
-    if message is not None:
-        st.text(f"{message[0]}: {message[1]}")
+    toast = st.session_state.get("conflict-toast-42")
+    error = st.session_state.get("conflict-error-42")
+    if error is not None:
+        st.text(f"error: {error}")
+    elif toast is not None:
+        st.text(f"success: {toast}")
 
 
 @pytest.fixture
@@ -297,7 +300,7 @@ def test_resolving_writes_the_chosen_side(fake_admin_api):
     # isInheritanceEnabled is re-attached after schema validation strips it, so choosing a side for it
     # actually reaches the admin API.
     assert call["config"]["isInheritanceEnabled"] is True
-    assert at.text[0].value.startswith("success: Chart 42 updated on staging")
+    assert at.text[0].value == "success: Chart 42 updated on staging (1 from staging, 2 from production)"
 
 
 def test_resolving_a_malformed_edit_writes_nothing(fake_admin_api):
@@ -346,9 +349,12 @@ def _refreshable_app():
         resolver.show_field_resolver(field)
     st.button("Resolve conflicts", disabled=bool(resolver.fields_undecided), on_click=resolver.resolve_conflicts)
 
-    message = st.session_state.get("conflict-resolver-msg-42")
-    if message is not None:
-        st.text(f"{message[0]}: {message[1]}")
+    toast = st.session_state.get("conflict-toast-42")
+    error = st.session_state.get("conflict-error-42")
+    if error is not None:
+        st.text(f"error: {error}")
+    elif toast is not None:
+        st.text(f"success: {toast}")
 
 
 def test_editor_follows_a_value_that_changed_under_it(fake_admin_api):
@@ -439,9 +445,12 @@ def _empty_string_app():
         resolver.show_field_resolver(field)
     st.button("Resolve conflicts", disabled=bool(resolver.fields_undecided), on_click=resolver.resolve_conflicts)
 
-    message = st.session_state.get("conflict-resolver-msg-42")
-    if message is not None:
-        st.text(f"{message[0]}: {message[1]}")
+    toast = st.session_state.get("conflict-toast-42")
+    error = st.session_state.get("conflict-error-42")
+    if error is not None:
+        st.text(f"error: {error}")
+    elif toast is not None:
+        st.text(f"success: {toast}")
 
 
 def test_choosing_an_empty_string_writes_it_rather_than_removing_the_field(fake_admin_api):
@@ -465,7 +474,7 @@ def test_emptying_the_editor_removes_the_field_and_says_so(fake_admin_api):
     at = at.button[0].click().run()
 
     assert "note" not in fake_admin_api.calls[0]["config"]
-    assert "(field removed)" in at.text[0].value
+    assert "1 removed" in at.text[0].value
 
 
 def test_choosing_staging_everywhere_writes_nothing(fake_admin_api):
@@ -512,9 +521,12 @@ def _realistic_app():
         resolver.show_field_resolver(field)
     st.button("Resolve conflicts", disabled=bool(resolver.fields_undecided), on_click=resolver.resolve_conflicts)
 
-    message = st.session_state.get("conflict-resolver-msg-42")
-    if message is not None:
-        st.text(f"{message[0]}: {message[1]}")
+    toast = st.session_state.get("conflict-toast-42")
+    error = st.session_state.get("conflict-error-42")
+    if error is not None:
+        st.text(f"error: {error}")
+    elif toast is not None:
+        st.text(f"success: {toast}")
 
 
 @pytest.fixture
