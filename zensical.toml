@@ -124,7 +124,7 @@ nav = [
     ] },
     { "Technical publications" = [
         "analyses/index.md",
-        { "Energy of world regions" = "analyses/energy_of_world_regions/index.md" },
+        { "Energy of world regions" = "analyses/energy_of_world_regions/energy_of_world_regions.html" },
         { "Does the news reflect what we die from?" = "analyses/media_deaths/methodology.md" },
         { "Food supply of world regions" = "analyses/food_supply_of_world_regions/food_supply_of_world_regions.html" },
         { "Our COVID work" = "api/covid.md" },

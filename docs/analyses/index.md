@@ -7,11 +7,13 @@ This is just a sneak peek into some of our data work. But note that all our code
 
 !!! note ""
 
-    ## [Energy of world regions](energy_of_world_regions/index.md)
+    ## [Energy of world regions](energy_of_world_regions/energy_of_world_regions.html)
 
-    How continental and income-group aggregates are constructed from the Energy Institute's Statistical Review, the U.S. EIA's international data, and Ember's electricity data: the undisclosed "Other" regions, the methodological differences between producers, the derivation of "other renewables", and the dedicated indicators behind stacked charts.
+    How our continental and income-group energy aggregates are built from the Energy Institute's Statistical Review, the U.S. EIA's international data, and Ember's electricity data: the undisclosed "Other" regions, the methodological differences between producers, the derivation of "other renewables", and the dedicated indicators behind stacked charts.
 
-    [:material-book-open-variant: Methodology](energy_of_world_regions/index.md){ .md-button }
+    [:material-notebook: View notebook](energy_of_world_regions/energy_of_world_regions.html){ .md-button }
+    [:material-play-circle: Run in Colab](https://colab.research.google.com/github/owid/etl/blob/master/docs/analyses/energy_of_world_regions/energy_of_world_regions.ipynb){ .md-button }
+    [:material-download: Download notebook](https://raw.githubusercontent.com/owid/etl/master/docs/analyses/energy_of_world_regions/energy_of_world_regions.ipynb){ .md-button }
 
 
 !!! note ""
