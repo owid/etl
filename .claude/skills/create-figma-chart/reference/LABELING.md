@@ -465,3 +465,28 @@ Split what you find in two, and be explicit about which is which:
 - **The chart author's** — sort order, entity selection, colors, tolerance, the year. Give them a short numbered list with the trade-off spelled out (what it costs, what it buys) and let them decide. Never apply these by editing vectors: the image would stop matching the interactive chart.
 
 If you genuinely have nothing to suggest, say that instead of inventing something. A thin recommendation wastes more of the author's attention than none.
+
+## Shortening entity names — where the space actually comes from
+
+Long entity names cost plot area on every chart type that labels entities, so this is a general
+labeling decision rather than a bar-chart one. What changes per type is **what the labels are competing
+with**, and that decides whether shortening buys anything at all:
+
+| Chart | What the labels cost | Does shortening the longest one gain space? |
+|---|---|---|
+| Ranked / discrete bar | a column on the left, as wide as the longest name | **Yes** — and only the longest one does. The re-layout is in [per-chart-type/bar.md](per-chart-type/bar.md) |
+| Slope | a column at each end, so it is paid twice | Yes, at whichever end carries the longer names |
+| Line with end labels | the right margin of the plot | Yes |
+| Stacked bar / stacked area | direct labels inside or beside the bands | Sometimes — a name that no longer needs a leader or a second line is the real win |
+| Scatter | nothing structural; labels sit beside their points | **No edge moves** — the gain is fewer collisions, and it can be worth it for that alone |
+| Marimekko | labels under narrow segments, which is where truncation and rotation start | Yes, in the sense that a shorter name may fit where the full one could not |
+| Map | country names are not drawn; only annotations and leader labels carry text | Only for an annotation |
+
+Two rules hold across all of them, and they are the ones to state when you ask (SKILL.md → Step 4):
+
+- **`US` and `UK` are settled** by the Writing and Style Guide, without periods. Any other short form is
+  a **proposal**: name it in the question, say it is a suggestion, and let the user decide. The reader
+  cannot tell a common abbreviation from an invented one, so an unrecognisable one reads as data.
+- **Identify what is actually binding before offering the change.** On a bar chart that is the longest
+  name and nothing else; on a scatter there is no binding edge, so promising a bigger plot would be
+  wrong. Offering a rename that cannot help spends the user's decision for nothing.

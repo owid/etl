@@ -345,8 +345,13 @@ reach out to the far left and right edges. Leaving them out lets the map fill th
 
 Details, and what it measured last time, in [reference/per-chart-type/maps.md](reference/per-chart-type/maps.md).
 
-**2. Long country names.** On a bar chart the names sit in a column on the left, and that column is as
-wide as the **longest** name — so shortening anything *but* the longest one gains no space at all.
+**2. Long country names.** This applies to **any chart that labels entities**, not just bar charts —
+what differs is where the space goes. On a bar chart the names sit in a column on the left that is as
+wide as the **longest** name, so shortening anything *but* the longest one gains nothing. On a slope or
+line chart the labels eat into the plot at the end they sit on. On a scatter or a marimekko there is no
+column at all and the gain is fewer collisions, so a shorter name can be worth it even when no edge
+moves. Work out what the labels are actually costing before you ask
+([reference/LABELING.md](reference/LABELING.md) has the per-type version).
 
 `US` and `UK` are settled: the Writing and Style Guide rules on those two, without periods
 ([STYLE_GUIDE.md](../check-metadata-style/STYLE_GUIDE.md)). For any other name you may **propose** a

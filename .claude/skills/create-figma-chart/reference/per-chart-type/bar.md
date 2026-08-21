@@ -63,7 +63,8 @@ before offering the change.**
 country, you may **propose** a short form that a reader would already recognise — and propose it rather
 than apply it, because the reader cannot tell a common abbreviation from one we made up, and an invented
 one reads as data. Say in the question that it is a suggestion. See [SKILL.md](../../SKILL.md) → Step 4
-for the wording of both cases.
+for the wording of both cases, and [LABELING.md](../LABELING.md) for what shortening buys on the other
+chart types — a bar chart's left column is the clearest case, but it is not the only one.
 
 When it *is* worth doing, the re-layout is four steps and the third is the one that matters:
 
