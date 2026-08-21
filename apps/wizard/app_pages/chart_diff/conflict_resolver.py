@@ -99,11 +99,17 @@ def resolve_field_value(field_key: str, text: str, rendered_text: str, rendered_
 
 
 def build_resolved_config(source_config: dict[str, Any], resolutions: dict[str, Any]) -> dict[str, Any]:
-    """Apply the resolution of each conflicted field on top of the staging config."""
+    """Apply the resolution of each conflicted field on top of the staging config.
+
+    A resolution of `None` means the field should not be set at all: either the chosen environment
+    does not have it, or the editor was emptied. An empty string is a different thing -- a chart can
+    hold `subtitle: ""` on purpose, and dropping the key instead would let the indicator's metadata be
+    inherited in its place, which is not what the user picked.
+    """
     config = deepcopy(source_config)
 
     for field_key, value in resolutions.items():
-        if (value is None) or (value == ""):
+        if value is None:
             config.pop(field_key, None)
         else:
             config[field_key] = value
@@ -267,6 +273,10 @@ class ChartDiffConflictResolver:
             placeholder = "Choose PRODUCTION or STAGING above."
         elif rendered_value is None:
             placeholder = f"This field is not present in {ENVIRONMENT_IDS[choice]}!"
+        elif rendered_value == "":
+            # Distinguish "explicitly blank" from "not set": emptying the editor removes the field,
+            # which is not the same chart (an unset field can be inherited from the indicator).
+            placeholder = f"Empty in {ENVIRONMENT_IDS[choice]} — saved as empty, not removed."
         else:
             placeholder = ""
 
@@ -300,8 +310,13 @@ class ChartDiffConflictResolver:
             field_key = field["key"]
             choice = st.session_state[self._radio_key(field_key)]
             origin = ENVIRONMENT_IDS[choice]
-            edited = resolutions[field_key] != field[f"raw{choice}"]
-            lines.append(f"- `{field_key}`: {origin}{' (edited)' if edited else ''}")
+            if resolutions[field_key] is None:
+                note = " (field removed)"
+            elif resolutions[field_key] != field[f"raw{choice}"]:
+                note = " (edited)"
+            else:
+                note = ""
+            lines.append(f"- `{field_key}`: {origin}{note}")
         return "\n".join(lines)
 
     def resolve_conflicts(self, rerun: bool = False):

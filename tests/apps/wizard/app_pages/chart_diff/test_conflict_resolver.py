@@ -402,3 +402,67 @@ def test_a_literal_json_cannot_hold_is_a_field_error(fake_admin_api):
     assert at.exception == []
     assert fake_admin_api.calls == []
     assert at.text[0].value.startswith("error: Nothing was written")
+
+
+def test_build_resolved_config_keeps_an_explicit_empty_string():
+    """`subtitle: ""` is a chart with a blank subtitle; dropping the key inherits one instead."""
+    config = build_resolved_config({"subtitle": "Staging subtitle"}, {"subtitle": ""})
+    assert config["subtitle"] == ""
+
+    # An emptied editor still means "do not set this field".
+    assert "subtitle" not in build_resolved_config({"subtitle": "Staging subtitle"}, {"subtitle": None})
+
+
+def _empty_string_app():
+    """One conflict where production's value is an explicit empty string. Must be self-contained."""
+    import streamlit as st
+
+    import apps.wizard.app_pages.chart_diff.conflict_resolver as cr
+
+    class _Chart:
+        def __init__(self, config):
+            self.config = config
+            self.lastEditedByUserId = 13
+
+    class _Diff:
+        chart_id = 42
+
+        def __init__(self):
+            self.target_chart = _Chart({"$schema": "s", "note": ""})
+            self.source_chart = _Chart({"$schema": "s", "note": "Staging note"})
+
+        def set_conflict_to_resolved(self, session):
+            pass
+
+    resolver = cr.ChartDiffConflictResolver(_Diff(), session=None)  # ty: ignore
+    for field in resolver.config_compare:
+        resolver.show_field_resolver(field)
+    st.button("Resolve conflicts", disabled=bool(resolver.fields_undecided), on_click=resolver.resolve_conflicts)
+
+    message = st.session_state.get("conflict-resolver-msg-42")
+    if message is not None:
+        st.text(f"{message[0]}: {message[1]}")
+
+
+def test_choosing_an_empty_string_writes_it_rather_than_removing_the_field(fake_admin_api):
+    at = AppTest.from_function(_empty_string_app, default_timeout=30).run()
+
+    at = at.radio[0].set_value(1).run()  # note <- production, which has it set to ""
+    assert at.text_area[0].value == ""
+    assert not at.text_area[0].disabled
+    # The editor looks the same as an unset field, so it says which of the two this is.
+    assert "not removed" in at.text_area[0].placeholder
+
+    at = at.button[0].click().run()
+    assert fake_admin_api.calls[0]["config"]["note"] == ""
+
+
+def test_emptying_the_editor_removes_the_field_and_says_so(fake_admin_api):
+    at = AppTest.from_function(_empty_string_app, default_timeout=30).run()
+
+    at = at.radio[0].set_value(2).run()  # note <- staging ("Staging note")
+    at = at.text_area[0].set_value("").run()
+    at = at.button[0].click().run()
+
+    assert "note" not in fake_admin_api.calls[0]["config"]
+    assert "(field removed)" in at.text[0].value
