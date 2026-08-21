@@ -121,6 +121,25 @@ before and after, since a rewrap shows up there and nowhere else.
   which excludes zero-area nodes from the **fill** inventory for the opposite reason (a tick's default
   black fill paints nothing and reports a phantom `#000000`). Same nodes, opposite treatment, because
   one row is about strokes and the other about fills — so the exclusion belongs per-row, never per-node.
+- **Fit the BOX, which means unwrapping the import first.** A fresh SVG import is a FRAME with the
+  export canvas's padding baked in — measured **43.43 × 42.00px** on one and **46.83 × 44.00** on
+  another — so aligning *that* box to the content edges insets the chart by ~29px of nothing. Take the
+  `chart-area` child out of the import frame and parent it to the template frame: a GROUP hugs its
+  rendered content, so its box and its ink coincide to within stroke overhang, and every later
+  measurement can use the box without lying. Then delete the emptied import frame.
+- **Close a width residual with a uniform `rescale`, never a `resize` squeeze.** After a height-first
+  fit the width lands within ~0.5%, and the direction decides the tool. A stretch can use `resize`. A
+  **squeeze must not** — `resize` narrows the text boxes and rewraps the labels. `rescale` scales the
+  type with the geometry, so nothing rewraps at any factor; it costs a little height, which the gaps
+  simply absorb. Measured: a discrete bar came back **510.69px** wide, `rescale(508/510.69)` took it to
+  508.00, labels went 13.771 → 13.693px (still clear of the 12px floor) and the gaps went 14 → 15.08px.
+  Budget **1–2 iterations** — `rescale`'s own rounding leaves ~0.015px, so loop until the width is
+  within 0.005 rather than assuming one pass lands it.
+- **Furniture goes to the house 1px, which is NOT the same as restoring grapher's value.** Restoring
+  the pre-scale weight looks like the honest inverse of `rescale`'s thinning, and it is wrong: grapher
+  draws the zero line at **0.5px in canvas units**, so a 0.675 fit leaves 0.34px and *restoring* 0.5
+  still ships a 0.5px line against a 1px target. Read CHECKS.md's furniture row and set 1px outright,
+  after the last scale. Only the *dash* is a restore-the-original operation.
 - **Align on the group's own bbox, because that is what the canvas reports.** A GROUP's box hugs its
   children's rendered content, so for an imported chart it *is* the ink — and it is the number the user
   reads in the properties panel. A fit that measured leaves with `absoluteRenderBounds` while the user
@@ -130,12 +149,29 @@ before and after, since a rewrap shows up there and nowhere else.
   tool for the *gap* checks, where stroke overhang and text leading are exactly what you are measuring —
   but note it is **clipped by an ancestor frame**, so it cannot measure a group that overflows, which is
   the case the previous bullet is about. Bbox to fit, render bounds to verify.
-- **Equal box gaps are not equal VISIBLE gaps — centre on the ink.** The text box carries half its
-  leading, and the amount differs above (subtitle) and below (source), so a chart placed at 14/14 from
-  the box edges reads as 15.6 above and 15.0 below. Place the chart's ink midway between the subtitle's
-  ink bottom and the source's ink top instead, and the visible gaps come out **equal to 0.00px** — at
-  the cost of box gaps that read 13.7/14.3, which is the right trade because the reader sees ink. Both
-  are inside the 12–16 target and inside the 1.5px symmetry tolerance the gap check allows.
+- **Centre on the BOX, not the ink — and know that you cannot have both.** The two targets are
+  mutually exclusive, so this is a choice and the choice is the box. Measured across eight frames: with
+  the ink gaps equal to 0.01px, the **box** gaps were off by 0.34–2.24px on every single frame. Three
+  independent things drive the difference — the source line carries a constant **2.14px** of leading
+  above its first glyph, the subtitle carries **0.08–2.87px** depending on whether its last line has
+  descenders, and the chart group itself has **0–3.5px** of slack between its box and its ink. Equalize
+  one and the other goes out by their sum.
+
+  The box wins for three reasons: it is what the properties panel shows, so it is the number anyone
+  reviewing will actually check; it is what the template's own auto-layout spacing is expressed in; and
+  it is what `verify_page.js` has always measured (`rel()` reads `absoluteBoundingBox`, and `bandTop`
+  and `footerTop` come from the header and footer boxes). That last point is the real lesson — the
+  script already encoded the house convention, and hand-rolling an ink-based centring pass beside it
+  produced eight frames that the checker would have passed and a human immediately called asymmetric.
+  **Use the predicate the script uses.**
+
+  ```js
+  const headerB = header.absoluteBoundingBox.y + header.height;   // BOX bottom
+  const footerT = footer.absoluteBoundingBox.y;                   // BOX top
+  const b = chart.absoluteBoundingBox;
+  chart.y += (headerB + (footerT - headerB - b.height) / 2) - b.y;
+  ```
+
 - **The gap you measure box-to-box is not the gap the reader sees.** A text box carries half its
   leading above and below the glyphs, so the visual gap runs about **1.6px larger above** and **1px
   larger below** than the header/footer box edges suggest. A box-measured 14 is ~15.6 visually — still
