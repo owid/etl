@@ -24,7 +24,11 @@ from apps.chart_sync.admin_api import AdminAPI
 from apps.utils.llms.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader
 from apps.wizard.app_pages.chart_diff.citations import st_show_citations
-from apps.wizard.app_pages.chart_diff.conflict_resolver import ChartDiffConflictResolver
+from apps.wizard.app_pages.chart_diff.conflict_resolver import (
+    PRODUCTION,
+    STAGING,
+    ChartDiffConflictResolver,
+)
 from apps.wizard.app_pages.chart_diff.utils import ANALYTICS_NUM_DAYS, SOURCE, TARGET, prettify_date
 from apps.wizard.utils.components import grapher_chart
 from etl.config import OWID_ENV
@@ -273,19 +277,43 @@ class ChartDiffShow:
                 "Find below the chart config fields that do not match. Choose the value you want to keep for each of the fields (or introduce a new one)."
             )
 
+            # Shortcuts to decide every field at once (nothing is preselected otherwise)
+            col1, col2 = st.columns(2)
+            col1.button(
+                "Use staging for all",
+                help="Choose the staging value for every field below. You can still change individual fields afterwards.",
+                key=f"conflict-all-staging-{self.diff.chart_id}",
+                on_click=resolver.choose_env_for_all,
+                args=(STAGING,),
+                width="stretch",
+            )
+            col2.button(
+                "Use production for all",
+                help="Choose the production value for every field below. You can still change individual fields afterwards.",
+                key=f"conflict-all-production-{self.diff.chart_id}",
+                on_click=resolver.choose_env_for_all,
+                args=(PRODUCTION,),
+                width="stretch",
+            )
+
             # Show conflict resolver per field
             ## Provide tools to merge the content of each field
             for field in resolver.config_compare:
-                resolver._show_field_conflict_resolver(field)
+                resolver.show_field_resolver(field)
 
-            # Button to resolve all conflicts
+            # Button to resolve all conflicts. Undecided fields block it: writing an unconfirmed
+            # default is exactly how staging edits used to get silently reverted.
+            undecided = resolver.fields_undecided
             st.button(
                 "Resolve conflicts",
                 help="Click to resolve the conflicts and update the chart config.",
                 key=f"resolve-conflicts-btn-{self.diff.chart_id}",
                 type="primary",
+                disabled=bool(undecided),
                 on_click=lambda r=resolver: _resolve_conflicts(r),
             )
+            if undecided:
+                st.caption("Choose an environment for: " + ", ".join(f"`{field}`" for field in undecided) + ".")
         else:
             st.success(
                 "No conflicts found actually. Unsure why you were prompted with the conflict resolver. Please report."
@@ -790,9 +818,27 @@ class ChartDiffShow:
                 case gm.ChartStatus.PENDING.value:
                     st.toast(f"**Resetting** state for chart {self.diff.chart_id}.", icon=":material/restart_alt:")
 
+    def _show_conflict_resolver_message(self) -> None:
+        """Show the outcome of a conflict resolution.
+
+        `resolve_conflicts` runs as a callback and the popover it lives in is gone by the time the
+        conflict is resolved, so the message is deferred to session state and drawn here instead.
+        """
+        message = st.session_state.pop(f"conflict-resolver-msg-{self.diff.chart_id}", None)
+        if message is None:
+            return
+        kind, text = message
+        if kind == "success":
+            st.success(text)
+        else:
+            st.error(text)
+
     @st.fragment
     def show(self):
         """Show chart diff."""
+        # Outcome of a conflict resolution (shown even if the diff itself is gone afterwards)
+        self._show_conflict_resolver_message()
+
         # Chart diff no longer exists (e.g. after a refresh found no differences)
         if st.session_state.pop(f"chart-diff-gone-{self.diff.chart_id}", False):
             st.info(
