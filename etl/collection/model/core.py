@@ -342,13 +342,21 @@ class Collection(MDIMBase):
         the config gets upserted a second time here -- the first upsert necessarily
         happened before there was a package to point at.
 
-        Explorers are skipped: they have no `multi_dim_data_pages` row to take a slug
-        from, and no page that could render a download button.
+        Two kinds of collection are skipped, both because there is no page to attach a
+        package to: explorers, which have no `multi_dim_data_pages` row at all, and
+        MDIMs that have a row but no slug because nobody has published them yet. The
+        latter is not an edge case -- 13 of the 59 multidim steps are in that state on a
+        staging server -- so it must not fail the step. A collection published later
+        gets its package on the next run.
         """
-        from etl.collection.download_package import build_download_package_for_collection
+        from etl.collection.download_package import build_download_package_for_collection, resolve_page_slug
 
         if self._collection_type != "multidim":
-            log.info("collection.download_package.skipped", collection_type=self._collection_type)
+            log.info("collection.download_package.skipped_not_multidim", collection_type=self._collection_type)
+            return
+
+        if resolve_page_slug(self) is None:
+            log.info("collection.download_package.skipped_unpublished", catalog_path=self.catalog_path)
             return
 
         package = build_download_package_for_collection(self, dest_dir=self.local_download_package_dir)

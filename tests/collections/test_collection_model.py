@@ -2488,6 +2488,7 @@ def test_save_download_package_records_and_reupserts():
 
     with (
         patch("etl.collection.download_package.build_download_package_for_collection", return_value=built) as build,
+        patch("etl.collection.download_package.resolve_page_slug", return_value="a-slug"),
         patch.object(Collection, "save_config_local") as save_local,
         patch.object(Collection, "upsert_to_db") as upsert,
     ):
@@ -2516,3 +2517,27 @@ def test_save_download_package_skips_explorers():
 
     assert build.call_count == 0
     assert explorer.download_package is None
+
+
+def test_save_download_package_skips_unpublished_collections():
+    """
+    Test Collection.save_download_package - a collection with no page slug builds nothing.
+
+    ETL never assigns the slug (`put_mdim_config` sends only the config); someone publishing
+    the MDIM in the admin does. So a step whose MDIM was never published has a
+    `multi_dim_data_pages` row and no slug, which is the normal state of 13 of the 59
+    multidim steps on a staging server. Since save() now builds packages by default, that
+    has to be a skip rather than a failed step.
+    """
+    collection = Collection.from_dict(_make_minimal_config())
+
+    with (
+        patch("etl.collection.download_package.resolve_page_slug", return_value=None),
+        patch("etl.collection.download_package.build_download_package_for_collection") as build,
+        patch.object(Collection, "upsert_to_db") as upsert,
+    ):
+        collection.save_download_package()
+
+    assert build.call_count == 0
+    assert upsert.call_count == 0
+    assert collection.download_package is None
