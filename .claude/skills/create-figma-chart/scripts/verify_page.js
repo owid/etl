@@ -40,9 +40,11 @@
 // SKIPPED with the reason and the tool that owns it. Colour-vision and grayscale seams are
 // `scripts/color_audit.py`; spelling is `codespell`; "the text is true of the indicator" is
 // `/adversarial-data-review`; the entity-completeness row needs the EFFECTIVE selection from
-// outside Figma (Step 1's table); the arrow and leader-on-map rows need rendered pixels (CHECKS.md's
-// four-render protocol). A check that cannot fail is worse than no check, so those are reported as
-// gaps in coverage, not as passes.
+// outside Figma (Step 1's table); the arrow row needs rendered pixels (CHECKS.md's four-render
+// protocol); leader-on-map is a VECTOR ray-cast against the country's rings, with the pixel mask only
+// as its fallback; and the page census is a page-level count, where this script is handed frames. A
+// check that cannot fail is worse than no check, so those are reported as gaps in coverage, not as
+// passes.
 
 const CONFIG = {
   frameId: "26000:6",
@@ -928,7 +930,20 @@ const checkFrame = async (frameId) => {
   // and can be reused the moment pairing exists.
   skip("label-contrast-on-fill", "4.5:1 for every label drawn INSIDE a fill, at 13.5px regular — the 3:1 large-text allowance does not apply. Needs label->segment pairing to know which fill is behind each label. Because this row is not computed, label-contrast-on-background does NOT route the ambiguous cases here and drop them: a label carrying the frame's own colour is reported there as REVIEW", "CHECKS.md + the direct-label-pairing row");
   skip("arrow-clearance", "arrow pixels vs target pixels; needs 3N+1 renders (the four-render protocol, pair-specific)", "CHECKS.md");
-  skip("leader-on-map", "terminal vertex against the country's PIXELS, not its bounding box", "CHECKS.md + per-chart-type/maps.md");
+  // Vector-first, because that is what CHECKS.md now prescribes and it is the CHEAP half: the old
+  // wording named the PIXEL mask as the method, which sent a reader following this output straight
+  // past a one-call exact test and into a multi-render fallback.
+  skip("leader-on-map", "terminal vertex against the country's own GEOMETRY, not its bounding box. Do it in VECTORS first: transform the terminal into the country's local space through the inverse of its `absoluteTransform`, parse `vectorPaths` into rings, ray-cast. Exact, and one call. The PIXEL mask (hide the country vector, diff the renders, require the dot within ~1px of that pixel set) is the FALLBACK, for the cases the ray-cast cannot answer — a country a few pixels across whose ring is smaller than the dot, or a fill rule that makes the cast ambiguous", "CHECKS.md + per-chart-type/maps.md");
+  // CHECKS.md -> "How much is on the page" prescribes this, so it gets a row: a prescribed check with
+  // no row at all is how a run returns "no mechanical row failed" while the reader is looking at a
+  // pile of near-identical maps. Declared rather than computed for two reasons, and only the first is
+  // fixable here. This script is handed FRAME ids and never a page, and `page.children` on a page
+  // nobody switched to comes back SHORT without erroring (GOTCHAS.md) — so an undercount would read
+  // as "clean", which is the exact failure the row exists to catch. `PageNode.loadAsync()` would
+  // settle that half (diff_against_template.js does it). The other half does not go away: the target
+  // is one object per INTENDED item, and how many reference copies were meant to be left on the page
+  // is not a property of the file.
+  skip("page-census", "count the plot-bearing objects ANYWHERE on the page — `countries-with-data` groups on a map, the equivalent plot group otherwise — and name what each one is for. One per intended item: the deliverable plus the reference copies you meant to place; a spare is clutter. Do NOT substitute an overlap test between top-level children — three maps at three distinct positions pass it while the reader sees a pile. And do not key the census on a SHORTENED node name, which merges `<slug>` with `<slug> — original SVG (unstyled)` into one bucket", "CHECKS.md -> How much is on the page");
 
   const fails = rows.filter((x) => x.status === "FAIL");
   const review = rows.filter((x) => x.status === "REVIEW");

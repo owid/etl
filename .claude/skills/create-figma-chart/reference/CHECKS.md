@@ -14,9 +14,10 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > **Every row it cannot judge comes back `SKIPPED` with the reason and the tool that owns it** —
 > colour-vision and grayscale (`color_audit.py`), spelling (`codespell`), the data-truth row
 > (`/adversarial-data-review`), entity completeness (needs the *effective* selection from outside
-> Figma), and the arrow and leader-on-map rows (they need rendered pixels). A `SKIPPED` row is a
-> declared gap in coverage, never a pass — which is the whole reason to read the list rather than
-> the verdict.
+> Figma), the arrow row (it needs rendered pixels), `leader-on-map` (a **vector** ray-cast against
+> the country's rings — pixels are only its fallback), and the page count (a page-level fact, where
+> the script is handed frames). A `SKIPPED` row is a declared gap in coverage, never a pass — which
+> is the whole reason to read the list rather than the verdict.
 >
 > **[`scripts/diff_against_template.js`](../scripts/diff_against_template.js) is the other half of the
 > gate, and it answers a question `verify_page.js` cannot: *did this frame drift from the template it

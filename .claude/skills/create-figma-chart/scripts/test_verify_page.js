@@ -252,7 +252,20 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     // the fifth review finding: BOTH contrast rows must exist, one computed and one declared
     check("1 label-contrast-on-background present", !!row(out, "label-contrast-on-background"), "row missing");
     check("1 label-contrast-on-fill DECLARED", row(out, "label-contrast-on-fill") && row(out, "label-contrast-on-fill").status === "SKIPPED", "row missing");
-    check("1 no row silently absent", out.rows.length >= 24, `${out.rows.length} rows`);
+    // Every row CHECKS.md prescribes has to EXIST, even where it is not computed — a prescribed check
+    // with no row is how a run reports "no mechanical row failed" and means "nobody looked".
+    check("1 page-census DECLARED", row(out, "page-census") && row(out, "page-census").status === "SKIPPED", "row missing");
+    check("1 page-census says COUNT, not overlap",
+          /count the plot-bearing objects/i.test(row(out, "page-census").detail) && /overlap test/i.test(row(out, "page-census").detail),
+          row(out, "page-census").detail);
+    // leader-on-map is declared, but it must declare the VECTOR test as the method and pixels as the
+    // fallback. Named backwards it sends the reader past a one-call exact check.
+    check("1 leader-on-map DECLARED", row(out, "leader-on-map") && row(out, "leader-on-map").status === "SKIPPED", "row missing");
+    check("1 leader-on-map prescribes vectors first",
+          /VECTORS first/.test(row(out, "leader-on-map").detail) && /FALLBACK/.test(row(out, "leader-on-map").detail),
+          row(out, "leader-on-map").detail);
+    check("1 leader-on-map does not call the bbox the target", /not its bounding box/.test(row(out, "leader-on-map").detail), row(out, "leader-on-map").detail);
+    check("1 no row silently absent", out.rows.length >= 26, `${out.rows.length} rows`);
   }
 
   // 2 — the 302-wide floor. 11px text is legitimate there (SMALL-CHARTS.md), a failure on a 540.
