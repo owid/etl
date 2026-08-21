@@ -7,6 +7,15 @@ This is just a sneak peek into some of our data work. But note that all our code
 
 !!! note ""
 
+    ## [How we build regional aggregates in our energy data](energy_region_aggregates/index.md)
+
+    How continental and income-group aggregates are constructed from the Energy Institute's Statistical Review, the U.S. EIA's international data, and Ember's electricity data: the undisclosed "Other" regions, the methodological differences between producers, the derivation of "other renewables", and the dedicated indicators behind stacked charts.
+
+    [:material-book-open-variant: Methodology](energy_region_aggregates/index.md){ .md-button }
+
+
+!!! note ""
+
     ## [Does the news reflect what we die from?](media_deaths/methodology.md)
 
     This analysis accompanies the article "[Does the news reflect what we die from?](https://ourworldindata.org/does-the-news-reflect-what-we-die-from)". It compares the leading causes of death in the United States in 2023 with the amount of media coverage each receives.
