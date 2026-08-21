@@ -314,7 +314,7 @@ applied in the editor:
 
 1. **view dimensions** — the target view's own dimension values (from the
    proposal), because the new chart opens on the MDIM's default view;
-2. **controls** — taken from the narrative chart's `chart_configs.patch` (the
+2. **controls** — taken from the narrative chart's authored layer (`narrative_charts.patchConfigId` → `chart_configs.config`) (the
    delta its author typed on top of the parent) plus its stored
    `queryParamsForParentChart`, and listed **chart type first** (it decides
    which other controls exist), **then the entity selection** (the most visible
@@ -571,7 +571,7 @@ them:
   an MDIM looks each view up by its dimension-derived view id and updates that
   `chart_configs` row in place, so the id survives content edits and only ever
   changes together with `view_id`. To tell whether the reviewed *rendering* still
-  holds, compare `viewConfigMd5` (`chart_configs.fullMd5`) — the target-side
+  holds, compare `viewConfigMd5` (`chart_configs.configMd5`) — the target-side
   mirror of a source chart's `configMd5`. Both md5s are in the review
   fingerprint and in `preflight.py`'s staleness checks.
 - **`charts.publishedAt` is not the live publication flag.** It records the first

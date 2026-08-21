@@ -121,9 +121,9 @@ If the user only gives a branch or no input at all, infer the dataset(s) from `g
 
    sql = """
    SELECT c.id AS chart_id, cc.slug,
-          JSON_UNQUOTE(JSON_EXTRACT(cc.full, '$.title'))       AS title,
-          JSON_UNQUOTE(JSON_EXTRACT(cc.full, '$.hasMapTab'))   AS has_map,
-          JSON_UNQUOTE(JSON_EXTRACT(cc.full, '$.type'))        AS chart_type,
+          JSON_UNQUOTE(JSON_EXTRACT(cc.config, '$.title'))       AS title,
+          JSON_UNQUOTE(JSON_EXTRACT(cc.config, '$.hasMapTab'))   AS has_map,
+          JSON_UNQUOTE(JSON_EXTRACT(cc.config, '$.type'))        AS chart_type,
           SUM(v_new.dataChecksum <> v_old.dataChecksum)        AS n_changed,
           COUNT(*)                                             AS n_vars
    FROM charts c

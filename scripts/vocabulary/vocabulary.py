@@ -77,8 +77,8 @@ def extract_chart_texts(topic_slug: str) -> tuple[str, list[str]]:
         SELECT DISTINCT
             t.name as topic_name,
             t.slug as topic_slug,
-            cc.full->'$.title' as chart_title,
-            cc.full->'$.subtitle' as chart_subtitle
+            cc.config->'$.title' as chart_title,
+            cc.config->'$.subtitle' as chart_subtitle
         FROM charts c
         JOIN chart_configs cc ON c.configId = cc.id
         JOIN chart_tags ct ON c.id = ct.chartId
