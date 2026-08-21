@@ -772,7 +772,13 @@ class ChartDiffShow:
         If a conflict is detected (i.e. edits in production), a conflict resolver is shown.
         """
         if self.diff.in_conflict:
-            with st.popover("⚠️ Resolve conflict"):
+            # A popover rather than a dialog on purpose: its content is rendered eagerly, so a
+            # half-made decision survives an accidental click outside, and interacting with a widget
+            # cannot close it. `st.dialog` needs a session-state flag to survive widget interaction at
+            # all, and, with no dismissal callback in Streamlit, a dismissed dialog would reopen on the
+            # next fragment rerun. `width="stretch"` gives the panel the width the side-by-side value
+            # comparison needs, which was the one real advantage a modal had.
+            with st.popover("⚠️ Resolve conflict", width="stretch"):
                 self._show_conflict_resolver()
 
         if self.diff.error:
