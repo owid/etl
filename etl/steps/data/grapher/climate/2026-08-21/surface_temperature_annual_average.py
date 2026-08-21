@@ -49,8 +49,12 @@ def run() -> None:
     tb_decadal_average = (
         tb_annual_average.groupby(["decade", "country"])[["temperature_anomaly", "temperature_2m"]].mean().reset_index()
     )
-    # Set the decadal values for 2020 to NaN
-    tb_decadal_average.loc[tb_decadal_average["decade"] == 2020, ["temperature_anomaly", "temperature_2m"]] = np.nan
+    # Blank the decade in progress: its mean would be computed from a handful of years and read as
+    # a completed decadal value. Derived from the data so it moves on its own at each decade turn.
+    current_decade = (tb_annual_average["year"].max() // 10) * 10
+    tb_decadal_average.loc[
+        tb_decadal_average["decade"] == current_decade, ["temperature_anomaly", "temperature_2m"]
+    ] = np.nan
     # Merge the decadal average Table with the original Table
     combined = pr.merge(
         tb_annual_average, tb_decadal_average, on=["decade", "country"], how="left", suffixes=("", "_decadal")

@@ -1,14 +1,16 @@
 """Script to create a snapshot of the GWIS yearly burned area dataset.
 
 Data is fetched from the GWIS country profile API, which returns annual totals by
-land cover type and contains more recent data (including 2024) than the bulk download
-ZIP available on the downloads page.
+land cover type and is more up to date than the bulk download ZIP on the downloads page.
 
 API base: https://cprof.effis.emergency.copernicus.eu/api/v3/
 
-NOTE: Update YEAR_TO when a new year of data becomes available.
+The API only serves complete calendar years, so the range is derived from what it
+returns rather than hardcoded: we ask for everything up to the current year and keep
+the years it actually reports.
 """
 
+import datetime as dt
 import tempfile
 import time
 from pathlib import Path
@@ -27,7 +29,14 @@ BASE_URL = "https://cprof.effis.emergency.copernicus.eu/api/v3"
 LC_COLS = ["lc1", "lc2", "lc3", "lc4", "lc5"]
 LC_NAMES = ["forest", "savannas", "shrublands_grasslands", "croplands", "other"]
 YEAR_FROM = 2002
-YEAR_TO = 2024
+# Upper bound of the request window. The API serves only complete years, so asking for the
+# current year returns whatever it has, and the latest year is derived from the response.
+YEAR_TO = dt.date.today().year
+
+# A year is only kept if at least this share of countries report it. The API publishes a new
+# year for all countries at once, so a year present for only a handful of them is a partial
+# rollout, not a complete year.
+MIN_COUNTRY_COVERAGE = 0.9
 
 
 def get_countries() -> list:
@@ -61,7 +70,29 @@ def fetch_all() -> pd.DataFrame:
                 rows.append(row)
         time.sleep(0.2)
 
-    return pd.DataFrame(rows)
+    tb = pd.DataFrame(rows)
+
+    # Drop any trailing year the API has only partially published.
+    coverage = tb.groupby("year")["iso3"].nunique() / tb["iso3"].nunique()
+    complete = coverage[coverage >= MIN_COUNTRY_COVERAGE]
+    assert not complete.empty, "No year is reported by enough countries; check the API response."
+    latest = int(complete.index.max())
+    dropped = sorted(y for y in tb["year"].unique() if y > latest)
+    if dropped:
+        log.info("Dropping partially published years", years=dropped)
+        tb = tb[tb["year"] <= latest]
+
+    # Guard against a silent truncation of the series.
+    assert latest >= dt.date.today().year - 2, (
+        f"Latest complete year is {latest}, more than two years behind. Has the API changed?"
+    )
+    expected = set(range(YEAR_FROM, latest + 1))
+    missing = expected - set(tb["year"].unique())
+    assert not missing, f"Missing years in the API response: {sorted(missing)}"
+
+    log.info("Fetched burned area data", year_from=YEAR_FROM, year_to=latest, n_rows=len(tb))
+
+    return tb
 
 
 @click.command()

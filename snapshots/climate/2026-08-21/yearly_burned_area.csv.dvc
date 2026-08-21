@@ -21,6 +21,6 @@ meta:
       name: CC BY 4.0
       url: https://gwis.jrc.ec.europa.eu/about-gwis/data-license
 outs:
-  - md5: ca17a2fa02df7c092a71b224aee88898
-    size: 350489
+  - md5: 4088000f1ec4a848576872c45e13130b
+    size: 365748
     path: yearly_burned_area.csv

@@ -42,7 +42,8 @@ def run(dest_dir: str) -> None:
 
     # Loop through each group of indicators and apply the same calculations
     for group in column_groups:
-        # Select columns that contain the group name and a year between 2003 (minimum value in emisssions; 2012 in area burned) and 2024 (inclusive)
+        # Select columns that contain the group name and a year between 2003 (minimum value in
+        # emissions; 2012 in area burnt) and CURRENT_YEAR - 2, inclusive.
         group_columns = [
             col for col in tb.columns if group in col and "2003" <= col.split("_")[1] <= str(CURRENT_YEAR - 2)
         ]

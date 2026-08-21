@@ -6,10 +6,6 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
-# Year with incomplete data
-INCOMPLETE_YEAR = 2026
-
-
 def run() -> None:
     #
     # Load inputs.
@@ -22,19 +18,25 @@ def run() -> None:
     # Process data.
     #
 
-    # Get the year
-    tb["year"] = tb["time"].astype(str).str[0:4]
+    # Get the year and month.
+    tb["year"] = tb["time"].astype(str).str[0:4].astype(int)
+    tb["month"] = tb["time"].astype(str).str[5:7].astype(int)
 
-    # Group by year and calculate the mean of the specified columns
+    # Annual totals are only meaningful for years the source has reported in full, so drop any
+    # year with fewer than 12 months. Derived from the data rather than hardcoded, otherwise the
+    # series silently freezes as soon as the calendar moves on.
+    months_per_year = tb.groupby("year")["month"].nunique()
+    incomplete_years = months_per_year[months_per_year < 12].index.tolist()
+    if incomplete_years:
+        paths.log.info("Dropping incomplete years", years=sorted(incomplete_years))
+    tb = tb[~tb["year"].isin(incomplete_years)].drop(columns=["month"])
+
+    # Group by year and sum the specified columns.
     tb = (
         tb.groupby(["year", "country"])
         .agg({"total_precipitation": "sum", "precipitation_anomaly": "sum"})
         .reset_index()
     )
-
-    # Remove rows where the year is 2024 as it's incomplete
-    tb["year"] = tb["year"].astype(int)
-    tb = tb[tb["year"] != INCOMPLETE_YEAR]
 
     tb = tb.format(["year", "country"])
 
