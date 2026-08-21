@@ -1304,6 +1304,39 @@ steps:
   # archived; last active in 8ae3ab94ffa3 on 2026-07-20
   data://garden/bls/2026-03-24/us_ppi_construction:
     - snapshot://bls/2026-03-24/us_ppi_construction.csv
+  # archived; last active in 64b19ea0388e on 2026-07-27
+  data://grapher/oecd/2025-12-23/official_development_assistance:
+    - data://garden/oecd/2025-12-23/official_development_assistance:
+      - data://meadow/oecd/2025-12-23/official_development_assistance:
+        - snapshot://oecd/2025-12-23/official_development_assistance_dac5.zip
+        - snapshot://oecd/2025-12-23/official_development_assistance_dac2a.zip
+        - snapshot://oecd/2025-12-23/official_development_assistance_dac1.zip
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/demography/2024-07-15/population
+  # archived; last active in 7cd4b39ceab8 on 2026-07-29
+  data://grapher/worldbank_wdi/2026-07-14/wdi:
+    - data://garden/worldbank_wdi/2026-07-14/wdi:
+      - data://garden/un/2024-07-12/un_wpp
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/demography/2024-07-15/population
+      - data://meadow/worldbank_wdi/2026-07-14/wdi:
+        - snapshot://worldbank_wdi/2026-07-14/wdi.zip
+      - snapshot://worldbank_wdi/2026-07-14/wdi.zip
+  # archived; last active in 7cd4b39ceab8 on 2026-07-29
+  data://grapher/worldbank_wdi/2025-09-08/wdi:
+    - data://garden/worldbank_wdi/2025-09-08/wdi:
+      - snapshot://worldbank_wdi/2025-09-08/wdi.zip
+      - data://meadow/worldbank_wdi/2025-09-08/wdi:
+        - snapshot://worldbank_wdi/2025-09-08/wdi.zip
+      - data://garden/un/2024-07-12/un_wpp
+      - data://garden/regions/2023-01-01/regions
+      - data://garden/wb/2026-07-01/income_groups
+      - data://garden/demography/2024-07-15/population
+  # archived; last active in 8b30eb0a0898 on 2026-08-18
+  data://garden/bls/2026-07-20/us_ppi_construction:
+    - snapshot://bls/2026-07-20/us_ppi_construction.csv
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml

@@ -16,7 +16,7 @@ The use of ETL is mainly addressed to OWID staff, but open to the general public
 
 ## Install dependencies
 
-You will need Python 3.10+, basic build tools, and MySQL client libraries.
+You will need Python 3.11+, basic build tools, and MySQL client libraries.
 
 === "MacOS"
 
@@ -30,7 +30,7 @@ You will need Python 3.10+, basic build tools, and MySQL client libraries.
     xcode-select --install
     ```
 
-    Then install Python 3.10+ and MySQL client and [:octicons-link-external-16: UV](https://docs.astral.sh/uv/). UV is our preferred python packaging and dependency management tool.
+    Then install Python 3.11+ and MySQL client and [:octicons-link-external-16: UV](https://docs.astral.sh/uv/). UV is our preferred python packaging and dependency management tool.
 
     ```bash
     brew install python mysql-client uv pkg-config

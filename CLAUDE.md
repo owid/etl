@@ -10,47 +10,83 @@ Our World in Data's ETL system - a content-addressable data pipeline with DAG-ba
 - **`dag/archive/*.yml` is a generated record** — it is reconstructed from git history by `etl archive-dag`, so never hand-edit it. It lists steps that were once active (with the commit where they were last active) purely for recovery; to bring one back, `git checkout` that commit.
 - **Never delete a step without archiving it.** Removing or superseding an active step (new version, retirement, replacement) obligates you to archive it — deleting the files alone is a bug. Procedure: remove its `dag/*.yml` entry and delete its files → **commit** → run `etl archive-dag` (it reads *committed* history, so the removal must be committed first) → commit the regenerated `dag/archive/*.yml`. If `archive-dag` sweeps in unrelated steps others left un-archived, `git checkout` those files to keep your PR scoped (never hand-edit the archive). For a migrated/backport dataset, also delete its now-orphaned `snapshots/backport/latest/dataset_<id>_*` mirror files.
 - **Ask the user** if unsure - don't guess
-- **Always run `make check` before committing**
+- **Say what's left open.** Multi-step work rarely ends with everything closed, so close the report (and the PR body) by saying what's still pending, who owns it, and what nobody checked. No fixed format — `.claude/docs/open-items.md` lists what tends to get dropped.
+- **Always run `make check` before committing** (format, lint, typecheck on changed files). Run the test suite with `make unittest` (or `make test` for checks + tests + version-tracker); `lib/*` packages have their own venv and Makefile — run it from inside that directory.
 - If not told otherwise, save outputs to `ai/` directory.
 - **Notebooks**: Always create AND execute immediately using `uv run jupyter nbconvert --to notebook --execute --inplace <path>`
-- **Skills**: When creating new skills in `.claude/skills/`, always include `metadata: { internal: true }` in the SKILL.md frontmatter unless the user explicitly asks for the skill to be public. This prevents external skill indexes from crawling and listing our internal skills.
+- **Skills**: When creating new skills in `.claude/skills/`, always include `metadata: { internal: true }` in the SKILL.md frontmatter unless the user explicitly asks for the skill to be public. This prevents external skill indexes from crawling and listing our internal skills. Write the `description` as a folded block scalar (`>-`) whenever it contains a `:` or a `#`: in a plain scalar a `: ` makes the **whole frontmatter block** fail to parse, and a ` #` silently truncates the value at that point. Claude Code's own loader is lenient enough to hide both, so verify by parsing the file and comparing the parsed `description` against the text you intended — not merely by checking that parsing didn't raise. (Two skills shipped broken this way: one truncated mid-sentence, one with no parseable `name`, `description` or `internal` flag at all.)
+
+## Start from a skill
+
+Most recurring work here has a skill that runs it end to end. Reach for it **before** hand-rolling from the sections below — those document the underlying mechanics (`etls`, `etlr`, `etl pr`) that the skills already orchestrate, not a procedure to follow in parallel with one. Full descriptions live in `.claude/skills/`; this is just the entry-point index.
+
+| Task | Skill |
+|------|-------|
+| Refresh an existing dataset to a new version | `/update-dataset` |
+| Brand-new dataset from a file or link the user provides | `/create-dataset` |
+| Add a new snapshot (`.dvc`, plus a script only if needed) | `/create-snapshot` |
+| Scaffold meadow/garden/grapher steps for a snapshot that already exists | `/create-etl-steps` — the primitive `/create-dataset` calls; don't run it standalone unless scaffolding really is all you need |
+| Bring a legacy (no-catalogPath) dataset into ETL | `/migrate-dataset` |
+| Change user-facing chart/indicator text — title, subtitle, footnote, units, `description_short`, WYSK/`description_key`, entity selection | `/edit-faust-metadata` |
+| Check that text against the Writing and Style Guide | `/check-metadata-style` |
+| Build a multi-dim indicator, or an explorer | `/create-multidim`, `/create-explorer` |
+| Review a dataset-update PR | `/review-data-pr` |
+| Announce a finished update, internally | `/data-updates-comms` — the #data-updates-comms Slack form |
+| Announce a finished update, to readers | `/data-update-announcement` — the "Data update" post on ourworldindata.org/latest |
+
+One that's easy to skip and shouldn't be: `/edit-faust-metadata` owns **every** user-facing-text edit — it routes each field to the right layer (garden `.meta.yml` vs MDim yaml vs chart config on staging) and reports the blast radius on other charts before touching shared metadata.
 
 ## Team
 
-Everything you post to GitHub or Slack goes out under a **human's identity**. Any text you author and post that a reader could take for the human's own words **must** carry the attribution line below. This is mandatory — not a judgment call about whether the comment is "worth it."
+Everything you post to GitHub or Slack goes out under a **human's identity**. Any text you author and post that a reader could take for the human's own words **must** carry the attribution line below. This is mandatory — not a judgment call about whether the comment is "worth it." (An agent posting under its own bot account, e.g. `chatgpt-codex-connector[bot]`, skips the line: the platform already attributes the content.)
 
 1. **Attribute the work.** Put this blockquote as the *first line* of the content:
 
-   ```
-   > _Written by Claude <model name> — @<handle> at the wheel._
-   ```
+```
+> _Written by <assistant> <model name> — @<handle> at the wheel._
+```
 
-   Replace `<model name>` with the human-readable name of the model actually generating the content (e.g. "Sonnet 5", "Opus 4.8", "Fable 5", "Haiku 4.5") — not the literal string "Code". Keeping the "Claude" prefix makes the attribution recognizable even to readers unfamiliar with individual model names.
+Replace `<assistant>` with the product actually generating the content ("Claude", "Codex", "Copilot", ...) and `<model name>` with the human-readable name of its underlying model (e.g. "Fable 5", "Opus 4.8", "GPT-5.6"). For Claude, always use a model name, never the literal string "Code". Keeping the product prefix makes the attribution recognizable even to readers unfamiliar with individual model names.
 
-   It applies to **every** surface, **every** time you post:
-   - PR descriptions / bodies
-   - PR issue-level comments
-   - **Inline review comments _and_ replies to review comments** (e.g. answering Codex / Copilot / a reviewer)
-   - Standalone Slack messages or drafts
+It applies to **every** surface, **every** time you post:
+- PR descriptions / bodies
+- PR issue-level comments
+- **Inline review comments _and_ replies to review comments** (e.g. answering Codex / Copilot / a reviewer)
+- Standalone Slack messages or drafts
 
-   Use the handle of the human directing the work (usually the current git user; ask if ambiguous).
+Use the handle of the human directing the work (usually the current git user; ask if ambiguous).
 
-   **The only exception** is a comment that is a bare mechanical token with *no prose* — a lone `@codex review` ping or a 👍. The moment your comment contains a sentence of explanation, it needs the line. When in doubt, include it.
+Besides the bot-account case above, **the only exception** is a comment that is a bare mechanical token with *no prose* — a lone `@codex review` ping or a 👍. The moment your comment contains a sentence of explanation, it needs the line. When in doubt, include it.
 
-2. **Use exact handles** from the table below when tagging colleagues. Don't guess — a wrong tag pings a real person. If a name isn't in this table, write the plain name (e.g. "Bastian") instead of `@`-tagging, and ask the user for the handle.
+2. **Use exact handles** from the list below when tagging colleagues. Don't guess — a wrong tag pings a real person. If a name isn't on this list, write the plain name (e.g. "Bastian") instead of `@`-tagging, and ask the user for the handle.
 
-   | Name | GitHub handle |
-   |---|---|
-   | Pablo A Rosado | `@pabloarosado` |
-   | Pablo Arriagada | `@paarriagadap` |
-   | Veronika Samborska | `@veronikasamborska1994` |
-   | Mojmir Vinkler | `@Marigold` |
-   | Lucas Rodés-Guirao | `@lucasrodes` |
-   | Tuna Acisu | `@antea04` |
-   | Fiona Spooner | `@spoonerf` |
-   | Edouard Mathieu | `@edomt` |
+Max Roser                @maxroser
+Esteban Ortiz-Ospina     @eoo-owid
+Edouard Mathieu          @edomt
+Joe Hasell               @JoeHasell
+Hannah Ritchie           @HannahRitchie
+Daniel Bachler           @danyx23
+Fiona Spooner            @spoonerf
+Tuna Acisu               @antea04
+Pablo Arriagada          @paarriagadap
+Bastian Herre            @bastianherre
+Bertha Rohenkohl         @bertharc
+Charlie Giattino         @CGiattino
+Pablo Rosado             @pabloarosado
+Lucas Rodés-Guirao       @lucasrodes
+Matthieu Bergel          @mlbrgl
+Marcel Gerber            @marcelgerber
+Sophia Mersmann          @sophiamersmann
+Martin Račák             @rakyi
+Ike Saunders             @ikesau
+Mojmír Vinkler           @Marigold
+Bobbie Macdonald         @bnjmacdonald
+Marwa Boukarim           @mrwbkrm
+Natalie Reynolds-Garcia  @natreygar
+Angela Wenham            @angelawenham
+Valerie Rogers Muigai    @ValRMuigai
 
-   The disclosure rule does **not** apply to OWID-reader-facing artifacts (e.g. the `/latest` data-update post on ourworldindata.org) — those are authored by the named human, not by Claude.
+The disclosure rule does **not** apply to OWID-reader-facing artifacts (e.g. the `/latest` data-update post on ourworldindata.org) — those are authored by the named human, not by Claude.
 
 3. **This repo is public — keep internal context out of it.** PR descriptions, commit messages, and issue/review comments must never identify people who contact us (no names, roles, or employers — say "a reader pointed out ..." instead), and must not reference internal discussions (Slack threads, Notion docs) or who suggested what internally. Motivate changes using public facts only; internal context stays internal.
 
@@ -64,6 +100,7 @@ Everything you post to GitHub or Slack goes out under a **human's identity**. An
 | meadow | `etl/steps/data/meadow/` | Basic cleaning |
 | garden | `etl/steps/data/garden/` | Business logic, harmonization |
 | grapher | `etl/steps/data/grapher/` | MySQL ingestion |
+| export | `etl/steps/export/` | Explorers, collections, APIs |
 
 **Snapshot is raw passthrough only.** It downloads the source files and writes them out using the source's own row labels, column labels, and period labels. That's it. The following all belong in **garden**, not in the snapshot script:
 
@@ -94,11 +131,21 @@ Internal terms that recur across this guide, the skills, and the codebase:
 ```bash
 .venv/bin/etlr namespace/version/dataset --private      # Run step
 .venv/bin/etlr namespace/version/dataset --grapher      # Upload to grapher
+.venv/bin/etlr export://.../dataset --export             # Run an export:// step (mdim, explorer, static_viz, ...)
 .venv/bin/etlr namespace/version/dataset --dry-run      # Preview
 .venv/bin/etlr namespace/version/dataset --force --only # Force re-run
 ```
 
-Key flags: `--grapher/-g` (upload), `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
+Key flags: `--grapher/-g` (upload), `--export` (required for any `export://...` step — mdims, explorers, static viz; omitting it makes `etlr` report "No steps matched" and then list your exact step among the "closest matches", even though it is in the DAG), `--dry-run` (preview), `--force/-f` (re-run), `--only/-o` (no deps), `--private` (always use)
+
+**"The step completed" is not "the data is right".** After running a step for
+someone, report what came out of it: row count, year range, entities, and a few
+values from the latest year, plus whether anything changed against the published
+catalog. `✅ No differences found` is itself a result worth reporting.
+
+```bash
+.venv/bin/etl diff REMOTE data/ --include <dataset> --verbose
+```
 
 ### Running Snapshot Steps
 
@@ -108,7 +155,7 @@ Key flags: `--grapher/-g` (upload), `--dry-run` (preview), `--force/-f` (re-run)
 ```
 
 **Important:**
-- **Snapshot scripts need no `__main__` guard** — the `etls` CLI imports the module and invokes its click command `run` directly, so don't add `if __name__ == "__main__":` boilerplate. Many old scripts still carry it; don't copy them.
+- **Snapshot scripts need no `__main__` guard and no `click` decorators** — the `etls` CLI imports the module and calls its `run()` function itself, so don't add `if __name__ == "__main__":` boilerplate or `@click.command()` / `@click.option(...)`. New scripts should match the shape the wizard's cookiecutter emits: a plain `def run(upload: bool = True) -> None:`. Most existing scripts still carry both — they keep working, because `etl/snapshot_command.py` also accepts a click command — but don't copy them.
 - **Avoid `--force`** — `etlr` has built-in change detection and re-runs steps whose **code, dag entries, or data** changed. Editing a step's `.py`/`.yml` or its dag dependency line is enough to trigger a rebuild — don't add `--force`. Reserve `--force --only` for the narrow case where nothing in the repo changed but you still need to re-run (e.g., upstream data was patched out-of-band). Never use `--force` alone.
 - **`--only` requires deps on disk.** It skips dep resolution and won't download missing deps — even with `PREFER_DOWNLOAD=1`. If you hit a `FileNotFoundError` on a dep's `index.json`, drop `--only` and let etlr resolve the chain.
 - **`PREFER_DOWNLOAD=1`** — Download already-built datasets from the OWID catalog instead of recomputing locally. Useful when verifying a downstream step still works after a dag edit (the upstream deps get fetched, not rebuilt). Doesn't help if you've edited the dataset's own code. It also **fails with `AccessDenied` when the target version isn't in the catalog yet** (e.g. a version you just created) — use it only to fetch already-published upstream deps, never for the new step you're building locally.
@@ -140,8 +187,6 @@ gh pr edit <number> --body "..."
 ```
 
 **Cleaning up after merge**: `etl pr-clean` lists local branches whose PR was merged or closed (it checks the GitHub PR state, so squash-merges are detected), then deletes the selected branch(es). For branches created in a worktree (`etl pr "..." --worktree`), it also removes the worktree and copies that worktree's Claude sessions back into the main repo's `~/.claude/projects/` dir so they stay resumable.
-
-**After `etl pr --worktree`, verify the branch is current AND actually pushed.** Worktree creation can branch off a stale local `master` (missing recent merges → `_check_dag_completeness` "not in the DAG" errors on steps that should already exist) — fix with `git fetch origin master && git rebase origin/master`. That rebase then needs its own push: check `gh pr view --json additions,deletions` isn't `0`/`0` before assuming the PR reflects your commits.
 
 **Post `@codex review` as a separate PR comment** (not in the PR description) when the PR is ready for a review pass. Do not repost it after every push/update unless the user asks or the changes are substantial enough to warrant a fresh review.
 
@@ -186,8 +231,9 @@ Only universally understood abbreviations are fine (`gdp`, `co2`, `un_wpp`-style
 - **`paths.regions.harmonize_names(tb, country_col=..., countries_file=...)`** — current harmonization API (replaces `geo.harmonize_countries`)
 - **Attach population with `paths.regions.add_population(tb, population_col=...)`** — never read population columns directly (`historical.population_historical`, `population_original.population`). Only the `population` table's `population` column carries the single collapsed *"Various sources"* origin; the other tables carry disaggregated HYDE/Gapminder/UN WPP origins that then leak onto your indicators. Add `data://garden/demography/<version>/population` as a dep.
 - **`Table.format(keys, short_name=paths.short_name)`** sets the index, sorts, verifies integrity, and sets `short_name` in one call — use it in data steps. It takes an explicit key list; if `keys` is None (default) it uses `country` + `year`, but it is not limited to those. For a year-only table use `tb.format(["year"], short_name=paths.short_name)`. Don't hand-roll `set_index` + `tb.metadata.short_name`.
-- **`*.meta.yml`**: omit `dataset:` block — inherited from origin. Only define `tables:` → `variables:`
+- **`*.meta.yml`**: the `dataset:` block carries only `update_period_days` and `owners` — everything else is inherited from origin. Always make sure `owners` is set (new dataset: the user; update: append the user if missing) — first entry is the accountable owner; canonical names per the `schemas/dataset-schema.json` enum, resolved via `etl.owners.resolve_owner`.
 - **`grapher_config`: omit `$schema:`** — pinning a specific schema version ages badly. The default in `etl/config.py:DEFAULT_GRAPHER_SCHEMA` is applied automatically by `_validate_grapher_config`.
+- **`description_key` is a list *or* a markdown string — check, never assume.** A YAML list survives garden so per-item Jinja can render, and is joined into markdown by `update_variable_metadata`, which runs when a step renders dimensions (`_yield_wide_table` / `_metadata_for_dimensions`) and again at the DB write (`etl/grapher/to_db.py`). A `data://grapher/...` dataset on disk therefore holds a string for some datasets and a list for others — MySQL is string-only, the grapher channel is not. Steps reading one — mdim and explorer `export://` steps especially — must handle both and pass the value through rather than rebuild it. Never `list()` it: that yields one bullet *per character*, which every write path used to rejoin into valid-looking markdown, and it shipped ~2,900 one-character WYSK bullets to readers (#6647). The string form is now an `owid.catalog.core.meta.Markdown` — a `str` that raises `TypeError` on iteration, so the mistake fails on the line that writes it.
 
 ### Performance
 
@@ -214,23 +260,6 @@ def run() -> None:
 
 For a known *source* error we patch locally until the provider fixes it, don't inline `.loc[...]`/`.drop(...)` — declare it in a `<short_name>.corrections.yml` next to the step and apply with `tb = paths.apply_corrections(tb)`. See `etl/data_corrections.py` for the format; `etl corrections -o /tmp/c.html --charts` inventories and visualises them all. For enumerated provider point-errors only — systematic recoding *rules* and aggregation stay in step code.
 
-### Ad-hoc Data Exploration
-```python
-from etl.snapshot import Snapshot
-snap = Snapshot("namespace/version/file.csv")
-tb = snap.read_csv()
-```
-
-### Catalog System
-
-Built on **owid.catalog** library:
-- **Dataset**: Container for multiple tables with shared metadata
-- **Table**: pandas.DataFrame subclass with rich metadata per column
-- **Variable**: pandas.Series subclass with variable-specific metadata
-- Content-based checksums for change detection
-- Multiple formats (feather, parquet, csv) with automatic schema validation
-
-
 ### HTTP calls to OWID infra
 
 When internal code hits an OWID host (catalog, grapher, `files.ourworldindata.org`, `search.owid.io`, Datasette, admin API, etc.), use the shared session from `etl.http` instead of bare `requests` / `httpx` / `pd.read_*(url)`. It pre-sets a `User-Agent: owid-etl/...` header so our traffic is distinguishable in CDN logs.
@@ -254,10 +283,16 @@ with open(file_path, 'w') as f:
 
 ### Writing origin / metadata fields
 
-- **Consult the reference** — before writing `.dvc` `origin` or `.meta.yml` fields, look the field up in `schemas/definitions.json` (rendered at the [metadata reference](https://docs.owid.io/projects/etl/architecture/metadata/reference/)) and follow its `guidelines`. They're detailed and per-field: requirement level, good/bad examples, and when to omit optional fields (`title_snapshot`, `description_snapshot`, `attribution` all default to null / auto-generated). Each field has one job — don't fold content that belongs in one field into another.
+**Consult the reference first.** Before writing `.dvc` `origin` or `.meta.yml` fields, look the field up in `schemas/definitions.json` (rendered at the [metadata reference](https://docs.owid.io/projects/etl/architecture/metadata/reference/)) and follow its `guidelines`. They're detailed and per-field: requirement level, good/bad examples, and when to omit optional fields. Each field has one job — don't fold content that belongs in one field into another. Don't infer field usage by copying other `.dvc` files; they may use optional fields for reasons that don't apply to your snapshot.
+
+Mistakes the reference already covers but that keep happening:
+
 - **License goes under `origin`, not at the top level.** In a snapshot `.dvc`, the license is `meta.origin.license` (4-space, inside `origin`) — never the top-level `meta.license` (2-space). Both parse (they differ only by indentation), but the top-level form is a deprecated `SnapshotMeta` field that doesn't travel with the origin, so the license is dropped from Grapher's per-origin metadata (which matters for multi-origin datasets). The wizard cookiecutter already does this correctly; a schema `not`-constraint + `test_snapshot_license_lives_under_origin` enforce it. Each origin in a multi-origin `.dvc` needs its own `license`.
 - **`license.url` points to the producer's own license statement** — the page or PDF download link where the producer states the terms (often the same landing page as `url_main`). Never a `creativecommons.org` deed or other generic license page. If the producer states no license anywhere, leave `url` empty (don't fall back to the dataset's main page).
-- **American spelling always**.
+- **`title_snapshot` / `description_snapshot`**: default to omitting both. Only use them when several snapshots are created from the same data product and need disambiguation. If a data product maps to a single snapshot — even one that is a subset of the product — describe that subset in `description` instead.
+- **`attribution`**: omit — grapher builds `producer (year)` automatically. Only set it when that automatic format is genuinely uninformative (e.g. a well-known data product title should be cited alongside the producer).
+- **`citation_full`**: follow the producer's requested citation, but with appropriate minor edits: don't fold other metadata fields into it — e.g. license text like "Licence: CC BY-NC-SA 3.0 IGO" belongs in `license`, not in the citation.
+- **American spelling, always** — even when the producer's own text uses British spelling (adapting it is one of the "minor edits" the reference allows).
 
 ### Description fields: `.dvc` vs garden `description_processing`
 
@@ -268,132 +303,26 @@ Two different descriptions, two different jobs. Don't mix them:
 
 If the same sentence could fit in both, it belongs in garden — not in `.dvc`. Don't repeat producer-side facts in `description_processing`, and don't put OWID-side transformations in the `.dvc`.
 
-### Origin metadata fields: follow the metadata reference
+### Two rules for every subtitle you write
 
-When writing or editing `.dvc` origin fields, follow the ETL metadata reference — `schemas/definitions.json` in this repo (rendered at https://docs.owid.io/projects/etl/architecture/metadata/reference/). It defines, per field, the requirement level, formatting guidelines, and good/bad examples. Don't infer field usage by copying other `.dvc` files — they may use optional fields for reasons that don't apply to your snapshot.
+These apply to `description_short` and `presentation.grapher_config.subtitle` alike — both feed a chart's subtitle through grapher inheritance (`grapher_config.subtitle` wins; `description_short` is the fallback) — and to `subtitle` in MDim and explorer configs:
 
-Mistakes the reference already covers but that keep happening:
+- **Don't open with "The" when the next word works just as well.** ❌ `The estimated number of deaths from drowning among children under 5.` ✅ `Estimated number of deaths from drowning among children under 5.` Keep "The" only when dropping it breaks the grammar — the text is a sentence whose subject is that noun phrase (`The Gini coefficient measures inequality…`, `The Augmented Human Development Index (AHDI) is a summary measure…`) — or when it's part of a proper name (`The Gambia`, `The Internet`).
+- **Always end with punctuation, normally a period.** ❌ `Estimated number of deaths from drowning among children under 5` ✅ `Estimated number of deaths from drowning among children under 5.`
 
-- **`title_snapshot` / `description_snapshot`**: default to omitting both. Only use them when several snapshots are created from the same data product and need disambiguation. If a data product maps to a single snapshot — even one that is a subset of the product — describe that subset in `description` instead.
-- **`attribution`**: omit — grapher builds `producer (year)` automatically. Only set it when that automatic format is genuinely uninformative (e.g. a well-known data product title should be cited alongside the producer).
-- **`citation_full`**: follow the producer's requested citation, but with appropriate minor edits: don't fold other metadata fields into it — e.g. license text like "Licence: CC BY-NC-SA 3.0 IGO" belongs in `license`, not in the citation.
-- **American spelling, always** — even when the producer's own text uses British spelling (adapting it is one of the "minor edits" the reference allows).
+Full guide (synced from Notion every two weeks) in `.claude/skills/check-metadata-style/STYLE_GUIDE.md`; `/check-metadata-style` audits a dataset against it.
 
 ## Sanity checks
 
-Silent data corruption is one of the easier bugs to miss. A step can run cleanly, pass type checks, and ship to staging while producing wrong numbers — and by the time someone notices on a chart, the bad data may already be live. Sanity checks are how we catch that at build time instead.
+Silent data corruption is one of the easier bugs to miss: a step can run cleanly, pass type checks, and ship wrong numbers to staging. Every garden step that does more than a straight load-and-format asserts its assumptions about its inputs and its output — and so does any snapshot that parses non-trivially (PDF tables, custom binary formats, scraping). Where they go, what they look like, and which categories are worth checking are in `.claude/rules/sanity-checks.md`, which loads on its own when you open a step or snapshot script.
 
-**Write them. Make them strict.** Every garden step that does anything more than a straight load-and-format should assert its assumptions about both the input it received and the output it produced. The bar isn't "would I notice this on a chart" — it's "could this go wrong, and if it did, would the step still finish without complaining?". If yes, that's a check.
+## Querying MySQL, and verifying charts on staging
 
-### Where they go
-
-- **Garden** is the main home. The input tables, the transformations, and the output table are all in one place, and that's where business logic lives. Put one `sanity_check_inputs(...)` right after loading meadow tables (before any transform), and one `sanity_check_outputs(...)` right before `paths.create_dataset(...)`. Call both from `run()`. See [`rff/2026-06-10/emissions_weighted_carbon_price.py`](etl/steps/data/garden/rff/2026-06-10/emissions_weighted_carbon_price.py) for a clean, recent example.
-- **Snapshot** usually doesn't need checks — most snapshots just download and write. But when the snapshot itself does non-trivial parsing (PDF tables, custom binary formats, scraping), add integrity checks right before `snap.create_snapshot(...)`. If the parser can produce silently-wrong rows, the snapshot is the only place to catch it before the bad rows leak into meadow.
-- **Meadow** should stay light. If you find yourself wanting checks there, it usually means the logic belongs in garden instead.
-
-### How they look
-
-Use plain `assert` with a clear error message. Hard-fail is the default — let the step crash loudly. Save `log.warning(...)` for checks that flag suspicious patterns the maintainer should *review* but that aren't always wrong (e.g., a country dropping to zero in the latest year — could be a real signal, could be incomplete reporting).
-
-```python
-def sanity_check_inputs(tb_economy: Table, tb_coverage: Table) -> None:
-    assert set(tb_economy["jurisdiction"]) == set(tb_coverage["jurisdiction"]), "Jurisdictions don't match between the two input tables."
-    assert not tb_economy.duplicated(subset=["jurisdiction", "year"]).any(), "Duplicate (jurisdiction, year) rows in economy table."
-    price_cols = [c for c in tb_economy.columns if c not in ["jurisdiction", "year"]]
-    assert tb_economy[price_cols].min().min() >= 0, "Negative price found — source error or unit mistake."
-
-
-def sanity_check_outputs(tb: Table) -> None:
-    assert tb.columns[tb.isna().all()].empty, "Output has a fully-NaN column."
-    # Soft signal — surface for review, don't fail.
-    dropped = sorted(set(tb[tb["year"] == tb["year"].max()].query("value == 0")["country"]))
-    if dropped:
-        log.warning(f"Countries that dropped to zero in the latest year: {dropped}")
-```
-
-### Categories worth checking
-
-Pick whichever apply to your step. Don't write all of these by default — write the ones that would catch a real failure mode for this dataset.
-
-- **Shape / schema invariants.** Set-equality on the columns, categories, subcategories, variables, or any other identifier list you expect to be stable across versions. (`set(tb["category"]) == set(EXPECTED_CATEGORIES)`.) Catches schema changes at the source.
-- **Key uniqueness.** `assert not tb.duplicated(subset=[...]).any()` on whatever key columns the table is supposed to be unique on. Catches accidental row duplication from joins.
-- **Value ranges.** Non-negative where it should be, within plausible bounds where you know them, no NaN where you don't expect any. Catches unit mistakes and parser drift.
-- **Cross-table / cross-source agreement.** If two source tables both report the same key, their overlap should agree to the dollar (or within a documented tolerance). Catches misaligned extractions.
-- **Sum reconciles with published total.** If the source publishes both the components and the total, assert that summing the components equals the total within tolerance. See [`emissions/2026-02-11/emissions_by_custom_sector.py`](etl/steps/data/garden/emissions/2026-02-11/emissions_by_custom_sector.py:172) for an example. Catches row-shift extraction bugs and unit-mismatches.
-- **No silent drops.** If you filter, dedupe, or aggregate, assert that the row count or aggregate matches what you'd expect. (`assert len(tb) == n_expected`.) Catches transforms that quietly lose data.
-- **Coverage didn't shrink.** When updating a dataset version, check that you still have at least as many countries / quarters / categories as the previous version — a sudden drop is usually a parsing regression, not a real change.
-- **Magnitude matches the previous version.** When rewriting or updating a step, compare output values against the previous live version — a silent unit regression (e.g. a dropped ×1e6 conversion) passes every schema check and ships wrong-by-a-million values. Source columns whose headers carry unit markers (`(mils)`, `(000)`, `%`) demand an explicit conversion in garden **plus** a magnitude assert (`assert 1e12 < tb[col].max() < 1e14`), so the conversion can't be lost in a future rewrite.
-
-### When checks fail
-
-Don't suppress the assertion to get the step to pass. Treat the failure as the signal it is: investigate, then either fix the upstream logic or — if the source genuinely changed — update the assertion (and document why in a `# NOTE:` comment near the check).
-
-## Querying MySQL
-
-### Quick queries (staging)
-```bash
-make query SQL="SELECT COUNT(*) FROM variables WHERE catalogPath IS NULL"
-```
-Automatically connects to `staging-site-{branch}` based on current git branch.
-
-### Python (for more control)
-```python
-from etl.config import OWID_ENV
-df = OWID_ENV.read_sql("SELECT * FROM datasets LIMIT 10")
-```
-
-**Prefer Python when the SQL contains `%` (LIKE patterns, JSON_EXTRACT paths) or single-quoted strings — `make query` re-interprets those via shell + make and breaks unpredictably.** Use `params={...}` for `%`/quoted values to dodge pymysql's own `%`-format-string parsing.
-
-**`OWID_ENV` targets your local dev DB even when you're on a branch.** To query the branch's staging DB from Python, use `OWIDEnv.from_staging('<branch>')` (`from etl.config import OWIDEnv`) — e.g. `OWIDEnv.from_staging('my-branch').read_sql(...)`. Also note `make query` shells out to the `mysql` CLI, which may not be installed; if it errors with `mysql: command not found`, use the Python `from_staging(...).read_sql(...)` path instead.
-
-### Production queries via public Datasette
-
-When you need production data (which charts use an indicator, chart configs, gdoc links) and local/prod MySQL isn't reachable, query the public Datasette over HTTP:
-
-```bash
-curl -s "https://datasette-public.owid.io/owid.json?sql=<url-encoded SQL>"
-```
-
-`chart_dimensions` + `charts` + `chart_configs` answer "which charts use variable X"; `narrative_charts` and `posts_gdocs_links` cover derived charts and article references — together they answer the full "what does this dataset affect?" question when assessing the blast radius of a data fix.
-
-## Verifying charts on staging
-
-- **Indicator data/metadata API**: `https://api-staging.owid.io/staging-site-<branch>/v1/indicators/<id>.data.json` (and `.metadata.json`). The path prefix is `staging-site-<branch>`, **not** the bare branch name — a wrong prefix silently serves data from a different environment instead of 404ing, which looks exactly like "my fix didn't take". When in doubt, grep the staging chart page (`http://staging-site-<branch>/grapher/<slug>`) for `data.json` to get the exact URLs it loads.
-- **Rendered chart without a browser**: `http://staging-site-<branch>/grapher/<slug>.svg` returns a server-side render — grep it for axis labels / entity names to verify a fix end-to-end (e.g. `grep -oE '>[0-9]+ [a-z]+[^<]*<'` to read the y-axis ticks).
-
-## Additional Tools
-
-Get `--help` for details on any command.
-
-### Fast File Searching
-
-Use `rg` (ripgrep) instead of `find -exec grep` - it's ~100x faster:
-```bash
-rg -l "pattern" -g "*.py" -g "!.venv"
-```
+Use the `query-grapher-db` skill — it covers the local dev DB, a branch's staging DB, production via the public Datasette, and the staging indicator/SVG endpoints.
 
 ## Package Management
 
-Use `uv` (not pip):
-```bash
-uv add package_name
-uv remove package_name
-```
-
 **Never run bare `uv sync`** — it prunes optional deps the repo needs (streamlit, etc.) and breaks `etl`/`etl pr`. The full environment is `uv sync --all-extras --group dev` (what `make .venv` runs); use that to install or repair the venv.
-
-## VSCode Extensions
-
-Extensions live in `vscode_extensions/<name>/`. After **every** code change, you must compile, package, and install — just compiling is NOT enough:
-
-```bash
-cd vscode_extensions/<name>
-npm run compile
-npx @vscode/vsce package --out install/<name>-<version>.vsix
-code --install-extension install/<name>-<version>.vsix --force
-```
-
-Then tell the user to reload: `Cmd+Shift+P` → "Developer: Reload Window".
 
 ## GitHub Actions
 
@@ -406,7 +335,14 @@ When editing `.github/workflows/**` or `.github/actions/**`, follow the SHA-pinn
 See `.claude/docs/` for:
 - `debugging.md` - Data quality debugging approach
 - `pipeline-stages.md` - Pipeline architecture details
+- `cloud-sandbox.md` - Claude Code on the web: what a cloud session can and can't do
+- `open-items.md` - What tends to be left open at the end of multi-step work
+
+If you are running in a Claude Code cloud sandbox (`CLAUDE_CODE_REMOTE=true`), read
+`.claude/docs/cloud-sandbox.md` **before starting work** — it covers the pre-created
+branch name, spurious `uv.lock` diffs, the absence of a database, which OWID hosts
+the egress proxy blocks, and how to resolve an `admin.owid.io` link you can't open.
 
 ## Individual Preferences
 
-- @~/.claude/instructions/etl.md
+Personal, non-shared preferences go in `CLAUDE.local.md` at the repo root (already gitignored). Claude Code also auto-loads your own `~/.claude/CLAUDE.md`, so there is nothing to import here.

@@ -118,6 +118,14 @@ The ETL has built-in change detection — if you modify the config, it will auto
 ## Config YAML Structure
 
 ```yaml
+# Grapher chart-config schema the view configs below are written against. Always pin it, as a
+# QUOTED string — a bare `011` is YAML octal. Use the current DEFAULT_GRAPHER_SCHEMA version
+# (etl/config.py) when authoring a new MDIM, then leave it alone: Grapher migrates outdated
+# configs forward, but skips migration entirely when no version is given.
+grapher_schema: "011"
+# Never put `$schema` inside a view's `config` block: Grapher lets the view value override this
+# collection-level pin, so the two silently disagree. ETL warns when that happens.
+
 title:
   title: "Chart Title"
   title_variant: ""

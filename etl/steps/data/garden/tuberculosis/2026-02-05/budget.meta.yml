@@ -197,7 +197,7 @@ tables:
         short_unit: "$"
       budget_gap:
         title: Budget gap
-        description_short: The gap between the total budget required and the total expected funding from all sources.
+        description_short: Gap between the total budget required and the total expected funding from all sources.
         unit: "constant 2022 US$"
         short_unit: "$"
         processing_level: major

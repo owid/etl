@@ -13,7 +13,7 @@ tables:
         short_unit: users
         unit: users
         description_short: |-
-          The number of individuals using the Internet.
+          Number of individuals using the Internet.
         description_processing: |-
           The number of internet users is calculated by Our World in Data based on internet access figures as a share of the total population, published in the World Development Indicators by the World Bank and total population figures from the UN World Population Prospects, Gapminder and HYDE."
         display:

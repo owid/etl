@@ -1,25 +1,29 @@
 ---
 name: check-metadata-style
-description: Check grapher chart metadata (titles, subtitles, descriptions, display names) against OWID's Writing and Style Guide. Use when the user mentions the style guide, writing guide, chart copy quality, title/subtitle review, or after editing .meta.yml files under etl/steps/data/grapher/.
+description: Check user-facing indicator and chart metadata (titles, subtitles, descriptions, description_key/WYSK, display names) against OWID's Writing and Style Guide. Use when the user mentions the style guide, writing guide, chart copy quality, title/subtitle/WYSK review, or after editing any .meta.yml under etl/steps/data/ — garden or grapher. Most user-facing text is authored in garden and inherited by grapher; this skill reads the resolved metadata off the built grapher dataset, so garden-authored text is in scope.
 metadata:
   internal: true
 ---
 
 # Check Metadata Style
 
-Audit the user-facing text in a grapher step's metadata against OWID's Writing and Style Guide. Flags fields that break the rules and offers to rewrite them.
+Audit a dataset's user-facing text against OWID's Writing and Style Guide. Flags fields that break the rules and offers to rewrite them.
 
-Rules live in [STYLE_GUIDE.md](STYLE_GUIDE.md) next to this file — a committed snapshot of the [OWID Notion page](https://app.notion.com/p/owid/Writing-and-style-guide-d51a3739ff8542ca90297fa8de40437c). The file records a `Last synced from Notion` date in its header; the skill checks that date on every run and refreshes the snapshot from Notion when it is more than two months old (see step 1). Refreshes are committed via a PR.
+The text itself is usually authored in the **garden** `.meta.yml` (`description_key`/WYSK, `description_short`, `title`, `display.name`) and inherited by grapher; a smaller share is set or overridden in the grapher step. This skill reads the **resolved** metadata off the built grapher dataset, so it covers both — you point it at the grapher step, and any fix it proposes goes back to whichever layer authored the field.
+
+Rules live in [STYLE_GUIDE.md](STYLE_GUIDE.md) next to this file — a committed snapshot of the [OWID Notion page](https://app.notion.com/p/owid/Writing-and-style-guide-d51a3739ff8542ca90297fa8de40437c). The file records a `Last synced from Notion` date in its header; the skill checks that date on every run and refreshes the snapshot from Notion when it is more than two weeks old (see step 1). Refreshes are committed via a PR.
 
 ## When to use
 
-- After editing a `.meta.yml` under `etl/steps/data/grapher/`.
-- When the user asks to check chart copy / titles / subtitles / descriptions against the style guide.
+- After editing a `.meta.yml` under `etl/steps/data/` — **garden or grapher**.
+- When the user asks to check chart copy / titles / subtitles / descriptions / WYSK against the style guide.
 - As part of pre-PR QA for a dataset update.
 
 ## Scope
 
-**Current step only.** Ask for the step path if it's not obvious from context (e.g. `etl/steps/data/grapher/un/2026-04-08/child_labor_report`). Do not walk all active steps — keep the skill focused on the one dataset the user is working on.
+**Current dataset only.** Ask for the step path if it's not obvious from context. Do not walk all active steps — keep the skill focused on the one dataset the user is working on.
+
+Read the **grapher** step even when the edit was to a garden `.meta.yml` (e.g. you edited `etl/steps/data/garden/un/2026-04-08/child_labor_report.meta.yml` → read `etl/steps/data/grapher/un/2026-04-08/child_labor_report`). Only the grapher dataset carries the resolved, inherited text a reader actually sees. If the grapher build is stale relative to your garden edit, rebuild it first (step 3) or you will be auditing the old copy.
 
 ---
 
@@ -29,8 +33,8 @@ Rules live in [STYLE_GUIDE.md](STYLE_GUIDE.md) next to this file — a committed
 
 Read the `> Last synced from Notion: YYYY-MM-DD` line in the header of [STYLE_GUIDE.md](STYLE_GUIDE.md).
 
-- If the date is **less than two months** before today, skip to step 2 — no fetch needed.
-- If the line is missing or the date is **two months old or more**, refresh the snapshot, trying in order:
+- If the date is **less than two weeks** before today, skip to step 2 — no fetch needed.
+- If the line is missing or the date is **two weeks old or more**, refresh the snapshot, trying in order:
 
 1. **Notion MCP.** Load the Notion tools with `ToolSearch` (query `+notion fetch`) and fetch the [Notion page](https://app.notion.com/p/owid/Writing-and-style-guide-d51a3739ff8542ca90297fa8de40437c). Use the result only if it looks complete: all sections present (Branding, Capitalization, Grammar and syntax, Short citations for charts, Writing in GDoc, Descriptions, Dates, Punctuation, Spelling) with the ❌/✅ examples intact. Note: authorizing the connector **mid-session doesn't help** — MCP tool lists are fixed at session start (subagents inherit the same registry, and resuming the session doesn't refresh it either), so a newly authorized connector is only reachable from a brand-new session.
 2. **Manual export.** If the Notion MCP is unavailable or unauthenticated, or the fetched content is incomplete or mangled, ask the user to download a markdown export of the page (open the Notion link → `•••` menu → **Export** → format **Markdown & CSV**) and provide the file path.
@@ -88,6 +92,8 @@ for table_name in ds.table_names:
         put('description_short', getattr(m, 'description_short', None))
 
         dk = getattr(m, 'description_key', None) or []
+        if isinstance(dk, str):  # modern format: one free-form markdown string
+            dk = [dk]
         for i, v in enumerate(dk):
             put(f'description_key[{i}]', v)
 
@@ -117,7 +123,7 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 |---|---|
 | `title` | Variable short title; shows in the catalog and some chart views |
 | `description_short` | One-liner rendered under chart titles |
-| `description_key[i]` | Bullet list on chart data pages |
+| `description_key[i]` | Key information on chart data pages (markdown string, or legacy bullet list) |
 | `display.name` | Series label in chart legends |
 | `presentation.title_public` | Public-facing chart title |
 | `presentation.title_variant` | Disambiguator ("Historical", "WHO estimate", …) |
@@ -134,7 +140,11 @@ print(json.dumps(rows, indent=2, ensure_ascii=False))
 
 **Fallback if the dataset isn't built:**
 
-If `DATA_DIR / step_path` does not exist, parse the `.meta.yml` directly with `etl.files.ruamel_load` and pull the same field names from the `tables → <name> → variables → <var>` tree. Warn the user that Jinja templates (`<<var>>`, `{definitions.xxx}`, `<%- ... -%>`) are **not** resolved in this fallback path, so template-generated violations will be missed. Suggest building the step first:
+If `DATA_DIR / step_path` does not exist, parse the `.meta.yml` directly with `etl.files.ruamel_load` and pull the same field names from the `tables → <name> → variables → <var>` tree.
+
+**Parse the garden `.meta.yml`, not just the grapher one.** Most datasets author their user-facing text in garden and have a thin or absent grapher `.meta.yml`, so reading only the grapher layer here finds nothing and reports a clean bill of health on unaudited text. Read both (`etl/steps/data/garden/<ns>/<version>/<dataset>.meta.yml` and the grapher one if it exists) and note that grapher values override garden ones on the same field.
+
+Warn the user that Jinja templates (`<<var>>`, `{definitions.xxx}`, `<%- ... -%>`) and garden→grapher inheritance are **not** resolved in this fallback path, so template-generated violations will be missed. Suggest building the step first:
 
 ```bash
 .venv/bin/etlr grapher/<namespace>/<version>/<dataset> --grapher --private
@@ -198,6 +208,6 @@ After fixes:
 
 - **No persistent output.** Analysis results stay in-conversation: no report `.md`, no scripts under `scripts/`. The only persistent file tied to this skill is `STYLE_GUIDE.md` (the committed rulebook).
 - **Current step only.** If the user asks to audit the whole catalog, say the skill is scoped to one step and suggest running it per dataset.
-- **Keep `STYLE_GUIDE.md` in sync with Notion.** The header's `Last synced from Notion` date is checked on every run (step 1); when it is more than two months old the skill refreshes the snapshot — Notion MCP first, manual markdown export as fallback — and the refresh is committed via a PR. Between syncs the skill stays deterministic and offline-capable by always auditing against the committed file.
+- **Keep `STYLE_GUIDE.md` in sync with Notion.** The header's `Last synced from Notion` date is checked on every run (step 1); when it is more than two weeks old the skill refreshes the snapshot — Notion MCP first, manual markdown export as fallback — and the refresh is committed via a PR. Between syncs the skill stays deterministic and offline-capable by always auditing against the committed file.
 - **Archive-aware.** If the provided step path is under `dag/archive/*.yml`, point that out and confirm the user still wants to check it.
 - **Don't hallucinate rules.** If `STYLE_GUIDE.md` doesn't say something, don't flag it. Prefer false negatives over false positives.

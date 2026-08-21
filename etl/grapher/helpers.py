@@ -621,7 +621,7 @@ def adapt_table_with_dates_to_grapher(
     date_column: str = "date",
     country_column: str = "country",
     drop_date_column: bool = True,
-    time_interval: TimeInterval = "day",
+    time_interval: TimeInterval | None = None,
 ) -> catalog.Table:
     """Adapt a table that has a date column to grapher requirements.
 
@@ -631,6 +631,12 @@ def adapt_table_with_dates_to_grapher(
     All sub-yearly data is encoded as days-since-`zeroDay` integers (the same encoding daily data
     uses); `time_interval` tells grapher how to interpret and format those integers. Pass
     ``time_interval="month"``/``"week"``/etc. for data whose points represent months/weeks/etc.
+
+    When `time_interval` is not given, a `display.timeInterval` already declared on the column
+    (e.g. in a garden `.meta.yml`) is preserved, and only columns without one fall back to "day".
+    This matters because grapher steps run this function implicitly, via
+    `_adapt_table_for_grapher`, on every table that still has a date column — so an interval
+    declared in metadata would otherwise be silently overwritten with "day".
 
     Parameters
     ----------
@@ -644,7 +650,8 @@ def adapt_table_with_dates_to_grapher(
         Name of country column, by default "country".
     time_interval : TimeInterval, optional
         Interval each date represents ("day", "week", "month", "quarter", "year", "decade"),
-        written to ``display.timeInterval``. By default "day".
+        written to ``display.timeInterval``. If None (default), an interval already declared in
+        the column's ``display.timeInterval`` wins, and columns without one get "day".
 
     Returns
     -------
@@ -673,8 +680,11 @@ def adapt_table_with_dates_to_grapher(
             tb[column].metadata.display = {}
 
         # Set the timeInterval metadata field, so that grapher knows how to interpret and format the
-        # days-since-zeroDay integers (e.g. "month" -> "Jan 2023")
-        tb[column].metadata.display["timeInterval"] = time_interval
+        # days-since-zeroDay integers (e.g. "month" -> "Jan 2023"). An explicit argument wins, then
+        # an interval already declared in metadata, and "day" is the fallback.
+        tb[column].metadata.display["timeInterval"] = (
+            time_interval or tb[column].metadata.display.get("timeInterval") or "day"
+        )
 
         # Set zeroDay, which grapher will interpret as the earliest day from which to start counting dates.
         tb[column].metadata.display["zeroDay"] = zero_day.strftime("%Y-%m-%d")
@@ -717,7 +727,6 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
             assert tab[col].metadata.title is not None, f"Column `{col}` must have a title."
             assert tab[col].m.origins, f"Column `{col}` must have at least one origin"
 
-            _validate_description_key(tab[col].m.description_key, col)
             _validate_ordinal_variables(tab, col)
             _validate_grapher_config(tab, col)
             _validate_time_interval(tab, col)
@@ -747,8 +756,12 @@ TIME_INTERVALS = {"day", "week", "month", "quarter", "year", "decade"}
 
 
 def _validate_time_interval(tab: Table, col: str) -> None:
-    """Validate the display.timeInterval field, if set."""
+    """Validate the display.timeInterval field, and guard against the removed yearIsDay flag."""
     display = tab[col].m.display or {}
+    # yearIsDay has been fully replaced by timeInterval; catch any regression or stray copy-paste.
+    assert "yearIsDay" not in display, (
+        f"Column `{col}` sets the removed display.yearIsDay flag; use display.timeInterval instead."
+    )
     time_interval = display.get("timeInterval")
     if time_interval is not None:
         assert time_interval in TIME_INTERVALS, (
@@ -777,13 +790,6 @@ def _validate_grapher_config(tab: Table, col: str) -> None:
             validate(grapher_config, schema)
         except ValidationError as e:
             raise ValueError(f"Invalid grapher_config for column `{col}`: {e}") from None
-
-
-def _validate_description_key(description_key: list[str], col: str) -> None:
-    if description_key:
-        assert not all(len(x) == 1 for x in description_key), (
-            f"Column `{col}` uses string {description_key} as description_key, should be list of strings."
-        )
 
 
 def _validate_ordinal_variables(tab: Table, col: str) -> None:

@@ -45,6 +45,30 @@ CURRENT_DIR = os.path.dirname(__file__)
 @dataclass
 class DatasetUpsertResult:
     dataset_id: int
+    # Dataset-level fields that end up in every indicator's metadata JSON (see
+    # `_dataset_metadata_fields`). They take part in the metadata checksum, so that editing one
+    # of them re-uploads the affected files.
+    metadata_fields: dict[str, Any]
+
+
+def _dataset_metadata_fields(ds: gm.Dataset) -> dict[str, Any]:
+    """Dataset-level fields that `_load_variable` joins into every indicator's metadata JSON.
+
+    Kept in sync with the SELECT in `apps/backport/datasync/data_metadata.py`. `sourceName` and
+    `sourceDescription` are deliberately left out: ETL upserts variables with `sourceId=None`, so
+    the legacy `sources` join only ever contributes to backported datasets.
+
+    None values are dropped, mirroring `_omit_nullable_values` before upload - a field that is
+    null (and therefore absent from the JSON) must not take part in the hash, otherwise adding a
+    field here would flip the checksum of every variable that doesn't set it.
+    """
+    fields = {
+        "datasetName": ds.name,
+        "datasetVersion": ds.version,
+        "updatePeriodDays": ds.updatePeriodDays,
+        "nonRedistributable": bool(ds.nonRedistributable),
+    }
+    return {k: v for k, v in fields.items() if v is not None}
 
 
 def upsert_dataset(engine: Engine, dataset: catalog.Dataset, namespace: str) -> DatasetUpsertResult:
@@ -97,7 +121,7 @@ def upsert_dataset(engine: Engine, dataset: catalog.Dataset, namespace: str) -> 
 
         session.commit()
 
-        return DatasetUpsertResult(ds.id)
+        return DatasetUpsertResult(ds.id, _dataset_metadata_fields(ds))
 
 
 def check_table(table: Table) -> None:
@@ -183,7 +207,7 @@ def upsert_table(
     df["value"] = df["value"].astype("string")
 
     checksum_data = calculate_checksum_data(df)
-    checksum_metadata = calculate_checksum_metadata(variable_meta, df)
+    checksum_metadata = calculate_checksum_metadata(variable_meta, df, dataset_upsert_result.metadata_fields)
 
     if config.FORCE_UPLOAD:
         checksums["dataChecksum"] = None
@@ -318,7 +342,7 @@ def upsert_metadata(
     return db_variable
 
 
-def calculate_checksum_metadata(variable_meta: VariableMeta, df: pd.DataFrame) -> str:
+def calculate_checksum_metadata(variable_meta: VariableMeta, df: pd.DataFrame, dataset_metadata: dict[str, Any]) -> str:
     # Hash the canonical (pruned) dict representation, not the dataclass itself.
     # Dataclass-shape changes (a field renamed, added, or removed — even when the
     # default is None / [] and the JSON output is unchanged) used to spuriously
@@ -334,12 +358,18 @@ def calculate_checksum_metadata(variable_meta: VariableMeta, df: pd.DataFrame) -
     # that prunes inline, same trick `dataclass_from_dict` uses in core/utils.py.
     #
     # entities and years are also part of the metadata checksum.
+    #
+    # So are the dataset-level fields the JSON embeds (`_dataset_metadata_fields`): they live on
+    # the dataset, not on the variable, so without them clearing e.g. `update_period_days` left
+    # every variable's checksum untouched, every upload was skipped, and the file in R2 stayed
+    # stale forever while MySQL was correct.
     return str(
         hash_any(
             (
                 hash_any(sorted(df.entityId.unique())),
                 hash_any(sorted(df.year.unique())),
                 hash_any(variable_meta.to_dict()),
+                hash_any(dataset_metadata),
             )
         )
     )
@@ -535,14 +565,21 @@ def _raise_error_for_deleted_variables(rows: pd.DataFrame) -> bool:
 
 def _get_timespan(table: pd.DataFrame, variable_meta: VariableMeta) -> str:
     display = variable_meta.display or {}
-    # Timespan does not work for sub-yearly data
-    if display.get("yearIsDay") or display.get("timeInterval") in {"day", "week", "month", "quarter"}:
+
+    # Timespan does not work for sub-yearly data.
+    if display.get("timeInterval") in {"day", "week", "month", "quarter"}:
         return ""
-    else:
-        years = table.year.unique()
-        if len(years) == 0:
-            return ""
-        else:
-            min_year = min(years)
-            max_year = max(years)
-            return f"{min_year}-{max_year}"
+
+    years = table.year.unique()
+    if len(years) == 0:
+        return ""
+
+    min_year = min(years)
+    max_year = max(years)
+    if display.get("timeInterval") == "decade":
+        # Each value codes a calendar decade (e.g. 1820s = 1820–1829) by a representative year
+        # within it; snap the start down and the end up to the decade boundaries so the timespan
+        # reflects the full coverage (e.g. 1820–2019, not 1820–2010).
+        min_year = (min_year // 10) * 10
+        max_year = (max_year // 10) * 10 + 9
+    return f"{min_year}-{max_year}"

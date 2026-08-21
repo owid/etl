@@ -4,6 +4,7 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
+from owid.catalog.core.meta import description_key_to_string
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 from structlog import get_logger
@@ -128,6 +129,9 @@ def _variable_metadata(
     display = json.loads(displayJson)
     license = json.loads(licenseJson) if licenseJson else None
     descriptionKey = json.loads(descriptionKeyJson) if descriptionKeyJson else None
+    # Rows written before description_key became a string carry lists.
+    if isinstance(descriptionKey, list):
+        descriptionKey = description_key_to_string(descriptionKey)
     sort = json.loads(sortJson) if sortJson else None
 
     # group fields from flat structure into presentation field

@@ -9,7 +9,7 @@ metadata:
 
 Create a new ETL snapshot from a source URL: fetch the page, infer metadata, confirm with the user, write the `.dvc` file (plus a `.py` script only when one is genuinely needed), then run the snapshot.
 
-> **Paired skill — keep in sync.** [`/create-dataset`](../create-dataset/SKILL.md) consumes the conventions defined here (its Step 4 builds the snapshot for a full dataset chain): whenever you change the `.dvc` field guidance, the script templates, or the workflow in this file, check whether `create-dataset/SKILL.md` needs a matching edit (and make it in the same commit if so). The reverse also holds — see the mirror note there. The update-side skills are part of the same family: the fields written here are exactly what [`/update-dataset`](../update-dataset/SKILL.md) §6c re-checks on every version bump and what [`/review-data-pr`](../review-data-pr/SKILL.md) §5 compares old-vs-new at review time — keep the field guidance consistent across all of them.
+> **Paired skill — keep in sync.** [`/create-dataset`](../create-dataset/SKILL.md) consumes the conventions defined here (its Step 4 builds the snapshot for a full dataset chain, reusing this skill's step 3 generator call with `dataset_manual_import: True`): whenever you change the `.dvc` field guidance, the cookiecutter context, or the workflow in this file, check whether `create-dataset/SKILL.md` needs a matching edit (and make it in the same commit if so). The reverse also holds — see the mirror note there. The update-side skills are part of the same family: the fields written here are exactly what [`/update-dataset`](../update-dataset/SKILL.md) §6c re-checks on every version bump and what [`/review-data-pr`](../review-data-pr/SKILL.md) §5 compares old-vs-new at review time — keep the field guidance consistent across all of them.
 
 ## Inputs
 
@@ -28,7 +28,7 @@ Use WebFetch to fetch `url_main`. From the page content, extract as much metadat
 | Field | Where to look |
 |-------|---------------|
 | `title` | Page `<title>`, main heading, dataset title |
-| `description` | Page description, abstract, or "about" section — copy the producer's text **verbatim** (light copyedits only — typos, spacing, encoding artifacts), don't paraphrase. For academic papers, use the abstract verbatim. If the page prose spans several paragraphs, take all of them (skip only navigation/boilerplate) |
+| `description` | Page description, abstract, or "about" section. Per the metadata reference: if the producer provides a *good, factual* description, use it exactly or conveniently rephrased. Academic abstracts and methodology summaries usually qualify — take them as-is. **Never paste promotional or first-person copy** ("our nation", "vital information", funding pitches): rewrite it as a neutral, factual description from OWID's point of view (who runs it, what it measures, coverage, cadence) |
 | `producer` | Organisation name, data owner, author |
 | `citation_full` | The producer's recommended citation, copied **verbatim** (light copyedits only — fixing a typo, stray spacing, or encoding artifacts; never rephrasing) — look for "cite as" / "suggested citation" / "please make the following reference" blocks on the page, an "Original citation" on repository pages (e.g. WRAP), NBER's suggested citation, or "Reference:" headers inside the data files themselves. Sites often have a dedicated "how to cite" / citation page separate from the dataset landing page — browse the site's navigation for one. Only construct a citation in standard format when the producer provides none |
 | `attribution_short` | Short org name / acronym |
@@ -63,106 +63,114 @@ Present the inferred metadata and ask the user to fill in or correct:
 
 Present this as a summary block so the user can quickly scan and correct individual fields. Wait for confirmation before proceeding.
 
-### 3. Write the files
+### 3. Generate the files
 
-Once the user confirms, compute:
-```
-snapshot_dir = snapshots/<namespace>/<version>/
-dvc_path     = snapshots/<namespace>/<version>/<short_name>.<file_extension>.dvc
-py_path      = snapshots/<namespace>/<version>/<short_name>.py   # only when a script is needed — see below
-```
+Once the user confirms, generate both files from the wizard's snapshot cookiecutter — the same templates the wizard's snapshot page uses.
 
-Create the directory if it doesn't exist.
+> **Never hand-write these files, and never copy the templates into this file.** `apps/wizard/etl_steps/cookiecutter/snapshot/` is the single source of truth. Hand-copied templates drift: an earlier version of this skill carried its own copies, and the manual-import one had already lost the canonical docstring. The template also gets details right that are easy to fluff by hand — most importantly `license` nested **inside** `origin` (CLAUDE.md's most-repeated snapshot mistake, and a schema `not`-constraint plus `test_snapshot_license_lives_under_origin` exist because of it), and `is_public: false` for a private snapshot.
+
+Files produced:
+```
+snapshots/<namespace>/<version>/<short_name>.<file_extension>.dvc
+snapshots/<namespace>/<version>/<short_name>.py    # removed again when no script is needed — see below
+```
 
 **Decide whether a `.py` script is needed** (CLAUDE.md, "No `.py` for simple downloads"):
 
-- **Plain `url_download`, no custom logic** → write **only the `.dvc`**. `etls <namespace>/<version>/<short_name>` runs it straight from the `.dvc`. This is the default case — `/review-data-pr` §3/§7 treat the script as optional, so don't add one "for completeness".
-- **Manual import** (`dataset_manual_import: true`) → write the manual-import script below.
-- **Download needing custom code** (API pagination, auth, scraping, multi-file assembly, non-trivial parsing before storing) → write the automatic-download script below with the custom logic inside `run()`.
+- **Plain `url_download`, no custom logic** → set `dvc_only: True`, which deletes the generated script so only the `.dvc` remains. `etls <namespace>/<version>/<short_name>` runs it straight from the `.dvc`. This is the default case — `/review-data-pr` §3/§7 treat the script as optional, so don't keep one "for completeness".
+- **Manual import** → set `dataset_manual_import: True`; the template emits the `path_to_file` variant of `run()`.
+- **Download needing custom code** (API pagination, auth, scraping, multi-file assembly, non-trivial parsing before storing) → keep the generated script and add the custom logic inside `run()`, between `paths.init_snapshot()` and `snap.create_snapshot(...)`.
 
-Either script is a plain `run()` — **no `click` decorators and no `if __name__ == "__main__":` block**. The `etls` CLI imports the module and invokes `run` itself, supplying `--path-to-file` for manual imports. (Many old scripts still carry the boilerplate; don't copy them.)
+Either way the script is a plain `run()` — **no `click` decorators and no `if __name__ == "__main__":` block**. The `etls` CLI imports the module and invokes `run` itself, supplying `--path-to-file` for manual imports. The template already gets this right; the warning matters because many old scripts in the repo still carry the boilerplate — don't copy one of those as a model.
 
-**Write the DVC file** (`<short_name>.<file_extension>.dvc`):
+**Generate the files.** Every field confirmed in step 2 goes in as cookiecutter context. Pass **all** the keys below — there is no committed `cookiecutter.json` supplying defaults, so a missing key is a Jinja `UndefinedError`, and an empty string is how you say "omit this field" (the template's `{%- if %}` guards drop it from the output).
 
-```yaml
-# Learn more at:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
-meta:
-  origin:
-    # Data product / Snapshot
-    title: "<title>"
-    title_snapshot: "<title> - <file specifics>"   # only when the file is one table/extract of a broader data product
-    description: |-               # omit block if empty; verbatim producer text
-      <description>
-    description_snapshot: |-      # required whenever title_snapshot is set; own wording is fine here
-      <what this specific file contains: table number, variables, units, years, plus any OWID-side
-      context such as manual transcription or retrieval from an archived copy>
-    date_published: "<date_published>"
+**Write the context as JSON with the `Write` tool, then run the generator against that file.** Do not interpolate the field values into a `python -c` program: `citation_full`, `title` and `description` are producer prose, and an apostrophe (`World Bank's`), a double quote, a backslash, or a newline in any of them either breaks the program or silently changes the value before cookiecutter sees it. Producer citations contain apostrophes routinely, so this is the normal case, not an edge case. JSON keeps the prose out of shell and Python literals entirely.
 
-    # Citation
-    producer: <producer>
-    citation_full: |-
-      <citation_full>
-    attribution_short: <attribution_short>   # omit if empty
+First write `/tmp/snapshot_context.json` (booleans are real JSON `true`/`false`, and `""` means "omit this field"):
 
-    # Files
-    url_main: <url_main>
-    url_download: <url_download>             # omit if not provided
-    date_accessed: <version>                 # use the snapshot version date
-
-    # License
-    license:
-      name: <license_name>
-      url: <license_url>                     # omit if empty
-
-  is_public: false    # omit this line if is_private is false
-outs:
-  - md5: ""
-    size: 0
-    path: <short_name>.<file_extension>
+```json
+{
+  "channel": "snapshots",
+  "namespace": "<namespace>",
+  "snapshot_version": "<version>",
+  "short_name": "<short_name>",
+  "file_extension": "<file_extension>",
+  "is_private": false,
+  "dataset_manual_import": false,
+  "dvc_only": false,
+  "title": "<title>",
+  "description": "<description>",
+  "title_snapshot": "",
+  "description_snapshot": "",
+  "origin_version": "",
+  "date_published": "<date_published>",
+  "producer": "<producer>",
+  "citation_full": "<citation_full>",
+  "attribution": "",
+  "attribution_short": "<attribution_short>",
+  "url_main": "<url_main>",
+  "url_download": "<url_download>",
+  "date_accessed": "<version>",
+  "license_name": "<license_name>",
+  "license_url": "<license_url>"
+}
 ```
 
-**Write the Python script** (`<short_name>.py`) — only in the two cases above:
+Then generate. The only string literal in this program is a fixed path, so no field value can break it:
 
-If the download runs automatically but needs custom code:
-```python
-"""Script to create a snapshot of dataset."""
+```bash
+.venv/bin/python -c "
+import json
+from apps.utils.files import generate_step
+from apps.wizard.etl_steps.utils import COOKIE_SNAPSHOT
+from etl.paths import SNAPSHOTS_DIR
 
-from etl.helpers import PathFinder
+with open('/tmp/snapshot_context.json') as f:
+    data = json.load(f)
+generate_step(cookiecutter_path=COOKIE_SNAPSHOT, data=data, target_dir=SNAPSHOTS_DIR)
 
-paths = PathFinder(__file__)
-
-
-def run(upload: bool = True) -> None:
-    """Create a new snapshot.
-
-    Args:
-        upload: Whether to upload the snapshot to S3.
-    """
-    snap = paths.init_snapshot()
-    # ... custom fetch/assembly logic here ...
-    snap.create_snapshot(upload=upload)
+# dvc_only: drop the script the template always writes.
+if data['dvc_only']:
+    py = SNAPSHOTS_DIR / data['namespace'] / data['snapshot_version'] / (data['short_name'] + '.py')
+    py.unlink(missing_ok=True)
+"
 ```
 
-If `dataset_manual_import` is `true` (no direct download link) — same template as `/create-dataset` Step 4:
-```python
-"""Script to create a snapshot of dataset.
+Note that `license` belongs to `origin` — the template nests `license_name` / `license_url` correctly, so there is nothing to move afterwards.
 
-The data file is provided manually. Steps to obtain it:
-  1. Go to <url_main>
-  2. Download the data file and save it locally.
-  3. Run: etls <namespace>/<version>/<short_name> --path-to-file <path>
-"""
+Which fields to fill, and when to leave them empty:
 
-from etl.helpers import PathFinder
+| Context key | Value |
+|---|---|
+| `title` / `description` | The data product. `description` is factual — the producer's own text when it is factual, never promotional copy |
+| `title_snapshot` / `description_snapshot` | Both empty by default. Set them **only** when the file is one table/extract of a broader product; `description_snapshot` then becomes required, and carries the file specifics (table number, variables, units, years) plus any OWID-side context such as manual transcription or an archived copy |
+| `attribution` | Empty unless `producer (year)` is genuinely uninformative |
+| `attribution_short` / `origin_version` | Empty when the producer gives none |
+| `url_download` | Empty for a manual import |
+| `license_url` | Empty when the producer states no license anywhere — don't fall back to the landing page |
+| `date_accessed` | The snapshot version date |
 
-paths = PathFinder(__file__)
+**After generating**, three things to do:
 
+- **Verify the `.dvc` parses.** The template escapes the single-line fields it quotes (`title`, `producer`, `title_snapshot`, `attribution`, `attribution_short`, `version_producer`, `license_name`) and uses block scalars for the multi-line prose (`description`, `description_snapshot`, `citation_full`), so ordinary producer text — quotes, colons, `#`, backslashes — round-trips correctly. This check is therefore a cheap guard, not a workaround for a known gap: if it ever fails, the bug is in the template's escaping and belongs upstream in `apps/wizard/etl_steps/cookiecutter/snapshot/`, not in a hand-fix to the generated file.
 
-def run(upload: bool = True, path_to_file: str | None = None) -> None:
-    snap = paths.init_snapshot()
-    snap.create_snapshot(filename=path_to_file, upload=upload)
-```
+  ```bash
+  .venv/bin/python -c "
+  import sys, yaml
+  p = 'snapshots/<namespace>/<version>/<short_name>.<file_extension>.dvc'
+  try:
+      yaml.safe_load(open(p))
+  except yaml.YAMLError as e:
+      sys.exit(f'{p} is not valid YAML — re-quote the offending field:\n{e}')
+  print(f'{p}: valid YAML')
+  "
+  ```
+
+- Tidy the end of the `.dvc`. The template's final `{%- endif -%}` leaves a whitespace-only line (`"  "`) after the license block, and for a private snapshot the file also ends without a final newline. Both parse fine as YAML, but committed files shouldn't carry either: drop the whitespace-only line and make sure the file ends with exactly one `\n`.
+- Add any `#` comments this skill calls for: the companion-files `# NOTE:` above `url_download` (step 6), and a one-line note when `citation_full`'s year deliberately differs from `date_published` (step 5).
+
+There is deliberately **no `outs:` block** — `snap.create_snapshot()` writes it with the real md5 and size when step 4 runs. Don't add a placeholder.
 
 ### 4. Run the snapshot
 
@@ -180,15 +188,26 @@ After writing the files, run:
 
 ### 5. Verify links and field consistency
 
-- **Links**: run the HEAD-check loop from `/update-dataset` §6c ("Link verification") on every URL in the new `.dvc` (`url_main`, `url_download`, `license.url`, and any URL inside `description`). A curl non-2xx is a *signal*, not proof — Cloudflare-fronted hosts return false 404s to curl. Escalate with WebFetch, then the Wayback Machine, before treating a link as broken; never swap a link for an alternative on a curl-only failure. URLs carrying a `#fragment` also need §6c's anchor pass — HTTP status alone can't validate a fragment.
+- **Links**: run the HEAD-check loop from `/update-dataset` §6c ("Link verification") on every URL in the new `.dvc` (`url_main`, `url_download`, `license.url`, and any URL inside `description`). A curl non-2xx is a *signal*, not proof — Cloudflare-fronted hosts return false 404s to curl. Escalate with WebFetch, then the Wayback availability API, but per §6c no automated signal is decisive (a missing Wayback capture is non-evidence, and bot-blocked hosts fail curl *and* WebFetch while serving browsers fine): a link that fails every automated check gets reported with its evidence trail for the user to confirm in a browser — never mark it broken or swap it for an alternative on automated failures alone. URLs carrying a `#fragment` also need §6c's anchor pass — HTTP status alone can't validate a fragment.
 - **Citation year vs `date_published` year**: the year inside `citation_full` should normally match `date_published`'s year. A deliberate mismatch is fine when the producer labels the release by *edition* rather than publish date (e.g. a "2025 report" published 2026-03-17) — leave a one-line `#` comment in the `.dvc` so the next reviewer doesn't re-flag it (`/review-data-pr` §5 checks exactly this pair).
-- **Optional deeper pass — adversarial source verification**: [`/adversarial-data-review`](../adversarial-data-review/SKILL.md) goes beyond "the links resolve" and *reads* the producer's documentation behind them, checking every `.dvc` claim (description verbatim-ness, counts, `date_published`, license, citation) against what the docs actually say — its Phase 0 is the slice that applies at snapshot stage (the data cross-checks need a built garden dataset, e.g. via `/create-dataset`). Don't run it by default — it fetches docs and runs web searches, so it can consume many tokens; offer it when the source looks unreliable (no version labels, self-published, or the page and file seem to disagree).
+- **Typos in the `.dvc`**: run [`/check-metadata-typos`](../check-metadata-typos/SKILL.md) on the new file, passing the `.dvc` path itself (or the extensionless `snapshots/<namespace>/<version>/<short_name>` stem) to its "current step only" scope, which normalizes both to the `.dvc`. Confirm it reports a target count of 1 before trusting the result — a scope that matched no file reports no typos. The prose fields written in step 3 — `description`, `title`, `citation_full`, `attribution` — are user-facing, and nothing downstream spell-checks them: `/update-dataset` §6c only re-checks them on a *later* version bump. `citation_full` is the exception to fixing what it reports: it is verbatim producer text, so only correct a typo there if the producer's own page has it right (see the `citation_full` note above).
+- **Outdated practices in the `.py`**, when step 3 wrote one: run [`/check-outdated-practices`](../check-outdated-practices/SKILL.md) on it. Run the skill rather than eyeballing the file; it reads the detector extension as its source of truth and catches helper calls that look current but aren't. `/review-data-pr` treats a leftover `__main__` block in a snapshot as a 🔴 blocker, so this is cheaper to fix here than at review.
+
+  **Know what it does and does not cover, and don't read a clean result as more than it is.** For snapshot paths the detector's main pattern is the `if __name__ == "__main__":` guard, plus the metadata-preserving patterns, which only bite when the script parses before storing. Don't assume it covers every convention in step 3 — check the pattern list in `vscode_extensions/detect-outdated-practices/src/extension.ts` rather than inferring coverage from a clean run, and confirm the `@click` convention yourself with the grep below (cheap, and correct whether or not the installed build carries a click pattern).
+
+  ```bash
+  grep -n "@click" snapshots/<namespace>/<version>/<short_name>.py   # expect no output
+  ```
+
+  Route the finding by where the pattern came from. The script templates in step 3 are variants of `apps/wizard/etl_steps/cookiecutter/snapshot/`, which is where the current practices are supposed to live — so a hit on a line that came from the template means the **template** is stale, and fixing only the generated file leaves every future snapshot carrying it. Fix it upstream in the cookiecutter (and in this skill's copy of it) as well as in the file you just wrote.
+- **Optional deeper pass — adversarial source verification**: [`/adversarial-data-review`](../adversarial-data-review/SKILL.md) goes beyond "the links resolve" and *reads* the producer's documentation behind them, checking every `.dvc` claim (description accuracy, counts, `date_published`, license, citation) against what the docs actually say — its Phase 0 is the slice that applies at snapshot stage (the data cross-checks need a built garden dataset, e.g. via `/create-dataset`). Don't run it by default — it fetches docs and runs web searches, so it can consume many tokens; offer it when the source looks unreliable (no version labels, self-published, or the page and file seem to disagree).
 
 ### 6. Report to the user
 
 Show:
 - The paths of the files created (`.dvc`, plus the `.py` if one was needed)
 - Whether the snapshot ran successfully
+- The results of the step 5 checks — links, typos, and outdated practices — including "clean" results. Silence on a check reads as "not a problem" when it may mean "not run".
 - **The source's other data files, if any** — when the landing page / repository ships several data files (companion indices, summary panels, codebooks with data), list the ones NOT snapshotted so the user can opt in now or skip deliberately. **Persist the inventory in the `.dvc`**, not just in chat — a `# NOTE:` comment above `url_download` listing the release's other data files as of `date_accessed` (e.g. `# NOTE: the release also ships Foo_Index.csv and codebook.pdf — not snapshotted (2026-07-20)`). That comment is the baseline the next `/update-dataset` cycle diffs against when the host has no file-history API; a new companion file is invisible to every within-file check (see `/update-dataset`, "Surface new indicators").
 - Next steps: "You can now create a meadow step for `<namespace>/<version>/<short_name>`"
 
@@ -203,5 +222,5 @@ Show:
 - Never guess at citation text — if you can't find it on the page, leave a placeholder like `<TO BE FILLED>` and ask the user.
 - Licenses and citations are often not on the landing page: check the documentation too (sources & methods PDFs, notes sheets inside the workbook, repository cover sheets), and look for dedicated pages elsewhere on the same site (licensing, terms of use, how-to-cite sections). A citation request ("please cite as...") is not a license — you may summarize it as the license name only when the page explicitly frames usage terms (e.g. "when using these data (for whatever purpose), please make the following reference"). If nothing is stated anywhere, warn the user and use `© <producer> (<year>)`.
 - `citation_full` should be the producer's recommended citation **verbatim** whenever one exists (page "cite as" blocks, repository "Original citation", NBER suggested citations, "Reference:" lines inside the data files); slight modifications are fine to fix typos or spacing issues in the source (e.g. "mirror : a" → "mirror: a"), but never rephrase or reformat the citation style. If the recommended citation is for a working-paper version of a published work, keep it and append the published version (e.g. "Published as: …"). Construct a standard-format citation only when the producer recommends none.
-- `description` must be the producer's own words, copied verbatim from the landing page or the paper's abstract — a fluent paraphrase is not acceptable. Slight modifications are fine when they fix a typo, spacing, or encoding artifact in the source text. Verify against the actual page text.
-- When the snapshot is a single file/table of a broader data product, split the metadata: `title`/`description` describe the data product (verbatim), while `title_snapshot`/`description_snapshot` describe the specific file. Whenever `title_snapshot` is set, also write a `description_snapshot` — that one doesn't need to be verbatim. OWID-side context (hand-transcription notes, "retrieved from the Internet Archive", etc.) belongs in `description_snapshot`, never inside the producer's `description`.
+- `description` describes the data product factually. When the producer's own text is factual (abstracts, methodology summaries), prefer it, exactly or lightly rephrased — don't rewrite for the sake of rewriting. When the producer's page only offers promotional or first-person copy ("our nation", "vital information", how the data guides funding), do NOT paste it — write a neutral description from OWID's point of view instead: who produces it, what it measures, coverage, cadence. (Schema guideline: "If the producer provides a good description, use that, either exactly or conveniently rephrased.")
+- When the snapshot is a single file/table of a broader data product, split the metadata: `title`/`description` describe the data product, while `title_snapshot`/`description_snapshot` describe the specific file. Whenever `title_snapshot` is set, also write a `description_snapshot` — that one doesn't need to be verbatim. OWID-side context (hand-transcription notes, "retrieved from the Internet Archive", etc.) belongs in `description_snapshot`, never inside the producer's `description`.

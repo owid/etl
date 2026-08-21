@@ -21,9 +21,9 @@ tables:
         unit: deaths per 1,000 people
         description_short: |-
           <% if sex == 'total' %>
-          The death rate, calculated as the number of deaths divided by the average number of people alive during the year. UN Medium projections for 2024-2100.
+          Death rate, calculated as the number of deaths divided by the average number of people alive during the year. UN Medium projections for 2024-2100.
           <%- else %>
-          The death rate, calculated as the number of <<sex>> deaths divided by the average number of <<sex>>s alive during the year. UN Medium projections for 2024-2100.
+          Death rate, calculated as the number of <<sex>> deaths divided by the average number of <<sex>>s alive during the year. UN Medium projections for 2024-2100.
           <%- endif %>
         description_processing: |-
           This indicator is constructed by combining data from multiple sources:
@@ -42,9 +42,9 @@ tables:
         unit: deaths
         description_short: |-
           <% if sex == 'total' %>
-          The total number of deaths in a given year. UN Medium projections for 2024-2100.
+          Total number of deaths in a given year. UN Medium projections for 2024-2100.
           <%- else %>
-          The total number of << sex >> deaths in a given year. UN Medium projections for 2024-2100.
+          Total number of << sex >> deaths in a given year. UN Medium projections for 2024-2100.
           <%- endif %>
         description_processing: |-
           This indicator is constructed by combining data from multiple sources:
@@ -63,9 +63,9 @@ tables:
         unit: deaths per 1,000 people
         description_short: |-
           <% if sex == 'total' %>
-          The death rate, calculated as the number of deaths divided by the average number of people alive during the year.
+          Death rate, calculated as the number of deaths divided by the average number of people alive during the year.
           <%- else %>
-          The death rate, calculated as the number of <<sex>> deaths divided by the average number of <<sex>>s alive during the year.
+          Death rate, calculated as the number of <<sex>> deaths divided by the average number of <<sex>>s alive during the year.
           <%- endif %>
         description_processing: |-
           This indicator is constructed by combining data from multiple sources:
@@ -82,9 +82,9 @@ tables:
         unit: deaths
         description_short: |-
           <% if sex == 'total' %>
-          The total number of deaths in a given year.
+          Total number of deaths in a given year.
           <%- else %>
-          The total number of << sex >> deaths in a given year.
+          Total number of << sex >> deaths in a given year.
           <%- endif %>
         description_processing: |-
           This indicator is constructed by combining data from multiple sources:

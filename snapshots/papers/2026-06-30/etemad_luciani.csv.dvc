@@ -1,0 +1,23 @@
+meta:
+  origin:
+    producer: Etemad & Luciani
+    title: World Energy Production 1800-1985
+    description: |-
+      Historical estimates of world energy production, broken down by fuel (coal, oil, gas, nuclear, hydroelectricity, geothermal energy and peat) and reported in million tonnes of oil equivalent.
+
+      The book covers 1800 to 1985. This snapshot is the machine-readable version released by The Shift Project through The Shift Data Portal, with the agreement of B. Etemad, which covers 1900 to 1979 for 127 countries, alongside regional and other aggregates.
+    citation_full: |-
+      Etemad, B. and Luciani, J. (1991). World Energy Production 1800-1985 / Production mondiale d'énergie, 1800-1985. Edited by P. Bairoch and J.-C. Toutain. Publications d'histoire économique et sociale internationale 7. Geneva: Librairie Droz. ISBN 9782600560078.
+
+      Machine-readable version published by The Shift Project (The Shift Data Portal), with the agreement of B. Etemad.
+    date_published: "1991"
+    date_accessed: "2026-07-07"
+    url_main: https://www.droz.org/product/9782600560078
+    url_download: https://raw.githubusercontent.com/dataforgoodfr/shiftdataportal/b69de961ce4beb010661b444b6030fc14b6b9b24/server/data/WORLD_ENERGY_HISTORY_primary_energy_prod.csv
+    license:
+      name: CC BY-SA 3.0
+      url: https://www.theshiftdataportal.org/legal-notice
+outs:
+  - md5: a9c2d4e0ce0ac12c5b3d8c39464a22e0
+    size: 13721220
+    path: etemad_luciani.csv

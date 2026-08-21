@@ -27,7 +27,7 @@ tables:
           In cases where multiple domains were associated with a model, we consolidated these entries under the label "Multiple domains". We also identified domains associated with fewer than 20 notable systems and grouped these under the category 'Other'.
         display:
           zeroDay: '1949-01-01'
-          yearIsDay: true
+          timeInterval: day
 
       organization_categorization:
         title: Researcher affiliation
@@ -49,12 +49,12 @@ tables:
         display:
           numDecimalPlaces: 0
           zeroDay: '1949-01-01'
-          yearIsDay: true
+          timeInterval: day
 
       training_dataset_size__total:
         title: Training dataset size
         unit: 'unique datapoints'
-        description_short: The number of unique data points used to train the model. Each domain has a specific data point unit; for example, for vision it is images, for language it is words, and for games it is timesteps. This means systems can only be compared directly within the same domain.
+        description_short: Number of unique data points used to train the model. Each domain has a specific data point unit; for example, for vision it is images, for language it is words, and for games it is timesteps. This means systems can only be compared directly within the same domain.
         description_key:
           - Training data size measures the volume of unique examples used to train an AI model during its learning phase. It represents the total number of distinct data points the model learns from, counted only once regardless of how many times they're seen during training.
           - To understand this concept, imagine teaching someone to identify different bird species. Each unique bird photo you show them is one piece of training data. If you show 100 different photos, your training data size is 100, even if you review those same photos multiple times.
@@ -63,7 +63,7 @@ tables:
         display:
           numDecimalPlaces: 0
           zeroDay: '1949-01-01'
-          yearIsDay: true
+          timeInterval: day
 
       training_computation_petaflop:
         title: Training computation (petaFLOP)
@@ -77,7 +77,7 @@ tables:
         display:
           numDecimalPlaces: 0
           zeroDay: '1949-01-01'
-          yearIsDay: true
+          timeInterval: day
         presentation:
           grapher_config:
             title: Training computation
@@ -85,7 +85,7 @@ tables:
       publication_date:
         title: Publication date
         unit: ''
-        description_short: The date when the AI model was first published.
+        description_short: Date when the AI model was first published.
         description_from_producer: The publication, announcement, or release date of the model, in YYYY-MM-DD format. If the year and month are known but the day is unknown, the day is filled in as YYYY-MM-15. If the year is known but the month and day are unknown, the month and day are filled in as YYYY-07-01.
 
 

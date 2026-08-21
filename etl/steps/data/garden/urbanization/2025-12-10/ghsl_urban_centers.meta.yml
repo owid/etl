@@ -13,9 +13,6 @@ definitions:
     - City boundaries are model-derived and may not match official administrative limits. Data quality varies by region and tends to be lower where census data is sparse or outdated.
     - The underlying population figures have been rescaled to match UN World Population Prospects 2022 national totals, so country-level numbers are consistent with UN estimates.
 
-  desc_processing_density: &desc_processing_density |-
-    Population density was calculated by dividing the population of the urban centre by its total land area.
-
   desc_processing_cagr: &desc_processing_cagr |-
     The annualized exponential growth rate was calculated as: 100 × ln(P_t / P_prev) / (year_t - year_prev), where P_t is the population at time t and P_prev is the population at the previous observation. For five-year intervals, year_t - year_prev = 5. This assumes constant exponential growth between observations.
 
@@ -26,6 +23,31 @@ definitions:
 
   desc_capital_threshold_caveat: &desc_capital_threshold_caveat |-
     Capital cities are only included if they meet the threshold of at least 50,000 people in a contiguous urban area with a density of at least 1,500 people per km². Some capital cities (e.g., Canberra) do not appear in historical estimates because they did not meet this threshold, though they may appear in projections as they grow.
+
+  # The producer flags the plausibility of every city's population figure. We don't show the values it
+  # rates "low" in indicators built from a single named city, but we keep them in every aggregate.
+  #
+  # This wording is deliberately kept to ONE anchor. YAML cannot join two anchors into one string, so
+  # anything that has to appear alongside it goes in `description_key` instead, which is a list and can
+  # compose aliases. The density anchor below is the one unavoidable exception, because its own
+  # sentence is genuinely part of the same processing description.
+  desc_processing_low_plausibility: &desc_processing_low_plausibility |-
+    The producer rates how plausible each city's population figure is, on a four-point scale from low to very high. We do not show the historical figures it rates as "low", leaving those years blank rather than estimating them. Projected values are kept as published, because for future years a low rating usually reflects ordinary forecast uncertainty.
+
+  # Used by the projected density indicators, where nothing is filtered.
+  desc_processing_density: &desc_processing_density |-
+    Population density was calculated by dividing the population of the urban center by its total land area.
+
+  desc_processing_density_low_plausibility: &desc_processing_density_low_plausibility |-
+    Population density was calculated by dividing the population of the urban center by its total land area.
+
+    The producer rates how plausible each city's population figure is, on a four-point scale from low to very high. We do not show the historical figures it rates as "low", leaving those years blank rather than estimating them. Projected values are kept as published, because for future years a low rating usually reflects ordinary forecast uncertainty.
+
+  desc_key_low_plausibility: &desc_key_low_plausibility |-
+    Historical figures that the producer rates as low plausibility are not shown, and appear as gaps.
+
+  desc_key_largest_city_no_rerank: &desc_key_largest_city_no_rerank |-
+    The largest city is found by ranking a country's cities by population. Where the top city's figure is one we do not show due to a "low" plausibility flag, the value is left blank for that year rather than falling back to the second-largest city, which would otherwise be presented as the largest.
 
   # Degurba descriptions to use for towns and suburbs variables.
   text_degurba_overview: &text_degurba_overview |-
@@ -346,12 +368,14 @@ tables:
       urban_pop_estimates:
         title: Population of the capital city
         unit: people
-        description_short: The total number of people living in the country's capital city. {definitions.desc_cities_definition}
+        description_short: Total number of people living in the country's capital city. {definitions.desc_cities_definition}
         description_key:
           - Estimated total population living in the country's capital city, based on satellite imagery and census data.
           - *desc_key_common
           - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_low_plausibility
         display:
           numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapCapitals
@@ -384,13 +408,14 @@ tables:
         title: Population density of the capital city
         unit: people per km²
         short_unit: per km²
-        description_short: The number of people per km² of land area in the country's capital city. {definitions.desc_cities_definition}
+        description_short: Number of people per km² of land area in the country's capital city. {definitions.desc_cities_definition}
         description_key:
           - Estimated population density of the country's capital city, based on satellite imagery and census data.
           - *desc_key_common
           - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - Where a country has multiple capital cities, the density shown is for the administrative capital.
-        description_processing: *desc_processing_density
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_density_low_plausibility
         display:
           numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapCapitals
@@ -424,12 +449,14 @@ tables:
       urban_pop_top_100_estimates:
         title: Population of the top 100 most populous cities
         unit: people
-        description_short: The total number of people living in cities ranked among the top 100 most populous in 2020. {definitions.desc_cities_definition}
+        description_short: Total number of people living in cities ranked among the top 100 most populous in 2020. {definitions.desc_cities_definition}
         description_key:
           - Estimated total population living in each of the world's 100 most populous cities (as ranked in 2020), based on satellite imagery and census data.
           - *desc_key_common
           - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - The ranking of the top 100 cities is fixed based on their population in 2020. Historical values show the population of those same cities across time.
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_low_plausibility
         display:
           numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapTop100
@@ -457,13 +484,14 @@ tables:
         title: Population density of the top 100 most populous cities
         unit: people per km²
         short_unit: per km²
-        description_short: The number of people per km² of land area for cities ranked among the top 100 most populous in 2020. {definitions.desc_cities_definition}
+        description_short: Number of people per km² of land area for cities ranked among the top 100 most populous in 2020. {definitions.desc_cities_definition}
         description_key:
           - Estimated population density of each of the world's 100 most populous cities (as ranked in 2020), based on satellite imagery and census data.
           - *desc_key_common
           - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - The ranking of the top 100 cities is fixed based on their population in 2020. Historical values show the density of those same cities across time.
-        description_processing: *desc_processing_density
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_density_low_plausibility
         display:
           numDecimalPlaces: 0
           entityAnnotationsMap: *entityAnnotationsMapTop100
@@ -499,10 +527,12 @@ tables:
           - Estimated share of a country's urban population living in its capital city, based on satellite imagery and census data.
           - *desc_key_common
           - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
-          - The urban population total used as the denominator covers all cities (urban centres with at least 50,000 people) within the country.
+          - The urban population total used as the denominator covers all cities (urban centers with at least 50,000 people) within the country.
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
           - *desc_capital_threshold_caveat
           - *desc_crossborder_exclusion
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_low_plausibility
         display:
           numDecimalPlaces: 1
           entityAnnotationsMap: *entityAnnotationsMapCapitals
@@ -516,7 +546,7 @@ tables:
           - Projected share of a country's urban population living in its capital city, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
-          - The urban population total used as the denominator covers all cities (urban centres with at least 50,000 people) within the country.
+          - The urban population total used as the denominator covers all cities (urban centers with at least 50,000 people) within the country.
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
           - *desc_capital_threshold_caveat
           - *desc_crossborder_exclusion
@@ -539,6 +569,8 @@ tables:
           - The total population includes both urban and rural populations.
           - Where a country has multiple capital cities, the population shown is for the administrative capital.
           - *desc_crossborder_exclusion
+          - *desc_key_low_plausibility
+        description_processing: *desc_processing_low_plausibility
         display:
           numDecimalPlaces: 1
           entityAnnotationsMap: *entityAnnotationsMapCapitals
@@ -575,8 +607,11 @@ tables:
           - Estimated share of a country's urban population living in its largest city (determined by 2020 population), based on satellite imagery and census data.
           - *desc_key_common
           - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
-          - The largest city is determined by 2020 population and may differ from the capital city. The urban population total used as the denominator covers all cities (urban centres with at least 50,000 people) within the country.
+          - The largest city is determined by 2020 population and may differ from the capital city. The urban population total used as the denominator covers all cities (urban centers with at least 50,000 people) within the country.
           - *desc_crossborder_exclusion
+          - *desc_key_low_plausibility
+          - *desc_key_largest_city_no_rerank
+        description_processing: *desc_processing_low_plausibility
         display:
           numDecimalPlaces: 1
 
@@ -589,8 +624,11 @@ tables:
           - Projected share of a country's urban population living in its largest city (determined by 2020 population), based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
-          - The largest city is determined by 2020 population and may differ from the capital city. The urban population total used as the denominator covers all cities (urban centres with at least 50,000 people) within the country.
+          - The largest city is determined by 2020 population and may differ from the capital city. The urban population total used as the denominator covers all cities (urban centers with at least 50,000 people) within the country.
           - *desc_crossborder_exclusion
+          - *desc_key_low_plausibility
+          - *desc_key_largest_city_no_rerank
+        description_processing: *desc_processing_low_plausibility
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -608,6 +646,9 @@ tables:
           - For 1950–1975, estimates use UN national statistics. From 1975 onwards, population is mapped to 1 km² grid cells using the [Global Human Settlement Layer (GHSL)](https://human-settlement.emergency.copernicus.eu/).
           - The largest city is determined by 2020 population and may differ from the capital city. The total population includes both urban and rural populations.
           - *desc_crossborder_exclusion
+          - *desc_key_low_plausibility
+          - *desc_key_largest_city_no_rerank
+        description_processing: *desc_processing_low_plausibility
         display:
           numDecimalPlaces: 1
 
@@ -622,6 +663,9 @@ tables:
           - Projections use the [CRISP spatial model](https://www.researchgate.net/publication/384062691_Calibration_of_the_CRISP_model_A_global_assessment_of_local_built-up_area_presence) at 1 km² resolution, following the UN World Population Prospects 2024 medium scenario.
           - The largest city is determined by 2020 population and may differ from the capital city. The total population includes both urban and rural populations.
           - *desc_crossborder_exclusion
+          - *desc_key_low_plausibility
+          - *desc_key_largest_city_no_rerank
+        description_processing: *desc_processing_low_plausibility
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -1121,7 +1165,7 @@ tables:
         title: Annual growth rate of the share of population in cities with 300,000 or more people (projected)
         unit: "%"
         short_unit: "%"
-        description_short: The expected average annual growth in the share of population living in cities with at least 300,000 people, calculated over five-year periods. {definitions.desc_cities_definition}
+        description_short: Expected average annual growth in the share of population living in cities with at least 300,000 people, calculated over five-year periods. {definitions.desc_cities_definition}
         description_key:
           - Projected annual growth rate of the share of the population living in cities with 300,000 or more people, based on the GHSL modelling framework anchored to UN World Population Prospects 2022.
           - *desc_key_common

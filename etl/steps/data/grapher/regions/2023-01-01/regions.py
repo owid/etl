@@ -85,6 +85,14 @@ def run() -> None:
         mask = tb_regions["ilo_2_region"].isna() & (tb_regions["ilo_1_region"] == "Arab States (ILO)")
         tb_regions.loc[mask, "ilo_2_region"] = tb_regions.loc[mask, "ilo_1_region"]
 
+    # North Africa and Middle East, and South Asia, are IHME GBD super-regions with no finer breakdown, so
+    # each is tagged ihme_gbd_1 only. Backfill them into the region map (ihme_gbd_2) so that partition is
+    # complete; IHME itself reports both as a super-region and as a region (mirrors the ILO case above).
+    if {"ihme_gbd_1_region", "ihme_gbd_2_region"} <= set(tb_regions.columns):
+        shared = ["North Africa and Middle East (IHME GBD)", "South Asia (IHME GBD)"]
+        mask = tb_regions["ihme_gbd_2_region"].isna() & tb_regions["ihme_gbd_1_region"].isin(shared)
+        tb_regions.loc[mask, "ihme_gbd_2_region"] = tb_regions.loc[mask, "ihme_gbd_1_region"]
+
     # Australia and New Zealand is one of FAO's 8 SDG regions, but it is also a fao_2 subregion, so it is
     # tagged fao_2. Backfill it into the fao_sdg map so that partition is complete (mirrors the ILO case above).
     if {"fao_2_region", "fao_sdg_region"} <= set(tb_regions.columns):

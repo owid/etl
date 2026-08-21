@@ -1,7 +1,7 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   year_is_day: &year_is_day
-    yearIsDay: true
+    timeInterval: day
     zeroDay: "2020-01-01"
   restriction_text_short: |-
     <% if restriction_name == 'c4m_restrictions_on_gatherings' %>
@@ -179,7 +179,7 @@ tables:
       # E - economic policies
       e1_income_support:
         title: Income support
-        description_short: "Record if the government is providing direct cash payments to people who lose their jobs or cannot work. Note: only includes payments to firms if explicitly linked to payroll/salaries"
+        description_short: "Record if the government is providing direct cash payments to people who lose their jobs or cannot work. Note: only includes payments to firms if explicitly linked to payroll/salaries."
         description_key:
           - |-
             Possible categories:
@@ -201,7 +201,7 @@ tables:
 
       e3_fiscal_measures:
         title: Fiscal measures
-        description_short: "Announced economic stimulus spending. Note: only record amount additional to previously announced spending"
+        description_short: "Announced economic stimulus spending. Note: only record amount additional to previously announced spending."
         description_key:
           - |-
             Record monetary value in USD of fiscal stimuli, includes any spending or tax cuts NOT included in `International support`, `Emergency investment in healthcare` or `Investment in vaccines`.

@@ -227,7 +227,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          The price of 100 packs of cigarettes as a share of GDP per capita. This price is based on the most-sold brand of cigarettes in a given country and includes taxes. Lower values indicate that cigarettes are more affordable.
+          Price of 100 packs of cigarettes as a share of GDP per capita. This price is based on the most-sold brand of cigarettes in a given country and includes taxes. Lower values indicate that cigarettes are more affordable.
       tobacco_help_quit:
         title: Support to help quit smoking
         unit: ""

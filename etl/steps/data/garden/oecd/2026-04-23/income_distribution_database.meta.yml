@@ -225,7 +225,7 @@ tables:
         title: S80/S20 ratio (disposable income) - <<age>>
         unit: ""
         short_unit: ""
-        description_short: The share of income of the richest 20% divided by the share of the poorest 20%.
+        description_short: Share of income of the richest 20% divided by the share of the poorest 20%.
         description_key:
           - "{definitions.disposable_income}"
           - "{definitions.equivalization}"

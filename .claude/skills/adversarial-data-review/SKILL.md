@@ -34,7 +34,7 @@ Any rewrites you propose use American spelling.
 
 Scope by calling context:
 
-In the workflow skills this review is an **optional, offered** step (it can consume many tokens — see the estimates in Step 1); when invoked from one of them, scope accordingly:
+In most workflow skills this review is an **optional, offered** step (it can consume many tokens — see the estimates in Step 1), except where the table marks it mandatory; when invoked from one of them, scope accordingly:
 
 | Context | Scope |
 |---|---|
@@ -42,6 +42,7 @@ In the workflow skills this review is an **optional, offered** step (it can cons
 | `/create-dataset` Step 6b (optional) | Everything — all indicators (new datasets are small and have no charts yet) |
 | `/create-snapshot` § 5 (optional) | Phase 0 only — verify the `.dvc` claims against the fetched producer docs (no built dataset yet, so no data cross-checks) |
 | `/review-data-pr` § 10b | Only if the author ran it: verify outcomes and independently spot-check 2–3 findings and 2–3 anchor values |
+| `/edit-faust-metadata` (**mandatory**) | Claims-only, on the added/edited metadata text exclusively — verify each new/changed sentence against the producer docs behind the links in the text and the snapshot `.dvc`. NO data-value cross-checks, anomaly scans, or indicator prioritization (no data changed), and unedited metadata is out of scope — a handful of web calls, not the full review |
 | Standalone | Top-N + anomalies (or `--full`) |
 
 ## Step 1 — Prioritize indicators by chart views (heaviness control)
@@ -175,11 +176,15 @@ This is the half that catches the *source's* mistakes — the ones invisible to 
 
 **Independence rules (anti-circularity — read before searching).** An independent source is a *different producer measuring the same quantity* (WHO vs. IHME, IEA vs. Energy Institute, IMF vs. World Bank, UN WPP vs. a national statistics office), or the primary source the producer aggregates. **Never** count as independent: ourworldindata.org itself; sites that republish OWID (Wikipedia charts and infoboxes frequently cite us — check the citation); mirrors of the same producer (tradingeconomics and friends scrape WB/IMF); or the producer's own secondary pages.
 
-**Procedure per value:** WebSearch the quantity + entity + year → open 1–2 authoritative hits with WebFetch → record source, value, and link in the Part 2 table.
+**Procedure per value:** WebSearch the quantity + entity + year → open 1–2 authoritative hits with WebFetch → record source, value, and link in the Part 2 table. **Never cite a number straight from the search-results summary** — summaries blend several sources and lag living pages; every figure that reaches a finding, a PR body, or a producer question must be quoted from a page you actually opened (a stale search-summary count once shipped into a producer email as "21 of 32" when the opened page said 22, later 26).
 
 **Measurement-artifact scrutiny (per source, not per value):** search `"<producer> completeness bias"`, `"<producer> coverage <region>"`, `"<indicator> revision history"` and read what comes back. When you flag a comparability problem, name the **specific mechanism** by which the data misleads (e.g. "death registration completeness below 60% in region X inflates apparent improvement"); a bare "comparisons should be made with care" is banned.
 
-**Tolerance:** rounding, vintage/revision drift, and methodology gaps of a few percent are *not* findings. The targets are magnitude errors (×10/×100/×1000), wrong-year values, sign errors, entity mix-ups, and stale pre-revision values. Declaring a **confirmed source error requires ≥2 independent sources that agree with each other and disagree with ours** beyond methodology tolerance.
+**Internal accounting identities beat external sources.** When a producer publishes components *and* their aggregate, check that they reconcile — a contradiction inside the producer's own release is arithmetic, needs no independent source, and can't be waved away as a methodology difference. It also survives the common case where every external source is bot-blocked. This is confirmation **route (b)** in the Tolerance gate below — it settles a source error on its own, provided the guards hold: every term of the identity comes from the **same release and vintage** (never mix an old download's share with a new download's rate), the terms are defined so the identity holds **by construction** (shares that sum to 1, urban+rural weighted by the same population split), and the contradiction is far beyond rounding. (WDI 2026-07: Chad's rural electricity access published as 100.0% for 2024, when the same release's rural population share of 73.1% and urban access of 51.0% imply a national rate of 86.8% against a published 13.4% — solving the identity for the rural term gives ≈0%, matching the 0.4% of the prior year. IEA, the AfDB portal, the Tracking SDG7 PDF and the UN SDG API were all unreachable; the identity settled it alone.) Two habits that make this reusable: sweep the identity across **all** entities, not just the suspicious one, to prove the error is isolated rather than systematic; and check the producer's footnote table (`WDIfootnote.csv` and equivalents) — an unqualified bad value is a stronger finding than a flagged one. One more guard before anything reaches the corrections route: the contradiction proves *an* error exists among the identity's terms — it does not by itself say **which** term is wrong. Identify the bad term with evidence beyond the identity: the entity's own adjacent years (in the Chad case the solved rural rate ≈0% matched the prior year's 0.4%, while the other terms sat in line with their own histories), the all-entity sweep isolating a single term, or a footnote. If nothing singles out one term, the finding is still a confirmed producer error — report it and hand it to producer follow-up, but don't guess which value to overwrite in `corrections.yml`.
+
+**A "no charts use this indicator" clearance goes stale the moment charts are remapped.** Blast-radius checks are version-scoped; a chart stranded on an older version won't match a query filtered to the version you're updating, and will silently come into scope once the stranded-chart sweep runs. Re-run any such check after the indicator upgrade before relying on it. (Six corrections were approved partly on "zero published charts use these"; one was wrong by the time it mattered.)
+
+**Tolerance:** rounding, vintage/revision drift, and methodology gaps of a few percent are *not* findings. The targets are magnitude errors (×10/×100/×1000), wrong-year values, sign errors, entity mix-ups, and stale pre-revision values. Declaring a **confirmed source error** requires one of two routes: **(a) ≥2 independent sources that agree with each other and disagree with ours** beyond methodology tolerance, or **(b) an accounting-identity contradiction internal to the producer's own release** (the paragraph above) — components and aggregate from the same release and vintage, defined so the identity must hold by construction, disagreeing far beyond rounding. Route (b) stands alone; it does not additionally need external sources.
 
 **Attribution before routing.** Before routing any confirmed bad value, read the raw snapshot (`from etl.snapshot import Snapshot; Snapshot("<ns>/<version>/<file>").read()` — `read()` picks the reader from the file's format; use the format-specific `read_csv`/`read_excel`/`read_json` only when auto-detection needs overriding) to determine where it entered: present in the source file → source error (corrections route); absent → our processing introduced it (trace snapshot → meadow → garden and fix the step).
 
@@ -202,7 +207,7 @@ Lead with the concrete rewrite, not the objection. "Add a link" is a valid fix. 
 |---|---|---|
 | Metadata contradicts producer docs (unit/definition/scope; content in the wrong field per the `.dvc`-vs-`description_processing` split) | Edit `.meta.yml`/`.dvc`, re-run the step (`--grapher` for grapher channel) | 🔴/🟡 with quote + doc link |
 | Value wrong in our output but correct in the raw snapshot | Fix the step code — never corrections.yml, never mask | 🔴 |
-| Value confirmed wrong **at the source** (raw snapshot carries it; ≥2 independent sources agree against it) | Add `<short_name>.corrections.yml` next to the garden step + `tb = paths.apply_corrections(tb)` (format: `etl/data_corrections.py`); fill `reason`/`provider`/`status`, add an `expect` guard; tell the user to notify the producer and record the `reported:` date | 🔴 if confirmed and uncorrected |
+| Value confirmed wrong **at the source** (raw snapshot carries it; confirmed via route (a) — ≥2 independent sources agree against it — or route (b) — same-release accounting-identity contradiction, *with the erroneous term identified* per that paragraph's guard) | Add `<short_name>.corrections.yml` next to the garden step + `tb = paths.apply_corrections(tb)` (format: `etl/data_corrections.py`); fill `reason`/`provider`/`status`, add an `expect` guard; tell the user to notify the producer and record the `reported:` date | 🔴 if confirmed and uncorrected |
 | Suspicious but unconfirmed (independent sources disagree with each other, or methodology plausibly explains the gap) | "Verify manually" item in the report — do **not** add a correction | 🟡 |
 | Docs/data unreachable after curl → WebFetch → Wayback | "Unable to verify — worth checking" (proportionality cap) | 🟢 |
 | Producer-doc vs. shipped-file discrepancy | Preserve the data as shipped; flag for producer follow-up | 🟢 |
@@ -239,7 +244,7 @@ N. 🔴|🟡|🟢 [data-level|text-level] <one-line defect>
 - Anomalies beyond the WebSearch cap, listed as unchecked
 ```
 
-Severity rubric (aligned with `/review-data-pr`): 🔴 = confirmed factual error (metadata contradicted by the producer's own docs, or a value confirmed wrong by ≥2 independent sources with snapshot-level attribution); 🟡 = likely issue needing confirmation; 🟢 = informational or unverifiable.
+Severity rubric (aligned with `/review-data-pr`): 🔴 = confirmed factual error (metadata contradicted by the producer's own docs, or a value confirmed wrong — via ≥2 independent sources or a same-release accounting-identity contradiction — with snapshot-level attribution); 🟡 = likely issue needing confirmation; 🟢 = informational or unverifiable.
 
 In author flows, apply the 🔴 fixes immediately (they're why the skill ran before commit); leave 🟡/🟢 as report items for the user to triage.
 

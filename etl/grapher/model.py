@@ -31,7 +31,7 @@ import pandas as pd
 import structlog
 from deprecated import deprecated
 from owid import catalog
-from owid.catalog.core.meta import VARIABLE_TYPE
+from owid.catalog.core.meta import VARIABLE_TYPE, validate_description_key_list
 from owid.catalog.core.paths import CatalogPath
 from pyarrow import feather
 from sqlalchemy import (
@@ -130,62 +130,6 @@ class Base(MappedAsDataclass, DeclarativeBase):
             cls.__table__.create(engine, checkfirst=False)  # ty: ignore
         else:
             raise ValueError(f"Unrecognized value for if_exists: {if_exists}")
-
-
-class HousekeeperReview(Base):
-    __tablename__ = "housekeeper_reviews"
-
-    id: Mapped[int] = mapped_column(
-        Integer,
-        primary_key=True,
-        init=False,
-        # autoincrement=True,
-        comment="Identifier of the review",
-    )
-    suggestedAt: Mapped[datetime] = mapped_column(
-        DateTime,
-        nullable=True,
-        server_default=text("CURRENT_TIMESTAMP"),
-        comment="Date when the review was suggested",
-    )
-    objectType: Mapped[str] = mapped_column(
-        String(255),
-        nullable=False,
-        comment="Type of the object to review (e.g., 'chart', 'dataset', etc.)",
-    )
-
-    objectId: Mapped[int] = mapped_column(Integer, nullable=False)
-
-    @classmethod
-    def load_reviews(cls, session: Session, object_type: str | None = None) -> list["HousekeeperReview"]:
-        if object_type is None:
-            vars = session.scalars(select(cls)).all()
-            return list(vars)
-        else:
-            vars = session.scalars(select(cls).where(cls.objectType == object_type)).all()
-            return list(vars)
-
-    @classmethod
-    def load_reviews_object_id(cls, session: Session, object_type: str, since: datetime | None = None) -> list[int]:
-        """Load object IDs that have been reviewed.
-
-        Args:
-            session: Database session
-            object_type: Type of object (e.g., 'chart')
-            since: If provided, only return reviews after this date
-        """
-        query = select(cls.objectId).where(cls.objectType == object_type)
-        if since is not None:
-            query = query.where(cls.suggestedAt >= since)
-        vars = session.scalars(query).all()
-        return list(vars)
-
-    @classmethod
-    def add_review(cls, session: Session, object_type: str, object_id: int):
-        new_review = cls(objectType=object_type, objectId=object_id, suggestedAt=datetime.now(timezone.utc))
-        session.add(new_review)
-        session.commit()
-        # return new_review
 
 
 class Entity(Base):
@@ -1148,7 +1092,7 @@ class Variable(Base):
     attribution: Mapped[str | None] = mapped_column(TEXT, default=None)
     descriptionShort: Mapped[str | None] = mapped_column(TEXT, default=None)
     descriptionFromProducer: Mapped[str | None] = mapped_column(TEXT, default=None)
-    descriptionKey: Mapped[list[str] | None] = mapped_column(JSON, default=None)
+    descriptionKey: Mapped[str | None] = mapped_column(JSON, default=None)
     descriptionProcessing: Mapped[str | None] = mapped_column(TEXT, default=None)
     # NOTE: Use of `licenses` is discouraged, they should be captured in origins.
     licenses: Mapped[list[dict] | None] = mapped_column(JSON, default=None)
@@ -1242,7 +1186,12 @@ class Variable(Base):
         presentation_dict.pop("faqs", None)
 
         if metadata.description_key:
-            assert isinstance(metadata.description_key, list), "descriptionKey should be a list of bullet points"
+            if isinstance(metadata.description_key, list):
+                # A list should have been converted by `update_variable_metadata` long
+                # before this point. Run the sanity check anyway, so a corrupted value
+                # reports its likely cause instead of the bare assert below.
+                validate_description_key_list(metadata.description_key, context=catalog_path)
+            assert isinstance(metadata.description_key, str), "descriptionKey should be a markdown string"
 
         return cls(
             shortName=short_name,

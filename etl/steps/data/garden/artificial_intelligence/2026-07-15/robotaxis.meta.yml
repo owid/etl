@@ -25,7 +25,7 @@ tables:
         title: Monthly completed trips by robotaxis
         unit: trips
         description_processing: *desc_processing_carriers
-        description_short: The total number of completed passenger trips each month in California's paid driverless taxi services.
+        description_short: Total number of completed passenger trips each month in California's paid driverless taxi services.
         description_key:
           - This counts completed passenger trips in California's paid robotaxi services that are approved to operate.
           - Only includes trips where passengers actually rode in the vehicle and paid for the service.
@@ -36,11 +36,12 @@ tables:
           name: Completed trips
           numDecimalPlaces: 0
 
+          timeInterval: month
       totalpassengerscarried:
         title: Monthly number of people who rode in robotaxis
         unit: passengers
         description_processing: *desc_processing_carriers
-        description_short: The total number of passengers traveling each month in California's paid driverless taxi services.
+        description_short: Total number of passengers traveling each month in California's paid driverless taxi services.
         description_key:
           - This counts all passengers who rode in California's paid robotaxi services that are approved to operate.
           - Each person is counted once per trip, so if someone takes multiple trips, they're counted multiple times.
@@ -52,6 +53,7 @@ tables:
           name: Passengers carried
           numDecimalPlaces: 0
 
+          timeInterval: month
       totalpmt:
         title: Monthly distance traveled by robotaxi passengers
         unit: kilometers
@@ -70,3 +72,4 @@ tables:
         display:
           name: Passenger-kilometers
           numDecimalPlaces: 0
+          timeInterval: month
