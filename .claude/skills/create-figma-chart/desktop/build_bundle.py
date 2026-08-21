@@ -727,6 +727,12 @@ def check_frontmatter(staging: Path) -> list[str]:
 
 def build(out_dir: Path) -> Path:
     staging = out_dir / BUNDLE_NAME
+    resolved = staging.resolve()
+    if resolved.is_relative_to(SKILL_DIR) or SKILL_DIR.is_relative_to(resolved):
+        raise BuildError(
+            f"--out {out_dir} stages to {resolved}, which aliases the source skill at {SKILL_DIR} — "
+            "the build would delete or re-copy its own source. Pick a directory outside the skill."
+        )
     if staging.exists():
         shutil.rmtree(staging)
     staging.mkdir(parents=True)
