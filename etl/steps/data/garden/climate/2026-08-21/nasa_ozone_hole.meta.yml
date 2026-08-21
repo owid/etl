@@ -9,6 +9,7 @@ dataset:
   update_period_days: 365
 
   owners:
+    - Pablo Rosado
     - Lucas Rodés-Guirao
 tables:
   nasa_ozone_hole:
