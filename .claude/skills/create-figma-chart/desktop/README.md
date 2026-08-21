@@ -47,8 +47,9 @@ claude.ai's rules (`description` ≤ 200 chars; `name` = folder name).
 
 1. Download `create-figma-chart.zip`.
 2. Claude desktop app / claude.ai → **Settings → Capabilities → Skills → Upload skill** → pick the
-   zip. Code execution must be enabled; connect the **Figma connector** under Settings →
-   Connectors.
+   zip. Connect the **Figma connector** under Settings → Connectors (required). Code execution is
+   optional but strongly recommended, matching the skill's own Environment check — without it the
+   run falls back to manual routes (the user downloads and drags the SVGs).
 3. In a new chat, ask e.g. *"create a figma chart from https://ourworldindata.org/grapher/life-expectancy"*.
 
 Known limits in the desktop app: no bespoke-viz route, the 302-thumbnail Cloudflare upload stays a
