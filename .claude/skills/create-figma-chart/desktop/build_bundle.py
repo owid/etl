@@ -245,9 +245,13 @@ Then pull the chart's texts, which seed the template texts in Step 6.""",
         "> Two details the command has to get right: the footer group sits **after** `chart-area` in the document, so a slice that stops at the plot returns the title and subtitle only and quietly loses the source and note; and the SVG carries XML entities (`&#x27;` for an apostrophe), so unescape before pasting.",
         """> Two details the command has to get right: the footer group sits **after** `chart-area` in the document, so a slice that stops at the plot returns the title and subtitle only and quietly loses the source and note; and the SVG carries XML entities (`&#x27;` for an apostrophe), so unescape before pasting.
 >
-> No sandbox? The same strings are one `use_figma` read away once the SVG is imported in Step 5 —
-> grapher's header and footer arrive as TEXT nodes inside `<g id="header">` and `<g id="footer">`;
-> read their `characters` instead of grepping the file.""",
+> No sandbox? Step 4's proposal needs every one of these texts before anything touches Figma, so
+> gather them pre-approval: fetch the same `.svg` URL with the web-fetch tool and read the strings
+> straight from its markup — title and subtitle inside `<g id="header">`, sources and note inside
+> `<g id="footer">`, with the same two details as above. If no fetch tool can reach the file, ask
+> the user to open the chart in a browser and paste the four texts. After the Step 5 import the
+> same strings are one `use_figma` read away (TEXT nodes under those two groups) — use that read
+> to double-check what was pasted, not to gather.""",
     ),
     (
         "SKILL.md",
@@ -274,9 +278,11 @@ Then pull the chart's texts, which seed the template texts in Step 6.""",
         "`imWidth`/`imHeight` set the **aspect ratio only** — the server renormalizes",
         """**No sandbox network?** (the Environment check's probe failed): give the user those same URLs
 as clickable links with the filenames to save (`original.svg`, and `original_square.svg` when a
-square format is in the run — the embed URL comes later, in Step 7), and continue once they've
-dragged each onto the page created in Step 5. The sanity checks below then become `use_figma`
-reads of the imported node — its size and child count — instead of `head`/`grep` on a local file.
+square format is in the run — the embed URL comes later, in Step 7), and ask them only to
+download the files for now: the page they will drag onto doesn't exist until Step 5 creates it,
+after the Step 4 approval — request the drag there. The sanity checks below then run after that
+import, as `use_figma` reads of the imported node — its size and child count — instead of
+`head`/`grep` on a local file.
 
 `imWidth`/`imHeight` set the **aspect ratio only** — the server renormalizes""",
     ),
