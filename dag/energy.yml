@@ -176,7 +176,7 @@ steps:
       # Lazard - Levelized Cost of Energy
       - data://meadow/lazard/2025-09-17/levelized_cost_of_energy:
         - snapshot://lazard/2025-09-17/levelized_cost_of_energy.csv
-      - data://garden/economics/2025-08-29/owid_deflator
+      - data://garden/economics/2026-08-21/owid_deflator
   #
   # Rupert Way - Historical energy costs.
   #
@@ -294,5 +294,48 @@ steps:
     - data://garden/energy/2025-11-10/ireland_metered_consumption:
       - data://meadow/energy/2025-11-10/ireland_metered_consumption:
         - snapshot://energy/2025-11-10/ireland_metered_consumption.csv
+  data://meadow/irena/2026-07-28/renewable_power_generation_costs:
+    - snapshot://irena/2026-07-28/renewable_power_generation_costs.xlsx
+  data://meadow/irena/2026-07-28/renewable_energy_statistics:
+    - snapshot://irena/2026-07-28/renewable_energy_statistics.xlsx
+  data://meadow/irena/2026-07-28/renewable_energy_patents:
+    - snapshot://irena/2026-07-28/renewable_energy_patents.csv
 
+  # IRENA - Renewable power generation costs.
 
+  # NOTE: This step combines three releases of the data, because each older release contains data that the newer ones dropped (see the step's docstring).
+  data://garden/irena/2026-07-28/renewable_power_generation_costs:
+    - data://meadow/irena/2026-07-28/renewable_power_generation_costs
+    - data://meadow/irena/2025-08-22/renewable_power_generation_costs
+    - data://meadow/irena/2024-11-15/renewable_power_generation_costs
+    - data://garden/economics/2026-08-21/owid_deflator
+
+  # IRENA - Renewable energy statistics.
+  data://garden/irena/2026-07-28/renewable_energy_statistics:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/irena/2026-07-28/renewable_energy_statistics
+    - data://garden/wb/2026-07-01/income_groups
+  data://garden/irena/2026-07-28/renewable_energy_patents:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/irena/2026-07-28/renewable_energy_patents
+    - data://garden/wb/2026-07-01/income_groups
+  data://grapher/irena/2026-07-28/renewable_power_generation_costs:
+    - data://garden/irena/2026-07-28/renewable_power_generation_costs
+  data://grapher/irena/2026-07-28/renewable_capacity:
+    - data://garden/irena/2026-07-28/renewable_energy_statistics
+  data://grapher/irena/2026-07-28/renewable_capacity_by_technology:
+    - data://garden/irena/2026-07-28/renewable_energy_statistics
+  data://garden/energy/2026-07-28/photovoltaic_cost_and_capacity:
+    - data://garden/irena/2026-07-28/renewable_power_generation_costs
+    - data://garden/papers/2023-12-12/nemet_2009
+    - data://garden/irena/2026-07-28/renewable_energy_statistics
+    - data://garden/papers/2023-12-12/farmer_lafond_2016
+    - data://garden/economics/2026-08-21/owid_deflator
+
+  # IRENA - Renewable energy patents.
+  data://grapher/irena/2026-07-28/renewable_energy_patents:
+    - data://garden/irena/2026-07-28/renewable_energy_patents
+
+  # Energy - Photovoltaic cost and capacity.
+  data://grapher/energy/2026-07-28/photovoltaic_cost_and_capacity:
+    - data://garden/energy/2026-07-28/photovoltaic_cost_and_capacity

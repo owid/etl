@@ -7,19 +7,21 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Define the original base year of the deflator.
-BASE_DOLLAR_YEAR_ORIGINAL = 2017
+# Define the original base year of the deflator (the year where the WDI linked series equals 100; it can move
+# when the World Bank re-references the index in a new release).
+BASE_DOLLAR_YEAR_ORIGINAL = 2020
 # Define the base year for the deflator.
 BASE_DOLLAR_YEAR = 2024
-# We use the WDI GDP deflator: linked series, but this is usually missing the latest year.
-# We manually add the missing value here.
+# We use the WDI GDP deflator: linked series, which is sometimes missing the latest year.
+# When that happens, manually add the missing value here (in the same base as the WDI series).
 # To get this value, go to:
 # https://fred.stlouisfed.org/series/GDPDEF
 # click on "Edit Graph", and set:
 # * Modify frequency: "Annual" if possible, otherwise "Semiannual" (if there's no annual data yet for the last year),
 # * Aggregation method: "Average",
 # * Everything else by default, e.g. in "Units", leave it on "Select".
-DEFLATOR_MISSING_VALUES = {2025: 127.742}
+# NOTE: The current deflator version covers all years of the Lazard data, so no value needs to be added.
+DEFLATOR_MISSING_VALUES = {}
 
 
 def deflate_prices(tb: Table, tb_deflator: Table) -> Table:
