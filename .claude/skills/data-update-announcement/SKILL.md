@@ -7,8 +7,10 @@ description: >-
   a "data update", a data update post or announcement, an OWID announcement, or pastes a
   #data-updates-comms Slack message and asks for copy. Use it for partial requests too — just
   a title, just the CTA — and even when the ask is casual, e.g. "can you write up the SIPRI
-  update?" or "we refreshed the WASH charts, need a post." Also invoked by /update-dataset
-  step 9b. This is NOT the internal Slack form itself — filling that in is /data-updates-comms.
+  update?" or "we refreshed the WASH charts, need a post." Checks our prior coverage of the same
+  data first and declines to draft when we posted about it less than six months ago. Also invoked
+  by /update-dataset step 9b. This is NOT the internal Slack form itself — filling that in is
+  /data-updates-comms.
 metadata:
   internal: true
 ---
@@ -23,7 +25,7 @@ Short announcement posts published when a data scientist refreshes a dataset, wr
 
 **`references/examples.md` is the style guide.** Read at least three before drafting, picked to match the update in hand — solo refresh, multi-author, new chart, static viz, or politically contested. Everything about how these posts read is in there: how they open, how long they run, how they introduce a source, how they handle caveats, how they close. This file deliberately doesn't restate that, because rules abstracted from the examples get applied where they don't fit. Match the examples instead.
 
-The same goes for subject matter. OWID has usually written about the topic already — a topic page, an article, a Data Insight — and that writing is the golden example for how to frame *this subject*. Step 3 covers it.
+The same goes for subject matter. OWID has usually written about the topic already — a topic page, an article, a Data Insight — and that writing is the golden example for how to frame *this subject*. Steps 2 and 4 cover it.
 
 [`references/gdoc-format.md`](references/gdoc-format.md) holds the Google Doc mechanics: the CMS format, the styling, and the traps.
 
@@ -37,7 +39,7 @@ What follows is only what neither set of examples can tell you.
 - `workbench/<short_name>/slack-announcement.md` — the Slack draft from step 9. Its editorial framing is the closest cousin to this post; read it before drafting.
 - Author is the git user (`git config user.name`), resolved to a canonical OWID name through `etl.owners.resolve_owner`. If that returns `None`, **ask who the post is by** rather than writing the raw git name — `authors:` is a public byline, and a checkout's commit identity can be an automation account or a spelling the site doesn't know. Nothing in the Mode A context records collaborators, so name the byline you resolved when you hand over the drafts and ask whether anyone else should be credited — updates are often joint work, and `authors:` takes a comma-separated list.
 
-Skip step 1. Don't gate on the chart image (step 2) — a mid-pipeline dataset update shouldn't stall on a screenshot. Anything the post needs that isn't in the YAML, gather it (snapshot `.dvc`, garden `.meta.yml`, `url_main`) and **persist it back** so the next consumer doesn't redo the work.
+Skip step 1 — there is no Slack message to find. **Step 2 applies in full**: the prior-coverage check decides whether a post should exist at all, and Mode A is exactly where it gets skipped by accident, because the update itself feels like reason enough to publish. Don't gate on the chart *image* (step 3) — a mid-pipeline update shouldn't stall on a screenshot — but do settle *which chart* before drafting. Anything the post needs that isn't in the YAML, gather it (snapshot `.dvc`, garden `.meta.yml`, `url_main`) and **persist it back** so the next consumer doesn't redo the work.
 
 **Mode B — standalone.** Someone asks for a post out of the blue, or pastes a Slack message. Run the full workflow below.
 
@@ -53,7 +55,56 @@ Link the message when reporting back, using the `Permalink` field from the searc
 
 Slack permalink timestamps convert as `p1234567890123456` → `1234567890.123456`.
 
-**2. Get the chart.** The pick belongs to the data scientist, who has already attached candidates to the Slack message — don't suggest one. Post this block exactly as written:
+**2. Check what we've already published about this data.** Both modes, before the chart and before
+any drafting. Two things come out of it: whether a post should exist at all, and — if it should —
+what we have already said that the new one has to stay consistent with.
+
+*The lookup.* `posts_gdocs` on the [public Datasette](https://datasette-public.owid.io) holds every
+published gdoc: `slug`, `type`, `publishedAt`, and a searchable `content` JSON blob (keys `title`,
+`excerpt`, `authors`, `kicker`, `type`, `body`). Query it through `etl.http.session` so our traffic
+is tagged, and remember it is DuckDB-backed — `json_extract_string`, not MySQL's `->>`.
+
+1. Resolve the dataset's chart ids: `chart_dimensions` → `variables.catalogPath`, across **all**
+   versions of the dataset, not just the one being updated.
+2. Collect **every slug each chart has ever had** — the current one from
+   `json_extract_string(cc.full, '$.slug')`, **plus every historical slug from
+   `chart_slug_redirects WHERE chart_id IN (…)`**.
+3. Search `posts_gdocs.content LIKE` for any of those slugs — a `/latest` post's CTA embeds the
+   grapher slug — OR'd with the producer name and the dataset title.
+4. Keep `type IN ('announcement','data-insight','article','topic-page','linear-topic-page')`, order
+   by `publishedAt DESC`. The two halves of the result do different jobs: **`announcement` and
+   `data-insight` drive the cooldown below**, while `article`, `topic-page` and `linear-topic-page`
+   never block a post — they are there to tell you how we already frame the subject.
+
+*The keys are not equally precise, so read the hits accordingly.* A **slug** hit is definitive — it
+means a post linked this very chart. A **dataset title** is usually tight enough ("World Development
+Indicators" → 9 posts). A **producer name** ranges from precise to useless: "California Public
+Utilities Commission" matches 1 post, "World Bank" matches **113**, nearly all about other datasets.
+So for a big-name producer, lean on the slugs and the dataset title, and treat producer hits as
+candidates to eyeball rather than evidence of prior coverage.
+
+**The historical-slug hop (item 2) is not optional — skipping it produces a false all-clear.** Charts get
+renamed between cycles, and the prior posts keep pointing at the old slug. Searching only the
+*current* slug is the single most likely way to conclude "nothing published yet" about a dataset we
+have covered twice. (Robotaxis, Aug 2026: the live chart is
+`passenger-kilometers-traveled-self-driving-taxis` and returns **zero** hits, while all three prior
+posts link the retired `passenger-miles-traveled-self-driving-taxis`; `chart_slug_redirects` ties
+that slug to the same chart id and closes the gap. Searching the producer name alone found 1 of 3;
+the dataset title found 0. No single key suffices — OR them together.)
+
+*The cooldown — a hard stop.* If the most recent **`announcement` or `data-insight`** about this data
+is **less than six months old**, do not draft. Say so, list the prior posts with their dates, give
+the date it becomes eligible, and offer the internal Slack post instead — that one has no cooldown,
+it is internal and runs every update. A third post inside six months repeats us to the same readers,
+however genuinely new the data is. Draft anyway only if the user explicitly overrides.
+
+*When the gate passes but prior coverage exists.* Read it before drafting, and stay consistent with
+it: the wording we use for the concept, which aspect we lead with, how much we hedge. Where the prior
+piece is an **announcement or a Data Insight on the same data, treat the new post as an update of
+that text** rather than a fresh composition — same framing, moved forward. Either way still produce
+two options (step 5); consistency with our past wording is not an excuse to hand over one draft.
+
+**3. Get the chart.** The pick belongs to the data scientist, who has already attached candidates to the Slack message — don't suggest one. Post this block exactly as written:
 
 ````markdown
 ## Now let's choose a chart
@@ -64,13 +115,27 @@ Slack permalink timestamps convert as `p1234567890123456` → `1234567890.123456
 4. Paste your chosen chart here in the chat so that I can use it to draft versions of the announcement
 ````
 
-*Mode B*: **stop here** and don't draft the post until the image arrives. The gate is on the post, not on the skill — a partial ask the chart has no bearing on (the CTA `url:` and `text:`, a Doc title, a check on an existing draft) gets answered straight away; the description invites those. *Mode A*: post the block, fill the `filename:` slot from the convention, and keep going — the user can swap the chart later.
+**Separate the chart *choice* from the chart *image*, and never draft before the choice is settled.**
+Which chart the post is built around has to be fixed first, in **both** modes; only the PNG itself can
+lag. Drafting around an unsettled chart is how you end up rewriting: the view that gets picked turns
+out to be dominated by one outlier country, or carries a framing controversy, and the copy you already
+wrote is now about the wrong thing. Step 2 usually settles it for you — if we have covered this data
+before, the chart we used then is the default, and changing it needs a reason.
 
-**3. Read the golden examples. There are two kinds.**
+*Mode B*: **stop here** and don't draft until the image arrives. The gate is on the post, not on the
+skill — a partial ask the chart has no bearing on (the CTA `url:` and `text:`, a Doc title, a check on
+an existing draft) gets answered straight away; the description invites those. *Mode A*: post the
+block and keep going without the PNG, filling the `filename:` slot from the convention — but get the
+chart *decision* confirmed before you draft, and say which chart you are writing to.
+
+On picking the chart for a **large multi-topic dataset**, see "Big datasets" below — the choice
+question is different there, and it is the case most likely to send you back for a rewrite.
+
+**4. Read the golden examples. There are two kinds.**
 
 *How these posts are written* — at least three from `references/examples.md`, matched to this update.
 
-*How OWID frames this topic* — whatever we've already published on it. This is where the tone for a specific subject comes from, and it's often quite different from what a general-purpose take would produce. Two to four pages is plenty; this doesn't need to be exhaustive:
+*How OWID frames this topic* — whatever we've already published on it. This is where the tone for a specific subject comes from, and it's often quite different from what a general-purpose take would produce. Step 2 has already handed you the list for this dataset, so make it one pass, not two: read those hits first, then widen to the topic's other pages if they aren't covered. Two to four pages is plenty; this doesn't need to be exhaustive:
 
 - The **topic page introduction**. Grapher charts often name it in the footer — the child mortality chart reads `OurWorldinData.org/child-mortality`.
 - Any **major article** on the topic, e.g. [Child mortality: the greatest problem, in brief](https://ourworldindata.org/child-mortality-big-problem-in-brief).
@@ -80,13 +145,13 @@ Find them by searching rather than guessing at URLs.
 
 Read for framing and register, not for facts to lift: which aspect OWID leads with, how it words the concept, how much moral weight it carries, what it treats as the point. If the topic page frames the subject differently from the draft you had in mind, follow the topic page.
 
-**4. Draft two versions** in the chat. Make them worth choosing between: a different angle or title pattern, not the same draft reworded. The point is to hand the author a real choice rather than anchor them on your first angle.
+**5. Draft two versions** in the chat. Make them worth choosing between: a different angle or title pattern, not the same draft reworded. The point is to hand the author a real choice rather than anchor them on your first angle.
 
-**5. Get sign-off, then save.** Iterate until the author picks one (or splices the two). In Mode A, save the chosen draft to `workbench/<short_name>/data-update.md`.
+**6. Get sign-off, then save.** Iterate until the author picks one (or splices the two). In Mode A, save the chosen draft to `workbench/<short_name>/data-update.md`.
 
-**6. Create the Google Doc** — only now, with the approved content already inside it, and share the link. See [`references/gdoc-format.md`](references/gdoc-format.md) for the title convention, the styled-HTML upload, the styling source, and the verification step. The ordering matters: the Drive MCP has no edit-content or delete tool, so a Doc created too early is an orphan the user has to clean up by hand.
+**7. Create the Google Doc** — only now, with the approved content already inside it, and share the link. See [`references/gdoc-format.md`](references/gdoc-format.md) for the title convention, the styled-HTML upload, the styling source, and the verification step. The ordering matters: the Drive MCP has no edit-content or delete tool, so a Doc created too early is an orphan the user has to clean up by hand.
 
-**7. Post the admin reminder,** exactly as written, once, immediately after the Doc link:
+**8. Post the admin reminder,** exactly as written, once, immediately after the Doc link:
 
 ````markdown
 ## Now that the GDoc is created, don't forget to:
@@ -160,15 +225,61 @@ The `datasetProducts` value is the **dataset title**, not the producer. Resolve 
 
 **Current conventions.** The examples span a convention change, so don't infer from majority vote:
 - Kicker is `data-update`. Older posts show `Data update`; the file has been normalized, but don't be surprised by the old form elsewhere.
-- Stat-as-title has been de-emphasized since mid-2026. Question titles are the default.
+- Titles are usually **a question** ("How do homicide rates vary around the world?") or **"Track <X>"**
+  ("Track the recovery of the ozone layer with updated data"). Another shape is fine when the source or
+  the framing calls for it — don't force one of the two: example 6 is a statement plus an imperative,
+  example 7 is "We've refreshed…". Stat-as-title has been de-emphasized since mid-2026, so treat
+  example 3 as a shape you *can* use rather than one to reach for.
 - Chart counts state public charts only. An update touching 41 charts of which 28 are public is "28 of our charts." Approximate counts are fine: if the data scientist gave a rough figure, "about 60 of our charts" works, and there's no need to chase an exact one. In Mode A, `charts.published_count` in `update-context.yml` is already filtered to published charts.
 
 **Length.** Bodies in the examples run 117–161 words across four to seven paragraphs. Drafts should land in that range. Shorter is usually better on heavy topics.
 
 **Voice.** Solo author refreshing data → first person singular. Multiple authors, a brand-new chart, or a static viz refresh → first person plural.
 
+**The opening line.** The first body paragraph has to connect to the title and complement it — not
+restate it, not start somewhere unrelated — and it has to land in something the reader already
+recognizes. Never open on the mechanics of the update; "I recently updated…" is how these posts *end*,
+in every example. Two shapes carry all eight:
+
+- **Pose or answer the title's question.** #4 opens "Measuring democracy is challenging. It has many
+  dimensions…" against the title "How can we measure the state of democracy around the world?"; #8
+  defines homicide before using it; #7 repeats its own question.
+- **Ground the subject in human stakes before any data.** #2: the ozone layer "plays a vital role in
+  making the planet habitable for us and other species", then skin cancer. #6: "just under half of the
+  people alive today are dependent on synthetic fertilizers."
+
+Note the inversion in #5: when the *title* carries the statistic, the *opening line* is the question
+("How many people live in poverty around the world…?"). That is the same rule seen from the other side
+— between them, the title and the first line owe the reader one hook and one orientation.
+
+**How specific to get.** After the opening, get concrete — but an announcement is not a Data Insight.
+A DI is built around a single figure and interrogates it; an announcement points readers at a dataset
+and trusts the chart to carry the detail. Across the eight examples the whole body runs to roughly
+**zero to three numbers**, and several carry none at all. If you find yourself writing a third
+statistic, you are probably writing the wrong format.
+
+**Caveat-heavy data: fewer numbers, not more hedging.** The more caveated the data, the less the copy
+should lean on specific values — a number surrounded by qualifications invites the reader to trust it
+anyway. The examples are consistent about this: #4 (democracy, contested measurement) and #8
+(homicides, patchy country coverage) cite **no** data figures at all, and #8 spends its closing
+paragraph on the coverage limitation instead of a finding. #5 (PIP), the cleanest and best-understood
+source of the eight, is the one that carries three. Where the caveat changes how the chart should be
+read, state the caveat and skip the number. "Editorial sensitivity" below covers the *contested* case;
+this is the same instinct applied to data that is merely messy.
+
+**Big datasets.** When the update spans a large multi-topic dataset, the chart has to convey the
+dataset's **expanse**, not one slice of it — otherwise the post advertises a single indicator while
+claiming to be about hundreds. A breakdown-by-category view is the usual way: example 1 shows
+government spending split by purpose (health, education, defense) rather than one country's total, the
+same way causes of death stands in for a burden-of-disease release.
+
+Where no single chart can do that, don't force it. Name the broad areas the dataset covers — the
+opening line is the natural place, as a list the reader can see themselves in — and point at one
+representative chart as an example rather than pretending it is the whole. Keep the chart count as the
+scale signal (public charts only, as above); it does more work here than any single figure.
+
 **Things the examples can't show you, because absences aren't visible:**
-- Don't open with a statistic the chart doesn't support. A number in the first line reads as the headline finding and sends the reader into the image to find it.
+- Don't open with a statistic the chart doesn't support. A number in the first line reads as the headline finding and sends the reader into the image to find it. (This is narrower than "no numbers up top" — see "The opening line" above: a figure the chart *does* carry can open a post, as in #3, but the two shapes that work in every example don't need one.)
 - Don't omit the headline finding because the chart already shows it. Stating it is the copy's job.
 - Don't invent URLs. Link only what was provided or confirmed.
 - Don't paste drafts into the Doc before the author has picked one.
