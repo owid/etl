@@ -220,7 +220,7 @@ const checkFrame = async (frameId) => {
     if (n.type === "VECTOR" && insidePlot) vectors.push({ node: n, seriesOf });
     if ("children" in n && n.children.length) { n.children.forEach((c) => collect(c, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap)); return; }
     const b = rel(n);
-    if (b && b.w > 0 && b.h > 0) leaves.push({ name: n.name, type: n.type, box: b, insidePlot });
+    if (b && b.w > 0 && b.h > 0) leaves.push({ name: n.name, type: n.type, box: b, insidePlot, fromMap: !!insideMap });
   };
   for (const child of frame.children) {
     if (child === logo) continue;
@@ -437,7 +437,12 @@ const checkFrame = async (frameId) => {
     const plotBox = (() => { const bs = plotRoots.map(rel).filter(Boolean);
       return bs.length ? { w: Math.max(...bs.map((b) => b.rr)) - Math.min(...bs.map((b) => b.l)),
                            h: Math.max(...bs.map((b) => b.bb)) - Math.min(...bs.map((b) => b.t)) } : null; })();
-    const isStraddler = (x) => plotBox && x.box.w > 0.3 * plotBox.w && x.box.h < 0.05 * plotBox.h;
+    // Gated on MAP GEOMETRY, not on the shape alone. Wide-and-thin describes plenty of legitimate marks
+    // on other chart types — a nearly flat line, a thin horizontal bar — and exempting those hands back
+    // an `ok` on a real overflow. The documented exception is specific to multipart map shapes, so the
+    // node must actually sit under grapher's own map container (`fromMap`), which is stricter than
+    // "this chart is a map": a legend swatch on a map is not a straddler either.
+    const isStraddler = (x) => x.fromMap && plotBox && x.box.w > 0.3 * plotBox.w && x.box.h < 0.05 * plotBox.h;
     const straddlersSeen = leaves.filter((x) => x.insidePlot && isStraddler(x));
     if (marginL === null || marginR === null) skip("margins", "content box not resolved");
     else {
@@ -547,7 +552,11 @@ const checkFrame = async (frameId) => {
 
     // Furniture and forbidden marks, by bbox. A gridline, axis or tick is axis-aligned, so its bbox IS
     // its geometry; dots and value labels are small and compact, so a bbox is right for them too.
-    const furnitureBoxes = stroked.filter((s) => s.insidePlot && !/^(line|outline)__/.test(s.name))
+    // The predicate is the WEIGHT row's, not "stroked and not named like a series": the loose version
+    // counted every stroked plot node as furniture, so on a map each country entered `crossings` by its
+    // bounding box and the knockout row then demanded a 3px stroke on an annotation sitting over open
+    // ocean — while the filled-mark path above deliberately excludes that same geometry.
+    const furnitureBoxes = stroked.filter((s) => s.insidePlot && s.inFurniture && !s.seriesKind)
       .map((s) => ({ name: s.name, box: rel(s.node) })).filter((x) => x.box);
     // A MAP SHAPE is inventoried by nobody here: per-chart-type/maps.md, a country's bounding box is not
     // its painted geometry — an antimeridian straddler's box spans almost the whole map — so an
@@ -558,7 +567,10 @@ const checkFrame = async (frameId) => {
     const forbiddenBoxes = markBoxes.filter((x) => x.insidePlot && !x.fromMap);
 
     if (!annotations.length) { skip("annotation-overlap", "no annotation__* nodes on this frame"); }
-    else if (!polylines.length && !furnitureBoxes.length) { skip("annotation-overlap", "nothing to test against: no readable polylines and no furniture"); }
+    else if (!polylines.length && !furnitureBoxes.length) {
+      skip("annotation-overlap", "nothing to test against: no readable polylines and no furniture" +
+           (mapMarks.length ? `. The ${mapMarks.length} map shape(s) here are deliberately not judged by bbox (maps.md) — on a map with no furniture this row covers NOTHING, and whether an annotation sits on land is the rendered-pixel probe's call` : ""));
+    }
     else {
       crossings = {};
       const illegal = [];

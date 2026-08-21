@@ -1,0 +1,274 @@
+// Stubbed-figma harness for diff_against_template.js — the same job test_verify_page.js does for
+// verify_page.js, and for the same reason.
+//
+// diff_against_template.js executes ONLY inside Figma (pasted as a `use_figma` call), so every review
+// of it is reading-only, and its whole purpose is to report drift that a screenshot survives. A script
+// like that fails in one specific direction: it returns "matches the template" because it never looked.
+// Three defects of exactly that shape were found by writing this file — a header that lost its subtitle
+// reported as matching, four fingerprinted footer properties never compared, and a TypeError that
+// killed the whole diff when one row changed node type.
+//
+// Run after ANY edit to diff_against_template.js:
+//     node .claude/skills/create-figma-chart/scripts/test_diff_against_template.js
+//
+// It is a MOCK: it validates control flow against the Plugin API's documented shapes, never Figma's
+// actual behaviour. Keep the mock honest — a TEXT row needs `getStyledTextSegments`, and the auto-layout
+// bands need the same properties the real fingerprint reads.
+
+const fs = require("fs");
+const path = require("path");
+
+const SRC = fs.readFileSync(path.join(__dirname, "diff_against_template.js"), "utf8");
+
+let AUTO = 0;
+function node(props) {
+  const n = Object.assign({ visible: true, x: 0, y: 0, width: 0, height: 0, type: "FRAME", name: "" }, props);
+  if (!n.id) n.id = `auto:${++AUTO}`;
+  if (n.children) for (const c of n.children) c.parent = n;
+  return n;
+}
+const solid = (hex) => [{ type: "SOLID", visible: true, color: {
+  r: parseInt(hex.slice(1, 3), 16) / 255, g: parseInt(hex.slice(3, 5), 16) / 255, b: parseInt(hex.slice(5, 7), 16) / 255 } }];
+
+// A TEXT row. Segments are given as [value, start, end] because that is the shape the real API returns
+// and the offsets are load-bearing: `getStyledTextSegments` merges adjacent equal values, so a fully
+// bound row with a bold prefix is ONE style run over 0-40 and TWO font runs (Bold 0-12, Regular 12-40).
+// Only the character ranges say whether an unbound style run sits over bolded text.
+//
+// `textStyleId` is `figma.mixed` — a SYMBOL — on any node with a range override, which is why the
+// node-level value can never be the thing that is compared.
+const SEG = { fontPlain: [["Regular", 0, 40]] };
+const txt = (name, o) => {
+  const opt = o || {};
+  const styles = opt.styleSegs || [[opt.styleId === undefined ? "S:abc" : opt.styleId, 0, 40]];
+  const fonts = opt.fontSegs || SEG.fontPlain;
+  return node({
+    type: "TEXT", name, fontSize: opt.size || 16, fills: solid(opt.fill || "#000000"),
+    textStyleId: styles.length > 1 ? Symbol("figma.mixed") : styles[0][0],
+    textAutoResize: opt.autoResize || "HEIGHT",
+    layoutSizingHorizontal: opt.lsH || "FILL", layoutSizingVertical: opt.lsV || "HUG",
+    width: opt.w || 508, height: 19,
+    getStyledTextSegments: (fields) =>
+      (fields.indexOf("fontName") !== -1
+        ? fonts.map(([v, start, end]) => ({ fontName: { style: v }, start, end }))
+        : styles.map(([v, start, end]) => ({ textStyleId: v, start, end }))),
+  });
+};
+// The template's source row: bold "Data source:" prefix, the WHOLE row bound to one style. One style
+// run, two font runs — the state TEXTS.md says is reachable in the UI only.
+const BOLD_PREFIX = { fontSegs: [["Bold", 0, 12], ["Regular", 12, 40]] };
+const tplSource = () => txt("source", Object.assign({ size: 13 }, BOLD_PREFIX));
+
+// A template or a clone: header band, footer band, logo sibling. Matches the structural resolution the
+// script uses — the logo is a SIBLING, and header/footer are the topmost and bottommost auto-layouts.
+function buildFrame(o) {
+  const opt = o || {};
+  const footer = node({
+    name: "footer", layoutMode: opt.footerMode || "VERTICAL",
+    primaryAxisSizingMode: opt.footerSizing || "AUTO", itemSpacing: opt.footerSpacing === undefined ? 4 : opt.footerSpacing,
+    primaryAxisAlignItems: opt.footerAlign || "MIN", counterAxisAlignItems: opt.footerCounterAlign || "MIN",
+    constraints: { vertical: opt.footerConstraint || "MIN" },
+    x: 16, y: opt.footerY === undefined ? 488 : opt.footerY, width: 508, height: 36,
+    children: opt.footerRows || [txt("source", { size: 13 })],
+  });
+  return node({
+    id: opt.id, name: opt.name || "frame", width: 540, height: 540, fills: solid(opt.fill || "#ffffff"),
+    children: [
+      node({ name: "header", layoutMode: "VERTICAL", primaryAxisSizingMode: opt.headerSizing || "AUTO",
+             itemSpacing: opt.headerSpacing === undefined ? 6 : opt.headerSpacing,
+             primaryAxisAlignItems: "MIN", counterAxisAlignItems: "MIN",
+             x: 16, y: 16, width: 508, height: 92,
+             children: opt.headerRows || [txt("title", { size: 25 }), txt("subtitle", { size: 16 })] }),
+      footer,
+      node({ name: "logo", x: 460, y: 16, width: 64, height: 35 }),
+    ],
+  });
+}
+
+async function run(tpl, clone, expected, opts) {
+  const o = opts || {};
+  tpl.id = "T:1";
+  clone.id = "C:1";
+  const tplPage = node({ id: "P:tpl", type: "PAGE", name: "Templates", children: [tpl] });
+  const clonePage = o.samePage ? tplPage : node({ id: "P:clone", type: "PAGE", name: "20260821 Chart", children: [clone] });
+  tpl.parent = tplPage;
+  clone.parent = clonePage;
+  if (o.samePage) tplPage.children.push(clone);
+  const byId = { "T:1": tpl, "C:1": clone };
+  let switches = 0;
+  const figma = {
+    currentPage: o.startOn === "clone" ? clonePage : tplPage,
+    getNodeByIdAsync: async (id) => byId[id] || null,
+    setCurrentPageAsync: async (p) => {
+      switches++;
+      if (switches > 1) throw new Error("Cannot switch pages more than once per call");
+      figma.currentPage = p;
+    },
+  };
+  const body = SRC.replace(/^const CONFIG = \{[\s\S]*?^\};/m,
+    `const CONFIG = { templateId: "T:1", frameIds: ["C:1"], expected: ${JSON.stringify(expected || [])} };`);
+  const fn = new Function("figma", `return (async () => { ${body} })();`);
+  const out = await fn(figma);
+  return { out, switches };
+}
+
+const results = [];
+const check = (name, cond, detail) => results.push({ name, ok: !!cond, detail: cond ? "" : String(detail).slice(0, 240) });
+const drift = (res) => res.out.frames[0].drift;
+const has = (res, re) => drift(res).some((d) => re.test(d));
+
+(async () => {
+  // 1 — an untouched clone is clean, and text CONTENT is excluded by design.
+  {
+    const res = await run(buildFrame({ name: "tpl" }), buildFrame({ name: "clone" }));
+    check("1 an untouched clone matches", res.out.frames[0].verdict === "matches the template", JSON.stringify(drift(res)));
+    check("1 verdict says all frames match", /all 1 resolved frame\(s\) match/.test(res.out.verdict), res.out.verdict);
+    check("1 exactly one page switch", res.switches === 1, `${res.switches} switches`);
+  }
+
+  // 2 — ONE page switch, and only one. The connector throws on the second (GOTCHAS.md), so the template
+  // must already be current: this is the defect that made the script unrunnable from the clone page.
+  {
+    let threw = null;
+    try { await run(buildFrame({ name: "tpl" }), buildFrame({ name: "clone" }), [], { startOn: "clone" }); }
+    catch (e) { threw = e.message; }
+    check("2 started on the wrong page, it refuses up front", threw && /open the template's page/.test(threw), threw);
+    check("2 and names the page to open", threw && /Templates/.test(threw), threw);
+    check("2 not the connector's opaque page error", threw && !/more than once/.test(threw), threw);
+    // clones on the template's own page need no switch at all
+    const same = await run(buildFrame({ name: "tpl" }), buildFrame({ name: "clone" }), [], { samePage: true });
+    check("2 clones on the template's page cost zero switches", same.switches === 0, `${same.switches} switches`);
+  }
+
+  // 3 — a header that LOST a row. The row loop only walks the overlap, so without a row-count compare
+  // a clone shipped with no subtitle reported "matches the template".
+  {
+    const res = await run(buildFrame({ name: "tpl" }),
+                          buildFrame({ name: "clone", headerRows: [txt("title", { size: 25 })] }));
+    check("3 a header that lost a row is DRIFT", drift(res).length > 0, JSON.stringify(drift(res)));
+    check("3 and it is named as a row count", has(res, /header rowCount 1 != 2/), JSON.stringify(drift(res)));
+  }
+
+  // 4 — every auto-layout property fingerprinted must be compared. Four of them were collected and
+  // never diffed, which reads as coverage while passing everything.
+  {
+    const res = await run(buildFrame({ name: "tpl" }), buildFrame({ name: "clone",
+      footerSizing: "FIXED", footerSpacing: 99, footerAlign: "MAX", footerCounterAlign: "MAX", footerConstraint: "SCALE" }));
+    check("4 footer sizing compared", has(res, /footer sizing FIXED != AUTO/), JSON.stringify(drift(res)));
+    check("4 footer itemSpacing compared", has(res, /footer itemSpacing 99 != 4/), JSON.stringify(drift(res)));
+    check("4 footer alignment compared", has(res, /primaryAxisAlignItems MAX != MIN/), JSON.stringify(drift(res)));
+    check("4 footer counter-alignment compared", has(res, /counterAxisAlignItems MAX != MIN/), JSON.stringify(drift(res)));
+    check("4 footer vertical constraint compared", has(res, /vertical constraint SCALE != MIN/), JSON.stringify(drift(res)));
+    const hdr = await run(buildFrame({ name: "tpl" }), buildFrame({ name: "clone", headerSizing: "FIXED", headerSpacing: 20 }));
+    check("4 header sizing compared, with the reason", has(hdr, /header sizing FIXED != AUTO.*tracking the copy/), JSON.stringify(drift(hdr)));
+    check("4 header itemSpacing compared", has(hdr, /header itemSpacing 20 != 6/), JSON.stringify(drift(hdr)));
+  }
+
+  // 5 — a row that changed NODE TYPE. Reading the text fields across that threw a TypeError on
+  // `segFonts.join`, so one swapped row killed the entire diff instead of being reported.
+  {
+    const res = await run(buildFrame({ name: "tpl" }), buildFrame({ name: "clone",
+      headerRows: [txt("title", { size: 25 }), node({ type: "RECTANGLE", name: "blob", width: 508, height: 19 })] }));
+    check("5 a swapped row type does not throw", Array.isArray(drift(res)), "the diff died");
+    check("5 and is reported as a type change", has(res, /header\[1\] node type RECTANGLE != TEXT/), JSON.stringify(drift(res)));
+  }
+
+  // 6 — the drift that a run is MEANT to produce: sizes, fills, weights, sizing modes.
+  {
+    const res = await run(buildFrame({ name: "tpl" }),
+                          buildFrame({ name: "clone", footerRows: [txt("source", { size: 11, lsV: "FIXED" })] }));
+    check("6 a shrunken source line is DRIFT", has(res, /footer\[0\] size 11 != 13/), JSON.stringify(drift(res)));
+    check("6 a FIXED row where the template HUGs is DRIFT", has(res, /layoutSizingVertical FIXED != HUG/), JSON.stringify(drift(res)));
+  }
+
+  // 7 — a DETACHED text style is the defect (assigning `characters` drops the binding); it must not be
+  // waved through as the documented half-bound prefix.
+  {
+    const res = await run(buildFrame({ name: "tpl" }),
+                          buildFrame({ name: "clone", footerRows: [txt("source", { size: 13, styleId: "" })] }));
+    check("7 an unbound style is DRIFT", has(res, /footer\[0\] style \(unbound\)/), JSON.stringify(drift(res)));
+    check("7 and is not filed as half-bound", res.out.frames[0].halfBound.length === 0, JSON.stringify(res.out.frames[0].halfBound));
+  }
+
+  // 8 — the bolded `Data source:` prefix CANNOT be both bold and style-bound through the plugin API.
+  // That is a documented limitation (TEXTS.md), reported separately from real drift — and it is decided
+  // by CHARACTER RANGE: the template is one bound style run, the clone is two runs, so segment counts
+  // alone cannot tell this apart from a regular range losing its binding (test 11).
+  {
+    const res = await run(
+      buildFrame({ name: "tpl", footerRows: [tplSource()] }),
+      buildFrame({ name: "clone", footerRows: [txt("source", Object.assign({ size: 13,
+        styleSegs: [["(unbound)", 0, 12], ["S:abc", 12, 40]] }, BOLD_PREFIX))] }));
+    check("8 a half-bound prefix is not counted as drift", drift(res).length === 0, JSON.stringify(drift(res)));
+    check("8 and is reported in halfBound", res.out.frames[0].halfBound.length === 1, JSON.stringify(res.out.frames[0].halfBound));
+    check("8 with the API limitation named", /half-bound/.test(res.out.frames[0].halfBound[0] || ""), JSON.stringify(res.out.frames[0].halfBound));
+    check("8 and the character ranges are shown", /@0-12/.test(res.out.frames[0].halfBound[0] || ""), JSON.stringify(res.out.frames[0].halfBound));
+    // a real weight change is still drift
+    const w = await run(buildFrame({ name: "tpl", footerRows: [tplSource()] }),
+      buildFrame({ name: "clone", footerRows: [txt("source", { size: 13, fontSegs: [["Regular", 0, 40]] })] }));
+    check("8 a lost bold prefix is still DRIFT", has(w, /weights Regular != Bold\+Regular/), JSON.stringify(drift(w)));
+  }
+
+  // 9 — CONFIG.expected reclassifies DECIDED drift as `accepted`, and nothing else.
+  {
+    const res = await run(buildFrame({ name: "tpl" }), buildFrame({ name: "clone", footerMode: "HORIZONTAL" }),
+                          ["footer mode HORIZONTAL"]);
+    check("9 declared drift is accepted, not drift", drift(res).length === 0, JSON.stringify(drift(res)));
+    check("9 and is listed as accepted", res.out.frames[0].accepted.length === 1, JSON.stringify(res.out.frames[0].accepted));
+    const un = await run(buildFrame({ name: "tpl" }), buildFrame({ name: "clone", footerMode: "HORIZONTAL" }));
+    check("9 undeclared, the same change IS drift", has(un, /footer mode HORIZONTAL/), JSON.stringify(drift(un)));
+  }
+
+  // 10 — a footer that grew a row legitimately moves, but its BOTTOM edge must hold.
+  {
+    const res = await run(buildFrame({ name: "tpl" }), buildFrame({ name: "clone", footerY: 440 }));
+    check("10 a stranded footer is DRIFT", has(res, /footer bottom/), JSON.stringify(drift(res)));
+    check("10 and says to re-pin it", has(res, /re-pin it/), JSON.stringify(drift(res)));
+  }
+
+  // 11 — a REGULAR range that lost its binding, which is the real defect (assigning `characters`
+  // detaches the style). It is byte-for-byte the same SHAPE as test 8's documented exception — one
+  // unbound run beside one bound run — and differs only in WHICH characters the unbound run covers. So
+  // this is the assertion that a range-blind rule cannot satisfy at the same time as test 8.
+  {
+    const res = await run(
+      buildFrame({ name: "tpl", footerRows: [tplSource()] }),
+      buildFrame({ name: "clone", footerRows: [txt("source", Object.assign({ size: 13,
+        styleSegs: [["S:abc", 0, 12], ["(unbound)", 12, 40]] }, BOLD_PREFIX))] }));
+    check("11 an unbound REGULAR range is DRIFT, not the API limitation", drift(res).length > 0, JSON.stringify(drift(res)));
+    check("11 and is NOT filed under halfBound", res.out.frames[0].halfBound.length === 0, JSON.stringify(res.out.frames[0].halfBound));
+    check("11 and the segments are shown with ranges", has(res, /segments \[.*@12-40/), JSON.stringify(drift(res)));
+    // mixed vs mixed with a different style id is drift too — both node-level values are the same SYMBOL
+    const other = await run(
+      buildFrame({ name: "tpl", footerRows: [txt("source", Object.assign({ size: 13,
+        styleSegs: [["(unbound)", 0, 12], ["S:abc", 12, 40]] }, BOLD_PREFIX))] }),
+      buildFrame({ name: "clone", footerRows: [txt("source", Object.assign({ size: 13,
+        styleSegs: [["(unbound)", 0, 12], ["S:zzz", 12, 40]] }, BOLD_PREFIX))] }));
+    check("11 two mixed nodes with different bindings are compared at all", drift(other).length > 0, JSON.stringify(drift(other)));
+  }
+
+  // 12 — a clone whose id does not resolve is an UNCHECKED deliverable. Counting only drift let the
+  // aggregate verdict say everything matched while a frame had never been looked at.
+  {
+    const tpl = buildFrame({ name: "tpl" });
+    const clone = buildFrame({ name: "clone" });
+    const tplPage = node({ id: "P:tpl", type: "PAGE", name: "Templates", children: [tpl] });
+    const clonePage = node({ id: "P:clone", type: "PAGE", name: "20260821 Chart", children: [clone] });
+    tpl.id = "T:1"; clone.id = "C:1"; tpl.parent = tplPage; clone.parent = clonePage;
+    const byId = { "T:1": tpl, "C:1": clone };
+    const figma = { currentPage: tplPage, getNodeByIdAsync: async (id) => byId[id] || null,
+                    setCurrentPageAsync: async (p) => { figma.currentPage = p; } };
+    const body = SRC.replace(/^const CONFIG = \{[\s\S]*?^\};/m,
+      'const CONFIG = { templateId: "T:1", frameIds: ["C:1", "C:stale"], expected: [] };');
+    const out = await new Function("figma", `return (async () => { ${body} })();`)(figma);
+    check("12 a stale id is not reported as matching", !/^all 2 frame\(s\) match/.test(out.verdict), out.verdict);
+    check("12 the verdict says NOT CHECKED", /NOT CHECKED/.test(out.verdict), out.verdict);
+    check("12 and names the unresolved id", /C:stale/.test(out.verdict), out.verdict);
+    check("12 and counts it", out.unchecked === 1, String(out.unchecked));
+  }
+
+  const bad = results.filter((x) => !x.ok);
+  for (const x of results) console.log(`${x.ok ? "PASS" : "FAIL"}  ${x.name}${x.ok ? "" : "  >> " + x.detail}`);
+  console.log(bad.length ? `\n${bad.length} FAILURES` : `\nALL PASS (${results.length} checks)`);
+  process.exit(bad.length ? 1 : 0);
+})();

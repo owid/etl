@@ -15,16 +15,16 @@
 //     templateId — the template the clones came from (reference/NODE-MAP.md has the ids).
 //     frameIds   — the finished clones. All must be on ONE page: a script may switch pages only once
 //                  (GOTCHAS.md), and this one spends its single switch on the CLONES' page.
+//     expected   — drift you have decided on, as an array of substrings. A footer converted to
+//                  VERTICAL to give a long source its own row is a deliberate change, not a defect, so
+//                  it belongs here and is reported as `accepted` instead of `DRIFT`. Anything not
+//                  listed is drift you did not choose.
 //
 // RUN IT WITH THE TEMPLATE'S PAGE OPEN. That is a precondition, not a detail. Both halves need their
 // page current — an unswitched page's contents load lazily and come back short without erroring
 // (GOTCHAS.md) — and the connector allows exactly one `setCurrentPageAsync` per call. Starting on the
 // template's page costs zero switches to fingerprint it and leaves the one switch for the clones;
 // starting anywhere else needs two, and the second throws, so the script says so up front instead.
-//     expected   — drift you have decided on, as an array of substrings. A footer converted to
-//                  VERTICAL to give a long source its own row is a deliberate change, not a defect, so
-//                  it belongs here and is reported as `accepted` instead of `DRIFT`. Anything not
-//                  listed is drift you did not choose.
 //
 // Two readings this deliberately gets right, because both were wrong in an earlier hand-rolled pass:
 //   - `textStyleId` is `figma.mixed` (a SYMBOL) on any node with a per-range style override. A
@@ -61,11 +61,19 @@ const parts = (frame) => {
   return { logo, header: autos[0] || null, footer: autos.length > 1 ? autos[autos.length - 1] : null };
 };
 
+// Segments are captured WITH their character offsets. `getStyledTextSegments` merges adjacent equal
+// values, so the style runs and the font runs of one node do not line up one-to-one — a fully bound row
+// with a bold prefix is ONE style run and TWO font runs. Without `start`/`end` there is no way to tell
+// "the bolded prefix lost its binding" (the documented API limitation) from "a regular range lost its
+// binding" (a real defect): both read as one unbound run next to one bound run.
+const segs = (n, field, read) => n.getStyledTextSegments([field]).map((s) => ({ v: read(s), start: s.start, end: s.end }));
+const vals = (list) => list.map((s) => s.v);
+
 const textRow = (n) => ({
   size: n.fontSize,
   style: sid(n.textStyleId),
-  segStyles: n.getStyledTextSegments(["textStyleId"]).map((s) => sid(s.textStyleId)),
-  segFonts: n.getStyledTextSegments(["fontName"]).map((s) => s.fontName.style),
+  segStyles: segs(n, "textStyleId", (s) => sid(s.textStyleId)),
+  segFonts: segs(n, "fontName", (s) => s.fontName.style),
   fill: firstFill(n),
   autoResize: n.textAutoResize,
   lsH: n.layoutSizingHorizontal,
@@ -80,7 +88,9 @@ const fingerprint = (frame) => {
     fill: firstFill(frame),
     header: header
       ? { mode: header.layoutMode, sizing: header.primaryAxisSizingMode, spacing: header.itemSpacing,
-          x: r(header.x), w: r(header.width), rows: header.children.map((c) => (c.type === "TEXT" ? textRow(c) : { nonText: c.type })) }
+          align: header.primaryAxisAlignItems, counterAlign: header.counterAxisAlignItems,
+          x: r(header.x), w: r(header.width), rowCount: header.children.length,
+          rows: header.children.map((c) => (c.type === "TEXT" ? textRow(c) : { nonText: c.type })) }
       : null,
     footer: footer
       ? { mode: footer.layoutMode, sizing: footer.primaryAxisSizingMode, spacing: footer.itemSpacing,
@@ -115,18 +125,46 @@ if (clonePage && figma.currentPage !== clonePage) await figma.setCurrentPageAsyn
 
 const cmpText = (label, got, want, push) => {
   if (!got || !want) return;
+  // A row can change TYPE — a designer replaces the subtitle with a group, or a text row becomes an
+  // image. That is drift worth naming, and reading the text fields across it threw
+  // `Cannot read properties of undefined (reading 'join')` on `segFonts`, killing the whole diff on
+  // one swapped row rather than reporting it.
+  if (got.nonText || want.nonText) {
+    if (got.nonText !== want.nonText) push(`${label} node type ${got.nonText || "TEXT"} != ${want.nonText || "TEXT"}`);
+    return;
+  }
   if (got.size !== want.size) push(`${label} size ${got.size} != ${want.size}`);
   if (got.fill !== want.fill) push(`${label} fill ${got.fill} != ${want.fill}`);
   if (got.autoResize !== want.autoResize) push(`${label} textAutoResize ${got.autoResize} != ${want.autoResize}`);
   if (got.lsH !== want.lsH) push(`${label} layoutSizingHorizontal ${got.lsH} != ${want.lsH}`);
   if (got.lsV !== want.lsV) push(`${label} layoutSizingVertical ${got.lsV} != ${want.lsV}`);
-  if (got.segFonts.join("+") !== want.segFonts.join("+")) push(`${label} weights ${got.segFonts.join("+")} != ${want.segFonts.join("+")}`);
+  if (vals(got.segFonts).join("+") !== vals(want.segFonts).join("+")) push(`${label} weights ${vals(got.segFonts).join("+")} != ${vals(want.segFonts).join("+")}`);
   // width is only law where the template FIXES it; a FILL row's width follows its parent
   if (want.lsH === "FIXED" && got.w !== want.w) push(`${label} width ${got.w} != ${want.w}`);
-  if (got.style !== want.style) {
-    const halfBound = got.style === "Symbol(figma.mixed)" && want.segStyles.length && got.segStyles.some((s) => s !== "(unbound)");
-    push(`${label} style ${got.style.startsWith("S:") ? got.style.slice(0, 16) + "…" : got.style} != template` +
-         (halfBound ? "  [half-bound: a range override cleared the binding — expected for a bolded prefix, see TEXTS.md]" : ""),
+  // Style bindings are compared PER SEGMENT, never by the node-level value alone. `textStyleId` is
+  // `figma.mixed` on any node with a range override, so two nodes with different per-range bindings both
+  // stringify to "Symbol(figma.mixed)" and a node-level compare finds them equal — which let a clone
+  // whose bold prefix had come unbound while the rest stayed bound report as matching the template. That
+  // is the exact half-bound state this script exists to expose.
+  const gseg = vals(got.segStyles).join(" | "), wseg = vals(want.segStyles).join(" | ");
+  if (got.style !== want.style || gseg !== wseg) {
+    // The ONE acceptable difference: a bolded range cannot be both bold and style-bound through the
+    // plugin API (TEXTS.md). Decided by CHARACTER RANGE, not by segment index — an unbound style run
+    // counts as the documented limitation only when the characters it covers are entirely non-Regular.
+    // A REGULAR range that lost its binding is the real defect (assigning `characters` detaches the
+    // style), and by index alone the two are indistinguishable.
+    const boldAt = (start, end) => got.segFonts.some((f) => f.v !== "Regular" && f.start <= start && f.end >= end);
+    const wantIds = vals(want.segStyles).filter((v) => v !== "(unbound)");
+    const gotUnbound = got.segStyles.filter((s) => s.v === "(unbound)");
+    const halfBound =
+      wantIds.length > 0 && !vals(want.segStyles).includes("(unbound)") &&   // the template is fully bound
+      gotUnbound.length > 0 &&                                                // the clone has lost some binding
+      gotUnbound.every((s) => boldAt(s.start, s.end)) &&                      // …only over bolded characters
+      got.segStyles.every((s) => s.v === "(unbound)" || wantIds.includes(s.v)); // and the rest is the template's own style
+    const shown = (v) => (v.startsWith("S:") ? v.slice(0, 16) + "…" : v);
+    const range = (s) => `${shown(s.v)}@${s.start}-${s.end}`;
+    push(`${label} style ${shown(got.style)} != template${gseg !== wseg ? `; segments [${got.segStyles.map(range).join(", ")}] != [${want.segStyles.map(range).join(", ")}]` : ""}` +
+         (halfBound ? "  [half-bound: a bolded range cannot also be style-bound — expected, see TEXTS.md]" : ""),
          halfBound);
   }
 };
@@ -153,10 +191,18 @@ for (const id of CONFIG.frameIds) {
     if (!g) continue;
     if (g.mode !== w.mode) push(`${key} mode ${g.mode} != ${w.mode}`);
     if (g.x !== w.x || g.w !== w.w) push(`${key} box ${g.x}/${g.w} != ${w.x}/${w.w}`);
-    if (g.rowCount !== undefined && g.rowCount !== w.rowCount) push(`${key} rowCount ${g.rowCount} != ${w.rowCount}`);
-    // The header's sizing mode is load-bearing: FIXED stops the band tracking the copy (NODE-MAP.md).
-    if (key === "header" && g.sizing !== w.sizing) push(`header sizing ${g.sizing} != ${w.sizing} — the band stops tracking the copy`);
-    if (key === "header" && g.spacing !== w.spacing) push(`header itemSpacing ${g.spacing} != ${w.spacing}`);
+    // Row count is compared on BOTH bands. Guarding this on `rowCount !== undefined` while only the
+    // footer carried the field meant a header that LOST a row — a clone shipped with no subtitle at all
+    // — was reported as matching the template: the row loop below only walks the overlap.
+    if (g.rowCount !== w.rowCount) push(`${key} rowCount ${g.rowCount} != ${w.rowCount}`);
+    // Every auto-layout property fingerprinted here is compared. Collecting one and not diffing it is a
+    // check that cannot fire, and it reads as coverage: a footer switched to FIXED sizing, re-aligned,
+    // re-spaced and re-constrained came back "matches the template" on all four.
+    if (g.sizing !== w.sizing) push(`${key} sizing ${g.sizing} != ${w.sizing}` + (key === "header" ? " — the band stops tracking the copy (NODE-MAP.md)" : " — the band stops tracking its text"));
+    if (g.spacing !== w.spacing) push(`${key} itemSpacing ${g.spacing} != ${w.spacing}`);
+    if (g.align !== w.align) push(`${key} primaryAxisAlignItems ${g.align} != ${w.align}`);
+    if (g.counterAlign !== w.counterAlign) push(`${key} counterAxisAlignItems ${g.counterAlign} != ${w.counterAlign}`);
+    if (key === "footer" && g.constraintV !== w.constraintV) push(`footer vertical constraint ${g.constraintV} != ${w.constraintV} — MIN keeps the TOP edge, so the band grows off the artboard (GOTCHAS.md)`);
     // A footer that grew a row legitimately moves; what must hold is its BOTTOM edge.
     if (key === "footer" && Math.abs(g.bottom - w.bottom) > 0.5) push(`footer bottom ${g.bottom} != ${w.bottom} — re-pin it, MIN constraints grow off the artboard`);
     const n = Math.min(g.rows.length, w.rows.length);
@@ -171,9 +217,16 @@ for (const id of CONFIG.frameIds) {
 }
 
 const totalDrift = results.reduce((s, x) => s + (x.drift ? x.drift.length : 0), 0);
+// A frame that could not be resolved is an UNCHECKED deliverable, and it must never sit behind a verdict
+// that says everything matches. A stale id is the normal way this happens — a re-import replaces the
+// group and the id captured earlier returns null (GOTCHAS.md) — so it is the likely case, not the exotic
+// one, and counting only drift let it pass as a clean run.
+const missing = results.filter((x) => x.error);
 return {
   template: { id: CONFIG.templateId, name: tpl.name, size: T.size, fill: T.fill },
-  verdict: totalDrift ? `${totalDrift} unintended difference(s) across ${results.length} frame(s)` : `all ${results.length} frame(s) match the template`,
+  verdict: (totalDrift ? `${totalDrift} unintended difference(s) across ${results.length} frame(s)` : `all ${results.length - missing.length} resolved frame(s) match the template`) +
+           (missing.length ? ` — ${missing.length} of ${results.length} frame(s) NOT CHECKED, id not found: ${missing.map((x) => x.frame).join(", ")}. Resolve the clone by NAME, not by a captured id (GOTCHAS.md).` : ""),
+  unchecked: missing.length,
   note: "text CONTENT and any added chart are excluded by design; `accepted` is drift declared in CONFIG.expected; `halfBound` is the API limitation on a bolded prefix, not a defect",
   frames: results,
 };
