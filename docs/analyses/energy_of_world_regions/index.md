@@ -1,4 +1,4 @@
-# How we build regional aggregates in our energy data
+# Energy of world regions
 
 Our energy datasets combine three producers: the Energy Institute's Statistical Review of World Energy, the U.S. Energy Information Administration's international energy data, and Ember's electricity data.
 This page documents how our regional aggregates (continents and income groups) are constructed from them, the problems each choice responds to, and the evidence behind those choices.
