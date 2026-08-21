@@ -96,6 +96,19 @@ const checkFrame = async (frameId) => {
     const b = n.absoluteBoundingBox;
     return b ? { l: b.x - fb.x, t: b.y - fb.y, rr: b.x - fb.x + b.width, bb: b.y - fb.y + b.height, w: b.width, h: b.height } : null;
   };
+  // `fontSize` is `figma.mixed` — a SYMBOL — on a node with per-range sizes, so a `typeof === "number"`
+  // gate drops the WHOLE node rather than the odd range: a partially restyled annotation or label could
+  // carry an 8px or off-ladder run while text-floor, ladder-sizes, named-styles and text-hierarchy all
+  // reported on everything else and never mentioned it. Read the RANGES; each one is judged on its own.
+  const sizeRanges = (n) => {
+    if (typeof n.fontSize === "number") return [{ size: n.fontSize, range: null }];
+    try {
+      return n.getStyledTextSegments(["fontSize"])
+        .map((s) => ({ size: s.fontSize, range: `${s.start}-${s.end}` }))
+        .filter((s) => typeof s.size === "number");
+    } catch (e) { return []; }
+  };
+  const unreadableText = [];
 
   // --- structural resolution, the same rule verify_templates.js and measure_fit.js use. Names are not
   // stable across design edits and the logo is a SIBLING of the header, not a child.
@@ -152,14 +165,20 @@ const checkFrame = async (frameId) => {
     if (insidePlot && MAP_GROUPS.test(n.name)) { isMap = true; insideMap = true; }
     const sm = SERIES_ANY.exec(n.name);
     if (sm) seriesOf = { kind: sm[1], series: sm[2] };
-    if (n.type === "TEXT" && typeof n.fontSize === "number") {
+    if (n.type === "TEXT") {
       const tf = Array.isArray(n.fills) && n.fills[0] && n.fills[0].type === "SOLID" && n.fills[0].visible !== false
         ? "#" + [n.fills[0].color.r, n.fills[0].color.g, n.fills[0].color.b].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join("")
         : null;
       let mixedWeight = false;
       try { mixedWeight = n.getStyledTextSegments(["fontName"]).length > 1; } catch (e) { mixedWeight = false; }
-      texts.push({ node: n, name: n.name, chars: (n.characters || "").slice(0, 30), size: n.fontSize,
-                   styleId: n.textStyleId || "", box: rel(n), insidePlot, fill: tf, mixedWeight });
+      const ranges = sizeRanges(n);
+      // A node whose size cannot be read at all is DECLARED, never dropped on the floor.
+      if (!ranges.length) unreadableText.push(n.name || n.type);
+      for (const sr of ranges) {
+        texts.push({ node: n, name: n.name, chars: (n.characters || "").slice(0, 30), size: sr.size,
+                     sizeRange: sr.range, mixedSize: ranges.length > 1,
+                     styleId: n.textStyleId || "", box: rel(n), insidePlot, fill: tf, mixedWeight });
+      }
     }
     if (/^annotation__/.test(n.name)) annotations.push({ node: n, name: n.name, box: rel(n), type: n.type });
     if ("strokeWeight" in n && typeof n.strokeWeight === "number" && n.strokes && n.strokes.length) {
@@ -232,9 +251,11 @@ const checkFrame = async (frameId) => {
   {
     const under = texts.filter((t) => t.size < TEXT_FLOOR - 0.01);
     add("text-floor", under.length ? "FAIL" : "ok",
-        (under.length ? `${under.length} text node(s) below ${TEXT_FLOOR}px: ` + under.map((t) => `"${t.chars}" ${r(t.size)}px`).join(", ")
-                      : `all ${texts.length} text nodes at or above ${TEXT_FLOOR}px`) +
-        ` (floor ${TEXT_FLOOR}px, ${CONFIG.textFloor != null ? "from CONFIG" : isSmall ? "302-wide format — SMALL-CHARTS.md overrides 12 to 11" : "540/850-wide format"})`);
+        (under.length ? `${under.length} text range(s) below ${TEXT_FLOOR}px: ` + under.map((t) => `"${t.chars}"${t.sizeRange ? ` chars ${t.sizeRange}` : ""} ${r(t.size)}px`).join(", ")
+                      : `all ${texts.length} text range(s) at or above ${TEXT_FLOOR}px`) +
+        ` (floor ${TEXT_FLOOR}px, ${CONFIG.textFloor != null ? "from CONFIG" : isSmall ? "302-wide format — SMALL-CHARTS.md overrides 12 to 11" : "540/850-wide format"})` +
+        (texts.some((t) => t.mixedSize) ? `. ${texts.filter((t) => t.mixedSize).length} range(s) come from MIXED-size node(s), read per range rather than per node` : "") +
+        (unreadableText.length ? `. ${unreadableText.length} text node(s) NOT judged — no readable fontSize on the node or its ranges: ${unreadableText.slice(0, 4).join(", ")}` : ""));
   }
 
   // Annotation ladder + ceiling. Only annotation__* nodes are ours; an imported chart's label sizes
@@ -298,8 +319,14 @@ const checkFrame = async (frameId) => {
     // Structurally: the header's second TEXT child. Picking index 1 out of a list of collected texts
     // sorted by y is fragile — anything that lands two nodes at the same top, or collects a node
     // twice, silently promotes the TITLE into the subtitle's place, and a 25px bar passes everything.
-    const headerTexts = header ? header.children.filter((c) => c.type === "TEXT" && typeof c.fontSize === "number") : [];
-    const subtitle = headerTexts.length > 1 ? { size: headerTexts[1].fontSize, chars: headerTexts[1].characters.slice(0, 24) } : null;
+    // Same mixed-size trap as the collector: filtering the header's children on a NUMERIC fontSize
+    // skipped a subtitle that carries a per-range size, which then shifted the wrong node into index 1.
+    // The ceiling takes the LARGEST range of the subtitle, since nothing in the plot may exceed it.
+    const headerTexts = header ? header.children.filter((c) => c.type === "TEXT") : [];
+    const subtitleSizes = headerTexts.length > 1 ? sizeRanges(headerTexts[1]) : [];
+    const subtitle = subtitleSizes.length
+      ? { size: Math.max(...subtitleSizes.map((s) => s.size)), chars: (headerTexts[1].characters || "").slice(0, 24) }
+      : null;
     if (!subtitle) skip("text-hierarchy", "could not resolve the subtitle (header has fewer than two TEXT children)");
     else {
       const over = texts.filter((t) => (t.insidePlot || /^annotation__/.test(t.name)) && t.size > subtitle.size + 0.01);
@@ -376,15 +403,29 @@ const checkFrame = async (frameId) => {
       const isGrid = (s) => !isSolidByDesign(s) && (/grid/i.test(s.name) || /grid/i.test(s.furnitureGroup || ""));
       const grids = furn.filter(isGrid);
       const native = furn.filter((s) => !isGrid(s));
-      const offTarget = (s) => s.dash.length !== FURNITURE_DASH.length || s.dash.some((v, i) => Math.abs(v - FURNITURE_DASH[i]) >= 0.05);
-      const badDash = grids.filter(offTarget);
+      const matches = (d, t) => d.length === t.length && d.every((v, i) => Math.abs(v - t[i]) < 0.05);
+      const badDash = grids.filter((s) => !matches(s.dash, FURNITURE_DASH));
       const cleared = badDash.filter((s) => !s.dash.length);
-      add("furniture-dash", badDash.length ? "FAIL" : "ok",
-          badDash.length
-            ? `${badDash.length} of ${grids.length} gridline(s) off [${FURNITURE_DASH}]: ` +
-              [...new Set(badDash.map((s) => JSON.stringify(s.dash.map(r))))].join(", ") +
-              (cleared.length ? `. ${cleared.length} of them carry NO dash at all (${cleared.map((s) => s.name).join(", ")}) — a cleared pattern is a restyled grid, not a solid node by design` : "")
-            : `all ${grids.length} gridline(s) at [${FURNITURE_DASH}]; ${native.length} zero-line/tick/axis node(s) left at their native pattern (` +
+      // The zero-line/tick/axis bucket is VALIDATED too, not merely reported. Reporting it was the
+      // mirror image of the cleared-gridline defect: a tick restyled to the gridline's [4,4] counted as
+      // "native" and passed. Allowed is empty (CHECKS.md) or a slope chart's native [3,2] — anything
+      // else on furniture that is meant to be solid is the restyle this row exists to catch.
+      const NATIVE_OK = [[], [3, 2]];
+      const badNative = native.filter((s) => !NATIVE_OK.some((t) => matches(s.dash, t)));
+      const badTotal = badDash.length + badNative.length;
+      add("furniture-dash", badTotal ? "FAIL" : "ok",
+          badTotal
+            ? [badDash.length
+                 ? `${badDash.length} of ${grids.length} gridline(s) off [${FURNITURE_DASH}]: ` +
+                   [...new Set(badDash.map((s) => JSON.stringify(s.dash.map(r))))].join(", ") +
+                   (cleared.length ? ` — ${cleared.length} carry NO dash at all (${cleared.map((s) => s.name).join(", ")}), and a cleared pattern is a restyled grid, not a solid node by design` : "")
+                 : "",
+               badNative.length
+                 ? `${badNative.length} zero-line/tick/axis node(s) should be solid but are dashed: ` +
+                   badNative.map((s) => `${s.name} ${JSON.stringify(s.dash.map(r))}`).join(", ") +
+                   `. CHECKS.md keeps these at an EMPTY pattern; only a slope chart's native [3,2] zero line is exempt`
+                 : ""].filter(Boolean).join(". ")
+            : `all ${grids.length} gridline(s) at [${FURNITURE_DASH}]; all ${native.length} zero-line/tick/axis node(s) solid or at the slope's native [3,2] (` +
               (native.length ? [...new Set(native.map((s) => (s.dash.length ? JSON.stringify(s.dash.map(r)) : "solid")))].join(", ") : "none") + ")");
     }
   }
@@ -416,9 +457,16 @@ const checkFrame = async (frameId) => {
       const t = Math.min(...boxes.map((b) => b.t)) - bandTop;
       const b2 = footerTop - Math.max(...boxes.map((b) => b.bb));
       const within = (v) => v >= target[0] - 0.5 && v <= target[1] + 0.5;
-      const bad = !within(t) || !within(b2) || Math.abs(t - b2) > 1.5;
+      // Symmetry to 0.5px, not 1.5. The gap is set BY CONSTRUCTION by the height-first fit plus a
+      // centring step, so equal-to-0.01px is achievable on every frame — measured across eight, the
+      // asymmetry ran 0.34-2.24px and a 1.5px allowance passed seven of them while a reviewer called
+      // all eight asymmetric. Slack that only ever hides a defect. Measured BOX-to-box on purpose: box
+      // and ink symmetry are mutually exclusive (the source line carries constant leading, the subtitle
+      // varies with descenders), so equalising one throws the other out by their sum — FITTING.md.
+      const SYMMETRY = 0.5;
+      const bad = !within(t) || !within(b2) || Math.abs(t - b2) > SYMMETRY;
       add("gap", bad ? "FAIL" : "ok",
-          `top ${r(t)}, bottom ${r(b2)} against a ${target[0]}-${target[1]}px target${Math.abs(t - b2) > 1.5 ? " — and the two ends differ by more than 1.5px" : ""}`);
+          `top ${r(t)}, bottom ${r(b2)} against a ${target[0]}-${target[1]}px target${Math.abs(t - b2) > SYMMETRY ? ` — and the two ends differ by more than ${SYMMETRY}px` : ""}`);
     }
   }
 
@@ -567,8 +615,13 @@ const checkFrame = async (frameId) => {
     const forbiddenBoxes = markBoxes.filter((x) => x.insidePlot && !x.fromMap);
 
     if (!annotations.length) { skip("annotation-overlap", "no annotation__* nodes on this frame"); }
-    else if (!polylines.length && !furnitureBoxes.length) {
-      skip("annotation-overlap", "nothing to test against: no readable polylines and no furniture" +
+    // `forbiddenBoxes` counts as something to test against, and leaving it out of this guard was a real
+    // gap: an axis-less tightly-measured bar has no polylines and no furniture, but its bar segments and
+    // value labels ARE geometry. The row skipped with the segments already inventoried, and because the
+    // knockout row keys off `crossings`, that skipped too — two rows silent on a chart type the skill
+    // ships regularly.
+    else if (!polylines.length && !furnitureBoxes.length && !forbiddenBoxes.length) {
+      skip("annotation-overlap", "nothing to test against: no readable polylines, no furniture and no filled marks" +
            (mapMarks.length ? `. The ${mapMarks.length} map shape(s) here are deliberately not judged by bbox (maps.md) — on a map with no furniture this row covers NOTHING, and whether an annotation sits on land is the rendered-pixel probe's call` : ""));
     }
     else {

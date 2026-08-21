@@ -19,10 +19,26 @@ const path = require("path");
 
 const SRC = fs.readFileSync(path.join(__dirname, "verify_page.js"), "utf8");
 
+// `figma.mixed` is a SYMBOL, not a string or null. A node with per-range font sizes reports it as its
+// node-level `fontSize`, which is why a `typeof === "number"` gate silently drops the whole node.
+const MIXED = Symbol("figma.mixed");
+
 let AUTO = 0;
 function node(props) {
   const n = Object.assign({ visible: true, x: 0, y: 0, width: 0, height: 0, type: "FRAME", name: "" }, props);
   if (!n.id) n.id = `auto:${++AUTO}`;
+  // `segments: { fontSize: [[v, start, end], ...], fontName: [...] }` serves getStyledTextSegments with
+  // the CHARACTER OFFSETS the real API returns. A field the fixture did not declare throws, exactly as
+  // an unsupported field would, so the script's try/catch is exercised rather than bypassed.
+  if (n.segments) {
+    const S = n.segments;
+    n.getStyledTextSegments = (fields) => {
+      const f = fields[0];
+      if (!S[f]) throw new Error(`mock: no ${f} segments declared on "${n.name}"`);
+      return S[f].map(([v, start, end]) =>
+        f === "fontName" ? { fontName: { family: "Lato", style: v }, start, end } : { [f]: v, start, end });
+    };
+  }
   if (n.children) for (const c of n.children) c.parent = n;
   if (!("absoluteBoundingBox" in n)) n.absoluteBoundingBox = { x: n.x, y: n.y, width: n.width, height: n.height };
   n.findAll = function (fn) {
@@ -448,7 +464,12 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const clean = await run(buildFrame(), {});
     const dc = row(clean, "furniture-dash").detail;
     check("26 a solid zero line is NOT dragged to the grid target", row(clean, "furniture-dash").status === "ok", dc);
-    check("26 and is reported as native, not as a pass against [4,4]", /native pattern/.test(dc), dc);
+    check("26 and is judged as solid, not against [4,4]", /solid or at the slope's native/.test(dc), dc);
+    // the mirror-image defect: a tick or zero line restyled TO the gridline target is not "native"
+    const restyled = await run(buildFrame({ zeroLineOnly: 1, zeroLineDash: [4, 4] }), {});
+    const dr = row(restyled, "furniture-dash").detail;
+    check("26 a zero line restyled to [4,4] FAILS", row(restyled, "furniture-dash").status === "FAIL", dr);
+    check("26 and is named as a should-be-solid node", /should be solid but are dashed/.test(dr) && /vertical-zero-line/.test(dr), dr);
     // the deliberate decision: a slope's native [3,2] zero line stays [3,2]
     const slopeZero = await run(buildFrame({ zeroLineOnly: 1, zeroLineDash: [3, 2] }), {});
     check("26 a native [3,2] zero line passes", row(slopeZero, "furniture-dash").status === "ok", row(slopeZero, "furniture-dash").detail);
@@ -482,6 +503,64 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     check("28 a map shape is not judged as a covered mark", row(out, "annotation-overlap").status === "ok", d);
     check("28 no country reported as covered", !/covers country__FRA/.test(d), d);
     check("28 and the exclusion is DECLARED", /map shape\(s\) NOT judged/.test(d), d);
+  }
+
+  // 29 — a node with PER-RANGE font sizes. `fontSize` is figma.mixed (a SYMBOL) there, so a
+  // `typeof === "number"` gate dropped the whole node from `texts`: an 8px run inside an otherwise
+  // correct annotation was invisible to text-floor, ladder-sizes AND text-hierarchy at once.
+  {
+    const mixedSize = text("annotation__mix", "Note with a tiny tail", 14, 100, 195, 120, 18, "#2d2e2d", {
+      fontSize: MIXED, strokes: [], strokeWeight: 0, textStyleId: "S:abc",
+      segments: { fontSize: [[14, 0, 10], [8, 10, 21]], fontName: [["Regular", 0, 21]] },
+    });
+    const out = await run(buildFrame({ annotation: mixedSize }), {});
+    const d = row(out, "text-floor").detail;
+    check("29 an 8px RANGE breaches the floor", row(out, "text-floor").status === "FAIL", d);
+    check("29 and the character range is named", /chars 10-21/.test(d), d);
+    check("29 and mixed-size reading is declared", /MIXED-size node/.test(d), d);
+    check("29 the off-ladder range is caught too", row(out, "ladder-sizes").status === "FAIL", row(out, "ladder-sizes").detail);
+    // a mixed-size SUBTITLE must still resolve, or the hierarchy row loses its ceiling
+    const f = buildFrame();
+    const hdr = f.children.find((c) => c.name === "header");
+    hdr.children[1] = text("subtitle", "A subtitle line", MIXED, 16, 51, 508, 19, null, {
+      fontSize: MIXED, segments: { fontSize: [[16, 0, 8], [15, 8, 15]], fontName: [["Regular", 0, 15]] } });
+    const sub = await run(f, {});
+    check("29 a mixed-size subtitle still resolves", row(sub, "text-hierarchy").status !== "SKIPPED", row(sub, "text-hierarchy").detail);
+    check("29 and the ceiling is its LARGEST range", /16px/.test(row(sub, "text-hierarchy").detail), row(sub, "text-hierarchy").detail);
+  }
+
+  // 30 — an axis-less bar: no polylines, no furniture, but filled segments ARE geometry. Leaving them
+  // out of the skip guard silenced BOTH annotation rows on a chart type the skill ships regularly.
+  {
+    const f = buildFrame({ barSegment: true,
+      annotation: annotation({ x: 120, y: 390, w: 80, h: 16, stroke: "#ffffff", strokeWeight: 3 }) });
+    // strip the furniture and the series lines, leaving only the bar segment
+    const chart = f.children.find((c) => c.name === "chart");
+    chart.children = chart.children.filter((c) => /^bar__/.test(c.name));
+    const out = await run(f, {});
+    const d = row(out, "annotation-overlap").detail;
+    check("30 the row does NOT skip with only filled marks", row(out, "annotation-overlap").status !== "SKIPPED", d);
+    check("30 and it catches the covered segment", row(out, "annotation-overlap").status === "FAIL" && /bar__A/.test(d), d);
+    check("30 the knockout row is not stranded either", row(out, "annotation-knockout").status !== "SKIPPED", row(out, "annotation-knockout").detail);
+  }
+
+  // 31 — gap symmetry is 0.5px, not 1.5. The fit sets the gap by construction, so 1.5px of slack only
+  // ever hid a defect: measured across eight frames the asymmetry ran 0.34-2.24px and seven passed.
+  {
+    const f = buildFrame();
+    const chart = f.children.find((c) => c.name === "chart");
+    // header bottom 108, footer top 488 -> a 352-tall chart centred sits at 122 with 14/14. Offset by
+    // half a pixel gives 14.5 top and 13.5 bottom: a 1.0px asymmetry, which the OLD 1.5px rule passed
+    // and both ends of which are still inside the 12-16 target. So this fixture isolates the tolerance.
+    chart.absoluteBoundingBox = { x: 16, y: 122.5, width: 508, height: 352 };
+    const out = await run(f, {});
+    const d = row(out, "gap").detail;
+    check("31 a 1.0px asymmetry now FAILS", row(out, "gap").status === "FAIL", d);
+    check("31 both ends are still inside the 12-16 target", /top 14.5, bottom 13.5/.test(d), d);
+    check("31 and the bound is stated as 0.5px", /differ by more than 0.5px/.test(d), d);
+    const even = buildFrame();
+    even.children.find((c) => c.name === "chart").absoluteBoundingBox = { x: 16, y: 122, width: 508, height: 352 };
+    check("31 a symmetric 14/14 still passes", row(await run(even, {}), "gap").status === "ok", row(await run(even, {}), "gap").detail);
   }
 
   const bad = results.filter((x) => !x.ok);

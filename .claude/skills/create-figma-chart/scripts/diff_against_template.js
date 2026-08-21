@@ -183,7 +183,10 @@ for (const id of CONFIG.frameIds) {
   if (String(G.size) !== String(T.size)) push(`frame size ${G.size} != ${T.size}`);
   if (G.fill !== T.fill) push(`frame fill ${G.fill} != ${T.fill}`);
   if (!!G.logo !== !!T.logo) push("logo present/absent differs");
-  else if (G.logo && (G.logo.x !== T.logo.x || G.logo.y !== T.logo.y || G.logo.w !== T.logo.w)) push(`logo moved to ${G.logo.x}/${G.logo.y}`);
+  // Height included: a logo resized vertically while keeping its x, y and width is a DISTORTED logo, and
+  // leaving `h` out of the comparison reported that as matching the template.
+  else if (G.logo && (G.logo.x !== T.logo.x || G.logo.y !== T.logo.y || G.logo.w !== T.logo.w || G.logo.h !== T.logo.h))
+    push(`logo ${G.logo.w}x${G.logo.h} at ${G.logo.x}/${G.logo.y} != ${T.logo.w}x${T.logo.h} at ${T.logo.x}/${T.logo.y}`);
 
   for (const key of ["header", "footer"]) {
     const g = G[key], w = T[key];

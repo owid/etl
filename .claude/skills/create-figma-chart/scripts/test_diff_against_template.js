@@ -267,6 +267,20 @@ const has = (res, re) => drift(res).some((d) => re.test(d));
     check("12 and counts it", out.unchecked === 1, String(out.unchecked));
   }
 
+  // 13 — a logo squashed vertically keeps its x, y and width, so leaving `h` out of the comparison
+  // reported a distorted logo as matching. `h` was fingerprinted the whole time.
+  {
+    const tpl = buildFrame({ name: "tpl" });
+    const clone = buildFrame({ name: "clone" });
+    clone.children.find((c) => c.name === "logo").height = 24;   // 35 in the template
+    const res = await run(tpl, clone);
+    check("13 a squashed logo is DRIFT", has(res, /logo 64x24/), JSON.stringify(drift(res)));
+    check("13 and the template's size is quoted", has(res, /!= 64x35/), JSON.stringify(drift(res)));
+    // a logo that has not moved or resized is still clean
+    const same = await run(buildFrame({ name: "tpl" }), buildFrame({ name: "clone" }));
+    check("13 an untouched logo is not drift", !has(same, /logo/), JSON.stringify(drift(same)));
+  }
+
   const bad = results.filter((x) => !x.ok);
   for (const x of results) console.log(`${x.ok ? "PASS" : "FAIL"}  ${x.name}${x.ok ? "" : "  >> " + x.detail}`);
   console.log(bad.length ? `\n${bad.length} FAILURES` : `\nALL PASS (${results.length} checks)`);
