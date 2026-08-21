@@ -135,9 +135,18 @@ const checkFrame = async (frameId) => {
   // series at all and the weight row skips in silence. Same shape as `datapoints__<Entity>`: name on
   // the group, properties on the child. So carry the nearest naming ancestor down the walk.
   const SERIES_ANY = /^(line|slope|outline)__(.+)$/;
+  // A map is detected structurally, by grapher's own container. It matters because a map is the one
+  // chart type whose INK ASPECT IS FIXED: measured live, a map requested at a 1.4033 target came back
+  // at 1.5428 (and at 1.7446 unsolved), because the projection sets the aspect and any extra canvas
+  // height becomes letterbox. So a map cannot be aspect-solved into the band, and per-chart-type/
+  // maps.md fits it WIDTH-first instead ("scale so it spans the content width") — which leaves gaps
+  // far larger than the 12-16px band rule by construction.
+  const MAP_GROUPS = /^(map|countries|countries-without-data)$/i;
+  let isMap = false;
   const collect = (n, insidePlot, inFurniture, seriesOf) => {
     if ("visible" in n && !n.visible) return;
     if (FURNITURE_GROUPS.test(n.name)) inFurniture = true;
+    if (insidePlot && MAP_GROUPS.test(n.name)) isMap = true;
     const sm = SERIES_ANY.exec(n.name);
     if (sm) seriesOf = { kind: sm[1], series: sm[2] };
     if (n.type === "TEXT" && typeof n.fontSize === "number") {
@@ -365,7 +374,8 @@ const checkFrame = async (frameId) => {
       const dl = l - contentL, dr = rr - contentR;
       const bad = Math.abs(dl) > 1 || Math.abs(dr) > 1;
       add("box-alignment", bad ? "FAIL" : "ok",
-          `chart ${r(l)}..${r(rr)} against the header's ${r(contentL)}..${r(contentR)} (left ${r(dl) >= 0 ? "+" : ""}${r(dl)}, right ${r(dr) >= 0 ? "+" : ""}${r(dr)})`);
+          `chart ${r(l)}..${r(rr)} against the header's ${r(contentL)}..${r(contentR)} (left ${r(dl) >= 0 ? "+" : ""}${r(dl)}, right ${r(dr) >= 0 ? "+" : ""}${r(dr)})` +
+          (isMap ? " — on a map this is the BINDING axis, not a cross-check: the width is what the fit sets and the gap row is skipped" : ""));
     }
   }
 
@@ -373,7 +383,8 @@ const checkFrame = async (frameId) => {
   {
     const boxes = plotRoots.map(rel).filter(Boolean);
     const target = CONFIG.gapTarget || (fb && Math.round(fb.width) === 560 ? [30, 30] : [12, 16]);
-    if (isSmall) skip("gap", "302-wide format: free frame height and no fit step, so the 12-16px band rule does not apply as written — SMALL-CHARTS.md");
+    if (isMap) skip("gap", "map: its ink aspect is fixed by the projection (measured 1.74 unsolved, 1.54 even when solved for 1.40), so it cannot be aspect-solved into the band and maps.md fits it WIDTH-first — which leaves gaps well outside 12-16 by construction. Centre it in the band and check the width instead, which box-alignment does");
+    else if (isSmall) skip("gap", "302-wide format: free frame height and no fit step, so the 12-16px band rule does not apply as written — SMALL-CHARTS.md");
     else if (CONFIG.tightlyMeasured) skip("gap", "tightlyMeasured: CHECKS.md's band figure does not apply to a trimmed, hugged group — match the reference page's own measurement (typically 20-30px) and record it");
     else if (!boxes.length || bandTop === null || footerTop === null) skip("gap", "band or chart not resolved");
     else {

@@ -64,6 +64,26 @@ The chart spans the full content width, left-aligned with the title/subtitle/log
 > you have already unwrapped — delete the text first, after which the bbox *is* the canvas and one
 > rescale lands the height on the template's to `delta 0`.
 
+### Height-first is the rule for a chart whose aspect you control — and a map's you do not
+
+The fit below is height-first because the solve makes the export's aspect match the band's, so the
+height binds and the x-map closes a sub-pixel remainder. **A map breaks that premise.** Its ink aspect
+is set by the projection, not by the canvas you request: measured on the same chart, `tab=map` came
+back at **1.7446** against a band's usable **1.3656**, and re-solving for a 1.4033 target moved it only
+to **1.5428** (the legend reflowed; the map did not). Height-fitting it then overflows the width by
+**141px** — Russia, Australia and the legend's last bin are simply cut off at the frame edge, which is
+what it looks like rather than a subtle miss.
+
+So for a map: **skip the aspect solve, fit width-first** (`scale = contentW / inkW`, which
+per-chart-type/maps.md already prescribes as "scale so it spans the content width"), and **centre the
+result in the band**. A world map lands ~291px tall in a 372px band, so it carries ~49px above and
+below and the 12–16px gap rule does not apply to it — `scripts/verify_page.js` skips that row on a map
+and treats the width as the binding axis instead.
+
+The general form, worth holding onto: **fit on whichever axis binds.** Height-first is correct
+*because* the solve guarantees the aspect; where the aspect is not yours to set, the axis that would
+overflow is the one to fit.
+
 ### The two-pass export, measured end to end
 
 Validated on a live run rather than argued from the model, so the numbers are the claim:

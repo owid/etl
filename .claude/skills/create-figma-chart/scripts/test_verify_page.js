@@ -126,7 +126,7 @@ function buildFrame(opts = {}) {
   if (opts.zeroLineOnly) kids.push(node({ type: "VECTOR", name: "vertical-zero-line", x: 40, y: 160, width: 1, height: 300,
     strokeWeight: opts.zeroLineOnly, strokes: solid("#333333"), dashPattern: [], strokeAlign: "CENTER",
     absoluteTransform: [[1, 0, 40], [0, 1, 160]], vectorNetwork: { vertices: [{ x: 0, y: 0 }, { x: 0, y: 300 }], segments: [{ start: 0, end: 1 }] } }));
-  if (opts.mapCountries) kids.push(node({ name: "countries", x: 40, y: 160, width: 400, height: 200, children: [
+  if (opts.mapCountries) kids.push(node({ name: "map", x: 40, y: 160, width: 400, height: 200, children: [
     node({ type: "VECTOR", name: "country__FRA", x: 40, y: 160, width: 60, height: 40, strokeWeight: 0.22,
            strokes: solid("#ffffff"), dashPattern: [], fills: solid("#4c6a9c"),
            absoluteTransform: [[1, 0, 40], [0, 1, 160]], vectorNetwork: { vertices: [{ x: 0, y: 0 }, { x: 60, y: 40 }], segments: [{ start: 0, end: 1 }] } }),
@@ -316,6 +316,12 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const out = await run(buildFrame({ mapCountries: true }), {});
     const d = row(out, "furniture-weight").detail;
     check("15 map country strokes not judged as furniture", row(out, "furniture-weight").status === "ok" && !/0\.22|0\.33/.test(d), d);
+    // A width-first map centred in the band has ~49px gaps by construction; the band rule must not
+    // fail it, and box-alignment must say it is the binding axis.
+    check("15 gap SKIPPED on a map", row(out, "gap").status === "SKIPPED" && /projection/.test(row(out, "gap").detail), row(out, "gap").detail);
+    check("15 box-alignment flags itself as binding", /BINDING axis/.test(row(out, "box-alignment").detail), row(out, "box-alignment").detail);
+    const notMap = await run(buildFrame(), {});
+    check("15 a non-map still checks gap", row(notMap, "gap").status !== "SKIPPED", row(notMap, "gap").detail);
   }
 
   // 16 — the highlight bar is a RELATIONSHIP, not a set of allowed numbers.
