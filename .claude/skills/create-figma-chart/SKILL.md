@@ -346,23 +346,27 @@ reach out to the far left and right edges. Leaving them out lets the map fill th
 Details, and what it measured last time, in [reference/per-chart-type/maps.md](reference/per-chart-type/maps.md).
 
 **2. Long country names.** On a bar chart the names sit in a column on the left, and that column is as
-wide as the **longest** name. **`US` and `UK` are the only short forms to offer** — the Writing and
-Style Guide rules on those two and nothing else ([STYLE_GUIDE.md](../check-metadata-style/STYLE_GUIDE.md),
-and no periods). Never invent an abbreviation for another country to make a layout work; that is a
-naming decision dressed up as a fit, and the reader has no way to know it was ours.
+wide as the **longest** name — so shortening anything *but* the longest one gains no space at all.
 
-Which means the honest answer depends on which name is widest, so measure before you ask:
+`US` and `UK` are settled: the Writing and Style Guide rules on those two, without periods
+([STYLE_GUIDE.md](../check-metadata-style/STYLE_GUIDE.md)). For any other name you may **propose** a
+short form, provided it is one a reader would already recognise — and propose it, never apply it. The
+line to hold is between a *common* abbreviation and an *invented* one: a reader cannot tell which is
+which, so anything they would not recognise reads as data rather than as our layout choice. If you are
+not confident it is in common use, say so in the question and let the user decide.
+
+Measure first, then ask. When the two settled ones are enough:
 
 > *"The names on the left take up a lot of room, and the widest one decides how much. I can shorten
 > 'United States' to 'US' and 'United Kingdom' to 'UK', which makes the bars about 5% longer. Shorten
 > them, or keep the full names?"*
 
-**And when the widest name has no short form, say the change buys nothing rather than offering it.**
-That is the common case, and offering a rename that cannot help wastes the decision:
+When the widest name is a third country, name the short form you have in mind and own that it is a
+suggestion:
 
-> *"I could shorten 'United States' to 'US', but it would not make the bars any longer here — the
-> column is as wide as its longest name, and that is one without a standard short form. Worth doing
-> for its own sake, or leave the names as they are?"*
+> *"The widest name is what sets that column, so shortening 'United States' to 'US' alone would not
+> make the bars any longer. If we also shorten the widest one — I'd suggest <short form>, but tell me if
+> that is not how we write it — the bars get about 5% longer. Shorten them, or keep the full names?"*
 
 The measurements, and the four-step re-layout that keeps the bar lengths proportional to the data, are
 in [reference/per-chart-type/bar.md](reference/per-chart-type/bar.md).
