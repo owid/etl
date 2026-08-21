@@ -1,5 +1,7 @@
 """Multidim for the energy mix (source x metric), based on Total Energy Supply."""
 
+# Force re-run to re-upsert view-level default entity selections (grapher #6922).
+
 import math
 from copy import deepcopy
 

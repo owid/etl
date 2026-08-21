@@ -297,6 +297,59 @@ const check = (name, cond, detail) => {
       JSON.stringify(out.group.strokes),
     );
     check("5 stroke verdict in notes", out.notes.some((n) => n.includes("OFF THE HOUSE")), "");
+
+    // 5b — a SLOPE export puts `slope__<Entity>`/`outline__<Entity>` on GROUPS and calls the stroked
+    // vector plain `line`. Matched on the node's own name that inventory is EMPTY, and `[].every()` is
+    // true — so this reported "ok — strokes sit at the house 3/4" without inspecting a single stroke.
+    const slopeGroup = (id, w) => {
+      const seg = (weight) => mkNode({ type: "VECTOR", name: "line", x: 710, y: 120, width: 700, height: 0.001, strokeWeight: weight });
+      const g = mkGroup(id);
+      g.children = g.children.filter((c) => c.name !== "line__chile");
+      const wrap = (nm, weight) => {
+        const n = mkNode({ name: nm, x: 710, y: 120, width: 700, height: 10, children: [
+          mkNode({ type: "VECTOR", name: "start-point", x: 710, y: 120, width: 6, height: 6 }), seg(weight)] });
+        n.children.forEach((c) => { c.parent = n; });
+        return n;
+      };
+      g.children.push(wrap("slope__chile", w), wrap("outline__chile", w + 0.4));
+      g.children.forEach((c) => { c.parent = g; });
+      return g;
+    };
+    const slopeFrame = mkFrame().frame;
+    const fitted = slopeGroup("G:5b", 1.1);
+    slopeFrame.children.push(fitted);
+    fitted.parent = slopeFrame;
+    const slopeOut = await run(
+      { frameId: "F:1", groupId: "G:5b", hideNames: [/^connectors$/, /^datapoints__/], hideIds: [],
+        declared: null, imFontSize: null, originalGroupId: "G:5borig" },
+      { frame: slopeFrame, extraNodes: [slopeGroup("G:5borig", 1.4)] },
+    );
+    check("5b a slope's ancestor-named series is inventoried at all",
+          slopeOut.group.strokes && slopeOut.group.strokes.rows.length === 2 &&
+          slopeOut.group.strokes.rows.every((x) => /^(slope|outline)__chile$/.test(x.name)),
+          JSON.stringify(slopeOut.group.strokes));
+    check("5b and its off-house weights are reported, not passed vacuously",
+          /OFF THE HOUSE 3\/4/.test(slopeOut.group.strokes.verdict) &&
+          /slope__chile 1\.1 -> 3/.test(slopeOut.group.strokes.verdict) &&
+          /outline__chile 1\.5 -> 4/.test(slopeOut.group.strokes.verdict),
+          slopeOut.group.strokes.verdict);
+
+    // 5c — and an inventory that comes back empty says so, instead of `[].every()` reading as a pass.
+    const bareFrame = mkFrame().frame;
+    const bare = mkGroup("G:5c");
+    bare.children = bare.children.filter((c) => c.name !== "line__chile");
+    bareFrame.children.push(bare);
+    bare.parent = bareFrame;
+    const bareOrig = mkGroup("G:5corig");
+    bareOrig.children = bareOrig.children.filter((c) => c.name !== "line__chile");
+    const bareOut = await run(
+      { frameId: "F:1", groupId: "G:5c", hideNames: [/^connectors$/, /^datapoints__/], hideIds: [],
+        declared: null, imFontSize: null, originalGroupId: "G:5corig" },
+      { frame: bareFrame, extraNodes: [bareOrig] },
+    );
+    check("5c an empty stroke inventory is NOT CHECKED, not ok",
+          /^NOT CHECKED/.test(bareOut.group.strokes.verdict) && !/^ok/.test(bareOut.group.strokes.verdict),
+          bareOut.group.strokes.verdict);
   }
 
   // Case 6: bad hideIds reported as unmatched (round 2 guard preserved).
@@ -342,6 +395,56 @@ const check = (name, cond, detail) => {
       out.group.nextPass.includes("--target-label") && /CONFIG\.declared/.test(out.group.nextPassNote),
       `${out.group.nextPass} | ${out.group.nextPassNote}`,
     );
+  }
+
+  // Case 8: a ZERO-WIDTH stroked line is ink. Grapher draws a single-entity stacked discrete bar's
+  // vertical zero line at 1.54x the bar height, so an ink walk that drops zero-area nodes measures
+  // only the bars and the fit leaves the rest of the stroke hanging off the artboard. The line here
+  // is 200px taller than every other leaf, so if it were dropped the measured height would be 640.
+  {
+    const { frame } = mkFrame();
+    const group = mkGroup("G:8");
+    group.children.push(
+      mkNode({ type: "VECTOR", name: "vertical-zero-line", x: 760, y: 60, width: 0, height: 840,
+               strokeWeight: 0.5, strokes: [{ type: "SOLID", visible: true }] }),
+    );
+    // and a zero-area node with NO stroke stays excluded — it paints nothing
+    group.children.push(
+      mkNode({ type: "VECTOR", name: "phantom", x: 100, y: 60, width: 0, height: 2000, strokes: [] }),
+    );
+    frame.children.push(group);
+    group.parent = frame;
+    const out = await run(
+      { frameId: "F:1", groupId: "G:8", hideNames: [/^connectors$/, /^datapoints__/], hideIds: [],
+        declared: null, imFontSize: null, originalGroupId: null },
+      { frame },
+    );
+    const h = out.group.measured.h;
+    check("8 zero-width stroked line counts as ink", Math.abs(h - 840) < 0.5, `measured h=${h}, expected 840`);
+    const l = out.group.measured.x0 !== undefined ? out.group.measured.x0 : null;
+    check("8 zero-area node with no stroke stays excluded", h < 2000 && (l === null || l > 100),
+          `measured=${JSON.stringify(out.group.measured)}`);
+
+    // 8b — "has a stroke" is not "paints a stroke". A paint switched off or made transparent renders
+    // nothing, and these bounds set the fit AND the second-pass export parameters, so counting one
+    // biases every number downstream.
+    const f2 = mkFrame().frame;
+    const g2 = mkGroup("G:8b");
+    g2.children.push(mkNode({ type: "VECTOR", name: "invisible-paint", x: 760, y: 60, width: 0, height: 3000,
+                              strokeWeight: 1, strokes: [{ type: "SOLID", visible: false }] }));
+    g2.children.push(mkNode({ type: "VECTOR", name: "transparent-paint", x: 100, y: 60, width: 0, height: 3000,
+                              strokeWeight: 1, strokes: [{ type: "SOLID", opacity: 0 }] }));
+    f2.children.push(g2);
+    g2.parent = f2;
+    const out2 = await run(
+      { frameId: "F:1", groupId: "G:8b", hideNames: [/^connectors$/, /^datapoints__/], hideIds: [],
+        declared: null, imFontSize: null, originalGroupId: null },
+      { frame: f2 },
+    );
+    check("8b a stroke paint that is invisible does not count as ink", out2.group.measured.h < 3000,
+          `measured h=${out2.group.measured.h}, a 3000px invisible stroke was counted`);
+    check("8b nor does a fully transparent one", out2.group.measured.h < 3000,
+          `measured h=${out2.group.measured.h}`);
   }
 
   const bad = results.filter((x) => !x.ok);

@@ -64,6 +64,141 @@ The chart spans the full content width, left-aligned with the title/subtitle/log
 > you have already unwrapped — delete the text first, after which the bbox *is* the canvas and one
 > rescale lands the height on the template's to `delta 0`.
 
+### The x-map is not optional, and it is what makes the right edge land on 0
+
+The height-first fit sets the scale from the height, so the width lands on the content box only if the
+achieved ink aspect equals the target *exactly*. It never does: `imFontSize` is an integer, `imWidth`
+is an integer ratio, and grapher rounds the declared size when it renormalizes to ~510,000 px². That
+leaves 0.1–0.4% of aspect error, which is **0.5–2px of width** — visible as a chart whose right edge
+does not line up with the subtitle's. Measured across seven chart types the residual ran 0.13 to 1.27px
+before the map and **0.01 to 0.05px after**, so this step is the difference between "nearly aligned"
+and aligned.
+
+**One `resize` on the group does it — and it must be a STRETCH.** Scale the group so the *ink* lands on
+the content width, then align the ink's left edge:
+
+```js
+const f = contentW / inkW;                 // must be >= 1; see below
+chart.resize(chart.width * f, chart.height);
+chart.x += CONTENT_X - ink().x0;           // align on the INK, not the group's bbox
+```
+
+`resize()` and not `rescale()`: resize leaves `strokeWeight` alone, which is the point — this must not
+re-thin the strokes you just set. Measured on eight frames this lands the ink at **508.000 ± 0.001px**
+with the left edge exactly on 16, in one operation.
+
+**The direction matters, and this is the part to get right.** Grapher's exported labels hug their
+glyphs with no slack, so squeezing the group rewraps them — measured on an 80-label scatter:
+
+| factor | labels rewrapped |
+|---|---|
+| 1.0003 (the real correction) | **0** |
+| 0.999 | 5 |
+| 0.995 | 25 |
+| 0.99 | 78 |
+| 0.95 | 78 |
+
+So a **stretch** of a fraction of a percent is clean, and even a 0.1% **squeeze** starts breaking
+labels — which is the concrete form of the `resize()` warning in Step 5. Two consequences: always
+solve so the ink comes back *narrower* than the box and close the gap by stretching, and if the ink is
+ever wider, re-export rather than squeeze. Assert it either way — compare every text node's height
+before and after, since a rewrap shows up there and nowhere else.
+
+**Two other things that make the edges lie, both measured here:**
+
+- **A group's bbox is not its ink, so position by the ink.** Fit by the ink and then set `chart.y` and
+  the chart lands off by whatever the group carries beyond it — measured **7.71px** on a discrete bar,
+  and **63px** on a stacked bar whose group holds a layer the ink walk excludes. Scale on the ink, then
+  correct position by the ink's own offset inside the group.
+- **A zero-AREA node is still ink when it carries a stroke, and missing that overflows the artboard.**
+  A vertical zero line has width **0** and a tick mark has one zero dimension too, so the "skip
+  degenerate geometry" filter every ink walk needs will silently drop them. Measured cost: grapher draws
+  a single-entity stacked discrete bar's zero line at **1.54× the bar height** — checked at four canvas
+  sizes (1000/700/520/420 all give 1.54, so it is structural and no re-export fixes it) — and the fit,
+  computed from the bars alone, left **440px of stroke** hanging 31px past the frame and straight
+  through the source line. `measure_fit.js` now keeps a zero-area node when any of its strokes is
+  visible; `test_measure_fit.js` case 8 is the regression. Note the asymmetry with `verify_page.js`,
+  which excludes zero-area nodes from the **fill** inventory for the opposite reason (a tick's default
+  black fill paints nothing and reports a phantom `#000000`). Same nodes, opposite treatment, because
+  one row is about strokes and the other about fills — so the exclusion belongs per-row, never per-node.
+- **Fit the BOX, which means unwrapping the import first.** A fresh SVG import is a FRAME with the
+  export canvas's padding baked in — measured **43.43 × 42.00px** on one and **46.83 × 44.00** on
+  another — so aligning *that* box to the content edges insets the chart by ~29px of nothing. Take the
+  `chart-area` child out of the import frame and parent it to the template frame: a GROUP hugs its
+  rendered content, so its box and its ink coincide to within stroke overhang, and every later
+  measurement can use the box without lying. Then delete the emptied import frame.
+- **Close a width residual with a uniform `rescale`, never a `resize` squeeze.** After a height-first
+  fit the width lands within ~0.5%, and the direction decides the tool. A stretch can use `resize`. A
+  **squeeze must not** — `resize` narrows the text boxes and rewraps the labels. `rescale` scales the
+  type with the geometry, so nothing rewraps at any factor; it costs a little height, which the gaps
+  simply absorb. Measured: a discrete bar came back **510.69px** wide, `rescale(508/510.69)` took it to
+  508.00, labels went 13.771 → 13.693px (still clear of the 12px floor) and the gaps went 14 → 15.08px.
+  Budget **1–2 iterations** — `rescale`'s own rounding leaves ~0.015px, so loop until the width is
+  within 0.005 rather than assuming one pass lands it.
+- **Furniture goes to the house 1px, which is NOT the same as restoring grapher's value.** Restoring
+  the pre-scale weight looks like the honest inverse of `rescale`'s thinning, and it is wrong: grapher
+  draws the zero line at **0.5px in canvas units**, so a 0.675 fit leaves 0.34px and *restoring* 0.5
+  still ships a 0.5px line against a 1px target. Read CHECKS.md's furniture row and set 1px outright,
+  after the last scale. Only the *dash* is a restore-the-original operation.
+- **Align on the group's own bbox, because that is what the canvas reports.** A GROUP's box hugs its
+  children's rendered content, so for an imported chart it *is* the ink — and it is the number the user
+  reads in the properties panel. A fit that measured leaves with `absoluteRenderBounds` while the user
+  read the group's box came out 0.12px apart on a scatter (523.878 against a 524 target): invisible in a
+  render, but a real miss when someone selects the node and checks. Stretch to make the **group box**
+  exactly the content width, then set `x` from the group box. `absoluteRenderBounds` stays the right
+  tool for the *gap* checks, where stroke overhang and text leading are exactly what you are measuring —
+  but note it is **clipped by an ancestor frame**, so it cannot measure a group that overflows, which is
+  the case the previous bullet is about. Bbox to fit, render bounds to verify.
+- **Centre on the BOX, not the ink — and know that you cannot have both.** The two targets are
+  mutually exclusive, so this is a choice and the choice is the box. Measured across eight frames: with
+  the ink gaps equal to 0.01px, the **box** gaps were off by 0.34–2.24px on every single frame. Three
+  independent things drive the difference — the source line carries a constant **2.14px** of leading
+  above its first glyph, the subtitle carries **0.08–2.87px** depending on whether its last line has
+  descenders, and the chart group itself has **0–3.5px** of slack between its box and its ink. Equalize
+  one and the other goes out by their sum.
+
+  The box wins for three reasons: it is what the properties panel shows, so it is the number anyone
+  reviewing will actually check; it is what the template's own auto-layout spacing is expressed in; and
+  it is what `verify_page.js` has always measured (`rel()` reads `absoluteBoundingBox`, and `bandTop`
+  and `footerTop` come from the header and footer boxes). That last point is the real lesson — the
+  script already encoded the house convention, and hand-rolling an ink-based centring pass beside it
+  produced eight frames that the checker would have passed and a human immediately called asymmetric.
+  **Use the predicate the script uses.**
+
+  ```js
+  const headerB = header.absoluteBoundingBox.y + header.height;   // BOX bottom
+  const footerT = footer.absoluteBoundingBox.y;                   // BOX top
+  const b = chart.absoluteBoundingBox;
+  chart.y += (headerB + (footerT - headerB - b.height) / 2) - b.y;
+  ```
+
+- **The gap you measure box-to-box is not the gap the reader sees.** A text box carries half its
+  leading above and below the glyphs, so the visual gap runs about **1.6px larger above** and **1px
+  larger below** than the header/footer box edges suggest. A box-measured 14 is ~15.6 visually — still
+  inside 12–16, but a box-measured 16 is outside it. Measure ink-to-ink when the number matters.
+
+### Some chart types are letterboxed, and their aspect will not follow the canvas
+
+### Height-first is the rule for a chart whose aspect you control — and a map's you do not
+
+The fit below is height-first because the solve makes the export's aspect match the band's, so the
+height binds and the x-map closes a sub-pixel remainder. **A map breaks that premise.** Its ink aspect
+is set by the projection, not by the canvas you request: measured on the same chart, `tab=map` came
+back at **1.7446** against a band's usable **1.3656**, and re-solving for a 1.4033 target moved it only
+to **1.5428** (the legend reflowed; the map did not). Height-fitting it then overflows the width by
+**141px** — Russia, Australia and the legend's last bin are simply cut off at the frame edge, which is
+what it looks like rather than a subtle miss.
+
+So for a map: **skip the aspect solve, fit width-first** (`scale = contentW / inkW`, which
+per-chart-type/maps.md already prescribes as "scale so it spans the content width"), and **centre the
+result in the band**. A world map lands ~291px tall in a 372px band, so it carries ~49px above and
+below and the 12–16px gap rule does not apply to it — `scripts/verify_page.js` skips that row on a map
+and treats the width as the binding axis instead.
+
+The general form, worth holding onto: **fit on whichever axis binds.** Height-first is correct
+*because* the solve guarantees the aspect; where the aspect is not yours to set, the axis that would
+overflow is the one to fit.
+
 ### The two-pass export, measured end to end
 
 Validated on a live run rather than argued from the model, so the numbers are the claim:
