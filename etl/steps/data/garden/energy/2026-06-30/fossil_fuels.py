@@ -79,9 +79,10 @@ DUPLICATED_TERRITORIES = ["East Germany", "West Germany", "Czechoslovakia"]
 # since the Statistical Review has no counterpart to them.
 CONTINENTS = ["Africa", "Asia", "Europe", "North America", "Oceania", "South America"]
 
-# Income groups are summed from countries in every column, because the Statistical Review assigns none of
-# its residual regions to them: its own gas production for the low-income group is a third of the sum of
-# those countries, and a residual region cannot be assigned to one income group even in principle.
+# Income groups are summed from countries in every column. The Statistical Review publishes no aggregates
+# for them, and none of its residual regions can be assigned to one, even in principle; an aggregate built
+# from its individually-reported countries alone is incomplete (a third of the full sum, for the
+# low-income group's gas production).
 INCOME_GROUPS = [
     "High-income countries",
     "Low-income countries",
@@ -136,10 +137,12 @@ ACCEPTED_OVERLAPS = [
 
 def prepare_statistical_review_data(tb_review: Table) -> Table:
     tb = tb_review[["country", "year"] + ENERGY_COLUMNS]
-    # Drop its income-group aggregates, which rest on residual "Other *" regions it assigns to no group at
-    # all, so they are understated (its gas production for the low-income group is a third of the sum of
-    # those countries); they are rebuilt in add_region_aggregates. Its continents are kept: it does assign
-    # those regions to them, so they cover the whole globe.
+    # Drop the income-group aggregates built in the upstream Statistical Review step. The producer
+    # publishes no aggregates for income groups, and its residual "Other *" regions cannot be assigned to
+    # one, so an aggregate built from its individually-reported countries alone is incomplete (summing gas
+    # production that way for the low-income group gives a third of the sum that includes EIA countries);
+    # they are rebuilt in add_region_aggregates. The continental aggregates are kept: every residual region
+    # is assigned to a continent, so those cover the whole globe.
     tb = tb[~tb["country"].isin(INCOME_GROUPS)].reset_index(drop=True)
     return tb
 
@@ -241,8 +244,9 @@ def backfill_world_consumption(tb: Table) -> Table:
 def add_region_aggregates(tb: Table, tb_review: Table, tb_eia: Table) -> Table:
     """Sum the OWID region aggregates from the combined country-level data.
 
-    The continents keep the Statistical Review's own energy columns (see CONTINENTS) and take only their
-    EIA-only columns from this sum, since the Statistical Review has no counterpart to those. The income
+    The continents keep the energy columns of the upstream Statistical Review dataset (see CONTINENTS)
+    and take only their EIA-only columns from this sum, since the Statistical Review has no counterpart
+    to those. The income
     groups take every column from it. No coverage condition is imposed, since within EIA's years every
     region reports at least three quarters of the countries that ever report there; the checks in
     sanity_check_outputs are what catch a region losing data.

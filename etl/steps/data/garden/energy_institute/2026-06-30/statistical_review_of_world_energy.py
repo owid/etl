@@ -276,12 +276,16 @@ REGIONS = {
     # Given that "Other Asia Pacific (EI)" is often similar to or even larger than Oceania, we avoid including it in Oceania (and include it in Asia, see comment above).
     # This means that we may be underestimating Oceania by a significant amount, but EI does not provide unambiguous data to avoid this. The Statistical Review also reports no oil or gas production for New Zealand and nothing at all for Papua New Guinea, so Oceania's production aggregates are Australia alone.
     "Oceania": {},
-    # Income groups. Unlike the continents, these get no "Other *" region at all: a residual region's
-    # membership is undisclosed and varies by indicator, and even its plausible membership spans income
-    # groups ("Other South America" alone covers Uruguay, Paraguay, Suriname and Bolivia, which sit in three
-    # different ones). So these aggregates cover only the countries the Statistical Review itemizes, and are
-    # understated by whatever the residual regions hold: summed, they reach 91-99% of its own World total,
-    # depending on the indicator, and it reports nothing at all for the low-income group.
+    # Income groups. NOTE: the producer publishes no aggregates for income groups; the ones built here are
+    # our own sums of its individually-reported countries. Unlike the continents, they can include no
+    # "Other *" region at all: a residual region's membership is undisclosed and varies by indicator, and
+    # even its plausible membership spans income groups ("Other South America" alone covers Uruguay,
+    # Paraguay, Suriname and Bolivia, which sit in three different ones). These sums are therefore
+    # incomplete, and the shortfall concentrates in the poorest groups: little is missing from the two
+    # richest, but around 14% of the lower-middle-income group's energy supply is (a third of its
+    # hydropower, over half of its other renewables), and the low-income group is empty, since almost no
+    # low-income country is individually reported. The energy_mix and fossil_fuels steps drop them and
+    # rebuild income groups from EI plus EIA country data instead.
     "Low-income countries": {},
     "Lower-middle-income countries": {},
     "Upper-middle-income countries": {},

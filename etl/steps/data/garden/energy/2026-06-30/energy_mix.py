@@ -47,10 +47,13 @@ CONTINENTS = [
 # would count the same territory twice.
 DUPLICATED_TERRITORIES = ["East Germany", "West Germany", "Czechoslovakia"]
 
-# Income groups are rebuilt here from the combined country data, because the Statistical Review assigns
-# none of its residual regions to them: summed, its own income groups reach only 91-99% of its World total,
-# it reports nothing at all for the low-income group, and a residual region cannot be assigned to one of
-# them even in principle (the countries "Other South America" stands for span three income groups).
+# Income groups are built here from the combined country data. The Statistical Review publishes no
+# aggregates for them, and none of its residual regions can be assigned to one, even in principle (the
+# countries "Other South America" stands for span three income groups). An aggregate built from its
+# individually-reported countries alone misses little for the two richest groups, but around 14% of the
+# lower-middle-income group's energy supply (a third of its hydropower, over half of its other
+# renewables), and cannot be built at all for the low-income group, where almost no country is
+# individually reported.
 INCOME_GROUPS = [
     "High-income countries",
     "Low-income countries",
