@@ -12,12 +12,12 @@ meta:
     attribution_short: NOAA/GML
     url_main: https://gml.noaa.gov/ccgg/trends_n2o/
     url_download: https://gml.noaa.gov/webdata/ccgg/trends/n2o/n2o_mm_gl.csv
-    date_accessed: '2026-07-10'
-    date_published: '2026-07-05'
+    date_accessed: '2026-08-21'
+    date_published: '2026-08-05'
     license:
       name: CC BY 4.0
       url: https://gml.noaa.gov/about/disclaimer.html
 outs:
-  - md5: 27843925a636afa3578c511def303958
-    size: 14393
+  - md5: 29a7ee9741c94e75e40f77acc7ba56f7
+    size: 14435
     path: n2o_concentration_monthly.csv

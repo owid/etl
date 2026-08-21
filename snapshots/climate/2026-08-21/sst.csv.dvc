@@ -8,12 +8,12 @@ meta:
       National Oceanic and Atmospheric Administration (NOAA) National Centers for Environmental Information (NCEI) - Equatorial Pacific Sea Surface Temperatures (SST) data
     url_main: https://www.ncei.noaa.gov/access/monitoring/enso/sst
     url_download: https://www.cpc.ncep.noaa.gov/data/indices/sstoi.indices
-    date_accessed: '2026-07-10'
+    date_accessed: '2026-08-21'
     date_published: '2026'
     license:
       name: CC BY 4.0
       url: https://gml.noaa.gov/about/disclaimer.html
 outs:
-  - md5: 20724f36b25f64a69028ef6d7b1ae291
-    size: 44463
+  - md5: 76e82b475d05b6478cba77a1721defe3
+    size: 44501
     path: sst.csv

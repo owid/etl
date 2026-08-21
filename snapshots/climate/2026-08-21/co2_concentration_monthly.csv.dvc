@@ -12,12 +12,12 @@ meta:
     attribution_short: NOAA/GML
     url_main: https://gml.noaa.gov/ccgg/trends/gl_data.html
     url_download: https://gml.noaa.gov/webdata/ccgg/trends/co2/co2_mm_gl.csv
-    date_accessed: '2026-07-10'
-    date_published: '2026-07-05'
+    date_accessed: '2026-08-21'
+    date_published: '2026-08-05'
     license:
       name: CC BY 4.0
       url: https://gml.noaa.gov/about/disclaimer.html
 outs:
-  - md5: 811eac6fe77963e2cfa659cfd46b6aad
-    size: 24643
+  - md5: d487d4f704cc61ab3cd391109628bd5d
+    size: 24683
     path: co2_concentration_monthly.csv
