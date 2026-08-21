@@ -203,10 +203,15 @@ What makes this list good is that each term takes the reader somewhere *differen
 5. Prefer the shortest form of a term that still names its subject. A reader
    clicking "sex ratio" is shown every chart about it; "sex ratio at birth"
    hides most of them for no gain. Give the broad form, not the specific one.
-6. Words from the topic's own name are not just allowed but usually necessary —
-   most of these charts say them. Give "maternal deaths" and "maternal mortality
-   ratio" on Maternal Mortality; just don't offer the bare topic name itself,
-   which narrows nothing.
+6. Words from the topic's own name are not just allowed, they are usually
+   required. Look at the most-viewed charts at the top of the list: whatever they
+   call their subject is the term readers want, even when it repeats the topic's
+   name almost exactly. On "Child & Infant Mortality", whose biggest charts are
+   titled "Child mortality rate", give "child mortality". On "Electricity Mix",
+   give "electricity production". Offer them first. Don't worry about a term
+   being too close to the topic's name — anything that genuinely narrows nothing
+   is dropped afterwards, so the cost of including it is zero and the cost of
+   leaving it out is the topic's most important term.
 7. Skip anything too broad to narrow the list down: a bare "men", "women",
    "children", "countries", "population".
 8. Never name a place. No countries, regions, continents or income groups —
@@ -436,6 +441,7 @@ async def process_topics(
                     else 0.0,
                     4,
                 ),
+                "topic_name_share": round(selection.topic_name_share, 4),
                 "weighting": weighting,
                 "views_column": views_column,
                 "selection": "coverage",

@@ -392,10 +392,53 @@ class TopicSelection:
     total_weight: float = 0.0
     total_count: int = 0
     uncovered: list[tuple[str, float]] = field(default_factory=list)
+    # What the topic's own name alone would reach. A reader on the page has
+    # already applied it, so it is the share of the topic that no suggestion can
+    # narrow — and the reason a topic like Life Expectancy, half of whose traffic
+    # is one chart called "Life expectancy", cannot score highly however good its
+    # terms are. Reported rather than subtracted: the coverage number stays a
+    # plain share of the topic, and this says how much of it was reachable.
+    topic_name_share: float = 0.0
 
     @property
     def covered_weight(self) -> float:
         return self.selected[-1].cumulative_weight if self.selected else 0.0
+
+
+def offerable_candidates(candidates: list[str], topic_name: str) -> list[str]:
+    """Drop the candidates the site would refuse to show anyway.
+
+    Two rules, both copied from rankSuggestedKeywords in owid-grapher: a term the
+    topic's own name already contains narrows nothing for a reader already on
+    that page, and places are never suggested. Applying them here rather than
+    only there matters because the site drops them *after* truncating to five, so
+    a term it will discard otherwise costs a slot and shortens the line.
+
+    Deliberately no rule against a term merely resembling the topic name.
+    "Child mortality" on "Child & Infant Mortality" is that topic's single most
+    important term — it names the charts holding half its traffic — and only the
+    exact-containment test above can be trusted to remove a term that truly
+    narrows nothing.
+    """
+    lower_topic = topic_name.lower()
+    return [
+        candidate
+        for candidate in candidates
+        if candidate.lower() not in lower_topic and not _is_place_name(candidate)
+    ]
+
+
+# Region names are the site's business, and it filters them itself; here we only
+# need the obvious ones out of the way so they don't win a slot on coverage. The
+# site's check (getRegionByNameOrVariantName) knows every variant name, so this is
+# a cheap first pass rather than a replacement for it.
+_COMMON_PLACE_WORDS = frozenset(
+    {"world", "africa", "asia", "europe", "america", "oceania", "antarctica"}
+)
+
+
+def _is_place_name(term: str) -> bool:
+    return term.strip().lower() in _COMMON_PLACE_WORDS
 
 
 def select_terms_by_coverage(
@@ -421,6 +464,7 @@ def select_terms_by_coverage(
     charts. And a term the block would show nothing for covers nothing, so it
     can't be taken at all.
     """
+    candidates = offerable_candidates(candidates, universe.topic_name)
     matches = {term: match_identities(universe, term) for term in candidates}
     total_weight = universe.total_weight
     total_count = len(universe.records)
@@ -429,10 +473,12 @@ def select_terms_by_coverage(
     def weight(identities: frozenset[str]) -> float:
         return sum(weight_of.get(identity, 0.0) for identity in identities)
 
+    self_named = match_identities(universe, universe.topic_name)
     selection = TopicSelection(
         topic_name=universe.topic_name,
         total_weight=total_weight,
         total_count=total_count,
+        topic_name_share=(weight(self_named) / total_weight if total_weight else 0.0),
     )
     covered: set[str] = set()
     remaining = list(candidates)

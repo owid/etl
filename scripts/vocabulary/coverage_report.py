@@ -42,6 +42,12 @@ def render_topic_table(selection: TopicSelection, universe: WeightedUniverse) ->
         f"  uncovered: {uncovered_weight / total if total else 0:.1%} of views, "
         f"{len(selection.uncovered)} records"
     )
+    if selection.topic_name_share > 0.2:
+        lines.append(
+            f"  note: the topic's own name alone reaches "
+            f"{selection.topic_name_share:.0%} of these views, which no suggestion "
+            f"can narrow — the reachable share is smaller than 100%"
+        )
     for title, weight in selection.uncovered[:5]:
         lines.append(f"      {weight:>9,.0f}  {title[:64]}")
     return "\n".join(lines)
@@ -168,6 +174,13 @@ def render_html_report(
                 f"<div class='note'>Weights: {resolution.get('per-view', 0)} records per view, "
                 f"{resolution.get('averaged', 0)} averaged over their explorer or multi-dim, "
                 f"{resolution.get('unmatched', 0)} with no view data.</div>"
+            )
+        if selection.topic_name_share > 0.2:
+            out.append(
+                f"<div class='note'>The topic's own name alone reaches "
+                f"<strong>{selection.topic_name_share:.0%}</strong> of these views. A reader here "
+                "has already applied it, so that much of the topic is not narrowable by any "
+                "suggestion and the coverage above is measured against a ceiling below 100%.</div>"
             )
         out.append(
             f"<div class='note'>Uncovered: {1 - share:.1%} of views across "
