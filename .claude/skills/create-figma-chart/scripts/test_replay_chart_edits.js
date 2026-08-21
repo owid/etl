@@ -87,7 +87,7 @@ async function run(frame, cfg) {
   const fn = new Function("figma", "__CONFIG__", `return (async () => { ${body} })();`);
   return fn(figma, Object.assign({ frameId: "F:1", chartName: "chart", contentL: 16, contentW: 508, gap: 14,
     hide: [], trimSubpaths: [], trimToExtentOf: [], furnitureWeight: 1, seriesWeights: null,
-    restoreDashes: true, legend: null, dryRun: false }, cfg));
+    restoreDashes: true, legend: null, bindAxis: "height", dryRun: false }, cfg));
 }
 
 const results = [];
@@ -199,6 +199,58 @@ const check = (name, ok, detail) => results.push({ name, ok: !!ok, detail: ok ? 
     let threw = null;
     try { await run(f, {}); } catch (e) { threw = e.message; }
     check("10 a missing chart group throws with a usable message", threw && /no child named/.test(threw) && /re-import/.test(threw), String(threw));
+  }
+
+  // 11 — a refused width fit has to reach the VERDICT. It used to live only in `fit.widthNote` while
+  //      the verdict said "wrote every edit" whenever no text happened to rewrap, which put a success
+  //      line over a chart hanging 150px off the content box.
+  {
+    const f = build();
+    f.findOne((n) => n.name === "chart").width = 1400;
+    const out = await run(f, {});
+    check("11 a refused width fit makes the verdict INCOMPLETE", /^INCOMPLETE/.test(out.verdict), out.verdict);
+    check("11 and the verdict itself names the refusal", /refused/i.test(out.verdict), out.verdict);
+    check("11 and names the box that missed the content edges", /does not sit on the content box/.test(out.verdict), out.verdict);
+    check("11 with the same facts listed in result.problems", out.result.problems.length >= 2, JSON.stringify(out.result.problems));
+    const clean = await run(build(), {});
+    check("11 while a clean run still reads as a clean success", !/^INCOMPLETE/.test(clean.verdict) && clean.result.problems.length === 0, clean.verdict);
+  }
+
+  // 12 — a MAP binds on the WIDTH. Its ink aspect is the projection's, not the canvas's, so a
+  //      height-first fit overflows the content width (measured 141px: Russia, Australia and the
+  //      legend's last bin cut off). reference/FITTING.md and per-chart-type/maps.md fit it width-first
+  //      and centre it in the band.
+  {
+    const mapFrame = () => { const f = build({ mapBody: true }); const c = f.findOne((n) => n.name === "chart"); c.width = 900; c.height = 480; return f; };
+    const hf = await run(mapFrame(), {});
+    check("12 height-first on a map overflows and is reported, not silently accepted",
+          /^INCOMPLETE/.test(hf.verdict) && !hf.result.edgesExact && hf.result.box.w > 508,
+          `${hf.verdict} | w=${hf.result.box.w}`);
+
+    const wf = await run(mapFrame(), { bindAxis: "width" });
+    check("12 width-bound puts the box exactly on the content width", Math.abs(wf.result.box.w - 508) < 0.01 && wf.result.edgesExact, JSON.stringify(wf.result.box));
+    check("12 and needs no second rescale", /no second rescale/.test(wf.fit.widthNote) && wf.fit.bindAxis === "width", wf.fit.widthNote);
+    check("12 leaving the height where the projection put it, centred in the band", wf.result.symmetric && wf.result.box.T > 14, JSON.stringify(wf.result));
+    check("12 and the run reads as complete", !/^INCOMPLETE/.test(wf.verdict), wf.verdict);
+
+    // a map too tall for the band is an overflow to REPORT, never a squeeze: squeezing one axis
+    // distorts dots, arrowheads and text, so the fix is a re-export.
+    const tall = build({ mapBody: true });
+    const tc = tall.findOne((n) => n.name === "chart"); tc.width = 900; tc.height = 900;
+    const to = await run(tall, { bindAxis: "width" });
+    check("12 a map taller than the band reports the overflow in the verdict",
+          /^INCOMPLETE/.test(to.verdict) && /overflows the band/i.test(to.verdict) && /never squeeze/.test(to.fit.heightNote),
+          `${to.verdict} | ${to.fit.heightNote}`);
+  }
+
+  // 13 — a mistyped axis must throw. Silently fitting the wrong axis is the overflow the option exists
+  //      to prevent, and an absent value keeps the height default every non-map chart wants.
+  {
+    let threw = null;
+    try { await run(build(), { bindAxis: "Width" }); } catch (e) { threw = e.message; }
+    check("13 a mistyped bindAxis throws", threw && /bindAxis must be "height" or "width"/.test(threw), String(threw));
+    const noneGiven = await run(build(), { bindAxis: undefined });
+    check("13 while an absent bindAxis defaults to the height", noneGiven.fit.bindAxis === "height" && noneGiven.result.edgesExact, JSON.stringify(noneGiven.fit));
   }
 
   for (const x of results) console.log(`${x.ok ? "PASS" : "FAIL"}  ${x.name}${x.ok ? "" : "  >> " + x.detail}`);

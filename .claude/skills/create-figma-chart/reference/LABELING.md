@@ -417,7 +417,18 @@ chart.y = header.y + header.height + (band - chart.height) / 2
   before letting it write. It also refuses a width squeeze beyond 0.5% rather than silently rewrapping
   labels, and reports a rewrap by **line count** (`height / fontSize`) rather than raw height, since a
   uniform rescale changes every height in proportion and a raw-height check cries wolf on all of them.
-  Harness: [`scripts/test_replay_chart_edits.js`](../scripts/test_replay_chart_edits.js) (23
+
+  **Set `bindAxis: "width"` for a map.** The default fit is height-first, which is only correct because
+  the export solve makes the aspect the band's — and a map's aspect is the projection's, not the
+  canvas's. Height-fitting one overflows the content width by a measured **141px** (FITTING.md), so a
+  map fits width-first and is centred in the band with the larger gaps that leaves. A value that is
+  neither `"height"` nor `"width"` throws rather than quietly fitting the wrong axis.
+
+  **And read the `verdict`, which now carries every way the run can be incomplete** — a refused width
+  fit, a map taller than the band, a box that missed the content edges, asymmetric gaps — not just a
+  rewrap. It used to say "wrote every edit" whenever no text happened to rewrap, which put a success
+  line over a chart hanging off the content box; `result.problems` lists the same facts.
+  Harness: [`scripts/test_replay_chart_edits.js`](../scripts/test_replay_chart_edits.js) (36
   assertions, mostly asserting the ordering rather than the arithmetic). Then re-run Step 8c on the new chart; the earlier pass certified an object that no longer exists.
 
 Keep the export URL — same `imFontSize`, same `imType`, same params — so the only thing that changes is what the chart author changed. And re-check the category order and the entity list against what you were told changed: a reorder can move more than the category you asked about.

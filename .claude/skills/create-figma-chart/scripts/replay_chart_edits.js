@@ -11,9 +11,11 @@
 //   1. hide            — before measuring anything. Connectors and year markers extend past the plot,
 //                        so hiding them narrows the group and makes it relatively taller.
 //   2. trim            — subpaths and over-long furniture, also before measuring.
-//   3. fit             — ONE rescale() to put the box on the band. rescale() scales type with
-//                        geometry, so nothing rewraps.
-//   4. width           — close the residual. Only ever a STRETCH; see the direction rule below.
+//   3. fit             — ONE rescale() on whichever axis BINDS (CONFIG.bindAxis: the band's height
+//                        normally, the content width for a map). rescale() scales type with geometry,
+//                        so nothing rewraps.
+//   4. width           — close the residual left by a height-bound fit. Only ever a STRETCH; see the
+//                        direction rule below. A width-bound fit has no residual to close.
 //   5. strokes         — LAST, because rescale() multiplies strokeWeight. Setting them before step 3
 //                        is the single most repeated mistake in this skill's history.
 //   6. legend + centre — after the geometry is final.
@@ -27,6 +29,14 @@ const CONFIG = {
   contentL: 16, // the content box, from the header (reference/NODE-MAP.md)
   contentW: 508,
   gap: 14, // per end, box-to-box (reference/FITTING.md — the box, not the ink)
+
+  // Which axis binds the fit. "height" is right for a chart whose aspect the export solve controls, so
+  // the height binds and the width step closes a sub-pixel remainder. A MAP breaks that premise: its
+  // ink aspect is set by the projection, not by the canvas requested, so height-fitting it overflows
+  // the content width by a measured 141px — Russia, Australia and the legend's last bin cut off at the
+  // frame edge. reference/FITTING.md and per-chart-type/maps.md fit a map WIDTH-first and centre it in
+  // the band, which leaves ~49px gaps by construction. Set this to "width" for any map.
+  bindAxis: "height", // "height" | "width"
 
   // Names to hide. Strings match exactly; use a RegExp for a family. Hiding is reversible; deleting
   // is not, so this never deletes a node.
@@ -151,7 +161,14 @@ const strokeState = [];
 
 // ---------------------------------------------------------------- 3. fit, and 4. width
 const box0 = chart.absoluteBoundingBox;
-const fitFactor = targetH / box0.height;
+// Fit on whichever axis BINDS. Height-first is correct only because the export solve guarantees the
+// aspect; where the aspect is not ours to set — a map — the axis that would overflow is the one to fit.
+// Absent means the height, which is what every non-map chart wants; a value that is neither throws,
+// because a typo silently fitting the wrong axis is the overflow this option exists to prevent.
+const bindAxis = CONFIG.bindAxis == null ? "height" : CONFIG.bindAxis;
+if (bindAxis !== "height" && bindAxis !== "width") throw new Error(`CONFIG.bindAxis must be "height" or "width", got ${JSON.stringify(CONFIG.bindAxis)}`);
+const widthBound = bindAxis === "width";
+const fitFactor = widthBound ? CONFIG.contentW / box0.width : targetH / box0.height;
 // A rewrap is a change in LINE COUNT, not in height. `rescale` scales every text height in proportion,
 // so comparing raw heights reports a rewrap on every uniform scale — which made this warning fire on
 // a run where nothing had rewrapped at all. height/fontSize is invariant under rescale and changes
@@ -159,17 +176,30 @@ const fitFactor = targetH / box0.height;
 const textLines = () => { const o = []; (function tw(n) { if (n.type === "TEXT" && typeof n.fontSize === "number" && n.fontSize > 0) o.push(Math.round((n.height / n.fontSize) * 20) / 20); if ("children" in n) n.children.forEach(tw); })(chart); return o; };
 const hBefore = textLines();
 let widthNote = "not attempted (dryRun)";
+let heightNote = "not attempted (dryRun)";
 if (!CONFIG.dryRun) {
   chart.rescale(fitFactor);
-  // close the width residual. A STRETCH is free; a SQUEEZE rewraps labels (measured: 0.999x rewrapped
-  // 5 of 80 on a scatter, 0.99x rewrapped 78). If the ink is wider than the box, re-export.
-  for (let i = 0; i < 3; i++) {
-    const w = chart.width;
-    if (Math.abs(w - CONFIG.contentW) < 0.005) break;
-    const f = CONFIG.contentW / w;
-    if (f < 0.995) { widthNote = `REFUSED: would squeeze x${r(f)} and rewrap labels; left at ${r(w)}. Re-export shorter instead.`; break; }
-    chart.rescale(f); // uniform, so type scales with the box and nothing rewraps
-    widthNote = `closed by uniform rescale to ${r(chart.width)}`;
+  if (widthBound) {
+    // The one rescale already put the box on the content width, so there is no residual to close — and
+    // the height is deliberately left where the projection puts it. Never squeeze it into the band:
+    // maps.md centres the map and accepts the larger gaps. Report an overflow rather than hiding it.
+    widthNote = `width-bound fit x${r(fitFactor)} — the box spans the content width at ${r(chart.width)}; no second rescale`;
+    const over = chart.height - bandH;
+    heightNote = over > 0.5
+      ? `OVERFLOWS the band by ${r(over)}px (${r(chart.height)} into ${r(bandH)}) — re-export at a flatter aspect; never squeeze one axis`
+      : `${r(chart.height)} into a ${r(bandH)} band, centred (a map carries larger gaps by construction)`;
+  } else {
+    // close the width residual. A STRETCH is free; a SQUEEZE rewraps labels (measured: 0.999x rewrapped
+    // 5 of 80 on a scatter, 0.99x rewrapped 78). If the ink is wider than the box, re-export.
+    for (let i = 0; i < 3; i++) {
+      const w = chart.width;
+      if (Math.abs(w - CONFIG.contentW) < 0.005) break;
+      const f = CONFIG.contentW / w;
+      if (f < 0.995) { widthNote = `REFUSED: would squeeze x${r(f)} and rewrap labels; left at ${r(w)}. Re-export shorter instead.`; break; }
+      chart.rescale(f); // uniform, so type scales with the box and nothing rewraps
+      widthNote = `closed by uniform rescale to ${r(chart.width)}`;
+    }
+    heightNote = `height-bound fit x${r(fitFactor)} onto a ${r(targetH)} target`;
   }
 }
 const hAfter = CONFIG.dryRun ? hBefore : textLines();
@@ -220,24 +250,40 @@ if (!CONFIG.dryRun) {
 
 const b = chart.absoluteBoundingBox;
 const gapAbove = b.y - headerB, gapBelow = footerT - (b.y + b.height);
+const symmetric = Math.abs(gapAbove - gapBelow) < 0.005;
+const edgesExact = Math.abs(b.x - fb.x - CONFIG.contentL) < 0.005 && Math.abs(b.x + b.width - fb.x - (CONFIG.contentL + CONFIG.contentW)) < 0.005;
+
+// Every way this run can come out incomplete has to reach the VERDICT, not just a nested note. A
+// refused squeeze leaves the chart overflowing the content box and `edgesExact` false, and the verdict
+// still said "wrote every edit" whenever no text happened to rewrap — a prominent success line over a
+// broken layout, which the caller has to go digging in `fit.widthNote` to disbelieve.
+const problems = [];
+if (!CONFIG.dryRun) {
+  if (rewrapped) problems.push(`${rewrapped} text node(s) changed height — a label rewrapped`);
+  if (/^REFUSED/.test(widthNote)) problems.push(`the width fit was refused (${widthNote})`);
+  if (/^OVERFLOWS/.test(heightNote)) problems.push(heightNote.replace(/^OVERFLOWS/, "the chart overflows"));
+  if (!edgesExact) problems.push(`the box does not sit on the content box (L ${r(b.x - fb.x)}, R ${r(b.x + b.width - fb.x)}, want ${CONFIG.contentL}..${CONFIG.contentL + CONFIG.contentW})`);
+  if (!symmetric) problems.push(`the band gaps are not symmetric (${r(gapAbove)} above, ${r(gapBelow)} below)`);
+}
 return {
   dryRun: CONFIG.dryRun,
   frame: { id: frame.id, name: frame.name },
   band: { headerBottom: r(headerB - fb.y), footerTop: r(footerT - fb.y), h: r(bandH), targetChartH: r(targetH) },
   plan,
   hiddenCount: hidden.length,
-  fit: { factor: r(fitFactor), widthNote, rewrappedTextNodes: rewrapped },
+  fit: { bindAxis, factor: r(fitFactor), widthNote, heightNote, rewrappedTextNodes: rewrapped },
   strokeFixes,
   legendNote,
   result: {
     box: { L: r(b.x - fb.x), R: r(b.x + b.width - fb.x), T: r(b.y - fb.y), B: r(b.y + b.height - fb.y), w: r(b.width) },
     gapAbove: r(gapAbove), gapBelow: r(gapBelow),
-    symmetric: Math.abs(gapAbove - gapBelow) < 0.005,
-    edgesExact: Math.abs(b.x - fb.x - CONFIG.contentL) < 0.005 && Math.abs(b.x + b.width - fb.x - (CONFIG.contentL + CONFIG.contentW)) < 0.005,
+    symmetric,
+    edgesExact,
+    problems,
   },
   verdict: CONFIG.dryRun
     ? "DRY RUN — nothing was written. Read `plan`, then set CONFIG.dryRun = false."
-    : rewrapped
-      ? `WROTE, but ${rewrapped} text node(s) changed height — a label rewrapped. Check the frame.`
-      : "wrote every edit; no text rewrapped",
+    : problems.length
+      ? `INCOMPLETE — ${problems.join("; ")}. The edits were written, but the layout is not finished; fix these before checking the frame off.`
+      : "wrote every edit; no text rewrapped, the box is on the content edges and the band gaps are symmetric",
 };

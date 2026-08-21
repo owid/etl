@@ -439,14 +439,22 @@ const checkFrame = async (frameId) => {
         const m = /^(-?\d+(?:[.,]\d+)?)\s*[a-z%\-_ ]*$/i.exec(String(name).trim());
         return !!m && Math.abs(parseFloat(m[1].replace(",", "."))) < 1e-9;
       };
-      // A furniture group with fewer than three members is not a grid — it is the pair of axis lines a
-      // slope chart draws at its two ends (named "1980"/"2023"), which are solid. Judged as gridlines
-      // they reported 2 of 2 "cleared".
+      // A furniture group with fewer than three members is not necessarily a grid — it can be the pair
+      // of axis lines a slope chart draws at its two ends (named "1980"/"2023"), which are solid and
+      // which, judged as gridlines, reported 2 of 2 "cleared".
+      // But the COUNT is not that shape, and count alone cut both ways on a legitimate two-line
+      // HORIZONTAL grid: correctly dashed it FAILED ("2 zero-line/tick/axis node(s) should be solid but
+      // are dashed"), and with its dash CLEARED it passed — the exact defect this row exists to catch,
+      // hidden by the exemption. So require the shape as well as the count: a slope's end axes are
+      // VERTICAL, a y-grid's lines are horizontal, and only a small group of verticals is reclassified.
+      // Residual, declared rather than hidden: a chart whose x-grid holds exactly two vertical lines has
+      // the slope's shape and travels with it. `axisOnlyGroups` names everything that was moved.
       // Group by the actual PARENT, not by `furnitureGroup`. A gridline is itself named "grid-N", which
       // matches FURNITURE_GROUPS, so collect() overwrites furnitureGroup with the node's own name and
       // every gridline reads as a group of one — which made this rule reclassify a whole grid as axis
       // lines. The parent is the container the siblings actually share.
       const AXIS_GROUP_MIN = 3;
+      const isVertical = (s) => { const b = rel(s.node); return !!b && b.h > b.w; };
       const byGroup = new Map();
       for (const s of furn.filter(isGridByName)) {
         const parent = s.node.parent;
@@ -456,7 +464,7 @@ const checkFrame = async (frameId) => {
       }
       const axisOnly = [], gridCandidates = [], axisOnlySet = new Set();
       for (const g of byGroup.values()) {
-        if (g.members.length < AXIS_GROUP_MIN) {
+        if (g.members.length < AXIS_GROUP_MIN && g.members.every(isVertical)) {
           axisOnly.push({ group: g.name, names: g.members.map((s) => s.name) });
           g.members.forEach((s) => axisOnlySet.add(s));
         } else gridCandidates.push(...g.members);
@@ -469,10 +477,13 @@ const checkFrame = async (frameId) => {
       const cleared = badDash.filter((s) => !s.dash.length);
       // The zero-line/tick/axis bucket is VALIDATED too, not merely reported. Reporting it was the
       // mirror image of the cleared-gridline defect: a tick restyled to the gridline's [4,4] counted as
-      // "native" and passed. Allowed is empty (CHECKS.md) or a slope chart's native [3,2] — anything
-      // else on furniture that is meant to be solid is the restyle this row exists to catch.
-      const NATIVE_OK = [[], [3, 2]];
-      const badNative = native.filter((s) => !NATIVE_OK.some((t) => matches(s.dash, t)));
+      // "native" and passed. Allowed is empty (CHECKS.md) — and the [3,2] exception is a slope chart's
+      // native ZERO LINE only, so it is gated on that identity rather than granted to the whole bucket:
+      // as a blanket allowance it also accepted an ordinary tick or axis line dashed [3,2], which
+      // CHECKS.md does not permit anywhere. Anything else on furniture meant to be solid is the restyle
+      // this row exists to catch.
+      const isZeroLine = (s) => /zero/i.test(s.name) || /zero/i.test(s.furnitureGroup || "") || ZERO_TICK(s.name);
+      const badNative = native.filter((s) => !matches(s.dash, []) && !(isZeroLine(s) && matches(s.dash, [3, 2])));
       const badTotal = badDash.length + badNative.length;
       add("furniture-dash", badTotal ? "FAIL" : "ok",
           badTotal
@@ -484,7 +495,7 @@ const checkFrame = async (frameId) => {
                badNative.length
                  ? `${badNative.length} zero-line/tick/axis node(s) should be solid but are dashed: ` +
                    badNative.map((s) => `${s.name} ${JSON.stringify(s.dash.map(r))}`).join(", ") +
-                   `. CHECKS.md keeps these at an EMPTY pattern; only a slope chart's native [3,2] zero line is exempt`
+                   `. CHECKS.md keeps these at an EMPTY pattern; the [3,2] exception is a slope chart's native ZERO line only, so a tick or axis line carrying it is a restyle too`
                  : ""].filter(Boolean).join(". ")
             : `all ${grids.length} gridline(s) at [${FURNITURE_DASH}]; all ${native.length} zero-line/tick/axis node(s) solid or at the slope's native [3,2] (` +
               (native.length ? [...new Set(native.map((s) => (s.dash.length ? JSON.stringify(s.dash.map(r)) : "solid")))].join(", ") : "none") + ")",

@@ -39,7 +39,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 >
 > Validated by planting defects and confirming each row **fails**, twice over: 11 planted in Figma and
 > 11 caught, then a stubbed-figma harness ([`scripts/test_verify_page.js`](../scripts/test_verify_page.js),
-> `node` it after any edit) covering **108** assertions including the rows that are awkward to plant on a
+> `node` it after any edit) covering **122** assertions including the rows that are awkward to plant on a
 > real page. **A check that cannot fail is worse than no check**, so when you extend this script,
 > extend both passes with it.
 >
@@ -204,11 +204,20 @@ mock, and both changes make a row *less* red on purpose. Read them before treati
   value, so the zero line arrives as `0`, `0%` or `0-years` and matches none of the zero/tick/axis words
   the row looks for — it was reported as a "cleared" dash on **5 of 8** frames, and on a slope chart,
   whose two end verticals are named `1980` and `2023` and sit in a group of two, on 2 of 2. Those are
-  now reclassified by **identity** (a name denoting zero; a furniture group with fewer than three
-  members), never by the dash the node carries — that circularity is the defect the row exists to catch.
+  now reclassified by **identity** (a name denoting zero; a small furniture group of *vertical* lines),
+  never by the dash the node carries — that circularity is the defect the row exists to catch.
   And they are **reclassified, not exempted**: they go through the solid-by-design validation, so a zero
   line genuinely restyled to `[4,4]` still fails. The row reports what it reclassified, so you can see
   it happen.
+
+  **The shape matters as much as the count, and so does whose exception `[3,2]` is.** A first pass
+  reclassified *any* group of fewer than three members, and that cut both ways on a legitimate two-line
+  horizontal grid: correctly dashed it failed as a dashed "axis" node, and with its dash cleared it
+  **passed** — the very defect the row exists to catch, hidden by the exemption. A slope's end axes are
+  vertical and a y-grid's lines are not, so only a small group of verticals is moved. Likewise the
+  `[3,2]` allowance belongs to a slope chart's native **zero line**, not to the whole solid-by-design
+  bucket: granted in bulk it also accepted an ordinary tick or axis line dashed `[3,2]`, which this
+  document permits nowhere.
 - **`ladder-sizes` reports imported text instead of failing it.** Judged strictly it failed on **8 of
   8**, i.e. on every fitted import that can exist, and a row that always fails carries no information.
   The cause is a real three-way conflict: text metrics help set the group's width, so snapping labels to

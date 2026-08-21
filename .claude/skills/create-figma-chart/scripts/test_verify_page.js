@@ -76,6 +76,16 @@ const gridline = (name, y, dashed, dashOverride) => node({
   vectorNetwork: { vertices: [{ x: 0, y: 0 }, { x: 508, y: 0 }], segments: [{ start: 0, end: 1 }] },
 });
 
+// A slope chart's end axis lines are VERTICAL — a column 260px tall and 1px wide at the plot's edge —
+// which is what separates them from a two-line horizontal grid. Modelling them with the horizontal
+// helper above made the fixture contradict its own comment and let a count-only rule look correct.
+const vgridline = (name, x, dashOverride) => node({
+  type: "VECTOR", name, x, y: 200, width: 1, height: 260,
+  strokeWeight: 1, strokes: solid("#dddddd"), dashPattern: dashOverride || [], strokeAlign: "CENTER",
+  absoluteTransform: [[1, 0, x], [0, 1, 200]],
+  vectorNetwork: { vertices: [{ x: 0, y: 0 }, { x: 0, y: 260 }], segments: [{ start: 0, end: 1 }] },
+});
+
 function buildFrame(opts = {}) {
   const W = opts.frameW || 540;
   const contentW = W - 32;
@@ -98,16 +108,21 @@ function buildFrame(opts = {}) {
   // `valueNamedZero` models what grapher actually emits: each gridline is named after its TICK VALUE,
   // so the zero line arrives as "0%" and matches none of the zero/tick/axis words. `zeroTickDash` lets a
   // case restyle that node to the grid target, which must still fail.
-  const gridKids = [gridline("grid-1", 200, gridDashed), gridline("grid-2", 300, gridDashed),
-                    gridline("grid-3", 360, gridDashed)];
-  if (opts.valueNamedZero) gridKids.push(gridline("0%", 460, false, opts.zeroTickDash));
-  else gridKids.push(gridline("zero", 460, false));
+  // `gridLines` overrides the count, for the two-line grid that a count-only exemption misjudged in
+  // both directions; `noZeroLine` keeps that group at exactly that many members.
+  const gridKids = opts.gridLines !== undefined
+    ? Array.from({ length: opts.gridLines }, (_, i) => gridline(`grid-${i + 1}`, 200 + i * 80, gridDashed))
+    : [gridline("grid-1", 200, gridDashed), gridline("grid-2", 300, gridDashed), gridline("grid-3", 360, gridDashed)];
+  if (!opts.noZeroLine) {
+    if (opts.valueNamedZero) gridKids.push(gridline("0%", 460, false, opts.zeroTickDash));
+    else gridKids.push(gridline("zero", 460, false));
+  }
   const grid = node({ name: "horizontal-grid-lines", x: 16, y: 200, width: contentW, height: 260, children: gridKids });
-  // A slope chart draws exactly two solid verticals at its ends, named for the years. Fewer than three
-  // members is not a grid, so these must not be judged against [4,4].
+  // A slope chart draws exactly two solid VERTICAL lines at its ends, named for the years. A small
+  // group of verticals is an axis pair, not a grid, so these must not be judged against [4,4].
   const axisPair = opts.slopeAxisPair
     ? node({ name: "vertical-grid-lines", x: 16, y: 200, width: contentW, height: 260,
-             children: [gridline("1980", 200, false), gridline("2023", 460, false)] })
+             children: [vgridline("1980", 16), vgridline("2023", 523)] })
     : null;
   const kids = [
     grid,
@@ -127,7 +142,7 @@ function buildFrame(opts = {}) {
   if (opts.extraLine) kids.push(line("line__B", [[40, 420], [200, 340], [440, 300]], opts.extraLine));
   if (opts.zeroAreaTick) kids.push(node({ name: "horizontal-axis", x: 40, y: 470, width: 400, height: 6, children: [
     node({ type: "VECTOR", name: "tick-0", x: 40, y: 470, width: 0, height: 6,
-      strokeWeight: 1, strokes: solid("#dddddd"), dashPattern: [], strokeAlign: "CENTER", fills: solid("#000000"),
+      strokeWeight: 1, strokes: solid("#dddddd"), dashPattern: opts.tickDash || [], strokeAlign: "CENTER", fills: solid("#000000"),
       absoluteTransform: [[1, 0, 40], [0, 1, 470]],
       vectorNetwork: { vertices: [{ x: 0, y: 0 }, { x: 0, y: 6 }], segments: [{ start: 0, end: 1 }] } })] }));
   // A map: every country is a stroked non-series plot node at 0.22px by design. Nested under NO
@@ -516,13 +531,35 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
           row(valZeroBad, "furniture-dash").status === "FAIL" && /should be solid but are dashed/.test(row(valZeroBad, "furniture-dash").detail),
           row(valZeroBad, "furniture-dash").detail);
 
-    // a slope chart's two end verticals are not a grid; fewer than three members means axis lines
+    // a slope chart's two end verticals are not a grid; a small group of VERTICAL lines is an axis pair
     const slopePair = await run(buildFrame({ slopeAxisPair: true }), {});
     const dsp = row(slopePair, "furniture-dash").detail;
-    check("26 a 2-member solid axis pair is not judged as a grid", row(slopePair, "furniture-dash").status === "ok", dsp);
+    check("26 a 2-member solid VERTICAL axis pair is not judged as a grid", row(slopePair, "furniture-dash").status === "ok", dsp);
     check("26 and the pair is reported as axis-only",
           /1980/.test(JSON.stringify(row(slopePair, "furniture-dash").reclassifiedAsSolidByDesign || {})),
           JSON.stringify(row(slopePair, "furniture-dash").reclassifiedAsSolidByDesign));
+
+    // ...but the COUNT is not that shape. Exempting every group of fewer than three cut both ways on a
+    // legitimate two-line HORIZONTAL grid: correctly dashed it FAILED as a dashed "axis" node, and with
+    // its dash cleared it PASSED — the very defect this row exists to catch, hidden by the exemption.
+    const twoOk = await run(buildFrame({ gridLines: 2, noZeroLine: true }), {});
+    check("26 a 2-line HORIZONTAL grid correctly at [4,4] passes",
+          row(twoOk, "furniture-dash").status === "ok" && /all 2 gridline\(s\) at \[4,4\]/.test(row(twoOk, "furniture-dash").detail),
+          row(twoOk, "furniture-dash").detail);
+    const twoCleared = await run(buildFrame({ gridLines: 2, noZeroLine: true, clearedGrid: true }), {});
+    check("26 and a 2-line HORIZONTAL grid whose dash was CLEARED still FAILS",
+          row(twoCleared, "furniture-dash").status === "FAIL" && /2 carry NO dash at all/.test(row(twoCleared, "furniture-dash").detail),
+          row(twoCleared, "furniture-dash").detail);
+
+    // the [3,2] exception belongs to a slope chart's native ZERO line, not to the whole solid-by-design
+    // bucket: granted in bulk it also accepted an ordinary tick dashed [3,2], which CHECKS.md permits
+    // nowhere.
+    const tick32 = await run(buildFrame({ zeroAreaTick: true, tickDash: [3, 2] }), {});
+    check("26 a TICK dashed [3,2] FAILS — the exception is the slope's zero line only",
+          row(tick32, "furniture-dash").status === "FAIL" && /tick-0 \[3,2\]/.test(row(tick32, "furniture-dash").detail),
+          row(tick32, "furniture-dash").detail);
+    const tickSolid = await run(buildFrame({ zeroAreaTick: true }), {});
+    check("26 while a solid tick still passes", row(tickSolid, "furniture-dash").status === "ok", row(tickSolid, "furniture-dash").detail);
   }
 
   // 27 — a slope chart's stroked vector is called plain `line` and the series identity sits on its
