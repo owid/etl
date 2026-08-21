@@ -23,13 +23,17 @@ from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET
 from apps.wizard.app_pages.metadata_diff.core import (
     CHART_FIELD_PREFIX,
     CHART_FIELDS,
+    DEFAULT_SECTION,
     METADATA_FIELDS,
+    SECTIONS,
     ViewDiff,
     as_bullets,
     charts_in_reading_order,
+    coerce_section,
     diff_preview_html,
     field_label,
     inline_diff_html,
+    section_label,
     split_by_prominence,
     text_change_key,
 )
@@ -41,6 +45,10 @@ FIELD_ORDER = list(METADATA_FIELDS) + [CHART_FIELD_PREFIX + f for f in CHART_FIE
 
 # Name of the baseline, as shown in the UI ("production" / "staging-site-master").
 BASELINE_NAME = TARGET.name
+
+# The URL key Chart Diff uses for the same control, so a link keeps its section across the two pages.
+SECTION_QUERY_KEY = "diff-type"
+SECTION_STATE_KEY = "metadata-diff-section"
 
 DIFF_CSS = """
 <style>
@@ -553,3 +561,35 @@ def markdown_output(text: str, filename: str, key: str) -> None:
         height=44,
     )
     st.download_button("⬇ Download .md", data=text, file_name=filename, mime="text/markdown", key=f"dl_{key}")
+
+
+def st_section_switcher(progress: dict[str, tuple[int, int]]) -> str:
+    """The Charts / MDims / Explorers control, with its selection kept in the URL.
+
+    Hand-rolled rather than `url_persist`ed because the labels carry review progress and therefore change
+    as you review: `st.segmented_control` round-trips its value *as the label*, so a tick leaves the
+    browser holding a label that no longer exists, and Streamlit hands that label back in place of the
+    option. Coercing on the way in keeps the selection where the reviewer put it, and only ever writes a
+    section key to the URL — which Chart Diff reads too, and validates strictly.
+    """
+    from_url = coerce_section(st.query_params.get(SECTION_QUERY_KEY))
+    st.session_state[SECTION_STATE_KEY] = coerce_section(st.session_state.get(SECTION_STATE_KEY), from_url)
+
+    selected = coerce_section(
+        st.segmented_control(
+            label="Section",
+            options=list(SECTIONS),
+            format_func=lambda s: section_label(s, progress),
+            key=SECTION_STATE_KEY,
+            label_visibility="collapsed",
+        ),
+        from_url,
+    )
+
+    # Keep the default out of the URL, as url_persist does, so a plain link stays plain. Written only on
+    # a real change, so a run that touches nothing leaves the URL alone.
+    if selected == DEFAULT_SECTION:
+        st.query_params.pop(SECTION_QUERY_KEY, None)
+    elif st.query_params.get(SECTION_QUERY_KEY) != selected:
+        st.query_params[SECTION_QUERY_KEY] = selected
+    return selected

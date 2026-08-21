@@ -749,3 +749,45 @@ def _truncate_html(rendered: str, max_chars: int) -> str:
         if safe.count(f"<{tag}") > safe.count(f"</{tag}>"):
             safe += f"</{tag}>"
     return safe + "…"
+
+
+# Sections of the page, in Chart Diff's order, each with the icon Chart Diff gives it.
+SECTIONS = {
+    "charts": (":material/show_chart:", "Charts"),
+    "mdims": (":material/dashboard:", "MDims"),
+    "explorers": (":material/explore:", "Explorers"),
+}
+DEFAULT_SECTION = "charts"
+
+
+def section_label(section: str, progress: dict[str, tuple[int, int]]) -> str:
+    """Section label carrying its review progress, so "anything left?" is answerable without clicking.
+
+    `reviewed/total` while anything is outstanding, and a tick once the section is done — a bare total
+    cannot distinguish "nothing to review" from "nothing reviewed yet", which is the whole question.
+    """
+    icon, name = SECTIONS[section]
+    done, total = progress.get(section, (0, 0))
+    if not total:
+        return f"{icon} {name} (0)"
+    if done == total:
+        return f"{icon} {name} ({total} ✓)"
+    return f"{icon} {name} ({done}/{total})"
+
+
+def coerce_section(value: object, fallback: str = DEFAULT_SECTION) -> str:
+    """Whatever the switcher hands back (or the URL carries), as a section key.
+
+    `st.segmented_control` uses the formatted label as its wire format and returns that label unchanged
+    when it matches no current option. Our labels count reviewed changes, so every tick invalidates the
+    label the browser is holding — without this, the label leaks into the selection and into the URL,
+    where the next page load rejects it. The count is stripped by matching the label's stable prefix.
+    """
+    if not isinstance(value, str):
+        return fallback
+    if value in SECTIONS:
+        return value
+    for section, (icon, name) in SECTIONS.items():
+        if value.startswith(f"{icon} {name}"):
+            return section
+    return fallback

@@ -22,8 +22,8 @@ from structlog import get_logger
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines
 from apps.wizard.app_pages.metadata_diff import cached, charts_section, explorers_section, mdims_section
 from apps.wizard.app_pages.metadata_diff.data import count_ticked
-from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, st_stale_server_banner
-from apps.wizard.utils.components import st_title_with_expert, url_persist
+from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, st_section_switcher, st_stale_server_banner
+from apps.wizard.utils.components import st_title_with_expert
 from etl.config import OWID_ENV
 
 log = get_logger()
@@ -34,12 +34,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed",
 )
-
-SECTIONS = {
-    "charts": (":material/show_chart:", "Charts"),
-    "mdims": (":material/dashboard:", "MDims"),
-    "explorers": (":material/explore:", "Explorers"),
-}
 
 
 def _review_progress(source_engine, summary) -> dict[str, tuple[int, int]]:
@@ -52,21 +46,6 @@ def _review_progress(source_engine, summary) -> dict[str, tuple[int, int]]:
         section: (count_ticked(source_engine, entries), len(entries))
         for section, entries in summary.review_keys.items()
     }
-
-
-def _section_label(section: str, progress: dict[str, tuple[int, int]]) -> str:
-    """Section label carrying its review progress, so "anything left?" is answerable without clicking.
-
-    `reviewed/total` while anything is outstanding, and a tick once the section is done — a bare total
-    cannot distinguish "nothing to review" from "nothing reviewed yet", which is the whole question.
-    """
-    icon, name = SECTIONS[section]
-    done, total = progress.get(section, (0, 0))
-    if not total:
-        return f"{icon} {name} (0)"
-    if done == total:
-        return f"{icon} {name} ({total} ✓)"
-    return f"{icon} {name} ({done}/{total})"
 
 
 def main() -> None:
@@ -103,14 +82,7 @@ what ships is what you meant, and to see how far each change reaches.
     if not summary.has_changes and not summary.warnings:
         st.success(f"**No metadata text changes** on this staging server against `{BASELINE_NAME}`.")
 
-    section = url_persist(st.segmented_control)(
-        label="Section",
-        options=list(SECTIONS),
-        format_func=lambda s: _section_label(s, progress),
-        key="diff-type",
-        value="charts",
-        label_visibility="collapsed",
-    )
+    section = st_section_switcher(progress)
 
     if section == "mdims":
         mdims_section.st_show_mdim_metadata_diffs(source_engine, target_engine)

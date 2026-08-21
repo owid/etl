@@ -8,6 +8,7 @@ override (contained to the MDIM).
 import re
 
 import pandas as pd
+import pytest
 
 from apps.owidbot.metadata_diff import format_metadata_diff, status_icon
 from apps.wizard.app_pages.metadata_diff.brief import changed_text_lines, decision, garden_location_lines, ship_section
@@ -1516,7 +1517,7 @@ def test_a_reordered_list_still_shows_every_bullet():
 
 def test_section_badges_answer_whether_anything_is_left_to_review():
     """A bare total cannot tell "nothing to review" from "nothing reviewed yet" — the whole question."""
-    from apps.wizard.app_pages.metadata_diff.app import _section_label
+    from apps.wizard.app_pages.metadata_diff.core import section_label as _section_label
 
     assert "(0/10)" in _section_label("charts", {"charts": (0, 10)})
     assert "(3/10)" in _section_label("charts", {"charts": (3, 10)})
@@ -1583,3 +1584,105 @@ def test_charts_are_listed_most_prominent_first():
 
     # Without a field to judge by, fall back to whether the chart has a data page at all.
     assert [c["slug"] for c in charts_in_reading_order(charts)] == ["beta", "zebra", "alpha"]
+
+
+def test_coerce_section_recovers_a_section_from_its_label():
+    """A label must never be mistaken for a section key.
+
+    `st.segmented_control` round-trips its value as the formatted label and returns that label unchanged
+    when it matches no option — which happens here every time a tick changes a count. Left uncoerced, the
+    label reached the URL and the next page load rejected it against the options.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import coerce_section, section_label
+
+    assert coerce_section("mdims") == "mdims"
+
+    # Every label this page can render maps back to the section it names, whatever the counts say.
+    for section in ("charts", "mdims", "explorers"):
+        for progress in ({}, {section: (0, 4)}, {section: (2, 10)}, {section: (10, 10)}):
+            assert coerce_section(section_label(section, progress)) == section
+
+    # Anything else is the caller's fallback: a deselected control, a hand-edited URL, junk.
+    assert coerce_section(None) == "charts"
+    assert coerce_section(None, "mdims") == "mdims"
+    assert coerce_section("", "explorers") == "explorers"
+    assert coerce_section("charts-and-mdims", "mdims") == "mdims"
+    assert coerce_section(3, "mdims") == "mdims"
+
+
+def test_a_stale_section_label_never_survives_as_a_value():
+    """The Streamlit behaviour behind the crash, checked where it actually happens.
+
+    `st.segmented_control` sends and receives the *formatted* label. Ours count reviewed changes, so a
+    tick leaves the browser holding a label the widget no longer offers, and the single-select serde
+    returns that raw label in place of the option — which then reached `?diff-type=` and made the next
+    page load raise. Asserted through the coercion, so a Streamlit release that stops leaking passes too.
+    """
+    button_group = pytest.importorskip("streamlit.elements.widgets.button_group")
+    serde_cls = getattr(button_group, "_SingleSelectButtonGroupSerde", None)
+    if serde_cls is None:
+        pytest.skip("Streamlit's single-select serde moved; coerce_section still guards the value")
+
+    from apps.wizard.app_pages.metadata_diff.core import SECTIONS, coerce_section, section_label
+
+    options = list(SECTIONS)
+    after = {"mdims": (3, 10)}  # one more change reviewed than the browser last saw
+    formatted = [section_label(o, after) for o in options]
+    serde = serde_cls(
+        options,
+        formatted_options=formatted,
+        formatted_option_to_option_index={f: i for i, f in enumerate(formatted)},
+        format_func=lambda o: section_label(o, after),
+    )
+
+    stale = section_label("mdims", {"mdims": (2, 10)})
+    assert stale not in formatted, "the labels must differ, or there is nothing to defend against"
+    assert coerce_section(serde.deserialize([stale]), "charts") == "mdims"
+
+    # A label that is still current round-trips to its option, coercion or not.
+    assert coerce_section(serde.deserialize([formatted[1]]), "charts") == "mdims"
+
+
+def test_section_switcher_keeps_the_url_on_a_section_key():
+    """The switcher's contract, driven through Streamlit: a label never reaches the URL.
+
+    Covers the crash reported from staging — the URL had picked up ":material/show_chart: Charts (2/10)"
+    and every later page load rejected it — and the recovery path for a link that already carries one.
+    """
+    from streamlit.testing.v1 import AppTest
+
+    def param(at) -> str | None:
+        # AppTest hands query params back as lists where the real app has plain strings.
+        value = at.query_params.get("diff-type")
+        return value[0] if isinstance(value, list) else value
+
+    def app() -> None:
+        import streamlit as st
+
+        from apps.wizard.app_pages.metadata_diff.render import st_section_switcher
+
+        # Stands in for the review counter: whatever it says ends up inside the option labels.
+        reviewed = st.session_state.get("reviewed", 0)
+        st.text(f"section={st_section_switcher({'mdims': (reviewed, 10)})}")
+        if st.button("review one"):
+            st.session_state["reviewed"] = reviewed + 1
+
+    # A poisoned link — the shape the crash produced — opens on the section its label names, and is
+    # rewritten to the key, so navigating on to Chart Diff (which validates strictly) is safe.
+    at = AppTest.from_function(app)
+    at.query_params["diff-type"] = ":material/dashboard: MDims (2/10)"
+    at.run()
+    assert not at.exception
+    assert at.text[0].value == "section=mdims"
+    assert param(at) == "mdims"
+
+    # Reviewing a change alters every label. The selection holds and the URL stays a key.
+    at.button[0].click().run()
+    assert not at.exception
+    assert at.text[0].value == "section=mdims"
+    assert param(at) == "mdims"
+
+    # Back to the default section: the param is dropped rather than spelled out, as url_persist does.
+    at.segmented_control[0].set_value("charts").run()
+    assert at.text[0].value == "section=charts"
+    assert param(at) is None
