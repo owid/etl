@@ -554,9 +554,12 @@ def _write_parquet(
     absolute precision. That is the same trade every other repacked catalog
     table already makes.
     """
-    df = keys.copy()
-    for catalog_path, long_name, _variable_id, _col in columns:
-        df[long_name] = wide[catalog_path].values
+    # One concat rather than N column assignments, for the reason given where the
+    # CSV frame is built.
+    df = pd.concat(
+        [keys] + [pd.Series(wide[catalog_path].values, name=long_name) for catalog_path, long_name, _, _ in columns],
+        axis=1,
+    )
     pq.write_table(
         pa.Table.from_pandas(repack_frame(df), preserve_index=False),
         path,
@@ -810,9 +813,15 @@ def build_download_package_for_collection(
             time_header: wide[time_col],
         }
     )
-    final = keys.copy()
-    for catalog_path, long_name, _variable_id, _col in columns:
-        final[long_name] = _format_numeric_series(wide[catalog_path])
+    # Concatenated in one go rather than assigned column by column: each
+    # assignment into a DataFrame copies its block layout, so inserting N
+    # columns one at a time is quadratic. poverty_pip has 306 of them, which is
+    # enough for pandas to start warning about a fragmented frame.
+    final = pd.concat(
+        [keys]
+        + [_format_numeric_series(wide[catalog_path]).rename(long_name) for catalog_path, long_name, _, _ in columns],
+        axis=1,
+    )
 
     csv_path = dest_dir / f"{page_slug}.csv"
     final.to_csv(csv_path, index=False)
