@@ -34,27 +34,32 @@ would show nothing for covers nothing and cannot be chosen at all.
 ```
 
 ### Extract for specific topics
-```bash
-# Single topic
-.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy
 
-# Multiple topics (run in parallel)
-.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --topic climate-change
+The uploaded file *replaces* the vocabulary rather than merging into it, so a
+`--topic` run can't go to the key the site reads — every topic it skipped would
+lose its suggestions. Such a run therefore has to say where its result should go
+instead: `--no-upload` to keep it local, or `--upload-path` to try it on a
+staging server.
+
+```bash
+# Single topic, kept out of production
+.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --no-upload
+
+# Multiple topics (run in parallel), published to a staging key
+.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --topic climate-change \
+    --upload-path topic_vocabulary/my-branch.json
 ```
 
 ### Save to file
 ```bash
-# Single topic - saves as single object
-.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --output vocab.json
-
-# Multiple topics - saves as dict keyed by slug
-.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --topic climate-change --output vocab.json
+# A dict keyed by topic slug, whatever the topic count
+.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --no-upload --output vocab.json
 ```
 
 ### Choose model
 ```bash
 # Use faster/cheaper model (default: gemini-3-flash-preview)
-.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --model gemini-2.5-flash-lite
+.venv/bin/python scripts/vocabulary/vocabulary.py --topic energy --no-upload --model gemini-2.5-flash-lite
 ```
 
 ## CLI Options

@@ -584,6 +584,26 @@ def main(
         click.echo("No topics specified, extracting for all topics...")
         topic_slugs = get_all_topic_slugs()
 
+    # A run over some of the topics cannot be published to the key the site
+    # reads: the file *replaces* the vocabulary rather than merging into it, so
+    # every topic the run skipped would lose its suggestions. Retrying a handful
+    # of topics is still useful — point --upload-path at another key to look at
+    # the result, or --no-upload --output to keep it locally — but publishing
+    # takes a run over every topic. Checked before the first API call, so the
+    # mistake costs nothing.
+    if topic and not no_upload and upload_path == DEFAULT_S3_VOCABULARY_PATH:
+        click.secho(
+            f"✗ Refusing to publish a {len(topic_slugs)}-topic run to {DEFAULT_S3_VOCABULARY_PATH}, "
+            "the key the site reads: it would drop every other topic's suggestions.",
+            fg="red",
+        )
+        click.secho(
+            "  Drop --topic to cover every topic, or keep this run out of production with "
+            "--no-upload (optionally with --output) or --upload-path.",
+            fg="red",
+        )
+        sys.exit(1)
+
     click.echo("=" * 80)
     click.echo("OWID TOPIC VOCABULARY")
     click.echo(f"Topics:    {len(topic_slugs)}")
@@ -676,17 +696,23 @@ def main(
     else:
         click.secho(f"Cost: unknown — no pricing recorded for {model} (add it to PRICING)", fg="yellow")
 
-    # Build output data
-    if len(results) == 1:
-        output_data = results[0]
-    else:
-        output_data = {r["topic_slug"]: r for r in results}
+    # Always keyed by topic slug, single-topic runs included: the site reads the
+    # file as a mapping of topics, and a bare entry object indexes to nothing at
+    # all rather than to one topic.
+    output_data = {r["topic_slug"]: r for r in results}
+
+    # Written before the guard below, so a run that ends up refusing to publish
+    # still leaves behind whatever it did manage to produce.
+    if output:
+        with open(output, "w") as f:
+            json.dump(output_data, f, indent=2)
+        click.echo()
+        click.secho(f"✓ Saved results to: {output}", fg="green")
 
     # Refuse to publish a vocabulary that is missing topics. A run fans out one
     # request per topic, so a transient API failure used to mean those topics
     # quietly vanished from the file — and uploading that over a complete
-    # vocabulary loses their suggestions until someone notices. Keep the result
-    # (--output still writes it) but make publishing it a deliberate choice.
+    # vocabulary loses their suggestions until someone notices.
     if failed_slugs and not no_upload:
         click.echo()
         click.secho(
@@ -694,8 +720,9 @@ def main(
             fg="red",
         )
         click.secho(
-            "  Not uploading a partial vocabulary over a complete one. Re-run (optionally with "
-            f"{' '.join('--topic ' + s for s in failed_slugs)}) or pass --no-upload to keep the partial result.",
+            "  Not uploading a partial vocabulary over a complete one. Re-run over every topic to "
+            "publish — re-running just these few can't be, since the file replaces the whole "
+            "vocabulary. Pass --no-upload to keep this partial result.",
             fg="red",
         )
         sys.exit(1)
@@ -720,13 +747,6 @@ def main(
                 )
         finally:
             os.unlink(tmp_path)
-
-    # Save to local file if requested
-    if output:
-        with open(output, "w") as f:
-            json.dump(output_data, f, indent=2)
-        click.echo()
-        click.secho(f"✓ Saved results to: {output}", fg="green")
 
 
 if __name__ == "__main__":
