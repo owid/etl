@@ -136,8 +136,8 @@ def _check_column_names_unique(page_slug: str, columns: list[tuple[str, str, int
     DuckDB already does on its own.
     """
     seen: dict[str, list[str]] = defaultdict(list)
-    for wide_name, long_name, _variable_id, _col in columns:
-        seen[long_name].append(wide_name)
+    for catalog_path, long_name, _variable_id, _col in columns:
+        seen[long_name].append(catalog_path)
     collisions = {name: cols for name, cols in seen.items() if len(cols) > 1}
     if not collisions:
         return
@@ -258,16 +258,6 @@ def _resolve_time_column(tb: Table) -> tuple[Table, str]:
     return tb, "date"
 
 
-def _dimension_suffix(col_dimensions: dict) -> str:
-    parts = [f"{key}_{col_dimensions[key]}" for key in sorted(col_dimensions) if col_dimensions[key]]
-    return "__".join(parts)
-
-
-def _wide_column_name(short_name: str, col_dimensions: dict) -> str:
-    suffix = _dimension_suffix(col_dimensions)
-    return f"{short_name}__{suffix}" if suffix else short_name
-
-
 def _outer_join_on_key(tables: list[Table]) -> Table:
     time_cols = {_time_column(tb) for tb in tables}
     if len(time_cols) > 1:
@@ -324,14 +314,29 @@ def _split_catalog_path(catalog_path: str) -> tuple[str, str, str]:
     return "/".join(dataset_segments), table_name, column
 
 
-def build_wide_table_for_collection(collection: Collection) -> tuple[Table, dict[str, str], dict[str, list[dict]]]:
+def build_wide_table_for_collection(collection: Collection) -> tuple[Table, dict[str, list[dict]]]:
     """Resolves the indicator list and their dimension values from the
     collection's own views, and loads each underlying table fresh from the
     on-disk catalog (no dependency on any script's in-memory tables). Returns
-    (wide_table, {wide_column_name: catalog_path}, {wide_column_name:
-    dimension_combinations}) -- the second is needed to look each indicator's
-    metadata up by variable ID, the third to report the dimension structure in
-    metadata.json."""
+    (wide_table, {catalog_path: dimension_combinations}) -- the second both
+    enumerates the columns in first-seen order and carries what metadata.json
+    needs to report each one's dimension structure.
+
+    **The wide table's columns are named by catalog path**, which is the one name
+    guaranteed to be unique: it is the key `_used_indicators` returns, so one
+    column per indicator, and no two indicators can claim the same one. That
+    matters more than it sounds. The name this replaced was rebuilt from the
+    indicator's dimension-*stripped* short name plus the dimensions of the *view*
+    that showed it, and a view can show many indicators: poverty_pip's 306
+    indicators collapsed onto 40 such names, 20 of them shared by 286 indicators.
+    Each collision silently overwrote the previous column's entry in the returned
+    dicts, so the package would have shipped 40 columns and dropped 266
+    indicators without a word -- it only surfaced as a crash because pandas
+    refuses to assign a 17-column frame to one column.
+
+    These names are internal plumbing and never reach a reader: the CSV header,
+    the Parquet field name and metadata.json's key are all `_long_column_name`,
+    which is checked separately for uniqueness by `_check_column_names_unique`."""
     by_table: dict[tuple[str, str], list[tuple[str, list[dict]]]] = defaultdict(list)
     for catalog_path, combinations in _used_indicators(collection).items():
         dataset_dir, table_name, column = _split_catalog_path(catalog_path)
@@ -339,7 +344,6 @@ def build_wide_table_for_collection(collection: Collection) -> tuple[Table, dict
 
     dataset_cache: dict[str, CatalogDataset] = {}
     renamed_tables = []
-    column_to_catalog_path: dict[str, str] = {}
     column_to_dimensions: dict[str, list[dict]] = {}
     for (dataset_dir, table_name), cols in by_table.items():
         if dataset_dir not in dataset_cache:
@@ -358,14 +362,13 @@ def build_wide_table_for_collection(collection: Collection) -> tuple[Table, dict
                     column=column,
                 )
                 continue
-            wide_name = _wide_column_name(tb[column].metadata.original_short_name or column, combinations[0])
-            rename[column] = wide_name
-            column_to_catalog_path[wide_name] = f"{dataset_dir}/{table_name}#{column}"
-            column_to_dimensions[wide_name] = combinations
+            catalog_path = f"{dataset_dir}/{table_name}#{column}"
+            rename[column] = catalog_path
+            column_to_dimensions[catalog_path] = combinations
             keep.append(column)
         renamed_tables.append(tb[keep].rename(columns=rename))
 
-    return _outer_join_on_key(renamed_tables), column_to_catalog_path, column_to_dimensions
+    return _outer_join_on_key(renamed_tables), column_to_dimensions
 
 
 def resolve_variable_ids(catalog_paths: list[str]) -> dict[str, int]:
@@ -470,8 +473,8 @@ def _view_fields(combinations: list[dict], page_url: str) -> dict:
     Choice *slugs* rather than names, because they're stable across copy edits
     and they're the same tokens the page's query params use -- which is what
     makes the URL derivable, and gives a consumer the round trip from a CSV
-    column back to the view it came from. Empty values are dropped for the same
-    reason `_dimension_suffix` drops them: they identify nothing.
+    column back to the view it came from. Empty values are dropped because they
+    identify nothing.
 
     Almost every column belongs to exactly one combination, so that one is
     inlined as flat `dimensions` + `url` fields and there's nothing else. A
@@ -481,10 +484,9 @@ def _view_fields(combinations: list[dict], page_url: str) -> dict:
     a death at age 0. The extras then go in `otherViews`, so the rare case stays
     complete without every column paying for it with a nested list.
 
-    The inlined one is simply the first view that referenced the indicator --
-    the same one `_wide_column_name` takes its suffix from, so the two agree.
-    It is not semantically privileged, and a consumer that wants every
-    combination has to read `otherViews` too.
+    The inlined one is simply the first view that referenced the indicator. It
+    is not semantically privileged, and a consumer that wants every combination
+    has to read `otherViews` too.
     """
     assert combinations, "a column exists because some view referenced it"
     entries = []
@@ -553,8 +555,8 @@ def _write_parquet(
     table already makes.
     """
     df = keys.copy()
-    for wide_name, long_name, _variable_id, _col in columns:
-        df[long_name] = wide[wide_name].values
+    for catalog_path, long_name, _variable_id, _col in columns:
+        df[long_name] = wide[catalog_path].values
     pq.write_table(
         pa.Table.from_pandas(repack_frame(df), preserve_index=False),
         path,
@@ -723,27 +725,25 @@ def build_download_package_for_collection(
         )
     page_url = f"https://ourworldindata.org/grapher/{page_slug}"
 
-    wide, column_to_catalog_path, column_to_dimensions = build_wide_table_for_collection(collection)
+    wide, column_to_dimensions = build_wide_table_for_collection(collection)
 
-    variable_ids = resolve_variable_ids(list(column_to_catalog_path.values()))
-    missing = [p for p in column_to_catalog_path.values() if p not in variable_ids]
+    catalog_paths = list(column_to_dimensions)
+    variable_ids = resolve_variable_ids(catalog_paths)
+    missing = [p for p in catalog_paths if p not in variable_ids]
     if missing:
         log.warning("download_package.variable_id_missing", catalog_paths=missing)
 
-    resolved = [
-        (wide_name, variable_ids[catalog_path])
-        for wide_name, catalog_path in column_to_catalog_path.items()
-        if catalog_path in variable_ids
-    ]
+    resolved = [(path, variable_ids[path]) for path in catalog_paths if path in variable_ids]
     metadata_by_id = _fetch_indicator_metadata([variable_id for _, variable_id in resolved])
 
-    # One name per wide-table column -- the CSV header, the Parquet field name
-    # and metadata.json's column key, so none of the three can drift from the
-    # others, and all three need it to be unique.
+    # One name per column -- the CSV header, the Parquet field name and
+    # metadata.json's column key, so none of the three can drift from the
+    # others, and all three need it to be unique. The wide table itself is keyed
+    # by catalog path; this is the name a reader sees.
     columns: list[tuple[str, str, int, IndicatorColumn]] = []
-    for wide_name, variable_id in resolved:
+    for catalog_path, variable_id in resolved:
         col = IndicatorColumn(metadata_by_id[variable_id])
-        columns.append((wide_name, _long_column_name(col), variable_id, col))
+        columns.append((catalog_path, _long_column_name(col), variable_id, col))
     _check_column_names_unique(page_slug, columns)
 
     dimension_definitions = _dimension_definitions(collection)
@@ -755,7 +755,7 @@ def build_download_package_for_collection(
     metadata_columns = {}
     readme_sections = []
     attributions = set()
-    for wide_name, long_name, variable_id, col in columns:
+    for catalog_path, long_name, variable_id, col in columns:
         attributions.add(get_attribution(col))
         metadata_columns[long_name] = {
             # MDIM-only. A single-chart download has no dimension structure, so
@@ -763,7 +763,7 @@ def build_download_package_for_collection(
             # -- an intended divergence from that format, not drift. Emitted
             # first so they're the first thing visible under a column key, above
             # the long description fields.
-            **_view_fields(column_to_dimensions[wide_name], page_url),
+            **_view_fields(column_to_dimensions[catalog_path], page_url),
             **metadata_column_entry(
                 col,
                 variable_id,
@@ -811,8 +811,8 @@ def build_download_package_for_collection(
         }
     )
     final = keys.copy()
-    for wide_name, long_name, _variable_id, _col in columns:
-        final[long_name] = _format_numeric_series(wide[wide_name])
+    for catalog_path, long_name, _variable_id, _col in columns:
+        final[long_name] = _format_numeric_series(wide[catalog_path])
 
     csv_path = dest_dir / f"{page_slug}.csv"
     final.to_csv(csv_path, index=False)
