@@ -241,6 +241,7 @@ def cli(
 
                     # Map variable IDs from source to target
                     migrated_config = diff.source_chart.migrate_config(source_session, target_session)
+                    migrated_etl_config = diff.source_chart.migrate_etl_config(source_session, target_session)
 
                     # Get user who edited the chart
                     user_id = diff.source_chart.lastEditedByUserId
@@ -250,29 +251,59 @@ def cli(
 
                     # Chart in target exists, update it
                     if diff.target_chart:
+                        target_chart_id = diff.target_chart.id
+                        catalog_path_twin = (
+                            diff.source_chart.catalogPath
+                            and diff.source_chart.catalogPath == diff.target_chart.catalogPath
+                            and diff.source_chart.id != diff.target_chart.id
+                        )
+
                         # Check if configs and tags are equal
                         target_tags = diff.target_chart.tags(target_session)
                         configs_equal = configs_are_equal(migrated_config, diff.target_chart.config)
                         tags_equal = tags_are_equal(source_tags, target_tags)
+                        target_etl_config = diff.target_chart.load_etl_config(target_session)
+                        etl_configs_equal = migrated_etl_config == target_etl_config
+                        publication_equal = migrated_config.get("isPublished") == diff.target_chart.config.get(
+                            "isPublished"
+                        )
 
                         # Skip if both configs and tags are equal
-                        if configs_equal and tags_equal:
+                        if (
+                            configs_equal
+                            and tags_equal
+                            and etl_configs_equal
+                            and (not catalog_path_twin or publication_equal)
+                        ):
                             log.info(
                                 "chart_sync.skip",
                                 slug=diff.target_chart.slug,
                                 reason="identical chart already exists",
                                 chart_id=chart_id,
+                                target_chart_id=target_chart_id,
                             )
                             continue
 
                         # Change has been approved, update the chart
                         if diff.is_approved:
-                            log.info("chart_sync.chart_update", slug=chart_slug, chart_id=chart_id)
+                            log.info(
+                                "chart_sync.chart_update",
+                                slug=chart_slug,
+                                chart_id=chart_id,
+                                target_chart_id=target_chart_id,
+                            )
                             charts_synced += 1
                             synced_chart_ids.add(chart_id)
                             if not dry_run:
-                                target_api.update_chart(chart_id, migrated_config, user_id=user_id)
-                                target_api.set_tags(chart_id, source_tags, user_id=user_id)
+                                if migrated_etl_config is not None:
+                                    target_api.put_chart_etl_config(
+                                        target_chart_id,
+                                        migrated_etl_config,
+                                        catalog_path=diff.source_chart.catalogPath,
+                                        user_id=user_id,
+                                    )
+                                target_api.update_chart(target_chart_id, migrated_config, user_id=user_id)
+                                target_api.set_tags(target_chart_id, source_tags, user_id=user_id)
 
                         # Rejected chart diff
                         elif diff.is_rejected:
@@ -284,6 +315,7 @@ def cli(
                                 "chart_sync.pending_chart",
                                 slug=chart_slug,
                                 chart_id=chart_id,
+                                target_chart_id=target_chart_id,
                                 source_updatedAt=str(diff.source_chart.updatedAt),
                                 target_updatedAt=str(diff.target_chart.updatedAt),
                                 staging_created_at=SERVER_CREATION_TIME,
@@ -300,7 +332,23 @@ def cli(
                             synced_chart_ids.add(chart_id)
                             # Note: New charts don't have old datasets to archive, so no dataset IDs collected
                             if not dry_run:
-                                resp = target_api.create_chart(migrated_config, user_id=user_id)
+                                if migrated_etl_config is not None:
+                                    bootstrap = {
+                                        "$schema": migrated_config.get("$schema", config.DEFAULT_GRAPHER_SCHEMA),
+                                        "slug": migrated_config.get("slug"),
+                                        "dimensions": migrated_config["dimensions"],
+                                        "isPublished": False,
+                                    }
+                                    resp = target_api.create_chart(bootstrap, user_id=user_id)
+                                    target_api.put_chart_etl_config(
+                                        resp["chartId"],
+                                        migrated_etl_config,
+                                        catalog_path=diff.source_chart.catalogPath,
+                                        user_id=user_id,
+                                    )
+                                    target_api.update_chart(resp["chartId"], migrated_config, user_id=user_id)
+                                else:
+                                    resp = target_api.create_chart(migrated_config, user_id=user_id)
                                 target_api.set_tags(resp["chartId"], source_tags, user_id=user_id)
                             else:
                                 resp = {"chartId": None}
@@ -384,10 +432,11 @@ def _is_commit_sha(source: str) -> bool:
 
 def _notify_slack_chart_update(chart_id: int, source: str, diff: ChartDiff, dry_run: bool) -> None:
     assert diff.target_chart
+    target_chart_id = diff.target_chart.id
 
     message = f"""
 :warning: *ETL chart-sync: Pending Chart Update Not Synced* from `{source}`
-<http://{get_container_name(source)}/admin/charts/{chart_id}/edit|View Staging Chart> | <https://admin.owid.io/admin/charts/{chart_id}/edit|View Admin Chart>
+<http://{get_container_name(source)}/admin/charts/{chart_id}/edit|View Staging Chart> | <https://admin.owid.io/admin/charts/{target_chart_id}/edit|View Admin Chart>
 *Staging        Edited*: {str(diff.source_chart.updatedAt)} UTC
 *Production Edited*: {str(diff.target_chart.updatedAt)} UTC
 ```
