@@ -12,7 +12,7 @@ from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
 from structlog import get_logger
 
-from apps.wizard.app_pages.metadata_diff.core import METADATA_FIELDS, ViewBundle, build_view_bundle, mark_identity
+from apps.wizard.app_pages.metadata_diff.core import METADATA_FIELDS, ViewBundle, build_view_bundle
 from etl.db import read_sql
 
 log = get_logger()
@@ -60,22 +60,29 @@ def load_reviews(engine: Engine, catalog_path: str) -> dict[str, dict[str, Any]]
 REVIEWED = "reviewed"
 
 
-def count_reviewed(engine: Engine, surface: str, groups: list) -> int:
-    """How many of these changes are ticked off, counting only ticks the text has not outgrown.
+def count_ticked(engine: Engine, entries: list[tuple[str, str, str]]) -> int:
+    """How many of these (surface, change key, content hash) changes are currently ticked reviewed.
 
-    A stored mark carries the content hash it was made against, so an edit since then leaves the row in
-    place but no longer reviewed — the same rule the toggles apply, applied here so a progress count and
-    the toggles beside it can never disagree.
+    Deliberately uncached and cheap — one query per surface — because it answers a question that changes
+    the instant someone presses a toggle. Identifying *which* changes exist is the expensive half and is
+    cached elsewhere; if this were cached with it, the counter would sit still for minutes after a tick.
+
+    A tick only counts against the text it was made on: an edit since then leaves the row in place but no
+    longer reviewed, the same rule the toggles apply.
     """
-    if not groups:
+    if not entries:
         return 0
-    stored = load_reviews(engine, surface)
+    by_surface: dict[str, dict[str, str]] = {}
+    for surface, change_key, content_hash in entries:
+        by_surface.setdefault(surface, {})[change_key] = content_hash
+
     done = 0
-    for group in groups:
-        change_key, content_hash = mark_identity(surface, group)
-        row = stored.get(change_key)
-        if row and row.get("status") == REVIEWED and row.get("contentHash") == content_hash:
-            done += 1
+    for surface, wanted in by_surface.items():
+        stored = load_reviews(engine, surface)
+        for change_key, content_hash in wanted.items():
+            row = stored.get(change_key)
+            if row and row.get("status") == REVIEWED and row.get("contentHash") == content_hash:
+                done += 1
     return done
 
 

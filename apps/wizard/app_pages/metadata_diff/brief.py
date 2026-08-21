@@ -15,7 +15,6 @@ from apps.wizard.app_pages.metadata_diff.core import (
     affected_charts,
     as_bullets,
     as_plaintext,
-    charts_in_reading_order,
     dims_str,
     distinct_garden_datasets,
     distinct_indicator_short_names,
@@ -23,6 +22,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     group_usage,
     override_snippet,
     parse_catalog_path,
+    split_by_prominence,
     yaml_field_snippet,
 )
 
@@ -220,9 +220,10 @@ def surface_lines(g: ChangeGroup, usage: dict[int, dict[str, list[dict[str, Any]
     """Name every chart and MDim this change lands on — not just a count.
 
     A count ("10 charts") is not something an author can check. Applying to all means those specific
-    charts change, so the brief lists them by slug, and flags any chart that does NOT render a data page
-    (a multi-indicator chart has no single data page, so a WYSK edit is invisible to its readers). When
-    the change is scoped, the same list is what *keeps* the old text — equally worth seeing."""
+    charts change, so the brief lists them by slug, split by where a reader meets the change: on the
+    chart's own data page, or behind "Learn more about this data" for a chart that combines several
+    indicators and so has no data page. When the change is scoped, the same list is what *keeps* the old
+    text — equally worth seeing."""
     imp = group_usage(g, usage)
     charts, mdims = imp.get("charts", []), imp.get("mdims", [])
     if not charts and not mdims:
@@ -232,14 +233,21 @@ def surface_lines(g: ChangeGroup, usage: dict[int, dict[str, list[dict[str, Any]
     out: list[str] = []
     if charts:
         out.append(f"- **Charts that {verb} ({len(charts)}):**")
-        for c in charts_in_reading_order(charts, {g.field}):
-            slug = c.get("slug") or f"chart {c.get('chartId')}"
-            note = (
-                ""
-                if c.get("has_data_page", True)
-                else " — multi-indicator chart: shown under *Learn more about this data*, not on a data page"
-            )
-            out.append(f"  - [`{slug}`](https://ourworldindata.org/grapher/{slug}){note}")
+        on_page, behind_drawer = split_by_prominence(charts, {g.field})
+        for label, group in (
+            (f"Data pages affected ({len(on_page)})", on_page),
+            (
+                f"Via *Learn more about this data* ({len(behind_drawer)}) — multi-indicator charts, "
+                "no data page, shown under the indicator's own entry",
+                behind_drawer,
+            ),
+        ):
+            if not group:
+                continue
+            out.append(f"  - {label}:")
+            for c in group:
+                slug = c.get("slug") or f"chart {c.get('chartId')}"
+                out.append(f"    - [`{slug}`](https://ourworldindata.org/grapher/{slug})")
     if mdims:
         out.append(f"- **Other MDims that {verb} ({len(mdims)}):**")
         for m in sorted(mdims, key=lambda m: str(m.get("slug") or "")):

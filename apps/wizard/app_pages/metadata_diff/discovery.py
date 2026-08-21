@@ -34,12 +34,12 @@ from apps.wizard.app_pages.metadata_diff.core import (
     diff_views,
     field_label,
     group_changes,
+    mark_identity,
     surface_key,
 )
 from apps.wizard.app_pages.metadata_diff.data import (
     _load_configs,
     build_env_bundles,
-    count_reviewed,
     fetch_variable_rows,
     fetch_variable_rows_by_path,
     load_mdim_config,
@@ -994,8 +994,10 @@ class Summary:
     fields: dict[str, int] = field(default_factory=dict)  # field label -> distinct changes
     # Indicator changes by origin: ours / master / stale / unknown (see classify_origins).
     attribution: dict[str, int] = field(default_factory=dict)
-    # Section -> (changes ticked off, changes in total). What the badges count down.
-    review_progress: dict[str, tuple[int, int]] = field(default_factory=dict)
+    # Section -> the (surface, change key, content hash) of every change in it. The badges count these,
+    # and read how many are ticked separately: identifying them is slow and cacheable, whereas whether one
+    # is ticked changes the moment a reviewer presses a toggle.
+    review_keys: dict[str, list[tuple[str, str, str]]] = field(default_factory=dict)
     # Datasets this server holds an older build of than the baseline: dataset -> (here, baseline).
     # Their differences read backwards, so this is a defect in the server, not in the branch.
     stale: dict[str, tuple[Any, Any]] = field(default_factory=dict)
@@ -1105,10 +1107,8 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
         _collect_changes(seen, chart_groups)
         usage = charts_affected(source_engine, changed)
         summary.n_charts = len(charts_reached(chart_groups, usage))
-        summary.review_progress["charts"] = (
-            count_reviewed(source_engine, surface_key("charts", "indicators"), chart_groups),
-            len(chart_groups),
-        )
+        charts_surface = surface_key("charts", "indicators")
+        summary.review_keys["charts"] = [(charts_surface, *mark_identity(charts_surface, g)) for g in chart_groups]
         for origin in attribute_indicator_changes(source_engine, target_engine, changed.paths, master_engine).values():
             summary.attribution[origin] = summary.attribution.get(origin, 0) + 1
         # Report every stale dataset, not only ones behind a reported change: a stale build can also
@@ -1146,10 +1146,9 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
                     summary.n_mdims += 1
                     summary.n_mdim_changes += len(ours)
                     _collect_changes(seen, ours)
-                    done, total = summary.review_progress.get("mdims", (0, 0))
-                    summary.review_progress["mdims"] = (
-                        done + count_reviewed(source_engine, surface_key("mdim", cp), ours),
-                        total + len(ours),
+                    mdim_surface = surface_key("mdim", cp)
+                    summary.review_keys.setdefault("mdims", []).extend(
+                        (mdim_surface, *mark_identity(mdim_surface, g)) for g in ours
                     )
         # Drafts are counted only where they actually have changed text, same test as the rest.
         if len(drafts) > MAX_MDIMS_RESOLVED:
@@ -1179,10 +1178,9 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
         for slug, diffs in branch_views.items():
             explorer_groups = group_changes(diffs)
             _collect_changes(seen, explorer_groups)
-            done, total = summary.review_progress.get("explorers", (0, 0))
-            summary.review_progress["explorers"] = (
-                done + count_reviewed(source_engine, surface_key("explorer", slug), explorer_groups),
-                total + len(explorer_groups),
+            explorer_surface = surface_key("explorer", slug)
+            summary.review_keys.setdefault("explorers", []).extend(
+                (explorer_surface, *mark_identity(explorer_surface, g)) for g in explorer_groups
             )
     except Exception as e:  # noqa: BLE001
         log.warning("metadata_diff.explorer_discovery_failed", error=str(e))

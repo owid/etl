@@ -1533,25 +1533,31 @@ def test_section_badges_answer_whether_anything_is_left_to_review():
 
 
 def test_a_tick_only_counts_while_the_text_it_was_made_against_stands(monkeypatch):
-    """The progress count applies the same content-hash rule as the toggles, or the two would disagree."""
+    """The badge counter applies the same content-hash rule as the toggles, or the two would disagree.
+
+    It also has to read the ticks live: they are counted from identities the cached summary carries, but
+    the counting query itself is uncached, so pressing a toggle moves the number in the same rerun.
+    """
     from apps.wizard.app_pages.metadata_diff.core import mark_identity, surface_key
-    from apps.wizard.app_pages.metadata_diff.data import REVIEWED, count_reviewed
+    from apps.wizard.app_pages.metadata_diff.data import REVIEWED, count_ticked
 
     group = ChangeGroup(field="descriptionKey", old=["a"], new=["b"], view_dims=[{"d": "x"}])
     edited = ChangeGroup(field="descriptionKey", old=["a"], new=["c"], view_dims=[{"d": "x"}])
     surface = surface_key("mdim", "grapher/ns/latest/ds")
     change_key, content_hash = mark_identity(surface, group)
 
-    stored = {change_key: {"status": REVIEWED, "contentHash": content_hash}}
-
     from apps.wizard.app_pages.metadata_diff import data as data_module
 
-    monkeypatch.setattr(data_module, "load_reviews", lambda engine, catalog_path: stored)
+    monkeypatch.setattr(
+        data_module,
+        "load_reviews",
+        lambda engine, catalog_path: {change_key: {"status": REVIEWED, "contentHash": content_hash}},
+    )
 
-    assert count_reviewed("engine", surface, [group]) == 1
+    assert count_ticked("engine", [(surface, *mark_identity(surface, group))]) == 1
     # Same slot, text moved on: the tick no longer counts.
-    assert count_reviewed("engine", surface, [edited]) == 0
-    assert count_reviewed("engine", surface, []) == 0
+    assert count_ticked("engine", [(surface, *mark_identity(surface, edited))]) == 0
+    assert count_ticked("engine", []) == 0
 
 
 def test_charts_are_listed_most_prominent_first():

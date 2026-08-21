@@ -26,11 +26,11 @@ from apps.wizard.app_pages.metadata_diff.core import (
     METADATA_FIELDS,
     ViewDiff,
     as_bullets,
-    behind_sources_drawer,
     charts_in_reading_order,
     diff_preview_html,
     field_label,
     inline_diff_html,
+    split_by_prominence,
     text_change_key,
 )
 from apps.wizard.app_pages.metadata_diff.data import set_scope
@@ -351,23 +351,36 @@ def render_affected_lists(view: ViewDiff, charts: list[dict], mdims: list[dict])
 
 
 def render_chart_list(charts: list[dict[str, Any]], verb: str = "render this text", fields: Any = None) -> None:
-    """Name the charts a change lands on — a count is not something an author can check.
+    """Name the charts a change lands on, in two sections — a count is not something an author can check.
 
-    Marks the ones that show the text only behind "Learn more about this data": a chart combining several
-    indicators has no data page, so its readers reach the same description through the sources drawer
-    instead. Less prominent, not absent — which is why every one of these charts is still counted.
+    The split is where the change meets a reader: a chart with a data page lays the text out on the page,
+    while one combining several indicators keeps it behind "Learn more about this data", under the
+    indicator's own entry. Both are affected — hence both listed and both counted — but they are not the
+    same thing to a reviewer deciding how much care an edit needs.
     """
     if not charts:
         st.caption("No published chart uses these indicators.")
         return
-    st.markdown(f"**{len(charts)} chart{'s' if len(charts) != 1 else ''} {verb}:**")
-    lines = []
-    for c in charts_in_reading_order(charts, fields):
-        slug = c.get("slug") or f"chart {c.get('chartId')}"
-        drawer = fields is not None and behind_sources_drawer(fields, c)
-        flag = " :gray-badge[:small[via *Learn more about this data*]]" if drawer else ""
-        lines.append(f"- [`{slug}`]({SOURCE.site}/grapher/{slug}){flag}")
-    st.markdown("\n".join(lines))
+
+    on_page, behind_drawer = split_by_prominence(charts, fields)
+
+    def _bullets(group: list[dict[str, Any]]) -> str:
+        rows = []
+        for c in group:
+            slug = c.get("slug") or f"chart {c.get('chartId')}"
+            rows.append(f"- [`{slug}`]({SOURCE.site}/grapher/{slug})")
+        return "\n".join(rows)
+
+    if on_page:
+        st.markdown(f"**{len(on_page)} data page{'s' if len(on_page) != 1 else ''} affected** — {verb}:")
+        st.markdown(_bullets(on_page))
+    if behind_drawer:
+        st.markdown(f"**{len(behind_drawer)} via *Learn more about this data***")
+        st.caption(
+            "These combine several indicators, so they have no data page: their readers reach the text "
+            "under the indicator's own entry in the sources drawer."
+        )
+        st.markdown(_bullets(behind_drawer))
 
 
 def render_author_scope(

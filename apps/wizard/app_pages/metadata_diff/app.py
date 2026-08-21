@@ -21,6 +21,7 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines
 from apps.wizard.app_pages.metadata_diff import cached, charts_section, explorers_section, mdims_section
+from apps.wizard.app_pages.metadata_diff.data import count_ticked
 from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, st_stale_server_banner
 from apps.wizard.utils.components import st_title_with_expert, url_persist
 from etl.config import OWID_ENV
@@ -39,6 +40,18 @@ SECTIONS = {
     "mdims": (":material/dashboard:", "MDims"),
     "explorers": (":material/explore:", "Explorers"),
 }
+
+
+def _review_progress(source_engine, summary) -> dict[str, tuple[int, int]]:
+    """(ticked, total) per section, with the ticks read fresh.
+
+    `summary` is cached for minutes, which is right for what changed and wrong for what has been reviewed:
+    pressing a toggle has to move the counter above it in the same rerun.
+    """
+    return {
+        section: (count_ticked(source_engine, entries), len(entries))
+        for section, entries in summary.review_keys.items()
+    }
 
 
 def _section_label(section: str, progress: dict[str, tuple[int, int]]) -> str:
@@ -80,6 +93,7 @@ what ships is what you meant, and to see how far each change reaches.
         st.warning("- " + "\n\n- ".join(WARN_MSG))
 
     summary = cached.summary(source_engine, target_engine)
+    progress = _review_progress(source_engine, summary)
     for warning in summary.warnings:
         st.warning(warning)
 
@@ -92,7 +106,7 @@ what ships is what you meant, and to see how far each change reaches.
     section = url_persist(st.segmented_control)(
         label="Section",
         options=list(SECTIONS),
-        format_func=lambda s: _section_label(s, summary.review_progress),
+        format_func=lambda s: _section_label(s, progress),
         key="diff-type",
         value="charts",
         label_visibility="collapsed",

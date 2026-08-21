@@ -512,6 +512,26 @@ def charts_behind_drawer(fields: Iterable[str], charts: list[dict[str, Any]]) ->
     return [c for c in charts if behind_sources_drawer(fields, c)]
 
 
+def split_by_prominence(
+    charts: list[dict[str, Any]], fields: Iterable[str] | None = None
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """(charts whose page shows the change, charts that keep it behind the sources drawer), each by slug.
+
+    Two groups rather than one flagged list: on thirty charts a per-row badge is something you scan for,
+    while a heading is something you see. `fields` decides what counts as prominent — a title or short
+    description is on every chart's canvas, so for those the second group is empty and the list stays one
+    section.
+    """
+    behind = (
+        charts_behind_drawer(fields, charts)
+        if fields is not None
+        else [c for c in charts if not c.get("has_data_page", True)]
+    )
+    behind_ids = {id(c) for c in behind}
+    on_page = [c for c in charts if id(c) not in behind_ids]
+    return charts_in_reading_order(on_page), charts_in_reading_order(behind)
+
+
 def charts_in_reading_order(charts: list[dict[str, Any]], fields: Iterable[str] | None = None) -> list[dict[str, Any]]:
     """Charts ordered the way a reviewer wants to read them: most prominent first, then by slug.
 

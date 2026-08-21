@@ -18,7 +18,6 @@ from apps.wizard.app_pages.metadata_diff import cached, datapage, mdim_pages
 from apps.wizard.app_pages.metadata_diff.core import (
     ChangeGroup,
     affected_charts,
-    charts_behind_drawer,
     charts_in_reading_order,
     distinct_garden_datasets,
     distinct_indicator_short_names,
@@ -139,18 +138,15 @@ def _render_change(
 ) -> None:
     """One distinct text change: what changed, where it appears, and what it reaches."""
     g: ChangeGroup = mark.group
-    imp = group_usage(g, usage)
-    mdims = imp["mdims"]
+    # Charts only, here. An MDim rendering the same indicator appears in the MDims section on its own
+    # card — its indicator text changed, which is what puts it there — so naming it in both places
+    # doubles every shared change and leaves neither section answering its own question.
     # Every chart using the indicator counts: its readers see the new text either on the chart's data page
-    # or through "Learn more about this data". The second group is marked, not deducted.
-    charts = imp["charts"]
-    behind_drawer = charts_behind_drawer({g.field}, charts)
+    # or through "Learn more about this data". The list below groups them; neither group is deducted.
+    charts = group_usage(g, usage)["charts"]
 
     with st.container(border=True):
-        head = f"{mark.icon} **{field_label(g.field)}** · {len(charts)} chart{'s' if len(charts) != 1 else ''}"
-        if mdims:
-            head += f" · {len(mdims)} MDim{'s' if len(mdims) != 1 else ''}"
-        st.markdown(head)
+        st.markdown(f"{mark.icon} **{field_label(g.field)}** · {len(charts)} chart{'s' if len(charts) != 1 else ''}")
         st.caption(_where_line(g))
         st_origin_caption(_group_paths(g), attribution)
 
@@ -165,32 +161,9 @@ def _render_change(
         with col_charts:
             with st.popover(f"📊 {len(charts)} affected chart{'s' if len(charts) != 1 else ''}", width="stretch"):
                 render_chart_list(charts, fields={g.field})
-                _prominence_note(behind_drawer, len(charts))
-                if mdims:
-                    verb = "use" if len(mdims) != 1 else "uses"
-                    st.markdown(f"**{len(mdims)} MDim{'s' if len(mdims) != 1 else ''}** also {verb} these indicators:")
-                    st.markdown("\n".join(f"- `{m.get('slug') or m.get('catalogPath')}`" for m in mdims))
                 _open_chart_buttons(charts, mark.change_key)
         with col_review:
             st_reviewed_toggle(source_engine, SURFACE, mark)
-
-
-def _prominence_note(behind_drawer: list[dict[str, Any]], n_total: int) -> None:
-    """Say how prominently the change lands on charts that show it only in the sources drawer.
-
-    Worth saying: it is the difference between a page a reader lands on and a drawer they have to open.
-    Not a reason to leave those charts out of the count — the earlier version of this note claimed the text
-    was "not shown to readers there", which is untrue. It is one click away, under the indicator's entry.
-    """
-    if not behind_drawer:
-        return
-    n = len(behind_drawer)
-    which = f"All {n} of these charts" if n == n_total else f"{n} of these {n_total} charts"
-    st.caption(
-        f"ℹ️ {which} combine several indicators, so they have no data page: their readers reach this text "
-        "through **Learn more about this data**, under the indicator's own entry, rather than on the page "
-        "itself."
-    )
 
 
 def _group_paths(g: ChangeGroup) -> set[str]:

@@ -14,7 +14,7 @@ from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.chart_diff.utils import SOURCE
 from apps.wizard.app_pages.metadata_diff import cached, datapage, discovery, mdim_pages
-from apps.wizard.app_pages.metadata_diff.core import ViewDiff, affected_charts, field_label
+from apps.wizard.app_pages.metadata_diff.core import ViewDiff, field_label
 from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, DIFF_CSS, impact_counts, st_origin_caption
 from apps.wizard.app_pages.metadata_diff.review_state import (
     n_reviewed,
@@ -142,7 +142,6 @@ def _render_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame,
     )
     changed_views = [v for v in view_diffs if v.changed]
     groups, other_groups = discovery.split_mdim_groups(catalog_path, changed_views)
-    usage = _usage(source_engine, view_diffs, catalog_path, row)
     paths = tuple(sorted({p for g in groups for p in (g.catalog_paths or set())}))
     attribution = cached.indicator_attribution(source_engine, target_engine, paths) if paths else {}
 
@@ -164,7 +163,7 @@ def _render_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame,
             marks = resolve_marks(source_engine, surface_key("mdim", catalog_path), groups)
             st.caption(f"{n_reviewed(marks)}/{len(marks)} reviewed")
             for mark in marks[:MAX_INLINE_CHANGES]:
-                _render_change(source_engine, catalog_path, mark, usage, attribution)
+                _render_change(source_engine, catalog_path, mark, attribution)
             if len(marks) > MAX_INLINE_CHANGES:
                 st.caption(f"… and {len(marks) - MAX_INLINE_CHANGES} more — open **View diff** above.")
 
@@ -177,15 +176,14 @@ def _render_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame,
             )
 
 
-def _render_change(source_engine: Engine, catalog_path: str, mark, usage: dict, attribution: dict[str, str]) -> None:
+def _render_change(source_engine: Engine, catalog_path: str, mark, attribution: dict[str, str]) -> None:
     """One distinct text change of an MDim, in data-page layout, with its reviewed toggle."""
     g = mark.group
-    # Same reach rule as the Charts section, or the identical change reports a different number
-    # depending on which page you opened.
-    charts = affected_charts(g, usage) if g.affects_indicator else []
+    # Views only, here — the charts this same indicator reaches are the Charts section's business, and it
+    # lists them there. What still belongs on an MDim card is *whether* the change is shared, because that
+    # decides whether scoping it to this MDim is even a question: the Blast radius and View diff pages
+    # behind the buttons above carry the cross-surface reach and the scope decision itself.
     reach = f"{len(g.view_dims)} view{'s' if len(g.view_dims) != 1 else ''}"
-    if charts:
-        reach += f" · ↗ {len(charts)} chart{'s' if len(charts) != 1 else ''}"
     scope = "🔗 shared indicator metadata" if g.affects_indicator else "🔒 MDim override"
 
     st.markdown(f"{mark.icon} **{field_label(g.field)}** :small[:gray[{reach} · {scope}]]")
