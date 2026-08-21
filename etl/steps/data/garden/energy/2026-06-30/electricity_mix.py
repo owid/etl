@@ -697,6 +697,14 @@ def build_monthly_electricity_mix() -> Table:
     tb = add_per_capita_variables_monthly(tb=tb)
     tb = add_share_variables_monthly(tb=tb)
     tb = tb.format(keys=["country", "date"], sort_columns=True, short_name="electricity_mix_monthly")
+
+    # Each point represents a calendar month, so tag the interval: grapher encodes sub-yearly data as
+    # days-since-zeroDay integers, and without this it formats them as individual days -- on the site,
+    # and in the MDIM download package, which labelled these monthly figures "daily" and dated them to
+    # the 1st. energy_prices tags its monthly table the same way.
+    for column in tb.columns:
+        tb[column].m.display = {**(tb[column].m.display or {}), "timeInterval": "month"}
+
     return tb
 
 

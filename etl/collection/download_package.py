@@ -105,6 +105,10 @@ class DownloadPackageTooLargeError(Exception):
     """Raised when the built package exceeds `MAX_PACKAGE_SIZE_BYTES`."""
 
 
+class UndeclaredTimeIntervalError(ValueError):
+    """A date-based series that must be labelled with a frequency but declares none."""
+
+
 class DuplicateColumnNameError(Exception):
     """Raised when two wide-table columns resolve to the same display name."""
 
@@ -257,13 +261,19 @@ def _format_time_labels(values: pd.Series, interval: str) -> pd.Series:
     return dates.dt.strftime("%Y-%m-%d")
 
 
-def _table_time_interval(tb: Table, axis: str) -> str:
-    """The interval declared by a table's value columns, as one value.
+def _table_time_interval(tb: Table, axis: str) -> str | None:
+    """The interval declared by a table's value columns, as one value, or None.
 
-    Grapher's own fallback: a date-based table with nothing declared is daily, a
-    year-based one is annual (`adapt_table_with_dates_to_grapher`, and the schema's
-    default). A table whose columns disagree has no single answer, and every caller
-    here needs one, so say so rather than pick.
+    A year axis needs no declaration: the schema's default is "year" and there is
+    nothing finer to mistake it for. A date axis does need one -- the dates alone
+    cannot say whether they are days, weeks or months, and guessing is how monthly
+    data ends up labelled `daily` and written `1999-01-01`, which reads as the 1st
+    of January. `electricity_mix_monthly` is exactly that case (its display carries
+    only a name), while `energy_prices_monthly` declares `month` and comes out
+    right. So return None and let the caller decide whether it can proceed without
+    knowing.
+
+    A table whose columns disagree has no single answer, and every caller needs one.
     """
     value_cols = [c for c in tb.columns if c not in ("country", "year", "date")]
     declared = {(getattr(tb[c].metadata, "display", None) or {}).get("timeInterval") for c in value_cols} - {None}
@@ -274,7 +284,7 @@ def _table_time_interval(tb: Table, axis: str) -> str:
         )
     if declared:
         return declared.pop()  # ty: ignore[invalid-return-type]
-    return "day" if axis == "date" else "year"
+    return None if axis == "date" else "year"
 
 
 def _time_column(tb: Table) -> str:
@@ -465,7 +475,7 @@ def build_wide_table_for_collection(collection: Collection) -> WideTable:
 
     dataset_cache: dict[str, CatalogDataset] = {}
     by_axis: dict[str, list[Table]] = defaultdict(list)
-    axis_intervals: dict[str, set[str]] = defaultdict(set)
+    axis_intervals: dict[str, set[str | None]] = defaultdict(set)
     column_to_dimensions: dict[str, list[dict]] = {}
     column_to_frequency: dict[str, str] = {}
     for (dataset_dir, table_name), cols in by_table.items():
@@ -489,7 +499,7 @@ def build_wide_table_for_collection(collection: Collection) -> WideTable:
             catalog_path = f"{dataset_dir}/{table_name}#{column}"
             rename[column] = catalog_path
             column_to_dimensions[catalog_path] = combinations
-            column_to_frequency[catalog_path] = FREQUENCY_LABELS[interval]
+            column_to_frequency[catalog_path] = FREQUENCY_LABELS[interval] if interval else ""
             keep.append(column)
         by_axis[time_col].append(tb[keep].rename(columns=rename))
         axis_intervals[time_col].add(interval)
@@ -518,6 +528,14 @@ def build_wide_table_for_collection(collection: Collection) -> WideTable:
                 "resolutions relate."
             )
         interval = intervals.pop()
+        if interval is None:
+            raise UndeclaredTimeIntervalError(
+                f"The {axis!r} axis of {collection.catalog_path} declares no display.timeInterval, so "
+                "its rows cannot be labelled with a frequency or written at the right resolution. "
+                "Declare it on those indicators (`timeInterval: month`, as energy_prices does) rather "
+                "than having this guess -- guessing publishes monthly figures as daily ones, dated to "
+                "the 1st of the month."
+            )
         joined = _outer_join_on_key(tables)
         joined["frequency"] = FREQUENCY_LABELS[interval]
         joined["time"] = _format_time_labels(joined[axis], interval)
