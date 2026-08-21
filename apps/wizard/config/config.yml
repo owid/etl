@@ -120,7 +120,9 @@ sections:
         description: Review the metadata texts this branch changes, on charts, MDims and explorers
         maintainer: "@joe"
         icon: ":material/manage_search:"
-        image_url: "https://cdn.pixabay.com/photo/2017/01/10/03/54/icon-1968247_960_720.png"
+        # Chart Diff's apples: the two tools are the same comparison on different material, so they
+        # share the picture. (`search-comparison` already shares it too.)
+        image_url: "https://images.squarespace-cdn.com/content/v1/5ea8287254c2e00f35d1cc48/1595511684480-6RM6YK3XZGB2SD21GPGP/20140620appletoapplescomparison.jpg"
         disable:
           production: True
 
