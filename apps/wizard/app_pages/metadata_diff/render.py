@@ -49,6 +49,34 @@ BASELINE_NAME = TARGET.name
 # The URL key Chart Diff uses for the same control, so a link keeps its section across the two pages.
 SECTION_QUERY_KEY = "diff-type"
 SECTION_STATE_KEY = "metadata-diff-section"
+SECTION_NAV_KEY = "metadata-diff-nav"
+
+# The switcher rides along as you scroll: the lists below it run to hundreds of rows, and switching
+# section (or reading the review counter) should not mean scrolling back to the top to find the buttons.
+#
+# The positioning goes on the `stLayoutWrapper` Streamlit puts around the container, not on the container:
+# a sticky box can only travel inside its containing block, and that wrapper is sized to its content, so
+# sticking the container itself has nowhere to travel (measured: a 47px bar in a 47px wrapper). The
+# wrapper's parent is the full-height page block. `top` clears the app header, which overlays the top of
+# the scrolling area. If a Streamlit release renames the wrapper the rule stops matching and the bar
+# simply scrolls with the page again — the styling below it stands on its own.
+SECTION_NAV_CSS = f"""
+<style>
+div[data-testid="stLayoutWrapper"]:has(> div.st-key-{SECTION_NAV_KEY}) {{
+    position: sticky;
+    /* Clears the app header, which is opaque and overlays the top 3.75rem of the scrolling area. */
+    top: 3.75rem;
+    z-index: 100;
+}}
+div.st-key-{SECTION_NAV_KEY} {{
+    /* Opaque, or the rows sliding underneath read through the bar. The wizard theme pins base="light"
+       (.streamlit/config.toml), so the page background is white. */
+    background: #ffffff;
+    padding: 0.4rem 0 0.5rem 0;
+    border-bottom: 1px solid rgba(49, 51, 63, 0.15);
+}}
+</style>
+"""
 
 DIFF_CSS = """
 <style>
@@ -358,16 +386,26 @@ def render_affected_lists(view: ViewDiff, charts: list[dict], mdims: list[dict])
             st.markdown(f"- `{m.get('catalogPath')}`")
 
 
-def render_chart_list(charts: list[dict[str, Any]], verb: str = "render this text", fields: Any = None) -> None:
-    """Name the charts a change lands on, in two sections — a count is not something an author can check.
+def render_chart_list(
+    charts: list[dict[str, Any]],
+    verb: str = "render this text",
+    fields: Any = None,
+    drafts: list[dict[str, Any]] | None = None,
+) -> None:
+    """Name the charts a change lands on, in sections — a count is not something an author can check.
 
-    The split is where the change meets a reader: a chart with a data page lays the text out on the page,
-    while one combining several indicators keeps it behind "Learn more about this data", under the
+    The first split is where the change meets a reader: a chart with a data page lays the text out on the
+    page, while one combining several indicators keeps it behind "Learn more about this data", under the
     indicator's own entry. Both are affected — hence both listed and both counted — but they are not the
     same thing to a reviewer deciding how much care an edit needs.
+
+    `drafts` are unpublished charts, listed last and never counted with the rest: no reader can open one,
+    so they are a different question — is this edit what the draft's author wants — and their links go to
+    the admin editor, since `/grapher/<slug>` serves nothing until the chart is published.
     """
-    if not charts:
-        st.caption("No published chart uses these indicators.")
+    drafts = drafts or []
+    if not charts and not drafts:
+        st.caption("No chart uses these indicators.")
         return
 
     on_page, behind_drawer = split_by_prominence(charts, fields)
@@ -389,6 +427,18 @@ def render_chart_list(charts: list[dict[str, Any]], verb: str = "render this tex
             "under the indicator's own entry in the sources drawer."
         )
         st.markdown(_bullets(behind_drawer))
+    if drafts:
+        st.markdown(f"**{len(drafts)} unpublished draft{'s' if len(drafts) != 1 else ''}**")
+        st.caption(
+            "Not counted above: no reader can open a draft. Listed because the edit is in them, and "
+            "whoever is building them may not expect it. Links open the chart in the admin."
+        )
+        rows = []
+        for c in sorted(drafts, key=lambda c: str(c.get("slug") or "")):
+            chart_id = c.get("chartId")
+            label = c.get("slug") or f"chart {chart_id}"
+            rows.append(f"- [`{label}`]({SOURCE.admin_site}/admin/charts/{chart_id}/edit)")
+        st.markdown("\n".join(rows))
 
 
 def render_author_scope(
@@ -575,16 +625,19 @@ def st_section_switcher(progress: dict[str, tuple[int, int]]) -> str:
     from_url = coerce_section(st.query_params.get(SECTION_QUERY_KEY))
     st.session_state[SECTION_STATE_KEY] = coerce_section(st.session_state.get(SECTION_STATE_KEY), from_url)
 
-    selected = coerce_section(
-        st.segmented_control(
-            label="Section",
-            options=list(SECTIONS),
-            format_func=lambda s: section_label(s, progress),
-            key=SECTION_STATE_KEY,
-            label_visibility="collapsed",
-        ),
-        from_url,
-    )
+    # Idempotent, and emitted on every rerun so the bar survives a rerun that starts mid-page.
+    st.markdown(SECTION_NAV_CSS, unsafe_allow_html=True)
+    with st.container(border=False, key=SECTION_NAV_KEY):
+        selected = coerce_section(
+            st.segmented_control(
+                label="Section",
+                options=list(SECTIONS),
+                format_func=lambda s: section_label(s, progress),
+                key=SECTION_STATE_KEY,
+                label_visibility="collapsed",
+            ),
+            from_url,
+        )
 
     # Keep the default out of the URL, as url_persist does, so a plain link stays plain. Written only on
     # a real change, so a run that touches nothing leaves the URL alone.

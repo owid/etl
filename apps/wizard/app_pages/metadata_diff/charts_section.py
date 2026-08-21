@@ -18,6 +18,7 @@ from apps.wizard.app_pages.metadata_diff import cached, datapage, mdim_pages
 from apps.wizard.app_pages.metadata_diff.core import (
     ChangeGroup,
     affected_charts,
+    affected_drafts,
     charts_in_reading_order,
     distinct_garden_datasets,
     distinct_indicator_short_names,
@@ -144,9 +145,26 @@ def _render_change(
     # Every chart using the indicator counts: its readers see the new text either on the chart's data page
     # or through "Learn more about this data". The list below groups them; neither group is deducted.
     charts = group_usage(g, usage)["charts"]
+    drafts = affected_drafts(g, usage)
 
+    plural = "s" if len(charts) != 1 else ""
+    # Drafts sit outside the reach count and are named in the label, so "10 charts" keeps meaning
+    # "10 charts a reader can open" wherever it appears.
+    draft_note = f" · {len(drafts)} draft{'s' if len(drafts) != 1 else ''}" if drafts else ""
     with st.container(border=True):
-        st.markdown(f"{mark.icon} **{field_label(g.field)}** · {len(charts)} chart{'s' if len(charts) != 1 else ''}")
+        # The header carries the reach and the list behind it: "10 charts" is a claim, and the charts are
+        # what lets an author check it, so the count itself opens them rather than sending the reader to
+        # the foot of the card. Review sits alongside, the way the MDim cards lead with their actions.
+        col_head, col_review = st.columns([3, 1], vertical_alignment="center")
+        with col_head:
+            with st.container(border=False, horizontal=True, vertical_alignment="center"):
+                st.markdown(f"{mark.icon} **{field_label(g.field)}** ·")
+                with st.popover(f"📊 {len(charts)} chart{plural}{draft_note}"):
+                    render_chart_list(charts, fields={g.field}, drafts=drafts)
+                    _open_chart_buttons(charts, mark.change_key)
+        with col_review:
+            st_reviewed_toggle(source_engine, SURFACE, mark)
+
         st.caption(_where_line(g))
         st_origin_caption(_group_paths(g), attribution)
 
@@ -156,14 +174,6 @@ def _render_change(
             staging_label="This staging server",
             show_unchanged_slots=False,
         )
-
-        col_charts, col_review = st.columns([3, 1])
-        with col_charts:
-            with st.popover(f"📊 {len(charts)} affected chart{'s' if len(charts) != 1 else ''}", width="stretch"):
-                render_chart_list(charts, fields={g.field})
-                _open_chart_buttons(charts, mark.change_key)
-        with col_review:
-            st_reviewed_toggle(source_engine, SURFACE, mark)
 
 
 def _group_paths(g: ChangeGroup) -> set[str]:

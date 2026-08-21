@@ -101,10 +101,21 @@ def usage_for_indicators(
     _source_engine: Engine,
     cache_key: str = "",
 ) -> dict[int, dict[str, list[dict[str, Any]]]]:
-    """For each changed indicator, the charts and *other* MDims on this server that use it."""
+    """For each changed indicator, the charts and *other* MDims on this server that use it.
+
+    Published and draft charts come back under separate keys. Every caller that counts reach reads
+    `charts`, so a draft cannot inflate a number by being in the same list — it has to be asked for.
+    """
     ids = list(indicator_ids)
     if not ids:
         return {}
     charts = charts_using_indicators(_source_engine, ids)
     mdims = mdims_using_indicators(_source_engine, ids, exclude_catalog_path=catalog_path)
-    return {i: {"charts": charts.get(i, []), "mdims": mdims.get(i, [])} for i in ids}
+    return {
+        i: {
+            "charts": [c for c in charts.get(i, []) if c.get("is_published", True)],
+            "draft_charts": [c for c in charts.get(i, []) if not c.get("is_published", True)],
+            "mdims": mdims.get(i, []),
+        }
+        for i in ids
+    }

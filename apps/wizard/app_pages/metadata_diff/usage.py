@@ -22,7 +22,11 @@ def _chunked(values: list, size: int = 500):
 
 
 def charts_using_indicators(engine: Engine, indicator_ids: list[int]) -> dict[int, list[dict[str, Any]]]:
-    """indicator id -> published charts that use it (chartId, slug, title, has_data_page).
+    """indicator id -> charts that use it (chartId, slug, title, has_data_page, is_published).
+
+    Drafts are returned alongside published charts rather than filtered out: an edit does land on them,
+    and their author is often the person reading this. They are flagged instead of counted — `is_published`
+    is false — so reach stays the number of charts a reader can reach.
 
     `has_data_page` records how prominently an indicator-metadata edit appears, not whether it appears.
     Grapher gives a data page — where the descriptions are laid out in full — only to a single-indicator
@@ -42,19 +46,24 @@ def charts_using_indicators(engine: Engine, indicator_ids: list[int]) -> dict[in
             select cd.variableId as variableId,
                    c.id as chartId,
                    cc.slug as slug,
-                   cc.full ->> '$.title' as title
+                   cc.full ->> '$.title' as title,
+                   c.publishedAt is not null as is_published
             from chart_dimensions cd
             join charts c on c.id = cd.chartId
             join chart_configs cc on cc.id = c.configId
             where cd.variableId in ({placeholders})
-              and c.publishedAt is not null
             """,
             engine=engine,
             params=tuple(chunk),
         )
         for record in df.to_dict("records"):
             result[int(record["variableId"])].append(
-                {"chartId": int(record["chartId"]), "slug": record["slug"], "title": record["title"]}
+                {
+                    "chartId": int(record["chartId"]),
+                    "slug": record["slug"],
+                    "title": record["title"],
+                    "is_published": bool(record["is_published"]),
+                }
             )
             all_chart_ids.add(int(record["chartId"]))
 

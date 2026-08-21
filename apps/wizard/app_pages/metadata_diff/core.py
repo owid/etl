@@ -477,14 +477,21 @@ def group_usage(g: "ChangeGroup", usage: dict[int, dict[str, list[Any]]]) -> dic
     """
     ids = g.indicator_ids or ({g.indicator_id} if g.indicator_id is not None else set())
     charts: dict[int, dict[str, Any]] = {}
+    drafts: dict[int, dict[str, Any]] = {}
     mdims: dict[str, dict[str, Any]] = {}
     for iid in ids:
         imp = usage.get(iid, {})
         for c in imp.get("charts", []):
             charts.setdefault(c["chartId"], c)
+        for c in imp.get("draft_charts", []):
+            drafts.setdefault(c["chartId"], c)
         for m in imp.get("mdims", []):
             mdims.setdefault(m["catalogPath"], m)
-    return {"charts": list(charts.values()), "mdims": list(mdims.values())}
+    return {
+        "charts": list(charts.values()),
+        "draft_charts": list(drafts.values()),
+        "mdims": list(mdims.values()),
+    }
 
 
 # Fields laid out in full on an indicator's own data page. Grapher gives a data page to a
@@ -555,6 +562,15 @@ def charts_in_reading_order(charts: list[dict[str, Any]], fields: Iterable[str] 
 def affected_charts(g: "ChangeGroup", usage: dict[int, dict[str, list[Any]]]) -> list[dict[str, Any]]:
     """Every published chart this change reaches — the one reach number, wherever it is reported."""
     return list(group_usage(g, usage).get("charts", []))
+
+
+def affected_drafts(g: "ChangeGroup", usage: dict[int, dict[str, list[Any]]]) -> list[dict[str, Any]]:
+    """Unpublished charts this change lands on — shown, never counted as reach.
+
+    A draft renders the new text for whoever opens it in the admin and for nobody else, so it belongs in
+    the review (its author may well be the person reading this) and outside every reader-facing number.
+    """
+    return list(group_usage(g, usage).get("draft_charts", []))
 
 
 def group_changes(view_diffs: list[ViewDiff]) -> list[ChangeGroup]:

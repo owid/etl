@@ -1686,3 +1686,68 @@ def test_section_switcher_keeps_the_url_on_a_section_key():
     at.segmented_control[0].set_value("charts").run()
     assert at.text[0].value == "section=charts"
     assert param(at) is None
+
+
+def test_a_draft_chart_is_listed_but_never_counted_as_reach():
+    """Drafts are shown to the author and kept out of every reader-facing number.
+
+    They used to be dropped at the query, so an edit landing on a draft was invisible here. Keeping them
+    in the same list as published charts would have been worse: `affected_charts` feeds the section
+    header, the PR brief and the "apply to all — N charts" scope decision, none of which may overstate
+    who sees a change.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import affected_charts, affected_drafts, group_usage
+
+    group = ChangeGroup(field="descriptionKey", old=["a"], new=["b"], indicator_ids={1, 2})
+    usage = {
+        1: {
+            "charts": [{"chartId": 10, "slug": "live-one", "has_data_page": True, "is_published": True}],
+            "draft_charts": [{"chartId": 11, "slug": "wip", "has_data_page": True, "is_published": False}],
+            "mdims": [],
+        },
+        # A second indicator of the same shared definition, reaching one of the same charts.
+        2: {
+            "charts": [{"chartId": 10, "slug": "live-one", "has_data_page": True, "is_published": True}],
+            "draft_charts": [{"chartId": 12, "slug": "wip-two", "has_data_page": False, "is_published": False}],
+            "mdims": [],
+        },
+    }
+
+    assert [c["chartId"] for c in affected_charts(group, usage)] == [10]
+    assert sorted(c["chartId"] for c in affected_drafts(group, usage)) == [11, 12]
+    # Both sides dedupe across the indicators of a shared definition.
+    assert len(group_usage(group, usage)["charts"]) == 1
+
+    # A usage dict from before drafts were kept carries no key, and must not raise.
+    legacy = {1: {"charts": [{"chartId": 10, "slug": "live-one"}], "mdims": []}}
+    assert affected_drafts(group, legacy) == []
+
+
+def test_chart_list_names_drafts_separately(monkeypatch):
+    """The list has three groups, and a draft links to the admin: /grapher/<slug> serves nothing yet."""
+    from apps.wizard.app_pages.metadata_diff import render
+
+    written: list[str] = []
+    monkeypatch.setattr(render.st, "markdown", lambda text, **kw: written.append(str(text)))
+    monkeypatch.setattr(render.st, "caption", lambda text, **kw: written.append(str(text)))
+
+    render.render_chart_list(
+        [{"chartId": 1, "slug": "published-one", "has_data_page": True, "is_published": True}],
+        fields={"descriptionKey"},
+        drafts=[{"chartId": 7, "slug": "draft-one", "has_data_page": True, "is_published": False}],
+    )
+    out = "\n".join(written)
+
+    assert "1 data page affected" in out
+    assert "1 unpublished draft" in out
+    assert "published-one" in out and "draft-one" in out
+    # The draft's link goes to the editor, not to a public URL that would 404.
+    assert "/admin/charts/7/edit" in out
+    assert "/grapher/draft-one" not in out
+
+    # Drafts alone still render — the case where an edit only lands on unpublished work.
+    written.clear()
+    render.render_chart_list([], fields={"descriptionKey"}, drafts=[{"chartId": 7, "slug": "d", "is_published": False}])
+    out = "\n".join(written)
+    assert "1 unpublished draft" in out
+    assert "No chart uses these indicators" not in out

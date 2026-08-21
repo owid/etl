@@ -149,6 +149,10 @@ def _render_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame,
         badge = "🆕 new" if row["is_new"] else f"{len(groups)} change{'s' if len(groups) != 1 else ''}"
         n_views = len(changed_views)
         head = f"**`{catalog_path}`** :gray-badge[{badge}]"
+        if row["is_draft"]:
+            # Which expander a card sits in is not something you can see once you are reading the card.
+            head += " :orange-badge[📝 unpublished]"
+
         if n_views:
             head += f" :small[:gray[{n_views} of {len(view_diffs)} views]]"
         st.markdown(head)
