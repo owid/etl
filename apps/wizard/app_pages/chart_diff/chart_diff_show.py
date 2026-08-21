@@ -260,16 +260,6 @@ class ChartDiffShow:
             self._refresh_chart_diff()
 
         resolver = ChartDiffConflictResolver(self.diff, self.source_session)
-        col1, col2 = st.columns(2)
-        with col1:
-            st.warning("This is under development! Find below a form with the different fields that present conflicts.")
-        with col2:
-            st.button(
-                key=f"resolve-conflicts-{self.diff.chart_id}",
-                label="⚠️ Mark as resolved: Accept all changes from staging",
-                help="Click to resolve the conflict by accepting all changes from staging. The changes from production will be ignored. This can be useful if you're happy with the changes in staging as they are.",
-                on_click=_mark_as_resolved,
-            )
 
         # If things to compare...
         if resolver.config_compare:
@@ -314,9 +304,32 @@ class ChartDiffShow:
             )
             if undecided:
                 st.caption("Choose an environment for: " + ", ".join(f"`{field}`" for field in undecided) + ".")
+
+            # Recovery path for a failed write: the error message points at this button.
+            if st.session_state.get(f"conflict-write-failed-{self.diff.chart_id}"):
+                st.button(
+                    "Mark as resolved",
+                    key=f"resolve-conflicts-{self.diff.chart_id}",
+                    help="Clear the conflict without writing anything, for when you have already integrated the changes by hand.",
+                    on_click=_mark_as_resolved,
+                )
+
+            st.caption(
+                "This is under development. A field marked *Not present* is missing from that "
+                "environment's config; charts inherit those fields from the indicator's metadata, so "
+                "choosing that side removes the field rather than blanking it."
+            )
         else:
-            st.success(
-                "No conflicts found actually. Unsure why you were prompted with the conflict resolver. Please report."
+            st.info(
+                "Production was edited after this staging server was created, but no config field "
+                "differs between the two. Mark the conflict as resolved to carry on."
+            )
+            st.button(
+                "Mark as resolved",
+                key=f"resolve-conflicts-{self.diff.chart_id}",
+                type="primary",
+                help="Clear the conflict. Neither chart is changed.",
+                on_click=_mark_as_resolved,
             )
 
     def _show_chart_diff_header(self):

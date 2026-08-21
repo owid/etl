@@ -324,7 +324,7 @@ def _refreshable_app():
 
     import apps.wizard.app_pages.chart_diff.conflict_resolver as cr
 
-    staging_title = "New staging title" if st.session_state.get("refreshed") else "Staging title"
+    production_title = "New production title" if st.session_state.get("refreshed") else "Production title"
 
     class _Chart:
         def __init__(self, config):
@@ -335,8 +335,8 @@ def _refreshable_app():
         chart_id = 42
 
         def __init__(self):
-            self.target_chart = _Chart({"$schema": "s", "title": "Production title"})
-            self.source_chart = _Chart({"$schema": "s", "title": staging_title})
+            self.target_chart = _Chart({"$schema": "s", "title": production_title})
+            self.source_chart = _Chart({"$schema": "s", "title": "Staging title"})
 
         def set_conflict_to_resolved(self, session):
             pass
@@ -354,23 +354,23 @@ def _refreshable_app():
 def test_editor_follows_a_value_that_changed_under_it(fake_admin_api):
     """An untouched editor must not keep showing -- and writing back -- a superseded value."""
     at = AppTest.from_function(_refreshable_app, default_timeout=30).run()
-    at = at.radio[0].set_value(2).run()
-    assert at.text_area[0].value == "Staging title"
+    at = at.radio[0].set_value(1).run()
+    assert at.text_area[0].value == "Production title"
 
-    # The staging chart gets edited again and the diff is refreshed.
+    # The production chart gets edited again and the diff is refreshed.
     at.session_state["refreshed"] = True
     at = at.run()
-    assert at.text_area[0].value == "New staging title"
+    assert at.text_area[0].value == "New production title"
     assert at.warning == []
 
     at = at.button[0].click().run()
-    assert fake_admin_api.calls[0]["config"]["title"] == "New staging title"
+    assert fake_admin_api.calls[0]["config"]["title"] == "New production title"
 
 
 def test_a_hand_edit_survives_a_value_that_changed_under_it(fake_admin_api):
     """A hand edit is never thrown away silently -- it is kept, and the user is told why it matters."""
     at = AppTest.from_function(_refreshable_app, default_timeout=30).run()
-    at = at.radio[0].set_value(2).run()
+    at = at.radio[0].set_value(1).run()
     at = at.text_area[0].set_value("Hand-written title").run()
 
     at.session_state["refreshed"] = True
@@ -382,9 +382,9 @@ def test_a_hand_edit_survives_a_value_that_changed_under_it(fake_admin_api):
     assert fake_admin_api.calls[0]["config"]["title"] == "Hand-written title"
 
     # Re-picking an environment starts from the new value, as the warning says.
-    at = at.radio[0].set_value(1).run()
     at = at.radio[0].set_value(2).run()
-    assert at.text_area[0].value == "New staging title"
+    at = at.radio[0].set_value(1).run()
+    assert at.text_area[0].value == "New production title"
 
 
 def test_a_literal_json_cannot_hold_is_a_field_error(fake_admin_api):
@@ -466,3 +466,85 @@ def test_emptying_the_editor_removes_the_field_and_says_so(fake_admin_api):
 
     assert "note" not in fake_admin_api.calls[0]["config"]
     assert "(field removed)" in at.text[0].value
+
+
+def test_choosing_staging_everywhere_writes_nothing(fake_admin_api):
+    """That is the chart staging already has, so it needs no revision, only the conflict cleared."""
+    at = AppTest.from_function(_resolve_app, default_timeout=30).run()
+    at = at.radio[0].set_value(2).run()
+    at = at.radio[1].set_value(2).run()
+    at = at.radio[2].set_value(2).run()
+    at = at.button[0].click().run()
+
+    assert fake_admin_api.calls == []
+    assert at.text[0].value.startswith("success: Chart 42 left as it is on staging")
+
+
+def _realistic_app():
+    """A conflict on a config that validates against the real grapher schema. Self-contained."""
+    import streamlit as st
+
+    import apps.wizard.app_pages.chart_diff.conflict_resolver as cr
+
+    base = {
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.011.json",
+        "dimensions": [{"property": "y", "variableId": 1000}],
+        "subtitle": "A subtitle",
+    }
+
+    class _Chart:
+        def __init__(self, config):
+            self.config = config
+            self.lastEditedByUserId = 13
+
+    class _Diff:
+        chart_id = 42
+
+        def __init__(self):
+            self.target_chart = _Chart({**base, "title": "Production title"})
+            self.source_chart = _Chart({**base, "title": "Staging title"})
+
+        def set_conflict_to_resolved(self, session):
+            pass
+
+    resolver = cr.ChartDiffConflictResolver(_Diff(), session=None)  # ty: ignore
+    for field in resolver.config_compare:
+        resolver.show_field_resolver(field)
+    st.button("Resolve conflicts", disabled=bool(resolver.fields_undecided), on_click=resolver.resolve_conflicts)
+
+    message = st.session_state.get("conflict-resolver-msg-42")
+    if message is not None:
+        st.text(f"{message[0]}: {message[1]}")
+
+
+@pytest.fixture
+def fake_admin_api_real_schema(monkeypatch):
+    """Like `fake_admin_api`, but validating against the grapher schema vendored in the repo."""
+    import apps.wizard.app_pages.chart_diff.conflict_resolver as cr
+    from etl.files import read_json_schema
+    from etl.paths import SCHEMAS_DIR
+
+    schema = read_json_schema(SCHEMAS_DIR / "grapher-schema.011.json")
+    FakeAdminAPI.calls = []
+    monkeypatch.setattr(cr, "AdminAPI", FakeAdminAPI)
+    monkeypatch.setattr(cr, "get_schema_from_url", lambda url: schema)
+    return FakeAdminAPI
+
+
+def test_resolving_does_not_fill_the_config_with_schema_defaults(fake_admin_api_real_schema):
+    """Resolving a conflict changes the conflicted fields and nothing else.
+
+    Validation used to double as a transformation: it filled in every schema default, which wrote
+    ~38 top-level fields the chart never had (`hasMapTab`, `chartTypes`, `minTime`, `map.region`, ...)
+    as explicit chart-level values, so they stopped following the indicator's metadata and showed up
+    as differences against production.
+    """
+    at = AppTest.from_function(_realistic_app, default_timeout=30).run()
+    at = at.radio[0].set_value(1).run()  # title <- production
+    at = at.button[0].click().run()
+
+    assert at.exception == []
+    config = fake_admin_api_real_schema.calls[0]["config"]
+    assert config["title"] == "Production title"
+    # Exactly the fields the chart had, no more.
+    assert set(config) == {"$schema", "dimensions", "subtitle", "title"}

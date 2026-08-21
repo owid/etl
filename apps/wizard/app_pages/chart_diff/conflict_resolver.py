@@ -146,6 +146,19 @@ def compare_chart_configs(c1: dict[str, Any], c2: dict[str, Any]) -> list[dict[s
     return diff_list
 
 
+def show_field_value(value: Any) -> None:
+    """Render one side's value of a conflicted field.
+
+    A field that is not in that environment's config gets a short marker rather than a `None`: the
+    chart inherits such fields from the indicator's metadata, and the difference between "absent" and
+    "blank" matters when resolving (see `build_resolved_config`).
+    """
+    if value is None:
+        st.warning("Not present", icon=":material/block:")
+    else:
+        st.write(value)
+
+
 class ChartDiffConflictResolver:
     """Resolve conflicts between charts.
 
@@ -195,21 +208,16 @@ class ChartDiffConflictResolver:
             # Choose option
             choice = self._choose_env(field)
 
-            # Show the fields values
-            msg_none = "The field might be `None` because it is not present in the config, but inherited automatically from the indicator's metadata."
+            # Show the field's value on each side
             col1, col2 = st.columns(2)
             with col1:
                 with st.container(border=True):
                     st.markdown("**Production**")
-                    st.write(field["raw1"])
-                    if field["raw1"] is None:
-                        st.warning(msg_none)
+                    show_field_value(field["raw1"])
             with col2:
                 with st.container(border=True):
                     st.markdown("**Staging**")
-                    st.write(field["raw2"])
-                    if field["raw2"] is None:
-                        st.warning(msg_none)
+                    show_field_value(field["raw2"])
 
             # Merge editor
             self._show_merge_editor(field, choice)
@@ -359,16 +367,28 @@ class ChartDiffConflictResolver:
             # Consolidate changes
             config = build_resolved_config(self.diff.source_chart.config, resolutions)
 
-            # `validate_chart_config_and_set_defaults` drops isInheritanceEnabled (it lives in the
-            # charts table, not in the config schema), but AdminAPI.update_chart needs it to set the
-            # inheritance flag -- without re-attaching it, resolving that field does nothing.
-            is_inheritance_enabled = config.get("isInheritanceEnabled")
-
-            # Verify config
-            try:
-                config_new = validate_chart_config_and_set_defaults(
-                    config, schema=get_schema_from_url(config["$schema"])
+            # Choosing staging for every field leaves the chart exactly as it is. Say so and mark the
+            # conflict resolved, rather than pushing an identical config: that would add a chart
+            # revision and bump updatedAt, which invalidates an existing approval of this diff.
+            if config == build_resolved_config(self.diff.source_chart.config, {}):
+                self.diff.set_conflict_to_resolved(self.session)
+                st.session_state.pop(f"conflict-write-failed-{self.diff.chart_id}", None)
+                st.session_state[message_key] = (
+                    "success",
+                    f"Chart {self.diff.chart_id} left as it is on staging, conflict marked as resolved:\n\n{summary}",
                 )
+                return
+
+            # Verify the config, but send the config we built: the return value of this function has
+            # every schema default filled in (38 extra top-level fields on a typical chart, from
+            # `hasMapTab` to `map.region`), which would write values the chart never had as explicit
+            # overrides -- they stop following the indicator's metadata and show up as differences
+            # against production for ever after. Removing them again afterwards is not the answer
+            # either: `validate_chart_config_and_remove_defaults` reverts genuine overrides that
+            # happen to equal a schema default (#5911). Resolving a conflict should change the
+            # conflicted fields and nothing else.
+            try:
+                validate_chart_config_and_set_defaults(config, schema=get_schema_from_url(config["$schema"]))
             except Exception as e:
                 log.error(e)
                 st.session_state[message_key] = (
@@ -377,28 +397,28 @@ class ChartDiffConflictResolver:
                 )
                 return
 
-            if is_inheritance_enabled is not None:
-                config_new["isInheritanceEnabled"] = is_inheritance_enabled
-
             # User who last edited the chart
             user_id = self.diff.source_chart.lastEditedByUserId
 
             api = AdminAPI(SOURCE)
             try:
-                # Push new chart to staging
+                # Push new chart to staging. isInheritanceEnabled stays in the payload on purpose:
+                # update_chart pops it and turns it into the ?inheritance= parameter.
                 api.update_chart(
                     chart_id=self.diff.chart_id,
-                    chart_config=config_new,
+                    chart_config=config,
                     user_id=user_id,
                 )
             except HTTPError as e:
                 log.error(e)
+                st.session_state[f"conflict-write-failed-{self.diff.chart_id}"] = True
                 st.session_state[message_key] = (
                     "error",
-                    f"An error occurred while updating the chart in staging. Please report this to #proj-new-data-workflow. If you are in a rush, you can manually integrate the changes in production [here]({SOURCE.chart_admin_site(self.diff.chart_id)}), and then click on the 'Mark as resolved' button in the conflict resolver. \n\n {e}",
+                    f"An error occurred while updating the chart in staging. Please report this to #proj-new-data-workflow. If you are in a rush, you can manually integrate the changes in production [here]({SOURCE.chart_admin_site(self.diff.chart_id)}), and then click on the 'Mark as resolved' button below. \n\n {e}",
                 )
             else:
                 # Set conflict as resolved
+                st.session_state.pop(f"conflict-write-failed-{self.diff.chart_id}", None)
                 self.diff.set_conflict_to_resolved(self.session)
                 # Signal user that everything went well, and with which value each field ended up
                 st.session_state[message_key] = (
