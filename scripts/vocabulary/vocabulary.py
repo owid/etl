@@ -41,6 +41,23 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from owid.catalog import s3_utils  # ty: ignore
 
+from coverage_model import (  # ty: ignore
+    DEFAULT_VIEWS_COLUMN,
+    EmptyAnalyticsError,
+    TopicSelection,
+    ViewAnalytics,
+    WeightedUniverse,
+    fetch_topic_universe,
+    load_mdim_view_config_ids,
+    load_view_analytics,
+    select_terms_by_coverage,
+    weigh_universe,
+)
+from coverage_report import (  # ty: ignore
+    render_html_report,
+    render_run_summary,
+    render_topic_table,
+)
 from etl.config import OWID_ENV  # ty: ignore
 
 S3_BUCKET_NAME = "owid-public"
@@ -55,18 +72,17 @@ DEFAULT_MODEL = "gemini-3.7-flash"
 LLM_MAX_ATTEMPTS = 4
 LLM_RETRY_BACKOFF_SECONDS = 4
 
-# Phase 2 asks the site's own search API what each candidate term actually
-# returns, so phase 3 can judge the shortlist on real results rather than on how
-# the terms read. This is the same Algolia index the all-charts block searches,
-# filtered to the same topic, so "what would a reader see if they clicked this
-# chip" is answered directly instead of guessed at.
-DEFAULT_SEARCH_API = "https://ourworldindata.org/api/search"
-# How many results define a term's destination. A suggestion is a shortcut to
-# the top of a result list, not to all of it — two terms whose first few charts
-# are identical are duplicates however long their tails are.
-SEARCH_API_TOP_N = 3
-SEARCH_API_CONCURRENCY = 8
-SEARCH_API_TIMEOUT_SECONDS = 30
+# How many topics' record sets to fetch at once.
+SEARCH_CONCURRENCY = 8
+
+# How many terms to publish. The site shows five, then drops any that name a place
+# or repeat the topic's own name, so a couple of spares keep the line full.
+DEFAULT_MAX_TERMS = 8
+
+# A term revealing less than this share of a topic's views is not worth one of
+# five slots on a single line. Terms just below it are reported as near misses so
+# the floor can be judged from the output.
+DEFAULT_MIN_MARGINAL_SHARE = 0.01
 
 # Gemini pricing per million tokens, for the cost estimate the CLI prints.
 # Models absent from here still run; their cost is simply reported as unknown,
@@ -96,52 +112,50 @@ def get_all_topic_slugs() -> list[str]:
     return df["slug"].tolist()
 
 
-def extract_chart_texts(topic_slug: str) -> tuple[str, list[str]]:
-    """Extract all chart titles and subtitles for a topic.
+def get_topic_names(topic_slugs: list[str]) -> dict[str, str]:
+    """Map topic slugs to the tag names the search index and gdocs use.
 
-    Returns: (topic_name, list_of_texts)
+    One query for every topic rather than one per topic: OWID_ENV.read_sql opens a
+    connection per call, and the old per-topic version spent most of a run's
+    wall-clock on 125 of them.
     """
-    query = """
-        SELECT DISTINCT
-            t.name as topic_name,
-            t.slug as topic_slug,
-            cc.full->'$.title' as chart_title,
-            cc.full->'$.subtitle' as chart_subtitle
-        FROM charts c
-        JOIN chart_configs cc ON c.configId = cc.id
-        JOIN chart_tags ct ON c.id = ct.chartId
-        JOIN tags t ON ct.tagId = t.id
-        WHERE c.publishedAt IS NOT NULL
-          AND t.slug = %s
+    placeholders = ", ".join(["%s"] * len(topic_slugs))
+    rows = OWID_ENV.read_sql(
+        f"SELECT slug, name FROM tags WHERE slug IN ({placeholders})",
+        params=tuple(topic_slugs),
+    )
+    return {row.slug: row.name for row in rows.itertuples(index=False)}
+
+
+def texts_for_prompt(universe: WeightedUniverse, limit: int = 200) -> list[str]:
+    """The topic's chart texts to show the model, most-viewed first.
+
+    Taken from the topic's *rendered* record set rather than from the `charts`
+    table, which was the old source and a real hole: multi-dim and explorer views
+    never reached the model, so on a topic like Climate Change it was proposing
+    terms having seen 67 of 714 records. Since selection now scores terms on how
+    much of that list they cover, the model has to be shown the list it is
+    being scored against.
+
+    Ordered by views and cut at `limit` rather than sampled at random, so the
+    terms proposed are the ones describing what people actually look at, and two
+    runs see the same input.
     """
-
-    df = OWID_ENV.read_sql(query, params=(topic_slug,))
-
-    if df.empty:
-        raise ValueError(f"No charts found for topic '{topic_slug}'")
-
-    topic_name = df["topic_name"].iloc[0]
-
-    # Collect all non-null titles and subtitles
-    texts = []
-    for _, row in df.iterrows():
-        if row["chart_title"]:
-            texts.append(str(row["chart_title"]))
-        if row["chart_subtitle"]:
-            texts.append(str(row["chart_subtitle"]))
-
-    # Deduplicate texts (many charts have similar/identical titles)
-    unique_texts = list(set(texts))
-
-    # If still too many, take a representative sample
-    if len(unique_texts) > 200:
-        import random
-
-        random.seed(42)  # Reproducible sampling
-        unique_texts = random.sample(unique_texts, 200)
-
-    return topic_name, unique_texts
-
+    ordered = sorted(
+        universe.records.items(),
+        key=lambda item: -universe.weights.get(item[0], 0.0),
+    )
+    texts: list[str] = []
+    seen: set[str] = set()
+    for _, record in ordered:
+        for text in (record.get("title"), record.get("subtitle")):
+            if not text or text in seen:
+                continue
+            seen.add(text)
+            texts.append(str(text))
+        if len(texts) >= limit:
+            break
+    return texts[:limit]
 
 async def extract_keywords_with_llm(
     topic_slug: str, topic_name: str, texts: list[str], api_key: str, model_id: str = DEFAULT_MODEL
@@ -155,8 +169,10 @@ async def extract_keywords_with_llm(
     # Combine all texts
     combined_text = "\n".join(texts)
 
-    prompt = f"""Below are the titles and subtitles of every chart Our World in Data
-publishes on the topic "{topic_name}":
+    prompt = f"""Below are the titles and subtitles of the charts Our World in Data publishes on
+the topic "{topic_name}", most-viewed first. They include the individual views of
+its multi-dimensional charts and its explorers, which is what the topic page
+actually lists:
 
 {combined_text}
 
@@ -184,19 +200,33 @@ What makes this list good is that each term takes the reader somewhere *differen
 3. Order the list so that each term adds something the ones before it did not.
 4. Terms should be things a reader would plausibly type: specific subjects,
    technologies, diseases, materials, policies, groups.
-5. Skip anything too broad to narrow the list down: a bare "men", "women",
-   "children", "countries", "population", or the topic's own name.
-6. Never name a place. No countries, regions, continents or income groups —
+5. Prefer the shortest form of a term that still names its subject. A reader
+   clicking "sex ratio" is shown every chart about it; "sex ratio at birth"
+   hides most of them for no gain. Give the broad form, not the specific one.
+6. Words from the topic's own name are not just allowed but usually necessary —
+   most of these charts say them. Give "maternal deaths" and "maternal mortality
+   ratio" on Maternal Mortality; just don't offer the bare topic name itself,
+   which narrows nothing.
+7. Skip anything too broad to narrow the list down: a bare "men", "women",
+   "children", "countries", "population".
+8. Never name a place. No countries, regions, continents or income groups —
    not "United States", "Ukraine", "China", "low-income countries". The charts
    above mention them constantly and they are searched for separately.
-7. Skip measurement and units language: percentage, per capita, share, rate,
+9. Skip measurement and units language: percentage, per capita, share, rate,
    level, annual, total, average, "GDP per capita", and terms that are only a
    generic process word, such as "energy consumption" or "oil prices" (prefer
    "oil"). "GDP" on its own is only a term for a topic that is actually about
    GDP.
-8. Skip historical or obsolete terms unless they are still what people search for.
+10. Skip historical or obsolete terms unless they are still what people search for.
 
-Output JSON (up to 30 terms; far fewer is right when the topic is narrow —
+Give a generous list — the more real candidates you offer, the better the final
+selection can be. Terms are scored by how many of the charts above they actually
+bring up, so favour the words those titles really use. Only a handful are shown to the reader, and they are chosen
+from your list by measuring how much of the chart list above each one actually
+brings up, so a term that is right but not obvious costs nothing to include and
+a term that duplicates another costs nothing to leave out.
+
+Output JSON (up to 40 terms; far fewer is right when the topic is narrow —
 never pad the list with variations to reach a number):
 {{
   "keywords": ["term1", "term2", ...]
@@ -262,254 +292,180 @@ never pad the list with variations to reach a number):
         raise RuntimeError(f"LLM extraction failed for {topic_name}: {e}")
 
 
-async def fetch_term_results(
+async def build_topic_universe(
     client: httpx.AsyncClient,
-    api_base: str,
+    topic_slug: str,
     topic_name: str,
-    term: str,
+    analytics: ViewAnalytics | None,
+    mdim_config_ids: dict,
     semaphore: asyncio.Semaphore,
-) -> list[str] | None:
-    """Titles of the first few charts the site's search returns for a term, within a topic.
-
-    Returns: chart titles, best match first; [] when the term genuinely finds
-    nothing, and None when the search could not be performed at all. The two
-    must not be conflated: "no results" is evidence against a term, whereas
-    "unmeasurable" is no evidence either way, and treating the second as the
-    first deletes perfectly good terms.
-
-    Today the API conflates them itself: a topic-filtered search that finds
-    nothing 400s if the topic is outside the 100 commonest of our ~140 topic
-    tags, claiming the topic doesn't exist (owid/owid-grapher#7026 fixes this).
-    Until that ships, terms in those topics come back unmeasurable and keep
-    their place unjudged, which is the safe direction. Afterwards an empty
-    result set arrives as a 200 and counts as evidence, as it should.
-    """
-    params = {"q": term, "topics": topic_name, "hitsPerPage": str(SEARCH_API_TOP_N)}
-    async with semaphore:
-        for attempt in range(1, LLM_MAX_ATTEMPTS + 1):
-            try:
-                response = await client.get(api_base, params=params, timeout=SEARCH_API_TIMEOUT_SECONDS)
-                response.raise_for_status()
-                results = response.json().get("results") or []
-                return [r["title"] for r in results[:SEARCH_API_TOP_N] if r.get("title")]
-            except httpx.HTTPStatusError as e:
-                # A rejected topic or query will be rejected identically on a
-                # retry; only server-side trouble is worth another go.
-                if e.response.status_code < 500:
-                    return None
-                if attempt == LLM_MAX_ATTEMPTS:
-                    return None
-                await asyncio.sleep(LLM_RETRY_BACKOFF_SECONDS * attempt)
-            except (httpx.HTTPError, KeyError, ValueError):
-                if attempt == LLM_MAX_ATTEMPTS:
-                    return None
-                await asyncio.sleep(LLM_RETRY_BACKOFF_SECONDS * attempt)
-    return None
-
-
-async def measure_coverage(
-    api_base: str, topic_name: str, terms: list[str], semaphore: asyncio.Semaphore
-) -> dict[str, list[str] | None]:
-    """What each candidate term actually returns, per the site's search API.
-
-    Returns: term -> titles of its top results, or None where it couldn't be measured
-    """
-    async with httpx.AsyncClient() as client:
-        tasks = [fetch_term_results(client, api_base, topic_name, term, semaphore) for term in terms]
-        results = await asyncio.gather(*tasks)
-    return dict(zip(terms, results, strict=True))
-
-
-async def refine_keywords_with_llm(
-    topic_name: str,
-    candidates: list[str],
-    coverage: dict[str, list[str] | None],
-    api_key: str,
-    model_id: str,
-) -> tuple[list[str], int, int]:
-    """Re-pick the shortlist now that each candidate's real results are known.
-
-    Only terms whose results could actually be measured are put to the model.
-    Unmeasured ones are appended afterwards, unjudged, so a search that couldn't
-    answer never costs a term its place.
-
-    Returns: (keywords, input_tokens, output_tokens)
-    """
-    client = genai.Client(api_key=api_key)
-
-    measured = [c for c in candidates if coverage.get(c) is not None]
-    unmeasured = [c for c in candidates if coverage.get(c) is None]
-    if not measured:
-        return candidates, 0, 0
-
-    lines = []
-    for term in measured:
-        titles = coverage[term] or []
-        shown = "; ".join(titles) if titles else "NOTHING"
-        lines.append(f'- "{term}" → {shown}')
-    findings = "\n".join(lines)
-
-    prompt = f"""These are candidate search terms for the Our World in Data topic
-"{topic_name}", each followed by the charts our site's search actually returns for
-it, within this topic, best match first:
-
-{findings}
-
-They are offered to a reader as a short line of suggestions under a search box:
-"Suggested: term, term, term…". Only the first few are shown. A term is worth a
-slot only if clicking it takes the reader somewhere the earlier terms didn't.
-
-Return the terms worth keeping, best first, applying what the results above show:
-
-1. Drop a term whose results are the same charts an earlier kept term already
-   returns. Keep whichever of them is the more natural thing to type.
-2. Drop a term that returned NOTHING.
-3. Drop a term whose results are unrelated to it — that means our search doesn't
-   understand the term, so the reader would get nonsense. Acronyms often fail
-   this way: check the titles actually concern the term's subject.
-4. Order them so each adds a subject the ones before it didn't, most central to
-   "{topic_name}" first.
-5. Keep every term that earns its slot; don't trim to a round number, and don't
-   invent terms that weren't offered above.
-
-Output JSON:
-{{
-  "keywords": ["term1", "term2", ...]
-}}"""
-
-    response = None
-    for attempt in range(1, LLM_MAX_ATTEMPTS + 1):
-        try:
-            response = await client.aio.models.generate_content(model=model_id, contents=prompt)
-            break
-        except (genai_errors.ServerError, genai_errors.ClientError) as e:
-            retriable = getattr(e, "code", None) == 429 or isinstance(e, genai_errors.ServerError)
-            if not retriable or attempt == LLM_MAX_ATTEMPTS:
-                raise
-            await asyncio.sleep(LLM_RETRY_BACKOFF_SECONDS * attempt)
-    assert response is not None
-
-    result_text = response.text.strip()
-    if "```json" in result_text:
-        result_text = result_text.split("```json")[1].split("```")[0].strip()
-    elif "```" in result_text:
-        result_text = result_text.split("```")[1].split("```")[0].strip()
-    parsed = json.loads(result_text)
-
-    usage = response.usage_metadata
-    input_tokens = int(getattr(usage, "prompt_token_count", 0) or 0)
-    output_tokens = int(getattr(usage, "candidates_token_count", 0) or 0)
-
-    # Never let the refinement introduce a term that wasn't measured.
-    allowed = {c.lower(): c for c in measured}
-    keywords = [allowed[k.lower()] for k in parsed.get("keywords", []) if k.lower() in allowed]
-    return keywords + unmeasured, input_tokens, output_tokens
+) -> WeightedUniverse:
+    """Fetch and weight everything the all-charts block lists for one topic."""
+    records = await fetch_topic_universe(client, topic_name, semaphore)
+    if not records:
+        raise ValueError(f"no charts indexed for topic '{topic_slug}'")
+    return weigh_universe(topic_name, records, analytics, mdim_config_ids)
 
 
 async def process_topics(
     topic_slugs: list[str],
     api_key: str,
     model: str,
-    search_api: str | None,
-) -> tuple[list[dict], list[str]]:
-    """Process multiple topics in parallel using asyncio.gather.
+    weighting: str,
+    views_column: str,
+    max_terms: int,
+    min_marginal_share: float,
+) -> tuple[list[dict], list[str], dict[str, WeightedUniverse], list[TopicSelection]]:
+    """Generate a vocabulary for each topic and choose its terms by coverage.
 
-    When `search_api` is set, each topic's candidates go through two more
-    phases: ask that API what each candidate actually returns, then ask the
-    model to re-pick the shortlist knowing the real results.
+    Four phases. The first three are shared setup and one request per topic; only
+    the LLM call is per topic and expensive.
 
-    Returns: (results, slugs that failed)
+    1. Load, once: topic names, chart view counts, and the multi-dim view →
+       config id map that lets a view's own popularity be found.
+    2. Per topic, fetch the record set the all-charts block lists and weight each
+       record by its views.
+    3. Ask the model for candidate terms, having shown it that record set.
+    4. Choose the terms that cover the most of it — see select_terms_by_coverage.
+
+    There used to be a second LLM pass here, re-picking the shortlist from what
+    the search returned for each candidate. Coverage subsumes it: a term whose
+    rows are already covered adds nothing and is not chosen, and a term the block
+    would show nothing for covers nothing and cannot be chosen at all.
+
+    Returns: (results, failed slugs, universes by topic name, selections)
     """
-    # Extract chart texts for all topics first
     failed: list[str] = []
-    topic_data = []
-    for topic_slug in topic_slugs:
-        try:
-            topic_name, texts = extract_chart_texts(topic_slug)
-            topic_data.append((topic_slug, topic_name, texts))
-            click.secho(f"✓ {topic_name}: Found {len(texts)} texts", fg="green")
-        except ValueError as e:
-            click.secho(f"✗ {topic_slug}: {e}", fg="red")
-            failed.append(topic_slug)
 
-    if not topic_data:
-        return [], failed
-
-    # Extract keywords for all topics in parallel
-    click.echo(f"\nExtracting keywords using LLM for {len(topic_data)} topics in parallel...")
-    tasks = [
-        extract_keywords_with_llm(topic_slug, topic_name, texts, api_key, model)
-        for topic_slug, topic_name, texts in topic_data
-    ]
-
-    results = await asyncio.gather(*tasks, return_exceptions=True)
-
-    # Handle any exceptions
-    final_results = []
-    for i, result in enumerate(results):
-        if isinstance(result, Exception):
-            topic_slug = topic_data[i][0]
-            click.secho(f"✗ {topic_slug}: {result}", fg="red")
-            failed.append(topic_slug)
-        else:
-            final_results.append(result)
-            click.secho(f"✓ {result['topic_name']}: Extracted {len(result['keywords'])} keywords", fg="green")
-
-    if search_api and final_results:
-        click.echo(f"\nChecking what each candidate returns via {search_api} ...")
-        semaphore = asyncio.Semaphore(SEARCH_API_CONCURRENCY)
-        coverages = await asyncio.gather(
-            *(measure_coverage(search_api, r["topic_name"], r["keywords"], semaphore) for r in final_results)
+    click.echo("Loading topic names, chart views and multi-dim views...")
+    names_by_slug = get_topic_names(topic_slugs)
+    analytics = None if weighting == "uniform" else load_view_analytics(views_column)
+    mdim_config_ids = load_mdim_view_config_ids() if analytics else {}
+    if analytics:
+        click.secho(
+            f"✓ {len(analytics.by_slug):,} charts and {len(analytics.by_config_id):,} "
+            f"views have {views_column}; {len(mdim_config_ids):,} multi-dim views mapped",
+            fg="green",
+        )
+    else:
+        click.secho(
+            "! --weighting uniform: every chart counts the same, popularity is ignored",
+            fg="yellow",
         )
 
-        click.echo("Re-picking each shortlist from those results ...")
-        refinements = await asyncio.gather(
-            *(
-                refine_keywords_with_llm(r["topic_name"], r["keywords"], coverage, api_key, model)
-                for r, coverage in zip(final_results, coverages, strict=True)
-            ),
-            return_exceptions=True,
-        )
+    semaphore = asyncio.Semaphore(SEARCH_CONCURRENCY)
+    universes: dict[str, WeightedUniverse] = {}
+    prompt_inputs: list[tuple[str, str, list[str]]] = []
 
-        unmeasurable = [
-            r["topic_name"]
-            for r, coverage in zip(final_results, coverages, strict=True)
-            if coverage and all(c is None for c in coverage.values())
-        ]
-        if unmeasurable:
-            click.secho(
-                f"! {len(unmeasurable)} topics could not be measured and keep their unrefined "
-                f"candidates: {', '.join(unmeasurable)}",
-                fg="yellow",
+    click.echo(f"\nFetching the chart list for {len(topic_slugs)} topics...")
+    async with httpx.AsyncClient() as client:
+        async def load(topic_slug: str):
+            topic_name = names_by_slug.get(topic_slug)
+            if not topic_name:
+                raise ValueError(f"no tag named for topic '{topic_slug}'")
+            return topic_slug, topic_name, await build_topic_universe(
+                client, topic_slug, topic_name, analytics, mdim_config_ids, semaphore
             )
 
-        for result, coverage, refinement in zip(final_results, coverages, refinements, strict=True):
-            if isinstance(refinement, BaseException):
-                # Keep the unrefined shortlist rather than losing the topic; say
-                # so, since it is measurably weaker than the refined ones.
-                click.secho(f"! {result['topic_name']}: refinement failed, keeping candidates ({refinement})", fg="yellow")
-                result["stats"]["refined"] = False
+        for outcome in await asyncio.gather(
+            *(load(slug) for slug in topic_slugs), return_exceptions=True
+        ):
+            if isinstance(outcome, BaseException):
+                click.secho(f"✗ {outcome}", fg="red")
                 continue
-            keywords, input_tokens, output_tokens = refinement
-            if not keywords:
-                click.secho(f"! {result['topic_name']}: refinement returned nothing, keeping candidates", fg="yellow")
-                result["stats"]["refined"] = False
-                continue
-            dropped = [k for k in result["keywords"] if k not in keywords]
-            result["keywords"] = keywords
-            result["stats"]["refined"] = True
-            result["stats"]["num_keywords"] = len(keywords)
-            result["stats"]["input_tokens"] += input_tokens
-            result["stats"]["output_tokens"] += output_tokens
-            result["stats"]["terms_measured"] = sum(1 for c in coverage.values() if c is not None)
-            result["stats"]["terms_returning_nothing"] = sum(1 for c in coverage.values() if c == [])
+            topic_slug, topic_name, universe = outcome
+            universes[topic_name] = universe
+            prompt_inputs.append((topic_slug, topic_name, texts_for_prompt(universe)))
             click.secho(
-                f"✓ {result['topic_name']}: kept {len(keywords)}"
-                + (f", dropped {', '.join(dropped)}" if dropped else ""),
+                f"✓ {topic_name}: {len(universe.records)} records, "
+                f"{universe.total_weight:,.0f} views",
                 fg="green",
             )
 
-    return final_results, failed
+    # Any topic whose record set didn't load can't be generated at all.
+    loaded = {slug for slug, _, _ in prompt_inputs}
+    failed.extend(slug for slug in topic_slugs if slug not in loaded)
+
+    if not prompt_inputs:
+        return [], failed, universes, []
+
+    click.echo(f"\nAsking for candidate terms for {len(prompt_inputs)} topics...")
+    candidate_results = await asyncio.gather(
+        *(
+            extract_keywords_with_llm(topic_slug, topic_name, texts, api_key, model)
+            for topic_slug, topic_name, texts in prompt_inputs
+        ),
+        return_exceptions=True,
+    )
+
+    click.echo("\nChoosing the terms that cover the most of each topic...")
+    results: list[dict] = []
+    selections: list[TopicSelection] = []
+    for (topic_slug, topic_name, _), candidates in zip(
+        prompt_inputs, candidate_results, strict=True
+    ):
+        if isinstance(candidates, BaseException):
+            click.secho(f"✗ {topic_slug}: {candidates}", fg="red")
+            failed.append(topic_slug)
+            continue
+
+        universe = universes[topic_name]
+        offered = list(candidates["keywords"])
+        selection = select_terms_by_coverage(
+            universe,
+            candidates["keywords"],
+            max_terms=max_terms,
+            min_marginal_share=min_marginal_share,
+        )
+        selections.append(selection)
+
+        total = selection.total_weight
+        candidates["keywords"] = [term.term for term in selection.selected]
+        candidates["stats"].update(
+            {
+                "num_keywords": len(selection.selected),
+                "num_candidates": len(offered),
+                "num_records": selection.total_count,
+                "weighted_coverage": round(
+                    selection.covered_weight / total if total else 0.0, 4
+                ),
+                "chart_coverage": round(
+                    (selection.total_count - len(selection.uncovered))
+                    / selection.total_count
+                    if selection.total_count
+                    else 0.0,
+                    4,
+                ),
+                "weighting": weighting,
+                "views_column": views_column,
+                "selection": "coverage",
+                # The consumer keys "trust this order" off `refined`; the order is
+                # now measured rather than guessed, so it still holds. See
+                # rankSuggestedKeywords in owid-grapher.
+                "refined": True,
+            }
+        )
+        candidates["keyword_stats"] = [
+            {
+                "term": term.term,
+                "own_share": round(term.own_share(total), 4),
+                "own_records": term.own_count,
+                "marginal_share": round(term.marginal_share(total), 4),
+                "marginal_records": term.marginal_count,
+                "cumulative_share": round(term.cumulative_share(total), 4),
+            }
+            for term in selection.selected
+        ]
+        results.append(candidates)
+
+        share = selection.covered_weight / total if total else 0.0
+        click.secho(
+            f"✓ {topic_name}: {len(selection.selected)} terms cover {share:.0%} of views "
+            f"— {', '.join(term.term for term in selection.selected) or '(none)'}",
+            fg="green" if share >= 0.35 else "yellow",
+        )
+
+    return results, failed, universes, selections
 
 
 @click.command()
@@ -534,17 +490,37 @@ async def process_topics(
     ),
 )
 @click.option(
-    "--search-api",
-    default=DEFAULT_SEARCH_API,
+    "--report",
+    "report_path",
+    type=click.Path(dir_okay=False, writable=True),
+    help="Write an HTML coverage report here: per term, what it reveals and what it adds.",
+)
+@click.option(
+    "--weighting",
+    type=click.Choice(["views", "uniform"]),
+    default="views",
+    help="Weight charts by how much they are viewed (default), or count them equally.",
+)
+@click.option(
+    "--views-column",
+    type=click.Choice(["views_7d", "views_14d", "views_365d"]),
+    default=DEFAULT_VIEWS_COLUMN,
     help=(
-        f"Search API used to check what each candidate term actually returns (default: {DEFAULT_SEARCH_API}). "
-        "Point it at a staging server to measure against that branch's index."
+        f"Which view window to weight by (default: {DEFAULT_VIEWS_COLUMN}). A vocabulary is "
+        "read for weeks, so the year is steadier than the week."
     ),
 )
 @click.option(
-    "--no-refine",
-    is_flag=True,
-    help="Skip the search-API check and the second LLM pass; keep the first set of candidates as-is.",
+    "--max-terms",
+    default=DEFAULT_MAX_TERMS,
+    show_default=True,
+    help="Most terms to publish per topic.",
+)
+@click.option(
+    "--min-marginal-share",
+    default=DEFAULT_MIN_MARGINAL_SHARE,
+    show_default=True,
+    help="Stop once the next term would reveal less than this share of a topic's views.",
 )
 @click.option("--no-upload", is_flag=True, help="Skip uploading to R2 (useful for testing)")
 def main(
@@ -552,15 +528,19 @@ def main(
     output: str | None,
     model: str,
     upload_path: str,
-    search_api: str,
-    no_refine: bool,
+    report_path: str | None,
+    weighting: str,
+    views_column: str,
+    max_terms: int,
+    min_marginal_share: float,
     no_upload: bool,
 ):
-    """Extract vocabulary for topics using LLM (simple approach).
+    """Build the OWID topic vocabulary: the suggested search terms per topic.
 
-    Takes all chart titles and subtitles for topics and asks an LLM to extract
-    characteristic keywords/phrases. Processes multiple topics in parallel.
-    Shows API cost by default.
+    For each topic, fetches the chart list its all-charts block shows, weights
+    every chart by how much it is viewed, asks an LLM for candidate search terms,
+    and then picks the terms covering the most of that list — most-revealing
+    first, each next one adding the most that is still uncovered.
     """
     # Load .env file from project root
     env_path = Path(__file__).parent.parent.parent / ".env"
@@ -581,20 +561,34 @@ def main(
         topic_slugs = get_all_topic_slugs()
 
     click.echo("=" * 80)
-    click.echo("SIMPLE LLM-BASED VOCABULARY EXTRACTION")
-    click.echo(f"Topics: {len(topic_slugs)}")
-    click.echo(f"Model: {model}")
+    click.echo("OWID TOPIC VOCABULARY")
+    click.echo(f"Topics:    {len(topic_slugs)}")
+    click.echo(f"Model:     {model}")
+    click.echo(
+        f"Weighting: {'every chart equally' if weighting == 'uniform' else views_column}"
+    )
+    click.echo(f"Terms:     at most {max_terms}, stopping below {min_marginal_share:.1%}")
     upload_target = "skipped" if no_upload else f"s3://{S3_BUCKET_NAME}/{upload_path}"
-    click.echo(f"Upload: {upload_target}")
-    click.echo(f"Refine: {'skipped' if no_refine else search_api}")
+    click.echo(f"Upload:    {upload_target}")
     click.echo("=" * 80)
     click.echo()
 
-    # Extract chart texts and process with LLM
-    click.echo("Extracting chart titles and subtitles from database...")
-    results, failed_slugs = asyncio.run(
-        process_topics(topic_slugs, api_key, model, None if no_refine else search_api)
-    )
+    try:
+        results, failed_slugs, universes, selections = asyncio.run(
+            process_topics(
+                topic_slugs,
+                api_key,
+                model,
+                weighting=weighting,
+                views_column=views_column,
+                max_terms=max_terms,
+                min_marginal_share=min_marginal_share,
+            )
+        )
+    except EmptyAnalyticsError as e:
+        click.echo()
+        click.secho(f"✗ {e}", fg="red")
+        sys.exit(1)
 
     if not results:
         click.secho("\n✗ No results generated", fg="red")
@@ -623,15 +617,23 @@ def main(
     click.echo("=" * 80)
     click.echo()
 
-    for result in results:
-        click.echo(f"Topic: {result['topic_name']}")
-        click.echo(f"Keywords extracted: {len(result['keywords'])}")
+    # A run covers every topic, so the per-term arithmetic only goes to the
+    # terminal when few enough topics were asked for to read it; otherwise it is
+    # one line each, worst-covered first, and the detail goes to --report.
+    if len(selections) <= 3:
+        for selection in selections:
+            click.echo(render_topic_table(selection, universes[selection.topic_name]))
+            click.echo()
+    else:
+        click.echo(render_run_summary(selections))
         click.echo()
-        click.echo("Keywords:")
-        for i, kw in enumerate(result["keywords"], 1):
-            click.echo(f"  {i:2d}. {kw}")
-        click.echo()
-        click.echo("-" * 80)
+
+    if report_path:
+        Path(report_path).write_text(
+            render_html_report(selections, universes, weighting, views_column),
+            encoding="utf-8",
+        )
+        click.secho(f"✓ Coverage report: {report_path}", fg="green")
         click.echo()
 
     # Output total cost
