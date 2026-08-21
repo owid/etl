@@ -211,12 +211,18 @@ What makes this list good is that each term takes the reader somewhere *differen
    rule to remember:
    - Not how a number is expressed. A measurement's shape is not a subject, and
      a reader looking for one is not looking for charts. Prefer "oil" to "oil
-     prices", "electricity" to "electricity consumption". Never on its own, and
-     never as the head of a phrase: per capita, GDP per capita, share, rate,
-     death rate, total, annual, average, level, index, projections, reported,
-     confirmed, vital registration. (This list is spelled out because it is the
-     rule most often broken: asked only for the principle, the model offered
-     "gdp per capita" as the first suggestion on Poverty.)
+     prices", "electricity" to "electricity consumption". These are never a term
+     on their own and never the head of a phrase: per capita, share, rate, death
+     rate, total, annual, average, level, index, projections, reported,
+     confirmed, vital registration. The list is spelled out because it is the
+     rule most often broken.
+
+     **Unless a chart above is actually called that.** Then it is a subject, by
+     definition — someone named a chart after it. "GDP per capita" reads like a
+     unit and is one of the charts on the Poverty topic, worth a third of its
+     traffic; refusing it leaves that chart with nothing pointing at it. The test
+     is the titles in front of you, not how the words sound: if one of them is
+     essentially just this term, give it.
    - Not a place. Countries, regions and income groups say *who* rather than
      *what*; these charts mention them constantly and readers search for them
      separately.
