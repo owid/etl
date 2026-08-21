@@ -652,7 +652,6 @@ tables:
           grapher_config:
             title: Number of people using the Internet
             subtitle: 'Number of people who [used the Internet](#dod:internetuser) in the last three months.'
-            timelineMinTime: 1990
             originUrl: https://ourworldindata.org/internet
             hideAnnotationFieldsInTitle:
               time: true
