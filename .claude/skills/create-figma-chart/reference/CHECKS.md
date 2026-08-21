@@ -18,9 +18,28 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > declared gap in coverage, never a pass — which is the whole reason to read the list rather than
 > the verdict.
 >
+> **[`scripts/diff_against_template.js`](../scripts/diff_against_template.js) is the other half of the
+> gate, and it answers a question `verify_page.js` cannot: *did this frame drift from the template it
+> was cloned from?*** The workflow is start from the template, modify it, and **check back against the
+> template** — and that last step is the one that gets skipped. Run it in one read-only `use_figma`
+> call with the template id and the finished clones; it fingerprints the template **at runtime**, so it
+> works for any of the ten rather than hard-coding one. Text CONTENT is excluded by design (that is
+> what a run is meant to change); everything else is the template's law. Declare deliberate drift in
+> `CONFIG.expected` and it reports as `accepted` instead of `DRIFT`.
+>
+> On one eight-frame run it found what a screenshot pass had missed entirely: every footer row left
+> `layoutSizingHorizontal: FIXED` where the template HUGs — which stops the source line resizing with
+> its text — and it separates the one API limitation that is *not* a defect (a bolded `Data source:`
+> prefix cannot be both bold and style-bound through the plugin API, so it reports as `halfBound`; see
+> [TEXTS.md](TEXTS.md)) from real drift. Its harness is
+> [`scripts/test_diff_against_template.js`](../scripts/test_diff_against_template.js) (**43**
+> assertions), which found four defects in the script that review had not: a header that lost a row
+> reported as matching, five fingerprinted footer properties never actually compared, and a
+> `TypeError` that killed the whole diff when a row changed type.
+>
 > Validated by planting defects and confirming each row **fails**, twice over: 11 planted in Figma and
 > 11 caught, then a stubbed-figma harness ([`scripts/test_verify_page.js`](../scripts/test_verify_page.js),
-> `node` it after any edit) covering 34 assertions including the rows that are awkward to plant on a
+> `node` it after any edit) covering **108** assertions including the rows that are awkward to plant on a
 > real page. **A check that cannot fail is worse than no check**, so when you extend this script,
 > extend both passes with it.
 >

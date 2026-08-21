@@ -57,7 +57,7 @@ step lives in [`reference/`](reference/) and is read *at* that step, not up fron
 | [reference/TEXTS.md](reference/TEXTS.md) | Step 6 | Filling the template's text slots, and the header reflow that makes the band measurable. |
 | [reference/FITTING.md](reference/FITTING.md) | Step 7 | Measuring the band, importing the embed, unwrapping and scaling. The local-SVG restyle route. |
 | [reference/LABELING.md](reference/LABELING.md) | Step 8, 8b, and any re-export | Direct labels, highlighting, the palette and its bound styles, annotations and arrows. What to replay after a re-import. |
-| [reference/CHECKS.md](reference/CHECKS.md) | Step 8c, before showing anyone | The gate. Every check, and the rule to re-run the pass after the *last* change. `scripts/verify_page.js` runs the mechanical rows in one call and declares what it cannot judge. |
+| [reference/CHECKS.md](reference/CHECKS.md) | Step 8c, before showing anyone | The gate. Every check, and the rule to re-run the pass after the *last* change. `scripts/verify_page.js` runs the mechanical rows in one call and declares what it cannot judge; `scripts/diff_against_template.js` checks the finished frame back **against the template it was cloned from**. |
 | [reference/GOTCHAS.md](reference/GOTCHAS.md) | On an error, or grep by symptom | Every known pitfall. Worth one skim before your first `use_figma` call. |
 
 [GUIDELINES.md](GUIDELINES.md) stays eagerly read — it is pointed into from all over this page — but
