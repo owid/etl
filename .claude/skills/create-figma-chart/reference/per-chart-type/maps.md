@@ -44,13 +44,59 @@
   ```
 
 - **ASK before trimming the fringe — it is a visibility decision, not a fit detail.** Trimming buys
-  real map size, and it does it by removing real places: Hawaii, and the Pacific islands east of Fiji.
-  So put the trade-off to the user rather than deciding it: *"I can gain about 6% of the map's width
-  (29.6px of 490 on a 540 frame) by trimming the Pacific fringe — Hawaii and the islands east of Fiji
-  would stop being visible. Trim, or keep them and accept the smaller map?"* Quote the measured
-  numbers for the chart in hand, name what disappears, and default to keeping them if there is no
-  answer. A map that silently loses islands is the kind of edit a reader notices and nobody approved.
+  real map size, and it does it by removing real places. So put the trade-off to the user rather than
+  deciding it, **and ask it in plain words.** Name the countries, say how much bigger the map gets, say
+  what stops being drawn, and stop there:
 
+  > *"The map is sitting small in its space because a few tiny Pacific islands reach out to the far left
+  > and right edges and stop it filling the width. I can leave them out — Hawaii, Fiji, Kiribati, Samoa,
+  > Tonga, Tuvalu, Nauru and the Marshall Islands — which makes the map about 14% bigger. Those places
+  > would no longer be drawn; most are under 2px across here, so they are barely visible either way.
+  > Leave them out, or keep every country and accept the smaller map?"*
+
+  Keep the internal vocabulary out of it. "Antimeridian straddler", "content width", "the fringe",
+  "ink vs bbox" and the pixel arithmetic are how *you* decide; none of them help the person answering,
+  and a question full of them reads as a status report rather than a choice. One sentence on why, one
+  list of what goes, one number for what it buys.
+
+  Default to keeping them if there is no answer. A map that silently loses islands is the kind of edit
+  a reader notices and nobody approved.
+
+- **Detect a straddler by width AND height — width alone hides Russia.** The test above is
+  `w > 150 && h < 12`, and the height half is the load-bearing half: Chukotka crosses 180°, so Russia's
+  box measured **461px wide** on a live frame — indistinguishable from Fiji's 593px by width. A
+  width-only rule set `Russia.visible = false` and took the largest country on earth off the map, which
+  a screenshot makes obvious and a numeric fit check does not. Russia's box is 67px tall, so the height
+  clause rejects it cleanly. The rule was already written here; the ad-hoc script that ran the trim
+  reimplemented it from memory with the height clause dropped — reuse the predicate, don't retype it.
+- **What trimming actually bought, end to end, on a 540 frame.** Hiding the seven island nodes plus
+  Hawaii's five subpaths took the map body from **444 → 508px** wide (×1.143 then ×1.059, in two passes
+  because Hawaii is inside the US vector and only surfaces once the separate nodes are gone) and 207 →
+  251px tall. The gaps above and below the chart went from **39.4 / 42.1px to 12.96 / 12.96** — from
+  well outside the 12–16 target to inside it, which is the actual point of the trim. Afterwards the
+  edges are set by real content: Alaska at x=16, New Zealand at x=523.98.
+- **Adjusting the map is not finished until you have re-adjusted the LEGEND.** Grapher lays the legend
+  out for the map it exported, so the moment you trim or rescale the map the legend is wrong in two ways
+  at once, and neither shows up in a width check on the chart group. Measured on the live frame: the
+  legend sat **55.57px** in from the left content edge and **0.1px past** the right one — indented and
+  flush at the same time, because it had been sized for the untrimmed map — and it floated **66.4px**
+  below the map, mid-band, reading as a separate object rather than part of the chart. Fix both:
+
+  ```js
+  legend.x += (fb.x + CONTENT_L + (CONTENT_W - lInk.w) / 2) - lInk.x0;   // centre on the content box
+  legend.y += (mapInk.y1 + 16) - lInk.y0;                                // tuck under the map
+  // then re-centre the whole chart group, because the block just got shorter
+  ```
+
+  Centre it on the content box rather than left-aligning it — a legend is a caption for the map above
+  it, not a column of body text, and at 452px against a 508px box the 27.7px it gets on each side is
+  what makes it read as attached.
+- **Expect the outer gaps to GROW when you tuck the legend in, and leave them.** Pulling the legend from
+  66px to 16px shortened the block by 50px, so the symmetric gaps above and below went **12.96 → 38.15px**
+  — outside the 12–16 target, and correct anyway. A map is the one chart type where the target does not
+  bind: it is width-limited, so the band's leftover height has nowhere to go, and ocean is placeable
+  space (which is how the reference fits a 247px map in a 540px frame). Do **not** claw the gaps back by
+  pushing the legend down again; that trades a real relationship — legend belongs to map — for a number.
 - **The fringe is worth ~6% of the map's width, measured.** On a live 540-wide frame the map group's raw
   bbox ran 490.06px while the straddler-excluded union ran 481.76 and the mainland began 29.57px in — so
   Fiji's box costs **8.29px** and the Tonga/Samoa/Kiribati specks another **21.28px**, which is the
