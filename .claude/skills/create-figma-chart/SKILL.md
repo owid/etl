@@ -328,6 +328,37 @@ Caveats: `?tab=table` is silently ignored (renders the default tab); `imSquareSi
 
 Before touching the file, show the user in one message: the page name **`YYYYMMDD <Title> (<Creator>)`** (today's date, the *final* — possibly rewritten — title), the chosen template(s), every text that will go into the template, the labeling changes you propose (Step 8), and the annotations with their content. **Wait for explicit approval.** This is the single checkpoint; after it, iterate freely on the same page without re-asking.
 
+### Two things to ask about, not decide
+
+Both change what the reader sees, both are cheap to do and awkward to undo, and neither has a right
+answer you can work out from the data. Ask them **with the numbers from the chart in hand**, and ask
+in plain words — no "antimeridian straddler", no "content width", no pixel arithmetic. The person
+answering needs to know what changes and what it costs, nothing else.
+
+**1. Small islands on a map.** A world map often sits small in its space because a few tiny islands
+reach out to the far left and right edges. Leaving them out lets the map fill the width.
+
+> *"The map is sitting small because a few tiny Pacific islands stretch out to the edges. I can leave
+> them out — Hawaii, Fiji, Kiribati, Samoa, Tonga, Tuvalu, Nauru and the Marshall Islands — which makes
+> the map about 14% bigger. Those places would no longer be drawn; most are under 2px across here, so
+> they are barely visible either way. Leave them out, or keep everything and accept the smaller map?"*
+
+Details, and what it measured last time, in [reference/per-chart-type/maps.md](reference/per-chart-type/maps.md).
+
+**2. Long country names.** On a bar chart the names sit in a column on the left, and that column is as
+wide as the **longest** name. Shortening a name to `US` or `UK` is house style
+([STYLE_GUIDE.md](../check-metadata-style/STYLE_GUIDE.md) — no periods), but it only makes the bars
+longer if you shorten the longest one. So measure first, then ask:
+
+> *"The names on the left take up a lot of room, and the widest one sets how much. If I shorten
+> 'United States' to 'US', 'United Kingdom' to 'UK' and 'Dominican Republic' to 'Dominican Rep.', the
+> bars get about 5% longer. Shorten them, or keep the full names?"*
+
+If shortening the famous names buys nothing because a longer name still sets the column width, **say
+so** rather than offering a change with no benefit. The measurements, and the four-step re-layout that
+keeps the bar lengths proportional to the data, are in
+[reference/per-chart-type/bar.md](reference/per-chart-type/bar.md).
+
 ## Step 5 — Create the page and place the pieces
 
 > Template ids, sizes and the band table are in [reference/NODE-MAP.md](reference/NODE-MAP.md) — and `scripts/verify_templates.js` runs from there before you clone.

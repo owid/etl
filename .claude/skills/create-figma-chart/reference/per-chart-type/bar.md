@@ -30,3 +30,49 @@
 On **stacked** bars specifically: label only the segment the title is about (`135:1424`, `330:323`); a category that never gets a header can be named inside the one bar where it is widest (`596:346`); totals sit outside the bar in dark gray past the last segment (`323:119`, `283:316`, `27:1027`); an ordinal category axis gets an explicit direction cue (`269:77`, "Richer countries →"); and one bar among plain ones may be stacked to break out the comparison (`596:405`). A 100%-stacked bar can also be turned on its side into a **labeled list** — `378:104`, one full-width row per category, name and value in white inside, an explanatory sentence to the right in that segment's color.
 
 Exemplars: `364:129` (reference row), `169:1167` (braced ties + qualifying group), `545:78` (butterfly), `676:351` (threshold line), `687:203` (tiered headers over a reference row), `378:104` (stacked bar as a list).
+
+## What a grapher bar-chart import needs fixing, measured
+
+- **The value labels come in ~5px too high, because their box TOP is aligned to the bar's top.** On a
+  discrete-bar import every `value-labels` child sat with its box top equal to its bar's top, so a 16px
+  label inside a 27.4px row read 5.04–5.09px above centre on all nine rows. Grapher's *entity* labels
+  are fine (−0.65px from the bar's centre, which is optical centring for cap height), so the fix is to
+  align each value label to its **paired entity label**, not to the bar's geometric centre — matching
+  the bar centre instead would leave the two texts in a row 0.65px apart, which is what a reader sees.
+  Pair them by nearest vertical centre; the boxes are the same height, so it is a pure `y` move, the
+  chart's own box does not change, and no refit is needed.
+- **A stacked bar's value labels are NOT the same defect.** They measured −1.29px on all thirty, and a
+  single consistent offset across every label is grapher centring deliberately, not a bug. Leave them.
+  The tell is the *spread*: nine identical offsets of ~5.05 in the opposite direction to the entity
+  labels' is a misalignment; thirty identical offsets of −1.29 that match the entity labels is a choice.
+- **A single-entity stacked discrete bar is the wrong exemplar, not a geometry problem.** With one row,
+  grapher draws the zero line at **1.54× the bar height** — the same ratio at every canvas size tested
+  (imHeight 1000/700/520/420), so no re-export changes it, and the canvas saturates at 1010×505 so a
+  shorter request returns the same SVG. The fix is the entity selection: with six countries the bars
+  fill the plot and the proportion disappears. Reach for `country=` before reaching for the geometry.
+
+## Shortening long entity names, and reclaiming the space properly
+
+The names sit in a column on the left whose width is set by the **longest** one. That single fact
+decides whether shortening is worth anything: renaming `United States` → `US` and `United Kingdom` →
+`UK` on a chart whose widest name is `Dominican Republic` frees **0px** of plot, because the column does
+not move. Measure before offering it — see [SKILL.md](../../SKILL.md) → Step 4 for the wording.
+
+When it *is* worth doing, the re-layout is four steps and the third is the one that matters:
+
+1. Rename, loading every segment's font first (`getStyledTextSegments(["fontName"])` — a text edit on
+   an unloaded font throws), and switch a `NONE`/`HEIGHT` box to `WIDTH_AND_HEIGHT` so it hugs.
+2. Take the new column width from the longest label and right-align every label to it. Keep grapher's
+   own gap between the column and the zero line rather than inventing one.
+3. Move the zero line, then **stretch the bars from it by one factor** —
+   `newEnd = Z1 + (oldEnd − Z0) × (maxBarEnd − Z1) / (maxBarEnd − Z0)`. Every bar starts at the zero
+   line and its length is proportional to its value, so scaling all of them from that shared origin
+   preserves the mapping exactly: measured `maxRatioDrift: 0`. **Assert that**, because a bar chart
+   whose lengths no longer match its numbers is the worst thing this skill could ship. And check first
+   that the chart has no x-axis ticks — if it has, they must move with the bars or they will lie.
+4. Move each value label by **its own bar's** end delta, so it keeps its gap. Never scale it.
+
+The counter-intuitive part of step 3: most bar *ends* move LEFT while every bar gets LONGER, because the
+origin moves left further than the bar grows. On the measured run the factor was 1.079 and India's bar
+went 171.5 → 185.0px while its end went 312.5 → 299.2. Reading the ends alone looks like the chart
+shrank; read the lengths.

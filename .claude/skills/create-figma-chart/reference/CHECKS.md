@@ -194,3 +194,26 @@ including the arrow probe.
   you are testing against silently includes the boundary. A `#e8f1f9` sample is within 18 of
   `#deebf7` and is half background; that tolerance is what let a dot in open water pass a pixel
   check.
+
+## Two rows that a real run re-calibrated
+
+Both were changed after the first run of `verify_page.js` against eight real frames rather than the
+mock, and both changes make a row *less* red on purpose. Read them before treating either as slack.
+
+- **`furniture-dash` no longer flags grapher's zero line.** grapher names each gridline after its tick
+  value, so the zero line arrives as `0`, `0%` or `0-years` and matches none of the zero/tick/axis words
+  the row looks for — it was reported as a "cleared" dash on **5 of 8** frames, and on a slope chart,
+  whose two end verticals are named `1980` and `2023` and sit in a group of two, on 2 of 2. Those are
+  now reclassified by **identity** (a name denoting zero; a furniture group with fewer than three
+  members), never by the dash the node carries — that circularity is the defect the row exists to catch.
+  And they are **reclassified, not exempted**: they go through the solid-by-design validation, so a zero
+  line genuinely restyled to `[4,4]` still fails. The row reports what it reclassified, so you can see
+  it happen.
+- **`ladder-sizes` reports imported text instead of failing it.** Judged strictly it failed on **8 of
+  8**, i.e. on every fitted import that can exist, and a row that always fails carries no information.
+  The cause is a real three-way conflict: text metrics help set the group's width, so snapping labels to
+  rungs moves the box off the content edge, and re-fitting to the edge moves the sizes back off the
+  ladder. So the verdict is split by *who set the size* — an **annotation** is authored here and still
+  FAILS, while imported text is REVIEW with its distance to the nearest rung, FAILing only past 0.75px.
+  Measured drift on the eight frames was 0.11–0.48px; the scatter's bubble legend was 6.01px from its
+  rung, which is the case the threshold exists to catch.
