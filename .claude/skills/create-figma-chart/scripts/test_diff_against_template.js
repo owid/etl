@@ -128,18 +128,41 @@ const has = (res, re) => drift(res).some((d) => re.test(d));
     check("1 exactly one page switch", res.switches === 1, `${res.switches} switches`);
   }
 
-  // 2 — ONE page switch, and only one. The connector throws on the second (GOTCHAS.md), so the template
-  // must already be current: this is the defect that made the script unrunnable from the clone page.
+  // 2 — ONE page switch, and only one, and it does NOT matter which page the call starts on.
+  //
+  // This case used to assert the opposite: that the script refuses unless the template's page is already
+  // current. That contract was unsatisfiable in practice — `figma.currentPage` resets to the file's FIRST
+  // page at the start of every `use_figma` call (measured 2026-08-21: a call ending in
+  // `setCurrentPageAsync(<working page>)` was followed by one reporting "Cover"), so "open that page and
+  // re-run" is not something a session can arrange and the script could never run at all. It now reads
+  // the template unswitched and gates on the read being COMPLETE instead, which is what the old guard was
+  // really protecting against.
   {
-    let threw = null;
-    try { await run(buildFrame({ name: "tpl" }), buildFrame({ name: "clone" }), [], { startOn: "clone" }); }
-    catch (e) { threw = e.message; }
-    check("2 started on the wrong page, it refuses up front", threw && /open the template's page/.test(threw), threw);
-    check("2 and names the page to open", threw && /Templates/.test(threw), threw);
-    check("2 not the connector's opaque page error", threw && !/more than once/.test(threw), threw);
+    const off = await run(buildFrame({ name: "tpl" }), buildFrame({ name: "clone" }), [], { startOn: "clone" });
+    check("2 starting on the clone's page no longer refuses", off.out.frames[0].verdict === "matches the template", JSON.stringify(drift(off)));
+    // At most one, ever. Starting on the clone's page costs ZERO — the script only switches if it has to.
+    check("2 never more than one page switch", off.switches <= 1, `${off.switches} switches`);
+    check("2 and none at all when already on the clone's page", off.switches === 0, `${off.switches} switches`);
+    check("2 and the read declares the page was not current", off.out.templateFingerprintRead.pageWasCurrent === false,
+          JSON.stringify(off.out.templateFingerprintRead));
     // clones on the template's own page need no switch at all
     const same = await run(buildFrame({ name: "tpl" }), buildFrame({ name: "clone" }), [], { samePage: true });
     check("2 clones on the template's page cost zero switches", same.switches === 0, `${same.switches} switches`);
+  }
+
+  // 2b — the failure the old guard existed for, now asserted directly: a template whose subtree did not
+  // load reads SHORT (no auto-layout children, so no header) and must STOP rather than diff against a
+  // partial fingerprint. A check that cannot fail is worse than no check, so removing the page guard
+  // obliges this one to exist.
+  {
+    let threw = null;
+    try {
+      await run(node({ name: "tpl-unloaded", width: 540, height: 540, fills: solid("#ffffff"), children: [] }),
+                buildFrame({ name: "clone" }));
+    } catch (e) { threw = e.message; }
+    check("2b a short template read STOPS", threw && /read SHORT/.test(threw), threw);
+    check("2b and names what was missing", threw && /header did not resolve/.test(threw), threw);
+    check("2b and says it is a stop, not a diff", threw && /not a diff/.test(threw), threw);
   }
 
   // 3 — a header that LOST a row. The row loop only walks the overlap, so without a row-count compare

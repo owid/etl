@@ -484,6 +484,47 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     check("18 single-weight unbound still FAILS", row(out2, "named-styles").status === "FAIL", row(out2, "named-styles").detail);
   }
 
+  // 18b — a WHOLLY BOLD annotation is unbindable for the same reason a mixed-weight one is: the ladder is
+  // all Lato Regular, so applying the style strips the bold. GUIDELINES.md prescribes size-without-binding
+  // for bold country names, and the design team's own finished highlight map (`273:320`) ships nine of them
+  // at 12px Lato Bold with an empty textStyleId. Before this exemption the row fired on all nine.
+  {
+    const boldAnn = annotation({ x: 100, y: 195, stroke: "#ffffff", strokeWeight: 3, styleId: "" });
+    boldAnn.getStyledTextSegments = () => [{ fontName: { family: "Lato", style: "Bold" } }];
+    const out = await run(buildFrame({ annotation: boldAnn }), {});
+    check("18b wholly-bold unbound annotation is exempt", row(out, "named-styles").status === "ok", row(out, "named-styles").detail);
+    check("18b and says why, naming the weight", /wholly-bold/.test(row(out, "named-styles").detail) && /Bold/.test(row(out, "named-styles").detail),
+          row(out, "named-styles").detail);
+    // and the exemption must not swallow the defect it sits next to
+    const regularAnn = annotation({ x: 100, y: 195, stroke: "#ffffff", strokeWeight: 3, styleId: "" });
+    regularAnn.getStyledTextSegments = () => [{ fontName: { family: "Lato", style: "Regular" } }];
+    const still = await run(buildFrame({ annotation: regularAnn }), {});
+    check("18b an unbound REGULAR annotation still FAILS", row(still, "named-styles").status === "FAIL", row(still, "named-styles").detail);
+    check("18b and the message says REGULAR", /REGULAR/.test(row(still, "named-styles").detail), row(still, "named-styles").detail);
+  }
+
+  // 18c — label-contrast-on-background used to require `insidePlot`, which made it DEAD: annotations are
+  // appended to the FRAME, so insidePlot is false for every one and `insidePlot && /^annotation__/` is a
+  // contradiction. A nine-label map reported SKIPPED "no annotation text with a solid fill" while carrying
+  // nine filled annotations. Same can't-fail family as the `annotations` walk this file already fixed.
+  {
+    const dark = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, fill: "#2d2e2d", stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    check("18c a frame-level annotation IS judged", row(dark, "label-contrast-on-background").status === "ok",
+          row(dark, "label-contrast-on-background").detail);
+    check("18c and the row is not skipped", row(dark, "label-contrast-on-background").status !== "SKIPPED",
+          row(dark, "label-contrast-on-background").detail);
+    const pale = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, fill: "#bbbbbb", stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    check("18c a pale annotation on white FAILS 4.5:1", row(pale, "label-contrast-on-background").status === "FAIL",
+          row(pale, "label-contrast-on-background").detail);
+    // White-on-a-dark-mark is a correct label (GUIDELINES.md → maps), and measuring it against a white
+    // frame would report 1:1. It is knocked out to the on-fill row rather than failed.
+    const onMark = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, fill: "#ffffff", stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    check("18c a label in the frame's own colour is not failed", row(onMark, "label-contrast-on-background").status !== "FAIL",
+          row(onMark, "label-contrast-on-background").detail);
+    check("18c and is declared as drawn inside a mark", /inside a mark/.test(row(onMark, "label-contrast-on-background").detail),
+          row(onMark, "label-contrast-on-background").detail);
+  }
+
   // 19 — the unimplemented half of the hierarchy is declared, not certified.
   {
     const out = await run(buildFrame(), {});

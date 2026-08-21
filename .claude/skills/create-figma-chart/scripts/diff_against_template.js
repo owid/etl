@@ -111,18 +111,35 @@ const fingerprint = (frame) => {
   };
 };
 
-// --- the template's own fingerprint. NO page switch: the template's page must already be current.
+// --- the template's own fingerprint, read WITHOUT a page switch.
+//
+// `figma.currentPage` RESETS to the file's first page at the start of every `use_figma` call and does
+// not persist between calls. Measured 2026-08-21: a call ending in `setCurrentPageAsync(<working
+// page>)` was followed by one reporting `figma.currentPage.name === "Cover"`. An earlier version of
+// this script threw unless the template's page was already current, telling you to open that page and
+// re-run — which a session cannot arrange, so the script could never run at all. Only a human
+// clicking in the desktop app could satisfy it, and that is not who runs this.
+//
+// Reading it unswitched is sound because the failure the old guard feared is specific: a fingerprint
+// read off an unloaded page comes back SHORT (children missing), not plausible-but-wrong — and short
+// is detectable. So prove completeness instead of demanding page-currency. Completeness, not specific
+// numbers, so this holds for any of the ten templates; `verify_templates.js` owns the numbers.
 const tpl = await figma.getNodeByIdAsync(CONFIG.templateId);
 if (!tpl) throw new Error(`templateId ${CONFIG.templateId} not found — new yearly file? ask for the link`);
 let tplPage = tpl;
 while (tplPage && tplPage.type !== "PAGE") tplPage = tplPage.parent;
-if (tplPage && figma.currentPage !== tplPage)
-  throw new Error(
-    `open the template's page ("${tplPage.name}") in Figma, then re-run. Currently on "${figma.currentPage.name}". ` +
-    `Only ONE setCurrentPageAsync is allowed per call and this one is spent on the clones' page, so the template ` +
-    `must already be current — a fingerprint read off an unswitched page comes back short without erroring. ` +
-    `(If the clones are on the template's own page, no switch is needed at all.)`);
 const T = fingerprint(tpl);
+const shortRead = [];
+if (!T.size || typeof T.size[0] !== "number" || typeof T.size[1] !== "number") shortRead.push("frame size unreadable");
+if (!T.header) shortRead.push("header did not resolve");
+else if (!T.header.rowCount) shortRead.push("header resolved with no rows");
+if (shortRead.length)
+  throw new Error(
+    `the template fingerprint read SHORT from page "${tplPage ? tplPage.name : "?"}" (${shortRead.join("; ")}). ` +
+    `Every comparison below would be against a partial template, so this is a stop, not a diff. ` +
+    `Re-check that ${CONFIG.templateId} is still a frame with a header.`);
+// The footer is deliberately NOT in that gate: the 302-wide pair has no footer (its bottom-most
+// auto-layout child is a source row), so a null there is a template shape, not a short read.
 
 // --- the clones. The one and only page switch.
 const first = await figma.getNodeByIdAsync(CONFIG.frameIds[0]);
@@ -248,6 +265,12 @@ const totalDrift = results.reduce((s, x) => s + (x.drift ? x.drift.length : 0), 
 // one, and counting only drift let it pass as a clean run.
 const missing = results.filter((x) => x.error);
 return {
+  templateFingerprintRead: {
+    fromPage: tplPage ? tplPage.name : null,
+    pageWasCurrent: !!(tplPage && figma.currentPage === tplPage),
+    footerResolved: !!T.footer,
+    note: "read with no page switch, completeness gated above — figma.currentPage resets to the first page every call, so requiring the template's page to be current is unsatisfiable from a session",
+  },
   template: { id: CONFIG.templateId, name: tpl.name, size: T.size, fill: T.fill },
   verdict: (totalDrift ? `${totalDrift} unintended difference(s) across ${results.length} frame(s)` : `all ${results.length - missing.length} resolved frame(s) match the template`) +
            (missing.length ? ` — ${missing.length} of ${results.length} frame(s) NOT CHECKED, id not found: ${missing.map((x) => x.frame).join(", ")}. Resolve the clone by NAME, not by a captured id (GOTCHAS.md).` : ""),

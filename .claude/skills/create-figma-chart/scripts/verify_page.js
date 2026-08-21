@@ -188,15 +188,22 @@ const checkFrame = async (frameId) => {
       const tf = Array.isArray(n.fills) && n.fills[0] && n.fills[0].type === "SOLID" && n.fills[0].visible !== false
         ? "#" + [n.fills[0].color.r, n.fills[0].color.g, n.fills[0].color.b].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join("")
         : null;
-      let mixedWeight = false;
-      try { mixedWeight = n.getStyledTextSegments(["fontName"]).length > 1; } catch (e) { mixedWeight = false; }
+      // The WEIGHTS, not just whether they differ: a uniformly non-Regular node is style-unbindable
+      // for the same API reason a mixed-weight one is, and named-styles has to know the difference
+      // between "bold throughout" (prescribed) and "Regular and unbound" (a defect).
+      let mixedWeight = false, weights = [];
+      try {
+        const fsegs = n.getStyledTextSegments(["fontName"]);
+        mixedWeight = fsegs.length > 1;
+        weights = [...new Set(fsegs.map((s) => s.fontName && s.fontName.style).filter(Boolean))];
+      } catch (e) { mixedWeight = false; weights = []; }
       const ranges = sizeRanges(n);
       // A node whose size cannot be read at all is DECLARED, never dropped on the floor.
       if (!ranges.length) unreadableText.push(n.name || n.type);
       for (const sr of ranges) {
         texts.push({ node: n, name: n.name, chars: (n.characters || "").slice(0, 30), size: sr.size,
                      sizeRange: sr.range, mixedSize: ranges.length > 1,
-                     styleId: n.textStyleId || "", box: rel(n), insidePlot, fill: tf, mixedWeight });
+                     styleId: n.textStyleId || "", box: rel(n), insidePlot, fill: tf, mixedWeight, weights });
       }
     }
     if (/^annotation__/.test(n.name)) annotations.push({ node: n, name: n.name, box: rel(n), type: n.type });
@@ -350,18 +357,31 @@ const checkFrame = async (frameId) => {
   // row judges OUR nodes only and reports the imported ones as context.
   {
     const ann = texts.filter((t) => /^annotation__/.test(t.name));
-    // An annotation that bolds its key phrase — the prescribed recipe — is MIXED-WEIGHT, and Figma
-    // drops the node-level textStyleId when it is (reference/GOTCHAS.md says so and says not to treat
-    // it as a defect). Failing those means a correctly-built annotation can never pass, so they are
-    // judged on their ladder size instead, which the ladder-sizes row above already enforces.
-    const unbound = ann.filter((t) => !t.styleId && !t.mixedWeight);
+    // TWO exemptions, both the same API limitation, and both prescribed rather than tolerated.
+    //
+    // 1. An annotation that bolds its key phrase — the house convention — is MIXED-WEIGHT, and Figma
+    //    drops the node-level textStyleId when it is (reference/GOTCHAS.md).
+    // 2. An annotation that is bold THROUGHOUT is equally unbindable, because the whole ladder is Lato
+    //    Regular: applying the style would strip the bold, so GUIDELINES.md → Named styles tells you
+    //    outright to "set fontSize to the ladder value and leave the weight alone rather than binding
+    //    the style and losing the bold". Confirmed against the design team's own finished highlight map
+    //    (Chart Library `273:320`), whose nine country labels ship 12px Lato Bold with an EMPTY
+    //    textStyleId. Before this exemption existed the row fired on nine correctly-built labels.
+    //
+    // Both are judged on their ladder size instead, which ladder-sizes above already enforces. What is
+    // still a real defect: Regular text that is unbound — there the binding was simply not applied.
+    const boldThroughout = (t) => t.weights && t.weights.length === 1 && t.weights[0] !== "Regular";
+    const unbound = ann.filter((t) => !t.styleId && !t.mixedWeight && !boldThroughout(t));
     const mixed = ann.filter((t) => t.mixedWeight);
+    const bold = ann.filter((t) => !t.mixedWeight && boldThroughout(t));
     const importedRaw = texts.filter((t) => t.insidePlot && !/^annotation__/.test(t.name) && !t.styleId).length;
     if (!ann.length) skip("named-styles", "no annotation__* text nodes; an imported chart's text cannot carry a style id");
     else add("named-styles", unbound.length ? "FAIL" : "ok",
-             (unbound.length ? `${unbound.length} annotation(s) with no textStyleId — setting fontSize looks like the ladder and is not it: ` + unbound.map((t) => `"${t.chars}"`).join(", ")
-                             : `all ${ann.length - mixed.length} single-weight annotation(s) bound to a text style`) +
-             (mixed.length ? ` ${mixed.length} mixed-weight annotation(s) exempted — Figma drops the node-level style id when a phrase is bolded, which is the prescribed recipe (GOTCHAS.md); their sizes are covered by ladder-sizes.` : "") +
+             (unbound.length ? `${unbound.length} REGULAR annotation(s) with no textStyleId — setting fontSize looks like the ladder and is not it: ` + unbound.map((t) => `"${t.chars}"`).join(", ")
+                             : `all ${ann.length - mixed.length - bold.length} regular-weight annotation(s) bound to a text style`) +
+             (mixed.length ? ` ${mixed.length} mixed-weight annotation(s) exempted — Figma drops the node-level style id when a phrase is bolded, which is the prescribed recipe (GOTCHAS.md).` : "") +
+             (bold.length ? ` ${bold.length} wholly-bold annotation(s) exempted — the ladder is all Lato Regular, so binding a style would strip the bold; GUIDELINES.md prescribes size-without-binding here and the finished pages ship it (weights seen: ${[...new Set(bold.flatMap((t) => t.weights))].join(", ")}).` : "") +
+             ((mixed.length || bold.length) ? " Their sizes are covered by ladder-sizes." : "") +
              ` ${importedRaw} imported chart text node(s) are raw, which is expected.`);
   }
 
@@ -819,15 +839,31 @@ const checkFrame = async (frameId) => {
 
   // Direct labels readable as text — computed, not declared. CHECKS.md wants 4.5:1 against the
   // background for every category label drawn on it; that is a pure function of two hexes.
+  //
+  // This row used to require `insidePlot`, which made it DEAD on every correctly-built page: annotations
+  // are appended to the FRAME (GOTCHAS.md), so `insidePlot` is false for all of them, and
+  // `insidePlot && /^annotation__/` is a contradiction. Same can't-fail bug this file already fixed once
+  // for the `annotations` walk, in a second row, unnoticed until a nine-label map reported SKIPPED with
+  // "no annotation text with a solid fill" while carrying nine filled annotations. So: annotations are
+  // judged against the FRAME's fill, which is what is actually behind them; `label__*` nodes stay gated
+  // on insidePlot because what is behind those is a mark, not the frame.
   {
-    const onBg = texts.filter((t) => t.insidePlot && t.fill && /^(label|annotation)__/.test(t.name));
+    const candidates = texts.filter((t) => t.fill && (/^annotation__/.test(t.name) || (t.insidePlot && /^label__/.test(t.name))));
+    // A label in the frame's OWN colour cannot be meant to be read against the frame — it is white text
+    // inside a dark mark (GUIDELINES.md → maps: "values written inside countries take whichever colour
+    // reads against the fill"). Measuring those against the frame reports 1:1 and fails a correct label,
+    // so they are knocked out to the on-fill row rather than judged here.
+    const onMark = frameFill ? candidates.filter((t) => t.fill.toLowerCase() === frameFill.toLowerCase()) : [];
+    const onBg = candidates.filter((t) => onMark.indexOf(t) === -1);
     if (!frameFill) skip("label-contrast-on-background", "frame carries no solid fill to measure against");
-    else if (!onBg.length) skip("label-contrast-on-background", "no label__*/annotation__* text with a solid fill");
+    else if (!onBg.length) skip("label-contrast-on-background", "no label__*/annotation__* text sits on the frame's own background" +
+                                (onMark.length ? ` — all ${onMark.length} carry the frame's own colour, so they are drawn inside a mark; that is label-contrast-on-fill's row` : ""));
     else {
       const bad = onBg.map((t) => ({ t, c: contrast(t.fill, frameFill) })).filter((x) => x.c < 4.5);
       add("label-contrast-on-background", bad.length ? "FAIL" : "ok",
-          bad.length ? bad.map((x) => `"${x.t.chars}" ${x.t.fill} on ${frameFill} = ${r(x.c)}:1 (want 4.5)`).join(", ")
-                     : `all ${onBg.length} label(s) clear 4.5:1 against ${frameFill} (lowest ${r(Math.min(...onBg.map((t) => contrast(t.fill, frameFill))))}:1)`);
+          (bad.length ? bad.map((x) => `"${x.t.chars}" ${x.t.fill} on ${frameFill} = ${r(x.c)}:1 (want 4.5)`).join(", ")
+                     : `all ${onBg.length} label(s) clear 4.5:1 against ${frameFill} (lowest ${r(Math.min(...onBg.map((t) => contrast(t.fill, frameFill))))}:1)`) +
+          (onMark.length ? `. ${onMark.length} label(s) in the frame's own colour NOT judged here — they are drawn inside a mark, which is label-contrast-on-fill's row` : ""));
     }
   }
 

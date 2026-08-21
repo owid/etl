@@ -19,7 +19,10 @@ Replace the lorem-ipsum text nodes in the cloned template. Source everything fro
   2. **Check the indicator's `origins`** for what each producer's presence actually obliges. An origin whose licence or attribution terms require a credit **keeps its credit even when its values are not the ones displayed** — provenance decides whether the data is shown, the licence decides whether the name may come off. If the terms are unclear, leave the citation alone; it is the cheaper error.
   3. **Then corroborate with the data**, as a consistency check on the conclusion rather than as the proof: fetch the single-producer chart's `csvType=full` CSV and diff it against the displayed window point by point. On this run all **220** points of a 1970–2024 window matched UN IGME exactly (0 mismatches, coverage from 1956) while the citation also named Gapminder (1800–2015) — agreeing with the splice logic, which is what made it safe to credit UN IGME alone. Had the diff *disagreed* with the splice logic, that is a signal to stop and re-read, not to trust the numbers.
 
-  Do **not** do any of this from the indicator's prose: `descriptionKey` said Gapminder covers 1800–2015 and UN IGME "some countries from 1932", which sounds like both contribute and does not tell you which wins where. Record the drop as a deliberate deviation, note that the interactive chart's footer will still list both, and re-measure the footer afterwards — a shorter line can collapse a planned two-row footer back to the template's single row, which is worth ~20px of chart.
+  4. **Read the SNAPSHOT SCRIPTS' own comments, because a producer whose rows are absent from the window can still be the source of the values in it.** The case that breaks the whole "whose rows are these?" framing is a hand-built *continuation* table: OWID extends a source that stopped publishing by carrying its last state forward. On the nuclear-weapons indicator, Bleek's garden step caps open-ended intervals at `LATEST_YEAR = 2016`, and the NTI snapshot script builds rows "from 2017 onwards" up to 2023 — so a 2023 image contains **no Bleek rows at all**, and the naive read is "drop Bleek". But that script's own comments say the table "should be considered as a continuation of Bleek (2017)" and that "no country has changed its status since 2016": the 2023 values *are* Bleek's 2016 codings, restated and checked against NTI, and the classification the subtitle quotes is Bleek's. Crediting NTI alone would attribute a scheme to a producer that did not create it. Bleek's licence (`Copyright 2017, President and Fellows of Harvard College`, against NTI's CC BY 4.0) says the same thing via step 2. **Both credits stay.**
+     - The tell that you are looking at a continuation rather than a real series: identical values across every year of the extension. Verified by rendering the map at 2015, 2016, 2017, 2020 and 2023 — all five report the same bin composition (9 / 1 / 1 / 191). Which is worth knowing for its own sake: it means the year in the title is provenance, not news, and it settles "should we wait for the refresh?" as *no* — the refresh will extend the same values to a later year.
+
+  Do **not** do any of this from the indicator's prose: `descriptionKey` said Gapminder covers 1800–2015 and UN IGME "some countries from 1932", which sounds like both contribute and does not tell you which wins where. `descriptionProcessing` is no better — "double-checked with information from the Nuclear Threat Initiative" reads as verification-only for a table that in fact supplies every row in the window. Record the drop as a deliberate deviation, note that the interactive chart's footer will still list both, and re-measure the footer afterwards — a shorter line can collapse a planned two-row footer back to the template's single row, which is worth ~20px of chart.
 
   > **First check whether the template already gives the source its own row — the static mobile ones do.** `Frame 15` on both static mobile templates is a two-row block, 38px tall, with `Data source:` and the license each on their own full-width row at `x=0`. There is nothing to rearrange there, and running the manoeuvre below on one of those clones adds a **third** row. The recipe applies to the genuinely one-row footers — `DI_Template`'s `Frame 37` at y=508. The Instagram templates are already two-row for their own reasons (the `OurWorldinData.org/[Topic]` line).
   >
@@ -166,7 +169,19 @@ of the two reachable states you are shipping.** Measured step by step on a fille
 2. `src.characters = …` alone drops it to **unbound**, segments collapsed to the first character's
    style. This is the bug: a recipe that writes the string and fixes the weights produces a
    correct-*looking* footer whose source carries no style at all. Eight of eight on one run.
-3. `setTextStyleIdAsync(fullId)` re-binds the whole node, at the style's uniform Regular.
+   - **It does not always drop the binding, and that is the trap in step 3.** Observed on the DI
+     template: after `characters`, the *tail* still reported the style id while the whole line had
+     gone Bold — the propagation had landed as a range override *on top of* a surviving binding. Which
+     of the two states you are in is not predictable from the recipe, so read it rather than assume it.
+3. `setTextStyleIdAsync(fullId)` re-binds the whole node, at the style's uniform Regular — **but it is
+   a NO-OP when the node is still bound to that same id, and it fails silently.** Applying the id the
+   node already carries changes nothing, including the range font overrides, so the line stays
+   uniformly Bold and step 4's `setRangeFontName(0, PREFIX.length, Bold)` is a no-op too. The footer
+   then ships with a wholly bold citation, which looks deliberate. Two ways out, and the order matters:
+   either clear the weight at node level first (`src.fontName = {family:"Lato", style:"Regular"}` —
+   which strips the binding, so the style application afterwards *does* take effect), or set the tail's
+   weight explicitly by range. **Assert the outcome either way**, on the segments and not on
+   `node.textStyleId`: the target is `"Data source:" Bold unbound` + `" <citation>" Regular BOUND`.
 4. `setRangeFontName(0, PREFIX.length, Bold)` then **strips the style from that range**: the prefix
    goes `Bold | unbound`, the tail stays `Regular | BOUND`, and `node.textStyleId` becomes
    `figma.mixed`.
