@@ -128,7 +128,11 @@ not in the type file, for that reason — the worked examples stay in `reference
     chart scaled by 0.657 left `line__Chile` at **1.32px** and its white halo at 1.98. Nothing looks
     broken — it reads as a weaker chart than grapher's own, and a designer spots it before you do.
     `scripts/measure_fit.js` detects it when given `CONFIG.originalGroupId`, comparing the fitted
-    strokes against the untouched reference import of the same format.
+    strokes against the untouched reference import of the same format. **It reads the series identity
+    from the naming ANCESTOR** — on a slope export `slope__<Entity>` and `outline__<Entity>` are groups
+    and the stroked vector is called plain `line`, so matching the node's own name inventoried *nothing*
+    and `[].every()` reported "strokes sit at the house 3/4" without inspecting one. An empty inventory
+    now reports `NOT CHECKED`, because an empty comparison is a gap in coverage and not a pass.
   - **It goes the other way too, on any template whose band is WIDER than the export.** Static
     Vertical fits at **1.30x**, an upscale, so the same multiplier *thickens*: its line arrived at 2.61
     and its halo at 3.91 and both had to come **down** to 2/3. So the rule is not "restore what the
@@ -160,3 +164,30 @@ not in the type file, for that reason — the worked examples stay in `reference
   Re-append the label to the chart group after moving it (`chart.appendChild(label)`), and **check
   the render, not the node list**: the tree looks correct either way. Found on stacked areas, and it
   is the same failure as a map leader hidden by the annotation it starts from.
+
+## Running the scripts
+
+- **`use_figma`'s `code` parameter caps at 50,000 bytes**, and `verify_page.js` is ~59KB with its
+  comments. It has to be comment-stripped to run: drop the header block and every whole-line `//`
+  comment (never inline ones — a URL or a regex can contain `//`), which took it to ~37KB. Worth
+  knowing before you plan a run around it, and worth remembering when adding to any of these scripts:
+  past the cap, a script cannot be executed at all.
+- **`node --check` rejects these scripts, and that is not a syntax error.** They use top-level `await`
+  and `return`, which are valid inside the async wrapper `use_figma` provides and invalid in a plain
+  CommonJS file. The harnesses are the real gate — they wrap the source the same way the tool does —
+  so run `node test_<name>.js`, never `node --check <name>.js`.
+- **`verify_docs.py --against` takes a git ref, not a path.** `--against HEAD` is the useful form while
+  a move is still uncommitted: it diffs the working tree against the committed text and reports
+  anything that went missing as `LOST`.
+
+## Re-checking a row outside its script
+
+**Copy the predicate verbatim, or run the script.** Re-implementing a check compactly to spot-check a
+few frames is how a check becomes vacuous: dropping half of one predicate — `isGridByName` tests the
+node's name *or* its furniture container, and only the name got copied — meant nothing was classified as
+a gridline, so the row reported `ok` having judged **zero** nodes, on frames that genuinely had the
+defect a moment earlier.
+
+**So make every ad-hoc check report the COUNT it judged**, not just its verdict. `status: "ok"` and
+`gridsJudged: 0` in the same object is instantly recognisable as vacuous; `status: "ok"` alone is not.
+This is the same failure the harnesses exist to prevent, arriving through the side door.

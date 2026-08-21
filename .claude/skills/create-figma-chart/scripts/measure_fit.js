@@ -274,7 +274,22 @@ if (groupNode) {
       return;
     }
     const b = n.absoluteBoundingBox;
-    if (!b || b.width === 0 || b.height === 0) return;
+    if (!b) return;
+    // A zero-AREA node is still ink when it carries a visible stroke. A vertical zero line and a
+    // tick mark both have width 0 and paint a real line, and dropping them under-measures the group:
+    // grapher draws a single-entity stacked discrete bar's zero line at 1.54x the bar height (checked
+    // at four canvas sizes), so a fit computed without it left 440px of stroke hanging 31px past the
+    // artboard and straight through the source line. Zero-area nodes stay excluded from the FILL
+    // inventory for the opposite reason — see the same distinction in verify_page.js.
+    // "Has a stroke" is not "paints a stroke". A paint switched off (`visible: false`) or made
+    // transparent (`opacity: 0`) renders nothing, and counting it here widens the measured bounds, which
+    // is worse than it sounds: these bounds set the fit AND the second-pass export parameters, so one
+    // invisible stroke on a zero-area node biases every number downstream. Same predicate as
+    // verify_page.js's knockout row — one rule for "does this paint render", not three call sites that
+    // drifted apart.
+    const paints = (s) => s && s.visible !== false && (s.opacity === undefined || s.opacity > 0.01);
+    const strokedInk = "strokes" in n && Array.isArray(n.strokes) && n.strokes.some(paints);
+    if ((b.width === 0 || b.height === 0) && !strokedInk) return;
     x0 = Math.min(x0, b.x);
     y0 = Math.min(y0, b.y);
     x1 = Math.max(x1, b.x + b.width);
@@ -382,13 +397,24 @@ if (groupNode) {
     if (!orig) {
       group.strokes = { error: `originalGroupId ${CONFIG.originalGroupId} not found` };
     } else {
-      const widths = (node) => {
+      // The series identity can sit on an ANCESTOR rather than on the stroked node. On a slope export
+      // `slope__<Entity>` and `outline__<Entity>` are GROUPS of {start-point, end-point, line} and the
+      // only stroked node is called plain `line` — so matching the node's own name found nothing, BOTH
+      // inventories came back empty, and `[].every(...)` is true: the verdict read "strokes sit at the
+      // house 3/4" without a single stroke inspected. The old pattern did not even list `slope__`.
+      // So carry the nearest naming ancestor down the walk, the way verify_page.js and
+      // replay_chart_edits.js do. Where one series group holds several stroked children, the THICKEST
+      // is the series stroke — the others are its end-point marks.
+      const SERIES_ANY = /^(line|slope|outline)__(.+)$/;
+      const widths = (root) => {
         const m = {};
-        for (const n of node.findAll(() => true)) {
-          if (/^(line|outline)__/.test(n.name) && "strokeWeight" in n && typeof n.strokeWeight === "number") {
-            m[n.name] = r(n.strokeWeight);
+        (function walk(n, named) {
+          if (SERIES_ANY.test(n.name)) named = n.name;
+          if (named && "strokeWeight" in n && typeof n.strokeWeight === "number") {
+            m[named] = Math.max(m[named] === undefined ? 0 : m[named], r(n.strokeWeight));
           }
-        }
+          if ("children" in n) n.children.forEach((c) => walk(c, named));
+        })(root, null);
         return m;
       };
       const o = widths(orig);
@@ -407,7 +433,13 @@ if (groupNode) {
       }));
       group.strokes = {
         rows: strokeRows,
-        verdict: strokeRows.every((x) => x.ok)
+        // An EMPTY inventory is a gap in coverage, not a pass. `[].every()` is true, so this reported
+        // "ok — strokes sit at the house 3/4" on any import whose series names it could not find.
+        verdict: !strokeRows.length
+          ? "NOT CHECKED — no line__/slope__/outline__ series found in the reference import, so nothing " +
+            "was compared. Check what the export actually named its series (a slope's stroked node is " +
+            "called plain `line`, with the identity on its group) rather than reading this as a pass."
+          : strokeRows.every((x) => x.ok)
           ? "ok — strokes sit at the house 3/4"
           : "STROKES ARE OFF THE HOUSE 3/4 — set them after the scale: " +
             strokeRows.filter((x) => !x.ok).map((x) => `${x.name} ${x.fitted} -> ${x.house}`).join(", ") +

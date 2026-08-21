@@ -60,6 +60,16 @@ And don't try to read the ink out of the SVG to skip the first import: text ink 
 metrics that are not in the file. Parsing every coordinate in one came out 13-33px wide of what
 Figma measured.
 
+DOES NOT APPLY TO A MAP. Every pass above assumes the ink aspect follows from (canvas - inset), i.e.
+that asking for a taller canvas yields taller ink. A map's does not: the projection fixes its aspect
+and the extra canvas height becomes letterbox. Measured on the same chart at `tab=map`, requesting a
+1.4033 target returned a canvas of exactly 761x670 as predicted, and ink at **1.5428** -- moved from
+the unsolved 1.7446 only because the legend reflowed, not because the map did. So skip the solve for
+a map and fit it WIDTH-first, per reference/per-chart-type/maps.md ("scale so it spans the content
+width"). The consequence is deliberate: a width-fitted world map sits about 291px tall in a 372px
+band, so it is CENTRED with ~49px above and below rather than meeting the 12-16px gap rule, and it is
+the width that has to land on the content box.
+
 The band is not the target. Step 7 fits the chart to `band - 2*gap`, not to the band itself, so the
 aspect to solve for is `bandW / (bandH - 2*gap)`. Solving for the band's own aspect lands the chart
 edge to edge with a zero-pixel gap. The gap is 14 by default with 12-16 the comfortable range on the

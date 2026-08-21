@@ -5,6 +5,55 @@
 
 Every one of these caught a real defect on this skill's first run, and none of them is visible by looking at the frame. Run them as a pass, and report the numbers rather than "looks fine".
 
+> **[`scripts/verify_page.js`](../scripts/verify_page.js) runs the MECHANICAL rows in ONE read-only
+> `use_figma` call** — text floor, annotation ladder, named styles, text hierarchy, series and
+> furniture weights, dash patterns, box alignment, gap, margins, unbound fills, annotation knockout
+> tier, annotation block gap, and the series polylines the annotation-overlap row needs. Done one at
+> a time those are a dozen round trips at ~8-10s each.
+>
+> **Every row it cannot judge comes back `SKIPPED` with the reason and the tool that owns it** —
+> colour-vision and grayscale (`color_audit.py`), spelling (`codespell`), the data-truth row
+> (`/adversarial-data-review`), entity completeness (needs the *effective* selection from outside
+> Figma), and the arrow and leader-on-map rows (they need rendered pixels). A `SKIPPED` row is a
+> declared gap in coverage, never a pass — which is the whole reason to read the list rather than
+> the verdict.
+>
+> **[`scripts/diff_against_template.js`](../scripts/diff_against_template.js) is the other half of the
+> gate, and it answers a question `verify_page.js` cannot: *did this frame drift from the template it
+> was cloned from?*** The workflow is start from the template, modify it, and **check back against the
+> template** — and that last step is the one that gets skipped. Run it in one read-only `use_figma`
+> call with the template id and the finished clones; it fingerprints the template **at runtime**, so it
+> works for any of the ten rather than hard-coding one. Text CONTENT is excluded by design (that is
+> what a run is meant to change); everything else is the template's law. Declare deliberate drift in
+> `CONFIG.expected` and it reports as `accepted` instead of `DRIFT`.
+>
+> On one eight-frame run it found what a screenshot pass had missed entirely: every footer row left
+> `layoutSizingHorizontal: FIXED` where the template HUGs — which stops the source line resizing with
+> its text — and it separates the one API limitation that is *not* a defect (a bolded `Data source:`
+> prefix cannot be both bold and style-bound through the plugin API, so it reports as `halfBound`; see
+> [TEXTS.md](TEXTS.md)) from real drift. Its harness is
+> [`scripts/test_diff_against_template.js`](../scripts/test_diff_against_template.js) (**49**
+> assertions), which found four defects in the script that review had not: a header that lost a row
+> reported as matching, five fingerprinted footer properties never actually compared, and a
+> `TypeError` that killed the whole diff when a row changed type. A fifth, from review: the text
+> fingerprint held each range's font **style** but not its **family**, so a row retyped in Arial
+> Regular read as the template's Lato Regular and the clone reported as matching. Both are compared now.
+>
+> Validated by planting defects and confirming each row **fails**, twice over: 11 planted in Figma and
+> 11 caught, then a stubbed-figma harness ([`scripts/test_verify_page.js`](../scripts/test_verify_page.js),
+> `node` it after any edit) covering **137** assertions including the rows that are awkward to plant on a
+> real page. **A check that cannot fail is worse than no check**, so when you extend this script,
+> extend both passes with it.
+>
+> Between them those passes found six bugs in the script itself, five of which were rows that could
+> not fail: annotations are appended to the **frame**, so a walk over only [chart, header, footer] left
+> `annotations` empty on every real page; the 12px floor rejected the 302-wide format's legitimate 11px
+> text; the ladder row judged only *bound* nodes, so a rescaled export's arbitrary 13.36px labels
+> passed as "imported, expected"; the knockout row judged only annotations that already had a stroke,
+> certifying a **missing** one; both 4.5:1 contrast rows were neither computed nor declared; and the
+> muted-context classification read each node's own weight, so the 2px halo of a legally-crossed 1px
+> context line was reported as a protagonist.
+
 > **On a 302-wide small or pull chart, five of these bars are different**, and reporting the 540-wide figures there produces false failures — the text floor is **11px** (the template's own subtitle, source and year labels are 11px by design), the margins are **12 … 290**, the chart's width need not match the header box, and the gap rule doesn't apply as written. The table is in SMALL-CHARTS.md → Checks. Everything else below holds unchanged.
 
 | Check | How | Bar |
@@ -147,3 +196,49 @@ including the arrow probe.
   you are testing against silently includes the boundary. A `#e8f1f9` sample is within 18 of
   `#deebf7` and is half background; that tolerance is what let a dot in open water pass a pixel
   check.
+
+## Two rows that a real run re-calibrated
+
+Both were changed after the first run of `verify_page.js` against eight real frames rather than the
+mock, and both changes make a row *less* red on purpose. Read them before treating either as slack.
+
+- **`furniture-dash` no longer flags grapher's zero line.** grapher names each gridline after its tick
+  value, so the zero line arrives as `0`, `0%` or `0-years` and matches none of the zero/tick/axis words
+  the row looks for — it was reported as a "cleared" dash on **5 of 8** frames, and on a slope chart,
+  whose two end verticals are named `1980` and `2023` and sit in a group of two, on 2 of 2. Those are
+  now reclassified by **identity** (a name denoting zero; a small furniture group of *vertical* lines),
+  never by the dash the node carries — that circularity is the defect the row exists to catch.
+  And they are **reclassified, not exempted**: they go through the solid-by-design validation, so a zero
+  line genuinely restyled to `[4,4]` still fails. The row reports what it reclassified, so you can see
+  it happen.
+
+  **The shape matters as much as the count, and so does whose exception `[3,2]` is.** A first pass
+  reclassified *any* group of fewer than three members, and that cut both ways on a legitimate two-line
+  horizontal grid: correctly dashed it failed as a dashed "axis" node, and with its dash cleared it
+  **passed** — the very defect the row exists to catch, hidden by the exemption. A slope's end axes are
+  vertical and a y-grid's lines are not, so only a small group of verticals is moved. Likewise the
+  `[3,2]` allowance belongs to a slope chart's native **zero line**, not to the whole solid-by-design
+  bucket: granted in bulk it also accepted an ordinary tick or axis line dashed `[3,2]`, which this
+  document permits nowhere.
+
+## A skip with a false reason is the failure mode, not a wrong number
+
+Worth stating on its own, because it has now bitten in three different rows. When `CONFIG.chartName`
+finds nothing — the documented case where a designer has **ungrouped** the chart — the plot has to be
+resolved from the frame's children, and doing that from a list of container names was line-chart-shaped:
+it knew the axis, grid and lines groups and missed a map's `map`, a bar's `bars`, a scatter's point
+container and a slope's `slopes`. Those children were then walked as *not* in the plot, which does not
+make a row fail — it **empties** one. `off-palette` then reported "no solid fills found in the plot" on
+a map full of them, both annotation rows found no marks to test against, and `isMap` was never set, so
+the map was judged by the band rule written for a chart whose aspect we control. The resolution is
+structural now: everything that is not the header, the footer, the logo or one of our own annotations is
+plot content, and the row records what it resolved. **When you extend either script, ask what a row says
+when it finds nothing — not only what it says when it finds a defect.**
+- **`ladder-sizes` reports imported text instead of failing it.** Judged strictly it failed on **8 of
+  8**, i.e. on every fitted import that can exist, and a row that always fails carries no information.
+  The cause is a real three-way conflict: text metrics help set the group's width, so snapping labels to
+  rungs moves the box off the content edge, and re-fitting to the edge moves the sizes back off the
+  ladder. So the verdict is split by *who set the size* — an **annotation** is authored here and still
+  FAILS, while imported text is REVIEW with its distance to the nearest rung, FAILing only past 0.75px.
+  Measured drift on the eight frames was 0.11–0.48px; the scatter's bubble legend was 6.01px from its
+  rung, which is the case the threshold exists to catch.

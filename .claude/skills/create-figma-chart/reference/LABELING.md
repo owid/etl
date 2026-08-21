@@ -405,7 +405,37 @@ chart.x = header.x
 chart.y = header.y + header.height + (band - chart.height) / 2
 ```
 
-**Everything that lived inside the old chart goes out with it — replay it, from a list.** That pass restores only the furniture removal, the scale and the text re-hug. Every other Step 8 edit was parented under the group you just removed: the hidden `connectors`, the cloned direct labels and their placement, the added ticks, the bound stroke and fill styles, and the whole highlight treatment (gray context lines at 1px, the palette color on the protagonist, the widened halo, the hidden markers). Only the annotations survive, because they are parented to the template clone rather than to the chart. Keep the chart-local edits as **one scripted function you re-run after the import**, or as an explicit list you work down — memory is not enough, because a frame that has quietly reverted to grapher's raw rendering looks finished. Then re-run Step 8c on the new chart; the earlier pass certified an object that no longer exists.
+**Everything that lived inside the old chart goes out with it — replay it, from a list.** That pass restores only the furniture removal, the scale and the text re-hug. Every other Step 8 edit was parented under the group you just removed: the hidden `connectors`, the cloned direct labels and their placement, the added ticks, the bound stroke and fill styles, and the whole highlight treatment (gray context lines at 1px, the palette color on the protagonist, the widened halo, the hidden markers). Only the annotations survive, because they are parented to the template clone rather than to the chart. Keep the chart-local edits as **one scripted function you re-run after the import**, or as an explicit list you work down — memory is not enough, because a frame that has quietly reverted to grapher's raw rendering looks finished.
+
+  **[`scripts/replay_chart_edits.js`](../scripts/replay_chart_edits.js) is that function.** Fill in a
+  `CONFIG` saying *what* the frame needs — nodes to hide, subpaths to trim, furniture to shorten to the
+  data's extent, the furniture weight, a map legend to re-centre — and it owns the **order**, which is
+  the part that is easy to get wrong and expensive to debug: hide and trim *before* measuring (they
+  change the group's proportions), fit with one `rescale`, close the width residual, and set strokes
+  **last**, because `rescale` multiplies `strokeWeight` and setting them first is the most repeated
+  mistake in this skill's history. It runs `dryRun: true` by default and returns the plan; read that
+  before letting it write. It also refuses a width squeeze beyond 0.5% rather than silently rewrapping
+  labels, and reports a rewrap by **line count** (`height / fontSize`) rather than raw height, since a
+  uniform rescale changes every height in proportion and a raw-height check cries wolf on all of them.
+
+  **Set `bindAxis: "width"` for a map.** The default fit is height-first, which is only correct because
+  the export solve makes the aspect the band's — and a map's aspect is the projection's, not the
+  canvas's. Height-fitting one overflows the content width by a measured **141px** (FITTING.md), so a
+  map fits width-first and is centred in the band with the larger gaps that leaves. A value that is
+  neither `"height"` nor `"width"` throws rather than quietly fitting the wrong axis.
+
+  **It reads the series identity from the naming ANCESTOR, not the stroked node.** On a slope export
+  `slope__<Entity>` and `outline__<Entity>` are groups and the only stroked node is called plain `line`,
+  so a leaf-name match found no series at all and `seriesWeights` was silently never applied — a
+  completed replay over grapher's own 1.1/1.7px. The furniture container is carried the same way, since
+  checking only the immediate parent left a gridline nested one level deeper un-un-thinned.
+
+  **And read the `verdict`, which now carries every way the run can be incomplete** — a refused width
+  fit, a map taller than the band, a box that missed the content edges, asymmetric gaps — not just a
+  rewrap. It used to say "wrote every edit" whenever no text happened to rewrap, which put a success
+  line over a chart hanging off the content box; `result.problems` lists the same facts.
+  Harness: [`scripts/test_replay_chart_edits.js`](../scripts/test_replay_chart_edits.js) (49
+  assertions, mostly asserting the ordering rather than the arithmetic). Then re-run Step 8c on the new chart; the earlier pass certified an object that no longer exists.
 
 Keep the export URL — same `imFontSize`, same `imType`, same params — so the only thing that changes is what the chart author changed. And re-check the category order and the entity list against what you were told changed: a reorder can move more than the category you asked about.
 
@@ -441,3 +471,28 @@ Split what you find in two, and be explicit about which is which:
 - **The chart author's** — sort order, entity selection, colors, tolerance, the year. Give them a short numbered list with the trade-off spelled out (what it costs, what it buys) and let them decide. Never apply these by editing vectors: the image would stop matching the interactive chart.
 
 If you genuinely have nothing to suggest, say that instead of inventing something. A thin recommendation wastes more of the author's attention than none.
+
+## Shortening entity names — where the space actually comes from
+
+Long entity names cost plot area on every chart type that labels entities, so this is a general
+labeling decision rather than a bar-chart one. What changes per type is **what the labels are competing
+with**, and that decides whether shortening buys anything at all:
+
+| Chart | What the labels cost | Does shortening the longest one gain space? |
+|---|---|---|
+| Ranked / discrete bar | a column on the left, as wide as the longest name | **Yes** — and only the longest one does. The re-layout is in [per-chart-type/bar.md](per-chart-type/bar.md) |
+| Slope | a column at each end, so it is paid twice | Yes, at whichever end carries the longer names |
+| Line with end labels | the right margin of the plot | Yes |
+| Stacked bar / stacked area | direct labels inside or beside the bands | Sometimes — a name that no longer needs a leader or a second line is the real win |
+| Scatter | nothing structural; labels sit beside their points | **No edge moves** — the gain is fewer collisions, and it can be worth it for that alone |
+| Marimekko | labels under narrow segments, which is where truncation and rotation start | Yes, in the sense that a shorter name may fit where the full one could not |
+| Map | country names are not drawn; only annotations and leader labels carry text | Only for an annotation |
+
+Two rules hold across all of them, and they are the ones to state when you ask (SKILL.md → Step 4):
+
+- **`US` and `UK` are settled** by the Writing and Style Guide, without periods. Any other short form is
+  a **proposal**: name it in the question, say it is a suggestion, and let the user decide. The reader
+  cannot tell a common abbreviation from an invented one, so an unrecognisable one reads as data.
+- **Identify what is actually binding before offering the change.** On a bar chart that is the longest
+  name and nothing else; on a scatter there is no binding edge, so promising a bigger plot would be
+  wrong. Offering a rename that cannot help spends the user's decision for nothing.
