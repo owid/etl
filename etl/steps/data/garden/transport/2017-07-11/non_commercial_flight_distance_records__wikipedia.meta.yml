@@ -7,7 +7,7 @@ tables:
     variables:
       non_commercial_flight_distance_record__km__wikipedia:
         title: Non-Commercial Flight Distance Record (km) (Wikipedia)
-        unit: kilometres
+        unit: kilometers
         short_unit: km
     dimensions:
       - name: year

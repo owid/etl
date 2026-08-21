@@ -263,7 +263,7 @@ tables:
       inbound_tourism_by_region:
         title: International tourist arrivals by region of origin
         unit: arrivals
-        description_short: Global number of arrivals by people travelling from abroad and staying overnight, broken down by the region where visitors reside. Data for the latest years is preliminary because not all countries have reported arrivals by region of origin yet.
+        description_short: Global number of arrivals by people traveling from abroad and staying overnight, broken down by the region where visitors reside. Data for the latest years is preliminary because not all countries have reported arrivals by region of origin yet.
         description_key:
           - *desc_key_arrivals
           - *desc_key_region_origin
@@ -445,7 +445,7 @@ tables:
       # =========================================================================
 
       out_tour_exp_balance_of_payments_travel_vis:
-        title: Spending by a country’s residents while travelling abroad on travel (current US$)
+        title: Spending by a country’s residents while traveling abroad on travel (current US$)
         unit: current US$
         short_unit: $
         description_short: Money spent by a country's residents abroad on accommodation, food, local transport, entertainment, shopping, and cruise fares. The data is expressed in current US dollars and is not adjusted for inflation or differences in living costs between countries.
@@ -458,7 +458,7 @@ tables:
           numDecimalPlaces: 0
 
       out_tour_exp_balance_of_payments_passenger_transport_vis:
-        title: Spending by a country’s residents while travelling abroad on passenger transport (current US$)
+        title: Spending by a country’s residents while traveling abroad on passenger transport (current US$)
         unit: current US$
         short_unit: $
         description_short: Money spent on fares paid to foreign airlines by the country's residents, including airfares, excess baggage fees, and onboard purchases. The data is expressed in current US dollars and is not adjusted for inflation or differences in living costs between countries.
@@ -471,7 +471,7 @@ tables:
           numDecimalPlaces: 0
 
       out_tour_exp_balance_of_payments_total_vis:
-        title: Spending by a country’s residents while travelling abroad (current US$)
+        title: Spending by a country’s residents while traveling abroad (current US$)
         unit: current US$
         short_unit: $
         description_short: Money spent by a country’s residents abroad on accommodation, food, transport, entertainment, shopping, and fares paid to foreign airlines. The data is expressed in current US dollars and is not adjusted for inflation or differences in living costs between countries.
@@ -484,7 +484,7 @@ tables:
           numDecimalPlaces: 0
 
       out_tour_exp_total_share_gdp:
-        title: Spending by a country’s residents while travelling abroad as a share of GDP
+        title: Spending by a country’s residents while traveling abroad as a share of GDP
         unit: "%"
         short_unit: "%"
         description_short: Money spent by a country's residents abroad on accommodation, food, transport, entertainment, shopping, and fares paid to foreign airlines, as a percentage of the country's [GDP](#dod:gdp).
@@ -498,7 +498,7 @@ tables:
           numDecimalPlaces: 2
 
       outbound_exp_us_cpi_adj_2021:
-        title: Spending by a country’s residents while travelling abroad (in constant 2021 US$)
+        title: Spending by a country’s residents while traveling abroad (in constant 2021 US$)
         unit: constant 2021 US$
         short_unit: $
         description_short: Money spent by a country's residents abroad on accommodation, food, transport, entertainment, shopping, and fares paid to foreign airlines. This data is expressed in in constant 2021 US$. It is adjusted for inflation but does not account for differences in living costs between countries.
