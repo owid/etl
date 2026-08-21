@@ -281,7 +281,7 @@ COMMON_VIEW_EXTRAS = {
     "relatedQuestions": [
         {
             "text": "Why has our energy data changed?",
-            "url": "https://ourworldindata.org/how-primary-energy-is-measured-has-changed-across-our-charts",
+            "url": "https://ourworldindata.org/primary-energy-measurement-change",
         }
     ],
 }
