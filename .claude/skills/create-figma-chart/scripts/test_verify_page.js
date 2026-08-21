@@ -559,6 +559,29 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
           row(pale, "label-contrast-on-background").status);
   }
 
+  // 18d — colour is only ONE of the two ways a label can be unjudgeable against the frame. The other is
+  // GEOMETRY: an annotation sitting on a MAP SHAPE has a country's fill behind it, not the frame's, and a
+  // country's bbox is deliberately not judged by annotation-overlap (a bbox is not its ink, maps.md) — so
+  // dark text on a dark country was measured against the WHITE FRAME, scored well over 4.5:1 and passed,
+  // with no other row looking. Over a NON-map mark the position is already illegal and annotation-overlap
+  // FAILs it, so ordinary charts keep an informative ok/FAIL here instead of a blanket REVIEW.
+  {
+    // `mapCountries` puts France (#4c6a9c) at 40-100 x 160-200; the annotation is placed over it.
+    const onCountry = await run(buildFrame({
+      mapCountries: true,
+      annotation: annotation({ x: 45, y: 165, w: 50, h: 16, fill: "#2d2e2d", stroke: "#ffffff", strokeWeight: 3 }),
+    }), {});
+    const rowA = row(onCountry, "label-contrast-on-background");
+    check("18d a label over a map shape is not certified ok", rowA.status === "REVIEW", rowA.status + " " + rowA.detail);
+    check("18d and the map shape it overlaps is named", /map shape/.test(rowA.detail), rowA.detail);
+    check("18d and the country is identified", /country__FRA/.test(rowA.detail), rowA.detail);
+    check("18d and the ratio against that fill is given", /#4c6a9c = /.test(rowA.detail), rowA.detail);
+    // no map shape under it: the row stays informative rather than reviewing everything
+    const clear = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, fill: "#2d2e2d", stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    check("18d a label clear of every mark is still judged ok", row(clear, "label-contrast-on-background").status === "ok",
+          row(clear, "label-contrast-on-background").detail);
+  }
+
   // 19 — the unimplemented half of the hierarchy is declared, not certified.
   {
     const out = await run(buildFrame(), {});

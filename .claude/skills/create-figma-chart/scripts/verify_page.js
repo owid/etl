@@ -70,6 +70,9 @@ const lin = (c) => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4
 const lum = (hex) => { const n = parseInt(hex.slice(1), 16); const R = ((n >> 16) & 255) / 255, G = ((n >> 8) & 255) / 255, B = (n & 255) / 255;
   return 0.2126 * lin(R) + 0.7152 * lin(G) + 0.0722 * lin(B); };
 const contrast = (a, b) => { const la = lum(a), lb = lum(b); return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05); };
+const hexOf = (f) => (f && f.type === "SOLID"
+  ? "#" + [f.color.r, f.color.g, f.color.b].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join("")
+  : null);
 let rows = [];
 const add = (name, status, detail, extra) => rows.push({ check: name, status, detail, ...(extra || {}) });
 const skip = (name, why, owner) => add(name, "SKIPPED", why, owner ? { ownedBy: owner } : null);
@@ -221,10 +224,7 @@ const checkFrame = async (frameId) => {
     const hasArea = areaBox && areaBox.w > 0 && areaBox.h > 0;
     if (hasArea && "fills" in n && Array.isArray(n.fills)) {
       for (const f of n.fills) {
-        if (f.type === "SOLID" && f.visible !== false) {
-          const hex = "#" + [f.color.r, f.color.g, f.color.b].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join("");
-          fills.push({ name: n.name, type: n.type, hex, styleId: n.fillStyleId || "", insidePlot });
-        }
+        if (f.type === "SOLID" && f.visible !== false) fills.push({ name: n.name, type: n.type, hex: hexOf(f), styleId: n.fillStyleId || "", insidePlot });
       }
     }
     // Marker groups and value labels. The NAME is on the group and the GEOMETRY is on its children, and
@@ -241,12 +241,15 @@ const checkFrame = async (frameId) => {
     // that carries a visible solid fill, is not furniture, and is not text is a mark the reader sees.
     if (insidePlot && !inFurniture && n.type !== "TEXT" && !(("children" in n) && n.children.length)) {
       const mb0 = rel(n);
-      const filled = Array.isArray(n.fills) && n.fills.some((f) => f.type === "SOLID" && f.visible !== false);
+      // The mark's own COLOUR travels with its box. Without it, a label sitting on a mark can only ever be
+      // measured against the frame, which is not what is behind it (see label-contrast-on-background).
+      const markPaint = Array.isArray(n.fills) ? n.fills.find((f) => f.type === "SOLID" && f.visible !== false) : null;
+      const filled = !!markPaint;
       // `fromMap` is carried because a MAP SHAPE's bbox is not its ink: per-chart-type/maps.md, a
       // country split across the antimeridian has a box spanning almost the whole map, so an annotation
       // over open ocean falls inside it. Counting those as covered marks reports a FAIL that is not
       // there, so the annotation row drops them and says so rather than judging them by bbox.
-      if (filled && mb0 && mb0.w > 0 && mb0.h > 0) markBoxes.push({ name: n.name, box: mb0, why: "a filled data mark", insidePlot, fromMap: !!insideMap });
+      if (filled && mb0 && mb0.w > 0 && mb0.h > 0) markBoxes.push({ name: n.name, box: mb0, why: "a filled data mark", insidePlot, fromMap: !!insideMap, hex: hexOf(markPaint) });
     }
     if (/^datapoints__|^dot__|^value__/.test(n.name)) {
       const why = /^value__/.test(n.name) ? "a value label" : "a dot";
@@ -863,29 +866,49 @@ const checkFrame = async (frameId) => {
   // on insidePlot because what is behind those is a mark, not the frame.
   {
     const candidates = texts.filter((t) => t.fill && (/^annotation__/.test(t.name) || (t.insidePlot && /^label__/.test(t.name))));
-    // A label in the frame's OWN colour is AMBIGUOUS, and it is the one case this row cannot settle
-    // arithmetically. Read one way it is the prescribed white-on-dark-mark label (GUIDELINES.md → maps:
-    // "values written inside countries take whichever colour reads against the fill") and measuring it
-    // against the frame reports 1:1, failing a correct label. Read the other way it is an annotation that
-    // was accidentally given the frame's own colour — white on white, unreadable, a real defect.
+    // Two ways a label can be UNJUDGEABLE against the frame, and neither may be dropped: the on-fill row
+    // is a DECLARED gap below (it needs label->mark pairing, which nothing here has), so anything routed
+    // to it is reported by NOBODY, and a defect that leaves no row is worse than a row a human looks at.
+    // Both go to REVIEW.
     //
-    // Matching colours are no evidence either way, so these are handed to REVIEW rather than knocked out
-    // silently: `label-contrast-on-fill` is a DECLARED gap below (it needs label->mark pairing, which
-    // nothing here has), so anything routed to it is reported by NOBODY. A defect that leaves no row is
-    // worse than a row a human has to look at.
-    const onMark = frameFill ? candidates.filter((t) => t.fill.toLowerCase() === frameFill.toLowerCase()) : [];
-    const onBg = candidates.filter((t) => onMark.indexOf(t) === -1);
-    const sameColour = (n) => `${n} label(s) carry the frame's own colour ${frameFill}: either drawn inside a darker mark, which is correct and is label-contrast-on-fill's row, or the frame's colour by accident, which is invisible text. No geometry here pairs a label with the mark behind it, so check these by eye: ` +
-                              onMark.map((t) => `"${t.chars}"`).slice(0, 8).join(", ");
+    // The first is COLOUR. A label in the frame's own colour reads either as the prescribed
+    // white-on-dark-mark label (GUIDELINES.md → maps: "values written inside countries take whichever
+    // colour reads against the fill"), which measured against the frame reports 1:1 and fails correct
+    // work, or as an annotation accidentally given the frame's colour — invisible text. Matching colours
+    // are no evidence either way.
+    //
+    // The second way in is GEOMETRY. An annotation over a MAP SHAPE is the case: in-country labels are
+    // prescribed there, and a country's bbox is deliberately not judged by annotation-overlap (a bbox is
+    // not a country's ink, maps.md), so nothing else looks at it either — black text on a dark country
+    // would be measured against the white FRAME, score 21:1 and pass. Over a NON-map mark the position
+    // is already illegal and annotation-overlap FAILs it, so those need no second opinion here and the
+    // row keeps its information value on ordinary charts.
+    const overlaps = (a, b) => a.l < b.rr && a.rr > b.l && a.t < b.bb && a.bb > b.t;
+    const mapShapes = markBoxes.filter((x) => x.insidePlot && x.fromMap && x.hex);
+    const marksUnder = (t) => (t.box ? mapShapes.filter((m) => overlaps(t.box, m.box)) : []);
+    const ambiguous = candidates.filter((t) =>
+      (frameFill && t.fill.toLowerCase() === frameFill.toLowerCase()) || marksUnder(t).length);
+    const onBg = candidates.filter((t) => ambiguous.indexOf(t) === -1);
+    // Named per label, with the arithmetic where it exists: against a map shape's own fill the ratio IS
+    // computable, it is just not certain to be the fill behind the text.
+    const why = (t) => {
+      const over = marksUnder(t);
+      const worst = over.length ? over.reduce((a, m) => (contrast(t.fill, m.hex) < contrast(t.fill, a.hex) ? m : a)) : null;
+      return `"${t.chars}" ${t.fill}` +
+             (frameFill && t.fill.toLowerCase() === frameFill.toLowerCase() ? " — the frame's own colour, so either inside a darker mark (correct) or invisible text on the frame" : "") +
+             (worst ? ` — overlaps ${over.length} map shape(s), worst ${worst.name} ${worst.hex} = ${r(contrast(t.fill, worst.hex))}:1` : "");
+    };
+    const review = (n) => `${n} label(s) cannot be judged against the frame — a bbox overlap is not proof of what is behind the text, and no geometry here pairs a label with its mark, so check these by eye: ` +
+                          ambiguous.slice(0, 8).map(why).join("; ");
     if (!frameFill) skip("label-contrast-on-background", "frame carries no solid fill to measure against");
-    else if (!onBg.length && !onMark.length) skip("label-contrast-on-background", "no label__*/annotation__* text sits on the frame's own background");
-    else if (!onBg.length) add("label-contrast-on-background", "REVIEW", `nothing measurable against the background — all ${sameColour(onMark.length)}`);
+    else if (!onBg.length && !ambiguous.length) skip("label-contrast-on-background", "no label__*/annotation__* text sits on the frame's own background");
+    else if (!onBg.length) add("label-contrast-on-background", "REVIEW", `nothing measurable against the background — all ${review(ambiguous.length)}`);
     else {
       const bad = onBg.map((t) => ({ t, c: contrast(t.fill, frameFill) })).filter((x) => x.c < 4.5);
-      add("label-contrast-on-background", bad.length ? "FAIL" : onMark.length ? "REVIEW" : "ok",
+      add("label-contrast-on-background", bad.length ? "FAIL" : ambiguous.length ? "REVIEW" : "ok",
           (bad.length ? bad.map((x) => `"${x.t.chars}" ${x.t.fill} on ${frameFill} = ${r(x.c)}:1 (want 4.5)`).join(", ")
                      : `all ${onBg.length} label(s) clear 4.5:1 against ${frameFill} (lowest ${r(Math.min(...onBg.map((t) => contrast(t.fill, frameFill))))}:1)`) +
-          (onMark.length ? `. Plus ${sameColour(onMark.length)}` : ""));
+          (ambiguous.length ? `. Plus ${review(ambiguous.length)}` : ""));
     }
   }
 

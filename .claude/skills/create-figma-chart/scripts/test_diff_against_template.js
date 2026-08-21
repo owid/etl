@@ -191,12 +191,24 @@ const has = (res, re) => drift(res).some((d) => re.test(d));
   // 2d — where loadAsync does not exist the script must still RUN (that is the whole point of dropping
   // the page guard), and must stop overclaiming: the gate is then an inference and the result says so.
   {
-    const res = await run(buildFrame({ name: "tpl" }), buildFrame({ name: "clone" }), [], { noLoadAsync: true });
+    // Started on the CLONES' page, so neither loadAsync nor page-currency is doing any work.
+    const res = await run(buildFrame({ name: "tpl" }), buildFrame({ name: "clone" }), [], { noLoadAsync: true, startOn: "clone" });
     check("2d it still runs with no loadAsync", !drift(res).length, JSON.stringify(drift(res)));
     check("2d and does not claim the page was loaded", res.out.templateFingerprintRead.pageLoadedWithoutSwitch === false,
           JSON.stringify(res.out.templateFingerprintRead));
     check("2d and the note admits completeness is INFERRED", /INFERRED/.test(res.out.templateFingerprintRead.note),
           res.out.templateFingerprintRead.note);
+    // `pageWasCurrent` must be sampled BEFORE the clones' switch. Read at the end it is always false —
+    // the switch has happened by then — which reports a complete current-page read as an inferred
+    // off-page one, inverting the very diagnostic it exists to give.
+    const cur = await run(buildFrame({ name: "tpl" }), buildFrame({ name: "clone" }), [], { noLoadAsync: true });
+    check("2d a current template page is reported as current", cur.out.templateFingerprintRead.pageWasCurrent === true,
+          JSON.stringify(cur.out.templateFingerprintRead));
+    check("2d and the switch to the clones happened anyway", cur.switches === 1, `${cur.switches} switches`);
+    check("2d and its note does not claim an inference", !/INFERRED/.test(cur.out.templateFingerprintRead.note),
+          cur.out.templateFingerprintRead.note);
+    check("2d while an off-page read is NOT reported as current", res.out.templateFingerprintRead.pageWasCurrent === false,
+          JSON.stringify(res.out.templateFingerprintRead));
     let threw = null;
     try {
       await run(node({ name: "tpl-unloaded", width: 540, height: 540, fills: solid("#ffffff"), children: [] }),

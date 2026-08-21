@@ -143,6 +143,10 @@ if (tplPage && typeof tplPage.loadAsync === "function") {
   await tplPage.loadAsync();
   tplPageLoaded = true;
 }
+// Sampled HERE, not in the result below: the clones' switch happens in between, so a value read at the
+// end reports `false` for a fingerprint that was in fact taken on the current page — which inverts the
+// diagnostic exactly where it matters, a complete current-page read reported as an inferred off-page one.
+const tplPageWasCurrent = !!(tplPage && figma.currentPage === tplPage);
 const T = fingerprint(tpl);
 const shortRead = [];
 if (!T.size || typeof T.size[0] !== "number" || typeof T.size[1] !== "number") shortRead.push("frame size unreadable");
@@ -292,12 +296,14 @@ const unanimous = resolved.length > 1
 return {
   templateFingerprintRead: {
     fromPage: tplPage ? tplPage.name : null,
-    pageWasCurrent: !!(tplPage && figma.currentPage === tplPage),
+    pageWasCurrent: tplPageWasCurrent,
     pageLoadedWithoutSwitch: tplPageLoaded,
     footerResolved: !!T.footer,
     note: (tplPageLoaded
             ? "read with no page switch, after PageNode.loadAsync() loaded the page's contents — so the read is complete, not inferred complete"
-            : "read with no page switch and PageNode.loadAsync() unavailable, so completeness is INFERRED from the short-read gate above; treat structural drift shared by every frame as a suspect baseline") +
+            : tplPageWasCurrent
+              ? "read with no page switch and PageNode.loadAsync() unavailable, but the template's page happened to be CURRENT when the fingerprint was taken, which loads it — complete for this run, and not something a script can arrange"
+              : "read with no page switch, PageNode.loadAsync() unavailable and the template's page not current, so completeness is INFERRED from the short-read gate above; treat structural drift shared by every frame as a suspect baseline") +
           " — figma.currentPage resets to the first page every call, so requiring the template's page to be current is unsatisfiable from a session",
   },
   template: { id: CONFIG.templateId, name: tpl.name, size: T.size, fill: T.fill },
