@@ -903,6 +903,9 @@
                             "includedEntityNames": {
                                 "$ref": "grapher-schema.011.json#/properties/includedEntityNames"
                             },
+                            "inapplicableEntityNames": {
+                                "$ref": "grapher-schema.011.json#/properties/inapplicableEntityNames"
+                            },
                             "entityTypePlural": {
                                 "$ref": "grapher-schema.011.json#/properties/entityTypePlural"
                             },
