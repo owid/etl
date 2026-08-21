@@ -288,10 +288,37 @@ const checkFrame = async (frameId) => {
     else {
       const off = subject.filter((t) => !LADDER.some((L) => Math.abs(t.size - L) < 0.01));
       const distinct = [...new Set(off.map((t) => r(t.size)))].sort((a, b) => a - b);
-      add("ladder-sizes", off.length ? "FAIL" : "ok",
-          off.length ? `${off.length} of ${subject.length} text node(s) off the ${LADDER.join("/")} ladder: ${distinct.join(", ")}px. A rescaled export leaves arbitrary sizes — set them to the nearest rung by rank.`
-                     : `all ${subject.length} plot/annotation text node(s) on the ${LADDER.join("/")} ladder`,
-          { offLadderSizes: distinct });
+      // Split the verdict by WHO set the size, because only one half is actionable.
+      //
+      // An annotation is a node we author, so it must sit exactly on a rung: FAIL.
+      //
+      // An imported chart's labels are sized by grapher and then by the fit factor, and they cannot
+      // land on a rung except by chance. Snapping them is not free either: text metrics are part of
+      // what sets the group's width, so snapping moves the box off the content edge, and re-fitting to
+      // the edge moves the sizes back off the ladder. Exact ladder, exact 508 box and a fitted import
+      // are mutually exclusive unless the width is closed by stretching GEOMETRY while MOVING text
+      // (reference/FITTING.md) rather than by scaling the group. Judged strictly, this row therefore
+      // failed on 8 of 8 real frames — a row that fails on every chart carries no information and
+      // trains a reader to skip it. So imported text is REVIEW with the distance to the nearest rung,
+      // and only a distance too large to be fit drift is a FAIL: at that point the text is not a
+      // rescaled rung but the wrong size (a scatter's bubble legend measured 5.99px against a 12px
+      // floor, 6.01 from its nearest rung).
+      const isAnn = (x) => /^annotation__/.test(x.name);
+      const annOff = off.filter(isAnn);
+      const impOff = off.filter((x) => !isAnn(x));
+      const nearest = (v) => LADDER.reduce((a, b) => (Math.abs(b - v) < Math.abs(a - v) ? b : a));
+      const drift = (x) => Math.abs(x.size - nearest(x.size));
+      const FIT_DRIFT = 0.75;
+      const wayOff = impOff.filter((x) => drift(x) > FIT_DRIFT);
+      const maxDrift = impOff.length ? Math.max(...impOff.map(drift)) : 0;
+      const status = annOff.length || wayOff.length ? "FAIL" : impOff.length ? "REVIEW" : "ok";
+      add("ladder-sizes", status,
+          !off.length
+            ? `all ${subject.length} plot/annotation text node(s) on the ${LADDER.join("/")} ladder`
+            : [annOff.length ? `${annOff.length} ANNOTATION(s) off the ${LADDER.join("/")} ladder: ` + [...new Set(annOff.map((x) => r(x.size)))].join(", ") + "px — an annotation is authored here, so set it to a rung" : "",
+               wayOff.length ? `${wayOff.length} imported text node(s) further than ${FIT_DRIFT}px from any rung (max ${r(maxDrift)}px): ` + [...new Set(wayOff.map((x) => `"${x.chars}" ${r(x.size)}px`))].slice(0, 5).join(", ") + " — too far to be fit drift, so these are the wrong size rather than a rescaled rung" : "",
+               impOff.length && !wayOff.length ? `${impOff.length} of ${subject.length} imported text node(s) off the ladder but all within ${FIT_DRIFT}px of a rung (max ${r(maxDrift)}px): ${distinct.join(", ")}px. Expected for a fitted export — snapping them to rungs moves the group off the content edge, so it is a designer's call, not a defect` : ""].filter(Boolean).join(". "),
+          { offLadderSizes: distinct, maxDriftFromRung: r(maxDrift), annotationsOffLadder: annOff.length });
     }
   }
 
@@ -400,9 +427,43 @@ const checkFrame = async (frameId) => {
       // must NOT be pulled to the gridline target (per-chart-type/slope-charts.md).
       const SOLID_BY_DESIGN = /zero-line|zero|tick|axis/i;
       const isSolidByDesign = (s) => SOLID_BY_DESIGN.test(s.name) || SOLID_BY_DESIGN.test(s.furnitureGroup || "");
-      const isGrid = (s) => !isSolidByDesign(s) && (/grid/i.test(s.name) || /grid/i.test(s.furnitureGroup || ""));
-      const grids = furn.filter(isGrid);
-      const native = furn.filter((s) => !isGrid(s));
+      const isGridByName = (s) => !isSolidByDesign(s) && (/grid/i.test(s.name) || /grid/i.test(s.furnitureGroup || ""));
+      // grapher names each gridline after its TICK VALUE, so the zero line arrives as "0", "0%" or
+      // "0-years" and matches none of the words above. It is solid by design, and judging it against the
+      // [4,4] target reported a cleared dash on five of eight real frames — a false positive on every
+      // chart that has a zero line. Reclassify by IDENTITY (does the name denote zero?), never by the
+      // dash the node currently carries, which is the circularity the comment above warns about. And
+      // reclassify rather than exempt: these then go through the solid-by-design validation below, so a
+      // zero line that really was restyled to [4,4] still fails.
+      const ZERO_TICK = (name) => {
+        const m = /^(-?\d+(?:[.,]\d+)?)\s*[a-z%\-_ ]*$/i.exec(String(name).trim());
+        return !!m && Math.abs(parseFloat(m[1].replace(",", "."))) < 1e-9;
+      };
+      // A furniture group with fewer than three members is not a grid — it is the pair of axis lines a
+      // slope chart draws at its two ends (named "1980"/"2023"), which are solid. Judged as gridlines
+      // they reported 2 of 2 "cleared".
+      // Group by the actual PARENT, not by `furnitureGroup`. A gridline is itself named "grid-N", which
+      // matches FURNITURE_GROUPS, so collect() overwrites furnitureGroup with the node's own name and
+      // every gridline reads as a group of one — which made this rule reclassify a whole grid as axis
+      // lines. The parent is the container the siblings actually share.
+      const AXIS_GROUP_MIN = 3;
+      const byGroup = new Map();
+      for (const s of furn.filter(isGridByName)) {
+        const parent = s.node.parent;
+        const k = parent ? parent.id : "(ungrouped)";
+        if (!byGroup.has(k)) byGroup.set(k, { name: parent ? parent.name : "(ungrouped)", members: [] });
+        byGroup.get(k).members.push(s);
+      }
+      const axisOnly = [], gridCandidates = [], axisOnlySet = new Set();
+      for (const g of byGroup.values()) {
+        if (g.members.length < AXIS_GROUP_MIN) {
+          axisOnly.push({ group: g.name, names: g.members.map((s) => s.name) });
+          g.members.forEach((s) => axisOnlySet.add(s));
+        } else gridCandidates.push(...g.members);
+      }
+      const zeroTicks = gridCandidates.filter((s) => ZERO_TICK(s.name));
+      const grids = gridCandidates.filter((s) => !ZERO_TICK(s.name));
+      const native = furn.filter((s) => !isGridByName(s) || axisOnlySet.has(s) || ZERO_TICK(s.name));
       const matches = (d, t) => d.length === t.length && d.every((v, i) => Math.abs(v - t[i]) < 0.05);
       const badDash = grids.filter((s) => !matches(s.dash, FURNITURE_DASH));
       const cleared = badDash.filter((s) => !s.dash.length);
@@ -426,7 +487,10 @@ const checkFrame = async (frameId) => {
                    `. CHECKS.md keeps these at an EMPTY pattern; only a slope chart's native [3,2] zero line is exempt`
                  : ""].filter(Boolean).join(". ")
             : `all ${grids.length} gridline(s) at [${FURNITURE_DASH}]; all ${native.length} zero-line/tick/axis node(s) solid or at the slope's native [3,2] (` +
-              (native.length ? [...new Set(native.map((s) => (s.dash.length ? JSON.stringify(s.dash.map(r)) : "solid")))].join(", ") : "none") + ")");
+              (native.length ? [...new Set(native.map((s) => (s.dash.length ? JSON.stringify(s.dash.map(r)) : "solid")))].join(", ") : "none") + ")",
+          { reclassifiedAsSolidByDesign: {
+              zeroTicksByName: zeroTicks.map((s) => s.name),
+              axisOnlyGroups: axisOnly } });
     }
   }
 

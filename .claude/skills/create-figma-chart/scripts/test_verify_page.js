@@ -69,9 +69,9 @@ const line = (name, pts, weight) => node({
                    segments: pts.slice(1).map((_, i) => ({ start: i, end: i + 1 })) },
 });
 
-const gridline = (name, y, dashed) => node({
+const gridline = (name, y, dashed, dashOverride) => node({
   type: "VECTOR", name, x: 16, y, width: 508, height: 1,
-  strokeWeight: 1, strokes: solid("#dddddd"), dashPattern: dashed ? [4, 4] : [], strokeAlign: "CENTER",
+  strokeWeight: 1, strokes: solid("#dddddd"), dashPattern: dashOverride || (dashed ? [4, 4] : []), strokeAlign: "CENTER",
   absoluteTransform: [[1, 0, 16], [0, 1, y]],
   vectorNetwork: { vertices: [{ x: 0, y: 0 }, { x: 508, y: 0 }], segments: [{ start: 0, end: 1 }] },
 });
@@ -93,10 +93,25 @@ function buildFrame(opts = {}) {
   // `clearedGrid` drops the dash off the gridlines while leaving everything else alone — the shape a
   // rescale-and-repair pass produces when it resets weights and forgets the pattern.
   const gridDashed = !opts.clearedGrid;
-  const grid = node({ name: "horizontal-grid-lines", x: 16, y: 200, width: contentW, height: 260,
-    children: [gridline("grid-1", 200, gridDashed), gridline("grid-2", 300, gridDashed), gridline("zero", 460, false)] });
+  // A real gridline group carries 6-12 lines; three is the minimum that still reads as a GRID rather
+  // than a slope chart's pair of end axis lines, which verify_page.js reclassifies as solid by design.
+  // `valueNamedZero` models what grapher actually emits: each gridline is named after its TICK VALUE,
+  // so the zero line arrives as "0%" and matches none of the zero/tick/axis words. `zeroTickDash` lets a
+  // case restyle that node to the grid target, which must still fail.
+  const gridKids = [gridline("grid-1", 200, gridDashed), gridline("grid-2", 300, gridDashed),
+                    gridline("grid-3", 360, gridDashed)];
+  if (opts.valueNamedZero) gridKids.push(gridline("0%", 460, false, opts.zeroTickDash));
+  else gridKids.push(gridline("zero", 460, false));
+  const grid = node({ name: "horizontal-grid-lines", x: 16, y: 200, width: contentW, height: 260, children: gridKids });
+  // A slope chart draws exactly two solid verticals at its ends, named for the years. Fewer than three
+  // members is not a grid, so these must not be judged against [4,4].
+  const axisPair = opts.slopeAxisPair
+    ? node({ name: "vertical-grid-lines", x: 16, y: 200, width: contentW, height: 260,
+             children: [gridline("1980", 200, false), gridline("2023", 460, false)] })
+    : null;
   const kids = [
     grid,
+    ...(axisPair ? [axisPair] : []),
     line("line__A", [[40, 440], [200, 300], [440, 260]], lineWeight),
     line("outline__A", [[40, 440], [200, 300], [440, 260]], lineWeight + 1),
     text("label__A", "Country A", labelSize, 450, 250, 60, 16, opts.labelFill || "#4c6a9c"),
@@ -226,11 +241,26 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     check("2 CONFIG.textFloor overrides", row(override, "text-floor").status === "ok" && /from CONFIG/.test(row(override, "text-floor").detail), row(override, "text-floor").detail);
   }
 
-  // 3 — an arbitrary rescaled size must fail the ladder, style id or not (review finding 2).
+  // 3 — the ladder verdict is split by WHO set the size. An imported label at 13.36 is 0.36 from a
+  // rung, which is ordinary fit drift: reported, not failed, because judged strictly this row failed on
+  // 8 of 8 real frames and a row that always fails carries no information. An ANNOTATION at the same
+  // size is authored here, so it still fails. And a size too far from any rung to be drift fails too.
   {
     const out = await run(buildFrame({ labelSize: 13.36 }), {});
-    check("3 off-ladder 13.36 FAILS", row(out, "ladder-sizes").status === "FAIL", row(out, "ladder-sizes").detail);
-    check("3 names the offending size", /13\.36/.test(row(out, "ladder-sizes").detail), row(out, "ladder-sizes").detail);
+    const d = row(out, "ladder-sizes");
+    check("3 an imported label 0.36 off a rung is REVIEW, not FAIL", d.status === "REVIEW", d.detail);
+    check("3 names the offending size", /13\.36/.test(d.detail), d.detail);
+    check("3 and reports the distance to the nearest rung", d.maxDriftFromRung === 0.36, String(d.maxDriftFromRung));
+
+    const wayOff = await run(buildFrame({ labelSize: 5.99 }), {});
+    const dw = row(wayOff, "ladder-sizes");
+    check("3 but 5.99px is too far from any rung and FAILS", dw.status === "FAIL", dw.detail);
+    check("3 and says why it is not fit drift", /too far to be fit drift/.test(dw.detail), dw.detail);
+
+    const annOff = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, w: 120, h: 18, size: 13.36, stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    const da = row(annOff, "ladder-sizes");
+    check("3 an ANNOTATION off the ladder still FAILS", da.status === "FAIL" && da.annotationsOffLadder > 0, da.detail);
+    check("3 and says an annotation is authored here", /authored here/.test(da.detail), da.detail);
   }
 
   // 4 — an annotation crossing furniture with NO knockout (review finding 3: the old code passed it).
@@ -473,6 +503,26 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     // the deliberate decision: a slope's native [3,2] zero line stays [3,2]
     const slopeZero = await run(buildFrame({ zeroLineOnly: 1, zeroLineDash: [3, 2] }), {});
     check("26 a native [3,2] zero line passes", row(slopeZero, "furniture-dash").status === "ok", row(slopeZero, "furniture-dash").detail);
+
+    // grapher names each gridline after its TICK VALUE, so its zero line arrives as "0%" and matches
+    // none of the zero/tick/axis words. Judged against [4,4] it reported a cleared dash on five of
+    // eight real frames. It is reclassified by identity, and reclassified rather than exempted.
+    const valZero = await run(buildFrame({ valueNamedZero: true }), {});
+    const dv = row(valZero, "furniture-dash").detail;
+    check("26 a solid gridline named for the value 0 passes", row(valZero, "furniture-dash").status === "ok", dv);
+    check("26 and is reported as reclassified", /0%/.test(JSON.stringify(row(valZero, "furniture-dash").reclassifiedAsSolidByDesign || {})), JSON.stringify(row(valZero, "furniture-dash").reclassifiedAsSolidByDesign));
+    const valZeroBad = await run(buildFrame({ valueNamedZero: true, zeroTickDash: [4, 4] }), {});
+    check("26 but a value-named zero RESTYLED to [4,4] still FAILS",
+          row(valZeroBad, "furniture-dash").status === "FAIL" && /should be solid but are dashed/.test(row(valZeroBad, "furniture-dash").detail),
+          row(valZeroBad, "furniture-dash").detail);
+
+    // a slope chart's two end verticals are not a grid; fewer than three members means axis lines
+    const slopePair = await run(buildFrame({ slopeAxisPair: true }), {});
+    const dsp = row(slopePair, "furniture-dash").detail;
+    check("26 a 2-member solid axis pair is not judged as a grid", row(slopePair, "furniture-dash").status === "ok", dsp);
+    check("26 and the pair is reported as axis-only",
+          /1980/.test(JSON.stringify(row(slopePair, "furniture-dash").reclassifiedAsSolidByDesign || {})),
+          JSON.stringify(row(slopePair, "furniture-dash").reclassifiedAsSolidByDesign));
   }
 
   // 27 — a slope chart's stroked vector is called plain `line` and the series identity sits on its
