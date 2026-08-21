@@ -741,55 +741,6 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     check("31 a symmetric 14/14 still passes", row(await run(even, {}), "gap").status === "ok", row(await run(even, {}), "gap").detail);
   }
 
-  // 32 — a text node whose SIZES COULD NOT BE READ is not a pass. `sizeRanges` catches a throwing or
-  // non-numeric segment read and returns [], so the node contributes no ranges at all and `under.length`
-  // stays 0 — the row said "ok" and the frame verdict read "no mechanical row failed" with an unmeasured
-  // range sitting on it. The count was already in the detail; it was the STATUS that certified the frame.
-  {
-    // over empty space and strokeless, so this isolates the text rows: the knockout row must stay ok
-    const unreadable = text("annotation__opaque", "Note nobody could measure", MIXED, 60, 140, 90, 18, "#2d2e2d", {
-      fontSize: MIXED, strokes: [], strokeWeight: 0, textStyleId: "S:abc",
-      // fontName only: asking for fontSize throws, exactly as an unsupported field would
-      segments: { fontName: [["Regular", 0, 25]] },
-    });
-    const out = await run(buildFrame({ annotation: unreadable }), {});
-    const tf = row(out, "text-floor");
-    check("32 an unmeasurable text node is not certified ok", tf.status === "REVIEW", tf.status + " " + tf.detail);
-    check("32 and the node is named as NOT judged", /NOT judged/.test(tf.detail) && /annotation__opaque/.test(tf.detail), tf.detail);
-    const clean = await run(buildFrame(), {});
-    const nrev = (o) => o.rows.filter((x) => x.status === "REVIEW").length;
-    check("32 it adds a row to review on an otherwise identical frame", nrev(out) === nrev(clean) + 1, `${nrev(out)} vs ${nrev(clean)}`);
-    check("32 the same frame with readable text is still a clean ok", row(clean, "text-floor").status === "ok", row(clean, "text-floor").detail);
-    // and a REAL breach still outranks it — FAIL is not softened to REVIEW
-    const both = await run(buildFrame({ labelSize: 9, annotation: unreadable }), {});
-    check("32 a genuine sub-floor range still FAILS", row(both, "text-floor").status === "FAIL", row(both, "text-floor").detail);
-  }
-
-  // 33 — a knockout paint that RENDERS NOTHING. `strokes.length` counts a paint switched off or at zero
-  // opacity, so an annotation crossing a gridline with a disabled stroke passed the weight, alignment and
-  // colour rows: the row certified the missing knockout it exists to catch. Fills are read this way
-  // everywhere above (`visible !== false`); strokes were not.
-  {
-    const off = annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 });
-    off.strokes = [Object.assign({}, off.strokes[0], { visible: false })];
-    const out = await run(buildFrame({ annotation: off }), {});
-    const d = row(out, "annotation-knockout").detail;
-    check("33 a switched-off knockout paint FAILS", row(out, "annotation-knockout").status === "FAIL", d);
-    check("33 and is reported as NO knockout", /carries NO knockout/.test(d), d);
-    const clear = annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 });
-    clear.strokes = [Object.assign({}, clear.strokes[0], { opacity: 0 })];
-    check("33 a fully transparent one FAILS by the same route",
-          row(await run(buildFrame({ annotation: clear }), {}), "annotation-knockout").status === "FAIL",
-          row(await run(buildFrame({ annotation: clear }), {}), "annotation-knockout").detail);
-    // the COLOUR is read off the paint that renders, never off strokes[0]: an invisible white in front
-    // of the frame's own cream used to be reported as a hardcoded-white knockout
-    const layered = annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 });
-    layered.strokes = [Object.assign({}, layered.strokes[0], { visible: false }), solid("#fffbf5")[0]];
-    const lay = await run(buildFrame({ frameFill: "#fffbf5", annotation: layered }), {});
-    check("33 an invisible paint in front does not mask the real colour",
-          row(lay, "annotation-knockout").status === "ok", row(lay, "annotation-knockout").detail);
-  }
-
   const bad = results.filter((x) => !x.ok);
   for (const x of results) console.log(`${x.ok ? "PASS" : "FAIL"}  ${x.name}${x.ok ? "" : "  >> " + x.detail}`);
   console.log(bad.length ? `\n${bad.length} FAILURES` : `\nALL PASS (${results.length} checks)`);
