@@ -1,6 +1,8 @@
 title:
   title: Net migration
   title_variant: ""
+topic_tags:
+  - Migration
 
 default_selection:
   - World
