@@ -60,3 +60,60 @@ def test_wide_table_keeps_columns_a_single_view_cannot_distinguish():
     assert wide["country"].tolist() == ["Brazil", "Brazil", "Mexico"]
     assert wide[left].fillna(-1).tolist() == [5.0, 6.0, -1]
     assert wide[right].fillna(-1).tolist() == [-1, -1, 7.0]
+
+
+def _table_with_day_offsets() -> Table:
+    """A table shaped the way grapher stores sub-yearly data: day offsets in "year"."""
+    tb = Table({"country": ["Angola"] * 3, "year": [-17, 0, 14], "weekly_cases": [1.0, 2.0, 3.0]})
+    tb["weekly_cases"].metadata.display = {"zeroDay": "2020-01-21", "timeInterval": "day"}
+    return tb
+
+
+def test_sub_yearly_offsets_decode_to_dates():
+    """Test _resolve_time_column - day offsets become real dates, keyed on timeInterval.
+
+    Grapher stores every interval shorter than a year as days-since-zeroDay integers in a
+    column named "year". This used to be detected via `display.yearIsDay`, a flag the repo
+    removed, so the branch could never be taken and covid's weekly cases published as
+    `Year,-17` instead of 2020-01-04.
+    """
+    from etl.collection.download_package import _resolve_time_column
+
+    tb, time_col = _resolve_time_column(_table_with_day_offsets())
+    assert time_col == "date"
+    assert tb["date"].tolist() == ["2020-01-04", "2020-01-21", "2020-02-04"]
+    assert "year" not in tb.columns
+
+
+def test_calendar_years_are_left_alone():
+    """Test _resolve_time_column - year and decade intervals stay on the year axis.
+
+    A decade codes a representative calendar year, not an offset, so it must not decode.
+    """
+    from etl.collection.download_package import _resolve_time_column
+
+    for interval in (None, "year", "decade"):
+        tb = Table({"country": ["Angola"], "year": [1850], "population": [1.0]})
+        if interval:
+            tb["population"].metadata.display = {"timeInterval": interval}
+        out, time_col = _resolve_time_column(tb)
+        assert time_col == "year", f"interval={interval}"
+        assert out["year"].tolist() == [1850]
+
+
+def test_table_mixing_offsets_and_years_is_refused():
+    """Test _resolve_time_column - a table with both kinds of "year" value cannot be converted.
+
+    Converting it would turn the yearly columns' calendar years into nonsense dates; not
+    converting does the same to the offsets. Either way it is silent, so refuse instead.
+    """
+    import pytest
+
+    from etl.collection.download_package import MixedTimeGranularityError, _resolve_time_column
+
+    tb = Table({"country": ["Angola"], "year": [0], "weekly_cases": [1.0], "population": [2.0]})
+    tb["weekly_cases"].metadata.display = {"zeroDay": "2020-01-21", "timeInterval": "day"}
+    tb["population"].metadata.display = {"timeInterval": "year"}
+
+    with pytest.raises(MixedTimeGranularityError, match="mixes sub-yearly and yearly"):
+        _resolve_time_column(tb)

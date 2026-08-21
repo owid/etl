@@ -82,6 +82,7 @@ from etl.paths import DATA_DIR
 
 if TYPE_CHECKING:
     from etl.collection.model.core import Collection
+from etl.grapher.helpers import SUB_YEARLY_TIME_INTERVALS
 
 log = get_logger()
 
@@ -220,14 +221,19 @@ def _time_column(tb: Table) -> str:
 def _resolve_time_column(tb: Table) -> tuple[Table, str]:
     """Return (possibly-converted table, time column name).
 
-    Grapher has a second daily-data convention this module didn't originally
-    account for: some indicators store a day-offset integer in a column
-    literally named "year" (`display.yearIsDay=True`, `display.zeroDay` gives
-    the reference date) rather than in an actual "date" column. Confirmed on
-    covid/latest/cases_deaths: display == {"zeroDay": "2020-01-21",
-    "yearIsDay": True, ...}. Left unconverted, that integer gets silently
-    treated as a calendar year (e.g. -17, 2350) -- wrong, not just mislabeled.
-    Convert it to a real "date" column before it reaches any join/output.
+    Sub-yearly data does not arrive in a "date" column. Grapher stores every
+    interval shorter than a year as days-since-`display.zeroDay` integers in a
+    column literally named "year" (`adapt_table_with_dates_to_grapher` writes
+    it), with `display.timeInterval` saying how to read them. Left unconverted,
+    those offsets are silently taken for calendar years -- covid's weekly cases
+    published as `Year,-17` rather than 2020-01-04. So decode them to a real
+    "date" column before they reach any join or output.
+
+    `timeInterval` is the field to test: `yearIsDay` was removed, and
+    `etl.grapher.helpers._validate_time_interval` now asserts against it. This
+    module used to check the removed flag, which is why the bug above shipped --
+    the branch could never be taken. "decade" stays on the year axis, since it
+    codes a representative calendar year rather than an offset.
     """
     if "date" in tb.columns:
         # Normalize dtype regardless of source -- real "date" columns show up
@@ -243,13 +249,25 @@ def _resolve_time_column(tb: Table) -> tuple[Table, str]:
         raise ValueError(f"Expected one of {TIME_COLUMN_CANDIDATES} in columns, found {list(tb.columns)}")
 
     value_cols = [c for c in tb.columns if c not in ("country", "year")]
-    displays = [getattr(tb[c].metadata, "display", None) or {} for c in value_cols]
-    if not any(d.get("yearIsDay") for d in displays):
+    displays = {c: (getattr(tb[c].metadata, "display", None) or {}) for c in value_cols}
+    sub_yearly = {c for c, d in displays.items() if d.get("timeInterval") in SUB_YEARLY_TIME_INTERVALS}
+    if not sub_yearly:
         return tb, "year"
+    if len(sub_yearly) != len(value_cols):
+        # Converting the table would turn the calendar years of the remaining columns
+        # into nonsense dates, and leaving it alone does the same to the offsets. A
+        # table this shape has to be split before it gets here.
+        raise MixedTimeGranularityError(
+            f"Table mixes sub-yearly and yearly columns on one 'year' column: "
+            f"{sorted(sub_yearly)[:3]} are offsets, {sorted(set(value_cols) - sub_yearly)[:3]} are years."
+        )
 
-    zero_days = {d["zeroDay"] for d in displays if d.get("yearIsDay") and d.get("zeroDay")}
+    zero_days = {d["zeroDay"] for c, d in displays.items() if c in sub_yearly and d.get("zeroDay")}
     if len(zero_days) != 1:
-        raise ValueError(f"Expected exactly one zeroDay for yearIsDay columns, found {zero_days}")
+        raise ValueError(
+            f"Expected exactly one zeroDay across the sub-yearly columns, found {sorted(zero_days)}. "
+            "Without it the day offsets cannot be decoded."
+        )
     zero_day = pd.Timestamp(zero_days.pop())
 
     tb = tb.copy()

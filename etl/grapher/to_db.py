@@ -567,7 +567,7 @@ def _get_timespan(table: pd.DataFrame, variable_meta: VariableMeta) -> str:
     display = variable_meta.display or {}
 
     # Timespan does not work for sub-yearly data.
-    if display.get("timeInterval") in {"day", "week", "month", "quarter"}:
+    if display.get("timeInterval") in gh.SUB_YEARLY_TIME_INTERVALS:
         return ""
 
     years = table.year.unique()
