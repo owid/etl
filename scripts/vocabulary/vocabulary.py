@@ -34,6 +34,7 @@ import click
 import httpx
 from dotenv import load_dotenv  # ty: ignore
 from google import genai  # ty: ignore
+from google.genai import types as genai_types  # ty: ignore
 from google.genai import errors as genai_errors  # ty: ignore
 
 # Add parent directory to path for imports
@@ -64,6 +65,14 @@ S3_BUCKET_NAME = "owid-public"
 DEFAULT_S3_VOCABULARY_PATH = "topic_vocabulary.json"
 
 DEFAULT_MODEL = "gemini-3.7-flash"
+
+# Ask for the same candidates every time. Left at the model's defaults, two runs
+# of identical code disagreed on almost every topic — Gender Ratio came back
+# covering 30% of its traffic in one run and 79% in the next — which makes a
+# prompt improvement indistinguishable from luck, and this prompt has been
+# iterated on a lot. Deterministic sampling doesn't make the candidates better,
+# it makes a change in them attributable.
+LLM_SAMPLING = {"temperature": 0.0, "seed": 1}
 
 # A whole-vocabulary run fires one request per topic at once, which draws the
 # occasional 503/429 out of the API. Those are transient, but a topic that
@@ -218,8 +227,12 @@ What makes this list good is that each term takes the reader somewhere *differen
    "religious affiliation", "mortality" as well as "child mortality". The short
    one brings up everything the long one does and more, and if it turns out to
    add nothing it is dropped, so it costs nothing to offer.
-7. Skip anything too broad to narrow the list down: a bare "men", "women",
-   "children", "countries", "population".
+7. Skip a bare "men", "women", "children", "countries" or "population" — each
+   is too broad to narrow anything. This applies to the word alone, not to
+   compounds built from it: on Gender Ratio, "female population" names the chart
+   "Share of the population that is female", which is a fifth of that topic's
+   traffic, and skipping it leaves that chart unreachable. If a big chart's
+   subject can only be said with one of these words, say it with two.
 8. Never name a place. No countries, regions, continents or income groups —
    not "United States", "Ukraine", "China", "low-income countries". The charts
    above mention them constantly and they are searched for separately.
@@ -247,7 +260,11 @@ never pad the list with variations to reach a number):
         response = None
         for attempt in range(1, LLM_MAX_ATTEMPTS + 1):
             try:
-                response = await client.aio.models.generate_content(model=model_id, contents=prompt)
+                response = await client.aio.models.generate_content(
+                    model=model_id,
+                    contents=prompt,
+                    config=genai_types.GenerateContentConfig(**LLM_SAMPLING),
+                )
                 break
             except (genai_errors.ServerError, genai_errors.ClientError) as e:
                 # 429 (rate limited) and 5xx are worth another go; anything else
