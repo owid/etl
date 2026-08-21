@@ -501,6 +501,29 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const still = await run(buildFrame({ annotation: regularAnn }), {});
     check("18b an unbound REGULAR annotation still FAILS", row(still, "named-styles").status === "FAIL", row(still, "named-styles").detail);
     check("18b and the message says REGULAR", /REGULAR/.test(row(still, "named-styles").detail), row(still, "named-styles").detail);
+    // A heavier bold-family face is the same case as Bold, and exempt for the same reason.
+    const semiAnn = annotation({ x: 100, y: 195, stroke: "#ffffff", strokeWeight: 3, styleId: "" });
+    semiAnn.getStyledTextSegments = () => [{ fontName: { family: "Lato", style: "Semibold" } }];
+    const semi = await run(buildFrame({ annotation: semiAnn }), {});
+    check("18b Semibold is exempt too", row(semi, "named-styles").status === "ok", row(semi, "named-styles").detail);
+  }
+
+  // 18b-2 — the exemption is keyed on the weight being BOLD, not on it merely being "not Regular".
+  // Written the loose way (`weights[0] !== "Regular"`) it swallowed every other single-weight face —
+  // Light, Medium, Italic — none of which GUIDELINES.md licenses, and reported them back to the reader
+  // as "wholly-bold", which is a false statement about the page. Binding is a real defect there.
+  {
+    for (const weight of ["Light", "Medium", "Italic"]) {
+      const ann = annotation({ x: 100, y: 195, stroke: "#ffffff", strokeWeight: 3, styleId: "" });
+      ann.getStyledTextSegments = () => [{ fontName: { family: "Lato", style: weight } }];
+      const out = await run(buildFrame({ annotation: ann }), {});
+      check(`18b-2 an unbound ${weight} annotation FAILS`, row(out, "named-styles").status === "FAIL",
+            row(out, "named-styles").detail);
+      check(`18b-2 ${weight} is NOT called wholly-bold`, !/wholly-bold/.test(row(out, "named-styles").detail),
+            row(out, "named-styles").detail);
+      check(`18b-2 ${weight} is named in the message`, new RegExp(weight).test(row(out, "named-styles").detail),
+            row(out, "named-styles").detail);
+    }
   }
 
   // 18c — label-contrast-on-background used to require `insidePlot`, which made it DEAD: annotations are
@@ -516,13 +539,24 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const pale = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, fill: "#bbbbbb", stroke: "#ffffff", strokeWeight: 3 }) }), {});
     check("18c a pale annotation on white FAILS 4.5:1", row(pale, "label-contrast-on-background").status === "FAIL",
           row(pale, "label-contrast-on-background").detail);
-    // White-on-a-dark-mark is a correct label (GUIDELINES.md → maps), and measuring it against a white
-    // frame would report 1:1. It is knocked out to the on-fill row rather than failed.
+    // A label in the frame's own colour is AMBIGUOUS, not settled: white-on-a-dark-mark is a correct
+    // label (GUIDELINES.md → maps) and measuring it against a white frame reports 1:1, but white text
+    // that landed on the white FRAME is unreadable and a real defect. Matching colours are no evidence
+    // either way. It must not be routed to label-contrast-on-fill, which is a DECLARED gap — anything
+    // sent there is reported by nobody, so an invisible annotation would leave no row at all.
     const onMark = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, fill: "#ffffff", stroke: "#ffffff", strokeWeight: 3 }) }), {});
     check("18c a label in the frame's own colour is not failed", row(onMark, "label-contrast-on-background").status !== "FAIL",
           row(onMark, "label-contrast-on-background").detail);
-    check("18c and is declared as drawn inside a mark", /inside a mark/.test(row(onMark, "label-contrast-on-background").detail),
+    check("18c nor silently dropped — it is REVIEW", row(onMark, "label-contrast-on-background").status === "REVIEW",
+          row(onMark, "label-contrast-on-background").status);
+    check("18c and names both readings", /inside a darker mark/.test(row(onMark, "label-contrast-on-background").detail)
+          && /invisible text/.test(row(onMark, "label-contrast-on-background").detail),
           row(onMark, "label-contrast-on-background").detail);
+    check("18c and tells the reader to check by eye", /by eye/.test(row(onMark, "label-contrast-on-background").detail),
+          row(onMark, "label-contrast-on-background").detail);
+    // a real contrast failure elsewhere still outranks the ambiguity
+    check("18c a measurable failure still FAILS rather than REVIEWs", row(pale, "label-contrast-on-background").status === "FAIL",
+          row(pale, "label-contrast-on-background").status);
   }
 
   // 19 — the unimplemented half of the hierarchy is declared, not certified.

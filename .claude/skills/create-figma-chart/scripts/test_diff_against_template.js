@@ -98,6 +98,13 @@ async function run(tpl, clone, expected, opts) {
   if (o.samePage) tplPage.children.push(clone);
   const byId = { "T:1": tpl, "C:1": clone };
   let switches = 0;
+  // `PageNode.loadAsync` loads a page's contents WITHOUT switching to it — the honest way to read the
+  // template's page, and unmetered by the one-switch budget. It exists only under dynamic-page document
+  // access, so `noLoadAsync` models the environment where it does not and the short-read gate is the
+  // whole defence.
+  const loaded = [];
+  if (!o.noLoadAsync)
+    for (const pg of [tplPage, clonePage]) pg.loadAsync = async () => { loaded.push(pg.name); };
   const figma = {
     currentPage: o.startOn === "clone" ? clonePage : tplPage,
     getNodeByIdAsync: async (id) => byId[id] || null,
@@ -111,7 +118,7 @@ async function run(tpl, clone, expected, opts) {
     `const CONFIG = { templateId: "T:1", frameIds: ["C:1"], expected: ${JSON.stringify(expected || [])} };`);
   const fn = new Function("figma", `return (async () => { ${body} })();`);
   const out = await fn(figma);
-  return { out, switches };
+  return { out, switches, loaded };
 }
 
 const results = [];
@@ -163,6 +170,70 @@ const has = (res, re) => drift(res).some((d) => re.test(d));
     check("2b a short template read STOPS", threw && /read SHORT/.test(threw), threw);
     check("2b and names what was missing", threw && /header did not resolve/.test(threw), threw);
     check("2b and says it is a stop, not a diff", threw && /not a diff/.test(threw), threw);
+  }
+
+  // 2c — "the header resolved with rows in it" is an INFERENCE about completeness, not a proof: the
+  // short list in GOTCHAS.md's first entry was NONEMPTY (a page read 4 children while current and 2
+  // later), so a partial subtree can clear that gate and become the baseline. So the read is MADE
+  // complete: `PageNode.loadAsync()` loads the template's page without switching to it, which does not
+  // touch the one-switch budget the clones need.
+  {
+    const res = await run(buildFrame({ name: "tpl" }), buildFrame({ name: "clone" }), [], { startOn: "clone" });
+    check("2c the template's page is LOADED, not merely read", res.loaded.indexOf("Templates") !== -1, JSON.stringify(res.loaded));
+    check("2c and reported as loaded", res.out.templateFingerprintRead.pageLoadedWithoutSwitch === true,
+          JSON.stringify(res.out.templateFingerprintRead));
+    check("2c and the note says the read is complete, not inferred", /not inferred complete/.test(res.out.templateFingerprintRead.note),
+          res.out.templateFingerprintRead.note);
+    check("2c loading costs no page switch", res.switches === 0, `${res.switches} switches`);
+    check("2c and the diff is still clean", !drift(res).length, JSON.stringify(drift(res)));
+  }
+
+  // 2d — where loadAsync does not exist the script must still RUN (that is the whole point of dropping
+  // the page guard), and must stop overclaiming: the gate is then an inference and the result says so.
+  {
+    const res = await run(buildFrame({ name: "tpl" }), buildFrame({ name: "clone" }), [], { noLoadAsync: true });
+    check("2d it still runs with no loadAsync", !drift(res).length, JSON.stringify(drift(res)));
+    check("2d and does not claim the page was loaded", res.out.templateFingerprintRead.pageLoadedWithoutSwitch === false,
+          JSON.stringify(res.out.templateFingerprintRead));
+    check("2d and the note admits completeness is INFERRED", /INFERRED/.test(res.out.templateFingerprintRead.note),
+          res.out.templateFingerprintRead.note);
+    let threw = null;
+    try {
+      await run(node({ name: "tpl-unloaded", width: 540, height: 540, fills: solid("#ffffff"), children: [] }),
+                buildFrame({ name: "clone" }), [], { noLoadAsync: true });
+    } catch (e) { threw = e.message; }
+    check("2d a short read still STOPS without loadAsync", threw && /read SHORT/.test(threw), threw);
+    check("2d and says a lazy read is still possible", threw && /re-run once/.test(threw), threw);
+  }
+
+  // 2e — no gate can fully exclude a partial template read, and its signature is specific: EVERY clone
+  // reports the SAME structural difference, because what is wrong is the baseline. Left unnamed, one bad
+  // read reads as N frames each missing the same band, and a reader "fixes" correct clones.
+  {
+    const tpl = buildFrame({ name: "tpl" });
+    const a = buildFrame({ name: "clone-a", headerRows: [txt("title", { size: 25 })] });
+    const b = buildFrame({ name: "clone-b", headerRows: [txt("title", { size: 25 })] });
+    const tplPage = node({ id: "P:tpl", type: "PAGE", name: "Templates", children: [tpl] });
+    const clonePage = node({ id: "P:clone", type: "PAGE", name: "20260821 Chart", children: [a, b] });
+    tpl.id = "T:1"; a.id = "C:1"; b.id = "C:2";
+    tpl.parent = tplPage; a.parent = clonePage; b.parent = clonePage;
+    for (const pg of [tplPage, clonePage]) pg.loadAsync = async () => {};
+    const byId = { "T:1": tpl, "C:1": a, "C:2": b };
+    const figma = { currentPage: tplPage, getNodeByIdAsync: async (id) => byId[id] || null,
+                    setCurrentPageAsync: async (pg) => { figma.currentPage = pg; } };
+    const body = SRC.replace(/^const CONFIG = \{[\s\S]*?^\};/m,
+      'const CONFIG = { templateId: "T:1", frameIds: ["C:1", "C:2"], expected: [] };');
+    const out = await new Function("figma", `return (async () => { ${body} })();`)(figma);
+    check("2e unanimous structural drift is named", /SUSPECT BASELINE/.test(out.verdict), out.verdict);
+    check("2e and the shared difference is quoted", /rowCount 1 != 2/.test(out.verdict), out.verdict);
+    check("2e and it is collected for the caller", out.unanimousStructuralDrift.length === 1,
+          JSON.stringify(out.unanimousStructuralDrift));
+    check("2e and it says to re-read the template first", /re-read the template/.test(out.verdict), out.verdict);
+    // one frame cannot be unanimous with itself, and per-frame drift must not be misread as a bad baseline
+    const solo = await run(buildFrame({ name: "tpl" }),
+                           buildFrame({ name: "clone", headerRows: [txt("title", { size: 25 })] }));
+    check("2e a single frame raises no baseline suspicion", !/SUSPECT BASELINE/.test(solo.out.verdict), solo.out.verdict);
+    check("2e and its own drift is still reported", has(solo, /header rowCount 1 != 2/), JSON.stringify(drift(solo)));
   }
 
   // 3 — a header that LOST a row. The row loop only walks the overlap, so without a row-count compare

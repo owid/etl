@@ -370,15 +370,29 @@ const checkFrame = async (frameId) => {
     //
     // Both are judged on their ladder size instead, which ladder-sizes above already enforces. What is
     // still a real defect: Regular text that is unbound — there the binding was simply not applied.
-    const boldThroughout = (t) => t.weights && t.weights.length === 1 && t.weights[0] !== "Regular";
+    //
+    // The exemption is keyed on the weight being BOLD, not merely on it being "not Regular". Written the
+    // loose way it swallowed every other single-weight face too — an annotation left in Lato Light,
+    // Medium or Italic is not the prescribed exception, nothing in GUIDELINES.md licenses it, and it was
+    // being waved through AND reported back as "wholly-bold", which is a false statement about the page.
+    const BOLD_WEIGHT = /bold|black/i;   // Bold, Semibold, Extrabold, Black, and their italics
+    const boldThroughout = (t) => t.weights && t.weights.length === 1 && BOLD_WEIGHT.test(t.weights[0]);
     const unbound = ann.filter((t) => !t.styleId && !t.mixedWeight && !boldThroughout(t));
     const mixed = ann.filter((t) => t.mixedWeight);
     const bold = ann.filter((t) => !t.mixedWeight && boldThroughout(t));
     const importedRaw = texts.filter((t) => t.insidePlot && !/^annotation__/.test(t.name) && !t.styleId).length;
+    // An unbound node is reported in the weight it actually carries. Calling a Lato Light node "REGULAR"
+    // sends the reader looking for a missing binding on text whose weight is the real problem.
+    const weightOf = (t) => (t.weights && t.weights.length === 1 ? t.weights[0] : "mixed");
+    const named = (t) => `"${t.chars}"`;
+    const unboundRegular = unbound.filter((t) => !t.weights || !t.weights.length || weightOf(t) === "Regular");
+    const unboundOther = unbound.filter((t) => unboundRegular.indexOf(t) === -1);
     if (!ann.length) skip("named-styles", "no annotation__* text nodes; an imported chart's text cannot carry a style id");
     else add("named-styles", unbound.length ? "FAIL" : "ok",
-             (unbound.length ? `${unbound.length} REGULAR annotation(s) with no textStyleId — setting fontSize looks like the ladder and is not it: ` + unbound.map((t) => `"${t.chars}"`).join(", ")
-                             : `all ${ann.length - mixed.length - bold.length} regular-weight annotation(s) bound to a text style`) +
+             (unbound.length
+                ? [unboundRegular.length ? `${unboundRegular.length} REGULAR annotation(s) with no textStyleId — setting fontSize looks like the ladder and is not it: ` + unboundRegular.map(named).join(", ") : "",
+                   unboundOther.length ? `${unboundOther.length} annotation(s) unbound in a weight the ladder does not prescribe (${[...new Set(unboundOther.map(weightOf))].join(", ")}) — the exemption covers BOLD only, so either bind the style or make the emphasis bold on purpose: ` + unboundOther.map(named).join(", ") : ""].filter(Boolean).join(". ")
+                : `all ${ann.length - mixed.length - bold.length} regular-weight annotation(s) bound to a text style`) +
              (mixed.length ? ` ${mixed.length} mixed-weight annotation(s) exempted — Figma drops the node-level style id when a phrase is bolded, which is the prescribed recipe (GOTCHAS.md).` : "") +
              (bold.length ? ` ${bold.length} wholly-bold annotation(s) exempted — the ladder is all Lato Regular, so binding a style would strip the bold; GUIDELINES.md prescribes size-without-binding here and the finished pages ship it (weights seen: ${[...new Set(bold.flatMap((t) => t.weights))].join(", ")}).` : "") +
              ((mixed.length || bold.length) ? " Their sizes are covered by ladder-sizes." : "") +
@@ -849,21 +863,29 @@ const checkFrame = async (frameId) => {
   // on insidePlot because what is behind those is a mark, not the frame.
   {
     const candidates = texts.filter((t) => t.fill && (/^annotation__/.test(t.name) || (t.insidePlot && /^label__/.test(t.name))));
-    // A label in the frame's OWN colour cannot be meant to be read against the frame — it is white text
-    // inside a dark mark (GUIDELINES.md → maps: "values written inside countries take whichever colour
-    // reads against the fill"). Measuring those against the frame reports 1:1 and fails a correct label,
-    // so they are knocked out to the on-fill row rather than judged here.
+    // A label in the frame's OWN colour is AMBIGUOUS, and it is the one case this row cannot settle
+    // arithmetically. Read one way it is the prescribed white-on-dark-mark label (GUIDELINES.md → maps:
+    // "values written inside countries take whichever colour reads against the fill") and measuring it
+    // against the frame reports 1:1, failing a correct label. Read the other way it is an annotation that
+    // was accidentally given the frame's own colour — white on white, unreadable, a real defect.
+    //
+    // Matching colours are no evidence either way, so these are handed to REVIEW rather than knocked out
+    // silently: `label-contrast-on-fill` is a DECLARED gap below (it needs label->mark pairing, which
+    // nothing here has), so anything routed to it is reported by NOBODY. A defect that leaves no row is
+    // worse than a row a human has to look at.
     const onMark = frameFill ? candidates.filter((t) => t.fill.toLowerCase() === frameFill.toLowerCase()) : [];
     const onBg = candidates.filter((t) => onMark.indexOf(t) === -1);
+    const sameColour = (n) => `${n} label(s) carry the frame's own colour ${frameFill}: either drawn inside a darker mark, which is correct and is label-contrast-on-fill's row, or the frame's colour by accident, which is invisible text. No geometry here pairs a label with the mark behind it, so check these by eye: ` +
+                              onMark.map((t) => `"${t.chars}"`).slice(0, 8).join(", ");
     if (!frameFill) skip("label-contrast-on-background", "frame carries no solid fill to measure against");
-    else if (!onBg.length) skip("label-contrast-on-background", "no label__*/annotation__* text sits on the frame's own background" +
-                                (onMark.length ? ` — all ${onMark.length} carry the frame's own colour, so they are drawn inside a mark; that is label-contrast-on-fill's row` : ""));
+    else if (!onBg.length && !onMark.length) skip("label-contrast-on-background", "no label__*/annotation__* text sits on the frame's own background");
+    else if (!onBg.length) add("label-contrast-on-background", "REVIEW", `nothing measurable against the background — all ${sameColour(onMark.length)}`);
     else {
       const bad = onBg.map((t) => ({ t, c: contrast(t.fill, frameFill) })).filter((x) => x.c < 4.5);
-      add("label-contrast-on-background", bad.length ? "FAIL" : "ok",
+      add("label-contrast-on-background", bad.length ? "FAIL" : onMark.length ? "REVIEW" : "ok",
           (bad.length ? bad.map((x) => `"${x.t.chars}" ${x.t.fill} on ${frameFill} = ${r(x.c)}:1 (want 4.5)`).join(", ")
                      : `all ${onBg.length} label(s) clear 4.5:1 against ${frameFill} (lowest ${r(Math.min(...onBg.map((t) => contrast(t.fill, frameFill))))}:1)`) +
-          (onMark.length ? `. ${onMark.length} label(s) in the frame's own colour NOT judged here — they are drawn inside a mark, which is label-contrast-on-fill's row` : ""));
+          (onMark.length ? `. Plus ${sameColour(onMark.length)}` : ""));
     }
   }
 
@@ -881,7 +903,7 @@ const checkFrame = async (frameId) => {
   // row above owns: the bar's own fill is the background here, and picking it by geometry is that
   // pairing problem. The contrast arithmetic is already in this file (see label-contrast-on-background)
   // and can be reused the moment pairing exists.
-  skip("label-contrast-on-fill", "4.5:1 for every label drawn INSIDE a fill, at 13.5px regular — the 3:1 large-text allowance does not apply. Needs label->segment pairing to know which fill is behind each label", "CHECKS.md + the direct-label-pairing row");
+  skip("label-contrast-on-fill", "4.5:1 for every label drawn INSIDE a fill, at 13.5px regular — the 3:1 large-text allowance does not apply. Needs label->segment pairing to know which fill is behind each label. Because this row is not computed, label-contrast-on-background does NOT route the ambiguous cases here and drop them: a label carrying the frame's own colour is reported there as REVIEW", "CHECKS.md + the direct-label-pairing row");
   skip("arrow-clearance", "arrow pixels vs target pixels; needs 3N+1 renders (the four-render protocol, pair-specific)", "CHECKS.md");
   skip("leader-on-map", "terminal vertex against the country's PIXELS, not its bounding box", "CHECKS.md + per-chart-type/maps.md");
 
