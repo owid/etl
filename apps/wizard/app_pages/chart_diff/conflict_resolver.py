@@ -68,12 +68,21 @@ def parse_field_text(field_key: str, text: str, rendered_value: Any) -> Any:
     except json.JSONDecodeError:
         pass
 
+    # Values shown as JSON come back as JSON, but a user may paste a Python repr (single quotes,
+    # True/None), which json.loads rejects.
     try:
-        # Values shown as JSON come back as JSON, but a user may paste a Python repr (single quotes,
-        # True/None), which json.loads rejects.
-        return json.loads(json.dumps(ast.literal_eval(text)))
-    except (ValueError, SyntaxError) as e:
+        value = ast.literal_eval(text)
+    except Exception as e:
+        # literal_eval raises a whole family of errors on input that is not a literal (ValueError,
+        # SyntaxError, TypeError, MemoryError, RecursionError). They all mean the same thing here.
         raise FieldParseError(field_key, str(e)) from e
+
+    try:
+        # Not every Python literal is a value a chart config can hold: a set has no JSON form, and
+        # neither does an out-of-range float.
+        return json.loads(json.dumps(value, allow_nan=False))
+    except (TypeError, ValueError) as e:
+        raise FieldParseError(field_key, f"{type(value).__name__} is not a valid JSON value") from e
 
 
 def resolve_field_value(field_key: str, text: str, rendered_text: str, rendered_value: Any) -> Any:
@@ -231,12 +240,28 @@ class ChartDiffConflictResolver:
         rendered_value = None if choice is None else field[f"raw{choice}"]
         rendered_text = "" if choice is None else field[f"text{choice}"]
 
-        # Re-seed the editor whenever the chosen environment changes (and on first render).
-        if st.session_state.get(applied_key) != choice:
+        # `rendered_key` holds the text the editor was last seeded with. It is what tells an untouched
+        # editor apart from a hand-edited one, both here and in `_resolutions`, so it is written only
+        # when the editor is actually seeded.
+        seeded_text = st.session_state.get(rendered_key)
+        hand_edited = (seeded_text is not None) and (st.session_state.get(editor_key) != seeded_text)
+        value_changed = rendered_text != seeded_text
+
+        # Seed the editor when the chosen environment changes (and on first render), and also when
+        # the chosen environment's own value changes under us: the diff can be refreshed while the
+        # resolver is open, and an editor still showing the old text would write it back over the
+        # newer edit -- which is the bug this whole resolver was fixed for, one level down.
+        if (st.session_state.get(applied_key) != choice) or (value_changed and not hand_edited):
             st.session_state[editor_key] = rendered_text
-            st.session_state[applied_key] = choice
-        # Remember what the editor was seeded with, to tell later whether the user edited it.
-        st.session_state[rendered_key] = rendered_text
+            st.session_state[rendered_key] = rendered_text
+        st.session_state[applied_key] = choice
+
+        # A hand edit is never thrown away silently; say that it is now based on an outdated value.
+        if hand_edited and value_changed and (choice is not None):
+            st.warning(
+                f"The {ENVIRONMENT_IDS[choice]} value changed while you were editing this field. Your "
+                "edit is kept — pick an environment again to start from the new value."
+            )
 
         if choice is None:
             placeholder = "Choose PRODUCTION or STAGING above."

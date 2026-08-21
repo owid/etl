@@ -313,3 +313,92 @@ def test_resolving_a_malformed_edit_writes_nothing(fake_admin_api):
     assert fake_admin_api.calls == []
     assert at.text[0].value.startswith("error: Nothing was written")
     assert "selectedEntityNames" in at.text[0].value
+
+
+def _refreshable_app():
+    """Same as `_resolve_app`, but the staging value changes when `refreshed` is set.
+
+    Simulates the diff being refreshed (or the chart being edited again) while the resolver is open.
+    """
+    import streamlit as st
+
+    import apps.wizard.app_pages.chart_diff.conflict_resolver as cr
+
+    staging_title = "New staging title" if st.session_state.get("refreshed") else "Staging title"
+
+    class _Chart:
+        def __init__(self, config):
+            self.config = config
+            self.lastEditedByUserId = 13
+
+    class _Diff:
+        chart_id = 42
+
+        def __init__(self):
+            self.target_chart = _Chart({"$schema": "s", "title": "Production title"})
+            self.source_chart = _Chart({"$schema": "s", "title": staging_title})
+
+        def set_conflict_to_resolved(self, session):
+            pass
+
+    resolver = cr.ChartDiffConflictResolver(_Diff(), session=None)  # ty: ignore
+    for field in resolver.config_compare:
+        resolver.show_field_resolver(field)
+    st.button("Resolve conflicts", disabled=bool(resolver.fields_undecided), on_click=resolver.resolve_conflicts)
+
+    message = st.session_state.get("conflict-resolver-msg-42")
+    if message is not None:
+        st.text(f"{message[0]}: {message[1]}")
+
+
+def test_editor_follows_a_value_that_changed_under_it(fake_admin_api):
+    """An untouched editor must not keep showing -- and writing back -- a superseded value."""
+    at = AppTest.from_function(_refreshable_app, default_timeout=30).run()
+    at = at.radio[0].set_value(2).run()
+    assert at.text_area[0].value == "Staging title"
+
+    # The staging chart gets edited again and the diff is refreshed.
+    at.session_state["refreshed"] = True
+    at = at.run()
+    assert at.text_area[0].value == "New staging title"
+    assert at.warning == []
+
+    at = at.button[0].click().run()
+    assert fake_admin_api.calls[0]["config"]["title"] == "New staging title"
+
+
+def test_a_hand_edit_survives_a_value_that_changed_under_it(fake_admin_api):
+    """A hand edit is never thrown away silently -- it is kept, and the user is told why it matters."""
+    at = AppTest.from_function(_refreshable_app, default_timeout=30).run()
+    at = at.radio[0].set_value(2).run()
+    at = at.text_area[0].set_value("Hand-written title").run()
+
+    at.session_state["refreshed"] = True
+    at = at.run()
+    assert at.text_area[0].value == "Hand-written title"
+    assert "changed while you were editing" in at.warning[0].value
+
+    at = at.button[0].click().run()
+    assert fake_admin_api.calls[0]["config"]["title"] == "Hand-written title"
+
+    # Re-picking an environment starts from the new value, as the warning says.
+    at = at.radio[0].set_value(1).run()
+    at = at.radio[0].set_value(2).run()
+    assert at.text_area[0].value == "New staging title"
+
+
+def test_a_literal_json_cannot_hold_is_a_field_error(fake_admin_api):
+    """`{1, 2}` is a valid Python literal but not a JSON value: report it, never crash the callback."""
+    with pytest.raises(FieldParseError):
+        parse_field_text("selectedEntityNames", "{1, 2}", ["Kenya"])
+
+    at = AppTest.from_function(_resolve_app, default_timeout=30).run()
+    at = at.radio[0].set_value(2).run()
+    at = at.radio[1].set_value(2).run()
+    at = at.radio[2].set_value(2).run()
+    at = at.text_area[1].set_value("{1, 2}").run()
+    at = at.button[0].click().run()
+
+    assert at.exception == []
+    assert fake_admin_api.calls == []
+    assert at.text[0].value.startswith("error: Nothing was written")
