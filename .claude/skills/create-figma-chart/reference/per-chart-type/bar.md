@@ -53,10 +53,17 @@ Exemplars: `364:129` (reference row), `169:1167` (braced ties + qualifying group
 
 ## Shortening long entity names, and reclaiming the space properly
 
-The names sit in a column on the left whose width is set by the **longest** one. That single fact
-decides whether shortening is worth anything: renaming `United States` → `US` and `United Kingdom` →
-`UK` on a chart whose widest name is `Dominican Republic` frees **0px** of plot, because the column does
-not move. Measure before offering it — see [SKILL.md](../../SKILL.md) → Step 4 for the wording.
+The names sit in a column on the left whose width is set by the **longest** one, and **`US` and `UK`
+are the only short forms the Writing and Style Guide sanctions.** Those two facts together decide
+whether shortening is worth anything, and usually it is not: renaming `United States` → `US` and
+`United Kingdom` → `UK` frees **0px** of plot on any chart whose widest name is some third country,
+because the column does not move. Measured on a nine-country chart, the widest name was 122px against
+`United Kingdom`'s 100px and `United States`' 83px — so the two renames bought nothing at all.
+
+**Do not invent an abbreviation for the widest country to unlock the space.** It reads as data rather
+than as a layout choice, and a reader cannot tell it was ours. When the widest name has no standard
+short form, the correct answer is that the change buys nothing — see [SKILL.md](../../SKILL.md) →
+Step 4, which has wording for exactly that case.
 
 When it *is* worth doing, the re-layout is four steps and the third is the one that matters:
 
