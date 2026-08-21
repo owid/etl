@@ -126,6 +126,11 @@ function buildFrame(opts = {}) {
   if (opts.zeroLineOnly) kids.push(node({ type: "VECTOR", name: "vertical-zero-line", x: 40, y: 160, width: 1, height: 300,
     strokeWeight: opts.zeroLineOnly, strokes: solid("#333333"), dashPattern: [], strokeAlign: "CENTER",
     absoluteTransform: [[1, 0, 40], [0, 1, 160]], vectorNetwork: { vertices: [{ x: 0, y: 0 }, { x: 0, y: 300 }], segments: [{ start: 0, end: 1 }] } }));
+  // Fiji: split across the antimeridian, so its BOX spans the plot at ~4px tall while its ink is two
+  // small clusters. It must be excluded from the margins row or it breaches on every map.
+  if (opts.straddler) kids.push(node({ name: "map", x: 16, y: 300, width: 400, height: 200, children: [
+    node({ type: "VECTOR", name: "Fiji", x: 10, y: 320, width: 505, height: 4, fills: solid("#4c6a9c") }),
+    node({ type: "VECTOR", name: "Brazil", x: 150, y: 340, width: 80, height: 60, fills: solid("#b13507") })] }));
   if (opts.mapCountries) kids.push(node({ name: "map", x: 40, y: 160, width: 400, height: 200, children: [
     node({ type: "VECTOR", name: "country__FRA", x: 40, y: 160, width: 60, height: 40, strokeWeight: 0.22,
            strokes: solid("#ffffff"), dashPattern: [], fills: solid("#4c6a9c"),
@@ -408,6 +413,21 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     check("24 zero line counted as furniture", row(ok, "furniture-weight").status === "ok" && !/no stroked node/.test(row(ok, "furniture-weight").detail), row(ok, "furniture-weight").detail);
     const bad3 = await run(buildFrame({ zeroLineOnly: 0.64 }), {});
     check("24 a thinned zero line FAILS", row(bad3, "furniture-weight").status === "FAIL" && /0\.64/.test(row(bad3, "furniture-weight").detail), row(bad3, "furniture-weight").detail);
+  }
+
+  // 25 — an antimeridian straddler's bbox must not count as a margin breach (found by measuring Fiji).
+  {
+    const out = await run(buildFrame({ straddler: true }), {});
+    const d = row(out, "margins").detail;
+    check("25 straddler excluded from margins", !/Fiji \d/.test(d) || /straddler\(s\) excluded/.test(d), d);
+    check("25 and the exclusion is reported", /antimeridian straddler/.test(d), d);
+    check("25 margins still ok", row(out, "margins").status === "ok", d);
+    // a genuinely overflowing normal shape must still fail
+    const f = buildFrame({ straddler: true });
+    const mapg = f.children.find((c) => c.name === "chart").children.find((c) => c.name === "map");
+    mapg.children[1].absoluteBoundingBox = { x: 480, y: 340, width: 80, height: 60 };
+    const bad4 = await run(f, {});
+    check("25 a real overflow still FAILS", row(bad4, "margins").status === "FAIL" && /Brazil/.test(row(bad4, "margins").detail), row(bad4, "margins").detail);
   }
 
   const bad = results.filter((x) => !x.ok);

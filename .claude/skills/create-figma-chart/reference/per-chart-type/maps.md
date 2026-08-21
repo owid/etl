@@ -43,6 +43,16 @@
   node.x += want.x0 - (b.x - fb.x); node.y += want.y0 - (b.y - fb.y);
   ```
 
+- **The fringe is worth ~6% of the map's width, measured.** On a live 540-wide frame the map group's raw
+  bbox ran 490.06px while the straddler-excluded union ran 481.76 and the mainland began 29.57px in — so
+  Fiji's box costs **8.29px** and the Tonga/Samoa/Kiribati specks another **21.28px**, which is the
+  "~30px" below, confirmed. Worth knowing before you decide whether to spend the trim.
+- **Fitting the fringe out is not a one-line rescale, because the legend moves too.** Scaling the chart
+  group so the straddler-excluded union spans the content width gained 27.67px of map and produced three
+  breaches: Fiji's box (see the bbox note above) plus the legend's right end at 542.92 against a 524
+  edge, because the legend already sat at the margin and scaled with the group. So the order is: trim
+  the fringe first, then fit the map, then re-fit the legend — not scale-and-hope.
+
 - **Fit on the real content, then check the margins.** Measure the union of visible country boxes (minus the straddlers), scale so it spans the content width, and afterwards assert that nothing sits outside the 16…524 band — a speck left in the frame's margin shows up as a cut sliver at the edge. And re-set the hairlines *after* the final scale (GOTCHAS.md → `rescale()` multiplies every stroke width).
 - **Place a bottom annotation against the deepest ink in its own column, not the map's global bbox.** Empty ocean is placeable space, which is how the reference gets a 247px map into a 540px frame; but a 3px island left in that column will push the text down as if it were a continent (hide it — see above).
 - Legends: align left; vertical columns matched to label lengths; one–two categories → shrink the legend; horizontal stretched legends only for sequential palettes, not categorical.

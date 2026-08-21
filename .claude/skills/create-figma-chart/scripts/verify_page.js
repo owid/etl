@@ -404,13 +404,24 @@ const checkFrame = async (frameId) => {
     // there and from the header everywhere else (SMALL-CHARTS.md -> Checks).
     const marginL = isSmall ? 12 : contentL;
     const marginR = isSmall && fb ? fb.width - 12 : contentR;
+    // An ANTIMERIDIAN STRADDLER's bbox is not its ink. Fiji is split across the map's two edges, so its
+    // box spans nearly the whole plot at ~4px tall (measured 515x3.75, aspect 137) while its actual ink
+    // is two small clusters. Testing that box against the margins is a guaranteed false breach on every
+    // map, however it is fitted — the same bbox-is-not-the-shape problem maps.md flags for the FIT.
+    // Excluded here and reported, never silently dropped.
+    const plotBox = (() => { const bs = plotRoots.map(rel).filter(Boolean);
+      return bs.length ? { w: Math.max(...bs.map((b) => b.rr)) - Math.min(...bs.map((b) => b.l)),
+                           h: Math.max(...bs.map((b) => b.bb)) - Math.min(...bs.map((b) => b.t)) } : null; })();
+    const isStraddler = (x) => plotBox && x.box.w > 0.3 * plotBox.w && x.box.h < 0.05 * plotBox.h;
+    const straddlersSeen = leaves.filter((x) => x.insidePlot && isStraddler(x));
     if (marginL === null || marginR === null) skip("margins", "content box not resolved");
     else {
-      const out = leaves.filter((x) => (x.insidePlot || /^annotation__/.test(x.name)) && (x.box.l < marginL - 0.5 || x.box.rr > marginR + 0.5));
+      const out = leaves.filter((x) => (x.insidePlot || /^annotation__/.test(x.name)) && !isStraddler(x) && (x.box.l < marginL - 0.5 || x.box.rr > marginR + 0.5));
       add("margins", out.length ? "FAIL" : "ok",
           (out.length ? `${out.length} mark(s) outside ${r(marginL)}..${r(marginR)}: ` + out.slice(0, 6).map((x) => `${x.name} at ${r(x.box.l)}..${r(x.box.rr)}`).join(", ")
                       : `no ink outside ${r(marginL)}..${r(marginR)} across ${leaves.filter((x) => x.insidePlot).length} plot leaves`) +
-          ` (bounds from ${isSmall ? "the 302-wide FORMAT, not its hugging header" : "the header box"})`);
+          ` (bounds from ${isSmall ? "the 302-wide FORMAT, not its hugging header" : "the header box"})` +
+          (straddlersSeen.length ? `. ${straddlersSeen.length} antimeridian straddler(s) excluded — their bbox spans the plot while their ink does not: ${straddlersSeen.slice(0, 3).map((x) => `${x.name} ${r(x.box.w)}x${r(x.box.h)}`).join(", ")}` : ""));
     }
   }
 
