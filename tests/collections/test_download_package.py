@@ -29,10 +29,11 @@ def test_wide_table_keeps_columns_a_single_view_cannot_distinguish():
 
     Regression test for poverty_pip. The wide column used to be named after the
     indicator's dimension-stripped short name plus the dimensions of the view showing
-    it, so N indicators reachable from one view collapsed onto one name: 306 indicators
-    became 40 columns, and the entries for the other 266 were silently overwritten.
-    Naming the columns by catalog path makes that impossible -- it is the key the
-    indicator list is built from, so there is exactly one column per indicator.
+    it, so indicators shown together by one view collapsed onto a single name: its 34
+    indicators produced 24 names, 4 of them shared by 14 indicators, and the entries
+    for the losers were silently overwritten. Naming the columns by catalog path makes
+    that impossible -- it is the key the indicator list is built from, so there is
+    exactly one column per indicator.
     """
     tb = _table_with_two_indistinguishable_columns()
     # Both indicators are shown by the same view, with identical dimension values --

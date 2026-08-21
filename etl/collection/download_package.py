@@ -327,12 +327,17 @@ def build_wide_table_for_collection(collection: Collection) -> tuple[Table, dict
     column per indicator, and no two indicators can claim the same one. That
     matters more than it sounds. The name this replaced was rebuilt from the
     indicator's dimension-*stripped* short name plus the dimensions of the *view*
-    that showed it, and a view can show many indicators: poverty_pip's 306
-    indicators collapsed onto 40 such names, 20 of them shared by 286 indicators.
+    that showed it -- and a view can show several indicators at once, which then
+    have identical view dimensions by construction. poverty_pip is the measured
+    case: its 34 indicators produced only 24 such names, with 4 names shared by
+    14 indicators. Those are its stacked-area views, where one view shows three
+    or four `headcount_between` bands ($1-3, $3-4.20, ...) that differ only in
+    dimensions the view does not carry.
+
     Each collision silently overwrote the previous column's entry in the returned
-    dicts, so the package would have shipped 40 columns and dropped 266
-    indicators without a word -- it only surfaced as a crash because pandas
-    refuses to assign a 17-column frame to one column.
+    dicts, so the package would have shipped 24 columns and dropped 10 indicators
+    without a word. It surfaced as a crash only because pandas refuses to assign
+    a multi-column frame to a single column.
 
     These names are internal plumbing and never reach a reader: the CSV header,
     the Parquet field name and metadata.json's key are all `_long_column_name`,
