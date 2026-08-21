@@ -252,9 +252,11 @@ highlight map: the legend is deleted, every label is authored from scratch, and 
 and strokes only, so there is no imported label whose position could have moved. On one such page the
 reference was worse than neutral — it put the export's *own* legend/map collision on display beside a
 clean frame, and a reviewer read the page as "a lot of unused maps on top of each other." Decide it by
-asking what question the copy would answer; if you cannot name one, don't place it. The `original —
-<slug>` reference from Step 5 stays either way — that is the before/after comparison, and it is a
-different artifact.
+asking what question the copy would answer; if you cannot name one, don't place it. In
+`scripts/restyle_static_import.js` that decision is the job's `reference` field: omit it, with
+`referenceGap`, and the pass places no copy — a *wrong* id there is still an error, so a typo cannot
+pass itself off as this decision. The `original — <slug>` reference from Step 5 stays either way —
+that is the before/after comparison, and it is a different artifact.
 
 **Put it to the LEFT of the frame**, so the page reads original → edited in reading order. To the
 right it reads as an afterthought and the eye reaches the raw export last, when it is the thing being

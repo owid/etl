@@ -2,8 +2,13 @@
 // fonts and palette, put every label back on its anchor, and keep an unstyled copy beside the frame.
 //
 // HOW TO USE
-//   1. Render the step, then `upload_assets` TWO copies of each SVG — one to style, one to keep as the
-//      untouched reference. Note each returned `placedOnNodeId`.
+//   1. Render the step, then `upload_assets` the SVG. TWO copies where an unstyled reference copy earns
+//      its place — one to style, one to keep untouched — but that copy is CONDITIONAL: it answers
+//      questions about what the restyle did to the export's own content, so where none of that content
+//      survives (a highlight map: legend deleted, every label authored from scratch, fills and strokes
+//      only) it answers nothing and is a second full-size chart on the page. See FITTING.md → "Keep the
+//      untouched import beside the edited frame". Upload one copy then, and omit `reference` from the
+//      job. Note each returned `placedOnNodeId`.
 //   2. Fill in CONFIG below.
 //   3. Paste this whole file as the `code` argument of one `use_figma` call.
 //
@@ -38,7 +43,9 @@
 const CONFIG = {
   pageId: "0:0", // the dated chart page
   jobs: [
-    // One per frame. `styled` is consumed into the frame; `reference` is parked beside it.
+    // One per frame. `styled` is consumed into the frame; `reference` is parked beside it. `reference`
+    // is OPTIONAL — omit it (with `referenceGap`) when no imported content survives the restyle, so the
+    // copy would answer nothing (FITTING.md). Given but unresolvable is an error, not a skip.
     { frameId: "0:0", styled: "0:0", reference: "0:0", canvasWidth: 816, frameWidth: 850, referenceGap: 80, reflowLegend: false },
   ],
   // Each family is one palette base plus members at the tint weights the step gives them. Weight 0
@@ -117,8 +124,12 @@ const landingPages = new Set();
 for (const job of CONFIG.jobs) {
   const frame = page.children.find((f) => f.id === job.frameId);
   const styled = await figma.getNodeByIdAsync(job.styled);
-  const reference = await figma.getNodeByIdAsync(job.reference);
-  for (const node of [styled, reference]) {
+  // Absent is a decision; present-but-missing is a typo. Distinguishing them matters, because silently
+  // treating an unresolvable id as "no reference wanted" ships the page the rule is about by accident.
+  const reference = job.reference ? await figma.getNodeByIdAsync(job.reference) : null;
+  if (job.reference && !reference)
+    throw new Error(`reference ${job.reference} not found — re-read the placedOnNodeId, or drop the field if this frame wants no reference copy`);
+  for (const node of [styled, reference].filter(Boolean)) {
     let ancestor = node;
     while (ancestor && ancestor.type !== "PAGE") ancestor = ancestor.parent;
     if (ancestor) landingPages.add(`${ancestor.id} ${ancestor.name}`);
@@ -130,10 +141,12 @@ for (const job of CONFIG.jobs) {
   // The untouched import, parked to the LEFT of the frame so the page reads original → edited in
   // reading order. (To its right it reads as an afterthought, and the eye lands on the raw export
   // last, when it is the thing you are comparing against.)
-  reference.rescale(scale);
-  reference.name = `${frame.name} — original SVG (unstyled)`;
-  reference.x = frame.x - reference.width - job.referenceGap;
-  reference.y = frame.y;
+  if (reference) {
+    reference.rescale(scale);
+    reference.name = `${frame.name} — original SVG (unstyled)`;
+    reference.x = frame.x - reference.width - job.referenceGap;
+    reference.y = frame.y;
+  }
 
   styled.rescale(scale);
 
@@ -278,7 +291,7 @@ for (const job of CONFIG.jobs) {
     strippedPatches,
     recentred,
     reflowed,
-    reference: reference.name,
+    reference: reference ? reference.name : "none placed — this job declared no reference copy (FITTING.md: it earns its place only where imported content survives the restyle)",
   });
 }
 

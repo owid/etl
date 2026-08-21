@@ -127,14 +127,22 @@ Rules: replace `characters`, and leave the node's **base** styling alone — the
 
 ```js
 const PREFIX = "Data source:";
+const LATO = (style) => ({family: "Lato", style});
 src.characters = PREFIX + " " + citation;
 // REQUIRED, and missing from this recipe until it was measured: assigning `characters` DETACHES the
-// node's text style. Re-bind before touching weights, with the FULL style id.
+// node's text style — USUALLY. Sometimes the binding SURVIVES and the propagation lands as a range
+// override on top of it, and then re-applying the id the node already carries is a silent no-op and
+// the whole line stays Bold (step 3 below). Clearing the weight at node level strips any surviving
+// binding, so the style application takes effect in BOTH states rather than only in the common one.
+await figma.loadFontAsync(LATO("Regular"));
+src.fontName = LATO("Regular");
 await src.setTextStyleIdAsync(SOURCE_STYLE_ID);   // resets range weights — so the bold goes after
-await figma.loadFontAsync(src.getStyledTextSegments(["fontName"])[0].fontName);
-src.setRangeFontName(0, PREFIX.length, {family:"Lato", style:"Bold"});
+await figma.loadFontAsync(LATO("Bold"));          // the face being SET must be loaded, not the one being replaced
+src.setRangeFontName(0, PREFIX.length, LATO("Bold"));
 // and do NOT re-set the tail to Regular: the style already provides it. The prefix range loses its
 // style binding here and cannot get it back — see below; the tail keeps it.
+// Assert on the SEGMENTS, never on `src.textStyleId`, which is now `figma.mixed`:
+//   "Data source:" Bold unbound  +  " <citation>" Regular BOUND
 ```
 
 **Only three of the nine templates bind their source to a style at all — read the clone, never assume.**
@@ -180,8 +188,10 @@ of the two reachable states you are shipping.** Measured step by step on a fille
    then ships with a wholly bold citation, which looks deliberate. Two ways out, and the order matters:
    either clear the weight at node level first (`src.fontName = {family:"Lato", style:"Regular"}` —
    which strips the binding, so the style application afterwards *does* take effect), or set the tail's
-   weight explicitly by range. **Assert the outcome either way**, on the segments and not on
-   `node.textStyleId`: the target is `"Data source:" Bold unbound` + `" <citation>" Regular BOUND`.
+   weight explicitly by range. **The snippet above takes the first**, unconditionally, because which of
+   the two states you are in is not knowable from the recipe — a note under a recipe that walks into the
+   trap is not a fix. **Assert the outcome either way**, on the segments and not on `node.textStyleId`:
+   the target is `"Data source:" Bold unbound` + `" <citation>" Regular BOUND`.
 4. `setRangeFontName(0, PREFIX.length, Bold)` then **strips the style from that range**: the prefix
    goes `Bold | unbound`, the tail stays `Regular | BOUND`, and `node.textStyleId` becomes
    `figma.mixed`.
