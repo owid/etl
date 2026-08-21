@@ -636,7 +636,7 @@ tables:
         description_key:
           - An Internet user is defined by the International Telecommunication Union as anyone who has accessed the Internet from any location in the last three months.
           - This can be from any type of device, including a computer, mobile phone, personal digital assistant, games machine, digital TV, and other technological devices.
-          - The World Bank publishes the share of the population using the Internet, not the number of people. We calculate the number from that share and the World Bank's own population figures, so the regional and global values follow the World Bank's definitions of those groups.
+          - Regional and global figures come from the World Bank's own aggregates, so they follow the World Bank's definitions of those groups rather than ours.
         processing_level: major
         display:
           name: Number of people using the Internet
