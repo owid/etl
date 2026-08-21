@@ -26,12 +26,11 @@ from apps.wizard.app_pages.metadata_diff.core import (
     METADATA_FIELDS,
     ViewDiff,
     as_bullets,
+    behind_sources_drawer,
     diff_preview_html,
     field_label,
     inline_diff_html,
-    renders_fields,
     text_change_key,
-    view_rendering_charts,
 )
 from apps.wizard.app_pages.metadata_diff.data import set_scope
 from apps.wizard.app_pages.metadata_diff.tree import render_affected_charts_html
@@ -248,7 +247,7 @@ def view_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any]]]
     """(charts, other_mdims) affected by this view's indicator-layer change; empty if MDim-only.
 
     The *unfiltered* set, for the surfaces that list charts by name. Anything reporting a count has to
-    put the charts through `view_rendering_charts` first.
+    every chart using the indicator counts.
     """
     if not (view.affects_indicator and view.indicator_id is not None):
         return [], []
@@ -265,7 +264,7 @@ def impact_counts(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any]
     if not view.changed:
         return {"charts": 0, "mdims": 0}
     charts, mdims = view_impact(view, usage)
-    return {"charts": len(view_rendering_charts(view, charts)), "mdims": len(mdims)}
+    return {"charts": len(charts), "mdims": len(mdims)}
 
 
 def render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any]]]], unit: str = "view") -> None:
@@ -287,8 +286,7 @@ def render_impact(view: ViewDiff, usage: dict[int, dict[str, list[dict[str, Any]
     charts, mdims = view_impact(view, usage)
     # The banner states *reach*, so it counts only the charts that can show this change. The popover
     # below lists the full set and flags the rest, so a chart the author expects never simply vanishes.
-    shown = view_rendering_charts(view, charts)
-    n_c, n_m, n_hidden = len(shown), len(mdims), len(charts) - len(shown)
+    n_c, n_m, n_hidden = len(charts), len(mdims), len(charts) - len(charts)
     parts = []
     if n_c:
         parts.append(f"<b>{n_c}</b> chart{'s' if n_c != 1 else ''}")
@@ -351,29 +349,22 @@ def render_affected_lists(view: ViewDiff, charts: list[dict], mdims: list[dict])
             st.markdown(f"- `{m.get('catalogPath')}`")
 
 
-def render_chart_list(charts: list[dict[str, Any]], verb: str = "render this text", n_excluded: int = 0) -> None:
+def render_chart_list(charts: list[dict[str, Any]], verb: str = "render this text", fields: Any = None) -> None:
     """Name the charts a change lands on — a count is not something an author can check.
 
-    Flags any chart with no data page: grapher renders one only for single-indicator charts, so a WYSK
-    edit is invisible to readers of a scatter or multi-series chart. `n_excluded` is how many charts were
-    filtered out for that reason, so the empty case can say which of two very different things happened:
-    no chart uses these indicators at all, or charts use them but none of them shows this field.
+    Marks the ones that show the text only behind "Learn more about this data": a chart combining several
+    indicators has no data page, so its readers reach the same description through the sources drawer
+    instead. Less prominent, not absent — which is why every one of these charts is still counted.
     """
     if not charts:
-        if n_excluded:
-            st.caption(
-                f"No chart **shows** this text: the {n_excluded} chart"
-                f"{'s' if n_excluded != 1 else ''} using these indicators combine several indicators, so "
-                "they render no data page."
-            )
-        else:
-            st.caption("No published chart uses these indicators.")
+        st.caption("No published chart uses these indicators.")
         return
     st.markdown(f"**{len(charts)} chart{'s' if len(charts) != 1 else ''} {verb}:**")
     lines = []
     for c in sorted(charts, key=lambda c: str(c.get("slug") or "")):
         slug = c.get("slug") or f"chart {c.get('chartId')}"
-        flag = "" if c.get("wysk_shown", True) else " :orange-badge[:small[no data page — WYSK not shown to readers]]"
+        drawer = fields is not None and behind_sources_drawer(fields, c)
+        flag = " :gray-badge[:small[via *Learn more about this data*]]" if drawer else ""
         lines.append(f"- [`{slug}`]({SOURCE.site}/grapher/{slug}){flag}")
     st.markdown("\n".join(lines))
 
@@ -397,7 +388,7 @@ def render_author_scope(
     imp = usage.get(view_diff.indicator_id, {}) if view_diff.indicator_id is not None else {}
     # "Apply to all" is a decision about who sees the change, so it has to be offered against the reach
     # readers actually get — the same count the Charts section and the MDim cards report.
-    n_c = len([c for c in imp.get("charts", []) if renders_fields({field_name}, c)])
+    n_c = len(imp.get("charts", []))
     n_m = len(imp.get("mdims", []))
     reach = f"{n_c} chart{'s' if n_c != 1 else ''}"
     if n_m:
@@ -431,7 +422,7 @@ def render_author_scope(
         rows = []
         for c in sorted(imp.get("charts", []), key=lambda c: str(c.get("slug") or "")):
             slug = c.get("slug") or f"chart {c.get('chartId')}"
-            flag = "" if c.get("wysk_shown", True) else " ⚠️ no data page — WYSK not shown to readers"
+            flag = "" if c.get("has_data_page", True) else " — via *Learn more about this data* (no data page)"
             rows.append(f"- [`{slug}`]({SOURCE.site}/grapher/{slug}){flag}")
         for m in sorted(imp.get("mdims", []), key=lambda m: str(m.get("slug") or "")):
             rows.append(f"- MDim `{m.get('slug') or m.get('catalogPath')}`")

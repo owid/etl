@@ -98,7 +98,7 @@ def render_affected_charts_html(
     is reused as every chart's hover tooltip. Links open each chart on this staging server, where
     the change is live. Returns (html, initial_height_px).
     """
-    no_dp_title = "Multi-indicator chart — no data page, so this text is not shown to readers here"
+    no_dp_title = "Multi-indicator chart — no data page, so readers reach this text through Learn more about this data"
     items = []
     for i, c in enumerate(charts):
         slug = c.get("slug")
@@ -106,8 +106,8 @@ def render_affected_charts_html(
         href = f"{staging_site}/grapher/{slug}" if slug else "#"
         flag = (
             ""
-            if c.get("wysk_shown", True)
-            else f' <span class="ac-flag" title="{no_dp_title}">&#9888; no data page</span>'
+            if c.get("has_data_page", True)
+            else f' <span class="ac-flag" title="{no_dp_title}">via Learn more</span>'
         )
         items.append(
             f'<li class="ac-li" data-i="{i}"><a class="ac-item" href="{html.escape(href)}" '
@@ -115,7 +115,7 @@ def render_affected_charts_html(
         )
 
     n = len(charts)
-    n_no_dp = sum(1 for c in charts if not c.get("wysk_shown", True))
+    n_no_dp = sum(1 for c in charts if not c.get("has_data_page", True))
     paged = n > per_page
     header = (
         f'<p class="ac-header">These <b>{n}</b> chart{"s" if n != 1 else ""} also use this indicator, so each '
@@ -126,8 +126,8 @@ def render_affected_charts_html(
     if n_no_dp:
         verb, plural = ("is a", "") if n_no_dp == 1 else ("are", "s")
         note = (
-            f"<b>&#9888; {n_no_dp}</b> of these {verb} multi-indicator chart{plural} with no data page, so "
-            "the change is <b>not shown to readers</b> there."
+            f"<b>{n_no_dp}</b> of these {verb} multi-indicator chart{plural} with no data page, so readers "
+            "reach the change through <b>Learn more about this data</b> rather than on the page."
         )
         footnote = f'<p class="ac-note">{note}</p>'
     pager_style = "" if paged else ' style="display:none"'

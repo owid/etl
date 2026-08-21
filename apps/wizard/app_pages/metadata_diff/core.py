@@ -487,54 +487,34 @@ def group_usage(g: "ChangeGroup", usage: dict[int, dict[str, list[Any]]]) -> dic
     return {"charts": list(charts.values()), "mdims": list(mdims.values())}
 
 
-# Fields that only ever render on the indicator's own data page. Grapher gives a data page only to a
-# single-indicator chart, so on a chart combining several indicators an edit to one of these reaches
-# nobody — the title and the short description, by contrast, feed the chart itself.
+# Fields laid out in full on an indicator's own data page. Grapher gives a data page to a
+# single-indicator chart; a chart combining several has none, and its readers reach the same text through
+# "Learn more about this data", per indicator. Both audiences can see the change — one has to open a
+# drawer first — so this distinction is about prominence, never about whether a chart counts.
 DATA_PAGE_ONLY_FIELDS = {"descriptionKey", "descriptionProcessing", "descriptionFromProducer"}
 
 
-def renders_fields(fields: Iterable[str], chart: dict[str, Any]) -> bool:
-    """Whether a reader of this chart can see a change to *any* of these fields.
+def behind_sources_drawer(fields: Iterable[str], chart: dict[str, Any]) -> bool:
+    """Whether this chart shows these fields only behind "Learn more about this data".
 
-    The one rule behind every reach count, whether the change is described as a group (one field) or as
-    a view (the set of fields that changed in it). `usage` flags multi-indicator charts as
-    `wysk_shown=False`: they have no data page, so a change confined to data-page-only fields reaches
-    nobody there. Anything else renders on the chart itself, and the chart counts.
+    True for a multi-indicator chart when every changed field is one the data page owns. For labelling
+    only: an earlier version read the same condition as "the change reaches nobody here" and dropped such
+    charts from every count, which understated the reach of a WYSK edit — the commonest change reviewed
+    here — on exactly the charts whose readers have to go looking for it.
     """
     if set(fields) - DATA_PAGE_ONLY_FIELDS:
-        return True
-    return bool(chart.get("wysk_shown", True))
+        return False
+    return not chart.get("has_data_page", True)
 
 
-def renders_change(g: "ChangeGroup", chart: dict[str, Any]) -> bool:
-    """Whether a reader of this chart can see this change at all.
-
-    Counting a chart with no data page in the reach of a WYSK edit claims an audience that does not
-    exist.
-    """
-    return renders_fields({g.field}, chart)
+def charts_behind_drawer(fields: Iterable[str], charts: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """The charts among these that show the fields only behind the sources drawer."""
+    return [c for c in charts if behind_sources_drawer(fields, c)]
 
 
-def rendering_charts(g: "ChangeGroup", usage: dict[int, dict[str, list[Any]]]) -> list[dict[str, Any]]:
-    """The charts from `group_usage` whose readers can actually see this change.
-
-    Every surface that reports a *count* of reach has to filter this way, or one change reports two
-    different reaches depending on which page you opened. Surfaces that *list* charts by name keep the
-    unfiltered set and flag the non-rendering ones instead: a chart the edit lands on is worth naming
-    even when its readers will not see the text.
-    """
-    return [c for c in group_usage(g, usage).get("charts", []) if renders_change(g, c)]
-
-
-def view_rendering_charts(view: "ViewDiff", charts: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """The charts whose readers can see this view's indicator-layer change — the view-level `rendering_charts`.
-
-    The blast radius of a *view* is judged against every indicator-layer field that changed in it, so a
-    view that edits a title alongside its WYSK still reaches every chart. Same division of labour as at
-    group level: counts filter, lists do not — the affected-charts popover keeps the unfiltered set and
-    flags the ones with no data page.
-    """
-    return [c for c in charts if renders_fields(view.indicator_changed_fields, c)]
+def affected_charts(g: "ChangeGroup", usage: dict[int, dict[str, list[Any]]]) -> list[dict[str, Any]]:
+    """Every published chart this change reaches — the one reach number, wherever it is reported."""
+    return list(group_usage(g, usage).get("charts", []))
 
 
 def group_changes(view_diffs: list[ViewDiff]) -> list[ChangeGroup]:

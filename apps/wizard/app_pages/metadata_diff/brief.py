@@ -12,6 +12,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     OVERRIDE_TARGET,
     ChangeGroup,
     ViewDiff,
+    affected_charts,
     as_bullets,
     as_plaintext,
     dims_str,
@@ -21,7 +22,6 @@ from apps.wizard.app_pages.metadata_diff.core import (
     group_usage,
     override_snippet,
     parse_catalog_path,
-    rendering_charts,
     yaml_field_snippet,
 )
 
@@ -61,7 +61,7 @@ def review_markdown(
         scope = "shared indicator metadata" if g.affects_indicator else "MDim override"
         reach = f"{len(g.view_dims)} view(s)"
         if g.affects_indicator:
-            n_charts = len(rendering_charts(g, usage))
+            n_charts = len(affected_charts(g, usage))
             if n_charts:
                 reach += f", {n_charts} chart(s)"
         lines.append(f"## {field_label(g.field)} — {status}")
@@ -235,8 +235,8 @@ def surface_lines(g: ChangeGroup, usage: dict[int, dict[str, list[dict[str, Any]
             slug = c.get("slug") or f"chart {c.get('chartId')}"
             note = (
                 ""
-                if c.get("wysk_shown", True)
-                else " — ⚠️ multi-indicator chart: no data page, so WYSK is not shown to readers"
+                if c.get("has_data_page", True)
+                else " — multi-indicator chart: shown under *Learn more about this data*, not on a data page"
             )
             out.append(f"  - [`{slug}`](https://ourworldindata.org/grapher/{slug}){note}")
     if mdims:
@@ -426,7 +426,7 @@ def pr_brief_markdown(
             lines += surface_lines(g, usage, "scoped")
         else:
             imp = group_usage(g, usage)
-            n_c, n_m = len(rendering_charts(g, usage)), len(imp.get("mdims", []))
+            n_c, n_m = len(affected_charts(g, usage)), len(imp.get("mdims", []))
             reach = f"{n_c} chart(s)" + (f" · {n_m} other MDim(s)" if n_m else "") + f" · {len(g.view_dims)} view(s)"
             lines += garden_location_lines(g, reach)
             # Applying to all means these specific charts change — name them, so the author can check.
@@ -501,7 +501,7 @@ def chart_pr_brief_markdown(
             lines.append(f"- **Set to:** {as_plaintext(g.new)}")
         elif g.affects_indicator:
             imp = group_usage(g, usage)
-            n_c, n_m = len(rendering_charts(g, usage)), len(imp.get("mdims", []))
+            n_c, n_m = len(affected_charts(g, usage)), len(imp.get("mdims", []))
             # `"..." or "no other surface"` never reached the fallback — a non-empty f-string is truthy, so
             # a change reaching nothing else read as "0 other chart(s)". Say it in words instead.
             if n_c or n_m:

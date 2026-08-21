@@ -14,7 +14,7 @@ from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.chart_diff.utils import SOURCE
 from apps.wizard.app_pages.metadata_diff import cached, datapage, discovery, mdim_pages
-from apps.wizard.app_pages.metadata_diff.core import ViewDiff, field_label, rendering_charts
+from apps.wizard.app_pages.metadata_diff.core import ViewDiff, affected_charts, field_label
 from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, DIFF_CSS, impact_counts, st_origin_caption
 from apps.wizard.app_pages.metadata_diff.review_state import (
     n_reviewed,
@@ -180,9 +180,9 @@ def _render_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame,
 def _render_change(source_engine: Engine, catalog_path: str, mark, usage: dict, attribution: dict[str, str]) -> None:
     """One distinct text change of an MDim, in data-page layout, with its reviewed toggle."""
     g = mark.group
-    # Only charts that can actually show this change count as reach — same rule as the Charts section, or
-    # the identical change reports a different number depending on which page you opened.
-    charts = rendering_charts(g, usage) if g.affects_indicator else []
+    # Same reach rule as the Charts section, or the identical change reports a different number
+    # depending on which page you opened.
+    charts = affected_charts(g, usage) if g.affects_indicator else []
     reach = f"{len(g.view_dims)} view{'s' if len(g.view_dims) != 1 else ''}"
     if charts:
         reach += f" · ↗ {len(charts)} chart{'s' if len(charts) != 1 else ''}"

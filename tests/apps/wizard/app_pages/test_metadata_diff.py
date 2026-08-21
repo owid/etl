@@ -624,43 +624,42 @@ def test_multi_collection_recipe_names_come_from_its_config_files():
     assert _config_file_collection_name("democracy.eiu.config.yml") == "democracy_eiu"
 
 
-def test_wysk_reach_counts_only_charts_that_show_it():
-    """WYSK renders on the data page, which a multi-indicator chart does not have."""
-    usage = {7: [{"chartId": 1, "wysk_shown": True}, {"chartId": 2, "wysk_shown": False}]}
-    wysk = ChangeGroup(field="descriptionKey", old=["a"], new=["b"], indicator_ids={7})
-    assert charts_reached([wysk], usage) == {1}
+def test_reach_counts_every_chart_that_can_reach_the_text():
+    """A multi-indicator chart has no data page, but its readers can still reach the text.
 
-    # A title or short description feeds the chart itself, so every chart using it is reached.
+    "Learn more about this data" opens the sources drawer, where each indicator's own description, WYSK and
+    notes are listed. An earlier version of this counted those charts out of every reach number, which
+    understated the audience of a WYSK edit on precisely the charts whose readers have to go looking.
+    """
+    usage = {7: [{"chartId": 1, "has_data_page": True}, {"chartId": 2, "has_data_page": False}]}
+    wysk = ChangeGroup(field="descriptionKey", old=["a"], new=["b"], indicator_ids={7})
+    assert charts_reached([wysk], usage) == {1, 2}
+
     title = ChangeGroup(field="titlePublic", old="Old", new="New", indicator_ids={7})
     assert charts_reached([title], usage) == {1, 2}
 
 
-def test_every_reach_count_excludes_charts_that_cannot_show_the_change():
-    """One change must not report two different reaches depending on which page you opened.
+def test_one_change_reports_one_reach_everywhere():
+    """The Charts section, the MDim card, the scope label and the PR brief read the same usage.
 
-    The Charts section has always filtered by whether a reader can see the change; the MDim card, the
-    scope label and the PR brief read the same usage and so have to filter identically.
+    They have to agree, or the identical change reports a different audience depending on which page you
+    opened — which is what happened while some of them filtered by "has a data page" and others did not.
     """
-    from apps.wizard.app_pages.metadata_diff.core import rendering_charts
+    from apps.wizard.app_pages.metadata_diff.core import affected_charts
 
     usage = {
         7: {
             "charts": [
-                {"chartId": 1, "slug": "a", "wysk_shown": True},
-                {"chartId": 2, "slug": "b", "wysk_shown": False},
+                {"chartId": 1, "slug": "a", "has_data_page": True},
+                {"chartId": 2, "slug": "b", "has_data_page": False},
             ],
             "mdims": [],
         }
     }
     wysk = ChangeGroup(field="descriptionKey", old=["a"], new=["b"], affects_indicator=True, indicator_ids={7})
-    assert [c["chartId"] for c in rendering_charts(wysk, usage)] == [1]
-
-    # A title or short description feeds the chart itself, so no chart drops out.
-    title = ChangeGroup(field="titlePublic", old="Old", new="New", affects_indicator=True, indicator_ids={7})
-    assert [c["chartId"] for c in rendering_charts(title, usage)] == [1, 2]
-
+    assert [c["chartId"] for c in affected_charts(wysk, usage)] == [1, 2]
     # The scope consequence — "N charts also use this indicator, all will change" — counts the same way.
-    assert "1 chart" in _scope_label("all", wysk, usage)
+    assert "2 charts" in _scope_label("all", wysk, usage)
 
 
 def test_an_empty_diff_is_not_all_clear_when_indicators_are_new():
@@ -1005,44 +1004,25 @@ def test_chart_brief_says_no_other_surface_in_words():
     assert "0 other chart(s)" not in brief
 
 
-def test_view_level_reach_counts_also_exclude_charts_that_cannot_show_the_change():
-    """The per-view counts ask the same question as the per-group ones, so they need the same answer.
+def test_prominence_is_labelled_rather_than_deducted():
+    """The data-page distinction survives as *where* the text appears, not whether it appears.
 
-    The tree markers, the blast-radius banner and the author's "apply to all" label all read the raw
-    usage entry. Left unfiltered, a WYSK-only view claimed multi-indicator charts that have no data page
-    to show it on — and the scope decision was offered against that inflated number.
+    Only a data-page-only field can be behind the drawer: a title or short description feeds the chart
+    itself, so it is on the canvas of every chart regardless.
     """
-    from apps.wizard.app_pages.metadata_diff.core import view_rendering_charts
-    from apps.wizard.app_pages.metadata_diff.render import impact_counts, view_impact
+    from apps.wizard.app_pages.metadata_diff.core import behind_sources_drawer, charts_behind_drawer
 
-    charts = [
-        {"chartId": 1, "slug": "a", "wysk_shown": True},
-        {"chartId": 2, "slug": "b", "wysk_shown": False},
-    ]
-    wysk_only = ViewDiff(
-        dimensions={},
-        fields={"descriptionKey": {"old": ["a"], "new": ["b"]}},
-        indicator_id=7,
-        indicator_changed_fields={"descriptionKey"},
-    )
-    assert [c["chartId"] for c in view_rendering_charts(wysk_only, charts)] == [1]
+    on_page = {"chartId": 1, "has_data_page": True}
+    drawer_only = {"chartId": 2, "has_data_page": False}
 
-    # A view that also changed a title reaches every chart: the title renders on the chart itself.
-    with_title = ViewDiff(
-        dimensions={},
-        fields={"descriptionKey": {"old": ["a"], "new": ["b"]}, "titlePublic": {"old": "O", "new": "N"}},
-        indicator_id=7,
-        indicator_changed_fields={"descriptionKey", "titlePublic"},
-    )
-    assert [c["chartId"] for c in view_rendering_charts(with_title, charts)] == [1, 2]
+    assert behind_sources_drawer({"descriptionKey"}, drawer_only)
+    assert not behind_sources_drawer({"descriptionKey"}, on_page)
+    # A field the chart renders itself is never behind the drawer, whatever the chart is.
+    assert not behind_sources_drawer({"titlePublic"}, drawer_only)
+    # Nor is a mixed set: something in it is on the canvas.
+    assert not behind_sources_drawer({"descriptionKey", "titlePublic"}, drawer_only)
 
-    # The tree markers report the filtered count.
-    usage = {7: {"charts": charts, "mdims": []}}
-    assert impact_counts(wysk_only, usage)["charts"] == 1
-    assert impact_counts(with_title, usage)["charts"] == 2
-
-    # The unfiltered list stays available, so the popover can still name every chart and flag the rest.
-    assert [c["chartId"] for c in view_impact(wysk_only, usage)[0]] == [1, 2]
+    assert [c["chartId"] for c in charts_behind_drawer({"descriptionKey"}, [on_page, drawer_only])] == [2]
 
 
 def test_export_products_only_covers_recipes_the_branch_edited():

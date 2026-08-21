@@ -22,13 +22,13 @@ def _chunked(values: list, size: int = 500):
 
 
 def charts_using_indicators(engine: Engine, indicator_ids: list[int]) -> dict[int, list[dict[str, Any]]]:
-    """indicator id -> published charts that use it (chartId, slug, title, wysk_shown).
+    """indicator id -> published charts that use it (chartId, slug, title, has_data_page).
 
-    `wysk_shown` is whether the chart actually renders the indicator's "what you should know"
-    data page. Grapher shows a data page only for single-indicator charts; a chart that combines
-    several indicators (a scatter's x+y, a multi-series line) has no single data page, so an edit
-    to this indicator's description_key is NOT visible to readers there. We approximate this with
-    the chart's distinct-variable count (1 → data page shown; >1 → not shown).
+    `has_data_page` records how prominently an indicator-metadata edit appears, not whether it appears.
+    Grapher gives a data page — where the descriptions are laid out in full — only to a single-indicator
+    chart; a chart combining several (a scatter's x+y, a multi-series line) shows the same text through
+    "Learn more about this data", per indicator. Approximated by the chart's distinct-variable count
+    (1 → data page; >1 → sources drawer only).
     """
     result: dict[int, list[dict[str, Any]]] = {int(i): [] for i in indicator_ids}
     ids = [int(i) for i in set(indicator_ids)]
@@ -76,7 +76,7 @@ def charts_using_indicators(engine: Engine, indicator_ids: list[int]) -> dict[in
     for vid, charts in result.items():
         seen: dict[int, dict[str, Any]] = {}
         for c in charts:
-            c["wysk_shown"] = n_vars.get(c["chartId"], 1) == 1
+            c["has_data_page"] = n_vars.get(c["chartId"], 1) == 1
             seen.setdefault(c["chartId"], c)
         result[vid] = list(seen.values())
     return result

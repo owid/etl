@@ -34,7 +34,6 @@ from apps.wizard.app_pages.metadata_diff.core import (
     diff_views,
     field_label,
     group_changes,
-    renders_change,
     surface_key,
 )
 from apps.wizard.app_pages.metadata_diff.data import (
@@ -1046,17 +1045,16 @@ class Summary:
 
 
 def charts_reached(groups: list[ChangeGroup], usage: dict[int, list[dict[str, Any]]]) -> set[int]:
-    """Chart ids where at least one of these changes is actually visible to a reader.
+    """Chart ids these changes reach.
 
-    Every chart using the indicator is *affected*; not every one *shows* the field that changed. A WYSK
-    edit reaches only the charts with a data page, so counting the rest would have the PR comment claim
-    an audience that cannot see the edit.
+    Every published chart using the indicator: its readers can see the new text either on the chart's data
+    page or through "Learn more about this data". Which of the two is a matter of prominence, reported in
+    the lists rather than deducted from the count.
     """
     reached: set[int] = set()
     for g in groups:
-        ids = g.indicator_ids or ({g.indicator_id} if g.indicator_id is not None else set())
-        for iid in ids:
-            reached.update(int(c["chartId"]) for c in usage.get(iid, []) if renders_change(g, c))
+        for iid in g.indicator_ids or ({g.indicator_id} if g.indicator_id is not None else set()):
+            reached.update(int(c["chartId"]) for c in usage.get(iid, []))
     return reached
 
 

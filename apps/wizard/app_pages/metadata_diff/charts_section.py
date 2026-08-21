@@ -17,14 +17,14 @@ from sqlalchemy.engine.base import Engine
 from apps.wizard.app_pages.metadata_diff import cached, datapage, mdim_pages
 from apps.wizard.app_pages.metadata_diff.core import (
     ChangeGroup,
+    affected_charts,
+    charts_behind_drawer,
     distinct_garden_datasets,
     distinct_indicator_short_names,
     field_label,
     group_changes,
     group_usage,
     parse_catalog_path,
-    rendering_charts,
-    renders_change,
 )
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
@@ -70,8 +70,7 @@ def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -
         return
 
     marks = resolve_marks(source_engine, SURFACE, groups)
-    # Charts that *show* the changed field, not merely charts using the indicator — see rendering_charts.
-    n_charts = len({c["chartId"] for g in groups for c in rendering_charts(g, usage)})
+    n_charts = len({c["chartId"] for g in groups for c in affected_charts(g, usage)})
     st.markdown(
         f"**{len(groups)} text change{'s' if len(groups) != 1 else ''}** on "
         f"**{len(changed.diffs)} indicator{'s' if len(changed.diffs) != 1 else ''}**, reaching "
@@ -141,12 +140,10 @@ def _render_change(
     g: ChangeGroup = mark.group
     imp = group_usage(g, usage)
     mdims = imp["mdims"]
-    # Same split as the section total: every chart using the indicator is affected, but a data-page-only
-    # field (WYSK, processing note, producer description) is invisible on a multi-indicator chart. Counting
-    # those here would contradict the total and claim an audience that cannot see the edit; they are still
-    # named below, because a chart the author might expect in the list must not vanish without a word.
-    charts = [c for c in imp["charts"] if renders_change(g, c)]
-    no_data_page = [c for c in imp["charts"] if not renders_change(g, c)]
+    # Every chart using the indicator counts: its readers see the new text either on the chart's data page
+    # or through "Learn more about this data". The second group is marked, not deducted.
+    charts = imp["charts"]
+    behind_drawer = charts_behind_drawer({g.field}, charts)
 
     with st.container(border=True):
         head = f"{mark.icon} **{field_label(g.field)}** · {len(charts)} chart{'s' if len(charts) != 1 else ''}"
@@ -166,8 +163,8 @@ def _render_change(
         col_charts, col_review = st.columns([3, 1])
         with col_charts:
             with st.popover(f"📊 {len(charts)} affected chart{'s' if len(charts) != 1 else ''}", width="stretch"):
-                render_chart_list(charts, n_excluded=len(no_data_page))
-                _no_data_page_note(no_data_page)
+                render_chart_list(charts, fields={g.field})
+                _prominence_note(behind_drawer, len(charts))
                 if mdims:
                     verb = "use" if len(mdims) != 1 else "uses"
                     st.markdown(f"**{len(mdims)} MDim{'s' if len(mdims) != 1 else ''}** also {verb} these indicators:")
@@ -177,22 +174,21 @@ def _render_change(
             st_reviewed_toggle(source_engine, SURFACE, mark)
 
 
-def _no_data_page_note(charts: list[dict[str, Any]]) -> None:
-    """Name the charts left out of the count — they use the indicator but cannot show this field.
+def _prominence_note(behind_drawer: list[dict[str, Any]], n_total: int) -> None:
+    """Say how prominently the change lands on charts that show it only in the sources drawer.
 
-    Left out of the reach count, not hidden: an author looking for a chart they know uses the indicator
-    has to find it here, with the reason it is not counted.
+    Worth saying: it is the difference between a page a reader lands on and a drawer they have to open.
+    Not a reason to leave those charts out of the count — the earlier version of this note claimed the text
+    was "not shown to readers there", which is untrue. It is one click away, under the indicator's entry.
     """
-    if not charts:
+    if not behind_drawer:
         return
-    n = len(charts)
-    slugs = ", ".join(
-        f"`{c.get('slug') or c.get('chartId')}`" for c in sorted(charts, key=lambda c: str(c.get("slug") or ""))
-    )
+    n = len(behind_drawer)
+    which = f"All {n} of these charts" if n == n_total else f"{n} of these {n_total} charts"
     st.caption(
-        f"⚠️ {n} further chart{'s' if n != 1 else ''} use{'' if n != 1 else 's'} these indicators but "
-        f"ha{'ve' if n != 1 else 's'} no data page (multi-indicator charts), so this text is **not shown to "
-        f"readers** there and is not counted above: {slugs}"
+        f"ℹ️ {which} combine several indicators, so they have no data page: their readers reach this text "
+        "through **Learn more about this data**, under the indicator's own entry, rather than on the page "
+        "itself."
     )
 
 

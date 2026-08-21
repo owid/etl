@@ -18,14 +18,13 @@ from apps.wizard.app_pages.metadata_diff import brief, cached, discovery
 from apps.wizard.app_pages.metadata_diff.core import (
     CHART_FIELD_PREFIX,
     ViewDiff,
+    affected_charts,
     change_group_identity,
     diff_views,
     field_label,
     group_changes,
     group_usage,
-    rendering_charts,
     text_change_key,
-    view_rendering_charts,
 )
 from apps.wizard.app_pages.metadata_diff.data import (
     build_chart_bundle,
@@ -154,8 +153,7 @@ def _scope_label(scope: str, g: Any, usage: dict[int, dict[str, list[dict[str, A
     if not g.affects_indicator:
         return "🔒 MDim override — local to this view; no other charts or MDims are affected."
     imp = group_usage(g, usage)
-    # Charts that cannot show the change are not a consequence of applying it — see rendering_charts.
-    n_c, n_m = len(rendering_charts(g, usage)), len(imp.get("mdims", []))
+    n_c, n_m = len(affected_charts(g, usage)), len(imp.get("mdims", []))
     if not n_c and not n_m:
         return "🔗 Shared indicator metadata — no other charts or MDims use it, so nothing else changes."
     also = f"{n_c} chart{'s' if n_c != 1 else ''}" + (f" and {n_m} other MDim{'s' if n_m != 1 else ''}" if n_m else "")
@@ -438,9 +436,7 @@ def render_view_diff_page(
             # 🟢 once reviewed, 🟡 not yet.
             marker = "🟢" if int(i) in visited else "🟡"
             charts, _ = view_impact(cv, usage)
-            # Only charts that can show the change — same count as everywhere else on the page.
-            shown = view_rendering_charts(cv, charts)
-            suffix = f"  —  ↗ {len(shown)} charts" if shown else ""
+            suffix = f"  —  ↗ {len(charts)} charts" if charts else ""
             return f"{marker} {view_label(cv, dimensions)}{suffix}"
 
         jump_col, nav_col, _spacer = st.columns([2, 1, 2], vertical_alignment="bottom")
@@ -673,8 +669,8 @@ def chart_flow(source_engine: Engine, target_engine: Engine) -> None:
     if not chart.get("has_data_page", True):
         st.warning(
             f"**{chart.get('title') or chart['slug']}** is a **multi-indicator chart** "
-            f"({chart['n_indicators']} indicators) — it has **no data page**, so this text isn't shown to "
-            "readers here. The diff below is the indicator's metadata for reference only."
+            f"({chart['n_indicators']} indicators), so it has **no data page**: its readers reach this text "
+            "through *Learn more about this data*, under each indicator, rather than on the page itself."
         )
     tgt = build_chart_bundle(target_engine, str(chart["slug"]))
     target_bundle = tgt[0] if tgt is not None else None
