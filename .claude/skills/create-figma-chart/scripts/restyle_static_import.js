@@ -143,7 +143,7 @@ for (const job of CONFIG.jobs) {
   //
   // Three things this has to get right, and each was wrong in an earlier version:
   //   - matplotlib writes a patch as `<g id="patch_1"><path/></g>`, so it imports as a GROUP, which
-  //     has no `fills` of its own (see SKILL.md → Gotchas). The paint is on the descendant vector, so
+  //     has no `fills` of its own (see reference/GOTCHAS.md). The paint is on the descendant vector, so
   //     that is what decides whether the patch covers anything.
   //   - only a *fill* counts. The spine group is a `patch_N` too and is stroke-only, so testing fills
   //     rather than any paint leaves it alone.
