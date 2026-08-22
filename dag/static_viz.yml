@@ -18,3 +18,8 @@ steps:
   # Expected height of boys and girls from birth to age 19 (WHO growth reference)
   export://static_viz/who/2026-08-07/height_for_age:
     - data://garden/who/2026-08-07/height_for_age
+
+  # The long-run history of child mortality: hunter-gatherer and historical societies, against the
+  # global rate since 1950
+  export://static_viz/papers/2026-08-18/child_mortality_long_run:
+    - data://garden/papers/2026-08-18/child_mortality_in_the_past
