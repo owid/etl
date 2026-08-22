@@ -156,22 +156,29 @@ to work like (`/create-figma-chart` has a whole mode for that).
 Reuse the existing resolver rather than writing another one:
 
 ```bash
-.venv/bin/python .claude/skills/edit-faust-metadata/scripts/resolve_target.py <reference> [--json]
+.venv/bin/python .claude/skills/edit-faust-metadata/scripts/resolve_target.py <reference> [--json] [--no-db]
 ```
 
 It takes a live/staging/admin URL, a bare slug, a chart id, or an indicator catalogPath, reports
 the chart's variables **with their catalogPaths**, and names the candidate ETL step files —
 including a warning when the grapher catalogPath's version differs from what is on disk.
 
-**In a cloud session it cannot run, and it says so misleadingly.** The resolver is `read_sql`
-throughout; a cloud sandbox has no MySQL and staging is on Tailscale, so it reports *"Staging server
-… is not reachable. Run `etl pr` first or wait for the staging build to finish"* — which invites
-waiting for something that will never arrive here. Don't wait, and don't run `etl pr` for it. Fall
-back to the read-only routes in [cloud-sandbox.md](../../docs/cloud-sandbox.md) —
+**In a cloud session, run it with `--no-db` first — only the DB half is unavailable.** Parse-only
+mode never calls `read_sql`, so it works in a sandbox: it identifies what the reference *is*,
+preserves the dimension query params, and names the candidate ETL step files for an indicator or
+MDim catalogPath. Do that before reaching for anything else. What `--no-db` cannot give you is the
+DB half — a bare slug stays `chart-or-mdim (needs DB)`, and the chart's variables and their
+catalogPaths need MySQL.
+
+**For that half, don't wait on staging.** A cloud sandbox has no MySQL and staging is on Tailscale,
+so the DB path reports *"Staging server … is not reachable. Run `etl pr` first or wait for the
+staging build to finish"* — which invites waiting for something that will never arrive here. Don't
+wait, and don't run `etl pr` for it. Fall back to the read-only routes in
+[cloud-sandbox.md](../../docs/cloud-sandbox.md) —
 `https://ourworldindata.org/grapher/<slug>.config.json` for a published chart, the public Datasette
 for `variables` and `chart_dimensions` — or ask the user to run the resolver locally and paste the
-output. This is a fallback for one environment, not a replacement: use the resolver wherever MySQL
-is reachable, since it does strictly more than the fallbacks do.
+output. This is a fallback for one environment, not a replacement: use the resolver with its DB
+wherever MySQL is reachable, since it does strictly more than the fallbacks do.
 
 **From an old static viz image**, two routes, neither of which the popularity CSV can do alone:
 
