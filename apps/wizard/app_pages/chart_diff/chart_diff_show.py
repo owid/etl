@@ -24,7 +24,11 @@ from apps.chart_sync.admin_api import AdminAPI
 from apps.utils.llms.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader
 from apps.wizard.app_pages.chart_diff.citations import st_show_citations
-from apps.wizard.app_pages.chart_diff.conflict_resolver import ChartDiffConflictResolver
+from apps.wizard.app_pages.chart_diff.conflict_resolver import (
+    PRODUCTION,
+    STAGING,
+    ChartDiffConflictResolver,
+)
 from apps.wizard.app_pages.chart_diff.utils import ANALYTICS_NUM_DAYS, SOURCE, TARGET, prettify_date
 from apps.wizard.utils.components import grapher_chart
 from etl.config import OWID_ENV
@@ -256,16 +260,6 @@ class ChartDiffShow:
             self._refresh_chart_diff()
 
         resolver = ChartDiffConflictResolver(self.diff, self.source_session)
-        col1, col2 = st.columns(2)
-        with col1:
-            st.warning("This is under development! Find below a form with the different fields that present conflicts.")
-        with col2:
-            st.button(
-                key=f"resolve-conflicts-{self.diff.chart_id}",
-                label="⚠️ Mark as resolved: Accept all changes from staging",
-                help="Click to resolve the conflict by accepting all changes from staging. The changes from production will be ignored. This can be useful if you're happy with the changes in staging as they are.",
-                on_click=_mark_as_resolved,
-            )
 
         # If things to compare...
         if resolver.config_compare:
@@ -273,22 +267,72 @@ class ChartDiffShow:
                 "Find below the chart config fields that do not match. Choose the value you want to keep for each of the fields (or introduce a new one)."
             )
 
+            # Shortcuts to decide every field at once (nothing is preselected otherwise)
+            col1, col2 = st.columns(2)
+            col1.button(
+                "Use staging for all",
+                help="Choose the staging value for every field below. You can still change individual fields afterwards.",
+                key=f"conflict-all-staging-{self.diff.chart_id}",
+                on_click=resolver.choose_env_for_all,
+                args=(STAGING,),
+                width="stretch",
+            )
+            col2.button(
+                "Use production for all",
+                help="Choose the production value for every field below. You can still change individual fields afterwards.",
+                key=f"conflict-all-production-{self.diff.chart_id}",
+                on_click=resolver.choose_env_for_all,
+                args=(PRODUCTION,),
+                width="stretch",
+            )
+
             # Show conflict resolver per field
             ## Provide tools to merge the content of each field
             for field in resolver.config_compare:
-                resolver._show_field_conflict_resolver(field)
+                resolver.show_field_resolver(field)
 
-            # Button to resolve all conflicts
+            # Button to resolve all conflicts. Undecided fields block it: writing an unconfirmed
+            # default is exactly how staging edits used to get silently reverted.
+            undecided = resolver.fields_undecided
             st.button(
                 "Resolve conflicts",
                 help="Click to resolve the conflicts and update the chart config.",
                 key=f"resolve-conflicts-btn-{self.diff.chart_id}",
                 type="primary",
+                disabled=bool(undecided),
                 on_click=lambda r=resolver: _resolve_conflicts(r),
             )
+            if undecided:
+                st.caption("Choose an environment for: " + ", ".join(f"`{field}`" for field in undecided) + ".")
+
+            # Why the last attempt wrote nothing, if it wrote nothing.
+            resolver.show_error()
+
+            # Recovery path for a failed write: the error message points at this button.
+            if st.session_state.get(f"conflict-write-failed-{self.diff.chart_id}"):
+                st.button(
+                    "Mark as resolved",
+                    key=f"resolve-conflicts-{self.diff.chart_id}",
+                    help="Clear the conflict without writing anything, for when you have already integrated the changes by hand.",
+                    on_click=_mark_as_resolved,
+                )
+
+            st.caption(
+                "This is under development. A field marked *Not present* is missing from that "
+                "environment's config; charts inherit those fields from the indicator's metadata, so "
+                "choosing that side removes the field rather than blanking it."
+            )
         else:
-            st.success(
-                "No conflicts found actually. Unsure why you were prompted with the conflict resolver. Please report."
+            st.info(
+                "Production was edited after this staging server was created, but no config field "
+                "differs between the two. Mark the conflict as resolved to carry on."
+            )
+            st.button(
+                "Mark as resolved",
+                key=f"resolve-conflicts-{self.diff.chart_id}",
+                type="primary",
+                help="Clear the conflict. Neither chart is changed.",
+                on_click=_mark_as_resolved,
             )
 
     def _show_chart_diff_header(self):
@@ -731,7 +775,13 @@ class ChartDiffShow:
         If a conflict is detected (i.e. edits in production), a conflict resolver is shown.
         """
         if self.diff.in_conflict:
-            with st.popover("⚠️ Resolve conflict"):
+            # A popover rather than a dialog on purpose: its content is rendered eagerly, so a
+            # half-made decision survives an accidental click outside, and interacting with a widget
+            # cannot close it. `st.dialog` needs a session-state flag to survive widget interaction at
+            # all, and, with no dismissal callback in Streamlit, a dismissed dialog would reopen on the
+            # next fragment rerun. `width="stretch"` gives the panel the width the side-by-side value
+            # comparison needs, which was the one real advantage a modal had.
+            with st.popover("⚠️ Resolve conflict", width="stretch"):
                 self._show_conflict_resolver()
 
         if self.diff.error:
@@ -790,9 +840,24 @@ class ChartDiffShow:
                 case gm.ChartStatus.PENDING.value:
                     st.toast(f"**Resetting** state for chart {self.diff.chart_id}.", icon=":material/restart_alt:")
 
+    def _show_conflict_resolver_toast(self) -> None:
+        """Show the outcome of a conflict resolution.
+
+        As a toast: it floats, so it pushes no content down, and the outcome of a resolve is not
+        something to keep on screen. `resolve_conflicts` runs as a callback, and the popover it lives
+        in is gone by the time the conflict is resolved, so the message is deferred to session state
+        and drawn here instead (drawing it from the callback duplicates it).
+        """
+        message = st.session_state.pop(f"conflict-toast-{self.diff.chart_id}", None)
+        if message is not None:
+            st.toast(message, icon=":material/merge:")
+
     @st.fragment
     def show(self):
         """Show chart diff."""
+        # Outcome of a conflict resolution (shown even if the diff itself is gone afterwards)
+        self._show_conflict_resolver_toast()
+
         # Chart diff no longer exists (e.g. after a refresh found no differences)
         if st.session_state.pop(f"chart-diff-gone-{self.diff.chart_id}", False):
             st.info(

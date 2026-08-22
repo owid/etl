@@ -545,16 +545,6 @@ def as_valid_json(s):
             return s
 
 
-def as_list(s):
-    """Return `s` as a list if applicable."""
-    if isinstance(s, str):
-        try:
-            return ast.literal_eval(s)
-        except (ValueError, SyntaxError):
-            return s
-    return s
-
-
 @cache
 def is_running_in_streamlit():
     """Check if running in Streamlit."""
