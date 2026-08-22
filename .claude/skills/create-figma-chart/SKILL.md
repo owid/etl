@@ -29,7 +29,7 @@ already loaded.
 
 **In a cloud session the *authenticated* `admin.owid.io` routes are unreachable** — Cloudflare Access
 `302`s them to a login page. That is an app-layer redirect, not the egress gateway, so
-`recentRelayFailures` stays empty while every `/admin/*` call quietly redirects; don't go hunting for
+`recentRelayFailures` stays empty while the call quietly redirects; don't go hunting for
 credentials. Measured from a sandbox: `/api/narrative-chart-map` **works** (it is unauthenticated),
 while `/api/figma/image` and `POST /api/images` are **blocked** — so **Step 9's** 3× PNG export and
 upload move to the user's machine. That export is optional for a full-size chart, but for a **302-wide
@@ -37,8 +37,10 @@ small or pull chart the PNG _is_ the deliverable** — a cloud session can build
 it, so say which at delivery. [cloud-sandbox.md](../../docs/cloud-sandbox.md) has the read-only
 fallbacks for chart config.
 
-Nothing else here is slower in a cloud session: the connector's own latency and concurrency measure
-the same either way. The wall clock goes on the **turn** around each call — see the Round-trip budget.
+Nothing else here is known to be slower in a cloud session: measured there, the connector's latency
+and concurrency match the baseline in the **Round-trip budget** below. That baseline was not taken on
+one machine against the other, so treat "same either way" as unmeasured — what is measured is that the
+wall clock goes on the **turn** around each call, not the connector.
 
 **The single checkpoint rule:** the Charts file is a shared design file other people work in. Nothing is written to it before the user has seen the full proposal (page name, template choice, texts, planned label/annotation edits) and explicitly approved. Reading the file to check conventions needs no permission.
 
