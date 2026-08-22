@@ -26,9 +26,16 @@ For agent sessions running in a Claude Code cloud sandbox
 
 - **OWID hosts require `Full` network access.** Under `Trusted` the gateway
   refuses snapshots, the catalog and Datasette together — a setting to fix, not
-  to work around, so ask the user to switch it. `admin.owid.io` never works:
-  Cloudflare Access rejects non-browser clients. Creating snapshots with `etls`
+  to work around, so ask the user to switch it. Creating snapshots with `etls`
   needs the `R2_*` variables (in 1Password — never scrape credentials elsewhere).
+
+- **On `admin.owid.io`, only the *authenticated* routes fail.** Cloudflare Access
+  `302`s `/admin/*` and authenticated `/api/*` to a login page — an app-layer
+  redirect, so `recentRelayFailures` stays empty and there are no credentials
+  worth hunting for. Routes the app serves unauthenticated do work: measured from
+  a sandbox, `GET /api/narrative-chart-map` returns its full name→uuid map, while
+  `/admin/api/charts/<id>.config.json`, `/api/figma/image` and `POST /api/images`
+  all redirect. Test the specific route before concluding the host is closed.
 
 - **A refused host looks like an auth failure.** WebFetch reports `403 Forbidden`
   and suggests an authenticated tool; `curl` returns `000`. Confirm the cause

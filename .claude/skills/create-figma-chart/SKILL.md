@@ -27,14 +27,15 @@ select:mcp__Figma__use_figma,mcp__Figma__get_screenshot,mcp__Figma__get_metadata
 Add `get_design_context` or `download_assets` when the route needs them; harmless where they are
 already loaded.
 
-**In a cloud session `admin.owid.io` never resolves**, and the refusal arrives as a `403` that reads
-like an auth failure — so discovering it mid-run costs retries plus a credential hunt that could not
-have helped. Two steps reach for it, and
-[cloud-sandbox.md](../../docs/cloud-sandbox.md) has the fallbacks: **Step 1's** narrative-chart-by-name
-map, which the Datasette row in that same table replaces, and **Step 9's** 3× PNG export and upload,
-which move to the user's machine. That export is optional for a full-size chart, but for a **302-wide
+**In a cloud session the *authenticated* `admin.owid.io` routes are unreachable** — Cloudflare Access
+`302`s them to a login page. That is an app-layer redirect, not the egress gateway, so
+`recentRelayFailures` stays empty while every `/admin/*` call quietly redirects; don't go hunting for
+credentials. Measured from a sandbox: `/api/narrative-chart-map` **works** (it is unauthenticated),
+while `/api/figma/image` and `POST /api/images` are **blocked** — so **Step 9's** 3× PNG export and
+upload move to the user's machine. That export is optional for a full-size chart, but for a **302-wide
 small or pull chart the PNG _is_ the deliverable** — a cloud session can build the frame and not ship
-it, so say which at delivery.
+it, so say which at delivery. [cloud-sandbox.md](../../docs/cloud-sandbox.md) has the read-only
+fallbacks for chart config.
 
 Nothing else here is slower in a cloud session: the connector's own latency and concurrency measure
 the same either way. The wall clock goes on the **turn** around each call — see the Round-trip budget.
@@ -187,7 +188,7 @@ Get an SVG URL for the chart, whatever form the reference takes:
 | **Explorer view** | `https://ourworldindata.org/explorers/<slug>.svg?<view params>` — `EXPLORER_DYNAMIC_THUMBNAIL_URL` in `settings/clientSettings.ts`. **Carry the view's full param set:** requested bare it returns an axis and nothing else, at HTTP 200 (2 texts, no series). Verified on the `imType=thumbnail` route; untested for the other `imType`s. |
 | **Bespoke component** (no slug, no `.svg`) | there is no endpoint — render and serialize the component yourself. See [BESPOKE-SVG.md](BESPOKE-SVG.md). |
 | Admin link `/admin/charts/<id>/edit` | **`/admin/charts/<id>.svg` does not exist** (it returns the admin SPA shell). Resolve the chart's `configId` — `SELECT configId FROM charts WHERE id = <id>` on the public Datasette (see the `query-grapher-db` skill), or `GET /admin/api/charts/<id>.config.json` — then use `https://ourworldindata.org/grapher/by-uuid/<configId>.svg`. Works for unpublished drafts too. |
-| Narrative chart (**name**) | name → uuid via the unauthenticated map `https://admin.owid.io/api/narrative-chart-map`, then `https://ourworldindata.org/grapher/by-uuid/<uuid>.svg`. **In a cloud session this host never resolves** — take the Datasette route in the row below instead |
+| Narrative chart (**name**) | name → uuid via the unauthenticated map `https://admin.owid.io/api/narrative-chart-map`, then `https://ourworldindata.org/grapher/by-uuid/<uuid>.svg`. Being unauthenticated, this one route works from a cloud sandbox even though the rest of `admin.owid.io` does not |
 | Narrative chart (**admin link with a numeric id**, `/admin/narrative-charts/<id>/edit`) | **Try the direct lookup first** — `select id, name, chartConfigId from narrative_charts where id = <id>` on the public Datasette hands you the uuid outright (note the column is `chartConfigId`, not `configId`). Only when the id isn't mirrored yet do you need the guessing route below. |
 | … the same, when the id is **newer than the Datasette mirror** | there is no id→uuid endpoint, and the mirror lags production by days (it once stopped at 338 while 341 existed). Diff the live name-keyed map against `select name from narrative_charts` to get the unmirrored names, then order them by uuid — they are **uuidv7, so lexical order is creation order** — and count up from the mirror's highest id. That gives a *candidate*, not an answer: ids have gaps where charts were deleted. **Always render the candidate and have the user confirm it before building.** In practice the **name is a far stronger signal than the id arithmetic** — these are named after the piece they serve (`share-of-women-in-parliament-di`), so an unmirrored name matching the DI's topic, *and* carrying the highest uuid, is near-certain. Note the DI page itself is not a reliable route: an older published DI can have `linkedNarrativeCharts: {}` because it ships a hand-made PNG, so the narrative chart you were handed may be newer than the post. Its embedded JSON is still worth reading for `grapher-url`, `authors` and the body text you need in Step 2. |
 | Description only | find candidates via site search (`https://ourworldindata.org/search?q=...`) or a Datasette title match; show the candidates and confirm before proceeding |
