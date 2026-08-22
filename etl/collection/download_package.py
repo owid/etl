@@ -92,7 +92,14 @@ log = get_logger()
 TIME_COLUMN_CANDIDATES = ("year", "date")
 
 # Tripwire, not a technical limit -- see _check_package_size.
-MAX_PACKAGE_SIZE_BYTES = 10_000_000
+# Raised from 10MB once the first real offender was measured. covid-mdim is 33.5MB
+# zipped, and it is not the pathological case the tripwire was written for: it unions
+# ~101 indicators from every covid topic onto a 262-entity x 2,392-day grid, so a third
+# of its cells are empty but the other two thirds are 20.8M genuine values. No format
+# choice makes that small -- its Parquet is 42MB precisely because nulls are nearly free
+# there and the rest is data. 50MB keeps the guard useful against a runaway while
+# admitting the largest package we actually publish.
+MAX_PACKAGE_SIZE_BYTES = 50_000_000
 
 
 class MixedTimeGranularityError(ValueError):
@@ -201,9 +208,11 @@ def _check_package_size(
     So when it trips, the fix is a judgement call about that collection, and
     the options are roughly:
 
-      * Raise `max_size_bytes` for this one collection, if a multi-MB download
-        is genuinely acceptable for its audience. Cheapest, and more often right
-        than it looks, given the Parquet covers the people who would suffer most.
+      * Raise `max_size_bytes`, if a multi-MB download is genuinely acceptable for
+        that audience. Cheapest, and more often right than it looks. Note the
+        Parquet does not automatically rescue the reader here: on a sparse table it
+        is far smaller than the zip, but on a merely *large* one it is the same
+        order of magnitude, since what it drops is the padding, not the data.
       * No zip for this collection, pointing people at the Parquet and the
         Python catalog library instead, which let them select the columns they
         actually want and skip the padding entirely.
