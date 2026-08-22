@@ -26,9 +26,16 @@ For agent sessions running in a Claude Code cloud sandbox
 
 - **OWID hosts require `Full` network access.** Under `Trusted` the gateway
   refuses snapshots, the catalog and Datasette together — a setting to fix, not
-  to work around, so ask the user to switch it. `admin.owid.io` never works:
-  Cloudflare Access rejects non-browser clients. Creating snapshots with `etls`
+  to work around, so ask the user to switch it. Creating snapshots with `etls`
   needs the `R2_*` variables (in 1Password — never scrape credentials elsewhere).
+
+- **On `admin.owid.io`, only the *authenticated* routes fail.** Cloudflare Access
+  `302`s `/admin/*` and authenticated `/api/*` to a login page — an app-layer
+  redirect, so `recentRelayFailures` stays empty and there are no credentials
+  worth hunting for. Routes the app serves unauthenticated do work: measured from
+  a sandbox, `GET /api/narrative-chart-map` returns its full name→uuid map, while
+  `/admin/api/charts/<id>.config.json`, `/api/figma/image` and `POST /api/images`
+  all redirect. Test the specific route before concluding the host is closed.
 
 - **A refused host looks like an auth failure.** WebFetch reports `403 Forbidden`
   and suggests an authenticated tool; `curl` returns `000`. Confirm the cause
@@ -58,6 +65,19 @@ For agent sessions running in a Claude Code cloud sandbox
   intermittently on long queries. Charts and gdocs are published-only, so an
   empty result usually means a draft — ask the user to paste
   `admin.owid.io/admin/api/charts/<id>.config.json` rather than guessing.
+
+- **MCP connectors are not the reason a session feels slow.** Figma, Slack, Notion
+  and GitHub traffic goes to `mcp-proxy.anthropic.com`, which is in `NO_PROXY` —
+  it never touches the egress proxy, and per-call latency measured here matches
+  the figure the skill already recorded (Figma `get_screenshot`: 7.8–9.9 s, 3.85×
+  faster when six are batched in one message) — no local-vs-sandbox comparison
+  has actually been run, so don't upgrade that to "identical". What *is* slower
+  is the **turn** around each call, a ~12 s median, so a skill making hundreds of
+  MCP calls is won or lost on batching: issue independent calls in one message,
+  4–6 at a time. Two smaller taxes — HTTP GETs to OWID and CDN hosts pay
+  0.6–2.3 s of proxy overhead each (parallelize batches with `xargs -P`), and MCP
+  tool schemas arrive deferred, so load the ones a run needs in a single
+  `ToolSearch` instead of one per turn.
 
 - **After pushing, give the user a deep-linked staging URL** (it takes a while to
   build, especially the first time):
