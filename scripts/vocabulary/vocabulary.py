@@ -233,12 +233,13 @@ What makes this list good is that each term takes the reader somewhere *differen
 
 Do not worry about whether a term is too broad, or too close to the topic's own
 name. That is measured afterwards against the chart list, far more reliably than
-either of us can guess: a term that turns out to reveal most of the topic is set
-aside unless nothing narrower reaches those charts. So offer the obvious central
-terms — "child mortality" on Child & Infant Mortality, "religious" on Religion,
-"female population" on Gender Ratio — including the topic's own name and the bare
-root of it. Withholding them is how a topic ends up with no way to reach the very
-charts it exists for; offering one that turns out too blunt costs nothing.
+either of us can guess: the only term dropped for breadth is one matching nearly
+every chart above, which would narrow nothing. Anything short of that competes on
+what it reveals. So offer the obvious central terms — "child mortality" on Child &
+Infant Mortality, "religious" on Religion, "sex ratio" and "female population" on
+Gender Ratio — including the topic's own name and the bare root of it. Withholding
+them is how a topic ends up with no way to reach the very charts it exists for;
+offering one that turns out too broad costs nothing.
 
 Give a generous list — only a handful are ever shown, and they are picked from
 yours by measuring how much of the chart list above each one actually brings up.
