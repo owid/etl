@@ -1,0 +1,1928 @@
+"""Tests for the Metadata Diff blast-radius logic (pure, no DB).
+
+These cover the key distinction the tool makes: a changed field that comes from the shared
+indicator metadata (propagates to charts / other MDIMs) vs. one that comes from an MDIM-level
+override (contained to the MDIM).
+"""
+
+import re
+
+import pandas as pd
+import pytest
+
+from apps.owidbot.metadata_diff import format_metadata_diff, status_icon
+from apps.wizard.app_pages.metadata_diff.brief import changed_text_lines, decision, garden_location_lines, ship_section
+from apps.wizard.app_pages.metadata_diff.charts_section import _where_line
+from apps.wizard.app_pages.metadata_diff.core import (
+    ChangeGroup,
+    ViewDiff,
+    build_view_bundle,
+    change_group_identity,
+    diff_views,
+    distinct_garden_datasets,
+    distinct_indicator_short_names,
+    group_changes,
+    override_snippet,
+    parse_catalog_path,
+    yaml_field_snippet,
+)
+from apps.wizard.app_pages.metadata_diff.datapage import ordered_slots
+from apps.wizard.app_pages.metadata_diff.discovery import (
+    EXPLORER_EXPORT_KIND,
+    MDIM_EXPORT_KIND,
+    BranchScope,
+    ExplorerChanges,
+    Summary,
+    _config_file_collection_name,
+    _count_fields,
+    _dataset_of,
+    _emitted_collection_names,
+    _export_kind,
+    _export_namespace,
+    charts_reached,
+    compare_explorer_views,
+    compare_indicator_texts,
+    mdim_in_branch,
+    mdim_namespace,
+    mdim_short_name,
+    narrow_to_branch,
+    split_mdim_groups,
+)
+from apps.wizard.app_pages.metadata_diff.mdim_pages import _scope_label
+from apps.wizard.app_pages.metadata_diff.render import render_text_html
+from apps.wizard.app_pages.metadata_diff.review_state import surface_key
+from apps.wizard.app_pages.metadata_diff.usage import _indicator_ids_in_mdim_config
+
+
+def _view(dims, indicators=None, metadata=None):
+    view = {"dimensions": dims}
+    if indicators is not None:
+        view["indicators"] = indicators
+    if metadata is not None:
+        view["metadata"] = metadata
+    return view
+
+
+def _var(id, description_short=None, description_key=None, name="Var"):
+    return {
+        "id": id,
+        "name": name,
+        "titlePublic": None,
+        "descriptionShort": description_short,
+        "descriptionKey": description_key,
+        "descriptionProcessing": None,
+        "descriptionFromProducer": None,
+    }
+
+
+def test_indicator_change_flags_affects_indicator():
+    """When the indicator's own text changes between envs, the field is flagged as shared."""
+    dims = {"metric": "mean"}
+    src = build_view_bundle(_view(dims), None, _var(10, description_short="New text"), None)
+    tgt = build_view_bundle(_view(dims), None, _var(7, description_short="Old text"), None)
+
+    [diff] = diff_views([src], [tgt])
+
+    assert diff.changed
+    assert diff.affects_indicator
+    assert "descriptionShort" in diff.indicator_changed_fields
+    assert diff.indicator_id == 10  # the staging (source) id, used for the blast-radius lookup
+
+
+def test_mdim_override_change_is_not_shared():
+    """A change coming only from an MDIM view override must NOT be flagged as affecting charts."""
+    dims = {"metric": "mean"}
+    var = _var(10, description_short="Indicator text")  # identical indicator in both envs
+    # View-level overrides are stored camelCased in the DB config (descriptionShort, not description_short).
+    src = build_view_bundle(_view(dims, metadata={"descriptionShort": "Override NEW"}), None, var, None)
+    tgt = build_view_bundle(_view(dims, metadata={"descriptionShort": "Override OLD"}), None, var, None)
+
+    [diff] = diff_views([src], [tgt])
+
+    assert diff.changed  # the merged text differs...
+    assert "descriptionShort" in diff.fields
+    assert not diff.affects_indicator  # ...but the indicator itself didn't change
+    assert diff.indicator_changed_fields == set()
+
+
+def test_view_repointed_to_another_indicator_is_not_a_shared_edit():
+    """Replacing a view's indicator is not an edit to the replacement's metadata.
+
+    The two `base` bundles then describe two unrelated indicators, and every field they disagree on
+    would be reported as a shared indicator edit — sending the reviewer to change garden metadata on an
+    indicator nobody touched, and counting every other chart using it as blast radius. The view's own
+    text difference is still reported; only the shared-edit claim is withheld.
+    """
+    dims = {"metric": "mean"}
+    src_var = _var(10, description_short="Deaths from drowning") | {
+        "catalogPath": "grapher/un/2026-08-19/wpp/tbl#deaths"
+    }
+    tgt_var = _var(7, description_short="Population") | {"catalogPath": "grapher/un/2026-08-19/wpp/tbl#population"}
+
+    [diff] = diff_views(
+        [build_view_bundle(_view(dims), None, src_var, None)], [build_view_bundle(_view(dims), None, tgt_var, None)]
+    )
+
+    assert diff.changed  # the view's text really did change...
+    assert "descriptionShort" in diff.fields
+    assert not diff.affects_indicator  # ...but nobody edited `deaths`
+    assert diff.indicator_changed_fields == set()
+
+
+def test_version_bump_is_still_the_same_indicator():
+    """A version bump moves the catalogPath without changing which indicator it is.
+
+    The counterweight to the test above: demanding equal paths would report no indicator-layer change at
+    all for a re-versioned dataset — the update this tool exists to review.
+    """
+    dims = {"metric": "mean"}
+    src_var = _var(10, description_short="New text") | {"catalogPath": "grapher/un/2026-08-19/wpp/tbl#population"}
+    tgt_var = _var(7, description_short="Old text") | {"catalogPath": "grapher/un/2026-05-01/wpp/tbl#population"}
+
+    [diff] = diff_views(
+        [build_view_bundle(_view(dims), None, src_var, None)], [build_view_bundle(_view(dims), None, tgt_var, None)]
+    )
+
+    assert diff.affects_indicator
+    assert "descriptionShort" in diff.indicator_changed_fields
+
+
+def test_chart_field_change_is_never_shared():
+    """Chart title/subtitle/note are MDIM-local and never count as an indicator change."""
+    dims = {"metric": "mean"}
+    var = _var(10, description_short="same")
+    src = build_view_bundle(_view(dims), None, var, {"title": "New chart title"})
+    tgt = build_view_bundle(_view(dims), None, var, {"title": "Old chart title"})
+
+    [diff] = diff_views([src], [tgt])
+
+    assert "chart.title" in diff.fields
+    assert not diff.affects_indicator
+
+
+def test_new_view_does_not_flag_indicator_change():
+    """A brand-new MDIM view does not, by itself, change any indicator's metadata."""
+    dims = {"metric": "mean"}
+    src = build_view_bundle(_view(dims), None, _var(10, description_short="text"), None)
+
+    [diff] = diff_views([src], [])  # no target: view is new
+
+    assert diff.is_new
+    assert not diff.affects_indicator
+
+
+def test_chart_shaped_bundle_diff():
+    """A standalone chart = a single bundle with empty dims: indicator text (shared) + chart FAUST (local)."""
+    src = build_view_bundle(
+        {"dimensions": {}},
+        None,
+        _var(10, description_key=["BER a", "b"]),
+        {"title": "T", "subtitle": "New", "note": "N"},
+    )
+    tgt = build_view_bundle(
+        {"dimensions": {}}, None, _var(7, description_key=["a", "b"]), {"title": "T", "subtitle": "Old", "note": "N"}
+    )
+
+    [d] = diff_views([src], [tgt])
+
+    assert d.changed
+    assert "descriptionKey" in d.fields  # indicator-level change (shared → affects other charts/MDims)
+    assert "chart.subtitle" in d.fields  # chart-config change (local to this chart)
+    assert d.affects_indicator and "descriptionKey" in d.indicator_changed_fields
+    assert "subtitle" not in d.indicator_changed_fields  # chart FAUST is never an indicator change
+    assert d.indicator_id == 10
+
+
+def test_override_snippet_routes_each_field():
+    """The generator emits a real MDim .py override idiom, routing each field to the right container."""
+    v = ViewDiff(dimensions={"decile": "p50", "welfare": "income"}, fields={})
+
+    # descriptionKey (list) -> view.metadata, snake_case key, one bullet per line
+    dk = override_snippet(v, "descriptionKey", ["Bullet one.", "Bullet two."])
+    assert 'if view.matches(decile="p50", welfare="income"):' in dk
+    assert "view.metadata = view.metadata or {}" in dk
+    assert 'view.metadata["description_key"] = [' in dk and '"Bullet one.",' in dk
+
+    # titlePublic -> nested under presentation
+    assert 'setdefault("presentation", {})["title_public"] = "T"' in override_snippet(v, "titlePublic", "T")
+
+    # chart field -> view.config
+    cs = override_snippet(v, "chart.subtitle", "S")
+    assert "view.config = view.config or {}" in cs and 'view.config["subtitle"] = "S"' in cs
+
+
+def test_parse_catalog_path_resolves_garden_file_and_anchor():
+    """The PR brief resolves an indicator catalogPath to (garden dir, table, short_name)."""
+    assert parse_catalog_path("grapher/worldbank_wdi/2026-07-27/wdi/wdi#fp_cpi_totl_zg") == (
+        "etl/steps/data/garden/worldbank_wdi/2026-07-27/wdi",
+        "wdi",
+        "fp_cpi_totl_zg",
+    )
+    # No explicit table segment -> table defaults to the dataset name.
+    assert parse_catalog_path("grapher/ns/2020-01-01/ds#col") == ("etl/steps/data/garden/ns/2020-01-01/ds", "ds", "col")
+    # Unusable inputs return None (brief falls back to a generic hint).
+    assert parse_catalog_path(None) is None
+    assert parse_catalog_path("grapher/ns/2020/ds") is None
+
+
+def test_distinct_indicator_short_names_fingerprints_shared_definition():
+    """A change hitting several indicators is the fingerprint of a shared definition/anchor.
+
+    Different flatten suffixes on the same base name collapse to one; genuinely different base names
+    (gini vs share_top_1) stay distinct, so >1 signals a shared `definitions.*` edit to the PR brief."""
+    # Same indicator, two dimension-flattened columns -> one base short_name.
+    assert distinct_indicator_short_names(
+        {
+            "grapher/wid/2026-06-18/wid/inequality#gini__welfare_type_wealth",
+            "grapher/wid/2026-06-18/wid/inequality#gini",
+        }
+    ) == ["gini"]
+    # Two different indicators sharing the identical text -> the shared-definition fingerprint.
+    assert distinct_indicator_short_names(
+        {
+            "grapher/wid/2026-06-18/wid/inequality#gini__welfare_type_wealth",
+            "grapher/wid/2026-06-18/wid/inequality#share_top_1__welfare_type_wealth",
+        }
+    ) == ["gini", "share_top_1"]
+    assert distinct_indicator_short_names(set()) == []
+
+
+def test_group_changes_collects_catalog_paths_across_indicators():
+    """A shared text change accumulates every indicator's catalogPath, so the brief can detect a
+    shared definition (>1 distinct base short_name) rather than guessing one variable."""
+    shared = {"descriptionKey": {"old": ["a"], "new": ["a", "NEW"]}}
+    v1 = ViewDiff(
+        dimensions={"metric": "gini", "welfare_type": "wealth"},
+        fields=shared,
+        indicator_id=1,
+        catalog_path="grapher/wid/2026-06-18/wid/inequality#gini__welfare_type_wealth",
+        indicator_changed_fields={"descriptionKey"},
+    )
+    v2 = ViewDiff(
+        dimensions={"metric": "share_top_1", "welfare_type": "wealth"},
+        fields=shared,
+        indicator_id=2,
+        catalog_path="grapher/wid/2026-06-18/wid/inequality#share_top_1__welfare_type_wealth",
+        indicator_changed_fields={"descriptionKey"},
+    )
+    (group,) = group_changes([v1, v2])
+    assert distinct_indicator_short_names(group.catalog_paths) == ["gini", "share_top_1"]
+    # Both indicators are collected so the brief can union their blast radius (apply-to-all reaches all).
+    assert group.indicator_ids == {1, 2}
+
+
+def test_yaml_field_snippet_is_pastable():
+    """The snippet uses the snake_case metadata key and renders lists as YAML bullets."""
+    assert yaml_field_snippet("descriptionShort", "Annual inflation.") == "description_short: Annual inflation."
+    dk = yaml_field_snippet("descriptionKey", ["One.", "Two."])
+    assert dk.splitlines()[0] == "description_key:"
+    assert "- One." in dk and "- Two." in dk
+
+
+def test_group_changes_collapses_shared_text_and_ranks_by_reach():
+    """The review unit: identical changes across views collapse to one group, ranked by reach."""
+    shared = {"descriptionKey": {"old": ["a"], "new": ["a", "NEW"]}}
+    v1 = ViewDiff(
+        dimensions={"m": "mean", "w": "income"},
+        fields=shared,
+        indicator_id=10,
+        indicator_changed_fields={"descriptionKey"},
+    )
+    v2 = ViewDiff(
+        dimensions={"m": "mean", "w": "consumption"},
+        fields=shared,
+        indicator_id=10,
+        indicator_changed_fields={"descriptionKey"},
+    )
+    v3 = ViewDiff(
+        dimensions={"m": "median", "w": "income"}, fields={"descriptionShort": {"old": "x", "new": "y"}}
+    )  # override
+
+    groups = group_changes([v1, v2, v3])
+
+    assert len(groups) == 2  # the two identical shared changes collapse into one
+    top = groups[0]  # ranked by reach: the 2-view group first
+    assert top.field == "descriptionKey" and len(top.view_dims) == 2
+    assert top.affects_indicator and top.indicator_id == 10
+    assert groups[1].field == "descriptionShort" and not groups[1].affects_indicator
+
+
+def test_change_group_identity_is_content_bound():
+    """Lock-in: same slot keeps its change_key, but any text edit changes content_hash (→ stale)."""
+    base = dict(dimensions={"m": "mean"}, indicator_id=10, indicator_changed_fields={"descriptionKey"})
+    [g1] = group_changes([ViewDiff(fields={"descriptionKey": {"old": ["a"], "new": ["a", "NEW"]}}, **base)])
+    [g2] = group_changes([ViewDiff(fields={"descriptionKey": {"old": ["a"], "new": ["a", "NEW"]}}, **base)])
+    [g3] = group_changes([ViewDiff(fields={"descriptionKey": {"old": ["a"], "new": ["a", "EDITED"]}}, **base)])
+
+    k1, h1 = change_group_identity("grapher/x/mdim", g1)
+    k2, h2 = change_group_identity("grapher/x/mdim", g2)
+    k3, h3 = change_group_identity("grapher/x/mdim", g3)
+
+    assert (k1, h1) == (k2, h2)  # identical change → identical identity (approval persists)
+    assert k3 == k1 and h3 != h1  # edited text → same slot key, new hash → stored approval goes stale
+
+
+def test_indicator_ids_in_mdim_config_scans_all_axes():
+    config = {
+        "views": [
+            {"indicators": {"y": [{"id": 1}, {"id": 2}], "x": [3], "color": [{"id": 4}]}},
+            {"indicators": {"y": [2, {"id": 5}]}},
+            {"indicators": {}},
+            {},
+        ]
+    }
+    assert _indicator_ids_in_mdim_config(config) == {1, 2, 3, 4, 5}
+
+
+# --- Discovery: what did this branch change? -----------------------------------------------------
+
+
+def _row(path="grapher/ns/2026-01-01/ds/tb#v", id=1, short="s", key=None, name="V"):
+    """A `variables` row as the DB hands it back."""
+    return {
+        "id": id,
+        "name": name,
+        "catalogPath": path,
+        "titlePublic": None,
+        "descriptionShort": short,
+        "descriptionKey": key,
+        "descriptionProcessing": None,
+        "descriptionFromProducer": None,
+    }
+
+
+def test_indicator_comparison_is_keyed_by_catalog_path():
+    """Matching indicators by id would report a whole version-bumped dataset as changed.
+
+    A grapher step bumped to a new version mints fresh variable ids on staging, so the ids simply do not
+    exist in the baseline. catalogPath is the identifier that survives, and a differing id behind the
+    same path is not a change to any text a reader sees.
+    """
+    path = "grapher/ns/2026-01-01/ds/tb#v"
+    source = {path: _row(id=9999, short="Same text.")}
+    target = {path: _row(id=1, short="Same text.")}
+    assert compare_indicator_texts(source, target).diffs == {}
+    # The staging id is still recorded — it is what the blast-radius lookup needs.
+    assert compare_indicator_texts(source, target).ids == {path: 9999}
+
+    changed = compare_indicator_texts({path: _row(short="New text.")}, {path: _row(short="Old text.")})
+    assert list(changed.diffs) == [path]
+    assert changed.diffs[path].fields["descriptionShort"] == {"old": "Old text.", "new": "New text."}
+    assert changed.diffs[path].catalog_path == path
+
+
+def test_indicator_comparison_ignores_empty_variants_and_flags_new():
+    """NULL / NaN / "" / whitespace are the same absence of text; a path absent from the baseline is new."""
+    path = "grapher/ns/2026-01-01/ds/tb#v"
+    source = {path: _row(short=None)}
+    assert compare_indicator_texts(source, {path: _row(short=float("nan"))}).diffs == {}
+    assert compare_indicator_texts(source, {path: _row(short="   ")}).diffs == {}
+
+    result = compare_indicator_texts(source, {})
+    assert result.new_paths == {path}
+    # A new indicator has no old text to diff, so it is not reported as a text change.
+    assert result.diffs == {}
+
+
+def test_narrow_to_branch_keeps_only_this_branch_datasets():
+    """Without narrowing, a branch lagging master reports master's edits as its own."""
+    paths = [
+        "grapher/mine/2026-01-01/ds/tb#a",
+        "grapher/theirs/2026-01-01/ds/tb#b",
+    ]
+    narrowed, applied = narrow_to_branch(paths, ["grapher/mine/2026-01-01/ds"])
+    assert narrowed == ["grapher/mine/2026-01-01/ds/tb#a"]
+    assert applied is True
+
+    # git unavailable: keep everything, but say so, so the UI can warn instead of quietly over-reporting.
+    unnarrowed, applied = narrow_to_branch(paths, None)
+    assert unnarrowed == paths
+    assert applied is False
+
+
+def _explorer_row(dims, title="T", subtitle="S", note=None):
+    return {"dimensions": dims, "title": title, "subtitle": subtitle, "note": note}
+
+
+def test_explorer_views_compared_per_view_id():
+    """Explorer views are matched on (slug, viewId) — the key that is stable across environments."""
+    source = {
+        ("co2", "v1"): _explorer_row({"Metric": "Total"}, title="New title"),
+        ("co2", "v2"): _explorer_row({"Metric": "Per capita"}),
+    }
+    target = {
+        ("co2", "v1"): _explorer_row({"Metric": "Total"}, title="Old title"),
+        ("co2", "v2"): _explorer_row({"Metric": "Per capita"}),
+    }
+    changed = compare_explorer_views(source, target)
+    # Only the view whose text moved is reported; the identical one is not.
+    assert list(changed) == ["co2"]
+    assert len(changed["co2"]) == 1
+    assert changed["co2"][0].fields["chart.title"] == {"old": "Old title", "new": "New title"}
+    assert changed["co2"][0].dimensions == {"Metric": "Total"}
+
+
+def test_explorer_view_missing_in_baseline_is_new():
+    source = {("co2", "v1"): _explorer_row({"Metric": "Total"})}
+    changed = compare_explorer_views(source, {})
+    assert changed["co2"][0].is_new is True
+
+
+def test_summary_field_counts_group_identical_changes():
+    """The owidbot line counts *distinct* changes, so one reworded bullet on 50 indicators counts once."""
+    diffs = [
+        ViewDiff(dimensions={"d": "a"}, fields={"descriptionKey": {"old": ["x"], "new": ["y"]}}),
+        ViewDiff(dimensions={"d": "b"}, fields={"descriptionKey": {"old": ["x"], "new": ["y"]}}),
+        ViewDiff(dimensions={"d": "c"}, fields={"chart.subtitle": {"old": "p", "new": "q"}}),
+    ]
+    counts: dict[str, int] = {}
+    _count_fields(counts, diffs)
+    assert counts == {"WYSK": 1, "Chart subtitle": 1}
+
+
+# --- Data-page layout (Ed's review-view request) --------------------------------------------------
+
+
+def test_ordered_slots_follow_the_data_page():
+    """Fields are shown where the reader meets them, not in field-name order."""
+    slots = ordered_slots({"descriptionKey", "titlePublic"})
+    labels = [s.label for s in slots]
+    assert labels.index("Title") < labels.index("What you should know about this data")
+    # The footnote sits under the chart; everything above it is above the chart.
+    assert [s.region for s in slots if s.label == "Footnote"] == ["under"]
+    changed = {s.label for s in slots if s.changed}
+    assert changed == {"Title", "What you should know about this data"}
+
+    # Only-changed mode drops the placeholders for untouched slots.
+    assert all(s.changed for s in ordered_slots({"titlePublic"}, include_unchanged=False))
+
+
+def test_ordered_slots_keep_an_unplaced_field_visible():
+    """A field with no slot yet must still be rendered — dropping a change is the one unacceptable bug."""
+    slots = ordered_slots({"someNewField"})
+    assert [s.label for s in slots if s.changed] == ["someNewField"]
+
+
+# --- Reviewed/unreviewed bookkeeping --------------------------------------------------------------
+
+
+def test_list_review_surfaces_cannot_collide_with_sign_off():
+    """A list tick and an Approve/Flag sign-off must never write the same row.
+
+    The Review page keys sign-off on the bare catalogPath (MDims) or `chart:<slug>`; the list toggles are
+    namespaced under `list:`, so the two stay independent even for the same change.
+    """
+    assert surface_key("mdim", "grapher/ns/latest/ds") == "list:mdim:grapher/ns/latest/ds"
+    assert surface_key("chart", "daily-mean-income") != "chart:daily-mean-income"
+    assert surface_key("explorer", "co2").startswith("list:")
+
+
+def test_review_mark_is_bound_to_the_text():
+    """Editing the text again in the same PR must reopen the change — a tick is never carried over."""
+    group = ChangeGroup(field="descriptionKey", old=["a"], new=["b"], view_dims=[{"d": "x"}])
+    surface = surface_key("mdim", "grapher/ns/latest/ds")
+    change_key, content_hash = change_group_identity(surface, group)
+
+    edited = ChangeGroup(field="descriptionKey", old=["a"], new=["c"], view_dims=[{"d": "x"}])
+    edited_key, edited_hash = change_group_identity(surface, edited)
+    # Same slot (so the stored row is found), different content (so it reads as stale).
+    assert edited_key == change_key
+    assert edited_hash != content_hash
+
+
+# --- PR brief routing ------------------------------------------------------------------------------
+
+
+def test_brief_decision_routes_from_resolved_rows():
+    """The brief builders are pure now: the decision comes in on the row, not out of session state."""
+    assert decision({"stale": False, "label": "✅ Approve", "seed_label": "⏳ Pending"}) == "approved"
+    assert decision({"stale": False, "label": "🚩 Flag", "seed_label": "⏳ Pending"}) == "flagged"
+    assert decision({"stale": False, "label": None, "seed_label": "⏳ Pending"}) == "pending"
+    # A change edited since it was reviewed is never treated as approved.
+    assert decision({"stale": True, "label": "✅ Approve", "seed_label": "✅ Approve"}) == "stale"
+
+
+# --- Attribution: this branch's change, or the baseline moving on? --------------------------------
+
+
+def test_branch_scope_separates_data_steps_from_export_recipes():
+    """`export://` URIs identify a changed MDim/explorer recipe; everything else is a dataset path."""
+    scope = BranchScope(
+        dataset_paths={"garden/wid/2026-06-18/world_inequality_database"},
+        export_products={(MDIM_EXPORT_KIND, "incomes_wid")},
+    )
+    assert scope.covers_indicator("grapher/wid/2026-06-18/world_inequality_database/tb#share_top_1")
+    assert not scope.covers_indicator("grapher/wb/2026-06-26/world_bank_pip/tb#gini")
+    assert scope.covers_export(MDIM_EXPORT_KIND, "incomes_wid")
+    assert not scope.covers_export(MDIM_EXPORT_KIND, "poverty_pip")
+
+
+def test_export_scope_is_per_kind_not_per_name():
+    """A recipe name is only unique within its export kind, and `migration_flows` exists in both.
+
+    `export/multidim/migration/latest/migration_flows.py` and
+    `export/explorers/migration/latest/migration_flows.py` both exist, so a name-only scope would let an
+    edit to the MDim recipe vouch for every differing view of the unrelated explorer.
+    """
+    assert _export_kind("export://multidim/migration/latest/migration_flows") == MDIM_EXPORT_KIND
+    assert _export_kind("export://explorers/migration/latest/migration_flows") == EXPLORER_EXPORT_KIND
+
+    scope = BranchScope(export_products={(MDIM_EXPORT_KIND, "migration_flows")})
+    assert scope.covers_export(MDIM_EXPORT_KIND, "migration_flows")
+    assert not scope.covers_export(EXPLORER_EXPORT_KIND, "migration_flows")
+
+
+def test_mdim_short_name_from_catalog_path():
+    assert mdim_short_name("grapher/wid/latest/incomes_wid#incomes_wid") == "incomes_wid"
+    assert mdim_short_name("wid/latest/incomes_wid") == "incomes_wid"
+
+
+def test_split_mdim_groups_keeps_config_changes_only_for_our_own_recipe():
+    """An MDim we touched is not a licence to attribute *everything* in it to this PR.
+
+    Its view configs are rewritten whenever master rebuilds it, so on an older staging server they differ
+    wholesale. Unless the branch changed the MDim's recipe, only indicator-layer changes are ours.
+    """
+    indicator_change = ViewDiff(
+        dimensions={"d": "a"},
+        fields={"descriptionKey": {"old": ["x"], "new": ["y"]}},
+        indicator_changed_fields={"descriptionKey"},
+    )
+    config_change = ViewDiff(dimensions={"d": "b"}, fields={"chart.title": {"old": "p", "new": "q"}})
+
+    scope = BranchScope(dataset_paths=set(), export_products=set())
+    ours, other = split_mdim_groups("grapher/ns/latest/mine#mine", [indicator_change, config_change], scope)
+    assert [g.field for g in ours] == ["descriptionKey"]
+    assert [g.field for g in other] == ["chart.title"]
+
+    # When the branch edits the MDim's own recipe, its config-level edits are exactly the point.
+    scope_with_recipe = BranchScope(dataset_paths=set(), export_products={(MDIM_EXPORT_KIND, "mine")})
+    ours, other = split_mdim_groups("grapher/ns/latest/mine#mine", [indicator_change, config_change], scope_with_recipe)
+    assert {g.field for g in ours} == {"descriptionKey", "chart.title"}
+    assert other == []
+
+
+def test_split_mdim_groups_reports_everything_when_git_is_unavailable():
+    """No narrowing signal means no attribution — show it all rather than guess it away."""
+    config_change = ViewDiff(dimensions={"d": "b"}, fields={"chart.title": {"old": "p", "new": "q"}})
+    ours, other = split_mdim_groups("grapher/ns/latest/mine#mine", [config_change], BranchScope(available=False))
+    assert len(ours) == 1
+    assert other == []
+
+
+def test_explorer_changes_split_branch_from_lag():
+    """The section shows this branch's explorers; the rest stay visible but separate."""
+    changes = ExplorerChanges(
+        views={"mine": [ViewDiff(dimensions={})], "theirs": [ViewDiff(dimensions={})]},
+        in_branch={"mine"},
+    )
+    assert list(changes.branch_views()) == ["mine"]
+    assert list(changes.other_views()) == ["theirs"]
+
+    # Without narrowing, nothing is claimed as lag.
+    unnarrowed = ExplorerChanges(views={"a": [ViewDiff(dimensions={})]}, in_branch=set(), narrowed=False)
+    assert list(unnarrowed.branch_views()) == ["a"]
+    assert unnarrowed.other_views() == {}
+
+
+def test_export_recipe_scope_reads_the_name_it_publishes():
+    """A recipe's file name is not always the collection it publishes, and the slug is what we match on.
+
+    `explorers/emissions/latest/ipcc_scenarios.py` publishes `ipcc-scenarios`; `multidim/un/latest/
+    un_wpp.py` publishes `population-and-demography`. Matching the file name alone would file a recipe
+    edit of either as baseline lag and drop it from the review.
+    """
+    assert _emitted_collection_names(
+        'explorer = paths.create_collection(config=config, short_name="ipcc-scenarios", explorer=True)'
+    ) == {"ipcc-scenarios"}
+    assert _emitted_collection_names('    collection_name="population-and-demography",') == {
+        "population-and-demography"
+    }
+    # A recipe that names nothing publishes under its own file name, which is matched anyway.
+    assert _emitted_collection_names("c = paths.create_collection(config=config)") == set()
+
+    # The resolved names are what `covers_export` is asked about — either spelling has to answer yes.
+    scope = BranchScope(
+        dataset_paths=set(),
+        export_products={
+            (EXPLORER_EXPORT_KIND, "ipcc_scenarios"),
+            (EXPLORER_EXPORT_KIND, "ipcc-scenarios"),
+        },
+    )
+    assert scope.covers_export(EXPLORER_EXPORT_KIND, "ipcc-scenarios")
+    assert scope.covers_export(EXPLORER_EXPORT_KIND, "ipcc_scenarios")
+
+
+def test_multi_collection_recipe_names_come_from_its_config_files():
+    """A recipe publishing several collections derives their names, so no literal is there to read.
+
+    `multidim/covid/latest/covid.py` builds one collection per `covid.<key>.yml` companion file, naming
+    each after the file. Without that, an edit to one of those configs would look like baseline lag.
+    """
+    assert _config_file_collection_name("covid.cases.yml") == "covid_cases"
+    assert _config_file_collection_name("covid.xm_models.yml") == "covid_xm_models"
+    # `.config.yml` companions carry the same meaning without the marker segment.
+    assert _config_file_collection_name("democracy.eiu.config.yml") == "democracy_eiu"
+
+
+def test_reach_counts_every_chart_that_can_reach_the_text():
+    """A multi-indicator chart has no data page, but its readers can still reach the text.
+
+    "Learn more about this data" opens the sources drawer, where each indicator's own description, WYSK and
+    notes are listed. An earlier version of this counted those charts out of every reach number, which
+    understated the audience of a WYSK edit on precisely the charts whose readers have to go looking.
+    """
+    usage = {7: [{"chartId": 1, "has_data_page": True}, {"chartId": 2, "has_data_page": False}]}
+    wysk = ChangeGroup(field="descriptionKey", old=["a"], new=["b"], indicator_ids={7})
+    assert charts_reached([wysk], usage) == {1, 2}
+
+    title = ChangeGroup(field="titlePublic", old="Old", new="New", indicator_ids={7})
+    assert charts_reached([title], usage) == {1, 2}
+
+
+def test_one_change_reports_one_reach_everywhere():
+    """The Charts section, the MDim card, the scope label and the PR brief read the same usage.
+
+    They have to agree, or the identical change reports a different audience depending on which page you
+    opened — which is what happened while some of them filtered by "has a data page" and others did not.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import affected_charts
+
+    usage = {
+        7: {
+            "charts": [
+                {"chartId": 1, "slug": "a", "has_data_page": True},
+                {"chartId": 2, "slug": "b", "has_data_page": False},
+            ],
+            "mdims": [],
+        }
+    }
+    wysk = ChangeGroup(field="descriptionKey", old=["a"], new=["b"], affects_indicator=True, indicator_ids={7})
+    assert [c["chartId"] for c in affected_charts(wysk, usage)] == [1, 2]
+    # The scope consequence — "N charts also use this indicator, all will change" — counts the same way.
+    assert "2 charts" in _scope_label("all", wysk, usage)
+
+
+def test_an_empty_diff_is_not_all_clear_when_indicators_are_new():
+    """A version bump replaces every catalog path, so the comparison is empty and nothing is reviewed.
+
+    Green there would wave through a whole dataset's worth of reader-facing text — the same trap
+    `Summary.has_changes` closes for the page as a whole.
+    """
+    from apps.wizard.app_pages.metadata_diff.charts_section import _empty_diff_notice
+    from apps.wizard.app_pages.metadata_diff.discovery import IndicatorChanges
+
+    all_clear, message = _empty_diff_notice(IndicatorChanges())
+    assert all_clear and "No indicator text changes" in message
+
+    all_clear, message = _empty_diff_notice(IndicatorChanges(new_paths={"grapher/ns/v/d/t#a", "grapher/ns/v/d/t#b"}))
+    assert not all_clear
+    assert "2 indicators unreviewed" in message
+
+
+def test_only_the_json_backed_field_is_json_decoded():
+    """Every field but WYSK is plain text; decoding one that happens to be valid JSON rewrites it."""
+    row = {
+        "id": 1,
+        "name": "Internal name",
+        "titlePublic": "false",
+        "descriptionShort": "null",
+        "descriptionKey": '["a", "b"]',
+        "descriptionProcessing": None,
+        "descriptionFromProducer": None,
+    }
+    bundle = build_view_bundle({"dimensions": {}}, None, row, None)
+
+    # Decoded, these became the boolean False (so the internal name replaced it) and None.
+    assert bundle.metadata["titlePublic"] == "false"
+    assert bundle.metadata["descriptionShort"] == "null"
+    # The one JSON column is still decoded, or every WYSK diff would compare raw JSON strings.
+    assert bundle.metadata["descriptionKey"] == ["a", "b"]
+
+
+def test_scope_label_reads_every_indicator_in_the_group():
+    """A shared definition renders into many indicators; the scope decision must see all of their charts.
+
+    Reading only the group's first indicator can say "nothing else changes" while a second indicator in
+    the same group is on charts that do change — the one claim a scope decision must not get wrong.
+    """
+    usage = {
+        1: {"charts": [], "mdims": []},
+        2: {"charts": [{"chartId": 9, "slug": "s"}], "mdims": []},
+    }
+    g = ChangeGroup(
+        field="descriptionShort", old="a", new="b", affects_indicator=True, indicator_id=1, indicator_ids={1, 2}
+    )
+    label = _scope_label("all", g, usage)
+    assert "nothing else changes" not in label
+    assert "1 chart" in label
+
+
+def test_group_spanning_two_datasets_names_both_files_and_rebuilds():
+    """One group can span two garden datasets: it is keyed on the text, and identical edits collapse.
+
+    Naming only the first dataset would send the author to fix half the change, and leave the second
+    dataset unbuilt on staging.
+    """
+    paths = {
+        "grapher/ns_a/2026-01-01/ds_a/ds_a#gdp",
+        "grapher/ns_b/2026-01-01/ds_b/ds_b#gdp",
+    }
+    assert distinct_garden_datasets(paths) == [
+        "etl/steps/data/garden/ns_a/2026-01-01/ds_a",
+        "etl/steps/data/garden/ns_b/2026-01-01/ds_b",
+    ]
+
+    g = ChangeGroup(
+        field="descriptionShort",
+        old="a",
+        new="b",
+        affects_indicator=True,
+        catalog_path=sorted(paths)[0],
+        catalog_paths=paths,
+    )
+    where = "\n".join(garden_location_lines(g, "2 charts"))
+    assert "ds_a.meta.yml" in where and "ds_b.meta.yml" in where
+    # Two files cannot share a `definitions.*` block, so that claim must not be made here.
+    assert "shared definition" not in where
+
+    ship = "\n".join(ship_section([g], "production"))
+    assert "garden/ns_a/2026-01-01/ds_a" in ship and "garden/ns_b/2026-01-01/ds_b" in ship
+
+    # The Charts section's "where to edit" caption says the same thing.
+    where_caption = _where_line(g)
+    assert "2 separate garden datasets" in where_caption
+    assert "ds_a.meta.yml" in where_caption and "ds_b.meta.yml" in where_caption
+
+
+def test_reordered_wysk_bullets_are_shown_not_hidden():
+    """A reorder edits no bullet, so a membership filter finds nothing while the lists genuinely differ.
+
+    Rendering "(no changes here)" for a change the tool itself detected lets a reviewer sign off without
+    ever seeing what moved, so a reorder falls through to the full, positional list.
+    """
+    old, new = ["alpha", "beta", "gamma"], ["gamma", "alpha", "beta"]
+
+    def _bullets(html: str) -> list[str]:
+        return [re.sub(r"<[^>]+>", "", li.split("</li>")[0]) for li in html.split("<li>")[1:]]
+
+    # Each side shows its own full order, so what moved is visible on both.
+    assert _bullets(render_text_html(new, old, side="new", changed_only=True)) == new
+    assert _bullets(render_text_html(old, new, side="old", changed_only=True)) == old
+
+    # A genuine no-op still says so, rather than printing the whole list for nothing.
+    assert "(no changes here)" in render_text_html(["a", "b"], ["a", "b"], side="new", changed_only=True)
+
+    # The brief has to hand the executor an instruction too, not an empty diff block.
+    g = ChangeGroup(field="descriptionKey", old=old, new=new)
+    lines = "\n".join(changed_text_lines(g))
+    assert "reordered" in lines
+    assert "- alpha\n- beta\n- gamma" in lines and "+ gamma\n+ alpha\n+ beta" in lines
+
+
+def test_new_mdim_needs_a_branch_signal_too():
+    """Absent from the baseline is not by itself this branch's work.
+
+    A staging server materializes master's rebuilds as well, so an MDim master added after the baseline
+    was published shows up here untouched by this PR. It needs the same recipe signal a config change
+    needs — and either way it stays in `has_changes`, so nothing is dropped from the page.
+    """
+    df = pd.DataFrame(
+        {
+            "catalogPath": ["grapher/ns/latest/mine#mine", "grapher/ns/latest/theirs#theirs"],
+            "is_new": [True, True],
+            "config_changed": [False, False],
+            "indicator_changed": [False, False],
+        }
+    )
+    scope = BranchScope(export_products={(MDIM_EXPORT_KIND, "mine")})
+    own_recipe = df["catalogPath"].map(lambda cp: scope.covers_export(MDIM_EXPORT_KIND, mdim_short_name(str(cp))))
+    assert list(mdim_in_branch(df, own_recipe)) == [True, False]
+
+    # An indicator-layer change is already branch-narrowed, so it stands on its own.
+    df["indicator_changed"] = [False, True]
+    assert list(mdim_in_branch(df, own_recipe)) == [True, True]
+
+
+def test_explorer_attribution_is_per_view_not_per_slug():
+    """One qualifying view must not vouch for the rest of a lagging explorer's views.
+
+    A master rebuild moves every view of an explorer. If a single view of it renders an indicator this
+    branch edited, only that view is this branch's — the others are lag, and are reported as such.
+    """
+    ours, lag = ViewDiff(dimensions={"v": "1"}), ViewDiff(dimensions={"v": "2"})
+    changes = ExplorerChanges(
+        views={"mixed": [ours, lag]},
+        in_branch={"mixed"},
+        branch_view_diffs={"mixed": [ours]},
+        other_view_diffs={"mixed": [lag]},
+    )
+    assert changes.branch_views() == {"mixed": [ours]}
+    assert changes.other_views() == {"mixed": [lag]}
+
+
+def test_summary_counts_new_indicators_as_something_to_review():
+    """A version bump gives every indicator a fresh catalog path, so nothing has a baseline to diff."""
+    assert not Summary().has_changes
+    assert Summary(n_new_indicators=3).has_changes
+    assert status_icon(Summary(n_new_indicators=3)) == "✏️"
+    # ... and the report says so, instead of returning "No metadata text changes." before that line.
+    assert "New indicators: 3" in format_metadata_diff(Summary(n_new_indicators=3))
+
+
+def test_dataset_of_indicator_path_matches_datasets_table():
+    """`datasets.catalogPath` has no channel prefix and stops at the dataset."""
+    assert _dataset_of("grapher/wid/2026-06-18/world_inequality_database/tb#share_top_1") == (
+        "wid/2026-06-18/world_inequality_database"
+    )
+    assert _dataset_of("garden/wb/2026-06-26/world_bank_pip/poverty#headcount") == "wb/2026-06-26/world_bank_pip"
+
+
+def test_candidate_selection_needs_both_git_scope_and_a_rebuild_here():
+    """Attribution needs both signals; either alone credits other people's work to this branch.
+
+    A changed file expands into its whole downstream subgraph, so the git scope is far wider than what the
+    branch touched — measured on a one-line metadata edit: 118 datasets in scope, 9 actually rebuilt on
+    the server. Attributing on scope alone put 526 differences from an unrelated data page in this
+    branch's list. "Rebuilt here" alone is not enough either: an automatic job can refresh a dataset on
+    this server without the branch asking for it.
+    """
+    from apps.wizard.app_pages.metadata_diff.discovery import BranchScope, select_candidates
+
+    ours = "grapher/wb/2026-06-26/world_bank_pip/poverty#headcount"
+    downstream = "grapher/un/2026-01-01/un_wpp/tb#population"  # in scope via the DAG, never rebuilt here
+    automatic = "grapher/covid/latest/cases/tb#cases"  # rebuilt here by a job, not in this branch's scope
+
+    scope = BranchScope(
+        dataset_paths={"garden/wb/2026-06-26/world_bank_pip", "garden/un/2026-01-01/un_wpp"},
+        export_products=set(),
+    )
+    built = {"wb/2026-06-26/world_bank_pip", "covid/latest/cases"}
+
+    selected, narrowed = select_candidates([ours, downstream, automatic], scope, built)
+    assert selected == [ours]
+    assert narrowed is True
+
+
+def test_candidate_selection_without_git_still_requires_a_rebuild_here():
+    """With no git signal the scope filter is skipped, but "rebuilt here" still applies."""
+    from apps.wizard.app_pages.metadata_diff.discovery import BranchScope, select_candidates
+
+    ours = "grapher/wb/2026-06-26/world_bank_pip/poverty#headcount"
+    theirs = "grapher/un/2026-01-01/un_wpp/tb#population"
+    selected, narrowed = select_candidates(
+        [ours, theirs], BranchScope(available=False), {"wb/2026-06-26/world_bank_pip"}
+    )
+    assert selected == [ours]
+    # False so the UI can say the list is not narrowed to the branch.
+    assert narrowed is False
+
+
+# --- Where a difference came from -----------------------------------------------------------------
+
+
+def test_origins_call_a_change_ours_only_when_master_does_not_have_it():
+    """The verdict is per text, so a real change is no longer hedged just because master touched the dataset.
+
+    The previous rule was dataset-level: "this server rebuilt it AND master edited it" meant every change
+    in that dataset got a warning. On a normal branch that is most of them — it fired on all ten changes
+    of a PR whose ten changes were all its own. Comparing against master's own server answers it directly.
+    """
+    from apps.wizard.app_pages.metadata_diff.discovery import MASTER, OURS, classify_origins
+
+    mine = "grapher/wb/2026-06-26/world_bank_pip/poverty#headcount"
+    theirs = "grapher/wb/2026-06-26/world_bank_pip/poverty#headcount_ratio"
+
+    origins = classify_origins([mine, theirs], identical_to_master={theirs}, stale={}, master_checked=True)
+    assert origins[mine] == OURS
+    assert origins[theirs] == MASTER
+
+
+def test_origins_are_unknown_when_master_cannot_be_reached():
+    """No master server is a reason to say so, not to guess — and never to claim the change is ours."""
+    from apps.wizard.app_pages.metadata_diff.discovery import UNKNOWN, classify_origins
+
+    path = "grapher/wb/2026-06-26/world_bank_pip/poverty#headcount"
+    assert classify_origins([path], set(), {}, master_checked=False) == {path: UNKNOWN}
+
+
+def test_a_stale_dataset_outranks_every_other_verdict():
+    """A stale build inverts the diff, so nothing else about that change is worth acting on first."""
+    from apps.wizard.app_pages.metadata_diff.discovery import STALE, classify_origins
+
+    path = "grapher/wid/2026-06-18/world_inequality_database/tb#share_top_1"
+    stale = {"wid/2026-06-18/world_inequality_database": ("2026-08-05", "2026-08-17")}
+    # Identical to master AND stale: still STALE, because the rebuild has to happen before the rest means anything.
+    origins = classify_origins([path], identical_to_master={path}, stale=stale, master_checked=True)
+    assert origins[path] == STALE
+
+
+def test_stale_datasets_are_those_this_server_built_earlier_than_the_baseline(monkeypatch):
+    """Only "we are behind" counts — being ahead is the normal state of a branch that changed something.
+
+    And only for a dataset this server actually rebuilt. One it never rebuilt is older here for the
+    ordinary reason (the baseline moved on after the fork), which no rebuild of ours fixes — counting it
+    would flag most long-lived servers as broken.
+    """
+    from datetime import datetime
+
+    from apps.wizard.app_pages.metadata_diff import discovery
+
+    created = datetime(2026, 8, 5, 9, 0)
+    behind = datetime(2026, 8, 5, 13, 54)
+    ahead = datetime(2026, 8, 19, 9, 29)
+    baseline = datetime(2026, 8, 17, 18, 2)
+    never_built_here = datetime(2026, 7, 1, 10, 0)  # predates the fork: cloned from the baseline, untouched
+
+    times = {
+        "here": {
+            "ns/v/stale": behind,
+            "ns/v/ours": ahead,
+            "ns/v/same": baseline,
+            "ns/v/only_here": ahead,
+            "ns/v/untouched": never_built_here,
+        },
+        "there": {
+            "ns/v/stale": baseline,
+            "ns/v/ours": baseline,
+            "ns/v/same": baseline,
+            "ns/v/untouched": baseline,  # the baseline rebuilt it after the fork — not our staleness
+        },
+    }
+    monkeypatch.setattr(discovery, "dataset_edit_times", lambda engine: times[engine])
+    monkeypatch.setattr(discovery, "_staging_creation_time", lambda engine: created)
+
+    stale = discovery.stale_datasets("here", "there")
+    assert set(stale) == {"ns/v/stale"}
+    assert stale["ns/v/stale"] == (behind, baseline)
+
+
+def test_owidbot_leads_with_a_stale_server_and_flags_it_in_the_icon():
+    """A stale server makes every count below it untrustworthy, so it cannot be a footnote."""
+    from apps.owidbot.metadata_diff import format_metadata_diff, status_icon
+    from apps.wizard.app_pages.metadata_diff.discovery import Summary
+
+    clean = Summary(n_charts=3, n_indicators=2, fields={"WYSK": 1})
+    assert status_icon(clean) == "✏️"
+    assert "behind on" not in format_metadata_diff(clean)
+
+    stale = Summary(
+        n_charts=3,
+        n_indicators=2,
+        fields={"WYSK": 1},
+        stale={"wid/2026-06-18/world_inequality_database": ("2026-08-05", "2026-08-17")},
+    )
+    assert status_icon(stale) == "🚧"
+    body = format_metadata_diff(stale)
+    assert "behind on 1 dataset" in body
+    assert body.index("behind on") < body.index("Charts:")  # it leads
+
+    # And it survives the no-changes path, where a stale build may be the reason there are none.
+    assert "behind on 1 dataset" in format_metadata_diff(Summary(stale=stale.stale))
+
+
+def test_chart_brief_says_no_other_surface_in_words():
+    """A change reaching nothing else used to read "0 other chart(s)".
+
+    The old expression was `f"{n_c} other chart(s)" + (...) or "no other surface"`, and a non-empty
+    f-string is always truthy, so the fallback was unreachable.
+    """
+    from apps.wizard.app_pages.metadata_diff.brief import chart_pr_brief_markdown
+
+    group = ChangeGroup(
+        field="descriptionKey",
+        old=["a"],
+        new=["b"],
+        view_dims=[{}],
+        affects_indicator=True,
+        indicator_id=1,
+        catalog_path="grapher/ns/2026-01-01/ds/tb#var",
+        catalog_paths={"grapher/ns/2026-01-01/ds/tb#var"},
+    )
+    resolved = [{"g": group, "stale": False, "label": "✅ Approve", "seed_label": "✅ Approve", "charts": []}]
+    brief = chart_pr_brief_markdown({"slug": "some-chart"}, "production", resolved, {}, "chart:some-chart")
+    assert "no other surface" in brief
+    assert "0 other chart(s)" not in brief
+
+
+def test_prominence_is_labelled_rather_than_deducted():
+    """The data-page distinction survives as *where* the text appears, not whether it appears.
+
+    Only a data-page-only field can be behind the drawer: a title or short description feeds the chart
+    itself, so it is on the canvas of every chart regardless.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import behind_sources_drawer, charts_behind_drawer
+
+    on_page = {"chartId": 1, "has_data_page": True}
+    drawer_only = {"chartId": 2, "has_data_page": False}
+
+    assert behind_sources_drawer({"descriptionKey"}, drawer_only)
+    assert not behind_sources_drawer({"descriptionKey"}, on_page)
+    # A field the chart renders itself is never behind the drawer, whatever the chart is.
+    assert not behind_sources_drawer({"titlePublic"}, drawer_only)
+    # Nor is a mixed set: something in it is on the canvas.
+    assert not behind_sources_drawer({"descriptionKey", "titlePublic"}, drawer_only)
+
+    assert [c["chartId"] for c in charts_behind_drawer({"descriptionKey"}, [on_page, drawer_only])] == [2]
+
+
+def test_export_products_only_covers_recipes_the_branch_edited():
+    """A data-step edit expands into every export downstream of it, none of whose configs we wrote.
+
+    `covers_export` is what lets config-level MDim and explorer text count as this branch's work. Fed
+    the whole downstream subgraph, one garden metadata edit would vouch for every MDim built on that
+    dataset, and `split_mdim_groups` would hand the reviewer a wholesale config diff nobody authored —
+    the exact failure that split exists to prevent.
+    """
+    from etl.io import get_directly_changed_export_uris
+
+    data_step = "etl/steps/data/garden/wb/2026-06-26/world_bank_pip.meta.yml"
+    recipe = "etl/steps/export/multidim/wb/latest/poverty_pip.py"
+
+    assert get_directly_changed_export_uris({data_step: "M", recipe: "M"}) == [
+        "export://multidim/wb/latest/poverty_pip"
+    ]
+    # A branch touching only a data step claims no export recipe at all.
+    assert get_directly_changed_export_uris({data_step: "M"}) == []
+
+
+def test_a_change_with_no_visible_chart_reach_still_counts_as_a_change():
+    """`n_charts` is reach, not existence — and a real change can legitimately reach nobody.
+
+    A WYSK edit on an indicator that only feeds multi-indicator charts has a blast radius of zero
+    readers, but the Charts section still renders it as a change to review. Keying the verdict off the
+    filtered reach put "No metadata text changes" and a green all-clear over exactly that.
+    """
+    assert Summary(n_charts=0, n_indicators=1, n_chart_changes=1).has_changes
+    # Nothing anywhere is still nothing.
+    assert not Summary().has_changes
+    # And the pre-existing reasons to speak up are unaffected.
+    assert Summary(n_charts=3).has_changes
+    assert Summary(n_new_indicators=2).has_changes
+    assert Summary(n_mdims=1).has_changes
+    assert Summary(n_explorers=1).has_changes
+
+
+def test_shared_metadata_file_credits_its_sibling_steps():
+    """`shared.meta.yml` is merged into every sibling step, but is itself no step at all.
+
+    It resolves to a `.../shared` path that is in no DAG, so the scope came back empty — and an empty
+    scope narrows away every rebuilt indicator, reporting "no metadata text changes" for an edit that
+    rewrote text across every dataset in the folder.
+    """
+    from apps.wizard.app_pages.metadata_diff.discovery import _shared_step_file_datasets
+
+    reached = _shared_step_file_datasets({"etl/steps/data/garden/ihme_gbd/2026-02-07/shared.meta.yml": "M"})
+    assert len(reached) > 1
+    assert "garden/ihme_gbd/2026-02-07/gbd_cause_deaths" in reached
+    assert all(p.startswith("garden/ihme_gbd/2026-02-07/") for p in reached)
+    # `shared` is not a step, so it must not be credited as one.
+    assert "garden/ihme_gbd/2026-02-07/shared" not in reached
+
+    # A file that *is* a step needs no expansion — the subgraph walk already covers it.
+    assert (
+        _shared_step_file_datasets({"etl/steps/data/garden/ihme_gbd/2026-02-07/gbd_cause_deaths.meta.yml": "M"})
+        == set()
+    )
+    # Files outside a step folder are not ours to expand.
+    assert _shared_step_file_datasets({"apps/wizard/app_pages/metadata_diff/core.py": "M"}) == set()
+
+
+def test_a_draft_mdim_is_marked_rather_than_filtered_away(monkeypatch):
+    """Grapher serves an MDim only when `published = 1`, so a draft's text reaches no reader.
+
+    38 of the 78 MDims on this branch's staging server are drafts, and one of the two the branch changes is
+    among them — so counting drafts reported twice the reader-facing work that exists. But filtering them
+    out of the query removed them from the list and the "other differences" section as well, and a branch
+    whose only change is a draft MDim then read as "no metadata text changes". They are kept and marked, so
+    the count stays reader-facing while the review still sees them.
+    """
+    import pandas as pd
+
+    from apps.wizard.app_pages.metadata_diff import discovery
+
+    def fake_mdim_list(engine):
+        return pd.DataFrame(
+            {
+                "catalogPath": ["ns/latest/live#live", "ns/latest/draft#draft"],
+                "configMd5": ["here" if engine == "source" else "there"] * 2,
+                "published": [1, 0],
+                "slug": ["live", "draft"],
+            }
+        )
+
+    def no_db(engine):
+        raise RuntimeError("no database in this test")
+
+    monkeypatch.setattr(discovery, "mdim_list", fake_mdim_list)
+    monkeypatch.setattr(discovery, "_load_configs", no_db)
+    monkeypatch.setattr(discovery, "branch_scope", lambda: discovery.BranchScope(available=False))
+
+    df = discovery.mdim_changes_df("source", "target")
+    # Both are present — nothing is dropped at the query — and only the unpublished one is marked.
+    assert set(df.index) == {"ns/latest/live#live", "ns/latest/draft#draft"}
+    assert not bool(df.loc["ns/latest/live#live", "is_draft"])
+    assert bool(df.loc["ns/latest/draft#draft", "is_draft"])
+    # Both still register as changed against the baseline, which is what puts them in front of a reviewer.
+    assert bool(df.loc["ns/latest/draft#draft", "config_changed"])
+
+
+def test_package_step_files_credit_the_step_they_live_in():
+    """A step implemented as a package keeps its metadata *inside* the step folder, not beside it.
+
+    `garden/democracy/2026-03-17/vdem` is one of six active steps that are packages, and its 200 kB of
+    reader-facing text sits in `.../vdem/vdem.meta.yml` — one level below the sibling layout. That strips
+    to `.../vdem/vdem`, a path in no DAG, so the scope came back empty; and an empty scope narrows away
+    every rebuilt indicator, reporting "no metadata text changes" for an edit that rewrote a whole
+    dataset's text.
+    """
+    from apps.wizard.app_pages.metadata_diff.discovery import _shared_step_file_datasets
+
+    step = "garden/democracy/2026-03-17/vdem"
+    assert _shared_step_file_datasets({f"etl/steps/data/{step}/vdem.meta.yml": "M"}) == {step}
+    # The package's own module names no step of its own either, so it needs the same resolution.
+    assert _shared_step_file_datasets({f"etl/steps/data/{step}/__init__.py": "M"}) == {step}
+
+    # The *nearest* ancestor wins: a package file credits its own step, not every step in the version
+    # folder. `who/latest/monkeypox` shares its folder with three unrelated steps that it must not claim.
+    assert _shared_step_file_datasets({"etl/steps/data/garden/who/latest/monkeypox/__init__.py": "M"}) == {
+        "garden/who/latest/monkeypox"
+    }
+
+    # A file nested in a folder that names *no* step falls back to the folder-wide credit, exactly as a
+    # flat `shared.py` does — a helper sub-package serves the same siblings.
+    reached = _shared_step_file_datasets({"etl/steps/data/garden/owid/latest/key_indicators/table_population.py": "M"})
+    assert reached
+    assert all(p.startswith("garden/owid/latest/") for p in reached)
+
+
+def test_review_widget_state_is_bound_to_the_text_it_signed_off():
+    """An edit must not inherit the previous sign-off through the reviewer's open session.
+
+    `change_key` identifies the slot and deliberately survives an edit, so widget state keyed on it alone
+    kept "✅ Approve" in session across the edit. The next save wrote that approval back against the new
+    content hash, the stale warning disappeared, and text nobody approved read as approved.
+    """
+    from apps.wizard.app_pages.metadata_diff.mdim_pages import _review_comment_key, _review_status_key
+
+    group = ChangeGroup(field="titlePublic", old="Old", new="New", view_dims=[{"sex": "female"}])
+    edited = ChangeGroup(field="titlePublic", old="Old", new="New, revised", view_dims=[{"sex": "female"}])
+
+    key, content_hash = change_group_identity("grapher/ns/latest/mine#mine", group)
+    key_after, hash_after = change_group_identity("grapher/ns/latest/mine#mine", edited)
+
+    # The slot is the same; only the content moved. That is the whole trap.
+    assert key_after == key
+    assert hash_after != content_hash
+
+    for make_key in (_review_status_key, _review_comment_key):
+        assert make_key("cp", key, content_hash) != make_key("cp", key_after, hash_after)
+
+
+def test_export_scope_is_per_namespace_not_just_per_name():
+    """A recipe file name is not unique within one export kind either.
+
+    `multidim/emissions/latest/air_pollution.py` and `multidim/ihme_gbd/latest/air_pollution.py` both
+    publish an MDim whose catalogPath ends in `air_pollution`, so matching on kind+name alone let an edit
+    to one vouch for the other. On a lagging staging server that presents a whole MDim's worth of
+    config-level text nobody in the PR wrote as this branch's work.
+    """
+    assert _export_namespace("export://multidim/ihme_gbd/latest/air_pollution") == "ihme_gbd"
+    assert mdim_namespace("grapher/ihme_gbd/latest/air_pollution#air_pollution") == "ihme_gbd"
+
+    scope = BranchScope(
+        export_products={(MDIM_EXPORT_KIND, "air_pollution")},
+        export_namespaces={(MDIM_EXPORT_KIND, "air_pollution"): {"emissions"}},
+    )
+    assert scope.covers_mdim("grapher/emissions/latest/air_pollution#air_pollution")
+    assert not scope.covers_mdim("grapher/ihme_gbd/latest/air_pollution#air_pollution")
+    # A different name is no match either way.
+    assert not scope.covers_mdim("grapher/emissions/latest/ceds#ceds")
+
+    # An explorer slug carries no namespace, so it keeps matching on kind and name alone.
+    assert BranchScope(export_products={(EXPLORER_EXPORT_KIND, "ipcc-scenarios")}).covers_export(
+        EXPLORER_EXPORT_KIND, "ipcc-scenarios"
+    )
+
+
+def test_shared_export_helper_credits_its_sibling_recipes():
+    """A recipe's helpers are not recipes — the export mirror of the shared-metadata blind spot.
+
+    `explorers/un/latest/un_wpp.py` imports its siblings `utils.py` and `view_edits.py` and reads
+    `map_brackets.yml`. None is a step, so the changed-export scan derives `.../utils`, a recipe that
+    exists in no DAG, and the explorer's own text differences get filed as baseline lag instead.
+    """
+    from apps.wizard.app_pages.metadata_diff.discovery import _export_scope_names, _shared_export_recipe_uris
+
+    for helper in ("utils.py", "view_edits.py", "map_brackets.yml"):
+        reached = _shared_export_recipe_uris({f"etl/steps/export/explorers/un/latest/{helper}": "M"})
+        assert reached == {"export://explorers/un/latest/un_wpp"}, helper
+
+    # And the recipe it credits answers to the slug the explorer actually publishes under.
+    assert "population-and-demography" in _export_scope_names("export://explorers/un/latest/un_wpp")
+
+    # A file that *is* a recipe, and a config companion resolving to one, need no expansion.
+    assert _shared_export_recipe_uris({"etl/steps/export/explorers/un/latest/un_wpp.py": "M"}) == set()
+    assert (
+        _shared_export_recipe_uris({"etl/steps/export/explorers/un/latest/un_wpp.sex_ratio.config.yml": "M"}) == set()
+    )
+    # Files outside an export folder are not ours to expand.
+    assert _shared_export_recipe_uris({"apps/wizard/app_pages/metadata_diff/core.py": "M"}) == set()
+
+
+def test_shared_export_helper_credits_only_the_recipes_that_use_it():
+    """A folder is not a consumer list: an untouched sibling must not be credited.
+
+    `multidim/un/latest` holds three recipes, and only `un_wpp.py` reaches the helpers — by import
+    (`utils`, `view_edits`) and by name (`map_brackets.yml`). Crediting `child_labor` and
+    `hazardous_work` too would flip `covers_mdim` for them, and that alone makes `split_mdim_groups`
+    hand over every config difference in those MDims as this branch's work. Unlike the data-step mirror
+    there is no second gate to catch it: no rebuilt-here check, no master cross-check.
+    """
+    from apps.wizard.app_pages.metadata_diff.discovery import _recipes_using, _shared_export_recipe_uris
+
+    for helper in ("utils.py", "view_edits.py", "map_brackets.yml"):
+        reached = _shared_export_recipe_uris({f"etl/steps/export/multidim/un/latest/{helper}": "M"})
+        assert reached == {"export://multidim/un/latest/un_wpp"}, helper
+
+    # "No recipe names it" means "cannot tell" — a helper reached only via another helper falls back to
+    # the whole folder, keeping the reviewer's own edit visible rather than dropping it.
+    siblings = {"export://multidim/un/latest/child_labor", "export://multidim/un/latest/hazardous_work"}
+    assert _recipes_using("utils.py", siblings) == set()
+
+
+def test_export_scope_without_recorded_namespaces_still_matches_on_name():
+    """Narrowing must not get *stricter* by accident: unknown namespace means fall back to the name."""
+    scope = BranchScope(export_products={(MDIM_EXPORT_KIND, "mine")})
+    assert scope.covers_mdim("grapher/ns/latest/mine#mine")
+    # A path too short to carry a namespace resolves to None, which also falls back to the name.
+    assert mdim_namespace("mine") is None
+    assert scope.covers_export(MDIM_EXPORT_KIND, "mine", mdim_namespace("mine"))
+
+
+def test_reviewed_toggle_key_is_bound_to_the_text_it_ticked():
+    """The list toggle is the same stale-state trap the sign-off widgets had.
+
+    `change_key` survives an edit, so a key without the content hash kept the tick reading "Reviewed" in
+    an open session while the stored mark and the stale caption both said unreviewed.
+    """
+    from apps.wizard.app_pages.metadata_diff.review_state import ReviewMark, reviewed_toggle_key
+
+    group = ChangeGroup(field="titlePublic", old="Old", new="New", view_dims=[{"sex": "female"}])
+    edited = ChangeGroup(field="titlePublic", old="Old", new="New, revised", view_dims=[{"sex": "female"}])
+    key, content_hash = change_group_identity("grapher/ns/latest/mine#mine", group)
+    key_after, hash_after = change_group_identity("grapher/ns/latest/mine#mine", edited)
+
+    # Same slot, moved content — exactly the case the key has to tell apart.
+    assert key_after == key
+    before = ReviewMark(group=group, change_key=key, content_hash=content_hash, reviewed=True, stale=False)
+    after = ReviewMark(group=edited, change_key=key_after, content_hash=hash_after, reviewed=False, stale=True)
+    assert reviewed_toggle_key("surface", before) != reviewed_toggle_key("surface", after)
+
+
+def test_indicator_identity_ignores_only_the_version():
+    """A version bump is the same indicator; another dataset's same-named indicator is not.
+
+    Short names are unique only within a dataset, and the common ones (`gini`, `population`, `share`) are
+    common exactly where repointing an MDim view between sources is plausible — so comparing the
+    `#short_name` tail alone would call a replacement an edit and report garden metadata nobody touched.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import _same_indicator
+
+    bumped_old = "grapher/un/2026-05-01/wpp/tbl#population"
+    bumped_new = "grapher/un/2026-08-19/wpp/tbl#population"
+    assert _same_indicator(bumped_old, bumped_new)
+
+    # Same short name, different dataset: a replacement, not an edit.
+    assert not _same_indicator(
+        "grapher/wb/2026-06-26/world_bank_pip/inequality#gini",
+        "grapher/wid/2026-06-18/world_inequality_database/wid#gini",
+    )
+    # Same dataset and version, different indicator.
+    assert not _same_indicator(
+        "grapher/wb/2026-06-26/world_bank_pip/poverty#headcount",
+        "grapher/wb/2026-06-26/world_bank_pip/poverty#headcount_ratio",
+    )
+    # A channel prefix must not affect identity, and an unknown path stays comparable.
+    assert _same_indicator("garden/un/2026-05-01/wpp/tbl#population", bumped_new)
+    assert _same_indicator(None, bumped_new)
+
+
+def test_a_draft_mdim_is_reported_but_not_counted_as_reader_facing():
+    """An unpublished MDim shows readers nothing — but the branch still changed its text.
+
+    Filtering drafts out of the query removed them from the list, the counts and the "other differences"
+    section at once, so a PR whose only change was a draft MDim read as "No metadata text changes". They
+    are now counted separately and labelled, the same way every other not-reader-facing case is.
+    """
+    from apps.owidbot.metadata_diff import format_metadata_diff, status_icon
+    from apps.wizard.app_pages.metadata_diff.discovery import Summary
+
+    draft_only = Summary(n_draft_mdims=1)
+    assert draft_only.has_changes
+    assert status_icon(draft_only) == "✏️"
+    body = format_metadata_diff(draft_only)
+    assert "Unpublished MDims changed: 1" in body
+    assert "No metadata text changes" not in body
+
+    # A draft never inflates the reader-facing MDim count.
+    both = Summary(n_mdims=2, n_draft_mdims=3)
+    assert "MDims: 2" in format_metadata_diff(both)
+
+
+def test_a_branch_owned_draft_is_not_also_reported_as_baseline_lag():
+    """A draft this branch changed belongs to the branch, so it is not a difference someone else caused.
+
+    `n_other_mdims` was every changed MDim minus the *published* in-branch ones, which left the branch's own
+    drafts in the baseline-lag bucket: the PR comment then reported the same MDim twice, once as
+    "Unpublished MDims changed" and once as "a further difference ... not this branch". The MDims list had
+    always used the right set (`has_changes & ~in_branch`); only the counter disagreed with it.
+    """
+    import pandas as pd
+
+    from apps.wizard.app_pages.metadata_diff import discovery
+
+    df = pd.DataFrame(
+        {
+            "has_changes": [True, True, True],
+            "in_branch": [True, True, False],
+            "is_draft": [False, True, False],
+        },
+        index=["ours/published", "ours/draft", "master/rebuilt"],
+    )
+    reader_facing = df["in_branch"] & ~df["is_draft"]
+    flagged = list(df.index[reader_facing])
+    # Only the MDim nobody in the branch touched is baseline lag — not the branch's own draft.
+    assert int((df["has_changes"] & ~df["in_branch"]).sum()) == 1
+    # The old arithmetic counted the draft as well, which is what double-reported it.
+    assert int(df["has_changes"].sum()) - len(flagged) == 2
+    assert list(df.index[df["has_changes"] & ~df["in_branch"]]) == ["master/rebuilt"]
+    assert discovery.Summary(n_other_mdims=1).n_other == 1
+
+
+def test_too_many_draft_mdims_reports_a_ceiling_instead_of_a_truncated_count():
+    """Resolving drafts is capped, and a capped count must say it is a ceiling.
+
+    The published path already reports `len(flagged)` and sets `mdims_resolved = False` when it cannot diff
+    view by view. The draft path instead sliced to the first `MAX_MDIMS_RESOLVED` and reported whatever it
+    found there as exact — an undercount with nothing to signal it. The flag is separate from the published
+    one, so overflowing drafts never mislabel a reader-facing count that resolved fine.
+    """
+    from apps.owidbot.metadata_diff import format_metadata_diff
+    from apps.wizard.app_pages.metadata_diff.discovery import MAX_MDIMS_RESOLVED, Summary
+
+    capped = Summary(n_mdims=2, n_draft_mdims=MAX_MDIMS_RESOLVED + 9, draft_mdims_resolved=False)
+    body = format_metadata_diff(capped)
+    assert f"Unpublished MDims changed: {MAX_MDIMS_RESOLVED + 9} (flagged; too many to resolve view by view)" in body
+    # The reader-facing count resolved cleanly, so it carries no ceiling qualifier of its own.
+    assert "MDims: 2</li>" in body
+
+    # And the usual case stays unqualified.
+    assert "Unpublished MDims changed: 3 — no reader sees them yet" in format_metadata_diff(Summary(n_draft_mdims=3))
+
+
+def test_a_retired_export_recipe_does_not_claim_the_live_product():
+    """A recipe file left in the tree after its DAG entry moved on publishes nothing — and must vouch for nothing.
+
+    `etl/steps/export/explorers/wash/2024-02-15/water_and_sanitation.py` is in no DAG; only
+    `export://explorers/wash/latest/water_and_sanitation` is. The derived URI still reads like the live
+    product, because the scope names are taken from the recipe's own source, so editing the retired file put
+    `water-and-sanitation` in scope and filed the live explorer's baseline lag as this branch's work — the
+    one bucket a reviewer will not search for their own edit in.
+
+    Erring narrow is right on the export side: `covers_export` has no second gate, and a dropped URI is
+    still reported under "other differences" rather than lost.
+    """
+    from apps.wizard.app_pages.metadata_diff.discovery import _active_export_uris, _export_scope_names
+
+    active = _active_export_uris()
+    assert "export://explorers/wash/latest/water_and_sanitation" in active
+    retired = "export://explorers/wash/2024-02-15/water_and_sanitation"
+    assert retired not in active
+    # The retired recipe really does still answer to the live explorer's name — hence the filter.
+    assert "water-and-sanitation" in _export_scope_names(retired)
+
+
+def test_filtering_to_active_export_recipes_drops_no_real_recipe():
+    """The filter must not narrow away a recipe the branch legitimately edited.
+
+    Every export step file that names an active DAG step has to survive it, or a real recipe edit would be
+    misfiled as baseline lag — the failure this whole scope exists to prevent, in the other direction.
+    """
+    from apps.wizard.app_pages.metadata_diff.discovery import _active_export_uris
+    from etl.paths import STEP_DIR
+
+    active = _active_export_uris()
+    derived = set()
+    for path in (STEP_DIR / "export").rglob("*.py"):
+        if path.name == "__init__.py":
+            continue
+        derived.add("export://" + path.relative_to(STEP_DIR / "export").with_suffix("").as_posix())
+    # Every active step is reachable from a file in the tree, so the filter keeps all of them.
+    assert active <= derived
+    assert active & derived == active
+
+
+# --- Bullet-level diffing -------------------------------------------------------------------------
+
+
+def _highlighted(html: str) -> list[str]:
+    """The text inside <ins>/<del> spans — what a reviewer's eye is drawn to."""
+    import re
+
+    return re.findall(r"<(?:ins|del)[^>]*>(.*?)</(?:ins|del)>", html)
+
+
+def test_an_edited_bullet_highlights_only_the_words_that_changed():
+    """A one-sentence insertion must not read as a rewritten paragraph.
+
+    Matching bullets by membership could only answer "is this exact text on the other side?", so an
+    edited bullet was diffed against the empty string and every word of it came back highlighted —
+    both columns solid colour, with no way to see what actually moved.
+    """
+    from apps.wizard.app_pages.metadata_diff.render import render_text_html
+
+    old = ["Estimates are extrapolated using growth forecasts. See the documentation for the methodology."]
+    new = [
+        "Estimates are extrapolated using growth forecasts. The most recent years are therefore "
+        "projections. See the documentation for the methodology."
+    ]
+
+    new_side = _highlighted(render_text_html(new, old, side="new", changed_only=True))
+    assert new_side == ["The most recent years are therefore projections. "]
+    # Nothing was removed, so the old column has no highlight at all.
+    assert _highlighted(render_text_html(old, new, side="old", changed_only=True)) == []
+
+
+def test_an_added_bullet_is_highlighted_whole_and_a_removed_one_shows_on_the_old_side():
+    """A bullet with no counterpart is an addition or a removal, and reads as one."""
+    from apps.wizard.app_pages.metadata_diff.render import render_text_html
+
+    old = ["Kept exactly as it was."]
+    new = ["Kept exactly as it was.", "An entirely new point about the data."]
+
+    assert _highlighted(render_text_html(new, old, side="new", changed_only=True)) == [
+        "An entirely new point about the data."
+    ]
+    # The addition has nothing on the old side, and the surviving bullet is unchanged, so nothing shows.
+    assert "(no changes here)" in render_text_html(old, new, side="old", changed_only=True)
+
+    # And the reverse: a removal is highlighted on the old side.
+    assert _highlighted(render_text_html(old, new[1:], side="old", changed_only=True)) != []
+
+
+def test_unrelated_bullets_are_not_paired_as_an_edit():
+    """Below the similarity threshold, two bullets are a removal and an addition, not one rewrite.
+
+    Otherwise boilerplate shared between unrelated bullets ("see the documentation") would pair them and
+    present a wholesale replacement as a small edit.
+    """
+    from apps.wizard.app_pages.metadata_diff.render import pair_bullets
+
+    pairs = pair_bullets(
+        ["Income is measured after taxes. See the documentation."],
+        ["Wealth counts non-financial assets held by households, minus debts."],
+    )
+    assert sorted((o is None, n is None) for o, n in pairs) == [(False, True), (True, False)]
+
+
+def test_pairing_is_identical_whichever_column_asks():
+    """Each column renders in its own call, so both must reach the same pairing or they disagree."""
+    from apps.wizard.app_pages.metadata_diff.render import pair_bullets
+
+    old = ["First point.", "Second point, later reworded a bit.", "Third point."]
+    new = ["First point.", "Second point, reworded a bit later on.", "A fourth point."]
+    assert pair_bullets(old, new) == pair_bullets(old, new)
+    # The edited bullet pairs with its own earlier wording, not with the survivor or the newcomer.
+    assert (old[1], new[1]) in pair_bullets(old, new)
+
+
+def test_a_reordered_list_still_shows_every_bullet():
+    """Pairing finds no textual change in a reorder, so the positional view has to take over."""
+    from apps.wizard.app_pages.metadata_diff.render import render_text_html
+
+    old = ["Alpha point.", "Beta point."]
+    new = ["Beta point.", "Alpha point."]
+    import re
+
+    html = render_text_html(new, old, side="new", changed_only=True)
+    assert "(no changes here)" not in html
+    # Tags wrap the words that moved, so compare the text with markup stripped.
+    text = re.sub(r"<[^>]+>", "", html)
+    assert "Alpha point." in text and "Beta point." in text
+
+
+# --- Section badges -------------------------------------------------------------------------------
+
+
+def test_section_badges_answer_whether_anything_is_left_to_review():
+    """A bare total cannot tell "nothing to review" from "nothing reviewed yet" — the whole question."""
+    from apps.wizard.app_pages.metadata_diff.core import section_label as _section_label
+
+    assert "(0/10)" in _section_label("charts", {"charts": (0, 10)})
+    assert "(3/10)" in _section_label("charts", {"charts": (3, 10)})
+    # Done reads as done, not as "10/10" the eye has to compare.
+    assert "(10 ✓)" in _section_label("charts", {"charts": (10, 10)})
+
+    # A section with nothing in it stays a plain zero rather than "0/0". (The icon name has a slash of
+    # its own, so look only at the counter.)
+    def counter(label: str) -> str:
+        return label.rsplit("(", 1)[1].rstrip(")")
+
+    assert counter(_section_label("explorers", {})) == "0"
+    assert counter(_section_label("explorers", {"explorers": (0, 0)})) == "0"
+
+
+def test_a_tick_only_counts_while_the_text_it_was_made_against_stands(monkeypatch):
+    """The badge counter applies the same content-hash rule as the toggles, or the two would disagree.
+
+    It also has to read the ticks live: they are counted from identities the cached summary carries, but
+    the counting query itself is uncached, so pressing a toggle moves the number in the same rerun.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import mark_identity, surface_key
+    from apps.wizard.app_pages.metadata_diff.data import REVIEWED, count_ticked
+
+    group = ChangeGroup(field="descriptionKey", old=["a"], new=["b"], view_dims=[{"d": "x"}])
+    edited = ChangeGroup(field="descriptionKey", old=["a"], new=["c"], view_dims=[{"d": "x"}])
+    surface = surface_key("mdim", "grapher/ns/latest/ds")
+    change_key, content_hash = mark_identity(surface, group)
+
+    from apps.wizard.app_pages.metadata_diff import data as data_module
+
+    monkeypatch.setattr(
+        data_module,
+        "load_reviews",
+        lambda engine, catalog_path: {change_key: {"status": REVIEWED, "contentHash": content_hash}},
+    )
+
+    assert count_ticked("engine", [(surface, *mark_identity(surface, group))]) == 1
+    # Same slot, text moved on: the tick no longer counts.
+    assert count_ticked("engine", [(surface, *mark_identity(surface, edited))]) == 0
+    assert count_ticked("engine", []) == 0
+
+
+def test_charts_are_listed_most_prominent_first():
+    """Charts whose page shows the change come before the ones that keep it behind the drawer.
+
+    Both are affected, so both are listed — but the first group is where the change actually meets a
+    reader, and grouping them keeps a long list scannable instead of interleaving the two.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import charts_in_reading_order
+
+    charts = [
+        {"chartId": 1, "slug": "zebra", "has_data_page": True},
+        {"chartId": 2, "slug": "alpha", "has_data_page": False},
+        {"chartId": 3, "slug": "beta", "has_data_page": True},
+    ]
+
+    # WYSK: the data-page charts lead, each group alphabetical within itself.
+    order = [c["slug"] for c in charts_in_reading_order(charts, {"descriptionKey"})]
+    assert order == ["beta", "zebra", "alpha"]
+
+    # A field the chart renders itself is equally prominent everywhere, so slug order is all that is left.
+    assert [c["slug"] for c in charts_in_reading_order(charts, {"titlePublic"})] == ["alpha", "beta", "zebra"]
+
+    # Without a field to judge by, fall back to whether the chart has a data page at all.
+    assert [c["slug"] for c in charts_in_reading_order(charts)] == ["beta", "zebra", "alpha"]
+
+
+def test_coerce_section_recovers_a_section_from_its_label():
+    """A label must never be mistaken for a section key.
+
+    `st.segmented_control` round-trips its value as the formatted label and returns that label unchanged
+    when it matches no option — which happens here every time a tick changes a count. Left uncoerced, the
+    label reached the URL and the next page load rejected it against the options.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import coerce_section, section_label
+
+    assert coerce_section("mdims") == "mdims"
+
+    # Every label this page can render maps back to the section it names, whatever the counts say.
+    for section in ("charts", "mdims", "explorers"):
+        for progress in ({}, {section: (0, 4)}, {section: (2, 10)}, {section: (10, 10)}):
+            assert coerce_section(section_label(section, progress)) == section
+
+    # Anything else is the caller's fallback: a deselected control, a hand-edited URL, junk.
+    assert coerce_section(None) == "charts"
+    assert coerce_section(None, "mdims") == "mdims"
+    assert coerce_section("", "explorers") == "explorers"
+    assert coerce_section("charts-and-mdims", "mdims") == "mdims"
+    assert coerce_section(3, "mdims") == "mdims"
+
+
+def test_a_stale_section_label_never_survives_as_a_value():
+    """The Streamlit behaviour behind the crash, checked where it actually happens.
+
+    `st.segmented_control` sends and receives the *formatted* label. Ours count reviewed changes, so a
+    tick leaves the browser holding a label the widget no longer offers, and the single-select serde
+    returns that raw label in place of the option — which then reached `?diff-type=` and made the next
+    page load raise. Asserted through the coercion, so a Streamlit release that stops leaking passes too.
+    """
+    button_group = pytest.importorskip("streamlit.elements.widgets.button_group")
+    serde_cls = getattr(button_group, "_SingleSelectButtonGroupSerde", None)
+    if serde_cls is None:
+        pytest.skip("Streamlit's single-select serde moved; coerce_section still guards the value")
+
+    from apps.wizard.app_pages.metadata_diff.core import SECTIONS, coerce_section, section_label
+
+    options = list(SECTIONS)
+    after = {"mdims": (3, 10)}  # one more change reviewed than the browser last saw
+    formatted = [section_label(o, after) for o in options]
+    serde = serde_cls(
+        options,
+        formatted_options=formatted,
+        formatted_option_to_option_index={f: i for i, f in enumerate(formatted)},
+        format_func=lambda o: section_label(o, after),
+    )
+
+    stale = section_label("mdims", {"mdims": (2, 10)})
+    assert stale not in formatted, "the labels must differ, or there is nothing to defend against"
+    assert coerce_section(serde.deserialize([stale]), "charts") == "mdims"
+
+    # A label that is still current round-trips to its option, coercion or not.
+    current = formatted[options.index("mdims")]
+    assert coerce_section(serde.deserialize([current]), "charts") == "mdims"
+
+
+def test_section_switcher_keeps_the_url_on_a_section_key():
+    """The switcher's contract, driven through Streamlit: a label never reaches the URL.
+
+    Covers the crash reported from staging — the URL had picked up ":material/show_chart: Charts (2/10)"
+    and every later page load rejected it — and the recovery path for a link that already carries one.
+    """
+    from streamlit.testing.v1 import AppTest
+
+    def param(at) -> str | None:
+        # AppTest hands query params back as lists where the real app has plain strings.
+        value = at.query_params.get("diff-type")
+        return value[0] if isinstance(value, list) else value
+
+    def app() -> None:
+        import streamlit as st
+
+        from apps.wizard.app_pages.metadata_diff.render import st_section_switcher
+
+        # Stands in for the review counter: whatever it says ends up inside the option labels.
+        reviewed = st.session_state.get("reviewed", 0)
+        st.text(f"section={st_section_switcher({'mdims': (reviewed, 10)})}")
+        if st.button("review one"):
+            st.session_state["reviewed"] = reviewed + 1
+
+    # A poisoned link — the shape the crash produced — opens on the section its label names, and is
+    # rewritten to the key, so navigating on to Chart Diff (which validates strictly) is safe.
+    at = AppTest.from_function(app)
+    at.query_params["diff-type"] = ":material/dashboard: MDims (2/10)"
+    at.run()
+    assert not at.exception
+    assert at.text[0].value == "section=mdims"
+    assert param(at) == "mdims"
+
+    # Reviewing a change alters every label. The selection holds and the URL stays a key.
+    at.button[0].click().run()
+    assert not at.exception
+    assert at.text[0].value == "section=mdims"
+    assert param(at) == "mdims"
+
+    # Back to the default section: the param is dropped rather than spelled out, as url_persist does.
+    at.segmented_control[0].set_value("charts").run()
+    assert at.text[0].value == "section=charts"
+    assert param(at) is None
+
+
+def test_a_draft_chart_is_listed_but_never_counted_as_reach():
+    """Drafts are shown to the author and kept out of every reader-facing number.
+
+    They used to be dropped at the query, so an edit landing on a draft was invisible here. Keeping them
+    in the same list as published charts would have been worse: `affected_charts` feeds the section
+    header, the PR brief and the "apply to all — N charts" scope decision, none of which may overstate
+    who sees a change.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import affected_charts, affected_drafts, group_usage
+
+    group = ChangeGroup(field="descriptionKey", old=["a"], new=["b"], indicator_ids={1, 2})
+    usage = {
+        1: {
+            "charts": [{"chartId": 10, "slug": "live-one", "has_data_page": True, "is_published": True}],
+            "draft_charts": [{"chartId": 11, "slug": "wip", "has_data_page": True, "is_published": False}],
+            "mdims": [],
+        },
+        # A second indicator of the same shared definition, reaching one of the same charts.
+        2: {
+            "charts": [{"chartId": 10, "slug": "live-one", "has_data_page": True, "is_published": True}],
+            "draft_charts": [{"chartId": 12, "slug": "wip-two", "has_data_page": False, "is_published": False}],
+            "mdims": [],
+        },
+    }
+
+    assert [c["chartId"] for c in affected_charts(group, usage)] == [10]
+    assert sorted(c["chartId"] for c in affected_drafts(group, usage)) == [11, 12]
+    # Both sides dedupe across the indicators of a shared definition.
+    assert len(group_usage(group, usage)["charts"]) == 1
+
+    # A usage dict from before drafts were kept carries no key, and must not raise.
+    legacy = {1: {"charts": [{"chartId": 10, "slug": "live-one"}], "mdims": []}}
+    assert affected_drafts(group, legacy) == []
+
+
+def test_chart_list_names_drafts_separately(monkeypatch):
+    """The list has three groups, and a draft links to the admin: /grapher/<slug> serves nothing yet."""
+    from apps.wizard.app_pages.metadata_diff import render
+
+    written: list[str] = []
+    monkeypatch.setattr(render.st, "markdown", lambda text, **kw: written.append(str(text)))
+    monkeypatch.setattr(render.st, "caption", lambda text, **kw: written.append(str(text)))
+
+    render.render_chart_list(
+        [{"chartId": 1, "slug": "published-one", "has_data_page": True, "is_published": True}],
+        fields={"descriptionKey"},
+        drafts=[{"chartId": 7, "slug": "draft-one", "has_data_page": True, "is_published": False}],
+    )
+    out = "\n".join(written)
+
+    assert "1 data page affected" in out
+    assert "1 unpublished draft" in out
+    assert "published-one" in out and "draft-one" in out
+    # The draft's link goes to the editor, not to a public URL that would 404.
+    assert "/admin/charts/7/edit" in out
+    assert "/grapher/draft-one" not in out
+
+    # Drafts alone still render — the case where an edit only lands on unpublished work.
+    written.clear()
+    render.render_chart_list([], fields={"descriptionKey"}, drafts=[{"chartId": 7, "slug": "d", "is_published": False}])
+    out = "\n".join(written)
+    assert "1 unpublished draft" in out
+    assert "No chart uses these indicators" not in out
+
+
+def test_reach_never_counts_a_draft_chart():
+    """`charts_reached` is the reach reported in the PR comment, so a draft must not enter it.
+
+    Drafts come back from the same query as published charts, on purpose — they are listed so their author
+    sees the edit landed there. This is the boundary: listed, not counted.
+    """
+    group = ChangeGroup(field="descriptionKey", old=["a"], new=["b"], indicator_ids={1})
+    usage = {
+        1: [
+            {"chartId": 1, "slug": "live", "is_published": True},
+            {"chartId": 2, "slug": "wip", "is_published": False},
+            # Rows from before the flag existed default to published, as the callers always assumed.
+            {"chartId": 3, "slug": "legacy"},
+        ]
+    }
+    assert charts_reached([group], usage) == {1, 3}
+
+
+def _reach_fixture():
+    """One shared WYSK edit across three surfaces, plus a second edit on one chart only."""
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach
+
+    shared = ChangeReach(
+        field="descriptionKey",
+        old=["a"],
+        new=["b"],
+        charts=[
+            {"chartId": 1, "slug": "on-page", "has_data_page": True, "is_published": True},
+            {"chartId": 2, "slug": "combined", "has_data_page": False, "is_published": True},
+        ],
+        draft_charts=[{"chartId": 3, "slug": "wip", "has_data_page": True, "is_published": False}],
+        mdims=[
+            {"catalogPath": "grapher/ns/latest/live", "n_views": 16, "is_draft": False},
+            {"catalogPath": "grapher/ns/latest/hidden", "n_views": 4, "is_draft": True},
+        ],
+        explorers=[{"slug": "an-explorer", "n_views": 3}],
+    )
+    subtitle = ChangeReach(
+        field="descriptionShort",
+        old="x",
+        new="y",
+        charts=[{"chartId": 1, "slug": "on-page", "has_data_page": True, "is_published": True}],
+    )
+    return shared, subtitle
+
+
+def test_reach_separates_who_can_see_it_from_who_cannot():
+    """The headline number is reader-facing places; drafts and unpublished views are counted apart."""
+    shared, subtitle = _reach_fixture()
+
+    # 2 published charts + 16 views of the published MDim + 3 explorer views.
+    assert shared.n_reader_facing == 21
+    # 1 draft chart + 4 views of the unpublished MDim.
+    assert shared.n_hidden == 5
+    assert subtitle.n_reader_facing == 1
+    assert subtitle.n_hidden == 0
+
+
+def test_reach_by_surface_collapses_a_page_carrying_two_changes():
+    """The by-surface view exists for exactly this: one page, every edit landing on it."""
+    from apps.wizard.app_pages.metadata_diff.discovery import reach_by_surface
+
+    rows = reach_by_surface(list(_reach_fixture()))
+    by_name = {r["name"]: r for r in rows}
+
+    # `on-page` carries both edits and appears once, with both fields.
+    assert sorted(by_name["on-page"]["fields"]) == ["Description", "WYSK"]
+    assert by_name["on-page"]["detail"] == "data page"
+    assert by_name["on-page"]["published"] is True
+
+    # A multi-indicator chart says how its readers reach the text.
+    assert by_name["combined"]["detail"] == "via Learn more about this data"
+
+    # Unpublished surfaces are marked, not dropped: the draft chart and the unpublished MDim.
+    assert by_name["wip"]["published"] is False
+    assert by_name["grapher/ns/latest/hidden"]["published"] is False
+    assert by_name["grapher/ns/latest/live"]["detail"] == "16 views"
+    assert by_name["an-explorer"]["detail"] == "3 views"
+
+    # Published charts lead and drafts come last, so the reader-facing rows are read first.
+    kinds = [r["kind"] for r in rows]
+    assert kinds.index("chart") < kinds.index("mdim") < kinds.index("draft_chart")
+
+
+def test_the_same_text_on_two_surfaces_is_one_blast_radius_row():
+    """`change_identity` ignores the surface, which is what makes a shared definition one row."""
+    from apps.wizard.app_pages.metadata_diff.discovery import _reach_slot, change_identity
+
+    mdim_group = ChangeGroup(field="descriptionKey", old=["a"], new=["b"], view_dims=[{"d": "x"}])
+    chart_group = ChangeGroup(field="descriptionKey", old=["a"], new=["b"], indicator_ids={5})
+    other_text = ChangeGroup(field="descriptionKey", old=["a"], new=["c"])
+
+    assert change_identity(mdim_group) == change_identity(chart_group)
+
+    reach: dict = {}
+    _reach_slot(reach, mdim_group).mdims.append({"catalogPath": "cp", "n_views": 2, "is_draft": False})
+    _reach_slot(reach, chart_group).charts.append({"chartId": 1, "slug": "s", "is_published": True})
+    _reach_slot(reach, other_text)
+
+    assert len(reach) == 2
+    merged = reach[change_identity(mdim_group)]
+    assert len(merged.mdims) == 1 and len(merged.charts) == 1
+
+
+def test_blast_radius_badge_carries_no_review_counter():
+    """It reports reach and holds no sign-off, so "(0)" there would say the wrong thing."""
+    from apps.wizard.app_pages.metadata_diff.core import COUNTED_SECTIONS, SECTIONS, section_label
+
+    assert list(SECTIONS)[0] == "blast", "Blast radius leads the section bar"
+    assert "blast" not in COUNTED_SECTIONS
+    label = section_label("blast", {})
+    assert label.endswith("Blast radius")
+    assert "(" not in label
+    # The review sections keep their counters.
+    assert section_label("charts", {"charts": (2, 10)}).endswith("(2/10)")
+
+
+def test_diff_preview_windows_on_the_change_not_the_start():
+    """A sentence added deep inside a long bullet still shows as an insertion.
+
+    Truncating from the front showed the first 260 identical characters and no highlight at all — which is
+    what the blast-radius rows did on real data, leaving two rows both labelled WYSK and neither saying
+    what it changed.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import diff_window_html
+
+    lead = "The World Bank defines extreme poverty as living on less than $3 per day, a threshold set so "
+    lead += "that poverty can be compared across countries and over time in a consistent way. " * 3
+    old = lead + "For more details refer to the documentation."
+    new = lead + "The most recent years are projections. For more details refer to the documentation."
+
+    out = diff_window_html(old, new, max_chars=200)
+    assert "<ins" in out, "the inserted sentence has to be visible in the preview"
+    assert "most recent years" in out
+    # The window opens with an ellipsis because it skipped the identical opening.
+    assert out.startswith("… ")
+    assert len(out) < len(old)
+
+    # A change at the very start needs no ellipsis, and still highlights.
+    out_front = diff_window_html("Old title", "New title", max_chars=200)
+    assert not out_front.startswith("… ")
+    assert "<ins" in out_front or "<del" in out_front
+
+    # Values that differ without any word-level highlight (a pure reorder) still render something.
+    reordered = diff_window_html(["a", "b"], ["b", "a"], max_chars=200)
+    assert reordered
+
+
+def test_by_surface_counts_two_edits_of_the_same_field_on_one_page():
+    """Two distinct WYSK edits on one chart is the finding this view exists for.
+
+    Deduping the labels for display while counting them for the sort order hid it, and put those rows at
+    the top of the list with nothing to explain why they were there.
+    """
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, reach_by_surface
+
+    chart = {"chartId": 1, "slug": "hit-twice", "has_data_page": False, "is_published": True}
+    other = {"chartId": 2, "slug": "hit-once", "has_data_page": True, "is_published": True}
+    reach = [
+        ChangeReach(field="descriptionKey", old=["a"], new=["b"], charts=[chart]),
+        ChangeReach(field="descriptionKey", old=["c"], new=["d"], charts=[chart, other]),
+    ]
+
+    rows = {r["name"]: r for r in reach_by_surface(reach)}
+    assert rows["hit-twice"]["field_counts"] == {"WYSK": 2}
+    assert rows["hit-twice"]["n_changes"] == 2
+    assert rows["hit-once"]["field_counts"] == {"WYSK": 1}
+
+    # A data page is read before a chart that keeps the text behind the sources drawer, even though the
+    # drawer chart carries more edits.
+    order = [r["name"] for r in reach_by_surface(reach)]
+    assert order == ["hit-once", "hit-twice"]

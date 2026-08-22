@@ -229,7 +229,7 @@ definitions:
     <% if table is defined and table == "Income or consumption intra/extrapolated" %>
     Country estimates are interpolated and extrapolated to the year of the data release using GDP growth estimates and forecasts. This data is then used to produce regional and global aggregates available for each year. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html).
     <%- else %>
-    Regional and global estimates are extrapolated to the year of the data release using growth estimates and forecasts from [national accounts](#dod:national-accounts). For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
+    Regional and global estimates are extrapolated to the year of the data release using growth estimates and forecasts from [national accounts](#dod:national-accounts). The most recent years are therefore projections, not survey measurements. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
     <%- endif %>
     <%- endif %>
 

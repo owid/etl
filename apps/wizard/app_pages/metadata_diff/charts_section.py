@@ -1,0 +1,259 @@
+"""Charts section: the indicator texts this branch changed, and the charts that render them.
+
+Organised by *change*, not by chart. One reworded WYSK bullet can reach hundreds of charts; listing it
+once with its charts underneath is both shorter and truer to what the author has to decide, and it keeps
+the page usable on a big data update where a per-chart list would run to thousands of entries.
+
+A chart's own title/subtitle/footnote is Chart Diff's territory (it is chart config). What this section
+adds is the layer Chart Diff cannot see: the text a chart *inherits* from indicator metadata, authored
+in the garden step — WYSK above all, which no config diff shows.
+"""
+
+from typing import Any
+
+import streamlit as st
+from sqlalchemy.engine.base import Engine
+
+from apps.wizard.app_pages.metadata_diff import cached, datapage, mdim_pages
+from apps.wizard.app_pages.metadata_diff.core import (
+    ChangeGroup,
+    affected_charts,
+    affected_drafts,
+    charts_in_reading_order,
+    distinct_garden_datasets,
+    distinct_indicator_short_names,
+    field_label,
+    group_changes,
+    group_usage,
+    parse_catalog_path,
+)
+from apps.wizard.app_pages.metadata_diff.render import (
+    BASELINE_NAME,
+    DIFF_CSS,
+    render_chart_list,
+    st_origin_caption,
+)
+from apps.wizard.app_pages.metadata_diff.review_state import (
+    n_reviewed,
+    resolve_marks,
+    st_reviewed_toggle,
+    surface_key,
+)
+from apps.wizard.utils.components import Pagination
+
+# All chart-side changes share one reviewed-state surface: a change is a change to an indicator's text,
+# wherever it surfaces.
+SURFACE = surface_key("charts", "indicators")
+
+CHANGES_PER_PAGE = 5
+
+
+def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -> None:
+    """Render the Charts section: every indicator text change, with the charts it lands on."""
+    st.markdown(DIFF_CSS, unsafe_allow_html=True)
+
+    changed = cached.indicator_changes(source_engine, target_engine)
+    groups = group_changes(changed.view_diffs())
+    usage = cached.usage_for_indicators(tuple(changed.ids_list), "", source_engine)
+    attribution = cached.indicator_attribution(source_engine, target_engine, tuple(changed.paths))
+
+    if not changed.narrowed:
+        st.warning(
+            "Could not read this branch's changed files from git, so the list is **not narrowed to your "
+            "branch** — it may include metadata that master has moved on since this server was created."
+        )
+
+    if not groups:
+        all_clear, message = _empty_diff_notice(changed)
+        (st.success if all_clear else st.info)(message)
+        _extra_notes(changed)
+        _lookup_expander(source_engine, target_engine)
+        return
+
+    marks = resolve_marks(source_engine, SURFACE, groups)
+    n_charts = len({c["chartId"] for g in groups for c in affected_charts(g, usage)})
+    st.markdown(
+        f"**{len(groups)} text change{'s' if len(groups) != 1 else ''}** on "
+        f"**{len(changed.diffs)} indicator{'s' if len(changed.diffs) != 1 else ''}**, reaching "
+        f"**{n_charts} published chart{'s' if n_charts != 1 else ''}** · "
+        f"{n_reviewed(marks)}/{len(marks)} reviewed",
+        help="Reviewed is your own progress marker — it is stored on this staging server, resets if the "
+        "text is edited again, and is never synced to production.",
+    )
+    _extra_notes(changed)
+
+    pagination = Pagination(marks, items_per_page=CHANGES_PER_PAGE, pagination_key="mdd-charts-pagination")
+    if len(marks) > CHANGES_PER_PAGE:
+        pagination.show_controls()
+
+    for mark in pagination.get_page_items():
+        _render_change(source_engine, mark, usage, attribution)
+
+    if len(marks) > CHANGES_PER_PAGE:
+        pagination.show_controls(position="bottom")
+
+    _lookup_expander(source_engine, target_engine)
+
+
+def _empty_diff_notice(changed) -> tuple[bool, str]:
+    """Whether an empty diff is genuinely all clear, and what to say about it.
+
+    Green means "nothing here needs your eyes", and an empty comparison does not establish that. A version
+    bump replaces every catalog path, so nothing has a baseline counterpart and the diff comes back empty
+    while a whole dataset's worth of reader-facing text has never been read. `Summary.has_changes` counts
+    new indicators for that reason; this section has to agree, or the page says all clear right above a
+    caption admitting a hundred indicators went unreviewed.
+    """
+    if changed.new_paths:
+        n = len(changed.new_paths)
+        return False, (
+            f"**Nothing to diff, and {n} indicator{'s' if n != 1 else ''} unreviewed** — no indicator's "
+            f"text *differs* from {BASELINE_NAME}, but {n} {'are' if n != 1 else 'is'} new on this server, "
+            "so there is no old text to compare against. A version bump lands exactly here."
+        )
+    return True, (
+        f"**No indicator text changes** against {BASELINE_NAME} — no chart's inherited title, subtitle "
+        "or *What you should know* text differs here."
+    )
+
+
+def _extra_notes(changed) -> None:
+    """New indicators and the section's scope — stated, so an empty list is never read as 'all clear'."""
+    if changed.new_paths:
+        n = len(changed.new_paths)
+        st.caption(
+            f"➕ {n} indicator{'s' if n != 1 else ''} on this server {'do' if n != 1 else 'does'} not exist in "
+            f"{BASELINE_NAME} yet, so there is no old text to diff. New indicators are not listed here."
+        )
+    st.caption(
+        "This section covers text a chart **inherits from indicator metadata** (garden `.meta.yml`). A "
+        "chart's own title/subtitle/footnote lives in its config — review those in **Chart Diff**."
+    )
+
+
+def _render_change(
+    source_engine: Engine,
+    mark,
+    usage: dict[int, dict[str, list[dict[str, Any]]]],
+    attribution: dict[str, str],
+) -> None:
+    """One distinct text change: what changed, where it appears, and what it reaches."""
+    g: ChangeGroup = mark.group
+    # Charts only, here. An MDim rendering the same indicator appears in the MDims section on its own
+    # card — its indicator text changed, which is what puts it there — so naming it in both places
+    # doubles every shared change and leaves neither section answering its own question.
+    # Every chart using the indicator counts: its readers see the new text either on the chart's data page
+    # or through "Learn more about this data". The list below groups them; neither group is deducted.
+    charts = group_usage(g, usage)["charts"]
+    drafts = affected_drafts(g, usage)
+
+    plural = "s" if len(charts) != 1 else ""
+    # Drafts sit outside the reach count and are named in the label, so "10 charts" keeps meaning
+    # "10 charts a reader can open" wherever it appears.
+    draft_note = f" · {len(drafts)} draft{'s' if len(drafts) != 1 else ''}" if drafts else ""
+    with st.container(border=True):
+        # The header carries the reach and the list behind it: "10 charts" is a claim, and the charts are
+        # what lets an author check it, so the count itself opens them rather than sending the reader to
+        # the foot of the card. Review sits alongside, the way the MDim cards lead with their actions.
+        col_head, col_review = st.columns([3, 1], vertical_alignment="center")
+        with col_head:
+            with st.container(border=False, horizontal=True, vertical_alignment="center"):
+                st.markdown(f"{mark.icon} **{field_label(g.field)}** ·")
+                with st.popover(f"📊 {len(charts)} chart{plural}{draft_note}"):
+                    render_chart_list(charts, fields={g.field}, drafts=drafts)
+                    _open_chart_buttons(charts, mark.change_key)
+        with col_review:
+            st_reviewed_toggle(source_engine, SURFACE, mark)
+
+        st.caption(_where_line(g))
+        st_origin_caption(_group_paths(g), attribution)
+
+        datapage.st_datapage_diff(
+            {g.field: {"old": g.old, "new": g.new}},
+            baseline_label=BASELINE_NAME.capitalize(),
+            staging_label="This staging server",
+            show_unchanged_slots=False,
+        )
+
+
+def _group_paths(g: ChangeGroup) -> set[str]:
+    """The indicator catalogPaths carrying this change (a shared definition reaches several)."""
+    return g.catalog_paths or ({g.catalog_path} if g.catalog_path else set())
+
+
+def _where_line(g: ChangeGroup) -> str:
+    """Where to edit this text — never presenting a variable key as the target when a definition is likelier.
+
+    Two shapes of sharing, and only one used to be caught. Several *differently named* indicators carrying
+    the identical text can only have got it from a shared `definitions.*` entry. But the same text landing
+    on many dimensional variants of ONE indicator (`thr__welfare_type_income…`, ×8) is equally a template,
+    and naming `tables.<t>.variables.thr` as the target there sends the author to edit a field whose value
+    is a `{definitions.*}` reference — the exact mistake this tool exists to prevent.
+
+    Both shapes assume one garden dataset. When the identical text was edited in several, it is that many
+    separate edits — no definition is shared across datasets — so those are named instead of one file.
+    """
+    garden_dirs = distinct_garden_datasets(g.catalog_paths)
+    if len(garden_dirs) > 1:
+        files = ", ".join(f"`{d}.meta.yml`" for d in garden_dirs[:4]) + (" …" if len(garden_dirs) > 4 else "")
+        return (
+            f"✂️ The identical text was edited in {len(garden_dirs)} separate garden datasets ({files}) — no "
+            "`definitions.*` block is shared across datasets, so this is that many edits. Edit each file."
+        )
+    shared_names = distinct_indicator_short_names(g.catalog_paths)
+    if len(shared_names) > 1:
+        preview = ", ".join(f"`{n}`" for n in shared_names[:5]) + (" …" if len(shared_names) > 5 else "")
+        return (
+            f"🔗 The identical text renders on {len(shared_names)} indicators ({preview}) — that is a shared "
+            "`definitions.*` / `shared.meta.yml` entry, not a per-variable field. Edit the definition."
+        )
+    parsed = parse_catalog_path(g.catalog_path)
+    if len(g.catalog_paths) > 1:
+        where = f"`{parsed[0]}.meta.yml`" if parsed else "the indicator's garden `.meta.yml`"
+        return (
+            f"🔗 The identical text renders on {len(g.catalog_paths)} dimensional variants of "
+            f"`{parsed[2] if parsed else 'this indicator'}` — so it comes from a template, not a literal "
+            f"value. Grep {where} for the changed text and edit the `definitions.*` entry it resolves to."
+        )
+    if parsed:
+        return (
+            f"Authored in `{parsed[0]}.meta.yml` → `tables.{parsed[1]}.variables.{parsed[2]}` — if that "
+            "field holds a `{definitions.*}` reference, edit the definition rather than the field."
+        )
+    return "Authored in the indicator's garden `.meta.yml`"
+
+
+def _open_chart_buttons(charts: list[dict[str, Any]], change_key: str) -> None:
+    """Jump into the per-chart review (the deep view with sign-off and a PR brief) for one chart.
+
+    The same chart can render several distinct changes, so the widget key carries the change too.
+    """
+    if not charts:
+        return
+    st.caption("Open one of them in the full per-chart review:")
+    for c in charts_in_reading_order(charts)[:8]:
+        slug = str(c.get("slug") or "")
+        if not slug:
+            continue
+        st.button(
+            f"🔍 {slug}",
+            key=f"mdd-open-chart-{change_key[:12]}-{slug}",
+            on_click=_select_chart,
+            args=(slug,),
+            help="Opens the chart's own review below, with its blast radius and PR brief.",
+        )
+
+
+def _select_chart(slug: str) -> None:
+    st.session_state["chart"] = slug
+
+
+def _lookup_expander(source_engine: Engine, target_engine: Engine) -> None:
+    """Any chart, changed or not — for checking that a chart you expected to change didn't, or vice versa."""
+    selected = st.session_state.get("chart")
+    with st.expander("🔎 Look up any chart", expanded=bool(selected)):
+        st.caption(
+            "The lists above only show what this branch changed. Use this to inspect any published chart's "
+            "inherited metadata — including confirming that a chart you were worried about is untouched."
+        )
+        mdim_pages.chart_flow(source_engine, target_engine)
