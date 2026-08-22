@@ -1640,7 +1640,8 @@ def test_a_stale_section_label_never_survives_as_a_value():
     assert coerce_section(serde.deserialize([stale]), "charts") == "mdims"
 
     # A label that is still current round-trips to its option, coercion or not.
-    assert coerce_section(serde.deserialize([formatted[1]]), "charts") == "mdims"
+    current = formatted[options.index("mdims")]
+    assert coerce_section(serde.deserialize([current]), "charts") == "mdims"
 
 
 def test_section_switcher_keeps_the_url_on_a_section_key():
@@ -1751,3 +1752,177 @@ def test_chart_list_names_drafts_separately(monkeypatch):
     out = "\n".join(written)
     assert "1 unpublished draft" in out
     assert "No chart uses these indicators" not in out
+
+
+def test_reach_never_counts_a_draft_chart():
+    """`charts_reached` is the reach reported in the PR comment, so a draft must not enter it.
+
+    Drafts come back from the same query as published charts, on purpose — they are listed so their author
+    sees the edit landed there. This is the boundary: listed, not counted.
+    """
+    group = ChangeGroup(field="descriptionKey", old=["a"], new=["b"], indicator_ids={1})
+    usage = {
+        1: [
+            {"chartId": 1, "slug": "live", "is_published": True},
+            {"chartId": 2, "slug": "wip", "is_published": False},
+            # Rows from before the flag existed default to published, as the callers always assumed.
+            {"chartId": 3, "slug": "legacy"},
+        ]
+    }
+    assert charts_reached([group], usage) == {1, 3}
+
+
+def _reach_fixture():
+    """One shared WYSK edit across three surfaces, plus a second edit on one chart only."""
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach
+
+    shared = ChangeReach(
+        field="descriptionKey",
+        old=["a"],
+        new=["b"],
+        charts=[
+            {"chartId": 1, "slug": "on-page", "has_data_page": True, "is_published": True},
+            {"chartId": 2, "slug": "combined", "has_data_page": False, "is_published": True},
+        ],
+        draft_charts=[{"chartId": 3, "slug": "wip", "has_data_page": True, "is_published": False}],
+        mdims=[
+            {"catalogPath": "grapher/ns/latest/live", "n_views": 16, "is_draft": False},
+            {"catalogPath": "grapher/ns/latest/hidden", "n_views": 4, "is_draft": True},
+        ],
+        explorers=[{"slug": "an-explorer", "n_views": 3}],
+    )
+    subtitle = ChangeReach(
+        field="descriptionShort",
+        old="x",
+        new="y",
+        charts=[{"chartId": 1, "slug": "on-page", "has_data_page": True, "is_published": True}],
+    )
+    return shared, subtitle
+
+
+def test_reach_separates_who_can_see_it_from_who_cannot():
+    """The headline number is reader-facing places; drafts and unpublished views are counted apart."""
+    shared, subtitle = _reach_fixture()
+
+    # 2 published charts + 16 views of the published MDim + 3 explorer views.
+    assert shared.n_reader_facing == 21
+    # 1 draft chart + 4 views of the unpublished MDim.
+    assert shared.n_hidden == 5
+    assert subtitle.n_reader_facing == 1
+    assert subtitle.n_hidden == 0
+
+
+def test_reach_by_surface_collapses_a_page_carrying_two_changes():
+    """The by-surface view exists for exactly this: one page, every edit landing on it."""
+    from apps.wizard.app_pages.metadata_diff.discovery import reach_by_surface
+
+    rows = reach_by_surface(list(_reach_fixture()))
+    by_name = {r["name"]: r for r in rows}
+
+    # `on-page` carries both edits and appears once, with both fields.
+    assert sorted(by_name["on-page"]["fields"]) == ["Description", "WYSK"]
+    assert by_name["on-page"]["detail"] == "data page"
+    assert by_name["on-page"]["published"] is True
+
+    # A multi-indicator chart says how its readers reach the text.
+    assert by_name["combined"]["detail"] == "via Learn more about this data"
+
+    # Unpublished surfaces are marked, not dropped: the draft chart and the unpublished MDim.
+    assert by_name["wip"]["published"] is False
+    assert by_name["grapher/ns/latest/hidden"]["published"] is False
+    assert by_name["grapher/ns/latest/live"]["detail"] == "16 views"
+    assert by_name["an-explorer"]["detail"] == "3 views"
+
+    # Published charts lead and drafts come last, so the reader-facing rows are read first.
+    kinds = [r["kind"] for r in rows]
+    assert kinds.index("chart") < kinds.index("mdim") < kinds.index("draft_chart")
+
+
+def test_the_same_text_on_two_surfaces_is_one_blast_radius_row():
+    """`change_identity` ignores the surface, which is what makes a shared definition one row."""
+    from apps.wizard.app_pages.metadata_diff.discovery import _reach_slot, change_identity
+
+    mdim_group = ChangeGroup(field="descriptionKey", old=["a"], new=["b"], view_dims=[{"d": "x"}])
+    chart_group = ChangeGroup(field="descriptionKey", old=["a"], new=["b"], indicator_ids={5})
+    other_text = ChangeGroup(field="descriptionKey", old=["a"], new=["c"])
+
+    assert change_identity(mdim_group) == change_identity(chart_group)
+
+    reach: dict = {}
+    _reach_slot(reach, mdim_group).mdims.append({"catalogPath": "cp", "n_views": 2, "is_draft": False})
+    _reach_slot(reach, chart_group).charts.append({"chartId": 1, "slug": "s", "is_published": True})
+    _reach_slot(reach, other_text)
+
+    assert len(reach) == 2
+    merged = reach[change_identity(mdim_group)]
+    assert len(merged.mdims) == 1 and len(merged.charts) == 1
+
+
+def test_blast_radius_badge_carries_no_review_counter():
+    """It reports reach and holds no sign-off, so "(0)" there would say the wrong thing."""
+    from apps.wizard.app_pages.metadata_diff.core import COUNTED_SECTIONS, SECTIONS, section_label
+
+    assert list(SECTIONS)[0] == "blast", "Blast radius leads the section bar"
+    assert "blast" not in COUNTED_SECTIONS
+    label = section_label("blast", {})
+    assert label.endswith("Blast radius")
+    assert "(" not in label
+    # The review sections keep their counters.
+    assert section_label("charts", {"charts": (2, 10)}).endswith("(2/10)")
+
+
+def test_diff_preview_windows_on_the_change_not_the_start():
+    """A sentence added deep inside a long bullet still shows as an insertion.
+
+    Truncating from the front showed the first 260 identical characters and no highlight at all — which is
+    what the blast-radius rows did on real data, leaving two rows both labelled WYSK and neither saying
+    what it changed.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import diff_window_html
+
+    lead = "The World Bank defines extreme poverty as living on less than $3 per day, a threshold set so "
+    lead += "that poverty can be compared across countries and over time in a consistent way. " * 3
+    old = lead + "For more details refer to the documentation."
+    new = lead + "The most recent years are projections. For more details refer to the documentation."
+
+    out = diff_window_html(old, new, max_chars=200)
+    assert "<ins" in out, "the inserted sentence has to be visible in the preview"
+    assert "most recent years" in out
+    # The window opens with an ellipsis because it skipped the identical opening.
+    assert out.startswith("… ")
+    assert len(out) < len(old)
+
+    # A change at the very start needs no ellipsis, and still highlights.
+    out_front = diff_window_html("Old title", "New title", max_chars=200)
+    assert not out_front.startswith("… ")
+    assert "<ins" in out_front or "<del" in out_front
+
+    # Values that differ without any word-level highlight (a pure reorder) still render something.
+    reordered = diff_window_html(["a", "b"], ["b", "a"], max_chars=200)
+    assert reordered
+
+
+def test_by_surface_counts_two_edits_of_the_same_field_on_one_page():
+    """Two distinct WYSK edits on one chart is the finding this view exists for.
+
+    Deduping the labels for display while counting them for the sort order hid it, and put those rows at
+    the top of the list with nothing to explain why they were there.
+    """
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, reach_by_surface
+
+    chart = {"chartId": 1, "slug": "hit-twice", "has_data_page": False, "is_published": True}
+    other = {"chartId": 2, "slug": "hit-once", "has_data_page": True, "is_published": True}
+    reach = [
+        ChangeReach(field="descriptionKey", old=["a"], new=["b"], charts=[chart]),
+        ChangeReach(field="descriptionKey", old=["c"], new=["d"], charts=[chart, other]),
+    ]
+
+    rows = {r["name"]: r for r in reach_by_surface(reach)}
+    assert rows["hit-twice"]["field_counts"] == {"WYSK": 2}
+    assert rows["hit-twice"]["n_changes"] == 2
+    assert rows["hit-once"]["field_counts"] == {"WYSK": 1}
+
+    # A data page is read before a chart that keeps the text behind the sources drawer, even though the
+    # drawer chart carries more edits.
+    order = [r["name"] for r in reach_by_surface(reach)]
+    assert order == ["hit-once", "hit-twice"]

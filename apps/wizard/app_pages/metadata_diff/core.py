@@ -727,10 +727,10 @@ def diff_preview_html(view_diff: ViewDiff, max_fields: int = 3, max_chars: int =
                 o = old_list[i] if i < len(old_list) else ""
                 n = new_list[i] if i < len(new_list) else ""
                 if _normalize(o) != _normalize(n):
-                    bullet_bits.append(f"<li>{_truncate_html(inline_diff_html(str(o), str(n)), max_chars)}</li>")
+                    bullet_bits.append(f"<li>{truncate_html(inline_diff_html(str(o), str(n)), max_chars)}</li>")
             body = f'<ul class="mdd-bullets">{"".join(bullet_bits)}</ul>'
         else:
-            body = _truncate_html(inline_diff_html(str(old), str(new)), max_chars)
+            body = truncate_html(inline_diff_html(str(old), str(new)), max_chars)
         blocks.append(f'<div class="mdd-field"><b>{html.escape(field_label(field_name))}</b>{body}</div>')
 
     hidden = len(view_diff.fields) - max_fields
@@ -739,7 +739,27 @@ def diff_preview_html(view_diff: ViewDiff, max_fields: int = 3, max_chars: int =
     return "".join(blocks)
 
 
-def _truncate_html(rendered: str, max_chars: int) -> str:
+def diff_window_html(old: Any, new: Any, max_chars: int = 240, lead: int = 70) -> str:
+    """Word-level diff of one change, windowed on the first edit rather than cut from the start.
+
+    Everything `inline_diff_html` emits before its first `<del>`/`<ins>` is plain text — unchanged tokens
+    carry no markup — so the window can start at any character before that point without splitting a tag.
+    """
+    rendered = inline_diff_html(as_plaintext(old), as_plaintext(new))
+    marks = [i for i in (rendered.find("<del"), rendered.find("<ins")) if i != -1]
+    if not marks:
+        # No highlight to centre on: the change is a reorder, or the values differ only in whitespace.
+        return truncate_html(rendered, max_chars)
+
+    start = max(0, min(marks) - lead)
+    if start:
+        # Snap forward to a word boundary so the window does not open mid-word.
+        space = rendered.find(" ", start)
+        start = space + 1 if 0 <= space < min(marks) else start
+    return ("… " if start else "") + truncate_html(rendered[start:], max_chars)
+
+
+def truncate_html(rendered: str, max_chars: int) -> str:
     """Truncate rendered diff HTML to `max_chars` of *visible* text (tags don't count).
 
     Counting tag characters against the budget made the preview cut off right after the change;
@@ -767,12 +787,19 @@ def _truncate_html(rendered: str, max_chars: int) -> str:
     return safe + "…"
 
 
-# Sections of the page, in Chart Diff's order, each with the icon Chart Diff gives it.
+# Sections of the page. Blast radius leads — it is the overview of everywhere the branch's edits land,
+# and the three review surfaces follow in Chart Diff's order, with the icons Chart Diff gives them.
 SECTIONS = {
+    "blast": (":material/explosion:", "Blast radius"),
     "charts": (":material/show_chart:", "Charts"),
     "mdims": (":material/dashboard:", "MDims"),
     "explorers": (":material/explore:", "Explorers"),
 }
+# Sections whose badge counts reviewed changes. Blast radius holds no sign-off of its own — it reports
+# reach — so a counter there would read as "nothing to review" when it means "nothing to count".
+COUNTED_SECTIONS = frozenset({"charts", "mdims", "explorers"})
+# The landing section stays Charts: that is where the review work happens, and changing where the page
+# opens would move everyone's habit for the sake of the new view's prominence in the bar.
 DEFAULT_SECTION = "charts"
 
 
@@ -783,6 +810,8 @@ def section_label(section: str, progress: dict[str, tuple[int, int]]) -> str:
     cannot distinguish "nothing to review" from "nothing reviewed yet", which is the whole question.
     """
     icon, name = SECTIONS[section]
+    if section not in COUNTED_SECTIONS:
+        return f"{icon} {name}"
     done, total = progress.get(section, (0, 0))
     if not total:
         return f"{icon} {name} (0)"

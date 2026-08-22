@@ -7,6 +7,8 @@ config diff. Titles, subtitles, footnotes, `description_short` and WYSK / `descr
 The page opens on the changes. Three sections, same order and icons as Chart Diff, each carrying a count
 so you can see at a glance where this branch landed:
 
+- **Blast radius** — everywhere the branch's edits land, across all three surfaces, by change or by
+  affected page. The one view that crosses surfaces on purpose.
 - **Charts** — indicator texts that changed, and the published charts that render them.
 - **MDims** — MDims whose view texts changed, linking into the per-MDim Blast radius / View diff / Review.
 - **Explorers** — published explorer views whose resolved text changed.
@@ -20,7 +22,13 @@ import streamlit as st
 from structlog import get_logger
 
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines
-from apps.wizard.app_pages.metadata_diff import cached, charts_section, explorers_section, mdims_section
+from apps.wizard.app_pages.metadata_diff import (
+    blast_section,
+    cached,
+    charts_section,
+    explorers_section,
+    mdims_section,
+)
 from apps.wizard.app_pages.metadata_diff.data import count_ticked
 from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, st_section_switcher, st_stale_server_banner
 from apps.wizard.utils.components import st_title_with_expert
@@ -84,7 +92,9 @@ what ships is what you meant, and to see how far each change reaches.
 
     section = st_section_switcher(progress)
 
-    if section == "mdims":
+    if section == "blast":
+        blast_section.st_show_blast_radius(source_engine, target_engine)
+    elif section == "mdims":
         mdims_section.st_show_mdim_metadata_diffs(source_engine, target_engine)
     elif section == "explorers":
         explorers_section.st_show_explorer_metadata_diffs(source_engine, target_engine)

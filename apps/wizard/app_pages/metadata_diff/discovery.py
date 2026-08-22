@@ -980,6 +980,9 @@ class Summary:
     """Counts behind the section badges and the owidbot report."""
 
     n_charts: int = 0  # published charts rendering a changed indicator text
+    # Per changed text, every surface it lands on. Powers the Blast radius section; `mdims_resolved`
+    # False means its MDim rows are incomplete, for the same reason the MDim count is a ceiling.
+    reach: list["ChangeReach"] = field(default_factory=list)
     n_indicators: int = 0  # indicators whose text changed
     n_chart_changes: int = 0  # distinct (field, old -> new) changes on the indicator layer
     n_new_indicators: int = 0  # on staging, absent from the baseline (no old text to diff)
@@ -1047,22 +1050,125 @@ class Summary:
 
 
 def charts_reached(groups: list[ChangeGroup], usage: dict[int, list[dict[str, Any]]]) -> set[int]:
-    """Chart ids these changes reach.
+    """Chart ids these changes reach — published only.
 
     Every published chart using the indicator: its readers can see the new text either on the chart's data
     page or through "Learn more about this data". Which of the two is a matter of prominence, reported in
     the lists rather than deducted from the count.
+
+    Drafts arrive in the same list from `charts_using_indicators` (they are listed, per surface, so their
+    author can see the edit landed there) and are dropped here: nobody can open one, and this number is
+    the reach reported in the PR comment.
     """
     reached: set[int] = set()
     for g in groups:
         for iid in g.indicator_ids or ({g.indicator_id} if g.indicator_id is not None else set()):
-            reached.update(int(c["chartId"]) for c in usage.get(iid, []))
+            reached.update(int(c["chartId"]) for c in usage.get(iid, []) if c.get("is_published", True))
     return reached
+
+
+@dataclass
+class ChangeReach:
+    """One changed text and every surface it lands on — the blast radius of a single edit.
+
+    The unit is the *text*, not the sighting: a reworded shared definition renders on its indicator's
+    charts, on every MDim view using it and on every explorer view, and those are one edit to judge with
+    several audiences, not several edits. `change_identity` is what merges them, so the same text edited
+    in two garden datasets still collapses here.
+    """
+
+    field: str
+    old: Any = None
+    new: Any = None
+    charts: list[dict[str, Any]] = field(default_factory=list)  # published, with `has_data_page`
+    draft_charts: list[dict[str, Any]] = field(default_factory=list)
+    mdims: list[dict[str, Any]] = field(default_factory=list)  # {catalogPath, n_views, is_draft}
+    explorers: list[dict[str, Any]] = field(default_factory=list)  # {slug, n_views}
+
+    @property
+    def n_reader_facing(self) -> int:
+        """Places a reader can actually reach this text: published charts and published views."""
+        return (
+            len(self.charts)
+            + sum(int(m["n_views"]) for m in self.mdims if not m["is_draft"])
+            + sum(int(e["n_views"]) for e in self.explorers)
+        )
+
+    @property
+    def n_hidden(self) -> int:
+        """Places carrying it that no reader can open — draft charts and unpublished MDim views."""
+        return len(self.draft_charts) + sum(int(m["n_views"]) for m in self.mdims if m["is_draft"])
+
+
+def reach_by_surface(reach: list[ChangeReach]) -> list[dict[str, Any]]:
+    """Invert the blast radius: one row per affected surface, naming the changes that land on it.
+
+    The by-change view answers "how far does this edit go", which is the review question. This answers
+    "what happens to this page", which is the question you have when a specific chart matters to you —
+    and it is the only view where a chart carrying two separate edits shows up as one thing.
+    """
+    rows: dict[tuple[str, str], dict[str, Any]] = {}
+
+    def slot(kind: str, name: str, detail: str, published: bool) -> dict[str, Any]:
+        row = rows.get((kind, name))
+        if row is None:
+            row = {"kind": kind, "name": name, "detail": detail, "published": published, "fields": []}
+            rows[(kind, name)] = row
+        return row
+
+    for r in reach:
+        label = field_label(r.field)
+        for c in r.charts:
+            detail = "data page" if c.get("has_data_page", True) else "via Learn more about this data"
+            slot("chart", str(c.get("slug") or f"chart {c.get('chartId')}"), detail, True)["fields"].append(label)
+        for c in r.draft_charts:
+            name = str(c.get("slug") or f"chart {c.get('chartId')}")
+            slot("draft_chart", name, "unpublished chart", False)["fields"].append(label)
+        for m in r.mdims:
+            n_views = int(m["n_views"])
+            detail = f"{n_views} view{'s' if n_views != 1 else ''}"
+            slot("mdim", str(m["catalogPath"]), detail, not m["is_draft"])["fields"].append(label)
+        for e in r.explorers:
+            n_views = int(e["n_views"])
+            detail = f"{n_views} view{'s' if n_views != 1 else ''}"
+            slot("explorer", str(e["slug"]), detail, True)["fields"].append(label)
+
+    # Reader-facing surfaces first, data pages ahead of the sources drawer, then the pages carrying the
+    # most edits — the order a reviewer reads them in.
+    order = {"chart": 0, "mdim": 1, "explorer": 2, "draft_chart": 3}
+    for row in rows.values():
+        counts: dict[str, int] = {}
+        for label in row["fields"]:
+            counts[label] = counts.get(label, 0) + 1
+        # A page can carry the same field twice — two distinct WYSK edits, say, from two indicators it
+        # renders. Deduping for display without saying so made those rows unreadable.
+        row["field_counts"] = counts
+        row["n_changes"] = len(row["fields"])
+        row["fields"] = sorted(counts)
+    return sorted(
+        rows.values(),
+        key=lambda r: (
+            order.get(r["kind"], 9),
+            0 if r["detail"] == "data page" else 1,
+            -r["n_changes"],
+            r["name"],
+        ),
+    )
 
 
 def change_identity(g: ChangeGroup) -> tuple[str, str]:
     """A distinct text change, independent of which surface renders it."""
     return (g.field, json.dumps([g.old, g.new], sort_keys=True, default=str))
+
+
+def _reach_slot(reach: dict[tuple[str, str], ChangeReach], g: ChangeGroup) -> ChangeReach:
+    """The blast-radius row for this change, creating it on first sight of the text."""
+    key = change_identity(g)
+    slot = reach.get(key)
+    if slot is None:
+        slot = ChangeReach(field=g.field, old=g.old, new=g.new)
+        reach[key] = slot
+    return slot
 
 
 def _collect_changes(seen: set[tuple[str, str]], groups: list[ChangeGroup]) -> None:
@@ -1094,6 +1200,7 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
     """
     summary = Summary()
     seen: set[tuple[str, str]] = set()
+    reach: dict[tuple[str, str], ChangeReach] = {}
 
     # --- Charts (indicator layer) ---
     try:
@@ -1107,6 +1214,14 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
         _collect_changes(seen, chart_groups)
         usage = charts_affected(source_engine, changed)
         summary.n_charts = len(charts_reached(chart_groups, usage))
+        for g in chart_groups:
+            by_id: dict[int, dict[str, Any]] = {}
+            for iid in g.indicator_ids or ({g.indicator_id} if g.indicator_id is not None else set()):
+                for c in usage.get(iid, []):
+                    by_id.setdefault(int(c["chartId"]), c)
+            slot = _reach_slot(reach, g)
+            slot.charts = [c for c in by_id.values() if c.get("is_published", True)]
+            slot.draft_charts = [c for c in by_id.values() if not c.get("is_published", True)]
         charts_surface = surface_key("charts", "indicators")
         summary.review_keys["charts"] = [(charts_surface, *mark_identity(charts_surface, g)) for g in chart_groups]
         for origin in attribute_indicator_changes(source_engine, target_engine, changed.paths, master_engine).values():
@@ -1150,6 +1265,10 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
                     summary.review_keys.setdefault("mdims", []).extend(
                         (mdim_surface, *mark_identity(mdim_surface, g)) for g in ours
                     )
+                    for g in ours:
+                        _reach_slot(reach, g).mdims.append(
+                            {"catalogPath": cp, "n_views": len(g.view_dims), "is_draft": False}
+                        )
         # Drafts are counted only where they actually have changed text, same test as the rest.
         if len(drafts) > MAX_MDIMS_RESOLVED:
             # Too many to diff view by view. Report the flag count as a ceiling and say so, rather than
@@ -1162,8 +1281,13 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
             scope_for_drafts = branch_scope()
             for cp in drafts:
                 view_diffs = [v for v in mdim_text_changes(source_engine, target_engine, cp) if v.changed]
-                if split_mdim_groups(cp, view_diffs, scope_for_drafts)[0]:
+                draft_groups = split_mdim_groups(cp, view_diffs, scope_for_drafts)[0]
+                if draft_groups:
                     summary.n_draft_mdims += 1
+                    for g in draft_groups:
+                        _reach_slot(reach, g).mdims.append(
+                            {"catalogPath": cp, "n_views": len(g.view_dims), "is_draft": True}
+                        )
     except Exception as e:  # noqa: BLE001
         log.warning("metadata_diff.mdim_discovery_failed", error=str(e))
         summary.warnings.append(f"MDim discovery failed: {e}")
@@ -1182,6 +1306,8 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
             summary.review_keys.setdefault("explorers", []).extend(
                 (explorer_surface, *mark_identity(explorer_surface, g)) for g in explorer_groups
             )
+            for g in explorer_groups:
+                _reach_slot(reach, g).explorers.append({"slug": slug, "n_views": len(g.view_dims)})
     except Exception as e:  # noqa: BLE001
         log.warning("metadata_diff.explorer_discovery_failed", error=str(e))
         summary.warnings.append(f"Explorer discovery failed: {e}")
@@ -1190,5 +1316,7 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
         label = field_label(field_name)
         summary.fields[label] = summary.fields.get(label, 0) + 1
     summary.n_distinct_changes = len(seen)
+    # Widest first: the blast radius is read to find what an edit costs, and the expensive ones lead.
+    summary.reach = sorted(reach.values(), key=lambda r: (-r.n_reader_facing, -r.n_hidden, r.field))
 
     return summary
