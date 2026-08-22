@@ -16,6 +16,29 @@ stop before the first Figma call and recommend re-running on **Opus** (or **Sonn
 mechanical re-export or a single text fix); continue only on the user's say-so — this skill is long
 chains of design judgment, and a build on the wrong model wastes the shared file's review cycle.
 
+**Load the Figma tool schemas in one `ToolSearch`, before the first Figma call.** Where the
+`mcp__Figma__*` tools arrive deferred — a cloud session serves them that way — discovering them one at
+a time costs a model turn each, ~7 over a run:
+
+```
+select:mcp__Figma__use_figma,mcp__Figma__get_screenshot,mcp__Figma__get_metadata,mcp__Figma__upload_assets,mcp__Figma__search_design_system
+```
+
+Add `get_design_context` or `download_assets` when the route needs them; harmless where they are
+already loaded.
+
+**In a cloud session `admin.owid.io` never resolves**, and the refusal arrives as a `403` that reads
+like an auth failure — so discovering it mid-run costs retries plus a credential hunt that could not
+have helped. Two steps reach for it, and
+[cloud-sandbox.md](../../docs/cloud-sandbox.md) has the fallbacks: **Step 1's** narrative-chart-by-name
+map, which the Datasette row in that same table replaces, and **Step 9's** 3× PNG export and upload,
+which move to the user's machine. That export is optional for a full-size chart, but for a **302-wide
+small or pull chart the PNG _is_ the deliverable** — a cloud session can build the frame and not ship
+it, so say which at delivery.
+
+Nothing else here is slower in a cloud session: the connector's own latency and concurrency measure
+the same either way. The wall clock goes on the **turn** around each call — see the Round-trip budget.
+
 **The single checkpoint rule:** the Charts file is a shared design file other people work in. Nothing is written to it before the user has seen the full proposal (page name, template choice, texts, planned label/annotation edits) and explicitly approved. Reading the file to check conventions needs no permission.
 
 Read [GUIDELINES.md](GUIDELINES.md) (sibling file) before editing any chart — it distills the DI Charts Guidelines per chart type and the Good Data Viz Checklist.
@@ -81,16 +104,32 @@ Three sibling skills do the text work this one depends on, and Step 8c calls the
 
 ## Round-trip budget
 
-Every Figma MCP call is a network hop to Figma's hosted connector: **7–10 s for `use_figma`, ~10 s for `get_screenshot`**, flat regardless of how big the script is. A run makes 120–190 of them. So the round trips are where the wall-clock goes — not the SVG exports (0.24 s each, under 2 s for a whole run) and not the response payloads (~1.5 KB per `use_figma`). Measured across five sessions by sweeping each one's call intervals for peak simultaneous in-flight calls: **two sessions never batched at all** (peak 1, nothing overlapping) and two more barely did (peak 2 and 5, 1–9% of calls overlapping), which is **16–28 minutes of pure serial round trips per chart**. One batched heavily — and paid for it; see the ceiling below.
+**A call costs twice, and the second cost is the one that gets forgotten.** The *call* is a network
+hop to Figma's hosted connector — **7–10 s for `use_figma`, ~10 s for `get_screenshot`**, flat
+regardless of how big the script is. The *turn* around it — issuing the call and reading its result —
+is a model turn, measured at a **~12 s median** (min 0.4 s, mean 19.5 s across 23 consecutive calls).
+So an unbatched call costs **~20 s, not ~10 s**, and a run's 120–190 of them come to **~50 minutes**
+when nothing overlaps. Nothing else is close: not the SVG exports (0.24 s each locally, 0.9–2.6 s
+through a cloud sandbox's egress proxy) and not the response payloads (~1.5 KB per `use_figma`).
 
-**Fan out independent calls — one message, 4–6 at a time.** The connector serves them concurrently: eight screenshots issued together came back **4.1× faster** than serially (79.7 s of work in 19.4 s of wall clock). It admits about four or five at once, and per-call latency inflates past that — 8.2 s for the first of eight, 13.2 s for the last — so **4–6 per message is the sweet spot and more just queues.** This is the `figma-use` skill's own instruction too: issue the N calls in one message, and don't await one before issuing the next.
+**So the unit to minimize is messages, not calls.** A batch collapses both costs at once — the
+connector serves the calls concurrently *and* they share one turn. Measured across five sessions by
+sweeping each one's call intervals for peak simultaneous in-flight calls: **two sessions never
+batched at all** (peak 1, nothing overlapping) and two more barely did (peak 2 and 5, 1–9% of calls
+overlapping). One batched heavily — and paid for it; see the ceiling below.
+
+**Fan out independent calls — one message, 4–6 at a time.** The connector serves them concurrently: eight screenshots issued together came back **4.1× faster** than serially (79.7 s of work in 19.4 s of wall clock), and six came back **3.85×** faster (53.1 s in 13.8 s). It admits about four or five at once, and per-call latency inflates past that — 8.2 s for the first of eight, 13.2 s for the last — so **4–6 per message is the sweet spot and more just queues.** This is the `figma-use` skill's own instruction too: issue the N calls in one message, and don't await one before issuing the next.
 
 Reads fan out freely. **Writes only when they target different pages** — a script may switch pages only once, so two `use_figma` writes aimed at the same page in one message race each other.
 
-What is independent, and today is not batched:
+What is independent — **the batch manifest, keyed by the step that owes it.** Issue each row's calls
+in one message, so batching is mechanical rather than a fresh judgment call every run:
 
+- **Step 5 — the page survey.** The page enumeration and `verify_templates.js` go together. Checking N pages means N calls — `page.children` on a page you have not switched to is lazily loaded — and they fan out.
+- **Step 8c — the checks.** `verify_page.js` and `diff_against_template.js` are one read-only call each; issue them together, with every pixel probe the pass needs.
+- **Step 9 — the delivery renders.** One screenshot per delivered frame, all in one message.
 - **The palette harvest.** `search_design_system` caps at ~14 results against a 24-fill palette, so it takes one group query plus ~11 by-name queries. Every one of them is independent.
-- **Screenshots of different frames or pages.** Issue them together, then `curl` all the returned URLs in one bash call, then Read each. A screenshot is otherwise three tool calls, and a run takes 14–70 of them.
+- **Screenshots of different frames or pages.** Issue them together, then `curl` all the returned URLs in one bash call — **in parallel**, `printf '%s\n' "$U1" … | xargs -P6 -I{} curl -sSL -o …` (six serially is 2.7 s through a cloud sandbox's egress proxy, 0.8 s in parallel) — then Read each. A screenshot is otherwise three tool calls, and a run takes 14–70 of them.
 - **Every format in a multi-format run**, and every frame of a `chart-rows` set — separate pages and frames, so the writes fan out as well as the reads.
 - **Any survey of N nodes** — but at 4–6, not more. The pass that wrote GUIDELINES.md screenshotted 272 chart-library nodes at **peak 14 in flight**, and its calls averaged **35.5 s** against ~10 s everywhere else. That is the ceiling being exceeded, not the connector being slow: 8.2 s at one in flight, 13.2 s at eight queued, 35.5 s at fourteen.
 - **`upload_assets` takes a `count`.** One call returns N single-use `submitUrl`s and the POSTs parallelize, so a two-format run uploads both originals in one call rather than two — and both embeds in one more.
@@ -148,7 +187,7 @@ Get an SVG URL for the chart, whatever form the reference takes:
 | **Explorer view** | `https://ourworldindata.org/explorers/<slug>.svg?<view params>` — `EXPLORER_DYNAMIC_THUMBNAIL_URL` in `settings/clientSettings.ts`. **Carry the view's full param set:** requested bare it returns an axis and nothing else, at HTTP 200 (2 texts, no series). Verified on the `imType=thumbnail` route; untested for the other `imType`s. |
 | **Bespoke component** (no slug, no `.svg`) | there is no endpoint — render and serialize the component yourself. See [BESPOKE-SVG.md](BESPOKE-SVG.md). |
 | Admin link `/admin/charts/<id>/edit` | **`/admin/charts/<id>.svg` does not exist** (it returns the admin SPA shell). Resolve the chart's `configId` — `SELECT configId FROM charts WHERE id = <id>` on the public Datasette (see the `query-grapher-db` skill), or `GET /admin/api/charts/<id>.config.json` — then use `https://ourworldindata.org/grapher/by-uuid/<configId>.svg`. Works for unpublished drafts too. |
-| Narrative chart (**name**) | name → uuid via the unauthenticated map `https://admin.owid.io/api/narrative-chart-map`, then `https://ourworldindata.org/grapher/by-uuid/<uuid>.svg` |
+| Narrative chart (**name**) | name → uuid via the unauthenticated map `https://admin.owid.io/api/narrative-chart-map`, then `https://ourworldindata.org/grapher/by-uuid/<uuid>.svg`. **In a cloud session this host never resolves** — take the Datasette route in the row below instead |
 | Narrative chart (**admin link with a numeric id**, `/admin/narrative-charts/<id>/edit`) | **Try the direct lookup first** — `select id, name, chartConfigId from narrative_charts where id = <id>` on the public Datasette hands you the uuid outright (note the column is `chartConfigId`, not `configId`). Only when the id isn't mirrored yet do you need the guessing route below. |
 | … the same, when the id is **newer than the Datasette mirror** | there is no id→uuid endpoint, and the mirror lags production by days (it once stopped at 338 while 341 existed). Diff the live name-keyed map against `select name from narrative_charts` to get the unmirrored names, then order them by uuid — they are **uuidv7, so lexical order is creation order** — and count up from the mirror's highest id. That gives a *candidate*, not an answer: ids have gaps where charts were deleted. **Always render the candidate and have the user confirm it before building.** In practice the **name is a far stronger signal than the id arithmetic** — these are named after the piece they serve (`share-of-women-in-parliament-di`), so an unmirrored name matching the DI's topic, *and* carrying the highest uuid, is near-certain. Note the DI page itself is not a reliable route: an older published DI can have `linkedNarrativeCharts: {}` because it ships a hand-made PNG, so the narrative chart you were handed may be newer than the post. Its embedded JSON is still worth reading for `grapher-url`, `authors` and the body text you need in Step 2. |
 | Description only | find candidates via site search (`https://ourworldindata.org/search?q=...`) or a Datasette title match; show the candidates and confirm before proceeding |
@@ -463,6 +502,6 @@ The checks are a gate, not a formality: **re-run the whole pass after the last c
 4. **Clear the rejected variants off the page.** Proposal frames accumulate fast — a palette trial, a labeling trial, a layout trial — and a page with four near-identical charts makes the reader work out which one is live. When the user picks, delete what they didn't pick and keep what they asked to keep; a variant kept deliberately is fine, one left behind by accident is not.
 5. Do **not** export a PNG by default — the designer usually keeps editing. On request, let the user export from Figma, or use the admin's Figma endpoint below. **`get_screenshot` cannot do it:** `maxDimension` only ever *downscales* and clamps at the node's natural size, so a 540 frame returns 540px however large a number you pass, and a 302 frame returns 302px. There is no way to get the 4× (2160×2160) DI export through it.
 
-   For a **302-wide thumbnail** the export is part of the deliverable rather than optional, and it has its own route: `GET /api/figma/image?fileId=<key>&nodeId=<node>` on the OWID admin (`adminSiteServer/apiRoutes/figma.ts`) calls the Figma API at `scale: 3`, then `POST /api/images` uploads it to Cloudflare Images. PNG only — `ACCEPTED_IMG_TYPES` rejects SVG. See SMALL-CHARTS.md → Delivery for the naming rules and the retina reason for 3×.
+   For a **302-wide thumbnail** the export is part of the deliverable rather than optional, and it has its own route: `GET /api/figma/image?fileId=<key>&nodeId=<node>` on the OWID admin (`adminSiteServer/apiRoutes/figma.ts`) calls the Figma API at `scale: 3`, then `POST /api/images` uploads it to Cloudflare Images. PNG only — `ACCEPTED_IMG_TYPES` rejects SVG. See SMALL-CHARTS.md → Delivery for the naming rules and the retina reason for 3×. **Neither call reaches `admin.owid.io` from a cloud session**, so there the export and upload move to the user's machine — say that when you deliver instead of leaving the deliverable half-finished.
 6. **Give the user a clickable link to the frame — once, when you first create it.** `https://www.figma.com/design/<fileKey>/<FileName>?node-id=<node-id>`, with the node id's colon written as a hyphen (`24977:6` → `node-id=24977-6`). Deep-link the **frame**, not the page: it opens with the chart on screen rather than wherever the canvas was last parked. A first delivery without the link is not delivered — making someone hunt for a page in a 180-page file is pure friction. But **don't repeat it on every iteration**: they already have the tab open, and a link at the top of every reply is noise. Re-send it only if the frame moves to a new page or they ask.
 7. Report what was created (page name, frames, edits made) and what remains manual: the Flags plugin if it was used, and any design review — **you cannot read Figma comments via MCP, so never report the design review as clean.** Deviations and open items go in the report and the handover doc; put them on the Figma page **only if the user asks** — an unrequested note is clutter in someone else's design file.

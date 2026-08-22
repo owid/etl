@@ -8,6 +8,12 @@ Data Viz Checklist. This file only covers what is different at 302px.
 **Last verified: 2026-08-14.** Re-verify the template geometry at the start of every run
 (`get_metadata` on `798:54`); the design team edits these frames in place.
 
+**A cloud session cannot finish this format — say so before you start.** The deliverable here is a
+PNG on Cloudflare Images, and both halves of that route go through `admin.owid.io`, which never
+resolves from a cloud sandbox (see [cloud-sandbox.md](../../docs/cloud-sandbox.md)). The frame can be
+built and reviewed anywhere; the 3× export and upload have to happen on the user's machine. Tell them
+that up front rather than at delivery, so they can decide whether to run this locally instead.
+
 ## The two vocabularies
 
 The design team's names and the code's names diverged, and the code's older name has been deleted.
@@ -738,7 +744,8 @@ SVG is rejected.
    Note `get_screenshot` **cannot** do this — `maxDimension` only ever downscales, and clamps at the
    node's natural size.
 3. **Upload** via the admin (`POST /api/images`), then reference the filename in the block's `image:`
-   field.
+   field. **From a cloud session steps 2 and 3 are both unreachable** — hand them to the user, with
+   the frame's node id and the target filename, rather than reporting the chart as delivered.
 
 Side effect to expect: `ImagesIndexPage.tsx:56` buckets anything whose filename contains
 `thumbnail` into the admin's featured-thumbnail filter.

@@ -69,11 +69,14 @@ its step. After editing any doc in this skill:
 .venv/bin/python .claude/skills/create-figma-chart/scripts/verify_docs.py --skill create-static-viz --against <ref>
 ```
 
-**When you do make a Figma MCP call, batch it.** Every call is a ~7–10 s network hop to the hosted
-connector, so a handful issued one at a time is the difference between seconds and minutes. The
+**When you do make a Figma MCP call, batch it.** A call costs twice: the ~7–10 s network hop to the
+hosted connector, **and the model turn around it** — a ~12 s median — so an unbatched call is ~20 s
+and a handful issued one at a time is the difference between seconds and minutes. The
 connector serves concurrent calls — eight screenshots in one message measured 4.1× faster than
-serially — and admits about four or five at once, so **put independent calls in one message, 4–6 at
-a time.** Reads always; writes only when they target different pages. `/create-figma-chart` →
+serially, six measured 3.85× — and admits about four or five at once, so **put independent calls in
+one message, 4–6 at a time.** Reads always; writes only when they target different pages. Where the
+`mcp__Figma__*` tools arrive deferred (a cloud session serves them that way), load the ones you need
+in a single `ToolSearch` rather than paying a turn per tool. `/create-figma-chart` →
 **Round-trip budget** has the full rule and the list of what is genuinely serial.
 
 **What this skill does not decide:** colors, fonts, background, the logo, and any visual treatment
@@ -160,11 +163,22 @@ It takes a live/staging/admin URL, a bare slug, a chart id, or an indicator cata
 the chart's variables **with their catalogPaths**, and names the candidate ETL step files —
 including a warning when the grapher catalogPath's version differs from what is on disk.
 
+**In a cloud session it cannot run, and it says so misleadingly.** The resolver is `read_sql`
+throughout; a cloud sandbox has no MySQL and staging is on Tailscale, so it reports *"Staging server
+… is not reachable. Run `etl pr` first or wait for the staging build to finish"* — which invites
+waiting for something that will never arrive here. Don't wait, and don't run `etl pr` for it. Fall
+back to the read-only routes in [cloud-sandbox.md](../../docs/cloud-sandbox.md) —
+`https://ourworldindata.org/grapher/<slug>.config.json` for a published chart, the public Datasette
+for `variables` and `chart_dimensions` — or ask the user to run the resolver locally and paste the
+output. This is a fallback for one environment, not a replacement: use the resolver wherever MySQL
+is reachable, since it does strictly more than the fallbacks do.
+
 **From an old static viz image**, two routes, neither of which the popularity CSV can do alone:
 
 1. The grapher `static_viz` table carries a **`grapherSlug`** column. That gives a slug, and the
    slug goes through the resolver above. Note this table is **not** mirrored to the public
-   Datasette, so query a staging DB or the local dev DB (see `/query-grapher-db`).
+   Datasette, so query a staging DB or the local dev DB (see `/query-grapher-db`) — which means a
+   cloud session cannot reach it either, and the slug has to come from the user.
 2. `ai/static_viz_popularity/static_viz_popular.csv` gives rank, the pages it appears on, views,
    authors and tags — useful context, but it has **no slug or indicator column**, so it cannot
    reach the data by itself.
