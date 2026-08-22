@@ -1,0 +1,246 @@
+# Step 8c — The checks that must pass before you show it
+
+> Read at Step 8c, before you show the user anything.  Part of [`/create-figma-chart`](../SKILL.md); the spine has the step order.
+
+
+Every one of these caught a real defect on this skill's first run, and none of them is visible by looking at the frame. Run them as a pass, and report the numbers rather than "looks fine".
+
+> **[`scripts/verify_page.js`](../scripts/verify_page.js) runs the MECHANICAL rows in ONE read-only
+> `use_figma` call** — text floor, annotation ladder, named styles, text hierarchy, series and
+> furniture weights, dash patterns, box alignment, gap, margins, unbound fills, annotation knockout
+> tier, annotation block gap, and the series polylines the annotation-overlap row needs. Done one at
+> a time those are a dozen round trips at ~8-10s each.
+>
+> **Every row it cannot judge comes back `SKIPPED` with the reason and the tool that owns it** —
+> colour-vision and grayscale (`color_audit.py`), spelling (`codespell`), the data-truth row
+> (`/adversarial-data-review`), entity completeness (needs the *effective* selection from outside
+> Figma), the arrow row (it needs rendered pixels), `leader-on-map` (a **vector** ray-cast against
+> the country's rings — pixels are only its fallback), and the page count (a page-level fact, where
+> the script is handed frames). A `SKIPPED` row is a declared gap in coverage, never a pass — which
+> is the whole reason to read the list rather than the verdict.
+>
+> **[`scripts/diff_against_template.js`](../scripts/diff_against_template.js) is the other half of the
+> gate, and it answers a question `verify_page.js` cannot: *did this frame drift from the template it
+> was cloned from?*** The workflow is start from the template, modify it, and **check back against the
+> template** — and that last step is the one that gets skipped. Run it in one read-only `use_figma`
+> call with the template id and the finished clones; it fingerprints the template **at runtime**, so it
+> works for any of the ten rather than hard-coding one. Text CONTENT is excluded by design (that is
+> what a run is meant to change); everything else is the template's law. Declare deliberate drift in
+> `CONFIG.expected` and it reports as `accepted` instead of `DRIFT`.
+>
+> On one eight-frame run it found what a screenshot pass had missed entirely: every footer row left
+> `layoutSizingHorizontal: FIXED` where the template HUGs — which stops the source line resizing with
+> its text — and it separates the one API limitation that is *not* a defect (a bolded `Data source:`
+> prefix cannot be both bold and style-bound through the plugin API, so it reports as `halfBound`; see
+> [TEXTS.md](TEXTS.md)) from real drift. Its harness is
+> [`scripts/test_diff_against_template.js`](../scripts/test_diff_against_template.js) (**49**
+> assertions), which found four defects in the script that review had not: a header that lost a row
+> reported as matching, five fingerprinted footer properties never actually compared, and a
+> `TypeError` that killed the whole diff when a row changed type. A fifth, from review: the text
+> fingerprint held each range's font **style** but not its **family**, so a row retyped in Arial
+> Regular read as the template's Lato Regular and the clone reported as matching. Both are compared now.
+>
+> Validated by planting defects and confirming each row **fails**, twice over: 11 planted in Figma and
+> 11 caught, then a stubbed-figma harness ([`scripts/test_verify_page.js`](../scripts/test_verify_page.js),
+> `node` it after any edit) covering **137** assertions including the rows that are awkward to plant on a
+> real page. **A check that cannot fail is worse than no check**, so when you extend this script,
+> extend both passes with it.
+>
+> Between them those passes found six bugs in the script itself, five of which were rows that could
+> not fail: annotations are appended to the **frame**, so a walk over only [chart, header, footer] left
+> `annotations` empty on every real page; the 12px floor rejected the 302-wide format's legitimate 11px
+> text; the ladder row judged only *bound* nodes, so a rescaled export's arbitrary 13.36px labels
+> passed as "imported, expected"; the knockout row judged only annotations that already had a stroke,
+> certifying a **missing** one; both 4.5:1 contrast rows were neither computed nor declared; and the
+> muted-context classification read each node's own weight, so the 2px halo of a legally-crossed 1px
+> context line was reported as a protagonist.
+
+> **On a 302-wide small or pull chart, five of these bars are different**, and reporting the 540-wide figures there produces false failures — the text floor is **11px** (the template's own subtitle, source and year labels are 11px by design), the margins are **12 … 290**, the chart's width need not match the header box, and the gap rule doesn't apply as written. The table is in SMALL-CHARTS.md → Checks. Everything else below holds unchanged.
+
+| Check | How | Bar |
+|---|---|---|
+| Color-vision safety | `color_audit.py` | no pair under **ΔE 20** for deuteranopia or protanopia; tritanopia noted, never acted on alone. **Categorical fills only** — a sequential map ramp is exempt, see below |
+| Spelling and prose | `.venv/bin/codespell` over the texts, plus a read against the style guide | American spelling (CLAUDE.md), no typos, no style-guide breaches — see below |
+| The text is *true* of the indicator | `/adversarial-data-review` on the dataset behind the chart | **every** string that says something about the data survives checking against the producer's documentation — title, subtitle, note, year, annotations, direct and value labels, legend and category labels, units, entity names, source line. Labels you shortened are in scope |
+| Entities all render | the **effective** selection (Step 1's table, not the saved `selectedEntityNames`) vs the labels in the SVG | every selected entity appears — a member missing its latest year is dropped silently (`/check-empty-entities` is the pipeline sweep) |
+| Year or period stated, and not stale | the period the export actually shows — the link's `time=` where there is one, otherwise the rendered SVG — plus the source chart's `maxTime` | a **single-time** image says which year it shows, in the title or subtitle; a **time series** states its period on its own time axis and takes no caption (adding one makes a series read as a snapshot — see "A pinned year, and a frozen image" below). Either way the source chart isn't pinned to an old year (`/check-hardcoded-years`) |
+| Grayscale survival | `color_audit.py` (grayscale seam section) | **adjacent** pairs above ~**1.6:1**; below that they merge in print. **Stacked or segmented fills only** — for a plain or grouped bar chart, a line chart or a map pass `--separated` (`--line`/`--maps` imply it) and read the closest pairs as information, since legend order says nothing about which marks meet |
+| Off-palette fills | compare every fill against the library groups | every fill is a library color, **bound as a style** — grapher emits `#585c64` for residual categories, which is in no group. Two standing exceptions, listed rather than flagged: the muting grays of a highlight treatment, and a grapher-managed sequential map ramp (see below) |
+| Legend agreement | pair swatch→label by geometry, compare against the bars | zero mismatches |
+| Direct labels name what they sit on | for each category label, compare its **fill** against the fill of the segment it names, and its **x** against that segment's edges in the reference row | the color is identical (same bound style, not merely a close hex) and the label is anchored on its own segment. A direct label carries the swatch's job with none of the swatch's proximity, so a mispaired one is unfalsifiable by eye |
+| Direct labels readable as text | `contrast(labelHex, "#ffffff")` for every category label drawn on the background | **4.5:1**. The same color must also clear 4.5:1 against the white value label inside its bar — a palette that only clears one of the two has to move (Step 8) |
+| Text size | read `fontSize` off every text node | nothing below **12px**; annotations on the named ladder |
+| Mark weight | read `strokeWeight` off **every** line and halo, after the last scale | on a highlight treatment: context **1px** (the settled value — GUIDELINES.md → Highlighting; 1.5px is the reference-page treatment this skill tells you not to copy), protagonist **3px**, halo 2× (or line+1 where nothing crosses). Read it even when you never set it — and especially *because* you never set it: `rescale()` multiplies stroke weight, so fitting a chart to the band took grapher's 2.5px lines down to **0.88px** hairlines on a frame that otherwise measured perfect. Set the weights explicitly *after* the final scale, never before |
+| Furniture weight | read `strokeWeight` **and `dashPattern`** off the gridlines, the zero line and the tick marks | all **1px** — but the dash target is **per node type**, not blanket: the dashed gridlines are `[4, 4]`, while the **zero line and the tick marks are solid** and must keep an **empty `dashPattern`**. Applying one `[4, 4]` target to all three restyles the furniture instead of unscaling it. The safe repair is conditional — reset the weight everywhere, and only re-dash a node that already had a dash pattern, scaling its existing values back rather than assigning new ones. `rescale()` thins these too, and they are the easiest properties in the frame to miss because you never touch them and "don't restyle the grid" reads as "don't look at it": a 0.7× height fit left every gridline at **0.7px with a [2.81, 2.81] dash**, i.e. a visibly fainter, finer grid than any OWID chart ships. Restore them in the same pass as the series weights |
+| Label-on-fill contrast | `contrast(labelHex, barHex)` for every in-bar label | **4.5:1** at 13.5px regular — the 3:1 large-text allowance does not apply |
+| Text hierarchy | list every distinct `fontSize` with what it belongs to, **and its rank** | title > subtitle ≥ annotations > supporting text ≥ labels. Sizes may vary inside the plot by rank; a lead annotation may *equal* the subtitle (Annotation XL 16) but nothing may exceed it, and same-rank items must share a size |
+| Sizes are named styles | every size matches a style in the file | no arbitrary sizes left over from scaling the export (13.7, 16.8). Choose from the ladder by rank rather than by element type — see GUIDELINES.md → Subtitles and notes |
+| Annotations cover only furniture | for each `annotation__*` node, test its rect against every line's **sampled polyline** (not bboxes — see below), and against the dots and value labels | gridlines, empty space or a muted context line — never a highlighted line, a dot, a value label or a bar segment carrying a number |
+| Knockout tier matches what it crosses | the same test decides the tier: compare each annotation's crossings against whether it carries a stroke | an annotation crossing furniture has a **3px** `OUTSIDE` stroke in the template's canvas color; one crossing nothing has **no** stroke and no frame. A sub-pixel weight (0.65) means the stroke was assigned without setting the weight after a `rescale()` — see Step 8 |
+| Label alignment | compare each label's center against its mark | bar values centered on bars, legend labels on swatches |
+| Box alignment | compare the chart's left/right against the header frame | identical to the subtitle box, to the pixel |
+| Gap | `(footerTop - headerBottom - chart.height) / 2`, with `footerTop = footer.y + Math.min(0, source.y)` — a source row raised inside the footer lifts the band's bottom (Step 7) | equal top and bottom, at the band figure of **the template you filled**: **12–16px** on the 540-wide frames, **30px** on the IG portrait (see Step 7). **Exception — a tightly measured group:** on an axis-less chart whose furniture was trimmed and label boxes hugged (Step 8), the band no longer applies as written; the figure to match is the one the **reference page** measures the same way, typically **20–30px**. Measure it there, record yours with a note that the group is tightly measured, and do not shrink a correct chart to force the band |
+| Annotation block gap | the **block's** outer edges (topmost annotation, bottommost annotation, plot — whichever is extreme) vs the header and footer frames | the same clearance the plot owes: **27px** each side on the 540×540 pages. An annotation outside the plot is part of the block, so spacing the plot alone is not enough (GUIDELINES.md → Annotations) |
+| Every pointer lands on its target | for each leader, the **terminal vertex** (transformed, not the bbox) vs the thing it names — the country's own **ink** on a map, the band border at the stated year on a chart | the dot or tip is inside/on its target, and where the text names a year, at that year's x — with the first and last year taken from the plot's edge, not the tick label's centre. **A country's bounding box is not the target.** Countries are concave and multi-part, so a point can sit well inside the box and still be in open ocean — the US box reaches past Hawaii, an antimeridian straddler's spans the whole Pacific (see the map fit in `reference/per-chart-type/maps.md`). **Do it in VECTORS first — it is exact, and it is one call.** Transform the terminal into the country's local space through the inverse of its `absoluteTransform`, parse its `vectorPaths` into rings, and ray-cast. No renders, no masks, and it caught a leader whose terminal sat in the Bay of Bengal while its bbox test passed. Fall back to the **pixel** mask — hide the country vector, diff the renders, require the dot within ~1px of that pixel set — only where the vector test cannot answer: a country a few pixels across whose ring is smaller than the dot, or a shape whose fill rule makes the ray-cast ambiguous |
+| Nothing in the margins | every visible mark's `absoluteBoundingBox` vs the content band | no ink outside **16…524** on a 540-wide frame. A speck left in the margin after a map fit renders as a cut sliver at the frame edge |
+| How much is on the page | count the plot-bearing objects anywhere on the page — `countries-with-data` groups on a map, the equivalent plot group otherwise — and name what each one is for | one per **intended** item: the deliverable, plus the reference copies you meant to place. A third is clutter. **Do not check this by testing top-level children for overlap** — that answers a different question and answers it "clean": on one page three world maps sat at three distinct positions, so an overlap test passed twice while the reader was looking at a pile of near-identical maps in the left-hand column, one of which displayed the export's own legend/map collision. The reader's question is *how many of this thing am I looking at*, and only a count answers it. Watch the truncation trap too: a per-item node census keyed on a **shortened** name silently merged `<slug>` with `<slug> — original SVG (unstyled)` into one bucket, which is how a 467-node count for a 233-node frame read as normal |
+
+**For arrows, drop vectors entirely and probe the rendered pixels.** Arrow groups are rotated, so every vector-space measurement of theirs is wrong (see Gotchas), and "very close but never on top" is a pixel property anyway. Screenshot the frame at 1:1, take the arrow's **`absoluteBoundingBox`** in frame coordinates, and inside it measure how close the arrow's pixels come to the target line's.
+
+**Identify each shape's pixels by node identity, never by color.** A pixel belongs to the shape whose hiding changed it, which is true whatever either shape is colored. Screenshot the frame at 1:1 **four times** — whole, with the arrow's `visible = false`, with the target line's, and with **both** hidden — and diff each shape against the both-hidden render, from the pass where the *other* shape was already gone:
+
+```python
+from math import hypot
+
+crop   = [(x, y) for y in range(y0, y1) for x in range(x0, x1)]   # arrow's absoluteBoundingBox, padded
+arrow  = [p for p in crop if no_target[p] != no_both[p]]          # arrow alone vs neither
+target = [p for p in crop if no_arrow[p]  != no_both[p]]          # line alone vs neither
+
+assert arrow,  "no arrow pixels — wrong bbox, wrong frame, or the hide never applied"
+assert target, "no target pixels — pad the bbox, or this is not the node the arrow points at"
+
+d        = lambda a, b: hypot(a[0]-b[0], a[1]-b[1])
+minGap   = min(d(a, b) for a in arrow for b in target)
+touching = sum(1 for a in arrow for b in target if d(a, b) <= 1.5)
+```
+
+**Don't diff either mask against the whole render — that hides the overlap you are testing for.** Whichever node paints on top covers part of the other, and hiding the *covered* one changes nothing in those pixels, so a mask taken from `full` comes back with a hole exactly where the two shapes meet. An arrowhead sitting on the end of its line then measures its `minGap` to the nearest still-*exposed* line pixel and reports a comfortable 3–7px with `touching == 0` while the two are plainly overlapping — the one verdict this check exists to prevent. Diffing from the other-hidden pass costs one extra screenshot and is symmetric, so it holds whichever node is on top.
+
+Restore `visible = True` on both afterwards, and **guard the masks**: each difference must fall inside that shape's own `absoluteBoundingBox`. If it doesn't, hiding the node reflowed something else (a group's derived box, an auto-layout sibling) and the mask is measuring the reflow, not the shape.
+
+**Classifying pixels by color instead is the version to avoid — it produced two different false verdicts before it was replaced.** That first cut called the arrow "gray" (`abs(r−g) < 14 and 60 < r < 165`) and the line by its own hue, and both halves break on ordinary charts. A **gray target** — an arrow aimed at a muted context line — satisfies the arrow predicate, so every target pixel is filed as arrow ink and the check dies with an empty target set on a chart where nothing is wrong. And **gray furniture** in the padded crop — a gridline, a second context series, gray annotation text — is collected as arrow ink too, so the target line merely *crossing a gridline* reports `touching > 0` while the arrow itself is comfortably clear. Neither is fixable by narrowing the crop, since a crop cannot separate two shapes that answer the same predicate. Three extra screenshots cost less than one wrong verdict, and hardcoding the hue is worse again: the palette runs to 24 fills, so a fixed `TARGET` collects nothing on most charts and `min()` then dies on an empty sequence instead of reporting a clearance.
+
+**Pass is `touching == 0` with `minGap` about 3–7px.** This is the only check that caught the real defects: it found the peak arrow overlapping the line by 11 pixel pairs where the vector math had reported a comfortable clearance, and it confirmed the fix at 3.0px with zero contacts. Report both numbers per arrow.
+
+**On a line chart the bbox overlap test is not conservative, it is useless — sample the polyline.** A diagonal line's bounding box is most of the plot, so a bbox test reports every annotation as covering every line: on this run it returned 5 collisions across 4 frames, all but one of them phantom, and it *buried the one real defect in the noise* (a portrait annotation genuinely clipping the projection line). Extract the path's points — the numbers in `vectorPaths[0].data` alternate x,y, so map each pair through the node's own transform — then walk the segments and sample each at ~1px:
+
+```js
+const pts = (v, frame) => {                          // path space -> FRAME space
+  const n = ((v.vectorPaths||[]).map(p=>p.data).join(" ").match(/-?\d+\.?\d*/g)||[]).map(Number);
+  const [[a,b,tx],[c,d,ty]] = v.absoluteTransform;   // rotation + scale + translation, in one matrix
+  const fb = frame.absoluteBoundingBox;
+  const out = [];
+  for (let i = 0; i + 1 < n.length; i += 2)          // path coords are local to the node
+    out.push({ x: a*n[i] + b*n[i+1] + tx - fb.x,
+               y: c*n[i] + d*n[i+1] + ty - fb.y });
+  return out;
+};
+```
+
+**Drive it off `absoluteTransform`, not `v.x`/`v.y`, even though the naive version happens to work on a fresh import.** Group ancestors are transparent for coordinates, so a line nested under `lines` → `chart-area` does report frame coordinates and the short form measures correctly — that is why it produced sound numbers here. But the assumption is invisible and it fails three ways: under a nested **FRAME** ancestor, under an ancestor that was **scaled** rather than rescaled, and on any node with non-zero **rotation** (which is exactly how the arrow measurements in this skill came out as fiction). The transform costs one property read and cannot be wrong, so prefer it and keep the audit trustworthy when someone later reparents the chart.
+
+**And take the transform, not the bounding box, or rotation silently defeats the fix.** The tempting short version — normalize the local x,y into `absoluteBoundingBox` by their own min/max — reads like it handles rotation, because for a rotated node the bbox *is* the visual one. It does the opposite: normalizing two axes independently into an axis-aligned box cannot rotate anything, so you get an **unrotated polyline stretched across the visual box**, a shape the reader never sees, and the audit then certifies the wrong geometry with more confidence than before. `absoluteTransform` carries the rotation in the matrix, so applying it to each point is both shorter and the only version that is actually rotation-safe. (The regex takes every number in the path data, which is right for the M/L polylines grapher exports; a path with curve commands would need its control points dropped first.)
+
+That took the same four frames to **one** finding, which was real. And the same routine fixes it without guesswork: take the topmost line point under the annotation's x-range and set `box.y = thatY − 12 − box.height` — the ~12px the knockout rule asks for (GUIDELINES.md → Annotations), not the 5px that merely clears the test. **A clear audit is necessary here, not sufficient:** the polyline check only asks whether the box *touches* the line, so it reports 5px as clean, and 5px is the gap a reviewer called visibly too close. If 12px pushes the block somewhere awkward, narrow the block — re-wrap the same sentence into more, shorter lines — rather than moving it further away. Then re-run the test and confirm it still reports clear. (This is the line-chart counterpart of the subpath-bbox rule for maps: boxes decide where things may go, geometry decides how it reads.)
+
+**A sequential map ramp is not a categorical palette, and two of the rows above don't apply to it as written.** GUIDELINES.md → Colors keeps map colors in grapher on a Viridis or ColorBrewer sequential scale and off the OWID categorical palette, because ordered bins separate better once a map shows many classes. That has two consequences here, and both look like defects if you don't know them. **The ΔE 20 bar is an all-pairs *categorical* test, so a ramp fails it by construction** — neighboring stops are supposed to be close, that is what makes the ramp read as ordered — and `color_audit.py` has no sequential mode: `--maps` swaps the search over to the **Categorical Maps** group, so `--maps --suggest` on a ramp cheerfully proposes an unordered set and destroys the encoding. Don't run it there. **And the off-palette sweep can't pass either**, because grapher's ramp belongs to no library group and arrives as raw fills — demanding a bound style would mean repainting the map in Figma, which the guidelines forbid. So for a sequential map, check the scale where it is actually set, in grapher: that the bins are ordered and distinguishable, and that the legend labels and any values written onto the shapes clear their own contrast bar. Then record the ramp as grapher-managed in one line instead of listing every stop as an off-palette fill. `--maps` and the ΔE gate are for a **categorical** choropleth — one color per region or class, no order between them — which is the case those rows were written for.
+
+**Filter the fill sweep to what actually paints, or it invents failures.** Two kinds of phantom show up and both look exactly like a real off-palette color in a listing. **Hidden ancestors:** `visible` is per-node, so the children of a group you hid are still individually `visible: true` — walk up to the frame and skip anything with a hidden ancestor, or a hidden `connectors` group reports a dozen stray colors. **Zero-area vectors:** grapher's exported tick marks are zero-width stroked paths that carry a default black `fill` which can never paint, so an unfiltered sweep reports twelve `#000000` fills on a chart that has none. With both filters the same chart went from 4 apparent off-palette colors to the 2 real ones.
+
+**But apply that second filter to `fills` only — a stroke sweep needs the opposite rule.** A gridline is a zero-*height* node and a tick mark a zero-*width* one, and their strokes are the most visible furniture in the chart. Requiring nonzero area on both properties silently drops every axis line: one sweep came back with three stroke colors on a chart that has five, reporting no gridline stroke at all and — worse — reading as a clean result. So: fills need `width > 0 && height > 0`, strokes need `width > 0 || height > 0`. A stroke inventory that lists no `#dddddd` on a chart with visible gridlines is the tell.
+
+```js
+const paints = n => { let m = n; while (m && m !== clone) { if (!m.visible) return false; m = m.parent } return true }
+// ...and ignore `fills` on nodes whose width or height rounds to 0
+```
+
+**Make label-centering part of the build, not a follow-up.** It regressed three times in one run — each rebuild re-hugs the text, which restores the drift, and a separate "now center the labels" step is forgotten or applied to a chart instance that is later replaced. Put the centering loop at the end of the same function that imports, scales and re-hugs, so it cannot be skipped.
+
+**Re-run this whole pass after the last change, not after each one.** Fixes get lost silently: a label-centering pass applied to a chart instance that is later swapped for a re-export leaves the drift back exactly as it was, and every screenshot in between looks correct. And a structural change spends budget elsewhere — lifting an aggregate row to the top added 8px of height, which came straight out of the 12–16px gap and took it to 8.2 without anything reporting a problem. Treat "I already checked that" as false after any re-export, reorder, rescale or restyle.
+
+### Checking the words, not just the geometry
+
+The chart's text is not yours — you transcribed it from the indicator's metadata — so a defect in it is a defect **upstream**, and fixing it only in the image leaves the interactive chart, the data page and every other surface still wrong. Check it here because this is where someone finally reads it slowly; fix it where it lives.
+
+- **Spelling and prose.** You transcribe these strings verbatim, so you are not the one introducing a typo — you are the last reader before it is frozen into an image, which is a worse place for it than a chart that can be corrected in place. Run `.venv/bin/codespell` over the strings (it is a dev dependency; `/check-metadata-typos` covers the same ground on `.meta.yml` and `.dvc`). American spelling always, per CLAUDE.md, including in text copied out of a chart. For the wording itself, `/check-metadata-style` holds the Writing and Style Guide, whose FAUST rules govern exactly the strings this skill moves.
+- **Whether the text is true.** Run **`/adversarial-data-review`** on the dataset behind the chart, over the data *and* every string in the frame that says something about it. That skill fetches the producer's own documentation from the snapshot's links and treats each sentence as a claim to be refuted, which is the right posture for text about to be published as an image. Its scope here is **everything, not just the FAUST**:
+
+  | Text | The claim it makes |
+  |---|---|
+  | Title | the headline assertion — that the data shows this |
+  | Subtitle | what is measured, in what units, over what population |
+  | Note | the caveats, and that these are the ones the producer actually states |
+  | The year or period, wherever it is stated — in the title, as `Data for <YYYY>.`, or on a time axis — and any year caveat | that it is what the export actually shows, for every entity |
+  | Annotations | each number, comparison and superlative — transcribed *or* derived |
+  | Direct labels and value labels | that this number belongs to this mark |
+  | **Legend and category labels** | that the category contains what the label says it does |
+  | Axis labels and units | the scale, and whether it is a share, a rate or a count |
+  | Entity names | that the entity is the one the producer means (aggregates especially) |
+  | `Data source:` line | the producer, and the year of *their* release |
+
+  **Shortening a label is a factual edit, so put it through this check too — not just the strings you inherited.** Words in a category label are the definition of the category: "Other meats" → "Other" loses nothing on a chart entirely about meat, but "Beef and buffalo" → "Beef" drops a species the category counts, and where buffalo is most of it (India, Pakistan) the shorter label understates what the bar contains. Check it against the producer's own indicator title — FAO's is "beef and buffalo meat" — and note that the interactive chart will still carry the long form, so the image and the chart will disagree.
+
+  That does not make the short form forbidden. A team may prefer the plain word and accept the imprecision; on this chart the owner did. What it makes it is **a decision, taken knowingly and recorded** (see the accepted-deviations rule below) rather than a side effect of needing 20px. Say what the short label costs, say what keeping the long one costs — here, one row at 12px or two rows at 15px — and let the owner choose.
+- **Rendered spacing.** Metadata is often Jinja-templated, and a template defect shows up only in the rendered string — a double space, or a missing one where a conditional collapsed. You are pasting the rendered form, so you inherit it silently. `/check-metadata-spacing` is the pipeline check for this; here it is enough to read the placed strings once for spacing, and to distrust any sentence whose shape suggests a template (`in {country}`, a units clause that reads oddly).
+- **Entities that render empty — the check this skill learned the hard way.** A pinned selection can silently lose a member: grapher drops an entity whose data doesn't reach the displayed year, with no warning anywhere. This run shipped ten of eleven countries for exactly that reason, and only the accompanying text naming the missing country exposed it. `/check-empty-entities` is the pipeline sweep for this class; the local version is Step 1's rule — compare the **effective** selection against the entity labels in the exported SVG, every time. Effective, not saved: a link carrying `country=` overrides `selectedEntityNames` entirely, and diffing against the config there reports every saved default as missing on a chart where nothing is wrong.
+- **A pinned year, and a frozen image.** `/check-hardcoded-years` exists because a chart pinned to `maxTime: 2019` quietly stops showing new data. The static image has the sharper version of the problem: it is pinned to whatever year it was exported at, permanently, and nothing will ever refresh it. So check two things — that the *source chart* isn't pinned to a stale year (you would be freezing someone else's oversight), and, **for a single-time export**, that the year is stated **somewhere the reader will see it**: in the title when the claim is year-specific, otherwise in the subtitle as `Data for <YYYY>.` (GUIDELINES.md → Titles). Check for it in both places before calling it missing, and check it appears in only one of them. The year to state is the one the export shows — a `time=` in the link overrides `maxTime`, so read it off the link or the rendered SVG rather than the saved config. An undated single-time image is the one defect that gets worse with time.
+
+  **A time series needs no such caption — its own axis is the date line.** There is no single year a 1990–2025 chart "shows", and appending `Data for 2025.` to one makes a whole series read as a snapshot of its last year. What a time series needs from this check is the *other* half: that the axis actually runs to the latest year the data has, which is the stale-`maxTime` question above. The caption rule is scoped to single-year charts everywhere else it appears (Step 4's subtitle rule, GUIDELINES.md → Subtitles and notes); keep it scoped here too.
+- **Where a finding goes.** A wrong or misspelled string belongs upstream in the chart's own text, not in the Figma frame — same rule as sort order and colors. Route the fix through `/edit-faust-metadata`, always, and don't pick the layer yourself: that skill decides which layer the field actually lives in (garden `.meta.yml`, an MDim's yaml, or the chart config on staging) and reports which *other* charts inherit the same string before anything changes. Editing the garden file directly because it looked like the obvious home is how a one-chart correction silently rewrites text on a dozen others. Report the finding, hand it over, and hold the image until it's fixed if the claim is load-bearing; a static image outlives the chart text it was copied from, so shipping a known-wrong sentence is worse here than on the live chart, where it can be corrected in place.
+- **Annotations you wrote are your own claims.** Anything you drafted rather than transcribed — a derived percentage, a "more than half" — carries no upstream provenance, so verify it against the data yourself and say in the report which annotations are transcribed and which are derived.
+
+**A failing check is a finding to report, not a veto.** Measure it, say plainly what fails and by how much, offer the alternatives with their own numbers — then do what the author decides. If they accept the deviation, record it in the report; chart-side work goes in the handover doc and reusable mechanics go in this skill. **Add a note to the Figma page only if the user asks for one** — don't volunteer it (GUIDELINES.md → Colors).
+
+**Check the properties you didn't change, not just the ones you did.** A verification pass naturally retraces the edits — it measures the colors because you set colors, the positions because you moved things — and that is exactly how an inherited value survives it. The context lines on this chart stayed at the export's 2px through a full pass that confirmed their color, because nothing in the pass ever asked what weight they were. Derive the check from **what the finished frame is supposed to look like**, property by property, rather than from your own edit history; anything the treatment specifies gets read back, whether or not you believe you touched it.
+
+Two habits make the difference. **Assert, don't eyeball** — a 1.2px label drift, a 1.18:1 grayscale pair and a scrambled legend all looked perfectly fine in a screenshot. And **re-run the affected checks after every change**, because they interact: applying a text style resets range colors, rescaling rewraps text and shifts label centers, adding an annotation changes the group's width, and swapping one color moves the safety floor to a different pair.
+
+**Two pixel-probe mechanics that decide whether any of the render-sampling checks above are telling
+you the truth.** Both were found on map leaders and both apply to every probe on this page —
+including the arrow probe.
+
+- **A canvas coordinate of `N.0` is the seam between pixels `N-1` and `N`, so sample
+  `floor(coord − 0.5)`.** Reading `int(coord)` checks the neighbouring pixel, which reports a
+  correctly placed mark as misplaced. That cost two rounds of "fixing" placement that was already
+  right — and it is the same off-by-one whichever probe you are running.
+- **Match a fill strictly — summed `|ΔRGB| ≤ ~9`, not `~40`.** A loose tolerance admits the
+  antialiased edge, where each pixel is a blend of the mark and the background, so the "interior"
+  you are testing against silently includes the boundary. A `#e8f1f9` sample is within 18 of
+  `#deebf7` and is half background; that tolerance is what let a dot in open water pass a pixel
+  check.
+
+## Two rows that a real run re-calibrated
+
+Both were changed after the first run of `verify_page.js` against eight real frames rather than the
+mock, and both changes make a row *less* red on purpose. Read them before treating either as slack.
+
+- **`furniture-dash` no longer flags grapher's zero line.** grapher names each gridline after its tick
+  value, so the zero line arrives as `0`, `0%` or `0-years` and matches none of the zero/tick/axis words
+  the row looks for — it was reported as a "cleared" dash on **5 of 8** frames, and on a slope chart,
+  whose two end verticals are named `1980` and `2023` and sit in a group of two, on 2 of 2. Those are
+  now reclassified by **identity** (a name denoting zero; a small furniture group of *vertical* lines),
+  never by the dash the node carries — that circularity is the defect the row exists to catch.
+  And they are **reclassified, not exempted**: they go through the solid-by-design validation, so a zero
+  line genuinely restyled to `[4,4]` still fails. The row reports what it reclassified, so you can see
+  it happen.
+
+  **The shape matters as much as the count, and so does whose exception `[3,2]` is.** A first pass
+  reclassified *any* group of fewer than three members, and that cut both ways on a legitimate two-line
+  horizontal grid: correctly dashed it failed as a dashed "axis" node, and with its dash cleared it
+  **passed** — the very defect the row exists to catch, hidden by the exemption. A slope's end axes are
+  vertical and a y-grid's lines are not, so only a small group of verticals is moved. Likewise the
+  `[3,2]` allowance belongs to a slope chart's native **zero line**, not to the whole solid-by-design
+  bucket: granted in bulk it also accepted an ordinary tick or axis line dashed `[3,2]`, which this
+  document permits nowhere.
+
+## A skip with a false reason is the failure mode, not a wrong number
+
+Worth stating on its own, because it has now bitten in three different rows. When `CONFIG.chartName`
+finds nothing — the documented case where a designer has **ungrouped** the chart — the plot has to be
+resolved from the frame's children, and doing that from a list of container names was line-chart-shaped:
+it knew the axis, grid and lines groups and missed a map's `map`, a bar's `bars`, a scatter's point
+container and a slope's `slopes`. Those children were then walked as *not* in the plot, which does not
+make a row fail — it **empties** one. `off-palette` then reported "no solid fills found in the plot" on
+a map full of them, both annotation rows found no marks to test against, and `isMap` was never set, so
+the map was judged by the band rule written for a chart whose aspect we control. The resolution is
+structural now: everything that is not the header, the footer, the logo or one of our own annotations is
+plot content, and the row records what it resolved. **When you extend either script, ask what a row says
+when it finds nothing — not only what it says when it finds a defect.**
+- **`ladder-sizes` reports imported text instead of failing it.** Judged strictly it failed on **8 of
+  8**, i.e. on every fitted import that can exist, and a row that always fails carries no information.
+  The cause is a real three-way conflict: text metrics help set the group's width, so snapping labels to
+  rungs moves the box off the content edge, and re-fitting to the edge moves the sizes back off the
+  ladder. So the verdict is split by *who set the size* — an **annotation** is authored here and still
+  FAILS, while imported text is REVIEW with its distance to the nearest rung, FAILing only past 0.75px.
+  Measured drift on the eight frames was 0.11–0.48px; the scatter's bubble legend was 6.01px from its
+  rung, which is the case the threshold exists to catch.

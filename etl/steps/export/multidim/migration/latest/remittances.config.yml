@@ -3,6 +3,9 @@ grapher_schema: "011"
 title:
   title: Remittances
   title_variant: ""
+topic_tags:
+  - Migration
+  - Economic Inequality
 
 default_selection:
   - World
