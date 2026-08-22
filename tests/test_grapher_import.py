@@ -1,4 +1,8 @@
+from types import SimpleNamespace
+
 import pandas as pd
+import pytest
+import requests
 from owid.catalog import Origin, VariableMeta, VariablePresentationMeta
 
 import etl.grapher.to_db as db
@@ -104,3 +108,93 @@ def test_get_timespan_subyearly_is_empty():
     df = pd.DataFrame({"year": [0, 28, 59]})
     for interval in ("day", "week", "month", "quarter"):
         assert db._get_timespan(df, VariableMeta(display={"timeInterval": interval})) == ""
+
+
+class _FakeAdminAPI:
+    """Records the calls a cleanup makes and replays canned Admin API responses.
+
+    A response may be an exception instance, which is raised instead of returned.
+    """
+
+    owid_env = SimpleNamespace(admin_api="http://localhost:3030/admin/api")
+
+    def __init__(self, responses: list[dict | Exception]) -> None:
+        self._responses = list(responses)
+        self.calls: list[dict] = []
+
+    def delete_variables(self, variable_ids: list[int]) -> dict:
+        self.calls.append({"variable_ids": variable_ids})
+        response = self._responses.pop(0)
+        if isinstance(response, Exception):
+            raise response
+        return response
+
+
+def _blocked(variable_id: int, chart_id: int) -> dict:
+    return {
+        "variableId": variable_id,
+        "variableName": f"Variable {variable_id}",
+        "chartId": chart_id,
+        "chartSlug": f"chart-{chart_id}",
+    }
+
+
+def _response(deleted=(), blocked=()) -> dict:
+    return {"deleted": list(deleted), "blocked": list(blocked)}
+
+
+def test_delete_ghost_variables_sends_the_ids_to_remove():
+    admin_api = _FakeAdminAPI([_response(deleted=[7])])
+
+    assert db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]
+
+    assert admin_api.calls == [{"variable_ids": [7]}]
+
+
+def test_delete_ghost_variables_does_not_call_out_when_there_are_no_ghosts():
+    admin_api = _FakeAdminAPI([])
+
+    assert db.delete_ghost_variables(admin_api, ghost_variable_ids=[])  # ty: ignore[invalid-argument-type]
+
+    assert admin_api.calls == []
+
+
+def test_delete_ghost_variables_warns_in_production_when_a_chart_still_uses_one(monkeypatch):
+    monkeypatch.setattr(db.config, "ENV", "production")
+    admin_api = _FakeAdminAPI([_response(deleted=[7], blocked=[_blocked(8, 100), _blocked(8, 101)])])
+
+    # Not successful, so the checksum stays unset and the next run tries again.
+    assert not db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]
+
+
+def test_delete_ghost_variables_raises_outside_production(monkeypatch):
+    monkeypatch.setattr(db.config, "ENV", "dev")
+    admin_api = _FakeAdminAPI([_response(blocked=[_blocked(8, 100)])])
+
+    with pytest.raises(ValueError, match="chart-100"):
+        db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]
+
+
+def test_delete_ghost_variables_warns_when_admin_api_is_unreachable(monkeypatch):
+    """Working locally without a running admin: warn and let a later run clean up."""
+    monkeypatch.setattr(db.config, "ENV", "dev")
+    admin_api = _FakeAdminAPI([requests.exceptions.ConnectionError("connection refused")])
+
+    assert not db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]
+
+
+@pytest.mark.parametrize("env", ["staging", "production"])
+def test_delete_ghost_variables_raises_when_a_deployed_admin_is_unreachable(monkeypatch, env):
+    """A deployed environment always has an admin, so an unreachable one is an outage."""
+    monkeypatch.setattr(db.config, "ENV", env)
+    admin_api = _FakeAdminAPI([requests.exceptions.ConnectionError("connection refused")])
+
+    with pytest.raises(requests.exceptions.ConnectionError):
+        db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]
+
+
+def test_delete_ghost_variables_does_not_swallow_other_admin_api_errors():
+    admin_api = _FakeAdminAPI([requests.exceptions.HTTPError("500 Server Error")])
+
+    with pytest.raises(requests.exceptions.HTTPError):
+        db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]
