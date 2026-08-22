@@ -18,3 +18,7 @@ steps:
   # Expected height of boys and girls from birth to age 19 (WHO growth reference)
   export://static_viz/who/2026-08-07/height_for_age:
     - data://garden/who/2026-08-07/height_for_age
+
+  # How do people spend their time? (OECD Time Use Database, one stacked bar per country)
+  export://static_viz/oecd/2026-08-14/time_use_by_country:
+    - data://garden/oecd/2026-08-14/time_use

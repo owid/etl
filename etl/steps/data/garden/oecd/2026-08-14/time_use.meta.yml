@@ -1,0 +1,216 @@
+definitions:
+  common:
+    unit: minutes per day
+    short_unit: min
+    display:
+      numDecimalPlaces: 0
+    presentation:
+      topic_tags:
+        - Time Use
+  averaged: &averaged |-
+    Minutes are a daily average over the whole week, including both weekdays and weekends.
+  groups_processing: &groups_processing |-
+    We group the OECD's detailed activities into the categories shown in our chart "How do people spend their time?":
+
+    - Paid work: paid work in all jobs, travel to and from work or study, job search, and other paid work or study-related activities.
+    - Education: time in school or classes, plus research and homework.
+    - Sleep: sleeping.
+    - Housework & shopping: routine housework, plus shopping.
+    - Other unpaid work: the rest of unpaid work (care for household and non-household members, volunteering, travel related to household activities, and other unpaid work), plus the OECD's small "other" category (religious and spiritual activities, civic obligations, and uncategorized time).
+    - Personal care: personal, household and medical services, and travel related to personal care (personal care other than sleeping, eating and drinking).
+    - Eating & drinking: eating and drinking.
+    - TV & radio: watching TV or listening to the radio at home.
+    - Seeing friends: visiting or entertaining friends.
+    - Other leisure: sports, participating in or attending events, and other leisure activities.
+
+    Groups that cover "the rest" of one of the OECD's top-level categories are computed as remainders from that category's total, so minutes that a country does not allocate to any detailed sub-activity remain included.
+
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Arriagada
+
+tables:
+  time_use:
+    title: Time use across activities
+    variables:
+      paid_work_or_study:
+        title: Time spent on paid work or study
+        description_short: |-
+          Average time spent on paid work or study, including travel to and from work or study and job search. {definitions.averaged}
+      paid_work_all_jobs:
+        title: Time spent on paid work (all jobs)
+        description_short: |-
+          Average time spent on paid work, across all jobs. {definitions.averaged}
+      travel_to_and_from_work_or_study:
+        title: Time spent traveling to and from work or study
+        description_short: |-
+          Average time spent traveling to and from work or study. {definitions.averaged}
+      time_in_school_or_classes:
+        title: Time spent in school or classes
+        description_short: |-
+          Average time spent in school or classes. {definitions.averaged}
+      research_and_homework:
+        title: Time spent on research and homework
+        description_short: |-
+          Average time spent on research and homework. {definitions.averaged}
+      job_search:
+        title: Time spent on job search
+        description_short: |-
+          Average time spent searching for a job. {definitions.averaged}
+      other_paid_work_or_study_related:
+        title: Time spent on other paid work or study-related activities
+        description_short: |-
+          Average time spent on other activities related to paid work or study. {definitions.averaged}
+      unpaid_work:
+        title: Time spent on unpaid work
+        description_short: |-
+          Average time spent on unpaid work, such as housework, shopping, care work, and volunteering. {definitions.averaged}
+      routine_housework:
+        title: Time spent on routine housework
+        description_short: |-
+          Average time spent on routine housework. {definitions.averaged}
+      shopping:
+        title: Time spent shopping
+        description_short: |-
+          Average time spent shopping. {definitions.averaged}
+      care_for_household_members:
+        title: Time spent caring for household members
+        description_short: |-
+          Average time spent caring for household members, including children and adults. {definitions.averaged}
+      child_care:
+        title: Time spent on child care
+        description_short: |-
+          Average time spent caring for children in the household. {definitions.averaged}
+      adult_care:
+        title: Time spent on adult care
+        description_short: |-
+          Average time spent caring for adults in the household. {definitions.averaged}
+      care_for_non_household_members:
+        title: Time spent caring for non-household members
+        description_short: |-
+          Average time spent caring for people outside the household. {definitions.averaged}
+      volunteering:
+        title: Time spent volunteering
+        description_short: |-
+          Average time spent volunteering. {definitions.averaged}
+      travel_related_to_household_activities:
+        title: Time spent traveling for household activities
+        description_short: |-
+          Average time spent traveling in relation to household activities. {definitions.averaged}
+      other_unpaid_work_activities:
+        title: Time spent on other unpaid work
+        description_short: |-
+          Average time spent on other unpaid work. {definitions.averaged}
+      personal_care:
+        title: Time spent on personal care
+        description_short: |-
+          Average time spent on personal care, including sleeping, eating and drinking. {definitions.averaged}
+      sleeping:
+        title: Time spent sleeping
+        description_short: |-
+          Average time spent sleeping. {definitions.averaged}
+      eating_and_drinking:
+        title: Time spent eating and drinking
+        description_short: |-
+          Average time spent eating and drinking. {definitions.averaged}
+      other_personal_care_services:
+        title: Time spent on other personal care
+        description_short: |-
+          Average time spent on personal, household, and medical services, and travel related to personal care. {definitions.averaged}
+      leisure:
+        title: Time spent on leisure
+        description_short: |-
+          Average time spent on leisure activities, such as sports, events, seeing friends, TV or radio, and other leisure. {definitions.averaged}
+      sports:
+        title: Time spent on sports
+        description_short: |-
+          Average time spent on sports. {definitions.averaged}
+      participating_in_or_attending_events:
+        title: Time spent participating in or attending events
+        description_short: |-
+          Average time spent participating in or attending events. {definitions.averaged}
+      visiting_or_entertaining_friends:
+        title: Time spent visiting or entertaining friends
+        description_short: |-
+          Average time spent visiting or entertaining friends. {definitions.averaged}
+      tv_or_radio_at_home:
+        title: Time spent watching TV or listening to the radio at home
+        description_short: |-
+          Average time spent watching TV or listening to the radio at home. {definitions.averaged}
+      other_leisure_activities:
+        title: Time spent on other leisure activities
+        description_short: |-
+          Average time spent on other leisure activities. {definitions.averaged}
+      other_activities:
+        title: Time spent on other activities
+        description_short: |-
+          Average time spent on religious and spiritual activities, civic obligations, and activities without a category. {definitions.averaged}
+      religious_spiritual_and_civic_activities:
+        title: Time spent on religious, spiritual, and civic activities
+        description_short: |-
+          Average time spent on religious and spiritual activities and civic obligations. {definitions.averaged}
+      other_uncategorized_activities:
+        title: Time spent on uncategorized activities
+        description_short: |-
+          Average time spent on activities without a category. {definitions.averaged}
+      survey_year:
+        title: Survey year
+        unit: ""
+        short_unit: ""
+        description_short: The year(s) in which the country's most recent national time-use survey was conducted.
+      age_of_reference:
+        title: Age of reference
+        unit: ""
+        short_unit: ""
+        description_short: The age range of the population covered by the country's time-use survey.
+  time_use_chart_groups:
+    title: Time use across activities (chart groups)
+    common:
+      description_processing: *groups_processing
+      processing_level: major
+    variables:
+      paid_work:
+        title: Time spent on paid work
+        description_short: |-
+          Average time spent on paid work, including travel to and from work or study and job search. {definitions.averaged}
+      education:
+        title: Time spent on education
+        description_short: |-
+          Average time spent in school or classes and on research and homework. {definitions.averaged}
+      sleep:
+        title: Time spent sleeping
+        description_short: |-
+          Average time spent sleeping. {definitions.averaged}
+      housework_and_shopping:
+        title: Time spent on housework and shopping
+        description_short: |-
+          Average time spent on routine housework and shopping. {definitions.averaged}
+      other_unpaid_work:
+        title: Time spent on other unpaid work
+        description_short: |-
+          Average time spent on care work, volunteering, travel related to household activities, and other unpaid or uncategorized activities. {definitions.averaged}
+      personal_care:
+        title: Time spent on personal care other than sleeping and eating
+        description_short: |-
+          Average time spent on personal, household, and medical services, and travel related to personal care. {definitions.averaged}
+      eating_and_drinking:
+        title: Time spent eating and drinking
+        description_short: |-
+          Average time spent eating and drinking. {definitions.averaged}
+      tv_and_radio:
+        title: Time spent watching TV or listening to the radio
+        description_short: |-
+          Average time spent watching TV or listening to the radio at home. {definitions.averaged}
+      seeing_friends:
+        title: Time spent seeing friends
+        description_short: |-
+          Average time spent visiting or entertaining friends. {definitions.averaged}
+      other_leisure:
+        title: Time spent on other leisure activities
+        description_short: |-
+          Average time spent on sports, participating in or attending events, and other leisure activities. {definitions.averaged}
+      total_leisure:
+        title: Total time spent on leisure
+        description_short: |-
+          Average time spent on all leisure activities, such as sports, events, seeing friends, TV or radio, and other leisure. {definitions.averaged}
