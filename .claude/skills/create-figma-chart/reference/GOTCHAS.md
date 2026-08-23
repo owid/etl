@@ -23,6 +23,23 @@
 - **A text node carries a *scaled* `strokeWeight` after `rescale()`, even with no strokes.** So adding the tier-2 white outside stroke to an annotation on a chart you height-fitted gives a 0.65px halo unless you set the weight — and a sub-pixel halo is indistinguishable from none, which reads as "the knockout didn't work" rather than "the weight is wrong". Set `strokeWeight = 3` explicitly and read it back.
 - **A hugging annotation frame clips its own descenders — a tier-3-only trap, and a reason to prefer tier 2.** Frames have `clipsContent = true` by default, and `leadingTrim = "CAP_HEIGHT"` puts the baseline *at* the box bottom — so every descender is cut and "today" renders as "todav", "very" as "verv". It is invisible in a node listing and easy to miss in a thumbnail. Set `box.clipsContent = false` on every annotation frame you create; keep the trim. Clipping is only half of it — the opaque fill still stops at the baseline, so pair it with `paddingBottom ≈ 0.22 × the last line's font size` or the recovered descenders sit outside their own knockout. A bare text node with an outside stroke has neither failure, which is most of why GUIDELINES.md → Annotations makes the stroke the default.
 - **`entity-labels` children are not always TEXT.** When a bar's entity name wraps, grapher groups the two lines, so `node.fontSize = 14` throws `no such property 'fontSize' on GROUP` — and because `use_figma` is atomic you lose the whole pass. Iterate `group.query("TEXT")` for styling and `group.children` for per-row layout.
+- **`upload_assets` gives you N `submitUrl`s so the POSTs can overlap — run them that way.** The
+  Step 5 snippet shows one `curl`, and a two-format run that copies it twice pays two full uploads of
+  a ~165 KB SVG back to back. Pair each URL with its file and fan them out, exactly as the screenshot
+  downloads do:
+
+  ```bash
+  printf '%s %s\n' "$URL1" "$DIR/original.svg" "$URL2" "$DIR/original-square.svg" \
+    | xargs -P4 -n2 sh -c 'curl -s -X POST "$1" -F "file=@$2;type=image/svg+xml"' _
+  ```
+
+  Two ways to get this wrong, both silent. `xargs -I{}` with a single `-F` uploads the *same file*
+  to every URL, because `{}` expands only in the URL — the same trap as the screenshot downloads. And
+  with a trailing `_`, `sh -c` binds `$0` to the `_`, so the pair arrives as `$1` and `$2`: a snippet
+  reading `$0` posts to nothing. Expand the paths in the `printf` rather than referencing `$DIR`
+  inside the single quotes, where the child shell never sees it. Keep filenames comma-free (see above), and verify by counting the page's children
+  rather than trusting N `success` responses.
+
 - **`upload_assets`, never `createNodeFromSvg`** — the plugin sandbox has no `fetch`, and inlining an SVG into `use_figma` blows the 50k-char cap. `upload_assets` handles up to 10 MB and yields an editable vector tree.
 - **`rescale()`, never `resize()`** on imported charts — `resize` crops instead of scaling children.
 - **Figma plugins can't be run from here — but the no-data hatch no longer needs one.** Imported no-data shapes arrive with an **empty `fills` array**, and the hatch the design team applies by hand is just an `IMAGE` fill, `scaleMode: "TILE"`, `scalingFactor ≈ 0.5` from a 12×12 tile. Reproduce it by copying `fills` from a shape that already has it, or rebuild it from `assets/no-data-hatch-tile.png` via `figma.createImage(bytes)` — and apply it to **every** no-data shape *and* the legend's "No data" pill, never a flat `#C9C9C9` (GUIDELINES.md → Flags, animals, no-data pattern). The Flags plugin (`2654:5`) is still manual.

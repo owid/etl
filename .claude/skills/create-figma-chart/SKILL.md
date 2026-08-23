@@ -110,7 +110,9 @@ Three sibling skills do the text work this one depends on, and Step 8c calls the
 
 **A call costs twice, and both terms move with the environment.** The *call* is a network hop to
 Figma's hosted connector — **7–10 s for `use_figma`, 8–20 s for `get_screenshot`** — flat regardless
-of script size. And it is the *cloud* that is fast: `get_screenshot` measured 7.8–9.9 s from a
+of script size *or* render size: a 545-char script that loaded a page and walked 286 nodes came back
+**faster** than a 45-char one, and a natural-size screenshot costs 1.10× a 256 px one, inside the
+noise. **So collapse work into fewer calls freely, and never shrink a screenshot for speed.** And it is the *cloud* that is fast: `get_screenshot` measured 7.8–9.9 s from a
 sandbox against 12.5–20.5 s from a local session with the Figma desktop app running. The *turn* around it — issuing the call, reading the result — runs the other way: **~12 s
 median in a cloud session** (23 consecutive calls) against **2–4 s on a light local turn.** So budget
 a run as **turns × (turn + call)**, with both terms read off the environment you are in. An unbatched
@@ -123,7 +125,7 @@ connector serves the calls concurrently *and* they share one turn. Yet across fi
 **two batched nothing at all** and two barely did (1–9% of calls overlapping); one batched heavily
 and paid for it (see the ceiling below).
 
-**Fan out independent calls — one message, 4–6 at a time.** Four independent runs put the payoff at **4.1× ± 0.15**: 4.1× (eight screenshots, 79.7 s of work in 19.4 s), 3.85× in a cloud session, and 4.13× / 3.87× in two local ones (six calls, ~25.0 s wall both times) — with a full six in flight every time, in both environments. But **the batch is not free after the first call.** Completions arrive evenly spaced, so one more call costs about **1.2 s in the cloud and 2.5 s locally**; that marginal cost is the stopping rule. Past four or five the connector also queues — 8.2 s for the first of eight, 13.2 s for the last — so **4–6 per message is the sweet spot.** This is the `figma-use` skill's own instruction too: issue the N calls in one message, and don't await one before issuing the next.
+**Fan out independent calls — one message, 4–6 at a time.** Five independent runs put the payoff at **≈3.9×, spanning 3.72–4.13×**: 4.1× (eight screenshots, 79.7 s of work in 19.4 s), 3.85× and 3.72× in two cloud sessions, and 4.13× / 3.87× in two local ones (six calls, ~25.0 s wall both times) — with a full six in flight every time, in both environments. But **the batch is not free after the first call.** Completions arrive evenly spaced, so one more call costs about **1.2 s in the cloud and 2.5 s locally**; that marginal cost is the stopping rule. Past four or five the connector also queues — 8.2 s for the first of eight, 13.2 s for the last — so **4–6 per message is the sweet spot.** This is the `figma-use` skill's own instruction too: issue the N calls in one message, and don't await one before issuing the next.
 
 Reads fan out freely. **Writes only when they target different pages** — a script may switch pages only once, so two `use_figma` writes aimed at the same page in one message race each other.
 
@@ -140,12 +142,6 @@ in one message, so batching is mechanical rather than a fresh judgment call ever
 - **`upload_assets` takes a `count`.** One call returns N single-use `submitUrl`s and the POSTs parallelize, so a two-format run uploads both originals in one call rather than two — and both embeds in one more.
 - **The Step 8c property sweeps** — font sizes, stroke weights, dash patterns, fills, polylines. Those are reads of a single page, so they collapse into *one* `use_figma` returning one JSON. `scripts/verify_templates.js` already does exactly this for ten templates.
 - **The arrow probe's baseline render.** Only the FULL render is shared across arrows: the other three states of the four-render protocol (no-arrow, no-target, both-hidden) each hide *that pair's* nodes, so they are pair-specific and cannot be reused. N arrows cost `3N + 1` screenshots, not `4N` — and not `N + 2`, which under-collects and produces masks containing another pair's target.
-
-**Measured on one template, end to end: 18 Figma calls.** Of those, 3 went on the footer-conversion
-bug now fixed in TEXTS.md and 1 on a wrong guess about the footer's layout, so the same build now
-costs ~14 — against ~21 per template on the previous run and 124–188 for a whole chart before any of
-this. The two-pass export is where the saving is concentrated: it replaces "export, eyeball, re-export"
-with one probe and one solved re-export.
 
 **What is serial for a reason — don't collapse these:**
 
@@ -447,6 +443,8 @@ curl -s -X POST "<submitUrl>" -F "file=@$DIR/original.svg;type=image/svg+xml"
 # → {"success":true, ..., "placedOnNodeId":"<id>"}
 ```
 
+For two or more assets, run the POSTs concurrently rather than one per call — Gotchas has the pattern.
+
 4. **Lay out the page**: the original chart on the left; the adapted template **to its right** (~100 px gap). If several formats were requested, keep one original and line the templates up to its right. Move imported nodes with `use_figma` (`page.appendChild(node)`, set `node.x/node.y`). This page-level parenting is for the **original** reference chart only — the embed gets reparented into the template clone in Step 7.
 
 > **Imported SVGs arrive at their natural size** (850×600 / 540×540). Scale with `node.rescale(factor)` — never `resize()`, see Step 7.
@@ -508,5 +506,5 @@ The checks are a gate, not a formality: **re-run the whole pass after the last c
 5. Do **not** export a PNG by default — the designer usually keeps editing. On request, let the user export from Figma, or use the admin's Figma endpoint below. **`get_screenshot` cannot do it:** `maxDimension` only ever *downscales* and clamps at the node's natural size, so a 540 frame returns 540px however large a number you pass, and a 302 frame returns 302px. There is no way to get the 4× (2160×2160) DI export through it.
 
    For a **302-wide thumbnail** the export is part of the deliverable rather than optional, and it has its own route: `GET /api/figma/image?fileId=<key>&nodeId=<node>` on the OWID admin (`adminSiteServer/apiRoutes/figma.ts`) calls the Figma API at `scale: 3`, then `POST /api/images` uploads it to Cloudflare Images. PNG only — `ACCEPTED_IMG_TYPES` rejects SVG. See SMALL-CHARTS.md → Delivery for the naming rules and the retina reason for 3×. **Neither call reaches `admin.owid.io` from a cloud session**, so there the export and upload move to the user's machine — say that when you deliver instead of leaving the deliverable half-finished.
-6. **Give the user a clickable link to the frame — once, when you first create it.** `https://www.figma.com/design/<fileKey>/<FileName>?node-id=<node-id>`, with the node id's colon written as a hyphen (`24977:6` → `node-id=24977-6`). Deep-link the **frame**, not the page: it opens with the chart on screen rather than wherever the canvas was last parked. A first delivery without the link is not delivered — making someone hunt for a page in a 180-page file is pure friction. But **don't repeat it on every iteration**: they already have the tab open, and a link at the top of every reply is noise. Re-send it only if the frame moves to a new page or they ask.
+6. **Give the user a clickable link to the frame — once, when you first create it.** `https://www.figma.com/design/<fileKey>/<FileName>?node-id=<node-id>`, with the node id's colon written as a hyphen (`24977:6` → `node-id=24977-6`). Deep-link the **frame**, not the page: it opens with the chart on screen rather than wherever the canvas was last parked. A first delivery without the link is not delivered — making someone hunt for a page in a ~200-page file is pure friction. But **don't repeat it on every iteration**: they already have the tab open, and a link at the top of every reply is noise. Re-send it only if the frame moves to a new page or they ask.
 7. Report what was created (page name, frames, edits made) and what remains manual: the Flags plugin if it was used, and any design review — **you cannot read Figma comments via MCP, so never report the design review as clean.** Deviations and open items go in the report and the handover doc; put them on the Figma page **only if the user asks** — an unrequested note is clutter in someone else's design file.
