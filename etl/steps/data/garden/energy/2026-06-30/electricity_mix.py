@@ -697,14 +697,6 @@ def build_monthly_electricity_mix() -> Table:
     tb = add_per_capita_variables_monthly(tb=tb)
     tb = add_share_variables_monthly(tb=tb)
     tb = tb.format(keys=["country", "date"], sort_columns=True, short_name="electricity_mix_monthly")
-
-    # Each point represents a calendar month, so tag the interval: grapher encodes sub-yearly data as
-    # days-since-zeroDay integers, and without this it formats them as individual days -- on the site,
-    # and in the MDIM download package, which labelled these monthly figures "daily" and dated them to
-    # the 1st. energy_prices tags its monthly table the same way.
-    for column in tb.columns:
-        tb[column].m.display = {**(tb[column].m.display or {}), "timeInterval": "month"}
-
     return tb
 
 
@@ -835,4 +827,19 @@ def run() -> None:
     #
     # Create a new garden dataset with both the annual and the monthly tables.
     ds_garden = paths.create_dataset(tables=[combined, tb_monthly])
+
+    # Each monthly point represents a calendar month, so tag the interval. Grapher encodes sub-yearly
+    # data as days-since-zeroDay integers and, with nothing declared, formats them as individual days
+    # -- on the site, and in the MDIM download package, which labelled these monthly figures "daily"
+    # and dated them to the 1st of the month. energy_prices tags its monthly table the same way.
+    #
+    # After create_dataset, not inside the builder: the monthly table reuses the annual table's
+    # *shared_variables anchor, whose `display: {name: ...}` blocks replace the whole display mapping
+    # when the metadata YAML is applied. Tagging earlier survives only on the columns that anchor does
+    # not mention, which is how this first shipped half-applied.
+    tb_monthly_out = ds_garden["electricity_mix_monthly"]
+    for column in tb_monthly_out.columns:
+        tb_monthly_out[column].m.display = {**(tb_monthly_out[column].m.display or {}), "timeInterval": "month"}
+    ds_garden.add(tb_monthly_out)
+
     ds_garden.save()
