@@ -38,9 +38,9 @@ small or pull chart the PNG _is_ the deliverable** — a cloud session can build
 it, so say which at delivery. [cloud-sandbox.md](../../docs/cloud-sandbox.md) has the read-only
 fallbacks for chart config.
 
-The connector is *not* slower in a cloud session — measured, it is about **twice as fast** there
-(7.8–9.9 s per call against 12.5–20.5 s locally). What a cloud session pays instead is the **turn**
-around each call: ~12 s against 2–4 s. So the **Round-trip budget** below is where a slow cloud run
+`get_screenshot` is *not* slower in a cloud session — measured, it is about **twice as fast** there
+(7.8–9.9 s against 12.5–20.5 s locally; it is the only tool timed in both). What a cloud session pays
+instead is the **turn** around each call: ~12 s against 2–4 s. So the **Round-trip budget** below is where a slow cloud run
 is won or lost, and batching is what wins it.
 
 **The single checkpoint rule:** the Charts file is a shared design file other people work in. Nothing is written to it before the user has seen the full proposal (page name, template choice, texts, planned label/annotation edits) and explicitly approved. Reading the file to check conventions needs no permission.

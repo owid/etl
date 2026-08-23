@@ -70,18 +70,20 @@ its step. After editing any doc in this skill:
 ```
 
 **When you do make a Figma MCP call, batch it.** A call costs twice — the network hop to the hosted
-connector **and the model turn around it** — and both terms move with the environment: the hop is
+connector **and the model turn around it** — and both terms move with the environment. The
+cross-environment figures here are all **`get_screenshot`, the only tool timed in both**: the hop is
 7.8–9.9 s from a cloud sandbox against 12.5–20.5 s locally, while the turn is ~12 s in the cloud
-against 2–4 s on a light local turn. So a handful issued one at a time is the difference between
-seconds and minutes either way. Batching pays about the same in both: the connector serves concurrent
-calls — eight screenshots in one message measured 4.1× faster than serially, and four runs now sit
-inside **4.1× ± 0.15** with six in flight — and admits about four or five at once, so **put
-independent calls in one message, 4–6 at a time.** One extra call in a batch still costs ~1.2 s
-(cloud) or ~2.5 s (local), so that is the stopping rule. Reads always; writes only when they target
-different pages. If the `mcp__Figma__*` tools arrive deferred (a cloud session serves them that way),
-load the ones you need in a single `ToolSearch`; skip that where they are already loaded.
-`/create-figma-chart` → **Round-trip budget** has the full rule and the list of what is genuinely
-serial.
+against 2–4 s on a light local turn. Read them as the shape of the cost, not as per-tool numbers —
+`use_figma` and `upload_assets` have not been benchmarked across environments. Either way, a handful
+issued one at a time is the difference between seconds and minutes. Batching pays about the same in
+both: the connector serves concurrent calls — eight screenshots in one message measured 4.1× faster
+than serially, and five runs now span **3.72–4.13×** (about 3.9×) with six in flight — and admits
+about four or five at once, so **put independent calls in one message, 4–6 at a time.** One extra
+screenshot in a batch still costs ~1.2 s (cloud) or ~2.5 s (local), so that is the stopping rule.
+Reads always; writes only when they target different pages. If the `mcp__Figma__*` tools arrive
+deferred (a cloud session serves them that way), load the ones you need in a single `ToolSearch`;
+skip that where they are already loaded. `/create-figma-chart` → **Round-trip budget** has the full
+rule and the list of what is genuinely serial.
 
 **What this skill does not decide:** colors, fonts, background, the logo, and any visual treatment
 the template provides. Those are applied in Figma. The ETL step owns the *data*, the *structure*
