@@ -111,7 +111,8 @@ Three sibling skills do the text work this one depends on, and Step 8c calls the
 ## Round-trip budget
 
 **A call costs twice, and both terms move with the environment.** The *call* is a network hop to
-Figma's hosted connector — in a cloud session **3–6 s for `use_figma`, 8–11 s for `get_screenshot`**.
+Figma's hosted connector — in a cloud session **3–6 s for `use_figma`, 8–9 s for `get_screenshot`**
+(60 calls of a fixed six-node probe: median 8.8 s, range 7.7–10.6 s).
 Eight `use_figma` calls measured 2.67–5.99 s, at both two and six in flight, so the 7–10 s this file
 used to claim was about twice too high: a `use_figma` is roughly *half* a screenshot, not equal to
 one. Either is flat regardless of script size *or* render size — a 545-char script that loaded a page
@@ -136,7 +137,7 @@ connector serves the calls concurrently *and* they share one turn. Yet across fi
 **two batched nothing at all** and two barely did (1–9% of calls overlapping); one batched heavily
 and paid for it (see the ceiling below).
 
-**Fan out independent calls — one message, 4–6 at a time.** Five independent runs put the payoff at **≈3.9×, spanning 3.72–4.13×**: 4.1× (eight screenshots, 79.7 s of work in 19.4 s), 3.85× and 3.72× in two cloud sessions, and 4.13× / 3.87× in two local ones (six calls, ~25.0 s wall both times) — with a full six in flight every time, in both environments. But **the batch is not free after the first call.** Completions arrive evenly spaced, so one more call costs about **1.2 s in the cloud and 2.5 s locally**; that marginal cost is the stopping rule. Past four or five the connector also queues — 8.2 s for the first of eight, 13.2 s for the last — so **4–6 per message is the sweet spot.** This is the `figma-use` skill's own instruction too: issue the N calls in one message, and don't await one before issuing the next.
+**Fan out independent calls — one message, 4–6 at a time.** Twelve runs of a fixed six-call probe put the payoff at **≈4.0×, and identically so in both environments**: ten cloud reps mean **4.00×** (3.79–4.24×, median 3.95×, wall 12.4–14.0 s) and two local reps mean **4.00×** (3.87× / 4.13×, wall ~25.0 s), with a full six calls in flight in *every* rep. So batching is environment-neutral — only what each call costs differs. An eighth call still helps (an earlier eight-screenshot run measured 4.1×, 79.7 s of work in 19.4 s), but see the ceiling below. But **the batch is not free after the first call.** Completions arrive evenly spaced, so one more call costs about **1.2 s in the cloud and 2.5 s locally**; that marginal cost is the stopping rule. Past four or five the connector also queues — 8.2 s for the first of eight, 13.2 s for the last — so **4–6 per message is the sweet spot.** This is the `figma-use` skill's own instruction too: issue the N calls in one message, and don't await one before issuing the next.
 
 **Batching pays less for cheap calls.** Six `use_figma` calls at ~4 s each came back only **2.63×**
 faster (24.4 s of work in 9.3 s, peak 5 in flight), against 3.7–4.1× for ~9 s screenshots: calls are

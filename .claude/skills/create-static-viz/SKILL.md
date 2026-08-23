@@ -77,8 +77,9 @@ against 2–4 s on a light local turn. Read them as the shape of the cost, not a
 `use_figma` and `upload_assets` have not been benchmarked across environments. Either way, a handful
 issued one at a time is the difference between seconds and minutes. Batching pays about the same in
 both: the connector serves concurrent calls — eight screenshots in one message measured 4.1× faster
-than serially, and five runs now span **3.72–4.13×** (about 3.9×) with six in flight — and admits
-about four or five at once, so **put independent calls in one message, 4–6 at a time.** One extra
+than serially, and twelve runs of a fixed six-call probe mean **4.0× in both environments** (ten
+cloud reps 4.00×, two local 4.00×, six in flight every time) — and admits about four or five at once,
+so **put independent calls in one message, 4–6 at a time.** One extra
 screenshot in a batch still costs ~1.2 s (cloud) or ~2.5 s (local), so that is the stopping rule.
 Reads always; writes only when they target different pages. If the `mcp__Figma__*` tools arrive
 deferred (a cloud session serves them that way), load the ones you need in a single `ToolSearch`;
