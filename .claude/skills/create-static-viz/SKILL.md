@@ -69,15 +69,19 @@ its step. After editing any doc in this skill:
 .venv/bin/python .claude/skills/create-figma-chart/scripts/verify_docs.py --skill create-static-viz --against <ref>
 ```
 
-**When you do make a Figma MCP call, batch it.** A call costs twice: the ~7–10 s network hop to the
-hosted connector, **and the model turn around it** — a ~12 s median — so an unbatched call is ~20 s
-and a handful issued one at a time is the difference between seconds and minutes. The
-connector serves concurrent calls — eight screenshots in one message measured 4.1× faster than
-serially, six measured 3.85× — and admits about four or five at once, so **put independent calls in
-one message, 4–6 at a time.** Reads always; writes only when they target different pages. Where the
-`mcp__Figma__*` tools arrive deferred (a cloud session serves them that way), load the ones you need
-in a single `ToolSearch` rather than paying a turn per tool. `/create-figma-chart` →
-**Round-trip budget** has the full rule and the list of what is genuinely serial.
+**When you do make a Figma MCP call, batch it.** A call costs twice — the network hop to the hosted
+connector **and the model turn around it** — and both terms move with the environment: the hop is
+7.8–9.9 s from a cloud sandbox against 12.5–20.5 s locally, while the turn is ~12 s in the cloud
+against 2–4 s on a light local turn. So a handful issued one at a time is the difference between
+seconds and minutes either way. Batching pays about the same in both: the connector serves concurrent
+calls — eight screenshots in one message measured 4.1× faster than serially, and four runs now sit
+inside **4.1× ± 0.15** with six in flight — and admits about four or five at once, so **put
+independent calls in one message, 4–6 at a time.** One extra call in a batch still costs ~1.2 s
+(cloud) or ~2.5 s (local), so that is the stopping rule. Reads always; writes only when they target
+different pages. If the `mcp__Figma__*` tools arrive deferred (a cloud session serves them that way),
+load the ones you need in a single `ToolSearch`; skip that where they are already loaded.
+`/create-figma-chart` → **Round-trip budget** has the full rule and the list of what is genuinely
+serial.
 
 **What this skill does not decide:** colors, fonts, background, the logo, and any visual treatment
 the template provides. Those are applied in Figma. The ETL step owns the *data*, the *structure*
