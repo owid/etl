@@ -73,8 +73,8 @@ For agent sessions running in a Claude Code cloud sandbox
   here, 12.5–20.5 s locally). What a sandbox pays instead is the **turn** around
   each call — a ~12 s median, against 2–4 s on a light local turn — so a skill
   making hundreds of MCP calls is won or lost on batching: issue independent
-  calls in one message, 4–6 at a time (4.1× ± 0.15 across four runs, in both
-  environments). Two smaller taxes, and these *are* sandbox-specific: HTTP GETs
+  calls in one message, 4–6 at a time (≈3.9×, five runs spanning 3.72–4.13×, in
+  both environments). Two smaller taxes, and these *are* sandbox-specific: HTTP GETs
   to OWID and CDN hosts pay 0.6–2.3 s of proxy overhead each where a local
   session sees 0.05–0.3 s (parallelize batches with `xargs -P`), and MCP tool
   schemas arrive deferred, so load the ones a run needs in a single `ToolSearch`
