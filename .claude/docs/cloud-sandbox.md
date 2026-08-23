@@ -69,8 +69,9 @@ For agent sessions running in a Claude Code cloud sandbox
 - **MCP connectors are not the reason a session feels slow.** Figma, Slack, Notion
   and GitHub traffic goes to `mcp-proxy.anthropic.com`, which is in `NO_PROXY` —
   it never touches the egress proxy, and measured against a local session the
-  sandbox is about **twice as fast per call** (Figma `get_screenshot`: 7.8–9.9 s
-  here, 12.5–20.5 s locally). What a sandbox pays instead is the **turn** around
+  sandbox is about **twice as fast per screenshot** (Figma `get_screenshot`:
+  7.8–9.9 s here, 12.5–20.5 s locally — the only tool timed in both, so read it
+  as the shape of the cost, not a per-tool constant). What a sandbox pays instead is the **turn** around
   each call — a ~12 s median, against 2–4 s on a light local turn — so a skill
   making hundreds of MCP calls is won or lost on batching: issue independent
   calls in one message, 4–6 at a time (≈3.9×, five runs spanning 3.72–4.13×, in
