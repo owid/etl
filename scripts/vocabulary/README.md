@@ -72,7 +72,7 @@ staging server.
 - `--report PATH` - Write an HTML coverage report: per term, what it reveals and what it adds, plus the most-viewed charts nothing covers
 - `--weighting {views,uniform}` - Weight charts by views (default) or count them equally
 - `--views-column {views_7d,views_14d,views_365d}` - Which window to weight by (default `views_365d`; a vocabulary is read for weeks, so the year is steadier than the week)
-- `--max-terms N` - Most terms to publish per topic (default 8; the site shows five and drops some, so a couple of spares keep the line full)
+- `--max-terms N` - Most terms to publish per topic (default 5). The site renders the list as published, so this is the length of the suggestion line and the coverage reported per topic describes exactly what a reader can reach
 - `--min-marginal-share F` - Stop once the next term would reveal less than this share of a topic's views (default 0.01)
 
 ## Chart view data

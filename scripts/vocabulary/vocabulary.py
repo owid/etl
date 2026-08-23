@@ -84,12 +84,20 @@ LLM_RETRY_BACKOFF_SECONDS = 4
 # How many topics' record sets to fetch at once.
 SEARCH_CONCURRENCY = 8
 
-# How many terms to publish. The site shows five, then drops any that name a place
-# or repeat the topic's own name, so a couple of spares keep the line full.
-DEFAULT_MAX_TERMS = 8
+# How many terms to publish, which is also how many the site shows: it renders
+# the list as published rather than trimming it, so this is the length of the
+# suggestion line itself.
+#
+# It used to publish eight as spares, on the reasoning that the site would drop
+# some. It drops only place names, and currently drops none of them, so the
+# spares were never shown — which quietly made the coverage reported below a
+# claim about a line no reader sees: eight terms reach a median 92.4% of a
+# topic's views, the five shown reach 87.8%. Publishing what is shown makes the
+# number true.
+DEFAULT_MAX_TERMS = 5
 
 # A term revealing less than this share of a topic's views is not worth one of
-# five slots on a single line. Terms just below it are reported as near misses so
+# the line's few slots. Terms just below it are reported as near misses so
 # the floor can be judged from the output.
 DEFAULT_MIN_MARGINAL_SHARE = 0.01
 
@@ -464,10 +472,6 @@ async def process_topics(
                 "weighting": weighting,
                 "views_column": views_column,
                 "selection": "coverage",
-                # The consumer keys "trust this order" off `refined`; the order is
-                # now measured rather than guessed, so it still holds. See
-                # rankSuggestedKeywords in owid-grapher.
-                "refined": True,
             }
         )
         candidates["keyword_stats"] = [
