@@ -137,13 +137,18 @@ connector serves the calls concurrently *and* they share one turn. Yet across fi
 **two batched nothing at all** and two barely did (1–9% of calls overlapping); one batched heavily
 and paid for it (see the ceiling below).
 
-**Fan out independent calls — one message, 4–6 at a time.** Twelve runs of a fixed six-call probe put the payoff at **≈4.0×, and identically so in both environments**: ten cloud reps mean **4.00×** (3.79–4.24×, median 3.95×, wall 12.4–14.0 s) and two local reps mean **4.00×** (3.87× / 4.13×, wall ~25.0 s), with a full six calls in flight in *every* rep. So batching is environment-neutral — only what each call costs differs. An eighth call still helps (an earlier eight-screenshot run measured 4.1×, 79.7 s of work in 19.4 s), but see the ceiling below. But **the batch is not free after the first call.** Completions arrive evenly spaced, so one more call costs about **1.2 s in the cloud and 2.5 s locally**; that marginal cost is the stopping rule. Past four or five the connector also queues — 8.2 s for the first of eight, 13.2 s for the last — so **4–6 per message is the sweet spot.** This is the `figma-use` skill's own instruction too: issue the N calls in one message, and don't await one before issuing the next.
+**Fan out independent calls — one message, 4–6 at a time.** Twelve runs of a fixed six-call probe put the payoff at **≈4.0×, and identically so in both environments**: ten cloud reps mean **4.00×** (3.79–4.24×, median 3.95×, wall 12.4–14.0 s) and two local reps mean **4.00×** (3.87× / 4.13×), with a full six calls in flight in *every* rep. So batching is environment-neutral — only what each call costs differs. An eighth call still helps (an earlier eight-screenshot run measured 4.1×, 79.7 s of work in 19.4 s of wall clock), but the connector admits about four or five at once and per-call latency inflates past that — 8.2 s for the first of eight, 13.2 s for the last — so **4–6 per message is the sweet spot and more just queues**; see the ceiling below. This is the `figma-use` skill's own instruction too: issue the N calls in one message, and don't await one before issuing the next.
 
-**Batching pays less for cheap calls.** Six `use_figma` calls at ~4 s each came back only **2.63×**
-faster (24.4 s of work in 9.3 s, peak 5 in flight), against 3.7–4.1× for ~9 s screenshots: calls are
-dispatched as their blocks finish streaming, so with short calls that stagger is a large share of the
-wall clock. Batch either way — the turn still dominates — but expect the gain to track per-call
-latency rather than call count.
+**A batch's wall clock is `first call + rate × (n−1)`**, and both terms are environment-specific:
+**9.2 s + 0.75 s** per extra call in a cloud session, **11.7 s + 2.1 s** locally (ten reps a side;
+predicts 12.9 s and 22.2 s against measured 13.2 s and 22.3 s). That is the stopping rule, and it
+says the two environments batch differently, not just slower: in the cloud the completions finish in
+a *narrower* spread than they were dispatched in — near-true parallelism — while locally they
+pipeline, each call ending ~2.1 s after the one before. Two consequences. Batching a *cheap* call
+wins less, because the dispatch stagger is then a large share of the wall (six `use_figma` at ~4 s
+managed only 2.63×). And `sum/wall` is not the honest gain: locally it flatters batching, since a
+queued call's duration includes its wait (~3.2× against a serial baseline, not 3.84×); in the cloud
+it understates it (4.19× against 4.00×).
 
 Reads fan out freely — **including reads that each switch pages**, which is what makes the Step 5 and Step 8c rows below safe: two concurrent calls, one holding `Cover` and one the Templates page for three seconds with 7.7 s of overlap, each saw only its own page, so `figma.currentPage` is per-call. It is concurrent *mutation* of one page that races, not the switch. **Writes only when they target different pages** — a script may switch pages only once, so two `use_figma` writes aimed at the same page in one message race each other.
 
@@ -172,7 +177,7 @@ in one message, so batching is mechanical rather than a fresh judgment call ever
 
 And a bigger batch is a bigger loss: `use_figma` is atomic, so a script that throws on its last line reverts the whole pass. Stay inside the plugin's ~10-logical-operations-per-call guidance.
 
-**Measuring whether any of this happened: use interval overlap, never a calls-per-message count.** The transcript writes one entry per tool call whether or not the calls were batched, so a calls-per-assistant-message histogram reports `{1: N}` for a provably concurrent run — checked against an 8-call probe that measured 4.12×, which the histogram scored as eight singletons. Sweep `tool_use` → `tool_result` timestamps for peak simultaneous in-flight calls instead, and count how many calls start before the previous one finished.
+**To check whether a run actually batched, sweep `tool_use` → `tool_result` intervals for peak in-flight calls** — never a calls-per-message count, which reports singletons for a provably concurrent run (Gotchas).
 
 ## Inputs
 
