@@ -145,7 +145,7 @@ dispatched as their blocks finish streaming, so with short calls that stagger is
 wall clock. Batch either way — the turn still dominates — but expect the gain to track per-call
 latency rather than call count.
 
-Reads fan out freely. **Writes only when they target different pages** — a script may switch pages only once, so two `use_figma` writes aimed at the same page in one message race each other.
+Reads fan out freely — **including reads that each switch pages**, which is what makes the Step 5 and Step 8c rows below safe: two concurrent calls, one holding `Cover` and one the Templates page for three seconds with 7.7 s of overlap, each saw only its own page, so `figma.currentPage` is per-call. It is concurrent *mutation* of one page that races, not the switch. **Writes only when they target different pages** — a script may switch pages only once, so two `use_figma` writes aimed at the same page in one message race each other.
 
 What is independent — **the batch manifest, keyed by the step that owes it.** Issue each row's calls
 in one message, so batching is mechanical rather than a fresh judgment call every run:
