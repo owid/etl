@@ -91,9 +91,11 @@ step lives in [`reference/`](reference/) and is read *at* that step, not up fron
 its per-chart-type conventions are now one file each under
 [reference/per-chart-type/](reference/per-chart-type/). **Read only the one for the chart in hand.**
 
-**This file has a size budget: keep the spine under 60 KB and GUIDELINES.md under 80 KB.** They are
-read on every run, so a paragraph added here costs every future chart. New detail belongs in the
-reference file for its step. After editing any doc in this skill:
+**This file has a size budget: keep the spine under 62 KB, GUIDELINES.md under 80 KB, and the two
+together under 140 KB.** Both are read on every run, so a paragraph added here costs every future
+chart — and moving one from this file into GUIDELINES.md saves a run nothing, which is why the pair
+is capped and not just each file. New detail belongs in the
+reference file for its step, which is read only at that step. After editing any doc in this skill:
 
 ```bash
 .venv/bin/python .claude/skills/create-figma-chart/scripts/verify_docs.py --structure
@@ -109,16 +111,25 @@ Three sibling skills do the text work this one depends on, and Step 8c calls the
 ## Round-trip budget
 
 **A call costs twice, and both terms move with the environment.** The *call* is a network hop to
-Figma's hosted connector — **7–10 s for `use_figma`, 8–20 s for `get_screenshot`** — flat regardless
-of script size *or* render size: a 545-char script that loaded a page and walked 286 nodes came back
-**faster** than a 45-char one, and a natural-size screenshot costs 1.10× a 256 px one, inside the
-noise. **So collapse work into fewer calls freely, and never shrink a screenshot for speed.** And it is the *cloud* that is fast: `get_screenshot` measured 7.8–9.9 s from a
-sandbox against 12.5–20.5 s from a local session with the Figma desktop app running. The *turn* around it — issuing the call, reading the result — runs the other way: **~12 s
-median in a cloud session** (23 consecutive calls) against **2–4 s on a light local turn.** So budget
-a run as **turns × (turn + call)**, with both terms read off the environment you are in. An unbatched
-cloud call costs ~20 s, so 120–190 of them come to **~50 minutes** with nothing overlapping. Nothing
+Figma's hosted connector — in a cloud session **3–6 s for `use_figma`, 8–11 s for `get_screenshot`**.
+Eight `use_figma` calls measured 2.67–5.99 s, at both two and six in flight, so the 7–10 s this file
+used to claim was about twice too high: a `use_figma` is roughly *half* a screenshot, not equal to
+one. Either is flat regardless of script size *or* render size — a 545-char script that loaded a page
+and walked 286 nodes came back **faster** than a 45-char one, and a natural-size screenshot costs
+1.10× a 256 px one. **So collapse work into fewer calls freely, and never shrink a screenshot for
+speed.** And it is the *cloud* that is fast: `get_screenshot` measured 7.8–9.9 s from a sandbox
+against 12.5–20.5 s from a local session with the Figma desktop app running. The *turn* around it —
+issuing the call, reading the result — runs the other way: **~12 s median in a cloud session** (23
+consecutive calls) against **2–4 s on a light local turn**, so in the cloud the turn costs two to
+four times the `use_figma` call it wraps. Budget a run as **turns × (turn + call)**, both terms read
+off the environment. An unbatched cloud screenshot costs ~20 s, so 120–190 calls come to **~50
+minutes** with nothing overlapping. Nothing
 else is close: not the SVG exports (0.05–0.3 s locally, 0.9–2.6 s through a sandbox's egress proxy)
 and not the response payloads (~1.5 KB per `use_figma`).
+
+**What a build should cost, to calibrate against mid-run:** ~14 Figma calls per template — measured
+at 18 end to end, 4 of them on bugs since fixed — against ~21 per template a run earlier, and 124–188
+for a whole chart before any of this. [FITTING.md](reference/FITTING.md) credits the saving.
 
 **So the unit to minimize is messages, not calls.** A batch collapses both costs at once — the
 connector serves the calls concurrently *and* they share one turn. Yet across five measured sessions
@@ -126,6 +137,12 @@ connector serves the calls concurrently *and* they share one turn. Yet across fi
 and paid for it (see the ceiling below).
 
 **Fan out independent calls — one message, 4–6 at a time.** Five independent runs put the payoff at **≈3.9×, spanning 3.72–4.13×**: 4.1× (eight screenshots, 79.7 s of work in 19.4 s), 3.85× and 3.72× in two cloud sessions, and 4.13× / 3.87× in two local ones (six calls, ~25.0 s wall both times) — with a full six in flight every time, in both environments. But **the batch is not free after the first call.** Completions arrive evenly spaced, so one more call costs about **1.2 s in the cloud and 2.5 s locally**; that marginal cost is the stopping rule. Past four or five the connector also queues — 8.2 s for the first of eight, 13.2 s for the last — so **4–6 per message is the sweet spot.** This is the `figma-use` skill's own instruction too: issue the N calls in one message, and don't await one before issuing the next.
+
+**Batching pays less for cheap calls.** Six `use_figma` calls at ~4 s each came back only **2.63×**
+faster (24.4 s of work in 9.3 s, peak 5 in flight), against 3.7–4.1× for ~9 s screenshots: calls are
+dispatched as their blocks finish streaming, so with short calls that stagger is a large share of the
+wall clock. Batch either way — the turn still dominates — but expect the gain to track per-call
+latency rather than call count.
 
 Reads fan out freely. **Writes only when they target different pages** — a script may switch pages only once, so two `use_figma` writes aimed at the same page in one message race each other.
 

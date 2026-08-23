@@ -201,10 +201,9 @@ overflow is the one to fit.
 
 ### The two-pass export, measured end to end
 
-**Measured on one template, end to end: 18 Figma calls.** Of those, 3 went on the footer-conversion
-bug now fixed in TEXTS.md and 1 on a wrong guess about the footer's layout, so the same build now
-costs ~14 — against ~21 per template on the previous run and 124–188 for a whole chart before any of
-this. The two-pass export is where the saving is concentrated: it replaces "export, eyeball, re-export"
+**Where the saving came from.** Of the 18 Figma calls one template build measured end to end, 3 went
+on the footer-conversion bug now fixed in TEXTS.md and 1 on a wrong guess about the footer's layout.
+The two-pass export is where the rest is concentrated: it replaces "export, eyeball, re-export"
 with one probe and one solved re-export.
 
 
