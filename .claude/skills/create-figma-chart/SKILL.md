@@ -16,16 +16,17 @@ stop before the first Figma call and recommend re-running on **Opus** (or **Sonn
 mechanical re-export or a single text fix); continue only on the user's say-so — this skill is long
 chains of design judgment, and a build on the wrong model wastes the shared file's review cycle.
 
-**Load the Figma tool schemas in one `ToolSearch`, before the first Figma call.** Where the
-`mcp__Figma__*` tools arrive deferred — a cloud session serves them that way — discovering them one at
-a time costs a model turn each, ~7 over a run:
+**If the `mcp__Figma__*` tools arrive deferred, load them in one `ToolSearch` before the first Figma
+call.** A cloud session serves them that way, and discovering them one at a time costs a model turn
+each — ~7 over a run:
 
 ```
 select:mcp__Figma__use_figma,mcp__Figma__get_screenshot,mcp__Figma__get_metadata,mcp__Figma__upload_assets,mcp__Figma__search_design_system
 ```
 
-Add `get_design_context` or `download_assets` when the route needs them; harmless where they are
-already loaded.
+Add `get_design_context` or `download_assets` when the route needs them. **Skip this entirely where
+the tools are already loaded** — a local session normally has them, and an unnecessary `ToolSearch`
+is itself a wasted turn.
 
 **In a cloud session the *authenticated* `admin.owid.io` routes are unreachable** — Cloudflare Access
 `302`s them to a login page. That is an app-layer redirect, not the egress gateway, so
@@ -37,10 +38,10 @@ small or pull chart the PNG _is_ the deliverable** — a cloud session can build
 it, so say which at delivery. [cloud-sandbox.md](../../docs/cloud-sandbox.md) has the read-only
 fallbacks for chart config.
 
-Nothing else here is known to be slower in a cloud session: measured there, the connector's latency
-and concurrency match the baseline in the **Round-trip budget** below. That baseline was not taken on
-one machine against the other, so treat "same either way" as unmeasured — what is measured is that the
-wall clock goes on the **turn** around each call, not the connector.
+The connector is *not* slower in a cloud session — measured, it is about **twice as fast** there
+(7.8–9.9 s per call against 12.5–20.5 s locally). What a cloud session pays instead is the **turn**
+around each call: ~12 s against 2–4 s. So the **Round-trip budget** below is where a slow cloud run
+is won or lost, and batching is what wins it.
 
 **The single checkpoint rule:** the Charts file is a shared design file other people work in. Nothing is written to it before the user has seen the full proposal (page name, template choice, texts, planned label/annotation edits) and explicitly approved. Reading the file to check conventions needs no permission.
 
@@ -107,21 +108,22 @@ Three sibling skills do the text work this one depends on, and Step 8c calls the
 
 ## Round-trip budget
 
-**A call costs twice, and the second cost is the one that gets forgotten.** The *call* is a network
-hop to Figma's hosted connector — **7–10 s for `use_figma`, ~10 s for `get_screenshot`**, flat
-regardless of how big the script is. The *turn* around it — issuing the call and reading its result —
-is a model turn, measured at a **~12 s median** (min 0.4 s, mean 19.5 s across 23 consecutive calls).
-So an unbatched call costs **~20 s, not ~10 s**, and a run's 120–190 of them come to **~50 minutes**
-when nothing overlaps. Nothing else is close: not the SVG exports (0.24 s each locally, 0.9–2.6 s
-through a cloud sandbox's egress proxy) and not the response payloads (~1.5 KB per `use_figma`).
+**A call costs twice, and both terms move with the environment.** The *call* is a network hop to
+Figma's hosted connector — **7–10 s for `use_figma`, 8–20 s for `get_screenshot`** — flat regardless
+of script size. And it is the *cloud* that is fast: `get_screenshot` measured 7.8–9.9 s from a
+sandbox against 12.5–20.5 s from a local session with the Figma desktop app running. The *turn* around it — issuing the call, reading the result — runs the other way: **~12 s
+median in a cloud session** (23 consecutive calls) against **2–4 s on a light local turn.** So budget
+a run as **turns × (turn + call)**, with both terms read off the environment you are in. An unbatched
+cloud call costs ~20 s, so 120–190 of them come to **~50 minutes** with nothing overlapping. Nothing
+else is close: not the SVG exports (0.05–0.3 s locally, 0.9–2.6 s through a sandbox's egress proxy)
+and not the response payloads (~1.5 KB per `use_figma`).
 
 **So the unit to minimize is messages, not calls.** A batch collapses both costs at once — the
-connector serves the calls concurrently *and* they share one turn. Measured across five sessions by
-sweeping each one's call intervals for peak simultaneous in-flight calls: **two sessions never
-batched at all** (peak 1, nothing overlapping) and two more barely did (peak 2 and 5, 1–9% of calls
-overlapping). One batched heavily — and paid for it; see the ceiling below.
+connector serves the calls concurrently *and* they share one turn. Yet across five measured sessions
+**two batched nothing at all** and two barely did (1–9% of calls overlapping); one batched heavily
+and paid for it (see the ceiling below).
 
-**Fan out independent calls — one message, 4–6 at a time.** The connector serves them concurrently: eight screenshots issued together came back **4.1× faster** than serially (79.7 s of work in 19.4 s of wall clock), and six came back **3.85×** faster (53.1 s in 13.8 s). It admits about four or five at once, and per-call latency inflates past that — 8.2 s for the first of eight, 13.2 s for the last — so **4–6 per message is the sweet spot and more just queues.** This is the `figma-use` skill's own instruction too: issue the N calls in one message, and don't await one before issuing the next.
+**Fan out independent calls — one message, 4–6 at a time.** Four independent runs put the payoff at **4.1× ± 0.15**: 4.1× (eight screenshots, 79.7 s of work in 19.4 s), 3.85× in a cloud session, and 4.13× / 3.87× in two local ones (six calls, ~25.0 s wall both times) — with a full six in flight every time, in both environments. But **the batch is not free after the first call.** Completions arrive evenly spaced, so one more call costs about **1.2 s in the cloud and 2.5 s locally**; that marginal cost is the stopping rule. Past four or five the connector also queues — 8.2 s for the first of eight, 13.2 s for the last — so **4–6 per message is the sweet spot.** This is the `figma-use` skill's own instruction too: issue the N calls in one message, and don't await one before issuing the next.
 
 Reads fan out freely. **Writes only when they target different pages** — a script may switch pages only once, so two `use_figma` writes aimed at the same page in one message race each other.
 
