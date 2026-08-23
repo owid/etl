@@ -133,7 +133,7 @@ What is independent — **the batch manifest, keyed by the step that owes it.** 
 in one message, so batching is mechanical rather than a fresh judgment call every run:
 
 - **Step 5 — the page survey.** The page enumeration and `verify_templates.js` go together. Checking N pages means N calls — `page.children` on a page you have not switched to is lazily loaded — and they fan out.
-- **Step 8c — the checks.** `verify_page.js` and `diff_against_template.js` are one read-only call each; issue them together, with every pixel probe the pass needs.
+- **Step 8c — the checks.** `verify_page.js` and `diff_against_template.js` are one read-only call each; issue them together, with every pixel probe that reads one fixed state.
 - **Step 9 — the delivery renders.** One screenshot per delivered frame, all in one message.
 - **The palette harvest.** `search_design_system` caps at ~14 results against a 24-fill palette, so it takes one group query plus ~11 by-name queries. Every one of them is independent.
 - **Screenshots of different frames or pages.** Issue them together, then `curl` all the returned URLs in one bash call — **in parallel**, pairing each URL with its own output name: `printf '%s %s\n' "$U1" 1.png "$U2" 2.png | xargs -P6 -n2 sh -c 'curl -sSL -o "$2" "$1"' _` (six serially is 2.7 s through a cloud sandbox's egress proxy, 0.8 s in parallel). Don't use `-I{}` with a single `-o`: `{}` expands only in the URL, so every parallel `curl` writes the same file and you Read one screenshot six times. Then Read each. A screenshot is otherwise three tool calls, and a run takes 14–70 of them.
@@ -150,6 +150,7 @@ in one message, so batching is mechanical rather than a fresh judgment call ever
 | trim → position → read height | `leadingTrim` does not update `height` within the call that sets it (Step 7) |
 | original → clone → fill texts → measure band → export embed → fit | the band is not knowable until the real title and subtitle have reflowed the header (Step 3) |
 | one page per `use_figma` call | `page.children` on a page you have not switched to returns a short list *without erroring* (Gotchas) |
+| hide → render → hide → render | the four-render arrow probe needs a *different* `visible` state per render, so batching them races the writes and the masks capture the wrong state (CHECKS.md) |
 
 And a bigger batch is a bigger loss: `use_figma` is atomic, so a script that throws on its last line reverts the whole pass. Stay inside the plugin's ~10-logical-operations-per-call guidance.
 
