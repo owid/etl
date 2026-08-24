@@ -31,8 +31,10 @@ corrupts all three, and the corruption surfaces as a plugin syntax error with no
 from __future__ import annotations
 
 import argparse
+import itertools
 import re
 import sys
+from collections.abc import Iterator
 from pathlib import Path
 
 SCRIPTS = Path(__file__).resolve().parent
@@ -43,19 +45,33 @@ CROWDED = 0.80
 # stripping, because --rows selects on them.
 REGION = re.compile(r"^//\s*#(region\s+\S+|endregion)\s*$")
 
+# The calls reference/CHECKS.md tells an operator to send, per script. `--check` measures THESE.
+# Keep the two in step: this list is the workflow, and the doc is where a human reads it.
+DOCUMENTED_CALLS: dict[str, list[tuple[str, ...]]] = {
+    "verify_page.js": [("type", "series"), ("geometry", "annotations")],
+}
+
 
 def strip_js(src: str) -> str:
     """Remove comments while respecting string, template-literal and regex context."""
     out: list[str] = []
     i, n = 0, len(src)
-    # None | "'" | '"' | '`' | 'regex'
-    context: str | None = None
+    # A STACK, not a single context, because a template literal can hold a `${}` expression that
+    # holds another template. That nesting is ordinary JS, and a flat context could not see it: the
+    # INNER opening backtick looked like the outer one closing, so from there the parser was
+    # one level out of step and stripped template text as if it were code. Balanced nesting left the
+    # final context at None, so the end-of-file guard passed it — the emitted script differed from
+    # the file on disk, silently, which is the one failure this stripper exists to prevent.
+    # "code" is the base level; "expr" is the inside of a `${}`, which is code too — a comment there
+    # IS a comment — and it ends at the brace that matches its own, so its depth is tracked.
+    stack: list[str] = ["code"]  # "code" | "expr" | "'" | '"' | "`" | "regex"
+    depth: list[int] = []  # brace depth within each "expr" entry, innermost last
 
     while i < n:
         ch = src[i]
         nxt = src[i + 1] if i + 1 < n else ""
 
-        if context is None:
+        if stack[-1] in ("code", "expr"):
             if ch == "/" and nxt == "/":
                 line_end = src.find("\n", i)
                 line_end = n if line_end < 0 else line_end
@@ -71,9 +87,17 @@ def strip_js(src: str) -> str:
                 i += 2
                 continue
             if ch in "'\"`":
-                context = ch
+                stack.append(ch)
             elif ch == "/" and _regex_allowed(out):
-                context = "regex"
+                stack.append("regex")
+            elif stack[-1] == "expr" and ch == "{":
+                depth[-1] += 1
+            elif stack[-1] == "expr" and ch == "}":
+                if depth[-1]:
+                    depth[-1] -= 1
+                else:
+                    stack.pop()
+                    depth.pop()
             out.append(ch)
             i += 1
             continue
@@ -85,15 +109,51 @@ def strip_js(src: str) -> str:
                 out.append(src[i + 1])
             i += 2
             continue
-        if (context == "regex" and ch == "/") or (context != "regex" and ch == context):
-            context = None
-        elif context in ("'", '"') and ch == "\n":
-            context = None  # unterminated string; bail rather than swallow the file
+        # `${` opens an expression INSIDE the template: code again, one level down.
+        if stack[-1] == "`" and ch == "$" and nxt == "{":
+            stack.append("expr")
+            depth.append(0)
+            out.append(ch)
+            out.append(nxt)
+            i += 2
+            continue
+        if (stack[-1] == "regex" and ch == "/") or (stack[-1] != "regex" and ch == stack[-1]):
+            stack.pop()
+        elif stack[-1] in ("'", '"') and ch == "\n":
+            stack.pop()  # unterminated string; bail rather than swallow the file
         out.append(ch)
         i += 1
 
     lines = [ln.rstrip() for ln in "".join(out).split("\n")]
-    return "\n".join(ln for ln in lines if ln.strip())
+    stripped = "\n".join(ln for ln in lines if ln.strip())
+
+    # Ending inside a literal means the parse desynchronized and the rest of the file was copied
+    # verbatim — the failure this stripper exists to avoid, and it is SILENT: the output is still
+    # valid JS, just far larger, so it gets sent and the size guard is what eventually notices.
+    # It happened once already: `--check` jumped 75% -> 96% of cap on a 1.8KB edit, which is the only
+    # reason it was caught.
+    #
+    # The signature is the OPEN CONTEXT, not a surviving comment. An earlier version of this guard
+    # flagged any `//` line that came through, which is wrong: a template literal may legitimately
+    # contain one, the stripper handles that correctly, and the guard then called correct behaviour
+    # corruption. Well-formed JS always closes its literals, so this has no false positive to trade
+    # away — but it is only a backstop, and a BALANCED nested template closes everything it opens.
+    # That case is parsed rather than caught, by the stack above; the guard is what is left for
+    # genuinely unterminated source.
+    if len(stack) > 1:
+        kind = {
+            "regex": "regex literal",
+            "`": "template literal",
+            "'": "string",
+            '"': "string",
+            "expr": "template ${} expression",
+        }[stack[-1]]
+        raise ValueError(
+            f"comment stripping failed: the file ends inside an unterminated {kind}, so the parser "
+            "lost sync and the rest of the source was copied verbatim. Check for an unclosed "
+            "backtick, quote, brace or regex literal."
+        )
+    return stripped
 
 
 def select_rows(src: str, wanted: set[str]) -> tuple[str, list[str]]:
@@ -127,6 +187,66 @@ def _regex_allowed(out: list[str]) -> bool:
     return True
 
 
+def split_advice(stripped: str, groups: list[str], floor: int) -> str | None:
+    """What to tell an operator whose script is over the cap — or None when there is nothing to say.
+
+    Three genuinely different answers, and the middle one used to be given for all three. Past the
+    FLOOR every 2-way split is over the cap by construction, so naming the smallest of them as "a
+    split that fits" contradicts the exhaustion line printed beside it and sends the reader off to
+    rewrite CHECKS.md around a call that would be refused.
+    """
+    if len(groups) < 2:
+        return None
+    size, left = min(
+        (
+            max(
+                len(select_rows(stripped, set(sub))[0]),
+                len(select_rows(stripped, set(groups) - set(sub))[0]),
+            ),
+            sub,
+        )
+        for sub in _proper_subsets(groups)
+    )
+    right = [g for g in groups if g not in left]
+    if size <= CAP:
+        return (
+            f"a 2-way split that fits: --rows {','.join(left)} then --rows {','.join(right)} "
+            f"(larger call {size:,}) — update CHECKS.md and DOCUMENTED_CALLS together"
+        )
+    if floor <= CAP:
+        return (
+            f"no 2-way split fits — the best is --rows {','.join(left)} / --rows {','.join(right)} "
+            f"at {size:,}. The floor is {floor:,}, under the {CAP:,} cap, so a finer split does: "
+            "try three calls."
+        )
+    # Floor over the cap: the line above already says no split fits and names the only remedy left.
+    return None
+
+
+def _proper_subsets(groups: list[str]) -> Iterator[tuple[str, ...]]:
+    """Every way to split `groups` into two non-empty calls, as the left half of each split."""
+    for size in range(1, len(groups)):
+        yield from itertools.combinations(groups, size)
+
+
+def _documented_problem(groups: list[str], calls: list[tuple[str, ...]]) -> str | None:
+    """A declared workflow must send every row group exactly once, or the measurement is a fiction.
+
+    Without this, a `#region` added to a script and not written into the call list is simply absent
+    from what --check measures: the number stays comfortable while a row nobody sends goes unchecked
+    in the frame. That is the same wrong-answer shape as measuring an undocumented split.
+    """
+    flat = [g for call in calls for g in call]
+    parts = []
+    if missing := [g for g in groups if g not in flat]:
+        parts.append(f"in the file but never sent: {', '.join(missing)}")
+    if unknown := [g for g in flat if g not in groups]:
+        parts.append(f"documented but not in the file: {', '.join(unknown)}")
+    if repeated := sorted({g for g in flat if flat.count(g) > 1}):
+        parts.append(f"sent by more than one call: {', '.join(repeated)}")
+    return "; ".join(parts) or None
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("script", nargs="?", help="e.g. verify_page.js")
@@ -150,18 +270,93 @@ def main() -> int:
     args = ap.parse_args()
 
     if args.check:
-        worst = 0
-        print(f"{'script':<30} {'raw':>8} {'stripped':>9} {'of cap':>8}")
+        # What matters is the largest thing anyone actually SENDS, which for a script carrying
+        # #region markers is a slice, not the whole file. Judging a sliceable script on its total
+        # would report a failure for a file that runs perfectly — verify_page.js is now PAST the cap
+        # whole, and that changes nothing about how it is used, because the whole-file path is
+        # already refused above CROWDED.
+        #
+        # But the largest SINGLE group is not the answer either: `--rows` combines groups, and the
+        # documented pass is two calls covering all of them (CHECKS.md), so nobody sends one slice at
+        # a time. So measure THE DOCUMENTED CALLS, the ones an operator is actually told to send —
+        # not the best split this script can find for itself. Minimising over every partition answers
+        # a question nobody asked, and it can hold the check green by discovering an undocumented
+        # split while the workflow in the doc is over the cap. Measured on this file: 16,000 more
+        # characters in `annotations` puts the documented `geometry,annotations` call at 50,314 —
+        # over the cap and refused — while `annotations` alone against the other three peaks at
+        # 45,131, so the optimiser would report 90% and exit 0 for a workflow that no longer runs.
+        # The number has to be the one the operator will hit.
+        failed = False
+        print(f"{'script':<30} {'raw':>8} {'stripped':>9} {'sent':>9} {'of cap':>8} {'floor':>8}")
         for p in sorted(SCRIPTS.glob("*.js")):
             if p.name.startswith("test_"):
                 continue
-            raw = p.read_text()
-            stripped = strip_js(raw)
-            pct = len(stripped) / CAP * 100
-            flag = "  OVER CAP" if len(stripped) > CAP else ""
-            worst = max(worst, len(stripped))
-            print(f"{p.name:<30} {len(raw):>8,} {len(stripped):>9,} {pct:>7.0f}%{flag}")
-        return 1 if worst > CAP else 0
+            stripped = strip_js(p.read_text())
+            groups = list(dict.fromkeys(select_rows(stripped, set())[1]))
+            documented = DOCUMENTED_CALLS.get(p.name)
+            problem = None
+            if documented is not None:
+                problem = _documented_problem(groups, documented)
+                sizes = [(call, len(select_rows(stripped, set(call))[0])) for call in documented]
+                sent = max(size for _, size in sizes)
+                how = (
+                    "  (largest of the documented calls: "
+                    + ", ".join(f"--rows {','.join(call)} {size:,}" for call, size in sizes)
+                    + ")"
+                )
+            elif len(groups) > 1:
+                # A sliceable script with no declared workflow is itself the gap: measuring it on
+                # some split of this tool's choosing would report a size nobody sends.
+                problem = (
+                    f"{len(groups)} row groups but no entry in DOCUMENTED_CALLS — add the calls "
+                    "CHECKS.md gives operators, so this measures what they send"
+                )
+                sent = len(select_rows(stripped, set(groups))[0])
+                how = "  (every slice at once — no documented split to measure)"
+            elif groups:
+                sent = len(select_rows(stripped, set(groups))[0])
+                how = "  (its only slice)"
+            else:
+                sent = len(stripped)
+                how = ""
+            # The FLOOR: preamble + the single largest group, i.e. the smallest any call can ever be
+            # made by re-splitting. `sent` says whether today's documented calls fit; the floor says
+            # whether ANY partition can. They move independently, and confusing them misreads the
+            # risk in both directions — verify_page.js sat at 82% sent against a 72% floor, so it
+            # looked ~9,000 characters from trouble when re-splitting bought it ~14,000.
+            #
+            # Once the floor passes the cap, slicing is exhausted: the shared preamble plus one row
+            # group no longer fits, and the only remaining move is to break the script into separate
+            # files with their own preambles. That is a rewrite, so it wants warning, not discovery.
+            floor = max((len(select_rows(stripped, {g})[0]) for g in groups), default=len(stripped))
+            over = sent > CAP
+            failed = failed or over or bool(problem)
+            print(
+                f"{p.name:<30} {len(p.read_text()):>8,} {len(stripped):>9,} {sent:>9,} "
+                f"{sent / CAP * 100:>7.0f}% {floor / CAP * 100:>7.0f}%"
+                f"{'  OVER CAP' if over else ''}{how}"
+            )
+            if problem:
+                print(f"{'':<30}   ^ {problem}")
+            if groups and floor > CAP:
+                failed = True
+                print(
+                    f"{'':<30}   ^ FLOOR OVER CAP: preamble + the largest single group is {floor:,}, "
+                    "so no split fits. Move rows into a separate script with its own preamble."
+                )
+            elif groups and floor > CAP * 0.85:
+                print(
+                    f"{'':<30}   ^ floor at {floor / CAP * 100:.0f}% — re-splitting is nearly "
+                    f"exhausted; {CAP - floor:,} characters of shared preamble + largest group left."
+                )
+            # Over the cap, the useful next step is the split that would fit, so the doc can be
+            # rewritten to it. Enumerating the subsets is fine here: these are hand-authored #region
+            # markers and there is a handful of them per script.
+            if over:
+                advice = split_advice(stripped, groups, floor)
+                if advice:
+                    print(f"{'':<30}   ^ {advice}")
+        return 1 if failed else 0
 
     if not args.script:
         ap.error("give a script name, or --check")

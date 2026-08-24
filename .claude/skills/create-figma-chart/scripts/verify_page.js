@@ -75,6 +75,37 @@ const contrast = (a, b) => { const la = lum(a), lb = lum(b); return (Math.max(la
 const hexOf = (f) => (f && f.type === "SOLID"
   ? "#" + [f.color.r, f.color.g, f.color.b].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join("")
   : null);
+// A paint that PAINTS NO PIXELS is not a colour this file may report. Figma switches a paint off two
+// independent ways — `visible: false` and `opacity: 0` — and only the first of those was tested at the
+// sites that pick a FILL, so a fully transparent decoy could still supply a mark's colour. That mark
+// then entered the colour-audit palette as a category nobody can see (and could be recommended a
+// replacement for), and stood in as the backdrop a label's contrast was measured against. The stroke
+// collector already applied both tests; this is that same predicate, named once so the sites cannot
+// drift apart again. It is the same reasoning that already excludes zero-area nodes from the fill
+// inventory: a paint nobody can see is a phantom colour, and reporting one sends a reviewer to go and
+// fix a mark that is not on the canvas.
+// The test is ZERO, not a floor. A 0.01 cutoff was a threshold nobody chose: a paint at 0.005 does
+// reach the canvas, and dropping it took its node out of EVERY row — text-floor, overlap, margins —
+// with nothing anywhere saying so. Silently auditing a subset is the failure this file exists to
+// remove, and it does not become acceptable because the subset is faint. Anything positive is
+// TRANSLUCENT: held out of the palette, named, and still judged by every row that is about geometry
+// rather than colour.
+const renders = (p) => !!p && p.type === "SOLID" && p.visible !== false
+                       && (p.opacity === undefined || p.opacity > 0);
+// PARTIAL opacity is a different problem from zero, and it is not solved by dropping the node: the mark
+// IS on the canvas, so it still has a box, still blocks an annotation, still needs its stroke weight
+// judged. What it does NOT have is a reportable COLOUR. `hexOf` returns the paint's raw RGB, and what
+// the reader sees is that RGB composited onto whatever is behind it — LABELING.md works the same sum
+// the other way round and measures the gap as `#ecebe8` against `#fbf9f3`, "close enough to look
+// deliberate and wrong enough to see". Auditing the raw value asks color_audit.py about a colour that
+// is not on the page: its deltaE and grayscale verdicts, and any `--suggest` replacement, are then all
+// answers to the wrong question. This is not hypothetical — grapher exports non-focused series at
+// `stroke-opacity="0.5"` (GUIDELINES.md) and this skill's own period band is a fill at 50%.
+// Compositing it here is the tempting fix and is refused: it needs what is DIRECTLY behind the mark,
+// which for a mark inside a plot is usually another mark rather than the frame, plus every ancestor's
+// opacity. Guessing the frame would just relocate the confident wrong answer. So a translucent paint
+// is declared UNMEASURABLE and named, the same way a sequential ramp and an unsafe `--names` are.
+const translucent = (p) => !!p && typeof p.opacity === "number" && p.opacity < 0.999;
 let rows = [];
 const add = (name, status, detail, extra) => rows.push({ check: name, status, detail, ...(extra || {}) });
 const skip = (name, why, owner) => add(name, "SKIPPED", why, owner ? { ownedBy: owner } : null);
@@ -86,16 +117,59 @@ const checkFrame = async (frameId) => {
   rows = [];
   const frame = await figma.getNodeByIdAsync(frameId);
   if (!frame) throw new Error(`frameId ${frameId} not found`);
+  // The FRAME is the one ancestor EVERY mark shares, and it sits ABOVE the walk below — which was
+  // seeded with a literal 1, so the frame was the only node whose opacity was never examined. A frame
+  // left at reduced opacity (or the section holding it) dims every mark on the canvas while the colour
+  // rows go on reporting raw paints: the same wrong-verdict-about-what-is-not-there this file guards
+  // against everywhere else, reached by the one path that skipped the guard. Accumulated on the climb
+  // that already runs to find the PAGE, so it picks up section and group ancestors too.
+  // VISIBILITY is the OTHER switch, and it is inherited the same way. `collect` tests `visible` on every
+  // node it walks, but it starts at the frame's CHILDREN — so a `visible: false` on the frame itself, or
+  // on a group or section holding it, was never read, and a hidden node's descendants keep their own
+  // `visible: true`. The frame then certified a sheet of verdicts about a deliverable that is switched
+  // off. Same climb, same reason as the opacity above; collected as a LIST because unhiding the nearest
+  // ancestor is not enough when two of them are off.
+  let frameOpacity = 1;
+  const hiddenAncestors = [];
   let page = frame;
-  while (page && page.type !== "PAGE") page = page.parent;
+  while (page && page.type !== "PAGE") {
+    if ("opacity" in page && typeof page.opacity === "number") frameOpacity *= page.opacity;
+    if ("visible" in page && page.visible === false) hiddenAncestors.push(`${page.name || "(unnamed)"} (${page.type})`);
+    page = page.parent;
+  }
   if (page && figma.currentPage !== page) await figma.setCurrentPageAsync(page);
 
   const fb = frame.absoluteBoundingBox;
+  // A frame that PAINTS NO PIXELS is not a frame with a lot of passing rows on it. Figma switches a node
+  // off two independent ways — `visible: false` and opacity — and this file already treats those as ONE
+  // state everywhere else (see `renders` for a paint and the zero-opacity return in `collect` for a node);
+  // the frame is the last place they were handled as two. Whichever way it is off, every row below would
+  // be a verdict about something no reader can see, so the frame is REPORTED as not rendered instead and
+  // no other row is emitted. That is the honest shape: not "nothing failed", but "nothing was checked".
+  if (hiddenAncestors.length || frameOpacity <= 0) {
+    const why = hiddenAncestors.length
+      ? `switched off with visible=false on ${hiddenAncestors.join(", then ")}`
+      : "at effective opacity ZERO, counting every group and section above it";
+    add("frame-not-rendered", "FAIL",
+        `NOT CHECKED — this frame paints no pixels: ${why}. Both switches are INHERITED, and the walk`
+        + " below starts at the frame's children, so a descendant's own visible=true and opacity=1 say"
+        + " nothing about whether it renders. Every other row would be a verdict about something the"
+        + " reader cannot see, so none was emitted: this is not an empty or a passing frame. Unhide it,"
+        + " or reset its opacity, along with any group or section above it, and re-run.");
+    return {
+      frame: { id: frame.id, name: frame.name, w: fb ? r(fb.width) : null, h: fb ? r(fb.height) : null },
+      resolved: { chartBy: "not resolved — nothing under a frame that paints no pixels was walked",
+                  contentBox: [null, null], band: [null, null],
+                  counts: { texts: 0, stroked: 0, plotLeaves: 0, annotations: 0 } },
+      verdict: `NOT CHECKED — the frame paints no pixels (${hiddenAncestors.length ? "hidden" : "effective opacity " + r(frameOpacity)})`,
+      rows,
+    };
+  }
   const isSmall = fb ? Math.round(fb.width) <= SMALL_FRAME_W : false;
   const TEXT_FLOOR = CONFIG.textFloor !== null && CONFIG.textFloor !== undefined ? CONFIG.textFloor : (isSmall ? 11 : 12);
   const LADDER = isSmall ? [11, ...LADDER_FULL] : LADDER_FULL;
   const frameFill = (() => { const f = frame.fills && frame.fills[0];
-    if (!f || f.type !== "SOLID" || f.visible === false) return null;
+    if (!renders(f)) return null;
     return "#" + [f.color.r, f.color.g, f.color.b].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join(""); })();
   const rel = (n) => {
     const b = n.absoluteBoundingBox;
@@ -141,12 +215,27 @@ const checkFrame = async (frameId) => {
   // So: everything that is not the header, the footer, the logo or one of OUR annotations is plot
   // content. Annotations are excluded because they are ours rather than the chart's — they have their
   // own four rows, and counting their fills among the plot's invents off-palette entries.
-  let chart = CONFIG.chartName ? frame.children.find((c) => c.name === CONFIG.chartName) : null;
+  // Exact name first, then `<chartName>__<slug>`. Measured on the real file: a `static_viz` import
+  // lands as `chart__agriculture-share`, so an exact-only match resolved NOTHING on those pages and
+  // fell through to the ungrouped branch — which still walked the right node, but reported "the chart
+  // group looks ungrouped" about a frame whose chart group is right there and correctly named.
+  // A wrong explanation for a working result is how the next reader is sent to fix the wrong thing.
+  // Three variants counted on the live file, so match all three rather than the one this default
+  // was written for: `chart` (grapher import), `chart__<slug>` (a static_viz import), and
+  // `chart-desktop` / `chart-mobile` (a two-format page). Exact first, then a `__` or `-` suffix.
+  const chartSuffixed = (c) => c.name.startsWith(CONFIG.chartName + "__") || c.name.startsWith(CONFIG.chartName + "-");
+  let chart = CONFIG.chartName
+    ? frame.children.find((c) => c.name === CONFIG.chartName) || frame.children.find(chartSuffixed)
+    : null;
   let plotRoots = chart
     ? [chart]
     : frame.children.filter((c) => c !== header && c !== footer && c !== logo && !/^annotation__/.test(c.name));
+  // NOT a nested template literal: `inline_script.py`'s stripper is not nesting-aware, so a backtick
+  // inside a ${} closes the outer context, desynchronizes, and silently stops stripping comments for
+  // the rest of the file. Caught by --check jumping 75% -> 96% of cap on a 1.8KB edit.
+  const chartSuffix = chart && chart.name !== CONFIG.chartName ? ' (matched "' + CONFIG.chartName + '__|-<suffix>")' : "";
   const chartResolvedBy = chart
-    ? `name "${CONFIG.chartName}"`
+    ? `name "${chart.name}"` + chartSuffix
     : plotRoots.length
       ? `${plotRoots.length} ungrouped frame child(ren) — the chart group looks ungrouped: ${plotRoots.map((c) => c.name).join(", ")}`
       : "NOT RESOLVED — no frame child left after the header, footer, logo and annotations";
@@ -172,6 +261,12 @@ const checkFrame = async (frameId) => {
   // series at all and the weight row skips in silence. Same shape as `datapoints__<Entity>`: name on
   // the group, properties on the child. So carry the nearest naming ancestor down the walk.
   const SERIES_ANY = /^(line|slope|outline)__(.+)$/;
+  // The CATEGORY a node belongs to, by grapher's `<kind>__<Entity>` naming. Broader than SERIES_ANY on
+  // purpose: `datapoints__<Entity>`, `bar__<Entity>` and `country__<ISO>` all name a category and none
+  // of them is a series line. Like `seriesOf` it has to travel DOWN the walk, because the name sits on
+  // the group while the paint sits on its leaves — a `datapoints__<Entity>` marker is a filled leaf
+  // called `Ellipse 12`, so reading the category off the painted node's own name loses it every time.
+  const CATEGORY_ANY = /^[a-z][a-z-]*__(.+)$/i;
   // A map is detected structurally, by grapher's own container. It matters because a map is the one
   // chart type whose INK ASPECT IS FIXED: measured live, a map requested at a 1.4033 target came back
   // at 1.5428 (and at 1.7446 unsolved), because the projection sets the aspect and any extra canvas
@@ -179,20 +274,50 @@ const checkFrame = async (frameId) => {
   // maps.md fits it WIDTH-first instead ("scale so it spans the content width") — which leaves gaps
   // far larger than the 12-16px band rule by construction.
   const MAP_GROUPS = /^(map|countries|countries-without-data)$/i;
+  // A LEGEND is furniture that happens to be filled, and grapher draws it INSIDE the chart group and
+  // OUTSIDE the map: measured on the file, a map page reads `chart > numeric-color-legend > {lines,
+  // swatches, labels, swatch-hit-areas}` as a SIBLING of `map`. So every swatch is a filled non-text
+  // plot leaf whose ancestors MAP_GROUPS does not match, and an ordinary map came back holding "both a
+  // map and chart marks" — its own legend audited as a second, chart-side palette, against the wrong
+  // set, with a recommendation to go and restyle the legend rather than the categories. The names are
+  // read off grapher's own `makeFigmaId` calls, not guessed: `numeric-color-legend`,
+  // `categorical-color-legend` and `vertical-color-legend`, each holding a `swatches` group.
+  const LEGEND_GROUPS = /^(numeric|categorical|vertical)-color-legend$|^legend$|^legend[-_]/i;
   let isMap = false;
-  const collect = (n, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap) => {
+  const collect = (n, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap, catAncestor, nodeOpacity, insideLegend) => {
     if ("visible" in n && !n.visible) return;
+    // NODE opacity dims every paint under it, and it ACCUMULATES down the tree — a group at 0.5 holding
+    // a leaf at 0.5 renders the leaf at 0.25. Carried as the PRODUCT, not a boolean, because ZERO and
+    // PARTIAL are two different answers and a boolean cannot tell them apart. Read as a boolean, a node
+    // the reader cannot see at all came back as a held-back TRANSLUCENT mark: the audit named an
+    // invisible category and told the operator to reset its opacity or judge it by eye — a verdict
+    // about something that is not on the canvas. The product is also what sees a group at 0 holding an
+    // opaque leaf, which no single-node test can.
+    if ("opacity" in n && typeof n.opacity === "number") nodeOpacity *= n.opacity;
+    // Effective opacity ZERO paints NO PIXELS. That is the same non-rendering state as `visible: false`
+    // directly above and as a zero-opacity paint under `renders`, so it takes the same treatment both of
+    // those take — out of every row entirely — rather than being grouped with genuinely visible partial
+    // opacity. The test is exactly zero, and the multiplication is what reaches it: a factor of 0
+    // anywhere on the climb zeroes the product exactly. It is NOT a floor. A near-zero node — 0.05
+    // inside 0.05 — is faint, not absent, and dropping it here took it out of every row in the file,
+    // including the ones that never look at colour: an 8px label at 0.005 left `text-floor` reporting
+    // that all of its ranges cleared the floor. A subset audited as a whole is the defect this script
+    // exists to catch, so faintness is reported through the translucent path instead, which names it.
+    if (nodeOpacity <= 0) return;
+    const dimmed = nodeOpacity < 0.999;
     // The furniture CONTAINER name is carried, not just the boolean: the dash target is decided by what
     // a node IS (a gridline vs a zero line vs a tick), and deciding it from the node's own current dash
     // instead makes a cleared gridline dash self-justifying. See the furniture-dash row.
     if (FURNITURE_GROUPS.test(n.name)) { inFurniture = true; furnitureGroup = n.name; }
     if (insidePlot && MAP_GROUPS.test(n.name)) { isMap = true; insideMap = true; }
+    if (insidePlot && LEGEND_GROUPS.test(n.name)) insideLegend = true;
     const sm = SERIES_ANY.exec(n.name);
     if (sm) seriesOf = { kind: sm[1], series: sm[2] };
+    const cm = CATEGORY_ANY.exec(n.name);
+    if (cm) catAncestor = cm[1];
     if (n.type === "TEXT") {
-      const tf = Array.isArray(n.fills) && n.fills[0] && n.fills[0].type === "SOLID" && n.fills[0].visible !== false
-        ? "#" + [n.fills[0].color.r, n.fills[0].color.g, n.fills[0].color.b].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join("")
-        : null;
+      const tf = Array.isArray(n.fills) && renders(n.fills[0]) ? hexOf(n.fills[0]) : null;
+      const tfDim = dimmed || translucent(Array.isArray(n.fills) ? n.fills[0] : null);
       // The WEIGHTS, not just whether they differ: a uniformly non-Regular node is style-unbindable
       // for the same API reason a mixed-weight one is, and named-styles has to know the difference
       // between "bold throughout" (prescribed) and "Regular and unbound" (a defect).
@@ -208,14 +333,20 @@ const checkFrame = async (frameId) => {
       for (const sr of ranges) {
         texts.push({ node: n, name: n.name, chars: (n.characters || "").slice(0, 30), size: sr.size,
                      sizeRange: sr.range, mixedSize: ranges.length > 1,
-                     styleId: n.textStyleId || "", box: rel(n), insidePlot, fill: tf, mixedWeight, weights });
+                     styleId: n.textStyleId || "", box: rel(n), insidePlot, fill: tf, translucent: tfDim, mixedWeight, weights });
       }
     }
-    if (/^annotation__/.test(n.name)) annotations.push({ node: n, name: n.name, box: rel(n), type: n.type });
+    if (/^annotation__/.test(n.name)) annotations.push({ node: n, name: n.name, box: rel(n), type: n.type, opacity: nodeOpacity });
     if ("strokeWeight" in n && typeof n.strokeWeight === "number" && n.strokes && n.strokes.length) {
+      // The stroke's COLOUR travels with it, picked the same way the knockout row picks one: the first
+      // paint that actually RENDERS, not `strokes[0]`, which can be a switched-off or transparent decoy.
+      // A line chart's series colour lives here and nowhere else — it is not a fill — so without this
+      // the colour rows can only ever see a chart's fills.
+      const strokePaint = n.strokes.find(renders);
       stroked.push({ node: n, name: n.name, type: n.type, w: n.strokeWeight,
                      dash: "dashPattern" in n && n.dashPattern ? [...n.dashPattern] : [],
                      align: n.strokeAlign, insidePlot, inFurniture, furnitureGroup: furnitureGroup || null, insideMap: !!insideMap,
+                     hex: hexOf(strokePaint), translucent: dimmed || translucent(strokePaint),
                      seriesKind: seriesOf ? seriesOf.kind : null, seriesName: seriesOf ? seriesOf.series : null });
     }
     // Zero-area nodes are EXCLUDED from the fill inventory and KEPT for the stroke rows (CHECKS.md).
@@ -226,7 +357,7 @@ const checkFrame = async (frameId) => {
     const hasArea = areaBox && areaBox.w > 0 && areaBox.h > 0;
     if (hasArea && "fills" in n && Array.isArray(n.fills)) {
       for (const f of n.fills) {
-        if (f.type === "SOLID" && f.visible !== false) fills.push({ name: n.name, type: n.type, hex: hexOf(f), styleId: n.fillStyleId || "", insidePlot });
+        if (renders(f)) fills.push({ name: n.name, type: n.type, hex: hexOf(f), styleId: n.fillStyleId || "", insidePlot });
       }
     }
     // Marker groups and value labels. The NAME is on the group and the GEOMETRY is on its children, and
@@ -245,13 +376,19 @@ const checkFrame = async (frameId) => {
       const mb0 = rel(n);
       // The mark's own COLOUR travels with its box. Without it, a label sitting on a mark can only ever be
       // measured against the frame, which is not what is behind it (see label-contrast-on-background).
-      const markPaint = Array.isArray(n.fills) ? n.fills.find((f) => f.type === "SOLID" && f.visible !== false) : null;
+      const markPaint = Array.isArray(n.fills) ? n.fills.find(renders) : null;
       const filled = !!markPaint;
       // `fromMap` is carried because a MAP SHAPE's bbox is not its ink: per-chart-type/maps.md, a
       // country split across the antimeridian has a box spanning almost the whole map, so an annotation
       // over open ocean falls inside it. Counting those as covered marks reports a FAIL that is not
       // there, so the annotation row drops them and says so rather than judging them by bbox.
-      if (filled && mb0 && mb0.w > 0 && mb0.h > 0) markBoxes.push({ name: n.name, box: mb0, why: "a filled data mark", insidePlot, fromMap: !!insideMap, hex: hexOf(markPaint) });
+      // A legend swatch KEEPS its box — an annotation dropped over the legend covers something the
+      // reader needs — but it is named for what it is, because "covers a filled data mark" sends the
+      // reader looking for a bar that is not there. The palette below drops it on the same grounds.
+      if (filled && mb0 && mb0.w > 0 && mb0.h > 0) markBoxes.push({ name: n.name, box: mb0,
+                                      why: insideLegend ? "a legend swatch" : "a filled data mark",
+                                      insidePlot, fromMap: !!insideMap, fromLegend: !!insideLegend, hex: hexOf(markPaint),
+                                      translucent: dimmed || translucent(markPaint), cat: catAncestor || null });
     }
     if (/^datapoints__|^dot__|^value__/.test(n.name)) {
       const why = /^value__/.test(n.name) ? "a value label" : "a dot";
@@ -259,7 +396,7 @@ const checkFrame = async (frameId) => {
         if ("visible" in m && !m.visible) return;
         if ("children" in m && m.children.length) { m.children.forEach(pushLeafBoxes); return; }
         const b = rel(m);
-        if (b && b.w > 0 && b.h > 0) markBoxes.push({ name: n.name, box: b, why, insidePlot, fromMap: false });
+        if (b && b.w > 0 && b.h > 0) markBoxes.push({ name: n.name, box: b, why, insidePlot, fromMap: false, fromLegend: !!insideLegend });
       };
       pushLeafBoxes(n);
     }
@@ -268,13 +405,13 @@ const checkFrame = async (frameId) => {
     // the fixture models), so a bare node here loses it and the name-only filter below matches nothing —
     // every slope segment silently absent from `polylines`, and annotation-overlap unable to fail.
     if (n.type === "VECTOR" && insidePlot) vectors.push({ node: n, seriesOf });
-    if ("children" in n && n.children.length) { n.children.forEach((c) => collect(c, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap)); return; }
+    if ("children" in n && n.children.length) { n.children.forEach((c) => collect(c, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap, catAncestor, nodeOpacity, insideLegend)); return; }
     const b = rel(n);
     if (b && b.w > 0 && b.h > 0) leaves.push({ name: n.name, type: n.type, box: b, insidePlot, fromMap: !!insideMap });
   };
   for (const child of frame.children) {
     if (child === logo) continue;
-    collect(child, plotRoots.indexOf(child) !== -1, false, null, null, false);
+    collect(child, plotRoots.indexOf(child) !== -1, false, null, null, false, null, frameOpacity, false);
   }
 
   // ---------------------------------------------------------------- rows
@@ -859,7 +996,7 @@ const checkFrame = async (frameId) => {
     if (!annotations.length) skip("annotation-knockout", "no annotation__* nodes on this frame");
     else if (!crossings) skip("annotation-knockout", "crossings not computed (no furniture and no readable polylines) — cannot decide the tier, so not judging the strokes either");
     else {
-      const bad = [];
+      const bad = [], unsure = [];
       for (const a of annotations) {
         const n = a.node;
         if (!("strokeWeight" in n) || typeof n.strokeWeight !== "number") continue;
@@ -868,7 +1005,7 @@ const checkFrame = async (frameId) => {
         // whose knockout paints nothing passed the weight, alignment and colour checks — the row
         // certified the missing knockout it exists to catch. And the colour check read `strokes[0]`
         // unconditionally, which is the wrong paint the moment an invisible one sits in front of it.
-        const paint = (n.strokes || []).find((s) => s && s.visible !== false && (s.opacity === undefined || s.opacity > 0.01));
+        const paint = (n.strokes || []).find((s) => s && s.visible !== false && (s.opacity === undefined || s.opacity > 0));
         const hasStroke = !!paint && n.strokeWeight > 0;
         const crosses = crossings[a.name] || [];
         if (crosses.length && !hasStroke) {
@@ -878,6 +1015,19 @@ const checkFrame = async (frameId) => {
         if (!crosses.length && hasStroke) {
           bad.push(`${a.name} crosses nothing yet carries a ${r(n.strokeWeight)}px knockout — an annotation over empty space takes no stroke and no frame`);
           continue;
+        }
+        // A knockout works by PAINTING the frame's colour over what it crosses, so a translucent one
+        // does not do the job its 3px and OUTSIDE alignment are for: at 0.005 the crossing shows
+        // straight through, and the geometry checks below would still return ok. Zero is already
+        // handled above as no knockout at all; anything between is on the canvas but cannot be
+        // certified from here — how much it masks depends on what is behind it, which is the same
+        // question the palette refuses to guess at. So it is REVIEWED with the number named, rather
+        // than passed or failed: at 0.98 it masks fine, at 0.05 it does not, and this script cannot
+        // tell the reader which side of that they are on.
+        const knockoutAlpha = (a.opacity === undefined ? 1 : a.opacity)
+                              * (hasStroke && paint.opacity !== undefined ? paint.opacity : 1);
+        if (hasStroke && knockoutAlpha < 0.999) {
+          unsure.push(`${a.name} carries a knockout at effective opacity ${r(knockoutAlpha)} (paint x node), so it does not fully mask the ${crosses.length} thing(s) it crosses — a knockout paints the frame's colour OVER them, and a partly transparent one lets them through. Set it to 1, or judge this one by eye`);
         }
         if (hasStroke && Math.abs(n.strokeWeight - 3) >= 0.05) {
           bad.push(`${a.name} knockout ${r(n.strokeWeight)}px (want 3)` + (n.strokeWeight < 1 ? " — sub-pixel means the stroke was set before a rescale()" : ""));
@@ -891,7 +1041,9 @@ const checkFrame = async (frameId) => {
           }
         }
       }
-      add("annotation-knockout", bad.length ? "FAIL" : "ok", bad.length ? bad.join("; ") : `all ${annotations.length} annotation(s) carry the tier their crossings require`);
+      add("annotation-knockout", bad.length ? "FAIL" : unsure.length ? "REVIEW" : "ok",
+          (bad.length ? bad.join("; ") : `all ${annotations.length} annotation(s) carry the tier their crossings require`)
+          + (unsure.length ? `. ${unsure.length} NOT certified: ${unsure.join("; ")}` : ""));
     }
   }
 
@@ -957,8 +1109,13 @@ const checkFrame = async (frameId) => {
     const overlaps = (a, b) => a.l < b.rr && a.rr > b.l && a.t < b.bb && a.bb > b.t;
     const mapShapes = markBoxes.filter((x) => x.insidePlot && x.fromMap && x.hex);
     const marksUnder = (t) => (t.box ? mapShapes.filter((m) => overlaps(t.box, m.box)) : []);
+    // A THIRD way in: a translucent label. Its `fill` is the raw paint, but what the reader sees is that
+    // colour composited onto the background, which is always LOWER contrast than the raw value — so
+    // measuring the raw one passes text that is genuinely too faint, the one direction this row must
+    // not fail in. The ratio is not computable here for the same reason the palette will not audit it,
+    // so it joins the by-eye bucket rather than being scored or dropped.
     const ambiguous = candidates.filter((t) =>
-      (frameFill && t.fill.toLowerCase() === frameFill.toLowerCase()) || marksUnder(t).length);
+      (frameFill && t.fill.toLowerCase() === frameFill.toLowerCase()) || marksUnder(t).length || t.translucent);
     const onBg = candidates.filter((t) => ambiguous.indexOf(t) === -1);
     // Named per label, with the arithmetic where it exists: against a map shape's own fill the ratio IS
     // computable, it is just not certain to be the fill behind the text.
@@ -966,6 +1123,7 @@ const checkFrame = async (frameId) => {
       const over = marksUnder(t);
       const worst = over.length ? over.reduce((a, m) => (contrast(t.fill, m.hex) < contrast(t.fill, a.hex) ? m : a)) : null;
       return `"${t.chars}" ${t.fill}` +
+             (t.translucent ? " — partly transparent, so the colour that reaches the reader is this one composited onto what is behind it and ALWAYS lower contrast than the raw value; reset the opacity to 1 to have it measured" : "") +
              (frameFill && t.fill.toLowerCase() === frameFill.toLowerCase() ? " — the frame's own colour, so either inside a darker mark (correct) or invisible text on the frame" : "") +
              (worst ? ` — overlaps ${over.length} map shape(s), worst ${worst.name} ${worst.hex} = ${r(contrast(t.fill, worst.hex))}:1` : "");
     };
@@ -985,8 +1143,238 @@ const checkFrame = async (frameId) => {
 
   // ---------------------------------------------------------------- declared gaps in coverage
 // #endregion
-  skip("colour-vision", "all-pairs deltaE 20 for deuteranopia/protanopia on CATEGORICAL fills", "scripts/color_audit.py");
-  skip("grayscale-seams", "adjacent pairs above ~1.6:1; needs --separated for non-stacked charts", "scripts/color_audit.py");
+  // These two are owned by color_audit.py, which cannot run in here — this is a Figma plugin
+  // sandbox with no shell. But the palette it needs is already on the canvas, so emit the command
+  // ready to paste instead of a tool name to go and look up. A declared gap the operator has to
+  // reconstruct by hand is the one most likely to be skipped for real.
+  {
+    // The palette is built from IDENTIFIED DATA MARKS AND SERIES STROKES, never from the `fills`
+    // inventory. `fills` holds every solid paint on an area node inside the plot and a TEXT node has
+    // both, so axis and legend labels would enter the palette as categories; meanwhile a line chart's
+    // series colours live on STROKES and are not in `fills` at all. Measured on this script's own test
+    // fixture, that inventory returned exactly one entry — the fill of `label__A`, a text node — with
+    // the series colour it should have audited missing entirely. Auditing furniture while omitting the
+    // data is the confident wrong answer these rows exist to prevent.
+    // `outline__*` strokes are excluded along with it: that is the white halo grapher draws under a
+    // line so crossings stay readable. Every series shares it, and it is not a category colour.
+    // `cat` comes from the walk's nearest categorical ANCESTOR, not from the painted node's own name.
+    // grapher puts the stable name on the group and the paint on its leaves — a `datapoints__<Entity>`
+    // marker is a filled leaf called `Ellipse 12` — so reading it off `m.name` loses the category on
+    // exactly the shape the collector already goes out of its way to preserve, and the clash note below
+    // then cannot fire for those marks.
+    // The category is also the LABEL: `--names` exists so the audit's findings name the categories that
+    // need attention, and a marker's painted leaf is called `Ellipse 12`. Reporting a failing pair as
+    // "Ellipse 12 vs Ellipse 12" identifies nothing. Fall back to the node's own name only when there
+    // is no categorical ancestor. Map shapes keep their node names, which already carry the country.
+    // LEGEND SWATCHES are not categories, they are a picture OF the categories: a legend repeats the
+    // colours the marks already carry and adds none of its own. Audited as marks they turn every
+    // ordinary map into a "map plus chart marks" frame (the legend sits inside the chart group and
+    // outside `map`), get run against the wrong palette under `--separated`, and their names — grapher
+    // ids each swatch after its bin label, and a numeric legend's bins are unnamed rects — either
+    // impersonate a category or trip the import-default gate and drop `--names` for the whole run.
+    const markSrc = markBoxes.filter((m) => m.insidePlot && m.hex && !m.fromLegend);
+    const legendSrc = markBoxes.filter((m) => m.insidePlot && m.hex && m.fromLegend);
+    const strokeSrc = stroked.filter((s) => s.insidePlot && !s.inFurniture && s.hex
+                                            && (s.seriesKind === "line" || s.seriesKind === "slope"));
+    // Translucent paints are held back rather than audited at their raw value (see `translucent`).
+    // COUNTED, though, and named below: a silently shorter palette is a subset audit reported as a
+    // whole one, which is the failure this row exists to avoid.
+    const dimMarks = markSrc.filter((m) => m.translucent);
+    const dimStrokes = strokeSrc.filter((s) => s.translucent);
+    // `fromMap` and `stroke` travel with the entry because they decide WHICH PALETTE the audit searches,
+    // and that is a property of the mark, not of the frame it sits in.
+    const marks = markSrc.filter((m) => !m.translucent)
+      .map((m) => ({ id: (m.fromMap ? null : m.cat) || m.name, hex: m.hex, cat: m.fromMap ? null : m.cat,
+                     fromMap: !!m.fromMap, stroke: false }));
+    const seriesStrokes = strokeSrc.filter((s) => !s.translucent)
+      .map((s) => ({ id: s.seriesName, hex: s.hex, cat: s.seriesName, fromMap: false, stroke: true }));
+    const paletteSrc = [...marks, ...seriesStrokes];
+    // The name is the category where there is one, so the note points at something the operator can
+    // find on the canvas rather than at a count.
+    const dimNames = [...new Set([...dimMarks.map((m) => (m.fromMap ? null : m.cat) || m.name),
+                                 ...dimStrokes.map((s) => s.seriesName)].filter(Boolean))];
+    const dimNote = dimMarks.length + dimStrokes.length
+      ? ` ${dimMarks.length + dimStrokes.length} translucent mark(s)/series are NOT in this palette`
+        + (dimNames.length ? ` (${dimNames.slice(0, 6).join(", ")})` : "")
+        + " — a partly transparent paint reads as its colour composited onto whatever is behind it, which"
+        + " this script cannot determine from inside the plot, so auditing its raw value would answer the"
+        + " wrong question. Reset the opacity to 1 (GUIDELINES.md does this for grapher's non-focused"
+        + " series) and re-run, or judge those by eye."
+      : "";
+    // Dropping them SILENTLY would be the same subset-reported-as-a-whole this file refuses elsewhere,
+    // and one legend colour genuinely can be missing from the marks: an empty bin nobody falls into is
+    // drawn in the legend and nowhere else. So the count is stated and any colour the palette does not
+    // already carry is named, rather than being quietly audited or quietly dropped.
+    const legendOnly = [...new Set(legendSrc.filter((m) => !m.translucent).map((m) => m.hex.toLowerCase()))];
+    const paletteHexes = new Set(paletteSrc.map((x) => x.hex.toLowerCase()));
+    const legendUnmatched = legendOnly.filter((h) => !paletteHexes.has(h));
+    const legendNote = legendSrc.length
+      ? ` ${legendSrc.length} legend swatch(es) are NOT in this palette — a legend repeats the`
+        + " categories' own colours rather than adding any, and grapher draws it inside the chart group"
+        + " and outside the map, so counting it made an ordinary map report a second, chart-side palette"
+        + " and audited its own furniture."
+        + (legendUnmatched.length
+            ? ` ${legendUnmatched.length} of its colour(s) appear ONLY in the legend and on no mark`
+              + ` (${legendUnmatched.slice(0, 4).join(", ")}) — an empty bin, or a mark this script could`
+              + " not read; judge those by eye."
+            : "")
+      : "";
+    // `--maps` swaps in the CATEGORICAL Maps palette, and the deltaE 20 all-pairs gate is a categorical
+    // test. A SEQUENTIAL choropleth — Viridis, a ColorBrewer ramp — is ordered by construction and set
+    // in grapher: its adjacent stops are MEANT to sit close together, so that gate fails a correct ramp,
+    // and the script's own "rerun with --suggest" would then answer with an unordered categorical set.
+    // Nothing here can tell a ramp from a categorical choropleth off the fills alone, so it is not
+    // guessed: the map branch says which chart the command is for and which chart it does not apply to.
+    const mapNote = " — this frame is a MAP, and this row covers a CATEGORICAL choropleth ONLY."
+      + " If these fills are a SEQUENTIAL ramp, do not run it: the ramp is ordered and grapher sets it,"
+      + " adjacent stops are meant to be close, so the deltaE 20 gate fails correct work and --suggest"
+      + " would offer an unordered categorical palette in its place. Judge a ramp by lightness order.";
+    const lineNote = " — `--line` is `--separated` plus the Line and Slope Chart variants, the darker set"
+      + " meant for thin marks and text on white, so a --suggest rerun recommends stroke colours rather"
+      + " than fill colours. A line or slope chart has no seams, so nothing here needs reordering.";
+    const separatedNote = " — `--separated` assumes nothing shares an edge, which holds for lines, maps"
+      + " and plain/grouped bars. On a STACKED or SEGMENTED chart drop it and reorder the"
+      + " colours into stack order first, because the seam check reads adjacency off that order.";
+    // ONE RUN PER PALETTE FAMILY, not one per FRAME. A frame can hold both at once: combination.md's
+    // exemplar is a line chart with an inset locator map whose countries are filled with THE SAME
+    // COLOURS AS THEIR SERIES. `isMap` is a frame-level flag, so on that frame the map won and the line
+    // strokes were audited under `--maps` — whose "rerun with --suggest" answers out of the LIGHTER
+    // Categorical Maps set, recommending FILL colours for thin strokes. That is the exact swap `--line`
+    // exists to prevent, arrived at because one verdict was picked for a frame that holds two different
+    // things. The frame is one; the palettes are two, so each is deduped, named, flagged and emitted on
+    // its own, and neither is judged against the other's palette.
+    const mapPal = paletteSrc.filter((p) => p.fromMap);
+    const chartPal = paletteSrc.filter((p) => !p.fromMap);
+    const mixed = mapPal.length > 0 && chartPal.length > 0;
+    const paletteRun = (src) => {
+      // Dedupe by COLOUR, because color_audit.py takes a PALETTE: hand it forty bar segments in six
+      // colours and every real finding competes with dozens of deltaE 0 self-pairs.
+      const seen = new Map();  // hex -> first mark/series name, in walk order
+      for (const p of src) if (!seen.has(p.hex.toLowerCase())) seen.set(p.hex.toLowerCase(), p.id);
+      const hexes = [...seen.keys()];
+      if (!hexes.length) return "";
+      // BOTH rows compare PAIRS — the deltaE gate across all of them, the seam gate across adjacent
+      // ones — so a palette of one colour has nothing to compare. `color_audit.py` does not say so: it
+      // runs, prints an empty pair list and an overall minimum deltaE of `inf`, and exits 0, which
+      // reads exactly like a clean audit. GUIDELINES.md already rules on this case in as many words —
+      // "one categorical color against neutral grays has no pair to check, and reporting no failures
+      // from a two-color audit reads as coverage you don't have" — and names the two checks that ARE
+      // live instead. So the command is withheld and those two are handed over in its place. Emitting
+      // it would be this file's own failure mode: a runnable-looking gate that cannot fail.
+      // Computed BEFORE the single-colour exit below, not after it. Two categories painted the same
+      // colour ARE a one-colour palette, and that is the severest collision there is — so the one
+      // branch that withholds the command is the branch that most needs to say what it found.
+      const catsByHex = new Map();
+      for (const p of src) {
+        if (!p.cat) continue;
+        const h = p.hex.toLowerCase();
+        if (!catsByHex.has(h)) catsByHex.set(h, new Set());
+        catsByHex.get(h).add(p.cat);
+      }
+      const shared = [...catsByHex].filter(([, c]) => c.size > 1)
+        .map(([h, c]) => `${h} carries ${[...c].slice(0, 4).join(" + ")}`);
+      const sharedNote = shared.length
+        ? ` One colour, two categories — the audit sees these as ONE entry and cannot report the clash,`
+          + ` so judge them by eye: ${shared.slice(0, 4).join("; ")}. Correct for a highlight treatment;`
+          + " a defect if they are separate categories."
+        : "";
+      const soleName = [...seen.values()][0];
+      if (hexes.length < 2) {
+        return (mixed ? (src.some((x) => x.fromMap) ? " MAP shapes —" : " Chart marks and series —") : "")
+          + ` NOTHING TO RUN: this palette holds ONE colour (${hexes[0]}${soleName ? ", " + soleName : ""})`
+          + ` drawn from ${src.length} plot mark(s)/series, and both rows compare PAIRS, so there is no`
+          + " categorical pair to check. color_audit.py would still run on it and exit 0, printing an"
+          + " overall minimum deltaE of `inf` from an empty pair list — a clean-looking verdict from a"
+          + " comparison that never happened. GUIDELINES.md says not to run it on a chart like this."
+          + " Check the two things that ARE live: this colour's contrast against the frame's background,"
+          + " and whether it still separates from the neutral grays in grayscale."
+          + sharedNote + dimNote + legendNote;
+      }
+      // What that collapse HIDES is stated above, not swallowed. Two categories on one colour is the
+      // severest collision there is — deltaE 0, indistinguishable to everyone — and the audit cannot
+      // report it, because to the audit they are one entry.
+      // Not graded, and phrased as a question, because sharing a colour is often correct: a highlight
+      // treatment greys every unhighlighted series to the same value on purpose. Map shapes are left out
+      // of the note altogether — a choropleth puts every country in a bin into one colour by definition,
+      // so flagging that would fire on every map. Only grapher's `<kind>__<Entity>` names count as a
+      // category; an SVG import's `Rectangle 12` is unique per node and means nothing.
+      // A name carrying a comma would silently split into two --names entries and misalign every label
+      // after it; a name carrying an apostrophe would end the single-quoted shell argument mid-name, so
+      // "Women's employment" turns a paste-ready command into a shell syntax error. Both drop the flag
+      // wholesale rather than emitting it subtly wrong. State the ACTUAL reason: an unnamed mark, a
+      // comma'd one and an apostrophe'd one all disqualify the flag, and reporting one as another is the
+      // same wrong-verdict habit these checks exist to catch.
+      const names = [...seen.values()];
+      // A name that is not DISTINCT across the palette is the worst of the lot, because it looks
+      // right. Measured on the real file: a `static_viz` import names every bar group `bars__<slug>`
+      // — the dataset, not the category — and every paint-bearing leaf `Vector`, so four genuinely
+      // different colours came out labelled `agriculture-share,agriculture-share,...`. The audit
+      // would then print four rows under one name and the operator would read a per-category verdict
+      // off labels that name no category. Distinctness is the property `--names` actually promises.
+      const genericName = /^(vector|rectangle|ellipse|group|frame|line|path|polygon|union|subtract)\b/i;
+      const nameProblem = names.some((n) => !n) ? "a mark has no name"
+        : names.some((n) => n.includes(",")) ? "a name contains a comma, which would misalign the labels"
+        : names.some((n) => n.includes("'")) ? "a name contains an apostrophe, which would break the quoted shell argument"
+        : new Set(names).size !== names.length
+          ? `${names.length} colours share only ${new Set(names).size} distinct name(s) (${[...new Set(names)].slice(0, 3).join(", ")}) — the names identify the series or the import, not the category`
+        : names.some((n) => genericName.test(n))
+          ? `a name is an import default (${names.find((n) => genericName.test(n))}), which labels nothing`
+        : null;
+      const namesSafe = !nameProblem;
+      // The mode flag also selects which PALETTE color_audit.py searches when the operator follows its
+      // "rerun with --suggest" instruction, so `--separated` is not interchangeable with the others.
+      // `--separated` only turns the seam gate off; `--line` turns it off AND installs the Line and Slope
+      // variants, the darker set meant for thin marks on white. A line or slope palette given plain
+      // `--separated` therefore gets fill colours recommended for strokes. All three imply "nothing
+      // shares an edge", which is why only the stacked/segmented case ever needs the flag dropped.
+      // Read off THIS palette's own marks, so a mixed frame cannot hand one family the other's flag.
+      const isMapPal = src.some((p) => p.fromMap);
+      const mode = isMapPal ? "--maps" : src.some((p) => p.stroke) ? "--line" : "--separated";
+      const cmd = ".venv/bin/python .claude/skills/create-figma-chart/scripts/color_audit.py "
+        + `'${hexes.join(",")}'`
+        + (namesSafe ? ` --names '${names.join(",")}'` : "")
+        + ` ${mode}`;
+      // The other case GUIDELINES.md rules on: one highlight against neutral grays. Those grays are
+      // FURNITURE, not categories, so a palette that is one real colour plus muting grays is the
+      // single-colour case wearing a larger count — and "no failures" out of it is coverage nobody has.
+      // Not suppressed, because which entries are muting grays is a judgement this script cannot make
+      // (a category legitimately painted gray is a category), and a check silently withheld is worse
+      // than one a human is told to weigh. Fires only when the treatment is DECLARED.
+      const highlightNote = CONFIG.highlightTreatment
+        ? " CONFIG.highlightTreatment is set: if this palette is one highlight plus muting grays, do NOT"
+          + " run it — GUIDELINES.md rules that out, because the grays are furniture and leave no"
+          + " categorical pair. Check the highlight's contrast against the background and its grayscale"
+          + " separation from the grays instead. Run it only for the pairs that are real categories."
+        : "";
+      return (mixed ? (isMapPal ? " MAP shapes —" : " Chart marks and series —") : "")
+        + highlightNote
+        + ` Run: ${cmd}`
+        + (isMapPal ? mapNote : mode === "--line" ? lineNote : separatedNote)
+        + ` Palette: ${hexes.length} distinct colour(s) drawn from ${src.length} plot mark(s)/series.`
+        + sharedNote
+        + (namesSafe ? "" : ` (--names omitted: ${nameProblem}.)`);
+    };
+    // The overlap between the two is NOT a finding: combination.md fills the locator map's countries
+    // with their own series colours on purpose, so saying so here stops the split from reading as a
+    // clash the operator has to go and reconcile.
+    const mixedNote = mixed
+      ? " This frame holds BOTH a map and chart marks/series. They take DIFFERENT color_audit.py"
+        + " palettes — Categorical Maps against the Line and Slope variants — so they are audited as two"
+        + " separate runs rather than one, and a colour appearing in both is expected (combination.md"
+        + " fills an inset locator map's countries with their series colours)."
+      : "";
+    const how = paletteSrc.length
+      ? mixedNote + paletteRun(chartPal) + paletteRun(mapPal) + dimNote + legendNote
+      // An all-translucent plot — or one whose only fills are its legend — must not report "no data
+      // marks found": that reads as an empty frame and sends the operator looking for missing nodes
+      // instead of at the opacity they set or the legend they are looking straight at. A frame that
+      // paints no pixels at all never reaches here: it returns one `frame-not-rendered` row instead.
+      : dimNote || legendNote
+        ? ` No auditable palette:${dimNote}${legendNote}`
+        : " No data marks or series strokes found in the plot, so there is no palette to audit.";
+    skip("colour-vision", "all-pairs deltaE 20 for deuteranopia/protanopia on CATEGORICAL fills." + how, "scripts/color_audit.py");
+    skip("grayscale-seams", "adjacent pairs above ~1.6:1 — same command, same run as colour-vision." + how, "scripts/color_audit.py");
+  }
   skip("spelling-and-prose", "American spelling, typos, style-guide breaches", ".venv/bin/codespell + /check-metadata-style");
   skip("text-true-of-indicator", "every claim in every string checked against the producer's documentation", "/adversarial-data-review");
   skip("entities-all-render", "needs the EFFECTIVE selection (URL country=, or the MDim view's resolved list from the DB) — never the SVG's own labels, which makes the check unable to fail", "Step 1's table + /query-grapher-db");

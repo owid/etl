@@ -130,6 +130,14 @@
   failure as batching the four-render arrow protocol. Bulk-render surveys and delivery renders of
   finished frames; keep every post-write probe on `get_screenshot`. It also returns no
   `original_width`/`original_height`, so the size-only survey still wants `get_screenshot`.
+  **Checked 2026-08-24: ETL carries no such token** — no `FIGMA_API_KEY` in its env files — so this
+  is blocked on someone provisioning one, not on anybody's time. Don't write the wrapper first: an
+  untested client for an API you cannot call is a thing that reports success it has not earned.
+  And weigh it against what it would actually buy now. Its niche is a *cloud* session doing bulk
+  reads, since a local one has the desktop server for that; and `measure_pixels.py` removed the
+  reason most probes rendered at all, which was for a model to look at them. So the case for it is
+  narrower than when it was first written down: raise it if cloud screenshot volume becomes the
+  measured bottleneck on a real run, and not before.
 
 - **The Figma *desktop* MCP server serves reads ~30× faster, and is still the wrong tool for a chart
   build. Use it for a bulk survey of nodes that already exist; not in the per-chart flow.** The
