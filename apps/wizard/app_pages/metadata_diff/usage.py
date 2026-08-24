@@ -13,6 +13,7 @@ from typing import Any
 
 from sqlalchemy.engine.base import Engine
 
+from apps.wizard.app_pages.metadata_diff.data import config_column
 from etl.db import read_sql
 
 
@@ -34,6 +35,7 @@ def charts_using_indicators(engine: Engine, indicator_ids: list[int]) -> dict[in
     "Learn more about this data", per indicator. Approximated by the chart's distinct-variable count
     (1 → data page; >1 → sources drawer only).
     """
+    cfg = config_column(engine)
     result: dict[int, list[dict[str, Any]]] = {int(i): [] for i in indicator_ids}
     ids = [int(i) for i in set(indicator_ids)]
     if not ids:
@@ -46,7 +48,7 @@ def charts_using_indicators(engine: Engine, indicator_ids: list[int]) -> dict[in
             select cd.variableId as variableId,
                    c.id as chartId,
                    cc.slug as slug,
-                   cc.full ->> '$.title' as title,
+                   cc.{cfg} ->> '$.title' as title,
                    c.publishedAt is not null as is_published
             from chart_dimensions cd
             join charts c on c.id = cd.chartId

@@ -224,7 +224,7 @@ def _where_line(g: ChangeGroup) -> str:
 
 
 def _open_chart_buttons(charts: list[dict[str, Any]], change_key: str) -> None:
-    """Jump into the per-chart review (the deep view with sign-off and a PR brief) for one chart.
+    """Open one chart's own diff below — every field of it this branch changed, against the baseline.
 
     The same chart can render several distinct changes, so the widget key carries the change too.
     """
@@ -240,7 +240,7 @@ def _open_chart_buttons(charts: list[dict[str, Any]], change_key: str) -> None:
             key=f"mdd-open-chart-{change_key[:12]}-{slug}",
             on_click=_select_chart,
             args=(slug,),
-            help="Opens the chart's own review below, with its blast radius and PR brief.",
+            help="Opens this chart's own field-by-field diff below.",
         )
 
 

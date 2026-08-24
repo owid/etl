@@ -3,37 +3,41 @@
 The list replaces the old namespace filter + searchable selectbox. Picking an MDim out of a dropdown
 only works if you already know which one your PR touched — which is exactly what a reviewer doesn't.
 
-Selecting an MDim opens the existing deep views (Blast radius / View diff / Review) unchanged, so the
-list is an entry point rather than a replacement.
+One level, deliberately. The list used to be an entry point into three deep pages (Blast radius, View
+diff, Review & PR brief), and those pages formed a closed loop: the author's scope decision was read only
+by the Review page, the Approve/Flag sign-off was read by nothing, and neither is consulted at merge —
+metadata ships through ETL, unlike chart-diff approvals, which gate `etl chart-sync`. They also carried a
+second review vocabulary, stored apart from this list's ticks so the two could not collide, which meant a
+change could read Reviewed here and Pending there forever.
+
+What they contributed that nothing else does is kept: the **PR brief** is a download on each card, and the
+dimension grid lives in the **Blast radius** section, which every card links into.
 """
 
 import pandas as pd
 import streamlit as st
-import streamlit.components.v1 as components
 from sqlalchemy.engine.base import Engine
 
-from apps.wizard.app_pages.chart_diff.utils import SOURCE
-from apps.wizard.app_pages.metadata_diff import cached, datapage, discovery, mdim_pages
-from apps.wizard.app_pages.metadata_diff.core import ViewDiff, field_label
-from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, DIFF_CSS, impact_counts, st_origin_caption
+from apps.wizard.app_pages.metadata_diff import brief, cached, datapage, discovery
+from apps.wizard.app_pages.metadata_diff.core import field_label, group_usage
+from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, DIFF_CSS, markdown_output, st_origin_caption
 from apps.wizard.app_pages.metadata_diff.review_state import (
     n_reviewed,
     resolve_marks,
     st_reviewed_toggle,
     surface_key,
 )
-from apps.wizard.app_pages.metadata_diff.tree import render_tree_html
-from apps.wizard.utils.components import Pagination, url_persist
+from apps.wizard.utils.components import Pagination
 
 MDIMS_PER_PAGE = 4
 
-# Changes shown inline per MDim before pointing at the View diff for the rest — enough to see what the
-# PR did without turning the list into the detail page.
-MAX_INLINE_CHANGES = 3
+# Changes shown inline per MDim. There is no detail page to defer the rest to any more, so the cap is the
+# point at which a card stops being readable rather than a hand-off — the remainder is named in a caption.
+MAX_INLINE_CHANGES = 12
 
 
 def st_show_mdim_metadata_diffs(source_engine: Engine, target_engine: Engine) -> None:
-    """Render the MDims section: the changed-MDim list, or one MDim's deep views when selected."""
+    """Render the MDims section: the changed-MDim list."""
     st.markdown(DIFF_CSS, unsafe_allow_html=True)
 
     df = cached.mdim_changes(source_engine, target_engine)
@@ -46,16 +50,11 @@ def st_show_mdim_metadata_diffs(source_engine: Engine, target_engine: Engine) ->
             "**config** changes only — an MDim whose texts changed may be missing. Open one to diff it anyway."
         )
 
-    selected = st.query_params.get("mdim")
-    if selected and selected not in df.index:
-        # Stale deep link (renamed or deleted MDim) — drop it rather than crash.
-        st.query_params.pop("mdim", None)
-        st.session_state.pop("mdim", None)
-        selected = None
-
-    if selected:
-        _render_selected(source_engine, target_engine, df, str(selected))
-        return
+    # Links from before the deep pages were removed carry ?mdim= and ?mode=; drop them rather than
+    # leave a parameter that now selects nothing.
+    for stale_param in ("mdim", "mode"):
+        st.query_params.pop(stale_param, None)
+        st.session_state.pop(stale_param, None)
 
     reader_facing = df["in_branch"] & ~df["is_draft"]
     flagged = [str(cp) for cp in df.index[reader_facing]]
@@ -135,7 +134,7 @@ def _cache_key(row: pd.Series) -> str:
 
 
 def _render_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, catalog_path: str) -> None:
-    """One MDim: what changed in its views, inline, plus links into the deep views."""
+    """One MDim: what changed in its views, inline, with a PR brief and a way into its dimension grid."""
     row = df.loc[catalog_path]
     dimensions, view_diffs = cached.mdim_view_diffs(
         catalog_path, source_engine, target_engine, cache_key=_cache_key(row)
@@ -156,7 +155,6 @@ def _render_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame,
         if n_views:
             head += f" :small[:gray[{n_views} of {len(view_diffs)} views]]"
         st.markdown(head)
-        _mode_buttons(catalog_path)
 
         if not groups:
             st.caption(
@@ -165,11 +163,17 @@ def _render_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame,
             )
         else:
             marks = resolve_marks(source_engine, surface_key("mdim", catalog_path), groups)
+            _card_actions(
+                source_engine, target_engine, catalog_path, marks, usage_for(source_engine, groups, catalog_path, row)
+            )
             st.caption(f"{n_reviewed(marks)}/{len(marks)} reviewed")
             for mark in marks[:MAX_INLINE_CHANGES]:
                 _render_change(source_engine, catalog_path, mark, attribution)
             if len(marks) > MAX_INLINE_CHANGES:
-                st.caption(f"… and {len(marks) - MAX_INLINE_CHANGES} more — open **View diff** above.")
+                st.caption(
+                    f"… and {len(marks) - MAX_INLINE_CHANGES} more of this MDim's changes; the PR brief "
+                    "above lists every one."
+                )
 
         if other_groups:
             # This MDim's own view configs also differ, without the branch touching its recipe — almost
@@ -180,13 +184,78 @@ def _render_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame,
             )
 
 
+def usage_for(source_engine: Engine, groups: list, catalog_path: str, row) -> dict:
+    """Charts and other MDims rendering this MDim's changed indicators — the brief's reach lines."""
+    ids = sorted({g.indicator_id for g in groups if g.affects_indicator and g.indicator_id is not None})
+    if not ids:
+        return {}
+    return cached.usage_for_indicators(
+        tuple(ids), catalog_path, source_engine, cache_key=str(row.get("configMd5_source"))
+    )
+
+
+def _card_actions(
+    source_engine: Engine,
+    target_engine: Engine,
+    catalog_path: str,
+    marks: list,
+    usage: dict,
+) -> None:
+    """The two things the deep pages had that the list did not: the brief, and the dimension grid.
+
+    The brief is generated from the ticks on this card — the one review state there is — so what it calls
+    ready to apply is what somebody actually ticked here.
+    """
+    col_brief, col_tree = st.columns(2)
+    with col_brief:
+        rows = [
+            {
+                "g": mark.group,
+                "change_key": mark.change_key,
+                "content_hash": mark.content_hash,
+                "stale": mark.stale,
+                "reviewed": mark.reviewed,
+                "reviewer": mark.reviewer,
+                "updatedAt": mark.updated_at,
+                "charts": group_usage(mark.group, usage).get("charts", []),
+                "mdims": group_usage(mark.group, usage).get("mdims", []),
+            }
+            for mark in marks
+        ]
+        # Collapsed: the brief is a page of markdown, and the changes below it are what the card is for.
+        with st.expander("📋 PR brief — every change, with the edit to make"):
+            markdown_output(
+                brief.pr_brief_markdown(catalog_path, BASELINE_NAME, rows, usage),
+                "pr-brief.md",
+                f"mdim_brief_{catalog_path}",
+            )
+    with col_tree:
+        st.button(
+            "🌳 Dimension tree",
+            key=f"mdd-tree-{catalog_path}",
+            on_click=_open_dimension_tree,
+            args=(catalog_path,),
+            help="Opens this MDim's views on its dimension grid, in the Blast radius section.",
+            width="stretch",
+        )
+
+
+def _open_dimension_tree(catalog_path: str) -> None:
+    """Send the reader to the Blast radius section with this MDim's grid already selected."""
+    st.query_params["diff-type"] = "blast"
+    st.query_params["blast-group"] = "dimensions"
+    st.session_state["metadata-diff-section"] = "blast"
+    st.session_state["blast-group"] = "dimensions"
+    st.session_state["blast-tree-mdim"] = catalog_path
+
+
 def _render_change(source_engine: Engine, catalog_path: str, mark, attribution: dict[str, str]) -> None:
     """One distinct text change of an MDim, in data-page layout, with its reviewed toggle."""
     g = mark.group
     # Views only, here — the charts this same indicator reaches are the Charts section's business, and it
     # lists them there. What still belongs on an MDim card is *whether* the change is shared, because that
-    # decides whether scoping it to this MDim is even a question: the Blast radius and View diff pages
-    # behind the buttons above carry the cross-surface reach and the scope decision itself.
+    # is what makes the edit's spread a question at all; the Blast radius section answers it across
+    # surfaces, and the PR brief above carries it per change.
     reach = f"{len(g.view_dims)} view{'s' if len(g.view_dims) != 1 else ''}"
     scope = "🔗 shared indicator metadata" if g.affects_indicator else "🔒 MDim override"
 
@@ -199,93 +268,3 @@ def _render_change(source_engine: Engine, catalog_path: str, mark, attribution: 
         show_unchanged_slots=False,
     )
     st_reviewed_toggle(source_engine, surface_key("mdim", catalog_path), mark)
-
-
-def _mode_buttons(catalog_path: str) -> None:
-    """Open this MDim's deep views (the pages that carry sign-off, scope and the PR brief)."""
-    cols = st.columns(3)
-    for col, mode, label in zip(
-        cols, ("tree", "view", "review"), ("💥 Blast radius", "🔍 View diff", "📋 Review & PR brief")
-    ):
-        with col:
-            st.button(
-                label,
-                key=f"mdd-open-{mode}-{catalog_path}",
-                on_click=_select_mdim,
-                args=(catalog_path, mode),
-                width="stretch",
-            )
-
-
-def _select_mdim(catalog_path: str, mode: str) -> None:
-    """Deep-link into one MDim (URL params, so the view is shareable)."""
-    mdim_pages._clear_view_params()
-    st.query_params["mdim"] = catalog_path
-    st.query_params["mode"] = mode
-    st.session_state["mode"] = mode
-
-
-def _clear_mdim() -> None:
-    mdim_pages._clear_view_params()
-    for key in ("mdim", "mode"):
-        st.query_params.pop(key, None)
-        st.session_state.pop(key, None)
-
-
-def _usage(source_engine: Engine, view_diffs: list[ViewDiff], catalog_path: str, row: pd.Series) -> dict:
-    """Blast radius for the MDim's changed indicators: which charts / other MDims share them."""
-    ids = sorted({v.indicator_id for v in view_diffs if v.affects_indicator and v.indicator_id is not None})
-    return cached.usage_for_indicators(
-        tuple(ids), catalog_path, source_engine, cache_key=str(row.get("configMd5_source"))
-    )
-
-
-def _render_selected(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, catalog_path: str) -> None:
-    """One MDim's deep views: the tree, the view-by-view diff, or the review + PR brief."""
-    row = df.loc[catalog_path]
-    st.button("← All changed MDims", on_click=_clear_mdim, key="mdd-back-to-list")
-    st.markdown(f"### `{catalog_path}`")
-
-    dimensions, view_diffs = cached.mdim_view_diffs(
-        catalog_path, source_engine, target_engine, cache_key=_cache_key(row)
-    )
-    if not view_diffs:
-        st.warning("This MDim has no views.")
-        return
-
-    mode = url_persist(st.segmented_control)(
-        "Mode",
-        key="mode",
-        options=["tree", "view", "review"],
-        format_func=lambda m: {"tree": "💥 Blast radius", "view": "🔍 View diff", "review": "📋 Review"}[m],
-        value="tree",
-        label_visibility="collapsed",
-    )
-    mode = mode or "tree"  # segmented_control returns None if deselected
-    st.caption(
-        "**Blast radius**: how far each change reaches · **View diff**: the proposed changes, view by "
-        "view · **Review**: sign off, comment & prepare a PR."
-    )
-
-    usage = _usage(source_engine, view_diffs, catalog_path, row)
-
-    if mode == "view":
-        mdim_pages.render_view_diff_page(catalog_path, dimensions, view_diffs, row, usage, source_engine)
-    elif mode == "review":
-        mdim_pages.render_review_page(catalog_path, dimensions, view_diffs, row, usage, source_engine)
-    else:
-        n_changed = sum(1 for v in view_diffs if v.changed)
-        if n_changed == 0:
-            st.success("No metadata changes in any view of this MDim. The tree below shows all views.")
-        external_impacts = [impact_counts(v, usage) for v in view_diffs]
-        tree_html, height = render_tree_html(
-            catalog_path,
-            dimensions,
-            view_diffs,
-            dim_param_prefix=mdim_pages.DIM_PARAM_PREFIX,
-            external_impacts=external_impacts,
-            self_url=f"{SOURCE.wizard_url}/metadata-diff",
-        )
-        # NOTE: nothing should be rendered below the component — it resizes itself to its
-        # content, and Streamlit-rendered siblings would overlap during the resize.
-        components.html(tree_html, height=height, scrolling=True)

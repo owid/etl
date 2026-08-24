@@ -9,82 +9,39 @@ from typing import Any
 
 from apps.wizard.app_pages.metadata_diff.core import (
     CHART_FIELD_PREFIX,
-    OVERRIDE_TARGET,
     ChangeGroup,
-    ViewDiff,
     affected_charts,
     as_bullets,
-    as_plaintext,
-    dims_str,
     distinct_garden_datasets,
     distinct_indicator_short_names,
     field_label,
     group_usage,
-    override_snippet,
     parse_catalog_path,
     split_by_prominence,
     yaml_field_snippet,
 )
 
+
 # Statuses a resolved row can carry, and how they route into the brief's sections.
-_STATUS_TO_DB = {"✅ Approve": "approved", "🚩 Flag": "flagged"}
-
-
 def decision(r: dict[str, Any]) -> str:
-    """The reviewer's call for one change — approved | flagged | pending | stale — used to route it
-    into the PR brief's Apply / Hold / Pending sections."""
-    if r["stale"]:
+    """Where one change goes in the brief — reviewed | stale | pending.
+
+    Read from the card's tick, the only review state there is: a change ticked against text that has been
+    edited since counts as `stale`, exactly as the toggle and the section badge treat it.
+    """
+    if r.get("stale"):
         return "stale"
-    return _STATUS_TO_DB.get(str(r.get("label") or r["seed_label"]), "pending")
-
-
-def review_markdown(
-    catalog_path: str,
-    baseline_name: str,
-    resolved: list[dict[str, Any]],
-    usage: dict[int, dict[str, list[dict[str, Any]]]],
-) -> str:
-    """Compile the reviewer's sign-off + comments into a copy-pasteable punch-list for the author."""
-
-    def _label(r: dict[str, Any]) -> str:
-        if r["stale"]:
-            return "⚠️ edited since review"
-        return str(r.get("label") or r["seed_label"])
-
-    flagged = sum(1 for r in resolved if _label(r).startswith("🚩"))
-    lines = [f"# Metadata review — `{catalog_path}`", "", f"_Baseline: {baseline_name}_", ""]
-    lines.append(f"**{len(resolved)} distinct change(s)** — {flagged} flagged.")
-    lines.append("")
-    for r in resolved:
-        g = r["g"]
-        status = _label(r)
-        comment = str(r.get("comment") or "").strip()
-        scope = "shared indicator metadata" if g.affects_indicator else "MDim override"
-        reach = f"{len(g.view_dims)} view(s)"
-        if g.affects_indicator:
-            n_charts = len(affected_charts(g, usage))
-            if n_charts:
-                reach += f", {n_charts} chart(s)"
-        lines.append(f"## {field_label(g.field)} — {status}")
-        lines.append(f"- **Scope:** {scope}; affects {reach}")
-        views = "; ".join(dims_str(d) for d in g.view_dims[:8]) + (" …" if len(g.view_dims) > 8 else "")
-        lines.append(f"- **Views:** {views}")
-        lines.append(f"- **Before:** {as_plaintext(g.old)}")
-        lines.append(f"- **After:** {as_plaintext(g.new)}")
-        if comment:
-            lines.append(f"- **💬 Comment:** {comment}")
-        lines.append("")
-    return "\n".join(lines)
+    return "reviewed" if r.get("reviewed") else "pending"
 
 
 _BRIEF_LEGEND = [
     "**▶ To open the PR:** copy this whole brief, paste it to Claude Code, and ask it to open the PR — it "
     "carries the changes, the checks to run, and a ready-to-paste PR description.",
     "",
-    "**How to action each change (from the review decisions):**",
-    "- ✅ **Approve → add to the PR** — apply the edit shown.",
-    "- 🚩 **Flag → hold** — do NOT add; the reviewer wants a change (see the note).",
-    "- ⏳ **Pending → do nothing** — not reviewed yet; leave as-is.",
+    "**How to action each change:**",
+    "- ✅ **Reviewed → apply the edit shown** — somebody ticked this change off against this exact text.",
+    "- ⏳ **Not yet reviewed → your call** — listed so the brief accounts for the whole MDim; read it "
+    "in Metadata Diff before applying.",
     "",
     "_The **value** to set is exact. The **location** (file + key) is a best guess from the indicator's "
     "catalogPath — confirm it against the metadata build before committing, since a value set via "
@@ -392,25 +349,26 @@ def pr_brief_markdown(
     resolved: list[dict[str, Any]],
     usage: dict[int, dict[str, list[dict[str, Any]]]],
 ) -> str:
-    """Decision-grouped PR brief for an MDim: **Apply** (approved) carries a turnkey edit — a pastable
-    YAML value with a best-guess file+key, or a scoped `.py` override; **Hold** (flagged) carries the
-    reviewer's note and is explicitly not applied; **Pending** is listed for reference only."""
-    approved = [r for r in resolved if decision(r) == "approved"]
-    flagged = [r for r in resolved if decision(r) == "flagged"]
+    """PR brief for an MDim, grouped by the card's ticks.
+
+    **Reviewed** changes carry a turnkey edit — a pastable YAML value with a best-guess file and key, or
+    the changed line where the field is a template. **Not yet reviewed** are listed for reference, so the
+    brief accounts for the whole MDim either way.
+    """
+    reviewed = [r for r in resolved if decision(r) == "reviewed"]
     pending = [r for r in resolved if decision(r) in ("pending", "stale")]
 
     lines = [
         f"# PR brief — `{catalog_path}`",
         "",
-        f"_Baseline: {baseline_name}. ✅ {len(approved)} to apply · 🚩 {len(flagged)} on hold · "
-        f"⏳ {len(pending)} pending._",
+        f"_Baseline: {baseline_name}. ✅ {len(reviewed)} reviewed · ⏳ {len(pending)} not yet._",
         "",
         *_BRIEF_LEGEND,
-        f"## ✅ Apply — add to the PR ({len(approved)})",
+        f"## ✅ Reviewed — ready to apply ({len(reviewed)})",
     ]
-    if not approved:
-        lines.append("_Nothing approved yet._")
-    for r in approved:
+    if not reviewed:
+        lines.append("_Nothing ticked as reviewed yet._")
+    for r in reviewed:
         g = r["g"]
         field = g.field
         lines.append(f"### {field_label(field)}")
@@ -419,20 +377,6 @@ def pr_brief_markdown(
                 f"- **Where:** MDim-level field in `{catalog_path}` — set it on the view(s) in this MDim's step."
             )
             lines += yaml_block(field, g.new)
-        elif r["scope"] == "scoped" and field in OVERRIDE_TARGET:
-            n_c = len(r["charts"])
-            others = f"the {n_c} other chart(s) keep the old text" if n_c else "no other surface changes"
-            lines.append(
-                "- **Where:** scope to these views — add an override in this MDim's `.py` step **and** revert "
-                f"the shared change in the indicator's garden `.meta.yml` ({others})."
-            )
-            lines.append("```python")
-            for dims in g.view_dims[:8]:
-                lines.append(override_snippet(ViewDiff(dimensions=dims), field, g.new))
-            if len(g.view_dims) > 8:
-                lines.append(f"# … and {len(g.view_dims) - 8} more view(s) — same override")
-            lines.append("```")
-            lines += surface_lines(g, usage, "scoped")
         else:
             imp = group_usage(g, usage)
             n_c, n_m = len(affected_charts(g, usage)), len(imp.get("mdims", []))
@@ -454,99 +398,8 @@ def pr_brief_markdown(
             lines += yaml_block(field, g.new)
         lines.append("")
 
-    if flagged:
-        lines.append(f"## 🚩 Hold — flagged, do NOT add ({len(flagged)})")
-        for r in flagged:
-            g = r["g"]
-            comment = str(r.get("comment") or "").strip()
-            lines.append(f"### {field_label(g.field)}")
-            if comment:
-                lines.append(f"- **Reviewer:** {comment}")
-            lines.append(f"- **Proposed:** {as_plaintext(g.old)} → {as_plaintext(g.new)}")
-            lines.append("")
-
     if pending:
-        lines += pending_lines(f"## ⏳ Pending — no action ({len(pending)})", pending)
-    if approved:
-        lines += ship_section([r["g"] for r in approved], baseline_name)
+        lines += pending_lines(f"## ⏳ Not yet reviewed ({len(pending)})", pending)
+    if reviewed:
+        lines += ship_section([r["g"] for r in reviewed], baseline_name)
     return "\n".join(lines)
-
-
-def chart_pr_brief_markdown(
-    chart: dict[str, Any],
-    baseline_name: str,
-    resolved: list[dict[str, Any]],
-    usage: dict[int, dict[str, list[dict[str, Any]]]],
-    catalog_root: str,
-) -> str:
-    """Decision-grouped PR brief for a standalone chart. Approved indicator-layer changes carry a turnkey
-    garden YAML edit; approved chart-config changes (title/subtitle/footnote) are flagged as NOT an ETL
-    edit (they belong on the chart itself). Flagged → hold; pending → no action."""
-    approved = [r for r in resolved if decision(r) == "approved"]
-    flagged = [r for r in resolved if decision(r) == "flagged"]
-    pending = [r for r in resolved if decision(r) in ("pending", "stale")]
-    slug = chart.get("slug")
-
-    lines = [
-        f"# PR brief — chart `{slug}`",
-        "",
-        f"_Baseline: {baseline_name}. ✅ {len(approved)} to apply · 🚩 {len(flagged)} on hold · "
-        f"⏳ {len(pending)} pending._",
-        "",
-        *_BRIEF_LEGEND,
-        f"## ✅ Apply — add to the PR ({len(approved)})",
-    ]
-    if not approved:
-        lines.append("_Nothing approved yet._")
-    for r in approved:
-        g = r["g"]
-        field = g.field
-        lines.append(f"### {field_label(field)}")
-        if field.startswith(CHART_FIELD_PREFIX):
-            lines.append(
-                "- ⚠️ **Not an ETL edit** — this is the chart's own config (title/subtitle/footnote). Change "
-                "it on the chart itself (grapher admin / chart-diff), not in the ETL repo."
-            )
-            lines.append(f"- **Set to:** {as_plaintext(g.new)}")
-        elif g.affects_indicator:
-            imp = group_usage(g, usage)
-            n_c, n_m = len(affected_charts(g, usage)), len(imp.get("mdims", []))
-            # `"..." or "no other surface"` never reached the fallback — a non-empty f-string is truthy, so
-            # a change reaching nothing else read as "0 other chart(s)". Say it in words instead.
-            if n_c or n_m:
-                reach = f"{n_c} other chart(s)" + (f" · {n_m} MDim(s)" if n_m else "")
-            else:
-                reach = "no other surface"
-            lines += garden_location_lines(g, reach)
-            lines += surface_lines(g, usage, "all")
-            # The changed line is always the safe, minimal edit. The full rendered field is kept for
-            # reference but explicitly NOT pastable unless the field is authored literally — most
-            # description_key fields are lists of `{definitions.*}` refs, and overwriting them with a
-            # rendered value silently drops every other definition and Jinja branch.
-            lines += changed_text_lines(g)
-            lines.append(
-                "- _Full rendered value, for reference — do **not** paste it over the field unless "
-                "the field is authored literally (no `{definitions.*}` refs, no Jinja):_"
-            )
-            lines += yaml_block(field, g.new)
-        else:
-            lines.append("- **Where:** the indicator's garden `.meta.yml`.")
-            lines += yaml_block(field, g.new)
-        lines.append("")
-
-    if flagged:
-        lines.append(f"## 🚩 Hold — flagged, do NOT add ({len(flagged)})")
-        for r in flagged:
-            g = r["g"]
-            lines.append(f"### {field_label(g.field)}")
-            lines.append(f"- **Proposed:** {as_plaintext(g.old)} → {as_plaintext(g.new)}")
-            lines.append("")
-
-    if pending:
-        lines += pending_lines(f"## ⏳ Pending — no action ({len(pending)})", pending)
-    if approved:
-        lines += ship_section([r["g"] for r in approved], baseline_name)
-    return "\n".join(lines)
-
-
-# The reviewer only accepts or rejects — the scope decision belongs to the author (View diff toggle).

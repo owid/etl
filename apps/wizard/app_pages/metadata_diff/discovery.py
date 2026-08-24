@@ -43,6 +43,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
 from apps.wizard.app_pages.metadata_diff.data import (
     _load_configs,
     build_env_bundles,
+    config_column,
     fetch_variable_paths,
     fetch_variable_rows_by_path,
     load_mdim_config,
@@ -832,15 +833,16 @@ def explorer_view_rows(engine: Engine) -> dict[tuple[str, str], dict[str, Any]]:
     Caveats the UI states rather than hides: a legacy CSV-backed explorer has no `explorer_views` rows,
     and `full` only refreshes when the explorer's export step re-runs.
     """
+    cfg = config_column(engine)
     df = read_sql(
-        """
+        f"""
         select ev.explorerSlug as explorerSlug,
                ev.viewId as viewId,
                ev.dimensions as dimensions,
-               cc.full ->> '$.dimensions' as indicators,
-               cc.full ->> '$.title' as title,
-               cc.full ->> '$.subtitle' as subtitle,
-               cc.full ->> '$.note' as note
+               cc.{cfg} ->> '$.dimensions' as indicators,
+               cc.{cfg} ->> '$.title' as title,
+               cc.{cfg} ->> '$.subtitle' as subtitle,
+               cc.{cfg} ->> '$.note' as note
         from explorer_views ev
         join explorers e on e.slug = ev.explorerSlug
         join chart_configs cc on cc.id = ev.chartConfigId

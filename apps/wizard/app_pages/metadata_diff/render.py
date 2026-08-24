@@ -17,7 +17,6 @@ from typing import Any
 
 import streamlit as st
 import streamlit.components.v1 as components
-from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET
 from apps.wizard.app_pages.metadata_diff.cached import clear_discovery_caches
@@ -29,16 +28,12 @@ from apps.wizard.app_pages.metadata_diff.core import (
     SECTIONS,
     ViewDiff,
     as_bullets,
-    charts_in_reading_order,
     coerce_section,
     diff_preview_html,
-    field_label,
     inline_diff_html,
     section_label,
     split_by_prominence,
-    text_change_key,
 )
-from apps.wizard.app_pages.metadata_diff.data import set_scope
 from apps.wizard.app_pages.metadata_diff.tree import render_affected_charts_html
 
 # Display order of the diffed fields: indicator metadata first, then the chart's own text.
@@ -440,66 +435,6 @@ def render_chart_list(
             label = c.get("slug") or f"chart {chart_id}"
             rows.append(f"- [`{label}`]({SOURCE.admin_site}/admin/charts/{chart_id}/edit)")
         st.markdown("\n".join(rows))
-
-
-def render_author_scope(
-    catalog_path: str,
-    view_diff: ViewDiff,
-    field_name: str,
-    change: dict[str, Any],
-    usage: dict[int, dict[str, list[dict[str, Any]]]],
-    source_engine: Engine,
-    scopes: dict[str, str],
-    multi: bool = False,
-) -> None:
-    """The AUTHOR's per-change scope toggle, shown right under the affected-charts button: apply the
-    shared change everywhere the indicator is used, or scope it to only this view. Default is
-    **scope to this view** (the conservative choice — the other charts keep their existing text).
-    Persisted (`metadata_scope`) so the reviewer is *shown* the decision — they approve or reject it,
-    they don't set it. `multi` prefixes the field name when a view has several shared changes."""
-    key = text_change_key(catalog_path, field_name, change["old"], change["new"])
-    imp = usage.get(view_diff.indicator_id, {}) if view_diff.indicator_id is not None else {}
-    # "Apply to all" is a decision about who sees the change, so it has to be offered against the reach
-    # readers actually get — the same count the Charts section and the MDim cards report.
-    n_c = len(imp.get("charts", []))
-    n_m = len(imp.get("mdims", []))
-    reach = f"{n_c} chart{'s' if n_c != 1 else ''}"
-    if n_m:
-        reach += f" · {n_m} other MDim{'s' if n_m != 1 else ''}"
-
-    sk = f"scope::{key}"
-    if sk not in st.session_state:
-        # Default to the conservative "only this view" unless the author explicitly chose "apply to all".
-        st.session_state[sk] = "all" if scopes.get(key) == "all" else "scoped"
-
-    def _save() -> None:
-        set_scope(source_engine, catalog_path, key, st.session_state.get(sk, "scoped"), reviewer())
-
-    labels = {"all": f"Apply to all — {reach}", "scoped": "Scope to only this view"}
-    radio_label = f"“{field_label(field_name)}” applies to" if multi else "This change applies to"
-    st.radio(
-        radio_label,
-        options=["scoped", "all"],
-        format_func=lambda x: labels[x],
-        key=sk,
-        on_change=_save,
-        horizontal=True,
-        help="The author's decision: apply this shared change everywhere the indicator is used, or only to "
-        "this view (the default — check the affected charts in the banner above before applying to all). "
-        "The reviewer is shown this and approves or rejects it — they don't set it.",
-    )
-
-    # Choosing "apply to all" must show WHAT it applies to: a count is not something the author can
-    # check, so name every chart here, at the moment of the decision (and again in the PR brief).
-    if st.session_state.get(sk) == "all" and (n_c or n_m):
-        rows = []
-        for c in charts_in_reading_order(imp.get("charts", []), {field_name}):
-            slug = c.get("slug") or f"chart {c.get('chartId')}"
-            flag = "" if c.get("has_data_page", True) else " — via *Learn more about this data* (no data page)"
-            rows.append(f"- [`{slug}`]({SOURCE.site}/grapher/{slug}){flag}")
-        for m in sorted(imp.get("mdims", []), key=lambda m: str(m.get("slug") or "")):
-            rows.append(f"- MDim `{m.get('slug') or m.get('catalogPath')}`")
-        st.warning(f"**This will change {reach}.** These are the surfaces that get the new text:\n" + "\n".join(rows))
 
 
 def st_origin_caption(catalog_paths: set[str] | list[str], attribution: dict[str, str]) -> None:

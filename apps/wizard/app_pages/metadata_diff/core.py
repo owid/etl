@@ -312,8 +312,9 @@ def _indicator_identity(catalog_path: str) -> tuple[str, ...]:
 def surface_key(kind: str, ident: str) -> str:
     """Namespaced key for the reviewed-state rows of one surface (`list:chart:<slug>`, ...).
 
-    The `list:` prefix keeps these separate from the Approve/Flag sign-off rows, which key on the bare
-    catalogPath (MDims) or `chart:<slug>` (the per-chart review).
+    The `list:` prefix is historical: it kept these apart from an Approve/Flag sign-off that keyed on the
+    bare catalogPath, which is gone — that second review record was read by nothing and could contradict
+    these ticks indefinitely. Kept as-is so existing ticks still resolve.
     """
     return f"list:{kind}:{ident}"
 
@@ -638,12 +639,11 @@ def distinct_garden_datasets(catalog_paths: Iterable[str]) -> list[str]:
 
 
 def text_change_key(catalog_path: str, field: str, old: Any, new: Any) -> str:
-    """View-agnostic, content-bound key for one distinct text change (the AUTHOR's scope decision).
+    """View-agnostic, content-bound key for one distinct text change.
 
-    Unlike `change_group_identity` (per group of views), this keys only on (MDim, field, old→new), so
-    the same distinct change maps to ONE decision whether the author sets it from a single view (View
-    diff) or the reviewer sees it grouped (Review). Content-bound: editing the text mints a new key,
-    so the scope decision resets with the text.
+    Unlike `change_group_identity` (per group of views), this keys only on (MDim, field, old→new), so the
+    same distinct change maps to one key however it is grouped. Content-bound: editing the text mints a
+    new key, so anything stored against it resets with the text.
     """
     content = json.dumps([old, new], sort_keys=True, default=str)
     return hashlib.sha256(f"{catalog_path}\x1f{field}\x1f{content}".encode()).hexdigest()

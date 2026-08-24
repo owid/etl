@@ -2,7 +2,7 @@
 
 Renders the views of an MDIM as a horizontal tree following the order of the MDIM's
 dimensions (first control = first fork). Nodes are colored by whether any view
-underneath them changed; leaves are real links to the View diff page and show a hover
+underneath them changed; leaves are real links (supplied by the caller) and show a hover
 preview of the change. All interactivity (collapse, filter, tooltips, self-resizing)
 is inline JS with no external dependencies, so the component is fully deterministic.
 """
@@ -274,7 +274,7 @@ def render_tree_html(
     catalog_path: str,
     dimensions: list[dict[str, Any]],
     view_diffs: list[ViewDiff],
-    dim_param_prefix: str = "d_",
+    leaf_hrefs: list[str] | None = None,
     external_impacts: list[dict[str, int]] | None = None,
     self_url: str = "",
 ) -> tuple[str, int]:
@@ -303,16 +303,13 @@ def render_tree_html(
 
     previews = [diff_preview_html(v) + _impact_preview_line(impacts[i]) for i, v in enumerate(view_diffs)]
     leaf_badges = [_impact_badge(impacts[i]) for i in range(len(view_diffs))]
-    # Absolute URL to this page, so the link resolves against the Wizard app (not the component
-    # iframe's own origin) — otherwise a relative "?query" opens a broken URL in the new tab.
-    leaf_hrefs = [
-        self_url
-        + "?"
-        + urllib.parse.urlencode(
-            {"mdim": catalog_path, "mode": "view", **{(dim_param_prefix + s): c for s, c in v.dimensions.items()}}
-        )
-        for v in view_diffs
-    ]
+    # Supplied by the caller: this component cannot know the app's routing, and the URLs it used to build
+    # pointed at a per-view diff page that no longer exists. Absolute, so a link resolves against the site
+    # rather than the component iframe's own origin.
+    if leaf_hrefs is None:
+        leaf_hrefs = [
+            self_url + "?" + urllib.parse.urlencode({"mdim": catalog_path, **v.dimensions}) for v in view_diffs
+        ]
 
     dim_names = " &#8594; ".join(html.escape(d.get("name") or d["slug"]) for d in dimensions)
     body = "".join(_render_node(node, view_diffs, leaf_hrefs, leaf_badges) for node in tree)

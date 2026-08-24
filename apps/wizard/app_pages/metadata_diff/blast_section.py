@@ -24,14 +24,14 @@ dimension tree diffs one MDim's views, which is why it asks which MDim rather th
 
 import html
 from typing import Any
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
 
 import streamlit as st
 import streamlit.components.v1 as components
 from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.chart_diff.utils import SOURCE
-from apps.wizard.app_pages.metadata_diff import cached, mdim_pages
+from apps.wizard.app_pages.metadata_diff import cached
 from apps.wizard.app_pages.metadata_diff.core import diff_window_html, field_label
 from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, EditGroup, group_by_edit, reach_by_surface
 from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, DIFF_CSS, impact_counts
@@ -262,11 +262,15 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
 
     ids = sorted({v.indicator_id for v in view_diffs if v.affects_indicator and v.indicator_id is not None})
     usage = cached.usage_for_indicators(tuple(ids), catalog_path, source_engine, cache_key=cache_key)
+    # Each leaf opens that view on this staging server — the view as a reader gets it, which is the
+    # question you have when you click one view out of fifty.
+    slug = str(row["slug_source"]) if row is not None and row.get("slug_source") else ""
+    leaf_hrefs = [f"{SOURCE.site}/grapher/{slug}?{urlencode(v.dimensions)}" if slug else "" for v in view_diffs]
     tree_html, height = render_tree_html(
         catalog_path,
         dimensions,
         view_diffs,
-        dim_param_prefix=mdim_pages.DIM_PARAM_PREFIX,
+        leaf_hrefs=leaf_hrefs,
         external_impacts=[impact_counts(v, usage) for v in view_diffs],
         self_url=f"{SOURCE.wizard_url.rstrip('/')}/metadata-diff",
     )

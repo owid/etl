@@ -127,54 +127,6 @@ def delete_review(engine: Engine, change_key: str) -> None:
         con.execute(text("delete from metadata_review where changeKey = :ck"), {"ck": change_key})
 
 
-# --- Author scope decisions ---------------------------------------------------------------------
-# The AUTHOR's per-change decision — "apply to all charts/views" vs "scope to only these views" —
-# stored separately from the reviewer's sign-off. The reviewer is shown this decision and approves
-# or rejects it (they don't set the scope themselves).
-_SCOPE_TABLE_DDL = """
-CREATE TABLE IF NOT EXISTS metadata_scope (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    catalogPath VARCHAR(500) NOT NULL,
-    changeKey VARCHAR(64) NOT NULL,
-    scope VARCHAR(16) NOT NULL,
-    author VARCHAR(255),
-    updatedAt DATETIME NOT NULL,
-    UNIQUE KEY uniq_scope_key (changeKey),
-    KEY idx_scope_catalog (catalogPath)
-)
-"""
-
-
-def _ensure_scope_table(engine: Engine) -> None:
-    with engine.begin() as con:
-        con.execute(text(_SCOPE_TABLE_DDL))
-
-
-def load_scopes(engine: Engine, catalog_path: str) -> dict[str, str]:
-    """The author's scope decisions for one MDim, keyed by changeKey → 'all' | 'scoped'."""
-    _ensure_scope_table(engine)
-    df = read_sql(
-        "select changeKey, scope from metadata_scope where catalogPath = %(cp)s",
-        engine=engine,
-        params={"cp": catalog_path},
-    )
-    return {str(r["changeKey"]): str(r["scope"]) for _, r in df.iterrows()}
-
-
-def set_scope(engine: Engine, catalog_path: str, change_key: str, scope: str, author: str | None) -> None:
-    """Record the author's scope decision for a change."""
-    _ensure_scope_table(engine)
-    with engine.begin() as con:
-        con.execute(
-            text(
-                "insert into metadata_scope (catalogPath, changeKey, scope, author, updatedAt) "
-                "values (:cp, :ck, :sc, :au, :ts) "
-                "on duplicate key update scope=values(scope), author=values(author), updatedAt=values(updatedAt)"
-            ),
-            {"cp": catalog_path, "ck": change_key, "sc": scope, "au": author, "ts": datetime.now(timezone.utc)},
-        )
-
-
 def _load_configs(engine: Engine) -> dict[str, dict[str, Any]]:
     """Every MDIM's config, keyed by catalogPath.
 
@@ -219,6 +171,26 @@ def _first_y_indicator_id(view: dict[str, Any]) -> int | None:
     if isinstance(first, int):
         return first
     return None
+
+
+_CONFIG_COLUMN_CACHE: dict[str, str] = {}
+
+
+def config_column(engine: Engine) -> str:
+    """Name of `chart_configs`' resolved-config column in this environment.
+
+    Grapher renamed it from `full` to `config`, and the two environments this tool compares migrate at
+    different times — production first, a branch's staging server whenever it rebuilds. Asking the schema
+    is the only thing that works for both, and the answer cannot change under a running app, so it is
+    read once per environment.
+    """
+    key = str(engine.url)
+    cached_name = _CONFIG_COLUMN_CACHE.get(key)
+    if cached_name is None:
+        columns = set(read_sql("show columns from chart_configs", engine=engine)["Field"].tolist())
+        cached_name = "config" if "config" in columns else "full"
+        _CONFIG_COLUMN_CACHE[key] = cached_name
+    return cached_name
 
 
 def _chunked(values: list, size: int = 500):
@@ -311,15 +283,16 @@ def fetch_chart_text(engine: Engine, config_uuids: list[str]) -> dict[str, dict[
     """Chart text fields (title, subtitle, note) of chart configs, keyed by UUID."""
     if not config_uuids:
         return {}
+    cfg = config_column(engine)
     out: dict[str, dict[str, Any]] = {}
     for chunk in _chunked(sorted(set(config_uuids))):
         placeholders = ", ".join(["%s"] * len(chunk))
         df = read_sql(
             f"""
             select cc.id,
-                   cc.full ->> '$.title' as title,
-                   cc.full ->> '$.subtitle' as subtitle,
-                   cc.full ->> '$.note' as note
+                   cc.{cfg} ->> '$.title' as title,
+                   cc.{cfg} ->> '$.subtitle' as subtitle,
+                   cc.{cfg} ->> '$.note' as note
             from chart_configs cc
             where cc.id in ({placeholders})
             """,
@@ -341,13 +314,14 @@ def resolve_chart(engine: Engine, ref: str) -> dict[str, Any] | None:
     else:
         slug = ref.rstrip("/").split("/")[-1].split("?")[0]  # tolerate a full /grapher/<slug>?… URL
         where, params = "cc.slug = %(v)s", {"v": slug}
+    cfg = config_column(engine)
     df = read_sql(
         f"""
         select c.id as chartId,
                cc.slug as slug,
-               cc.full ->> '$.title' as title,
-               cc.full ->> '$.subtitle' as subtitle,
-               cc.full ->> '$.note' as note
+               cc.{cfg} ->> '$.title' as title,
+               cc.{cfg} ->> '$.subtitle' as subtitle,
+               cc.{cfg} ->> '$.note' as note
         from charts c
         join chart_configs cc on cc.id = c.configId
         where {where} and c.publishedAt is not null

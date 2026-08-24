@@ -10,7 +10,7 @@ so you can see at a glance where this branch landed:
 - **Blast radius** — everywhere the branch's edits land, across all three surfaces, by change or by
   affected page. The one view that crosses surfaces on purpose.
 - **Charts** — indicator texts that changed, and the published charts that render them.
-- **MDims** — MDims whose view texts changed, linking into the per-MDim Blast radius / View diff / Review.
+- **MDims** — MDims whose view texts changed, each with its changes inline and a PR brief to download.
 - **Explorers** — published explorer views whose resolved text changed.
 
 There is one baseline, resolved the way every other diff in the wizard resolves it (production where this

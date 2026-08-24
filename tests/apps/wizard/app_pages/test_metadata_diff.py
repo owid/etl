@@ -48,7 +48,6 @@ from apps.wizard.app_pages.metadata_diff.discovery import (
     narrow_to_branch,
     split_mdim_groups,
 )
-from apps.wizard.app_pages.metadata_diff.mdim_pages import _scope_label
 from apps.wizard.app_pages.metadata_diff.render import render_text_html
 from apps.wizard.app_pages.metadata_diff.review_state import surface_key
 from apps.wizard.app_pages.metadata_diff.usage import _indicator_ids_in_mdim_config
@@ -493,13 +492,18 @@ def test_review_mark_is_bound_to_the_text():
 # --- PR brief routing ------------------------------------------------------------------------------
 
 
-def test_brief_decision_routes_from_resolved_rows():
-    """The brief builders are pure now: the decision comes in on the row, not out of session state."""
-    assert decision({"stale": False, "label": "✅ Approve", "seed_label": "⏳ Pending"}) == "approved"
-    assert decision({"stale": False, "label": "🚩 Flag", "seed_label": "⏳ Pending"}) == "flagged"
-    assert decision({"stale": False, "label": None, "seed_label": "⏳ Pending"}) == "pending"
-    # A change edited since it was reviewed is never treated as approved.
-    assert decision({"stale": True, "label": "✅ Approve", "seed_label": "✅ Approve"}) == "stale"
+def test_brief_decision_routes_from_the_card_tick():
+    """The brief reads the one review state there is, so it cannot disagree with the page.
+
+    It used to route on an Approve/Flag sign-off stored apart from these ticks — two records that could
+    contradict each other indefinitely, and that nothing read at merge time.
+    """
+    assert decision({"stale": False, "reviewed": True}) == "reviewed"
+    assert decision({"stale": False, "reviewed": False}) == "pending"
+    # A change ticked and then edited is not reviewed text, and the brief says so.
+    assert decision({"stale": True, "reviewed": False}) == "stale"
+    # Rows built before the tick existed carry neither key.
+    assert decision({}) == "pending"
 
 
 # --- Attribution: this branch's change, or the baseline moving on? --------------------------------
@@ -659,8 +663,6 @@ def test_one_change_reports_one_reach_everywhere():
     }
     wysk = ChangeGroup(field="descriptionKey", old=["a"], new=["b"], affects_indicator=True, indicator_ids={7})
     assert [c["chartId"] for c in affected_charts(wysk, usage)] == [1, 2]
-    # The scope consequence — "N charts also use this indicator, all will change" — counts the same way.
-    assert "2 charts" in _scope_label("all", wysk, usage)
 
 
 def test_an_empty_diff_is_not_all_clear_when_indicators_are_new():
@@ -698,24 +700,6 @@ def test_only_the_json_backed_field_is_json_decoded():
     assert bundle.metadata["descriptionShort"] == "null"
     # The one JSON column is still decoded, or every WYSK diff would compare raw JSON strings.
     assert bundle.metadata["descriptionKey"] == ["a", "b"]
-
-
-def test_scope_label_reads_every_indicator_in_the_group():
-    """A shared definition renders into many indicators; the scope decision must see all of their charts.
-
-    Reading only the group's first indicator can say "nothing else changes" while a second indicator in
-    the same group is on charts that do change — the one claim a scope decision must not get wrong.
-    """
-    usage = {
-        1: {"charts": [], "mdims": []},
-        2: {"charts": [{"chartId": 9, "slug": "s"}], "mdims": []},
-    }
-    g = ChangeGroup(
-        field="descriptionShort", old="a", new="b", affects_indicator=True, indicator_id=1, indicator_ids={1, 2}
-    )
-    label = _scope_label("all", g, usage)
-    assert "nothing else changes" not in label
-    assert "1 chart" in label
 
 
 def test_group_spanning_two_datasets_names_both_files_and_rebuilds():
@@ -981,30 +965,6 @@ def test_owidbot_leads_with_a_stale_server_and_flags_it_in_the_icon():
     assert "behind on 1 dataset" in format_metadata_diff(Summary(stale=stale.stale))
 
 
-def test_chart_brief_says_no_other_surface_in_words():
-    """A change reaching nothing else used to read "0 other chart(s)".
-
-    The old expression was `f"{n_c} other chart(s)" + (...) or "no other surface"`, and a non-empty
-    f-string is always truthy, so the fallback was unreachable.
-    """
-    from apps.wizard.app_pages.metadata_diff.brief import chart_pr_brief_markdown
-
-    group = ChangeGroup(
-        field="descriptionKey",
-        old=["a"],
-        new=["b"],
-        view_dims=[{}],
-        affects_indicator=True,
-        indicator_id=1,
-        catalog_path="grapher/ns/2026-01-01/ds/tb#var",
-        catalog_paths={"grapher/ns/2026-01-01/ds/tb#var"},
-    )
-    resolved = [{"g": group, "stale": False, "label": "✅ Approve", "seed_label": "✅ Approve", "charts": []}]
-    brief = chart_pr_brief_markdown({"slug": "some-chart"}, "production", resolved, {}, "chart:some-chart")
-    assert "no other surface" in brief
-    assert "0 other chart(s)" not in brief
-
-
 def test_prominence_is_labelled_rather_than_deducted():
     """The data-page distinction survives as *where* the text appears, not whether it appears.
 
@@ -1156,14 +1116,15 @@ def test_package_step_files_credit_the_step_they_live_in():
     assert all(p.startswith("garden/owid/latest/") for p in reached)
 
 
-def test_review_widget_state_is_bound_to_the_text_it_signed_off():
-    """An edit must not inherit the previous sign-off through the reviewer's open session.
+def test_review_widget_state_is_bound_to_the_text_it_marked():
+    """A mark must not inherit through the reviewer's open session when the text is edited.
 
     `change_key` identifies the slot and deliberately survives an edit, so widget state keyed on it alone
-    kept "✅ Approve" in session across the edit. The next save wrote that approval back against the new
-    content hash, the stale warning disappeared, and text nobody approved read as approved.
+    kept the previous mark in session across the edit — and the next save wrote it back against the new
+    content hash, so text nobody had reviewed read as reviewed. The Approve/Flag keys this used to check
+    are gone with that workflow; the Reviewed toggle is the control that carries the risk now.
     """
-    from apps.wizard.app_pages.metadata_diff.mdim_pages import _review_comment_key, _review_status_key
+    from apps.wizard.app_pages.metadata_diff.review_state import ReviewMark, reviewed_toggle_key
 
     group = ChangeGroup(field="titlePublic", old="Old", new="New", view_dims=[{"sex": "female"}])
     edited = ChangeGroup(field="titlePublic", old="Old", new="New, revised", view_dims=[{"sex": "female"}])
@@ -1175,8 +1136,10 @@ def test_review_widget_state_is_bound_to_the_text_it_signed_off():
     assert key_after == key
     assert hash_after != content_hash
 
-    for make_key in (_review_status_key, _review_comment_key):
-        assert make_key("cp", key, content_hash) != make_key("cp", key_after, hash_after)
+    surface = surface_key("mdim", "grapher/ns/latest/mine#mine")
+    before = ReviewMark(group=group, change_key=key, content_hash=content_hash, reviewed=True, stale=False)
+    after = ReviewMark(group=edited, change_key=key_after, content_hash=hash_after, reviewed=False, stale=True)
+    assert reviewed_toggle_key(surface, before) != reviewed_toggle_key(surface, after)
 
 
 def test_export_scope_is_per_namespace_not_just_per_name():
