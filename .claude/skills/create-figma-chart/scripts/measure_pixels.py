@@ -107,6 +107,11 @@ def cmd_arrow_gap(args: argparse.Namespace) -> int:
         name: load(Path(p))
         for name, p in (("no_arrow", args.no_arrow), ("no_target", args.no_target), ("no_both", args.no_both))
     }
+    # The optional full render is diffed against the others, so it has to clear the same size check.
+    # Undersized it raises a broadcasting error; oversized (a 2x export) it crops to the same box over
+    # a different part of the design and the diagnostic comes out plausible and wrong.
+    if args.full:
+        renders["full"] = load(Path(args.full))
     shapes = {name: img.shape for name, img in renders.items()}
     if len(set(shapes.values())) != 1:
         print(f"renders differ in size, so a pixel diff is meaningless: {shapes}", file=sys.stderr)
@@ -174,7 +179,7 @@ def cmd_arrow_gap(args: argparse.Namespace) -> int:
     # Optional: catch the discredited from-full method silently disagreeing. Whichever node paints
     # on top leaves a hole in the OTHER's from-full mask, so the failure is under-reported contact.
     if args.full:
-        full = crop_of(load(Path(args.full)), box)
+        full = crops["full"]
         naive_arrow = differs(full, crops["no_arrow"])
         naive_target = differs(full, crops["no_target"])
         if naive_arrow.any() and naive_target.any():

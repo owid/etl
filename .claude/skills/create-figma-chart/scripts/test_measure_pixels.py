@@ -130,6 +130,32 @@ def test_overlap_is_caught(tmp: Path) -> None:
     check("naive method disagreed", "note" in out, True)
 
 
+def test_mismatched_full_render_is_unmeasurable(tmp: Path) -> None:
+    print("a --full render at another size must be refused, not broadcast or silently believed")
+    s = scene(tmp, arrow_x=20, target_x=26)
+    args = (
+        "arrow-gap",
+        "--no-arrow",
+        s["no_arrow"],
+        "--no-target",
+        s["no_target"],
+        "--no-both",
+        s["no_both"],
+        "--crop",
+        "0,0,60,40",
+    )
+    # Undersized: the crop comes out smaller and the diff used to raise a broadcasting ValueError.
+    small = save(np.asarray(Image.open(s["full"]))[:20, :30].copy(), tmp / "full_small.png")
+    code, _ = run(*args, "--full", str(small))
+    check("undersized full exits 2", code, 2)
+
+    # Oversized: a 2x export crops to the same box over a different part of the design, so the
+    # diagnostic used to come out plausible and wrong rather than erroring at all.
+    big = np.asarray(Image.open(s["full"]).resize((120, 80), Image.NEAREST))
+    code, _ = run(*args, "--full", str(save(big.copy(), tmp / "full_2x.png")))
+    check("oversized full exits 2", code, 2)
+
+
 def test_empty_mask_is_unmeasurable(tmp: Path) -> None:
     print("a crop containing neither shape must not read as a clean pass")
     s = scene(tmp, arrow_x=20, target_x=26)
@@ -292,6 +318,7 @@ def main() -> int:
         for test in (
             test_clear_arrow,
             test_overlap_is_caught,
+            test_mismatched_full_render_is_unmeasurable,
             test_empty_mask_is_unmeasurable,
             test_bbox_guard,
             test_gray_target_would_defeat_color_classification,
