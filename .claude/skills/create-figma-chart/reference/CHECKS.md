@@ -89,20 +89,36 @@ Every one of these caught a real defect on this skill's first run, and none of t
 
 **Identify each shape's pixels by node identity, never by color.** A pixel belongs to the shape whose hiding changed it, which is true whatever either shape is colored. Screenshot the frame at 1:1 **four times** — whole, with the arrow's `visible = false`, with the target line's, and with **both** hidden — and diff each shape against the both-hidden render, from the pass where the *other* shape was already gone:
 
-```python
-from math import hypot
+**`scripts/measure_pixels.py` does the arithmetic — don't route the renders through your own eyes.**
+Every number below is computable from the PNGs, so looking at them costs a turn and an image each
+and is less accurate than the arithmetic. Download the three pair-specific renders (locally,
+`scripts/figma_desktop_read.py shot` gets them in one call), then:
 
-crop   = [(x, y) for y in range(y0, y1) for x in range(x0, x1)]   # arrow's absoluteBoundingBox, padded
-arrow  = [p for p in crop if no_target[p] != no_both[p]]          # arrow alone vs neither
-target = [p for p in crop if no_arrow[p]  != no_both[p]]          # line alone vs neither
-
-assert arrow,  "no arrow pixels — wrong bbox, wrong frame, or the hide never applied"
-assert target, "no target pixels — pad the bbox, or this is not the node the arrow points at"
-
-d        = lambda a, b: hypot(a[0]-b[0], a[1]-b[1])
-minGap   = min(d(a, b) for a in arrow for b in target)
-touching = sum(1 for a in arrow for b in target if d(a, b) <= 1.5)
+```bash
+.venv/bin/python .claude/skills/create-figma-chart/scripts/measure_pixels.py arrow-gap \
+  --no-arrow no_arrow.png --no-target no_target.png --no-both no_both.png \
+  --crop <arrow bbox, padded> [--full full.png] \
+  [--arrow-bbox <absoluteBoundingBox>] [--target-bbox <absoluteBoundingBox>]
 ```
+
+It masks each shape from the pass where the *other* was already hidden, reports `min_gap`,
+`touching_pairs` and `arrow_px`/`target_px`, and **exits 2 rather than 0 when the measurement
+cannot be trusted** — an empty mask, renders of different sizes, or a mask straying outside the
+`--*-bbox` you declared. That distinction is the point: a bare number cannot tell "the arrow is
+clear" from "I measured nothing". Pass `--full` and it also reports what the discredited
+from-full masking would have said, and warns when that would have missed a real contact.
+
+Two things it fixes beyond the turn saving. The all-pairs loop this replaces is `O(arrow × target)`
+— thousands of pixels each on a padded crop, so millions of pairs — where a distance transform is
+exact and linear. And `touching` counted *pairs* within 1.5px, which is exactly the 3×3
+neighbourhood; the script reports both that and the count of distinct arrow pixels in contact, so
+the magnitude is interpretable rather than just non-zero.
+
+The same script covers the other two pixel checks: `contrast` for a hairline (the sub-pixel stroke
+trap in Gotchas — measure it on the 4× clone, not the 540px preview) and `ink-box` for "nothing in
+the margins", which reads the true extent of everything that paints. Run against a stock 540 frame,
+`ink-box` returns `[16, 16, 524, 524]` — the content band this file specifies — with the background
+inferred rather than declared.
 
 **Don't diff either mask against the whole render — that hides the overlap you are testing for.** Whichever node paints on top covers part of the other, and hiding the *covered* one changes nothing in those pixels, so a mask taken from `full` comes back with a hole exactly where the two shapes meet. An arrowhead sitting on the end of its line then measures its `minGap` to the nearest still-*exposed* line pixel and reports a comfortable 3–7px with `touching == 0` while the two are plainly overlapping — the one verdict this check exists to prevent. Diffing from the other-hidden pass costs one extra screenshot and is symmetric, so it holds whichever node is on top.
 
