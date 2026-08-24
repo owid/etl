@@ -181,9 +181,12 @@ const checkFrame = async (frameId) => {
   // fell through to the ungrouped branch — which still walked the right node, but reported "the chart
   // group looks ungrouped" about a frame whose chart group is right there and correctly named.
   // A wrong explanation for a working result is how the next reader is sent to fix the wrong thing.
+  // Three variants counted on the live file, so match all three rather than the one this default
+  // was written for: `chart` (grapher import), `chart__<slug>` (a static_viz import), and
+  // `chart-desktop` / `chart-mobile` (a two-format page). Exact first, then a `__` or `-` suffix.
+  const chartSuffixed = (c) => c.name.startsWith(CONFIG.chartName + "__") || c.name.startsWith(CONFIG.chartName + "-");
   let chart = CONFIG.chartName
-    ? frame.children.find((c) => c.name === CONFIG.chartName)
-      || frame.children.find((c) => c.name.startsWith(CONFIG.chartName + "__"))
+    ? frame.children.find((c) => c.name === CONFIG.chartName) || frame.children.find(chartSuffixed)
     : null;
   let plotRoots = chart
     ? [chart]
@@ -191,7 +194,7 @@ const checkFrame = async (frameId) => {
   // NOT a nested template literal: `inline_script.py`'s stripper is not nesting-aware, so a backtick
   // inside a ${} closes the outer context, desynchronizes, and silently stops stripping comments for
   // the rest of the file. Caught by --check jumping 75% -> 96% of cap on a 1.8KB edit.
-  const chartSuffix = chart && chart.name !== CONFIG.chartName ? ' (matched "' + CONFIG.chartName + '__<slug>")' : "";
+  const chartSuffix = chart && chart.name !== CONFIG.chartName ? ' (matched "' + CONFIG.chartName + '__|-<suffix>")' : "";
   const chartResolvedBy = chart
     ? `name "${chart.name}"` + chartSuffix
     : plotRoots.length

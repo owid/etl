@@ -406,13 +406,29 @@ mock, and both changes make a row *less* red on purpose. Read them before treati
 
 ## A skip with a false reason is the failure mode, not a wrong number
 
-**First, the common case is not the one this section assumed.** `chartName` defaults to `chart`, and a
-read of the live file found the real convention is **`chart__<slug>`** — a `static_viz` import lands as
-`chart__agriculture-share`. An exact-only match resolved nothing on every one of those pages, fell
-through to the ungrouped branch, walked the right node anyway, and reported *"the chart group looks
-ungrouped"* about a frame whose chart group is present and correctly named. The answer was right and
-the explanation was wrong, which is the worse of the two: it sends the next reader to fix a
-non-problem. The resolver now takes an exact match first, then `<chartName>__<slug>`.
+**First, the common case is not the one this section assumed.** `chartName` defaults to `chart`, and
+counting the live file found **three** names in use, not one: `chart` (a grapher import),
+`chart__agriculture-share` (a `static_viz` import) and `chart-desktop` / `chart-mobile` (a two-format
+page). An exact-only match resolved nothing on two of the three, fell through to the ungrouped branch,
+walked the right node anyway, and reported *"the chart group looks ungrouped"* about a frame whose
+chart group is present and correctly named. The answer was right and the explanation was wrong, which
+is the worse of the two: it sends the next reader to fix a non-problem. The resolver now takes an
+exact match first, then a `__` or `-` suffix, and names what it matched.
+
+**And there are two `<kind>__<name>` conventions, which is what made the palette labels wrong.**
+
+| Source | Names | Is the second token a category? |
+|---|---|---|
+| Grapher's SVG export | `line__<Entity>`, `outline__<Entity>`, `datapoints__<Entity>` | **yes** — one per series, in selection order |
+| A `static_viz` matplotlib step | `bars__<slug>`, `diagram__median`, `{slug}__{part}` | **no** — a dataset slug or a part name, repeated across marks |
+
+`CATEGORY_ANY` matches `<word>__<rest>` and cannot tell them apart, so on a `static_viz` bar chart every
+bar resolved to the same "category" and `--names` labelled three distinct colours
+`agriculture-share,agriculture-share,agriculture-share`. That is why `--names` is now gated on the names
+being **distinct across the palette** and not import defaults (`Vector`, `Rectangle 12`): the grapher
+case passes that gate and keeps its labels, the `static_viz` case fails it and the flag is dropped with
+the reason. Do not "fix" this by widening `CATEGORY_ANY` — the two conventions are genuinely ambiguous
+at the name level, and distinctness is the property `--names` actually promises.
 
 The rest of this section is the genuinely ungrouped case. It has bitten in three different rows. When
 `CONFIG.chartName` finds nothing — a designer has **ungrouped** the chart — the plot has to be

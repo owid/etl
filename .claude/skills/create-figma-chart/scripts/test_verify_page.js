@@ -1166,6 +1166,26 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     check("33b an import-default name drops --names and says so",
           !/--names '/.test(dGen) && /(import default|distinct name)/.test(dGen), dGen);
 
+    // 33b-grapher — the OTHER naming convention, and the one --names exists for. Grapher's own SVG
+    // export emits `line__<Entity>` / `outline__<Entity>` / `datapoints__<Entity>` per series, where
+    // the second token IS the category. That must keep producing labels; the guards above are aimed
+    // at `static_viz`'s `<slug>__<part>`, where it is not. One frame proves both halves are separable.
+    const grapher = buildFrame();
+    const gChart = grapher.children.find((c) => c.name === "chart");
+    for (const [entity, hex] of [["Chile", "#883039"], ["Peru", "#00847e"]]) {
+      gChart.children.push(node({
+        name: `line__${entity}`, type: "GROUP", x: 100, y: 200, width: 200, height: 80,
+        children: [node({ type: "VECTOR", name: "Vector", x: 100, y: 200, width: 200, height: 80,
+                          strokes: solid(hex), strokeWeight: 3, strokeAlign: "CENTER", dashPattern: [] })],
+      }));
+    }
+    const dGrapher = row(await run(grapher, {}), "colour-vision").detail;
+    check("33b grapher line__<Entity> DOES produce --names",
+          /--names '[^']*Chile[^']*Peru[^']*'/.test(dGrapher) || /--names '[^']*Peru[^']*Chile[^']*'/.test(dGrapher), dGrapher);
+    check("33b and the leaf's generic `Vector` name is not what gets used",
+          !/--names '[^']*Vector/.test(dGrapher), dGrapher);
+    check("33b a line palette selects --line", /--line\b/.test(dGrapher), dGrapher);
+
     // 33c — a `static_viz` chart group is `chart__<slug>`, and an exact-only match called that
     // "ungrouped" while walking it anyway: a wrong explanation for a right answer.
     const slugged = buildFrame();
@@ -1175,6 +1195,13 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
           /name "chart__agriculture-share"/.test(outSlug.resolved.chartBy), outSlug.resolved.chartBy);
     check("33c and is not reported as ungrouped",
           !/ungrouped/.test(outSlug.resolved.chartBy), outSlug.resolved.chartBy);
+    // The third variant counted in the file: a two-format page names them `chart-desktop`/`chart-mobile`.
+    const hyphen = buildFrame();
+    hyphen.children.find((c) => c.name === "chart").name = "chart-desktop";
+    const outHyphen = await run(hyphen, {});
+    check("33c chart-desktop resolves by name",
+          /name "chart-desktop"/.test(outHyphen.resolved.chartBy) && !/ungrouped/.test(outHyphen.resolved.chartBy),
+          outHyphen.resolved.chartBy);
     check("33c plain `chart` still resolves exactly",
           /name "chart"$/.test((await run(buildFrame(), {})).resolved.chartBy),
           (await run(buildFrame(), {})).resolved.chartBy);
