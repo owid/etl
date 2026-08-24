@@ -96,7 +96,12 @@ function buildFrame(opts = {}) {
   const subtitle = text("subtitle", "A subtitle line", 16, 16, 51, contentW, 19);
   const header = node({ name: "header", layoutMode: "VERTICAL", primaryAxisSizingMode: "AUTO", itemSpacing: 6,
     x: 16, y: 16, width: contentW, height: 92, children: [title, subtitle] });
-  const src = text("source", "Data source: X", 13, 16, 488, contentW, 16);
+  // "Data source: X" — the prefix is chars 0-12, the producer name 12-14. `boldSource` models the
+  // real defect: assigning `characters` collapses the node to its first run's style, so the bold
+  // prefix takes the producer name with it.
+  const src = text("source", "Data source: X", 13, 16, 488, contentW, 16, undefined, {
+    segments: { fontName: opts.boldSource ? [["Bold", 0, 14]] : [["Bold", 0, 12], ["Regular", 12, 14]] },
+  });
   const footer = node({ name: "footer", layoutMode: "VERTICAL", x: 16, y: 488, width: contentW, height: 36, children: [src] });
   const logo = node({ name: "logo", x: W - 80, y: 16, width: 64, height: 35 });
 
@@ -593,6 +598,16 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const clear = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, fill: "#2d2e2d", stroke: "#ffffff", strokeWeight: 3 }) }), {});
     check("18d a label clear of every mark is still judged ok", row(clear, "label-contrast-on-background").status === "ok",
           row(clear, "label-contrast-on-background").detail);
+  }
+
+  // 18e — the footer's source line: bold on the prefix ONLY. A real run shipped it bold throughout
+  // and every other row passed, because nothing else inspects weight outside annotation__*.
+  {
+    const good = await run(buildFrame(), {});
+    check("18e a correct source line passes", row(good, "source-line-weight").status === "ok", row(good, "source-line-weight").detail);
+    const bad = await run(buildFrame({ boldSource: true }), {});
+    check("18e a wholly-bold source line FAILS", row(bad, "source-line-weight").status === "FAIL", row(bad, "source-line-weight").detail);
+    check("18e and names the collapse that causes it", /FIRST run/.test(row(bad, "source-line-weight").detail), row(bad, "source-line-weight").detail);
   }
 
   // 19 — the unimplemented half of the hierarchy is declared, not certified.

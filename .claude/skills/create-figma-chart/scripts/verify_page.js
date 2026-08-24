@@ -429,6 +429,40 @@ const checkFrame = async (frameId) => {
     }
   }
 
+  // The footer's source line: bold on the `Data source:` prefix ONLY.
+  //
+  // Added after a run shipped `Data source: V-Dem (2026)` bold THROUGHOUT and every other row passed
+  // it. The cause is generic enough to be worth stating: assigning `characters` collapses a text node
+  // to its FIRST run's style, and the template's first run is the bold prefix — so filling the slot
+  // silently bolds the producer name. It renders as a slightly heavy line that reads as fine.
+  // Nothing else here inspects weight outside `annotation__*`, which is why it went unnoticed.
+  {
+    // findAll, not findOne: the static templates nest the source inside a row frame, and findOne is
+    // surface the test harness's figma stub does not implement.
+    const src = footer ? footer.findAll((c) => c.type === "TEXT" && /^\s*Data source:/.test(c.characters || ""))[0] : null;
+    if (!footer) skip("source-line-weight", "no footer resolved on this frame");
+    else if (!src) skip("source-line-weight", "no footer TEXT starting `Data source:` — a template whose footer names its source differently is not judged here");
+    else {
+      const PREFIX = "Data source:";
+      let segs = [];
+      try { segs = src.getStyledTextSegments(["fontName"]); } catch (e) { segs = []; }
+      if (!segs.length) skip("source-line-weight", "footer source line has no readable font segments");
+      else {
+        const BOLD = /bold|black/i;
+        const weightAt = (i) => { const s = segs.find((x) => i >= x.start && i < x.end); return s && s.fontName ? s.fontName.style : null; };
+        const prefixWeights = [...new Set([...Array(Math.min(PREFIX.length, src.characters.length)).keys()].map(weightAt).filter(Boolean))];
+        const restWeights = [...new Set([...Array(Math.max(0, src.characters.length - PREFIX.length)).keys()]
+          .map((k) => weightAt(k + PREFIX.length)).filter(Boolean))];
+        const bad = [];
+        if (!prefixWeights.length || !prefixWeights.every((w) => BOLD.test(w))) bad.push(`"${PREFIX}" is ${prefixWeights.join("/") || "unreadable"} (want Bold)`);
+        if (restWeights.some((w) => BOLD.test(w))) bad.push(`the producer name is ${restWeights.join("/")} — setting \`characters\` collapses the node to its FIRST run's style, which here is the bold prefix (GOTCHAS.md). Re-assert Regular across the whole string, then bold the prefix`);
+        add("source-line-weight", bad.length ? "FAIL" : "ok",
+            bad.length ? bad.join("; ") : `"${PREFIX}" bold, producer name ${restWeights.join("/") || "empty"}`,
+            { prefixWeights, restWeights });
+      }
+    }
+  }
+
   // Mark weight — the series lines and their halos.
   //
   // Two things vary by chart type and both were wrong when this only knew line charts. The series line
