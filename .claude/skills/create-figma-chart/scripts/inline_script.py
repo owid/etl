@@ -45,6 +45,12 @@ CROWDED = 0.80
 # stripping, because --rows selects on them.
 REGION = re.compile(r"^//\s*#(region\s+\S+|endregion)\s*$")
 
+# The calls reference/CHECKS.md tells an operator to send, per script. `--check` measures THESE.
+# Keep the two in step: this list is the workflow, and the doc is where a human reads it.
+DOCUMENTED_CALLS: dict[str, list[tuple[str, ...]]] = {
+    "verify_page.js": [("type", "series"), ("geometry", "annotations")],
+}
+
 
 def strip_js(src: str) -> str:
     """Remove comments while respecting string, template-literal and regex context."""
@@ -135,6 +141,24 @@ def _proper_subsets(groups: list[str]) -> Iterator[tuple[str, ...]]:
         yield from itertools.combinations(groups, size)
 
 
+def _documented_problem(groups: list[str], calls: list[tuple[str, ...]]) -> str | None:
+    """A declared workflow must send every row group exactly once, or the measurement is a fiction.
+
+    Without this, a `#region` added to a script and not written into the call list is simply absent
+    from what --check measures: the number stays comfortable while a row nobody sends goes unchecked
+    in the frame. That is the same wrong-answer shape as measuring an undocumented split.
+    """
+    flat = [g for call in calls for g in call]
+    parts = []
+    if missing := [g for g in groups if g not in flat]:
+        parts.append(f"in the file but never sent: {', '.join(missing)}")
+    if unknown := [g for g in flat if g not in groups]:
+        parts.append(f"documented but not in the file: {', '.join(unknown)}")
+    if repeated := sorted({g for g in flat if flat.count(g) > 1}):
+        parts.append(f"sent by more than one call: {', '.join(repeated)}")
+    return "; ".join(parts) or None
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("script", nargs="?", help="e.g. verify_page.js")
@@ -166,9 +190,14 @@ def main() -> int:
         #
         # But the largest SINGLE group is not the answer either: `--rows` combines groups, and the
         # documented pass is two calls covering all of them (CHECKS.md), so nobody sends one slice at
-        # a time. Measure that two-call partition — the split that minimises its larger call, which is
-        # what following the doc produces. Enumerating the subsets is fine: these are hand-authored
-        # #region markers and there is a handful of them per script.
+        # a time. So measure THE DOCUMENTED CALLS, the ones an operator is actually told to send —
+        # not the best split this script can find for itself. Minimising over every partition answers
+        # a question nobody asked, and it can hold the check green by discovering an undocumented
+        # split while the workflow in the doc is over the cap. Measured on this file: 16,000 more
+        # characters in `annotations` puts the documented `geometry,annotations` call at 50,314 —
+        # over the cap and refused — while `annotations` alone against the other three peaks at
+        # 45,131, so the optimiser would report 90% and exit 0 for a workflow that no longer runs.
+        # The number has to be the one the operator will hit.
         failed = False
         print(f"{'script':<30} {'raw':>8} {'stripped':>9} {'sent':>9} {'of cap':>8}")
         for p in sorted(SCRIPTS.glob("*.js")):
@@ -176,15 +205,26 @@ def main() -> int:
                 continue
             stripped = strip_js(p.read_text())
             groups = list(dict.fromkeys(select_rows(stripped, set())[1]))
-            if len(groups) > 1:
-                sent = min(
-                    max(
-                        len(select_rows(stripped, set(left))[0]),
-                        len(select_rows(stripped, set(groups) - set(left))[0]),
-                    )
-                    for left in _proper_subsets(groups)
+            documented = DOCUMENTED_CALLS.get(p.name)
+            problem = None
+            if documented is not None:
+                problem = _documented_problem(groups, documented)
+                sizes = [(call, len(select_rows(stripped, set(call))[0])) for call in documented]
+                sent = max(size for _, size in sizes)
+                how = (
+                    "  (largest of the documented calls: "
+                    + ", ".join(f"--rows {','.join(call)} {size:,}" for call, size in sizes)
+                    + ")"
                 )
-                how = f"  (larger call of the best 2-way split of {len(groups)} slices)"
+            elif len(groups) > 1:
+                # A sliceable script with no declared workflow is itself the gap: measuring it on
+                # some split of this tool's choosing would report a size nobody sends.
+                problem = (
+                    f"{len(groups)} row groups but no entry in DOCUMENTED_CALLS — add the calls "
+                    "CHECKS.md gives operators, so this measures what they send"
+                )
+                sent = len(select_rows(stripped, set(groups))[0])
+                how = "  (every slice at once — no documented split to measure)"
             elif groups:
                 sent = len(select_rows(stripped, set(groups))[0])
                 how = "  (its only slice)"
@@ -192,11 +232,33 @@ def main() -> int:
                 sent = len(stripped)
                 how = ""
             over = sent > CAP
-            failed = failed or over
+            failed = failed or over or bool(problem)
             print(
                 f"{p.name:<30} {len(p.read_text()):>8,} {len(stripped):>9,} {sent:>9,} "
                 f"{sent / CAP * 100:>7.0f}%{'  OVER CAP' if over else ''}{how}"
             )
+            if problem:
+                print(f"{'':<30}   ^ {problem}")
+            # Over the cap, the useful next step is the split that would fit, so the doc can be
+            # rewritten to it. Enumerating the subsets is fine here: these are hand-authored #region
+            # markers and there is a handful of them per script.
+            if over and len(groups) > 1:
+                size, left = min(
+                    (
+                        max(
+                            len(select_rows(stripped, set(sub))[0]),
+                            len(select_rows(stripped, set(groups) - set(sub))[0]),
+                        ),
+                        sub,
+                    )
+                    for sub in _proper_subsets(groups)
+                )
+                right = [g for g in groups if g not in left]
+                print(
+                    f"{'':<30}   ^ a 2-way split that fits: --rows {','.join(left)} then "
+                    f"--rows {','.join(right)} (larger call {size:,}) — update CHECKS.md and "
+                    "DOCUMENTED_CALLS together"
+                )
         return 1 if failed else 0
 
     if not args.script:

@@ -976,6 +976,18 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     // fails a correct ramp by construction, so the row must say so rather than hand over the command flat.
     check("33 a map warns that a sequential ramp is out of scope",
           /SEQUENTIAL ramp/.test(binned) && /--maps/.test(binned), binned);
+    // Figma switches a paint off two independent ways, and only `visible: false` was tested on the
+    // FILL side — so a mark left at `opacity: 0` handed the audit a category colour that paints no
+    // pixels, and could be sent a reviewer to go and "fix". The stroke side already applied both
+    // tests. This hex is carried by nothing else in the fixture, so its absence can only come from
+    // the opacity test; the visible segment is asserted present so the case cannot pass by the
+    // command going missing altogether.
+    const ghost = buildFrame({ barSegment: true });
+    chartOf(ghost).children.push(node({ type: "RECTANGLE", name: "bar__Ghost", x: 300, y: 380,
+      width: 60, height: 40, fills: [Object.assign(solid("#12ab34")[0], { opacity: 0 })] }));
+    const dGhost = row(await run(ghost, {}), "colour-vision").detail;
+    check("33 a fully transparent mark fill is not a palette colour",
+          !/#12ab34/.test(dGhost) && /#4c6a9c/.test(dGhost), dGhost);
 
     // --- when --names is safe to emit. Rename EVERY qualifying mark, not one: the emitter keeps the
     // FIRST name per distinct hex, so renaming an arbitrary node can leave its colour already

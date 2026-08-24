@@ -75,6 +75,17 @@ const contrast = (a, b) => { const la = lum(a), lb = lum(b); return (Math.max(la
 const hexOf = (f) => (f && f.type === "SOLID"
   ? "#" + [f.color.r, f.color.g, f.color.b].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join("")
   : null);
+// A paint that PAINTS NO PIXELS is not a colour this file may report. Figma switches a paint off two
+// independent ways — `visible: false` and `opacity: 0` — and only the first of those was tested at the
+// sites that pick a FILL, so a fully transparent decoy could still supply a mark's colour. That mark
+// then entered the colour-audit palette as a category nobody can see (and could be recommended a
+// replacement for), and stood in as the backdrop a label's contrast was measured against. The stroke
+// collector already applied both tests; this is that same predicate, named once so the sites cannot
+// drift apart again. It is the same reasoning that already excludes zero-area nodes from the fill
+// inventory: a paint nobody can see is a phantom colour, and reporting one sends a reviewer to go and
+// fix a mark that is not on the canvas.
+const renders = (p) => !!p && p.type === "SOLID" && p.visible !== false
+                       && (p.opacity === undefined || p.opacity > 0.01);
 let rows = [];
 const add = (name, status, detail, extra) => rows.push({ check: name, status, detail, ...(extra || {}) });
 const skip = (name, why, owner) => add(name, "SKIPPED", why, owner ? { ownedBy: owner } : null);
@@ -95,7 +106,7 @@ const checkFrame = async (frameId) => {
   const TEXT_FLOOR = CONFIG.textFloor !== null && CONFIG.textFloor !== undefined ? CONFIG.textFloor : (isSmall ? 11 : 12);
   const LADDER = isSmall ? [11, ...LADDER_FULL] : LADDER_FULL;
   const frameFill = (() => { const f = frame.fills && frame.fills[0];
-    if (!f || f.type !== "SOLID" || f.visible === false) return null;
+    if (!renders(f)) return null;
     return "#" + [f.color.r, f.color.g, f.color.b].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join(""); })();
   const rel = (n) => {
     const b = n.absoluteBoundingBox;
@@ -198,9 +209,7 @@ const checkFrame = async (frameId) => {
     const cm = CATEGORY_ANY.exec(n.name);
     if (cm) catAncestor = cm[1];
     if (n.type === "TEXT") {
-      const tf = Array.isArray(n.fills) && n.fills[0] && n.fills[0].type === "SOLID" && n.fills[0].visible !== false
-        ? "#" + [n.fills[0].color.r, n.fills[0].color.g, n.fills[0].color.b].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join("")
-        : null;
+      const tf = Array.isArray(n.fills) && renders(n.fills[0]) ? hexOf(n.fills[0]) : null;
       // The WEIGHTS, not just whether they differ: a uniformly non-Regular node is style-unbindable
       // for the same API reason a mixed-weight one is, and named-styles has to know the difference
       // between "bold throughout" (prescribed) and "Regular and unbound" (a defect).
@@ -228,8 +237,7 @@ const checkFrame = async (frameId) => {
       stroked.push({ node: n, name: n.name, type: n.type, w: n.strokeWeight,
                      dash: "dashPattern" in n && n.dashPattern ? [...n.dashPattern] : [],
                      align: n.strokeAlign, insidePlot, inFurniture, furnitureGroup: furnitureGroup || null, insideMap: !!insideMap,
-                     hex: hexOf(n.strokes.find((s) => s && s.type === "SOLID" && s.visible !== false
-                                                      && (s.opacity === undefined || s.opacity > 0.01))),
+                     hex: hexOf(n.strokes.find(renders)),
                      seriesKind: seriesOf ? seriesOf.kind : null, seriesName: seriesOf ? seriesOf.series : null });
     }
     // Zero-area nodes are EXCLUDED from the fill inventory and KEPT for the stroke rows (CHECKS.md).
@@ -240,7 +248,7 @@ const checkFrame = async (frameId) => {
     const hasArea = areaBox && areaBox.w > 0 && areaBox.h > 0;
     if (hasArea && "fills" in n && Array.isArray(n.fills)) {
       for (const f of n.fills) {
-        if (f.type === "SOLID" && f.visible !== false) fills.push({ name: n.name, type: n.type, hex: hexOf(f), styleId: n.fillStyleId || "", insidePlot });
+        if (renders(f)) fills.push({ name: n.name, type: n.type, hex: hexOf(f), styleId: n.fillStyleId || "", insidePlot });
       }
     }
     // Marker groups and value labels. The NAME is on the group and the GEOMETRY is on its children, and
@@ -259,7 +267,7 @@ const checkFrame = async (frameId) => {
       const mb0 = rel(n);
       // The mark's own COLOUR travels with its box. Without it, a label sitting on a mark can only ever be
       // measured against the frame, which is not what is behind it (see label-contrast-on-background).
-      const markPaint = Array.isArray(n.fills) ? n.fills.find((f) => f.type === "SOLID" && f.visible !== false) : null;
+      const markPaint = Array.isArray(n.fills) ? n.fills.find(renders) : null;
       const filled = !!markPaint;
       // `fromMap` is carried because a MAP SHAPE's bbox is not its ink: per-chart-type/maps.md, a
       // country split across the antimeridian has a box spanning almost the whole map, so an annotation
