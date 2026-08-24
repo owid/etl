@@ -114,6 +114,25 @@ exact and linear. And `touching` counted *pairs* within 1.5px, which is exactly 
 neighbourhood; the script reports both that and the count of distinct arrow pixels in contact, so
 the magnitude is interpretable rather than just non-zero.
 
+**Probe a render at its natural size. A resampled one cannot be masked reliably — and both render
+paths resample.** A pixel mask is a per-pixel difference, so it only means "this shape's ink" while
+each pixel still corresponds to one rendered pixel. Downscaling breaks that, and how badly depends
+on the filter: an area-average resample merely softens each edge, but a **ringing** filter overshoots
+two or three pixels past it, which inflates both masks until two shapes five pixels apart have
+*overlapping* masks and every gap reads as `0.0` with hundreds of contacts. That is a property of the
+resampling, not of the chart, and it looks exactly like a real defect. So: `get_screenshot`'s
+`maxDimension` downscales, and the desktop server caps the longer edge at **1024px** (Gotchas) — a
+540-wide frame is safe on either, but the **616×1096 Reel arrives at 576×1024 from the desktop
+server**, already resampled. For a pixel probe on a frame taller or wider than 1024, use the hosted
+`get_screenshot` at natural size, or the 4× clone trick. Same reason the arrow renders are specified
+at 1:1 above.
+
+Verified under fake AA (supersample, area-average down): masks hold their size at every separation
+and `min_gap` tracks the true gap exactly. Note `min_gap` is the distance between pixel *centres*,
+so it reads one more than the number of blank pixels between the two edges — two blank columns
+measure `3.0`. That is the same convention as the `hypot` above, so the 3–7px band applies to it
+unchanged.
+
 The same script covers the other two pixel checks: `contrast` for a hairline (the sub-pixel stroke
 trap in Gotchas — measure it on the 4× clone, not the 540px preview) and `ink-box` for "nothing in
 the margins", which reads the true extent of everything that paints. Run against a stock 540 frame,

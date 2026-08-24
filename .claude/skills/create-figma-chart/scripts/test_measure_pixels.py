@@ -8,13 +8,21 @@ masking from the full render hides the overlap being tested for; classifying pix
 collects the wrong shape; an empty mask must be UNMEASURABLE rather than a clean pass; and a
 sub-pixel stroke reads as a defect at 1:1 and clears the bar at 4x.
 
+Anti-aliasing gets its own case, because it is the difference between these synthetic renders and
+a real one, and because the obvious way to fake it is wrong. Fake AA by supersampling and
+downscaling with **BOX** (area average). A ringing filter such as LANCZOS overshoots two or three
+pixels past each edge, which inflates a `differs` mask enough that two shapes five pixels apart
+have overlapping masks and every gap reads as 0 — an alarming result that says nothing about the
+check. Two rigs were wrong before this one: that, and an arrow whose slant carried it into the
+target so the nominal gap was never the real one.
+
 NOT covered, deliberately: the branch where from-full masking reports a *comfortable* 3-7px with
-zero contacts. That needs the eroded mask to sit more than 1.5px from the surviving one, and with
-hard-edged shapes it cannot — a contiguous overlap always leaves the covering shape's edge adjacent
-to where the covered one reappears, so the naive gap comes out at 1.0px however the overlap is
-arranged. The real case that motivated the rule had anti-aliased edges. So the script keeps that
-branch (it is the right check on real renders) and these tests only pin the invariant that holds
-either way: from-full masking over-reports the gap, never under-reports it.
+zero contacts. That needs the eroded mask to sit more than 1.5px from the surviving one, and a
+contiguous overlap cannot produce it — the covering shape's edge is always adjacent to where the
+covered one reappears, so the naive gap comes out at 1.0px however the overlap is arranged. The
+script keeps that branch (it is the right check on a real render, where a partly-covered edge
+blends rather than stopping cleanly) and these tests pin the invariant that holds either way:
+from-full masking over-reports the gap, never under-reports it.
 """
 
 from __future__ import annotations
@@ -211,6 +219,59 @@ def test_subpixel_stroke_scale(tmp: Path) -> None:
     check("exit code", code, 0)
 
 
+def test_antialiased_gap_tracks_truth(tmp: Path) -> None:
+    """Under realistic AA the masks must not inflate and the gap must track the real separation.
+
+    Rendered by supersampling and downscaling with BOX (area average), which is what a renderer's
+    anti-aliasing does. Do NOT use a ringing filter such as LANCZOS here: its overshoot spreads a
+    `differs` mask two or three pixels past the shape, far enough that two separated shapes' masks
+    overlap and every gap reads as 0. That is a property of the resampling, not of the check.
+    """
+    print("anti-aliased edges: measured gap tracks the true separation, masks stay put")
+    S, W, H, target_x = 8, 80, 40, 40
+
+    def render(arrow_right: int, with_arrow: bool, with_target: bool, name: str) -> str:
+        a = np.full((H * S, W * S, 3), 255, dtype=np.uint8)
+        if with_target:
+            a[10 * S : 30 * S, target_x * S : (target_x + 2) * S] = BLUE
+        if with_arrow:
+            for row in range(10 * S, 30 * S):  # slants away from the target, so the top row is closest
+                x1 = arrow_right * S - int((row - 10 * S) / (4 * S) * S)
+                a[row, x1 - 2 * S : x1] = GRAY
+        path = tmp / f"aa_{name}.png"
+        Image.fromarray(a).resize((W, H), Image.BOX).save(path)
+        return str(path)
+
+    for blank_columns, want_gap in ((2, 3.0), (5, 6.0)):
+        arrow_right = target_x - blank_columns
+        paths = {
+            key: render(arrow_right, arrow, tgt, f"{key}_{blank_columns}")
+            for key, (arrow, tgt) in {
+                "no_arrow": (False, True),
+                "no_target": (True, False),
+                "no_both": (False, False),
+            }.items()
+        }
+        _, out = run(
+            "arrow-gap",
+            "--no-arrow",
+            paths["no_arrow"],
+            "--no-target",
+            paths["no_target"],
+            "--no-both",
+            paths["no_both"],
+            "--crop",
+            "0,0,80,40",
+        )
+        # min_gap is the distance between pixel CENTRES, so it reads one more than the number of
+        # blank columns between the two shapes' edges. Same convention as CHECKS.md's hypot().
+        check(f"{blank_columns} blank columns -> gap", out.get("min_gap"), want_gap)
+        check(f"{blank_columns} blank columns -> no contact", out.get("touching_pairs"), 0)
+        # 20 rows x 2px arrow = 60 with the slant's stair-steps; the target bar is a clean 2x20.
+        check(f"{blank_columns} blank columns -> arrow mask not inflated", out.get("arrow_px"), 60)
+        check(f"{blank_columns} blank columns -> target mask not inflated", out.get("target_px"), 40)
+
+
 def test_ink_box(tmp: Path) -> None:
     print("ink-box finds the true extent, and reports EMPTY rather than a bogus box")
     img = canvas(100, 50)
@@ -235,6 +296,7 @@ def main() -> int:
             test_bbox_guard,
             test_gray_target_would_defeat_color_classification,
             test_subpixel_stroke_scale,
+            test_antialiased_gap_tracks_truth,
             test_ink_box,
         ):
             test(tmp)
