@@ -133,6 +133,16 @@ so it reads one more than the number of blank pixels between the two edges — t
 measure `3.0`. That is the same convention as the `hypot` above, so the 3–7px band applies to it
 unchanged.
 
+**And verified against this file's own recorded number, on a real chart.** Run on a clone of the
+population-growth page's peak arrow — a real curvy arrow at **rotation −162.4°**, real
+anti-aliased renders through the desktop server — the script returns **`min_gap` 3.0 with zero
+contacts**, which is exactly the figure recorded above for that arrow after its fix. A second arrow
+on the same chart at **+170.7°** returns 5.385px, zero contacts, and `arrow_px_outside_bbox: 0`
+against its declared `absoluteBoundingBox`. Both sit inside the 3–7px band. That pair is also the
+empirical proof of the rotated-bbox warning: the first arrow's raw `x` is **167.1** where its
+absolute box starts at **100.0**, and the second reports raw `x: 536.7, width: 29.8` against an
+absolute `495.1, 41.7` — crop from the raw numbers and you probe empty canvas.
+
 The same script covers the other two pixel checks: `contrast` for a hairline (the sub-pixel stroke
 trap in Gotchas — measure it on the 4× clone, not the 540px preview) and `ink-box` for "nothing in
 the margins", which reads the true extent of everything that paints. Run against a stock 540 frame,

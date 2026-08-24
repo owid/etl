@@ -168,6 +168,16 @@
      Bash over JSON-RPC, which needs no config change —
      `scripts/figma_desktop_read.py` does the handshake, fans out the calls and writes the PNGs.
      One handshake serves many calls, so amortize it.
+  5. **It renders the desktop app's copy of the file, which lags a write you just made — and a
+     stale render looks perfectly plausible.** Measured: a frame cloned via `use_figma` and
+     screenshotted on the next tool call came back **33,784 bytes**, against **47,664** for the same
+     node once it had settled. Nothing errored; the render was simply of a half-built frame. So
+     after any *structural* write (a clone, a reparent, an import), do not trust the first render —
+     re-render and compare, or read something back through `use_figma` first to give the app a beat.
+     Small property writes (a `visible` toggle) settled reliably across the same gap in the same
+     session, but the failure is silent either way, so the mask guards in `measure_pixels.py` are
+     what actually catch it: a stale render yields an empty or wrong-sized mask, which it reports as
+     `UNMEASURABLE` rather than as a clean pass.
 
   Metering is the open question: these calls never reach the hosted connector, and Figma documents
   no desktop exemption either way. Untested in a real chart build.
