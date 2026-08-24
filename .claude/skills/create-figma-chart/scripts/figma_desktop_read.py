@@ -118,6 +118,40 @@ def result_text(result: dict) -> str:
     return "".join(item.get("text", "") for item in result.get("content", []))
 
 
+def check(expect_node: str) -> int:
+    """Preflight: is the desktop path usable right now? Exit 0 yes, 1 no — never raises.
+
+    "Usable" is two conditions, and the second is the one that bites: the server must be up, AND
+    the document holding `expect_node` must be the ACTIVE TAB, since there is no fileKey to pass.
+    """
+    try:
+        session = connect()
+        reply = call_tool(
+            "get_metadata",
+            {"nodeId": expect_node, "clientLanguages": "unknown", "clientFrameworks": "unknown"},
+            300,
+            session,
+        )
+    except SystemExit as exc:
+        print(f"desktop path UNAVAILABLE: {exc}")
+        print("Fall back to the hosted connector's get_screenshot.")
+        return 1
+
+    result = reply.get("result", {})
+    text = result_text(result)
+    if result.get("isError") or not text.strip():
+        print(f"desktop path UNAVAILABLE: {expect_node} is not in the active document.")
+        print(f"  server said: {text.strip()[:200]}")
+        print("  The Figma desktop app must be running with the target file as the ACTIVE TAB.")
+        return 1
+
+    name = ""
+    if 'name="' in text:
+        name = text.split('name="', 1)[1].split('"', 1)[0]
+    print(f"desktop path available — {expect_node} resolves to {name!r} in the active document.")
+    return 0
+
+
 def shot(nodes: list[str], out_dir: Path) -> int:
     session = connect()
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -178,12 +212,22 @@ def main() -> int:
     p_shot.add_argument("nodes", nargs="+", metavar="NODE_ID", help="e.g. 798:161 (or 798-161)")
     p_shot.add_argument("--out-dir", type=Path, default=Path("."), help="where to write the PNGs")
 
+    p_check = sub.add_parser("check", help="preflight: is the desktop path usable right now?")
+    p_check.add_argument(
+        "--expect-node",
+        default="798:161",
+        metavar="NODE_ID",
+        help="a node that must exist in the active document (default: a Charts-file template)",
+    )
+
     p_meta = sub.add_parser("meta", help="XML structure of a node, or the page list with no node")
     p_meta.add_argument("node", nargs="?", metavar="NODE_ID")
 
     args = ap.parse_args()
     if args.mode == "shot":
         return 1 if shot(args.nodes, args.out_dir) else 0
+    if args.mode == "check":
+        return check(args.expect_node)
     return meta(args.node)
 
 

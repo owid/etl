@@ -172,6 +172,19 @@
   Metering is the open question: these calls never reach the hosted connector, and Figma documents
   no desktop exemption either way. Untested in a real chart build.
 
+- **Downloading N screenshot URLs: parallelize, and pair each URL with its own output file.** Six
+  serially is 2.7 s through a cloud sandbox's egress proxy, 0.8 s in parallel:
+
+  ```bash
+  printf '%s %s\n' "$U1" 1.png "$U2" 2.png | xargs -P6 -n2 sh -c 'curl -sSL -o "$2" "$1"' _
+  ```
+
+  **Don't use `-I{}` with a single `-o`:** `{}` expands only in the URL, so every parallel `curl`
+  writes the same file and you Read one screenshot six times — a wrong verdict from a real render,
+  which is the worst shape of bug this skill has. Same trap as the `upload_assets` pattern below,
+  and the same fix. Locally you can skip this leg entirely: `scripts/figma_desktop_read.py shot`
+  returns the PNGs directly, no URLs to fetch (see the desktop-server entry above).
+
 - **`upload_assets` gives you N `submitUrl`s so the POSTs can overlap — run them that way.** The
   Step 5 snippet shows one `curl`, and a two-format run that copies it twice pays two full uploads of
   a ~165 KB SVG back to back. Pair each URL with its file and fan them out, exactly as the screenshot
