@@ -191,7 +191,7 @@ definitions:
 
   description_key_ppp: |-
     <% if poverty_line is not defined or poverty_line not in ["40% of the median", "50% of the median", "60% of the median"] %>
-    This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
+    This data is expressed in constant international dollars to adjust for inflation and differences in living costs between countries. Comparisons across countries and over time are only meaningful after this adjustment. Read more in our article, [What are international dollars?](https://ourworldindata.org/international-dollars)
     <%- endif %>
 
   description_key_source_world_bank: |-
@@ -346,9 +346,9 @@ definitions:
     received
     <%- endif %>
 
-  ppp_adjustment_subtitle: This data is adjusted for inflation and differences in living costs between countries.
+  ppp_adjustment_subtitle: This data is adjusted for inflation and for differences in living costs between countries.
 
-  ppp_adjustment_note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at <<ppp_version>> prices.
+  ppp_adjustment_note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at <<ppp_version>> prices, which adjust for price differences between countries.
 
   ppp_adjustment_note_longer: This data is measured in [international-$](#dod:int_dollar_abbreviation) at <<ppp_version>> prices to adjust for inflation and differences in living costs between countries.
 
@@ -764,7 +764,7 @@ tables:
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main_poverty}
         description_from_producer: |-
-          % of population living in households with consumption or income per person below the poverty line at <<ppp_version>> international prices. As a result of revisions in PPP exchange rates, poverty rates for individual countries cannot be compared with poverty rates reported in earlier editions.
+          % of population living in households with consumption or income per person below the poverty line at <<ppp_version>> international prices. As a result of revisions in PPP exchange rates, poverty rates for individual countries cannot be compared with poverty rates reported in earlier editions of this data.
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
@@ -777,7 +777,7 @@ tables:
         presentation:
           title_public: |-
             <% if survey_comparability != "No spells" %>
-            Share of population in poverty ({definitions.poverty_line_a_day})
+            Share of the population living in poverty ({definitions.poverty_line_a_day})
             <%- endif %>
           topic_tags:
             - Poverty
