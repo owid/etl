@@ -132,7 +132,8 @@ def update_chart_config(
     `dimension_display_baselines` maps each dimension's (new) variable ID to that variable's
     own `display` metadata, used to strip the same kind of redundant defaults from
     `dimensions[*].display` -- a separate inheritance path, see prune_dimension_displays.
-    `original_patch` is the chart's own stored `chart_configs.patch` (not `.full`) -- see
+    `original_patch` is the chart's own stored authored layer (the `chart_configs` row named
+    by `charts.patchConfigId`, not the one named by `configId`) -- see
     ChartIndicatorUpdater.run for why this matters for inheritance-enabled charts.
     """
     is_inheritance_enabled = config.get("isInheritanceEnabled", False)
@@ -205,9 +206,10 @@ class ChartIndicatorUpdater:
             `is_inheritance_enabled`, since dimension display always inherits from the
             variable's own display metadata.
         original_patch : Optional[Dict[str, Any]]
-            The chart's own stored `chart_configs.patch` (not `.full`). `config` itself is
-            normally `chart.config`, which SQLAlchemy builds from `.full` -- the fully
-            resolved config, with every value the chart *inherits* from its indicator
+            The chart's own stored authored layer: the `chart_configs` row named by
+            `charts.patchConfigId`, not the one named by `configId`. `config` itself is
+            normally `chart.config`, which SQLAlchemy builds from the row named by
+            `configId` -- the fully resolved config, with every value it *inherits*
             already merged in. If we tracked "explicitly set" paths from `config` directly,
             an inherited field the chart never touched (e.g. its title, pulled from the
             *old* indicator) would be misread as an explicit override, and compared against

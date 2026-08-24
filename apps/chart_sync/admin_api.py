@@ -80,7 +80,7 @@ class AdminAPI:
         return js
 
     def create_chart(self, chart_config: dict, user_id: int | None = None) -> dict:
-        # Extract chart-table fields; keep them out of chart_configs.full payload.
+        # Extract chart-table fields; keep them out of the chart config payload.
         config = chart_config.copy()
         is_inheritance_enabled = config.pop("isInheritanceEnabled", None)
         config.pop("forceDatapage", None)
@@ -104,7 +104,7 @@ class AdminAPI:
         return js
 
     def update_chart(self, chart_id: int, chart_config: dict, user_id: int | None = None) -> dict:
-        # Extract chart-table fields; keep them out of chart_configs.full payload.
+        # Extract chart-table fields; keep them out of the chart config payload.
         config = chart_config.copy()
         is_inheritance_enabled = config.pop("isInheritanceEnabled", None)
         config.pop("forceDatapage", None)

@@ -372,7 +372,7 @@ grep -oE 'font-size="[0-9.]+"' chart.svg | sort | uniq -c | sort -rn | head -3
 
 Bigger text needs more room, so this trades against how much fits — see the axis rule in Step 8 and, failing that, the entity count.
 
-**`tab=` FALLS BACK SILENTLY when the chart does not declare that type — check the mark group, not the HTTP status.** `co-emissions-per-capita?tab=marimekko` returns 200 and a plausible 9 KB SVG containing `lines`: a line chart. `tab=stacked-discrete-bar` on the same slug returns `stacked-areas`. Nothing errors and the file looks right, so a whole "chart-type sweep" can be built on two charts that are not the types you asked for — which is what happened here. Two defences: find charts that actually declare the type (`json_extract_string(cc.full, '$.chartTypes')` on the public Datasette — `/query-grapher-db`), and assert the mark group in the returned SVG:
+**`tab=` FALLS BACK SILENTLY when the chart does not declare that type — check the mark group, not the HTTP status.** `co-emissions-per-capita?tab=marimekko` returns 200 and a plausible 9 KB SVG containing `lines`: a line chart. `tab=stacked-discrete-bar` on the same slug returns `stacked-areas`. Nothing errors and the file looks right, so a whole "chart-type sweep" can be built on two charts that are not the types you asked for — which is what happened here. Two defences: find charts that actually declare the type (`json_extract_string(cc.config, '$.chartTypes')` on the public Datasette — `/query-grapher-db`), and assert the mark group in the returned SVG:
 
 | type | mark group `id` |
 |---|---|
