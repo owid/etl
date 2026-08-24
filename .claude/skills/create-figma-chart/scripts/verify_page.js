@@ -211,13 +211,22 @@ const checkFrame = async (frameId) => {
   // far larger than the 12-16px band rule by construction.
   const MAP_GROUPS = /^(map|countries|countries-without-data)$/i;
   let isMap = false;
-  const collect = (n, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap, catAncestor, dimmed) => {
+  const collect = (n, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap, catAncestor, nodeOpacity) => {
     if ("visible" in n && !n.visible) return;
     // NODE opacity dims every paint under it, and it ACCUMULATES down the tree — a group at 0.5 holding
-    // a leaf at 0.5 renders the leaf at 0.25. Carried as a boolean rather than a product because the
-    // only question asked of it is "is this colour still reportable", and once anything above has
-    // dimmed the node the answer is no whatever the exact factor.
-    if ("opacity" in n && typeof n.opacity === "number" && n.opacity < 0.999) dimmed = true;
+    // a leaf at 0.5 renders the leaf at 0.25. Carried as the PRODUCT, not a boolean, because ZERO and
+    // PARTIAL are two different answers and a boolean cannot tell them apart. Read as a boolean, a node
+    // the reader cannot see at all came back as a held-back TRANSLUCENT mark: the audit named an
+    // invisible category and told the operator to reset its opacity or judge it by eye — a verdict
+    // about something that is not on the canvas. Two nested nodes at 0.05 compound to 0.0025, so the
+    // product is also the only way to see that pair as invisible rather than merely dim.
+    if ("opacity" in n && typeof n.opacity === "number") nodeOpacity *= n.opacity;
+    // Effective opacity zero paints NO PIXELS. That is the same non-rendering state as `visible: false`
+    // directly above and as a zero-opacity paint under `renders`, so it takes the same treatment both of
+    // those take — out of every row entirely — rather than being grouped with genuinely visible partial
+    // opacity. Same 0.01 floor `renders` applies to a paint, applied here to the node instead.
+    if (nodeOpacity <= 0.01) return;
+    const dimmed = nodeOpacity < 0.999;
     // The furniture CONTAINER name is carried, not just the boolean: the dash target is decided by what
     // a node IS (a gridline vs a zero line vs a tick), and deciding it from the node's own current dash
     // instead makes a cleared gridline dash self-justifying. See the furniture-dash row.
@@ -312,13 +321,13 @@ const checkFrame = async (frameId) => {
     // the fixture models), so a bare node here loses it and the name-only filter below matches nothing —
     // every slope segment silently absent from `polylines`, and annotation-overlap unable to fail.
     if (n.type === "VECTOR" && insidePlot) vectors.push({ node: n, seriesOf });
-    if ("children" in n && n.children.length) { n.children.forEach((c) => collect(c, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap, catAncestor, dimmed)); return; }
+    if ("children" in n && n.children.length) { n.children.forEach((c) => collect(c, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap, catAncestor, nodeOpacity)); return; }
     const b = rel(n);
     if (b && b.w > 0 && b.h > 0) leaves.push({ name: n.name, type: n.type, box: b, insidePlot, fromMap: !!insideMap });
   };
   for (const child of frame.children) {
     if (child === logo) continue;
-    collect(child, plotRoots.indexOf(child) !== -1, false, null, null, false, null, false);
+    collect(child, plotRoots.indexOf(child) !== -1, false, null, null, false, null, 1);
   }
 
   // ---------------------------------------------------------------- rows

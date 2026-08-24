@@ -1010,6 +1010,42 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const dDim = row(await run(dimGroup, {}), "colour-vision").detail;
     check("33 an ancestor's opacity disqualifies an opaque leaf's colour",
           !/#12ab34/.test(dDim) && /translucent/.test(dDim), dDim);
+    // ZERO node opacity is NOT partial opacity, and the two must not share a verdict. A node at
+    // `opacity: 0` paints no pixels at all — the same non-rendering state as `visible: false` and as a
+    // zero-opacity PAINT, both of which are already dropped outright. Grouped with partial opacity it
+    // came back as a held-back translucent mark, so the audit NAMED an invisible category and told the
+    // operator to reset its opacity or judge it by eye: a verdict about something not on the canvas.
+    // The group carries the zero and the leaf is fully opaque, so the leaf's own paint cannot excuse it.
+    const zeroGroup = buildFrame({ barSegment: true });
+    chartOf(zeroGroup).children.push(node({ name: "series__Invisible", x: 300, y: 380, width: 60, height: 40,
+      opacity: 0, children: [node({ type: "RECTANGLE", name: "Rectangle 9", x: 300, y: 380,
+        width: 60, height: 40, fills: solid("#12ab34") })] }));
+    const dZero = row(await run(zeroGroup, {}), "colour-vision").detail;
+    check("33 a node at opacity 0 is not a palette colour",
+          !/#12ab34/.test(dZero) && /#4c6a9c/.test(dZero), dZero);
+    check("33 and it is not reported as a translucent mark to go and check",
+          !/translucent/.test(dZero) && !/Invisible/.test(dZero), dZero);
+    // Opacity MULTIPLIES down the tree, so invisibility can be reached without any single node being
+    // zero: 0.05 inside 0.05 is 0.0025, under the same floor `renders` puts a paint. A boolean could
+    // only ever call this pair "dim"; the product is what sees it is gone.
+    const compounded = buildFrame({ barSegment: true });
+    chartOf(compounded).children.push(node({ name: "series__Vanished", x: 300, y: 380, width: 60, height: 40,
+      opacity: 0.05, children: [node({ name: "inner", x: 300, y: 380, width: 60, height: 40, opacity: 0.05,
+        children: [node({ type: "RECTANGLE", name: "Rectangle 10", x: 300, y: 380,
+          width: 60, height: 40, fills: solid("#12ab34") })] })] }));
+    const dComp = row(await run(compounded, {}), "colour-vision").detail;
+    check("33 compounded opacity below the floor is invisible, not dim",
+          !/#12ab34/.test(dComp) && !/translucent/.test(dComp) && /#4c6a9c/.test(dComp), dComp);
+    // But a compounded value that is still ABOVE the floor is genuinely on the canvas: it keeps the
+    // translucent treatment and stays NAMED, or the new zero gate would swallow every dimmed mark.
+    const stillVisible = buildFrame({ barSegment: true });
+    chartOf(stillVisible).children.push(node({ name: "series__Halved", x: 300, y: 380, width: 60, height: 40,
+      opacity: 0.5, children: [node({ name: "inner", x: 300, y: 380, width: 60, height: 40, opacity: 0.5,
+        children: [node({ type: "RECTANGLE", name: "Rectangle 11", x: 300, y: 380,
+          width: 60, height: 40, fills: solid("#12ab34") })] })] }));
+    const dStill = row(await run(stillVisible, {}), "colour-vision").detail;
+    check("33 a compounded but still-visible mark stays translucent and named",
+          !/#12ab34/.test(dStill) && /translucent/.test(dStill) && /Halved/.test(dStill), dStill);
     // And the note must not fire on an ordinary opaque chart, or it becomes noise on every run.
     const opaque = row(await run(buildFrame({ barSegment: true }), {}), "colour-vision").detail;
     check("33 an opaque plot carries no translucency note",
