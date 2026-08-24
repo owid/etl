@@ -449,13 +449,19 @@ const checkFrame = async (frameId) => {
       if (!segs.length) skip("source-line-weight", "footer source line has no readable font segments");
       else {
         const BOLD = /bold|black/i;
+        // The tail is judged against Regular, not merely against "not bold". TEXTS.md states the target
+        // twice and unconditionally — `"Data source:" Bold unbound` + `" <citation>" Regular BOUND` — so
+        // a Medium, Light or Italic producer name is off-contract too, and a not-bold test certifies it.
+        const REGULAR = /^regular$/i;
         const weightAt = (i) => { const s = segs.find((x) => i >= x.start && i < x.end); return s && s.fontName ? s.fontName.style : null; };
         const prefixWeights = [...new Set([...Array(Math.min(PREFIX.length, src.characters.length)).keys()].map(weightAt).filter(Boolean))];
         const restWeights = [...new Set([...Array(Math.max(0, src.characters.length - PREFIX.length)).keys()]
           .map((k) => weightAt(k + PREFIX.length)).filter(Boolean))];
+        const offTail = restWeights.filter((w) => !REGULAR.test(w));
         const bad = [];
         if (!prefixWeights.length || !prefixWeights.every((w) => BOLD.test(w))) bad.push(`"${PREFIX}" is ${prefixWeights.join("/") || "unreadable"} (want Bold)`);
-        if (restWeights.some((w) => BOLD.test(w))) bad.push(`the producer name is ${restWeights.join("/")} — setting \`characters\` collapses the node to its FIRST run's style, which here is the bold prefix (GOTCHAS.md). Re-assert Regular across the whole string, then bold the prefix`);
+        if (offTail.some((w) => BOLD.test(w))) bad.push(`the producer name is ${restWeights.join("/")} — setting \`characters\` collapses the node to its FIRST run's style, which here is the bold prefix (GOTCHAS.md). Re-assert Regular across the whole string, then bold the prefix`);
+        else if (offTail.length) bad.push(`the producer name is ${restWeights.join("/")}, and TEXTS.md prescribes Regular — re-assert it across the tail. If a template genuinely ships ${offTail.join("/")} there, measure it and record it in TEXTS.md rather than loosening this row`);
         add("source-line-weight", bad.length ? "FAIL" : "ok",
             bad.length ? bad.join("; ") : `"${PREFIX}" bold, producer name ${restWeights.join("/") || "empty"}`,
             { prefixWeights, restWeights });

@@ -98,9 +98,10 @@ function buildFrame(opts = {}) {
     x: 16, y: 16, width: contentW, height: 92, children: [title, subtitle] });
   // "Data source: X" — the prefix is chars 0-12, the producer name 12-14. `boldSource` models the
   // real defect: assigning `characters` collapses the node to its first run's style, so the bold
-  // prefix takes the producer name with it.
+  // prefix takes the producer name with it. `sourceTailWeight` sets the tail to any other weight,
+  // for the off-contract-but-not-bold cases a not-bold test would wave through.
   const src = text("source", "Data source: X", 13, 16, 488, contentW, 16, undefined, {
-    segments: { fontName: opts.boldSource ? [["Bold", 0, 14]] : [["Bold", 0, 12], ["Regular", 12, 14]] },
+    segments: { fontName: opts.boldSource ? [["Bold", 0, 14]] : [["Bold", 0, 12], [opts.sourceTailWeight || "Regular", 12, 14]] },
   });
   const footer = node({ name: "footer", layoutMode: "VERTICAL", x: 16, y: 488, width: contentW, height: 36, children: [src] });
   const logo = node({ name: "logo", x: W - 80, y: 16, width: 64, height: 35 });
@@ -608,6 +609,13 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const bad = await run(buildFrame({ boldSource: true }), {});
     check("18e a wholly-bold source line FAILS", row(bad, "source-line-weight").status === "FAIL", row(bad, "source-line-weight").detail);
     check("18e and names the collapse that causes it", /FIRST run/.test(row(bad, "source-line-weight").detail), row(bad, "source-line-weight").detail);
+    // Not-bold is not the bar: the contract is Regular, so the weights BETWEEN Regular and Bold have
+    // to fail too, or a tail nudged to Medium/Light/Italic gets certified.
+    for (const w of ["Medium", "Light", "Italic"]) {
+      const off = await run(buildFrame({ sourceTailWeight: w }), {});
+      check(`18e a ${w} producer name FAILS`, row(off, "source-line-weight").status === "FAIL", row(off, "source-line-weight").detail);
+      check(`18e and says Regular is what ${w} owes`, /prescribes Regular/.test(row(off, "source-line-weight").detail), row(off, "source-line-weight").detail);
+    }
   }
 
   // 19 — the unimplemented half of the hierarchy is declared, not certified.
