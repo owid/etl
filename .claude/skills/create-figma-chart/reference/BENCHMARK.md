@@ -23,8 +23,13 @@ own result.
 
 ## Fixed conditions
 
-- The yearly **Charts (YYYY)** file, a new page as Step 4 specifies. **Do not delete the page
-  afterwards** — this run produces something real; that is the point of choosing it.
+- The yearly **Charts (YYYY)** file, a new page as Step 4 specifies. **The page is disposable —
+  delete it once the numbers are recorded**, unless someone actually wants the chart. It is a
+  shared design file, and a benchmark that leaves a page behind on every run silts it up. (The
+  first run's page was dropped straight after; nothing was lost, which is the proof.)
+- **So the benchmark's output cannot be the page.** Everything worth keeping — the timings, the
+  call counts, the defects found — is recorded below and lives outside Figma. If a finding only
+  exists as something you can see on the page, it has not been recorded yet.
 - Run it as a normal build, checkpoint rule included. The approval pause is part of the cost.
 - Note which render path was available: the desktop reader is quota-limited and cannot see
   just-written frames, so a build normally runs entirely on the hosted connector (GOTCHAS.md).

@@ -9,17 +9,13 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > **50,000 characters** and the file is **~84,000**, so the instruction below is not executable
 > verbatim — a run that pastes it is rejected. Emit it stripped instead:
 >
-> ```bash
-> .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js
-> ```
->
-> That returns ~48,000 characters of comment-free source, which fits and still parses (the helper is
-> context-aware, so URLs, regex literals and template strings survive; `--check` sizes every script
-> and fails if one overflows).
->
-> **Better: run it in slices, which is what `--rows` is for.** 48,000 chars is 97% of the cap and
-> still has to be relayed verbatim, where a one-character corruption yields a *wrong verdict* rather
-> than an error. The rows are grouped, each slice carries the shared preamble and runs on its own:
+> **Run it in slices — that is the supported path, and the only one.** Stripping the comments does
+> get it to ~48,000 characters, which parses (the helper is context-aware, so URLs, regex literals
+> and template strings survive). But 48,000 is **97% of the cap**, and all of it has to be relayed
+> verbatim, where a one-character corruption yields a *wrong verdict* rather than an error — the
+> exact failure this gate exists to catch. So `inline_script.py verify_page.js` with no `--rows`
+> now **refuses and exits 1**, naming the size and pointing here; `--whole` overrides it if you
+> genuinely mean to. The rows are grouped, each slice carries the shared preamble and runs alone:
 >
 > ```bash
 > .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js --list-rows
@@ -195,6 +191,26 @@ trap in Gotchas — measure it on the 4× clone, not the 540px preview) and `ink
 the margins", which reads the true extent of everything that paints. Run against a stock 540 frame,
 `ink-box` returns `[16, 16, 524, 524]` — the content band this file specifies — with the background
 inferred rather than declared.
+
+**Use them as a pair, and here is the pair settling a real case.** Run on a *shipped* page — the
+population-growth DI — `ink-box` came back `[16, 16, 527, 524]`: ink reaching **527** against a band
+that ends at **524**. On its own that is ambiguous, because antialiasing along a mark's edge also
+registers as ink. So ask `contrast` what the ink in that strip actually is:
+
+```bash
+measure_pixels.py ink-box  --png frame.png --region 524,0,540,540 --background '#ffffff'
+measure_pixels.py contrast --png frame.png --region 524,0,540,540 --background '#ffffff'
+```
+
+34 ink pixels, 3px wide by 76px tall, **peak contrast 6.79:1** — that is the annotation gray at full
+strength, not a fringe (the fringe is there too, and shows as the 1.78 median). So it is real ink: the
+tail of a curvy arrow whose `absoluteBoundingBox` reaches **536.8**, overrunning the right content
+edge. `verify_page.js`'s `margins` row flags the same thing more harshly, since it measures the box
+rather than the ink.
+
+The generalisable part is the division of labour: **`ink-box` finds the overrun, `contrast` rules out
+the artefact.** A margin verdict from either alone is a guess — one cannot tell ink from fringe, the
+other does not know where the band is.
 
 **Don't diff either mask against the whole render — that hides the overlap you are testing for.** Whichever node paints on top covers part of the other, and hiding the *covered* one changes nothing in those pixels, so a mask taken from `full` comes back with a hole exactly where the two shapes meet. An arrowhead sitting on the end of its line then measures its `minGap` to the nearest still-*exposed* line pixel and reports a comfortable 3–7px with `touching == 0` while the two are plainly overlapping — the one verdict this check exists to prevent. Diffing from the other-hidden pass costs one extra screenshot and is symmetric, so it holds whichever node is on top.
 
