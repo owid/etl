@@ -30,10 +30,12 @@ For agent sessions running in a Claude Code cloud sandbox
   needs the `R2_*` variables (in 1Password — never scrape credentials elsewhere).
 
 - **On `admin.owid.io`, only the *authenticated* routes fail.** Cloudflare Access
-  `302`s `/admin/*` and authenticated `/api/*` to a login page — an app-layer
-  redirect, so `recentRelayFailures` stays empty and there are no credentials
-  worth hunting for. Routes the app serves unauthenticated do work: measured from
-  a sandbox, `GET /api/narrative-chart-map` returns its full name→uuid map, while
+  rejects non-browser clients, `302`-ing `/admin/*` and authenticated `/api/*` to
+  a login page — an app-layer redirect, so `recentRelayFailures` stays empty and
+  there are no credentials worth hunting for. It follows that the user can open
+  one of these in their browser when you cannot: ask them to paste rather than
+  concluding the endpoint is broken. Routes the app serves unauthenticated do
+  work: measured from a sandbox, `GET /api/narrative-chart-map` returns its full name→uuid map, while
   `/admin/api/charts/<id>.config.json`, `/api/figma/image` and `POST /api/images`
   all redirect. Test the specific route before concluding the host is closed.
 
@@ -71,8 +73,13 @@ For agent sessions running in a Claude Code cloud sandbox
   it never touches the egress proxy, and measured against a local session the
   sandbox is about **twice as fast per screenshot** (Figma `get_screenshot`, 60
   calls here: median 8.8 s against 12.5–20.5 s locally — the only tool timed in
-  both, so read it as the shape of the cost, not a per-tool constant). What a sandbox pays instead is the **turn** around
-  each call — a ~12 s median, against 2–4 s on a light local turn — so a skill
+  both, so read it as the shape of the cost, not a per-tool constant). Every local
+  run was taken with Figma's **desktop app open**, which is the visible asymmetry
+  against a sandbox and the reason a local desktop-app bridge is the suspect for
+  the gap; nobody has re-run it with the app quit, so that is a condition of the
+  local figure rather than a property of local sessions. What a
+  sandbox pays instead is the **turn** around each call — a ~12 s median, against
+  2–4 s on a light local turn — so a skill
   making hundreds of MCP calls is won or lost on batching: issue independent
   calls in one message, 4–6 at a time. Ten reps of a fixed six-call probe on each
   side put that at **≈4.0× in both** (cloud 4.00×, local 3.84×), so batching is
@@ -81,8 +88,9 @@ For agent sessions running in a Claude Code cloud sandbox
   `first call + rate × (n−1)` — 9.2 s + 0.75 s here, 11.7 s + 2.1 s locally —
   so the sandbox is near-parallel while a local session pipelines. Net effect
   once you batch: both environments land near 4.2 s per call, and the gap that
-  shows up unbatched (where local is ~1.4× faster) closes. Two smaller taxes, and these *are* sandbox-specific: HTTP GETs
-  to OWID and CDN hosts pay 0.6–2.3 s of proxy overhead each where a local
+  shows up unbatched (where local is ~1.4× faster) closes. Two smaller taxes,
+  and these *are* sandbox-specific: HTTP GETs to OWID and CDN hosts pay
+  0.6–2.3 s of proxy overhead each where a local
   session sees 0.05–0.3 s (parallelize batches with `xargs -P`), and MCP tool
   schemas arrive deferred, so load the ones a run needs in a single `ToolSearch`
   instead of one per turn.

@@ -39,7 +39,7 @@ it, so say which at delivery. [cloud-sandbox.md](../../docs/cloud-sandbox.md) ha
 fallbacks for chart config.
 
 `get_screenshot` is *not* slower in a cloud session — measured, it is about **twice as fast** there
-(7.8–9.9 s against 12.5–20.5 s locally; it is the only tool timed in both). What a cloud session pays
+(7.8–9.9 s against 12.5–20.5 s locally with Figma's desktop app open; the only tool timed in both). What a cloud session pays
 instead is the **turn** around each call: ~12 s against 2–4 s. So the **Round-trip budget** below is
 where a slow cloud run is won or lost, and batching is what wins it.
 
@@ -125,7 +125,7 @@ consecutive calls) against **2–4 s on a light local turn**, so in the cloud th
 four times the `use_figma` call it wraps. Budget a run as **turns × (turn + call)**, both terms read
 off the environment. An unbatched cloud screenshot costs ~20 s, so 120–190 calls come to **~50
 minutes** with nothing overlapping. Nothing
-else is close: not the SVG exports (0.05–0.3 s locally, 0.9–2.6 s through a sandbox's egress proxy)
+else is close: not the SVG exports (0.05–0.3 s locally, 0.9–2.6 s through a sandbox's egress proxy, under 2 s for a whole run locally)
 and not the response payloads (~1.5 KB per `use_figma`).
 
 **What a build should cost, to calibrate against mid-run:** ~14 Figma calls per template — measured
@@ -142,15 +142,15 @@ and paid for it (see the ceiling below).
 **A batch's wall clock is `first call + rate × (n−1)`**, and both terms are environment-specific:
 **9.2 s + 0.75 s** per extra call in a cloud session, **11.7 s + 2.1 s** locally (ten reps a side;
 predicts 12.9 s and 22.2 s against measured 13.2 s and 22.3 s). That is the stopping rule, and it
-says the two environments batch differently, not just slower: in the cloud the completions finish in
+says the environments batch differently, not just slower: in the cloud the completions finish in
 a *narrower* spread than they were dispatched in — near-true parallelism — while locally they
-pipeline, each call ending ~2.1 s after the one before. Two consequences. Batching a *cheap* call
+pipeline, each call ending ~2.1 s after the last. Batching a *cheap* call
 wins less, because the dispatch stagger is then a large share of the wall (six `use_figma` at ~4 s
-managed only 2.63×). And `sum/wall` is not the honest gain: locally it flatters batching, since a
+managed only 2.63×). `sum/wall` is also not the honest gain: locally it flatters batching, since a
 queued call's duration includes its wait (~3.2× against a serial baseline, not 3.84×); in the cloud
 it understates it (4.19× against 4.00×).
 
-Reads fan out freely — **including reads that each switch pages**, which is what makes the Step 5 and Step 8c rows below safe: two concurrent calls, one holding `Cover` and one the Templates page for three seconds with 7.7 s of overlap, each saw only its own page, so `figma.currentPage` is per-call. It is concurrent *mutation* of one page that races, not the switch. **Writes only when they target different pages** — a script may switch pages only once, so two `use_figma` writes aimed at the same page in one message race each other.
+Reads fan out freely — **including reads that each switch pages**, which makes the Step 5 and Step 8c rows below safe: two concurrent calls, one holding `Cover` and one the Templates page, overlapping for 7.7 s, each saw only its own — `figma.currentPage` is per-call. It is concurrent *mutation* of one page that races, not the switch. **Writes only when they target different pages** — a script may switch pages only once, so two `use_figma` writes aimed at the same page in one message race each other.
 
 What is independent — **the batch manifest, keyed by the step that owes it.** Issue each row's calls
 in one message, so batching is mechanical rather than a fresh judgment call every run:
