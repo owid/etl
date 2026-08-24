@@ -130,8 +130,9 @@ Every one of these caught a real defect on this skill's first run, and none of t
 
 **`scripts/measure_pixels.py` does the arithmetic — don't route the renders through your own eyes.**
 Every number below is computable from the PNGs, so looking at them costs a turn and an image each
-and is less accurate than the arithmetic. Download the three pair-specific renders (locally,
-`scripts/figma_desktop_read.py shot` gets them in one call), then:
+and is less accurate than the arithmetic. Get the three pair-specific renders onto disk — one
+screenshot per visibility state, and if you fetch URLs, in parallel with one output file each, or
+every `curl` overwrites the same PNG (GOTCHAS.md). Then:
 
 ```bash
 .venv/bin/python .claude/skills/create-figma-chart/scripts/measure_pixels.py arrow-gap \
@@ -143,6 +144,17 @@ and is less accurate than the arithmetic. Download the three pair-specific rende
 It masks each shape from the pass where the *other* was already hidden, reports `min_gap`,
 `touching_pairs` and `arrow_px`/`target_px`. Pass `--full` and it also reports what the discredited
 from-full masking would have said, and warns when that would have missed a real contact.
+
+**The desktop read path can serve these renders — but not in one call, and the difference bites.**
+`figma_desktop_read.py shot` toggles nothing: it screenshots the nodes you name in whatever state
+they are already in. So naming one frame three times returns the *same* render three times, and all
+three collide on one `<node>.png`, because the output name is derived from the node id.
+`measure_pixels.py` then reads identical PNGs, finds an empty mask and answers `UNMEASURABLE` with
+`arrow_px: 0, target_px: 0` — the guard holds, but the renders bought nothing. Each state is a
+hosted `use_figma` write, so the real sequence is **one write then one screenshot per state**, three
+times. Property writes to a page already open in the app do replicate, and this protocol is the
+measured case for that (GOTCHAS.md → the desktop MCP server, per-step verdict) — what does not
+exist is a single call that captures three states.
 
 **The exit code is the part to read, and it is the same for all three probes:**
 

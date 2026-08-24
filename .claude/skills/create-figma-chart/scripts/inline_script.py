@@ -17,8 +17,10 @@ slice carries the preamble and runs alone. Nothing was moved, so the harness sti
 file. `--list-rows` prints the groups with their sizes; `--frame-id` rewrites `CONFIG.frameId` so
 the output can go straight into the call.
 
-    inline_script.py verify_page.js --rows series --frame-id 26417:6
-    inline_script.py verify_page.js --rows type,series          # groups combine
+    .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js \
+        --rows series --frame-id 26417:6
+    .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js \
+        --rows type,series                                      # groups combine
 
 Stripping is context-aware, not a regex. These files contain `https://` inside strings, regex
 literals holding `/*`, and template literals spanning lines — a naive `//`-to-end-of-line strip
