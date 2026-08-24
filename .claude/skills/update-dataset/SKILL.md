@@ -57,7 +57,7 @@ Assumptions:
 - [ ] **Always suggest** the **optional** empty-entity audit (`check-empty-entities`) after all remaps — it sweeps every surface (charts, map `columnSlug`, MDim views, explorer views, narrative charts, gdoc `country=` references). Surfacing this offer to the user is **mandatory every run** (even when you recommend skipping it); only the *run* is opt-in — it can consume many tokens on widely-charted datasets, so run on user opt-in or when the remap touched many views; regressions vs production = fix, pre-existing = document (see step 7)
 - [ ] Update `update-context.yml` with published chart count and 1–3 chart views for the public announcement
 - [ ] Render Slack announcement via `data-updates-comms`, save to workbench, post `@codex review` as a separate PR comment, and notify user to post it to #data-updates-comms
-- [ ] Draft the public-facing "Data update" post for OWID /latest via `data-update-announcement` (Mode A) — two versions, user picks, then the Google Doc in /Data updates, and hand the user the link (not added to the PR)
+- [ ] Draft the public-facing "Data update" post for OWID /latest via `data-update-announcement` (Mode A) — two versions, user picks, then the Google Doc in /Data updates, and hand the user the link (not added to the PR). The skill declines when we posted about this data less than six months ago; a declined post is a **completed** item — record the eligible date, don't override
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
 - [ ] Run downstream-dependency check (`rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"`); for each consumer outside the dataset's own chain, decide with the user whether to bump in this PR or document under "Downstream dependencies" for a follow-up PR (see "Downstream dependency check" section below for details)
 - [ ] Run the silent-breakage check whenever downstream consumers were repointed in this PR: confirm the `buildkite/etl-automated-staging-environment` PR check is green (red = a consumer crashed on staging, and the report under-reports until it's fixed; `.venv/bin/etlr --modified --continue-on-failure --private` is the optional local equivalent for small fan-outs), then triage the data-diff report — every red "− lost N data point(s)" entry in its Top-changes list and every 🔴-tier dataset (see "Silent-breakage check" section) and run the full-report audit probes (structural / World / raw-country / >30% / wipe-vs-edge per loss)
@@ -706,6 +706,11 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
          - title: <chart title>
            slug: <chart slug>
            rationale: <why this represents the dataset>
+     announcement:
+       prior_posts: <list of {slug, type, published} for OWID posts already covering this data, or []>
+       last_public_post: <date of the most recent announcement or data-insight, or null>
+       eligible_from: <last_public_post + 6 months, or null if never posted>
+       decision: <drafted | declined (cooldown) | n/a>
      update_summary:
        snapshot_diff: <short summary or artifact path>
        meadow_diff: <short summary or artifact path>
@@ -770,6 +775,7 @@ For the **long-format with dimensions** sub-case specifically (e.g. one row per 
    - This is **separate from the Slack announcement** (step 9) — that one is a 10-field form for the internal channel; this one is a mini-blog-post for OWID readers, published on [https://ourworldindata.org/latest](https://ourworldindata.org/latest).
    - The skill drafts **two versions** for the user to choose between, saves the chosen one to `workbench/<short_name>/data-update.md`, and only then creates the Google Doc. Don't create the Doc yourself, and don't shortcut the sign-off — the Drive API can't edit or delete a Doc once created.
    - If the skill reports a missing fact, gather it (snapshot `.dvc`, garden `.meta.yml`, `url_main`), **persist it back** to `update-context.yml`, and re-run rather than inventing a value.
+   - **"No post" is a valid outcome, not a blocked task.** The skill checks what OWID has already published about this data and stops when the last announcement or data insight is less than six months old — a routine refresh of a frequently-updated dataset often lands inside that window. When it declines, record the prior post(s) and the eligible date under `announcement:` in `update-context.yml` and in the PR's open items, and move on; don't override it to get a draft. The Slack post (step 9) is unaffected — that one runs every update.
    - **Do not put the post in the PR at all** — no embed and no pointer. Like the Slack draft, it stays in `workbench/`.
 
 10) Codex review: address comments and resolve threads

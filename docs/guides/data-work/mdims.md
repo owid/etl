@@ -123,6 +123,20 @@ In this example, we note that we can group together indicators from any dataset.
 
     The one exception is a pin that **contradicts the config body** — e.g. pinned `005` while the config uses `chartTypes`, a field that only exists from `006` onwards (the 005→006 migration is what creates it). That is a stale pin rather than a record, and leaving it means Grapher runs migrations over a config they were never meant to touch. Correct such a pin to the version the config is actually written against.
 
+    **Pin it in one place only.** A view's own `config` may also carry a `$schema`, and Grapher lets that value *win* over the collection pin — while being far less visible, since it usually sits in a Python dict rather than on line 1 of the YAML. ETL logs a warning when a view shadows the collection pin; don't add new ones. If you need to know what version an MDIM actually declares, the collection pin is the answer unless that warning fires.
+
+    **The pin appears under three different names**, which is worth knowing before you go looking for it:
+
+    | Where | Key | Value |
+    |---|---|---|
+    | config YAML | `grapher_schema` | `"011"` |
+    | `export/multidim/…/<name>.config.json` | `grapher_schema` | `"011"` |
+    | Grapher DB / admin API payload | `grapherConfigSchema` | `https://…/grapher-schema.011.json` |
+
+    The generated JSON keeps the authored short form because `CollectionSet.read()` loads it back through `Collection.from_dict`; only the upsert payload is camelized and resolved to a full URL. So grepping the generated JSON for `grapherConfigSchema` finds nothing even when the pin is working perfectly.
+
+    Note also that while `DEFAULT_GRAPHER_SCHEMA` equals the version everything pins, a working pin and a dropped one look identical in the database. ETL logs a warning when a collection falls back to the default, which is the signal to trust.
+
     This field is MDIM-only. Explorers reach Grapher through the legacy TSV path, which has no equivalent.
 
 !!! tip "Learn more about the structure of MDIMs in [:fontawesome-brands-github: their schema](https://github.com/owid/etl/blob/master/schemas/multidim-schema.json)"

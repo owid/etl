@@ -254,6 +254,14 @@
         "type": "string"
       }
     },
+    "inapplicableEntityNames": {
+      "type": "array",
+      "description": "Entities the indicator's data can't apply to by construction, e.g. Mexico for\n\"Where do Mexican emigrants live?\". On the map, they are excluded from the\ncolor scale and rendered in a dedicated pattern.\n",
+      "default": [],
+      "items": {
+        "type": "string"
+      }
+    },
     "selectedEntityColors": {
       "type": "object",
       "description": "Colors for selected entities",

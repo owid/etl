@@ -3,6 +3,9 @@ grapher_schema: "011"
 title:
   title: Internal displacement
   title_variant: ""
+topic_tags:
+  - Migration
+  - War & Peace
 
 default_selection:
   - World
@@ -287,7 +290,7 @@ views:
         colorScale:
           baseColorScheme: OrRd
           binningStrategy: manual
-          customNumericValues: [0, 10000, 30000, 100000, 300000, 1000000, 3000000, 0]
+          customNumericValues: [0, 10000, 30000, 100000, 300000, 1000000, 0]
           minValue: 1640
     metadata:
       description_key:

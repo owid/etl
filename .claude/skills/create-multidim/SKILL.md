@@ -123,10 +123,17 @@ The ETL has built-in change detection — if you modify the config, it will auto
 # (etl/config.py) when authoring a new MDIM, then leave it alone: Grapher migrates outdated
 # configs forward, but skips migration entirely when no version is given.
 grapher_schema: "011"
+# Never put `$schema` inside a view's `config` block: Grapher lets the view value override this
+# collection-level pin, so the two silently disagree. ETL warns when that happens.
 
 title:
   title: "Chart Title"
   title_variant: ""
+
+# REQUIRED — one or more topic tags (see "Topic tags" section below)
+topic_tags:
+  - tag 1
+  - tag 2
 
 default_selection:
   - World
@@ -180,7 +187,28 @@ views:
       subtitle: "Subtitle for males view"
 ```
 
-### Multi-indicator views (multiple lines on one chart)
+### Topic tags (required)
+
+Every multidim **must** declare at least one `topic_tags` entry — it's a top-level key in the config (right after `title`).
+
+```yaml
+topic_tags:
+  - tag 1
+  - tag 2
+```
+
+Rules:
+- Each entry must **exactly match** one of the valid tag names below (case- and spelling-sensitive, e.g. `War & Peace`, not `war and peace`).
+- The **first** tag is the primary topic — order it deliberately.
+- Reuse the tags of the charts/topic the mdim is built from; a new mdim rarely needs a brand-new tag.
+
+Valid topic tags (from `topic_tags` in `schemas/dataset-schema.json`):
+
+The schema enum is a static snapshot; if a tag seems missing, the canonical live list is this [Datasette query](https://datasette-public.owid.io/owid?sql=SELECT%0D%0A++DISTINCT+t.name%0D%0AFROM%0D%0A++tag_graph+tg%0D%0A++LEFT+JOIN+tags+t+ON+tg.childId+%3D+t.id%0D%0A++LEFT+JOIN+posts_gdocs+p+ON+t.slug+%3D+p.slug%0D%0A++AND+p.published+%3D+1%0D%0A++AND+p.type+IN+%28%27article%27%2C+%27topic-page%27%2C+%27linear-topic-page%27%29%0D%0AWHERE%0D%0A++p.slug+IS+NOT+NULL%0D%0AUNION%0D%0ASELECT%0D%0A++%27Uncategorized%27%0D%0AORDER+BY%0D%0A++t.name).
+
+`Access to Energy`, `Age Structure`, `Agricultural Production`, `Air Pollution`, `Alcohol Consumption`, `Animal Welfare`, `Antibiotics & Antibiotic Resistance`, `Artificial Intelligence`, `Biodiversity`, `Books`, `Burden of Disease`, `CO2 & Greenhouse Gas Emissions`, `COVID-19`, `Cancer`, `Cardiovascular Diseases`, `Causes of Death`, `Child & Infant Mortality`, `Child Labor`, `Clean Water`, `Clean Water & Sanitation`, `Climate Change`, `Corruption`, `Crop Yields`, `Democracy`, `Diarrheal Diseases`, `Diet Compositions`, `Economic Growth`, `Economic Inequality`, `Economic Inequality by Gender`, `Education Spending`, `Electricity Mix`, `Employment in Agriculture`, `Energy`, `Energy Mix`, `Environmental Impacts of Food Production`, `Eradication of Diseases`, `Famines`, `Farm Size`, `Fertility Rate`, `Fertilizers`, `Fish & Overfishing`, `Food Prices`, `Food Supply`, `Foreign Aid`, `Forests & Deforestation`, `Fossil Fuels`, `Gender Ratio`, `Global Education`, `Global Health`, `Government Spending`, `HIV/AIDS`, `Happiness & Life Satisfaction`, `Healthcare Spending`, `Homelessness`, `Homicides`, `Housing`, `Human Development Index (HDI)`, `Human Height`, `Human Rights`, `Hunger & Undernourishment`, `Illicit Drug Use`, `Indoor Air Pollution`, `Influenza`, `Internet`, `LGBT+ Rights`, `Land Use`, `Lead Pollution`, `Life Expectancy`, `Light at Night`, `Literacy`, `Loneliness & Social Connections`, `Malaria`, `Marriages & Divorces`, `Maternal Mortality`, `Meat & Dairy Production`, `Medicine & Biotechnology`, `Mental Health`, `Metals & Minerals`, `Micronutrient Deficiency`, `Migration`, `Military Personnel & Spending`, `Mpox (monkeypox)`, `Natural Disasters`, `Neglected Tropical Diseases`, `Nuclear Energy`, `Nuclear Weapons`, `Obesity`, `Oil Spills`, `Outdoor Air Pollution`, `Ozone Layer`, `Pandemics`, `Pesticides`, `Plastic Pollution`, `Pneumonia`, `Polio`, `Population Growth`, `Poverty`, `Religion`, `Renewable Energy`, `Research & Development`, `Sanitation`, `Smallpox`, `Smoking`, `Space Exploration & Satellites`, `State Capacity`, `Suicides`, `Taxation`, `Technological Change`, `Terrorism`, `Tetanus`, `Time Use`, `Tourism`, `Trade & Globalization`, `Transport`, `Trust`, `Tuberculosis`, `Uncategorized`, `Urbanization`, `Vaccination`, `Violence Against Children & Children's Rights`, `War & Peace`, `Waste Management`, `Water Use & Stress`, `Wildfires`, `Women's Employment`, `Women's Rights`, `Work & Employment`, `Working Hours`
+
+
 
 When a view should show several indicators as separate lines:
 
