@@ -156,6 +156,29 @@ def test_mismatched_full_render_is_unmeasurable(tmp: Path) -> None:
     check("oversized full exits 2", code, 2)
 
 
+def test_negative_bounds_are_refused(tmp: Path) -> None:
+    print("a box padded past the top-left must be refused, not indexed from the opposite edge")
+    s = scene(tmp, arrow_x=20, target_x=26)
+    code, _ = run(
+        "arrow-gap",
+        "--no-arrow",
+        s["no_arrow"],
+        "--no-target",
+        s["no_target"],
+        "--no-both",
+        s["no_both"],
+        "--crop",
+        "-5,0,50,30",
+    )
+    check("arrow-gap exits 2", code, 2)
+    # contrast used to raise from argmax() on the empty crop rather than report it.
+    code, _ = run("contrast", "--png", s["full"], "--region", "-5,0,50,30")
+    check("contrast exits 2", code, 2)
+    # ink-box used to answer EMPTY with exit 0 — a "nothing in the margins" pass over zero pixels.
+    code, _ = run("ink-box", "--png", s["full"], "--region", "0,-5,50,30")
+    check("ink-box exits 2", code, 2)
+
+
 def test_empty_mask_is_unmeasurable(tmp: Path) -> None:
     print("a crop containing neither shape must not read as a clean pass")
     s = scene(tmp, arrow_x=20, target_x=26)
@@ -319,6 +342,7 @@ def main() -> int:
             test_clear_arrow,
             test_overlap_is_caught,
             test_mismatched_full_render_is_unmeasurable,
+            test_negative_bounds_are_refused,
             test_empty_mask_is_unmeasurable,
             test_bbox_guard,
             test_gray_target_would_defeat_color_classification,

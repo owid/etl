@@ -56,13 +56,24 @@ def load(path: Path) -> np.ndarray:
     return np.asarray(img.convert("RGB"), dtype=np.uint8)
 
 
+def unmeasurable(message: str) -> SystemExit:
+    """Exit 2, never 1: the measurement did not happen, which must not read as a failed check."""
+    print(message, file=sys.stderr)
+    return SystemExit(2)
+
+
 def parse_box(spec: str, what: str) -> tuple[int, int, int, int]:
     try:
         x0, y0, x1, y1 = (int(round(float(v))) for v in spec.split(","))
     except ValueError:
-        raise SystemExit(f"{what} must be x0,y0,x1,y1 — got {spec!r}")
+        raise unmeasurable(f"{what} must be x0,y0,x1,y1 — got {spec!r}")
     if x1 <= x0 or y1 <= y0:
-        raise SystemExit(f"{what} is empty: {spec!r}")
+        raise unmeasurable(f"{what} is empty: {spec!r}")
+    # A negative origin is the one out-of-range case numpy does not complain about: it indexes from
+    # the far edge instead, so padding a bbox past the top-left silently measures the wrong pixels
+    # (or none — an empty crop reads as "no ink here", which is a pass).
+    if x0 < 0 or y0 < 0:
+        raise unmeasurable(f"{what} starts outside the render: {spec!r} — clamp the padded box to 0")
     return x0, y0, x1, y1
 
 
@@ -74,7 +85,7 @@ def as_hex(rgb: np.ndarray) -> str:
 def parse_hex(value: str) -> np.ndarray:
     h = value.lstrip("#")
     if len(h) != 6:
-        raise SystemExit(f"--background must be a 6-digit hex color — got {value!r}")
+        raise unmeasurable(f"--background must be a 6-digit hex color — got {value!r}")
     return np.array([int(h[i : i + 2], 16) for i in (0, 2, 4)], dtype=np.int16)
 
 
