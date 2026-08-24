@@ -94,12 +94,14 @@ For agent sessions running in a Claude Code cloud sandbox
   local gain is 2.8–3.2×, and the figures are comparable to each other rather than
   to a stopwatch. And all of it is `get_screenshot`: batching `use_figma` does not
   compress server time at all (0.8–1.1× on the calls, since a Figma file runs plugin
-  scripts one at a time) and pays only by collecting the turn gaps — which is still
-  worth doing where a turn costs 12 s. A batch's wall is
+  scripts one at a time) and pays only by collecting the turn gaps — still worth
+  doing, and worth *more* in a sandbox, where a 0.70 s call leaves the turn ~80% of
+  the cost against ~46% locally. A batch's wall is
   `first call + rate × (n−1)` — 9.2 s + 0.75 s here, 11.7 s + 2.1 s locally —
-  so the sandbox is near-parallel while a local session pipelines. Net effect
-  once you batch: both environments land near 4.2 s per call, and the gap that
-  shows up unbatched (where local is ~1.4× faster) closes. One smaller tax
+  so the sandbox is near-parallel while a local session pipelines. Net effect: the
+  sandbox is the faster side either way, and batching *widens* the gap rather than
+  closing it — at one turn per call it is 11.6 s against 17.6 s (1.5×), and at one
+  turn per six-call batch 2.7 s against 4.4 s per call (1.6×). One smaller tax
   *is* sandbox-specific: HTTP GETs to OWID and CDN hosts pay
   0.6–2.3 s of proxy overhead each where a local
   session sees 0.05–0.3 s (parallelize batches with `xargs -P`). One is not —

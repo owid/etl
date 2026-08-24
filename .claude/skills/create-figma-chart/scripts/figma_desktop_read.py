@@ -72,7 +72,14 @@ def rpc(payload: dict, session: str | None = None) -> dict:
         ) from exc
     # Strip SSE framing: the JSON payload is spread over the "data: " lines.
     data = "".join(line[6:] for line in body.splitlines() if line.startswith("data: "))
-    return json.loads(data) if data else {}
+    # A notification gets no reply at all, so an empty body is normal; a top-level `error` is not.
+    reply = json.loads(data) if data else {}
+    if isinstance(reply, dict) and reply.get("error"):
+        err = reply["error"]
+        detail = err.get("message", err) if isinstance(err, dict) else err
+        code = err.get("code", "?") if isinstance(err, dict) else "?"
+        raise SystemExit(f"the Figma desktop MCP server returned JSON-RPC error {code}: {detail}")
+    return reply
 
 
 def connect() -> str | None:
@@ -151,7 +158,10 @@ def meta(node: str | None) -> int:
     if node:
         args["nodeId"] = node
     reply = call_tool("get_metadata", args, 200, session)
-    result = reply.get("result", {})
+    if "result" not in reply:
+        print(f"FAILED no result in the server's reply: {reply}", file=sys.stderr)
+        return 1
+    result = reply["result"]
     text = result_text(result)
     if result.get("isError"):
         print(f"FAILED {text.strip()}", file=sys.stderr)

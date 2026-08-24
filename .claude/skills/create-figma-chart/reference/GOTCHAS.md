@@ -44,7 +44,7 @@
   another. Client-side overlap is not server-side concurrency — the calls all show as in flight
   while the file's single plugin context runs them one at a time. So a batch's `sum/wall` (2.0–2.6×)
   is pure artifact: the honest figure straddles 1.0×, meaning **the server time does not compress at
-  all**. The budget's `2.63×` for six `use_figma` is that same `sum/wall` illusion.
+  all**.
 
   Two runs, four batches, and the spread is worth reading honestly: 0.82× and 0.83× and 0.83× against
   one 1.05×. The high one was the *second* batch of its session and opened with a 3.83 s call where
@@ -54,9 +54,10 @@
   **This does not mean stop batching writes** — a call costs the turn *and* the hop, and only the hop
   serializes, so batching still collects every turn gap. Measured end to end including turns: four
   calls one per message took **29.89 s** against **16.67 s** batched, **1.79×**, on a session whose
-  turns ran 3.7 s. In a cloud session at ~12 s a turn the turn is most of the cost, so batching
-  should pay *more* there, not less — the serialization is a property of the file's plugin context and
-  would not change. What does change is the stopping rule: an extra `use_figma` in a batch costs
+  turns ran 3.7 s. In a cloud session the turn is an even larger share of the cost — because the
+  *call* is cheap there, not because the turn is dear — so batching pays *more*, which the block
+  below now measures at **2.26×**. The serialization is a property of the file's plugin context and
+  does not change. What does change is the stopping rule: an extra `use_figma` in a batch costs
   roughly a **whole call** (measured 4.10 s against a 4.37 s serial mean, within 6%), not the
   0.75–2.1 s an extra `get_screenshot` costs. So collapsing work into one bigger script — which is
   free, script size doesn't move the latency — beats spreading it across a batch every time.
