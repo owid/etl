@@ -85,7 +85,13 @@ For agent sessions running in a Claude Code cloud sandbox
   calls in one message, 4–6 at a time. Ten reps of a fixed six-call probe on each
   side put that at **≈4.0× in both** (cloud 4.00×, local 3.84×), so batching is
   environment-neutral even though the calls are not: cloud median 8.75 s per
-  screenshot and 13.1 s per batch, local 13.91 s and 22.5 s. A batch's wall is
+  screenshot and 13.1 s per batch, local 13.91 s and 22.5 s. **Those are `sum/wall`,
+  which counts a queued call's own wait as work** — against a serial arm the honest
+  local gain is 2.8–3.2×, and the figures are comparable to each other rather than
+  to a stopwatch. And all of it is `get_screenshot`: batching `use_figma` does not
+  compress server time at all (0.8–1.1× on the calls, since a Figma file runs plugin
+  scripts one at a time) and pays only by collecting the turn gaps — which is still
+  worth doing where a turn costs 12 s. A batch's wall is
   `first call + rate × (n−1)` — 9.2 s + 0.75 s here, 11.7 s + 2.1 s locally —
   so the sandbox is near-parallel while a local session pipelines. Net effect
   once you batch: both environments land near 4.2 s per call, and the gap that
