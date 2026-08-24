@@ -66,14 +66,14 @@ def _fetch_single_indicator_config(chart_config: dict, indicator_mapping: dict[i
     variable_id = indicator_mapping.get(candidates[0]["variableId"], candidates[0]["variableId"])
 
     df = read_sql(
-        "SELECT cc.full FROM variables v JOIN chart_configs cc ON cc.id = v.grapherConfigIdETL WHERE v.id = %(vid)s",
+        "SELECT cc.config FROM variables v JOIN chart_configs cc ON cc.id = v.patchConfigIdETL WHERE v.id = %(vid)s",
         engine=get_engine(),
         params={"vid": int(variable_id)},
     )
     if df.empty:
         return {}
-    full = df.iloc[0]["full"]
-    return json.loads(full) if isinstance(full, (str, bytes)) else full
+    config = df.iloc[0]["config"]
+    return json.loads(config) if isinstance(config, (str, bytes)) else config
 
 
 def _fetch_dimension_display_baselines(chart_config: dict, indicator_mapping: dict[int, int]) -> dict[int, dict] | None:
@@ -113,11 +113,13 @@ def _update_single_chart(
         get_schema_from_url(chart.config["$schema"]),
         indicator_config=_fetch_single_indicator_config(chart.config, indicator_mapping),
         dimension_display_baselines=_fetch_dimension_display_baselines(chart.config, indicator_mapping),
-        # chart.config is chart_configs.full (the fully resolved config, inherited values
-        # included) -- pass the real stored patch too so inheritance pruning can tell
-        # "genuinely explicit" apart from "just showing through via inheritance from the
-        # old indicator" (see ChartIndicatorUpdater.run's original_patch docstring).
-        original_patch=chart.chart_config.patch,
+        # chart.config is the resolved config (chart_configs.config for the row named by
+        # charts.configId, inherited values included) -- pass the authored layer too so
+        # inheritance pruning can tell "genuinely explicit" apart from "just showing through
+        # via inheritance from the old indicator" (see ChartIndicatorUpdater.run's
+        # original_patch docstring). The authored layer is its own chart_configs row, named
+        # by charts.patchConfigId.
+        original_patch=chart.patch_config.config,
     )
 
     # Get chart ID
@@ -272,18 +274,18 @@ def _load_patches_and_parent_configs(
     parent_configs: dict[int, dict] = {}
     if nc_ids:
         df = read_sql(
-            "SELECT nc.id, cc.patch FROM narrative_charts nc JOIN chart_configs cc ON cc.id = nc.chartConfigId "
+            "SELECT nc.id, cc.config FROM narrative_charts nc JOIN chart_configs cc ON cc.id = nc.patchConfigId "
             f"WHERE nc.id IN ({','.join(str(int(i)) for i in nc_ids)})",
             engine=get_engine(),
         )
-        patches = {int(row["id"]): to_dict(row["patch"]) for _, row in df.iterrows()}
+        patches = {int(row["id"]): to_dict(row["config"]) for _, row in df.iterrows()}
     if parent_ids:
         df = read_sql(
-            "SELECT c.id, cc.full FROM charts c JOIN chart_configs cc ON cc.id = c.configId "
+            "SELECT c.id, cc.config FROM charts c JOIN chart_configs cc ON cc.id = c.configId "
             f"WHERE c.id IN ({','.join(str(int(i)) for i in parent_ids)})",
             engine=get_engine(),
         )
-        parent_configs = {int(row["id"]): to_dict(row["full"]) for _, row in df.iterrows()}
+        parent_configs = {int(row["id"]): to_dict(row["config"]) for _, row in df.iterrows()}
     return patches, parent_configs
 
 
