@@ -35,23 +35,37 @@
 
   | | per call | wall for 4 | against 4× serial |
   |---|---|---|---|
-  | one call per message (n=5) | 3.49–5.75 s, mean **4.44 s** | 17.8 s | — |
-  | four in one message, run 1 | 9.33–17.71 s | **21.50 s** | **0.83×** |
-  | four in one message, run 2 (warm) | 9.64–17.36 s | **21.43 s** | **0.83×** |
+  | one call per message (n=11 over two runs) | 3.49–5.75 s, mean **4.4 s** | 17.5–17.8 s | — |
+  | four in one message — four such batches | 3.83–17.86 s | **16.67–21.50 s** | **0.82–1.05×** |
 
-  Four in flight every time, and the wall is almost exactly `4 × 4.44 s` plus overhead — the shape of
-  a queue, not of parallelism. Client-side overlap is not server-side concurrency: the calls all show
-  as in flight together while the file's single plugin context runs them one at a time, which is also
-  why a batch's `sum/wall` (2.5×) looks like a win when the honest number is a **17% loss**. The
-  budget's `2.63×` for six `use_figma` is that same `sum/wall` artifact.
+  Four in flight every time, and the wall is `4 × 4.4 s` plus overhead — the shape of a queue, not of
+  parallelism. **The completion timestamps are the proof:** inside a batch the calls finish one every
+  ~3.8–4.7 s, each gap a whole serial execution, having all been dispatched within ~4 s of one
+  another. Client-side overlap is not server-side concurrency — the calls all show as in flight
+  while the file's single plugin context runs them one at a time. So a batch's `sum/wall` (2.0–2.6×)
+  is pure artifact: the honest figure straddles 1.0×, meaning **the server time does not compress at
+  all**. The budget's `2.63×` for six `use_figma` is that same `sum/wall` illusion.
+
+  Two runs, four batches, and the spread is worth reading honestly: 0.82× and 0.83× and 0.83× against
+  one 1.05×. The high one was the *second* batch of its session and opened with a 3.83 s call where
+  the cold ones opened at ~9.6 s, so some of the loss is a one-off warm-up rather than a property of
+  batching. Do not read a reliable 17% penalty into it; read "no gain on the calls".
 
   **This does not mean stop batching writes** — a call costs the turn *and* the hop, and only the hop
-  serializes. Four calls one-per-message cost `4 × (4.4 + turn)`; batched they cost `21.4 + turn`, so
-  batching still wins wherever the turn is expensive (clearly in a cloud session at ~12 s a turn, and
-  even locally at 2–4 s). What changes is the stopping rule: an extra `use_figma` in a batch costs
-  roughly a **whole call**, not the 0.75–2.1 s an extra `get_screenshot` costs. So collapsing work
-  into one bigger script — which is free, script size doesn't move the latency — beats spreading it
-  across a batch every time. Untested: mutating scripts, heavier scripts, and cloud sessions.
+  serializes, so batching still collects every turn gap. Measured end to end including turns: four
+  calls one per message took **29.89 s** against **16.67 s** batched, **1.79×**, on a session whose
+  turns ran 3.7 s. In a cloud session at ~12 s a turn the turn is most of the cost, so batching
+  should pay *more* there, not less — the serialization is a property of the file's plugin context and
+  would not change. What does change is the stopping rule: an extra `use_figma` in a batch costs
+  roughly a **whole call** (measured 4.10 s against a 4.37 s serial mean, within 6%), not the
+  0.75–2.1 s an extra `get_screenshot` costs. So collapsing work into one bigger script — which is
+  free, script size doesn't move the latency — beats spreading it across a batch every time.
+
+  Two caveats on the numbers. A batched call's *own* duration is queue-inclusive, so only the fastest
+  call in a batch approximates real server time; and all of this is one file, hence one plugin
+  context — a batch spanning *different* files might genuinely parallelize, untested. Also untested:
+  mutating scripts, heavier scripts, and **cloud sessions** — two attempts to measure the cloud case
+  both turned out to be local sessions, so the cloud figure above is a prediction, not a measurement.
 
 - **`sum/wall` is not the speedup — measure a batch against a *serial arm run in the same session*.**
   A queued call's own duration includes the time it spent waiting, so summing the durations inside a

@@ -147,8 +147,8 @@ predicts 12.9 s and 22.2 s against measured 13.2 s and 22.3 s). That is the stop
 says the environments batch differently, not just slower: in the cloud the completions finish in
 a *narrower* spread than they were dispatched in — near-true parallelism — while locally they
 pipeline, each call ending ~2.1 s after the last. **All of this is `get_screenshot`; batching
-`use_figma` buys only the shared turn** — plugin runs serialize per file, 0.83× on the calls
-alone (GOTCHAS). `sum/wall` is also not the honest gain: locally it flatters batching, since a
+`use_figma` buys only the shared turn** — plugin runs serialize per file, 0.8–1.1× on the
+calls (GOTCHAS). `sum/wall` is also not the honest gain: locally it flatters batching, since a
 queued call's duration includes its wait (2.8–3.2× against a serial baseline, not 3.84×); in the cloud
 it understates it (4.19× against 4.00×).
 
