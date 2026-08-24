@@ -345,6 +345,28 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     check("6b and so does a fully transparent one",
           row(clear, "annotation-knockout").status === "FAIL" && /carries NO knockout/.test(row(clear, "annotation-knockout").detail),
           row(clear, "annotation-knockout").detail);
+    // 6b-2 — between the two. A knockout works by PAINTING the frame's colour over what it crosses,
+    //        so a nearly transparent one masks nothing while still passing the weight, alignment and
+    //        colour checks — a clean `ok` on a crossing the reader can see straight through. Zero is
+    //        the case above; anything positive is on the canvas but cannot be certified from here,
+    //        since how much it masks depends on what is behind it. REVIEW, with the number named.
+    const faintKO = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3, strokeOpacity: 0.005 }) }), {});
+    check("6b-2 a nearly transparent knockout is not certified",
+          row(faintKO, "annotation-knockout").status === "REVIEW", row(faintKO, "annotation-knockout").detail);
+    check("6b-2 and the effective opacity is named, not just flagged",
+          /0\.005|effective opacity/.test(row(faintKO, "annotation-knockout").detail), row(faintKO, "annotation-knockout").detail);
+    // The NODE's own opacity dims the knockout just as effectively as the paint's, and it is the half
+    // a paint-only read cannot see: this paint is fully opaque.
+    const dimAnn = annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 });
+    dimAnn.opacity = 0.4;
+    const dimKO = await run(buildFrame({ annotation: dimAnn }), {});
+    check("6b-2 a dimmed annotation node is not certified either",
+          row(dimKO, "annotation-knockout").status === "REVIEW", row(dimKO, "annotation-knockout").detail);
+    // The control: a fully opaque knockout still passes cleanly, or this becomes a row that always
+    // reviews and therefore says nothing.
+    const solidKO = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    check("6b-2 while an opaque knockout still passes",
+          row(solidKO, "annotation-knockout").status === "ok", row(solidKO, "annotation-knockout").detail);
     // ...and the COLOUR check must read the paint that renders, not strokes[0]
     const decoy = await run(buildFrame({ frameFill: "#fffbf5", annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#fffbf5", strokeWeight: 3, decoyStroke: "#ffffff" }) }), {});
     check("6b an invisible paint in front does not become the colour that is judged",

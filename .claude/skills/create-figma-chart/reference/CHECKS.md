@@ -6,14 +6,14 @@
 Every one of these caught a real defect on this skill's first run, and none of them is visible by looking at the frame. Run them as a pass, and report the numbers rather than "looks fine".
 
 > **⚠️ `verify_page.js` does not fit in a `use_figma` call as it ships.** The `code` argument caps at
-> **50,000 characters** and the file is **~116,000**, so the instruction below is not executable
+> **50,000 characters** and the file is **~117,000**, so the instruction below is not executable
 > verbatim — a run that pastes it is rejected. Emit it stripped instead:
 >
 > **Run it in slices — that is the supported path, and the only one.** Stripping the comments used to
 > get it *just* under the cap (the helper is context-aware, so URLs, regex literals and template
 > strings survive), and even then it sat at 97%, all of which has to be relayed verbatim — where a
 > one-character corruption yields a *wrong verdict* rather than an error, the exact failure this gate
-> exists to catch. It has since grown past the cap outright: **60,227 stripped**. So
+> exists to catch. It has since grown past the cap outright: **60,937 stripped**. So
 > `inline_script.py verify_page.js` with no `--rows` **refuses and exits 1**, naming the size and
 > pointing here, and `--whole` no longer overrides that — the cap is now a hard floor for this
 > script, not a judgement call. The rows are grouped, each slice carries the shared preamble:
@@ -28,18 +28,18 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 69% of cap |
 > | `series` | series-weight, furniture-weight, furniture-dash | 64% |
 > | `geometry` | box-alignment, gap, margins, off-palette | 59% |
-> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 75% |
+> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 76% |
 >
-> Groups combine, so the whole pass is two calls: `--rows type,series` (41,938) then
-> `--rows geometry,annotations` (42,617, **85% of cap** — the figure `inline_script.py --check`
+> Groups combine, so the whole pass is two calls: `--rows type,series` (41,960) then
+> `--rows geometry,annotations` (43,327, **87% of cap** — the figure `inline_script.py --check`
 > reports: it measures **these two calls**, declared as `DOCUMENTED_CALLS` in the script, rather
 > than the smallest split it could find for itself — an optimiser would go on reporting a
 > comfortable number by picking a split nobody is told to send. Change the pair here and there
 > together; `--check` fails if their groups no longer cover the file exactly once.
 > Read its **`floor`** column beside that percentage: `sent` is what today's two calls cost and can
 > always be bought down by re-splitting, while `floor` is the preamble plus the single largest row
-> group — the smallest any call can be, whatever the split. `verify_page.js` reads **85% sent against
-> a 75% floor**, so re-splitting still buys real room; when the floor itself passes the cap, slicing is
+> group — the smallest any call can be, whatever the split. `verify_page.js` reads **87% sent against
+> a 76% floor**, so re-splitting still buys real room; when the floor itself passes the cap, slicing is
 > exhausted and the only move left is splitting the script into separate files with their own
 > preambles. `--check` fails on that and warns past 85%.
 > **Run all four** — each reports its own rows and nothing else, so a group you skip is a group
@@ -140,6 +140,13 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > which switch is off and where, and the verdict reads `NOT CHECKED` — never "no mechanical row
 > failed". Unhide or reset the frame *and every group and section above it*, then re-run.
 >
+> **A translucent knockout is not certified.** An annotation's knockout works by painting the frame's
+> colour *over* what it crosses, so one at 0.005 masks nothing while still passing the weight,
+> alignment and colour checks — a clean `ok` on a crossing the reader can see straight through. Zero
+> is already "no knockout"; anything between is reported **REVIEW** with its effective opacity (paint
+> × node) named, because at 0.98 it masks fine and at 0.05 it does not, and which side of that a frame
+> is on depends on what sits behind the annotation.
+>
 > **Non-rendering means exactly zero, never a floor.** A node or paint at 0.005 does reach the canvas,
 > and a cutoff dropped its whole subtree from *every* row — an 8px label at 0.005 left `text-floor`
 > reporting that all of its ranges cleared the floor. Anything positive is **translucent**: held out of
@@ -172,7 +179,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 >
 > Validated by planting defects and confirming each row **fails**, twice over: 11 planted in Figma and
 > 11 caught, then a stubbed-figma harness ([`scripts/test_verify_page.js`](../scripts/test_verify_page.js),
-> `node` it after any edit) covering **272** assertions including the rows that are awkward to plant on a
+> `node` it after any edit) covering **276** assertions including the rows that are awkward to plant on a
 > real page. **A check that cannot fail is worse than no check**, so when you extend this script,
 > extend both passes with it.
 >

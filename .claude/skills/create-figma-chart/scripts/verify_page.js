@@ -336,7 +336,7 @@ const checkFrame = async (frameId) => {
                      styleId: n.textStyleId || "", box: rel(n), insidePlot, fill: tf, translucent: tfDim, mixedWeight, weights });
       }
     }
-    if (/^annotation__/.test(n.name)) annotations.push({ node: n, name: n.name, box: rel(n), type: n.type });
+    if (/^annotation__/.test(n.name)) annotations.push({ node: n, name: n.name, box: rel(n), type: n.type, opacity: nodeOpacity });
     if ("strokeWeight" in n && typeof n.strokeWeight === "number" && n.strokes && n.strokes.length) {
       // The stroke's COLOUR travels with it, picked the same way the knockout row picks one: the first
       // paint that actually RENDERS, not `strokes[0]`, which can be a switched-off or transparent decoy.
@@ -996,7 +996,7 @@ const checkFrame = async (frameId) => {
     if (!annotations.length) skip("annotation-knockout", "no annotation__* nodes on this frame");
     else if (!crossings) skip("annotation-knockout", "crossings not computed (no furniture and no readable polylines) — cannot decide the tier, so not judging the strokes either");
     else {
-      const bad = [];
+      const bad = [], unsure = [];
       for (const a of annotations) {
         const n = a.node;
         if (!("strokeWeight" in n) || typeof n.strokeWeight !== "number") continue;
@@ -1016,6 +1016,19 @@ const checkFrame = async (frameId) => {
           bad.push(`${a.name} crosses nothing yet carries a ${r(n.strokeWeight)}px knockout — an annotation over empty space takes no stroke and no frame`);
           continue;
         }
+        // A knockout works by PAINTING the frame's colour over what it crosses, so a translucent one
+        // does not do the job its 3px and OUTSIDE alignment are for: at 0.005 the crossing shows
+        // straight through, and the geometry checks below would still return ok. Zero is already
+        // handled above as no knockout at all; anything between is on the canvas but cannot be
+        // certified from here — how much it masks depends on what is behind it, which is the same
+        // question the palette refuses to guess at. So it is REVIEWED with the number named, rather
+        // than passed or failed: at 0.98 it masks fine, at 0.05 it does not, and this script cannot
+        // tell the reader which side of that they are on.
+        const knockoutAlpha = (a.opacity === undefined ? 1 : a.opacity)
+                              * (hasStroke && paint.opacity !== undefined ? paint.opacity : 1);
+        if (hasStroke && knockoutAlpha < 0.999) {
+          unsure.push(`${a.name} carries a knockout at effective opacity ${r(knockoutAlpha)} (paint x node), so it does not fully mask the ${crosses.length} thing(s) it crosses — a knockout paints the frame's colour OVER them, and a partly transparent one lets them through. Set it to 1, or judge this one by eye`);
+        }
         if (hasStroke && Math.abs(n.strokeWeight - 3) >= 0.05) {
           bad.push(`${a.name} knockout ${r(n.strokeWeight)}px (want 3)` + (n.strokeWeight < 1 ? " — sub-pixel means the stroke was set before a rescale()" : ""));
         }
@@ -1028,7 +1041,9 @@ const checkFrame = async (frameId) => {
           }
         }
       }
-      add("annotation-knockout", bad.length ? "FAIL" : "ok", bad.length ? bad.join("; ") : `all ${annotations.length} annotation(s) carry the tier their crossings require`);
+      add("annotation-knockout", bad.length ? "FAIL" : unsure.length ? "REVIEW" : "ok",
+          (bad.length ? bad.join("; ") : `all ${annotations.length} annotation(s) carry the tier their crossings require`)
+          + (unsure.length ? `. ${unsure.length} NOT certified: ${unsure.join("; ")}` : ""));
     }
   }
 
