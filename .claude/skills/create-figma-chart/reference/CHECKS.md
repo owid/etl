@@ -13,7 +13,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > get it *just* under the cap (the helper is context-aware, so URLs, regex literals and template
 > strings survive), and even then it sat at 97%, all of which has to be relayed verbatim — where a
 > one-character corruption yields a *wrong verdict* rather than an error, the exact failure this gate
-> exists to catch. It has since grown past the cap outright: **51,904 stripped**. So
+> exists to catch. It has since grown past the cap outright: **53,765 stripped**. So
 > `inline_script.py verify_page.js` with no `--rows` **refuses and exits 1**, naming the size and
 > pointing here, and `--whole` no longer overrides that — the cap is now a hard floor for this
 > script, not a judgement call. The rows are grouped, each slice carries the shared preamble:
@@ -25,13 +25,13 @@ Every one of these caught a real defect on this skill's first run, and none of t
 >
 > | group | rows | size |
 > |---|---|---|
-> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 53% of cap |
-> | `series` | series-weight, furniture-weight, furniture-dash | 47% |
-> | `geometry` | box-alignment, gap, margins, off-palette | 43% |
-> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 58% |
+> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 56% of cap |
+> | `series` | series-weight, furniture-weight, furniture-dash | 51% |
+> | `geometry` | box-alignment, gap, margins, off-palette | 46% |
+> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 62% |
 >
-> Groups combine, so the whole pass is two calls: `--rows type,series` (33,865) then
-> `--rows geometry,annotations` (34,294, **69% of cap** — the figure `inline_script.py --check`
+> Groups combine, so the whole pass is two calls: `--rows type,series` (35,473) then
+> `--rows geometry,annotations` (36,155, **72% of cap** — the figure `inline_script.py --check`
 > reports: it measures **these two calls**, declared as `DOCUMENTED_CALLS` in the script, rather
 > than the smallest split it could find for itself — an optimiser would go on reporting a
 > comfortable number by picking a split nobody is told to send. Change the pair here and there

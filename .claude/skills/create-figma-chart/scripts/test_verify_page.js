@@ -988,6 +988,32 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const dGhost = row(await run(ghost, {}), "colour-vision").detail;
     check("33 a fully transparent mark fill is not a palette colour",
           !/#12ab34/.test(dGhost) && /#4c6a9c/.test(dGhost), dGhost);
+    // PARTIAL opacity is the other half, and it is not the same case: the mark IS on the canvas, so it
+    // keeps its box and its other rows — but its colour is the raw paint, not the composite the reader
+    // sees, so auditing it asks about a colour that is not on the page. Held back and NAMED, since a
+    // silently shorter palette is a subset audit reported as a whole one.
+    const faded = buildFrame({ barSegment: true });
+    chartOf(faded).children.push(node({ type: "RECTANGLE", name: "bar__Faded", x: 300, y: 380,
+      width: 60, height: 40, fills: [Object.assign(solid("#12ab34")[0], { opacity: 0.5 })] }));
+    const dFaded = row(await run(faded, {}), "colour-vision").detail;
+    check("33 a translucent mark is held out of the palette",
+          !/#12ab34/.test(dFaded) && /#4c6a9c/.test(dFaded), dFaded);
+    check("33 and the held-back mark is named, not silently dropped",
+          /translucent/.test(dFaded) && /Faded/.test(dFaded), dFaded);
+    // NODE opacity dims every paint under it and accumulates down the tree, so a fully opaque leaf
+    // inside a half-opacity group is just as unreportable. Read off the leaf's own paint alone, this
+    // one looks perfectly measurable — which is why the group carries the opacity here, not the leaf.
+    const dimGroup = buildFrame({ barSegment: true });
+    chartOf(dimGroup).children.push(node({ name: "series__Muted", x: 300, y: 380, width: 60, height: 40,
+      opacity: 0.4, children: [node({ type: "RECTANGLE", name: "Rectangle 7", x: 300, y: 380,
+        width: 60, height: 40, fills: solid("#12ab34") })] }));
+    const dDim = row(await run(dimGroup, {}), "colour-vision").detail;
+    check("33 an ancestor's opacity disqualifies an opaque leaf's colour",
+          !/#12ab34/.test(dDim) && /translucent/.test(dDim), dDim);
+    // And the note must not fire on an ordinary opaque chart, or it becomes noise on every run.
+    const opaque = row(await run(buildFrame({ barSegment: true }), {}), "colour-vision").detail;
+    check("33 an opaque plot carries no translucency note",
+          !/translucent/.test(opaque) && /#4c6a9c/.test(opaque), opaque);
 
     // --- when --names is safe to emit. Rename EVERY qualifying mark, not one: the emitter keeps the
     // FIRST name per distinct hex, so renaming an arbitrary node can leave its colour already

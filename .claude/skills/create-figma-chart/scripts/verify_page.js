@@ -86,6 +86,20 @@ const hexOf = (f) => (f && f.type === "SOLID"
 // fix a mark that is not on the canvas.
 const renders = (p) => !!p && p.type === "SOLID" && p.visible !== false
                        && (p.opacity === undefined || p.opacity > 0.01);
+// PARTIAL opacity is a different problem from zero, and it is not solved by dropping the node: the mark
+// IS on the canvas, so it still has a box, still blocks an annotation, still needs its stroke weight
+// judged. What it does NOT have is a reportable COLOUR. `hexOf` returns the paint's raw RGB, and what
+// the reader sees is that RGB composited onto whatever is behind it — LABELING.md works the same sum
+// the other way round and measures the gap as `#ecebe8` against `#fbf9f3`, "close enough to look
+// deliberate and wrong enough to see". Auditing the raw value asks color_audit.py about a colour that
+// is not on the page: its deltaE and grayscale verdicts, and any `--suggest` replacement, are then all
+// answers to the wrong question. This is not hypothetical — grapher exports non-focused series at
+// `stroke-opacity="0.5"` (GUIDELINES.md) and this skill's own period band is a fill at 50%.
+// Compositing it here is the tempting fix and is refused: it needs what is DIRECTLY behind the mark,
+// which for a mark inside a plot is usually another mark rather than the frame, plus every ancestor's
+// opacity. Guessing the frame would just relocate the confident wrong answer. So a translucent paint
+// is declared UNMEASURABLE and named, the same way a sequential ramp and an unsafe `--names` are.
+const translucent = (p) => !!p && typeof p.opacity === "number" && p.opacity < 0.999;
 let rows = [];
 const add = (name, status, detail, extra) => rows.push({ check: name, status, detail, ...(extra || {}) });
 const skip = (name, why, owner) => add(name, "SKIPPED", why, owner ? { ownedBy: owner } : null);
@@ -197,8 +211,13 @@ const checkFrame = async (frameId) => {
   // far larger than the 12-16px band rule by construction.
   const MAP_GROUPS = /^(map|countries|countries-without-data)$/i;
   let isMap = false;
-  const collect = (n, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap, catAncestor) => {
+  const collect = (n, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap, catAncestor, dimmed) => {
     if ("visible" in n && !n.visible) return;
+    // NODE opacity dims every paint under it, and it ACCUMULATES down the tree — a group at 0.5 holding
+    // a leaf at 0.5 renders the leaf at 0.25. Carried as a boolean rather than a product because the
+    // only question asked of it is "is this colour still reportable", and once anything above has
+    // dimmed the node the answer is no whatever the exact factor.
+    if ("opacity" in n && typeof n.opacity === "number" && n.opacity < 0.999) dimmed = true;
     // The furniture CONTAINER name is carried, not just the boolean: the dash target is decided by what
     // a node IS (a gridline vs a zero line vs a tick), and deciding it from the node's own current dash
     // instead makes a cleared gridline dash self-justifying. See the furniture-dash row.
@@ -210,6 +229,7 @@ const checkFrame = async (frameId) => {
     if (cm) catAncestor = cm[1];
     if (n.type === "TEXT") {
       const tf = Array.isArray(n.fills) && renders(n.fills[0]) ? hexOf(n.fills[0]) : null;
+      const tfDim = dimmed || translucent(Array.isArray(n.fills) ? n.fills[0] : null);
       // The WEIGHTS, not just whether they differ: a uniformly non-Regular node is style-unbindable
       // for the same API reason a mixed-weight one is, and named-styles has to know the difference
       // between "bold throughout" (prescribed) and "Regular and unbound" (a defect).
@@ -225,7 +245,7 @@ const checkFrame = async (frameId) => {
       for (const sr of ranges) {
         texts.push({ node: n, name: n.name, chars: (n.characters || "").slice(0, 30), size: sr.size,
                      sizeRange: sr.range, mixedSize: ranges.length > 1,
-                     styleId: n.textStyleId || "", box: rel(n), insidePlot, fill: tf, mixedWeight, weights });
+                     styleId: n.textStyleId || "", box: rel(n), insidePlot, fill: tf, translucent: tfDim, mixedWeight, weights });
       }
     }
     if (/^annotation__/.test(n.name)) annotations.push({ node: n, name: n.name, box: rel(n), type: n.type });
@@ -234,10 +254,11 @@ const checkFrame = async (frameId) => {
       // paint that actually RENDERS, not `strokes[0]`, which can be a switched-off or transparent decoy.
       // A line chart's series colour lives here and nowhere else — it is not a fill — so without this
       // the colour rows can only ever see a chart's fills.
+      const strokePaint = n.strokes.find(renders);
       stroked.push({ node: n, name: n.name, type: n.type, w: n.strokeWeight,
                      dash: "dashPattern" in n && n.dashPattern ? [...n.dashPattern] : [],
                      align: n.strokeAlign, insidePlot, inFurniture, furnitureGroup: furnitureGroup || null, insideMap: !!insideMap,
-                     hex: hexOf(n.strokes.find(renders)),
+                     hex: hexOf(strokePaint), translucent: dimmed || translucent(strokePaint),
                      seriesKind: seriesOf ? seriesOf.kind : null, seriesName: seriesOf ? seriesOf.series : null });
     }
     // Zero-area nodes are EXCLUDED from the fill inventory and KEPT for the stroke rows (CHECKS.md).
@@ -273,7 +294,8 @@ const checkFrame = async (frameId) => {
       // country split across the antimeridian has a box spanning almost the whole map, so an annotation
       // over open ocean falls inside it. Counting those as covered marks reports a FAIL that is not
       // there, so the annotation row drops them and says so rather than judging them by bbox.
-      if (filled && mb0 && mb0.w > 0 && mb0.h > 0) markBoxes.push({ name: n.name, box: mb0, why: "a filled data mark", insidePlot, fromMap: !!insideMap, hex: hexOf(markPaint), cat: catAncestor || null });
+      if (filled && mb0 && mb0.w > 0 && mb0.h > 0) markBoxes.push({ name: n.name, box: mb0, why: "a filled data mark", insidePlot, fromMap: !!insideMap, hex: hexOf(markPaint),
+                                      translucent: dimmed || translucent(markPaint), cat: catAncestor || null });
     }
     if (/^datapoints__|^dot__|^value__/.test(n.name)) {
       const why = /^value__/.test(n.name) ? "a value label" : "a dot";
@@ -290,13 +312,13 @@ const checkFrame = async (frameId) => {
     // the fixture models), so a bare node here loses it and the name-only filter below matches nothing —
     // every slope segment silently absent from `polylines`, and annotation-overlap unable to fail.
     if (n.type === "VECTOR" && insidePlot) vectors.push({ node: n, seriesOf });
-    if ("children" in n && n.children.length) { n.children.forEach((c) => collect(c, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap, catAncestor)); return; }
+    if ("children" in n && n.children.length) { n.children.forEach((c) => collect(c, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap, catAncestor, dimmed)); return; }
     const b = rel(n);
     if (b && b.w > 0 && b.h > 0) leaves.push({ name: n.name, type: n.type, box: b, insidePlot, fromMap: !!insideMap });
   };
   for (const child of frame.children) {
     if (child === logo) continue;
-    collect(child, plotRoots.indexOf(child) !== -1, false, null, null, false, null);
+    collect(child, plotRoots.indexOf(child) !== -1, false, null, null, false, null, false);
   }
 
   // ---------------------------------------------------------------- rows
@@ -979,8 +1001,13 @@ const checkFrame = async (frameId) => {
     const overlaps = (a, b) => a.l < b.rr && a.rr > b.l && a.t < b.bb && a.bb > b.t;
     const mapShapes = markBoxes.filter((x) => x.insidePlot && x.fromMap && x.hex);
     const marksUnder = (t) => (t.box ? mapShapes.filter((m) => overlaps(t.box, m.box)) : []);
+    // A THIRD way in: a translucent label. Its `fill` is the raw paint, but what the reader sees is that
+    // colour composited onto the background, which is always LOWER contrast than the raw value — so
+    // measuring the raw one passes text that is genuinely too faint, the one direction this row must
+    // not fail in. The ratio is not computable here for the same reason the palette will not audit it,
+    // so it joins the by-eye bucket rather than being scored or dropped.
     const ambiguous = candidates.filter((t) =>
-      (frameFill && t.fill.toLowerCase() === frameFill.toLowerCase()) || marksUnder(t).length);
+      (frameFill && t.fill.toLowerCase() === frameFill.toLowerCase()) || marksUnder(t).length || t.translucent);
     const onBg = candidates.filter((t) => ambiguous.indexOf(t) === -1);
     // Named per label, with the arithmetic where it exists: against a map shape's own fill the ratio IS
     // computable, it is just not certain to be the fill behind the text.
@@ -988,6 +1015,7 @@ const checkFrame = async (frameId) => {
       const over = marksUnder(t);
       const worst = over.length ? over.reduce((a, m) => (contrast(t.fill, m.hex) < contrast(t.fill, a.hex) ? m : a)) : null;
       return `"${t.chars}" ${t.fill}` +
+             (t.translucent ? " — partly transparent, so the colour that reaches the reader is this one composited onto what is behind it and ALWAYS lower contrast than the raw value; reset the opacity to 1 to have it measured" : "") +
              (frameFill && t.fill.toLowerCase() === frameFill.toLowerCase() ? " — the frame's own colour, so either inside a darker mark (correct) or invisible text on the frame" : "") +
              (worst ? ` — overlaps ${over.length} map shape(s), worst ${worst.name} ${worst.hex} = ${r(contrast(t.fill, worst.hex))}:1` : "");
     };
@@ -1030,12 +1058,31 @@ const checkFrame = async (frameId) => {
     // need attention, and a marker's painted leaf is called `Ellipse 12`. Reporting a failing pair as
     // "Ellipse 12 vs Ellipse 12" identifies nothing. Fall back to the node's own name only when there
     // is no categorical ancestor. Map shapes keep their node names, which already carry the country.
-    const marks = markBoxes.filter((m) => m.insidePlot && m.hex)
+    const markSrc = markBoxes.filter((m) => m.insidePlot && m.hex);
+    const strokeSrc = stroked.filter((s) => s.insidePlot && !s.inFurniture && s.hex
+                                            && (s.seriesKind === "line" || s.seriesKind === "slope"));
+    // Translucent paints are held back rather than audited at their raw value (see `translucent`).
+    // COUNTED, though, and named below: a silently shorter palette is a subset audit reported as a
+    // whole one, which is the failure this row exists to avoid.
+    const dimMarks = markSrc.filter((m) => m.translucent);
+    const dimStrokes = strokeSrc.filter((s) => s.translucent);
+    const marks = markSrc.filter((m) => !m.translucent)
       .map((m) => ({ id: (m.fromMap ? null : m.cat) || m.name, hex: m.hex, cat: m.fromMap ? null : m.cat }));
-    const seriesStrokes = stroked.filter((s) => s.insidePlot && !s.inFurniture && s.hex
-                                                && (s.seriesKind === "line" || s.seriesKind === "slope"))
+    const seriesStrokes = strokeSrc.filter((s) => !s.translucent)
       .map((s) => ({ id: s.seriesName, hex: s.hex, cat: s.seriesName }));
     const paletteSrc = [...marks, ...seriesStrokes];
+    // The name is the category where there is one, so the note points at something the operator can
+    // find on the canvas rather than at a count.
+    const dimNames = [...new Set([...dimMarks.map((m) => (m.fromMap ? null : m.cat) || m.name),
+                                 ...dimStrokes.map((s) => s.seriesName)].filter(Boolean))];
+    const dimNote = dimMarks.length + dimStrokes.length
+      ? ` ${dimMarks.length + dimStrokes.length} translucent mark(s)/series are NOT in this palette`
+        + (dimNames.length ? ` (${dimNames.slice(0, 6).join(", ")})` : "")
+        + " — a partly transparent paint reads as its colour composited onto whatever is behind it, which"
+        + " this script cannot determine from inside the plot, so auditing its raw value would answer the"
+        + " wrong question. Reset the opacity to 1 (GUIDELINES.md does this for grapher's non-focused"
+        + " series) and re-run, or judge those by eye."
+      : "";
     // Dedupe by COLOUR, because color_audit.py takes a PALETTE: hand it forty bar segments in six
     // colours and every real finding competes with dozens of deltaE 0 self-pairs.
     const seen = new Map();  // hex -> first mark/series name, in walk order
@@ -1107,7 +1154,12 @@ const checkFrame = async (frameId) => {
             + ` report the clash, so judge them by eye: ${shared.slice(0, 4).join("; ")}. Correct for a`
             + ` highlight treatment; a defect if they are separate categories.` : "")
         + (namesSafe ? "" : ` (--names omitted: ${nameProblem}.)`)
-      : " No data marks or series strokes found in the plot, so there is no palette to audit.";
+        + dimNote
+      // An all-translucent plot must not report "no data marks found" — that reads as an empty frame
+      // and sends the operator looking for missing nodes instead of at the opacity they set.
+      : dimNote
+        ? ` No auditable palette:${dimNote}`
+        : " No data marks or series strokes found in the plot, so there is no palette to audit.";
     skip("colour-vision", "all-pairs deltaE 20 for deuteranopia/protanopia on CATEGORICAL fills." + how, "scripts/color_audit.py");
     skip("grayscale-seams", "adjacent pairs above ~1.6:1 — same command, same run as colour-vision." + how, "scripts/color_audit.py");
   }
