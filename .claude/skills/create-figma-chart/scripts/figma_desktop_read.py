@@ -23,13 +23,13 @@ size is the RENDERED size, which equals the natural size only below that cap (th
 natural 616x1096, arrives 576x1024). Needing true natural size above 1024 px means the hosted
 get_screenshot, which reports it whatever it renders.
 
-Usage:
+Usage (from the repo root, always through the repo virtualenv):
     # Screenshot nodes, concurrently, into a directory:
-    python3 scripts/figma_desktop_read.py shot 798:161 6689:8 --out-dir /tmp/shots
+    .venv/bin/python .claude/skills/create-figma-chart/scripts/figma_desktop_read.py shot 798:161 6689:8 --out-dir /tmp/shots
 
     # Structure of a page or frame as XML (all 198 pages, if you omit the node):
-    python3 scripts/figma_desktop_read.py meta 798:54
-    python3 scripts/figma_desktop_read.py meta
+    .venv/bin/python .claude/skills/create-figma-chart/scripts/figma_desktop_read.py meta 798:54
+    .venv/bin/python .claude/skills/create-figma-chart/scripts/figma_desktop_read.py meta
 
 Exits non-zero if any requested node failed, so a caller can trust a zero exit.
 """

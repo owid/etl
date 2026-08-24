@@ -74,10 +74,11 @@ For agent sessions running in a Claude Code cloud sandbox
   sandbox is about **twice as fast per screenshot** (Figma `get_screenshot`, 60
   calls here: median 8.8 s against 12.5–20.5 s locally — the only tool timed in
   both, so read it as the shape of the cost, not a per-tool constant). Every local
-  run was taken with Figma's **desktop app open**, which is the visible asymmetry
-  against a sandbox and the reason a local desktop-app bridge is the suspect for
-  the gap; nobody has re-run it with the app quit, so that is a condition of the
-  local figure rather than a property of local sessions. What a
+  run was taken with Figma's **desktop app open**, and that is *not* the
+  explanation: the desktop app serves its own MCP server on a separate path, so a
+  session holding `use_figma` is on the hosted connector and never routes through
+  the app at all. Quitting it would not move the hosted numbers, and the skill's
+  GOTCHAS has the tool-by-tool enumeration that settles it. What a
   sandbox pays instead is the **turn** around each call — a ~12 s median, against
   2–4 s on a light local turn — so a skill
   making hundreds of MCP calls is won or lost on batching: issue independent

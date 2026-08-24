@@ -13,9 +13,9 @@ Two modes, both read-only:
                          a link path, a heading level, or a pointer rewrite are normalized away, so
                          what it reports is text that actually went missing.
 
-Usage:
-    python3 .claude/skills/create-figma-chart/scripts/verify_docs.py --structure
-    python3 .claude/skills/create-figma-chart/scripts/verify_docs.py --against HEAD~1
+Usage (from the repo root, always through the repo virtualenv):
+    .venv/bin/python .claude/skills/create-figma-chart/scripts/verify_docs.py --structure
+    .venv/bin/python .claude/skills/create-figma-chart/scripts/verify_docs.py --against HEAD~1
 
 Exits 1 on any finding.
 """
