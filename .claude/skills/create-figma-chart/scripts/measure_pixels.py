@@ -32,6 +32,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -48,7 +49,14 @@ CONTACT_KERNEL = np.ones((3, 3), dtype=np.int32)
 
 def load(path: Path) -> np.ndarray:
     """RGB uint8, alpha composited over white so a transparent frame matches what Figma shows."""
-    img = Image.open(path)
+    # A missing, truncated or non-image file is an INPUT failure, not a failed check. Letting Pillow's
+    # exception escape exits 1, which is the code reserved for "the check ran and the chart is wrong" —
+    # so a download that silently produced an HTML error page would read as a genuine defect.
+    try:
+        img = Image.open(path)
+        img.load()
+    except (OSError, ValueError) as e:
+        raise unmeasurable(f"cannot read {path} as an image ({e}) — re-export the render and retry")
     if img.mode in ("RGBA", "LA", "P"):
         img = img.convert("RGBA")
         matte = Image.new("RGBA", img.size, (255, 255, 255, 255))
@@ -63,10 +71,18 @@ def unmeasurable(message: str) -> SystemExit:
 
 
 def parse_box(spec: str, what: str) -> tuple[int, int, int, int]:
+    # Figma's absoluteBoundingBox is routinely fractional, and a shape spanning 20.6..22.6 paints
+    # columns 20, 21 and 22. Rounding both edges to 21..23 drops column 20, and the bbox guard below
+    # then counts real anti-aliased ink as ink outside the box — UNMEASURABLE on a good render. Floor
+    # the lower edges and ceil the upper ones, so the box is the pixel-inclusive superset it stands for.
     try:
-        x0, y0, x1, y1 = (int(round(float(v))) for v in spec.split(","))
+        values = [float(v) for v in spec.split(",")]
     except ValueError:
         raise unmeasurable(f"{what} must be x0,y0,x1,y1 — got {spec!r}")
+    if len(values) != 4:
+        raise unmeasurable(f"{what} must be x0,y0,x1,y1 — got {spec!r}")
+    x0, y0 = (math.floor(v) for v in values[:2])
+    x1, y1 = (math.ceil(v) for v in values[2:])
     if x1 <= x0 or y1 <= y0:
         raise unmeasurable(f"{what} is empty: {spec!r}")
     # A negative origin is the one out-of-range case numpy does not complain about: it indexes from

@@ -219,6 +219,48 @@ def test_bbox_guard(tmp: Path) -> None:
     check("counts stray px", out.get("arrow_px_outside_bbox", 0) > 0, True)
 
 
+def test_fractional_bbox_keeps_its_edge_pixels(tmp: Path) -> None:
+    print("a fractional absoluteBoundingBox must not clip the anti-aliased columns it covers")
+    # The arrow paints columns 20-21 and rows 10-29. Figma would report that box fractionally, and
+    # rounding BOTH edges shrinks it to 20,10..21,29 — which excludes column 21 and row 29, so the
+    # guard counts the shape's own ink as evidence of a reflow. Floor/ceil keeps 19,9..22,30.
+    s = scene(tmp, arrow_x=20, target_x=26)
+    code, out = run(
+        "arrow-gap",
+        "--no-arrow",
+        s["no_arrow"],
+        "--no-target",
+        s["no_target"],
+        "--no-both",
+        s["no_both"],
+        "--crop",
+        "0,0,60,40",
+        "--arrow-bbox",
+        "19.6,9.6,21.4,29.4",
+    )
+    check("no stray px", out.get("arrow_px_outside_bbox"), 0)
+    check("verdict", out.get("verdict"), "PASS")
+    check("exit code", code, 0)
+
+
+def test_unreadable_png_is_unmeasurable(tmp: Path) -> None:
+    print("a missing or corrupt render is an input failure (2), never a failed check (1)")
+    missing = tmp / "does_not_exist.png"
+    code, _ = run("ink-box", "--png", str(missing))
+    check("missing file exits 2", code, 2)
+    # What a failed download actually leaves behind: an error page saved under a .png name.
+    not_an_image = tmp / "error_page.png"
+    not_an_image.write_text("<html><body>403 Forbidden</body></html>")
+    code, _ = run("contrast", "--png", str(not_an_image))
+    check("non-image exits 2", code, 2)
+    # A truncated PNG parses its header and fails on the pixels, which is why `load()` is forced.
+    good = save(canvas(10, 10), tmp / "whole.png")
+    truncated = tmp / "truncated.png"
+    truncated.write_bytes(good.read_bytes()[: -len(good.read_bytes()) // 3])
+    code, _ = run("ink-box", "--png", str(truncated))
+    check("truncated exits 2", code, 2)
+
+
 def test_gray_target_would_defeat_color_classification(tmp: Path) -> None:
     print("a GRAY target — the case that killed colour-based classification — still masks cleanly")
 
@@ -345,6 +387,8 @@ def main() -> int:
             test_negative_bounds_are_refused,
             test_empty_mask_is_unmeasurable,
             test_bbox_guard,
+            test_fractional_bbox_keeps_its_edge_pixels,
+            test_unreadable_png_is_unmeasurable,
             test_gray_target_would_defeat_color_classification,
             test_subpixel_stroke_scale,
             test_antialiased_gap_tracks_truth,

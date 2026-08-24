@@ -6,32 +6,32 @@
 Every one of these caught a real defect on this skill's first run, and none of them is visible by looking at the frame. Run them as a pass, and report the numbers rather than "looks fine".
 
 > **⚠️ `verify_page.js` does not fit in a `use_figma` call as it ships.** The `code` argument caps at
-> **50,000 characters** and the file is **~79,000**, so the instruction below is not executable
+> **50,000 characters** and the file is **~84,000**, so the instruction below is not executable
 > verbatim — a run that pastes it is rejected. Emit it stripped instead:
 >
 > ```bash
 > .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js
 > ```
 >
-> That returns ~45,000 characters of comment-free source, which fits and still parses (the helper is
+> That returns ~48,000 characters of comment-free source, which fits and still parses (the helper is
 > context-aware, so URLs, regex literals and template strings survive; `--check` sizes every script
 > and fails if one overflows).
 >
-> **Better: run it in slices, which is what `--rows` is for.** 45,000 chars is 90% of the cap and
+> **Better: run it in slices, which is what `--rows` is for.** 48,000 chars is 97% of the cap and
 > still has to be relayed verbatim, where a one-character corruption yields a *wrong verdict* rather
 > than an error. The rows are grouped, each slice carries the shared preamble and runs on its own:
 >
 > ```bash
-> inline_script.py verify_page.js --list-rows          # type / series / geometry / annotations
-> inline_script.py verify_page.js --rows series --frame-id <your frame>
+> .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js --list-rows
+> .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js --rows series --frame-id <your frame>
 > ```
 >
 > | group | rows | size |
 > |---|---|---|
-> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, text-hierarchy | 41% of cap |
+> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 46% of cap |
 > | `series` | series-weight, furniture-weight, furniture-dash | 40% |
 > | `geometry` | box-alignment, gap, margins, off-palette | 36% |
-> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 50% |
+> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 51% |
 >
 > Groups combine (`--rows type,series`), so the whole pass is two calls. **Run all four** — each
 > reports its own rows and nothing else, so a group you skip is a group nobody checked.
