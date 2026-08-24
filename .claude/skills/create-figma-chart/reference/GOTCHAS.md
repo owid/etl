@@ -168,19 +168,51 @@
      Bash over JSON-RPC, which needs no config change —
      `scripts/figma_desktop_read.py` does the handshake, fans out the calls and writes the PNGs.
      One handshake serves many calls, so amortize it.
-  5. **It renders the desktop app's copy of the file, which lags a write you just made — and a
-     stale render looks perfectly plausible.** Measured: a frame cloned via `use_figma` and
-     screenshotted on the next tool call came back **33,784 bytes**, against **47,664** for the same
-     node once it had settled. Nothing errored; the render was simply of a half-built frame. So
-     after any *structural* write (a clone, a reparent, an import), do not trust the first render —
-     re-render and compare, or read something back through `use_figma` first to give the app a beat.
-     Small property writes (a `visible` toggle) settled reliably across the same gap in the same
-     session, but the failure is silent either way, so the mask guards in `measure_pixels.py` are
-     what actually catch it: a stale render yields an empty or wrong-sized mask, which it reports as
-     `UNMEASURABLE` rather than as a clean pass.
+  5. **The two paths do not share a source of truth, and the reader is the stale one.** `use_figma`
+     runs server-side against the authoritative document; the desktop server renders **the desktop
+     app's local replica**. Nothing orders one against the other, so a write is not visible to the
+     reader until the app has synced it — and for page *contents* it may never sync at all.
 
-  Metering is the open question: these calls never reach the hosted connector, and Figma documents
-  no desktop exemption either way. Untested in a real chart build.
+     Measured, on a page created by `use_figma` and never opened by a human:
+
+     | | hosted path | desktop path |
+     |---|---|---|
+     | the new page appears in the page listing | yes | **yes**, within seconds |
+     | a deleted page disappears from it | yes | **yes** |
+     | the rectangle inside that page | renders, 200×200, correct fill | **"No node could be found"** |
+
+     Page-level structure replicates promptly. **Page contents are lazily loaded in the app too**, so
+     an unvisited page reports as `<canvas … width="0" height="0"/>` with its children missing. That
+     did not converge: ~3 minutes of polling across three attempts, still absent. And there is no
+     automatable fix — `page.loadAsync()` + `setCurrentPageAsync()` both succeed and the plugin then
+     *sees* the child, because that context is server-side; the replica is unmoved. Only a human
+     opening the page in the app loads it.
+
+     **So the failure message lies about the cause.** "No node could be found for the provided
+     nodeId" reads as a bad id; the truth is usually "that page has never been open in this app".
+     Two practical rules follow. **Desktop reads are for nodes that already exist and have been
+     looked at** — the templates, the arrows page, the chart page the designer is working in, which
+     is where the read volume actually is. **Never desktop-read a node you created this session**:
+     route it through the hosted `get_screenshot`, which is authoritative.
+
+     A partial version of the same thing is the more insidious one, because it does not error: a
+     frame cloned via `use_figma` and screenshotted on the next tool call came back **33,784 bytes**
+     against **47,664** for the same node once settled — a render of a half-built frame. Property
+     writes to a node on an *already-loaded* page do replicate reliably (the whole four-render arrow
+     probe works that way, and it reproduced its expected numbers). But since every version of this
+     is silent, the mask guards in `measure_pixels.py` are what actually protect you: a stale render
+     yields an empty or wrong-sized mask, reported as `UNMEASURABLE` rather than as a clean pass.
+     Note the irony worth remembering — cloning a page to *test* the arrow probe is precisely the
+     unsafe case, while running it on the designer's own open page is the safe one.
+
+  **Metering is settled, and not favourably: the desktop server has its own daily read quota.**
+  Exhausted, it answers every read with `Rate limit exceeded, please try again tomorrow` — and the
+  quota is **separate from the hosted connector's**, which kept working normally through it. So the
+  30× is 30× *until the cap*, and the cap is a day long. Two consequences. **Never poll this
+  server**: a convergence loop at 150 ms intervals spent the whole day's allowance in about three
+  minutes, which is how this was discovered. And **the error is indistinguishable from a missing
+  node** unless you read the message, so `scripts/figma_desktop_read.py` now names it and exits `2`
+  rather than reporting it as a wrong tab. Untested in a real chart build.
 
 - **Downloading N screenshot URLs: parallelize, and pair each URL with its own output file.** Six
   serially is 2.7 s through a cloud sandbox's egress proxy, 0.8 s in parallel:

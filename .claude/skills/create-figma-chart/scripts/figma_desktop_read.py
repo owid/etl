@@ -118,11 +118,25 @@ def result_text(result: dict) -> str:
     return "".join(item.get("text", "") for item in result.get("content", []))
 
 
+def rate_limited(text: str) -> bool:
+    """The desktop server has its OWN daily read quota, separate from the hosted connector's.
+
+    Exhausting it answers with "Rate limit exceeded, please try again tomorrow" and blocks every
+    further read for the day, while the hosted path keeps working. Worth naming distinctly: it is
+    indistinguishable from a missing node unless you read the message.
+    """
+    return "rate limit" in text.lower()
+
+
 def check(expect_node: str) -> int:
     """Preflight: is the desktop path usable right now? Exit 0 yes, 1 no — never raises.
 
-    "Usable" is two conditions, and the second is the one that bites: the server must be up, AND
-    the document holding `expect_node` must be the ACTIVE TAB, since there is no fileKey to pass.
+    Pass the node you actually intend to read, not the default: "usable" is per-node, not per-file.
+    Three things have to hold, and only the first is about the server being up. The document must be
+    the ACTIVE TAB (there is no fileKey to pass), and the node's PAGE must already have been opened
+    in the app — page contents are lazily loaded there, so a page created by a write and never
+    visited by a human reports its children as missing, indefinitely. That is why the server's "No
+    node could be found" is usually not a bad id.
     """
     try:
         session = connect()
@@ -140,9 +154,19 @@ def check(expect_node: str) -> int:
     result = reply.get("result", {})
     text = result_text(result)
     if result.get("isError") or not text.strip():
-        print(f"desktop path UNAVAILABLE: {expect_node} is not in the active document.")
+        print(f"desktop path UNAVAILABLE for {expect_node}.")
         print(f"  server said: {text.strip()[:200]}")
-        print("  The Figma desktop app must be running with the target file as the ACTIVE TAB.")
+        if rate_limited(text):
+            print("  The desktop server's OWN daily read quota is exhausted — separate from the")
+            print("  hosted connector's, which is unaffected and still usable. Nothing to fix")
+            print("  today: use the hosted get_screenshot. And do not POLL this server; every")
+            print("  call is quota, so a retry loop can spend the whole day's allowance.")
+            return 2
+        print("  Two causes, and the message does not distinguish them:")
+        print("   - the target file is not the ACTIVE TAB in the Figma desktop app; or")
+        print("   - that node's PAGE has never been opened in the app, so its contents are not")
+        print("     loaded in the replica. Writes cannot fix this and it does not resolve on its")
+        print("     own — a human must open the page, or you read via the hosted get_screenshot.")
         return 1
 
     name = ""
@@ -161,7 +185,10 @@ def shot(nodes: list[str], out_dir: Path) -> int:
         reply = call_tool("get_screenshot", {"nodeId": node}, 100 + index, session)
         result = reply.get("result", {})
         if result.get("isError"):
-            return node, f"FAILED {result_text(result).strip()}"
+            text = result_text(result).strip()
+            if rate_limited(text):
+                return node, f"FAILED (desktop daily quota exhausted — use the hosted path) {text}"
+            return node, f"FAILED {text}"
         for item in result.get("content", []):
             if item.get("type") != "image":
                 continue
