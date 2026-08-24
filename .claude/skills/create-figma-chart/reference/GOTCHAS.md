@@ -27,6 +27,54 @@
 
 - **A calls-per-message histogram cannot tell you whether calls were batched — use interval overlap.** The transcript writes one entry per tool call whether or not the calls were batched, so a calls-per-assistant-message histogram reports `{1: N}` for a provably concurrent run — checked against an 8-call probe that measured 4.12×, which the histogram scored as eight singletons. Sweep `tool_use` → `tool_result` timestamps for peak simultaneous in-flight calls instead, and count how many calls start before the previous one finished.
 
+- **`sum/wall` is not the speedup — measure a batch against a *serial arm run in the same session*.**
+  A queued call's own duration includes the time it spent waiting, so summing the durations inside a
+  batch and dividing by the wall clock counts that wait as work and flatters batching. An independent
+  local replication (six-call fixed probe, peak 6 of 6 in flight, Figma's desktop app running):
+  batch wall **25.85 s** where four one-per-message calls averaged **12.10 s** — so **2.81×** honestly,
+  against the **3.81×** the same batch scores on `sum/wall`. That reproduces the ~3.84× `sum/wall`
+  figure in the budget almost exactly while putting the real local gain at **2.8–3.2×**, and it
+  reproduces the mechanism too: per-call latency inflated to 11.5–21.3 s inside the batch against
+  10.8–13.9 s serial, and the completions ended over a **14.35 s** spread having been dispatched over
+  **4.57 s** — a local session pipelines rather than parallelizing. Batching still wins by a wide
+  margin; just don't quote `sum/wall` as the win.
+
+- **Only the *reading* tools are metered, so a screenshot-heavy run is the one that can hit a wall.**
+  Figma's [rate limits](https://developers.figma.com/docs/figma-mcp-server/rate-limits-access/)
+  (checked 2026-08-24) apply "to Figma MCP server tools that read data from Figma" — a per-day and a
+  per-minute cap, both varying by plan and seat, which is why the numbers are not copied here. Writes
+  are not documented as counting, so `use_figma` and `upload_assets` are effectively free of the
+  quota while `get_screenshot` and `get_metadata` spend it: a survey of N nodes is N against the cap,
+  and the surveys are what to trim if a run ever gets throttled. Two things to expect if it does —
+  the message is a plain refusal with no retry hint from the connector, and forum reports have the
+  limiter misreading the seat, so a refusal is not proof the quota was really spent. Figma has also
+  signposted `use_figma` becoming "a usage-based paid feature", which would change this arithmetic.
+
+- **For a *bulk* render, one Figma REST call replaces N `get_screenshot`s — but only for settled
+  state.** `GET https://api.figma.com/v1/images/<fileKey>?ids=<id1>,<id2>,…&format=png&scale=<n>`
+  renders **many nodes in one request** and returns a URL per node, where `get_screenshot` is one
+  node per 8–20 s call; it also takes `scale` up to 4, which `get_screenshot` cannot do at all
+  (`maxDimension` only downscales). It needs a personal access token in `X-Figma-Token`, which this
+  skill does not carry — the grapher server holds one as `FIGMA_API_KEY` for its own `/api/figma/image`
+  route, so an ETL-side use means asking for a token rather than reusing that. Untested from here;
+  treat the note as a lead, not a recipe, and check a render against a `get_screenshot` of the same
+  node before trusting a batch of them. **Never point it at a node you just wrote to.** The pixel
+  probes read state that a `use_figma` call created moments earlier, and a server-side render that
+  lags by a beat returns a plausible-looking image of the *old* state — the same silent-wrong-state
+  failure as batching the four-render arrow protocol. Bulk-render surveys and delivery renders of
+  finished frames; keep every post-write probe on `get_screenshot`. It also returns no
+  `original_width`/`original_height`, so the size-only survey still wants `get_screenshot`.
+
+- **The Figma *desktop* MCP server is not a fallback for this skill.** Per Figma's
+  [tools list](https://developers.figma.com/docs/figma-mcp-server/tools-and-prompts/) (checked
+  2026-08-24) `use_figma`, `upload_assets`, `search_design_system` and `download_assets` are
+  **remote-server-only** — the desktop server (`http://127.0.0.1:3845/mcp`) serves the read tools
+  and nothing this skill writes with, and carries no documented rate-limit exemption. So it cannot
+  be the answer to a slow local run. The untested lever there is the *transport*: connecting the
+  remote server directly (`claude mcp add --transport http figma https://mcp.figma.com/mcp`) instead
+  of through the claude.ai connector, which would tell us whether the local-vs-cloud per-call gap is
+  the connector path rather than the desktop app. Nobody has run that comparison.
+
 - **`upload_assets` gives you N `submitUrl`s so the POSTs can overlap — run them that way.** The
   Step 5 snippet shows one `curl`, and a two-format run that copies it twice pays two full uploads of
   a ~165 KB SVG back to back. Pair each URL with its file and fan them out, exactly as the screenshot

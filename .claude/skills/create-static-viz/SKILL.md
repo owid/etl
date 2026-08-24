@@ -59,7 +59,7 @@ The step-by-step detail lives in [`reference/`](reference/) and is read *at* tha
 | [reference/WRITING-THE-STEP.md](reference/WRITING-THE-STEP.md) | Step 4 | The handoff contract, grapher's axis and tick treatment, encoding diagrams, desktop/mobile pairing, text slots, labelling many categories, Figma-surviving anchors, the assertions to write. |
 | [reference/GOTCHAS.md](reference/GOTCHAS.md) | Its **Data** section at Step 1, before any column is used; the rest on an error, or grep by symptom | Data, layout and workflow pitfalls. |
 
-**Size budget: keep this spine under 30 KB and TEMPLATES.md under 25 KB.** Both are read on every
+**Size budget, enforced by `--structure`: this spine under 30 KB, TEMPLATES.md under 25 KB.** Both are read on every
 run, so a paragraph added here costs every future viz — new detail belongs in the reference file for
 its step. After editing any doc in this skill:
 
@@ -78,14 +78,14 @@ not as per-tool numbers — `use_figma` and `upload_assets` have not been benchm
 environments. Either way, a handful
 issued one at a time is the difference between seconds and minutes. Batching pays about the same in
 both: the connector serves concurrent calls — eight screenshots in one message measured 4.1× faster
-than serially, and twelve runs of a fixed six-call probe mean **4.0× in both environments** (ten
-cloud reps 4.00×, two local 4.00×, six in flight every time) — and admits about four or five at once,
-so **put independent calls in one message, 4–6 at a time.** A batch's wall is
+than serially, and ten reps of a fixed six-call probe a side put it at **≈4.0× in both
+environments** (4.00× cloud, 3.84× local, six in flight every time) — and admits about four or five
+at once, so **put independent calls in one message, 4–6 at a time.** A batch's wall is
 `first call + rate × (n−1)` — measured at **9.2 s + 0.75 s** per extra screenshot in a cloud session
 and **11.7 s + 2.1 s** locally — and that marginal cost is the stopping rule.
-Reads always; writes only when they target different pages. If the Figma tools arrive deferred (a
-cloud session serves them that way), load the ones you need in a single `ToolSearch`, taking the
-prefix from your own session's tool list since it differs between cloud and local; skip that where
+Reads always; writes only when they target different pages. If the Figma tools arrive deferred —
+a harness setting, not an environment — load the ones you need in a single `ToolSearch`, taking the
+prefix from your own session's tool list rather than assuming one; skip that where
 they are already loaded. `/create-figma-chart` → **Round-trip budget** has the full
 rule and the list of what is genuinely serial.
 

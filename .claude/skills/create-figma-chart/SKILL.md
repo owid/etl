@@ -16,10 +16,11 @@ stop before the first Figma call and recommend re-running on **Opus** (or **Sonn
 mechanical re-export or a single text fix); continue only on the user's say-so — this skill is long
 chains of design judgment, and a build on the wrong model wastes the shared file's review cycle.
 
-**If the Figma tools arrive deferred, load them in one `ToolSearch` before the first Figma call.** A
-cloud session serves them that way, and discovering them one at a time costs a model turn each — ~7
-over a run. **Take the prefix from your own session's tool list:**
-`mcp__Figma__` in a cloud session, `mcp__claude_ai_Figma__` locally — one naming the wrong prefix
+**If the Figma tools arrive deferred, load them in one `ToolSearch` before the first Figma call.**
+Discovering them one at a time costs a model turn each — ~7 over a run. Whether they arrive deferred
+is a harness setting, not an environment — a local session gets them that way too — so **read your
+own session's tool list** rather than inferring it, and take the prefix from there:
+both `mcp__Figma__` and `mcp__claude_ai_Figma__` are in use, and naming the wrong one
 matches nothing.
 
 ```
@@ -27,8 +28,7 @@ select:<prefix>use_figma,<prefix>get_screenshot,<prefix>get_metadata,<prefix>upl
 ```
 
 Add `get_design_context` or `download_assets` when the route needs them. **Skip this entirely where
-the tools are already loaded** — a local session normally has them, and an unnecessary `ToolSearch`
-is itself a wasted turn.
+the tools are already loaded** — an unnecessary `ToolSearch` is itself a wasted turn.
 
 **In a cloud session the *authenticated* `admin.owid.io` routes are unreachable** — Cloudflare Access
 `302`s them to a login page. That is an app-layer redirect, not the egress gateway, so
@@ -93,8 +93,8 @@ step lives in [`reference/`](reference/) and is read *at* that step, not up fron
 its per-chart-type conventions are now one file each under
 [reference/per-chart-type/](reference/per-chart-type/). **Read only the one for the chart in hand.**
 
-**This file has a size budget: keep the spine under 62 KB, GUIDELINES.md under 80 KB, and the two
-together under 140 KB.** Both are read on every run, so a paragraph added here costs every future
+**Size budget, enforced by `--structure`: spine under 62 KB, GUIDELINES.md under 80 KB, the pair
+under 140 KB.** Both are read on every run, so a paragraph added here costs every future
 chart — and moving one from this file into GUIDELINES.md saves a run nothing, which is why the pair
 is capped and not just each file. New detail belongs in the
 reference file for its step, which is read only at that step. After editing any doc in this skill:
@@ -120,8 +120,8 @@ used to claim was about twice too high: a `use_figma` is roughly *half* a screen
 one. Either is flat regardless of script size *or* render size — a 545-char script that loaded a page
 and walked 286 nodes came back **faster** than a 45-char one, and a natural-size screenshot costs
 1.10× a 256 px one. **So collapse work into fewer calls freely, and never shrink a screenshot for
-speed.** And it is the *cloud* that is fast: `get_screenshot` measured 7.8–9.9 s from a sandbox
-against 12.5–20.5 s from a local session with the Figma desktop app running. The *turn* around it —
+speed.** And it is the *cloud* that is fast: the same probe measures 12.5–20.5 s from a local
+session with the Figma desktop app running. The *turn* around it —
 issuing the call, reading the result — runs the other way: **~12 s median in a cloud session** (23
 consecutive calls) against **2–4 s on a light local turn**, so in the cloud the turn costs two to
 four times the `use_figma` call it wraps. Budget a run as **turns × (turn + call)**, both terms read
@@ -139,7 +139,7 @@ connector serves the calls concurrently *and* they share one turn. Yet across fi
 **two batched nothing at all** and two barely did (1–9% of calls overlapping); one batched heavily
 and paid for it (see the ceiling below).
 
-**Fan out independent calls — one message, 4–6 at a time.** The payoff is **≈4.0× and environment-neutral** — twelve runs of a fixed six-call probe, ten cloud and two local, all six calls in flight every time; only what each call costs differs. An eighth call still helps (an earlier eight-screenshot run measured 4.1×, 79.7 s of work in 19.4 s), but the connector admits about four or five at once and latency inflates past that, so **4–6 per message is the sweet spot and more just queues**; see the ceiling below. This is the `figma-use` skill's own instruction too: issue the N calls in one message, and don't await one before issuing the next.
+**Fan out independent calls — one message, 4–6 at a time.** The payoff is **≈4.0× and environment-neutral** — ten reps of a fixed six-call probe a side, 4.00× cloud against 3.84× local, six in flight every time; only what each call costs differs. An eighth call still helps (an earlier eight-screenshot run measured 4.1×, 79.7 s of work in 19.4 s), but the connector admits about four or five at once and latency inflates past that, so **4–6 per message is the sweet spot and more just queues**. This is the `figma-use` skill's own instruction too: issue the N calls in one message, and don't await one before issuing the next.
 
 **A batch's wall clock is `first call + rate × (n−1)`**, and both terms are environment-specific:
 **9.2 s + 0.75 s** per extra call in a cloud session, **11.7 s + 2.1 s** locally (ten reps a side;
@@ -149,7 +149,7 @@ a *narrower* spread than they were dispatched in — near-true parallelism — w
 pipeline, each call ending ~2.1 s after the last. Batching a *cheap* call
 wins less, because the dispatch stagger is then a large share of the wall (six `use_figma` at ~4 s
 managed only 2.63×). `sum/wall` is also not the honest gain: locally it flatters batching, since a
-queued call's duration includes its wait (~3.2× against a serial baseline, not 3.84×); in the cloud
+queued call's duration includes its wait (2.8–3.2× against a serial baseline, not 3.84×); in the cloud
 it understates it (4.19× against 4.00×).
 
 Reads fan out freely — **including reads that each switch pages**, which makes the Step 5 and Step 8c rows below safe: two concurrent calls, one holding `Cover` and one the Templates page, overlapping for 7.7 s, each saw only its own — `figma.currentPage` is per-call. It is concurrent *mutation* of one page that races, not the switch. **Writes only when they target different pages** — a script may switch pages only once, so two `use_figma` writes aimed at the same page in one message race each other.
