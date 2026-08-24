@@ -108,11 +108,15 @@ cannot be trusted** — an empty mask, renders of different sizes, or a mask str
 clear" from "I measured nothing". Pass `--full` and it also reports what the discredited
 from-full masking would have said, and warns when that would have missed a real contact.
 
-Two things it fixes beyond the turn saving. The all-pairs loop this replaces is `O(arrow × target)`
-— thousands of pixels each on a padded crop, so millions of pairs — where a distance transform is
-exact and linear. And `touching` counted *pairs* within 1.5px, which is exactly the 3×3
-neighbourhood; the script reports both that and the count of distinct arrow pixels in contact, so
-the magnitude is interpretable rather than just non-zero.
+**What it does not buy is arithmetic speed — measured, on the same three renders.** The all-pairs
+loop it replaces is `O(arrow × target)` against a linear distance transform, and that only pays at
+scale: at a 1× probe the loop wins (**0.01 s** against **0.32 s**, since the script pays numpy and
+scipy import), the two draw around 2×, and only at the **4×** render the hairline check requires
+does the loop fall behind (**1.61 s** against **0.31 s**, 8.9M pairs). Both agree on the answer at
+every scale. So reach for the script for what it guards, not for what it computes: the loop's
+numbers were never wrong, its *failure modes* were. `touching` is also clarified rather than
+changed — it counted *pairs* within 1.5px, exactly the 3×3 neighbourhood, and the script reports
+that alongside the count of distinct arrow pixels in contact, so a non-zero result is interpretable.
 
 **Probe a render at its natural size. A resampled one cannot be masked reliably — and both render
 paths resample.** A pixel mask is a per-pixel difference, so it only means "this shape's ink" while
