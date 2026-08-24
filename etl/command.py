@@ -254,21 +254,38 @@ def main_cli(
             # This lets staging-site-master do a full build with the same command as feature branches.
             click.echo("On master branch: --modified runs all selected steps (no diff filter).")
         else:
-            steps = _modified_steps(includes=steps, exact_match=exact_match)
-            if not steps:
-                click.echo("No steps modified relative to origin/master.")
-                return
-            # `--modified` surfaces modified export steps (multidim/explorer recipes) by design, but
-            # they're only buildable in export mode. When a branch edits only such a recipe (e.g. a
-            # single `<explorer>.<key>.config.yml`), the modified set is export-only; without this we
-            # would exclude it downstream and crash with "No steps matched". Enable export (which also
-            # un-excludes the grapher deps the export step needs) so the explorer actually rebuilds.
-            if not export and any(s.startswith("export://") for s in steps):
-                export = True
-                click.echo("Detected modified export step(s); enabling --export for this run.")
-            click.echo(f"Restricting to {len(steps)} step(s) modified vs origin/master.")
-            # We matched modified catalog paths as substrings, so disable exact matching downstream.
-            exact_match = False
+            from etl.git_helpers import get_changed_files
+
+            # We only need file names/statuses to pick steps, not the (slow) per-file diff contents.
+            files_changed = get_changed_files(include_diff=False)
+            global_changes = _global_checksum_inputs_changed(files_changed)
+            if global_changes:
+                # These files aren't under etl/steps/ or snapshots/, so _modified_steps would see
+                # nothing changed - but DataStep.checksum_input() bakes pd.__version__ and
+                # config.ETL_EPOCH into every step's checksum, so a change here makes every step
+                # dirty regardless of which step files were touched. Don't filter in that case.
+                click.echo(
+                    f"Detected changes to {', '.join(global_changes)}, which affect every step's "
+                    "checksum (pandas version / ETL_EPOCH); --modified runs all selected steps "
+                    "(no diff filter)."
+                )
+            else:
+                steps = _modified_steps(includes=steps, exact_match=exact_match, files_changed=files_changed)
+                if not steps:
+                    click.echo("No steps modified relative to origin/master.")
+                    return
+                # `--modified` surfaces modified export steps (multidim/explorer recipes) by design,
+                # but they're only buildable in export mode. When a branch edits only such a recipe
+                # (e.g. a single `<explorer>.<key>.config.yml`), the modified set is export-only;
+                # without this we would exclude it downstream and crash with "No steps matched".
+                # Enable export (which also un-excludes the grapher deps the export step needs) so
+                # the explorer actually rebuilds.
+                if not export and any(s.startswith("export://") for s in steps):
+                    export = True
+                    click.echo("Detected modified export step(s); enabling --export for this run.")
+                click.echo(f"Restricting to {len(steps)} step(s) modified vs origin/master.")
+                # We matched modified catalog paths as substrings, so disable exact matching downstream.
+                exact_match = False
 
     kwargs = dict(
         includes=steps,
@@ -350,7 +367,23 @@ def _current_branch_name() -> str | None:
         return None
 
 
-def _modified_steps(includes: list[str], exact_match: bool = False) -> list[str]:
+# Repo-wide files that, per `DataStep.checksum_input()` (etl/steps/__init__.py), get baked into
+# *every* step's checksum on top of the step's own files: the pandas version (root pyproject.toml /
+# uv.lock pin it) and config.ETL_EPOCH (etl/config.py). A change to any of these makes every step
+# dirty regardless of which step files a branch touched, so a plain git-diff of step files misses it.
+_GLOBAL_CHECKSUM_FILES = {"pyproject.toml", "uv.lock", "etl/config.py"}
+
+
+def _global_checksum_inputs_changed(files_changed: dict[str, dict[str, str]]) -> list[str]:
+    """Return which repo-wide, all-steps-checksum-affecting files changed vs origin/master."""
+    return sorted(f for f in _GLOBAL_CHECKSUM_FILES if f in files_changed)
+
+
+def _modified_steps(
+    includes: list[str],
+    exact_match: bool = False,
+    files_changed: dict[str, dict[str, str]] | None = None,
+) -> list[str]:
     """Return catalog paths of steps that changed vs origin/master, plus their downstream steps.
 
     Reuses the same machinery as chart-diff (`get_changed_files` + `get_all_changed_catalog_paths`),
@@ -361,12 +394,17 @@ def _modified_steps(includes: list[str], exact_match: bool = False) -> list[str]
     multidims/explorers a branch affects via their upstream data steps. Data steps are returned
     URI-less (e.g. "garden/foo/bar"); export steps keep their full URI so `export://...` patterns
     match them.
+
+    :param files_changed: Pass in an already-fetched `get_changed_files()` result to avoid
+        recomputing it (callers that also need to check `_global_checksum_inputs_changed` first).
     """
     from etl.git_helpers import get_changed_files
     from etl.io import get_all_changed_catalog_paths
 
-    # We only need file names/statuses to pick steps, not the (slow) per-file diff contents.
-    changed_paths = get_all_changed_catalog_paths(get_changed_files(include_diff=False), include_export=True)
+    if files_changed is None:
+        # We only need file names/statuses to pick steps, not the (slow) per-file diff contents.
+        files_changed = get_changed_files(include_diff=False)
+    changed_paths = get_all_changed_catalog_paths(files_changed, include_export=True)
 
     # Narrow to those also matching the explicit STEPS arguments.
     if includes:

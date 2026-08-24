@@ -13,7 +13,7 @@ steps:
   data://external/owid_grapher/latest/population:
     - data://grapher/demography/2024-07-15/population
   data://external/owid_grapher/latest/gdp:
-    - data://grapher/worldbank_wdi/2026-07-14/wdi
+    - data://grapher/worldbank_wdi/2026-07-27/wdi
   # Create a step with a simplified countries-regions file used by the notebooks repository.
   data://external/notebooks/latest/regions:
     - data://grapher/regions/2023-01-01/regions
@@ -31,7 +31,7 @@ steps:
   # Malnutrition
   data://grapher/malnutrition/2024-12-16/malnutrition:
     - data://garden/malnutrition/2024-12-16/malnutrition:
-      - data://garden/worldbank_wdi/2026-07-14/wdi
+      - data://garden/worldbank_wdi/2026-07-27/wdi
       - data://garden/un/2024-07-12/un_wpp
 
   #
@@ -44,14 +44,6 @@ steps:
       - data://meadow/un/2023-08-16/un_sdg
       - snapshot://un/2023-08-16/un_sdg_unit.csv
       - snapshot://un/2023-08-16/un_sdg_dimension.json
-
-  # Internet
-  data://grapher/technology/2024-12-23/internet:
-    - data://garden/technology/2024-12-23/internet:
-      - data://garden/worldbank_wdi/2026-07-14/wdi
-      - data://garden/demography/2024-07-15/population
-      - data://garden/regions/2023-01-01/regions
-      - data://garden/wb/2026-07-01/income_groups
 
   # UNDP
   data://garden/un/2025-05-07/undp_hdr:
@@ -250,7 +242,7 @@ steps:
         - snapshot://aviation_safety_network/2024-06-05/aviation_statistics_by_period.csv
         - snapshot://aviation_safety_network/2024-06-05/aviation_statistics.csv
         - snapshot://aviation_safety_network/2024-06-05/aviation_statistics_by_nature.csv
-      - data://garden/worldbank_wdi/2026-07-14/wdi
+      - data://garden/worldbank_wdi/2026-07-27/wdi
 
   # Homicide - OMM
   data://grapher/homicide/2024-07-30/homicide_long_run_omm:
@@ -459,20 +451,6 @@ steps:
       - data-private://meadow/language/2025-09-03/ethnologue:
         - snapshot-private://language/2025-09-03/ethnologue.zip
 
-  # World Development Indicators - WDI
-
-  data://garden/worldbank_wdi/2025-09-08/wdi:
-    - data://garden/regions/2023-01-01/regions
-    - data://meadow/worldbank_wdi/2025-09-08/wdi:
-      - snapshot://worldbank_wdi/2025-09-08/wdi.zip
-    - data://garden/wb/2026-07-01/income_groups
-    - data://garden/demography/2024-07-15/population
-    - data://garden/un/2024-07-12/un_wpp
-    - snapshot://worldbank_wdi/2025-09-08/wdi.zip
-
-  data://grapher/worldbank_wdi/2025-09-08/wdi:
-    - data://garden/worldbank_wdi/2025-09-08/wdi
-
   #
   # IMF Trade Data - Regional
   #
@@ -481,7 +459,7 @@ steps:
       - data://meadow/imf/2025-07-08/trade:
         - snapshot://imf/2025-07-08/trade.csv
       - data://garden/regions/2023-01-01/regions
-      - data://garden/worldbank_wdi/2026-07-14/wdi
+      - data://garden/worldbank_wdi/2026-07-27/wdi
 
   #
   # Trade Volume Index - WTO Trade Growth
@@ -570,13 +548,13 @@ steps:
       - data://meadow/worldbank_wdi/2026-01-29/wdi:
         - snapshot://worldbank_wdi/2026-01-29/wdi.zip
 
-  data://grapher/worldbank_wdi/2026-07-14/wdi:
-    - data://garden/worldbank_wdi/2026-07-14/wdi:
-      - data://meadow/worldbank_wdi/2026-07-14/wdi:
-        - snapshot://worldbank_wdi/2026-07-14/wdi.zip
+  data://grapher/worldbank_wdi/2026-07-27/wdi:
+    - data://garden/worldbank_wdi/2026-07-27/wdi:
+      - data://meadow/worldbank_wdi/2026-07-27/wdi:
+        - snapshot://worldbank_wdi/2026-07-27/wdi.zip
       - data://garden/un/2024-07-12/un_wpp
       - data://garden/regions/2023-01-01/regions
-      - snapshot://worldbank_wdi/2026-07-14/wdi.zip
+      - snapshot://worldbank_wdi/2026-07-27/wdi.zip
       - data://garden/wb/2026-07-01/income_groups
       - data://garden/demography/2024-07-15/population
 
@@ -642,8 +620,8 @@ steps:
 
 
   # USA PPI New Office Construction (US Bureau of Labor Statistics)
-  data://garden/bls/2026-07-20/us_ppi_construction:
-    - snapshot://bls/2026-07-20/us_ppi_construction.csv
+  data://garden/bls/2026-08-18/us_ppi_construction:
+    - snapshot://bls/2026-08-18/us_ppi_construction.csv
 
   #
   # World Airlines Traffic and Capacity
@@ -664,6 +642,7 @@ include:
   - dag/open_numbers.yml
   - dag/faostat.yml
   - dag/energy.yml
+  - dag/energy_legacy.yml
   - dag/wizard.yml
   - dag/emissions.yml
   - dag/papers.yml

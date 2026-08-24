@@ -128,3 +128,107 @@ def test_get_all_changed_catalog_paths_only_pulls_in_closest_preceding_sibling(m
     assert "garden/worldbank_wdi/2025-01-24/wdi" not in result
     assert "garden/worldbank_wdi/2025-09-08/wdi" not in result
     assert "garden/worldbank_wdi/2026-01-29/wdi" not in result
+
+
+@patch("etl.io.get_file_at_merge_base")
+@patch("etl.io.load_single_dag_file")
+def test_get_dag_dependency_changed_steps_repoint(mock_load_single, mock_merge_base):
+    """A dag-only dependency edit (repoint) must select the repointed step — and only it.
+
+    This is the WDI 2026-07 follow-up shape: consumers were repointed from one WDI version to
+    another with no change to any file under etl/steps/, so file-based selection saw nothing,
+    staging skipped the rebuilds, and six consumers' value changes reached neither chart-diff
+    nor datadiff.
+    """
+    from etl.io import get_dag_dependency_changed_steps
+
+    # Current branch state: consumer repointed to 2026-07-27; bystander untouched.
+    mock_load_single.return_value = {
+        "data://garden/malnutrition/2024-12-16/malnutrition": {"data://garden/worldbank_wdi/2026-07-27/wdi"},
+        "data://garden/technology/2024-12-23/internet": {"data://garden/demography/2024-07-15/population"},
+    }
+    # Merge-base state of the same dag file, in the nested form dag files actually use.
+    mock_merge_base.return_value = """
+steps:
+  data://garden/malnutrition/2024-12-16/malnutrition:
+    - data://garden/worldbank_wdi/2026-07-14/wdi
+  data://garden/technology/2024-12-23/internet:
+    - data://garden/demography/2024-07-15/population
+"""
+
+    changed = get_dag_dependency_changed_steps({"dag/main.yml": {"status": "M", "diff": ""}})
+    assert changed == {"data://garden/malnutrition/2024-12-16/malnutrition"}
+
+    # dag/archive is a generated record — never a selection source.
+    assert get_dag_dependency_changed_steps({"dag/archive/main.yml": "M"}) == set()
+    # Deleted dag files select nothing.
+    assert get_dag_dependency_changed_steps({"dag/main.yml": "D"}) == set()
+
+
+@patch("etl.io.get_file_at_merge_base")
+@patch("etl.io.load_single_dag_file")
+@patch("etl.io.load_dag")
+def test_get_all_changed_catalog_paths_dag_only_dependency_change(mock_load_dag, mock_load_single, mock_merge_base):
+    """A repoint-only branch must select the repointed consumer and its downstream steps,
+    even though no file under etl/steps/ changed."""
+    mock_load_dag.return_value = {
+        "data://garden/worldbank_wdi/2026-07-27/wdi": set(),
+        "data://garden/malnutrition/2024-12-16/malnutrition": {"data://garden/worldbank_wdi/2026-07-27/wdi"},
+        "data://grapher/malnutrition/2024-12-16/malnutrition": {"data://garden/malnutrition/2024-12-16/malnutrition"},
+    }
+    mock_load_single.return_value = {
+        "data://garden/malnutrition/2024-12-16/malnutrition": {"data://garden/worldbank_wdi/2026-07-27/wdi"},
+    }
+    mock_merge_base.return_value = """
+steps:
+  data://garden/malnutrition/2024-12-16/malnutrition:
+    - data://garden/worldbank_wdi/2026-07-14/wdi
+"""
+
+    result = get_all_changed_catalog_paths({"dag/main.yml": {"status": "M", "diff": ""}})
+
+    assert "garden/malnutrition/2024-12-16/malnutrition" in result
+    # Downstream grapher step is swept in via the subgraph expansion.
+    assert "grapher/malnutrition/2024-12-16/malnutrition" in result
+    # (The repoint target also appears, as upstream deps always do in the subgraph expansion —
+    # harmless, since an unchanged dataset diffs as identical.)
+
+
+@patch("etl.io.get_file_at_merge_base")
+@patch("etl.io.load_single_dag_file")
+@patch("etl.io.load_dag")
+def test_get_all_changed_catalog_paths_private_dag_only_dependency_change(
+    mock_load_dag, mock_load_single, mock_merge_base
+):
+    """A repoint of a data-private:// consumer must survive into the returned catalog paths.
+
+    The final projection kept only data:// nodes, so a private-only repoint returned an empty
+    list — `etl run --modified --private` then reported no modified steps and skipped the
+    rebuild, and chart-diff/datadiff filtered the private steps out as spurious.
+    """
+    mock_load_dag.return_value = {
+        "data-private://garden/worldbank_wdi/2026-07-27/wdi": set(),
+        "data-private://garden/malnutrition/2024-12-16/malnutrition": {
+            "data-private://garden/worldbank_wdi/2026-07-27/wdi"
+        },
+        "data-private://grapher/malnutrition/2024-12-16/malnutrition": {
+            "data-private://garden/malnutrition/2024-12-16/malnutrition"
+        },
+    }
+    mock_load_single.return_value = {
+        "data-private://garden/malnutrition/2024-12-16/malnutrition": {
+            "data-private://garden/worldbank_wdi/2026-07-27/wdi"
+        },
+    }
+    mock_merge_base.return_value = """
+steps:
+  data-private://garden/malnutrition/2024-12-16/malnutrition:
+    - data-private://garden/worldbank_wdi/2026-07-14/wdi
+"""
+
+    result = get_all_changed_catalog_paths({"dag/main.yml": {"status": "M", "diff": ""}})
+
+    # The repointed private consumer and its private downstream step are both returned, URI-less
+    # like their public counterparts.
+    assert "garden/malnutrition/2024-12-16/malnutrition" in result
+    assert "grapher/malnutrition/2024-12-16/malnutrition" in result

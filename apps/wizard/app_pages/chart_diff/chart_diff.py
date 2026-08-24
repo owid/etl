@@ -36,6 +36,18 @@ EXCLUDE_METADATA_CHANGES = [
     "grapher/artificial_intelligence/.*/epoch",
 ]
 
+# Config fields that are environment- or bookkeeping-specific, so a difference in them is not a
+# difference in the chart. Used both when comparing configs and when resolving conflicts, so that
+# the conflict resolver does not ask users to "resolve" e.g. a version number.
+CONFIG_KEYS_IGNORE = (
+    "id",
+    "isPublished",
+    "bakedGrapherURL",
+    "adminBaseUrl",
+    "dataApiUrl",
+    "version",
+)
+
 
 @dataclass
 class ChartDiffScores:
@@ -576,15 +588,26 @@ class ChartDiff:
         """Get all chart slugs. Use `slugs` to filter slugs as this can be slow otherwise."""
         if slugs is not None:
             where = "WHERE slug IN %(slugs)s"
+            where_configs = "AND cc.slug IN %(slugs)s"
             params = {"slugs": tuple(slugs)}
         else:
             where = ""
+            where_configs = ""
             params = {}
 
         slugs_redirects = set(
             read_sql(f"SELECT slug FROM chart_slug_redirects {where}", target_session, params=params)["slug"]
         )
-        slugs = set(read_sql(f"SELECT slug FROM chart_configs {where}", target_session, params=params)["slug"])
+        # A chart_configs row only holds a *chart's* slug if a chart points at it. Without the join
+        # we also pick up slugs from config rows nothing owns, and report them as taken.
+        slugs = set(
+            read_sql(
+                "SELECT cc.slug FROM chart_configs cc JOIN charts c ON c.configId = cc.id "
+                f"WHERE cc.slug IS NOT NULL {where_configs}",
+                target_session,
+                params=params,
+            )["slug"]
+        )
         return slugs | slugs_redirects
 
     @staticmethod
@@ -1144,9 +1167,8 @@ def configs_are_equal(config_1: dict[str, Any], config_2: dict[str, Any], verbos
     assert "isInheritanceEnabled" in config_1, "isInheritanceEnabled must be in config_1"
     assert "isInheritanceEnabled" in config_2, "isInheritanceEnabled must be in config_2"
 
-    exclude_keys = ("id", "isPublished", "bakedGrapherURL", "adminBaseUrl", "dataApiUrl", "version")
-    config_1 = {k: v for k, v in config_1.items() if k not in exclude_keys}
-    config_2 = {k: v for k, v in config_2.items() if k not in exclude_keys}
+    config_1 = {k: v for k, v in config_1.items() if k not in CONFIG_KEYS_IGNORE}
+    config_2 = {k: v for k, v in config_2.items() if k not in CONFIG_KEYS_IGNORE}
 
     # Use pretty print to convert dicts to strings for comparison
     config_1_str = pprint.pformat(config_1, sort_dicts=True)

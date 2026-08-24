@@ -41,4 +41,4 @@ tables:
 
       assessment_domain:
         title: Assessment domain
-        description_short: The domain that the AI performance benchmark assesses.
+        description_short: Domain that the AI performance benchmark assesses.

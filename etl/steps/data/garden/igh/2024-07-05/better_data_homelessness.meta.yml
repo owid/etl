@@ -49,7 +49,7 @@ tables:
         title: IGH Framework Category (simplified)
         unit: ""
         short_unit: ""
-        description_short: The category of the IGH Framework that the homelessness data falls under.
+        description_short: Category of the IGH Framework that the homelessness data falls under.
         description_key:
           - The [IGH Global Framework](https://ighomelessness.org/wp-content/uploads/2019/10/globalframeworkforundertanding.pdf) captures three broad categories of people who may be considered homeless, defined as "lacking access to minimally adequate housing". These categories are (1) People without accommodation, (2) People living in temporary or crisis accommodation, and (3) People living in severely inadequate or insecure accommodation.
           - Among the first category, people without accommodation, the IGH Framework distinguishes (1A) People sleeping in the streets or in other open spaces, (1B) People sleeping in public roofed spaces or buildings not intended for human habitation, (1C) People sleeping in their cars, rickshaws, open fishing boats and other forms of transport, and (1D) "Pavement dwellers" - individuals or households who live on the street in a regular spot, usually with some form of makeshift cover.
@@ -90,7 +90,7 @@ tables:
         title: Methodology
         unit: ""
         short_unit: ""
-        description_short: The methodology used to collect the homelessness data.
+        description_short: Methodology used to collect the homelessness data.
         presentation:
           title_public: Methodology
         display:
@@ -102,7 +102,7 @@ tables:
         title: Data Source Type
         unit: ""
         short_unit: ""
-        description_short: The type of data source used to collect the homelessness data.
+        description_short: Type of data source used to collect the homelessness data.
         presentation:
           title_public: Data Source Type
         display:

@@ -43,22 +43,73 @@ The per-variable latest time comes from the indicators API `metadata.json` → `
 - ℹ️ **Projection-series exception** — when the reference indicator's latest time lies in the **future**, a hiding-field pin below it is usually the last-estimates cutoff, not staleness: UN WPP MDim views deliberately pin `map.time` to the last estimate year so the map doesn't open deep in the projection tail (see `etl/steps/export/multidim/un/latest/view_edits.py`). Grade ℹ️ and never propose `"latest"` there — that change is actively harmful. Apply the is-it-future test only to year axes; a day-offset axis needs the `zeroDay` conversion first.
 - ℹ️ **Incomplete-latest-year exception** — when the source's newest year is only partially reported, export steps deliberately pin `maxTime` / `timelineMaxTime` / `map.time` at the last fully reported year, usually via a named constant with an explanatory comment (`LAST_FULLY_REPORTED_YEAR` in `etl/steps/export/multidim/natural_disasters/latest/shared.py` — the EM-DAT MDim). Switching those to `"latest"` would surface data the step explicitly declares misleading. So **before proposing `"latest"` for any 🔴/🟡 on an ETL-defined surface, read the pin's source** (the export step's YAML/Python): a pin set on purpose with a documented reason stays ℹ️, its correct maintenance is bumping the constant at the next update, and the audit's only job there is to flag when the constant has visibly fallen behind the last *complete* year. The same exception exists at **chart level**: an admin-set pin guarding an incomplete latest year is deliberate. Two mechanics to know when *placing* such a guard: use **`timelineMaxTime`**, not `maxTime` — a `maxTime` pin only moves the default view, and the slider (or a `?time=` URL) still reaches the misleading year — and don't trust a render to judge completeness, because `display.tolerance` backfills a partial year's missing series from prior years, so a mixed-vintage stacked bar *looks* complete; grade against each series' own max time from `metadata.json`. Note also that stacked **time-series** views need no guard at all (grapher drops time points with incomplete stacks) — the exposure is single-time discrete/map views.
 
-**Deliberate-pin signal:** the pinned value appears in the chart's `title`, `subtitle`, `note`, or slug (comparison charts like `...-2020-vs-1980`). Those pins are *coupled* to FAUST text — if anyone ever bumps the pin, the text must change with it — so never auto-fix them, and say so in the report. The heuristic only makes sense for year-valued time axes, not day offsets.
+**Deliberate-pin signal:** the pinned value appears in the chart's `title`, `subtitle`, `note`, or slug (comparison charts like `...-2020-vs-1980`). Those pins are *coupled* to FAUST text — if anyone ever bumps the pin, the text must change with it — so never auto-fix them, and say so in the report. The heuristic only makes sense for year-valued time axes, not day offsets. The text side of the same coupling is guarded by [`edit-faust-metadata`](../edit-faust-metadata/SKILL.md)'s pin-coupling check (never change the words without reading the pins) — keep the two rules in sync.
+
+**Min-side pins: grade against the first year *every* series has data, not the earliest year any of them does.** The dominant idiom is pinning `minTime` to the year all y-series become available, so the lines start together and the comparison is fair — measured against the *union* start that looks like "hiding 87% of history", measured against the *intersection* start it is exactly right. So before suspecting anything, compare the pin against the intersection start — the first year present in **every** y-variable's year list (the same `dimensions.years.values[].id` arrays the availability lookup already fetches). `max(first year of each series)` is only a lower bound, not the intersection start: it matches when series are gap-free, but a gap right after a series' first observation pushes the true first shared year later (one series observed in 1900 and then from 2000 onward, another from 1950: first shared year 2000, not 1950), and grading against the lower bound would flag a legitimate alignment pin as a crop. If the intersection is empty (the series never share a year), the alignment test is inapplicable — treat the pin as ungradable by this rule and default it to ℹ️. A min-side pin is only worth raising when **all** of these hold: the visible window (`maxTime or latest` − pin) is short, alignment doesn't explain the pin — i.e. the pin sits **strictly after** the all-series intersection start (at the intersection start it is exactly the alignment idiom; later than it, years in which *every* series has data are being hidden, so multi-series charts stay eligible — and "no alignment reason" may only be declared for a single *rendered* series: one y-variable **and** one selected entity) — and no year appears in its FAUST text or slug. Everything else is framing — pre-X data-quality cutoffs, decade starts, "last 50 years" charts.
+
+**Series are entities too, not just y-variables.** A chart plotting one y-variable across several selected countries renders one line per country, but `dimensions.years.values` in `metadata.json` is the indicator-wide **union** of years across all entities — a variable-level intersection cannot see that the pin starts the selected countries' lines together (and the same union blind spot understates the intersection start on multi-variable charts with several selected entities). For those charts, run the same intersection test on per-entity year lists: fetch the indicator's `<id>.data.json` (parallel `entities`/`years` arrays, same endpoint and prefix rules as `metadata.json`), map the chart's `selectedEntityNames` to entity ids via `metadata.json` → `dimensions.entities.values`, and take the first year present in every selected entity's list. If per-entity availability wasn't checked, leave the pin ℹ️ — never declare a crop from variable-level years alone.
+
+Three exclusions keep that check from crying wolf; without them a WDI-scale sweep flags ~46 pins of which ~1 is real:
+- **`minTime == maxTime` is a deliberate single-year view** (typically a scatter) — never a crop. Detect it as a zero-length visible window, not by chart type: a chart with an `x` dimension renders as a scatter even when `type` is absent (i.e. reports as the `LineChart` default). This exempts the chart from the min-side crop check only — whether the pinned year has gone stale is still graded by the single-year-snapshot rule in the rubric above (surface a 2+-years-behind snapshot as a decision when no year appears in its name or text).
+- **A pin *below* the all-series start shows more, not less** — it exposes partial series deliberately. Never a crop.
+- **Day-offset axes need the `zeroDay` conversion first, and mixed day/year scatters can't be graded at all.** A scatter whose y is day-based and x is year-based (e.g. `generative-ai-vs-gdp-per-capita`: y in days from 2025-06-30, x in years) will read as "pin far past the end of data" against either axis while rendering perfectly. Verify with the SVG before reporting one.
+
+(Real case: `municipal-water-as-a-share-of-total-water-withdrawals` pinned `minTime: 2019` against data ending 2022 — a 3-year window on a single-series chart with no year in its text. That is the shape worth flagging; the other 45 min-side pins in the same sweep were all legitimate.)
 
 **Stale years also hide in FAUST text with no config pin at all** — a subtitle saying "…in 2023" on a chart whose config already tracks `latest` is a year pin living in words, invisible to every config sweep. Grep the audited surfaces' `title`/`subtitle`/`note` for year literals at or below the previous data max, and check *narrative charts' merged configs* especially: their subtitles are often inherited from a parent (sometimes an unpublished draft), so the fix belongs **on the parent** to preserve inheritance — and a parent edit never rematerializes the child's stored config on its own, so re-saving the child's patch unchanged is a required step (mechanics in `/update-dataset` step 7), not something waiting can substitute for; only after that re-save can you judge whether the fix took. (ODA: after unpinning a top-10 snapshot chart to track latest, its inherited subtitle still said "in 2023" — fixed on parent draft 8778, then the child re-saved.)
 
 ## Surfaces and where the fix lives
 
-| Surface | Where the pins are | Where the fix goes |
-|---|---|---|
-| Charts | `chart_dimensions` → `charts` → `chart_configs.full` | Chart config edit — `AdminAPI` (`apps/chart_sync/admin_api.py`): `get_chart_config(id)`, set the field to `"latest"`, `update_chart(id, cfg)`. In an update, apply on **staging** with user sign-off — the edit rides Chart Diff to production at merge. General mode: hand the list to the user or get explicit sign-off per batch before touching production. |
-| MDim views | `multi_dim_x_chart_configs` → `chart_configs` (resolved configs) | The MDim YAML in `etl/steps/export/multidim/...` (view `config:` blocks / `common_view_config`), then re-run the export step. A DB-side fix is **overwritten at the next rebuild** — the YAML is the source of truth. |
-| Explorer views | `explorer_views` → `chart_configs` (join `explorers` for `isPublished`) | ETL-based explorers: `etl/steps/export/explorers/.../*.config.yml` + export re-run. Non-ETL explorers (no `explorer_views` rows; definition lives in `explorers.config`): the explorer admin TSV (`minTime`/`maxTime` columns in the graphers block, `time=` in `defaultView`) — report as a coverage caveat if you don't parse it. |
-| Narrative charts | merged parent+patch via `AdminAPI.get_narrative_chart` | Usually deliberate (ℹ️). If a pin must move, edit the narrative chart's patch via `AdminAPI.update_narrative_chart` — with user sign-off, as with any reader-facing change. |
-| Indicator-level configs | `presentation.grapher_config` in garden/grapher `.meta.yml` (repo grep below) | The `.meta.yml` + step re-run with `--grapher`. These propagate into every thin MDim/explorer view that inherits the indicator's config, so one pinned field here fans out to many views. |
-| Article references | `posts_gdocs_links` (join `posts_gdocs pg ON pg.id = pgl.sourceId` — the FK is `sourceId`, not a gdoc-named column — and filter `pg.published = 1`) whose `queryString` carries `time=` — embeds and hyperlinks to charts, MDims, and explorers alike | Gdoc edit (content follow-up). Same plumbing as `check-empty-entities` §4: resolve `target` through `chart_slug_redirects`, link each citation with a scroll-to-highlight URL via `find_chart_citations_in_content`, and verify fixes on the live article page, not the lagging Datasette mirror. |
+**Get the surface list from `find-chart-references`, not from your own joins:**
+
+```bash
+ENV_FILE=<creds> DATA_API_ENV=production .venv/bin/python \
+  .claude/skills/find-chart-references/scripts/find_references.py \
+  --dataset-id <new grapher dataset id> --transitive --json ai/refs.json
+```
+
+Each row carries a `config_id` (`chart_configs.id`) for every config-bearing
+surface — charts, MDim views, explorer views, narrative charts — so fetching the
+configs to inspect is one `WHERE id IN (...)` against `chart_configs`, with no
+surface joins of your own. Article rows carry the `query_string`, which is where
+`time=` pins live. A `surface = "explorer"` row (as opposed to `explorer view`)
+carries no `config_id`: the indicator is registered on that explorer but no view
+config names it, so report it as unchecked rather than passing it.
+
+`--transitive` is not optional here. Narrative charts hang off a chart *or* an MDim
+view, and both hops live behind that flag — drop it and every narrative chart on the
+dataset goes unaudited. This skill's job starts after that: find the pins, grade them against the
+data's latest time, and route the fix.
+
+| Surface | Where the fix goes |
+|---|---|
+| Charts | Chart config edit — `AdminAPI` (`apps/chart_sync/admin_api.py`): `get_chart_config(id)`, set the field to `"latest"`, `update_chart(id, cfg)`. In an update, apply on **staging** with user sign-off — the edit rides Chart Diff to production at merge. General mode: hand the list to the user or get explicit sign-off per batch before touching production. |
+| MDim views | The MDim YAML in `etl/steps/export/multidim/...` (view `config:` blocks / `common_view_config`), then re-run the export step. A DB-side fix is **overwritten at the next rebuild** — the YAML is the source of truth. |
+| Explorer views | ETL-based explorers: `etl/steps/export/explorers/.../*.config.yml` + export re-run. Non-ETL explorers (no `explorer_views` rows; definition lives in `explorers.config`): the explorer admin TSV (`minTime`/`maxTime` columns in the graphers block, `time=` in `defaultView`) — report as a coverage caveat if you don't parse it. |
+| Narrative charts | Usually deliberate (ℹ️). Read the **merged** config via `AdminAPI.get_narrative_chart(id)["configFull"]`, not the `config_id` row — that stored full lags a parent edit. If a pin must move, edit the patch via `AdminAPI.update_narrative_chart`, with user sign-off. |
+| Indicator-level configs | The `.meta.yml` + step re-run with `--grapher`. Pins live in `presentation.grapher_config` (repo grep below) — **not a DB surface**, so the sweep won't find them; grep for them separately. These propagate into every thin MDim/explorer view that inherits the indicator's config, so one pinned field here fans out to many views. |
+| Featured metrics | **Not in scope — skip them.** The sweep emits them, but a featured metric's URL cannot hold a time pin: the admin strips `time=` on paste, and Algolia matches the row's params exactly, so one carrying `time=` would simply fail to index. Nothing to grade. |
+| Article references | Gdoc edit (content follow-up). Link each citation with a scroll-to-highlight URL via `find_chart_citations_in_content`, and verify fixes on the live article page, not the lagging Datasette mirror. |
 
 **Parsing `time=` in URLs:** the grapher time param is a single value (`time=2019`) or a range (`time=1990..2020`, `time=earliest..2023`). Each **numeric** component is a pin — grade the end bound like `maxTime` (an embed with `time=..2019` keeps showing the old window after the data reaches 2025), the start bound like `minTime`. `earliest`/`latest` components are fine, and daily charts use ISO dates (`time=2020-01-01..latest`) — convert those to day offsets before grading: a day-axis variable advertises `display.zeroDay` in the same `metadata.json` (its `dimensions.years.values[].id` are day offsets from that date), so the component's comparable value is `(date.fromisoformat(part) - date.fromisoformat(zero_day)).days`. Skip `$time`-style template placeholders in country-page dynamic embeds. Article time pins are often deliberate framing of the surrounding prose, so default them to 🟡-at-worst and always hand them to content follow-up rather than editing configs.
+
+**Judging an article pin deliberate vs. stale.** Pull ±400 chars of `posts_gdocs.markdown` around the link and read it — but grade on the right signals, because the obvious test is a trap:
+
+- **Strip URLs from the context window before scanning it for years.** The context contains the link's own `time=1990..2016`, so a naive year regex "finds" 1990 and 2016 in every single case and marks the whole list deliberate. Sub out `https?://\S+` first. (This produced a wrong 9-of-15 "deliberate" verdict on the WDI 2026-07-27 sweep.)
+- **`endpointsOnly=1` justifies the start bound, not the end one.** It means the chart is a first-vs-last-point comparison — so the start year is structural, but the comparison is generally *better* with more years. These are usually "extend the end to `latest`, keep the start", not "leave alone".
+- **The real blocker is a numeric claim in the sentence that depends on the end year** — "increased 12-fold", "more than 95%", a ratio in the article title. Changing the pin there invalidates prose, so it's an editorial call, not a link fix. Scan for **numbers, not just years**: "the UK economy has grown 300% and the world economy more than 600%" names no year but is entirely determined by the pinned endpoint.
+- **Check the link's visible text and the article title too**, not just the surrounding sentence: link text of literally `2024`, or a title like "…over the past three decades" matching a `1994..2024` range, couples the pin to something a reader sees.
+- **Sibling links to the same chart are strong evidence.** If one link in a passage uses `time=latest` and another uses a pinned year, the pinned one is almost certainly an oversight; if the prose links use `latest` and only a `<Chart>` embed is pinned, likewise.
+- Also flag the inverse of staleness: a pin whose range **stops short of the years the sentence discusses** (prose about "2010 to 2019" under a chart pinned `1990..2017`).
+
+**Make each finding locatable in the Google Doc**, or the handoff is unusable — whoever fixes it has to find the link before they can edit it, and Google Docs search **does not index hyperlink targets**. So never hand over "search for the chart slug" for an in-text link:
+
+- **Report `posts_gdocs_links.text` — the visible anchor text** — as the search string for `span-link` components ("clicking here", "this other", "Several countries"). That is the only part of the link a reader, or Docs search, can see.
+- The slug is searchable **only** for components that write the URL out as literal text — `chart` (`<Chart url="…">`) and `front-matter`. Branch on `componentType` when composing the instruction; front-matter lives in the doc header, not the body.
+- **Report the raw `target`, not the redirect-resolved slug.** `posts_gdocs_links.target` stores the slug as the author typed it, which may predate a rename (`gross-domestic-product` → `gdp-worldbank-constant-usd`). Resolve through `chart_slug_redirects` for *grading*; keep the raw target for *locating*.
+- **Count sibling links to the same chart in the same doc** and say which one to fix. A doc can link one chart four times with different `time=` values; "search for X" is ambiguous otherwise. Flag when the anchor text is a very common word ("Here", "2024") so the editor knows to verify by hovering.
+
+**Parse `time=` components; don't prefix-match.** A `time=\d`-style regex silently drops `time=earliest..2017` and `time=earliest..latest` — split on `..` and test each component.
 
 Repo scan for the ETL-side sources (also catches pins that haven't reached any DB yet). The flat keys grep directly; the **nested map bounds (`map:` → `time`/`startTime`) never match a flat pattern** — walk the YAML for those:
 
@@ -142,13 +193,16 @@ def pins(cfg):
         if isinstance(v, (int, float)) and not isinstance(v, bool):
             yield path, v
 
-cfgs = env.read_sql("""
-    SELECT DISTINCT c.id AS chart_id, cc.slug, cc.full AS config
-    FROM chart_dimensions cd
-    JOIN variables v ON cd.variableId = v.id
-    JOIN charts c ON c.id = cd.chartId
-    JOIN chart_configs cc ON cc.id = c.configId
-    WHERE v.datasetId = %(d)s""", params={"d": DATASET_ID})
+# Surfaces come from find-chart-references (--dataset-id ... --json refs.json);
+# every config-bearing row carries a config_id, so one query fetches them all.
+refs = [r for r in json.load(open("refs.json")) if r["config_id"]]
+ids = tuple({r["config_id"] for r in refs})
+if not ids:  # `WHERE id IN ()` is a MySQL syntax error, not an empty result
+    raise SystemExit("No config-bearing references — report the unchecked surfaces instead.")
+cfgs = env.read_sql(
+    "SELECT id, slug, full AS config FROM chart_configs WHERE id IN %(i)s",
+    params={"i": ids},
+)
 
 for _, row in cfgs.iterrows():
     cfg = json.loads(row["config"])
@@ -176,7 +230,9 @@ for _, row in cfgs.iterrows():
         ...  # collect (sev, surface, chart_id, slug, field, val, ref, deliberate)
 ```
 
-Repeat over `multi_dim_x_chart_configs`, `explorer_views`, narrative-chart merged configs, and parsed `posts_gdocs_links` query strings (`time=` components), then fold in the repo grep. Query gotchas: pymysql `%`-formats break on quoted literals — parameterize everything. **The public Datasette mirror is DuckDB**, not SQLite/MySQL — `json_type()` returns DuckDB type names (`UBIGINT`, `VARCHAR`, …), so don't filter numerics by type name in SQL; use `TRY_CAST(json_extract_string(cc.full, '$.maxTime') AS DOUBLE) IS NOT NULL` or pull `json_extract_string(...)` values and classify client-side.
+The same loop covers MDim views and explorer views — they are `chart_configs` rows too, and the sweep already returned their `config_id`. Two surfaces need their own handling: **narrative charts** (read `AdminAPI.get_narrative_chart(id)["configFull"]`, since the stored full lags a parent edit) and **article references** (parse the `time=` components out of each row's `query_string`). Then fold in the repo grep for indicator-level `presentation.grapher_config` pins, which live in YAML and are invisible to any DB sweep.
+
+Query gotchas: pymysql `%`-formats break on quoted literals — parameterize everything. **The public Datasette mirror is DuckDB**, not SQLite/MySQL — `json_type()` returns DuckDB type names (`UBIGINT`, `VARCHAR`, …), so don't filter numerics by type name in SQL; use `TRY_CAST(json_extract_string(cc.full, '$.maxTime') AS DOUBLE) IS NOT NULL` or pull `json_extract_string(...)` values and classify client-side.
 
 ## Report format
 
@@ -188,3 +244,7 @@ One table per severity — chart/view id, surface, admin or grapher link (stagin
 - **Coverage caveats** — variables whose metadata fetch failed; non-ETL explorers whose TSV wasn't parsed.
 
 Pins are almost always **pre-existing** (updates don't create them), so there's no production-grading pass here — the question is only whether the new data now extends past the pin.
+
+### Close with what's still open
+
+End every run by saying what's still open — a line or two in chat, written out in the PR body when there is one. `.claude/docs/open-items.md` lists what tends to get dropped. An audit's findings mostly can't be closed by the audit, and this one's usual danglers cover all three categories: gdoc `time=` pins (waiting on someone else — content edit + re-ingest; give the searchable anchor text, not the slug), reader-facing `"latest"` conversions awaiting sign-off (waiting on a decision), and variables whose metadata fetch failed or surfaces skipped for cost (nobody checked it — if you bounded the sweep, say what fell outside the bound). Where the run touched things outside the audit's scope (a follow-up PR, an upstream data error to report to the producer), list those too.

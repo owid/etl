@@ -715,15 +715,23 @@
         "description": "Entity annotations"
       },
       "timeInterval": {
-        "type": "string",
         "description": "Interval that each value in the year/time column represents. Sub-yearly intervals (day, week, month, quarter) are encoded as days-since-`zeroDay` integers.",
-        "enum": [
-          "day",
-          "week",
-          "month",
-          "quarter",
-          "year",
-          "decade"
+        "oneOf": [
+          {
+            "type": "string",
+            "enum": [
+              "day",
+              "week",
+              "month",
+              "quarter",
+              "year",
+              "decade"
+            ]
+          },
+          {
+            "type": "string",
+            "pattern": "<%"
+          }
         ]
       },
       "color": {

@@ -850,6 +850,59 @@ def test_validate_dimension_uniqueness_single_dimension():
     collection.validate_dimension_uniqueness()
 
 
+def _collection_with_dimension_slug(slug: str) -> Collection:
+    return Collection(
+        catalog_path="test/latest/data#table",
+        title={"en": "Test"},
+        default_selection=[],
+        dimensions=[
+            Dimension(slug=slug, name="Some dimension", choices=[DimensionChoice(slug="a", name="A")]),
+        ],
+        views=[View(dimensions={slug: "a"}, indicators=ViewIndicators(y=[]))],
+        _definitions=Definitions(),
+    )
+
+
+def test_validate_dimension_slugs_not_grapher_query_params_success():
+    """
+    Test Collection.validate_dimension_slugs_not_grapher_query_params - passes with a regular slug.
+
+    Example: Collection with dimension slug "sex" should pass validation
+    """
+    collection = _collection_with_dimension_slug("sex")
+
+    # Should not raise any exception
+    collection.validate_dimension_slugs_not_grapher_query_params()
+
+
+def test_validate_dimension_slugs_not_grapher_query_params_reserved_slug():
+    """
+    Test Collection.validate_dimension_slugs_not_grapher_query_params - fails with a reserved slug.
+
+    Example: Collection with dimension slug "time" (a Grapher query param) should raise ValueError
+    """
+    collection = _collection_with_dimension_slug("time")
+
+    with pytest.raises(ValueError, match="collides with a query param reserved by Grapher"):
+        collection.validate_dimension_slugs_not_grapher_query_params()
+
+
+def test_validate_dimension_slugs_not_grapher_query_params_normalized_slug():
+    """
+    Test Collection.validate_dimension_slugs_not_grapher_query_params - compares snake_case forms.
+
+    Example: slug "Time" is persisted as "time" by save(), so it must fail; slug "stackMode" is
+    persisted as "stack_mode", which does not collide, so it must pass.
+    """
+    collection = _collection_with_dimension_slug("Time")
+
+    with pytest.raises(ValueError, match="collides with a query param reserved by Grapher"):
+        collection.validate_dimension_slugs_not_grapher_query_params()
+
+    # Should not raise any exception
+    _collection_with_dimension_slug("stackMode").validate_dimension_slugs_not_grapher_query_params()
+
+
 def test_validate_dimension_uniqueness_multiple_duplicates():
     """
     Test Collection.validate_dimension_uniqueness - catches first duplicate when multiple exist.
@@ -2225,3 +2278,177 @@ def test_convert_description_key_lists_flattens_anchored_lists():
     _convert_description_key_lists(config)
     assert config["metadata"]["description_key"] == "- shared one\n- shared two\n- extra"
     assert config["views"][0]["metadata"]["description_key"] == "only"
+
+
+def test_convert_description_key_lists_rejects_character_explosion():
+    """A markdown string split into its characters must fail here, instead of being
+    silently rejoined into thousands of one-character bullets."""
+    from etl.collection.model.core import _convert_description_key_lists
+
+    config = {
+        "views": [
+            {
+                "metadata": {
+                    "description_key": list(
+                        "A markdown string that is not a list of bullets, and is as long as a real one."
+                    )
+                }
+            }
+        ],
+    }
+    with pytest.raises(ValueError, match="Pathological `description_key`"):
+        _convert_description_key_lists(config, context="multidim/x/latest/y#y")
+
+
+def test_validate_description_keys_rejects_character_explosion():
+    """The shape of the natural-disasters bug (#6647): a grouped view whose
+    `description_key` was rebuilt with `list()` from the grapher-channel markdown string.
+
+    `Collection.save()` runs this before the upsert, so explorers — which override
+    `upsert_to_db` and never convert the list — are covered too.
+    """
+    collection = Collection(
+        catalog_path="multidim/natural_disasters/latest/affected#affected",
+        title={"en": "Test"},
+        default_selection=["World"],
+        dimensions=[
+            Dimension(slug="type", name="Type", choices=[DimensionChoice(slug="all_stacked", name="All disasters")])
+        ],
+        views=[
+            View(
+                dimensions={"type": "all_stacked"},
+                indicators=ViewIndicators(
+                    y=[Indicator(catalogPath="grapher/emdat/2026-04-30/natural_disasters/yearly#total_affected")]
+                ),
+                metadata={
+                    "description_key": list(
+                        "- EM-DAT counts an event as a disaster when it meets any of several criteria."
+                    )
+                },
+            )
+        ],
+        _definitions=Definitions(),
+    )
+
+    with pytest.raises(ValueError, match="Pathological `description_key`"):
+        collection.validate_description_keys()
+
+    # The same view with the string left alone passes.
+    collection.views[0].metadata = {
+        "description_key": "- EM-DAT counts an event as a disaster when it meets any of several criteria."
+    }
+    collection.validate_description_keys()
+
+
+def _make_minimal_config(**extra) -> dict:
+    """Smallest config that `Collection.from_dict` accepts."""
+    return {
+        "catalog_path": "test/latest/data#table",
+        "title": {"title": "Test", "title_variant": "variant"},
+        "default_selection": ["World"],
+        "dimensions": [{"slug": "metric", "name": "Metric", "choices": [{"slug": "total", "name": "Total"}]}],
+        "views": [
+            {
+                "dimensions": {"metric": "total"},
+                "indicators": {"y": [{"catalogPath": "grapher/ns/2024-01-01/ds/tb#ind"}]},
+                "config": {"hasMapTab": True},
+            }
+        ],
+        **extra,
+    }
+
+
+def test_collection_grapher_schema_round_trips():
+    """
+    Test Collection.grapher_schema - the authored pin survives from_dict/to_dict.
+
+    Without it the model used to drop the key entirely, so the version never reached Grapher.
+    """
+    collection = Collection.from_dict(_make_minimal_config(grapher_schema="011"))
+    assert collection.grapher_schema == "011"
+    assert collection.to_dict()["grapher_schema"] == "011"
+
+    # Omitted: the key is pruned, and `upsert_to_db` resolves the DEFAULT_GRAPHER_SCHEMA fallback.
+    collection = Collection.from_dict(_make_minimal_config())
+    assert collection.grapher_schema is None
+    assert "grapher_schema" not in collection.to_dict()
+
+
+def test_collection_grapher_schema_validates_at_init():
+    """
+    Test Collection.grapher_schema - a malformed pin fails at authoring time, not at upsert time.
+
+    Example: `grapher_schema: 011` unquoted in YAML arrives as 9 and is rejected.
+    """
+    with pytest.raises(ValueError, match="Invalid `grapher_schema` value"):
+        Collection.from_dict(_make_minimal_config(grapher_schema=9))
+
+
+def test_collection_grapher_schema_passes_schema_validation():
+    """
+    Test Collection.validate_schema - `grapher_schema` is accepted and format-checked by
+    schemas/multidim-schema.json (which sets additionalProperties: false at the top level).
+    """
+    Collection.from_dict(_make_minimal_config(grapher_schema="011")).validate_schema()
+
+    collection = Collection.from_dict(_make_minimal_config(grapher_schema="011"))
+    collection.grapher_schema = "latest"  # bypasses __post_init__
+    with pytest.raises(ValueError, match="must match pattern"):
+        collection.validate_schema()
+
+
+def test_explorer_rejects_grapher_schema():
+    """
+    Test Explorer - `grapher_schema` is multidim-only and must not be silently ignored.
+
+    Explorers reach Grapher through the legacy TSV path, which has no `grapherConfigSchema`.
+    """
+    from etl.collection.explorer import Explorer
+
+    with pytest.raises(ValueError, match="only supported for multidim collections"):
+        Explorer.from_dict(_make_minimal_config(grapher_schema="011", config={"explorerTitle": "T"}))
+
+
+def test_warn_on_view_schema_overrides(capsys):
+    """
+    Test Collection.warn_on_view_schema_overrides - a view `$schema` shadowing the collection pin
+    is surfaced, since Grapher lets the view value win and it is much less visible.
+
+    structlog writes to stdout rather than through stdlib logging, hence capsys not caplog.
+    """
+    collection = Collection.from_dict(
+        _make_minimal_config(
+            grapher_schema="011",
+            views=[
+                {
+                    "dimensions": {"metric": "total"},
+                    "indicators": {"y": [{"catalogPath": "grapher/ns/2024-01-01/ds/tb#ind"}]},
+                    "config": {"$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json"},
+                }
+            ],
+        )
+    )
+    collection.warn_on_view_schema_overrides()
+    out = capsys.readouterr().out
+    assert "grapher-schema.008.json" in out
+    assert "grapher-schema.011.json" in out
+    assert "grapher_schema" in out
+
+    # A view without its own `$schema` stays quiet.
+    Collection.from_dict(_make_minimal_config(grapher_schema="011")).warn_on_view_schema_overrides()
+    assert capsys.readouterr().out == ""
+
+
+def test_warn_if_grapher_schema_unpinned(capsys):
+    """
+    Test Collection.warn_if_grapher_schema_unpinned - an unpinned collection says so.
+
+    Without this, a config that silently relies on the DEFAULT_GRAPHER_SCHEMA fallback is
+    indistinguishable in the database from one that pins the same version deliberately.
+    """
+    Collection.from_dict(_make_minimal_config()).warn_if_grapher_schema_unpinned()
+    out = capsys.readouterr().out
+    assert "pins no `grapher_schema`" in out
+
+    Collection.from_dict(_make_minimal_config(grapher_schema="011")).warn_if_grapher_schema_unpinned()
+    assert capsys.readouterr().out == ""

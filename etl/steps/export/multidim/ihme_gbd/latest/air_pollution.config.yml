@@ -1,3 +1,5 @@
+grapher_schema: "011"
+
 title:
   title: Deaths from air pollution
   title_variant: ""
@@ -86,7 +88,7 @@ views:
       metric: number
     indicators:
       y:
-        - catalogPath: grapher/ihme_gbd/2026-02-07/gbd_risk_deaths/gbd_risk_deaths#value__metric_number__measure_deaths__rei_air_pollution__age_all_ages__cause_all_causes
+        - catalogPath: gbd_risk_deaths#value__metric_number__measure_deaths__rei_air_pollution__age_all_ages__cause_all_causes
     config:
       title: Deaths from air pollution
       subtitle: Estimated premature deaths attributed to air pollution. This means people died earlier than they would have in the absence of air pollution. This includes indoor household pollution, outdoor particulate matter and ozone pollution.
@@ -96,7 +98,7 @@ views:
       metric: rate
     indicators:
       y:
-        - catalogPath: grapher/ihme_gbd/2026-02-07/gbd_risk_deaths/gbd_risk_deaths#value__metric_rate__measure_deaths__rei_air_pollution__age_age_standardized__cause_all_causes
+        - catalogPath: gbd_risk_deaths#value__metric_rate__measure_deaths__rei_air_pollution__age_age_standardized__cause_all_causes
     config:
       title: Death rate from air pollution
       subtitle: Estimated premature deaths attributed to air pollution per 100,000 people. This means people died earlier than they would have in the absence of pollution.
@@ -107,7 +109,7 @@ views:
       metric: share
     indicators:
       y:
-        - catalogPath: grapher/ihme_gbd/2026-02-07/gbd_risk_deaths/gbd_risk_deaths#value__metric_percent__measure_deaths__rei_air_pollution__age_age_standardized__cause_all_causes
+        - catalogPath: gbd_risk_deaths#value__metric_percent__measure_deaths__rei_air_pollution__age_age_standardized__cause_all_causes
     config:
       title: Share of deaths attributed to air pollution
       subtitle: Share of deaths, from any cause, which are attributed to air pollution – from outdoor and indoor sources – as a risk factor.
@@ -118,7 +120,7 @@ views:
       metric: number
     indicators:
       y:
-        - catalogPath: grapher/ihme_gbd/2026-02-07/gbd_risk_deaths/gbd_risk_deaths#value__metric_number__measure_deaths__rei_ambient_particulate_matter_pollution__age_all_ages__cause_all_causes
+        - catalogPath: gbd_risk_deaths#value__metric_number__measure_deaths__rei_ambient_particulate_matter_pollution__age_all_ages__cause_all_causes
     config:
       title: Deaths from outdoor air pollution
       subtitle: Estimated premature deaths attributed to outdoor air pollution. This means people died earlier than they would have in the absence of outdoor particulate matter pollution.
@@ -128,7 +130,7 @@ views:
       metric: rate
     indicators:
       y:
-        - catalogPath: grapher/ihme_gbd/2026-02-07/gbd_risk_deaths/gbd_risk_deaths#value__metric_rate__measure_deaths__rei_ambient_particulate_matter_pollution__age_age_standardized__cause_all_causes
+        - catalogPath: gbd_risk_deaths#value__metric_rate__measure_deaths__rei_ambient_particulate_matter_pollution__age_age_standardized__cause_all_causes
     config:
       title: Outdoor air pollution death rate
       subtitle: Estimated premature deaths attributed to outdoor air pollution per 100,000 people. This means people died earlier than they would have in the absence of pollution.
@@ -139,7 +141,7 @@ views:
       metric: share
     indicators:
       y:
-        - catalogPath: grapher/ihme_gbd/2026-02-07/gbd_risk_deaths/gbd_risk_deaths#value__metric_percent__measure_deaths__rei_ambient_particulate_matter_pollution__age_all_ages__cause_all_causes
+        - catalogPath: gbd_risk_deaths#value__metric_percent__measure_deaths__rei_ambient_particulate_matter_pollution__age_all_ages__cause_all_causes
     config:
       title: Share of deaths attributed to outdoor air pollution
       subtitle: Share of deaths, from any cause, where ambient particulate matter air pollution is a risk factor.
@@ -150,7 +152,7 @@ views:
       metric: number
     indicators:
       y:
-        - catalogPath: grapher/ihme_gbd/2026-02-07/gbd_risk_deaths/gbd_risk_deaths#value__metric_number__measure_deaths__rei_household_air_pollution_from_solid_fuels__age_all_ages__cause_all_causes
+        - catalogPath: gbd_risk_deaths#value__metric_number__measure_deaths__rei_household_air_pollution_from_solid_fuels__age_all_ages__cause_all_causes
     config:
       title: Deaths from indoor air pollution
       subtitle: Estimated premature deaths attributed to indoor air pollution. This means people died earlier than they would have in the absence of indoor air pollution from solid fuels used for cooking and heating.
@@ -160,7 +162,7 @@ views:
       metric: rate
     indicators:
       y:
-        - catalogPath: grapher/ihme_gbd/2026-02-07/gbd_risk_deaths/gbd_risk_deaths#value__metric_rate__measure_deaths__rei_household_air_pollution_from_solid_fuels__age_age_standardized__cause_all_causes
+        - catalogPath: gbd_risk_deaths#value__metric_rate__measure_deaths__rei_household_air_pollution_from_solid_fuels__age_age_standardized__cause_all_causes
     config:
       title: Death rate from indoor air pollution
       subtitle: Estimated premature deaths attributed to indoor air pollution per 100,000 people. This means people died earlier than they would have in the absence of pollution.
@@ -171,7 +173,7 @@ views:
       metric: share
     indicators:
       y:
-        - catalogPath: grapher/ihme_gbd/2026-02-07/gbd_risk_deaths/gbd_risk_deaths#value__metric_percent__measure_deaths__rei_household_air_pollution_from_solid_fuels__age_age_standardized__cause_all_causes
+        - catalogPath: gbd_risk_deaths#value__metric_percent__measure_deaths__rei_household_air_pollution_from_solid_fuels__age_age_standardized__cause_all_causes
     config:
       title: Share of deaths from indoor air pollution
       subtitle: Share of deaths, from any cause, which are attributed to indoor air pollution – from burning solid fuels – as a risk factor.

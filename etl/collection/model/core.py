@@ -13,7 +13,7 @@ from typing import Any, Literal, TypedDict, cast
 import fastjsonschema
 import pandas as pd
 import yaml
-from owid.catalog.core.meta import GrapherConfig, description_key_to_string
+from owid.catalog.core.meta import GrapherConfig, description_key_to_string, validate_description_key_list
 from owid.catalog.core.utils import underscore
 from structlog import get_logger
 from typing_extensions import Self
@@ -35,15 +35,47 @@ from etl.collection.utils import (
     get_complete_dimensions_filter,
     get_tables_by_name_mapping,
     map_indicator_path_to_id,
+    resolve_grapher_schema,
     unique_records,
     validate_indicators_in_db,
 )
-from etl.config import OWID_ENV, OWIDEnv
+from etl.config import DEFAULT_GRAPHER_SCHEMA, OWID_ENV, OWIDEnv
 from etl.files import yaml_dump
 from etl.paths import EXPORT_DIR, SCHEMAS_DIR
 
 # Logging
 log = get_logger()
+
+# Query params that Grapher reads from a chart URL. Dimension slugs are also encoded as query
+# params on multidim/explorer pages, so they must not collide with these.
+# Source: `GRAPHER_QUERY_PARAM_KEYS` in owid-grapher (packages/@ourworldindata/types/src/
+# grapherTypes/GrapherTypes.ts), plus `hideControls` (a page-level param not in that list).
+GRAPHER_RESERVED_QUERY_PARAMS = {
+    "country",
+    "endpointsOnly",
+    "facet",
+    "focus",
+    "globe",
+    "globeRotation",
+    "globeZoom",
+    "hideControls",
+    "mapSelect",
+    "overlay",
+    "peerCountries",
+    "region",
+    "showNoDataArea",
+    "showSelectionOnlyInTable",
+    "stackMode",
+    "tab",
+    "tableFilter",
+    "tableSearch",
+    "time",
+    "uniformYAxis",
+    "xScale",
+    "yScale",
+    "year",
+    "zoomToSelection",
+}
 
 
 class _GroupedViewsEntry(TypedDict):
@@ -94,6 +126,11 @@ class Collection(MDIMBase):
 
     dependencies: set[str] = field(default_factory=set)
     topic_tags: list[str] | None = None
+    # Grapher chart-config schema version that this collection's view configs were authored
+    # against. Short ("011") or full URL form; see `resolve_grapher_schema`. Grapher uses it as the
+    # `$schema` of every view config, and skips config migrations entirely when it is missing — so
+    # pin it explicitly rather than relying on the `DEFAULT_GRAPHER_SCHEMA` fallback.
+    grapher_schema: str | None = None
     _default_dimensions: dict[str, str] | None = None
 
     # Internal use. For save() method.
@@ -128,6 +165,9 @@ class Collection(MDIMBase):
         if isinstance(self.dependencies, list):
             # Convert list to set
             self.dependencies = set(self.dependencies)
+
+        # Fail at authoring time on a malformed pin, rather than at upsert time
+        resolve_grapher_schema(self.grapher_schema)
 
     @property
     def definitions(self) -> Definitions:
@@ -226,6 +266,9 @@ class Collection(MDIMBase):
         # Check that no choice name or slug is repeated
         self.validate_dimension_uniqueness()
 
+        # Check that no dimension slug collides with a query param reserved by Grapher
+        self.validate_dimension_slugs_not_grapher_query_params()
+
         # Validate that datasets used are part of the dependencies
         indicators = self.indicators_in_use(tolerate_extra_indicators)
         self.validate_indicators_are_from_dependencies(indicators)
@@ -239,6 +282,15 @@ class Collection(MDIMBase):
 
         # Run sanity checks on grouped views
         self.validate_grouped_views()
+
+        # Check that no view carries a corrupted description_key
+        self.validate_description_keys()
+
+        # Warn about view configs that shadow the collection-level schema pin
+        self.warn_on_view_schema_overrides()
+
+        # Warn when no version is pinned and we fall back to the vendored default
+        self.warn_if_grapher_schema_unpinned()
 
         # Sort views based on dimension order
         self.sort_views_based_on_dimensions()
@@ -266,7 +318,13 @@ class Collection(MDIMBase):
 
         # description_key is a markdown string; a YAML list is authoring sugar
         # and gets converted before the config is stored.
-        _convert_description_key_lists(config)
+        _convert_description_key_lists(config, context=self.catalog_path)
+
+        # Grapher expects the resolved schema URL under its own key (`grapherConfigSchema`), which
+        # it injects as the `$schema` of every view config before migrating it to the latest
+        # version. Always send it: without it, Grapher skips those migrations.
+        config.pop("grapher_schema", None)
+        config["grapherConfigSchema"] = resolve_grapher_schema(self.grapher_schema)
 
         # Convert config from snake_case to camelCase
         config = camelize(config, exclude_keys={"dimensions"})
@@ -564,6 +622,25 @@ class Collection(MDIMBase):
             # Add slug to set
             slugs.add(dim.slug)
 
+    def validate_dimension_slugs_not_grapher_query_params(self):
+        """Validate that no dimension slug collides with a query param reserved by Grapher.
+
+        Dimension choices are encoded as query params on multidim/explorer pages (e.g.
+        ``?sex=female``), in the same URL where Grapher reads its own params (``time``,
+        ``country``, ``tab``, ...). A colliding slug would break one or the other.
+
+        Slugs are compared in their snake_case form, since that is what `save()` persists
+        and what ends up in the URL (e.g. a slug "Time" would be saved as "time").
+        """
+        for dim in self.dimensions:
+            slug = underscore(dim.slug)
+            if slug in GRAPHER_RESERVED_QUERY_PARAMS:
+                raise ValueError(
+                    f"Dimension slug '{slug}' in collection '{self.catalog_path}' collides with a query param "
+                    f"reserved by Grapher. Rename the dimension slug. Reserved names: "
+                    f"{sorted(GRAPHER_RESERVED_QUERY_PARAMS)}"
+                )
+
     def validate_indicators_are_from_dependencies(self, indicators):
         """Validate that the provided indicators are from tables in datasets specified in the collections dependencies."""
         deps = {dep.split("://", 1)[-1] if "://" in dep else dep for dep in self.dependencies}
@@ -584,6 +661,64 @@ class Collection(MDIMBase):
         for view in self.views:
             if view.is_grouped:
                 sanity_check_grouped_view(view)
+
+    def warn_on_view_schema_overrides(self):
+        """Warn when a view config carries its own `$schema`, shadowing `grapher_schema`.
+
+        Grapher applies the collection pin as `{$schema: grapherConfigSchema, **view.config}`, so a
+        view's own `$schema` wins — and it is far less visible than the collection pin on line 1 of
+        the config YAML. That combination has bitten us before: a config pinned at an old version
+        while its body used fields from a newer one, so Grapher ran migrations over a config they
+        were never meant to touch. Pin the collection instead.
+        """
+        overrides = defaultdict(int)
+        for view in self.views:
+            config = view.config
+            if isinstance(config, dict) and "$schema" in config:
+                overrides[config["$schema"]] += 1
+
+        for schema, n_views in sorted(overrides.items()):
+            log.warning(
+                f"Collection '{self.catalog_path}': {n_views} view(s) set `$schema` in their config "
+                f"({schema}), which overrides the collection-level `grapher_schema` "
+                f"({resolve_grapher_schema(self.grapher_schema)}). Remove it and pin the whole "
+                "collection with the top-level `grapher_schema` field instead."
+            )
+
+    def warn_if_grapher_schema_unpinned(self):
+        """Warn when the collection pins no schema version and the default is used.
+
+        The fallback is `DEFAULT_GRAPHER_SCHEMA`, so grapher is told the config already matches the
+        version this repo vendors. That is usually true, but it means a config authored against an
+        older schema would skip migration. It also makes "pinned" and "defaulted" indistinguishable
+        in the database while the two happen to agree — so say so out loud instead.
+        """
+        if self.grapher_schema is None:
+            log.warning(
+                f"Collection '{self.catalog_path}' pins no `grapher_schema`; falling back to "
+                f"{DEFAULT_GRAPHER_SCHEMA}. Add a top-level `grapher_schema` to the config YAML "
+                "recording the version its view configs were authored against."
+            )
+
+    def validate_description_keys(self):
+        """Fail on a view whose `description_key` list cannot be real content.
+
+        MDIMs convert these lists into a markdown string on upsert, and explorers skip
+        that conversion altogether (they override `upsert_to_db`), so neither path
+        noticed a corrupted value. `grapher_checks` doesn't help either: it only runs
+        from `create_dataset`, never for `export://` steps.
+        """
+        for view in self.views:
+            # `ViewMetadata` is a TypedDict, so view metadata is a plain dict at runtime.
+            metadata = view.metadata
+            if metadata is None:
+                continue
+            description_key = metadata.get("description_key")
+            if isinstance(description_key, list):
+                validate_description_key_list(
+                    _flatten_description_key(description_key),
+                    context=f"{self.catalog_path}, view {view.dimensions}",
+                )
 
     def prune_dimensions(self):
         """Remove dimension if only one of its choice is in use."""
@@ -1304,15 +1439,22 @@ def snake_to_camel(s: str) -> str:
     return _pattern.sub(lambda match: match.group(1).upper(), s)
 
 
-def _convert_description_key_lists(config: dict[str, Any]) -> None:
+def _flatten_description_key(description_key: list[Any]) -> list[str]:
+    """`- *anchor` authoring produces nested lists; flatten them like dataset YAML
+    metadata does."""
+    return [item for sub in description_key for item in ([sub] if isinstance(sub, str) else sub)]
+
+
+def _convert_description_key_lists(config: dict[str, Any], context: str | None = None) -> None:
     """Convert description_key lists to markdown strings in the collection-level
     and per-view metadata of a collection config (in place)."""
     metadatas = [config.get("metadata"), *(view.get("metadata") for view in config.get("views", []))]
     for metadata in metadatas:
         if metadata and isinstance(metadata.get("description_key"), list):
-            # `- *anchor` authoring produces nested lists; flatten them like
-            # dataset YAML metadata does before converting.
-            flat = [item for sub in metadata["description_key"] for item in ([sub] if isinstance(sub, str) else sub)]
+            flat = _flatten_description_key(metadata["description_key"])
+            # The conversion below joins the items into a markdown string, which hides a
+            # corrupted list (e.g. one bullet per character) rather than failing on it.
+            validate_description_key_list(flat, context=context)
             metadata["description_key"] = description_key_to_string(flat)
 
 

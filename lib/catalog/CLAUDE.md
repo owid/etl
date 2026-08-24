@@ -290,7 +290,7 @@ uv build
 
 ## Important Notes
 
-- Python 3.10+ required — see `requires-python` in `pyproject.toml` for the supported range
+- Python 3.11+ required — see `requires-python` in `pyproject.toml` for the supported range
 - This library is experimental - APIs may change
 - Extends ruff configuration from parent `../../pyproject.toml`
 - Always run `make check` before committing changes
