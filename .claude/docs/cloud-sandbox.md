@@ -88,12 +88,15 @@ For agent sessions running in a Claude Code cloud sandbox
   `first call + rate × (n−1)` — 9.2 s + 0.75 s here, 11.7 s + 2.1 s locally —
   so the sandbox is near-parallel while a local session pipelines. Net effect
   once you batch: both environments land near 4.2 s per call, and the gap that
-  shows up unbatched (where local is ~1.4× faster) closes. Two smaller taxes,
-  and these *are* sandbox-specific: HTTP GETs to OWID and CDN hosts pay
+  shows up unbatched (where local is ~1.4× faster) closes. One smaller tax
+  *is* sandbox-specific: HTTP GETs to OWID and CDN hosts pay
   0.6–2.3 s of proxy overhead each where a local
-  session sees 0.05–0.3 s (parallelize batches with `xargs -P`), and MCP tool
-  schemas arrive deferred, so load the ones a run needs in a single `ToolSearch`
-  instead of one per turn.
+  session sees 0.05–0.3 s (parallelize batches with `xargs -P`). One is not —
+  whether MCP tool schemas arrive deferred is a harness setting, not an
+  environment, and a local session gets them that way too, so read your own
+  session's tool list rather than inferring it from the environment; where they
+  are deferred, load the ones a run needs in a single `ToolSearch` instead of
+  one per turn.
 
 - **After pushing, give the user a deep-linked staging URL** (it takes a while to
   build, especially the first time):
