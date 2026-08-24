@@ -70,10 +70,15 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > on the test fixture, it returned a one-entry palette consisting of a text label's fill. `outline__*`
 > strokes are excluded too: that is the white halo under a line, shared by every series.
 >
+> The mode flag is chosen from what the palette was sourced from, and it is not cosmetic — it also
+> selects which palette a `--suggest` rerun searches. A line or slope palette gets **`--line`**
+> (`--separated` plus the Line and Slope Chart variants, the darker set for thin marks on white);
+> a map gets `--maps`; anything else gets `--separated`. All three mean "nothing shares an edge".
+>
 > Four things it will not decide for you:
-> - It assumes `--separated` (nothing shares an edge — true for lines, maps and plain or grouped
->   bars), so on a **stacked or segmented** chart drop that flag and reorder the colours into stack
->   order first, because the seam check reads adjacency off the order you give it.
+> - On a **stacked or segmented** chart drop the mode flag and reorder the colours into stack order
+>   first, because the seam check reads adjacency off the order you give it. That is the only chart
+>   where seams exist, so it is the only case where the emitted flag is wrong.
 > - On a **map** the command covers a *categorical* choropleth only. `--maps` selects the Categorical
 >   Maps palette and the ΔE 20 gate is a categorical test, so a **sequential ramp** — ordered by
 >   construction, and set in grapher — fails it by design, and `--suggest` would then offer an
@@ -85,7 +90,9 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > - The palette is deduplicated by **colour**, so two categories painted the same colour reach the
 >   audit as one entry and it cannot report the clash. The row names them instead, ungraded — a
 >   highlight treatment greys every unhighlighted series on purpose, and a choropleth bin is one
->   colour by definition (map shapes are left out of the note entirely).
+>   colour by definition (map shapes are left out of the note entirely). The category comes from the
+>   nearest `<kind>__<Entity>` **ancestor**, because grapher puts the name on the group and the paint
+>   on its leaves: a `datapoints__<Entity>` marker is a filled leaf called `Ellipse 12`.
 >
 > A `SKIPPED` row is a declared gap in coverage, never a pass — which
 > is the whole reason to read the list rather than the verdict.

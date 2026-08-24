@@ -172,6 +172,12 @@ const checkFrame = async (frameId) => {
   // series at all and the weight row skips in silence. Same shape as `datapoints__<Entity>`: name on
   // the group, properties on the child. So carry the nearest naming ancestor down the walk.
   const SERIES_ANY = /^(line|slope|outline)__(.+)$/;
+  // The CATEGORY a node belongs to, by grapher's `<kind>__<Entity>` naming. Broader than SERIES_ANY on
+  // purpose: `datapoints__<Entity>`, `bar__<Entity>` and `country__<ISO>` all name a category and none
+  // of them is a series line. Like `seriesOf` it has to travel DOWN the walk, because the name sits on
+  // the group while the paint sits on its leaves — a `datapoints__<Entity>` marker is a filled leaf
+  // called `Ellipse 12`, so reading the category off the painted node's own name loses it every time.
+  const CATEGORY_ANY = /^[a-z][a-z-]*__(.+)$/i;
   // A map is detected structurally, by grapher's own container. It matters because a map is the one
   // chart type whose INK ASPECT IS FIXED: measured live, a map requested at a 1.4033 target came back
   // at 1.5428 (and at 1.7446 unsolved), because the projection sets the aspect and any extra canvas
@@ -180,7 +186,7 @@ const checkFrame = async (frameId) => {
   // far larger than the 12-16px band rule by construction.
   const MAP_GROUPS = /^(map|countries|countries-without-data)$/i;
   let isMap = false;
-  const collect = (n, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap) => {
+  const collect = (n, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap, catAncestor) => {
     if ("visible" in n && !n.visible) return;
     // The furniture CONTAINER name is carried, not just the boolean: the dash target is decided by what
     // a node IS (a gridline vs a zero line vs a tick), and deciding it from the node's own current dash
@@ -189,6 +195,8 @@ const checkFrame = async (frameId) => {
     if (insidePlot && MAP_GROUPS.test(n.name)) { isMap = true; insideMap = true; }
     const sm = SERIES_ANY.exec(n.name);
     if (sm) seriesOf = { kind: sm[1], series: sm[2] };
+    const cm = CATEGORY_ANY.exec(n.name);
+    if (cm) catAncestor = cm[1];
     if (n.type === "TEXT") {
       const tf = Array.isArray(n.fills) && n.fills[0] && n.fills[0].type === "SOLID" && n.fills[0].visible !== false
         ? "#" + [n.fills[0].color.r, n.fills[0].color.g, n.fills[0].color.b].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join("")
@@ -257,7 +265,7 @@ const checkFrame = async (frameId) => {
       // country split across the antimeridian has a box spanning almost the whole map, so an annotation
       // over open ocean falls inside it. Counting those as covered marks reports a FAIL that is not
       // there, so the annotation row drops them and says so rather than judging them by bbox.
-      if (filled && mb0 && mb0.w > 0 && mb0.h > 0) markBoxes.push({ name: n.name, box: mb0, why: "a filled data mark", insidePlot, fromMap: !!insideMap, hex: hexOf(markPaint) });
+      if (filled && mb0 && mb0.w > 0 && mb0.h > 0) markBoxes.push({ name: n.name, box: mb0, why: "a filled data mark", insidePlot, fromMap: !!insideMap, hex: hexOf(markPaint), cat: catAncestor || null });
     }
     if (/^datapoints__|^dot__|^value__/.test(n.name)) {
       const why = /^value__/.test(n.name) ? "a value label" : "a dot";
@@ -274,13 +282,13 @@ const checkFrame = async (frameId) => {
     // the fixture models), so a bare node here loses it and the name-only filter below matches nothing —
     // every slope segment silently absent from `polylines`, and annotation-overlap unable to fail.
     if (n.type === "VECTOR" && insidePlot) vectors.push({ node: n, seriesOf });
-    if ("children" in n && n.children.length) { n.children.forEach((c) => collect(c, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap)); return; }
+    if ("children" in n && n.children.length) { n.children.forEach((c) => collect(c, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap, catAncestor)); return; }
     const b = rel(n);
     if (b && b.w > 0 && b.h > 0) leaves.push({ name: n.name, type: n.type, box: b, insidePlot, fromMap: !!insideMap });
   };
   for (const child of frame.children) {
     if (child === logo) continue;
-    collect(child, plotRoots.indexOf(child) !== -1, false, null, null, false);
+    collect(child, plotRoots.indexOf(child) !== -1, false, null, null, false, null);
   }
 
   // ---------------------------------------------------------------- rows
@@ -1005,9 +1013,13 @@ const checkFrame = async (frameId) => {
     // data is the confident wrong answer these rows exist to prevent.
     // `outline__*` strokes are excluded along with it: that is the white halo grapher draws under a
     // line so crossings stay readable. Every series shares it, and it is not a category colour.
-    const catOf = (nm) => (/^[a-z][a-z-]*__(.+)$/i.exec(nm || "") || [])[1] || null;
+    // `cat` comes from the walk's nearest categorical ANCESTOR, not from the painted node's own name.
+    // grapher puts the stable name on the group and the paint on its leaves — a `datapoints__<Entity>`
+    // marker is a filled leaf called `Ellipse 12` — so reading it off `m.name` loses the category on
+    // exactly the shape the collector already goes out of its way to preserve, and the clash note below
+    // then cannot fire for those marks.
     const marks = markBoxes.filter((m) => m.insidePlot && m.hex)
-      .map((m) => ({ id: m.name, hex: m.hex, cat: m.fromMap ? null : catOf(m.name) }));
+      .map((m) => ({ id: m.name, hex: m.hex, cat: m.fromMap ? null : m.cat }));
     const seriesStrokes = stroked.filter((s) => s.insidePlot && !s.inFurniture && s.hex
                                                 && (s.seriesKind === "line" || s.seriesKind === "slope"))
       .map((s) => ({ id: s.seriesName, hex: s.hex, cat: s.seriesName }));
@@ -1046,11 +1058,18 @@ const checkFrame = async (frameId) => {
       : names.some((n) => n.includes("'")) ? "a name contains an apostrophe, which would break the quoted shell argument"
       : null;
     const namesSafe = !nameProblem;
+    // The mode flag also selects which PALETTE color_audit.py searches when the operator follows its
+    // "rerun with --suggest" instruction, so `--separated` is not interchangeable with the others.
+    // `--separated` only turns the seam gate off; `--line` turns it off AND installs the Line and Slope
+    // variants, the darker set meant for thin marks on white. A line or slope palette given plain
+    // `--separated` therefore gets fill colours recommended for strokes. All three imply "nothing
+    // shares an edge", which is why only the stacked/segmented case ever needs the flag dropped.
+    const mode = isMap ? "--maps" : seriesStrokes.length ? "--line" : "--separated";
     const cmd = hexes.length
       ? ".venv/bin/python .claude/skills/create-figma-chart/scripts/color_audit.py "
         + `'${hexes.join(",")}'`
         + (namesSafe ? ` --names '${names.join(",")}'` : "")
-        + (isMap ? " --maps" : " --separated")
+        + ` ${mode}`
       : null;
     // `--maps` swaps in the CATEGORICAL Maps palette, and the deltaE 20 all-pairs gate is a categorical
     // test. A SEQUENTIAL choropleth — Viridis, a ColorBrewer ramp — is ordered by construction and set
@@ -1062,9 +1081,13 @@ const checkFrame = async (frameId) => {
       + " If these fills are a SEQUENTIAL ramp, do not run it: the ramp is ordered and grapher sets it,"
       + " adjacent stops are meant to be close, so the deltaE 20 gate fails correct work and --suggest"
       + " would offer an unordered categorical palette in its place. Judge a ramp by lightness order.";
+    const lineNote = " — `--line` is `--separated` plus the Line and Slope Chart variants, the darker set"
+      + " meant for thin marks and text on white, so a --suggest rerun recommends stroke colours rather"
+      + " than fill colours. A line or slope chart has no seams, so nothing here needs reordering.";
     const how = cmd
       ? ` Run: ${cmd}`
-        + (isMap ? mapNote : " — `--separated` assumes nothing shares an edge, which holds for lines, maps"
+        + (isMap ? mapNote : mode === "--line" ? lineNote
+            : " — `--separated` assumes nothing shares an edge, which holds for lines, maps"
             + " and plain/grouped bars. On a STACKED or SEGMENTED chart drop it and reorder the"
             + " colours into stack order first, because the seam check reads adjacency off that order.")
         + ` Palette: ${hexes.length} distinct colour(s) drawn from ${paletteSrc.length} plot mark(s)/series.`

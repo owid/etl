@@ -908,15 +908,26 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
       check(`33 ${name} emits the interpreter, not a bare script`,
             /\.venv\/bin\/python \.claude\/skills\/create-figma-chart\/scripts\/color_audit\.py/.test(r.detail), r.detail);
       check(`33 ${name} passes real hexes`, /'#[0-9a-f]{6}(,#[0-9a-f]{6})*'/.test(r.detail), r.detail);
-      check(`33 ${name} declares an adjacency mode`, /--separated|--maps/.test(r.detail), r.detail);
+      check(`33 ${name} declares an adjacency mode`, /--separated|--maps|--line/.test(r.detail), r.detail);
     }
     // Both rows must offer the SAME command — they are one run of one script.
     const cmdOf = (n) => (/color_audit\.py (.*?)(?: —|$)/.exec(row(out, n).detail) || [])[1];
     check("33 both rows hand over one identical command", cmdOf("colour-vision") === cmdOf("grayscale-seams"),
           `${cmdOf("colour-vision")} vs ${cmdOf("grayscale-seams")}`);
-    // A stacked chart is the case where order matters, so the warning must be present off a map.
-    check("33 non-map run warns that stack order matters",
-          /STACKED or SEGMENTED/.test(row(out, "colour-vision").detail), row(out, "colour-vision").detail);
+    // The mode flag also picks which palette a --suggest rerun searches, so it is not cosmetic.
+    // A line/slope palette needs `--line`: `--separated` alone would have the search recommend FILL
+    // colours for thin strokes. The default fixture is a line chart.
+    check("33 a line series asks for the Line and Slope variants",
+          / --line\b/.test(row(out, "colour-vision").detail), row(out, "colour-vision").detail);
+    // A stacked chart is the case where order matters, so the warning must be present there — and only
+    // there, since neither a map nor a line chart has seams. Strip the series lines to reach that branch.
+    const noSeries = buildFrame({ barSegment: true });
+    const chartOf = (f) => f.children.find((c) => c.name === "chart");
+    chartOf(noSeries).children = chartOf(noSeries).children.filter((c) => !/^(line|outline)__/.test(c.name));
+    const dSep = row(await run(noSeries, {}), "colour-vision").detail;
+    check("33 a fill-only palette gets --separated, not --line",
+          / --separated\b/.test(dSep) && !/--line/.test(dSep), dSep);
+    check("33 and that run warns that stack order matters", /STACKED or SEGMENTED/.test(dSep), dSep);
     // --- what the palette is BUILT FROM. The `fills` inventory was the wrong source: it carries every
     // solid paint on an area node in the plot, and a TEXT node has one, while a line chart's series
     // colour is a STROKE and is not in it at all. On this very fixture that meant the emitted command
@@ -936,6 +947,19 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const twoSeries = row(await run(buildFrame({ extraLine: 3 }), {}), "colour-vision").detail;
     check("33 two series on one colour are named, not silently merged",
           /judge them by eye/.test(twoSeries) && /A \+ B|B \+ A/.test(twoSeries), twoSeries);
+    // The category name sits on the GROUP and the paint on its leaves — grapher's documented
+    // `datapoints__<Entity>` shape, where the filled marker is called something like `Ellipse 12`.
+    // Reading the category off the painted node's own name loses it on exactly that shape, so two
+    // entities sharing a marker colour would be merged with no warning. The colour here is carried by
+    // NOTHING else in the fixture, so this can only pass via the ancestor.
+    const ancestry = buildFrame();
+    const marker = (entity) => node({ name: `datapoints__${entity}`, x: 60, y: 150, width: 40, height: 40,
+      children: [node({ type: "ELLIPSE", name: "Ellipse 12", x: 60, y: 150, width: 8, height: 8,
+                        fills: solid("#58ac8c") })] });
+    chartOf(ancestry).children.push(marker("Peru"), marker("Nepal"));
+    const dAnc = row(await run(ancestry, {}), "colour-vision").detail;
+    check("33 a marker's category is read from its group, not its leaf name",
+          /#58ac8c carries (Peru \+ Nepal|Nepal \+ Peru)/.test(dAnc), dAnc);
     // But a choropleth puts every country in a bin into ONE colour by design, so the same note must
     // not fire on a map or it fires on every map.
     const sameBin = buildFrame({ mapCountries: true });
