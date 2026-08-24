@@ -63,7 +63,7 @@ session transcript rather than estimated:
 | ├ approval, asked 13:26:35 → granted 13:26:51 | 16 s *(the checkpoint, by design)* |
 | └ stall, 13:29:16 → 13:30:33 | 77 s *(a defect — see below)* |
 | Figma calls | 30 (28 in the build proper) |
-| messages issuing them | 28 — **nothing was batched** |
+| messages issuing them | 28 — one call each, correctly (see the batching warning below) |
 
 **Two corrections this measurement forced, both against things assumed rather than checked:**
 
@@ -86,18 +86,39 @@ issuing assistant message id**, never by timestamp proximity:
 
 | | why |
 |---|---|
-| Figma calls by tool, and the total | against the 120–190 this skill's budget assumes |
-| messages containing >1 Figma call, and peak in-flight | whether the batch manifest was actually followed |
-
-**On the first run that last row read zero.** 28 calls, 28 messages, peak in-flight **1** — the
-batch manifest was in the skill, and the run followed none of it. That is the single largest
-finding the benchmark has produced, because batching is measured at **~4.0×** and is this branch's
-central claim. The manifest is not self-executing; SKILL.md already records two of five earlier
-sessions batching nothing at all, and the official benchmark is now the sixth data point and the
-worst. **Report this row first** — a run that never batched has not tested the thing being sold.
+| Figma calls by tool, and the total | against the **~14–18 per template** a build should cost |
 | turns, and median gap between them | the term that dominates `turns × (turn + call)` |
+| messages containing >1 Figma call, and peak in-flight | but read the warning below before scoring it |
 | screenshots that were *looked at* vs measured by script | the thing `measure_pixels.py` exists to reduce |
 | re-work: calls spent on a mistake, and what it was | the honest denominator — a fast wrong build is not fast |
+
+### Do not score batching on a single-chart build. It has nothing to batch.
+
+The first run came back **28 calls in 28 messages, peak in-flight 1**, and that was first written up
+here as the benchmark's largest finding — the manifest ignored, the ~4.0× left on the table. **That
+was wrong, and the mistake is worth more than the claim was.** Reading the calls back, 22 of the 28
+were `use_figma` writes to the DI page, and SKILL.md's own rule is that **writes batch only across
+different pages**, since a script may switch pages once and two writes at one page race. A build is
+one page. The three `upload_assets` are the two-pass export solve, serial by the documented
+`measure band → export embed → fit` chain; the two screenshots were four minutes apart on different
+states. **Nothing in that run was batchable.** Zero was the correct number, not a failure.
+
+The manifest's rows are surveys and checks — the Step 5 page enumeration, the Step 8c check pair,
+the Step 9 delivery renders, the palette harvest — and this build had one Step 8c call and two
+renders. So the ~4.0× is real and belongs to *read-heavy* passes; it was never available to the
+build spine.
+
+The general lesson, which is why this stays written down: **a zero is not a finding until you have
+checked that a non-zero was possible.** Measuring the number was right, and reading a verdict into
+it without asking whether the thing was even available is the same error as a check reporting PASS
+on input it could not measure. Score this row only against calls the manifest actually names.
+
+**What the number does say, once batching is off the table.** 28 calls against the ~14–18 a
+template should cost, and 30.8 min / 28 ≈ **66 s per call** where the call itself is ~4.4 s — so
+**~60 s of each is model turn**. The lever on a build is therefore *fewer, fatter* calls, not
+parallel ones: the plugin allows ~10 logical operations per call, and four of the 28 were pure
+diagnosis and rework (`Diagnose why the annotation text did not grow`, two position fixes, a
+re-bold after a style collapse). Turns dominate; that is what `turns × (turn + call)` already says.
 
 ## What this cannot tell you
 

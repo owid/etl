@@ -985,8 +985,40 @@ const checkFrame = async (frameId) => {
 
   // ---------------------------------------------------------------- declared gaps in coverage
 // #endregion
-  skip("colour-vision", "all-pairs deltaE 20 for deuteranopia/protanopia on CATEGORICAL fills", "scripts/color_audit.py");
-  skip("grayscale-seams", "adjacent pairs above ~1.6:1; needs --separated for non-stacked charts", "scripts/color_audit.py");
+  // These two are owned by color_audit.py, which cannot run in here — this is a Figma plugin
+  // sandbox with no shell. But the palette it needs is already in `fills`, so emit the command
+  // ready to paste instead of a tool name to go and look up. A declared gap the operator has to
+  // reconstruct by hand is the one most likely to be skipped for real.
+  {
+    const paletteSrc = fills.filter((f) => f.insidePlot && f.hex);
+    const seen = new Map();  // hex -> first node name, in walk order
+    for (const f of paletteSrc) if (!seen.has(f.hex.toLowerCase())) seen.set(f.hex.toLowerCase(), f.name);
+    const hexes = [...seen.keys()];
+    // A name carrying a comma would silently split into two --names entries and misalign every
+    // label after it, so the flag is dropped wholesale rather than emitted subtly wrong. State the
+    // ACTUAL reason: an unnamed node and a comma'd one both disqualify the flag, and reporting one
+    // as the other is the same wrong-verdict habit these checks exist to catch.
+    const names = [...seen.values()];
+    const nameProblem = names.some((n) => !n) ? "a fill node has no name"
+      : names.some((n) => n.includes(",")) ? "a node name contains a comma, which would misalign the labels"
+      : null;
+    const namesSafe = !nameProblem;
+    const cmd = hexes.length
+      ? ".venv/bin/python .claude/skills/create-figma-chart/scripts/color_audit.py "
+        + `'${hexes.join(",")}'`
+        + (namesSafe ? ` --names '${names.join(",")}'` : "")
+        + (isMap ? " --maps" : " --separated")
+      : null;
+    const how = cmd
+      ? ` Run: ${cmd}`
+        + (isMap ? "" : " — `--separated` assumes nothing shares an edge, which holds for lines, maps"
+            + " and plain/grouped bars. On a STACKED or SEGMENTED chart drop it and reorder the"
+            + " colours into stack order first, because the seam check reads adjacency off that order.")
+        + (namesSafe ? "" : ` (--names omitted: ${nameProblem}.)`)
+      : " No solid plot fills found on this frame, so there is no palette to audit.";
+    skip("colour-vision", "all-pairs deltaE 20 for deuteranopia/protanopia on CATEGORICAL fills." + how, "scripts/color_audit.py");
+    skip("grayscale-seams", "adjacent pairs above ~1.6:1 — same command, same run as colour-vision." + how, "scripts/color_audit.py");
+  }
   skip("spelling-and-prose", "American spelling, typos, style-guide breaches", ".venv/bin/codespell + /check-metadata-style");
   skip("text-true-of-indicator", "every claim in every string checked against the producer's documentation", "/adversarial-data-review");
   skip("entities-all-render", "needs the EFFECTIVE selection (URL country=, or the MDim view's resolved list from the DB) — never the SVG's own labels, which makes the check unable to fail", "Step 1's table + /query-grapher-db");

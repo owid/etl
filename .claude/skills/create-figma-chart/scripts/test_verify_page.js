@@ -896,6 +896,64 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     check("31 a symmetric 14/14 still passes", row(await run(even, {}), "gap").status === "ok", row(await run(even, {}), "gap").detail);
   }
 
+  // 33 — the colour-vision / grayscale-seams rows must hand over a RUNNABLE command, not a tool
+  // name. They stay SKIPPED (no shell inside a Figma plugin), but a gap the operator has to
+  // reconstruct by hand is the one that actually gets skipped.
+  {
+    const out = await run(buildFrame(), {});
+    for (const name of ["colour-vision", "grayscale-seams"]) {
+      const r = row(out, name);
+      check(`33 ${name} still declares itself skipped`, r.status === "SKIPPED", r.status);
+      check(`33 ${name} names its owner`, r.ownedBy === "scripts/color_audit.py", String(r.ownedBy));
+      check(`33 ${name} emits the interpreter, not a bare script`,
+            /\.venv\/bin\/python \.claude\/skills\/create-figma-chart\/scripts\/color_audit\.py/.test(r.detail), r.detail);
+      check(`33 ${name} passes real hexes`, /'#[0-9a-f]{6}(,#[0-9a-f]{6})*'/.test(r.detail), r.detail);
+      check(`33 ${name} declares an adjacency mode`, /--separated|--maps/.test(r.detail), r.detail);
+    }
+    // Both rows must offer the SAME command — they are one run of one script.
+    const cmdOf = (n) => (/color_audit\.py (.*?)(?: —|$)/.exec(row(out, n).detail) || [])[1];
+    check("33 both rows hand over one identical command", cmdOf("colour-vision") === cmdOf("grayscale-seams"),
+          `${cmdOf("colour-vision")} vs ${cmdOf("grayscale-seams")}`);
+    // A stacked chart is the case where order matters, so the warning must be present off a map.
+    check("33 non-map run warns that stack order matters",
+          /STACKED or SEGMENTED/.test(row(out, "colour-vision").detail), row(out, "colour-vision").detail);
+    // A comma in a node name would misalign every --names entry after it, so the flag is dropped.
+    // Rename EVERY filled descendant, not one: the emitter keeps the FIRST name per distinct hex,
+    // so renaming an arbitrary node can leave its colour already registered under a clean earlier
+    // name and silently test nothing. (That is exactly how this case first passed vacuously.)
+    const comma = buildFrame();
+    let renamed = 0;
+    (function walk(n) {
+      if (n.fills && n.fills.length && n.fills.some((f) => f.type === "SOLID")) { n.name = "series__Chile, mainland"; renamed++; }
+      (n.children || []).forEach(walk);
+    })(comma);
+    check("33 the comma fixture actually renamed a filled node", renamed > 0, `renamed ${renamed}`);
+    const d2 = row(await run(comma, {}), "colour-vision").detail;
+    // Match the FLAG (`--names '…'`), not the substring: the explanatory note says "--names
+    // omitted", so a bare /--names/ is satisfied by the very sentence proving it was dropped.
+    check("33 a comma in a node name drops --names rather than misaligning it",
+          !/--names '/.test(d2) && /contains a comma/.test(d2), d2);
+    // The happy path, or the two negatives above would pass on a build that never emits --names at
+    // all. Clean names on every filled node must produce the flag, carrying those names.
+    const named = buildFrame();
+    (function walk(n) {
+      if (n.fills && n.fills.length && n.fills.some((f) => f.type === "SOLID")) n.name = "series__Chile";
+      (n.children || []).forEach(walk);
+    })(named);
+    const d1 = row(await run(named, {}), "colour-vision").detail;
+    check("33 clean names DO produce --names", /--names 'series__Chile'/.test(d1), d1);
+    check("33 and then no omission note is attached", !/--names omitted/.test(d1), d1);
+    // And the reason given must be the real one, not the comma message reused for a missing name.
+    const anon = buildFrame();
+    (function walk(n) {
+      if (n.fills && n.fills.length && n.fills.some((f) => f.type === "SOLID")) n.name = "";
+      (n.children || []).forEach(walk);
+    })(anon);
+    const d3 = row(await run(anon, {}), "colour-vision").detail;
+    check("33 an unnamed fill node reports THAT, not a phantom comma",
+          /has no name/.test(d3) && !/contains a comma/.test(d3), d3);
+  }
+
   const bad = results.filter((x) => !x.ok);
   for (const x of results) console.log(`${x.ok ? "PASS" : "FAIL"}  ${x.name}${x.ok ? "" : "  >> " + x.detail}`);
   console.log(bad.length ? `\n${bad.length} FAILURES` : `\nALL PASS (${results.length} checks)`);

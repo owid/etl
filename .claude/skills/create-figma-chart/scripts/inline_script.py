@@ -150,18 +150,31 @@ def main() -> int:
     args = ap.parse_args()
 
     if args.check:
-        worst = 0
-        print(f"{'script':<30} {'raw':>8} {'stripped':>9} {'of cap':>8}")
+        # What matters is the largest thing anyone actually SENDS, which for a script carrying
+        # #region markers is its biggest slice, not the whole file. Judging a sliceable script on
+        # its total would report a failure for a file that runs perfectly — verify_page.js sits a
+        # few hundred characters under the cap whole, and crossing it changes nothing about how it
+        # is used, because the whole-file path is already refused above CROWDED.
+        failed = False
+        print(f"{'script':<30} {'raw':>8} {'stripped':>9} {'sent':>9} {'of cap':>8}")
         for p in sorted(SCRIPTS.glob("*.js")):
             if p.name.startswith("test_"):
                 continue
-            raw = p.read_text()
-            stripped = strip_js(raw)
-            pct = len(stripped) / CAP * 100
-            flag = "  OVER CAP" if len(stripped) > CAP else ""
-            worst = max(worst, len(stripped))
-            print(f"{p.name:<30} {len(raw):>8,} {len(stripped):>9,} {pct:>7.0f}%{flag}")
-        return 1 if worst > CAP else 0
+            stripped = strip_js(p.read_text())
+            groups = list(dict.fromkeys(select_rows(stripped, set())[1]))
+            if groups:
+                sent = max(len(select_rows(stripped, {g})[0]) for g in groups)
+                how = f"  (largest of {len(groups)} slices)"
+            else:
+                sent = len(stripped)
+                how = ""
+            over = sent > CAP
+            failed = failed or over
+            print(
+                f"{p.name:<30} {len(p.read_text()):>8,} {len(stripped):>9,} {sent:>9,} "
+                f"{sent / CAP * 100:>7.0f}%{'  OVER CAP' if over else ''}{how}"
+            )
+        return 1 if failed else 0
 
     if not args.script:
         ap.error("give a script name, or --check")

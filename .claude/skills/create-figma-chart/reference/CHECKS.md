@@ -55,7 +55,20 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > (`/adversarial-data-review`), entity completeness (needs the *effective* selection from outside
 > Figma), the arrow row (it needs rendered pixels), `leader-on-map` (a **vector** ray-cast against
 > the country's rings — pixels are only its fallback), and the page count (a page-level fact, where
-> the script is handed frames). A `SKIPPED` row is a declared gap in coverage, never a pass — which
+> the script is handed frames).
+>
+> **`colour-vision` and `grayscale-seams` hand back a runnable command, not just an owner.** The
+> script cannot run `color_audit.py` — a Figma plugin sandbox has no shell — but it already holds
+> every plot fill, so it emits the invocation with the palette filled in, the interpreter spelled
+> out and `--names` attached when the node names allow it. Paste and run it; both rows are one run
+> of one script. Two things it cannot decide for you: it assumes `--separated` (nothing shares an
+> edge — true for lines, maps and plain or grouped bars), so on a **stacked or segmented** chart
+> drop that flag and reorder the colours into stack order first, because the seam check reads
+> adjacency off the order you give it. And `--names` is dropped wholesale, with the reason stated,
+> if any fill node is unnamed or carries a comma — a comma would split into two entries and
+> misalign every label after it.
+>
+> A `SKIPPED` row is a declared gap in coverage, never a pass — which
 > is the whole reason to read the list rather than the verdict.
 >
 > **[`scripts/diff_against_template.js`](../scripts/diff_against_template.js) is the other half of the
