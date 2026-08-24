@@ -27,6 +27,30 @@
 
 - **A calls-per-message histogram cannot tell you whether calls were batched — use interval overlap.** The transcript writes one entry per tool call whether or not the calls were batched, so a calls-per-assistant-message histogram reports `{1: N}` for a provably concurrent run — checked against an 8-call probe that measured 4.12×, which the histogram scored as eight singletons. Sweep `tool_use` → `tool_result` timestamps for peak simultaneous in-flight calls instead, and count how many calls start before the previous one finished.
 
+- **`use_figma` calls do not run concurrently — plugin runs serialize per file, so batching them
+  buys only the shared turn.** Measured locally on an identical read-only script (count the file's
+  198 pages, no page switch), batches of four against a serial arm run before *and* after them:
+
+  | | per call | wall for 4 | against 4× serial |
+  |---|---|---|---|
+  | one call per message (n=5) | 3.49–5.75 s, mean **4.44 s** | 17.8 s | — |
+  | four in one message, run 1 | 9.33–17.71 s | **21.50 s** | **0.83×** |
+  | four in one message, run 2 (warm) | 9.64–17.36 s | **21.43 s** | **0.83×** |
+
+  Four in flight every time, and the wall is almost exactly `4 × 4.44 s` plus overhead — the shape of
+  a queue, not of parallelism. Client-side overlap is not server-side concurrency: the calls all show
+  as in flight together while the file's single plugin context runs them one at a time, which is also
+  why a batch's `sum/wall` (2.5×) looks like a win when the honest number is a **17% loss**. The
+  budget's `2.63×` for six `use_figma` is that same `sum/wall` artifact.
+
+  **This does not mean stop batching writes** — a call costs the turn *and* the hop, and only the hop
+  serializes. Four calls one-per-message cost `4 × (4.4 + turn)`; batched they cost `21.4 + turn`, so
+  batching still wins wherever the turn is expensive (clearly in a cloud session at ~12 s a turn, and
+  even locally at 2–4 s). What changes is the stopping rule: an extra `use_figma` in a batch costs
+  roughly a **whole call**, not the 0.75–2.1 s an extra `get_screenshot` costs. So collapsing work
+  into one bigger script — which is free, script size doesn't move the latency — beats spreading it
+  across a batch every time. Untested: mutating scripts, heavier scripts, and cloud sessions.
+
 - **`sum/wall` is not the speedup — measure a batch against a *serial arm run in the same session*.**
   A queued call's own duration includes the time it spent waiting, so summing the durations inside a
   batch and dividing by the wall clock counts that wait as work and flatters batching. An independent
