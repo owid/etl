@@ -1,0 +1,122 @@
+# Annotations and arrows
+
+> Read at **Step 8b**, and only if the chart is getting annotations or arrows — most are not.
+> Part of [`/create-figma-chart`](../SKILL.md); [GUIDELINES.md](../GUIDELINES.md) has the rest
+> of the design vocabulary.
+
+## Annotations
+
+- Use them to answer the questions a reader would ask, replicating what the accompanying DI/article text highlights.
+- Font size **12–16px**, and **12–14px on maps** — the design guidelines allow 10px there, but the file's ladder has no rung below XS 12 and the Step 8c text-size check rejects anything smaller, so maps take the bottom of the ladder rather than their own scale. Never below 12px for data labels. Pick from the named ladder rather than typing a number — **Annotation XL 16 / L 15 / M 14 / S 13 / XS 12** — taking the largest that fits without forcing an extra line, and staying at or below **L 15** so the subtitle's 16 still leads. Annotations of the same rank take the same size; drop to **XS** for a footnote that qualifies a claim rather than making one (a year caveat, a coverage note), and put it *after* the claim it qualifies. **Applying a text style resets the node's range fills and weights**, so set the size first and re-apply the color-and-bold convention after, never the other way round.
+- **When one annotation carries hierarchy inside itself, step the ladder down within it: bigger above, smaller below.** A two-line callout is usually a name and its supporting detail — `Rwanda` over `63.8%`, a category over its value — and setting both lines at one size makes the reader work out which is which. Put the identifying line one rung up and the detail one rung down (**M 14** over **XS 12** on a map label), so the eye lands on the name and the number reads as its annotation. The same rank logic as between separate annotations, applied inside one. It also shrinks the block — 27px to 24px on these labels — which on a map is free legibility. Set it with `setRangeFontSize` on each line rather than splitting into two text nodes: one node keeps the bold/color convention, any knockout and the line spacing intact. Re-centre the box on its old centre afterwards, or the label appears to drift as it shrinks.
+  - **On a line chart's `name / value` end label, step the *weight* instead** — see Line charts. Stepping the size there would take one of the two lines off the rung the rest of the plot sits on, which is a worse trade than the one this bullet describes for a map.
+- **The house convention: annotation text in the annotation gray, category words bold and in their category's color.** Set the whole line to `Data Insights/Annotations` `#5B5B5B`, then override just the words naming a series — "Chicken", "beef", "fish and seafood" — to that series' color **and** bold. The colored word is what ties the sentence to the mark, so it does the job an arrow would, without the ink. Use the **line variant** for any category whose fill is too light to read as text (Camel `#BC8E5A` becomes Camel\* `#996D39`); bind both the gray and the category colors to their library styles with `setRangeFillStyleId(start, end, style.id)` and set the weight with `setRangeFontName` — note these range setters are **synchronous**, unlike most of the modern API.
+- **A knockout is earned, not automatic, and the default form is a stroke on the text — not a frame behind it.** (**→ source says** the same, more bluntly: *“Avoid using a background for your annotation, which can often hide more details than necessary”* — and every annotation sample in the Cheat Sheets is specified as text *with a 2–3px white outline*. The tiers below are an escalation ladder off that default, not a replacement for it.) Three tiers, cheapest first; pick per annotation, not per chart:
+  1. **No knockout at all** when the annotation crosses no chart ink. Most annotations placed in genuinely empty plot space need nothing, and adding a treatment there is pure maintenance cost.
+  2. **A 3px outside stroke on the text node, in the template's canvas color** — the default whenever the annotation crosses *furniture* (gridlines, the axis rule, a muted context line). `txt.strokes = [canvas]`, `txt.strokeWeight = 3`, `txt.strokeAlign = "OUTSIDE"`. Outside, so it haloes the letterforms without deforming them.
+  3. **An opaque canvas-colored auto-layout frame, hugging the text on both axes** — the fallback for text on **canvas** that a 3px halo cannot carry, i.e. ink dense enough that a halo still leaves the words unreadable. Its mechanics are below, and its cost is real, so reach for it last.
+
+  **Never on a filled area — that is a different treatment, not tier 3.** A canvas-colored frame over a colored band punches a canvas-colored hole straight through the fill, and the annotation there is *white* (see the filled-area rule below), so an opaque canvas box behind it also erases the words. Inside a fill, use white text with a white elbowed leader; a pale band takes dark text instead, per the stacked-area rule — contrast decides, but the frame never enters it.
+
+  **Why the stroke beats the frame wherever it suffices:** the stroke is a per-glyph halo, so it interrupts what is behind it only where letters actually are; the frame is a rectangle sized to the *longest* line, so it erases a block-shaped hole in whatever it covers — including alongside every shorter line, where there is no text at all. Measured on the same annotation over a dashed gridline: with a stroke the gridline runs continuously up to each letterform and resumes; with a hugging frame it stops dead at the block's left edge and restarts at its right. The stroke also removes this section's whole trap list in one go — no clipping, no descender allowance, no parent-before-HUG ordering.
+
+  **Set the stroke weight explicitly.** A text node that has been through `rescale()` carries a scaled-down `strokeWeight` (0.65 after a 0.652 fit) even though it has no strokes, so assigning strokes without setting the weight gives you a sub-pixel halo that looks like no halo at all.
+
+  Read the canvas color off the template rather than hardcoding white — the Instagram templates sit on `Instagram/Beige Background` `#FBF9F3`, where a white halo is a visible outline. Same rule for the tier-3 frame's fill.
+
+  Whichever tier you use, append the annotation **last** so it sits above the chart.
+  - **Break the text yourself with `\n` so no quantity splits across lines.** Auto-wrap has no idea that `1.7 t per hectare` and `4.2 t` are single units, and it will put the number on one line and its unit on the next — which a designer spots immediately. Write the breaks in (`"In 2024, yields in Africa were\n1.7 t per hectare, less than half\nthe global average of 4.2 t"`) and set `textAutoResize = "WIDTH_AND_HEIGHT"` so the box hugs the longest line and cannot re-wrap later. Set the ranges (bold, category colors) *after* the characters, since writing `characters` resets them.
+- **Clearance is owed to *data*, not to furniture.** A stroked annotation may sit straight across gridlines — that is what the halo is for, and a page that does it reads fine. What no treatment licenses is covering a data mark: the highlighted line, a dot, a bar segment carrying a value, another label. So don't spend position dodging gridlines; spend it staying off the data.
+  - **The tier-3 frame is the exception, because it erases a rectangle**, and there ~10–15px of air from the nearest data is the working figure (5px was flagged by a reviewer as too close). When that pushes the block somewhere awkward, **narrow the block instead of moving it further** — re-wrapping the same sentence from three wide lines to four short ones pulls its lower corner away from a rising line and costs nothing.
+- **Keep `leadingTrim = "CAP_HEIGHT"` on the text in every tier.** Without a frame it is no longer sizing a knockout, but it still makes the text's box equal its ink, which is what lets you measure clearance honestly and center the block on anything: the line box carries leading above the cap height and below the baseline, and a two-line 14px label measures **34px tall for 27px of ink — 7px, 21%, of nothing**. The box shrinks around the ink, so nudge `y` by half the height lost to keep the text where it was.
+- **Tier-3 frame mechanics, when you do reach for one:** set the fill on the frame, `layoutSizingHorizontal`/`Vertical = "HUG"` on both frame and text, and zero padding on the sides and top. Then two traps that exist only for this tier:
+  - **`clipsContent = false`, plus a few pixels of `paddingBottom`.** Frames clip by default and the `CAP_HEIGHT` trim puts the baseline *at* the box bottom, so every descender is cut: "today" renders "todav", "very" renders "verv". Unclipping alone only half-fixes it — the opaque fill still stops at the baseline, so a recovered descender has no knockout behind it and a gridline crossing there shows through the letterform. Add `paddingBottom ≈ 0.22 × the font size` (≈3px at 14px).
+  - Parent the text into the frame **before** setting `HUG`; Figma rejects the value until the node is in an auto-layout context.
+  - A designer meeting one of these will reach for "unset auto-layout and drag it smaller" — right that the frame is too big, wrong in the fix, because hand-sizing stops the frame tracking its text and a later edit then overflows (or, with clipping left on, is silently cut). Trim the leading instead. Better still, drop to tier 2, which is what the instruction to "remove auto-layout on annotations" actually asks for.
+  - **If the only spot where the annotation fits would cover data, that is the signal to move it further away and point with an arrow** — or out of the plot entirely — not to accept the occlusion. Ink over a data point is worse than an unreadable annotation, because the reader cannot tell anything is missing.
+- **Default to putting the annotation in clear space and pointing with an arrow, rather than tucking it up against its mark.** Proximity is the tempting answer — it needs no extra ink and it passes every collision check — but it forces the text into the busiest part of the plot, which is exactly where there is least room, and the association it buys is weaker than an arrow's. A rework of a page built by this skill moved one annotation **42px up** into empty canvas and another **39px right and 23px down**, and connected each to its mark with a curvy arrow; both then sat in space the chart wasn't using. Reserve bare proximity for a mark with genuinely open canvas beside it.
+  - **This is a placement rule, not a leader rule, and the two are decided separately.** Here the arrow is not an addition you weigh up — it is part of moving the annotation away, because nothing else carries the association across that distance. Whether an annotation that *stays* beside its mark needs a joining line is the separate question answered below, and the answer there is usually no.
+  - It also dissolves a problem proximity creates. Squeezing an annotation in beside its mark can land a line of it level with a y-axis tick label, at which point "0.6" and "ended it in September 1973." read as one string — and the fix that suggests itself, indenting the block rightward past the axis labels, is the wrong axis. Move it **up or down** into a clear band instead and let the arrow cover the distance.
+- **Annotations placed outside the plot are part of the plot block, and owe the template's own gaps.** Once a chart's annotations sit in bands above and below the plot (the usual arrangement on a map), the reader sees one content block, and its outer edges — not the plot's — are what has to clear the subtitle and the source line. Measure the gap the template itself uses and apply it to the block: on the 540×540 pages that is **27px under the header frame and 27px above the footer**, with ~15px between an annotation and the plot. Spacing the *plot* correctly and letting the annotations drift into that clearance is the same defect as an unspaced plot, and it looks like a mistake rather than a choice.
+- **On a full-width chart, make room by opening a gap rather than overlaying.** A 100%-stacked bar has no free margin, so an annotation has nowhere to go — but dropping a few entities and re-exporting at a flatter aspect ratio frees a band, and a gap of about one row-and-a-half opened *directly beneath the bar being annotated* puts the text where no leader line is needed at all. Shift every row below the gap down by the same amount, then re-center. Beware the export arithmetic: a flatter aspect ratio means a bigger downscale to reach the same width, so the base font has to rise with it — at 2:1 the labels came back 8px until `imFontSize` went to 35. And size the export **backwards from the gap rule**: the plot plus the annotation gaps should come to the band minus 28px, so that a 14px gap falls out at each end. Padding a short plot with 33px gaps instead is the visible symptom of having exported the wrong height — retune `imHeight` and re-export rather than living with it.
+- Annotate important values directly: write out the values of the **first and last data points** and any point the text mentions.
+- **Inside a filled area, the annotation text *and* its arrow are white** — not the `#5B5B5B` annotation gray, which is for text on the white canvas. `71:511` and `596:474` (white text, white arrows on stacked areas), `185:76`, `1:1656`. Outside the fill the annotation instead takes **the color of the band or bar it is about** — `230:201`, `1:4786`, `572:70`.
+- **→ source says: the annotation gray may be *darkened* against colored marks, not only swapped for white.** `#5B5B5B` is the default, and the archive's answer inside a filled area is white — but the Cheat Sheets show a third option for a chart whose colors sit between the two: take the gray darker than `#5B5B5B` so it contrasts with the fills it crosses. Reach for it when white would look like a hole and `#5B5B5B` disappears.
+- **An annotation that sits beside its mark does not always need a leader.** Where the target is unambiguous at that distance, the archive sets the sentence beside it with nothing joining them — `327:235` (beside its country, in the country's color), `540:5`, `701:347`, `644:564`. Reach for a leader when the reader could plausibly attach the text to the wrong mark, not by default. **This governs the adjacent case only** — an annotation you have moved out into clear space (above) is joined by an arrow as part of that move, so the two rules never both apply to the same annotation.
+- **Bracket a group of marks and annotate the bracket.** A thin square bracket gathering several rows, bands or endpoints, with one sentence beside it, is the house device for "these ones, collectively" — `668:54`, `341:82`, `169:1167`, `323:216`, `445:80`, `99:723`, `636:144`.
+
+## Arrows
+
+- Copy the signature curvy arrows from the Charts file (node `798:773`); scale, rotate, or tweak as needed — within the rules below.
+- **1px stroke.** Arrowhead and line: one color, never two; the same style and size across the whole chart.
+- **An annotation's arrow on the white canvas takes the annotation gray, not the series color** — `Data Insights/Annotations` `#5B5B5B`, bound as a style on both parts: `setFillStyleIdAsync` on the head (it is a *filled* dart, not a stroke cap) and `setStrokeStyleIdAsync` on the curve. The arrow belongs to the sentence, so it matches the sentence; the series color is already doing its work on the line and on any value label. Measured off a designer's rework: curve `strokeWeight` **1**, head filled at the same gray, both bound, tip landing **3–5px** clear of the dot it names.
+  - **Inside a filled area this flips to white** — both the sentence and its arrow, per the filled-area rule under Annotations, because the gray is only readable against the white canvas. Check what the arrow crosses before binding the gray style; a gray leader over a stacked area is the low-contrast version of the same mistake as gray text there.
+  - The pairing to keep straight: **colored words tie a sentence to a series, an arrow ties it to a point.** Where an annotation names a category, color that word (below); where it points at one moment on one line, the arrow does the work and stays gray.
+- **Very close, but never on top.** An arrowhead resting on the line reads as welded to it, and one overlapping it hides the thing it is pointing at; a few pixels of air is what makes the arrow legible. **3–7px of visible gap** is the target, and the acceptance test is *zero touching pixels* — see the pixel probe in SKILL.md → Step 8c, because vector distances cannot be trusted here (the arrows are rotated groups). Move the annotation and its arrow as a rigid pair so the arrow keeps its aim.
+- **Point at what the sentence actually names — and read the sentence to find out.** An arrow is a claim about *which* mark the words describe, so derive its target from the text, not from convenience: "By 2020, growth had fallen to less than 1%" points at the stretch of line that is **below the 1% gridline near 2020**, which is the elbow where the estimates end. Aiming it higher, as an untargeted placement did here by 10.7px on one frame and 25.2px on the other, has the arrow indicating a value of about 1.1% — a number the annotation explicitly denies.
+  - Note the difference between "**by** 2020" and "**in** 2020": a threshold-crossing phrased with *by* describes a region, so pinning the exact x of the tick is over-precise. Take the year as a neighborhood and pick the point in it that best shows the threshold — usually where the line first clears it.
+- **Don't compute the offset by translating along the closest-point normal** — it only works when the arrow meets the line at an angle. These arrows curve in *alongside* the line for their last stretch, so pushing the tip away brings the shaft in and the measured clearance barely moves (0.9px → 0.7px after a 5px translation). Where the arrow runs parallel, move it along the *line's* normal instead, and confirm on pixels.
+- **Never scale a whole arrow** — the head distorts. Select just the line (cmd/ctrl-click inside the group), Shift-resize it, then move the head back into place.
+- Don't squish an arrow's width or height independently; always hold Shift.
+- If a curvy arrow gets messy in tight space, a straight thin line is better.
+- **Maps: no curvy arrows at all** — limited space, and no arrowheads either. Use the hairline leaders in Maps → *Map leaders* (`#2d2e2d` at **0.3px**, a filled dot at the country end; at 1px a gray line reads as a border), or call the value out directly inside the country shape. The 1px stroke above is for arrows on a plot.
+
+### Straight elbowed arrows — the variant for filled areas
+
+**On a stacked area or any chart where the annotation sits *on* a filled band, use a straight elbowed leader in white, not a curvy arrow.** A curvy arrow drawn over big blocks of color reads as a stray squiggle — it has no white ground to sit against, and its curve fights the hard horizontal/vertical edges of the bands. An elbow made of two straight segments looks like part of the chart's own geometry: it leaves the text horizontally, turns once, and arrives perpendicular to the thing it names. This is the house treatment on the file's stacked-area pages.
+
+The shape is exactly two segments meeting at a right angle, with an arrowhead on the far end only:
+
+- **Leaving text horizontally, arriving vertically** — run right (or left) from the text's edge to the target's x, then turn and drop onto it. Use this to point at a *moment*: a collapse, a peak, a crossing.
+- **Leaving text vertically, arriving horizontally** — drop from under the text, then turn and run onto the band. Use this to point at a *level*: a band's thickness at the last year, where the arrival should land on the boundary the value refers to.
+
+**1px white line, and the head is the file's own arrowhead asset — not a `strokeCap`.** This is the part to get right, because a stroke cap is the obvious guess and it looks wrong: `ARROW_LINES` draws a thin open chevron where the house head is a small **solid filled triangle**, and a designer spots the difference immediately. The finished pages build the elbow as two nodes:
+
+1. **The line**: a `VECTOR` with a right-angle path, `strokeWeight = 1`, white, `strokeJoin = "MITER"`, and **every** cap `NONE`.
+2. **The head**: a copy of the same filled arrowhead vector the curvy arrows use (~8×12px, white `fills`, no stroke). Clone it rather than drawing one — it inherits the house silhouette.
+
+```js
+const v = figma.createVector();
+parent.appendChild(v);
+v.vectorPaths = [{ windingRule: "NONE", data: `M 0 0 L ${dx} 0 L ${dx} ${dy}` }];   // out, then down
+v.strokes = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+v.strokeWeight = 1;
+v.strokeJoin = "MITER";                     // a rounded corner softens the geometry the elbow exists to echo
+```
+
+**`clone()` keeps the node's own transform and loses its parents' — so copy the source's `absoluteTransform`.** Arrowheads in the finished pages sit inside a group that is itself mirrored or rotated, and that group is where half the orientation lives. Clone the head alone and it lands mirrored: the solid dart renders as a **hollow open chevron**, which is the same wrong silhouette a `strokeCap` gives you, from a different cause. `rotation` will not warn you — a mirrored node's getter returns the un-mirrored angle, so the source reads 169.9° and its clone reads 10.1° while both claim to be "the same node". Set the linear part explicitly, then translate:
+
+```js
+const at = src.absoluteTransform;                       // carries the parent group's flip
+head.relativeTransform = [[at[0][0], at[0][1], 0], [at[1][0], at[1][1], 0]];
+```
+
+**Seat the head by its tip vertex, not its bounding box.** The tip is a point on a rotated path, so the bbox centre is off by a couple of pixels in both axes — enough for the head to read as detached from its line. Transform the vertices yourself and move the extreme one onto the target; then the line's own axis and the tip agree exactly:
+
+```js
+const m = head.absoluteTransform;
+const pts = head.vectorNetwork.vertices.map(q => [
+  m[0][0]*q.x + m[0][1]*q.y + m[0][2] - fb.x,
+  m[1][0]*q.x + m[1][1]*q.y + m[1][2] - fb.y ]);
+const tip = pts.reduce((a, q) => q[1] > a[1] ? q : a);   // largest y for a down-pointing head
+const rt = head.relativeTransform;
+head.relativeTransform = [[rt[0][0], rt[0][1], rt[0][2] + (target.x - tip[0])],
+                          [rt[1][0], rt[1][1], rt[1][2] + (target.y - tip[1])]];
+```
+
+Then stop the **line** ~7px short of the target so the head's rear covers the junction and the two read as one object — a gap between line and head is the other way this arrow looks broken.
+
+**Aim at the event, not at the floor.** An arrow annotating a collapse points at the *top of the collapsing band* at the year it collapses — that is where the change is legible. Running it all the way down to the plot's baseline crosses two other bands to arrive at a sliver, which reads as pointing at nothing; on this chart the difference was 54px of unnecessary line.
+
+**If the sentence names a year, the arrow points at that year** — derive the x from the axis, not by eye. Two traps in doing that:
+
+- **Grapher insets the first and last tick labels** (~17px on a 540px frame) so they don't clip, so a year→x fit through the *edge* labels is wrong for every year. Fit on the interior ticks only and check the residuals: the interior ones land within ±0.1px, and the two edge labels show up as identical opposite-signed outliers.
+- **The first and last data points sit at the plot's edges**, which is where the **gridlines** end — not at the last label's centre. "In 2025, x was y" therefore points at the extreme right of the plot; aiming at the label centre lands the arrow ~17px inside the chart, in the middle of nothing.
+
+**Set `x`/`y` to the path's bounding-box minimum, not to its first vertex.** A leader that runs up or left has negative coordinates, and Figma normalizes the bbox — so assigning the start point puts the box's *top-left* there and the line draws away in the wrong direction. One leader aimed up at Chad ran down into the footer instead:
+
+```js
+const mnx = Math.min(x1, x2), mny = Math.min(y1, y2);
+v.vectorPaths = [{ windingRule: "NONE", data: `M ${x1-mnx} ${y1-mny} L ${x2-mnx} ${y2-mny}` }];
+v.x = mnx; v.y = mny;
+```

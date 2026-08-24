@@ -279,6 +279,7 @@ const checkFrame = async (frameId) => {
 
   // ---------------------------------------------------------------- rows
   // Text floor (CHECKS.md: nothing below 12px)
+// #region type
   {
     const under = texts.filter((t) => t.size < TEXT_FLOOR - 0.01);
     // A node whose sizes could not be READ is not a pass. `sizeRanges` swallows a throwing or
@@ -428,6 +429,52 @@ const checkFrame = async (frameId) => {
     }
   }
 
+  // The footer's source line: bold on the `Data source:` prefix ONLY.
+  //
+  // Added after a run shipped `Data source: V-Dem (2026)` bold THROUGHOUT and every other row passed
+  // it. The cause is generic enough to be worth stating: assigning `characters` collapses a text node
+  // to its FIRST run's style, and the template's first run is the bold prefix — so filling the slot
+  // silently bolds the producer name. It renders as a slightly heavy line that reads as fine.
+  // Nothing else here inspects weight outside `annotation__*`, which is why it went unnoticed.
+  {
+    // findAll, not findOne: the static templates nest the source inside a row frame, and findOne is
+    // surface the test harness's figma stub does not implement.
+    const src = footer ? footer.findAll((c) => c.type === "TEXT" && /^\s*Data source:/.test(c.characters || ""))[0] : null;
+    if (!footer) skip("source-line-weight", "no footer resolved on this frame");
+    else if (!src) skip("source-line-weight", "no footer TEXT starting `Data source:` — a template whose footer names its source differently is not judged here");
+    else {
+      const PREFIX = "Data source:";
+      let segs = [];
+      try { segs = src.getStyledTextSegments(["fontName"]); } catch (e) { segs = []; }
+      if (!segs.length) skip("source-line-weight", "footer source line has no readable font segments");
+      else {
+        // Two different questions, so two different regexes. BOLDISH classifies the TAIL: the
+        // collapse copies whatever the prefix is, so anything bold-family there is the symptom.
+        // The PREFIX itself is judged exactly, like the tail's Regular — TEXTS.md prescribes
+        // `LATO("Bold")` unconditionally, so Semibold, ExtraBold, Black or Bold Italic there is
+        // off-contract, and a substring test certifies all four as ok.
+        const BOLDISH = /bold|black/i;
+        const BOLD = /^bold$/i;
+        // The tail is judged against Regular, not merely against "not bold". TEXTS.md states the target
+        // twice and unconditionally — `"Data source:" Bold unbound` + `" <citation>" Regular BOUND` — so
+        // a Medium, Light or Italic producer name is off-contract too, and a not-bold test certifies it.
+        const REGULAR = /^regular$/i;
+        const weightAt = (i) => { const s = segs.find((x) => i >= x.start && i < x.end); return s && s.fontName ? s.fontName.style : null; };
+        const prefixWeights = [...new Set([...Array(Math.min(PREFIX.length, src.characters.length)).keys()].map(weightAt).filter(Boolean))];
+        const restWeights = [...new Set([...Array(Math.max(0, src.characters.length - PREFIX.length)).keys()]
+          .map((k) => weightAt(k + PREFIX.length)).filter(Boolean))];
+        const offTail = restWeights.filter((w) => !REGULAR.test(w));
+        const bad = [];
+        if (!prefixWeights.length || !prefixWeights.every((w) => BOLD.test(w))) bad.push(`"${PREFIX}" is ${prefixWeights.join("/") || "unreadable"} (want Bold)`);
+        if (offTail.some((w) => BOLDISH.test(w))) bad.push(`the producer name is ${restWeights.join("/")} — setting \`characters\` collapses the node to its FIRST run's style, which here is the bold prefix (GOTCHAS.md). Re-assert Regular across the whole string, then bold the prefix`);
+        else if (offTail.length) bad.push(`the producer name is ${restWeights.join("/")}, and TEXTS.md prescribes Regular — re-assert it across the tail. If a template genuinely ships ${offTail.join("/")} there, measure it and record it in TEXTS.md rather than loosening this row`);
+        add("source-line-weight", bad.length ? "FAIL" : "ok",
+            bad.length ? bad.join("; ") : `"${PREFIX}" bold, producer name ${restWeights.join("/") || "empty"}`,
+            { prefixWeights, restWeights });
+      }
+    }
+  }
+
   // Mark weight — the series lines and their halos.
   //
   // Two things vary by chart type and both were wrong when this only knew line charts. The series line
@@ -436,6 +483,8 @@ const checkFrame = async (frameId) => {
   // halo ONLY when a series line of the same name exists: on a SCATTER, `outline__<Entity>` is the ring
   // around a point, which measured 3.5-4.1px here and was being judged against a line's halo bar.
   // So a halo is paired or it is not a halo.
+// #endregion
+// #region series
   {
     const lineNames = new Set();
     for (const s of stroked) if (s.seriesKind && s.seriesKind !== "outline") lineNames.add(s.seriesName);
@@ -577,6 +626,8 @@ const checkFrame = async (frameId) => {
   }
 
   // Box alignment — the chart's edges against the header box, to the pixel.
+// #endregion
+// #region geometry
   {
     const boxes = plotRoots.map(rel).filter(Boolean);
     if (isSmall) skip("box-alignment", "302-wide format: the header HUGS its own text (206-278 against a 278 content box), so the chart's width is not meant to match it — SMALL-CHARTS.md");
@@ -676,6 +727,8 @@ const checkFrame = async (frameId) => {
   // muted context line are legal; a protagonist line, a dot and a value label are not. Failing every
   // intersection alike reports a correct highlighted chart as broken, because crossing the muted
   // context is exactly what the treatment is for.
+// #endregion
+// #region annotations
   let crossings = null;
   {
     const map = (n, pt) => { const m = n.absoluteTransform; return { x: m[0][0] * pt.x + m[0][1] * pt.y + m[0][2] - fb.x, y: m[1][0] * pt.x + m[1][1] * pt.y + m[1][2] - fb.y }; };
@@ -848,11 +901,27 @@ const checkFrame = async (frameId) => {
     else if (isSmall) skip("annotation-block-gap", "302-wide format: SMALL-CHARTS.md replaces the 27px constant with 'scale to the frame', so the 540x540 figure would reject a valid scaled layout. Measure it against that page's own rule and record the number");
     else if (bandTop === null || footerTop === null) skip("annotation-block-gap", "band not resolved");
     else {
-      const all = [...annotations.map((a) => a.box), ...plotRoots.map(rel)].filter(Boolean);
+      const plotBoxes = plotRoots.map(rel).filter(Boolean);
+      const annBoxes = annotations.map((a) => a.box).filter(Boolean);
+      const all = [...annBoxes, ...plotBoxes];
       const top = Math.min(...all.map((b) => b.t)), bot = Math.max(...all.map((b) => b.bb));
       const cTop = top - (header ? header.y + header.height : bandTop), cBot = footerTop - bot;
-      const bad = cTop < BLOCK_CLEARANCE - 0.5 || cBot < BLOCK_CLEARANCE - 0.5;
-      add("annotation-block-gap", bad ? "FAIL" : "ok", `block clears header by ${r(cTop)} and footer by ${r(cBot)} (want >= ${BLOCK_CLEARANCE})`);
+      // The 27px rule is for annotations that sit OUTSIDE the plot, in bands above and below it —
+      // there the reader sees one content block whose outer edges owe the template's own gaps. When
+      // every annotation is inside the plot the block IS the plot, so this row would demand 27px of
+      // exactly the geometry the `gap` row requires to be 12-16: the two become unsatisfiable
+      // together, and a correctly-fitted chart fails one of them whatever you do. Measured on a DI
+      // whose annotations sat in the plot: gap ok at 14/14.21, this row FAIL wanting >= 27.
+      const plotTop = Math.min(...plotBoxes.map((b) => b.t)), plotBot = Math.max(...plotBoxes.map((b) => b.bb));
+      const outside = annBoxes.filter((b) => b.t < plotTop - 0.5 || b.bb > plotBot + 0.5);
+      if (!outside.length) {
+        skip("annotation-block-gap",
+             `all ${annBoxes.length} annotation(s) sit inside the plot's vertical extent, so the block IS the plot and its clearance is the \`gap\` row's business (measured ${r(cTop)}/${r(cBot)} here). This row governs annotations placed in bands ABOVE or BELOW the plot`);
+      } else {
+        const bad = cTop < BLOCK_CLEARANCE - 0.5 || cBot < BLOCK_CLEARANCE - 0.5;
+        add("annotation-block-gap", bad ? "FAIL" : "ok",
+            `block clears header by ${r(cTop)} and footer by ${r(cBot)} (want >= ${BLOCK_CLEARANCE}); ${outside.length} annotation(s) extend past the plot, which is what puts this row in scope`);
+      }
     }
   }
 
@@ -915,6 +984,7 @@ const checkFrame = async (frameId) => {
   }
 
   // ---------------------------------------------------------------- declared gaps in coverage
+// #endregion
   skip("colour-vision", "all-pairs deltaE 20 for deuteranopia/protanopia on CATEGORICAL fills", "scripts/color_audit.py");
   skip("grayscale-seams", "adjacent pairs above ~1.6:1; needs --separated for non-stacked charts", "scripts/color_audit.py");
   skip("spelling-and-prose", "American spelling, typos, style-guide breaches", ".venv/bin/codespell + /check-metadata-style");
