@@ -5,6 +5,25 @@
 
 Every one of these caught a real defect on this skill's first run, and none of them is visible by looking at the frame. Run them as a pass, and report the numbers rather than "looks fine".
 
+> **⚠️ `verify_page.js` does not fit in a `use_figma` call as it ships.** The `code` argument caps at
+> **50,000 characters** and the file is **~79,000**, so the instruction below is not executable
+> verbatim — a run that pastes it is rejected. Emit it stripped instead:
+>
+> ```bash
+> .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js
+> ```
+>
+> That returns ~45,000 characters of comment-free source, which fits and still parses (the helper is
+> context-aware, so URLs, regex literals and template strings survive; `--check` sizes every script
+> and fails if one overflows). **Edit `CONFIG.frameId` in the emitted text before sending it.**
+>
+> **Even stripped it is a hard thing to relay**, at 90% of the cap and requiring verbatim
+> reproduction into the tool call, where a one-character corruption yields a *wrong verdict* rather
+> than an error. A run that cannot do it safely should say so and fall back to checking the rows it
+> can — naming the ones it skipped, which is what a `SKIPPED` row means here anyway. **Splitting this
+> script into per-row modules is the standing fix, and it is not done.** `diff_against_template.js`
+> (~12,000 stripped) has no such problem.
+>
 > **[`scripts/verify_page.js`](../scripts/verify_page.js) runs the MECHANICAL rows in ONE read-only
 > `use_figma` call** — text floor, annotation ladder, named styles, text hierarchy, series and
 > furniture weights, dash patterns, box alignment, gap, margins, unbound fills, annotation knockout

@@ -321,9 +321,11 @@ head -c 300 $DIR/embed.svg   # expect <svg ... width="..." height="...">, no <ht
 > **[`scripts/solve_export.py`](scripts/solve_export.py) does this arithmetic — don't do it by hand.**
 > Run it from the repo root through the venv — `.venv/bin/python .claude/skills/create-figma-chart/scripts/solve_export.py …`;
 > it is committed non-executable like the rest of that directory.
-> `--band 508x371 --slug <slug>` returns the solved `imFontSize`, the `imWidth`/`imHeight` to
+> `--band 508x371 --slug <slug> --params '<the view's query string>'` returns the solved
+> `imFontSize`, the `imWidth`/`imHeight` to
 > request, the predicted content box, the **height-first** scale into the band, the leftover width
-> the x-map has to close, the final label size, and the finished `curl`. Two things to read it by:
+> the x-map has to close, the final label size, and the finished `curl`. **Omit `--params` and that
+> `curl` exports the DEFAULT chart** — a valid, plausible SVG of the wrong entities. Two things more:
 > it reports the leftover width rather than a predicted gap, because the gap is exact by
 > construction once you fit the height (Step 7) — that leftover is the same quantity
 > `measure_fit.js` reports as `xMapShortfall`, and it is the aspect miss expressed in px; and every
