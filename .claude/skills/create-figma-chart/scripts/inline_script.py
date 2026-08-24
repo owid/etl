@@ -101,7 +101,26 @@ def strip_js(src: str) -> str:
         i += 1
 
     lines = [ln.rstrip() for ln in "".join(out).split("\n")]
-    return "\n".join(ln for ln in lines if ln.strip())
+    stripped = "\n".join(ln for ln in lines if ln.strip())
+
+    # A surviving line comment means the parse desynchronized and the rest of the file was copied
+    # verbatim — the failure this stripper exists to avoid, and it is SILENT: the output is still
+    # valid JS, just far larger, so it is sent and the size guard is what eventually notices.
+    #
+    # It happened: a NESTED template literal (a backtick inside a `${}` inside a template) closes the
+    # outer context on the inner backtick. Nesting is legal JS and this parser is not nesting-aware.
+    # `--check` jumped 75% -> 96% of cap on a 1.8KB edit, which is the only reason it was caught.
+    # Verified against all ten scripts here: zero false positives. If legitimate content ever trips
+    # this, that content breaks the stripper too — failing is the correct answer either way.
+    survivors = [ln for ln in stripped.split("\n") if ln.lstrip().startswith("//") and not REGION.match(ln.strip())]
+    if survivors:
+        raise ValueError(
+            "comment stripping failed: "
+            + f"{len(survivors)} line comment(s) survived, starting with {survivors[0].strip()[:60]!r}. "
+            "The parser lost sync — most likely a nested template literal (a backtick inside a ${} "
+            "inside a template) or an unterminated literal. Rewrite it as concatenation."
+        )
+    return stripped
 
 
 def select_rows(src: str, wanted: set[str]) -> tuple[str, list[str]]:

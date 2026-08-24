@@ -1135,6 +1135,50 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     // audit's findings name the categories that need attention.
     check("33 clean names DO produce --names, carrying the category", /--names 'Chile'/.test(d1), d1);
     check("33 and then no omission note is attached", !/--names omitted/.test(d1), d1);
+    // 33b — the two conditions measured on the REAL file, not invented. A `static_viz` import names
+    // every series group `<kind>__<slug>` (the dataset, not the category) and every paint-bearing
+    // leaf `Vector`, so distinct colours arrive sharing one name. That is worse than a missing name
+    // because it looks right: the audit prints one row per colour, all under the same label.
+    const shareName = buildFrame();
+    const chartGrp = shareName.children.find((c) => c.name === "chart");
+    chartGrp.children.push(node({
+      name: "bars__agriculture-share", type: "GROUP", x: 100, y: 300, width: 120, height: 60,
+      children: [
+        node({ type: "RECTANGLE", name: "Vector", x: 100, y: 300, width: 40, height: 60, fills: solid("#00847e") }),
+        node({ type: "RECTANGLE", name: "Vector", x: 150, y: 300, width: 40, height: 60, fills: solid("#883039") }),
+      ],
+    }));
+    const dShare = row(await run(shareName, {}), "colour-vision").detail;
+    check("33b two colours under one category name drop --names",
+          !/--names '/.test(dShare) && /distinct name/.test(dShare), dShare);
+    check("33b and both colours still reach the palette",
+          /#00847e/.test(dShare) && /#883039/.test(dShare), dShare);
+
+    // A generic import name labels nothing, even when it is distinct per colour.
+    const generic = buildFrame();
+    const chartGrp2 = generic.children.find((c) => c.name === "chart");
+    chartGrp2.children.push(node({
+      name: "series__one", type: "GROUP", x: 100, y: 300, width: 40, height: 60,
+      children: [node({ type: "RECTANGLE", name: "Vector", x: 100, y: 300, width: 40, height: 60, fills: solid("#00847e") })],
+    }));
+    chartGrp2.children.push(node({ type: "RECTANGLE", name: "Rectangle 12", x: 150, y: 300, width: 40, height: 60, fills: solid("#883039") }));
+    const dGen = row(await run(generic, {}), "colour-vision").detail;
+    check("33b an import-default name drops --names and says so",
+          !/--names '/.test(dGen) && /(import default|distinct name)/.test(dGen), dGen);
+
+    // 33c — a `static_viz` chart group is `chart__<slug>`, and an exact-only match called that
+    // "ungrouped" while walking it anyway: a wrong explanation for a right answer.
+    const slugged = buildFrame();
+    slugged.children.find((c) => c.name === "chart").name = "chart__agriculture-share";
+    const outSlug = await run(slugged, {});
+    check("33c chart__<slug> resolves by name",
+          /name "chart__agriculture-share"/.test(outSlug.resolved.chartBy), outSlug.resolved.chartBy);
+    check("33c and is not reported as ungrouped",
+          !/ungrouped/.test(outSlug.resolved.chartBy), outSlug.resolved.chartBy);
+    check("33c plain `chart` still resolves exactly",
+          /name "chart"$/.test((await run(buildFrame(), {})).resolved.chartBy),
+          (await run(buildFrame(), {})).resolved.chartBy);
+
     // And the reason given must be the real one, not the comma message reused for a missing name.
     const anon = buildFrame({ barSegment: true });
     renameMarks(anon, "");

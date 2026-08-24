@@ -406,8 +406,16 @@ mock, and both changes make a row *less* red on purpose. Read them before treati
 
 ## A skip with a false reason is the failure mode, not a wrong number
 
-Worth stating on its own, because it has now bitten in three different rows. When `CONFIG.chartName`
-finds nothing — the documented case where a designer has **ungrouped** the chart — the plot has to be
+**First, the common case is not the one this section assumed.** `chartName` defaults to `chart`, and a
+read of the live file found the real convention is **`chart__<slug>`** — a `static_viz` import lands as
+`chart__agriculture-share`. An exact-only match resolved nothing on every one of those pages, fell
+through to the ungrouped branch, walked the right node anyway, and reported *"the chart group looks
+ungrouped"* about a frame whose chart group is present and correctly named. The answer was right and
+the explanation was wrong, which is the worse of the two: it sends the next reader to fix a
+non-problem. The resolver now takes an exact match first, then `<chartName>__<slug>`.
+
+The rest of this section is the genuinely ungrouped case. It has bitten in three different rows. When
+`CONFIG.chartName` finds nothing — a designer has **ungrouped** the chart — the plot has to be
 resolved from the frame's children, and doing that from a list of container names was line-chart-shaped:
 it knew the axis, grid and lines groups and missed a map's `map`, a bar's `bars`, a scatter's point
 container and a slope's `slopes`. Those children were then walked as *not* in the plot, which does not

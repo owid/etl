@@ -176,12 +176,24 @@ const checkFrame = async (frameId) => {
   // So: everything that is not the header, the footer, the logo or one of OUR annotations is plot
   // content. Annotations are excluded because they are ours rather than the chart's — they have their
   // own four rows, and counting their fills among the plot's invents off-palette entries.
-  let chart = CONFIG.chartName ? frame.children.find((c) => c.name === CONFIG.chartName) : null;
+  // Exact name first, then `<chartName>__<slug>`. Measured on the real file: a `static_viz` import
+  // lands as `chart__agriculture-share`, so an exact-only match resolved NOTHING on those pages and
+  // fell through to the ungrouped branch — which still walked the right node, but reported "the chart
+  // group looks ungrouped" about a frame whose chart group is right there and correctly named.
+  // A wrong explanation for a working result is how the next reader is sent to fix the wrong thing.
+  let chart = CONFIG.chartName
+    ? frame.children.find((c) => c.name === CONFIG.chartName)
+      || frame.children.find((c) => c.name.startsWith(CONFIG.chartName + "__"))
+    : null;
   let plotRoots = chart
     ? [chart]
     : frame.children.filter((c) => c !== header && c !== footer && c !== logo && !/^annotation__/.test(c.name));
+  // NOT a nested template literal: `inline_script.py`'s stripper is not nesting-aware, so a backtick
+  // inside a ${} closes the outer context, desynchronizes, and silently stops stripping comments for
+  // the rest of the file. Caught by --check jumping 75% -> 96% of cap on a 1.8KB edit.
+  const chartSuffix = chart && chart.name !== CONFIG.chartName ? ' (matched "' + CONFIG.chartName + '__<slug>")' : "";
   const chartResolvedBy = chart
-    ? `name "${CONFIG.chartName}"`
+    ? `name "${chart.name}"` + chartSuffix
     : plotRoots.length
       ? `${plotRoots.length} ungrouped frame child(ren) — the chart group looks ungrouped: ${plotRoots.map((c) => c.name).join(", ")}`
       : "NOT RESOLVED — no frame child left after the header, footer, logo and annotations";
@@ -1163,9 +1175,20 @@ const checkFrame = async (frameId) => {
       // comma'd one and an apostrophe'd one all disqualify the flag, and reporting one as another is the
       // same wrong-verdict habit these checks exist to catch.
       const names = [...seen.values()];
+      // A name that is not DISTINCT across the palette is the worst of the lot, because it looks
+      // right. Measured on the real file: a `static_viz` import names every bar group `bars__<slug>`
+      // — the dataset, not the category — and every paint-bearing leaf `Vector`, so four genuinely
+      // different colours came out labelled `agriculture-share,agriculture-share,...`. The audit
+      // would then print four rows under one name and the operator would read a per-category verdict
+      // off labels that name no category. Distinctness is the property `--names` actually promises.
+      const genericName = /^(vector|rectangle|ellipse|group|frame|line|path|polygon|union|subtract)\b/i;
       const nameProblem = names.some((n) => !n) ? "a mark has no name"
         : names.some((n) => n.includes(",")) ? "a name contains a comma, which would misalign the labels"
         : names.some((n) => n.includes("'")) ? "a name contains an apostrophe, which would break the quoted shell argument"
+        : new Set(names).size !== names.length
+          ? `${names.length} colours share only ${new Set(names).size} distinct name(s) (${[...new Set(names)].slice(0, 3).join(", ")}) — the names identify the series or the import, not the category`
+        : names.some((n) => genericName.test(n))
+          ? `a name is an import default (${names.find((n) => genericName.test(n))}), which labels nothing`
         : null;
       const namesSafe = !nameProblem;
       // The mode flag also selects which PALETTE color_audit.py searches when the operator follows its
