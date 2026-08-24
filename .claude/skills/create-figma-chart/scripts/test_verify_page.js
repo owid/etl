@@ -232,10 +232,13 @@ const annotation = (o) => text("annotation__test", o.chars || "Note", o.size || 
     textStyleId: o.styleId === undefined ? "S:abc" : o.styleId,
   });
 
-async function run(frame, config) {
+// `wrap` puts the frame under an ancestor — a section or a group — because two of the switches that
+// decide whether a frame renders at all live ABOVE it, and a page whose only child is the frame cannot
+// model either. It takes the frame and returns whatever should sit on the page in its place.
+async function run(frame, config, wrap) {
   const byId = {};
   const index = (n) => { if (n.id) byId[n.id] = n; for (const c of n.children || []) index(c); };
-  const page = node({ id: "P:1", type: "PAGE", name: "page", children: [frame] });
+  const page = node({ id: "P:1", type: "PAGE", name: "page", children: [wrap ? wrap(frame) : frame] });
   index(page);
   const figma = { currentPage: page, getNodeByIdAsync: async (id) => byId[id] || null, setCurrentPageAsync: async () => {} };
   const body = SRC.replace(/^const CONFIG = \{[\s\S]*?^\};/m, "const CONFIG = __CONFIG__;");
@@ -1082,15 +1085,15 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const dDimFrame = row(await run(dimFrame, {}), "colour-vision").detail;
     check("33 a frame's own opacity disqualifies every mark under it",
           !/#4c6a9c/.test(dDimFrame) && /translucent/.test(dDimFrame), dDimFrame);
-    // At zero the marks do not merely lose their colour, they leave every row — so the count is zero
-    // for a reason that has nothing to do with what is on the frame. Reported as "no data marks found"
-    // that reads as an empty frame and sends the operator hunting for nodes that are all present.
+    // At zero the marks do not merely lose their colour, they leave every row — and so does the frame:
+    // it paints no pixels, so it goes through the shared gate in case 35 rather than being explained
+    // inside a colour row while thirty other rows go on certifying it.
     const goneFrame = buildFrame({ barSegment: true });
     goneFrame.opacity = 0;
-    const dGoneFrame = row(await run(goneFrame, {}), "colour-vision").detail;
-    check("33 a frame at opacity 0 says so, instead of reporting an empty plot",
-          /FRAME itself is at effective opacity 0/.test(dGoneFrame)
-          && !/No data marks or series strokes found/.test(dGoneFrame), dGoneFrame);
+    const outGone = await run(goneFrame, {});
+    check("33 a frame at opacity 0 is not audited for colour at all",
+          !row(outGone, "colour-vision") && !!row(outGone, "frame-not-rendered"),
+          outGone.verdict);
     // And an ordinary frame must carry neither message, or both become noise on every run.
     // And the note must not fire on an ordinary opaque chart, or it becomes noise on every run.
     const opaque = row(await run(buildFrame({ barSegment: true }), {}), "colour-vision").detail;
@@ -1205,6 +1208,100 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     check("33c plain `chart` still resolves exactly",
           /name "chart"$/.test((await run(buildFrame(), {})).resolved.chartBy),
           (await run(buildFrame(), {})).resolved.chartBy);
+
+    // 34 — a LEGEND is a picture of the categories, not a set of categories. grapher draws it INSIDE
+    // the chart group and OUTSIDE `map` (measured: `chart > numeric-color-legend > {lines, swatches,
+    // labels, swatch-hit-areas}`, a sibling of `map`), so every swatch arrived as an ordinary filled
+    // plot mark with `fromMap: false`. An ordinary choropleth then reported TWO palettes — its own
+    // legend audited as chart marks, under `--separated`, against the wrong set.
+    const legendGroup = (name, swatches) => node({ name, x: 40, y: 470, width: 300, height: 30, children: [
+      node({ name: "swatches", x: 40, y: 470, width: 300, height: 12,
+             children: swatches.map(([nm, hex], i) => node({ type: "RECTANGLE", name: nm, x: 40 + i * 70,
+               y: 470, width: 60, height: 12, fills: solid(hex) })) }),
+      node({ name: "labels", x: 40, y: 486, width: 300, height: 14,
+             children: [text("0", "0", 12, 40, 486, 20, 14, "#2d2e2d")] })] });
+
+    // 34a — a pure map with grapher's numeric legend. Two of the swatches repeat the countries' own
+    // bin colours; the third is an empty bin, drawn in the legend and on no country.
+    const legMap = buildFrame({ mapCountries: true });
+    const legMapChart = legMap.children.find((c) => c.name === "chart");
+    legMapChart.children = legMapChart.children.filter((c) => !/^(line|outline)__|^datapoints__/.test(c.name));
+    legMapChart.children.push(legendGroup("numeric-color-legend", [
+      ["Rectangle 3", "#4c6a9c"], ["Rectangle 4", "#b13507"], ["Rectangle 5", "#e56e5a"]]));
+    const dLegMap = row(await run(legMap, {}), "colour-vision").detail;
+    check("34a a map's own legend does not make it a two-palette frame",
+          !/two separate runs/.test(dLegMap) && !/--separated/.test(dLegMap), dLegMap);
+    check("34a and the map itself is still audited", /--maps/.test(dLegMap) && /#4c6a9c/.test(dLegMap), dLegMap);
+    check("34a the excluded swatches are counted, not silently dropped",
+          /legend swatch\(es\) are NOT in this palette/.test(dLegMap), dLegMap);
+    check("34a and a colour that exists ONLY in the legend is named",
+          /#e56e5a/.test(dLegMap) && /ONLY in the legend/.test(dLegMap), dLegMap);
+    check("34a while a swatch's own node name never labels the audit",
+          !/Rectangle 3/.test(dLegMap), dLegMap);
+
+    // 34b — the same on an ordinary chart, where the harm lands on `--names`: a numeric legend's bins
+    // are unnamed rects, so one swatch in a colour of its own put an import default into the palette
+    // and dropped the flag for the whole run. The series here is `line__A`, which names itself.
+    const legLine = buildFrame();
+    legLine.children.find((c) => c.name === "chart").children
+      .push(legendGroup("categorical-color-legend", [["Rectangle 8", "#e56e5a"]]));
+    const dLegLine = row(await run(legLine, {}), "colour-vision").detail;
+    check("34b a legend swatch does not cost an ordinary chart its --names",
+          /--names 'A'/.test(dLegLine) && !/--names omitted/.test(dLegLine), dLegLine);
+    check("34b and the swatch colour is reported as legend-only, not audited as a category",
+          /#e56e5a/.test(dLegLine) && /ONLY in the legend/.test(dLegLine), dLegLine);
+
+    // 34c — excluded from the PALETTE is not excluded from the page: an annotation dropped over the
+    // legend still covers something the reader needs. It keeps its box and is named for what it is,
+    // because "covers a filled data mark" sends the reader hunting for a bar that is not there.
+    const legAnn = buildFrame({ annotation: annotation({ x: 45, y: 468, w: 40, h: 16, stroke: "#ffffff", strokeWeight: 3 }) });
+    legAnn.children.find((c) => c.name === "chart").children
+      .push(legendGroup("categorical-color-legend", [["Rectangle 8", "#e56e5a"]]));
+    const dLegAnn = row(await run(legAnn, {}), "annotation-overlap");
+    check("34c an annotation over a legend swatch still FAILS", dLegAnn.status === "FAIL", dLegAnn.detail);
+    check("34c and it is called a legend swatch, not a data mark",
+          /a legend swatch/.test(dLegAnn.detail) && !/Rectangle 8 — a filled data mark/.test(dLegAnn.detail), dLegAnn.detail);
+
+    // 35 — the frame that paints no pixels. `collect` tests `visible` on every node it walks, but it
+    // starts at the frame's CHILDREN: a `visible: false` on the frame itself, or on a section holding
+    // it, was never read, and those children carry their own `visible: true`. The frame certified a
+    // full sheet of rows about a deliverable that is switched off.
+    const hiddenFrame = buildFrame({ barSegment: true });
+    hiddenFrame.visible = false;
+    const outHidden = await run(hiddenFrame, {});
+    check("35 a hidden frame emits ONE row, not a sheet of verdicts",
+          outHidden.rows.length === 1 && outHidden.rows[0].check === "frame-not-rendered", `${outHidden.rows.length} rows`);
+    check("35 the row FAILS rather than passing quietly", outHidden.rows[0].status === "FAIL", outHidden.rows[0].status);
+    check("35 the verdict says NOT CHECKED, never 'no mechanical row failed'",
+          /NOT CHECKED/.test(outHidden.verdict) && !/no mechanical row failed/.test(outHidden.verdict), outHidden.verdict);
+    check("35 and it names the switch that is off", /visible=false/.test(outHidden.rows[0].detail), outHidden.rows[0].detail);
+    // The ancestor half. Nothing on the frame or under it is touched here, so only the climb can
+    // account for the difference — and unhiding the frame would not help.
+    const underSection = buildFrame({ barSegment: true });
+    const outSection = await run(underSection, {}, (f) => node({ type: "SECTION", name: "WIP", visible: false, children: [f] }));
+    check("35 a hidden SECTION above the frame counts too",
+          outSection.rows.length === 1 && outSection.rows[0].check === "frame-not-rendered", `${outSection.rows.length} rows`);
+    check("35 and the ancestor is named, since unhiding the frame would not help",
+          /WIP/.test(outSection.rows[0].detail), outSection.rows[0].detail);
+    // Zero effective opacity is the same state reached by the other switch, and takes the same route.
+    const zeroFrame = buildFrame({ barSegment: true });
+    zeroFrame.opacity = 0;
+    const outZero = await run(zeroFrame, {});
+    check("35 an effectively invisible frame takes the same gate",
+          outZero.rows.length === 1 && /effective opacity/.test(outZero.rows[0].detail), outZero.verdict);
+    // And the gate must not fire on a frame that merely CONTAINS something hidden, or every page with
+    // a switched-off spare layer stops being checked at all.
+    const hiddenChild = buildFrame({ barSegment: true });
+    hiddenChild.children.find((c) => c.name === "chart").visible = false;
+    const outChild = await run(hiddenChild, {});
+    check("35 a hidden CHILD does not stop the frame being checked",
+          !row(outChild, "frame-not-rendered") && outChild.rows.length > 20, `${outChild.rows.length} rows`);
+    // A visible frame under a visible section is the other direction: the climb must not invent a
+    // hidden ancestor out of a `visible: true` one.
+    const outVisibleSection = await run(buildFrame({ barSegment: true }), {}, (f) => node({ type: "SECTION", name: "Live", children: [f] }));
+    check("35 a visible section above the frame changes nothing",
+          !row(outVisibleSection, "frame-not-rendered") && outVisibleSection.rows.length > 20,
+          `${outVisibleSection.rows.length} rows`);
 
     // And the reason given must be the real one, not the comma message reused for a missing name.
     const anon = buildFrame({ barSegment: true });

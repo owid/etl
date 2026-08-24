@@ -6,14 +6,14 @@
 Every one of these caught a real defect on this skill's first run, and none of them is visible by looking at the frame. Run them as a pass, and report the numbers rather than "looks fine".
 
 > **⚠️ `verify_page.js` does not fit in a `use_figma` call as it ships.** The `code` argument caps at
-> **50,000 characters** and the file is **~103,000**, so the instruction below is not executable
+> **50,000 characters** and the file is **~112,000**, so the instruction below is not executable
 > verbatim — a run that pastes it is rejected. Emit it stripped instead:
 >
 > **Run it in slices — that is the supported path, and the only one.** Stripping the comments used to
 > get it *just* under the cap (the helper is context-aware, so URLs, regex literals and template
 > strings survive), and even then it sat at 97%, all of which has to be relayed verbatim — where a
 > one-character corruption yields a *wrong verdict* rather than an error, the exact failure this gate
-> exists to catch. It has since grown past the cap outright: **55,257 stripped**. So
+> exists to catch. It has since grown past the cap outright: **58,824 stripped**. So
 > `inline_script.py verify_page.js` with no `--rows` **refuses and exits 1**, naming the size and
 > pointing here, and `--whole` no longer overrides that — the cap is now a hard floor for this
 > script, not a judgement call. The rows are grouped, each slice carries the shared preamble:
@@ -25,13 +25,13 @@ Every one of these caught a real defect on this skill's first run, and none of t
 >
 > | group | rows | size |
 > |---|---|---|
-> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 59% of cap |
-> | `series` | series-weight, furniture-weight, furniture-dash | 54% |
-> | `geometry` | box-alignment, gap, margins, off-palette | 49% |
-> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 65% |
+> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 66% of cap |
+> | `series` | series-weight, furniture-weight, furniture-dash | 61% |
+> | `geometry` | box-alignment, gap, margins, off-palette | 56% |
+> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 72% |
 >
-> Groups combine, so the whole pass is two calls: `--rows type,series` (36,965) then
-> `--rows geometry,annotations` (37,647, **75% of cap** — the figure `inline_script.py --check`
+> Groups combine, so the whole pass is two calls: `--rows type,series` (40,532) then
+> `--rows geometry,annotations` (41,214, **82% of cap** — the figure `inline_script.py --check`
 > reports: it measures **these two calls**, declared as `DOCUMENTED_CALLS` in the script, rather
 > than the smallest split it could find for itself — an optimiser would go on reporting a
 > comfortable number by picking a split nobody is told to send. Change the pair here and there
@@ -77,6 +77,19 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > on the test fixture, it returned a one-entry palette consisting of a text label's fill. `outline__*`
 > strokes are excluded too: that is the white halo under a line, shared by every series.
 >
+> **A legend is furniture, and its swatches are not categories.** grapher draws the legend *inside*
+> the chart group and *outside* the map — a map page reads `chart > numeric-color-legend > {lines,
+> swatches, labels, swatch-hit-areas}` as a **sibling** of `map` — so every filled swatch reached the
+> palette as an ordinary chart-side mark. An ordinary choropleth then reported **two** palettes: the
+> map under `--maps` and its own legend under `--separated`, with a `--suggest` rerun ready to
+> recommend restyling the legend rather than the categories. On a line chart the harm landed on
+> `--names` instead: a numeric legend's bins are unnamed rects, so one swatch in a colour of its own
+> put an import default into the palette and dropped the flag for the whole run. A legend repeats the
+> categories' colours and adds none of its own, so the swatches are excluded, **counted** in the row,
+> and any colour appearing *only* in the legend — an empty bin — is named rather than quietly lost.
+> They keep their boxes for `annotation-overlap`, where an annotation dropped over the legend still
+> covers something the reader needs, and are reported there as "a legend swatch".
+>
 > The mode flag is chosen from what the palette was sourced from, and it is not cosmetic — it also
 > selects which palette a `--suggest` rerun searches. A line or slope palette gets **`--line`**
 > (`--separated` plus the Line and Slope Chart variants, the darker set for thin marks on white);
@@ -101,6 +114,14 @@ Every one of these caught a real defect on this skill's first run, and none of t
 >   nearest `<kind>__<Entity>` **ancestor**, because grapher puts the name on the group and the paint
 >   on its leaves: a `datapoints__<Entity>` marker is a filled leaf called `Ellipse 12`.
 >
+> **A frame that paints no pixels returns one row, not a sheet of them.** Figma switches a node off
+> two independent ways — `visible: false` and opacity — and both are **inherited**, while the walk
+> starts at the frame's *children*, whose own `visible: true` says nothing about whether they render.
+> So a hidden frame, or one under a hidden section, used to certify thirty rows of verdicts about a
+> deliverable nobody can see. Either switch now returns a single `frame-not-rendered` **FAIL** naming
+> which switch is off and where, and the verdict reads `NOT CHECKED` — never "no mechanical row
+> failed". Unhide or reset the frame *and every group and section above it*, then re-run.
+>
 > A `SKIPPED` row is a declared gap in coverage, never a pass — which
 > is the whole reason to read the list rather than the verdict.
 >
@@ -118,7 +139,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > its text — and it separates the one API limitation that is *not* a defect (a bolded `Data source:`
 > prefix cannot be both bold and style-bound through the plugin API, so it reports as `halfBound`; see
 > [TEXTS.md](TEXTS.md)) from real drift. Its harness is
-> [`scripts/test_diff_against_template.js`](../scripts/test_diff_against_template.js) (**49**
+> [`scripts/test_diff_against_template.js`](../scripts/test_diff_against_template.js) (**75**
 > assertions), which found four defects in the script that review had not: a header that lost a row
 > reported as matching, five fingerprinted footer properties never actually compared, and a
 > `TypeError` that killed the whole diff when a row changed type. A fifth, from review: the text
@@ -127,7 +148,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 >
 > Validated by planting defects and confirming each row **fails**, twice over: 11 planted in Figma and
 > 11 caught, then a stubbed-figma harness ([`scripts/test_verify_page.js`](../scripts/test_verify_page.js),
-> `node` it after any edit) covering **137** assertions including the rows that are awkward to plant on a
+> `node` it after any edit) covering **262** assertions including the rows that are awkward to plant on a
 > real page. **A check that cannot fail is worse than no check**, so when you extend this script,
 > extend both passes with it.
 >
