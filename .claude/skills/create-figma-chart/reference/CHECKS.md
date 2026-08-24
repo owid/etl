@@ -293,3 +293,7 @@ when it finds nothing — not only what it says when it finds a defect.**
   FAILS, while imported text is REVIEW with its distance to the nearest rung, FAILing only past 0.75px.
   Measured drift on the eight frames was 0.11–0.48px; the scatter's bubble legend was 6.01px from its
   rung, which is the case the threshold exists to catch.
+
+**The end-to-end run that exercises all of this** — a fixed request, written down before its first
+run so it cannot be tuned to its own result — is [BENCHMARK.md](BENCHMARK.md). Use it to check a
+change did not break the flow; use a fixed sub-task, not it, to claim a speedup.
