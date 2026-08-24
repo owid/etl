@@ -59,7 +59,7 @@ The step-by-step detail lives in [`reference/`](reference/) and is read *at* tha
 | [reference/WRITING-THE-STEP.md](reference/WRITING-THE-STEP.md) | Step 4 | The handoff contract, grapher's axis and tick treatment, encoding diagrams, desktop/mobile pairing, text slots, labelling many categories, Figma-surviving anchors, the assertions to write. |
 | [reference/GOTCHAS.md](reference/GOTCHAS.md) | Its **Data** section at Step 1, before any column is used; the rest on an error, or grep by symptom | Data, layout and workflow pitfalls. |
 
-**Size budget: keep this spine under 30 KB and TEMPLATES.md under 25 KB.** Both are read on every
+**Size budget, enforced by `--structure`: this spine under 30 KB, TEMPLATES.md under 25 KB.** Both are read on every
 run, so a paragraph added here costs every future viz — new detail belongs in the reference file for
 its step. After editing any doc in this skill:
 
@@ -69,12 +69,28 @@ its step. After editing any doc in this skill:
 .venv/bin/python .claude/skills/create-figma-chart/scripts/verify_docs.py --skill create-static-viz --against <ref>
 ```
 
-**When you do make a Figma MCP call, batch it.** Every call is a ~7–10 s network hop to the hosted
-connector, so a handful issued one at a time is the difference between seconds and minutes. The
-connector serves concurrent calls — eight screenshots in one message measured 4.1× faster than
-serially — and admits about four or five at once, so **put independent calls in one message, 4–6 at
-a time.** Reads always; writes only when they target different pages. `/create-figma-chart` →
-**Round-trip budget** has the full rule and the list of what is genuinely serial.
+**When you do make a Figma MCP call, batch it.** A call costs twice — the network hop to the hosted
+connector **and the model turn around it**. The hop is environment-specific and **the cloud is the
+faster side of it**: `get_screenshot` 7.8–9.9 s from a sandbox against 12.5–20.5 s locally,
+`use_figma` 0.70 s against 3.5–5.8 s. The **turn** is not environmental — it tracks the work in it,
+and identical light probes measured 2.8 s in a sandbox against 3.7 s locally. (A ~12 s cloud turn was
+claimed here once; it came from turns doing real chart work, so it is the heavy-turn cost either
+side.) Either way, a handful
+issued one at a time is the difference between seconds and minutes. Batching pays about the same in
+both: the connector serves concurrent calls — eight screenshots in one message measured 4.1× faster
+than serially, and ten reps of a fixed six-call probe a side put it at **≈4.0× in both
+environments** (4.00× cloud, 3.84× local, six in flight every time) — and admits about four or five
+at once, so **put independent calls in one message, 4–6 at a time.** A batch's wall is
+`first call + rate × (n−1)` — measured at **9.2 s + 0.75 s** per extra screenshot in a cloud session
+and **11.7 s + 2.1 s** locally — and that marginal cost is the stopping rule. Those are screenshots;
+batching `use_figma` never compresses its calls (one plugin context per file) and pays only by
+collecting turn gaps — still worth it, and worth *more* in the cloud, where the cheap call makes the
+turn 80% of the cost rather than 46%.
+Reads always; writes only when they target different pages. If the Figma tools arrive deferred —
+a harness setting, not an environment — load the ones you need in a single `ToolSearch`, taking the
+prefix from your own session's tool list rather than assuming one; skip that where
+they are already loaded. `/create-figma-chart` → **Round-trip budget** has the full
+rule and the list of what is genuinely serial.
 
 **What this skill does not decide:** colors, fonts, background, the logo, and any visual treatment
 the template provides. Those are applied in Figma. The ETL step owns the *data*, the *structure*
@@ -153,18 +169,36 @@ to work like (`/create-figma-chart` has a whole mode for that).
 Reuse the existing resolver rather than writing another one:
 
 ```bash
-.venv/bin/python .claude/skills/edit-faust-metadata/scripts/resolve_target.py <reference> [--json]
+.venv/bin/python .claude/skills/edit-faust-metadata/scripts/resolve_target.py <reference> [--json] [--no-db]
 ```
 
 It takes a live/staging/admin URL, a bare slug, a chart id, or an indicator catalogPath, reports
 the chart's variables **with their catalogPaths**, and names the candidate ETL step files —
 including a warning when the grapher catalogPath's version differs from what is on disk.
 
+**In a cloud session, run it with `--no-db` first — only the DB half is unavailable.** Parse-only
+mode never calls `read_sql`, so it works in a sandbox: it identifies what the reference *is*,
+preserves the dimension query params, and names the candidate ETL step files for an indicator or
+MDim catalogPath. Do that before reaching for anything else. What `--no-db` cannot give you is the
+DB half — a bare slug stays `chart-or-mdim (needs DB)`, and the chart's variables and their
+catalogPaths need MySQL.
+
+**For that half, don't wait on staging.** A cloud sandbox has no MySQL and staging is on Tailscale,
+so the DB path reports *"Staging server … is not reachable. Run `etl pr` first or wait for the
+staging build to finish"* — which invites waiting for something that will never arrive here. Don't
+wait, and don't run `etl pr` for it. Fall back to the read-only routes in
+[cloud-sandbox.md](../../docs/cloud-sandbox.md) —
+`https://ourworldindata.org/grapher/<slug>.config.json` for a published chart, the public Datasette
+for `variables` and `chart_dimensions` — or ask the user to run the resolver locally and paste the
+output. This is a fallback for one environment, not a replacement: use the resolver with its DB
+wherever MySQL is reachable, since it does strictly more than the fallbacks do.
+
 **From an old static viz image**, two routes, neither of which the popularity CSV can do alone:
 
 1. The grapher `static_viz` table carries a **`grapherSlug`** column. That gives a slug, and the
    slug goes through the resolver above. Note this table is **not** mirrored to the public
-   Datasette, so query a staging DB or the local dev DB (see `/query-grapher-db`).
+   Datasette, so query a staging DB or the local dev DB (see `/query-grapher-db`) — which means a
+   cloud session cannot reach it either, and the slug has to come from the user.
 2. `ai/static_viz_popularity/static_viz_popular.csv` gives rank, the pages it appears on, views,
    authors and tags — useful context, but it has **no slug or indicator column**, so it cannot
    reach the data by itself.

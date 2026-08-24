@@ -7,7 +7,7 @@
 - **`figma.currentPage` resets to the file's FIRST page at the start of every `use_figma` call — it does not persist between calls, and `upload_assets` does not follow it.** Measured 2026-08-21: a call ending in `setCurrentPageAsync(<working page>)` was followed by one whose first statement reported `figma.currentPage.name === "Cover"`. Two consequences worth holding onto. **A script must never require a particular page to be current on entry** — `diff_against_template.js` used to throw "open the template's page in Figma, then re-run", which is unsatisfiable from a session and made it unrunnable; it now reads the template unswitched instead. **`PageNode.loadAsync()` is the way to do that honestly** — it loads a page's contents *without* switching to it, which is the half of `setCurrentPageAsync` that matters and the half you are free to spend on a second page. Gating on "the read looks complete" is only the fallback for where `loadAsync` is unavailable, and it is an inference, not a proof: the short list in the point above was *nonempty*, so a resolved header with rows in it does not prove the rest of the subtree arrived. And **`upload_assets` places its asset on whatever page the FILE has open**, which is a third thing again: on one run three consecutive uploads all landed on the working page even though every script had started on Cover. So log the `placedOnNodeId`'s PAGE ancestor on every upload rather than predicting it, and reparent unconditionally.
 - **A sub-pixel stroke is invisible at 1:1 and solid in the export — so never judge one on a 540px preview.** A map leader at the prescribed 0.3px measured **1.26:1** against white in a 540px render (the line spreads over two pixels at ~12% coverage each) and **4.2–6.6:1** at 4×, which is the scale a DI is exported at. The first number reads as a defect and is an artefact. To measure at export scale you need a real 4× render, and neither obvious route gives you one: `get_screenshot`'s `maxDimension` only ever *downscales* and clamps at the node's natural size, so a 540 frame returns 540px however large a number you pass, and `node.screenshot({scale: 4})` returns an inline image you cannot pixel-probe. Clone the frame, `rescale(4)`, `get_screenshot` the clone at `maxDimension: 2160` (its natural size is now 2160, so the clamp allows it), measure the PNG, then delete the clone. Same trick for any hairline, dot or dash you are asked about.
 - **`get_screenshot` on a PAGE id can include nodes from other pages.** A page render came back 2860px wide for a page whose two nodes span 1149px, with a neighbouring page's frames in the image. Screenshot the frames you care about individually and compose the comparison yourself; use the page render only for a rough look, and never to decide what a page contains (see the previous point for the reliable way).
-- **`get_metadata` page listing lies** — it returned only "Cover" for both the Charts and Guidelines files. Enumerate pages via `use_figma` → `figma.root.children`; access known nodes directly by id.
+- **`get_metadata` page listing lies — and now quantified: it reports ONE page where the Charts file has 198.** Called with no `nodeId` the hosted connector answered `- 778:2684: Cover` and stopped, with no error, no truncation notice and nothing to suggest 197 pages were missing (measured 2026-08-24; it returned only "Cover" for the Guidelines file too). Same lazy loading as `page.children` above, one level up: it sees the loaded page. **Enumerate pages via `use_figma` → `figma.root.children`** — that returned all 198 in one call — and access known nodes directly by id. Two refinements worth having. *Scoped to a node it is fine*: asked for `798:161`, the hosted connector and the desktop server returned byte-identical XML in well under a second, so this is a document-level listing bug, not a reason to distrust `get_metadata` on a frame. And *the desktop server does not have the bug* — the same no-`nodeId` call there listed all 198 pages. This is also the diagnosis of what was previously filed as a size-related `get_metadata` failure on this file: it is not size, and it does not fail; it under-reports.
 - **And its node tree is lossy: a childless-looking frame usually isn't.** Every bar segment whose group held only a fill vector and no value label came back as an empty `<frame …/>`, while segments with both were listed in full — so reading the XML alone would say the small segments have no bar drawn at all. The tell is in the ids: consecutive siblings numbered `…494` and `…496` have a `495` that was dropped. Use it for structure and names, and confirm anything you intend to *assert* (a missing label, an unpainted mark) with a `use_figma` read.
 - **An empty `fills` array is NOT a reliable marker for "no-data shape".** It is the marker the no-data hatch rule leans on, and it over-matches: grapher's map export also contains an invisible `swatch-hit-areas` group — full-size rectangles over each legend bin, with no fill, there for mouse targeting. A blanket "every empty-fill vector gets the hatch" pass therefore painted diagonal stripes across all three legend bins while correctly hatching one country. Scope the sweep by parent instead — `countries-without-data` for the map and the legend's own `swatches` group for the key — and hide `swatch-hit-areas` outright, since a static image has nothing to target.
 - **A path with negative coordinates needs `x`/`y` at its bounding-box minimum, not at its first vertex.** Figma normalizes a vector's bbox, so `M 0 0 L 24 -104` assigned `v.y = startY` puts the box's *top* at `startY` and the line draws downward — the opposite of the intent. One leader aimed up at Chad ran down through the legend into the footer instead. Compute `min(y1,y2)` and offset the path data by it (snippet in GUIDELINES.md → Straight elbowed arrows).
@@ -23,6 +23,172 @@
 - **A text node carries a *scaled* `strokeWeight` after `rescale()`, even with no strokes.** So adding the tier-2 white outside stroke to an annotation on a chart you height-fitted gives a 0.65px halo unless you set the weight — and a sub-pixel halo is indistinguishable from none, which reads as "the knockout didn't work" rather than "the weight is wrong". Set `strokeWeight = 3` explicitly and read it back.
 - **A hugging annotation frame clips its own descenders — a tier-3-only trap, and a reason to prefer tier 2.** Frames have `clipsContent = true` by default, and `leadingTrim = "CAP_HEIGHT"` puts the baseline *at* the box bottom — so every descender is cut and "today" renders as "todav", "very" as "verv". It is invisible in a node listing and easy to miss in a thumbnail. Set `box.clipsContent = false` on every annotation frame you create; keep the trim. Clipping is only half of it — the opaque fill still stops at the baseline, so pair it with `paddingBottom ≈ 0.22 × the last line's font size` or the recovered descenders sit outside their own knockout. A bare text node with an outside stroke has neither failure, which is most of why GUIDELINES.md → Annotations makes the stroke the default.
 - **`entity-labels` children are not always TEXT.** When a bar's entity name wraps, grapher groups the two lines, so `node.fontSize = 14` throws `no such property 'fontSize' on GROUP` — and because `use_figma` is atomic you lose the whole pass. Iterate `group.query("TEXT")` for styling and `group.children` for per-row layout.
+- **Exceeding the concurrency ceiling inflates every call in the batch, silently.** The pass that wrote GUIDELINES.md screenshotted 272 chart-library nodes at **peak 14 in flight**, and its calls averaged **35.5 s** against ~10 s everywhere else. That is the ceiling being exceeded, not the connector being slow: 8.2 s at one in flight, 13.2 s at eight queued, 35.5 s at fourteen.
+
+- **A manifest row longer than the ceiling splits across messages — the ceiling wins.** SKILL.md's batch manifest says to issue each row's calls in one message, but that instruction exists to stop a row being dribbled out one call per turn; it is not licence to exceed 4–6 in flight. Where a row is longer than the ceiling, send it as consecutive batches of 4–6 in a row of messages, and never as one oversized message. The palette harvest is the row this actually bites — `search_design_system` caps at ~14 results against a 24-fill palette, so it needs about twelve queries, which is two or three batches rather than one. A page survey covering many pages is the other candidate. Batching all twelve at once would land squarely in the regime measured above, where every call in the batch pays for the queue.
+
+- **A calls-per-message histogram cannot tell you whether calls were batched — use interval overlap.** The transcript writes one entry per tool call whether or not the calls were batched, so a calls-per-assistant-message histogram reports `{1: N}` for a provably concurrent run — checked against an 8-call probe that measured 4.12×, which the histogram scored as eight singletons. Sweep `tool_use` → `tool_result` timestamps for peak simultaneous in-flight calls instead, and count how many calls start before the previous one finished.
+
+- **`use_figma` calls do not run concurrently — plugin runs serialize per file, so batching them
+  buys only the shared turn.** Measured locally on an identical read-only script (count the file's
+  198 pages, no page switch), batches of four against a serial arm run before *and* after them:
+
+  | | per call | wall for 4 | against 4× serial |
+  |---|---|---|---|
+  | one call per message (n=11 over two runs) | 3.49–5.75 s, mean **4.4 s** | 17.5–17.8 s | — |
+  | four in one message — four such batches | 3.83–17.86 s | **16.67–21.50 s** | **0.82–1.05×** |
+
+  Four in flight every time, and the wall is `4 × 4.4 s` plus overhead — the shape of a queue, not of
+  parallelism. **The completion timestamps are the proof:** inside a batch the calls finish one every
+  ~3.8–4.7 s, each gap a whole serial execution, having all been dispatched within ~4 s of one
+  another. Client-side overlap is not server-side concurrency — the calls all show as in flight
+  while the file's single plugin context runs them one at a time. So a batch's `sum/wall` (2.0–2.6×)
+  is pure artifact: the honest figure straddles 1.0×, meaning **the server time does not compress at
+  all**.
+
+  Two runs, four batches, and the spread is worth reading honestly: 0.82× and 0.83× and 0.83× against
+  one 1.05×. The high one was the *second* batch of its session and opened with a 3.83 s call where
+  the cold ones opened at ~9.6 s, so some of the loss is a one-off warm-up rather than a property of
+  batching. Do not read a reliable 17% penalty into it; read "no gain on the calls".
+
+  **This does not mean stop batching writes** — a call costs the turn *and* the hop, and only the hop
+  serializes, so batching still collects every turn gap. Measured end to end including turns: four
+  calls one per message took **29.89 s** against **16.67 s** batched, **1.79×**, on a session whose
+  turns ran 3.7 s. In a cloud session the turn is an even larger share of the cost — because the
+  *call* is cheap there, not because the turn is dear — so batching pays *more*, which the block
+  below now measures at **2.26×**. The serialization is a property of the file's plugin context and
+  does not change. What does change is the stopping rule: an extra `use_figma` in a batch costs
+  roughly a **whole call** (measured 4.10 s against a 4.37 s serial mean, within 6%), not the
+  0.75–2.1 s an extra `get_screenshot` costs. So collapsing work into one bigger script — which is
+  free, script size doesn't move the latency — beats spreading it across a batch every time.
+
+  Two caveats on the numbers. A batched call's *own* duration is queue-inclusive, so only the fastest
+  call in a batch approximates real server time; and all of this is one file, hence one plugin
+  context — a batch spanning *different* files might genuinely parallelize, untested. Still untested:
+  mutating scripts and heavier scripts.
+
+  **The cloud case is now measured, and it changes the arithmetic without changing the advice.** Same
+  four-arm probe from a verified cloud sandbox: serial `use_figma` **0.701 s** (n=6, σ 0.10) — six
+  times cheaper than local — and a turn of **2.79 s**, so the *call* is cheap and the *turn* is most
+  of the cost. Serialization is confirmed far more sharply than locally: a single-server queue model
+  (a call cannot start until the previous finishes) reproduces every batched duration **to the
+  millisecond**, and `sum/wall` never exceeds 1.14. Arm A's four ~6 s calls turned out to be one
+  **5.9 s cold start** — plugin context plus the 198-page file load — that all four queued behind,
+  then a 0.65–1.17 s staircase. So batch **or** don't, that cold start is paid once per session.
+
+  Honest speedup on the calls is *worse* in the cloud (0.30× and 0.56×) precisely because the calls
+  are so cheap that overhead dominates — and the overhead is the interesting part: **a cloud batch's
+  wall is mostly the model emitting the tool calls, not Figma running them.** One four-call batch
+  spent **3.9 s of its 5.0 s** wall on dispatch spread. Two consequences: keep batched call payloads
+  terse (short scripts, short `description`s), and read a batch's own `sum/wall` as meaningless here.
+  End to end including turns, batching still wins and wins bigger than locally — **2.26× against
+  1.79×** on the matched framing (arm wall to arm wall; the same cloud data reads as 1.79× if you
+  charge the batch its entry turn, which is how much the framing matters — pin it before comparing).
+  At the margin an extra call costs **1.44 s inside a batch against 3.49 s as its own turn**, so
+  batch it.
+
+- **`sum/wall` is not the speedup — measure a batch against a *serial arm run in the same session*.**
+  A queued call's own duration includes the time it spent waiting, so summing the durations inside a
+  batch and dividing by the wall clock counts that wait as work and flatters batching. An independent
+  local replication (six-call fixed probe, peak 6 of 6 in flight, Figma's desktop app running):
+  batch wall **25.85 s** where four one-per-message calls averaged **12.10 s** — so **2.81×** honestly,
+  against the **3.81×** the same batch scores on `sum/wall`. That reproduces the ~3.84× `sum/wall`
+  figure in the budget almost exactly while putting the real local gain at **2.8–3.2×**, and it
+  reproduces the mechanism too: per-call latency inflated to 11.5–21.3 s inside the batch against
+  10.8–13.9 s serial, and the completions ended over a **14.35 s** spread having been dispatched over
+  **4.57 s** — a local session pipelines rather than parallelizing. Batching still wins by a wide
+  margin; just don't quote `sum/wall` as the win.
+
+- **Only the *reading* tools are metered, so a screenshot-heavy run is the one that can hit a wall.**
+  Figma's [rate limits](https://developers.figma.com/docs/figma-mcp-server/rate-limits-access/)
+  (checked 2026-08-24) apply "to Figma MCP server tools that read data from Figma" — a per-day and a
+  per-minute cap, both varying by plan and seat, which is why the numbers are not copied here. Writes
+  are not documented as counting, so `use_figma` and `upload_assets` are effectively free of the
+  quota while `get_screenshot` and `get_metadata` spend it: a survey of N nodes is N against the cap,
+  and the surveys are what to trim if a run ever gets throttled. Two things to expect if it does —
+  the message is a plain refusal with no retry hint from the connector, and forum reports have the
+  limiter misreading the seat, so a refusal is not proof the quota was really spent. Figma has also
+  signposted `use_figma` becoming "a usage-based paid feature", which would change this arithmetic.
+
+- **For a *bulk* render, one Figma REST call replaces N `get_screenshot`s — but only for settled
+  state.** `GET https://api.figma.com/v1/images/<fileKey>?ids=<id1>,<id2>,…&format=png&scale=<n>`
+  renders **many nodes in one request** and returns a URL per node, where `get_screenshot` is one
+  node per 8–20 s call; it also takes `scale` up to 4, which `get_screenshot` cannot do at all
+  (`maxDimension` only downscales). It needs a personal access token in `X-Figma-Token`, which this
+  skill does not carry — the grapher server holds one as `FIGMA_API_KEY` for its own `/api/figma/image`
+  route, so an ETL-side use means asking for a token rather than reusing that. Untested from here;
+  treat the note as a lead, not a recipe, and check a render against a `get_screenshot` of the same
+  node before trusting a batch of them. **Never point it at a node you just wrote to.** The pixel
+  probes read state that a `use_figma` call created moments earlier, and a server-side render that
+  lags by a beat returns a plausible-looking image of the *old* state — the same silent-wrong-state
+  failure as batching the four-render arrow protocol. Bulk-render surveys and delivery renders of
+  finished frames; keep every post-write probe on `get_screenshot`. It also returns no
+  `original_width`/`original_height`, so the size-only survey still wants `get_screenshot`.
+
+- **The Figma *desktop* MCP server cannot do the writes — but it serves the reads ~30× faster, and
+  on a local run that is the biggest lever there is.** Two different servers are in play: the
+  hosted connector this skill normally uses, and one the desktop app serves on
+  `http://127.0.0.1:3845/mcp`. Enumerated live (2026-08-24) the desktop one offers **six tools,
+  all `readOnlyHint: true`** — `get_screenshot`, `get_metadata`, `get_design_context`,
+  `get_variable_defs`, `get_figjam`, `get_motion_context` — and **nothing this skill writes with**:
+  no `use_figma`, `upload_assets`, `search_design_system` or `download_assets`. That also settles
+  which server a session is on: if `use_figma` is in your tool list, you are on the hosted
+  connector and the desktop app is not in that path at all. So the desktop app cannot be the
+  reason hosted calls are slower locally — a hypothesis the budget section used to float.
+
+  What it *can* do is every read, at a different order of magnitude. Same six template nodes, same
+  session, measured both ways:
+
+  | | per call | six calls |
+  |---|---|---|
+  | hosted connector | 10.8–13.9 s (mean 12.10 s) | 25.85 s batched |
+  | desktop server | **0.27–0.60 s** (mean 0.37 s) | **0.51 s**, six fired at once |
+
+  Roughly **33× per call and 50× on a batch**, and it *does* parallelize where the hosted
+  connector queues. Renders verified genuine, not placeholders: `798:161` came back a real
+  540×540 PNG of the template. Four constraints, all load-bearing:
+
+  1. **No `fileKey` parameter** (`additionalProperties: false`) — it renders from whatever document
+     is the **active tab** in the running app. Its own error says so: *"Make sure the Figma desktop
+     app is open and the document containing the node is the active tab."* So it cannot touch an
+     arbitrary file, and a cloud session cannot use it at all.
+  2. **No `maxDimension`, and a silent 1024 px cap on the longer edge.** You cannot ask for a 256 px
+     thumbnail, and you do not reliably get natural size either: the Reel template
+     (`7336:8`, natural 616×1096) came back **576×1024**, scaled to fit. Anything whose longer edge
+     is ≤ 1024 does arrive at natural size — the four 540×540 templates and the 850×638 horizontal
+     all did, matching NODE-MAP.md exactly.
+  3. **The response is an inline base64 PNG**, with none of the hosted tool's
+     `original_width`/`original_height` JSON. Read the dimensions out of the PNG header instead
+     (big-endian uint32 pair at byte 16) — but per the cap above that is the *rendered* size, so it
+     is only the natural size below 1024 px. **For a size-only survey of anything taller or wider
+     than that, stay on the hosted `get_screenshot`**, which reports the true natural size whatever
+     it renders.
+  4. **Claude Code is not connected to it.** Either add it
+     (`claude mcp add --transport http figma-desktop http://127.0.0.1:3845/mcp`) or call it from
+     Bash over JSON-RPC, which needs no config change —
+     `scripts/figma_desktop_read.py` does the handshake, fans out the calls and writes the PNGs.
+     One handshake serves many calls, so amortize it.
+
+  Metering is the open question: these calls never reach the hosted connector, and Figma documents
+  no desktop exemption either way. Untested in a real chart build.
+
+- **`upload_assets` gives you N `submitUrl`s so the POSTs can overlap — run them that way.** The
+  Step 5 snippet shows one `curl`, and a two-format run that copies it twice pays two full uploads of
+  a ~165 KB SVG back to back. Pair each URL with its file and fan them out, exactly as the screenshot
+  downloads do:
+
+  ```bash
+  printf '%s %s\n' "$URL1" "$DIR/original.svg" "$URL2" "$DIR/original-square.svg" \
+    | xargs -P4 -n2 sh -c 'curl -s -X POST "$1" -F "file=@$2;type=image/svg+xml"' _
+  ```
+
+  Two ways to get this wrong, both silent. `xargs -I{}` with a single `-F` uploads the *same file*
+  to every URL, because `{}` expands only in the URL — the same trap as the screenshot downloads. And
+  with a trailing `_`, `sh -c` binds `$0` to the `_`, so the pair arrives as `$1` and `$2`: a snippet
+  reading `$0` posts to nothing. Expand the paths in the `printf` rather than referencing `$DIR`
+  inside the single quotes, where the child shell never sees it. Keep filenames comma-free (see above), and verify by counting the page's children
+  rather than trusting N `success` responses.
+
 - **`upload_assets`, never `createNodeFromSvg`** — the plugin sandbox has no `fetch`, and inlining an SVG into `use_figma` blows the 50k-char cap. `upload_assets` handles up to 10 MB and yields an editable vector tree.
 - **`rescale()`, never `resize()`** on imported charts — `resize` crops instead of scaling children.
 - **Figma plugins can't be run from here — but the no-data hatch no longer needs one.** Imported no-data shapes arrive with an **empty `fills` array**, and the hatch the design team applies by hand is just an `IMAGE` fill, `scaleMode: "TILE"`, `scalingFactor ≈ 0.5` from a 12×12 tile. Reproduce it by copying `fills` from a shape that already has it, or rebuild it from `assets/no-data-hatch-tile.png` via `figma.createImage(bytes)` — and apply it to **every** no-data shape *and* the legend's "No data" pill, never a flat `#C9C9C9` (GUIDELINES.md → Flags, animals, no-data pattern). The Flags plugin (`2654:5`) is still manual.
