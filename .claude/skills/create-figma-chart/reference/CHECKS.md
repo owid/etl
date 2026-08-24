@@ -419,7 +419,7 @@ exact match first, then a `__` or `-` suffix, and names what it matched.
 
 | Source | Names | Is the second token a category? |
 |---|---|---|
-| Grapher's SVG export | `line__<Entity>`, `outline__<Entity>`, `datapoints__<Entity>` | **yes** — one per series, in selection order |
+| Grapher's SVG export | `line__<Entity>`, `outline__<Entity>`, `label__<Entity>` | **yes** — one per series, in selection order |
 | A `static_viz` matplotlib step | `bars__<slug>`, `diagram__median`, `{slug}__{part}` | **no** — a dataset slug or a part name, repeated across marks |
 
 `CATEGORY_ANY` matches `<word>__<rest>` and cannot tell them apart, so on a `static_viz` bar chart every
@@ -429,6 +429,23 @@ being **distinct across the palette** and not import defaults (`Vector`, `Rectan
 case passes that gate and keeps its labels, the `static_viz` case fails it and the flag is dropped with
 the reason. Do not "fix" this by widening `CATEGORY_ANY` — the two conventions are genuinely ambiguous
 at the name level, and distinctness is the property `--names` actually promises.
+
+**The grapher half is confirmed against a live export**, not inferred. `child-mortality.svg?imType=uncaptioned`
+carries 7 `line__<Entity>`, 7 `outline__<Entity>` and 7 `label__<Entity>` ids — Ghana, India, Brazil,
+France, Sweden, United-Kingdom, United-States — with 7 distinct stroke colours, so the row emits
+`--names 'Ghana,India,…' --line` and the audit runs. You can check this without Figma at all:
+
+```bash
+# the naming and the palette, straight from grapher
+curl -s "https://ourworldindata.org/grapher/<slug>.svg?imType=uncaptioned" | grep -o 'id="line__[^"]*"'
+```
+
+Two things that run did **not** prove, so don't cite it for them. Its labels carry the same colours as
+its lines, so a palette wrongly sourced from text fills would produce the *same* hexes and look
+correct — only a chart whose labels differ from its marks tests that. And it is grapher's automatic
+7-series assignment, which GUIDELINES replaces with the highlight treatment anyway; the audit failing
+it (France/UK at **ΔE 0.0** under tritanopia, India/UK at **1.00:1** in grayscale) is the row working,
+not a defect in a shipped page.
 
 The rest of this section is the genuinely ungrouped case. It has bitten in three different rows. When
 `CONFIG.chartName` finds nothing — a designer has **ungrouped** the chart — the plot has to be
