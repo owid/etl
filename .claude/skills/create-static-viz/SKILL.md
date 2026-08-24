@@ -70,19 +70,22 @@ its step. After editing any doc in this skill:
 ```
 
 **When you do make a Figma MCP call, batch it.** A call costs twice — the network hop to the hosted
-connector **and the model turn around it** — and both terms move with the environment. The
-cross-environment figures here are all **`get_screenshot`, the only tool timed in both**: the hop is
-7.8–9.9 s from a cloud sandbox against 12.5–20.5 s locally with Figma's desktop app open, while the
-turn is ~12 s in the cloud against 2–4 s on a light local turn. Read them as the shape of the cost,
-not as per-tool numbers — `use_figma` and `upload_assets` have not been benchmarked across
-environments. Either way, a handful
+connector **and the model turn around it**. The hop is environment-specific and **the cloud is the
+faster side of it**: `get_screenshot` 7.8–9.9 s from a sandbox against 12.5–20.5 s locally,
+`use_figma` 0.70 s against 3.5–5.8 s. The **turn** is not environmental — it tracks the work in it,
+and identical light probes measured 2.8 s in a sandbox against 3.7 s locally. (A ~12 s cloud turn was
+claimed here once; it came from turns doing real chart work, so it is the heavy-turn cost either
+side.) Either way, a handful
 issued one at a time is the difference between seconds and minutes. Batching pays about the same in
 both: the connector serves concurrent calls — eight screenshots in one message measured 4.1× faster
 than serially, and ten reps of a fixed six-call probe a side put it at **≈4.0× in both
 environments** (4.00× cloud, 3.84× local, six in flight every time) — and admits about four or five
 at once, so **put independent calls in one message, 4–6 at a time.** A batch's wall is
 `first call + rate × (n−1)` — measured at **9.2 s + 0.75 s** per extra screenshot in a cloud session
-and **11.7 s + 2.1 s** locally — and that marginal cost is the stopping rule.
+and **11.7 s + 2.1 s** locally — and that marginal cost is the stopping rule. Those are screenshots;
+batching `use_figma` never compresses its calls (one plugin context per file) and pays only by
+collecting turn gaps — still worth it, and worth *more* in the cloud, where the cheap call makes the
+turn 80% of the cost rather than 46%.
 Reads always; writes only when they target different pages. If the Figma tools arrive deferred —
 a harness setting, not an environment — load the ones you need in a single `ToolSearch`, taking the
 prefix from your own session's tool list rather than assuming one; skip that where

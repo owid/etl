@@ -63,9 +63,28 @@
 
   Two caveats on the numbers. A batched call's *own* duration is queue-inclusive, so only the fastest
   call in a batch approximates real server time; and all of this is one file, hence one plugin
-  context — a batch spanning *different* files might genuinely parallelize, untested. Also untested:
-  mutating scripts, heavier scripts, and **cloud sessions** — two attempts to measure the cloud case
-  both turned out to be local sessions, so the cloud figure above is a prediction, not a measurement.
+  context — a batch spanning *different* files might genuinely parallelize, untested. Still untested:
+  mutating scripts and heavier scripts.
+
+  **The cloud case is now measured, and it changes the arithmetic without changing the advice.** Same
+  four-arm probe from a verified cloud sandbox: serial `use_figma` **0.701 s** (n=6, σ 0.10) — six
+  times cheaper than local — and a turn of **2.79 s**, so the *call* is cheap and the *turn* is most
+  of the cost. Serialization is confirmed far more sharply than locally: a single-server queue model
+  (a call cannot start until the previous finishes) reproduces every batched duration **to the
+  millisecond**, and `sum/wall` never exceeds 1.14. Arm A's four ~6 s calls turned out to be one
+  **5.9 s cold start** — plugin context plus the 198-page file load — that all four queued behind,
+  then a 0.65–1.17 s staircase. So batch **or** don't, that cold start is paid once per session.
+
+  Honest speedup on the calls is *worse* in the cloud (0.30× and 0.56×) precisely because the calls
+  are so cheap that overhead dominates — and the overhead is the interesting part: **a cloud batch's
+  wall is mostly the model emitting the tool calls, not Figma running them.** One four-call batch
+  spent **3.9 s of its 5.0 s** wall on dispatch spread. Two consequences: keep batched call payloads
+  terse (short scripts, short `description`s), and read a batch's own `sum/wall` as meaningless here.
+  End to end including turns, batching still wins and wins bigger than locally — **2.26× against
+  1.79×** on the matched framing (arm wall to arm wall; the same cloud data reads as 1.79× if you
+  charge the batch its entry turn, which is how much the framing matters — pin it before comparing).
+  At the margin an extra call costs **1.44 s inside a batch against 3.49 s as its own turn**, so
+  batch it.
 
 - **`sum/wall` is not the speedup — measure a batch against a *serial arm run in the same session*.**
   A queued call's own duration includes the time it spent waiting, so summing the durations inside a

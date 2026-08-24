@@ -40,10 +40,11 @@ small or pull chart the PNG _is_ the deliverable** — a cloud session can build
 it, so say which at delivery. [cloud-sandbox.md](../../docs/cloud-sandbox.md) has the read-only
 fallbacks for chart config.
 
-`get_screenshot` is *not* slower in a cloud session — measured, it is about **twice as fast** there
-(7.8–9.9 s against 12.5–20.5 s locally with Figma's desktop app open; the only tool timed in both). What a cloud session pays
-instead is the **turn** around each call: ~12 s against 2–4 s. So the **Round-trip budget** below is
-where a slow cloud run is won or lost, and batching is what wins it.
+**A cloud session is not the slow one.** `get_screenshot` measured about **twice as fast** there
+(7.8–9.9 s against 12.5–20.5 s locally), `use_figma` **six times** (0.70 s against 4.4 s), and the
+model turn is no worse — 2.8 s cloud against 3.7 s local on identical probes. What makes any run slow
+is **turns × (turn + call)**, so the **Round-trip budget** below is where a run is won or lost, and
+batching is what wins it.
 
 **The single checkpoint rule:** the Charts file is a shared design file other people work in. Nothing is written to it before the user has seen the full proposal (page name, template choice, texts, planned label/annotation edits) and explicitly approved. Reading the file to check conventions needs no permission.
 
@@ -112,21 +113,19 @@ Three sibling skills do the text work this one depends on, and Step 8c calls the
 
 ## Round-trip budget
 
-**A call costs twice, and both terms move with the environment.** The *call* is a network hop to
-Figma's hosted connector — in a cloud session **3–6 s for `use_figma`, 8–9 s for `get_screenshot`**
-(60 calls of a fixed six-node probe: median 8.8 s, range 7.7–10.6 s).
-Eight `use_figma` calls measured 2.67–5.99 s, at both two and six in flight, so the 7–10 s this file
-used to claim was about twice too high: a `use_figma` is roughly *half* a screenshot, not equal to
-one. Either is flat regardless of script size *or* render size — a 545-char script that loaded a page
-and walked 286 nodes came back **faster** than a 45-char one, and a natural-size screenshot costs
-1.10× a 256 px one. **So collapse work into fewer calls freely, and never shrink a screenshot for
-speed.** And it is the *cloud* that is fast: the same probe measures 12.5–20.5 s from a local
-session with the Figma desktop app running. The *turn* around it —
-issuing the call, reading the result — runs the other way: **~12 s median in a cloud session** (23
-consecutive calls) against **2–4 s on a light local turn**, so in the cloud the turn costs two to
-four times the `use_figma` call it wraps. Budget a run as **turns × (turn + call)**, both terms read
-off the environment. An unbatched cloud screenshot costs ~20 s, so 120–190 calls come to **~50
-minutes** with nothing overlapping. Nothing
+**A call costs twice: the call, and the turn around it.** The *call* is a network hop to Figma's
+hosted connector, and **the cloud is the fast side** — `get_screenshot` **8–9 s** there (60 calls,
+median 8.8 s, range 7.7–10.6 s) against **12.5–20.5 s** locally; `use_figma` **0.70 s** there against
+**3.5–5.8 s** locally (31 calls, three sessions). A `use_figma` is much the cheaper of the two, not
+equal to a screenshot. Either is flat regardless of script size *or* render size — a 545-char script
+that loaded a page and walked 286 nodes came back **faster** than a 45-char one, and a natural-size
+screenshot costs 1.10× a 256 px one. **So collapse work into fewer calls freely, and never shrink a
+screenshot for speed.** **The *turn* tracks the work in it, not the environment** — identical light probes
+measured **2.8 s in the cloud and 3.7 s locally**, so there is no cloud turn penalty. The **~12 s**
+this file once billed to the cloud came from 23 turns doing real chart work: read it as the
+*heavy-turn* figure, which is what a real run pays in either environment. Budget a run as
+**turns × (turn + call)**, the call off the environment and the turn off the work. An unbatched
+heavy-turn screenshot costs ~20 s, so 120–190 calls come to **~50 minutes** serial. Nothing
 else is close: not the SVG exports (0.05–0.3 s locally, 0.9–2.6 s through a sandbox's egress proxy, under 2 s for a whole run locally)
 and not the response payloads (~1.5 KB per `use_figma`).
 

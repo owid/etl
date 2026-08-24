@@ -79,9 +79,13 @@ For agent sessions running in a Claude Code cloud sandbox
   session holding `use_figma` is on the hosted connector and never routes through
   the app at all. Quitting it would not move the hosted numbers, and the skill's
   GOTCHAS has the tool-by-tool enumeration that settles it. What a
-  sandbox pays instead is the **turn** around each call — a ~12 s median, against
-  2–4 s on a light local turn — so a skill
-  making hundreds of MCP calls is won or lost on batching: issue independent
+  sandbox pays instead is **nothing per turn that a local session doesn't** — the
+  turn tracks the work in it, not the environment, and identical light probes
+  measured **2.8 s in a sandbox against 3.7 s locally**. A ~12 s median was once
+  billed to the cloud here; it came from 23 turns doing real chart work, so read
+  it as the *heavy-turn* cost a real run pays either side. Which leaves the
+  sandbox faster on every term measured so far, and a skill
+  making hundreds of MCP calls won or lost on batching: issue independent
   calls in one message, 4–6 at a time. Ten reps of a fixed six-call probe on each
   side put that at **≈4.0× in both** (cloud 4.00×, local 3.84×), so batching is
   environment-neutral even though the calls are not: cloud median 8.75 s per
