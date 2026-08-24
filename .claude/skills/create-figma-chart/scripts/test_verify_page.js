@@ -149,6 +149,11 @@ function buildFrame(opts = {}) {
                       node({ type: "ELLIPSE", name: "dp2", x: 60, y: 262, width: 8, height: 8 })] }),
   ];
   if (opts.extraLine) kids.push(line("line__B", [[40, 420], [200, 340], [440, 300]], opts.extraLine));
+  // A second category in a SECOND colour. The palette rows compare pairs, so a one-colour fixture has
+  // no pair for them to check and the command is withheld by design — any case asserting on that
+  // command therefore needs two colours, or it is asserting on a branch that no longer runs.
+  if (opts.secondColour) kids.push(node({ type: "RECTANGLE", name: "bar__B", x: 420, y: 400,
+    width: 40, height: 30, fills: solid("#883039") }));
   if (opts.zeroAreaTick) kids.push(node({ name: "horizontal-axis", x: 40, y: 470, width: 400, height: 6, children: [
     node({ type: "VECTOR", name: "tick-0", x: 40, y: 470, width: 0, height: 6,
       strokeWeight: 1, strokes: solid("#dddddd"), dashPattern: opts.tickDash || [], strokeAlign: "CENTER", fills: solid("#000000"),
@@ -903,7 +908,7 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
   // name. They stay SKIPPED (no shell inside a Figma plugin), but a gap the operator has to
   // reconstruct by hand is the one that actually gets skipped.
   {
-    const out = await run(buildFrame(), {});
+    const out = await run(buildFrame({ secondColour: true }), {});
     for (const name of ["colour-vision", "grayscale-seams"]) {
       const r = row(out, name);
       check(`33 ${name} still declares itself skipped`, r.status === "SKIPPED", r.status);
@@ -924,7 +929,7 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
           / --line\b/.test(row(out, "colour-vision").detail), row(out, "colour-vision").detail);
     // A stacked chart is the case where order matters, so the warning must be present there — and only
     // there, since neither a map nor a line chart has seams. Strip the series lines to reach that branch.
-    const noSeries = buildFrame({ barSegment: true });
+    const noSeries = buildFrame({ barSegment: true, secondColour: true });
     const chartOf = (f) => f.children.find((c) => c.name === "chart");
     chartOf(noSeries).children = chartOf(noSeries).children.filter((c) => !/^(line|outline)__/.test(c.name));
     const dSep = row(await run(noSeries, {}), "colour-vision").detail;
@@ -969,9 +974,13 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
           /--names '[^']*Peru/.test(dAnc) && !/Ellipse 12/.test(dAnc), dAnc);
     // But a choropleth puts every country in a bin into ONE colour by design, so the same note must
     // not fire on a map or it fires on every map.
+    // Three countries, two of them in one bin: sharing a bin must not read as a clash, and the third
+    // keeps a genuine PAIR in the palette so the map's own run is still emitted.
     const sameBin = buildFrame({ mapCountries: true });
-    sameBin.children.find((c) => c.name === "chart").children
-      .find((c) => c.name === "map").children.find((c) => c.name === "country__DEU").fills = solid("#4c6a9c");
+    const sameBinMap = sameBin.children.find((c) => c.name === "chart").children.find((c) => c.name === "map");
+    sameBinMap.children.find((c) => c.name === "country__DEU").fills = solid("#4c6a9c");
+    sameBinMap.children.push(node({ type: "VECTOR", name: "country__BRA", x: 200, y: 160, width: 60, height: 40,
+      fills: solid("#b13507") }));
     const binned = row(await run(sameBin, {}), "colour-vision").detail;
     check("33 map shapes sharing a bin colour are NOT reported as a clash",
           !/judge them by eye/.test(binned), binned);
@@ -988,9 +997,9 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     // the series disappeared from `--names` altogether. This fixture IS that chart: `mapCountries` adds
     // the inset to the default line series, and `country__FRA` reuses the series colour exactly as the
     // guidelines prescribe.
-    const combo = row(await run(buildFrame({ mapCountries: true }), {}), "colour-vision").detail;
+    const combo = row(await run(buildFrame({ mapCountries: true, secondColour: true }), {}), "colour-vision").detail;
     check("33 a combination frame audits the series as a LINE, not as a map",
-          /--names 'A' --line/.test(combo), combo);
+          /--names 'B,A' --line/.test(combo), combo);
     check("33 and still audits its inset map as a map",
           /--names 'country__FRA,country__DEU' --maps/.test(combo), combo);
     check("33 and says why there are two runs, so the shared colour is not read as a clash",
@@ -1002,7 +1011,7 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const dMapOnly = row(await run(mapOnly, {}), "colour-vision").detail;
     check("33 a map with no series is still ONE run, in --maps",
           /--maps/.test(dMapOnly) && !/--line/.test(dMapOnly) && !/two separate runs/.test(dMapOnly), dMapOnly);
-    const lineOnly = row(await run(buildFrame({}), {}), "colour-vision").detail;
+    const lineOnly = row(await run(buildFrame({ secondColour: true }), {}), "colour-vision").detail;
     check("33 a line chart with no map is still ONE run, in --line",
           /--line/.test(lineOnly) && !/--maps/.test(lineOnly) && !/two separate runs/.test(lineOnly), lineOnly);
     // Figma switches a paint off two independent ways, and only `visible: false` was tested on the
@@ -1126,17 +1135,21 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     // registered under a clean earlier name and silently test nothing. (That is exactly how this case
     // first passed vacuously.) `barSegment` supplies a filled RECTANGLE — a data mark, which is what
     // now feeds the palette; renaming text fills tests nothing.
+    // `to` may be a function of the mark's index, for the cases where the names must differ from each
+    // other — a palette of two colours under one name is a different defect, tested separately.
     const renameMarks = (frame, to) => {
       let renamed = 0;
       (function walk(n) {
         if (n.type !== "TEXT" && !(n.children && n.children.length)
-            && n.fills && n.fills.length && n.fills.some((f) => f.type === "SOLID")) { n.name = to; renamed++; }
+            && n.fills && n.fills.length && n.fills.some((f) => f.type === "SOLID")) {
+          n.name = typeof to === "function" ? to(renamed) : to; renamed++;
+        }
         (n.children || []).forEach(walk);
       })(frame);
       return renamed;
     };
     // A comma in a name would misalign every --names entry after it, so the flag is dropped.
-    const comma = buildFrame({ barSegment: true });
+    const comma = buildFrame({ barSegment: true, secondColour: true });
     const renamed = renameMarks(comma, "series__Chile, mainland");
     check("33 the comma fixture actually renamed a data mark", renamed > 0, `renamed ${renamed}`);
     const d2 = row(await run(comma, {}), "colour-vision").detail;
@@ -1146,18 +1159,18 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
           !/--names '/.test(d2) && /contains a comma/.test(d2), d2);
     // An apostrophe would end the single-quoted shell argument mid-name, so the advertised paste-ready
     // command would not parse. Same treatment, and the reason must name the apostrophe.
-    const apos = buildFrame({ barSegment: true });
+    const apos = buildFrame({ barSegment: true, secondColour: true });
     renameMarks(apos, "series__Women's employment");
     const d4 = row(await run(apos, {}), "colour-vision").detail;
     check("33 an apostrophe in a name drops --names rather than breaking the shell",
           !/--names '/.test(d4) && /apostrophe/.test(d4), d4);
     // The happy path, or the negatives above would pass on a build that never emits --names at all.
-    const named = buildFrame({ barSegment: true });
-    renameMarks(named, "series__Chile");
+    const named = buildFrame({ barSegment: true, secondColour: true });
+    renameMarks(named, (i) => `series__${["Chile", "Peru", "Nepal"][i] || "Other"}`);
     const d1 = row(await run(named, {}), "colour-vision").detail;
     // The label is the CATEGORY the mark belongs to, not the node's raw name — `--names` exists so the
     // audit's findings name the categories that need attention.
-    check("33 clean names DO produce --names, carrying the category", /--names 'Chile'/.test(d1), d1);
+    check("33 clean names DO produce --names, carrying the category", /--names 'Chile[,']/.test(d1), d1);
     check("33 and then no omission note is attached", !/--names omitted/.test(d1), d1);
     // 33b — the two conditions measured on the REAL file, not invented. A `static_viz` import names
     // every series group `<kind>__<slug>` (the dataset, not the category) and every paint-bearing
@@ -1263,12 +1276,12 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     // 34b — the same on an ordinary chart, where the harm lands on `--names`: a numeric legend's bins
     // are unnamed rects, so one swatch in a colour of its own put an import default into the palette
     // and dropped the flag for the whole run. The series here is `line__A`, which names itself.
-    const legLine = buildFrame();
+    const legLine = buildFrame({ secondColour: true });
     legLine.children.find((c) => c.name === "chart").children
       .push(legendGroup("categorical-color-legend", [["Rectangle 8", "#e56e5a"]]));
     const dLegLine = row(await run(legLine, {}), "colour-vision").detail;
     check("34b a legend swatch does not cost an ordinary chart its --names",
-          /--names 'A'/.test(dLegLine) && !/--names omitted/.test(dLegLine), dLegLine);
+          /--names 'B,A'/.test(dLegLine) && !/--names omitted/.test(dLegLine), dLegLine);
     check("34b and the swatch colour is reported as legend-only, not audited as a category",
           /#e56e5a/.test(dLegLine) && /ONLY in the legend/.test(dLegLine), dLegLine);
 
@@ -1325,11 +1338,47 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
           `${outVisibleSection.rows.length} rows`);
 
     // And the reason given must be the real one, not the comma message reused for a missing name.
-    const anon = buildFrame({ barSegment: true });
+    const anon = buildFrame({ barSegment: true, secondColour: true });
     renameMarks(anon, "");
     const d3 = row(await run(anon, {}), "colour-vision").detail;
     check("33 an unnamed mark reports THAT, not a phantom comma",
           /has no name/.test(d3) && !/contains a comma/.test(d3) && !/apostrophe/.test(d3), d3);
+
+    // 36 — a palette of ONE colour has no pair, and both rows compare pairs. `color_audit.py` does not
+    // say so: handed a single hex it prints an empty pair list, "overall: min dE inf", and exits 0,
+    // which reads exactly like a clean audit. GUIDELINES.md rules on this case directly — one
+    // categorical colour against neutral grays has nothing to check — so the command is withheld and
+    // the two checks that ARE live are handed over instead.
+    const oneColour = row(await run(buildFrame(), {}), "colour-vision").detail;
+    check("36 a one-colour palette emits no command at all",
+          !/Run: /.test(oneColour) && !/--names|--line|--maps|--separated/.test(oneColour)
+          && /NOTHING TO RUN/.test(oneColour), oneColour);
+    check("36 and it names the colour rather than reporting an empty plot",
+          /#4c6a9c/.test(oneColour) && !/No data marks or series strokes found/.test(oneColour), oneColour);
+    check("36 and hands over the two checks that are live",
+          /contrast against the frame's background/.test(oneColour) && /grayscale/.test(oneColour), oneColour);
+    check("36 and says why running it anyway would look clean",
+          /inf/.test(oneColour) && /GUIDELINES/.test(oneColour), oneColour);
+    // The negative control: two colours is a pair, so the command comes back.
+    const twoColour = row(await run(buildFrame({ secondColour: true }), {}), "colour-vision").detail;
+    check("36 two colours still produce a runnable command",
+          /Run: \.venv\/bin\/python/.test(twoColour) && !/NOTHING TO RUN/.test(twoColour), twoColour);
+    // And the clash note must SURVIVE the withheld command. Two categories painted one colour ARE a
+    // one-colour palette — deltaE 0, the severest collision there is — so the branch that withholds
+    // the run is the branch that most needs to report what it found. Computed before the exit.
+    const twoOnOne = row(await run(buildFrame({ extraLine: 3 }), {}), "colour-vision").detail;
+    check("36 a withheld run still names two categories sharing one colour",
+          /NOTHING TO RUN/.test(twoOnOne) && /judge them by eye/.test(twoOnOne)
+          && /(A \+ B|B \+ A)/.test(twoOnOne), twoOnOne);
+    // GUIDELINES.md rules the same way on a declared highlight treatment: the muting grays are
+    // furniture, so one highlight against them leaves no categorical pair. Which entries are muting
+    // grays is not decidable here — a category legitimately painted gray is a category — so the run is
+    // annotated rather than suppressed, and only when the treatment is DECLARED.
+    const hi = row(await run(buildFrame({ secondColour: true }), { highlightTreatment: true }), "colour-vision").detail;
+    check("36 a declared highlight treatment warns before the command",
+          /highlightTreatment is set/.test(hi) && /Run: \.venv\/bin\/python/.test(hi), hi);
+    check("36 and an undeclared frame carries no such warning",
+          !/highlightTreatment is set/.test(twoColour), twoColour);
   }
 
   const bad = results.filter((x) => !x.ok);

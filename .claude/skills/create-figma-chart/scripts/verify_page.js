@@ -1238,14 +1238,17 @@ const checkFrame = async (frameId) => {
       for (const p of src) if (!seen.has(p.hex.toLowerCase())) seen.set(p.hex.toLowerCase(), p.id);
       const hexes = [...seen.keys()];
       if (!hexes.length) return "";
-      // What that collapse HIDES is stated, not swallowed. Two categories on one colour is the severest
-      // collision there is — deltaE 0, indistinguishable to everyone — and the audit cannot report it,
-      // because to the audit they are one entry. So name them here instead.
-      // Not graded, and phrased as a question, because sharing a colour is often correct: a highlight
-      // treatment greys every unhighlighted series to the same value on purpose. Map shapes are left out
-      // of the note altogether — a choropleth puts every country in a bin into one colour by definition,
-      // so flagging that would fire on every map. Only grapher's `<kind>__<Entity>` names count as a
-      // category; an SVG import's `Rectangle 12` is unique per node and means nothing.
+      // BOTH rows compare PAIRS — the deltaE gate across all of them, the seam gate across adjacent
+      // ones — so a palette of one colour has nothing to compare. `color_audit.py` does not say so: it
+      // runs, prints an empty pair list and an overall minimum deltaE of `inf`, and exits 0, which
+      // reads exactly like a clean audit. GUIDELINES.md already rules on this case in as many words —
+      // "one categorical color against neutral grays has no pair to check, and reporting no failures
+      // from a two-color audit reads as coverage you don't have" — and names the two checks that ARE
+      // live instead. So the command is withheld and those two are handed over in its place. Emitting
+      // it would be this file's own failure mode: a runnable-looking gate that cannot fail.
+      // Computed BEFORE the single-colour exit below, not after it. Two categories painted the same
+      // colour ARE a one-colour palette, and that is the severest collision there is — so the one
+      // branch that withholds the command is the branch that most needs to say what it found.
       const catsByHex = new Map();
       for (const p of src) {
         if (!p.cat) continue;
@@ -1255,6 +1258,31 @@ const checkFrame = async (frameId) => {
       }
       const shared = [...catsByHex].filter(([, c]) => c.size > 1)
         .map(([h, c]) => `${h} carries ${[...c].slice(0, 4).join(" + ")}`);
+      const sharedNote = shared.length
+        ? ` One colour, two categories — the audit sees these as ONE entry and cannot report the clash,`
+          + ` so judge them by eye: ${shared.slice(0, 4).join("; ")}. Correct for a highlight treatment;`
+          + " a defect if they are separate categories."
+        : "";
+      const soleName = [...seen.values()][0];
+      if (hexes.length < 2) {
+        return (mixed ? (src.some((x) => x.fromMap) ? " MAP shapes —" : " Chart marks and series —") : "")
+          + ` NOTHING TO RUN: this palette holds ONE colour (${hexes[0]}${soleName ? ", " + soleName : ""})`
+          + ` drawn from ${src.length} plot mark(s)/series, and both rows compare PAIRS, so there is no`
+          + " categorical pair to check. color_audit.py would still run on it and exit 0, printing an"
+          + " overall minimum deltaE of `inf` from an empty pair list — a clean-looking verdict from a"
+          + " comparison that never happened. GUIDELINES.md says not to run it on a chart like this."
+          + " Check the two things that ARE live: this colour's contrast against the frame's background,"
+          + " and whether it still separates from the neutral grays in grayscale."
+          + sharedNote + dimNote + legendNote;
+      }
+      // What that collapse HIDES is stated above, not swallowed. Two categories on one colour is the
+      // severest collision there is — deltaE 0, indistinguishable to everyone — and the audit cannot
+      // report it, because to the audit they are one entry.
+      // Not graded, and phrased as a question, because sharing a colour is often correct: a highlight
+      // treatment greys every unhighlighted series to the same value on purpose. Map shapes are left out
+      // of the note altogether — a choropleth puts every country in a bin into one colour by definition,
+      // so flagging that would fire on every map. Only grapher's `<kind>__<Entity>` names count as a
+      // category; an SVG import's `Rectangle 12` is unique per node and means nothing.
       // A name carrying a comma would silently split into two --names entries and misalign every label
       // after it; a name carrying an apostrophe would end the single-quoted shell argument mid-name, so
       // "Women's employment" turns a paste-ready command into a shell syntax error. Both drop the flag
@@ -1291,13 +1319,24 @@ const checkFrame = async (frameId) => {
         + `'${hexes.join(",")}'`
         + (namesSafe ? ` --names '${names.join(",")}'` : "")
         + ` ${mode}`;
+      // The other case GUIDELINES.md rules on: one highlight against neutral grays. Those grays are
+      // FURNITURE, not categories, so a palette that is one real colour plus muting grays is the
+      // single-colour case wearing a larger count — and "no failures" out of it is coverage nobody has.
+      // Not suppressed, because which entries are muting grays is a judgement this script cannot make
+      // (a category legitimately painted gray is a category), and a check silently withheld is worse
+      // than one a human is told to weigh. Fires only when the treatment is DECLARED.
+      const highlightNote = CONFIG.highlightTreatment
+        ? " CONFIG.highlightTreatment is set: if this palette is one highlight plus muting grays, do NOT"
+          + " run it — GUIDELINES.md rules that out, because the grays are furniture and leave no"
+          + " categorical pair. Check the highlight's contrast against the background and its grayscale"
+          + " separation from the grays instead. Run it only for the pairs that are real categories."
+        : "";
       return (mixed ? (isMapPal ? " MAP shapes —" : " Chart marks and series —") : "")
+        + highlightNote
         + ` Run: ${cmd}`
         + (isMapPal ? mapNote : mode === "--line" ? lineNote : separatedNote)
         + ` Palette: ${hexes.length} distinct colour(s) drawn from ${src.length} plot mark(s)/series.`
-        + (shared.length ? ` One colour, two categories — the audit sees these as ONE entry and cannot`
-            + ` report the clash, so judge them by eye: ${shared.slice(0, 4).join("; ")}. Correct for a`
-            + ` highlight treatment; a defect if they are separate categories.` : "")
+        + sharedNote
         + (namesSafe ? "" : ` (--names omitted: ${nameProblem}.)`);
     };
     // The overlap between the two is NOT a finding: combination.md fills the locator map's countries

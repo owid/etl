@@ -6,14 +6,14 @@
 Every one of these caught a real defect on this skill's first run, and none of them is visible by looking at the frame. Run them as a pass, and report the numbers rather than "looks fine".
 
 > **⚠️ `verify_page.js` does not fit in a `use_figma` call as it ships.** The `code` argument caps at
-> **50,000 characters** and the file is **~112,000**, so the instruction below is not executable
+> **50,000 characters** and the file is **~116,000**, so the instruction below is not executable
 > verbatim — a run that pastes it is rejected. Emit it stripped instead:
 >
 > **Run it in slices — that is the supported path, and the only one.** Stripping the comments used to
 > get it *just* under the cap (the helper is context-aware, so URLs, regex literals and template
 > strings survive), and even then it sat at 97%, all of which has to be relayed verbatim — where a
 > one-character corruption yields a *wrong verdict* rather than an error, the exact failure this gate
-> exists to catch. It has since grown past the cap outright: **58,726 stripped**. So
+> exists to catch. It has since grown past the cap outright: **60,227 stripped**. So
 > `inline_script.py verify_page.js` with no `--rows` **refuses and exits 1**, naming the size and
 > pointing here, and `--whole` no longer overrides that — the cap is now a hard floor for this
 > script, not a judgement call. The rows are grouped, each slice carries the shared preamble:
@@ -25,13 +25,13 @@ Every one of these caught a real defect on this skill's first run, and none of t
 >
 > | group | rows | size |
 > |---|---|---|
-> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 66% of cap |
-> | `series` | series-weight, furniture-weight, furniture-dash | 61% |
-> | `geometry` | box-alignment, gap, margins, off-palette | 56% |
-> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 72% |
+> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 69% of cap |
+> | `series` | series-weight, furniture-weight, furniture-dash | 64% |
+> | `geometry` | box-alignment, gap, margins, off-palette | 59% |
+> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 75% |
 >
-> Groups combine, so the whole pass is two calls: `--rows type,series` (40,437) then
-> `--rows geometry,annotations` (41,116, **82% of cap** — the figure `inline_script.py --check`
+> Groups combine, so the whole pass is two calls: `--rows type,series` (41,938) then
+> `--rows geometry,annotations` (42,617, **85% of cap** — the figure `inline_script.py --check`
 > reports: it measures **these two calls**, declared as `DOCUMENTED_CALLS` in the script, rather
 > than the smallest split it could find for itself — an optimiser would go on reporting a
 > comfortable number by picking a split nobody is told to send. Change the pair here and there
@@ -95,6 +95,18 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > (`--separated` plus the Line and Slope Chart variants, the darker set for thin marks on white);
 > a map gets `--maps`; anything else gets `--separated`. All three mean "nothing shares an edge".
 >
+> **A palette of one colour gets no command at all.** Both rows compare *pairs*, so a single colour
+> has nothing to compare — but `color_audit.py` does not say so: handed one hex it prints an empty pair
+> list and `overall: min dE inf`, and exits 0, which reads exactly like a clean audit.
+> [GUIDELINES.md](../GUIDELINES.md) already rules on this ("one categorical color against neutral grays
+> has no pair to check, and reporting no failures from a two-color audit reads as coverage you don't
+> have"), so the row withholds the command, names the colour, and hands over the two checks that *are*
+> live: that colour's contrast against the background, and whether it still separates from the grays in
+> grayscale. The clash note survives the withholding — two categories painted one colour **are** a
+> one-colour palette, and that is the severest collision there is. A declared `highlightTreatment` gets
+> the same warning attached to its command rather than the command withheld, because which entries are
+> muting grays is a judgement this script cannot make.
+>
 > Four things it will not decide for you:
 > - On a **stacked or segmented** chart drop the mode flag and reorder the colours into stack order
 >   first, because the seam check reads adjacency off the order you give it. That is the only chart
@@ -154,7 +166,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 >
 > Validated by planting defects and confirming each row **fails**, twice over: 11 planted in Figma and
 > 11 caught, then a stubbed-figma harness ([`scripts/test_verify_page.js`](../scripts/test_verify_page.js),
-> `node` it after any edit) covering **264** assertions including the rows that are awkward to plant on a
+> `node` it after any edit) covering **272** assertions including the rows that are awkward to plant on a
 > real page. **A check that cannot fail is worse than no check**, so when you extend this script,
 > extend both passes with it.
 >
