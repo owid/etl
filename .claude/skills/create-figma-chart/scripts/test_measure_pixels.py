@@ -179,6 +179,46 @@ def test_negative_bounds_are_refused(tmp: Path) -> None:
     check("ink-box exits 2", code, 2)
 
 
+def test_non_finite_bounds_are_refused(tmp: Path) -> None:
+    print("a coordinate that is not a finite number bounds no region, so it cannot be measured")
+    s = scene(tmp, arrow_x=20, target_x=26)
+    # float() takes all of these, and floor/ceil then raised ValueError (nan) or OverflowError
+    # (inf) from inside parse_box. An uncaught exception exits 1 — "the check ran and the chart is
+    # wrong" — so a malformed box reported a defect that no pixel had been read to establish.
+    for bad in ("0,0,nan,30", "nan,0,50,30", "0,0,inf,30", "-inf,0,50,30", "0,0,50,Infinity", "0,0,50,NAN"):
+        code, _ = run(
+            "arrow-gap",
+            "--no-arrow",
+            s["no_arrow"],
+            "--no-target",
+            s["no_target"],
+            "--no-both",
+            s["no_both"],
+            "--crop",
+            bad,
+        )
+        check(f"--crop {bad} exits 2", code, 2)
+        # Every box flag goes through the same parse, so the guard has to hold on all of them.
+        check(f"--region {bad} exits 2 for contrast", run("contrast", "--png", s["full"], "--region", bad)[0], 2)
+        check(f"--region {bad} exits 2 for ink-box", run("ink-box", "--png", s["full"], "--region", bad)[0], 2)
+    # The guard flags are parsed the same way and must refuse the same values.
+    for flag in ("--arrow-bbox", "--target-bbox"):
+        code, _ = run(
+            "arrow-gap",
+            "--no-arrow",
+            s["no_arrow"],
+            "--no-target",
+            s["no_target"],
+            "--no-both",
+            s["no_both"],
+            "--crop",
+            "0,0,50,30",
+            flag,
+            "0,0,nan,30",
+        )
+        check(f"{flag} nan exits 2", code, 2)
+
+
 def test_empty_mask_is_unmeasurable(tmp: Path) -> None:
     print("a crop containing neither shape must not read as a clean pass")
     s = scene(tmp, arrow_x=20, target_x=26)
@@ -314,8 +354,16 @@ def test_numeric_flags_outside_their_range_are_refused(tmp: Path) -> None:
     for bad in ("-1", "0", "0.5", "21.5", "100"):
         code, _ = run("contrast", "--png", str(hp), "--background", "#ffffff", "--bar", bad)
         check(f"--bar {bad} exits 2", code, 2)
-    check("--bar 1 is the floor and is allowed", run("contrast", "--png", str(hp), "--background", "#ffffff", "--bar", "1")[0], 0)
-    check("--bar 21 is the ceiling and is allowed", run("contrast", "--png", str(hp), "--background", "#ffffff", "--bar", "21")[0], 1)
+    check(
+        "--bar 1 is the floor and is allowed",
+        run("contrast", "--png", str(hp), "--background", "#ffffff", "--bar", "1")[0],
+        0,
+    )
+    check(
+        "--bar 21 is the ceiling and is allowed",
+        run("contrast", "--png", str(hp), "--background", "#ffffff", "--bar", "21")[0],
+        1,
+    )
 
 
 def test_gray_target_would_defeat_color_classification(tmp: Path) -> None:
@@ -442,6 +490,7 @@ def main() -> int:
             test_overlap_is_caught,
             test_mismatched_full_render_is_unmeasurable,
             test_negative_bounds_are_refused,
+            test_non_finite_bounds_are_refused,
             test_empty_mask_is_unmeasurable,
             test_bbox_guard,
             test_fractional_bbox_keeps_its_edge_pixels,

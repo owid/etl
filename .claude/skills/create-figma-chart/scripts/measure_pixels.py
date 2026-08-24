@@ -32,10 +32,11 @@ Exit codes — the contract, stated once, because every flag added later inherit
 So a caller can tell "the arrow is clear" from "I could not tell", which a bare number cannot.
 
 **Anything wrong with the INPUT is 2, never 1 and never a pass.** An unreadable PNG, a malformed
-`--background`, a crop outside the render, a numeric flag outside its meaningful range, an empty
-mask, mismatched render sizes, a guard violation. The rule exists because the alternative failure
-is the expensive one: a check that answers PASS or FAIL on input it could not actually measure
-reports a verdict it has not earned, and a wrong verdict is worse than an error — it is believed.
+`--background`, a crop outside the render or with a non-finite coordinate, a numeric flag outside
+its meaningful range, an empty mask, mismatched render sizes, a guard violation. The rule exists
+because the alternative failure is the expensive one: a check that answers PASS or FAIL on input it
+could not actually measure reports a verdict it has not earned, and a wrong verdict is worse than
+an error — it is believed.
 Numeric ranges live in RANGES and are enforced centrally in main(); colours go through parse_hex;
 boxes through parse_box. Add a flag to one of those and it is covered.
 """
@@ -110,6 +111,12 @@ def parse_box(spec: str, what: str) -> tuple[int, int, int, int]:
         raise unmeasurable(f"{what} must be x0,y0,x1,y1 — got {spec!r}")
     if len(values) != 4:
         raise unmeasurable(f"{what} must be x0,y0,x1,y1 — got {spec!r}")
+    # float() accepts 'nan', 'inf' and '-inf', and floor/ceil then raise ValueError/OverflowError.
+    # An uncaught exception exits 1 — the code reserved for "the chart is wrong" — so a coordinate
+    # that is not a finite number used to read as a genuine chart defect, with a traceback as the
+    # report. It bounds no region, so there is nothing to measure and nothing to conclude.
+    if not all(math.isfinite(v) for v in values):
+        raise unmeasurable(f"{what} needs four finite numbers — got {spec!r}")
     x0, y0 = (math.floor(v) for v in values[:2])
     x1, y1 = (math.ceil(v) for v in values[2:])
     if x1 <= x0 or y1 <= y0:
