@@ -154,14 +154,14 @@ it understates it (4.19× against 4.00×).
 Reads fan out freely — **including reads that each switch pages**, which makes the Step 5 and Step 8c rows below safe: two concurrent calls, one holding `Cover` and one the Templates page, overlapping for 7.7 s, each saw only its own — `figma.currentPage` is per-call. It is concurrent *mutation* of one page that races, not the switch. **Writes only when they target different pages** — a script may switch pages only once, so two `use_figma` writes aimed at the same page in one message race each other.
 
 What is independent — **the batch manifest, keyed by the step that owes it.** Issue each row's calls
-in one message, so batching is mechanical rather than a fresh judgment call every run:
+in one message, so batching is mechanical rather than a fresh judgment call every run.
 
 - **Step 5 — the page survey.** The page enumeration and `verify_templates.js` go together. Checking N pages means N calls — `page.children` on a page you have not switched to is lazily loaded — and they fan out.
 - **Step 8c — the checks.** `verify_page.js` and `diff_against_template.js` are one read-only call each; issue them together, with every pixel probe that reads one fixed state.
 - **Step 9 — the delivery renders.** One screenshot per delivered frame, all in one message.
 - **The palette harvest.** `search_design_system` caps at ~14 results against a 24-fill palette, so it takes one group query plus ~11 by-name queries. All independent; 4–6 per message.
 - **A size-only survey is one batch, not two.** `get_screenshot` returns `original_width`/`original_height` — the node's natural size — beside the rendered dimensions, so it already answers how big a frame is. Add `get_metadata` only when you also need names or structure; eight A/B runs each paid for both batches before noticing.
-- **Screenshots of different frames or pages.** Issue them together, then `curl` all the returned URLs in one bash call — **in parallel**, pairing each URL with its own output name: `printf '%s %s\n' "$U1" 1.png "$U2" 2.png | xargs -P6 -n2 sh -c 'curl -sSL -o "$2" "$1"' _` (six serially is 2.7 s through a cloud sandbox's egress proxy, 0.8 s in parallel). Don't use `-I{}` with a single `-o`: `{}` expands only in the URL, so every parallel `curl` writes the same file and you Read one screenshot six times. Then Read each. A screenshot is otherwise three tool calls, and a run takes 14–70 of them.
+- **Screenshots of different frames or pages.** Issue them together, then download all the URLs in one parallel bash call (pattern and its two silent traps: Gotchas). Keep these on the hosted `get_screenshot`: most frames a build screenshots are ones it just wrote, and the desktop reader cannot see those (Gotchas).
 - **Every format in a multi-format run**, and every frame of a `chart-rows` set — their *reads* fan out. Their **writes do not**: one chart is one page, and Step 4 lines the formats up on that page, so those frames are separate frames on a *shared* page — which by the rule above makes two `use_figma` writes in one message race. Batch the screenshots and property reads; build the frames one call at a time.
 - **Any survey of N nodes** — but at 4–6, not more; past that the connector queues and every call slows (Gotchas).
 - **`upload_assets` takes a `count`.** One call returns N single-use `submitUrl`s and the POSTs parallelize, so a two-format run uploads both originals in one call rather than two — and both embeds in one more.
@@ -321,9 +321,11 @@ head -c 300 $DIR/embed.svg   # expect <svg ... width="..." height="...">, no <ht
 > **[`scripts/solve_export.py`](scripts/solve_export.py) does this arithmetic — don't do it by hand.**
 > Run it from the repo root through the venv — `.venv/bin/python .claude/skills/create-figma-chart/scripts/solve_export.py …`;
 > it is committed non-executable like the rest of that directory.
-> `--band 508x371 --slug <slug>` returns the solved `imFontSize`, the `imWidth`/`imHeight` to
+> `--band 508x371 --slug <slug> --params '<the view's query string>'` returns the solved
+> `imFontSize`, the `imWidth`/`imHeight` to
 > request, the predicted content box, the **height-first** scale into the band, the leftover width
-> the x-map has to close, the final label size, and the finished `curl`. Two things to read it by:
+> the x-map has to close, the final label size, and the finished `curl`. **Omit `--params` and that
+> `curl` exports the DEFAULT chart** — a valid, plausible SVG of the wrong entities. Two things more:
 > it reports the leftover width rather than a predicted gap, because the gap is exact by
 > construction once you fit the height (Step 7) — that leftover is the same quantity
 > `measure_fit.js` reports as `xMapShortfall`, and it is the aspect miss expressed in px; and every
@@ -534,3 +536,4 @@ The checks are a gate, not a formality: **re-run the whole pass after the last c
    For a **302-wide thumbnail** the export is part of the deliverable rather than optional, and it has its own route: `GET /api/figma/image?fileId=<key>&nodeId=<node>` on the OWID admin (`adminSiteServer/apiRoutes/figma.ts`) calls the Figma API at `scale: 3`, then `POST /api/images` uploads it to Cloudflare Images. PNG only — `ACCEPTED_IMG_TYPES` rejects SVG. See SMALL-CHARTS.md → Delivery for the naming rules and the retina reason for 3×. **Neither call reaches `admin.owid.io` from a cloud session**, so there the export and upload move to the user's machine — say that when you deliver instead of leaving the deliverable half-finished.
 6. **Give the user a clickable link to the frame — once, when you first create it.** `https://www.figma.com/design/<fileKey>/<FileName>?node-id=<node-id>`, with the node id's colon written as a hyphen (`24977:6` → `node-id=24977-6`). Deep-link the **frame**, not the page: it opens with the chart on screen rather than wherever the canvas was last parked. A first delivery without the link is not delivered — making someone hunt for a page in a ~200-page file is pure friction. But **don't repeat it on every iteration**: they already have the tab open, and a link at the top of every reply is noise. Re-send it only if the frame moves to a new page or they ask.
 7. Report what was created (page name, frames, edits made) and what remains manual: the Flags plugin if it was used, and any design review — **you cannot read Figma comments via MCP, so never report the design review as clean.** Deviations and open items go in the report and the handover doc; put them on the Figma page **only if the user asks** — an unrequested note is clutter in someone else's design file.
+   - **Name the Step 8c rows that came back `SKIPPED`** — about a dozen do, each owned by a tool this pass doesn't run. A report listing only what passed turns a declared gap into an implied clean bill.

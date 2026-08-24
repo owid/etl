@@ -36,7 +36,7 @@ Run [`scripts/verify_templates.js`](../scripts/verify_templates.js) through `use
 | **`small-chart-template-pull`** | **`25344:1391`** | 302 × free | the same plus a mandatory source row — see [SMALL-CHARTS.md](../SMALL-CHARTS.md) |
 | `"SMALL" Charts` section heading | `25344:1235` | — | "featured on the OWID website as guided and PULL charts" |
 | Curvy arrows | `798:773` | — | copy/paste into the chart; scaling rules in GUIDELINES.md |
-| "No data" hashed-pattern instructions | `4162:5` | — | Hero Patterns plugin (manual route). Scriptable instead — TILE `IMAGE` fill from `assets/no-data-hatch-tile.png`, see GUIDELINES.md → Flags, animals, no-data pattern |
+| "No data" hashed-pattern instructions | `4162:5` | — | Hero Patterns plugin (manual route). Scriptable instead — TILE `IMAGE` fill from `assets/no-data-hatch-tile.png`, see [FLAGS-ANIMALS-NODATA.md](FLAGS-ANIMALS-NODATA.md) |
 | Flags | `2654:5` | — | Flags **plugin** — manual; US flags provided in the file |
 | Animals | `5336:5` | — | chicken, rooster, turkey, fish, cow, egg-laying hen, pig |
 | Good Data Viz Checklist | `20729:1027` | — | distilled in GUIDELINES.md |

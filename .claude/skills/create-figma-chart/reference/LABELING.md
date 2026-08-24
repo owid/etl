@@ -291,7 +291,7 @@ The high-value edits to propose (include them in the Step 4 proposal):
 
   **Two fit tests, not one, because the edge labels are anchored differently.** Interior labels are centered on their tick, so they need `pitch ≥ labelWidth + ~8px`. The **first** label is left-aligned *at* its tick and the **last** right-aligned *at* its tick — grapher does this to keep them inside the plot — so each spends a full label width on its inward side, and the two slots next to them need roughly `1.5 × labelWidth + gutter`. Miss that and the arithmetic says yes while the render overlaps: on one chart a 50.3px pitch cleared the 43px interior requirement, added 1995 and 2020, and left both of them 2.2px *inside* the edge labels. Measure the neighbor gaps after adding and revert if any is negative — the honest outcome is often that grapher's axis was already right, and the years it dropped were exactly the edge-adjacent ones.
 
-- **Annotations replicating the accompanying text** (12–16px; 12–14px on maps): text color = the annotated object's color, `Text/Gray 80` #5B5B5B, or a mix; bold the key phrase; append last so it sits above the chart. **The annotation is a bare TEXT node — no wrapping frame** — and it gets a knockout only if it actually crosses chart ink, in which case that knockout is a **3px outside stroke in the template's canvas color**. GUIDELINES.md → Annotations has the three tiers and why the stroke beats a frame wherever it suffices.
+- **Annotations replicating the accompanying text** (12–16px; 12–14px on maps): text color = the annotated object's color, `Text/Gray 80` #5B5B5B, or a mix; bold the key phrase; append last so it sits above the chart. **The annotation is a bare TEXT node — no wrapping frame** — and it gets a knockout only if it actually crosses chart ink, in which case that knockout is a **3px outside stroke in the template's canvas color**. [ANNOTATIONS-AND-ARROWS.md](ANNOTATIONS-AND-ARROWS.md) has the three tiers and why the stroke beats a frame wherever it suffices.
 
   ```js
   const txt = figma.createText();
@@ -333,7 +333,7 @@ The high-value edits to propose (include them in the Step 4 proposal):
 
   > **If you do need tier 3** (ink too dense on the canvas for a halo — never a filled area, see GUIDELINES.md), the frame recipe
   > and its two traps — `clipsContent = false` and `paddingBottom ≈ 0.22 × the last line's font size` —
-  > are in GUIDELINES.md → Annotations. Note `figma.createAutoLayout()` **is** a real API (declared in
+  > are in [ANNOTATIONS-AND-ARROWS.md](ANNOTATIONS-AND-ARROWS.md). Note `figma.createAutoLayout()` **is** a real API (declared in
   > `references/plugin-api-standalone.d.ts`; the `figma-use` skill's rule 12a prefers it over
   > `createFrame()` + absolute coordinates) — a review pass once asserted otherwise and the rewrite to
   > `createFrame()` had to be reverted. Check the typings before changing it.
