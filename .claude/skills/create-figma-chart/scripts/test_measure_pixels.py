@@ -262,19 +262,31 @@ def test_unreadable_png_is_unmeasurable(tmp: Path) -> None:
 
 
 def test_malformed_background_is_unmeasurable(tmp: Path) -> None:
-    print("a six-character non-hex --background is bad input (2), not a failed check (1)")
+    print("every malformed --background is bad input (2), not a failed check (1)")
     png = save(canvas(30, 20), tmp / "plain.png")
-    # Length is not validity. `#fffffg` passes the 6-digit gate and dies inside int(..., 16), and an
-    # uncaught ValueError exits 1 — the code that means "the chart is wrong".
-    for bad in ("#fffffg", "zzzzzz", "#12345g"):
-        code, _ = run("ink-box", "--png", str(png), "--background", bad)
-        check(f"{bad} exits 2", code, 2)
-    code, _ = run("contrast", "--png", str(png), "--background", "#ffff")
-    check("wrong length still exits 2", code, 2)
+    # Three separate holes, one regex. `#fffffg` cleared the 6-digit gate and died inside
+    # int(..., 16) — an uncaught ValueError exits 1, the code that means "the chart is wrong".
+    # `###ffffff` cleared it too, because lstrip("#") strips every leading hash.
+    for bad in ("#fffffg", "zzzzzz", "#12345g", "###ffffff", "#ffff", "#fffffff", "", "#"):
+        for mode in ("ink-box", "contrast"):
+            code, _ = run(mode, "--png", str(png), "--background", bad)
+            check(f"{mode} {bad!r} exits 2", code, 2)
+    # An EMPTY value is a typo, not an omission — truthiness used to swap the caller's declared
+    # background for an inferred one, silently answering a question they did not ask.
+    code, _ = run("ink-box", "--png", str(png), "--background", "")
+    check("ink-box '' exits 2 rather than inferring", code, 2)
+    # The forms that ARE valid keep working, with and without the hash.
+    img = canvas(30, 20)
+    img[5:10, 5:10] = (0, 0, 0)
+    inked = save(img, tmp / "inked.png")
+    for good in ("#ffffff", "ffffff", "#FFFFFF"):
+        code, out = run("ink-box", "--png", str(inked), "--background", good, "--json")
+        check(f"{good!r} measures", out.get("ink_box"), [5, 5, 10, 10])
+        check(f"{good!r} exits 0", code, 0)
 
 
-def test_negative_tolerance_is_refused(tmp: Path) -> None:
-    print("a negative --tolerance would call the whole region ink, and say so with exit 0")
+def test_numeric_flags_outside_their_range_are_refused(tmp: Path) -> None:
+    print("a numeric flag outside its meaningful range is bad input (2), never a verdict")
     img = canvas(60, 40)
     img[10:30, 20:25] = (0, 0, 0)
     png = save(img, tmp / "square.png")
@@ -282,10 +294,28 @@ def test_negative_tolerance_is_refused(tmp: Path) -> None:
     check("true extent", out.get("ink_box"), [20, 10, 25, 30])
     check("true ink px", out.get("ink_px"), 100)
     check("exit code", code, 0)
-    # Every pixel satisfies abs(delta) > -1, background included, so the box becomes the region and
-    # the run still exits 0 — a plausible, confident, wrong answer about where the ink ends.
-    code, _ = run("ink-box", "--png", str(png), "--background", "#ffffff", "--tolerance", "-1", "--json")
-    check("negative tolerance exits 2", code, 2)
+    # Every pixel satisfies abs(delta) > -1, background included, so the box becomes the whole
+    # region and the run still exits 0 — a confident, wrong answer about where the ink ends.
+    for bad in ("-1", "-8", "256", "1000"):
+        code, _ = run("ink-box", "--png", str(png), "--background", "#ffffff", "--tolerance", bad)
+        check(f"--tolerance {bad} exits 2", code, 2)
+    check("--tolerance 0 is still allowed", run("ink-box", "--png", str(png), "--background", "#ffffff")[0], 0)
+
+    # #f0f0f0 on white is 1.14:1 — an unreadable hairline, and the case `contrast` exists to catch.
+    hair = canvas(40, 20)
+    hair[5:15, 20] = (240, 240, 240)
+    hp = save(hair, tmp / "hairline.png")
+    code, out = run("contrast", "--png", str(hp), "--background", "#ffffff", "--json")
+    check("hairline is FAIL at the default bar", out.get("verdict"), "FAIL")
+    check("and exits 1", code, 1)
+    check("peak contrast", out.get("peak_contrast"), 1.14)
+    # Under a bar of 1 every pixel clears it, background included, so the same unreadable hairline
+    # comes back PASS with exit 0. Above 21 nothing can ever clear it.
+    for bad in ("-1", "0", "0.5", "21.5", "100"):
+        code, _ = run("contrast", "--png", str(hp), "--background", "#ffffff", "--bar", bad)
+        check(f"--bar {bad} exits 2", code, 2)
+    check("--bar 1 is the floor and is allowed", run("contrast", "--png", str(hp), "--background", "#ffffff", "--bar", "1")[0], 0)
+    check("--bar 21 is the ceiling and is allowed", run("contrast", "--png", str(hp), "--background", "#ffffff", "--bar", "21")[0], 1)
 
 
 def test_gray_target_would_defeat_color_classification(tmp: Path) -> None:
@@ -417,7 +447,7 @@ def main() -> int:
             test_fractional_bbox_keeps_its_edge_pixels,
             test_unreadable_png_is_unmeasurable,
             test_malformed_background_is_unmeasurable,
-            test_negative_tolerance_is_refused,
+            test_numeric_flags_outside_their_range_are_refused,
             test_gray_target_would_defeat_color_classification,
             test_subpixel_stroke_scale,
             test_antialiased_gap_tracks_truth,

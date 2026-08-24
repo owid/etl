@@ -141,11 +141,24 @@ and is less accurate than the arithmetic. Download the three pair-specific rende
 ```
 
 It masks each shape from the pass where the *other* was already hidden, reports `min_gap`,
-`touching_pairs` and `arrow_px`/`target_px`, and **exits 2 rather than 0 when the measurement
-cannot be trusted** — an empty mask, renders of different sizes, or a mask straying outside the
-`--*-bbox` you declared. That distinction is the point: a bare number cannot tell "the arrow is
-clear" from "I measured nothing". Pass `--full` and it also reports what the discredited
+`touching_pairs` and `arrow_px`/`target_px`. Pass `--full` and it also reports what the discredited
 from-full masking would have said, and warns when that would have missed a real contact.
+
+**The exit code is the part to read, and it is the same for all three probes:**
+
+| | |
+|---|---|
+| **0** | the check ran and passed |
+| **1** | the check ran and failed — *the chart is wrong*, and nothing else means this |
+| **2** | the check did **not** run, so there is no verdict |
+
+Everything wrong with the *input* is 2: an unreadable PNG, a malformed `--background`, a crop
+outside the render, a numeric flag outside its meaningful range, an empty mask, renders of
+different sizes, a mask straying outside a declared `--*-bbox`. **Never read a 2 as a pass and
+never read it as a defect** — it means the probe could not measure, and the remedy is to fix the
+input and re-run. A bare number cannot tell "the arrow is clear" from "I measured nothing", which
+is the whole reason these return a code at all. `figma_desktop_read.py` uses the same three codes,
+with 2 reserved there for the daily read quota.
 
 **What it does not buy is arithmetic speed — measured, on the same three renders.** The all-pairs
 loop it replaces is `O(arrow × target)` against a linear distance transform, and that only pays at

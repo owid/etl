@@ -23,9 +23,21 @@ Usage (from the repo root, through the repo interpreter):
     .venv/bin/python .claude/skills/create-figma-chart/scripts/measure_pixels.py ink-box \\
         --png render.png [--region 0,0,540,540] [--background '#ffffff']
 
-Exit codes: 0 the check passed, 1 it failed, 2 the measurement is not trustworthy (an empty mask,
-a guard violation, mismatched renders) — so a caller can tell "arrow is clear" from "I could not
-tell", which a bare number cannot.
+Exit codes — the contract, stated once, because every flag added later inherits it:
+
+    0  the check ran and PASSED
+    1  the check ran and FAILED — reserved for "the chart is wrong", nothing else
+    2  the check did NOT run, so there is no verdict to report
+
+So a caller can tell "the arrow is clear" from "I could not tell", which a bare number cannot.
+
+**Anything wrong with the INPUT is 2, never 1 and never a pass.** An unreadable PNG, a malformed
+`--background`, a crop outside the render, a numeric flag outside its meaningful range, an empty
+mask, mismatched render sizes, a guard violation. The rule exists because the alternative failure
+is the expensive one: a check that answers PASS or FAIL on input it could not actually measure
+reports a verdict it has not earned, and a wrong verdict is worse than an error — it is believed.
+Numeric ranges live in RANGES and are enforced centrally in main(); colours go through parse_hex;
+boxes through parse_box. Add a flag to one of those and it is covered.
 """
 
 from __future__ import annotations
@@ -33,6 +45,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import re
 import sys
 from pathlib import Path
 
@@ -45,6 +58,22 @@ from scipy import ndimage
 GAP_MIN, GAP_MAX = 3.0, 7.0
 # radius 1.5 in CHECKS.md's `touching` is exactly the 3x3 neighbourhood: max hypot is 1.414.
 CONTACT_KERNEL = np.ones((3, 3), dtype=np.int32)
+
+# Every numeric flag, and the range in which it means anything. Checked in ONE place (main), so a
+# flag added later is covered by listing it here rather than by remembering to guard its own
+# command. Outside the range is not a stricter check, it is an ABSENT one: a negative --tolerance
+# counts the background as ink and hands back the whole region as the extent; a --bar under 1 is
+# cleared by every pixel including the background, so an unreadable hairline comes back PASS. Both
+# exit 0 with a confident, wrong number, which is the one outcome this script exists to prevent.
+RANGES: dict[str, tuple[float, float, str]] = {
+    # flag name (argparse dest) -> (low, high, what the number is)
+    "tolerance": (0, 255, "a per-channel delta between two 8-bit channels"),
+    "bar": (1.0, 21.0, "a WCAG contrast ratio (1.0 is invisible, 21.0 is black on white)"),
+}
+
+# 6 hex digits, with at most one leading '#'. A regex rather than lstrip('#') + len: lstrip strips
+# EVERY leading '#', so '###ffffff' passed, and a length test says nothing about the digits.
+HEX_COLOR = re.compile(r"^#?[0-9a-fA-F]{6}$")
 
 
 def load(path: Path) -> np.ndarray:
@@ -99,16 +128,24 @@ def as_hex(rgb: np.ndarray) -> str:
 
 
 def parse_hex(value: str) -> np.ndarray:
+    # One test covers all three ways this was wrong: the wrong length, a stray '#', and a non-hex
+    # digit anywhere. The last used to raise ValueError out of int(..., 16) and exit 1 — the code
+    # reserved for "the chart is wrong" — so a typo in the background read as a genuine defect.
+    if not HEX_COLOR.match(value):
+        raise unmeasurable(f"--background must be a 6-digit hex color like '#ffffff' — got {value!r}")
     h = value.lstrip("#")
-    if len(h) != 6:
-        raise unmeasurable(f"--background must be a 6-digit hex color — got {value!r}")
-    # Length is not validity: `#fffffg` is six characters and `int(..., 16)` raises on it. Uncaught,
-    # that exits 1 — the code reserved for "the check ran and the chart is wrong" — so a typo in the
-    # background would read as a genuine defect.
-    try:
-        return np.array([int(h[i : i + 2], 16) for i in (0, 2, 4)], dtype=np.int16)
-    except ValueError:
-        raise unmeasurable(f"--background must be a 6-digit hex color — got {value!r}")
+    return np.array([int(h[i : i + 2], 16) for i in (0, 2, 4)], dtype=np.int16)
+
+
+def check_ranges(args: argparse.Namespace) -> None:
+    """Enforce RANGES for whichever numeric flags this subcommand actually has."""
+    for name, (low, high, what) in RANGES.items():
+        value = getattr(args, name, None)
+        if value is None:
+            continue
+        if not low <= value <= high:
+            flag = "--" + name.replace("_", "-")
+            raise unmeasurable(f"{flag} must be {what}, in [{low}, {high}] — got {value}")
 
 
 def relative_luminance(rgb: np.ndarray) -> np.ndarray:
@@ -258,7 +295,7 @@ def cmd_contrast(args: argparse.Namespace) -> int:
         return 2
     region = crop_of(img, box).reshape(-1, 3)
 
-    if args.background:
+    if args.background is not None:
         background = parse_hex(args.background)
     else:
         # The modal color of a region that is mostly background.
@@ -307,13 +344,7 @@ def cmd_ink_box(args: argparse.Namespace) -> int:
         return 2
     region = crop_of(img, box)
 
-    # A negative tolerance makes `abs(delta) > tolerance` true for every pixel, background included,
-    # so the extent comes back as the whole region with a confident exit 0 — a plausible but false
-    # "ink reaches the edge", which is the one verdict this check exists to produce honestly.
-    if args.tolerance < 0:
-        raise unmeasurable(f"--tolerance must be a non-negative channel delta — got {args.tolerance}")
-
-    if args.background:
+    if args.background is not None:
         background = parse_hex(args.background)
     else:
         colors, counts = np.unique(region.reshape(-1, 3), axis=0, return_counts=True)
@@ -388,6 +419,9 @@ def main() -> int:
         parser.add_argument("--json", action="store_true", help="emit JSON instead of lines")
 
     args = ap.parse_args()
+    # Before any measurement, and for every subcommand at once — so the guard cannot be forgotten in
+    # a new command the way it was in `contrast` and `ink-box`.
+    check_ranges(args)
     return args.func(args)
 
 

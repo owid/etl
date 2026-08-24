@@ -31,9 +31,19 @@ Usage (from the repo root, always through the repo virtualenv):
     .venv/bin/python .claude/skills/create-figma-chart/scripts/figma_desktop_read.py meta 798:54
     .venv/bin/python .claude/skills/create-figma-chart/scripts/figma_desktop_read.py meta
 
-Exits non-zero if any requested node failed, so a caller can trust a zero exit. `1` is an ordinary
-failure — a bad node id, the wrong active tab — and `2` is the daily read quota, in every mode. The
-two want opposite remedies (fix the ids vs. stop using this server today), so they are kept apart.
+Exit codes — the contract, stated once, because every mode added later inherits it:
+
+    0  every requested node was read
+    1  an ordinary failure: a bad node id, the wrong active tab, an unopened page, a server that
+       is not running
+    2  the daily read quota is exhausted — in EVERY mode, and however it surfaces
+
+`2` is separate because the two want opposite remedies. `1` says fix the ids and retry; `2` says
+stop calling this server today and use the hosted connector, which has its own, unaffected quota.
+Folding them together sends a caller to re-check node ids that were fine. Every path that can see
+the server's refusal — a tool result's `isError` in `check`, `shot` and `meta`, and a transport-level
+JSON-RPC error in `rpc` — routes through `rate_limited()`, so the distinction cannot be lost by
+adding a mode that forgets to make it.
 """
 
 from __future__ import annotations
@@ -54,6 +64,17 @@ PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
 # Prefix that marks a per-node failure as the daily quota rather than a bad node, so `shot` can
 # raise its exit code to 2 the way `check` does. A sentinel, not a phrase to match loosely.
 QUOTA_MARK = "FAILED (desktop daily quota exhausted"
+# Said once, printed by every mode that can hit the cap.
+QUOTA_ADVICE = (
+    "The desktop server's OWN daily read quota is exhausted — separate from the hosted\n"
+    "connector's, which is unaffected and still usable. Nothing to fix today: use the hosted\n"
+    "get_screenshot. And do not POLL this server; every call is quota, so a retry loop can\n"
+    "spend the whole day's allowance."
+)
+
+
+def quota_note(indent: str = "  ") -> str:
+    return "\n".join(f"{indent}{line}" for line in QUOTA_ADVICE.splitlines())
 
 
 def rpc(payload: dict, session: str | None = None) -> dict:
@@ -83,7 +104,13 @@ def rpc(payload: dict, session: str | None = None) -> dict:
         err = reply["error"]
         detail = err.get("message", err) if isinstance(err, dict) else err
         code = err.get("code", "?") if isinstance(err, dict) else "?"
-        raise SystemExit(f"the Figma desktop MCP server returned JSON-RPC error {code}: {detail}")
+        message = f"the Figma desktop MCP server returned JSON-RPC error {code}: {detail}"
+        # The cap can also surface as a transport-level error rather than a tool result's isError,
+        # and it exits 2 wherever it appears — every other failure here wants a different remedy.
+        if rate_limited(str(detail)):
+            print(f"{message}\n{quota_note('')}", file=sys.stderr)
+            raise SystemExit(2)
+        raise SystemExit(message)
     return reply
 
 
@@ -152,6 +179,13 @@ def check(expect_node: str) -> int:
             session,
         )
     except SystemExit as exc:
+        # A quota refusal raised as a transport error already carries its own code, and printed its
+        # own message to stderr — so don't flatten it back to 1, and don't print the bare code as
+        # though it were the reason.
+        if exc.code == 2:
+            print("desktop path UNAVAILABLE: the daily read quota is exhausted (detail above).")
+            print("Fall back to the hosted connector's get_screenshot.")
+            return 2
         print(f"desktop path UNAVAILABLE: {exc}")
         print("Fall back to the hosted connector's get_screenshot.")
         return 1
@@ -162,10 +196,7 @@ def check(expect_node: str) -> int:
         print(f"desktop path UNAVAILABLE for {expect_node}.")
         print(f"  server said: {text.strip()[:200]}")
         if rate_limited(text):
-            print("  The desktop server's OWN daily read quota is exhausted — separate from the")
-            print("  hosted connector's, which is unaffected and still usable. Nothing to fix")
-            print("  today: use the hosted get_screenshot. And do not POLL this server; every")
-            print("  call is quota, so a retry loop can spend the whole day's allowance.")
+            print(quota_note())
             return 2
         print("  Two causes, and the message does not distinguish them:")
         print("   - the target file is not the ACTIVE TAB in the Figma desktop app; or")
@@ -238,6 +269,12 @@ def meta(node: str | None) -> int:
     text = result_text(result)
     if result.get("isError"):
         print(f"FAILED {text.strip()}", file=sys.stderr)
+        # Every mode that can see the server's isError owes the same distinction: quota is 2, and a
+        # bad node or the wrong active tab is 1. `meta` used to fold them together, so a caller
+        # reading a structure dump could not tell "fix the node id" from "stop using this server".
+        if rate_limited(text):
+            print(quota_note(""), file=sys.stderr)
+            return 2
         return 1
     print(text)
     return 0
