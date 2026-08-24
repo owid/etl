@@ -16,12 +16,14 @@ stop before the first Figma call and recommend re-running on **Opus** (or **Sonn
 mechanical re-export or a single text fix); continue only on the user's say-so — this skill is long
 chains of design judgment, and a build on the wrong model wastes the shared file's review cycle.
 
-**If the `mcp__Figma__*` tools arrive deferred, load them in one `ToolSearch` before the first Figma
-call.** A cloud session serves them that way, and discovering them one at a time costs a model turn
-each — ~7 over a run:
+**If the Figma tools arrive deferred, load them in one `ToolSearch` before the first Figma call.** A
+cloud session serves them that way, and discovering them one at a time costs a model turn each — ~7
+over a run. **Take the prefix from your own session's tool list:**
+`mcp__Figma__` in a cloud session, `mcp__claude_ai_Figma__` locally — one naming the wrong prefix
+matches nothing.
 
 ```
-select:mcp__Figma__use_figma,mcp__Figma__get_screenshot,mcp__Figma__get_metadata,mcp__Figma__upload_assets,mcp__Figma__search_design_system
+select:<prefix>use_figma,<prefix>get_screenshot,<prefix>get_metadata,<prefix>upload_assets,<prefix>search_design_system
 ```
 
 Add `get_design_context` or `download_assets` when the route needs them. **Skip this entirely where
@@ -137,7 +139,7 @@ connector serves the calls concurrently *and* they share one turn. Yet across fi
 **two batched nothing at all** and two barely did (1–9% of calls overlapping); one batched heavily
 and paid for it (see the ceiling below).
 
-**Fan out independent calls — one message, 4–6 at a time.** Twelve runs of a fixed six-call probe put the payoff at **≈4.0×, and identically so in both environments**: ten cloud reps mean **4.00×** (3.79–4.24×, median 3.95×, wall 12.4–14.0 s) and two local reps mean **4.00×** (3.87× / 4.13×), with a full six calls in flight in *every* rep. So batching is environment-neutral — only what each call costs differs. An eighth call still helps (an earlier eight-screenshot run measured 4.1×, 79.7 s of work in 19.4 s of wall clock), but the connector admits about four or five at once and per-call latency inflates past that — 8.2 s for the first of eight, 13.2 s for the last — so **4–6 per message is the sweet spot and more just queues**; see the ceiling below. This is the `figma-use` skill's own instruction too: issue the N calls in one message, and don't await one before issuing the next.
+**Fan out independent calls — one message, 4–6 at a time.** The payoff is **≈4.0× and environment-neutral** — twelve runs of a fixed six-call probe, ten cloud and two local, all six calls in flight every time; only what each call costs differs. An eighth call still helps (an earlier eight-screenshot run measured 4.1×, 79.7 s of work in 19.4 s), but the connector admits about four or five at once and latency inflates past that, so **4–6 per message is the sweet spot and more just queues**; see the ceiling below. This is the `figma-use` skill's own instruction too: issue the N calls in one message, and don't await one before issuing the next.
 
 **A batch's wall clock is `first call + rate × (n−1)`**, and both terms are environment-specific:
 **9.2 s + 0.75 s** per extra call in a cloud session, **11.7 s + 2.1 s** locally (ten reps a side;
@@ -159,9 +161,10 @@ in one message, so batching is mechanical rather than a fresh judgment call ever
 - **Step 8c — the checks.** `verify_page.js` and `diff_against_template.js` are one read-only call each; issue them together, with every pixel probe that reads one fixed state.
 - **Step 9 — the delivery renders.** One screenshot per delivered frame, all in one message.
 - **The palette harvest.** `search_design_system` caps at ~14 results against a 24-fill palette, so it takes one group query plus ~11 by-name queries. Every one of them is independent.
+- **A size-only survey is one batch, not two.** `get_screenshot` returns `original_width`/`original_height` — the node's natural size — beside the rendered dimensions, so it already answers how big a frame is. Add `get_metadata` only when you also need names or structure; eight A/B runs each paid for both batches before noticing.
 - **Screenshots of different frames or pages.** Issue them together, then `curl` all the returned URLs in one bash call — **in parallel**, pairing each URL with its own output name: `printf '%s %s\n' "$U1" 1.png "$U2" 2.png | xargs -P6 -n2 sh -c 'curl -sSL -o "$2" "$1"' _` (six serially is 2.7 s through a cloud sandbox's egress proxy, 0.8 s in parallel). Don't use `-I{}` with a single `-o`: `{}` expands only in the URL, so every parallel `curl` writes the same file and you Read one screenshot six times. Then Read each. A screenshot is otherwise three tool calls, and a run takes 14–70 of them.
 - **Every format in a multi-format run**, and every frame of a `chart-rows` set — their *reads* fan out. Their **writes do not**: one chart is one page, and Step 4 lines the formats up on that page, so those frames are separate frames on a *shared* page — which by the rule above makes two `use_figma` writes in one message race. Batch the screenshots and property reads; build the frames one call at a time.
-- **Any survey of N nodes** — but at 4–6, not more. The pass that wrote GUIDELINES.md screenshotted 272 chart-library nodes at **peak 14 in flight**, and its calls averaged **35.5 s** against ~10 s everywhere else. That is the ceiling being exceeded, not the connector being slow: 8.2 s at one in flight, 13.2 s at eight queued, 35.5 s at fourteen.
+- **Any survey of N nodes** — but at 4–6, not more; past that the connector queues and every call slows (Gotchas).
 - **`upload_assets` takes a `count`.** One call returns N single-use `submitUrl`s and the POSTs parallelize, so a two-format run uploads both originals in one call rather than two — and both embeds in one more.
 - **The Step 8c property sweeps** — font sizes, stroke weights, dash patterns, fills, polylines. Those are reads of a single page, so they collapse into *one* `use_figma` returning one JSON. `scripts/verify_templates.js` already does exactly this for ten templates.
 - **The arrow probe's baseline render.** Only the FULL render is shared across arrows: the other three states of the four-render protocol (no-arrow, no-target, both-hidden) each hide *that pair's* nodes, so they are pair-specific and cannot be reused. N arrows cost `3N + 1` screenshots, not `4N` — and not `N + 2`, which under-collects and produces masks containing another pair's target.

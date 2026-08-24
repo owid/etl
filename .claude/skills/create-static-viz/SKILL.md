@@ -73,8 +73,9 @@ its step. After editing any doc in this skill:
 connector **and the model turn around it** — and both terms move with the environment. The
 cross-environment figures here are all **`get_screenshot`, the only tool timed in both**: the hop is
 7.8–9.9 s from a cloud sandbox against 12.5–20.5 s locally with Figma's desktop app open, while the
-turn is ~12 s in the cloud against 2–4 s on a light local turn. Read them as the shape of the cost, not as per-tool numbers —
-`use_figma` and `upload_assets` have not been benchmarked across environments. Either way, a handful
+turn is ~12 s in the cloud against 2–4 s on a light local turn. Read them as the shape of the cost,
+not as per-tool numbers — `use_figma` and `upload_assets` have not been benchmarked across
+environments. Either way, a handful
 issued one at a time is the difference between seconds and minutes. Batching pays about the same in
 both: the connector serves concurrent calls — eight screenshots in one message measured 4.1× faster
 than serially, and twelve runs of a fixed six-call probe mean **4.0× in both environments** (ten
@@ -82,9 +83,10 @@ cloud reps 4.00×, two local 4.00×, six in flight every time) — and admits ab
 so **put independent calls in one message, 4–6 at a time.** A batch's wall is
 `first call + rate × (n−1)` — measured at **9.2 s + 0.75 s** per extra screenshot in a cloud session
 and **11.7 s + 2.1 s** locally — and that marginal cost is the stopping rule.
-Reads always; writes only when they target different pages. If the `mcp__Figma__*` tools arrive
-deferred (a cloud session serves them that way), load the ones you need in a single `ToolSearch`;
-skip that where they are already loaded. `/create-figma-chart` → **Round-trip budget** has the full
+Reads always; writes only when they target different pages. If the Figma tools arrive deferred (a
+cloud session serves them that way), load the ones you need in a single `ToolSearch`, taking the
+prefix from your own session's tool list since it differs between cloud and local; skip that where
+they are already loaded. `/create-figma-chart` → **Round-trip budget** has the full
 rule and the list of what is genuinely serial.
 
 **What this skill does not decide:** colors, fonts, background, the logo, and any visual treatment
