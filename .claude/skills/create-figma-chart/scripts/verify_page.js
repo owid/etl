@@ -213,9 +213,15 @@ const checkFrame = async (frameId) => {
     }
     if (/^annotation__/.test(n.name)) annotations.push({ node: n, name: n.name, box: rel(n), type: n.type });
     if ("strokeWeight" in n && typeof n.strokeWeight === "number" && n.strokes && n.strokes.length) {
+      // The stroke's COLOUR travels with it, picked the same way the knockout row picks one: the first
+      // paint that actually RENDERS, not `strokes[0]`, which can be a switched-off or transparent decoy.
+      // A line chart's series colour lives here and nowhere else — it is not a fill — so without this
+      // the colour rows can only ever see a chart's fills.
       stroked.push({ node: n, name: n.name, type: n.type, w: n.strokeWeight,
                      dash: "dashPattern" in n && n.dashPattern ? [...n.dashPattern] : [],
                      align: n.strokeAlign, insidePlot, inFurniture, furnitureGroup: furnitureGroup || null, insideMap: !!insideMap,
+                     hex: hexOf(n.strokes.find((s) => s && s.type === "SOLID" && s.visible !== false
+                                                      && (s.opacity === undefined || s.opacity > 0.01))),
                      seriesKind: seriesOf ? seriesOf.kind : null, seriesName: seriesOf ? seriesOf.series : null });
     }
     // Zero-area nodes are EXCLUDED from the fill inventory and KEPT for the stroke rows (CHECKS.md).
@@ -990,17 +996,54 @@ const checkFrame = async (frameId) => {
   // ready to paste instead of a tool name to go and look up. A declared gap the operator has to
   // reconstruct by hand is the one most likely to be skipped for real.
   {
-    const paletteSrc = fills.filter((f) => f.insidePlot && f.hex);
-    const seen = new Map();  // hex -> first node name, in walk order
-    for (const f of paletteSrc) if (!seen.has(f.hex.toLowerCase())) seen.set(f.hex.toLowerCase(), f.name);
+    // The palette is built from IDENTIFIED DATA MARKS AND SERIES STROKES, never from the `fills`
+    // inventory. `fills` holds every solid paint on an area node inside the plot and a TEXT node has
+    // both, so axis and legend labels would enter the palette as categories; meanwhile a line chart's
+    // series colours live on STROKES and are not in `fills` at all. Measured on this script's own test
+    // fixture, that inventory returned exactly one entry — the fill of `label__A`, a text node — with
+    // the series colour it should have audited missing entirely. Auditing furniture while omitting the
+    // data is the confident wrong answer these rows exist to prevent.
+    // `outline__*` strokes are excluded along with it: that is the white halo grapher draws under a
+    // line so crossings stay readable. Every series shares it, and it is not a category colour.
+    const catOf = (nm) => (/^[a-z][a-z-]*__(.+)$/i.exec(nm || "") || [])[1] || null;
+    const marks = markBoxes.filter((m) => m.insidePlot && m.hex)
+      .map((m) => ({ id: m.name, hex: m.hex, cat: m.fromMap ? null : catOf(m.name) }));
+    const seriesStrokes = stroked.filter((s) => s.insidePlot && !s.inFurniture && s.hex
+                                                && (s.seriesKind === "line" || s.seriesKind === "slope"))
+      .map((s) => ({ id: s.seriesName, hex: s.hex, cat: s.seriesName }));
+    const paletteSrc = [...marks, ...seriesStrokes];
+    // Dedupe by COLOUR, because color_audit.py takes a PALETTE: hand it forty bar segments in six
+    // colours and every real finding competes with dozens of deltaE 0 self-pairs.
+    const seen = new Map();  // hex -> first mark/series name, in walk order
+    for (const p of paletteSrc) if (!seen.has(p.hex.toLowerCase())) seen.set(p.hex.toLowerCase(), p.id);
     const hexes = [...seen.keys()];
-    // A name carrying a comma would silently split into two --names entries and misalign every
-    // label after it, so the flag is dropped wholesale rather than emitted subtly wrong. State the
-    // ACTUAL reason: an unnamed node and a comma'd one both disqualify the flag, and reporting one
-    // as the other is the same wrong-verdict habit these checks exist to catch.
+    // What that collapse HIDES is stated, not swallowed. Two categories on one colour is the severest
+    // collision there is — deltaE 0, indistinguishable to everyone — and the audit cannot report it,
+    // because to the audit they are one entry. So name them here instead.
+    // Not graded, and phrased as a question, because sharing a colour is often correct: a highlight
+    // treatment greys every unhighlighted series to the same value on purpose. Map shapes are left out
+    // of the note altogether — a choropleth puts every country in a bin into one colour by definition,
+    // so flagging that would fire on every map. Only grapher's `<kind>__<Entity>` names count as a
+    // category; an SVG import's `Rectangle 12` is unique per node and means nothing.
+    const catsByHex = new Map();
+    for (const p of paletteSrc) {
+      if (!p.cat) continue;
+      const h = p.hex.toLowerCase();
+      if (!catsByHex.has(h)) catsByHex.set(h, new Set());
+      catsByHex.get(h).add(p.cat);
+    }
+    const shared = [...catsByHex].filter(([, c]) => c.size > 1)
+      .map(([h, c]) => `${h} carries ${[...c].slice(0, 4).join(" + ")}`);
+    // A name carrying a comma would silently split into two --names entries and misalign every label
+    // after it; a name carrying an apostrophe would end the single-quoted shell argument mid-name, so
+    // "Women's employment" turns a paste-ready command into a shell syntax error. Both drop the flag
+    // wholesale rather than emitting it subtly wrong. State the ACTUAL reason: an unnamed mark, a
+    // comma'd one and an apostrophe'd one all disqualify the flag, and reporting one as another is the
+    // same wrong-verdict habit these checks exist to catch.
     const names = [...seen.values()];
-    const nameProblem = names.some((n) => !n) ? "a fill node has no name"
-      : names.some((n) => n.includes(",")) ? "a node name contains a comma, which would misalign the labels"
+    const nameProblem = names.some((n) => !n) ? "a mark has no name"
+      : names.some((n) => n.includes(",")) ? "a name contains a comma, which would misalign the labels"
+      : names.some((n) => n.includes("'")) ? "a name contains an apostrophe, which would break the quoted shell argument"
       : null;
     const namesSafe = !nameProblem;
     const cmd = hexes.length
@@ -1009,13 +1052,27 @@ const checkFrame = async (frameId) => {
         + (namesSafe ? ` --names '${names.join(",")}'` : "")
         + (isMap ? " --maps" : " --separated")
       : null;
+    // `--maps` swaps in the CATEGORICAL Maps palette, and the deltaE 20 all-pairs gate is a categorical
+    // test. A SEQUENTIAL choropleth — Viridis, a ColorBrewer ramp — is ordered by construction and set
+    // in grapher: its adjacent stops are MEANT to sit close together, so that gate fails a correct ramp,
+    // and the script's own "rerun with --suggest" would then answer with an unordered categorical set.
+    // Nothing here can tell a ramp from a categorical choropleth off the fills alone, so it is not
+    // guessed: the map branch says which chart the command is for and which chart it does not apply to.
+    const mapNote = " — this frame is a MAP, and this row covers a CATEGORICAL choropleth ONLY."
+      + " If these fills are a SEQUENTIAL ramp, do not run it: the ramp is ordered and grapher sets it,"
+      + " adjacent stops are meant to be close, so the deltaE 20 gate fails correct work and --suggest"
+      + " would offer an unordered categorical palette in its place. Judge a ramp by lightness order.";
     const how = cmd
       ? ` Run: ${cmd}`
-        + (isMap ? "" : " — `--separated` assumes nothing shares an edge, which holds for lines, maps"
+        + (isMap ? mapNote : " — `--separated` assumes nothing shares an edge, which holds for lines, maps"
             + " and plain/grouped bars. On a STACKED or SEGMENTED chart drop it and reorder the"
             + " colours into stack order first, because the seam check reads adjacency off that order.")
+        + ` Palette: ${hexes.length} distinct colour(s) drawn from ${paletteSrc.length} plot mark(s)/series.`
+        + (shared.length ? ` One colour, two categories — the audit sees these as ONE entry and cannot`
+            + ` report the clash, so judge them by eye: ${shared.slice(0, 4).join("; ")}. Correct for a`
+            + ` highlight treatment; a defect if they are separate categories.` : "")
         + (namesSafe ? "" : ` (--names omitted: ${nameProblem}.)`)
-      : " No solid plot fills found on this frame, so there is no palette to audit.";
+      : " No data marks or series strokes found in the plot, so there is no palette to audit.";
     skip("colour-vision", "all-pairs deltaE 20 for deuteranopia/protanopia on CATEGORICAL fills." + how, "scripts/color_audit.py");
     skip("grayscale-seams", "adjacent pairs above ~1.6:1 — same command, same run as colour-vision." + how, "scripts/color_audit.py");
   }

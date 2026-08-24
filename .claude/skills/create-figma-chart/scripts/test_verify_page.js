@@ -917,41 +917,80 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     // A stacked chart is the case where order matters, so the warning must be present off a map.
     check("33 non-map run warns that stack order matters",
           /STACKED or SEGMENTED/.test(row(out, "colour-vision").detail), row(out, "colour-vision").detail);
-    // A comma in a node name would misalign every --names entry after it, so the flag is dropped.
-    // Rename EVERY filled descendant, not one: the emitter keeps the FIRST name per distinct hex,
-    // so renaming an arbitrary node can leave its colour already registered under a clean earlier
-    // name and silently test nothing. (That is exactly how this case first passed vacuously.)
-    const comma = buildFrame();
-    let renamed = 0;
-    (function walk(n) {
-      if (n.fills && n.fills.length && n.fills.some((f) => f.type === "SOLID")) { n.name = "series__Chile, mainland"; renamed++; }
-      (n.children || []).forEach(walk);
-    })(comma);
-    check("33 the comma fixture actually renamed a filled node", renamed > 0, `renamed ${renamed}`);
+    // --- what the palette is BUILT FROM. The `fills` inventory was the wrong source: it carries every
+    // solid paint on an area node in the plot, and a TEXT node has one, while a line chart's series
+    // colour is a STROKE and is not in it at all. On this very fixture that meant the emitted command
+    // audited `label__A`'s text fill and omitted the series colour — furniture in, data out.
+    const offPaletteLabel = row(await run(buildFrame({ labelFill: "#123456" }), {}), "colour-vision").detail;
+    check("33 a text label's fill is NOT audited as a category",
+          !/#123456/.test(offPaletteLabel), offPaletteLabel);
+    // The other half: the series colour must be PRESENT, and it exists only as a stroke.
+    const strokeOnly = row(await run(buildFrame({ gappedLine: true }), {}), "colour-vision").detail;
+    check("33 a line series' stroke colour IS audited", /#b13507/.test(strokeOnly), strokeOnly);
+    // `outline__*` is the white halo under a line, shared by every series — not a category colour.
+    const rings = row(await run(buildFrame({ scatterRings: true }), {}), "colour-vision").detail;
+    check("33 the white outline halo is not taken for a category",
+          !/#ffffff/.test(rings) && /#b13507/.test(rings), rings);
+    // A colour carrying two categories is collapsed by the hex dedupe, so it is NAMED instead of
+    // silently dropped — otherwise the severest clash there is (deltaE 0) produces a vacuous pass.
+    const twoSeries = row(await run(buildFrame({ extraLine: 3 }), {}), "colour-vision").detail;
+    check("33 two series on one colour are named, not silently merged",
+          /judge them by eye/.test(twoSeries) && /A \+ B|B \+ A/.test(twoSeries), twoSeries);
+    // But a choropleth puts every country in a bin into ONE colour by design, so the same note must
+    // not fire on a map or it fires on every map.
+    const sameBin = buildFrame({ mapCountries: true });
+    sameBin.children.find((c) => c.name === "chart").children
+      .find((c) => c.name === "map").children.find((c) => c.name === "country__DEU").fills = solid("#4c6a9c");
+    const binned = row(await run(sameBin, {}), "colour-vision").detail;
+    check("33 map shapes sharing a bin colour are NOT reported as a clash",
+          !/judge them by eye/.test(binned), binned);
+    // A map is audited as a CATEGORICAL choropleth, which a sequential ramp is not: the deltaE 20 gate
+    // fails a correct ramp by construction, so the row must say so rather than hand over the command flat.
+    check("33 a map warns that a sequential ramp is out of scope",
+          /SEQUENTIAL ramp/.test(binned) && /--maps/.test(binned), binned);
+
+    // --- when --names is safe to emit. Rename EVERY qualifying mark, not one: the emitter keeps the
+    // FIRST name per distinct hex, so renaming an arbitrary node can leave its colour already
+    // registered under a clean earlier name and silently test nothing. (That is exactly how this case
+    // first passed vacuously.) `barSegment` supplies a filled RECTANGLE — a data mark, which is what
+    // now feeds the palette; renaming text fills tests nothing.
+    const renameMarks = (frame, to) => {
+      let renamed = 0;
+      (function walk(n) {
+        if (n.type !== "TEXT" && !(n.children && n.children.length)
+            && n.fills && n.fills.length && n.fills.some((f) => f.type === "SOLID")) { n.name = to; renamed++; }
+        (n.children || []).forEach(walk);
+      })(frame);
+      return renamed;
+    };
+    // A comma in a name would misalign every --names entry after it, so the flag is dropped.
+    const comma = buildFrame({ barSegment: true });
+    const renamed = renameMarks(comma, "series__Chile, mainland");
+    check("33 the comma fixture actually renamed a data mark", renamed > 0, `renamed ${renamed}`);
     const d2 = row(await run(comma, {}), "colour-vision").detail;
     // Match the FLAG (`--names '…'`), not the substring: the explanatory note says "--names
     // omitted", so a bare /--names/ is satisfied by the very sentence proving it was dropped.
-    check("33 a comma in a node name drops --names rather than misaligning it",
+    check("33 a comma in a name drops --names rather than misaligning it",
           !/--names '/.test(d2) && /contains a comma/.test(d2), d2);
-    // The happy path, or the two negatives above would pass on a build that never emits --names at
-    // all. Clean names on every filled node must produce the flag, carrying those names.
-    const named = buildFrame();
-    (function walk(n) {
-      if (n.fills && n.fills.length && n.fills.some((f) => f.type === "SOLID")) n.name = "series__Chile";
-      (n.children || []).forEach(walk);
-    })(named);
+    // An apostrophe would end the single-quoted shell argument mid-name, so the advertised paste-ready
+    // command would not parse. Same treatment, and the reason must name the apostrophe.
+    const apos = buildFrame({ barSegment: true });
+    renameMarks(apos, "series__Women's employment");
+    const d4 = row(await run(apos, {}), "colour-vision").detail;
+    check("33 an apostrophe in a name drops --names rather than breaking the shell",
+          !/--names '/.test(d4) && /apostrophe/.test(d4), d4);
+    // The happy path, or the negatives above would pass on a build that never emits --names at all.
+    const named = buildFrame({ barSegment: true });
+    renameMarks(named, "series__Chile");
     const d1 = row(await run(named, {}), "colour-vision").detail;
     check("33 clean names DO produce --names", /--names 'series__Chile'/.test(d1), d1);
     check("33 and then no omission note is attached", !/--names omitted/.test(d1), d1);
     // And the reason given must be the real one, not the comma message reused for a missing name.
-    const anon = buildFrame();
-    (function walk(n) {
-      if (n.fills && n.fills.length && n.fills.some((f) => f.type === "SOLID")) n.name = "";
-      (n.children || []).forEach(walk);
-    })(anon);
+    const anon = buildFrame({ barSegment: true });
+    renameMarks(anon, "");
     const d3 = row(await run(anon, {}), "colour-vision").detail;
-    check("33 an unnamed fill node reports THAT, not a phantom comma",
-          /has no name/.test(d3) && !/contains a comma/.test(d3), d3);
+    check("33 an unnamed mark reports THAT, not a phantom comma",
+          /has no name/.test(d3) && !/contains a comma/.test(d3) && !/apostrophe/.test(d3), d3);
   }
 
   const bad = results.filter((x) => !x.ok);
