@@ -15,7 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from inline_script import CAP, DOCUMENTED_CALLS, select_rows, strip_js  # noqa: E402
+from inline_script import CAP, DOCUMENTED_CALLS, select_rows, split_advice, strip_js  # noqa: E402
 
 results: list[tuple[str, bool, str]] = []
 
@@ -45,17 +45,44 @@ check("the trailing line comment is gone", "// trailing comment" not in out, out
 check("the block comment is gone", "block" not in out.replace("not a comment", ""), out)
 check("code after a block comment survives", "const after = 1;" in out, out)
 
-# --- the corruption guard ------------------------------------------------------------------------
-# A NESTED template literal (a backtick inside a ${} inside a template) is legal JS and this parser
-# is not nesting-aware: it closes the outer context on the inner backtick, desynchronizes, and stops
-# stripping for the rest of the file. Silent, and the output is still valid JS — just far larger.
+# --- nested templates, which are ordinary JS ------------------------------------------------------
+# A template literal can hold a `${}` expression that holds another template. A flat context could
+# not see that: the INNER opening backtick read as the outer one closing, and from there the parser
+# was one level out of step. Balanced nesting still ended at context None, so the end-of-file guard
+# passed it and the emitted script differed from the file on disk — silently, which is the one
+# failure this stripper exists to prevent. Parsed with a stack, each level closes its own.
 nested = 'const a = `x${c ? "" : ` inner \\`${y}\\``}`;\n// must be stripped\nconst b = 1;\n'
-try:
-    strip_js(nested)
-    check("a desynchronizing nested template is REFUSED", False, "no exception raised")
-except ValueError as exc:
-    check("a desynchronizing nested template is REFUSED", True, str(exc))
-    check("and the message names the likely cause", "NESTED template" in str(exc), str(exc))
+kept_nested = strip_js(nested)
+check("a balanced nested template parses instead of refusing", "` inner" in kept_nested, kept_nested)
+check("and the parser is still in sync after it", "// must be stripped" not in kept_nested, kept_nested)
+check("so the code after it survives", "const b = 1;" in kept_nested, kept_nested)
+
+# The case that made this visible: a `//` inside the INNER template is template text, not a comment,
+# and the outer template resumes after the expression closes.
+inner_comment = "const t = `outer ${`inner // keep\nline`} tail`;\n// gone\nconst z = 2;\n"
+kept_inner = strip_js(inner_comment)
+check("a // inside a nested template is not stripped", "// keep" in kept_inner, kept_inner)
+check("the outer template's tail survives", "tail`" in kept_inner, kept_inner)
+check("and the comment after it is still stripped", "// gone" not in kept_inner, kept_inner)
+
+# Inside a `${}` the content is CODE, so a comment there is a comment and must go — the mirror of
+# the case above, and the reason the expression is tracked rather than copied verbatim.
+expr_comment = "const v = `a${ x /* drop */ }b`;\n"
+check("a comment inside a ${} expression IS stripped", "drop" not in strip_js(expr_comment), strip_js(expr_comment))
+
+# --- the corruption guard ------------------------------------------------------------------------
+# Well-formed JS closes every literal it opens, so ending inside one means the parse desynchronized
+# and the rest of the file was copied verbatim. That is the backstop the stack cannot replace.
+for label, bad in [
+    ("template", "const a = `unterminated\n// must be stripped\n"),
+    ("${} expression", "const a = `x${ y\n// must be stripped\n"),
+]:
+    try:
+        strip_js(bad)
+        check(f"an unterminated {label} is REFUSED", False, "no exception raised")
+    except ValueError as exc:
+        check(f"an unterminated {label} is REFUSED", True, str(exc))
+        check(f"and the {label} message names what is open", "unterminated" in str(exc), str(exc))
 
 # Region markers are structure, not commentary — `--rows` selects on them, so they must survive.
 regioned = "const pre = 1;\n// #region alpha\nconst a = 1; // gone\n// #endregion\n// #region beta\nconst b = 2;\n// #endregion\n"
@@ -103,6 +130,39 @@ whole = len(select_rows(stripped_big, set(gs))[0])
 check("the floor is the largest SINGLE group, not the total", floor < whole, f"floor {floor} whole {whole}")
 check("the floor is preamble + largest group", floor == len(select_rows(stripped_big, {"alpha"})[0]), floor)
 check("the floor never exceeds the whole file", floor <= whole, f"{floor} vs {whole}")
+
+
+# --- what to advise when a script is over the cap -------------------------------------------------
+# Three different situations, and one of them used to be given the middle answer: past the FLOOR
+# every 2-way split is over the cap by construction, so naming the smallest of them as "a split that
+# fits" contradicts the exhaustion line printed beside it and points at a call that would be refused.
+def group_src(a: int, b: int) -> str:
+    return (
+        "const pre = 1;\n"
+        + "// #region alpha\n"
+        + "const a = 1;\n" * a
+        + "// #endregion\n"
+        + "// #region beta\n"
+        + "const b = 2;\n" * b
+        + "// #endregion\n"
+    )
+
+
+def advice_for(a: int, b: int) -> tuple[str | None, int]:
+    kept_src = strip_js(group_src(a, b))
+    gs = select_rows(kept_src, set())[1]
+    fl = max(len(select_rows(kept_src, {g})[0]) for g in gs)
+    return split_advice(kept_src, gs, fl), fl
+
+
+# Two modest groups whose combined call is over the cap but either one alone is well under it.
+fits, _ = advice_for(3_600, 3_600)
+check("a split that fits is offered as one", fits is not None and "a 2-way split that fits" in fits, fits)
+
+# One group alone already past the cap: no partition can help, so nothing may be described as fitting.
+exhausted, fl_ex = advice_for(4_500, 100)
+check("the floor fixture really is exhausted", fl_ex > 50_000, fl_ex)
+check("past the floor, no split is advertised as fitting", exhausted is None or "fits" not in exhausted, exhausted)
 
 # --- the declared workflow must cover the file exactly once --------------------------------------
 # A declaration that drifts from the #regions is how the check goes on reporting a comfortable
