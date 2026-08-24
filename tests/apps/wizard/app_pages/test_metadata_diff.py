@@ -2054,3 +2054,46 @@ def test_chart_text_changes_need_the_dataset_to_be_in_scope_and_rebuilt(monkeypa
     unavailable = BranchScope(available=False)
     out = discovery.changed_chart_texts("src", "tgt", unavailable, built)  # type: ignore[arg-type]
     assert out.diffs == {} and out.narrowed is False
+
+
+def test_a_view_pointing_at_another_variant_is_marked_not_blamed_on_the_baseline():
+    """Two unlike reasons a difference is not this branch's, and they read very differently.
+
+    Found on a live branch: a poverty_pip view renders `…survey_comparability_4` on staging and
+    `…survey_comparability_6` in production, so its title differs both because the variant changed and
+    because this branch reworded it. The tool cannot attribute that, which is correct — but captioning it
+    "its recipe is untouched" said master had done it.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import build_view_bundle, diff_views, group_changes
+
+    def bundle(path: str, title: str):
+        return build_view_bundle(
+            view={"dimensions": {"poverty_line": "_100"}},
+            config_metadata=None,
+            variable_row={"id": 1, "catalogPath": path, "titlePublic": title, "name": "n"},
+            chart_config=None,
+        )
+
+    base = "grapher/wb/2026-06-26/world_bank_pip/poverty#headcount_ratio__spells"
+
+    # Same indicator, reworded: attributable, and not a replacement.
+    edited = diff_views([bundle(f"{base}_4", "New title")], [bundle(f"{base}_4", "Old title")])[0]
+    assert edited.changed and edited.indicator_changed_fields == {"titlePublic"}
+    assert edited.indicator_replaced is False
+
+    # Different variant: the text differs, but no rewording can be attributed to it.
+    swapped = diff_views([bundle(f"{base}_4", "New title")], [bundle(f"{base}_6", "Old title")])[0]
+    assert swapped.changed
+    assert swapped.indicator_changed_fields == set(), "a replacement is not an indicator-layer edit"
+    assert swapped.indicator_replaced is True
+
+    # A version bump alone is still the same indicator, so it must not be marked as replaced.
+    other_version = base.replace("2026-06-26", "2026-01-22")
+    bumped = diff_views([bundle(f"{base}_4", "New title")], [bundle(f"{other_version}_4", "Old title")])[0]
+    assert bumped.indicator_replaced is False
+    assert bumped.indicator_changed_fields == {"titlePublic"}
+
+    # The flag reaches the group the card reads.
+    group = group_changes([swapped])[0]
+    assert group.indicator_replaced is True
+    assert group_changes([edited])[0].indicator_replaced is False

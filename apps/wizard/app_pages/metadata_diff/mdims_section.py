@@ -175,12 +175,19 @@ def _render_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame,
                     "above lists every one."
                 )
 
-        if other_groups:
-            # This MDim's own view configs also differ, without the branch touching its recipe — almost
-            # always master having rebuilt it. Counted separately so it can't be read as this PR's work.
+        # Two unlike reasons a difference is not attributable, and only one of them is master's doing.
+        repointed = [g for g in other_groups if g.indicator_replaced]
+        lagging = [g for g in other_groups if not g.indicator_replaced]
+        if lagging:
             st.caption(
-                f"🕓 {len(other_groups)} further difference(s) in this MDim's view configs are not from this "
+                f"🕓 {len(lagging)} further difference(s) in this MDim's view configs are not from this "
                 "branch (its recipe is untouched) — see Chart Diff's MDIMs section."
+            )
+        if repointed:
+            st.caption(
+                f"🔀 {len(repointed)} difference(s) are on views that render a **different indicator "
+                f"variant** here than on `{BASELINE_NAME}` — a replacement, not an edit. Their text "
+                "differs for that reason too, so a rewording of yours cannot be told apart from the swap."
             )
 
 

@@ -89,6 +89,10 @@ class ViewDiff:
     # Subset of METADATA_FIELDS whose *indicator-layer* value changed (i.e. the change is not
     # just an MDIM override). These are the changes that also propagate to charts / other MDIMs.
     indicator_changed_fields: set[str] = field(default_factory=set)
+    # The view's first y-indicator is a different indicator here than in the baseline — a *replacement*,
+    # not an edit. Its texts then differ for two reasons at once, so no rewording can be attributed to
+    # this branch; worth saying, rather than filing the difference under someone else's rebuild.
+    indicator_replaced: bool = False
 
     @property
     def changed(self) -> bool:
@@ -264,6 +268,10 @@ def diff_views(
             for key in METADATA_FIELDS:
                 if _normalize(src.base.get(key)) != _normalize(target.base.get(key)):
                     view_diff.indicator_changed_fields.add(key)
+        elif target is not None and view_diff.fields:
+            # Same view, different indicator. Recorded so the caller can say so instead of implying the
+            # baseline moved on.
+            view_diff.indicator_replaced = True
 
         diffs.append(view_diff)
     return diffs
@@ -442,6 +450,8 @@ class ChangeGroup:
     new: Any
     view_dims: list[dict[str, str]] = field(default_factory=list)
     affects_indicator: bool = False
+    # Any view in this group renders a different indicator here than in the baseline.
+    indicator_replaced: bool = False
     indicator_id: int | None = None
     catalog_path: str | None = None  # indicator catalogPath (shared changes) — for the PR brief
     # Every distinct indicator *id* whose indicator layer carries this same text change. A shared
@@ -593,6 +603,8 @@ def group_changes(view_diffs: list[ViewDiff]) -> list[ChangeGroup]:
                 groups[key] = g
                 order.append(key)
             g.view_dims.append(v.dimensions)
+            if v.indicator_replaced:
+                g.indicator_replaced = True
             if fld in v.indicator_changed_fields:
                 g.affects_indicator = True
                 if g.indicator_id is None:
