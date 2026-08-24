@@ -607,8 +607,18 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const out = await run(buildFrame({ frameW: 302, frameH: 400, labelSize: 11,
       annotation: annotation({ x: 20, y: 130, w: 80, h: 14, size: 11, stroke: "#ffffff", strokeWeight: 3 }) }), {});
     check("20 block-gap SKIPPED on 302", row(out, "annotation-block-gap").status === "SKIPPED", row(out, "annotation-block-gap").detail);
-    const big = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    // The annotation has to sit ABOVE the plot (which spans y 122-474) for this row to be in scope
+    // at all — see the in-plot case below. At y=110 it clears the header by 2px, so the row runs and
+    // fails, which is what "not SKIPPED" is asserting.
+    const big = await run(buildFrame({ annotation: annotation({ x: 100, y: 110, stroke: "#ffffff", strokeWeight: 3 }) }), {});
     check("20 540-wide still checks block-gap", row(big, "annotation-block-gap").status !== "SKIPPED", row(big, "annotation-block-gap").detail);
+    check("20 and it reports which annotations put it in scope", /extend past the plot/.test(row(big, "annotation-block-gap").detail), row(big, "annotation-block-gap").detail);
+    // An annotation INSIDE the plot makes the block the plot, so this row would demand 27px of the
+    // very geometry `gap` requires to be 12-16 — the two are unsatisfiable together. It defers.
+    const inPlot = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    check("20 an in-plot annotation defers to the gap row", row(inPlot, "annotation-block-gap").status === "SKIPPED", row(inPlot, "annotation-block-gap").detail);
+    check("20 and says why it deferred", /inside the plot/.test(row(inPlot, "annotation-block-gap").detail), row(inPlot, "annotation-block-gap").detail);
+    check("20 while the gap row still passes on that frame", row(inPlot, "gap").status === "ok", row(inPlot, "gap").detail);
   }
 
   // 21 — an annotation covering a filled bar segment, with no value label to catch it.

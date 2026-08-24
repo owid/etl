@@ -855,11 +855,27 @@ const checkFrame = async (frameId) => {
     else if (isSmall) skip("annotation-block-gap", "302-wide format: SMALL-CHARTS.md replaces the 27px constant with 'scale to the frame', so the 540x540 figure would reject a valid scaled layout. Measure it against that page's own rule and record the number");
     else if (bandTop === null || footerTop === null) skip("annotation-block-gap", "band not resolved");
     else {
-      const all = [...annotations.map((a) => a.box), ...plotRoots.map(rel)].filter(Boolean);
+      const plotBoxes = plotRoots.map(rel).filter(Boolean);
+      const annBoxes = annotations.map((a) => a.box).filter(Boolean);
+      const all = [...annBoxes, ...plotBoxes];
       const top = Math.min(...all.map((b) => b.t)), bot = Math.max(...all.map((b) => b.bb));
       const cTop = top - (header ? header.y + header.height : bandTop), cBot = footerTop - bot;
-      const bad = cTop < BLOCK_CLEARANCE - 0.5 || cBot < BLOCK_CLEARANCE - 0.5;
-      add("annotation-block-gap", bad ? "FAIL" : "ok", `block clears header by ${r(cTop)} and footer by ${r(cBot)} (want >= ${BLOCK_CLEARANCE})`);
+      // The 27px rule is for annotations that sit OUTSIDE the plot, in bands above and below it —
+      // there the reader sees one content block whose outer edges owe the template's own gaps. When
+      // every annotation is inside the plot the block IS the plot, so this row would demand 27px of
+      // exactly the geometry the `gap` row requires to be 12-16: the two become unsatisfiable
+      // together, and a correctly-fitted chart fails one of them whatever you do. Measured on a DI
+      // whose annotations sat in the plot: gap ok at 14/14.21, this row FAIL wanting >= 27.
+      const plotTop = Math.min(...plotBoxes.map((b) => b.t)), plotBot = Math.max(...plotBoxes.map((b) => b.bb));
+      const outside = annBoxes.filter((b) => b.t < plotTop - 0.5 || b.bb > plotBot + 0.5);
+      if (!outside.length) {
+        skip("annotation-block-gap",
+             `all ${annBoxes.length} annotation(s) sit inside the plot's vertical extent, so the block IS the plot and its clearance is the \`gap\` row's business (measured ${r(cTop)}/${r(cBot)} here). This row governs annotations placed in bands ABOVE or BELOW the plot`);
+      } else {
+        const bad = cTop < BLOCK_CLEARANCE - 0.5 || cBot < BLOCK_CLEARANCE - 0.5;
+        add("annotation-block-gap", bad ? "FAIL" : "ok",
+            `block clears header by ${r(cTop)} and footer by ${r(cBot)} (want >= ${BLOCK_CLEARANCE}); ${outside.length} annotation(s) extend past the plot, which is what puts this row in scope`);
+      }
     }
   }
 
