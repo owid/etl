@@ -13,7 +13,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > get it *just* under the cap (the helper is context-aware, so URLs, regex literals and template
 > strings survive), and even then it sat at 97%, all of which has to be relayed verbatim — where a
 > one-character corruption yields a *wrong verdict* rather than an error, the exact failure this gate
-> exists to catch. It has since grown past the cap outright: **58,824 stripped**. So
+> exists to catch. It has since grown past the cap outright: **58,726 stripped**. So
 > `inline_script.py verify_page.js` with no `--rows` **refuses and exits 1**, naming the size and
 > pointing here, and `--whole` no longer overrides that — the cap is now a hard floor for this
 > script, not a judgement call. The rows are grouped, each slice carries the shared preamble:
@@ -30,8 +30,8 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > | `geometry` | box-alignment, gap, margins, off-palette | 56% |
 > | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 72% |
 >
-> Groups combine, so the whole pass is two calls: `--rows type,series` (40,532) then
-> `--rows geometry,annotations` (41,214, **82% of cap** — the figure `inline_script.py --check`
+> Groups combine, so the whole pass is two calls: `--rows type,series` (40,437) then
+> `--rows geometry,annotations` (41,116, **82% of cap** — the figure `inline_script.py --check`
 > reports: it measures **these two calls**, declared as `DOCUMENTED_CALLS` in the script, rather
 > than the smallest split it could find for itself — an optimiser would go on reporting a
 > comfortable number by picking a split nobody is told to send. Change the pair here and there
@@ -122,6 +122,12 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > which switch is off and where, and the verdict reads `NOT CHECKED` — never "no mechanical row
 > failed". Unhide or reset the frame *and every group and section above it*, then re-run.
 >
+> **Non-rendering means exactly zero, never a floor.** A node or paint at 0.005 does reach the canvas,
+> and a cutoff dropped its whole subtree from *every* row — an 8px label at 0.005 left `text-floor`
+> reporting that all of its ranges cleared the floor. Anything positive is **translucent**: held out of
+> the palette, named there so the shortfall is visible, and still judged by every row that is about
+> geometry rather than colour.
+>
 > A `SKIPPED` row is a declared gap in coverage, never a pass — which
 > is the whole reason to read the list rather than the verdict.
 >
@@ -148,7 +154,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 >
 > Validated by planting defects and confirming each row **fails**, twice over: 11 planted in Figma and
 > 11 caught, then a stubbed-figma harness ([`scripts/test_verify_page.js`](../scripts/test_verify_page.js),
-> `node` it after any edit) covering **262** assertions including the rows that are awkward to plant on a
+> `node` it after any edit) covering **264** assertions including the rows that are awkward to plant on a
 > real page. **A check that cannot fail is worse than no check**, so when you extend this script,
 > extend both passes with it.
 >

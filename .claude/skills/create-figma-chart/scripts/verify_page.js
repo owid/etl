@@ -84,8 +84,14 @@ const hexOf = (f) => (f && f.type === "SOLID"
 // drift apart again. It is the same reasoning that already excludes zero-area nodes from the fill
 // inventory: a paint nobody can see is a phantom colour, and reporting one sends a reviewer to go and
 // fix a mark that is not on the canvas.
+// The test is ZERO, not a floor. A 0.01 cutoff was a threshold nobody chose: a paint at 0.005 does
+// reach the canvas, and dropping it took its node out of EVERY row — text-floor, overlap, margins —
+// with nothing anywhere saying so. Silently auditing a subset is the failure this file exists to
+// remove, and it does not become acceptable because the subset is faint. Anything positive is
+// TRANSLUCENT: held out of the palette, named, and still judged by every row that is about geometry
+// rather than colour.
 const renders = (p) => !!p && p.type === "SOLID" && p.visible !== false
-                       && (p.opacity === undefined || p.opacity > 0.01);
+                       && (p.opacity === undefined || p.opacity > 0);
 // PARTIAL opacity is a different problem from zero, and it is not solved by dropping the node: the mark
 // IS on the canvas, so it still has a box, still blocks an annotation, still needs its stroke weight
 // judged. What it does NOT have is a reportable COLOUR. `hexOf` returns the paint's raw RGB, and what
@@ -140,11 +146,10 @@ const checkFrame = async (frameId) => {
   // the frame is the last place they were handled as two. Whichever way it is off, every row below would
   // be a verdict about something no reader can see, so the frame is REPORTED as not rendered instead and
   // no other row is emitted. That is the honest shape: not "nothing failed", but "nothing was checked".
-  if (hiddenAncestors.length || frameOpacity <= 0.01) {
+  if (hiddenAncestors.length || frameOpacity <= 0) {
     const why = hiddenAncestors.length
       ? `switched off with visible=false on ${hiddenAncestors.join(", then ")}`
-      : `at effective opacity ${r(frameOpacity)}, counting every group and section above it`
-        + " (zero, or under the same 0.01 floor a paint is dropped at)";
+      : "at effective opacity ZERO, counting every group and section above it";
     add("frame-not-rendered", "FAIL",
         `NOT CHECKED — this frame paints no pixels: ${why}. Both switches are INHERITED, and the walk`
         + " below starts at the frame's children, so a descendant's own visible=true and opacity=1 say"
@@ -286,14 +291,19 @@ const checkFrame = async (frameId) => {
     // PARTIAL are two different answers and a boolean cannot tell them apart. Read as a boolean, a node
     // the reader cannot see at all came back as a held-back TRANSLUCENT mark: the audit named an
     // invisible category and told the operator to reset its opacity or judge it by eye — a verdict
-    // about something that is not on the canvas. Two nested nodes at 0.05 compound to 0.0025, so the
-    // product is also the only way to see that pair as invisible rather than merely dim.
+    // about something that is not on the canvas. The product is also what sees a group at 0 holding an
+    // opaque leaf, which no single-node test can.
     if ("opacity" in n && typeof n.opacity === "number") nodeOpacity *= n.opacity;
-    // Effective opacity zero paints NO PIXELS. That is the same non-rendering state as `visible: false`
+    // Effective opacity ZERO paints NO PIXELS. That is the same non-rendering state as `visible: false`
     // directly above and as a zero-opacity paint under `renders`, so it takes the same treatment both of
     // those take — out of every row entirely — rather than being grouped with genuinely visible partial
-    // opacity. Same 0.01 floor `renders` applies to a paint, applied here to the node instead.
-    if (nodeOpacity <= 0.01) return;
+    // opacity. The test is exactly zero, and the multiplication is what reaches it: a factor of 0
+    // anywhere on the climb zeroes the product exactly. It is NOT a floor. A near-zero node — 0.05
+    // inside 0.05 — is faint, not absent, and dropping it here took it out of every row in the file,
+    // including the ones that never look at colour: an 8px label at 0.005 left `text-floor` reporting
+    // that all of its ranges cleared the floor. A subset audited as a whole is the defect this script
+    // exists to catch, so faintness is reported through the translucent path instead, which names it.
+    if (nodeOpacity <= 0) return;
     const dimmed = nodeOpacity < 0.999;
     // The furniture CONTAINER name is carried, not just the boolean: the dash target is decided by what
     // a node IS (a gridline vs a zero line vs a tick), and deciding it from the node's own current dash
@@ -995,7 +1005,7 @@ const checkFrame = async (frameId) => {
         // whose knockout paints nothing passed the weight, alignment and colour checks — the row
         // certified the missing knockout it exists to catch. And the colour check read `strokes[0]`
         // unconditionally, which is the wrong paint the moment an invisible one sits in front of it.
-        const paint = (n.strokes || []).find((s) => s && s.visible !== false && (s.opacity === undefined || s.opacity > 0.01));
+        const paint = (n.strokes || []).find((s) => s && s.visible !== false && (s.opacity === undefined || s.opacity > 0));
         const hasStroke = !!paint && n.strokeWeight > 0;
         const crosses = crossings[a.name] || [];
         if (crosses.length && !hasStroke) {

@@ -1054,17 +1054,38 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
           !/#12ab34/.test(dZero) && /#4c6a9c/.test(dZero), dZero);
     check("33 and it is not reported as a translucent mark to go and check",
           !/translucent/.test(dZero) && !/Invisible/.test(dZero), dZero);
-    // Opacity MULTIPLIES down the tree, so invisibility can be reached without any single node being
-    // zero: 0.05 inside 0.05 is 0.0025, under the same floor `renders` puts a paint. A boolean could
-    // only ever call this pair "dim"; the product is what sees it is gone.
+    // Opacity MULTIPLIES down the tree, so a pair of small values compounds to a very small one:
+    // 0.05 inside 0.05 is 0.0025. That is FAINT, not absent — the non-rendering exit is exactly zero,
+    // never a floor — so it takes the translucent treatment: out of the palette, and NAMED, because
+    // "reset the opacity and re-run" is the one instruction that helps here. A cutoff would have
+    // dropped it from every row in the file instead, including the rows that never look at colour.
     const compounded = buildFrame({ barSegment: true });
     chartOf(compounded).children.push(node({ name: "series__Vanished", x: 300, y: 380, width: 60, height: 40,
       opacity: 0.05, children: [node({ name: "inner", x: 300, y: 380, width: 60, height: 40, opacity: 0.05,
         children: [node({ type: "RECTANGLE", name: "Rectangle 10", x: 300, y: 380,
           width: 60, height: 40, fills: solid("#12ab34") })] })] }));
     const dComp = row(await run(compounded, {}), "colour-vision").detail;
-    check("33 compounded opacity below the floor is invisible, not dim",
-          !/#12ab34/.test(dComp) && !/translucent/.test(dComp) && /#4c6a9c/.test(dComp), dComp);
+    check("33 a mark compounded to near-zero is held out of the palette and named",
+          !/#12ab34/.test(dComp) && /translucent/.test(dComp) && /Vanished/.test(dComp) && /#4c6a9c/.test(dComp), dComp);
+    // And it stays in the rows that are not about colour at all. A cutoff took the whole subtree out of
+    // the walk, so an 8px label at 0.005 left `text-floor` reporting that every range cleared the floor
+    // — a row certifying a frame on input it had silently removed. Faint is not gone.
+    const faintText = buildFrame();
+    chartOf(faintText).children.push(node({ name: "faint", x: 60, y: 300, width: 80, height: 12, opacity: 0.005,
+      children: [text("label__Faint", "8px and faint", 8, 60, 300, 80, 12, "#4c6a9c")] }));
+    const outFaint = await run(faintText, {});
+    check("33 a near-transparent 8px label is still judged by text-floor",
+          row(outFaint, "text-floor").status === "FAIL" && /8px and faint/.test(row(outFaint, "text-floor").detail),
+          row(outFaint, "text-floor").detail);
+    // Exactly zero is the other side of that line, and it must stay dropped: the product reaches it
+    // only through a factor of zero, so nothing here is a threshold judgement.
+    const zeroText = buildFrame();
+    chartOf(zeroText).children.push(node({ name: "gone", x: 60, y: 300, width: 80, height: 12, opacity: 0,
+      children: [text("label__Gone", "8px and gone", 8, 60, 300, 80, 12, "#4c6a9c")] }));
+    const outZeroText = await run(zeroText, {});
+    check("33 while an 8px label at opacity 0 is not judged at all",
+          row(outZeroText, "text-floor").status === "ok" && !/8px and gone/.test(row(outZeroText, "text-floor").detail),
+          row(outZeroText, "text-floor").detail);
     // But a compounded value that is still ABOVE the floor is genuinely on the canvas: it keeps the
     // translucent treatment and stays NAMED, or the new zero gate would swallow every dimmed mark.
     const stillVisible = buildFrame({ barSegment: true });
