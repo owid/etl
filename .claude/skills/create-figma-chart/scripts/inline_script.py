@@ -35,6 +35,8 @@ from pathlib import Path
 
 SCRIPTS = Path(__file__).resolve().parent
 CAP = 50_000
+# Above this fraction of the cap, a sliceable script refuses to emit whole (see main()).
+CROWDED = 0.80
 # `// #region name` ... `// #endregion` mark independently-emittable row groups. Kept through
 # stripping, because --rows selects on them.
 REGION = re.compile(r"^//\s*#(region\s+\S+|endregion)\s*$")
@@ -137,6 +139,12 @@ def main() -> int:
         "--frame-id",
         help="rewrite CONFIG.frameId in the emitted source, so the output is ready to send as-is",
     )
+    ap.add_argument(
+        "--whole",
+        action="store_true",
+        # argparse runs help through %-formatting, so a literal percent sign must be doubled.
+        help=f"emit a sliceable script whole even when it is over {int(CROWDED * 100)}%% of the cap",
+    )
     args = ap.parse_args()
 
     if args.check:
@@ -197,6 +205,22 @@ def main() -> int:
             file=sys.stderr,
         )
         return 1
+
+    # Fitting is not the same as being safe to send. Near the cap the whole file has to be relayed
+    # verbatim through the model, and a one-character corruption there yields a WRONG VERDICT rather
+    # than an error — which is the failure this helper exists to prevent, not to enable. So refuse
+    # the whole-file path once it is this close and point at the slices, which are half the size.
+    if not args.rows and not args.whole and len(stripped) > CAP * CROWDED and select_rows(stripped, set())[1]:
+        pct = len(stripped) / CAP * 100
+        print(
+            f"{args.script} is {len(stripped):,} chars stripped — {pct:.0f}% of the {CAP:,} cap.\n"
+            "It fits, but relaying that much verbatim risks a silent corruption, and a corrupted\n"
+            "check reports a wrong verdict rather than failing. Use --rows instead (--list-rows\n"
+            "shows the groups; each is roughly half this). --whole overrides if you really mean it.",
+            file=sys.stderr,
+        )
+        return 1
+
     print(stripped)
     return 0
 

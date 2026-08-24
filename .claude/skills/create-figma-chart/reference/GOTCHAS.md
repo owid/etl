@@ -225,7 +225,22 @@
   server**: a convergence loop at 150 ms intervals spent the whole day's allowance in about three
   minutes, which is how this was discovered. And **the error is indistinguishable from a missing
   node** unless you read the message, so `scripts/figma_desktop_read.py` now names it and exits `2`
-  rather than reporting it as a wrong tab. Untested in a real chart build.
+  rather than reporting it as a wrong tab.
+
+  **Per-step verdict, so nobody has to re-derive it.** The question "should Steps 5, 8c and 9 default
+  to this path?" is closed, and the answer is no in all three — but for three different reasons, and
+  one of them leaves a door open:
+
+  | step | reads | verdict |
+  |---|---|---|
+  | **5** — page survey | `page.children` across N pages the run has not opened | **No.** Those are arbitrary pages of a ~200-page file; the app has not loaded them, so the replica reports them empty. This is the exact case constraint 5 describes. |
+  | **8c** — the checks | `verify_page.js` and `diff_against_template.js` | **No, and it could never be yes:** those are `use_figma` calls, and the desktop server has no `use_figma` at all. |
+  | **8c** — the pixel probes | screenshots after `visible` toggles, on the page in view | **The one qualifying case.** Property writes to an already-loaded page replicate reliably — the four-render arrow protocol works this way and reproduced its expected numbers. Still opt-in: preflight the actual node, and fall back on any doubt. |
+  | **9** — delivery renders | screenshots of frames just built | **No.** Structural writes; a render taken next call caught a half-built frame (33,784 bytes against 47,664). |
+
+  So the flow stays on the hosted connector, and this path is for a bulk survey of nodes that already
+  exist — plus, if you want it, the Step 8c probes on a page the designer has open. It has not been
+  used in a full chart build, and after the run that produced this entry, it is not expected to be.
 
 - **Downloading N screenshot URLs: parallelize, and pair each URL with its own output file.** Six
   serially is 2.7 s through a cloud sandbox's egress proxy, 0.8 s in parallel:
