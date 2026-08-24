@@ -960,6 +960,10 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const dAnc = row(await run(ancestry, {}), "colour-vision").detail;
     check("33 a marker's category is read from its group, not its leaf name",
           /#58ac8c carries (Peru \+ Nepal|Nepal \+ Peru)/.test(dAnc), dAnc);
+    // And the category is what LABELS the audit too. Left as the leaf name, a failing pair reads
+    // "Ellipse 12 vs Ellipse 12" and identifies nothing.
+    check("33 and it labels the audit, so --names never says Ellipse 12",
+          /--names '[^']*Peru/.test(dAnc) && !/Ellipse 12/.test(dAnc), dAnc);
     // But a choropleth puts every country in a bin into ONE colour by design, so the same note must
     // not fire on a map or it fires on every map.
     const sameBin = buildFrame({ mapCountries: true });
@@ -1007,7 +1011,9 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const named = buildFrame({ barSegment: true });
     renameMarks(named, "series__Chile");
     const d1 = row(await run(named, {}), "colour-vision").detail;
-    check("33 clean names DO produce --names", /--names 'series__Chile'/.test(d1), d1);
+    // The label is the CATEGORY the mark belongs to, not the node's raw name — `--names` exists so the
+    // audit's findings name the categories that need attention.
+    check("33 clean names DO produce --names, carrying the category", /--names 'Chile'/.test(d1), d1);
     check("33 and then no omission note is attached", !/--names omitted/.test(d1), d1);
     // And the reason given must be the real one, not the comma message reused for a missing name.
     const anon = buildFrame({ barSegment: true });

@@ -1000,7 +1000,7 @@ const checkFrame = async (frameId) => {
   // ---------------------------------------------------------------- declared gaps in coverage
 // #endregion
   // These two are owned by color_audit.py, which cannot run in here — this is a Figma plugin
-  // sandbox with no shell. But the palette it needs is already in `fills`, so emit the command
+  // sandbox with no shell. But the palette it needs is already on the canvas, so emit the command
   // ready to paste instead of a tool name to go and look up. A declared gap the operator has to
   // reconstruct by hand is the one most likely to be skipped for real.
   {
@@ -1018,8 +1018,12 @@ const checkFrame = async (frameId) => {
     // marker is a filled leaf called `Ellipse 12` — so reading it off `m.name` loses the category on
     // exactly the shape the collector already goes out of its way to preserve, and the clash note below
     // then cannot fire for those marks.
+    // The category is also the LABEL: `--names` exists so the audit's findings name the categories that
+    // need attention, and a marker's painted leaf is called `Ellipse 12`. Reporting a failing pair as
+    // "Ellipse 12 vs Ellipse 12" identifies nothing. Fall back to the node's own name only when there
+    // is no categorical ancestor. Map shapes keep their node names, which already carry the country.
     const marks = markBoxes.filter((m) => m.insidePlot && m.hex)
-      .map((m) => ({ id: m.name, hex: m.hex, cat: m.fromMap ? null : m.cat }));
+      .map((m) => ({ id: (m.fromMap ? null : m.cat) || m.name, hex: m.hex, cat: m.fromMap ? null : m.cat }));
     const seriesStrokes = stroked.filter((s) => s.insidePlot && !s.inFurniture && s.hex
                                                 && (s.seriesKind === "line" || s.seriesKind === "slope"))
       .map((s) => ({ id: s.seriesName, hex: s.hex, cat: s.seriesName }));

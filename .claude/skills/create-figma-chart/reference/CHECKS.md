@@ -6,16 +6,17 @@
 Every one of these caught a real defect on this skill's first run, and none of them is visible by looking at the frame. Run them as a pass, and report the numbers rather than "looks fine".
 
 > **⚠️ `verify_page.js` does not fit in a `use_figma` call as it ships.** The `code` argument caps at
-> **50,000 characters** and the file is **~84,000**, so the instruction below is not executable
+> **50,000 characters** and the file is **~94,000**, so the instruction below is not executable
 > verbatim — a run that pastes it is rejected. Emit it stripped instead:
 >
-> **Run it in slices — that is the supported path, and the only one.** Stripping the comments does
-> get it to ~48,000 characters, which parses (the helper is context-aware, so URLs, regex literals
-> and template strings survive). But 48,000 is **97% of the cap**, and all of it has to be relayed
-> verbatim, where a one-character corruption yields a *wrong verdict* rather than an error — the
-> exact failure this gate exists to catch. So `inline_script.py verify_page.js` with no `--rows`
-> now **refuses and exits 1**, naming the size and pointing here; `--whole` overrides it if you
-> genuinely mean to. The rows are grouped, each slice carries the shared preamble and runs alone:
+> **Run it in slices — that is the supported path, and the only one.** Stripping the comments used to
+> get it *just* under the cap (the helper is context-aware, so URLs, regex literals and template
+> strings survive), and even then it sat at 97%, all of which has to be relayed verbatim — where a
+> one-character corruption yields a *wrong verdict* rather than an error, the exact failure this gate
+> exists to catch. It has since grown past the cap outright: **52,206 stripped**. So
+> `inline_script.py verify_page.js` with no `--rows` **refuses and exits 1**, naming the size and
+> pointing here, and `--whole` no longer overrides that — the cap is now a hard floor for this
+> script, not a judgement call. The rows are grouped, each slice carries the shared preamble:
 >
 > ```bash
 > .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js --list-rows
@@ -24,13 +25,15 @@ Every one of these caught a real defect on this skill's first run, and none of t
 >
 > | group | rows | size |
 > |---|---|---|
-> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 46% of cap |
-> | `series` | series-weight, furniture-weight, furniture-dash | 40% |
-> | `geometry` | box-alignment, gap, margins, off-palette | 36% |
-> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 51% |
+> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 54% of cap |
+> | `series` | series-weight, furniture-weight, furniture-dash | 48% |
+> | `geometry` | box-alignment, gap, margins, off-palette | 44% |
+> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 59% |
 >
-> Groups combine (`--rows type,series`), so the whole pass is two calls. **Run all four** — each
-> reports its own rows and nothing else, so a group you skip is a group nobody checked.
+> Groups combine, so the whole pass is two calls: `--rows type,series` (34,167) then
+> `--rows geometry,annotations` (34,596, **69% of cap** — the figure `inline_script.py --check`
+> reports, since that larger call is the biggest thing anyone actually sends). **Run all four** —
+> each reports its own rows and nothing else, so a group you skip is a group nobody checked.
 > `diff_against_template.js` (~12,000 stripped) needs none of this.
 >
 > **Do NOT substitute a hand-rolled subset. It is worse than skipping the pass, and this is

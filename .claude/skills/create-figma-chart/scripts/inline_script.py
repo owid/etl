@@ -31,8 +31,10 @@ corrupts all three, and the corruption surfaces as a plugin syntax error with no
 from __future__ import annotations
 
 import argparse
+import itertools
 import re
 import sys
+from collections.abc import Iterator
 from pathlib import Path
 
 SCRIPTS = Path(__file__).resolve().parent
@@ -127,6 +129,12 @@ def _regex_allowed(out: list[str]) -> bool:
     return True
 
 
+def _proper_subsets(groups: list[str]) -> Iterator[tuple[str, ...]]:
+    """Every way to split `groups` into two non-empty calls, as the left half of each split."""
+    for size in range(1, len(groups)):
+        yield from itertools.combinations(groups, size)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("script", nargs="?", help="e.g. verify_page.js")
@@ -151,10 +159,16 @@ def main() -> int:
 
     if args.check:
         # What matters is the largest thing anyone actually SENDS, which for a script carrying
-        # #region markers is its biggest slice, not the whole file. Judging a sliceable script on
-        # its total would report a failure for a file that runs perfectly — verify_page.js sits a
-        # few hundred characters under the cap whole, and crossing it changes nothing about how it
-        # is used, because the whole-file path is already refused above CROWDED.
+        # #region markers is a slice, not the whole file. Judging a sliceable script on its total
+        # would report a failure for a file that runs perfectly — verify_page.js is now PAST the cap
+        # whole, and that changes nothing about how it is used, because the whole-file path is
+        # already refused above CROWDED.
+        #
+        # But the largest SINGLE group is not the answer either: `--rows` combines groups, and the
+        # documented pass is two calls covering all of them (CHECKS.md), so nobody sends one slice at
+        # a time. Measure that two-call partition — the split that minimises its larger call, which is
+        # what following the doc produces. Enumerating the subsets is fine: these are hand-authored
+        # #region markers and there is a handful of them per script.
         failed = False
         print(f"{'script':<30} {'raw':>8} {'stripped':>9} {'sent':>9} {'of cap':>8}")
         for p in sorted(SCRIPTS.glob("*.js")):
@@ -162,9 +176,18 @@ def main() -> int:
                 continue
             stripped = strip_js(p.read_text())
             groups = list(dict.fromkeys(select_rows(stripped, set())[1]))
-            if groups:
-                sent = max(len(select_rows(stripped, {g})[0]) for g in groups)
-                how = f"  (largest of {len(groups)} slices)"
+            if len(groups) > 1:
+                sent = min(
+                    max(
+                        len(select_rows(stripped, set(left))[0]),
+                        len(select_rows(stripped, set(groups) - set(left))[0]),
+                    )
+                    for left in _proper_subsets(groups)
+                )
+                how = f"  (larger call of the best 2-way split of {len(groups)} slices)"
+            elif groups:
+                sent = len(select_rows(stripped, set(groups))[0])
+                how = "  (its only slice)"
             else:
                 sent = len(stripped)
                 how = ""
