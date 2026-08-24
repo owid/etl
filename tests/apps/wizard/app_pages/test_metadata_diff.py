@@ -1984,3 +1984,73 @@ def test_mdim_tree_link_survives_the_hash_in_a_catalog_path():
     assert "diff-type=mdims" in url
     # No doubled slash: SOURCE.wizard_url already ends in one.
     assert "//metadata-diff" not in url
+
+
+def test_chart_config_text_is_compared_because_the_indicator_row_never_carries_it():
+    """A `presentation.grapher_config` edit lands in the chart's config, not in the `variables` row.
+
+    Measured on a live staging server: editing two shared definitions moved the subtitle of 15 published
+    charts and the footnote of 14, while `variables` matched the new text zero times. The Charts section
+    read only `variables`, so those edits were not under-reported — they were invisible.
+    """
+    from apps.wizard.app_pages.metadata_diff.discovery import compare_chart_texts
+
+    source = {
+        "reworded": {"chartId": 1, "slug": "reworded", "title": "T", "subtitle": "New wording", "note": "N"},
+        "same-wording": {"chartId": 2, "slug": "same-wording", "title": "T", "subtitle": "New wording", "note": "N"},
+        "untouched": {"chartId": 3, "slug": "untouched", "title": "T", "subtitle": "Old wording", "note": "N"},
+        "brand-new": {"chartId": 4, "slug": "brand-new", "title": "T", "subtitle": "Whatever", "note": "N"},
+    }
+    target = {
+        "reworded": {"slug": "reworded", "title": "T", "subtitle": "Old wording", "note": "N"},
+        "same-wording": {"slug": "same-wording", "title": "T", "subtitle": "Old wording", "note": "N"},
+        "untouched": {"slug": "untouched", "title": "T", "subtitle": "Old wording", "note": "N"},
+        # "brand-new" is absent from the baseline.
+    }
+
+    changes = compare_chart_texts(source, target)
+
+    assert sorted(changes.diffs) == ["reworded", "same-wording"]
+    assert "untouched" not in changes.diffs, "an identical chart is not a change"
+    # A chart the baseline does not publish is a new chart, which is chart-diff's subject, not this one's.
+    assert "brand-new" not in changes.diffs
+
+    diff = changes.diffs["reworded"]
+    assert set(diff.fields) == {"chart.subtitle"}
+    assert diff.fields["chart.subtitle"] == {"old": "Old wording", "new": "New wording"}
+
+    # Each chart is a view keyed by its slug, so the two charts saying the same thing group into one
+    # change — which is what a shared `definitions.*` edit produces.
+    groups = group_changes(changes.view_diffs())
+    assert len(groups) == 1
+    assert sorted(d["chart"] for d in groups[0].view_dims) == ["reworded", "same-wording"]
+
+    # The charts are carried on the change itself: a chart-level edit reaches exactly these charts,
+    # rather than everything that renders some indicator.
+    assert changes.charts["reworded"]["chartId"] == 1
+    assert changes.charts["reworded"]["has_data_page"] is True, "a chart's own text is on its canvas"
+
+
+def test_chart_text_changes_need_the_dataset_to_be_in_scope_and_rebuilt(monkeypatch):
+    """The same two signals the indicator layer uses, or a chart master rebuilt would read as ours."""
+    from apps.wizard.app_pages.metadata_diff import discovery
+
+    calls = {}
+
+    def fake_rows(engine, dataset_paths):
+        calls["paths"] = list(dataset_paths)
+        return {}
+
+    monkeypatch.setattr(discovery, "chart_text_rows", fake_rows)
+    monkeypatch.setattr(discovery, "chart_text_rows_by_slug", lambda engine, slugs: {})
+
+    scope = BranchScope(dataset_paths={"grapher/ns/2026-01-01/in_scope", "grapher/ns/2026-01-01/not_built"})
+    built = {"ns/2026-01-01/in_scope"}
+    discovery.changed_chart_texts("src", "tgt", scope, built)  # type: ignore[arg-type]
+    assert calls["paths"] == ["grapher/ns/2026-01-01/in_scope"], "only datasets both in scope and rebuilt here"
+
+    # With no git scope there is nothing to narrow by, and the caller is told so rather than shown a list
+    # that would include everything master has moved on since.
+    unavailable = BranchScope(available=False)
+    out = discovery.changed_chart_texts("src", "tgt", unavailable, built)  # type: ignore[arg-type]
+    assert out.diffs == {} and out.narrowed is False

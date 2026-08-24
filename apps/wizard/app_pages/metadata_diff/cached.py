@@ -160,6 +160,19 @@ def indicator_attribution(
     return discovery.attribute_indicator_changes(_source_engine, _target_engine, list(catalog_paths), master_engine())
 
 
+@st.cache_data(ttl=CACHE_TTL, show_spinner="Checking the charts' own config text…")
+def chart_text_changes(
+    _source_engine: Engine, _target_engine: Engine, cache_key: str = ""
+) -> discovery.ChartTextChanges:
+    """Published charts whose own config text (title / subtitle / footnote) this branch changed.
+
+    A `presentation.grapher_config` edit in a garden step lands in the chart's resolved config and never
+    touches the `variables` row, so it needs its own comparison — the indicator-layer one cannot see it.
+    """
+    scope, built = shared_facts(_source_engine, cache_key=cache_key)
+    return discovery.changed_chart_texts(_source_engine, _target_engine, scope, built)
+
+
 @st.cache_data(ttl=CACHE_TTL, show_spinner="Finding explorer views whose text changed…")
 def explorer_changes(_source_engine: Engine, _target_engine: Engine, cache_key: str = "") -> discovery.ExplorerChanges:
     """Published explorers whose view text changed, split into this branch's and baseline lag."""
@@ -202,6 +215,7 @@ def clear_discovery_caches() -> None:
     """
     for cached_fn in (
         summary,
+        chart_text_changes,
         mdim_changes,
         mdim_view_diffs,
         indicator_changes,

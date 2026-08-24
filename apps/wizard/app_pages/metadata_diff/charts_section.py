@@ -16,8 +16,8 @@ from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.metadata_diff import cached, datapage, mdim_pages
 from apps.wizard.app_pages.metadata_diff.core import (
+    CHART_FIELD_PREFIX,
     ChangeGroup,
-    affected_charts,
     affected_drafts,
     charts_in_reading_order,
     distinct_garden_datasets,
@@ -53,7 +53,10 @@ def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -
     st.markdown(DIFF_CSS, unsafe_allow_html=True)
 
     changed = cached.indicator_changes(source_engine, target_engine)
-    groups = group_changes(changed.view_diffs())
+    chart_text = cached.chart_text_changes(source_engine, target_engine)
+    # Indicator-layer changes first, then the charts' own config text. Grouped separately because the two
+    # carry their affected charts differently, then reviewed as one list.
+    groups = group_changes(changed.view_diffs()) + group_changes(chart_text.view_diffs())
     usage = cached.usage_for_indicators(tuple(changed.ids_list), "", source_engine)
     attribution = cached.indicator_attribution(source_engine, target_engine, tuple(changed.paths))
 
@@ -71,10 +74,16 @@ def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -
         return
 
     marks = resolve_marks(source_engine, SURFACE, groups)
-    n_charts = len({c["chartId"] for g in groups for c in affected_charts(g, usage)})
+    reached = {c["chartId"] for g in groups for c in _group_charts(g, usage, chart_text)}
+    n_charts = len(reached)
+    authored = f"**{len(changed.diffs)} indicator{'s' if len(changed.diffs) != 1 else ''}**"
+    if chart_text.diffs:
+        # Said separately because it is a different edit to make: one is the indicator's metadata, the
+        # other is the chart's own config (`presentation.grapher_config` in the garden step).
+        authored += f" and the config of **{len(chart_text.diffs)} chart{'s' if len(chart_text.diffs) != 1 else ''}**"
     st.markdown(
         f"**{len(groups)} text change{'s' if len(groups) != 1 else ''}** on "
-        f"**{len(changed.diffs)} indicator{'s' if len(changed.diffs) != 1 else ''}**, reaching "
+        f"{authored}, reaching "
         f"**{n_charts} published chart{'s' if n_charts != 1 else ''}** · "
         f"{n_reviewed(marks)}/{len(marks)} reviewed",
         help="Reviewed is your own progress marker — it is stored on this staging server, resets if the "
@@ -87,7 +96,7 @@ def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -
         pagination.show_controls()
 
     for mark in pagination.get_page_items():
-        _render_change(source_engine, mark, usage, attribution)
+        _render_change(source_engine, mark, usage, attribution, chart_text)
 
     if len(marks) > CHANGES_PER_PAGE:
         pagination.show_controls(position="bottom")
@@ -131,11 +140,23 @@ def _extra_notes(changed) -> None:
     )
 
 
+def _group_charts(g: ChangeGroup, usage: dict, chart_text) -> list[dict[str, Any]]:
+    """The published charts one change lands on, from wherever that change knows them.
+
+    An indicator-layer change reaches whatever renders the indicator, so its charts come from `usage`. A
+    chart-level change *is* a set of charts — each one a view keyed by its slug — so it carries its own.
+    """
+    if g.field.startswith(CHART_FIELD_PREFIX):
+        return [chart_text.charts[d["chart"]] for d in g.view_dims if d.get("chart") in chart_text.charts]
+    return group_usage(g, usage)["charts"]
+
+
 def _render_change(
     source_engine: Engine,
     mark,
     usage: dict[int, dict[str, list[dict[str, Any]]]],
     attribution: dict[str, str],
+    chart_text=None,
 ) -> None:
     """One distinct text change: what changed, where it appears, and what it reaches."""
     g: ChangeGroup = mark.group
@@ -144,8 +165,8 @@ def _render_change(
     # doubles every shared change and leaves neither section answering its own question.
     # Every chart using the indicator counts: its readers see the new text either on the chart's data page
     # or through "Learn more about this data". The list below groups them; neither group is deducted.
-    charts = group_usage(g, usage)["charts"]
-    drafts = affected_drafts(g, usage)
+    charts = _group_charts(g, usage, chart_text) if chart_text is not None else group_usage(g, usage)["charts"]
+    drafts = [] if g.field.startswith(CHART_FIELD_PREFIX) else affected_drafts(g, usage)
 
     plural = "s" if len(charts) != 1 else ""
     # Drafts sit outside the reach count and are named in the label, so "10 charts" keeps meaning

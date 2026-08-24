@@ -30,6 +30,7 @@ from sqlalchemy.orm import Session
 from structlog import get_logger
 
 from apps.wizard.app_pages.metadata_diff.core import (
+    CHART_FIELDS,
     ChangeGroup,
     ViewDiff,
     build_view_bundle,
@@ -41,6 +42,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     surface_key,
 )
 from apps.wizard.app_pages.metadata_diff.data import (
+    _chunked,
     _load_configs,
     build_env_bundles,
     fetch_variable_paths,
@@ -543,6 +545,152 @@ def changed_indicators(
     return out
 
 
+@dataclass
+class ChartTextChanges:
+    """Published charts whose own config text differs from the baseline."""
+
+    # slug -> the diff of its chart-level fields (title / subtitle / note).
+    diffs: dict[str, ViewDiff] = field(default_factory=dict)
+    # slug -> {chartId, slug}, for the reach lists and the links.
+    charts: dict[str, dict[str, Any]] = field(default_factory=dict)
+    # False when the branch's scope could not be read, so the caller can say the list is unfiltered.
+    narrowed: bool = True
+
+    def view_diffs(self) -> list[ViewDiff]:
+        return [self.diffs[slug] for slug in sorted(self.diffs)]
+
+
+def chart_text_rows(engine: Engine, dataset_paths: list[str]) -> dict[str, dict[str, Any]]:
+    """Resolved title/subtitle/note of every published chart rendering one of these datasets, by slug.
+
+    The *resolved* config, so a value the chart inherits from its indicator's `grapher_config` is already
+    baked in — which is the whole point: that is where a garden-authored subtitle ends up, and it is not
+    in the `variables` row at all.
+    """
+    if not dataset_paths:
+        return {}
+    cfg = "config"
+    clauses, params = [], {}
+    for i, path in enumerate(sorted(set(dataset_paths))):
+        clauses.append(f"v.catalogPath like %(p{i})s")
+        params[f"p{i}"] = f"{path}%"
+    df = read_sql(
+        f"""
+        select distinct c.id as chartId,
+               cc.slug as slug,
+               cc.{cfg} ->> '$.title' as title,
+               cc.{cfg} ->> '$.subtitle' as subtitle,
+               cc.{cfg} ->> '$.note' as note
+        from charts c
+        join chart_configs cc on cc.id = c.configId
+        join chart_dimensions cd on cd.chartId = c.id
+        join variables v on v.id = cd.variableId
+        where c.publishedAt is not null
+          and cc.slug is not null
+          and ({" or ".join(clauses)})
+        """,
+        engine=engine,
+        params=params,
+    )
+    return {str(r["slug"]): {str(k): v for k, v in r.items()} for r in df.to_dict("records")}
+
+
+def chart_text_rows_by_slug(engine: Engine, slugs: list[str]) -> dict[str, dict[str, Any]]:
+    """The same three fields for named slugs, for the other side of the comparison.
+
+    By slug, not by dataset: the baseline may not carry the branch's datasets at all (a new step), and the
+    question here is only what the chart said before.
+    """
+    if not slugs:
+        return {}
+    cfg = "config"
+    rows: dict[str, dict[str, Any]] = {}
+    for chunk in _chunked(sorted(set(slugs))):
+        placeholders = ", ".join(["%s"] * len(chunk))
+        df = read_sql(
+            f"""
+            select cc.slug as slug,
+                   cc.{cfg} ->> '$.title' as title,
+                   cc.{cfg} ->> '$.subtitle' as subtitle,
+                   cc.{cfg} ->> '$.note' as note
+            from charts c
+            join chart_configs cc on cc.id = c.configId
+            where c.publishedAt is not null and cc.slug in ({placeholders})
+            """,
+            engine=engine,
+            params=tuple(chunk),
+        )
+        for record in df.to_dict("records"):
+            rows[str(record["slug"])] = {str(k): v for k, v in record.items()}
+    return rows
+
+
+def compare_chart_texts(
+    source_rows: dict[str, dict[str, Any]],
+    target_rows: dict[str, dict[str, Any]],
+) -> ChartTextChanges:
+    """Pure comparison of chart-level text, one ViewDiff per chart.
+
+    Each chart is treated as a view whose only dimension is its slug, so `group_changes` collapses charts
+    that say the same thing into one change — which is what a shared `definitions.*` edit produces — and
+    the existing renderers, brief and reach model need no chart-specific branch.
+    """
+    out = ChartTextChanges()
+    for slug, src_row in source_rows.items():
+        target_row = target_rows.get(slug)
+        if target_row is None:
+            # A chart the baseline does not publish is not a text change; it is a new chart, and
+            # chart-diff is where a new chart belongs.
+            continue
+        src = build_view_bundle(
+            view={"dimensions": {"chart": slug}},
+            config_metadata=None,
+            variable_row=None,
+            chart_config={key: src_row.get(key) for key in CHART_FIELDS},
+        )
+        tgt = build_view_bundle(
+            view={"dimensions": {"chart": slug}},
+            config_metadata=None,
+            variable_row=None,
+            chart_config={key: target_row.get(key) for key in CHART_FIELDS},
+        )
+        diff = diff_views([src], [tgt])[0]
+        if diff.changed:
+            out.diffs[slug] = diff
+            out.charts[slug] = {
+                "chartId": int(src_row["chartId"]) if src_row.get("chartId") is not None else None,
+                "slug": slug,
+                "has_data_page": True,  # a chart's own text is on its canvas, never behind the drawer
+                "is_published": True,
+            }
+    return out
+
+
+def changed_chart_texts(
+    source_engine: Engine,
+    target_engine: Engine,
+    scope: BranchScope | None = None,
+    built: set[str] | None = None,
+) -> ChartTextChanges:
+    """Charts whose own config text this branch changed.
+
+    Restricted the same way indicator changes are: the chart must render a dataset in the branch's git
+    scope that this server rebuilt. Without both, a chart master rebuilt would read as this branch's work.
+    """
+    scope = scope if scope is not None else branch_scope()
+    built = built if built is not None else datasets_built_here(source_engine)
+    if not scope.available:
+        return ChartTextChanges(narrowed=False)
+
+    in_play = sorted({p for p in scope.dataset_paths if _dataset_of(p) in built})
+    if not in_play:
+        return ChartTextChanges()
+
+    source_rows = chart_text_rows(source_engine, in_play)
+    target_rows = chart_text_rows_by_slug(target_engine, list(source_rows))
+    return compare_chart_texts(source_rows, target_rows)
+
+
 def dataset_edit_times(engine: Engine) -> dict[str, Any]:
     """Dataset catalogPath (`ns/version/short`) -> when its metadata was last edited in this environment."""
     df = read_sql(
@@ -1011,6 +1159,10 @@ class Summary:
     """Counts behind the section badges and the owidbot report."""
 
     n_charts: int = 0  # published charts rendering a changed indicator text
+    # Charts whose own config text changed — a garden `presentation.grapher_config` edit lands there and
+    # never touches the `variables` row, so it needs its own comparison and its own count.
+    n_chart_text_changes: int = 0
+    n_charts_own_text: int = 0
     # Per changed text, every surface it lands on. Powers the Blast radius section; `mdims_resolved`
     # False means its MDim rows are incomplete, for the same reason the MDim count is a ceiling.
     reach: list["ChangeReach"] = field(default_factory=list)
@@ -1072,6 +1224,7 @@ class Summary:
         return bool(
             self.n_chart_changes
             or self.n_indicators
+            or self.n_chart_text_changes
             or self.n_charts
             or self.n_mdims
             or self.n_explorers
@@ -1360,6 +1513,7 @@ def summarize(
             if explorers is None
             else None
         )
+        pending_chart_text = pool.submit(changed_chart_texts, source_engine, target_engine, scope, built)
 
     # --- Charts (indicator layer) ---
     try:
@@ -1396,6 +1550,27 @@ def summarize(
     except Exception as e:  # noqa: BLE001 — a broken surface must not blank the whole report
         log.warning("metadata_diff.chart_discovery_failed", error=str(e))
         summary.warnings.append(f"Chart discovery failed: {e}")
+
+    # --- Charts (their own config text) ---
+    try:
+        chart_text = pending_chart_text.result()
+        chart_text_groups = group_changes(chart_text.view_diffs())
+        summary.n_chart_text_changes = len(chart_text_groups)
+        summary.n_charts_own_text = len(chart_text.diffs)
+        _collect_changes(seen, chart_text_groups)
+        charts_surface = surface_key("charts", "indicators")
+        summary.review_keys.setdefault("charts", []).extend(
+            (charts_surface, *mark_identity(charts_surface, g)) for g in chart_text_groups
+        )
+        for g in chart_text_groups:
+            # The affected charts are the group's own membership: each chart is a view keyed by its slug.
+            slot = _reach_slot(reach, g)
+            slot.charts.extend(
+                chart_text.charts[dims["chart"]] for dims in g.view_dims if dims.get("chart") in chart_text.charts
+            )
+    except Exception as e:  # noqa: BLE001
+        log.warning("metadata_diff.chart_text_discovery_failed", error=str(e))
+        summary.warnings.append(f"Chart text discovery failed: {e}")
 
     # --- MDims ---
     try:
