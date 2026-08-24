@@ -278,7 +278,7 @@ OWID_ENV.read_sql("""
 """, params={"s": "<short_name>"})
 # charts using it — slug lives on chart_configs, not charts
 OWID_ENV.read_sql("""
-  SELECT c.id, cc.slug, cc.full->>'$.title' AS title
+  SELECT c.id, cc.slug, cc.config->>'$.title' AS title
   FROM charts c JOIN chart_dimensions cd ON cd.chartId=c.id
   JOIN chart_configs cc ON cc.id=c.configId
   WHERE cd.variableId=%(v)s

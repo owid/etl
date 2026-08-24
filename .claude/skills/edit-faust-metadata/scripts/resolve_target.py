@@ -115,8 +115,10 @@ def load_chart(env: OWIDEnv, *, chart_id: int | None = None, slug: str | None = 
     where = "c.id = %(chart_id)s" if chart_id is not None else "cc.slug = %(slug)s"
     df = env.read_sql(
         f"""
-        SELECT c.id, cc.slug, c.publishedAt, c.isInheritanceEnabled, cc.patch
-        FROM charts c JOIN chart_configs cc ON c.configId = cc.id
+        SELECT c.id, cc.slug, c.publishedAt, c.isInheritanceEnabled, pc.config AS patch
+        FROM charts c
+        JOIN chart_configs cc ON c.configId = cc.id
+        JOIN chart_configs pc ON c.patchConfigId = pc.id
         WHERE {where}
         ORDER BY (c.publishedAt IS NULL), c.id
         """,
@@ -131,8 +133,7 @@ def load_chart(env: OWIDEnv, *, chart_id: int | None = None, slug: str | None = 
     variables = env.read_sql(
         """
         SELECT cd.property, cd.`order`, v.id AS variable_id, v.catalogPath,
-               v.grapherConfigIdETL IS NOT NULL AS has_etl_config,
-               v.grapherConfigIdAdmin IS NOT NULL AS has_admin_config
+               v.patchConfigIdETL IS NOT NULL AS has_etl_config
         FROM chart_dimensions cd JOIN variables v ON cd.variableId = v.id
         WHERE cd.chartId = %(chart_id)s
         ORDER BY cd.property, cd.`order`
@@ -216,7 +217,7 @@ def match_mdim_view(config: dict, query: dict[str, str]) -> dict[str, Any]:
 
 def load_indicator(env: OWIDEnv, catalog_path: str) -> dict | None:
     df = env.read_sql(
-        "SELECT id, catalogPath, grapherConfigIdETL IS NOT NULL AS has_etl_config FROM variables "
+        "SELECT id, catalogPath, patchConfigIdETL IS NOT NULL AS has_etl_config FROM variables "
         "WHERE catalogPath = %(cp)s",
         params={"cp": catalog_path},
     )
@@ -424,7 +425,7 @@ def print_human(result: dict[str, Any]) -> None:
         for v in chart["variables"]:
             print(
                 f"  [{v['property']}] id={v['variable_id']} etl_config={bool(v['has_etl_config'])} "
-                f"admin_config={bool(v['has_admin_config'])} {v['catalogPath']}"
+                f"{v['catalogPath']}"
             )
     mdim = result.get("mdim")
     if mdim:
