@@ -72,6 +72,32 @@ DECILES_THR = {
     "p99_999p100": "Richest 0.001%",
 }
 
+# Define the WID balance sheet codes of the households and NPISH sector combined (which WID calls
+# the private sector) and their new names. See https://wid.world/codes-dictionary/#aggregate-wealth
+WEALTH_TYPES = {
+    "pweal": "net_wealth",
+    "pwdeb": "debt",
+    "pwhou": "housing_and_land",
+}
+
+# WID publishes financial assets and business assets separately. We combine them into one category,
+# following the definition the GC Wealth Project uses for the household wealth portfolio.
+WEALTH_TYPES_COMBINED = {"financial_and_business_assets": ["pwfin", "pwbus"]}
+
+# Tolerance for the balance sheet identity, net wealth = assets - liabilities, in ratios to national
+# income. WID rounds each series to four decimals, so four components can differ from the total by
+# up to about 0.0005.
+WEALTH_IDENTITY_TOLERANCE = 0.001
+
+# Minimum share of rows the identity above must be checked on. Net wealth goes back to 1800 while the
+# components start in 1980, so about half the rows can be checked; well below that means the
+# components stopped being reported and the check has gone vacuous.
+WEALTH_IDENTITY_MIN_COVERAGE = 0.4
+
+# Largest plausible ratio of wealth to national income, as a fraction. Used to catch a rescaling
+# upstream: the highest value WID reports is under 10.
+WEALTH_RATIO_MAX = 15
+
 # Define decile for avg and share and their new names
 DECILES_AVG_SHARE = {
     "p0p10": "1",
@@ -104,6 +130,7 @@ def run() -> None:
     tb_distribution = ds_meadow.read("world_inequality_database_distribution")
     tb_distribution_extrapolated = ds_meadow.read("world_inequality_database_distribution_with_extrapolations")
     tb_fiscal = ds_meadow.read("world_inequality_database_fiscal")
+    tb_aggregate_wealth = ds_meadow.read("world_inequality_database_aggregate_wealth")
 
     #
     # Process data.
@@ -116,6 +143,8 @@ def run() -> None:
     tb_inequality, tb_incomes = make_table_long_and_separate(tb=tb)
 
     tb_distribution = format_percentiles_table(tb=tb_distribution)
+
+    tb_wealth_aggregates = make_wealth_aggregates_table(tb=tb_aggregate_wealth)
 
     # Add relative poverty values to inequality table
     tb_relative_poverty = add_relative_poverty(
@@ -158,6 +187,9 @@ def run() -> None:
         ["country", "year", "welfare_type", "p", "percentile", "extrapolated"], short_name="distribution"
     )
     tb_fiscal = tb_fiscal.format(["country", "year"], short_name="fiscal_income")
+    tb_wealth_aggregates = tb_wealth_aggregates.format(
+        ["country", "year", "wealth_type"], short_name="wealth_aggregates"
+    )
 
     #
     # Save outputs.
@@ -170,6 +202,7 @@ def run() -> None:
             tb_relative_poverty,
             tb_distribution,
             tb_fiscal,
+            tb_wealth_aggregates,
         ],
         default_metadata=ds_meadow.metadata,
         repack=False,
@@ -343,6 +376,124 @@ def format_percentiles_table(tb: Table) -> Table:
     tb["welfare_type"] = tb["welfare_type"].replace(WELFARE_TYPES)
 
     return tb
+
+
+def make_wealth_aggregates_table(tb: Table) -> Table:
+    """
+    Build the wealth composition table of the households and NPISH sector combined, as a share of
+    national income. WID reports financial and business assets separately, so they are added up here.
+    """
+    tb = tb.copy()
+
+    # These series carry no percentile, age or population dimension, so make sure they are constant
+    # before dropping them.
+    for column, expected in [("percentile", "p0p100"), ("age", 999), ("pop", "i")]:
+        values = set(tb[column].unique())
+        assert values == {expected}, f"Unexpected {column} values in the aggregate wealth table: {values}"
+    tb = tb.drop(columns=["percentile", "age", "pop"], errors="raise")
+
+    # WID codes are built as a one-letter series type, a five-letter concept, a three-digit age code
+    # and a one-letter population unit. See https://wid.world/codes-dictionary/#one-letter-code
+    series_types = set(tb["variable"].str[0].unique())
+    assert series_types == {"w"}, (
+        f"Only ratios to national income (series type 'w') are expected here, but found: {series_types}"
+    )
+    tb["concept"] = tb["variable"].str[1:6]
+
+    concepts_expected = set(WEALTH_TYPES.keys()) | {
+        concept for concepts in WEALTH_TYPES_COMBINED.values() for concept in concepts
+    }
+    concepts_available = set(tb["concept"].unique())
+    assert concepts_available == concepts_expected, (
+        f"Unexpected WID concepts in the aggregate wealth table: {concepts_available ^ concepts_expected}"
+    )
+
+    # Make the table wide, to combine concepts and to check the balance sheet identity
+    tb_wide = tb.pivot(index=["country", "year"], columns="concept", values="value", join_column_levels_with="_")
+
+    # Add up the concepts that form a single category. This keeps missing values missing: a country
+    # reporting only one of the two components does not get a partial total.
+    for wealth_type, concepts in WEALTH_TYPES_COMBINED.items():
+        tb_wide[wealth_type] = tb_wide[concepts].sum(axis=1, min_count=len(concepts))
+
+    tb_wide = tb_wide.rename(columns=WEALTH_TYPES, errors="raise")
+    tb_wide = tb_wide.drop(
+        columns=[concept for concepts in WEALTH_TYPES_COMBINED.values() for concept in concepts], errors="raise"
+    )
+
+    sanity_checks_wealth_aggregates(tb=tb_wide)
+
+    # Make the table long again, with the wealth categories as a dimension
+    wealth_types = list(WEALTH_TYPES.values()) + list(WEALTH_TYPES_COMBINED.keys())
+    tb_long = tb_wide.melt(
+        id_vars=["country", "year"],
+        value_vars=wealth_types,
+        var_name="wealth_type",
+        value_name="share_of_national_income",
+    )
+    tb_long = tb_long.dropna(subset=["share_of_national_income"]).reset_index(drop=True)
+
+    # WID reports these ratios as fractions of national income
+    tb_long["share_of_national_income"] *= 100
+
+    # Copy origins from the original table, because pivoting and melting drops them
+    for col in tb_long.columns:
+        tb_long[col].m.origins = tb["value"].m.origins
+
+    return tb_long
+
+
+def sanity_checks_wealth_aggregates(tb: Table) -> None:
+    """
+    Check the wealth composition table against WID's own balance sheet identity and against the
+    signs each category can take.
+    """
+    # Net wealth is assets minus liabilities, so the categories must reconcile with the total
+    identity_gap = (
+        tb["net_wealth"] - (tb["housing_and_land"] + tb["financial_and_business_assets"] - tb["debt"])
+    ).abs()
+    worst = tb[identity_gap > WEALTH_IDENTITY_TOLERANCE]
+    assert worst.empty, (
+        f"Net wealth does not match housing and land + financial and business assets - debt for "
+        f"{len(worst)} rows (largest gap: {identity_gap.max():.6f}, tolerance: "
+        f"{WEALTH_IDENTITY_TOLERANCE}): {sorted(set(worst['country']))}"
+    )
+
+    # The identity above can only be checked where all four categories exist, and net wealth reaches
+    # much further back than the components do. Guard against the check going vacuous if a future
+    # update stops reporting the components.
+    checked = identity_gap.notna().sum()
+    assert checked / len(tb) > WEALTH_IDENTITY_MIN_COVERAGE, (
+        f"The balance sheet identity could only be checked on {checked} of {len(tb)} rows. "
+        f"The asset and liability components look missing."
+    )
+
+    # These are ratios to national income, still as fractions at this point. No sector has ever held
+    # wealth worth 15 years of national income, so anything larger means a units mistake upstream.
+    for column in list(WEALTH_TYPES.values()) + list(WEALTH_TYPES_COMBINED.keys()):
+        largest = tb[column].abs().max()
+        assert largest < WEALTH_RATIO_MAX, (
+            f"{column} reaches {largest:.2f} times national income — the ratios look rescaled."
+        )
+
+    # Assets and liabilities are always positive. Net wealth is the only category that can be
+    # negative, when a sector owes more than it owns.
+    for column in ["debt", "housing_and_land", "financial_and_business_assets"]:
+        negative = tb[tb[column] < 0]
+        assert negative.empty, (
+            f"Negative values found in {column}: {sorted(set(negative['country']))} "
+            f"({negative['year'].min()}-{negative['year'].max()})"
+        )
+
+    assert not tb.duplicated(subset=["country", "year"]).any(), "Duplicate country-year rows in the wealth table."
+
+    # Report coverage per category, to make regressions between updates visible
+    for column in list(WEALTH_TYPES.values()) + list(WEALTH_TYPES_COMBINED.keys()):
+        available = tb.dropna(subset=[column])
+        paths.log.info(
+            f"{column}: {len(available)} rows, {available['country'].nunique()} countries and regions, "
+            f"{available['year'].min()}-{available['year'].max()}"
+        )
 
 
 def add_relative_poverty(tb_inequality: Table, tb_incomes: Table, tb_distribution: Table) -> Table:

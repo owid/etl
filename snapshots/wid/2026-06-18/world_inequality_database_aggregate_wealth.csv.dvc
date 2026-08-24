@@ -1,0 +1,23 @@
+meta:
+  origin:
+    producer: World Inequality Database (WID.world)
+    title: World Inequality Database (WID)
+    description: |-
+      The World Inequality Database (WID.world) aims to provide open and convenient access to the most extensive available database on the historical evolution of the world distribution of income and wealth, both within countries and between countries.
+    title_snapshot: World Inequality Database (WID) - Aggregate wealth of households and NPISH
+    description_snapshot: |-
+      The balance sheet of the households and NPISH sector combined, which WID refers to as the private sector: net wealth, liabilities, housing assets, business and other non-financial assets, and financial assets.
+
+      Each series is reported as a ratio to net national income.
+    citation_full: World Inequality Database (WID), https://wid.world
+    attribution_short: WID
+    url_main: https://wid.world
+    date_accessed: '2026-08-24'
+    date_published: '2026'
+    license:
+      name: CC BY 4.0
+      url: https://wid.world/
+outs:
+  - md5: 602b9e9f712c63de7a020c4548799b26
+    size: 3146750
+    path: world_inequality_database_aggregate_wealth.csv

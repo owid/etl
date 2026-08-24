@@ -190,6 +190,9 @@ def run() -> None:
 
     # Load regions table
     ds_regions = paths.load_dataset("regions")
+    # NOTE: Kept as a subscript read on purpose. `ds_regions.read("regions")` returns nullable string
+    # dtypes, which stops the merge below from matching and makes unmatched rows read "<NA>" instead of
+    # the "nan" sentinel harmonize_countries filters on. Modernizing this needs that sentinel fixed too.
     tb_regions = ds_regions["regions"].reset_index()
 
     #
@@ -238,9 +241,26 @@ def run() -> None:
     )
     tb_fiscal = tb_fiscal.format(short_name="world_inequality_database_fiscal")
 
+    # Add aggregate wealth data.
+    # NOTE: This snapshot is long (one row per WID code) and has no extrapolated counterpart, so it
+    # does not go through SNAPSHOTS_DICT above.
+    snap_aggregate_wealth = paths.load_snapshot("world_inequality_database_aggregate_wealth.csv")
+    tb_aggregate_wealth = snap_aggregate_wealth.read(keep_default_na=False, na_values=NA_VALUES)
+
+    # Harmonize countries
+    tb_aggregate_wealth = harmonize_countries(
+        tb=tb_aggregate_wealth, tb_regions=tb_regions, codes_missing=CODES_MISSING, codes_excluded=CODES_EXCLUDED
+    )
+    tb_aggregate_wealth = tb_aggregate_wealth.format(
+        ["country", "year", "variable"], short_name="world_inequality_database_aggregate_wealth"
+    )
+
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = paths.create_dataset(
-        tables=tables + [tb_fiscal], check_variables_metadata=True, default_metadata=snap_main.metadata, repack=False
+        tables=tables + [tb_fiscal, tb_aggregate_wealth],
+        check_variables_metadata=True,
+        default_metadata=snap_main.metadata,
+        repack=False,
     )
 
     # Save changes in the new meadow dataset.
@@ -263,9 +283,9 @@ def harmonize_countries(tb: Table, tb_regions: Table, codes_missing: dict, codes
     for x, y in codes_missing.items():
         tb.loc[tb["country"] == x, "name"] = y
 
-    # Create list of unmatched entitites
+    # Create list of unmatched entities
     missing_list = list(tb[tb["name"] == "nan"]["country"].unique())
-    # Substract excluded from missing_list
+    # Subtract excluded from missing_list
     missing_list = [x for x in missing_list if x not in codes_excluded.keys()]
     missing_count = len(missing_list)
 

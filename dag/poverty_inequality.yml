@@ -41,6 +41,7 @@ steps:
     - data://garden/wid/2026-06-18/world_inequality_database:
       - data://meadow/wid/2026-06-18/world_inequality_database:
         - snapshot://wid/2026-06-18/world_inequality_database.csv
+        - snapshot://wid/2026-06-18/world_inequality_database_aggregate_wealth.csv
         - snapshot://wid/2026-06-18/world_inequality_database_distribution.csv
         - snapshot://wid/2026-06-18/world_inequality_database_distribution_with_extrapolations.csv
         - snapshot://wid/2026-06-18/world_inequality_database_fiscal.csv

@@ -10,19 +10,28 @@ This program extracts inequality data from LIS for three types of income and one
 The inequality variables extracted from here include Gini coefficients, averages, thresholds and shares per decile, statistics for the top 1, 0.1, 0.01 and 0.001% percentile and share ratios.
 When needed, values are converted to PPP (2011 vintage) adjusted to prices of the most recent year available.
 
+It also extracts the balance sheet of the households and NPISH sector combined (net wealth, debt,
+housing and land, business assets, and financial assets), as a ratio to net national income.
+
 HOW TO EXECUTE:
 
 1. Open this do-file in a local installation of Stata (it takes several hours to execute)
-2. It generates five CSV files in this directory (snapshots/wid/2026-06-18/), which exclude and
-   include extrapolations. A single command imports all five as snapshots in the ETL (the script
-   world_inequality_database.py maps each generated CSV to its snapshot):
+2. It generates six CSV files in this directory (snapshots/wid/2026-06-18/). Five of them exclude
+   and include extrapolations, and a single command imports all five as snapshots in the ETL (the
+   script world_inequality_database.py maps each generated CSV to its snapshot):
 	etls wid/2026-06-18/world_inequality_database
+   The sixth, wid_aggregate_wealth.csv, has its own snapshot script:
+	etls wid/2026-06-18/world_inequality_database_aggregate_wealth
 3. Delete the leftover csv files: from the snapshots/wid/2026-06-18/ folder, run
     rm *.csv
    (kept on separate lines so the path and the glob never form a "slash-star" token, which
     Stata would otherwise read as a nested block-comment opener and comment out the whole file)
 
 	(Change the date for future updates)
+
+TO REBUILD ONLY THE AGGREGATE WEALTH CSV: set `global aggregate_wealth_only` to 1 below. That
+section runs in a few minutes, and the do-file stops right after it, leaving the other five CSVs
+(and their snapshots) untouched.
 
 */
 
@@ -45,6 +54,10 @@ global unit j
 *Select the dataset to extract. "all" for the entire LIS data, "test" for test data, small (CL GB)
 global dataset = "all"
 
+* Set to 1 to rebuild only the aggregate wealth CSV and stop there, skipping the distributional
+* and fiscal extractions that take hours
+global aggregate_wealth_only 0
+
 ///////////////////////////////////////////////////////////////////////////////////////
 
 *Run this code to include and exclude extrapolations
@@ -52,6 +65,11 @@ global exclude_extrapolations 1 0
 
 * Average and threshold indicators do not vary between key variables and distributional datasets
 global indicators_avg_thr aptinc tptinc adiinc tdiinc acainc tcainc ahweal thweal
+
+* Balance sheet of the households and NPISH sector combined (WID calls it the private sector).
+* The w series type is a ratio to net national income, so these need no PPP conversion.
+* See https://wid.world/codes-dictionary/#aggregate-wealth
+global indicators_aggregate_wealth wpweal wpwdeb wpwhou wpwbus wpwfin
 
 *Show entire output
 set more off
@@ -83,6 +101,31 @@ else if "$dataset" == "test" {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////////////
+* AGGREGATE WEALTH OF HOUSEHOLDS AND NPISH
+*
+* These series carry no percentile dimension and are identical with and without
+* extrapolations, so one extraction covers them. They are also ratios to net national
+* income, so the PPP conversion applied to the monetary series above does not apply here.
+* WID codes are kept as they are: the mapping to OWID names happens in the garden step.
+///////////////////////////////////////////////////////////////////////////////////////
+
+*Restrict the areas only when testing: the full extraction is small enough to request at once
+local areas_option
+if "$dataset" == "test" {
+	local areas_option areas(`list_of_countries')
+}
+
+qui wid, indicators($indicators_aggregate_wealth) `areas_option' perc(p0p100) ages(999) pop(i) exclude clear
+
+sort country year variable
+
+export delimited using "wid_aggregate_wealth.csv", replace
+
+*Stop here when only the aggregate wealth snapshot needs rebuilding
+if $aggregate_wealth_only == 1 {
+	exit, clear
+}
 
 
 foreach option in $options {

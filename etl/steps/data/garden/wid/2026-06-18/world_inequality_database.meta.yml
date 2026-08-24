@@ -248,6 +248,57 @@ definitions:
     {definitions.note_ppp}
     <%- endif %>
 
+  # Wealth composition of the households and NPISH sector combined. These indicators have their own
+  # dimension (wealth_type) and no welfare_type, period or extrapolated dimension.
+  wealth_type_title: |-
+    <% if wealth_type == "net_wealth" %>
+    Net wealth
+    <%- elif wealth_type == "debt" %>
+    Debt
+    <%- elif wealth_type == "housing_and_land" %>
+    Housing and land
+    <%- elif wealth_type == "financial_and_business_assets" %>
+    Financial assets and business capital
+    <%- endif %>
+
+  wealth_type_description: |-
+    <% if wealth_type == "net_wealth" %>
+    Value of everything households and non-profit institutions own, minus their debts.
+    <%- elif wealth_type == "debt" %>
+    Value of what households and non-profit institutions owe, such as mortgages, consumer credit, and other loans.
+    <%- elif wealth_type == "housing_and_land" %>
+    Value of the homes and other buildings households and non-profit institutions own, and of the land underneath them.
+    <%- elif wealth_type == "financial_and_business_assets" %>
+    Value of the financial assets households and non-profit institutions hold — deposits, bonds, equities, pension funds, and life insurance — plus the capital of unincorporated businesses.
+    <%- endif %>
+
+  description_key_wealth_sector: |-
+    Households and non-profit institutions serving households (NPISH) — charities, religious organizations, trade unions, and similar bodies — are reported together as a single sector, which the World Inequality Database (WID) calls the private sector. Non-profit institutions typically hold less than 5% of the sector’s wealth.
+
+  description_key_wealth_national_income: |-
+    National income here is net national income: the income earned by a country’s residents in a year, after subtracting the depreciation of capital. It is a broad measure taken from the [national accounts](#dod:national-accounts).
+
+  description_key_wealth_ratio_reading: |-
+    Because wealth is a stock accumulated over many years and national income is a yearly flow, these ratios are well above 100%. A value of 600% means the sector owns wealth worth six years of national income.
+
+  description_key_wealth_identity: |-
+    Net wealth is housing and land, plus financial assets and business capital, minus debt.
+
+  description_key_wealth_aggregate_only: |-
+    These are aggregate balance sheets for the sector as a whole, built from national accounts. They say nothing about how wealth is distributed between households — for that, see WID’s wealth inequality indicators.
+
+  description_processing_wealth_aggregates: |-
+    We extract the balance sheet of the households and NPISH sector combined via the [`wid` Stata command](https://github.com/world-inequality-database/wid-stata-tool), using the series expressed as a ratio to national income (WID codes `wpweal`, `wpwdeb`, `wpwhou`, `wpwbus`, and `wpwfin`), and convert the ratios to percentages.
+
+    WID reports financial assets and business assets as two separate series. We add them together into a single category, following the definition the [GC Wealth Project](https://wealthproject.gc.cuny.edu/wealth-topography/mountains-of-assets/) uses for the household wealth portfolio.
+
+  map_brackets_wealth_aggregates: &map_brackets_wealth_aggregates |-
+    <% if wealth_type == "net_wealth" %> [0, 100, 200, 300, 400, 500, 600, 700, 800]
+    <%- elif wealth_type == "debt" %> [0, 20, 40, 60, 80, 100, 120, 140]
+    <%- elif wealth_type == "housing_and_land" %> [0, 50, 100, 150, 200, 250, 300, 350, 400]
+    <%- elif wealth_type == "financial_and_business_assets" %> [0, 100, 200, 300, 400, 500, 600]
+    <%- endif %>
+
   map_brackets_gini: &map_brackets_gini |-
     <% if welfare_type in ["after tax", "after tax disposable"] %> [1, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.1]
     <%- elif welfare_type == "before tax" %> [1, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.1]
@@ -1011,4 +1062,41 @@ tables:
                 baseColorScheme: "Purples"
                 binningStrategy: "manual"
                 customNumericValues: *map_brackets_thr
+            selectedEntityNames: *entity_names_inequality
+  wealth_aggregates:
+    variables:
+      share_of_national_income:
+        title: "{definitions.wealth_type_title} of households and non-profit institutions"
+        unit: "% of national income"
+        short_unit: "%"
+        description_short: |-
+          {definitions.wealth_type_description} Measured as a share of net national income.
+        description_key:
+          - "{definitions.description_key_wealth_sector}"
+          - "{definitions.description_key_wealth_national_income}"
+          - "{definitions.description_key_wealth_ratio_reading}"
+          - "{definitions.description_key_wealth_identity}"
+          - "{definitions.description_key_wealth_aggregate_only}"
+        description_processing: |-
+          {definitions.description_processing_wealth_aggregates}
+        display:
+          name: "{definitions.wealth_type_title}"
+          numDecimalPlaces: 0
+          <<: *common_display
+        presentation:
+          title_variant: ""
+          grapher_config:
+            title: "{definitions.wealth_type_title} of households, as a share of national income"
+            subtitle: |-
+              {definitions.wealth_type_description} Shown as a share of net national income.
+            note: Households here include non-profit institutions serving households, such as charities and religious organizations.
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "Greens"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_wealth_aggregates
             selectedEntityNames: *entity_names_inequality

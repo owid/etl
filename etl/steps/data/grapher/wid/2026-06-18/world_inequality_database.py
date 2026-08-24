@@ -17,6 +17,7 @@ def run() -> None:
     tb_inequality = ds_garden.read("inequality", reset_index=False)
     tb_incomes = ds_garden.read("incomes", reset_index=False)
     tb_relative_poverty = ds_garden.read("relative_poverty", reset_index=False)
+    tb_wealth_aggregates = ds_garden.read("wealth_aggregates", reset_index=False)
 
     #
     # Save outputs.
@@ -27,6 +28,7 @@ def run() -> None:
             tb_inequality,
             tb_incomes,
             tb_relative_poverty,
+            tb_wealth_aggregates,
         ],
         default_metadata=ds_garden.metadata,
     )

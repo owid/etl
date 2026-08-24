@@ -4,6 +4,9 @@ A single script handles all five snapshots: ``wid_indices.do`` (in this director
 data from WID.world via Stata and writes five CSV files here, so instead of one near-identical
 script per file we map each of those CSVs to its snapshot and create them all in one go.
 
+``wid_indices.do`` also writes a sixth CSV, the aggregate wealth of households and NPISH, which
+``world_inequality_database_aggregate_wealth.py`` turns into its own snapshot.
+
 To update:
 
 1. Open ``wid_indices.do`` in a local Stata installation and run it (it takes several hours).
