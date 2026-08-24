@@ -27,7 +27,7 @@ Usage (from the repo root, always through the repo virtualenv):
     # Screenshot nodes, concurrently, into a directory:
     .venv/bin/python .claude/skills/create-figma-chart/scripts/figma_desktop_read.py shot 798:161 6689:8 --out-dir /tmp/shots
 
-    # Structure of a page or frame as XML (all 198 pages, if you omit the node):
+    # Structure of a page or frame as XML (every page, if you omit the node):
     .venv/bin/python .claude/skills/create-figma-chart/scripts/figma_desktop_read.py meta 798:54
     .venv/bin/python .claude/skills/create-figma-chart/scripts/figma_desktop_read.py meta
 
