@@ -36,6 +36,12 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > than the smallest split it could find for itself — an optimiser would go on reporting a
 > comfortable number by picking a split nobody is told to send. Change the pair here and there
 > together; `--check` fails if their groups no longer cover the file exactly once.
+> Read its **`floor`** column beside that percentage: `sent` is what today's two calls cost and can
+> always be bought down by re-splitting, while `floor` is the preamble plus the single largest row
+> group — the smallest any call can be, whatever the split. `verify_page.js` reads **85% sent against
+> a 75% floor**, so re-splitting still buys real room; when the floor itself passes the cap, slicing is
+> exhausted and the only move left is splitting the script into separate files with their own
+> preambles. `--check` fails on that and warns past 85%.
 > **Run all four** — each reports its own rows and nothing else, so a group you skip is a group
 > nobody checked.
 > `diff_against_template.js` (~12,000 stripped) needs none of this.
