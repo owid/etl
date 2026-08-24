@@ -1072,6 +1072,26 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const dStill = row(await run(stillVisible, {}), "colour-vision").detail;
     check("33 a compounded but still-visible mark stays translucent and named",
           !/#12ab34/.test(dStill) && /translucent/.test(dStill) && /Halved/.test(dStill), dStill);
+    // The FRAME is the one ancestor every mark shares, and it sits ABOVE the walk — which was seeded
+    // with a literal 1, so it was the only node whose opacity was never examined. A frame left at
+    // reduced opacity dims every mark on the canvas, and the raw paints went on being emitted as a
+    // paste-ready command. Nothing inside the frame is touched here, so only the frame can account for
+    // the difference.
+    const dimFrame = buildFrame({ barSegment: true });
+    dimFrame.opacity = 0.4;
+    const dDimFrame = row(await run(dimFrame, {}), "colour-vision").detail;
+    check("33 a frame's own opacity disqualifies every mark under it",
+          !/#4c6a9c/.test(dDimFrame) && /translucent/.test(dDimFrame), dDimFrame);
+    // At zero the marks do not merely lose their colour, they leave every row — so the count is zero
+    // for a reason that has nothing to do with what is on the frame. Reported as "no data marks found"
+    // that reads as an empty frame and sends the operator hunting for nodes that are all present.
+    const goneFrame = buildFrame({ barSegment: true });
+    goneFrame.opacity = 0;
+    const dGoneFrame = row(await run(goneFrame, {}), "colour-vision").detail;
+    check("33 a frame at opacity 0 says so, instead of reporting an empty plot",
+          /FRAME itself is at effective opacity 0/.test(dGoneFrame)
+          && !/No data marks or series strokes found/.test(dGoneFrame), dGoneFrame);
+    // And an ordinary frame must carry neither message, or both become noise on every run.
     // And the note must not fire on an ordinary opaque chart, or it becomes noise on every run.
     const opaque = row(await run(buildFrame({ barSegment: true }), {}), "colour-vision").detail;
     check("33 an opaque plot carries no translucency note",

@@ -111,8 +111,18 @@ const checkFrame = async (frameId) => {
   rows = [];
   const frame = await figma.getNodeByIdAsync(frameId);
   if (!frame) throw new Error(`frameId ${frameId} not found`);
+  // The FRAME is the one ancestor EVERY mark shares, and it sits ABOVE the walk below — which was
+  // seeded with a literal 1, so the frame was the only node whose opacity was never examined. A frame
+  // left at reduced opacity (or the section holding it) dims every mark on the canvas while the colour
+  // rows go on reporting raw paints: the same wrong-verdict-about-what-is-not-there this file guards
+  // against everywhere else, reached by the one path that skipped the guard. Accumulated on the climb
+  // that already runs to find the PAGE, so it picks up section and group ancestors too.
+  let frameOpacity = 1;
   let page = frame;
-  while (page && page.type !== "PAGE") page = page.parent;
+  while (page && page.type !== "PAGE") {
+    if ("opacity" in page && typeof page.opacity === "number") frameOpacity *= page.opacity;
+    page = page.parent;
+  }
   if (page && figma.currentPage !== page) await figma.setCurrentPageAsync(page);
 
   const fb = frame.absoluteBoundingBox;
@@ -327,7 +337,7 @@ const checkFrame = async (frameId) => {
   };
   for (const child of frame.children) {
     if (child === logo) continue;
-    collect(child, plotRoots.indexOf(child) !== -1, false, null, null, false, null, 1);
+    collect(child, plotRoots.indexOf(child) !== -1, false, null, null, false, null, frameOpacity);
   }
 
   // ---------------------------------------------------------------- rows
@@ -1192,7 +1202,13 @@ const checkFrame = async (frameId) => {
     const how = paletteSrc.length
       ? mixedNote + paletteRun(chartPal) + paletteRun(mapPal) + dimNote
       // An all-translucent plot must not report "no data marks found" — that reads as an empty frame
-      // and sends the operator looking for missing nodes instead of at the opacity they set.
+      // and sends the operator looking for missing nodes instead of at the opacity they set. A frame at
+      // effective opacity zero is the same trap one level up: every node under it returned early, so
+      // the count is zero for a reason that has nothing to do with what is on the frame.
+      : frameOpacity <= 0.01
+        ? " The FRAME itself is at effective opacity 0, so nothing on it paints any pixels and there is"
+          + " no palette to read — this is not an empty frame. Reset the frame's opacity (and any"
+          + " section or group above it) to 1 and re-run."
       : dimNote
         ? ` No auditable palette:${dimNote}`
         : " No data marks or series strokes found in the plot, so there is no palette to audit.";
