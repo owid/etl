@@ -103,22 +103,27 @@ def strip_js(src: str) -> str:
     lines = [ln.rstrip() for ln in "".join(out).split("\n")]
     stripped = "\n".join(ln for ln in lines if ln.strip())
 
-    # A surviving line comment means the parse desynchronized and the rest of the file was copied
+    # Ending inside a literal means the parse desynchronized and the rest of the file was copied
     # verbatim — the failure this stripper exists to avoid, and it is SILENT: the output is still
-    # valid JS, just far larger, so it is sent and the size guard is what eventually notices.
+    # valid JS, just far larger, so it gets sent and the size guard is what eventually notices.
     #
     # It happened: a NESTED template literal (a backtick inside a `${}` inside a template) closes the
     # outer context on the inner backtick. Nesting is legal JS and this parser is not nesting-aware.
     # `--check` jumped 75% -> 96% of cap on a 1.8KB edit, which is the only reason it was caught.
-    # Verified against all ten scripts here: zero false positives. If legitimate content ever trips
-    # this, that content breaks the stripper too — failing is the correct answer either way.
-    survivors = [ln for ln in stripped.split("\n") if ln.lstrip().startswith("//") and not REGION.match(ln.strip())]
-    if survivors:
+    #
+    # The signature is the OPEN CONTEXT, not a surviving comment. The first version of this guard
+    # flagged any `//` line that came through, which is wrong: a template literal may legitimately
+    # contain one, the stripper handles that correctly, and the guard then called correct behaviour
+    # corruption. Measured — a legitimate template with a `//` line ends at context None; the nested
+    # case ends holding an unterminated backtick. Well-formed JS always closes its literals, so this
+    # has no false positive to trade away.
+    if context is not None:
+        kind = {"regex": "regex literal", "`": "template literal", "'": "string", '"': "string"}[context]
         raise ValueError(
-            "comment stripping failed: "
-            + f"{len(survivors)} line comment(s) survived, starting with {survivors[0].strip()[:60]!r}. "
-            "The parser lost sync — most likely a nested template literal (a backtick inside a ${} "
-            "inside a template) or an unterminated literal. Rewrite it as concatenation."
+            f"comment stripping failed: the file ends inside an unterminated {kind}, so the parser "
+            "lost sync and the rest of the source was copied verbatim. Most likely a NESTED template "
+            "literal (a backtick inside a ${} inside a template), which is legal JS but not handled "
+            "here — rewrite it as string concatenation."
         )
     return stripped
 
@@ -218,7 +223,7 @@ def main() -> int:
         # 45,131, so the optimiser would report 90% and exit 0 for a workflow that no longer runs.
         # The number has to be the one the operator will hit.
         failed = False
-        print(f"{'script':<30} {'raw':>8} {'stripped':>9} {'sent':>9} {'of cap':>8}")
+        print(f"{'script':<30} {'raw':>8} {'stripped':>9} {'sent':>9} {'of cap':>8} {'floor':>8}")
         for p in sorted(SCRIPTS.glob("*.js")):
             if p.name.startswith("test_"):
                 continue
@@ -250,14 +255,36 @@ def main() -> int:
             else:
                 sent = len(stripped)
                 how = ""
+            # The FLOOR: preamble + the single largest group, i.e. the smallest any call can ever be
+            # made by re-splitting. `sent` says whether today's documented calls fit; the floor says
+            # whether ANY partition can. They move independently, and confusing them misreads the
+            # risk in both directions — verify_page.js sat at 82% sent against a 72% floor, so it
+            # looked ~9,000 characters from trouble when re-splitting bought it ~14,000.
+            #
+            # Once the floor passes the cap, slicing is exhausted: the shared preamble plus one row
+            # group no longer fits, and the only remaining move is to break the script into separate
+            # files with their own preambles. That is a rewrite, so it wants warning, not discovery.
+            floor = max((len(select_rows(stripped, {g})[0]) for g in groups), default=len(stripped))
             over = sent > CAP
             failed = failed or over or bool(problem)
             print(
                 f"{p.name:<30} {len(p.read_text()):>8,} {len(stripped):>9,} {sent:>9,} "
-                f"{sent / CAP * 100:>7.0f}%{'  OVER CAP' if over else ''}{how}"
+                f"{sent / CAP * 100:>7.0f}% {floor / CAP * 100:>7.0f}%"
+                f"{'  OVER CAP' if over else ''}{how}"
             )
             if problem:
                 print(f"{'':<30}   ^ {problem}")
+            if groups and floor > CAP:
+                failed = True
+                print(
+                    f"{'':<30}   ^ FLOOR OVER CAP: preamble + the largest single group is {floor:,}, "
+                    "so no split fits. Move rows into a separate script with its own preamble."
+                )
+            elif groups and floor > CAP * 0.85:
+                print(
+                    f"{'':<30}   ^ floor at {floor / CAP * 100:.0f}% — re-splitting is nearly "
+                    f"exhausted; {CAP - floor:,} characters of shared preamble + largest group left."
+                )
             # Over the cap, the useful next step is the split that would fit, so the doc can be
             # rewritten to it. Enumerating the subsets is fine here: these are hand-authored #region
             # markers and there is a handful of them per script.
