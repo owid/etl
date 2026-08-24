@@ -20,6 +20,7 @@ import streamlit.components.v1 as components
 from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET
+from apps.wizard.app_pages.metadata_diff.cached import clear_discovery_caches
 from apps.wizard.app_pages.metadata_diff.core import (
     CHART_FIELD_PREFIX,
     CHART_FIELDS,
@@ -628,16 +629,30 @@ def st_section_switcher(progress: dict[str, tuple[int, int]]) -> str:
     # Idempotent, and emitted on every rerun so the bar survives a rerun that starts mid-page.
     st.markdown(SECTION_NAV_CSS, unsafe_allow_html=True)
     with st.container(border=False, key=SECTION_NAV_KEY):
-        selected = coerce_section(
-            st.segmented_control(
-                label="Section",
-                options=list(SECTIONS),
-                format_func=lambda s: section_label(s, progress),
-                key=SECTION_STATE_KEY,
-                label_visibility="collapsed",
-            ),
-            from_url,
-        )
+        col_sections, col_refresh = st.columns([6, 1], vertical_alignment="center")
+        with col_sections:
+            selected = coerce_section(
+                st.segmented_control(
+                    label="Section",
+                    options=list(SECTIONS),
+                    format_func=lambda s: section_label(s, progress),
+                    key=SECTION_STATE_KEY,
+                    label_visibility="collapsed",
+                ),
+                from_url,
+            )
+        with col_refresh:
+            # Rides in the sticky bar so it is reachable from anywhere in a long list.
+            st.button(
+                ":material/refresh: Re-read",
+                key="mdd-refresh",
+                on_click=clear_discovery_caches,
+                help=(
+                    "Read both servers again. The page holds its reading for 30 minutes, so use this "
+                    "after rebuilding a step — or after `etlr grapher://… --grapher` on this branch."
+                ),
+                width="stretch",
+            )
 
     # Keep the default out of the URL, as url_persist does, so a plain link stays plain. Written only on
     # a real change, so a run that touches nothing leaves the URL alone.

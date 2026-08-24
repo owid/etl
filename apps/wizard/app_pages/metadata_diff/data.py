@@ -5,6 +5,8 @@ environments being compared (staging = "source", production = "target"). Read-on
 """
 
 import json
+from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from typing import Any
 
@@ -224,23 +226,62 @@ def _chunked(values: list, size: int = 500):
         yield values[i : i + size]
 
 
+def _fetch_chunks(fetch: Callable[[list], list[Any]], values: list) -> list[Any]:
+    """Run one chunked query over `values` concurrently, returning every row.
+
+    A 10,000-id lookup is 21 chunks of 500, and issuing them in sequence pays the round trip to the
+    staging server 21 times — 2.2s of a 7s page load, all of it waiting. The chunks are independent and
+    the engines pool 30 connections, so they go out together; rows are merged by key afterwards, so
+    completion order never matters.
+    """
+    chunks = list(_chunked(values))
+    if len(chunks) <= 1:
+        return [row for chunk in chunks for row in fetch(chunk)]
+    with ThreadPoolExecutor(max_workers=min(8, len(chunks))) as pool:
+        return [row for rows in pool.map(fetch, chunks) for row in rows]
+
+
 def fetch_variable_rows(engine: Engine, variable_ids: list[int]) -> dict[int, dict[str, Any]]:
     """Metadata columns of the `variables` table for the given IDs, keyed by ID."""
     if not variable_ids:
         return {}
     columns = ["id", "name", "catalogPath"] + list(METADATA_FIELDS)
-    rows: dict[int, dict[str, Any]] = {}
-    for chunk in _chunked(sorted(set(variable_ids))):
+
+    def fetch(chunk: list) -> list[Any]:
         placeholders = ", ".join(["%s"] * len(chunk))
         df = read_sql(
             f"select {', '.join(columns)} from variables where id in ({placeholders})",
             engine=engine,
             params=tuple(chunk),
         )
-        for record in df.to_dict("records"):
-            # to_dict returns Hashable keys; our columns are all strings.
-            rows[int(record["id"])] = {str(k): v for k, v in record.items()}
-    return rows
+        return df.to_dict("records")
+
+    # to_dict returns Hashable keys; our columns are all strings.
+    return {
+        int(record["id"]): {str(k): v for k, v in record.items()}
+        for record in _fetch_chunks(fetch, sorted(set(variable_ids)))
+    }
+
+
+def fetch_variable_paths(engine: Engine, variable_ids: list[int]) -> dict[int, str]:
+    """id -> catalogPath, for callers that only need the mapping.
+
+    `fetch_variable_rows` returns every metadata column, which is a lot of text to move when the answer
+    wanted is one identifier: on this server it cost 2.4s for the 10,387 variables an MDim sweep touches.
+    """
+    if not variable_ids:
+        return {}
+
+    def fetch(chunk: list) -> list[Any]:
+        placeholders = ", ".join(["%s"] * len(chunk))
+        df = read_sql(
+            f"select id, catalogPath from variables where id in ({placeholders}) and catalogPath is not null",
+            engine=engine,
+            params=tuple(chunk),
+        )
+        return df.to_dict("records")
+
+    return {int(record["id"]): str(record["catalogPath"]) for record in _fetch_chunks(fetch, sorted(set(variable_ids)))}
 
 
 def fetch_variable_rows_by_path(engine: Engine, catalog_paths: list[str]) -> dict[str, dict[str, Any]]:

@@ -17,9 +17,11 @@ mints fresh ids on staging, so id-matching would report every indicator of that 
 
 import json
 import re
+from collections.abc import Callable
+from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, TypeVar
 
 import git
 import pandas as pd
@@ -41,7 +43,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
 from apps.wizard.app_pages.metadata_diff.data import (
     _load_configs,
     build_env_bundles,
-    fetch_variable_rows,
+    fetch_variable_paths,
     fetch_variable_rows_by_path,
     load_mdim_config,
 )
@@ -50,6 +52,8 @@ from etl.db import read_sql
 from etl.git_helpers import get_changed_files
 from etl.io import get_all_changed_catalog_paths, get_directly_changed_export_uris
 from etl.paths import BASE_DIR, STEP_DIR
+
+T = TypeVar("T")
 
 log = get_logger()
 
@@ -91,6 +95,19 @@ def _staging_creation_time(source_engine: Engine):
 
     with Session(source_engine) as session:
         return get_staging_creation_time(session)
+
+
+def _both(fetch: Callable[..., T], first: Engine, second: Engine, *args: Any) -> tuple[T, T]:
+    """Run one fetch against two environments concurrently, returning (first, second).
+
+    Every comparison in this module reads the same thing from the staging server and from the baseline.
+    The two are independent round trips, so running them in sequence is latency and nothing else; the
+    engines' pool is 30 connections wide, and results come back in argument order, never completion order.
+    """
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        pending_first = pool.submit(fetch, first, *args)
+        pending_second = pool.submit(fetch, second, *args)
+        return pending_first.result(), pending_second.result()
 
 
 def _dataset_of(catalog_path: str) -> str:
@@ -443,11 +460,19 @@ def select_candidates(paths: list[str], scope: BranchScope, built: set[str]) -> 
 
 
 def candidate_paths(
-    source_engine: Engine, paths: list[str], scope: BranchScope | None = None
+    source_engine: Engine,
+    paths: list[str],
+    scope: BranchScope | None = None,
+    built: set[str] | None = None,
 ) -> tuple[list[str], bool]:
-    """`select_candidates`, reading the scope from git and the rebuilt-here set from the server."""
+    """`select_candidates`, reading the scope from git and the rebuilt-here set from the server.
+
+    Both are per-run facts, not per-call ones: `scope` shells out to git and `built` reads every dataset
+    row. Callers that make several selections in one pass should read them once and pass them in.
+    """
     scope = scope if scope is not None else branch_scope()
-    return select_candidates(paths, scope, datasets_built_here(source_engine))
+    built = built if built is not None else datasets_built_here(source_engine)
+    return select_candidates(paths, scope, built)
 
 
 def charted_indicator_paths(source_engine: Engine) -> list[str]:
@@ -503,15 +528,16 @@ def changed_indicators(
     source_engine: Engine,
     target_engine: Engine,
     catalog_paths: list[str] | None = None,
+    scope: BranchScope | None = None,
 ) -> IndicatorChanges:
     """Indicators whose text this branch changed. `catalog_paths` defaults to charted indicators."""
     paths = charted_indicator_paths(source_engine) if catalog_paths is None else list(catalog_paths)
-    paths, narrowed = narrow_to_branch(paths, _branch_catalog_paths())
+    scope = scope if scope is not None else branch_scope()
+    paths, narrowed = narrow_to_branch(paths, sorted(scope.dataset_paths) if scope.available else None)
     if not paths:
         return IndicatorChanges(narrowed=narrowed)
 
-    source_rows = fetch_variable_rows_by_path(source_engine, paths)
-    target_rows = fetch_variable_rows_by_path(target_engine, paths)
+    source_rows, target_rows = _both(fetch_variable_rows_by_path, source_engine, target_engine, paths)
     out = compare_indicator_texts(source_rows, target_rows)
     out.narrowed = narrowed
     return out
@@ -611,8 +637,7 @@ def attribute_indicator_changes(
     if master_engine is not None and master_engine is not target_engine:
         try:
             result = compare_indicator_texts(
-                fetch_variable_rows_by_path(source_engine, catalog_paths),
-                fetch_variable_rows_by_path(master_engine, catalog_paths),
+                *_both(fetch_variable_rows_by_path, source_engine, master_engine, catalog_paths)
             )
             identical_to_master = set(catalog_paths) - set(result.diffs) - result.new_paths
             master_checked = True
@@ -656,12 +681,16 @@ def mdim_indicator_paths(source_engine: Engine, configs: dict[str, dict[str, Any
     if not all_ids:
         return {cp: set() for cp in configs}
 
-    rows = fetch_variable_rows(source_engine, all_ids)
-    path_by_id = {i: str(r["catalogPath"]) for i, r in rows.items() if r.get("catalogPath")}
+    path_by_id = fetch_variable_paths(source_engine, all_ids)
     return {cp: {path_by_id[i] for i in ids if i in path_by_id} for cp, ids in ids_by_mdim.items()}
 
 
-def mdim_changes_df(source_engine: Engine, target_engine: Engine) -> pd.DataFrame:
+def mdim_changes_df(
+    source_engine: Engine,
+    target_engine: Engine,
+    scope: BranchScope | None = None,
+    built: set[str] | None = None,
+) -> pd.DataFrame:
     """Every MDim on this server, flagged against the baseline. Indexed by catalogPath.
 
     Two independent signals, because either changes what a reader sees:
@@ -687,8 +716,7 @@ def mdim_changes_df(source_engine: Engine, target_engine: Engine) -> pd.DataFram
     # Drafts are kept, and marked. They show nothing to readers, so they do not belong in the
     # reader-facing count — but they are also the text that goes live the moment `published` flips, and
     # dropping them from the query would hide them from the list and the "other differences" section too.
-    df_source = mdim_list(source_engine)
-    df_target = mdim_list(target_engine)
+    df_source, df_target = _both(mdim_list, source_engine, target_engine)
 
     df = pd.merge(df_source, df_target, on="catalogPath", suffixes=("_source", "_target"), how="left")
     df["is_new"] = df["configMd5_target"].isnull()
@@ -698,12 +726,11 @@ def mdim_changes_df(source_engine: Engine, target_engine: Engine) -> pd.DataFram
     try:
         paths_by_mdim = mdim_indicator_paths(source_engine, _load_configs(source_engine))
         all_paths = sorted({p for paths in paths_by_mdim.values() for p in paths})
-        narrowed_paths, _ = candidate_paths(source_engine, all_paths)
+        narrowed_paths, _ = candidate_paths(source_engine, all_paths, scope, built)
         changed_paths: set[str] = set()
         if narrowed_paths:
             result = compare_indicator_texts(
-                fetch_variable_rows_by_path(source_engine, narrowed_paths),
-                fetch_variable_rows_by_path(target_engine, narrowed_paths),
+                *_both(fetch_variable_rows_by_path, source_engine, target_engine, narrowed_paths)
             )
             changed_paths = set(result.diffs) | result.new_paths
         changed_mdims = {cp for cp, paths in paths_by_mdim.items() if paths & changed_paths}
@@ -716,7 +743,7 @@ def mdim_changes_df(source_engine: Engine, target_engine: Engine) -> pd.DataFram
     df["indicator_changed"] = df["catalogPath"].isin(changed_mdims)
     df["has_changes"] = df["is_new"] | df["config_changed"] | df["indicator_changed"]
 
-    scope = branch_scope()
+    scope = scope if scope is not None else branch_scope()
     if scope.available:
         # An MDim's own recipe changing (`export://multidim/.../<short>`) is the other way this branch can
         # move its texts, so a config change counts when the recipe is ours.
@@ -783,12 +810,14 @@ def split_mdim_groups(
 
 def mdim_text_changes(source_engine: Engine, target_engine: Engine, catalog_path: str) -> list[ViewDiff]:
     """Per-view text diff of one MDim against the baseline (cached for the app in `cached.py`)."""
-    source_config = load_mdim_config(source_engine, catalog_path)
+    source_config, target_config = _both(load_mdim_config, source_engine, target_engine, catalog_path)
     if source_config is None:
         return []
-    target_config = load_mdim_config(target_engine, catalog_path)
-    source_bundles = build_env_bundles(source_engine, source_config)
-    target_bundles = build_env_bundles(target_engine, target_config) if target_config else []
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        pending_source = pool.submit(build_env_bundles, source_engine, source_config)
+        pending_target = pool.submit(build_env_bundles, target_engine, target_config) if target_config else None
+        source_bundles = pending_source.result()
+        target_bundles = pending_target.result() if pending_target is not None else []
     return diff_views(source_bundles, target_bundles)
 
 
@@ -916,16 +945,21 @@ class ExplorerChanges:
         return {slug: diffs for slug, diffs in self.views.items() if slug not in self.in_branch}
 
 
-def changed_explorer_views(source_engine: Engine, target_engine: Engine) -> ExplorerChanges:
+def changed_explorer_views(
+    source_engine: Engine,
+    target_engine: Engine,
+    scope: BranchScope | None = None,
+    built: set[str] | None = None,
+) -> ExplorerChanges:
     """Published explorers whose view text differs from the baseline, attributed to branch or lag."""
-    source_rows = explorer_view_rows(source_engine)
-    detailed = compare_explorer_views_detailed(source_rows, explorer_view_rows(target_engine))
+    source_rows, target_rows = _both(explorer_view_rows, source_engine, target_engine)
+    detailed = compare_explorer_views_detailed(source_rows, target_rows)
 
     views: dict[str, list[ViewDiff]] = {}
     for (slug, _), diff in detailed.items():
         views.setdefault(slug, []).append(diff)
 
-    scope = branch_scope()
+    scope = scope if scope is not None else branch_scope()
     if not scope.available or not views:
         return ExplorerChanges(views=views, in_branch=set(views), narrowed=scope.available)
 
@@ -942,17 +976,13 @@ def changed_explorer_views(source_engine: Engine, target_engine: Engine) -> Expl
         ids_by_view[key] = set(source_rows.get(key, {}).get("indicator_ids") or set())
 
     all_ids = sorted({i for ids in ids_by_view.values() for i in ids})
-    rows = fetch_variable_rows(source_engine, all_ids) if all_ids else {}
-    paths_by_id = {i: str(r["catalogPath"]) for i, r in rows.items() if r.get("catalogPath")}
+    paths_by_id = fetch_variable_paths(source_engine, all_ids)
     # Only indicators this branch actually rebuilt here can carry one of its edits — compare just those.
-    candidates, _ = candidate_paths(source_engine, sorted(set(paths_by_id.values())), scope)
+    candidates, _ = candidate_paths(source_engine, sorted(set(paths_by_id.values())), scope, built)
     candidates = sorted(set(candidates))
     changed_paths: set[str] = set()
     if candidates:
-        result = compare_indicator_texts(
-            fetch_variable_rows_by_path(source_engine, candidates),
-            fetch_variable_rows_by_path(target_engine, candidates),
-        )
+        result = compare_indicator_texts(*_both(fetch_variable_rows_by_path, source_engine, target_engine, candidates))
         changed_paths = set(result.diffs) | result.new_paths
 
     ours_keys = {key for key in detailed if key[0] in own_recipe}
@@ -1242,7 +1272,64 @@ def _count_fields(counts: dict[str, int], diffs: list[ViewDiff]) -> None:
         counts[label] = counts.get(label, 0) + 1
 
 
-def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engine | None = None) -> Summary:
+def _resolved(given: T | None, pending: "Future[T] | None") -> T:
+    """Whichever the caller supplied, or the reading started on its behalf — exactly one exists.
+
+    `summarize` prefetches only what it was not given, so a surface has either a value or a future. Any
+    exception surfaces here, inside the try/except that owns that surface.
+    """
+    if given is not None:
+        return given
+    assert pending is not None, "a surface with no value must have a pending read"
+    return pending.result()
+
+
+def shared_facts(source_engine: Engine) -> tuple[BranchScope, set[str]]:
+    """(git scope, datasets rebuilt here) — the two facts every surface needs, read once.
+
+    One shells out to git and the other reads every dataset row, so they wait on different things and
+    wait together. Callers that make several selections in one pass should read this once and pass both
+    down; six `branch_scope()` calls and two `datasets_built_here()` were most of a cold load.
+    """
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        pending_scope = pool.submit(branch_scope)
+        pending_built = pool.submit(datasets_built_here, source_engine)
+        return pending_scope.result(), pending_built.result()
+
+
+def _mdim_groups_for(
+    source_engine: Engine,
+    target_engine: Engine,
+    catalog_paths: list[str],
+    scope: BranchScope,
+) -> list[list[ChangeGroup]]:
+    """This branch's change groups for each MDim, diffed concurrently, returned in the order given.
+
+    One MDim's view diff is two independent queries, so a list of them is latency rather than work. The
+    order is the caller's, not completion order: counts and review keys must not depend on timing.
+    """
+    if not catalog_paths:
+        return []
+
+    def groups_for(catalog_path: str) -> list[ChangeGroup]:
+        view_diffs = [v for v in mdim_text_changes(source_engine, target_engine, catalog_path) if v.changed]
+        return split_mdim_groups(catalog_path, view_diffs, scope)[0]
+
+    with ThreadPoolExecutor(max_workers=min(8, len(catalog_paths))) as pool:
+        return list(pool.map(groups_for, catalog_paths))
+
+
+def summarize(
+    source_engine: Engine,
+    target_engine: Engine,
+    master_engine: Engine | None = None,
+    *,
+    changed: "IndicatorChanges | None" = None,
+    df_mdims: "pd.DataFrame | None" = None,
+    explorers: "ExplorerChanges | None" = None,
+    facts: tuple[BranchScope, set[str]] | None = None,
+    attribution: dict[str, str] | None = None,
+) -> Summary:
     """Everything the section badges and the owidbot comment need, in one pass.
 
     `master_engine` (master's own staging server) is optional but worth passing: without it, a change
@@ -1256,9 +1343,27 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
     seen: set[tuple[str, str]] = set()
     reach: dict[tuple[str, str], ChangeReach] = {}
 
+    scope, built = facts if facts is not None else shared_facts(source_engine)
+
+    # The three surfaces share nothing but the engines, and their cost is time spent waiting on MySQL, so
+    # whatever the caller has not already read is fetched here, together. Each block below still consumes
+    # its own result inside its own try/except, which keeps one broken surface from blanking the page.
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        pending_charts = (
+            pool.submit(changed_indicators, source_engine, target_engine, None, scope) if changed is None else None
+        )
+        pending_mdims = (
+            pool.submit(mdim_changes_df, source_engine, target_engine, scope, built) if df_mdims is None else None
+        )
+        pending_explorers = (
+            pool.submit(changed_explorer_views, source_engine, target_engine, scope, built)
+            if explorers is None
+            else None
+        )
+
     # --- Charts (indicator layer) ---
     try:
-        changed = changed_indicators(source_engine, target_engine)
+        changed = _resolved(changed, pending_charts)
         summary.narrowed = changed.narrowed
         summary.n_indicators = len(changed.diffs)
         summary.n_new_indicators = len(changed.new_paths)
@@ -1278,7 +1383,12 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
             slot.draft_charts = [c for c in by_id.values() if not c.get("is_published", True)]
         charts_surface = surface_key("charts", "indicators")
         summary.review_keys["charts"] = [(charts_surface, *mark_identity(charts_surface, g)) for g in chart_groups]
-        for origin in attribute_indicator_changes(source_engine, target_engine, changed.paths, master_engine).values():
+        origins = (
+            attribution
+            if attribution is not None
+            else attribute_indicator_changes(source_engine, target_engine, changed.paths, master_engine)
+        )
+        for origin in origins.values():
             summary.attribution[origin] = summary.attribution.get(origin, 0) + 1
         # Report every stale dataset, not only ones behind a reported change: a stale build can also
         # *hide* a change, and then there is nothing in the lists to hang the warning off.
@@ -1289,7 +1399,7 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
 
     # --- MDims ---
     try:
-        df_mdims = mdim_changes_df(source_engine, target_engine)
+        df_mdims = _resolved(df_mdims, pending_mdims)
         if bool(df_mdims["indicator_check_failed"].any()):
             summary.warnings.append(
                 "Could not compare indicator metadata for MDims — the count reflects config changes only."
@@ -1307,10 +1417,9 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
             summary.mdims_resolved = False
             summary.n_mdims = len(flagged)
         else:
-            scope = branch_scope()
-            for cp in flagged:
-                view_diffs = [v for v in mdim_text_changes(source_engine, target_engine, cp) if v.changed]
-                ours, _other = split_mdim_groups(cp, view_diffs, scope)
+            # Each MDim's view diff is two queries; up to MAX_MDIMS_RESOLVED of them run concurrently.
+            # Results are consumed in `flagged` order, so what the page reports never depends on timing.
+            for cp, ours in zip(flagged, _mdim_groups_for(source_engine, target_engine, flagged, scope)):
                 if ours:
                     summary.n_mdims += 1
                     summary.n_mdim_changes += len(ours)
@@ -1332,10 +1441,7 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
             summary.draft_mdims_resolved = False
             summary.n_draft_mdims = len(drafts)
         else:
-            scope_for_drafts = branch_scope()
-            for cp in drafts:
-                view_diffs = [v for v in mdim_text_changes(source_engine, target_engine, cp) if v.changed]
-                draft_groups = split_mdim_groups(cp, view_diffs, scope_for_drafts)[0]
+            for cp, draft_groups in zip(drafts, _mdim_groups_for(source_engine, target_engine, drafts, scope)):
                 if draft_groups:
                     summary.n_draft_mdims += 1
                     for g in draft_groups:
@@ -1348,7 +1454,7 @@ def summarize(source_engine: Engine, target_engine: Engine, master_engine: Engin
 
     # --- Explorers ---
     try:
-        explorers = changed_explorer_views(source_engine, target_engine)
+        explorers = _resolved(explorers, pending_explorers)
         branch_views = explorers.branch_views()
         summary.n_explorers = len(branch_views)
         summary.n_explorer_views = sum(len(v) for v in branch_views.values())
