@@ -32,6 +32,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     ViewDiff,
     build_view_bundle,
     diff_views,
+    edit_fingerprint,
     field_label,
     group_changes,
     mark_identity,
@@ -1098,6 +1099,59 @@ class ChangeReach:
     def n_hidden(self) -> int:
         """Places carrying it that no reader can open — draft charts and unpublished MDim views."""
         return len(self.draft_charts) + sum(int(m["n_views"]) for m in self.mdims if m["is_draft"])
+
+
+@dataclass
+class EditGroup:
+    """One authored edit, and the rendered texts it produced.
+
+    The distinction the counts turned on: `changes` is what the site renders (one per distinct text),
+    `self` is what somebody wrote. A shared definition makes those numbers differ by an order of
+    magnitude, and reporting the larger one as "changes to review" overstates the work by that much.
+    """
+
+    field: str
+    inserted: str
+    deleted: str
+    changes: list[ChangeReach] = field(default_factory=list)
+
+    @property
+    def n_texts(self) -> int:
+        return len(self.changes)
+
+    def surfaces(self) -> dict[str, set[str]]:
+        """Distinct places this edit lands, by kind — deduped, since texts share pages.
+
+        MDim and explorer views are counted as their page: view counts belong to a text, not to the
+        edit, because two texts of one edit can land on overlapping views of the same MDim.
+        """
+        out: dict[str, set[str]] = {"charts": set(), "draft_charts": set(), "mdims": set(), "explorers": set()}
+        for c in self.changes:
+            out["charts"].update(str(x["chartId"]) for x in c.charts)
+            out["draft_charts"].update(str(x["chartId"]) for x in c.draft_charts)
+            out["mdims"].update(str(m["catalogPath"]) for m in c.mdims if not m["is_draft"])
+            out["explorers"].update(str(e["slug"]) for e in c.explorers)
+        return out
+
+    @property
+    def n_reader_facing(self) -> int:
+        """Pages a reader can reach — each counted once, however many of these texts it renders."""
+        s = self.surfaces()
+        return len(s["charts"]) + len(s["mdims"]) + len(s["explorers"])
+
+
+def group_by_edit(reach: list[ChangeReach]) -> list[EditGroup]:
+    """Collapse rendered texts into the edits that produced them, widest reach first."""
+    groups: dict[tuple[str, str, str], EditGroup] = {}
+    for r in reach:
+        inserted, deleted = edit_fingerprint(r.old, r.new)
+        key = (r.field, inserted, deleted)
+        group = groups.get(key)
+        if group is None:
+            group = EditGroup(field=r.field, inserted=inserted, deleted=deleted)
+            groups[key] = group
+        group.changes.append(r)
+    return sorted(groups.values(), key=lambda g: (-g.n_reader_facing, -g.n_texts, g.field))
 
 
 def reach_by_surface(reach: list[ChangeReach]) -> list[dict[str, Any]]:

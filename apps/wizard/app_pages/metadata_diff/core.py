@@ -739,6 +739,32 @@ def diff_preview_html(view_diff: ViewDiff, max_fields: int = 3, max_chars: int =
     return "".join(blocks)
 
 
+def edit_fingerprint(old: Any, new: Any) -> tuple[str, str]:
+    """(inserted text, deleted text) for one change — what was *authored*, wherever it landed.
+
+    Two changes with the same fingerprint are one edit applied in several places: a sentence added to a
+    shared `definitions.*` entry renders into every description referencing it, each with different
+    surrounding text, so comparing whole texts sees many changes where a reviewer sees one.
+
+    Two edits that happen to insert and delete exactly the same words also group. That is a fair reading
+    of "one edit applied twice", and grouping them is the lesser error: the alternative counts a single
+    authored sentence as eleven separate changes to review.
+    """
+    old_tokens, new_tokens = _tokenize(as_plaintext(old)), _tokenize(as_plaintext(new))
+    matcher = difflib.SequenceMatcher(a=old_tokens, b=new_tokens, autojunk=False)
+    inserted, deleted = [], []
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag in ("insert", "replace"):
+            inserted.append("".join(new_tokens[j1:j2]))
+        if tag in ("delete", "replace"):
+            deleted.append("".join(old_tokens[i1:i2]))
+
+    def joined(parts: list[str]) -> str:
+        return " … ".join(" ".join(p.split()) for p in parts if p.strip())
+
+    return joined(inserted), joined(deleted)
+
+
 def diff_window_html(old: Any, new: Any, max_chars: int = 240, lead: int = 70) -> str:
     """Word-level diff of one change, windowed on the first edit rather than cut from the start.
 

@@ -1926,3 +1926,98 @@ def test_by_surface_counts_two_edits_of_the_same_field_on_one_page():
     # drawer chart carries more edits.
     order = [r["name"] for r in reach_by_surface(reach)]
     assert order == ["hit-once", "hit-twice"]
+
+
+def test_one_authored_sentence_is_one_edit_across_many_texts():
+    """A sentence spliced into several descriptions is one edit, not one per description.
+
+    This is what made the headline read "11 distinct text changes" for a single edit to a shared
+    `definitions.*` entry: the texts genuinely differ, because their surrounding wording differs, so
+    comparing whole texts cannot see that one thing was written.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import edit_fingerprint
+
+    added = "The most recent years are therefore projections."
+    first_old = "Regional estimates are extrapolated from growth forecasts. See the docs."
+    second_old = "Mean income comes from PIP surveys. See the docs."
+    first_new = f"Regional estimates are extrapolated from growth forecasts. {added} See the docs."
+    second_new = f"Mean income comes from PIP surveys. {added} See the docs."
+
+    assert edit_fingerprint(first_old, first_new) == edit_fingerprint(second_old, second_new)
+    assert edit_fingerprint(first_old, first_new)[0] == added
+    assert edit_fingerprint(first_old, first_new)[1] == ""
+
+    # A different edit stays a different edit.
+    assert edit_fingerprint(first_old, first_new) != edit_fingerprint(first_old, first_old + " Something else.")
+
+    # A deletion is recorded as one, and a rewording carries both halves.
+    assert edit_fingerprint("Keep this. Drop that.", "Keep this.")[1] != ""
+    inserted, deleted = edit_fingerprint("Share of people below $2.15", "Share of people below $3.00")
+    assert inserted and deleted
+
+    # A reordered bullet list reads as a move: the flattened order differs, so both halves are non-empty.
+    moved_in, moved_out = edit_fingerprint(["a", "b"], ["b", "a"])
+    assert moved_in and moved_out
+
+    # Whitespace-only is the case with nothing to quote, and the renderer has to handle it.
+    assert edit_fingerprint("one  two", "one   two") == ("", "")
+
+
+def test_group_by_edit_counts_pages_once_per_edit():
+    """The edit's reach is distinct pages: a chart rendering two of its texts is one page."""
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, group_by_edit
+
+    added = "The most recent years are therefore projections."
+    shared = {"chartId": 1, "slug": "both-texts", "has_data_page": True, "is_published": True}
+    only_first = {"chartId": 2, "slug": "first-only", "has_data_page": True, "is_published": True}
+
+    reach = [
+        ChangeReach(
+            field="descriptionKey",
+            old="Regional estimates. See the docs.",
+            new=f"Regional estimates. {added} See the docs.",
+            charts=[shared, only_first],
+            mdims=[{"catalogPath": "grapher/a/latest/one", "n_views": 6, "is_draft": False}],
+        ),
+        ChangeReach(
+            field="descriptionKey",
+            old="Mean income. See the docs.",
+            new=f"Mean income. {added} See the docs.",
+            charts=[shared],
+            mdims=[{"catalogPath": "grapher/a/latest/one", "n_views": 3, "is_draft": False}],
+        ),
+        # A separate edit, on a different field.
+        ChangeReach(field="titlePublic", old="Old title", new="New title", charts=[only_first]),
+    ]
+
+    groups = group_by_edit(reach)
+    assert len(groups) == 2, "the two spliced texts are one edit; the title is another"
+
+    spliced = next(g for g in groups if g.field == "descriptionKey")
+    assert spliced.n_texts == 2
+    assert spliced.inserted == added
+    # 2 distinct charts + 1 MDim, not 3 charts and 9 views: the shared chart and the shared MDim count once.
+    assert spliced.n_reader_facing == 3
+    assert spliced.surfaces()["charts"] == {"1", "2"}
+    assert spliced.surfaces()["mdims"] == {"grapher/a/latest/one"}
+
+    # Widest reach leads.
+    assert groups[0].field == "descriptionKey"
+
+
+def test_mdim_tree_link_survives_the_hash_in_a_catalog_path():
+    """Every MDim catalogPath carries a `#`, which a browser reads as the start of the fragment.
+
+    Left raw, the link drops `&mode=tree` into the fragment and truncates the path, so it opens the MDims
+    list instead of that MDim's dimension tree.
+    """
+    from apps.wizard.app_pages.metadata_diff.blast_section import _mdim_tree_url
+
+    url = _mdim_tree_url("wb/latest/poverty_pip#poverty_pip")
+
+    assert "%23poverty_pip" in url, "the hash has to be percent-encoded"
+    assert "#" not in url, "nothing may start a fragment"
+    assert url.endswith("&mode=tree")
+    assert "diff-type=mdims" in url
+    # No doubled slash: SOURCE.wizard_url already ends in one.
+    assert "//metadata-diff" not in url

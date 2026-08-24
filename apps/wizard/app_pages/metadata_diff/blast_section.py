@@ -5,25 +5,37 @@ and vice versa, because a reviewer working through one surface should not be cou
 This section is the deliberate exception: it is the one place where crossing surfaces is the point, so an
 author can see what one edit costs before deciding how careful to be with it.
 
-Two ways to read the same data, because there are two questions:
+Three levels, which is the point: an **edit** somebody authored, the **texts** it renders into, and the
+**pages** each of those texts lands on. A sentence added to a shared `definitions.*` entry is one edit,
+eleven texts and seventy-odd pages, and reporting any one of those numbers alone misleads — as reporting
+the middle one did.
 
-- **by change** — how far does this edit go? The review question, and the same unit every other section
-  uses (one distinct text, however many places render it).
-- **by surface** — what happens to this page? The question you have when one particular chart matters to
-  you, and the only view where a chart carrying two separate edits appears as one thing.
+Three readings of the same data:
 
-It reads the cached summary the section badges already use, so switching to it costs no queries.
+- **by edit** — edit → text → page. How far does one authored edit actually go?
+- **by surface** — one row per affected page, with every edit landing on it. The question you have when
+  one particular chart matters to you, and the only view where a page carrying two edits appears once.
+- **dimension tree** — one affected MDim's views laid out on its own dimension grid, which is the one
+  thing the other two cannot show: not how many views changed, but *which*, and what sits beside them.
+
+The first two read the cached summary the section badges already use, so they cost no queries. The
+dimension tree diffs one MDim's views, which is why it asks which MDim rather than drawing them all.
 """
 
+import html
 from typing import Any
+from urllib.parse import quote
 
 import streamlit as st
+import streamlit.components.v1 as components
 from sqlalchemy.engine.base import Engine
 
-from apps.wizard.app_pages.metadata_diff import cached
+from apps.wizard.app_pages.chart_diff.utils import SOURCE
+from apps.wizard.app_pages.metadata_diff import cached, mdim_pages
 from apps.wizard.app_pages.metadata_diff.core import diff_window_html, field_label
-from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, reach_by_surface
-from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, DIFF_CSS
+from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, EditGroup, group_by_edit, reach_by_surface
+from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, DIFF_CSS, impact_counts
+from apps.wizard.app_pages.metadata_diff.tree import render_tree_html
 from apps.wizard.utils.components import url_persist
 
 GROUP_KEY = "blast-group"
@@ -32,7 +44,7 @@ KIND_ICON = {"chart": "📈", "draft_chart": "📝", "mdim": "🧩", "explorer":
 
 
 def st_show_blast_radius(source_engine: Engine, target_engine: Engine) -> None:
-    """Everywhere the branch's metadata changes land, by change or by surface."""
+    """Everywhere the branch's metadata changes land: by edit, by surface, or on an MDim's dimension grid."""
     st.markdown(DIFF_CSS, unsafe_allow_html=True)
     summary = cached.summary(source_engine, target_engine)
     reach = summary.reach
@@ -41,19 +53,27 @@ def st_show_blast_radius(source_engine: Engine, target_engine: Engine) -> None:
         st.success(f"**Nothing to show:** no metadata text on this server differs from `{BASELINE_NAME}`.")
         return
 
-    readers = sum(r.n_reader_facing for r in reach)
-    hidden = sum(r.n_hidden for r in reach)
+    edits = group_by_edit(reach)
+    # Pages are counted from the inverted view, so a page rendering two of these texts counts once.
+    # Summing each text's reach gave a larger number for the same data, which is what made "11 changes"
+    # read as eleven things to review when one sentence had been written.
+    rows = reach_by_surface(reach)
+    pages = sum(1 for r in rows if r["published"])
+    hidden_pages = len(rows) - pages
+
     head = (
-        f"**{len(reach)} distinct text change{'s' if len(reach) != 1 else ''}** landing in "
-        f"**{readers} place{'s' if readers != 1 else ''}** a reader can reach"
+        f"**{len(edits)} edit{'s' if len(edits) != 1 else ''}** authored here, rendering "
+        f"**{len(reach)} distinct text{'s' if len(reach) != 1 else ''}**, on "
+        f"**{pages} page{'s' if pages != 1 else ''}** a reader can reach"
     )
-    if hidden:
-        head += f" · {hidden} in unpublished charts or views"
+    if hidden_pages:
+        head += f" · {hidden_pages} unpublished"
     st.markdown(head)
     st.caption(
-        "Counted per distinct text, not per sighting: one reworded shared definition reaches its "
-        "indicator's charts, every MDim view rendering it and every explorer view — one edit to judge, "
-        "several audiences. Sign-off lives in the three sections; this view is for seeing the spread."
+        "Three different numbers, on purpose. One sentence added to a shared `definitions.*` entry is "
+        "**one edit** to judge; it splices into every description referencing it, so the site renders "
+        "**several texts**; and each of those is read on **many pages**. Sign-off lives in the three "
+        "sections — this view is for seeing the spread before you decide how careful to be."
     )
 
     if not summary.mdims_resolved:
@@ -64,8 +84,13 @@ def st_show_blast_radius(source_engine: Engine, target_engine: Engine) -> None:
 
     grouping = url_persist(st.segmented_control)(
         label="Group by",
-        options=["change", "surface"],
-        format_func=lambda g: {"change": "📄 By change", "surface": "🎯 By surface"}[g],
+        # "change" keeps its name so existing links still resolve; it groups by authored edit now.
+        options=["change", "surface", "dimensions"],
+        format_func=lambda g: {
+            "change": "🧬 By edit",
+            "surface": "🎯 By surface",
+            "dimensions": "🌳 Dimension tree",
+        }[g],
         key=GROUP_KEY,
         value="change",
         label_visibility="collapsed",
@@ -73,22 +98,75 @@ def st_show_blast_radius(source_engine: Engine, target_engine: Engine) -> None:
 
     if grouping == "surface":
         _by_surface(reach)
+    elif grouping == "dimensions":
+        # Last thing on the page, deliberately: the component resizes its own iframe to fit its content,
+        # and Streamlit-rendered siblings below it overlap while that happens.
+        _dimension_tree(source_engine, target_engine, reach)
     else:
-        _by_change(reach)
+        _tree(edits)
 
 
-def _by_change(reach: list[ChangeReach]) -> None:
-    """One row per changed text, with every surface it reaches underneath."""
-    for r in reach[:MAX_ROWS]:
+def _tree(edits: list[EditGroup]) -> None:
+    """Edit → text → page, one card per authored edit.
+
+    The texts sit inside an expander: with a shared definition there are ten or more of them, and the
+    thing worth seeing first is that they are one edit, not ten.
+    """
+    for group in edits[:MAX_ROWS]:
         with st.container(border=True):
-            st.markdown(f"**{field_label(r.field)}** · reaches **{r.n_reader_facing}** reader-facing place(s)")
             st.markdown(
-                f'<div class="mdd-diff">{_preview(r)}</div>',
-                unsafe_allow_html=True,
+                f"**{field_label(group.field)}** · **1 edit** → "
+                f"**{group.n_texts} rendered text{'s' if group.n_texts != 1 else ''}** → "
+                f"**{group.n_reader_facing} page{'s' if group.n_reader_facing != 1 else ''}** a reader can reach"
             )
-            for line in _reach_lines(r):
-                st.markdown(line)
-    _truncation_note(len(reach))
+            _edit_body(group)
+            st.markdown(f"_{_surface_summary(group)}_")
+
+            label = f"🌳 {group.n_texts} rendered text{'s' if group.n_texts != 1 else ''}, and where each lands"
+            with st.expander(label, expanded=group.n_texts == 1):
+                for i, r in enumerate(group.changes, start=1):
+                    st.markdown(
+                        f'<div class="mdd-diff"><b>Text {i} of {group.n_texts}</b> — {_preview(r)}</div>',
+                        unsafe_allow_html=True,
+                    )
+                    for line in _reach_lines(r):
+                        st.markdown(f"  {line}")
+    _truncation_note(len(edits))
+
+
+def _edit_body(group: EditGroup) -> None:
+    """The edit itself — the words added and removed, which is what a reviewer is judging."""
+    if group.inserted:
+        quoted = html.escape(group.inserted)
+        st.markdown(
+            f'<div class="mdd-diff">added <ins class="mdd-ins">{quoted}</ins></div>',
+            unsafe_allow_html=True,
+        )
+    if group.deleted:
+        quoted = html.escape(group.deleted)
+        st.markdown(
+            f'<div class="mdd-diff">removed <del class="mdd-del">{quoted}</del></div>',
+            unsafe_allow_html=True,
+        )
+    if not group.inserted and not group.deleted:
+        # No words either way — a whitespace-only edit. A reordered list is not this case: its moved
+        # bullets do read as an insertion and a deletion.
+        st.caption("No words added or removed — whitespace only. The texts below show both sides.")
+
+
+def _surface_summary(group: EditGroup) -> str:
+    """One line naming the kinds of page this edit reaches, deduped across its texts."""
+    s = group.surfaces()
+    bits = []
+    if s["charts"]:
+        bits.append(f"{len(s['charts'])} chart(s)")
+    if s["mdims"]:
+        bits.append(f"{len(s['mdims'])} MDim(s)")
+    if s["explorers"]:
+        bits.append(f"{len(s['explorers'])} explorer(s)")
+    if s["draft_charts"]:
+        bits.append(f"{len(s['draft_charts'])} draft chart(s)")
+    return "Reaches " + ", ".join(bits) if bits else "Reaches nothing a reader or an editor can open yet"
 
 
 def _reach_lines(r: ChangeReach) -> list[str]:
@@ -102,7 +180,9 @@ def _reach_lines(r: ChangeReach) -> list[str]:
         lines.append(f"- 🔍 **{len(drawer)}** chart(s) via *Learn more about this data*: {_names(drawer)}")
     for m in sorted(r.mdims, key=lambda m: str(m["catalogPath"])):
         draft = " :orange-badge[unpublished]" if m["is_draft"] else ""
-        lines.append(f"- 🧩 `{m['catalogPath']}` — {m['n_views']} view(s){draft}")
+        # Straight into that MDim's dimension tree, which is the one thing this view cannot show: which
+        # views exist, not just how many changed.
+        lines.append(f"- 🧩 `{m['catalogPath']}` — [{m['n_views']} view(s)]({_mdim_tree_url(m['catalogPath'])}){draft}")
     for e in sorted(r.explorers, key=lambda e: str(e["slug"])):
         lines.append(f"- 🧭 explorer `{e['slug']}` — {e['n_views']} view(s)")
     if r.draft_charts:
@@ -111,6 +191,16 @@ def _reach_lines(r: ChangeReach) -> list[str]:
         # Worth saying rather than leaving blank: a real change nobody can currently see is a finding.
         lines.append("- Nothing renders this text yet — no published chart, MDim view or explorer view.")
     return lines
+
+
+def _mdim_tree_url(catalog_path: str) -> str:
+    """Link to one MDim's dimension tree.
+
+    The catalogPath is percent-encoded: it always carries a `#`, which a browser would otherwise read as
+    the start of the fragment, dropping `&mode=tree` and truncating the path.
+    """
+    base = SOURCE.wizard_url.rstrip("/")
+    return f"{base}/metadata-diff?diff-type=mdims&mdim={quote(catalog_path, safe='/')}&mode=tree"
 
 
 def _names(charts: list[dict[str, Any]], limit: int = 6) -> str:
@@ -131,6 +221,58 @@ def _by_surface(reach: list[ChangeReach]) -> None:
         badge = "" if row["published"] else " :orange-badge[unpublished]"
         st.markdown(f"- {icon} `{row['name']}` — {fields} :small[:gray[({row['detail']})]]{badge}")
     _truncation_note(len(rows))
+
+
+def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[ChangeReach]) -> None:
+    """One affected MDim's views on its dimension grid — which views changed, and what sits beside them.
+
+    The same component the per-MDim 💥 button opens, reachable without leaving the overview. One at a time:
+    it sizes its own iframe to its content, so stacked components overlap whatever follows them, and each
+    one costs that MDim's view diff.
+    """
+    affected = sorted({str(m["catalogPath"]) for r in reach for m in r.mdims})
+    if not affected:
+        st.info("No MDim renders any of these changes, so there is no dimension grid to draw.")
+        return
+
+    # View *changes*, not distinct views: two texts of one edit can land on the same view, and the reach
+    # model carries per-text counts rather than the views themselves. The tree itself reports the
+    # authoritative "N of M views changed" once it is drawn.
+    view_changes = {
+        cp: sum(m["n_views"] for r in reach for m in r.mdims if str(m["catalogPath"]) == cp) for cp in affected
+    }
+    df = cached.mdim_changes(source_engine, target_engine)
+
+    def label(cp: str) -> str:
+        draft = " · unpublished" if cp in df.index and bool(df.loc[cp, "is_draft"]) else ""
+        return f"{cp} — {view_changes[cp]} view change(s){draft}"
+
+    catalog_path = st.selectbox(
+        "MDim", options=affected, format_func=label, key="blast-tree-mdim", label_visibility="collapsed"
+    )
+    if not catalog_path:
+        return
+
+    row = df.loc[catalog_path] if catalog_path in df.index else None
+    cache_key = f"{row.get('configMd5_source')}-{row.get('configMd5_target')}" if row is not None else ""
+    dimensions, view_diffs = cached.mdim_view_diffs(catalog_path, source_engine, target_engine, cache_key=cache_key)
+    if not view_diffs:
+        st.warning("This MDim has no views.")
+        return
+
+    ids = sorted({v.indicator_id for v in view_diffs if v.affects_indicator and v.indicator_id is not None})
+    usage = cached.usage_for_indicators(tuple(ids), catalog_path, source_engine, cache_key=cache_key)
+    tree_html, height = render_tree_html(
+        catalog_path,
+        dimensions,
+        view_diffs,
+        dim_param_prefix=mdim_pages.DIM_PARAM_PREFIX,
+        external_impacts=[impact_counts(v, usage) for v in view_diffs],
+        self_url=f"{SOURCE.wizard_url.rstrip('/')}/metadata-diff",
+    )
+    # NOTE: nothing may be rendered below this — the component resizes itself to its content, and
+    # Streamlit-rendered siblings would overlap during the resize.
+    components.html(tree_html, height=height, scrolling=True)
 
 
 def _truncation_note(total: int) -> None:
