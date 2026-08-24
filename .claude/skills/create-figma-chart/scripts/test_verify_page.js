@@ -976,6 +976,32 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     // fails a correct ramp by construction, so the row must say so rather than hand over the command flat.
     check("33 a map warns that a sequential ramp is out of scope",
           /SEQUENTIAL ramp/.test(binned) && /--maps/.test(binned), binned);
+    // A frame can hold BOTH families at once — combination.md's exemplar is a line chart with an inset
+    // locator map whose countries are filled with the same colours as their series. `isMap` is
+    // frame-level, so the map won the single mode flag and the LINE STROKES were audited under
+    // `--maps`, whose --suggest answers out of the lighter Categorical Maps set: fill colours
+    // recommended for thin strokes, the exact swap `--line` exists to prevent. Worse, colour dedupe ran
+    // across both families, so the series entry collapsed into the country that shares its colour and
+    // the series disappeared from `--names` altogether. This fixture IS that chart: `mapCountries` adds
+    // the inset to the default line series, and `country__FRA` reuses the series colour exactly as the
+    // guidelines prescribe.
+    const combo = row(await run(buildFrame({ mapCountries: true }), {}), "colour-vision").detail;
+    check("33 a combination frame audits the series as a LINE, not as a map",
+          /--names 'A' --line/.test(combo), combo);
+    check("33 and still audits its inset map as a map",
+          /--names 'country__FRA,country__DEU' --maps/.test(combo), combo);
+    check("33 and says why there are two runs, so the shared colour is not read as a clash",
+          /two separate runs/.test(combo) && /expected/.test(combo), combo);
+    // The split must not fire on a frame with only one family, or every ordinary chart grows a note
+    // about a map it does not have. Both directions, since either alone can pass on a broken gate.
+    const mapOnly = buildFrame({ mapCountries: true });
+    chartOf(mapOnly).children = chartOf(mapOnly).children.filter((c) => c.name !== "line__A");
+    const dMapOnly = row(await run(mapOnly, {}), "colour-vision").detail;
+    check("33 a map with no series is still ONE run, in --maps",
+          /--maps/.test(dMapOnly) && !/--line/.test(dMapOnly) && !/two separate runs/.test(dMapOnly), dMapOnly);
+    const lineOnly = row(await run(buildFrame({}), {}), "colour-vision").detail;
+    check("33 a line chart with no map is still ONE run, in --line",
+          /--line/.test(lineOnly) && !/--maps/.test(lineOnly) && !/two separate runs/.test(lineOnly), lineOnly);
     // Figma switches a paint off two independent ways, and only `visible: false` was tested on the
     // FILL side — so a mark left at `opacity: 0` handed the audit a category colour that paints no
     // pixels, and could be sent a reviewer to go and "fix". The stroke side already applied both

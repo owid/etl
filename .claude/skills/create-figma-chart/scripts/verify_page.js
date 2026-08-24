@@ -1075,10 +1075,13 @@ const checkFrame = async (frameId) => {
     // whole one, which is the failure this row exists to avoid.
     const dimMarks = markSrc.filter((m) => m.translucent);
     const dimStrokes = strokeSrc.filter((s) => s.translucent);
+    // `fromMap` and `stroke` travel with the entry because they decide WHICH PALETTE the audit searches,
+    // and that is a property of the mark, not of the frame it sits in.
     const marks = markSrc.filter((m) => !m.translucent)
-      .map((m) => ({ id: (m.fromMap ? null : m.cat) || m.name, hex: m.hex, cat: m.fromMap ? null : m.cat }));
+      .map((m) => ({ id: (m.fromMap ? null : m.cat) || m.name, hex: m.hex, cat: m.fromMap ? null : m.cat,
+                     fromMap: !!m.fromMap, stroke: false }));
     const seriesStrokes = strokeSrc.filter((s) => !s.translucent)
-      .map((s) => ({ id: s.seriesName, hex: s.hex, cat: s.seriesName }));
+      .map((s) => ({ id: s.seriesName, hex: s.hex, cat: s.seriesName, fromMap: false, stroke: true }));
     const paletteSrc = [...marks, ...seriesStrokes];
     // The name is the category where there is one, so the note points at something the operator can
     // find on the canvas rather than at a count.
@@ -1092,53 +1095,6 @@ const checkFrame = async (frameId) => {
         + " wrong question. Reset the opacity to 1 (GUIDELINES.md does this for grapher's non-focused"
         + " series) and re-run, or judge those by eye."
       : "";
-    // Dedupe by COLOUR, because color_audit.py takes a PALETTE: hand it forty bar segments in six
-    // colours and every real finding competes with dozens of deltaE 0 self-pairs.
-    const seen = new Map();  // hex -> first mark/series name, in walk order
-    for (const p of paletteSrc) if (!seen.has(p.hex.toLowerCase())) seen.set(p.hex.toLowerCase(), p.id);
-    const hexes = [...seen.keys()];
-    // What that collapse HIDES is stated, not swallowed. Two categories on one colour is the severest
-    // collision there is — deltaE 0, indistinguishable to everyone — and the audit cannot report it,
-    // because to the audit they are one entry. So name them here instead.
-    // Not graded, and phrased as a question, because sharing a colour is often correct: a highlight
-    // treatment greys every unhighlighted series to the same value on purpose. Map shapes are left out
-    // of the note altogether — a choropleth puts every country in a bin into one colour by definition,
-    // so flagging that would fire on every map. Only grapher's `<kind>__<Entity>` names count as a
-    // category; an SVG import's `Rectangle 12` is unique per node and means nothing.
-    const catsByHex = new Map();
-    for (const p of paletteSrc) {
-      if (!p.cat) continue;
-      const h = p.hex.toLowerCase();
-      if (!catsByHex.has(h)) catsByHex.set(h, new Set());
-      catsByHex.get(h).add(p.cat);
-    }
-    const shared = [...catsByHex].filter(([, c]) => c.size > 1)
-      .map(([h, c]) => `${h} carries ${[...c].slice(0, 4).join(" + ")}`);
-    // A name carrying a comma would silently split into two --names entries and misalign every label
-    // after it; a name carrying an apostrophe would end the single-quoted shell argument mid-name, so
-    // "Women's employment" turns a paste-ready command into a shell syntax error. Both drop the flag
-    // wholesale rather than emitting it subtly wrong. State the ACTUAL reason: an unnamed mark, a
-    // comma'd one and an apostrophe'd one all disqualify the flag, and reporting one as another is the
-    // same wrong-verdict habit these checks exist to catch.
-    const names = [...seen.values()];
-    const nameProblem = names.some((n) => !n) ? "a mark has no name"
-      : names.some((n) => n.includes(",")) ? "a name contains a comma, which would misalign the labels"
-      : names.some((n) => n.includes("'")) ? "a name contains an apostrophe, which would break the quoted shell argument"
-      : null;
-    const namesSafe = !nameProblem;
-    // The mode flag also selects which PALETTE color_audit.py searches when the operator follows its
-    // "rerun with --suggest" instruction, so `--separated` is not interchangeable with the others.
-    // `--separated` only turns the seam gate off; `--line` turns it off AND installs the Line and Slope
-    // variants, the darker set meant for thin marks on white. A line or slope palette given plain
-    // `--separated` therefore gets fill colours recommended for strokes. All three imply "nothing
-    // shares an edge", which is why only the stacked/segmented case ever needs the flag dropped.
-    const mode = isMap ? "--maps" : seriesStrokes.length ? "--line" : "--separated";
-    const cmd = hexes.length
-      ? ".venv/bin/python .claude/skills/create-figma-chart/scripts/color_audit.py "
-        + `'${hexes.join(",")}'`
-        + (namesSafe ? ` --names '${names.join(",")}'` : "")
-        + ` ${mode}`
-      : null;
     // `--maps` swaps in the CATEGORICAL Maps palette, and the deltaE 20 all-pairs gate is a categorical
     // test. A SEQUENTIAL choropleth — Viridis, a ColorBrewer ramp — is ordered by construction and set
     // in grapher: its adjacent stops are MEANT to sit close together, so that gate fails a correct ramp,
@@ -1152,18 +1108,89 @@ const checkFrame = async (frameId) => {
     const lineNote = " — `--line` is `--separated` plus the Line and Slope Chart variants, the darker set"
       + " meant for thin marks and text on white, so a --suggest rerun recommends stroke colours rather"
       + " than fill colours. A line or slope chart has no seams, so nothing here needs reordering.";
-    const how = cmd
-      ? ` Run: ${cmd}`
-        + (isMap ? mapNote : mode === "--line" ? lineNote
-            : " — `--separated` assumes nothing shares an edge, which holds for lines, maps"
-            + " and plain/grouped bars. On a STACKED or SEGMENTED chart drop it and reorder the"
-            + " colours into stack order first, because the seam check reads adjacency off that order.")
-        + ` Palette: ${hexes.length} distinct colour(s) drawn from ${paletteSrc.length} plot mark(s)/series.`
+    const separatedNote = " — `--separated` assumes nothing shares an edge, which holds for lines, maps"
+      + " and plain/grouped bars. On a STACKED or SEGMENTED chart drop it and reorder the"
+      + " colours into stack order first, because the seam check reads adjacency off that order.";
+    // ONE RUN PER PALETTE FAMILY, not one per FRAME. A frame can hold both at once: combination.md's
+    // exemplar is a line chart with an inset locator map whose countries are filled with THE SAME
+    // COLOURS AS THEIR SERIES. `isMap` is a frame-level flag, so on that frame the map won and the line
+    // strokes were audited under `--maps` — whose "rerun with --suggest" answers out of the LIGHTER
+    // Categorical Maps set, recommending FILL colours for thin strokes. That is the exact swap `--line`
+    // exists to prevent, arrived at because one verdict was picked for a frame that holds two different
+    // things. The frame is one; the palettes are two, so each is deduped, named, flagged and emitted on
+    // its own, and neither is judged against the other's palette.
+    const mapPal = paletteSrc.filter((p) => p.fromMap);
+    const chartPal = paletteSrc.filter((p) => !p.fromMap);
+    const mixed = mapPal.length > 0 && chartPal.length > 0;
+    const paletteRun = (src) => {
+      // Dedupe by COLOUR, because color_audit.py takes a PALETTE: hand it forty bar segments in six
+      // colours and every real finding competes with dozens of deltaE 0 self-pairs.
+      const seen = new Map();  // hex -> first mark/series name, in walk order
+      for (const p of src) if (!seen.has(p.hex.toLowerCase())) seen.set(p.hex.toLowerCase(), p.id);
+      const hexes = [...seen.keys()];
+      if (!hexes.length) return "";
+      // What that collapse HIDES is stated, not swallowed. Two categories on one colour is the severest
+      // collision there is — deltaE 0, indistinguishable to everyone — and the audit cannot report it,
+      // because to the audit they are one entry. So name them here instead.
+      // Not graded, and phrased as a question, because sharing a colour is often correct: a highlight
+      // treatment greys every unhighlighted series to the same value on purpose. Map shapes are left out
+      // of the note altogether — a choropleth puts every country in a bin into one colour by definition,
+      // so flagging that would fire on every map. Only grapher's `<kind>__<Entity>` names count as a
+      // category; an SVG import's `Rectangle 12` is unique per node and means nothing.
+      const catsByHex = new Map();
+      for (const p of src) {
+        if (!p.cat) continue;
+        const h = p.hex.toLowerCase();
+        if (!catsByHex.has(h)) catsByHex.set(h, new Set());
+        catsByHex.get(h).add(p.cat);
+      }
+      const shared = [...catsByHex].filter(([, c]) => c.size > 1)
+        .map(([h, c]) => `${h} carries ${[...c].slice(0, 4).join(" + ")}`);
+      // A name carrying a comma would silently split into two --names entries and misalign every label
+      // after it; a name carrying an apostrophe would end the single-quoted shell argument mid-name, so
+      // "Women's employment" turns a paste-ready command into a shell syntax error. Both drop the flag
+      // wholesale rather than emitting it subtly wrong. State the ACTUAL reason: an unnamed mark, a
+      // comma'd one and an apostrophe'd one all disqualify the flag, and reporting one as another is the
+      // same wrong-verdict habit these checks exist to catch.
+      const names = [...seen.values()];
+      const nameProblem = names.some((n) => !n) ? "a mark has no name"
+        : names.some((n) => n.includes(",")) ? "a name contains a comma, which would misalign the labels"
+        : names.some((n) => n.includes("'")) ? "a name contains an apostrophe, which would break the quoted shell argument"
+        : null;
+      const namesSafe = !nameProblem;
+      // The mode flag also selects which PALETTE color_audit.py searches when the operator follows its
+      // "rerun with --suggest" instruction, so `--separated` is not interchangeable with the others.
+      // `--separated` only turns the seam gate off; `--line` turns it off AND installs the Line and Slope
+      // variants, the darker set meant for thin marks on white. A line or slope palette given plain
+      // `--separated` therefore gets fill colours recommended for strokes. All three imply "nothing
+      // shares an edge", which is why only the stacked/segmented case ever needs the flag dropped.
+      // Read off THIS palette's own marks, so a mixed frame cannot hand one family the other's flag.
+      const isMapPal = src.some((p) => p.fromMap);
+      const mode = isMapPal ? "--maps" : src.some((p) => p.stroke) ? "--line" : "--separated";
+      const cmd = ".venv/bin/python .claude/skills/create-figma-chart/scripts/color_audit.py "
+        + `'${hexes.join(",")}'`
+        + (namesSafe ? ` --names '${names.join(",")}'` : "")
+        + ` ${mode}`;
+      return (mixed ? (isMapPal ? " MAP shapes —" : " Chart marks and series —") : "")
+        + ` Run: ${cmd}`
+        + (isMapPal ? mapNote : mode === "--line" ? lineNote : separatedNote)
+        + ` Palette: ${hexes.length} distinct colour(s) drawn from ${src.length} plot mark(s)/series.`
         + (shared.length ? ` One colour, two categories — the audit sees these as ONE entry and cannot`
             + ` report the clash, so judge them by eye: ${shared.slice(0, 4).join("; ")}. Correct for a`
             + ` highlight treatment; a defect if they are separate categories.` : "")
-        + (namesSafe ? "" : ` (--names omitted: ${nameProblem}.)`)
-        + dimNote
+        + (namesSafe ? "" : ` (--names omitted: ${nameProblem}.)`);
+    };
+    // The overlap between the two is NOT a finding: combination.md fills the locator map's countries
+    // with their own series colours on purpose, so saying so here stops the split from reading as a
+    // clash the operator has to go and reconcile.
+    const mixedNote = mixed
+      ? " This frame holds BOTH a map and chart marks/series. They take DIFFERENT color_audit.py"
+        + " palettes — Categorical Maps against the Line and Slope variants — so they are audited as two"
+        + " separate runs rather than one, and a colour appearing in both is expected (combination.md"
+        + " fills an inset locator map's countries with their series colours)."
+      : "";
+    const how = paletteSrc.length
+      ? mixedNote + paletteRun(chartPal) + paletteRun(mapPal) + dimNote
       // An all-translucent plot must not report "no data marks found" — that reads as an empty frame
       // and sends the operator looking for missing nodes instead of at the opacity they set.
       : dimNote
