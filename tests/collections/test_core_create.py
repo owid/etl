@@ -1118,3 +1118,52 @@ class TestCreateCollectionMultipleTables:
                 # The user's input config object must not have been mutated.
                 assert len(config["views"]) == 1
                 assert config["views"][0]["indicators"]["y"][0]["catalogPath"] == "manual_view#stages"
+
+
+def test_create_collection_preserves_grapher_schema_from_table():
+    """
+    Test create_collection - the `grapher_schema` pin survives the table-driven path.
+
+    Some configs (e.g. corruption_barometer, causes_of_death, migration_flows) get their dimension
+    choices from the table rather than the YAML, so the config dict is rebuilt on the way through.
+    The pin must not be lost in that rebuild. Uses a non-default version so a dropped pin can't be
+    masked by the DEFAULT_GRAPHER_SCHEMA fallback.
+    """
+    from unittest.mock import patch
+
+    from owid.catalog import Table, Variable
+    from owid.catalog.meta import VariableMeta
+
+    from etl.collection.core.create import create_collection
+
+    tb = Table(
+        {"country": ["USA", "CAN"], "year": [2020, 2020], "deaths__sex_male": [1, 2]},
+        short_name="tb",
+    )
+    tb["deaths__sex_male"] = Variable(
+        tb["deaths__sex_male"],
+        name="deaths__sex_male",
+        metadata=VariableMeta(original_short_name="deaths", dimensions={"sex": "male"}),
+    )
+
+    config = {
+        "grapher_schema": "007",
+        "title": {"title": "T", "title_variant": "v"},
+        "default_selection": ["World"],
+        "dimensions": [],
+        "views": [],
+    }
+
+    with (
+        patch("etl.collection.core.utils.process_views"),
+        patch("etl.collection.core.create._get_expand_path_mode", return_value="table"),
+    ):
+        c = create_collection(
+            config_yaml=config,
+            dependencies=set(),
+            catalog_path="ns/latest/ds#short",
+            tb=tb,
+        )
+
+    assert c.grapher_schema == "007"
+    assert c.to_dict()["grapher_schema"] == "007"

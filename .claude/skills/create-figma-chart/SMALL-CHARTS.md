@@ -8,6 +8,15 @@ Data Viz Checklist. This file only covers what is different at 302px.
 **Last verified: 2026-08-14.** Re-verify the template geometry at the start of every run
 (`get_metadata` on `798:54`); the design team edits these frames in place.
 
+**A cloud session cannot finish this format — say so before you start.** The deliverable here is a
+PNG on Cloudflare Images, and both halves of that route — the 3× export (`GET /api/figma/image`) and
+the upload (`POST /api/images`) — are *authenticated* `admin.owid.io` endpoints, which Cloudflare
+Access `302`s to a login page from a cloud sandbox. The host itself resolves and its unauthenticated
+routes work, so this is an access wall on these two endpoints, not a network problem to troubleshoot
+(see [cloud-sandbox.md](../../docs/cloud-sandbox.md)). The frame can be built and reviewed anywhere;
+the 3× export and upload have to happen on the user's machine. Tell them that up front rather than at
+delivery, so they can decide whether to run this locally instead.
+
 ## The two vocabularies
 
 The design team's names and the code's names diverged, and the code's older name has been deleted.
@@ -62,18 +71,20 @@ heading `"SMALL" Charts (featured on the OWID website as guided and PULL charts)
 | `small-chart-template-guided` | `25344:1357` | 302×233 | title `25344:1378`, optional subtitle `25344:1379` |
 | `small-chart-template-pull` | `25344:1391` | 302×233 | title `25344:1396`, optional subtitle `25344:1397`, **source `25344:1398`** |
 
-### The background is not where you expect it
+### The background — check it, but expect nothing to repair
 
-Both templates ship their frame fill as **white with `visible: false`**, and paint the background from
-a `Group > Group > Vector` — a white **302×233 rectangle** — instead. So:
+**Both templates now carry a real visible white frame fill and no background vector**, so a clone is
+ready to use as-is. Assert that rather than assume it, because the shape of the old defect is what
+makes a regression recognizable:
 
-- **Do not just delete that group.** It is the only thing painting the background; remove it and the
-  frame is transparent, which shows up immediately as charts with no white card behind them.
-- **But do not keep it either**, because it is a *fixed* 302×233 rectangle and this format's height is
-  free. It under-covers a 272-tall frame and overhangs a 221-tall one.
-- **Enable the frame's own fill and drop the vector group**: `frame.fills = frame.fills.map(f => ({...f, visible: true}))`.
-  A fill follows the frame at any height, and it is what the designer's finished charts did — every
-  one of them had the frame fill visible and no full-size background vector.
+- They used to ship the frame fill as **white with `visible: false`** and paint the background from a
+  `Group > Group > Vector` — a white **302×233 rectangle**. If you meet that again, enable the frame's
+  own fill and drop the vector group: `frame.fills = frame.fills.map(f => ({...f, visible: true}))`.
+- **Neither half of that repair works alone.** Deleting the group leaves a transparent frame — charts
+  with no white card behind them. Keeping it leaves a *fixed* 302×233 rectangle in a format whose
+  height is free, so it under-covers a 272-tall frame and overhangs a 221-tall one. A frame fill
+  follows the frame at any height, which is why it is the right answer and what the designer's
+  finished charts all use.
 
 There is **no z-order hazard to avoid here.** `appendChild` puts the imported chart last, so it draws
 above the background whatever the background is. The "an opaque background paints over the template"
@@ -259,6 +270,30 @@ GUIDELINES.md → Direct labeling has the placement rules, and the per-type conv
 the target. How much of that work there is depends on the chart type, so measure the export before
 estimating.
 
+### The frame height is an output, and the frame must be resized BEFORE the chart goes in
+
+The shipped 302-wide templates measure 302×233, but that height is a placeholder: grapher returns
+whatever ink the chart needs and reserves the rest. Measured on a single-series line chart at
+`imFontSize=16`: **122.7px of ink in a 183.5px canvas** for the guided variant and 110.9 in 166.5 for
+the pull one — roughly 60px and 56px of vertical space grapher asked for and then did not use. Forcing
+that ink to fill a 233px frame would need a rescale, which this route forbids because it moves the
+font sizes off the 11/12px ladder.
+
+So compute the frame height from the ink: `44 + inkHeight + 12` for the guided variant, and
+`44 + inkHeight + 6 + sourceRowHeight + 12` for the pull one, whose source row sits below the chart.
+That gave 179 and 184 against the shipped 233.
+
+**A resize displaces everything already in the frame, so re-pin afterwards.** Two things broke on one
+`clone.resize()`. The chart, placed before it, was squashed 122.7px → 94.26px — non-uniformly, through
+the group's top-and-bottom constraint, and reported as though that were its real height. And the
+**header moved and was clipped**: these templates constrain it `vertical: CENTER` (pull) and `SCALE`
+(guided), so shrinking 233 → 184 put the pull header at **y = −15** and `clipsContent` sliced the title
+off. Placing the chart after the resize fixes the first; only re-pinning fixes the second, because the
+header ships inside the template.
+
+So the order is: **resize → re-pin the header to `y = 10` → place the chart at `y = 44` → place the
+source row** — then assert no child has a negative `y`, because a clipping frame hides exactly this.
+
 ### Request the final pixel size directly
 
 `getThumbnailOptions` sets `staticBounds = Bounds(0, 0, imWidth / 4, imHeight / 4)`, so `imWidth`
@@ -313,6 +348,13 @@ single-entity chart is pure overhead at 302px.
 | One entity, one indicator | nothing | no name at all — first and last **values** only | **`1`** |
 | One entity, several indicators | the indicator | the indicator's **display name**, placed away from the values | **`1`** |
 | Several entities *and* indicators | both | reconsider the chart — it is too much for 302px |
+
+**This is easy to skip, and the default is the wrong one.** Omitting `imMinimal` gives you `0`, which
+on a single-entity line chart puts the country's name inside a 278px plot — measured on Argentina, the
+export's texts were `1950 | 2025 | Argentina | 0.52`, with "Argentina" sitting in the left of the plot
+where the first value should be. Passing `imMinimal=1` returned `1950 | 2025 | 0.19 | 0.52`: name gone,
+first value gained. Pass it explicitly for rows two and three of the table rather than relying on the
+default.
 
 `imMinimal=1` is the mechanism for rows two and three, and it does exactly the right thing: it drops
 the entity name **and** emits the first *and* last value per series. Verified —
@@ -448,7 +490,7 @@ of label → series possible:
 
 Two Figma mechanics that bite here: **`leadingTrim` heights only settle on the next `use_figma` call**,
 so trim in one call and centre in the next; and a text node's **width is stale in the call that set its
-characters**, which silently invalidates any placement search built from it (SKILL.md → Gotchas).
+characters**, which silently invalidates any placement search built from it (reference/GOTCHAS.md).
 
 ### Expand the plot to the content box — the dots belong on the title box's edges
 
@@ -626,10 +668,11 @@ entities and the values are the point. It is an editorial choice, so ask rather 
 Steps 5 and 7 of SKILL.md, reduced to what this format needs:
 
 1. Clone `25344:1357` (guided) or `25344:1391` (pull) onto the page.
-2. **Fix the background:** set the clone's own white fill to `visible: true`, then remove the
-   `Group > Group > Vector` background rectangle (see above for why both halves are needed). That
-   group is a **`GROUP`**, not a `FRAME` — `get_metadata` renders groups as `<frame …>`, so a filter
-   on `type === "FRAME"` silently matches nothing and leaves it in place.
+2. **Check the background, don't fix it:** the clone should already have a visible white frame fill
+   and no background vector. Only if it does not, apply the repair above — set the clone's own white
+   fill to `visible: true` *and* remove the `Group > Group > Vector` rectangle, both halves. When
+   hunting for that group, note it is a **`GROUP`**, not a `FRAME` — `get_metadata` renders groups as
+   `<frame …>`, so a filter on `type === "FRAME"` silently matches nothing and leaves it in place.
 3. Resize the clone to `H`. On a pull clone, move the source row to `y = H − 23`.
 4. Fill the text slots — title, optional subtitle, and the bare `Producer (Year)` source on a pull
    chart. Per SKILL.md Step 6, setting `characters` flattens mixed weights; these slots are
@@ -704,7 +747,8 @@ SVG is rejected.
    Note `get_screenshot` **cannot** do this — `maxDimension` only ever downscales, and clamps at the
    node's natural size.
 3. **Upload** via the admin (`POST /api/images`), then reference the filename in the block's `image:`
-   field.
+   field. **From a cloud session steps 2 and 3 are both Access-blocked** — hand them to the user, with
+   the frame's node id and the target filename, rather than reporting the chart as delivered.
 
 Side effect to expect: `ImagesIndexPage.tsx:56` buckets anything whose filename contains
 `thumbnail` into the admin's featured-thumbnail filter.

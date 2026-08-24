@@ -1,5 +1,6 @@
 import hashlib
 import json
+import os
 import random
 import re
 import urllib.parse
@@ -23,6 +24,16 @@ from etl.config import OWID_ENV, OWIDEnv
 from etl.grapher.model import Variable
 
 log = get_logger()
+
+# Grapher is consumed as a published npm package (`@ourworldindata/grapher`). The built
+# bundles of every release are also served on our Tailnet, which is all a browser needs —
+# unlike the npm registry, these URLs require no auth token. Set GRAPHER_PACKAGE_URL to
+# pin a version (e.g. .../ourworldindata/grapher/v0.1.0) instead of tracking the latest.
+GRAPHER_PACKAGE_URL = os.environ.get(
+    "GRAPHER_PACKAGE_URL",
+    "https://owid-packages.tail6e23.ts.net/ourworldindata/grapher/latest",
+).rstrip("/")
+
 
 HORIZONTAL_STYLE = """<style class="hide-element">
     /* Hides the style container and removes the extra spacing */
@@ -175,6 +186,33 @@ def mdim_chart(url: str, view: dict, height: int = 600, default_display: str | N
     return st.iframe(f"{url}{query_string}", height=height, width=int(1.6 * height))
 
 
+def _grapher_html(chart_config: dict[str, Any], owid_env: OWIDEnv, height: int = 600) -> str:
+    """Build the HTML that mounts a Grapher chart with the `@ourworldindata/grapher` package."""
+    config = deepcopy(chart_config)
+
+    # Env-specific URLs Grapher uses for its share / embed / edit links.
+    config["bakedGrapherURL"] = f"{owid_env.base_site}/grapher"
+    config["adminBaseUrl"] = owid_env.base_site
+
+    return f"""
+    <link rel="stylesheet" href="https://ourworldindata.org/fonts.css" />
+    <link rel="stylesheet" href="{GRAPHER_PACKAGE_URL}/grapher.css" />
+    <style>
+        html, body {{ margin: 0; padding: 0; }}
+        /* The chart fills its container, so the container needs an explicit size. */
+        #grapher {{ width: 100%; height: {height}px; }}
+    </style>
+    <div id="grapher"></div>
+    <script type="module">
+        import {{ GrapherLoader }} from "{GRAPHER_PACKAGE_URL}/grapher.standalone.min.js";
+        GrapherLoader.fromApi({{
+            config: {json.dumps(config, default=default_converter)},
+            dataApiUrl: "{owid_env.indicators_url}/",
+        }}).mount(document.getElementById("grapher"));
+    </script>
+    """
+
+
 def _chart_html(chart_config: dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
     """Plot a Grapher chart using the Grapher API.
 
@@ -185,26 +223,7 @@ def _chart_html(chart_config: dict[str, Any], owid_env: OWIDEnv, height=600, **k
     owid_env : OWIDEnv
         Environment configuration. This is needed to access the correct API (changes between servers).
     """
-    chart_config_tmp = deepcopy(chart_config)
-
-    chart_config_tmp["bakedGrapherURL"] = f"{owid_env.base_site}/grapher"
-    chart_config_tmp["adminBaseUrl"] = owid_env.base_site
-    chart_config_tmp["dataApiUrl"] = f"{owid_env.indicators_url}/"
-
-    HTML = f"""
-    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
-    <div class="StandaloneGrapherOrExplorerPage">
-        <main>
-            <figure data-grapher-src></figure>
-        </main>
-        <script> document.cookie = "isAdmin=true;max-age=31536000" </script>
-        <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
-        <script type="module">
-            var jsonConfig = {json.dumps(chart_config_tmp, default=default_converter)}; window.renderSingleGrapherOnGrapherPage({{ config: jsonConfig, dataApiUrl: "{owid_env.data_api_url}/v1/indicators/", catalogUrl: "{owid_env.catalog_url}" }});
-        </script>
-    </div>
-    """
+    HTML = _grapher_html(chart_config, owid_env, height=height)
 
     components.html(HTML, height=height, width=int(1.6 * height), **kwargs)
 

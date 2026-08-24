@@ -525,6 +525,13 @@ def embed_references(redirects: list[dict]) -> dict[int, str]:
     Pure SQL, so this works with read-only credentials (the admin references API needs
     ADMIN_API_KEY). Counts only — audit_references.py does the full sweep with
     replacement URLs.
+
+    **Featured metrics are deliberately not counted here.** The audit marks them RED but keeps
+    them out of its embed count, so the two still classify identically (the rule in SKILL.md).
+    A featured metric is a topic-page slot keyed by URL, not a rendered copy of the config, so
+    it is exempt for the same reason `key chart` is: no page breaks and no article edit fixes
+    it. Not free, though — the slot empties and cannot be re-created afterwards — which is why
+    the audit gives it its own section and says to swap it *before* the CLI runs.
     """
     ids = tuple(r["chart"]["id"] for r in redirects)
     if not ids:

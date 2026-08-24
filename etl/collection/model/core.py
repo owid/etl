@@ -35,10 +35,11 @@ from etl.collection.utils import (
     get_complete_dimensions_filter,
     get_tables_by_name_mapping,
     map_indicator_path_to_id,
+    resolve_grapher_schema,
     unique_records,
     validate_indicators_in_db,
 )
-from etl.config import OWID_ENV, OWIDEnv
+from etl.config import DEFAULT_GRAPHER_SCHEMA, OWID_ENV, OWIDEnv
 from etl.files import yaml_dump
 from etl.paths import EXPORT_DIR, SCHEMAS_DIR
 
@@ -125,6 +126,11 @@ class Collection(MDIMBase):
 
     dependencies: set[str] = field(default_factory=set)
     topic_tags: list[str] | None = None
+    # Grapher chart-config schema version that this collection's view configs were authored
+    # against. Short ("011") or full URL form; see `resolve_grapher_schema`. Grapher uses it as the
+    # `$schema` of every view config, and skips config migrations entirely when it is missing — so
+    # pin it explicitly rather than relying on the `DEFAULT_GRAPHER_SCHEMA` fallback.
+    grapher_schema: str | None = None
     _default_dimensions: dict[str, str] | None = None
 
     # Internal use. For save() method.
@@ -159,6 +165,9 @@ class Collection(MDIMBase):
         if isinstance(self.dependencies, list):
             # Convert list to set
             self.dependencies = set(self.dependencies)
+
+        # Fail at authoring time on a malformed pin, rather than at upsert time
+        resolve_grapher_schema(self.grapher_schema)
 
     @property
     def definitions(self) -> Definitions:
@@ -277,6 +286,12 @@ class Collection(MDIMBase):
         # Check that no view carries a corrupted description_key
         self.validate_description_keys()
 
+        # Warn about view configs that shadow the collection-level schema pin
+        self.warn_on_view_schema_overrides()
+
+        # Warn when no version is pinned and we fall back to the vendored default
+        self.warn_if_grapher_schema_unpinned()
+
         # Sort views based on dimension order
         self.sort_views_based_on_dimensions()
 
@@ -304,6 +319,12 @@ class Collection(MDIMBase):
         # description_key is a markdown string; a YAML list is authoring sugar
         # and gets converted before the config is stored.
         _convert_description_key_lists(config, context=self.catalog_path)
+
+        # Grapher expects the resolved schema URL under its own key (`grapherConfigSchema`), which
+        # it injects as the `$schema` of every view config before migrating it to the latest
+        # version. Always send it: without it, Grapher skips those migrations.
+        config.pop("grapher_schema", None)
+        config["grapherConfigSchema"] = resolve_grapher_schema(self.grapher_schema)
 
         # Convert config from snake_case to camelCase
         config = camelize(config, exclude_keys={"dimensions"})
@@ -640,6 +661,44 @@ class Collection(MDIMBase):
         for view in self.views:
             if view.is_grouped:
                 sanity_check_grouped_view(view)
+
+    def warn_on_view_schema_overrides(self):
+        """Warn when a view config carries its own `$schema`, shadowing `grapher_schema`.
+
+        Grapher applies the collection pin as `{$schema: grapherConfigSchema, **view.config}`, so a
+        view's own `$schema` wins — and it is far less visible than the collection pin on line 1 of
+        the config YAML. That combination has bitten us before: a config pinned at an old version
+        while its body used fields from a newer one, so Grapher ran migrations over a config they
+        were never meant to touch. Pin the collection instead.
+        """
+        overrides = defaultdict(int)
+        for view in self.views:
+            config = view.config
+            if isinstance(config, dict) and "$schema" in config:
+                overrides[config["$schema"]] += 1
+
+        for schema, n_views in sorted(overrides.items()):
+            log.warning(
+                f"Collection '{self.catalog_path}': {n_views} view(s) set `$schema` in their config "
+                f"({schema}), which overrides the collection-level `grapher_schema` "
+                f"({resolve_grapher_schema(self.grapher_schema)}). Remove it and pin the whole "
+                "collection with the top-level `grapher_schema` field instead."
+            )
+
+    def warn_if_grapher_schema_unpinned(self):
+        """Warn when the collection pins no schema version and the default is used.
+
+        The fallback is `DEFAULT_GRAPHER_SCHEMA`, so grapher is told the config already matches the
+        version this repo vendors. That is usually true, but it means a config authored against an
+        older schema would skip migration. It also makes "pinned" and "defaulted" indistinguishable
+        in the database while the two happen to agree — so say so out loud instead.
+        """
+        if self.grapher_schema is None:
+            log.warning(
+                f"Collection '{self.catalog_path}' pins no `grapher_schema`; falling back to "
+                f"{DEFAULT_GRAPHER_SCHEMA}. Add a top-level `grapher_schema` to the config YAML "
+                "recording the version its view configs were authored against."
+            )
 
     def validate_description_keys(self):
         """Fail on a view whose `description_key` list cannot be real content.
