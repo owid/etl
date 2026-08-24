@@ -279,6 +279,7 @@ const checkFrame = async (frameId) => {
 
   // ---------------------------------------------------------------- rows
   // Text floor (CHECKS.md: nothing below 12px)
+// #region type
   {
     const under = texts.filter((t) => t.size < TEXT_FLOOR - 0.01);
     // A node whose sizes could not be READ is not a pass. `sizeRanges` swallows a throwing or
@@ -436,6 +437,8 @@ const checkFrame = async (frameId) => {
   // halo ONLY when a series line of the same name exists: on a SCATTER, `outline__<Entity>` is the ring
   // around a point, which measured 3.5-4.1px here and was being judged against a line's halo bar.
   // So a halo is paired or it is not a halo.
+// #endregion
+// #region series
   {
     const lineNames = new Set();
     for (const s of stroked) if (s.seriesKind && s.seriesKind !== "outline") lineNames.add(s.seriesName);
@@ -577,6 +580,8 @@ const checkFrame = async (frameId) => {
   }
 
   // Box alignment — the chart's edges against the header box, to the pixel.
+// #endregion
+// #region geometry
   {
     const boxes = plotRoots.map(rel).filter(Boolean);
     if (isSmall) skip("box-alignment", "302-wide format: the header HUGS its own text (206-278 against a 278 content box), so the chart's width is not meant to match it — SMALL-CHARTS.md");
@@ -676,6 +681,8 @@ const checkFrame = async (frameId) => {
   // muted context line are legal; a protagonist line, a dot and a value label are not. Failing every
   // intersection alike reports a correct highlighted chart as broken, because crossing the muted
   // context is exactly what the treatment is for.
+// #endregion
+// #region annotations
   let crossings = null;
   {
     const map = (n, pt) => { const m = n.absoluteTransform; return { x: m[0][0] * pt.x + m[0][1] * pt.y + m[0][2] - fb.x, y: m[1][0] * pt.x + m[1][1] * pt.y + m[1][2] - fb.y }; };
@@ -915,6 +922,7 @@ const checkFrame = async (frameId) => {
   }
 
   // ---------------------------------------------------------------- declared gaps in coverage
+// #endregion
   skip("colour-vision", "all-pairs deltaE 20 for deuteranopia/protanopia on CATEGORICAL fills", "scripts/color_audit.py");
   skip("grayscale-seams", "adjacent pairs above ~1.6:1; needs --separated for non-stacked charts", "scripts/color_audit.py");
   skip("spelling-and-prose", "American spelling, typos, style-guide breaches", ".venv/bin/codespell + /check-metadata-style");

@@ -5,11 +5,20 @@ Two problems this solves, and the first one is a hard blocker:
 
   * **`verify_page.js` does not fit.** `use_figma` caps `code` at 50,000 characters and that file is
     ~79,000 — so Step 8c's "runs the mechanical rows in ONE read-only call" is impossible as written.
-    Stripped of comments it is ~45,000 and fits.
+    Stripped of comments it is ~45,000, which fits but leaves you relaying 90% of the cap verbatim.
   * **Reading a script to paste it costs the model context twice** — once for the Read, once for the
     tool call. Piping this straight into the call skips the Read entirely.
 
     .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js
+
+`--rows` is the answer to the size, and it is a slice rather than a rewrite: the rows already sit in
+bare `{ }` blocks above a shared preamble, so `// #region` markers select whole blocks and every
+slice carries the preamble and runs alone. Nothing was moved, so the harness still tests the one
+file. `--list-rows` prints the groups with their sizes; `--frame-id` rewrites `CONFIG.frameId` so
+the output can go straight into the call.
+
+    inline_script.py verify_page.js --rows series --frame-id 26417:6
+    inline_script.py verify_page.js --rows type,series          # groups combine
 
 Stripping is context-aware, not a regex. These files contain `https://` inside strings, regex
 literals holding `/*`, and template literals spanning lines — a naive `//`-to-end-of-line strip
@@ -20,11 +29,15 @@ corrupts all three, and the corruption surfaces as a plugin syntax error with no
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from pathlib import Path
 
 SCRIPTS = Path(__file__).resolve().parent
 CAP = 50_000
+# `// #region name` ... `// #endregion` mark independently-emittable row groups. Kept through
+# stripping, because --rows selects on them.
+REGION = re.compile(r"^//\s*#(region\s+\S+|endregion)\s*$")
 
 
 def strip_js(src: str) -> str:
@@ -40,8 +53,12 @@ def strip_js(src: str) -> str:
 
         if context is None:
             if ch == "/" and nxt == "/":
-                while i < n and src[i] != "\n":
-                    i += 1
+                line_end = src.find("\n", i)
+                line_end = n if line_end < 0 else line_end
+                # Region markers are structure, not commentary: --rows needs them to survive.
+                if REGION.match(src[i:line_end]):
+                    out.append(src[i:line_end])
+                i = line_end
                 continue
             if ch == "/" and nxt == "*":
                 i += 2
@@ -75,6 +92,28 @@ def strip_js(src: str) -> str:
     return "\n".join(ln for ln in lines if ln.strip())
 
 
+def select_rows(src: str, wanted: set[str]) -> tuple[str, list[str]]:
+    """Keep everything outside regions, plus the regions named. Unmarked files come back whole.
+
+    The preamble (frame resolution, the node walk, the shared boxes and bands) sits outside every
+    region, so each slice is self-contained and runs on its own.
+    """
+    kept, found, skipping = [], [], False
+    for line in src.split("\n"):
+        m = REGION.match(line.strip())
+        if m:
+            if m.group(1) == "endregion":
+                skipping = False
+            else:
+                name = m.group(1).split()[1]
+                found.append(name)
+                skipping = name not in wanted
+            continue
+        if not skipping:
+            kept.append(line)
+    return "\n".join(kept), found
+
+
 def _regex_allowed(out: list[str]) -> bool:
     """A `/` starts a regex only where a value is expected — after an operator or an opener."""
     for ch in reversed(out):
@@ -88,6 +127,16 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("script", nargs="?", help="e.g. verify_page.js")
     ap.add_argument("--check", action="store_true", help="report sizes for every script; print none")
+    ap.add_argument(
+        "--rows",
+        help="comma-separated row groups to keep (verify_page.js: type, series, geometry, "
+        "annotations). Omit for the whole file. Use --list-rows to see them with their sizes.",
+    )
+    ap.add_argument("--list-rows", action="store_true", help="list a script's row groups and exit")
+    ap.add_argument(
+        "--frame-id",
+        help="rewrite CONFIG.frameId in the emitted source, so the output is ready to send as-is",
+    )
     args = ap.parse_args()
 
     if args.check:
@@ -111,10 +160,40 @@ def main() -> int:
         ap.error(f"no such script: {path}")
 
     stripped = strip_js(path.read_text())
+
+    if args.list_rows:
+        _, groups = select_rows(stripped, set())
+        if not groups:
+            print(f"{args.script} has no #region markers — it is emitted whole ({len(stripped):,} chars)")
+            return 0
+        base = len(select_rows(stripped, set())[0])
+        print(f"{args.script}: preamble {base:,} chars, plus each group:")
+        for g in dict.fromkeys(groups):
+            size = len(select_rows(stripped, {g})[0])
+            print(f"  {g:<14} +{size - base:>6,}  = {size:>6,} chars  ({size / CAP * 100:>3.0f}% of cap)")
+        return 0
+
+    if args.rows:
+        wanted = {w.strip() for w in args.rows.split(",") if w.strip()}
+        stripped, groups = select_rows(stripped, wanted)
+        unknown = wanted - set(groups)
+        if unknown:
+            ap.error(
+                f"no such row group(s): {', '.join(sorted(unknown))}. Available: {', '.join(dict.fromkeys(groups))}"
+            )
+
+    if args.frame_id:
+        stripped, n_sub = re.subn(
+            r'(frameId:\s*)"[^"]*"', lambda m: f'{m.group(1)}"{args.frame_id}"', stripped, count=1
+        )
+        if not n_sub:
+            print(f"--frame-id given but {args.script} has no CONFIG.frameId to rewrite", file=sys.stderr)
+            return 1
+
     if len(stripped) > CAP:
         print(
             f"{args.script} is {len(stripped):,} chars stripped, over the {CAP:,} cap — "
-            "it cannot be inlined and must be split.",
+            f"split it with --rows (see --list-rows).",
             file=sys.stderr,
         )
         return 1

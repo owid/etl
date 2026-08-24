@@ -15,14 +15,38 @@ Every one of these caught a real defect on this skill's first run, and none of t
 >
 > That returns ~45,000 characters of comment-free source, which fits and still parses (the helper is
 > context-aware, so URLs, regex literals and template strings survive; `--check` sizes every script
-> and fails if one overflows). **Edit `CONFIG.frameId` in the emitted text before sending it.**
+> and fails if one overflows).
 >
-> **Even stripped it is a hard thing to relay**, at 90% of the cap and requiring verbatim
-> reproduction into the tool call, where a one-character corruption yields a *wrong verdict* rather
-> than an error. A run that cannot do it safely should say so and fall back to checking the rows it
-> can — naming the ones it skipped, which is what a `SKIPPED` row means here anyway. **Splitting this
-> script into per-row modules is the standing fix, and it is not done.** `diff_against_template.js`
-> (~12,000 stripped) has no such problem.
+> **Better: run it in slices, which is what `--rows` is for.** 45,000 chars is 90% of the cap and
+> still has to be relayed verbatim, where a one-character corruption yields a *wrong verdict* rather
+> than an error. The rows are grouped, each slice carries the shared preamble and runs on its own:
+>
+> ```bash
+> inline_script.py verify_page.js --list-rows          # type / series / geometry / annotations
+> inline_script.py verify_page.js --rows series --frame-id <your frame>
+> ```
+>
+> | group | rows | size |
+> |---|---|---|
+> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, text-hierarchy | 41% of cap |
+> | `series` | series-weight, furniture-weight, furniture-dash | 40% |
+> | `geometry` | box-alignment, gap, margins, off-palette | 36% |
+> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 50% |
+>
+> Groups combine (`--rows type,series`), so the whole pass is two calls. **Run all four** — each
+> reports its own rows and nothing else, so a group you skip is a group nobody checked.
+> `diff_against_template.js` (~12,000 stripped) needs none of this.
+>
+> **Do NOT substitute a hand-rolled subset. It is worse than skipping the pass, and this is
+> measured.** A run that could not relay the script wrote its own seven rows instead, reported six
+> `PASS` and shipped three defects a reviewer caught by eye within minutes: a series line left at
+> **1.296px** after a `rescale()` (the stroke-weight rows were simply absent), a **bold producer
+> name** in the footer (the text-weight rows were absent), and — the instructive one — annotations
+> with **no knockout at all**, which its own knockout row had passed. That row tested crossings
+> against **data**, where this file requires a 3px stroke whenever **furniture** is crossed; both
+> annotations sat squarely across gridlines. A skipped row announces a gap. A reimplemented row
+> *closes* the gap on paper while leaving it open in the frame, and you cannot tell from the report
+> which you have. So: relay the script, or declare the whole pass unrun.
 >
 > **[`scripts/verify_page.js`](../scripts/verify_page.js) runs the MECHANICAL rows in ONE read-only
 > `use_figma` call** — text floor, annotation ladder, named styles, text hierarchy, series and
