@@ -125,8 +125,15 @@
   finished frames; keep every post-write probe on `get_screenshot`. It also returns no
   `original_width`/`original_height`, so the size-only survey still wants `get_screenshot`.
 
-- **The Figma *desktop* MCP server cannot do the writes — but it serves the reads ~30× faster, and
-  on a local run that is the biggest lever there is.** Two different servers are in play: the
+- **The Figma *desktop* MCP server serves reads ~30× faster, and is still the wrong tool for a chart
+  build. Use it for a bulk survey of nodes that already exist; not in the per-chart flow.** The
+  verdict first, because the speedup below is real and reads like a recommendation. A normal build
+  screenshots 14–70 times, and most of those are of frames it *just made* — which is precisely what
+  this path cannot see (constraint 5). What is left saves a couple of minutes and buys a silent
+  staleness failure and a daily quota. **Where it is transformative is the other shape of task:**
+  reading hundreds of long-existing nodes — auditing the chart library, rebuilding NODE-MAP,
+  documenting the templates. The pass that wrote GUIDELINES.md screenshotted **272** chart-library
+  nodes and averaged 35.5 s a call; the same sweep here is seconds. That is the case to reach for it. Two different servers are in play: the
   hosted connector this skill normally uses, and one the desktop app serves on
   `http://127.0.0.1:3845/mcp`. Enumerated live (2026-08-24) the desktop one offers **six tools,
   all `readOnlyHint: true`** — `get_screenshot`, `get_metadata`, `get_design_context`,
@@ -224,8 +231,9 @@
   **Don't use `-I{}` with a single `-o`:** `{}` expands only in the URL, so every parallel `curl`
   writes the same file and you Read one screenshot six times — a wrong verdict from a real render,
   which is the worst shape of bug this skill has. Same trap as the `upload_assets` pattern below,
-  and the same fix. Locally you can skip this leg entirely: `scripts/figma_desktop_read.py shot`
-  returns the PNGs directly, no URLs to fetch (see the desktop-server entry above).
+  and the same fix. On a *bulk survey* you can skip this leg entirely — `figma_desktop_read.py shot`
+  returns the PNGs directly, no URLs to fetch — but read the desktop-server entry above first: it is
+  not for a normal chart build.
 
 - **`upload_assets` gives you N `submitUrl`s so the POSTs can overlap — run them that way.** The
   Step 5 snippet shows one `curl`, and a two-format run that copies it twice pays two full uploads of

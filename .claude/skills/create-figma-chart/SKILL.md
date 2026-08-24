@@ -154,9 +154,7 @@ it understates it (4.19× against 4.00×).
 Reads fan out freely — **including reads that each switch pages**, which makes the Step 5 and Step 8c rows below safe: two concurrent calls, one holding `Cover` and one the Templates page, overlapping for 7.7 s, each saw only its own — `figma.currentPage` is per-call. It is concurrent *mutation* of one page that races, not the switch. **Writes only when they target different pages** — a script may switch pages only once, so two `use_figma` writes aimed at the same page in one message race each other.
 
 What is independent — **the batch manifest, keyed by the step that owes it.** Issue each row's calls
-in one message, so batching is mechanical rather than a fresh judgment call every run. **Locally,
-run `figma_desktop_read.py check` first:** where the desktop path is available every *read* row costs
-~0.37 s rather than ~12 s and barely needs batching; the write rows are unaffected (Gotchas).
+in one message, so batching is mechanical rather than a fresh judgment call every run.
 
 - **Step 5 — the page survey.** The page enumeration and `verify_templates.js` go together. Checking N pages means N calls — `page.children` on a page you have not switched to is lazily loaded — and they fan out.
 - **Step 8c — the checks.** `verify_page.js` and `diff_against_template.js` are one read-only call each; issue them together, with every pixel probe that reads one fixed state.
