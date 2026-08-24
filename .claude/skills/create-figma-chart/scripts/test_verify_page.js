@@ -99,9 +99,12 @@ function buildFrame(opts = {}) {
   // "Data source: X" — the prefix is chars 0-12, the producer name 12-14. `boldSource` models the
   // real defect: assigning `characters` collapses the node to its first run's style, so the bold
   // prefix takes the producer name with it. `sourceTailWeight` sets the tail to any other weight,
-  // for the off-contract-but-not-bold cases a not-bold test would wave through.
+  // for the off-contract-but-not-bold cases a not-bold test would wave through. `sourcePrefixWeight`
+  // does the same for the PREFIX, where a substring test on /bold/ certifies Semibold and Black.
   const src = text("source", "Data source: X", 13, 16, 488, contentW, 16, undefined, {
-    segments: { fontName: opts.boldSource ? [["Bold", 0, 14]] : [["Bold", 0, 12], [opts.sourceTailWeight || "Regular", 12, 14]] },
+    segments: { fontName: opts.boldSource
+      ? [["Bold", 0, 14]]
+      : [[opts.sourcePrefixWeight || "Bold", 0, 12], [opts.sourceTailWeight || "Regular", 12, 14]] },
   });
   const footer = node({ name: "footer", layoutMode: "VERTICAL", x: 16, y: 488, width: contentW, height: 36, children: [src] });
   const logo = node({ name: "logo", x: W - 80, y: 16, width: 64, height: 35 });
@@ -615,6 +618,14 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
       const off = await run(buildFrame({ sourceTailWeight: w }), {});
       check(`18e a ${w} producer name FAILS`, row(off, "source-line-weight").status === "FAIL", row(off, "source-line-weight").detail);
       check(`18e and says Regular is what ${w} owes`, /prescribes Regular/.test(row(off, "source-line-weight").detail), row(off, "source-line-weight").detail);
+    }
+    // The prefix owes Bold exactly, for the same reason the tail owes Regular exactly. A substring
+    // test on /bold|black/ certifies all four of these, so a footer nudged off the house weight
+    // ships looking almost right.
+    for (const w of ["Semibold", "ExtraBold", "Black", "Bold Italic"]) {
+      const off = await run(buildFrame({ sourcePrefixWeight: w }), {});
+      check(`18e a ${w} prefix FAILS`, row(off, "source-line-weight").status === "FAIL", row(off, "source-line-weight").detail);
+      check(`18e and names Bold as the target`, /want Bold/.test(row(off, "source-line-weight").detail), row(off, "source-line-weight").detail);
     }
   }
 

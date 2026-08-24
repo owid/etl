@@ -102,7 +102,13 @@ def parse_hex(value: str) -> np.ndarray:
     h = value.lstrip("#")
     if len(h) != 6:
         raise unmeasurable(f"--background must be a 6-digit hex color — got {value!r}")
-    return np.array([int(h[i : i + 2], 16) for i in (0, 2, 4)], dtype=np.int16)
+    # Length is not validity: `#fffffg` is six characters and `int(..., 16)` raises on it. Uncaught,
+    # that exits 1 — the code reserved for "the check ran and the chart is wrong" — so a typo in the
+    # background would read as a genuine defect.
+    try:
+        return np.array([int(h[i : i + 2], 16) for i in (0, 2, 4)], dtype=np.int16)
+    except ValueError:
+        raise unmeasurable(f"--background must be a 6-digit hex color — got {value!r}")
 
 
 def relative_luminance(rgb: np.ndarray) -> np.ndarray:
@@ -300,6 +306,12 @@ def cmd_ink_box(args: argparse.Namespace) -> int:
         print(f"--region {args.region} falls outside the {width}x{height} render", file=sys.stderr)
         return 2
     region = crop_of(img, box)
+
+    # A negative tolerance makes `abs(delta) > tolerance` true for every pixel, background included,
+    # so the extent comes back as the whole region with a confident exit 0 — a plausible but false
+    # "ink reaches the edge", which is the one verdict this check exists to produce honestly.
+    if args.tolerance < 0:
+        raise unmeasurable(f"--tolerance must be a non-negative channel delta — got {args.tolerance}")
 
     if args.background:
         background = parse_hex(args.background)

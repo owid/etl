@@ -31,7 +31,9 @@ Usage (from the repo root, always through the repo virtualenv):
     .venv/bin/python .claude/skills/create-figma-chart/scripts/figma_desktop_read.py meta 798:54
     .venv/bin/python .claude/skills/create-figma-chart/scripts/figma_desktop_read.py meta
 
-Exits non-zero if any requested node failed, so a caller can trust a zero exit.
+Exits non-zero if any requested node failed, so a caller can trust a zero exit. `1` is an ordinary
+failure — a bad node id, the wrong active tab — and `2` is the daily read quota, in every mode. The
+two want opposite remedies (fix the ids vs. stop using this server today), so they are kept apart.
 """
 
 from __future__ import annotations
@@ -49,6 +51,9 @@ from pathlib import Path
 SERVER = "http://127.0.0.1:3845/mcp"
 TIMEOUT = 120
 PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
+# Prefix that marks a per-node failure as the daily quota rather than a bad node, so `shot` can
+# raise its exit code to 2 the way `check` does. A sentinel, not a phrase to match loosely.
+QUOTA_MARK = "FAILED (desktop daily quota exhausted"
 
 
 def rpc(payload: dict, session: str | None = None) -> dict:
@@ -187,7 +192,7 @@ def shot(nodes: list[str], out_dir: Path) -> int:
         if result.get("isError"):
             text = result_text(result).strip()
             if rate_limited(text):
-                return node, f"FAILED (desktop daily quota exhausted — use the hosted path) {text}"
+                return node, f"{QUOTA_MARK} — use the hosted path) {text}"
             return node, f"FAILED {text}"
         for item in result.get("content", []):
             if item.get("type") != "image":
@@ -206,11 +211,18 @@ def shot(nodes: list[str], out_dir: Path) -> int:
     with ThreadPoolExecutor(max_workers=min(8, len(nodes))) as pool:
         results = list(pool.map(one, enumerate(nodes)))
 
-    failures = 0
+    failures, quota = 0, False
     for node, line in results:
         print(f"{node}: {line}")
         failures += line.startswith("FAILED")
-    return failures
+        quota = quota or line.startswith(QUOTA_MARK)
+    # Quota outranks the count. A batch can exhaust the allowance partway through — the preflight
+    # passed, then the cap hit — and collapsing that to a generic 1 tells the caller "bad node ids",
+    # whose remedy is to fix the ids. The remedy here is the opposite: stop calling this server for
+    # the day and use the hosted connector. `check` already separates the two; so does `shot` now.
+    if quota:
+        return 2
+    return 1 if failures else 0
 
 
 def meta(node: str | None) -> int:
@@ -252,7 +264,7 @@ def main() -> int:
 
     args = ap.parse_args()
     if args.mode == "shot":
-        return 1 if shot(args.nodes, args.out_dir) else 0
+        return shot(args.nodes, args.out_dir)
     if args.mode == "check":
         return check(args.expect_node)
     return meta(args.node)

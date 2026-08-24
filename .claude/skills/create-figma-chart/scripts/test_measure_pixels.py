@@ -261,6 +261,33 @@ def test_unreadable_png_is_unmeasurable(tmp: Path) -> None:
     check("truncated exits 2", code, 2)
 
 
+def test_malformed_background_is_unmeasurable(tmp: Path) -> None:
+    print("a six-character non-hex --background is bad input (2), not a failed check (1)")
+    png = save(canvas(30, 20), tmp / "plain.png")
+    # Length is not validity. `#fffffg` passes the 6-digit gate and dies inside int(..., 16), and an
+    # uncaught ValueError exits 1 — the code that means "the chart is wrong".
+    for bad in ("#fffffg", "zzzzzz", "#12345g"):
+        code, _ = run("ink-box", "--png", str(png), "--background", bad)
+        check(f"{bad} exits 2", code, 2)
+    code, _ = run("contrast", "--png", str(png), "--background", "#ffff")
+    check("wrong length still exits 2", code, 2)
+
+
+def test_negative_tolerance_is_refused(tmp: Path) -> None:
+    print("a negative --tolerance would call the whole region ink, and say so with exit 0")
+    img = canvas(60, 40)
+    img[10:30, 20:25] = (0, 0, 0)
+    png = save(img, tmp / "square.png")
+    code, out = run("ink-box", "--png", str(png), "--background", "#ffffff", "--json")
+    check("true extent", out.get("ink_box"), [20, 10, 25, 30])
+    check("true ink px", out.get("ink_px"), 100)
+    check("exit code", code, 0)
+    # Every pixel satisfies abs(delta) > -1, background included, so the box becomes the region and
+    # the run still exits 0 — a plausible, confident, wrong answer about where the ink ends.
+    code, _ = run("ink-box", "--png", str(png), "--background", "#ffffff", "--tolerance", "-1", "--json")
+    check("negative tolerance exits 2", code, 2)
+
+
 def test_gray_target_would_defeat_color_classification(tmp: Path) -> None:
     print("a GRAY target — the case that killed colour-based classification — still masks cleanly")
 
@@ -389,6 +416,8 @@ def main() -> int:
             test_bbox_guard,
             test_fractional_bbox_keeps_its_edge_pixels,
             test_unreadable_png_is_unmeasurable,
+            test_malformed_background_is_unmeasurable,
+            test_negative_tolerance_is_refused,
             test_gray_target_would_defeat_color_classification,
             test_subpixel_stroke_scale,
             test_antialiased_gap_tracks_truth,

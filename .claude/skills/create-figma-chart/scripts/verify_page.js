@@ -448,7 +448,13 @@ const checkFrame = async (frameId) => {
       try { segs = src.getStyledTextSegments(["fontName"]); } catch (e) { segs = []; }
       if (!segs.length) skip("source-line-weight", "footer source line has no readable font segments");
       else {
-        const BOLD = /bold|black/i;
+        // Two different questions, so two different regexes. BOLDISH classifies the TAIL: the
+        // collapse copies whatever the prefix is, so anything bold-family there is the symptom.
+        // The PREFIX itself is judged exactly, like the tail's Regular — TEXTS.md prescribes
+        // `LATO("Bold")` unconditionally, so Semibold, ExtraBold, Black or Bold Italic there is
+        // off-contract, and a substring test certifies all four as ok.
+        const BOLDISH = /bold|black/i;
+        const BOLD = /^bold$/i;
         // The tail is judged against Regular, not merely against "not bold". TEXTS.md states the target
         // twice and unconditionally — `"Data source:" Bold unbound` + `" <citation>" Regular BOUND` — so
         // a Medium, Light or Italic producer name is off-contract too, and a not-bold test certifies it.
@@ -460,7 +466,7 @@ const checkFrame = async (frameId) => {
         const offTail = restWeights.filter((w) => !REGULAR.test(w));
         const bad = [];
         if (!prefixWeights.length || !prefixWeights.every((w) => BOLD.test(w))) bad.push(`"${PREFIX}" is ${prefixWeights.join("/") || "unreadable"} (want Bold)`);
-        if (offTail.some((w) => BOLD.test(w))) bad.push(`the producer name is ${restWeights.join("/")} — setting \`characters\` collapses the node to its FIRST run's style, which here is the bold prefix (GOTCHAS.md). Re-assert Regular across the whole string, then bold the prefix`);
+        if (offTail.some((w) => BOLDISH.test(w))) bad.push(`the producer name is ${restWeights.join("/")} — setting \`characters\` collapses the node to its FIRST run's style, which here is the bold prefix (GOTCHAS.md). Re-assert Regular across the whole string, then bold the prefix`);
         else if (offTail.length) bad.push(`the producer name is ${restWeights.join("/")}, and TEXTS.md prescribes Regular — re-assert it across the tail. If a template genuinely ships ${offTail.join("/")} there, measure it and record it in TEXTS.md rather than loosening this row`);
         add("source-line-weight", bad.length ? "FAIL" : "ok",
             bad.length ? bad.join("; ") : `"${PREFIX}" bold, producer name ${restWeights.join("/") || "empty"}`,

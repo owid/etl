@@ -198,8 +198,10 @@ that ends at **524**. On its own that is ambiguous, because antialiasing along a
 registers as ink. So ask `contrast` what the ink in that strip actually is:
 
 ```bash
-measure_pixels.py ink-box  --png frame.png --region 524,0,540,540 --background '#ffffff'
-measure_pixels.py contrast --png frame.png --region 524,0,540,540 --background '#ffffff'
+.venv/bin/python .claude/skills/create-figma-chart/scripts/measure_pixels.py ink-box \
+    --png frame.png --region 524,0,540,540 --background '#ffffff'
+.venv/bin/python .claude/skills/create-figma-chart/scripts/measure_pixels.py contrast \
+    --png frame.png --region 524,0,540,540 --background '#ffffff'
 ```
 
 34 ink pixels, 3px wide by 76px tall, **peak contrast 6.79:1** — that is the annotation gray at full
