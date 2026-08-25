@@ -190,6 +190,9 @@ def _build_tree(
             node: dict[str, Any] = {
                 "slug": slug,
                 "name": choice_name(level, slug),
+                # The dimension this pill is a choice of — rendered as a muted prefix, so the tree's
+                # columns explain themselves without a header row (their x positions vary per branch).
+                "dim_name": dimensions[level].get("name") or dim_slug,
                 "changed": sum(1 for i in bucket if view_diffs[i].changed),
                 "total": len(bucket),
             }
@@ -229,6 +232,8 @@ def _render_node(
     changed = node["changed"] > 0
     status = "changed" if changed else "unchanged"
 
+    dim = f'<span class="mdd-dimname">{html.escape(node["dim_name"])}</span>' if node.get("dim_name") else ""
+
     if "view_index" in node:
         i = node["view_index"]
         is_new = view_diffs[i].is_new
@@ -241,18 +246,16 @@ def _render_node(
         return (
             f'<div class="mdd-node mdd-leafnode mdd-n-{status}">'
             f'<a class="{cls}" data-view="{i}" href="{html.escape(leaf_hrefs[i])}" target="_blank" rel="noopener">'
-            f'{html.escape(node["name"])}{badge}{leaf_badges[i]}<span class="mdd-golink">&#8599;</span></a>'
+            f'{dim}{html.escape(node["name"])}{badge}{leaf_badges[i]}<span class="mdd-golink">&#8599;</span></a>'
             f"</div>"
         )
 
     counter = f'<span class="mdd-count">{node["changed"]}/{node["total"]}</span>' if changed else ""
-    # A section branch carries what used to be in the toolbar: which dimensions this MDim is cut by.
-    note = f'<span class="mdd-dims">{html.escape(node["note"])}</span>' if node.get("note") else ""
     children = "".join(_render_node(child, view_diffs, leaf_hrefs, leaf_badges) for child in node["children"])
     return (
         f'<div class="mdd-node mdd-n-{status}">'
         f'<div class="mdd-box mdd-branch mdd-{status}" role="button" title="Click to collapse/expand">'
-        f'<span class="mdd-caret">&#9662;</span>{html.escape(node["name"])}{counter}{note}</div>'
+        f'<span class="mdd-caret">&#9662;</span>{dim}{html.escape(node["name"])}{counter}</div>'
         f'<div class="mdd-children">{children}</div>'
         f"</div>"
     )
@@ -409,7 +412,6 @@ def render_multi_tree_html(
         section_nodes.append(
             {
                 "name": str(section.get("catalog_path") or "MDim"),
-                "note": " → ".join(str(d.get("name") or d["slug"]) for d in dimensions),
                 "changed": n_changed,
                 "total": len(view_diffs),
                 "children": nodes,
@@ -435,23 +437,25 @@ def render_multi_tree_html(
     if len(section_nodes) == 1:
         body = "".join(_render_node(child, all_views, all_hrefs, all_badges) for child in section_nodes[0]["children"])
         summary = f"<b>{total_changed}</b> of {len(all_views)} views changed"
-        dims_line = f'<div class="mdd-dims">Controls: {html.escape(section_nodes[0]["note"])}</div>'
+        dims_line = ""  # each pill names its own dimension now
     else:
         parts = []
         for i, node in enumerate(section_nodes):
             anchor = f"mdd-section-{i}"
             index_entries.append((anchor, f"{node['name']} ({node['changed']}/{node['total']})"))
-            parts.append(f'<div id="{anchor}">{_render_node(node, all_views, all_hrefs, all_badges)}</div>')
+            parts.append(
+                f'<div id="{anchor}" class="mdd-section">{_render_node(node, all_views, all_hrefs, all_badges)}</div>'
+            )
         body = "".join(parts)
         summary = f"<b>{total_changed}</b> of {len(all_views)} views changed across <b>{len(section_nodes)}</b> MDims"
-        dims_line = '<div class="mdd-dims">Each MDim is a branch, cut by its own dimensions.</div>'
+        dims_line = ""  # each pill names its own dimension now
 
     if chart_branch:
         chart_html, chart_previews = _render_chart_branch(chart_branch, len(previews))
         if chart_html:
             n_charts = sum(len(g.get("charts") or []) for g in chart_branch.get("groups") or [])
             index_entries.append(("mdd-section-charts", f"{chart_branch.get('label') or 'Charts'} ({n_charts})"))
-            body += f'<div id="mdd-section-charts">{chart_html}</div>'
+            body += f'<div id="mdd-section-charts" class="mdd-section">{chart_html}</div>'
         previews = previews + chart_previews
 
     # The index only earns its row when there is more than one place to jump to.
@@ -481,6 +485,9 @@ def render_multi_tree_html(
     #mdd-root .mdd-legend span {{ margin-right: 12px; }}
     #mdd-root .mdd-dot {{ display: inline-block; width: 10px; height: 10px; border-radius: 5px; margin-right: 4px; }}
     #mdd-root .mdd-index {{ color: #555; }}
+    #mdd-root .mdd-dimname {{ color: #999; font-weight: 400; margin-right: 5px; }}
+    #mdd-root .mdd-section {{ margin: 4px 0 16px; padding-top: 14px; border-top: 1px solid #e3e3e3; }}
+    #mdd-root .mdd-section:first-child {{ border-top: none; padding-top: 0; margin-top: 0; }}
     #mdd-root .mdd-index-link {{ color: #1c7ed6; text-decoration: none; }}
     #mdd-root .mdd-index-link:hover {{ text-decoration: underline; }}
     #mdd-root .mdd-tree {{ overflow: auto; padding: 4px; }}
@@ -570,7 +577,23 @@ def render_multi_tree_html(
         const node = target.querySelector(".mdd-node");
         if (node) node.classList.remove("mdd-collapsed");
         fit();
-        target.scrollIntoView({{behavior: "smooth", block: "start"}});
+        // This frame is sized to its content, so the *page* scrolls, not this document —
+        // scrollIntoView here moves nothing. Same-origin, so scroll the parent's main
+        // container to the target's position; when the tree scrolls internally (past
+        // MAX_HEIGHT), line the target up inside it first.
+        if (treeEl.scrollHeight > treeEl.clientHeight + 2) {{
+          treeEl.scrollTop = Math.max(0, target.offsetTop - treeEl.offsetTop - 8);
+        }}
+        try {{
+          const fe = window.frameElement;
+          const scroller = window.parent.document.querySelector("section.stMain")
+            || window.parent.document.scrollingElement;
+          const HEADER = 130;  // the app header plus the sticky section bar
+          const top = fe.getBoundingClientRect().top + target.getBoundingClientRect().top;
+          scroller.scrollBy({{top: top - HEADER, behavior: "smooth"}});
+        }} catch (err) {{
+          target.scrollIntoView({{behavior: "smooth", block: "start"}});
+        }}
       }});
     }});
 
