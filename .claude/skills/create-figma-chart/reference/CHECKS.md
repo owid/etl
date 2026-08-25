@@ -157,15 +157,34 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > matches a ground's composite, and a canvas-coloured halo with some filled shape's box around it.
 > Both name the shape and the sum so the call can be made by eye.
 >
-> Two consequences that are easy to get wrong in the other direction. **Grounds stack**: a translucent
-> tint over an opaque plot background renders as the *ordered* composite of both, which equals neither
-> shape's own composite over the frame — so the row folds the candidates in paint order, and where they
+> Four consequences that are easy to get wrong in the other direction.
+>
+> **Grounds stack, and so do a single node's fills.** A translucent tint over an opaque plot background
+> renders as the *ordered* composite of both, which equals neither shape's own composite over the
+> frame; and a node carrying several visible paints renders their composite too, so reading only its
+> first paint reports a colour that is not on the canvas. The row folds both — the node's fills into one
+> effective colour and alpha, then the candidates over each other in paint order — and where candidates
 > overlap and nothing matches it **REVIEWS** instead of failing, because any subset of the stack is a
-> possible ground and a bounding box cannot say which. And **the tier branch knows about the ground
-> too**: "crosses nothing yet carries a knockout" is a FAIL on *bare canvas* only. An annotation inside
-> a tint keeps its halo while the region under it is still empty — that is the point
-> ANNOTATIONS-AND-ARROWS.md makes — so it is REVIEWED, and the FAIL stands only where no filled shape's
-> box contains the annotation at all.
+> possible ground and a bounding box cannot say which.
+>
+> **Only what is painted *under* the annotation is behind it.** A containing shape appended *after* the
+> annotation sits on top of it — the re-import z-order bug this page describes further down, where a
+> tint appended last washes the text out. Matched by box alone it read as the ground and the row
+> recommended colouring the halo to match it, turning the bug into advice. Paint position is carried
+> alongside the box.
+>
+> **A full-bleed node is dropped only when it composites to the frame's own fill.** Such a backdrop
+> paints the canvas colour and would turn every correct canvas-coloured halo into a review. A full-bleed
+> rect in a *different* colour is the opposite case — it is the ground behind every annotation on the
+> frame, which is exactly how the Instagram templates carry their beige — and dropping it by geometry
+> alone failed a correct halo twice over: once as a needless knockout, then again against a frame fill
+> the reader never sees.
+>
+> **The tier branch knows about the ground too.** "Crosses nothing yet carries a knockout" is a FAIL on
+> *bare canvas* only. An annotation inside a tint keeps its halo while the region under it is still
+> empty — that is the point ANNOTATIONS-AND-ARROWS.md makes — so it is REVIEWED. But a *backdrop* is
+> canvas whatever colour it paints, so it never excuses a halo over empty space; only a bounded shape
+> does, and the FAIL stands where no bounded filled shape contains the annotation.
 >
 > **Non-rendering means exactly zero, never a floor.** A node or paint at 0.005 does reach the canvas,
 > and a cutoff dropped its whole subtree from *every* row — an 8px label at 0.005 left `text-floor`

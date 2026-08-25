@@ -115,12 +115,34 @@ const translucent = (p) => !!p && typeof p.opacity === "number" && p.opacity < 0
 // exists for the one case where the second term IS known — an annotation's knockout, whose ground is a
 // single shape sitting directly on the frame's own fill (ANNOTATIONS-AND-ARROWS.md). Even there the
 // answer is REVIEWED rather than passed, because the shape is matched by bounding box; see the row.
+const chOf = (h) => { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+const hexFrom = (rgb) => "#" + rgb.map((x) => Math.max(0, Math.min(255, Math.round(x))).toString(16).padStart(2, "0")).join("");
 const composite = (hex, alpha, over) => {
   const a = Math.max(0, Math.min(1, alpha));
-  const ch = (h) => { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
-  const f = ch(hex), b = ch(over);
-  return "#" + [0, 1, 2].map((i) => Math.round(a * f[i] + (1 - a) * b[i]).toString(16).padStart(2, "0")).join("");
+  const f = chOf(hex), b = chOf(over);
+  return hexFrom([0, 1, 2].map((i) => a * f[i] + (1 - a) * b[i]));
 };
+// A node's own fills composite among THEMSELVES before the node composites over anything else. Reading
+// only the first rendering paint reported a colour the reader never sees, and failed a halo that
+// matched the one they do. Folded back-to-front — the order `fills` carries, the same order `children`
+// uses — into a PREMULTIPLIED (C, A) pair, with the node's opacity applied to the RESULT rather than to
+// each paint, which is where it actually sits. `hex`/`alpha` are the single-paint equivalent of that
+// pair: exact for compositing, and readable in a verdict.
+const flattenFills = (fills, nodeOpacity) => {
+  let C = [0, 0, 0], A = 0;
+  for (const f of fills) {
+    if (!renders(f)) continue;
+    const a = Math.max(0, Math.min(1, f.opacity === undefined ? 1 : f.opacity));
+    const c = [f.color.r * 255, f.color.g * 255, f.color.b * 255];
+    C = [0, 1, 2].map((i) => c[i] * a + C[i] * (1 - a));
+    A = a + A * (1 - a);
+  }
+  C = C.map((x) => x * nodeOpacity);
+  A = A * nodeOpacity;
+  return { C, A, hex: A > 0 ? hexFrom(C.map((x) => x / A)) : null, alpha: A };
+};
+// What a ground actually paints when it is laid over a given base.
+const groundOver = (g, base) => hexFrom(chOf(base).map((b, i) => g.C[i] + (1 - g.A) * b));
 let rows = [];
 const add = (name, status, detail, extra) => rows.push({ check: name, status, detail, ...(extra || {}) });
 const skip = (name, why, owner) => add(name, "SKIPPED", why, owner ? { ownedBy: owner } : null);
@@ -266,6 +288,10 @@ const checkFrame = async (frameId) => {
   // one. Kept separate from `fills` because that inventory is about which colours are on the page and
   // drops the box and the alpha — both of which are the whole question here.
   const grounds = [];
+  // Monotonic paint position, stamped on annotations and grounds alike as they are walked. `collect`
+  // descends `children` in array order — the order Figma paints them — and records a parent's own fill
+  // before walking into it, so a smaller stamp means "painted earlier", i.e. underneath.
+  let paintOrder = 0;
   // Grapher groups its axis furniture under stable container names. Identifying furniture as
   // "stroked and not a series line" instead is wrong the moment the chart is not a line chart: on a
   // map EVERY country vector is a stroked non-series plot node, so the prescribed 0.22px borders and
@@ -355,7 +381,7 @@ const checkFrame = async (frameId) => {
                      styleId: n.textStyleId || "", box: rel(n), insidePlot, fill: tf, translucent: tfDim, mixedWeight, weights });
       }
     }
-    if (/^annotation__/.test(n.name)) annotations.push({ node: n, name: n.name, box: rel(n), type: n.type, opacity: nodeOpacity });
+    if (/^annotation__/.test(n.name)) annotations.push({ node: n, name: n.name, box: rel(n), type: n.type, opacity: nodeOpacity, order: paintOrder++ });
     if ("strokeWeight" in n && typeof n.strokeWeight === "number" && n.strokes && n.strokes.length) {
       // The stroke's COLOUR travels with it, picked the same way the knockout row picks one: the first
       // paint that actually RENDERS, not `strokes[0]`, which can be a switched-off or transparent decoy.
@@ -378,10 +404,9 @@ const checkFrame = async (frameId) => {
       for (const f of n.fills) {
         if (renders(f)) fills.push({ name: n.name, type: n.type, hex: hexOf(f), styleId: n.fillStyleId || "", insidePlot });
       }
-      const gp = n.fills.find((f) => renders(f));
-      if (gp && n.type !== "TEXT" && !/^annotation__/.test(n.name)) {
-        grounds.push({ name: n.name, box: areaBox, hex: hexOf(gp),
-                       alpha: nodeOpacity * (gp.opacity === undefined ? 1 : gp.opacity) });
+      if (n.type !== "TEXT" && !/^annotation__/.test(n.name) && n.fills.some((f) => renders(f))) {
+        const g = flattenFills(n.fills, nodeOpacity);
+        if (g.A > 0) grounds.push({ name: n.name, box: areaBox, order: paintOrder++, C: g.C, A: g.A, hex: g.hex, alpha: g.alpha });
       }
     }
     // Marker groups and value labels. The NAME is on the group and the GEOMETRY is on its children, and
@@ -1039,15 +1064,32 @@ const checkFrame = async (frameId) => {
         const paint = (n.strokes || []).find((s) => s && s.visible !== false && (s.opacity === undefined || s.opacity > 0));
         const hasStroke = !!paint && n.strokeWeight > 0;
         const crosses = crossings[a.name] || [];
-        // GROUND CANDIDATES: filled shapes whose box CONTAINS the annotation and which are not the
-        // frame's own backdrop — a full-bleed node composites to itself and would turn every correct
-        // canvas-coloured halo into a review. Computed HERE, not beside the colour test that consumes
-        // them, because the TIER branch immediately below needs them too.
+        // GROUND CANDIDATES: filled shapes whose box CONTAINS the annotation and which are painted
+        // UNDER it. Computed HERE, not beside the colour test that consumes them, because the TIER
+        // branch immediately below needs them too.
         const eps = 0.5;
-        const cands = (a.box ? grounds.filter((g) => g.box && g.name !== a.name
-          && !(g.box.l <= 0.5 && g.box.t <= 0.5 && g.box.rr >= fb.width - 0.5 && g.box.bb >= fb.height - 0.5)
+        const fullBleed = (g) => g.box.l <= 0.5 && g.box.t <= 0.5
+          && g.box.rr >= fb.width - 0.5 && g.box.bb >= fb.height - 0.5;
+        // Painted AFTER the annotation means painted ON TOP of it, which is not a ground at all — it is
+        // the re-import z-order bug ANNOTATIONS-AND-ARROWS.md describes, where a tint appended last
+        // washes the text out. Without this the row read that tint as the ground and recommended
+        // matching the halo to it, turning the bug into advice.
+        const under = (g) => g.order === undefined || a.order === undefined || g.order < a.order;
+        const contains = (g) => g.box && g.name !== a.name && under(g)
           && g.box.l <= a.box.l + eps && g.box.rr >= a.box.rr - eps
-          && g.box.t <= a.box.t + eps && g.box.bb >= a.box.bb - eps) : []);
+          && g.box.t <= a.box.t + eps && g.box.bb >= a.box.bb - eps;
+        // A full-bleed node is dropped only when it composites to the frame's OWN fill: such a backdrop
+        // paints the canvas colour and would turn every correct canvas-coloured halo into a review. A
+        // full-bleed rect in a DIFFERENT colour is the opposite case — it is the ground behind every
+        // annotation on the frame, which is exactly how the Instagram templates carry their beige — and
+        // dropping it by geometry alone failed a correct halo twice: once as a needless knockout, then
+        // again against a `frameFill` the reader never sees.
+        const cands = (a.box ? grounds.filter((g) => contains(g)
+          && !(fullBleed(g) && frameFill && groundOver(g, frameFill).toLowerCase() === frameFill.toLowerCase())) : []);
+        // The TIER branch asks a different question — is there SHADING under this annotation that earns
+        // it a halo? — and a full-bleed backdrop is the canvas whatever colour it paints. So it never
+        // excuses a halo over empty space; only a bounded shape does.
+        const tints = cands.filter((g) => !fullBleed(g));
         if (crosses.length && !hasStroke) {
           bad.push(`${a.name} crosses ${crosses.length} thing(s) (${crosses.slice(0, 3).join(", ")}) but carries NO knockout — CHECKS.md requires a 3px OUTSIDE stroke whenever furniture is crossed`);
           continue;
@@ -1059,11 +1101,11 @@ const checkFrame = async (frameId) => {
         // here contradicted the page, and did so BEFORE the colour test below ever ran — so a correct
         // tint-coloured halo over an empty wedge was rejected without its colour being looked at.
         if (!crosses.length && hasStroke) {
-          if (!cands.length) {
+          if (!tints.length) {
             bad.push(`${a.name} crosses nothing yet carries a ${r(n.strokeWeight)}px knockout — an annotation over empty space takes no stroke and no frame`);
             continue;
           }
-          unsure.push(`${a.name} crosses nothing yet carries a ${r(n.strokeWeight)}px knockout, which is a FAIL on bare canvas — but ${cands.length} filled shape(s) have a box containing it (${cands.slice(0, 3).map((g) => g.name).join(", ")}), and an annotation on a tint keeps its halo even where the tint is empty today (ANNOTATIONS-AND-ARROWS.md). The ground was matched by BOUNDING BOX, so confirm by eye that it really sits on that shading`);
+          unsure.push(`${a.name} crosses nothing yet carries a ${r(n.strokeWeight)}px knockout, which is a FAIL on bare canvas — but ${tints.length} filled shape(s) have a box containing it (${tints.slice(0, 3).map((g) => g.name).join(", ")}), and an annotation on a tint keeps its halo even where the tint is empty today (ANNOTATIONS-AND-ARROWS.md). The ground was matched by BOUNDING BOX, so confirm by eye that it really sits on that shading`);
         }
         // A knockout works by PAINTING the frame's colour over what it crosses, so a translucent one
         // does not do the job its 3px and OUTSIDE alignment are for: at 0.005 the crossing shows
@@ -1102,17 +1144,17 @@ const checkFrame = async (frameId) => {
             // raised rather than passed — a white outline around every letter is exactly what a
             // reviewer sees and this row never used to mention.
             if (cands.length) {
-              unsure.push(`${a.name} knockout is the frame's ${frameFill}, which is right on bare canvas — but ${cands.length} filled shape(s) have a box containing it (${cands.slice(0, 3).map((g) => `${g.name} -> ${composite(g.hex, g.alpha, frameFill)}`).join(", ")}). If it really sits on that shading the halo reads as a white outline around every letter and should be the composite instead (ANNOTATIONS-AND-ARROWS.md)`);
+              unsure.push(`${a.name} knockout is the frame's ${frameFill}, which is right on bare canvas — but ${cands.length} filled shape(s) have a box containing it (${cands.slice(0, 3).map((g) => `${g.name} -> ${groundOver(g, frameFill)}`).join(", ")}). If it really sits on that shading the halo reads as a white outline around every letter and should be the composite instead (ANNOTATIONS-AND-ARROWS.md)`);
             }
           } else {
-            const hit = cands.find((g) => composite(g.hex, g.alpha, frameFill).toLowerCase() === hex.toLowerCase());
+            const hit = cands.find((g) => groundOver(g, frameFill).toLowerCase() === hex.toLowerCase());
             // Grounds STACK, and a lone ground is the easy case rather than the general one. A
             // translucent tint laid over an opaque plot background renders as the ORDERED composite of
             // both, which equals neither shape's own composite over the frame — so testing the
             // candidates only one at a time called a correct halo a FAIL. `collect` walks children
             // back-to-front, the order Figma paints them, so folding the candidates in the order they
             // were found reproduces the stack.
-            const stacked = cands.reduce((acc, g) => composite(g.hex, g.alpha, acc), frameFill);
+            const stacked = cands.reduce((acc, g) => groundOver(g, acc), frameFill);
             if (hit) {
               unsure.push(`${a.name} knockout is ${hex} rather than the frame's ${frameFill}, which is what ANNOTATIONS-AND-ARROWS.md asks for when the annotation sits on a tint: it is ${hit.name}'s ${hit.hex} at alpha ${r(hit.alpha)} composited over ${frameFill}. NOT certified — the ground was matched by BOUNDING BOX, so confirm by eye that the annotation is really over the shading`);
             } else if (cands.length > 1 && stacked.toLowerCase() === hex.toLowerCase()) {
@@ -1122,11 +1164,11 @@ const checkFrame = async (frameId) => {
               // actually sits on — any subset of the stack is a possible ground, and enumerating them
               // is exactly the geometry problem this row already declines. A wrong colour and a right
               // one against a subset are indistinguishable from here, so it is raised, not rejected.
-              unsure.push(`${a.name} knockout is ${hex}, which matches neither the frame's ${frameFill}, nor any single ground behind it, nor all ${cands.length} of them stacked (${stacked}). Which of the overlapping grounds it actually sits on cannot be settled from BOUNDING BOXES, so this is raised rather than failed — check it by eye against ${cands.slice(0, 3).map((g) => `${g.name} -> ${composite(g.hex, g.alpha, frameFill)}`).join(", ")}`);
+              unsure.push(`${a.name} knockout is ${hex}, which matches neither the frame's ${frameFill}, nor any single ground behind it, nor all ${cands.length} of them stacked (${stacked}). Which of the overlapping grounds it actually sits on cannot be settled from BOUNDING BOXES, so this is raised rather than failed — check it by eye against ${cands.slice(0, 3).map((g) => `${g.name} -> ${groundOver(g, frameFill)}`).join(", ")}`);
             } else {
               bad.push(`${a.name} knockout is ${hex}, which is neither the frame's own ${frameFill} nor the composite of any ground behind it — read the colour off what is behind THIS annotation, never hardcode white. `
                 + (cands.length
-                    ? `Shape(s) whose box contains it composite to ${cands.slice(0, 3).map((g) => `${composite(g.hex, g.alpha, frameFill)} (${g.name}, ${g.hex} at ${r(g.alpha)})`).join(", ")}`
+                    ? `Shape(s) whose box contains it composite to ${cands.slice(0, 3).map((g) => `${groundOver(g, frameFill)} (${g.name}, ${g.hex} at ${r(g.alpha)})`).join(", ")}`
                     : `No filled shape's box contains it, so the ground here is the frame`));
             }
           }

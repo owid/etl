@@ -225,10 +225,19 @@ function buildFrame(opts = {}) {
   // A shaded region behind the annotation — the shape whose COMPOSITE the knockout has to match.
   // `tintOpacity` sits on the node, which is where this skill's own wedge carries it; the halo must
   // match `tint over frameFill`, never the raw `tint`.
-  if (opts.tint) children.push(node({ type: "RECTANGLE", name: "wedge__below", x: 90, y: 190,
-    width: 200, height: 60, fills: solid(opts.tint),
+  // `tintFills` gives the wedge SEVERAL visible paints, which Figma renders as their ordered composite.
+  if (opts.tint || opts.tintFills) children.push(node({ type: "RECTANGLE", name: "wedge__below", x: 90, y: 190,
+    width: 200, height: 60, fills: opts.tintFills || solid(opts.tint),
     opacity: opts.tintOpacity === undefined ? 0.45 : opts.tintOpacity }));
   if (opts.annotation) children.push(opts.annotation);
+  // Pushed AFTER the annotation, so it is painted ON TOP of it — the re-import z-order bug, not a
+  // ground. A bbox-only filter cannot tell the two apart.
+  if (opts.tintAbove) children.push(node({ type: "RECTANGLE", name: "wedge__above", x: 90, y: 190,
+    width: 200, height: 60, fills: solid(opts.tintAbove), opacity: 0.45 }));
+  // A full-bleed rectangle used as the visible background — how the Instagram templates carry their
+  // beige. Unshifted so it sits at the BOTTOM of the stack, under everything else on the frame.
+  if (opts.backdrop) children.unshift(node({ type: "RECTANGLE", name: "backdrop", x: 0, y: 0,
+    width: W, height: opts.frameH || 540, fills: solid(opts.backdrop) }));
 
   return node({ id: "F:1", name: "test frame", x: 0, y: 0, width: W, height: opts.frameH || 540,
                 fills: solid(opts.frameFill || "#ffffff"), children });
@@ -499,6 +508,62 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const one = row(await run(buildFrame({ tint: "#dddddd", tintOpacity: 0.45,
       annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#123456", strokeWeight: 3 }) }), {}), "annotation-knockout");
     check("6f but a single ground still FAILS an unmatched halo", one.status === "FAIL", one.detail);
+  }
+
+  // 6g — a tint painted ON TOP of the annotation is not a ground, it is the re-import z-order bug
+  //      ANNOTATIONS-AND-ARROWS.md describes. Matching by bounding box alone read it as the ground
+  //      behind the text and recommended colouring the halo to match it.
+  {
+    const out = await run(buildFrame({ tintAbove: "#dddddd",
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    const z = row(out, "annotation-knockout");
+    check("6g a tint ABOVE the annotation is not treated as its ground", z.status === "ok", z.detail);
+    check("6g and the overlaid tint is not named as a halo colour", !/wedge__above/.test(z.detail), z.detail);
+  }
+
+  // 6h — a full-bleed rectangle used as the visible background IS the ground behind every annotation.
+  //      Excluding every full-bleed node by geometry failed a correct halo twice: as a needless
+  //      knockout, and then against a frame fill the reader never sees.
+  {
+    const beige = (stroke, extra) => buildFrame(Object.assign({ backdrop: "#fbf9f3",
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke, strokeWeight: 3 }) }, extra || {}));
+
+    const good = row(await run(beige("#fbf9f3"), {}), "annotation-knockout");
+    check("6h a halo matching a differently-coloured backdrop does not FAIL", good.status !== "FAIL", good.detail);
+    check("6h and the backdrop is named as the ground", /backdrop/.test(good.detail), good.detail);
+
+    // The white halo on that beige is the Instagram defect the page opens with; it must be raised.
+    const white = row(await run(beige("#ffffff"), {}), "annotation-knockout");
+    check("6h a white halo on a beige backdrop is raised", white.status === "REVIEW", white.detail);
+
+    // ...but a backdrop that paints the frame's OWN colour composites to itself, and must NOT turn a
+    // correct canvas-coloured halo into a review. That exclusion is the whole point of the rule.
+    const same = row(await run(beige("#ffffff", { backdrop: "#ffffff" }), {}), "annotation-knockout");
+    check("6h a backdrop that composites to the frame fill still stays silent", same.status === "ok", same.detail);
+
+    // And a backdrop is CANVAS, not shading — it never excuses a halo over empty space.
+    const needless = row(await run(buildFrame({ backdrop: "#fbf9f3",
+      annotation: annotation({ x: 60, y: 140, w: 90, h: 18, stroke: "#fbf9f3", strokeWeight: 3 }) }), {}), "annotation-knockout");
+    check("6h but a backdrop does not excuse a knockout over empty space", needless.status === "FAIL", needless.detail);
+    check("6h and that is still reported as crossing nothing", /crosses nothing/.test(needless.detail), needless.detail);
+  }
+
+  // 6i — a ground node with SEVERAL visible fills renders their ordered composite. Reading only the
+  //      first paint reported a colour that is not on the canvas, and failed the halo that matched
+  //      the one that is.
+  {
+    // #ff0000, then #ffffff at 50% on top of it, on a fully opaque node: [255, 127.5, 127.5] -> #ff8080.
+    const twoFills = (stroke) => buildFrame({ tintOpacity: 1,
+      tintFills: [solid("#ff0000")[0], Object.assign({}, solid("#ffffff")[0], { opacity: 0.5 })],
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke, strokeWeight: 3 }) });
+
+    const both = row(await run(twoFills("#ff8080"), {}), "annotation-knockout");
+    check("6i a halo matching ALL the ground's fills does not FAIL", both.status !== "FAIL", both.detail);
+    check("6i and the sum it accepted is the composited one", /#ff8080/.test(both.detail), both.detail);
+
+    // The first paint alone is the old wrong answer, and is not a colour the reader sees.
+    const first = row(await run(twoFills("#ff0000"), {}), "annotation-knockout");
+    check("6i a halo matching only the FIRST fill still FAILS", first.status === "FAIL", first.detail);
   }
 
   // 7 — crossing a MUTED context line is legal under the highlight treatment (review finding 4).
