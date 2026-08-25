@@ -740,6 +740,7 @@ steps:
   data://grapher/who/2025-04-07/gho_smoking:
     - data://garden/who/2025-04-07/gho_smoking:
       # Global Health Observatory (GHO) from WHO
+      # When updating the GHO, remember update the "latest year" in the smoking data as well
         - data://garden/who/2026-05-22/gho
         - data://garden/regions/2023-01-01/regions
         - data://garden/wb/2026-07-01/income_groups
