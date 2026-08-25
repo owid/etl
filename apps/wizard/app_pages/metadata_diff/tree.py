@@ -304,8 +304,9 @@ def _render_chart_branch(branch: dict[str, Any], preview_offset: int) -> tuple[s
                 f"</div>"
             )
         title = html.escape(group.get("name") or "")
+        # Collapsed by default: with the root pill gone, this is what keeps the section's closed footprint.
         group_html.append(
-            f'<div class="mdd-node mdd-n-changed">'
+            f'<div class="mdd-node mdd-n-changed mdd-collapsed">'
             f'<div class="mdd-box mdd-branch mdd-changed" role="button" title="{html.escape(group.get("note") or "")}">'
             f'<span class="mdd-caret">&#9662;</span>{title}'
             f'<span class="mdd-count">{len(charts)}</span></div>'
@@ -316,14 +317,11 @@ def _render_chart_branch(branch: dict[str, Any], preview_offset: int) -> tuple[s
     if not group_html:
         return "", []
 
+    # The sibling of the "MDims" hierarchy: same header level, its groups indented the same way.
     label = html.escape(branch.get("label") or "Charts")
     body = (
-        f'<div class="mdd-node mdd-n-changed mdd-collapsed">'
-        f'<div class="mdd-box mdd-branch mdd-changed" role="button" title="Click to collapse/expand">'
-        f'<span class="mdd-caret">&#9662;</span>{label}'
-        f'<span class="mdd-count">{total}</span></div>'
-        f'<div class="mdd-children">{"".join(group_html)}</div>'
-        f"</div>"
+        f'<div class="mdd-super-title">{label}<span class="mdd-count">{total} affected</span></div>'
+        f'<div class="mdd-super-children">{"".join(group_html)}</div>'
     )
     return body, previews
 
@@ -474,13 +472,21 @@ def render_multi_tree_html(
 
     total_changed = sum(1 for v in all_views if v.changed)
 
-    index_entries: list[tuple[str, str, str]] = []  # (anchor id, label, count) for the section index
+    # (anchor id, label, count, indented) — indented rows sit under the "MDims" group label.
+    index_entries: list[tuple[str, str, str, bool]] = []
     parts = []
     for i, node in enumerate(section_nodes):
         anchor = f"mdd-section-{i}"
-        index_entries.append((anchor, node["title"], f"{node['changed']}/{node['total']} views changed"))
+        index_entries.append((anchor, node["title"], f"{node['changed']}/{node['total']} views changed", True))
         parts.append(_render_section(node, anchor, all_views, all_hrefs, all_badges))
-    body = "".join(parts)
+    body = ""
+    if parts:
+        # The MDims as one hierarchy: a header over the individual sections, Charts as its sibling.
+        head = (
+            f'<div class="mdd-super-title">MDims'
+            f'<span class="mdd-count">{len(section_nodes)} MDim{"s" if len(section_nodes) != 1 else ""}</span></div>'
+        )
+        body = f'<div class="mdd-super">{head}<div class="mdd-super-children">{"".join(parts)}</div></div>'
     summary = f"<b>{total_changed}</b> of {len(all_views)} views changed"
     if len(section_nodes) > 1:
         summary += f" across <b>{len(section_nodes)}</b> MDims"
@@ -490,7 +496,7 @@ def render_multi_tree_html(
         if chart_html:
             n_charts = sum(len(g.get("charts") or []) for g in chart_branch.get("groups") or [])
             index_entries.append(
-                ("mdd-section-charts", str(chart_branch.get("label") or "Charts"), f"{n_charts} affected")
+                ("mdd-section-charts", str(chart_branch.get("label") or "Charts"), f"{n_charts} affected", False)
             )
             body += f'<div id="mdd-section-charts" class="mdd-section">{chart_html}</div>'
         previews = previews + chart_previews
@@ -499,13 +505,19 @@ def render_multi_tree_html(
     # per section, rather than an inline "a · b · c" line that vanished into the toolbar text around it.
     index_html = ""
     if len(index_entries) > 1:
-        rows = "".join(
-            f'<a class="mdd-index-link" href="#" data-target="{anchor}">'
-            f"<span>{html.escape(label)}</span>"
-            f'<span class="mdd-index-count">{html.escape(count)}</span></a>'
-            for anchor, label, count in index_entries
-        )
-        index_html = f'<div class="mdd-index"><div class="mdd-index-title">Jump to a section</div>{rows}</div>'
+        rows = []
+        group_open = False
+        for anchor, label, count, indented in index_entries:
+            if indented and not group_open:
+                rows.append('<div class="mdd-index-group">MDims</div>')
+                group_open = True
+            indent = " mdd-index-indent" if indented else ""
+            rows.append(
+                f'<a class="mdd-index-link{indent}" href="#" data-target="{anchor}">'
+                f"<span>{html.escape(label)}</span>"
+                f'<span class="mdd-index-count">{html.escape(count)}</span></a>'
+            )
+        index_html = f'<div class="mdd-index"><div class="mdd-index-title">Jump to a section</div>{"".join(rows)}</div>'
 
     visible_leaves = total_changed if total_changed else len(all_views)
     # One row per section header, plus one for the collapsed charts branch.
@@ -530,6 +542,11 @@ def render_multi_tree_html(
     /* Inside an MDim section every pill takes the same width, so each depth is a true column and the
        title row above can point at it. Pitch = 190 (border-box pill) + 26 (children indent). */
     #mdd-root .mdd-cols .mdd-box {{ width: 190px; box-sizing: border-box; white-space: normal; }}
+    #mdd-root .mdd-super-title {{ font-size: 17px; font-weight: 800; color: #111; margin: 12px 0 2px; }}
+    #mdd-root .mdd-super-title .mdd-count {{ font-weight: 400; font-size: 12px; }}
+    #mdd-root .mdd-super-children {{ margin-left: 12px; border-left: 3px solid #ececec; padding-left: 14px; }}
+    #mdd-root .mdd-index-group {{ color: #333; font-weight: 600; padding: 3px 0 0; }}
+    #mdd-root .mdd-index-indent {{ padding-left: 14px; }}
     #mdd-root .mdd-sec-title {{ font-size: 15px; font-weight: 700; color: #222; }}
     #mdd-root .mdd-sec-title .mdd-count {{ font-weight: 400; font-size: 12px; }}
     #mdd-root .mdd-sec-sub {{ color: #868e96; font-size: 12px;
@@ -619,9 +636,10 @@ def render_multi_tree_html(
         ev.preventDefault();
         const target = document.getElementById(link.dataset.target);
         if (!target) return;
-        // Jumping to a collapsed section would show a closed box; open it first.
-        const node = target.querySelector(".mdd-node");
-        if (node) node.classList.remove("mdd-collapsed");
+        // Jumping to a section whose top-level groups are collapsed would land on closed boxes.
+        target.querySelectorAll(
+          ":scope > .mdd-node.mdd-collapsed, :scope > .mdd-super-children > .mdd-node.mdd-collapsed"
+        ).forEach(n => n.classList.remove("mdd-collapsed"));
         fit();
         // This frame is sized to its content, so the *page* scrolls, not this document —
         // scrollIntoView here moves nothing. Same-origin, so scroll the parent's main

@@ -345,7 +345,7 @@ def _chart_branch(reach: list[ChangeReach], badged: set) -> dict[str, Any]:
     drawer = [leaf(c, r) for c, r in charts.values() if not c.get("has_data_page", True)]
     draft_leaves = [leaf(c, r, published=False) for c, r in drafts.values()]
     return {
-        "label": "📈 Charts",
+        "label": "Charts",
         "groups": [
             {"name": "Data pages", "note": "The text is laid out on the chart's data page.", "charts": on_page},
             {
