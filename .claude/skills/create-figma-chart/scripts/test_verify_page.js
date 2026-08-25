@@ -209,7 +209,10 @@ function buildFrame(opts = {}) {
     // two disconnected subpaths with a wide gap between vertex 1 and vertex 2
     vectorNetwork: { vertices: [{ x: 40, y: 200 }, { x: 120, y: 220 }, { x: 380, y: 280 }, { x: 440, y: 300 }],
                      segments: [{ start: 0, end: 1 }, { start: 2, end: 3 }] } }));
-  const chart = node({ name: "chart", type: "GROUP", x: 16, y: 122, width: contentW, height: 352, children: kids });
+  // `chartShort` narrows the chart's box by a sub-pixel amount, the shape a rescale-and-repair pass
+  // leaves when an ornament stops setting the right edge. It used to slip through a +/-1px gate.
+  const chart = node({ name: "chart", type: "GROUP", x: 16, y: 122,
+    width: contentW - (opts.chartShort || 0), height: 352, children: kids });
 
   // `ungrouped` models the documented rework case: the chart GROUP is gone and its subgroups sit as
   // direct frame children, so CONFIG.chartName resolves nothing and the fallback has to find the plot.
@@ -454,6 +457,25 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const without = await run(buildFrame(), {});
     const n = (x) => Number(/all (\d+) furniture/.exec(row(x, "furniture-weight").detail)[1]);
     check("13 the tick's STROKE is still counted", n(out) === n(without) + 1, `${n(without)} -> ${n(out)} furniture strokes`);
+  }
+
+  // 13b — box-alignment is EXACT, not "within a pixel". The old gate allowed +/-1px, which passed a
+  // chart ending 0.57px short of the content box — invisible in a render, plainly wrong in the
+  // properties panel next to a header and footer that do land on it.
+  {
+    const exact = await run(buildFrame(), {});
+    check("13b an exactly-aligned chart passes", row(exact, "box-alignment").status === "ok", row(exact, "box-alignment").detail);
+
+    const short = await run(buildFrame({ chartShort: 0.57 }), {});
+    check("13b a 0.57px shortfall now FAILS", row(short, "box-alignment").status === "FAIL", row(short, "box-alignment").detail);
+    check("13b and the failure points at the re-pin recipe", /re-pin per FITTING\.md/.test(row(short, "box-alignment").detail), row(short, "box-alignment").detail);
+
+    // float residue from rescale must still pass, or every fitted page fails on arithmetic noise
+    const noise = await run(buildFrame({ chartShort: 0.004 }), {});
+    check("13b rescale float residue still passes", row(noise, "box-alignment").status === "ok", row(noise, "box-alignment").detail);
+
+    // and the tolerance is stated in the row, so a reader knows what it is being held to
+    check("13b the row states the tolerance", /must be exact to 0\.05/.test(row(exact, "box-alignment").detail), row(exact, "box-alignment").detail);
   }
 
   // 14 — the rest of the 302-wide geometry, not just the text floor.
