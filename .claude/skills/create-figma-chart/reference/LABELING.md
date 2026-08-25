@@ -161,6 +161,18 @@ The high-value edits to propose (include them in the Step 4 proposal):
 
   When it *does* fit, the reliable recipe is: for each category, find the row where its segment is widest, **clone that segment's existing value label** (the clone inherits the right font, size and — importantly — the black-on-light vs white-on-dark fill grapher already chose), set its characters to the category name, then center the `[name, 4px, value]` pair on the segment. To rebuild a legend you removed too eagerly: recolor the labels to `Text/Gray 80` #5B5B5B, add a 10×10 swatch in each category's own color 4px to their left, and lay them out in grapher's own split — as many as fit on the first row, the longest alone on the second.
 
+  **Hiding furniture does not re-centre what grapher centred against it — and the axis titles are the ones that move.** Grapher centres the x-axis title on *its own* plot area, which includes any column you then remove: hide the vertical legend, and the title keeps its absolute position while the plot it labels grows into the freed space. Measured after hiding a 145px legend and refitting: the x-axis title's centre sat **46px left** of the plot's, and 34px left of the frame's — centred on nothing, which is neither of the two placements GUIDELINES.md allows (centred under the axis, or bottom-right). It survives every geometry check, because the title is interior to the chart's box and moves the ink extremes not at all.
+
+  So after removing furniture, re-centre the axis titles against the **measured** plot rather than trusting the export:
+
+  ```js
+  const plotL = Math.min(...vgrid.children.map((c) => rel(c).l));   // gridlines, not the group box
+  const plotR = Math.max(...hgrid.children.map((c) => rel(c).rr));
+  xTitle.x += (plotL + plotR) / 2 - (rel(xTitle).l + rel(xTitle).rr) / 2;
+  ```
+
+  The y-axis title is stacked at the content box's left edge and is unaffected — check it anyway, since the same logic applies to anything the export positioned relative to a region you changed.
+
   **Labels over the reference row: anchor, tier, wrap, point.** The four moves that took six categories past the "they don't fit side by side" cap, measured off [a designer's rework](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=24853-5) of a page this skill had produced with a conventional legend:
 
   - **Anchor each label to its segment's edge, not its center.** Left-align to the left edge of that category's segment in the reference row (the top row — `World`, or whichever row the chart is read from); right-align the *last* category to the bar's right edge. Centering drifts a label off a narrow segment and reads as pointing at its neighbor.
