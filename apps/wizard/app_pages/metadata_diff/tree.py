@@ -367,16 +367,54 @@ def render_tree_html(
     )
 
 
-def _column_heads(dims: list[str], root_title: str | None = None) -> str:
+def _column_heads(dims: list[str]) -> str:
     """The title row over a section's columns.
 
     Only possible because the columns are real: inside an `mdd-cols` section every pill has the same
-    fixed width, so depth d starts at d × pitch and a title can sit exactly over its column. `root_title`
-    covers the section-pill column, which sits before the first dimension in the multi-MDim grid.
+    fixed width, so depth d starts at d × pitch and a title can sit exactly over its column.
     """
-    titles = ([root_title] if root_title else []) + dims
+    titles = dims
     spans = "".join(f'<span class="mdd-colhead">{html.escape(t)}</span>' for t in titles)
     return f'<div class="mdd-colheads">{spans}</div>'
+
+
+def _legend_html(with_external: bool) -> str:
+    items = [("#ff922b", "Changed"), ("#d9d9d9", "No change")]
+    if with_external:
+        items.append(("#9c36b5", "&#8599; Affects charts/other MDims"))
+    return "".join(
+        f'<span><span class="mdd-dot" style="background:{color}"></span>{label}</span>' for color, label in items
+    )
+
+
+def _render_section(
+    node: dict[str, Any],
+    anchor: str,
+    all_views: list[ViewDiff],
+    all_hrefs: list[str],
+    all_badges: list[str],
+) -> str:
+    """One MDim's block: title, catalogPath subtitle, its own filter + legend, column heads, the tree.
+
+    The filter is per section — each checkbox hides only this section's unchanged views, and defaults to
+    hidden only where the section has changes (a fully-unchanged MDim with everything hidden would be an
+    empty box). There is no root pill: the catalogPath lives in the subtitle, so the tree starts at the
+    first dimension and the columns are exactly the dimensions the heads name.
+    """
+    checked = " checked" if node["changed"] == 0 else ""
+    hide = "" if node["changed"] == 0 else " mdd-hide-unchanged"
+    counter = f'<span class="mdd-count">{node["changed"]}/{node["total"]} views changed</span>'
+    subtitle = f'<div class="mdd-sec-sub">{html.escape(node["subtitle"])}</div>' if node["subtitle"] else ""
+    trees = "".join(_render_node(child, all_views, all_hrefs, all_badges) for child in node["children"])
+    return (
+        f'<div id="{anchor}" class="mdd-section mdd-cols{hide}">'
+        f'<div class="mdd-sec-title">{html.escape(node["title"])}{counter}</div>'
+        f"{subtitle}"
+        f'<div class="mdd-sec-toolbar">'
+        f'<label><input type="checkbox" class="mdd-sec-check"{checked}> Show all views</label>'
+        f'<span class="mdd-legend">{_legend_html(node["has_external"])}</span></div>'
+        f"{_column_heads(node['dims'])}{trees}</div>"
+    )
 
 
 def render_multi_tree_html(
@@ -399,7 +437,6 @@ def render_multi_tree_html(
     all_badges: list[str] = []
     previews: list[str] = []
     section_nodes: list[dict[str, Any]] = []
-    any_external = False
 
     for section in sections:
         dimensions = section.get("dimensions") or []
@@ -407,7 +444,7 @@ def render_multi_tree_html(
         if not view_diffs:
             continue
         impacts = section.get("external_impacts") or [{} for _ in view_diffs]
-        any_external = any_external or any((i.get("charts") or i.get("mdims")) for i in impacts)
+        has_external = any((i.get("charts") or i.get("mdims")) for i in impacts)
         hrefs = section.get("leaf_hrefs")
         if hrefs is None:
             hrefs = [
@@ -420,10 +457,13 @@ def render_multi_tree_html(
         n_changed = sum(1 for v in view_diffs if v.changed)
         section_nodes.append(
             {
-                "name": str(section.get("catalog_path") or "MDim"),
+                # The human-readable title leads; the catalogPath is its subtitle, not a tree column.
+                "title": str(section.get("title") or section.get("catalog_path") or "MDim"),
+                "subtitle": str(section.get("subtitle") or ""),
                 "dims": [str(d.get("name") or d["slug"]) for d in dimensions],
                 "changed": n_changed,
                 "total": len(view_diffs),
+                "has_external": has_external,
                 "children": nodes,
             }
         )
@@ -434,34 +474,16 @@ def render_multi_tree_html(
 
     total_changed = sum(1 for v in all_views if v.changed)
 
-    legend_items = [("#ff922b", "Changed"), ("#d9d9d9", "No change")]
-    if any_external:
-        legend_items.append(("#9c36b5", "&#8599; Affects charts/other MDims"))
-    legend_html = "".join(
-        f'<span><span class="mdd-dot" style="background:{color}"></span>{label}</span>' for color, label in legend_items
-    )
-
-    # A single section keeps its old shape: no outer branch to collapse, since there is nothing to
-    # compare it against. Several sections each become a collapsible root.
     index_entries: list[tuple[str, str, str]] = []  # (anchor id, label, count) for the section index
-    if len(section_nodes) == 1:
-        inner = "".join(_render_node(child, all_views, all_hrefs, all_badges) for child in section_nodes[0]["children"])
-        body = f'<div class="mdd-cols">{_column_heads(section_nodes[0]["dims"])}{inner}</div>'
-        summary = f"<b>{total_changed}</b> of {len(all_views)} views changed"
-        dims_line = ""  # each pill names its own dimension now
-    else:
-        parts = []
-        for i, node in enumerate(section_nodes):
-            anchor = f"mdd-section-{i}"
-            index_entries.append((anchor, node["name"], f"{node['changed']}/{node['total']} views changed"))
-            heads = _column_heads(node["dims"], root_title="MDim")
-            parts.append(
-                f'<div id="{anchor}" class="mdd-section mdd-cols">'
-                f"{heads}{_render_node(node, all_views, all_hrefs, all_badges)}</div>"
-            )
-        body = "".join(parts)
-        summary = f"<b>{total_changed}</b> of {len(all_views)} views changed across <b>{len(section_nodes)}</b> MDims"
-        dims_line = ""  # each pill names its own dimension now
+    parts = []
+    for i, node in enumerate(section_nodes):
+        anchor = f"mdd-section-{i}"
+        index_entries.append((anchor, node["title"], f"{node['changed']}/{node['total']} views changed"))
+        parts.append(_render_section(node, anchor, all_views, all_hrefs, all_badges))
+    body = "".join(parts)
+    summary = f"<b>{total_changed}</b> of {len(all_views)} views changed"
+    if len(section_nodes) > 1:
+        summary += f" across <b>{len(section_nodes)}</b> MDims"
 
     if chart_branch:
         chart_html, chart_previews = _render_chart_branch(chart_branch, len(previews))
@@ -485,14 +507,13 @@ def render_multi_tree_html(
         )
         index_html = f'<div class="mdd-index"><div class="mdd-index-title">Jump to a section</div>{rows}</div>'
 
-    show_unchanged_default = "false" if total_changed else "true"
     visible_leaves = total_changed if total_changed else len(all_views)
     # One row per section header, plus one for the collapsed charts branch.
     extra_rows = len(section_nodes) + (1 if chart_branch else 0)
     initial_height = min(INITIAL_HEIGHT_CAP_PX, 170 + (visible_leaves + extra_rows) * 38)
     return (
         f"""
-<div id="mdd-root" class="mdd-hide-unchanged">
+<div id="mdd-root">
   <style>
     #mdd-root {{ font-family: -apple-system, system-ui, sans-serif; font-size: 13px; color: #333; }}
     #mdd-root .mdd-toolbar {{ margin-bottom: 10px; display: flex; flex-direction: column; gap: 6px; }}
@@ -509,6 +530,12 @@ def render_multi_tree_html(
     /* Inside an MDim section every pill takes the same width, so each depth is a true column and the
        title row above can point at it. Pitch = 190 (border-box pill) + 26 (children indent). */
     #mdd-root .mdd-cols .mdd-box {{ width: 190px; box-sizing: border-box; white-space: normal; }}
+    #mdd-root .mdd-sec-title {{ font-size: 15px; font-weight: 700; color: #222; }}
+    #mdd-root .mdd-sec-title .mdd-count {{ font-weight: 400; font-size: 12px; }}
+    #mdd-root .mdd-sec-sub {{ color: #868e96; font-size: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace; margin-top: 1px; }}
+    #mdd-root .mdd-sec-toolbar {{ display: flex; gap: 18px; align-items: center; color: #555;
+      margin: 6px 0 2px; flex-wrap: wrap; }}
     #mdd-root .mdd-colheads {{ display: flex; margin: 8px 0 4px; }}
     #mdd-root .mdd-colhead {{ width: 216px; flex-shrink: 0; color: #868e96; font-size: 11px;
       font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }}
@@ -540,7 +567,7 @@ def render_multi_tree_html(
     #mdd-root .mdd-leaf:hover {{ box-shadow: 0 1px 5px rgba(0,0,0,.25); text-decoration: underline; }}
     #mdd-root .mdd-collapsed > .mdd-box .mdd-caret {{ transform: rotate(-90deg); }}
     #mdd-root .mdd-collapsed > .mdd-children {{ display: none; }}
-    #mdd-root.mdd-hide-unchanged .mdd-n-unchanged {{ display: none; }}
+    #mdd-root .mdd-hide-unchanged .mdd-n-unchanged {{ display: none; }}
     #mdd-tooltip {{ position: fixed; display: none; z-index: 10; max-width: 460px; background: #fff;
                     border: 1px solid #bbb; border-radius: 6px; box-shadow: 0 3px 14px rgba(0,0,0,.2);
                     padding: 10px 12px; font-size: 12.5px; line-height: 1.45; white-space: normal; }}
@@ -551,11 +578,6 @@ def render_multi_tree_html(
     #mdd-root ins.mdd-ins, #mdd-tooltip ins.mdd-ins {{ background: #d3f9d8; color: #2b8a3e; text-decoration: none; }}
   </style>
   <div class="mdd-toolbar">
-    <div class="mdd-row-top">
-      <label><input type="checkbox" id="mdd-show-unchanged"> Show all views</label>
-      <span class="mdd-legend">{legend_html}</span>
-    </div>
-    {dims_line}
     <div class="mdd-summary">{summary}</div>
     {index_html}
   </div>
@@ -583,14 +605,14 @@ def render_multi_tree_html(
       fe.setAttribute("height", wanted);
     }};
 
-    const checkbox = document.getElementById("mdd-show-unchanged");
-    checkbox.checked = {show_unchanged_default};
-    const applyFilter = () => {{
-      root.classList.toggle("mdd-hide-unchanged", !checkbox.checked);
-      fit();
-    }};
-    checkbox.addEventListener("change", applyFilter);
-    applyFilter();
+    // Each section filters itself: its checkbox hides only its own unchanged views.
+    root.querySelectorAll(".mdd-sec-check").forEach(cb => {{
+      const section = cb.closest(".mdd-section");
+      cb.addEventListener("change", () => {{
+        section.classList.toggle("mdd-hide-unchanged", !cb.checked);
+        fit();
+      }});
+    }});
 
     root.querySelectorAll(".mdd-index-link").forEach(link => {{
       link.addEventListener("click", (ev) => {{

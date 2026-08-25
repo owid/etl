@@ -257,7 +257,9 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
     for catalog_path in shown:
         row = df.loc[catalog_path] if catalog_path in df.index else None
         cache_key = f"{row.get('configMd5_source')}-{row.get('configMd5_target')}" if row is not None else ""
-        dimensions, view_diffs = cached.mdim_view_diffs(catalog_path, source_engine, target_engine, cache_key=cache_key)
+        title, dimensions, view_diffs = cached.mdim_view_diffs(
+            catalog_path, source_engine, target_engine, cache_key=cache_key
+        )
         if not view_diffs:
             continue
 
@@ -272,7 +274,9 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
         draft = " · unpublished" if row is not None and bool(row.get("is_draft")) else ""
         sections.append(
             {
-                "catalog_path": f"{catalog_path}{draft}",
+                "title": f"{title}{draft}",
+                "subtitle": catalog_path,
+                "catalog_path": catalog_path,
                 "dimensions": dimensions,
                 "view_diffs": view_diffs,
                 "leaf_hrefs": [

@@ -136,7 +136,7 @@ def _cache_key(row: pd.Series) -> str:
 def _render_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, catalog_path: str) -> None:
     """One MDim: what changed in its views, inline, with a PR brief and a way into its dimension grid."""
     row = df.loc[catalog_path]
-    dimensions, view_diffs = cached.mdim_view_diffs(
+    _title, dimensions, view_diffs = cached.mdim_view_diffs(
         catalog_path, source_engine, target_engine, cache_key=_cache_key(row)
     )
     changed_views = [v for v in view_diffs if v.changed]

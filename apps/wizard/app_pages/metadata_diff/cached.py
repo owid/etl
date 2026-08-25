@@ -133,11 +133,21 @@ def mdim_view_diffs(
     _source_engine: Engine,
     _target_engine: Engine,
     cache_key: str = "",
-) -> tuple[list[dict[str, Any]], list[ViewDiff]]:
-    """(dimensions, per-view diffs) for one MDim. `cache_key` should carry its config hashes."""
+) -> tuple[str, list[dict[str, Any]], list[ViewDiff]]:
+    """(title, dimensions, per-view diffs) for one MDim. `cache_key` should carry its config hashes.
+
+    The title is the config's own human-readable one ("Poverty", not `wb/latest/poverty_pip#poverty_pip`),
+    falling back to the catalogPath where the config carries none.
+    """
     config = discovery.load_mdim_config(_source_engine, catalog_path)
     assert config is not None, f"MDim {catalog_path} not found in staging."
-    return config.get("dimensions") or [], discovery.mdim_text_changes(_source_engine, _target_engine, catalog_path)
+    raw_title = config.get("title")
+    title = str((raw_title.get("title") if isinstance(raw_title, dict) else raw_title) or catalog_path)
+    return (
+        title,
+        config.get("dimensions") or [],
+        discovery.mdim_text_changes(_source_engine, _target_engine, catalog_path),
+    )
 
 
 @st.cache_data(ttl=CACHE_TTL, show_spinner="Finding indicators whose text changed…")
