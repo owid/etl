@@ -4,6 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Economic Inequality
+      attribution_short: World Bank; WID
     processing_level: major
   description_metrics: &description_metrics |-
     Metrics are computed directly from the harmonized 109-bin distributions, identically for both sources: the Gini coefficient (from the Lorenz curve; a slight underestimate since bins carry no within-bin inequality), and three Generalized Entropy indices whose parameter α sets the sensitivity to the top versus the bottom of the distribution — GE(0), the mean log deviation (bottom-sensitive, with zero incomes floored at $0.01/day); GE(1), the Theil index; and GE(2) (top-sensitive).

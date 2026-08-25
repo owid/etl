@@ -4,6 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Economic Inequality
+      attribution_short: World Bank; WID
     processing_level: major
   description_series: &description_series |-
     Each row belongs to one of eight series:
