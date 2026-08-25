@@ -110,6 +110,17 @@ const renders = (p) => !!p && p.type === "SOLID" && p.visible !== false
 // opacity. Guessing the frame would just relocate the confident wrong answer. So a translucent paint
 // is declared UNMEASURABLE and named, the same way a sequential ramp and an unsafe `--names` are.
 const translucent = (p) => !!p && typeof p.opacity === "number" && p.opacity < 0.999;
+// Compositing is refused ABOVE for a mark's reported colour, and that refusal stands: what is behind a
+// mark inside a plot is usually another mark, so the sum has no trustworthy second term. This helper
+// exists for the one case where the second term IS known — an annotation's knockout, whose ground is a
+// single shape sitting directly on the frame's own fill (ANNOTATIONS-AND-ARROWS.md). Even there the
+// answer is REVIEWED rather than passed, because the shape is matched by bounding box; see the row.
+const composite = (hex, alpha, over) => {
+  const a = Math.max(0, Math.min(1, alpha));
+  const ch = (h) => { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+  const f = ch(hex), b = ch(over);
+  return "#" + [0, 1, 2].map((i) => Math.round(a * f[i] + (1 - a) * b[i]).toString(16).padStart(2, "0")).join("");
+};
 let rows = [];
 const add = (name, status, detail, extra) => rows.push({ check: name, status, detail, ...(extra || {}) });
 const skip = (name, why, owner) => add(name, "SKIPPED", why, owner ? { ownedBy: owner } : null);
@@ -251,6 +262,10 @@ const checkFrame = async (frameId) => {
   // four rows report "no annotation__* nodes" forever, which reads as "nothing to check" rather than
   // "I never looked". Caught by planting an annotation and watching the rows stay silent.
   const texts = [], stroked = [], fills = [], leaves = [], annotations = [], vectors = [], markBoxes = [];
+  // Candidate GROUNDS for an annotation's knockout: filled, non-text shapes big enough to sit behind
+  // one. Kept separate from `fills` because that inventory is about which colours are on the page and
+  // drops the box and the alpha — both of which are the whole question here.
+  const grounds = [];
   // Grapher groups its axis furniture under stable container names. Identifying furniture as
   // "stroked and not a series line" instead is wrong the moment the chart is not a line chart: on a
   // map EVERY country vector is a stroked non-series plot node, so the prescribed 0.22px borders and
@@ -362,6 +377,11 @@ const checkFrame = async (frameId) => {
     if (hasArea && "fills" in n && Array.isArray(n.fills)) {
       for (const f of n.fills) {
         if (renders(f)) fills.push({ name: n.name, type: n.type, hex: hexOf(f), styleId: n.fillStyleId || "", insidePlot });
+      }
+      const gp = n.fills.find((f) => renders(f));
+      if (gp && n.type !== "TEXT" && !/^annotation__/.test(n.name)) {
+        grounds.push({ name: n.name, box: areaBox, hex: hexOf(gp),
+                       alpha: nodeOpacity * (gp.opacity === undefined ? 1 : gp.opacity) });
       }
     }
     // Marker groups and value labels. The NAME is on the group and the GEOMETRY is on its children, and
@@ -1044,11 +1064,46 @@ const checkFrame = async (frameId) => {
           bad.push(`${a.name} knockout ${r(n.strokeWeight)}px (want 3)` + (n.strokeWeight < 1 ? " — sub-pixel means the stroke was set before a rescale()" : ""));
         }
         if (hasStroke && n.strokeAlign !== "OUTSIDE") bad.push(`${a.name} strokeAlign ${n.strokeAlign} (want OUTSIDE)`);
-        if (hasStroke && frameFill) {
-          const sf = paint;
-          if (sf.type === "SOLID") {
-            const hex = "#" + [sf.color.r, sf.color.g, sf.color.b].map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join("");
-            if (hex.toLowerCase() !== frameFill.toLowerCase()) bad.push(`${a.name} knockout is ${hex}, not the frame's own ${frameFill} — read the colour off the frame, never hardcode white`);
+        // The knockout's colour is the ground DIRECTLY BEHIND THIS ANNOTATION, which is the frame's
+        // fill only when nothing else is. Demanding `frameFill` unconditionally failed a correct
+        // chart: an annotation placed inside a tinted region needs a halo the colour of the TINT, and
+        // a canvas-coloured one there paints a white outline around every letter — the very defect the
+        // rule exists to prevent. Two further traps this branch has to hold. The ground is nearly
+        // always a fill at PARTIAL opacity, so the halo matches the COMPOSITE the reader sees and not
+        // the fill that was set (#dddddd at 45% over white is #f0f0f0, and testing against #dddddd
+        // fails a correct halo just as surely as testing against #ffffff). And the answer is REVIEW,
+        // never ok: the ground is matched by BOUNDING BOX, and a tint is usually a triangle or a wedge
+        // whose ink fills only part of its box, so this cannot prove the annotation is over the
+        // shading rather than beside it. Dropping the halo instead is not the fix — see
+        // ANNOTATIONS-AND-ARROWS.md, tier 1 is for a gradient or an image, where no colour can match.
+        if (hasStroke && frameFill && paint.type === "SOLID") {
+          const hex = hexOf(paint);
+          const eps = 0.5;
+          // A ground is a filled shape whose box CONTAINS the annotation and that is not the frame's
+          // own backdrop — a full-bleed node composites to itself and would turn every correct
+          // canvas-coloured halo into a review.
+          const cands = (a.box ? grounds.filter((g) => g.box && g.name !== a.name
+            && !(g.box.l <= 0.5 && g.box.t <= 0.5 && g.box.rr >= fb.width - 0.5 && g.box.bb >= fb.height - 0.5)
+            && g.box.l <= a.box.l + eps && g.box.rr >= a.box.rr - eps
+            && g.box.t <= a.box.t + eps && g.box.bb >= a.box.bb - eps) : []);
+          if (hex.toLowerCase() === frameFill.toLowerCase()) {
+            // Right colour for a bare canvas, and the defect ANNOTATIONS-AND-ARROWS.md describes the
+            // moment the annotation is actually over shading. The bbox cannot settle which, so this is
+            // raised rather than passed — a white outline around every letter is exactly what a
+            // reviewer sees and this row never used to mention.
+            if (cands.length) {
+              unsure.push(`${a.name} knockout is the frame's ${frameFill}, which is right on bare canvas — but ${cands.length} filled shape(s) have a box containing it (${cands.slice(0, 3).map((g) => `${g.name} -> ${composite(g.hex, g.alpha, frameFill)}`).join(", ")}). If it really sits on that shading the halo reads as a white outline around every letter and should be the composite instead (ANNOTATIONS-AND-ARROWS.md)`);
+            }
+          } else {
+            const hit = cands.find((g) => composite(g.hex, g.alpha, frameFill).toLowerCase() === hex.toLowerCase());
+            if (hit) {
+              unsure.push(`${a.name} knockout is ${hex} rather than the frame's ${frameFill}, which is what ANNOTATIONS-AND-ARROWS.md asks for when the annotation sits on a tint: it is ${hit.name}'s ${hit.hex} at alpha ${r(hit.alpha)} composited over ${frameFill}. NOT certified — the ground was matched by BOUNDING BOX, so confirm by eye that the annotation is really over the shading`);
+            } else {
+              bad.push(`${a.name} knockout is ${hex}, which is neither the frame's own ${frameFill} nor the composite of any ground behind it — read the colour off what is behind THIS annotation, never hardcode white. `
+                + (cands.length
+                    ? `Shape(s) whose box contains it composite to ${cands.slice(0, 3).map((g) => `${composite(g.hex, g.alpha, frameFill)} (${g.name}, ${g.hex} at ${r(g.alpha)})`).join(", ")}`
+                    : `No filled shape's box contains it, so the ground here is the frame`));
+            }
           }
         }
       }

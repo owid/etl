@@ -217,6 +217,12 @@ function buildFrame(opts = {}) {
   // `ungrouped` models the documented rework case: the chart GROUP is gone and its subgroups sit as
   // direct frame children, so CONFIG.chartName resolves nothing and the fallback has to find the plot.
   const children = opts.ungrouped ? [header, footer, logo, ...kids] : [header, footer, logo, chart];
+  // A shaded region behind the annotation — the shape whose COMPOSITE the knockout has to match.
+  // `tintOpacity` sits on the node, which is where this skill's own wedge carries it; the halo must
+  // match `tint over frameFill`, never the raw `tint`.
+  if (opts.tint) children.push(node({ type: "RECTANGLE", name: "wedge__below", x: 90, y: 190,
+    width: 200, height: 60, fills: solid(opts.tint),
+    opacity: opts.tintOpacity === undefined ? 0.45 : opts.tintOpacity }));
   if (opts.annotation) children.push(opts.annotation);
 
   return node({ id: "F:1", name: "test frame", x: 0, y: 0, width: W, height: opts.frameH || 540,
@@ -408,7 +414,44 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
   // 6 — knockout colour must be the frame's own fill, never hardcoded white.
   {
     const out = await run(buildFrame({ frameFill: "#fffbf5", annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {});
-    check("6 white knockout on cream FAILS", /not the frame's own #fffbf5/.test(row(out, "annotation-knockout").detail), row(out, "annotation-knockout").detail);
+    check("6 white knockout on cream FAILS",
+          row(out, "annotation-knockout").status === "FAIL"
+          && /the frame's own #fffbf5/.test(row(out, "annotation-knockout").detail),
+          row(out, "annotation-knockout").detail);
+  }
+
+  // 6d — the knockout's ground is what is behind THIS annotation, not the frame. Demanding the frame's
+  //      fill unconditionally FAILED a correct chart: an annotation inside a tinted region takes a halo
+  //      the colour of the tint, and a canvas-coloured one there is a white outline around every letter.
+  {
+    // #dddddd at 45% over white composites to #f0f0f0 — what the reader sees, and what the halo must be.
+    const onTint = (stroke) => buildFrame({ tint: "#dddddd", tintOpacity: 0.45,
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke, strokeWeight: 3 }) });
+
+    const good = await run(onTint("#f0f0f0"), {});
+    const g = row(good, "annotation-knockout");
+    check("6d a halo matching the tint's COMPOSITE does not FAIL", g.status !== "FAIL", g.detail);
+    check("6d and it is REVIEWED, since the ground was matched by bounding box",
+          g.status === "REVIEW" && /BOUNDING BOX/.test(g.detail), g.detail);
+    check("6d and the detail shows the sum it accepted",
+          /wedge__below/.test(g.detail) && /#dddddd/.test(g.detail) && /0\.45/.test(g.detail), g.detail);
+
+    // The trap the compositing exists for: matching the tint's RAW fill is still wrong, because that
+    // is not the colour on the canvas. A check that skipped the alpha would wave this through.
+    const raw = row(await run(onTint("#dddddd"), {}), "annotation-knockout");
+    check("6d a halo matching the tint's RAW fill still FAILS", raw.status === "FAIL", raw.detail);
+    check("6d and it names the composite it wanted instead", /#f0f0f0/.test(raw.detail), raw.detail);
+
+    // A canvas-coloured halo over shading is the original defect, and the bbox cannot prove the
+    // annotation is over the tint's ink rather than beside it — so it is raised, not failed.
+    const white = row(await run(onTint("#ffffff"), {}), "annotation-knockout");
+    check("6d a canvas halo over a tint is REVIEWED, not passed silently", white.status === "REVIEW", white.detail);
+    check("6d and it names the white-outline symptom", /white outline/.test(white.detail), white.detail);
+
+    // ...and with no tint on the frame, the same canvas halo stays clean: the review must be caused by
+    // the shading, not fire on every annotation.
+    const bare = row(await run(buildFrame({ annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {}), "annotation-knockout");
+    check("6d and a canvas halo on bare canvas is still ok", bare.status === "ok", bare.detail);
   }
 
   // 7 — crossing a MUTED context line is legal under the highlight treatment (review finding 4).

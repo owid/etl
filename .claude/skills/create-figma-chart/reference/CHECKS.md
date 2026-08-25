@@ -147,6 +147,16 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > × node) named, because at 0.98 it masks fine and at 0.05 it does not, and which side of that a frame
 > is on depends on what sits behind the annotation.
 >
+> **The knockout's colour is the ground behind *that* annotation, not the frame's fill.** Requiring
+> `frameFill` unconditionally failed a correct chart: an annotation placed inside a tinted region takes
+> a halo the colour of the *tint*, and a canvas-coloured one there paints a white outline around every
+> letter. The row now composites — the ground is almost always a fill at partial opacity, so the halo
+> matches what the reader sees (`#dddddd` at 45% over white is `#f0f0f0`) and matching the raw fill
+> still **FAILS**. Two outcomes are **REVIEW** rather than `ok`, because the ground is matched by
+> *bounding box* and a tint is usually a triangle or a wedge whose ink fills part of it: a halo that
+> matches a ground's composite, and a canvas-coloured halo with some filled shape's box around it.
+> Both name the shape and the sum so the call can be made by eye.
+>
 > **Non-rendering means exactly zero, never a floor.** A node or paint at 0.005 does reach the canvas,
 > and a cutoff dropped its whole subtree from *every* row — an 8px label at 0.005 left `text-floor`
 > reporting that all of its ranges cleared the floor. Anything positive is **translucent**: held out of
@@ -380,6 +390,23 @@ const paints = n => { let m = n; while (m && m !== clone) { if (!m.visible) retu
 **Make label-centering part of the build, not a follow-up.** It regressed three times in one run — each rebuild re-hugs the text, which restores the drift, and a separate "now center the labels" step is forgotten or applied to a chart instance that is later replaced. Put the centering loop at the end of the same function that imports, scales and re-hugs, so it cannot be skipped.
 
 **Re-run this whole pass after the last change, not after each one.** Fixes get lost silently: a label-centering pass applied to a chart instance that is later swapped for a re-export leaves the drift back exactly as it was, and every screenshot in between looks correct. And a structural change spends budget elsewhere — lifting an aggregate row to the top added 8px of height, which came straight out of the 12–16px gap and took it to 8.2 without anything reporting a problem. Treat "I already checked that" as false after any re-export, reorder, rescale or restyle.
+
+**Someone else editing your frame is a change like any other — re-run the pass, and diff the texts.**
+The Charts file is shared, so an author or a designer can rewrite your title, restyle your
+annotations and move nodes while you are still working, and none of it announces itself. Two
+different losses come out of that, and only one is mechanical:
+
+- **The gate catches a hand-edit only where a check already exists.** A rewrite that stripped both
+  annotations' halo strokes went unnoticed until a row for them was written. So when you find that a
+  hand-edit undid something, add the check *before* you re-apply the fix — otherwise the next
+  hand-edit undoes it again just as quietly.
+- **The gate cannot catch what it does not know was deliberate.** A subtitle rewrite that was a
+  genuine improvement on the wording also removed a reading aid the author had asked for, and nothing
+  on the frame distinguishes a sentence that was dropped from one that was never there. Keep the
+  approved strings and diff them: the frame does not remember what it used to say.
+
+Keep the improvements — the point is not to revert a colleague's edits, but to notice which of them
+were trades nobody actually chose, and put those back to the author.
 
 ### Checking the words, not just the geometry
 
