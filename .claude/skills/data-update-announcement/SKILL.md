@@ -67,7 +67,7 @@ is tagged, and remember it is DuckDB-backed — `json_extract_string`, not MySQL
 1. Resolve the dataset's chart ids: `chart_dimensions` → `variables.catalogPath`, across **all**
    versions of the dataset, not just the one being updated.
 2. Collect **every slug each chart has ever had** — the current one from
-   `json_extract_string(cc.full, '$.slug')`, **plus every historical slug from
+   `json_extract_string(cc.config, '$.slug')`, **plus every historical slug from
    `chart_slug_redirects WHERE chart_id IN (…)`**.
 3. Search `posts_gdocs.content LIKE` for any of those slugs — a `/latest` post's CTA embeds the
    grapher slug — OR'd with the producer name and the dataset title.

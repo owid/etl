@@ -201,6 +201,12 @@ overflow is the one to fit.
 
 ### The two-pass export, measured end to end
 
+**Where the saving came from.** Of the 18 Figma calls one template build measured end to end, 3 went
+on the footer-conversion bug now fixed in TEXTS.md and 1 on a wrong guess about the footer's layout.
+The two-pass export is where the rest is concentrated: it replaces "export, eyeball, re-export"
+with one probe and one solved re-export.
+
+
 Validated on a live run rather than argued from the model, so the numbers are the claim:
 
 | | pass 1 (model inset) | pass 2 (measured inset) |
