@@ -58,7 +58,7 @@ tables:
       geothermal__total:
         title: Geothermal capacity (total)
         description_short: |-
-          Total geothermal (on- and off-grid) electricity installed capacity, measured in megawatts.
+          Total geothermal electricity installed capacity, measured in megawatts.
         display:
           name: Geothermal (total)
         presentation:
