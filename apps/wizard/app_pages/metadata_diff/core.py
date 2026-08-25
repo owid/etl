@@ -858,6 +858,24 @@ def section_label(section: str, progress: dict[str, tuple[int, int]]) -> str:
     return f"{icon} {name} ({done}/{total})"
 
 
+def empty_sections(progress: dict[str, tuple[int, int]], keep: Iterable[str] = ()) -> list[str]:
+    """Counted sections with nothing in them — to be shown greyed out, not removed.
+
+    Removing them would read as tidier and say less: "Explorers (0)" is the tool reporting that it looked,
+    and a bar that silently shrinks cannot be told apart from a tool that never checked. Greyed keeps the
+    zero legible and still stops anyone opening a page with nothing on it.
+
+    A zero is only worth greying when it is a finding rather than a silence, so callers pass `keep` for
+    the sections whose count they cannot vouch for: a surface whose lookup warned, or one whose page
+    carries something that is not a reviewable change (new indicators have no old text to diff, so they
+    sit behind a zero badge and still need reading).
+
+    Blast radius is never counted and never greyed: it is the default, and the page has to land somewhere.
+    """
+    forced = set(keep)
+    return [s for s in SECTIONS if s in COUNTED_SECTIONS and s not in forced and progress.get(s, (0, 0))[1] == 0]
+
+
 def coerce_section(value: object, fallback: str = DEFAULT_SECTION) -> str:
     """Whatever the switcher hands back (or the URL carries), as a section key.
 

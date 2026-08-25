@@ -2207,3 +2207,44 @@ def test_view_url_sends_unpublished_views_to_the_admin_preview():
     # One `/admin`, not two: `admin_site` already ends in it, and the doubled path serves the admin
     # shell with no editor or preview in it.
     assert "/admin/admin/" not in unpublished
+
+
+def test_empty_sections_are_greyed_not_removed():
+    """A section with nothing in it stays on the bar, showing its zero."""
+    from apps.wizard.app_pages.metadata_diff.core import empty_sections
+
+    progress = {"charts": (0, 12), "mdims": (0, 0), "explorers": (0, 0)}
+    assert empty_sections(progress) == ["mdims", "explorers"], "in bar order, and never Blast radius"
+    # Everything populated: nothing greyed.
+    assert empty_sections({"charts": (1, 2), "mdims": (0, 3), "explorers": (2, 2)}) == []
+    # A section the summary never mentioned counts as empty, same as an explicit zero.
+    assert empty_sections({}) == ["charts", "mdims", "explorers"]
+
+
+def test_a_zero_we_cannot_vouch_for_stays_clickable():
+    """Greying a section because its lookup failed would hide the tool's own blind spot."""
+    from apps.wizard.app_pages.metadata_diff.core import COUNTED_SECTIONS, empty_sections
+
+    nothing = {"charts": (0, 0), "mdims": (0, 0), "explorers": (0, 0)}
+    # A warning anywhere: nothing is greyed, because a failed surface reads exactly like an empty one.
+    assert empty_sections(nothing, COUNTED_SECTIONS) == []
+    # One unresolved surface stays live; the others are honestly empty.
+    assert empty_sections(nothing, {"mdims"}) == ["charts", "explorers"]
+    # New indicators are not reviewable changes, so Charts counts zero while holding something to read.
+    assert empty_sections(nothing, {"charts"}) == ["mdims", "explorers"]
+
+
+def test_dead_section_css_targets_the_right_buttons():
+    """The CSS selects by position, so the indices must follow the options list it was given."""
+    from apps.wizard.app_pages.metadata_diff.core import SECTIONS
+    from apps.wizard.app_pages.metadata_diff.render import _dead_section_css
+
+    options = list(SECTIONS)  # blast, charts, mdims, explorers
+    css = _dead_section_css(options, {"mdims", "explorers"})
+    # nth-child is 1-based: mdims is the 3rd button, explorers the 4th.
+    assert "button:nth-child(3)" in css and "button:nth-child(4)" in css
+    assert "button:nth-child(1)" not in css and "button:nth-child(2)" not in css
+    assert "pointer-events: none" in css
+
+    # Nothing to grey: no style block at all, rather than an empty rule.
+    assert _dead_section_css(options, set()) == ""

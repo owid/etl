@@ -29,8 +29,13 @@ from apps.wizard.app_pages.metadata_diff import (
     explorers_section,
     mdims_section,
 )
+from apps.wizard.app_pages.metadata_diff.core import COUNTED_SECTIONS, empty_sections
 from apps.wizard.app_pages.metadata_diff.data import count_ticked
-from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, st_section_switcher, st_stale_server_banner
+from apps.wizard.app_pages.metadata_diff.render import (
+    BASELINE_NAME,
+    st_section_switcher,
+    st_stale_server_banner,
+)
 from apps.wizard.utils.components import st_title_with_expert
 from etl.config import OWID_ENV
 
@@ -90,7 +95,16 @@ what ships is what you meant, and to see how far each change reaches.
     if not summary.has_changes and not summary.warnings:
         st.success(f"**No metadata text changes** on this staging server against `{BASELINE_NAME}`.")
 
-    section = st_section_switcher(progress)
+    # A zero badge is only trustworthy when the lookup behind it worked. Any warning at all keeps every
+    # section reachable — a surface that failed to load reads as "nothing here" otherwise — and so do new
+    # indicators, which the Charts section reports even though they are not reviewable changes.
+    keep = set(COUNTED_SECTIONS) if summary.warnings else set()
+    if not summary.mdims_resolved:
+        keep.add("mdims")
+    if summary.n_new_indicators:
+        keep.add("charts")
+
+    section = st_section_switcher(progress, empty_sections(progress, keep))
 
     if section == "blast":
         blast_section.st_show_blast_radius(source_engine, target_engine)

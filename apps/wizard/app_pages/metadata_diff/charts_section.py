@@ -4,9 +4,11 @@ Organised by *change*, not by chart. One reworded WYSK bullet can reach hundreds
 once with its charts underneath is both shorter and truer to what the author has to decide, and it keeps
 the page usable on a big data update where a per-chart list would run to thousands of entries.
 
-A chart's own title/subtitle/footnote is Chart Diff's territory (it is chart config). What this section
-adds is the layer Chart Diff cannot see: the text a chart *inherits* from indicator metadata, authored
-in the garden step — WYSK above all, which no config diff shows.
+What this section adds is the layer Chart Diff cannot see: text a chart inherits from ETL metadata.
+That is more than the indicator's own fields. A garden step can also set the chart's FAUST through
+`presentation.grapher_config`, and those edits reach readers as title, subtitle and footnote while leaving
+the `variables` row untouched — so they are compared here too, alongside WYSK. What belongs to Chart Diff
+is the other origin: text typed into a chart in the admin.
 """
 
 from typing import Any
@@ -31,6 +33,7 @@ from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
     DIFF_CSS,
     render_chart_list,
+    st_note,
     st_origin_caption,
 )
 from apps.wizard.app_pages.metadata_diff.review_state import (
@@ -130,13 +133,14 @@ def _extra_notes(changed) -> None:
     """New indicators and the section's scope — stated, so an empty list is never read as 'all clear'."""
     if changed.new_paths:
         n = len(changed.new_paths)
-        st.caption(
+        st_note(
             f"➕ {n} indicator{'s' if n != 1 else ''} on this server {'do' if n != 1 else 'does'} not exist in "
             f"{BASELINE_NAME} yet, so there is no old text to diff. New indicators are not listed here."
         )
-    st.caption(
-        "This section covers text a chart **inherits from indicator metadata** (garden `.meta.yml`). A "
-        "chart's own title/subtitle/footnote lives in its config — review those in **Chart Diff**."
+    st_note(
+        "This section covers the text a chart <b>inherits from ETL metadata</b>: the indicator's own "
+        "fields, and the title, subtitle or footnote a garden step sets for the chart. Text typed "
+        "directly into a chart in the admin is not from ETL — review that in <b>Chart Diff</b>."
     )
 
 
@@ -186,7 +190,7 @@ def _render_change(
         with col_review:
             st_reviewed_toggle(source_engine, SURFACE, mark)
 
-        st.caption(_where_line(g))
+        st_note(_where_line(g))
         st_origin_caption(_group_paths(g), attribution)
 
         datapage.st_datapage_diff(
@@ -203,45 +207,46 @@ def _group_paths(g: ChangeGroup) -> set[str]:
 
 
 def _where_line(g: ChangeGroup) -> str:
-    """Where to edit this text — never presenting a variable key as the target when a definition is likelier.
+    """Why this card is one change and not several: the same text, written once, shared.
 
-    Two shapes of sharing, and only one used to be caught. Several *differently named* indicators carrying
-    the identical text can only have got it from a shared `definitions.*` entry. But the same text landing
-    on many dimensional variants of ONE indicator (`thr__welfare_type_income…`, ×8) is equally a template,
-    and naming `tables.<t>.variables.thr` as the target there sends the author to edit a field whose value
-    is a `{definitions.*}` reference — the exact mistake this tool exists to prevent.
+    Returns HTML for `st_note`. It says what is true — these indicators carry the identical text, all of
+    it — rather than which YAML construct produced it. Naming `definitions.*` or a variable key here was
+    both jargon and a trap: on a dimensional indicator the variable's own field holds a template
+    reference, so pointing at it sends the author to edit the wrong line. The exact field to edit is the
+    PR brief's job, and it still does it.
 
-    Both shapes assume one garden dataset. When the identical text was edited in several, it is that many
-    separate edits — no definition is shared across datasets — so those are named instead of one file.
+    One case is not sharing at all: the group is keyed on the text, so the same wording edited in two
+    garden datasets arrives as one card. Nothing is shared across datasets, so that is as many edits as
+    there are datasets, and saying otherwise would send someone to fix half of it.
     """
     garden_dirs = distinct_garden_datasets(g.catalog_paths)
     if len(garden_dirs) > 1:
-        files = ", ".join(f"`{d}.meta.yml`" for d in garden_dirs[:4]) + (" …" if len(garden_dirs) > 4 else "")
-        return (
-            f"✂️ The identical text was edited in {len(garden_dirs)} separate garden datasets ({files}) — no "
-            "`definitions.*` block is shared across datasets, so this is that many edits. Edit each file."
+        files = ", ".join(f"<code>{d}.meta.yml</code>" for d in garden_dirs[:4]) + (
+            " …" if len(garden_dirs) > 4 else ""
         )
+        return (
+            f"✂️ Grouped by their text, but <b>edited in {len(garden_dirs)} separate garden datasets</b> "
+            f"({files}) — nothing is shared between datasets, so this is {len(garden_dirs)} edits, not one. "
+            "Each one has to be changed on its own."
+        )
+    label = field_label(g.field)
     shared_names = distinct_indicator_short_names(g.catalog_paths)
     if len(shared_names) > 1:
-        preview = ", ".join(f"`{n}`" for n in shared_names[:5]) + (" …" if len(shared_names) > 5 else "")
+        preview = ", ".join(f"<code>{n}</code>" for n in shared_names[:5]) + (" …" if len(shared_names) > 5 else "")
         return (
-            f"🔗 The identical text renders on {len(shared_names)} indicators ({preview}) — that is a shared "
-            "`definitions.*` / `shared.meta.yml` entry, not a per-variable field. Edit the definition."
+            f"🔗 Grouped because these {len(shared_names)} indicators ({preview}) have <b>exactly the same "
+            f"{label}</b> — the whole text, word for word. It is written once and shared between them, so "
+            "this is one edit."
         )
     parsed = parse_catalog_path(g.catalog_path)
     if len(g.catalog_paths) > 1:
-        where = f"`{parsed[0]}.meta.yml`" if parsed else "the indicator's garden `.meta.yml`"
+        name = f"<code>{parsed[2]}</code>" if parsed else "this indicator"
         return (
-            f"🔗 The identical text renders on {len(g.catalog_paths)} dimensional variants of "
-            f"`{parsed[2] if parsed else 'this indicator'}` — so it comes from a template, not a literal "
-            f"value. Grep {where} for the changed text and edit the `definitions.*` entry it resolves to."
+            f"🔗 Grouped because {len(g.catalog_paths)} versions of {name} have <b>exactly the same "
+            f"{label}</b> — the whole text, word for word. It is written once and shared between them, so "
+            "this is one edit."
         )
-    if parsed:
-        return (
-            f"Authored in `{parsed[0]}.meta.yml` → `tables.{parsed[1]}.variables.{parsed[2]}` — if that "
-            "field holds a `{definitions.*}` reference, edit the definition rather than the field."
-        )
-    return "Authored in the indicator's garden `.meta.yml`"
+    return f"This {label} belongs to one indicator only — nothing else shares it."
 
 
 def _open_chart_buttons(charts: list[dict[str, Any]], change_key: str) -> None:

@@ -13,6 +13,7 @@ import difflib
 import html
 import json
 import urllib.parse
+from collections.abc import Iterable
 from typing import Any
 
 import streamlit as st
@@ -76,6 +77,11 @@ div.st-key-{SECTION_NAV_KEY} {{
 
 DIFF_CSS = """
 <style>
+/* An explanatory note: caption-sized, but in the theme's own text colour rather than caption grey.
+   These lines say why a card groups what it groups, so they have to be read, not skimmed past. Colour is
+   inherited on purpose — it follows the light/dark theme without hardcoding either. */
+.mdd-note { font-size: 0.875rem; line-height: 1.5; }
+.mdd-note code { font-size: 0.8rem; padding: 1px 4px; border-radius: 4px; background: #f1f3f5; }
 .mdd-text { border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px 14px; line-height: 1.5;
             background: #fff; }
 .mdd-text ul { margin: 0 0 0 18px; padding: 0; }
@@ -445,6 +451,15 @@ def render_chart_list(
         st.markdown("\n".join(rows))
 
 
+def st_note(text: str) -> None:
+    """Render an explanatory note: caption-sized, body-text coloured, HTML rather than markdown.
+
+    Callers pass HTML (`<b>`, `<code>`) because markdown is not parsed inside a raw HTML wrapper, and the
+    wrapper is what carries the colour. Kept as one helper so every note in the tool reads the same.
+    """
+    st.markdown(f'<span class="mdd-note">{text}</span>', unsafe_allow_html=True)
+
+
 def st_origin_caption(catalog_paths: set[str] | list[str], attribution: dict[str, str]) -> None:
     """Say where a difference came from — and say nothing at all when it is plainly this branch's.
 
@@ -457,18 +472,18 @@ def st_origin_caption(catalog_paths: set[str] | list[str], attribution: dict[str
 
     origins = {attribution.get(p) for p in catalog_paths}
     if STALE in origins:
-        st.caption(
-            "🚧 **This server holds an older build of this dataset than "
-            f"{BASELINE_NAME}**, so this diff reads backwards — the “new” side is *older* text. Rebuild the "
-            "dataset here before reviewing it (see the banner at the top of the page)."
+        st_note(
+            "🚧 <b>This server holds an older build of this dataset than "
+            f"{BASELINE_NAME}</b>, so this diff reads backwards — the “new” side is <i>older</i> text. "
+            "Rebuild the dataset here before reviewing it (see the banner at the top of the page)."
         )
     elif MASTER in origins:
-        st.caption(
-            f"🕓 This text is **master's, not this branch's** — it matches master's own server, and "
+        st_note(
+            "🕓 This text is <b>master's, not this branch's</b> — it matches master's own server, and "
             f"{BASELINE_NAME} simply has not rebuilt the dataset yet. Nothing to review here."
         )
     elif UNKNOWN in origins:
-        st.caption(
+        st_note(
             "❔ Could not reach master's server to check whether this text is yours or an edit master made "
             f"that {BASELINE_NAME} has not rebuilt yet. Compare it against the edits you actually made."
         )
@@ -557,8 +572,29 @@ def markdown_output(text: str, filename: str, key: str) -> None:
     st.download_button("⬇ Download .md", data=text, file_name=filename, mime="text/markdown", key=f"dl_{key}")
 
 
-def st_section_switcher(progress: dict[str, tuple[int, int]]) -> str:
+def _dead_section_css(options: list[str], dead: set[str]) -> str:
+    """Grey out and disable the given sections, by their position on the bar.
+
+    `st.segmented_control` takes no per-option `disabled`, and its buttons carry no attribute naming the
+    option they stand for — so position is what there is to select on. Kept honest by deriving the indices
+    from the same list the control was given, in the same order.
+    """
+    if not dead:
+        return ""
+    picks = ",\n".join(
+        f'div.st-key-{SECTION_NAV_KEY} [data-testid="stButtonGroup"] > div > button:nth-child({i + 1})'
+        for i, section in enumerate(options)
+        if section in dead
+    )
+    return f"<style>\n{picks} {{ opacity: .4; pointer-events: none; cursor: default; }}\n</style>"
+
+
+def st_section_switcher(progress: dict[str, tuple[int, int]], empty: Iterable[str] = ()) -> str:
     """The Charts / MDims / Explorers control, with its selection kept in the URL.
+
+    `empty` names the sections with nothing in them (see `empty_sections`): they stay on the bar, showing
+    their `(0)`, but go grey and stop taking clicks. A section is never greyed while it is the one being
+    shown — arriving on it by link is allowed, and a greyed-out current section would just look broken.
 
     Hand-rolled rather than `url_persist`ed because the labels carry review progress and therefore change
     as you review: `st.segmented_control` round-trips its value *as the label*, so a tick leaves the
@@ -566,6 +602,7 @@ def st_section_switcher(progress: dict[str, tuple[int, int]]) -> str:
     option. Coercing on the way in keeps the selection where the reviewer put it, and only ever writes a
     section key to the URL — which Chart Diff reads too, and validates strictly.
     """
+    options = list(SECTIONS)
     from_url = coerce_section(st.query_params.get(SECTION_QUERY_KEY))
     st.session_state[SECTION_STATE_KEY] = coerce_section(st.session_state.get(SECTION_STATE_KEY), from_url)
 
@@ -577,13 +614,16 @@ def st_section_switcher(progress: dict[str, tuple[int, int]]) -> str:
             selected = coerce_section(
                 st.segmented_control(
                     label="Section",
-                    options=list(SECTIONS),
+                    options=options,
                     format_func=lambda s: section_label(s, progress),
                     key=SECTION_STATE_KEY,
                     label_visibility="collapsed",
                 ),
                 from_url,
             )
+            # Greying is CSS on the nth button, so it has to be emitted after the control exists and to
+            # skip whichever section is currently open.
+            st.markdown(_dead_section_css(options, set(empty) - {selected}), unsafe_allow_html=True)
         with col_refresh:
             # Rides in the sticky bar so it is reachable from anywhere in a long list.
             st.button(
