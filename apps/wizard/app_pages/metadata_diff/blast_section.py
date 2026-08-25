@@ -85,8 +85,8 @@ def st_show_blast_radius(source_engine: Engine, target_engine: Engine) -> None:
     st.markdown(head)
     st.caption(
         "Why three numbers: one edit can render into several texts, and each text lands on many pages. "
-        "A sentence added to a shared `definitions.*` entry is one thing to judge, even when it turns up "
-        "in eighty places."
+        "A sentence added to a shared definition across multiple indicators is one thing to judge, even "
+        "when it turns up in eighty places."
     )
 
     if not summary.mdims_resolved:
