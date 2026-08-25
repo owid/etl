@@ -418,10 +418,22 @@ def _render_section(
     )
 
 
+def _mdim_count_label(drawn: int, total: int | None) -> str:
+    """How many MDims this is, out of how many were compared — the MDims section's own phrasing.
+
+    Falls back to the bare count when the caller has no total to give: the grid is also rendered for a
+    single MDim from its own page, where "1 of 78" would be answering a question nobody asked.
+    """
+    if not total:
+        return f"{drawn} MDim{'s' if drawn != 1 else ''}"
+    return f"{drawn} of {total} MDim{'s' if total != 1 else ''} changed by this branch"
+
+
 def render_multi_tree_html(
     sections: list[dict[str, Any]],
     branches: list[dict[str, Any]] | None = None,
     self_url: str = "",
+    mdim_total: int | None = None,
 ) -> tuple[str, int]:
     """Render every affected MDim as a root branch of one tree, with the flat surfaces as more of them.
 
@@ -484,13 +496,12 @@ def render_multi_tree_html(
         parts.append(_render_section(node, anchor, all_views, all_hrefs, all_badges))
     body = ""
     if parts:
-        # The MDims as one hierarchy: a header over the individual sections, Charts as its sibling. The
-        # view total lives here — the toolbar used to repeat what the index rows already say per section.
-        plural = "s" if len(section_nodes) != 1 else ""
+        # The MDims as one hierarchy: a header over the individual sections, with Charts and Explorers as
+        # its siblings. It counts MDims, not views: every section header and index row below already
+        # carries its own view count, and two different denominators side by side read as a discrepancy.
         head = (
             f'<div class="mdd-super-title">MDims'
-            f'<span class="mdd-count">{len(section_nodes)} MDim{plural}'
-            f" · {total_changed} of {len(all_views)} views changed</span></div>"
+            f'<span class="mdd-count">{_mdim_count_label(len(section_nodes), mdim_total)}</span></div>'
         )
         body = f'<div class="mdd-super">{head}<div class="mdd-super-children">{"".join(parts)}</div></div>'
 

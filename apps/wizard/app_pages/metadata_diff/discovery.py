@@ -45,6 +45,7 @@ from apps.wizard.app_pages.metadata_diff.data import (
     _chunked,
     _load_configs,
     build_env_bundles,
+    fetch_indicator_config_texts,
     fetch_variable_paths,
     fetch_variable_rows_by_path,
     load_mdim_config,
@@ -1063,6 +1064,23 @@ def compare_explorer_views(
     return out
 
 
+def changed_indicator_configs(source_engine: Engine, target_engine: Engine, paths: list[str]) -> set[str]:
+    """Indicators whose garden-authored chart text (`presentation.grapher_config`) differs from the baseline.
+
+    An indicator absent from the baseline is not reported here: it has no old text to differ from, and the
+    new-indicator case is already carried by `compare_indicator_texts`.
+    """
+    src, tgt = _both(fetch_indicator_config_texts, source_engine, target_engine, paths)
+    changed = set()
+    for path, fields in src.items():
+        before = tgt.get(path)
+        if before is None:
+            continue
+        if any((fields.get(key) or "") != (before.get(key) or "") for key in ("title", "subtitle", "note")):
+            changed.add(path)
+    return changed
+
+
 @dataclass
 class ExplorerChanges:
     """Explorer views that differ from the baseline, split by whether this branch caused it.
@@ -1135,6 +1153,11 @@ def changed_explorer_views(
     if candidates:
         result = compare_indicator_texts(*_both(fetch_variable_rows_by_path, source_engine, target_engine, candidates))
         changed_paths = set(result.diffs) | result.new_paths
+        # An explorer view's text is a chart config, and a garden step can author that text directly
+        # through `presentation.grapher_config`. That edit changes no column of the `variables` row, so
+        # asking only `compare_indicator_texts` credited the branch with none of it: a reworded shared
+        # subtitle moved 402 LIS explorer views and every one was filed as master's lag.
+        changed_paths |= changed_indicator_configs(source_engine, target_engine, candidates)
 
     ours_keys = {key for key in detailed if key[0] in own_recipe}
     ours_keys |= {key for key, ids in ids_by_view.items() if any(paths_by_id.get(i) in changed_paths for i in ids)}
@@ -1666,7 +1689,11 @@ def summarize(
                 (explorer_surface, *mark_identity(explorer_surface, g)) for g in explorer_groups
             )
             for g in explorer_groups:
-                _reach_slot(reach, g).explorers.append({"slug": slug, "n_views": len(g.view_dims)})
+                # The dimensions, not just the count: one edit renders into a text per view here, so
+                # counts alone cannot be combined across texts without double counting or under-counting.
+                _reach_slot(reach, g).explorers.append(
+                    {"slug": slug, "n_views": len(g.view_dims), "views": [dict(d) for d in g.view_dims]}
+                )
     except Exception as e:  # noqa: BLE001
         log.warning("metadata_diff.explorer_discovery_failed", error=str(e))
         summary.warnings.append(f"Explorer discovery failed: {e}")

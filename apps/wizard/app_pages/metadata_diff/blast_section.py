@@ -210,12 +210,15 @@ def _explorer_totals(group: EditGroup) -> list[tuple[str, int]]:
     back to, and exact whenever the texts land on the same views. Only published explorers are compared
     upstream, so there is no unpublished split to make here.
     """
-    counts: dict[str, int] = {}
+    views: dict[str, set] = {}
+    counted: dict[str, int] = {}
     for change in group.changes:
         for explorer in change.explorers:
             slug = str(explorer["slug"])
-            counts[slug] = max(counts.get(slug, 0), int(explorer.get("n_views") or 0))
-    return sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))
+            views.setdefault(slug, set()).update(tuple(sorted(v.items())) for v in explorer.get("views") or [])
+            counted[slug] = max(counted.get(slug, 0), int(explorer.get("n_views") or 0))
+    totals = [(slug, len(seen) or counted[slug]) for slug, seen in views.items()]
+    return sorted(totals, key=lambda kv: (-kv[1], kv[0]))
 
 
 def _mdim_totals(group: EditGroup) -> list[dict[str, Any]]:
@@ -381,6 +384,8 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
         sections,
         branches=[b for b in (_chart_branch(reach, badged), _explorer_branch(reach)) if b],
         self_url=f"{SOURCE.wizard_url.rstrip('/')}/metadata-diff",
+        # The same denominator the MDims section reports: every MDim compared, not only those drawn here.
+        mdim_total=len(df),
     )
     # NOTE: nothing may be rendered below this — the component resizes itself to its content, and
     # Streamlit-rendered siblings would overlap during the resize.
@@ -396,18 +401,23 @@ def _explorer_branch(reach: list[ChangeReach]) -> dict[str, Any] | None:
     an explorer's views are not addressable the way an MDim's dimensions are. The count rides on the
     label so the branch's total and the header's page count can still be reconciled.
     """
-    explorers: dict[str, tuple[int, ChangeReach]] = {}
+    seen_views: dict[str, set] = {}
+    counted: dict[str, int] = {}
+    first_change: dict[str, ChangeReach] = {}
     for r in reach:
         for e in r.explorers:
             slug = str(e["slug"])
-            views = int(e.get("n_views") or 0)
-            seen = explorers.get(slug)
-            explorers[slug] = (max(views, seen[0]) if seen else views, seen[1] if seen else r)
-    if not explorers:
+            seen_views.setdefault(slug, set()).update(tuple(sorted(v.items())) for v in e.get("views") or [])
+            counted[slug] = max(counted.get(slug, 0), int(e.get("n_views") or 0))
+            first_change.setdefault(slug, r)
+    if not seen_views:
         return None
 
     leaves = []
-    for slug, (n_views, change) in sorted(explorers.items()):
+    for slug in sorted(seen_views):
+        # Distinct views across every text of every edit — a view carrying two of them is one view.
+        n_views = len(seen_views[slug]) or counted[slug]
+        change = first_change[slug]
         leaves.append(
             {
                 "label": f"{slug} · {n_views} view{'s' if n_views != 1 else ''}",

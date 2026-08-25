@@ -236,6 +236,40 @@ def fetch_variable_paths(engine: Engine, variable_ids: list[int]) -> dict[int, s
     return {int(record["id"]): str(record["catalogPath"]) for record in _fetch_chunks(fetch, sorted(set(variable_ids)))}
 
 
+def fetch_indicator_config_texts(engine: Engine, catalog_paths: list[str]) -> dict[str, dict[str, Any]]:
+    """The chart text a garden step authors for an indicator, by catalogPath.
+
+    `presentation.grapher_config`'s title / subtitle / note do not live in the `variables` row — they are a
+    config of their own, reached through `variables.patchConfigIdETL`. So none of the columns
+    `fetch_variable_rows_by_path` reads move when a garden step rewords a subtitle, while every chart, MDim
+    view and explorer view rendering that indicator does.
+    """
+    if not catalog_paths:
+        return {}
+    rows: dict[str, dict[str, Any]] = {}
+
+    def fetch(chunk: list) -> list[Any]:
+        placeholders = ", ".join(["%s"] * len(chunk))
+        df = read_sql(
+            f"""
+            select v.catalogPath as catalogPath,
+                   cc.config ->> '$.title' as title,
+                   cc.config ->> '$.subtitle' as subtitle,
+                   cc.config ->> '$.note' as note
+            from variables v
+            join chart_configs cc on cc.id = v.patchConfigIdETL
+            where v.catalogPath in ({placeholders})
+            """,
+            engine=engine,
+            params=tuple(chunk),
+        )
+        return df.to_dict("records")
+
+    for record in _fetch_chunks(fetch, sorted(set(catalog_paths))):
+        rows[str(record["catalogPath"])] = {key: record.get(key) for key in ("title", "subtitle", "note")}
+    return rows
+
+
 def fetch_variable_rows_by_path(engine: Engine, catalog_paths: list[str]) -> dict[str, dict[str, Any]]:
     """Same columns as `fetch_variable_rows`, but keyed by catalogPath.
 
