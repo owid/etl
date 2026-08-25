@@ -34,7 +34,13 @@ from apps.wizard.app_pages.chart_diff.utils import SOURCE
 from apps.wizard.app_pages.metadata_diff import cached
 from apps.wizard.app_pages.metadata_diff.core import diff_window_html, field_label
 from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, EditGroup, group_by_edit, reach_by_surface
-from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, DIFF_CSS, impact_counts
+from apps.wizard.app_pages.metadata_diff.render import (
+    BASELINE_NAME,
+    DIFF_CSS,
+    impact_counts,
+    render_chart_list,
+    view_impact,
+)
 from apps.wizard.app_pages.metadata_diff.tree import render_tree_html
 from apps.wizard.utils.components import url_persist
 
@@ -82,17 +88,21 @@ def st_show_blast_radius(source_engine: Engine, target_engine: Engine) -> None:
             "same ceiling the MDims badge reports."
         )
 
+    # The grid leads, but only when there is one to draw: on a branch that changes no MDim it would
+    # open on "nothing to draw" while the real changes sat one click away. Both names are unchanged, so
+    # existing `?blast-group=` links still resolve.
+    has_mdim = any(r.mdims for r in reach)
     grouping = url_persist(st.segmented_control)(
         label="Group by",
         # "change" keeps its name so existing links still resolve; it groups by authored edit now.
-        options=["change", "surface", "dimensions"],
+        options=["dimensions", "change", "surface"],
         format_func=lambda g: {
+            "dimensions": "🌳 Dimension tree",
             "change": "🧬 By edit",
             "surface": "🎯 By surface",
-            "dimensions": "🌳 Dimension tree",
         }[g],
         key=GROUP_KEY,
-        value="change",
+        value="dimensions" if has_mdim else "change",
         label_visibility="collapsed",
     )
 
@@ -232,7 +242,9 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
     """
     affected = sorted({str(m["catalogPath"]) for r in reach for m in r.mdims})
     if not affected:
-        st.info("No MDim renders any of these changes, so there is no dimension grid to draw.")
+        st.caption("No MDim renders any of these changes, so there is no dimension grid to draw.")
+        # Nothing to badge, so every affected chart is one the grid says nothing about.
+        _chart_reach(reach, badged=set())
         return
 
     # View *changes*, not distinct views: two texts of one edit can land on the same view, and the reach
@@ -262,6 +274,12 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
 
     ids = sorted({v.indicator_id for v in view_diffs if v.affects_indicator and v.indicator_id is not None})
     usage = cached.usage_for_indicators(tuple(ids), catalog_path, source_engine, cache_key=cache_key)
+
+    # What the grid's `↗ N charts` badges account for: charts using the indicator of a view whose change
+    # is in the shared indicator layer. Everything else this branch reaches is nowhere in the grid.
+    badged = {c["chartId"] for v in view_diffs for c in view_impact(v, usage)[0]}
+    _chart_reach(reach, badged)
+
     # Each leaf opens that view on this staging server — the view as a reader gets it, which is the
     # question you have when you click one view out of fifty.
     slug = str(row["slug_source"]) if row is not None and row.get("slug_source") else ""
@@ -277,6 +295,50 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
     # NOTE: nothing may be rendered below this — the component resizes itself to its content, and
     # Streamlit-rendered siblings would overlap during the resize.
     components.html(tree_html, height=height, scrolling=True)
+
+
+def _chart_reach(reach: list[ChangeReach], badged: set) -> None:
+    """Every chart these edits reach, split by whether the grid below accounts for it.
+
+    A grapher chart is never a view of an MDim, so the grid can only mention one indirectly, through a
+    view's `↗ N charts` badge — which fires when that view's change is in the shared indicator layer.
+    Anything else the branch touched (its chart-config edits, and indicators this MDim does not render)
+    appears nowhere in the grid, and that is the part worth naming: measured on this branch, 23 of 66
+    affected charts for one MDim and 47 of 66 for the other.
+    """
+    charts, drafts = {}, {}
+    for r in reach:
+        for c in r.charts:
+            charts.setdefault(c["chartId"], c)
+        for c in r.draft_charts:
+            drafts.setdefault(c["chartId"], c)
+    if not charts and not drafts:
+        st.caption("These edits reach no published chart.")
+        return
+
+    elsewhere = [c for cid, c in charts.items() if cid not in badged]
+    in_grid = [c for cid, c in charts.items() if cid in badged]
+
+    label = f"📈 {len(charts)} chart{'s' if len(charts) != 1 else ''} affected"
+    if elsewhere:
+        label += f" · {len(elsewhere)} the grid does not mention"
+    if drafts:
+        label += f" · {len(drafts)} draft{'s' if len(drafts) != 1 else ''}"
+    with st.expander(label):
+        if elsewhere:
+            st.markdown(f"**{len(elsewhere)} chart(s) the grid below says nothing about**")
+            st.caption(
+                "Either their text came from a chart-config edit, which no MDim view carries, or they "
+                "render an indicator this MDim does not."
+            )
+            render_chart_list(elsewhere, verb="render this branch's edited text", drafts=list(drafts.values()))
+        if in_grid:
+            st.markdown(f"**{len(in_grid)} chart(s) the grid accounts for**")
+            st.caption(
+                "Reachable in the grid through a view's `↗ N charts` badge: they use the same indicator as "
+                "a view whose shared metadata changed."
+            )
+            render_chart_list(in_grid, verb="share an indicator with a changed view")
 
 
 def _truncation_note(total: int) -> None:
