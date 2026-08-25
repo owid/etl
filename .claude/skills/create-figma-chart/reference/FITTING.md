@@ -149,6 +149,35 @@ before and after, since a rewrap shows up there and nowhere else.
   tool for the *gap* checks, where stroke overhang and text leading are exactly what you are measuring —
   but note it is **clipped by an ancestor frame**, so it cannot measure a group that overflows, which is
   the case the previous bullet is about. Bbox to fit, render bounds to verify.
+- **"Aligned" means EXACT, not within a tolerance — and the checker will not tell you.**
+  `verify_page.js`'s `box-alignment` row passes anything inside **±1px**, so a chart that ends at
+  523.43 against a 524 content box reports `ok` and is still wrong: every other full-width element —
+  header, subtitle, footer, a legend row — sits on those two edges, so the miss is visible the moment
+  anyone selects the node and reads the properties panel. Assert `< 0.01` yourself; the shipped
+  tolerance is a floor for the script, not the standard for the frame.
+
+  **Re-pin after *any* edit that changes the chart's ink**, not just after the fit: a re-export, a
+  font-size change, resizing an ornament. The order matters, and steps 2–5 are the ones that get skipped:
+
+  1. `chart.rescale(contentW / chart.absoluteBoundingBox.width)`.
+  2. **Put the type back on the ladder.** The scale nudges every size off it (14 → 14.016). This does
+     not undo the width *when* the box's right edge is a clip rect (`scatterBounds`, `boundsClip`)
+     and the text is left- or centre-anchored — which is the common case, because grapher's export
+     wraps the plot in one. Verify it rather than assuming: re-read the box after resetting.
+  3. **Put the furniture stroke weights back.** `rescale` multiplies them, so the house 1px line
+     comes back as 1.001 and any ring you added drifts with it.
+  4. Translate so the left edge is exact, then assert *both* edges.
+  5. **Re-centre the block and re-check everything parented to the FRAME rather than the chart.**
+     Annotations and a legend row do not travel with the chart, so a rescale slides the plot out from
+     under them — wedge containment, dot clearance and collisions all have to be re-run.
+
+  Never close the gap with a horizontal `resize`: it ovals the dots.
+
+  **A corollary about ornaments.** Anything *you* add — a highlight ring, a dot you place — can become
+  the box's rightmost ink, at which point the frame's alignment depends on its size. Sizing an ornament
+  to make a number come out right works and then silently breaks when a later review asks why that
+  ornament is a different size from its siblings. Prefer letting the export's own geometry set the edge
+  and closing the residual with step 1.
 - **Centre on the BOX, not the ink — and know that you cannot have both.** The two targets are
   mutually exclusive, so this is a choice and the choice is the box. Measured across eight frames: with
   the ink gaps equal to 0.01px, the **box** gaps were off by 0.34–2.24px on every single frame. Three

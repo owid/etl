@@ -234,6 +234,23 @@ The high-value edits to propose (include them in the Step 4 proposal):
 
 - **Placing several annotations is a constrained assignment, not five independent choices — and the constraint set is bigger than it looks.** A label needs: clear of every country bbox, clear of the other labels, inside the plot (a label in the band above the map reads as a third subtitle line), **its leader must not pass through another highlighted country**, and — the one that is easy to miss — **no leader may pass through another label**, or it vanishes behind that label's knockout and looks broken. Encode all of them as acceptance tests over a per-country candidate list, then **search across assignment orderings** rather than trusting one greedy pass: ordering widest-first pushed the smallest label from a 10px leader to a 114px one here, and evaluating all orderings for minimum total leader length recovered it. Report total and worst leader length so the arrangement can be compared against the next attempt.
 
+  **Two bugs that make a placement search silently produce bad layouts, both found by reading the
+  output rather than the render:**
+
+  - **Diagonal candidates need `dist / √2` per axis, not `dist` per axis.** Offsetting both x and y by
+    the full distance puts the box's nearest corner at `hypot(d, d)` = **1.41 × d** — so a candidate
+    generated as "10px away" actually lands 14px away, and the search then rejects diagonals as
+    expensive and clusters everything on the four cardinals. Symptom: a reviewer says two specific
+    labels "look a bit far" while the report claims they are inside the distance cap, and both turn out
+    to be the diagonal ones. Scale the offset by `Math.SQRT1_2` so `dist` means what the cost function
+    thinks it means.
+  - **Weight the objective, then check the weights against a case you can judge.** A greedy pass that
+    penalises label-on-label overlap more heavily than covering data will happily hide ten marks to
+    avoid one overlap. Measured: a first pass moved one label from 3 hidden dots to **10**, because
+    10 × `W_dot` still scored below a single `W_overlap`. Prefer coordinate descent — re-optimise each
+    label against all the others until nothing moves — over a single ordered pass, which bakes in
+    whoever went first.
+
   **Test "is this spot empty?" against one box per SUBPATH, never one per country.** A country's bounding box is a terrible proxy for a country that comes in pieces: the US spans Alaska *and* the mainland, so its bbox swallows most of the North Pacific and Atlantic, and Russia's wraps the antimeridian and covers the whole northern strip. The tempting shortcut is to exclude those countries from the test — and that shortcut is exactly how a label ends up printed on Florida while your own audit reports it clear. Split every vector's `vectorPaths` on `M`, take each subpath's bbox, and map it to frame coordinates via the node's own local-min offset. On this chart it turned ~200 country boxes into 321 subpath boxes, needed no exclusions at all, and immediately caught a label the exclusion-based test had passed.
 
   ```js

@@ -63,6 +63,10 @@ const SMALL_FRAME_W = 302;                // the small/pull templates, whose flo
 const HOUSE_LINE = 3, HOUSE_HALO = 4;
 const FURNITURE_W = 1, FURNITURE_DASH = [4, 4];
 const BLOCK_CLEARANCE = 27;          // annotation block vs header/footer on the 540x540 pages
+// The chart's box must meet the content box EXACTLY — same tolerance verify_templates.js calls
+// TIGHT. Wide enough for rescale's float residue, narrow enough that nothing visible in Figma's
+// properties panel passes. See FITTING.md for why "within a pixel" is not good enough.
+const BOX_EPS = 0.05;
 const GRAPHER_RESIDUAL = "#585c64";  // emitted for residual categories; in no library group
 
 const r = (v) => (v === null || v === undefined ? null : Math.round(v * 100) / 100);
@@ -772,9 +776,16 @@ const checkFrame = async (frameId) => {
     else {
       const l = Math.min(...boxes.map((b) => b.l)), rr = Math.max(...boxes.map((b) => b.rr));
       const dl = l - contentL, dr = rr - contentR;
-      const bad = Math.abs(dl) > 1 || Math.abs(dr) > 1;
+      // EXACT, not "close enough". Every other full-width element — header, subtitle, footer, a
+      // legend row — sits on these two edges, so a sub-pixel miss is visible the moment anyone
+      // selects the node and reads the properties panel. This gate used to allow +/-1px, which
+      // passed a chart ending at 523.43 against a 524 box; FITTING.md carries the re-pin recipe.
+      // BOX_EPS matches verify_templates.js's TIGHT: loose enough for rescale's float residue,
+      // tight enough that nothing a reader or reviewer could notice survives it.
+      const bad = Math.abs(dl) > BOX_EPS || Math.abs(dr) > BOX_EPS;
       add("box-alignment", bad ? "FAIL" : "ok",
-          `chart ${r(l)}..${r(rr)} against the header's ${r(contentL)}..${r(contentR)} (left ${r(dl) >= 0 ? "+" : ""}${r(dl)}, right ${r(dr) >= 0 ? "+" : ""}${r(dr)})` +
+          `chart ${r(l)}..${r(rr)} against the header's ${r(contentL)}..${r(contentR)} (left ${r(dl) >= 0 ? "+" : ""}${r(dl)}, right ${r(dr) >= 0 ? "+" : ""}${r(dr)}; must be exact to ${BOX_EPS})` +
+          (bad ? " — re-pin per FITTING.md: rescale to the content width, restore the type ladder and stroke weights, translate, then re-centre the block and re-check anything parented to the FRAME" : "") +
           (isMap ? " — on a map this is the BINDING axis, not a cross-check: the width is what the fit sets and the gap row is skipped" : ""));
     }
   }
