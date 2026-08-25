@@ -278,7 +278,6 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
     # What the grid's `↗ N charts` badges account for: charts using the indicator of a view whose change
     # is in the shared indicator layer. Everything else this branch reaches is nowhere in the grid.
     badged = {c["chartId"] for v in view_diffs for c in view_impact(v, usage)[0]}
-    _chart_reach(reach, badged)
 
     # Each leaf opens that view on this staging server — the view as a reader gets it, which is the
     # question you have when you click one view out of fifty.
@@ -291,14 +290,67 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
         leaf_hrefs=leaf_hrefs,
         external_impacts=[impact_counts(v, usage) for v in view_diffs],
         self_url=f"{SOURCE.wizard_url.rstrip('/')}/metadata-diff",
+        chart_branch=_chart_branch(reach, badged),
     )
     # NOTE: nothing may be rendered below this — the component resizes itself to its content, and
     # Streamlit-rendered siblings would overlap during the resize.
     components.html(tree_html, height=height, scrolling=True)
 
 
+def _chart_branch(reach: list[ChangeReach], badged: set) -> dict[str, Any]:
+    """The charts these edits reach, as a branch of the grid: grouped by how a reader meets the text.
+
+    Grouped the way the chart lists elsewhere group: a data page lays the text out, a multi-indicator
+    chart keeps it behind "Learn more about this data", and a draft shows nobody anything. Charts the
+    grid already accounts for through a view badge are marked rather than hidden, so the branch's total
+    and the badges' totals can be reconciled by eye.
+    """
+    charts, drafts = {}, {}
+    for r in reach:
+        for c in r.charts:
+            charts.setdefault(c["chartId"], (c, r))
+        for c in r.draft_charts:
+            drafts.setdefault(c["chartId"], (c, r))
+
+    def leaf(chart: dict[str, Any], change: ChangeReach, published: bool = True) -> dict[str, Any]:
+        slug = str(chart.get("slug") or f"chart {chart.get('chartId')}")
+        href = (
+            f"{SOURCE.site}/grapher/{slug}"
+            if published and chart.get("slug")
+            else f"{SOURCE.admin_site}/admin/charts/{chart.get('chartId')}/edit"
+        )
+        return {
+            "label": slug,
+            "href": href,
+            "badged": chart.get("chartId") in badged,
+            "preview": (
+                f'<p class="mdd-impact-line">{html.escape(field_label(change.field))} changed</p>'
+                f'<div class="mdd-diff">{_preview(change)}</div>'
+            ),
+        }
+
+    on_page = [leaf(c, r) for c, r in charts.values() if c.get("has_data_page", True)]
+    drawer = [leaf(c, r) for c, r in charts.values() if not c.get("has_data_page", True)]
+    draft_leaves = [leaf(c, r, published=False) for c, r in drafts.values()]
+    return {
+        "label": "📈 Charts",
+        "groups": [
+            {"name": "Data pages", "note": "The text is laid out on the chart's data page.", "charts": on_page},
+            {
+                "name": "Via Learn more about this data",
+                "note": "Multi-indicator charts: their readers reach the text in the sources drawer.",
+                "charts": drawer,
+            },
+            {"name": "Unpublished drafts", "note": "No reader can open these.", "charts": draft_leaves},
+        ],
+    }
+
+
 def _chart_reach(reach: list[ChangeReach], badged: set) -> None:
-    """Every chart these edits reach, split by whether the grid below accounts for it.
+    """Every chart these edits reach — the fallback for when there is no grid to hang them off.
+
+    With a grid on screen the charts are a branch of it (`_chart_branch`); this is what a branch that
+    changes no MDim gets instead.
 
     A grapher chart is never a view of an MDim, so the grid can only mention one indirectly, through a
     view's `↗ N charts` badge — which fires when that view's change is in the shared indicator layer.

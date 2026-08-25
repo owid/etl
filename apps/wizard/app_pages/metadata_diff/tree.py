@@ -256,6 +256,63 @@ def _render_node(
     )
 
 
+def _render_chart_branch(branch: dict[str, Any], preview_offset: int) -> tuple[str, list[str]]:
+    """(html, previews) for the charts branch — a root sibling of the dimension tree.
+
+    `branch` is {"label": str, "groups": [{"name": str, "note": str, "charts": [chart, ...]}]} where each
+    chart is {"label", "href", "preview", "badged"}. Leaves reuse `.mdd-leaf` and `data-view`, indexing
+    into the shared previews array from `preview_offset`, so the existing hover and filter code applies
+    unchanged. Everything here is marked "changed": a chart in this list is affected by definition.
+    """
+    previews: list[str] = []
+    group_html: list[str] = []
+    total = 0
+
+    for group in branch.get("groups") or []:
+        charts = group.get("charts") or []
+        if not charts:
+            continue
+        total += len(charts)
+        leaves = []
+        for chart in charts:
+            index = preview_offset + len(previews)
+            previews.append(chart.get("preview") or "")
+            # The same marker the grid uses on a view, so a chart the grid already accounts for is
+            # recognisable as the same fact rather than a second one.
+            mark = '<span class="mdd-impact" title="Also reachable from a view badge in the grid">&#8599;</span>'
+            leaves.append(
+                f'<div class="mdd-node mdd-leafnode mdd-n-changed">'
+                f'<a class="mdd-box mdd-leaf mdd-changed" data-view="{index}" '
+                f'href="{html.escape(chart.get("href") or "")}" target="_blank" rel="noopener">'
+                f"{html.escape(chart.get('label') or '')}{mark if chart.get('badged') else ''}"
+                f'<span class="mdd-golink">&#8599;</span></a>'
+                f"</div>"
+            )
+        title = html.escape(group.get("name") or "")
+        group_html.append(
+            f'<div class="mdd-node mdd-n-changed">'
+            f'<div class="mdd-box mdd-branch mdd-changed" role="button" title="{html.escape(group.get("note") or "")}">'
+            f'<span class="mdd-caret">&#9662;</span>{title}'
+            f'<span class="mdd-count">{len(charts)}</span></div>'
+            f'<div class="mdd-children">{"".join(leaves)}</div>'
+            f"</div>"
+        )
+
+    if not group_html:
+        return "", []
+
+    label = html.escape(branch.get("label") or "Charts")
+    body = (
+        f'<div class="mdd-node mdd-n-changed mdd-collapsed">'
+        f'<div class="mdd-box mdd-branch mdd-changed" role="button" title="Click to collapse/expand">'
+        f'<span class="mdd-caret">&#9662;</span>{label}'
+        f'<span class="mdd-count">{total}</span></div>'
+        f'<div class="mdd-children">{"".join(group_html)}</div>'
+        f"</div>"
+    )
+    return body, previews
+
+
 def _impact_preview_line(impact: dict[str, int] | None) -> str:
     """A '↗ Also affects …' line appended to a leaf's hover preview."""
     if not impact:
@@ -275,6 +332,7 @@ def render_tree_html(
     dimensions: list[dict[str, Any]],
     view_diffs: list[ViewDiff],
     leaf_hrefs: list[str] | None = None,
+    chart_branch: dict[str, Any] | None = None,
     external_impacts: list[dict[str, int]] | None = None,
     self_url: str = "",
 ) -> tuple[str, int]:
@@ -314,9 +372,16 @@ def render_tree_html(
     dim_names = " &#8594; ".join(html.escape(d.get("name") or d["slug"]) for d in dimensions)
     body = "".join(_render_node(node, view_diffs, leaf_hrefs, leaf_badges) for node in tree)
 
+    # The charts, as a root sibling. Its previews extend the same array, so a chart leaf is a leaf.
+    if chart_branch:
+        chart_html, chart_previews = _render_chart_branch(chart_branch, len(previews))
+        body += chart_html
+        previews = previews + chart_previews
+
     show_unchanged_default = "false" if n_changed else "true"
     visible_leaves = n_changed if n_changed else len(view_diffs)
-    initial_height = min(MAX_HEIGHT_PX, 170 + visible_leaves * 38)
+    # +1 row for the collapsed charts branch, so the frame does not open a scrollbar for its header.
+    initial_height = min(MAX_HEIGHT_PX, 170 + (visible_leaves + (1 if chart_branch else 0)) * 38)
 
     return (
         f"""
