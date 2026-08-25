@@ -27,11 +27,11 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > |---|---|---|
 > | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 69% of cap |
 > | `series` | series-weight, furniture-weight, furniture-dash | 64% |
-> | `geometry` | box-alignment, gap, margins, off-palette | 59% |
+> | `geometry` | box-alignment, gap, margins, off-palette | 60% |
 > | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 76% |
 >
-> Groups combine, so the whole pass is two calls: `--rows type,series` (41,960) then
-> `--rows geometry,annotations` (43,327, **87% of cap** — the figure `inline_script.py --check`
+> Groups combine, so the whole pass is two calls: `--rows type,series` (41,982) then
+> `--rows geometry,annotations` (43,597, **87% of cap** — the figure `inline_script.py --check`
 > reports: it measures **these two calls**, declared as `DOCUMENTED_CALLS` in the script, rather
 > than the smallest split it could find for itself — an optimiser would go on reporting a
 > comfortable number by picking a split nobody is told to send. Change the pair here and there

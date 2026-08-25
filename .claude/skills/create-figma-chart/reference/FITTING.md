@@ -149,12 +149,14 @@ before and after, since a rewrap shows up there and nowhere else.
   tool for the *gap* checks, where stroke overhang and text leading are exactly what you are measuring —
   but note it is **clipped by an ancestor frame**, so it cannot measure a group that overflows, which is
   the case the previous bullet is about. Bbox to fit, render bounds to verify.
-- **"Aligned" means EXACT, not within a tolerance — and the checker will not tell you.**
-  `verify_page.js`'s `box-alignment` row passes anything inside **±1px**, so a chart that ends at
-  523.43 against a 524 content box reports `ok` and is still wrong: every other full-width element —
-  header, subtitle, footer, a legend row — sits on those two edges, so the miss is visible the moment
-  anyone selects the node and reads the properties panel. Assert `< 0.01` yourself; the shipped
-  tolerance is a floor for the script, not the standard for the frame.
+- **"Aligned" means EXACT, not within a tolerance — and the checker now gates on it.**
+  `verify_page.js`'s `box-alignment` row used to pass anything inside **±1px**, so a chart that ended
+  at 523.43 against a 524 content box reported `ok` and was still wrong: every other full-width
+  element — header, subtitle, footer, a legend row — sits on those two edges, so the miss is visible
+  the moment anyone selects the node and reads the properties panel. It now gates at **`BOX_EPS =
+  0.05`**, matching `verify_templates.js`'s `TIGHT`: that same 0.57px shortfall `FAIL`s, while the
+  ~0.004px float residue a `rescale` leaves behind still passes, so a correctly fitted page is not
+  failed by arithmetic noise. Read a `FAIL` on that row as "re-pin", not as a rounding note.
 
   **Re-pin after *any* edit that changes the chart's ink**, not just after the fit: a re-export, a
   font-size change, resizing an ornament. The order matters, and steps 2–5 are the ones that get skipped:
