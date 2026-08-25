@@ -56,13 +56,13 @@ tables:
         presentation:
           title_public: Geothermal capacity (off-grid)
       geothermal__total:
-        title: Geothermal capacity (total)
+        title: Installed geothermal capacity (total)
         description_short: |-
           Total geothermal (on- and off-grid) electricity installed capacity, measured in megawatts.
         display:
           name: Geothermal (total)
         presentation:
-          title_public: Total geothermal capacity
+          title_public: Total installed geothermal capacity
       hydropower:
         title: Hydropower capacity (on-grid)
         description_short: |-
