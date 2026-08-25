@@ -2338,3 +2338,117 @@ def test_validate_description_keys_rejects_character_explosion():
         "description_key": "- EM-DAT counts an event as a disaster when it meets any of several criteria."
     }
     collection.validate_description_keys()
+
+
+def _make_minimal_config(**extra) -> dict:
+    """Smallest config that `Collection.from_dict` accepts."""
+    return {
+        "catalog_path": "test/latest/data#table",
+        "title": {"title": "Test", "title_variant": "variant"},
+        "default_selection": ["World"],
+        "dimensions": [{"slug": "metric", "name": "Metric", "choices": [{"slug": "total", "name": "Total"}]}],
+        "views": [
+            {
+                "dimensions": {"metric": "total"},
+                "indicators": {"y": [{"catalogPath": "grapher/ns/2024-01-01/ds/tb#ind"}]},
+                "config": {"hasMapTab": True},
+            }
+        ],
+        **extra,
+    }
+
+
+def test_collection_grapher_schema_round_trips():
+    """
+    Test Collection.grapher_schema - the authored pin survives from_dict/to_dict.
+
+    Without it the model used to drop the key entirely, so the version never reached Grapher.
+    """
+    collection = Collection.from_dict(_make_minimal_config(grapher_schema="011"))
+    assert collection.grapher_schema == "011"
+    assert collection.to_dict()["grapher_schema"] == "011"
+
+    # Omitted: the key is pruned, and `upsert_to_db` resolves the DEFAULT_GRAPHER_SCHEMA fallback.
+    collection = Collection.from_dict(_make_minimal_config())
+    assert collection.grapher_schema is None
+    assert "grapher_schema" not in collection.to_dict()
+
+
+def test_collection_grapher_schema_validates_at_init():
+    """
+    Test Collection.grapher_schema - a malformed pin fails at authoring time, not at upsert time.
+
+    Example: `grapher_schema: 011` unquoted in YAML arrives as 9 and is rejected.
+    """
+    with pytest.raises(ValueError, match="Invalid `grapher_schema` value"):
+        Collection.from_dict(_make_minimal_config(grapher_schema=9))
+
+
+def test_collection_grapher_schema_passes_schema_validation():
+    """
+    Test Collection.validate_schema - `grapher_schema` is accepted and format-checked by
+    schemas/multidim-schema.json (which sets additionalProperties: false at the top level).
+    """
+    Collection.from_dict(_make_minimal_config(grapher_schema="011")).validate_schema()
+
+    collection = Collection.from_dict(_make_minimal_config(grapher_schema="011"))
+    collection.grapher_schema = "latest"  # bypasses __post_init__
+    with pytest.raises(ValueError, match="must match pattern"):
+        collection.validate_schema()
+
+
+def test_explorer_rejects_grapher_schema():
+    """
+    Test Explorer - `grapher_schema` is multidim-only and must not be silently ignored.
+
+    Explorers reach Grapher through the legacy TSV path, which has no `grapherConfigSchema`.
+    """
+    from etl.collection.explorer import Explorer
+
+    with pytest.raises(ValueError, match="only supported for multidim collections"):
+        Explorer.from_dict(_make_minimal_config(grapher_schema="011", config={"explorerTitle": "T"}))
+
+
+def test_warn_on_view_schema_overrides(capsys):
+    """
+    Test Collection.warn_on_view_schema_overrides - a view `$schema` shadowing the collection pin
+    is surfaced, since Grapher lets the view value win and it is much less visible.
+
+    structlog writes to stdout rather than through stdlib logging, hence capsys not caplog.
+    """
+    collection = Collection.from_dict(
+        _make_minimal_config(
+            grapher_schema="011",
+            views=[
+                {
+                    "dimensions": {"metric": "total"},
+                    "indicators": {"y": [{"catalogPath": "grapher/ns/2024-01-01/ds/tb#ind"}]},
+                    "config": {"$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json"},
+                }
+            ],
+        )
+    )
+    collection.warn_on_view_schema_overrides()
+    out = capsys.readouterr().out
+    assert "grapher-schema.008.json" in out
+    assert "grapher-schema.011.json" in out
+    assert "grapher_schema" in out
+
+    # A view without its own `$schema` stays quiet.
+    Collection.from_dict(_make_minimal_config(grapher_schema="011")).warn_on_view_schema_overrides()
+    assert capsys.readouterr().out == ""
+
+
+def test_warn_if_grapher_schema_unpinned(capsys):
+    """
+    Test Collection.warn_if_grapher_schema_unpinned - an unpinned collection says so.
+
+    Without this, a config that silently relies on the DEFAULT_GRAPHER_SCHEMA fallback is
+    indistinguishable in the database from one that pins the same version deliberately.
+    """
+    Collection.from_dict(_make_minimal_config()).warn_if_grapher_schema_unpinned()
+    out = capsys.readouterr().out
+    assert "pins no `grapher_schema`" in out
+
+    Collection.from_dict(_make_minimal_config(grapher_schema="011")).warn_if_grapher_schema_unpinned()
+    assert capsys.readouterr().out == ""

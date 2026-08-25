@@ -332,23 +332,25 @@ class ChartConfig(Base):
     __table_args__ = (Index("idx_chart_configs_slug", "slug"),)
 
     id: Mapped[bytes] = mapped_column(CHAR(36), primary_key=True)
-    patch: Mapped[dict] = mapped_column(JSON, nullable=False)
-    full: Mapped[dict] = mapped_column(JSON, nullable=False)
-    fullMd5: Mapped[str] = mapped_column(CHAR(24), Computed("(to_base64(unhex(md5(full))))", persisted=True))
+    # A chart_configs row is a config. The FK that names it says which kind: `…ConfigId` names
+    # the config that renders, `patchConfigId` names an authored layer. Always reach a config
+    # through its owner -- a bare query over this table mixes the two.
+    config: Mapped[dict] = mapped_column(JSON, nullable=False)
+    configMd5: Mapped[str] = mapped_column(CHAR(24), Computed("(to_base64(unhex(md5(config))))", persisted=True))
     slug: Mapped[str | None] = mapped_column(
-        String(255), Computed("(json_unquote(json_extract(`full`, '$.slug')))", persisted=True)
+        String(255), Computed("(json_unquote(json_extract(`config`, '$.slug')))", persisted=True)
     )
     chartType: Mapped[str | None] = mapped_column(
         String(255),
         Computed(
-            "(CASE WHEN full ->> '$.chartTypes' IS NULL THEN 'LineChart' ELSE full ->> '$.chartTypes[0]' END)",
+            "(CASE WHEN config ->> '$.chartTypes' IS NULL THEN 'LineChart' ELSE config ->> '$.chartTypes[0]' END)",
             persisted=True,
         ),
     )
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), nullable=False)
     updatedAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
 
-    chartss: Mapped[list["Chart"]] = relationship("Chart", back_populates="chart_config")
+    chartss: Mapped[list["Chart"]] = relationship("Chart", back_populates="chart_config", foreign_keys="Chart.configId")
     explorer_viewss: Mapped[list["ExplorerView"]] = relationship("ExplorerView", back_populates="chart_config")
 
 
@@ -357,6 +359,13 @@ class Chart(Base):
     __table_args__ = (
         ForeignKeyConstraint(
             ["configId"], ["chart_configs.id"], ondelete="RESTRICT", onupdate="RESTRICT", name="charts_configId"
+        ),
+        ForeignKeyConstraint(
+            ["patchConfigId"],
+            ["chart_configs.id"],
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+            name="fk_charts_patch_config_id",
         ),
         ForeignKeyConstraint(
             ["lastEditedByUserId"],
@@ -375,10 +384,13 @@ class Chart(Base):
         Index("charts_lastEditedByUserId", "lastEditedByUserId"),
         Index("charts_publishedByUserId", "publishedByUserId"),
         Index("configId", "configId", unique=True),
+        Index("patchConfigId", "patchConfigId", unique=True),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     configId: Mapped[bytes] = mapped_column(CHAR(36))
+    # The authored layer, as its own chart_configs row. `configId` is what renders.
+    patchConfigId: Mapped[bytes] = mapped_column(CHAR(36))
     isInheritanceEnabled: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'1'"))
     forceDatapage: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
@@ -390,7 +402,15 @@ class Chart(Base):
     publishedAt: Mapped[datetime | None] = mapped_column(DateTime)
     publishedByUserId: Mapped[int | None] = mapped_column(Integer)
 
-    chart_config: Mapped["ChartConfig"] = relationship("ChartConfig", back_populates="chartss", lazy="joined")
+    # `charts` now has two FKs into chart_configs, so each relationship must name its own.
+    chart_config: Mapped["ChartConfig"] = relationship(
+        "ChartConfig", back_populates="chartss", lazy="joined", foreign_keys=[configId]
+    )
+    # The authored layer. Deliberately *not* lazy="joined": only the indicator upgrader reads
+    # it, and joining it into every chart query would cost the common path (chart-diff loads
+    # charts in bulk) for a field almost nothing wants. If a caller ever needs it for many
+    # charts at once, use selectinload there rather than eager-loading it for everyone.
+    patch_config: Mapped["ChartConfig"] = relationship("ChartConfig", foreign_keys=[patchConfigId])
 
     @hybrid_property
     def updatedAt(self) -> datetime:  # ty: ignore
@@ -403,7 +423,7 @@ class Chart(Base):
 
     @hybrid_property
     def config(self) -> dict[str, Any]:  # ty: ignore
-        config = self.chart_config.full.copy()
+        config = self.chart_config.config.copy()
         # Include chart-level flags in config so they're part of comparison/diff logic.
         config["isInheritanceEnabled"] = bool(self.isInheritanceEnabled)
         config["forceDatapage"] = bool(self.forceDatapage)
@@ -411,7 +431,7 @@ class Chart(Base):
 
     @config.expression
     def config(cls):
-        return select(ChartConfig.full).where(ChartConfig.id == cls.configId).scalar_subquery()
+        return select(ChartConfig.config).where(ChartConfig.id == cls.configId).scalar_subquery()
 
     @hybrid_property
     def slug(self) -> str | None:  # ty: ignore
@@ -1100,8 +1120,10 @@ class Variable(Base):
     license: Mapped[dict | None] = mapped_column(JSON, default=None)
     type: Mapped[VARIABLE_TYPE | None] = mapped_column(ENUM(*get_args(VARIABLE_TYPE)), default=None)
     sort: Mapped[list[str] | None] = mapped_column(JSON, default=None)
-    grapherConfigIdAdmin: Mapped[str | None] = mapped_column(VARCHAR(32), default=None)
-    grapherConfigIdETL: Mapped[bytes | None] = mapped_column(CHAR(32), default=None)
+    # The ETL-authored indicator-level config layer. Named `patch…` because it *is* an authored
+    # layer, like charts.patchConfigId -- there is no stored merged indicator config; grapher
+    # merges it in code. Written only over HTTP (PUT /variables/{id}/grapherConfigETL).
+    patchConfigIdETL: Mapped[bytes | None] = mapped_column(CHAR(32), default=None)
     dataChecksum: Mapped[str | None] = mapped_column(VARCHAR(64), default=None)
     metadataChecksum: Mapped[str | None] = mapped_column(VARCHAR(64), default=None)
 
@@ -2024,7 +2046,15 @@ class NarrativeChart(Base):
             ["multi_dim_x_chart_configs.id"],
             name="fk_narrative_charts_parent_multi_dim_x_chart_config_id",
         ),
+        ForeignKeyConstraint(
+            ["patchConfigId"],
+            ["chart_configs.id"],
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+            name="fk_narrative_charts_patch_config_id",
+        ),
         Index("chartConfigId", "chartConfigId"),
+        Index("patchConfigId", "patchConfigId", unique=True),
         Index("fk_narrative_charts_parent_multi_dim_x_chart_config_id", "parentMultiDimXChartConfigId"),
         Index("lastEditedByUserId", "lastEditedByUserId"),
         Index("name", "name", unique=True),
@@ -2034,6 +2064,8 @@ class NarrativeChart(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(VARCHAR(255), nullable=False)
     chartConfigId: Mapped[str] = mapped_column(CHAR(36), nullable=False)
+    # The authored layer, as its own chart_configs row. `chartConfigId` is what renders.
+    patchConfigId: Mapped[str] = mapped_column(CHAR(36), nullable=False)
     queryParamsForParentChart: Mapped[dict] = mapped_column(JSON, nullable=False)
     queryParamsForParentChartMd5: Mapped[str] = mapped_column(
         CHAR(24), Computed("(to_base64(unhex(md5(`queryParamsForParentChart`))))", persisted=True), nullable=False
@@ -2056,10 +2088,15 @@ class NarrativeChart(Base):
         return list(session.scalars(select(cls).where(cls.parentChartId.in_(parent_chart_ids))).all())
 
     def load_config(self, session: Session) -> dict[str, Any]:
-        """Load the patch config from chart_configs table."""
+        """Load the authored (patch) config from chart_configs table.
+
+        The authored layer is its own chart_configs row, named by `patchConfigId`.
+        `chartConfigId` names the row that renders (parent + patch merged), which is a
+        different thing -- do not read it here.
+        """
         result = session.execute(
-            text("SELECT patch FROM chart_configs WHERE id = :config_id"),
-            {"config_id": self.chartConfigId},
+            text("SELECT config FROM chart_configs WHERE id = :config_id"),
+            {"config_id": self.patchConfigId},
         ).fetchone()
         if result is None:
             return {}

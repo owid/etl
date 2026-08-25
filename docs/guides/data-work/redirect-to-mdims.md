@@ -15,15 +15,63 @@ is the order of operations.
 
 ## First: the MDIM has to be ready
 
-Publish it, and **add the MDIM views you want as featured metrics by hand**. Nothing propagates charts and explorers here.
+Publish it, and **add the MDIM views you want as featured metrics by hand**. Nothing propagates charts and explorers here — and the reverse matters just as much, so it has its own section below.
 
 Note that a topic page's *All charts* won't show a redirected MDim, because the block is built from charts only. Have that in mind if you are redirecting charts touching multiple topic pages.
 
 An unpublished MDIM is refused as a redirect target, and even if a row existed the baker filters on publication, so the redirect would serve nothing.
 
+## Featured metrics: swap them before you apply
+
+A featured metric is an editorial slot on a topic page, and at the top of that topic's search
+results. It is a row in `featured_metrics` holding a **URL** — with no foreign key to what it
+names — so it turns up in no reference table and no reference count.
+
+**A redirect does not cover it.** The row is resolved only when Algolia indexes, matching
+pathname *and* exact query params against **published** records, following no redirect. So
+unpublishing the source empties the slot silently. The one signal is an *"Algolia Featured
+Metric Indexing Failures"* post in Slack after the next index.
+
+!!! danger "The window closes when you apply, and does not reopen"
+    Adding a featured metric validates that the slug resolves to something **published**. Once
+    the source is unpublished or the explorer is retired, you can no longer add a row for it —
+    and the record of what was featured, and where it ranked, is gone. Swap while the old rows
+    are still readable.
+
+The mapping skills list the affected rows in `references.md`.
+
+### The swap, per row
+
+At [`/admin/featured-metrics`](https://admin.owid.io/admin/featured-metrics). Nothing is
+scripted — these are editorial slots, so it is worth asking whoever owns the topic first.
+
+1. Note the old row's tag, income group, ranking, and whether *boost in search* is on.
+2. The new URL is `…/grapher/<mdim-slug>?<dimension params>` — the **complete** dimension set,
+   and **no reader params** (the admin strips `country`, `tab`, `time`, … and an explorer's
+   `pickerSort`/`pickerMetric`/`hideControls`).
+3. Add it under the same tag and income group. It lands at the bottom of that group.
+4. Drag it to the old row's position.
+5. Delete the old row — the ranking gap closes on its own.
+6. Re-apply *boost in search* if it was on; it does not carry over.
+
+Repeat per row. The key is (URL, tag, income group), so one chart may hold several.
+
+!!! warning "The featured-metric URL is not the redirect target"
+    A redirect target carries the source's own parameters — a featured metric must be the bare
+    view. The admin accepts either, because creating a row **never validates the query params**,
+    only the slug. So the mistake surfaces months later, in the Slack report.
+
+Two collisions to expect: several charts mapping to one view yield only one row (keep the lowest
+ranking, and note which slots collapsed); and an explorer row must carry a query string, while an
+MDIM URL without one means the default view.
+
+**Verifying:** after the next index, the new URL is absent from the Slack report and the metric
+is visible on the topic page — browsing the topic with an **empty query**, since a free-text
+search filters featured metrics out.
+
 ## Explorers
 
-Steps 1–3 are reversible; step 4 is not.
+Steps 1–3b are reversible; step 4 is not.
 
 ### 1. Run `/map-explorer-to-mdim`
 
@@ -87,6 +135,12 @@ the bulk endpoint reject the redirect — and it caches per-source checks, so on
   nothing points at it, so it can simply go.
 
 Either action re-bakes automatically.
+
+### 3b. Swap the featured metrics
+
+The featured-metric rows in `references.md`, using
+[the procedure above](#featured-metrics-swap-them-before-you-apply). Do it now: creating the
+redirect darkens the explorer, so after step 4 you can no longer add a row for any of its views.
 
 ### 4. Apply
 
@@ -153,6 +207,12 @@ There is no way to repoint one, so each is re-created from the MDIM view and the
 pointed at the new name. The entity selection, other controls, and any overridden
 title/subtitle/footnote do **not** carry over.
 
+### 2b. Swap the featured metrics
+
+Same procedure, [above](#featured-metrics-swap-them-before-you-apply). Before the handoff: the CLI
+unpublishes the sources in the same transaction that creates the redirects, and an unpublished
+chart can no longer be added as a featured metric.
+
 ### 3. Hand the CSV to a Grapher developer
 
 You get a `;`-delimited CSV plus a handoff note. **They run the migration, not us.** Ask
@@ -184,5 +244,6 @@ migrates their old slugs in one transaction.
 | Applied with | admin **Bulk-create redirects from JSON**, one payload per explorer | `createMultiDimRedirectsFromCsv`, run by a Grapher developer |
 | Redirect fires | every request — the source goes dark at once | only on a 404, so the source must be unpublished |
 | Embeds break | when the redirect is created | when the chart is unpublished |
+| Featured metrics stop matching | when the redirect is created | when the chart is unpublished |
 | Old slugs | n/a | migrated by the CLI; the admin API refuses them |
 | Undo | one row at a time | none |
