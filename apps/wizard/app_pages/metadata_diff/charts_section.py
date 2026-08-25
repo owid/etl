@@ -21,7 +21,6 @@ from apps.wizard.app_pages.metadata_diff.core import (
     CHART_FIELD_PREFIX,
     ChangeGroup,
     affected_drafts,
-    charts_in_reading_order,
     distinct_garden_datasets,
     distinct_indicator_short_names,
     field_label,
@@ -186,7 +185,6 @@ def _render_change(
                 st.markdown(f"{mark.icon} **{field_label(g.field)}** ·")
                 with st.popover(f"📊 {len(charts)} chart{plural}{draft_note}"):
                     render_chart_list(charts, fields={g.field}, drafts=drafts)
-                    _open_chart_buttons(charts, mark.change_key)
         with col_review:
             st_reviewed_toggle(source_engine, SURFACE, mark)
 
@@ -249,35 +247,14 @@ def _where_line(g: ChangeGroup) -> str:
     return f"This {label} belongs to one indicator only — nothing else shares it."
 
 
-def _open_chart_buttons(charts: list[dict[str, Any]], change_key: str) -> None:
-    """Open one chart's own diff below — every field of it this branch changed, against the baseline.
-
-    The same chart can render several distinct changes, so the widget key carries the change too.
-    """
-    if not charts:
-        return
-    st.caption("Open one of them in the full per-chart review:")
-    for c in charts_in_reading_order(charts)[:8]:
-        slug = str(c.get("slug") or "")
-        if not slug:
-            continue
-        st.button(
-            f"🔍 {slug}",
-            key=f"mdd-open-chart-{change_key[:12]}-{slug}",
-            on_click=_select_chart,
-            args=(slug,),
-            help="Opens this chart's own field-by-field diff below.",
-        )
-
-
-def _select_chart(slug: str) -> None:
-    st.session_state["chart"] = slug
-
-
 def _lookup_expander(source_engine: Engine, target_engine: Engine) -> None:
-    """Any chart, changed or not — for checking that a chart you expected to change didn't, or vice versa."""
-    selected = st.session_state.get("chart")
-    with st.expander("🔎 Look up any chart", expanded=bool(selected)):
+    """Any chart, changed or not — for checking that a chart you expected to change didn't, or vice versa.
+
+    Opens itself when a slug is already in the box, which is how it survives the rerun that a lookup
+    causes. It used to be opened remotely by a button on every card, and that button was the problem: it
+    worked, silently, a page and a half below where it was pressed.
+    """
+    with st.expander("🔎 Look up any chart", expanded=bool(st.session_state.get("chart"))):
         st.caption(
             "The lists above only show what this branch changed. Use this to inspect any published chart's "
             "inherited metadata — including confirming that a chart you were worried about is untouched."

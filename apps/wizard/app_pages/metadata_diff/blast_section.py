@@ -12,8 +12,8 @@ the middle one did.
 
 Two readings of the same data:
 
-- **dimension tree** — every affected MDim's views on their own dimension grids, with the charts beside
-  them. Not how many views changed but *which*, and what sits next to them.
+- **dimension tree** — every affected MDim's views on their own dimension grids, with the charts and
+  explorer views beside them. Not how many views changed but *which*, and what sits next to them.
 - **by edit** — edit → text → page. How far does one authored edit actually go?
 
 By-edit reads the cached summary the section badges already use, so it costs no queries. The grid diffs
@@ -64,7 +64,13 @@ def st_show_blast_radius(source_engine: Engine, target_engine: Engine) -> None:
     reach = summary.reach
 
     if not reach:
-        st.success(f"**Nothing to show:** no metadata text on this server differs from `{BASELINE_NAME}`.")
+        # The page has already said there are no changes; repeating it teaches nobody what this view does.
+        st.success(f"**No metadata text changes** on this server against `{BASELINE_NAME}`.")
+        st.caption(
+            "This view traces where an edit lands — every affected MDim view on its dimension grid, with "
+            "the charts and explorer views beside it. With no changed text there is nothing to trace, and "
+            "the three review sections are empty for the same reason."
+        )
         return
 
     edits = group_by_edit(reach)
@@ -163,11 +169,18 @@ def _edit_detail(group: EditGroup) -> None:
     on_page = [c for c in charts.values() if c.get("has_data_page", True)]
     drawer = [c for c in charts.values() if not c.get("has_data_page", True)]
 
+    explorers = _explorer_totals(group)
     live_mdims = [e for e in mdims if not e["is_draft"]]
     draft_mdims = [e for e in mdims if e["is_draft"]]
 
-    if live_mdims or charts:
+    if live_mdims or charts or explorers:
         lines = _mdim_lines(live_mdims)
+        for slug, n_views in explorers:
+            # Explorer views have no data page, so a WYSK edit reaches the view and shows nobody anything.
+            invisible = (
+                " — but not in the view itself, which has no data page" if group.field == "descriptionKey" else ""
+            )
+            lines.append(f"- **{n_views} view{'s' if n_views != 1 else ''}** in the explorer *{slug}*{invisible}")
         if charts:
             where = []
             if on_page:
@@ -185,8 +198,24 @@ def _edit_detail(group: EditGroup) -> None:
         st.markdown("**Not published, so no reader can see it yet**")
         st.markdown("\n".join(lines))
 
-    if not mdims and not charts and not drafts:
+    if not mdims and not charts and not drafts and not explorers:
         st.caption("Nothing renders this text yet — no MDim view, chart or explorer view.")
+
+
+def _explorer_totals(group: EditGroup) -> list[tuple[str, int]]:
+    """One row per explorer this edit reaches, widest first.
+
+    Explorer reach carries a view count and no view identities, so texts landing on the same explorer are
+    reconciled by taking the largest count rather than a union — the same lower bound `_mdim_totals` falls
+    back to, and exact whenever the texts land on the same views. Only published explorers are compared
+    upstream, so there is no unpublished split to make here.
+    """
+    counts: dict[str, int] = {}
+    for change in group.changes:
+        for explorer in change.explorers:
+            slug = str(explorer["slug"])
+            counts[slug] = max(counts.get(slug, 0), int(explorer.get("n_views") or 0))
+    return sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))
 
 
 def _mdim_totals(group: EditGroup) -> list[dict[str, Any]]:
@@ -295,6 +324,7 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
         st.caption("No MDim renders any of these changes, so there is no dimension grid to draw.")
         # Nothing to badge, so every affected chart is one the grid says nothing about.
         _chart_reach(reach, badged=set())
+        _explorer_reach(reach)
         return
 
     df = cached.mdim_changes(source_engine, target_engine)
@@ -338,6 +368,7 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
     if not sections:
         st.warning("The affected MDims have no views to draw.")
         _chart_reach(reach, badged=set())
+        _explorer_reach(reach)
         return
 
     if dropped:
@@ -348,7 +379,7 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
 
     tree_html, height = render_multi_tree_html(
         sections,
-        chart_branch=_chart_branch(reach, badged),
+        branches=[b for b in (_chart_branch(reach, badged), _explorer_branch(reach)) if b],
         self_url=f"{SOURCE.wizard_url.rstrip('/')}/metadata-diff",
     )
     # NOTE: nothing may be rendered below this — the component resizes itself to its content, and
@@ -356,6 +387,49 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
     # scrolling=False: the component resizes its frame to its content, so an iframe scrollbar could only
     # ever nest a second vertical scroll inside the page's.
     components.html(tree_html, height=height, scrolling=False)
+
+
+def _explorer_branch(reach: list[ChangeReach]) -> dict[str, Any] | None:
+    """The explorers these edits reach, as a branch beside the charts — or nothing, when none are.
+
+    One leaf per explorer rather than per view: the reach carries a view count, not view identities, and
+    an explorer's views are not addressable the way an MDim's dimensions are. The count rides on the
+    label so the branch's total and the header's page count can still be reconciled.
+    """
+    explorers: dict[str, tuple[int, ChangeReach]] = {}
+    for r in reach:
+        for e in r.explorers:
+            slug = str(e["slug"])
+            views = int(e.get("n_views") or 0)
+            seen = explorers.get(slug)
+            explorers[slug] = (max(views, seen[0]) if seen else views, seen[1] if seen else r)
+    if not explorers:
+        return None
+
+    leaves = []
+    for slug, (n_views, change) in sorted(explorers.items()):
+        leaves.append(
+            {
+                "label": f"{slug} · {n_views} view{'s' if n_views != 1 else ''}",
+                "href": f"{SOURCE.site}/explorers/{slug}",
+                "badged": False,
+                "preview": (
+                    f'<p class="mdd-impact-line">{html.escape(field_label(change.field))} changed</p>'
+                    f'<div class="mdd-diff">{_preview(change)}</div>'
+                ),
+            }
+        )
+    return {
+        "id": "explorers",
+        "label": "Explorers",
+        "groups": [
+            {
+                "name": "Published explorers",
+                "note": "An explorer view renders no data page, so a WYSK edit is not visible in one.",
+                "leaves": leaves,
+            }
+        ],
+    }
 
 
 def _chart_branch(reach: list[ChangeReach], badged: set) -> dict[str, Any]:
@@ -394,17 +468,32 @@ def _chart_branch(reach: list[ChangeReach], badged: set) -> dict[str, Any]:
     drawer = [leaf(c, r) for c, r in charts.values() if not c.get("has_data_page", True)]
     draft_leaves = [leaf(c, r, published=False) for c, r in drafts.values()]
     return {
+        "id": "charts",
         "label": "Charts",
         "groups": [
-            {"name": "Data pages", "note": "The text is laid out on the chart's data page.", "charts": on_page},
+            {"name": "Data pages", "note": "The text is laid out on the chart's data page.", "leaves": on_page},
             {
                 "name": "Via Learn more about this data",
                 "note": "Multi-indicator charts: their readers reach the text in the sources drawer.",
-                "charts": drawer,
+                "leaves": drawer,
             },
-            {"name": "Unpublished drafts", "note": "No reader can open these.", "charts": draft_leaves},
+            {"name": "Unpublished drafts", "note": "No reader can open these.", "leaves": draft_leaves},
         ],
     }
+
+
+def _explorer_reach(reach: list[ChangeReach]) -> None:
+    """The explorer views these edits reach, for the paths with no grid to hang a branch off.
+
+    Silent when nothing is reached: an "Explorers (0)" heading in a page about what changed is noise.
+    """
+    branch = _explorer_branch(reach)
+    if branch is None:
+        return
+    leaves = branch["groups"][0]["leaves"]
+    st.markdown(f"**{len(leaves)} explorer{'s' if len(leaves) != 1 else ''} affected**")
+    st.caption(branch["groups"][0]["note"])
+    st.markdown("\n".join(f"- [`{leaf['label']}`]({leaf['href']})" for leaf in leaves))
 
 
 def _chart_reach(reach: list[ChangeReach], badged: set) -> None:

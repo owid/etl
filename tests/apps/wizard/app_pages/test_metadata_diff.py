@@ -2248,3 +2248,64 @@ def test_dead_section_css_targets_the_right_buttons():
 
     # Nothing to grey: no style block at all, rather than an empty rule.
     assert _dead_section_css(options, set()) == ""
+
+
+def test_explorer_reach_is_counted_and_named():
+    """An explorer view is a page a reader can open, so an edit landing on one has to say so."""
+    from apps.wizard.app_pages.metadata_diff.blast_section import _explorer_branch, _explorer_totals
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, group_by_edit
+
+    added = "Values are rounded."
+    reach = [
+        ChangeReach(
+            field="descriptionKey",
+            old="Energy data.",
+            new=f"Energy data. {added}",
+            explorers=[{"slug": "energy", "n_views": 12}, {"slug": "co2", "n_views": 3}],
+        ),
+        ChangeReach(
+            field="descriptionKey",
+            old="Emissions data.",
+            new=f"Emissions data. {added}",
+            explorers=[{"slug": "energy", "n_views": 5}],
+        ),
+    ]
+    group = group_by_edit(reach)[0]
+    # Widest first; the explorer both texts land on is reconciled to one row, not 12 + 5.
+    assert _explorer_totals(group) == [("energy", 12), ("co2", 3)]
+
+    branch = _explorer_branch(reach)
+    assert branch is not None
+    assert branch["id"] == "explorers"
+    labels = [leaf["label"] for leaf in branch["groups"][0]["leaves"]]
+    assert labels == ["co2 · 3 views", "energy · 12 views"]
+    assert branch["groups"][0]["leaves"][0]["href"].endswith("/explorers/co2")
+    # The caveat that makes an explorer different from a chart is carried on the group.
+    assert "no data page" in branch["groups"][0]["note"]
+
+    # No explorers reached: no branch at all, rather than an empty heading.
+    assert _explorer_branch([ChangeReach(field="subtitle", old="a", new="b")]) is None
+
+
+def test_tree_draws_a_branch_per_flat_surface():
+    """Charts and explorers are siblings of the MDim grid — each drawn only when it has leaves."""
+    from apps.wizard.app_pages.metadata_diff.tree import render_multi_tree_html
+
+    def branch(bid, label, leaves):
+        return {"id": bid, "label": label, "groups": [{"name": label, "note": "", "leaves": leaves}]}
+
+    leaf = {"label": "a-chart", "href": "http://x/grapher/a-chart", "preview": "", "badged": False}
+    html_out, _ = render_multi_tree_html(
+        [],
+        branches=[
+            branch("charts", "Charts", [leaf]),
+            branch("explorers", "Explorers", [{**leaf, "label": "energy · 3 views"}]),
+            branch("nothing", "Nothing", []),
+        ],
+    )
+    assert 'id="mdd-section-charts"' in html_out
+    assert 'id="mdd-section-explorers"' in html_out
+    assert "energy · 3 views" in html_out
+    # An empty branch is not drawn, and does not appear in the jump index either.
+    assert 'id="mdd-section-nothing"' not in html_out and "Nothing" not in html_out
+    assert html_out.count('data-target="mdd-section-') == 2

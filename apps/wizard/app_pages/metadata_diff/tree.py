@@ -271,25 +271,26 @@ def _offset_view_indices(nodes: list[dict[str, Any]], offset: int) -> list[dict[
     return out
 
 
-def _render_chart_branch(branch: dict[str, Any], preview_offset: int) -> tuple[str, list[str]]:
-    """(html, previews) for the charts branch — a root sibling of the dimension tree.
+def _render_leaf_branch(branch: dict[str, Any], preview_offset: int) -> tuple[str, list[str]]:
+    """(html, previews) for a branch of plain leaves — a root sibling of the dimension tree.
 
-    `branch` is {"label": str, "groups": [{"name": str, "note": str, "charts": [chart, ...]}]} where each
-    chart is {"label", "href", "preview", "badged"}. Leaves reuse `.mdd-leaf` and `data-view`, indexing
+    Used for the surfaces that have no dimension grid of their own: charts, and explorers. `branch` is
+    {"id": str, "label": str, "groups": [{"name": str, "note": str, "leaves": [leaf, ...]}]} where each
+    leaf is {"label", "href", "preview", "badged"}. Leaves reuse `.mdd-leaf` and `data-view`, indexing
     into the shared previews array from `preview_offset`, so the existing hover and filter code applies
-    unchanged. Everything here is marked "changed": a chart in this list is affected by definition.
+    unchanged. Everything here is marked "changed": a leaf in this list is affected by definition.
     """
     previews: list[str] = []
     group_html: list[str] = []
     total = 0
 
     for group in branch.get("groups") or []:
-        charts = group.get("charts") or []
-        if not charts:
+        items = group.get("leaves") or []
+        if not items:
             continue
-        total += len(charts)
+        total += len(items)
         leaves = []
-        for chart in charts:
+        for chart in items:
             index = preview_offset + len(previews)
             previews.append(chart.get("preview") or "")
             # The same marker the grid uses on a view, so a chart the grid already accounts for is
@@ -309,7 +310,7 @@ def _render_chart_branch(branch: dict[str, Any], preview_offset: int) -> tuple[s
             f'<div class="mdd-node mdd-n-changed mdd-collapsed">'
             f'<div class="mdd-box mdd-branch mdd-changed" role="button" title="{html.escape(group.get("note") or "")}">'
             f'<span class="mdd-caret">&#9662;</span>{title}'
-            f'<span class="mdd-count">{len(charts)}</span></div>'
+            f'<span class="mdd-count">{len(items)}</span></div>'
             f'<div class="mdd-children">{"".join(leaves)}</div>'
             f"</div>"
         )
@@ -317,7 +318,7 @@ def _render_chart_branch(branch: dict[str, Any], preview_offset: int) -> tuple[s
     if not group_html:
         return "", []
 
-    # The sibling of the "MDims" hierarchy: same header level, its groups indented the same way.
+    # A sibling of the "MDims" hierarchy: same header level, its groups indented the same way.
     label = html.escape(branch.get("label") or "Charts")
     body = (
         f'<div class="mdd-super-title">{label}<span class="mdd-count">{total} affected</span></div>'
@@ -347,7 +348,7 @@ def render_tree_html(
     leaf_hrefs: list[str] | None = None,
     external_impacts: list[dict[str, int]] | None = None,
     self_url: str = "",
-    chart_branch: dict[str, Any] | None = None,
+    branches: list[dict[str, Any]] | None = None,
 ) -> tuple[str, int]:
     """One MDim's grid. Thin wrapper over `render_multi_tree_html`, which does the work."""
     return render_multi_tree_html(
@@ -360,7 +361,7 @@ def render_tree_html(
                 "external_impacts": external_impacts,
             }
         ],
-        chart_branch=chart_branch,
+        branches=branches,
         self_url=self_url,
     )
 
@@ -419,10 +420,10 @@ def _render_section(
 
 def render_multi_tree_html(
     sections: list[dict[str, Any]],
-    chart_branch: dict[str, Any] | None = None,
+    branches: list[dict[str, Any]] | None = None,
     self_url: str = "",
 ) -> tuple[str, int]:
-    """Render every affected MDim as a root branch of one tree, with the charts as another.
+    """Render every affected MDim as a root branch of one tree, with the flat surfaces as more of them.
 
     One component, not one per MDim: each component sizes its own iframe and would overlap whatever
     follows it, so stacking them is not available. A section is
@@ -493,15 +494,18 @@ def render_multi_tree_html(
         )
         body = f'<div class="mdd-super">{head}<div class="mdd-super-children">{"".join(parts)}</div></div>'
 
-    if chart_branch:
-        chart_html, chart_previews = _render_chart_branch(chart_branch, len(previews))
-        if chart_html:
-            n_charts = sum(len(g.get("charts") or []) for g in chart_branch.get("groups") or [])
-            index_entries.append(
-                ("mdd-section-charts", str(chart_branch.get("label") or "Charts"), f"{n_charts} affected", False)
-            )
-            body += f'<div id="mdd-section-charts" class="mdd-section">{chart_html}</div>'
-        previews = previews + chart_previews
+    # Each flat surface that has anything in it becomes a branch beside the MDims, in the order given.
+    # An empty one is not drawn at all: a "Explorers — 0 affected" heading is a heading about nothing.
+    drawn_branches = 0
+    for branch in branches or []:
+        branch_html, branch_previews = _render_leaf_branch(branch, len(previews))
+        if branch_html:
+            anchor = f"mdd-section-{branch.get('id') or 'charts'}"
+            n_leaves = sum(len(g.get("leaves") or []) for g in branch.get("groups") or [])
+            index_entries.append((anchor, str(branch.get("label") or "Charts"), f"{n_leaves} affected", False))
+            body += f'<div id="{anchor}" class="mdd-section">{branch_html}</div>'
+            drawn_branches += 1
+        previews = previews + branch_previews
 
     # The index only earns its place when there is more than one place to jump to. A panel of rows, one
     # per section, rather than an inline "a · b · c" line that vanished into the toolbar text around it.
@@ -525,8 +529,8 @@ def render_multi_tree_html(
         index_html = f'<div class="mdd-index"><div class="mdd-index-title">Jump to a section</div>{"".join(rows)}</div>'
 
     visible_leaves = total_changed if total_changed else len(all_views)
-    # One row per section header, plus one for the collapsed charts branch.
-    extra_rows = len(section_nodes) + (1 if chart_branch else 0)
+    # One row per section header, plus one per collapsed flat branch.
+    extra_rows = len(section_nodes) + drawn_branches
     initial_height = min(INITIAL_HEIGHT_CAP_PX, 170 + (visible_leaves + extra_rows) * 38)
     return (
         f"""
