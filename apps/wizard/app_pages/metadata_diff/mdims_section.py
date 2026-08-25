@@ -75,7 +75,7 @@ def st_show_mdim_metadata_diffs(source_engine: Engine, target_engine: Engine) ->
             st.success(message)
     else:
         st.markdown(
-            f"**{len(flagged)} of {len(df)} MDims** changed by this branch.",
+            f"**{len(flagged)} MDim{'s' if len(flagged) != 1 else ''}** changed by this branch.",
             help="Either the metadata of an indicator they use changed, or their own export recipe did — "
             "most text edits are authored in the garden step and reach an MDim through indicator metadata, "
             "leaving its config identical.",

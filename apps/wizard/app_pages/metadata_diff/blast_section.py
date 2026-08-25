@@ -400,8 +400,6 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
         # The explorers are a hierarchy of grids now, not a flat branch: their views have dimensions.
         hierarchies=[h for h in ({"id": "mdims", "label": "MDims", "sections": sections}, explorer_hierarchy) if h],
         self_url=f"{SOURCE.wizard_url.rstrip('/')}/metadata-diff",
-        # The same denominator the MDims section reports: every MDim compared, not only those drawn here.
-        mdim_total=len(df),
     )
     # NOTE: nothing may be rendered below this — the component resizes itself to its content, and
     # Streamlit-rendered siblings would overlap during the resize.

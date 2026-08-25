@@ -424,15 +424,13 @@ def _render_section(
     )
 
 
-def _mdim_count_label(drawn: int, total: int | None) -> str:
-    """How many MDims this is, out of how many were compared — the MDims section's own phrasing.
+def _mdim_count_label(drawn: int) -> str:
+    """How many MDims changed — the MDims section's own phrasing, without a denominator.
 
-    Falls back to the bare count when the caller has no total to give: the grid is also rendered for a
-    single MDim from its own page, where "1 of 78" would be answering a question nobody asked.
+    "1 of 78" invited a comparison nobody is making: 78 is every MDim on the site, and a branch touching
+    one of them has not covered a seventy-eighth of anything.
     """
-    if not total:
-        return f"{drawn} MDim{'s' if drawn != 1 else ''}"
-    return f"{drawn} of {total} MDim{'s' if total != 1 else ''} changed by this branch"
+    return f"{drawn} MDim{'s' if drawn != 1 else ''} changed by this branch"
 
 
 def _section_nodes(
@@ -491,7 +489,6 @@ def render_multi_tree_html(
     sections: list[dict[str, Any]],
     branches: list[dict[str, Any]] | None = None,
     self_url: str = "",
-    mdim_total: int | None = None,
     hierarchies: list[dict[str, Any]] | None = None,
 ) -> tuple[str, int]:
     """Render every affected surface as a root branch of one tree.
@@ -541,7 +538,7 @@ def render_multi_tree_html(
         # discrepancy.
         count_label = group.get("count_label")
         if count_label is None and group["id"] == "mdims":
-            count_label = _mdim_count_label(len(nodes), mdim_total)
+            count_label = _mdim_count_label(len(nodes))
         head = (
             f'<div class="mdd-super-title">{html.escape(str(group["label"]))}'
             f'<span class="mdd-count">{html.escape(str(count_label or ""))}</span></div>'
