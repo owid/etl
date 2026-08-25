@@ -295,37 +295,6 @@ class AdminAPI:
             raise AdminAPIError({"error": js["error"], "variable_id": variable_id})
         return js
 
-    def put_chart_etl_config(
-        self,
-        chart_id: int,
-        grapher_config: dict[str, Any],
-        catalog_path: str | None = None,
-        user_id: int | None = None,
-    ) -> dict:
-        """Insert or update the chart's ETL-authored grapher config.
-
-        Writes the ETL config to its own `chart_configs` row, pointed to by
-        `charts.configIdETL`. Admin patches are preserved; the rendered `full`
-        is recomputed as merge(variableETL, etlConfig, patch).
-        When `catalog_path` is given, it's stored on `charts.catalogPath` as the
-        chart's ETL identity (mirrors `multi_dim_data_pages.catalogPath`).
-        """
-        # Mirror put_grapher_config: default the schema if missing.
-        grapher_config.setdefault("$schema", DEFAULT_GRAPHER_SCHEMA)
-
-        # Retry in case we're restarting Admin on staging server
-        resp = requests_with_retry().put(
-            self.owid_env.admin_api + f"/charts/{chart_id}/etlConfig",
-            headers=self._headers(user_id),
-            params={"catalogPath": catalog_path} if catalog_path else None,
-            json=grapher_config,
-            timeout=TIMEOUT,
-        )
-        js = self._json_from_response(resp)
-        if not js["success"]:
-            raise AdminAPIError({"error": js["error"], "chart_id": chart_id, "grapher_config": grapher_config})
-        return js
-
     def upsert_chart_etl_config(
         self,
         chart_config_id: str,
@@ -336,8 +305,8 @@ class AdminAPI:
         """Insert or update a chart's ETL-authored grapher config, addressed by
         the chart's config UUID (`charts.configId`).
 
-        Unlike `put_chart_etl_config`, this has upsert semantics: if no chart
-        with the given config UUID exists, the admin creates a minimal draft
+        This has upsert semantics: if no chart with the given config UUID
+        exists, the admin creates a minimal draft
         chart carrying that UUID as its identity and attaches the ETL config to
         it. The response contains the numeric `chartId` and a `created` flag.
         """

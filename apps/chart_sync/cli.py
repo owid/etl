@@ -301,9 +301,9 @@ def cli(
                             synced_chart_ids.add(chart_id)
                             if not dry_run:
                                 if migrated_etl_config is not None:
-                                    target_api.put_chart_etl_config(
-                                        target_chart_id,
-                                        migrated_etl_config,
+                                    target_api.upsert_chart_etl_config(
+                                        chart_config_id=diff.target_chart.configId,
+                                        grapher_config=migrated_etl_config,
                                         catalog_path=diff.source_chart.catalogPath,
                                         user_id=user_id,
                                     )
