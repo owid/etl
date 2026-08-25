@@ -147,6 +147,71 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > × node) named, because at 0.98 it masks fine and at 0.05 it does not, and which side of that a frame
 > is on depends on what sits behind the annotation.
 >
+> **The knockout's colour is the ground behind *that* annotation, not the frame's fill.** Requiring
+> `frameFill` unconditionally failed a correct chart: an annotation placed inside a tinted region takes
+> a halo the colour of the *tint*, and a canvas-coloured one there paints a white outline around every
+> letter. The row now composites — the ground is almost always a fill at partial opacity, so the halo
+> matches what the reader sees (`#dddddd` at 45% over white is `#f0f0f0`) and matching the raw fill
+> still **FAILS**. Two outcomes are **REVIEW** rather than `ok`, because the ground is matched by
+> *bounding box* and a tint is usually a triangle or a wedge whose ink fills part of it: a halo that
+> matches a ground's composite, and a canvas-coloured halo with some filled shape's box around it.
+> Both name the shape and the sum so the call can be made by eye.
+>
+> Seven consequences that are easy to get wrong in the other direction.
+>
+> **Grounds stack, and so do a single node's fills.** A translucent tint over an opaque plot background
+> renders as the *ordered* composite of both, which equals neither shape's own composite over the
+> frame; and a node carrying several visible paints renders their composite too, so reading only its
+> first paint reports a colour that is not on the canvas. The row folds both — the node's fills into one
+> effective colour and alpha, then the candidates over each other in paint order — and where candidates
+> overlap and nothing matches it **REVIEWS** instead of failing, because any subset of the stack is a
+> possible ground and a bounding box cannot say which.
+>
+> **Where the answer depends on something this script cannot establish, it declines instead of
+> guessing.** Folding a node's fills needs to know which end of `fills` is the top, and nothing we rely
+> on states it — the harness can only encode whatever the script assumes, so it cannot referee. Getting
+> it backwards fails a correct halo, or blesses a colour that is nowhere on the canvas. So the stack is
+> folded **both ways** and asserted only where the two agree: every single-fill ground, and any stack
+> the order does not change. Where they disagree — and where a paint has no single colour at all, a
+> gradient or an image — the ground is declared **NOT measurable** and named, the same treatment a
+> translucent mark and a sequential ramp already get. It was worth doing: before this, a ground that
+> was a solid *plus a gradient* dropped the gradient silently and the row certified the solid base as
+> "the colour ANNOTATIONS-AND-ARROWS.md asks for", on a ground that page puts on tier 1.
+>
+> **Only what is painted *under* the annotation is behind it.** A containing shape appended *after* the
+> annotation sits on top of it — the re-import z-order bug this page describes further down, where a
+> tint appended last washes the text out. Matched by box alone it read as the ground and the row
+> recommended colouring the halo to match it, turning the bug into advice. Paint position is carried
+> alongside the box.
+>
+> **A full-bleed node is dropped only when it composites to the frame's own fill.** Such a backdrop
+> paints the canvas colour and would turn every correct canvas-coloured halo into a review. A full-bleed
+> rect in a *different* colour is the opposite case — it is the ground behind every annotation on the
+> frame, which is exactly how the Instagram templates carry their beige — and dropping it by geometry
+> alone failed a correct halo twice over: once as a needless knockout, then again against a frame fill
+> the reader never sees.
+>
+> **...and only when that colour is actually known.** "Composites to the frame's fill" is a question
+> about a ground whose colour was established; asked of an **unmeasurable** one it is answered by the
+> arbitrary forward fold, and a full-bleed layer carrying a white solid *under a gradient* coincides
+> with a white frame and disappears — taking the "not measurable" signal with it, so the halo is
+> certified `ok` against a frame the reader never sees. A ground whose colour cannot be established is
+> never a no-op; it is the reason to decline.
+>
+> **A group's opacity is applied once, to its children already combined.** Every descendant carries the
+> cumulative opacity of its ancestors, which is right for a single ground and double-counts the moment
+> two of them overlap: two opaque children of a 50% group are one 50% layer, not two. Modelling that
+> needs per-group compositing *and* the paint order the row already declines to assume, so where two
+> candidates share a translucent ancestor the stack is declared **NOT measurable** instead. Decided per
+> annotation, never written back onto the ground — whether a group counts as shared depends on how many
+> of its children contain *this* annotation.
+>
+> **The tier branch knows about the ground too.** "Crosses nothing yet carries a knockout" is a FAIL on
+> *bare canvas* only. An annotation inside a tint keeps its halo while the region under it is still
+> empty — that is the point ANNOTATIONS-AND-ARROWS.md makes — so it is REVIEWED. But a *backdrop* is
+> canvas whatever colour it paints, so it never excuses a halo over empty space; only a bounded shape
+> does, and the FAIL stands where no bounded filled shape contains the annotation.
+>
 > **Non-rendering means exactly zero, never a floor.** A node or paint at 0.005 does reach the canvas,
 > and a cutoff dropped its whole subtree from *every* row — an 8px label at 0.005 left `text-floor`
 > reporting that all of its ranges cleared the floor. Anything positive is **translucent**: held out of
@@ -380,6 +445,23 @@ const paints = n => { let m = n; while (m && m !== clone) { if (!m.visible) retu
 **Make label-centering part of the build, not a follow-up.** It regressed three times in one run — each rebuild re-hugs the text, which restores the drift, and a separate "now center the labels" step is forgotten or applied to a chart instance that is later replaced. Put the centering loop at the end of the same function that imports, scales and re-hugs, so it cannot be skipped.
 
 **Re-run this whole pass after the last change, not after each one.** Fixes get lost silently: a label-centering pass applied to a chart instance that is later swapped for a re-export leaves the drift back exactly as it was, and every screenshot in between looks correct. And a structural change spends budget elsewhere — lifting an aggregate row to the top added 8px of height, which came straight out of the 12–16px gap and took it to 8.2 without anything reporting a problem. Treat "I already checked that" as false after any re-export, reorder, rescale or restyle.
+
+**Someone else editing your frame is a change like any other — re-run the pass, and diff the texts.**
+The Charts file is shared, so an author or a designer can rewrite your title, restyle your
+annotations and move nodes while you are still working, and none of it announces itself. Two
+different losses come out of that, and only one is mechanical:
+
+- **The gate catches a hand-edit only where a check already exists.** A rewrite that stripped both
+  annotations' halo strokes went unnoticed until a row for them was written. So when you find that a
+  hand-edit undid something, add the check *before* you re-apply the fix — otherwise the next
+  hand-edit undoes it again just as quietly.
+- **The gate cannot catch what it does not know was deliberate.** A subtitle rewrite that was a
+  genuine improvement on the wording also removed a reading aid the author had asked for, and nothing
+  on the frame distinguishes a sentence that was dropped from one that was never there. Keep the
+  approved strings and diff them: the frame does not remember what it used to say.
+
+Keep the improvements — the point is not to revert a colleague's edits, but to notice which of them
+were trades nobody actually chose, and put those back to the author.
 
 ### Checking the words, not just the geometry
 

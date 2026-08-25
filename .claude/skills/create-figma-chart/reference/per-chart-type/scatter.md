@@ -155,3 +155,19 @@ sat 7px past a plot ending at 516.6, and read as half-on, half-off the shading.
 
 Re-run this after *any* rescale: the tint is a chart child and the annotation usually is not, so the
 region slides out from under it.
+
+**The annotation is owed containment; the direct labels are not.** Having established that the
+annotation must sit inside the tint, the tempting next move is to hold the entities' own labels to
+the same rule — and it is a constraint the geometry cannot meet. The region narrows toward the
+divider, and the entities inside it are the ones nearest the plot's right edge, so "inside the tint"
+and "inside the frame" are a few pixels apart; forcing containment pushed one label 29px past the
+content box, where the margins check caught it and no amount of re-placing would have fixed it.
+
+A label near a tint has two constraints and no third:
+
+- **Don't cross the divider.** A label straddling the line contradicts the one rule the tint exists
+  to teach, and it is the only placement that genuinely misreads.
+- **Match the halo to the ground it lands on** ([ANNOTATIONS-AND-ARROWS.md](../ANNOTATIONS-AND-ARROWS.md)).
+  This is the real defect the containment rule was reaching for: a canvas-colored halo on a label
+  that is half on the tint reads as a torn white patch. Fix the halo and the placement stops
+  mattering.

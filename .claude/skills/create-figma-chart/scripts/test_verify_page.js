@@ -217,7 +217,34 @@ function buildFrame(opts = {}) {
   // `ungrouped` models the documented rework case: the chart GROUP is gone and its subgroups sit as
   // direct frame children, so CONFIG.chartName resolves nothing and the fallback has to find the plot.
   const children = opts.ungrouped ? [header, footer, logo, ...kids] : [header, footer, logo, chart];
+  // An OPAQUE layer UNDER the tint — a plot background — pushed first so it sits at the bottom of the
+  // stack. With both present the ground behind the annotation is the ORDERED composite of the two, which
+  // equals neither shape's own composite over the frame.
+  if (opts.tintBase) children.push(node({ type: "RECTANGLE", name: "plot-background", x: 80, y: 180,
+    width: 220, height: 80, fills: solid(opts.tintBase) }));
+  // A shaded region behind the annotation — the shape whose COMPOSITE the knockout has to match.
+  // `tintOpacity` sits on the node, which is where this skill's own wedge carries it; the halo must
+  // match `tint over frameFill`, never the raw `tint`.
+  // `tintFills` gives the wedge SEVERAL visible paints, which Figma renders as their ordered composite.
+  if (opts.tint || opts.tintFills) children.push(node({ type: "RECTANGLE", name: "wedge__below", x: 90, y: 190,
+    width: 200, height: 60, fills: opts.tintFills || solid(opts.tint),
+    opacity: opts.tintOpacity === undefined ? 0.45 : opts.tintOpacity }));
+  // Two OVERLAPPING opaque grounds inside one translucent GROUP, pushed BEFORE the annotation so they
+  // are painted under it. Figma composites the pair, then applies the group's opacity once;
+  // `nodeOpacity` folds it into each child instead, so compositing them independently applies it twice.
+  if (opts.dimGroup) children.push(node({ name: "shading", opacity: opts.dimGroup, x: 85, y: 185,
+    width: 220, height: 70, children: [
+      node({ type: "RECTANGLE", name: "wedge__lower", x: 85, y: 185, width: 220, height: 70, fills: solid("#dddddd") }),
+      node({ type: "RECTANGLE", name: "wedge__upper", x: 88, y: 188, width: 210, height: 62, fills: solid("#bbbbbb") })] }));
   if (opts.annotation) children.push(opts.annotation);
+  // Pushed AFTER the annotation, so it is painted ON TOP of it — the re-import z-order bug, not a
+  // ground. A bbox-only filter cannot tell the two apart.
+  if (opts.tintAbove) children.push(node({ type: "RECTANGLE", name: "wedge__above", x: 90, y: 190,
+    width: 200, height: 60, fills: solid(opts.tintAbove), opacity: 0.45 }));
+  // A full-bleed rectangle used as the visible background — how the Instagram templates carry their
+  // beige. Unshifted so it sits at the BOTTOM of the stack, under everything else on the frame.
+  if (opts.backdrop || opts.backdropFills) children.unshift(node({ type: "RECTANGLE", name: "backdrop", x: 0, y: 0,
+    width: W, height: opts.frameH || 540, fills: opts.backdropFills || solid(opts.backdrop) }));
 
   return node({ id: "F:1", name: "test frame", x: 0, y: 0, width: W, height: opts.frameH || 540,
                 fills: solid(opts.frameFill || "#ffffff"), children });
@@ -408,7 +435,216 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
   // 6 — knockout colour must be the frame's own fill, never hardcoded white.
   {
     const out = await run(buildFrame({ frameFill: "#fffbf5", annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {});
-    check("6 white knockout on cream FAILS", /not the frame's own #fffbf5/.test(row(out, "annotation-knockout").detail), row(out, "annotation-knockout").detail);
+    check("6 white knockout on cream FAILS",
+          row(out, "annotation-knockout").status === "FAIL"
+          && /the frame's own #fffbf5/.test(row(out, "annotation-knockout").detail),
+          row(out, "annotation-knockout").detail);
+  }
+
+  // 6d — the knockout's ground is what is behind THIS annotation, not the frame. Demanding the frame's
+  //      fill unconditionally FAILED a correct chart: an annotation inside a tinted region takes a halo
+  //      the colour of the tint, and a canvas-coloured one there is a white outline around every letter.
+  {
+    // #dddddd at 45% over white composites to #f0f0f0 — what the reader sees, and what the halo must be.
+    const onTint = (stroke) => buildFrame({ tint: "#dddddd", tintOpacity: 0.45,
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke, strokeWeight: 3 }) });
+
+    const good = await run(onTint("#f0f0f0"), {});
+    const g = row(good, "annotation-knockout");
+    check("6d a halo matching the tint's COMPOSITE does not FAIL", g.status !== "FAIL", g.detail);
+    check("6d and it is REVIEWED, since the ground was matched by bounding box",
+          g.status === "REVIEW" && /BOUNDING BOX/.test(g.detail), g.detail);
+    check("6d and the detail shows the sum it accepted",
+          /wedge__below/.test(g.detail) && /#dddddd/.test(g.detail) && /0\.45/.test(g.detail), g.detail);
+
+    // The trap the compositing exists for: matching the tint's RAW fill is still wrong, because that
+    // is not the colour on the canvas. A check that skipped the alpha would wave this through.
+    const raw = row(await run(onTint("#dddddd"), {}), "annotation-knockout");
+    check("6d a halo matching the tint's RAW fill still FAILS", raw.status === "FAIL", raw.detail);
+    check("6d and it names the composite it wanted instead", /#f0f0f0/.test(raw.detail), raw.detail);
+
+    // A canvas-coloured halo over shading is the original defect, and the bbox cannot prove the
+    // annotation is over the tint's ink rather than beside it — so it is raised, not failed.
+    const white = row(await run(onTint("#ffffff"), {}), "annotation-knockout");
+    check("6d a canvas halo over a tint is REVIEWED, not passed silently", white.status === "REVIEW", white.detail);
+    check("6d and it names the white-outline symptom", /white outline/.test(white.detail), white.detail);
+
+    // ...and with no tint on the frame, the same canvas halo stays clean: the review must be caused by
+    // the shading, not fire on every annotation.
+    const bare = row(await run(buildFrame({ annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {}), "annotation-knockout");
+    check("6d and a canvas halo on bare canvas is still ok", bare.status === "ok", bare.detail);
+  }
+
+  // 6e — the TIER branch has to know about the ground too. An annotation inside a tint that happens to
+  //      cross no gridline hit `!crosses.length && hasStroke` and FAILED as "over empty space" before
+  //      the colour test ever ran — which is the opposite of what ANNOTATIONS-AND-ARROWS.md now says:
+  //      the halo stays on a tint precisely because a region that is clear today fills at the next
+  //      refresh. Test 5 above is the control that keeps the FAIL alive on genuinely bare canvas.
+  {
+    // y=205..223 clears the gridlines at 200/300/360/460 and both series segments, so nothing is crossed.
+    const clear = (extra) => buildFrame(Object.assign({ tint: "#dddddd", tintOpacity: 0.45,
+      annotation: annotation({ x: 100, y: 205, w: 120, h: 18, stroke: "#f0f0f0", strokeWeight: 3 }) }, extra || {}));
+    const t = row(await run(clear(), {}), "annotation-knockout");
+    check("6e a halo on an EMPTY tint is not failed as 'over empty space'", t.status !== "FAIL", t.detail);
+    check("6e and it is REVIEWED, naming the tint that earns the halo",
+          t.status === "REVIEW" && /keeps its halo even where the tint is empty/.test(t.detail), t.detail);
+  }
+
+  // 6f — grounds STACK. A translucent tint over an opaque plot background renders as the ordered
+  //      composite of both; compositing each candidate over the FRAME instead matches neither, and a
+  //      correct halo came back FAIL.
+  {
+    // #dddddd at 45% over #eeeeee is #e6e6e6. Over the frame's white it would be #f0f0f0, and the base
+    // alone is #eeeeee — so a per-candidate test rejects the one colour the reader actually sees.
+    const stack = (stroke) => buildFrame({ tint: "#dddddd", tintOpacity: 0.45, tintBase: "#eeeeee",
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke, strokeWeight: 3 }) });
+
+    const ok = row(await run(stack("#e6e6e6"), {}), "annotation-knockout");
+    check("6f a halo matching the STACKED ground does not FAIL", ok.status !== "FAIL", ok.detail);
+    check("6f and it names the paint order it folded",
+          ok.status === "REVIEW" && /composited in paint order/.test(ok.detail)
+          && /plot-background/.test(ok.detail) && /wedge__below/.test(ok.detail), ok.detail);
+
+    // Matching nothing is still not a FAIL once the grounds overlap: any SUBSET of the stack is a
+    // possible ground and bounding boxes cannot say which, so the call goes to a human.
+    const miss = row(await run(stack("#123456"), {}), "annotation-knockout");
+    check("6f overlapping grounds downgrade an unmatched halo to REVIEW", miss.status === "REVIEW", miss.detail);
+    check("6f and it says why it cannot decide", /cannot be settled from BOUNDING BOXES/.test(miss.detail), miss.detail);
+
+    // ...and with a SINGLE ground there is nothing to be ambiguous about, so the FAIL stands.
+    const one = row(await run(buildFrame({ tint: "#dddddd", tintOpacity: 0.45,
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#123456", strokeWeight: 3 }) }), {}), "annotation-knockout");
+    check("6f but a single ground still FAILS an unmatched halo", one.status === "FAIL", one.detail);
+  }
+
+  // 6g — a tint painted ON TOP of the annotation is not a ground, it is the re-import z-order bug
+  //      ANNOTATIONS-AND-ARROWS.md describes. Matching by bounding box alone read it as the ground
+  //      behind the text and recommended colouring the halo to match it.
+  {
+    const out = await run(buildFrame({ tintAbove: "#dddddd",
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    const z = row(out, "annotation-knockout");
+    check("6g a tint ABOVE the annotation is not treated as its ground", z.status === "ok", z.detail);
+    check("6g and the overlaid tint is not named as a halo colour", !/wedge__above/.test(z.detail), z.detail);
+  }
+
+  // 6h — a full-bleed rectangle used as the visible background IS the ground behind every annotation.
+  //      Excluding every full-bleed node by geometry failed a correct halo twice: as a needless
+  //      knockout, and then against a frame fill the reader never sees.
+  {
+    const beige = (stroke, extra) => buildFrame(Object.assign({ backdrop: "#fbf9f3",
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke, strokeWeight: 3 }) }, extra || {}));
+
+    const good = row(await run(beige("#fbf9f3"), {}), "annotation-knockout");
+    check("6h a halo matching a differently-coloured backdrop does not FAIL", good.status !== "FAIL", good.detail);
+    check("6h and the backdrop is named as the ground", /backdrop/.test(good.detail), good.detail);
+
+    // The white halo on that beige is the Instagram defect the page opens with; it must be raised.
+    const white = row(await run(beige("#ffffff"), {}), "annotation-knockout");
+    check("6h a white halo on a beige backdrop is raised", white.status === "REVIEW", white.detail);
+
+    // ...but a backdrop that paints the frame's OWN colour composites to itself, and must NOT turn a
+    // correct canvas-coloured halo into a review. That exclusion is the whole point of the rule.
+    const same = row(await run(beige("#ffffff", { backdrop: "#ffffff" }), {}), "annotation-knockout");
+    check("6h a backdrop that composites to the frame fill still stays silent", same.status === "ok", same.detail);
+
+    // And a backdrop is CANVAS, not shading — it never excuses a halo over empty space.
+    const needless = row(await run(buildFrame({ backdrop: "#fbf9f3",
+      annotation: annotation({ x: 60, y: 140, w: 90, h: 18, stroke: "#fbf9f3", strokeWeight: 3 }) }), {}), "annotation-knockout");
+    check("6h but a backdrop does not excuse a knockout over empty space", needless.status === "FAIL", needless.detail);
+    check("6h and that is still reported as crossing nothing", /crosses nothing/.test(needless.detail), needless.detail);
+  }
+
+  // 6i — a ground node with SEVERAL visible fills renders their ordered composite, and reading only
+  //      the first paint reports a colour that is not on the canvas. But folding them needs to know
+  //      which end of `fills` is the top, and nothing available to this script establishes that — so
+  //      where the order changes the answer the ground is declared UNMEASURABLE rather than guessed.
+  //      Guessing it backwards would fail a correct halo, or bless one that is nowhere on the canvas.
+  {
+    // #ff0000 and #ffffff at 50%: one order renders #ff8080, the other plain #ff0000. Both are
+    // reachable readings of the same node, so neither may be asserted.
+    const ambiguous = (stroke) => buildFrame({ tintOpacity: 1,
+      tintFills: [solid("#ff0000")[0], Object.assign({}, solid("#ffffff")[0], { opacity: 0.5 })],
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke, strokeWeight: 3 }) });
+
+    for (const stroke of ["#ff8080", "#ff0000"]) {
+      const amb = row(await run(ambiguous(stroke), {}), "annotation-knockout");
+      check(`6i an order-dependent ground does not FAIL a ${stroke} halo`, amb.status !== "FAIL", amb.detail);
+      check(`6i and it says the ORDER is what it cannot settle (${stroke})`,
+            /ORDER decides the colour/.test(amb.detail), amb.detail);
+      check(`6i and it never certifies either reading (${stroke})`,
+            !/asks for when the annotation sits on a tint/.test(amb.detail), amb.detail);
+    }
+
+    // Where the order does NOT change the answer there is nothing to decline, and the ground is
+    // measured as usual — which is every single-fill ground on every real frame.
+    const stable = row(await run(buildFrame({ tintOpacity: 1,
+      tintFills: [solid("#dddddd")[0], Object.assign({}, solid("#dddddd")[0], { opacity: 0.5 })],
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#dddddd", strokeWeight: 3 }) }), {}),
+      "annotation-knockout");
+    check("6i an order-INDEPENDENT stack is still measured", stable.status === "REVIEW", stable.detail);
+    check("6i and is not declared unmeasurable", !/NOT measurable/.test(stable.detail), stable.detail);
+  }
+
+  // 6j — a ground combining a solid with a gradient or image has no single colour. The solid passed
+  //      the SOLID-only paint filter and every other paint was silently dropped, so the row could
+  //      describe a halo matching the solid base as the colour the doc asks for — on a ground the
+  //      doc actually assigns to tier 1.
+  {
+    const gradient = { type: "GRADIENT_LINEAR", visible: true };
+    const mixed = row(await run(buildFrame({ tintOpacity: 1,
+      tintFills: [solid("#ff0000")[0], gradient],
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ff0000", strokeWeight: 3 }) }), {}),
+      "annotation-knockout");
+    check("6j a gradient over a solid is not FAILED", mixed.status !== "FAIL", mixed.detail);
+    check("6j and the gradient is named as why it cannot be measured",
+          /GRADIENT_LINEAR/.test(mixed.detail) && /no single colour/.test(mixed.detail), mixed.detail);
+    check("6j and the solid base is not blessed as the requested ground",
+          !/asks for when the annotation sits on a tint/.test(mixed.detail), mixed.detail);
+    check("6j and it points at tier 1", /tier 1/.test(mixed.detail), mixed.detail);
+  }
+
+  // 6k — an UNMEASURABLE full-bleed ground must never be dropped by the "composites to the frame" test.
+  //       `groundOver` on one returns the arbitrary forward fold, so a white solid under a gradient
+  //       coincides with a white frame and vanished — taking the "not measurable" signal with it and
+  //       letting the halo be certified against a frame nobody sees.
+  {
+    const gradient = { type: "GRADIENT_LINEAR", visible: true };
+    const out = row(await run(buildFrame({ frameFill: "#ffffff",
+      backdropFills: [solid("#ffffff")[0], gradient],
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {}),
+      "annotation-knockout");
+    check("6k an unmeasurable full-bleed ground is not silently dropped", out.status === "REVIEW", out.detail);
+    check("6k and it is named as unmeasurable", /NOT measurable/.test(out.detail) && /GRADIENT_LINEAR/.test(out.detail), out.detail);
+
+    // ...while a MEASURABLE full-bleed ground that really does paint the frame's colour is still
+    // dropped, or every correct canvas-coloured halo becomes a review.
+    const noop = row(await run(buildFrame({ frameFill: "#ffffff", backdrop: "#ffffff",
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {}),
+      "annotation-knockout");
+    check("6k a measurable no-op backdrop is still dropped", noop.status === "ok", noop.detail);
+  }
+
+  // 6l — two overlapping grounds under ONE translucent group. Their shared group opacity is already
+  //      baked into each of them, so folding them composites it twice; Figma applies it once to the
+  //      pair combined. The script declines rather than modelling it.
+  {
+    const out = row(await run(buildFrame({ dimGroup: 0.5,
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#e2e2e2", strokeWeight: 3 }) }), {}),
+      "annotation-knockout");
+    check("6l overlapping grounds in a dim group are not FAILED", out.status !== "FAIL", out.detail);
+    check("6l and the shared group is named as the reason",
+          /translucent group/.test(out.detail), out.detail);
+    check("6l and no composite is blessed as the requested colour",
+          !/asks for when the annotation sits on a tint/.test(out.detail), out.detail);
+
+    // A SINGLE ground under a translucent group is not affected — the opacity is applied once either
+    // way, so it must still be measured. Otherwise this fix would silence every tinted annotation.
+    const lone = row(await run(buildFrame({ tint: "#dddddd", tintOpacity: 0.45,
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#f0f0f0", strokeWeight: 3 }) }), {}),
+      "annotation-knockout");
+    check("6l a lone ground under one opacity is still measured",
+          lone.status === "REVIEW" && !/translucent group/.test(lone.detail), lone.detail);
   }
 
   // 7 — crossing a MUTED context line is legal under the highlight treatment (review finding 4).
