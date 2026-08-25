@@ -16,6 +16,36 @@ stop before the first Figma call and recommend re-running on **Opus** (or **Sonn
 mechanical re-export or a single text fix); continue only on the user's say-so — this skill is long
 chains of design judgment, and a build on the wrong model wastes the shared file's review cycle.
 
+**If the Figma tools arrive deferred, load them in one `ToolSearch` before the first Figma call.**
+Discovering them one at a time costs a model turn each — ~7 over a run. Whether they arrive deferred
+is a harness setting, not an environment — a local session gets them that way too — so **read your
+own session's tool list** rather than inferring it, and take the prefix from there:
+both `mcp__Figma__` and `mcp__claude_ai_Figma__` are in use, and naming the wrong one
+matches nothing.
+
+```
+select:<prefix>use_figma,<prefix>get_screenshot,<prefix>get_metadata,<prefix>upload_assets,<prefix>search_design_system
+```
+
+Add `get_design_context` or `download_assets` when the route needs them. **Skip this entirely where
+the tools are already loaded** — an unnecessary `ToolSearch` is itself a wasted turn.
+
+**In a cloud session the *authenticated* `admin.owid.io` routes are unreachable** — Cloudflare Access
+`302`s them to a login page. That is an app-layer redirect, not the egress gateway, so
+`recentRelayFailures` stays empty while the call quietly redirects; don't go hunting for
+credentials. Measured from a sandbox: `/api/narrative-chart-map` **works** (it is unauthenticated),
+while `/api/figma/image` and `POST /api/images` are **blocked** — so **Step 9's** 3× PNG export and
+upload move to the user's machine. That export is optional for a full-size chart, but for a **302-wide
+small or pull chart the PNG _is_ the deliverable** — a cloud session can build the frame and not ship
+it, so say which at delivery. [cloud-sandbox.md](../../docs/cloud-sandbox.md) has the read-only
+fallbacks for chart config.
+
+**A cloud session is not the slow one.** `get_screenshot` measured about **twice as fast** there
+(7.8–9.9 s against 12.5–20.5 s locally), `use_figma` **six times** (0.70 s against 4.4 s), and the
+model turn is no worse — 2.8 s cloud against 3.7 s local on identical probes. What makes any run slow
+is **turns × (turn + call)**, so the **Round-trip budget** below is where a run is won or lost, and
+batching is what wins it.
+
 **The single checkpoint rule:** the Charts file is a shared design file other people work in. Nothing is written to it before the user has seen the full proposal (page name, template choice, texts, planned label/annotation edits) and explicitly approved. Reading the file to check conventions needs no permission.
 
 Read [GUIDELINES.md](GUIDELINES.md) (sibling file) before editing any chart — it distills the DI Charts Guidelines per chart type and the Good Data Viz Checklist.
@@ -64,9 +94,11 @@ step lives in [`reference/`](reference/) and is read *at* that step, not up fron
 its per-chart-type conventions are now one file each under
 [reference/per-chart-type/](reference/per-chart-type/). **Read only the one for the chart in hand.**
 
-**This file has a size budget: keep the spine under 60 KB and GUIDELINES.md under 80 KB.** They are
-read on every run, so a paragraph added here costs every future chart. New detail belongs in the
-reference file for its step. After editing any doc in this skill:
+**Size budget, enforced by `--structure`: spine under 62 KB, GUIDELINES.md under 80 KB, the pair
+under 140 KB.** Both are read on every run, so a paragraph added here costs every future
+chart — and moving one from this file into GUIDELINES.md saves a run nothing, which is why the pair
+is capped and not just each file. New detail belongs in the
+reference file for its step, which is read only at that step. After editing any doc in this skill:
 
 ```bash
 .venv/bin/python .claude/skills/create-figma-chart/scripts/verify_docs.py --structure
@@ -81,27 +113,60 @@ Three sibling skills do the text work this one depends on, and Step 8c calls the
 
 ## Round-trip budget
 
-Every Figma MCP call is a network hop to Figma's hosted connector: **7–10 s for `use_figma`, ~10 s for `get_screenshot`**, flat regardless of how big the script is. A run makes 120–190 of them. So the round trips are where the wall-clock goes — not the SVG exports (0.24 s each, under 2 s for a whole run) and not the response payloads (~1.5 KB per `use_figma`). Measured across five sessions by sweeping each one's call intervals for peak simultaneous in-flight calls: **two sessions never batched at all** (peak 1, nothing overlapping) and two more barely did (peak 2 and 5, 1–9% of calls overlapping), which is **16–28 minutes of pure serial round trips per chart**. One batched heavily — and paid for it; see the ceiling below.
+**A call costs twice: the call, and the turn around it.** The *call* is a network hop to Figma's
+hosted connector, and **the cloud is the fast side** — `get_screenshot` **8–9 s** there (60 calls,
+median 8.8 s, range 7.7–10.6 s) against **12.5–20.5 s** locally; `use_figma` **0.70 s** there against
+**3.5–5.8 s** locally (31 calls, three sessions). A `use_figma` is much the cheaper of the two, not
+equal to a screenshot. Either is flat regardless of script size *or* render size — a 545-char script
+that loaded a page and walked 286 nodes came back **faster** than a 45-char one, and a natural-size
+screenshot costs 1.10× a 256 px one. **So collapse work into fewer calls freely, and never shrink a
+screenshot for speed.** **The *turn* tracks the work in it, not the environment** — identical light probes
+measured **2.8 s in the cloud and 3.7 s locally**, so there is no cloud turn penalty. The **~12 s**
+this file once billed to the cloud came from 23 turns doing real chart work: read it as the
+*heavy-turn* figure, which is what a real run pays in either environment. Budget a run as
+**turns × (turn + call)**, the call off the environment and the turn off the work. An unbatched
+heavy-turn screenshot costs ~20 s, so 120–190 calls come to **~50 minutes** serial. Nothing
+else is close: not the SVG exports (0.05–0.3 s locally, 0.9–2.6 s through a sandbox's egress proxy, under 2 s for a whole run locally)
+and not the response payloads (~1.5 KB per `use_figma`).
 
-**Fan out independent calls — one message, 4–6 at a time.** The connector serves them concurrently: eight screenshots issued together came back **4.1× faster** than serially (79.7 s of work in 19.4 s of wall clock). It admits about four or five at once, and per-call latency inflates past that — 8.2 s for the first of eight, 13.2 s for the last — so **4–6 per message is the sweet spot and more just queues.** This is the `figma-use` skill's own instruction too: issue the N calls in one message, and don't await one before issuing the next.
+**What a build should cost, to calibrate against mid-run:** ~14 Figma calls per template — measured
+at 18 end to end, 4 of them on bugs since fixed — against ~21 per template a run earlier, and 124–188
+for a whole chart before any of this. [FITTING.md](reference/FITTING.md) credits the saving.
 
-Reads fan out freely. **Writes only when they target different pages** — a script may switch pages only once, so two `use_figma` writes aimed at the same page in one message race each other.
+**So the unit to minimize is messages, not calls.** A batch collapses both costs at once — the
+connector serves the calls concurrently *and* they share one turn. Yet across five measured sessions
+**two batched nothing at all** and two barely did (1–9% of calls overlapping); one batched heavily
+and paid for it (see the ceiling below).
 
-What is independent, and today is not batched:
+**Fan out independent calls — one message, 4–6 at a time.** The payoff is **≈4.0× and environment-neutral** — ten reps of a fixed six-call probe a side, 4.00× cloud against 3.84× local, six in flight every time; only what each call costs differs. An eighth call still helps (an earlier eight-screenshot run measured 4.1×, 79.7 s of work in 19.4 s), but the connector admits about four or five at once and latency inflates past that, so **4–6 per message is the sweet spot and more just queues**. This is the `figma-use` skill's own instruction too: issue the N calls in one message, and don't await one before issuing the next.
 
-- **The palette harvest.** `search_design_system` caps at ~14 results against a 24-fill palette, so it takes one group query plus ~11 by-name queries. Every one of them is independent.
-- **Screenshots of different frames or pages.** Issue them together, then `curl` all the returned URLs in one bash call, then Read each. A screenshot is otherwise three tool calls, and a run takes 14–70 of them.
-- **Every format in a multi-format run**, and every frame of a `chart-rows` set — separate pages and frames, so the writes fan out as well as the reads.
-- **Any survey of N nodes** — but at 4–6, not more. The pass that wrote GUIDELINES.md screenshotted 272 chart-library nodes at **peak 14 in flight**, and its calls averaged **35.5 s** against ~10 s everywhere else. That is the ceiling being exceeded, not the connector being slow: 8.2 s at one in flight, 13.2 s at eight queued, 35.5 s at fourteen.
+**A batch's wall clock is `first call + rate × (n−1)`**, and both terms are environment-specific:
+**9.2 s + 0.75 s** per extra call in a cloud session, **11.7 s + 2.1 s** locally (ten reps a side;
+predicts 12.9 s and 22.2 s against measured 13.2 s and 22.3 s). That is the stopping rule, and it
+says the environments batch differently, not just slower: in the cloud the completions finish in
+a *narrower* spread than they were dispatched in — near-true parallelism — while locally they
+pipeline, each call ending ~2.1 s after the last. **All of this is `get_screenshot`; batching
+`use_figma` buys only the shared turn** — plugin runs serialize per file, 0.8–1.1× on the
+calls (GOTCHAS). `sum/wall` is also not the honest gain: locally it flatters batching, since a
+queued call's duration includes its wait (2.8–3.2× against a serial baseline, not 3.84×); in the cloud
+it understates it (4.19× against 4.00×).
+
+Reads fan out freely — **including reads that each switch pages**, which makes the Step 5 and Step 8c rows below safe: two concurrent calls, one holding `Cover` and one the Templates page, overlapping for 7.7 s, each saw only its own — `figma.currentPage` is per-call. It is concurrent *mutation* of one page that races, not the switch. **Writes only when they target different pages** — a script may switch pages only once, so two `use_figma` writes aimed at the same page in one message race each other.
+
+What is independent — **the batch manifest, keyed by the step that owes it.** Issue each row's calls
+in one message, so batching is mechanical rather than a fresh judgment call every run.
+
+- **Step 5 — the page survey.** The page enumeration and `verify_templates.js` go together. Checking N pages means N calls — `page.children` on a page you have not switched to is lazily loaded — and they fan out.
+- **Step 8c — the checks.** `verify_page.js` and `diff_against_template.js` are one read-only call each; issue them together, with every pixel probe that reads one fixed state.
+- **Step 9 — the delivery renders.** One screenshot per delivered frame, all in one message.
+- **The palette harvest.** `search_design_system` caps at ~14 results against a 24-fill palette, so it takes one group query plus ~11 by-name queries. All independent; 4–6 per message.
+- **A size-only survey is one batch, not two.** `get_screenshot` returns `original_width`/`original_height` — the node's natural size — beside the rendered dimensions, so it already answers how big a frame is. Add `get_metadata` only when you also need names or structure; eight A/B runs each paid for both batches before noticing.
+- **Screenshots of different frames or pages.** Issue them together, then download all the URLs in one parallel bash call (pattern and its two silent traps: Gotchas). Keep these on the hosted `get_screenshot`: most frames a build screenshots are ones it just wrote, and the desktop reader cannot see those (Gotchas).
+- **Every format in a multi-format run**, and every frame of a `chart-rows` set — their *reads* fan out. Their **writes do not**: one chart is one page, and Step 4 lines the formats up on that page, so those frames are separate frames on a *shared* page — which by the rule above makes two `use_figma` writes in one message race. Batch the screenshots and property reads; build the frames one call at a time.
+- **Any survey of N nodes** — but at 4–6, not more; past that the connector queues and every call slows (Gotchas).
 - **`upload_assets` takes a `count`.** One call returns N single-use `submitUrl`s and the POSTs parallelize, so a two-format run uploads both originals in one call rather than two — and both embeds in one more.
 - **The Step 8c property sweeps** — font sizes, stroke weights, dash patterns, fills, polylines. Those are reads of a single page, so they collapse into *one* `use_figma` returning one JSON. `scripts/verify_templates.js` already does exactly this for ten templates.
 - **The arrow probe's baseline render.** Only the FULL render is shared across arrows: the other three states of the four-render protocol (no-arrow, no-target, both-hidden) each hide *that pair's* nodes, so they are pair-specific and cannot be reused. N arrows cost `3N + 1` screenshots, not `4N` — and not `N + 2`, which under-collects and produces masks containing another pair's target.
-
-**Measured on one template, end to end: 18 Figma calls.** Of those, 3 went on the footer-conversion
-bug now fixed in TEXTS.md and 1 on a wrong guess about the footer's layout, so the same build now
-costs ~14 — against ~21 per template on the previous run and 124–188 for a whole chart before any of
-this. The two-pass export is where the saving is concentrated: it replaces "export, eyeball, re-export"
-with one probe and one solved re-export.
 
 **What is serial for a reason — don't collapse these:**
 
@@ -110,10 +175,11 @@ with one probe and one solved re-export.
 | trim → position → read height | `leadingTrim` does not update `height` within the call that sets it (Step 7) |
 | original → clone → fill texts → measure band → export embed → fit | the band is not knowable until the real title and subtitle have reflowed the header (Step 3) |
 | one page per `use_figma` call | `page.children` on a page you have not switched to returns a short list *without erroring* (Gotchas) |
+| hide → render → hide → render | the four-render arrow probe needs a *different* `visible` state per render, so batching them races the writes and the masks capture the wrong state (CHECKS.md) |
 
 And a bigger batch is a bigger loss: `use_figma` is atomic, so a script that throws on its last line reverts the whole pass. Stay inside the plugin's ~10-logical-operations-per-call guidance.
 
-**Measuring whether any of this happened: use interval overlap, never a calls-per-message count.** The transcript writes one entry per tool call whether or not the calls were batched, so a calls-per-assistant-message histogram reports `{1: N}` for a provably concurrent run — checked against an 8-call probe that measured 4.12×, which the histogram scored as eight singletons. Sweep `tool_use` → `tool_result` timestamps for peak simultaneous in-flight calls instead, and count how many calls start before the previous one finished.
+**To check whether a run actually batched, sweep `tool_use` → `tool_result` intervals for peak in-flight calls** — never a calls-per-message count, which reports singletons for a provably concurrent run (Gotchas).
 
 ## Inputs
 
@@ -148,7 +214,7 @@ Get an SVG URL for the chart, whatever form the reference takes:
 | **Explorer view** | `https://ourworldindata.org/explorers/<slug>.svg?<view params>` — `EXPLORER_DYNAMIC_THUMBNAIL_URL` in `settings/clientSettings.ts`. **Carry the view's full param set:** requested bare it returns an axis and nothing else, at HTTP 200 (2 texts, no series). Verified on the `imType=thumbnail` route; untested for the other `imType`s. |
 | **Bespoke component** (no slug, no `.svg`) | there is no endpoint — render and serialize the component yourself. See [BESPOKE-SVG.md](BESPOKE-SVG.md). |
 | Admin link `/admin/charts/<id>/edit` | **`/admin/charts/<id>.svg` does not exist** (it returns the admin SPA shell). Resolve the chart's `configId` — `SELECT configId FROM charts WHERE id = <id>` on the public Datasette (see the `query-grapher-db` skill), or `GET /admin/api/charts/<id>.config.json` — then use `https://ourworldindata.org/grapher/by-uuid/<configId>.svg`. Works for unpublished drafts too. |
-| Narrative chart (**name**) | name → uuid via the unauthenticated map `https://admin.owid.io/api/narrative-chart-map`, then `https://ourworldindata.org/grapher/by-uuid/<uuid>.svg` |
+| Narrative chart (**name**) | name → uuid via the unauthenticated map `https://admin.owid.io/api/narrative-chart-map`, then `https://ourworldindata.org/grapher/by-uuid/<uuid>.svg`. Being unauthenticated, this one route works from a cloud sandbox, while the *authenticated* `admin.owid.io` routes are Access-blocked there — test a specific route rather than assuming the host |
 | Narrative chart (**admin link with a numeric id**, `/admin/narrative-charts/<id>/edit`) | **Try the direct lookup first** — `select id, name, chartConfigId from narrative_charts where id = <id>` on the public Datasette hands you the uuid outright (note the column is `chartConfigId`, not `configId`). Only when the id isn't mirrored yet do you need the guessing route below. |
 | … the same, when the id is **newer than the Datasette mirror** | there is no id→uuid endpoint, and the mirror lags production by days (it once stopped at 338 while 341 existed). Diff the live name-keyed map against `select name from narrative_charts` to get the unmirrored names, then order them by uuid — they are **uuidv7, so lexical order is creation order** — and count up from the mirror's highest id. That gives a *candidate*, not an answer: ids have gaps where charts were deleted. **Always render the candidate and have the user confirm it before building.** In practice the **name is a far stronger signal than the id arithmetic** — these are named after the piece they serve (`share-of-women-in-parliament-di`), so an unmirrored name matching the DI's topic, *and* carrying the highest uuid, is near-certain. Note the DI page itself is not a reliable route: an older published DI can have `linkedNarrativeCharts: {}` because it ships a hand-made PNG, so the narrative chart you were handed may be newer than the post. Its embedded JSON is still worth reading for `grapher-url`, `authors` and the body text you need in Step 2. |
 | Description only | find candidates via site search (`https://ourworldindata.org/search?q=...`) or a Datasette title match; show the candidates and confirm before proceeding |
@@ -255,9 +321,11 @@ head -c 300 $DIR/embed.svg   # expect <svg ... width="..." height="...">, no <ht
 > **[`scripts/solve_export.py`](scripts/solve_export.py) does this arithmetic — don't do it by hand.**
 > Run it from the repo root through the venv — `.venv/bin/python .claude/skills/create-figma-chart/scripts/solve_export.py …`;
 > it is committed non-executable like the rest of that directory.
-> `--band 508x371 --slug <slug>` returns the solved `imFontSize`, the `imWidth`/`imHeight` to
+> `--band 508x371 --slug <slug> --params '<the view's query string>'` returns the solved
+> `imFontSize`, the `imWidth`/`imHeight` to
 > request, the predicted content box, the **height-first** scale into the band, the leftover width
-> the x-map has to close, the final label size, and the finished `curl`. Two things to read it by:
+> the x-map has to close, the final label size, and the finished `curl`. **Omit `--params` and that
+> `curl` exports the DEFAULT chart** — a valid, plausible SVG of the wrong entities. Two things more:
 > it reports the leftover width rather than a predicted gap, because the gap is exact by
 > construction once you fit the height (Step 7) — that leftover is the same quantity
 > `measure_fit.js` reports as `xMapShortfall`, and it is the aspect miss expressed in px; and every
@@ -304,7 +372,7 @@ grep -oE 'font-size="[0-9.]+"' chart.svg | sort | uniq -c | sort -rn | head -3
 
 Bigger text needs more room, so this trades against how much fits — see the axis rule in Step 8 and, failing that, the entity count.
 
-**`tab=` FALLS BACK SILENTLY when the chart does not declare that type — check the mark group, not the HTTP status.** `co-emissions-per-capita?tab=marimekko` returns 200 and a plausible 9 KB SVG containing `lines`: a line chart. `tab=stacked-discrete-bar` on the same slug returns `stacked-areas`. Nothing errors and the file looks right, so a whole "chart-type sweep" can be built on two charts that are not the types you asked for — which is what happened here. Two defences: find charts that actually declare the type (`json_extract_string(cc.full, '$.chartTypes')` on the public Datasette — `/query-grapher-db`), and assert the mark group in the returned SVG:
+**`tab=` FALLS BACK SILENTLY when the chart does not declare that type — check the mark group, not the HTTP status.** `co-emissions-per-capita?tab=marimekko` returns 200 and a plausible 9 KB SVG containing `lines`: a line chart. `tab=stacked-discrete-bar` on the same slug returns `stacked-areas`. Nothing errors and the file looks right, so a whole "chart-type sweep" can be built on two charts that are not the types you asked for — which is what happened here. Two defences: find charts that actually declare the type (`json_extract_string(cc.config, '$.chartTypes')` on the public Datasette — `/query-grapher-db`), and assert the mark group in the returned SVG:
 
 | type | mark group `id` |
 |---|---|
@@ -403,6 +471,8 @@ curl -s -X POST "<submitUrl>" -F "file=@$DIR/original.svg;type=image/svg+xml"
 # → {"success":true, ..., "placedOnNodeId":"<id>"}
 ```
 
+For two or more assets, run the POSTs concurrently rather than one per call — Gotchas has the pattern.
+
 4. **Lay out the page**: the original chart on the left; the adapted template **to its right** (~100 px gap). If several formats were requested, keep one original and line the templates up to its right. Move imported nodes with `use_figma` (`page.appendChild(node)`, set `node.x/node.y`). This page-level parenting is for the **original** reference chart only — the embed gets reparented into the template clone in Step 7.
 
 > **Imported SVGs arrive at their natural size** (850×600 / 540×540). Scale with `node.rescale(factor)` — never `resize()`, see Step 7.
@@ -463,6 +533,7 @@ The checks are a gate, not a formality: **re-run the whole pass after the last c
 4. **Clear the rejected variants off the page.** Proposal frames accumulate fast — a palette trial, a labeling trial, a layout trial — and a page with four near-identical charts makes the reader work out which one is live. When the user picks, delete what they didn't pick and keep what they asked to keep; a variant kept deliberately is fine, one left behind by accident is not.
 5. Do **not** export a PNG by default — the designer usually keeps editing. On request, let the user export from Figma, or use the admin's Figma endpoint below. **`get_screenshot` cannot do it:** `maxDimension` only ever *downscales* and clamps at the node's natural size, so a 540 frame returns 540px however large a number you pass, and a 302 frame returns 302px. There is no way to get the 4× (2160×2160) DI export through it.
 
-   For a **302-wide thumbnail** the export is part of the deliverable rather than optional, and it has its own route: `GET /api/figma/image?fileId=<key>&nodeId=<node>` on the OWID admin (`adminSiteServer/apiRoutes/figma.ts`) calls the Figma API at `scale: 3`, then `POST /api/images` uploads it to Cloudflare Images. PNG only — `ACCEPTED_IMG_TYPES` rejects SVG. See SMALL-CHARTS.md → Delivery for the naming rules and the retina reason for 3×.
-6. **Give the user a clickable link to the frame — once, when you first create it.** `https://www.figma.com/design/<fileKey>/<FileName>?node-id=<node-id>`, with the node id's colon written as a hyphen (`24977:6` → `node-id=24977-6`). Deep-link the **frame**, not the page: it opens with the chart on screen rather than wherever the canvas was last parked. A first delivery without the link is not delivered — making someone hunt for a page in a 180-page file is pure friction. But **don't repeat it on every iteration**: they already have the tab open, and a link at the top of every reply is noise. Re-send it only if the frame moves to a new page or they ask.
+   For a **302-wide thumbnail** the export is part of the deliverable rather than optional, and it has its own route: `GET /api/figma/image?fileId=<key>&nodeId=<node>` on the OWID admin (`adminSiteServer/apiRoutes/figma.ts`) calls the Figma API at `scale: 3`, then `POST /api/images` uploads it to Cloudflare Images. PNG only — `ACCEPTED_IMG_TYPES` rejects SVG. See SMALL-CHARTS.md → Delivery for the naming rules and the retina reason for 3×. **Neither call reaches `admin.owid.io` from a cloud session**, so there the export and upload move to the user's machine — say that when you deliver instead of leaving the deliverable half-finished.
+6. **Give the user a clickable link to the frame — once, when you first create it.** `https://www.figma.com/design/<fileKey>/<FileName>?node-id=<node-id>`, with the node id's colon written as a hyphen (`24977:6` → `node-id=24977-6`). Deep-link the **frame**, not the page: it opens with the chart on screen rather than wherever the canvas was last parked. A first delivery without the link is not delivered — making someone hunt for a page in a ~200-page file is pure friction. But **don't repeat it on every iteration**: they already have the tab open, and a link at the top of every reply is noise. Re-send it only if the frame moves to a new page or they ask.
 7. Report what was created (page name, frames, edits made) and what remains manual: the Flags plugin if it was used, and any design review — **you cannot read Figma comments via MCP, so never report the design review as clean.** Deviations and open items go in the report and the handover doc; put them on the Figma page **only if the user asks** — an unrequested note is clutter in someone else's design file.
+   - **Name the Step 8c rows that came back `SKIPPED`** — about a dozen do, each owned by a tool this pass doesn't run. A report listing only what passed turns a declared gap into an implied clean bill.

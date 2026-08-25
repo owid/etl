@@ -923,8 +923,8 @@ def _modified_chart_configs_on_staging(
     base_q = """
     select
         c.id as chartId,
-        MD5(CONCAT(cc.full, IFNULL(isInheritanceEnabled, 0))) as chartChecksum,
-        cc.full as chartConfig,
+        MD5(CONCAT(cc.config, IFNULL(isInheritanceEnabled, 0))) as chartChecksum,
+        cc.config as chartConfig,
         isInheritanceEnabled
     from charts as c
     join chart_configs as cc on c.configId = cc.id

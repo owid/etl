@@ -5,6 +5,58 @@
 
 Every one of these caught a real defect on this skill's first run, and none of them is visible by looking at the frame. Run them as a pass, and report the numbers rather than "looks fine".
 
+> **⚠️ `verify_page.js` does not fit in a `use_figma` call as it ships.** The `code` argument caps at
+> **50,000 characters** and the file is **~117,000**, so the instruction below is not executable
+> verbatim — a run that pastes it is rejected. Emit it stripped instead:
+>
+> **Run it in slices — that is the supported path, and the only one.** Stripping the comments used to
+> get it *just* under the cap (the helper is context-aware, so URLs, regex literals and template
+> strings survive), and even then it sat at 97%, all of which has to be relayed verbatim — where a
+> one-character corruption yields a *wrong verdict* rather than an error, the exact failure this gate
+> exists to catch. It has since grown past the cap outright: **60,937 stripped**. So
+> `inline_script.py verify_page.js` with no `--rows` **refuses and exits 1**, naming the size and
+> pointing here, and `--whole` no longer overrides that — the cap is now a hard floor for this
+> script, not a judgement call. The rows are grouped, each slice carries the shared preamble:
+>
+> ```bash
+> .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js --list-rows
+> .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js --rows series --frame-id <your frame>
+> ```
+>
+> | group | rows | size |
+> |---|---|---|
+> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 69% of cap |
+> | `series` | series-weight, furniture-weight, furniture-dash | 64% |
+> | `geometry` | box-alignment, gap, margins, off-palette | 59% |
+> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 76% |
+>
+> Groups combine, so the whole pass is two calls: `--rows type,series` (41,960) then
+> `--rows geometry,annotations` (43,327, **87% of cap** — the figure `inline_script.py --check`
+> reports: it measures **these two calls**, declared as `DOCUMENTED_CALLS` in the script, rather
+> than the smallest split it could find for itself — an optimiser would go on reporting a
+> comfortable number by picking a split nobody is told to send. Change the pair here and there
+> together; `--check` fails if their groups no longer cover the file exactly once.
+> Read its **`floor`** column beside that percentage: `sent` is what today's two calls cost and can
+> always be bought down by re-splitting, while `floor` is the preamble plus the single largest row
+> group — the smallest any call can be, whatever the split. `verify_page.js` reads **87% sent against
+> a 76% floor**, so re-splitting still buys real room; when the floor itself passes the cap, slicing is
+> exhausted and the only move left is splitting the script into separate files with their own
+> preambles. `--check` fails on that and warns past 85%.
+> **Run all four** — each reports its own rows and nothing else, so a group you skip is a group
+> nobody checked.
+> `diff_against_template.js` (~12,000 stripped) needs none of this.
+>
+> **Do NOT substitute a hand-rolled subset. It is worse than skipping the pass, and this is
+> measured.** A run that could not relay the script wrote its own seven rows instead, reported six
+> `PASS` and shipped three defects a reviewer caught by eye within minutes: a series line left at
+> **1.296px** after a `rescale()` (the stroke-weight rows were simply absent), a **bold producer
+> name** in the footer (the text-weight rows were absent), and — the instructive one — annotations
+> with **no knockout at all**, which its own knockout row had passed. That row tested crossings
+> against **data**, where this file requires a 3px stroke whenever **furniture** is crossed; both
+> annotations sat squarely across gridlines. A skipped row announces a gap. A reimplemented row
+> *closes* the gap on paper while leaving it open in the frame, and you cannot tell from the report
+> which you have. So: relay the script, or declare the whole pass unrun.
+>
 > **[`scripts/verify_page.js`](../scripts/verify_page.js) runs the MECHANICAL rows in ONE read-only
 > `use_figma` call** — text floor, annotation ladder, named styles, text hierarchy, series and
 > furniture weights, dash patterns, box alignment, gap, margins, unbound fills, annotation knockout
@@ -16,7 +68,92 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > (`/adversarial-data-review`), entity completeness (needs the *effective* selection from outside
 > Figma), the arrow row (it needs rendered pixels), `leader-on-map` (a **vector** ray-cast against
 > the country's rings — pixels are only its fallback), and the page count (a page-level fact, where
-> the script is handed frames). A `SKIPPED` row is a declared gap in coverage, never a pass — which
+> the script is handed frames).
+>
+> **`colour-vision` and `grayscale-seams` hand back a runnable command, not just an owner.** The
+> script cannot run `color_audit.py` — a Figma plugin sandbox has no shell — but the palette is
+> already on the canvas, so it emits the invocation with the palette filled in, the interpreter
+> spelled out and `--names` attached when the node names allow it. Paste and run it; both rows are
+> one run of one script.
+>
+> The palette is taken from **identified data marks and line/slope series strokes**, never from the
+> script's `fills` inventory. That inventory holds every solid paint on an area node in the plot and
+> a TEXT node has one, while a line chart's series colour is a **stroke** and is not in it at all —
+> so sourcing from it audits axis and legend labels as categories while omitting the data. Measured
+> on the test fixture, it returned a one-entry palette consisting of a text label's fill. `outline__*`
+> strokes are excluded too: that is the white halo under a line, shared by every series.
+>
+> **A legend is furniture, and its swatches are not categories.** grapher draws the legend *inside*
+> the chart group and *outside* the map — a map page reads `chart > numeric-color-legend > {lines,
+> swatches, labels, swatch-hit-areas}` as a **sibling** of `map` — so every filled swatch reached the
+> palette as an ordinary chart-side mark. An ordinary choropleth then reported **two** palettes: the
+> map under `--maps` and its own legend under `--separated`, with a `--suggest` rerun ready to
+> recommend restyling the legend rather than the categories. On a line chart the harm landed on
+> `--names` instead: a numeric legend's bins are unnamed rects, so one swatch in a colour of its own
+> put an import default into the palette and dropped the flag for the whole run. A legend repeats the
+> categories' colours and adds none of its own, so the swatches are excluded, **counted** in the row,
+> and any colour appearing *only* in the legend — an empty bin — is named rather than quietly lost.
+> They keep their boxes for `annotation-overlap`, where an annotation dropped over the legend still
+> covers something the reader needs, and are reported there as "a legend swatch".
+>
+> The mode flag is chosen from what the palette was sourced from, and it is not cosmetic — it also
+> selects which palette a `--suggest` rerun searches. A line or slope palette gets **`--line`**
+> (`--separated` plus the Line and Slope Chart variants, the darker set for thin marks on white);
+> a map gets `--maps`; anything else gets `--separated`. All three mean "nothing shares an edge".
+>
+> **A palette of one colour gets no command at all.** Both rows compare *pairs*, so a single colour
+> has nothing to compare — but `color_audit.py` does not say so: handed one hex it prints an empty pair
+> list and `overall: min dE inf`, and exits 0, which reads exactly like a clean audit.
+> [GUIDELINES.md](../GUIDELINES.md) already rules on this ("one categorical color against neutral grays
+> has no pair to check, and reporting no failures from a two-color audit reads as coverage you don't
+> have"), so the row withholds the command, names the colour, and hands over the two checks that *are*
+> live: that colour's contrast against the background, and whether it still separates from the grays in
+> grayscale. The clash note survives the withholding — two categories painted one colour **are** a
+> one-colour palette, and that is the severest collision there is. A declared `highlightTreatment` gets
+> the same warning attached to its command rather than the command withheld, because which entries are
+> muting grays is a judgement this script cannot make.
+>
+> Four things it will not decide for you:
+> - On a **stacked or segmented** chart drop the mode flag and reorder the colours into stack order
+>   first, because the seam check reads adjacency off the order you give it. That is the only chart
+>   where seams exist, so it is the only case where the emitted flag is wrong.
+> - On a **map** the command covers a *categorical* choropleth only. `--maps` selects the Categorical
+>   Maps palette and the ΔE 20 gate is a categorical test, so a **sequential ramp** — ordered by
+>   construction, and set in grapher — fails it by design, and `--suggest` would then offer an
+>   unordered palette in place of a correct ramp. Nothing in the plugin can tell the two apart from
+>   the fills, so judge a ramp by lightness order instead of running this.
+> - `--names` is dropped wholesale, with the reason stated, if any mark is unnamed, carries a comma
+>   (it would split into two entries and misalign every label after it), or carries an apostrophe
+>   (it would end the single-quoted shell argument mid-name).
+> - The palette is deduplicated by **colour**, so two categories painted the same colour reach the
+>   audit as one entry and it cannot report the clash. The row names them instead, ungraded — a
+>   highlight treatment greys every unhighlighted series on purpose, and a choropleth bin is one
+>   colour by definition (map shapes are left out of the note entirely). The category comes from the
+>   nearest `<kind>__<Entity>` **ancestor**, because grapher puts the name on the group and the paint
+>   on its leaves: a `datapoints__<Entity>` marker is a filled leaf called `Ellipse 12`.
+>
+> **A frame that paints no pixels returns one row, not a sheet of them.** Figma switches a node off
+> two independent ways — `visible: false` and opacity — and both are **inherited**, while the walk
+> starts at the frame's *children*, whose own `visible: true` says nothing about whether they render.
+> So a hidden frame, or one under a hidden section, used to certify thirty rows of verdicts about a
+> deliverable nobody can see. Either switch now returns a single `frame-not-rendered` **FAIL** naming
+> which switch is off and where, and the verdict reads `NOT CHECKED` — never "no mechanical row
+> failed". Unhide or reset the frame *and every group and section above it*, then re-run.
+>
+> **A translucent knockout is not certified.** An annotation's knockout works by painting the frame's
+> colour *over* what it crosses, so one at 0.005 masks nothing while still passing the weight,
+> alignment and colour checks — a clean `ok` on a crossing the reader can see straight through. Zero
+> is already "no knockout"; anything between is reported **REVIEW** with its effective opacity (paint
+> × node) named, because at 0.98 it masks fine and at 0.05 it does not, and which side of that a frame
+> is on depends on what sits behind the annotation.
+>
+> **Non-rendering means exactly zero, never a floor.** A node or paint at 0.005 does reach the canvas,
+> and a cutoff dropped its whole subtree from *every* row — an 8px label at 0.005 left `text-floor`
+> reporting that all of its ranges cleared the floor. Anything positive is **translucent**: held out of
+> the palette, named there so the shortfall is visible, and still judged by every row that is about
+> geometry rather than colour.
+>
+> A `SKIPPED` row is a declared gap in coverage, never a pass — which
 > is the whole reason to read the list rather than the verdict.
 >
 > **[`scripts/diff_against_template.js`](../scripts/diff_against_template.js) is the other half of the
@@ -33,7 +170,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > its text — and it separates the one API limitation that is *not* a defect (a bolded `Data source:`
 > prefix cannot be both bold and style-bound through the plugin API, so it reports as `halfBound`; see
 > [TEXTS.md](TEXTS.md)) from real drift. Its harness is
-> [`scripts/test_diff_against_template.js`](../scripts/test_diff_against_template.js) (**49**
+> [`scripts/test_diff_against_template.js`](../scripts/test_diff_against_template.js) (**75**
 > assertions), which found four defects in the script that review had not: a header that lost a row
 > reported as matching, five fingerprinted footer properties never actually compared, and a
 > `TypeError` that killed the whole diff when a row changed type. A fifth, from review: the text
@@ -42,7 +179,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 >
 > Validated by planting defects and confirming each row **fails**, twice over: 11 planted in Figma and
 > 11 caught, then a stubbed-figma harness ([`scripts/test_verify_page.js`](../scripts/test_verify_page.js),
-> `node` it after any edit) covering **137** assertions including the rows that are awkward to plant on a
+> `node` it after any edit) covering **276** assertions including the rows that are awkward to plant on a
 > real page. **A check that cannot fail is worse than no check**, so when you extend this script,
 > extend both passes with it.
 >
@@ -80,7 +217,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Label alignment | compare each label's center against its mark | bar values centered on bars, legend labels on swatches |
 | Box alignment | compare the chart's left/right against the header frame | identical to the subtitle box, to the pixel |
 | Gap | `(footerTop - headerBottom - chart.height) / 2`, with `footerTop = footer.y + Math.min(0, source.y)` — a source row raised inside the footer lifts the band's bottom (Step 7) | equal top and bottom, at the band figure of **the template you filled**: **12–16px** on the 540-wide frames, **30px** on the IG portrait (see Step 7). **Exception — a tightly measured group:** on an axis-less chart whose furniture was trimmed and label boxes hugged (Step 8), the band no longer applies as written; the figure to match is the one the **reference page** measures the same way, typically **20–30px**. Measure it there, record yours with a note that the group is tightly measured, and do not shrink a correct chart to force the band |
-| Annotation block gap | the **block's** outer edges (topmost annotation, bottommost annotation, plot — whichever is extreme) vs the header and footer frames | the same clearance the plot owes: **27px** each side on the 540×540 pages. An annotation outside the plot is part of the block, so spacing the plot alone is not enough (GUIDELINES.md → Annotations) |
+| Annotation block gap | the **block's** outer edges (topmost annotation, bottommost annotation, plot — whichever is extreme) vs the header and footer frames | the same clearance the plot owes: **27px** each side on the 540×540 pages. An annotation outside the plot is part of the block, so spacing the plot alone is not enough ([ANNOTATIONS-AND-ARROWS.md](ANNOTATIONS-AND-ARROWS.md)) |
 | Every pointer lands on its target | for each leader, the **terminal vertex** (transformed, not the bbox) vs the thing it names — the country's own **ink** on a map, the band border at the stated year on a chart | the dot or tip is inside/on its target, and where the text names a year, at that year's x — with the first and last year taken from the plot's edge, not the tick label's centre. **A country's bounding box is not the target.** Countries are concave and multi-part, so a point can sit well inside the box and still be in open ocean — the US box reaches past Hawaii, an antimeridian straddler's spans the whole Pacific (see the map fit in `reference/per-chart-type/maps.md`). **Do it in VECTORS first — it is exact, and it is one call.** Transform the terminal into the country's local space through the inverse of its `absoluteTransform`, parse its `vectorPaths` into rings, and ray-cast. No renders, no masks, and it caught a leader whose terminal sat in the Bay of Bengal while its bbox test passed. Fall back to the **pixel** mask — hide the country vector, diff the renders, require the dot within ~1px of that pixel set — only where the vector test cannot answer: a country a few pixels across whose ring is smaller than the dot, or a shape whose fill rule makes the ray-cast ambiguous |
 | Nothing in the margins | every visible mark's `absoluteBoundingBox` vs the content band | no ink outside **16…524** on a 540-wide frame. A speck left in the margin after a map fit renders as a cut sliver at the frame edge |
 | How much is on the page | count the plot-bearing objects anywhere on the page — `countries-with-data` groups on a map, the equivalent plot group otherwise — and name what each one is for | one per **intended** item: the deliverable, plus the reference copies you meant to place. A third is clutter. **Do not check this by testing top-level children for overlap** — that answers a different question and answers it "clean": on one page three world maps sat at three distinct positions, so an overlap test passed twice while the reader was looking at a pile of near-identical maps in the left-hand column, one of which displayed the export's own legend/map collision. The reader's question is *how many of this thing am I looking at*, and only a count answers it. Watch the truncation trap too: a per-item node census keyed on a **shortened** name silently merged `<slug>` with `<slug> — original SVG (unstyled)` into one bucket, which is how a 467-node count for a 233-node frame read as normal |
@@ -89,20 +226,116 @@ Every one of these caught a real defect on this skill's first run, and none of t
 
 **Identify each shape's pixels by node identity, never by color.** A pixel belongs to the shape whose hiding changed it, which is true whatever either shape is colored. Screenshot the frame at 1:1 **four times** — whole, with the arrow's `visible = false`, with the target line's, and with **both** hidden — and diff each shape against the both-hidden render, from the pass where the *other* shape was already gone:
 
-```python
-from math import hypot
+**`scripts/measure_pixels.py` does the arithmetic — don't route the renders through your own eyes.**
+Every number below is computable from the PNGs, so looking at them costs a turn and an image each
+and is less accurate than the arithmetic. Get the three pair-specific renders onto disk — one
+screenshot per visibility state, and if you fetch URLs, in parallel with one output file each, or
+every `curl` overwrites the same PNG (GOTCHAS.md). Then:
 
-crop   = [(x, y) for y in range(y0, y1) for x in range(x0, x1)]   # arrow's absoluteBoundingBox, padded
-arrow  = [p for p in crop if no_target[p] != no_both[p]]          # arrow alone vs neither
-target = [p for p in crop if no_arrow[p]  != no_both[p]]          # line alone vs neither
-
-assert arrow,  "no arrow pixels — wrong bbox, wrong frame, or the hide never applied"
-assert target, "no target pixels — pad the bbox, or this is not the node the arrow points at"
-
-d        = lambda a, b: hypot(a[0]-b[0], a[1]-b[1])
-minGap   = min(d(a, b) for a in arrow for b in target)
-touching = sum(1 for a in arrow for b in target if d(a, b) <= 1.5)
+```bash
+.venv/bin/python .claude/skills/create-figma-chart/scripts/measure_pixels.py arrow-gap \
+  --no-arrow no_arrow.png --no-target no_target.png --no-both no_both.png \
+  --crop <arrow bbox, padded> [--full full.png] \
+  [--arrow-bbox <absoluteBoundingBox>] [--target-bbox <absoluteBoundingBox>]
 ```
+
+It masks each shape from the pass where the *other* was already hidden, reports `min_gap`,
+`touching_pairs` and `arrow_px`/`target_px`. Pass `--full` and it also reports what the discredited
+from-full masking would have said, and warns when that would have missed a real contact.
+
+**The desktop read path can serve these renders — but not in one call, and the difference bites.**
+`figma_desktop_read.py shot` toggles nothing: it screenshots the nodes you name in whatever state
+they are already in. So naming one frame three times returns the *same* render three times, and all
+three collide on one `<node>.png`, because the output name is derived from the node id.
+`measure_pixels.py` then reads identical PNGs, finds an empty mask and answers `UNMEASURABLE` with
+`arrow_px: 0, target_px: 0` — the guard holds, but the renders bought nothing. Each state is a
+hosted `use_figma` write, so the real sequence is **one write then one screenshot per state**, three
+times. Property writes to a page already open in the app do replicate, and this protocol is the
+measured case for that (GOTCHAS.md → the desktop MCP server, per-step verdict) — what does not
+exist is a single call that captures three states.
+
+**The exit code is the part to read, and it is the same for all three probes:**
+
+| | |
+|---|---|
+| **0** | the check ran and passed |
+| **1** | the check ran and failed — *the chart is wrong*, and nothing else means this |
+| **2** | the check did **not** run, so there is no verdict |
+
+Everything wrong with the *input* is 2: an unreadable PNG, a malformed `--background`, a crop
+outside the render or one whose coordinates are not finite numbers, a numeric flag outside its
+meaningful range, an empty mask, renders of different sizes, a mask straying outside a declared
+`--*-bbox`. **Never read a 2 as a pass and never read it as a defect** — it means the probe could
+not measure, and the remedy is to fix the input and re-run. A bare number cannot tell "the arrow is
+clear" from "I measured nothing", which is the whole reason these return a code at all.
+`figma_desktop_read.py` uses the same three codes, with 2 reserved there for the daily read quota.
+
+**What it does not buy is arithmetic speed — measured, on the same three renders.** The all-pairs
+loop it replaces is `O(arrow × target)` against a linear distance transform, and that only pays at
+scale: at a 1× probe the loop wins (**0.01 s** against **0.32 s**, since the script pays numpy and
+scipy import), the two draw around 2×, and only at the **4×** render the hairline check requires
+does the loop fall behind (**1.61 s** against **0.31 s**, 8.9M pairs). Both agree on the answer at
+every scale. So reach for the script for what it guards, not for what it computes: the loop's
+numbers were never wrong, its *failure modes* were. `touching` is also clarified rather than
+changed — it counted *pairs* within 1.5px, exactly the 3×3 neighbourhood, and the script reports
+that alongside the count of distinct arrow pixels in contact, so a non-zero result is interpretable.
+
+**Probe a render at its natural size. A resampled one cannot be masked reliably — and both render
+paths resample.** A pixel mask is a per-pixel difference, so it only means "this shape's ink" while
+each pixel still corresponds to one rendered pixel. Downscaling breaks that, and how badly depends
+on the filter: an area-average resample merely softens each edge, but a **ringing** filter overshoots
+two or three pixels past it, which inflates both masks until two shapes five pixels apart have
+*overlapping* masks and every gap reads as `0.0` with hundreds of contacts. That is a property of the
+resampling, not of the chart, and it looks exactly like a real defect. So: `get_screenshot`'s
+`maxDimension` downscales, and the desktop server caps the longer edge at **1024px** (Gotchas) — a
+540-wide frame is safe on either, but the **616×1096 Reel arrives at 576×1024 from the desktop
+server**, already resampled. For a pixel probe on a frame taller or wider than 1024, use the hosted
+`get_screenshot` at natural size, or the 4× clone trick. Same reason the arrow renders are specified
+at 1:1 above.
+
+Verified under fake AA (supersample, area-average down): masks hold their size at every separation
+and `min_gap` tracks the true gap exactly. Note `min_gap` is the distance between pixel *centres*,
+so it reads one more than the number of blank pixels between the two edges — two blank columns
+measure `3.0`. That is the same convention as the `hypot` above, so the 3–7px band applies to it
+unchanged.
+
+**And verified against this file's own recorded number, on a real chart.** Run on a clone of the
+population-growth page's peak arrow — a real curvy arrow at **rotation −162.4°**, real
+anti-aliased renders through the desktop server — the script returns **`min_gap` 3.0 with zero
+contacts**, which is exactly the figure recorded above for that arrow after its fix. A second arrow
+on the same chart at **+170.7°** returns 5.385px, zero contacts, and `arrow_px_outside_bbox: 0`
+against its declared `absoluteBoundingBox`. Both sit inside the 3–7px band. That pair is also the
+empirical proof of the rotated-bbox warning: the first arrow's raw `x` is **167.1** where its
+absolute box starts at **100.0**, and the second reports raw `x: 536.7, width: 29.8` against an
+absolute `495.1, 41.7` — crop from the raw numbers and you probe empty canvas.
+
+The same script covers the other two pixel checks: `contrast` for a hairline (the sub-pixel stroke
+trap in Gotchas — measure it on the 4× clone, not the 540px preview) and `ink-box` for "nothing in
+the margins", which reads the true extent of everything that paints. Run against a stock 540 frame,
+`ink-box` returns `[16, 16, 524, 524]` — the content band this file specifies — with the background
+inferred rather than declared.
+
+**Use them as a pair, and here is the pair settling a real case.** Run on a *shipped* page — the
+population-growth DI — `ink-box` came back `[16, 16, 527, 524]`: ink reaching **527** against a band
+that ends at **524**. On its own that is ambiguous, because antialiasing along a mark's edge also
+registers as ink. So ask `contrast` what the ink in that strip actually is:
+
+```bash
+.venv/bin/python .claude/skills/create-figma-chart/scripts/measure_pixels.py ink-box \
+    --png frame.png --region 524,0,540,540 --background '#ffffff'
+.venv/bin/python .claude/skills/create-figma-chart/scripts/measure_pixels.py contrast \
+    --png frame.png --region 524,0,540,540 --background '#ffffff'
+```
+
+34 ink pixels, 3px wide by 76px tall, **peak contrast 6.79:1** — that is the annotation gray at full
+strength, not a fringe (the fringe is there too, and shows as the 1.78 median). So it is real ink: the
+tail of a curvy arrow whose `absoluteBoundingBox` reaches **536.8**, overrunning the right content
+edge. `verify_page.js`'s `margins` row flags the same thing more harshly, since it measures the box
+rather than the ink.
+
+The generalisable part is the division of labour: **`ink-box` finds the overrun, `contrast` rules out
+the artefact.** A margin verdict from either alone is a guess — one cannot tell ink from fringe, the
+other does not know where the band is.
 
 **Don't diff either mask against the whole render — that hides the overlap you are testing for.** Whichever node paints on top covers part of the other, and hiding the *covered* one changes nothing in those pixels, so a mask taken from `full` comes back with a hole exactly where the two shapes meet. An arrowhead sitting on the end of its line then measures its `minGap` to the nearest still-*exposed* line pixel and reports a comfortable 3–7px with `touching == 0` while the two are plainly overlapping — the one verdict this check exists to prevent. Diffing from the other-hidden pass costs one extra screenshot and is symmetric, so it holds whichever node is on top.
 
@@ -131,7 +364,7 @@ const pts = (v, frame) => {                          // path space -> FRAME spac
 
 **And take the transform, not the bounding box, or rotation silently defeats the fix.** The tempting short version — normalize the local x,y into `absoluteBoundingBox` by their own min/max — reads like it handles rotation, because for a rotated node the bbox *is* the visual one. It does the opposite: normalizing two axes independently into an axis-aligned box cannot rotate anything, so you get an **unrotated polyline stretched across the visual box**, a shape the reader never sees, and the audit then certifies the wrong geometry with more confidence than before. `absoluteTransform` carries the rotation in the matrix, so applying it to each point is both shorter and the only version that is actually rotation-safe. (The regex takes every number in the path data, which is right for the M/L polylines grapher exports; a path with curve commands would need its control points dropped first.)
 
-That took the same four frames to **one** finding, which was real. And the same routine fixes it without guesswork: take the topmost line point under the annotation's x-range and set `box.y = thatY − 12 − box.height` — the ~12px the knockout rule asks for (GUIDELINES.md → Annotations), not the 5px that merely clears the test. **A clear audit is necessary here, not sufficient:** the polyline check only asks whether the box *touches* the line, so it reports 5px as clean, and 5px is the gap a reviewer called visibly too close. If 12px pushes the block somewhere awkward, narrow the block — re-wrap the same sentence into more, shorter lines — rather than moving it further away. Then re-run the test and confirm it still reports clear. (This is the line-chart counterpart of the subpath-bbox rule for maps: boxes decide where things may go, geometry decides how it reads.)
+That took the same four frames to **one** finding, which was real. And the same routine fixes it without guesswork: take the topmost line point under the annotation's x-range and set `box.y = thatY − 12 − box.height` — the ~12px the knockout rule asks for ([ANNOTATIONS-AND-ARROWS.md](ANNOTATIONS-AND-ARROWS.md)), not the 5px that merely clears the test. **A clear audit is necessary here, not sufficient:** the polyline check only asks whether the box *touches* the line, so it reports 5px as clean, and 5px is the gap a reviewer called visibly too close. If 12px pushes the block somewhere awkward, narrow the block — re-wrap the same sentence into more, shorter lines — rather than moving it further away. Then re-run the test and confirm it still reports clear. (This is the line-chart counterpart of the subpath-bbox rule for maps: boxes decide where things may go, geometry decides how it reads.)
 
 **A sequential map ramp is not a categorical palette, and two of the rows above don't apply to it as written.** GUIDELINES.md → Colors keeps map colors in grapher on a Viridis or ColorBrewer sequential scale and off the OWID categorical palette, because ordered bins separate better once a map shows many classes. That has two consequences here, and both look like defects if you don't know them. **The ΔE 20 bar is an all-pairs *categorical* test, so a ramp fails it by construction** — neighboring stops are supposed to be close, that is what makes the ramp read as ordered — and `color_audit.py` has no sequential mode: `--maps` swaps the search over to the **Categorical Maps** group, so `--maps --suggest` on a ramp cheerfully proposes an unordered set and destroys the encoding. Don't run it there. **And the off-palette sweep can't pass either**, because grapher's ramp belongs to no library group and arrives as raw fills — demanding a bound style would mean repainting the map in Figma, which the guidelines forbid. So for a sequential map, check the scale where it is actually set, in grapher: that the bins are ordered and distinguishable, and that the legend labels and any values written onto the shapes clear their own contrast bar. Then record the ramp as grapher-managed in one line instead of listing every stop as an off-palette fill. `--maps` and the ΔE gate are for a **categorical** choropleth — one color per region or class, no order between them — which is the case those rows were written for.
 
@@ -225,8 +458,49 @@ mock, and both changes make a row *less* red on purpose. Read them before treati
 
 ## A skip with a false reason is the failure mode, not a wrong number
 
-Worth stating on its own, because it has now bitten in three different rows. When `CONFIG.chartName`
-finds nothing — the documented case where a designer has **ungrouped** the chart — the plot has to be
+**First, the common case is not the one this section assumed.** `chartName` defaults to `chart`, and
+counting the live file found **three** names in use, not one: `chart` (a grapher import),
+`chart__agriculture-share` (a `static_viz` import) and `chart-desktop` / `chart-mobile` (a two-format
+page). An exact-only match resolved nothing on two of the three, fell through to the ungrouped branch,
+walked the right node anyway, and reported *"the chart group looks ungrouped"* about a frame whose
+chart group is present and correctly named. The answer was right and the explanation was wrong, which
+is the worse of the two: it sends the next reader to fix a non-problem. The resolver now takes an
+exact match first, then a `__` or `-` suffix, and names what it matched.
+
+**And there are two `<kind>__<name>` conventions, which is what made the palette labels wrong.**
+
+| Source | Names | Is the second token a category? |
+|---|---|---|
+| Grapher's SVG export | `line__<Entity>`, `outline__<Entity>`, `label__<Entity>` | **yes** — one per series, in selection order |
+| A `static_viz` matplotlib step | `bars__<slug>`, `diagram__median`, `{slug}__{part}` | **no** — a dataset slug or a part name, repeated across marks |
+
+`CATEGORY_ANY` matches `<word>__<rest>` and cannot tell them apart, so on a `static_viz` bar chart every
+bar resolved to the same "category" and `--names` labelled three distinct colours
+`agriculture-share,agriculture-share,agriculture-share`. That is why `--names` is now gated on the names
+being **distinct across the palette** and not import defaults (`Vector`, `Rectangle 12`): the grapher
+case passes that gate and keeps its labels, the `static_viz` case fails it and the flag is dropped with
+the reason. Do not "fix" this by widening `CATEGORY_ANY` — the two conventions are genuinely ambiguous
+at the name level, and distinctness is the property `--names` actually promises.
+
+**The grapher half is confirmed against a live export**, not inferred. `child-mortality.svg?imType=uncaptioned`
+carries 7 `line__<Entity>`, 7 `outline__<Entity>` and 7 `label__<Entity>` ids — Ghana, India, Brazil,
+France, Sweden, United-Kingdom, United-States — with 7 distinct stroke colours, so the row emits
+`--names 'Ghana,India,…' --line` and the audit runs. You can check this without Figma at all:
+
+```bash
+# the naming and the palette, straight from grapher
+curl -s "https://ourworldindata.org/grapher/<slug>.svg?imType=uncaptioned" | grep -o 'id="line__[^"]*"'
+```
+
+Two things that run did **not** prove, so don't cite it for them. Its labels carry the same colours as
+its lines, so a palette wrongly sourced from text fills would produce the *same* hexes and look
+correct — only a chart whose labels differ from its marks tests that. And it is grapher's automatic
+7-series assignment, which GUIDELINES replaces with the highlight treatment anyway; the audit failing
+it (France/UK at **ΔE 0.0** under tritanopia, India/UK at **1.00:1** in grayscale) is the row working,
+not a defect in a shipped page.
+
+The rest of this section is the genuinely ungrouped case. It has bitten in three different rows. When
+`CONFIG.chartName` finds nothing — a designer has **ungrouped** the chart — the plot has to be
 resolved from the frame's children, and doing that from a list of container names was line-chart-shaped:
 it knew the axis, grid and lines groups and missed a map's `map`, a bar's `bars`, a scatter's point
 container and a slope's `slopes`. Those children were then walked as *not* in the plot, which does not
@@ -244,3 +518,7 @@ when it finds nothing — not only what it says when it finds a defect.**
   FAILS, while imported text is REVIEW with its distance to the nearest rung, FAILing only past 0.75px.
   Measured drift on the eight frames was 0.11–0.48px; the scatter's bubble legend was 6.01px from its
   rung, which is the case the threshold exists to catch.
+
+**The end-to-end run that exercises all of this** — a fixed request, written down before its first
+run so it cannot be tuned to its own result — is [BENCHMARK.md](BENCHMARK.md). Use it to check a
+change did not break the flow; use a fixed sub-task, not it, to claim a speedup.

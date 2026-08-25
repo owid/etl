@@ -4,7 +4,8 @@
 Two modes, both read-only:
 
   --structure            every relative link resolves; every reference/ file is reachable from
-                         SKILL.md; nothing is orphaned. Run this after any edit.
+                         SKILL.md; nothing is orphaned; the eagerly-read docs are inside their
+                         size budgets. Run this after any edit.
 
   --against <git-ref>    every substantive line of the docs at <git-ref> still exists somewhere in
                          the working tree. Run this after moving text between files: splitting a
@@ -12,9 +13,9 @@ Two modes, both read-only:
                          a link path, a heading level, or a pointer rewrite are normalized away, so
                          what it reports is text that actually went missing.
 
-Usage:
-    python3 .claude/skills/create-figma-chart/scripts/verify_docs.py --structure
-    python3 .claude/skills/create-figma-chart/scripts/verify_docs.py --against HEAD~1
+Usage (from the repo root, always through the repo virtualenv):
+    .venv/bin/python .claude/skills/create-figma-chart/scripts/verify_docs.py --structure
+    .venv/bin/python .claude/skills/create-figma-chart/scripts/verify_docs.py --against HEAD~1
 
 Exits 1 on any finding.
 """
@@ -37,6 +38,16 @@ SKILLS_ROOT = DEFAULT_SKILL_DIR.parent
 LINK = re.compile(r"\[([^\]]+)\]\((?!https?:|#)([^)]+)\)")
 MIN_LINE = 12  # shorter lines are punctuation/table rules and carry no instruction
 
+# Byte budgets for the docs a run reads EAGERLY, keyed by skill directory name. Each doc has its own
+# cap, and the group has a combined one: capping only per-file is gameable, since moving a paragraph
+# from one eagerly-read file to another satisfies both caps while costing a run exactly as much. Each
+# skill's own SKILL.md states these numbers — keep the two in step. Lazily-read files (reference/,
+# per-chart-type/) are deliberately unbudgeted: they cost only the run that needs them.
+BUDGETS: dict[str, dict[str, int]] = {
+    "create-figma-chart": {"SKILL.md": 62_000, "GUIDELINES.md": 80_000, "*": 140_000},
+    "create-static-viz": {"SKILL.md": 30_000, "TEMPLATES.md": 25_000},
+}
+
 
 def docs(skill_dir: Path) -> list[Path]:
     return sorted(p for p in skill_dir.rglob("*.md") if "__pycache__" not in p.parts)
@@ -52,6 +63,32 @@ def normalize(s: str) -> str:
     # value, and every such character breaks the verbatim run the wrapped-rewording fallback needs.
     s = s.replace("`", "").replace("**", "")
     return s
+
+
+def check_budgets(skill_dir: Path) -> list[str]:
+    """Report any eagerly-read doc, or the group, over its byte budget."""
+    budgets = BUDGETS.get(skill_dir.name)
+    if not budgets:
+        return []  # a skill with no declared budget is not a failure
+
+    findings = []
+    per_file = {name: cap for name, cap in budgets.items() if name != "*"}
+    total = 0
+    for name, cap in per_file.items():
+        doc = skill_dir / name
+        if not doc.exists():
+            findings.append(f"budget: {name} is budgeted but missing from {skill_dir.name}")
+            continue
+        size = doc.stat().st_size
+        total += size
+        if size > cap:
+            findings.append(f"over budget: {name} is {size:,} bytes, cap {cap:,} (+{size - cap:,})")
+
+    combined = budgets.get("*")
+    if combined is not None and len(per_file) > 1 and total > combined:
+        names = " + ".join(per_file)
+        findings.append(f"over budget: {names} together are {total:,} bytes, cap {combined:,} (+{total - combined:,})")
+    return findings
 
 
 def check_structure(skill_dir: Path) -> list[str]:
@@ -178,7 +215,7 @@ def check_against(ref: str, skill_dir: Path, repo_root: Path) -> list[str]:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--structure", action="store_true", help="check links and reachability")
+    ap.add_argument("--structure", action="store_true", help="check links, reachability and size budgets")
     ap.add_argument("--against", metavar="GIT_REF", help="check no instruction was dropped since GIT_REF")
     ap.add_argument(
         "--skill",
@@ -202,6 +239,7 @@ def main() -> int:
     findings = []
     if args.structure:
         findings += check_structure(skill_dir)
+        findings += check_budgets(skill_dir)
     if args.against:
         findings += check_against(args.against, skill_dir, repo_root)
 

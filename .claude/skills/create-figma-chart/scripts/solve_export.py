@@ -338,9 +338,25 @@ def main() -> int:
         except ValueError:
             ap.error(f"{flag} must look like 508x409")
             raise
+        # `math.isfinite` and not `a <= 0`: float() accepts 'nan' and 'inf', and neither is caught by
+        # a sign test — `nan <= 0` is False and so is `inf <= 0`. Both used to sail through and die
+        # ~90 lines later in `int(round(w / h * 1000))` as an uncaught traceback.
+        if not (math.isfinite(a) and math.isfinite(b)):
+            ap.error(f"{flag} must be two finite numbers, got {s!r}")
         if a <= 0 or b <= 0:
             ap.error(f"{flag} must be positive on both axes, got {a:g}x{b:g}")
         return a, b
+
+    # Same hole on every scalar float flag, and the same reason: a sign test cannot see a non-finite.
+    # Swept off the parser rather than a hand-kept list, so a float flag added later is covered
+    # without anyone remembering to add it here — the first draft of this guard named two flags that
+    # do not exist (`label_gap`, `font_size`) while missing four that do, which is exactly the
+    # failure a hardcoded list invites.
+    for action in ap._actions:
+        if action.type is float:
+            value = getattr(args, action.dest, None)
+            if value is not None and not math.isfinite(value):
+                ap.error(f"{action.option_strings[0]} must be finite, got {value}")
 
     bw, bh = pair(args.band, "--band")
     placed_w = args.placed_width or bw
