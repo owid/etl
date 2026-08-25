@@ -246,14 +246,29 @@ def _render_node(
         )
 
     counter = f'<span class="mdd-count">{node["changed"]}/{node["total"]}</span>' if changed else ""
+    # A section branch carries what used to be in the toolbar: which dimensions this MDim is cut by.
+    note = f'<span class="mdd-dims">{html.escape(node["note"])}</span>' if node.get("note") else ""
     children = "".join(_render_node(child, view_diffs, leaf_hrefs, leaf_badges) for child in node["children"])
     return (
         f'<div class="mdd-node mdd-n-{status}">'
         f'<div class="mdd-box mdd-branch mdd-{status}" role="button" title="Click to collapse/expand">'
-        f'<span class="mdd-caret">&#9662;</span>{html.escape(node["name"])}{counter}</div>'
+        f'<span class="mdd-caret">&#9662;</span>{html.escape(node["name"])}{counter}{note}</div>'
         f'<div class="mdd-children">{children}</div>'
         f"</div>"
     )
+
+
+def _offset_view_indices(nodes: list[dict[str, Any]], offset: int) -> list[dict[str, Any]]:
+    """Shift a section's leaf indices into the combined view list, non-destructively."""
+    out = []
+    for node in nodes:
+        copy = dict(node)
+        if "view_index" in copy:
+            copy["view_index"] += offset
+        if "children" in copy:
+            copy["children"] = _offset_view_indices(copy["children"], offset)
+        out.append(copy)
+    return out
 
 
 def _render_chart_branch(branch: dict[str, Any], preview_offset: int) -> tuple[str, list[str]]:
@@ -332,57 +347,127 @@ def render_tree_html(
     dimensions: list[dict[str, Any]],
     view_diffs: list[ViewDiff],
     leaf_hrefs: list[str] | None = None,
-    chart_branch: dict[str, Any] | None = None,
     external_impacts: list[dict[str, int]] | None = None,
     self_url: str = "",
+    chart_branch: dict[str, Any] | None = None,
 ) -> tuple[str, int]:
-    """Render the Blast Radius component. Returns (html, initial_height_px).
+    """One MDim's grid. Thin wrapper over `render_multi_tree_html`, which does the work."""
+    return render_multi_tree_html(
+        [
+            {
+                "catalog_path": catalog_path,
+                "dimensions": dimensions,
+                "view_diffs": view_diffs,
+                "leaf_hrefs": leaf_hrefs,
+                "external_impacts": external_impacts,
+            }
+        ],
+        chart_branch=chart_branch,
+        self_url=self_url,
+    )
 
-    The component resizes its own iframe to fit its content (collapse, filter), so the
-    returned height is only the initial estimate.
 
-    `external_impacts` (per view index) carries the count of charts / other MDIMs that share the
-    view's changed indicator, surfaced as a leaf marker and a preview line.
+def render_multi_tree_html(
+    sections: list[dict[str, Any]],
+    chart_branch: dict[str, Any] | None = None,
+    self_url: str = "",
+) -> tuple[str, int]:
+    """Render every affected MDim as a root branch of one tree, with the charts as another.
+
+    One component, not one per MDim: each component sizes its own iframe and would overlap whatever
+    follows it, so stacking them is not available. A section is
+    `{catalog_path, dimensions, view_diffs, leaf_hrefs, external_impacts}`; its leaf indices are shifted
+    into a combined view list so the hover previews, the badges and the "show all views" filter keep
+    working exactly as they do for a single grid.
+
+    Returns (html, initial_height_px). The component resizes itself to its content afterwards.
     """
-    tree = _build_tree(dimensions, view_diffs)
-    n_changed = sum(1 for v in view_diffs if v.changed)
-    impacts = external_impacts or [{} for _ in view_diffs]
+    all_views: list[ViewDiff] = []
+    all_hrefs: list[str] = []
+    all_badges: list[str] = []
+    previews: list[str] = []
+    section_nodes: list[dict[str, Any]] = []
+    any_external = False
 
-    # Legend: only show states that actually occur here (e.g. drop "New view" when nothing is new).
-    legend_items = [("#e8590c", "Changed")]
-    if any(v.is_new for v in view_diffs):
-        legend_items.append(("#1971c2", "New view"))
-    legend_items.append(("#d9d9d9", "No change"))
-    if any((imp.get("charts") or imp.get("mdims")) for imp in impacts):
+    for section in sections:
+        dimensions = section.get("dimensions") or []
+        view_diffs: list[ViewDiff] = section.get("view_diffs") or []
+        if not view_diffs:
+            continue
+        impacts = section.get("external_impacts") or [{} for _ in view_diffs]
+        any_external = any_external or any((i.get("charts") or i.get("mdims")) for i in impacts)
+        hrefs = section.get("leaf_hrefs")
+        if hrefs is None:
+            hrefs = [
+                self_url + "?" + urllib.parse.urlencode({"mdim": section.get("catalog_path", ""), **v.dimensions})
+                for v in view_diffs
+            ]
+
+        offset = len(all_views)
+        nodes = _offset_view_indices(_build_tree(dimensions, view_diffs), offset)
+        n_changed = sum(1 for v in view_diffs if v.changed)
+        section_nodes.append(
+            {
+                "name": str(section.get("catalog_path") or "MDim"),
+                "note": " → ".join(str(d.get("name") or d["slug"]) for d in dimensions),
+                "changed": n_changed,
+                "total": len(view_diffs),
+                "children": nodes,
+            }
+        )
+        all_views.extend(view_diffs)
+        all_hrefs.extend(hrefs)
+        all_badges.extend(_impact_badge(impacts[i]) for i in range(len(view_diffs)))
+        previews.extend(diff_preview_html(v) + _impact_preview_line(impacts[i]) for i, v in enumerate(view_diffs))
+
+    total_changed = sum(1 for v in all_views if v.changed)
+
+    legend_items = [("#ff922b", "Changed"), ("#d9d9d9", "No change")]
+    if any_external:
         legend_items.append(("#9c36b5", "&#8599; Affects charts/other MDims"))
     legend_html = "".join(
         f'<span><span class="mdd-dot" style="background:{color}"></span>{label}</span>' for color, label in legend_items
     )
 
-    previews = [diff_preview_html(v) + _impact_preview_line(impacts[i]) for i, v in enumerate(view_diffs)]
-    leaf_badges = [_impact_badge(impacts[i]) for i in range(len(view_diffs))]
-    # Supplied by the caller: this component cannot know the app's routing, and the URLs it used to build
-    # pointed at a per-view diff page that no longer exists. Absolute, so a link resolves against the site
-    # rather than the component iframe's own origin.
-    if leaf_hrefs is None:
-        leaf_hrefs = [
-            self_url + "?" + urllib.parse.urlencode({"mdim": catalog_path, **v.dimensions}) for v in view_diffs
-        ]
+    # A single section keeps its old shape: no outer branch to collapse, since there is nothing to
+    # compare it against. Several sections each become a collapsible root.
+    index_entries: list[tuple[str, str]] = []  # (anchor id, label) for the click-to-section index
+    if len(section_nodes) == 1:
+        body = "".join(_render_node(child, all_views, all_hrefs, all_badges) for child in section_nodes[0]["children"])
+        summary = f"<b>{total_changed}</b> of {len(all_views)} views changed"
+        dims_line = f'<div class="mdd-dims">Controls: {html.escape(section_nodes[0]["note"])}</div>'
+    else:
+        parts = []
+        for i, node in enumerate(section_nodes):
+            anchor = f"mdd-section-{i}"
+            index_entries.append((anchor, f"{node['name']} ({node['changed']}/{node['total']})"))
+            parts.append(f'<div id="{anchor}">{_render_node(node, all_views, all_hrefs, all_badges)}</div>')
+        body = "".join(parts)
+        summary = f"<b>{total_changed}</b> of {len(all_views)} views changed across <b>{len(section_nodes)}</b> MDims"
+        dims_line = '<div class="mdd-dims">Each MDim is a branch, cut by its own dimensions.</div>'
 
-    dim_names = " &#8594; ".join(html.escape(d.get("name") or d["slug"]) for d in dimensions)
-    body = "".join(_render_node(node, view_diffs, leaf_hrefs, leaf_badges) for node in tree)
-
-    # The charts, as a root sibling. Its previews extend the same array, so a chart leaf is a leaf.
     if chart_branch:
         chart_html, chart_previews = _render_chart_branch(chart_branch, len(previews))
-        body += chart_html
+        if chart_html:
+            n_charts = sum(len(g.get("charts") or []) for g in chart_branch.get("groups") or [])
+            index_entries.append(("mdd-section-charts", f"{chart_branch.get('label') or 'Charts'} ({n_charts})"))
+            body += f'<div id="mdd-section-charts">{chart_html}</div>'
         previews = previews + chart_previews
 
-    show_unchanged_default = "false" if n_changed else "true"
-    visible_leaves = n_changed if n_changed else len(view_diffs)
-    # +1 row for the collapsed charts branch, so the frame does not open a scrollbar for its header.
-    initial_height = min(MAX_HEIGHT_PX, 170 + (visible_leaves + (1 if chart_branch else 0)) * 38)
+    # The index only earns its row when there is more than one place to jump to.
+    index_html = ""
+    if len(index_entries) > 1:
+        links = " · ".join(
+            f'<a class="mdd-index-link" href="#" data-target="{anchor}">{html.escape(label)}</a>'
+            for anchor, label in index_entries
+        )
+        index_html = f'<div class="mdd-index">Jump to: {links}</div>'
 
+    show_unchanged_default = "false" if total_changed else "true"
+    visible_leaves = total_changed if total_changed else len(all_views)
+    # One row per section header, plus one for the collapsed charts branch.
+    extra_rows = len(section_nodes) + (1 if chart_branch else 0)
+    initial_height = min(MAX_HEIGHT_PX, 170 + (visible_leaves + extra_rows) * 38)
     return (
         f"""
 <div id="mdd-root" class="mdd-hide-unchanged">
@@ -395,6 +480,9 @@ def render_tree_html(
     #mdd-root .mdd-hint {{ color: #999; font-size: 12px; margin-bottom: 8px; }}
     #mdd-root .mdd-legend span {{ margin-right: 12px; }}
     #mdd-root .mdd-dot {{ display: inline-block; width: 10px; height: 10px; border-radius: 5px; margin-right: 4px; }}
+    #mdd-root .mdd-index {{ color: #555; }}
+    #mdd-root .mdd-index-link {{ color: #1c7ed6; text-decoration: none; }}
+    #mdd-root .mdd-index-link:hover {{ text-decoration: underline; }}
     #mdd-root .mdd-tree {{ overflow: auto; padding: 4px; }}
     #mdd-root .mdd-node {{ display: flex; align-items: flex-start; margin: 2px 0; }}
     #mdd-root .mdd-children {{ display: flex; flex-direction: column; border-left: 2px solid #e3e3e3;
@@ -433,8 +521,9 @@ def render_tree_html(
       <label><input type="checkbox" id="mdd-show-unchanged"> Show all views</label>
       <span class="mdd-legend">{legend_html}</span>
     </div>
-    <div class="mdd-dims">Controls: {dim_names}</div>
-    <div class="mdd-summary"><b>{n_changed}</b> of {len(view_diffs)} views changed</div>
+    {dims_line}
+    <div class="mdd-summary">{summary}</div>
+    {index_html}
   </div>
   <div class="mdd-hint">Hover over a view to preview its changes; click it to open the View diff in a
     new tab. Click a branch to collapse/expand it.</div>
@@ -471,6 +560,19 @@ def render_tree_html(
     }};
     checkbox.addEventListener("change", applyFilter);
     applyFilter();
+
+    root.querySelectorAll(".mdd-index-link").forEach(link => {{
+      link.addEventListener("click", (ev) => {{
+        ev.preventDefault();
+        const target = document.getElementById(link.dataset.target);
+        if (!target) return;
+        // Jumping to a collapsed section would show a closed box; open it first.
+        const node = target.querySelector(".mdd-node");
+        if (node) node.classList.remove("mdd-collapsed");
+        fit();
+        target.scrollIntoView({{behavior: "smooth", block: "start"}});
+      }});
+    }});
 
     root.querySelectorAll(".mdd-branch").forEach(box => {{
       box.addEventListener("click", () => {{

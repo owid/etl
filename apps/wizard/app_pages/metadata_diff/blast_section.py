@@ -41,12 +41,15 @@ from apps.wizard.app_pages.metadata_diff.render import (
     render_chart_list,
     view_impact,
 )
-from apps.wizard.app_pages.metadata_diff.tree import render_tree_html
+from apps.wizard.app_pages.metadata_diff.tree import render_multi_tree_html
 from apps.wizard.utils.components import url_persist
 
 GROUP_KEY = "blast-group"
 MAX_ROWS = 60
 KIND_ICON = {"chart": "📈", "draft_chart": "📝", "mdim": "🧩", "explorer": "🧭"}
+# MDims drawn on the grid at once. Each costs a view diff against the baseline, and past a handful the
+# canvas is unreadable anyway; the rest are named rather than silently dropped.
+MAX_TREE_MDIMS = 6
 
 
 def st_show_blast_radius(source_engine: Engine, target_engine: Engine) -> None:
@@ -234,11 +237,11 @@ def _by_surface(reach: list[ChangeReach]) -> None:
 
 
 def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[ChangeReach]) -> None:
-    """One affected MDim's views on its dimension grid — which views changed, and what sits beside them.
+    """Every affected MDim on its dimension grid, with the charts as one more branch.
 
-    The same component the per-MDim 💥 button opens, reachable without leaving the overview. One at a time:
-    it sizes its own iframe to its content, so stacked components overlap whatever follows them, and each
-    one costs that MDim's view diff.
+    One component holding all of them rather than one component each: a component sizes its own iframe and
+    would overlap whatever Streamlit renders after it, so they cannot be stacked. Its cost is one view
+    diff per MDim, which is why it stops at MAX_TREE_MDIMS and says so instead of drawing forever.
     """
     affected = sorted({str(m["catalogPath"]) for r in reach for m in r.mdims})
     if not affected:
@@ -247,50 +250,53 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
         _chart_reach(reach, badged=set())
         return
 
-    # View *changes*, not distinct views: two texts of one edit can land on the same view, and the reach
-    # model carries per-text counts rather than the views themselves. The tree itself reports the
-    # authoritative "N of M views changed" once it is drawn.
-    view_changes = {
-        cp: sum(m["n_views"] for r in reach for m in r.mdims if str(m["catalogPath"]) == cp) for cp in affected
-    }
     df = cached.mdim_changes(source_engine, target_engine)
+    shown, dropped = affected[:MAX_TREE_MDIMS], affected[MAX_TREE_MDIMS:]
 
-    def label(cp: str) -> str:
-        draft = " · unpublished" if cp in df.index and bool(df.loc[cp, "is_draft"]) else ""
-        return f"{cp} — {view_changes[cp]} view change(s){draft}"
+    sections, badged = [], set()
+    for catalog_path in shown:
+        row = df.loc[catalog_path] if catalog_path in df.index else None
+        cache_key = f"{row.get('configMd5_source')}-{row.get('configMd5_target')}" if row is not None else ""
+        dimensions, view_diffs = cached.mdim_view_diffs(catalog_path, source_engine, target_engine, cache_key=cache_key)
+        if not view_diffs:
+            continue
 
-    catalog_path = st.selectbox(
-        "MDim", options=affected, format_func=label, key="blast-tree-mdim", label_visibility="collapsed"
-    )
-    if not catalog_path:
+        ids = sorted({v.indicator_id for v in view_diffs if v.affects_indicator and v.indicator_id is not None})
+        usage = cached.usage_for_indicators(tuple(ids), catalog_path, source_engine, cache_key=cache_key)
+        # What this MDim's `↗ N charts` badges account for, union across every MDim drawn.
+        badged |= {c["chartId"] for v in view_diffs for c in view_impact(v, usage)[0]}
+
+        # Each leaf opens that view on this staging server — the view as a reader gets it, which is the
+        # question you have when you click one view out of fifty.
+        slug = str(row["slug_source"]) if row is not None and row.get("slug_source") else ""
+        draft = " · unpublished" if row is not None and bool(row.get("is_draft")) else ""
+        sections.append(
+            {
+                "catalog_path": f"{catalog_path}{draft}",
+                "dimensions": dimensions,
+                "view_diffs": view_diffs,
+                "leaf_hrefs": [
+                    f"{SOURCE.site}/grapher/{slug}?{urlencode(v.dimensions)}" if slug else "" for v in view_diffs
+                ],
+                "external_impacts": [impact_counts(v, usage) for v in view_diffs],
+            }
+        )
+
+    if not sections:
+        st.warning("The affected MDims have no views to draw.")
+        _chart_reach(reach, badged=set())
         return
 
-    row = df.loc[catalog_path] if catalog_path in df.index else None
-    cache_key = f"{row.get('configMd5_source')}-{row.get('configMd5_target')}" if row is not None else ""
-    dimensions, view_diffs = cached.mdim_view_diffs(catalog_path, source_engine, target_engine, cache_key=cache_key)
-    if not view_diffs:
-        st.warning("This MDim has no views.")
-        return
+    if dropped:
+        st.caption(
+            f"Drawing {len(sections)} of {len(affected)} affected MDims — each one costs a view diff. "
+            f"Not drawn: {', '.join(f'`{cp}`' for cp in dropped)}."
+        )
 
-    ids = sorted({v.indicator_id for v in view_diffs if v.affects_indicator and v.indicator_id is not None})
-    usage = cached.usage_for_indicators(tuple(ids), catalog_path, source_engine, cache_key=cache_key)
-
-    # What the grid's `↗ N charts` badges account for: charts using the indicator of a view whose change
-    # is in the shared indicator layer. Everything else this branch reaches is nowhere in the grid.
-    badged = {c["chartId"] for v in view_diffs for c in view_impact(v, usage)[0]}
-
-    # Each leaf opens that view on this staging server — the view as a reader gets it, which is the
-    # question you have when you click one view out of fifty.
-    slug = str(row["slug_source"]) if row is not None and row.get("slug_source") else ""
-    leaf_hrefs = [f"{SOURCE.site}/grapher/{slug}?{urlencode(v.dimensions)}" if slug else "" for v in view_diffs]
-    tree_html, height = render_tree_html(
-        catalog_path,
-        dimensions,
-        view_diffs,
-        leaf_hrefs=leaf_hrefs,
-        external_impacts=[impact_counts(v, usage) for v in view_diffs],
-        self_url=f"{SOURCE.wizard_url.rstrip('/')}/metadata-diff",
+    tree_html, height = render_multi_tree_html(
+        sections,
         chart_branch=_chart_branch(reach, badged),
+        self_url=f"{SOURCE.wizard_url.rstrip('/')}/metadata-diff",
     )
     # NOTE: nothing may be rendered below this — the component resizes itself to its content, and
     # Streamlit-rendered siblings would overlap during the resize.
