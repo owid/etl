@@ -157,6 +157,16 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > matches a ground's composite, and a canvas-coloured halo with some filled shape's box around it.
 > Both name the shape and the sum so the call can be made by eye.
 >
+> Two consequences that are easy to get wrong in the other direction. **Grounds stack**: a translucent
+> tint over an opaque plot background renders as the *ordered* composite of both, which equals neither
+> shape's own composite over the frame — so the row folds the candidates in paint order, and where they
+> overlap and nothing matches it **REVIEWS** instead of failing, because any subset of the stack is a
+> possible ground and a bounding box cannot say which. And **the tier branch knows about the ground
+> too**: "crosses nothing yet carries a knockout" is a FAIL on *bare canvas* only. An annotation inside
+> a tint keeps its halo while the region under it is still empty — that is the point
+> ANNOTATIONS-AND-ARROWS.md makes — so it is REVIEWED, and the FAIL stands only where no filled shape's
+> box contains the annotation at all.
+>
 > **Non-rendering means exactly zero, never a floor.** A node or paint at 0.005 does reach the canvas,
 > and a cutoff dropped its whole subtree from *every* row — an 8px label at 0.005 left `text-floor`
 > reporting that all of its ranges cleared the floor. Anything positive is **translucent**: held out of

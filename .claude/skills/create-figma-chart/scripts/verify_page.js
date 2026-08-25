@@ -1039,13 +1039,31 @@ const checkFrame = async (frameId) => {
         const paint = (n.strokes || []).find((s) => s && s.visible !== false && (s.opacity === undefined || s.opacity > 0));
         const hasStroke = !!paint && n.strokeWeight > 0;
         const crosses = crossings[a.name] || [];
+        // GROUND CANDIDATES: filled shapes whose box CONTAINS the annotation and which are not the
+        // frame's own backdrop — a full-bleed node composites to itself and would turn every correct
+        // canvas-coloured halo into a review. Computed HERE, not beside the colour test that consumes
+        // them, because the TIER branch immediately below needs them too.
+        const eps = 0.5;
+        const cands = (a.box ? grounds.filter((g) => g.box && g.name !== a.name
+          && !(g.box.l <= 0.5 && g.box.t <= 0.5 && g.box.rr >= fb.width - 0.5 && g.box.bb >= fb.height - 0.5)
+          && g.box.l <= a.box.l + eps && g.box.rr >= a.box.rr - eps
+          && g.box.t <= a.box.t + eps && g.box.bb >= a.box.bb - eps) : []);
         if (crosses.length && !hasStroke) {
           bad.push(`${a.name} crosses ${crosses.length} thing(s) (${crosses.slice(0, 3).join(", ")}) but carries NO knockout — CHECKS.md requires a 3px OUTSIDE stroke whenever furniture is crossed`);
           continue;
         }
+        // "Crosses nothing yet carries a knockout" is a FAIL on BARE CANVAS and only there. An
+        // annotation sitting on a TINT keeps its halo while the region under it is still empty, which is
+        // the whole point ANNOTATIONS-AND-ARROWS.md now makes: a region that is clear at this build
+        // stops being clear at the next data refresh, and the halo is what survives that. Failing it
+        // here contradicted the page, and did so BEFORE the colour test below ever ran — so a correct
+        // tint-coloured halo over an empty wedge was rejected without its colour being looked at.
         if (!crosses.length && hasStroke) {
-          bad.push(`${a.name} crosses nothing yet carries a ${r(n.strokeWeight)}px knockout — an annotation over empty space takes no stroke and no frame`);
-          continue;
+          if (!cands.length) {
+            bad.push(`${a.name} crosses nothing yet carries a ${r(n.strokeWeight)}px knockout — an annotation over empty space takes no stroke and no frame`);
+            continue;
+          }
+          unsure.push(`${a.name} crosses nothing yet carries a ${r(n.strokeWeight)}px knockout, which is a FAIL on bare canvas — but ${cands.length} filled shape(s) have a box containing it (${cands.slice(0, 3).map((g) => g.name).join(", ")}), and an annotation on a tint keeps its halo even where the tint is empty today (ANNOTATIONS-AND-ARROWS.md). The ground was matched by BOUNDING BOX, so confirm by eye that it really sits on that shading`);
         }
         // A knockout works by PAINTING the frame's colour over what it crosses, so a translucent one
         // does not do the job its 3px and OUTSIDE alignment are for: at 0.005 the crossing shows
@@ -1078,14 +1096,6 @@ const checkFrame = async (frameId) => {
         // ANNOTATIONS-AND-ARROWS.md, tier 1 is for a gradient or an image, where no colour can match.
         if (hasStroke && frameFill && paint.type === "SOLID") {
           const hex = hexOf(paint);
-          const eps = 0.5;
-          // A ground is a filled shape whose box CONTAINS the annotation and that is not the frame's
-          // own backdrop — a full-bleed node composites to itself and would turn every correct
-          // canvas-coloured halo into a review.
-          const cands = (a.box ? grounds.filter((g) => g.box && g.name !== a.name
-            && !(g.box.l <= 0.5 && g.box.t <= 0.5 && g.box.rr >= fb.width - 0.5 && g.box.bb >= fb.height - 0.5)
-            && g.box.l <= a.box.l + eps && g.box.rr >= a.box.rr - eps
-            && g.box.t <= a.box.t + eps && g.box.bb >= a.box.bb - eps) : []);
           if (hex.toLowerCase() === frameFill.toLowerCase()) {
             // Right colour for a bare canvas, and the defect ANNOTATIONS-AND-ARROWS.md describes the
             // moment the annotation is actually over shading. The bbox cannot settle which, so this is
@@ -1096,8 +1106,23 @@ const checkFrame = async (frameId) => {
             }
           } else {
             const hit = cands.find((g) => composite(g.hex, g.alpha, frameFill).toLowerCase() === hex.toLowerCase());
+            // Grounds STACK, and a lone ground is the easy case rather than the general one. A
+            // translucent tint laid over an opaque plot background renders as the ORDERED composite of
+            // both, which equals neither shape's own composite over the frame — so testing the
+            // candidates only one at a time called a correct halo a FAIL. `collect` walks children
+            // back-to-front, the order Figma paints them, so folding the candidates in the order they
+            // were found reproduces the stack.
+            const stacked = cands.reduce((acc, g) => composite(g.hex, g.alpha, acc), frameFill);
             if (hit) {
               unsure.push(`${a.name} knockout is ${hex} rather than the frame's ${frameFill}, which is what ANNOTATIONS-AND-ARROWS.md asks for when the annotation sits on a tint: it is ${hit.name}'s ${hit.hex} at alpha ${r(hit.alpha)} composited over ${frameFill}. NOT certified — the ground was matched by BOUNDING BOX, so confirm by eye that the annotation is really over the shading`);
+            } else if (cands.length > 1 && stacked.toLowerCase() === hex.toLowerCase()) {
+              unsure.push(`${a.name} knockout is ${hex}, which is the ${cands.length} grounds behind it composited in paint order over ${frameFill} (${cands.map((g) => `${g.name} ${g.hex} at ${r(g.alpha)}`).join(" then ")}) — what ANNOTATIONS-AND-ARROWS.md asks for. NOT certified: the grounds were matched by BOUNDING BOX, so confirm by eye that the annotation is over all of them`);
+            } else if (cands.length > 1) {
+              // Overlapping grounds, and the bbox cannot say WHICH of them the annotation's ink
+              // actually sits on — any subset of the stack is a possible ground, and enumerating them
+              // is exactly the geometry problem this row already declines. A wrong colour and a right
+              // one against a subset are indistinguishable from here, so it is raised, not rejected.
+              unsure.push(`${a.name} knockout is ${hex}, which matches neither the frame's ${frameFill}, nor any single ground behind it, nor all ${cands.length} of them stacked (${stacked}). Which of the overlapping grounds it actually sits on cannot be settled from BOUNDING BOXES, so this is raised rather than failed — check it by eye against ${cands.slice(0, 3).map((g) => `${g.name} -> ${composite(g.hex, g.alpha, frameFill)}`).join(", ")}`);
             } else {
               bad.push(`${a.name} knockout is ${hex}, which is neither the frame's own ${frameFill} nor the composite of any ground behind it — read the colour off what is behind THIS annotation, never hardcode white. `
                 + (cands.length

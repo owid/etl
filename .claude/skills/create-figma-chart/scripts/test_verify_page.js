@@ -217,6 +217,11 @@ function buildFrame(opts = {}) {
   // `ungrouped` models the documented rework case: the chart GROUP is gone and its subgroups sit as
   // direct frame children, so CONFIG.chartName resolves nothing and the fallback has to find the plot.
   const children = opts.ungrouped ? [header, footer, logo, ...kids] : [header, footer, logo, chart];
+  // An OPAQUE layer UNDER the tint — a plot background — pushed first so it sits at the bottom of the
+  // stack. With both present the ground behind the annotation is the ORDERED composite of the two, which
+  // equals neither shape's own composite over the frame.
+  if (opts.tintBase) children.push(node({ type: "RECTANGLE", name: "plot-background", x: 80, y: 180,
+    width: 220, height: 80, fills: solid(opts.tintBase) }));
   // A shaded region behind the annotation — the shape whose COMPOSITE the knockout has to match.
   // `tintOpacity` sits on the node, which is where this skill's own wedge carries it; the halo must
   // match `tint over frameFill`, never the raw `tint`.
@@ -452,6 +457,48 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     // the shading, not fire on every annotation.
     const bare = row(await run(buildFrame({ annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {}), "annotation-knockout");
     check("6d and a canvas halo on bare canvas is still ok", bare.status === "ok", bare.detail);
+  }
+
+  // 6e — the TIER branch has to know about the ground too. An annotation inside a tint that happens to
+  //      cross no gridline hit `!crosses.length && hasStroke` and FAILED as "over empty space" before
+  //      the colour test ever ran — which is the opposite of what ANNOTATIONS-AND-ARROWS.md now says:
+  //      the halo stays on a tint precisely because a region that is clear today fills at the next
+  //      refresh. Test 5 above is the control that keeps the FAIL alive on genuinely bare canvas.
+  {
+    // y=205..223 clears the gridlines at 200/300/360/460 and both series segments, so nothing is crossed.
+    const clear = (extra) => buildFrame(Object.assign({ tint: "#dddddd", tintOpacity: 0.45,
+      annotation: annotation({ x: 100, y: 205, w: 120, h: 18, stroke: "#f0f0f0", strokeWeight: 3 }) }, extra || {}));
+    const t = row(await run(clear(), {}), "annotation-knockout");
+    check("6e a halo on an EMPTY tint is not failed as 'over empty space'", t.status !== "FAIL", t.detail);
+    check("6e and it is REVIEWED, naming the tint that earns the halo",
+          t.status === "REVIEW" && /keeps its halo even where the tint is empty/.test(t.detail), t.detail);
+  }
+
+  // 6f — grounds STACK. A translucent tint over an opaque plot background renders as the ordered
+  //      composite of both; compositing each candidate over the FRAME instead matches neither, and a
+  //      correct halo came back FAIL.
+  {
+    // #dddddd at 45% over #eeeeee is #e6e6e6. Over the frame's white it would be #f0f0f0, and the base
+    // alone is #eeeeee — so a per-candidate test rejects the one colour the reader actually sees.
+    const stack = (stroke) => buildFrame({ tint: "#dddddd", tintOpacity: 0.45, tintBase: "#eeeeee",
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke, strokeWeight: 3 }) });
+
+    const ok = row(await run(stack("#e6e6e6"), {}), "annotation-knockout");
+    check("6f a halo matching the STACKED ground does not FAIL", ok.status !== "FAIL", ok.detail);
+    check("6f and it names the paint order it folded",
+          ok.status === "REVIEW" && /composited in paint order/.test(ok.detail)
+          && /plot-background/.test(ok.detail) && /wedge__below/.test(ok.detail), ok.detail);
+
+    // Matching nothing is still not a FAIL once the grounds overlap: any SUBSET of the stack is a
+    // possible ground and bounding boxes cannot say which, so the call goes to a human.
+    const miss = row(await run(stack("#123456"), {}), "annotation-knockout");
+    check("6f overlapping grounds downgrade an unmatched halo to REVIEW", miss.status === "REVIEW", miss.detail);
+    check("6f and it says why it cannot decide", /cannot be settled from BOUNDING BOXES/.test(miss.detail), miss.detail);
+
+    // ...and with a SINGLE ground there is nothing to be ambiguous about, so the FAIL stands.
+    const one = row(await run(buildFrame({ tint: "#dddddd", tintOpacity: 0.45,
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#123456", strokeWeight: 3 }) }), {}), "annotation-knockout");
+    check("6f but a single ground still FAILS an unmatched halo", one.status === "FAIL", one.detail);
   }
 
   // 7 — crossing a MUTED context line is legal under the highlight treatment (review finding 4).
