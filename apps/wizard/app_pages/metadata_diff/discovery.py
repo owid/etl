@@ -806,20 +806,23 @@ def charts_affected(source_engine: Engine, changed: IndicatorChanges) -> dict[in
 
 
 def mdim_list(engine: Engine) -> pd.DataFrame:
-    """Every MDim with its config hash, publication state and slug (most recently updated first).
+    """Every MDim with its config hash, publication state, slug and title (most recently updated first).
 
-    `config` is deliberately excluded: it is a large JSON blob, and selecting it alongside
-    `order by updatedAt` makes MySQL sort rows carrying those blobs, which overruns the sort buffer.
+    Sorted in pandas, not in SQL. Touching `config` at all — even to extract the title scalar with `->>` —
+    puts the row's JSON in MySQL's sort set, and `order by updatedAt desc` over that overruns the sort
+    buffer outright ("Out of sort memory"). Measured, not assumed: the earlier version of this query with
+    both the extraction and the ORDER BY failed against a real server.
     """
-    return read_sql(
+    df = read_sql(
         """
-        select catalogPath, configMd5, published, slug
+        select catalogPath, configMd5, published, slug, updatedAt,
+               coalesce(config ->> '$.title.title', config ->> '$.title') as title
         from multi_dim_data_pages
         where catalogPath is not null
-        order by updatedAt desc
         """,
         engine=engine,
     )
+    return df.sort_values("updatedAt", ascending=False).drop(columns=["updatedAt"])
 
 
 def mdim_indicator_paths(source_engine: Engine, configs: dict[str, dict[str, Any]]) -> dict[str, set[str]]:
@@ -1398,6 +1401,31 @@ def change_identity(g: ChangeGroup) -> tuple[str, str]:
     return (g.field, json.dumps([g.old, g.new], sort_keys=True, default=str))
 
 
+def _mdim_reach(catalog_path: str, g: ChangeGroup, df_mdims: "pd.DataFrame", is_draft: bool) -> dict[str, Any]:
+    """One MDim's entry in a change's reach: what to call it, where its views live, and which they are.
+
+    `title` and `slug` come from the MDim list, so the detail views can use the same naming as the
+    dimension grid and link each view to the page a reader would open. `views` carries the dimension dicts
+    rather than a count, because a link needs them and a count can be derived.
+    """
+    row = df_mdims.loc[catalog_path] if catalog_path in df_mdims.index else None
+
+    def field(name: str) -> str:
+        if row is None:
+            return ""
+        value = row.get(f"{name}_source", row.get(name))
+        return "" if value is None or value != value else str(value)  # NaN-safe
+
+    return {
+        "catalogPath": catalog_path,
+        "title": field("title") or catalog_path,
+        "slug": field("slug"),
+        "n_views": len(g.view_dims),
+        "views": [dict(d) for d in g.view_dims],
+        "is_draft": is_draft,
+    }
+
+
 def _reach_slot(reach: dict[tuple[str, str], ChangeReach], g: ChangeGroup) -> ChangeReach:
     """The blast-radius row for this change, creating it on first sight of the text."""
     key = change_identity(g)
@@ -1604,9 +1632,7 @@ def summarize(
                         (mdim_surface, *mark_identity(mdim_surface, g)) for g in ours
                     )
                     for g in ours:
-                        _reach_slot(reach, g).mdims.append(
-                            {"catalogPath": cp, "n_views": len(g.view_dims), "is_draft": False}
-                        )
+                        _reach_slot(reach, g).mdims.append(_mdim_reach(cp, g, df_mdims, is_draft=False))
         # Drafts are counted only where they actually have changed text, same test as the rest.
         if len(drafts) > MAX_MDIMS_RESOLVED:
             # Too many to diff view by view. Report the flag count as a ceiling and say so, rather than
@@ -1620,9 +1646,7 @@ def summarize(
                 if draft_groups:
                     summary.n_draft_mdims += 1
                     for g in draft_groups:
-                        _reach_slot(reach, g).mdims.append(
-                            {"catalogPath": cp, "n_views": len(g.view_dims), "is_draft": True}
-                        )
+                        _reach_slot(reach, g).mdims.append(_mdim_reach(cp, g, df_mdims, is_draft=True))
     except Exception as e:  # noqa: BLE001
         log.warning("metadata_diff.mdim_discovery_failed", error=str(e))
         summary.warnings.append(f"MDim discovery failed: {e}")
