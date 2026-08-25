@@ -157,7 +157,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > matches a ground's composite, and a canvas-coloured halo with some filled shape's box around it.
 > Both name the shape and the sum so the call can be made by eye.
 >
-> Four consequences that are easy to get wrong in the other direction.
+> Five consequences that are easy to get wrong in the other direction.
 >
 > **Grounds stack, and so do a single node's fills.** A translucent tint over an opaque plot background
 > renders as the *ordered* composite of both, which equals neither shape's own composite over the
@@ -166,6 +166,17 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > effective colour and alpha, then the candidates over each other in paint order — and where candidates
 > overlap and nothing matches it **REVIEWS** instead of failing, because any subset of the stack is a
 > possible ground and a bounding box cannot say which.
+>
+> **Where the answer depends on something this script cannot establish, it declines instead of
+> guessing.** Folding a node's fills needs to know which end of `fills` is the top, and nothing we rely
+> on states it — the harness can only encode whatever the script assumes, so it cannot referee. Getting
+> it backwards fails a correct halo, or blesses a colour that is nowhere on the canvas. So the stack is
+> folded **both ways** and asserted only where the two agree: every single-fill ground, and any stack
+> the order does not change. Where they disagree — and where a paint has no single colour at all, a
+> gradient or an image — the ground is declared **NOT measurable** and named, the same treatment a
+> translucent mark and a sequential ramp already get. It was worth doing: before this, a ground that
+> was a solid *plus a gradient* dropped the gradient silently and the row certified the solid base as
+> "the colour ANNOTATIONS-AND-ARROWS.md asks for", on a ground that page puts on tier 1.
 >
 > **Only what is painted *under* the annotation is behind it.** A containing shape appended *after* the
 > annotation sits on top of it — the re-import z-order bug this page describes further down, where a

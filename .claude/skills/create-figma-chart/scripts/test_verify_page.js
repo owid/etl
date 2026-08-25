@@ -548,22 +548,53 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     check("6h and that is still reported as crossing nothing", /crosses nothing/.test(needless.detail), needless.detail);
   }
 
-  // 6i — a ground node with SEVERAL visible fills renders their ordered composite. Reading only the
-  //      first paint reported a colour that is not on the canvas, and failed the halo that matched
-  //      the one that is.
+  // 6i — a ground node with SEVERAL visible fills renders their ordered composite, and reading only
+  //      the first paint reports a colour that is not on the canvas. But folding them needs to know
+  //      which end of `fills` is the top, and nothing available to this script establishes that — so
+  //      where the order changes the answer the ground is declared UNMEASURABLE rather than guessed.
+  //      Guessing it backwards would fail a correct halo, or bless one that is nowhere on the canvas.
   {
-    // #ff0000, then #ffffff at 50% on top of it, on a fully opaque node: [255, 127.5, 127.5] -> #ff8080.
-    const twoFills = (stroke) => buildFrame({ tintOpacity: 1,
+    // #ff0000 and #ffffff at 50%: one order renders #ff8080, the other plain #ff0000. Both are
+    // reachable readings of the same node, so neither may be asserted.
+    const ambiguous = (stroke) => buildFrame({ tintOpacity: 1,
       tintFills: [solid("#ff0000")[0], Object.assign({}, solid("#ffffff")[0], { opacity: 0.5 })],
       annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke, strokeWeight: 3 }) });
 
-    const both = row(await run(twoFills("#ff8080"), {}), "annotation-knockout");
-    check("6i a halo matching ALL the ground's fills does not FAIL", both.status !== "FAIL", both.detail);
-    check("6i and the sum it accepted is the composited one", /#ff8080/.test(both.detail), both.detail);
+    for (const stroke of ["#ff8080", "#ff0000"]) {
+      const amb = row(await run(ambiguous(stroke), {}), "annotation-knockout");
+      check(`6i an order-dependent ground does not FAIL a ${stroke} halo`, amb.status !== "FAIL", amb.detail);
+      check(`6i and it says the ORDER is what it cannot settle (${stroke})`,
+            /ORDER decides the colour/.test(amb.detail), amb.detail);
+      check(`6i and it never certifies either reading (${stroke})`,
+            !/asks for when the annotation sits on a tint/.test(amb.detail), amb.detail);
+    }
 
-    // The first paint alone is the old wrong answer, and is not a colour the reader sees.
-    const first = row(await run(twoFills("#ff0000"), {}), "annotation-knockout");
-    check("6i a halo matching only the FIRST fill still FAILS", first.status === "FAIL", first.detail);
+    // Where the order does NOT change the answer there is nothing to decline, and the ground is
+    // measured as usual — which is every single-fill ground on every real frame.
+    const stable = row(await run(buildFrame({ tintOpacity: 1,
+      tintFills: [solid("#dddddd")[0], Object.assign({}, solid("#dddddd")[0], { opacity: 0.5 })],
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#dddddd", strokeWeight: 3 }) }), {}),
+      "annotation-knockout");
+    check("6i an order-INDEPENDENT stack is still measured", stable.status === "REVIEW", stable.detail);
+    check("6i and is not declared unmeasurable", !/NOT measurable/.test(stable.detail), stable.detail);
+  }
+
+  // 6j — a ground combining a solid with a gradient or image has no single colour. The solid passed
+  //      the SOLID-only paint filter and every other paint was silently dropped, so the row could
+  //      describe a halo matching the solid base as the colour the doc asks for — on a ground the
+  //      doc actually assigns to tier 1.
+  {
+    const gradient = { type: "GRADIENT_LINEAR", visible: true };
+    const mixed = row(await run(buildFrame({ tintOpacity: 1,
+      tintFills: [solid("#ff0000")[0], gradient],
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ff0000", strokeWeight: 3 }) }), {}),
+      "annotation-knockout");
+    check("6j a gradient over a solid is not FAILED", mixed.status !== "FAIL", mixed.detail);
+    check("6j and the gradient is named as why it cannot be measured",
+          /GRADIENT_LINEAR/.test(mixed.detail) && /no single colour/.test(mixed.detail), mixed.detail);
+    check("6j and the solid base is not blessed as the requested ground",
+          !/asks for when the annotation sits on a tint/.test(mixed.detail), mixed.detail);
+    check("6j and it points at tier 1", /tier 1/.test(mixed.detail), mixed.detail);
   }
 
   // 7 — crossing a MUTED context line is legal under the highlight treatment (review finding 4).

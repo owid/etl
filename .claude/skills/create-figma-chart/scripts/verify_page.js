@@ -94,8 +94,8 @@ const hexOf = (f) => (f && f.type === "SOLID"
 // remove, and it does not become acceptable because the subset is faint. Anything positive is
 // TRANSLUCENT: held out of the palette, named, and still judged by every row that is about geometry
 // rather than colour.
-const renders = (p) => !!p && p.type === "SOLID" && p.visible !== false
-                       && (p.opacity === undefined || p.opacity > 0);
+const paints = (p) => !!p && p.visible !== false && (p.opacity === undefined || p.opacity > 0);
+const renders = (p) => paints(p) && p.type === "SOLID";
 // PARTIAL opacity is a different problem from zero, and it is not solved by dropping the node: the mark
 // IS on the canvas, so it still has a box, still blocks an annotation, still needs its stroke weight
 // judged. What it does NOT have is a reportable COLOUR. `hexOf` returns the paint's raw RGB, and what
@@ -122,24 +122,38 @@ const composite = (hex, alpha, over) => {
   const f = chOf(hex), b = chOf(over);
   return hexFrom([0, 1, 2].map((i) => a * f[i] + (1 - a) * b[i]));
 };
-// A node's own fills composite among THEMSELVES before the node composites over anything else. Reading
-// only the first rendering paint reported a colour the reader never sees, and failed a halo that
-// matched the one they do. Folded back-to-front — the order `fills` carries, the same order `children`
-// uses — into a PREMULTIPLIED (C, A) pair, with the node's opacity applied to the RESULT rather than to
-// each paint, which is where it actually sits. `hex`/`alpha` are the single-paint equivalent of that
-// pair: exact for compositing, and readable in a verdict.
+// A node's own fills composite among THEMSELVES before the node composites over anything else, so
+// reading only the first rendering paint reports a colour the reader never sees. Folding them needs
+// their ORDER, and which end of `fills` is the top is NOT something this script can establish: nothing
+// in Figma's docs that we rely on states it, the mock can only encode whatever we assume, and getting
+// it backwards turns a correct halo into a FAIL — or, worse, blesses a colour that is nowhere on the
+// canvas. So the stack is folded BOTH ways and the answer is asserted only where the two agree, which
+// is every single-fill ground and any stack the order does not change. Where they disagree, and where a
+// paint has no single colour at all (a gradient or an image — tier 1 in ANNOTATIONS-AND-ARROWS.md, and
+// silently skipped here before), the ground is declared UNMEASURABLE and named, the same treatment a
+// translucent mark and a sequential ramp already get.
 const flattenFills = (fills, nodeOpacity) => {
-  let C = [0, 0, 0], A = 0;
-  for (const f of fills) {
-    if (!renders(f)) continue;
-    const a = Math.max(0, Math.min(1, f.opacity === undefined ? 1 : f.opacity));
-    const c = [f.color.r * 255, f.color.g * 255, f.color.b * 255];
-    C = [0, 1, 2].map((i) => c[i] * a + C[i] * (1 - a));
-    A = a + A * (1 - a);
-  }
-  C = C.map((x) => x * nodeOpacity);
-  A = A * nodeOpacity;
-  return { C, A, hex: A > 0 ? hexFrom(C.map((x) => x / A)) : null, alpha: A };
+  const visible = fills.filter(paints);
+  const solids = visible.filter((f) => f.type === "SOLID");
+  const others = [...new Set(visible.filter((f) => f.type !== "SOLID").map((f) => f.type))];
+  const fold = (list) => {
+    let C = [0, 0, 0], A = 0;
+    for (const f of list) {
+      const a = Math.max(0, Math.min(1, f.opacity === undefined ? 1 : f.opacity));
+      const c = [f.color.r * 255, f.color.g * 255, f.color.b * 255];
+      C = [0, 1, 2].map((i) => c[i] * a + C[i] * (1 - a));
+      A = a + A * (1 - a);
+    }
+    return { C: C.map((x) => x * nodeOpacity), A: A * nodeOpacity };
+  };
+  const fwd = fold(solids), rev = fold(solids.slice().reverse());
+  const agree = Math.abs(fwd.A - rev.A) < 0.002
+                && [0, 1, 2].every((i) => Math.abs(fwd.C[i] - rev.C[i]) < 0.5);
+  const unmeasurable = others.length
+    ? `carries a ${others.join("/")} paint, which has no single colour`
+    : (!agree ? `stacks ${solids.length} fills whose ORDER decides the colour, and this script cannot establish which end of \`fills\` is on top` : null);
+  return { C: fwd.C, A: fwd.A, hex: fwd.A > 0 ? hexFrom(fwd.C.map((x) => x / fwd.A)) : null,
+           alpha: fwd.A, unmeasurable, hasPaint: visible.length > 0 };
 };
 // What a ground actually paints when it is laid over a given base.
 const groundOver = (g, base) => hexFrom(chOf(base).map((b, i) => g.C[i] + (1 - g.A) * b));
@@ -404,9 +418,10 @@ const checkFrame = async (frameId) => {
       for (const f of n.fills) {
         if (renders(f)) fills.push({ name: n.name, type: n.type, hex: hexOf(f), styleId: n.fillStyleId || "", insidePlot });
       }
-      if (n.type !== "TEXT" && !/^annotation__/.test(n.name) && n.fills.some((f) => renders(f))) {
+      if (n.type !== "TEXT" && !/^annotation__/.test(n.name) && n.fills.some(paints)) {
         const g = flattenFills(n.fills, nodeOpacity);
-        if (g.A > 0) grounds.push({ name: n.name, box: areaBox, order: paintOrder++, C: g.C, A: g.A, hex: g.hex, alpha: g.alpha });
+        if (g.A > 0 || g.unmeasurable) grounds.push({ name: n.name, box: areaBox, order: paintOrder++,
+          C: g.C, A: g.A, hex: g.hex, alpha: g.alpha, unmeasurable: g.unmeasurable });
       }
     }
     // Marker groups and value labels. The NAME is on the group and the GEOMETRY is on its children, and
@@ -1090,6 +1105,10 @@ const checkFrame = async (frameId) => {
         // it a halo? — and a full-bleed backdrop is the canvas whatever colour it paints. So it never
         // excuses a halo over empty space; only a bounded shape does.
         const tints = cands.filter((g) => !fullBleed(g));
+        // A ground whose colour cannot be established still occupies the box, so it is named in every
+        // verdict — it just never certifies or rejects a halo.
+        const vague = cands.filter((g) => g.unmeasurable);
+        const label = (g) => (g.unmeasurable ? `${g.name} (NOT measurable — it ${g.unmeasurable})` : `${g.name} -> ${groundOver(g, frameFill)}`);
         if (crosses.length && !hasStroke) {
           bad.push(`${a.name} crosses ${crosses.length} thing(s) (${crosses.slice(0, 3).join(", ")}) but carries NO knockout — CHECKS.md requires a 3px OUTSIDE stroke whenever furniture is crossed`);
           continue;
@@ -1144,27 +1163,32 @@ const checkFrame = async (frameId) => {
             // raised rather than passed — a white outline around every letter is exactly what a
             // reviewer sees and this row never used to mention.
             if (cands.length) {
-              unsure.push(`${a.name} knockout is the frame's ${frameFill}, which is right on bare canvas — but ${cands.length} filled shape(s) have a box containing it (${cands.slice(0, 3).map((g) => `${g.name} -> ${groundOver(g, frameFill)}`).join(", ")}). If it really sits on that shading the halo reads as a white outline around every letter and should be the composite instead (ANNOTATIONS-AND-ARROWS.md)`);
+              unsure.push(`${a.name} knockout is the frame's ${frameFill}, which is right on bare canvas — but ${cands.length} filled shape(s) have a box containing it (${cands.slice(0, 3).map(label).join(", ")}). If it really sits on that shading the halo reads as a white outline around every letter and should be the composite instead (ANNOTATIONS-AND-ARROWS.md)`);
             }
           } else {
-            const hit = cands.find((g) => groundOver(g, frameFill).toLowerCase() === hex.toLowerCase());
+            const hit = cands.find((g) => !g.unmeasurable && groundOver(g, frameFill).toLowerCase() === hex.toLowerCase());
             // Grounds STACK, and a lone ground is the easy case rather than the general one. A
             // translucent tint laid over an opaque plot background renders as the ORDERED composite of
             // both, which equals neither shape's own composite over the frame — so testing the
             // candidates only one at a time called a correct halo a FAIL. `collect` walks children
             // back-to-front, the order Figma paints them, so folding the candidates in the order they
             // were found reproduces the stack.
-            const stacked = cands.reduce((acc, g) => groundOver(g, acc), frameFill);
+            const stacked = vague.length ? null : cands.reduce((acc, g) => groundOver(g, acc), frameFill);
             if (hit) {
               unsure.push(`${a.name} knockout is ${hex} rather than the frame's ${frameFill}, which is what ANNOTATIONS-AND-ARROWS.md asks for when the annotation sits on a tint: it is ${hit.name}'s ${hit.hex} at alpha ${r(hit.alpha)} composited over ${frameFill}. NOT certified — the ground was matched by BOUNDING BOX, so confirm by eye that the annotation is really over the shading`);
-            } else if (cands.length > 1 && stacked.toLowerCase() === hex.toLowerCase()) {
+            } else if (cands.length > 1 && stacked && stacked.toLowerCase() === hex.toLowerCase()) {
               unsure.push(`${a.name} knockout is ${hex}, which is the ${cands.length} grounds behind it composited in paint order over ${frameFill} (${cands.map((g) => `${g.name} ${g.hex} at ${r(g.alpha)}`).join(" then ")}) — what ANNOTATIONS-AND-ARROWS.md asks for. NOT certified: the grounds were matched by BOUNDING BOX, so confirm by eye that the annotation is over all of them`);
+            } else if (vague.length) {
+              // Neither certified nor rejected: the ground behind this annotation has no single colour
+              // this script can name, so any verdict on the halo's colour would be invented. Named so
+              // the reader can settle it on the canvas, which is the only place the answer exists.
+              unsure.push(`${a.name} knockout is ${hex}, and the ground behind it cannot be measured from here: ${vague.slice(0, 3).map(label).join(", ")}. Judge this halo by eye — and if that ground is a gradient or an image, ANNOTATIONS-AND-ARROWS.md puts the annotation on tier 1, because no single colour can match it`);
             } else if (cands.length > 1) {
               // Overlapping grounds, and the bbox cannot say WHICH of them the annotation's ink
               // actually sits on — any subset of the stack is a possible ground, and enumerating them
               // is exactly the geometry problem this row already declines. A wrong colour and a right
               // one against a subset are indistinguishable from here, so it is raised, not rejected.
-              unsure.push(`${a.name} knockout is ${hex}, which matches neither the frame's ${frameFill}, nor any single ground behind it, nor all ${cands.length} of them stacked (${stacked}). Which of the overlapping grounds it actually sits on cannot be settled from BOUNDING BOXES, so this is raised rather than failed — check it by eye against ${cands.slice(0, 3).map((g) => `${g.name} -> ${groundOver(g, frameFill)}`).join(", ")}`);
+              unsure.push(`${a.name} knockout is ${hex}, which matches neither the frame's ${frameFill}, nor any single ground behind it, nor all ${cands.length} of them stacked (${stacked}). Which of the overlapping grounds it actually sits on cannot be settled from BOUNDING BOXES, so this is raised rather than failed — check it by eye against ${cands.slice(0, 3).map(label).join(", ")}`);
             } else {
               bad.push(`${a.name} knockout is ${hex}, which is neither the frame's own ${frameFill} nor the composite of any ground behind it — read the colour off what is behind THIS annotation, never hardcode white. `
                 + (cands.length
