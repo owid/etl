@@ -836,9 +836,9 @@ SECTIONS = {
 # Sections whose badge counts reviewed changes. Blast radius holds no sign-off of its own — it reports
 # reach — so a counter there would read as "nothing to review" when it means "nothing to count".
 COUNTED_SECTIONS = frozenset({"charts", "mdims", "explorers"})
-# The landing section stays Charts: that is where the review work happens, and changing where the page
-# opens would move everyone's habit for the sake of the new view's prominence in the bar.
-DEFAULT_SECTION = "charts"
+# The page opens on Blast radius: the first question about a branch is how far its edits go, and the three
+# review sections are where you go once you know. It is also the section the URL omits when it is current.
+DEFAULT_SECTION = "blast"
 
 
 def section_label(section: str, progress: dict[str, tuple[int, int]]) -> str:

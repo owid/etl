@@ -406,12 +406,14 @@ def _render_section(
     trees = "".join(_render_node(child, all_views, all_hrefs, all_badges) for child in node["children"])
     return (
         f'<div id="{anchor}" class="mdd-section mdd-cols{hide}">'
-        f'<div class="mdd-sec-title">{html.escape(node["title"])}{counter}</div>'
+        f'<div class="mdd-sec-title mdd-sec-toggle" role="button" title="Click to collapse/expand this MDim">'
+        f'<span class="mdd-caret">&#9662;</span>{html.escape(node["title"])}{counter}</div>'
         f"{subtitle}"
+        f'<div class="mdd-sec-body">'
         f'<div class="mdd-sec-toolbar">'
         f'<label><input type="checkbox" class="mdd-sec-check"{checked}> Show all views</label>'
         f'<span class="mdd-legend">{_legend_html(node["has_external"])}</span></div>'
-        f"{_column_heads(node['dims'])}{trees}</div>"
+        f"{_column_heads(node['dims'])}{trees}</div></div>"
     )
 
 
@@ -481,15 +483,15 @@ def render_multi_tree_html(
         parts.append(_render_section(node, anchor, all_views, all_hrefs, all_badges))
     body = ""
     if parts:
-        # The MDims as one hierarchy: a header over the individual sections, Charts as its sibling.
+        # The MDims as one hierarchy: a header over the individual sections, Charts as its sibling. The
+        # view total lives here — the toolbar used to repeat what the index rows already say per section.
+        plural = "s" if len(section_nodes) != 1 else ""
         head = (
             f'<div class="mdd-super-title">MDims'
-            f'<span class="mdd-count">{len(section_nodes)} MDim{"s" if len(section_nodes) != 1 else ""}</span></div>'
+            f'<span class="mdd-count">{len(section_nodes)} MDim{plural}'
+            f" · {total_changed} of {len(all_views)} views changed</span></div>"
         )
         body = f'<div class="mdd-super">{head}<div class="mdd-super-children">{"".join(parts)}</div></div>'
-    summary = f"<b>{total_changed}</b> of {len(all_views)} views changed"
-    if len(section_nodes) > 1:
-        summary += f" across <b>{len(section_nodes)}</b> MDims"
 
     if chart_branch:
         chart_html, chart_previews = _render_chart_branch(chart_branch, len(previews))
@@ -512,9 +514,12 @@ def render_multi_tree_html(
                 rows.append('<div class="mdd-index-group">MDims</div>')
                 group_open = True
             indent = " mdd-index-indent" if indented else ""
+            # The bullet lives in the label span, not a ::before: the row is a two-item flex with the
+            # count pushed right, and a third flex item would strand the label in the middle.
+            bullet = '<span class="mdd-index-bullet">•</span> ' if indented else ""
             rows.append(
                 f'<a class="mdd-index-link{indent}" href="#" data-target="{anchor}">'
-                f"<span>{html.escape(label)}</span>"
+                f"<span>{bullet}{html.escape(label)}</span>"
                 f'<span class="mdd-index-count">{html.escape(count)}</span></a>'
             )
         index_html = f'<div class="mdd-index"><div class="mdd-index-title">Jump to a section</div>{"".join(rows)}</div>'
@@ -545,9 +550,13 @@ def render_multi_tree_html(
     #mdd-root .mdd-super-title {{ font-size: 17px; font-weight: 800; color: #111; margin: 12px 0 2px; }}
     #mdd-root .mdd-super-title .mdd-count {{ font-weight: 400; font-size: 12px; }}
     #mdd-root .mdd-super-children {{ margin-left: 12px; border-left: 3px solid #ececec; padding-left: 14px; }}
-    #mdd-root .mdd-index-group {{ color: #333; font-weight: 600; padding: 3px 0 0; }}
-    #mdd-root .mdd-index-indent {{ padding-left: 14px; }}
+    #mdd-root .mdd-index-group {{ color: #333; font-weight: 600; padding: 4px 0 1px; }}
+    #mdd-root .mdd-index-indent {{ padding-left: 20px; }}
+    #mdd-root .mdd-index-bullet {{ color: #adb5bd; }}
     #mdd-root .mdd-sec-title {{ font-size: 15px; font-weight: 700; color: #222; }}
+    #mdd-root .mdd-sec-toggle {{ cursor: pointer; user-select: none; }}
+    #mdd-root .mdd-sec-collapsed > .mdd-sec-title .mdd-caret {{ transform: rotate(-90deg); }}
+    #mdd-root .mdd-sec-collapsed > .mdd-sec-body {{ display: none; }}
     #mdd-root .mdd-sec-title .mdd-count {{ font-weight: 400; font-size: 12px; }}
     #mdd-root .mdd-sec-sub {{ color: #868e96; font-size: 12px;
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace; margin-top: 1px; }}
@@ -595,7 +604,6 @@ def render_multi_tree_html(
     #mdd-root ins.mdd-ins, #mdd-tooltip ins.mdd-ins {{ background: #d3f9d8; color: #2b8a3e; text-decoration: none; }}
   </style>
   <div class="mdd-toolbar">
-    <div class="mdd-summary">{summary}</div>
     {index_html}
   </div>
   <div class="mdd-hint">Hover over a view to preview its changes; click it to open the View diff in a
@@ -637,6 +645,8 @@ def render_multi_tree_html(
         const target = document.getElementById(link.dataset.target);
         if (!target) return;
         // Jumping to a section whose top-level groups are collapsed would land on closed boxes.
+        // A folded section, or a section whose top-level groups are folded, would be nothing to land on.
+        target.classList.remove("mdd-sec-collapsed");
         target.querySelectorAll(
           ":scope > .mdd-node.mdd-collapsed, :scope > .mdd-super-children > .mdd-node.mdd-collapsed"
         ).forEach(n => n.classList.remove("mdd-collapsed"));
@@ -654,6 +664,13 @@ def render_multi_tree_html(
         }} catch (err) {{
           target.scrollIntoView({{behavior: "smooth", block: "start"}});
         }}
+      }});
+    }});
+
+    root.querySelectorAll(".mdd-sec-toggle").forEach(title => {{
+      title.addEventListener("click", () => {{
+        title.closest(".mdd-section").classList.toggle("mdd-sec-collapsed");
+        fit();
       }});
     }});
 

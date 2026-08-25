@@ -10,16 +10,14 @@ Three levels, which is the point: an **edit** somebody authored, the **texts** i
 eleven texts and seventy-odd pages, and reporting any one of those numbers alone misleads — as reporting
 the middle one did.
 
-Three readings of the same data:
+Two readings of the same data:
 
+- **dimension tree** — every affected MDim's views on their own dimension grids, with the charts beside
+  them. Not how many views changed but *which*, and what sits next to them.
 - **by edit** — edit → text → page. How far does one authored edit actually go?
-- **by surface** — one row per affected page, with every edit landing on it. The question you have when
-  one particular chart matters to you, and the only view where a page carrying two edits appears once.
-- **dimension tree** — one affected MDim's views laid out on its own dimension grid, which is the one
-  thing the other two cannot show: not how many views changed, but *which*, and what sits beside them.
 
-The first two read the cached summary the section badges already use, so they cost no queries. The
-dimension tree diffs one MDim's views, which is why it asks which MDim rather than drawing them all.
+By-edit reads the cached summary the section badges already use, so it costs no queries. The grid diffs
+each MDim's views, which is why it stops at `MAX_TREE_MDIMS`.
 """
 
 import html
@@ -45,8 +43,14 @@ from apps.wizard.app_pages.metadata_diff.tree import render_multi_tree_html
 from apps.wizard.utils.components import url_persist
 
 GROUP_KEY = "blast-group"
+_CONTEXT_CSS = """
+<style>
+.mdd-context {{ color: #555; }}
+.mdd-context-label {{ color: #999; font-size: 12px; text-transform: uppercase;
+  letter-spacing: .04em; margin-right: 6px; }}
+</style>
+""".replace("{{", "{").replace("}}", "}")
 MAX_ROWS = 60
-KIND_ICON = {"chart": "📈", "draft_chart": "📝", "mdim": "🧩", "explorer": "🧭"}
 # MDims drawn on the grid at once. Each costs a view diff against the baseline, and past a handful the
 # canvas is unreadable anyway; the rest are named rather than silently dropped.
 MAX_TREE_MDIMS = 6
@@ -54,7 +58,7 @@ MAX_TREE_MDIMS = 6
 
 def st_show_blast_radius(source_engine: Engine, target_engine: Engine) -> None:
     """Everywhere the branch's metadata changes land: by edit, by surface, or on an MDim's dimension grid."""
-    st.markdown(DIFF_CSS, unsafe_allow_html=True)
+    st.markdown(DIFF_CSS + _CONTEXT_CSS, unsafe_allow_html=True)
     summary = cached.summary(source_engine, target_engine)
     reach = summary.reach
 
@@ -95,23 +99,25 @@ def st_show_blast_radius(source_engine: Engine, target_engine: Engine) -> None:
     # open on "nothing to draw" while the real changes sat one click away. Both names are unchanged, so
     # existing `?blast-group=` links still resolve.
     has_mdim = any(r.mdims for r in reach)
+    options = ["dimensions", "change"]
+    # A link written before "By surface" was dropped would otherwise reach url_persist's strict check and
+    # raise on every load. Sanitize it here rather than let a stale bookmark break the page.
+    if st.query_params.get(GROUP_KEY) not in options:
+        st.query_params.pop(GROUP_KEY, None)
+    if st.session_state.get(GROUP_KEY) not in options:
+        st.session_state.pop(GROUP_KEY, None)
+
     grouping = url_persist(st.segmented_control)(
         label="Group by",
         # "change" keeps its name so existing links still resolve; it groups by authored edit now.
-        options=["dimensions", "change", "surface"],
-        format_func=lambda g: {
-            "dimensions": "🌳 Dimension tree",
-            "change": "🧬 By edit",
-            "surface": "🎯 By surface",
-        }[g],
+        options=options,
+        format_func=lambda g: {"dimensions": "🌳 Dimension tree", "change": "🧬 By edit"}[g],
         key=GROUP_KEY,
         value="dimensions" if has_mdim else "change",
         label_visibility="collapsed",
     )
 
-    if grouping == "surface":
-        _by_surface(reach)
-    elif grouping == "dimensions":
+    if grouping == "dimensions":
         # Last thing on the page, deliberately: the component resizes its own iframe to fit its content,
         # and Streamlit-rendered siblings below it overlap while that happens.
         _dimension_tree(source_engine, target_engine, reach)
@@ -148,23 +154,35 @@ def _tree(edits: list[EditGroup]) -> None:
 
 
 def _edit_body(group: EditGroup) -> None:
-    """The edit itself — the words added and removed, which is what a reviewer is judging."""
-    if group.inserted:
-        quoted = html.escape(group.inserted)
-        st.markdown(
-            f'<div class="mdd-diff">added <ins class="mdd-ins">{quoted}</ins></div>',
-            unsafe_allow_html=True,
-        )
-    if group.deleted:
-        quoted = html.escape(group.deleted)
-        st.markdown(
-            f'<div class="mdd-diff">removed <del class="mdd-del">{quoted}</del></div>',
-            unsafe_allow_html=True,
-        )
-    if not group.inserted and not group.deleted:
+    """The edit itself: the words as one diff line, then the same edit in context.
+
+    A rewording is one change, so it reads as one line — `old` struck through, `new` highlighted — rather
+    than as an "added" statement and a "removed" statement that the reader has to pair up. The context
+    line below shows where it lands, windowed on the change inside the first text carrying it: every text
+    in the group shares this edit by construction, so one is a fair exemplar, labelled as one.
+    """
+    deleted = f'<del class="mdd-del">{html.escape(group.deleted)}</del>' if group.deleted else ""
+    inserted = f'<ins class="mdd-ins">{html.escape(group.inserted)}</ins>' if group.inserted else ""
+
+    if deleted and inserted:
+        st.markdown(f'<div class="mdd-diff">{deleted} &#8594; {inserted}</div>', unsafe_allow_html=True)
+    elif inserted:
+        st.markdown(f'<div class="mdd-diff">added {inserted}</div>', unsafe_allow_html=True)
+    elif deleted:
+        st.markdown(f'<div class="mdd-diff">removed {deleted}</div>', unsafe_allow_html=True)
+    else:
         # No words either way — a whitespace-only edit. A reordered list is not this case: its moved
         # bullets do read as an insertion and a deletion.
         st.caption("No words added or removed — whitespace only. The texts below show both sides.")
+
+    if group.changes:
+        exemplar = group.changes[0]
+        where = "in context" if group.n_texts == 1 else f"in context, in the first of {group.n_texts} texts"
+        st.markdown(
+            f'<div class="mdd-diff mdd-context"><span class="mdd-context-label">{where}</span> '
+            f"{diff_window_html(exemplar.old, exemplar.new, max_chars=300)}</div>",
+            unsafe_allow_html=True,
+        )
 
 
 def _surface_summary(group: EditGroup) -> str:
@@ -220,20 +238,6 @@ def _names(charts: list[dict[str, Any]], limit: int = 6) -> str:
     slugs = sorted(str(c.get("slug") or f"chart {c.get('chartId')}") for c in charts)
     shown = ", ".join(f"`{s}`" for s in slugs[:limit])
     return shown if len(slugs) <= limit else f"{shown} … +{len(slugs) - limit}"
-
-
-def _by_surface(reach: list[ChangeReach]) -> None:
-    """One row per affected chart / MDim / explorer, with the changes landing on it."""
-    rows = reach_by_surface(reach)
-    st.caption(f"{len(rows)} affected surface(s). A page listed twice under *By change* appears once here.")
-    for row in rows[:MAX_ROWS]:
-        icon = KIND_ICON.get(row["kind"], "•")
-        # "WYSK ×2" rather than a bare "WYSK": two distinct edits on one page is the finding here.
-        counts = row.get("field_counts") or {label: 1 for label in row["fields"]}
-        fields = ", ".join(f"{label} ×{n}" if n > 1 else label for label, n in sorted(counts.items()))
-        badge = "" if row["published"] else " :orange-badge[unpublished]"
-        st.markdown(f"- {icon} `{row['name']}` — {fields} :small[:gray[({row['detail']})]]{badge}")
-    _truncation_note(len(rows))
 
 
 def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[ChangeReach]) -> None:

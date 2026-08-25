@@ -1566,7 +1566,7 @@ def test_coerce_section_recovers_a_section_from_its_label():
             assert coerce_section(section_label(section, progress)) == section
 
     # Anything else is the caller's fallback: a deselected control, a hand-edited URL, junk.
-    assert coerce_section(None) == "charts"
+    assert coerce_section(None) == "blast", "the page's landing section is the fallback"
     assert coerce_section(None, "mdims") == "mdims"
     assert coerce_section("", "explorers") == "explorers"
     assert coerce_section("charts-and-mdims", "mdims") == "mdims"
@@ -1646,9 +1646,14 @@ def test_section_switcher_keeps_the_url_on_a_section_key():
     assert at.text[0].value == "section=mdims"
     assert param(at) == "mdims"
 
-    # Back to the default section: the param is dropped rather than spelled out, as url_persist does.
+    # A non-default section is spelled out in the URL...
     at.segmented_control[0].set_value("charts").run()
     assert at.text[0].value == "section=charts"
+    assert param(at) == "charts"
+
+    # ...and the landing section is dropped from it rather than spelled out, as url_persist does.
+    at.segmented_control[0].set_value("blast").run()
+    assert at.text[0].value == "section=blast"
     assert param(at) is None
 
 
