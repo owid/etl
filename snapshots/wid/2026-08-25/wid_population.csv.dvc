@@ -1,0 +1,23 @@
+meta:
+  origin:
+    producer: World Inequality Database (WID.world)
+    title: World Inequality Database (WID)
+    description: |-
+      The World Inequality Database (WID.world) aims to provide open and convenient access to the most extensive available database on the historical evolution of the world distribution of income and wealth, both within countries and between countries.
+    title_snapshot: World Inequality Database (WID) - Population
+    description_snapshot: |-
+      WID's population counts (indicator npopul): the number of adults (aged 20 and over, WID age code 992) and the total population (all ages, code 999), counted as individuals, for every country and year.
+
+      WID's income series are expressed per adult ("equal-split adults"), so these counts are needed to convert them to a per-capita basis and to weight countries consistently when comparing WID with per-capita sources such as the World Bank's Poverty and Inequality Platform.
+    citation_full: World Inequality Database (WID), https://wid.world
+    attribution_short: WID
+    url_main: https://wid.world
+    date_accessed: '2026-08-25'
+    date_published: '2026'
+    license:
+      name: CC BY 4.0
+      url: https://wid.world/
+outs:
+  - md5: b4b84d5e0c0e3164b350f3e672849031
+    size: 1493196
+    path: wid_population.csv
