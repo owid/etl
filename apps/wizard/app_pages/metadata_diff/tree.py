@@ -16,7 +16,9 @@ from apps.wizard.app_pages.metadata_diff.core import ViewDiff, diff_preview_html
 
 # The component iframe grows to fit its content up to this cap; beyond it, the tree
 # scrolls internally.
-MAX_HEIGHT_PX = 4000
+# First-paint estimate only: fit() resizes the frame to its real content as soon as the script runs,
+# so this caps nothing — it just keeps the initial placeholder frame from being absurd.
+INITIAL_HEIGHT_CAP_PX = 4000
 
 
 # CSS/JS for the affected-charts component kept as plain (non-f) strings so their literal
@@ -190,9 +192,6 @@ def _build_tree(
             node: dict[str, Any] = {
                 "slug": slug,
                 "name": choice_name(level, slug),
-                # The dimension this pill is a choice of — rendered as a muted prefix, so the tree's
-                # columns explain themselves without a header row (their x positions vary per branch).
-                "dim_name": dimensions[level].get("name") or dim_slug,
                 "changed": sum(1 for i in bucket if view_diffs[i].changed),
                 "total": len(bucket),
             }
@@ -232,8 +231,6 @@ def _render_node(
     changed = node["changed"] > 0
     status = "changed" if changed else "unchanged"
 
-    dim = f'<span class="mdd-dimname">{html.escape(node["dim_name"])}</span>' if node.get("dim_name") else ""
-
     if "view_index" in node:
         i = node["view_index"]
         is_new = view_diffs[i].is_new
@@ -246,7 +243,7 @@ def _render_node(
         return (
             f'<div class="mdd-node mdd-leafnode mdd-n-{status}">'
             f'<a class="{cls}" data-view="{i}" href="{html.escape(leaf_hrefs[i])}" target="_blank" rel="noopener">'
-            f'{dim}{html.escape(node["name"])}{badge}{leaf_badges[i]}<span class="mdd-golink">&#8599;</span></a>'
+            f'{html.escape(node["name"])}{badge}{leaf_badges[i]}<span class="mdd-golink">&#8599;</span></a>'
             f"</div>"
         )
 
@@ -255,7 +252,7 @@ def _render_node(
     return (
         f'<div class="mdd-node mdd-n-{status}">'
         f'<div class="mdd-box mdd-branch mdd-{status}" role="button" title="Click to collapse/expand">'
-        f'<span class="mdd-caret">&#9662;</span>{dim}{html.escape(node["name"])}{counter}</div>'
+        f'<span class="mdd-caret">&#9662;</span>{html.escape(node["name"])}{counter}</div>'
         f'<div class="mdd-children">{children}</div>'
         f"</div>"
     )
@@ -370,6 +367,18 @@ def render_tree_html(
     )
 
 
+def _column_heads(dims: list[str], root_title: str | None = None) -> str:
+    """The title row over a section's columns.
+
+    Only possible because the columns are real: inside an `mdd-cols` section every pill has the same
+    fixed width, so depth d starts at d × pitch and a title can sit exactly over its column. `root_title`
+    covers the section-pill column, which sits before the first dimension in the multi-MDim grid.
+    """
+    titles = ([root_title] if root_title else []) + dims
+    spans = "".join(f'<span class="mdd-colhead">{html.escape(t)}</span>' for t in titles)
+    return f'<div class="mdd-colheads">{spans}</div>'
+
+
 def render_multi_tree_html(
     sections: list[dict[str, Any]],
     chart_branch: dict[str, Any] | None = None,
@@ -412,6 +421,7 @@ def render_multi_tree_html(
         section_nodes.append(
             {
                 "name": str(section.get("catalog_path") or "MDim"),
+                "dims": [str(d.get("name") or d["slug"]) for d in dimensions],
                 "changed": n_changed,
                 "total": len(view_diffs),
                 "children": nodes,
@@ -433,18 +443,21 @@ def render_multi_tree_html(
 
     # A single section keeps its old shape: no outer branch to collapse, since there is nothing to
     # compare it against. Several sections each become a collapsible root.
-    index_entries: list[tuple[str, str]] = []  # (anchor id, label) for the click-to-section index
+    index_entries: list[tuple[str, str, str]] = []  # (anchor id, label, count) for the section index
     if len(section_nodes) == 1:
-        body = "".join(_render_node(child, all_views, all_hrefs, all_badges) for child in section_nodes[0]["children"])
+        inner = "".join(_render_node(child, all_views, all_hrefs, all_badges) for child in section_nodes[0]["children"])
+        body = f'<div class="mdd-cols">{_column_heads(section_nodes[0]["dims"])}{inner}</div>'
         summary = f"<b>{total_changed}</b> of {len(all_views)} views changed"
         dims_line = ""  # each pill names its own dimension now
     else:
         parts = []
         for i, node in enumerate(section_nodes):
             anchor = f"mdd-section-{i}"
-            index_entries.append((anchor, f"{node['name']} ({node['changed']}/{node['total']})"))
+            index_entries.append((anchor, node["name"], f"{node['changed']}/{node['total']} views changed"))
+            heads = _column_heads(node["dims"], root_title="MDim")
             parts.append(
-                f'<div id="{anchor}" class="mdd-section">{_render_node(node, all_views, all_hrefs, all_badges)}</div>'
+                f'<div id="{anchor}" class="mdd-section mdd-cols">'
+                f"{heads}{_render_node(node, all_views, all_hrefs, all_badges)}</div>"
             )
         body = "".join(parts)
         summary = f"<b>{total_changed}</b> of {len(all_views)} views changed across <b>{len(section_nodes)}</b> MDims"
@@ -454,24 +467,29 @@ def render_multi_tree_html(
         chart_html, chart_previews = _render_chart_branch(chart_branch, len(previews))
         if chart_html:
             n_charts = sum(len(g.get("charts") or []) for g in chart_branch.get("groups") or [])
-            index_entries.append(("mdd-section-charts", f"{chart_branch.get('label') or 'Charts'} ({n_charts})"))
+            index_entries.append(
+                ("mdd-section-charts", str(chart_branch.get("label") or "Charts"), f"{n_charts} affected")
+            )
             body += f'<div id="mdd-section-charts" class="mdd-section">{chart_html}</div>'
         previews = previews + chart_previews
 
-    # The index only earns its row when there is more than one place to jump to.
+    # The index only earns its place when there is more than one place to jump to. A panel of rows, one
+    # per section, rather than an inline "a · b · c" line that vanished into the toolbar text around it.
     index_html = ""
     if len(index_entries) > 1:
-        links = " · ".join(
-            f'<a class="mdd-index-link" href="#" data-target="{anchor}">{html.escape(label)}</a>'
-            for anchor, label in index_entries
+        rows = "".join(
+            f'<a class="mdd-index-link" href="#" data-target="{anchor}">'
+            f"<span>{html.escape(label)}</span>"
+            f'<span class="mdd-index-count">{html.escape(count)}</span></a>'
+            for anchor, label, count in index_entries
         )
-        index_html = f'<div class="mdd-index">Jump to: {links}</div>'
+        index_html = f'<div class="mdd-index"><div class="mdd-index-title">Jump to a section</div>{rows}</div>'
 
     show_unchanged_default = "false" if total_changed else "true"
     visible_leaves = total_changed if total_changed else len(all_views)
     # One row per section header, plus one for the collapsed charts branch.
     extra_rows = len(section_nodes) + (1 if chart_branch else 0)
-    initial_height = min(MAX_HEIGHT_PX, 170 + (visible_leaves + extra_rows) * 38)
+    initial_height = min(INITIAL_HEIGHT_CAP_PX, 170 + (visible_leaves + extra_rows) * 38)
     return (
         f"""
 <div id="mdd-root" class="mdd-hide-unchanged">
@@ -484,13 +502,22 @@ def render_multi_tree_html(
     #mdd-root .mdd-hint {{ color: #999; font-size: 12px; margin-bottom: 8px; }}
     #mdd-root .mdd-legend span {{ margin-right: 12px; }}
     #mdd-root .mdd-dot {{ display: inline-block; width: 10px; height: 10px; border-radius: 5px; margin-right: 4px; }}
-    #mdd-root .mdd-index {{ color: #555; }}
-    #mdd-root .mdd-dimname {{ color: #999; font-weight: 400; margin-right: 5px; }}
+    #mdd-root .mdd-index {{ border: 1px solid #dee2e6; border-radius: 8px; padding: 8px 12px;
+      margin: 4px 0 2px; max-width: 560px; background: #fafafa; }}
+    #mdd-root .mdd-index-title {{ font-weight: 600; color: #333; margin-bottom: 4px; }}
+    #mdd-root .mdd-index-count {{ color: #868e96; font-size: 12px; }}
+    /* Inside an MDim section every pill takes the same width, so each depth is a true column and the
+       title row above can point at it. Pitch = 190 (border-box pill) + 26 (children indent). */
+    #mdd-root .mdd-cols .mdd-box {{ width: 190px; box-sizing: border-box; white-space: normal; }}
+    #mdd-root .mdd-colheads {{ display: flex; margin: 8px 0 4px; }}
+    #mdd-root .mdd-colhead {{ width: 216px; flex-shrink: 0; color: #868e96; font-size: 11px;
+      font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }}
     #mdd-root .mdd-section {{ margin: 4px 0 16px; padding-top: 14px; border-top: 1px solid #e3e3e3; }}
     #mdd-root .mdd-section:first-child {{ border-top: none; padding-top: 0; margin-top: 0; }}
-    #mdd-root .mdd-index-link {{ color: #1c7ed6; text-decoration: none; }}
-    #mdd-root .mdd-index-link:hover {{ text-decoration: underline; }}
-    #mdd-root .mdd-tree {{ overflow: auto; padding: 4px; }}
+    #mdd-root .mdd-index-link {{ color: #1c7ed6; text-decoration: none; display: flex;
+      justify-content: space-between; gap: 16px; padding: 3px 0; }}
+    #mdd-root .mdd-index-link:hover span:first-child {{ text-decoration: underline; }}
+    #mdd-root .mdd-tree {{ overflow-x: auto; overflow-y: visible; padding: 4px; }}
     #mdd-root .mdd-node {{ display: flex; align-items: flex-start; margin: 2px 0; }}
     #mdd-root .mdd-children {{ display: flex; flex-direction: column; border-left: 2px solid #e3e3e3;
                                margin-left: 10px; padding-left: 14px; }}
@@ -538,7 +565,6 @@ def render_multi_tree_html(
   <div id="mdd-tooltip"></div>
   <script>
     const PREVIEWS = {json.dumps(previews)};
-    const MAX_HEIGHT = {MAX_HEIGHT_PX};
     const root = document.getElementById("mdd-root");
     const tooltip = document.getElementById("mdd-tooltip");
     const treeEl = root.querySelector(".mdd-tree");
@@ -549,14 +575,12 @@ def render_multi_tree_html(
     const fit = () => {{
       const fe = window.frameElement;
       if (!fe) return;
-      treeEl.style.maxHeight = "none";
+      // The frame always grows to its content, so the page is the only vertical scrollbar — a capped
+      // frame put a second scrollbar inside the tree, nested in the page's. Set both the style and the
+      // height attribute so Streamlit's layout pushes the content below the component down.
       const wanted = document.documentElement.scrollHeight + 24;
-      const h = Math.min(wanted, MAX_HEIGHT);
-      if (wanted > MAX_HEIGHT) treeEl.style.maxHeight = (MAX_HEIGHT - 100) + "px";
-      // Set both the style and the height attribute so Streamlit's layout pushes the
-      // content below the component down instead of letting it overlap the tree.
-      fe.style.height = h + "px";
-      fe.setAttribute("height", h);
+      fe.style.height = wanted + "px";
+      fe.setAttribute("height", wanted);
     }};
 
     const checkbox = document.getElementById("mdd-show-unchanged");
@@ -579,11 +603,7 @@ def render_multi_tree_html(
         fit();
         // This frame is sized to its content, so the *page* scrolls, not this document —
         // scrollIntoView here moves nothing. Same-origin, so scroll the parent's main
-        // container to the target's position; when the tree scrolls internally (past
-        // MAX_HEIGHT), line the target up inside it first.
-        if (treeEl.scrollHeight > treeEl.clientHeight + 2) {{
-          treeEl.scrollTop = Math.max(0, target.offsetTop - treeEl.offsetTop - 8);
-        }}
+        // container to the target's position.
         try {{
           const fe = window.frameElement;
           const scroller = window.parent.document.querySelector("section.stMain")

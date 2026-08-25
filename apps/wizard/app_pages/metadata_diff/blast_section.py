@@ -300,7 +300,9 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
     )
     # NOTE: nothing may be rendered below this — the component resizes itself to its content, and
     # Streamlit-rendered siblings would overlap during the resize.
-    components.html(tree_html, height=height, scrolling=True)
+    # scrolling=False: the component resizes its frame to its content, so an iframe scrollbar could only
+    # ever nest a second vertical scroll inside the page's.
+    components.html(tree_html, height=height, scrolling=False)
 
 
 def _chart_branch(reach: list[ChangeReach], badged: set) -> dict[str, Any]:
