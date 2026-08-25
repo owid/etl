@@ -84,10 +84,9 @@ def st_show_blast_radius(source_engine: Engine, target_engine: Engine) -> None:
         head += f" · {hidden_pages} unpublished"
     st.markdown(head)
     st.caption(
-        "Three different numbers, on purpose. One sentence added to a shared `definitions.*` entry is "
-        "**one edit** to judge; it splices into every description referencing it, so the site renders "
-        "**several texts**; and each of those is read on **many pages**. Sign-off lives in the three "
-        "sections — this view is for seeing the spread before you decide how careful to be."
+        "Why three numbers: one edit can render into several texts, and each text lands on many pages. "
+        "A sentence added to a shared `definitions.*` entry is one thing to judge, even when it turns up "
+        "in eighty places."
     )
 
     if not summary.mdims_resolved:
