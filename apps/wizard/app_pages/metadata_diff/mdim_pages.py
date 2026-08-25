@@ -36,6 +36,7 @@ from apps.wizard.app_pages.metadata_diff.render import (
     render_impact,
     render_text_html,
 )
+from apps.wizard.utils.components import url_persist
 
 # URL-parameter prefix for the MDim view selectors (`?d_<dimension>=<choice>`).
 DIM_PARAM_PREFIX = "d_"
@@ -82,9 +83,14 @@ def render_chart_review(
 
 def chart_flow(source_engine: Engine, target_engine: Engine) -> None:
     """Review a standalone chart's data-page WYSK (the indicator metadata it inherits), vs the baseline."""
-    ref = st.text_input(
+    # URL-persisted, so `?chart=<slug>` opens this review directly — which is what the chart lists link
+    # to. The box stays a box: typing in it updates the URL, and the URL fills it on the way in.
+    ref = url_persist(st.text_input)(
         "Chart",
         key="chart",
+        # An explicit empty default is what makes `url_persist` *remove* `?chart=` when the box is
+        # cleared; without it, leaving the per-chart page left a dangling `chart=` on every URL.
+        value="",
         placeholder="Chart slug, id, or grapher URL (e.g. daily-mean-income)",
         help="Select a chart to see changes to its metadata.",
     )

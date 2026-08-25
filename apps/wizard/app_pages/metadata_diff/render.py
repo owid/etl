@@ -96,6 +96,9 @@ DIFF_CSS = """
             margin: 10px 0 2px; }
 .mdd-slot-unchanged { font-size: 0.78rem; color: #adb5bd; border-left: 3px solid #e9ecef;
                       padding-left: 8px; margin: 6px 0; }
+/* Chart lists are HTML, not markdown, so they need the list styling markdown would have given them. */
+.mdd-chart-list { margin: 0 0 0 18px; padding: 0; font-size: 0.9rem; }
+.mdd-chart-list li { margin-bottom: 2px; }
 </style>
 """
 
@@ -131,6 +134,19 @@ def view_url(env, catalog_path: str, published_slug: str | None, dims: dict[str,
     if published_slug:
         return f"{env.site}/grapher/{published_slug}?{params}"
     return f"{env.admin_site}/grapher/{urllib.parse.quote(catalog_path, safe='')}/?{params}"
+
+
+def chart_review_url(slug: str) -> str:
+    """This tool's own full review of one chart — every field of it this branch changed.
+
+    Relative on purpose. An absolute URL has to name a host, and the only host this module knows is the
+    *staging* server's wizard (`SOURCE.wizard_url`) — so on a local instance every one of these links left
+    the app you were using. A query-only href keeps whatever host you are on.
+
+    Safe to render from Streamlit markdown, which is not sandboxed; a component iframe would resolve it
+    against its own srcdoc origin instead, which is why the grid builds absolute links.
+    """
+    return "?" + urllib.parse.urlencode({"diff-type": "charts", "chart": slug})
 
 
 def chart_datapage_url(env, chart_id: int) -> str:
@@ -421,22 +437,39 @@ def render_chart_list(
     on_page, behind_drawer = split_by_prominence(charts, fields)
 
     def _bullets(group: list[dict[str, Any]]) -> str:
+        """The name opens this tool's review of that chart, in this tab; the arrow opens the chart itself.
+
+        HTML rather than markdown because of `target`: Streamlit renders every markdown link with
+        `target="_blank"`, so the review opened in a new tab and the tab the reader clicked from did not
+        change — indistinguishable from a link that does nothing. The ↗ keeps `_blank`, since that one is
+        genuinely leaving the tool.
+        """
         rows = []
         for c in group:
-            slug = c.get("slug") or f"chart {c.get('chartId')}"
-            rows.append(f"- [`{slug}`]({SOURCE.site}/grapher/{slug})")
-        return "\n".join(rows)
+            slug = str(c.get("slug") or "")
+            label = html.escape(slug or f"chart {c.get('chartId')}")
+            if not slug:
+                rows.append(f"<li><code>{label}</code></li>")
+                continue
+            rows.append(
+                f'<li><a href="{html.escape(chart_review_url(slug))}" target="_self">'
+                f"<code>{label}</code></a> "
+                f'<a href="{SOURCE.site}/grapher/{html.escape(slug)}" target="_blank" rel="noopener"'
+                f' title="Open the chart itself">↗</a></li>'
+            )
+        return f'<ul class="mdd-chart-list">{"".join(rows)}</ul>'
 
     if on_page:
+        st.caption("A name opens that chart's own review, here. The ↗ opens the chart itself.")
         st.markdown(f"**{len(on_page)} data page{'s' if len(on_page) != 1 else ''} affected** — {verb}:")
-        st.markdown(_bullets(on_page))
+        st.markdown(_bullets(on_page), unsafe_allow_html=True)
     if behind_drawer:
         st.markdown(f"**{len(behind_drawer)} via *Learn more about this data***")
         st.caption(
             "These combine several indicators, so they have no data page: their readers reach the text "
             "under the indicator's own entry in the sources drawer."
         )
-        st.markdown(_bullets(behind_drawer))
+        st.markdown(_bullets(behind_drawer), unsafe_allow_html=True)
     if drafts:
         st.markdown(f"**{len(drafts)} unpublished draft{'s' if len(drafts) != 1 else ''}**")
         st.caption(

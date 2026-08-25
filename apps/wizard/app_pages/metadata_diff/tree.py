@@ -227,6 +227,7 @@ def _render_node(
     view_diffs: list[ViewDiff],
     leaf_hrefs: list[str],
     leaf_badges: list[str],
+    fold: bool = False,
 ) -> str:
     changed = node["changed"] > 0
     status = "changed" if changed else "unchanged"
@@ -248,9 +249,12 @@ def _render_node(
         )
 
     counter = f'<span class="mdd-count">{node["changed"]}/{node["total"]}</span>' if changed else ""
-    children = "".join(_render_node(child, view_diffs, leaf_hrefs, leaf_badges) for child in node["children"])
+    children = "".join(_render_node(child, view_diffs, leaf_hrefs, leaf_badges, fold) for child in node["children"])
+    # A folded branch keeps its subtree out of the initial layout — the only way a grid of hundreds of
+    # views is something you open rather than something you scroll past.
+    folded = " mdd-collapsed" if fold else ""
     return (
-        f'<div class="mdd-node mdd-n-{status}">'
+        f'<div class="mdd-node mdd-n-{status}{folded}">'
         f'<div class="mdd-box mdd-branch mdd-{status}" role="button" title="Click to collapse/expand">'
         f'<span class="mdd-caret">&#9662;</span>{html.escape(node["name"])}{counter}</div>'
         f'<div class="mdd-children">{children}</div>'
@@ -404,10 +408,12 @@ def _render_section(
     hide = "" if node["changed"] == 0 else " mdd-hide-unchanged"
     counter = f'<span class="mdd-count">{node["changed"]}/{node["total"]} views changed</span>'
     subtitle = f'<div class="mdd-sec-sub">{html.escape(node["subtitle"])}</div>' if node["subtitle"] else ""
-    trees = "".join(_render_node(child, all_views, all_hrefs, all_badges) for child in node["children"])
+    fold = bool(node.get("fold"))
+    trees = "".join(_render_node(child, all_views, all_hrefs, all_badges, fold) for child in node["children"])
+    folded = " mdd-sec-collapsed" if fold else ""
     return (
-        f'<div id="{anchor}" class="mdd-section mdd-cols{hide}">'
-        f'<div class="mdd-sec-title mdd-sec-toggle" role="button" title="Click to collapse/expand this MDim">'
+        f'<div id="{anchor}" class="mdd-section mdd-cols{hide}{folded}">'
+        f'<div class="mdd-sec-title mdd-sec-toggle" role="button" title="Click to collapse/expand">'
         f'<span class="mdd-caret">&#9662;</span>{html.escape(node["title"])}{counter}</div>'
         f"{subtitle}"
         f'<div class="mdd-sec-body">'
@@ -429,28 +435,21 @@ def _mdim_count_label(drawn: int, total: int | None) -> str:
     return f"{drawn} of {total} MDim{'s' if total != 1 else ''} changed by this branch"
 
 
-def render_multi_tree_html(
+def _section_nodes(
     sections: list[dict[str, Any]],
-    branches: list[dict[str, Any]] | None = None,
-    self_url: str = "",
-    mdim_total: int | None = None,
-) -> tuple[str, int]:
-    """Render every affected MDim as a root branch of one tree, with the flat surfaces as more of them.
+    all_views: list[ViewDiff],
+    all_hrefs: list[str],
+    all_badges: list[str],
+    previews: list[str],
+    self_url: str,
+) -> list[dict[str, Any]]:
+    """Turn one hierarchy's sections into render-ready nodes, appending their views to the shared lists.
 
-    One component, not one per MDim: each component sizes its own iframe and would overlap whatever
-    follows it, so stacking them is not available. A section is
-    `{catalog_path, dimensions, view_diffs, leaf_hrefs, external_impacts}`; its leaf indices are shifted
-    into a combined view list so the hover previews, the badges and the "show all views" filter keep
-    working exactly as they do for a single grid.
-
-    Returns (html, initial_height_px). The component resizes itself to its content afterwards.
+    The lists are shared across every hierarchy on the page: leaf indices are offsets into one combined
+    view list, which is what lets the hover previews, the badges and each section's "show all views"
+    filter work the same whether the page holds one grid or ten.
     """
-    all_views: list[ViewDiff] = []
-    all_hrefs: list[str] = []
-    all_badges: list[str] = []
-    previews: list[str] = []
-    section_nodes: list[dict[str, Any]] = []
-
+    nodes_out: list[dict[str, Any]] = []
     for section in sections:
         dimensions = section.get("dimensions") or []
         view_diffs: list[ViewDiff] = section.get("view_diffs") or []
@@ -468,7 +467,7 @@ def render_multi_tree_html(
         offset = len(all_views)
         nodes = _offset_view_indices(_build_tree(dimensions, view_diffs), offset)
         n_changed = sum(1 for v in view_diffs if v.changed)
-        section_nodes.append(
+        nodes_out.append(
             {
                 # The human-readable title leads; the catalogPath is its subtitle, not a tree column.
                 "title": str(section.get("title") or section.get("catalog_path") or "MDim"),
@@ -477,6 +476,7 @@ def render_multi_tree_html(
                 "changed": n_changed,
                 "total": len(view_diffs),
                 "has_external": has_external,
+                "fold": bool(section.get("fold")),
                 "children": nodes,
             }
         )
@@ -484,26 +484,70 @@ def render_multi_tree_html(
         all_hrefs.extend(hrefs)
         all_badges.extend(_impact_badge(impacts[i]) for i in range(len(view_diffs)))
         previews.extend(diff_preview_html(v) + _impact_preview_line(impacts[i]) for i, v in enumerate(view_diffs))
+    return nodes_out
 
+
+def render_multi_tree_html(
+    sections: list[dict[str, Any]],
+    branches: list[dict[str, Any]] | None = None,
+    self_url: str = "",
+    mdim_total: int | None = None,
+    hierarchies: list[dict[str, Any]] | None = None,
+) -> tuple[str, int]:
+    """Render every affected surface as a root branch of one tree.
+
+    Two kinds of root. A **hierarchy** is a group of dimension grids under one heading: the MDims, and the
+    explorers, whose views are addressed by dimensions in the same way. A **branch** is a flat list of
+    linked leaves, for a surface with no dimensions of its own — the charts. `hierarchies` names the groups
+    (`{id, label, count_label, sections}`); `sections` is the shorthand for one group of MDims, which is
+    what a single MDim's own page renders.
+
+    One component, not one per grid: each component sizes its own iframe and would overlap whatever follows
+    it, so stacking them is not available. A section is
+    `{catalog_path, dimensions, view_diffs, leaf_hrefs, external_impacts, fold}`.
+
+    Returns (html, initial_height_px). The component resizes itself to its content afterwards.
+    """
+    all_views: list[ViewDiff] = []
+    all_hrefs: list[str] = []
+    all_badges: list[str] = []
+    previews: list[str] = []
+
+    groups = list(hierarchies) if hierarchies else [{"id": "mdims", "label": "MDims", "sections": sections}]
+    for group in groups:
+        group["nodes"] = _section_nodes(
+            group.get("sections") or [], all_views, all_hrefs, all_badges, previews, self_url
+        )
+    section_nodes = [node for group in groups for node in group["nodes"]]
     total_changed = sum(1 for v in all_views if v.changed)
 
-    # (anchor id, label, count, indented) — indented rows sit under the "MDims" group label.
-    index_entries: list[tuple[str, str, str, bool]] = []
-    parts = []
-    for i, node in enumerate(section_nodes):
-        anchor = f"mdd-section-{i}"
-        index_entries.append((anchor, node["title"], f"{node['changed']}/{node['total']} views changed", True))
-        parts.append(_render_section(node, anchor, all_views, all_hrefs, all_badges))
+    # (anchor id, label, count, group label) — a row with a group label is indented under that heading.
+    index_entries: list[tuple[str, str, str, str]] = []
     body = ""
-    if parts:
-        # The MDims as one hierarchy: a header over the individual sections, with Charts and Explorers as
-        # its siblings. It counts MDims, not views: every section header and index row below already
-        # carries its own view count, and two different denominators side by side read as a discrepancy.
+    drawn_groups = 0
+    for group in groups:
+        nodes = group["nodes"]
+        if not nodes:
+            continue
+        parts = []
+        for node in nodes:
+            anchor = f"mdd-section-{len(index_entries)}"
+            index_entries.append(
+                (anchor, node["title"], f"{node['changed']}/{node['total']} views changed", str(group["label"]))
+            )
+            parts.append(_render_section(node, anchor, all_views, all_hrefs, all_badges))
+        # A heading over the group's grids. It counts surfaces, not views: every section header and index
+        # row below already carries its own view count, and two denominators side by side read as a
+        # discrepancy.
+        count_label = group.get("count_label")
+        if count_label is None and group["id"] == "mdims":
+            count_label = _mdim_count_label(len(nodes), mdim_total)
         head = (
-            f'<div class="mdd-super-title">MDims'
-            f'<span class="mdd-count">{_mdim_count_label(len(section_nodes), mdim_total)}</span></div>'
+            f'<div class="mdd-super-title">{html.escape(str(group["label"]))}'
+            f'<span class="mdd-count">{html.escape(str(count_label or ""))}</span></div>'
         )
-        body = f'<div class="mdd-super">{head}<div class="mdd-super-children">{"".join(parts)}</div></div>'
+        body += f'<div class="mdd-super">{head}<div class="mdd-super-children">{"".join(parts)}</div></div>'
+        drawn_groups += 1
 
     # Each flat surface that has anything in it becomes a branch beside the MDims, in the order given.
     # An empty one is not drawn at all: a "Explorers — 0 affected" heading is a heading about nothing.
@@ -523,15 +567,15 @@ def render_multi_tree_html(
     index_html = ""
     if len(index_entries) > 1:
         rows = []
-        group_open = False
-        for anchor, label, count, indented in index_entries:
-            if indented and not group_open:
-                rows.append('<div class="mdd-index-group">MDims</div>')
-                group_open = True
-            indent = " mdd-index-indent" if indented else ""
+        current_group = None
+        for anchor, label, count, group_label in index_entries:
+            if group_label and group_label != current_group:
+                rows.append(f'<div class="mdd-index-group">{html.escape(group_label)}</div>')
+            current_group = group_label
+            indent = " mdd-index-indent" if group_label else ""
             # The bullet lives in the label span, not a ::before: the row is a two-item flex with the
             # count pushed right, and a third flex item would strand the label in the middle.
-            bullet = '<span class="mdd-index-bullet">•</span> ' if indented else ""
+            bullet = '<span class="mdd-index-bullet">•</span> ' if group_label else ""
             rows.append(
                 f'<a class="mdd-index-link{indent}" href="#" data-target="{anchor}">'
                 f"<span>{bullet}{html.escape(label)}</span>"
@@ -540,8 +584,8 @@ def render_multi_tree_html(
         index_html = f'<div class="mdd-index"><div class="mdd-index-title">Jump to a section</div>{"".join(rows)}</div>'
 
     visible_leaves = total_changed if total_changed else len(all_views)
-    # One row per section header, plus one per collapsed flat branch.
-    extra_rows = len(section_nodes) + drawn_branches
+    # One row per section header, one per hierarchy heading, one per collapsed flat branch.
+    extra_rows = len(section_nodes) + drawn_groups + drawn_branches
     initial_height = min(INITIAL_HEIGHT_CAP_PX, 170 + (visible_leaves + extra_rows) * 38)
     return (
         f"""

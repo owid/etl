@@ -27,6 +27,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     group_changes,
     group_usage,
     parse_catalog_path,
+    requested_chart,
 )
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
@@ -51,8 +52,21 @@ CHANGES_PER_PAGE = 5
 
 
 def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -> None:
-    """Render the Charts section: every indicator text change, with the charts it lands on."""
+    """Render the Charts section: every indicator text change, with the charts it lands on.
+
+    Unless one chart is named. `?chart=<slug>` is a route, not a filter: it shows that chart's own review
+    and nothing else. It used to render inside an expander below the whole list, which is why following a
+    link to it looked like nothing had happened.
+    """
     st.markdown(DIFF_CSS, unsafe_allow_html=True)
+
+    requested = requested_chart(st.session_state.get("chart"), st.query_params.get("chart"))
+    if requested:
+        # Seed the widget from the link before it renders, or `url_persist` writes its blank back and the
+        # navigation undoes itself.
+        st.session_state["chart"] = requested
+        _single_chart_page(source_engine, target_engine)
+        return
 
     changed = cached.indicator_changes(source_engine, target_engine)
     chart_text = cached.chart_text_changes(source_engine, target_engine)
@@ -245,6 +259,27 @@ def _where_line(g: ChangeGroup) -> str:
             "this is one edit."
         )
     return f"This {label} belongs to one indicator only — nothing else shares it."
+
+
+def _single_chart_page(source_engine: Engine, target_engine: Engine) -> None:
+    """One chart's review, alone on the page, with the way back to the list.
+
+    The box stays: it is how you get to a different chart from here, and it is the same URL-persisted
+    widget the list's lookup renders, so the two can never disagree about which chart is open.
+    """
+    st.button(
+        "← All chart changes",
+        key="mdd-clear-chart",
+        on_click=_clear_chart,
+        help="Back to every text change on this branch.",
+    )
+    mdim_pages.chart_flow(source_engine, target_engine)
+
+
+def _clear_chart() -> None:
+    """Leave the per-chart page: clear the widget and the URL it is routed by."""
+    st.session_state["chart"] = ""
+    st.query_params.pop("chart", None)
 
 
 def _lookup_expander(source_engine: Engine, target_engine: Engine) -> None:

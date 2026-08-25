@@ -23,7 +23,7 @@ from streamlit.runtime.scriptrunner import add_script_run_ctx, get_script_run_ct
 from structlog import get_logger
 
 from apps.wizard.app_pages.chart_diff.utils import TARGET
-from apps.wizard.app_pages.metadata_diff import discovery
+from apps.wizard.app_pages.metadata_diff import data, discovery
 from apps.wizard.app_pages.metadata_diff.core import ViewDiff
 from apps.wizard.app_pages.metadata_diff.usage import charts_using_indicators, mdims_using_indicators
 from etl.config import OWIDEnv
@@ -188,6 +188,12 @@ def explorer_changes(_source_engine: Engine, _target_engine: Engine, cache_key: 
     """Published explorers whose view text changed, split into this branch's and baseline lag."""
     scope, built = shared_facts(_source_engine, cache_key=cache_key)
     return discovery.changed_explorer_views(_source_engine, _target_engine, scope, built)
+
+
+@st.cache_data(ttl=CACHE_TTL, show_spinner=False)
+def explorer_titles(_source_engine: Engine, cache_key: str = "") -> dict[str, str]:
+    """Published explorers' reader-facing names, by slug."""
+    return data.fetch_explorer_titles(_source_engine)
 
 
 @st.cache_data(ttl=CACHE_TTL, show_spinner="Finding affected charts and MDims…")

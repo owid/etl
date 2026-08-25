@@ -22,7 +22,7 @@ each MDim's views, which is why it stops at `MAX_TREE_MDIMS`.
 
 import html
 from typing import Any
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
 
 import streamlit as st
 import streamlit.components.v1 as components
@@ -30,7 +30,7 @@ from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.chart_diff.utils import SOURCE
 from apps.wizard.app_pages.metadata_diff import cached
-from apps.wizard.app_pages.metadata_diff.core import diff_window_html, field_label
+from apps.wizard.app_pages.metadata_diff.core import ViewDiff, diff_window_html, field_label
 from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, EditGroup, group_by_edit, reach_by_surface
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
@@ -55,6 +55,9 @@ MAX_ROWS = 60
 # MDims drawn on the grid at once. Each costs a view diff against the baseline, and past a handful the
 # canvas is unreadable anyway; the rest are named rather than silently dropped.
 MAX_TREE_MDIMS = 6
+# Explorer grids drawn at once. Their views come from one comparison already made for the badges, so the
+# cost is layout rather than queries — but a page of folded grids nobody opens is still a page.
+MAX_TREE_EXPLORERS = 4
 
 
 def st_show_blast_radius(source_engine: Engine, target_engine: Engine) -> None:
@@ -322,12 +325,23 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
     would overlap whatever Streamlit renders after it, so they cannot be stacked. Its cost is one view
     diff per MDim, which is why it stops at MAX_TREE_MDIMS and says so instead of drawing forever.
     """
+    explorer_hierarchy = _explorer_hierarchy(source_engine, target_engine)
     affected = sorted({str(m["catalogPath"]) for r in reach for m in r.mdims})
     if not affected:
-        st.caption("No MDim renders any of these changes, so there is no dimension grid to draw.")
-        # Nothing to badge, so every affected chart is one the grid says nothing about.
-        _chart_reach(reach, badged=set())
-        _explorer_reach(reach)
+        st.caption("No MDim renders any of these changes, so there is no MDim grid to draw.")
+        if explorer_hierarchy is None:
+            # Nothing to badge, so every affected chart is one the grid says nothing about.
+            _chart_reach(reach, badged=set())
+            _explorer_reach(reach)
+            return
+        # Explorer views have dimensions of their own, so there is still a grid worth drawing.
+        tree_html, height = render_multi_tree_html(
+            [],
+            branches=[_chart_branch(reach, set())],
+            hierarchies=[explorer_hierarchy],
+            self_url=f"{SOURCE.wizard_url.rstrip('/')}/metadata-diff",
+        )
+        components.html(tree_html, height=height, scrolling=False)
         return
 
     df = cached.mdim_changes(source_engine, target_engine)
@@ -381,8 +395,10 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
         )
 
     tree_html, height = render_multi_tree_html(
-        sections,
-        branches=[b for b in (_chart_branch(reach, badged), _explorer_branch(reach)) if b],
+        [],
+        branches=[_chart_branch(reach, badged)],
+        # The explorers are a hierarchy of grids now, not a flat branch: their views have dimensions.
+        hierarchies=[h for h in ({"id": "mdims", "label": "MDims", "sections": sections}, explorer_hierarchy) if h],
         self_url=f"{SOURCE.wizard_url.rstrip('/')}/metadata-diff",
         # The same denominator the MDims section reports: every MDim compared, not only those drawn here.
         mdim_total=len(df),
@@ -392,6 +408,91 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
     # scrolling=False: the component resizes its frame to its content, so an iframe scrollbar could only
     # ever nest a second vertical scroll inside the page's.
     components.html(tree_html, height=height, scrolling=False)
+
+
+def _explorer_hierarchy(source_engine: Engine, target_engine: Engine) -> dict[str, Any] | None:
+    """The affected explorers as dimension grids, a hierarchy beside the MDims — or nothing, when none are.
+
+    An explorer view is addressed by dimensions exactly as an MDim view is, so the same grid answers the
+    same question: not how many views changed but *which*, and what sits next to them.
+
+    Drawn like the MDim grids in every respect — expanded, titled with the explorer's own name and its
+    slug beneath — so the two hierarchies read the same way. That does mean an explorer whose every view
+    changed draws every one of them: a shared subtitle edit reached 402 views of one LIS explorer. The
+    section's own "Show all views" filter and its collapsible branches are what keep that navigable.
+    """
+    changes = cached.explorer_changes(source_engine, target_engine)
+    branch = changes.branch_views()
+    if not branch:
+        return None
+
+    titles = cached.explorer_titles(source_engine)
+    sections = []
+    for slug in sorted(branch)[:MAX_TREE_EXPLORERS]:
+        diffs = [d for d in branch[slug] if d.changed] or branch[slug]
+        dimensions = _explorer_dimensions(diffs)
+        if not dimensions:
+            continue
+        sections.append(
+            {
+                # Titled the way an MDim section is: the name a reader sees, with the slug beneath it.
+                "title": titles.get(slug, slug),
+                "subtitle": slug,
+                "dimensions": dimensions,
+                "view_diffs": diffs,
+                "leaf_hrefs": [f"{SOURCE.site}/explorers/{slug}?{urlencode(v.dimensions)}" for v in diffs],
+            }
+        )
+    if not sections:
+        return None
+
+    dropped = sorted(branch)[MAX_TREE_EXPLORERS:]
+    label = f"{len(sections)} explorer{'s' if len(sections) != 1 else ''}"
+    if dropped:
+        label += f" · not drawn: {', '.join(dropped)}"
+    return {"id": "explorers", "label": "Explorers", "count_label": label, "sections": sections}
+
+
+def _explorer_dimensions(diffs: list[ViewDiff]) -> list[dict[str, Any]]:
+    """The grid's columns, inferred from the views themselves.
+
+    An explorer publishes no dimension list the tool can read — there is no `dimensions` block like an
+    MDim config's — so the columns are the keys its views carry, with each key's values in first-seen
+    order. The slugs are the labels because that is all there is, and an explorer's are already written
+    for people ("1-poorest", "After tax").
+
+    Narrowest dimension first, widest last, which is a guess but a better one than the order the views
+    happen to list. A leaf is named by the last dimension's value, so leaving a two-choice toggle there
+    labels four hundred leaves "true" and "false"; putting the widest dimension last names them by the
+    thing that actually distinguishes them, and the toggle becomes the branch you open to get there.
+    """
+    order: list[str] = []
+    choices: dict[str, list[str]] = {}
+    for diff in diffs:
+        for key, value in diff.dimensions.items():
+            if key not in choices:
+                order.append(key)
+                choices[key] = []
+            if value not in choices[key]:
+                choices[key].append(value)
+    # Positions captured first: `list.sort` empties the list while it runs, so a key function calling
+    # `order.index` raises ValueError on the very first comparison.
+    seen_at = {key: i for i, key in enumerate(order)}
+    order.sort(key=lambda key: (len(choices[key]), seen_at[key]))
+
+    def pretty(text: str) -> str:
+        # Tidied, but never tidied away: a dimension value of "-" (this view has no decile) turned into a
+        # single space and left four hundred leaves labelled with nothing at all.
+        return text.replace("-", " ").replace("_", " ").strip() or text
+
+    return [
+        {
+            "slug": key,
+            "name": pretty(key),
+            "choices": [{"slug": value, "name": pretty(value)} for value in choices[key]],
+        }
+        for key in order
+    ]
 
 
 def _explorer_branch(reach: list[ChangeReach]) -> dict[str, Any] | None:

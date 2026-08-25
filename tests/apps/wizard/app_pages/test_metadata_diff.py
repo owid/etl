@@ -1479,21 +1479,21 @@ def test_a_reordered_list_still_shows_every_bullet():
 
 
 def test_section_badges_answer_whether_anything_is_left_to_review():
-    """A bare total cannot tell "nothing to review" from "nothing reviewed yet" — the whole question."""
+    """Whether anything is left — not how many of what, which a number beside "Charts" gets wrong."""
     from apps.wizard.app_pages.metadata_diff.core import section_label as _section_label
 
-    assert "(0/10)" in _section_label("charts", {"charts": (0, 10)})
-    assert "(3/10)" in _section_label("charts", {"charts": (3, 10)})
-    # Done reads as done, not as "10/10" the eye has to compare.
-    assert "(10 ✓)" in _section_label("charts", {"charts": (10, 10)})
+    assert _section_label("charts", {"charts": (0, 10)}).endswith("🟡")
+    assert _section_label("charts", {"charts": (3, 10)}).endswith("🟡")
+    assert _section_label("charts", {"charts": (10, 10)}).endswith("✅")
 
-    # A section with nothing in it stays a plain zero rather than "0/0". (The icon name has a slash of
-    # its own, so look only at the counter.)
-    def counter(label: str) -> str:
-        return label.rsplit("(", 1)[1].rstrip(")")
+    # No count anywhere: "(2/10)" counted distinct text changes, and beside the word "Charts" that read
+    # as ten charts — one text change can reach eight hundred.
+    assert "10" not in _section_label("charts", {"charts": (3, 10)}).removeprefix(":material/show_chart:")
 
-    assert counter(_section_label("explorers", {})) == "0"
-    assert counter(_section_label("explorers", {"explorers": (0, 0)})) == "0"
+    # A section with nothing in it gets no marker: it is greyed out for exactly that reason.
+    for empty in ({}, {"explorers": (0, 0)}):
+        label = _section_label("explorers", empty)
+        assert label.endswith("Explorers"), label
 
 
 def test_a_tick_only_counts_while_the_text_it_was_made_against_stands(monkeypatch):
@@ -1576,10 +1576,11 @@ def test_coerce_section_recovers_a_section_from_its_label():
 def test_a_stale_section_label_never_survives_as_a_value():
     """The Streamlit behaviour behind the crash, checked where it actually happens.
 
-    `st.segmented_control` sends and receives the *formatted* label. Ours count reviewed changes, so a
-    tick leaves the browser holding a label the widget no longer offers, and the single-select serde
-    returns that raw label in place of the option — which then reached `?diff-type=` and made the next
-    page load raise. Asserted through the coercion, so a Streamlit release that stops leaking passes too.
+    `st.segmented_control` sends and receives the *formatted* label. Ours carry review state, so ticking
+    the last change in a section leaves the browser holding a label the widget no longer offers, and the
+    single-select serde returns that raw label in place of the option — which then reached `?diff-type=`
+    and made the next page load raise. Asserted through the coercion, so a Streamlit release that stops
+    leaking passes too.
     """
     button_group = pytest.importorskip("streamlit.elements.widgets.button_group")
     serde_cls = getattr(button_group, "_SingleSelectButtonGroupSerde", None)
@@ -1589,7 +1590,7 @@ def test_a_stale_section_label_never_survives_as_a_value():
     from apps.wizard.app_pages.metadata_diff.core import SECTIONS, coerce_section, section_label
 
     options = list(SECTIONS)
-    after = {"mdims": (3, 10)}  # one more change reviewed than the browser last saw
+    after = {"mdims": (10, 10)}  # the last change reviewed, so the marker flips: 🟡 -> ✅
     formatted = [section_label(o, after) for o in options]
     serde = serde_cls(
         options,
@@ -1834,9 +1835,9 @@ def test_blast_radius_badge_carries_no_review_counter():
     assert "blast" not in COUNTED_SECTIONS
     label = section_label("blast", {})
     assert label.endswith("Blast radius")
-    assert "(" not in label
-    # The review sections keep their counters.
-    assert section_label("charts", {"charts": (2, 10)}).endswith("(2/10)")
+    assert "(" not in label and "🟡" not in label and "✅" not in label
+    # The review sections do carry the marker.
+    assert section_label("charts", {"charts": (2, 10)}).endswith("🟡")
 
 
 def test_diff_preview_windows_on_the_change_not_the_start():
@@ -2309,3 +2310,59 @@ def test_tree_draws_a_branch_per_flat_surface():
     # An empty branch is not drawn, and does not appear in the jump index either.
     assert 'id="mdd-section-nothing"' not in html_out and "Nothing" not in html_out
     assert html_out.count('data-target="mdd-section-') == 2
+
+
+def test_explorer_grid_columns_are_inferred_narrowest_first():
+    """An explorer publishes no dimension list, so the grid's columns come from the views themselves.
+
+    Narrowest dimension first: a leaf is named by the last dimension's value, so leaving a two-choice
+    toggle there labels every leaf "true" or "false".
+
+    Also pins the crash this shipped with for one page load — the sort key called `order.index`, and
+    `list.sort` empties the list while it runs, so the first comparison raised
+    `ValueError: list.index(x): x not in list` and took the whole Blast radius down.
+    """
+    from apps.wizard.app_pages.metadata_diff.blast_section import _explorer_dimensions
+    from apps.wizard.app_pages.metadata_diff.core import ViewDiff
+
+    views = [
+        ViewDiff(dimensions={"Equivalized": "true", "Decile": d, "Period": p})
+        for d in ("1-poorest", "5", "10-richest")
+        for p in ("Day", "Month")
+    ] + [ViewDiff(dimensions={"Equivalized": "false", "Decile": "1-poorest", "Period": "Day"})]
+
+    dims = _explorer_dimensions(views)
+    assert [d["slug"] for d in dims] == ["Equivalized", "Period", "Decile"], "narrowest first, widest last"
+    assert [c["slug"] for c in dims[-1]["choices"]] == ["1-poorest", "5", "10-richest"], "first-seen order"
+    assert dims[0]["name"] == "Equivalized"
+
+    # Ties keep the order the views listed them in, rather than an arbitrary one.
+    tied = [ViewDiff(dimensions={"B": "1", "A": "1"}), ViewDiff(dimensions={"B": "2", "A": "2"})]
+    assert [d["slug"] for d in _explorer_dimensions(tied)] == ["B", "A"]
+
+    # Tidying dashes into spaces must not tidy a label away: "-" means this view has no decile, and it
+    # rendered as a single space, leaving four hundred leaves labelled with nothing.
+    dashed = _explorer_dimensions([ViewDiff(dimensions={"Decile": "-"}), ViewDiff(dimensions={"Decile": "1-poorest"})])
+    assert [c["name"] for c in dashed[0]["choices"]] == ["-", "1 poorest"]
+
+
+def test_a_chart_link_beats_the_blank_left_by_the_lookup_box():
+    """Following a chart link inside an open session used to undo itself.
+
+    `url_persist` seeds a widget from the query string only when its session value is `None`. The lookup
+    box leaves an empty string once rendered, so arriving with `?chart=<slug>` found a blank widget, wrote
+    the blank back over the URL, and left the reader on the list they had just clicked away from.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import requested_chart
+
+    # The link wins over the blank the box left behind — the case that was broken.
+    assert requested_chart("", "life-expectancy") == "life-expectancy"
+    assert requested_chart(None, "life-expectancy") == "life-expectancy"
+    assert requested_chart("   ", "life-expectancy") == "life-expectancy"
+
+    # A chart already open wins over the URL: typing in the box is what put it there.
+    assert requested_chart("child-mortality", "life-expectancy") == "child-mortality"
+
+    # Nothing anywhere means the list, not a blank per-chart page.
+    assert requested_chart(None, None) == ""
+    assert requested_chart("", "") == ""

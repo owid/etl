@@ -842,20 +842,21 @@ DEFAULT_SECTION = "blast"
 
 
 def section_label(section: str, progress: dict[str, tuple[int, int]]) -> str:
-    """Section label carrying its review progress, so "anything left?" is answerable without clicking.
+    """Section label with a review marker — the same ✅ / 🟡 the change cards use.
 
-    `reviewed/total` while anything is outstanding, and a tick once the section is done — a bare total
-    cannot distinguish "nothing to review" from "nothing reviewed yet", which is the whole question.
+    Deliberately not a count. `(2/10)` counted distinct text changes, and beside the word "Charts" that
+    reads as ten charts, which it is not: one text change can reach eight hundred of them. The number
+    belongs inside the section, next to what it counts. What the bar has to answer is narrower — is there
+    anything in here still to look at.
     """
     icon, name = SECTIONS[section]
     if section not in COUNTED_SECTIONS:
         return f"{icon} {name}"
     done, total = progress.get(section, (0, 0))
     if not total:
-        return f"{icon} {name} (0)"
-    if done == total:
-        return f"{icon} {name} ({total} ✓)"
-    return f"{icon} {name} ({done}/{total})"
+        # Nothing to review. The button is greyed out for exactly this, so a marker would repeat it.
+        return f"{icon} {name}"
+    return f"{icon} {name} {'✅' if done >= total else '🟡'}"
 
 
 def empty_sections(progress: dict[str, tuple[int, int]], keep: Iterable[str] = ()) -> list[str]:
@@ -874,6 +875,18 @@ def empty_sections(progress: dict[str, tuple[int, int]], keep: Iterable[str] = (
     """
     forced = set(keep)
     return [s for s in SECTIONS if s in COUNTED_SECTIONS and s not in forced and progress.get(s, (0, 0))[1] == 0]
+
+
+def requested_chart(session_value: object, query_value: object) -> str:
+    """Which chart the page should open, from the lookup widget's value and the URL's.
+
+    The URL wins whenever the widget is blank, and that is the whole point of the function. `url_persist`
+    seeds a widget from the query string only when its session value is `None`, and the lookup box leaves
+    an empty *string* behind once it has rendered — so following a chart link inside an already-open
+    session arrived with `?chart=` set, an empty widget, and that empty value written straight back over
+    the URL. Measured: the link worked in a fresh tab and did nothing in the tab you were using.
+    """
+    return str(session_value or "").strip() or str(query_value or "").strip()
 
 
 def coerce_section(value: object, fallback: str = DEFAULT_SECTION) -> str:

@@ -236,6 +236,23 @@ def fetch_variable_paths(engine: Engine, variable_ids: list[int]) -> dict[int, s
     return {int(record["id"]): str(record["catalogPath"]) for record in _fetch_chunks(fetch, sorted(set(variable_ids)))}
 
 
+def fetch_explorer_titles(engine: Engine) -> dict[str, str]:
+    """Each published explorer's reader-facing name, by slug.
+
+    Deliberately unordered. `config` is a large JSON blob, and an `order by` over rows carrying it
+    overruns MySQL's sort buffer even when only a scalar is selected out of it.
+    """
+    df = read_sql(
+        """
+        select slug, config ->> '$.explorerTitle' as title
+        from explorers
+        where isPublished = 1
+        """,
+        engine=engine,
+    )
+    return {str(r["slug"]): str(r["title"]) for r in df.to_dict("records") if r.get("title")}
+
+
 def fetch_indicator_config_texts(engine: Engine, catalog_paths: list[str]) -> dict[str, dict[str, Any]]:
     """The chart text a garden step authors for an indicator, by catalogPath.
 
