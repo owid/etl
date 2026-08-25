@@ -532,7 +532,7 @@ class Chart(Base):
         """Load the chart's ETL-authored config layer, if it has one."""
         assert self.id, "Chart must come from a database"
         etl_config = session.scalar(
-            select(ChartConfig.full).join(Chart, ChartConfig.id == Chart.configIdETL).where(Chart.id == self.id)
+            select(ChartConfig.config).join(Chart, ChartConfig.id == Chart.configIdETL).where(Chart.id == self.id)
         )
         return copy.deepcopy(etl_config) if etl_config else None
 
