@@ -80,8 +80,11 @@ DIFF_CSS = """
             background: #fff; }
 .mdd-text ul { margin: 0 0 0 18px; padding: 0; }
 .mdd-text li { margin-bottom: 8px; }
-.mdd-text del.mdd-del { background: #ffe3e3; color: #c92a2a; text-decoration: line-through; }
-.mdd-text ins.mdd-ins { background: #d3f9d8; color: #2b8a3e; text-decoration: none; }
+/* Both containers: `.mdd-text` is the bordered before/after box, `.mdd-diff` an inline diff line (the
+   by-edit cards). Without the second selector an <ins>/<del> there fell back to the browser's underline
+   and strikethrough — the change was in the markup and invisible as a diff. */
+.mdd-text del.mdd-del, .mdd-diff del.mdd-del { background: #ffe3e3; color: #c92a2a; text-decoration: line-through; }
+.mdd-text ins.mdd-ins, .mdd-diff ins.mdd-ins { background: #d3f9d8; color: #2b8a3e; text-decoration: none; }
 .mdd-empty { color: #999; font-style: italic; }
 .mdd-slot { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: #868e96;
             margin: 10px 0 2px; }
