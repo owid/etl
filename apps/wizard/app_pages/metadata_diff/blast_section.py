@@ -22,7 +22,7 @@ each MDim's views, which is why it stops at `MAX_TREE_MDIMS`.
 
 import html
 from typing import Any
-from urllib.parse import quote, urlencode
+from urllib.parse import quote
 
 import streamlit as st
 import streamlit.components.v1 as components
@@ -38,6 +38,7 @@ from apps.wizard.app_pages.metadata_diff.render import (
     impact_counts,
     render_chart_list,
     view_impact,
+    view_url,
 )
 from apps.wizard.app_pages.metadata_diff.tree import render_multi_tree_html
 from apps.wizard.utils.components import url_persist
@@ -147,90 +148,83 @@ def _tree(edits: list[EditGroup]) -> None:
 
 
 def _edit_detail(group: EditGroup) -> None:
-    """Where one edit lands, aggregated over its texts: MDim views first, then charts, everything linked.
+    """Where one edit lands, aggregated over its texts: what a reader can see, then what nobody can yet.
 
-    Deduped across the texts — a view or chart carrying two of them is one place, not two — and grouped by
-    the question a reviewer is actually asking: which views, in which MDim, and how prominently a chart
-    shows the text.
+    Counts and names, not links. One edit reaches a hundred views, the dimension grid already enumerates
+    every one of them, and listing them again here buried the two numbers this expander exists to give.
+
+    Published first, and unpublished kept apart, because "can a reader see this today" is the question
+    that decides how much care the edit needs — not how many places it touches in total.
+
+    Deduped across the edit's texts: a view or chart carrying two of them is one place, not two.
     """
-    by_mdim: dict[str, dict[str, Any]] = {}
-    for change in group.changes:
-        for mdim in change.mdims:
-            entry = by_mdim.setdefault(
-                str(mdim["catalogPath"]),
-                {
-                    "title": str(mdim.get("title") or mdim["catalogPath"]),
-                    "slug": str(mdim.get("slug") or ""),
-                    "is_draft": bool(mdim.get("is_draft")),
-                    "views": {},
-                },
-            )
-            for view in mdim.get("views") or []:
-                entry["views"][urlencode(sorted(view.items()))] = view
-
-    published = {cp: e for cp, e in by_mdim.items() if not e["is_draft"]}
-    drafts = {cp: e for cp, e in by_mdim.items() if e["is_draft"]}
-    for label, group_of_mdims in (("", published), (" · unpublished MDims", drafts)):
-        if not group_of_mdims:
-            continue
-        n_views = sum(len(e["views"]) for e in group_of_mdims.values())
-        st.markdown(
-            f"**{n_views} view{'s' if n_views != 1 else ''}** in "
-            f"**{len(group_of_mdims)} MDim{'s' if len(group_of_mdims) != 1 else ''}**{label}"
-        )
-        for entry in sorted(group_of_mdims.values(), key=lambda e: e["title"]):
-            views = list(entry["views"].values())
-            st.markdown(f"- {entry['title']} — {_view_links(entry['slug'], views)}")
-
+    mdims = _mdim_totals(group)
     charts = {c["chartId"]: c for change in group.changes for c in change.charts}
-    draft_charts = {c["chartId"]: c for change in group.changes for c in change.draft_charts}
+    drafts = {c["chartId"]: c for change in group.changes for c in change.draft_charts}
     on_page = [c for c in charts.values() if c.get("has_data_page", True)]
     drawer = [c for c in charts.values() if not c.get("has_data_page", True)]
 
-    if charts or draft_charts:
-        st.markdown(f"**{len(charts)} chart{'s' if len(charts) != 1 else ''}** a reader can open")
-        if on_page:
-            st.markdown(f"- On their data page ({len(on_page)}) — {_chart_links(on_page)}")
-        if drawer:
-            st.markdown(f"- Via *Learn more about this data* ({len(drawer)}) — {_chart_links(drawer)}")
-        if draft_charts:
-            st.markdown(
-                f"- Unpublished drafts ({len(draft_charts)}), which no reader can open — "
-                f"{_chart_links(list(draft_charts.values()), published=False)}"
-            )
-    if not by_mdim and not charts and not draft_charts:
+    live_mdims = [e for e in mdims if not e["is_draft"]]
+    draft_mdims = [e for e in mdims if e["is_draft"]]
+
+    if live_mdims or charts:
+        lines = _mdim_lines(live_mdims)
+        if charts:
+            where = []
+            if on_page:
+                where.append(f"{len(on_page)} on their data page")
+            if drawer:
+                where.append(f"{len(drawer)} via *Learn more about this data*")
+            lines.append(f"- **{len(charts)} chart{'s' if len(charts) != 1 else ''}** — {', '.join(where)}")
+        st.markdown("**A reader can see this**")
+        st.markdown("\n".join(lines))
+
+    if draft_mdims or drafts:
+        lines = _mdim_lines(draft_mdims)
+        if drafts:
+            lines.append(f"- **{len(drafts)} draft chart{'s' if len(drafts) != 1 else ''}**")
+        st.markdown("**Not published, so no reader can see it yet**")
+        st.markdown("\n".join(lines))
+
+    if not mdims and not charts and not drafts:
         st.caption("Nothing renders this text yet — no MDim view, chart or explorer view.")
 
 
-def _view_links(slug: str, views: list[dict[str, Any]], limit: int = 12) -> str:
-    """One link per view, to the view as a reader gets it. Without a slug there is nothing to link to."""
-    if not views:
-        return "no views"
-    labels = sorted(" · ".join(str(v) for v in view.values()) or "default" for view in views)
-    if not slug:
-        shown = ", ".join(labels[:limit])
-        return shown + (f" … +{len(labels) - limit}" if len(labels) > limit else "")
-    links = []
-    for view, label in zip(sorted(views, key=lambda v: " · ".join(str(x) for x in v.values())), labels):
-        links.append(f"[{label}]({SOURCE.site}/grapher/{slug}?{urlencode(view)})")
-    shown = ", ".join(links[:limit])
-    return shown + (f" … +{len(links) - limit} more" if len(links) > limit else "")
+def _mdim_totals(group: EditGroup) -> list[dict[str, Any]]:
+    """One row per MDim this edit reaches: what to call it, whether it is published, how many views.
+
+    Views are counted as a set of dimension tuples, so an MDim reached by several of the edit's texts is
+    one row with its distinct views — not the same view counted twice. Where a reach entry carries only a
+    count and no dimensions, the largest count any single text reported is used: it is the tightest lower
+    bound available, and it is exact whenever the texts land on the same views.
+    """
+    by_path: dict[str, dict[str, Any]] = {}
+    for change in group.changes:
+        for mdim in change.mdims:
+            entry = by_path.setdefault(
+                str(mdim["catalogPath"]),
+                {
+                    "title": str(mdim.get("title") or mdim["catalogPath"]),
+                    "is_draft": bool(mdim.get("is_draft")),
+                    "views": set(),
+                    "counted": 0,
+                },
+            )
+            entry["views"] |= {tuple(sorted(v.items())) for v in mdim.get("views") or []}
+            entry["counted"] = max(entry["counted"], int(mdim.get("n_views") or 0))
+    for entry in by_path.values():
+        entry["n_views"] = len(entry["views"]) or entry["counted"]
+    return sorted(by_path.values(), key=lambda e: (-e["n_views"], e["title"]))
 
 
-def _chart_links(charts: list[dict[str, Any]], published: bool = True, limit: int = 12) -> str:
-    """One link per chart — the published page, or the admin editor for a draft."""
-    rows = []
-    for chart in sorted(charts, key=lambda c: str(c.get("slug") or "")):
-        slug = str(chart.get("slug") or "")
-        label = slug or f"chart {chart.get('chartId')}"
-        href = (
-            f"{SOURCE.site}/grapher/{slug}"
-            if published and slug
-            else f"{SOURCE.admin_site}/admin/charts/{chart.get('chartId')}/edit"
-        )
-        rows.append(f"[{label}]({href})")
-    shown = ", ".join(rows[:limit])
-    return shown + (f" … +{len(rows) - limit} more" if len(rows) > limit else "")
+def _mdim_lines(entries: list[dict[str, Any]]) -> list[str]:
+    """One bullet per MDim, named as the dimension grid names it, widest reach first.
+
+    The surface is named on every line. A bullet reading "30 views in Incomes across the distribution"
+    leaves the reader to infer that the italicised thing is an MDim, and beside a bullet counting charts
+    that inference is exactly what should not be left to them.
+    """
+    return [f"- **{e['n_views']} view{'s' if e['n_views'] != 1 else ''}** in the MDim *{e['title']}*" for e in entries]
 
 
 def _edit_body(group: EditGroup) -> None:
@@ -325,16 +319,18 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
         # Each leaf opens that view on this staging server — the view as a reader gets it, which is the
         # question you have when you click one view out of fifty.
         slug = str(row["slug_source"]) if row is not None and row.get("slug_source") else ""
-        draft = " · unpublished" if row is not None and bool(row.get("is_draft")) else ""
+        is_draft = row is not None and bool(row.get("is_draft"))
         sections.append(
             {
-                "title": f"{title}{draft}",
+                "title": f"{title}{' · unpublished' if is_draft else ''}",
                 "subtitle": catalog_path,
                 "catalog_path": catalog_path,
                 "dimensions": dimensions,
                 "view_diffs": view_diffs,
+                # An unpublished MDim has no reader-facing page — `/grapher/<slug>` 404s even when the
+                # slug is already set — so its views open in the admin preview, which applies dimensions.
                 "leaf_hrefs": [
-                    f"{SOURCE.site}/grapher/{slug}?{urlencode(v.dimensions)}" if slug else "" for v in view_diffs
+                    view_url(SOURCE, catalog_path, None if is_draft else slug, v.dimensions) for v in view_diffs
                 ],
                 "external_impacts": [impact_counts(v, usage) for v in view_diffs],
             }
@@ -383,7 +379,7 @@ def _chart_branch(reach: list[ChangeReach], badged: set) -> dict[str, Any]:
         href = (
             f"{SOURCE.site}/grapher/{slug}"
             if published and chart.get("slug")
-            else f"{SOURCE.admin_site}/admin/charts/{chart.get('chartId')}/edit"
+            else SOURCE.chart_admin_site(chart.get("chartId"))  # ty: ignore
         )
         return {
             "label": slug,

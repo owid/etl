@@ -2102,3 +2102,108 @@ def test_a_view_pointing_at_another_variant_is_marked_not_blamed_on_the_baseline
     group = group_changes([swapped])[0]
     assert group.indicator_replaced is True
     assert group_changes([edited])[0].indicator_replaced is False
+
+
+def test_edit_detail_counts_distinct_views_per_mdim():
+    """An MDim reached by several of an edit's texts is one row, with its views counted once."""
+    from apps.wizard.app_pages.metadata_diff.blast_section import _mdim_lines, _mdim_totals
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, group_by_edit
+
+    added = "Values are rounded."
+    overlapping = {"indicator": "mean", "period": "day"}
+    reach = [
+        ChangeReach(
+            field="descriptionKey",
+            old="Income data.",
+            new=f"Income data. {added}",
+            mdims=[
+                {
+                    "catalogPath": "grapher/a/latest/incomes",
+                    "title": "Incomes across the distribution",
+                    "n_views": 2,
+                    "views": [overlapping, {"indicator": "mean", "period": "month"}],
+                    "is_draft": False,
+                }
+            ],
+        ),
+        ChangeReach(
+            field="descriptionKey",
+            old="Poverty data.",
+            new=f"Poverty data. {added}",
+            mdims=[
+                {
+                    "catalogPath": "grapher/a/latest/incomes",
+                    "title": "Incomes across the distribution",
+                    "n_views": 1,
+                    "views": [overlapping],
+                    "is_draft": False,
+                },
+                {
+                    "catalogPath": "grapher/a/latest/poverty",
+                    "title": "Poverty indicators",
+                    "n_views": 1,
+                    "views": [{"indicator": "headcount"}],
+                    "is_draft": True,
+                },
+            ],
+        ),
+    ]
+    group = group_by_edit(reach)[0]
+    totals = _mdim_totals(group)
+
+    assert [e["title"] for e in totals] == [
+        "Incomes across the distribution",
+        "Poverty indicators",
+    ], "widest reach first"
+    # The view both texts land on is one view, so 2 + 1 overlapping = 2, not 3.
+    assert totals[0]["n_views"] == 2
+    assert totals[0]["is_draft"] is False
+    assert totals[1]["is_draft"] is True, "the draft MDim stays flagged, to be listed apart"
+    assert _mdim_lines(totals[:1]) == ["- **2 views** in the MDim *Incomes across the distribution*"]
+    assert _mdim_lines([totals[1]]) == ["- **1 view** in the MDim *Poverty indicators*"]
+
+
+def test_edit_detail_counts_reach_entries_without_dimensions():
+    """A reach entry carrying only a count still reports one: the largest any single text saw."""
+    from apps.wizard.app_pages.metadata_diff.blast_section import _mdim_totals
+    from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, group_by_edit
+
+    reach = [
+        ChangeReach(
+            field="subtitle",
+            old="A.",
+            new="A. B.",
+            mdims=[{"catalogPath": "grapher/a/latest/one", "n_views": 6, "is_draft": False}],
+        ),
+        ChangeReach(
+            field="subtitle",
+            old="C.",
+            new="C. B.",
+            mdims=[{"catalogPath": "grapher/a/latest/one", "n_views": 3, "is_draft": False}],
+        ),
+    ]
+    totals = _mdim_totals(group_by_edit(reach)[0])
+    assert len(totals) == 1
+    assert totals[0]["n_views"] == 6, "no dimensions to union, so the tightest bound is the largest count"
+    assert totals[0]["title"] == "grapher/a/latest/one", "no title in the entry falls back to the path"
+
+
+def test_view_url_sends_unpublished_views_to_the_admin_preview():
+    """`/grapher/<slug>` 404s until an MDim is published, so an unpublished view links to the preview."""
+    from apps.wizard.app_pages.metadata_diff.render import view_url
+
+    class Env:
+        site = "http://staging-site-x"
+        admin_site = "http://staging-site-x/admin"
+
+    dims = {"indicator": "headcount", "period": "day"}
+    published = view_url(Env(), "wb/latest/poverty_pip#poverty_pip", "poverty-wb", dims)
+    assert published == "http://staging-site-x/grapher/poverty-wb?indicator=headcount&period=day"
+
+    unpublished = view_url(Env(), "wb/latest/poverty_pip#poverty_pip", None, dims)
+    assert unpublished == (
+        "http://staging-site-x/admin/grapher/wb%2Flatest%2Fpoverty_pip%23poverty_pip/?indicator=headcount&period=day"
+    )
+    # One `/admin`, not two: `admin_site` already ends in it, and the doubled path serves the admin
+    # shell with no editor or preview in it.
+    assert "/admin/admin/" not in unpublished

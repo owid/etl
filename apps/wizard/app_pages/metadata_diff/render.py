@@ -115,7 +115,12 @@ def view_label(view: ViewDiff, dimensions: list[dict[str, Any]]) -> str:
 
 
 def view_url(env, catalog_path: str, published_slug: str | None, dims: dict[str, str]) -> str:
-    """URL of a view in a given environment (site if published there, admin preview otherwise)."""
+    """URL of a view in a given environment (site if published there, admin preview otherwise).
+
+    Pass `published_slug=None` for an MDim that is not published in that environment even if it already
+    has a slug: `/grapher/<slug>` 404s until publication, while the admin preview renders the page and
+    applies the dimensions from the query string (both verified against a staging server).
+    """
     params = urllib.parse.urlencode(dims)
     if published_slug:
         return f"{env.site}/grapher/{published_slug}?{params}"
@@ -436,7 +441,7 @@ def render_chart_list(
         for c in sorted(drafts, key=lambda c: str(c.get("slug") or "")):
             chart_id = c.get("chartId")
             label = c.get("slug") or f"chart {chart_id}"
-            rows.append(f"- [`{label}`]({SOURCE.admin_site}/admin/charts/{chart_id}/edit)")
+            rows.append(f"- [`{label}`]({SOURCE.chart_admin_site(chart_id)})")  # ty: ignore
         st.markdown("\n".join(rows))
 
 
