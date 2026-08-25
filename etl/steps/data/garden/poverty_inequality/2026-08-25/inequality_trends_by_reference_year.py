@@ -110,9 +110,15 @@ def compute_metrics(tb_distributions: Table) -> Table:
 
         # Gini via the Lorenz curve (trapezoid rule, valid for unequal bin widths). Bins carry no
         # within-bin inequality, so this is a slight underestimate — identically for all series.
-        lorenz = np.cumsum(w * x, axis=1) / (w * x).sum(axis=1, keepdims=True)
+        # The Lorenz curve must be traced in income order: a few adjusted distributions are
+        # non-monotone along the percentile axis (kept upstream), so sort each row's bins by
+        # income first (stable sort: monotone rows are unchanged).
+        order = np.argsort(x, axis=1, kind="stable")
+        x_sorted = np.take_along_axis(x, order, axis=1)
+        w_sorted = np.take_along_axis(w, order, axis=1)
+        lorenz = np.cumsum(w_sorted * x_sorted, axis=1) / (w_sorted * x_sorted).sum(axis=1, keepdims=True)
         lorenz_prev = np.concatenate([np.zeros((len(keys), 1)), lorenz[:, :-1]], axis=1)
-        block["gini"] = 1 - ((lorenz + lorenz_prev) * w).sum(axis=1)
+        block["gini"] = 1 - ((lorenz + lorenz_prev) * w_sorted).sum(axis=1)
 
         # GE(0) = mean log deviation, with the zero floor.
         x_floored = np.where(x == 0, ZERO_INCOME_REPLACEMENT, x)
