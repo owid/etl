@@ -229,6 +229,13 @@ function buildFrame(opts = {}) {
   if (opts.tint || opts.tintFills) children.push(node({ type: "RECTANGLE", name: "wedge__below", x: 90, y: 190,
     width: 200, height: 60, fills: opts.tintFills || solid(opts.tint),
     opacity: opts.tintOpacity === undefined ? 0.45 : opts.tintOpacity }));
+  // Two OVERLAPPING opaque grounds inside one translucent GROUP, pushed BEFORE the annotation so they
+  // are painted under it. Figma composites the pair, then applies the group's opacity once;
+  // `nodeOpacity` folds it into each child instead, so compositing them independently applies it twice.
+  if (opts.dimGroup) children.push(node({ name: "shading", opacity: opts.dimGroup, x: 85, y: 185,
+    width: 220, height: 70, children: [
+      node({ type: "RECTANGLE", name: "wedge__lower", x: 85, y: 185, width: 220, height: 70, fills: solid("#dddddd") }),
+      node({ type: "RECTANGLE", name: "wedge__upper", x: 88, y: 188, width: 210, height: 62, fills: solid("#bbbbbb") })] }));
   if (opts.annotation) children.push(opts.annotation);
   // Pushed AFTER the annotation, so it is painted ON TOP of it — the re-import z-order bug, not a
   // ground. A bbox-only filter cannot tell the two apart.
@@ -236,8 +243,8 @@ function buildFrame(opts = {}) {
     width: 200, height: 60, fills: solid(opts.tintAbove), opacity: 0.45 }));
   // A full-bleed rectangle used as the visible background — how the Instagram templates carry their
   // beige. Unshifted so it sits at the BOTTOM of the stack, under everything else on the frame.
-  if (opts.backdrop) children.unshift(node({ type: "RECTANGLE", name: "backdrop", x: 0, y: 0,
-    width: W, height: opts.frameH || 540, fills: solid(opts.backdrop) }));
+  if (opts.backdrop || opts.backdropFills) children.unshift(node({ type: "RECTANGLE", name: "backdrop", x: 0, y: 0,
+    width: W, height: opts.frameH || 540, fills: opts.backdropFills || solid(opts.backdrop) }));
 
   return node({ id: "F:1", name: "test frame", x: 0, y: 0, width: W, height: opts.frameH || 540,
                 fills: solid(opts.frameFill || "#ffffff"), children });
@@ -595,6 +602,49 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     check("6j and the solid base is not blessed as the requested ground",
           !/asks for when the annotation sits on a tint/.test(mixed.detail), mixed.detail);
     check("6j and it points at tier 1", /tier 1/.test(mixed.detail), mixed.detail);
+  }
+
+  // 6k — an UNMEASURABLE full-bleed ground must never be dropped by the "composites to the frame" test.
+  //       `groundOver` on one returns the arbitrary forward fold, so a white solid under a gradient
+  //       coincides with a white frame and vanished — taking the "not measurable" signal with it and
+  //       letting the halo be certified against a frame nobody sees.
+  {
+    const gradient = { type: "GRADIENT_LINEAR", visible: true };
+    const out = row(await run(buildFrame({ frameFill: "#ffffff",
+      backdropFills: [solid("#ffffff")[0], gradient],
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {}),
+      "annotation-knockout");
+    check("6k an unmeasurable full-bleed ground is not silently dropped", out.status === "REVIEW", out.detail);
+    check("6k and it is named as unmeasurable", /NOT measurable/.test(out.detail) && /GRADIENT_LINEAR/.test(out.detail), out.detail);
+
+    // ...while a MEASURABLE full-bleed ground that really does paint the frame's colour is still
+    // dropped, or every correct canvas-coloured halo becomes a review.
+    const noop = row(await run(buildFrame({ frameFill: "#ffffff", backdrop: "#ffffff",
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {}),
+      "annotation-knockout");
+    check("6k a measurable no-op backdrop is still dropped", noop.status === "ok", noop.detail);
+  }
+
+  // 6l — two overlapping grounds under ONE translucent group. Their shared group opacity is already
+  //      baked into each of them, so folding them composites it twice; Figma applies it once to the
+  //      pair combined. The script declines rather than modelling it.
+  {
+    const out = row(await run(buildFrame({ dimGroup: 0.5,
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#e2e2e2", strokeWeight: 3 }) }), {}),
+      "annotation-knockout");
+    check("6l overlapping grounds in a dim group are not FAILED", out.status !== "FAIL", out.detail);
+    check("6l and the shared group is named as the reason",
+          /translucent group/.test(out.detail), out.detail);
+    check("6l and no composite is blessed as the requested colour",
+          !/asks for when the annotation sits on a tint/.test(out.detail), out.detail);
+
+    // A SINGLE ground under a translucent group is not affected — the opacity is applied once either
+    // way, so it must still be measured. Otherwise this fix would silence every tinted annotation.
+    const lone = row(await run(buildFrame({ tint: "#dddddd", tintOpacity: 0.45,
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#f0f0f0", strokeWeight: 3 }) }), {}),
+      "annotation-knockout");
+    check("6l a lone ground under one opacity is still measured",
+          lone.status === "REVIEW" && !/translucent group/.test(lone.detail), lone.detail);
   }
 
   // 7 — crossing a MUTED context line is legal under the highlight treatment (review finding 4).

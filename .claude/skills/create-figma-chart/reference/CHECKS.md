@@ -157,7 +157,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > matches a ground's composite, and a canvas-coloured halo with some filled shape's box around it.
 > Both name the shape and the sum so the call can be made by eye.
 >
-> Five consequences that are easy to get wrong in the other direction.
+> Seven consequences that are easy to get wrong in the other direction.
 >
 > **Grounds stack, and so do a single node's fills.** A translucent tint over an opaque plot background
 > renders as the *ordered* composite of both, which equals neither shape's own composite over the
@@ -190,6 +190,21 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > frame, which is exactly how the Instagram templates carry their beige — and dropping it by geometry
 > alone failed a correct halo twice over: once as a needless knockout, then again against a frame fill
 > the reader never sees.
+>
+> **...and only when that colour is actually known.** "Composites to the frame's fill" is a question
+> about a ground whose colour was established; asked of an **unmeasurable** one it is answered by the
+> arbitrary forward fold, and a full-bleed layer carrying a white solid *under a gradient* coincides
+> with a white frame and disappears — taking the "not measurable" signal with it, so the halo is
+> certified `ok` against a frame the reader never sees. A ground whose colour cannot be established is
+> never a no-op; it is the reason to decline.
+>
+> **A group's opacity is applied once, to its children already combined.** Every descendant carries the
+> cumulative opacity of its ancestors, which is right for a single ground and double-counts the moment
+> two of them overlap: two opaque children of a 50% group are one 50% layer, not two. Modelling that
+> needs per-group compositing *and* the paint order the row already declines to assume, so where two
+> candidates share a translucent ancestor the stack is declared **NOT measurable** instead. Decided per
+> annotation, never written back onto the ground — whether a group counts as shared depends on how many
+> of its children contain *this* annotation.
 >
 > **The tier branch knows about the ground too.** "Crosses nothing yet carries a knockout" is a FAIL on
 > *bare canvas* only. An annotation inside a tint keeps its halo while the region under it is still

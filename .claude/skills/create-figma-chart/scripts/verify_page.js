@@ -343,7 +343,7 @@ const checkFrame = async (frameId) => {
   // `categorical-color-legend` and `vertical-color-legend`, each holding a `swatches` group.
   const LEGEND_GROUPS = /^(numeric|categorical|vertical)-color-legend$|^legend$|^legend[-_]/i;
   let isMap = false;
-  const collect = (n, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap, catAncestor, nodeOpacity, insideLegend) => {
+  const collect = (n, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap, catAncestor, nodeOpacity, insideLegend, dimGroup) => {
     if ("visible" in n && !n.visible) return;
     // NODE opacity dims every paint under it, and it ACCUMULATES down the tree — a group at 0.5 holding
     // a leaf at 0.5 renders the leaf at 0.25. Carried as the PRODUCT, not a boolean, because ZERO and
@@ -421,7 +421,7 @@ const checkFrame = async (frameId) => {
       if (n.type !== "TEXT" && !/^annotation__/.test(n.name) && n.fills.some(paints)) {
         const g = flattenFills(n.fills, nodeOpacity);
         if (g.A > 0 || g.unmeasurable) grounds.push({ name: n.name, box: areaBox, order: paintOrder++,
-          C: g.C, A: g.A, hex: g.hex, alpha: g.alpha, unmeasurable: g.unmeasurable });
+          C: g.C, A: g.A, hex: g.hex, alpha: g.alpha, unmeasurable: g.unmeasurable, dimGroup: dimGroup || null });
       }
     }
     // Marker groups and value labels. The NAME is on the group and the GEOMETRY is on its children, and
@@ -469,13 +469,22 @@ const checkFrame = async (frameId) => {
     // the fixture models), so a bare node here loses it and the name-only filter below matches nothing —
     // every slope segment silently absent from `polylines`, and annotation-overlap unable to fail.
     if (n.type === "VECTOR" && insidePlot) vectors.push({ node: n, seriesOf });
-    if ("children" in n && n.children.length) { n.children.forEach((c) => collect(c, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap, catAncestor, nodeOpacity, insideLegend)); return; }
+    if ("children" in n && n.children.length) {
+      // A GROUP's own opacity is applied ONCE, to its children's artwork already composited together —
+      // it is not an opacity each child carries separately. `nodeOpacity` folds it into every
+      // descendant, which is right for a single ground and double-counts the moment two of them
+      // overlap. Stamp the nearest such ancestor so the ground rows can SEE the shared group; they
+      // decline rather than model it.
+      const dg = ("opacity" in n && typeof n.opacity === "number" && n.opacity < 0.999) ? (n.id || n.name) : dimGroup;
+      n.children.forEach((c) => collect(c, insidePlot, inFurniture, seriesOf, furnitureGroup, insideMap, catAncestor, nodeOpacity, insideLegend, dg));
+      return;
+    }
     const b = rel(n);
     if (b && b.w > 0 && b.h > 0) leaves.push({ name: n.name, type: n.type, box: b, insidePlot, fromMap: !!insideMap });
   };
   for (const child of frame.children) {
     if (child === logo) continue;
-    collect(child, plotRoots.indexOf(child) !== -1, false, null, null, false, null, frameOpacity, false);
+    collect(child, plotRoots.indexOf(child) !== -1, false, null, null, false, null, frameOpacity, false, null);
   }
 
   // ---------------------------------------------------------------- rows
@@ -1099,8 +1108,29 @@ const checkFrame = async (frameId) => {
         // annotation on the frame, which is exactly how the Instagram templates carry their beige — and
         // dropping it by geometry alone failed a correct halo twice: once as a needless knockout, then
         // again against a `frameFill` the reader never sees.
-        const cands = (a.box ? grounds.filter((g) => contains(g)
-          && !(fullBleed(g) && frameFill && groundOver(g, frameFill).toLowerCase() === frameFill.toLowerCase())) : []);
+        // ...and only when its colour is actually KNOWN. `groundOver` on an unmeasurable ground returns
+        // the arbitrary forward fold, so a full-bleed layer carrying a gradient over a white solid
+        // could coincide with `frameFill` and be dropped — taking the "not measurable" signal with it
+        // and letting the halo be certified against a frame the reader never sees. A ground whose
+        // colour cannot be established is never a no-op; it is the reason to decline.
+        const cands0 = (a.box ? grounds.filter((g) => contains(g)
+          && !(fullBleed(g) && !g.unmeasurable && frameFill && groundOver(g, frameFill).toLowerCase() === frameFill.toLowerCase())) : []);
+        // Two candidates under ONE translucent group is a stack this script cannot fold: their shared
+        // group opacity is already baked into each of them, so compositing them would apply it twice —
+        // Figma applies it once, to the two of them already combined. Modelling that properly needs
+        // per-group compositing AND the paint order `flattenFills` already declines to assume, so the
+        // stack is declared unmeasurable instead. Same answer as a gradient: named, never invented.
+        // Per ANNOTATION, never on the shared `grounds` entries: whether a group is shared depends on
+        // how many of ITS children contain THIS annotation, so writing the verdict back onto the ground
+        // would carry one annotation's answer into the next one's.
+        const sharedDim = new Map();
+        for (const g of cands0) if (g.dimGroup) sharedDim.set(g.dimGroup, (sharedDim.get(g.dimGroup) || 0) + 1);
+        const cands = cands0.map((g) => {
+          const n2 = g.dimGroup ? (sharedDim.get(g.dimGroup) || 0) - 1 : 0;
+          return (n2 > 0 && !g.unmeasurable)
+            ? { ...g, unmeasurable: `shares a translucent group with ${n2} other ground(s), whose opacity Figma applies ONCE to them combined and this script cannot un-bake` }
+            : g;
+        });
         // The TIER branch asks a different question — is there SHADING under this annotation that earns
         // it a halo? — and a full-bleed backdrop is the canvas whatever colour it paints. So it never
         // excuses a halo over empty space; only a bounded shape does.
