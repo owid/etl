@@ -34,10 +34,7 @@ set more off
 * (individuals), all countries, all years.
 wid, indicators(npopul) areas(_all) ages(992 999) population(i) clear
 
-keep country year value variable
-reshape wide value, i(country year) j(variable) string
-
-rename valuenpopul992i adult_population
-rename valuenpopul999i total_population
-
+* Raw passthrough: export the response exactly as the wid command returns it
+* (country / variable / percentile / year / value). The reshape to one column
+* per variable and the descriptive column names happen in the meadow step.
 export delimited using "wid_population_992_999_i.csv", replace delim(",")

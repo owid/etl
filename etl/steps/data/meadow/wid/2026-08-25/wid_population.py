@@ -1,5 +1,9 @@
 """Load the WID population snapshot and create a meadow dataset.
 
+The snapshot is the raw long-format response of WID's data API (one row per country, year and
+variable, where variable is `npopul992i` for adults aged 20+ and `npopul999i` for the total
+population). It is reshaped here to one column per variable, with descriptive names.
+
 WID area codes are ISO alpha-2 plus WID's own additions (historical entities, subnational splits
 and regional aggregates). Codes are mapped to country names with the OWID regions dataset, plus
 the manual lists below for the non-ISO codes.
@@ -14,6 +18,12 @@ paths = PathFinder(__file__)
 
 # There is a country labeled NA (Namibia) which pandas reads as null without these parameters.
 NA_VALUES = [""]
+
+# WID variable codes in the snapshot, renamed to descriptive column names.
+VARIABLE_NAMES = {
+    "npopul992i": "adult_population",
+    "npopul999i": "total_population",
+}
 
 # WID codes not in the ISO alpha-2 standard, mapped by hand: historical entities plus the nine
 # canonical WID world regions and World (PPP variants).
@@ -95,6 +105,8 @@ def run() -> None:
     #
     # Process data.
     #
+    tb = reshape_to_one_column_per_variable(tb=tb)
+
     tb = harmonize_countries(tb=tb, tb_regions=tb_regions)
 
     tb = tb.format(["country", "year"], short_name="wid_population")
@@ -104,6 +116,19 @@ def run() -> None:
     #
     ds_meadow = paths.create_dataset(tables=[tb], default_metadata=snap.metadata)
     ds_meadow.save()
+
+
+def reshape_to_one_column_per_variable(tb: Table) -> Table:
+    """Reshape the raw long API response to one column per WID variable, with descriptive names."""
+    unexpected = sorted(set(tb["variable"]) - set(VARIABLE_NAMES))
+    assert not unexpected, f"Unexpected WID variables in the population snapshot: {unexpected}"
+    assert (tb["percentile"] == "p0p100").all(), "Population rows must all cover the full distribution (p0p100)."
+    assert not tb.duplicated(subset=["country", "year", "variable"]).any(), "Duplicate (country, year, variable) rows."
+
+    tb = tb.pivot(index=["country", "year"], columns="variable", values="value", join_column_levels_with="_")
+    tb = tb.rename(columns=VARIABLE_NAMES)
+
+    return tb
 
 
 def harmonize_countries(tb: Table, tb_regions: Table) -> Table:

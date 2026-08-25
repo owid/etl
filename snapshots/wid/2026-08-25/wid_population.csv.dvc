@@ -18,6 +18,6 @@ meta:
       name: CC BY 4.0
       url: https://wid.world/
 outs:
-  - md5: b4b84d5e0c0e3164b350f3e672849031
-    size: 1493196
+  - md5: c114e8de1bfa41cf7774a5a53997f960
+    size: 5077560
     path: wid_population.csv
