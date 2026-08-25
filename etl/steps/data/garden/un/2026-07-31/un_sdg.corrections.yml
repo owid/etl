@@ -31,6 +31,9 @@
     Both sexes is reported as the sum of the male and female rates rather than a weighted
     average, and it is the only country-year where the female rate exceeds the male rate.
     Consistent with this series being transposed with the non-fatal one at source.
+  # Every matched row is >100 per 100,000 (116.08, 440.92, 556.99); a corrected rate would be
+  # single-digit, so this fails the build instead of silently suppressing the fix.
+  expect: {gt: 100}
   provider: International Labour Organization
   status: open
 
@@ -42,5 +45,6 @@
     cross-country median (613.58 for 2020 onwards). Both sexes is reported as the sum of the
     male and female rates rather than a weighted average. Consistent with this series being
     transposed with the fatal one at source.
+  expect: {lt: 100}
   provider: International Labour Organization
   status: open

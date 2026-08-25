@@ -269,57 +269,40 @@ def _read_goal_csv(content: bytes) -> pd.DataFrame:
     return pd.read_csv(StringIO(str(content, "utf-8")), low_memory=False)
 
 
-def download_file(url: str, goal: str, area_codes: list, max_retries: int, bytes_read: int = 0) -> bytes:
-    """Downloads a file from a url.
+def download_file(url: str, goal: str, area_codes: list, max_retries: int) -> bytes:
+    """Download one goal's CSV, restarting from the beginning if the stream breaks.
 
-    Retries download up to {max_retries} times following a ChunkedEncodingError
-    exception.
+    This endpoint advertises `Accept-Ranges: bytes` but ignores a `Range` header on POST: it answers
+    200 with the complete body and no `Content-Range`. An earlier version of this function tried to
+    resume after a `ChunkedEncodingError` by re-requesting with `Range` and appending the response to
+    the bytes already read — which therefore glued a second, complete copy of the CSV onto a partial
+    one. Nothing downstream could catch that: the result still ends in a complete line, so the
+    truncation assert passes, and the duplicated rows survive into the snapshot. Restarting the
+    download is the only correct option against a server that cannot resume.
     """
-    log.info(
-        "Downloading data...",
-        url=url,
-        bytes_read=bytes_read,
-        remaining_retries=max_retries,
-        goal=goal,
-    )
-    if bytes_read:
-        headers = {"Range": f"bytes={bytes_read}-"}
-    else:
-        headers = {}
-
-    content = b""
-    try:
-        with requests.post(
-            url,
-            data={"goal": goal, "areaCodes": area_codes},
-            headers=headers,
-            stream=True,
-        ) as r:
-            r.raise_for_status()
-            for chunk in r.iter_content(chunk_size=CHUNK_SIZE):
-                # `iter_content` yields *at most* CHUNK_SIZE bytes, so the offset must advance by
-                # what actually arrived. Counting a full CHUNK_SIZE would make the `Range` header on
-                # a resume start past bytes we never received, silently dropping part of the CSV.
-                bytes_read += len(chunk)
-                content += chunk
-    except requests.exceptions.ChunkedEncodingError:
-        if max_retries > 0:
-            log.info("Encountered ChunkedEncodingError, resuming download...")
-            content += download_file(
-                url=url,
+    for attempt in range(1, max_retries + 2):
+        log.info("Downloading data...", url=url, goal=goal, attempt=attempt, max_attempts=max_retries + 1)
+        content = b""
+        try:
+            with requests.post(url, data={"goal": goal, "areaCodes": area_codes}, stream=True) as r:
+                r.raise_for_status()
+                for chunk in r.iter_content(chunk_size=CHUNK_SIZE):
+                    content += chunk
+            return content
+        except requests.exceptions.ChunkedEncodingError:
+            if attempt > max_retries:
+                raise RuntimeError(
+                    f"Stream broke for goal {goal} and max_retries has been exceeded after reading "
+                    f"{len(content)} bytes. Download was not completed."
+                ) from None
+            log.info(
+                "Stream broke; restarting the download from the beginning.",
                 goal=goal,
-                area_codes=area_codes,
-                max_retries=max_retries - 1,
-                bytes_read=bytes_read,
+                bytes_discarded=len(content),
+                attempt=attempt,
             )
-        else:
-            # Returning the partial content here would silently publish a truncated
-            # snapshot, so fail loudly instead.
-            raise RuntimeError(
-                f"Encountered ChunkedEncodingError for goal {goal}, but max_retries has been "
-                f"exceeded after reading {bytes_read} bytes. Download was not completed."
-            )
-    return content
+
+    raise AssertionError("unreachable: the loop either returns or raises")
 
 
 def attributes_description(snap: Snapshot) -> dict[Any, Any]:

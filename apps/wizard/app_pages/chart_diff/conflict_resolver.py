@@ -410,6 +410,22 @@ class ChartDiffConflictResolver:
     def _editor_key(self, field_key: str) -> str:
         return f"conflict-editor-{field_key}-{self.diff.chart_id}"
 
+    def _clear_field_state(self) -> None:
+        """Forget the per-field choices once a conflict is resolved.
+
+        The keys are namespaced by chart, not by conflict, so they outlive the conflict they were
+        answered for. If production edits the same chart again during one Streamlit session, the old
+        selections are still set: `fields_undecided` comes back empty and the Resolve button is live
+        before the reviewer has looked at the new conflict, which would apply the previous
+        conflict's PRODUCTION/STAGING choices to different values.
+
+        Safe to do here because this runs in a button callback, before the next rerun re-creates the
+        widgets — the same reason `choose_env_for_all` may write them.
+        """
+        for field in self.config_compare:
+            st.session_state.pop(self._radio_key(field["key"]), None)
+            st.session_state.pop(self._editor_key(field["key"]), None)
+
     @property
     def fields_undecided(self) -> list[str]:
         """Conflicted fields for which no environment has been chosen yet."""
@@ -623,6 +639,7 @@ class ChartDiffConflictResolver:
             # revision and bump updatedAt, which invalidates an existing approval of this diff.
             if config == build_resolved_config(self.diff.source_chart.config, {}):
                 self.diff.set_conflict_to_resolved(self.session)
+                self._clear_field_state()
                 st.session_state.pop(f"conflict-write-failed-{self.diff.chart_id}", None)
                 st.session_state[self.toast_key] = (
                     f"Chart {self.diff.chart_id} left as it is on staging, conflict resolved ({summary})"
@@ -666,6 +683,7 @@ class ChartDiffConflictResolver:
                 # Set conflict as resolved
                 st.session_state.pop(f"conflict-write-failed-{self.diff.chart_id}", None)
                 self.diff.set_conflict_to_resolved(self.session)
+                self._clear_field_state()
                 # Signal user that everything went well, and where the values came from
                 st.session_state[self.toast_key] = f"Chart {self.diff.chart_id} updated on staging ({summary})"
         if rerun:
