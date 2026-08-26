@@ -200,10 +200,12 @@ def _explorer_views(source_engine: Engine, slug: str, diffs: list[ViewDiff]) -> 
     view = candidates[0]
     shown = changed.index(view) + 1
     st.caption(f"Changed view {shown} of {len(changed)} — **Next change ▶** steps through them.")
-    _render_explorer_view(source_engine, slug, view, labels[changed.index(view)])
+    _render_explorer_view(source_engine, slug, view, labels[changed.index(view)], recorded)
 
 
-def _render_explorer_view(source_engine: Engine, slug: str, view: ViewDiff, label: str) -> None:
+def _render_explorer_view(
+    source_engine: Engine, slug: str, view: ViewDiff, label: str, recorded: dict | None = None
+) -> None:
     """One explorer view: its name and both servers' links, its tick, then its diffs."""
     with st.container(border=True):
         n = len(view.fields)
@@ -214,7 +216,9 @@ def _render_explorer_view(source_engine: Engine, slug: str, view: ViewDiff, labe
             f":green[**This staging server**] [view ↗]({SOURCE.site}/explorers/{slug}?{query})"
         )
         surface = surface_key("item", f"explorer:{slug}")
-        mark = resolve_item_mark(load_reviews(source_engine, surface), surface, dims_str(view.dimensions), view.fields)
+        # Already read to mark the jump's options; reading it again is a second query per rerun.
+        stored = recorded if recorded is not None else load_reviews(source_engine, surface)
+        mark = resolve_item_mark(stored, surface, dims_str(view.dimensions), view.fields)
         st_review_strip(source_engine, surface, mark)
         datapage.st_datapage_diff(
             view.fields,

@@ -9,6 +9,7 @@ enumerations the sections use. A stored row carries a hash rather than a name (t
 edit to the text), so the index is rebuilt by hashing each known item the same way and matching.
 """
 
+import subprocess
 from typing import Any
 from urllib.parse import urlencode
 
@@ -19,8 +20,17 @@ from apps.wizard.app_pages.chart_diff.utils import SOURCE
 from apps.wizard.app_pages.metadata_diff import cached
 from apps.wizard.app_pages.metadata_diff.core import dims_str, item_identity
 from apps.wizard.app_pages.metadata_diff.data import REVIEWED, load_item_notes
-from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, markdown_output, view_label, view_url
+from apps.wizard.app_pages.metadata_diff.render import (
+    BASELINE_NAME,
+    markdown_output,
+    st_copy_button,
+    view_label,
+    view_url,
+)
 from apps.wizard.app_pages.metadata_diff.review_state import surface_key
+
+# The PR lookup shells out, so it is asked once per session rather than on every rerun.
+_PR_CACHE_KEY = "mdd-pr-url"
 
 
 def st_show_review(source_engine: Engine, target_engine: Engine) -> None:
@@ -86,7 +96,9 @@ def st_show_review(source_engine: Engine, target_engine: Engine) -> None:
                     for row in bare:
                         st.markdown(_row_line(row, index))
 
-    markdown_output(_markdown(rows, index, totals), "metadata-review.md", "mdd_review_notes")
+    text = _markdown(rows, index, totals)
+    st_copy_button(text, "📋 Copy the review notes", key="mdd-copy-review")
+    markdown_output(text, "metadata-review.md", "mdd_review_notes")
 
 
 def _row_line(row: dict[str, Any], index: dict[str, dict[str, str]]) -> str:
@@ -195,6 +207,46 @@ def _bullet_lines(note: str) -> list[str]:
     return [f"  - {parts[0]}"] + [f"    {line}" if line.strip() else "" for line in parts[1:]]
 
 
+def _provenance() -> list[str]:
+    """Where this review was done: the branch, its PR if there is one, the server, and the baseline."""
+    branch = SOURCE.name.removeprefix("staging-site-")
+    lines = [
+        f"- Branch: `{branch}`",
+        f"- Staging server: {SOURCE.site}",
+        f"- Compared against: `{BASELINE_NAME}`",
+    ]
+    pr = _pull_request_url(branch)
+    if pr:
+        lines.insert(1, f"- Pull request: {pr}")
+    return lines
+
+
+def _pull_request_url(branch: str) -> str:
+    """The PR for this branch, asked of `gh` once and cached for the session.
+
+    Best-effort on purpose: `gh` may be absent, unauthenticated, or the branch may have no PR yet, and
+    none of that is a reason for the notes to fail to render. A missing line is better than a wrong one,
+    so nothing is guessed from the branch name.
+    """
+    if _PR_CACHE_KEY in st.session_state:
+        return str(st.session_state[_PR_CACHE_KEY])
+    url = ""
+    try:
+        result = subprocess.run(
+            ["gh", "pr", "view", branch, "--json", "url", "--jq", ".url"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+            check=False,
+        )
+        if result.returncode == 0:
+            url = result.stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        url = ""
+    st.session_state[_PR_CACHE_KEY] = url
+    return url
+
+
 def _footnote() -> None:
     """The two things about this record that are easy to assume wrongly."""
     st.caption(
@@ -223,8 +275,13 @@ def _surface_title(surface: str) -> str:
 
 
 def _markdown(rows: list[dict[str, Any]], index: dict[str, dict[str, str]], totals: dict[str, int]) -> str:
-    """The notes as markdown, for pasting into the PR — named and linked, like the page."""
-    lines = ["## Metadata review notes", "", f"Against `{BASELINE_NAME}`.", ""]
+    """The notes as markdown, for pasting into the PR — named, linked, and saying where they came from.
+
+    The header matters as much as the notes. Pasted into a PR comment or handed back to an assistant, the
+    text used to arrive with no branch, no PR and no baseline, and item names that mean nothing without
+    knowing which server they were read on.
+    """
+    lines = ["## Metadata review notes", ""] + _provenance() + [""]
     for surface, group in sorted(_by_surface(rows).items()):
         done = sum(1 for row in group if row.get("status") == REVIEWED)
         of = totals.get(surface)

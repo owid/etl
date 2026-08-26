@@ -296,10 +296,12 @@ def _views_page(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, 
     shown = changed.index(view) + 1 if view in changed else None
     if shown is not None:
         st.caption(f"Changed view {shown} of {len(changed)} — **Next change ▶** steps through them.")
-    _render_view(view, view_label(view, dimensions), dimensions, catalog_path, slug, row, source_engine)
+    _render_view(view, view_label(view, dimensions), dimensions, catalog_path, slug, row, source_engine, recorded)
 
 
-def _render_view(view, label: str, dimensions: list, catalog_path: str, slug: str, row, source_engine=None) -> None:
+def _render_view(
+    view, label: str, dimensions: list, catalog_path: str, slug: str, row, source_engine=None, recorded=None
+) -> None:
     """One view: what it is called, where to open it, every field of it that changed, and its own tick.
 
     The tick is the view's, not an edit's: what you just read is a page, and its changed fields are read
@@ -326,9 +328,10 @@ def _render_view(view, label: str, dimensions: list, catalog_path: str, slug: st
         st.markdown(links)
         if source_engine is not None and view.fields:
             surface = surface_key("item", f"mdim:{catalog_path}")
-            mark = resolve_item_mark(
-                load_reviews(source_engine, surface), surface, dims_str(view.dimensions), view.fields
-            )
+            # Passed down from the caller where there is one: it has already read this surface's rows to
+            # mark the jump's options, and reading them again is a second query per rerun.
+            stored = recorded if recorded is not None else load_reviews(source_engine, surface)
+            mark = resolve_item_mark(stored, surface, dims_str(view.dimensions), view.fields)
             st_review_strip(source_engine, surface, mark)
         if view.is_new:
             st.caption(f"This view does not exist on `{BASELINE_NAME}`, so there is no old text to compare.")

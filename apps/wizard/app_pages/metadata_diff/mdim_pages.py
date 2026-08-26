@@ -61,6 +61,7 @@ def render_chart_review(
     baseline_url: str,
     staging_url: str,
     usage: dict[int, dict[str, list[dict[str, Any]]]],
+    recorded: dict | None = None,
 ) -> None:
     """One looked-up chart's changed fields, side by side, in data-page order.
 
@@ -84,7 +85,8 @@ def render_chart_review(
     if diff.fields:
         surface = surface_key("item", "chart")
         mark = resolve_item_mark(
-            load_reviews(source_engine, surface),
+            # The picker has already read every chart's recorded state to mark its options.
+            recorded if recorded is not None else load_reviews(source_engine, surface),
             surface,
             str(chart.get("slug") or chart["chartId"]),
             diff.fields,
@@ -101,7 +103,7 @@ def render_chart_review(
                 st.markdown(render_text_html(g.new, g.old, side="new", changed_only=True), unsafe_allow_html=True)
 
 
-def render_chart_by_ref(source_engine: Engine, target_engine: Engine, ref: str) -> None:
+def render_chart_by_ref(source_engine: Engine, target_engine: Engine, ref: str, recorded: dict | None = None) -> None:
     """Review one chart's inherited text against the baseline — every field of it this branch changed.
 
     Takes the chart as an argument rather than reading a text box: the box was the only way to reach this
@@ -161,4 +163,4 @@ def render_chart_by_ref(source_engine: Engine, target_engine: Engine, ref: str) 
     st.markdown(f"**{nf} field{'s' if nf != 1 else ''} changed** in this chart.")
     render_impact(diff, usage, unit="chart")
     # Each changed field in its own collapsible, baseline on the left and this server on the right.
-    render_chart_review(chart, diff, source_engine, baseline_url, staging_url, usage)
+    render_chart_review(chart, diff, source_engine, baseline_url, staging_url, usage, recorded)

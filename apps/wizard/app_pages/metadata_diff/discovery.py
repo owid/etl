@@ -995,16 +995,43 @@ def mdim_text_changes(source_engine: Engine, target_engine: Engine, catalog_path
 # --- Explorers ----------------------------------------------------------------------------------
 
 
-def explorer_view_rows(engine: Engine) -> dict[tuple[str, str], dict[str, Any]]:
+def explorer_view_hashes(engine: Engine) -> dict[tuple[str, str], str]:
+    """Every published explorer view's resolved-config hash, keyed by (explorer slug, viewId).
+
+    The cheap half of the comparison: no JSON extraction, one small column per row. Two views whose
+    hashes match cannot differ in their text, so this is what decides whose text is worth reading.
+    """
+    df = read_sql(
+        """
+        select ev.explorerSlug as explorerSlug, ev.viewId as viewId, cc.configMd5 as configMd5
+        from explorer_views ev
+        join explorers e on e.slug = ev.explorerSlug
+        join chart_configs cc on cc.id = ev.chartConfigId
+        where e.isPublished = 1
+        """,
+        engine=engine,
+    )
+    return {(str(r["explorerSlug"]), str(r["viewId"])): str(r["configMd5"]) for r in df.to_dict("records")}
+
+
+def explorer_view_rows(
+    engine: Engine, keys: list[tuple[str, str]] | None = None
+) -> dict[tuple[str, str], dict[str, Any]]:
     """Resolved text of every view of every published explorer, keyed by (explorer slug, viewId).
 
     `chart_configs.full` is the *resolved* config, so indicator-driven inheritance (`title_public` ->
     title, `description_short` -> subtitle) is already baked in — no metadata resolution needed here.
+    `keys` restricts the read to particular views — which is how this is called: reading the text of all
+    nine thousand published views to find the handful that changed took 3.75s of the page's cold load,
+    where a hash join over `configMd5` names the candidates for a fraction of that. Passing None reads
+    everything, which is what a caller comparing from scratch wants.
+
     Caveats the UI states rather than hides: a legacy CSV-backed explorer has no `explorer_views` rows,
-    and `full` only refreshes when the explorer's export step re-runs.
+    and the resolved config only refreshes when the explorer's export step re-runs.
     """
-    df = read_sql(
-        """
+    if keys is not None and not keys:
+        return {}
+    select = """
         select ev.explorerSlug as explorerSlug,
                ev.viewId as viewId,
                ev.dimensions as dimensions,
@@ -1016,9 +1043,26 @@ def explorer_view_rows(engine: Engine) -> dict[tuple[str, str], dict[str, Any]]:
         join explorers e on e.slug = ev.explorerSlug
         join chart_configs cc on cc.id = ev.chartConfigId
         where e.isPublished = 1
-        """,
-        engine=engine,
-    )
+        """
+    if keys is None:
+        df = read_sql(select, engine=engine)
+    else:
+        # Chunked: the candidate set is normally tiny, but a branch that rebuilds an explorer makes every
+        # one of its views a candidate, and a single IN list of thousands of pairs is its own problem.
+        frames = []
+        for start in range(0, len(keys), 500):
+            chunk = keys[start : start + 500]
+            placeholders = ", ".join(["(%s, %s)"] * len(chunk))
+            frames.append(
+                read_sql(
+                    f"{select} and (ev.explorerSlug, ev.viewId) in ({placeholders})",
+                    engine=engine,
+                    params=tuple(value for key in chunk for value in key),
+                )
+            )
+        df = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+    if df.empty:
+        return {}
     out: dict[tuple[str, str], dict[str, Any]] = {}
     for record in df.to_dict("records"):
         raw_dims = record.get("dimensions")
@@ -1140,7 +1184,14 @@ def changed_explorer_views(
     built: set[str] | None = None,
 ) -> ExplorerChanges:
     """Published explorers whose view text differs from the baseline, attributed to branch or lag."""
-    source_rows, target_rows = _both(explorer_view_rows, source_engine, target_engine)
+    # Hashes first, text second. Views whose resolved config hash matches cannot differ in their text,
+    # so only the rest are worth reading — the difference between four JSON extractions on nine thousand
+    # rows and on a handful.
+    source_hashes, target_hashes = _both(explorer_view_hashes, source_engine, target_engine)
+    candidates = sorted(
+        key for key in set(source_hashes) | set(target_hashes) if source_hashes.get(key) != target_hashes.get(key)
+    )
+    source_rows, target_rows = _both(explorer_view_rows, source_engine, target_engine, candidates)
     detailed = compare_explorer_views_detailed(source_rows, target_rows)
 
     views: dict[str, list[ViewDiff]] = {}

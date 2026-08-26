@@ -166,7 +166,7 @@ def _chart_browser(source_engine: Engine, target_engine: Engine, groups, usage: 
             help="The next changed chart, wrapping round at the end.",
         )
 
-    mdim_pages.render_chart_by_ref(source_engine, target_engine, current)
+    mdim_pages.render_chart_by_ref(source_engine, target_engine, current, recorded)
 
 
 def _pick_chart() -> None:
