@@ -21,9 +21,12 @@ from sqlalchemy.engine.base import Engine
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET
 from apps.wizard.app_pages.metadata_diff import cached, datapage
 from apps.wizard.app_pages.metadata_diff.core import ViewDiff, dims_str, field_label, group_changes
+from apps.wizard.app_pages.metadata_diff.data import load_reviews
 from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, DIFF_CSS, st_layout_switcher
 from apps.wizard.app_pages.metadata_diff.review_state import (
+    resolve_item_mark,
     resolve_marks,
+    st_reviewed_toggle,
     surface_key,
 )
 from apps.wizard.utils.components import Pagination
@@ -78,7 +81,7 @@ def st_show_explorer_metadata_diffs(source_engine: Engine, target_engine: Engine
             pagination.show_controls()
         for slug in pagination.get_page_items():
             if layout == "items":
-                _render_explorer_views(slug, branch[slug])
+                _render_explorer_views(source_engine, slug, branch[slug])
             else:
                 _render_explorer(source_engine, slug, branch[slug])
         if len(slugs) > EXPLORERS_PER_PAGE:
@@ -87,7 +90,7 @@ def st_show_explorer_metadata_diffs(source_engine: Engine, target_engine: Engine
     _render_other(other)
 
 
-def _render_explorer_views(slug: str, diffs: list[ViewDiff]) -> None:
+def _render_explorer_views(source_engine: Engine, slug: str, diffs: list[ViewDiff]) -> None:
     """One explorer, its changed views inline, each with a link to itself and its diffs.
 
     An explorer's views carry their dimensions as display names already (`Decile`, `After tax`), so the
@@ -109,6 +112,11 @@ def _render_explorer_views(slug: str, diffs: list[ViewDiff]) -> None:
                     staging_label="This staging server",
                     show_unchanged_slots=False,
                 )
+                surface = surface_key("item", f"explorer:{slug}")
+                mark = resolve_item_mark(
+                    load_reviews(source_engine, surface), surface, dims_str(view.dimensions), view.fields
+                )
+                st_reviewed_toggle(source_engine, surface, mark)
         rest = len(changed) - VIEWS_IN_CARD
         if rest > 0:
             st.caption(

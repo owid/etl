@@ -20,7 +20,6 @@ from sqlalchemy.engine.base import Engine
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET
 from apps.wizard.app_pages.metadata_diff import cached
 from apps.wizard.app_pages.metadata_diff.core import (
-    CHART_FIELD_PREFIX,
     ViewDiff,
     diff_views,
     field_label,
@@ -28,6 +27,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
 )
 from apps.wizard.app_pages.metadata_diff.data import (
     build_chart_bundle,
+    load_reviews,
 )
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
@@ -35,6 +35,11 @@ from apps.wizard.app_pages.metadata_diff.render import (
     chart_datapage_url,
     render_impact,
     render_text_html,
+)
+from apps.wizard.app_pages.metadata_diff.review_state import (
+    resolve_item_mark,
+    st_reviewed_toggle,
+    surface_key,
 )
 
 # URL-parameter prefix for the MDim view selectors (`?d_<dimension>=<choice>`).
@@ -68,16 +73,29 @@ def render_chart_review(
     if not groups:
         return
 
+    # The two pages, once. They were repeated on every field's two columns — the same pair of links four
+    # or five times down a chart with four changed fields, saying nothing new each time.
+    st.markdown(
+        f":gray[**{BASELINE_NAME.capitalize()}**] [data page ↗]({baseline_url}) · "
+        f":green[**This staging server**] [data page ↗]({staging_url})"
+    )
     for g in groups:
-        link_kind = "chart ↗" if g.field.startswith(CHART_FIELD_PREFIX) else "data page ↗"
         with st.expander(f"{field_label(g.field)}", expanded=True):
             c1, c2 = st.columns(2)
             with c1:
-                st.markdown(f":gray[**{BASELINE_NAME.capitalize()}**] · [{link_kind}]({baseline_url})")
+                st.markdown(f":gray[**{BASELINE_NAME.capitalize()}**]")
                 st.markdown(render_text_html(g.old, g.new, side="old", changed_only=True), unsafe_allow_html=True)
             with c2:
-                st.markdown(f":green[**This staging server**] · [{link_kind}]({staging_url})")
+                st.markdown(":green[**This staging server**]")
                 st.markdown(render_text_html(g.new, g.old, side="new", changed_only=True), unsafe_allow_html=True)
+
+    if diff.fields:
+        # The chart's own tick: what you just read is one page, however many of its fields moved.
+        surface = surface_key("item", "chart")
+        mark = resolve_item_mark(
+            load_reviews(source_engine, surface), surface, str(chart.get("slug") or chart["chartId"]), diff.fields
+        )
+        st_reviewed_toggle(source_engine, surface, mark)
 
 
 def render_chart_by_ref(source_engine: Engine, target_engine: Engine, ref: str) -> None:
@@ -137,7 +155,7 @@ def render_chart_by_ref(source_engine: Engine, target_engine: Engine, ref: str) 
         return
 
     nf = len(diff.fields)
-    st.warning(f"**{nf} field{'s' if nf != 1 else ''} changed** in this chart.")
+    st.markdown(f"**{nf} field{'s' if nf != 1 else ''} changed** in this chart.")
     render_impact(diff, usage, unit="chart")
     # Each changed field in its own collapsible, baseline on the left and this server on the right.
     render_chart_review(chart, diff, source_engine, baseline_url, staging_url, usage)

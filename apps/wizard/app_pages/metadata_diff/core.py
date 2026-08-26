@@ -347,6 +347,23 @@ def mark_identity(surface: str, group: "ChangeGroup") -> tuple[str, str]:
     return change_key, content_hash
 
 
+def item_identity(surface: str, item_key: str, fields: dict[str, Any]) -> tuple[str, str]:
+    """(slot key, content hash) for one *item* — a chart, an MDim view, an explorer view.
+
+    The slot names the item and survives an edit to it; the hash covers every changed text on it, so
+    editing any one of them makes the stored mark stale and the item reopens. Deliberately parallel to
+    `mark_identity`, which does the same for a single edit: an item's tick means "I have read this page",
+    an edit's means "I have judged this rewording", and neither implies the other.
+    """
+    slot = json.dumps([surface, item_key], sort_keys=True)
+    payload = json.dumps(
+        {field: [change.get("old"), change.get("new")] for field, change in sorted(fields.items())},
+        sort_keys=True,
+        default=str,
+    )
+    return hashlib.sha256(slot.encode()).hexdigest(), hashlib.sha256(payload.encode()).hexdigest()
+
+
 def field_label(field_name: str) -> str:
     if field_name.startswith(CHART_FIELD_PREFIX):
         return CHART_FIELDS[field_name[len(CHART_FIELD_PREFIX) :]]

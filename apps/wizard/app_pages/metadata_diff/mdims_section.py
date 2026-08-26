@@ -21,7 +21,8 @@ from sqlalchemy.engine.base import Engine
 from apps.wizard.app_pages.chart_diff.utils import SOURCE
 from apps.wizard.app_pages.metadata_diff import brief, cached, datapage, discovery
 from apps.wizard.app_pages.metadata_diff.blast_section import GROUP_KEY, TREE_MDIM_KEY
-from apps.wizard.app_pages.metadata_diff.core import LAYOUT_QUERY_KEY, field_label, group_usage
+from apps.wizard.app_pages.metadata_diff.core import LAYOUT_QUERY_KEY, dims_str, field_label, group_usage
+from apps.wizard.app_pages.metadata_diff.data import load_reviews
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
     DIFF_CSS,
@@ -32,7 +33,9 @@ from apps.wizard.app_pages.metadata_diff.render import (
     view_url,
 )
 from apps.wizard.app_pages.metadata_diff.review_state import (
+    resolve_item_mark,
     resolve_marks,
+    st_reviewed_toggle,
     surface_key,
 )
 from apps.wizard.utils.components import Pagination, url_persist
@@ -266,38 +269,52 @@ def _views_page(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, 
     slug = str(row["slug_source"]) if row.get("slug_source") else ""
     labels = [view_label(v, dimensions) for v in changed]
 
-    _jump_to_changed(changed, labels, dimensions)
+    # Where we are, read from the URL rather than from the menu's return: the nav has to render before
+    # the menu (its callbacks write the menu's state), so this is the only order in which "next" can be
+    # relative to the view on screen.
+    url_selection = {
+        dim["slug"]: st.query_params.get(DIM_PARAM_PREFIX + dim["slug"])
+        for dim in dimensions
+        if st.query_params.get(DIM_PARAM_PREFIX + dim["slug"]) is not None
+    }
+    position = _displayed_index(changed, url_selection)
+
+    _jump_to_changed(changed, labels, dimensions, position)
     selection = _dimension_menu(view_diffs, dimensions)
 
-    # A complete selection is a single view — the state the ⚡ jump puts the menu into.
-    if len(selection) == len(dimensions) and dimensions:
-        view = next((v for v in view_diffs if v.dimensions == selection), None)
-        if view is None:
-            st.warning("No view exists for this combination of controls.")
-        elif not view.changed:
-            st.success("**No changes in this view** — its texts match the baseline.")
-            st.markdown(
-                f"[Open this view ↗]({view_url(SOURCE, catalog_path, None if row['is_draft'] else slug, selection)})"
-            )
-        else:
-            _render_view(view, view_label(view, dimensions), dimensions, catalog_path, slug, row)
-        return
+    # One view, always. Which one: the exact match if the menu names it, else the first view consistent
+    # with a partial menu, else the first changed view — so arriving here shows a diff rather than a set
+    # of controls, and Next ▶ walks the rest.
+    view = next((v for v in view_diffs if v.dimensions == selection), None) if selection else None
+    if view is None:
+        candidates = [v for v in changed if _matches(v, selection)] if selection else changed
+        if not candidates:
+            st.info("No changed view matches the menu above. Clear a dimension to widen it.")
+            return
+        view = candidates[0]
 
-    # Otherwise the list, narrowed by whatever the menu has set.
-    shown = [(v, label) for v, label in zip(changed, labels) if _matches(v, selection)]
-    if selection:
-        st.caption(f"{len(shown)} of {len(changed)} changed views match the menu above.")
-    if not shown:
-        st.info("No changed view matches the menu above. Clear a dimension to widen it.")
-        return
+    shown = changed.index(view) + 1 if view in changed else None
+    if shown is not None:
+        st.caption(f"Changed view {shown} of {len(changed)} — **Next change ▶** steps through them.")
+    _render_view(view, view_label(view, dimensions), dimensions, catalog_path, slug, row, source_engine)
 
-    pagination = Pagination(shown, items_per_page=VIEWS_PER_PAGE, pagination_key=f"mdd-views-{catalog_path}")
-    if len(shown) > VIEWS_PER_PAGE:
-        pagination.show_controls()
-    for view, label in pagination.get_page_items():
-        _render_view(view, label, dimensions, catalog_path, slug, row)
-    if len(shown) > VIEWS_PER_PAGE:
-        pagination.show_controls(position="bottom")
+
+def _displayed_index(changed: list, selection: dict[str, str]) -> int | None:
+    """Which changed view the page is showing, by the same precedence the page uses to choose it.
+
+    Next ▶ steps from here, so it has to agree with what is on screen or the first press goes nowhere:
+    with no selection the page shows the first changed view, and a position of "unknown" made Next select
+    that same view again.
+
+    None means the menu is sitting on a view that did not change — a deliberate lookup — from which the
+    next change is the first one.
+    """
+    if not selection:
+        return 0
+    exact = next((i for i, view in enumerate(changed) if view.dimensions == selection), None)
+    if exact is not None:
+        return exact
+    return next((i for i, view in enumerate(changed) if _matches(view, selection)), None)
 
 
 def _matches(view, selection: dict[str, str]) -> bool:
@@ -305,7 +322,7 @@ def _matches(view, selection: dict[str, str]) -> bool:
     return all(view.dimensions.get(slug) == choice for slug, choice in selection.items())
 
 
-def _jump_to_changed(changed: list, labels: list[str], dimensions: list) -> None:
+def _jump_to_changed(changed: list, labels: list[str], dimensions: list, position: int | None) -> None:
     """The ⚡ jump and **Next change ▶**: two ways to move between this MDim's changed views.
 
     Both do the same thing — set the dimension menu below — so there is one answer on screen to "which
@@ -334,17 +351,7 @@ def _jump_to_changed(changed: list, labels: list[str], dimensions: list) -> None
         if picked is not None:
             _select(int(picked))
 
-    # Where the menu is sitting now, if it happens to be on a changed view.
-    selection = {
-        dim["slug"]: st.query_params.get(DIM_PARAM_PREFIX + dim["slug"])
-        for dim in dimensions
-        if st.query_params.get(DIM_PARAM_PREFIX + dim["slug"]) is not None
-    }
-    current = next(
-        (i for i, view in enumerate(changed) if selection and _matches(view, selection)),
-        None,
-    )
-
+    current = position
     col_jump, col_next = st.columns([4, 1], vertical_alignment="bottom")
     with col_jump:
         st.selectbox(
@@ -358,14 +365,14 @@ def _jump_to_changed(changed: list, labels: list[str], dimensions: list) -> None
             help="Sets the menu below to that view, so the two never disagree about what you are looking at.",
         )
     with col_next:
-        position = "" if current is None else f" ({current + 1} of {len(changed)})"
+        where = "" if current is None else f" ({current + 1} of {len(changed)})"
         st.button(
             "Next change ▶",
             key="mdd-view-next",
             on_click=_select,
             args=(0 if current is None else current + 1,),
             width="stretch",
-            help=f"The next changed view of this MDim{position}, wrapping round at the end.",
+            help=f"The next changed view of this MDim{where}, wrapping round at the end.",
         )
 
 
@@ -410,8 +417,12 @@ def _dimension_menu(view_diffs: list, dimensions: list) -> dict[str, str]:
     return selection
 
 
-def _render_view(view, label: str, dimensions: list, catalog_path: str, slug: str, row) -> None:
-    """One view: what it is called, where to open it, and every field of it that changed."""
+def _render_view(view, label: str, dimensions: list, catalog_path: str, slug: str, row, source_engine=None) -> None:
+    """One view: what it is called, where to open it, every field of it that changed, and its own tick.
+
+    The tick is the view's, not an edit's: what you just read is a page, and its changed fields are read
+    together. Editing any of them makes the mark stale, so the view reopens.
+    """
     with st.container(border=True):
         n = len(view.fields)
         head = f"**{label}**"
@@ -430,6 +441,12 @@ def _render_view(view, label: str, dimensions: list, catalog_path: str, slug: st
             staging_label="This staging server",
             show_unchanged_slots=False,
         )
+        if source_engine is not None and view.fields:
+            surface = surface_key("item", f"mdim:{catalog_path}")
+            mark = resolve_item_mark(
+                load_reviews(source_engine, surface), surface, dims_str(view.dimensions), view.fields
+            )
+            st_reviewed_toggle(source_engine, surface, mark)
 
 
 def _clear_views() -> None:

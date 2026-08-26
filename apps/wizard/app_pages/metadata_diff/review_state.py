@@ -20,7 +20,12 @@ from typing import Any
 import streamlit as st
 from sqlalchemy.engine.base import Engine
 
-from apps.wizard.app_pages.metadata_diff.core import ChangeGroup, mark_identity, surface_key  # noqa: F401
+from apps.wizard.app_pages.metadata_diff.core import (  # noqa: F401
+    ChangeGroup,
+    item_identity,
+    mark_identity,
+    surface_key,
+)
 from apps.wizard.app_pages.metadata_diff.data import REVIEWED, delete_review, load_reviews, upsert_review
 
 
@@ -28,7 +33,8 @@ from apps.wizard.app_pages.metadata_diff.data import REVIEWED, delete_review, lo
 class ReviewMark:
     """One change group's reviewed state, resolved against what is stored."""
 
-    group: ChangeGroup
+    # None for an item mark (a chart, a view): those are not change groups, and nothing reads it there.
+    group: ChangeGroup | None
     change_key: str
     content_hash: str
     reviewed: bool  # ticked, and the text has not moved since
@@ -63,6 +69,29 @@ def resolve_marks(engine: Engine, surface: str, groups: list[ChangeGroup]) -> li
             )
         )
     return marks
+
+
+def resolve_item_mark(stored: dict[str, Any], surface: str, item_key: str, fields: dict[str, Any]) -> ReviewMark:
+    """The reviewed state of one item, against rows already loaded for its surface.
+
+    Takes `stored` rather than querying, because the item views render one item per surface per run and a
+    lookup each would be a query per row on the explorer list.
+
+    `group` is None: an item is not a change group, and nothing on the item views reads it. The rest of
+    `ReviewMark` carries over unchanged, so `st_reviewed_toggle` works on both kinds of mark.
+    """
+    change_key, content_hash = item_identity(surface, item_key, fields)
+    row = stored.get(change_key)
+    stale = bool(row) and row.get("contentHash") != content_hash
+    return ReviewMark(
+        group=None,
+        change_key=change_key,
+        content_hash=content_hash,
+        reviewed=bool(row) and not stale,
+        stale=stale,
+        reviewer=(row or {}).get("reviewer"),
+        updated_at=(row or {}).get("updatedAt"),
+    )
 
 
 def n_reviewed(marks: list[ReviewMark]) -> int:
