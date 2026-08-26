@@ -2695,3 +2695,40 @@ def test_the_bot_comment_reports_a_chart_config_only_change():
     body = format_metadata_diff(both)
     assert "Charts: 4 (from 1 indicator)" in body
     assert "Charts whose own config text changed: 3 (1 change)" in body
+
+
+def test_chart_text_looks_for_variables_in_the_channel_variables_live_in(monkeypatch):
+    """A `shared.meta.yml` edit resolves to garden steps, and a garden path matches no variable.
+
+    Chart text is the only comparison that can see a shared `presentation.grapher_config` edit — it never
+    touches the indicator row — so a channel mismatch here loses the change altogether rather than
+    reporting it from somewhere else.
+    """
+    from apps.wizard.app_pages.metadata_diff import discovery
+
+    captured: dict[str, list[str]] = {}
+
+    def fake_rows(engine, dataset_paths):
+        captured["paths"] = list(dataset_paths)
+        return {}
+
+    monkeypatch.setattr(discovery, "chart_text_rows", fake_rows)
+
+    scope = discovery.BranchScope(
+        dataset_paths={
+            # What a shared-file edit leaves behind: the garden steps that own the file, and no grapher one.
+            "garden/ihme_gbd/2026-02-07/gbd_cause",
+            # And the ordinary case, where both channels are in scope for one dataset.
+            "garden/wb/2026-06-26/world_bank_pip",
+            "grapher/wb/2026-06-26/world_bank_pip",
+        },
+        available=True,
+    )
+    built = {"ihme_gbd/2026-02-07/gbd_cause", "wb/2026-06-26/world_bank_pip"}
+
+    discovery.changed_chart_texts(None, None, scope, built)
+
+    assert captured["paths"] == [
+        "grapher/ihme_gbd/2026-02-07/gbd_cause",
+        "grapher/wb/2026-06-26/world_bank_pip",
+    ], "every dataset in scope has to be asked for in the grapher channel, exactly once"

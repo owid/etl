@@ -698,7 +698,11 @@ def changed_chart_texts(
     if not scope.available:
         return ChartTextChanges(narrowed=False)
 
-    in_play = sorted({p for p in scope.dataset_paths if _dataset_of(p) in built})
+    # In the channel the *variables* use. The scope holds whichever channel the changed file sits in, and
+    # a garden pattern matches no variable catalogPath at all: an edit to a `shared.meta.yml` resolves to
+    # its folder's garden steps only (they are the steps that own the file), so the charts a shared
+    # `grapher_config` edit reaches were invisible here — the one comparison that can see that edit.
+    in_play = sorted({f"grapher/{_dataset_of(p)}" for p in scope.dataset_paths if _dataset_of(p) in built})
     if not in_play:
         return ChartTextChanges()
 
