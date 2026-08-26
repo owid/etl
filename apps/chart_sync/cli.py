@@ -17,7 +17,7 @@ from apps.wizard.app_pages.chart_diff.chart_diff import (
     ChartDiffsLoader,
     configs_are_equal,
     get_deleted_charts,
-    patch_keys_lost_by_sync,
+    patch_paths_lost_by_sync,
     same_config_uuid,
     tags_are_equal,
 )
@@ -298,24 +298,34 @@ def cli(
                             # `_target_updated_at_for_review`). The target's own ETL creates the
                             # chart after the merge, and if someone edits it there before this
                             # runs, the approval still matches and we would overwrite them.
-                            # Compare the authored layers and refuse instead.
-                            lost_keys = (
-                                patch_keys_lost_by_sync(
+                            # Compare what each side authored and refuse instead. Tags count too:
+                            # `set_tags` below replaces the target's set wholesale, and adding a
+                            # tag in the target moves no timestamp (grapher's `setChartTags`
+                            # rewrites `chart_tags` without touching `charts.updatedAt`), so
+                            # nothing else would notice one going missing.
+                            lost = (
+                                patch_paths_lost_by_sync(
                                     diff.target_chart.load_patch_config(target_session),
                                     diff.source_chart.load_patch_config(source_session),
                                 )
+                                + [
+                                    f"tag: {name}"
+                                    for name in sorted(
+                                        {t["name"] for t in target_tags} - {t["name"] for t in source_tags}
+                                    )
+                                ]
                                 if cross_env_twin
                                 else []
                             )
-                            if lost_keys:
+                            if lost:
                                 log.warning(
                                     "chart_sync.target_edited_after_creation",
                                     slug=chart_slug,
                                     chart_id=chart_id,
                                     target_chart_id=target_chart_id,
-                                    keys=lost_keys,
+                                    lost=lost,
                                 )
-                                _notify_slack_target_edited(chart_id, str(source), diff, lost_keys, dry_run)
+                                _notify_slack_target_edited(chart_id, str(source), diff, lost, dry_run)
                                 continue
 
                             log.info(
@@ -462,9 +472,7 @@ def _is_commit_sha(source: str) -> bool:
     return re.match(r"[0-9a-f]{40}", source) is not None
 
 
-def _notify_slack_target_edited(
-    chart_id: int, source: str, diff: ChartDiff, lost_keys: list[str], dry_run: bool
-) -> None:
+def _notify_slack_target_edited(chart_id: int, source: str, diff: ChartDiff, lost: list[str], dry_run: bool) -> None:
     """Report a chart whose target copy carries edits this sync would have dropped.
 
     Deliberately not the "pending" message: nothing is stale here. The chart was approved, and
@@ -478,7 +486,7 @@ def _notify_slack_target_edited(
     message = f"""
 :warning: *ETL chart-sync: Chart Edited In Target, Not Synced* from `{source}`
 <http://{get_container_name(source)}/admin/charts/{chart_id}/edit|View Staging Chart> | <https://admin.owid.io/admin/charts/{target_chart_id}/edit|View Admin Chart>
-Syncing would have dropped these fields, authored in the target's admin: `{"`, `".join(lost_keys)}`
+Syncing would have dropped these fields, authored in the target's admin: `{"`, `".join(lost)}`
 *Staging Edited*: {str(diff.source_chart.updatedAt)} UTC
 *Production Edited*: {str(diff.target_chart.updatedAt)} UTC
 ```

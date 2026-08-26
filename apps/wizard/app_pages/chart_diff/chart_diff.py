@@ -1306,20 +1306,36 @@ def get_chart_diffs_from_grapher(
 _PATCH_BOOKKEEPING_KEYS = ("id", "version", "$schema")
 
 
-def patch_keys_lost_by_sync(target_patch: dict[str, Any] | None, source_patch: dict[str, Any] | None) -> list[str]:
-    """Entries of the target's authored layer that syncing the source over it would drop.
+def patch_paths_lost_by_sync(
+    target_patch: dict[str, Any] | None, source_patch: dict[str, Any] | None, _prefix: str = ""
+) -> list[str]:
+    """Fields of the target's authored layer that syncing the source over it would drop.
 
     Chart-sync writes the source chart's config to the target, where the server re-diffs it into
-    the target's authored layer. Any key the target's layer carries and the source's does not is
-    therefore lost. On a chart the branch created, the target's layer starts out holding only the
-    bootstrap `slug`, so anything else in it was authored in the target's own admin.
+    the target's authored layer. That layer is then derived entirely from the source, so anything
+    only the target carries is lost. On a chart the branch created, the target's layer starts out
+    holding only the bootstrap `slug`, so anything beyond that was authored in the target's admin.
 
-    Keys present on both sides are not reported: the source wins there by design (that is the
-    change the reviewer approved, e.g. a renamed slug), and the reviewer saw it in chart-diff.
+    Nested fields are compared field by field, not as whole objects: the two sides can each hold a
+    different corner of the same object (`yAxis.min` in the target, `yAxis.max` in the source), and
+    reporting only `yAxis` as shared would let the target's half be dropped silently.
+
+    A field both sides carry is not reported. The source wins there by design, and that difference
+    is the change the reviewer approved in chart-diff — a slug renamed on staging, say.
     """
     target_patch = target_patch or {}
     source_patch = source_patch or {}
-    return sorted(k for k in target_patch if k not in _PATCH_BOOKKEEPING_KEYS and k not in source_patch)
+    lost = []
+    for key, target_value in target_patch.items():
+        # Bookkeeping only appears at the top level, and grapher writes it, not a person.
+        if not _prefix and key in _PATCH_BOOKKEEPING_KEYS:
+            continue
+        path = f"{_prefix}{key}"
+        if key not in source_patch:
+            lost.append(path)
+        elif isinstance(target_value, dict) and isinstance(source_patch[key], dict):
+            lost.extend(patch_paths_lost_by_sync(target_value, source_patch[key], f"{path}."))
+    return sorted(lost)
 
 
 def configs_are_equal(config_1: dict[str, Any], config_2: dict[str, Any], verbose=False) -> bool:
