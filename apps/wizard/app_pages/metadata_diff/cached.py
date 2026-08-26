@@ -15,6 +15,7 @@ import threading
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
+from urllib.parse import urlencode
 
 import pandas as pd
 import streamlit as st
@@ -22,9 +23,19 @@ from sqlalchemy.engine.base import Engine
 from streamlit.runtime.scriptrunner import add_script_run_ctx, get_script_run_ctx
 from structlog import get_logger
 
-from apps.wizard.app_pages.chart_diff.utils import TARGET
+from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET
 from apps.wizard.app_pages.metadata_diff import data, discovery
-from apps.wizard.app_pages.metadata_diff.core import CHART_FIELD_PREFIX, ViewDiff, group_changes, group_usage
+from apps.wizard.app_pages.metadata_diff.core import (
+    CHART_FIELD_PREFIX,
+    ViewDiff,
+    dims_str,
+    group_changes,
+    group_usage,
+    item_identity,
+    surface_key,
+    view_label,
+    view_url,
+)
 from apps.wizard.app_pages.metadata_diff.usage import charts_using_indicators, mdims_using_indicators
 from etl.config import OWIDEnv
 
@@ -181,6 +192,84 @@ def chart_text_changes(
     """
     scope, built = shared_facts(_source_engine, cache_key=cache_key)
     return discovery.changed_chart_texts(_source_engine, _target_engine, scope, built)
+
+
+@st.cache_data(ttl=CACHE_TTL, show_spinner="Listing the items to review…")
+def item_index(
+    _source_engine: Engine, _target_engine: Engine, cache_key: str = ""
+) -> tuple[dict[str, dict[str, str]], dict[str, int]]:
+    """change key -> {name, url} for every reviewable item, plus how many each surface holds.
+
+    Shared by the Review tab, which needs the names, and the section bar, which needs the totals. Built by
+    enumerating the items the sections show and hashing each one the way its tick was hashed — a stored row
+    carries a hash, not a name, because the slot has to survive an edit to the text.
+
+    An enumeration that fails is skipped rather than guessed at: a total that quietly omits a surface is
+    worse than one that is conservative, and the sections report their own ceilings.
+    """
+    index: dict[str, dict[str, str]] = {}
+    totals: dict[str, int] = {}
+
+    # --- MDim views ---
+    try:
+        df = mdim_changes(_source_engine, _target_engine, cache_key=cache_key)
+        flagged = [str(cp) for cp in df.index[df["in_branch"] & df["has_changes"]]]
+    except Exception:  # noqa: BLE001
+        flagged, df = [], None
+    for catalog_path in flagged:
+        assert df is not None
+        row = df.loc[catalog_path]
+        surface = surface_key("item", f"mdim:{catalog_path}")
+        try:
+            title, dimensions, view_diffs = mdim_view_diffs(
+                catalog_path,
+                _source_engine,
+                _target_engine,
+                cache_key=f"{row['configMd5_source']}::{row['configMd5_target']}",
+            )
+        except Exception:  # noqa: BLE001
+            continue
+        slug = str(row["slug_source"]) if row.get("slug_source") else ""
+        changed = [v for v in view_diffs if v.changed]
+        totals[surface] = len(changed)
+        for view in changed:
+            key, _ = item_identity(surface, dims_str(view.dimensions), {})
+            index[key] = {
+                "name": f"{title or catalog_path} — {view_label(view, dimensions)}",
+                "url": view_url(SOURCE, catalog_path, None if row["is_draft"] else slug, view.dimensions),
+            }
+
+    # --- Explorer views ---
+    try:
+        branch = explorer_changes(_source_engine, _target_engine, cache_key=cache_key).branch_views()
+    except Exception:  # noqa: BLE001
+        branch = {}
+    for explorer_slug, diffs in branch.items():
+        surface = surface_key("item", f"explorer:{explorer_slug}")
+        changed = [d for d in diffs if d.changed]
+        totals[surface] = len(changed)
+        for view in changed:
+            key, _ = item_identity(surface, dims_str(view.dimensions), {})
+            label = " · ".join(str(v) for v in view.dimensions.values()) or "(view)"
+            index[key] = {
+                "name": f"{explorer_slug} — {label}",
+                "url": f"{SOURCE.site}/explorers/{explorer_slug}?{urlencode(view.dimensions)}",
+            }
+
+    # --- Charts ---
+    surface = surface_key("item", "chart")
+    try:
+        counts = changed_charts(_source_engine, _target_engine, cache_key=cache_key)
+    except Exception:  # noqa: BLE001
+        counts = {}
+    totals[surface] = len(counts)
+    for chart_slug, n_changes in counts.items():
+        key, _ = item_identity(surface, chart_slug, {})
+        index[key] = {
+            "name": f"{chart_slug} ({n_changes} change{'s' if n_changes != 1 else ''})",
+            "url": f"{SOURCE.site}/grapher/{chart_slug}",
+        }
+    return index, totals
 
 
 @st.cache_data(ttl=CACHE_TTL, show_spinner="Listing the charts this branch changed…")

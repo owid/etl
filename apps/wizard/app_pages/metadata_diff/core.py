@@ -16,6 +16,7 @@ import json
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from typing import Any
+from urllib.parse import quote, urlencode
 
 from etl.files import ruamel_dump
 
@@ -345,6 +346,38 @@ def mark_identity(surface: str, group: "ChangeGroup") -> tuple[str, str]:
     change_key = hashlib.sha256(slot.encode()).hexdigest()
     content_hash = hashlib.sha256(json.dumps([group.old, group.new], sort_keys=True, default=str).encode()).hexdigest()
     return change_key, content_hash
+
+
+def view_label(view: ViewDiff, dimensions: list[dict[str, Any]]) -> str:
+    """Human-readable 'Choice · Choice · …' label for a view, in dimension order."""
+    parts = []
+    for dim in dimensions:
+        slug = view.dimensions.get(dim["slug"])
+        if slug is None:
+            continue
+        names = {c["slug"]: (c.get("name") or c["slug"]) for c in dim.get("choices", [])}
+        name = names.get(slug, slug)
+        if name and str(name).strip():
+            parts.append(str(name))
+    return " · ".join(parts) if parts else "(view)"
+
+
+def view_url(env, catalog_path: str, published_slug: str | None, dims: dict[str, str]) -> str:
+    """URL of a view in a given environment (site if published there, admin preview otherwise).
+
+    Pass `published_slug=None` for an MDim that is not published in that environment even if it already
+    has a slug: `/grapher/<slug>` 404s until publication, while the admin preview renders the page and
+    applies the dimensions from the query string (both verified against a staging server).
+    """
+    params = urlencode(dims)
+    if published_slug:
+        return f"{env.site}/grapher/{published_slug}?{params}"
+    return f"{env.admin_site}/grapher/{quote(catalog_path, safe='')}/?{params}"
+
+
+# The last layout the page actually rendered. Not the widget's key: a widget's state cannot be written
+# after it exists in the same run, and this has to survive exactly that moment.
+LAST_LAYOUT_KEY = "metadata-diff-layout-last"
 
 
 def item_identity(surface: str, item_key: str, fields: dict[str, Any]) -> tuple[str, str]:
@@ -869,8 +902,13 @@ COUNTED_SECTIONS = frozenset({"charts", "mdims", "explorers"})
 DEFAULT_SECTION = "blast"
 
 
-def section_label(section: str, progress: dict[str, tuple[int, int]]) -> str:
-    """Just the section's name.
+# How far a pass through one section has got. The bar is well placed to say this and nothing else: 👀
+# nothing recorded, ⏳ started, ✅ every item ticked.
+REVIEW_MARKS = {"none": "👀", "partial": "⏳", "done": "✅"}
+
+
+def section_label(section: str, progress: dict[str, tuple[int, int]], marks: dict[str, str] | None = None) -> str:
+    """The section's name, and how far its review has got.
 
     It carried a count once (`Charts (2/10)`, which read as ten charts and was ten *edits*), then a
     ✅ / 🟡 review marker. With sign-off out of the UI there is no progress to report, and the bar's job is
@@ -878,7 +916,11 @@ def section_label(section: str, progress: dict[str, tuple[int, int]]) -> str:
     taken, because that greying reads its totals.
     """
     icon, name = SECTIONS[section]
-    return f"{icon} {name}"
+    # Only a section that holds items can be part-way through reviewing them. Blast radius reports reach
+    # and Review collects the record, so a mark on either would be a claim about nothing — enforced here
+    # rather than left to the caller to remember.
+    mark = REVIEW_MARKS.get((marks or {}).get(section, ""), "") if section in COUNTED_SECTIONS else ""
+    return f"{icon} {name} {mark}" if mark else f"{icon} {name}"
 
 
 def empty_sections(progress: dict[str, tuple[int, int]], keep: Iterable[str] = ()) -> list[str]:

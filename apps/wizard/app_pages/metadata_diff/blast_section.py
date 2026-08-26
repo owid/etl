@@ -30,7 +30,7 @@ from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.chart_diff.utils import SOURCE
 from apps.wizard.app_pages.metadata_diff import cached
-from apps.wizard.app_pages.metadata_diff.core import ViewDiff, diff_window_html, field_label
+from apps.wizard.app_pages.metadata_diff.core import ViewDiff, diff_window_html, field_label, view_url
 from apps.wizard.app_pages.metadata_diff.discovery import ChangeReach, EditGroup, group_by_edit, reach_by_surface
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
@@ -38,7 +38,6 @@ from apps.wizard.app_pages.metadata_diff.render import (
     impact_counts,
     render_chart_list,
     view_impact,
-    view_url,
 )
 from apps.wizard.app_pages.metadata_diff.tree import render_multi_tree_html
 from apps.wizard.utils.components import url_persist

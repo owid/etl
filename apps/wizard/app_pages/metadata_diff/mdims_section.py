@@ -21,7 +21,14 @@ from sqlalchemy.engine.base import Engine
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET
 from apps.wizard.app_pages.metadata_diff import brief, cached, datapage, discovery, view_nav
 from apps.wizard.app_pages.metadata_diff.blast_section import GROUP_KEY, TREE_MDIM_KEY
-from apps.wizard.app_pages.metadata_diff.core import LAYOUT_QUERY_KEY, dims_str, field_label, group_usage
+from apps.wizard.app_pages.metadata_diff.core import (
+    LAYOUT_QUERY_KEY,
+    dims_str,
+    field_label,
+    group_usage,
+    view_label,
+    view_url,
+)
 from apps.wizard.app_pages.metadata_diff.data import load_item_notes, load_reviews
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
@@ -29,8 +36,6 @@ from apps.wizard.app_pages.metadata_diff.render import (
     markdown_output,
     st_layout_switcher,
     st_origin_caption,
-    view_label,
-    view_url,
 )
 from apps.wizard.app_pages.metadata_diff.review_state import (
     item_marker,

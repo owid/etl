@@ -11,23 +11,18 @@ edit to the text), so the index is rebuilt by hashing each known item the same w
 
 import subprocess
 from typing import Any
-from urllib.parse import urlencode
 
 import streamlit as st
 from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.chart_diff.utils import SOURCE
 from apps.wizard.app_pages.metadata_diff import cached
-from apps.wizard.app_pages.metadata_diff.core import dims_str, item_identity
 from apps.wizard.app_pages.metadata_diff.data import REVIEWED, load_item_notes
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
     markdown_output,
     st_copy_button,
-    view_label,
-    view_url,
 )
-from apps.wizard.app_pages.metadata_diff.review_state import surface_key
 
 # The PR lookup shells out, so it is asked once per session rather than on every rerun.
 _PR_CACHE_KEY = "mdd-pr-url"
@@ -36,7 +31,7 @@ _PR_CACHE_KEY = "mdd-pr-url"
 def st_show_review(source_engine: Engine, target_engine: Engine) -> None:
     """What this pass produced: ticks and notes, named and linked, against the number of items there are."""
     rows = load_item_notes(source_engine)
-    index, totals = _item_index(source_engine, target_engine)
+    index, totals = cached.item_index(source_engine, target_engine)
     total = sum(totals.values())
     ticked = [r for r in rows if r.get("status") == REVIEWED]
     noted = [r for r in rows if r.get("comment")]
@@ -112,79 +107,6 @@ def _row_line(row: dict[str, Any], index: dict[str, dict[str, str]]) -> str:
         return f"{icon} :gray[an item that is no longer in this diff]{when}"
     name = known["name"]
     return f"{icon} [{name}]({known['url']}){when}" if known.get("url") else f"{icon} {name}{when}"
-
-
-def _item_index(source_engine: Engine, target_engine: Engine) -> tuple[dict[str, dict[str, str]], dict[str, int]]:
-    """change key -> {name, url}, plus how many items each surface holds.
-
-    Built by enumerating the same items the sections show and hashing each one the way its tick was
-    hashed. An enumeration that fails is skipped rather than guessed at: a total that quietly omits a
-    surface is worse than one that is conservative, and the sections report their own ceilings.
-    """
-    index: dict[str, dict[str, str]] = {}
-    totals: dict[str, int] = {}
-
-    # --- MDim views ---
-    try:
-        df = cached.mdim_changes(source_engine, target_engine)
-        flagged = [str(cp) for cp in df.index[df["in_branch"] & df["has_changes"]]]
-    except Exception:  # noqa: BLE001
-        flagged, df = [], None
-    for catalog_path in flagged:
-        assert df is not None
-        row = df.loc[catalog_path]
-        surface = surface_key("item", f"mdim:{catalog_path}")
-        try:
-            title, dimensions, view_diffs = cached.mdim_view_diffs(
-                catalog_path,
-                source_engine,
-                target_engine,
-                cache_key=f"{row['configMd5_source']}::{row['configMd5_target']}",
-            )
-        except Exception:  # noqa: BLE001
-            continue
-        slug = str(row["slug_source"]) if row.get("slug_source") else ""
-        changed = [v for v in view_diffs if v.changed]
-        totals[surface] = len(changed)
-        for view in changed:
-            key, _ = item_identity(surface, dims_str(view.dimensions), {})
-            index[key] = {
-                "name": f"{title or catalog_path} — {view_label(view, dimensions)}",
-                "url": view_url(SOURCE, catalog_path, None if row["is_draft"] else slug, view.dimensions),
-            }
-
-    # --- Explorer views ---
-    try:
-        changes = cached.explorer_changes(source_engine, target_engine)
-        branch = changes.branch_views()
-    except Exception:  # noqa: BLE001
-        branch = {}
-    for explorer_slug, diffs in branch.items():
-        surface = surface_key("item", f"explorer:{explorer_slug}")
-        changed = [d for d in diffs if d.changed]
-        totals[surface] = len(changed)
-        for view in changed:
-            key, _ = item_identity(surface, dims_str(view.dimensions), {})
-            label = " · ".join(str(v) for v in view.dimensions.values()) or "(view)"
-            index[key] = {
-                "name": f"{explorer_slug} — {label}",
-                "url": f"{SOURCE.site}/explorers/{explorer_slug}?{urlencode(view.dimensions)}",
-            }
-
-    # --- Charts ---
-    surface = surface_key("item", "chart")
-    try:
-        counts = cached.changed_charts(source_engine, target_engine)
-    except Exception:  # noqa: BLE001
-        counts = {}
-    totals[surface] = len(counts)
-    for chart_slug, n_changes in counts.items():
-        key, _ = item_identity(surface, chart_slug, {})
-        index[key] = {
-            "name": f"{chart_slug} ({n_changes} change{'s' if n_changes != 1 else ''})",
-            "url": f"{SOURCE.site}/grapher/{chart_slug}",
-        }
-    return index, totals
 
 
 def _quoted(note: str) -> str:

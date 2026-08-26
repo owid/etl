@@ -118,35 +118,8 @@ def reviewer() -> str | None:
     return (st.session_state.get("mdd_reviewer") or "").strip() or None
 
 
-def view_label(view: ViewDiff, dimensions: list[dict[str, Any]]) -> str:
-    """Human-readable 'Choice · Choice · …' label for a view, in dimension order."""
-    parts = []
-    for dim in dimensions:
-        slug = view.dimensions.get(dim["slug"])
-        if slug is None:
-            continue
-        names = {c["slug"]: (c.get("name") or c["slug"]) for c in dim.get("choices", [])}
-        name = names.get(slug, slug)
-        if name and str(name).strip():
-            parts.append(str(name))
-    return " · ".join(parts) if parts else "(view)"
-
-
-def view_url(env, catalog_path: str, published_slug: str | None, dims: dict[str, str]) -> str:
-    """URL of a view in a given environment (site if published there, admin preview otherwise).
-
-    Pass `published_slug=None` for an MDim that is not published in that environment even if it already
-    has a slug: `/grapher/<slug>` 404s until publication, while the admin preview renders the page and
-    applies the dimensions from the query string (both verified against a staging server).
-    """
-    params = urllib.parse.urlencode(dims)
-    if published_slug:
-        return f"{env.site}/grapher/{published_slug}?{params}"
-    return f"{env.admin_site}/grapher/{urllib.parse.quote(catalog_path, safe='')}/?{params}"
-
-
-# The last layout the page actually rendered. Not the widget's key: a widget's state cannot be written
-# after it exists in the same run, and this has to survive exactly that moment.
+# The last layout the page actually rendered. Not the widget's key: a widget's state cannot be
+# written after it exists in the same run, and this has to survive exactly that moment.
 LAST_LAYOUT_KEY = "metadata-diff-layout-last"
 
 
@@ -725,7 +698,9 @@ def _dead_section_css(options: list[str], dead: set[str]) -> str:
     return f"<style>\n{picks} {{ opacity: .4; pointer-events: none; cursor: default; }}\n</style>"
 
 
-def st_section_switcher(progress: dict[str, tuple[int, int]], empty: Iterable[str] = ()) -> str:
+def st_section_switcher(
+    progress: dict[str, tuple[int, int]], empty: Iterable[str] = (), marks: dict[str, str] | None = None
+) -> str:
     """The Charts / MDims / Explorers control, with its selection kept in the URL.
 
     `empty` names the sections with nothing in them (see `empty_sections`): they stay on the bar, showing
@@ -751,7 +726,7 @@ def st_section_switcher(progress: dict[str, tuple[int, int]], empty: Iterable[st
                 st.segmented_control(
                     label="Section",
                     options=options,
-                    format_func=lambda s: section_label(s, progress),
+                    format_func=lambda s: section_label(s, progress, marks),
                     key=SECTION_STATE_KEY,
                     label_visibility="collapsed",
                 ),

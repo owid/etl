@@ -2238,7 +2238,7 @@ def test_edit_detail_counts_reach_entries_without_dimensions():
 
 def test_view_url_sends_unpublished_views_to_the_admin_preview():
     """`/grapher/<slug>` 404s until an MDim is published, so an unpublished view links to the preview."""
-    from apps.wizard.app_pages.metadata_diff.render import view_url
+    from apps.wizard.app_pages.metadata_diff.core import view_url
 
     class Env:
         site = "http://staging-site-x"
@@ -2752,3 +2752,21 @@ def test_a_multiline_note_survives_the_report():
     # An empty note produces something renderable rather than an IndexError.
     assert _quoted("") == ">"
     assert _bullet_lines("") == ["  - "]
+
+
+def test_a_section_badge_shows_how_far_its_review_has_got():
+    """👀 nothing recorded, ⏳ started, ✅ every item ticked — and nothing at all when unknown."""
+    from apps.wizard.app_pages.metadata_diff.core import section_label
+
+    assert section_label("charts", {}, {"charts": "none"}).endswith("👀")
+    assert section_label("charts", {}, {"charts": "partial"}).endswith("⏳")
+    assert section_label("charts", {}, {"charts": "done"}).endswith("✅")
+
+    # No mark for this section, an unknown state, or no marks at all: the name alone.
+    assert section_label("charts", {}, {"mdims": "done"}).endswith("Charts")
+    assert section_label("charts", {}, {"charts": "elsewhere"}).endswith("Charts")
+    assert section_label("charts", {}).endswith("Charts")
+
+    # Blast radius and Review hold no items, so they never carry one.
+    assert section_label("blast", {}, {"blast": "done"}).endswith("Blast radius")
+    assert section_label("review", {}, {"review": "partial"}).endswith("Review")

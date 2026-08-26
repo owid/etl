@@ -31,6 +31,7 @@ from apps.wizard.app_pages.metadata_diff import (
     review_section,
 )
 from apps.wizard.app_pages.metadata_diff.core import empty_sections
+from apps.wizard.app_pages.metadata_diff.data import REVIEWED, load_item_notes
 from apps.wizard.app_pages.metadata_diff.discovery import keep_sections
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
@@ -48,6 +49,44 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed",
 )
+
+
+# Which section a recorded row belongs to, from the surface it was written under.
+_SECTION_OF_SURFACE = (("item:mdim:", "mdims"), ("item:explorer:", "explorers"), ("item:chart", "charts"))
+
+
+def _review_marks(source_engine, target_engine) -> dict[str, str]:
+    """Per section: nothing recorded, started, or every item ticked.
+
+    Lazy on purpose. With nothing ticked there is no "done" to establish, so a fresh page shows 👀 without
+    enumerating — and enumerating means diffing every changed view of every changed MDim. The totals are
+    asked for only once something has been recorded, by which point those caches are warm from the reading.
+    """
+    ticked: dict[str, int] = {"charts": 0, "mdims": 0, "explorers": 0}
+    for row in load_item_notes(source_engine):
+        if row.get("status") != REVIEWED:
+            continue
+        surface = str(row.get("catalogPath") or "")
+        for prefix, section in _SECTION_OF_SURFACE:
+            if prefix in surface:
+                ticked[section] += 1
+                break
+
+    marks = {section: "none" for section in ticked}
+    if not any(ticked.values()):
+        return marks
+
+    _index, totals = cached.item_index(source_engine, target_engine)
+    per_section: dict[str, int] = {"charts": 0, "mdims": 0, "explorers": 0}
+    for surface, total in totals.items():
+        for prefix, section in _SECTION_OF_SURFACE:
+            if prefix in surface:
+                per_section[section] += total
+                break
+    for section, done in ticked.items():
+        total = per_section.get(section, 0)
+        marks[section] = "none" if not done else ("done" if total and done >= total else "partial")
+    return marks
 
 
 def _section_totals(summary) -> dict[str, tuple[int, int]]:
@@ -96,7 +135,11 @@ what ships is what you meant, and to see how far each change reaches.
 
     # A zero badge is only trustworthy when the lookup behind it worked; `keep_sections` says which zeros
     # are silences rather than findings, and those sections stay reachable.
-    section = st_section_switcher(progress, empty_sections(progress, keep_sections(summary)))
+    section = st_section_switcher(
+        progress,
+        empty_sections(progress, keep_sections(summary)),
+        _review_marks(source_engine, target_engine),
+    )
 
     if section == "review":
         review_section.st_show_review(source_engine, target_engine)
