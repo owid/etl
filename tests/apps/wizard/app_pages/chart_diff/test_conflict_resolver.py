@@ -6,16 +6,20 @@ whatever the editor was born with (production's value) was what got written to t
 """
 
 import json
+from datetime import datetime
 
 import pytest
 from streamlit.testing.v1 import AppTest
 
 from apps.wizard.app_pages.chart_diff.conflict_resolver import (
     FieldParseError,
+    attribute_field_changes,
     build_resolved_config,
     compare_chart_configs,
+    field_value_diff,
     parse_field_text,
     resolve_field_value,
+    summarize_production_edits,
 )
 
 PROD_CONFIG = {
@@ -560,3 +564,88 @@ def test_resolving_does_not_fill_the_config_with_schema_defaults(fake_admin_api_
     assert config["title"] == "Production title"
     # Exactly the fields the chart had, no more.
     assert set(config) == {"$schema", "dimensions", "subtitle", "title"}
+
+
+# --------------------------------------------------------------------------------------------------
+# What production changed while we worked on staging
+# --------------------------------------------------------------------------------------------------
+
+REV_A = datetime(2026, 8, 1, 9, 0)
+REV_B = datetime(2026, 8, 10, 15, 18)
+
+
+def test_field_value_diff_reads_as_a_unified_diff():
+    diff = field_value_diff("Child employment is defined", "Child labor is defined")
+    assert "-Child employment is defined" in diff
+    assert "+Child labor is defined" in diff
+    # File headers name nothing here, so they are stripped.
+    assert "---" not in diff and "+++" not in diff
+
+
+def test_field_value_diff_shows_only_the_changed_lines_of_a_structured_value():
+    before = ["World", "Kenya", "Peru"]
+    after = ["World", "Kenya", "Chile"]
+    diff = field_value_diff(before, after)
+    assert '-  "Peru"' in diff
+    assert '+  "Chile"' in diff
+    # Untouched entries stay out of the diff body, bar one line of context.
+    assert '"World"' not in diff
+
+
+def test_field_value_diff_handles_a_field_that_was_not_set():
+    assert field_value_diff(None, {"scaleType": "log"}).startswith("@@")
+    assert "+" in field_value_diff(None, {"scaleType": "log"})
+
+
+def test_attribute_field_changes_credits_each_field_to_the_revision_that_changed_it():
+    baseline = {"title": "Old title", "note": "Old note"}
+    revisions = [
+        (REV_B, "Bertha", {"title": "Old title", "note": "New note"}),
+        (REV_A, "Pablo", {"title": "New title", "note": "Old note"}),
+    ]
+    # Careful: revisions are newest-first, so Pablo's title edit precedes Bertha's note edit. The
+    # chain therefore reads baseline -> Pablo -> Bertha, and Bertha reverts the title.
+    attribution = attribute_field_changes(revisions, baseline)
+    assert attribution["note"]["author"] == "Bertha"
+    assert attribution["note"]["before"] == "Old note"
+    assert attribution["note"]["after"] == "New note"
+    # The title moved and moved back, so the latest change is Bertha's revert.
+    assert attribution["title"]["author"] == "Bertha"
+    assert attribution["title"]["before"] == "New title"
+    assert attribution["title"]["after"] == "Old title"
+
+
+def test_attribute_field_changes_needs_a_baseline_to_diff_against():
+    revisions = [(REV_B, "Bertha", {"title": "Whatever"})]
+    assert attribute_field_changes(revisions, None) == {}
+    assert attribute_field_changes([], {"title": "Whatever"}) == {}
+
+
+def test_summarize_production_edits_reports_a_bulk_write_as_such():
+    # `charts.updatedAt` moves on ETL-driven writes too, which leave no revision behind. Naming the
+    # author of some months-old manual edit there would be actively misleading.
+    summary = summarize_production_edits([], {"title": "Old"}, {"title"})
+    assert summary == {"kind": "no_revision"}
+
+
+def test_summarize_production_edits_names_the_latest_editor():
+    revisions = [
+        (REV_B, "Bertha", {"title": "Newest"}),
+        (REV_A, "Pablo", {"title": "Middle"}),
+    ]
+    summary = summarize_production_edits(revisions, {"title": "Oldest"}, {"title"})
+    assert summary is not None
+    assert summary["kind"] == "revision"
+    assert summary["author"] == "Bertha"
+    assert summary["created_at"] == REV_B
+    assert summary["n_revisions"] == 2
+    assert summary["keys"] == ["title"]
+    assert summary["overlapping"] == ["title"]
+
+
+def test_summarize_production_edits_separates_overlapping_from_other_fields():
+    revisions = [(REV_B, "Bertha", {"title": "New", "note": "New note"})]
+    summary = summarize_production_edits(revisions, {"title": "Old", "note": "Old note"}, {"title"})
+    assert summary is not None
+    assert summary["keys"] == ["note", "title"]
+    assert summary["overlapping"] == ["title"]

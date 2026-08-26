@@ -1,21 +1,27 @@
 import ast
+import difflib
 import json
 from collections import Counter
 from copy import deepcopy
+from functools import cached_property
 from typing import Any
 
 import streamlit as st
 import structlog
 from requests.exceptions import HTTPError
+from sqlalchemy import text as sa_text
 from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.app_pages.chart_diff.chart_diff import CONFIG_KEYS_IGNORE, ChartDiff
 from apps.wizard.app_pages.chart_diff.utils import SOURCE
+from apps.wizard.utils import get_staging_creation_time
 from etl.files import get_schema_from_url
 from etl.indicator_upgrade.schema import validate_chart_config_and_set_defaults
 
 log = structlog.get_logger()
+
+ADMIN_REVISIONS_URL = "https://admin.owid.io/admin/charts/{chart_id}/edit?tab=revisions"
 
 PRODUCTION = 1
 STAGING = 2
@@ -147,6 +153,134 @@ def compare_chart_configs(c1: dict[str, Any], c2: dict[str, Any]) -> list[dict[s
     return diff_list
 
 
+def field_value_diff(before: Any, after: Any) -> str:
+    """A unified diff of one config field, from what production held before an edit to after it.
+
+    Shown instead of the old value alone: for anything structured (a dimensions block, an entity
+    list) the interesting part is the handful of changed lines, not the whole value.
+    """
+    old = as_text(before).splitlines() if before is not None else []
+    new = as_text(after).splitlines() if after is not None else []
+    # The ---/+++ headers name files, which there are none of here.
+    lines = [line for line in difflib.unified_diff(old, new, lineterm="", n=1) if not line.startswith(("---", "+++"))]
+    return "\n".join(lines)
+
+
+def fetch_production_revisions(
+    session: Session, chart_id: int, since: Any
+) -> tuple[list[tuple[Any, str, dict[str, Any]]], dict[str, Any] | None]:
+    """Production revisions of a chart since `since`, newest first, plus the one preceding them.
+
+    That extra older revision is the baseline the earliest in-window revision is diffed against —
+    without it there is nothing to compare the first change to.
+    """
+    rows = session.execute(
+        sa_text(
+            """
+            SELECT r.createdAt, COALESCE(u.fullName, 'unknown') AS author, r.config
+            FROM chart_revisions r
+            LEFT JOIN users u ON u.id = r.userId
+            WHERE r.chartId = :chart_id AND r.createdAt > :since
+            ORDER BY r.createdAt DESC
+            """
+        ),
+        {"chart_id": chart_id, "since": since},
+    ).all()
+    # The baseline is only a config to diff against, so it needs no author.
+    baseline = session.execute(
+        sa_text(
+            """
+            SELECT r.createdAt, '' AS author, r.config
+            FROM chart_revisions r
+            WHERE r.chartId = :chart_id AND r.createdAt <= :since
+            ORDER BY r.createdAt DESC
+            LIMIT 1
+            """
+        ),
+        {"chart_id": chart_id, "since": since},
+    ).all()
+
+    def rows_to_revisions(raw) -> list[tuple[Any, str, dict[str, Any]]]:
+        return [
+            (created_at, author, config if isinstance(config, dict) else json.loads(config or "{}"))
+            for created_at, author, config in raw
+        ]
+
+    baseline_rev = rows_to_revisions(baseline)
+    return rows_to_revisions(rows), (baseline_rev[0][2] if baseline_rev else None)
+
+
+def attribute_field_changes(
+    revisions: list[tuple[Any, str, dict[str, Any]]],
+    baseline_config: dict[str, Any] | None,
+) -> dict[str, dict[str, Any]]:
+    """Per field, who changed it in production since the fork and what it held before.
+
+    Walks the revision chain oldest-first and attributes each changed field to the revision that
+    changed it, keeping the most recent attribution. `before` is the value in the revision
+    immediately preceding that change, which is what makes the annotation useful next to the
+    conflict: production moved this field from `before` to its current value, while staging moved
+    the same field from `before` to its own.
+    """
+    if baseline_config is None or not revisions:
+        return {}
+
+    chain = [(None, "", baseline_config)] + list(reversed(revisions))
+    attribution: dict[str, dict[str, Any]] = {}
+    for (_, _, older), (created_at, author, newer) in zip(chain, chain[1:]):
+        for field in compare_chart_configs(older, newer):
+            attribution[field["key"]] = {
+                "author": author,
+                "created_at": created_at,
+                "before": field["raw1"],
+                # The value this revision set, rather than production's current config value. They
+                # are normally the same, but taking it from the revision keeps the diff faithful to
+                # what the edit actually did.
+                "after": field["raw2"],
+            }
+    return attribution
+
+
+def summarize_production_edits(
+    revisions: list[tuple[Any, str, dict[str, Any]]],
+    baseline_config: dict[str, Any] | None,
+    conflicted_keys: set[str],
+) -> dict[str, Any] | None:
+    """Describe what production did to a chart while we were working on it on staging.
+
+    A conflict says *that* production moved, not what it moved. Without that, the reviewer has to open
+    the admin's revision tab to find out whether the production edit even touches the fields they are
+    being asked to resolve.
+
+    `revisions` are the production revisions recorded since the staging server was created, newest
+    first; `baseline_config` is the config immediately before them. A chart can be in conflict with no
+    revisions at all — `charts.updatedAt` also moves on bulk and ETL-driven writes, which leave no
+    admin revision — and that is reported as such rather than guessed at.
+    """
+    if not revisions:
+        return {"kind": "no_revision"}
+
+    newest_at, newest_author, latest_config = revisions[0]
+    summary: dict[str, Any] = {
+        "kind": "revision",
+        "author": newest_author,
+        "created_at": newest_at,
+        "n_revisions": len(revisions),
+        "keys": [],
+        "overlapping": [],
+    }
+    if baseline_config is None:
+        # Nothing earlier to diff against, so we can name the editor but not what they changed.
+        return summary
+
+    # Union of what changed across the whole window, not just the last edit: every one of these
+    # revisions landed after the staging branch forked, so all of them are news to the reviewer.
+    keys = sorted({field["key"] for field in compare_chart_configs(baseline_config, latest_config)})
+    summary["keys"] = keys
+    summary["overlapping"] = [k for k in keys if k in conflicted_keys]
+    return summary
+
+
 def show_field_value(value: Any) -> None:
     """Render one side's value of a conflicted field.
 
@@ -170,16 +304,84 @@ class ChartDiffConflictResolver:
     would re-create it), so anything stored on `self` between renders would be stale.
     """
 
-    def __init__(self, diff: ChartDiff, session: Session):
+    def __init__(self, diff: ChartDiff, session: Session, target_session: Session | None = None):
         # Chart diff
         self.diff = diff
         # Session (needed to update conflict table in db)
         self.session = session
+        # Production session, used only to read what production changed while we worked on staging.
+        # Optional so the resolver still works without it (the summary is then simply not shown).
+        self.target_session = target_session
         # Compare chart configs
         self.config_compare = compare_chart_configs(
             self.diff.target_chart.config,  # ty: ignore
             self.diff.source_chart.config,
         )
+
+    @cached_property
+    def _production_history(self) -> tuple[dict[str, Any] | None, dict[str, dict[str, Any]]]:
+        """Production's revisions since the fork, as (headline summary, per-field attribution).
+
+        Cached: the per-field accessor is read once per conflicted field while rendering, and each
+        read would otherwise be two queries against the production DB.
+        """
+        if self.target_session is None:
+            return None, {}
+        try:
+            revisions, baseline = fetch_production_revisions(
+                self.target_session,
+                self.diff.chart_id,
+                get_staging_creation_time(self.session),
+            )
+        except Exception as e:  # noqa: BLE001 — context is a nicety; never break the resolver for it
+            log.warning("conflict_resolver.production_edits_failed", chart_id=self.diff.chart_id, error=str(e))
+            return None, {}
+        summary = summarize_production_edits(revisions, baseline, {f["key"] for f in self.config_compare})
+        return summary, attribute_field_changes(revisions, baseline)
+
+    @property
+    def production_edits(self) -> dict[str, Any] | None:
+        """What production did to this chart since the staging server was created."""
+        return self._production_history[0]
+
+    @property
+    def production_field_changes(self) -> dict[str, dict[str, Any]]:
+        """Per conflicted field, who last changed it in production and what it held before."""
+        return self._production_history[1]
+
+    def show_production_edits(self) -> None:
+        """Say who last changed production and whether that edit touches the fields being resolved."""
+        summary = self.production_edits
+        if summary is None:
+            return
+
+        link = f"[revision history]({ADMIN_REVISIONS_URL.format(chart_id=self.diff.chart_id)})"
+
+        if summary["kind"] == "no_revision":
+            # `charts.updatedAt` moved but no admin revision was recorded, which is what a bulk or
+            # ETL-driven write looks like. Saying "last edited by X" here would name whoever happened
+            # to make the previous manual edit, months earlier.
+            st.caption(
+                "Production's timestamp moved but no chart revision was recorded, so this is most "
+                f"likely a bulk or ETL-driven write rather than someone editing the chart · {link}"
+            )
+            return
+
+        when = summary["created_at"].strftime("%Y-%m-%d %H:%M")
+        n = summary["n_revisions"]
+        line = f"Production was last edited by **{summary['author']}** on **{when}**"
+        if n > 1:
+            line += f" ({n} edits since this staging server was created)"
+        line += f" · {link}"
+        st.markdown(line)
+
+        # Which field production moved, and from what, is annotated on each field below instead of
+        # summarised here — that is where the choice is actually made.
+        if not any(f["key"] in self.production_field_changes for f in self.config_compare):
+            st.caption(
+                "None of the conflicted fields below were changed by it — they differ for some other "
+                "reason (schema defaults, or an edit predating this staging server)."
+            )
 
     @property
     def toast_key(self) -> str:
@@ -208,6 +410,22 @@ class ChartDiffConflictResolver:
     def _editor_key(self, field_key: str) -> str:
         return f"conflict-editor-{field_key}-{self.diff.chart_id}"
 
+    def _clear_field_state(self) -> None:
+        """Forget the per-field choices once a conflict is resolved.
+
+        The keys are namespaced by chart, not by conflict, so they outlive the conflict they were
+        answered for. If production edits the same chart again during one Streamlit session, the old
+        selections are still set: `fields_undecided` comes back empty and the Resolve button is live
+        before the reviewer has looked at the new conflict, which would apply the previous
+        conflict's PRODUCTION/STAGING choices to different values.
+
+        Safe to do here because this runs in a button callback, before the next rerun re-creates the
+        widgets — the same reason `choose_env_for_all` may write them.
+        """
+        for field in self.config_compare:
+            st.session_state.pop(self._radio_key(field["key"]), None)
+            st.session_state.pop(self._editor_key(field["key"]), None)
+
     @property
     def fields_undecided(self) -> list[str]:
         """Conflicted fields for which no environment has been chosen yet."""
@@ -221,6 +439,23 @@ class ChartDiffConflictResolver:
         """
         for field in self.config_compare:
             st.session_state[self._radio_key(field["key"])] = choice
+
+    def _show_field_provenance(self, field_key: str) -> None:
+        """Say who moved this field in production, and what it moved away from.
+
+        The value it moved *from* is the point of this: staging started from the same value, so
+        seeing it makes the choice concrete — production went one way from there, staging another.
+        """
+        change = self.production_field_changes.get(field_key)
+        if change is None:
+            st.caption("Unchanged in production since this staging server was created.")
+            return
+
+        when = change["created_at"].strftime("%Y-%m-%d %H:%M")
+        st.caption(f":material/history: Changed by **{change['author']}** on {when}")
+        diff = field_value_diff(change["before"], change["after"])
+        if diff:
+            st.code(diff, language="diff")
 
     def show_field_resolver(self, field: dict[str, Any]) -> None:
         with st.container(border=True):
@@ -236,6 +471,7 @@ class ChartDiffConflictResolver:
                 with st.container(border=True):
                     st.markdown("**Production**")
                     show_field_value(field["raw1"])
+                    self._show_field_provenance(field["key"])
             with col2:
                 with st.container(border=True):
                     st.markdown("**Staging**")
@@ -403,6 +639,7 @@ class ChartDiffConflictResolver:
             # revision and bump updatedAt, which invalidates an existing approval of this diff.
             if config == build_resolved_config(self.diff.source_chart.config, {}):
                 self.diff.set_conflict_to_resolved(self.session)
+                self._clear_field_state()
                 st.session_state.pop(f"conflict-write-failed-{self.diff.chart_id}", None)
                 st.session_state[self.toast_key] = (
                     f"Chart {self.diff.chart_id} left as it is on staging, conflict resolved ({summary})"
@@ -446,6 +683,7 @@ class ChartDiffConflictResolver:
                 # Set conflict as resolved
                 st.session_state.pop(f"conflict-write-failed-{self.diff.chart_id}", None)
                 self.diff.set_conflict_to_resolved(self.session)
+                self._clear_field_state()
                 # Signal user that everything went well, and where the values came from
                 st.session_state[self.toast_key] = f"Chart {self.diff.chart_id} updated on staging ({summary})"
         if rerun:
