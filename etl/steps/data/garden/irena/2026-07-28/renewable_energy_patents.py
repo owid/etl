@@ -1,7 +1,6 @@
 from owid.catalog import Table
 from owid.datautils.dataframes import map_series
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -165,12 +164,6 @@ def run() -> None:
     ds_meadow = paths.load_dataset("renewable_energy_patents")
     tb = ds_meadow.read("renewable_energy_patents")
 
-    # Load income groups dataset.
-    ds_income_groups = paths.load_dataset("income_groups")
-
-    # Load regions dataset.
-    ds_regions = paths.load_dataset("regions")
-
     #
     # Process data.
     #
@@ -178,13 +171,11 @@ def run() -> None:
     tb = regroup_sub_technologies(tb=tb)
 
     # Harmonize country names.
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb=tb)
 
     # Add region aggregates.
-    tb = geo.add_regions_to_table(
+    tb = paths.regions.add_aggregates(
         tb=tb,
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
         regions=REGIONS,
         index_columns=["country", "year", "sector", "technology", "sub_technology"],
     )
