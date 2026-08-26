@@ -36,8 +36,7 @@ from apps.wizard.app_pages.metadata_diff.review_state import (
     item_marker,
     resolve_item_mark,
     resolve_marks,
-    st_item_note,
-    st_reviewed_toggle,
+    st_review_strip,
     surface_key,
     surface_progress,
 )
@@ -314,28 +313,23 @@ def _render_view(view, label: str, dimensions: list, catalog_path: str, slug: st
         head += f" :small[:gray[{n} field{'s' if n != 1 else ''} changed]]"
         # The tick sits beside the name, not under the diff: it is where the decision is made, and at the
         # foot of a long block it was below the fold on anything with several changed fields.
-        col_head, col_review = st.columns([4, 1], vertical_alignment="center")
-        with col_head:
-            st.markdown(head)
-            # Both sides, the way the chart review offers both: reading a diff and then opening only one
-            # of the two pages leaves you comparing text against memory. An unpublished MDim has no
-            # reader-facing page on either server, so those open in the admin preview instead.
-            staging_href = view_url(SOURCE, catalog_path, None if row["is_draft"] else slug, view.dimensions)
-            baseline_slug = str(row["slug_target"]) if row.get("published_target") == 1 else None
-            baseline_href = view_url(TARGET, catalog_path, baseline_slug, view.dimensions)
-            links = f":green[**This staging server**] [view ↗]({staging_href})"
-            if not view.is_new:
-                links = f":gray[**{BASELINE_NAME.capitalize()}**] [view ↗]({baseline_href}) · " + links
-            st.markdown(links)
-        with col_review:
-            if source_engine is not None and view.fields:
-                surface = surface_key("item", f"mdim:{catalog_path}")
-                mark = resolve_item_mark(
-                    load_reviews(source_engine, surface), surface, dims_str(view.dimensions), view.fields
-                )
-                st_reviewed_toggle(source_engine, surface, mark)
+        st.markdown(head)
+        # Both sides, the way the chart review offers both: reading a diff and then opening only
+        # one of the two pages leaves you comparing text against memory. An unpublished MDim has no
+        # reader-facing page on either server, so those open in the admin preview instead.
+        staging_href = view_url(SOURCE, catalog_path, None if row["is_draft"] else slug, view.dimensions)
+        baseline_slug = str(row["slug_target"]) if row.get("published_target") == 1 else None
+        baseline_href = view_url(TARGET, catalog_path, baseline_slug, view.dimensions)
+        links = f":green[**This staging server**] [view ↗]({staging_href})"
+        if not view.is_new:
+            links = f":gray[**{BASELINE_NAME.capitalize()}**] [view ↗]({baseline_href}) · " + links
+        st.markdown(links)
         if source_engine is not None and view.fields:
-            st_item_note(source_engine, surface, mark)
+            surface = surface_key("item", f"mdim:{catalog_path}")
+            mark = resolve_item_mark(
+                load_reviews(source_engine, surface), surface, dims_str(view.dimensions), view.fields
+            )
+            st_review_strip(source_engine, surface, mark)
         if view.is_new:
             st.caption(f"This view does not exist on `{BASELINE_NAME}`, so there is no old text to compare.")
         datapage.st_datapage_diff(

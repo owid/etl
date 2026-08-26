@@ -38,8 +38,7 @@ from apps.wizard.app_pages.metadata_diff.render import (
 )
 from apps.wizard.app_pages.metadata_diff.review_state import (
     resolve_item_mark,
-    st_item_note,
-    st_reviewed_toggle,
+    st_review_strip,
     surface_key,
 )
 
@@ -78,24 +77,19 @@ def render_chart_review(
     # columns — the same pair of links four or five times down a chart with four changed fields — and the
     # tick was below the last of them, so on a chart with several fields you scrolled past the answer to
     # reach the control.
-    col_links, col_review = st.columns([4, 1], vertical_alignment="center")
-    with col_links:
-        st.markdown(
-            f":gray[**{BASELINE_NAME.capitalize()}**] [data page ↗]({baseline_url}) · "
-            f":green[**This staging server**] [data page ↗]({staging_url})"
-        )
-    with col_review:
-        if diff.fields:
-            surface = surface_key("item", "chart")
-            mark = resolve_item_mark(
-                load_reviews(source_engine, surface),
-                surface,
-                str(chart.get("slug") or chart["chartId"]),
-                diff.fields,
-            )
-            st_reviewed_toggle(source_engine, surface, mark)
+    st.markdown(
+        f":gray[**{BASELINE_NAME.capitalize()}**] [data page ↗]({baseline_url}) · "
+        f":green[**This staging server**] [data page ↗]({staging_url})"
+    )
     if diff.fields:
-        st_item_note(source_engine, surface_key("item", "chart"), mark)
+        surface = surface_key("item", "chart")
+        mark = resolve_item_mark(
+            load_reviews(source_engine, surface),
+            surface,
+            str(chart.get("slug") or chart["chartId"]),
+            diff.fields,
+        )
+        st_review_strip(source_engine, surface, mark)
     for g in groups:
         with st.expander(f"{field_label(g.field)}", expanded=True):
             c1, c2 = st.columns(2)

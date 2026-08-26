@@ -102,6 +102,10 @@ DIFF_CSS = """
 .mdd-slot-unchanged { font-size: 0.78rem; color: #adb5bd; border-left: 3px solid #e9ecef;
                       padding-left: 8px; margin: 6px 0; }
 /* Chart lists are HTML, not markdown, so they need the list styling markdown would have given them. */
+/* The review strip: tick and note together, tinted so a row of controls does not disappear between
+   two columns of prose. Keyed containers render as `st-key-<key>`, so this matches by prefix. */
+div[class*="st-key-mdd-strip-"] { background: #f1f3f9; border-color: #b8c0e8 !important; }
+div[class*="st-key-mdd-strip-"] textarea { background: #ffffff; }
 .mdd-chart-list { margin: 0 0 0 18px; padding: 0; font-size: 0.9rem; }
 .mdd-chart-list li { margin-bottom: 2px; }
 </style>

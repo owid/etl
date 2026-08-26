@@ -27,8 +27,7 @@ from apps.wizard.app_pages.metadata_diff.review_state import (
     item_marker,
     resolve_item_mark,
     resolve_marks,
-    st_item_note,
-    st_reviewed_toggle,
+    st_review_strip,
     surface_key,
     surface_progress,
 )
@@ -208,21 +207,15 @@ def _render_explorer_view(source_engine: Engine, slug: str, view: ViewDiff, labe
     """One explorer view: its name and both servers' links, its tick, then its diffs."""
     with st.container(border=True):
         n = len(view.fields)
-        col_head, col_review = st.columns([4, 1], vertical_alignment="center")
-        with col_head:
-            st.markdown(f"**{label}** :small[:gray[{n} field{'s' if n != 1 else ''} changed]]")
-            query = urlencode(view.dimensions)
-            st.markdown(
-                f":gray[**{BASELINE_NAME.capitalize()}**] [view ↗]({TARGET.site}/explorers/{slug}?{query}) · "
-                f":green[**This staging server**] [view ↗]({SOURCE.site}/explorers/{slug}?{query})"
-            )
-        with col_review:
-            surface = surface_key("item", f"explorer:{slug}")
-            mark = resolve_item_mark(
-                load_reviews(source_engine, surface), surface, dims_str(view.dimensions), view.fields
-            )
-            st_reviewed_toggle(source_engine, surface, mark)
-        st_item_note(source_engine, surface, mark)
+        st.markdown(f"**{label}** :small[:gray[{n} field{'s' if n != 1 else ''} changed]]")
+        query = urlencode(view.dimensions)
+        st.markdown(
+            f":gray[**{BASELINE_NAME.capitalize()}**] [view ↗]({TARGET.site}/explorers/{slug}?{query}) · "
+            f":green[**This staging server**] [view ↗]({SOURCE.site}/explorers/{slug}?{query})"
+        )
+        surface = surface_key("item", f"explorer:{slug}")
+        mark = resolve_item_mark(load_reviews(source_engine, surface), surface, dims_str(view.dimensions), view.fields)
+        st_review_strip(source_engine, surface, mark)
         datapage.st_datapage_diff(
             view.fields,
             baseline_label=BASELINE_NAME.capitalize(),

@@ -186,18 +186,23 @@ def surface_progress(rows: list[dict[str, Any]], surface: str) -> str:
     return " · ".join(parts)
 
 
-def st_item_note(engine: Engine, surface: str, mark: ReviewMark, label: str = "") -> None:
-    """A note box for one item, saved as you leave it, and never mistaken for a tick.
+def st_review_strip(engine: Engine, surface: str, mark: ReviewMark) -> None:
+    """One item's tick and note, side by side, directly under its name.
 
-    Collapsed unless something is written, so a page of items is a page of items. A note-only row carries
-    the `noted` status, so `reviewed` stays false and the Review tab can tell the two apart.
+    Together and open, on purpose: they are two halves of one decision, and separating them — the tick in
+    a header column, the note folded into an expander — left the note looking like a detail and the tick
+    easy to walk past. The box is tinted (see the diff CSS) for the same reason: on a page whose body is
+    two columns of prose, an untinted row of controls disappears.
+
+    A note-only row carries the `noted` status, so writing a note never reads as a tick and the Review tab
+    can tell them apart.
     """
-    widget_key = f"mdd-note::{surface}::{mark.change_key}::{mark.content_hash[:8]}"
-    if widget_key not in st.session_state:
-        st.session_state[widget_key] = mark.note
+    note_key = f"mdd-note::{surface}::{mark.change_key}::{mark.content_hash[:8]}"
+    if note_key not in st.session_state:
+        st.session_state[note_key] = mark.note
 
-    def _save() -> None:
-        note = str(st.session_state.get(widget_key) or "").strip()
+    def _save_note() -> None:
+        note = str(st.session_state.get(note_key) or "").strip()
         if note:
             status = REVIEWED if mark.reviewed else NOTED
             upsert_review(engine, surface, mark.change_key, mark.content_hash, status, note, reviewer())
@@ -206,21 +211,19 @@ def st_item_note(engine: Engine, surface: str, mark: ReviewMark, label: str = ""
         else:
             delete_review(engine, mark.change_key)
 
-    with st.expander(
-        f"📝 Note{' — written' if mark.note else ''}{f' · {label}' if label else ''}", expanded=bool(mark.note)
-    ):
-        st.text_area(
-            "Note",
-            key=widget_key,
-            on_change=_save,
-            height=90,
-            placeholder="What you want to remember about this one — a question, a follow-up, a reason.",
-            label_visibility="collapsed",
-        )
-        st.caption(
-            "Saved on this staging server as you leave the box, and collected in the **Review** tab. Like "
-            "the ticks, it is never synced anywhere on merge."
-        )
+    with st.container(border=True, key=f"mdd-strip-{mark.change_key[:16]}"):
+        col_tick, col_note = st.columns([1, 4], vertical_alignment="center")
+        with col_tick:
+            st_reviewed_toggle(engine, surface, mark)
+        with col_note:
+            st.text_area(
+                "Note",
+                key=note_key,
+                on_change=_save_note,
+                height=68,
+                placeholder="Note — a question, a follow-up, a reason. Saved when you click away.",
+                label_visibility="collapsed",
+            )
 
 
 def reviewer() -> str | None:
