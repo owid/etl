@@ -259,10 +259,12 @@ class ChartDiffShow:
             resolver.resolve_conflicts(rerun=False)
             self._refresh_chart_diff()
 
-        resolver = ChartDiffConflictResolver(self.diff, self.source_session)
+        resolver = ChartDiffConflictResolver(self.diff, self.source_session, self.target_session)
 
         # If things to compare...
         if resolver.config_compare:
+            # What production actually did, before asking which side to keep.
+            resolver.show_production_edits()
             st.markdown(
                 "Find below the chart config fields that do not match. Choose the value you want to keep for each of the fields (or introduce a new one)."
             )

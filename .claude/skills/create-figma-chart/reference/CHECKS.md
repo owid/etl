@@ -6,16 +6,17 @@
 Every one of these caught a real defect on this skill's first run, and none of them is visible by looking at the frame. Run them as a pass, and report the numbers rather than "looks fine".
 
 > **⚠️ `verify_page.js` does not fit in a `use_figma` call as it ships.** The `code` argument caps at
-> **50,000 characters** and the file is **~84,000**, so the instruction below is not executable
+> **50,000 characters** and the file is **~117,000**, so the instruction below is not executable
 > verbatim — a run that pastes it is rejected. Emit it stripped instead:
 >
-> **Run it in slices — that is the supported path, and the only one.** Stripping the comments does
-> get it to ~48,000 characters, which parses (the helper is context-aware, so URLs, regex literals
-> and template strings survive). But 48,000 is **97% of the cap**, and all of it has to be relayed
-> verbatim, where a one-character corruption yields a *wrong verdict* rather than an error — the
-> exact failure this gate exists to catch. So `inline_script.py verify_page.js` with no `--rows`
-> now **refuses and exits 1**, naming the size and pointing here; `--whole` overrides it if you
-> genuinely mean to. The rows are grouped, each slice carries the shared preamble and runs alone:
+> **Run it in slices — that is the supported path, and the only one.** Stripping the comments used to
+> get it *just* under the cap (the helper is context-aware, so URLs, regex literals and template
+> strings survive), and even then it sat at 97%, all of which has to be relayed verbatim — where a
+> one-character corruption yields a *wrong verdict* rather than an error, the exact failure this gate
+> exists to catch. It has since grown past the cap outright: **60,937 stripped**. So
+> `inline_script.py verify_page.js` with no `--rows` **refuses and exits 1**, naming the size and
+> pointing here, and `--whole` no longer overrides that — the cap is now a hard floor for this
+> script, not a judgement call. The rows are grouped, each slice carries the shared preamble:
 >
 > ```bash
 > .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js --list-rows
@@ -24,13 +25,25 @@ Every one of these caught a real defect on this skill's first run, and none of t
 >
 > | group | rows | size |
 > |---|---|---|
-> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 46% of cap |
-> | `series` | series-weight, furniture-weight, furniture-dash | 40% |
-> | `geometry` | box-alignment, gap, margins, off-palette | 36% |
-> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 51% |
+> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 69% of cap |
+> | `series` | series-weight, furniture-weight, furniture-dash | 64% |
+> | `geometry` | box-alignment, gap, margins, off-palette | 60% |
+> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 76% |
 >
-> Groups combine (`--rows type,series`), so the whole pass is two calls. **Run all four** — each
-> reports its own rows and nothing else, so a group you skip is a group nobody checked.
+> Groups combine, so the whole pass is two calls: `--rows type,series` (41,982) then
+> `--rows geometry,annotations` (43,597, **87% of cap** — the figure `inline_script.py --check`
+> reports: it measures **these two calls**, declared as `DOCUMENTED_CALLS` in the script, rather
+> than the smallest split it could find for itself — an optimiser would go on reporting a
+> comfortable number by picking a split nobody is told to send. Change the pair here and there
+> together; `--check` fails if their groups no longer cover the file exactly once.
+> Read its **`floor`** column beside that percentage: `sent` is what today's two calls cost and can
+> always be bought down by re-splitting, while `floor` is the preamble plus the single largest row
+> group — the smallest any call can be, whatever the split. `verify_page.js` reads **87% sent against
+> a 76% floor**, so re-splitting still buys real room; when the floor itself passes the cap, slicing is
+> exhausted and the only move left is splitting the script into separate files with their own
+> preambles. `--check` fails on that and warns past 85%.
+> **Run all four** — each reports its own rows and nothing else, so a group you skip is a group
+> nobody checked.
 > `diff_against_template.js` (~12,000 stripped) needs none of this.
 >
 > **Do NOT substitute a hand-rolled subset. It is worse than skipping the pass, and this is
@@ -55,7 +68,157 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > (`/adversarial-data-review`), entity completeness (needs the *effective* selection from outside
 > Figma), the arrow row (it needs rendered pixels), `leader-on-map` (a **vector** ray-cast against
 > the country's rings — pixels are only its fallback), and the page count (a page-level fact, where
-> the script is handed frames). A `SKIPPED` row is a declared gap in coverage, never a pass — which
+> the script is handed frames).
+>
+> **`colour-vision` and `grayscale-seams` hand back a runnable command, not just an owner.** The
+> script cannot run `color_audit.py` — a Figma plugin sandbox has no shell — but the palette is
+> already on the canvas, so it emits the invocation with the palette filled in, the interpreter
+> spelled out and `--names` attached when the node names allow it. Paste and run it; both rows are
+> one run of one script.
+>
+> The palette is taken from **identified data marks and line/slope series strokes**, never from the
+> script's `fills` inventory. That inventory holds every solid paint on an area node in the plot and
+> a TEXT node has one, while a line chart's series colour is a **stroke** and is not in it at all —
+> so sourcing from it audits axis and legend labels as categories while omitting the data. Measured
+> on the test fixture, it returned a one-entry palette consisting of a text label's fill. `outline__*`
+> strokes are excluded too: that is the white halo under a line, shared by every series.
+>
+> **A legend is furniture, and its swatches are not categories.** grapher draws the legend *inside*
+> the chart group and *outside* the map — a map page reads `chart > numeric-color-legend > {lines,
+> swatches, labels, swatch-hit-areas}` as a **sibling** of `map` — so every filled swatch reached the
+> palette as an ordinary chart-side mark. An ordinary choropleth then reported **two** palettes: the
+> map under `--maps` and its own legend under `--separated`, with a `--suggest` rerun ready to
+> recommend restyling the legend rather than the categories. On a line chart the harm landed on
+> `--names` instead: a numeric legend's bins are unnamed rects, so one swatch in a colour of its own
+> put an import default into the palette and dropped the flag for the whole run. A legend repeats the
+> categories' colours and adds none of its own, so the swatches are excluded, **counted** in the row,
+> and any colour appearing *only* in the legend — an empty bin — is named rather than quietly lost.
+> They keep their boxes for `annotation-overlap`, where an annotation dropped over the legend still
+> covers something the reader needs, and are reported there as "a legend swatch".
+>
+> The mode flag is chosen from what the palette was sourced from, and it is not cosmetic — it also
+> selects which palette a `--suggest` rerun searches. A line or slope palette gets **`--line`**
+> (`--separated` plus the Line and Slope Chart variants, the darker set for thin marks on white);
+> a map gets `--maps`; anything else gets `--separated`. All three mean "nothing shares an edge".
+>
+> **A palette of one colour gets no command at all.** Both rows compare *pairs*, so a single colour
+> has nothing to compare — but `color_audit.py` does not say so: handed one hex it prints an empty pair
+> list and `overall: min dE inf`, and exits 0, which reads exactly like a clean audit.
+> [GUIDELINES.md](../GUIDELINES.md) already rules on this ("one categorical color against neutral grays
+> has no pair to check, and reporting no failures from a two-color audit reads as coverage you don't
+> have"), so the row withholds the command, names the colour, and hands over the two checks that *are*
+> live: that colour's contrast against the background, and whether it still separates from the grays in
+> grayscale. The clash note survives the withholding — two categories painted one colour **are** a
+> one-colour palette, and that is the severest collision there is. A declared `highlightTreatment` gets
+> the same warning attached to its command rather than the command withheld, because which entries are
+> muting grays is a judgement this script cannot make.
+>
+> Four things it will not decide for you:
+> - On a **stacked or segmented** chart drop the mode flag and reorder the colours into stack order
+>   first, because the seam check reads adjacency off the order you give it. That is the only chart
+>   where seams exist, so it is the only case where the emitted flag is wrong.
+> - On a **map** the command covers a *categorical* choropleth only. `--maps` selects the Categorical
+>   Maps palette and the ΔE 20 gate is a categorical test, so a **sequential ramp** — ordered by
+>   construction, and set in grapher — fails it by design, and `--suggest` would then offer an
+>   unordered palette in place of a correct ramp. Nothing in the plugin can tell the two apart from
+>   the fills, so judge a ramp by lightness order instead of running this.
+> - `--names` is dropped wholesale, with the reason stated, if any mark is unnamed, carries a comma
+>   (it would split into two entries and misalign every label after it), or carries an apostrophe
+>   (it would end the single-quoted shell argument mid-name).
+> - The palette is deduplicated by **colour**, so two categories painted the same colour reach the
+>   audit as one entry and it cannot report the clash. The row names them instead, ungraded — a
+>   highlight treatment greys every unhighlighted series on purpose, and a choropleth bin is one
+>   colour by definition (map shapes are left out of the note entirely). The category comes from the
+>   nearest `<kind>__<Entity>` **ancestor**, because grapher puts the name on the group and the paint
+>   on its leaves: a `datapoints__<Entity>` marker is a filled leaf called `Ellipse 12`.
+>
+> **A frame that paints no pixels returns one row, not a sheet of them.** Figma switches a node off
+> two independent ways — `visible: false` and opacity — and both are **inherited**, while the walk
+> starts at the frame's *children*, whose own `visible: true` says nothing about whether they render.
+> So a hidden frame, or one under a hidden section, used to certify thirty rows of verdicts about a
+> deliverable nobody can see. Either switch now returns a single `frame-not-rendered` **FAIL** naming
+> which switch is off and where, and the verdict reads `NOT CHECKED` — never "no mechanical row
+> failed". Unhide or reset the frame *and every group and section above it*, then re-run.
+>
+> **A translucent knockout is not certified.** An annotation's knockout works by painting the frame's
+> colour *over* what it crosses, so one at 0.005 masks nothing while still passing the weight,
+> alignment and colour checks — a clean `ok` on a crossing the reader can see straight through. Zero
+> is already "no knockout"; anything between is reported **REVIEW** with its effective opacity (paint
+> × node) named, because at 0.98 it masks fine and at 0.05 it does not, and which side of that a frame
+> is on depends on what sits behind the annotation.
+>
+> **The knockout's colour is the ground behind *that* annotation, not the frame's fill.** Requiring
+> `frameFill` unconditionally failed a correct chart: an annotation placed inside a tinted region takes
+> a halo the colour of the *tint*, and a canvas-coloured one there paints a white outline around every
+> letter. The row now composites — the ground is almost always a fill at partial opacity, so the halo
+> matches what the reader sees (`#dddddd` at 45% over white is `#f0f0f0`) and matching the raw fill
+> still **FAILS**. Two outcomes are **REVIEW** rather than `ok`, because the ground is matched by
+> *bounding box* and a tint is usually a triangle or a wedge whose ink fills part of it: a halo that
+> matches a ground's composite, and a canvas-coloured halo with some filled shape's box around it.
+> Both name the shape and the sum so the call can be made by eye.
+>
+> Seven consequences that are easy to get wrong in the other direction.
+>
+> **Grounds stack, and so do a single node's fills.** A translucent tint over an opaque plot background
+> renders as the *ordered* composite of both, which equals neither shape's own composite over the
+> frame; and a node carrying several visible paints renders their composite too, so reading only its
+> first paint reports a colour that is not on the canvas. The row folds both — the node's fills into one
+> effective colour and alpha, then the candidates over each other in paint order — and where candidates
+> overlap and nothing matches it **REVIEWS** instead of failing, because any subset of the stack is a
+> possible ground and a bounding box cannot say which.
+>
+> **Where the answer depends on something this script cannot establish, it declines instead of
+> guessing.** Folding a node's fills needs to know which end of `fills` is the top, and nothing we rely
+> on states it — the harness can only encode whatever the script assumes, so it cannot referee. Getting
+> it backwards fails a correct halo, or blesses a colour that is nowhere on the canvas. So the stack is
+> folded **both ways** and asserted only where the two agree: every single-fill ground, and any stack
+> the order does not change. Where they disagree — and where a paint has no single colour at all, a
+> gradient or an image — the ground is declared **NOT measurable** and named, the same treatment a
+> translucent mark and a sequential ramp already get. It was worth doing: before this, a ground that
+> was a solid *plus a gradient* dropped the gradient silently and the row certified the solid base as
+> "the colour ANNOTATIONS-AND-ARROWS.md asks for", on a ground that page puts on tier 1.
+>
+> **Only what is painted *under* the annotation is behind it.** A containing shape appended *after* the
+> annotation sits on top of it — the re-import z-order bug this page describes further down, where a
+> tint appended last washes the text out. Matched by box alone it read as the ground and the row
+> recommended colouring the halo to match it, turning the bug into advice. Paint position is carried
+> alongside the box.
+>
+> **A full-bleed node is dropped only when it composites to the frame's own fill.** Such a backdrop
+> paints the canvas colour and would turn every correct canvas-coloured halo into a review. A full-bleed
+> rect in a *different* colour is the opposite case — it is the ground behind every annotation on the
+> frame, which is exactly how the Instagram templates carry their beige — and dropping it by geometry
+> alone failed a correct halo twice over: once as a needless knockout, then again against a frame fill
+> the reader never sees.
+>
+> **...and only when that colour is actually known.** "Composites to the frame's fill" is a question
+> about a ground whose colour was established; asked of an **unmeasurable** one it is answered by the
+> arbitrary forward fold, and a full-bleed layer carrying a white solid *under a gradient* coincides
+> with a white frame and disappears — taking the "not measurable" signal with it, so the halo is
+> certified `ok` against a frame the reader never sees. A ground whose colour cannot be established is
+> never a no-op; it is the reason to decline.
+>
+> **A group's opacity is applied once, to its children already combined.** Every descendant carries the
+> cumulative opacity of its ancestors, which is right for a single ground and double-counts the moment
+> two of them overlap: two opaque children of a 50% group are one 50% layer, not two. Modelling that
+> needs per-group compositing *and* the paint order the row already declines to assume, so where two
+> candidates share a translucent ancestor the stack is declared **NOT measurable** instead. Decided per
+> annotation, never written back onto the ground — whether a group counts as shared depends on how many
+> of its children contain *this* annotation.
+>
+> **The tier branch knows about the ground too.** "Crosses nothing yet carries a knockout" is a FAIL on
+> *bare canvas* only. An annotation inside a tint keeps its halo while the region under it is still
+> empty — that is the point ANNOTATIONS-AND-ARROWS.md makes — so it is REVIEWED. But a *backdrop* is
+> canvas whatever colour it paints, so it never excuses a halo over empty space; only a bounded shape
+> does, and the FAIL stands where no bounded filled shape contains the annotation.
+>
+> **Non-rendering means exactly zero, never a floor.** A node or paint at 0.005 does reach the canvas,
+> and a cutoff dropped its whole subtree from *every* row — an 8px label at 0.005 left `text-floor`
+> reporting that all of its ranges cleared the floor. Anything positive is **translucent**: held out of
+> the palette, named there so the shortfall is visible, and still judged by every row that is about
+> geometry rather than colour.
+>
+> A `SKIPPED` row is a declared gap in coverage, never a pass — which
 > is the whole reason to read the list rather than the verdict.
 >
 > **[`scripts/diff_against_template.js`](../scripts/diff_against_template.js) is the other half of the
@@ -72,7 +235,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > its text — and it separates the one API limitation that is *not* a defect (a bolded `Data source:`
 > prefix cannot be both bold and style-bound through the plugin API, so it reports as `halfBound`; see
 > [TEXTS.md](TEXTS.md)) from real drift. Its harness is
-> [`scripts/test_diff_against_template.js`](../scripts/test_diff_against_template.js) (**49**
+> [`scripts/test_diff_against_template.js`](../scripts/test_diff_against_template.js) (**75**
 > assertions), which found four defects in the script that review had not: a header that lost a row
 > reported as matching, five fingerprinted footer properties never actually compared, and a
 > `TypeError` that killed the whole diff when a row changed type. A fifth, from review: the text
@@ -81,7 +244,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 >
 > Validated by planting defects and confirming each row **fails**, twice over: 11 planted in Figma and
 > 11 caught, then a stubbed-figma harness ([`scripts/test_verify_page.js`](../scripts/test_verify_page.js),
-> `node` it after any edit) covering **137** assertions including the rows that are awkward to plant on a
+> `node` it after any edit) covering **276** assertions including the rows that are awkward to plant on a
 > real page. **A check that cannot fail is worse than no check**, so when you extend this script,
 > extend both passes with it.
 >
@@ -101,7 +264,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Color-vision safety | `color_audit.py` | no pair under **ΔE 20** for deuteranopia or protanopia; tritanopia noted, never acted on alone. **Categorical fills only** — a sequential map ramp is exempt, see below |
 | Spelling and prose | `.venv/bin/codespell` over the texts, plus a read against the style guide | American spelling (CLAUDE.md), no typos, no style-guide breaches — see below |
 | The text is *true* of the indicator | `/adversarial-data-review` on the dataset behind the chart | **every** string that says something about the data survives checking against the producer's documentation — title, subtitle, note, year, annotations, direct and value labels, legend and category labels, units, entity names, source line. Labels you shortened are in scope |
-| Entities all render | the **effective** selection (Step 1's table, not the saved `selectedEntityNames`) vs the labels in the SVG | every selected entity appears — a member missing its latest year is dropped silently (`/check-empty-entities` is the pipeline sweep) |
+| Entities all render | the **effective** selection (Step 1's table, not the saved `selectedEntityNames`) vs the labels in the SVG | every selected entity appears — a member missing its latest year is dropped silently (`/check-empty-entities` is the pipeline sweep). **On an unselected chart that plots everything, the producer's own API gives a baseline the SVG cannot fake**: count the entities it reports for the displayed year and compare against the marks drawn. WHO GHO's OData endpoint returned 167 countries reporting both sexes for 2022, against 167 `__datapoint` groups in the export — a real pass, where an SVG-vs-SVG comparison could only ever agree with itself. Also count the *raw snapshot*, not the garden table, if you want the number the chart should show: garden adds OWID's regional aggregates (174 there against the source's 167) |
 | Year or period stated, and not stale | the period the export actually shows — the link's `time=` where there is one, otherwise the rendered SVG — plus the source chart's `maxTime` | a **single-time** image says which year it shows, in the title or subtitle; a **time series** states its period on its own time axis and takes no caption (adding one makes a series read as a snapshot — see "A pinned year, and a frozen image" below). Either way the source chart isn't pinned to an old year (`/check-hardcoded-years`) |
 | Grayscale survival | `color_audit.py` (grayscale seam section) | **adjacent** pairs above ~**1.6:1**; below that they merge in print. **Stacked or segmented fills only** — for a plain or grouped bar chart, a line chart or a map pass `--separated` (`--line`/`--maps` imply it) and read the closest pairs as information, since legend order says nothing about which marks meet |
 | Off-palette fills | compare every fill against the library groups | every fill is a library color, **bound as a style** — grapher emits `#585c64` for residual categories, which is in no group. Two standing exceptions, listed rather than flagged: the muting grays of a highlight treatment, and a grapher-managed sequential map ramp (see below) |
@@ -117,7 +280,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Annotations cover only furniture | for each `annotation__*` node, test its rect against every line's **sampled polyline** (not bboxes — see below), and against the dots and value labels | gridlines, empty space or a muted context line — never a highlighted line, a dot, a value label or a bar segment carrying a number |
 | Knockout tier matches what it crosses | the same test decides the tier: compare each annotation's crossings against whether it carries a stroke | an annotation crossing furniture has a **3px** `OUTSIDE` stroke in the template's canvas color; one crossing nothing has **no** stroke and no frame. A sub-pixel weight (0.65) means the stroke was assigned without setting the weight after a `rescale()` — see Step 8 |
 | Label alignment | compare each label's center against its mark | bar values centered on bars, legend labels on swatches |
-| Box alignment | compare the chart's left/right against the header frame | identical to the subtitle box, to the pixel |
+| Box alignment | compare the chart's left/right against the header frame | identical to the subtitle box **exactly** — `verify_page.js` gates at **0.05** (`BOX_EPS`), not the ±1px it used to allow. Every other full-width element sits on those two edges, so a 0.57px shortfall is invisible in the render and plainly wrong in the properties panel. It is a `FAIL`, not a rounding note: re-pin per [FITTING.md](FITTING.md) — rescale to the content width, restore the type ladder **and** the furniture stroke weights that `rescale` multiplied, translate, then re-centre the block and re-check anything parented to the FRAME rather than the chart |
 | Gap | `(footerTop - headerBottom - chart.height) / 2`, with `footerTop = footer.y + Math.min(0, source.y)` — a source row raised inside the footer lifts the band's bottom (Step 7) | equal top and bottom, at the band figure of **the template you filled**: **12–16px** on the 540-wide frames, **30px** on the IG portrait (see Step 7). **Exception — a tightly measured group:** on an axis-less chart whose furniture was trimmed and label boxes hugged (Step 8), the band no longer applies as written; the figure to match is the one the **reference page** measures the same way, typically **20–30px**. Measure it there, record yours with a note that the group is tightly measured, and do not shrink a correct chart to force the band |
 | Annotation block gap | the **block's** outer edges (topmost annotation, bottommost annotation, plot — whichever is extreme) vs the header and footer frames | the same clearance the plot owes: **27px** each side on the 540×540 pages. An annotation outside the plot is part of the block, so spacing the plot alone is not enough ([ANNOTATIONS-AND-ARROWS.md](ANNOTATIONS-AND-ARROWS.md)) |
 | Every pointer lands on its target | for each leader, the **terminal vertex** (transformed, not the bbox) vs the thing it names — the country's own **ink** on a map, the band border at the stated year on a chart | the dot or tip is inside/on its target, and where the text names a year, at that year's x — with the first and last year taken from the plot's edge, not the tick label's centre. **A country's bounding box is not the target.** Countries are concave and multi-part, so a point can sit well inside the box and still be in open ocean — the US box reaches past Hawaii, an antimeridian straddler's spans the whole Pacific (see the map fit in `reference/per-chart-type/maps.md`). **Do it in VECTORS first — it is exact, and it is one call.** Transform the terminal into the country's local space through the inverse of its `absoluteTransform`, parse its `vectorPaths` into rings, and ray-cast. No renders, no masks, and it caught a leader whose terminal sat in the Bay of Bengal while its bbox test passed. Fall back to the **pixel** mask — hide the country vector, diff the renders, require the dot within ~1px of that pixel set — only where the vector test cannot answer: a country a few pixels across whose ring is smaller than the dot, or a shape whose fill rule makes the ray-cast ambiguous |
@@ -283,6 +446,23 @@ const paints = n => { let m = n; while (m && m !== clone) { if (!m.visible) retu
 
 **Re-run this whole pass after the last change, not after each one.** Fixes get lost silently: a label-centering pass applied to a chart instance that is later swapped for a re-export leaves the drift back exactly as it was, and every screenshot in between looks correct. And a structural change spends budget elsewhere — lifting an aggregate row to the top added 8px of height, which came straight out of the 12–16px gap and took it to 8.2 without anything reporting a problem. Treat "I already checked that" as false after any re-export, reorder, rescale or restyle.
 
+**Someone else editing your frame is a change like any other — re-run the pass, and diff the texts.**
+The Charts file is shared, so an author or a designer can rewrite your title, restyle your
+annotations and move nodes while you are still working, and none of it announces itself. Two
+different losses come out of that, and only one is mechanical:
+
+- **The gate catches a hand-edit only where a check already exists.** A rewrite that stripped both
+  annotations' halo strokes went unnoticed until a row for them was written. So when you find that a
+  hand-edit undid something, add the check *before* you re-apply the fix — otherwise the next
+  hand-edit undoes it again just as quietly.
+- **The gate cannot catch what it does not know was deliberate.** A subtitle rewrite that was a
+  genuine improvement on the wording also removed a reading aid the author had asked for, and nothing
+  on the frame distinguishes a sentence that was dropped from one that was never there. Keep the
+  approved strings and diff them: the frame does not remember what it used to say.
+
+Keep the improvements — the point is not to revert a colleague's edits, but to notice which of them
+were trades nobody actually chose, and put those back to the author.
+
 ### Checking the words, not just the geometry
 
 The chart's text is not yours — you transcribed it from the indicator's metadata — so a defect in it is a defect **upstream**, and fixing it only in the image leaves the interactive chart, the data page and every other surface still wrong. Check it here because this is where someone finally reads it slowly; fix it where it lives.
@@ -360,8 +540,49 @@ mock, and both changes make a row *less* red on purpose. Read them before treati
 
 ## A skip with a false reason is the failure mode, not a wrong number
 
-Worth stating on its own, because it has now bitten in three different rows. When `CONFIG.chartName`
-finds nothing — the documented case where a designer has **ungrouped** the chart — the plot has to be
+**First, the common case is not the one this section assumed.** `chartName` defaults to `chart`, and
+counting the live file found **three** names in use, not one: `chart` (a grapher import),
+`chart__agriculture-share` (a `static_viz` import) and `chart-desktop` / `chart-mobile` (a two-format
+page). An exact-only match resolved nothing on two of the three, fell through to the ungrouped branch,
+walked the right node anyway, and reported *"the chart group looks ungrouped"* about a frame whose
+chart group is present and correctly named. The answer was right and the explanation was wrong, which
+is the worse of the two: it sends the next reader to fix a non-problem. The resolver now takes an
+exact match first, then a `__` or `-` suffix, and names what it matched.
+
+**And there are two `<kind>__<name>` conventions, which is what made the palette labels wrong.**
+
+| Source | Names | Is the second token a category? |
+|---|---|---|
+| Grapher's SVG export | `line__<Entity>`, `outline__<Entity>`, `label__<Entity>` | **yes** — one per series, in selection order |
+| A `static_viz` matplotlib step | `bars__<slug>`, `diagram__median`, `{slug}__{part}` | **no** — a dataset slug or a part name, repeated across marks |
+
+`CATEGORY_ANY` matches `<word>__<rest>` and cannot tell them apart, so on a `static_viz` bar chart every
+bar resolved to the same "category" and `--names` labelled three distinct colours
+`agriculture-share,agriculture-share,agriculture-share`. That is why `--names` is now gated on the names
+being **distinct across the palette** and not import defaults (`Vector`, `Rectangle 12`): the grapher
+case passes that gate and keeps its labels, the `static_viz` case fails it and the flag is dropped with
+the reason. Do not "fix" this by widening `CATEGORY_ANY` — the two conventions are genuinely ambiguous
+at the name level, and distinctness is the property `--names` actually promises.
+
+**The grapher half is confirmed against a live export**, not inferred. `child-mortality.svg?imType=uncaptioned`
+carries 7 `line__<Entity>`, 7 `outline__<Entity>` and 7 `label__<Entity>` ids — Ghana, India, Brazil,
+France, Sweden, United-Kingdom, United-States — with 7 distinct stroke colours, so the row emits
+`--names 'Ghana,India,…' --line` and the audit runs. You can check this without Figma at all:
+
+```bash
+# the naming and the palette, straight from grapher
+curl -s "https://ourworldindata.org/grapher/<slug>.svg?imType=uncaptioned" | grep -o 'id="line__[^"]*"'
+```
+
+Two things that run did **not** prove, so don't cite it for them. Its labels carry the same colours as
+its lines, so a palette wrongly sourced from text fills would produce the *same* hexes and look
+correct — only a chart whose labels differ from its marks tests that. And it is grapher's automatic
+7-series assignment, which GUIDELINES replaces with the highlight treatment anyway; the audit failing
+it (France/UK at **ΔE 0.0** under tritanopia, India/UK at **1.00:1** in grayscale) is the row working,
+not a defect in a shipped page.
+
+The rest of this section is the genuinely ungrouped case. It has bitten in three different rows. When
+`CONFIG.chartName` finds nothing — a designer has **ungrouped** the chart — the plot has to be
 resolved from the frame's children, and doing that from a list of container names was line-chart-shaped:
 it knew the axis, grid and lines groups and missed a map's `map`, a bar's `bars`, a scatter's point
 container and a slope's `slopes`. Those children were then walked as *not* in the plot, which does not

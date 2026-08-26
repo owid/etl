@@ -161,6 +161,18 @@ The high-value edits to propose (include them in the Step 4 proposal):
 
   When it *does* fit, the reliable recipe is: for each category, find the row where its segment is widest, **clone that segment's existing value label** (the clone inherits the right font, size and — importantly — the black-on-light vs white-on-dark fill grapher already chose), set its characters to the category name, then center the `[name, 4px, value]` pair on the segment. To rebuild a legend you removed too eagerly: recolor the labels to `Text/Gray 80` #5B5B5B, add a 10×10 swatch in each category's own color 4px to their left, and lay them out in grapher's own split — as many as fit on the first row, the longest alone on the second.
 
+  **Hiding furniture does not re-centre what grapher centred against it — and the axis titles are the ones that move.** Grapher centres the x-axis title on *its own* plot area, which includes any column you then remove: hide the vertical legend, and the title keeps its absolute position while the plot it labels grows into the freed space. Measured after hiding a 145px legend and refitting: the x-axis title's centre sat **46px left** of the plot's, and 34px left of the frame's — centred on nothing, which is neither of the two placements GUIDELINES.md allows (centred under the axis, or bottom-right). It survives every geometry check, because the title is interior to the chart's box and moves the ink extremes not at all.
+
+  So after removing furniture, re-centre the axis titles against the **measured** plot rather than trusting the export:
+
+  ```js
+  const plotL = Math.min(...vgrid.children.map((c) => rel(c).l));   // gridlines, not the group box
+  const plotR = Math.max(...hgrid.children.map((c) => rel(c).rr));
+  xTitle.x += (plotL + plotR) / 2 - (rel(xTitle).l + rel(xTitle).rr) / 2;
+  ```
+
+  The y-axis title is stacked at the content box's left edge and is unaffected — check it anyway, since the same logic applies to anything the export positioned relative to a region you changed.
+
   **Labels over the reference row: anchor, tier, wrap, point.** The four moves that took six categories past the "they don't fit side by side" cap, measured off [a designer's rework](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=24853-5) of a page this skill had produced with a conventional legend:
 
   - **Anchor each label to its segment's edge, not its center.** Left-align to the left edge of that category's segment in the reference row (the top row — `World`, or whichever row the chart is read from); right-align the *last* category to the bar's right edge. Centering drifts a label off a narrow segment and reads as pointing at its neighbor.
@@ -233,6 +245,23 @@ The high-value edits to propose (include them in the Step 4 proposal):
   **Then re-place every annotation, because the trim moved the water they were sitting in.** This is the trap: removing the map's westernmost territory shifts the whole projection left and *shrinks* the visible ocean on that side (the Pacific west of Mexico went from 71px to 43px when Hawaii went), so labels verified clear before the trim can land off-frame after it. Treat "annotations still fit" as false after any change to which territories are drawn.
 
 - **Placing several annotations is a constrained assignment, not five independent choices — and the constraint set is bigger than it looks.** A label needs: clear of every country bbox, clear of the other labels, inside the plot (a label in the band above the map reads as a third subtitle line), **its leader must not pass through another highlighted country**, and — the one that is easy to miss — **no leader may pass through another label**, or it vanishes behind that label's knockout and looks broken. Encode all of them as acceptance tests over a per-country candidate list, then **search across assignment orderings** rather than trusting one greedy pass: ordering widest-first pushed the smallest label from a 10px leader to a 114px one here, and evaluating all orderings for minimum total leader length recovered it. Report total and worst leader length so the arrangement can be compared against the next attempt.
+
+  **Two bugs that make a placement search silently produce bad layouts, both found by reading the
+  output rather than the render:**
+
+  - **Diagonal candidates need `dist / √2` per axis, not `dist` per axis.** Offsetting both x and y by
+    the full distance puts the box's nearest corner at `hypot(d, d)` = **1.41 × d** — so a candidate
+    generated as "10px away" actually lands 14px away, and the search then rejects diagonals as
+    expensive and clusters everything on the four cardinals. Symptom: a reviewer says two specific
+    labels "look a bit far" while the report claims they are inside the distance cap, and both turn out
+    to be the diagonal ones. Scale the offset by `Math.SQRT1_2` so `dist` means what the cost function
+    thinks it means.
+  - **Weight the objective, then check the weights against a case you can judge.** A greedy pass that
+    penalises label-on-label overlap more heavily than covering data will happily hide ten marks to
+    avoid one overlap. Measured: a first pass moved one label from 3 hidden dots to **10**, because
+    10 × `W_dot` still scored below a single `W_overlap`. Prefer coordinate descent — re-optimise each
+    label against all the others until nothing moves — over a single ordered pass, which bakes in
+    whoever went first.
 
   **Test "is this spot empty?" against one box per SUBPATH, never one per country.** A country's bounding box is a terrible proxy for a country that comes in pieces: the US spans Alaska *and* the mainland, so its bbox swallows most of the North Pacific and Atlantic, and Russia's wraps the antimeridian and covers the whole northern strip. The tempting shortcut is to exclude those countries from the test — and that shortcut is exactly how a label ends up printed on Florida while your own audit reports it clear. Split every vector's `vectorPaths` on `M`, take each subpath's bbox, and map it to frame coordinates via the node's own local-min offset. On this chart it turned ~200 country boxes into 321 subpath boxes, needed no exclusions at all, and immediately caught a label the exclusion-based test had passed.
 
