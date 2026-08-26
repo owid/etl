@@ -306,33 +306,67 @@ def _matches(view, selection: dict[str, str]) -> bool:
 
 
 def _jump_to_changed(changed: list, labels: list[str], dimensions: list) -> None:
-    """The ⚡ jump: pick a changed view, and the menu below moves to it.
+    """The ⚡ jump and **Next change ▶**: two ways to move between this MDim's changed views.
 
-    Writing the dimension widgets' state from a callback is the only order that works — a widget reads its
-    session value when it is created, so setting it after the fact is a change nobody sees until the next
-    rerun. This runs before the menu is built, which is what makes the jump land in one click.
+    Both do the same thing — set the dimension menu below — so there is one answer on screen to "which
+    view am I looking at". Writing the dimension widgets' state from a callback is the only order that
+    works: a widget reads its session value when it is created, so setting it afterwards is a change
+    nobody sees until the next rerun. This runs before the menu is built, which is what makes either
+    control land in one click.
+
+    Next is relative to where you are, not to a counter of its own: the current position is recovered by
+    matching the menu's selection against the changed views, so stepping continues from a view you reached
+    with the menu or from a pasted link, and wraps at the end rather than dead-ending.
     """
     if len(changed) < 2:
         return
 
-    def _goto() -> None:
-        picked = st.session_state.get(JUMP_KEY)
-        if picked is None:
-            return
-        for slug, choice in changed[int(picked)].dimensions.items():
+    def _select(index: int) -> None:
+        target = changed[index % len(changed)]
+        for slug, choice in target.dimensions.items():
             st.session_state[DIM_PARAM_PREFIX + slug] = choice
             st.query_params[DIM_PARAM_PREFIX + slug] = choice
+        # Keep the jump showing what is on screen, whichever control moved us.
+        st.session_state[JUMP_KEY] = index % len(changed)
 
-    st.selectbox(
-        f"⚡ Changes detected — jump to a changed view ({len(changed)})",
-        options=list(range(len(changed))),
-        format_func=lambda i: labels[i],
-        index=None,
-        placeholder="Type to search this MDim's changed views…",
-        key=JUMP_KEY,
-        on_change=_goto,
-        help="Sets the menu below to that view, so the two never disagree about what you are looking at.",
+    def _goto() -> None:
+        picked = st.session_state.get(JUMP_KEY)
+        if picked is not None:
+            _select(int(picked))
+
+    # Where the menu is sitting now, if it happens to be on a changed view.
+    selection = {
+        dim["slug"]: st.query_params.get(DIM_PARAM_PREFIX + dim["slug"])
+        for dim in dimensions
+        if st.query_params.get(DIM_PARAM_PREFIX + dim["slug"]) is not None
+    }
+    current = next(
+        (i for i, view in enumerate(changed) if selection and _matches(view, selection)),
+        None,
     )
+
+    col_jump, col_next = st.columns([4, 1], vertical_alignment="bottom")
+    with col_jump:
+        st.selectbox(
+            f"⚡ Changes detected — jump to a changed view ({len(changed)})",
+            options=list(range(len(changed))),
+            format_func=lambda i: labels[i],
+            index=None,
+            placeholder="Type to search this MDim's changed views…",
+            key=JUMP_KEY,
+            on_change=_goto,
+            help="Sets the menu below to that view, so the two never disagree about what you are looking at.",
+        )
+    with col_next:
+        position = "" if current is None else f" ({current + 1} of {len(changed)})"
+        st.button(
+            "Next change ▶",
+            key="mdd-view-next",
+            on_click=_select,
+            args=(0 if current is None else current + 1,),
+            width="stretch",
+            help=f"The next changed view of this MDim{position}, wrapping round at the end.",
+        )
 
 
 def _dimension_menu(view_diffs: list, dimensions: list) -> dict[str, str]:
