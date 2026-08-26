@@ -433,8 +433,16 @@ def yaml_field_snippet(field_name: str, value: Any) -> str:
     value = as_bullets(value)
     try:
         return ruamel_dump({key: value}).rstrip("\n")
-    except Exception:
-        return f"{key}: {value!r}"
+    except Exception as e:  # noqa: BLE001 — one unserializable value must not sink the whole brief
+        # Never pass a `repr` off as YAML: it can be invalid, or valid and wrong, and this snippet is
+        # presented for pasting straight under a variable. Say what happened instead, in the snippet
+        # itself where whoever is about to paste it reads it, and comment out every line so there is
+        # nothing to paste by accident.
+        return (
+            f"# Could not render this value as YAML ({type(e).__name__}: {e}).\n"
+            f"# Copy the text from the diff above instead of this line:\n"
+            f"# {key}: {value!r}"
+        )
 
 
 @dataclass

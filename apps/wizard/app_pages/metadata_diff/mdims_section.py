@@ -101,6 +101,10 @@ def _render_drafts(source_engine: Engine, target_engine: Engine, df: pd.DataFram
     Kept out of the count above — the badge answers "what changes for readers" — but not out of the
     review: this is the text that goes live the moment `published` flips, so the PR that publishes an
     MDim is exactly the one whose reviewer needs to read it.
+
+    Paginated like the published list, and for the same reason: there is no MDim lookup anywhere in this
+    section, so a card left off the first page could not be opened at all — its diff and its Reviewed
+    toggles were counted and then put out of reach.
     """
     if not drafts:
         return
@@ -109,10 +113,13 @@ def _render_drafts(source_engine: Engine, target_engine: Engine, df: pd.DataFram
             "Their `published` flag is false, so they are not counted above. They are still worth reading "
             "if this PR is the one that publishes them."
         )
-        for catalog_path in drafts[:MDIMS_PER_PAGE]:
+        pagination = Pagination(drafts, items_per_page=MDIMS_PER_PAGE, pagination_key="mdd-drafts-pagination")
+        if len(drafts) > MDIMS_PER_PAGE:
+            pagination.show_controls()
+        for catalog_path in pagination.get_page_items():
             _render_card(source_engine, target_engine, df, catalog_path)
         if len(drafts) > MDIMS_PER_PAGE:
-            st.caption(f"… and {len(drafts) - MDIMS_PER_PAGE} more; open one from its catalogPath above.")
+            pagination.show_controls(position="bottom")
 
 
 def _render_other(others: list[str]) -> None:

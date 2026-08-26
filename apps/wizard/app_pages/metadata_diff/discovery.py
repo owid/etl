@@ -561,6 +561,17 @@ class ChartTextChanges:
         return [self.diffs[slug] for slug in sorted(self.diffs)]
 
 
+def catalog_path_like_patterns(dataset_path: str) -> list[str]:
+    """SQL LIKE patterns selecting every indicator *of* this dataset, and nothing past its name.
+
+    `<path>%` also matches a sibling dataset whose name merely starts with this one — and those exist in
+    live paths: `climate/2026-08-21/surface_temperature` selected `surface_temperature_anomalies` too, so
+    a difference of the sibling's (which may simply lag the baseline) was attributed to this branch. An
+    indicator's catalogPath continues with `/<table>#<short_name>`, so the separator is the boundary.
+    """
+    return [f"{dataset_path}/%", f"{dataset_path}#%"]
+
+
 def chart_text_rows(engine: Engine, dataset_paths: list[str]) -> dict[str, dict[str, Any]]:
     """Resolved title/subtitle/note of every published chart rendering one of these datasets, by slug.
 
@@ -573,8 +584,11 @@ def chart_text_rows(engine: Engine, dataset_paths: list[str]) -> dict[str, dict[
     cfg = "config"
     clauses, params = [], {}
     for i, path in enumerate(sorted(set(dataset_paths))):
-        clauses.append(f"v.catalogPath like %(p{i})s")
-        params[f"p{i}"] = f"{path}%"
+        alternatives = []
+        for j, pattern in enumerate(catalog_path_like_patterns(path)):
+            params[f"p{i}_{j}"] = pattern
+            alternatives.append(f"v.catalogPath like %(p{i}_{j})s")
+        clauses.append("(" + " or ".join(alternatives) + ")")
     df = read_sql(
         f"""
         select distinct c.id as chartId,
@@ -1469,6 +1483,38 @@ def _collect_changes(seen: set[tuple[str, str]], groups: list[ChangeGroup]) -> N
     seen.update(change_identity(g) for g in groups)
 
 
+def _record_mdim_groups(
+    summary: "Summary",
+    reach: dict[tuple[str, str], "ChangeReach"],
+    seen: set[tuple[str, str]],
+    catalog_path: str,
+    groups: list[ChangeGroup],
+    df_mdims: "pd.DataFrame",
+    *,
+    is_draft: bool,
+) -> None:
+    """One MDim's changes into the summary: what it is counted as, its review marks, and its reach rows.
+
+    Drafts go through the same recording, deliberately. Their cards carry Reviewed toggles like every
+    other card, and the MDims badge counts `review_keys` — so recording a draft's reach without its marks
+    left a branch whose only change is an unpublished MDim looking at a greyed-out MDims section it could
+    never open, while the page said, correctly, that text had changed.
+
+    What being a draft changes is only what it is *counted as*: `n_draft_mdims`, kept out of the
+    reader-facing `n_mdims`, because no reader sees it yet.
+    """
+    if is_draft:
+        summary.n_draft_mdims += 1
+    else:
+        summary.n_mdims += 1
+        summary.n_mdim_changes += len(groups)
+    _collect_changes(seen, groups)
+    surface = surface_key("mdim", catalog_path)
+    summary.review_keys.setdefault("mdims", []).extend((surface, *mark_identity(surface, g)) for g in groups)
+    for g in groups:
+        _reach_slot(reach, g).mdims.append(_mdim_reach(catalog_path, g, df_mdims, is_draft=is_draft))
+
+
 def _count_fields(counts: dict[str, int], diffs: list[ViewDiff]) -> None:
     """Field breakdown of a single surface's diffs (used where no cross-surface dedup is needed)."""
     for g in group_changes(diffs):
@@ -1647,15 +1693,7 @@ def summarize(
             # Results are consumed in `flagged` order, so what the page reports never depends on timing.
             for cp, ours in zip(flagged, _mdim_groups_for(source_engine, target_engine, flagged, scope)):
                 if ours:
-                    summary.n_mdims += 1
-                    summary.n_mdim_changes += len(ours)
-                    _collect_changes(seen, ours)
-                    mdim_surface = surface_key("mdim", cp)
-                    summary.review_keys.setdefault("mdims", []).extend(
-                        (mdim_surface, *mark_identity(mdim_surface, g)) for g in ours
-                    )
-                    for g in ours:
-                        _reach_slot(reach, g).mdims.append(_mdim_reach(cp, g, df_mdims, is_draft=False))
+                    _record_mdim_groups(summary, reach, seen, cp, ours, df_mdims, is_draft=False)
         # Drafts are counted only where they actually have changed text, same test as the rest.
         if len(drafts) > MAX_MDIMS_RESOLVED:
             # Too many to diff view by view. Report the flag count as a ceiling and say so, rather than
@@ -1667,9 +1705,7 @@ def summarize(
         else:
             for cp, draft_groups in zip(drafts, _mdim_groups_for(source_engine, target_engine, drafts, scope)):
                 if draft_groups:
-                    summary.n_draft_mdims += 1
-                    for g in draft_groups:
-                        _reach_slot(reach, g).mdims.append(_mdim_reach(cp, g, df_mdims, is_draft=True))
+                    _record_mdim_groups(summary, reach, seen, cp, draft_groups, df_mdims, is_draft=True)
     except Exception as e:  # noqa: BLE001
         log.warning("metadata_diff.mdim_discovery_failed", error=str(e))
         summary.warnings.append(f"MDim discovery failed: {e}")

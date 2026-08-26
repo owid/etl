@@ -2525,3 +2525,128 @@ def test_a_chart_link_beats_the_blank_left_by_the_lookup_box():
     # Nothing anywhere means the list, not a blank per-chart page.
     assert requested_chart(None, None) == ""
     assert requested_chart("", "") == ""
+
+
+def test_chart_text_matching_stops_at_the_dataset_boundary():
+    """`LIKE '<path>%'` also selects a sibling dataset whose name merely starts with this one.
+
+    Both `climate/2026-08-21/surface_temperature` and `surface_temperature_anomalies` are live, so the
+    prefix quietly pulled the sibling's charts in — and a difference of the sibling's (baseline lag, say)
+    was then reported as this branch's work.
+    """
+    import re
+
+    from apps.wizard.app_pages.metadata_diff.discovery import catalog_path_like_patterns
+
+    def matches(dataset_path: str, candidate: str) -> bool:
+        # SQL LIKE, close enough for these patterns: `%` stands for any run of characters.
+        return any(
+            re.fullmatch(".*".join(re.escape(part) for part in pattern.split("%")), candidate) is not None
+            for pattern in catalog_path_like_patterns(dataset_path)
+        )
+
+    dataset = "grapher/climate/2026-08-21/surface_temperature"
+    sibling = "grapher/climate/2026-08-21/surface_temperature_anomalies"
+
+    assert matches(dataset, f"{dataset}/annual#temperature_anomaly")
+    assert matches(dataset, f"{dataset}#temperature_anomaly")
+    assert not matches(dataset, f"{sibling}/annual#anomaly")
+    assert not matches(dataset, sibling)
+
+
+def test_a_draft_only_branch_can_still_open_its_mdims_section():
+    """An unpublished MDim's card carries Reviewed toggles, and the MDims badge counts `review_keys`.
+
+    Recording a draft's reach but not its marks left a branch whose only change is an unpublished MDim
+    with a greyed-out MDims section it could never open — while the page said, correctly, that this
+    branch had changed text.
+    """
+    import pandas as pd
+
+    from apps.wizard.app_pages.metadata_diff.core import ChangeGroup, empty_sections
+    from apps.wizard.app_pages.metadata_diff.discovery import Summary, _record_mdim_groups
+
+    groups = [ChangeGroup(field="descriptionShort", old="Old.", new="New.", view_dims=[{"metric": "mean"}])]
+
+    draft = Summary()
+    reach: dict = {}
+    _record_mdim_groups(draft, reach, set(), "grapher/a/latest/incomes#incomes", groups, pd.DataFrame(), is_draft=True)
+
+    assert draft.has_changes
+    assert (draft.n_draft_mdims, draft.n_mdims) == (1, 0), "a draft is not reader-facing, and is not counted as one"
+    assert len(draft.review_keys["mdims"]) == 1
+    assert next(iter(reach.values())).mdims[0]["is_draft"] is True
+    # The symptom: with its marks recorded, the section is reachable instead of greyed out.
+    assert "mdims" not in empty_sections({"mdims": (0, len(draft.review_keys["mdims"]))})
+
+    # A published MDim goes through the same recording and is counted as reader-facing.
+    published = Summary()
+    _record_mdim_groups(
+        published, {}, set(), "grapher/a/latest/poverty#poverty", groups, pd.DataFrame(), is_draft=False
+    )
+    assert (published.n_mdims, published.n_draft_mdims) == (1, 0)
+    assert published.n_mdim_changes == 1
+    assert len(published.review_keys["mdims"]) == 1
+
+
+def test_every_unpublished_mdim_is_reachable(monkeypatch):
+    """The drafts expander rendered the first four cards and pointed at a route that does not exist.
+
+    There is no MDim lookup in this section, so a fifth unpublished MDim's diff and its Reviewed toggles
+    could not be opened at all.
+    """
+    from streamlit.testing.v1 import AppTest
+
+    from apps.wizard.app_pages.metadata_diff import cached, discovery, mdims_section, review_state
+    from apps.wizard.app_pages.metadata_diff.core import ViewDiff, group_changes
+
+    monkeypatch.setattr(review_state, "load_reviews", lambda engine, surface: {})
+    views = [ViewDiff(dimensions={"metric": "mean"}, fields={"descriptionShort": {"old": "Old.", "new": "New."}})]
+    monkeypatch.setattr(cached, "mdim_view_diffs", lambda *args, **kwargs: ("Incomes", [], views))
+    monkeypatch.setattr(discovery, "split_mdim_groups", lambda _path, changed: (group_changes(changed), []))
+
+    paths = [f"grapher/a/latest/draft_{i}#draft_{i}" for i in range(mdims_section.MDIMS_PER_PAGE + 2)]
+
+    def app() -> None:
+        import pandas as pd
+
+        from apps.wizard.app_pages.metadata_diff.mdims_section import MDIMS_PER_PAGE, _render_drafts
+
+        drafts = [f"grapher/a/latest/draft_{i}#draft_{i}" for i in range(MDIMS_PER_PAGE + 2)]
+        df = pd.DataFrame(
+            [{"is_new": False, "is_draft": True, "configMd5_source": "a", "configMd5_target": "b"} for _ in drafts],
+            index=drafts,
+        )
+        _render_drafts(None, None, df, drafts)
+
+    def rendered(at) -> set[str]:
+        return {path for path in paths if any(path in element.value for element in at.markdown)}
+
+    at = AppTest.from_function(app, default_timeout=30)
+    at.run()
+    assert not at.exception
+    first_page = rendered(at)
+    assert len(first_page) == mdims_section.MDIMS_PER_PAGE
+
+    at.session_state["mdd-drafts-pagination"] = 2
+    at.run()
+    assert not at.exception
+    assert rendered(at) == set(paths) - first_page, "the rest have to be reachable, not merely counted"
+
+
+def test_a_value_that_cannot_be_dumped_says_so_instead_of_passing_off_a_repr(monkeypatch):
+    """The brief's snippets are for pasting under a variable, so a fallback has to be unpastable.
+
+    Substituting `repr(value)` and labelling it YAML hands over something that may be invalid, or valid
+    and wrong, with nothing to say the dump failed.
+    """
+    from apps.wizard.app_pages.metadata_diff import core
+
+    def boom(_value):
+        raise ValueError("cannot represent this")
+
+    monkeypatch.setattr(core, "ruamel_dump", boom)
+    snippet = core.yaml_field_snippet("descriptionShort", object())
+
+    assert "cannot represent this" in snippet
+    assert all(line.startswith("#") for line in snippet.splitlines()), "nothing here may be pasted as a value"
