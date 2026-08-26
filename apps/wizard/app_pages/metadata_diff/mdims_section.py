@@ -18,8 +18,8 @@ import pandas as pd
 import streamlit as st
 from sqlalchemy.engine.base import Engine
 
-from apps.wizard.app_pages.chart_diff.utils import SOURCE
-from apps.wizard.app_pages.metadata_diff import brief, cached, datapage, discovery
+from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET
+from apps.wizard.app_pages.metadata_diff import brief, cached, datapage, discovery, view_nav
 from apps.wizard.app_pages.metadata_diff.blast_section import GROUP_KEY, TREE_MDIM_KEY
 from apps.wizard.app_pages.metadata_diff.core import LAYOUT_QUERY_KEY, dims_str, field_label, group_usage
 from apps.wizard.app_pages.metadata_diff.data import load_reviews
@@ -38,7 +38,7 @@ from apps.wizard.app_pages.metadata_diff.review_state import (
     st_reviewed_toggle,
     surface_key,
 )
-from apps.wizard.utils.components import Pagination, url_persist
+from apps.wizard.utils.components import Pagination
 
 MDIMS_PER_PAGE = 4
 # The URL key that opens one MDim's views. A route, not a filter: the page shows that MDim's changed views
@@ -65,15 +65,9 @@ def st_show_mdim_metadata_diffs(source_engine: Engine, target_engine: Engine) ->
 
     df = cached.mdim_changes(source_engine, target_engine)
 
-    requested = str(st.session_state.get(VIEWS_KEY) or st.query_params.get(VIEWS_KEY) or "").strip()
-    if requested:
-        if requested in df.index:
-            st.session_state[VIEWS_KEY] = requested
-            _views_page(source_engine, target_engine, df, requested)
-            return
-        # A stale link — the MDim is no longer in the comparison. Say so instead of rendering an empty page.
-        st.warning(f"`{requested}` is not among the MDims that differ from `{BASELINE_NAME}` on this server.")
-        _clear_views()
+    # No early route on `?mdim-views=`: it used to render that MDim's page and return, which skipped the
+    # layout switcher entirely — so once anything set the key (the picker and Next set it on every move),
+    # "By change" disappeared from the section. The browser reads the key as its selection instead.
     if df.empty:
         st.warning("No MDims found on this staging server.")
         return
@@ -272,22 +266,18 @@ def _views_page(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, 
     # Where we are, read from the URL rather than from the menu's return: the nav has to render before
     # the menu (its callbacks write the menu's state), so this is the only order in which "next" can be
     # relative to the view on screen.
-    url_selection = {
-        dim["slug"]: st.query_params.get(DIM_PARAM_PREFIX + dim["slug"])
-        for dim in dimensions
-        if st.query_params.get(DIM_PARAM_PREFIX + dim["slug"]) is not None
-    }
-    position = _displayed_index(changed, url_selection)
+    url_selection = view_nav.url_selection(dimensions, DIM_PARAM_PREFIX)
+    position = view_nav.displayed_index(changed, url_selection)
 
-    _jump_to_changed(changed, labels, dimensions, position)
-    selection = _dimension_menu(view_diffs, dimensions)
+    view_nav.st_jump_and_next(changed, labels, position, DIM_PARAM_PREFIX, JUMP_KEY, "view")
+    selection = view_nav.st_dimension_menu(view_diffs, dimensions, DIM_PARAM_PREFIX)
 
     # One view, always. Which one: the exact match if the menu names it, else the first view consistent
     # with a partial menu, else the first changed view — so arriving here shows a diff rather than a set
     # of controls, and Next ▶ walks the rest.
     view = next((v for v in view_diffs if v.dimensions == selection), None) if selection else None
     if view is None:
-        candidates = [v for v in changed if _matches(v, selection)] if selection else changed
+        candidates = [v for v in changed if view_nav.matches(v, selection)] if selection else changed
         if not candidates:
             st.info("No changed view matches the menu above. Clear a dimension to widen it.")
             return
@@ -297,124 +287,6 @@ def _views_page(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, 
     if shown is not None:
         st.caption(f"Changed view {shown} of {len(changed)} — **Next change ▶** steps through them.")
     _render_view(view, view_label(view, dimensions), dimensions, catalog_path, slug, row, source_engine)
-
-
-def _displayed_index(changed: list, selection: dict[str, str]) -> int | None:
-    """Which changed view the page is showing, by the same precedence the page uses to choose it.
-
-    Next ▶ steps from here, so it has to agree with what is on screen or the first press goes nowhere:
-    with no selection the page shows the first changed view, and a position of "unknown" made Next select
-    that same view again.
-
-    None means the menu is sitting on a view that did not change — a deliberate lookup — from which the
-    next change is the first one.
-    """
-    if not selection:
-        return 0
-    exact = next((i for i, view in enumerate(changed) if view.dimensions == selection), None)
-    if exact is not None:
-        return exact
-    return next((i for i, view in enumerate(changed) if _matches(view, selection)), None)
-
-
-def _matches(view, selection: dict[str, str]) -> bool:
-    """Whether a view satisfies every dimension the menu has set."""
-    return all(view.dimensions.get(slug) == choice for slug, choice in selection.items())
-
-
-def _jump_to_changed(changed: list, labels: list[str], dimensions: list, position: int | None) -> None:
-    """The ⚡ jump and **Next change ▶**: two ways to move between this MDim's changed views.
-
-    Both do the same thing — set the dimension menu below — so there is one answer on screen to "which
-    view am I looking at". Writing the dimension widgets' state from a callback is the only order that
-    works: a widget reads its session value when it is created, so setting it afterwards is a change
-    nobody sees until the next rerun. This runs before the menu is built, which is what makes either
-    control land in one click.
-
-    Next is relative to where you are, not to a counter of its own: the current position is recovered by
-    matching the menu's selection against the changed views, so stepping continues from a view you reached
-    with the menu or from a pasted link, and wraps at the end rather than dead-ending.
-    """
-    if len(changed) < 2:
-        return
-
-    def _select(index: int) -> None:
-        target = changed[index % len(changed)]
-        for slug, choice in target.dimensions.items():
-            st.session_state[DIM_PARAM_PREFIX + slug] = choice
-            st.query_params[DIM_PARAM_PREFIX + slug] = choice
-        # Keep the jump showing what is on screen, whichever control moved us.
-        st.session_state[JUMP_KEY] = index % len(changed)
-
-    def _goto() -> None:
-        picked = st.session_state.get(JUMP_KEY)
-        if picked is not None:
-            _select(int(picked))
-
-    current = position
-    col_jump, col_next = st.columns([4, 1], vertical_alignment="bottom")
-    with col_jump:
-        st.selectbox(
-            f"⚡ Changes detected — jump to a changed view ({len(changed)})",
-            options=list(range(len(changed))),
-            format_func=lambda i: labels[i],
-            index=None,
-            placeholder="Type to search this MDim's changed views…",
-            key=JUMP_KEY,
-            on_change=_goto,
-            help="Sets the menu below to that view, so the two never disagree about what you are looking at.",
-        )
-    with col_next:
-        where = "" if current is None else f" ({current + 1} of {len(changed)})"
-        st.button(
-            "Next change ▶",
-            key="mdd-view-next",
-            on_click=_select,
-            args=(0 if current is None else current + 1,),
-            width="stretch",
-            help=f"The next changed view of this MDim{where}, wrapping round at the end.",
-        )
-
-
-def _dimension_menu(view_diffs: list, dimensions: list) -> dict[str, str]:
-    """The MDim's own menu, cascading: each dimension offers only what the ones before it allow.
-
-    Every dimension may be left unset — that is the difference from #6615, where a complete selection was
-    forced and an impossible combination was reachable. Returns only the dimensions actually set.
-    """
-    selection: dict[str, str] = {}
-    if not dimensions:
-        return selection
-
-    columns = st.columns(min(4, len(dimensions)))
-    for i, dim in enumerate(dimensions):
-        dim_slug = dim["slug"]
-        key = DIM_PARAM_PREFIX + dim_slug
-        available: list[str] = []
-        for view in view_diffs:
-            if _matches(view, selection):
-                choice = view.dimensions.get(dim_slug)
-                if choice is not None and choice not in available:
-                    available.append(choice)
-        # A value the narrowed menu no longer offers — from a stale link, or from widening a dimension
-        # above this one. Dropped rather than left to fail url_persist's strict check on every load.
-        if st.query_params.get(key) not in available:
-            st.query_params.pop(key, None)
-            st.session_state.pop(key, None)
-
-        names = {c["slug"]: (c.get("name") or c["slug"]) for c in dim.get("choices", [])}
-        with columns[i % len(columns)]:
-            picked = url_persist(st.selectbox)(
-                dim.get("name") or dim_slug,
-                key=key,
-                options=available,
-                index=None,
-                format_func=lambda slug, names=names: names.get(slug, slug),
-                placeholder="Any",
-            )
-        if picked is not None:
-            selection[dim_slug] = picked
-    return selection
 
 
 def _render_view(view, label: str, dimensions: list, catalog_path: str, slug: str, row, source_engine=None) -> None:
@@ -429,10 +301,28 @@ def _render_view(view, label: str, dimensions: list, catalog_path: str, slug: st
         if view.is_new:
             head += " :green-badge[🆕 new view]"
         head += f" :small[:gray[{n} field{'s' if n != 1 else ''} changed]]"
-        st.markdown(head)
-        # An unpublished MDim has no reader-facing page, so its views open in the admin preview.
-        href = view_url(SOURCE, catalog_path, None if row["is_draft"] else slug, view.dimensions)
-        st.markdown(f"[Open this view ↗]({href})")
+        # The tick sits beside the name, not under the diff: it is where the decision is made, and at the
+        # foot of a long block it was below the fold on anything with several changed fields.
+        col_head, col_review = st.columns([4, 1], vertical_alignment="center")
+        with col_head:
+            st.markdown(head)
+            # Both sides, the way the chart review offers both: reading a diff and then opening only one
+            # of the two pages leaves you comparing text against memory. An unpublished MDim has no
+            # reader-facing page on either server, so those open in the admin preview instead.
+            staging_href = view_url(SOURCE, catalog_path, None if row["is_draft"] else slug, view.dimensions)
+            baseline_slug = str(row["slug_target"]) if row.get("published_target") == 1 else None
+            baseline_href = view_url(TARGET, catalog_path, baseline_slug, view.dimensions)
+            links = f":green[**This staging server**] [view ↗]({staging_href})"
+            if not view.is_new:
+                links = f":gray[**{BASELINE_NAME.capitalize()}**] [view ↗]({baseline_href}) · " + links
+            st.markdown(links)
+        with col_review:
+            if source_engine is not None and view.fields:
+                surface = surface_key("item", f"mdim:{catalog_path}")
+                mark = resolve_item_mark(
+                    load_reviews(source_engine, surface), surface, dims_str(view.dimensions), view.fields
+                )
+                st_reviewed_toggle(source_engine, surface, mark)
         if view.is_new:
             st.caption(f"This view does not exist on `{BASELINE_NAME}`, so there is no old text to compare.")
         datapage.st_datapage_diff(
@@ -441,12 +331,6 @@ def _render_view(view, label: str, dimensions: list, catalog_path: str, slug: st
             staging_label="This staging server",
             show_unchanged_slots=False,
         )
-        if source_engine is not None and view.fields:
-            surface = surface_key("item", f"mdim:{catalog_path}")
-            mark = resolve_item_mark(
-                load_reviews(source_engine, surface), surface, dims_str(view.dimensions), view.fields
-            )
-            st_reviewed_toggle(source_engine, surface, mark)
 
 
 def _clear_views() -> None:

@@ -19,7 +19,7 @@ import streamlit as st
 from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET
-from apps.wizard.app_pages.metadata_diff import cached, datapage
+from apps.wizard.app_pages.metadata_diff import cached, datapage, view_nav
 from apps.wizard.app_pages.metadata_diff.core import ViewDiff, dims_str, field_label, group_changes
 from apps.wizard.app_pages.metadata_diff.data import load_reviews
 from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, DIFF_CSS, st_layout_switcher
@@ -37,9 +37,11 @@ EXPLORERS_PER_PAGE = 4
 # one without a toggle is a counter that can never reach completion. Chart Diff's TSV can show the text of
 # the folded ones but cannot tick them here, so it was never the hand-off it looked like.
 MAX_INLINE_CHANGES = 4
-# Changed views drawn inline per explorer in the item view. One LIS edit reached 402 views of a single
-# explorer, so this is a sample with a pointer to the grid, never the whole list.
-VIEWS_IN_CARD = 3
+# Which explorer the item view is showing, and the keys its ⚡ jump and menu use. Distinct from the MDims
+# section's prefix on purpose: the two must never read each other's dimension selections.
+EXPLORER_KEY = "explorer-views"
+JUMP_KEY = "explorer-view-jump"
+DIM_PARAM_PREFIX = "edim-"
 
 
 def st_show_explorer_metadata_diffs(source_engine: Engine, target_engine: Engine) -> None:
@@ -75,54 +77,142 @@ def st_show_explorer_metadata_diffs(source_engine: Engine, target_engine: Engine
             "🔍 View by view",
             "**View by view** lists every changed view of every affected explorer, with its diffs",
         )
+        if layout == "items":
+            _explorer_browser(source_engine, branch)
+            _render_other(other)
+            return
+
         slugs = sorted(branch)
         pagination = Pagination(slugs, items_per_page=EXPLORERS_PER_PAGE, pagination_key="mdd-explorers-pagination")
         if len(slugs) > EXPLORERS_PER_PAGE:
             pagination.show_controls()
         for slug in pagination.get_page_items():
-            if layout == "items":
-                _render_explorer_views(source_engine, slug, branch[slug])
-            else:
-                _render_explorer(source_engine, slug, branch[slug])
+            _render_explorer(source_engine, slug, branch[slug])
         if len(slugs) > EXPLORERS_PER_PAGE:
             pagination.show_controls(position="bottom")
 
     _render_other(other)
 
 
-def _render_explorer_views(source_engine: Engine, slug: str, diffs: list[ViewDiff]) -> None:
-    """One explorer, its changed views inline, each with a link to itself and its diffs.
+def _explorer_browser(source_engine: Engine, branch: dict[str, list[ViewDiff]]) -> None:
+    """Pick an explorer, then read it view by view — the MDims browser, on explorer data.
 
-    An explorer's views carry their dimensions as display names already (`Decile`, `After tax`), so the
-    label is those values joined — there is no dimension config to read choice names from.
+    Explorers differ in one way that matters: they publish no dimension list, so the menu's columns are
+    inferred from the views themselves. Everything else is the same, deliberately — the two sections ask
+    the same question and had no business answering it differently.
     """
-    changed = [d for d in diffs if d.changed]
-    with st.container(border=True):
-        st.markdown(f"**`{slug}`** :small[:gray[{len(changed)} changed view{'s' if len(changed) != 1 else ''}]]")
-        for view in changed[:VIEWS_IN_CARD]:
-            label = " · ".join(str(v) for v in view.dimensions.values()) or "(view)"
-            with st.container(border=True):
-                n = len(view.fields)
-                st.markdown(f"**{label}** :small[:gray[{n} field{'s' if n != 1 else ''} changed]]")
-                href = f"{SOURCE.site}/explorers/{slug}?{urlencode(view.dimensions)}"
-                st.markdown(f"[Open this view ↗]({href})")
-                datapage.st_datapage_diff(
-                    view.fields,
-                    baseline_label=BASELINE_NAME.capitalize(),
-                    staging_label="This staging server",
-                    show_unchanged_slots=False,
-                )
-                surface = surface_key("item", f"explorer:{slug}")
-                mark = resolve_item_mark(
-                    load_reviews(source_engine, surface), surface, dims_str(view.dimensions), view.fields
-                )
-                st_reviewed_toggle(source_engine, surface, mark)
-        rest = len(changed) - VIEWS_IN_CARD
-        if rest > 0:
-            st.caption(
-                f"{rest} further changed view{'s' if rest != 1 else ''} in this explorer — see them on the "
-                "Blast radius grid, or switch to **By change** to review the distinct edits."
+    slugs = sorted(branch)
+    current = str(st.session_state.get(EXPLORER_KEY) or st.query_params.get(EXPLORER_KEY) or "").strip()
+    if current not in slugs:
+        current = slugs[0]
+    st.session_state[EXPLORER_KEY] = current
+    position = slugs.index(current)
+
+    if len(slugs) > 1:
+        col_pick, col_next = st.columns([4, 1], vertical_alignment="bottom")
+        with col_pick:
+            st.selectbox(
+                f"Explorer {position + 1} of {len(slugs)} changed by this branch",
+                options=slugs,
+                index=position,
+                format_func=lambda slug: (
+                    f"{slug} · {len(branch[slug])} changed view{'s' if len(branch[slug]) != 1 else ''}"
+                ),
+                key="mdd-explorer-picker",
+                on_change=_pick_explorer,
+                help="Type to search the affected explorers.",
             )
+        with col_next:
+            st.button(
+                "Next explorer ▶",
+                key="mdd-explorer-next",
+                on_click=_step_explorer,
+                args=(slugs, position + 1),
+                width="stretch",
+                help="The next affected explorer, wrapping round at the end.",
+            )
+
+    _explorer_views(source_engine, current, branch[current])
+
+
+def _pick_explorer() -> None:
+    """The picker's choice becomes the URL."""
+    slug = str(st.session_state.get("mdd-explorer-picker") or "").strip()
+    if slug:
+        st.session_state[EXPLORER_KEY] = slug
+        st.query_params[EXPLORER_KEY] = slug
+        _reset_view_selection()
+
+
+def _step_explorer(slugs: list[str], index: int) -> None:
+    """Step to the next explorer, wrapping."""
+    slug = slugs[index % len(slugs)]
+    st.session_state[EXPLORER_KEY] = slug
+    st.session_state["mdd-explorer-picker"] = slug
+    st.query_params[EXPLORER_KEY] = slug
+    _reset_view_selection()
+
+
+def _reset_view_selection() -> None:
+    """Drop the previous explorer's ⚡ jump and menu — its dimensions mean nothing in the next one."""
+    st.session_state.pop(JUMP_KEY, None)
+    for key in [k for k in list(st.session_state.keys()) if isinstance(k, str) and k.startswith(DIM_PARAM_PREFIX)]:
+        st.session_state.pop(key, None)
+    for key in [k for k in list(st.query_params.keys()) if k.startswith(DIM_PARAM_PREFIX)]:
+        st.query_params.pop(key, None)
+
+
+def _explorer_views(source_engine: Engine, slug: str, diffs: list[ViewDiff]) -> None:
+    """One explorer, one view at a time: the ⚡ jump, the inferred menu, and that view's diffs."""
+    changed = [d for d in diffs if d.changed]
+    st.markdown(f"### `{slug}`")
+    st.caption(f"{len(changed)} changed view{'s' if len(changed) != 1 else ''} in this explorer")
+    if not changed:
+        st.info("No view of this explorer renders a text this branch changed.")
+        return
+
+    dimensions = view_nav.dimensions_from_views(changed)
+    labels = [" · ".join(str(v) for v in view.dimensions.values()) or "(view)" for view in changed]
+
+    url_selection = view_nav.url_selection(dimensions, DIM_PARAM_PREFIX)
+    position = view_nav.displayed_index(changed, url_selection)
+    view_nav.st_jump_and_next(changed, labels, position, DIM_PARAM_PREFIX, JUMP_KEY, "view")
+    selection = view_nav.st_dimension_menu(changed, dimensions, DIM_PARAM_PREFIX)
+
+    candidates = [v for v in changed if view_nav.matches(v, selection)] if selection else changed
+    if not candidates:
+        st.info("No changed view matches the menu above. Clear a dimension to widen it.")
+        return
+    view = candidates[0]
+    shown = changed.index(view) + 1
+    st.caption(f"Changed view {shown} of {len(changed)} — **Next change ▶** steps through them.")
+    _render_explorer_view(source_engine, slug, view, labels[changed.index(view)])
+
+
+def _render_explorer_view(source_engine: Engine, slug: str, view: ViewDiff, label: str) -> None:
+    """One explorer view: its name and both servers' links, its tick, then its diffs."""
+    with st.container(border=True):
+        n = len(view.fields)
+        col_head, col_review = st.columns([4, 1], vertical_alignment="center")
+        with col_head:
+            st.markdown(f"**{label}** :small[:gray[{n} field{'s' if n != 1 else ''} changed]]")
+            query = urlencode(view.dimensions)
+            st.markdown(
+                f":gray[**{BASELINE_NAME.capitalize()}**] [view ↗]({TARGET.site}/explorers/{slug}?{query}) · "
+                f":green[**This staging server**] [view ↗]({SOURCE.site}/explorers/{slug}?{query})"
+            )
+        with col_review:
+            surface = surface_key("item", f"explorer:{slug}")
+            mark = resolve_item_mark(
+                load_reviews(source_engine, surface), surface, dims_str(view.dimensions), view.fields
+            )
+            st_reviewed_toggle(source_engine, surface, mark)
+        datapage.st_datapage_diff(
+            view.fields,
+            baseline_label=BASELINE_NAME.capitalize(),
+            staging_label="This staging server",
+            show_unchanged_slots=False,
+        )
 
 
 def _render_other(other: dict[str, list[ViewDiff]]) -> None:

@@ -73,12 +73,26 @@ def render_chart_review(
     if not groups:
         return
 
-    # The two pages, once. They were repeated on every field's two columns — the same pair of links four
-    # or five times down a chart with four changed fields, saying nothing new each time.
-    st.markdown(
-        f":gray[**{BASELINE_NAME.capitalize()}**] [data page ↗]({baseline_url}) · "
-        f":green[**This staging server**] [data page ↗]({staging_url})"
-    )
+    # The two pages, once, with the chart's own tick beside them. They were repeated on every field's two
+    # columns — the same pair of links four or five times down a chart with four changed fields — and the
+    # tick was below the last of them, so on a chart with several fields you scrolled past the answer to
+    # reach the control.
+    col_links, col_review = st.columns([4, 1], vertical_alignment="center")
+    with col_links:
+        st.markdown(
+            f":gray[**{BASELINE_NAME.capitalize()}**] [data page ↗]({baseline_url}) · "
+            f":green[**This staging server**] [data page ↗]({staging_url})"
+        )
+    with col_review:
+        if diff.fields:
+            surface = surface_key("item", "chart")
+            mark = resolve_item_mark(
+                load_reviews(source_engine, surface),
+                surface,
+                str(chart.get("slug") or chart["chartId"]),
+                diff.fields,
+            )
+            st_reviewed_toggle(source_engine, surface, mark)
     for g in groups:
         with st.expander(f"{field_label(g.field)}", expanded=True):
             c1, c2 = st.columns(2)
@@ -88,14 +102,6 @@ def render_chart_review(
             with c2:
                 st.markdown(":green[**This staging server**]")
                 st.markdown(render_text_html(g.new, g.old, side="new", changed_only=True), unsafe_allow_html=True)
-
-    if diff.fields:
-        # The chart's own tick: what you just read is one page, however many of its fields moved.
-        surface = surface_key("item", "chart")
-        mark = resolve_item_mark(
-            load_reviews(source_engine, surface), surface, str(chart.get("slug") or chart["chartId"]), diff.fields
-        )
-        st_reviewed_toggle(source_engine, surface, mark)
 
 
 def render_chart_by_ref(source_engine: Engine, target_engine: Engine, ref: str) -> None:
