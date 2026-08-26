@@ -170,48 +170,6 @@ def st_layout_switcher(items_label: str, items_help: str) -> str:
     return layout
 
 
-def st_copy_button(text: str, label: str = "📋 Copy to clipboard", key: str = "") -> None:
-    """A button that copies `text` to the clipboard.
-
-    A component, not a Streamlit widget: the clipboard is a browser API, and nothing server-side can reach
-    it. The text is embedded as JSON so quotes, backticks and newlines survive intact, and the fallback
-    path (`document.execCommand`) covers a browser that refuses `navigator.clipboard` outside HTTPS —
-    which a staging server over plain HTTP is.
-    """
-    payload = json.dumps(text)
-    components.html(
-        f"""
-        <button id="mdd-copy" style="font: 14px -apple-system, system-ui, sans-serif; padding: 6px 12px;
-            border: 1px solid rgba(49,51,63,.2); border-radius: 8px; background: #fff; cursor: pointer;">
-          {html.escape(label)}
-        </button>
-        <span id="mdd-copied" style="font: 13px -apple-system, system-ui, sans-serif; color: #2b8a3e;
-            margin-left: 8px;"></span>
-        <script>
-          const text = {payload};
-          const button = document.getElementById("mdd-copy");
-          const said = document.getElementById("mdd-copied");
-          button.addEventListener("click", async () => {{
-            try {{
-              await navigator.clipboard.writeText(text);
-            }} catch (err) {{
-              // Plain HTTP: `navigator.clipboard` is unavailable, so fall back to a hidden textarea.
-              const box = document.createElement("textarea");
-              box.value = text;
-              document.body.appendChild(box);
-              box.select();
-              document.execCommand("copy");
-              box.remove();
-            }}
-            said.textContent = "Copied";
-            setTimeout(() => {{ said.textContent = ""; }}, 2000);
-          }});
-        </script>
-        """,
-        height=44,
-    )
-
-
 def chart_review_url(slug: str) -> str:
     """This tool's own full review of one chart — every field of it this branch changed.
 

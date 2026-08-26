@@ -17,11 +17,12 @@ from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.chart_diff.utils import SOURCE
 from apps.wizard.app_pages.metadata_diff import cached
+from apps.wizard.app_pages.metadata_diff.core import field_label
 from apps.wizard.app_pages.metadata_diff.data import REVIEWED, load_item_notes
+from apps.wizard.app_pages.metadata_diff.discovery import group_by_edit, reach_by_surface
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
     markdown_output,
-    st_copy_button,
 )
 
 # The PR lookup shells out, so it is asked once per session rather than on every rerun.
@@ -91,9 +92,20 @@ def st_show_review(source_engine: Engine, target_engine: Engine) -> None:
                     for row in bare:
                         st.markdown(_row_line(row, index))
 
-    text = _markdown(rows, index, totals)
-    st_copy_button(text, "📋 Copy the review notes", key="mdd-copy-review")
-    markdown_output(text, "metadata-review.md", "mdd_review_notes")
+    summary = cached.summary(source_engine, target_engine)
+    st.divider()
+    st.markdown("#### What this branch changed")
+    st.caption(
+        "The metadata edits themselves, grouped as Blast radius groups them. Copy this into an issue, a PR "
+        "comment or a channel when you want to discuss the change rather than the review."
+    )
+    markdown_output(_changes_markdown(summary), "metadata-changes.md", "mdd_changes_digest")
+
+    st.markdown("#### The review notes")
+    st.caption(
+        "What you ticked and wrote, for the same places — kept separate, since the two often go to different people."
+    )
+    markdown_output(_notes_markdown(rows, index, totals), "metadata-review.md", "mdd_review_notes")
 
 
 def _row_line(row: dict[str, Any], index: dict[str, dict[str, str]]) -> str:
@@ -196,8 +208,108 @@ def _surface_title(surface: str) -> str:
     return body
 
 
-def _markdown(rows: list[dict[str, Any]], index: dict[str, dict[str, str]], totals: dict[str, int]) -> str:
-    """The notes as markdown, for pasting into the PR — named, linked, and saying where they came from.
+def _changes_markdown(summary: Any) -> str:
+    """What this branch changed, as markdown to paste into an issue, a PR comment or a channel.
+
+    Grouped by authored edit, the way Blast radius groups it: one reworded sentence is one entry, however
+    many texts it renders into and pages it lands on. Reporting the texts as separate changes overstates
+    the work by an order of magnitude on a shared definition, which is why that grouping exists at all.
+    """
+    lines = ["## Metadata changes on this branch", ""] + _provenance() + [""]
+    edits = group_by_edit(summary.reach)
+    if not edits:
+        return "\n".join(lines + [f"_No metadata text on this server differs from `{BASELINE_NAME}`._"])
+
+    rows = reach_by_surface(summary.reach)
+    pages = sum(1 for row in rows if row["published"])
+    hidden = len(rows) - pages
+    head = (
+        f"**{len(edits)} edit{'s' if len(edits) != 1 else ''}** authored here, rendering "
+        f"**{len(summary.reach)} distinct text{'s' if len(summary.reach) != 1 else ''}**, on "
+        f"**{pages} page{'s' if pages != 1 else ''}** a reader can reach"
+    )
+    if hidden:
+        head += f", plus {hidden} unpublished"
+    lines += [head, ""]
+
+    for edit in edits:
+        surfaces = edit.surfaces()
+        reach = []
+        for kind, label in (("charts", "chart"), ("mdims", "MDim"), ("explorers", "explorer")):
+            count = len(surfaces.get(kind) or ())
+            if count:
+                reach.append(f"{count} {label}{'s' if count != 1 else ''}")
+        drafts = len(surfaces.get("draft_charts") or ())
+        if drafts:
+            reach.append(f"{drafts} unpublished chart{'s' if drafts != 1 else ''}")
+        lines.append(
+            f"### {field_label(edit.field)} — {edit.n_texts} text{'s' if edit.n_texts != 1 else ''}"
+            + (f" · {', '.join(reach)}" if reach else " · nothing published renders it")
+        )
+        if edit.inserted and not edit.deleted:
+            lines.append(f"- added: “{_trimmed(edit.inserted)}”")
+        elif edit.deleted and not edit.inserted:
+            lines.append(f"- removed: “{_trimmed(edit.deleted)}”")
+        else:
+            first = edit.changes[0]
+            before, after = _around_change(first.old, first.new)
+            lines.append(f"- before: “{before}”")
+            lines.append(f"- after: “{after}”")
+        lines.append("")
+    return "\n".join(lines)
+
+
+def _trimmed(value: Any, limit: int = 240) -> str:
+    """One readable line from whatever a field holds.
+
+    WYSK is a list of bullets, so it is joined rather than printed as a Python list, and newlines are
+    folded: this is a summary line, and the tool itself is where the full text lives.
+    """
+    text = _flat(value)
+    return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
+
+
+def _around_change(old: Any, new: Any, window: int = 110) -> tuple[str, str]:
+    """The two texts trimmed around where they differ, so the difference is inside what is shown.
+
+    Trimming from the front showed two identical 240-character openings for an edit whose words moved
+    later in the sentence — the same failure the blast-radius preview had. The common prefix and suffix
+    are measured, and each side is shown from a little before the divergence to a little after it.
+    """
+    before, after = _flat(old), _flat(new)
+    if before == after:
+        return _trimmed(before), _trimmed(after)
+
+    prefix = 0
+    while prefix < min(len(before), len(after)) and before[prefix] == after[prefix]:
+        prefix += 1
+    suffix = 0
+    while (
+        suffix < min(len(before), len(after)) - prefix
+        and before[len(before) - 1 - suffix] == after[len(after) - 1 - suffix]
+    ):
+        suffix += 1
+
+    def cut(text: str, end_of_change: int) -> str:
+        start = max(0, prefix - window)
+        end = min(len(text), end_of_change + window)
+        piece = text[start:end].strip()
+        return ("…" if start > 0 else "") + piece + ("…" if end < len(text) else "")
+
+    return cut(before, len(before) - suffix), cut(after, len(after) - suffix)
+
+
+def _flat(value: Any) -> str:
+    """Whatever a field holds, as one line of text."""
+    if isinstance(value, (list, tuple)):
+        text = " / ".join(str(item) for item in value if item)
+    else:
+        text = str(value or "")
+    return " ".join(text.split())
+
+
+def _notes_markdown(rows: list[dict[str, Any]], index: dict[str, dict[str, str]], totals: dict[str, int]) -> str:
+    """The review notes as markdown — named, linked, and saying where they came from.
 
     The header matters as much as the notes. Pasted into a PR comment or handed back to an assistant, the
     text used to arrive with no branch, no PR and no baseline, and item names that mean nothing without

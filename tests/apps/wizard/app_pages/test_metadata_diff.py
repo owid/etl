@@ -2770,3 +2770,34 @@ def test_a_section_badge_shows_how_far_its_review_has_got():
     # Blast radius and Review hold no items, so they never carry one.
     assert section_label("blast", {}, {"blast": "done"}).endswith("Blast radius")
     assert section_label("review", {}, {"review": "partial"}).endswith("Review")
+
+
+def test_the_shared_digest_trims_around_the_change():
+    """A before/after pair has to contain the difference, wherever in the sentence it is.
+
+    Trimming from the front produced two identical openings for an edit whose words moved later on — the
+    digest showed "before: X…" and "after: X…" for a change that was real. Second time this branch made
+    that mistake: the blast-radius preview had it too.
+    """
+    from apps.wizard.app_pages.metadata_diff.review_section import _around_change
+
+    lead = "This data is expressed in international dollars at 2021 prices. " * 4
+    before, after = _around_change(
+        lead + "Compared with earlier editions.", lead + "Compared with earlier editions of this data."
+    )
+    assert before != after, (before, after)
+    assert "earlier editions" in before and "of this data" in after
+    assert before.startswith("…") and after.startswith("…"), "the identical opening is trimmed away"
+
+    # A change at the very start needs no leading ellipsis and must still show both sides.
+    before, after = _around_change("Alpha " + lead, "Omega " + lead)
+    assert before.startswith("Alpha") and after.startswith("Omega")
+
+    # WYSK is a list of bullets; it is flattened rather than printed as a Python list.
+    before, after = _around_change(["One.", "Two."], ["One.", "Two.", "Three."])
+    assert "[" not in before and "[" not in after
+    assert "Three." in after and "Three." not in before
+
+    # Identical values are not a diff, and must not be dressed up as one.
+    same_before, same_after = _around_change("Unchanged text.", "Unchanged text.")
+    assert same_before == same_after == "Unchanged text."
