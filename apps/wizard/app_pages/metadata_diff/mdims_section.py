@@ -19,13 +19,11 @@ import streamlit as st
 from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET
-from apps.wizard.app_pages.metadata_diff import brief, cached, datapage, discovery, view_nav
+from apps.wizard.app_pages.metadata_diff import cached, datapage, discovery, view_nav
 from apps.wizard.app_pages.metadata_diff.blast_section import GROUP_KEY, TREE_MDIM_KEY
 from apps.wizard.app_pages.metadata_diff.core import (
-    LAYOUT_QUERY_KEY,
     dims_str,
     field_label,
-    group_usage,
     view_label,
     view_url,
 )
@@ -33,7 +31,6 @@ from apps.wizard.app_pages.metadata_diff.data import load_item_notes, load_revie
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
     DIFF_CSS,
-    markdown_output,
     st_layout_switcher,
     st_origin_caption,
 )
@@ -137,19 +134,6 @@ def st_show_mdim_metadata_diffs(source_engine: Engine, target_engine: Engine) ->
 
     _render_drafts(source_engine, target_engine, df, drafts)
     _render_other(others)
-
-
-def _open_item_view(catalog_path: str) -> None:
-    """From a change card, into the view browser on this MDim.
-
-    Sets the layout as well as the MDim: the button lives in the By-change list, so it is switching how
-    you are reading the section, not just which MDim is selected.
-    """
-    st.session_state[LAYOUT_QUERY_KEY] = "items"
-    st.query_params[LAYOUT_QUERY_KEY] = "items"
-    st.session_state[VIEWS_KEY] = catalog_path
-    st.query_params[VIEWS_KEY] = catalog_path
-    _reset_view_selection()
 
 
 def _views_browser(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, paths: list[str]) -> None:
@@ -432,9 +416,6 @@ def _render_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame,
             )
         else:
             marks = resolve_marks(source_engine, surface_key("mdim", catalog_path), groups)
-            _card_actions(
-                source_engine, target_engine, catalog_path, marks, usage_for(source_engine, groups, catalog_path, row)
-            )
             for mark in marks[:MAX_INLINE_CHANGES]:
                 _render_change(source_engine, catalog_path, mark, attribution)
             folded = marks[MAX_INLINE_CHANGES:]
@@ -457,81 +438,6 @@ def _render_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame,
                 f"variant** here than on `{BASELINE_NAME}` — a replacement, not an edit. Their text "
                 "differs for that reason too, so a rewording of yours cannot be told apart from the swap."
             )
-
-
-def usage_for(source_engine: Engine, groups: list, catalog_path: str, row) -> dict:
-    """Charts and other MDims rendering this MDim's changed indicators — the brief's reach lines.
-
-    Every indicator of a group, not just its first: one edit to a shared definition renders into several
-    indicators, and `group_usage` reads the whole of `indicator_ids` back out. An id missing from this map
-    is a chart or an MDim the brief never mentions.
-    """
-    ids: set[int] = set()
-    for g in groups:
-        if not g.affects_indicator:
-            continue
-        # `indicator_ids` is the full set; `indicator_id` is the fallback for a group built without it.
-        ids |= g.indicator_ids or ({g.indicator_id} if g.indicator_id is not None else set())
-    if not ids:
-        return {}
-    return cached.usage_for_indicators(
-        tuple(sorted(ids)), catalog_path, source_engine, cache_key=str(row.get("configMd5_source"))
-    )
-
-
-def _card_actions(
-    source_engine: Engine,
-    target_engine: Engine,
-    catalog_path: str,
-    marks: list,
-    usage: dict,
-) -> None:
-    """The two things the deep pages had that the list did not: the brief, and the dimension grid.
-
-    The brief is generated from the ticks on this card — the one review state there is — so what it calls
-    ready to apply is what somebody actually ticked here.
-    """
-    col_brief, col_views, col_tree = st.columns(3)
-    with col_brief:
-        rows = [
-            {
-                "g": mark.group,
-                "change_key": mark.change_key,
-                "content_hash": mark.content_hash,
-                "stale": mark.stale,
-                "reviewed": mark.reviewed,
-                "reviewer": mark.reviewer,
-                "updatedAt": mark.updated_at,
-                "charts": group_usage(mark.group, usage).get("charts", []),
-                "mdims": group_usage(mark.group, usage).get("mdims", []),
-            }
-            for mark in marks
-        ]
-        # Collapsed: the brief is a page of markdown, and the changes below it are what the card is for.
-        with st.expander("📋 PR brief — every change, with the edit to make"):
-            markdown_output(
-                brief.pr_brief_markdown(catalog_path, BASELINE_NAME, rows, usage),
-                "pr-brief.md",
-                f"mdim_brief_{catalog_path}",
-            )
-    with col_views:
-        st.button(
-            "🔍 View by view",
-            key=f"mdd-views-{catalog_path}",
-            on_click=_open_item_view,
-            args=(catalog_path,),
-            help="Switches to View by view, on this MDim.",
-            width="stretch",
-        )
-    with col_tree:
-        st.button(
-            "🌳 Dimension tree",
-            key=f"mdd-tree-{catalog_path}",
-            on_click=_open_dimension_tree,
-            args=(catalog_path,),
-            help="Opens this MDim's views on its dimension grid, in the Blast radius section.",
-            width="stretch",
-        )
 
 
 def _open_dimension_tree(catalog_path: str) -> None:

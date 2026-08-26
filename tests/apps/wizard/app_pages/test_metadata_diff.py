@@ -2007,7 +2007,7 @@ def test_the_pr_brief_fetches_usage_for_every_indicator_of_a_shared_edit(monkeyp
     of `indicator_ids` back out, so the brief silently omitted the charts and MDims reached through the
     others — for a shared-definition edit, most of the reach.
     """
-    from apps.wizard.app_pages.metadata_diff import mdims_section
+    from apps.wizard.app_pages.metadata_diff import brief
     from apps.wizard.app_pages.metadata_diff.core import ChangeGroup, group_usage
 
     captured: dict[str, tuple] = {}
@@ -2016,7 +2016,7 @@ def test_the_pr_brief_fetches_usage_for_every_indicator_of_a_shared_edit(monkeyp
         captured["ids"] = ids
         return {i: {"charts": [{"chartId": i, "slug": f"chart-{i}"}], "draft_charts": [], "mdims": []} for i in ids}
 
-    monkeypatch.setattr(mdims_section.cached, "usage_for_indicators", fake_usage)
+    monkeypatch.setattr(brief.cached, "usage_for_indicators", fake_usage)
 
     shared = ChangeGroup(
         field="descriptionShort",
@@ -2031,7 +2031,7 @@ def test_the_pr_brief_fetches_usage_for_every_indicator_of_a_shared_edit(monkeyp
     # An MDim-only override reaches nothing else, so it asks for nothing.
     override = ChangeGroup(field="titlePublic", old="C", new="D", affects_indicator=False, indicator_id=99)
 
-    usage = mdims_section.usage_for(
+    usage = brief.usage_for(
         None, [shared, single, override], "grapher/a/latest/incomes#incomes", {"configMd5_source": "abc"}
     )
 

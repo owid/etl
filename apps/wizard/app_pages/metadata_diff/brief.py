@@ -7,6 +7,7 @@ itself plus the review decision (`label`, `comment`, `stale`, `scope`) the page 
 
 from typing import Any
 
+from apps.wizard.app_pages.metadata_diff import cached
 from apps.wizard.app_pages.metadata_diff.core import (
     CHART_FIELD_PREFIX,
     ChangeGroup,
@@ -403,3 +404,26 @@ def pr_brief_markdown(
     if reviewed:
         lines += ship_section([r["g"] for r in reviewed], baseline_name)
     return "\n".join(lines)
+
+
+def usage_for(source_engine, groups: list, catalog_path: str, row) -> dict:
+    """Charts and other MDims rendering this MDim's changed indicators — the brief's reach lines.
+
+    Every indicator of a group, not just its first: one edit to a shared definition renders into several
+    indicators, and `group_usage` reads the whole of `indicator_ids` back out. An id missing from this map
+    is a chart or an MDim the brief never mentions.
+
+    Lives here rather than in the MDims section: it exists for the brief, and the By-edit cards no longer
+    offer one — view by view, the dimension tree and the shareable summary each have their own home now.
+    """
+    ids: set[int] = set()
+    for g in groups:
+        if not g.affects_indicator:
+            continue
+        # `indicator_ids` is the full set; `indicator_id` is the fallback for a group built without it.
+        ids |= g.indicator_ids or ({g.indicator_id} if g.indicator_id is not None else set())
+    if not ids:
+        return {}
+    return cached.usage_for_indicators(
+        tuple(sorted(ids)), catalog_path, source_engine, cache_key=str(row.get("configMd5_source"))
+    )
