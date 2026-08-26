@@ -32,7 +32,6 @@ from apps.wizard.app_pages.metadata_diff.core import (
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
     DIFF_CSS,
-    chart_review_url,
     render_chart_list,
     st_layout_switcher,
     st_note,
@@ -61,14 +60,6 @@ def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -
     """
     st.markdown(DIFF_CSS, unsafe_allow_html=True)
 
-    requested = requested_chart(st.session_state.get("chart"), st.query_params.get("chart"))
-    if requested:
-        # Seed the widget from the link before it renders, or `url_persist` writes its blank back and the
-        # navigation undoes itself.
-        st.session_state["chart"] = requested
-        _single_chart_page(source_engine, target_engine)
-        return
-
     changed = cached.indicator_changes(source_engine, target_engine)
     chart_text = cached.chart_text_changes(source_engine, target_engine)
     # Indicator-layer changes first, then the charts' own config text. Grouped separately because the two
@@ -87,7 +78,6 @@ def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -
         all_clear, message = _empty_diff_notice(changed)
         (st.success if all_clear else st.info)(message)
         _extra_notes(changed)
-        _lookup_expander(source_engine, target_engine)
         return
 
     marks = resolve_marks(source_engine, SURFACE, groups)
@@ -106,13 +96,11 @@ def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -
     _extra_notes(changed)
     layout = st_layout_switcher(
         "🔍 Chart by chart",
-        "**Chart by chart** lists every chart this branch changed, with what changed on each",
+        "**Chart by chart** steps through the charts this branch changed, one full review at a time",
     )
-    _chart_picker(groups, usage, chart_text)
 
     if layout == "items":
-        _render_chart_list(groups, usage, chart_text)
-        _lookup_expander(source_engine, target_engine)
+        _chart_browser(source_engine, target_engine, groups, usage, chart_text)
         return
 
     pagination = Pagination(marks, items_per_page=CHANGES_PER_PAGE, pagination_key="mdd-charts-pagination")
@@ -125,55 +113,13 @@ def st_show_chart_metadata_diffs(source_engine: Engine, target_engine: Engine) -
     if len(marks) > CHANGES_PER_PAGE:
         pagination.show_controls(position="bottom")
 
-    _lookup_expander(source_engine, target_engine)
 
+def _chart_browser(source_engine: Engine, target_engine: Engine, groups, usage: dict, chart_text) -> None:
+    """One chart at a time: pick it or step to it, and read its whole review.
 
-def _render_chart_list(groups: list[ChangeGroup], usage: dict, chart_text) -> None:
-    """Every changed chart, with the fields that changed on it and a link to its own review.
-
-    A list, not sixty-seven diffs: the fields name what happened, and the review page has the text. Ordered
-    by how much changed, because a chart carrying four edits is the one to look at first.
-    """
-    per_chart: dict[str, dict[str, Any]] = {}
-    for g in groups:
-        for chart in _group_charts(g, usage, chart_text):
-            slug = str(chart.get("slug") or "")
-            if not slug:
-                continue
-            row = per_chart.setdefault(slug, {"fields": [], "has_data_page": chart.get("has_data_page", True)})
-            row["fields"].append(field_label(g.field))
-
-    if not per_chart:
-        st.caption("No published chart renders these changes.")
-        return
-
-    rows = sorted(per_chart.items(), key=lambda kv: (-len(kv[1]["fields"]), kv[0]))
-    st.markdown(f"**{len(rows)} chart{'s' if len(rows) != 1 else ''}** changed by this branch:")
-    pagination = Pagination(rows, items_per_page=CHARTS_PER_PAGE, pagination_key="mdd-chart-items-pagination")
-    if len(rows) > CHARTS_PER_PAGE:
-        pagination.show_controls()
-    for slug, row in pagination.get_page_items():
-        fields = ", ".join(sorted(set(row["fields"])))
-        n = len(row["fields"])
-        where = "" if row["has_data_page"] else " · behind *Learn more about this data*"
-        st_note(
-            f'<a href="{chart_review_url(slug)}" target="_self"><code>{slug}</code></a> — '
-            f"<b>{n} change{'s' if n != 1 else ''}</b>: {fields}{where}"
-        )
-    if len(rows) > CHARTS_PER_PAGE:
-        pagination.show_controls(position="bottom")
-
-
-def _chart_picker(groups: list[ChangeGroup], usage: dict, chart_text) -> None:
-    """Pick one of the charts this branch changed, and go to its own review.
-
-    The list below is organised by *change*, which is the right shape for judging an edit and the wrong one
-    for "what happened to the chart I care about" — that chart's changes are spread across however many
-    cards mention it. This is the other question, answered directly: every changed chart, searchable by
-    slug (a selectbox filters as you type), opening the per-chart page.
-
-    Charts only — an edit reaching an MDim view or an explorer view has no chart page to open. Counting is
-    per chart, not per change, so a chart appearing under three cards is one row saying "3 changes".
+    Ordered by how much changed, so stepping goes from the chart carrying four edits down to the ones
+    carrying one. The picker and **Next ▶** write the same `?chart=` the change-grouped cards link to, so
+    all three ways of arriving here agree and any of them can be pasted to somebody else.
     """
     counts: dict[str, int] = {}
     for g in groups:
@@ -182,31 +128,56 @@ def _chart_picker(groups: list[ChangeGroup], usage: dict, chart_text) -> None:
             if slug:
                 counts[slug] = counts.get(slug, 0) + 1
     if not counts:
+        st.caption("No published chart renders these changes.")
         return
 
-    # Most-changed first, then alphabetical: a chart carrying four edits is the one worth opening first.
-    slugs = sorted(counts, key=lambda s: (-counts[s], s))
-    st.selectbox(
-        f"Open one of the {len(slugs)} changed charts",
-        options=slugs,
-        index=None,
-        format_func=lambda s: f"{s} · {counts[s]} change{'s' if counts[s] != 1 else ''}",
-        placeholder="Type to search the changed charts…",
-        key="mdd-chart-picker",
-        on_change=_pick_chart,
-        help="Opens that chart's own review: every field of it this branch changed, in data-page order.",
-    )
+    slugs = sorted(counts, key=lambda slug: (-counts[slug], slug))
+    current = requested_chart(st.session_state.get("chart"), st.query_params.get("chart"))
+    if current not in slugs:
+        # Nothing chosen yet (or a slug from another branch): open the most-changed chart rather than an
+        # empty page asking to be told what to show.
+        current = slugs[0]
+    st.session_state["chart"] = current
+    position = slugs.index(current)
+
+    col_pick, col_next = st.columns([4, 1], vertical_alignment="bottom")
+    with col_pick:
+        st.selectbox(
+            f"Chart {position + 1} of {len(slugs)} changed by this branch",
+            options=slugs,
+            index=position,
+            format_func=lambda slug: f"{slug} · {counts[slug]} change{'s' if counts[slug] != 1 else ''}",
+            key="mdd-chart-picker",
+            on_change=_pick_chart,
+            help="Type to search. Every chart here has at least one text this branch changed.",
+        )
+    with col_next:
+        st.button(
+            "Next change ▶",
+            key="mdd-chart-next",
+            on_click=_step_chart,
+            args=(slugs, position + 1),
+            width="stretch",
+            help="The next changed chart, wrapping round at the end.",
+        )
+
+    mdim_pages.render_chart_by_ref(source_engine, target_engine, current)
 
 
 def _pick_chart() -> None:
-    """Route to the picked chart's review, the same way its link in a chart list does."""
+    """The picker's choice becomes the URL, so the page and the address agree."""
     slug = str(st.session_state.get("mdd-chart-picker") or "").strip()
-    if not slug:
-        return
+    if slug:
+        st.session_state["chart"] = slug
+        st.query_params["chart"] = slug
+
+
+def _step_chart(slugs: list[str], index: int) -> None:
+    """Step to the next chart, wrapping — the list is finite and stepping off the end should not dead-end."""
+    slug = slugs[index % len(slugs)]
     st.session_state["chart"] = slug
+    st.session_state["mdd-chart-picker"] = slug
     st.query_params["chart"] = slug
-    # Leave the picker empty, or coming back from the review re-opens the chart you just left.
-    st.session_state["mdd-chart-picker"] = None
 
 
 def _empty_diff_notice(changed) -> tuple[bool, str]:
@@ -348,37 +319,7 @@ def _where_line(g: ChangeGroup) -> str:
     return f"This {label} belongs to one indicator only — nothing else shares it."
 
 
-def _single_chart_page(source_engine: Engine, target_engine: Engine) -> None:
-    """One chart's review, alone on the page, with the way back to the list.
-
-    The box stays: it is how you get to a different chart from here, and it is the same URL-persisted
-    widget the list's lookup renders, so the two can never disagree about which chart is open.
-    """
-    st.button(
-        "← All chart changes",
-        key="mdd-clear-chart",
-        on_click=_clear_chart,
-        help="Back to every text change on this branch.",
-    )
-    mdim_pages.chart_flow(source_engine, target_engine)
-
-
 def _clear_chart() -> None:
     """Leave the per-chart page: clear the widget and the URL it is routed by."""
     st.session_state["chart"] = ""
     st.query_params.pop("chart", None)
-
-
-def _lookup_expander(source_engine: Engine, target_engine: Engine) -> None:
-    """Any chart, changed or not — for checking that a chart you expected to change didn't, or vice versa.
-
-    Opens itself when a slug is already in the box, which is how it survives the rerun that a lookup
-    causes. It used to be opened remotely by a button on every card, and that button was the problem: it
-    worked, silently, a page and a half below where it was pressed.
-    """
-    with st.expander("🔎 Look up any chart", expanded=bool(st.session_state.get("chart"))):
-        st.caption(
-            "The lists above only show what this branch changed. Use this to inspect any published chart's "
-            "inherited metadata — including confirming that a chart you were worried about is untouched."
-        )
-        mdim_pages.chart_flow(source_engine, target_engine)

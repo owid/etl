@@ -21,7 +21,7 @@ from sqlalchemy.engine.base import Engine
 from apps.wizard.app_pages.chart_diff.utils import SOURCE
 from apps.wizard.app_pages.metadata_diff import brief, cached, datapage, discovery
 from apps.wizard.app_pages.metadata_diff.blast_section import GROUP_KEY, TREE_MDIM_KEY
-from apps.wizard.app_pages.metadata_diff.core import field_label, group_usage
+from apps.wizard.app_pages.metadata_diff.core import LAYOUT_QUERY_KEY, field_label, group_usage
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
     DIFF_CSS,
@@ -104,24 +104,30 @@ def st_show_mdim_metadata_diffs(source_engine: Engine, target_engine: Engine) ->
         else:
             st.success(message)
     else:
+        # Drafts counted here as well as in the picker below: the header said "1 MDim" while the picker
+        # said "1 of 2", because one of them was unpublished. Two numbers for the same set read as a bug.
+        head = f"**{len(flagged)} MDim{'s' if len(flagged) != 1 else ''}** changed by this branch"
+        if drafts:
+            head += f", plus **{len(drafts)}** not published yet"
         st.markdown(
-            f"**{len(flagged)} MDim{'s' if len(flagged) != 1 else ''}** changed by this branch.",
+            head + ".",
             help="Either the metadata of an indicator they use changed, or their own export recipe did — "
             "most text edits are authored in the garden step and reach an MDim through indicator metadata, "
             "leaving its config identical.",
         )
         layout = st_layout_switcher(
             "🔍 View by view",
-            "**View by view** lists every changed view of every changed MDim, with its diffs",
+            "**View by view** steps through one MDim at a time, every changed view with its diffs",
         )
+        if layout == "items":
+            _views_browser(source_engine, target_engine, df, flagged + drafts)
+            return
+
         pagination = Pagination(flagged, items_per_page=MDIMS_PER_PAGE, pagination_key="mdd-mdims-pagination")
         if len(flagged) > MDIMS_PER_PAGE:
             pagination.show_controls()
         for catalog_path in pagination.get_page_items():
-            if layout == "items":
-                _render_views_card(source_engine, target_engine, df, catalog_path)
-            else:
-                _render_card(source_engine, target_engine, df, catalog_path)
+            _render_card(source_engine, target_engine, df, catalog_path)
         if len(flagged) > MDIMS_PER_PAGE:
             pagination.show_controls(position="bottom")
 
@@ -129,45 +135,107 @@ def st_show_mdim_metadata_diffs(source_engine: Engine, target_engine: Engine) ->
     _render_other(others)
 
 
-def _render_views_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, catalog_path: str) -> None:
-    """One MDim, its changed views inline — the item view of a card.
+def _open_item_view(catalog_path: str) -> None:
+    """From a change card, into the view browser on this MDim.
 
-    Capped: an MDim can have hundreds of changed views, and this is a list of MDims. The rest fold into an
-    expander, and the card's own button opens the focused page where they are paginated properly.
+    Sets the layout as well as the MDim: the button lives in the By-change list, so it is switching how
+    you are reading the section, not just which MDim is selected.
     """
-    row = df.loc[catalog_path]
-    title, dimensions, view_diffs = cached.mdim_view_diffs(
-        catalog_path, source_engine, target_engine, cache_key=_cache_key(row)
-    )
-    changed = [v for v in view_diffs if v.changed]
-    slug = str(row["slug_source"]) if row.get("slug_source") else ""
+    st.session_state[LAYOUT_QUERY_KEY] = "items"
+    st.query_params[LAYOUT_QUERY_KEY] = "items"
+    st.session_state[VIEWS_KEY] = catalog_path
+    st.query_params[VIEWS_KEY] = catalog_path
+    _reset_view_selection()
 
-    with st.container(border=True):
-        draft = " :orange-badge[📝 unpublished]" if row["is_draft"] else ""
-        st.markdown(f"**{title or catalog_path}**{draft}")
-        st.caption(f"`{catalog_path}` · {len(changed)} of {len(view_diffs)} views changed")
-        st.button(
-            "🔍 Open view by view",
-            key=f"mdd-views-open-{catalog_path}",
-            on_click=_open_views,
-            args=(catalog_path,),
-            help="This MDim's changed views on their own page, paginated.",
-        )
-        if not changed:
-            st.caption("Nothing this branch changed in the texts readers see.")
-            return
-        for view in changed[:VIEWS_IN_CARD]:
-            _render_view(view, view_label(view, dimensions), dimensions, catalog_path, slug, row)
-        rest = changed[VIEWS_IN_CARD:]
-        if rest:
-            with st.expander(f"… {len(rest)} more changed view{'s' if len(rest) != 1 else ''}"):
-                for view in rest[:MAX_INLINE_CHANGES]:
-                    _render_view(view, view_label(view, dimensions), dimensions, catalog_path, slug, row)
-                if len(rest) > MAX_INLINE_CHANGES:
-                    st.caption(
-                        f"{len(rest) - MAX_INLINE_CHANGES} further changed views are on the focused page — "
-                        "use **Open view by view** above."
-                    )
+
+def _views_browser(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, paths: list[str]) -> None:
+    """Pick which MDim, then read it view by view.
+
+    One picker over every MDim this branch changed, published and unpublished together: "which of mine
+    changed" is one question, and an unpublished MDim is the one most likely to be *yours* — it is badged
+    rather than filed somewhere else. Published first, then drafts, each group widest-reaching first, so
+    stepping down the list goes from what readers see today to what nobody sees yet.
+
+    `?mdim-views=<path>` is the selection, so a link opens the MDim it names.
+    """
+    if not paths:
+        return
+
+    known = [p for p in paths if p in df.index]
+    if not known:
+        st.info("No MDim to show.")
+        return
+
+    def sort_key(path: str) -> tuple:
+        row = df.loc[path]
+        return (bool(row["is_draft"]), path)
+
+    known.sort(key=sort_key)
+    current = str(st.session_state.get(VIEWS_KEY) or st.query_params.get(VIEWS_KEY) or "").strip()
+    if current not in known:
+        current = known[0]
+    st.session_state[VIEWS_KEY] = current
+    position = known.index(current)
+
+    def label(path: str) -> str:
+        row = df.loc[path]
+        title = str(row["title_source"] or path) if "title_source" in row and row["title_source"] else path
+        return f"{title} · 📝 unpublished" if row["is_draft"] else str(title)
+
+    if len(known) > 1:
+        col_pick, col_next = st.columns([4, 1], vertical_alignment="bottom")
+        with col_pick:
+            st.selectbox(
+                f"MDim {position + 1} of {len(known)} changed by this branch",
+                options=known,
+                index=position,
+                format_func=label,
+                key="mdd-mdim-picker",
+                on_change=_pick_mdim,
+                help="Type to search. Unpublished MDims are in here too, badged.",
+            )
+        with col_next:
+            st.button(
+                "Next MDim ▶",
+                key="mdd-mdim-next",
+                on_click=_step_mdim,
+                args=(known, position + 1),
+                width="stretch",
+                help="The next changed MDim, wrapping round at the end.",
+            )
+
+    _views_page(source_engine, target_engine, df, current)
+
+
+def _pick_mdim() -> None:
+    """The picker's choice becomes the URL."""
+    path = str(st.session_state.get("mdd-mdim-picker") or "").strip()
+    if path:
+        st.session_state[VIEWS_KEY] = path
+        st.query_params[VIEWS_KEY] = path
+        _reset_view_selection()
+
+
+def _step_mdim(paths: list[str], index: int) -> None:
+    """Step to the next MDim, wrapping."""
+    path = paths[index % len(paths)]
+    st.session_state[VIEWS_KEY] = path
+    st.session_state["mdd-mdim-picker"] = path
+    st.query_params[VIEWS_KEY] = path
+    _reset_view_selection()
+
+
+def _reset_view_selection() -> None:
+    """Drop the previous MDim's ⚡ jump and menu — its dimensions mean nothing in the next one.
+
+    Left in place, they either filter the new MDim to nothing or, worse, silently match a same-named
+    dimension and show a view nobody asked for.
+    """
+    st.session_state.pop(JUMP_KEY, None)
+    for key in [k for k in list(st.session_state.keys()) if isinstance(k, str) and k.startswith(DIM_PARAM_PREFIX)]:
+        st.session_state.pop(key, None)
+    for key in [k for k in list(st.query_params.keys()) if k.startswith(DIM_PARAM_PREFIX)]:
+        st.query_params.pop(key, None)
 
 
 def _views_page(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, catalog_path: str) -> None:
@@ -186,8 +254,6 @@ def _views_page(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, 
         catalog_path, source_engine, target_engine, cache_key=_cache_key(row)
     )
     changed = [v for v in view_diffs if v.changed]
-
-    st.button("← All MDims", key="mdd-clear-views", on_click=_clear_views, help="Back to every changed MDim.")
 
     draft = " :orange-badge[📝 unpublished]" if row["is_draft"] else ""
     st.markdown(f"### {title or catalog_path}{draft}")
@@ -330,12 +396,6 @@ def _render_view(view, label: str, dimensions: list, catalog_path: str, slug: st
             staging_label="This staging server",
             show_unchanged_slots=False,
         )
-
-
-def _open_views(catalog_path: str) -> None:
-    """Open one MDim's views: the URL carries it, so the destination survives a reload and can be shared."""
-    st.query_params[VIEWS_KEY] = catalog_path
-    st.session_state[VIEWS_KEY] = catalog_path
 
 
 def _clear_views() -> None:
@@ -508,9 +568,9 @@ def _card_actions(
         st.button(
             "🔍 View by view",
             key=f"mdd-views-{catalog_path}",
-            on_click=_open_views,
+            on_click=_open_item_view,
             args=(catalog_path,),
-            help="Every changed view of this MDim, with its diffs.",
+            help="Switches to View by view, on this MDim.",
             width="stretch",
         )
     with col_tree:
