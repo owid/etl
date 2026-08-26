@@ -19,6 +19,7 @@ import streamlit as st
 from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.metadata_diff import brief, cached, datapage, discovery
+from apps.wizard.app_pages.metadata_diff.blast_section import GROUP_KEY, TREE_MDIM_KEY
 from apps.wizard.app_pages.metadata_diff.core import field_label, group_usage
 from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, DIFF_CSS, markdown_output, st_origin_caption
 from apps.wizard.app_pages.metadata_diff.review_state import (
@@ -31,8 +32,10 @@ from apps.wizard.utils.components import Pagination
 
 MDIMS_PER_PAGE = 4
 
-# Changes shown inline per MDim. There is no detail page to defer the rest to any more, so the cap is the
-# point at which a card stops being readable rather than a hand-off — the remainder is named in a caption.
+# Changes shown open per MDim. There is no detail page to defer the rest to any more, so the cap is the
+# point at which a card stops being readable — a fold, not a cut: the remainder renders inside an
+# expander, with its Reviewed toggles, because `n_reviewed(marks)/len(marks)` counts every mark and a
+# change without a toggle is a counter that can never reach completion.
 MAX_INLINE_CHANGES = 12
 
 
@@ -169,11 +172,11 @@ def _render_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame,
             st.caption(f"{n_reviewed(marks)}/{len(marks)} reviewed")
             for mark in marks[:MAX_INLINE_CHANGES]:
                 _render_change(source_engine, catalog_path, mark, attribution)
-            if len(marks) > MAX_INLINE_CHANGES:
-                st.caption(
-                    f"… and {len(marks) - MAX_INLINE_CHANGES} more of this MDim's changes; the PR brief "
-                    "above lists every one."
-                )
+            folded = marks[MAX_INLINE_CHANGES:]
+            if folded:
+                with st.expander(f"… {len(folded)} more of this MDim's changes"):
+                    for mark in folded:
+                        _render_change(source_engine, catalog_path, mark, attribution)
 
         # Two unlike reasons a difference is not attributable, and only one of them is master's doing.
         repointed = [g for g in other_groups if g.indicator_replaced]
@@ -192,12 +195,22 @@ def _render_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame,
 
 
 def usage_for(source_engine: Engine, groups: list, catalog_path: str, row) -> dict:
-    """Charts and other MDims rendering this MDim's changed indicators — the brief's reach lines."""
-    ids = sorted({g.indicator_id for g in groups if g.affects_indicator and g.indicator_id is not None})
+    """Charts and other MDims rendering this MDim's changed indicators — the brief's reach lines.
+
+    Every indicator of a group, not just its first: one edit to a shared definition renders into several
+    indicators, and `group_usage` reads the whole of `indicator_ids` back out. An id missing from this map
+    is a chart or an MDim the brief never mentions.
+    """
+    ids: set[int] = set()
+    for g in groups:
+        if not g.affects_indicator:
+            continue
+        # `indicator_ids` is the full set; `indicator_id` is the fallback for a group built without it.
+        ids |= g.indicator_ids or ({g.indicator_id} if g.indicator_id is not None else set())
     if not ids:
         return {}
     return cached.usage_for_indicators(
-        tuple(ids), catalog_path, source_engine, cache_key=str(row.get("configMd5_source"))
+        tuple(sorted(ids)), catalog_path, source_engine, cache_key=str(row.get("configMd5_source"))
     )
 
 
@@ -248,12 +261,17 @@ def _card_actions(
 
 
 def _open_dimension_tree(catalog_path: str) -> None:
-    """Send the reader to the Blast radius section with this MDim's grid already selected."""
+    """Send the reader to the Blast radius section with this MDim's grid drawn first.
+
+    The catalogPath goes in the URL as well as in session state: the section reads it from there, which is
+    what makes the destination survive a reload and be worth pasting to somebody else.
+    """
     st.query_params["diff-type"] = "blast"
-    st.query_params["blast-group"] = "dimensions"
+    st.query_params[GROUP_KEY] = "dimensions"
+    st.query_params[TREE_MDIM_KEY] = catalog_path
     st.session_state["metadata-diff-section"] = "blast"
-    st.session_state["blast-group"] = "dimensions"
-    st.session_state["blast-tree-mdim"] = catalog_path
+    st.session_state[GROUP_KEY] = "dimensions"
+    st.session_state[TREE_MDIM_KEY] = catalog_path
 
 
 def _render_change(source_engine: Engine, catalog_path: str, mark, attribution: dict[str, str]) -> None:

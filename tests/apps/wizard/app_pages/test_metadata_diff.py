@@ -1974,22 +1974,181 @@ def test_group_by_edit_counts_pages_once_per_edit():
     assert groups[0].field == "descriptionKey"
 
 
-def test_mdim_tree_link_survives_the_hash_in_a_catalog_path():
-    """Every MDim catalogPath carries a `#`, which a browser reads as the start of the fragment.
+def test_mdim_tree_link_opens_the_section_the_tree_lives_in():
+    """`?diff-type=mdims&mdim=...&mode=tree` was the removed deep page's route.
 
-    Left raw, the link drops `&mode=tree` into the fragment and truncates the path, so it opens the MDims
-    list instead of that MDim's dimension tree.
+    The MDims list drops both of those parameters on load, so a link built that way opened the plain list
+    — the one place the reader already was. The tree lives in the Blast radius section now, so the link
+    has to carry that section's own state, MDim included.
+
+    And every MDim catalogPath carries a `#`, which a browser reads as the start of the fragment: left
+    raw, it truncates the path and drops every parameter after it.
     """
-    from apps.wizard.app_pages.metadata_diff.blast_section import _mdim_tree_url
+    from apps.wizard.app_pages.metadata_diff.blast_section import GROUP_KEY, TREE_MDIM_KEY, _mdim_tree_url
 
     url = _mdim_tree_url("wb/latest/poverty_pip#poverty_pip")
 
     assert "%23poverty_pip" in url, "the hash has to be percent-encoded"
     assert "#" not in url, "nothing may start a fragment"
-    assert url.endswith("&mode=tree")
-    assert "diff-type=mdims" in url
+    assert "diff-type=blast" in url
+    assert f"{GROUP_KEY}=dimensions" in url
+    assert f"{TREE_MDIM_KEY}=wb/latest/poverty_pip%23poverty_pip" in url
+    assert "diff-type=mdims" not in url and "mode=tree" not in url
     # No doubled slash: SOURCE.wizard_url already ends in one.
     assert "//metadata-diff" not in url
+
+
+def test_the_mdim_you_asked_for_is_drawn_even_past_the_grid_cap():
+    """Arriving from a card's "Dimension tree" button has to land on *that* MDim's grid.
+
+    The grid stops at MAX_TREE_MDIMS and names the rest, so an MDim sorting past the cap used to be
+    exactly the one the button could not show. Ordering, not filtering: nothing is dropped.
+    """
+    from streamlit.testing.v1 import AppTest
+
+    from apps.wizard.app_pages.metadata_diff.blast_section import MAX_TREE_MDIMS, TREE_MDIM_KEY
+
+    n_affected = MAX_TREE_MDIMS + 4
+    requested = f"grapher/ns/latest/mdim_{n_affected - 1:02d}"  # last alphabetically, so past the cap
+
+    def app() -> None:
+        import streamlit as st
+
+        from apps.wizard.app_pages.metadata_diff.blast_section import MAX_TREE_MDIMS, _requested_first
+
+        affected = sorted(f"grapher/ns/latest/mdim_{i:02d}" for i in range(MAX_TREE_MDIMS + 4))
+        ordered = _requested_first(affected)
+        st.text(f"first={ordered[0]}")
+        st.text(f"drawn={','.join(ordered[:MAX_TREE_MDIMS])}")
+        st.text(f"kept={sorted(ordered) == affected}")
+
+    at = AppTest.from_function(app)
+    at.query_params[TREE_MDIM_KEY] = requested
+    at.run()
+
+    assert not at.exception
+    assert at.text[0].value == f"first={requested}"
+    assert requested in at.text[1].value.removeprefix("drawn=").split(",")
+    assert at.text[2].value == "kept=True", "reordering may not drop or invent an affected MDim"
+
+    # Nothing asked for: the alphabetical order stands.
+    at = AppTest.from_function(app)
+    at.run()
+    assert at.text[0].value == "first=grapher/ns/latest/mdim_00"
+
+
+def test_the_pr_brief_fetches_usage_for_every_indicator_of_a_shared_edit(monkeypatch):
+    """One edit to a shared definition renders into several indicators, and each reaches its own charts.
+
+    The lookup used to request only each group's first `indicator_id` while `group_usage` reads the whole
+    of `indicator_ids` back out, so the brief silently omitted the charts and MDims reached through the
+    others — for a shared-definition edit, most of the reach.
+    """
+    from apps.wizard.app_pages.metadata_diff import mdims_section
+    from apps.wizard.app_pages.metadata_diff.core import ChangeGroup, group_usage
+
+    captured: dict[str, tuple] = {}
+
+    def fake_usage(ids, catalog_path, engine, cache_key=""):
+        captured["ids"] = ids
+        return {i: {"charts": [{"chartId": i, "slug": f"chart-{i}"}], "draft_charts": [], "mdims": []} for i in ids}
+
+    monkeypatch.setattr(mdims_section.cached, "usage_for_indicators", fake_usage)
+
+    shared = ChangeGroup(
+        field="descriptionShort",
+        old="Old.",
+        new="New.",
+        affects_indicator=True,
+        indicator_id=11,
+        indicator_ids={11, 12, 13},
+    )
+    # A group built without the set at all still contributes its single id.
+    single = ChangeGroup(field="titlePublic", old="A", new="B", affects_indicator=True, indicator_id=20)
+    # An MDim-only override reaches nothing else, so it asks for nothing.
+    override = ChangeGroup(field="titlePublic", old="C", new="D", affects_indicator=False, indicator_id=99)
+
+    usage = mdims_section.usage_for(
+        None, [shared, single, override], "grapher/a/latest/incomes#incomes", {"configMd5_source": "abc"}
+    )
+
+    assert captured["ids"] == (11, 12, 13, 20)
+    assert len(group_usage(shared, usage)["charts"]) == 3, "the brief reads every indicator's charts back out"
+
+
+def test_every_explorer_change_keeps_its_reviewed_toggle(monkeypatch):
+    """A change with no toggle is a `n/N reviewed` counter that can never reach completion.
+
+    Past the inline cap the extra changes used to render as a caption pointing at Chart Diff's TSV, which
+    can show their text but cannot tick anything here — so the Explorers badge stayed incomplete forever.
+    """
+    from streamlit.testing.v1 import AppTest
+
+    from apps.wizard.app_pages.metadata_diff import explorers_section, review_state
+
+    monkeypatch.setattr(review_state, "load_reviews", lambda engine, surface: {})
+    n_changes = explorers_section.MAX_INLINE_CHANGES + 3
+
+    def app() -> None:
+        from apps.wizard.app_pages.metadata_diff.core import ViewDiff
+        from apps.wizard.app_pages.metadata_diff.explorers_section import MAX_INLINE_CHANGES, _render_explorer
+
+        diffs = [
+            ViewDiff(
+                dimensions={"metric": f"m{i}"},
+                fields={"descriptionShort": {"old": f"Old {i}.", "new": f"New {i}."}},
+            )
+            for i in range(MAX_INLINE_CHANGES + 3)
+        ]
+        _render_explorer(None, "poverty-explorer", diffs)
+
+    at = AppTest.from_function(app, default_timeout=30)
+    at.run()
+
+    assert not at.exception
+    assert len(at.toggle) == n_changes, "every distinct change needs its own Reviewed toggle"
+
+
+def test_every_mdim_change_keeps_its_reviewed_toggle(monkeypatch):
+    """Same for an MDim card: the cap folds the rest away, it does not drop their controls.
+
+    `n_reviewed(marks)/len(marks)` counts every change on the card, so a change rendered as a caption
+    alone left the counter short of completion however much the reviewer read.
+    """
+    from streamlit.testing.v1 import AppTest
+
+    from apps.wizard.app_pages.metadata_diff import cached, discovery, mdims_section, review_state
+    from apps.wizard.app_pages.metadata_diff.core import ViewDiff, group_changes
+
+    monkeypatch.setattr(review_state, "load_reviews", lambda engine, surface: {})
+    n_changes = mdims_section.MAX_INLINE_CHANGES + 3
+    views = [
+        ViewDiff(
+            dimensions={"metric": f"m{i}"},
+            fields={"descriptionShort": {"old": f"Old {i}.", "new": f"New {i}."}},
+        )
+        for i in range(n_changes)
+    ]
+    monkeypatch.setattr(cached, "mdim_view_diffs", lambda *args, **kwargs: ("Incomes", [], views))
+    monkeypatch.setattr(discovery, "split_mdim_groups", lambda _path, changed: (group_changes(changed), []))
+
+    def app() -> None:
+        import pandas as pd
+
+        from apps.wizard.app_pages.metadata_diff.mdims_section import _render_card
+
+        catalog_path = "grapher/a/latest/incomes#incomes"
+        df = pd.DataFrame(
+            [{"is_new": False, "is_draft": False, "configMd5_source": "a", "configMd5_target": "b"}],
+            index=[catalog_path],
+        )
+        _render_card(None, None, df, catalog_path)
+
+    at = AppTest.from_function(app, default_timeout=30)
+    at.run()
+
+    assert not at.exception
+    assert len(at.toggle) == n_changes, "every distinct change needs its own Reviewed toggle"
 
 
 def test_chart_config_text_is_compared_because_the_indicator_row_never_carries_it():

@@ -44,6 +44,10 @@ from apps.wizard.app_pages.metadata_diff.tree import render_multi_tree_html
 from apps.wizard.utils.components import url_persist
 
 GROUP_KEY = "blast-group"
+# The MDim a reader arrived here to see — set by the MDim cards' "🌳 Dimension tree" button and
+# carried by `_mdim_tree_url`. Read from the URL so the link is shareable, and drawn first so
+# MAX_TREE_MDIMS can never be what drops the one MDim somebody asked for.
+TREE_MDIM_KEY = "blast-tree-mdim"
 _CONTEXT_CSS = """
 <style>
 .mdd-context {{ color: #555; }}
@@ -309,13 +313,35 @@ def _surface_summary(group: EditGroup) -> str:
 
 
 def _mdim_tree_url(catalog_path: str) -> str:
-    """Link to one MDim's dimension tree.
+    """Link to one MDim's dimension tree — which lives in this section.
+
+    `?diff-type=mdims&mdim=...&mode=tree` was the removed deep page's route, and the MDims list drops both
+    of those parameters on load, so a link built that way opened the plain list instead. This carries the
+    state `_open_dimension_tree` sets, as a URL somebody can paste.
 
     The catalogPath is percent-encoded: it always carries a `#`, which a browser would otherwise read as
-    the start of the fragment, dropping `&mode=tree` and truncating the path.
+    the start of the fragment, dropping every parameter after it and truncating the path.
     """
     base = SOURCE.wizard_url.rstrip("/")
-    return f"{base}/metadata-diff?diff-type=mdims&mdim={quote(catalog_path, safe='/')}&mode=tree"
+    return (
+        f"{base}/metadata-diff?diff-type=blast&{GROUP_KEY}=dimensions&{TREE_MDIM_KEY}={quote(catalog_path, safe='/')}"
+    )
+
+
+def _requested_mdim() -> str | None:
+    """The MDim somebody clicked through to see, from the URL or from the button that set it."""
+    return st.query_params.get(TREE_MDIM_KEY) or st.session_state.get(TREE_MDIM_KEY) or None
+
+
+def _requested_first(affected: list[str]) -> list[str]:
+    """Draw the requested MDim first, so the cap cannot drop the one the reader asked for.
+
+    Ordering, not filtering: the rest of the grid is what makes the section worth arriving at.
+    """
+    requested = _requested_mdim()
+    if requested is None or requested not in affected:
+        return affected
+    return [requested] + [cp for cp in affected if cp != requested]
 
 
 def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[ChangeReach]) -> None:
@@ -326,7 +352,7 @@ def _dimension_tree(source_engine: Engine, target_engine: Engine, reach: list[Ch
     diff per MDim, which is why it stops at MAX_TREE_MDIMS and says so instead of drawing forever.
     """
     explorer_hierarchy = _explorer_hierarchy(source_engine, target_engine)
-    affected = sorted({str(m["catalogPath"]) for r in reach for m in r.mdims})
+    affected = _requested_first(sorted({str(m["catalogPath"]) for r in reach for m in r.mdims}))
     if not affected:
         st.caption("No MDim renders any of these changes, so there is no MDim grid to draw.")
         if explorer_hierarchy is None:

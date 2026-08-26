@@ -29,6 +29,10 @@ from apps.wizard.app_pages.metadata_diff.review_state import (
 from apps.wizard.utils.components import Pagination
 
 EXPLORERS_PER_PAGE = 4
+# Changes shown open per explorer. Past this the card stops being readable, so the rest fold into an
+# expander — with their Reviewed toggles, because the `n/N reviewed` counter above counts every change and
+# one without a toggle is a counter that can never reach completion. Chart Diff's TSV can show the text of
+# the folded ones but cannot tick them here, so it was never the hand-off it looked like.
 MAX_INLINE_CHANGES = 4
 
 
@@ -120,25 +124,30 @@ def _render_explorer(source_engine: Engine, slug: str, diffs: list[ViewDiff]) ->
         )
 
         for mark in marks[:MAX_INLINE_CHANGES]:
-            g = mark.group
-            st.markdown(
-                f"{mark.icon} **{field_label(g.field)}** "
-                f":small[:gray[{len(g.view_dims)} view{'s' if len(g.view_dims) != 1 else ''}]]"
-            )
-            with st.popover(f"Views ({len(g.view_dims)})", width="content"):
-                st.markdown("\n".join(f"- {dims_str(d)}" for d in g.view_dims[:40]))
-                if len(g.view_dims) > 40:
-                    st.caption(f"… and {len(g.view_dims) - 40} more.")
-            datapage.st_datapage_diff(
-                {g.field: {"old": g.old, "new": g.new}},
-                baseline_label=BASELINE_NAME.capitalize(),
-                staging_label="This staging server",
-                show_unchanged_slots=False,
-            )
-            st_reviewed_toggle(source_engine, surface, mark)
+            _render_change(source_engine, surface, mark)
 
-        if len(marks) > MAX_INLINE_CHANGES:
-            st.caption(
-                f"… and {len(marks) - MAX_INLINE_CHANGES} more change(s) in this explorer. "
-                "The full TSV diff is in **Chart Diff → Explorers**."
-            )
+        folded = marks[MAX_INLINE_CHANGES:]
+        if folded:
+            with st.expander(f"… {len(folded)} more change(s) in this explorer"):
+                for mark in folded:
+                    _render_change(source_engine, surface, mark)
+
+
+def _render_change(source_engine: Engine, surface: str, mark) -> None:
+    """One distinct text change of an explorer, with the views it lands on and its reviewed toggle."""
+    g = mark.group
+    st.markdown(
+        f"{mark.icon} **{field_label(g.field)}** "
+        f":small[:gray[{len(g.view_dims)} view{'s' if len(g.view_dims) != 1 else ''}]]"
+    )
+    with st.popover(f"Views ({len(g.view_dims)})", width="content"):
+        st.markdown("\n".join(f"- {dims_str(d)}" for d in g.view_dims[:40]))
+        if len(g.view_dims) > 40:
+            st.caption(f"… and {len(g.view_dims) - 40} more.")
+    datapage.st_datapage_diff(
+        {g.field: {"old": g.old, "new": g.new}},
+        baseline_label=BASELINE_NAME.capitalize(),
+        staging_label="This staging server",
+        show_unchanged_slots=False,
+    )
+    st_reviewed_toggle(source_engine, surface, mark)
