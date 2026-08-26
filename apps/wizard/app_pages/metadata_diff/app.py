@@ -30,7 +30,6 @@ from apps.wizard.app_pages.metadata_diff import (
     mdims_section,
 )
 from apps.wizard.app_pages.metadata_diff.core import empty_sections
-from apps.wizard.app_pages.metadata_diff.data import count_ticked
 from apps.wizard.app_pages.metadata_diff.discovery import keep_sections
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
@@ -50,16 +49,14 @@ st.set_page_config(
 )
 
 
-def _review_progress(source_engine, summary) -> dict[str, tuple[int, int]]:
-    """(ticked, total) per section, with the ticks read fresh.
+def _section_totals(summary) -> dict[str, tuple[int, int]]:
+    """(0, total) per section — how many distinct changes each one holds.
 
-    `summary` is cached for minutes, which is right for what changed and wrong for what has been reviewed:
-    pressing a toggle has to move the counter above it in the same rerun.
+    The first element used to be how many were ticked, read fresh on every rerun so a toggle moved the
+    counter above it. Sign-off is out of the UI for now, so nothing is ticked and nothing queries for it;
+    the totals stay, because they are what decides whether a section has anything in it at all.
     """
-    return {
-        section: (count_ticked(source_engine, entries), len(entries))
-        for section, entries in summary.review_keys.items()
-    }
+    return {section: (0, len(entries)) for section, entries in summary.review_keys.items()}
 
 
 def main() -> None:
@@ -86,7 +83,7 @@ what ships is what you meant, and to see how far each change reaches.
         st.warning("- " + "\n\n- ".join(WARN_MSG))
 
     summary = cached.summary(source_engine, target_engine)
-    progress = _review_progress(source_engine, summary)
+    progress = _section_totals(summary)
     for warning in summary.warnings:
         st.warning(warning)
 

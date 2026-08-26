@@ -24,11 +24,15 @@ from apps.wizard.app_pages.metadata_diff.cached import clear_discovery_caches
 from apps.wizard.app_pages.metadata_diff.core import (
     CHART_FIELD_PREFIX,
     CHART_FIELDS,
+    DEFAULT_LAYOUT,
     DEFAULT_SECTION,
+    LAYOUT_QUERY_KEY,
+    LAYOUTS,
     METADATA_FIELDS,
     SECTIONS,
     ViewDiff,
     as_bullets,
+    coerce_layout,
     coerce_section,
     diff_preview_html,
     inline_diff_html,
@@ -36,6 +40,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     split_by_prominence,
 )
 from apps.wizard.app_pages.metadata_diff.tree import render_affected_charts_html
+from apps.wizard.utils.components import url_persist
 
 # Display order of the diffed fields: indicator metadata first, then the chart's own text.
 FIELD_ORDER = list(METADATA_FIELDS) + [CHART_FIELD_PREFIX + f for f in CHART_FIELDS]
@@ -134,6 +139,28 @@ def view_url(env, catalog_path: str, published_slug: str | None, dims: dict[str,
     if published_slug:
         return f"{env.site}/grapher/{published_slug}?{params}"
     return f"{env.admin_site}/grapher/{urllib.parse.quote(catalog_path, safe='')}/?{params}"
+
+
+def st_layout_switcher(items_label: str, items_help: str) -> str:
+    """The per-section "items or changes" control, with its choice kept in the URL.
+
+    One key across the three sections on purpose: whichever section you switch, the others follow, because
+    the choice is about how you are reading this branch rather than about one surface.
+    """
+    layout = url_persist(st.segmented_control)(
+        label="Layout",
+        options=list(LAYOUTS),
+        format_func=lambda v: {"items": items_label, "changes": "🧬 By change"}[v],
+        key=LAYOUT_QUERY_KEY,
+        value=DEFAULT_LAYOUT,
+        label_visibility="collapsed",
+    )
+    layout = coerce_layout(layout)
+    st.caption(
+        f"{items_help} · **By change** groups the same edits — one reworded sentence listed once, with "
+        "everywhere it lands underneath."
+    )
+    return layout
 
 
 def chart_review_url(slug: str) -> str:

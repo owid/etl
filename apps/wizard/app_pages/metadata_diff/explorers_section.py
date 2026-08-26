@@ -13,17 +13,17 @@ Two limits are stated in the UI rather than papered over:
   has not been rebuilt on this server, its stored text is still the old one and nothing appears here.
 """
 
+from urllib.parse import urlencode
+
 import streamlit as st
 from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET
 from apps.wizard.app_pages.metadata_diff import cached, datapage
 from apps.wizard.app_pages.metadata_diff.core import ViewDiff, dims_str, field_label, group_changes
-from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, DIFF_CSS
+from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, DIFF_CSS, st_layout_switcher
 from apps.wizard.app_pages.metadata_diff.review_state import (
-    n_reviewed,
     resolve_marks,
-    st_reviewed_toggle,
     surface_key,
 )
 from apps.wizard.utils.components import Pagination
@@ -34,6 +34,9 @@ EXPLORERS_PER_PAGE = 4
 # one without a toggle is a counter that can never reach completion. Chart Diff's TSV can show the text of
 # the folded ones but cannot tick them here, so it was never the hand-off it looked like.
 MAX_INLINE_CHANGES = 4
+# Changed views drawn inline per explorer in the item view. One LIS edit reached 402 views of a single
+# explorer, so this is a sample with a pointer to the grid, never the whole list.
+VIEWS_IN_CARD = 3
 
 
 def st_show_explorer_metadata_diffs(source_engine: Engine, target_engine: Engine) -> None:
@@ -65,16 +68,53 @@ def st_show_explorer_metadata_diffs(source_engine: Engine, target_engine: Engine
             f"**{len(branch)} explorer{'s' if len(branch) != 1 else ''}** with "
             f"**{total_views} changed view{'s' if total_views != 1 else ''}**."
         )
+        layout = st_layout_switcher(
+            "🔍 View by view",
+            "**View by view** lists every changed view of every affected explorer, with its diffs",
+        )
         slugs = sorted(branch)
         pagination = Pagination(slugs, items_per_page=EXPLORERS_PER_PAGE, pagination_key="mdd-explorers-pagination")
         if len(slugs) > EXPLORERS_PER_PAGE:
             pagination.show_controls()
         for slug in pagination.get_page_items():
-            _render_explorer(source_engine, slug, branch[slug])
+            if layout == "items":
+                _render_explorer_views(slug, branch[slug])
+            else:
+                _render_explorer(source_engine, slug, branch[slug])
         if len(slugs) > EXPLORERS_PER_PAGE:
             pagination.show_controls(position="bottom")
 
     _render_other(other)
+
+
+def _render_explorer_views(slug: str, diffs: list[ViewDiff]) -> None:
+    """One explorer, its changed views inline, each with a link to itself and its diffs.
+
+    An explorer's views carry their dimensions as display names already (`Decile`, `After tax`), so the
+    label is those values joined — there is no dimension config to read choice names from.
+    """
+    changed = [d for d in diffs if d.changed]
+    with st.container(border=True):
+        st.markdown(f"**`{slug}`** :small[:gray[{len(changed)} changed view{'s' if len(changed) != 1 else ''}]]")
+        for view in changed[:VIEWS_IN_CARD]:
+            label = " · ".join(str(v) for v in view.dimensions.values()) or "(view)"
+            with st.container(border=True):
+                n = len(view.fields)
+                st.markdown(f"**{label}** :small[:gray[{n} field{'s' if n != 1 else ''} changed]]")
+                href = f"{SOURCE.site}/explorers/{slug}?{urlencode(view.dimensions)}"
+                st.markdown(f"[Open this view ↗]({href})")
+                datapage.st_datapage_diff(
+                    view.fields,
+                    baseline_label=BASELINE_NAME.capitalize(),
+                    staging_label="This staging server",
+                    show_unchanged_slots=False,
+                )
+        rest = len(changed) - VIEWS_IN_CARD
+        if rest > 0:
+            st.caption(
+                f"{rest} further changed view{'s' if rest != 1 else ''} in this explorer — see them on the "
+                "Blast radius grid, or switch to **By change** to review the distinct edits."
+            )
 
 
 def _render_other(other: dict[str, list[ViewDiff]]) -> None:
@@ -114,10 +154,7 @@ def _render_explorer(source_engine: Engine, slug: str, diffs: list[ViewDiff]) ->
     marks = resolve_marks(source_engine, surface, groups)
 
     with st.container(border=True):
-        st.markdown(
-            f"**`{slug}`** :gray-badge[{len(diffs)} view{'s' if len(diffs) != 1 else ''}] "
-            f":small[:gray[{n_reviewed(marks)}/{len(marks)} reviewed]]"
-        )
+        st.markdown(f"**`{slug}`** :gray-badge[{len(diffs)} view{'s' if len(diffs) != 1 else ''}] ")
         st.markdown(
             f"[{BASELINE_NAME} ↗]({TARGET.site}/explorers/{slug}) · "
             f"[this staging server ↗]({SOURCE.site}/admin/explorers/preview/{slug})"
@@ -137,8 +174,7 @@ def _render_change(source_engine: Engine, surface: str, mark) -> None:
     """One distinct text change of an explorer, with the views it lands on and its reviewed toggle."""
     g = mark.group
     st.markdown(
-        f"{mark.icon} **{field_label(g.field)}** "
-        f":small[:gray[{len(g.view_dims)} view{'s' if len(g.view_dims) != 1 else ''}]]"
+        f"**{field_label(g.field)}** :small[:gray[{len(g.view_dims)} view{'s' if len(g.view_dims) != 1 else ''}]]"
     )
     with st.popover(f"Views ({len(g.view_dims)})", width="content"):
         st.markdown("\n".join(f"- {dims_str(d)}" for d in g.view_dims[:40]))
@@ -150,4 +186,3 @@ def _render_change(source_engine: Engine, surface: str, mark) -> None:
         staging_label="This staging server",
         show_unchanged_slots=False,
     )
-    st_reviewed_toggle(source_engine, surface, mark)

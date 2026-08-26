@@ -18,24 +18,37 @@ import pandas as pd
 import streamlit as st
 from sqlalchemy.engine.base import Engine
 
+from apps.wizard.app_pages.chart_diff.utils import SOURCE
 from apps.wizard.app_pages.metadata_diff import brief, cached, datapage, discovery
 from apps.wizard.app_pages.metadata_diff.blast_section import GROUP_KEY, TREE_MDIM_KEY
 from apps.wizard.app_pages.metadata_diff.core import field_label, group_usage
-from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, DIFF_CSS, markdown_output, st_origin_caption
+from apps.wizard.app_pages.metadata_diff.render import (
+    BASELINE_NAME,
+    DIFF_CSS,
+    markdown_output,
+    st_layout_switcher,
+    st_origin_caption,
+    view_label,
+    view_url,
+)
 from apps.wizard.app_pages.metadata_diff.review_state import (
-    n_reviewed,
     resolve_marks,
-    st_reviewed_toggle,
     surface_key,
 )
 from apps.wizard.utils.components import Pagination
 
 MDIMS_PER_PAGE = 4
+# The URL key that opens one MDim's views. A route, not a filter: the page shows that MDim's changed views
+# and nothing else, and the link survives a reload so it can be pasted to somebody else.
+VIEWS_KEY = "mdim-views"
+VIEWS_PER_PAGE = 5
+# Changed views drawn inline on an MDim's card before the rest fold away. A card is one item in a list of
+# MDims, so it shows enough to judge the MDim and hands the rest to the focused page.
+VIEWS_IN_CARD = 3
 
 # Changes shown open per MDim. There is no detail page to defer the rest to any more, so the cap is the
 # point at which a card stops being readable — a fold, not a cut: the remainder renders inside an
-# expander, with its Reviewed toggles, because `n_reviewed(marks)/len(marks)` counts every mark and a
-# change without a toggle is a counter that can never reach completion.
+# expander rather than being dropped, so the card's own count and what it shows can never disagree.
 MAX_INLINE_CHANGES = 12
 
 
@@ -44,6 +57,16 @@ def st_show_mdim_metadata_diffs(source_engine: Engine, target_engine: Engine) ->
     st.markdown(DIFF_CSS, unsafe_allow_html=True)
 
     df = cached.mdim_changes(source_engine, target_engine)
+
+    requested = str(st.session_state.get(VIEWS_KEY) or st.query_params.get(VIEWS_KEY) or "").strip()
+    if requested:
+        if requested in df.index:
+            st.session_state[VIEWS_KEY] = requested
+            _views_page(source_engine, target_engine, df, requested)
+            return
+        # A stale link — the MDim is no longer in the comparison. Say so instead of rendering an empty page.
+        st.warning(f"`{requested}` is not among the MDims that differ from `{BASELINE_NAME}` on this server.")
+        _clear_views()
     if df.empty:
         st.warning("No MDims found on this staging server.")
         return
@@ -83,16 +106,153 @@ def st_show_mdim_metadata_diffs(source_engine: Engine, target_engine: Engine) ->
             "most text edits are authored in the garden step and reach an MDim through indicator metadata, "
             "leaving its config identical.",
         )
+        layout = st_layout_switcher(
+            "🔍 View by view",
+            "**View by view** lists every changed view of every changed MDim, with its diffs",
+        )
         pagination = Pagination(flagged, items_per_page=MDIMS_PER_PAGE, pagination_key="mdd-mdims-pagination")
         if len(flagged) > MDIMS_PER_PAGE:
             pagination.show_controls()
         for catalog_path in pagination.get_page_items():
-            _render_card(source_engine, target_engine, df, catalog_path)
+            if layout == "items":
+                _render_views_card(source_engine, target_engine, df, catalog_path)
+            else:
+                _render_card(source_engine, target_engine, df, catalog_path)
         if len(flagged) > MDIMS_PER_PAGE:
             pagination.show_controls(position="bottom")
 
     _render_drafts(source_engine, target_engine, df, drafts)
     _render_other(others)
+
+
+def _render_views_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, catalog_path: str) -> None:
+    """One MDim, its changed views inline — the item view of a card.
+
+    Capped: an MDim can have hundreds of changed views, and this is a list of MDims. The rest fold into an
+    expander, and the card's own button opens the focused page where they are paginated properly.
+    """
+    row = df.loc[catalog_path]
+    title, dimensions, view_diffs = cached.mdim_view_diffs(
+        catalog_path, source_engine, target_engine, cache_key=_cache_key(row)
+    )
+    changed = [v for v in view_diffs if v.changed]
+    slug = str(row["slug_source"]) if row.get("slug_source") else ""
+
+    with st.container(border=True):
+        draft = " :orange-badge[📝 unpublished]" if row["is_draft"] else ""
+        st.markdown(f"**{title or catalog_path}**{draft}")
+        st.caption(f"`{catalog_path}` · {len(changed)} of {len(view_diffs)} views changed")
+        st.button(
+            "🔍 Open view by view",
+            key=f"mdd-views-open-{catalog_path}",
+            on_click=_open_views,
+            args=(catalog_path,),
+            help="This MDim's changed views on their own page, paginated.",
+        )
+        if not changed:
+            st.caption("Nothing this branch changed in the texts readers see.")
+            return
+        for view in changed[:VIEWS_IN_CARD]:
+            _render_view(view, view_label(view, dimensions), dimensions, catalog_path, slug, row)
+        rest = changed[VIEWS_IN_CARD:]
+        if rest:
+            with st.expander(f"… {len(rest)} more changed view{'s' if len(rest) != 1 else ''}"):
+                for view in rest[:MAX_INLINE_CHANGES]:
+                    _render_view(view, view_label(view, dimensions), dimensions, catalog_path, slug, row)
+                if len(rest) > MAX_INLINE_CHANGES:
+                    st.caption(
+                        f"{len(rest) - MAX_INLINE_CHANGES} further changed views are on the focused page — "
+                        "use **Open view by view** above."
+                    )
+
+
+def _views_page(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, catalog_path: str) -> None:
+    """One MDim, view by view: every changed view with its own diffs, in dimension order.
+
+    The list is the page. #6615's View diff put a set of dimension dropdowns first and rendered one view
+    once the selection happened to land on a changed one, so finding the changes was the work; here they
+    are already on screen and the selector below is a shortcut for a long MDim, not the way in.
+
+    Unchanged views are not drawn at all. The card that sent you here already reports how many of the
+    MDim's views changed, and a page of "no change" boxes is what the dimension grid is for.
+    """
+    row = df.loc[catalog_path]
+    title, dimensions, view_diffs = cached.mdim_view_diffs(
+        catalog_path, source_engine, target_engine, cache_key=_cache_key(row)
+    )
+    changed = [v for v in view_diffs if v.changed]
+
+    st.button("← All MDims", key="mdd-clear-views", on_click=_clear_views, help="Back to every changed MDim.")
+
+    draft = " :orange-badge[📝 unpublished]" if row["is_draft"] else ""
+    st.markdown(f"### {title or catalog_path}{draft}")
+    st.caption(f"`{catalog_path}` · {len(changed)} of {len(view_diffs)} views changed")
+
+    if not changed:
+        st.info("No view of this MDim renders a text this branch changed.")
+        return
+
+    slug = str(row["slug_source"]) if row.get("slug_source") else ""
+    labels = [view_label(v, dimensions) for v in changed]
+
+    if len(changed) > 1:
+        # Type to filter — a selectbox is searchable, which is what makes it useful at fifty views.
+        picked = st.selectbox(
+            "Jump to a view",
+            options=list(range(len(changed))),
+            format_func=lambda i: labels[i],
+            index=None,
+            placeholder="Type to search this MDim's changed views…",
+            key=f"mdd-view-jump-{catalog_path}",
+        )
+        if picked is not None:
+            _render_view(changed[picked], labels[picked], dimensions, catalog_path, slug, row)
+            st.caption("Clear the selection above to go back to the full list.")
+            return
+
+    pagination = Pagination(
+        list(zip(changed, labels)), items_per_page=VIEWS_PER_PAGE, pagination_key=f"mdd-views-{catalog_path}"
+    )
+    if len(changed) > VIEWS_PER_PAGE:
+        pagination.show_controls()
+    for view, label in pagination.get_page_items():
+        _render_view(view, label, dimensions, catalog_path, slug, row)
+    if len(changed) > VIEWS_PER_PAGE:
+        pagination.show_controls(position="bottom")
+
+
+def _render_view(view, label: str, dimensions: list, catalog_path: str, slug: str, row) -> None:
+    """One view: what it is called, where to open it, and every field of it that changed."""
+    with st.container(border=True):
+        n = len(view.fields)
+        head = f"**{label}**"
+        if view.is_new:
+            head += " :green-badge[🆕 new view]"
+        head += f" :small[:gray[{n} field{'s' if n != 1 else ''} changed]]"
+        st.markdown(head)
+        # An unpublished MDim has no reader-facing page, so its views open in the admin preview.
+        href = view_url(SOURCE, catalog_path, None if row["is_draft"] else slug, view.dimensions)
+        st.markdown(f"[Open this view ↗]({href})")
+        if view.is_new:
+            st.caption(f"This view does not exist on `{BASELINE_NAME}`, so there is no old text to compare.")
+        datapage.st_datapage_diff(
+            view.fields,
+            baseline_label=BASELINE_NAME.capitalize(),
+            staging_label="This staging server",
+            show_unchanged_slots=False,
+        )
+
+
+def _open_views(catalog_path: str) -> None:
+    """Open one MDim's views: the URL carries it, so the destination survives a reload and can be shared."""
+    st.query_params[VIEWS_KEY] = catalog_path
+    st.session_state[VIEWS_KEY] = catalog_path
+
+
+def _clear_views() -> None:
+    """Leave the view-by-view page."""
+    st.session_state[VIEWS_KEY] = ""
+    st.query_params.pop(VIEWS_KEY, None)
 
 
 def _render_drafts(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, drafts: list[str]) -> None:
@@ -176,7 +336,6 @@ def _render_card(source_engine: Engine, target_engine: Engine, df: pd.DataFrame,
             _card_actions(
                 source_engine, target_engine, catalog_path, marks, usage_for(source_engine, groups, catalog_path, row)
             )
-            st.caption(f"{n_reviewed(marks)}/{len(marks)} reviewed")
             for mark in marks[:MAX_INLINE_CHANGES]:
                 _render_change(source_engine, catalog_path, mark, attribution)
             folded = marks[MAX_INLINE_CHANGES:]
@@ -233,7 +392,7 @@ def _card_actions(
     The brief is generated from the ticks on this card — the one review state there is — so what it calls
     ready to apply is what somebody actually ticked here.
     """
-    col_brief, col_tree = st.columns(2)
+    col_brief, col_views, col_tree = st.columns(3)
     with col_brief:
         rows = [
             {
@@ -256,6 +415,15 @@ def _card_actions(
                 "pr-brief.md",
                 f"mdim_brief_{catalog_path}",
             )
+    with col_views:
+        st.button(
+            "🔍 View by view",
+            key=f"mdd-views-{catalog_path}",
+            on_click=_open_views,
+            args=(catalog_path,),
+            help="Every changed view of this MDim, with its diffs.",
+            width="stretch",
+        )
     with col_tree:
         st.button(
             "🌳 Dimension tree",
@@ -291,7 +459,7 @@ def _render_change(source_engine: Engine, catalog_path: str, mark, attribution: 
     reach = f"{len(g.view_dims)} view{'s' if len(g.view_dims) != 1 else ''}"
     scope = "🔗 shared indicator metadata" if g.affects_indicator else "🔒 MDim override"
 
-    st.markdown(f"{mark.icon} **{field_label(g.field)}** :small[:gray[{reach} · {scope}]]")
+    st.markdown(f"**{field_label(g.field)}** :small[:gray[{reach} · {scope}]]")
     st_origin_caption(g.catalog_paths or set(), attribution)
     datapage.st_datapage_diff(
         {g.field: {"old": g.old, "new": g.new}},
@@ -299,4 +467,3 @@ def _render_change(source_engine: Engine, catalog_path: str, mark, attribution: 
         staging_label="This staging server",
         show_unchanged_slots=False,
     )
-    st_reviewed_toggle(source_engine, surface_key("mdim", catalog_path), mark)

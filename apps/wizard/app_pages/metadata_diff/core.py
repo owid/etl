@@ -850,21 +850,15 @@ DEFAULT_SECTION = "blast"
 
 
 def section_label(section: str, progress: dict[str, tuple[int, int]]) -> str:
-    """Section label with a review marker — the same ✅ / 🟡 the change cards use.
+    """Just the section's name.
 
-    Deliberately not a count. `(2/10)` counted distinct text changes, and beside the word "Charts" that
-    reads as ten charts, which it is not: one text change can reach eight hundred of them. The number
-    belongs inside the section, next to what it counts. What the bar has to answer is narrower — is there
-    anything in here still to look at.
+    It carried a count once (`Charts (2/10)`, which read as ten charts and was ten *edits*), then a
+    ✅ / 🟡 review marker. With sign-off out of the UI there is no progress to report, and the bar's job is
+    narrower than it looks: name the surfaces, and grey the ones with nothing in them. `progress` is still
+    taken, because that greying reads its totals.
     """
     icon, name = SECTIONS[section]
-    if section not in COUNTED_SECTIONS:
-        return f"{icon} {name}"
-    done, total = progress.get(section, (0, 0))
-    if not total:
-        # Nothing to review. The button is greyed out for exactly this, so a marker would repeat it.
-        return f"{icon} {name}"
-    return f"{icon} {name} {'✅' if done >= total else '🟡'}"
+    return f"{icon} {name}"
 
 
 def empty_sections(progress: dict[str, tuple[int, int]], keep: Iterable[str] = ()) -> list[str]:
@@ -883,6 +877,19 @@ def empty_sections(progress: dict[str, tuple[int, int]], keep: Iterable[str] = (
     """
     forced = set(keep)
     return [s for s in SECTIONS if s in COUNTED_SECTIONS and s not in forced and progress.get(s, (0, 0))[1] == 0]
+
+
+# How a section lists what it found. "items" is the default everywhere: the question people arrive with is
+# what happened to a given view or chart, and grouping by change spreads one item's edits across cards.
+# "changes" is the edit-first list, and it is where sign-off lives — a tick is a decision about an edit.
+LAYOUTS = ("items", "changes")
+LAYOUT_QUERY_KEY = "layout"
+DEFAULT_LAYOUT = "items"
+
+
+def coerce_layout(value: object) -> str:
+    """Whatever the URL or the widget hands back, as a layout key."""
+    return str(value) if isinstance(value, str) and value in LAYOUTS else DEFAULT_LAYOUT
 
 
 def requested_chart(session_value: object, query_value: object) -> str:

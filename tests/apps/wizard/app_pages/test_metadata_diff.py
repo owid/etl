@@ -8,7 +8,6 @@ override (contained to the MDIM).
 import re
 
 import pandas as pd
-import pytest
 
 from apps.owidbot.metadata_diff import format_metadata_diff, status_icon
 from apps.wizard.app_pages.metadata_diff.brief import changed_text_lines, decision, garden_location_lines, ship_section
@@ -1478,22 +1477,21 @@ def test_a_reordered_list_still_shows_every_bullet():
 # --- Section badges -------------------------------------------------------------------------------
 
 
-def test_section_badges_answer_whether_anything_is_left_to_review():
-    """Whether anything is left — not how many of what, which a number beside "Charts" gets wrong."""
+def test_a_section_badge_is_just_its_name():
+    """It carried a count, then a review marker; with sign-off parked it carries neither.
+
+    The count was actively misleading — `Charts (2/10)` counted *edits*, and beside the word "Charts" it
+    read as ten charts, where one edit can reach eight hundred. Whatever the progress dict says, the label
+    is the name, and the bar's remaining job is to grey the sections with nothing in them.
+    """
     from apps.wizard.app_pages.metadata_diff.core import section_label as _section_label
 
-    assert _section_label("charts", {"charts": (0, 10)}).endswith("🟡")
-    assert _section_label("charts", {"charts": (3, 10)}).endswith("🟡")
-    assert _section_label("charts", {"charts": (10, 10)}).endswith("✅")
+    for progress in ({}, {"charts": (0, 10)}, {"charts": (3, 10)}, {"charts": (10, 10)}):
+        label = _section_label("charts", progress)
+        assert label.endswith("Charts"), label
+        assert not any(mark in label for mark in ("(", "🟡", "✅", "10")), label
 
-    # No count anywhere: "(2/10)" counted distinct text changes, and beside the word "Charts" that read
-    # as ten charts — one text change can reach eight hundred.
-    assert "10" not in _section_label("charts", {"charts": (3, 10)}).removeprefix(":material/show_chart:")
-
-    # A section with nothing in it gets no marker: it is greyed out for exactly that reason.
-    for empty in ({}, {"explorers": (0, 0)}):
-        label = _section_label("explorers", empty)
-        assert label.endswith("Explorers"), label
+    assert _section_label("explorers", {"explorers": (0, 0)}).endswith("Explorers")
 
 
 def test_a_tick_only_counts_while_the_text_it_was_made_against_stands(monkeypatch):
@@ -1571,41 +1569,6 @@ def test_coerce_section_recovers_a_section_from_its_label():
     assert coerce_section("", "explorers") == "explorers"
     assert coerce_section("charts-and-mdims", "mdims") == "mdims"
     assert coerce_section(3, "mdims") == "mdims"
-
-
-def test_a_stale_section_label_never_survives_as_a_value():
-    """The Streamlit behaviour behind the crash, checked where it actually happens.
-
-    `st.segmented_control` sends and receives the *formatted* label. Ours carry review state, so ticking
-    the last change in a section leaves the browser holding a label the widget no longer offers, and the
-    single-select serde returns that raw label in place of the option — which then reached `?diff-type=`
-    and made the next page load raise. Asserted through the coercion, so a Streamlit release that stops
-    leaking passes too.
-    """
-    button_group = pytest.importorskip("streamlit.elements.widgets.button_group")
-    serde_cls = getattr(button_group, "_SingleSelectButtonGroupSerde", None)
-    if serde_cls is None:
-        pytest.skip("Streamlit's single-select serde moved; coerce_section still guards the value")
-
-    from apps.wizard.app_pages.metadata_diff.core import SECTIONS, coerce_section, section_label
-
-    options = list(SECTIONS)
-    after = {"mdims": (10, 10)}  # the last change reviewed, so the marker flips: 🟡 -> ✅
-    formatted = [section_label(o, after) for o in options]
-    serde = serde_cls(
-        options,
-        formatted_options=formatted,
-        formatted_option_to_option_index={f: i for i, f in enumerate(formatted)},
-        format_func=lambda o: section_label(o, after),
-    )
-
-    stale = section_label("mdims", {"mdims": (2, 10)})
-    assert stale not in formatted, "the labels must differ, or there is nothing to defend against"
-    assert coerce_section(serde.deserialize([stale]), "charts") == "mdims"
-
-    # A label that is still current round-trips to its option, coercion or not.
-    current = formatted[options.index("mdims")]
-    assert coerce_section(serde.deserialize([current]), "charts") == "mdims"
 
 
 def test_section_switcher_keeps_the_url_on_a_section_key():
@@ -1836,8 +1799,8 @@ def test_blast_radius_badge_carries_no_review_counter():
     label = section_label("blast", {})
     assert label.endswith("Blast radius")
     assert "(" not in label and "🟡" not in label and "✅" not in label
-    # The review sections do carry the marker.
-    assert section_label("charts", {"charts": (2, 10)}).endswith("🟡")
+    # And neither does a review section, now that sign-off is out of the UI.
+    assert section_label("charts", {"charts": (2, 10)}).endswith("Charts")
 
 
 def test_diff_preview_windows_on_the_change_not_the_start():
@@ -2074,81 +2037,6 @@ def test_the_pr_brief_fetches_usage_for_every_indicator_of_a_shared_edit(monkeyp
 
     assert captured["ids"] == (11, 12, 13, 20)
     assert len(group_usage(shared, usage)["charts"]) == 3, "the brief reads every indicator's charts back out"
-
-
-def test_every_explorer_change_keeps_its_reviewed_toggle(monkeypatch):
-    """A change with no toggle is a `n/N reviewed` counter that can never reach completion.
-
-    Past the inline cap the extra changes used to render as a caption pointing at Chart Diff's TSV, which
-    can show their text but cannot tick anything here — so the Explorers badge stayed incomplete forever.
-    """
-    from streamlit.testing.v1 import AppTest
-
-    from apps.wizard.app_pages.metadata_diff import explorers_section, review_state
-
-    monkeypatch.setattr(review_state, "load_reviews", lambda engine, surface: {})
-    n_changes = explorers_section.MAX_INLINE_CHANGES + 3
-
-    def app() -> None:
-        from apps.wizard.app_pages.metadata_diff.core import ViewDiff
-        from apps.wizard.app_pages.metadata_diff.explorers_section import MAX_INLINE_CHANGES, _render_explorer
-
-        diffs = [
-            ViewDiff(
-                dimensions={"metric": f"m{i}"},
-                fields={"descriptionShort": {"old": f"Old {i}.", "new": f"New {i}."}},
-            )
-            for i in range(MAX_INLINE_CHANGES + 3)
-        ]
-        _render_explorer(None, "poverty-explorer", diffs)
-
-    at = AppTest.from_function(app, default_timeout=30)
-    at.run()
-
-    assert not at.exception
-    assert len(at.toggle) == n_changes, "every distinct change needs its own Reviewed toggle"
-
-
-def test_every_mdim_change_keeps_its_reviewed_toggle(monkeypatch):
-    """Same for an MDim card: the cap folds the rest away, it does not drop their controls.
-
-    `n_reviewed(marks)/len(marks)` counts every change on the card, so a change rendered as a caption
-    alone left the counter short of completion however much the reviewer read.
-    """
-    from streamlit.testing.v1 import AppTest
-
-    from apps.wizard.app_pages.metadata_diff import cached, discovery, mdims_section, review_state
-    from apps.wizard.app_pages.metadata_diff.core import ViewDiff, group_changes
-
-    monkeypatch.setattr(review_state, "load_reviews", lambda engine, surface: {})
-    n_changes = mdims_section.MAX_INLINE_CHANGES + 3
-    views = [
-        ViewDiff(
-            dimensions={"metric": f"m{i}"},
-            fields={"descriptionShort": {"old": f"Old {i}.", "new": f"New {i}."}},
-        )
-        for i in range(n_changes)
-    ]
-    monkeypatch.setattr(cached, "mdim_view_diffs", lambda *args, **kwargs: ("Incomes", [], views))
-    monkeypatch.setattr(discovery, "split_mdim_groups", lambda _path, changed: (group_changes(changed), []))
-
-    def app() -> None:
-        import pandas as pd
-
-        from apps.wizard.app_pages.metadata_diff.mdims_section import _render_card
-
-        catalog_path = "grapher/a/latest/incomes#incomes"
-        df = pd.DataFrame(
-            [{"is_new": False, "is_draft": False, "configMd5_source": "a", "configMd5_target": "b"}],
-            index=[catalog_path],
-        )
-        _render_card(None, None, df, catalog_path)
-
-    at = AppTest.from_function(app, default_timeout=30)
-    at.run()
-
-    assert not at.exception
-    assert len(at.toggle) == n_changes, "every distinct change needs its own Reviewed toggle"
 
 
 def test_chart_config_text_is_compared_because_the_indicator_row_never_carries_it():
@@ -2732,3 +2620,53 @@ def test_chart_text_looks_for_variables_in_the_channel_variables_live_in(monkeyp
         "grapher/ihme_gbd/2026-02-07/gbd_cause",
         "grapher/wb/2026-06-26/world_bank_pip",
     ], "every dataset in scope has to be asked for in the grapher channel, exactly once"
+
+
+def test_the_display_cap_folds_changes_away_but_never_drops_them(monkeypatch):
+    """Past the cap, an MDim card must still render every change — folded, not cut.
+
+    Codex found the original: changes beyond the cap were counted and then rendered as a caption, so they
+    could not be acted on at all. The controls that made it visible (a Reviewed toggle each) are parked,
+    but the invariant behind it is not — a card that says it holds N changes has to show N changes.
+    """
+    from streamlit.testing.v1 import AppTest
+
+    from apps.wizard.app_pages.metadata_diff import cached, discovery, mdims_section, review_state
+    from apps.wizard.app_pages.metadata_diff.core import ViewDiff, group_changes
+
+    # The card still resolves marks to iterate the changes — the toggles are gone, the grouping is not.
+    monkeypatch.setattr(review_state, "load_reviews", lambda engine, surface: {})
+    n_changes = mdims_section.MAX_INLINE_CHANGES + 3
+    views = [
+        ViewDiff(
+            dimensions={"metric": f"m{i}"},
+            # One inserted token per change, and nothing else different: the diff is rendered word by
+            # word, so a whole rewritten sentence comes back split across <ins>/<del> tags and cannot be
+            # searched for as a string.
+            fields={"descriptionShort": {"old": "Mean income per day.", "new": f"Mean income marker{i} per day."}},
+        )
+        for i in range(n_changes)
+    ]
+    monkeypatch.setattr(cached, "mdim_view_diffs", lambda *args, **kwargs: ("Incomes", [], views))
+    monkeypatch.setattr(discovery, "split_mdim_groups", lambda _path, changed: (group_changes(changed), []))
+
+    def app() -> None:
+        import pandas as pd
+
+        from apps.wizard.app_pages.metadata_diff.mdims_section import _render_card
+
+        catalog_path = "grapher/a/latest/incomes#incomes"
+        df = pd.DataFrame(
+            [{"is_new": False, "is_draft": False, "configMd5_source": "a", "configMd5_target": "b"}],
+            index=[catalog_path],
+        )
+        _render_card(None, None, df, catalog_path)
+
+    at = AppTest.from_function(app, default_timeout=60).run()
+    assert not at.exception
+
+    rendered = " ".join(str(getattr(el, "value", "") or "") for el in at.markdown) + " ".join(
+        str(getattr(el, "body", "") or "") for el in at.markdown
+    )
+    missing = [i for i in range(n_changes) if f"marker{i}" not in rendered]
+    assert not missing, f"changes dropped past the cap: {missing}"
