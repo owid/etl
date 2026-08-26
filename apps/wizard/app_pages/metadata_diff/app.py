@@ -28,6 +28,7 @@ from apps.wizard.app_pages.metadata_diff import (
     charts_section,
     explorers_section,
     mdims_section,
+    review_section,
 )
 from apps.wizard.app_pages.metadata_diff.core import empty_sections
 from apps.wizard.app_pages.metadata_diff.discovery import keep_sections
@@ -97,7 +98,9 @@ what ships is what you meant, and to see how far each change reaches.
     # are silences rather than findings, and those sections stay reachable.
     section = st_section_switcher(progress, empty_sections(progress, keep_sections(summary)))
 
-    if section == "blast":
+    if section == "review":
+        review_section.st_show_review(source_engine, target_engine)
+    elif section == "blast":
         blast_section.st_show_blast_radius(source_engine, target_engine)
     elif section == "mdims":
         mdims_section.st_show_mdim_metadata_diffs(source_engine, target_engine)

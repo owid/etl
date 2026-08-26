@@ -38,6 +38,7 @@ from apps.wizard.app_pages.metadata_diff.render import (
 )
 from apps.wizard.app_pages.metadata_diff.review_state import (
     resolve_item_mark,
+    st_item_note,
     st_reviewed_toggle,
     surface_key,
 )
@@ -93,6 +94,8 @@ def render_chart_review(
                 diff.fields,
             )
             st_reviewed_toggle(source_engine, surface, mark)
+    if diff.fields:
+        st_item_note(source_engine, surface_key("item", "chart"), mark)
     for g in groups:
         with st.expander(f"{field_label(g.field)}", expanded=True):
             c1, c2 = st.columns(2)

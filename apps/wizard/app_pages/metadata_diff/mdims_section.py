@@ -33,8 +33,10 @@ from apps.wizard.app_pages.metadata_diff.render import (
     view_url,
 )
 from apps.wizard.app_pages.metadata_diff.review_state import (
+    item_marker,
     resolve_item_mark,
     resolve_marks,
+    st_item_note,
     st_reviewed_toggle,
     surface_key,
 )
@@ -67,7 +69,7 @@ def st_show_mdim_metadata_diffs(source_engine: Engine, target_engine: Engine) ->
 
     # No early route on `?mdim-views=`: it used to render that MDim's page and return, which skipped the
     # layout switcher entirely — so once anything set the key (the picker and Next set it on every move),
-    # "By change" disappeared from the section. The browser reads the key as its selection instead.
+    # "By edit" disappeared from the section. The browser reads the key as its selection instead.
     if df.empty:
         st.warning("No MDims found on this staging server.")
         return
@@ -261,7 +263,10 @@ def _views_page(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, 
         return
 
     slug = str(row["slug_source"]) if row.get("slug_source") else ""
-    labels = [view_label(v, dimensions) for v in changed]
+    # One query for the whole MDim, so the jump can say what you have already done to each view.
+    item_surface = surface_key("item", f"mdim:{catalog_path}")
+    recorded = load_reviews(source_engine, item_surface)
+    labels = [item_marker(recorded, item_surface, dims_str(v.dimensions)) + view_label(v, dimensions) for v in changed]
 
     # Where we are, read from the URL rather than from the menu's return: the nav has to render before
     # the menu (its callbacks write the menu's state), so this is the only order in which "next" can be
@@ -323,6 +328,8 @@ def _render_view(view, label: str, dimensions: list, catalog_path: str, slug: st
                     load_reviews(source_engine, surface), surface, dims_str(view.dimensions), view.fields
                 )
                 st_reviewed_toggle(source_engine, surface, mark)
+        if source_engine is not None and view.fields:
+            st_item_note(source_engine, surface, mark)
         if view.is_new:
             st.caption(f"This view does not exist on `{BASELINE_NAME}`, so there is no old text to compare.")
         datapage.st_datapage_diff(

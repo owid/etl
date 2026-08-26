@@ -141,6 +141,21 @@ def view_url(env, catalog_path: str, published_slug: str | None, dims: dict[str,
     return f"{env.admin_site}/grapher/{urllib.parse.quote(catalog_path, safe='')}/?{params}"
 
 
+# The last layout the page actually rendered. Not the widget's key: a widget's state cannot be written
+# after it exists in the same run, and this has to survive exactly that moment.
+LAST_LAYOUT_KEY = "metadata-diff-layout-last"
+
+
+def _keep_layout_selected() -> None:
+    """Undo a deselection before the next run, so the active option never renders blank.
+
+    Callbacks run before the script does, which is the only window in which a widget's session value can
+    be set — hence a callback rather than a fix-up after the control is drawn.
+    """
+    if st.session_state.get(LAYOUT_QUERY_KEY) is None:
+        st.session_state[LAYOUT_QUERY_KEY] = st.session_state.get(LAST_LAYOUT_KEY, DEFAULT_LAYOUT)
+
+
 def st_layout_switcher(items_label: str, items_help: str) -> str:
     """The per-section "items or changes" control, with its choice kept in the URL.
 
@@ -155,18 +170,25 @@ def st_layout_switcher(items_label: str, items_help: str) -> str:
         if held is not None and held not in LAYOUTS:
             store[LAYOUT_QUERY_KEY] = coerce_layout(held)
 
-    layout = url_persist(st.segmented_control)(
+    raw = url_persist(st.segmented_control)(
         label="Layout",
         options=list(LAYOUTS),
-        format_func=lambda v: {"items": items_label, "changes": "🧬 By change"}[v],
+        format_func=lambda v: {"items": items_label, "changes": "🧬 By edit"}[v],
         key=LAYOUT_QUERY_KEY,
         value=DEFAULT_LAYOUT,
         label_visibility="collapsed",
+        on_change=_keep_layout_selected,
     )
-    layout = coerce_layout(layout)
+    # `st.segmented_control` is deselectable: clicking the option that is already active clears it and
+    # returns None. The page carried on showing the item view (None coerces to the default) while the
+    # control showed nothing selected — "sometimes they look unselected even if they are". The callback
+    # puts the value back before the next run, so it renders selected again; this fallback covers the run
+    # in which the click happened, where the widget's own value is already None.
+    layout = coerce_layout(raw if raw is not None else st.session_state.get(LAST_LAYOUT_KEY))
+    st.session_state[LAST_LAYOUT_KEY] = layout
     st.caption(
-        f"{items_help} · **By change** groups the same edits — one reworded sentence listed once, with "
-        "everywhere it lands underneath."
+        f"{items_help} · **By edit** groups them the way Blast radius does — one reworded sentence listed "
+        "once, with everywhere it lands underneath."
     )
     return layout
 
@@ -704,6 +726,12 @@ def st_section_switcher(progress: dict[str, tuple[int, int]], empty: Iterable[st
                 ),
                 width="stretch",
             )
+
+    st.caption(
+        "Left to right: **Blast radius** for how far this branch's edits reach, then **Charts**, **MDims** "
+        "and **Explorers** to read and tick them off one at a time, then **Review** to collect what you "
+        "wrote down."
+    )
 
     # Keep the default out of the URL, as url_persist does, so a plain link stays plain. Written only on
     # a real change, so a run that touches nothing leaves the URL alone.

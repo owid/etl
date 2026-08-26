@@ -24,8 +24,10 @@ from apps.wizard.app_pages.metadata_diff.core import ViewDiff, dims_str, field_l
 from apps.wizard.app_pages.metadata_diff.data import load_reviews
 from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, DIFF_CSS, st_layout_switcher
 from apps.wizard.app_pages.metadata_diff.review_state import (
+    item_marker,
     resolve_item_mark,
     resolve_marks,
+    st_item_note,
     st_reviewed_toggle,
     surface_key,
 )
@@ -172,7 +174,13 @@ def _explorer_views(source_engine: Engine, slug: str, diffs: list[ViewDiff]) -> 
         return
 
     dimensions = view_nav.dimensions_from_views(changed)
-    labels = [" · ".join(str(v) for v in view.dimensions.values()) or "(view)" for view in changed]
+    item_surface = surface_key("item", f"explorer:{slug}")
+    recorded = load_reviews(source_engine, item_surface)
+    labels = [
+        item_marker(recorded, item_surface, dims_str(view.dimensions))
+        + (" · ".join(str(v) for v in view.dimensions.values()) or "(view)")
+        for view in changed
+    ]
 
     url_selection = view_nav.url_selection(dimensions, DIM_PARAM_PREFIX)
     position = view_nav.displayed_index(changed, url_selection)
@@ -207,6 +215,7 @@ def _render_explorer_view(source_engine: Engine, slug: str, view: ViewDiff, labe
                 load_reviews(source_engine, surface), surface, dims_str(view.dimensions), view.fields
             )
             st_reviewed_toggle(source_engine, surface, mark)
+        st_item_note(source_engine, surface, mark)
         datapage.st_datapage_diff(
             view.fields,
             baseline_label=BASELINE_NAME.capitalize(),

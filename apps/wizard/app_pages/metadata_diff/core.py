@@ -857,6 +857,9 @@ SECTIONS = {
     "charts": (":material/show_chart:", "Charts"),
     "mdims": (":material/dashboard:", "MDims"),
     "explorers": (":material/explore:", "Explorers"),
+    # Last on the bar because it is last in the pass: it collects what the three surface sections
+    # recorded. Uncounted, like Blast radius — it holds no changes of its own.
+    "review": (":material/task_alt:", "Review"),
 }
 # Sections whose badge counts reviewed changes. Blast radius holds no sign-off of its own — it reports
 # reach — so a counter there would read as "nothing to review" when it means "nothing to count".
@@ -908,7 +911,10 @@ DEFAULT_LAYOUT = "items"
 # and Explorers, "Chart by chart" on Charts), which is exactly why a label can arrive under this key that
 # the current section does not offer.
 ITEMS_LABEL_MARK = "🔍"
-CHANGES_LABEL_MARK = "By change"
+# "By change" was this option's name until it was renamed to match Blast radius's "🧬 By edit". Both are
+# recognised: a link written before the rename still resolves to the grouping it meant, rather than
+# silently landing on the item view.
+CHANGES_LABEL_MARKS = ("By edit", "By change")
 
 
 def coerce_layout(value: object) -> str:
@@ -924,7 +930,7 @@ def coerce_layout(value: object) -> str:
         return DEFAULT_LAYOUT
     if value in LAYOUTS:
         return value
-    if CHANGES_LABEL_MARK in value:
+    if any(mark in value for mark in CHANGES_LABEL_MARKS):
         return "changes"
     if value.startswith(ITEMS_LABEL_MARK):
         return "items"

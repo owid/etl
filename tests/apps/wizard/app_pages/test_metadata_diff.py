@@ -2689,6 +2689,8 @@ def test_a_layout_label_never_survives_as_a_value():
     # Every label any section can render maps back to the option it denotes.
     for label in ("🔍 View by view", "🔍 Chart by chart", "🔍 Anything by anything"):
         assert coerce_layout(label) == "items", label
+    assert coerce_layout("🧬 By edit") == "changes"
+    # The name before the rename to match Blast radius, still honoured so old links resolve.
     assert coerce_layout("🧬 By change") == "changes"
 
     # The options themselves pass through untouched, and junk lands on the default.

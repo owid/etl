@@ -26,7 +26,13 @@ from apps.wizard.app_pages.metadata_diff.core import (  # noqa: F401
     mark_identity,
     surface_key,
 )
-from apps.wizard.app_pages.metadata_diff.data import REVIEWED, delete_review, load_reviews, upsert_review
+from apps.wizard.app_pages.metadata_diff.data import (
+    NOTED,
+    REVIEWED,
+    delete_review,
+    load_reviews,
+    upsert_review,
+)
 
 
 @dataclass
@@ -41,6 +47,7 @@ class ReviewMark:
     stale: bool  # was ticked, but the text changed afterwards — counts as not reviewed
     reviewer: str | None = None
     updated_at: Any = None
+    note: str = ""  # free text the reviewer wrote about this item; survives unticking
 
     @property
     def icon(self) -> str:
@@ -87,10 +94,12 @@ def resolve_item_mark(stored: dict[str, Any], surface: str, item_key: str, field
         group=None,
         change_key=change_key,
         content_hash=content_hash,
-        reviewed=bool(row) and not stale,
+        # Ticked, not merely present: a row can exist to hold a note and nothing else.
+        reviewed=bool(row) and row.get("status") == REVIEWED and not stale,
         stale=stale,
         reviewer=(row or {}).get("reviewer"),
         updated_at=(row or {}).get("updatedAt"),
+        note=str((row or {}).get("comment") or ""),
     )
 
 
@@ -119,7 +128,10 @@ def st_reviewed_toggle(engine: Engine, surface: str, mark: ReviewMark, key_suffi
 
     def _save() -> None:
         if st.session_state.get(widget_key):
-            upsert_review(engine, surface, mark.change_key, mark.content_hash, REVIEWED, None, reviewer())
+            upsert_review(engine, surface, mark.change_key, mark.content_hash, REVIEWED, mark.note or None, reviewer())
+        elif mark.note:
+            # Unticking must not throw away what the reviewer wrote: the row stays, holding the note.
+            upsert_review(engine, surface, mark.change_key, mark.content_hash, NOTED, mark.note, reviewer())
         else:
             delete_review(engine, mark.change_key)
 
@@ -135,6 +147,60 @@ def st_reviewed_toggle(engine: Engine, surface: str, mark: ReviewMark, key_suffi
     elif mark.reviewed and mark.reviewer:
         when = f" · {mark.updated_at}" if mark.updated_at else ""
         st.caption(f"Marked reviewed by **{mark.reviewer}**{when}")
+
+
+def item_marker(stored: dict[str, Any], surface: str, item_key: str) -> str:
+    """ "✅ " if this item is ticked, "📝 " if it only carries a note, "" if neither — for a picker label.
+
+    Reads the slot only. The change key is a hash of surface and item, not of the text, so this needs
+    nothing diffed — which is what makes it usable in a list of sixty-seven charts. The consequence is
+    that it cannot see staleness: a tick recorded against text edited since still shows ✅ here, while the
+    item's own page, which does have the text, shows it as needing another look.
+    """
+    change_key, _ = item_identity(surface, item_key, {})
+    row = stored.get(change_key)
+    if not row:
+        return ""
+    if row.get("status") == REVIEWED:
+        return "✅ "
+    return "📝 " if row.get("comment") else ""
+
+
+def st_item_note(engine: Engine, surface: str, mark: ReviewMark, label: str = "") -> None:
+    """A note box for one item, saved as you leave it, and never mistaken for a tick.
+
+    Collapsed unless something is written, so a page of items is a page of items. A note-only row carries
+    the `noted` status, so `reviewed` stays false and the Review tab can tell the two apart.
+    """
+    widget_key = f"mdd-note::{surface}::{mark.change_key}::{mark.content_hash[:8]}"
+    if widget_key not in st.session_state:
+        st.session_state[widget_key] = mark.note
+
+    def _save() -> None:
+        note = str(st.session_state.get(widget_key) or "").strip()
+        if note:
+            status = REVIEWED if mark.reviewed else NOTED
+            upsert_review(engine, surface, mark.change_key, mark.content_hash, status, note, reviewer())
+        elif mark.reviewed:
+            upsert_review(engine, surface, mark.change_key, mark.content_hash, REVIEWED, None, reviewer())
+        else:
+            delete_review(engine, mark.change_key)
+
+    with st.expander(
+        f"📝 Note{' — written' if mark.note else ''}{f' · {label}' if label else ''}", expanded=bool(mark.note)
+    ):
+        st.text_area(
+            "Note",
+            key=widget_key,
+            on_change=_save,
+            height=90,
+            placeholder="What you want to remember about this one — a question, a follow-up, a reason.",
+            label_visibility="collapsed",
+        )
+        st.caption(
+            "Saved on this staging server as you leave the box, and collected in the **Review** tab. Like "
+            "the ticks, it is never synced anywhere on merge."
+        )
 
 
 def reviewer() -> str | None:

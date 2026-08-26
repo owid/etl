@@ -29,6 +29,7 @@ from apps.wizard.app_pages.metadata_diff.core import (
     parse_catalog_path,
     requested_chart,
 )
+from apps.wizard.app_pages.metadata_diff.data import load_reviews
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
     DIFF_CSS,
@@ -38,6 +39,7 @@ from apps.wizard.app_pages.metadata_diff.render import (
     st_origin_caption,
 )
 from apps.wizard.app_pages.metadata_diff.review_state import (
+    item_marker,
     resolve_marks,
     surface_key,
 )
@@ -132,6 +134,9 @@ def _chart_browser(source_engine: Engine, target_engine: Engine, groups, usage: 
         return
 
     slugs = sorted(counts, key=lambda slug: (-counts[slug], slug))
+    # One query for every chart's recorded state, so the picker can mark what you have already done.
+    item_surface = surface_key("item", "chart")
+    recorded = load_reviews(source_engine, item_surface)
     current = requested_chart(st.session_state.get("chart"), st.query_params.get("chart"))
     if current not in slugs:
         # Nothing chosen yet (or a slug from another branch): open the most-changed chart rather than an
@@ -146,7 +151,10 @@ def _chart_browser(source_engine: Engine, target_engine: Engine, groups, usage: 
             f"Chart {position + 1} of {len(slugs)} changed by this branch",
             options=slugs,
             index=position,
-            format_func=lambda slug: f"{slug} · {counts[slug]} change{'s' if counts[slug] != 1 else ''}",
+            format_func=lambda slug: (
+                item_marker(recorded, item_surface, slug)
+                + f"{slug} · {counts[slug]} change{'s' if counts[slug] != 1 else ''}"
+            ),
             key="mdd-chart-picker",
             on_change=_pick_chart,
             help="Type to search. Every chart here has at least one text this branch changed.",

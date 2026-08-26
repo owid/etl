@@ -60,6 +60,28 @@ def load_reviews(engine: Engine, catalog_path: str) -> dict[str, dict[str, Any]]
 # Stored status for a change the reviewer has ticked off in a list. Distinct from the Review page's
 # "approved"/"flagged", so a list tick is never mistaken for a sign-off.
 REVIEWED = "reviewed"
+# A row that exists only to hold a note. Needed because "reviewed" used to mean "a row exists": writing a
+# note without ticking would otherwise have marked the item reviewed.
+NOTED = "noted"
+
+
+def load_item_notes(engine: Engine, prefix: str = "list:item:") -> list[dict[str, Any]]:
+    """Every note and tick on the item surfaces, newest first — what the Review tab consolidates.
+
+    Keyed by surface rather than fetched per item: the tab's whole job is to gather what is scattered
+    across the sections, and one query does it.
+
+    The prefix is `list:item:`, not `item:`: `surface_key` namespaces every surface with `list:`, so a
+    query for `item:%` matched nothing and the tab showed "nothing recorded" over a table with rows in it.
+    """
+    _ensure_review_table(engine)
+    df = read_sql(
+        "select catalogPath, changeKey, contentHash, status, comment, reviewer, updatedAt "
+        "from metadata_review where catalogPath like %(pat)s order by updatedAt desc",
+        engine=engine,
+        params={"pat": f"{prefix}%"},
+    )
+    return [{str(k): v for k, v in row.to_dict().items()} for _, row in df.iterrows()]
 
 
 def count_ticked(engine: Engine, entries: list[tuple[str, str, str]]) -> int:
