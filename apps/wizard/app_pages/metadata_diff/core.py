@@ -369,10 +369,12 @@ def view_url(env, catalog_path: str, published_slug: str | None, dims: dict[str,
     has a slug: `/grapher/<slug>` 404s until publication, while the admin preview renders the page and
     applies the dimensions from the query string (both verified against a staging server).
     """
-    params = urlencode(dims)
+    # No dimensions means the MDim's own page, so no query string at all: `?` on the end of a URL pasted
+    # into an issue looks like something got cut off.
+    query = f"?{urlencode(dims)}" if dims else ""
     if published_slug:
-        return f"{env.site}/grapher/{published_slug}?{params}"
-    return f"{env.admin_site}/grapher/{quote(catalog_path, safe='')}/?{params}"
+        return f"{env.site}/grapher/{published_slug}{query}"
+    return f"{env.admin_site}/grapher/{quote(catalog_path, safe='')}/{query}"
 
 
 # The last layout the page actually rendered. Not the widget's key: a widget's state cannot be written
@@ -521,6 +523,10 @@ class ChangeGroup:
     # `definitions.*`/anchor edit (one template renders into many variables) — the PR brief points there
     # instead of guessing a single variable, and warns the observed reach is a floor.
     catalog_paths: set[str] = field(default_factory=set)
+    # Indicators this text was seen on, whether or not their own metadata changed — so a chart-config edit
+    # can still name the garden dataset it was authored in. Read by the reporting, never by the
+    # shared-definition reasoning.
+    authored_in: set[str] = field(default_factory=set)
 
 
 def dims_str(dims: dict[str, str]) -> str:
@@ -661,6 +667,11 @@ def group_changes(view_diffs: list[ViewDiff]) -> list[ChangeGroup]:
                 groups[key] = g
                 order.append(key)
             g.view_dims.append(v.dimensions)
+            # Where the text was found, whatever layer it came from. `catalog_paths` below is narrower on
+            # purpose — it means "the indicator's own metadata changed", which is what licenses the
+            # shared-definition claim — while this only answers "which garden dataset authored this".
+            if v.catalog_path:
+                g.authored_in.add(v.catalog_path)
             if v.indicator_replaced:
                 g.indicator_replaced = True
             if fld in v.indicator_changed_fields:

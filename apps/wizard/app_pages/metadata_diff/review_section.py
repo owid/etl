@@ -17,7 +17,7 @@ from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.chart_diff.utils import SOURCE
 from apps.wizard.app_pages.metadata_diff import cached
-from apps.wizard.app_pages.metadata_diff.core import field_label
+from apps.wizard.app_pages.metadata_diff.core import distinct_garden_datasets, field_label, view_url
 from apps.wizard.app_pages.metadata_diff.data import REVIEWED, load_item_notes
 from apps.wizard.app_pages.metadata_diff.discovery import group_by_edit, reach_by_surface
 from apps.wizard.app_pages.metadata_diff.render import (
@@ -255,8 +255,41 @@ def _changes_markdown(summary: Any) -> str:
             before, after = _around_change(first.old, first.new)
             lines.append(f"- before: “{before}”")
             lines.append(f"- after: “{after}”")
+        lines += _where_to_look(edit)
         lines.append("")
     return "\n".join(lines)
+
+
+def _where_to_look(edit: Any) -> list[str]:
+    """Which dataset the edit is in, and which MDims and explorers to open — named and linked.
+
+    The counts above say how far it reaches; these say where to go. Datasets are the garden step dirs the
+    indicators resolve to, so a shared definition edited in two datasets names both — pointing at one
+    would send somebody to fix half of it.
+    """
+    lines: list[str] = []
+
+    datasets = distinct_garden_datasets({p for change in edit.changes for p in (change.catalog_paths or set())})
+    if datasets:
+        lines.append("- datasets: " + ", ".join(f"`{d}`" for d in datasets))
+
+    mdims: dict[str, dict[str, Any]] = {}
+    for change in edit.changes:
+        for mdim in change.mdims:
+            mdims.setdefault(str(mdim["catalogPath"]), mdim)
+    if mdims:
+        named = []
+        for path, mdim in sorted(mdims.items(), key=lambda kv: str(kv[1].get("title") or kv[0])):
+            slug = str(mdim.get("slug") or "")
+            url = view_url(SOURCE, path, None if mdim.get("is_draft") else slug, {})
+            draft = " (unpublished)" if mdim.get("is_draft") else ""
+            named.append(f"[{mdim.get('title') or path}]({url}){draft} — `{path}`")
+        lines.append("- MDims: " + "; ".join(named))
+
+    explorers = sorted({str(e["slug"]) for change in edit.changes for e in change.explorers})
+    if explorers:
+        lines.append("- explorers: " + ", ".join(f"[{slug}]({SOURCE.site}/explorers/{slug})" for slug in explorers))
+    return lines
 
 
 def _trimmed(value: Any, limit: int = 240) -> str:

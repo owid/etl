@@ -590,13 +590,18 @@ def chart_text_rows(engine: Engine, dataset_paths: list[str]) -> dict[str, dict[
             params[f"p{i}_{j}"] = pattern
             alternatives.append(f"v.catalogPath like %(p{i}_{j})s")
         clauses.append("(" + " or ".join(alternatives) + ")")
+    # Grouped rather than `distinct`, so one row per chart even when several of its indicators match, and
+    # so `catalogPath` can come back with it: a chart-config edit is authored in a garden step, and naming
+    # it is what lets the shared summary say where to go. Every selected column is aggregated because the
+    # group key is the chart and the rest live on other tables (ONLY_FULL_GROUP_BY).
     df = read_sql(
         f"""
-        select distinct c.id as chartId,
-               cc.slug as slug,
-               cc.{cfg} ->> '$.title' as title,
-               cc.{cfg} ->> '$.subtitle' as subtitle,
-               cc.{cfg} ->> '$.note' as note
+        select c.id as chartId,
+               min(cc.slug) as slug,
+               min(cc.{cfg} ->> '$.title') as title,
+               min(cc.{cfg} ->> '$.subtitle') as subtitle,
+               min(cc.{cfg} ->> '$.note') as note,
+               min(v.catalogPath) as catalogPath
         from charts c
         join chart_configs cc on cc.id = c.configId
         join chart_dimensions cd on cd.chartId = c.id
@@ -604,6 +609,7 @@ def chart_text_rows(engine: Engine, dataset_paths: list[str]) -> dict[str, dict[
         where c.publishedAt is not null
           and cc.slug is not null
           and ({" or ".join(clauses)})
+        group by c.id
         """,
         engine=engine,
         params=params,
@@ -661,7 +667,9 @@ def compare_chart_texts(
         src = build_view_bundle(
             view={"dimensions": {"chart": slug}},
             config_metadata=None,
-            variable_row=None,
+            # Only for its catalogPath: the text being compared is the chart's own config, not the
+            # indicator's metadata, but the indicator is what says which garden dataset authored it.
+            variable_row={"catalogPath": src_row.get("catalogPath")} if src_row.get("catalogPath") else None,
             chart_config={key: src_row.get(key) for key in CHART_FIELDS},
         )
         tgt = build_view_bundle(
@@ -1374,6 +1382,10 @@ class ChangeReach:
     draft_charts: list[dict[str, Any]] = field(default_factory=list)
     mdims: list[dict[str, Any]] = field(default_factory=list)  # {catalogPath, n_views, is_draft}
     explorers: list[dict[str, Any]] = field(default_factory=list)  # {slug, n_views}
+    # The indicators carrying this text, so anything reporting the edit can name the garden dataset it was
+    # authored in. A shared definition edited in two datasets collapses into one row here, and both paths
+    # are kept: naming one of them would send somebody to fix half the change.
+    catalog_paths: set[str] = field(default_factory=set)
 
     @property
     def n_reader_facing(self) -> int:
@@ -1536,6 +1548,7 @@ def _reach_slot(reach: dict[tuple[str, str], ChangeReach], g: ChangeGroup) -> Ch
     if slot is None:
         slot = ChangeReach(field=g.field, old=g.old, new=g.new)
         reach[key] = slot
+    slot.catalog_paths |= set(g.authored_in or g.catalog_paths or ({g.catalog_path} if g.catalog_path else set()))
     return slot
 
 
