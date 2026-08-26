@@ -143,7 +143,7 @@ class ArticleRef:
 
 
 # TODO: Remove this guard (and the defer() in _get_target_charts) once
-# owid-grapher #6553 — which adds charts.catalogPath and charts.configIdETL — is
+# owid-grapher #6826 — which adds charts.etlConfigCatalogPath and charts.patchConfigIdETL — is
 # merged to master and deployed. Until then PRODUCTION's charts table lacks those
 # columns, so chart-diff (which queries prod) must not select or match on them.
 # We detect their presence at runtime instead of using a manual flag, so the
@@ -159,7 +159,7 @@ def _charts_table_has_etl_columns(engine) -> bool:
             text(
                 "SELECT COUNT(*) FROM information_schema.COLUMNS "
                 "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'charts' "
-                "AND COLUMN_NAME IN ('catalogPath', 'configIdETL')"
+                "AND COLUMN_NAME IN ('etlConfigCatalogPath', 'patchConfigIdETL')"
             )
         ).scalar()
     return n == 2
@@ -198,8 +198,8 @@ def _same_chart_across_envs(source_chart: gm.Chart, target_chart: gm.Chart) -> b
         return True
     if (
         _target_has_etl_columns(target_chart)
-        and source_chart.catalogPath
-        and source_chart.catalogPath == target_chart.catalogPath
+        and source_chart.etlConfigCatalogPath
+        and source_chart.etlConfigCatalogPath == target_chart.etlConfigCatalogPath
     ):
         return True
     # Legacy fallback for charts synced before config UUIDs were carried
@@ -216,7 +216,9 @@ def _is_cross_env_twin(source_chart: gm.Chart, target_chart: gm.Chart | None) ->
         return True
     if not _target_has_etl_columns(target_chart):
         return False
-    return bool(source_chart.catalogPath and source_chart.catalogPath == target_chart.catalogPath)
+    return bool(
+        source_chart.etlConfigCatalogPath and source_chart.etlConfigCatalogPath == target_chart.etlConfigCatalogPath
+    )
 
 
 # Keys the ETL bootstrap (and the server-side rediff) leaves in a chart's admin
@@ -647,7 +649,7 @@ class ChartDiff:
             # both patches to flag deliberate staging admin edits in the UI.
             source_patch_config = None
             target_patch_config = None
-            is_etl_managed = getattr(source_chart, "configIdETL", None) is not None
+            is_etl_managed = getattr(source_chart, "patchConfigIdETL", None) is not None
             if is_etl_managed or (target_chart is not None and _is_cross_env_twin(source_chart, target_chart)):
                 source_patch_config = source_chart.load_patch_config(source_session)
                 if target_chart is not None:
@@ -837,14 +839,14 @@ class ChartDiff:
                 if target_has_cols:
                     target_charts_list = gm.Chart.load_charts(target_session, chart_ids=chart_ids)
                 else:
-                    # prod doesn't have charts.catalogPath/configIdETL yet, so don't
+                    # prod doesn't have charts.etlConfigCatalogPath/patchConfigIdETL yet, so don't
                     # SELECT them (it would raise "Unknown column"). See
                     # _charts_table_has_etl_columns.
                     target_charts_list = list(
                         target_session.scalars(
                             select(gm.Chart)
                             .where(gm.Chart.id.in_(list(chart_ids)))
-                            .options(defer(gm.Chart.catalogPath), defer(gm.Chart.configIdETL))
+                            .options(defer(gm.Chart.etlConfigCatalogPath), defer(gm.Chart.patchConfigIdETL))
                         ).all()
                     )
                     if not target_charts_list:
@@ -868,16 +870,16 @@ class ChartDiff:
 
                 stmt = select(gm.Chart).where(gm.Chart.configId == source_chart.configId)
                 if not target_has_cols:
-                    stmt = stmt.options(defer(gm.Chart.catalogPath), defer(gm.Chart.configIdETL))
+                    stmt = stmt.options(defer(gm.Chart.etlConfigCatalogPath), defer(gm.Chart.patchConfigIdETL))
                 twin = target_session.scalars(stmt).one_or_none()
                 if twin is not None:
                     target_charts[source_chart_id] = twin
                     continue
 
-                if target_has_cols and source_chart.catalogPath:
+                if target_has_cols and source_chart.etlConfigCatalogPath:
                     try:
                         target_charts[source_chart_id] = gm.Chart.load_chart(
-                            target_session, catalog_path=source_chart.catalogPath
+                            target_session, catalog_path=source_chart.etlConfigCatalogPath
                         )
                     except NoResultFound:
                         pass

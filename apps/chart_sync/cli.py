@@ -268,8 +268,8 @@ def cli(
                         cross_env_twin = diff.source_chart.id != diff.target_chart.id and (
                             same_config_uuid(diff.source_chart.configId, diff.target_chart.configId)
                             or (
-                                diff.source_chart.catalogPath
-                                and diff.source_chart.catalogPath == diff.target_chart.catalogPath
+                                diff.source_chart.etlConfigCatalogPath
+                                and diff.source_chart.etlConfigCatalogPath == diff.target_chart.etlConfigCatalogPath
                             )
                         )
 
@@ -314,7 +314,7 @@ def cli(
                                     target_api.upsert_chart_etl_config(
                                         chart_config_id=diff.target_chart.configId,
                                         grapher_config=migrated_etl_config,
-                                        catalog_path=diff.source_chart.catalogPath,
+                                        catalog_path=diff.source_chart.etlConfigCatalogPath,
                                         user_id=user_id,
                                     )
                                 if push_admin_patch:
@@ -357,7 +357,7 @@ def cli(
                                     resp = target_api.upsert_chart_etl_config(
                                         chart_config_id=source_config_id,
                                         grapher_config=migrated_etl_config,
-                                        catalog_path=diff.source_chart.catalogPath,
+                                        catalog_path=diff.source_chart.etlConfigCatalogPath,
                                         user_id=user_id,
                                     )
                                     if push_admin_patch:

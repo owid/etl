@@ -392,9 +392,11 @@ class Chart(Base):
     configId: Mapped[str] = mapped_column(CHAR(36))
     # The authored layer, as its own chart_configs row. `configId` is what renders.
     patchConfigId: Mapped[bytes] = mapped_column(CHAR(36))
-    configIdETL: Mapped[bytes | None] = mapped_column(CHAR(36), init=False)
-    # ETL step that authored this chart (mirrors multi_dim_data_pages.catalogPath); NULL for hand-authored charts.
-    catalogPath: Mapped[str | None] = mapped_column(VARCHAR(767), init=False)
+    # The ETL-authored layer, as its own chart_configs row (mirrors variables.patchConfigIdETL, per chart).
+    patchConfigIdETL: Mapped[bytes | None] = mapped_column(CHAR(36), init=False)
+    # ETL step that authored this chart's ETL layer (mirrors multi_dim_data_pages.catalogPath); NULL for
+    # hand-authored charts. Not an identifier: it records the current owner and may change on a step rename.
+    etlConfigCatalogPath: Mapped[str | None] = mapped_column(VARCHAR(767), init=False)
     isInheritanceEnabled: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'1'"))
     forceDatapage: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
@@ -464,7 +466,7 @@ class Chart(Base):
         elif slug:
             cond = cls.slug == slug
         elif catalog_path:
-            cond = cls.catalogPath == catalog_path
+            cond = cls.etlConfigCatalogPath == catalog_path
         elif config_id:
             cond = cls.configId == config_id
         else:
@@ -532,7 +534,7 @@ class Chart(Base):
         """Load the chart's ETL-authored config layer, if it has one."""
         assert self.id, "Chart must come from a database"
         etl_config = session.scalar(
-            select(ChartConfig.config).join(Chart, ChartConfig.id == Chart.configIdETL).where(Chart.id == self.id)
+            select(ChartConfig.config).join(Chart, ChartConfig.id == Chart.patchConfigIdETL).where(Chart.id == self.id)
         )
         return copy.deepcopy(etl_config) if etl_config else None
 

@@ -15,7 +15,7 @@ def _chart(chart_id: int, created_at: datetime, catalog_path: str | None = None,
         id=chart_id,
         createdAt=created_at,
         updatedAt=created_at + timedelta(hours=1),
-        catalogPath=catalog_path,
+        etlConfigCatalogPath=catalog_path,
         configId=config_id or f"config-uuid-{chart_id}",
     )
 
