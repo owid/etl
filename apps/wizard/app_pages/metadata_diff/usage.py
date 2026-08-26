@@ -42,7 +42,7 @@ def charts_using_indicators(engine: Engine, indicator_ids: list[int]) -> dict[in
             select cd.variableId as variableId,
                    c.id as chartId,
                    cc.slug as slug,
-                   cc.full ->> '$.title' as title
+                   cc.config ->> '$.title' as title
             from chart_dimensions cd
             join charts c on c.id = cd.chartId
             join chart_configs cc on cc.id = c.configId

@@ -30,7 +30,7 @@ METADATA_FIELDS = {
     "descriptionFromProducer": "Description from producer",
 }
 
-# Chart text fields, taken from the per-view chart config (chart_configs.full).
+# Chart text fields, taken from the per-view chart config (chart_configs.config).
 CHART_FIELDS = {
     "title": "Chart title",
     "subtitle": "Chart subtitle",
@@ -144,7 +144,7 @@ def build_view_bundle(
     - `variable_row`: row of the `variables` table for the view's first y-indicator.
     - `config_metadata`: MDIM-level `metadata` override (applies to all views).
     - `view["metadata"]`: view-level override; merged last, element-wise for lists.
-    - `chart_config`: the view's chart config (`chart_configs.full`).
+    - `chart_config`: the view's chart config (`chart_configs.config`).
     """
     base: dict[str, Any] = {}
     indicator_id: int | None = None

@@ -307,9 +307,9 @@ def fetch_chart_text(engine: Engine, config_uuids: list[str]) -> dict[str, dict[
         df = read_sql(
             f"""
             select cc.id,
-                   cc.full ->> '$.title' as title,
-                   cc.full ->> '$.subtitle' as subtitle,
-                   cc.full ->> '$.note' as note
+                   cc.config ->> '$.title' as title,
+                   cc.config ->> '$.subtitle' as subtitle,
+                   cc.config ->> '$.note' as note
             from chart_configs cc
             where cc.id in ({placeholders})
             """,
@@ -335,9 +335,9 @@ def resolve_chart(engine: Engine, ref: str) -> dict[str, Any] | None:
         f"""
         select c.id as chartId,
                cc.slug as slug,
-               cc.full ->> '$.title' as title,
-               cc.full ->> '$.subtitle' as subtitle,
-               cc.full ->> '$.note' as note
+               cc.config ->> '$.title' as title,
+               cc.config ->> '$.subtitle' as subtitle,
+               cc.config ->> '$.note' as note
         from charts c
         join chart_configs cc on cc.id = c.configId
         where {where} and c.publishedAt is not null
