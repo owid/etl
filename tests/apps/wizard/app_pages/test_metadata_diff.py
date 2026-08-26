@@ -2724,3 +2724,31 @@ def test_the_layout_switcher_sanitizes_a_label_left_in_the_url():
     assert not at.exception, at.exception
     assert at.text[0].value == "layout=items"
     assert at.text[1].value in ("url=items", "url=None"), at.text[1].value
+
+
+def test_a_multiline_note_survives_the_report():
+    """Markdown carries no newline inside a blockquote or a list item on its own.
+
+    `> one\ntwo` quotes the first line and drops the second out of the quote; `  - one\ntwo` ends the list
+    item and leaves the rest as a stray paragraph between bullets. Both showed up the moment a note had
+    two lines in it — which the note box now invites, since Shift+Enter starts a new line.
+    """
+    from apps.wizard.app_pages.metadata_diff.review_section import _bullet_lines, _quoted
+
+    quoted = _quoted("Line one.\n\nLine three.")
+    assert quoted.splitlines() == ["> Line one.", ">", "> Line three."], quoted
+    # Every line carries the marker, so the quote is one block rather than a quote and a paragraph.
+    assert all(line.startswith(">") for line in quoted.splitlines())
+
+    bullets = _bullet_lines("Line one.\nLine two.\n\nLine four.")
+    assert bullets == ["  - Line one.", "    Line two.", "", "    Line four."], bullets
+    # Continuations are indented past the bullet marker, which is what keeps them inside the item.
+    assert all(line.startswith("    ") or not line for line in bullets[1:])
+
+    # A single-line note is unchanged in both.
+    assert _quoted("Just one line.") == "> Just one line."
+    assert _bullet_lines("Just one line.") == ["  - Just one line."]
+
+    # An empty note produces something renderable rather than an IndexError.
+    assert _quoted("") == ">"
+    assert _bullet_lines("") == ["  - "]

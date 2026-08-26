@@ -79,7 +79,7 @@ def st_show_review(source_engine: Engine, target_engine: Engine) -> None:
             )
             for row in with_note:
                 st.markdown(_row_line(row, index))
-                st.markdown(f"> {row['comment']}")
+                st.markdown(_quoted(str(row["comment"])))
             if bare:
                 # Folded, not dropped: "which ones did I tick" is a fair question, just not the first one.
                 with st.expander(f"{len(bare)} ticked with no note"):
@@ -175,6 +175,26 @@ def _item_index(source_engine: Engine, target_engine: Engine) -> tuple[dict[str,
     return index, totals
 
 
+def _quoted(note: str) -> str:
+    """A note as a blockquote that survives its own newlines.
+
+    Markdown needs the marker on every line: `> one\ntwo` quotes the first line and drops the second out
+    of the quote entirely, which is what a two-line note looked like on this page. Blank lines keep a bare
+    `>` so the quote stays one block rather than splitting into two.
+    """
+    return "\n".join(f"> {line}" if line.strip() else ">" for line in note.splitlines() or [""])
+
+
+def _bullet_lines(note: str) -> list[str]:
+    """A note as one nested bullet, continuation lines indented to stay inside it.
+
+    Same failure in the export: a newline ends the list item, so the rest of the note came out as a stray
+    paragraph between two bullets. Four spaces keeps it within the `  - ` item.
+    """
+    parts = note.splitlines() or [""]
+    return [f"  - {parts[0]}"] + [f"    {line}" if line.strip() else "" for line in parts[1:]]
+
+
 def _footnote() -> None:
     """The two things about this record that are easy to assume wrongly."""
     st.caption(
@@ -220,6 +240,6 @@ def _markdown(rows: list[dict[str, Any]], index: dict[str, dict[str, str]], tota
             known = index.get(str(row.get("changeKey")))
             name = f"[{known['name']}]({known['url']})" if known else "an item no longer in this diff"
             lines.append(f"- {name}")
-            lines.append(f"  - {row['comment']}")
+            lines.extend(_bullet_lines(str(row["comment"])))
         lines.append("")
     return "\n".join(lines)
