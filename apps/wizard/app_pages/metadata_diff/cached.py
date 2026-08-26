@@ -24,7 +24,7 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.chart_diff.utils import TARGET
 from apps.wizard.app_pages.metadata_diff import data, discovery
-from apps.wizard.app_pages.metadata_diff.core import ViewDiff
+from apps.wizard.app_pages.metadata_diff.core import CHART_FIELD_PREFIX, ViewDiff, group_changes, group_usage
 from apps.wizard.app_pages.metadata_diff.usage import charts_using_indicators, mdims_using_indicators
 from etl.config import OWIDEnv
 
@@ -181,6 +181,31 @@ def chart_text_changes(
     """
     scope, built = shared_facts(_source_engine, cache_key=cache_key)
     return discovery.changed_chart_texts(_source_engine, _target_engine, scope, built)
+
+
+@st.cache_data(ttl=CACHE_TTL, show_spinner="Listing the charts this branch changed…")
+def changed_charts(_source_engine: Engine, _target_engine: Engine, cache_key: str = "") -> dict[str, int]:
+    """Every published chart this branch changed, and how many distinct changes each carries.
+
+    Shared by the Charts section's picker and the Review tab: both need the same list, and computing it
+    twice would let them disagree about how many charts there are.
+    """
+    changed = indicator_changes(_source_engine, _target_engine, cache_key=cache_key)
+    chart_text = chart_text_changes(_source_engine, _target_engine, cache_key=cache_key)
+    groups = group_changes(changed.view_diffs()) + group_changes(chart_text.view_diffs())
+    usage = usage_for_indicators(tuple(changed.ids_list), "", _source_engine, cache_key=cache_key)
+
+    counts: dict[str, int] = {}
+    for group in groups:
+        if group.field.startswith(CHART_FIELD_PREFIX):
+            charts = [chart_text.charts[d["chart"]] for d in group.view_dims if d.get("chart") in chart_text.charts]
+        else:
+            charts = group_usage(group, usage).get("charts", [])
+        for chart in charts:
+            slug = str(chart.get("slug") or "")
+            if slug:
+                counts[slug] = counts.get(slug, 0) + 1
+    return counts
 
 
 @st.cache_data(ttl=CACHE_TTL, show_spinner="Finding explorer views whose text changed…")

@@ -21,7 +21,7 @@ from sqlalchemy.engine.base import Engine
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET
 from apps.wizard.app_pages.metadata_diff import cached, datapage, view_nav
 from apps.wizard.app_pages.metadata_diff.core import ViewDiff, dims_str, field_label, group_changes
-from apps.wizard.app_pages.metadata_diff.data import load_reviews
+from apps.wizard.app_pages.metadata_diff.data import load_item_notes, load_reviews
 from apps.wizard.app_pages.metadata_diff.render import BASELINE_NAME, DIFF_CSS, st_layout_switcher
 from apps.wizard.app_pages.metadata_diff.review_state import (
     item_marker,
@@ -30,6 +30,7 @@ from apps.wizard.app_pages.metadata_diff.review_state import (
     st_item_note,
     st_reviewed_toggle,
     surface_key,
+    surface_progress,
 )
 from apps.wizard.utils.components import Pagination
 
@@ -111,15 +112,21 @@ def _explorer_browser(source_engine: Engine, branch: dict[str, list[ViewDiff]]) 
     position = slugs.index(current)
 
     if len(slugs) > 1:
+        # One query for every recorded row, so the picker says which explorers you have already been through.
+        recorded_rows = load_item_notes(source_engine)
+
+        def explorer_label(slug: str) -> str:
+            views = f"{len(branch[slug])} changed view{'s' if len(branch[slug]) != 1 else ''}"
+            progress = surface_progress(recorded_rows, surface_key("item", f"explorer:{slug}"))
+            return f"{slug} · {views}" + (f" · {progress}" if progress else "")
+
         col_pick, col_next = st.columns([4, 1], vertical_alignment="bottom")
         with col_pick:
             st.selectbox(
                 f"Explorer {position + 1} of {len(slugs)} changed by this branch",
                 options=slugs,
                 index=position,
-                format_func=lambda slug: (
-                    f"{slug} · {len(branch[slug])} changed view{'s' if len(branch[slug]) != 1 else ''}"
-                ),
+                format_func=explorer_label,
                 key="mdd-explorer-picker",
                 on_change=_pick_explorer,
                 help="Type to search the affected explorers.",

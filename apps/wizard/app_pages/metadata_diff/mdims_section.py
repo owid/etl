@@ -22,7 +22,7 @@ from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET
 from apps.wizard.app_pages.metadata_diff import brief, cached, datapage, discovery, view_nav
 from apps.wizard.app_pages.metadata_diff.blast_section import GROUP_KEY, TREE_MDIM_KEY
 from apps.wizard.app_pages.metadata_diff.core import LAYOUT_QUERY_KEY, dims_str, field_label, group_usage
-from apps.wizard.app_pages.metadata_diff.data import load_reviews
+from apps.wizard.app_pages.metadata_diff.data import load_item_notes, load_reviews
 from apps.wizard.app_pages.metadata_diff.render import (
     BASELINE_NAME,
     DIFF_CSS,
@@ -39,6 +39,7 @@ from apps.wizard.app_pages.metadata_diff.review_state import (
     st_item_note,
     st_reviewed_toggle,
     surface_key,
+    surface_progress,
 )
 from apps.wizard.utils.components import Pagination
 
@@ -176,10 +177,15 @@ def _views_browser(source_engine: Engine, target_engine: Engine, df: pd.DataFram
     st.session_state[VIEWS_KEY] = current
     position = known.index(current)
 
+    # One query for every recorded row, so the picker can say which MDims you have already been through.
+    recorded_rows = load_item_notes(source_engine)
+
     def label(path: str) -> str:
         row = df.loc[path]
         title = str(row["title_source"] or path) if "title_source" in row and row["title_source"] else path
-        return f"{title} · 📝 unpublished" if row["is_draft"] else str(title)
+        name = f"{title} · 📝 unpublished" if row["is_draft"] else str(title)
+        progress = surface_progress(recorded_rows, surface_key("item", f"mdim:{path}"))
+        return f"{name} · {progress}" if progress else name
 
     if len(known) > 1:
         col_pick, col_next = st.columns([4, 1], vertical_alignment="bottom")

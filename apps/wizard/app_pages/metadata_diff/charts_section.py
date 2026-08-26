@@ -123,12 +123,9 @@ def _chart_browser(source_engine: Engine, target_engine: Engine, groups, usage: 
     carrying one. The picker and **Next ▶** write the same `?chart=` the change-grouped cards link to, so
     all three ways of arriving here agree and any of them can be pasted to somebody else.
     """
-    counts: dict[str, int] = {}
-    for g in groups:
-        for chart in _group_charts(g, usage, chart_text):
-            slug = str(chart.get("slug") or "")
-            if slug:
-                counts[slug] = counts.get(slug, 0) + 1
+    # The same enumeration the Review tab counts against, so the two can never disagree about how many
+    # charts this branch changed.
+    counts = cached.changed_charts(source_engine, target_engine)
     if not counts:
         st.caption("No published chart renders these changes.")
         return

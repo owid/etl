@@ -166,6 +166,26 @@ def item_marker(stored: dict[str, Any], surface: str, item_key: str) -> str:
     return "📝 " if row.get("comment") else ""
 
 
+def surface_progress(rows: list[dict[str, Any]], surface: str) -> str:
+    """ "✅ 3 · 📝 1" for one surface's recorded rows, or "" when it has none.
+
+    For the pickers one level up — which MDim, which explorer — where the question is not "is this item
+    done" but "have I been here at all". No denominator: that would need every one of the surface's views
+    diffed to label a dropdown, and the section itself reports the count once you are inside it.
+    """
+    mine = [row for row in rows if str(row.get("catalogPath")) == surface]
+    if not mine:
+        return ""
+    ticked = sum(1 for row in mine if row.get("status") == REVIEWED)
+    noted = sum(1 for row in mine if row.get("comment"))
+    parts = []
+    if ticked:
+        parts.append(f"✅ {ticked}")
+    if noted:
+        parts.append(f"📝 {noted}")
+    return " · ".join(parts)
+
+
 def st_item_note(engine: Engine, surface: str, mark: ReviewMark, label: str = "") -> None:
     """A note box for one item, saved as you leave it, and never mistaken for a tick.
 
