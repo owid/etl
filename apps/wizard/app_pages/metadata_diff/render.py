@@ -145,8 +145,16 @@ def st_layout_switcher(items_label: str, items_help: str) -> str:
     """The per-section "items or changes" control, with its choice kept in the URL.
 
     One key across the three sections on purpose: whichever section you switch, the others follow, because
-    the choice is about how you are reading this branch rather than about one surface.
+    the choice is about how you are reading this branch rather than about one surface. That shared key is
+    also what made the labels unstable — each section words the item option differently — so both the URL
+    and the held value are read back through `coerce_layout` *before* the widget exists. Without that,
+    `url_persist`'s strict check sees the label a previous section wrote and raises on load.
     """
+    for store in (st.query_params, st.session_state):
+        held = store.get(LAYOUT_QUERY_KEY)
+        if held is not None and held not in LAYOUTS:
+            store[LAYOUT_QUERY_KEY] = coerce_layout(held)
+
     layout = url_persist(st.segmented_control)(
         label="Layout",
         options=list(LAYOUTS),

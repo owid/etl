@@ -887,9 +887,31 @@ LAYOUT_QUERY_KEY = "layout"
 DEFAULT_LAYOUT = "items"
 
 
+# What the switcher's two options are called. The item label varies by section ("View by view" on MDims
+# and Explorers, "Chart by chart" on Charts), which is exactly why a label can arrive under this key that
+# the current section does not offer.
+ITEMS_LABEL_MARK = "🔍"
+CHANGES_LABEL_MARK = "By change"
+
+
 def coerce_layout(value: object) -> str:
-    """Whatever the URL or the widget hands back, as a layout key."""
-    return str(value) if isinstance(value, str) and value in LAYOUTS else DEFAULT_LAYOUT
+    """Whatever the URL or the widget hands back, as a layout key — including a label.
+
+    `st.segmented_control` sends and receives the *formatted* label, and hands the raw label back when it
+    matches no current option. The item label differs per section, so moving between sections produced
+    exactly that, and `url_persist` wrote "🔍 Chart by chart" into `?layout=` where the next load rejected
+    it. Read by marker rather than by an exact table: the wording is per-section and will keep changing,
+    while which of the two a label denotes is stable.
+    """
+    if not isinstance(value, str):
+        return DEFAULT_LAYOUT
+    if value in LAYOUTS:
+        return value
+    if CHANGES_LABEL_MARK in value:
+        return "changes"
+    if value.startswith(ITEMS_LABEL_MARK):
+        return "items"
+    return DEFAULT_LAYOUT
 
 
 def requested_chart(session_value: object, query_value: object) -> str:

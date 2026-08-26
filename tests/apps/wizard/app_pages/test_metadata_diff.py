@@ -2670,3 +2670,55 @@ def test_the_display_cap_folds_changes_away_but_never_drops_them(monkeypatch):
     )
     missing = [i for i in range(n_changes) if f"marker{i}" not in rendered]
     assert not missing, f"changes dropped past the cap: {missing}"
+
+
+def test_a_layout_label_never_survives_as_a_value():
+    """A section's own wording for the layout must never reach `?layout=` as a value.
+
+    `st.segmented_control` sends and receives the *formatted* label, and hands the raw label back when it
+    matches no current option. The three sections word the item option differently — "🔍 View by view" on
+    MDims and Explorers, "🔍 Chart by chart" on Charts — under one shared key, so moving between sections
+    produced exactly that, `url_persist` wrote the label into the URL, and the next load raised
+
+        ValueError: Please review the URL query. Value 🔍 Chart by chart not in options ['items', 'changes'].
+
+    Second time this behaviour broke this page: the section switcher was hand-rolled for the same reason.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import DEFAULT_LAYOUT, LAYOUTS, coerce_layout
+
+    # Every label any section can render maps back to the option it denotes.
+    for label in ("🔍 View by view", "🔍 Chart by chart", "🔍 Anything by anything"):
+        assert coerce_layout(label) == "items", label
+    assert coerce_layout("🧬 By change") == "changes"
+
+    # The options themselves pass through untouched, and junk lands on the default.
+    for option in LAYOUTS:
+        assert coerce_layout(option) == option
+    for junk in (None, "", "views", 3, "🧬", "layout"):
+        assert coerce_layout(junk) == DEFAULT_LAYOUT, junk
+
+
+def test_the_layout_switcher_sanitizes_a_label_left_in_the_url():
+    """The guard has to run before the widget exists, or `url_persist` raises on the way in.
+
+    Reproduced through the real widget: a label in `?layout=` used to reach `_check_options_params` and
+    kill the page. It must resolve to the option it denotes instead — and the URL must be left holding a
+    value, not a label.
+    """
+    from streamlit.testing.v1 import AppTest
+
+    def app() -> None:
+        import streamlit as st
+
+        from apps.wizard.app_pages.metadata_diff.render import st_layout_switcher
+
+        # What the previous section's widget left behind.
+        st.query_params["layout"] = "🔍 Chart by chart"
+        layout = st_layout_switcher("🔍 View by view", "help")
+        st.text(f"layout={layout}")
+        st.text(f"url={st.query_params.get('layout')}")
+
+    at = AppTest.from_function(app, default_timeout=30).run()
+    assert not at.exception, at.exception
+    assert at.text[0].value == "layout=items"
+    assert at.text[1].value in ("url=items", "url=None"), at.text[1].value
