@@ -3,7 +3,7 @@ definitions:
     processing_level: major
     description_processing: |-
       - The resulting costs are compiled from three IRENA reports: Renewable Power Generation Costs in 2025 (primarily for data from 2010 onwards), Renewable Power Generation Costs in 2024 (for country series not included in the latest report), and Renewable Power Generation Costs in 2023 (for data prior to 2010, not included in later reports). Wherever reports overlap, the most recent one is used.
-      - Data from older reports (expressed in constant US dollars of an earlier year) was converted to constant {LATEST_YEAR} US dollars using the [US GDP deflator](https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS.AD?locations=US), to account for the effects of US dollar inflation. This matches the producer's own convention when moving between dollar base years.
+      - Data from older reports (expressed in constant US dollars of an earlier year) was converted to constant {LATEST_YEAR} US dollars using the [US GDP deflator (linked series)](https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS.AD?locations=US), to account for the effects of US dollar inflation. This matches the producer's own convention when moving between dollar base years.
     presentation:
       topic_tags:
         - Energy
@@ -82,6 +82,6 @@ tables:
         short_unit: "$/W"
         description_processing: |-
           - This data is taken from the Renewable Power Generation Costs in 2024 report, the last one to provide a global solar photovoltaic module price index. Later reports discontinued that index (they only provide yearly prices from 2020 onwards, for specific module technologies sold in Europe), so this series ends in 2024.
-          - The data (expressed in constant 2024 US dollars) was converted to constant {LATEST_YEAR} US dollars using the [US GDP deflator](https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS.AD?locations=US), to account for the effects of US dollar inflation.
+          - The data (expressed in constant 2024 US dollars) was converted to constant {LATEST_YEAR} US dollars using the [US GDP deflator (linked series)](https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS.AD?locations=US), to account for the effects of US dollar inflation.
         display:
           shortUnit: "$"
