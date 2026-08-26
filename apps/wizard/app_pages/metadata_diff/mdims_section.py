@@ -35,7 +35,7 @@ from apps.wizard.app_pages.metadata_diff.review_state import (
     resolve_marks,
     surface_key,
 )
-from apps.wizard.utils.components import Pagination
+from apps.wizard.utils.components import Pagination, url_persist
 
 MDIMS_PER_PAGE = 4
 # The URL key that opens one MDim's views. A route, not a filter: the page shows that MDim's changed views
@@ -45,6 +45,10 @@ VIEWS_PER_PAGE = 5
 # Changed views drawn inline on an MDim's card before the rest fold away. A card is one item in a list of
 # MDims, so it shows enough to judge the MDim and hands the rest to the focused page.
 VIEWS_IN_CARD = 3
+# The ⚡ jump's widget key, and the prefix for the MDim menu's per-dimension keys. Both are URL-visible:
+# a link to one view of one MDim is `?mdim-views=<path>&dim-<slug>=<choice>…`, which is shareable.
+JUMP_KEY = "mdim-view-jump"
+DIM_PARAM_PREFIX = "dim-"
 
 # Changes shown open per MDim. There is no detail page to defer the rest to any more, so the cap is the
 # point at which a card stops being readable — a fold, not a cut: the remainder renders inside an
@@ -167,14 +171,15 @@ def _render_views_card(source_engine: Engine, target_engine: Engine, df: pd.Data
 
 
 def _views_page(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, catalog_path: str) -> None:
-    """One MDim, view by view: every changed view with its own diffs, in dimension order.
+    """One MDim, view by view: the ⚡ jump, the MDim's own menu, and the views themselves.
 
-    The list is the page. #6615's View diff put a set of dimension dropdowns first and rendered one view
-    once the selection happened to land on a changed one, so finding the changes was the work; here they
-    are already on screen and the selector below is a shortcut for a long MDim, not the way in.
+    The jump does not render anything on its own — it writes into the menu, exactly as #6615's did, so
+    there is one answer on screen to "which view am I looking at". What differs is that every dimension
+    may be left unset: the menu filters the list as well as focusing it, and with nothing set you see
+    every changed view rather than a set of controls to guess with.
 
-    Unchanged views are not drawn at all. The card that sent you here already reports how many of the
-    MDim's views changed, and a page of "no change" boxes is what the dimension grid is for.
+    A complete selection shows that view whether or not it changed, because "did the view I was worried
+    about move?" is a question only the unchanged ones can answer.
     """
     row = df.loc[catalog_path]
     title, dimensions, view_diffs = cached.mdim_view_diffs(
@@ -195,30 +200,114 @@ def _views_page(source_engine: Engine, target_engine: Engine, df: pd.DataFrame, 
     slug = str(row["slug_source"]) if row.get("slug_source") else ""
     labels = [view_label(v, dimensions) for v in changed]
 
-    if len(changed) > 1:
-        # Type to filter — a selectbox is searchable, which is what makes it useful at fifty views.
-        picked = st.selectbox(
-            "Jump to a view",
-            options=list(range(len(changed))),
-            format_func=lambda i: labels[i],
-            index=None,
-            placeholder="Type to search this MDim's changed views…",
-            key=f"mdd-view-jump-{catalog_path}",
-        )
-        if picked is not None:
-            _render_view(changed[picked], labels[picked], dimensions, catalog_path, slug, row)
-            st.caption("Clear the selection above to go back to the full list.")
-            return
+    _jump_to_changed(changed, labels, dimensions)
+    selection = _dimension_menu(view_diffs, dimensions)
 
-    pagination = Pagination(
-        list(zip(changed, labels)), items_per_page=VIEWS_PER_PAGE, pagination_key=f"mdd-views-{catalog_path}"
-    )
-    if len(changed) > VIEWS_PER_PAGE:
+    # A complete selection is a single view — the state the ⚡ jump puts the menu into.
+    if len(selection) == len(dimensions) and dimensions:
+        view = next((v for v in view_diffs if v.dimensions == selection), None)
+        if view is None:
+            st.warning("No view exists for this combination of controls.")
+        elif not view.changed:
+            st.success("**No changes in this view** — its texts match the baseline.")
+            st.markdown(
+                f"[Open this view ↗]({view_url(SOURCE, catalog_path, None if row['is_draft'] else slug, selection)})"
+            )
+        else:
+            _render_view(view, view_label(view, dimensions), dimensions, catalog_path, slug, row)
+        return
+
+    # Otherwise the list, narrowed by whatever the menu has set.
+    shown = [(v, label) for v, label in zip(changed, labels) if _matches(v, selection)]
+    if selection:
+        st.caption(f"{len(shown)} of {len(changed)} changed views match the menu above.")
+    if not shown:
+        st.info("No changed view matches the menu above. Clear a dimension to widen it.")
+        return
+
+    pagination = Pagination(shown, items_per_page=VIEWS_PER_PAGE, pagination_key=f"mdd-views-{catalog_path}")
+    if len(shown) > VIEWS_PER_PAGE:
         pagination.show_controls()
     for view, label in pagination.get_page_items():
         _render_view(view, label, dimensions, catalog_path, slug, row)
-    if len(changed) > VIEWS_PER_PAGE:
+    if len(shown) > VIEWS_PER_PAGE:
         pagination.show_controls(position="bottom")
+
+
+def _matches(view, selection: dict[str, str]) -> bool:
+    """Whether a view satisfies every dimension the menu has set."""
+    return all(view.dimensions.get(slug) == choice for slug, choice in selection.items())
+
+
+def _jump_to_changed(changed: list, labels: list[str], dimensions: list) -> None:
+    """The ⚡ jump: pick a changed view, and the menu below moves to it.
+
+    Writing the dimension widgets' state from a callback is the only order that works — a widget reads its
+    session value when it is created, so setting it after the fact is a change nobody sees until the next
+    rerun. This runs before the menu is built, which is what makes the jump land in one click.
+    """
+    if len(changed) < 2:
+        return
+
+    def _goto() -> None:
+        picked = st.session_state.get(JUMP_KEY)
+        if picked is None:
+            return
+        for slug, choice in changed[int(picked)].dimensions.items():
+            st.session_state[DIM_PARAM_PREFIX + slug] = choice
+            st.query_params[DIM_PARAM_PREFIX + slug] = choice
+
+    st.selectbox(
+        f"⚡ Changes detected — jump to a changed view ({len(changed)})",
+        options=list(range(len(changed))),
+        format_func=lambda i: labels[i],
+        index=None,
+        placeholder="Type to search this MDim's changed views…",
+        key=JUMP_KEY,
+        on_change=_goto,
+        help="Sets the menu below to that view, so the two never disagree about what you are looking at.",
+    )
+
+
+def _dimension_menu(view_diffs: list, dimensions: list) -> dict[str, str]:
+    """The MDim's own menu, cascading: each dimension offers only what the ones before it allow.
+
+    Every dimension may be left unset — that is the difference from #6615, where a complete selection was
+    forced and an impossible combination was reachable. Returns only the dimensions actually set.
+    """
+    selection: dict[str, str] = {}
+    if not dimensions:
+        return selection
+
+    columns = st.columns(min(4, len(dimensions)))
+    for i, dim in enumerate(dimensions):
+        dim_slug = dim["slug"]
+        key = DIM_PARAM_PREFIX + dim_slug
+        available: list[str] = []
+        for view in view_diffs:
+            if _matches(view, selection):
+                choice = view.dimensions.get(dim_slug)
+                if choice is not None and choice not in available:
+                    available.append(choice)
+        # A value the narrowed menu no longer offers — from a stale link, or from widening a dimension
+        # above this one. Dropped rather than left to fail url_persist's strict check on every load.
+        if st.query_params.get(key) not in available:
+            st.query_params.pop(key, None)
+            st.session_state.pop(key, None)
+
+        names = {c["slug"]: (c.get("name") or c["slug"]) for c in dim.get("choices", [])}
+        with columns[i % len(columns)]:
+            picked = url_persist(st.selectbox)(
+                dim.get("name") or dim_slug,
+                key=key,
+                options=available,
+                index=None,
+                format_func=lambda slug, names=names: names.get(slug, slug),
+                placeholder="Any",
+            )
+        if picked is not None:
+            selection[dim_slug] = picked
+    return selection
 
 
 def _render_view(view, label: str, dimensions: list, catalog_path: str, slug: str, row) -> None:
