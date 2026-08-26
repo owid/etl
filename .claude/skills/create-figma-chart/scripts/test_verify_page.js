@@ -96,7 +96,16 @@ function buildFrame(opts = {}) {
   const subtitle = text("subtitle", "A subtitle line", 16, 16, 51, contentW, 19);
   const header = node({ name: "header", layoutMode: "VERTICAL", primaryAxisSizingMode: "AUTO", itemSpacing: 6,
     x: 16, y: 16, width: contentW, height: 92, children: [title, subtitle] });
-  const src = text("source", "Data source: X", 13, 16, 488, contentW, 16);
+  // "Data source: X" — the prefix is chars 0-12, the producer name 12-14. `boldSource` models the
+  // real defect: assigning `characters` collapses the node to its first run's style, so the bold
+  // prefix takes the producer name with it. `sourceTailWeight` sets the tail to any other weight,
+  // for the off-contract-but-not-bold cases a not-bold test would wave through. `sourcePrefixWeight`
+  // does the same for the PREFIX, where a substring test on /bold/ certifies Semibold and Black.
+  const src = text("source", "Data source: X", 13, 16, 488, contentW, 16, undefined, {
+    segments: { fontName: opts.boldSource
+      ? [["Bold", 0, 14]]
+      : [[opts.sourcePrefixWeight || "Bold", 0, 12], [opts.sourceTailWeight || "Regular", 12, 14]] },
+  });
   const footer = node({ name: "footer", layoutMode: "VERTICAL", x: 16, y: 488, width: contentW, height: 36, children: [src] });
   const logo = node({ name: "logo", x: W - 80, y: 16, width: 64, height: 35 });
 
@@ -140,6 +149,11 @@ function buildFrame(opts = {}) {
                       node({ type: "ELLIPSE", name: "dp2", x: 60, y: 262, width: 8, height: 8 })] }),
   ];
   if (opts.extraLine) kids.push(line("line__B", [[40, 420], [200, 340], [440, 300]], opts.extraLine));
+  // A second category in a SECOND colour. The palette rows compare pairs, so a one-colour fixture has
+  // no pair for them to check and the command is withheld by design — any case asserting on that
+  // command therefore needs two colours, or it is asserting on a branch that no longer runs.
+  if (opts.secondColour) kids.push(node({ type: "RECTANGLE", name: "bar__B", x: 420, y: 400,
+    width: 40, height: 30, fills: solid("#883039") }));
   if (opts.zeroAreaTick) kids.push(node({ name: "horizontal-axis", x: 40, y: 470, width: 400, height: 6, children: [
     node({ type: "VECTOR", name: "tick-0", x: 40, y: 470, width: 0, height: 6,
       strokeWeight: 1, strokes: solid("#dddddd"), dashPattern: opts.tickDash || [], strokeAlign: "CENTER", fills: solid("#000000"),
@@ -195,12 +209,42 @@ function buildFrame(opts = {}) {
     // two disconnected subpaths with a wide gap between vertex 1 and vertex 2
     vectorNetwork: { vertices: [{ x: 40, y: 200 }, { x: 120, y: 220 }, { x: 380, y: 280 }, { x: 440, y: 300 }],
                      segments: [{ start: 0, end: 1 }, { start: 2, end: 3 }] } }));
-  const chart = node({ name: "chart", type: "GROUP", x: 16, y: 122, width: contentW, height: 352, children: kids });
+  // `chartShort` narrows the chart's box by a sub-pixel amount, the shape a rescale-and-repair pass
+  // leaves when an ornament stops setting the right edge. It used to slip through a +/-1px gate.
+  const chart = node({ name: "chart", type: "GROUP", x: 16, y: 122,
+    width: contentW - (opts.chartShort || 0), height: 352, children: kids });
 
   // `ungrouped` models the documented rework case: the chart GROUP is gone and its subgroups sit as
   // direct frame children, so CONFIG.chartName resolves nothing and the fallback has to find the plot.
   const children = opts.ungrouped ? [header, footer, logo, ...kids] : [header, footer, logo, chart];
+  // An OPAQUE layer UNDER the tint — a plot background — pushed first so it sits at the bottom of the
+  // stack. With both present the ground behind the annotation is the ORDERED composite of the two, which
+  // equals neither shape's own composite over the frame.
+  if (opts.tintBase) children.push(node({ type: "RECTANGLE", name: "plot-background", x: 80, y: 180,
+    width: 220, height: 80, fills: solid(opts.tintBase) }));
+  // A shaded region behind the annotation — the shape whose COMPOSITE the knockout has to match.
+  // `tintOpacity` sits on the node, which is where this skill's own wedge carries it; the halo must
+  // match `tint over frameFill`, never the raw `tint`.
+  // `tintFills` gives the wedge SEVERAL visible paints, which Figma renders as their ordered composite.
+  if (opts.tint || opts.tintFills) children.push(node({ type: "RECTANGLE", name: "wedge__below", x: 90, y: 190,
+    width: 200, height: 60, fills: opts.tintFills || solid(opts.tint),
+    opacity: opts.tintOpacity === undefined ? 0.45 : opts.tintOpacity }));
+  // Two OVERLAPPING opaque grounds inside one translucent GROUP, pushed BEFORE the annotation so they
+  // are painted under it. Figma composites the pair, then applies the group's opacity once;
+  // `nodeOpacity` folds it into each child instead, so compositing them independently applies it twice.
+  if (opts.dimGroup) children.push(node({ name: "shading", opacity: opts.dimGroup, x: 85, y: 185,
+    width: 220, height: 70, children: [
+      node({ type: "RECTANGLE", name: "wedge__lower", x: 85, y: 185, width: 220, height: 70, fills: solid("#dddddd") }),
+      node({ type: "RECTANGLE", name: "wedge__upper", x: 88, y: 188, width: 210, height: 62, fills: solid("#bbbbbb") })] }));
   if (opts.annotation) children.push(opts.annotation);
+  // Pushed AFTER the annotation, so it is painted ON TOP of it — the re-import z-order bug, not a
+  // ground. A bbox-only filter cannot tell the two apart.
+  if (opts.tintAbove) children.push(node({ type: "RECTANGLE", name: "wedge__above", x: 90, y: 190,
+    width: 200, height: 60, fills: solid(opts.tintAbove), opacity: 0.45 }));
+  // A full-bleed rectangle used as the visible background — how the Instagram templates carry their
+  // beige. Unshifted so it sits at the BOTTOM of the stack, under everything else on the frame.
+  if (opts.backdrop || opts.backdropFills) children.unshift(node({ type: "RECTANGLE", name: "backdrop", x: 0, y: 0,
+    width: W, height: opts.frameH || 540, fills: opts.backdropFills || solid(opts.backdrop) }));
 
   return node({ id: "F:1", name: "test frame", x: 0, y: 0, width: W, height: opts.frameH || 540,
                 fills: solid(opts.frameFill || "#ffffff"), children });
@@ -223,10 +267,13 @@ const annotation = (o) => text("annotation__test", o.chars || "Note", o.size || 
     textStyleId: o.styleId === undefined ? "S:abc" : o.styleId,
   });
 
-async function run(frame, config) {
+// `wrap` puts the frame under an ancestor — a section or a group — because two of the switches that
+// decide whether a frame renders at all live ABOVE it, and a page whose only child is the frame cannot
+// model either. It takes the frame and returns whatever should sit on the page in its place.
+async function run(frame, config, wrap) {
   const byId = {};
   const index = (n) => { if (n.id) byId[n.id] = n; for (const c of n.children || []) index(c); };
-  const page = node({ id: "P:1", type: "PAGE", name: "page", children: [frame] });
+  const page = node({ id: "P:1", type: "PAGE", name: "page", children: [wrap ? wrap(frame) : frame] });
   index(page);
   const figma = { currentPage: page, getNodeByIdAsync: async (id) => byId[id] || null, setCurrentPageAsync: async () => {} };
   const body = SRC.replace(/^const CONFIG = \{[\s\S]*?^\};/m, "const CONFIG = __CONFIG__;");
@@ -328,6 +375,28 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     check("6b and so does a fully transparent one",
           row(clear, "annotation-knockout").status === "FAIL" && /carries NO knockout/.test(row(clear, "annotation-knockout").detail),
           row(clear, "annotation-knockout").detail);
+    // 6b-2 — between the two. A knockout works by PAINTING the frame's colour over what it crosses,
+    //        so a nearly transparent one masks nothing while still passing the weight, alignment and
+    //        colour checks — a clean `ok` on a crossing the reader can see straight through. Zero is
+    //        the case above; anything positive is on the canvas but cannot be certified from here,
+    //        since how much it masks depends on what is behind it. REVIEW, with the number named.
+    const faintKO = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3, strokeOpacity: 0.005 }) }), {});
+    check("6b-2 a nearly transparent knockout is not certified",
+          row(faintKO, "annotation-knockout").status === "REVIEW", row(faintKO, "annotation-knockout").detail);
+    check("6b-2 and the effective opacity is named, not just flagged",
+          /0\.005|effective opacity/.test(row(faintKO, "annotation-knockout").detail), row(faintKO, "annotation-knockout").detail);
+    // The NODE's own opacity dims the knockout just as effectively as the paint's, and it is the half
+    // a paint-only read cannot see: this paint is fully opaque.
+    const dimAnn = annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 });
+    dimAnn.opacity = 0.4;
+    const dimKO = await run(buildFrame({ annotation: dimAnn }), {});
+    check("6b-2 a dimmed annotation node is not certified either",
+          row(dimKO, "annotation-knockout").status === "REVIEW", row(dimKO, "annotation-knockout").detail);
+    // The control: a fully opaque knockout still passes cleanly, or this becomes a row that always
+    // reviews and therefore says nothing.
+    const solidKO = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    check("6b-2 while an opaque knockout still passes",
+          row(solidKO, "annotation-knockout").status === "ok", row(solidKO, "annotation-knockout").detail);
     // ...and the COLOUR check must read the paint that renders, not strokes[0]
     const decoy = await run(buildFrame({ frameFill: "#fffbf5", annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#fffbf5", strokeWeight: 3, decoyStroke: "#ffffff" }) }), {});
     check("6b an invisible paint in front does not become the colour that is judged",
@@ -366,7 +435,216 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
   // 6 — knockout colour must be the frame's own fill, never hardcoded white.
   {
     const out = await run(buildFrame({ frameFill: "#fffbf5", annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {});
-    check("6 white knockout on cream FAILS", /not the frame's own #fffbf5/.test(row(out, "annotation-knockout").detail), row(out, "annotation-knockout").detail);
+    check("6 white knockout on cream FAILS",
+          row(out, "annotation-knockout").status === "FAIL"
+          && /the frame's own #fffbf5/.test(row(out, "annotation-knockout").detail),
+          row(out, "annotation-knockout").detail);
+  }
+
+  // 6d — the knockout's ground is what is behind THIS annotation, not the frame. Demanding the frame's
+  //      fill unconditionally FAILED a correct chart: an annotation inside a tinted region takes a halo
+  //      the colour of the tint, and a canvas-coloured one there is a white outline around every letter.
+  {
+    // #dddddd at 45% over white composites to #f0f0f0 — what the reader sees, and what the halo must be.
+    const onTint = (stroke) => buildFrame({ tint: "#dddddd", tintOpacity: 0.45,
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke, strokeWeight: 3 }) });
+
+    const good = await run(onTint("#f0f0f0"), {});
+    const g = row(good, "annotation-knockout");
+    check("6d a halo matching the tint's COMPOSITE does not FAIL", g.status !== "FAIL", g.detail);
+    check("6d and it is REVIEWED, since the ground was matched by bounding box",
+          g.status === "REVIEW" && /BOUNDING BOX/.test(g.detail), g.detail);
+    check("6d and the detail shows the sum it accepted",
+          /wedge__below/.test(g.detail) && /#dddddd/.test(g.detail) && /0\.45/.test(g.detail), g.detail);
+
+    // The trap the compositing exists for: matching the tint's RAW fill is still wrong, because that
+    // is not the colour on the canvas. A check that skipped the alpha would wave this through.
+    const raw = row(await run(onTint("#dddddd"), {}), "annotation-knockout");
+    check("6d a halo matching the tint's RAW fill still FAILS", raw.status === "FAIL", raw.detail);
+    check("6d and it names the composite it wanted instead", /#f0f0f0/.test(raw.detail), raw.detail);
+
+    // A canvas-coloured halo over shading is the original defect, and the bbox cannot prove the
+    // annotation is over the tint's ink rather than beside it — so it is raised, not failed.
+    const white = row(await run(onTint("#ffffff"), {}), "annotation-knockout");
+    check("6d a canvas halo over a tint is REVIEWED, not passed silently", white.status === "REVIEW", white.detail);
+    check("6d and it names the white-outline symptom", /white outline/.test(white.detail), white.detail);
+
+    // ...and with no tint on the frame, the same canvas halo stays clean: the review must be caused by
+    // the shading, not fire on every annotation.
+    const bare = row(await run(buildFrame({ annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {}), "annotation-knockout");
+    check("6d and a canvas halo on bare canvas is still ok", bare.status === "ok", bare.detail);
+  }
+
+  // 6e — the TIER branch has to know about the ground too. An annotation inside a tint that happens to
+  //      cross no gridline hit `!crosses.length && hasStroke` and FAILED as "over empty space" before
+  //      the colour test ever ran — which is the opposite of what ANNOTATIONS-AND-ARROWS.md now says:
+  //      the halo stays on a tint precisely because a region that is clear today fills at the next
+  //      refresh. Test 5 above is the control that keeps the FAIL alive on genuinely bare canvas.
+  {
+    // y=205..223 clears the gridlines at 200/300/360/460 and both series segments, so nothing is crossed.
+    const clear = (extra) => buildFrame(Object.assign({ tint: "#dddddd", tintOpacity: 0.45,
+      annotation: annotation({ x: 100, y: 205, w: 120, h: 18, stroke: "#f0f0f0", strokeWeight: 3 }) }, extra || {}));
+    const t = row(await run(clear(), {}), "annotation-knockout");
+    check("6e a halo on an EMPTY tint is not failed as 'over empty space'", t.status !== "FAIL", t.detail);
+    check("6e and it is REVIEWED, naming the tint that earns the halo",
+          t.status === "REVIEW" && /keeps its halo even where the tint is empty/.test(t.detail), t.detail);
+  }
+
+  // 6f — grounds STACK. A translucent tint over an opaque plot background renders as the ordered
+  //      composite of both; compositing each candidate over the FRAME instead matches neither, and a
+  //      correct halo came back FAIL.
+  {
+    // #dddddd at 45% over #eeeeee is #e6e6e6. Over the frame's white it would be #f0f0f0, and the base
+    // alone is #eeeeee — so a per-candidate test rejects the one colour the reader actually sees.
+    const stack = (stroke) => buildFrame({ tint: "#dddddd", tintOpacity: 0.45, tintBase: "#eeeeee",
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke, strokeWeight: 3 }) });
+
+    const ok = row(await run(stack("#e6e6e6"), {}), "annotation-knockout");
+    check("6f a halo matching the STACKED ground does not FAIL", ok.status !== "FAIL", ok.detail);
+    check("6f and it names the paint order it folded",
+          ok.status === "REVIEW" && /composited in paint order/.test(ok.detail)
+          && /plot-background/.test(ok.detail) && /wedge__below/.test(ok.detail), ok.detail);
+
+    // Matching nothing is still not a FAIL once the grounds overlap: any SUBSET of the stack is a
+    // possible ground and bounding boxes cannot say which, so the call goes to a human.
+    const miss = row(await run(stack("#123456"), {}), "annotation-knockout");
+    check("6f overlapping grounds downgrade an unmatched halo to REVIEW", miss.status === "REVIEW", miss.detail);
+    check("6f and it says why it cannot decide", /cannot be settled from BOUNDING BOXES/.test(miss.detail), miss.detail);
+
+    // ...and with a SINGLE ground there is nothing to be ambiguous about, so the FAIL stands.
+    const one = row(await run(buildFrame({ tint: "#dddddd", tintOpacity: 0.45,
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#123456", strokeWeight: 3 }) }), {}), "annotation-knockout");
+    check("6f but a single ground still FAILS an unmatched halo", one.status === "FAIL", one.detail);
+  }
+
+  // 6g — a tint painted ON TOP of the annotation is not a ground, it is the re-import z-order bug
+  //      ANNOTATIONS-AND-ARROWS.md describes. Matching by bounding box alone read it as the ground
+  //      behind the text and recommended colouring the halo to match it.
+  {
+    const out = await run(buildFrame({ tintAbove: "#dddddd",
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    const z = row(out, "annotation-knockout");
+    check("6g a tint ABOVE the annotation is not treated as its ground", z.status === "ok", z.detail);
+    check("6g and the overlaid tint is not named as a halo colour", !/wedge__above/.test(z.detail), z.detail);
+  }
+
+  // 6h — a full-bleed rectangle used as the visible background IS the ground behind every annotation.
+  //      Excluding every full-bleed node by geometry failed a correct halo twice: as a needless
+  //      knockout, and then against a frame fill the reader never sees.
+  {
+    const beige = (stroke, extra) => buildFrame(Object.assign({ backdrop: "#fbf9f3",
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke, strokeWeight: 3 }) }, extra || {}));
+
+    const good = row(await run(beige("#fbf9f3"), {}), "annotation-knockout");
+    check("6h a halo matching a differently-coloured backdrop does not FAIL", good.status !== "FAIL", good.detail);
+    check("6h and the backdrop is named as the ground", /backdrop/.test(good.detail), good.detail);
+
+    // The white halo on that beige is the Instagram defect the page opens with; it must be raised.
+    const white = row(await run(beige("#ffffff"), {}), "annotation-knockout");
+    check("6h a white halo on a beige backdrop is raised", white.status === "REVIEW", white.detail);
+
+    // ...but a backdrop that paints the frame's OWN colour composites to itself, and must NOT turn a
+    // correct canvas-coloured halo into a review. That exclusion is the whole point of the rule.
+    const same = row(await run(beige("#ffffff", { backdrop: "#ffffff" }), {}), "annotation-knockout");
+    check("6h a backdrop that composites to the frame fill still stays silent", same.status === "ok", same.detail);
+
+    // And a backdrop is CANVAS, not shading — it never excuses a halo over empty space.
+    const needless = row(await run(buildFrame({ backdrop: "#fbf9f3",
+      annotation: annotation({ x: 60, y: 140, w: 90, h: 18, stroke: "#fbf9f3", strokeWeight: 3 }) }), {}), "annotation-knockout");
+    check("6h but a backdrop does not excuse a knockout over empty space", needless.status === "FAIL", needless.detail);
+    check("6h and that is still reported as crossing nothing", /crosses nothing/.test(needless.detail), needless.detail);
+  }
+
+  // 6i — a ground node with SEVERAL visible fills renders their ordered composite, and reading only
+  //      the first paint reports a colour that is not on the canvas. But folding them needs to know
+  //      which end of `fills` is the top, and nothing available to this script establishes that — so
+  //      where the order changes the answer the ground is declared UNMEASURABLE rather than guessed.
+  //      Guessing it backwards would fail a correct halo, or bless one that is nowhere on the canvas.
+  {
+    // #ff0000 and #ffffff at 50%: one order renders #ff8080, the other plain #ff0000. Both are
+    // reachable readings of the same node, so neither may be asserted.
+    const ambiguous = (stroke) => buildFrame({ tintOpacity: 1,
+      tintFills: [solid("#ff0000")[0], Object.assign({}, solid("#ffffff")[0], { opacity: 0.5 })],
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke, strokeWeight: 3 }) });
+
+    for (const stroke of ["#ff8080", "#ff0000"]) {
+      const amb = row(await run(ambiguous(stroke), {}), "annotation-knockout");
+      check(`6i an order-dependent ground does not FAIL a ${stroke} halo`, amb.status !== "FAIL", amb.detail);
+      check(`6i and it says the ORDER is what it cannot settle (${stroke})`,
+            /ORDER decides the colour/.test(amb.detail), amb.detail);
+      check(`6i and it never certifies either reading (${stroke})`,
+            !/asks for when the annotation sits on a tint/.test(amb.detail), amb.detail);
+    }
+
+    // Where the order does NOT change the answer there is nothing to decline, and the ground is
+    // measured as usual — which is every single-fill ground on every real frame.
+    const stable = row(await run(buildFrame({ tintOpacity: 1,
+      tintFills: [solid("#dddddd")[0], Object.assign({}, solid("#dddddd")[0], { opacity: 0.5 })],
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#dddddd", strokeWeight: 3 }) }), {}),
+      "annotation-knockout");
+    check("6i an order-INDEPENDENT stack is still measured", stable.status === "REVIEW", stable.detail);
+    check("6i and is not declared unmeasurable", !/NOT measurable/.test(stable.detail), stable.detail);
+  }
+
+  // 6j — a ground combining a solid with a gradient or image has no single colour. The solid passed
+  //      the SOLID-only paint filter and every other paint was silently dropped, so the row could
+  //      describe a halo matching the solid base as the colour the doc asks for — on a ground the
+  //      doc actually assigns to tier 1.
+  {
+    const gradient = { type: "GRADIENT_LINEAR", visible: true };
+    const mixed = row(await run(buildFrame({ tintOpacity: 1,
+      tintFills: [solid("#ff0000")[0], gradient],
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ff0000", strokeWeight: 3 }) }), {}),
+      "annotation-knockout");
+    check("6j a gradient over a solid is not FAILED", mixed.status !== "FAIL", mixed.detail);
+    check("6j and the gradient is named as why it cannot be measured",
+          /GRADIENT_LINEAR/.test(mixed.detail) && /no single colour/.test(mixed.detail), mixed.detail);
+    check("6j and the solid base is not blessed as the requested ground",
+          !/asks for when the annotation sits on a tint/.test(mixed.detail), mixed.detail);
+    check("6j and it points at tier 1", /tier 1/.test(mixed.detail), mixed.detail);
+  }
+
+  // 6k — an UNMEASURABLE full-bleed ground must never be dropped by the "composites to the frame" test.
+  //       `groundOver` on one returns the arbitrary forward fold, so a white solid under a gradient
+  //       coincides with a white frame and vanished — taking the "not measurable" signal with it and
+  //       letting the halo be certified against a frame nobody sees.
+  {
+    const gradient = { type: "GRADIENT_LINEAR", visible: true };
+    const out = row(await run(buildFrame({ frameFill: "#ffffff",
+      backdropFills: [solid("#ffffff")[0], gradient],
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {}),
+      "annotation-knockout");
+    check("6k an unmeasurable full-bleed ground is not silently dropped", out.status === "REVIEW", out.detail);
+    check("6k and it is named as unmeasurable", /NOT measurable/.test(out.detail) && /GRADIENT_LINEAR/.test(out.detail), out.detail);
+
+    // ...while a MEASURABLE full-bleed ground that really does paint the frame's colour is still
+    // dropped, or every correct canvas-coloured halo becomes a review.
+    const noop = row(await run(buildFrame({ frameFill: "#ffffff", backdrop: "#ffffff",
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#ffffff", strokeWeight: 3 }) }), {}),
+      "annotation-knockout");
+    check("6k a measurable no-op backdrop is still dropped", noop.status === "ok", noop.detail);
+  }
+
+  // 6l — two overlapping grounds under ONE translucent group. Their shared group opacity is already
+  //      baked into each of them, so folding them composites it twice; Figma applies it once to the
+  //      pair combined. The script declines rather than modelling it.
+  {
+    const out = row(await run(buildFrame({ dimGroup: 0.5,
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#e2e2e2", strokeWeight: 3 }) }), {}),
+      "annotation-knockout");
+    check("6l overlapping grounds in a dim group are not FAILED", out.status !== "FAIL", out.detail);
+    check("6l and the shared group is named as the reason",
+          /translucent group/.test(out.detail), out.detail);
+    check("6l and no composite is blessed as the requested colour",
+          !/asks for when the annotation sits on a tint/.test(out.detail), out.detail);
+
+    // A SINGLE ground under a translucent group is not affected — the opacity is applied once either
+    // way, so it must still be measured. Otherwise this fix would silence every tinted annotation.
+    const lone = row(await run(buildFrame({ tint: "#dddddd", tintOpacity: 0.45,
+      annotation: annotation({ x: 100, y: 195, w: 120, h: 18, stroke: "#f0f0f0", strokeWeight: 3 }) }), {}),
+      "annotation-knockout");
+    check("6l a lone ground under one opacity is still measured",
+          lone.status === "REVIEW" && !/translucent group/.test(lone.detail), lone.detail);
   }
 
   // 7 — crossing a MUTED context line is legal under the highlight treatment (review finding 4).
@@ -415,6 +693,25 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const without = await run(buildFrame(), {});
     const n = (x) => Number(/all (\d+) furniture/.exec(row(x, "furniture-weight").detail)[1]);
     check("13 the tick's STROKE is still counted", n(out) === n(without) + 1, `${n(without)} -> ${n(out)} furniture strokes`);
+  }
+
+  // 13b — box-alignment is EXACT, not "within a pixel". The old gate allowed +/-1px, which passed a
+  // chart ending 0.57px short of the content box — invisible in a render, plainly wrong in the
+  // properties panel next to a header and footer that do land on it.
+  {
+    const exact = await run(buildFrame(), {});
+    check("13b an exactly-aligned chart passes", row(exact, "box-alignment").status === "ok", row(exact, "box-alignment").detail);
+
+    const short = await run(buildFrame({ chartShort: 0.57 }), {});
+    check("13b a 0.57px shortfall now FAILS", row(short, "box-alignment").status === "FAIL", row(short, "box-alignment").detail);
+    check("13b and the failure points at the re-pin recipe", /re-pin per FITTING\.md/.test(row(short, "box-alignment").detail), row(short, "box-alignment").detail);
+
+    // float residue from rescale must still pass, or every fitted page fails on arithmetic noise
+    const noise = await run(buildFrame({ chartShort: 0.004 }), {});
+    check("13b rescale float residue still passes", row(noise, "box-alignment").status === "ok", row(noise, "box-alignment").detail);
+
+    // and the tolerance is stated in the row, so a reader knows what it is being held to
+    check("13b the row states the tolerance", /must be exact to 0\.05/.test(row(exact, "box-alignment").detail), row(exact, "box-alignment").detail);
   }
 
   // 14 — the rest of the 302-wide geometry, not just the text floor.
@@ -595,6 +892,31 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
           row(clear, "label-contrast-on-background").detail);
   }
 
+  // 18e — the footer's source line: bold on the prefix ONLY. A real run shipped it bold throughout
+  // and every other row passed, because nothing else inspects weight outside annotation__*.
+  {
+    const good = await run(buildFrame(), {});
+    check("18e a correct source line passes", row(good, "source-line-weight").status === "ok", row(good, "source-line-weight").detail);
+    const bad = await run(buildFrame({ boldSource: true }), {});
+    check("18e a wholly-bold source line FAILS", row(bad, "source-line-weight").status === "FAIL", row(bad, "source-line-weight").detail);
+    check("18e and names the collapse that causes it", /FIRST run/.test(row(bad, "source-line-weight").detail), row(bad, "source-line-weight").detail);
+    // Not-bold is not the bar: the contract is Regular, so the weights BETWEEN Regular and Bold have
+    // to fail too, or a tail nudged to Medium/Light/Italic gets certified.
+    for (const w of ["Medium", "Light", "Italic"]) {
+      const off = await run(buildFrame({ sourceTailWeight: w }), {});
+      check(`18e a ${w} producer name FAILS`, row(off, "source-line-weight").status === "FAIL", row(off, "source-line-weight").detail);
+      check(`18e and says Regular is what ${w} owes`, /prescribes Regular/.test(row(off, "source-line-weight").detail), row(off, "source-line-weight").detail);
+    }
+    // The prefix owes Bold exactly, for the same reason the tail owes Regular exactly. A substring
+    // test on /bold|black/ certifies all four of these, so a footer nudged off the house weight
+    // ships looking almost right.
+    for (const w of ["Semibold", "ExtraBold", "Black", "Bold Italic"]) {
+      const off = await run(buildFrame({ sourcePrefixWeight: w }), {});
+      check(`18e a ${w} prefix FAILS`, row(off, "source-line-weight").status === "FAIL", row(off, "source-line-weight").detail);
+      check(`18e and names Bold as the target`, /want Bold/.test(row(off, "source-line-weight").detail), row(off, "source-line-weight").detail);
+    }
+  }
+
   // 19 — the unimplemented half of the hierarchy is declared, not certified.
   {
     const out = await run(buildFrame(), {});
@@ -607,8 +929,18 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const out = await run(buildFrame({ frameW: 302, frameH: 400, labelSize: 11,
       annotation: annotation({ x: 20, y: 130, w: 80, h: 14, size: 11, stroke: "#ffffff", strokeWeight: 3 }) }), {});
     check("20 block-gap SKIPPED on 302", row(out, "annotation-block-gap").status === "SKIPPED", row(out, "annotation-block-gap").detail);
-    const big = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    // The annotation has to sit ABOVE the plot (which spans y 122-474) for this row to be in scope
+    // at all — see the in-plot case below. At y=110 it clears the header by 2px, so the row runs and
+    // fails, which is what "not SKIPPED" is asserting.
+    const big = await run(buildFrame({ annotation: annotation({ x: 100, y: 110, stroke: "#ffffff", strokeWeight: 3 }) }), {});
     check("20 540-wide still checks block-gap", row(big, "annotation-block-gap").status !== "SKIPPED", row(big, "annotation-block-gap").detail);
+    check("20 and it reports which annotations put it in scope", /extend past the plot/.test(row(big, "annotation-block-gap").detail), row(big, "annotation-block-gap").detail);
+    // An annotation INSIDE the plot makes the block the plot, so this row would demand 27px of the
+    // very geometry `gap` requires to be 12-16 — the two are unsatisfiable together. It defers.
+    const inPlot = await run(buildFrame({ annotation: annotation({ x: 100, y: 195, stroke: "#ffffff", strokeWeight: 3 }) }), {});
+    check("20 an in-plot annotation defers to the gap row", row(inPlot, "annotation-block-gap").status === "SKIPPED", row(inPlot, "annotation-block-gap").detail);
+    check("20 and says why it deferred", /inside the plot/.test(row(inPlot, "annotation-block-gap").detail), row(inPlot, "annotation-block-gap").detail);
+    check("20 while the gap row still passes on that frame", row(inPlot, "gap").status === "ok", row(inPlot, "gap").detail);
   }
 
   // 21 — an annotation covering a filled bar segment, with no value label to catch it.
@@ -850,6 +1182,483 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const even = buildFrame();
     even.children.find((c) => c.name === "chart").absoluteBoundingBox = { x: 16, y: 122, width: 508, height: 352 };
     check("31 a symmetric 14/14 still passes", row(await run(even, {}), "gap").status === "ok", row(await run(even, {}), "gap").detail);
+  }
+
+  // 33 — the colour-vision / grayscale-seams rows must hand over a RUNNABLE command, not a tool
+  // name. They stay SKIPPED (no shell inside a Figma plugin), but a gap the operator has to
+  // reconstruct by hand is the one that actually gets skipped.
+  {
+    const out = await run(buildFrame({ secondColour: true }), {});
+    for (const name of ["colour-vision", "grayscale-seams"]) {
+      const r = row(out, name);
+      check(`33 ${name} still declares itself skipped`, r.status === "SKIPPED", r.status);
+      check(`33 ${name} names its owner`, r.ownedBy === "scripts/color_audit.py", String(r.ownedBy));
+      check(`33 ${name} emits the interpreter, not a bare script`,
+            /\.venv\/bin\/python \.claude\/skills\/create-figma-chart\/scripts\/color_audit\.py/.test(r.detail), r.detail);
+      check(`33 ${name} passes real hexes`, /'#[0-9a-f]{6}(,#[0-9a-f]{6})*'/.test(r.detail), r.detail);
+      check(`33 ${name} declares an adjacency mode`, /--separated|--maps|--line/.test(r.detail), r.detail);
+    }
+    // Both rows must offer the SAME command — they are one run of one script.
+    const cmdOf = (n) => (/color_audit\.py (.*?)(?: —|$)/.exec(row(out, n).detail) || [])[1];
+    check("33 both rows hand over one identical command", cmdOf("colour-vision") === cmdOf("grayscale-seams"),
+          `${cmdOf("colour-vision")} vs ${cmdOf("grayscale-seams")}`);
+    // The mode flag also picks which palette a --suggest rerun searches, so it is not cosmetic.
+    // A line/slope palette needs `--line`: `--separated` alone would have the search recommend FILL
+    // colours for thin strokes. The default fixture is a line chart.
+    check("33 a line series asks for the Line and Slope variants",
+          / --line\b/.test(row(out, "colour-vision").detail), row(out, "colour-vision").detail);
+    // A stacked chart is the case where order matters, so the warning must be present there — and only
+    // there, since neither a map nor a line chart has seams. Strip the series lines to reach that branch.
+    const noSeries = buildFrame({ barSegment: true, secondColour: true });
+    const chartOf = (f) => f.children.find((c) => c.name === "chart");
+    chartOf(noSeries).children = chartOf(noSeries).children.filter((c) => !/^(line|outline)__/.test(c.name));
+    const dSep = row(await run(noSeries, {}), "colour-vision").detail;
+    check("33 a fill-only palette gets --separated, not --line",
+          / --separated\b/.test(dSep) && !/--line/.test(dSep), dSep);
+    check("33 and that run warns that stack order matters", /STACKED or SEGMENTED/.test(dSep), dSep);
+    // --- what the palette is BUILT FROM. The `fills` inventory was the wrong source: it carries every
+    // solid paint on an area node in the plot, and a TEXT node has one, while a line chart's series
+    // colour is a STROKE and is not in it at all. On this very fixture that meant the emitted command
+    // audited `label__A`'s text fill and omitted the series colour — furniture in, data out.
+    const offPaletteLabel = row(await run(buildFrame({ labelFill: "#123456" }), {}), "colour-vision").detail;
+    check("33 a text label's fill is NOT audited as a category",
+          !/#123456/.test(offPaletteLabel), offPaletteLabel);
+    // The other half: the series colour must be PRESENT, and it exists only as a stroke.
+    const strokeOnly = row(await run(buildFrame({ gappedLine: true }), {}), "colour-vision").detail;
+    check("33 a line series' stroke colour IS audited", /#b13507/.test(strokeOnly), strokeOnly);
+    // `outline__*` is the white halo under a line, shared by every series — not a category colour.
+    const rings = row(await run(buildFrame({ scatterRings: true }), {}), "colour-vision").detail;
+    check("33 the white outline halo is not taken for a category",
+          !/#ffffff/.test(rings) && /#b13507/.test(rings), rings);
+    // A colour carrying two categories is collapsed by the hex dedupe, so it is NAMED instead of
+    // silently dropped — otherwise the severest clash there is (deltaE 0) produces a vacuous pass.
+    const twoSeries = row(await run(buildFrame({ extraLine: 3 }), {}), "colour-vision").detail;
+    check("33 two series on one colour are named, not silently merged",
+          /judge them by eye/.test(twoSeries) && /A \+ B|B \+ A/.test(twoSeries), twoSeries);
+    // The category name sits on the GROUP and the paint on its leaves — grapher's documented
+    // `datapoints__<Entity>` shape, where the filled marker is called something like `Ellipse 12`.
+    // Reading the category off the painted node's own name loses it on exactly that shape, so two
+    // entities sharing a marker colour would be merged with no warning. The colour here is carried by
+    // NOTHING else in the fixture, so this can only pass via the ancestor.
+    const ancestry = buildFrame();
+    const marker = (entity) => node({ name: `datapoints__${entity}`, x: 60, y: 150, width: 40, height: 40,
+      children: [node({ type: "ELLIPSE", name: "Ellipse 12", x: 60, y: 150, width: 8, height: 8,
+                        fills: solid("#58ac8c") })] });
+    chartOf(ancestry).children.push(marker("Peru"), marker("Nepal"));
+    const dAnc = row(await run(ancestry, {}), "colour-vision").detail;
+    check("33 a marker's category is read from its group, not its leaf name",
+          /#58ac8c carries (Peru \+ Nepal|Nepal \+ Peru)/.test(dAnc), dAnc);
+    // And the category is what LABELS the audit too. Left as the leaf name, a failing pair reads
+    // "Ellipse 12 vs Ellipse 12" and identifies nothing.
+    check("33 and it labels the audit, so --names never says Ellipse 12",
+          /--names '[^']*Peru/.test(dAnc) && !/Ellipse 12/.test(dAnc), dAnc);
+    // But a choropleth puts every country in a bin into ONE colour by design, so the same note must
+    // not fire on a map or it fires on every map.
+    // Three countries, two of them in one bin: sharing a bin must not read as a clash, and the third
+    // keeps a genuine PAIR in the palette so the map's own run is still emitted.
+    const sameBin = buildFrame({ mapCountries: true });
+    const sameBinMap = sameBin.children.find((c) => c.name === "chart").children.find((c) => c.name === "map");
+    sameBinMap.children.find((c) => c.name === "country__DEU").fills = solid("#4c6a9c");
+    sameBinMap.children.push(node({ type: "VECTOR", name: "country__BRA", x: 200, y: 160, width: 60, height: 40,
+      fills: solid("#b13507") }));
+    const binned = row(await run(sameBin, {}), "colour-vision").detail;
+    check("33 map shapes sharing a bin colour are NOT reported as a clash",
+          !/judge them by eye/.test(binned), binned);
+    // A map is audited as a CATEGORICAL choropleth, which a sequential ramp is not: the deltaE 20 gate
+    // fails a correct ramp by construction, so the row must say so rather than hand over the command flat.
+    check("33 a map warns that a sequential ramp is out of scope",
+          /SEQUENTIAL ramp/.test(binned) && /--maps/.test(binned), binned);
+    // A frame can hold BOTH families at once — combination.md's exemplar is a line chart with an inset
+    // locator map whose countries are filled with the same colours as their series. `isMap` is
+    // frame-level, so the map won the single mode flag and the LINE STROKES were audited under
+    // `--maps`, whose --suggest answers out of the lighter Categorical Maps set: fill colours
+    // recommended for thin strokes, the exact swap `--line` exists to prevent. Worse, colour dedupe ran
+    // across both families, so the series entry collapsed into the country that shares its colour and
+    // the series disappeared from `--names` altogether. This fixture IS that chart: `mapCountries` adds
+    // the inset to the default line series, and `country__FRA` reuses the series colour exactly as the
+    // guidelines prescribe.
+    const combo = row(await run(buildFrame({ mapCountries: true, secondColour: true }), {}), "colour-vision").detail;
+    check("33 a combination frame audits the series as a LINE, not as a map",
+          /--names 'B,A' --line/.test(combo), combo);
+    check("33 and still audits its inset map as a map",
+          /--names 'country__FRA,country__DEU' --maps/.test(combo), combo);
+    check("33 and says why there are two runs, so the shared colour is not read as a clash",
+          /two separate runs/.test(combo) && /expected/.test(combo), combo);
+    // The split must not fire on a frame with only one family, or every ordinary chart grows a note
+    // about a map it does not have. Both directions, since either alone can pass on a broken gate.
+    const mapOnly = buildFrame({ mapCountries: true });
+    chartOf(mapOnly).children = chartOf(mapOnly).children.filter((c) => c.name !== "line__A");
+    const dMapOnly = row(await run(mapOnly, {}), "colour-vision").detail;
+    check("33 a map with no series is still ONE run, in --maps",
+          /--maps/.test(dMapOnly) && !/--line/.test(dMapOnly) && !/two separate runs/.test(dMapOnly), dMapOnly);
+    const lineOnly = row(await run(buildFrame({ secondColour: true }), {}), "colour-vision").detail;
+    check("33 a line chart with no map is still ONE run, in --line",
+          /--line/.test(lineOnly) && !/--maps/.test(lineOnly) && !/two separate runs/.test(lineOnly), lineOnly);
+    // Figma switches a paint off two independent ways, and only `visible: false` was tested on the
+    // FILL side — so a mark left at `opacity: 0` handed the audit a category colour that paints no
+    // pixels, and could be sent a reviewer to go and "fix". The stroke side already applied both
+    // tests. This hex is carried by nothing else in the fixture, so its absence can only come from
+    // the opacity test; the visible segment is asserted present so the case cannot pass by the
+    // command going missing altogether.
+    const ghost = buildFrame({ barSegment: true });
+    chartOf(ghost).children.push(node({ type: "RECTANGLE", name: "bar__Ghost", x: 300, y: 380,
+      width: 60, height: 40, fills: [Object.assign(solid("#12ab34")[0], { opacity: 0 })] }));
+    const dGhost = row(await run(ghost, {}), "colour-vision").detail;
+    check("33 a fully transparent mark fill is not a palette colour",
+          !/#12ab34/.test(dGhost) && /#4c6a9c/.test(dGhost), dGhost);
+    // PARTIAL opacity is the other half, and it is not the same case: the mark IS on the canvas, so it
+    // keeps its box and its other rows — but its colour is the raw paint, not the composite the reader
+    // sees, so auditing it asks about a colour that is not on the page. Held back and NAMED, since a
+    // silently shorter palette is a subset audit reported as a whole one.
+    const faded = buildFrame({ barSegment: true });
+    chartOf(faded).children.push(node({ type: "RECTANGLE", name: "bar__Faded", x: 300, y: 380,
+      width: 60, height: 40, fills: [Object.assign(solid("#12ab34")[0], { opacity: 0.5 })] }));
+    const dFaded = row(await run(faded, {}), "colour-vision").detail;
+    check("33 a translucent mark is held out of the palette",
+          !/#12ab34/.test(dFaded) && /#4c6a9c/.test(dFaded), dFaded);
+    check("33 and the held-back mark is named, not silently dropped",
+          /translucent/.test(dFaded) && /Faded/.test(dFaded), dFaded);
+    // NODE opacity dims every paint under it and accumulates down the tree, so a fully opaque leaf
+    // inside a half-opacity group is just as unreportable. Read off the leaf's own paint alone, this
+    // one looks perfectly measurable — which is why the group carries the opacity here, not the leaf.
+    const dimGroup = buildFrame({ barSegment: true });
+    chartOf(dimGroup).children.push(node({ name: "series__Muted", x: 300, y: 380, width: 60, height: 40,
+      opacity: 0.4, children: [node({ type: "RECTANGLE", name: "Rectangle 7", x: 300, y: 380,
+        width: 60, height: 40, fills: solid("#12ab34") })] }));
+    const dDim = row(await run(dimGroup, {}), "colour-vision").detail;
+    check("33 an ancestor's opacity disqualifies an opaque leaf's colour",
+          !/#12ab34/.test(dDim) && /translucent/.test(dDim), dDim);
+    // ZERO node opacity is NOT partial opacity, and the two must not share a verdict. A node at
+    // `opacity: 0` paints no pixels at all — the same non-rendering state as `visible: false` and as a
+    // zero-opacity PAINT, both of which are already dropped outright. Grouped with partial opacity it
+    // came back as a held-back translucent mark, so the audit NAMED an invisible category and told the
+    // operator to reset its opacity or judge it by eye: a verdict about something not on the canvas.
+    // The group carries the zero and the leaf is fully opaque, so the leaf's own paint cannot excuse it.
+    const zeroGroup = buildFrame({ barSegment: true });
+    chartOf(zeroGroup).children.push(node({ name: "series__Invisible", x: 300, y: 380, width: 60, height: 40,
+      opacity: 0, children: [node({ type: "RECTANGLE", name: "Rectangle 9", x: 300, y: 380,
+        width: 60, height: 40, fills: solid("#12ab34") })] }));
+    const dZero = row(await run(zeroGroup, {}), "colour-vision").detail;
+    check("33 a node at opacity 0 is not a palette colour",
+          !/#12ab34/.test(dZero) && /#4c6a9c/.test(dZero), dZero);
+    check("33 and it is not reported as a translucent mark to go and check",
+          !/translucent/.test(dZero) && !/Invisible/.test(dZero), dZero);
+    // Opacity MULTIPLIES down the tree, so a pair of small values compounds to a very small one:
+    // 0.05 inside 0.05 is 0.0025. That is FAINT, not absent — the non-rendering exit is exactly zero,
+    // never a floor — so it takes the translucent treatment: out of the palette, and NAMED, because
+    // "reset the opacity and re-run" is the one instruction that helps here. A cutoff would have
+    // dropped it from every row in the file instead, including the rows that never look at colour.
+    const compounded = buildFrame({ barSegment: true });
+    chartOf(compounded).children.push(node({ name: "series__Vanished", x: 300, y: 380, width: 60, height: 40,
+      opacity: 0.05, children: [node({ name: "inner", x: 300, y: 380, width: 60, height: 40, opacity: 0.05,
+        children: [node({ type: "RECTANGLE", name: "Rectangle 10", x: 300, y: 380,
+          width: 60, height: 40, fills: solid("#12ab34") })] })] }));
+    const dComp = row(await run(compounded, {}), "colour-vision").detail;
+    check("33 a mark compounded to near-zero is held out of the palette and named",
+          !/#12ab34/.test(dComp) && /translucent/.test(dComp) && /Vanished/.test(dComp) && /#4c6a9c/.test(dComp), dComp);
+    // And it stays in the rows that are not about colour at all. A cutoff took the whole subtree out of
+    // the walk, so an 8px label at 0.005 left `text-floor` reporting that every range cleared the floor
+    // — a row certifying a frame on input it had silently removed. Faint is not gone.
+    const faintText = buildFrame();
+    chartOf(faintText).children.push(node({ name: "faint", x: 60, y: 300, width: 80, height: 12, opacity: 0.005,
+      children: [text("label__Faint", "8px and faint", 8, 60, 300, 80, 12, "#4c6a9c")] }));
+    const outFaint = await run(faintText, {});
+    check("33 a near-transparent 8px label is still judged by text-floor",
+          row(outFaint, "text-floor").status === "FAIL" && /8px and faint/.test(row(outFaint, "text-floor").detail),
+          row(outFaint, "text-floor").detail);
+    // Exactly zero is the other side of that line, and it must stay dropped: the product reaches it
+    // only through a factor of zero, so nothing here is a threshold judgement.
+    const zeroText = buildFrame();
+    chartOf(zeroText).children.push(node({ name: "gone", x: 60, y: 300, width: 80, height: 12, opacity: 0,
+      children: [text("label__Gone", "8px and gone", 8, 60, 300, 80, 12, "#4c6a9c")] }));
+    const outZeroText = await run(zeroText, {});
+    check("33 while an 8px label at opacity 0 is not judged at all",
+          row(outZeroText, "text-floor").status === "ok" && !/8px and gone/.test(row(outZeroText, "text-floor").detail),
+          row(outZeroText, "text-floor").detail);
+    // But a compounded value that is still ABOVE the floor is genuinely on the canvas: it keeps the
+    // translucent treatment and stays NAMED, or the new zero gate would swallow every dimmed mark.
+    const stillVisible = buildFrame({ barSegment: true });
+    chartOf(stillVisible).children.push(node({ name: "series__Halved", x: 300, y: 380, width: 60, height: 40,
+      opacity: 0.5, children: [node({ name: "inner", x: 300, y: 380, width: 60, height: 40, opacity: 0.5,
+        children: [node({ type: "RECTANGLE", name: "Rectangle 11", x: 300, y: 380,
+          width: 60, height: 40, fills: solid("#12ab34") })] })] }));
+    const dStill = row(await run(stillVisible, {}), "colour-vision").detail;
+    check("33 a compounded but still-visible mark stays translucent and named",
+          !/#12ab34/.test(dStill) && /translucent/.test(dStill) && /Halved/.test(dStill), dStill);
+    // The FRAME is the one ancestor every mark shares, and it sits ABOVE the walk — which was seeded
+    // with a literal 1, so it was the only node whose opacity was never examined. A frame left at
+    // reduced opacity dims every mark on the canvas, and the raw paints went on being emitted as a
+    // paste-ready command. Nothing inside the frame is touched here, so only the frame can account for
+    // the difference.
+    const dimFrame = buildFrame({ barSegment: true });
+    dimFrame.opacity = 0.4;
+    const dDimFrame = row(await run(dimFrame, {}), "colour-vision").detail;
+    check("33 a frame's own opacity disqualifies every mark under it",
+          !/#4c6a9c/.test(dDimFrame) && /translucent/.test(dDimFrame), dDimFrame);
+    // At zero the marks do not merely lose their colour, they leave every row — and so does the frame:
+    // it paints no pixels, so it goes through the shared gate in case 35 rather than being explained
+    // inside a colour row while thirty other rows go on certifying it.
+    const goneFrame = buildFrame({ barSegment: true });
+    goneFrame.opacity = 0;
+    const outGone = await run(goneFrame, {});
+    check("33 a frame at opacity 0 is not audited for colour at all",
+          !row(outGone, "colour-vision") && !!row(outGone, "frame-not-rendered"),
+          outGone.verdict);
+    // And an ordinary frame must carry neither message, or both become noise on every run.
+    // And the note must not fire on an ordinary opaque chart, or it becomes noise on every run.
+    const opaque = row(await run(buildFrame({ barSegment: true }), {}), "colour-vision").detail;
+    check("33 an opaque plot carries no translucency note",
+          !/translucent/.test(opaque) && /#4c6a9c/.test(opaque), opaque);
+
+    // --- when --names is safe to emit. Rename EVERY qualifying mark, not one: the emitter keeps the
+    // FIRST name per distinct hex, so renaming an arbitrary node can leave its colour already
+    // registered under a clean earlier name and silently test nothing. (That is exactly how this case
+    // first passed vacuously.) `barSegment` supplies a filled RECTANGLE — a data mark, which is what
+    // now feeds the palette; renaming text fills tests nothing.
+    // `to` may be a function of the mark's index, for the cases where the names must differ from each
+    // other — a palette of two colours under one name is a different defect, tested separately.
+    const renameMarks = (frame, to) => {
+      let renamed = 0;
+      (function walk(n) {
+        if (n.type !== "TEXT" && !(n.children && n.children.length)
+            && n.fills && n.fills.length && n.fills.some((f) => f.type === "SOLID")) {
+          n.name = typeof to === "function" ? to(renamed) : to; renamed++;
+        }
+        (n.children || []).forEach(walk);
+      })(frame);
+      return renamed;
+    };
+    // A comma in a name would misalign every --names entry after it, so the flag is dropped.
+    const comma = buildFrame({ barSegment: true, secondColour: true });
+    const renamed = renameMarks(comma, "series__Chile, mainland");
+    check("33 the comma fixture actually renamed a data mark", renamed > 0, `renamed ${renamed}`);
+    const d2 = row(await run(comma, {}), "colour-vision").detail;
+    // Match the FLAG (`--names '…'`), not the substring: the explanatory note says "--names
+    // omitted", so a bare /--names/ is satisfied by the very sentence proving it was dropped.
+    check("33 a comma in a name drops --names rather than misaligning it",
+          !/--names '/.test(d2) && /contains a comma/.test(d2), d2);
+    // An apostrophe would end the single-quoted shell argument mid-name, so the advertised paste-ready
+    // command would not parse. Same treatment, and the reason must name the apostrophe.
+    const apos = buildFrame({ barSegment: true, secondColour: true });
+    renameMarks(apos, "series__Women's employment");
+    const d4 = row(await run(apos, {}), "colour-vision").detail;
+    check("33 an apostrophe in a name drops --names rather than breaking the shell",
+          !/--names '/.test(d4) && /apostrophe/.test(d4), d4);
+    // The happy path, or the negatives above would pass on a build that never emits --names at all.
+    const named = buildFrame({ barSegment: true, secondColour: true });
+    renameMarks(named, (i) => `series__${["Chile", "Peru", "Nepal"][i] || "Other"}`);
+    const d1 = row(await run(named, {}), "colour-vision").detail;
+    // The label is the CATEGORY the mark belongs to, not the node's raw name — `--names` exists so the
+    // audit's findings name the categories that need attention.
+    check("33 clean names DO produce --names, carrying the category", /--names 'Chile[,']/.test(d1), d1);
+    check("33 and then no omission note is attached", !/--names omitted/.test(d1), d1);
+    // 33b — the two conditions measured on the REAL file, not invented. A `static_viz` import names
+    // every series group `<kind>__<slug>` (the dataset, not the category) and every paint-bearing
+    // leaf `Vector`, so distinct colours arrive sharing one name. That is worse than a missing name
+    // because it looks right: the audit prints one row per colour, all under the same label.
+    const shareName = buildFrame();
+    const chartGrp = shareName.children.find((c) => c.name === "chart");
+    chartGrp.children.push(node({
+      name: "bars__agriculture-share", type: "GROUP", x: 100, y: 300, width: 120, height: 60,
+      children: [
+        node({ type: "RECTANGLE", name: "Vector", x: 100, y: 300, width: 40, height: 60, fills: solid("#00847e") }),
+        node({ type: "RECTANGLE", name: "Vector", x: 150, y: 300, width: 40, height: 60, fills: solid("#883039") }),
+      ],
+    }));
+    const dShare = row(await run(shareName, {}), "colour-vision").detail;
+    check("33b two colours under one category name drop --names",
+          !/--names '/.test(dShare) && /distinct name/.test(dShare), dShare);
+    check("33b and both colours still reach the palette",
+          /#00847e/.test(dShare) && /#883039/.test(dShare), dShare);
+
+    // A generic import name labels nothing, even when it is distinct per colour.
+    const generic = buildFrame();
+    const chartGrp2 = generic.children.find((c) => c.name === "chart");
+    chartGrp2.children.push(node({
+      name: "series__one", type: "GROUP", x: 100, y: 300, width: 40, height: 60,
+      children: [node({ type: "RECTANGLE", name: "Vector", x: 100, y: 300, width: 40, height: 60, fills: solid("#00847e") })],
+    }));
+    chartGrp2.children.push(node({ type: "RECTANGLE", name: "Rectangle 12", x: 150, y: 300, width: 40, height: 60, fills: solid("#883039") }));
+    const dGen = row(await run(generic, {}), "colour-vision").detail;
+    check("33b an import-default name drops --names and says so",
+          !/--names '/.test(dGen) && /(import default|distinct name)/.test(dGen), dGen);
+
+    // 33b-grapher — the OTHER naming convention, and the one --names exists for. Grapher's own SVG
+    // export emits `line__<Entity>` / `outline__<Entity>` / `datapoints__<Entity>` per series, where
+    // the second token IS the category. That must keep producing labels; the guards above are aimed
+    // at `static_viz`'s `<slug>__<part>`, where it is not. One frame proves both halves are separable.
+    const grapher = buildFrame();
+    const gChart = grapher.children.find((c) => c.name === "chart");
+    for (const [entity, hex] of [["Chile", "#883039"], ["Peru", "#00847e"]]) {
+      gChart.children.push(node({
+        name: `line__${entity}`, type: "GROUP", x: 100, y: 200, width: 200, height: 80,
+        children: [node({ type: "VECTOR", name: "Vector", x: 100, y: 200, width: 200, height: 80,
+                          strokes: solid(hex), strokeWeight: 3, strokeAlign: "CENTER", dashPattern: [] })],
+      }));
+    }
+    const dGrapher = row(await run(grapher, {}), "colour-vision").detail;
+    check("33b grapher line__<Entity> DOES produce --names",
+          /--names '[^']*Chile[^']*Peru[^']*'/.test(dGrapher) || /--names '[^']*Peru[^']*Chile[^']*'/.test(dGrapher), dGrapher);
+    check("33b and the leaf's generic `Vector` name is not what gets used",
+          !/--names '[^']*Vector/.test(dGrapher), dGrapher);
+    check("33b a line palette selects --line", /--line\b/.test(dGrapher), dGrapher);
+
+    // 33c — a `static_viz` chart group is `chart__<slug>`, and an exact-only match called that
+    // "ungrouped" while walking it anyway: a wrong explanation for a right answer.
+    const slugged = buildFrame();
+    slugged.children.find((c) => c.name === "chart").name = "chart__agriculture-share";
+    const outSlug = await run(slugged, {});
+    check("33c chart__<slug> resolves by name",
+          /name "chart__agriculture-share"/.test(outSlug.resolved.chartBy), outSlug.resolved.chartBy);
+    check("33c and is not reported as ungrouped",
+          !/ungrouped/.test(outSlug.resolved.chartBy), outSlug.resolved.chartBy);
+    // The third variant counted in the file: a two-format page names them `chart-desktop`/`chart-mobile`.
+    const hyphen = buildFrame();
+    hyphen.children.find((c) => c.name === "chart").name = "chart-desktop";
+    const outHyphen = await run(hyphen, {});
+    check("33c chart-desktop resolves by name",
+          /name "chart-desktop"/.test(outHyphen.resolved.chartBy) && !/ungrouped/.test(outHyphen.resolved.chartBy),
+          outHyphen.resolved.chartBy);
+    check("33c plain `chart` still resolves exactly",
+          /name "chart"$/.test((await run(buildFrame(), {})).resolved.chartBy),
+          (await run(buildFrame(), {})).resolved.chartBy);
+
+    // 34 — a LEGEND is a picture of the categories, not a set of categories. grapher draws it INSIDE
+    // the chart group and OUTSIDE `map` (measured: `chart > numeric-color-legend > {lines, swatches,
+    // labels, swatch-hit-areas}`, a sibling of `map`), so every swatch arrived as an ordinary filled
+    // plot mark with `fromMap: false`. An ordinary choropleth then reported TWO palettes — its own
+    // legend audited as chart marks, under `--separated`, against the wrong set.
+    const legendGroup = (name, swatches) => node({ name, x: 40, y: 470, width: 300, height: 30, children: [
+      node({ name: "swatches", x: 40, y: 470, width: 300, height: 12,
+             children: swatches.map(([nm, hex], i) => node({ type: "RECTANGLE", name: nm, x: 40 + i * 70,
+               y: 470, width: 60, height: 12, fills: solid(hex) })) }),
+      node({ name: "labels", x: 40, y: 486, width: 300, height: 14,
+             children: [text("0", "0", 12, 40, 486, 20, 14, "#2d2e2d")] })] });
+
+    // 34a — a pure map with grapher's numeric legend. Two of the swatches repeat the countries' own
+    // bin colours; the third is an empty bin, drawn in the legend and on no country.
+    const legMap = buildFrame({ mapCountries: true });
+    const legMapChart = legMap.children.find((c) => c.name === "chart");
+    legMapChart.children = legMapChart.children.filter((c) => !/^(line|outline)__|^datapoints__/.test(c.name));
+    legMapChart.children.push(legendGroup("numeric-color-legend", [
+      ["Rectangle 3", "#4c6a9c"], ["Rectangle 4", "#b13507"], ["Rectangle 5", "#e56e5a"]]));
+    const dLegMap = row(await run(legMap, {}), "colour-vision").detail;
+    check("34a a map's own legend does not make it a two-palette frame",
+          !/two separate runs/.test(dLegMap) && !/--separated/.test(dLegMap), dLegMap);
+    check("34a and the map itself is still audited", /--maps/.test(dLegMap) && /#4c6a9c/.test(dLegMap), dLegMap);
+    check("34a the excluded swatches are counted, not silently dropped",
+          /legend swatch\(es\) are NOT in this palette/.test(dLegMap), dLegMap);
+    check("34a and a colour that exists ONLY in the legend is named",
+          /#e56e5a/.test(dLegMap) && /ONLY in the legend/.test(dLegMap), dLegMap);
+    check("34a while a swatch's own node name never labels the audit",
+          !/Rectangle 3/.test(dLegMap), dLegMap);
+
+    // 34b — the same on an ordinary chart, where the harm lands on `--names`: a numeric legend's bins
+    // are unnamed rects, so one swatch in a colour of its own put an import default into the palette
+    // and dropped the flag for the whole run. The series here is `line__A`, which names itself.
+    const legLine = buildFrame({ secondColour: true });
+    legLine.children.find((c) => c.name === "chart").children
+      .push(legendGroup("categorical-color-legend", [["Rectangle 8", "#e56e5a"]]));
+    const dLegLine = row(await run(legLine, {}), "colour-vision").detail;
+    check("34b a legend swatch does not cost an ordinary chart its --names",
+          /--names 'B,A'/.test(dLegLine) && !/--names omitted/.test(dLegLine), dLegLine);
+    check("34b and the swatch colour is reported as legend-only, not audited as a category",
+          /#e56e5a/.test(dLegLine) && /ONLY in the legend/.test(dLegLine), dLegLine);
+
+    // 34c — excluded from the PALETTE is not excluded from the page: an annotation dropped over the
+    // legend still covers something the reader needs. It keeps its box and is named for what it is,
+    // because "covers a filled data mark" sends the reader hunting for a bar that is not there.
+    const legAnn = buildFrame({ annotation: annotation({ x: 45, y: 468, w: 40, h: 16, stroke: "#ffffff", strokeWeight: 3 }) });
+    legAnn.children.find((c) => c.name === "chart").children
+      .push(legendGroup("categorical-color-legend", [["Rectangle 8", "#e56e5a"]]));
+    const dLegAnn = row(await run(legAnn, {}), "annotation-overlap");
+    check("34c an annotation over a legend swatch still FAILS", dLegAnn.status === "FAIL", dLegAnn.detail);
+    check("34c and it is called a legend swatch, not a data mark",
+          /a legend swatch/.test(dLegAnn.detail) && !/Rectangle 8 — a filled data mark/.test(dLegAnn.detail), dLegAnn.detail);
+
+    // 35 — the frame that paints no pixels. `collect` tests `visible` on every node it walks, but it
+    // starts at the frame's CHILDREN: a `visible: false` on the frame itself, or on a section holding
+    // it, was never read, and those children carry their own `visible: true`. The frame certified a
+    // full sheet of rows about a deliverable that is switched off.
+    const hiddenFrame = buildFrame({ barSegment: true });
+    hiddenFrame.visible = false;
+    const outHidden = await run(hiddenFrame, {});
+    check("35 a hidden frame emits ONE row, not a sheet of verdicts",
+          outHidden.rows.length === 1 && outHidden.rows[0].check === "frame-not-rendered", `${outHidden.rows.length} rows`);
+    check("35 the row FAILS rather than passing quietly", outHidden.rows[0].status === "FAIL", outHidden.rows[0].status);
+    check("35 the verdict says NOT CHECKED, never 'no mechanical row failed'",
+          /NOT CHECKED/.test(outHidden.verdict) && !/no mechanical row failed/.test(outHidden.verdict), outHidden.verdict);
+    check("35 and it names the switch that is off", /visible=false/.test(outHidden.rows[0].detail), outHidden.rows[0].detail);
+    // The ancestor half. Nothing on the frame or under it is touched here, so only the climb can
+    // account for the difference — and unhiding the frame would not help.
+    const underSection = buildFrame({ barSegment: true });
+    const outSection = await run(underSection, {}, (f) => node({ type: "SECTION", name: "WIP", visible: false, children: [f] }));
+    check("35 a hidden SECTION above the frame counts too",
+          outSection.rows.length === 1 && outSection.rows[0].check === "frame-not-rendered", `${outSection.rows.length} rows`);
+    check("35 and the ancestor is named, since unhiding the frame would not help",
+          /WIP/.test(outSection.rows[0].detail), outSection.rows[0].detail);
+    // Zero effective opacity is the same state reached by the other switch, and takes the same route.
+    const zeroFrame = buildFrame({ barSegment: true });
+    zeroFrame.opacity = 0;
+    const outZero = await run(zeroFrame, {});
+    check("35 an effectively invisible frame takes the same gate",
+          outZero.rows.length === 1 && /effective opacity/.test(outZero.rows[0].detail), outZero.verdict);
+    // And the gate must not fire on a frame that merely CONTAINS something hidden, or every page with
+    // a switched-off spare layer stops being checked at all.
+    const hiddenChild = buildFrame({ barSegment: true });
+    hiddenChild.children.find((c) => c.name === "chart").visible = false;
+    const outChild = await run(hiddenChild, {});
+    check("35 a hidden CHILD does not stop the frame being checked",
+          !row(outChild, "frame-not-rendered") && outChild.rows.length > 20, `${outChild.rows.length} rows`);
+    // A visible frame under a visible section is the other direction: the climb must not invent a
+    // hidden ancestor out of a `visible: true` one.
+    const outVisibleSection = await run(buildFrame({ barSegment: true }), {}, (f) => node({ type: "SECTION", name: "Live", children: [f] }));
+    check("35 a visible section above the frame changes nothing",
+          !row(outVisibleSection, "frame-not-rendered") && outVisibleSection.rows.length > 20,
+          `${outVisibleSection.rows.length} rows`);
+
+    // And the reason given must be the real one, not the comma message reused for a missing name.
+    const anon = buildFrame({ barSegment: true, secondColour: true });
+    renameMarks(anon, "");
+    const d3 = row(await run(anon, {}), "colour-vision").detail;
+    check("33 an unnamed mark reports THAT, not a phantom comma",
+          /has no name/.test(d3) && !/contains a comma/.test(d3) && !/apostrophe/.test(d3), d3);
+
+    // 36 — a palette of ONE colour has no pair, and both rows compare pairs. `color_audit.py` does not
+    // say so: handed a single hex it prints an empty pair list, "overall: min dE inf", and exits 0,
+    // which reads exactly like a clean audit. GUIDELINES.md rules on this case directly — one
+    // categorical colour against neutral grays has nothing to check — so the command is withheld and
+    // the two checks that ARE live are handed over instead.
+    const oneColour = row(await run(buildFrame(), {}), "colour-vision").detail;
+    check("36 a one-colour palette emits no command at all",
+          !/Run: /.test(oneColour) && !/--names|--line|--maps|--separated/.test(oneColour)
+          && /NOTHING TO RUN/.test(oneColour), oneColour);
+    check("36 and it names the colour rather than reporting an empty plot",
+          /#4c6a9c/.test(oneColour) && !/No data marks or series strokes found/.test(oneColour), oneColour);
+    check("36 and hands over the two checks that are live",
+          /contrast against the frame's background/.test(oneColour) && /grayscale/.test(oneColour), oneColour);
+    check("36 and says why running it anyway would look clean",
+          /inf/.test(oneColour) && /GUIDELINES/.test(oneColour), oneColour);
+    // The negative control: two colours is a pair, so the command comes back.
+    const twoColour = row(await run(buildFrame({ secondColour: true }), {}), "colour-vision").detail;
+    check("36 two colours still produce a runnable command",
+          /Run: \.venv\/bin\/python/.test(twoColour) && !/NOTHING TO RUN/.test(twoColour), twoColour);
+    // And the clash note must SURVIVE the withheld command. Two categories painted one colour ARE a
+    // one-colour palette — deltaE 0, the severest collision there is — so the branch that withholds
+    // the run is the branch that most needs to report what it found. Computed before the exit.
+    const twoOnOne = row(await run(buildFrame({ extraLine: 3 }), {}), "colour-vision").detail;
+    check("36 a withheld run still names two categories sharing one colour",
+          /NOTHING TO RUN/.test(twoOnOne) && /judge them by eye/.test(twoOnOne)
+          && /(A \+ B|B \+ A)/.test(twoOnOne), twoOnOne);
+    // GUIDELINES.md rules the same way on a declared highlight treatment: the muting grays are
+    // furniture, so one highlight against them leaves no categorical pair. Which entries are muting
+    // grays is not decidable here — a category legitimately painted gray is a category — so the run is
+    // annotated rather than suppressed, and only when the treatment is DECLARED.
+    const hi = row(await run(buildFrame({ secondColour: true }), { highlightTreatment: true }), "colour-vision").detail;
+    check("36 a declared highlight treatment warns before the command",
+          /highlightTreatment is set/.test(hi) && /Run: \.venv\/bin\/python/.test(hi), hi);
+    check("36 and an undeclared frame carries no such warning",
+          !/highlightTreatment is set/.test(twoColour), twoColour);
   }
 
   const bad = results.filter((x) => !x.ok);

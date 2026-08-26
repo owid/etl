@@ -5,12 +5,18 @@
 
 - **`page.children` on a page you have NOT switched to is lazily loaded, and returns a short list without erroring.** This is the nastiest read in the skill, because it looks like evidence and it is used for exactly the check that matters: "did I leave litter on someone else's page?" The same page reported **4 children while it was current and 2 later without a switch** — which read as "I deleted two of a colleague's frames" in a shared design file. Nothing had been deleted. So: any claim about a page's contents needs `await figma.setCurrentPageAsync(page)` first (that is what loads it), and since a script may switch pages only once, checking N pages means N calls, fanned out in parallel. Never report a page as clean *or* as damaged from an unswitched read — and if you catch yourself about to tell the user you removed something, re-read it properly first.
 - **`figma.currentPage` resets to the file's FIRST page at the start of every `use_figma` call — it does not persist between calls, and `upload_assets` does not follow it.** Measured 2026-08-21: a call ending in `setCurrentPageAsync(<working page>)` was followed by one whose first statement reported `figma.currentPage.name === "Cover"`. Two consequences worth holding onto. **A script must never require a particular page to be current on entry** — `diff_against_template.js` used to throw "open the template's page in Figma, then re-run", which is unsatisfiable from a session and made it unrunnable; it now reads the template unswitched instead. **`PageNode.loadAsync()` is the way to do that honestly** — it loads a page's contents *without* switching to it, which is the half of `setCurrentPageAsync` that matters and the half you are free to spend on a second page. Gating on "the read looks complete" is only the fallback for where `loadAsync` is unavailable, and it is an inference, not a proof: the short list in the point above was *nonempty*, so a resolved header with rows in it does not prove the rest of the subtree arrived. And **`upload_assets` places its asset on whatever page the FILE has open**, which is a third thing again: on one run three consecutive uploads all landed on the working page even though every script had started on Cover. So log the `placedOnNodeId`'s PAGE ancestor on every upload rather than predicting it, and reparent unconditionally.
+- **Four ways a text edit goes wrong silently. All four cost a call on the run that found them, and three produce a plausible-looking result rather than an error.**
+  - **Setting `characters` collapses the node to its FIRST run's style.** The DI footer's first run is the bold `Data source:` prefix, so assigning the new string turned *the producer name bold too* — and it renders as a slightly heavy line that reads as fine until someone looks. The same trap hit an annotation whose figures were meant to be the only bold. **Always re-assert the base weight across the whole string before re-applying the exceptions:** `setRangeFontName(0, len, Regular)` and then bold the ranges you want.
+  - **`resize()` on a TEXT resets `textAutoResize` to `NONE`.** So the documented order — set `HEIGHT`, then `resize()` to fix the width — leaves the node at whatever height you passed, and the text overflows its own box invisibly. One annotation sat at `h: 10` holding 94 characters. Set the width first, the mode second.
+  - **Applying a text style swaps in the STYLE's font, so fonts you loaded beforehand are the wrong ones.** `setTextStyleIdAsync` then `setRangeFontName` throws `Cannot write to node with unloaded font` naming a font you never chose. Load → apply the style → **load again** from the node's new segments → then set ranges.
+  - **A style id carries a suffix, and a truncated one fails silently.** `S:e06b99579b766b5cf289bbcab36a90f3` looks complete and is not — the real id ends `…a90f33ef392cd,`. `setFillStyleIdAsync` with the short form neither binds nor raises; the node keeps its raw hex and the Step 8c unbound-fill row catches it much later. Read ids whole, never through a `.slice()` you added for readable output.
+- **Binding a chart colour needs `importStyleByKeyAsync`, and the key comes from `search_design_system` — not from `getLocalPaintStylesAsync`.** The Chart Colors palette is a *library*, so it is not local and a `/denim/i` scan of local styles returns nothing. Search for the colour by name, take the `key` of the `[Chart Colors] Library` / `Default Palette/...` hit (not the `[Grapher] Library` or `Color Explorations` namesakes, which are different styles with the same colour name), import it, then `setFillStyleIdAsync(imported.id)`.
 - **A sub-pixel stroke is invisible at 1:1 and solid in the export — so never judge one on a 540px preview.** A map leader at the prescribed 0.3px measured **1.26:1** against white in a 540px render (the line spreads over two pixels at ~12% coverage each) and **4.2–6.6:1** at 4×, which is the scale a DI is exported at. The first number reads as a defect and is an artefact. To measure at export scale you need a real 4× render, and neither obvious route gives you one: `get_screenshot`'s `maxDimension` only ever *downscales* and clamps at the node's natural size, so a 540 frame returns 540px however large a number you pass, and `node.screenshot({scale: 4})` returns an inline image you cannot pixel-probe. Clone the frame, `rescale(4)`, `get_screenshot` the clone at `maxDimension: 2160` (its natural size is now 2160, so the clamp allows it), measure the PNG, then delete the clone. Same trick for any hairline, dot or dash you are asked about.
 - **`get_screenshot` on a PAGE id can include nodes from other pages.** A page render came back 2860px wide for a page whose two nodes span 1149px, with a neighbouring page's frames in the image. Screenshot the frames you care about individually and compose the comparison yourself; use the page render only for a rough look, and never to decide what a page contains (see the previous point for the reliable way).
-- **`get_metadata` page listing lies** — it returned only "Cover" for both the Charts and Guidelines files. Enumerate pages via `use_figma` → `figma.root.children`; access known nodes directly by id.
+- **`get_metadata` page listing lies — and now quantified: it reports ONE page where the Charts file has ~200.** Called with no `nodeId` the hosted connector answered `- 778:2684: Cover` and stopped, with no error, no truncation notice and nothing to suggest the rest were missing (measured 2026-08-24; it returned only "Cover" for the Guidelines file too). Same lazy loading as `page.children` above, one level up: it sees the loaded page. **Enumerate pages via `use_figma` → `figma.root.children`** — that returned the full list in one call — and access known nodes directly by id. Don't hardcode the count from any of these figures: it was 198 that morning and 197 by the afternoon, because the team adds and deletes pages while you work. Two refinements worth having. *Scoped to a node it is fine*: asked for `798:161`, the hosted connector and the desktop server returned byte-identical XML in well under a second, so this is a document-level listing bug, not a reason to distrust `get_metadata` on a frame. And *the desktop server does not have the bug* — the same no-`nodeId` call there listed every page. This is also the diagnosis of what was previously filed as a size-related `get_metadata` failure on this file: it is not size, and it does not fail; it under-reports.
 - **And its node tree is lossy: a childless-looking frame usually isn't.** Every bar segment whose group held only a fill vector and no value label came back as an empty `<frame …/>`, while segments with both were listed in full — so reading the XML alone would say the small segments have no bar drawn at all. The tell is in the ids: consecutive siblings numbered `…494` and `…496` have a `495` that was dropped. Use it for structure and names, and confirm anything you intend to *assert* (a missing label, an unpainted mark) with a `use_figma` read.
 - **An empty `fills` array is NOT a reliable marker for "no-data shape".** It is the marker the no-data hatch rule leans on, and it over-matches: grapher's map export also contains an invisible `swatch-hit-areas` group — full-size rectangles over each legend bin, with no fill, there for mouse targeting. A blanket "every empty-fill vector gets the hatch" pass therefore painted diagonal stripes across all three legend bins while correctly hatching one country. Scope the sweep by parent instead — `countries-without-data` for the map and the legend's own `swatches` group for the key — and hide `swatch-hit-areas` outright, since a static image has nothing to target.
-- **A path with negative coordinates needs `x`/`y` at its bounding-box minimum, not at its first vertex.** Figma normalizes a vector's bbox, so `M 0 0 L 24 -104` assigned `v.y = startY` puts the box's *top* at `startY` and the line draws downward — the opposite of the intent. One leader aimed up at Chad ran down through the legend into the footer instead. Compute `min(y1,y2)` and offset the path data by it (snippet in GUIDELINES.md → Straight elbowed arrows).
+- **A path with negative coordinates needs `x`/`y` at its bounding-box minimum, not at its first vertex.** Figma normalizes a vector's bbox, so `M 0 0 L 24 -104` assigned `v.y = startY` puts the box's *top* at `startY` and the line draws downward — the opposite of the intent. One leader aimed up at Chad ran down through the legend into the footer instead. Compute `min(y1,y2)` and offset the path data by it (snippet in [ANNOTATIONS-AND-ARROWS.md](ANNOTATIONS-AND-ARROWS.md) → Straight elbowed arrows).
 - **`useColumnShortNames` suffixes every CSV column with the chart's slug, and the slug contains the other series' names.** On `elec-fossil-nuclear-renewables` every column ends `..._chart_elec_fossil_nuclear_renewables`, so `next(c for c in cols if "nuclear" in c)` returns the **fossil** column and every share you compute is wrong — in a way that looks plausible (61.7% "nuclear" in 1985). Match on the prefix (`c.startswith("nuclear_")`), and sanity-check one number against the rendered chart before writing it into an annotation.
 - **On a rotated node, `x`/`y`/`width`/`height` are NOT the visual bounding box — and the curvy arrows are all rotated.** Their `x` is the untransformed origin, so an arrow group reporting `x: 534.3, width: 29.6` in a 560-wide frame actually paints at `494.9`, 40px wide. Everything downstream inherits the error silently: a pixel probe over that box found *zero* arrow pixels, and — worse — the path→frame mapping used everywhere in this skill (normalize `vectorPaths` numbers by the path bbox, scale onto `node.width/height`) is only valid when rotation is 0, so every arrow-to-line distance measured that way was fiction. Use `absoluteBoundingBox` minus the frame's for anything that might be rotated, and check `node.rotation` before trusting a bbox-normalized path mapping. Imported chart geometry (lines, bars, ticks) is unrotated, which is why the mapping works there.
 - **`clone()` copies a node's own transform and drops its parents' — and `rotation` won't tell you.** Assets in the finished pages sit inside groups that are themselves mirrored or rotated, so a cloned child arrives with the group's half of the orientation missing: a solid arrowhead renders as a hollow chevron. The `rotation` getter is no help, because for a mirrored node it reports the un-mirrored angle — the source read `169.9` and its own clone read `10.1`, and only `absoluteTransform` (linear part `[[-1,0],[0,1]]` on the parent group) showed the flip. When cloning out of a group, set `clone.relativeTransform` from the source's `absoluteTransform` linear part, then translate. And seat the result by a **transformed vertex**, not the bbox: for a rotated shape the visual tip is a couple of pixels off the box centre in both axes, which is the difference between an arrow that touches its target and one that looks detached.
@@ -21,11 +27,263 @@
 - **Local file styles cannot be imported by key; library styles cannot be applied by id.** The two kinds look identical in a harvest and need opposite handling. `Data Insights/*` and `Instagram/*` are **local** to the Charts file — `importStyleByKeyAsync` throws `Style with key "…" not found`, and you apply them by passing the id straight through (`"S:e06b99…,"`, note the trailing comma). `Default Palette/*` and `Line and Slope Charts/*` come from the **[Chart Colors] Library** and must be imported by key first. Tell them apart by the id shape: a library style's id carries a node suffix (`S:28466fa…,2401:49`), a local one ends at the comma. Get every local id in one call with `figma.getLocalPaintStylesAsync()` / `getLocalTextStylesAsync()`; get library keys from `search_design_system` — and note that a query for the *group* name (`"Default Palette"`, `"Line and Slope Charts"`) is far cheaper than one query per color, **but it is a partial harvest, not an enumeration**: the call caps at ~14 results (gotcha below) while the Default Palette alone runs to 24 fills plus `Gray` (GUIDELINES.md → Colors). Take what it returns, then query the colors still missing by name.
 - **Load the fonts you are about to *write*, not only the ones already on the node.** Scanning `getStyledTextSegments(['fontName'])` over the imported chart loads what the export used — and then `label.fontName = {family:"Lato", style:"Bold"}` throws, because nothing in the chart was bold. Two variants of the same trap: `set_fontSize` also throws on a node that merely *contains* an unloaded weight (a template's `Data source:` line is Bold + Regular), so a size sweep over template text needs both weights loaded. Load `Lato Regular`, `Lato Bold` and `Playfair Display SemiBold` unconditionally at the top of any script that touches text.
 - **A text node carries a *scaled* `strokeWeight` after `rescale()`, even with no strokes.** So adding the tier-2 white outside stroke to an annotation on a chart you height-fitted gives a 0.65px halo unless you set the weight — and a sub-pixel halo is indistinguishable from none, which reads as "the knockout didn't work" rather than "the weight is wrong". Set `strokeWeight = 3` explicitly and read it back.
-- **A hugging annotation frame clips its own descenders — a tier-3-only trap, and a reason to prefer tier 2.** Frames have `clipsContent = true` by default, and `leadingTrim = "CAP_HEIGHT"` puts the baseline *at* the box bottom — so every descender is cut and "today" renders as "todav", "very" as "verv". It is invisible in a node listing and easy to miss in a thumbnail. Set `box.clipsContent = false` on every annotation frame you create; keep the trim. Clipping is only half of it — the opaque fill still stops at the baseline, so pair it with `paddingBottom ≈ 0.22 × the last line's font size` or the recovered descenders sit outside their own knockout. A bare text node with an outside stroke has neither failure, which is most of why GUIDELINES.md → Annotations makes the stroke the default.
+- **A hugging annotation frame clips its own descenders — a tier-3-only trap, and a reason to prefer tier 2.** Frames have `clipsContent = true` by default, and `leadingTrim = "CAP_HEIGHT"` puts the baseline *at* the box bottom — so every descender is cut and "today" renders as "todav", "very" as "verv". It is invisible in a node listing and easy to miss in a thumbnail. Set `box.clipsContent = false` on every annotation frame you create; keep the trim. Clipping is only half of it — the opaque fill still stops at the baseline, so pair it with `paddingBottom ≈ 0.22 × the last line's font size` or the recovered descenders sit outside their own knockout. A bare text node with an outside stroke has neither failure, which is most of why [ANNOTATIONS-AND-ARROWS.md](ANNOTATIONS-AND-ARROWS.md) makes the stroke the default.
 - **`entity-labels` children are not always TEXT.** When a bar's entity name wraps, grapher groups the two lines, so `node.fontSize = 14` throws `no such property 'fontSize' on GROUP` — and because `use_figma` is atomic you lose the whole pass. Iterate `group.query("TEXT")` for styling and `group.children` for per-row layout.
+- **Exceeding the concurrency ceiling inflates every call in the batch, silently.** The pass that wrote GUIDELINES.md screenshotted 272 chart-library nodes at **peak 14 in flight**, and its calls averaged **35.5 s** against ~10 s everywhere else. That is the ceiling being exceeded, not the connector being slow: 8.2 s at one in flight, 13.2 s at eight queued, 35.5 s at fourteen.
+
+- **A manifest row longer than the ceiling splits across messages — the ceiling wins.** SKILL.md's batch manifest says to issue each row's calls in one message, but that instruction exists to stop a row being dribbled out one call per turn; it is not licence to exceed 4–6 in flight. Where a row is longer than the ceiling, send it as consecutive batches of 4–6 in a row of messages, and never as one oversized message. The palette harvest is the row this actually bites — `search_design_system` caps at ~14 results against a 24-fill palette, so it needs about twelve queries, which is two or three batches rather than one. A page survey covering many pages is the other candidate. Batching all twelve at once would land squarely in the regime measured above, where every call in the batch pays for the queue.
+
+- **A calls-per-message histogram cannot tell you whether calls were batched — use interval overlap.** The transcript writes one entry per tool call whether or not the calls were batched, so a calls-per-assistant-message histogram reports `{1: N}` for a provably concurrent run — checked against an 8-call probe that measured 4.12×, which the histogram scored as eight singletons. Sweep `tool_use` → `tool_result` timestamps for peak simultaneous in-flight calls instead, and count how many calls start before the previous one finished.
+
+- **`use_figma` calls do not run concurrently — plugin runs serialize per file, so batching them
+  buys only the shared turn.** Measured locally on an identical read-only script (count the file's
+  198 pages, no page switch), batches of four against a serial arm run before *and* after them:
+
+  | | per call | wall for 4 | against 4× serial |
+  |---|---|---|---|
+  | one call per message (n=11 over two runs) | 3.49–5.75 s, mean **4.4 s** | 17.5–17.8 s | — |
+  | four in one message — four such batches | 3.83–17.86 s | **16.67–21.50 s** | **0.82–1.05×** |
+
+  Four in flight every time, and the wall is `4 × 4.4 s` plus overhead — the shape of a queue, not of
+  parallelism. **The completion timestamps are the proof:** inside a batch the calls finish one every
+  ~3.8–4.7 s, each gap a whole serial execution, having all been dispatched within ~4 s of one
+  another. Client-side overlap is not server-side concurrency — the calls all show as in flight
+  while the file's single plugin context runs them one at a time. So a batch's `sum/wall` (2.0–2.6×)
+  is pure artifact: the honest figure straddles 1.0×, meaning **the server time does not compress at
+  all**.
+
+  Two runs, four batches, and the spread is worth reading honestly: 0.82× and 0.83× and 0.83× against
+  one 1.05×. The high one was the *second* batch of its session and opened with a 3.83 s call where
+  the cold ones opened at ~9.6 s, so some of the loss is a one-off warm-up rather than a property of
+  batching. Do not read a reliable 17% penalty into it; read "no gain on the calls".
+
+  **This does not mean stop batching writes** — a call costs the turn *and* the hop, and only the hop
+  serializes, so batching still collects every turn gap. Measured end to end including turns: four
+  calls one per message took **29.89 s** against **16.67 s** batched, **1.79×**, on a session whose
+  turns ran 3.7 s. In a cloud session the turn is an even larger share of the cost — because the
+  *call* is cheap there, not because the turn is dear — so batching pays *more*, which the block
+  below now measures at **2.26×**. The serialization is a property of the file's plugin context and
+  does not change. What does change is the stopping rule: an extra `use_figma` in a batch costs
+  roughly a **whole call** (measured 4.10 s against a 4.37 s serial mean, within 6%), not the
+  0.75–2.1 s an extra `get_screenshot` costs. So collapsing work into one bigger script — which is
+  free, script size doesn't move the latency — beats spreading it across a batch every time.
+
+  Two caveats on the numbers. A batched call's *own* duration is queue-inclusive, so only the fastest
+  call in a batch approximates real server time; and all of this is one file, hence one plugin
+  context — a batch spanning *different* files might genuinely parallelize, untested. Still untested:
+  mutating scripts and heavier scripts.
+
+  **The cloud case is now measured, and it changes the arithmetic without changing the advice.** Same
+  four-arm probe from a verified cloud sandbox: serial `use_figma` **0.701 s** (n=6, σ 0.10) — six
+  times cheaper than local — and a turn of **2.79 s**, so the *call* is cheap and the *turn* is most
+  of the cost. Serialization is confirmed far more sharply than locally: a single-server queue model
+  (a call cannot start until the previous finishes) reproduces every batched duration **to the
+  millisecond**, and `sum/wall` never exceeds 1.14. Arm A's four ~6 s calls turned out to be one
+  **5.9 s cold start** — plugin context plus the 198-page file load — that all four queued behind,
+  then a 0.65–1.17 s staircase. So batch **or** don't, that cold start is paid once per session.
+
+  Honest speedup on the calls is *worse* in the cloud (0.30× and 0.56×) precisely because the calls
+  are so cheap that overhead dominates — and the overhead is the interesting part: **a cloud batch's
+  wall is mostly the model emitting the tool calls, not Figma running them.** One four-call batch
+  spent **3.9 s of its 5.0 s** wall on dispatch spread. Two consequences: keep batched call payloads
+  terse (short scripts, short `description`s), and read a batch's own `sum/wall` as meaningless here.
+  End to end including turns, batching still wins and wins bigger than locally — **2.26× against
+  1.79×** on the matched framing (arm wall to arm wall; the same cloud data reads as 1.79× if you
+  charge the batch its entry turn, which is how much the framing matters — pin it before comparing).
+  At the margin an extra call costs **1.44 s inside a batch against 3.49 s as its own turn**, so
+  batch it.
+
+- **`sum/wall` is not the speedup — measure a batch against a *serial arm run in the same session*.**
+  A queued call's own duration includes the time it spent waiting, so summing the durations inside a
+  batch and dividing by the wall clock counts that wait as work and flatters batching. An independent
+  local replication (six-call fixed probe, peak 6 of 6 in flight, Figma's desktop app running):
+  batch wall **25.85 s** where four one-per-message calls averaged **12.10 s** — so **2.81×** honestly,
+  against the **3.81×** the same batch scores on `sum/wall`. That reproduces the ~3.84× `sum/wall`
+  figure in the budget almost exactly while putting the real local gain at **2.8–3.2×**, and it
+  reproduces the mechanism too: per-call latency inflated to 11.5–21.3 s inside the batch against
+  10.8–13.9 s serial, and the completions ended over a **14.35 s** spread having been dispatched over
+  **4.57 s** — a local session pipelines rather than parallelizing. Batching still wins by a wide
+  margin; just don't quote `sum/wall` as the win.
+
+- **Only the *reading* tools are metered, so a screenshot-heavy run is the one that can hit a wall.**
+  Figma's [rate limits](https://developers.figma.com/docs/figma-mcp-server/rate-limits-access/)
+  (checked 2026-08-24) apply "to Figma MCP server tools that read data from Figma" — a per-day and a
+  per-minute cap, both varying by plan and seat, which is why the numbers are not copied here. Writes
+  are not documented as counting, so `use_figma` and `upload_assets` are effectively free of the
+  quota while `get_screenshot` and `get_metadata` spend it: a survey of N nodes is N against the cap,
+  and the surveys are what to trim if a run ever gets throttled. Two things to expect if it does —
+  the message is a plain refusal with no retry hint from the connector, and forum reports have the
+  limiter misreading the seat, so a refusal is not proof the quota was really spent. Figma has also
+  signposted `use_figma` becoming "a usage-based paid feature", which would change this arithmetic.
+
+- **For a *bulk* render, one Figma REST call replaces N `get_screenshot`s — but only for settled
+  state.** `GET https://api.figma.com/v1/images/<fileKey>?ids=<id1>,<id2>,…&format=png&scale=<n>`
+  renders **many nodes in one request** and returns a URL per node, where `get_screenshot` is one
+  node per 8–20 s call; it also takes `scale` up to 4, which `get_screenshot` cannot do at all
+  (`maxDimension` only downscales). It needs a personal access token in `X-Figma-Token`, which this
+  skill does not carry — the grapher server holds one as `FIGMA_API_KEY` for its own `/api/figma/image`
+  route, so an ETL-side use means asking for a token rather than reusing that. Untested from here;
+  treat the note as a lead, not a recipe, and check a render against a `get_screenshot` of the same
+  node before trusting a batch of them. **Never point it at a node you just wrote to.** The pixel
+  probes read state that a `use_figma` call created moments earlier, and a server-side render that
+  lags by a beat returns a plausible-looking image of the *old* state — the same silent-wrong-state
+  failure as batching the four-render arrow protocol. Bulk-render surveys and delivery renders of
+  finished frames; keep every post-write probe on `get_screenshot`. It also returns no
+  `original_width`/`original_height`, so the size-only survey still wants `get_screenshot`.
+  **Checked 2026-08-24: ETL carries no such token** — no `FIGMA_API_KEY` in its env files — so this
+  is blocked on someone provisioning one, not on anybody's time. Don't write the wrapper first: an
+  untested client for an API you cannot call is a thing that reports success it has not earned.
+  And weigh it against what it would actually buy now. Its niche is a *cloud* session doing bulk
+  reads, since a local one has the desktop server for that; and `measure_pixels.py` removed the
+  reason most probes rendered at all, which was for a model to look at them. So the case for it is
+  narrower than when it was first written down: raise it if cloud screenshot volume becomes the
+  measured bottleneck on a real run, and not before.
+
+- **The Figma *desktop* MCP server serves reads ~30× faster, and is still the wrong tool for a chart
+  build. Use it for a bulk survey of nodes that already exist; not in the per-chart flow.** The
+  verdict first, because the speedup below is real and reads like a recommendation. A normal build
+  screenshots 14–70 times, and most of those are of frames it *just made* — which is precisely what
+  this path cannot see (constraint 5). What is left saves a couple of minutes and buys a silent
+  staleness failure and a daily quota. **Where it is transformative is the other shape of task:**
+  reading hundreds of long-existing nodes — auditing the chart library, rebuilding NODE-MAP,
+  documenting the templates. The pass that wrote GUIDELINES.md screenshotted **272** chart-library
+  nodes and averaged 35.5 s a call; the same sweep here is seconds. That is the case to reach for it. Two different servers are in play: the
+  hosted connector this skill normally uses, and one the desktop app serves on
+  `http://127.0.0.1:3845/mcp`. Enumerated live (2026-08-24) the desktop one offers **six tools,
+  all `readOnlyHint: true`** — `get_screenshot`, `get_metadata`, `get_design_context`,
+  `get_variable_defs`, `get_figjam`, `get_motion_context` — and **nothing this skill writes with**:
+  no `use_figma`, `upload_assets`, `search_design_system` or `download_assets`. That also settles
+  which server a session is on: if `use_figma` is in your tool list, you are on the hosted
+  connector and the desktop app is not in that path at all. So the desktop app cannot be the
+  reason hosted calls are slower locally — a hypothesis the budget section used to float.
+
+  What it *can* do is every read, at a different order of magnitude. Same six template nodes, same
+  session, measured both ways:
+
+  | | per call | six calls |
+  |---|---|---|
+  | hosted connector | 10.8–13.9 s (mean 12.10 s) | 25.85 s batched |
+  | desktop server | **0.27–0.60 s** (mean 0.37 s) | **0.51 s**, six fired at once |
+
+  Roughly **33× per call and 50× on a batch**, and it *does* parallelize where the hosted
+  connector queues. Renders verified genuine, not placeholders: `798:161` came back a real
+  540×540 PNG of the template. Four constraints, all load-bearing:
+
+  1. **No `fileKey` parameter** (`additionalProperties: false`) — it renders from whatever document
+     is the **active tab** in the running app. Its own error says so: *"Make sure the Figma desktop
+     app is open and the document containing the node is the active tab."* So it cannot touch an
+     arbitrary file, and a cloud session cannot use it at all.
+  2. **No `maxDimension`, and a silent 1024 px cap on the longer edge.** You cannot ask for a 256 px
+     thumbnail, and you do not reliably get natural size either: the Reel template
+     (`7336:8`, natural 616×1096) came back **576×1024**, scaled to fit. Anything whose longer edge
+     is ≤ 1024 does arrive at natural size — the four 540×540 templates and the 850×638 horizontal
+     all did, matching NODE-MAP.md exactly.
+  3. **The response is an inline base64 PNG**, with none of the hosted tool's
+     `original_width`/`original_height` JSON. Read the dimensions out of the PNG header instead
+     (big-endian uint32 pair at byte 16) — but per the cap above that is the *rendered* size, so it
+     is only the natural size below 1024 px. **For a size-only survey of anything taller or wider
+     than that, stay on the hosted `get_screenshot`**, which reports the true natural size whatever
+     it renders.
+  4. **Claude Code is not connected to it.** Either add it
+     (`claude mcp add --transport http figma-desktop http://127.0.0.1:3845/mcp`) or call it from
+     Bash over JSON-RPC, which needs no config change —
+     `scripts/figma_desktop_read.py` does the handshake, fans out the calls and writes the PNGs.
+     One handshake serves many calls, so amortize it.
+  5. **The two paths do not share a source of truth, and the reader is the stale one.** `use_figma`
+     runs server-side against the authoritative document; the desktop server renders **the desktop
+     app's local replica**. Nothing orders one against the other, so a write is not visible to the
+     reader until the app has synced it — and for page *contents* it may never sync at all.
+
+     Measured, on a page created by `use_figma` and never opened by a human:
+
+     | | hosted path | desktop path |
+     |---|---|---|
+     | the new page appears in the page listing | yes | **yes**, within seconds |
+     | a deleted page disappears from it | yes | **yes** |
+     | the rectangle inside that page | renders, 200×200, correct fill | **"No node could be found"** |
+
+     Page-level structure replicates promptly. **Page contents are lazily loaded in the app too**, so
+     an unvisited page reports as `<canvas … width="0" height="0"/>` with its children missing. That
+     did not converge: ~3 minutes of polling across three attempts, still absent. And there is no
+     automatable fix — `page.loadAsync()` + `setCurrentPageAsync()` both succeed and the plugin then
+     *sees* the child, because that context is server-side; the replica is unmoved. Only a human
+     opening the page in the app loads it.
+
+     **So the failure message lies about the cause.** "No node could be found for the provided
+     nodeId" reads as a bad id; the truth is usually "that page has never been open in this app".
+     Two practical rules follow. **Desktop reads are for nodes that already exist and have been
+     looked at** — the templates, the arrows page, the chart page the designer is working in, which
+     is where the read volume actually is. **Never desktop-read a node you created this session**:
+     route it through the hosted `get_screenshot`, which is authoritative.
+
+     A partial version of the same thing is the more insidious one, because it does not error: a
+     frame cloned via `use_figma` and screenshotted on the next tool call came back **33,784 bytes**
+     against **47,664** for the same node once settled — a render of a half-built frame. Property
+     writes to a node on an *already-loaded* page do replicate reliably (the whole four-render arrow
+     probe works that way, and it reproduced its expected numbers). But since every version of this
+     is silent, the mask guards in `measure_pixels.py` are what actually protect you: a stale render
+     yields an empty or wrong-sized mask, reported as `UNMEASURABLE` rather than as a clean pass.
+     Note the irony worth remembering — cloning a page to *test* the arrow probe is precisely the
+     unsafe case, while running it on the designer's own open page is the safe one.
+
+  **Metering is settled, and not favourably: the desktop server has its own daily read quota.**
+  Exhausted, it answers every read with `Rate limit exceeded, please try again tomorrow` — and the
+  quota is **separate from the hosted connector's**, which kept working normally through it. So the
+  30× is 30× *until the cap*, and the cap is a day long. Two consequences. **Never poll this
+  server**: a convergence loop at 150 ms intervals spent the whole day's allowance in about three
+  minutes, which is how this was discovered. And **the error is indistinguishable from a missing
+  node** unless you read the message, so `scripts/figma_desktop_read.py` now names it and exits `2`
+  rather than reporting it as a wrong tab.
+
+  **Per-step verdict, so nobody has to re-derive it.** The question "should Steps 5, 8c and 9 default
+  to this path?" is closed, and the answer is no in all three — but for three different reasons, and
+  one of them leaves a door open:
+
+  | step | reads | verdict |
+  |---|---|---|
+  | **5** — page survey | `page.children` across N pages the run has not opened | **No.** Those are arbitrary pages of a ~200-page file; the app has not loaded them, so the replica reports them empty. This is the exact case constraint 5 describes. |
+  | **8c** — the checks | `verify_page.js` and `diff_against_template.js` | **No, and it could never be yes:** those are `use_figma` calls, and the desktop server has no `use_figma` at all. |
+  | **8c** — the pixel probes | screenshots after `visible` toggles, on the page in view | **The one qualifying case.** Property writes to an already-loaded page replicate reliably — the four-render arrow protocol works this way and reproduced its expected numbers. Still opt-in: preflight the actual node, and fall back on any doubt. |
+  | **9** — delivery renders | screenshots of frames just built | **No.** Structural writes; a render taken next call caught a half-built frame (33,784 bytes against 47,664). |
+
+  So the flow stays on the hosted connector, and this path is for a bulk survey of nodes that already
+  exist — plus, if you want it, the Step 8c probes on a page the designer has open. It has not been
+  used in a full chart build, and after the run that produced this entry, it is not expected to be.
+
+- **Downloading N screenshot URLs: parallelize, and pair each URL with its own output file.** Six
+  serially is 2.7 s through a cloud sandbox's egress proxy, 0.8 s in parallel:
+
+  ```bash
+  printf '%s %s\n' "$U1" 1.png "$U2" 2.png | xargs -P6 -n2 sh -c 'curl -sSL -o "$2" "$1"' _
+  ```
+
+  **Don't use `-I{}` with a single `-o`:** `{}` expands only in the URL, so every parallel `curl`
+  writes the same file and you Read one screenshot six times — a wrong verdict from a real render,
+  which is the worst shape of bug this skill has. Same trap as the `upload_assets` pattern below,
+  and the same fix. On a *bulk survey* you can skip this leg entirely — `figma_desktop_read.py shot`
+  returns the PNGs directly, no URLs to fetch — but read the desktop-server entry above first: it is
+  not for a normal chart build.
+
+- **`upload_assets` gives you N `submitUrl`s so the POSTs can overlap — run them that way.** The
+  Step 5 snippet shows one `curl`, and a two-format run that copies it twice pays two full uploads of
+  a ~165 KB SVG back to back. Pair each URL with its file and fan them out, exactly as the screenshot
+  downloads do:
+
+  ```bash
+  printf '%s %s\n' "$URL1" "$DIR/original.svg" "$URL2" "$DIR/original-square.svg" \
+    | xargs -P4 -n2 sh -c 'curl -s -X POST "$1" -F "file=@$2;type=image/svg+xml"' _
+  ```
+
+  Two ways to get this wrong, both silent. `xargs -I{}` with a single `-F` uploads the *same file*
+  to every URL, because `{}` expands only in the URL — the same trap as the screenshot downloads. And
+  with a trailing `_`, `sh -c` binds `$0` to the `_`, so the pair arrives as `$1` and `$2`: a snippet
+  reading `$0` posts to nothing. Expand the paths in the `printf` rather than referencing `$DIR`
+  inside the single quotes, where the child shell never sees it. Keep filenames comma-free (see above), and verify by counting the page's children
+  rather than trusting N `success` responses.
+
 - **`upload_assets`, never `createNodeFromSvg`** — the plugin sandbox has no `fetch`, and inlining an SVG into `use_figma` blows the 50k-char cap. `upload_assets` handles up to 10 MB and yields an editable vector tree.
 - **`rescale()`, never `resize()`** on imported charts — `resize` crops instead of scaling children.
-- **Figma plugins can't be run from here — but the no-data hatch no longer needs one.** Imported no-data shapes arrive with an **empty `fills` array**, and the hatch the design team applies by hand is just an `IMAGE` fill, `scaleMode: "TILE"`, `scalingFactor ≈ 0.5` from a 12×12 tile. Reproduce it by copying `fills` from a shape that already has it, or rebuild it from `assets/no-data-hatch-tile.png` via `figma.createImage(bytes)` — and apply it to **every** no-data shape *and* the legend's "No data" pill, never a flat `#C9C9C9` (GUIDELINES.md → Flags, animals, no-data pattern). The Flags plugin (`2654:5`) is still manual.
+- **Figma plugins can't be run from here — but the no-data hatch no longer needs one.** Imported no-data shapes arrive with an **empty `fills` array**, and the hatch the design team applies by hand is just an `IMAGE` fill, `scaleMode: "TILE"`, `scalingFactor ≈ 0.5` from a 12×12 tile. Reproduce it by copying `fills` from a shape that already has it, or rebuild it from `assets/no-data-hatch-tile.png` via `figma.createImage(bytes)` — and apply it to **every** no-data shape *and* the legend's "No data" pill, never a flat `#C9C9C9` ([FLAGS-ANIMALS-NODATA.md](FLAGS-ANIMALS-NODATA.md)). The Flags plugin (`2654:5`) is still manual.
 - **Fonts**: every text edit needs `loadFontAsync` first; the templates use Playfair Display and Lato — if a font is missing in the user's Figma, text edits throw.
 - **Before blaming a stale width, check that your setter changed anything.** Assigning a property the value it already holds is a no-op, and the unchanged geometry then looks exactly like the pinning below — so the diagnosis goes to the wrong place while the real cause sits untouched. Read the property back (`getStyledTextSegments(['fontSize', 'fontName'])` for text) and compare against what you meant to set.
 - **A text node pinned to a fixed width does not resize when you set its `characters`, and that reads exactly like a stale width.** SVG-imported text arrives **fixed** — the clone of a `22px` value label stays 22px wide and wraps "Poultry" onto two lines — so every width you read back is the old one and any layout computed from them lands wrong. **This silently invalidates a placement search**, which is the worst version of it: the candidate rectangles are built from the wrong widths, every collision test passes, and the script reports `forced: 0` while the labels sit on top of each other on the canvas. A search that returns a suspiciously clean result on a crowded chart is the tell. **The fix is the sizing mode, not a second call:** set `textAutoResize = "WIDTH_AND_HEIGHT"` *before* measuring. Measured 2026-08-18 on both a fresh node and a clone of an imported one: while a node is auto-resizing, `characters` → `width` reads true in the **same** call, on every ordering and across repeated reassignment (`71 → 233 → 12`), and releasing a pinned node's sizing mode updates it in that same call too (`71 → 233`). A node left at `textAutoResize = "NONE"` holds its 71 px however long the string gets — that is the pinning, not a cache, so don't spend a second call waiting for it to settle.

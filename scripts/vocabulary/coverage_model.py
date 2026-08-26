@@ -83,19 +83,29 @@ def split_into_match_words(text: str) -> list[str]:
     return [word for word in slug.split("-") if word]
 
 
-def record_row_texts(record: dict) -> list[str]:
-    """The texts a row actually displays: its title, subtitle and each producer.
+def record_subject_texts(record: dict) -> list[str]:
+    """What the chart is about: its title and its subtitle.
+
+    The row the site renders also carries the dataset's producers, and its search
+    filter reads them, so typing "UNESCO" does narrow the list. They are left out
+    *here* because this is the measure a suggestion is chosen by, and a producer
+    is not a subject: read with producers, "UNESCO" covered 96% of Literacy and
+    "IHME" most of Malaria, and those won the line on coverage alone. Read from
+    the title and subtitle, Literacy suggests "literacy, numeracy, living
+    languages" instead.
+
+    Measuring less than the site matches is the safe direction: producers only
+    ever *add* rows, so a term that reaches a chart here reaches it there too and
+    no suggestion can turn into a dead end.
 
     Kept as separate strings rather than joined, because the site never satisfies
     a query from words gathered across two of them.
     """
-    texts = [record.get("title") or "", record.get("subtitle") or ""]
-    texts.extend(record.get("datasetProducers") or [])
-    return [text for text in texts if text]
+    return [text for text in (record.get("title"), record.get("subtitle")) if text]
 
 
 def record_matches_term(record: dict, term: str) -> bool:
-    """Whether the block would show this row for this term.
+    """Whether this row is about this term.
 
     Every word of the term must appear in one of the row's own texts, in any
     order, with the last word allowed to match a prefix — see
@@ -105,7 +115,7 @@ def record_matches_term(record: dict, term: str) -> bool:
     if not term_words:
         return True
     leading, last = term_words[:-1], term_words[-1]
-    for text in record_row_texts(record):
+    for text in record_subject_texts(record):
         text_words = split_into_match_words(text)
         if all(word in text_words for word in leading) and any(
             word.startswith(last) for word in text_words
@@ -416,7 +426,7 @@ def offerable_candidates(candidates: list[str], topic_name: str) -> list[str]:
     its text at all: "religious" is not a substring of "Religion" and covers 81%
     of it, while "poverty line" contains the whole of "Poverty" and covers 12%.
     It is answerable from what the term covers, which is what
-    select_terms_by_coverage does with BROAD_TERM_SHARE.
+    select_terms_by_coverage does with SUBSUMING_CHART_SHARE.
     """
     return [candidate for candidate in candidates if not _is_place_name(candidate)]
 
@@ -433,29 +443,31 @@ def _is_place_name(term: str) -> bool:
     return term.strip().lower() in _COMMON_PLACE_WORDS
 
 
-# When one term covers more than this share of a topic — of its views *or* of its
-# charts — it is a blunt instrument: a reader clicking it is shown most of the
-# page they are already on.
+# A term matching this share of a topic's charts narrows nothing: a reader
+# clicking it is shown the page they are already on. "malaria" matches all 20
+# charts on Malaria, "poverty" all but a handful of Poverty's 250 — offering them
+# spends the line's first slot to stand still, and, since everything else is then
+# a subset that adds nothing, the line stops there. Held back, those topics
+# suggest "cases, deaths, children, funding" and "extreme poverty, relative
+# poverty, national poverty lines" instead.
 #
-# Both measures are needed. On Tuberculosis the term "tuberculosis" reaches 50 of
-# the topic's 52 charts but only 47% of its views, because the two most-viewed are
-# about causes of death generally. Judged on views alone it looked specific enough
-# to keep, and taking it made every real term — drug resistance, treatment, BCG —
-# a subset of it that added nothing, so coverage hit 100% with three blunt terms
-# and stopped.
-# Such a term is held back and used only when the sharper terms together cannot
-# reach this same share — the case for a topic whose charts are all named after
-# it, where nothing else reaches them at all.
+# Counted in charts, not views, and set where terms stop narrowing rather than
+# where they start being broad. Both of those were wrong before, and together
+# they made the rule a coin toss:
 #
-# Used for both halves on purpose, so there is one number rather than two: "a
-# term covering more than half the topic is blunt, and a blunt one is worth it
-# only if the rest cannot reach half". Both halves are reported per topic, so the
-# number can be judged from output rather than taste.
-#
-# It buys a great deal. Allowed everywhere, blunt terms lift median coverage from
-# 90% to 98% but collapse fifteen topics to a single chip — Poverty's 250 charts
-# reduced to "poverty". Held back entirely, thirty topics under-cover badly.
-BROAD_TERM_SHARE = 0.5
+# - It read views, so the *same* term on the same charts changed category as
+#   traffic moved. "sex ratio" matches 6 of Gender Ratio's 15 charts and sat at
+#   53% of its views — just over the old bar — so it was withheld, and the topic
+#   suggested six terms reaching half of it while five charts named "Sex ratio …"
+#   had nothing pointing at them. A week earlier the same code had suggested it
+#   first and reached 99%. A chart count only moves when charts are published, so
+#   the decision now holds still.
+# - The bar was half the topic, which is where useful terms live, not useless
+#   ones: a term matching six charts in fifteen is the most narrowing thing on
+#   offer. Anywhere in 80–95% the outcome is near enough identical (median
+#   coverage 94.3%, 95.0%, 95.7%), because almost nothing real sits there — which
+#   is the point of putting the bar there.
+SUBSUMING_CHART_SHARE = 0.9
 
 
 def select_terms_by_coverage(
@@ -480,6 +492,11 @@ def select_terms_by_coverage(
     "sex-selective abortion" and "excess female mortality", three terms and two
     charts. And a term the block would show nothing for covers nothing, so it
     can't be taken at all.
+
+    The one thing withheld from the competition is a term that matches nearly
+    every chart, because it narrows nothing (SUBSUMING_CHART_SHARE). Coverage is
+    otherwise the only criterion: a term revealing most of a topic is taken if it
+    reveals the most, which is what the line is supposed to open with.
     """
     candidates = offerable_candidates(candidates, universe.topic_name)
     matches = {term: match_identities(universe, term) for term in candidates}
@@ -491,26 +508,25 @@ def select_terms_by_coverage(
         return sum(weight_of.get(identity, 0.0) for identity in identities)
 
     self_named = match_identities(universe, universe.topic_name)
-    # Blunt terms — ones that alone reveal most of the topic — are set aside and
-    # only brought back if the rest cannot do the job. See BROAD_TERM_SHARE.
-    blunt = {
+    # Terms that match nearly every chart narrow nothing, so they are not offered
+    # — see SUBSUMING_CHART_SHARE. Everything else competes on coverage as usual,
+    # however much of the topic it happens to reveal.
+    narrowing = [
         term
-        for term, identities in matches.items()
-        if (total_weight and weight(identities) / total_weight > BROAD_TERM_SHARE)
-        or (total_count and len(identities) / total_count > BROAD_TERM_SHARE)
-    }
-    sharp = [term for term in candidates if term not in blunt]
+        for term in candidates
+        if not (
+            total_count and len(matches[term]) / total_count > SUBSUMING_CHART_SHARE
+        )
+    ]
 
     selection = _greedy(
-        universe, sharp, matches, weight, max_terms, min_marginal_share
+        universe, narrowing, matches, weight, max_terms, min_marginal_share
     )
-    if (
-        blunt
-        and total_weight
-        and selection.covered_weight / total_weight <= BROAD_TERM_SHARE
-    ):
-        # The sharp terms can't reach half the topic, so its charts really are
-        # only findable by the name they share with it.
+    if not selection.selected:
+        # Every candidate matches the whole topic. That happens on a topic whose
+        # charts are all named after it — Energy Mix, whose ten charts are all
+        # about the energy mix — where a term that narrows nothing is still better
+        # than no suggestion at all.
         selection = _greedy(
             universe, candidates, matches, weight, max_terms, min_marginal_share
         )

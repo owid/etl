@@ -170,7 +170,7 @@ def sweep_charts(env: OWIDEnv, variable_ids: list[int], field: str | None) -> li
         if not FIELD_RE.match(field):
             raise SystemExit(f"Invalid --field '{field}'")
         json_path = "$." + ".".join(f'"{p}"' for p in field.split("."))
-        shielded_col = f", MAX(JSON_CONTAINS_PATH(cc.patch, 'one', '{json_path}')) AS shielded"
+        shielded_col = f", MAX(JSON_CONTAINS_PATH(pc.config, 'one', '{json_path}')) AS shielded"
     df = env.read_sql(
         f"""
         SELECT c.id AS chart_id, cc.slug, c.publishedAt IS NOT NULL AS published,
@@ -185,6 +185,8 @@ def sweep_charts(env: OWIDEnv, variable_ids: list[int], field: str | None) -> li
         FROM chart_dimensions cd
         JOIN charts c ON c.id = cd.chartId
         JOIN chart_configs cc ON cc.id = c.configId
+        -- charts.patchConfigId is NOT NULL UNIQUE, so this join never drops or duplicates rows
+        JOIN chart_configs pc ON pc.id = c.patchConfigId
         JOIN variables v ON v.id = cd.variableId
         WHERE cd.variableId IN ({clause})
         GROUP BY c.id, cc.slug, c.publishedAt, c.isInheritanceEnabled
@@ -279,7 +281,7 @@ def _dims_match(view_id: Any, view: dict) -> bool:
 
 def sweep_explorer_views(env: OWIDEnv, variable_ids: list[int]) -> list[dict]:
     conditions = " OR ".join(
-        f"JSON_CONTAINS(cc.full->'$.dimensions', JSON_OBJECT('variableId', %(e{i})s))" for i in range(len(variable_ids))
+        f"JSON_CONTAINS(cc.config->'$.dimensions', JSON_OBJECT('variableId', %(e{i})s))" for i in range(len(variable_ids))
     )
     params = {f"e{i}": vid for i, vid in enumerate(variable_ids)}
     df = env.read_sql(
@@ -302,8 +304,8 @@ def sweep_narrative_charts(env: OWIDEnv, chart_ids: list[int], mx_ids: list[int]
         clause, params = _in_clause(chart_ids, "c")
         df = env.read_sql(
             f"""
-            SELECT nc.id, nc.name, nc.parentChartId, cc.patch
-            FROM narrative_charts nc JOIN chart_configs cc ON cc.id = nc.chartConfigId
+            SELECT nc.id, nc.name, nc.parentChartId, cc.config AS patch
+            FROM narrative_charts nc JOIN chart_configs cc ON cc.id = nc.patchConfigId
             WHERE nc.parentChartId IN ({clause})
             """,
             params=params,
@@ -313,8 +315,8 @@ def sweep_narrative_charts(env: OWIDEnv, chart_ids: list[int], mx_ids: list[int]
         clause, params = _in_clause(mx_ids, "m")
         df = env.read_sql(
             f"""
-            SELECT nc.id, nc.name, nc.parentMultiDimXChartConfigId AS parent_view, cc.patch
-            FROM narrative_charts nc JOIN chart_configs cc ON cc.id = nc.chartConfigId
+            SELECT nc.id, nc.name, nc.parentMultiDimXChartConfigId AS parent_view, cc.config AS patch
+            FROM narrative_charts nc JOIN chart_configs cc ON cc.id = nc.patchConfigId
             WHERE nc.parentMultiDimXChartConfigId IN ({clause})
             """,
             params=params,

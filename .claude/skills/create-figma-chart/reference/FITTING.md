@@ -149,6 +149,37 @@ before and after, since a rewrap shows up there and nowhere else.
   tool for the *gap* checks, where stroke overhang and text leading are exactly what you are measuring —
   but note it is **clipped by an ancestor frame**, so it cannot measure a group that overflows, which is
   the case the previous bullet is about. Bbox to fit, render bounds to verify.
+- **"Aligned" means EXACT, not within a tolerance — and the checker now gates on it.**
+  `verify_page.js`'s `box-alignment` row used to pass anything inside **±1px**, so a chart that ended
+  at 523.43 against a 524 content box reported `ok` and was still wrong: every other full-width
+  element — header, subtitle, footer, a legend row — sits on those two edges, so the miss is visible
+  the moment anyone selects the node and reads the properties panel. It now gates at **`BOX_EPS =
+  0.05`**, matching `verify_templates.js`'s `TIGHT`: that same 0.57px shortfall `FAIL`s, while the
+  ~0.004px float residue a `rescale` leaves behind still passes, so a correctly fitted page is not
+  failed by arithmetic noise. Read a `FAIL` on that row as "re-pin", not as a rounding note.
+
+  **Re-pin after *any* edit that changes the chart's ink**, not just after the fit: a re-export, a
+  font-size change, resizing an ornament. The order matters, and steps 2–5 are the ones that get skipped:
+
+  1. `chart.rescale(contentW / chart.absoluteBoundingBox.width)`.
+  2. **Put the type back on the ladder.** The scale nudges every size off it (14 → 14.016). This does
+     not undo the width *when* the box's right edge is a clip rect (`scatterBounds`, `boundsClip`)
+     and the text is left- or centre-anchored — which is the common case, because grapher's export
+     wraps the plot in one. Verify it rather than assuming: re-read the box after resetting.
+  3. **Put the furniture stroke weights back.** `rescale` multiplies them, so the house 1px line
+     comes back as 1.001 and any ring you added drifts with it.
+  4. Translate so the left edge is exact, then assert *both* edges.
+  5. **Re-centre the block and re-check everything parented to the FRAME rather than the chart.**
+     Annotations and a legend row do not travel with the chart, so a rescale slides the plot out from
+     under them — wedge containment, dot clearance and collisions all have to be re-run.
+
+  Never close the gap with a horizontal `resize`: it ovals the dots.
+
+  **A corollary about ornaments.** Anything *you* add — a highlight ring, a dot you place — can become
+  the box's rightmost ink, at which point the frame's alignment depends on its size. Sizing an ornament
+  to make a number come out right works and then silently breaks when a later review asks why that
+  ornament is a different size from its siblings. Prefer letting the export's own geometry set the edge
+  and closing the residual with step 1.
 - **Centre on the BOX, not the ink — and know that you cannot have both.** The two targets are
   mutually exclusive, so this is a choice and the choice is the box. Measured across eight frames: with
   the ink gaps equal to 0.01px, the **box** gaps were off by 0.34–2.24px on every single frame. Three
@@ -200,6 +231,12 @@ The general form, worth holding onto: **fit on whichever axis binds.** Height-fi
 overflow is the one to fit.
 
 ### The two-pass export, measured end to end
+
+**Where the saving came from.** Of the 18 Figma calls one template build measured end to end, 3 went
+on the footer-conversion bug now fixed in TEXTS.md and 1 on a wrong guess about the footer's layout.
+The two-pass export is where the rest is concentrated: it replaces "export, eyeball, re-export"
+with one probe and one solved re-export.
+
 
 Validated on a live run rather than argued from the model, so the numbers are the claim:
 
