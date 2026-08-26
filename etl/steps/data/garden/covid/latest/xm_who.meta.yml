@@ -13,7 +13,7 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-  title: Global excess deaths associated with COVID-19 (modelled estimates)
+  title: Global excess deaths associated with COVID-19 (modeled estimates)
 
   owners:
     - Lucas Rodés-Guirao
