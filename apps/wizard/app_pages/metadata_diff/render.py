@@ -105,7 +105,7 @@ DIFF_CSS = """
 /* The review strip: tick and note together, tinted so a row of controls does not disappear between
    two columns of prose. Keyed containers render as `st-key-<key>`, so this matches by prefix. */
 div[class*="st-key-mdd-strip-"] { background: #f1f3f9; border-color: #b8c0e8 !important; }
-div[class*="st-key-mdd-strip-"] textarea { background: #ffffff; }
+div[class*="st-key-mdd-strip-"] input { background: #ffffff; }
 .mdd-chart-list { margin: 0 0 0 18px; padding: 0; font-size: 0.9rem; }
 .mdd-chart-list li { margin-bottom: 2px; }
 </style>

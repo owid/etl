@@ -216,12 +216,14 @@ def st_review_strip(engine: Engine, surface: str, mark: ReviewMark) -> None:
         with col_tick:
             st_reviewed_toggle(engine, surface, mark)
         with col_note:
-            st.text_area(
+            # `st.text_input`, not `st.text_area`: in a text area Enter inserts a newline and the value is
+            # only committed on blur or Ctrl+Enter, so a note typed and confirmed with Enter looked saved
+            # and was not. One line is the cost, and a review note is a sentence.
+            st.text_input(
                 "Note",
                 key=note_key,
                 on_change=_save_note,
-                height=68,
-                placeholder="Note — a question, a follow-up, a reason. Saved when you click away.",
+                placeholder="Note — a question, a follow-up, a reason. Press Enter to save.",
                 label_visibility="collapsed",
             )
 
