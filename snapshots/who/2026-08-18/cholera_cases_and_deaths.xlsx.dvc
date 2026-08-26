@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Cholera cases and deaths"
+    description: |-
+      Interactive dashboard of cholera cases and deaths officially reported by WHO Member States annually since 2000, in aggregated form. All WHO Member States are encouraged to report annually to WHO on the occurrence, or absence of occurrence, of cholera, including "zero reporting" when no cases were detected. Annual figures might be subject to reporting biases, including lack of comparability of reporting criteria between countries, lack of stability of cholera surveillance systems over time, over-reporting, under-reporting, and absence of reporting.
+    date_published: "2026"
+
+    # Citation
+    producer: "World Health Organization"
+    citation_full: |-
+      Cholera dashboard - World Health Organization (WHO), Geneva, 2026. https://worldhealthorg.shinyapps.io/Cholera/
+    attribution_short: "WHO"
+
+    # Files
+    url_main: https://www.who.int/emergencies/surveillance/cholera-cases-and-deaths
+    url_download: https://worldhealthorg.shinyapps.io/Cholera/
+    date_accessed: '2026-08-18'
+
+    # License
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/licensing
+outs:
+  - md5: bad3a5c73bd4b44997ab6d43d7519d10
+    size: 40021
+    path: cholera_cases_and_deaths.xlsx

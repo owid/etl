@@ -100,7 +100,7 @@ tables:
         title: Number of ongoing conflicts per state
         unit: conflicts per state
         description_short: |-
-          The number of wars divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_ongoing_disputes.description_short}
+          Number of wars divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_ongoing_disputes.description_short}
         description_key: *description_key_ongoing
         display:
           numDecimalPlaces: 3
@@ -109,7 +109,7 @@ tables:
         title: Number of ongoing conflicts per state-pair
         unit: conflicts per state-pair
         description_short: |-
-          The number of wars divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_ongoing_disputes.description_short}
+          Number of wars divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_ongoing_disputes.description_short}
         description_key: *description_key_ongoing
         display:
           numDecimalPlaces: 5
@@ -128,7 +128,7 @@ tables:
         title: Number of new conflicts per state
         unit: conflicts per state
         description_short: |-
-          The number of wars divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_new_disputes.description_short}
+          Number of wars divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_new_disputes.description_short}
         description_key: *description_key_new
         display:
           numDecimalPlaces: 3
@@ -137,7 +137,7 @@ tables:
         title: Number of new conflicts per state-pair
         unit: conflicts per state-pair
         description_short: |-
-          The number of wars divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_new_disputes.description_short}
+          Number of wars divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_new_disputes.description_short}
         description_key: *description_key_new
         display:
           numDecimalPlaces: 5

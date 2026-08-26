@@ -17,7 +17,7 @@ tables:
         title: Passenger load factor
         unit: "%"
         short_unit: "%"
-        description_short: The share of available passenger seats on commercial airlines filled by paying passengers, also known as the passenger load factor.
+        description_short: Share of available passenger seats on commercial airlines filled by paying passengers, also known as the passenger load factor.
         description_key:
           - Passenger load factor shows how full commercial airline flights are, on average.
           - It is calculated by comparing the number of paying passengers with the total available passenger seating capacity provided by airlines.
@@ -32,7 +32,7 @@ tables:
         title: Share of empty airline seats
         unit: "%"
         short_unit: "%"
-        description_short: The share of available passenger seats on commercial airlines that flew empty.
+        description_short: Share of available passenger seats on commercial airlines that flew empty.
         description_key:
           - This indicator shows the share of available passenger seats on commercial airlines that were not filled by paying passengers.
           - A value of 20% means that, on average, 1 in 5 available passenger seats flew empty.
@@ -66,7 +66,7 @@ tables:
         title: Available seat-kilometres
         unit: seat-kilometres
         short_unit: seat-km
-        description_short: The total seating capacity provided by airlines, also known as available seat-kilometres.
+        description_short: Total seating capacity provided by airlines, also known as available seat-kilometres.
         description_key:
           - Available seat-kilometres measure how much passenger-carrying capacity airlines offered.
           - One available seat-kilometre equals one seat flown one kilometre, whether it was filled or empty.

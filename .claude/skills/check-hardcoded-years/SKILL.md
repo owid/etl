@@ -88,6 +88,7 @@ data's latest time, and route the fix.
 | Explorer views | ETL-based explorers: `etl/steps/export/explorers/.../*.config.yml` + export re-run. Non-ETL explorers (no `explorer_views` rows; definition lives in `explorers.config`): the explorer admin TSV (`minTime`/`maxTime` columns in the graphers block, `time=` in `defaultView`) — report as a coverage caveat if you don't parse it. |
 | Narrative charts | Usually deliberate (ℹ️). Read the **merged** config via `AdminAPI.get_narrative_chart(id)["configFull"]`, not the `config_id` row — that stored full lags a parent edit. If a pin must move, edit the patch via `AdminAPI.update_narrative_chart`, with user sign-off. |
 | Indicator-level configs | The `.meta.yml` + step re-run with `--grapher`. Pins live in `presentation.grapher_config` (repo grep below) — **not a DB surface**, so the sweep won't find them; grep for them separately. These propagate into every thin MDim/explorer view that inherits the indicator's config, so one pinned field here fans out to many views. |
+| Featured metrics | **Not in scope — skip them.** The sweep emits them, but a featured metric's URL cannot hold a time pin: the admin strips `time=` on paste, and Algolia matches the row's params exactly, so one carrying `time=` would simply fail to index. Nothing to grade. |
 | Article references | Gdoc edit (content follow-up). Link each citation with a scroll-to-highlight URL via `find_chart_citations_in_content`, and verify fixes on the live article page, not the lagging Datasette mirror. |
 
 **Parsing `time=` in URLs:** the grapher time param is a single value (`time=2019`) or a range (`time=1990..2020`, `time=earliest..2023`). Each **numeric** component is a pin — grade the end bound like `maxTime` (an embed with `time=..2019` keeps showing the old window after the data reaches 2025), the start bound like `minTime`. `earliest`/`latest` components are fine, and daily charts use ISO dates (`time=2020-01-01..latest`) — convert those to day offsets before grading: a day-axis variable advertises `display.zeroDay` in the same `metadata.json` (its `dimensions.years.values[].id` are day offsets from that date), so the component's comparable value is `(date.fromisoformat(part) - date.fromisoformat(zero_day)).days`. Skip `$time`-style template placeholders in country-page dynamic embeds. Article time pins are often deliberate framing of the surrounding prose, so default them to 🟡-at-worst and always hand them to content follow-up rather than editing configs.
@@ -199,7 +200,7 @@ ids = tuple({r["config_id"] for r in refs})
 if not ids:  # `WHERE id IN ()` is a MySQL syntax error, not an empty result
     raise SystemExit("No config-bearing references — report the unchecked surfaces instead.")
 cfgs = env.read_sql(
-    "SELECT id, slug, full AS config FROM chart_configs WHERE id IN %(i)s",
+    "SELECT id, slug, config FROM chart_configs WHERE id IN %(i)s",
     params={"i": ids},
 )
 
@@ -231,7 +232,7 @@ for _, row in cfgs.iterrows():
 
 The same loop covers MDim views and explorer views — they are `chart_configs` rows too, and the sweep already returned their `config_id`. Two surfaces need their own handling: **narrative charts** (read `AdminAPI.get_narrative_chart(id)["configFull"]`, since the stored full lags a parent edit) and **article references** (parse the `time=` components out of each row's `query_string`). Then fold in the repo grep for indicator-level `presentation.grapher_config` pins, which live in YAML and are invisible to any DB sweep.
 
-Query gotchas: pymysql `%`-formats break on quoted literals — parameterize everything. **The public Datasette mirror is DuckDB**, not SQLite/MySQL — `json_type()` returns DuckDB type names (`UBIGINT`, `VARCHAR`, …), so don't filter numerics by type name in SQL; use `TRY_CAST(json_extract_string(cc.full, '$.maxTime') AS DOUBLE) IS NOT NULL` or pull `json_extract_string(...)` values and classify client-side.
+Query gotchas: pymysql `%`-formats break on quoted literals — parameterize everything. **The public Datasette mirror is DuckDB**, not SQLite/MySQL — `json_type()` returns DuckDB type names (`UBIGINT`, `VARCHAR`, …), so don't filter numerics by type name in SQL; use `TRY_CAST(json_extract_string(cc.config, '$.maxTime') AS DOUBLE) IS NOT NULL` or pull `json_extract_string(...)` values and classify client-side.
 
 ## Report format
 
@@ -244,6 +245,6 @@ One table per severity — chart/view id, surface, admin or grapher link (stagin
 
 Pins are almost always **pre-existing** (updates don't create them), so there's no production-grading pass here — the question is only whether the new data now extends past the pin.
 
-### Always close with what's still open
+### Close with what's still open
 
-End every run with the open-items block defined in CLAUDE.md ("Close every report with what's still open") — in the PR body as well as chat. An audit's findings mostly can't be closed by the audit, and this one's usual danglers map onto the three buckets: gdoc `time=` pins (handed off — content edit + re-ingest; give the searchable anchor text, not the slug), reader-facing `"latest"` conversions awaiting sign-off (proposed), and variables whose metadata fetch failed or surfaces skipped for cost (unverified — if you bounded the sweep, say what fell outside the bound). Where the run touched things outside the audit's scope (a follow-up PR, an upstream data error to report to the producer), list those too.
+End every run by saying what's still open — a line or two in chat, written out in the PR body when there is one. `.claude/docs/open-items.md` lists what tends to get dropped. An audit's findings mostly can't be closed by the audit, and this one's usual danglers cover all three categories: gdoc `time=` pins (waiting on someone else — content edit + re-ingest; give the searchable anchor text, not the slug), reader-facing `"latest"` conversions awaiting sign-off (waiting on a decision), and variables whose metadata fetch failed or surfaces skipped for cost (nobody checked it — if you bounded the sweep, say what fell outside the bound). Where the run touched things outside the audit's scope (a follow-up PR, an upstream data error to report to the producer), list those too.

@@ -626,7 +626,7 @@ tables:
         title: Share (bottom 50%, <<welfare_type>>){definitions.title_extrapolated}
         unit: "%"
         short_unit: "%"
-        description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the poorest 50% of the population. {definitions.subtitle_welfare_type}
+        description_short: Share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the poorest 50% of the population. {definitions.subtitle_welfare_type}
         description_key:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_source_wid}"
@@ -640,7 +640,7 @@ tables:
         presentation:
           grapher_config:
             title: "{definitions.concept_welfare_type_capitalized} share of the poorest 50%{definitions.concept_welfare_type_for_title}"
-            subtitle: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the poorest 50% of the population. {definitions.subtitle_welfare_type}
+            subtitle: Share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the poorest 50% of the population. {definitions.subtitle_welfare_type}
             note: "{definitions.note_before_tax}"
             hasMapTab: true
             tab: map
@@ -658,7 +658,7 @@ tables:
         title: Share (middle 40%, <<welfare_type>>){definitions.title_extrapolated}
         unit: "%"
         short_unit: "%"
-        description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the middle 40% of the population. The middle 40% is the share of the population whose {definitions.concept_welfare_type} lies between the poorest 50% and the richest 10%. {definitions.subtitle_welfare_type}
+        description_short: Share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the middle 40% of the population. The middle 40% is the share of the population whose {definitions.concept_welfare_type} lies between the poorest 50% and the richest 10%. {definitions.subtitle_welfare_type}
         description_key:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_source_wid}"
@@ -674,7 +674,7 @@ tables:
         title: Share (90-99th percentiles, <<welfare_type>>){definitions.title_extrapolated}
         unit: "%"
         short_unit: "%"
-        description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the population between the 90th and 99th percentiles. {definitions.subtitle_welfare_type}
+        description_short: Share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the population between the 90th and 99th percentiles. {definitions.subtitle_welfare_type}
         description_key:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_source_wid}"
@@ -690,7 +690,7 @@ tables:
         title: Share (top 10%, <<welfare_type>>){definitions.title_extrapolated}
         unit: "%"
         short_unit: "%"
-        description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 10% of the population. {definitions.subtitle_welfare_type}
+        description_short: Share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 10% of the population. {definitions.subtitle_welfare_type}
         description_key:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_source_wid}"
@@ -704,7 +704,7 @@ tables:
         presentation:
           grapher_config:
             title: "{definitions.concept_welfare_type_capitalized} share of the richest 10%{definitions.concept_welfare_type_for_title}"
-            subtitle: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 10% of the population. {definitions.subtitle_welfare_type}
+            subtitle: Share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 10% of the population. {definitions.subtitle_welfare_type}
             note: "{definitions.note_before_tax}"
             hasMapTab: true
             tab: map
@@ -721,7 +721,7 @@ tables:
         title: Share (top 1%, <<welfare_type>>){definitions.title_extrapolated}
         unit: "%"
         short_unit: "%"
-        description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 1% of the population. {definitions.subtitle_welfare_type}
+        description_short: Share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 1% of the population. {definitions.subtitle_welfare_type}
         description_key:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_source_wid}"
@@ -735,7 +735,7 @@ tables:
         presentation:
           grapher_config:
             title: "{definitions.concept_welfare_type_capitalized} share of the richest 1%{definitions.concept_welfare_type_for_title}"
-            subtitle: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 1% of the population. {definitions.subtitle_welfare_type}
+            subtitle: Share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 1% of the population. {definitions.subtitle_welfare_type}
             note: "{definitions.note_before_tax}"
             hasMapTab: true
             tab: map
@@ -752,7 +752,7 @@ tables:
         title: Share (top 0.1%, <<welfare_type>>){definitions.title_extrapolated}
         unit: "%"
         short_unit: "%"
-        description_short: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 0.1% of the population. {definitions.subtitle_welfare_type}
+        description_short: Share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 0.1% of the population. {definitions.subtitle_welfare_type}
         description_key:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_source_wid}"
@@ -766,7 +766,7 @@ tables:
         presentation:
           grapher_config:
             title: "{definitions.concept_welfare_type_capitalized} share of the richest 0.1%{definitions.concept_welfare_type_for_title}"
-            subtitle: The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 0.1% of the population. {definitions.subtitle_welfare_type}
+            subtitle: Share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the richest 0.1% of the population. {definitions.subtitle_welfare_type}
             note: "{definitions.note_before_tax}"
             hasMapTab: true
             tab: map
@@ -895,7 +895,7 @@ tables:
         short_unit: "$"
         description_short: |-
           {macros}
-          The mean {definitions.concept_welfare_type}{definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
+          Mean {definitions.concept_welfare_type}{definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
         description_key:
           - "{definitions.description_key_avg}"
           - "{definitions.description_key_source_wid}"
@@ -917,7 +917,7 @@ tables:
               Mean {definitions.concept_welfare_type}{definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>>{definitions.concept_welfare_type_for_title}
             subtitle: |-
               {macros}
-              The mean {definitions.concept_welfare_type}{definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_ppp} {definitions.subtitle_welfare_type}
+              Mean {definitions.concept_welfare_type}{definitions.per_period} within the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_ppp} {definitions.subtitle_welfare_type}
             note: "{definitions.note_ppp_before_tax}"
             hasMapTab: true
             tab: map
@@ -938,7 +938,7 @@ tables:
         short_unit: "%"
         description_short: |-
           {macros}
-          The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
+          Share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
         description_key:
           - "{definitions.description_key_share}"
           - "{definitions.description_key_source_wid}"
@@ -958,7 +958,7 @@ tables:
               {definitions.concept_welfare_type_capitalized} share of the <<quantiles_avg_share(quantile) | lower>>{definitions.concept_welfare_type_for_title}
             subtitle: |-
               {macros}
-              The share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
+              Share of {definitions.concept_welfare_type} {definitions.verb_welfare_type} by the <<quantiles_avg_share(quantile) | lower>><<quantiles_avg_share_tenth_population(quantile)>>. {definitions.subtitle_welfare_type}
             note: "{definitions.note_before_tax}"
             hasMapTab: true
             tab: map
@@ -979,7 +979,7 @@ tables:
         short_unit: "$"
         description_short: |-
           {macros}
-          The level of {definitions.concept_welfare_type}{definitions.per_period} below which <<quantiles_thr_percentage(quantile)>>% of the population falls. {definitions.subtitle_welfare_type}
+          Level of {definitions.concept_welfare_type}{definitions.per_period} below which <<quantiles_thr_percentage(quantile)>>% of the population falls. {definitions.subtitle_welfare_type}
         description_key:
           - "{definitions.description_key_thr}"
           - "{definitions.description_key_source_wid}"
@@ -1000,7 +1000,7 @@ tables:
               {definitions.title_threshold}
             subtitle: |-
               {macros}
-              The level of {definitions.concept_welfare_type}{definitions.per_period} below which <<quantiles_thr_percentage(quantile)>>% of the population falls. {definitions.subtitle_ppp} {definitions.subtitle_welfare_type}
+              Level of {definitions.concept_welfare_type}{definitions.per_period} below which <<quantiles_thr_percentage(quantile)>>% of the population falls. {definitions.subtitle_ppp} {definitions.subtitle_welfare_type}
             note: "{definitions.note_ppp_before_tax}"
             hasMapTab: true
             tab: map

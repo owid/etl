@@ -43,7 +43,7 @@ tables:
     variables:
       blue:
         title: Number of Blue Whales caught per decade
-        description_short: Number of Blue Whales caught per decade
+        description_short: Number of Blue Whales caught per decade.
         description_key:
           - "{definitions.source_comb_decades}"
           - "{definitions.decade}"
@@ -58,7 +58,7 @@ tables:
           title_public: Blue whales
       brydes:
         title: Number of Bryde's Whales caught per decade
-        description_short: Number of Bryde's Whales caught per decade
+        description_short: Number of Bryde's Whales caught per decade.
         description_key:
           - "{definitions.source_comb_decades}"
           - "{definitions.decade}"
@@ -73,7 +73,7 @@ tables:
           title_public: Bryde's whales
       fin:
         title: Number of Fin Whales caught per decade
-        description_short: Number of Fin Whales caught per decade
+        description_short: Number of Fin Whales caught per decade.
         description_key:
           - "{definitions.source_comb_decades}"
           - "{definitions.decade}"
@@ -88,7 +88,7 @@ tables:
           title_public: Fin whales
       gray:
         title: Number of Gray Whales caught per decade
-        description_short: Number of Gray Whales caught per decade
+        description_short: Number of Gray Whales caught per decade.
         description_key:
           - "{definitions.source_comb_decades}"
           - "{definitions.decade}"
@@ -103,7 +103,7 @@ tables:
           title_public: Gray whales
       humpback:
         title: Number of Humpback Whales caught per decade
-        description_short: Number of Humpback Whales caught per decade
+        description_short: Number of Humpback Whales caught per decade.
         description_key:
           - "{definitions.source_comb_decades}"
           - "{definitions.decade}"
@@ -118,7 +118,7 @@ tables:
           title_public: Humpback whales
       minke:
         title: Number of Minke Whales caught per decade
-        description_short: Number of Minke Whales caught per decade
+        description_short: Number of Minke Whales caught per decade.
         description_key:
           - "{definitions.source_comb_decades}"
           - "{definitions.decade}"
@@ -133,7 +133,7 @@ tables:
           title_public: Minke whales
       right:
         title: Number of Right Whales caught per decade
-        description_short: Number of Right Whales caught per decade
+        description_short: Number of Right Whales caught per decade.
         description_key:
           - "{definitions.source_comb_decades}"
           - "{definitions.decade}"
@@ -148,7 +148,7 @@ tables:
           title_public: Right whales
       sei:
         title: Number of Sei Whales caught per decade
-        description_short: Number of Sei Whales caught per decade
+        description_short: Number of Sei Whales caught per decade.
         description_key:
           - "{definitions.source_comb_decades}"
           - "{definitions.decade}"
@@ -163,7 +163,7 @@ tables:
           title_public: Sei whales
       sperm:
         title: Number of Sperm Whales caught per decade
-        description_short: Number of Sperm Whales caught per decade
+        description_short: Number of Sperm Whales caught per decade.
         description_key:
           - "{definitions.source_comb_decades}"
           - "{definitions.decade}"
@@ -178,7 +178,7 @@ tables:
           title_public: Sperm whales
       total:
         title: Total number of whales caught per decade
-        description_short: Total number of whales caught per decade
+        description_short: Total number of whales caught per decade.
         description_key:
           - "{definitions.source_comb_decades}"
           - "{definitions.decade}"
@@ -193,7 +193,7 @@ tables:
           title_public: All whale species
       unspecified_other:
         title: Number of whales caught per decade where species is unspecified or other
-        description_short: Number of whales caught per decade, where the species is unspecified or other
+        description_short: Number of whales caught per decade, where the species is unspecified or other.
         description_key:
           - "{definitions.source_comb_decades}"
           - "{definitions.decade}"
@@ -226,7 +226,7 @@ tables:
           title_public: Blue whales
       brydes:
         title: Number of Bryde's Whales caught annually
-        description_short: Number of Bryde's Whales caught annually
+        description_short: Number of Bryde's Whales caught annually.
         description_key:
           - "{definitions.source_comb}"
           - "{definitions.subsistence_whaling}"
@@ -241,7 +241,7 @@ tables:
           title_public: Bryde's whales
       fin:
         title: Number of Fin Whales caught annually
-        description_short: Number of Fin Whales caught annually
+        description_short: Number of Fin Whales caught annually.
         description_key:
           - "{definitions.source_comb}"
           - "{definitions.subsistence_whaling}"
@@ -256,7 +256,7 @@ tables:
           title_public: Fin whales
       gray:
         title: Number of Gray Whales caught annually
-        description_short: Number of Gray Whales caught annually
+        description_short: Number of Gray Whales caught annually.
         description_key:
           - "{definitions.source_comb}"
           - "{definitions.subsistence_whaling}"
@@ -271,7 +271,7 @@ tables:
           title_public: Gray whales
       humpback:
         title: Number of Humpback Whales caught annually
-        description_short: Number of Humpback Whales caught annually
+        description_short: Number of Humpback Whales caught annually.
         description_key:
           - "{definitions.source_comb}"
           - "{definitions.subsistence_whaling}"
@@ -301,7 +301,7 @@ tables:
           title_public: Minke whales
       right:
         title: Number of Right Whales caught annually
-        description_short: Number of Right Whales caught annually
+        description_short: Number of Right Whales caught annually.
         description_key:
           - "{definitions.source_comb}"
           - "{definitions.subsistence_whaling}"
@@ -316,7 +316,7 @@ tables:
           title_public: Right whales
       sei:
         title: Number of Sei Whales caught annually
-        description_short: Number of Sei Whales caught annually
+        description_short: Number of Sei Whales caught annually.
         description_key:
           - "{definitions.source_comb}"
           - "{definitions.subsistence_whaling}"
@@ -331,7 +331,7 @@ tables:
           title_public: Sei whales
       sperm:
         title: Number of Sperm Whales caught annually
-        description_short: Number of Sperm Whales caught annually
+        description_short: Number of Sperm Whales caught annually.
         description_key:
           - "{definitions.source_comb}"
           - "{definitions.subsistence_whaling}"
@@ -346,7 +346,7 @@ tables:
           title_public: Sperm whales
       total:
         title: Total number of whales caught annually
-        description_short: Total number of whales caught annually
+        description_short: Total number of whales caught annually.
         description_key:
           - "{definitions.source_comb}"
           - "{definitions.subsistence_whaling}"
@@ -361,7 +361,7 @@ tables:
           title_public: All whale species
       unspecified_other:
         title: Number of whales caught annually, where species is unspecified or other
-        description_short: Number of whales caught annually where the species is unspecified or other
+        description_short: Number of whales caught annually where the species is unspecified or other.
         description_key:
           - "{definitions.source_comb}"
           - "{definitions.subsistence_whaling}"

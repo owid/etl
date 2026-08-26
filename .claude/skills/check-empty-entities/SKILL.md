@@ -53,7 +53,7 @@ grading the result against production.
 
 ### 1. Charts
 
-For every chart on the new dataset (`chart_dimensions` → `variables.datasetId`), parse `chart_configs.full`:
+For every chart on the new dataset (`chart_dimensions` → `variables.datasetId`), parse `chart_configs.config`:
 
 - `selectedEntityNames` must intersect the union of the chart's y-variables' entities-with-data. Zero overlap on a non-empty selection = the chart renders empty.
 - **Skip ScatterPlot and Marimekko** — they legitimately have no `selectedEntityNames` (they plot all entities). Detect them by shape, not by the `type` field: a chart with an `x` dimension renders as a scatter even when `type` is absent (reporting as the `LineChart` default). An **empty selection means every entity renders, not none** — so a bad value in such a chart is maximally visible, not hidden. (`share-of-rural-population-with-electricity-access-vs-…`, 0 selected + `minTime: latest`, is where a reader spotted Chad plotted at 100% rural electricity access.) Phrasing a report line as "corrected entity not in selection" for these charts is actively misleading.
@@ -70,7 +70,7 @@ Same selection-vs-availability check on their configs:
 
 - MDim views: the sweep returns them with a `config_id`, covering **all** MDims (not just the dataset's own — another MDim can carry these variables in its y-dimensions) and finding multi-indicator views that `mx.variableId` alone misses, since that column records only the first y indicator.
 - Explorer views: explorer panels render grapher configs and can pin `selectedEntityNames` too, so an upgraded explorer view can be empty while everything else passes. The sweep returns them one row per view (`surface = "explorer view"`), each with its own `config_id`, so they go through the same config loop as charts and MDim views. A `surface = "explorer"` row with no `config_id` means the indicator is registered on that explorer but no view config names it — report it as unchecked rather than passing it. **Legacy CSV-backed explorers** (`data://explorers/...` wide tables — e.g. the poverty explorer) appear in no DB table at all: their data and selections live in the explorer TSV, outside grapher configs, so report them as a coverage caveat instead of silently passing.
-- Narrative charts: audit the **full config, never the bare patch**. The patch in `narrative_charts.chartConfigId` → `chart_configs.patch` lacks every inherited field, so a narrative chart inheriting `selectedEntityNames` or dimensions from its parent can falsely pass — use `AdminAPI(OWIDEnv.from_staging("<branch>")).get_narrative_chart(id)["configFull"]` (this is the stored materialized `chart_configs.full`; it lags a parent edit until the child is re-saved — see `/update-dataset` step 7's narrative-chart notes). Pass the **staging** env explicitly — the global `OWID_ENV` points at your local/default environment unless the process was launched with `STAGING=<branch>`, and reading narrative configs from the wrong DB silently hides staging-only regressions.
+- Narrative charts: audit the **full config, never the bare patch**. The authored layer in `narrative_charts.patchConfigId` → `chart_configs.config` lacks every inherited field, so a narrative chart inheriting `selectedEntityNames` or dimensions from its parent can falsely pass — use `AdminAPI(OWIDEnv.from_staging("<branch>")).get_narrative_chart(id)["configFull"]` (this is the stored materialized `chart_configs.config`; it lags a parent edit until the child is re-saved — see `/update-dataset` step 7's narrative-chart notes). Pass the **staging** env explicitly — the global `OWID_ENV` points at your local/default environment unless the process was launched with `STAGING=<branch>`, and reading narrative configs from the wrong DB silently hides staging-only regressions.
 
 ### 4. Article references (gdoc embeds and hyperlinks)
 
@@ -121,7 +121,7 @@ ids = tuple({r["config_id"] for r in refs})
 if not ids:  # `WHERE id IN ()` is a MySQL syntax error, not an empty result
     raise SystemExit("No config-bearing references — report the unchecked surfaces instead.")
 cfgs = env.read_sql(
-    "SELECT id, slug, full AS config FROM chart_configs WHERE id IN %(i)s",
+    "SELECT id, slug, config FROM chart_configs WHERE id IN %(i)s",
     params={"i": ids},
 )
 
@@ -156,6 +156,6 @@ The same loop covers MDim and explorer views — they are `chart_configs` rows t
 - **Pre-existing gaps** (🟡 — still need fixing, just not necessarily in this PR): table of citation (scroll-to-highlight link), chart (staging grapher link via `OWIDEnv.from_staging(branch).chart_site(slug)` — same normalized-host rule as the API prefix; never hand-build `staging-site-<branch>`), and dead entities — the common pattern is a rename-cycle mismatch between the URL and the live entities (unsuffixed names in old URLs while data lives under suffixed entities, or stale `(OECD)`/`(WB)`-suffixed names after the data moved to unsuffixed forms).
 - **Coverage caveats**: charts with no production baseline; variables whose metadata fetch failed (don't count fetch failures as empty).
 
-### Always close with what's still open
+### Close with what's still open
 
-End every run with the open-items block defined in CLAUDE.md ("Close every report with what's still open") — in the PR body as well as chat. Unverified matters most here: fetch failures, unparsed legacy explorer TSVs, and surfaces skipped for cost read as "clean" when unmentioned, and a pre-existing gap left unlisted gets re-discovered from scratch next cycle.
+End every run by saying what's still open — a line or two in chat, written out in the PR body when there is one. `.claude/docs/open-items.md` lists what tends to get dropped. The "nobody checked it" category matters most here: fetch failures, unparsed legacy explorer TSVs, and surfaces skipped for cost read as "clean" when unmentioned, and a pre-existing gap left unlisted gets re-discovered from scratch next cycle.

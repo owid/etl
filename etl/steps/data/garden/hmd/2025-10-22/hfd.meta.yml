@@ -64,7 +64,7 @@ tables:
           <% set title = "Period total fertility rate" %>
           {definitions.others.title}
         description_short: |-
-          The average number of{definitions.others.bo_1} children a woman would have in her lifetime if she experienced the fertility rates of a specific year.
+          Average number of{definitions.others.bo_1} children a woman would have in her lifetime if she experienced the fertility rates of a specific year.
         unit: "births per woman"
         description_key:
           - Assumes current age-specific fertility rates remain constant throughout a woman's lifetime.
@@ -78,7 +78,7 @@ tables:
           <% set title = "Period total fertility rate by age 40" %>
           {definitions.others.title}
         description_short: |-
-          The average number of{definitions.others.bo_1} children a woman would have by age 40 if she experienced the fertility rates of a specific year.
+          Average number of{definitions.others.bo_1} children a woman would have by age 40 if she experienced the fertility rates of a specific year.
         unit: "births per woman"
         description_key:
           - Useful for understanding early and mid-reproductive age fertility patterns.
@@ -89,9 +89,9 @@ tables:
           {definitions.others.title}
         description_short: |-
           <% if birth_order == 'total' %>
-          The total fertility rate adjusted to account for delays or advances in childbearing.
+          Total fertility rate adjusted to account for delays or advances in childbearing.
           <%- else %>
-          The total fertility rate for{definitions.others.bo_1} births adjusted to account for delays or advances in having a{definitions.others.bo_1} child.
+          Total fertility rate for{definitions.others.bo_1} births adjusted to account for delays or advances in having a{definitions.others.bo_1} child.
           <%- endif %>
         unit: "births per woman"
         description_key:
@@ -107,9 +107,9 @@ tables:
           {definitions.others.title}
         description_short: |-
           <% if birth_order == 'total' %>
-          The total fertility rate adjusted for both the age of the mother and the number of children she already has.
+          Total fertility rate adjusted for both the age of the mother and the number of children she already has.
           <%- else %>
-          The total fertility rate for{definitions.others.bo_1} births adjusted for the age of the mother.
+          Total fertility rate for{definitions.others.bo_1} births adjusted for the age of the mother.
           <%- endif %>
         unit: "births per woman"
         description_key:
@@ -122,9 +122,9 @@ tables:
           {definitions.others.title}
         description_short: |-
           <% if birth_order == 'total' %>
-          The average age of mothers when they give birth in a specific year. It is standardized for the age structure of the female population of reproductive age.
+          Average age of mothers when they give birth in a specific year. It is standardized for the age structure of the female population of reproductive age.
           <%- else %>
-          The average age of mothers when they have their{definitions.others.bo_1} child in a specific year. It is standardized for the age structure of the female population of reproductive age.
+          Average age of mothers when they have their{definitions.others.bo_1} child in a specific year. It is standardized for the age structure of the female population of reproductive age.
           <%- endif %>
         unit: "years"
 
@@ -134,9 +134,9 @@ tables:
           {definitions.others.title}
         description_short: |-
           <% if birth_order == 'total' %>
-          The average age of mothers under 40 when they give birth. It is standardized for the age structure of the female population of reproductive age.
+          Average age of mothers under 40 when they give birth. It is standardized for the age structure of the female population of reproductive age.
           <%- else %>
-          The average age of mothers under 40 when they have their{definitions.others.bo_1} child in a specific year. It is standardized for the age structure of the female population of reproductive age.
+          Average age of mothers under 40 when they have their{definitions.others.bo_1} child in a specific year. It is standardized for the age structure of the female population of reproductive age.
           <%- endif %>
         unit: "years"
         description_key:
@@ -179,9 +179,9 @@ tables:
           {definitions.others.title}
         description_short: |-
           <% if birth_order == 'total' %>
-          The average age of mothers at birth, considering the number of children they already have.
+          Average age of mothers at birth, considering the number of children they already have.
           <%- else %>
-          The average age of mothers at the birth of their{definitions.others.bo_1} child.
+          Average age of mothers at the birth of their{definitions.others.bo_1} child.
           <%- endif %>
         unit: "years"
         description_key:
@@ -194,7 +194,7 @@ tables:
           <% set title = "Crude birth rate" %>
           {definitions.others.title}
         description_short: |-
-          The number of{definitions.others.bo_1} live births per 1,000 people in a given year. It is not standardized for the age structure of the population.
+          Number of{definitions.others.bo_1} live births per 1,000 people in a given year. It is not standardized for the age structure of the population.
         unit: "births per 1,000 people"
         description_key:
           - The rate is calculated by dividing the total number of{definitions.others.bo_1} live births occurring in a given year by person-years lived by all population in that year.
@@ -205,7 +205,7 @@ tables:
         title: |-
           <% set title = "Total live births" %>
           {definitions.others.title}
-        description_short: The total number of{definitions.others.bo_1} live births recorded in a given year.
+        description_short: Total number of{definitions.others.bo_1} live births recorded in a given year.
         unit: "births"
         description_key:
           - Shows the total number of{definitions.others.bo_1} live births, considering all mothers (regardless of their age) and all their parities (regardless of the order).
@@ -214,7 +214,7 @@ tables:
           numDecimalPlaces: 0
         presentation:
           grapher_config:
-            subtitle: The total number of live births recorded in a given year. A live birth refers to the delivery of a child displaying any sign of life, and the total count of live births excludes any stillbirths.
+            subtitle: Total number of live births recorded in a given year. A live birth refers to the delivery of a child displaying any sign of life, and the total count of live births excludes any stillbirths.
 
   cohort:
     variables:
@@ -226,9 +226,9 @@ tables:
           {definitions.others.title}
         description_short: |-
           <% if birth_order == 'total' %>
-          The average number of children born to women in the current cohort over their lifetime.
+          Average number of children born to women in the current cohort over their lifetime.
           <%- else %>
-          The average number of{definitions.others.bo_1} children born to women in a specific cohort over their lifetime.
+          Average number of{definitions.others.bo_1} children born to women in a specific cohort over their lifetime.
           <%- endif %>
         unit: "births per woman"
         description_key: &ccf_description_key
@@ -242,9 +242,9 @@ tables:
           {definitions.others.title}
         description_short: |-
           <% if birth_order == 'total' %>
-          The average number of children born to women in the 15-years-ago cohort over their lifetime.
+          Average number of children born to women in the 15-years-ago cohort over their lifetime.
           <%- else %>
-          The average number of{definitions.others.bo_1} children born to women in a specific cohort over their lifetime.
+          Average number of{definitions.others.bo_1} children born to women in a specific cohort over their lifetime.
           <%- endif %>
         unit: "births per woman"
         description_key: *ccf_description_key
@@ -254,9 +254,9 @@ tables:
           {definitions.others.title}
         description_short: |-
           <% if birth_order == 'total' %>
-          The average number of children born to women in the 30-years-ago cohort over their lifetime.
+          Average number of children born to women in the 30-years-ago cohort over their lifetime.
           <%- else %>
-          The average number of{definitions.others.bo_1} children born to women in a specific cohort over their lifetime.
+          Average number of{definitions.others.bo_1} children born to women in a specific cohort over their lifetime.
           <%- endif %>
         unit: "births per woman"
         description_key: *ccf_description_key
@@ -267,9 +267,9 @@ tables:
           {definitions.others.title}
         description_short: |-
           <% if birth_order == 'total' %>
-          The average number of children born to women under 40 in a specific cohort.
+          Average number of children born to women under 40 in a specific cohort.
           <%- else %>
-          The average number of{definitions.others.bo_1} children born to women under 40 in a specific cohort.
+          Average number of{definitions.others.bo_1} children born to women under 40 in a specific cohort.
           <%- endif %>
         unit: "births per woman"
         description_key:
@@ -283,9 +283,9 @@ tables:
           {definitions.others.title}
         description_short: |-
           <% if birth_order == 'total' %>
-          The average age at which women in a specific birth cohort have children. It is standardized for the age structure of the female population of reproductive age.
+          Average age at which women in a specific birth cohort have children. It is standardized for the age structure of the female population of reproductive age.
           <%- else %>
-          The average age at which women in a specific birth cohort have their{definitions.others.bo_1} child. It is standardized for the age structure of the female population of reproductive age.
+          Average age at which women in a specific birth cohort have their{definitions.others.bo_1} child. It is standardized for the age structure of the female population of reproductive age.
           <%- endif %>
         unit: "years"
         description_key:
@@ -299,9 +299,9 @@ tables:
           {definitions.others.title}
         description_short: |-
           <% if birth_order == 'total' %>
-          The average age at which women under 40 in a specific cohort have children.
+          Average age at which women under 40 in a specific cohort have children.
           <%- else %>
-          The average age at which women under 40 in a specific cohort have their{definitions.others.bo_1} child.
+          Average age at which women under 40 in a specific cohort have their{definitions.others.bo_1} child.
           <%- endif %>
         unit: "years"
         description_key:

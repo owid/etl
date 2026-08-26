@@ -74,7 +74,7 @@ class UIChartProducerAnalytics:
         df_top_10_daily_views = get_chart_views_from_bq(
             date_start=min_date,
             date_end=max_date,
-            groupby=["day", "grapher"],
+            groupby=["day", "chart_url"],
             grapher_urls=grapher_urls_top_10,
         )
 
@@ -85,7 +85,7 @@ class UIChartProducerAnalytics:
             0 if self.analytics["total_views"] == 0 else df_total_daily_views["renders"].mean()
         )
         ## Get total views of the top 10 charts in the selected date range.
-        self.analytics["df_top_10_total_views"] = df_top_10_daily_views.groupby("grapher", as_index=False).agg(
+        self.analytics["df_top_10_total_views"] = df_top_10_daily_views.groupby("chart_url", as_index=False).agg(
             {"renders": "sum"}
         )
 
@@ -159,11 +159,11 @@ class UIChartProducerAnalytics:
         # Prepare dataframe to plot.
         df_plot = pd.concat(
             [
-                df_total_daily_views.assign(**{"grapher": "Total"}),
+                df_total_daily_views.assign(**{"chart_url": "Total"}),
                 df_top_10_daily_views,
             ]
         ).rename(
-            columns={"grapher": "Chart slug"},
+            columns={"chart_url": "Chart slug"},
         )
         df_plot["Chart slug"] = df_plot["Chart slug"].apply(lambda x: x.split("/")[-1])
         df_plot["day"] = pd.to_datetime(df_plot["day"]).dt.strftime("%Y-%m-%d")

@@ -4,7 +4,7 @@ from owid.catalog import Table
 from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, end_with_punctuation
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -74,7 +74,7 @@ def add_metadata(tb: Table) -> Table:
         long_definition = tb["long_definition"].loc[tb["indicator_name"] == column]
         short_definition = tb["short_definition"].loc[tb["indicator_name"] == column]
         meta.description_from_producer = long_definition.iloc[0]
-        meta.description_short = short_definition.iloc[0]
+        meta.description_short = end_with_punctuation(short_definition.iloc[0])
         meta.title = column
         meta.unit = "%"
         meta.short_unit = "%"

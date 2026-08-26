@@ -150,6 +150,8 @@ def run() -> None:
 
     tb_garden = add_energy_access_variables(tb_garden)
 
+    tb_garden = add_internet_users(tb_garden)
+
     tb_garden = add_patents_articles_per_million_people(tb_garden)
 
     tb_garden = add_ilo_modeling_comparison_indicators(tb_garden)
@@ -878,6 +880,40 @@ def add_energy_access_variables(tb: Table) -> Table:
         tb[indicator].metadata.description_from_producer = tb["eg_elc_accs_zs"].metadata.description_from_producer
     for indicator in ["eg_cft_accs_zs_without", "eg_cft_accs_zs_number", "eg_cft_accs_zs_without_number"]:
         tb[indicator].metadata.description_from_producer = tb["eg_cft_accs_zs"].metadata.description_from_producer
+
+    return tb
+
+
+def add_internet_users(tb: Table) -> Table:
+    """
+    Add the number of people using the Internet.
+
+    WDI only publishes the share of the population using the Internet, so the absolute count is
+    ours. It is derived row by row from WDI's own population indicator rather than by summing
+    countries, which means every entity the World Bank publishes a share for -- including World and
+    its regional and income aggregates -- gets a count on the World Bank's own definition, and the
+    coverage of the newest year does not affect the aggregates.
+    """
+    tb = tb.reset_index()
+
+    assert tb["it_net_user_zs"].min() >= 0.0 and tb["it_net_user_zs"].max() <= 100.0, (
+        "it_net_user_zs is expected to be a share of the population, between 0 and 100."
+    )
+
+    tb["it_net_user_zs_number"] = tb["it_net_user_zs"] / 100 * tb["sp_pop_totl"]
+
+    # Guard against losing the division by 100 (or the share and population being swapped): the
+    # global count is in the billions, and a lost factor of 100 would still look plausible on a
+    # country chart.
+    world_max = tb.loc[tb["country"] == "World", "it_net_user_zs_number"].max()
+    assert 1e9 < world_max < 1e10, f"World Internet users ({world_max:.3g}) is outside the expected billions."
+
+    tb = tb.format(["country", "year"])
+
+    # Add description from producer to the new indicator (which contains relevant information).
+    tb["it_net_user_zs_number"].metadata.description_from_producer = tb[
+        "it_net_user_zs"
+    ].metadata.description_from_producer
 
     return tb
 

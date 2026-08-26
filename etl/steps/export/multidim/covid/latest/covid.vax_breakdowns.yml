@@ -1,3 +1,5 @@
+grapher_schema: "011"
+
 definitions:
   common_views:
     - config:
@@ -37,9 +39,9 @@ views:
       addCountryMode: "disabled"
       selectedEntityNames:
         - High-income countries
-        - Upper-middle-countriesincome countries
+        - Upper-middle-income countries
         - Lower-middle-income countries
-        - Low-income
+        - Low-income countries
       selectedEntityColors:
         High-income countries: "#0D8553"
         Upper-middle-income countries: "#A1CB81"

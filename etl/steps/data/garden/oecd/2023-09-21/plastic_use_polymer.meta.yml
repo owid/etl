@@ -42,7 +42,7 @@ tables:
       hdpe:
         title: HDPE
         unit: 'tonnes'
-        description_short: HDPE (High-Density Polyethylene) is a durable, chemical-resistant thermoplastic, widely used in containers, pipes, and outdoor furniture. It is lightweight, has high tensile strength, and is recyclable,
+        description_short: HDPE (High-Density Polyethylene) is a durable, chemical-resistant thermoplastic, widely used in containers, pipes, and outdoor furniture. It is lightweight, has high tensile strength, and is recyclable.
         short_unit: 't'
         display:
           numDecimalPlaces: 0

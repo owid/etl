@@ -1,0 +1,24 @@
+meta:
+  origin:
+    producer: World Health Organization
+    title: "WHO Growth Reference: Height-for-age, 5-19 years"
+    description: |-
+      The WHO Growth Reference for school-aged children and adolescents extends the WHO Child Growth Standards beyond age 5. It was constructed by merging the 1977 NCHS/WHO growth reference sample with the cross-sectional sample underlying the under-fives standards, then smoothing the result so that the curves transition smoothly into the under-fives standards at age 5.
+
+      The height-for-age reference covers months 61 to 228, tabulated by month of age.
+
+      These are the expanded tables, which WHO publishes so that countries can reproduce the growth charts on national health cards. They give the L, M, and S parameters of the fitted distribution alongside percentiles and z-scores at three-decimal precision. For height-for-age they also include a -5 SD cut-off, used to assess very short stature.
+    citation_full: |-
+      de Onis M, Onyango AW, Borghi E, Siyam A, Nishida C, Siekmann J. Development of a WHO growth reference for school-aged children and adolescents. Bulletin of the World Health Organization. 2007;85(9):660-667.
+    attribution_short: WHO
+    url_main: https://www.who.int/tools/growth-reference-data-for-5to19-years/indicators/height-for-age
+    url_download: https://cdn.who.int/media/docs/default-source/child-growth/growth-reference-5-19-years/height-for-age-(5-19-years)/hfa-girls-perc-who2007-exp.xlsx
+    date_accessed: '2026-08-07'
+    date_published: '2007-09-01'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
+outs:
+  - md5: 74b9fa223bc0f459404aa042a18ee01e
+    size: 35714
+    path: height_for_age_percentiles_girls_5_to_19.xlsx

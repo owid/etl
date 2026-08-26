@@ -1,0 +1,754 @@
+# Small and pull charts — the 302-wide format
+
+A compact chart image that sits inside an OWID article and points at a grapher view. Two flavors,
+two templates, one export route. Read this alongside [GUIDELINES.md](GUIDELINES.md), which owns
+everything shared with the larger formats — colors, annotations, per-chart-type conventions, the Good
+Data Viz Checklist. This file only covers what is different at 302px.
+
+**Last verified: 2026-08-14.** Re-verify the template geometry at the start of every run
+(`get_metadata` on `798:54`); the design team edits these frames in place.
+
+**A cloud session cannot finish this format — say so before you start.** The deliverable here is a
+PNG on Cloudflare Images, and both halves of that route — the 3× export (`GET /api/figma/image`) and
+the upload (`POST /api/images`) — are *authenticated* `admin.owid.io` endpoints, which Cloudflare
+Access `302`s to a login page from a cloud sandbox. The host itself resolves and its unauthenticated
+routes work, so this is an access wall on these two endpoints, not a network problem to troubleshoot
+(see [cloud-sandbox.md](../../docs/cloud-sandbox.md)). The frame can be built and reviewed anywhere;
+the 3× export and upload have to happen on the user's machine. Tell them that up front rather than at
+delivery, so they can decide whether to run this locally instead.
+
+## The two vocabularies
+
+The design team's names and the code's names diverged, and the code's older name has been deleted.
+Get this straight before searching for anything:
+
+| Design team says | gdoc block | Source row | Who supplies the context |
+|---|---|---|---|
+| "small chart" | a **`chart-rows`** row item | **none** | the block's own `kicker` / `title` / `source`, or the live grapher it drives |
+| "pull chart" | a **`pull-chart`** block | **mandatory** | nothing — it stands alone |
+
+- **`small-chart` is not a block type.** It was split into `chart-rows` + `pull-chart` and deleted
+  (`b7c2e0f344`, 2026-04-03). Grepping for it finds nothing; don't conclude the feature is missing.
+- **A "guided chart" is not one of these images.** `guided-chart` is a *live interactive* grapher
+  whose surrounding prose carries links that mutate it in place
+  (`site/gdocs/components/GuidedChart.tsx`). A `chart-rows` block placed **inside** a guided chart
+  turns its thumbnails into buttons that drive that live chart — which is why the design file's
+  section is titled "featured on the OWID website as guided and PULL charts". The image is the
+  thumbnail; the guided chart is what it drives.
+- The **"More views of this data"** heading is just `chart-rows`' default kicker
+  (`ChartRows.tsx:82`).
+
+Both render through `site/gdocs/components/ChartThumbnail.tsx`, which adds a 1px border and a
+"Click to explore" hover overlay.
+
+## Pull ≠ guided, and the source row is the symptom not the difference
+
+The two templates differ by one text node, so it is tempting to clone either and add or remove a
+source. Don't — **clone the right template**, because the reason there are two is editorial.
+
+A **pull chart** can be dropped anywhere in an article, so it carries its own attribution and its
+title and subtitle have to make sense with no surrounding narrative. A **chart-rows thumbnail** is
+always framed by something that supplies the context, so its text can lean on that and its
+attribution is already declared elsewhere.
+
+The block schemas settle it rather than merely suggesting it:
+
+- `EnrichedBlockChartRows` carries `kicker`, `title` **and `source`** at block level — attribution is
+  declared once for the whole block, so a row image repeating it would duplicate it.
+- `EnrichedBlockPullChart` is `{ type, align?, image, url, content }` — **no `source` field at all**.
+  If the image doesn't carry the source, the pull chart has none.
+
+So the pull chart's source is not a stylistic flourish and must not be dropped to buy 13px of plot;
+and adding one to a `chart-rows` thumbnail duplicates the block's own line.
+
+## The two templates
+
+Page ` 📑 Templates` (`798:54`) of `Charts (2026)`, file key `s6Sv60bakebRRW2TxsMQbF`, under the
+heading `"SMALL" Charts (featured on the OWID website as guided and PULL charts)` (`25344:1235`).
+
+| Template | Node | Ships at | Text slots |
+|---|---|---|---|
+| `small-chart-template-guided` | `25344:1357` | 302×233 | title `25344:1378`, optional subtitle `25344:1379` |
+| `small-chart-template-pull` | `25344:1391` | 302×233 | title `25344:1396`, optional subtitle `25344:1397`, **source `25344:1398`** |
+
+### The background — check it, but expect nothing to repair
+
+**Both templates now carry a real visible white frame fill and no background vector**, so a clone is
+ready to use as-is. Assert that rather than assume it, because the shape of the old defect is what
+makes a regression recognizable:
+
+- They used to ship the frame fill as **white with `visible: false`** and paint the background from a
+  `Group > Group > Vector` — a white **302×233 rectangle**. If you meet that again, enable the frame's
+  own fill and drop the vector group: `frame.fills = frame.fills.map(f => ({...f, visible: true}))`.
+- **Neither half of that repair works alone.** Deleting the group leaves a transparent frame — charts
+  with no white card behind them. Keeping it leaves a *fixed* 302×233 rectangle in a format whose
+  height is free, so it under-covers a 272-tall frame and overhangs a 221-tall one. A frame fill
+  follows the frame at any height, which is why it is the right answer and what the designer's
+  finished charts all use.
+
+There is **no z-order hazard to avoid here.** `appendChild` puts the imported chart last, so it draws
+above the background whatever the background is. The "an opaque background paints over the template"
+warning belongs to the `static_viz` local-SVG route, where the opaque patch is *inside the imported
+SVG* — a different problem with a different fix (SKILL.md Step 7).
+
+### Measured spec
+
+| Element | Font | Size | Color | Style |
+|---|---|---|---|---|
+| Title | Playfair Display **Bold** | 16px / 19px line height | `#2d2e2d` | **none — raw fill.** The value equals `Data Insights/Title`, but the node is not bound to it, so don't expect a style to read back |
+| Subtitle (optional) | Lato Regular | 11px | `#5b5b5b` | `Data Insights/Subtitle` (fill only) |
+| Source (pull only) | Lato Regular | 11px | `#858585` | `Data Insights/Source` (fill only) |
+| In-plot entity labels | Lato **Bold** | 11–12px | the series color | bound palette style |
+| In-plot value labels | Lato **Medium** | 11–12px | the series color, or `#2d2e2d` on a bar | — |
+| Axis year labels | Lato Regular | 11px | `#5b5b5b` | `Data Insights/Subtitle` |
+
+Geometry, all frame-local:
+
+- Frame fill **white** — not the static templates' cream `#fffbf5`.
+- Content `x=12`, width **278**. Side margins are 12px, not the 16px of the 540-wide frames.
+- Header block `Frame 7` at `y=10`; title 19 + 2px gap + subtitle 13 = 34 tall, so
+  `headerBottom = 44`. With no subtitle it is 19 tall and `headerBottom = 29`.
+- The header block **hugs its own text width** (206–278px measured across five finished charts). Unlike the 540-wide
+  templates, the plot may therefore legitimately rise into the space to its right — that is a design
+  decision per chart, not a misfit.
+- Source (pull) sits at `y = H − 23`, height 13, leaving a 10px bottom margin. In the 233-tall
+  template that reads `y=210`, but **derive it from `H`** — see below.
+- Band available to the chart: `44 → H − 10` (guided) or `44 → H − 23` (pull).
+
+Palette fills are **bound library styles** (`Default Palette/Midnight Blue #00295B`,
+`Default Palette/Rusty Orange #B13507`). GUIDELINES.md → Colors applies unchanged,
+including the `color_audit.py` pass.
+
+`Data Insights/Source` `#858585` is a paint style the rest of this skill doesn't otherwise use.
+
+### The source string
+
+Bare `Producer (Year)` — e.g. `Luxembourg Income Study (2026)`. **No `Data source:` prefix**: the
+template's placeholder is `[Data source (YYYY)]`, a fill-in-the-blank, and the earlier version of it
+spelled the rule out as *"an optional source, without the `Data source:`"*. This is the one place in
+this skill where the source line is *not* the verbatim grapher footer string, so don't reuse the
+Step 6 rule that forbids re-deriving it — take the producer and the release year from
+`chart.citation` and drop the prefix.
+
+## Per-type conventions, as measured
+
+The spec on this page was derived by measuring five worked examples the design team kept beside the
+templates. **Those examples have since been deleted** — deliberately, once this route could reproduce
+them — so this file is the record and there is nothing to go and look at. The templates are the only
+live reference.
+
+| Shape | Convention |
+|---|---|
+| Two-series line | dots **and** value labels at *both* ends; entity label along each line; title + subtitle |
+| Three-series indexed change | end dots and end values only; two-line title; no subtitle |
+| Bands between two time points | labels at both ends; the shortest frame of the set (221) |
+| Ranked bar | entity name over its year in a left label column; no axis at all; the tallest frame (272) |
+| Pull chart | the same, plus the source row — and four labeled axis ticks with 4px tick marks |
+
+Two facts worth keeping explicit, because they are the ones a single example would have taught:
+
+- **The axis treatment is not uniform.** One example carried four labeled ticks with 4px marks; the
+  others carried only the first and last year on a bare baseline. Choose per chart; there is no
+  default to inherit.
+- **The frame height moves with the content** — 221 / 233 / 234 / 272 across the five.
+
+## Width is fixed; height is free
+
+**302 is the only fixed dimension** — it is `.chart-rows__chart`'s 300px slot plus `ChartThumbnail`'s
+1px border each side. The templates ship at 233 tall, but that is a starting point, not a target.
+
+This inverts what every other template in this skill assumes. Elsewhere the frame is fixed and the
+chart is fitted into a measured band (SKILL.md Steps 3 and 7). Here **the frame is an output**:
+
+1. Decide the content — how many series or rows, axis or no axis. This is where a small chart is won;
+   see GUIDELINES.md and the narrative the image serves.
+2. Pick the plot height. Measured calibration: a 2–3 series line chart sits at 150–170px of
+   plot; a ranked bar chart is `rows × ~30px` of row pitch.
+3. `H = 44 (header) + gap + plotHeight + gap + (23 with a source row | 10 without)`.
+4. Export at that height (below). No aspect-ratio arithmetic.
+5. Resize the clone to `H`, and on a pull clone move the source row to `y = H − 23`.
+
+A consequence worth stating because it will be reached for: **an aspect-ratio check on a small chart
+is meaningless.** Only the width is a target, so there is no ratio to assert and nothing to compare a
+render against — check the width and the margins instead.
+
+## Sourcing the view
+
+The image points at a grapher view and, inside a guided chart, *drives the live chart to that view* —
+so the geometry has to be an export of the view the `url:` selects, not an independently drawn chart
+that is free to disagree with it.
+
+| Input | SVG endpoint |
+|---|---|
+| Chart slug | `https://ourworldindata.org/grapher/<slug>.svg?<view params>` |
+| MDim view | the same — the dimension params select the view |
+| Narrative chart / unpublished draft | `https://ourworldindata.org/grapher/by-uuid/<configId>.svg` |
+| **Explorer view** | `https://ourworldindata.org/explorers/<slug>.svg?<view params>` |
+
+The explorer endpoint is `EXPLORER_DYNAMIC_THUMBNAIL_URL` (`settings/clientSettings.ts:40`) and is
+new to this skill — the Step 1 table has no explorer row for any other format. Texts come from
+`.metadata.json` with the same params, per SKILL.md Step 1.
+
+**A missing view param fails silently, and it is the trap on this route.** Every one of these returns
+HTTP 200 whatever you pass:
+
+- An explorer requested with no view params came back with **two texts** — `1900`, `2020` — an axis
+  and nothing else.
+- An MDim slug with no params rendered its *default* view, which for `energy-mix` is a **map**
+  (`No data`, `0 TWh`, … `20,000 TWh`).
+- **A dimension takes one value, and an invalid set renders *nothing*.** `quantile=richest_1pct` gives
+  one series; `quantile=richest_1pct~richest_0_1pct` and the comma form both return an **empty SVG —
+  zero text nodes — at HTTP 200**, and a repeated `quantile=` param is last-wins. Nothing in the
+  response says so. See the composition note below for what to do about it.
+- **A `tab=` that the wrong slug can't honor degrades silently.** `tab=discrete-bar&time=latest` on
+  one MDim came back as dots on a time axis — one point per country, no bars, no names — while the
+  *same* params on the right slug produced a proper ranked bar with all seven names. The skill already
+  notes that `tab=table` is silently ignored; treat every `tab=` as a request, and check the render
+  rather than the URL before concluding anything about the route.
+
+So carry the view's full param set, and before building anything **assert the text count and the
+rendered tab against the view you asked for.**
+
+> **Don't count texts with `grep -c`.** These SVGs are frequently a single line, so `grep -c '<text'`
+> returns `1` for a chart with fourteen labels and reads exactly like the empty render you are testing
+> for. Extract them instead:
+>
+> ```bash
+> .venv/bin/python -c "import re,html,sys; s=open(sys.argv[1]).read(); \
+>   print([html.unescape(re.sub('<[^>]*>','',m)).strip() for m in re.findall(r'<text.*?</text>',s,re.S)])" chart.svg
+> ```
+>
+> A healthy 7-row bar thumbnail prints 14 strings — seven values and seven entity names.
+
+## The export: `imType=thumbnail`
+
+This is the same render mode the search results use
+([`ourworldindata.org/search`](https://ourworldindata.org/search)), and the design of these charts is
+deliberately close to those thumbnails. `constructPreviewUrl` (`site/search/searchUtils.tsx:301`)
+builds it; `getThumbnailOptions` (`functions/_common/imageOptions.ts:70`) resolves it to
+`variant: GrapherVariant.Thumbnail`, documented in grapher's own types as *"Simplified rendering,
+suitable for thumbnails. Less noisy visualization, but should be understandable on its own"*
+(`GrapherTypes.ts:851`). Dedicated renderers sit behind it: `LineChartThumbnail`,
+`SlopeChartThumbnail`, `StackedAreaChartThumbnail`, `MarimekkoChartThumbnail`.
+
+### It strips the furniture for you — but it does not label the series
+
+Same chart, same size, two routes:
+
+| Route | Texts emitted |
+|---|---|
+| `imType=uncaptioned` | 19 — `1880 · 1900 · 1920 · 1940 · 1960 · 1980 · 2000 · 2023`, `0 years` … `80 years`, `United States`, `China` |
+| **`imType=thumbnail`** | **8** — `1880 · 2023`, `United States`, `China`, `79.3` |
+
+So the y-axis, the interior year ticks and the legend are gone, and you get the first and last year
+plus an end value. That much is dependable.
+
+**The series labels are where it varies, so check them per chart rather than assuming.** Measured
+across five real views:
+
+| Chart | Series labeled |
+|---|---|
+| Ranked discrete bar, 7 countries | **7 of 7**, each with its own observation year |
+| Two-country line chart | 1 of 2 |
+| Single-series line chart | 1 of 1 |
+| Three-series MDim (levels) | 2 of 3 |
+| The same MDim with `stackMode=relative` | **0 of 3** |
+
+A discrete bar labels every row; a line chart labels some and drops the rest; `stackMode=relative`
+suppresses them entirely. The last case is not collision avoidance you can tune out — the labels
+stayed absent at `imFontSize` 12, 14, 15 and 16 and at frame heights of 180, 250 and 300px.
+
+Two omissions are consistent across every type: **only end values are labeled**, never the values at
+the start of a line (the reference charts label both ends), and an MDim's series names arrive in their
+raw form (`World - Richest decile`) rather than the reference's `Richest decile`. Grapher also folds a
+per-row year into the value rather than stacking it — `25.8% in 2022` where the reference sets
+`Brazil` over `2022` in the label column.
+
+So the thumbnail route reliably buys you the *stripping* — no legend to delete, no axis to remove, no
+rescale. **Budget for re-adding the missing series labels and rewriting the raw names in Figma**;
+GUIDELINES.md → Direct labeling has the placement rules, and the per-type conventions above give
+the target. How much of that work there is depends on the chart type, so measure the export before
+estimating.
+
+### The frame height is an output, and the frame must be resized BEFORE the chart goes in
+
+The shipped 302-wide templates measure 302×233, but that height is a placeholder: grapher returns
+whatever ink the chart needs and reserves the rest. Measured on a single-series line chart at
+`imFontSize=16`: **122.7px of ink in a 183.5px canvas** for the guided variant and 110.9 in 166.5 for
+the pull one — roughly 60px and 56px of vertical space grapher asked for and then did not use. Forcing
+that ink to fill a 233px frame would need a rescale, which this route forbids because it moves the
+font sizes off the 11/12px ladder.
+
+So compute the frame height from the ink: `44 + inkHeight + 12` for the guided variant, and
+`44 + inkHeight + 6 + sourceRowHeight + 12` for the pull one, whose source row sits below the chart.
+That gave 179 and 184 against the shipped 233.
+
+**A resize displaces everything already in the frame, so re-pin afterwards.** Two things broke on one
+`clone.resize()`. The chart, placed before it, was squashed 122.7px → 94.26px — non-uniformly, through
+the group's top-and-bottom constraint, and reported as though that were its real height. And the
+**header moved and was clipped**: these templates constrain it `vertical: CENTER` (pull) and `SCALE`
+(guided), so shrinking 233 → 184 put the pull header at **y = −15** and `clipsContent` sliced the title
+off. Placing the chart after the resize fixes the first; only re-pinning fixes the second, because the
+header ships inside the template.
+
+So the order is: **resize → re-pin the header to `y = 10` → place the chart at `y = 44` → place the
+source row** — then assert no child has a negative `y`, because a clipping frame hides exactly this.
+
+### Request the final pixel size directly
+
+`getThumbnailOptions` sets `staticBounds = Bounds(0, 0, imWidth / 4, imHeight / 4)`, so `imWidth`
+gives you the SVG **canvas** width exactly: `imWidth=1208&imHeight=664` returns
+`viewBox="0 0 302 166"`. Defaults with neither param are 1200×640 → a 300×160 SVG.
+
+**But target the content width, not the frame width — grapher insets the drawing inside the canvas.**
+Measured at `imFontSize=16`: a 302-wide canvas puts its ink at x 7.2 … 294.2, i.e. **~7.2px of padding
+per side**, which lands outside the template's 12 … 290 content box at both ends. Asking for the frame
+width and placing at `x=12` overflows the right margin; placing at `x=0` leaves a 7px margin where the
+template wants 12.
+
+So solve for the canvas whose *ink* is 278 wide:
+
+```
+imWidth  = 4 × (278 + 2 × 7.2)  ≈ 1170     # canvas 292.5 -> ink ~278
+imHeight = 4 × plotHeight                  # whatever the height step above chose
+```
+
+Then, because `unwrap` leaves you a GROUP and a group's box hugs its contents, the imported chart
+*is* its ink — set `chart.x = 12` and it lands on the content box. Verified across five charts:
+widths came back 277.5, 277.3 and 277.0 against the 278 target, with right edges at 289.5, 289.3 and
+289.0 against 290.
+
+Two caveats. The 7.2px inset was measured at one font size, so **measure the import and expect one
+correction** — the skill's standing advice for the default route applies here too. And a chart whose
+ink does not fill the canvas comes back narrower regardless: on a discrete-bar MDim and a
+single-series line chart the groups measured 235.9 and 233.7, because grapher reserved horizontal
+space it then did not use. That is not a fit error to correct with a rescale (which would move the
+font sizes off the ladder) — it is the export telling you the chart does not fill 278px.
+
+Two rules from SKILL.md Step 3 **do not apply here**, and both would cost a re-export:
+
+- **No renormalization and no aspect clamp.** `extractOptions` returns early for `imType=thumbnail`,
+  so `MIN/MAX_ASPECT_RATIO` and the ~510k px² normalization never run. The standing rule that
+  "`imWidth`/`imHeight` set the aspect ratio only" is true of the default and `uncaptioned` routes and
+  false here.
+- **No `rescale()` in Figma.** The import already lands at the content width, so every font size stays
+  exactly where the export put it. Elsewhere this skill goes to some length to avoid a rescale; here
+  it is free.
+
+### The labeling policy — what gets a label, and what it says
+
+The rule underneath every case: **name whatever distinguishes the series, and nothing else.** If the
+series differ by entity, label the entity; if they differ by indicator, label the indicator's display
+name; if there is only one series, name nothing and let the values carry it. The entity name on a
+single-entity chart is pure overhead at 302px.
+
+| Chart | What distinguishes the series | Label with | `imMinimal` |
+|---|---|---|---|
+| Several entities, one indicator | the entity | entity name, **bold, in the line's own color** | `0` |
+| One entity, one indicator | nothing | no name at all — first and last **values** only | **`1`** |
+| One entity, several indicators | the indicator | the indicator's **display name**, placed away from the values | **`1`** |
+| Several entities *and* indicators | both | reconsider the chart — it is too much for 302px |
+
+**This is easy to skip, and the default is the wrong one.** Omitting `imMinimal` gives you `0`, which
+on a single-entity line chart puts the country's name inside a 278px plot — measured on Argentina, the
+export's texts were `1950 | 2025 | Argentina | 0.52`, with "Argentina" sitting in the left of the plot
+where the first value should be. Passing `imMinimal=1` returned `1950 | 2025 | 0.19 | 0.52`: name gone,
+first value gained. Pass it explicitly for rows two and three of the table rather than relying on the
+default.
+
+`imMinimal=1` is the mechanism for rows two and three, and it does exactly the right thing: it drops
+the entity name **and** emits the first *and* last value per series. Verified —
+`imMinimal=0` on a single-country line gives `1913 | 2024 | United States | 9.9%`, while `imMinimal=1`
+gives `1913 | 2024 | 9.2% | 9.9%`. On the three-series MDim it replaces `World - Poorest decile` /
+`World - Richest decile` with `$1.22 | $36.79 | $3 | $9.65 | $55.51`. The display names then get added
+in Figma, positioned away from the value labels so the two roles stay legible.
+
+**Always label the first and last value of each line**, not just the last. `imMinimal=1` gives both;
+where you are on `imMinimal=0` (several entities) grapher labels only the end, so the start values are
+added in Figma.
+
+**Never carry grapher's `<name> - <indicator>` compound into the frame.** An MDim emits
+`World - Richest decile`; the label should read `Richest decile`, since "World" is the only entity and
+therefore distinguishes nothing.
+
+**But leave the entity name itself exactly as grapher spells it.** Dropping a redundant "World" is a
+labeling decision; re-typesetting the entity is a *data* edit. Grapher renders `Cote d'Ivoire` without
+the accent and a designer reference may show `Côte d'Ivoire` — leave grapher's form, because the entity
+name is the canonical one in the regions dataset and a "corrected" one makes the image disagree with
+both the chart and the data. Same reasoning as shortening a category label (SKILL.md Step 8c): if the
+spelling should change, it changes upstream. Asked on this run, the decision was to keep grapher's.
+
+### Order of operations — get this wrong and you place every label twice
+
+Each geometry change invalidates every label position, so **all the maps run before any label is
+placed.** Doing it out of order cost four full re-placement passes on the first run of this route:
+
+1. **Export** at the content width and chosen height (`imWidth=1170`, `imHeight = 4 × plotHeight`).
+2. **Clone** the right template; fix the background (frame fill on, vector out); resize to `H`; move
+   the source row on a pull clone.
+3. **Fill the text slots** — title, optional subtitle, source. The header reflows, so read
+   `headerBottom` back *after* this.
+4. **Import and unwrap** the chart; place at `x = 12`.
+5. **Map the geometry, x then y:** stretch to the content box, then stretch to the bottom margin,
+   reserving a label height under the header. Nothing textual moves yet.
+6. **Add what grapher omitted** — missing dots and missing start values (below).
+7. **Now place labels:** value labels first (they are anchored to marks), then series labels
+   (they only need to avoid lines and the value labels).
+8. **Then round, restyle and re-centre** — and re-run step 7 if any of it changed a width.
+9. **Then the checks.**
+
+The reason is mechanical: a label's position is derived from a mark, and every map moves the marks.
+There is no way to "adjust" placed labels after a map — they have to be re-derived.
+
+### Grapher omits dots and start values — count them before you trust them
+
+A thumbnail export does **not** reliably emit one dot and two value labels per series. Measured on
+these five charts: the Gini chart's UK series arrived with **no start dot**, and the thresholds chart's
+median series arrived with **neither a start dot nor its start value** — 5 labels for 3 series where 6
+were wanted, and the missing one is invisible unless you count.
+
+So **count first: a line chart wants `2 × series` value labels and `2 × series` dots.** Where one is
+missing, add it:
+
+- **Dot:** clone the same series' *other* dot, so size, fill and shape match exactly, then seat it on
+  the line's first path point. Never draw a fresh ellipse.
+- **Value:** take the number from `.csv?…&csvType=filtered` — never read it off the chart or infer it
+  from the other end. The median's 1990 threshold was `3.551` → `$3.55`, which is what the reference
+  shows.
+
+### The margins are 12px sides, 10px top and bottom — and the plot must reach them
+
+The template's own margins are **12px left and right, 10px top and bottom**, and the plot is expected
+to *fill* that box rather than float inside it. This is easy to get wrong in the bottom direction,
+because nothing looks broken: measured across four guided frames the bottom-most ink sat **15.7, 22.8,
+22.7 and 26.9px** from the frame edge instead of 10, so every one of them was floating.
+
+Where the plot's bottom edge lands depends on what is beneath it:
+
+| Frame | Bottom-most ink should be | Which node it is |
+|---|---|---|
+| Guided (no source row) | `H − 10` | the axis tick labels, or the last bar |
+| Pull (source row) | just above the source at `H − 23` | the source line itself then ends at `H − 10` |
+
+The fix is the y-analogue of the earlier map: derive the target baseline from the frame height
+(`newTickTop = H − 10 − tickHeight`, `newBaseline = newTickTop − 2`), map the plot geometry into it, then
+move the baseline and re-seat the tick labels — they are text and must be *translated*, never scaled.
+Measured stretches of 1.10–1.13× closed the gap on three line charts, and 1.03× on the ranked bar.
+
+> **Reserve a value label's height below the header when you map y.** An end label often has to sit
+> *above* its final dot, and if the map takes the data right up to the header there is nowhere for it
+> to go — on the Gini chart it wanted `y=40` against a header bottom of 44. Map to
+> `headerBottom + labelHeight + 6` rather than to `headerBottom`, and the label fits.
+
+### Placing value labels: beside the dot when there is room, above or below when there isn't
+
+**Beside is the default and the better look:** the start value to the **left** of the first dot, the end
+value to the **right** of the last, each **vertically centred on its dot**, with a 6px gap. That is what
+the references do and what grapher's own export does before you touch it.
+
+```js
+it.y = anchor.y - it.h / 2;
+it.x = isStart ? Math.max(12, anchor.x - 6 - it.w)
+               : Math.min(290 - it.w, anchor.x + 6);
+```
+
+Then **de-collide vertically within each side** — two series ending close together will overlap. Sort
+the side's labels by `y` and push overlapping neighbours apart symmetrically until a `height + 2` pitch
+holds; a handful of passes converges.
+
+**Above or below is the fallback, and it is only forced by the content box.** Once you have stretched
+the plot so the end dots sit on x=12 and x=290 there is no room beside them, so those labels must go
+above or below — and at 302px they will clash with a line unless placed deliberately. Two objectives
+that each fail alone:
+
+- **First-candidate-that-passes** leaves clashes. An 8px offset cannot clear a rising line across an
+  88px-wide label, and the search reports success while the label sits on the line.
+- **Maximum clearance** drifts labels away from the marks they name — it parked one 24px from its own
+  dot, in empty space, reading as belonging to nothing.
+
+Use both, in order: **filter to candidates with ≥4px clearance from every line and every already-placed
+label, then take the one nearest its own dot.** Generate candidates on both sides at several gaps
+(5/7/9/12/16/21px) and three horizontal alignments (centred, offset either way), clamp into `[12, 290]`
+and between the header and the bottom margin, and commit the **topmost anchor first** so crowded lower
+labels yield rather than the reverse.
+
+Which regime a chart is in follows from whether you stretched it to the box: the two charts whose dots
+sit on the edges use above/below, the two whose dots sit inboard use beside. Don't mix within a chart.
+
+### What the export's node tree gives you
+
+Worth knowing before writing any of the above, because it is what makes the maps safe and the mapping
+of label → series possible:
+
+| Node | Shape |
+|---|---|
+| `line__<Entity> - <Indicator>` | the path. A sibling `outline__…` carries its white halo — map both |
+| dots | **separate `Vector` nodes** named `Vector`, siblings of the lines. This is why a vertical map doesn't oval them |
+| value labels | a **haloed pair** inside a `Group`: a white stroked copy plus the coloured one |
+| the halo copy's **node name** | **the series name** (`World - Richest decile`) even though its characters are the value — this is how you map a value label to its line |
+| `tick-labels` | text; **translate**, never scale |
+
+Two Figma mechanics that bite here: **`leadingTrim` heights only settle on the next `use_figma` call**,
+so trim in one call and centre in the next; and a text node's **width is stale in the call that set its
+characters**, which silently invalidates any placement search built from it (reference/GOTCHAS.md).
+
+### Expand the plot to the content box — the dots belong on the title box's edges
+
+Grapher reserves horizontal margin for labels it then places differently, so a thumbnail import
+typically spans less than the 278px content width and the plot reads as inset from the title above it.
+**Stretch it so the first and last marks land on x=12 and x=290**, flush with the title/subtitle box.
+Two shapes, two mechanisms — both already in this skill:
+
+- **Line, slope, area:** an **x-map** over the plot geometry. Take the line group's own x extent as the
+  source, map to `[12, 290]`, then `resize()` each `line__`/`outline__` vector's width and reposition
+  it, map each **dot centre** while leaving its size alone, stretch the baseline, and anchor the edge
+  tick labels inwards (first at 12, last right-aligned on 290) the way grapher does. Verified at
+  k = 1.373 and 1.328 on two charts, with dots landing exactly on 12 and 290.
+- **Ranked bar:** the closed-form reclaim in SKILL.md Step 8. It is not an optimisation at 302px, it is
+  the norm — grapher sized the label gutter for un-shortened names and the value column for unrounded
+  numbers, and you have since shortened and rounded both. Measured here: `k = 1.437`, taking the
+  longest row's bar-plus-value from 235 to exactly 290.
+
+**Once the dots sit on the box edges, the value labels have to move above or below them** — there is no
+longer room beside. Centre each on its dot, clamped inside `[12, 290]` so the edge labels stay in the
+box. **And check the header:** on a short frame, "above the first dot" can land in the subtitle, so flip
+to below when `y < headerBottom + 2`. That happened on the Gini chart's `0.39`, which wanted y=40
+against a header bottom of 44.
+
+### Round the values to the precision the story needs
+
+Grapher exports full precision; a 302px frame rarely wants it. The references round, and consistently
+within a chart:
+
+| Kind | Reference | Grapher gave |
+|---|---|---|
+| Percentages | `26%`, `21%`, `10%`, `+171%` | `25.8%`, `20.7%`, `9.9%`, `+171.7%` |
+| Currency | `$36.79`, `$9.65`, `$3.00` | same — 2 dp kept |
+| Index values | `0.39`, `0.30` | `0.39`, `0.3` — pad to a consistent 2 dp |
+
+So: **percentages to whole numbers, currency and index values to two decimals**, and never a mix of
+precisions within one chart (`$3` beside `$9.65` reads as a different kind of number). Keep a decimal
+only where dropping it would collapse two visibly different marks into the same label.
+
+This is the same house practice SKILL.md records for DI bar charts, and it carries the same
+obligation: the image now deliberately disagrees with the interactive chart it links to, so **record it
+as an accepted deviation** rather than leaving a later audit to find it.
+
+Each value label is a **haloed pair** — a white stroked copy under the colored one, both with the same
+characters — so rewriting one half leaves the halo showing the old digits behind the new. Rewrite both.
+(Bar-chart value labels sit on white and have no halo, so those are single nodes.)
+
+### Value labels are centered on the mark they name
+
+**This applies everywhere in this skill, not only at 302px** — bar values on their bars, end-of-line
+values on their dots, legend labels on their swatches. Grapher positions text by baseline, so an
+imported label sits high by construction and the drift is uniform, which makes it read as deliberate
+rather than wrong. The recipe is in SKILL.md Step 7: `leadingTrim = "CAP_HEIGHT"` to shrink the line
+box to the ink, then `label.y = markCenter − label.height / 2`. Step 8c's *Label alignment* check is
+the gate.
+
+### A ranked bar puts the year under the entity name, not after the value
+
+Grapher folds a per-row year into the value — `25.8% in 2022` — which spends horizontal space on
+repeated words and pushes the value column right. Split it: the **entity name** on one line with the
+**year beneath it** in the label column (Lato Bold 11px `#2d2e2d` over Lato Regular 11px `#5b5b5b`,
+right-aligned on a shared edge), and the bare value beside the bar. That is what the reference does, and
+the reclaimed width goes to the bars.
+
+Three details that only show up once it is built: the name/year gap wants **5px ink-to-ink** (2px reads
+as cramped); the whole name+year block is **centred on the bar** as one unit, not each line
+independently; and `United States` takes the standing **`US`** abbreviation here, which also stops it
+being the only two-line label in the column. `United Kingdom → UK` is the other standing one.
+
+### The y-axis minimum is not yours to set, and it matters here
+
+A zero-based axis compresses a narrow series into a corner of the frame, which is much more visible at
+302px than at 850. Measured on the Gini chart: pairing its labeled end dots with their values gives
+−347.8 px per unit, which puts value 0 at y≈145.5 against a plot bottom of ~148 — i.e. **zero-based**,
+with the whole 0.25–0.39 range squeezed into the top quarter. The reference uses a tight range and
+fills the height.
+
+**There is no URL parameter for this.** `GrapherQueryParams` is `country`, `focus`, `tab`, `overlay`,
+`stackMode`, `zoomToSelection`, `xScale`, `yScale`, `time`, `region`, `endpointsOnly`, `facet`,
+`uniformYAxis`, … — and `yScale` is linear-vs-log, not bounds. The minimum lives in the chart config
+(`yAxis.min`), so the *durable* fix is **the chart author's**, exactly like sort order and entity
+selection (SKILL.md Step 8b): change the chart config, or point a draft chart with `yAxis.min` set and
+export it through `by-uuid/<configId>.svg`.
+
+**In practice the Figma fix is the one that gets taken, so treat it as the normal route and not a last
+resort.** Asked directly, the design owner chose to leave the rescale in the image rather than change
+`yAxis.min` on a chart that many other surfaces render. Record the deviation and move on; only push it
+upstream if the chart is one you own anyway.
+
+**Do it as a scripted y-map — not a group stretch.**
+Stretching the chart group on one axis ovals the dots and is forbidden elsewhere in this skill. But on
+a thumbnail export the line paths and the dots are *separate nodes*, which makes the y-analogue of
+Step 8's sanctioned x-map safe:
+
+```js
+const k = (DST_BOTTOM - DST_TOP) / (srcBottom - srcTop);      // src = the band the data occupies
+const mapY = y => DST_TOP + (y - srcTop) * k;
+for (const n of chart.query("VECTOR[name^=line__], VECTOR[name^=outline__]").toArray()) {
+  const y = mapY(n.y);
+  n.resize(n.width, Math.max(0.01, n.height * k));            // strokeWeight is a property, so it survives
+  n.y = y;
+}
+for (const d of dots) d.y = mapY(d.y + d.height / 2) - d.height / 2;   // map the CENTRE, keep the size
+```
+
+Verified on the Gini chart: a 2.32× map took the data from a 51px band to 118px, with every stroke
+still 1.5px and every dot still 7px round. Record it as an accepted deviation — the image now shows a
+tighter axis than the view its `url:` navigates to.
+
+> **Re-anchor the value labels by identity afterwards, never by proximity.** The obvious move — snap
+> each label to its nearest dot — compares *pre-map* label positions against *post-map* dots, so two
+> labels collapse onto the same anchor and the numbers end up on the wrong marks. Take each series'
+> own first and last path point instead: `anchors = { "0.32": poly.at(0), "0.39": poly.at(-1) }`.
+
+### Comparing two values of one dimension: two exports, one frame
+
+House practice for a chart like *"US income share: top 1% vs. top 0.1%"* is to export **each MDim view
+separately** and combine them in one frame — the dimension cannot carry both values, so there is no
+single view to ask for.
+
+**The catch is the y-scale, and it is not a detail.** Each export auto-scales to its own series, so the
+two arrive with different pixel-per-unit mappings and stacking them as-is misstates the gap between the
+series. Measured on the designer's finished reference, the two series *are* on one shared scale: pair
+each of the four labeled dots with its true value and every cross-series pair returns the same
+**−6.8 px per percentage point** (−6.79, −6.76, −6.87, −6.85), which two independently scaled exports
+would not produce.
+
+So a faithful composition has to reconcile the scales, and the obvious fix is barred: a vertical-only
+rescale ovals the dots and thickens the strokes unevenly, which SKILL.md forbids for exactly this
+reason. Three honest options, in order of preference:
+
+1. **Get a real two-series chart** — a standalone grapher chart or a narrative chart carrying both
+   indicators. Then it is an ordinary single export and everything else on this page applies.
+2. **Compose deliberately, and say so.** Place both exports, then reconcile by computing each series'
+   true data range (from `.csv?...&csvType=filtered`) and mapping both onto a common scale before
+   touching pixels. Record it as an accepted deviation — the image will not match either source view.
+3. **Ship them as two separate small charts.** A `chart-rows` block has several rows; two charts each
+   labeled with their own series is often clearer at 302px than one crowded composite.
+
+Whichever you pick, `.csv?...&csvType=filtered` is how you check the values — and note the CSV returns
+**every entity** unless `csvType=filtered` is present, so a naive `df[df.year == 1913]` silently reads
+some other country.
+
+### `imFontSize` is in rendered pixels, at 0.75×
+
+`imFontSize` is a base; labels come out at **0.75 × the base**, in final rendered pixels. Measured at
+302 wide on a two-series line chart and on a seven-row discrete bar:
+
+| `imFontSize` | 14 (default) | **15** | **16** | 18 | 20 |
+|---|---|---|---|---|---|
+| line chart | 10px | **11px** | **12px** | 13px | 15px |
+| discrete bar | 10.5px | 11.25px | **12px** | 13.5px | — |
+
+So **`imFontSize=16` is the one to reach for** — it lands on 12px on both types, and 12px is the top
+of the format's range. Use 15 when you want 11px on a line chart. The default of 14 renders at 10px,
+below the format's floor, so **always pass `imFontSize`**.
+
+Note the two types round differently — the bar chart keeps the fractional 11.25 where the line chart
+reports a whole 11 — so a value other than 16 can leave you off the type ladder on one type and on it
+on another. **Re-measure for a type you haven't done before** and record it here. Search itself drops
+to `imFontSize: 12` for `WorldMap`, `DiscreteBar` and `StackedDiscreteBar`, on the grounds that
+labels and legends are "too overpowering in thumbnail previews" at the default — worth trying if a
+chart comes back crowded.
+
+### `imMinimal` drops the entity names — it doesn't drop furniture
+
+`imMinimal=1` returned `39.4 · 32 · 79.3` where `imMinimal=0` returned
+`United States · China · 79.3`. Search can afford to lose the names because its own UI carries them.
+
+**Default to `imMinimal=0`.** Reach for `1` only when the surrounding narrative already names the
+entities and the values are the point. It is an editorial choice, so ask rather than assume.
+
+## In Figma
+
+Steps 5 and 7 of SKILL.md, reduced to what this format needs:
+
+1. Clone `25344:1357` (guided) or `25344:1391` (pull) onto the page.
+2. **Check the background, don't fix it:** the clone should already have a visible white frame fill
+   and no background vector. Only if it does not, apply the repair above — set the clone's own white
+   fill to `visible: true` *and* remove the `Group > Group > Vector` rectangle, both halves. When
+   hunting for that group, note it is a **`GROUP`**, not a `FRAME` — `get_metadata` renders groups as
+   `<frame …>`, so a filter on `type === "FRAME"` silently matches nothing and leaves it in place.
+3. Resize the clone to `H`. On a pull clone, move the source row to `y = H − 23`.
+4. Fill the text slots — title, optional subtitle, and the bare `Producer (Year)` source on a pull
+   chart. Per SKILL.md Step 6, setting `characters` flattens mixed weights; these slots are
+   single-weight, so nothing needs restoring.
+5. `upload_assets` the SVG, unwrap the import frame (SKILL.md Step 5's `unwrap` helper), and place at
+   `x = 12`, `y = 44 + gap`. **No rescale.**
+6. Then the checks below.
+
+A `chart-rows` block is 3–5 rows, so a run usually produces a **set**: one page, N frames laid out in
+a row. Two rules for a set — the same entity keeps the same bound library color in every frame, and
+heights may differ between frames, because the slot doesn't require them to match and forcing a
+common height costs the tallest chart its room.
+
+## Checks — the 302 numbers for Step 8c
+
+Most of Step 8c carries over. These bars are different at this size, and reporting the 540-wide
+figures here produces false failures:
+
+| Check | 540-wide bar | **302-wide bar** |
+|---|---|---|
+| Text size floor | 12px | **11px** — the template's own subtitle, source and year labels are 11px. Not a deviation |
+| Nothing in the margins | 16 … 524 | **12 … 290** |
+| Box alignment | chart matches the header box | chart left edge at 12; **width need not match the header**, which hugs its text |
+| Gap | 12–16px, equal top and bottom | not applicable as written — the band is `44 → H−10/−23` and the height was chosen to fit, so verify the chart sits inside the band with the margins above |
+| Annotation block gap | 27px | scale to the frame; annotations are rare at this size |
+
+Still fully in force: color-vision safety (`color_audit.py`), off-palette fills bound as library
+styles, legend/direct-label agreement, label-on-fill contrast, the year or period being stated, and
+every text claim being true of the indicator (`/adversarial-data-review`, `/check-metadata-style`,
+`/check-metadata-typos`).
+
+One new check for this route: **every label arrives twice.** Grapher draws each label as a white halo
+plus the ink, so the export contains `United States` twice. A text edit that touches one copy leaves
+the other behind, and a text-node count is double what the picture shows.
+
+## Per chart type
+
+GUIDELINES.md → Per chart type owns the conventions. What is specific to 302px:
+
+- **Line** — the workhorse, and what the thumbnail renderer handles best. 1–3 series; 5 is the
+  ceiling. Entity label along the line in Lato Bold, colored like it. Value labels at the ends only:
+  both ends when the change over the period is the point, the end alone when the level is.
+- **Slope / two time points** — labels at both ends, entity name beside the left end or along the
+  band. Fits in the shortest frame of the set (221).
+- **Ranked bar** — entity name (Lato Bold 11px `#2d2e2d`) over its year (Lato Regular 11px `#5b5b5b`)
+  in a right-aligned left column, values to the right of each bar. **Drop the axis entirely** when
+  every bar is labeled, per GUIDELINES.md. Height is `rows × ~30px`.
+- **Stacked area / stacked bar** — labels inside the bands in white; check the label-on-fill contrast
+  bar (4.5:1) at 11px, which is tighter than at 14.
+- **Dumbbell** — entity names to the left, observation year below in 11px `#5b5b5b`.
+- **Choropleth map** — **ask before building one.** A map loses most of its detail at 302px, and
+  GUIDELINES.md → Colors keeps map ramps in grapher rather than in Figma.
+
+When several series run close together, GUIDELINES.md's label-collision playbook applies; the two
+moves that pay most at this size are shortening the longest entity name (`United Kingdom` → `UK`) and
+moving a label to sit beside its end value rather than along the line.
+
+## Delivery
+
+The deliverable is a **PNG uploaded to Cloudflare Images**, referenced from the gdoc by bare
+filename. `ACCEPTED_IMG_TYPES` (`adminSiteClient/imagesHelpers.ts:22`) has no `image/svg+xml`, so an
+SVG is rejected.
+
+1. **Name the frame after the file.** `<grapher-slug>-thumbnail` — `images.filename` is unique
+   site-wide, and Figma uses the frame name as the export filename. Don't add a `-<W>x<H>` suffix:
+   `appendImageSizeSuffix` reserves the `-{n}w` form for archival srcsets, and `htmlToEnriched.ts`
+   strips `-1280x840`-style suffixes.
+2. **Export at 3×.** The admin already has a Figma path —
+   `GET /api/figma/image?fileId=<key>&nodeId=<node>` (`adminSiteServer/apiRoutes/figma.ts`) calls the
+   Figma API at `scale: 3`, giving **906 × 3H**. This matters: `getSizes(302)` yields
+   `[48, 100, 302]`, so the largest srcset candidate at 1× is 302w and a 2× display upscales it.
+   Note `get_screenshot` **cannot** do this — `maxDimension` only ever downscales, and clamps at the
+   node's natural size.
+3. **Upload** via the admin (`POST /api/images`), then reference the filename in the block's `image:`
+   field. **From a cloud session steps 2 and 3 are both Access-blocked** — hand them to the user, with
+   the frame's node id and the target filename, rather than reporting the chart as delivered.
+
+Side effect to expect: `ImagesIndexPage.tsx:56` buckets anything whose filename contains
+`thumbnail` into the admin's featured-thumbnail filter.
