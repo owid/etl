@@ -17,6 +17,7 @@ from apps.wizard.app_pages.chart_diff.chart_diff import (
     ChartDiffsLoader,
     configs_are_equal,
     get_deleted_charts,
+    patch_keys_lost_by_sync,
     same_config_uuid,
     tags_are_equal,
 )
@@ -291,6 +292,32 @@ def cli(
 
                         # Change has been approved, update the chart
                         if diff.is_approved:
+                            # A chart this branch created has no counterpart in the target at
+                            # review time, so its approval records no target version and never
+                            # goes stale (unlike an existing chart's — see
+                            # `_target_updated_at_for_review`). The target's own ETL creates the
+                            # chart after the merge, and if someone edits it there before this
+                            # runs, the approval still matches and we would overwrite them.
+                            # Compare the authored layers and refuse instead.
+                            lost_keys = (
+                                patch_keys_lost_by_sync(
+                                    diff.target_chart.load_patch_config(target_session),
+                                    diff.source_chart.load_patch_config(source_session),
+                                )
+                                if cross_env_twin
+                                else []
+                            )
+                            if lost_keys:
+                                log.warning(
+                                    "chart_sync.target_edited_after_creation",
+                                    slug=chart_slug,
+                                    chart_id=chart_id,
+                                    target_chart_id=target_chart_id,
+                                    keys=lost_keys,
+                                )
+                                _notify_slack_chart_update(chart_id, str(source), diff, dry_run)
+                                continue
+
                             log.info(
                                 "chart_sync.chart_update",
                                 slug=chart_slug,

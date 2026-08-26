@@ -105,3 +105,61 @@ def test_regular_charts_still_match_by_id_and_created_at():
     assert _same_chart_across_envs(source, target)
     assert not _is_cross_env_twin(source, target)
     assert _target_updated_at_for_review(source, target) == target.updatedAt
+
+
+# --- What a sync would drop from the target's authored layer ------------------
+#
+# A chart created on a staging branch has no counterpart in production when it is reviewed, so
+# its approval records no production version and never goes stale. Production's own ETL creates
+# the chart after the merge; if someone edits it there before chart-sync runs, the approval still
+# matches. `patch_keys_lost_by_sync` is what tells chart-sync to refuse instead of overwriting.
+
+# What grapher puts in a chart's authored layer when the ETL creates it: the slug, plus
+# bookkeeping it writes itself.
+_BOOTSTRAP_PATCH = {
+    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.011.json",
+    "id": 9231,
+    "version": 1,
+    "slug": "whales-caught",
+}
+
+
+def test_freshly_created_target_chart_loses_nothing():
+    from apps.wizard.app_pages.chart_diff.chart_diff import patch_keys_lost_by_sync
+
+    # Production's chart as its ETL just created it; staging carries an admin edit to sync.
+    assert patch_keys_lost_by_sync(_BOOTSTRAP_PATCH, {**_BOOTSTRAP_PATCH, "note": "Added on staging."}) == []
+
+
+def test_edit_made_in_the_target_admin_is_reported():
+    from apps.wizard.app_pages.chart_diff.chart_diff import patch_keys_lost_by_sync
+
+    target = {**_BOOTSTRAP_PATCH, "subtitle": "Hotfixed in production.", "note": "And a note."}
+    source = {**_BOOTSTRAP_PATCH, "note": "And a note."}
+    assert patch_keys_lost_by_sync(target, source) == ["subtitle"]
+
+
+def test_bookkeeping_keys_are_not_reported():
+    from apps.wizard.app_pages.chart_diff.chart_diff import patch_keys_lost_by_sync
+
+    # `id`, `version` and `$schema` are written by grapher, not by a person, and the two
+    # environments hand out their own — so the target can carry them while the source doesn't.
+    # Reporting those would block every sync.
+    assert patch_keys_lost_by_sync(_BOOTSTRAP_PATCH, {"slug": "whales-caught"}) == []
+
+
+def test_keys_present_on_both_sides_are_not_reported():
+    from apps.wizard.app_pages.chart_diff.chart_diff import patch_keys_lost_by_sync
+
+    # The source wins on a shared key by design — that difference is the change the reviewer
+    # approved in chart-diff (here, a slug renamed on staging), not something being lost.
+    source = {**_BOOTSTRAP_PATCH, "slug": "whales-caught-renamed-on-staging"}
+    assert patch_keys_lost_by_sync(_BOOTSTRAP_PATCH, source) == []
+
+
+def test_missing_patches_are_handled():
+    from apps.wizard.app_pages.chart_diff.chart_diff import patch_keys_lost_by_sync
+
+    assert patch_keys_lost_by_sync(None, None) == []
+    assert patch_keys_lost_by_sync({}, _BOOTSTRAP_PATCH) == []
+    assert patch_keys_lost_by_sync({"note": "Only in the target."}, None) == ["note"]

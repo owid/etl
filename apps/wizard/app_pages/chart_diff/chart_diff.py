@@ -1301,6 +1301,27 @@ def get_chart_diffs_from_grapher(
     return chart_diffs
 
 
+# Bookkeeping keys of an authored layer: grapher writes them itself, so their presence says
+# nothing about anyone having edited the chart.
+_PATCH_BOOKKEEPING_KEYS = ("id", "version", "$schema")
+
+
+def patch_keys_lost_by_sync(target_patch: dict[str, Any] | None, source_patch: dict[str, Any] | None) -> list[str]:
+    """Entries of the target's authored layer that syncing the source over it would drop.
+
+    Chart-sync writes the source chart's config to the target, where the server re-diffs it into
+    the target's authored layer. Any key the target's layer carries and the source's does not is
+    therefore lost. On a chart the branch created, the target's layer starts out holding only the
+    bootstrap `slug`, so anything else in it was authored in the target's own admin.
+
+    Keys present on both sides are not reported: the source wins there by design (that is the
+    change the reviewer approved, e.g. a renamed slug), and the reviewer saw it in chart-diff.
+    """
+    target_patch = target_patch or {}
+    source_patch = source_patch or {}
+    return sorted(k for k in target_patch if k not in _PATCH_BOOKKEEPING_KEYS and k not in source_patch)
+
+
 def configs_are_equal(config_1: dict[str, Any], config_2: dict[str, Any], verbose=False) -> bool:
     """Compare two chart configs, ignoring certain fields."""
     assert "isInheritanceEnabled" in config_1, "isInheritanceEnabled must be in config_1"
