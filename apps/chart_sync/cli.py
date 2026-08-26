@@ -315,7 +315,7 @@ def cli(
                                     target_chart_id=target_chart_id,
                                     keys=lost_keys,
                                 )
-                                _notify_slack_chart_update(chart_id, str(source), diff, dry_run)
+                                _notify_slack_target_edited(chart_id, str(source), diff, lost_keys, dry_run)
                                 continue
 
                             log.info(
@@ -460,6 +460,36 @@ def cli(
 
 def _is_commit_sha(source: str) -> bool:
     return re.match(r"[0-9a-f]{40}", source) is not None
+
+
+def _notify_slack_target_edited(
+    chart_id: int, source: str, diff: ChartDiff, lost_keys: list[str], dry_run: bool
+) -> None:
+    """Report a chart whose target copy carries edits this sync would have dropped.
+
+    Deliberately not the "pending" message: nothing is stale here. The chart was approved, and
+    the approval is still valid, because a chart the branch created has no target version to
+    bind to. What stops the sync is that someone edited the chart in the target's own admin
+    after the target's ETL created it.
+    """
+    assert diff.target_chart
+    target_chart_id = diff.target_chart.id
+
+    message = f"""
+:warning: *ETL chart-sync: Chart Edited In Target, Not Synced* from `{source}`
+<http://{get_container_name(source)}/admin/charts/{chart_id}/edit|View Staging Chart> | <https://admin.owid.io/admin/charts/{target_chart_id}/edit|View Admin Chart>
+Syncing would have dropped these fields, authored in the target's admin: `{"`, `".join(lost_keys)}`
+*Staging Edited*: {str(diff.source_chart.updatedAt)} UTC
+*Production Edited*: {str(diff.target_chart.updatedAt)} UTC
+```
+{_chart_config_diff(diff.target_chart.config, diff.source_chart.config, tabs=0, color=False)}
+```
+    """.strip()
+
+    print(message)
+
+    if config.SLACK_API_TOKEN and not dry_run:
+        send_slack_message(channel="#data-architecture-github", message=message)
 
 
 def _notify_slack_chart_update(chart_id: int, source: str, diff: ChartDiff, dry_run: bool) -> None:
