@@ -18,6 +18,7 @@ from dataclasses import dataclass
 from typing import Any
 
 import streamlit as st
+import streamlit.components.v1 as components
 from sqlalchemy.engine.base import Engine
 
 from apps.wizard.app_pages.metadata_diff.core import (  # noqa: F401
@@ -166,6 +167,37 @@ def item_marker(stored: dict[str, Any], surface: str, item_key: str) -> str:
     return "📝 " if row.get("comment") else ""
 
 
+# Enter saves, Shift+Enter newlines. Streamlit gives no keydown hook, so the binding is a script in a
+# zero-height component reaching the parent document — same-origin, the way the dimension grid does it.
+# Enter blurs the box rather than submitting anything: blur is what makes Streamlit commit a text area's
+# value and fire `on_change`, so the save path is the same one clicking away uses.
+_ENTER_SAVES_JS = """
+<script>
+const doc = window.parent.document;
+function bind() {
+  doc.querySelectorAll('[class*="st-key-mdd-strip-"] textarea').forEach((box) => {
+    if (box.dataset.mddEnter) return;
+    box.dataset.mddEnter = "1";
+    box.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey && !event.ctrlKey && !event.metaKey) {
+        event.preventDefault();
+        box.blur();
+      }
+    });
+  });
+}
+bind();
+// Streamlit rebuilds the DOM on every rerun, so the binding has to be reapplied rather than done once.
+new MutationObserver(bind).observe(doc.body, { childList: true, subtree: true });
+</script>
+"""
+
+
+def _st_enter_saves_script() -> None:
+    """Bind the keys for every review strip on the page (idempotent, and harmless if it never runs)."""
+    components.html(_ENTER_SAVES_JS, height=0)
+
+
 def surface_progress(rows: list[dict[str, Any]], surface: str) -> str:
     """ "✅ 3 · 📝 1" for one surface's recorded rows, or "" when it has none.
 
@@ -216,16 +248,15 @@ def st_review_strip(engine: Engine, surface: str, mark: ReviewMark) -> None:
         with col_tick:
             st_reviewed_toggle(engine, surface, mark)
         with col_note:
-            # `st.text_input`, not `st.text_area`: in a text area Enter inserts a newline and the value is
-            # only committed on blur or Ctrl+Enter, so a note typed and confirmed with Enter looked saved
-            # and was not. One line is the cost, and a review note is a sentence.
-            st.text_input(
+            st.text_area(
                 "Note",
                 key=note_key,
                 on_change=_save_note,
-                placeholder="Note — a question, a follow-up, a reason. Press Enter to save.",
+                height=68,
+                placeholder="Note — Enter saves, Shift+Enter starts a new line.",
                 label_visibility="collapsed",
             )
+    _st_enter_saves_script()
 
 
 def reviewer() -> str | None:
