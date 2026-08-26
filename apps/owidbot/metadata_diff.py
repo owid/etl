@@ -77,6 +77,14 @@ def format_metadata_diff(summary: Summary) -> str:
     if summary.n_charts or summary.n_indicators:
         indicators = f" (from {summary.n_indicators} indicator{'s' if summary.n_indicators != 1 else ''})"
         items.append(f"<li>Charts: {summary.n_charts}{indicators}</li>")
+    if summary.n_charts_own_text:
+        # A garden `presentation.grapher_config` edit moves a chart's own title, subtitle or footnote
+        # without touching the indicator's row, so it is not in the count above — and a branch that only
+        # does that had the count above at zero, leaving the comment with a field name and no charts at
+        # all. Reported as its own line rather than added in: the two sets overlap and nothing here
+        # dedupes them, so a total would be a number we cannot vouch for.
+        changes = f" ({summary.n_chart_text_changes} change{'s' if summary.n_chart_text_changes != 1 else ''})"
+        items.append(f"<li>Charts whose own config text changed: {summary.n_charts_own_text}{changes}</li>")
     if summary.n_mdims:
         # A count we could not resolve view by view is a ceiling, and says so rather than overstating.
         qualifier = "" if summary.mdims_resolved else " (flagged; too many to resolve view by view)"

@@ -31,6 +31,7 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.metadata_diff.core import (
     CHART_FIELDS,
+    COUNTED_SECTIONS,
     ChangeGroup,
     ViewDiff,
     build_view_bundle,
@@ -1239,6 +1240,16 @@ class Summary:
         return self.n_other_mdims + self.n_other_explorers
 
     @property
+    def mdim_counts_are_ceilings(self) -> bool:
+        """Either MDim count went unresolved, so the section holds cards it has no review keys for.
+
+        Two independent overflows — too many published MDims to diff view by view, or too many
+        unpublished ones — and either leaves the MDims section with a zero review total while its cards
+        are still rendered. Greying the section on that zero shuts the only door to them.
+        """
+        return not self.mdims_resolved or not self.draft_mdims_resolved
+
+    @property
     def total_changes(self) -> int:
         return self.n_chart_changes + self.n_mdim_changes + self.n_explorer_views
 
@@ -1471,6 +1482,24 @@ def _reach_slot(reach: dict[tuple[str, str], ChangeReach], g: ChangeGroup) -> Ch
         slot = ChangeReach(field=g.field, old=g.old, new=g.new)
         reach[key] = slot
     return slot
+
+
+def keep_sections(summary: "Summary") -> set[str]:
+    """Sections whose zero badge stays clickable instead of greying out.
+
+    A zero is only worth greying when it is a finding rather than a silence, and there are three ways it
+    is a silence: a surface whose lookup warned (its zero means "we could not look"), an MDim count that
+    overflowed the view-by-view budget in either direction, and new indicators, which the Charts section
+    reports even though they are not reviewable changes.
+    """
+    if summary.warnings:
+        return set(COUNTED_SECTIONS)
+    keep: set[str] = set()
+    if summary.mdim_counts_are_ceilings:
+        keep.add("mdims")
+    if summary.n_new_indicators:
+        keep.add("charts")
+    return keep
 
 
 def _collect_changes(seen: set[tuple[str, str]], groups: list[ChangeGroup]) -> None:

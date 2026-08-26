@@ -2650,3 +2650,48 @@ def test_a_value_that_cannot_be_dumped_says_so_instead_of_passing_off_a_repr(mon
 
     assert "cannot represent this" in snippet
     assert all(line.startswith("#") for line in snippet.splitlines()), "nothing here may be pasted as a value"
+
+
+def test_an_mdim_overflow_leaves_the_section_reachable_either_way():
+    """Both MDim counts can overflow the view-by-view budget, and either leaves no review keys behind.
+
+    The published overflow was allowed for; the unpublished one was not, so a branch changing more than
+    the budget's worth of draft MDims met a greyed-out section holding all of their cards.
+    """
+    from apps.wizard.app_pages.metadata_diff.core import empty_sections
+    from apps.wizard.app_pages.metadata_diff.discovery import Summary, keep_sections
+
+    drafts_overflowed = Summary(n_draft_mdims=30, draft_mdims_resolved=False)
+    assert "mdims" in keep_sections(drafts_overflowed)
+    assert "mdims" not in empty_sections({"mdims": (0, 0)}, keep_sections(drafts_overflowed))
+
+    published_overflowed = Summary(n_mdims=30, mdims_resolved=False)
+    assert "mdims" in keep_sections(published_overflowed)
+
+    # A summary that resolved everything still greys a section with nothing in it.
+    assert "mdims" in empty_sections({"mdims": (0, 0)}, keep_sections(Summary()))
+    # And a warning anywhere keeps every counted section reachable, because its zero means "we could not look".
+    assert keep_sections(Summary(warnings=["Chart discovery failed"])) == {"charts", "mdims", "explorers"}
+
+
+def test_the_bot_comment_reports_a_chart_config_only_change():
+    """A garden `grapher_config` edit changes chart text without touching any indicator row.
+
+    `has_changes` is true for it, so the comment posts — and it used to post with a field name and no
+    mention of a chart, because the Charts line was keyed off the indicator-layer counts alone.
+    """
+    from apps.owidbot.metadata_diff import format_metadata_diff, status_icon
+    from apps.wizard.app_pages.metadata_diff.discovery import Summary
+
+    config_only = Summary(n_chart_text_changes=2, n_charts_own_text=15, fields={"Chart subtitle": 2})
+
+    assert config_only.has_changes
+    body = format_metadata_diff(config_only)
+    assert "Charts whose own config text changed: 15 (2 changes)" in body
+    assert status_icon(config_only) == "✏️"
+
+    # The indicator-layer line is unchanged, and both appear when both happened.
+    both = Summary(n_charts=4, n_indicators=1, n_chart_text_changes=1, n_charts_own_text=3)
+    body = format_metadata_diff(both)
+    assert "Charts: 4 (from 1 indicator)" in body
+    assert "Charts whose own config text changed: 3 (1 change)" in body
