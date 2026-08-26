@@ -94,11 +94,17 @@ def read_screenshots_status(path: Path) -> dict | None:
 
 
 def make_screenshots_line(status: dict | None, branch: str, head_sha: str | None) -> str:
-    """The Site-screenshots line: the compare link, plus how the run that produced it went.
+    """The Site-screenshots line: the compare link, plus what the run that produced it found.
 
     Worth stating because a failed run is invisible otherwise. The buildkite step soft
     fails, and a run that fails commits nothing, so the compare link keeps showing the
     previous run's diff - which reads exactly like a run that found no changes.
+
+    A finished run is not one state but two, and only one of them wants the reviewer's
+    attention: a branch that changes seven pages and a branch that changes none both used
+    to read as a plain tick. `changedPages` counts what the compare link shows, so the
+    branch that repaints the site says so. Absent from the status file - an ops host that
+    predates it, or a run that failed before committing - the line stays as it was.
 
     There is one status file for all branches, because every branch's screenshots are
     taken in the same working copy on lxc-manager-1. A run of another branch that landed
@@ -118,7 +124,13 @@ def make_screenshots_line(status: dict | None, branch: str, head_sha: str | None
         return f"⏳ the run for {pending} hasn't reported yet: {compare_url}"
 
     if status.get("status") == "ok":
-        return f"✅ {compare_url}"
+        changed_pages = status.get("changedPages")
+        if changed_pages is None:
+            return f"✅ {compare_url}"
+        if not changed_pages:
+            return f"✅ no changes: {compare_url}"
+        pages = "page" if len(changed_pages) == 1 else "pages"
+        return f"⚠️ {len(changed_pages)} {pages} changed: {compare_url}"
 
     return f"❌ the run failed, so {compare_url} is still the previous run's"
 
