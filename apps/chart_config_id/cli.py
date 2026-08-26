@@ -134,8 +134,8 @@ def lookup(config_file: Path, slug: str | None, chart_id: int | None, env_name: 
     console.print(f"Looking up {target} in [bold]{owid_env.conf.DB_NAME}[/bold] on {owid_env.conf.DB_HOST}")
 
     # Deliberately a plain SELECT of the columns we need rather than loading the ORM `Chart`: some
-    # environments (production, until the grapher release lands) lack the `catalogPath` /
-    # `configIdETL` columns the model declares, and selecting those would fail with "Unknown column".
+    # environments (production, until the grapher release lands) lack the `etlConfigCatalogPath` /
+    # `patchConfigIdETL` columns the model declares, and selecting those would fail with "Unknown column".
     if chart_id is not None:
         # `charts.id` is the primary key, so this matches at most one row — no ambiguity to resolve.
         query = (
