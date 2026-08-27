@@ -221,3 +221,21 @@ def test_readme_strips_detail_on_demand_links():
 
     assert "#dod:" not in out
     assert "Measured in terawatt-hours of energy." in out, "the label survives, only the link goes"
+
+
+def test_zip_entries_are_stamped_with_the_build_date():
+    """Test _zip_timestamp - entries carry the build date, not 1980.
+
+    The stamp has to be fixed rather than "now", or an unchanged package would be a new
+    object on every ETL run. It used to be 1980-01-01, the earliest a zip can represent,
+    which is deterministic but shows up in a file listing as a date no file could have.
+    The build date is fixed in the same way and is true.
+    """
+    from datetime import date
+
+    from etl.collection.download_package import _zip_timestamp
+
+    assert _zip_timestamp(date(2026, 8, 27)) == (2026, 8, 27, 0, 0, 0)
+    # Same day in, same stamp out -- this is what keeps a same-day rebuild byte-identical.
+    assert _zip_timestamp(date(2026, 8, 27)) == _zip_timestamp(date(2026, 8, 27))
+    assert _zip_timestamp(date(2026, 8, 28)) != _zip_timestamp(date(2026, 8, 27))
