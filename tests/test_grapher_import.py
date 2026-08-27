@@ -116,7 +116,7 @@ class _FakeAdminAPI:
     A response may be an exception instance, which is raised instead of returned.
     """
 
-    owid_env = SimpleNamespace(admin_api="http://localhost:3030/admin/api")
+    owid_env = SimpleNamespace(admin_api="http://localhost:3030/admin/api", env_remote="dev")
 
     def __init__(self, responses: list[dict | Exception]) -> None:
         self._responses = list(responses)
@@ -187,19 +187,22 @@ def test_delete_ghost_variables_raises_outside_production(monkeypatch):
         db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]
 
 
-def test_delete_ghost_variables_warns_when_admin_api_is_unreachable(monkeypatch):
+def test_delete_ghost_variables_warns_when_a_local_admin_is_unreachable():
     """Working locally without a running admin: warn and let a later run clean up."""
-    monkeypatch.setattr(db.config, "ENV", "dev")
     admin_api = _FakeAdminAPI([requests.exceptions.ConnectionError("connection refused")])
 
     assert not db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]
 
 
-@pytest.mark.parametrize("env", ["staging", "production"])
-def test_delete_ghost_variables_raises_when_a_deployed_admin_is_unreachable(monkeypatch, env):
-    """A deployed environment always has an admin, so an unreachable one is an outage."""
-    monkeypatch.setattr(db.config, "ENV", env)
+@pytest.mark.parametrize("env_remote", ["staging", "production", "unknown"])
+def test_delete_ghost_variables_raises_when_a_remote_admin_is_unreachable(env_remote):
+    """A remote admin always exists, so failing to reach one is an outage.
+
+    The target decides this, not `config.ENV`: a local run with STAGING=1 keeps ENV as "dev"
+    while pointing at a remote staging admin.
+    """
     admin_api = _FakeAdminAPI([requests.exceptions.ConnectionError("connection refused")])
+    admin_api.owid_env = SimpleNamespace(admin_api="http://staging/admin/api", env_remote=env_remote)
 
     with pytest.raises(requests.exceptions.ConnectionError):
         db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]

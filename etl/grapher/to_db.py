@@ -438,9 +438,11 @@ def delete_ghost_variables(admin_api: AdminAPI, ghost_variable_ids: list[int]) -
     try:
         result = admin_api.delete_variables(ghost_variable_ids)
     except requests.exceptions.ConnectionError:
-        # Deployed environments always have an admin server, so failing to reach one there is
-        # an outage, not a workflow: let it fail rather than quietly skipping cleanup.
-        if config.ENV in ("staging", "production"):
+        # Only a genuinely local admin is allowed to be missing. Decide from the server we're
+        # talking to, not from `config.ENV`: a local run with STAGING=1 keeps ENV as "dev"
+        # while pointing at a remote staging admin, and failing to reach *that* is an outage,
+        # not a workflow.
+        if admin_api.owid_env.env_remote != "dev":
             raise
         # Working locally without a running Grapher admin. Leaving the ghost variables behind
         # is harmless there, so warn instead of failing the step — but report the cleanup as
