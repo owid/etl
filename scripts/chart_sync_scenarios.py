@@ -15,6 +15,10 @@ decide whether an edit survives:
     S4  approved, then production is edited                    -> approval expires, sync refuses
     S5  a chart the branch created, then edited in production  -> sync refuses
     S6  corner case normal work never reaches: see the note under S6 below
+    S7  a dataset update: the data changes, the settings don't    -> listed for review, never synced
+    S8  indicator metadata changes                                -> listed for review, never synced
+    S9  the chart is repointed at a different indicator           -> listed, and synced
+    S10 a chart made by hand on staging                           -> created in the target
 
 Read the PASS/FAIL lines, not the prose: each check states what should happen and prints what
 did. Setup checks come first, so a failure there means the situation was never reproduced and
@@ -58,6 +62,9 @@ NEW_PATCH_UUID = "0198c0e8-1111-7000-8000-000000000002"
 NEW_SLUG = "zz-chart-sync-scenarios-test-chart"
 NEW_CATALOG_PATH = "animal_welfare/latest/chart_sync_scenarios#chart_sync_scenarios"
 
+# Scenarios below, counted for the progress estimate.
+TOTAL_PHASES = 12
+
 # Tables the copy needs. chart_configs and variables are filtered (they are large).
 COPIED_TABLES = [
     "charts", "chart_dimensions", "datasets", "chart_tags", "tags", "chart_slug_redirects",
@@ -88,6 +95,27 @@ class Scenarios:
         self.new_chart_id: int | None = None
         self.config_uuid: str = ""
         self.catalog_path: str | None = None
+        self.hand_made_chart_id: int | None = None
+        self._started = time.monotonic()
+        self._phase = 0
+
+    def phase(self, title: str) -> None:
+        """Announce a scenario, with elapsed time and a rough estimate of what is left.
+
+        The estimate assumes the remaining phases cost about what the finished ones did. They
+        don't exactly -- the ones that shell out to chart-sync are far slower -- so read it as an
+        order of magnitude, not a promise.
+        """
+        self._phase += 1
+        elapsed = time.monotonic() - self._started
+        done = self._phase - 1
+        left = (elapsed / done) * (TOTAL_PHASES - done) if done else 0.0
+
+        def mmss(seconds: float) -> str:
+            return f"{int(seconds) // 60:d}m{int(seconds) % 60:02d}s"
+
+        remaining = f", ~{mmss(left)} left" if done else ""
+        print(f"\n[{self._phase}/{TOTAL_PHASES}  {mmss(elapsed)} elapsed{remaining}]  {title}")
 
     # -------------------------------------------------------------- small helpers
     def sql(self, env: OWIDEnv, statement: str, **params) -> None:
@@ -113,18 +141,23 @@ class Scenarios:
         self.results.append((name, ok, detail))
         print(f"  {'PASS' if ok else 'FAIL'}  {name}  [{detail}]")
 
-    def diff(self, chart_id: int | None = None):
-        """What chart-diff shows for one chart, staging vs the production copy."""
+    def diff(self, chart_id: int | None = None, data: bool = False, metadata: bool = False):
+        """What chart-diff shows for one chart, staging vs the production copy.
+
+        `data`/`metadata` mirror the checkboxes in the chart-diff UI. Chart-sync asks only for
+        config and tag changes, so a data-only change shows up here and is never synced.
+        """
         chart_id = chart_id or self.chart_id
         loader = ChartDiffsLoader(self.staging.get_engine(), self.production.get_engine(), chart_ids=[chart_id])
-        diffs = loader.get_diffs(sync=True, chart_ids=[chart_id], skip_analytics=True)
+        diffs = loader.get_diffs(sync=True, chart_ids=[chart_id], skip_analytics=True, data=data, metadata=metadata)
         return {d.chart_id: d for d in diffs}.get(chart_id)
 
     @staticmethod
     def describe(d) -> str:
         if d is None:
             return "not listed"
-        return f"listed (conflict={d.in_conflict}, status={d.approval_status})"
+        changes = ",".join(d.change_types) or ("new" if d.is_new else "-")
+        return f"listed ({changes}, conflict={d.in_conflict}, status={d.approval_status})"
 
     def approve(self, chart_id: int) -> None:
         """Approve a chart in chart-diff, as a reviewer would."""
@@ -339,7 +372,7 @@ class Scenarios:
         backup.write_text(json.dumps({"config": original_config, "etl_config": original_etl_config}, indent=2))
 
         try:
-            print("\nSetup: both copies identical, untouched since the staging server was created")
+            self.phase("Setup: both copies identical, untouched since the staging server was created")
             self.set_stamps(self.staging, last_edit)
             self.set_stamps(self.production, last_edit)
             staging_row, production_row = self.show("staging   ", self.staging), self.show("production", self.production)
@@ -349,7 +382,7 @@ class Scenarios:
                        production_row.lastEditedAt < created_at, str(production_row.lastEditedAt))
             self.check("setup: identical charts are not listed", self.diff() is None, self.describe(self.diff()))
 
-            print("\nS0: a staging build re-pushes the ETL layer unchanged")
+            self.phase("S0: a staging build re-pushes the ETL layer unchanged")
             self.api.upsert_chart_etl_config(chart_config_id=self.config_uuid,
                                              grapher_config=copy.deepcopy(original_etl_config),
                                              catalog_path=self.catalog_path)
@@ -358,13 +391,13 @@ class Scenarios:
                        r.lastEditedAt == last_edit, f"{r.lastEditedAt} (updatedAt moved: {r.updatedAt != last_edit})")
             self.check("S0: nothing to review after it", self.diff() is None, self.describe(self.diff()))
 
-            print("\nS1: the chart is edited in production; this branch never touched it")
+            self.phase("S1: the chart is edited in production; this branch never touched it")
             self.edit_in_production("Edited in the production admin (S1).")
             self.show("production", self.production)
             self.check("S1: a production-only edit is not listed on an unrelated branch",
                        self.diff() is None, self.describe(self.diff()))
 
-            print("\nS2: the branch rebuilds the chart, changing its ETL layer")
+            self.phase("S2: the branch rebuilds the chart, changing its ETL layer")
             self.revert_production(original_config.get("subtitle"), last_edit)
             rebuilt = {**copy.deepcopy(original_etl_config), "note": "Note changed by the ETL rebuild (S2)."}
             self.api.upsert_chart_etl_config(chart_config_id=self.config_uuid, grapher_config=rebuilt,
@@ -378,7 +411,7 @@ class Scenarios:
             self.check("S2: production edited too, so the same chart is now in conflict",
                        d is not None and d.in_conflict, self.describe(d))
 
-            print("\nS3: the chart is edited in the staging admin")
+            self.phase("S3: the chart is edited in the staging admin")
             self.revert_production(original_config.get("subtitle"), last_edit)
             config = self.api.get_chart_config(self.chart_id)
             config["note"] = "Note changed by hand in the staging admin (S3)."
@@ -388,7 +421,7 @@ class Scenarios:
             self.check("S3: a staging-admin edit is listed, and does not conflict on its own",
                        d is not None and not d.in_conflict, self.describe(d))
 
-            print("\nS4: approved on staging, then the chart is edited in production")
+            self.phase("S4: approved on staging, then the chart is edited in production")
             self.approve(self.chart_id)
             d = self.diff()
             self.check("S4: the approval is recorded", d is not None and d.is_approved, self.describe(d))
@@ -403,7 +436,7 @@ class Scenarios:
             took, log = self.chart_sync()
             self.check("S4: so chart-sync leaves production alone", not took["update"] and took["pending"], log)
 
-            print("\nS5: a chart this branch created, edited in production before chart-sync runs")
+            self.phase("S5: a chart this branch created, edited in production before chart-sync runs")
             self.new_chart_id = new_id = self.create_chart_on_staging()
             # Grapher creates an ETL chart as a draft, and publishing is only possible through the
             # admin. So publishing on staging is the ordinary workflow, and it is what makes the
@@ -448,7 +481,7 @@ class Scenarios:
             took, log = self.chart_sync(new_id, ignore_conflicts=True)
             self.check("S5: --ignore-conflicts overrides the refusal", took["update"] and not took["blocked"], log)
 
-            print("\nS6: corner case — a deletion on staging that normal work never reaches")
+            self.phase("S6: corner case — a deletion on staging that normal work never reaches")
             # Only reachable on the staging server that CREATED the chart, and only if someone
             # runs chart-sync there a second time by hand. Ordinary work cannot get here: on any
             # later branch the chart carries the target's own id, so this code never runs, and a
@@ -484,6 +517,82 @@ class Scenarios:
                        took["blocked"] and not took["update"], log)
             took, log = self.chart_sync(new_id, ignore_conflicts=True)
             self.check("S6 (corner case): --ignore-conflicts is the way through", took["update"] and not took["blocked"], log)
+
+
+            # ------------------------------------------------------------------ S7
+            self.phase("S7: a dataset update — the chart's data changes, its settings do not")
+            # The commonest reason a chart appears in chart-diff. ETL rewrites the indicator's
+            # values, and grapher records that as a new data checksum. Nothing about the chart
+            # itself changes, so there is nothing for chart-sync to copy: the new data is already
+            # in the target, put there by the target's own ETL run.
+            variable_id = int(self.staging.read_sql(
+                f"SELECT variableId FROM chart_dimensions WHERE chartId = {self.chart_id} LIMIT 1").variableId[0])
+            checksums = self.staging.read_sql(
+                f"SELECT dataChecksum, metadataChecksum FROM variables WHERE id = {variable_id}").iloc[0]
+            self.sql(self.staging, "UPDATE variables SET dataChecksum = 'changed-by-scenarios' WHERE id = :v",
+                     v=variable_id)
+            d = self.diff(data=True)
+            self.check("S7: the chart is listed for review, as a data change",
+                       d is not None and "data" in d.change_types, self.describe(d))
+            d = self.diff()
+            self.check("S7: it is NOT listed as a settings change", d is None, self.describe(d))
+            took, log = self.chart_sync()
+            self.check("S7: chart-sync writes nothing — data reaches the target through its own ETL",
+                       not took["update"] and not took["create"], log)
+
+            # ------------------------------------------------------------------ S8
+            self.phase("S8: indicator metadata changes (a title, a unit, a description)")
+            self.sql(self.staging, "UPDATE variables SET metadataChecksum = 'changed-by-scenarios' WHERE id = :v",
+                     v=variable_id)
+            d = self.diff(metadata=True)
+            self.check("S8: the chart is listed for review, as a metadata change",
+                       d is not None and "metadata" in d.change_types, self.describe(d))
+            took, log = self.chart_sync()
+            self.check("S8: chart-sync writes nothing for it either",
+                       not took["update"] and not took["create"], log)
+            # Back to the values the indicator actually had, not to NULL.
+            self.sql(self.staging, "UPDATE variables SET dataChecksum = :d, metadataChecksum = :m WHERE id = :v",
+                     d=checksums.dataChecksum, m=checksums.metadataChecksum, v=variable_id)
+
+            # ------------------------------------------------------------------ S9
+            self.phase("S9: the chart is repointed at a different indicator")
+            # A re-versioned dataset mints new indicator ids, so the chart's settings now name a
+            # different one. This is a settings change like any other, and it must sync.
+            other_variable_id = int(self.staging.read_sql(
+                f"SELECT variableId FROM chart_dimensions WHERE variableId <> {variable_id} "
+                "AND chartId IN (SELECT id FROM charts WHERE publishedAt IS NOT NULL) LIMIT 1").variableId[0])
+            repointed = copy.deepcopy(original_etl_config)
+            repointed["dimensions"] = [{"property": "y", "variableId": other_variable_id}]
+            self.api.upsert_chart_etl_config(chart_config_id=self.config_uuid, grapher_config=repointed,
+                                             catalog_path=self.catalog_path)
+            d = self.diff()
+            self.check(f"S9: repointing the chart at indicator {other_variable_id} is listed",
+                       d is not None and "config" in d.change_types, self.describe(d))
+            self.approve(self.chart_id)
+            took, log = self.chart_sync()
+            self.check("S9: and chart-sync would carry it to the target", took["update"], log)
+            self.api.upsert_chart_etl_config(chart_config_id=self.config_uuid,
+                                             grapher_config=copy.deepcopy(original_etl_config),
+                                             catalog_path=self.catalog_path)
+
+            # ------------------------------------------------------------------ S10
+            self.phase("S10: a chart made by hand on staging, which the target does not have")
+            # Not every chart comes from ETL. This is the create path: chart-sync makes the chart
+            # in the target rather than updating one, so none of the guard's comparisons apply.
+            hand_made = {
+                "title": "chart_sync_scenarios hand-made chart",
+                "subtitle": "Created by scripts/chart_sync_scenarios.py; deleted at the end of the run.",
+                "slug": "zz-chart-sync-scenarios-hand-made",
+                "dimensions": [{"property": "y", "variableId": variable_id}],
+            }
+            self.hand_made_chart_id = hand_id = int(self.api.create_chart(hand_made, user_id=self.user_id)["chartId"])
+            print(f"  created chart {hand_id} by hand on staging")
+            d = self.diff(hand_id)
+            self.check("S10: it is listed as new", d is not None and d.is_new, self.describe(d))
+            self.approve(hand_id)
+            took, log = self.chart_sync(hand_id)
+            self.check("S10: chart-sync creates it in the target, rather than updating anything",
+                       took["create"] and not took["blocked"], log)
 
         finally:
             print("\nCleanup")
