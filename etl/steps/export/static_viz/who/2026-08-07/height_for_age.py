@@ -109,20 +109,21 @@ before calling the setter.
 The threshold has to be bound too, and to the same style as the median beside it. The step draws both
 in the panel's own colour on purpose -- colour says which panel a mark belongs to, style says which mark
 it is -- so binding only the median splits the pair in Figma: the median moves to the library colour
-while the threshold keeps matplotlib's `#dd8452` / `#4c72b0`. Binding a paint style leaves
+while the threshold keeps matplotlib's `#4c72b0` / `#dd8452`. Binding a paint style leaves
 `dashPattern` alone, so the dash survives the binding. The encoding diagram's marks are not in this
 table: they stay the step's grey, which is what marks the diagram as a key rather than as data.
 
 | Layer | Treatment |
 |---|---|
-| `boys___50` | `setStrokeStyleIdAsync` -> `Default Palette/Rusty Orange`, key `65bab597d085689b1ea82a69f4d785cb9212c234` |
-| `girls___50` | `setStrokeStyleIdAsync` -> `Default Palette/Denim`, key `e1538d9330d7b22168f0c19fa562897aa8975f90` |
+| `boys___50` | `setStrokeStyleIdAsync` -> `Default Palette/Denim`, key `e1538d9330d7b22168f0c19fa562897aa8975f90` |
+| `girls___50` | `setStrokeStyleIdAsync` -> `Default Palette/Rusty Orange`, key `65bab597d085689b1ea82a69f4d785cb9212c234` |
 | `<sex>__stunting-threshold` | the same style as `<sex>___50` |
 | `<sex>__19-in-20-children` | that style's color blended 0.90 towards white |
 | `<sex>__8-in-10-children` | blended 0.74 towards white |
 
-Rusty Orange and Denim separate by dE 70 at worst; their grayscale seam is 1.14:1, which does not gate
-here because the two series sit in separate, text-titled panels.
+Denim and Rusty Orange separate by dE 70 at worst; their grayscale seam is 1.14:1, which does not gate
+here because the two series sit in separate, text-titled panels. Which panel takes which is set by
+`PANEL_COLOR_INDEX`, not here -- keep the two in step.
 
 **In-plot text.** Figma substitutes Inter for matplotlib's family, so restyle to Lato at three ranks
 and re-anchor every label on its mark. Do both in one call and in that order: the widths only settle
@@ -152,6 +153,7 @@ import numpy as np
 import seaborn as sns
 from matplotlib.colors import to_rgb
 from matplotlib.font_manager import FontProperties
+from matplotlib.lines import Line2D
 from matplotlib.textpath import TextPath
 from matplotlib.ticker import FuncFormatter
 from owid.catalog import Table
@@ -165,8 +167,11 @@ apply_svg_rcparams()
 paths = PathFinder(__file__)
 
 # One panel per sex. Colors are seaborn "deep" positions rather than raw hexes, so the
-# chart shifts with the shared palette instead of pinning its own.
-PANEL_COLOR_INDEX = {"Boys": 1, "Girls": 0}
+# chart shifts with the shared palette instead of pinning its own. Position 0 is the palette's blue
+# and 1 its orange, which Figma rebinds to Denim and Rusty Orange respectively -- so this mapping is
+# what decides which library colour each panel ends up in, and the Colors table in the Figma section
+# has to move with it.
+PANEL_COLOR_INDEX = {"Boys": 0, "Girls": 1}
 
 # The stunting threshold's stroke. It carries no colour of its own: in a panel it takes that panel's
 # colour, and in the encoding diagram it takes the diagram's grey, so colour says which panel a mark
@@ -353,6 +358,13 @@ MOBILE_NOTE = (
 # measurement, which matplotlib does in points.
 POINTS_PER_PIXEL = 0.72
 
+# One dash plus one gap, in POINTS: the dash units are multiples of the line width, so this is what
+# one repetition of the pattern measures. `even_dashes` converts it to display pixels with the
+# figure's own dpi rather than a constant, because the two are not the same number -- this figure
+# renders at 200 dpi while its geometry is laid out in 100-per-inch template pixels, so assuming
+# template pixels made every segment half a period and left the dash as uneven as before.
+STUNTING_DASH_PERIOD_PT = sum(STUNTING_DASHES[1]) * STUNTING_LINEWIDTH
+
 # Font size for the encoding diagram's labels, in points, relative to the body size. The design
 # team's floor is 12px and a point here renders as 100/72 px, so this must stay above 8.64pt.
 DIAGRAM_FONTSIZE_DROP = 1.8
@@ -454,6 +466,68 @@ def load_growth_reference() -> Table:
     """Load the spliced WHO height-for-age reference from garden."""
     ds = paths.load_dataset("height_for_age")
     return ds.read("height_for_age")
+
+
+def resample_for_even_dashes(x, y, transform, period_px: float):
+    """Resample a polyline so every segment spans exactly one dash period on the page.
+
+    Matplotlib dashes continuously along a path, so its own render does not care where the vertices
+    fall. **Figma does**: it fits a whole number of dash repetitions into each segment individually,
+    stretching or squeezing the pattern to make them fit. So the rendered dash length becomes a
+    function of vertex spacing, and a line whose vertices are unevenly spaced comes out with visibly
+    different dash frequencies along its length.
+
+    That is exactly what a growth curve produces. Matplotlib's path simplification keeps vertices
+    where the curvature is high and drops them where the line is straight, so the threshold arrived
+    in Figma with 51 vertices at a 6.7pt mean spacing against a 7.28pt dash period -- 35 of its 50
+    segments shorter than a single repetition. The steep part near birth collapsed into dots, the
+    flat part ran as long dashes, and the encoding diagram's miniature, densest of all, read as a
+    solid line rather than a dashed one.
+
+    Measured in Figma on four otherwise identical lines: at 6.7px spacing the pattern renders as
+    dots, at 13px as over-long dashes, and only at >=50px as specified. Rather than push the spacing
+    up -- which would cost the curve its shape, since the whole path is only ~470px long -- put
+    *exactly one* repetition in each segment. Then there is nothing to round: every segment renders
+    one dash and one gap, at any spacing, in both renderers.
+
+    Sampling is along the original polyline, so the curve's shape and its two step discontinuities
+    survive; only the vertex positions change.
+    """
+    points = transform.transform(np.column_stack([x, y]))
+    spans = np.hypot(*np.diff(points, axis=0).T)
+    distance = np.concatenate([[0.0], np.cumsum(spans)])
+    if distance[-1] <= period_px:
+        return x, y
+    steps = max(2, int(round(distance[-1] / period_px)) + 1)
+    targets = np.linspace(0.0, distance[-1], steps)
+    return np.interp(targets, distance, x), np.interp(targets, distance, y)
+
+
+def even_dashes(fig: plt.Figure, period_pt: float) -> int:
+    """Respace every dashed threshold in the figure so Figma renders its dash evenly.
+
+    Finds the lines by gid rather than being handed them, so a threshold added to a future panel or
+    diagram is picked up without plumbing. Returns how many it respaced, which is what the caller
+    logs -- a zero there means the gids drifted and the fix silently stopped applying.
+    """
+    # A transform lands in display pixels, which are the figure's dpi per inch and NOT the 100
+    # template pixels per inch its geometry is written in. Take the conversion from the figure.
+    period_px = period_pt * fig.dpi / 72
+    respaced = 0
+    for line in fig.findobj(Line2D):
+        gid = line.get_gid()
+        if not gid or not gid.endswith("__stunting-threshold"):
+            continue
+        x, y = line.get_data()
+        x, y = resample_for_even_dashes(np.asarray(x), np.asarray(y), line.get_transform(), period_px)
+        line.set_data(x, y)
+        # `set_data` invalidates the cached path; force it to rebuild now so that simplification --
+        # which is what made the spacing uneven to begin with -- can be switched off on the result
+        # before anything draws it. Left on, it would drop vertices from exactly the flat stretches
+        # this resampling exists to keep evenly spaced.
+        line.get_path().should_simplify = False
+        respaced += 1
+    return respaced
 
 
 def find_discontinuities(tb: Table) -> list[float]:
@@ -984,5 +1058,12 @@ def create_visualization(tb: Table, citation: str, breaks: list[float], layout: 
         wspace=0.1,
         hspace=0.35,
     )
+
+    # Every dashed threshold -- both panels and whichever diagram this layout drew -- is respaced now
+    # rather than where it was plotted, because `resample_for_even_dashes` measures on the page and
+    # the axes only reach their final size on the line above. Each line's own transform is the right
+    # one to measure through: the panels' is `transData`, the diagram's `transAxes`, and both land in
+    # display pixels.
+    even_dashes(fig, STUNTING_DASH_PERIOD_PT)
 
     return fig
