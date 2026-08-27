@@ -869,7 +869,7 @@ tables:
           - "{definitions.description_key_fossil_fuel_subsidies_united_states}"
           - "{definitions.description_key_fossil_fuel_subsidies_northern_america}"
         description_processing: |-
-          Values we consider erroneous are not shown: Latvia in 2022, which the source reports as 50 to 100 times its own values for 2021 and 2023; Venezuela from 2010 to 2014, where missing data is reported as zero; and Denmark and Poland in 2025 and 2026, where the source repeats their 2024 value in years for which no subsidy total is published.
+          Values we consider erroneous are not shown: Latvia in 2022, which the source reports as 50 to 100 times its own values for 2021 and 2023; Venezuela from 2010 to 2014, where missing data is reported as zero; Poland's whole series, which the source publishes as a fraction rather than a percentage, making it around 100 times too small; and Denmark in 2025 and 2026, where the source repeats its 2024 value in years for which no subsidy total is published.
         presentation:
           grapher_config:
             note: "{definitions.note_fossil_fuel_subsidies_united_states}"

@@ -986,27 +986,57 @@
   status: open
 
 # ---------------------------------------------------------------------------------------------
-# Indicator 12.c.1, series ER_FFS_CMPT_GDP: the ratio series outruns its own numerator. Denmark
-# and Poland are the only two entities in the whole indicator with 2025 and 2026 values, and
-# both are exact carry-forwards of their 2024 figure (SDG API, ER_FFS_CMPT_GDP: Denmark
-# 2024 = 2025 = 2026 = 0.23775; Poland 2024 = 2025 = 2026 = 0.00215). The subsidy total
-# ER_FFS_CMPT_CD stops at 2024 for every country including these two, so there is no numerator
-# from which a 2025 or 2026 share could have been measured.
+# Indicator 12.c.1, series ER_FFS_CMPT_GDP (fossil-fuel subsidies as a share of GDP): two more
+# defects, both confined to this one series of the three.
 #
-# Left in, they push the time axis of every chart on this series two years past the data: the
-# map lands on 2026 with two entities reporting, and the timeline runs to 2026 while the World
-# series ends in 2024.
+#   1. Poland's whole series is published as a FRACTION while labelled PERCENT, so it is ~100x
+#      too small. The SDG API returns 0.00089-0.00557 for 2015-2024, which renders as 0.00-0.01%
+#      on our charts, while Poland's own reported total is $0.62-2.71bn. Dividing that total by
+#      Poland's nominal GDP reproduces the published number as a fraction almost exactly --
+#      2020: 2.71/599.4 = 0.452% against a published 0.00448; 2022: 0.62/688 = 0.090% against
+#      0.00089 -- and Poland is the only entity in the indicator whose total exceeds $0.1bn
+#      while its share reads 0. Denmark, by contrast, is in percent (1.00931/424 = 0.238%
+#      against a published 0.23775), as is every other country checked. Poland's per-capita
+#      series agrees with its total (25.32 $/capita x 38.5m = $0.975bn against a reported
+#      $0.98bn), so the total is intact and only the share is mis-scaled.
 #
-# The guard can only be a value band, not "the total is missing" -- the corrections grammar
-# cannot compare against another series. A genuine 2025 figure that happens to land inside the
-# band would still be dropped; a revised one outside it fails the build.
+#      Dropped rather than rescaled. Multiplying by 100 would publish an OWID-adjusted number
+#      under a UN-attributed indicator, which is the trade #6760 declined for EN_HAZ_PCAP; and
+#      2024 does not fit the pattern as cleanly as 2015-2023 (implied GDP $456bn against
+#      Poland's actual ~$915bn), so at least one year may be wrong for a second reason. Poland
+#      keeps its total and per-capita series, which are unaffected.
+#
+#   2. Denmark and Poland are the only two entities in the indicator with 2025 and 2026 values,
+#      and both are exact carry-forwards of their 2024 figure (SDG API: Denmark
+#      2024 = 2025 = 2026 = 0.23775; Poland 2024 = 2025 = 2026 = 0.00215). The subsidy total
+#      ER_FFS_CMPT_CD stops at 2024 for every country, so there is no numerator from which a
+#      2025 or 2026 share could have been measured. Left in, they push the time axis of every
+#      chart on this series two years past the data: the map lands on 2026 with two entities
+#      reporting, while the World series ends in 2024.
+#
+#      The guard here can only be a value band, not "the total is missing" -- the corrections
+#      grammar cannot compare one series against another. A genuine 2025 figure that happened to
+#      land inside the band would still be dropped; a revised one outside it fails the build.
+- indicator: value
+  match: {seriescode: ER_FFS_CMPT_GDP, country: Poland}
+  action: drop
+  reason: >-
+    Published as a fraction while labelled PERCENT: 0.00089-0.00557 for 2015-2024, i.e. ~100x
+    too small, against a reported subsidy total of $0.62-2.71bn. Poland is the only entity in
+    the indicator whose total exceeds $0.1bn while its share reads 0, and its own per-capita
+    series is consistent with the total, so only this series is mis-scaled. Also covers the 2025
+    and 2026 carry-forwards, for which no subsidy total is published.
+  expect: {lt: 0.01}
+  provider: United Nations Statistics Division
+  status: open
+
 - indicator: value
   match: {seriescode: ER_FFS_CMPT_GDP, country: Denmark, year: 2025}
   action: drop
   reason: >-
-    Fossil-fuel subsidies as a share of GDP for a year in which the subsidy total is not
-    published for any country. The value is an exact carry-forward of Denmark's 2024 figure
-    (0.23775), not a measured 2025 observation.
+    Share of GDP for a year in which the subsidy total is not published for any country. The
+    value is an exact carry-forward of Denmark's 2024 figure (0.23775), not a measured 2025
+    observation.
   expect: {gt: 0.23, lt: 0.24}
   provider: United Nations Statistics Division
   status: open
@@ -1020,39 +1050,3 @@
   expect: {gt: 0.23, lt: 0.24}
   provider: United Nations Statistics Division
   status: open
-
-- indicator: value
-  match: {seriescode: ER_FFS_CMPT_GDP, country: Poland, year: 2025}
-  action: drop
-  reason: >-
-    As for Denmark: an exact carry-forward of Poland's 2024 figure (0.00215) in a year with no
-    published subsidy total. Poland's whole share series is also affected by the unit problem
-    noted below.
-  expect: {gt: 0.001, lt: 0.003}
-  provider: United Nations Statistics Division
-  status: open
-
-- indicator: value
-  match: {seriescode: ER_FFS_CMPT_GDP, country: Poland, year: 2026}
-  action: drop
-  reason: >-
-    As for 2025: an exact carry-forward of Poland's 2024 figure (0.00215) in a year with no
-    published subsidy total.
-  expect: {gt: 0.001, lt: 0.003}
-  provider: United Nations Statistics Division
-  status: open
-
-# NOT corrected, but known and reported: Poland's ER_FFS_CMPT_GDP is published as a FRACTION
-# while labelled PERCENT, so it is ~100x too small. The SDG API returns 0.00089-0.00557 for
-# 2015-2024, which renders as 0.00-0.01% on our charts, while Poland's own reported total is
-# $0.62-2.71bn. Dividing the total by Poland's nominal GDP reproduces the published number as a
-# fraction almost exactly -- 2020: 2.71/599.4 = 0.452% against a published 0.00448; 2022:
-# 0.62/688 = 0.090% against 0.00089 -- and Poland is the only entity in the indicator whose
-# total is above $0.1bn while its share reads 0. Denmark, by contrast, is in percent
-# (1.00931/424 = 0.238% against a published 0.23775), as is every other country checked.
-# Poland's per-capita series agrees with its total (25.32 $/capita x 38.5m = $0.975bn against a
-# reported $0.98bn), so the total is fine and only the share is mis-scaled.
-#
-# Left uncorrected pending a decision on whether to rescale (x100) or drop: rescaling publishes
-# an OWID-adjusted number under a UN-attributed indicator, which is the trade #6760 declined for
-# EN_HAZ_PCAP.
