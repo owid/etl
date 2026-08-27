@@ -148,8 +148,9 @@ In Mode A, record the choice under `announcement:` in `update-context.yml`.
 **On the designed route, ask `/create-figma-chart` for the PNG explicitly** — its Step 9 does *not*
 export one by default, because the designer usually keeps editing, so a run that isn't asked ends at
 an approved frame and the post's image gate never opens. Ask it for the **square 540×540** output
-(the format the block above asks for too), and give it the image slot's name as the frame slug, since
-that skill uses the frame name as the export filename. The last two steps are then the default
+(the format the block above asks for too), **exported at 3× — 1620×1620**, which is that family's
+export scale; 540×540 names the template, not the file you want. Give it the image slot's name as the
+frame slug, since that skill uses the frame name as the export filename. The last two steps are then the default
 route's, unchanged: upload the PNG to the [admin images page](https://admin.owid.io/admin/images),
 use the button there to generate alt text, and paste it back here. The design review is not the gate
 — the delivered image is.

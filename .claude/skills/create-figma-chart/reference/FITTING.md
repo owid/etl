@@ -143,9 +143,9 @@ before and after, since a rewrap shows up there and nowhere else.
 - **The data lines have the same trap pointing the other way, and no fixed target to fall back on.**
   Their `stroke-width` in the embed SVG is in the **export canvas's** units, so the fit scales it away
   — reading 1.5 there and setting 1.5 here ships a line at whatever fraction the fit left, and it
-  *looks* deliberate because you chose the number. Outside a highlight treatment there is no constant
-  to set: take the weight from the **reference copy at 1:1** in the page's left-hand column, compared
-  per unit of plot width. CHECKS.md's mark-weight row has the measured case.
+  *looks* deliberate because you chose the number. There is a constant: the house pair is **3px line,
+  4px halo**, outside a highlight treatment as well as in one, and `verify_page.js` gates on it. Set
+  that, after the last scale. CHECKS.md's mark-weight row has the measured case.
 - **Align on the group's own bbox, because that is what the canvas reports.** A GROUP's box hugs its
   children's rendered content, so for an imported chart it *is* the ink — and it is the number the user
   reads in the properties panel. A fit that measured leaves with `absoluteRenderBounds` while the user

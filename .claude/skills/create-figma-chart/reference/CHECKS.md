@@ -272,7 +272,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Direct labels name what they sit on | for each category label, compare its **fill** against the fill of the segment it names, and its **x** against that segment's edges in the reference row | the color is identical (same bound style, not merely a close hex) and the label is anchored on its own segment. A direct label carries the swatch's job with none of the swatch's proximity, so a mispaired one is unfalsifiable by eye |
 | Direct labels readable as text | `contrast(labelHex, "#ffffff")` for every category label drawn on the background | **4.5:1**. The same color must also clear 4.5:1 against the white value label inside its bar — a palette that only clears one of the two has to move (Step 8) |
 | Text size | read `fontSize` off every text node | nothing below **12px**; annotations on the named ladder |
-| Mark weight | read `strokeWeight` off **every** line and halo, after the last scale | on a highlight treatment: context **1px** (the settled value — GUIDELINES.md → Highlighting; 1.5px is the reference-page treatment this skill tells you not to copy), protagonist **3px**, halo 2× (or line+1 where nothing crosses). With **no** highlight treatment the target is whatever the **reference copy delivers at 1:1** — see below. Read it even when you never set it — and especially *because* you never set it: `rescale()` multiplies stroke weight, so fitting a chart to the band took grapher's 2.5px lines down to **0.88px** hairlines on a frame that otherwise measured perfect. Set the weights explicitly *after* the final scale, never before |
+| Mark weight | read `strokeWeight` off **every** line and halo, after the last scale | on a highlight treatment: context **1px** (the settled value — GUIDELINES.md → Highlighting; 1.5px is the reference-page treatment this skill tells you not to copy), protagonist **3px**, halo 2× (or line+1 where nothing crosses). With **no** highlight treatment every series takes that same house pair — **3px line, 4px halo** — which is what `verify_page.js` gates on (`HOUSE_LINE`/`HOUSE_HALO`, and it is not frame-width dependent). Read it even when you never set it — and especially *because* you never set it: `rescale()` multiplies stroke weight, so fitting a chart to the band took grapher's 2.5px lines down to **0.88px** hairlines on a frame that otherwise measured perfect. Set the weights explicitly *after* the final scale, never before |
 | Furniture weight | read `strokeWeight` **and `dashPattern`** off the gridlines, the zero line and the tick marks | all **1px** — but the dash target is **per node type**, not blanket: the dashed gridlines are `[4, 4]`, while the **zero line and the tick marks are solid** and must keep an **empty `dashPattern`**. Applying one `[4, 4]` target to all three restyles the furniture instead of unscaling it. The safe repair is conditional — reset the weight everywhere, and only re-dash a node that already had a dash pattern, scaling its existing values back rather than assigning new ones. `rescale()` thins these too, and they are the easiest properties in the frame to miss because you never touch them and "don't restyle the grid" reads as "don't look at it": a 0.7× height fit left every gridline at **0.7px with a [2.81, 2.81] dash**, i.e. a visibly fainter, finer grid than any OWID chart ships. Restore them in the same pass as the series weights |
 | Label-on-fill contrast | `contrast(labelHex, barHex)` for every in-bar label | **4.5:1** at 13.5px regular — the 3:1 large-text allowance does not apply |
 | Text hierarchy | list every distinct `fontSize` with what it belongs to, **and its rank** | title > subtitle ≥ annotations > supporting text ≥ labels. Sizes may vary inside the plot by rank; a lead annotation may *equal* the subtitle (Annotation XL 16) but nothing may exceed it, and same-rank items must share a size |
@@ -288,18 +288,19 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | How much is on the page | count the plot-bearing objects anywhere on the page — `countries-with-data` groups on a map, the equivalent plot group otherwise — and name what each one is for | one per **intended** item: the deliverable, plus the reference copies you meant to place. A third is clutter. **Do not check this by testing top-level children for overlap** — that answers a different question and answers it "clean": on one page three world maps sat at three distinct positions, so an overlap test passed twice while the reader was looking at a pile of near-identical maps in the left-hand column, one of which displayed the export's own legend/map collision. The reader's question is *how many of this thing am I looking at*, and only a count answers it. Watch the truncation trap too: a per-item node census keyed on a **shortened** name silently merged `<slug>` with `<slug> — original SVG (unstyled)` into one bucket, which is how a 467-node count for a 233-node frame read as normal |
 
 **A stroke weight read out of the embed SVG is in the EXPORT CANVAS's units, and the fit then scales
-it — so it is the weight the line *starts* at, never the one it arrives at.** The number to match is
-the one the **reference copy delivers at 1:1**: the original export placed beside the frame at the
-template's own size, which every page this skill builds already carries in its left-hand column. Read
-it off that node, and compare **per unit of plot width** rather than raw, since the two charts' plots
-differ. This is the data-line twin of the furniture rule in [FITTING.md](FITTING.md) — restoring
-grapher's exported *number* is not the same as restoring its delivered *weight*, in either direction:
-furniture ships too thin and lines too thick.
+it — so it is the weight the line *starts* at, never the one it arrives at.** Never take it as a
+target. The target is the house pair above, and if you want to see it confirmed at delivery size, the
+**reference copy** in the page's left-hand column is grapher's own export at 1:1 — compare **per unit
+of plot width**, since the two charts' plots differ. This is the data-line twin of the furniture rule
+in [FITTING.md](FITTING.md): restoring grapher's exported *number* is not restoring its delivered
+*weight*, in either direction — furniture ships too thin and lines too thick.
 
 (Measured: an 879-wide embed declaring `stroke-width="1.5"` arrived at **0.94px** after a 0.58 fit.
-Taking that 1.5 as the target shipped a chart at 3.9 units of stroke per 1000px of plot against the
-540 square export's **8.9** — less than half the reference density, on a frame that passed every other
-mechanical row. The reference copy sat 100px to its left the whole time.)
+Setting 1.5 as the "restored" weight shipped a chart at 3.9 units of stroke per 1000px of plot against
+the reference export's **8.9**. **The run had skipped `verify_page.js` and hand-rolled its own rows** —
+whose stroke assertion compared against the 1.5 it had just chosen, so it could not fail. The real
+gate would have failed it outright at `HOUSE_LINE`. That is the warning above this table arriving in
+practice, and it is why the row to trust is the script's, not one you write while holding the answer.)
 
 **For arrows, drop vectors entirely and probe the rendered pixels.** Arrow groups are rotated, so every vector-space measurement of theirs is wrong (see Gotchas), and "very close but never on top" is a pixel property anyway. Screenshot the frame at 1:1, take the arrow's **`absoluteBoundingBox`** in frame coordinates, and inside it measure how close the arrow's pixels come to the target line's.
 
