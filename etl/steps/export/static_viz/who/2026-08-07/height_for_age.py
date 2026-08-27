@@ -54,11 +54,12 @@ their left:
 
 | Frame | Node | Open it | Cloned from | Size |
 |---|---|---|---|---|
-| `expected-height-boys-girls` | `25284:6` | [link](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=25284-6) | `5332:75` Static Chart Template_Horizontal | 850x638 |
-| `expected-height-boys-girls-mobile` | `25284:14` | [link](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=25284-14) | `24590:32` Static Chart Template_Mobile (example 2) | 540x824 |
+| `expected-height-boys-girls` | `26869:1501` | [link](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=26869-1501) | `5332:75` Static Chart Template_Horizontal | 850x638 |
+| `expected-height-boys-girls-mobile` | `26869:1515` | [link](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=26869-1515) | `24590:32` Static Chart Template_Mobile (example 2) | 540x824 |
 
 The node ids are a convenience, not the join: they die if anyone rebuilds a frame from the template
-rather than swapping its chart. **The frame name is what actually identifies a chart** -- it is the
+rather than swapping its chart -- which happened here on 2026-08-27, when the design team's rebuild of
+`Static Chart Template_Horizontal` made re-cloning worthwhile and both frames got new ids. **The frame name is what actually identifies a chart** -- it is the
 kebab-case slug the website exports the PNG by, so it is the same string in the Figma layer panel, in
 the exported filename and in this table. Lost the ids? Search the file's page list for `height`; the
 pages are named `YYYYMMDD <Title> (<Creator>)` and this one is dated 20260812, the day it was first
@@ -99,8 +100,9 @@ two-line title and a two-line subtitle:
 
 - `subtitle.y = 16.216 + title.height + 6`. Reset `title.y = 16.216` first -- the desktop header is
   not an auto-layout frame, so Figma re-centres a title that shrinks to one line.
-- `note.y = 589.216 - 5.4 - note.height`, so a third line eats into the chart area rather than the
-  source row. Mobile's header is auto-layout and needs neither.
+- `note.y = 591 - 4 - note.height`, so a fourth line eats into the chart area rather than the source
+  row. The 4 is `Frame 22`'s own `itemSpacing`; read it off the clone rather than typing it, since it
+  was 5.4 in the template's previous build. Mobile's header is auto-layout and needs neither.
 
 **Colors.** Bind each panel's median *and its threshold* to the library style, and derive that panel's
 bands from it; the library carries no tints. The gid names a group, so descend to its `VECTOR` children
@@ -299,8 +301,13 @@ LAYOUTS = {
         "template": "horizontal",
         "margin": 16,
         "title_y": 16,
-        "chart_bottom_y": 556,
-        "source_y": 589,
+        # The three footer rows of `Static Chart Template_Horizontal`, measured 2026-08-27 after the
+        # design team rebuilt it: Note at 559, Data source at 591, and the tagline/licence row at 609,
+        # inside a `Frame 22` that starts at 559 and is 63 tall. `chart_bottom_y` is the Note's top
+        # for a two-line note, which is the shape the template ships. The previous values (556 / 589)
+        # came from the template's earlier build and left every row about 2px high.
+        "chart_bottom_y": 559,
+        "source_y": 591,
         "footer_y": 609,
         "nrows": 1,
         "ncols": 2,
