@@ -110,8 +110,13 @@ two options (step 5); consistency with our past wording is not an excuse to hand
 interesting the chart looks.** Ask in **both modes**, right after the chart is chosen and **before
 you post any export instructions**: the default route's block below tells the user to export, upload
 and paste in one go, so posting it first settles the question by default instead of asking it. Skip
-the question only when no post is being drafted (a cooldown decline needs no image), and when the
-chart is a map or the update is a static-viz refresh, which have their own routes.
+the question only when no post is being drafted (a cooldown decline needs no image), or when the
+update is a **static-viz refresh** — there the image already exists, because
+[`/create-static-viz`](../create-static-viz/SKILL.md) emits it and hands off to
+`/create-figma-chart` itself. **A map is not an exception**: it takes the same two routes as any
+other chart. The designed route just carries extra map guidance — `/create-figma-chart` →
+`reference/per-chart-type/maps.md`, where the small-islands trade-off is decided — which is a reason
+to *offer* that route on a map, not to skip the question.
 
 | Route | What it costs | When it fits |
 |---|---|---|
