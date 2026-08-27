@@ -126,6 +126,20 @@ class Scenarios:
             return "not listed"
         return f"listed (conflict={d.in_conflict}, status={d.approval_status})"
 
+    def approve(self, chart_id: int) -> None:
+        """Approve a chart in chart-diff, as a reviewer would."""
+        with Session(self.staging.get_engine()) as s, Session(self.production.get_engine()) as t:
+            loader = ChartDiffsLoader(self.staging.get_engine(), self.production.get_engine(),
+                                      chart_ids=[chart_id])
+            diffs = loader.get_diffs(sync=True, chart_ids=[chart_id], skip_analytics=True,
+                                     source_session=s, target_session=t)
+            if not diffs:
+                raise click.ClickException(
+                    f"Chart {chart_id} is not listed in chart-diff, so there is nothing to approve. "
+                    "The scenario did not reach the state it needs; the checks above say where it stopped."
+                )
+            diffs[0].approve(s)
+
     def chart_sync(self, chart_id: int | None = None, ignore_conflicts: bool = False) -> tuple[dict[str, bool], str]:
         """Run chart-sync --dry-run and report which decision it took for this chart."""
         chart_id = chart_id or self.chart_id
@@ -294,6 +308,14 @@ class Scenarios:
 
     # -------------------------------------------------------------- the scenarios
     def run(self) -> bool:
+        # A previous run may have died before its cleanup (the staging admin restarts, and
+        # calls to it 502). The test chart would then be copied into the production stand-in
+        # below, and S5 would be testing a chart that already exists there.
+        leftover = self.staging.read_sql(
+            f"SELECT id FROM charts WHERE configId = '{NEW_UUID}'").id.tolist()
+        for chart_id in leftover:
+            print(f"Removing chart {chart_id} left behind by an earlier run")
+            self.delete_test_chart(int(chart_id))
         self.build_production_copy()
         created_at = self.staging.read_sql(
             "SELECT MIN(create_time) AS t FROM information_schema.tables WHERE table_schema = DATABASE()").t[0]
@@ -367,11 +389,7 @@ class Scenarios:
                        d is not None and not d.in_conflict, self.describe(d))
 
             print("\nS4: approved on staging, then the chart is edited in production")
-            with Session(self.staging.get_engine()) as s, Session(self.production.get_engine()) as t:
-                loader = ChartDiffsLoader(self.staging.get_engine(), self.production.get_engine(),
-                                          chart_ids=[self.chart_id])
-                loader.get_diffs(sync=True, chart_ids=[self.chart_id], skip_analytics=True,
-                                 source_session=s, target_session=t)[0].approve(s)
+            self.approve(self.chart_id)
             d = self.diff()
             self.check("S4: the approval is recorded", d is not None and d.is_approved, self.describe(d))
             took, log = self.chart_sync()
@@ -398,10 +416,7 @@ class Scenarios:
             d = self.diff(new_id)
             self.check("S5: it is listed as new, since production has no such chart",
                        d is not None and d.is_new, self.describe(d))
-            with Session(self.staging.get_engine()) as s, Session(self.production.get_engine()) as t:
-                loader = ChartDiffsLoader(self.staging.get_engine(), self.production.get_engine(), chart_ids=[new_id])
-                loader.get_diffs(sync=True, chart_ids=[new_id], skip_analytics=True,
-                                 source_session=s, target_session=t)[0].approve(s)
+            self.approve(new_id)
             approval = self.staging.read_sql(
                 f"SELECT targetUpdatedAt FROM chart_diff_approvals WHERE chartId = {new_id} "
                 "ORDER BY updatedAt DESC LIMIT 1")
@@ -461,10 +476,7 @@ class Scenarios:
                 print(f"  {label} authored layer: {layer}")
             # Editing the source invalidated the earlier approval, so approve again — which is what
             # a reviewer does anyway: you make the change first, then approve it.
-            with Session(self.staging.get_engine()) as s, Session(self.production.get_engine()) as t:
-                loader = ChartDiffsLoader(self.staging.get_engine(), self.production.get_engine(), chart_ids=[new_id])
-                loader.get_diffs(sync=True, chart_ids=[new_id], skip_analytics=True,
-                                 source_session=s, target_session=t)[0].approve(s)
+            self.approve(new_id)
             d = self.diff(new_id)
             self.check("S6 (corner case): setup — the deletion is approved", d is not None and d.is_approved, self.describe(d))
             took, log = self.chart_sync(new_id)
