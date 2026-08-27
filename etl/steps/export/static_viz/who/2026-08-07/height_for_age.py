@@ -52,10 +52,17 @@ the dated block -- insert after the `-----------` divider page, not at a counted
 each named for the slug the website exports by, with a reference copy of this step's own render to
 their left:
 
-| Frame | Cloned from | Size |
-|---|---|---|
-| `expected-height-boys-girls` | `5332:75` Static Chart Template_Horizontal | 850x638 |
-| `expected-height-boys-girls-mobile` | `24590:32` Static Chart Template_Mobile (example 2) | 540x824 |
+| Frame | Node | Open it | Cloned from | Size |
+|---|---|---|---|---|
+| `expected-height-boys-girls` | `25284:6` | [link](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=25284-6) | `5332:75` Static Chart Template_Horizontal | 850x638 |
+| `expected-height-boys-girls-mobile` | `25284:14` | [link](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=25284-14) | `24590:32` Static Chart Template_Mobile (example 2) | 540x824 |
+
+The node ids are a convenience, not the join: they die if anyone rebuilds a frame from the template
+rather than swapping its chart. **The frame name is what actually identifies a chart** -- it is the
+kebab-case slug the website exports the PNG by, so it is the same string in the Figma layer panel, in
+the exported filename and in this table. Lost the ids? Search the file's page list for `height`; the
+pages are named `YYYYMMDD <Title> (<Creator>)` and this one is dated 20260812, the day it was first
+placed, which does not change when the chart is refreshed.
 
 **Import.** Upload with `upload_assets` and POST the file to the returned `submitUrl`
 (`curl -F "file=@<path>"`); never `createNodeFromSvg`, which caps at 50k characters. The upload lands
