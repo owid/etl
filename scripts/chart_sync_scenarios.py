@@ -387,10 +387,14 @@ class Scenarios:
 
             print("\nS5: a chart this branch created, edited in production before chart-sync runs")
             self.new_chart_id = new_id = self.create_chart_on_staging()
+            # Grapher creates an ETL chart as a draft, and publishing is only possible through the
+            # admin. So publishing on staging is the ordinary workflow, and it is what makes the
+            # staging copy differ from the one production's ETL will build — i.e. the thing
+            # chart-sync has to carry over. No contrived hand edit is needed.
             config = self.api.get_chart_config(new_id)
-            config["note"] = "Note added in the staging admin before approval (S5)."
+            config["isPublished"] = True
             self.api.update_chart(new_id, config, user_id=self.user_id)
-            print(f"  created chart {new_id} on staging, with a staging-admin edit to carry over")
+            print(f"  created chart {new_id} on staging and published it, as you would before approving")
             d = self.diff(new_id)
             self.check("S5: it is listed as new, since production has no such chart",
                        d is not None and d.is_new, self.describe(d))
@@ -432,13 +436,18 @@ class Scenarios:
             print("\nS6: the reviewer DELETES a field on staging that production still has")
             # From the target's side this is indistinguishable from an edit made there, so the
             # sync is refused. That is the deliberate trade: fail safe, and offer the override.
+            # Start from the state after an earlier sync: the same footnote on both sides.
             config = self.api.get_chart_config(new_id)
-            config.pop("note", None)
+            config["note"] = "Footnote both sides have after an earlier sync."
             self.api.update_chart(new_id, config, user_id=self.user_id)
             self.sql(self.production,
                      "UPDATE chart_configs cc JOIN charts c ON cc.id IN (c.configId, c.patchConfigId) "
-                     "SET cc.config = JSON_SET(cc.config, '$.note', 'Note that only production has now.') "
+                     "SET cc.config = JSON_SET(cc.config, '$.note', 'Footnote both sides have after an earlier sync.') "
                      "WHERE c.id = :id", id=production_id)
+            # Now the reviewer removes it on staging.
+            config = self.api.get_chart_config(new_id)
+            config.pop("note", None)
+            self.api.update_chart(new_id, config, user_id=self.user_id)
             for label, env, cid in [("production", self.production, production_id), ("staging   ", self.staging, new_id)]:
                 layer = env.read_sql("SELECT cc.config FROM charts c JOIN chart_configs cc ON cc.id = c.patchConfigId "
                                      f"WHERE c.id = {cid}").config[0]
