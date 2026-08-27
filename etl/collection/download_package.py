@@ -811,10 +811,20 @@ def _download_package_location(filename: str) -> tuple[str, str]:
     )
 
 
-# Fixed timestamp for every zip entry, so rebuilding an unchanged package
-# produces byte-identical output instead of a new object on every ETL run.
-# 1980-01-01 is the earliest date the zip format can represent.
-_ZIP_EPOCH = (1980, 1, 1, 0, 0, 0)
+def _zip_timestamp(build_date: date) -> tuple[int, int, int, int, int, int]:
+    """The modification time stamped on every zip entry.
+
+    It has to be fixed rather than "now", or an unchanged package would produce a
+    different object on every ETL run. It was 1980-01-01, the earliest the zip format
+    can represent -- which is deterministic but shows up in a file listing as a date no
+    file could plausibly have, and someone downloading the package noticed.
+
+    The build date is fixed in exactly the same way and means something. It costs no
+    reproducibility either: `metadata.json` already carries the same date as
+    `dateDownloaded`, so a package rebuilt on a later day was never byte-identical to
+    begin with. Same-day rebuilds still are.
+    """
+    return (build_date.year, build_date.month, build_date.day, 0, 0, 0)
 
 
 def _readme(title: str, page_url: str, column_sections: list[str], sources_section: str = "") -> str:
@@ -1113,7 +1123,7 @@ def build_download_package_for_collection(
             (f"{page_slug}.csv", csv_path.read_bytes()),
             ("readme.md", readme.encode()),
         ]:
-            info = zipfile.ZipInfo(name, date_time=_ZIP_EPOCH)
+            info = zipfile.ZipInfo(name, date_time=_zip_timestamp(build_date))
             # A ZipInfo carries its own compress_type, defaulting to ZIP_STORED,
             # and it silently wins over the ZipFile's -- so this has to be set
             # explicitly or the whole package ships uncompressed.
