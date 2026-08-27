@@ -249,7 +249,15 @@ def get_phrase_for_processing_level(processing_level: str | None) -> str:
 
 
 def _prepare_origin_for_display(origin: dict) -> dict:
-    """`prepareOriginForDisplay`."""
+    """`prepareOriginForDisplay`, plus the origin fields the TypeScript collects or
+    ignores and `sources_section_lines` renders.
+
+    `description` and `citation` are in the upstream shape already -- `getSources` just
+    never prints them, which is why the full citation looks absent from a download even
+    though the pipeline has it all along. The rest (producer, publication date, download
+    URL, license) are additive; `_sources_lines`, which is the faithful port, reads none
+    of them and is unaffected.
+    """
     label = origin.get("producer") or ""
     title = origin.get("title")
     if title and title != label:
@@ -260,6 +268,10 @@ def _prepare_origin_for_display(origin: dict) -> dict:
         "retrievedOn": origin.get("dateAccessed"),
         "retrievedFrom": origin.get("urlMain"),
         "citation": origin.get("citationFull"),
+        "producer": origin.get("producer"),
+        "datePublished": origin.get("datePublished"),
+        "urlDownload": origin.get("urlDownload"),
+        "license": origin.get("license") or {},
     }
 
 
@@ -685,8 +697,16 @@ def collect_unique_sources(cols: list[IndicatorColumn]) -> list[dict]:
 
 def sources_section_lines(sources: list[dict]) -> list[str]:
     """The document-level Sources section, rendered one level shallower than the
-    per-indicator blocks it replaces (`##`/`###` rather than `###`/`####`), because
-    it now sits alongside the other top-level sections rather than inside one."""
+    per-indicator blocks it replaces (`##`/`###` rather than `###`/`####`), because it
+    now sits alongside the other top-level sections rather than inside one.
+
+    Each source gets what someone re-using the data actually needs, rather than the
+    retrieval date and URL the per-indicator blocks were limited to: what the source is,
+    who published it and when, where to get it (including the direct file, where the
+    origin records one), the terms it comes under, and how to cite it. Listing sources
+    once is what makes room for this -- the same detail repeated per indicator would be
+    unreadable.
+    """
     if not sources:
         return []
     lines = ["", "## Source" if len(sources) == 1 else "## Sources", ""]
@@ -696,12 +716,37 @@ def sources_section_lines(sources: list[dict]) -> list[str]:
     )
     for source in sources:
         lines += ["", f"### {source['label']}"]
+
+        description = (source.get("description") or "").strip()
+        if description:
+            lines += ["", description]
+
+        facts = []
+        if source.get("producer"):
+            facts.append(f"Producer: {source['producer'].strip()}")
         if source.get("dataPublishedBy"):
-            lines.append(f"Data published by: {source['dataPublishedBy'].strip()}" + MARKDOWN_NEWLINE_ENDING)
+            facts.append(f"Data published by: {source['dataPublishedBy'].strip()}")
+        if source.get("datePublished"):
+            facts.append(f"Published: {source['datePublished'].strip()}")
         if source.get("retrievedOn"):
-            lines.append(f"Retrieved on: {source['retrievedOn'].strip()}" + MARKDOWN_NEWLINE_ENDING)
+            facts.append(f"Retrieved on: {source['retrievedOn'].strip()}")
         if source.get("retrievedFrom"):
-            lines.append(f"Retrieved from: {source['retrievedFrom'].strip()}" + MARKDOWN_NEWLINE_ENDING)
+            facts.append(f"Retrieved from: {source['retrievedFrom'].strip()}")
+        if source.get("urlDownload"):
+            facts.append(f"Direct download: {source['urlDownload'].strip()}")
+        license_ = source.get("license") or {}
+        if license_.get("name"):
+            terms = license_["name"].strip()
+            if license_.get("url"):
+                terms += f" ({license_['url'].strip()})"
+            facts.append(f"License: {terms}")
+        if facts:
+            lines.append("")
+            lines += [fact + MARKDOWN_NEWLINE_ENDING for fact in facts]
+
+        citation = (source.get("citation") or "").strip()
+        if citation:
+            lines += ["", f"Citation: {citation}"]
     return lines
 
 
