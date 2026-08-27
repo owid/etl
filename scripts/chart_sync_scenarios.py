@@ -62,6 +62,7 @@ PROD_DB = "owid_prodsim"
 NEW_UUID = "0198c0e8-1111-7000-8000-000000000001"
 NEW_PATCH_UUID = "0198c0e8-1111-7000-8000-000000000002"
 NEW_SLUG = "zz-chart-sync-scenarios-test-chart"
+HAND_MADE_SLUG = "zz-chart-sync-scenarios-hand-made"
 NEW_CATALOG_PATH = "animal_welfare/latest/chart_sync_scenarios#chart_sync_scenarios"
 
 # Scenarios below, counted for the progress estimate.
@@ -383,7 +384,8 @@ class Scenarios:
         # calls to it 502). The test chart would then be copied into the production stand-in
         # below, and S5 would be testing a chart that already exists there.
         leftover = self.staging.read_sql(
-            f"SELECT id FROM charts WHERE configId = '{NEW_UUID}'").id.tolist()
+            f"SELECT c.id FROM charts c JOIN chart_configs cc ON cc.id = c.configId "
+            f"WHERE c.configId = '{NEW_UUID}' OR cc.slug IN ('{NEW_SLUG}', '{HAND_MADE_SLUG}')").id.tolist()
         for chart_id in leftover:
             print(f"Removing chart {chart_id} left behind by an earlier run")
             self.delete_test_chart(int(chart_id))
@@ -661,7 +663,7 @@ class Scenarios:
                 "$schema": DEFAULT_GRAPHER_SCHEMA,
                 "title": "chart_sync_scenarios hand-made chart",
                 "subtitle": "Created by scripts/chart_sync_scenarios.py; deleted at the end of the run.",
-                "slug": "zz-chart-sync-scenarios-hand-made",
+                "slug": HAND_MADE_SLUG,
                 "dimensions": [{"property": "y", "variableId": variable_id}],
             }
             self.hand_made_chart_id = hand_id = int(self.api.create_chart(hand_made, user_id=self.user_id)["chartId"])
@@ -675,11 +677,12 @@ class Scenarios:
 
         finally:
             print("\nCleanup")
-            if self.new_chart_id is not None:
-                try:
-                    self.delete_test_chart(self.new_chart_id)
-                except Exception as e:  # noqa: BLE001
-                    print(f"  could not delete the test chart {self.new_chart_id}: {e}")
+            for test_chart in [self.new_chart_id, self.hand_made_chart_id]:
+                if test_chart is not None:
+                    try:
+                        self.delete_test_chart(test_chart)
+                    except Exception as e:  # noqa: BLE001
+                        print(f"  could not delete the test chart {test_chart}: {e}")
             try:
                 self.api.upsert_chart_etl_config(chart_config_id=self.config_uuid,
                                                  grapher_config=original_etl_config,
