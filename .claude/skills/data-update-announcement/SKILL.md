@@ -111,9 +111,11 @@ interesting the chart looks.** Ask in **both modes**, right after the chart is c
 you post any export instructions**: the default route's block below tells the user to export, upload
 and paste in one go, so posting it first settles the question by default instead of asking it. Skip
 the question only when no post is being drafted (a cooldown decline needs no image), or when the
-update is a **static-viz refresh** — there the image already exists, because
-[`/create-static-viz`](../create-static-viz/SKILL.md) emits it and hands off to
-`/create-figma-chart` itself. **A map is not an exception**: it takes the same two routes as any
+update is a **static-viz refresh** — there the route is already settled, because
+[`/create-static-viz`](../create-static-viz/SKILL.md) hands its viz to `/create-figma-chart`
+itself. Settled is not delivered, though: the `export://static_viz` PNG is a *pre-Figma*
+artifact, so finish through the designed route's ending below — the approved frame's PNG, then
+upload, alt text, paste back. **A map is not an exception**: it takes the same two routes as any
 other chart. The designed route just carries extra map guidance — `/create-figma-chart` →
 `reference/per-chart-type/maps.md`, where the small-islands trade-off is decided — which is a reason
 to *offer* that route on a map, not to skip the question.

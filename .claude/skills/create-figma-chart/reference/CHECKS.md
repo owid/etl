@@ -352,8 +352,9 @@ clear" from "I measured nothing", which is the whole reason these return a code 
 **What it does not buy is arithmetic speed — measured, on the same three renders.** The all-pairs
 loop it replaces is `O(arrow × target)` against a linear distance transform, and that only pays at
 scale: at a 1× probe the loop wins (**0.01 s** against **0.32 s**, since the script pays numpy and
-scipy import), the two draw around 2×, and only at the **4×** render the hairline check requires
-does the loop fall behind (**1.61 s** against **0.31 s**, 8.9M pairs). Both agree on the answer at
+scipy import), the two draw around 2×, and only at the scaled render the hairline check requires
+does the loop fall behind (**1.61 s** against **0.31 s**, 8.9M pairs — measured at 4×, before
+that check moved to the **3×** the 540 family actually exports at). Both agree on the answer at
 every scale. So reach for the script for what it guards, not for what it computes: the loop's
 numbers were never wrong, its *failure modes* were. `touching` is also clarified rather than
 changed — it counted *pairs* within 1.5px, exactly the 3×3 neighbourhood, and the script reports
@@ -369,8 +370,8 @@ resampling, not of the chart, and it looks exactly like a real defect. So: `get_
 `maxDimension` downscales, and the desktop server caps the longer edge at **1024px** (Gotchas) — a
 540-wide frame is safe on either, but the **616×1096 Reel arrives at 576×1024 from the desktop
 server**, already resampled. For a pixel probe on a frame taller or wider than 1024, use the hosted
-`get_screenshot` at natural size, or the 4× clone trick. Same reason the arrow renders are specified
-at 1:1 above.
+`get_screenshot` at natural size, or the clone trick at your family's export scale (NODE-MAP.md →
+Export scale per family). Same reason the arrow renders are specified at 1:1 above.
 
 Verified under fake AA (supersample, area-average down): masks hold their size at every separation
 and `min_gap` tracks the true gap exactly. Note `min_gap` is the distance between pixel *centres*,
@@ -389,7 +390,7 @@ absolute box starts at **100.0**, and the second reports raw `x: 536.7, width: 2
 absolute `495.1, 41.7` — crop from the raw numbers and you probe empty canvas.
 
 The same script covers the other two pixel checks: `contrast` for a hairline (the sub-pixel stroke
-trap in Gotchas — measure it on the 4× clone, not the 540px preview) and `ink-box` for "nothing in
+trap in Gotchas — measure it on the 3× clone, not the 540px preview) and `ink-box` for "nothing in
 the margins", which reads the true extent of everything that paints. Run against a stock 540 frame,
 `ink-box` returns `[16, 16, 524, 524]` — the content band this file specifies — with the background
 inferred rather than declared.
