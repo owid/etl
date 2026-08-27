@@ -73,7 +73,25 @@ The per-slot *positions* for the four static templates live in [`/create-static-
 | IG reel (616) | 28 | 18 | — | 15 | — | 15 |
 | Small guided / pull (302) | **16** | **11** | — | 11 (pull only) | — | — |
 
-Two traps in that table. The 850-wide pair's **12px note and source** are the smallest body text of any family, so a source line that overruns there cannot be fixed by dropping a size the way a 14px one can. And its **license shares a row with the 467px tagline inside 818px** — the slot holds roughly fifty characters, so a two-author credit overruns the tagline and prints on top of it; the phrasing gives (`by <names>` rather than `by the authors <names>`), never the names. When even that overruns, break the line yourself with `\n` after `by` rather than letting it wrap or dropping a size — the wrap point is then a decision instead of an accident, and both lines carry real content. TEMPLATES.md carries the measured widths.
+### Export scale per family
+
+**The PNG export scale is per family too, and it is not the same number everywhere** — so never carry
+one across, and never state a global figure:
+
+| Family | Export scale | On a 540/850/302-wide frame |
+|---|---|---|
+| DI, IG, static **mobile** (540 / 560 / 616) | **3×** | 1620 wide on a 540 frame |
+| Static **desktop** — Horizontal / Vertical (850) | **2×** | 1700 wide |
+| Small guided / pull (302) | **2×** | 604 wide |
+
+Two things this table is *not*. It is not `get_screenshot`'s business — that call only ever
+downscales and clamps at the node's natural size, so it cannot produce any of these (SKILL.md → Step
+9). And the 302 row is not the admin endpoint: `GET /api/figma/image` hardcodes `scale: 3` for the
+Cloudflare upload (SMALL-CHARTS.md → Delivery), which is a *different* number from the export
+panel's 2× for the same template. Both are correct for their own route; quoting one for the other is
+the mistake to avoid.
+
+Two traps in the slot-size table. The 850-wide pair's **12px note and source** are the smallest body text of any family, so a source line that overruns there cannot be fixed by dropping a size the way a 14px one can. And its **license shares a row with the 467px tagline inside 818px** — the slot holds roughly fifty characters, so a two-author credit overruns the tagline and prints on top of it; the phrasing gives (`by <names>` rather than `by the authors <names>`), never the names. When even that overruns, break the line yourself with `\n` after `by` rather than letting it wrap or dropping a size — the wrap point is then a decision instead of an accident, and both lines carry real content. TEMPLATES.md carries the measured widths.
 
 **In that credit, bold the names and nothing else.** The template ships one bold run (`[Name of author]`), so writing several names into it bolds the connectives too and the line reads as `Pablo Arriagada, Hannah Ritchie **and** Pablo Rosado`. Set the joining word back to an unbolded weight, the same way `Licensed under` and `by` are unbolded — the bold is doing one job, marking who is credited, and a bold `and` makes it look like part of a name.
 
