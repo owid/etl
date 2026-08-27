@@ -14,7 +14,7 @@ decide whether an edit survives:
     S3  the chart is edited in the staging admin               -> listed
     S4  approved, then production is edited                    -> approval expires, sync refuses
     S5  a chart the branch created, then edited in production  -> sync refuses
-    S6  the reviewer deletes a field on staging                -> refused too; --ignore-conflicts overrides
+    S6  corner case normal work never reaches: see the note under S6 below
 
 Read the PASS/FAIL lines, not the prose: each check states what should happen and prints what
 did. Setup checks come first, so a failure there means the situation was never reproduced and
@@ -433,9 +433,16 @@ class Scenarios:
             took, log = self.chart_sync(new_id, ignore_conflicts=True)
             self.check("S5: --ignore-conflicts overrides the refusal", took["update"] and not took["blocked"], log)
 
-            print("\nS6: the reviewer DELETES a field on staging that production still has")
-            # From the target's side this is indistinguishable from an edit made there, so the
-            # sync is refused. That is the deliberate trade: fail safe, and offer the override.
+            print("\nS6: corner case — a deletion on staging that normal work never reaches")
+            # Only reachable on the staging server that CREATED the chart, and only if someone
+            # runs chart-sync there a second time by hand. Ordinary work cannot get here: on any
+            # later branch the chart carries the target's own id, so this code never runs, and a
+            # deletion syncs like any other change.
+            #
+            # It is here because chart-sync sees only the two current states, never the history.
+            # 'the target has a footnote, the source does not' is what a deletion in the source
+            # and an edit in the target both look like. Refusing is the safe reading, and
+            # --ignore-conflicts is how you say which one it was.
             # Start from the state after an earlier sync: the same footnote on both sides.
             config = self.api.get_chart_config(new_id)
             config["note"] = "Footnote both sides have after an earlier sync."
@@ -459,12 +466,12 @@ class Scenarios:
                 loader.get_diffs(sync=True, chart_ids=[new_id], skip_analytics=True,
                                  source_session=s, target_session=t)[0].approve(s)
             d = self.diff(new_id)
-            self.check("S6: setup — the deletion is approved", d is not None and d.is_approved, self.describe(d))
+            self.check("S6 (corner case): setup — the deletion is approved", d is not None and d.is_approved, self.describe(d))
             took, log = self.chart_sync(new_id)
-            self.check("S6: a deletion on staging is refused too (fails safe, cannot tell them apart)",
+            self.check("S6 (corner case): the deletion is refused, since it reads like a target edit",
                        took["blocked"] and not took["update"], log)
             took, log = self.chart_sync(new_id, ignore_conflicts=True)
-            self.check("S6: --ignore-conflicts is the way through", took["update"] and not took["blocked"], log)
+            self.check("S6 (corner case): --ignore-conflicts is the way through", took["update"] and not took["blocked"], log)
 
         finally:
             print("\nCleanup")
