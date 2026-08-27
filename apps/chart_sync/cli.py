@@ -104,6 +104,9 @@ def cli(
     - You get a notification if the chart **_has been modified on live_** after staging server was created.
     - If the chart is pending in chart-diff, you'll get a warning and Slack notification
     - Deleted charts are **_not synced_**.
+    - A chart created on this branch is **_not overwritten_** if it carries edits in `TARGET` that
+      `SOURCE` doesn't have: you get a warning and a Slack notification naming those fields. Note a
+      field you deleted in `SOURCE` looks the same from here, so use `--ignore-conflicts` to sync it.
     - Use `--ignore-conflicts` to sync approved charts ignoring conflicts. Useful when syncing between staging servers.
 
     **Considerations on tags:**
@@ -303,6 +306,9 @@ def cli(
                             # tag in the target moves no timestamp (grapher's `setChartTags`
                             # rewrites `chart_tags` without touching `charts.updatedAt`), so
                             # nothing else would notice one going missing.
+                            # A field the reviewer *deleted* on the source looks the same from
+                            # here as one added in the target, so `--ignore-conflicts` is the way
+                            # to say "I know, sync anyway", as it is for every other conflict.
                             lost = (
                                 patch_paths_lost_by_sync(
                                     diff.target_chart.load_patch_config(target_session),
@@ -314,7 +320,7 @@ def cli(
                                         {t["name"] for t in target_tags} - {t["name"] for t in source_tags}
                                     )
                                 ]
-                                if cross_env_twin
+                                if cross_env_twin and not ignore_conflicts
                                 else []
                             )
                             if lost:
