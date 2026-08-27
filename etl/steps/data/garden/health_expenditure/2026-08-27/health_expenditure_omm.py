@@ -113,15 +113,17 @@ def sanity_check_splice_anchors(tb_oecd: Table, tb_oecd_1993: Table) -> None:
     country silently loses its 1960-1991 backcast. A shared year is only an anchor when share_gdp is
     non-null on both sides, which is what create_estimations_from_growth requires.
     """
-    tb_oecd = tb_oecd[tb_oecd["share_gdp"].notna()]
-    tb_oecd_1993 = tb_oecd_1993[tb_oecd_1993["share_gdp"].notna()]
+    # Membership comes from the unfiltered inputs: a country whose share_gdp is entirely null on one
+    # side must still be flagged, not quietly dropped from the set being checked.
     countries_both = set(tb_oecd["country"]) & set(tb_oecd_1993["country"])
+    years_oecd = tb_oecd[tb_oecd["share_gdp"].notna()]
+    years_oecd_1993 = tb_oecd_1993[tb_oecd_1993["share_gdp"].notna()]
     no_anchor = {
         country
         for country in countries_both
         if not (
-            set(tb_oecd.loc[tb_oecd["country"] == country, "year"])
-            & set(tb_oecd_1993.loc[tb_oecd_1993["country"] == country, "year"])
+            set(years_oecd.loc[years_oecd["country"] == country, "year"])
+            & set(years_oecd_1993.loc[years_oecd_1993["country"] == country, "year"])
         )
     }
     unexpected = no_anchor - SPLICE_ANCHOR_EXCEPTIONS
