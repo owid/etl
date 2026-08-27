@@ -79,6 +79,7 @@ from etl.collection.download_package_format import (
     get_title,
     metadata_column_entry,
     sources_section_lines,
+    strip_detail_on_demand_links,
 )
 from etl.paths import DATA_DIR
 
@@ -824,9 +825,16 @@ def _readme(title: str, page_url: str, column_sections: list[str], sources_secti
     headers shouldn't be parsed, and how to read metadata.json's "dimensions"
     and per-column "dimensions"/"url" keys instead.
 
+    Detail-on-demand links are stripped from the whole document. `[terawatt-hours](#dod:watt-hours)`
+    renders as a tooltip on our site and as a dead link in a downloaded markdown file, so it is noise
+    wherever it lands here -- 33 of them in electricity-mix. `assembleMetadata` already strips them
+    from metadata.json (which is why that file has none); the readme pipeline never did, in either
+    codebase. Applied once to the assembled document rather than per field, so a description that
+    starts carrying them tomorrow is covered too.
+
     !!! KEEP IN SYNC WITH owid-grapher's readmeTools.ts !!!
     """
-    return f"""# {title} - Data package
+    return strip_detail_on_demand_links(f"""# {title} - Data package
 
 This data package contains the data that powers the chart ["{title}"]({page_url}) on the Our World in Data website. It includes every dimension combination of this multidimensional dataset -- all metric/breakdown choices, not just the view selected on the chart.
 
@@ -861,7 +869,7 @@ All data and visualizations on Our World in Data rely on data sourced from one o
 ## Detailed information about each time series
 
 {chr(10).join(column_sections)}
-"""
+""")
 
 
 @dataclass

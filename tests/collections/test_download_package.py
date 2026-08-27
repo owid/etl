@@ -205,3 +205,19 @@ def test_same_metric_at_two_frequencies_merges_into_one_column():
     assert merged[0].values.notna().sum() == 4, "all four observations survive the merge"
     # Both views are reported, so a consumer can still see it spans two frequencies.
     assert merged[0].combinations == [{"frequency": "annual"}, {"frequency": "monthly"}]
+
+
+def test_readme_strips_detail_on_demand_links():
+    """Test _readme - DoD links are removed from the whole document.
+
+    `[terawatt-hours](#dod:watt-hours)` is a tooltip on our site and a dead link in a
+    downloaded file. metadata.json has always been stripped (assembleMetadata does it);
+    the readme was not, so electricity-mix shipped 33 of them.
+    """
+    from etl.collection.download_package import _readme
+
+    section = "## Total energy supply\nMeasured in [terawatt-hours](#dod:watt-hours) of energy."
+    out = _readme("Energy mix", "https://ourworldindata.org/grapher/energy-mix", [section])
+
+    assert "#dod:" not in out
+    assert "Measured in terawatt-hours of energy." in out, "the label survives, only the link goes"
