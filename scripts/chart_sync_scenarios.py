@@ -5,7 +5,7 @@ behaviour against a grapher database, which is where every bug in this area has 
 
     .venv/bin/python scripts/chart_sync_scenarios.py --staging my-branch
 
-It plays STAGING against a stand-in for PRODUCTION, and walks through the six situations that
+It plays STAGING against a stand-in for PRODUCTION, and walks through the situations that
 decide whether an edit survives:
 
     S0  a staging build re-pushes an unchanged ETL layer       -> chart must not be listed
@@ -14,6 +14,7 @@ decide whether an edit survives:
     S3  the chart is edited in the staging admin               -> listed
     S4  approved, then production is edited                    -> approval expires, sync refuses
     S5  a chart the branch created, then edited in production  -> sync refuses
+    S6  the reviewer deletes a field on staging                -> refused too; --ignore-conflicts overrides
 
 Read the PASS/FAIL lines, not the prose: each check states what should happen and prints what
 did. Setup checks come first, so a failure there means the situation was never reproduced and
@@ -125,9 +126,10 @@ class Scenarios:
             return "not listed"
         return f"listed (conflict={d.in_conflict}, status={d.approval_status})"
 
-    def chart_sync(self, chart_id: int | None = None) -> tuple[dict[str, bool], str]:
+    def chart_sync(self, chart_id: int | None = None, ignore_conflicts: bool = False) -> tuple[dict[str, bool], str]:
         """Run chart-sync --dry-run and report which decision it took for this chart."""
         chart_id = chart_id or self.chart_id
+        extra = ["--ignore-conflicts"] if ignore_conflicts else []
         env_file = BASE_DIR / f".env.{PROD_DB}"
         c = self.staging.conf
         env_file.write_text(
@@ -137,7 +139,7 @@ class Scenarios:
         try:
             proc = subprocess.run(
                 [sys.executable, "-c", "from apps.chart_sync.cli import cli; cli()",
-                 f"staging-site-{self.staging_name}", str(env_file), "--dry-run"],
+                 f"staging-site-{self.staging_name}", str(env_file), "--dry-run", *extra],
                 capture_output=True, text=True, cwd=str(BASE_DIR), env=os.environ.copy(), timeout=900,
             )
         finally:
@@ -424,6 +426,28 @@ class Scenarios:
             took, log = self.chart_sync(new_id)
             self.check("S5: chart-sync refuses, rather than overwriting the production edit",
                        took["blocked"] and not took["update"], log)
+            took, log = self.chart_sync(new_id, ignore_conflicts=True)
+            self.check("S5: --ignore-conflicts overrides the refusal", took["update"] and not took["blocked"], log)
+
+            print("\nS6: the reviewer DELETES a field on staging that production still has")
+            # From the target's side this is indistinguishable from an edit made there, so the
+            # sync is refused. That is the deliberate trade: fail safe, and offer the override.
+            config = self.api.get_chart_config(new_id)
+            config.pop("note", None)
+            self.api.update_chart(new_id, config, user_id=self.user_id)
+            self.sql(self.production,
+                     "UPDATE chart_configs cc JOIN charts c ON cc.id IN (c.configId, c.patchConfigId) "
+                     "SET cc.config = JSON_SET(cc.config, '$.note', 'Note that only production has now.') "
+                     "WHERE c.id = :id", id=production_id)
+            for label, env, cid in [("production", self.production, production_id), ("staging   ", self.staging, new_id)]:
+                layer = env.read_sql("SELECT cc.config FROM charts c JOIN chart_configs cc ON cc.id = c.patchConfigId "
+                                     f"WHERE c.id = {cid}").config[0]
+                print(f"  {label} authored layer: {layer}")
+            took, log = self.chart_sync(new_id)
+            self.check("S6: a deletion on staging is refused too (fails safe, cannot tell them apart)",
+                       took["blocked"] and not took["update"], log)
+            took, log = self.chart_sync(new_id, ignore_conflicts=True)
+            self.check("S6: --ignore-conflicts is the way through", took["update"] and not took["blocked"], log)
 
         finally:
             print("\nCleanup")
