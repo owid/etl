@@ -90,10 +90,34 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
 
     # Set topic tags on freshly created charts only — once a chart exists,
     # tags are admin-managed and ETL must not stomp on them.
-    if is_new and collection.topic_tags:
-        tags = _resolve_topic_tags(owid_env, collection.topic_tags)
-        if tags:
-            admin_api.set_tags(chart_id=chart_id, tags=tags)
+    if collection.topic_tags:
+        if is_new:
+            tags = _resolve_topic_tags(owid_env, collection.topic_tags)
+            if tags:
+                admin_api.set_tags(chart_id=chart_id, tags=tags)
+        else:
+            # Editing `topic_tags` on a chart that already exists does nothing, and without
+            # this the config author has no way of telling that from a successful push.
+            log.warning(
+                "collection.chart.topic_tags_ignored",
+                chart_id=chart_id,
+                topic_tags=collection.topic_tags,
+                reason="tags are admin-managed once a chart exists; ETL only sets them at creation",
+            )
+
+    # The slug is derived from the file's short name, but grapher excludes `slug` from what an
+    # ETL layer may contribute, so an existing chart keeps the slug it already had. Renaming the
+    # config file therefore looks like it renames the chart and doesn't.
+    if not is_new:
+        slug_in_grapher = admin_api.get_chart_config(chart_id).get("slug")
+        if slug_in_grapher and slug_in_grapher != slug:
+            log.warning(
+                "collection.chart.slug_not_applied",
+                chart_id=chart_id,
+                slug_in_grapher=slug_in_grapher,
+                slug_from_file_name=slug,
+                reason="an existing chart's slug cannot be changed from ETL; rename it in the admin instead",
+            )
 
     log.info(
         "collection.chart.upsert_success",
