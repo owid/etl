@@ -11,13 +11,16 @@ meta:
     citation_full: OECD (2026), Health Expenditure and Financing Database, https://data-explorer.oecd.org/
     attribution_short: OECD
     url_main: https://data-explorer.oecd.org/vis?df%5Bds%5D=DisseminateFinalDMZ&df%5Bid%5D=DSD_SHA%40DF_SHA&df%5Bag%5D=OECD.ELS.HD
-    url_download: https://sdmx.oecd.org/public/rest/data/OECD.ELS.HD,DSD_SHA@DF_SHA,1.1/.A.EXP_HEALTH.USD_PPP+USD_PPP_PS+PT_EXP_HLTH+PT_B1GQ.HF1+HF11+HF12HF13+HF121+HF122+HF2HF3+HF2+HF21+HF22+HF23+HF3+HF31+HF32+HF4+_U+_T.._T.._T...Q+_Z?dimensionAtObservation=AllDimensions&format=csvfilewithlabels
-    date_accessed: '2026-07-07'
-    date_published: '2026-07-06'
+    url_download: |-
+      https://sdmx.oecd.org/public/rest/data/OECD.ELS.HD,DSD_SHA@DF_SHA,1.1/.A.EXP_HEALTH.USD_PPP+USD_PPP_PS+PT_EXP_HLTH+PT_B1GQ.HF1+HF11+HF12HF13+HF121+HF122+HF2HF3+HF2+HF21+HF22+HF23+HF3+HF31+HF32+HF4+_U+_T.._T.._T...Q+_Z?dimensionAtObservation=AllDimensions&format=csvfilewithlabels
+    date_accessed: '2026-08-27'
+    # NOTE: OECD revises in place under the same dataflow version. Detect via md5 vs the
+    # previous snapshot; date it from the "Last updated" stamp on url_main.
+    date_published: '2026-07-17'
     license:
       name: OECD Terms and Conditions
       url: https://www.oecd.org/en/about/terms-conditions.html
 outs:
-  - md5: 058ade5d3e0c589f4a1838986c0c0f4f
-    size: 25151627
+  - md5: b8b1b46e850049e29d59024fc73aa524
+    size: 25151558
     path: health_expenditure.csv

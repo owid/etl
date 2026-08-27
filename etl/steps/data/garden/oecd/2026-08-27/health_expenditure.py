@@ -34,7 +34,7 @@ EXPECTED_FINANCING_SCHEMES = {
     "Unknown",
 }
 
-# Coverage floor: the 2026-07-06 release has 61 reference areas. A drop usually means a
+# Coverage floor: the 2026-07-17 release has 61 reference areas. A drop usually means a
 # parsing or mapping regression, not a real change — re-audit before lowering this.
 MIN_COUNTRIES = 61
 
