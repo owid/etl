@@ -38,7 +38,7 @@ definitions:
   # Sheet(s): "Gas Production - Bcm".
   producer_gas_production_bcm: &producer-gas-production-bcm >-
     Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation. As far as
-    possible, the data above represents standard cubic metres (measured at 15°C and 1013 mbar); as they are derived
+    possible, the data above represents standard cubic meters (measured at 15°C and 1013 mbar); as they are derived
     directly from measures of energy content using an average conversion factor and have been standardized using a Gross
     Calorific Value (GCV) of 40 MJ/m3, they do not necessarily equate with gas volumes expressed in specific national
     terms.
@@ -56,7 +56,7 @@ definitions:
   # Sheet(s): "Gas Consumption - Bcm".
   producer_gas_consumption_bcm: &producer-gas-consumption-bcm >-
     Excludes natural gas converted to liquid fuels but includes derivatives of coal as well as natural gas consumed in
-    Gas-to-Liquids transformation. As far as possible, the data above represent standard cubic metres (measured at 15°C
+    Gas-to-Liquids transformation. As far as possible, the data above represent standard cubic meters (measured at 15°C
     and 1013 mbar); as they are derived directly from measures of energy content using an average conversion factor and
     have been standardized using a Gross Calorific Value (GCV) of 40 MJ/m3, they do not necessarily equate with gas
     volumes expressed in specific national terms. The difference between these world consumption figures and the world
@@ -69,7 +69,7 @@ definitions:
     economic and operating conditions. The data series for total proved natural gas does not necessarily meet the
     definitions, guidelines and practices used for determining proved reserves at company level, for instance as
     published by the US Securities and Exchange Commission, nor does it necessarily represent the EI's view of proved
-    reserves by country. As far as possible, the data above represents standard cubic metres (measured at 15°C and 1013
+    reserves by country. As far as possible, the data above represents standard cubic meters (measured at 15°C and 1013
     mbar) and has been standardized using a gross calorific value (GCV) of 40 MJ/m3.
   # Sheet(s): "Oil Production - tonnes", "Oil Production - barrels".
   producer_oil_production: &producer-oil-production >-

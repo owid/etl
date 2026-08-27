@@ -35,10 +35,11 @@ from etl.collection.utils import (
     get_complete_dimensions_filter,
     get_tables_by_name_mapping,
     map_indicator_path_to_id,
+    resolve_grapher_schema,
     unique_records,
     validate_indicators_in_db,
 )
-from etl.config import OWID_ENV, OWIDEnv
+from etl.config import DEFAULT_GRAPHER_SCHEMA, OWID_ENV, OWIDEnv
 from etl.files import yaml_dump
 from etl.paths import EXPORT_DIR, SCHEMAS_DIR
 
@@ -125,7 +126,20 @@ class Collection(MDIMBase):
 
     dependencies: set[str] = field(default_factory=set)
     topic_tags: list[str] | None = None
+    # Grapher chart-config schema version that this collection's view configs were authored
+    # against. Short ("011") or full URL form; see `resolve_grapher_schema`. Grapher uses it as the
+    # `$schema` of every view config, and skips config migrations entirely when it is missing — so
+    # pin it explicitly rather than relying on the `DEFAULT_GRAPHER_SCHEMA` fallback.
+    grapher_schema: str | None = None
     _default_dimensions: dict[str, str] | None = None
+
+    # The published "download the complete dataset" package covering every
+    # dimension combination, as opposed to the per-view download. Shape matches
+    # grapher's DownloadPackage type. Not authored by hand: `save()` builds the
+    # package and fills this in, so a collection whose save() was passed
+    # `download_package=False` (or that failed to build one) leaves it None and
+    # its page renders exactly as before.
+    download_package: dict | None = None
 
     # Internal use. For save() method.
     _collection_type: str | None = field(init=False, default="multidim")
@@ -159,6 +173,9 @@ class Collection(MDIMBase):
         if isinstance(self.dependencies, list):
             # Convert list to set
             self.dependencies = set(self.dependencies)
+
+        # Fail at authoring time on a malformed pin, rather than at upsert time
+        resolve_grapher_schema(self.grapher_schema)
 
     @property
     def definitions(self) -> Definitions:
@@ -211,6 +228,13 @@ class Collection(MDIMBase):
         return EXPORT_DIR / collection_dir / (self.catalog_path.replace("#", "/") + ".config.json")
 
     @property
+    def local_download_package_dir(self) -> Path:
+        # Where the download package's files are written before being uploaded to R2.
+        # Kept next to the local config JSON, for the same reason: so the artifacts a
+        # run published can be inspected on disk afterwards.
+        return self.local_config_path.parent / "download_package"
+
+    @property
     def short_name(self):
         _, name = self.catalog_path.split("#")
         return name
@@ -229,6 +253,7 @@ class Collection(MDIMBase):
         tolerate_extra_indicators: bool = False,
         prune_choices: bool = True,
         prune_dimensions: bool = True,
+        download_package: bool = True,
     ):
         # Ensure we have an environment set
         if owid_env is None:
@@ -277,6 +302,12 @@ class Collection(MDIMBase):
         # Check that no view carries a corrupted description_key
         self.validate_description_keys()
 
+        # Warn about view configs that shadow the collection-level schema pin
+        self.warn_on_view_schema_overrides()
+
+        # Warn when no version is pinned and we fall back to the vendored default
+        self.warn_if_grapher_schema_unpinned()
+
         # Sort views based on dimension order
         self.sort_views_based_on_dimensions()
 
@@ -296,6 +327,46 @@ class Collection(MDIMBase):
         # Upsert to DB
         self.upsert_to_db(owid_env)
 
+        # Build and publish the complete-dataset download package.
+        if download_package:
+            self.save_download_package(owid_env)
+
+    def save_download_package(self, owid_env: OWIDEnv | None = None) -> None:
+        """Build the complete-dataset package (wide CSV + metadata.json + readme.md
+        zipped, plus Parquet + metadata.json), publish it to R2, and record where it
+        landed in the collection's config so the data page can link to it.
+
+        Called at the end of `save()`, and deliberately *after* `upsert_to_db()`:
+        the builder needs the page slug, which grapher assigns when the MDIM row is
+        created, and the indicators to be resolvable in the DB. That ordering is why
+        the config gets upserted a second time here -- the first upsert necessarily
+        happened before there was a package to point at.
+
+        Two kinds of collection are skipped, both because there is no page to attach a
+        package to: explorers, which have no `multi_dim_data_pages` row at all, and
+        MDIMs that have a row but no slug because nobody has published them yet. The
+        latter is not an edge case -- 13 of the 59 multidim steps are in that state on a
+        staging server -- so it must not fail the step. A collection published later
+        gets its package on the next run.
+        """
+        from etl.collection.download_package import build_download_package_for_collection, resolve_page_slug
+
+        if self._collection_type != "multidim":
+            log.info("collection.download_package.skipped_not_multidim", collection_type=self._collection_type)
+            return
+
+        if resolve_page_slug(self) is None:
+            log.info("collection.download_package.skipped_unpublished", catalog_path=self.catalog_path)
+            return
+
+        package = build_download_package_for_collection(self, dest_dir=self.local_download_package_dir)
+        self.download_package = package.to_config()
+
+        # Re-export and re-upsert so the local debug config and the DB both carry the
+        # package, rather than the version from before it was built.
+        self.save_config_local()
+        self.upsert_to_db(owid_env or OWID_ENV)
+
     def upsert_to_db(self, owid_env: OWIDEnv):
         # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
         # TODO: I think we could move this to the Grapher side.
@@ -304,6 +375,12 @@ class Collection(MDIMBase):
         # description_key is a markdown string; a YAML list is authoring sugar
         # and gets converted before the config is stored.
         _convert_description_key_lists(config, context=self.catalog_path)
+
+        # Grapher expects the resolved schema URL under its own key (`grapherConfigSchema`), which
+        # it injects as the `$schema` of every view config before migrating it to the latest
+        # version. Always send it: without it, Grapher skips those migrations.
+        config.pop("grapher_schema", None)
+        config["grapherConfigSchema"] = resolve_grapher_schema(self.grapher_schema)
 
         # Convert config from snake_case to camelCase
         config = camelize(config, exclude_keys={"dimensions"})
@@ -640,6 +717,44 @@ class Collection(MDIMBase):
         for view in self.views:
             if view.is_grouped:
                 sanity_check_grouped_view(view)
+
+    def warn_on_view_schema_overrides(self):
+        """Warn when a view config carries its own `$schema`, shadowing `grapher_schema`.
+
+        Grapher applies the collection pin as `{$schema: grapherConfigSchema, **view.config}`, so a
+        view's own `$schema` wins — and it is far less visible than the collection pin on line 1 of
+        the config YAML. That combination has bitten us before: a config pinned at an old version
+        while its body used fields from a newer one, so Grapher ran migrations over a config they
+        were never meant to touch. Pin the collection instead.
+        """
+        overrides = defaultdict(int)
+        for view in self.views:
+            config = view.config
+            if isinstance(config, dict) and "$schema" in config:
+                overrides[config["$schema"]] += 1
+
+        for schema, n_views in sorted(overrides.items()):
+            log.warning(
+                f"Collection '{self.catalog_path}': {n_views} view(s) set `$schema` in their config "
+                f"({schema}), which overrides the collection-level `grapher_schema` "
+                f"({resolve_grapher_schema(self.grapher_schema)}). Remove it and pin the whole "
+                "collection with the top-level `grapher_schema` field instead."
+            )
+
+    def warn_if_grapher_schema_unpinned(self):
+        """Warn when the collection pins no schema version and the default is used.
+
+        The fallback is `DEFAULT_GRAPHER_SCHEMA`, so grapher is told the config already matches the
+        version this repo vendors. That is usually true, but it means a config authored against an
+        older schema would skip migration. It also makes "pinned" and "defaulted" indistinguishable
+        in the database while the two happen to agree — so say so out loud instead.
+        """
+        if self.grapher_schema is None:
+            log.warning(
+                f"Collection '{self.catalog_path}' pins no `grapher_schema`; falling back to "
+                f"{DEFAULT_GRAPHER_SCHEMA}. Add a top-level `grapher_schema` to the config YAML "
+                "recording the version its view configs were authored against."
+            )
 
     def validate_description_keys(self):
         """Fail on a view whose `description_key` list cannot be real content.

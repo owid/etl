@@ -134,10 +134,23 @@ references written before a rename point at the old one):
 | data insights | `posts_gdocs.content->>'$."grapher-url"'` | `embed` |
 | static viz | `static_viz.grapherSlug` | `embed` |
 | key charts | `chart_tags` where `keyChartLevel > 0` | `render` |
+| featured metrics | `featured_metrics` matched on pathname (the table is read whole) | `render` |
 
 **Narrative charts get a second hop, always** (`sweep_articles_placing_narrative_charts`, run over the findings after every sweep — it needs no `--transitive`). A narrative chart is not itself in an article; articles place it **by name** in a `{.narrative-chart}` block. So a narrative-chart row alone says what has to change and not where the change lands, and every fix for one includes an article edit. Same table and column the admin's own references endpoint reads (`getNarrativeChartReferences` → `getPublishedLinksTo(…, ContentGraphLinkType.NarrativeChart)`), with one deliberate difference: unpublished drafts are **kept**, because a draft referencing the name is exactly what surprises you at delete time. `published` rides along so a consumer can rank it below the live ones.
 
 The placement rows carry the narrative chart as `subject` (not the chart that reached it), because `find_in_doc` falls through to `subject` when there is no anchor text — and the name is precisely what the ArchieML block spells out, so the search string comes out right for free. `text` is forced empty for the same reason.
+
+**A featured metric is the one `render` surface a redirect does not rescue.** Like a key chart
+it is a topic-page slot in no reference table — but held by **URL**, and resolved only when
+Algolia indexes, matching pathname *and* the exact query-param map against *published* records.
+So retiring what it names empties the slot silently, and re-adding the old URL is then refused
+(creating a row validates that the slug resolves to something published). It must be swapped by
+hand, before the migration — see `docs/guides/data-work/redirect-to-mdims.md`.
+
+Matching is on **pathname alone**, deliberately: for an MDIM or explorer the row's query string
+*is* the view, so a params-equal test would hide the rows a migration most needs to see — those
+whose params no longer name a live view. The params travel in `query_string` instead. One object
+can hold several rows; the key is `(url, parentTagId, incomeGroup)`.
 
 WordPress (`posts` / `posts_links`) is **not** swept, and adding it back would be a
 regression. Every published post there that links a chart 404s on the live site, and none
@@ -152,7 +165,8 @@ indicator). Explorer views are emitted **one row per view**, so a dataset poweri
 large explorer yields hundreds of rows — that is the price of every row carrying a
 `config_id`. Under `--transitive`, also the narrative charts parented to any chart
 **or MDIM view** that renders the indicators (`parentMultiDimXChartConfigId`): a
-narrative chart holds its own config, so skipping that hop leaves it unaudited.
+narrative chart holds its own config, so skipping that hop leaves it unaudited —
+and the featured metrics held by those charts, which no other hop reaches.
 
 MDIM findings are keyed by **(mdim, view, indicator)**, not by view: one view can
 render several of the requested indicators, and each one is its own reference. The
@@ -161,12 +175,16 @@ config scan resolves every stored indicator shape (an id, a `{id: …}` dict, a
 catalog path is not silently skipped.
 
 **MDIM subjects**: article links/embeds, narrative charts pinned to a view
-(`parentMultiDimXChartConfigId`), and inbound `multi_dim_redirects`.
+(`parentMultiDimXChartConfigId`), inbound `multi_dim_redirects`, and featured metrics —
+an MDIM's rows sit under `/grapher/<slug>`, the same namespace as a chart's, because
+multi-dims are served from `/grapher/`. A row with no query string names the default view.
 
 **Explorer subjects**: article links/embeds (`linkType='explorer'`) **plus a
 `linkType='url'` scan**, as for charts and MDIMs — an article that pastes
 `/explorers/<slug>?…` produces a url-typed row, and only that row carries the
-`country=`/`time=` pins the downstream audits grade.
+`country=`/`time=` pins the downstream audits grade. Also featured metrics, under
+`/explorers/<slug>`; an explorer's row always carries a query string, since the admin
+refuses one without it.
 
 Raw-URL targets are un-wrapped before matching: a link pasted through Google Docs can
 arrive as `google.com/url?q=<encoded>` (or `?url=<encoded>`), with the real URL and its
@@ -257,6 +275,15 @@ means UNKNOWN, not "nothing references it".
   MDIM dimension collisions are the same question — compare each reference's
   `query_string` against the target's dimension slugs — but the answer is stronger than
   "the reference overrides that one key": it discards the target's whole query.
+- **Swap a featured metric BEFORE the migration, and not to the redirect target.** The window
+  closes when the source is unpublished or the explorer retired, since adding a row requires a
+  *published* slug. And the admin strips every reader param on paste, so the URL is the bare
+  view — not the redirect target a mapping skill computes, which carries the source's pins.
+  Procedure: `docs/guides/data-work/redirect-to-mdims.md`.
+- **Adding a surface invalidates every recorded reference digest.** `REFERENCE_DIGEST_FIELDS`
+  in `reference_report.py` hashes the findings and `map-explorer-to-mdim`'s preflight gates on
+  it, so an audit predating a surface reads as drifted and blocks until re-run. That is correct
+  — it really is stale — but say so, or it looks like a bug.
 - **Cost control**: keep sweeps subject-scoped rather than site-wide, prefer the
   aggregate counts this script already returns over per-view rows, and treat a
   failed lookup as *unknown*, never as *none*.
