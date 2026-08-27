@@ -7,7 +7,7 @@ metadata:
 
 # Chart Editing (ETL-authored single charts)
 
-ETL-authored single charts are stored as zero-dimension mdim collections — a `.config.yml` with `dimensions: []` and exactly one view. ETL pushes them to Grapher's `chart_configs.etlConfig` column; admin edits land in `chart_configs.patch`; the two layers never collide.
+ETL-authored single charts are stored as zero-dimension mdim collections — a `.config.yml` with `dimensions: []` and exactly one view. Each layer of a chart is its own `chart_configs` row: ETL pushes to the one named by `charts.patchConfigIdETL`, admin edits land in the one named by `charts.patchConfigId`, and the two never collide.
 
 This skill covers creating and editing those `.config.yml` files, pushing them to staging, and previewing the result.
 
@@ -165,13 +165,13 @@ Read the resulting PNG with the `Read` tool to view the chart.
 
 ## Admin edits coexist with ETL edits
 
-Once a chart is on staging, an admin (human) can edit it in the chart editor. Those edits land in `chart_configs.patch` and survive subsequent ETL pushes — the layered model is exactly:
+Once a chart is on staging, an admin (human) can edit it in the chart editor. Those edits land in the chart's admin layer (`charts.patchConfigId`) and survive subsequent ETL pushes — the layered model is exactly:
 
 ```
-chart_configs.full = merge(variableETL, etlConfig, patch)
+the rendered config (charts.configId) = merge(indicator config, ETL layer, admin layer)
 ```
 
-Admin overrides always win on a per-field basis. To "unlink" a field back to the ETL-authored value, click the chip next to the field in the admin editor — it clears that field from `patch`.
+Admin overrides always win on a per-field basis. To "unlink" a field back to the ETL-authored value, click the chip next to the field in the admin editor — it clears that field from the admin layer.
 
 ## When NOT to use this skill
 
