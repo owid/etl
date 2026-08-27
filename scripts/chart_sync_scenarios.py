@@ -50,7 +50,7 @@ from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffsLoader
-from etl.config import Config, OWIDEnv
+from etl.config import DEFAULT_GRAPHER_SCHEMA, Config, OWIDEnv
 from etl.paths import BASE_DIR
 
 # The stand-in for production: a second database on the same MySQL server.
@@ -266,6 +266,22 @@ class Scenarios:
                  "SET cc.config = JSON_SET(cc.config, '$.subtitle', :s) WHERE c.id = :id",
                  s=subtitle, id=self.chart_id)
         self.set_stamps(self.production, when)
+
+    def reset_chart(self, original_config: dict, original_etl_config: dict, last_edit) -> None:
+        """Put the shared chart back to its original state on both sides.
+
+        Scenarios accumulate: by S7 the chart carries settings changes from S2, S3 and S4. A
+        scenario that wants to show one kind of change on its own has to start from a clean chart,
+        or it measures the leftovers of the previous ones.
+        """
+        self.api.upsert_chart_etl_config(chart_config_id=self.config_uuid,
+                                         grapher_config=copy.deepcopy(original_etl_config),
+                                         catalog_path=self.catalog_path)
+        self.api.update_chart(self.chart_id, original_config, user_id=self.user_id)
+        self.sql(self.staging, "DELETE FROM chart_diff_approvals WHERE chartId = :id", id=self.chart_id)
+        self.sql(self.staging, "DELETE FROM chart_diff_conflicts WHERE chartId = :id", id=self.chart_id)
+        self.revert_production(original_config.get("subtitle"), last_edit)
+        self.set_stamps(self.staging, last_edit)
 
     def create_chart_on_staging(self) -> int:
         """Create a chart the way an ETL step's first push does."""
@@ -525,6 +541,9 @@ class Scenarios:
             # values, and grapher records that as a new data checksum. Nothing about the chart
             # itself changes, so there is nothing for chart-sync to copy: the new data is already
             # in the target, put there by the target's own ETL run.
+            self.reset_chart(original_config, original_etl_config, last_edit)
+            self.check("S7: setup — the chart starts out identical on both sides", self.diff() is None,
+                       self.describe(self.diff()))
             variable_id = int(self.staging.read_sql(
                 f"SELECT variableId FROM chart_dimensions WHERE chartId = {self.chart_id} LIMIT 1").variableId[0])
             checksums = self.staging.read_sql(
@@ -580,6 +599,7 @@ class Scenarios:
             # Not every chart comes from ETL. This is the create path: chart-sync makes the chart
             # in the target rather than updating one, so none of the guard's comparisons apply.
             hand_made = {
+                "$schema": DEFAULT_GRAPHER_SCHEMA,
                 "title": "chart_sync_scenarios hand-made chart",
                 "subtitle": "Created by scripts/chart_sync_scenarios.py; deleted at the end of the run.",
                 "slug": "zz-chart-sync-scenarios-hand-made",
