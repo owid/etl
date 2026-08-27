@@ -443,6 +443,14 @@ class Scenarios:
                 layer = env.read_sql("SELECT cc.config FROM charts c JOIN chart_configs cc ON cc.id = c.patchConfigId "
                                      f"WHERE c.id = {cid}").config[0]
                 print(f"  {label} authored layer: {layer}")
+            # Editing the source invalidated the earlier approval, so approve again — which is what
+            # a reviewer does anyway: you make the change first, then approve it.
+            with Session(self.staging.get_engine()) as s, Session(self.production.get_engine()) as t:
+                loader = ChartDiffsLoader(self.staging.get_engine(), self.production.get_engine(), chart_ids=[new_id])
+                loader.get_diffs(sync=True, chart_ids=[new_id], skip_analytics=True,
+                                 source_session=s, target_session=t)[0].approve(s)
+            d = self.diff(new_id)
+            self.check("S6: setup — the deletion is approved", d is not None and d.is_approved, self.describe(d))
             took, log = self.chart_sync(new_id)
             self.check("S6: a deletion on staging is refused too (fails safe, cannot tell them apart)",
                        took["blocked"] and not took["update"], log)
