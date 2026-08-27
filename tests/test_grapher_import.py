@@ -130,12 +130,12 @@ class _FakeAdminAPI:
         return response
 
 
-def _blocked(variable_id: int, chart_id: int) -> dict:
+def _blocked(variable_id: int, ref: str, used_by: str = "chart") -> dict:
     return {
         "variableId": variable_id,
         "variableName": f"Variable {variable_id}",
-        "chartId": chart_id,
-        "chartSlug": f"chart-{chart_id}",
+        "usedBy": used_by,
+        "ref": ref,
     }
 
 
@@ -161,15 +161,27 @@ def test_delete_ghost_variables_does_not_call_out_when_there_are_no_ghosts():
 
 def test_delete_ghost_variables_warns_in_production_when_a_chart_still_uses_one(monkeypatch):
     monkeypatch.setattr(db.config, "ENV", "production")
-    admin_api = _FakeAdminAPI([_response(deleted=[7], blocked=[_blocked(8, 100), _blocked(8, 101)])])
+    admin_api = _FakeAdminAPI([_response(deleted=[7], blocked=[_blocked(8, "chart-100"), _blocked(8, "chart-101")])])
 
     # Not successful, so the checksum stays unset and the next run tries again.
     assert not db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]
 
 
+def test_blocked_by_a_published_explorer_raises_on_staging(monkeypatch):
+    """chart-sync can't remap an explorer or a live mdim view, so there's nothing to wait for."""
+    monkeypatch.setattr(db.config, "ENV", "staging")
+    rows = pd.DataFrame(
+        [_blocked(8, "energy", used_by="explorer")],
+        columns=["variableId", "variableName", "usedBy", "ref"],
+    )
+
+    # No chart-diff lookup should be needed to reach this answer.
+    assert db._raise_error_for_deleted_variables(rows)
+
+
 def test_delete_ghost_variables_raises_outside_production(monkeypatch):
     monkeypatch.setattr(db.config, "ENV", "dev")
-    admin_api = _FakeAdminAPI([_response(blocked=[_blocked(8, 100)])])
+    admin_api = _FakeAdminAPI([_response(blocked=[_blocked(8, "chart-100")])])
 
     with pytest.raises(ValueError, match="chart-100"):
         db.delete_ghost_variables(admin_api, ghost_variable_ids=[7])  # ty: ignore[invalid-argument-type]

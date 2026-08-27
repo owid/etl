@@ -462,9 +462,9 @@ def delete_ghost_variables(admin_api: AdminAPI, ghost_variable_ids: list[int]) -
     if not result["blocked"]:
         return True
 
-    rows = pd.DataFrame(result["blocked"], columns=["variableId", "variableName", "chartId", "chartSlug"])
+    rows = pd.DataFrame(result["blocked"], columns=["variableId", "variableName", "usedBy", "ref"])
 
-    message = "Variables used in charts will not be deleted automatically. Ignore this if your PR doesn't affect the problematic variables."
+    message = "Variables used in charts, published explorers or live multi-dim views will not be deleted automatically. Ignore this if your PR doesn't affect the problematic variables."
 
     if _raise_error_for_deleted_variables(rows):
         raise ValueError(f"{message}:\n{rows}")
@@ -474,10 +474,34 @@ def delete_ghost_variables(admin_api: AdminAPI, ghost_variable_ids: list[int]) -
     return False
 
 
+def _chart_ids_for_refs(refs: list[str]) -> set[int]:
+    """Resolve the chart references Grapher reports back to chart ids.
+
+    Grapher sends the chart's slug, falling back to its id when the config has no slug, so we
+    match on either.
+    """
+    if not refs:
+        return set()
+
+    q = """
+    SELECT c.id
+    FROM charts c
+    JOIN chart_configs cc ON cc.id = c.configId
+    WHERE cc.slug IN %(refs)s OR c.id IN %(refs)s
+    """
+    df = read_sql(q, params={"refs": tuple(str(ref) for ref in refs)})
+    return set(df["id"])
+
+
 def _raise_error_for_deleted_variables(rows: pd.DataFrame) -> bool:
-    """If we run into ghost variables that are still used in charts, should we raise an error?"""
+    """If we run into ghost variables that are still in use, should we raise an error?"""
     # raise an error if on staging server
     if config.ENV == "staging":
+        # A published explorer or a live multi-dim view isn't something chart-sync can remap, so
+        # there's nothing to wait for — surface it now.
+        if (rows.usedBy != "chart").any():
+            return True
+
         # It's possible that we merged changes to ETL, but the staging server still uses old charts. In
         # that case, we first check that the charts were really modified on our staging server.
 
@@ -485,7 +509,8 @@ def _raise_error_for_deleted_variables(rows: pd.DataFrame) -> bool:
         from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffsLoader
 
         modified_charts = ChartDiffsLoader(config.OWID_ENV.get_engine(), production_or_master_engine()).df
-        return bool(set(modified_charts.index) & set(rows.chartId))
+        blocking_chart_ids = _chart_ids_for_refs(rows.loc[rows.usedBy == "chart", "ref"].dropna().tolist())
+        return bool(set(modified_charts.index) & blocking_chart_ids)
     # Only show a warning in production. We can't raise an error because if someone merges changes to ETL
     # with renamed variables and valid chart-sync, the ETL deploy would fail. It would fail because ETL (and this part) runs
     # before chart-sync. If we only show a warning, `delete_ghost_variables` returns False, and ETL will

@@ -384,7 +384,8 @@ class AdminAPI:
         return js
 
     def delete_variables(self, variable_ids: list[int]) -> dict:
-        """Delete variables, leaving alone any a chart still uses.
+        """Delete variables, leaving alone any that a chart, a published explorer or a live
+        multi-dim view still uses.
 
         Grapher owns the delete because it owns the schema around it: the tables holding a
         `variableId` foreign key, and the `chart_configs` rows (and their R2 objects) that a
@@ -397,7 +398,10 @@ class AdminAPI:
 
         Returns:
             {"deleted": [variable_id],
-             "blocked": [{"variableId", "variableName", "chartId", "chartSlug"}]}
+             "blocked": [{"variableId", "variableName", "usedBy", "ref"}]}
+
+            `usedBy` is "chart", "explorer" or "multiDimView"; `ref` is the chart's slug (or
+            its id when the config has none), the explorer slug, or `catalogPath#viewId`.
         """
         # Retry in case we're restarting Admin on staging server. This is idempotent — a
         # variable already gone stays gone — so repeating it is safe.
