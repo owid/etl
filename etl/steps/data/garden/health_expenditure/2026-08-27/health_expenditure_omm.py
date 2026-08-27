@@ -20,10 +20,10 @@ MIN_COUNTRIES = 61
 # catching a unit slip or a botched splice.
 MAX_SHARE_GDP = 30
 
-# Countries present in both the OECD and the 1993 series but sharing no overlapping
-# year, so the retroactive splice has no anchor and they get no 1960-1991 backcast.
-# This is a property of the sources, not a bug — but a NEW country joining this set
-# means an overlap disappeared, which is worth a look.
+# Countries present in both the OECD and the 1993 series but sharing no year with a
+# value in both, so the retroactive splice has no anchor and they get no 1960-1991
+# backcast. This is a property of the sources, not a bug — but a NEW country joining
+# this set means an overlap disappeared, which is worth a look.
 SPLICE_ANCHOR_EXCEPTIONS = {"Belgium", "Switzerland"}
 
 
@@ -107,11 +107,14 @@ def sanity_check_inputs(tb_oecd: Table, tb_oecd_1993: Table, tb_lindert: Table) 
 
 def sanity_check_splice_anchors(tb_oecd: Table, tb_oecd_1993: Table) -> None:
     """
-    Check that countries in both the OECD and 1993 series share a year to anchor the splice.
+    Check that countries in both the OECD and 1993 series share a year with a value in both.
 
-    Without a shared year there is no reference value, so the retroactive growth yields NaN and the
-    country silently loses its 1960-1991 backcast.
+    Without such a year there is no reference value, so the retroactive growth yields NaN and the
+    country silently loses its 1960-1991 backcast. A shared year is only an anchor when share_gdp is
+    non-null on both sides, which is what create_estimations_from_growth requires.
     """
+    tb_oecd = tb_oecd[tb_oecd["share_gdp"].notna()]
+    tb_oecd_1993 = tb_oecd_1993[tb_oecd_1993["share_gdp"].notna()]
     countries_both = set(tb_oecd["country"]) & set(tb_oecd_1993["country"])
     no_anchor = {
         country
@@ -124,8 +127,9 @@ def sanity_check_splice_anchors(tb_oecd: Table, tb_oecd_1993: Table) -> None:
     unexpected = no_anchor - SPLICE_ANCHOR_EXCEPTIONS
     assert not unexpected, (
         f"Countries lost their splice anchor: {sorted(unexpected)}. They appear in both the OECD and "
-        "1993 series but share no year, so they will silently lose the 1960-1991 backcast. Confirm the "
-        "overlap really disappeared upstream before adding them to SPLICE_ANCHOR_EXCEPTIONS."
+        "1993 series but share no year with a value in both, so they will silently lose the 1960-1991 "
+        "backcast. Confirm the overlap really disappeared upstream before adding them to "
+        "SPLICE_ANCHOR_EXCEPTIONS."
     )
 
 
