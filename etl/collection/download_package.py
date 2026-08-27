@@ -72,11 +72,13 @@ from structlog import get_logger
 from etl import config
 from etl.collection.download_package_format import (
     IndicatorColumn,
+    collect_unique_sources,
     column_readme_text,
     dumps_like_json_stringify,
     get_attribution,
     get_title,
     metadata_column_entry,
+    sources_section_lines,
 )
 from etl.paths import DATA_DIR
 
@@ -814,7 +816,7 @@ def _download_package_location(filename: str) -> tuple[str, str]:
 _ZIP_EPOCH = (1980, 1, 1, 0, 0, 0)
 
 
-def _readme(title: str, page_url: str, column_sections: list[str]) -> str:
+def _readme(title: str, page_url: str, column_sections: list[str], sources_section: str = "") -> str:
     """Ported from `constructReadme`'s multi-column branch (readmeTools.ts),
     with the tolerance-column paragraph dropped (a complete-dataset package has
     no tolerance columns) and three MDIM-only additions that have no counterpart
@@ -853,6 +855,8 @@ Our World in Data is almost never the original producer of the data - almost all
 ### How we process data at Our World In Data
 All data and visualizations on Our World in Data rely on data sourced from one or several original data providers. Preparing this original data involves several processing steps. Depending on the data, this can include standardizing country names and world region definitions, converting units, calculating derived indicators such as per capita measures, as well as adding or adapting metadata such as the name or the description given to an indicator.
 [Read about our data pipeline](https://docs.owid.io/projects/etl/)
+
+{sources_section}
 
 ## Detailed information about each time series
 
@@ -1024,7 +1028,7 @@ def build_download_package_for_collection(
                 build_date,
             ),
         }
-        readme_sections.append("\n".join(column_readme_text(col, build_date, heading=long_name)))
+        readme_sections.append("\n".join(column_readme_text(col, build_date, heading=long_name, include_sources=False)))
 
     metadata_json = dumps_like_json_stringify(
         {
@@ -1042,7 +1046,11 @@ def build_download_package_for_collection(
             "activeFilters": {},
         }
     )
-    readme = _readme(title, page_url, readme_sections)
+    # One Sources section for the document, rather than one per indicator: the columns of an
+    # MDIM overwhelmingly share their sources, so repeating them per column is nearly all
+    # duplication -- 354 blocks describing 7 sources on electricity-mix.
+    sources_section = "\n".join(sources_section_lines(collect_unique_sources([c.col for c in columns])))
+    readme = _readme(title, page_url, readme_sections, sources_section)
 
     #
     # The CSV, in its final downloadable shape: Entity/Code/Year, long

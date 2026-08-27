@@ -626,7 +626,9 @@ def _data_processing_lines(col: IndicatorColumn) -> list[str]:
     return ["", "#### Notes on our processing step for this indicator", description_processing]
 
 
-def column_readme_text(col: IndicatorColumn, today: date, heading: str | None = None) -> list[str]:
+def column_readme_text(
+    col: IndicatorColumn, today: date, heading: str | None = None, include_sources: bool = True
+) -> list[str]:
     """`columnReadmeText` -- one indicator's full readme section, as lines.
 
     `heading` overrides the section title, which the port otherwise takes from
@@ -635,6 +637,11 @@ def column_readme_text(col: IndicatorColumn, today: date, heading: str | None = 
     match a readme section to a column, and since that name comes from the
     indicator's `name` rather than its display title the two would otherwise
     read as different indicators.
+
+    `include_sources=False` drops this section's own Sources block, for a document
+    that lists the sources once up front instead. Repeating them per indicator is
+    what the TypeScript does and is bearable for a chart's handful of columns; at
+    46 columns drawn from 7 sources it is 354 blocks, and most of the file.
     """
     attribution = get_attribution(col)
     return [
@@ -646,10 +653,56 @@ def column_readme_text(col: IndicatorColumn, today: date, heading: str | None = 
         *_citation_lines(col),
         f"Source: {get_source(attribution, col)}",
         *_description_section_lines(col, attribution),
-        *_sources_lines(col),
+        *(_sources_lines(col) if include_sources else []),
         *_data_processing_lines(col),
         "",
     ]
+
+
+def collect_unique_sources(cols: list[IndicatorColumn]) -> list[dict]:
+    """Every distinct source across the columns, in first-seen order.
+
+    Deduplicated on everything that gets rendered, not on the label alone: the same
+    producer retrieved twice on different dates is two rows a reader may need, and
+    collapsing them would quietly drop a retrieval date.
+    """
+    seen: set[tuple] = set()
+    unique = []
+    for col in cols:
+        for source in prepare_sources_for_display(col.meta):
+            key = (
+                source.get("label"),
+                source.get("dataPublishedBy"),
+                source.get("retrievedOn"),
+                source.get("retrievedFrom"),
+            )
+            if key in seen:
+                continue
+            seen.add(key)
+            unique.append(source)
+    return unique
+
+
+def sources_section_lines(sources: list[dict]) -> list[str]:
+    """The document-level Sources section, rendered one level shallower than the
+    per-indicator blocks it replaces (`##`/`###` rather than `###`/`####`), because
+    it now sits alongside the other top-level sections rather than inside one."""
+    if not sources:
+        return []
+    lines = ["", "## Source" if len(sources) == 1 else "## Sources", ""]
+    lines.append(
+        "These are the sources behind the data in this package. Each time series below names the ones "
+        "it draws on in its citation."
+    )
+    for source in sources:
+        lines += ["", f"### {source['label']}"]
+        if source.get("dataPublishedBy"):
+            lines.append(f"Data published by: {source['dataPublishedBy'].strip()}" + MARKDOWN_NEWLINE_ENDING)
+        if source.get("retrievedOn"):
+            lines.append(f"Retrieved on: {source['retrievedOn'].strip()}" + MARKDOWN_NEWLINE_ENDING)
+        if source.get("retrievedFrom"):
+            lines.append(f"Retrieved from: {source['retrievedFrom'].strip()}" + MARKDOWN_NEWLINE_ENDING)
+    return lines
 
 
 # ---------------------------------------------------------------------------
