@@ -115,6 +115,26 @@ two options (step 5); consistency with our past wording is not an excuse to hand
 4. Paste your chosen chart here in the chat so that I can use it to draft versions of the announcement
 ````
 
+**The block above is one of two routes to that image, and which one is the user's call — ask, don't
+infer it from how interesting the chart looks.** Ask in **both modes**, right after the chart is
+chosen and before drafting; skip it only when no post is being drafted (a cooldown decline needs no
+image), and when the chart is a map or the update is a static-viz refresh, which have their own
+routes.
+
+| Route | What it costs | When it fits |
+|---|---|---|
+| **Default grapher export** (the block above) | minutes | the chart already reads well at 540px: few series, legible labels, nothing to reduce or re-annotate |
+| **Designed chart** via [`/create-figma-chart`](../create-figma-chart/SKILL.md) | a build in the shared Charts file, plus a design review | the default is crowded — many series, a legend eating the width, a marker on every observation, or a story that wants direct labels or an annotation |
+
+**Series count is the usual tell**: past about four lines grapher falls back to an elbow legend that
+can take ~30% of the width, and the lines themselves stop being followable. Say what you can see when
+you ask — *"the default has nine lines and a legend down the right; a designed version could cut it to
+four with direct labels"* is a question the user can answer; *"do you want a Figma chart?"* is not.
+
+Either way the deliverable is named for the post's own image slot —
+`YYYY-MM-data-update-<short-topic>` — so the export drops into the `{.image}` block without renaming.
+In Mode A, record the choice under `announcement:` in `update-context.yml`.
+
 **Separate the chart *choice* from the chart *image*, and never draft before the choice is settled.**
 Which chart the post is built around has to be fixed first, in **both** modes; only the PNG itself can
 lag. Drafting around an unsettled chart is how you end up rewriting: the view that gets picked turns
