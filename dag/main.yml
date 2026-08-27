@@ -45,14 +45,6 @@ steps:
       - snapshot://un/2023-08-16/un_sdg_unit.csv
       - snapshot://un/2023-08-16/un_sdg_dimension.json
 
-  # Internet
-  data://grapher/technology/2024-12-23/internet:
-    - data://garden/technology/2024-12-23/internet:
-      - data://garden/worldbank_wdi/2026-07-27/wdi
-      - data://garden/demography/2024-07-15/population
-      - data://garden/regions/2023-01-01/regions
-      - data://garden/wb/2026-07-01/income_groups
-
   # UNDP
   data://garden/un/2025-05-07/undp_hdr:
     - data://garden/regions/2023-01-01/regions
@@ -628,8 +620,8 @@ steps:
 
 
   # USA PPI New Office Construction (US Bureau of Labor Statistics)
-  data://garden/bls/2026-07-20/us_ppi_construction:
-    - snapshot://bls/2026-07-20/us_ppi_construction.csv
+  data://garden/bls/2026-08-18/us_ppi_construction:
+    - snapshot://bls/2026-08-18/us_ppi_construction.csv
 
   #
   # World Airlines Traffic and Capacity
@@ -646,6 +638,15 @@ steps:
     - data://garden/itopf/2026-05-06/oil_spills:
       - data://meadow/itopf/2026-05-06/oil_spills:
         - snapshot://itopf/2026-05-06/oil_spills.pdf
+  #
+  # UN SDG (2026)
+  #
+  data://grapher/un/2026-07-31/un_sdg:
+    - data://garden/un/2026-07-31/un_sdg:
+      - data://meadow/un/2026-07-31/un_sdg:
+        - snapshot://un/2026-07-31/un_sdg.feather
+      - snapshot://un/2026-07-31/un_sdg_dimension.json
+      - snapshot://un/2026-07-31/un_sdg_unit.csv
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

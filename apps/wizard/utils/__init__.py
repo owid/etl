@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import Any, cast
 
 import numpy as np
+import pandas as pd
 import streamlit as st
 from owid.catalog import Dataset
 from sentry_sdk import capture_exception
@@ -545,16 +546,6 @@ def as_valid_json(s):
             return s
 
 
-def as_list(s):
-    """Return `s` as a list if applicable."""
-    if isinstance(s, str):
-        try:
-            return ast.literal_eval(s)
-        except (ValueError, SyntaxError):
-            return s
-    return s
-
-
 @cache
 def is_running_in_streamlit():
     """Check if running in Streamlit."""
@@ -577,6 +568,16 @@ def _canon(x):
     if isinstance(x, np.ndarray):
         # stable, hashable representation for numpy arrays
         return ("__np__", x.dtype.str, x.shape, x.tobytes())
+    if isinstance(x, (pd.DataFrame, pd.Series, pd.Index)):
+        # Content-based key. Falling through to the __dict__ branch below would build a key out of
+        # the internal BlockManager, whose repr contains the object's memory address - so the key
+        # would differ on every call, never hit the cache, and grow the cache without bound.
+        return (
+            "__pandas__",
+            x.__class__.__qualname__,
+            tuple(map(str, getattr(x, "columns", ()))),
+            _canon(pd.util.hash_pandas_object(x, index=True).to_numpy()),
+        )
     # Fallback: try dataclasses/objects with __dict__
     if hasattr(x, "__dict__"):
         return ("__obj__", x.__class__.__qualname__, _canon(vars(x)))
@@ -585,12 +586,12 @@ def _canon(x):
 
 
 def cache_all(f):
-    """A caching decorator that works for unhashable types (lists, dicts)."""
+    """A caching decorator that works for unhashable types (lists, dicts).
 
-    @cache
-    def _cached(key):
-        args_c, kwargs_c = key
-        return f(*args_c, **dict(kwargs_c))
+    The canonical form of the arguments is used as the cache key only; the wrapped function is
+    always called with the original arguments.
+    """
+    results = {}
 
     @wraps(f)
     def wrapper(*args, **kwargs):
@@ -598,7 +599,9 @@ def cache_all(f):
             tuple(_canon(a) for a in args),
             tuple(sorted((k, _canon(v)) for k, v in kwargs.items())),
         )
-        return _cached(key)
+        if key not in results:
+            results[key] = f(*args, **kwargs)
+        return results[key]
 
     return wrapper
 

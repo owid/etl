@@ -32,7 +32,7 @@ definitions:
     - proportion of births attended by a skilled health worker (SAB).
 
     The MMEIG has developed a method to adjust existing data in order to take into account these data quality issues and ensure the comparability of different data sources.
-    This method involves assessment of data for underreporting and, where necessary, adjustment for incompleteness and misclassification of deaths as well as development of estimates through statistical modelling for countries with no reliable national level data.
+    This method involves assessment of data for underreporting and, where necessary, adjustment for incompleteness and misclassification of deaths as well as development of estimates through statistical modeling for countries with no reliable national level data.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/

@@ -141,7 +141,6 @@ RELATED_QUESTIONS = [
 ]
 
 COMMON_VIEW_CONFIG = {
-    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
     "chartTypes": ["StackedBar"],
     "hasMapTab": True,
     "tab": "chart",
@@ -163,7 +162,6 @@ COMMON_VIEW_CONFIG = {
 }
 
 STACKED_VIEW_CONFIG = {
-    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
     "chartTypes": ["StackedBar"],
     # Map tab is enabled and shows the all-disasters total via map.columnSlug;
     # see _add_total_indicator_for_map in each step file for how the total indicator is

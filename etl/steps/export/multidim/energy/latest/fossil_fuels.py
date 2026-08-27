@@ -1,5 +1,7 @@
 """Multidim for fossil fuels (fuel x metric x per capita)."""
 
+# Force re-run to re-upsert view-level default entity selections (grapher #6922).
+
 import math
 from copy import deepcopy
 

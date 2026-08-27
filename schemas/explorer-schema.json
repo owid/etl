@@ -8,10 +8,6 @@
             "description": "Definitions with anchors that are reused in other parts of the metadata",
             "additionalProperties": true
         },
-        "grapherConfigSchema": {
-            "description": "URL of a JSON schema for the grapher config.",
-            "type": "string"
-        },
         "title": {
             "type": "object",
             "properties": {
@@ -404,6 +400,9 @@
                             },
                             "includedEntityNames": {
                                 "$ref": "grapher-schema.011.json#/properties/includedEntityNames"
+                            },
+                            "inapplicableEntityNames": {
+                                "$ref": "grapher-schema.011.json#/properties/inapplicableEntityNames"
                             },
                             "entityTypePlural": {
                                 "$ref": "grapher-schema.011.json#/properties/entityTypePlural"

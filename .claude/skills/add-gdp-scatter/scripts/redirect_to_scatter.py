@@ -33,18 +33,28 @@ import importlib.util
 import json
 import re
 import sys
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qsl, urlsplit
 
 from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV
+from etl.db import get_engine
 from etl.http import session as http_session
 
 
 def _load_sibling(name: str):
     """Import a script from this skill's own scripts directory."""
-    path = Path(__file__).resolve().parent / f"{name}.py"
+    return _load_module(name, Path(__file__).resolve().parent / f"{name}.py")
+
+
+def _load_shared(name: str):
+    """Import a find-chart-references module, so the surface definitions stay shared."""
+    return _load_module(name, Path(__file__).resolve().parents[2] / "find-chart-references" / "scripts" / f"{name}.py")
+
+
+def _load_module(name: str, path: Path):
     if not path.exists():
         raise SystemExit(f"Cannot import {name}: {path} does not exist")
     spec = importlib.util.spec_from_file_location(name, path)
@@ -55,8 +65,12 @@ def _load_sibling(name: str):
 
 
 # The log-source question, and the reversed-source exclusion it depends on, are owned by the
-# applier so the two consumers cannot disagree.
+# applier so the three consumers cannot disagree.
 applier = _load_sibling("apply_scatter_defaults")
+# Featured metrics are matched by the sweep's own reader rather than a local query: the only
+# handle a `featured_metrics` row carries is a URL, and `LIKE '%/grapher/<slug>%'` cannot tell
+# `/grapher/foo` from `/grapher/foo-bar` (see `featured_metric_rows`).
+fr = _load_shared("find_references")
 
 SLUG_RE = re.compile(r"/grapher/([^/?#]+)")
 TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
@@ -284,6 +298,177 @@ def row_query(src_id: int | None, log_sources: set[int]) -> str:
     return f"{TARGET_QUERY}&{Y_SCALE_LOG}" if src_id in log_sources else TARGET_QUERY
 
 
+def key_chart_slots(src_ids: Iterable[int]) -> dict[int, list[str]]:
+    """Topic pages that feature each source as a key chart.
+
+    `get_chart_references` cannot see these — a key chart is a chart-to-tag association
+    (`chart_tags.keyChartLevel`), not a row in any reference table — so without this query the
+    audit's verdicts look clean while topic pages quietly depend on the chart being unpublished.
+    They are the reason a lossy retirement can be unfixable: `GdocPost.loadRelatedCharts` selects
+    only `chartId, slug, title, variantName, keyChartLevel` and `RelatedCharts` renders
+    `<GrapherWithFallback slug=...>`, so a key-chart slot has nowhere to put a query string —
+    neither `tab=scatter` nor `yScale=log` can reach it, at either the source or the target.
+    """
+    ids = tuple(sorted(set(src_ids)))
+    if not ids:
+        return {}
+    df = OWID_ENV.read_sql(
+        "SELECT ct.chartId, t.name FROM chart_tags ct JOIN tags t ON t.id = ct.tagId "
+        "WHERE ct.chartId IN %(i)s AND ct.keyChartLevel > 0 ORDER BY t.name",
+        params={"i": ids},
+    )
+    out: dict[int, list[str]] = {}
+    for row in df.to_dict("records"):
+        out.setdefault(int(row["chartId"]), []).append(str(row["name"]))
+    return out
+
+
+def featured_metric_slots(slugs: Iterable[str]) -> dict[str, list[str]]:
+    """Topic-page featured-metric slots holding each source slug, keyed by slug.
+
+    The other param-less surface, and the harsher one: a featured metric names a chart, an MDIM
+    view or an explorer view — never a chart's *tab* — so the scatter view cannot be featured at
+    all (see "Featured metrics" in SKILL.md). A lossy retirement whose source is featured is
+    therefore the case where the loss is not merely unrecoverable by URL but unrecoverable
+    outright, which is exactly what the RECONSIDER block exists to surface.
+    """
+    wanted = {f"/grapher/{s}": (s, None) for s in slugs if s and s != "-"}
+    if not wanted:
+        return {}
+    out: dict[str, list[str]] = {}
+    for row in fr.sweep_featured_metrics("chart", wanted):
+        out.setdefault(str(row["subject"]), []).append(str(row["where"]))
+    return out
+
+
+def lossy_reasons(loss: dict, tgt_cfg: dict, engine) -> list[dict]:
+    """Why retiring this source loses something, in the reader's terms — or [] if it does not.
+
+    Only the losses that survive Part 2 count. A log y axis and the source's exclusions both do:
+    the redirect restores the log for a bare slug, but nothing restores it for a reader who
+    clicks the scatter tab or for a surface with no query string, and the exclusions are never
+    reinstated anywhere. The exclusion grading is the applier's, so this agrees with what Part 1
+    printed instead of second-guessing it.
+
+    Each reason carries its `kind`, because the two have different recovery channels and
+    `print_reconsider` has to split the blast radius on that: a log axis travels on any URL that
+    keeps its params, while an exclusion travels on nothing at all. Reporting them together as
+    one "fixable" count overstated what editing an href achieves.
+    """
+    reasons: list[dict] = []
+    if loss.get("log"):
+        reasons.append({"kind": "log", "text": "log y axis (the target's scatter tab opens linear)"})
+    excluded = loss.get("excluded") or []
+    if excluded:
+        try:
+            tgt_y = applier.find_dim(tgt_cfg, "y") or {}
+            y_var_id = tgt_y.get("variableId")
+            gdp_var_id = (applier.find_dim(tgt_cfg, "x") or {}).get("variableId")
+            if y_var_id is None or gdp_var_id is None:
+                raise ValueError("target has no y or no x dimension to grade against")
+            tol = int((tgt_y.get("display") or {}).get("tolerance") or 0)
+            year = applier.resolve_default_year(tgt_cfg, int(y_var_id), int(gdp_var_id), engine)
+            if year is None:
+                raise ValueError("no year where both indicators have data")
+            graded = applier.classify_exclusions(excluded, int(y_var_id), int(gdp_var_id), year, tol, engine)
+            bad = [g for g in graded if g["cls"] in applier.EXCLUSION_WARN_CLASSES]
+            if bad:
+                reasons.append(
+                    {
+                        "kind": "exclusions",
+                        "text": f"{len(bad)} exclusion(s) that matter: "
+                        + ", ".join(f"{g['entity']} {g['cls']}" for g in bad),
+                    }
+                )
+        except Exception as e:
+            reasons.append({"kind": "exclusions", "text": f"{len(excluded)} exclusion(s), ungraded ({e!s:.60})"})
+    return reasons
+
+
+def print_reconsider(plan: list[dict]) -> None:
+    """The rows where the retirement costs the reader something no redirect gives back.
+
+    Its own block rather than a column, because this is the one verdict here that is warn-only:
+    a linear axis or a returning outlier is an editorial loss, not a broken page, so it cannot
+    be turned into `BLOCKED` the way a MANUAL reference is without training everyone to pass a
+    waiver flag — roughly a fifth of a batch is logarithmic (2026-08-14, batch 1: 3 of 14). A
+    column would be missed; a block with the blast radius next to it has to be answered.
+
+    The blast radius is split by whether the fix can travel, and that depends on BOTH the loss
+    and the surface. Only a log axis has a recovery channel at all — `yScale=log` on a URL — and
+    only a prose link keeps it: an embed drops the query string, a key-chart slot has nowhere to
+    put one, and a featured metric cannot even name a chart's tab. An exclusion has no channel
+    anywhere, so for that loss every surface is unfixable and none of them counts as "by hand".
+    """
+    rows = [r for r in plan if r.get("lossy")]
+    if not rows:
+        return
+    print(f"\nRECONSIDER — {len(rows)} retirement(s) lose something the redirect cannot give back")
+    print("  Warn-only by design: this is an editorial call, not a broken page. Answer each row with the")
+    print("  topic owner before --apply — keeping the standalone chart is a legitimate outcome.")
+    for rec in rows:
+        refs = rec.get("refs") or {}
+        kinds = {r["kind"] for r in rec["lossy"]}
+        log_lost, excl_lost = "log" in kinds, "exclusions" in kinds
+        links, embeds = rec.get("gdoc_links", 0), rec.get("gdoc_embeds", 0)
+        # WordPress rows are prose links on the legacy mirror, so they group with the links.
+        carriers = links + refs.get("postsWordpress", 0)
+        key_charts = rec.get("key_charts") or []
+        featured = rec.get("featured_metrics") or []
+        print(f"\n  {rec['src']}  ({rec.get('src_id') or '-'} -> {rec.get('tgt_id') or '-'})")
+        for reason in rec["lossy"]:
+            print(f"    loses: {reason['text']}")
+        if log_lost and carriers:
+            print(f"    fixable by hand: {carriers} prose link(s) — add yScale=log to the href")
+        if embeds:
+            print(
+                f"    CANNOT carry the fix: {embeds} gdoc embed(s) (an embed renders the target's DEFAULT tab; "
+                f"no query string reaches it)"
+            )
+        for label, names, why in (
+            ("key-chart slot", key_charts, "a chart_tags row has nowhere to put a query string"),
+            ("featured metric", featured, "a chart's TAB cannot be featured at all"),
+        ):
+            if names:
+                # The count is per slot while the names are per topic, and one topic can hold
+                # several slots — so repeats are collapsed with a multiplicity rather than printed
+                # twice, and `len(names)` stays the true number of rows to re-point.
+                tally: dict[str, int] = {}
+                for n in names:
+                    tally[n] = tally.get(n, 0) + 1
+                labels = [n if c == 1 else f"{n} x{c}" for n, c in tally.items()]
+                shown = ", ".join(labels[:4]) + (f", +{len(labels) - 4} more" if len(labels) > 4 else "")
+                print(f"    CANNOT carry the fix: {len(names)} {label}(s) — {shown} ({why})")
+        if excl_lost:
+            print("    NOTHING carries an exclusion back: the target never re-applies them, so every reference")
+            print("    above meets the returning entity however its href is written")
+        if not (carriers or embeds or key_charts or featured):
+            print("    no references found, so the loss is confined to readers who arrive by the old slug")
+        # An embed is as unfixable as a key-chart slot — it was previously counted as "fixable",
+        # which is what made an embed-only log row look solved.
+        unfixable = embeds + len(key_charts) + len(featured)
+        if excl_lost:
+            verdict = "an exclusion cannot be restored anywhere — decide whether the scatter reads correctly with the entity back"
+        elif unfixable:
+            verdict = "the loss lands on pages no query string reaches — decide before applying"
+        elif carriers:
+            verdict = "every affected surface can carry the params — weigh the edit against keeping the chart"
+        else:
+            verdict = "the redirect carries yScale=log for old-slug arrivals; only a reader who clicks the target's scatter tab sees it linear"
+        print(f"    -> {verdict}")
+        # Also on the row itself, so a reader of the PLAN table alone cannot miss it. Appended the
+        # same way --allow-manual-refs appends, so a BLOCKED note keeps its own explanation.
+        summary = "; ".join(r["text"] for r in rec["lossy"])
+        parts = [f"{embeds} gdoc embed(s)"] if embeds else []
+        parts += [f"{len(key_charts)} key-chart slot(s)"] if key_charts else []
+        parts += [f"{len(featured)} featured metric(s)"] if featured else []
+        if parts:
+            summary += f"; {' + '.join(parts)} cannot carry the fix"
+        if excl_lost:
+            summary += "; no surface can carry an exclusion back"
+        rec["note"] = (rec["note"] + "  " if rec["note"] else "") + f"[RECONSIDER: {summary}]"
+
+
 def build_plan(api: AdminAPI, payload: list[dict], skip_aliases: bool) -> list[dict]:
     """Resolve every pair and decide what apply would do — all read-only.
 
@@ -292,7 +477,20 @@ def build_plan(api: AdminAPI, payload: list[dict], skip_aliases: bool) -> list[d
     """
     rows: list[dict[str, Any]] = []
     for row in payload:
-        rec: dict[str, Any] = {"status": "", "note": "", "aliases": [], "refs": {}, "manual": False}
+        rec: dict[str, Any] = {
+            "status": "",
+            "note": "",
+            "aliases": [],
+            "refs": {},
+            "manual": False,
+            "key_charts": [],
+            "featured_metrics": [],
+            "loss": {},
+            "lossy": [],
+            "tgt_cfg": {},
+            "gdoc_links": 0,
+            "gdoc_embeds": 0,
+        }
         try:
             rec |= {"src": slug_from_url(row["grapher_url"]), "tgt": slug_from_url(row["target_chart_url"])}
         except (KeyError, ValueError) as e:
@@ -304,10 +502,18 @@ def build_plan(api: AdminAPI, payload: list[dict], skip_aliases: bool) -> list[d
     ids = chart_ids_for_slugs(slugs)
     existing = chart_redirects_for_slugs(slugs)
     site_sources, mdim_sources = shadowing_sources(slugs)
-    # Which sources carry a log y axis on the indicator (reversed sources excluded).
-    log_sources = applier.log_y_axis_sources({ids[r["src"]] for r in rows if r["src"] in ids})
+    # What each source carries that the target cannot: a log y axis on the indicator (reversed
+    # sources excluded) and its `excludedEntityNames`. One read, one owner — the log half also
+    # decides this row's stored query. The exclusions are only counted here; grading them costs
+    # indicator data, so `main` does that after `--verify` has had its chance to short-circuit.
+    loss = applier.source_lossiness({ids[r["src"]] for r in rows if r["src"] in ids})
+    log_sources = {i for i, v in loss.items() if v["log"]}
+    key_charts = key_chart_slots(loss.keys())
     for rec in rows:
-        rec["query"] = row_query(ids.get(rec["src"]), log_sources)
+        src_id = ids.get(rec["src"])
+        rec["query"] = row_query(src_id, log_sources)
+        rec["loss"] = loss.get(src_id, {})
+        rec["key_charts"] = key_charts.get(src_id, [])
 
     for rec in rows:
         if rec["status"] == "ERROR":
@@ -326,6 +532,7 @@ def build_plan(api: AdminAPI, payload: list[dict], skip_aliases: bool) -> list[d
         # Target-side guards. These are also the wrong-staging-server detector: a target
         # without a scatter tab usually means this env doesn't have the part-1 changes.
         tgt_cfg = api.get_chart_config(rec["tgt_id"])
+        rec["tgt_cfg"] = tgt_cfg
         if "ScatterPlot" not in (tgt_cfg.get("chartTypes") or []):
             rec |= {"status": "SKIPPED", "note": "target has no ScatterPlot tab (wrong env?)"}
             continue
@@ -384,6 +591,25 @@ def build_plan(api: AdminAPI, payload: list[dict], skip_aliases: bool) -> list[d
                 "status": "BLOCKED",
                 "note": f"--skip-alias-repoint, but the unpublish would delete {len(rec['aliases'])} alias(es) of the source",
             }
+
+    # Featured metrics LAST, because they are matched by literal pathname and a slot may well name
+    # an inbound alias rather than the current slug — the aliases are only known once the loop
+    # above has read them. Unpublishing the source deletes every alias too, so a slot on an old
+    # slug empties just the same, and missing it would let RECONSIDER report no parameterless
+    # surface for a retirement that silently empties one.
+    featured = featured_metric_slots(
+        slug for rec in rows for slug in (rec["src"], *(a["slug"] for a in rec["aliases"])) if slug and slug != "-"
+    )
+    # One entry per SLOT, not per tag. A pathname can hold several slots under one topic tag —
+    # different `incomeGroup` rows, say — and each is a separate row someone has to re-point, so
+    # de-duplicating by tag name understated the count `print_reconsider` prints. There is nothing
+    # to de-duplicate anyway: the sweep visits each `featured_metrics` row once and matches it to a
+    # single pathname, and a slug appears once across a row's src plus its aliases.
+    for rec in rows:
+        slots: list[str] = []
+        for slug in (rec["src"], *(a["slug"] for a in rec["aliases"])):
+            slots.extend(featured.get(slug, []))
+        rec["featured_metrics"] = slots
     return rows
 
 
@@ -599,7 +825,9 @@ def verify_redirects(plan: list[dict]) -> int:
                 print(f"{r['slug']:<72} {'OK':<11} {resp.status_code} -> {expected}")
             else:
                 failures += 1
-                print(f"{r['slug']:<72} {'MISMATCH':<11} {resp.status_code} -> {loc.path}?{loc.query}  (expected {expected})")
+                print(
+                    f"{r['slug']:<72} {'MISMATCH':<11} {resp.status_code} -> {loc.path}?{loc.query}  (expected {expected})"
+                )
         elif resp.status_code == 200:
             failures += 1
             print(f"{r['slug']:<72} {'NOT_LIVE':<11} 200 — CDN still serves the cached chart page; bake/purge pending")
@@ -610,7 +838,14 @@ def verify_redirects(plan: list[dict]) -> int:
             failures += 1
             print(f"{r['slug']:<72} {'HTTP ' + str(resp.status_code):<11} unexpected answer")
     total = len(df) + len(unmet)
-    print(f"\n{total - failures}/{total} OK" + (f" — {failures} not verified; re-run once the bake lands" if failures else " — every redirect serves its target"))
+    print(
+        f"\n{total - failures}/{total} OK"
+        + (
+            f" — {failures} not verified; re-run once the bake lands"
+            if failures
+            else " — every redirect serves its target"
+        )
+    )
     return 1 if failures else 0
 
 
@@ -669,14 +904,62 @@ def main() -> int:
         rec["refs"] = ref_counts(refs)
         rec["manual"] = sum(rec["refs"][k] for k in MANUAL_REF_KEYS) > 0
 
+    engine = get_engine()
+    for rec in audited:
+        rec["lossy"] = lossy_reasons(rec.get("loss") or {}, rec.get("tgt_cfg") or {}, engine)
+
+    # Article references, split link vs embed, because RECONSIDER's blast radius turns on that:
+    # a prose link can be given `yScale=log`, an embed renders the target's default tab whatever
+    # its href says. Read once here and reused by the hand-edit table below. Aliases count too —
+    # an article linking an older slug lands on the same target.
+    rec_by_slug = {slug: rec for rec in audited for slug in (rec["src"], *(a["slug"] for a in rec["aliases"]))}
+    query_by_slug = {slug: rec["query"] for slug, rec in rec_by_slug.items()}
+    gdoc_rows = gdoc_references(tuple(sorted(query_by_slug)))
+
+    def count_ref(slug: str, kind: str) -> None:
+        owner = rec_by_slug.get(slug)
+        if owner is not None:
+            key = "gdoc_links" if kind == "link" else "gdoc_embeds"
+            owner[key] = owner.get(key, 0) + 1
+
+    for row in gdoc_rows:
+        count_ref(row["slug"], row["kind"])
+
+    # Raw pasted URLs too. `gdoc_references` reads only `linkType IN ('grapher','guided-chart')`,
+    # so an author who pasted a full `/grapher/...` URL (stored as `linkType='url'`) is invisible
+    # to it — and since the carrier count is now the link/embed split rather than the aggregate
+    # `postsGdocs`, such a reference would otherwise be counted nowhere at all. Delegated to the
+    # sweep's own reader, which already unwraps Google redirect wrappers and skips archive hosts.
+    # A failure here must not authorise the unpublish. `gdoc_references` above is unguarded and so
+    # already fails closed; guarding this one and continuing would have made the pair inconsistent
+    # — a reference sweep that could not run leaves the blast radius unknown, and `--apply` is
+    # exactly the step that acts on it. So: read-only runs report what they did gather and say the
+    # counts are short, while `--apply` refuses outright rather than unpublishing against a partial
+    # audit. There is deliberately no waiver flag: retry it, do not wave it through.
+    try:
+        url_rows = fr.sweep_gdoc_url_links({slug: {"id": rec.get("src_id")} for slug, rec in rec_by_slug.items()})
+        for row in url_rows:
+            count_ref(str(row["subject"]), "link" if row["kind"] == fr.LINK else "embed")
+    except Exception as e:
+        if args.apply:
+            print(
+                f"\nREFUSED: the raw-URL gdoc reference sweep failed ({e!s:.80}). The references audit is "
+                f"incomplete, so --apply would unpublish sources whose links and embeds were never counted. "
+                f"Re-run without --apply to see the partial audit, then retry once it succeeds."
+            )
+            return 2
+        print(f"\n  (raw-URL gdoc sweep failed, link/embed counts may understate: {e!s:.80})")
+
     print("\nREFERENCES AUDIT (of the OLD source chart)")
-    print(f"{'src_slug':<58} {'src':>5} {'tgt':>5} {'manual':>7} {'aliases':>7}  counts")
-    print("-" * 140)
+    print(f"{'src_slug':<58} {'src':>5} {'tgt':>5} {'manual':>7} {'lossy':>6} {'keych':>6} {'aliases':>7}  counts")
+    print("-" * 155)
     for rec in plan:
         counts = " ".join(f"{REF_LABEL[k]}={v}" for k, v in rec.get("refs", {}).items())
+        n_key = len(rec.get("key_charts") or [])
         print(
             f"{rec['src']:<58} {str(rec.get('src_id') or '-'):>5} {str(rec.get('tgt_id') or '-'):>5} "
-            f"{'MANUAL' if rec.get('manual') else '':>7} {len(rec['aliases']):>7}  {counts}"
+            f"{'MANUAL' if rec.get('manual') else '':>7} {'LOSSY' if rec.get('lossy') else '':>6} "
+            f"{(n_key or ''):>6} {len(rec['aliases']):>7}  {counts}"
         )
     # MANUAL_REF_KEYS says these BLOCK the row, so make that true rather than leaving it to the
     # operator to notice the audit column and re-run: the apply loop gates purely on `status`, so a
@@ -698,7 +981,12 @@ def main() -> int:
     print("\n  manual = a redirect alone won't fix it: explorers / dataInsights / staticViz reference the old")
     print("           chart directly. Those rows are BLOCKED; re-point them, then --allow-manual-refs.")
     print("  narr   = narrative charts. NOT a blocker (see the table below), but they need replacing.")
+    print("  lossy  = the migrated scatter will not look like the chart it replaces (see RECONSIDER below).")
+    print("  keych  = key-chart slots on topic pages. Invisible to get_chart_references, and they carry no")
+    print("           query string, so they can never show the scatter view — moved or not.")
     print("  aliases = old slugs of the SOURCE chart; the unpublish deletes them, so they get re-pointed too.")
+
+    print_reconsider(plan)
 
     # ---- NARRATIVE CHARTS PARENTED TO THE OLD CHARTS ----
     by_id = {rec["src_id"]: rec for rec in audited}
@@ -728,19 +1016,19 @@ def main() -> int:
         print("\n  Every target here is a plain chart, and a chart page has no 'Create narrative chart' control")
         print("  (it exists only on MDIM views), so creating the replacement is not a UI task. Same options as")
         print("  the handoff: leave the old one in place (it keeps rendering; its 'Explore the data' link")
-        print("  loses only the stored keys its params override), ask a developer to create it via the API, or wait for")
+        print(
+            "  loses only the stored keys its params override), ask a developer to create it via the API, or wait for"
+        )
         print("  the target to become an MDIM. SKILL.md 'Narrative charts' has the mechanism and citations.")
 
     # ---- ARTICLE LINKS THAT WON'T LAND ON THE SCATTER ----
-    # Aliases included: an article may well link the source chart's older slug. Each slug maps to
-    # the query of the row it belongs to — an alias is re-pointed carrying that same query (see
-    # repoint_alias), so it has the same keys to collide with. Per-row, because only a log source
-    # stores a `yScale` for a reference's own params to contradict.
-    query_by_slug = {
-        slug: rec["query"] for rec in audited for slug in (rec["src"], *(a["slug"] for a in rec["aliases"]))
-    }
+    # `gdoc_rows` and `query_by_slug` were read above for RECONSIDER's link/embed split. Aliases
+    # are included there: an article may well link the source chart's older slug, and an alias is
+    # re-pointed carrying that same query (see repoint_alias), so it has the same keys to collide
+    # with. Per-row, because only a log source stores a `yScale` for a reference's own params to
+    # contradict.
     refs = []
-    for r in gdoc_references(tuple(sorted(query_by_slug))):
+    for r in gdoc_rows:
         note = param_notes(r, query_by_slug[r["slug"]])
         if note:
             refs.append((r, note))

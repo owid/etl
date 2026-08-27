@@ -308,7 +308,7 @@ def _set_description_key(view, tb):
 
     if (view.d.estimate == "best_ci") or (view.d.indicator == "num_conflicts"):
         assert keys[-1].startswith('We show here the "best" death')
-        keys = keys[:-1] + [None]
+        keys = keys[:-1]
 
     return keys
 

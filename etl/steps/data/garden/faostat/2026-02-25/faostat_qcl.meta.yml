@@ -500,7 +500,7 @@ tables:
           title_public: Eggplant yield
       fibre_crops__00000821__yield__005412__tonnes_per_hectare:
         presentation:
-          title_public: Fibre crop yield
+          title_public: Fiber crop yield
       flax__raw_or_retted__00000771__yield__005412__tonnes_per_hectare:
         presentation:
           title_public: Flax raw or retted yield
