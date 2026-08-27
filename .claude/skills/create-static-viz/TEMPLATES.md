@@ -5,8 +5,16 @@ re-deriving it through Figma MCP calls every time.
 
 - **File:** `Charts (2026)`, file key `s6Sv60bakebRRW2TxsMQbF`
 - **Page:** `📑 Templates`, node `798:54`
-- **Re-verify with:** `get_metadata` on `798:54` for positions, `get_screenshot` on a frame for colors
-- **Last verified:** 2026-08-14
+- **Re-verify with:** `/create-figma-chart`'s [`scripts/verify_templates.js`](../create-figma-chart/scripts/verify_templates.js)
+  — it checks the shared geometry (sizes, content box, header band, footer position and growth) for all
+  ten templates and returns an `ok`/`DRIFT` verdict. Use `get_metadata` on `798:54` for the per-slot
+  positions it does not cover, and `get_screenshot` on a frame for colors. **Run it every refresh —
+  the date below never licenses skipping it.** A `DRIFT` verdict stops the refresh and gets reported.
+- **Last verified:** 2026-08-20 — the rhythm parameters and the Horizontal, Vertical and Mobile
+  example 1 header/footer structure re-measured live; the script returned `ok` on all ten templates.
+  The date is provenance, for judging a drift report. If the script *cannot* run, verify by hand with
+  `get_metadata` anyway, and let the date say how far to distrust this file meanwhile: **two weeks or
+  older, treat every number here as suspect.**
 
 The design team edits these frames in place, and edits that move a chart area's edge have landed days
 apart. **Re-verify the geometry at the start of every refresh** rather than trusting this file: a step
@@ -57,42 +65,70 @@ wrong twice: wrong pipeline, and a *ratio* check on a frame whose height is chos
 All values in template pixels, y measured **from the top edge** as Figma reports it. Content
 margin is **16 px** on all four frames, so content width is `frame width − 32`.
 
+Font sizes are in template px, measured off the live templates on **2026-08-17**. They matter to a
+step twice over: the emitted SVG should read like the template it is sized to, and `/create-figma-chart`
+fills these same slots when the SVG is imported.
+
 ### Horizontal — 850 × 638
 
-| Slot | y | Width | Height |
-|---|---|---|---|
-| Title | 16 | 738 | 58 (**two lines**) |
-| Logo | 16 | 64 | 35 (top-right, x=770) |
-| Subtitle | 80 | 818 | 38 (two lines) |
-| *chart area* | *118 → 556* | 818 | 438 |
-| `Note:` | 556 | 818 | 28 (two lines) |
-| `Data source:` | 589 | 818 | 14 |
-| Tagline (left) | 609 | 467 | 13 |
-| License (right, x=571) | 609 | 263 | 13 |
+| Slot | y | Width | Height | Size |
+|---|---|---|---|---|
+| Title | 16.22 | 737.84 | 58 (**two lines**) | 25 |
+| Logo | 16 | 64 | 35 (top-right, x=770) | — |
+| Subtitle | 80 | 818 | 38 (two lines) | 16 |
+| *chart area* | *118 → 558.6* | 818 | ~440 | — |
+| `Note:` | 558.62 | 818 | 28 (two lines) | **12** |
+| `Data source:` | 590.62 | 818 | 14 | **12** |
+| Tagline (left) | 608.62 | 467 | 13 | **11** |
+| License (right, x=571) | 608.62 | 263 | 13 | **11** |
 
-The slots sit in two auto-layout frames: header block `25398:753` spans 0→134, footer block
-`25398:769` starts at 540. Each carries 16 px of inner padding on the chart side, so the visual
-chart area is 118 → 556 while `header.y + header.height` reads 134 — that edge plus the padding.
+The slots sit in two auto-layout frames: a header block (`Frame 20` at last check) spanning **0→118**,
+and footer block **`Frame 22` (`25808:13`)** starting at **559**. **Neither wrapper carries inner
+padding** — `header.y + header.height` *is* the chart area's top edge at 118, and the footer's own `y`
+is the `Note:` row. Resolve both structurally (topmost/bottommost auto-layout child) rather than by
+name or id: the design team renames and re-ids these frames in place.
 
 ### Vertical — 850 × 1095
 
-Same slots, widths, and auto-layout wrappers as Horizontal. Header block `5332:94` is
-0→136; footer block `5332:101` starts at 997. Absolute y: title 16, subtitle 82, chart area
-136 → 997, `Note:` 1013, `Data source:` 1046, tagline/license 1066.
+Same slots, widths, sizes and auto-layout wrappers as Horizontal. The header block (`Frame 23`) is
+**0→118**; footer block **`Frame 25` (`25808:16`)** starts at **1015.81**. Absolute y: title 16.22,
+subtitle 80.22, chart area 118 → 1015.81, `Note:` 1015.81, `Data source:` 1047.81, tagline/license
+1065.81.
 
-Its subtitle matches Horizontal's — 16 px Lato Regular over two lines, 38 tall. The **title** is what
-differs: 30 px line height here against 29 px, so 60 px against 58 px, which is the whole of the
-136 vs 134 difference between the two header blocks.
+**The two header blocks are identical at 118**, so don't reintroduce a Vertical-specific header
+offset. They used to differ (136 against 134, from a 30 px title line height against 29), and before
+that both read 134.22 — an edge that only existed because the wrappers were padded 16 px on the chart
+side. Both the padding and that difference are gone.
+
+> **Wrapper figures re-verified 2026-08-19; the slot table above was not.** The wrapper ids, the 118
+> header bottom and the removal of the padding come from the same measurement pass as
+> `/create-figma-chart`'s node map. The per-slot `y` values still date from 2026-08-17 and sit within
+> ~0.4 px of it (the footer rows derive as 559 / 591 / 609 against the tabled 558.62 / 590.62 /
+> 608.62) — immaterial for emitting an SVG, but re-measure before trusting them for anything tighter.
+
+### The license slot holds about fifty characters
+
+263 px at 11 px, and it **shares its row with the 467 px tagline** inside 818 px of content. The
+template's own `Licensed under CC-BY by the author [Name of author]` fits; two names do not —
+`Licensed under CC-BY by the authors Esteban Ortiz-Ospina and Pablo Arriagada` measures **387 px**,
+overruns the tagline by 36 px, and prints on top of it. Drop the two words `the authors`
+(`Licensed under CC-BY by <names>`, 329 px) and it clears by 22 px.
+
+Never shorten a name to make it fit; the phrasing is what gives. Mobile is immune — its footer rows
+are stacked and full width, so the same string has 508 px to itself.
 
 ### Mobile — 540 × 540 (example 1) and 540 × 824 (example 2)
 
-| Slot | y (540×540) | y (540×824) | Width |
-|---|---|---|---|
-| Title | 16 | 16 | 428 (**two lines**; logo sits beside it at x=460) |
-| Subtitle | 80 | 80 | 508 |
-| *chart area* | *118 → 486* | *118 → 770* | 508 |
-| `Data source:` | 486 | 770 | 508 |
-| License | 507 | 791 | 508 |
+| Slot | y (540×540) | y (540×824) | Width | Size |
+|---|---|---|---|---|
+| Title | 16 | 16 | 428 (**two lines**; logo sits beside it at x=460) | 25 |
+| Subtitle | 80 | 80 | 508 | 16 |
+| *chart area* | *118 → 486* | *118 → 770* | 508 | — |
+| `Data source:` | 486 | 770 | 508 | 14 |
+| License | 507 | 791 | 508 | 14 |
+
+Note the mobile footer rows are **14 px** where the 850-wide pair's are 12 and 11 — mobile has one
+row per string and can afford the larger type, so don't copy sizes across the two families.
 
 The footer is one auto-layout block (`Frame 15`, `25343:276` and `25343:275`), 38 px tall, 16 px
 above the frame's bottom edge: two full-width rows, 21 px apart.
@@ -118,21 +154,148 @@ caveat whether it is about a *visual artifact* (safe to drop when the artifact i
 mobile size) or about *what the chart claims* (must move into the subtitle instead). See the
 `Note:` guidance in `SKILL.md`.
 
-## Two positions that are derived, not arbitrary
+## Every position in the table above is one text length away from being wrong
 
-- **`subtitle_y = 80` assumes a two-line title.** It is `16 + 2 × 29`, where 29 px is one line at
-  the template's title size. Pin a one-line title to y=16 and leave the subtitle at 80 and you
-  get a dead line of whitespace. Derive `subtitle_y` from the title's actual line count, and
-  calibrate so the two-line case reproduces 80 exactly.
-- **The title slot is two lines tall** in every template. A title that wraps to one line
-  under-fills it; one that wraps to three overflows into the subtitle.
-- **The `Note:` slot is two lines tall too, and the chart band's bottom edge is the footer block's `y`** —
-  so a one-line note moves the band. Derive both from the actual slot positions rather than from the
-  table above. (What that implies for *editing* a clone in Figma is `/create-figma-chart`'s Step 6, not
-  this file's business.)
-- **A header block's height is derived from its two text slots, so it moves whenever either reflows** —
-  a slot gaining a line grows the block without anything being repositioned. Read
-  `header.y + header.height` back after setting text rather than trusting a recorded band.
+**The table records the templates as shipped — two-line title, two-line subtitle, two-line Note — and
+almost no real chart has all three.** Header and footer are auto-layout blocks: the header grows
+*down* from the title, the footer grows *up* from the frame's bottom margin, so a slot that comes in
+shorter than the placeholder moves every edge below (or above) it, including the chart band's. A step
+that hard-codes any of these numbers is right for one string length and silently wrong for the rest —
+this is what leaves a line of dead space above a plot, and it survives every contract check.
+
+So derive them, from this rhythm:
+
+```
+title_row   = title_lines × 29 + row_pad_px                   # no max(): the logo is a SIBLING, see below
+subtitle_y  = origin_y + title_row + 6                        # 6 px auto-layout gap
+band_top    = subtitle_y + subtitle_lines × 19                # the subtitle's ink bottom
+band_bottom = note_ink_bottom − note_lines × 14               # the Note's ink top, growing upward
+```
+
+| | 850-wide pair | Mobile (both) |
+|---|---|---|
+| `origin_y` (the header block's own top edge) | 16 | 16 |
+| `logo_px` (the logo's **row**, not the logo) | 0 — the logo is a sibling | 0 — the logo is a sibling |
+| `row_pad_px` (the title row's own top padding) | 0 | 0 |
+| `note_ink_bottom` | 587 (Horizontal) / 1043.81 (Vertical) | — (no Note row) |
+| footer row spacing / block top padding | 4 / 0 | 4 / 0 |
+
+**Re-measured live on 2026-08-20** off `5332:93`, `5332:75` and `24590:20`. The headline is that **the
+rebuild unified the two families' header rhythm** — both now sit at `origin_y = 16` with no row
+padding, where the old padded generation had the 850-wide pair spanning the frame at `origin_y = 0`
+and carrying the 16.22 px inside `row_pad_px`. The line steps survived the rebuild unchanged: title
+**29**/line, subtitle **19**/line, a **6** px gap between them, and **4** px between footer rows.
+
+The rhythm now reproduces both templates exactly, which is the check that matters:
+
+| Case | Derivation | Live |
+|---|---|---|
+| Placeholder (2-line title, 2-line subtitle) | `16 + 58 + 6 + 38` | **118** ✓ |
+| One-line title, one-line subtitle | `16 + 29 + 6 + 19` | **70** ✓ |
+
+That second row is the one that used to disagree: the stale `origin_y = 0` / `row_pad_px = 16.22` pair
+derived **82.48** against a measured 70, and the 12.48 px gap between them was the whole error. Both
+figures now fall out of the same formula.
+
+> **The header is a flat auto-layout of `[title, subtitle]` with the logo as a SIBLING**, not a child
+> of a title row (`/create-figma-chart`'s SKILL.md → node map). A sibling contributes nothing to the
+> header's height, so `logo_px` is 0, the `max(…, logo_px)` cap does not apply, a one-line title *does*
+> shrink the header by a line, and there is no logo surplus to land between the title and the subtitle.
+> The logo constrains **width** instead: the title node is sized narrower than the content box to clear
+> it — 737.84 against 818 on the 850-wide pair, 428 against 508 on mobile.
+>
+> The **superseded nested-logo generation** lives in
+> [reference/SUPERSEDED-LOGO-GENERATION.md](reference/SUPERSEDED-LOGO-GENERATION.md), kept only so a
+> regression stays recognizable — its arithmetic no longer applies; the table above is the live one.
+> Everything below THIS note is current guidance.
+
+## Lay the plot inside the template's band, and draw the slots at the template's own sizes
+
+The band is the room between the subtitle's ink and the footer's, inset at each end (the design asks
+for 12–16 px; 14 is the middle):
+
+```python
+band_top, band_bottom = ...            # derived, per the rhythm above
+chart_top_px = band_top + BAND_INSET + header_px
+chart_bottom_px = band_bottom - BAND_INSET - below_px
+```
+
+**Both edges are ink, not frame — and on the current templates the footer frame's own `y` *is* its
+first row's ink** (Horizontal's footer starts at 559, which is the `Note:` row). So inset once, from
+that edge. This used to need a correction: the footer frame started 16 px above its `Note:` ink, and
+insetting from the frame's `y` then inset twice and left a visibly loose bottom. If you measure that
+gap again, the wrappers have been re-padded — re-verify before compensating for it.
+
+**Draw the step's own copies of these slots at the sizes in the table, not at sizes that merely look
+right.** It is tempting to set the step's title and subtitle a size or two smaller — nothing in the
+frame uses them, since the import drops them. But then the render's spacing is *not* the frame's: the
+band is correct for the frame while the step's smaller subtitle ends 20 px higher, so the PNG shows a
+hole that the frame does not have. Whoever reviews the PNG reports it as a bug, correctly. Matching
+the sizes, line heights and slot positions costs nothing and makes the render a preview rather than a
+proportion sketch — which is most of what the render is for.
+
+## Align to the content box on both sides
+
+Everything in the frame lines up on two verticals: the left edge where the subtitle and note start,
+and the right edge where the **logo** ends. Both are the content box, `16 … frame − 16`.
+
+- The left comes free if the country labels are right-aligned against the bars: the widest one starts
+  exactly at the margin.
+- The right does **not** come free. A total column drawn left-aligned at a fixed gap past the bars
+  stops wherever its longest number happens to end, short of the logo. Right-align it on the content
+  edge instead — `MINUTES_PER_DAY + total_column_px / px_per_min`, `ha="right"` — and the column, the
+  logo and the note all share one edge.
+
+## Two rules for laying out coloured text runs
+
+Both of these produced defects that survived a full visual check and were caught by a reader:
+
+- **A run may not begin with a space.** `TextPath` measures ink, so a *leading* space contributes
+  nothing to a run's advance — while matplotlib still draws it. Lay out `["Sleep", " · ", "Eating"]`
+  by summed advances and the separator is drawn one space further right than the layout accounted
+  for: the gap lands before the dot and vanishes after it (`Sleep ·Eating`). A *trailing* space is
+  fine, because `text_advance_px` recovers it with a sentinel glyph. So the space rides with the name:
+  `["Sleep ", "· ", "Eating"]`.
+- **Punctuation between coloured names needs its own run, in one neutral colour.** Appended to the
+  name before it, a separator inherits that name's fill — so it changes colour down the list and all
+  but disappears after a pale tint. It is punctuation, not data.
+
+## Predicting the template's line breaks from a step that has neither font
+
+A step decides its layout from strings it measures in its own font, and the template sets those same
+strings in Playfair Display and Lato. So every line count it predicts is an estimate, and the error
+does not point one way:
+
+| At the same pixel size | vs. a step measuring in Arial/DejaVu |
+|---|---|
+| Lato, 11 px | **2.4 % narrower** |
+| Lato, 16 px | 0.8 % narrower |
+| Playfair Display SemiBold, 25 px | **3.2 % wider** |
+
+**Do not "wrap a bit early to be safe".** It reads as prudent and it is not: the footer rows are sized
+so the template just fits them, so wrapping 6 % early broke both onto second lines the frame does not
+have — a render that looks broken while the frame is fine. Give a Lato slot the few percent it actually
+has, take the same few percent off a serif slot, and keep the two directions as separate named
+constants so neither gets applied backwards.
+
+**Measure, don't assume — the templates are in Figma and so are the fonts.** One `use_figma` call
+settles both the width and the line count for a string:
+
+```js
+await figma.loadFontAsync({ family: "Lato", style: "Regular" });   // or the assignment below throws
+const node = figma.createText();                    // inside a temp frame you remove afterwards
+node.fontName = { family: "Lato", style: "Regular" };
+node.fontSize = 16;
+node.characters = subtitle;
+node.textAutoResize = "WIDTH_AND_HEIGHT";
+const naturalWidth = node.width;                    // what the string wants
+node.textAutoResize = "HEIGHT";
+node.resize(slotWidth, node.height);
+const lines = node.height / lineHeight;             // what the slot gives it
+```
+
+That is how the three ratios above were measured, and how the Note was confirmed to take **three**
+lines at 12 px where a step's smaller footer took two.
 
 ## Unit conversions
 
@@ -156,10 +319,28 @@ against the template it targets.
 
 | Element | Color |
 |---|---|
-| Frame background | `#fbf9f3` (warm off-white, **not** pure white) |
+| Frame background | `#fffbf5` (warm off-white, **not** pure white) |
 | Title ink | `#2d2e2d` (serif) |
 | Subtitle | `#5b5b5b` |
-| All footer rows | `#858585`, with bold labels on `Note:`, `Data source:`, `OurWorldinData.org`, `CC-BY` |
+| All footer rows | `#858585` |
+
+## Weights, which are not "regular and bold"
+
+| Slot | Face |
+|---|---|
+| Title | Playfair Display SemiBold |
+| Subtitle | Lato Regular |
+| Footer rows | **Lato Medium**, with Lato Bold on the labels |
+
+The footer's body is Medium, not Regular — swapping it for Regular is a visible flattening of the
+whole block. Bold marks `Note:`, `Data source:`, `OurWorldinData.org`, `CC-BY` **and the author's
+name**: the license row's placeholder reads `Licensed under `(Medium)` CC-BY `(Bold)` by the author `
+(Medium)` [Name of author]`(Bold), so bolding a real name is the template's own convention rather than
+a request to argue with.
+
+A step cannot reproduce this — matplotlib has no rich text, so a mixed-weight row is several text
+objects, and its font may have no Medium at all. Emit the row as runs (`SKILL.md`) and set the faces
+in Figma.
 
 ## Exact strings the templates use
 

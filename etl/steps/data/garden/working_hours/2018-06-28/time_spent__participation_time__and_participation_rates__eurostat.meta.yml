@@ -19,7 +19,7 @@ tables:
         title: Participation rate in leisure, social, and associative life activities (Eurostat)
         unit: '%'
         description: |-
-          The proportion of individuals that spent some time in leisure, social, and associative life activities. Activities include organisational work, informal help to other households, participatory activities, visiting and feasts, social life, entertainment and culture, resting, walking and hiking, sport and outdoor activities, computer games, computing, hobbies and games, reading, TV and video, radio and music, and unspecified leisure.
+          The proportion of individuals that spent some time in leisure, social, and associative life activities. Activities include organizational work, informal help to other households, participatory activities, visiting and feasts, social life, entertainment and culture, resting, walking and hiking, sport and outdoor activities, computer games, computing, hobbies and games, reading, TV and video, radio and music, and unspecified leisure.
       participation_rate_in_personal_care__eurostat:
         title: Participation rate in personal care (Eurostat)
         unit: '%'
@@ -49,7 +49,7 @@ tables:
         title: Participation time in leisure, social, and associative life (Eurostat)
         unit: minutes
         description: |-
-          Measures the average time spent in activities by individuals who took part in leisure, social, and associative life activities. Activities include organisational work, informal help to other households, participatory activities, visiting and feasts, social life, entertainment and culture, resting, walking and hiking, sport and outdoor activities, computer games, computing, hobbies and games, reading, TV and video, radio and music, and unspecified leisure.
+          Measures the average time spent in activities by individuals who took part in leisure, social, and associative life activities. Activities include organizational work, informal help to other households, participatory activities, visiting and feasts, social life, entertainment and culture, resting, walking and hiking, sport and outdoor activities, computer games, computing, hobbies and games, reading, TV and video, radio and music, and unspecified leisure.
       participation_time_in_personal_care__eurostat:
         title: Participation time in personal care (Eurostat)
         unit: minutes
@@ -84,7 +84,7 @@ tables:
         title: Time spent on leisure, social, and associative life (Eurostat)
         unit: minutes
         description: |-
-          Measures the average time spent on leisure, social, and associative life by all individuals. Activities include organisational work, informal help to other households, participatory activities, visiting and feasts, social life, entertainment and culture, resting, walking and hiking, sport and outdoor activities, computer games, computing, hobbies and games, reading, TV and video, radio and music, and unspecified leisure.
+          Measures the average time spent on leisure, social, and associative life by all individuals. Activities include organizational work, informal help to other households, participatory activities, visiting and feasts, social life, entertainment and culture, resting, walking and hiking, sport and outdoor activities, computer games, computing, hobbies and games, reading, TV and video, radio and music, and unspecified leisure.
       time_spent_on_personal_care__eurostat:
         title: Time spent on personal care (Eurostat)
         unit: minutes

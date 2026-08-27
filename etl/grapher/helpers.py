@@ -754,6 +754,13 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
 
 TIME_INTERVALS = {"day", "week", "month", "quarter", "year", "decade"}
 
+# Intervals whose points are shorter than a year. Their time values are not calendar
+# years: they are days-since-`display.zeroDay` integers stored in the "year" column
+# (see `adapt_table_with_dates_to_grapher`), so anything reading those values has to
+# decode them first. "decade" is deliberately absent -- it codes a representative
+# calendar year, not an offset.
+SUB_YEARLY_TIME_INTERVALS = {"day", "week", "month", "quarter"}
+
 
 def _validate_time_interval(tab: Table, col: str) -> None:
     """Validate the display.timeInterval field, and guard against the removed yearIsDay flag."""

@@ -337,7 +337,7 @@ def upsert_metadata(
     if grapher_config:
         admin_api.put_grapher_config(db_variable_id, grapher_config)
     # grapher_config does not exist, but it's still in the database -> delete it
-    elif not grapher_config and db_variable.grapherConfigIdETL:
+    elif not grapher_config and db_variable.patchConfigIdETL:
         admin_api.delete_grapher_config(db_variable_id)
 
     return db_variable
@@ -502,7 +502,7 @@ def _get_timespan(table: pd.DataFrame, variable_meta: VariableMeta) -> str:
     display = variable_meta.display or {}
 
     # Timespan does not work for sub-yearly data.
-    if display.get("timeInterval") in {"day", "week", "month", "quarter"}:
+    if display.get("timeInterval") in gh.SUB_YEARLY_TIME_INTERVALS:
         return ""
 
     years = table.year.unique()

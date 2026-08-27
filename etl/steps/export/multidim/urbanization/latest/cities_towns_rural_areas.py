@@ -294,8 +294,8 @@ def create_stacked_metadata(metric, data_type, location_type=None):
     # Define description_key - same for all data types
     description_key = [
         "The [Degree of Urbanization](https://human-settlement.emergency.copernicus.eu/degurba.php) classifies areas as [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), or [rural areas](#dod:rural-areas-degurba) based on population density and settlement size rather than administrative boundaries. Developed by six international organizations and endorsed by the UN Statistical Commission in 2020, it provides consistent definitions for comparing urbanization across countries.",
-        "Cities are defined as densely populated areas with a minimum density of 1,500 people per square kilometre and at least 50,000 people in total.",
-        "Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometre and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities.",
+        "Cities are defined as densely populated areas with a minimum density of 1,500 people per square kilometer and at least 50,000 people in total.",
+        "Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometer and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities.",
         "Rural areas are places with less than 300 people per km² or a total population of less than 5,000.",
         "The classification uses 1 km² grid cells, combining satellite imagery with census data to map where people actually live.",
     ]
@@ -427,7 +427,7 @@ def create_individual_view_metadata(location_type, metric, data_type):
     metric_descriptions = {
         "population": "Number of people living",
         "popshare": "Share of population living",
-        "density": "Number of people per square kilometre",
+        "density": "Number of people per square kilometer",
         "popshare_change": "Annual rate of change in the population share living",
         "dominant_type": "Shows whether most people live in [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-degurba), or [rural areas](#dod:rural-areas-degurba)",
     }
@@ -462,11 +462,11 @@ def create_individual_view_metadata(location_type, metric, data_type):
     # Add location-specific definitions
     if location_type == "urban_centre":
         description_key.append(
-            "Cities are defined as densely populated areas with a minimum density of 1,500 people per square kilometre and at least 50,000 people in total."
+            "Cities are defined as densely populated areas with a minimum density of 1,500 people per square kilometer and at least 50,000 people in total."
         )
     elif location_type == "urban_cluster":
         description_key.append(
-            "Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometre and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities."
+            "Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometer and at least 5,000 people in total. This includes smaller towns, suburban areas, and peri-urban areas around cities."
         )
     elif location_type == "rural_total":
         description_key.append(
@@ -478,7 +478,7 @@ def create_individual_view_metadata(location_type, metric, data_type):
         )
     elif location_type == "by_dominant_type":
         description_key.append(
-            "Cities are defined as densely populated areas with a minimum density of 1,500 people per square kilometre and at least 50,000 people in total. Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometre and at least 5,000 people in total. Rural areas are everything else."
+            "Cities are defined as densely populated areas with a minimum density of 1,500 people per square kilometer and at least 50,000 people in total. Towns and suburbs are settlements outside cities where people live at moderate density. They have at least 300 people per square kilometer and at least 5,000 people in total. Rural areas are everything else."
         )
 
     # Add data source (classification method)

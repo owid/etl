@@ -36,6 +36,18 @@ EXCLUDE_METADATA_CHANGES = [
     "grapher/artificial_intelligence/.*/epoch",
 ]
 
+# Config fields that are environment- or bookkeeping-specific, so a difference in them is not a
+# difference in the chart. Used both when comparing configs and when resolving conflicts, so that
+# the conflict resolver does not ask users to "resolve" e.g. a version number.
+CONFIG_KEYS_IGNORE = (
+    "id",
+    "isPublished",
+    "bakedGrapherURL",
+    "adminBaseUrl",
+    "dataApiUrl",
+    "version",
+)
+
 
 @dataclass
 class ChartDiffScores:
@@ -911,8 +923,8 @@ def _modified_chart_configs_on_staging(
     base_q = """
     select
         c.id as chartId,
-        MD5(CONCAT(cc.full, IFNULL(isInheritanceEnabled, 0))) as chartChecksum,
-        cc.full as chartConfig,
+        MD5(CONCAT(cc.config, IFNULL(isInheritanceEnabled, 0))) as chartChecksum,
+        cc.config as chartConfig,
         isInheritanceEnabled
     from charts as c
     join chart_configs as cc on c.configId = cc.id
@@ -1155,9 +1167,8 @@ def configs_are_equal(config_1: dict[str, Any], config_2: dict[str, Any], verbos
     assert "isInheritanceEnabled" in config_1, "isInheritanceEnabled must be in config_1"
     assert "isInheritanceEnabled" in config_2, "isInheritanceEnabled must be in config_2"
 
-    exclude_keys = ("id", "isPublished", "bakedGrapherURL", "adminBaseUrl", "dataApiUrl", "version")
-    config_1 = {k: v for k, v in config_1.items() if k not in exclude_keys}
-    config_2 = {k: v for k, v in config_2.items() if k not in exclude_keys}
+    config_1 = {k: v for k, v in config_1.items() if k not in CONFIG_KEYS_IGNORE}
+    config_2 = {k: v for k, v in config_2.items() if k not in CONFIG_KEYS_IGNORE}
 
     # Use pretty print to convert dicts to strings for comparison
     config_1_str = pprint.pformat(config_1, sort_dicts=True)

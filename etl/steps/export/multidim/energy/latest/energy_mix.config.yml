@@ -1,3 +1,5 @@
+grapher_schema: "011"
+
 title:
   title: "Energy mix"
   title_variant: ""
@@ -18,7 +20,7 @@ definitions:
         # where the underlying values are identical under both methods.
         relatedQuestions:
           - text: "Why has our energy data changed?"
-            url: "https://ourworldindata.org/how-primary-energy-is-measured-has-changed-across-our-charts"
+            url: "https://ourworldindata.org/primary-energy-measurement-change"
 dimensions:
   - slug: "source"
     name: "Source"
