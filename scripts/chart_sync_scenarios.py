@@ -49,6 +49,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
+import apps.wizard.app_pages.chart_diff.chart_diff as chart_diff_module
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffsLoader
 from etl.config import DEFAULT_GRAPHER_SCHEMA, Config, OWIDEnv
 from etl.paths import BASE_DIR
@@ -544,12 +545,29 @@ class Scenarios:
             self.reset_chart(original_config, original_etl_config, last_edit)
             self.check("S7: setup — the chart starts out identical on both sides", self.diff() is None,
                        self.describe(self.diff()))
-            variable_id = int(self.staging.read_sql(
-                f"SELECT variableId FROM chart_dimensions WHERE chartId = {self.chart_id} LIMIT 1").variableId[0])
-            checksums = self.staging.read_sql(
-                f"SELECT dataChecksum, metadataChecksum FROM variables WHERE id = {variable_id}").iloc[0]
+            variable = self.staging.read_sql(
+                "SELECT v.id, v.catalogPath, v.datasetId, v.dataChecksum, v.metadataChecksum FROM variables v "
+                f"JOIN chart_dimensions cd ON cd.variableId = v.id WHERE cd.chartId = {self.chart_id} LIMIT 1").iloc[0]
+            variable_id = int(variable.id)
+            checksums = variable
+            # An ETL run that rewrites an indicator moves three things, and chart-diff wants all
+            # three before it will show the chart:
+            #   - the indicator's data checksum, which is what actually differs;
+            #   - the dataset's dataEditedAt, which chart-diff uses to ignore indicators that were
+            #     last touched before this staging server existed;
+            #   - the branch's git diff, which it uses to drop changes that come from the branch
+            #     lagging behind master rather than from the branch's own work.
+            # The first two are database state and are set here. The third is the working tree, so
+            # it is stood in for below. That filter is therefore NOT exercised by this scenario.
+            dataset_stamps = self.staging.read_sql(
+                f"SELECT dataEditedAt, metadataEditedAt FROM datasets WHERE id = {int(variable.datasetId)}").iloc[0]
+            dataset_path = "/".join(str(variable.catalogPath).split("/")[:4])
+            self.sql(self.staging, "UPDATE datasets SET dataEditedAt = NOW(), metadataEditedAt = NOW() WHERE id = :d",
+                     d=int(variable.datasetId))
             self.sql(self.staging, "UPDATE variables SET dataChecksum = 'changed-by-scenarios' WHERE id = :v",
                      v=variable_id)
+            real_changed_paths = chart_diff_module.get_all_changed_catalog_paths
+            chart_diff_module.get_all_changed_catalog_paths = lambda _files: {dataset_path}
             d = self.diff(data=True)
             self.check("S7: the chart is listed for review, as a data change",
                        d is not None and "data" in d.change_types, self.describe(d))
@@ -569,9 +587,12 @@ class Scenarios:
             took, log = self.chart_sync()
             self.check("S8: chart-sync writes nothing for it either",
                        not took["update"] and not took["create"], log)
-            # Back to the values the indicator actually had, not to NULL.
+            # Back to the values the indicator and its dataset actually had.
+            chart_diff_module.get_all_changed_catalog_paths = real_changed_paths
             self.sql(self.staging, "UPDATE variables SET dataChecksum = :d, metadataChecksum = :m WHERE id = :v",
                      d=checksums.dataChecksum, m=checksums.metadataChecksum, v=variable_id)
+            self.sql(self.staging, "UPDATE datasets SET dataEditedAt = :d, metadataEditedAt = :m WHERE id = :i",
+                     d=dataset_stamps.dataEditedAt, m=dataset_stamps.metadataEditedAt, i=int(variable.datasetId))
 
             # ------------------------------------------------------------------ S9
             self.phase("S9: the chart is repointed at a different indicator")

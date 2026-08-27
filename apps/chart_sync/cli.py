@@ -376,6 +376,9 @@ def cli(
                     else:
                         # New chart has been approved
                         if diff.is_approved:
+                            # Say so, as the update path does. Without this a dry run reports
+                            # nothing at all for a chart it would create.
+                            log.info("chart_sync.chart_create", slug=chart_slug, chart_id=chart_id)
                             charts_synced += 1
                             synced_chart_ids.add(chart_id)
                             # Note: New charts don't have old datasets to archive, so no dataset IDs collected
