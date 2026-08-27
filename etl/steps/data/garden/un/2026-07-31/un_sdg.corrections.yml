@@ -992,18 +992,19 @@
 #   1. Poland's whole series is published as a FRACTION while labelled PERCENT, so it is ~100x
 #      too small. The SDG API returns 0.00089-0.00557 for 2015-2024, which renders as 0.00-0.01%
 #      on our charts, while Poland's own reported total is $0.62-2.71bn. Dividing that total by
-#      Poland's nominal GDP reproduces the published number as a fraction almost exactly --
-#      2020: 2.71/599.4 = 0.452% against a published 0.00448; 2022: 0.62/688 = 0.090% against
+#      Poland's nominal GDP (World Bank, NY.GDP.MKTP.CD) reproduces the published number as a
+#      fraction almost exactly --
+#      2020: 2.71/605.9 = 0.447% against a published 0.00448; 2022: 0.62/695.6 = 0.089% against
 #      0.00089 -- and Poland is the only entity in the indicator whose total exceeds $0.1bn
-#      while its share reads 0. Denmark, by contrast, is in percent (1.00931/424 = 0.238%
+#      while its share reads 0. Denmark, by contrast, is in percent (1.00931/424.5 = 0.238%
 #      against a published 0.23775), as is every other country checked. Poland's per-capita
 #      series agrees with its total (25.32 $/capita x 38.5m = $0.975bn against a reported
 #      $0.98bn), so the total is intact and only the share is mis-scaled.
 #
 #      Dropped rather than rescaled. Multiplying by 100 would publish an OWID-adjusted number
 #      under a UN-attributed indicator, which is the trade #6760 declined for EN_HAZ_PCAP; and
-#      2024 does not fit the pattern as cleanly as 2015-2023 (implied GDP $456bn against
-#      Poland's actual ~$915bn), so at least one year may be wrong for a second reason. Poland
+#      2024 does not fit the pattern as cleanly as 2015-2023 (implied GDP $455.8bn against
+#      Poland's actual $917.8bn), so that year may be wrong for a second reason. Poland
 #      keeps its total and per-capita series, which are unaffected.
 #
 #   2. Denmark and Poland are the only two entities in the indicator with 2025 and 2026 values,

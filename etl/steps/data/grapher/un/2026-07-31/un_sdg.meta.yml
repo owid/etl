@@ -848,8 +848,8 @@ tables:
   # data: the OECD deleted the United States from its Inventory of Support Measures for Fossil
   # Fuels at the US's request in December 2025, retroactively for all years, so the US series is
   # flat at roughly one-eighth of its former level with no break to signal it. See
-  # owid/owid-issues#2516, and un_sdg.corrections.yml for the separate Latvia/Italy/Venezuela
-  # source errors in the same indicator.
+  # owid/owid-issues#2516, and un_sdg.corrections.yml for the five separate source errors in the
+  # same indicator (Latvia, Italy, Venezuela, Poland, Denmark).
   _12_c_1__er_ffs_cmpt_cd:
     variables:
       _12_c_1__er_ffs_cmpt_cd:
