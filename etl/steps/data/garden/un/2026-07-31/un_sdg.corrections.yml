@@ -48,3 +48,816 @@
   expect: {lt: 100}
   provider: International Labour Organization
   status: open
+
+# ---------------------------------------------------------------------------------------------
+# Indicator 12.4.2, series EN_HAZ_PCAP (hazardous waste generated, kg per capita): the 2026 Q2
+# release publishes the RECIPROCAL of the per-capita rate for 71 of the 116 countries that have
+# a usable total.
+#
+# The signature is algebraic, not statistical. For every affected country-year, the published
+# value multiplied by the rate implied by the country's own EN_HAZ_GENV total and its population
+# equals 100:
+#
+#     published_kg_per_capita  x  (EN_HAZ_GENV_tonnes * 1000 / population)  =  100
+#
+#   Russia 2018 : published 0.11    | implied 883      | product 100
+#   China  2023 : published 1.35    | implied 74.1     | product 100
+#   Belarus 2023: published 0.39    | implied 253      | product 100
+#
+# It runs in both directions, which is why it is easy to miss: where the true rate is small the
+# published value is enormous (Tanzania peaks at 211,720 "kg per capita"), and where the true
+# rate is large the published value collapses to hundredths of a kilogram. Where the true rate
+# is near 10 kg the two are numerically indistinguishable.
+#
+# EN_HAZ_GENV (the total, in tonnes) is unaffected and is byte-identical to the previous release
+# for every country checked, so the underlying national reporting is intact -- only the derived
+# per-capita series is wrong. EN_HAZ_GENGDP (per unit of GDP) is also unaffected.
+#
+# This is new in this release. Running the same test against the 2025-10-29 snapshot, the
+# reciprocal signature appears for 3 countries; here it appears for 71.
+#
+# The affected values are dropped rather than recomputed: deriving kg per capita ourselves from
+# EN_HAZ_GENV and our population series would silently publish an OWID-computed number under a
+# UN-attributed indicator. If we decide we want that series, it belongs in step code with its own
+# processing description, not here.
+#
+# LIMITATION: 25 of the entries carry no `expect` guard (Algeria, Azerbaijan, Bangladesh, Belarus,
+# Bermuda, China, Dominica, Fiji, French Guiana, Guadeloupe, Guatemala, Hong Kong, India, Jordan,
+# Martinique, Mauritius, Monaco, Oman, Palestine, Philippines, Qatar, Reunion, Thailand, Trinidad
+# and Tobago, Ukraine). Their published and implied values overlap in magnitude -- around 10 kg per
+# capita a number and its reciprocal-times-100 are the same size -- so no threshold separates a
+# corrupted value from a corrected one. The other 47 entries do carry a guard and will fail the
+# build once the UN corrects them; treat that failure as the signal to re-check all 71.
+#
+# Reported upstream: see the PR for the message sent to the SDG data team.
+# ---------------------------------------------------------------------------------------------
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Algeria}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2007: 10.52 kg/capita published
+    against 9.509 kg/capita implied by 325,100 tonnes; product = 100.0.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Andorra}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 7.12 kg/capita published
+    against 14.05 kg/capita implied by 1,136 tonnes; product = 100.0.
+  expect: {lt: 9.99548}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Argentina}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2021: 4.87 kg/capita published
+    against 20.54 kg/capita implied by 930,850 tonnes; product = 100.0.
+  expect: {lt: 10.0037}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Armenia}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 0.01 kg/capita published
+    against 1.087e+04 kg/capita implied by 32,000,570 tonnes; product = 108.7.
+  expect: {lt: 9.98198}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Azerbaijan}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 4.43 kg/capita published
+    against 22.57 kg/capita implied by 232,926 tonnes; product = 100.0.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Bahrain}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2019: 1.61 kg/capita published
+    against 62.25 kg/capita implied by 92,481 tonnes; product = 100.2.
+  expect: {lt: 9.99916}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Bangladesh}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2021: 1.54 kg/capita published
+    against 64.82 kg/capita implied by 10,867,839 tonnes; product = 99.8.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Belarus}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 0.39 kg/capita published
+    against 253.3 kg/capita implied by 2,309,131 tonnes; product = 98.8.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Belize}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2000: 31.07 kg/capita published
+    against 3.218 kg/capita implied by 775 tonnes; product = 100.0.
+  expect: {gt: 9.99966}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Benin}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2002: 452.03 kg/capita published
+    against 0.2212 kg/capita implied by 1,698 tonnes; product = 100.0.
+  expect: {gt: 10}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Bermuda}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2019: 3.56 kg/capita published
+    against 28.07 kg/capita implied by 1,800 tonnes; product = 99.9.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Bhutan}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2019: 213.26 kg/capita published
+    against 0.4689 kg/capita implied by 359 tonnes; product = 100.0.
+  expect: {gt: 10}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Burkina Faso}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2011: 91048.7 kg/capita published
+    against 0.001098 kg/capita implied by 18 tonnes; product = 100.0.
+  expect: {gt: 10}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Cameroon}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2009: 219.28 kg/capita published
+    against 0.456 kg/capita implied by 8,717 tonnes; product = 100.0.
+  expect: {gt: 10.0001}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Cape Verde}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2014: 14.44 kg/capita published
+    against 6.927 kg/capita implied by 3,549 tonnes; product = 100.0.
+  expect: {gt: 10.0013}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: China}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 1.35 kg/capita published
+    against 74.14 kg/capita implied by 105,465,000 tonnes; product = 100.1.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Cuba}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2021: 4.72 kg/capita published
+    against 21.17 kg/capita implied by 235,498 tonnes; product = 99.9.
+  expect: {lt: 10.001}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Dominica}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2021: 8.75 kg/capita published
+    against 11.42 kg/capita implied by 768 tonnes; product = 100.0.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Ecuador}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2020: 125.5 kg/capita published
+    against 0.7968 kg/capita implied by 13,981 tonnes; product = 100.0.
+  expect: {gt: 10.0002}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: El Salvador}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2021: 0.44 kg/capita published
+    against 228.4 kg/capita implied by 1,428,520 tonnes; product = 100.5.
+  expect: {lt: 10.0147}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Fiji}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 4.82 kg/capita published
+    against 20.73 kg/capita implied by 19,158 tonnes; product = 99.9.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: French Guiana}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 17.98 kg/capita published
+    against 5.56 kg/capita implied by 1,687 tonnes; product = 100.0.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Guadeloupe}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 2.86 kg/capita published
+    against 34.94 kg/capita implied by 13,157 tonnes; product = 99.9.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Guatemala}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2017: 106.45 kg/capita published
+    against 0.9394 kg/capita implied by 15,564 tonnes; product = 100.0.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Hong Kong}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 26.81 kg/capita published
+    against 3.73 kg/capita implied by 27,765 tonnes; product = 100.0.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: India}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 9.18 kg/capita published
+    against 10.89 kg/capita implied by 15,657,711 tonnes; product = 100.0.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Iraq}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 124.59 kg/capita published
+    against 0.8026 kg/capita implied by 36,178 tonnes; product = 100.0.
+  expect: {gt: 9.99987}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Jamaica}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2006: 27.01 kg/capita published
+    against 3.702 kg/capita implied by 10,000 tonnes; product = 100.0.
+  expect: {gt: 10.0003}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Jordan}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2021: 14.62 kg/capita published
+    against 6.842 kg/capita implied by 75,715 tonnes; product = 100.0.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Kazakhstan}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 0.05 kg/capita published
+    against 2159 kg/capita implied by 43,894,188 tonnes; product = 108.0.
+  expect: {lt: 10.3243}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Kenya}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2017: 128.3 kg/capita published
+    against 0.7795 kg/capita implied by 38,347 tonnes; product = 100.0.
+  expect: {gt: 10.0002}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Kyrgyzstan}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2017: 0.05 kg/capita published
+    against 2033 kg/capita implied by 12,648,247 tonnes; product = 101.7.
+  expect: {lt: 10.191}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Lebanon}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2002: 4.44 kg/capita published
+    against 22.51 kg/capita implied by 100,492 tonnes; product = 100.0.
+  expect: {lt: 9.99814}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Lesotho}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2019: 782.7 kg/capita published
+    against 0.1278 kg/capita implied by 282 tonnes; product = 100.0.
+  expect: {gt: 10.0001}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Liechtenstein}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 0.44 kg/capita published
+    against 228.3 kg/capita implied by 9,047 tonnes; product = 100.5.
+  expect: {lt: 10.0034}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Macao}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 60.91 kg/capita published
+    against 1.642 kg/capita implied by 1,172 tonnes; product = 100.0.
+  expect: {gt: 9.99938}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Madagascar}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2007: 44.21 kg/capita published
+    against 2.262 kg/capita implied by 45,957 tonnes; product = 100.0.
+  expect: {gt: 9.99975}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Malaysia}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 0.6 kg/capita published
+    against 166.3 kg/capita implied by 5,841,597 tonnes; product = 99.8.
+  expect: {lt: 10.003}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Martinique}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 8.04 kg/capita published
+    against 12.44 kg/capita implied by 4,304 tonnes; product = 100.0.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Mauritius}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2017: 5.98 kg/capita published
+    against 16.72 kg/capita implied by 21,576 tonnes; product = 100.0.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Moldova}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2021: 60.29 kg/capita published
+    against 1.659 kg/capita implied by 5,015 tonnes; product = 100.0.
+  expect: {gt: 10.0007}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Monaco}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 0.86 kg/capita published
+    against 115.7 kg/capita implied by 4,512 tonnes; product = 99.5.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Mongolia}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 0.79 kg/capita published
+    against 126.4 kg/capita implied by 433,903 tonnes; product = 99.9.
+  expect: {lt: 9.99244}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Morocco}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2013: 11.68 kg/capita published
+    against 8.562 kg/capita implied by 289,284 tonnes; product = 100.0.
+  expect: {gt: 10.0001}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Myanmar}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2021: 6101.38 kg/capita published
+    against 0.01639 kg/capita implied by 875 tonnes; product = 100.0.
+  expect: {gt: 10}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Niger}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2005: 2.48 kg/capita published
+    against 40.27 kg/capita implied by 554,000 tonnes; product = 99.9.
+  expect: {lt: 10.005}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Oman}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2024: 5.06 kg/capita published
+    against 19.75 kg/capita implied by 104,285 tonnes; product = 99.9.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Palestine}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2016: 0.65 kg/capita published
+    against 152.8 kg/capita implied by 707,791 tonnes; product = 99.3.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Panama}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2011: 119.35 kg/capita published
+    against 0.8379 kg/capita implied by 3,095 tonnes; product = 100.0.
+  expect: {gt: 10}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Peru}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2021: 1.58 kg/capita published
+    against 63.14 kg/capita implied by 2,093,460 tonnes; product = 99.8.
+  expect: {lt: 10.007}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Philippines}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2019: 2.3 kg/capita published
+    against 43.53 kg/capita implied by 4,823,160 tonnes; product = 100.1.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Qatar}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 1.64 kg/capita published
+    against 60.92 kg/capita implied by 181,477 tonnes; product = 99.9.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Reunion}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 4.97 kg/capita published
+    against 20.1 kg/capita implied by 17,589 tonnes; product = 99.9.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Russia}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 0.18 kg/capita published
+    against 557.6 kg/capita implied by 81,093,016 tonnes; product = 100.4.
+  expect: {lt: 10.0181}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Saint Vincent and the Grenadines}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2002: 75564.7 kg/capita published
+    against 0.001323 kg/capita implied by 0 tonnes; product = 100.0.
+  expect: {gt: 9.99921}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Saudi Arabia}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2020: 1.79 kg/capita published
+    against 55.97 kg/capita implied by 1,734,527 tonnes; product = 100.2.
+  expect: {lt: 9.99831}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Seychelles}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2021: 190.65 kg/capita published
+    against 0.5245 kg/capita implied by 65 tonnes; product = 100.0.
+  expect: {gt: 9.99952}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Singapore}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2020: 1.56 kg/capita published
+    against 63.91 kg/capita implied by 359,170 tonnes; product = 99.7.
+  expect: {lt: 9.9982}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: South Africa}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2017: 0.11 kg/capita published
+    against 903.6 kg/capita implied by 52,076,716 tonnes; product = 99.4.
+  expect: {lt: 10.0031}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Suriname}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 62888.6 kg/capita published
+    against 0.00159 kg/capita implied by 1 tonnes; product = 100.0.
+  expect: {gt: 9.99994}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Syria}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2003: 38889.8 kg/capita published
+    against 0.002571 kg/capita implied by 46 tonnes; product = 100.0.
+  expect: {gt: 10}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Tanzania}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2021: 92086.2 kg/capita published
+    against 0.001086 kg/capita implied by 68 tonnes; product = 100.0.
+  expect: {gt: 9.99982}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Thailand}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 30.11 kg/capita published
+    against 3.321 kg/capita implied by 238,135 tonnes; product = 100.0.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Togo}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2013: 621.53 kg/capita published
+    against 0.1724 kg/capita implied by 1,172 tonnes; product = 107.2.
+  expect: {gt: 10.3755}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Trinidad and Tobago}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2022: 4617.04 kg/capita published
+    against 0.02166 kg/capita implied by 32 tonnes; product = 100.0.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Tunisia}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2020: 3.57 kg/capita published
+    against 28 kg/capita implied by 335,227 tonnes; product = 99.9.
+  expect: {lt: 10.0009}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Ukraine}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 20.07 kg/capita published
+    against 4.984 kg/capita implied by 188,048 tonnes; product = 100.0.
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: United Arab Emirates}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 1.24 kg/capita published
+    against 80.94 kg/capita implied by 861,330 tonnes; product = 100.4.
+  expect: {lt: 9.99942}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Uzbekistan}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 28.39 kg/capita published
+    against 3.523 kg/capita implied by 125,593 tonnes; product = 100.0.
+  expect: {gt: 10.0005}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Vietnam}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2023: 7.27 kg/capita published
+    against 13.76 kg/capita implied by 1,381,027 tonnes; product = 100.0.
+  expect: {lt: 10.0024}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Zambia}
+  action: drop
+  reason: >-
+    Published per-capita value is the reciprocal of the rate implied by EN_HAZ_GENV and
+    population (see the block comment above). 2005: 14.65 kg/capita published
+    against 6.827 kg/capita implied by 80,000 tonnes; product = 100.0.
+  expect: {gt: 10.0005}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open
+# Brunei is broken differently: its total (EN_HAZ_GENV) reads 0.00-0.01 tonnes while the
+# per-capita series reads 8.7-36 million "kg per capita". The two series look transposed or
+# mis-scaled against each other; either way no per-capita value here is usable.
+- indicator: value
+  match: {seriescode: EN_HAZ_PCAP, country: Brunei}
+  action: drop
+  reason: >-
+    Hazardous waste of 8.7-36 million kg per capita is physically impossible (the highest
+    credible national rate in the series is ~2,200 kg). Brunei's own EN_HAZ_GENV total reads
+    0.00-0.01 tonnes over the same years, so the two series are inconsistent by ~12 orders of
+    magnitude.
+  expect: {gt: 1000000}
+  provider: United Nations Statistics Division and United Nations Environment Programme
+  status: open

@@ -22,7 +22,25 @@ def test_no_status_file_leaves_the_link_alone():
 
 
 def test_successful_run_is_marked():
+    # No changedPages: an ops host that predates the field, so the run is all we know
     assert make_screenshots_line(_status(), branch=BRANCH, head_sha=SHA) == f"✅ {COMPARE_URL}"
+
+
+def test_a_run_that_found_nothing_says_so():
+    line = make_screenshots_line(_status(changedPages=[]), branch=BRANCH, head_sha=SHA)
+    assert line == f"✅ no changes: {COMPARE_URL}"
+
+
+def test_changed_pages_are_worth_a_look():
+    # The case the plain tick used to hide: this branch repaints the site
+    status = _status(changedPages=["energy", "homepage", "life-expectancy-page"])
+    line = make_screenshots_line(status, branch=BRANCH, head_sha=SHA)
+    assert line == f"⚠️ 3 pages changed: {COMPARE_URL}"
+
+
+def test_one_changed_page_is_singular():
+    line = make_screenshots_line(_status(changedPages=["energy"]), branch=BRANCH, head_sha=SHA)
+    assert line == f"⚠️ 1 page changed: {COMPARE_URL}"
 
 
 def test_failed_run_says_the_link_is_stale():
@@ -64,6 +82,32 @@ def test_status_written_by_the_ops_script_parses(tmp_path):
     # The shape templates/lxc-manager/site-screenshots writes
     path = tmp_path / "site-screenshots-status.json"
     path.write_text(
-        json.dumps({"status": "ok", "branch": BRANCH, "grapherCommit": SHA, "finishedAt": "2026-08-21T08:00:00+00:00"})
+        json.dumps(
+            {
+                "status": "ok",
+                "branch": BRANCH,
+                "grapherCommit": SHA,
+                "finishedAt": "2026-08-21T08:00:00+00:00",
+                "changedPages": ["energy"],
+            }
+        )
     )
-    assert make_screenshots_line(read_screenshots_status(path), branch=BRANCH, head_sha=SHA) == f"✅ {COMPARE_URL}"
+    line = make_screenshots_line(read_screenshots_status(path), branch=BRANCH, head_sha=SHA)
+    assert line == f"⚠️ 1 page changed: {COMPARE_URL}"
+
+
+def test_a_failed_run_carries_no_changed_pages(tmp_path):
+    # The ops script leaves the field out rather than sending an empty list, which would
+    # claim the branch changes nothing
+    path = tmp_path / "site-screenshots-status.json"
+    path.write_text(
+        json.dumps(
+            {
+                "status": "failed",
+                "branch": BRANCH,
+                "grapherCommit": SHA,
+                "finishedAt": "2026-08-21T08:00:00+00:00",
+            }
+        )
+    )
+    assert make_screenshots_line(read_screenshots_status(path), branch=BRANCH, head_sha=SHA).startswith("❌")
