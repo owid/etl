@@ -133,6 +133,14 @@ class Collection(MDIMBase):
     grapher_schema: str | None = None
     _default_dimensions: dict[str, str] | None = None
 
+    # The published "download the complete dataset" package covering every
+    # dimension combination, as opposed to the per-view download. Shape matches
+    # grapher's DownloadPackage type. Not authored by hand: `save()` builds the
+    # package and fills this in, so a collection whose save() was passed
+    # `download_package=False` (or that failed to build one) leaves it None and
+    # its page renders exactly as before.
+    download_package: dict | None = None
+
     # Internal use. For save() method.
     _collection_type: str | None = field(init=False, default="multidim")
     _group_operations_done: int = field(init=False, default=0)
@@ -220,6 +228,13 @@ class Collection(MDIMBase):
         return EXPORT_DIR / collection_dir / (self.catalog_path.replace("#", "/") + ".config.json")
 
     @property
+    def local_download_package_dir(self) -> Path:
+        # Where the download package's files are written before being uploaded to R2.
+        # Kept next to the local config JSON, for the same reason: so the artifacts a
+        # run published can be inspected on disk afterwards.
+        return self.local_config_path.parent / "download_package"
+
+    @property
     def short_name(self):
         _, name = self.catalog_path.split("#")
         return name
@@ -238,6 +253,7 @@ class Collection(MDIMBase):
         tolerate_extra_indicators: bool = False,
         prune_choices: bool = True,
         prune_dimensions: bool = True,
+        download_package: bool = True,
     ):
         # Ensure we have an environment set
         if owid_env is None:
@@ -310,6 +326,46 @@ class Collection(MDIMBase):
 
         # Upsert to DB
         self.upsert_to_db(owid_env)
+
+        # Build and publish the complete-dataset download package.
+        if download_package:
+            self.save_download_package(owid_env)
+
+    def save_download_package(self, owid_env: OWIDEnv | None = None) -> None:
+        """Build the complete-dataset package (wide CSV + metadata.json + readme.md
+        zipped, plus Parquet + metadata.json), publish it to R2, and record where it
+        landed in the collection's config so the data page can link to it.
+
+        Called at the end of `save()`, and deliberately *after* `upsert_to_db()`:
+        the builder needs the page slug, which grapher assigns when the MDIM row is
+        created, and the indicators to be resolvable in the DB. That ordering is why
+        the config gets upserted a second time here -- the first upsert necessarily
+        happened before there was a package to point at.
+
+        Two kinds of collection are skipped, both because there is no page to attach a
+        package to: explorers, which have no `multi_dim_data_pages` row at all, and
+        MDIMs that have a row but no slug because nobody has published them yet. The
+        latter is not an edge case -- 13 of the 59 multidim steps are in that state on a
+        staging server -- so it must not fail the step. A collection published later
+        gets its package on the next run.
+        """
+        from etl.collection.download_package import build_download_package_for_collection, resolve_page_slug
+
+        if self._collection_type != "multidim":
+            log.info("collection.download_package.skipped_not_multidim", collection_type=self._collection_type)
+            return
+
+        if resolve_page_slug(self) is None:
+            log.info("collection.download_package.skipped_unpublished", catalog_path=self.catalog_path)
+            return
+
+        package = build_download_package_for_collection(self, dest_dir=self.local_download_package_dir)
+        self.download_package = package.to_config()
+
+        # Re-export and re-upsert so the local debug config and the DB both carry the
+        # package, rather than the version from before it was built.
+        self.save_config_local()
+        self.upsert_to_db(owid_env or OWID_ENV)
 
     def upsert_to_db(self, owid_env: OWIDEnv):
         # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
