@@ -15,9 +15,10 @@ decide whether an edit survives:
     S4  approved, then production is edited                    -> approval expires, sync refuses
     S5  a chart the branch created, then edited in production  -> sync refuses
     S6  corner case normal work never reaches: see the note under S6 below
-    S7  a dataset update: the data changes, the settings don't    -> listed for review, never synced
-    S8  indicator metadata changes                                -> listed for review, never synced
-    S9  the chart is repointed at a different indicator           -> listed, and synced
+    S7  the same indicator's numbers change (a `latest` dataset)  -> listed for review, never synced
+    S8  the same indicator's metadata changes                     -> listed for review, never synced
+    S9  a dataset bumped to a new version, so the chart plots a   -> listed as a settings change,
+        new indicator id                                             and synced
     S10 a chart made by hand on staging                           -> created in the target
 
 Read the PASS/FAIL lines, not the prose: each check states what should happen and prints what
@@ -537,11 +538,15 @@ class Scenarios:
 
 
             # ------------------------------------------------------------------ S7
-            self.phase("S7: a dataset update — the chart's data changes, its settings do not")
-            # The commonest reason a chart appears in chart-diff. ETL rewrites the indicator's
-            # values, and grapher records that as a new data checksum. Nothing about the chart
-            # itself changes, so there is nothing for chart-sync to copy: the new data is already
-            # in the target, put there by the target's own ETL run.
+            self.phase("S7: the same indicator's numbers change, its id does not")
+            # A dataset whose version does not move: a `latest` one such as COVID or wildfires, or
+            # a corrected source re-snapshotted into the same version. The indicator keeps its id
+            # and catalog path, only its numbers change. Nothing about the chart changes, so there
+            # is nothing for chart-sync to copy: the new data is already in the target, put there
+            # by the target's own ETL run.
+            #
+            # A dataset bumped to a NEW version behaves differently: the chart ends up plotting a
+            # different indicator id, which is a settings change. That is S9.
             self.reset_chart(original_config, original_etl_config, last_edit)
             self.check("S7: setup — the chart starts out identical on both sides", self.diff() is None,
                        self.describe(self.diff()))
@@ -578,7 +583,7 @@ class Scenarios:
                        not took["update"] and not took["create"], log)
 
             # ------------------------------------------------------------------ S8
-            self.phase("S8: indicator metadata changes (a title, a unit, a description)")
+            self.phase("S8: the same indicator's metadata changes (a title, a unit, a description)")
             self.sql(self.staging, "UPDATE variables SET metadataChecksum = 'changed-by-scenarios' WHERE id = :v",
                      v=variable_id)
             d = self.diff(metadata=True)
@@ -595,9 +600,12 @@ class Scenarios:
                      d=dataset_stamps.dataEditedAt, m=dataset_stamps.metadataEditedAt, i=int(variable.datasetId))
 
             # ------------------------------------------------------------------ S9
-            self.phase("S9: the chart is repointed at a different indicator")
-            # A re-versioned dataset mints new indicator ids, so the chart's settings now name a
-            # different one. This is a settings change like any other, and it must sync.
+            self.phase("S9: a dataset is bumped to a new version, so the chart plots a new indicator id")
+            # The everyday dataset update: a new version folder mints new indicator ids, the DAG
+            # points at them, and the chart's settings now name a different id. Chart-diff shows
+            # this as a settings change, not a data change -- the new indicator has no counterpart
+            # in the target, so the data comparison drops it (it joins the two sides on catalog
+            # path). It must sync, or the target's chart keeps plotting the old indicator.
             other_variable_id = int(self.staging.read_sql(
                 f"SELECT variableId FROM chart_dimensions WHERE variableId <> {variable_id} "
                 "AND chartId IN (SELECT id FROM charts WHERE publishedAt IS NOT NULL) LIMIT 1").variableId[0])
