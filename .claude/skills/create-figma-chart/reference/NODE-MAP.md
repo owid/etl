@@ -84,12 +84,18 @@ one across, and never state a global figure:
 | Static **desktop** — Horizontal / Vertical (850) | **2×** | 1700 wide |
 | Small guided / pull (302) | **2×** | 604 wide |
 
-Two things this table is *not*. It is not `get_screenshot`'s business — that call only ever
-downscales and clamps at the node's natural size, so it cannot produce any of these (SKILL.md → Step
-9). And the 302 row is not the admin endpoint: `GET /api/figma/image` hardcodes `scale: 3` for the
-Cloudflare upload (SMALL-CHARTS.md → Delivery), which is a *different* number from the export
-panel's 2× for the same template. Both are correct for their own route; quoting one for the other is
-the mistake to avoid.
+**These are the numbers to use — for exporting a deliverable and for any check that renders at export
+scale.** A pixel probe takes its family's row here, so a hairline is measured at the size it ships at
+(CHECKS.md → the sub-pixel-stroke note).
+
+This table is not `get_screenshot`'s business — that call only ever downscales and clamps at the
+node's natural size, so it cannot produce any of these (SKILL.md → Step 9). Clone, `rescale` to the
+row's factor, and screenshot the clone.
+
+> **Unreconciled:** `SMALL-CHARTS.md` → Delivery documents `GET /api/figma/image` hardcoding
+> `scale: 3` for the 302 Cloudflare upload, which disagrees with the 2× above. The 2× is the scale to
+> use; the endpoint's constant is a code fact this skill cannot change, so it is flagged here rather
+> than quietly contradicted. Whoever owns that route should settle it.
 
 Two traps in the slot-size table. The 850-wide pair's **12px note and source** are the smallest body text of any family, so a source line that overruns there cannot be fixed by dropping a size the way a 14px one can. And its **license shares a row with the 467px tagline inside 818px** — the slot holds roughly fifty characters, so a two-author credit overruns the tagline and prints on top of it; the phrasing gives (`by <names>` rather than `by the authors <names>`), never the names. When even that overruns, break the line yourself with `\n` after `by` rather than letting it wrap or dropping a size — the wrap point is then a decision instead of an accident, and both lines carry real content. TEMPLATES.md carries the measured widths.
 
