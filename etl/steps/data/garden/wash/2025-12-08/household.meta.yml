@@ -50,7 +50,7 @@ definitions:
   surface_water_desc: &surface_water_desc |
     Surface water includes rivers, streams, ponds, lakes, dams, canals and irrigation channels.
   safely_managed_water_desc: &safely_managed_water_desc |
-    Safely managed drinking water services are defined as an [improved drinking water source](#dod:improved-water-source) that is located on premises, available when needed and free from faecal and priority chemical contamination.
+    Safely managed drinking water services are defined as an [improved drinking water source](#dod:improved-water-source) that is located on premises, available when needed and free from fecal and priority chemical contamination.
   piped_water_desc: &piped_water_desc |
     Piped water refers to drinking water that is delivered through a pipe such as tap water on people's premises, their neighbor's premises, or a public tap/standpipe.
   non_piped_water_desc: &non_piped_water_desc |
@@ -154,9 +154,9 @@ tables:
         unit: "%"
         short_unit: "%"
       wat_imp_qual:
-        title: Share of the {definitions.residence} population using an improved drinking water source free of faecal and priority chemical contamination
-        description_short: Proportion of people using an [improved drinking water source](#dod:improved-water-source) that is free from faecal and priority chemical contamination.
-        description_from_producer: Use of improved drinking water sources free of faecal and priority chemical contamination.
+        title: Share of the {definitions.residence} population using an improved drinking water source free of fecal and priority chemical contamination
+        description_short: Proportion of people using an [improved drinking water source](#dod:improved-water-source) that is free from fecal and priority chemical contamination.
+        description_from_producer: Use of improved drinking water sources free of fecal and priority chemical contamination.
         description_key:
           - *drinking_water_rationale
           - *improved_drinking_water_desc
@@ -191,7 +191,7 @@ tables:
         short_unit: "%"
       wat_pip:
         title: Share of the {definitions.residence} population using piped drinking water
-        description_short: Proportion of people using piped drinking water, such as tap water on their own or their neighbour's premises, or a public tap.
+        description_short: Proportion of people using piped drinking water, such as tap water on their own or their neighbor's premises, or a public tap.
         description_from_producer: Use of piped drinking water sources.
         description_key:
           - *drinking_water_rationale
@@ -203,7 +203,7 @@ tables:
         short_unit: "%"
       wat_sm:
         title: Share of the {definitions.residence} population using safely managed drinking water
-        description_short: Proportion of people using an [improved drinking water source](#dod:improved-water-source) that is located on premises, available when needed and free from faecal and priority chemical contamination.
+        description_short: Proportion of people using an [improved drinking water source](#dod:improved-water-source) that is located on premises, available when needed and free from fecal and priority chemical contamination.
         description_from_producer: Use of safely managed drinking water services.
         description_key:
           - *drinking_water_rationale
@@ -563,9 +563,9 @@ tables:
           - *usage_vs_access
       wat_imp_qual_pop:
         title: |-
-          {definitions.residence_pop} using improved drinking water free of faecal and priority chemical contamination
-        description_short: Number of people using an [improved drinking water source](#dod:improved-water-source) that is free from faecal and priority chemical contamination.
-        description_from_producer: Use of improved drinking water sources free of faecal and priority chemical contamination
+          {definitions.residence_pop} using improved drinking water free of fecal and priority chemical contamination
+        description_short: Number of people using an [improved drinking water source](#dod:improved-water-source) that is free from fecal and priority chemical contamination.
+        description_from_producer: Use of improved drinking water sources free of fecal and priority chemical contamination
         unit: people
         display:
           numDecimalPlaces: 0
@@ -606,7 +606,7 @@ tables:
       wat_pip_pop:
         title: |-
           {definitions.residence_pop} using piped drinking water
-        description_short: Number of people using piped drinking water, such as tap water on their own or their neighbour's premises, or a public tap.
+        description_short: Number of people using piped drinking water, such as tap water on their own or their neighbor's premises, or a public tap.
         description_from_producer: Use of piped drinking water sources
         unit: people
         display:
@@ -620,7 +620,7 @@ tables:
       wat_sm_pop:
         title: |-
           {definitions.residence_pop} using safely managed drinking water
-        description_short: Number of people using an [improved drinking water source](#dod:improved-water-source) that is located on premises, available when needed and free from faecal and priority chemical contamination.
+        description_short: Number of people using an [improved drinking water source](#dod:improved-water-source) that is located on premises, available when needed and free from fecal and priority chemical contamination.
         description_from_producer: Use of safely managed drinking water services
         unit: people
         display:

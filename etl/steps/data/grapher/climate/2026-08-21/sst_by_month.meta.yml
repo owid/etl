@@ -28,7 +28,7 @@ tables:
           title_public: Oceanic Niño Index (ONI) anomaly
 
       colour_date:
-        title: Date colour code
+        title: Date color code
         unit: ""
         presentation:
           title_public: Date
