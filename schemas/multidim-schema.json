@@ -83,6 +83,9 @@
                     "Leave the pin alone once set — it records what the config was authored against, which is what lets Grapher migrate it after a breaking change."
                 ],
                 [
+                    "Pin here and nowhere else. A `$schema` inside a view's `config` overrides this field (grapher spreads the view config last) while being much less visible, so the two silently disagree. ETL logs a warning when a view shadows this pin."
+                ],
+                [
                     "The exception is a pin that contradicts the config body (e.g. pinned `005` while using `chartTypes`, which only exists from `006`). That is a stale pin, not a record: Grapher would run migrations over a config they were never meant to touch. Correct it to the version the config is actually written against."
                 ]
             ],
@@ -340,6 +343,55 @@
             "items": {
                 "type": "string"
             }
+        },
+        "download_package": {
+            "type": "object",
+            "title": "Complete-dataset download package",
+            "description": "Where the pre-built \"download the complete dataset\" package for this collection was published. Not authored by hand: Collection.save() builds the package, uploads it to R2, and fills this in. Absent when no package was built.",
+            "requirement_level": "optional",
+            "guidelines": [
+                [
+                    "Never set this by hand -- it records the output of a build, and a stale value points readers at an object that no longer matches the data."
+                ],
+                [
+                    "Pass `download_package=False` to `Collection.save()` to publish a collection without a package."
+                ]
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "url": {
+                    "type": "string",
+                    "description": "Public URL of the zip (wide CSV + metadata.json + readme.md), for the download button."
+                },
+                "parquetUrl": {
+                    "type": "string",
+                    "description": "Public URL of the same data as Parquet, for reading with code."
+                },
+                "metadataUrl": {
+                    "type": "string",
+                    "description": "Public URL of the standalone metadata.json accompanying the Parquet."
+                },
+                "indicatorCount": {
+                    "type": "integer",
+                    "description": "Number of indicator columns in the package."
+                },
+                "rowCount": {
+                    "type": "integer",
+                    "description": "Number of data rows in the package."
+                },
+                "sizeBytes": {
+                    "type": "integer",
+                    "description": "Size of the zip in bytes."
+                }
+            },
+            "required": [
+                "url",
+                "parquetUrl",
+                "metadataUrl",
+                "indicatorCount",
+                "rowCount",
+                "sizeBytes"
+            ]
         },
         "dimensions": {
             "type": "array",
@@ -899,6 +951,9 @@
                             },
                             "includedEntityNames": {
                                 "$ref": "grapher-schema.011.json#/properties/includedEntityNames"
+                            },
+                            "inapplicableEntityNames": {
+                                "$ref": "grapher-schema.011.json#/properties/inapplicableEntityNames"
                             },
                             "entityTypePlural": {
                                 "$ref": "grapher-schema.011.json#/properties/entityTypePlural"

@@ -2407,3 +2407,137 @@ def test_explorer_rejects_grapher_schema():
 
     with pytest.raises(ValueError, match="only supported for multidim collections"):
         Explorer.from_dict(_make_minimal_config(grapher_schema="011", config={"explorerTitle": "T"}))
+
+
+def test_warn_on_view_schema_overrides(capsys):
+    """
+    Test Collection.warn_on_view_schema_overrides - a view `$schema` shadowing the collection pin
+    is surfaced, since Grapher lets the view value win and it is much less visible.
+
+    structlog writes to stdout rather than through stdlib logging, hence capsys not caplog.
+    """
+    collection = Collection.from_dict(
+        _make_minimal_config(
+            grapher_schema="011",
+            views=[
+                {
+                    "dimensions": {"metric": "total"},
+                    "indicators": {"y": [{"catalogPath": "grapher/ns/2024-01-01/ds/tb#ind"}]},
+                    "config": {"$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json"},
+                }
+            ],
+        )
+    )
+    collection.warn_on_view_schema_overrides()
+    out = capsys.readouterr().out
+    assert "grapher-schema.008.json" in out
+    assert "grapher-schema.011.json" in out
+    assert "grapher_schema" in out
+
+    # A view without its own `$schema` stays quiet.
+    Collection.from_dict(_make_minimal_config(grapher_schema="011")).warn_on_view_schema_overrides()
+    assert capsys.readouterr().out == ""
+
+
+def test_warn_if_grapher_schema_unpinned(capsys):
+    """
+    Test Collection.warn_if_grapher_schema_unpinned - an unpinned collection says so.
+
+    Without this, a config that silently relies on the DEFAULT_GRAPHER_SCHEMA fallback is
+    indistinguishable in the database from one that pins the same version deliberately.
+    """
+    Collection.from_dict(_make_minimal_config()).warn_if_grapher_schema_unpinned()
+    out = capsys.readouterr().out
+    assert "pins no `grapher_schema`" in out
+
+    Collection.from_dict(_make_minimal_config(grapher_schema="011")).warn_if_grapher_schema_unpinned()
+    assert capsys.readouterr().out == ""
+
+
+def test_collection_download_package_defaults_to_absent():
+    """
+    Test Collection.download_package - unset, the key is pruned from the config.
+
+    It records the output of a build, so a collection that never built one must upsert a
+    config byte-identical to what it would have sent before packages existed.
+    """
+    collection = Collection.from_dict(_make_minimal_config())
+    assert collection.download_package is None
+    assert "download_package" not in collection.to_dict()
+
+
+def test_save_download_package_records_and_reupserts():
+    """
+    Test Collection.save_download_package - the built package lands in the config, and the
+    config is upserted again.
+
+    The second upsert is the point of the method: `save()` necessarily pushed the config
+    before there was a package to point at, so without it the DB keeps a config with no
+    package and the data page has nothing to link to.
+    """
+    collection = Collection.from_dict(_make_minimal_config())
+    manifest = {
+        "url": "https://example.org/x.complete-dataset.zip",
+        "parquetUrl": "https://example.org/x.parquet",
+        "metadataUrl": "https://example.org/x.metadata.json",
+        "indicatorCount": 2,
+        "rowCount": 10,
+        "sizeBytes": 1234,
+    }
+    built = type("Result", (), {"to_config": lambda self: manifest})()
+
+    with (
+        patch("etl.collection.download_package.build_download_package_for_collection", return_value=built) as build,
+        patch("etl.collection.download_package.resolve_page_slug", return_value="a-slug"),
+        patch.object(Collection, "save_config_local") as save_local,
+        patch.object(Collection, "upsert_to_db") as upsert,
+    ):
+        collection.save_download_package()
+
+    assert collection.download_package == manifest
+    assert collection.to_dict()["download_package"] == manifest
+    assert build.call_args.kwargs["dest_dir"] == collection.local_download_package_dir
+    assert save_local.call_count == 1
+    assert upsert.call_count == 1
+
+
+def test_save_download_package_skips_explorers():
+    """
+    Test Collection.save_download_package - explorers build no package.
+
+    They have no `multi_dim_data_pages` row to take a page slug from, so the builder would
+    raise; and no page that could render a download button.
+    """
+    from etl.collection.explorer import Explorer
+
+    explorer = Explorer.from_dict(_make_minimal_config(config={"explorerTitle": "T"}))
+
+    with patch("etl.collection.download_package.build_download_package_for_collection") as build:
+        explorer.save_download_package()
+
+    assert build.call_count == 0
+    assert explorer.download_package is None
+
+
+def test_save_download_package_skips_unpublished_collections():
+    """
+    Test Collection.save_download_package - a collection with no page slug builds nothing.
+
+    ETL never assigns the slug (`put_mdim_config` sends only the config); someone publishing
+    the MDIM in the admin does. So a step whose MDIM was never published has a
+    `multi_dim_data_pages` row and no slug, which is the normal state of 13 of the 59
+    multidim steps on a staging server. Since save() now builds packages by default, that
+    has to be a skip rather than a failed step.
+    """
+    collection = Collection.from_dict(_make_minimal_config())
+
+    with (
+        patch("etl.collection.download_package.resolve_page_slug", return_value=None),
+        patch("etl.collection.download_package.build_download_package_for_collection") as build,
+        patch.object(Collection, "upsert_to_db") as upsert,
+    ):
+        collection.save_download_package()
+
+    assert build.call_count == 0
+    assert upsert.call_count == 0
+    assert collection.download_package is None

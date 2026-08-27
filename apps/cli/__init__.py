@@ -182,6 +182,7 @@ GROUPS = (
             "name": "Anomalist",
             "commands": {
                 "anomalist": "apps.anomalist.cli.cli",
+                "anomalist-view": "apps.anomalist.view.cli",
             },
         },
         {

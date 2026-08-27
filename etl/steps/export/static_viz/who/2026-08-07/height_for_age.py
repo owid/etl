@@ -79,7 +79,7 @@ templates ship -- setting `characters` propagates the first character's style ov
 | Title | `TITLE` | template's Playfair |
 | Subtitle | `SUBTITLE` | Lato Regular |
 | `Note:` (desktop only) | `build_note(...)` | `Note:` Bold, rest Regular |
-| `Data source:` | `Data source: ` + `build_source_citation(...)` | `Data source:` Bold, rest Regular |
+| `Data source:` | `Data source: ` + `source_citation(...)` from `etl.static_viz` | `Data source:` Bold, rest Regular |
 | Tagline (desktop) | leave the template's | -- |
 | License | `Licensed under ` / `CC-BY` / ` by the author ` / `AUTHOR` | Medium / Bold / Medium / Bold |
 
@@ -140,7 +140,6 @@ own median, which is the check that catches a stale band or threshold selector -
 16..W-16, and gaps of about 14 on desktop and 20 on mobile.
 """
 
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
@@ -151,11 +150,10 @@ from matplotlib.ticker import FuncFormatter
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
+from etl.static_viz import PIXELS_PER_INCH, apply_svg_rcparams, export_frame, source_citation
 
-# Use non-path text so SVGs stay editable in Figma
-matplotlib.rcParams["svg.fonttype"] = "none"
-# Set deterministic hash for reproducible SVG output
-matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"
+# Figma-editable text, deterministic ids. Must run before any figure is created.
+apply_svg_rcparams()
 
 paths = PathFinder(__file__)
 
@@ -286,6 +284,7 @@ TAGLINE = "OurWorldinData.org — Research and data to make progress against the
 LAYOUTS = {
     "height_for_age": {
         "size": (850, 638),
+        "template": "horizontal",
         "margin": 16,
         "title_y": 16,
         "chart_bottom_y": 556,
@@ -306,6 +305,7 @@ LAYOUTS = {
     },
     "height_for_age_mobile": {
         "size": (540, 824),
+        "template": "mobile",
         "margin": 16,
         "title_y": 16,
         # The mobile templates' footer is a two-row block at y=770: Data source, then the license 21px
@@ -346,10 +346,6 @@ MOBILE_NOTE = (
 # measurement, which matplotlib does in points.
 POINTS_PER_PIXEL = 0.72
 
-# Template pixels per inch. The figure is sized so that one template pixel is one hundredth
-# of an inch, which keeps the saved image at the template's proportions.
-PIXELS_PER_INCH = 100
-
 # Font size for the encoding diagram's labels, in points, relative to the body size. The design
 # team's floor is 12px and a point here renders as 100/72 px, so this must stay above 8.64pt.
 DIAGRAM_FONTSIZE_DROP = 1.8
@@ -385,25 +381,22 @@ def run() -> None:
 
     assert_threshold_is_a_fixed_percentile(tb)
 
-    source_citation = build_source_citation(tb)
-    paths.log.info(f"Source citation: {source_citation}")
+    citation = source_citation(tb[MEDIAN_COLUMN], key="producer")
+    paths.log.info(f"Source citation: {citation}")
 
     breaks = find_discontinuities(tb)
     paths.log.info(f"Steps down in the median at ages: {[round(age, 2) for age in breaks]}")
 
     for short_name, layout in LAYOUTS.items():
-        fig = create_visualization(tb, source_citation, breaks, layout)
+        fig = create_visualization(tb, citation, breaks, layout)
         # No bbox_inches="tight" on either: cropping to the drawn content would change the frame,
         # and the point is to hand Figma an image at the template's exact proportions.
         #
-        # The two formats want opposite things from the canvas, so they are saved separately. The
-        # PNG stays opaque, because it is the copy a human reviews and a transparent one is
-        # unreadable against a dark editor background. The SVG is saved transparent, because it
-        # goes into a Figma template that supplies its own background -- and matplotlib's white
-        # figure patch is its own SVG group, so it would sit over that background and would not be
-        # uncovered by deleting the text.
-        paths.export_fig(fig, short_name, ["png"], dpi=300)
-        paths.export_fig(fig, short_name, ["svg"], transparent=True)
+        # export_frame owns the save discipline: the clip sweep, the opaque-PNG /
+        # transparent-SVG split, and the template-aspect assertion. `template` is a check, not a
+        # setting -- it fails the run if this layout's figsize has drifted off the frame it is
+        # laid out against.
+        export_frame(paths, fig, short_name, template=layout["template"])
         plt.close(fig)
 
 
@@ -454,23 +447,6 @@ def load_growth_reference() -> Table:
     """Load the spliced WHO height-for-age reference from garden."""
     ds = paths.load_dataset("height_for_age")
     return ds.read("height_for_age")
-
-
-def build_source_citation(tb: Table) -> str:
-    """Cite the producers behind the chart, from the origins on the median indicator.
-
-    Follows grapher's own footer convention of `producer (year)`, so the two WHO products cite as one
-    producer carrying both release years rather than as two separate data products.
-
-    Returned without a label, so the caller supplies the template's "Data source:" slot name.
-    """
-    years: dict[str, list[str]] = {}
-    for origin in tb[MEDIAN_COLUMN].metadata.origins:
-        year = origin.date_published.split("-")[0] if origin.date_published else ""
-        seen = years.setdefault(origin.producer, [])
-        if year and year not in seen:
-            seen.append(year)
-    return "; ".join(f"{producer} ({'; '.join(sorted(ys))})" for producer, ys in years.items())
 
 
 def find_discontinuities(tb: Table) -> list[float]:
@@ -691,7 +667,7 @@ def build_note(breaks: list[float], layout: dict) -> str:
     return wrap_to_content_width(text, layout, layout["footer_fontsize"])
 
 
-def create_visualization(tb: Table, source_citation: str, breaks: list[float], layout: dict) -> plt.Figure:
+def create_visualization(tb: Table, citation: str, breaks: list[float], layout: dict) -> plt.Figure:
     """Build one version of the two-panel growth-curve chart.
 
     Layout notes:
@@ -959,7 +935,7 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
     fig.text(
         fx(margin_px),
         fy(layout["source_y"]),
-        f"Data source: {source_citation}",
+        f"Data source: {citation}",
         ha="left",
         va="top",
         fontsize=footer_fontsize,
@@ -1001,10 +977,5 @@ def create_visualization(tb: Table, source_citation: str, breaks: list[float], l
         wspace=0.1,
         hspace=0.35,
     )
-
-    # Drop clipping everywhere so labels that sit outside the axes survive into the SVG
-    # and Figma receives whole shapes rather than cropped ones.
-    for artist in fig.findobj():
-        artist.set_clip_on(False)
 
     return fig

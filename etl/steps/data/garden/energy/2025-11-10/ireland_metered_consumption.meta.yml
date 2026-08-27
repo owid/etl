@@ -10,7 +10,7 @@ definitions:
   description_key_datacenters: &description_key_datacenters
     - Metered consumption refers to usage recorded by physical electricity meters (actual or estimated reads). It excludes flat-rate or unmetered services and network losses.
     - Because there is no single definition of a data center, the Central Statistics Office (CSO) of Ireland identified them using electricity consumption data rather than formal classifications.
-    - The CSO analysed roughly 2.5 million electricity meters to find sites that used large amounts of power but had few employees and were not involved in manufacturing.
+    - The CSO analyzed roughly 2.5 million electricity meters to find sites that used large amounts of power but had few employees and were not involved in manufacturing.
     - Identification was based on several checks, including known data center operators, high-use business park customers, and meters consuming more than 1 GWh per year.
     - The data can be updated retrospectively as new facilities are identified and as electricity use changes over time.
 

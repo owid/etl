@@ -7,7 +7,7 @@ tables:
     variables:
       suspended_particulate_matter__spm__fouquet_and_dpcc__2011:
         title: Suspended Particulate Matter (SPM) (Fouquet and DPCC (2011))
-        unit: micrograms per cubic metre
+        unit: micrograms per cubic meter
         display:
           unit: ''
     dimensions:

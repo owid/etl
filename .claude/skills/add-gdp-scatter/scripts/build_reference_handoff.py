@@ -500,12 +500,19 @@ def main() -> int:
     if key_charts:
         status = key_chart_target_status(key_charts, pairs)
         out += [
-            f"## 🔴 Key-chart slots ({len(key_charts)}) — invisible to the Part 2 audit",
+            f"## 🔴 Key-chart slots ({len(key_charts)}) — no redirect and no query string reach these",
             "",
-            "`redirect_to_scatter.py` never sees these: its audit counts wp/gdoc/explorer/narrative/"
-            "dataInsight/staticViz, and a key chart is a chart↔tag association "
-            "(`chart_tags.keyChartLevel`), not a row in any of them. Unpublishing the source 404s "
-            "nothing — the chart simply drops out of the topic page's key-chart list, silently.",
+            "A key chart is a chart↔tag association (`chart_tags.keyChartLevel`), not a row in any "
+            "reference table, so `get_chart_references` cannot count it — `redirect_to_scatter.py` "
+            "queries `chart_tags` itself for its `keych` column. Unpublishing the source 404s "
+            "nothing: the chart simply drops out of the topic page's key-chart list, silently.",
+            "",
+            "**A moved slot renders the target's DEFAULT view, not the scatter.** `GdocPost."
+            "loadRelatedCharts` selects only `chartId, slug, title, variantName, keyChartLevel` and "
+            "`RelatedCharts` renders `<GrapherWithFallback slug=…>`, so there is nowhere to put a "
+            "query string: neither `tab=scatter` nor a log row's `yScale=log` can travel here. Where "
+            "the topic page was featuring the scatter *because* it was a scatter, moving the "
+            "association is not equivalent — say so to the topic owner rather than moving it quietly.",
             "",
             "**Target on the page?** says whether the slot needs any work: ✅ the target is already "
             "a key chart on that page (nothing to move — the old slot just drops out), 🟡 the target "

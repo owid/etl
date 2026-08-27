@@ -127,6 +127,6 @@ Every multidim config pins `grapher_schema: "NNN"` (enforced by `test_multidim_c
 
 The one thing to check: step 2 repoints multidim view-config validation at the new version, so a config that is no longer valid under `MMM` will now fail `Collection.validate_schema()`. Fix the config *and* bump only that config's pin, since at that point it genuinely was re-authored against `MMM`.
 
-Views can also carry their own `$schema` inside a `config` block (grep `etl/steps/export/multidim` for `\$schema`), which overrides the collection-level pin. Same rule applies.
+Views can also carry their own `$schema` inside a `config` block, which **overrides** the collection-level pin (grapher spreads the view config last). As of #6705 follow-up no step does this any more, and ETL warns if one reappears — so treat a hit from `grep -rn '\$schema' etl/steps/export/multidim` as something to remove rather than to bump.
 
 One caveat on "leave the pins alone": that holds for pins that are *true*. A pin that contradicts its own config body — pinned `005` while the config uses `chartTypes`, which only exists from `006` (the 005→006 migration creates it) — is stale, not a record, and leaving it makes grapher run migrations over a config they were never meant to touch. Check a suspicious pin against the properties of that schema version (`curl https://files.ourworldindata.org/schemas/grapher-schema.NNN.json`) and correct it to the version the config is actually written against.

@@ -184,8 +184,10 @@ containerWidth = 34 + (bandWidth / bandHeight) × naturalHeight
 ```
 
 For the Horizontal template's band minus 12px gaps (818 × 414) that gave 923 → an 889 × 450 SVG →
-scale 0.92 → 818 × 414. Check the natural height first: a component that *does* scale height with
-width needs a different sum.
+scale 0.92 → 818 × 414. **That 0.92 is the trap, not the goal** — it is the run *Render to the band*
+below audits as off-ladder. It is what a fixed natural height forces on you; where the height can be
+driven too (`--viz-height`, see below), drive it and render at the band rather than scaling into it.
+Check the natural height first: a component that *does* scale height with width needs a different sum.
 
 ### Two things the downloaded draft got wrong for this purpose
 
@@ -200,6 +202,40 @@ anyone — and two of its steps are actively harmful when the destination is a F
 - **Do not embed the fonts as base64 `@font-face`.** That exists so the file renders on a machine
   without Playfair Display and Lato installed. Figma resolves both by name, and the embed adds
   ~100 KB per weight to a file you are about to discard the text from anyway.
+
+## Changing what the component is given, when its config can't express it
+
+Some asks are not reachable through `config` at all. The one that comes up is the **"Other" bucket**:
+`selectTopEntities` folds every entity past `maxNodes` into a single `Other` node per side, and nothing
+in `SankeyVariantConfig` turns that off. The two obvious routes are both wrong — deleting the grey
+nodes in Figma leaves links terminating in mid-air, and patching the component makes the image
+unreproducible.
+
+The route that works is to **serve the component a filtered dataset**, by intercepting its data request
+in the render browser. It needs no repo change: the component still does its own layout, labelling and
+formatting, so the output is something the component genuinely produces, just from fewer rows. With
+only 10 entities per side and `maxNodes = 10`, no bucket forms.
+
+```js
+// in the render script, right after `browser.newPage()` — and add `readFile` to its
+// `node:fs/promises` import, which carries only { access, mkdir, writeFile }
+const [needle, file] = process.env.BESPOKE_INTERCEPT.split("::")
+const body = await readFile(file, "utf8")
+await page.setRequestInterception(true)
+page.on("request", (req) =>
+    req.url().includes(needle)
+        ? req.respond({ status: 200, contentType: "application/json",
+                        headers: { "access-control-allow-origin": "*" }, body })
+        : req.continue())
+```
+
+**Say what it costs, in numbers, before you do it — this is a data decision wearing a styling
+costume.** Restricting the avocado sankey to its top 10 exporters × top 10 importers dropped **900,068 t,
+25.5% of world trade** and 1,745 of 1,821 flows; every node's total fell (Netherlands −37%, Kenya −35%,
+the US −0.0%), the exporter column **reordered**, and because the palette is assigned by rank several
+countries changed colour. The title, subtitle and note all had to be rewritten, and the percentages
+became shares of the subset rather than of world trade. None of that is visible in the rendered image,
+which is exactly why it has to be stated and signed off rather than quietly applied.
 
 ## Caveats to state to the user
 
@@ -221,7 +257,7 @@ anyone — and two of its steps are actively harmful when the destination is a F
 | 2 | Formats as usual. A wide viz (a sankey) wants Static Horizontal; a tall one, Vertical. |
 | 3 | No `imWidth`/`imHeight`/`imFontSize`. **The mounted container is the aspect control — not the viewport**: `--viz-width` and `--viz-height`, plus `--viz-css` when the component pins its height in SCSS. `--height` only resizes the browser window and leaves the chart alone, and a run with no `--viz-*` at all exports the demo grid's own mount at whatever width the page gives it. Measure the template band first (Step 7), then render at that aspect. Same ordering as the grapher route, different lever. |
 | 5 | Ordinary `upload_assets` + the `unwrap` helper. Two SVGs means two imports, positioned from the sidecar's `exportBox` (not `box` — see the viewBox widening above). |
-| 7 | **Fit the WIDTH, not the height** — the reverse of the grapher route. There, you fit height first and close the width with a scripted x-map; a sankey's bands cannot be x-mapped without distorting them, so the width is the constraint and the vertical gap falls out of it (17.3px each side on the wine chart). Expect **one correction after import**: Figma's unwrapped group measured **913** wide against the SVG's declared **889**, because a group's bbox includes stroke extents — so the aspect you solved against the SVG is a few percent off once it lands. Measure the group, then scale. |
+| 7 | **Fit the WIDTH, not the height** — the reverse of the grapher route. There, you fit height first and close the width with a scripted x-map; a sankey's bands cannot be x-mapped without distorting them, so the width is the constraint and the vertical gap falls out of it (17.3px each side on the wine chart). Expect **one correction after import**: Figma's unwrapped group measured **913** wide against the SVG's declared **889**, because a group's bbox includes stroke extents — so the aspect you solved against the SVG is a few percent off once it lands. Measure the group's inset from that first import, then **re-render at the corrected size — never rescale**: the label sizes are baked into the export, so any scale factor moves the whole type ladder off its rungs. See *Render to the band* below. |
 | 8 | Node names are the component's own, derived from its DOM. There is **no `connectors` group** to hide and no `horizontal-grid-lines`, so every named lookup in Steps 7–8 has to be re-derived: `grep -oE 'id="[^"]*"' <file>.svg \| sort -u`. |
 | 8c | Unchanged. Note the fills come from the component's own palette, not necessarily the Chart colors library, so expect the off-palette sweep to have findings — report them to the component's author rather than repainting in Figma. |
 
@@ -324,10 +360,26 @@ A natural width 0.4px short of the content box is invisible; a 1.0005 rescale th
 to 12.01 is a check failure. Re-render rather than nudge. After that both frames audited clean — a
 4-rung ladder of 25 / 16 (15 on Vertical) / 12 / 11, nothing off it, no chart label below 12.
 
-**Measure the band from the real slots, not the template's nominal numbers.** The Horizontal band is
-documented as 118 → 556, but that assumes a two-line subtitle; with a one-line subtitle the header
-bottom is 99, so the band is **456.6**, not 438. Read `subtitle.y + subtitle.height` and `note.y` off
-the clone after the texts are in.
+**Measure the band from the real slots, not the template's nominal numbers.** Read the header's and
+footer's own edges off the clone after the texts are in; the tabled figures assume the placeholder
+copy and are a way to pick a template, not an input to the fit.
+
+**And solve the render size against the imported GROUP, not against the SVG canvas — they are not the
+same box.** The component draws its ink inset from the canvas it declares, so the group Figma gives you
+is smaller than the file's `width`/`height`, and it is the group that has to fill the band. Measured on
+the food-trade sankey, the inset was **3.44px on the width and 12px on the height**, stable across both
+frame sizes, which made the whole thing predictable:
+
+```
+group width  = container - 34.4        (the SVG canvas is container - 31)
+group height = cssChartAreaHeight - 12
+```
+
+Fit against the canvas instead and the gaps come out ~6px wide on each side of target — 20.2px where
+14 was wanted, on both frames, because the error is a constant rather than a ratio. **The inset is
+chart-dependent**, though: removing the "Other" node changed the vertical figure from 12 to ~7, so
+derive it once per chart from a first import rather than carrying the number across. One import, one
+measurement, one corrected render.
 
 ## What to check, and what to hand back
 
