@@ -36,6 +36,7 @@ import numpy as np
 import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
+from sklearn.isotonic import IsotonicRegression
 
 from etl.helpers import PathFinder
 
@@ -63,6 +64,13 @@ ZERO_INCOME_REPLACEMENT = 0.01
 
 # PPP round of the PIP percentiles used to fit the consumption -> income model.
 PIP_PPP_VERSION = 2021
+
+# The consumption -> income model fits a separate (alpha, beta) per percentile, and those
+# coefficients are not monotone in p: at the sub-$1 consumption levels found at the bottom of poor
+# countries, p1's implies a higher income than p2's. So a monotone consumption profile can come out
+# non-monotone. True projects the fitted profile back onto the monotone cone by isotonic regression
+# (see enforce_monotone). Set False to reproduce the source project's unadjusted output.
+ENFORCE_MONOTONE_INCOME_BASIS = True
 
 # How to assign each country's welfare basis (income vs consumption) across the panel:
 #   "nearest_survey": the welfare type of the country's nearest national survey year — correct for
@@ -495,9 +503,60 @@ def adjust_consumption_to_income(tb_pip: Table, tb_model: Table, tb_welfare: Tab
 
     non_monotone = check_monotone_within_groups(tb.loc[consumption])
     if non_monotone:
-        log.warning(f"Non-monotone income-basis distributions (kept, as in the source project): {non_monotone[:10]}")
+        if ENFORCE_MONOTONE_INCOME_BASIS:
+            tb = enforce_monotone(tb, mask=consumption)
+            still_bad = check_monotone_within_groups(tb.loc[consumption])
+            assert not still_bad, f"Monotonicity not restored for {still_bad[:5]}"
+            log.info(f"Enforced monotonicity on {len(non_monotone)} income-basis country-years")
+        else:
+            log.warning(
+                f"Non-monotone income-basis distributions (kept, as in the source project): {non_monotone[:10]}"
+            )
 
     tb = recompute_shares(tb)
+    return tb
+
+
+def enforce_monotone(tb: Table, mask: np.ndarray) -> Table:
+    """Make bin averages non-decreasing across percentiles, for the masked rows only.
+
+    Isotonic regression (pool-adjacent-violators): the least-squares projection of the fitted
+    profile onto the monotone cone, weighted by bin population. A run of violating bins is replaced
+    by its weighted average, so the mean is preserved and every non-violating bin keeps its fitted
+    value.
+
+    A cumulative maximum would be simpler but is the wrong choice here. The inversion comes from the
+    model's own coefficients: p1 is the only percentile with beta below 1 (0.776 against 1.09-1.22
+    above it) and it has the worst fit (R^2 0.28), so at the sub-$1 consumption levels where this
+    bites it implies a HIGHER income than p2 does. A running maximum would broadcast that single
+    least-reliable estimate across the whole violating run; measured over the affected country-years
+    it shifts the mean by +0.11% and the within-country MLD by -0.011, against +0.000% and -0.00035
+    here. Averaging the violators instead down-weights the outlier, which is what it deserves.
+    """
+    # `mask` is positional against `tb` as passed, so reset the index (which preserves order) and
+    # carry the sort permutation explicitly rather than reordering the table under the mask.
+    tb = tb.reset_index(drop=True)
+    order = tb.sort_values(["country", "year", "bin_index"]).index.to_numpy()
+
+    avg = tb["avg"].to_numpy(dtype=float)
+    pop = tb["pop"].to_numpy(dtype=float)
+    n_groups = len(avg) // 109
+    assert n_groups * 109 == len(avg), "Rows do not divide into 109-bin country-years."
+
+    grid = avg[order].reshape(n_groups, 109)
+    weights = pop[order].reshape(n_groups, 109)
+    rows = np.asarray(mask, dtype=bool)[order].reshape(n_groups, 109).any(axis=1)
+
+    # Only the country-years that actually violate need fitting; the rest are already monotone.
+    violating = rows & (np.diff(grid, axis=1) < -1e-9).any(axis=1)
+    percentiles = np.arange(109)
+    fitter = IsotonicRegression(increasing=True)
+    for i in np.flatnonzero(violating):
+        grid[i] = fitter.fit_transform(percentiles, grid[i], sample_weight=weights[i])
+
+    out = avg.copy()
+    out[order] = grid.reshape(-1)
+    tb["avg"] = out
     return tb
 
 
