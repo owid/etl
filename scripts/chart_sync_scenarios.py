@@ -155,11 +155,31 @@ class Scenarios:
         return {d.chart_id: d for d in diffs}.get(chart_id)
 
     @staticmethod
+    def ui_control(d) -> str:
+        """Which control chart-diff puts on the chart.
+
+        Two different things can happen to a chart in the UI, and which one you get is decided in
+        `chart_diff_show._show_chart_diff_header`:
+
+          - "review-only": the chart changed only because ETL changed its data or metadata, so
+            there is nothing to approve or reject -- the change reaches the target through the
+            target's own ETL run either way. You are asked to confirm you looked at it.
+          - "approve/reject": the chart's settings changed, or the chart is new, so someone has to
+            decide whether those changes should be copied to the target.
+        """
+        if d is None:
+            return "not listed"
+        if d.is_modified and "config" not in d.change_types and ({"data", "metadata"} & set(d.change_types)):
+            return "review-only"
+        return "approve/reject"
+
+    @staticmethod
     def describe(d) -> str:
         if d is None:
             return "not listed"
         changes = ",".join(d.change_types) or ("new" if d.is_new else "-")
-        return f"listed ({changes}, conflict={d.in_conflict}, status={d.approval_status})"
+        return (f"listed ({changes}, {Scenarios.ui_control(d)}, conflict={d.in_conflict}, "
+                f"status={d.approval_status})")
 
     def approve(self, chart_id: int) -> None:
         """Approve a chart in chart-diff, as a reviewer would."""
@@ -424,6 +444,8 @@ class Scenarios:
             d = self.diff()
             self.check("S2: control — production untouched, so it is listed without a conflict",
                        d is not None and not d.in_conflict, self.describe(d))
+            self.check("S2: a settings change asks you to approve or reject it",
+                       self.ui_control(d) == "approve/reject", self.ui_control(d))
             self.edit_in_production("Edited in the production admin (S2).")
             d = self.diff()
             self.check("S2: production edited too, so the same chart is now in conflict",
@@ -578,6 +600,9 @@ class Scenarios:
                        d is not None and "data" in d.change_types, self.describe(d))
             d = self.diff()
             self.check("S7: it is NOT listed as a settings change", d is None, self.describe(d))
+            self.check("S7: it is shown for review only — there is nothing to approve or reject",
+                       self.ui_control(self.diff(data=True)) == "review-only",
+                       self.ui_control(self.diff(data=True)))
             took, log = self.chart_sync()
             self.check("S7: chart-sync writes nothing — data reaches the target through its own ETL",
                        not took["update"] and not took["create"], log)
@@ -590,6 +615,9 @@ class Scenarios:
             self.check("S8: the chart is listed for review, as a metadata change",
                        d is not None and "metadata" in d.change_types, self.describe(d))
             took, log = self.chart_sync()
+            self.check("S8: it is shown for review only too",
+                       self.ui_control(self.diff(metadata=True)) == "review-only",
+                       self.ui_control(self.diff(metadata=True)))
             self.check("S8: chart-sync writes nothing for it either",
                        not took["update"] and not took["create"], log)
             # Back to the values the indicator and its dataset actually had.
@@ -618,6 +646,8 @@ class Scenarios:
                        d is not None and "config" in d.change_types, self.describe(d))
             self.approve(self.chart_id)
             took, log = self.chart_sync()
+            self.check("S9: it asks you to approve or reject, since the settings changed",
+                       self.ui_control(d) == "approve/reject", self.ui_control(d))
             self.check("S9: and chart-sync would carry it to the target", took["update"], log)
             self.api.upsert_chart_etl_config(chart_config_id=self.config_uuid,
                                              grapher_config=copy.deepcopy(original_etl_config),
