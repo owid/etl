@@ -742,13 +742,10 @@ class Collection(MDIMBase):
             raise ValueError(
                 f"Collection '{self.catalog_path}' is a single chart (`dimensions: []`) but is missing "
                 "a top-level `chart_config_id`. It is the chart's identity in grapher (`charts.configId`) "
-                "and must be declared in the config YAML:\n"
-                "  - for a chart that already exists, use its config UUID (see `charts.configId`, e.g. "
-                "`SELECT c.configId FROM charts c JOIN chart_configs cf ON cf.id = c.configId "
-                "WHERE cf.slug = '<slug>'`);\n"
-                "  - for a brand-new chart, mint one with "
-                "`python -c 'from etl.collection.chart_upsert import new_chart_config_id; "
-                "print(new_chart_config_id())'`."
+                "and must be declared in the config YAML. `etl chart-config-id` writes it for you:\n"
+                "  - for a chart that already exists: "
+                "`etl chart-config-id lookup <config file> --slug <slug>`;\n"
+                "  - for a brand-new chart: `etl chart-config-id new <config file>`."
             )
 
         # The UUID is used verbatim as the lookup key in
