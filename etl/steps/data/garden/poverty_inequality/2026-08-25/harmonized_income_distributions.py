@@ -1,9 +1,22 @@
 """Harmonized PIP and WID income distributions on a common 109-bin structure, with bridging series
 and a between/within-country decomposition of global inequality.
 
-This step ports the verified data pipeline behind Joe Hasell's PIP-vs-WID triangulation work
-(github.com/JoeHasell/prague-pip-wid, `data/scripts/`) into ETL, extended from a single year to the
-full panel of years both sources cover, so the exercise re-runs on every PIP/WID data update.
+This step began as a port of the data pipeline behind Joe Hasell's PIP-vs-WID triangulation work
+(github.com/JoeHasell/prague-pip-wid, `data/scripts/`), extended from a single year to the full panel
+of years both sources cover, so the exercise re-runs on every PIP/WID data update.
+
+It is no longer a faithful port: three corrections make the output differ from that project by
+design, each documented where it happens and in
+ai/adversarial-review-harmonized_income_distributions-2026-08-26.md.
+
+  - The welfare basis of a country-year now follows PIP's own decision tree. The source project
+    preferred INCOME where PIP publishes both concepts, which mislabelled the 88 country-years whose
+    PIP distribution is in fact consumption (see build_welfare_basis).
+  - Fitted income profiles are made monotone (see ENFORCE_MONOTONE_INCOME_BASIS).
+  - WID is converted at the PPP year WID prices its series in, not a fixed one (in the snapshot).
+
+Exactly reproducing the source project is therefore no longer possible from a switch, and is not
+meant to be: two of the three departures fix errors in its numbers.
 
 What it builds, in order:
 
@@ -69,7 +82,9 @@ PIP_PPP_VERSION = 2021
 # coefficients are not monotone in p: at the sub-$1 consumption levels found at the bottom of poor
 # countries, p1's implies a higher income than p2's. So a monotone consumption profile can come out
 # non-monotone. True projects the fitted profile back onto the monotone cone by isotonic regression
-# (see enforce_monotone). Set False to reproduce the source project's unadjusted output.
+# (see enforce_monotone). False keeps the raw fitted profile, inversions included, as the source
+# project did — useful for isolating this one effect, though it no longer reproduces that
+# project's output on its own, since the welfare basis differs too.
 ENFORCE_MONOTONE_INCOME_BASIS = True
 
 # How to assign each country's welfare basis (income vs consumption) across the panel. PIP's
@@ -83,8 +98,10 @@ ENFORCE_MONOTONE_INCOME_BASIS = True
 #                        of country-years and moves the 2023 decomposition by 0.0000pp, but differs
 #                        on 40 interpolated country-years across 11 countries — which is what a
 #                        multi-year reading of the panel would rest on.
-#   "latest_survey":     one static type per country, from its most recent survey (what the source
-#                        project used for its single reference year) — kept for validation runs.
+#   "latest_survey":     one static type per country, from its most recent survey — the shape the
+#                        source project used for its single reference year. Kept for comparison,
+#                        but it does NOT reproduce that project: it preferred income where both
+#                        concepts exist, which is the mislabelling this step corrects.
 WELFARE_ASSIGNMENT = "pip_decision_tree"
 
 # Sanity floor on the common PIP-and-WID country sample.
