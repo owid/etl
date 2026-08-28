@@ -1524,3 +1524,13 @@ steps:
   # archived; last active in 4387a320d17b on 2026-08-28
   data://meadow/irena/2025-07-18/renewable_energy_statistics:
     - snapshot://irena/2025-07-18/renewable_energy_statistics.xlsx
+  # archived; last active in 4387a320d17b on 2026-08-28
+  data://grapher/lazard/2025-09-17/levelized_cost_of_energy:
+    - data://garden/lazard/2025-09-17/levelized_cost_of_energy
+  # archived; last active in 4387a320d17b on 2026-08-28
+  data://garden/lazard/2025-09-17/levelized_cost_of_energy:
+    - data://garden/economics/2025-08-29/owid_deflator
+    - data://meadow/lazard/2025-09-17/levelized_cost_of_energy
+  # archived; last active in 4387a320d17b on 2026-08-28
+  data://meadow/lazard/2025-09-17/levelized_cost_of_energy:
+    - snapshot://lazard/2025-09-17/levelized_cost_of_energy.csv
