@@ -31,20 +31,20 @@ fixes is the data, the structure, the proportions and the axis conventions.
 
 Template geometry
 -----------------
-Laid out against `Static Chart Template_Vertical` (`5332:93`), re-read from Figma on 2026-08-18 and
-matching `TEMPLATES.md`. Two things about it are not obvious and both are load-bearing:
+Laid out against `Static Chart Template_Vertical` (`5332:93`), verified against the live frame on
+2026-08-27 with `create-figma-chart/scripts/verify_templates.js` (no drift on any of the ten
+templates). Two things about it are not obvious and both are load-bearing:
 
-- **Almost none of the template's y values are constants.** Header and footer are auto-layout blocks,
-  so the title's line count moves everything below it. `derive_header` implements the rhythm and
-  `assert_header_rhythm` checks it against both positions TEMPLATES.md measured off the frame - the
-  two-line case the template ships (band at 118.22) and the one-line case this chart is in (82.48).
-- **This chart's title is one line, which is the case the templates were never exercised for.** Below
-  the logo's row height the *logo* sets the header's height, so a one-line title leaves 12.26 px of
-  dead space above the subtitle rather than the 6 px every finished page shows. TEMPLATES.md's fix is
-  to take the logo out of the title row in Figma - but only where the subtitle's first line stops
-  short of the logo's left edge at x=770, and this subtitle's first line reaches x=803. So the logo
-  stays in the flow, the wider gap is what the real frame will show, and the render matches it.
-  `assert_logo_stays_in_flow` re-measures that rather than trusting this paragraph.
+- **Almost none of the template's y values are constants.** Header and footer are auto-layout blocks
+  that hug their text, so the title's line count moves everything below it. `derive_header` implements
+  the rhythm and `assert_header_rhythm` checks it against both positions measured off the frame - the
+  two-line placeholder the template ships (band at 118) and the one-line case (70).
+- **The logo is the header's SIBLING, not its child**, so it contributes nothing to the header's height
+  and the band moves with the text alone. That changed under this step: until the design team flattened
+  the header, the logo sat inside the title row and set it whenever the title was shorter than 41.26px,
+  which cost this chart's one-line title 12.5px of dead space above the subtitle. What keeps the title
+  clear of the logo now is the width of the template's own title node - 737.84px against an 818px
+  content box - which is what `assert_title_clears_logo` measures against.
 
 The step's own title, subtitle, note and footer are drawn at the template's measured sizes (25, 16, 12
 and 11 template px) rather than at sizes that merely look right, so the PNG previews the frame's
@@ -70,7 +70,6 @@ offsets would silently start colliding.
 
 import math
 
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
@@ -79,13 +78,17 @@ from matplotlib.textpath import TextPath
 from owid.catalog import Table
 
 from etl.helpers import PathFinder
-
-# Use non-path text so SVGs stay editable in Figma.
-matplotlib.rcParams["svg.fonttype"] = "none"
-# Set deterministic hash for reproducible SVG output.
-matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"
+from etl.static_viz import PIXELS_PER_INCH, TEMPLATES, apply_svg_rcparams, export_frame, source_citation
 
 paths = PathFinder(__file__)
+
+# The Figma handoff contract - editable text, deterministic ids - lives in etl.static_viz rather than
+# being restated here. Called at import, because svg.hashsalt is read when a figure is built.
+apply_svg_rcparams()
+
+# Which static-chart template this is laid out against. `export_frame` validates the figure against
+# it on the way out, so a figsize typo cannot ship.
+TEMPLATE = "vertical"
 
 TITLE = "The long-run history of child mortality"
 
@@ -100,9 +103,9 @@ AUTHOR = "Max Roser and Pablo Arriagada"
 
 TAGLINE = "OurWorldinData.org — Research and data to make progress against the world's largest problems."
 
-# attribution_short is what collapses UN IGME's two vintages into one citation, but a chart footer is
-# read by people who do not know the acronyms, so the opaque ones cite by their full producer name.
-SOURCE_DISPLAY_NAMES = {"HMD": "Human Mortality Database"}
+# Source abbreviations written out for the footer, as the citation renders them (name, space, bracket).
+# Only the ones a reader of the chart would not recognise: "UN WPP" and "UN IGME" stay as they are.
+SOURCE_NAME_EXPANSIONS = {"HMD (": "Human Mortality Database ("}
 
 # Axis treatment copied from grapher so the static chart reads like our interactive ones. Values from
 # owid-grapher: GRID_LINE_DASH_PATTERN and TICK_COLOR in
@@ -144,18 +147,18 @@ LAYOUT = {
     # The header and footer are auto-layout blocks, so almost none of the template's own y values are
     # constants: the header grows down from the title and the footer up from the frame's bottom margin.
     # What is fixed is the rhythm - see `derive_header` - and these are its inputs.
-    "size": (850, 1095),
+    # From etl.static_viz rather than repeated here, so the frame this is laid out against and the one
+    # `export_frame` validates against cannot drift apart.
+    "size": (TEMPLATES[TEMPLATE].width_px, TEMPLATES[TEMPLATE].height_px),
     "margin": 16,
-    "origin_y": 0.0,
-    "row_pad_px": 16.22,
-    # The logo's *row*, not the logo: Vertical's wrapper adds 6.08px of top padding on top of the
-    # 35.18px instance. With a one-line title the logo, not the title, sets the header's height.
-    #
-    # TEMPLATES.md offers a fix for that - take the logo out of the flow in Figma and set this to 0 -
-    # but it is safe only where the subtitle's first line stops short of the logo's left edge at
-    # x=770.27. This chart's first line ends at x=803, so the logo stays in the flow and the header
-    # keeps the wider gap. `assert_header_rhythm` checks that the measurement still says so.
-    "logo_px": 41.26,
+    # The header block's own top edge. It carries no inner padding, so the title's ink starts here.
+    "origin_y": 16.0,
+    # The header is a flat auto-layout of [title, subtitle] and the logo is its SIBLING, so the logo
+    # contributes nothing to the header's height and the band moves with the text alone. It was not
+    # always so: until the design team flattened it (between 2026-08-18 and 2026-08-20) the logo sat
+    # inside the title row and, below its own 41.26px height, set that row - which cost a one-line
+    # title 12.5px of dead space above the subtitle. Verified against the live frame on 2026-08-27
+    # via `create-figma-chart/scripts/verify_templates.js`, which returned no drift on any template.
     "title_line_px": 29.0,
     "subtitle_line_px": 19.0,
     "note_line_px": 14.0,
@@ -187,20 +190,19 @@ LAYOUT = {
 # would inset twice and leave a visibly loose bottom.
 BAND_INSET = 14
 
-# TEMPLATES.md's two calibration points for the header rhythm on this frame, as
-# (title_lines, subtitle_lines, logo_px) -> band_top.
-HEADER_CALIBRATION = {(2, 2, 41.26): 118.22, (1, 1, 41.26): 82.48}
+# The two calibration points for the header rhythm on this frame, as
+# (title_lines, subtitle_lines) -> band_top. The first is the template's own placeholder, measured at
+# headerBottom 118; the second is what a one-line title and subtitle reflow it to.
+HEADER_CALIBRATION = {(2, 2): 118.0, (1, 1): 70.0}
 
 # A template pixel in points: the figure is 100 template px per inch and there are 72 points to the
 # inch. Used to convert the template's geometry for text measurement, which matplotlib does in points.
 POINTS_PER_PIXEL = 0.72
 
-# Template pixels per inch, which is what keeps the saved image at the template's proportions.
-PIXELS_PER_INCH = 100
-
-# The logo's left edge on the Vertical frame (`Frame 1`, 5332:97). What decides whether the logo can
-# be taken out of the title row: the subtitle's first line has to stop short of it.
-LOGO_LEFT_EDGE_PX = 770.27
+# The width the template gives its own title node, which is narrower than the 818px content box. That
+# is what keeps the title clear of the logo beside it, so a candidate title is measured against this
+# rather than against the content width.
+TITLE_NODE_WIDTH_PX = 737.84
 
 # How far a label sits from the mark it names, in template pixels, and the clearance kept between two
 # labels. Small, because adjacency is what removes the need for a leader line.
@@ -210,6 +212,13 @@ LABEL_PADDING_PX = 1.5
 # Clearance kept around each data mark, in template pixels, so a label placed beside its own mark does
 # not run over a neighbour's.
 MARKER_CLEARANCE_PX = 3
+
+# Line spacing for in-plot text, as a multiple of the font size. Used both to space the lines of a
+# multi-line label and to give a single-line label's reservation box its height.
+LINE_SPACING = 1.3
+
+# How far an average's label sits below its rule, in percentage points.
+AVERAGE_LABEL_DROP = 1.4
 
 # How far a label may sit from its mark, in percentage points, before it gets a hairline joining the
 # two. Set just above the smallest candidate offset, so a label nudged one slot is still read by
@@ -238,39 +247,42 @@ def run() -> None:
         f"global series {int(tb_global['year'].min())}-{int(tb_global['year'].max())}"
     )
 
-    source_citation = build_source_citation(tb_historical, tb_global)
-    paths.log.info(f"Source citation: {source_citation}")
+    # Keyed on attribution_short rather than producer: UN IGME's under-fifteen series combines two of
+    # its own releases whose producer strings differ, and grouping by producer cites them as two
+    # separate sources. The short forms also keep a five-source footer to one line.
+    citation = expand_opaque_source_names(
+        source_citation(
+            tb_historical["share_dying_before_15"], tb_global["share_dying_before_15"], key="attribution_short"
+        )
+    )
+    paths.log.info(f"Source citation: {citation}")
 
-    fig = create_visualization(tb_historical, tb_hunter_gatherer, tb_global, tb_extremes, tb_summary, source_citation)
+    fig = create_visualization(tb_historical, tb_hunter_gatherer, tb_global, tb_extremes, tb_summary, citation)
 
-    # No bbox_inches="tight" on either: cropping to the drawn content would change the frame, and the
-    # point is to hand Figma an image at the template's exact proportions.
-    #
-    # The two formats want opposite things from the canvas. The PNG stays opaque, because it is the
-    # copy a human reviews and a transparent one is unreadable against a dark editor background. The
-    # SVG is saved transparent, because in Figma the template supplies the background and
-    # matplotlib's white figure patch is its own SVG group, so it would cover it.
-    paths.export_fig(fig, paths.short_name, ["png"], dpi=300)
-    paths.export_fig(fig, paths.short_name, ["svg"], transparent=True)
+    # export_frame owns the save discipline: the clip sweep, the opaque PNG, the transparent SVG, and
+    # the check that the figure still matches the template it was laid out against.
+    export_frame(paths, fig, paths.short_name, template=TEMPLATE)
     plt.close(fig)
 
 
-def build_source_citation(tb_historical: Table, tb_global: Table) -> str:
-    """Cite the producers behind the chart, from the origins on its value columns.
+def expand_opaque_source_names(citation: str) -> str:
+    """Write out the source abbreviations a reader would not recognise.
 
-    Follows grapher's `producer (year)` convention, keyed on attribution_short so a producer whose
-    name has changed between vintages - UN IGME has - is cited once rather than twice, and carrying
-    only that producer's most recent year.
+    Keying the citation on `attribution_short` is what collapses UN IGME's two releases into one entry,
+    and it gives the right short form for the UN products - but for the Human Mortality Database it
+    gives an acronym that means nothing to a reader of the finished chart, where the producer's own
+    name is both readable and short. The trailing bracket is part of the match so it can only hit a
+    citation entry, never an acronym inside some other name.
     """
-    latest: dict[str, str] = {}
-    for column in (tb_historical["share_dying_before_15"], tb_global["share_dying_before_15"]):
-        for origin in column.metadata.origins:
-            name = origin.attribution_short or origin.producer
-            name = SOURCE_DISPLAY_NAMES.get(name, name)
-            year = origin.date_published.split("-")[0] if origin.date_published else ""
-            if year and year > latest.get(name, ""):
-                latest[name] = year
-    return "; ".join(f"{name} ({year})" for name, year in latest.items())
+    for short, full in SOURCE_NAME_EXPANSIONS.items():
+        # A replace that matches nothing returns the string unchanged and reports success, which would
+        # ship the acronym while this function looked like it had run.
+        assert short in citation, (
+            f"Expected {short!r} in the citation so it could be written out, but got: {citation!r}. "
+            "Either the origin's attribution_short changed or this expansion is no longer needed."
+        )
+        citation = citation.replace(short, full)
+    return citation
 
 
 def build_note(tb_global: Table, tb_historical: Table, tb_summary: Table) -> str:
@@ -336,14 +348,14 @@ def create_visualization(
     note = wrap_to_content_width(
         build_note(tb_global, tb_historical, tb_summary), LAYOUT, _points(LAYOUT["note_font_px"])
     )
-    assert_logo_stays_in_flow(subtitle)
+    assert_title_clears_logo(title)
 
     subtitle_y, band_top_px = derive_header(_lines(title), _lines(subtitle))
     note_y = LAYOUT["note_ink_bottom_y"] - _lines(note) * LAYOUT["note_line_px"]
 
     fig.text(
         fx(margin_px),
-        fy(LAYOUT["origin_y"] + LAYOUT["row_pad_px"]),
+        fy(LAYOUT["origin_y"]),
         title,
         ha="left",
         va="top",
@@ -578,26 +590,26 @@ def create_visualization(
         )
 
     # --- the two average labels ---
-    ax.text(
+    draw_text_block(
+        ax,
         hunter_gatherer_x,
-        hunter_gatherer_mean - 1.4,
+        hunter_gatherer_mean - AVERAGE_LABEL_DROP,
         hunter_gatherer_label,
+        ha="center",
+        va="top",
         fontsize=label_fontsize,
         color=TEXT_COLOR,
-        ha="center",
-        va="top",
-        zorder=7,
         gid="hunter_gatherer__mean_label",
     )
-    ax.text(
+    draw_text_block(
+        ax,
         (rule_span[0] + rule_span[1]) / 2,
-        historical_mean - 1.4,
+        historical_mean - AVERAGE_LABEL_DROP,
         f"{_round_half_up(historical_mean)}% is the average across these\n{len(tb_historical)} historical societies",
-        fontsize=label_fontsize,
-        color=accent,
         ha="center",
         va="top",
-        zorder=7,
+        fontsize=label_fontsize,
+        color=accent,
         gid="historical__mean_label",
     )
 
@@ -629,22 +641,22 @@ def draw_global_series(ax, tb_global: Table, tb_extremes: Table, accent, fontsiz
     # A two-line label centred on a mark puts its lower line half a block below it. The lowest-rate
     # mark sits at a few tenths of a percent, so centring that one would hang its second line under
     # the axis - it sits on the mark instead.
-    half_block = _px_to_data_y(ax, 1.3 * fontsize / POINTS_PER_PIXEL)
+    half_block = _px_to_data_y(ax, LINE_SPACING * fontsize / POINTS_PER_PIXEL)
     for gid, rate, text, color in build_modern_labels(tb_global, tb_extremes, accent):
         # The 1950 label hangs off the start of the series, the other three off its latest year.
         anchor = first_year if gid == "global__label-start" else last_year
         if gid.startswith("country__"):
             marker_gid = gid.removesuffix("-label") + "-marker"
             ax.plot([last_year], [rate], marker="o", markersize=2.6, color=accent, zorder=6, gid=marker_gid)
-        ax.text(
+        draw_text_block(
+            ax,
             anchor + gap,
             rate,
             text,
-            fontsize=fontsize,
-            color=color,
             ha="left",
             va="bottom" if rate - half_block < ax.get_ylim()[0] else "center",
-            zorder=7,
+            fontsize=fontsize,
+            color=color,
             gid=gid,
         )
 
@@ -682,57 +694,43 @@ def build_modern_labels(tb_global: Table, tb_extremes: Table, accent) -> list[tu
 def derive_header(title_lines: int, subtitle_lines: int) -> tuple[float, float]:
     """Where the subtitle starts and where the plot's band begins, in template pixels.
 
-    The header is an auto-layout block, so neither position is a constant: the title row hugs the
-    taller of the title and the logo, and everything below moves with it. Hard-coding the template's
-    own 80.22 and 118.22 is right for its two-line placeholder title and wrong for any other length -
-    which is what leaves a line of dead space above a plot, invisibly to every contract check.
+    The header is an auto-layout block that hugs its text, so neither position is a constant: a title
+    that wraps to a different number of lines than the template's placeholder moves everything below
+    it. Hard-coding the template's own 80 and 118 is right for its two-line placeholder and wrong for
+    any other length - which is what leaves a line of dead space above a plot, invisibly to every
+    contract check.
     """
-    title_row = max(title_lines * LAYOUT["title_line_px"], LAYOUT["logo_px"]) + LAYOUT["row_pad_px"]
-    subtitle_y = LAYOUT["origin_y"] + title_row + LAYOUT["title_subtitle_gap_px"]
+    subtitle_y = LAYOUT["origin_y"] + title_lines * LAYOUT["title_line_px"] + LAYOUT["title_subtitle_gap_px"]
     return subtitle_y, subtitle_y + subtitle_lines * LAYOUT["subtitle_line_px"]
 
 
 def assert_header_rhythm() -> None:
-    """Check the rhythm still reproduces the positions measured off the template.
+    """Check the rhythm still reproduces the positions measured off the live template.
 
     Both ends, because the two-line case is the only one the template itself exercises and the
     one-line case is the one this chart is in.
     """
-    for (title_lines, subtitle_lines, logo_px), expected in HEADER_CALIBRATION.items():
-        original = LAYOUT["logo_px"]
-        try:
-            LAYOUT["logo_px"] = logo_px
-            _, band_top = derive_header(title_lines, subtitle_lines)
-        finally:
-            LAYOUT["logo_px"] = original
+    for (title_lines, subtitle_lines), expected in HEADER_CALIBRATION.items():
+        _, band_top = derive_header(title_lines, subtitle_lines)
         assert abs(band_top - expected) < 0.02, (
             f"The header rhythm puts a {title_lines}-line title and {subtitle_lines}-line subtitle's band at "
             f"{band_top:.2f}, but the template measures {expected}. One of the inputs no longer matches the frame."
         )
 
 
-def assert_logo_stays_in_flow(subtitle: str) -> None:
-    """Check the decision recorded in `logo_px` against the subtitle actually being drawn.
+def assert_title_clears_logo(title: str) -> None:
+    """Check the title's ink fits the width the template gives it, which is not the content width.
 
-    Taking the logo out of the auto-layout flow removes the dead space a one-line title leaves above
-    the subtitle, but it lets the subtitle's first line run under the logo. Which way that goes depends
-    on the wrapped text, so it is re-measured here rather than settled once in a comment.
+    The logo sits beside the title rather than above the subtitle, and what keeps the two apart is
+    that the template sizes its title node narrower than the content box - 737.84 against 818. A title
+    measured against the content width instead would clear every check here and still run under the
+    logo in the frame.
     """
-    first_line = subtitle.split("\n")[0]
-    ink_end = LAYOUT["margin"] + _measure_px(first_line, _points(LAYOUT["subtitle_font_px"]))
-    clears = ink_end < LOGO_LEFT_EDGE_PX
-    if LAYOUT["logo_px"] == 0:
-        assert clears, (
-            f"logo_px is 0, which assumes the logo has been taken out of the title row in Figma, but the "
-            f"subtitle's first line reaches x={ink_end:.0f} against the logo's left edge at {LOGO_LEFT_EDGE_PX}. "
-            "Put the logo back in the flow (logo_px = 41.26) or shorten the subtitle's first line."
-        )
-    elif clears:
-        paths.log.info(
-            f"The subtitle's first line ends at x={ink_end:.0f}, clear of the logo at {LOGO_LEFT_EDGE_PX}. The logo "
-            "could be taken out of the title row in Figma and logo_px set to 0, which would close the "
-            f"{LAYOUT['logo_px'] - LAYOUT['title_line_px']:.1f}px of dead space above the subtitle."
-        )
+    widest = max(_measure_px(line, _points(LAYOUT["title_font_px"])) for line in title.split("\n"))
+    assert widest <= TITLE_NODE_WIDTH_PX, (
+        f"The title's widest line measures {widest:.0f}px against the {TITLE_NODE_WIDTH_PX}px the template gives its "
+        f"title node, so it would run under the logo. Shorten it or let it wrap: {title!r}"
+    )
 
 
 def assert_license_clears_tagline(license_text: str) -> None:
@@ -773,6 +771,44 @@ def assert_modern_labels_fit(ax, tb_global: Table, tb_extremes: Table, accent) -
         if right_edge > x_max:
             overflowing.append(f"{gid} overruns the plot by {_data_x_to_px(ax, right_edge - x_max):.1f}px")
     assert not overflowing, "Labels in the right-hand margin do not fit: " + "; ".join(overflowing)
+
+
+def draw_text_block(ax, x: float, y: float, text: str, *, ha: str, va: str, fontsize: float, color, gid: str) -> None:
+    """Draw a possibly multi-line label as one text call per line, each carrying its own anchor.
+
+    A `"\\n"` handed to a single `ax.text` gets no `text-anchor` at all: matplotlib centres each line
+    by baking a per-line `translate` in, using its own metrics. The lines then arrive in Figma as
+    independent left-anchored boxes and lose their alignment on each other - and on whatever they
+    label - the moment the font changes. That is the one case the anchor rule cannot rescue, because
+    there is no anchor to preserve.
+
+    Each line sits on an explicit baseline rather than on `va="center"`, which would reserve room for
+    descenders that most of these lines do not use and so ride about a tenth of a line high.
+    """
+    lines = text.split("\n")
+    step = _px_to_data_y(ax, LINE_SPACING * fontsize / POINTS_PER_PIXEL)
+    cap_half = _px_to_data_y(ax, _cap_half_px(fontsize))
+
+    # `y` is where the block's `va` edge belongs; convert it to the first line's visual centre.
+    if va == "top":
+        first_centre = y - cap_half
+    elif va == "bottom":
+        first_centre = y + (len(lines) - 1) * step + cap_half
+    else:
+        first_centre = y + (len(lines) - 1) * step / 2
+
+    for index, line in enumerate(lines):
+        ax.text(
+            x,
+            first_centre - index * step - cap_half,
+            line,
+            fontsize=fontsize,
+            color=color,
+            ha=ha,
+            va="baseline",
+            zorder=7,
+            gid=f"{gid}-{index + 1}" if len(lines) > 1 else gid,
+        )
 
 
 def build_hunter_gatherer_label(tb_summary: Table) -> str:
@@ -828,7 +864,7 @@ def place_labels(ax, tb_historical: Table, fontsize: float, reserved: list[tuple
     ):
         text = society_label(society, period, rate)
         width = _px_to_data_x(ax, _measure_px(text, fontsize))
-        height = _px_to_data_y(ax, 1.3 * fontsize / POINTS_PER_PIXEL)
+        height = _px_to_data_y(ax, LINE_SPACING * fontsize / POINTS_PER_PIXEL)
 
         for offset in LABEL_OFFSETS:
             for alignment, left in (("left", mid + gap_x), ("right", mid - gap_x - width)):
@@ -867,8 +903,8 @@ def reserve_drawn_areas(
     label placed beside its own mark runs straight over its neighbours' unless they are reserved -
     which is what the first render did.
     """
-    height = _px_to_data_y(ax, 1.3 * LAYOUT["label_fontsize"] / POINTS_PER_PIXEL)
-    body_height = _px_to_data_y(ax, 1.3 * LAYOUT["body_fontsize"] / POINTS_PER_PIXEL)
+    height = _px_to_data_y(ax, LINE_SPACING * LAYOUT["label_fontsize"] / POINTS_PER_PIXEL)
+    body_height = _px_to_data_y(ax, LINE_SPACING * LAYOUT["body_fontsize"] / POINTS_PER_PIXEL)
     marker_half_x = _px_to_data_x(ax, MARKER_CLEARANCE_PX)
     marker_half_y = _px_to_data_y(ax, MARKER_CLEARANCE_PX)
 
@@ -954,6 +990,16 @@ def _lowest_label(lowest: Table) -> str:
 def _lines(text: str) -> int:
     """How many lines a wrapped block occupies."""
     return text.count("\n") + 1
+
+
+def _cap_half_px(fontsize: float) -> float:
+    """Half a cap height at this size, in template pixels.
+
+    What turns a row's centre into a baseline. Measured off a digit, which has no descender, so lines
+    with and without one land on the same baseline.
+    """
+    extents = TextPath((0, 0), "0", prop=FontProperties(size=fontsize)).get_extents()
+    return extents.ymax / 2 / POINTS_PER_PIXEL
 
 
 def _points(template_px: float) -> float:
