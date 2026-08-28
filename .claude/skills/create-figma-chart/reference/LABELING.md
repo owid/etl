@@ -43,6 +43,50 @@ to the band's width less that padding on both sides. If the text does not fit th
 readable size, the band is too narrow for an in-band label — put the note beside it instead of
 shrinking the type.
 
+### Recolouring a stretch, and bracketing it with event rules
+
+The device table's *period told through the line* and *a moment* rows compose, and together they replace an
+arrow entirely: **recolour the stretch, put a thin dashed event rule at each boundary year, and dot the line
+where each rule meets it.** The rule is the pointer, so adding an arrow re-asserts the single point the
+recolour exists to avoid — the same reason the period band takes no arrow. Worked end to end on Chile's
+liberal-democracy index (1973 coup, 1990 restoration): Denim to 1972, Rusty Orange across the dictatorship,
+Denim from 1989, a rule from each dot to the nearer plot edge, and one annotation beside each rule ending
+8px short of it. No leader line and no arrow, and the annotations sat in the two large empty regions the
+shape of the data creates.
+
+Four things to get right:
+
+- **Split the line by slicing its OWN vertices, not by drawing new ones.** Read `vectorPaths`, confirm
+  `index = year - firstYear` against two known points, then clone the line per segment and rewrite each
+  clone's path to its slice. Translate each slice so its own minimum is `(0,0)` and set the node's `x`/`y`
+  to that minimum's absolute position — otherwise the node moves (GOTCHAS). Have consecutive segments
+  **share** their boundary vertex, and assert afterwards that segment *n*'s end equals segment *n+1*'s
+  start and that the union spans exactly what the original did.
+- **`strokeCap = "ROUND"` on the interior ends, and NOT on the two outer ones.** Separate paths have no
+  join, only caps, so a sharp direction change at a boundary shows a wedge with butt caps. But a round cap
+  on the *outer* ends overshoots by half the stroke weight and pushes the group past the content edge. The
+  middle segment's round caps cover both joins on their own, so the first and last segment can keep their
+  outer ends square.
+- **The naming convention cannot express this, and it costs a check.** `line__<Entity>__<phase>` makes the
+  series name `<Entity>__<phase>`, which no longer pairs with `outline__<Entity>` — so `series-weight`
+  reports the halo as an *unpaired* `outline__*` and **excludes it from judging**. Measured: 3 segments
+  judged at the house 3px, halo not judged. Either accept it and verify the halo's 4px by hand (say so in
+  the report), or name all three `line__<Entity>` and lose the phase names a designer opening the file
+  would want. Prefer the descriptive names; this is a gap in the convention, not in the chart.
+- **Decide where the colour changes relative to the event rule, and say why.** The two need not coincide.
+  Chile's coup was September 1973, so the 1973 annual value already reflects it and the 1972->1973 segment
+  *is* the collapse: colouring from the 1972 vertex makes the whole cliff the dictatorship colour, which
+  reads best, at the cost of the colour changing ~7px left of the rule. Starting at 1973 instead aligns
+  them and splits the cliff across two colours, which reads worse. Either is defensible; leaving the choice
+  unrecorded is not, because the next reader will "fix" it.
+
+**Check the grayscale separation of the two phase colours, and expect it to be poor.** Denim and Rusty
+Orange measure 1.14:1 in grayscale — near-identical lightness — so a printed copy loses the phase
+distinction entirely even though colour-vision passes comfortably (min deltaE 70.1). That is acceptable
+*because the rules, dots and annotations carry the story without colour*, which is a property of this
+composition and not a general excuse. If the recolour is the only thing marking the period, pick colours
+that differ in lightness (GUIDELINES.md -> Colors: the lightness column, not the hue).
+
 ## Placing an arrow
 
 An arrow has two ends and both are load-bearing: the tip has to point at the thing it names, and the

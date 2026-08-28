@@ -44,6 +44,25 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > preambles. `--check` fails on that and warns past 85%.
 > **Run all four** — each reports its own rows and nothing else, so a group you skip is a group
 > nobody checked.
+>
+> **The pair above is STALE — `--rows geometry,annotations` is now 50,594 characters, 101% of the cap.**
+> `inline_script.py --check` measures the pair declared here and will say so. The split that fits, measured
+> 2026-08-28: **`annotations` (45,163), `series` (34,294), `type,geometry` (~42,500)** — three calls, not
+> four, because the preamble is byte-identical across slices and the row groups are self-contained blocks
+> after it (GOTCHAS.md → Running the scripts has the `cmp` proof and the composition rule). Re-measure and
+> update both places together when the script next grows.
+>
+> **Budget for this: relaying the pass is the single largest time cost in a run.** The benchmark's second
+> run took 48 min against a 30.8 min baseline, and roughly 17 min of the difference was relaying these
+> groups verbatim — the baseline never ran them at all. Three composed calls and `Read` instead of `cat`
+> (GOTCHAS.md) is most of that back. It is still worth paying: on that run the pass caught two defects that
+> no screenshot showed and that the build's own measurements had passed.
+>
+> **Run `geometry` once on the FITTED chart, before you add labels and annotations.** Its `box-alignment`
+> row judges the fit, and a fit defect does not heal — on that run it was present from Step 7 onward and
+> was only found at the end, costing a diagnose-fix-reverify cycle with the annotations already built on
+> top of it. One early `geometry` call is cheaper than that cycle, and the rest of the pass still runs
+> after the last change.
 > `diff_against_template.js` (~12,000 stripped) needs none of this.
 >
 > **Do NOT substitute a hand-rolled subset. It is worse than skipping the pass, and this is
@@ -63,6 +82,15 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > tier, annotation block gap, and the series polylines the annotation-overlap row needs. Done one at
 > a time those are a dozen round trips at ~8-10s each.
 >
+> **`label-contrast-on-background` is blind to an annotation built the prescribed way — expect it to skip
+> and compute those by hand.** Bolding the category word (which the house convention requires) makes
+> `node.fills` report `figma.mixed`, so the row's `Array.isArray(n.fills)` guard yields `null` for the fill,
+> the annotation drops out of its candidate list, and the row says *"no label__*/annotation__* text sits on
+> the frame's own background"* — on a frame with two annotations. An end label named anything but
+> `label__*` is invisible to it for a second reason. Measured on the benchmark's second run: both
+> annotations and the end label skipped, and computed by hand they were 6.79:1 (`#5b5b5b`), 5.66:1 (Rusty
+> Orange) and 5.45:1 (Denim) against white — all passing. Report the numbers; do not report the row as
+> covered.
 > **Every row it cannot judge comes back `SKIPPED` with the reason and the tool that owns it** —
 > colour-vision and grayscale (`color_audit.py`), spelling (`codespell`), the data-truth row
 > (`/adversarial-data-review`), entity completeness (needs the *effective* selection from outside
@@ -553,6 +581,27 @@ mock, and both changes make a row *less* red on purpose. Read them before treati
   `[3,2]` allowance belongs to a slope chart's native **zero line**, not to the whole solid-by-design
   bucket: granted in bulk it also accepted an ordinary tick or axis line dashed `[3,2]`, which this
   document permits nowhere.
+
+## Audit the SKIPPED rows before you report, and say which of the three they are
+
+A dozen rows come back `SKIPPED`, and they are not one thing. Sort every one into **N/A here** (no arrows
+on this chart, no legend, not a map), **done by hand this run** (with the number), or **genuinely still
+open** (with who owns it). A report that lists them all as "skipped" understates the coverage in the first
+two cases and overstates it in none — which sounds safe and is not, because the reader cannot see which
+rows actually needed doing.
+
+Measured on the benchmark's second run, where the first report got this wrong: **two rows were satisfied
+and reported as skipped anyway** — `entities-all-render` (one entity selected via `country=~CHL`, one
+rendered, so it passes trivially) and `text-hierarchy-ranks` (25 > 16 > 15 = 15 > 14, same-rank items
+sharing a size). **One was genuinely open and had to be run afterwards**: `text-true-of-indicator`, because
+the subtitle had been *trimmed* from the indicator's `descriptionShort` — six components folded into four —
+which is a claim about what the producer measures and needs checking against the producer, not against the
+chart. The rest were legitimately N/A. So the audit is not paperwork: it found one real gap out of thirteen.
+
+**A trimmed subtitle is the recurring one.** Shortening the indicator's own description to fit a DI is
+normal and often right, but it converts a producer's wording into your paraphrase, so it belongs in
+`text-true-of-indicator` rather than in the layout rows. State the trim explicitly when you report, and name
+what was dropped, so a topic owner can accept or reject it.
 
 ## A skip with a false reason is the failure mode, not a wrong number
 

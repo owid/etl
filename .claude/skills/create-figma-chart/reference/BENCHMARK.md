@@ -79,6 +79,70 @@ wait wearing a checkpoint's clothes**, and it is 5× the real approval. This is 
 are actually for: a checkpoint is part of the design and stays, a stall is a defect and shows up
 here as human time the skill did not need to spend.
 
+**Second run, 2026-08-28, on `claude/create-figma-benchmark-chart-3r1st7` (cloud sandbox):**
+
+| | run 1 (local) | run 2 (cloud) |
+|---|---|---|
+| **agent time** | **30.8 min** | **~48 min** |
+| human wait | 93 s (16 s checkpoint + 77 s stall) | ~60 s — one checkpoint, no stall |
+| Figma calls | 28 in the build proper | 28 (14 in the build spine) |
+| messages with >1 Figma call | 0 | 3, peak 3 in flight |
+| `verify_page.js` run? | **no — not at all** | **yes, all four row groups** |
+| defects the pass caught | — | **2**, neither visible in a render |
+
+**Read that as two different runs, not a 17-minute regression — and quote the split, never the total.**
+Run 1 never executed the Step 8c script; run 2 ran every group, and relaying them verbatim accounts for
+substantially all of the difference. On the part the two share, run 2 was *faster*: **14 Figma calls for
+the build spine** against run 1's 28, at the low end of the ~14–18 a template should cost, with the Step 6
+and Step 4 questions collapsed into a single checkpoint and no stall. The honest comparison is therefore
+**14 calls / spine-only vs 28**, plus a first measurement of what the gate costs. Future runs should carry
+both figures, because a total that silently includes or excludes the pass is not comparable to anything.
+
+What the pass bought for that time, both invisible on screen and both passed by the build's own
+measurements: a **2.28px `box-alignment` failure** (a hidden node's ancestor groups still counting toward
+the chart group's box) and **furniture left mid-scale** (tick marks at 0.666px, gridline dash at
+`[2.663, 2.663]`). Both are now rules in FITTING.md, so the next run should not re-find them.
+
+**A correction to this page's own rationale, which run 2 falsified.** *Why this one* claims the two
+annotations force "the curvy arrows, and therefore the Step 8c pixel probes — the arrow-gap check". They
+do not. LABELING.md's device table assigns *a moment* to a thin vertical event rule and *a period told
+through the line* to a recolour, and explicitly warns against aiming one arrow at a multi-year story — using
+this very domain as its example. Built correctly, this chart carries **no arrow at all**, so
+`arrow-clearance` and the four-render probe are never exercised and come back SKIPPED with nothing to
+measure. The spec is left as written (it predates the runs on purpose); what needs changing is the
+expectation, or the addition of a second fixed request whose note really is about one value.
+
+## Every run ends by folding its lessons in — and they are general, not benchmark lessons
+
+**This is a fixed condition of the run, not a follow-up.** The headline is a number, but a run that
+surfaces defects and does not write them back has thrown away most of what it cost. So the run is not
+finished when the chart is delivered; it is finished when the lessons are in the skill's files and
+`verify_docs.py --structure` passes.
+
+**Where they go is the load-bearing part: into the skill, never into this page.** A lesson filed here is
+read only by the next benchmark run, which is the rarest run there is. A lesson in
+[GOTCHAS.md](GOTCHAS.md), [CHECKS.md](CHECKS.md), [FITTING.md](FITTING.md), [LABELING.md](LABELING.md),
+[GUIDELINES.md](../GUIDELINES.md) or the spine is picked up automatically by **every** future run, on every
+chart, whether or not anyone is benchmarking. This page records the number and what explains it. It does
+not record fixes.
+
+Three consequences worth stating, because each was got wrong once:
+
+- **Generalize past the chart in hand.** A finding met on a single-country line chart is almost never about
+  single-country line charts. "A group's box includes its hidden descendants" is a fact about Figma and
+  belongs in the fitting rules for every chart type — not in a note about Chile.
+- **Put each lesson at the step that will need it**, so it costs a run nothing until that step runs. The
+  spine and GUIDELINES.md are read on every run, so bytes there are a standing tax; a reference file is
+  read once, at its step. When the spine has to grow, pay for it by deduplicating something already there.
+- **A lesson that makes the next run faster outranks one that makes it more thorough**, when you have to
+  choose — but prefer the edit that does both, which is usually "here is the cheaper way to run the check"
+  rather than "skip the check".
+
+**Ordinary runs fold their lessons in too.** The benchmark does not own this habit, it just guarantees the
+habit happens on a schedule: any run of this skill that learns something the files do not say should end
+the same way. What the benchmark adds is the number that tells you whether the accumulated edits are
+actually making runs cheaper.
+
 ## What explains the number
 
 Sweep the session transcript afterwards — `tool_use` → `tool_result` timestamps, **grouped by the
