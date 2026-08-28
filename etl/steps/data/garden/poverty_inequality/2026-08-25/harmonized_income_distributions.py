@@ -218,6 +218,7 @@ def run() -> None:
 def make_bin_lookup() -> Table:
     """The canonical 109-bin structure: label, bounds (fractions) and a 0-108 position index."""
     labels = wid_bin_labels()
+    # "p99.9p100" -> ("99.9", "100"): strip the leading p, split on the separator p.
     bounds = [label[1:].split("p") for label in labels]
     tb = Table(
         {
@@ -288,9 +289,19 @@ def process_wid_distributions(tb_dist: Table, tb_pop: Table, bins_lookup: Table,
     d = d.merge(observed, on=["country", "year", "welfare_type"], how="left")
     d["wid_extrapolated"] = d["wid_extrapolated"].fillna("yes")
 
+    # Annual -> daily, to match PIP's clock. No PPP division here: that already happened in the
+    # snapshot's Stata extraction, and doing it twice was a historical bug in the source project.
     d["avg_daily_per_adult"] = d["avg"] / DAYS_PER_YEAR
+
+    # Per adult -> per capita. The same total income spread over everyone rather than over adults
+    # only, so the per-capita figure is SMALLER by exactly the adult share (~0.76 US, ~0.47 Nigeria).
+    # The float64 cast matters: these arrive as nullable dtypes, whose masked arithmetic is orders
+    # of magnitude slower on a table this size.
     adult_share = (d["adult_population"] / d["total_population"]).astype(np.float64)
     d["avg_daily_per_capita"] = d["avg_daily_per_adult"] * adult_share
+
+    # Bin populations: each bin covers a known slice of the distribution, so it holds that share of
+    # the country. Both bases are built because SERIES_BASIS picks one per series below.
     bin_width = d["p_high"] - d["p_low"]
     d["bin_adult_population"] = d["adult_population"].astype(np.float64) * bin_width
     d["bin_total_population"] = d["total_population"].astype(np.float64) * bin_width
@@ -335,8 +346,11 @@ def aggregate_pip_bins(tb_bins: Table, bins_lookup: Table, last_year: int) -> Ta
     counts = d.groupby(["country", "year"], observed=True).size()
     assert (counts == 1000).all(), f"PIP country-years without exactly 1000 bins: {counts[counts != 1000].head()}"
 
+    # Map each 0.1% quantile to its 109-bin position: the first 990 fall ten-to-one into the 99
+    # one-percent bins, and 991-1000 map one-to-one onto the ten bins above p99.
     q = d["quantile"].astype(int)
     d["bin_index"] = np.where(q <= 990, (q - 1) // 10, 99 + (q - 991))
+    # Aggregate on income, not on averages: a mean of means would ignore the bin populations.
     d["income"] = d["avg"] * d["pop"]
 
     g = (
@@ -390,6 +404,8 @@ def fit_consumption_income_model(tb_percentiles: Table) -> Table:
     national country-years where PIP publishes both welfare types at the current PPP round."""
     d = national_survey_percentiles(tb_percentiles)
 
+    # The estimation sample: country-years where PIP publishes BOTH welfare types, so income and
+    # consumption are observed for the same population.
     dual = d.groupby(["country", "year"], observed=True)["welfare_type"].nunique()
     dual = dual[dual == 2].index
     sample = d.set_index(["country", "year"]).loc[dual].reset_index()
@@ -398,12 +414,15 @@ def fit_consumption_income_model(tb_percentiles: Table) -> Table:
         .reset_index()
         .dropna()
     )
+    # Both sides are logged below, so zero and negative values cannot enter.
     piv = piv[(piv["income"] > 0) & (piv["consumption"] > 0)]
     log.info(
         f"Consumption->income estimation sample: {len(dual)} dual country-years, "
         f"{piv['country'].nunique()} countries, {len(piv):,} percentile pairs"
     )
 
+    # One regression per percentile: the mapping differs along the distribution, which is the
+    # whole point of fitting it per percentile rather than once for the country.
     rows = []
     for p, g in piv.groupby("percentile"):
         x = np.log(g["consumption"].to_numpy(dtype=float))
@@ -436,9 +455,13 @@ def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int,
     )
     types = types[types["country"].isin(countries)]
 
+    # A complete country x year grid, so every panel year gets a basis even without a survey.
     years = Table({"year": range(first_year, last_year + 1)})
     grid = types[["country"]].drop_duplicates().merge(years, how="cross").sort_values(["country", "year"])
 
+    # NOTE: merge_asof(direction="nearest") has NO distance limit, so a panel year far from any
+    # survey still takes that survey's basis — up to 32 years away in the current data. Flagged in
+    # ai/adversarial-review-harmonized_income_distributions-2026-08-26.md, not yet capped.
     if WELFARE_ASSIGNMENT == "nearest_survey":
         tb = pd.merge_asof(
             grid.sort_values("year"),
@@ -452,6 +475,7 @@ def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int,
         latest = types.sort_values("survey_year_used").groupby("country", observed=True).tail(1)
         tb = grid.merge(latest, on="country", how="left")
 
+    # `adjusted` drives the transform downstream: only consumption country-years get mapped.
     tb["adjusted"] = tb["welfare_type"] == "consumption"
     n_switch = tb.groupby("country", observed=True)["welfare_type"].nunique().gt(1).sum()
     missing = sorted(set(countries) - set(tb["country"].unique()))
@@ -565,12 +589,18 @@ def graft_top_tail(tb_base: Table, tb_wid: Table) -> Table:
     below keep their base values."""
     anchor = SPLICE_PERCENTILE - 1  # bin p94p95
 
+    # Both series as (country-years x 109) matrices, so the graft is one vectorised expression.
     base_keys, base_avg = to_matrix(tb_base, tb_base["series"].iloc[0])
     shape_keys, shape_avg = to_matrix(tb_wid, TOP_TAIL_SHAPE_SERIES)
     assert base_keys.equals(shape_keys), "Base and shape series cover different country-years."
 
     assert (shape_avg[:, anchor] > 0).all(), "WID anchor-bin value is zero for some country-year."
+    # WID's top as a ratio to its own anchor bin. Dividing by the anchor makes it scale-free, so
+    # only WID's SHAPE crosses over — any per-country factor in WID's levels (PPP vintage, price
+    # base, per-adult vs per-capita) cancels here.
     ratio = shape_avg / shape_avg[:, [anchor]]
+    # Rescale that shape to the base series' own anchor level, above the anchor only; the anchor
+    # bin and everything below keep their base values, so the splice is continuous by construction.
     col = np.arange(base_avg.shape[1])
     adjusted = np.where(col > anchor, base_avg[:, [anchor]] * ratio, base_avg)
     assert (np.diff(adjusted[:, anchor:], axis=1) >= 0).all(), "Non-monotone top after the graft."
@@ -592,6 +622,7 @@ def rescale_wid_to_adjusted_pip_means(tb_wid: Table, tb_top_adjusted: Table) -> 
         g = t.assign(income=t["avg"] * t["pop"]).groupby(["country", "year"], observed=True)[["income", "pop"]].sum()
         return (g["income"] / g["pop"]).rename("mean").reset_index()
 
+    # Each side's mean uses its OWN population weights, then the ratio is the per-country factor.
     factors = weighted_means(tb_top_adjusted).merge(
         weighted_means(tb), on=["country", "year"], suffixes=("_target", "_wid")
     )
@@ -642,12 +673,16 @@ def mld_decomposition(tb_distributions: Table, tb_pop: Table):
     d = d.merge(tb_pop, on=["country", "year"], how="left")
     assert d["total_population"].notna().all(), "Missing WID population for some country-year in the common sample."
 
+    # Country weights come from WID for every series (see the docstring), so the bin weight is the
+    # basis-matched national population times the bin's width.
     basis_is_adult = d["series"].map(SERIES_BASIS).eq("adult").to_numpy()
     ref_pop = np.where(
         basis_is_adult, d["adult_population"].to_numpy(dtype=float), d["total_population"].to_numpy(dtype=float)
     )
     w = ref_pop * (d["p_high"] - d["p_low"]).to_numpy(dtype=float)
 
+    # log(0) is undefined, so zero incomes take the floor — here only, never in the stored
+    # distributions. `zero_bin` carries the count so the report can quantify the substitution.
     x = d["avg"].to_numpy(dtype=float)
     zero = x == 0
     x = np.where(zero, ZERO_INCOME_REPLACEMENT, x)
@@ -657,6 +692,7 @@ def mld_decomposition(tb_distributions: Table, tb_pop: Table):
     d["wlnx"] = w * np.log(x)
     d["zero_bin"] = zero
 
+    # Per country: the weighted mean, and MLD within it as ln(mean) - mean of ln(x).
     by_country = d.groupby(["year", "series", "country"], observed=True)[["w", "wx", "wlnx"]].sum()
     by_country["mean"] = by_country["wx"] / by_country["w"]
     by_country["mld_within"] = np.log(by_country["mean"]) - by_country["wlnx"] / by_country["w"]
@@ -666,6 +702,8 @@ def mld_decomposition(tb_distributions: Table, tb_pop: Table):
 
     g = by_country.reset_index().merge(grand_mean.rename("grand_mean").reset_index(), on=["year", "series"], how="left")
     g = g.merge(total_sums["w"].rename("w_total").reset_index(), on=["year", "series"], how="left")
+    # The decomposition itself: both components are population-share-weighted sums, the between
+    # term over each country's distance from the global mean, the within term over its internal MLD.
     g["population_share"] = g["w"] / g["w_total"]
     g["between_term"] = g["population_share"] * np.log(g["grand_mean"] / g["mean"])
     g["within_term"] = g["population_share"] * g["mld_within"]
