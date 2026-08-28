@@ -42,11 +42,22 @@ the structure — which text slots exist, in what order — the proportions, and
 
 Figma handoff — a recipe, not a record
 --------------------------------------
-File `Charts (2026)`, key `s6Sv60bakebRRW2TxsMQbF`; page **20260817 How do people spend their time?
-(Pablo A)** (`25524:5`), which sits among the dated chart pages after the divider. One frame,
-`how-do-people-spend-their-time` (`26879:11`), a clone of `Static Chart Template_Vertical` (`5332:93`,
-850x1095), at x=1000 with its unstyled import parked at x=70 to the LEFT so the page reads original
-then edited.
+File `Charts (2026)`, key `s6Sv60bakebRRW2TxsMQbF`:
+https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-
+
+- Page **20260817 How do people spend their time? (Pablo A)**, `25524:5` —
+  https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=25524-5
+  Dated when the page was first placed, not when it was last refreshed, and it sits among the dated
+  chart pages after the divider.
+- Frame **`how-do-people-spend-their-time`**, `26879:11` —
+  https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=26879-11
+  A clone of `Static Chart Template_Vertical` (`5332:93`, 850x1095), at x=1000, with its unstyled
+  import parked at x=70 to the LEFT so the page reads original then edited.
+
+**The node ids are a convenience; the frame NAME is the durable join.** It is the kebab-case slug the
+website exports the PNG by, so it is the one string shared by the layer panel, the exported file and
+this step — and re-cloning a rebuilt template mints new ids, which is exactly when someone comes
+looking. Search the file for the name before trusting an id.
 
 **Re-verify the templates before cloning** — `/create-figma-chart`'s `scripts/verify_templates.js`,
 one `use_figma` call, `ok`/`DRIFT` verdict. The design team edits these frames in place and has: the
@@ -467,8 +478,13 @@ LAYOUTS = {
             "subtitle_slot_px": 817.57,
             "subtitle_px": 16,
             "subtitle_line_px": 19,
-            # Footer. Its rows are pinned to the frame's bottom margin, so the Note's ink bottom is
-            # fixed and its top rises as it wraps.
+            # Footer. Its wrapper is pinned by its TOP (`constraints.vertical: MIN`), so it grows
+            # DOWNWARD as the Note wraps — not upward into the chart, which is what this step's own
+            # layout does. The two agree while the Note is the template's own two lines, which is what
+            # `build_note` caps it at; a third line would leave the frame's licence row 2px from the
+            # bottom edge where the template puts 16. If a longer Note is ever wanted, re-pin the
+            # footer in the frame (`footer.y = frame.height - margin - footer.height`) and let it eat
+            # upward, and raise the cap here in the same change.
             "note_px": 12,
             "note_line_px": 14,
             "note_slot_px": 818,
@@ -1593,5 +1609,10 @@ def build_note(tb: Table, ages: dict[str, str], layout: dict) -> str:
     # The Note's slot is two lines tall, and the footer's auto-layout grows upward past that rather
     # than clipping — but every line it gains is a line the chart loses, so cap it. Three is what the
     # template's 12px takes for this Note where this step's older, smaller footer took two.
-    assert lines_in(wrapped) <= 3, f"The Note wraps to {lines_in(wrapped)} lines in its slot — shorten it."
+    # Two, not three: the frame's footer grows downward from a fixed top (see `note_bottom_px`), so a
+    # third line eats the template's bottom margin rather than the chart's band.
+    assert lines_in(wrapped) <= 2, (
+        f"The Note wraps to {lines_in(wrapped)} lines and the footer only holds two — shorten it, or "
+        f"re-pin the frame's footer and raise this cap together."
+    )
     return wrapped
