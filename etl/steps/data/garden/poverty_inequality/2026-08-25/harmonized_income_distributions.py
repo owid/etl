@@ -465,7 +465,18 @@ def fit_consumption_income_model(tb_percentiles: Table) -> Table:
 
 def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int, last_year: int) -> Table:
     """Each (country, year)'s welfare basis: the welfare type of the country's nearest national
-    survey (years with both types count as income, which PIP prefers where both exist)."""
+    survey. Years with both types count as income.
+
+    Income wins the tie because it is the TARGET basis of this harmonisation: `pip_income_basis`
+    exists to put every country on an income footing, so where PIP observes income directly there
+    is nothing to estimate and the fitted transform is skipped (`adjusted=False`). Using the model
+    where the real thing is available would only add error.
+
+    This is NOT because PIP prefers income. PIP states no preference rule — its handbook calls the
+    choice country-driven and, if anything, leans the other way ("the consumption approach is
+    arguably more directly connected to economic welfare") — and its own consolidated
+    `complete_series` keeps both welfare types for dual country-years rather than picking one.
+    """
     d = national_survey_percentiles(tb_percentiles)
     types = (
         d.groupby(["country", "year"], observed=True)["welfare_type"]
