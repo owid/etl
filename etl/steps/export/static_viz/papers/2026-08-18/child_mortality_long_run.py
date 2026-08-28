@@ -65,7 +65,24 @@ character count.
 
 That is deliberately not a table of hand-tuned offsets. The historical half of this chart never
 changes, but the global series gains a year annually, and a search re-solves around it where fixed
-offsets would silently start colliding.
+offsets would silently start colliding. The ladder of offsets is derived from each label's own height
+too: rungs finer than the block is tall only offer the search slots that cannot clear.
+
+Two defects in that search are worth not reintroducing, because neither shows up as an error - the
+search simply returns a worse answer:
+
+- **A label was blocked by its own mark.** The gap a label sits at is smaller than the clearance the
+  mark reserves, so the slot level with the mark - the one the ladder tries first, and the only one
+  needing no leader - was rejected for all 21. Every label is now tested against every box except its
+  own mark's.
+- **A stale reserve fenced off the empty band.** The global series' label column was reserved to the
+  *left* of the series, from before those labels moved to its right. It protected space nothing
+  occupies and blocked the band between the pre-modern cluster and the modern line, which is the room
+  the lowest labels need.
+
+With both fixed, all 21 place at a median 3.8 percentage points from their marks and a worst case of
+8.4. For comparison, stacking the period onto a second line - same content, same sizes - needed 19.1
+at worst and stranded four labels in the empty band, which is why the ranking is done on one line.
 
 Figma
 -----
@@ -79,7 +96,7 @@ sitting at the top of the dated block, immediately after the `-----------` divid
 | Frame | Node | Deep link |
 |---|---|---|
 | `long-run-history-child-mortality` | `26888:6` | https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=26888-6 |
-| `long-run-history-child-mortality - step render (reference)` | `26888:799` | this step's own PNG, parked 80px to the left |
+| `long-run-history-child-mortality - step render (reference)` | `27044:817` | this step's own PNG, parked 80px to the left |
 
 **The node ids are a convenience and go stale; the frame name is the durable join.** It is the same
 kebab-case slug the website exports the PNG by, so it is the one string shared by the layer panel, the
@@ -241,7 +258,12 @@ LAYOUT = {
     "tagline_font_px": 11,
     # In-plot type, which the template says nothing about because the import replaces the plot.
     "body_fontsize": 10.5,
-    "label_fontsize": 8,
+    # Each society's label is two ranked lines: who and how many, then when, a step smaller. Sizes are
+    # template pixels on the annotation ladder (XL 16 / L 15 / M 14 / S 13 / XS 12), and the smaller of
+    # the two sits on the 12px floor rather than under it - the single-line label this replaced ran at
+    # 11.1px, below the floor for in-plot text.
+    "label_font_px": 13,
+    "label_period_font_px": 12,
     # Reserved below the plot for the tick marks, the tick labels and the bold axis label.
     "x_label_space": 46,
 }
@@ -288,7 +310,14 @@ LEADER_THRESHOLD = 1.4
 
 # Candidate vertical offsets for a label, in percentage points, tried in this order: level with its
 # mark first, then alternating above and below.
-LABEL_OFFSETS = [0.0, 1.3, -1.3, 2.6, -2.6, 3.9, -3.9, 5.2, -5.2, 6.5, -6.5, 7.8, -7.8]
+# Candidate vertical offsets for a label, as multiples of its own height: level with its mark first,
+# then alternating above and below. Derived rather than listed, because the useful step is a property
+# of the label - a ladder whose rungs are finer than the block is tall just offers the search slots
+# that cannot clear, and one whose rungs are coarser skips slots that would have. Half a block per
+# rung lets two labels interleave where their x ranges differ. Fourteen rungs is what the 1600-1900
+# cluster needs: eleven marks inside 16 percentage points, most of them wanting the same column.
+LABEL_OFFSET_STEP = 0.55
+LABEL_OFFSET_RUNGS = 14
 
 
 def run() -> None:
@@ -387,7 +416,7 @@ def create_visualization(
 
     width_px, height_px = LAYOUT["size"]
     margin_px = LAYOUT["margin"]
-    label_fontsize = LAYOUT["label_fontsize"]
+    label_fontsize = _points(LAYOUT["label_font_px"])
 
     def fx(x_px: float) -> float:
         """Template x, in pixels from the left edge, as a figure fraction."""
@@ -496,8 +525,8 @@ def create_visualization(
     # The hunter-gatherer label is centred under its marker, so the axis has to start far enough left
     # to hold half of it. Measured, because the label carries a count from the data and a wording
     # change would silently push it off the frame.
-    hunter_gatherer_label = build_hunter_gatherer_label(tb_summary)
-    hunter_gatherer_half_px = max(_measure_px(line, label_fontsize) for line in hunter_gatherer_label.split("\n")) / 2
+    hunter_gatherer_label = uniform_lines(build_hunter_gatherer_label(tb_summary), label_fontsize)
+    hunter_gatherer_half_px = block_width_px(hunter_gatherer_label) / 2
 
     highest_rate = float(
         max(tb_historical["share_dying_before_15"].max(), tb_hunter_gatherer["share_dying_before_15"].max())
@@ -511,7 +540,7 @@ def create_visualization(
     lead_px = hunter_gatherer_half_px + LABEL_GAP_PX
     trail_px = (
         max(
-            *(_measure_px(text, label_fontsize) for text in build_society_labels(tb_historical)),
+            *(run_line_width_px(runs) for runs in build_society_labels(tb_historical)),
             *(
                 _measure_px(line, LAYOUT["body_fontsize"])
                 for _, _, text, _ in build_modern_labels(tb_global, tb_extremes, accent)
@@ -614,16 +643,16 @@ def create_visualization(
         gid="historical__points",
     )
 
-    reserved = reserve_drawn_areas(
+    reserved, own_marks = reserve_drawn_areas(
         ax, tb_historical, tb_global, rule_span, historical_mean, hunter_gatherer_x, hunter_gatherer_mean
     )
-    placements, unplaced = place_labels(ax, tb_historical, label_fontsize, reserved)
+    placements, unplaced = place_labels(ax, tb_historical, reserved, own_marks)
     assert not unplaced, (
         "No clear slot was found for these labels, so they would sit on top of something: "
-        f"{unplaced}. Widen the plot, shrink the label size, or extend LABEL_OFFSETS."
+        f"{unplaced}. Widen the plot, shrink the label size, or add rungs to LABEL_OFFSET_RUNGS."
     )
-    for text, (x, y, horizontal_alignment, mark_x, mark_y) in placements.items():
-        slug = _slug(text)
+    for (society, period), (runs, x, y, horizontal_alignment, mark_x, mark_y) in placements.items():
+        slug = _slug(f"{society} {period}")
         # A label pushed clear of its neighbours can end up a few percentage points from the mark it
         # names, and with 21 marks in one band the reader then cannot tell which is which. Where that
         # happens, a hairline joins the two; where the label sits level with its mark, adjacency does
@@ -638,15 +667,13 @@ def create_visualization(
                 zorder=3,
                 gid=f"historical__leader-{slug}",
             )
-        ax.text(
+        draw_run_line(
+            ax,
             x,
             y,
-            text,
-            fontsize=label_fontsize,
+            runs,
+            align=horizontal_alignment,
             color=TEXT_COLOR,
-            ha=horizontal_alignment,
-            va="center",
-            zorder=7,
             gid=f"historical__label-{slug}",
         )
 
@@ -658,7 +685,6 @@ def create_visualization(
         hunter_gatherer_label,
         ha="center",
         va="top",
-        fontsize=label_fontsize,
         color=TEXT_COLOR,
         gid="hunter_gatherer__mean_label",
     )
@@ -666,10 +692,13 @@ def create_visualization(
         ax,
         (rule_span[0] + rule_span[1]) / 2,
         historical_mean - AVERAGE_LABEL_DROP,
-        f"{_round_half_up(historical_mean)}% is the average across these\n{len(tb_historical)} historical societies",
+        uniform_lines(
+            f"{_round_half_up(historical_mean)}% is the average across these\n"
+            f"{len(tb_historical)} historical societies",
+            label_fontsize,
+        ),
         ha="center",
         va="top",
-        fontsize=label_fontsize,
         color=accent,
         gid="historical__mean_label",
     )
@@ -713,10 +742,9 @@ def draw_global_series(ax, tb_global: Table, tb_extremes: Table, accent, fontsiz
             ax,
             anchor + gap,
             rate,
-            text,
+            uniform_lines(text, fontsize),
             ha="left",
             va="bottom" if rate - half_block < ax.get_ylim()[0] else "center",
-            fontsize=fontsize,
             color=color,
             gid=gid,
         )
@@ -834,8 +862,15 @@ def assert_modern_labels_fit(ax, tb_global: Table, tb_extremes: Table, accent) -
     assert not overflowing, "Labels in the right-hand margin do not fit: " + "; ".join(overflowing)
 
 
-def draw_text_block(ax, x: float, y: float, text: str, *, ha: str, va: str, fontsize: float, color, gid: str) -> None:
-    """Draw a possibly multi-line label as one text call per line, each carrying its own anchor.
+def uniform_lines(text: str, fontsize: float) -> list[tuple[str, float]]:
+    """Split a wrapped string into the (line, size) pairs `draw_text_block` takes, all one size."""
+    return [(line, fontsize) for line in text.split("\n")]
+
+
+def draw_text_block(
+    ax, x: float, y: float, lines: list[tuple[str, float]], *, ha: str, va: str, color, gid: str
+) -> None:
+    """Draw a block of labelled lines as one text call per line, each carrying its own anchor.
 
     A `"\\n"` handed to a single `ax.text` gets no `text-anchor` at all: matplotlib centres each line
     by baking a per-line `translate` in, using its own metrics. The lines then arrive in Figma as
@@ -843,27 +878,25 @@ def draw_text_block(ax, x: float, y: float, text: str, *, ha: str, va: str, font
     label - the moment the font changes. That is the one case the anchor rule cannot rescue, because
     there is no anchor to preserve.
 
-    Each line sits on an explicit baseline rather than on `va="center"`, which would reserve room for
-    descenders that most of these lines do not use and so ride about a tenth of a line high.
+    Lines carry their own size, so a block can rank its content: the society labels put the name and
+    the rate on the first line and the period a step smaller on the second. Each sits on an explicit
+    baseline rather than on `va="center"`, which reserves room for descenders most of these lines do
+    not use and rides them about a tenth of a line high.
     """
-    lines = text.split("\n")
-    step = _px_to_data_y(ax, LINE_SPACING * fontsize / POINTS_PER_PIXEL)
-    cap_half = _px_to_data_y(ax, _cap_half_px(fontsize))
+    steps = [_px_to_data_y(ax, LINE_SPACING * size / POINTS_PER_PIXEL) for _, size in lines]
+    caps = [_px_to_data_y(ax, _cap_half_px(size)) for _, size in lines]
+    total = sum(steps)
 
-    # `y` is where the block's `va` edge belongs; convert it to the first line's visual centre.
-    if va == "top":
-        first_centre = y - cap_half
-    elif va == "bottom":
-        first_centre = y + (len(lines) - 1) * step + cap_half
-    else:
-        first_centre = y + (len(lines) - 1) * step / 2
-
-    for index, line in enumerate(lines):
+    # Walk down from the block's top edge, which `va` locates. Doing it this way rather than from the
+    # first line's centre is what lets the lines differ in size.
+    top = y if va == "top" else y + total if va == "bottom" else y + total / 2
+    for index, (line, size) in enumerate(lines):
+        centre = top - sum(steps[:index]) - steps[index] / 2
         ax.text(
             x,
-            first_centre - index * step - cap_half,
+            centre - caps[index],
             line,
-            fontsize=fontsize,
+            fontsize=size,
             color=color,
             ha=ha,
             va="baseline",
@@ -894,18 +927,31 @@ def build_hunter_gatherer_label(tb_summary: Table) -> str:
     return f"Average across {societies} hunter-gatherer\nsocieties: {_round_half_up(mean)}%"
 
 
-def society_label(society: str, period: str, rate: float) -> str:
-    """Label one society with its period and its rate, rounded to a whole percent.
+def society_label(society: str, period: str, rate: float) -> list[tuple[str, float]]:
+    """Label one society as two ranked runs on one baseline: who and how many, then when, a step smaller.
 
-    Rounded because these are estimates from skeletal remains and parish registers, and printing
-    "61.9%" for one claims a precision the study cannot support. It is also what the published chart
-    did. Full precision stays in the garden dataset.
+    The name and the rate are what a reader compares across the 21 marks; the period is the context
+    that tells them what they are comparing. At one size the three competed, so the ranking is real
+    work - but it is done with size alone, on a single line.
+
+    **Stacking the period onto a second line was tried and reverted.** It reads the same and costs 2.3x
+    the height, which this plot does not have: all 21 placed only by drifting up to 19 percentage points
+    from their marks, on fifteen leaders, with four labels stranded in the empty band below the cluster.
+    One line trades that back for width, and width stopped being the binding constraint once a label
+    was no longer blocked by its own mark.
+
+    The rate is rounded to a whole percent because these are estimates from skeletal remains and
+    parish registers, and printing "61.9%" claims a precision the study cannot support. Full precision
+    stays in the garden dataset.
     """
-    return f"{society} {period}: {_round_half_up(rate)}%"
+    return [
+        (f"{society}: {_round_half_up(rate)}%", _points(LAYOUT["label_font_px"])),
+        (period, _points(LAYOUT["label_period_font_px"])),
+    ]
 
 
-def build_society_labels(tb_historical: Table) -> list[str]:
-    """Every society's label, so their measured widths can size the axis before anything is drawn."""
+def build_society_labels(tb_historical: Table) -> list[list[tuple[str, float]]]:
+    """Every society's label as its runs, so measured widths can size the axis before anything is drawn."""
     return [
         society_label(society, period, rate)
         for society, period, rate in zip(
@@ -914,14 +960,93 @@ def build_society_labels(tb_historical: Table) -> list[str]:
     ]
 
 
-def place_labels(ax, tb_historical: Table, fontsize: float, reserved: list[tuple[float, float, float, float]]):
+def block_width_px(lines: list[tuple[str, float]]) -> float:
+    """How wide a block of stacked lines is: its widest line, each measured at its own size."""
+    return max(_measure_px(text, size) for text, size in lines)
+
+
+def space_px(fontsize: float) -> float:
+    """The advance of one space at this size, measured rather than assumed.
+
+    `TextPath` reports the ink, and a space has none, so it is the difference a space makes between
+    two glyphs that gives its advance.
+    """
+    return _measure_px("n n", fontsize) - _measure_px("nn", fontsize)
+
+
+def run_line_width_px(runs: list[tuple[str, float]]) -> float:
+    """How wide a line of ranked runs is: every run plus one space between, each at its own size."""
+    return sum(_measure_px(text, size) for text, size in runs) + sum(space_px(size) for _, size in runs[:-1])
+
+
+def draw_run_line(ax, x: float, y: float, runs: list[tuple[str, float]], *, align: str, color, gid: str) -> None:
+    """Draw ranked runs left to right on one baseline, each carrying its own anchor and size.
+
+    Two rules the re-render in Figma depends on. Every run is **anchored to the edge the whole line is
+    aligned to** - left-anchored for a line that starts at `x`, right-anchored for one that ends there -
+    because an anchor is the only thing that survives the font change, and it is the line's outer edge
+    that has to stay against the mark. And the cursor advances by the run's width **plus a measured
+    space**, while the run drawn is the stripped text: SVG centres trimmed ink, so a run carrying its
+    own trailing space lands half a space off.
+
+    The one thing this cannot preserve is the gap *between* the runs - Lato is narrower than the face
+    matplotlib lays out in, so the first run shrinks and the gap grows by the difference. It is a few
+    pixels on a 13px line. `restyle_static_import.js` has a reflow pass for closing it if it matters.
+    """
+    widths = [_measure_px(text, size) for text, size in runs]
+    gaps = [space_px(size) for _, size in runs[:-1]] + [0.0]
+    total = sum(widths) + sum(gaps)
+    cap_half = _px_to_data_y(ax, _cap_half_px(max(size for _, size in runs)))
+
+    # Walk from the line's own left edge, wherever `align` puts it.
+    left_px = 0.0 if align == "left" else -total
+    for index, (text, size) in enumerate(runs):
+        offset = sum(widths[:index]) + sum(gaps[:index])
+        # Anchored on the aligned edge: a left-aligned line pins each run's left, a right-aligned one
+        # pins each run's right, so the line's outer edge holds when the glyphs shrink.
+        if align == "left":
+            anchor_px, ha = left_px + offset, "left"
+        else:
+            anchor_px, ha = left_px + offset + widths[index], "right"
+        ax.text(
+            x + _px_to_data_x(ax, anchor_px),
+            y - cap_half,
+            text,
+            fontsize=size,
+            color=color,
+            ha=ha,
+            va="baseline",
+            zorder=7,
+            gid=f"{gid}-{index + 1}",
+        )
+
+
+def label_offsets(height: float) -> list[float]:
+    """The ladder of vertical offsets to try for a label of this height, nearest the mark first."""
+    step = height * LABEL_OFFSET_STEP
+    offsets = [0.0]
+    for rung in range(1, LABEL_OFFSET_RUNGS + 1):
+        offsets += [rung * step, -rung * step]
+    return offsets
+
+
+def place_labels(ax, tb_historical: Table, reserved: list[tuple[float, float, float, float]], own_marks: dict):
     """Find a slot for every society's label, or report the ones with nowhere to go.
 
     Greedy and deterministic: highest rate first, and for each, the first candidate slot whose
     measured box clears everything placed so far. Returns the accepted anchors and any failures.
+
+    A two-line label is measured as its widest line by its summed line heights, so ranking the lines
+    trades width for height - which is the trade this chart wants, because the binding constraint in
+    the 1600-1900 cluster is horizontal.
+
+    **A label is never tested against its own mark.** The gap it sits at is smaller than the clearance
+    the mark reserves, so every label overlapped its own mark's box and the slot level with it - the
+    one the ladder tries first and the one that needs no leader - was rejected for all 21. That is
+    invisible in the output: the search just quietly returns its second choice.
     """
     boxes = list(reserved)
-    placements: dict[str, tuple[float, float, str, float, float]] = {}
+    placements: dict[tuple[str, str], tuple[list[tuple[str, float]], float, float, str, float, float]] = {}
     unplaced: list[str] = []
 
     x_min, x_max = ax.get_xlim()
@@ -934,28 +1059,36 @@ def place_labels(ax, tb_historical: Table, fontsize: float, reserved: list[tuple
     for society, period, mid, rate in zip(
         tb["society"], tb["period_label"], tb["period_mid"], tb["share_dying_before_15"]
     ):
-        text = society_label(society, period, rate)
-        width = _px_to_data_x(ax, _measure_px(text, fontsize))
-        height = _px_to_data_y(ax, LINE_SPACING * fontsize / POINTS_PER_PIXEL)
+        runs = society_label(society, period, rate)
+        own = own_marks.get((float(mid), float(rate)))
+        width = _px_to_data_x(ax, run_line_width_px(runs))
+        height = _px_to_data_y(ax, LINE_SPACING * max(size for _, size in runs) / POINTS_PER_PIXEL)
 
-        for offset in LABEL_OFFSETS:
+        for offset in label_offsets(height):
             for alignment, left in (("left", mid + gap_x), ("right", mid - gap_x - width)):
                 y = rate + offset
                 box = (left - pad_x, y - height / 2 - pad_y, left + width + pad_x, y + height / 2 + pad_y)
                 if box[0] < x_min or box[2] > x_max or box[1] < y_min or box[3] > y_max:
                     continue
-                if any(_overlaps(box, other) for other in boxes):
+                if any(_overlaps(box, other) for other in boxes if other is not own):
                     continue
                 boxes.append(box)
                 anchor_x = mid + gap_x if alignment == "left" else mid - gap_x
-                placements[text] = (anchor_x, y, alignment, float(mid), float(rate))
+                placements[(society, period)] = (runs, anchor_x, y, alignment, float(mid), float(rate))
                 break
             else:
                 continue
             break
         else:
-            unplaced.append(text)
+            unplaced.append(f"{society} {period}")
 
+    # How far the search had to push, so a run that only just fits is visible rather than silent.
+    drifts = sorted((abs(y - rate) for _, _, y, _, _, rate in placements.values()), reverse=True)
+    paths.log.info(
+        f"Placed {len(placements)} of {len(tb)} society labels; largest drift from a mark "
+        f"{drifts[0]:.1f}pp, median {drifts[len(drifts) // 2]:.1f}pp, "
+        f"{sum(1 for d in drifts if d > LEADER_THRESHOLD)} needing a leader"
+    )
     return placements, unplaced
 
 
@@ -971,19 +1104,28 @@ def reserve_drawn_areas(
     """Boxes the society labels must not land on: every mark, the two average rules and their labels,
     and the global series with the labels hanging off it.
 
+    Returns the boxes alongside a lookup of each mark's own box, because a label must not be blocked
+    by the mark it names - see `place_labels`.
+
     The marks matter as much as the rest. Eleven of the twenty-one sit between 1600 and 1900, so a
     label placed beside its own mark runs straight over its neighbours' unless they are reserved -
     which is what the first render did.
     """
-    height = _px_to_data_y(ax, LINE_SPACING * LAYOUT["label_fontsize"] / POINTS_PER_PIXEL)
+    height = _px_to_data_y(ax, LINE_SPACING * _points(LAYOUT["label_font_px"]) / POINTS_PER_PIXEL)
     body_height = _px_to_data_y(ax, LINE_SPACING * LAYOUT["body_fontsize"] / POINTS_PER_PIXEL)
     marker_half_x = _px_to_data_x(ax, MARKER_CLEARANCE_PX)
     marker_half_y = _px_to_data_y(ax, MARKER_CLEARANCE_PX)
 
-    reserved = [
-        (mid - marker_half_x, rate - marker_half_y, mid + marker_half_x, rate + marker_half_y)
+    own_marks = {
+        (float(mid), float(rate)): (
+            mid - marker_half_x,
+            rate - marker_half_y,
+            mid + marker_half_x,
+            rate + marker_half_y,
+        )
         for mid, rate in zip(tb_historical["period_mid"], tb_historical["share_dying_before_15"])
-    ]
+    }
+    reserved = list(own_marks.values())
     reserved += [
         # The historical average rule, and the two lines of label under its middle.
         (rule_span[0], historical_mean - height, rule_span[1], historical_mean + height / 2),
@@ -1002,8 +1144,13 @@ def reserve_drawn_areas(
         ),
     ]
 
-    # The global series, as a corridor around the line, plus the column its labels occupy to the left
-    # of the latest year.
+    # The global series, as a corridor around the line, plus the column its four labels occupy.
+    #
+    # That column is to the RIGHT of the series - `draw_global_series` hangs every one of them off
+    # `anchor + gap` - and this reserve used to describe a column to its *left*, from where the labels
+    # sat before they were moved. A stale reserve is worse than a missing one: it fenced off the empty
+    # band between the pre-modern cluster and the modern line, which is exactly the room the lowest
+    # society labels need, while leaving the space the labels really use unprotected.
     years = tb_global["year"].to_numpy()
     rates = tb_global["share_dying_before_15"].to_numpy()
     corridor = _px_to_data_x(ax, 6)
@@ -1011,15 +1158,8 @@ def reserve_drawn_areas(
         reserved.append(
             (float(year) - corridor, float(rate) - height / 2, float(year) + corridor, float(rate) + height / 2)
         )
-    reserved.append(
-        (
-            float(years[0]) - _px_to_data_x(ax, 130),
-            0.0,
-            float(years[-1]),
-            float(rates[0]) + 2 * body_height,
-        )
-    )
-    return reserved
+    reserved.append((float(years[0]), 0.0, ax.get_xlim()[1], float(rates[0]) + 2 * body_height))
+    return reserved, own_marks
 
 
 def wrap_to_content_width(text: str, layout: dict, fontsize: float) -> str:

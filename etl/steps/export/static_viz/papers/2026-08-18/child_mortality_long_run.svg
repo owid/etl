@@ -42,51 +42,51 @@ L 0 3.6
 " style="stroke: #999999; stroke-width: 0.72"/>
       </defs>
       <g>
-       <use xlink:href="#m80adb0d162" x="138.558872" y="688.1832" style="fill: #999999; stroke: #999999; stroke-width: 0.72"/>
+       <use xlink:href="#m80adb0d162" x="144.151992" y="688.1832" style="fill: #999999; stroke: #999999; stroke-width: 0.72"/>
       </g>
      </g>
      <g id="text_1">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="138.558872" y="702.798903" transform="rotate(-0 138.558872 702.798903)">500 BCE</text>
+      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="144.151992" y="702.798903" transform="rotate(-0 144.151992 702.798903)">500 BCE</text>
      </g>
     </g>
     <g id="xtick_2">
      <g id="line2d_2">
       <g>
-       <use xlink:href="#m80adb0d162" x="262.825365" y="688.1832" style="fill: #999999; stroke: #999999; stroke-width: 0.72"/>
+       <use xlink:href="#m80adb0d162" x="258.516012" y="688.1832" style="fill: #999999; stroke: #999999; stroke-width: 0.72"/>
       </g>
      </g>
      <g id="text_2">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="262.825365" y="702.798903" transform="rotate(-0 262.825365 702.798903)">500 CE</text>
+      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="258.516012" y="702.798903" transform="rotate(-0 258.516012 702.798903)">500 CE</text>
      </g>
     </g>
     <g id="xtick_3">
      <g id="line2d_3">
       <g>
-       <use xlink:href="#m80adb0d162" x="324.958611" y="688.1832" style="fill: #999999; stroke: #999999; stroke-width: 0.72"/>
+       <use xlink:href="#m80adb0d162" x="315.698023" y="688.1832" style="fill: #999999; stroke: #999999; stroke-width: 0.72"/>
       </g>
      </g>
      <g id="text_3">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="324.958611" y="702.798903" transform="rotate(-0 324.958611 702.798903)">1000</text>
+      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="315.698023" y="702.798903" transform="rotate(-0 315.698023 702.798903)">1000</text>
      </g>
     </g>
     <g id="xtick_4">
      <g id="line2d_4">
       <g>
-       <use xlink:href="#m80adb0d162" x="387.091858" y="688.1832" style="fill: #999999; stroke: #999999; stroke-width: 0.72"/>
+       <use xlink:href="#m80adb0d162" x="372.880033" y="688.1832" style="fill: #999999; stroke: #999999; stroke-width: 0.72"/>
       </g>
      </g>
      <g id="text_4">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="387.091858" y="702.798903" transform="rotate(-0 387.091858 702.798903)">1500</text>
+      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="372.880033" y="702.798903" transform="rotate(-0 372.880033 702.798903)">1500</text>
      </g>
     </g>
     <g id="xtick_5">
      <g id="line2d_5">
       <g>
-       <use xlink:href="#m80adb0d162" x="452.2075" y="688.1832" style="fill: #999999; stroke: #999999; stroke-width: 0.72"/>
+       <use xlink:href="#m80adb0d162" x="432.80678" y="688.1832" style="fill: #999999; stroke: #999999; stroke-width: 0.72"/>
       </g>
      </g>
      <g id="text_5">
-      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="452.2075" y="702.798903" transform="rotate(-0 452.2075 702.798903)">2024</text>
+      <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="432.80678" y="702.798903" transform="rotate(-0 432.80678 702.798903)">2024</text>
      </g>
     </g>
     <g id="text_6">
@@ -159,156 +159,166 @@ L 600.48 74.16
 L 600.48 688.1832 
 " style="fill: none; stroke: #999999; stroke-width: 0.72; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
-   <g id="historical__leader-bavaria-germany-1750-99-50">
-    <path d="M 421.20301 249.5952 
-L 424.08301 215.385336 
+   <g id="historical__leader-japan-1776-1875">
+    <path d="M 410.105522 240.82344 
+L 407.225522 207.36144 
 " style="fill: none; stroke: #dddddd; stroke-width: 0.6"/>
    </g>
-   <g id="historical__leader-sweden-1600-1700-50">
-    <path d="M 405.731832 249.5952 
-L 402.851832 192.57876 
+   <g id="historical__leader-bavaria-germany-1750-99">
+    <path d="M 404.272957 249.5952 
+L 407.152957 289.7496 
 " style="fill: none; stroke: #dddddd; stroke-width: 0.6"/>
    </g>
-   <g id="historical__leader-teotihuacan-mexico-300-550-ce-49">
-    <path d="M 253.505378 254.858243 
-L 250.625378 220.648379 
+   <g id="historical__leader-teotihuacan-mexico-300-550-ce">
+    <path d="M 249.938711 254.858243 
+L 247.058711 228.088643 
 " style="fill: none; stroke: #dddddd; stroke-width: 0.6"/>
    </g>
-   <g id="historical__leader-japan-1300-1400-48">
-    <path d="M 368.451884 267.13872 
-L 371.331884 312.751872 
+   <g id="historical__leader-japan-1300-1400">
+    <path d="M 355.72543 267.13872 
+L 358.60543 313.98552 
 " style="fill: none; stroke: #dddddd; stroke-width: 0.6"/>
    </g>
-   <g id="historical__leader-nasca-peru-400-bce-550-ce-48">
-    <path d="M 210.012105 271.5246 
-L 212.892105 305.734464 
+   <g id="historical__leader-nasca-peru-400-bce-550-ce">
+    <path d="M 209.911303 271.5246 
+L 207.031303 304.9866 
 " style="fill: none; stroke: #dddddd; stroke-width: 0.6"/>
    </g>
-   <g id="historical__leader-imperial-china-1650-1800-45">
-    <path d="M 415.051819 293.454 
-L 412.171819 327.663864 
+   <g id="historical__leader-west-indies-1820-32">
+    <path d="M 410.162704 275.91048 
+L 413.042704 342.83448 
 " style="fill: none; stroke: #dddddd; stroke-width: 0.6"/>
    </g>
-   <g id="historical__leader-france-1600-1700-45">
-    <path d="M 405.731832 293.454 
-L 408.611832 350.47044 
+   <g id="historical__leader-mallorca-spain-400-200-bce">
+    <path d="M 167.024796 293.454 
+L 169.904796 320.2236 
 " style="fill: none; stroke: #dddddd; stroke-width: 0.6"/>
    </g>
-   <g id="historical__leader-france-1816-50-44">
-    <path d="M 428.4726 302.22576 
-L 431.3526 370.645488 
+   <g id="historical__leader-imperial-china-1650-1800">
+    <path d="M 398.611938 293.454 
+L 395.731938 340.3008 
 " style="fill: none; stroke: #dddddd; stroke-width: 0.6"/>
    </g>
-   <g id="historical__leader-belgium-1800-1900-41">
-    <path d="M 430.58513 328.54104 
-L 427.70513 374.154192 
+   <g id="historical__leader-france-1600-1700">
+    <path d="M 390.034636 293.454 
+L 392.914636 360.378 
 " style="fill: none; stroke: #dddddd; stroke-width: 0.6"/>
    </g>
-   <g id="historical__leader-italy-1700-1800-40">
-    <path d="M 418.158481 337.3128 
-L 421.038481 394.32924 
+   <g id="historical__leader-france-1816-50">
+    <path d="M 410.963252 302.22576 
+L 413.843252 375.84216 
 " style="fill: none; stroke: #dddddd; stroke-width: 0.6"/>
    </g>
-   <g id="historical__leader-china-1700-1800-40">
-    <path d="M 418.158481 337.3128 
-L 415.278481 394.32924 
+   <g id="historical__leader-belgium-1800-1900">
+    <path d="M 412.90744 328.54104 
+L 410.02744 375.38784 
 " style="fill: none; stroke: #dddddd; stroke-width: 0.6"/>
    </g>
-   <g id="historical__leader-sweden-1751-80-40">
-    <path d="M 420.084612 341.659496 
-L 422.964612 410.079224 
+   <g id="historical__leader-italy-1700-1800">
+    <path d="M 401.471038 337.3128 
+L 404.351038 390.852 
+" style="fill: none; stroke: #dddddd; stroke-width: 0.6"/>
+   </g>
+   <g id="historical__leader-china-1700-1800">
+    <path d="M 401.471038 337.3128 
+L 398.591038 390.852 
+" style="fill: none; stroke: #dddddd; stroke-width: 0.6"/>
+   </g>
+   <g id="historical__leader-sweden-1751-80">
+    <path d="M 403.24368 341.659496 
+L 406.12368 408.583496 
 " style="fill: none; stroke: #dddddd; stroke-width: 0.6"/>
    </g>
    <g id="historical__mean_rule">
-    <path d="M 163.41217 266.259684 
-L 433.691793 266.259684 
+    <path d="M 167.024796 266.259684 
+L 415.766541 266.259684 
 " style="fill: none; stroke: #c44e52; stroke-width: 2"/>
    </g>
    <g id="hunter_gatherer__mean_rule">
-    <path d="M 62.756311 260.121319 
-L 90.094939 260.121319 
+    <path d="M 74.389939 260.121319 
+L 99.550024 260.121319 
 " style="fill: none; stroke: #c44e52; stroke-width: 2"/>
    </g>
    <g id="global__series">
-    <path d="M 443.01178 457.095706 
-L 443.136046 462.929269 
-L 443.260312 471.096462 
-L 443.384579 475.775917 
-L 443.508845 482.266415 
-L 443.633112 487.718131 
-L 443.757378 493.115221 
-L 443.881645 496.363657 
-L 444.005911 500.642627 
-L 444.130178 480.585588 
-L 444.254444 463.043022 
-L 444.378711 487.661665 
-L 444.502977 515.131588 
-L 444.627244 519.154325 
-L 444.75151 523.15707 
-L 444.875777 521.816213 
-L 445.000043 525.312935 
-L 445.12431 528.802177 
-L 445.248576 534.12341 
-L 445.372843 537.307901 
-L 445.497109 538.696859 
-L 445.621376 539.139757 
-L 445.745642 545.53601 
-L 445.869909 548.578239 
-L 445.994175 550.801336 
-L 446.118442 552.569941 
-L 446.242708 554.747598 
-L 446.366975 558.245683 
-L 446.491241 561.025506 
-L 446.615508 565.257195 
-L 446.739774 568.264883 
-L 446.864041 571.277984 
-L 446.988307 574.344397 
-L 447.112574 575.19909 
-L 447.23684 577.571234 
-L 447.361107 580.067144 
-L 447.485373 583.380128 
-L 447.60964 586.823938 
-L 447.733906 587.798147 
-L 447.858173 590.940017 
-L 447.982439 594.489992 
-L 448.106706 594.969422 
-L 448.230972 595.979494 
-L 448.355239 597.28315 
-L 448.479505 598.922033 
-L 448.603772 601.284682 
-L 448.728038 602.327613 
-L 448.852305 604.423807 
-L 448.976571 605.770361 
-L 449.100838 609.270997 
-L 449.225104 611.952176 
-L 449.349371 614.143225 
-L 449.473637 617.040348 
-L 449.597904 619.807159 
-L 449.72217 621.924588 
-L 449.846437 625.411393 
-L 449.970703 628.17643 
-L 450.09497 630.666287 
-L 450.219236 632.617522 
-L 450.343503 634.423177 
-L 450.467769 636.720755 
-L 450.592036 637.800691 
-L 450.716302 640.64822 
-L 450.840569 642.293607 
-L 450.964835 643.394954 
-L 451.089102 644.426027 
-L 451.213368 645.577052 
-L 451.337635 646.395059 
-L 451.461901 647.501467 
-L 451.586168 647.954566 
-L 451.710434 648.471406 
-L 451.834701 648.008895 
-L 451.958967 647.576237 
-L 452.083234 649.253383 
-L 452.2075 650.257683 
+    <path d="M 424.343842 457.095706 
+L 424.458206 462.929269 
+L 424.57257 471.096462 
+L 424.686934 475.775917 
+L 424.801298 482.266415 
+L 424.915662 487.718131 
+L 425.030026 493.115221 
+L 425.14439 496.363657 
+L 425.258754 500.642627 
+L 425.373118 480.585588 
+L 425.487482 463.043022 
+L 425.601846 487.661665 
+L 425.71621 515.131588 
+L 425.830574 519.154325 
+L 425.944938 523.15707 
+L 426.059302 521.816213 
+L 426.173666 525.312935 
+L 426.288031 528.802177 
+L 426.402395 534.12341 
+L 426.516759 537.307901 
+L 426.631123 538.696859 
+L 426.745487 539.139757 
+L 426.859851 545.53601 
+L 426.974215 548.578239 
+L 427.088579 550.801336 
+L 427.202943 552.569941 
+L 427.317307 554.747598 
+L 427.431671 558.245683 
+L 427.546035 561.025506 
+L 427.660399 565.257195 
+L 427.774763 568.264883 
+L 427.889127 571.277984 
+L 428.003491 574.344397 
+L 428.117855 575.19909 
+L 428.232219 577.571234 
+L 428.346583 580.067144 
+L 428.460947 583.380128 
+L 428.575311 586.823938 
+L 428.689675 587.798147 
+L 428.804039 590.940017 
+L 428.918403 594.489992 
+L 429.032767 594.969422 
+L 429.147131 595.979494 
+L 429.261495 597.28315 
+L 429.375859 598.922033 
+L 429.490223 601.284682 
+L 429.604587 602.327613 
+L 429.718951 604.423807 
+L 429.833315 605.770361 
+L 429.947679 609.270997 
+L 430.062043 611.952176 
+L 430.176407 614.143225 
+L 430.290771 617.040348 
+L 430.405135 619.807159 
+L 430.519499 621.924588 
+L 430.633863 625.411393 
+L 430.748227 628.17643 
+L 430.862591 630.666287 
+L 430.976955 632.617522 
+L 431.091319 634.423177 
+L 431.205683 636.720755 
+L 431.320047 637.800691 
+L 431.434411 640.64822 
+L 431.548775 642.293607 
+L 431.663139 643.394954 
+L 431.777504 644.426027 
+L 431.891868 645.577052 
+L 432.006232 646.395059 
+L 432.120596 647.501467 
+L 432.23496 647.954566 
+L 432.349324 648.471406 
+L 432.463688 648.008895 
+L 432.578052 647.576237 
+L 432.692416 649.253383 
+L 432.80678 650.257683 
 " style="fill: none; stroke: #c44e52; stroke-width: 2.2; stroke-linecap: round"/>
    </g>
    <g id="hunter_gatherer__mean_marker">
-    <path d="M 76.425625 260.121319 
+    <path d="M 86.969981 260.121319 
 " style="fill: none; stroke: #c44e52; stroke-width: 1.5; stroke-linecap: round"/>
     <defs>
      <path id="m620425c7dd" d="M 0 2 
@@ -324,11 +334,11 @@ z
 " style="stroke: #c44e52"/>
     </defs>
     <g>
-     <use xlink:href="#m620425c7dd" x="76.425625" y="260.121319" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#m620425c7dd" x="86.969981" y="260.121319" style="fill: #c44e52; stroke: #c44e52"/>
     </g>
    </g>
    <g id="global__marker-start">
-    <path d="M 443.01178 457.095706 
+    <path d="M 424.343842 457.095706 
 " style="fill: none; stroke: #c44e52; stroke-width: 1.5; stroke-linecap: round"/>
     <defs>
      <path id="mf998daae6d" d="M 0 2.5 
@@ -344,18 +354,18 @@ z
 " style="stroke: #c44e52"/>
     </defs>
     <g>
-     <use xlink:href="#mf998daae6d" x="443.01178" y="457.095706" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mf998daae6d" x="424.343842" y="457.095706" style="fill: #c44e52; stroke: #c44e52"/>
     </g>
    </g>
    <g id="global__marker-end">
-    <path d="M 452.2075 650.257683 
+    <path d="M 432.80678 650.257683 
 " style="fill: none; stroke: #c44e52; stroke-width: 1.5; stroke-linecap: round"/>
     <g>
-     <use xlink:href="#mf998daae6d" x="452.2075" y="650.257683" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mf998daae6d" x="432.80678" y="650.257683" style="fill: #c44e52; stroke: #c44e52"/>
     </g>
    </g>
    <g id="country__highest-marker">
-    <path d="M 452.2075 567.839084 
+    <path d="M 432.80678 567.839084 
 " style="fill: none; stroke: #c44e52; stroke-width: 1.5; stroke-linecap: round"/>
     <defs>
      <path id="mde12fa07f4" d="M 0 1.3 
@@ -371,139 +381,202 @@ z
 " style="stroke: #c44e52"/>
     </defs>
     <g>
-     <use xlink:href="#mde12fa07f4" x="452.2075" y="567.839084" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="432.80678" y="567.839084" style="fill: #c44e52; stroke: #c44e52"/>
     </g>
    </g>
    <g id="country__lowest-marker">
-    <path d="M 452.2075 685.131733 
+    <path d="M 432.80678 685.131733 
 " style="fill: none; stroke: #c44e52; stroke-width: 1.5; stroke-linecap: round"/>
     <g>
-     <use xlink:href="#mde12fa07f4" x="452.2075" y="685.131733" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="432.80678" y="685.131733" style="fill: #c44e52; stroke: #c44e52"/>
     </g>
    </g>
    <g id="historical__points">
     <g>
-     <use xlink:href="#mde12fa07f4" x="421.20301" y="249.5952" style="fill: #c44e52; stroke: #c44e52"/>
-     <use xlink:href="#mde12fa07f4" x="430.58513" y="328.54104" style="fill: #c44e52; stroke: #c44e52"/>
-     <use xlink:href="#mde12fa07f4" x="418.158481" y="337.3128" style="fill: #c44e52; stroke: #c44e52"/>
-     <use xlink:href="#mde12fa07f4" x="405.731832" y="293.454" style="fill: #c44e52; stroke: #c44e52"/>
-     <use xlink:href="#mde12fa07f4" x="428.4726" y="302.22576" style="fill: #c44e52; stroke: #c44e52"/>
-     <use xlink:href="#mde12fa07f4" x="415.051819" y="293.454" style="fill: #c44e52; stroke: #c44e52"/>
-     <use xlink:href="#mde12fa07f4" x="418.158481" y="337.3128" style="fill: #c44e52; stroke: #c44e52"/>
-     <use xlink:href="#mde12fa07f4" x="368.451884" y="267.13872" style="fill: #c44e52; stroke: #c44e52"/>
-     <use xlink:href="#mde12fa07f4" x="427.540601" y="240.82344" style="fill: #c44e52; stroke: #c44e52"/>
-     <use xlink:href="#mde12fa07f4" x="163.41217" y="293.454" style="fill: #c44e52; stroke: #c44e52"/>
-     <use xlink:href="#mde12fa07f4" x="210.012105" y="271.5246" style="fill: #c44e52; stroke: #c44e52"/>
-     <use xlink:href="#mde12fa07f4" x="433.691793" y="203.104879" style="fill: #c44e52; stroke: #c44e52"/>
-     <use xlink:href="#mde12fa07f4" x="200.816385" y="188.19288" style="fill: #c44e52; stroke: #c44e52"/>
-     <use xlink:href="#mde12fa07f4" x="200.692118" y="249.5952" style="fill: #c44e52; stroke: #c44e52"/>
-     <use xlink:href="#mde12fa07f4" x="405.731832" y="249.5952" style="fill: #c44e52; stroke: #c44e52"/>
-     <use xlink:href="#mde12fa07f4" x="420.084612" y="341.659496" style="fill: #c44e52; stroke: #c44e52"/>
-     <use xlink:href="#mde12fa07f4" x="253.505378" y="254.858243" style="fill: #c44e52; stroke: #c44e52"/>
-     <use xlink:href="#mde12fa07f4" x="278.358676" y="145.211243" style="fill: #c44e52; stroke: #c44e52"/>
-     <use xlink:href="#mde12fa07f4" x="430.58513" y="240.82344" style="fill: #c44e52; stroke: #c44e52"/>
-     <use xlink:href="#mde12fa07f4" x="306.318637" y="227.6658" style="fill: #c44e52; stroke: #c44e52"/>
-     <use xlink:href="#mde12fa07f4" x="427.602734" y="275.91048" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="404.272957" y="249.5952" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="412.90744" y="328.54104" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="401.471038" y="337.3128" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="390.034636" y="293.454" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="410.963252" y="302.22576" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="398.611938" y="293.454" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="401.471038" y="337.3128" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="355.72543" y="267.13872" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="410.105522" y="240.82344" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="167.024796" y="293.454" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="209.911303" y="271.5246" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="415.766541" y="203.104879" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="201.448366" y="188.19288" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="201.334002" y="249.5952" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="390.034636" y="249.5952" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="403.24368" y="341.659496" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="249.938711" y="254.858243" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="272.811515" y="145.211243" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="412.90744" y="240.82344" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="298.543419" y="227.6658" style="fill: #c44e52; stroke: #c44e52"/>
+     <use xlink:href="#mde12fa07f4" x="410.162704" y="275.91048" style="fill: #c44e52; stroke: #c44e52"/>
     </g>
    </g>
    <g id="global__label-start-1">
-    <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #c44e52" x="448.77178" y="454.044144" transform="rotate(-0 448.77178 454.044144)">Global rate in 1950:</text>
+    <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #c44e52" x="430.103842" y="454.044144" transform="rotate(-0 430.103842 454.044144)">Global rate in 1950:</text>
    </g>
    <g id="global__label-start-2">
-    <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #c44e52" x="448.77178" y="467.694144" transform="rotate(-0 448.77178 467.694144)">26%</text>
+    <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #c44e52" x="430.103842" y="467.694144" transform="rotate(-0 430.103842 467.694144)">26%</text>
    </g>
    <g id="global__label-end-1">
-    <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #c44e52" x="457.9675" y="647.20612" transform="rotate(-0 457.9675 647.20612)">Global rate in 2024:</text>
+    <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #c44e52" x="438.56678" y="647.20612" transform="rotate(-0 438.56678 647.20612)">Global rate in 2024:</text>
    </g>
    <g id="global__label-end-2">
-    <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #c44e52" x="457.9675" y="660.85612" transform="rotate(-0 457.9675 660.85612)">4.3%</text>
+    <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #c44e52" x="438.56678" y="660.85612" transform="rotate(-0 438.56678 660.85612)">4.3%</text>
    </g>
    <g id="country__highest-label-1">
-    <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="457.9675" y="564.787522" transform="rotate(-0 457.9675 564.787522)">Niger has the highest</text>
+    <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="438.56678" y="564.787522" transform="rotate(-0 438.56678 564.787522)">Niger has the highest</text>
    </g>
    <g id="country__highest-label-2">
-    <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="457.9675" y="578.437522" transform="rotate(-0 457.9675 578.437522)">rate: 14%</text>
+    <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="438.56678" y="578.437522" transform="rotate(-0 438.56678 578.437522)">rate: 14%</text>
    </g>
    <g id="country__lowest-label-1">
-    <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="457.9675" y="671.481733" transform="rotate(-0 457.9675 671.481733)">Lowest rate: 0.3%, in Slovenia</text>
+    <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="438.56678" y="668.43017" transform="rotate(-0 438.56678 668.43017)">Lowest rate: 0.3%, in Slovenia</text>
    </g>
    <g id="country__lowest-label-2">
-    <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="457.9675" y="685.131733" transform="rotate(-0 457.9675 685.131733)">and 7 other countries</text>
+    <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="438.56678" y="682.08017" transform="rotate(-0 438.56678 682.08017)">and 7 other countries</text>
    </g>
-   <g id="historical__label-teotihuacan-mexico-550-700-ce-62">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="281.238676" y="135.877955" transform="rotate(-0 281.238676 135.877955)">Teotihuacan (Mexico) 550–700 CE: 62%</text>
+   <g id="historical__label-teotihuacan-mexico-550-700-ce-1">
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="275.691515" y="148.574993" transform="rotate(-0 275.691515 148.574993)">Teotihuacan (Mexico): 62%</text>
    </g>
-   <g id="historical__label-roman-egypt-1-ce-57">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="203.696385" y="178.859592" transform="rotate(-0 203.696385 178.859592)">Roman Egypt 1 CE: 57%</text>
+   <g id="historical__label-teotihuacan-mexico-550-700-ce-2">
+    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="390.388991" y="148.574993" transform="rotate(-0 390.388991 148.574993)">550–700 CE</text>
    </g>
-   <g id="historical__label-poland-1875-55">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="436.571793" y="193.769716" transform="rotate(-0 436.571793 193.769716)">Poland 1875: 55%</text>
+   <g id="historical__label-roman-egypt-1-ce-1">
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="204.328366" y="191.55663" transform="rotate(-0 204.328366 191.55663)">Roman Egypt: 57%</text>
    </g>
-   <g id="historical__label-wari-peru-600-1100-53">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="309.198637" y="218.332512" transform="rotate(-0 309.198637 218.332512)">Wari (Peru) 600–1100: 53%</text>
+   <g id="historical__label-roman-egypt-1-ce-2">
+    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="286.260724" y="191.55663" transform="rotate(-0 286.260724 191.55663)">1 CE</text>
    </g>
-   <g id="historical__label-venice-1800-1900-51">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="433.46513" y="231.488277" transform="rotate(-0 433.46513 231.488277)">Venice 1800–1900: 51%</text>
+   <g id="historical__label-poland-1875-1">
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="418.646541" y="206.468629" transform="rotate(-0 418.646541 206.468629)">Poland: 55%</text>
    </g>
-   <g id="historical__label-japan-1776-1875-51">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="424.660601" y="231.537027" transform="rotate(-0 424.660601 231.537027)">Japan 1776–1875: 51%</text>
+   <g id="historical__label-poland-1875-2">
+    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="473.028506" y="206.468629" transform="rotate(-0 473.028506 206.468629)">1875</text>
    </g>
-   <g id="historical__label-bavaria-germany-1750-99-50">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="424.08301" y="217.455336" transform="rotate(-0 424.08301 217.455336)">Bavaria (Germany) 1750–99: 50%</text>
+   <g id="historical__label-wari-peru-600-1100-1">
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="301.423419" y="231.02955" transform="rotate(-0 301.423419 231.02955)">Wari (Peru): 53%</text>
    </g>
-   <g id="historical__label-sweden-1600-1700-50">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="402.851832" y="194.646885" transform="rotate(-0 402.851832 194.646885)">Sweden 1600–1700: 50%</text>
+   <g id="historical__label-wari-peru-600-1100-2">
+    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="374.759934" y="231.02955" transform="rotate(-0 374.759934 231.02955)">600–1100</text>
    </g>
-   <g id="historical__label-rome-200-bce-200-ce-50">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="203.572118" y="240.260037" transform="rotate(-0 203.572118 240.260037)">Rome 200 BCE–200 CE: 50%</text>
+   <g id="historical__label-venice-1800-1900-1">
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="415.78744" y="244.18719" transform="rotate(-0 415.78744 244.18719)">Venice: 51%</text>
    </g>
-   <g id="historical__label-teotihuacan-mexico-300-550-ce-49">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="250.625378" y="222.718379" transform="rotate(-0 250.625378 222.718379)">Teotihuacan (Mexico) 300–550 CE: 49%</text>
+   <g id="historical__label-venice-1800-1900-2">
+    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="469.810545" y="244.18719" transform="rotate(-0 469.810545 244.18719)">1800–1900</text>
    </g>
-   <g id="historical__label-japan-1300-1400-48">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="371.331884" y="314.868747" transform="rotate(-0 371.331884 314.868747)">Japan 1300–1400: 48%</text>
+   <g id="historical__label-japan-1776-1875-1">
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="362.665664" y="210.72519" transform="rotate(-0 362.665664 210.72519)">Japan: 51%</text>
    </g>
-   <g id="historical__label-nasca-peru-400-bce-550-ce-48">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="212.892105" y="307.804464" transform="rotate(-0 212.892105 307.804464)">Nasca (Peru) 400 BCE–550 CE: 48%</text>
+   <g id="historical__label-japan-1776-1875-2">
+    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="407.225522" y="210.72519" transform="rotate(-0 407.225522 210.72519)">1776–1875</text>
    </g>
-   <g id="historical__label-west-indies-1820-32-47">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="430.482734" y="289.381893" transform="rotate(-0 430.482734 289.381893)">West Indies 1820–32: 47%</text>
+   <g id="historical__label-bavaria-germany-1750-99-1">
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="407.152957" y="293.11335" transform="rotate(-0 407.152957 293.11335)">Bavaria (Germany): 50%</text>
    </g>
-   <g id="historical__label-mallorca-spain-400-200-bce-45">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="160.53217" y="306.927288" transform="rotate(-0 160.53217 306.927288)">Mallorca (Spain) 400–200 BCE: 45%</text>
+   <g id="historical__label-bavaria-germany-1750-99-2">
+    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="511.488438" y="293.11335" transform="rotate(-0 511.488438 293.11335)">1750–99</text>
    </g>
-   <g id="historical__label-imperial-china-1650-1800-45">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="412.171819" y="329.780739" transform="rotate(-0 412.171819 329.780739)">Imperial China 1650–1800: 45%</text>
+   <g id="historical__label-sweden-1600-1700-1">
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="342.662278" y="252.95895" transform="rotate(-0 342.662278 252.95895)">Sweden: 50%</text>
    </g>
-   <g id="historical__label-france-1600-1700-45">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="408.611832" y="352.538565" transform="rotate(-0 408.611832 352.538565)">France 1600–1700: 45%</text>
+   <g id="historical__label-sweden-1600-1700-2">
+    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="387.154636" y="252.95895" transform="rotate(-0 387.154636 252.95895)">1600–1700</text>
    </g>
-   <g id="historical__label-france-1816-50-44">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="431.3526" y="372.713613" transform="rotate(-0 431.3526 372.713613)">France 1816–50: 44%</text>
+   <g id="historical__label-rome-200-bce-200-ce-1">
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="128.374294" y="246.26655" transform="rotate(-0 128.374294 246.26655)">Rome: 50%</text>
    </g>
-   <g id="historical__label-belgium-1800-1900-41">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="427.70513" y="376.224192" transform="rotate(-0 427.70513 376.224192)">Belgium 1800–1900: 41%</text>
+   <g id="historical__label-rome-200-bce-200-ce-2">
+    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="198.454002" y="246.26655" transform="rotate(-0 198.454002 246.26655)">200 BCE–200 CE</text>
    </g>
-   <g id="historical__label-italy-1700-1800-40">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="421.038481" y="396.39924" transform="rotate(-0 421.038481 396.39924)">Italy 1700–1800: 40%</text>
+   <g id="historical__label-teotihuacan-mexico-300-550-ce-1">
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="197.246509" y="231.452393" transform="rotate(-0 197.246509 231.452393)">Teotihuacan (Mexico): 49%</text>
    </g>
-   <g id="historical__label-china-1700-1800-40">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="415.278481" y="396.397365" transform="rotate(-0 415.278481 396.397365)">China 1700–1800: 40%</text>
+   <g id="historical__label-teotihuacan-mexico-300-550-ce-2">
+    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="247.058711" y="231.452393" transform="rotate(-0 247.058711 231.452393)">300–550 CE</text>
    </g>
-   <g id="historical__label-sweden-1751-80-40">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="422.964612" y="412.147349" transform="rotate(-0 422.964612 412.147349)">Sweden 1751–80: 40%</text>
+   <g id="historical__label-japan-1300-1400-1">
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="358.60543" y="317.34927" transform="rotate(-0 358.60543 317.34927)">Japan: 48%</text>
+   </g>
+   <g id="historical__label-japan-1300-1400-2">
+    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="409.798866" y="317.34927" transform="rotate(-0 409.798866 317.34927)">1300–1400</text>
+   </g>
+   <g id="historical__label-nasca-peru-400-bce-550-ce-1">
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="136.799677" y="308.35035" transform="rotate(-0 136.799677 308.35035)">Nasca (Peru): 48%</text>
+   </g>
+   <g id="historical__label-nasca-peru-400-bce-550-ce-2">
+    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="207.031303" y="308.35035" transform="rotate(-0 207.031303 308.35035)">400 BCE–550 CE</text>
+   </g>
+   <g id="historical__label-west-indies-1820-32-1">
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="413.042704" y="346.19823" transform="rotate(-0 413.042704 346.19823)">West Indies: 47%</text>
+   </g>
+   <g id="historical__label-west-indies-1820-32-2">
+    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="487.62216" y="346.19823" transform="rotate(-0 487.62216 346.19823)">1820–32</text>
+   </g>
+   <g id="historical__label-mallorca-spain-400-200-bce-1">
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="169.904796" y="323.58735" transform="rotate(-0 169.904796 323.58735)">Mallorca (Spain): 45%</text>
+   </g>
+   <g id="historical__label-mallorca-spain-400-200-bce-2">
+    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="263.313025" y="323.58735" transform="rotate(-0 263.313025 323.58735)">400–200 BCE</text>
+   </g>
+   <g id="historical__label-imperial-china-1650-1800-1">
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="351.23958" y="343.66455" transform="rotate(-0 351.23958 343.66455)">Imperial China: 45%</text>
+   </g>
+   <g id="historical__label-imperial-china-1650-1800-2">
+    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="395.731938" y="343.66455" transform="rotate(-0 395.731938 343.66455)">1650–1800</text>
+   </g>
+   <g id="historical__label-france-1600-1700-1">
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="392.914636" y="363.74175" transform="rotate(-0 392.914636 363.74175)">France: 45%</text>
+   </g>
+   <g id="historical__label-france-1600-1700-2">
+    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="447.237553" y="363.74175" transform="rotate(-0 447.237553 363.74175)">1600–1700</text>
+   </g>
+   <g id="historical__label-france-1816-50-1">
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="413.843252" y="379.20591" transform="rotate(-0 413.843252 379.20591)">France: 44%</text>
+   </g>
+   <g id="historical__label-france-1816-50-2">
+    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="468.166169" y="379.20591" transform="rotate(-0 468.166169 379.20591)">1816–50</text>
+   </g>
+   <g id="historical__label-belgium-1800-1900-1">
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="365.535082" y="378.75159" transform="rotate(-0 365.535082 378.75159)">Belgium: 41%</text>
+   </g>
+   <g id="historical__label-belgium-1800-1900-2">
+    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="410.02744" y="378.75159" transform="rotate(-0 410.02744 378.75159)">1800–1900</text>
+   </g>
+   <g id="historical__label-italy-1700-1800-1">
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="404.351038" y="394.21575" transform="rotate(-0 404.351038 394.21575)">Italy: 40%</text>
+   </g>
+   <g id="historical__label-italy-1700-1800-2">
+    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="446.603577" y="394.21575" transform="rotate(-0 446.603577 394.21575)">1700–1800</text>
+   </g>
+   <g id="historical__label-china-1700-1800-1">
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="354.09868" y="394.21575" transform="rotate(-0 354.09868 394.21575)">China: 40%</text>
+   </g>
+   <g id="historical__label-china-1700-1800-2">
+    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #5b5b5b" x="398.591038" y="394.21575" transform="rotate(-0 398.591038 394.21575)">1700–1800</text>
+   </g>
+   <g id="historical__label-sweden-1751-80-1">
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="406.12368" y="411.947246" transform="rotate(-0 406.12368 411.947246)">Sweden: 40%</text>
+   </g>
+   <g id="historical__label-sweden-1751-80-2">
+    <text style="font-size: 8.64px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #5b5b5b" x="465.486921" y="411.947246" transform="rotate(-0 465.486921 411.947246)">1751–80</text>
    </g>
    <g id="hunter_gatherer__mean_label-1">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="76.425625" y="278.151783" transform="rotate(-0 76.425625 278.151783)">Average across 17 hunter-gatherer</text>
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="86.969981" y="281.849533" transform="rotate(-0 86.969981 281.849533)">Average across 17 hunter-gatherer</text>
    </g>
    <g id="hunter_gatherer__mean_label-2">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="76.425625" y="288.551783" transform="rotate(-0 76.425625 288.551783)">societies: 49%</text>
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #5b5b5b" x="86.969981" y="294.017533" transform="rotate(-0 86.969981 294.017533)">societies: 49%</text>
    </g>
    <g id="historical__mean_label-1">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #c44e52" x="298.551981" y="284.290148" transform="rotate(-0 298.551981 284.290148)">48% is the average across these</text>
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #c44e52" x="291.395668" y="287.987898" transform="rotate(-0 291.395668 287.987898)">48% is the average across these</text>
    </g>
    <g id="historical__mean_label-2">
-    <text style="font-size: 8px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #c44e52" x="298.551981" y="294.690148" transform="rotate(-0 298.551981 294.690148)">21 historical societies</text>
+    <text style="font-size: 9.36px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: middle; fill: #c44e52" x="291.395668" y="300.155898" transform="rotate(-0 291.395668 300.155898)">21 historical societies</text>
    </g>
   </g>
   <g id="title">
