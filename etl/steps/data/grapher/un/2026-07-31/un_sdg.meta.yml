@@ -87,6 +87,15 @@ definitions:
   description_key_ilo_national_estimates: |-
     This data comes from the International Labour Organization’s ILOSTAT database, which compiles labor statistics from national sources. Underlying national surveys differ in design and coverage, so cross-country comparisons should be made with some caution.
 
+  description_key_fossil_fuel_subsidies_united_states: |-
+    Figures for the United States exclude the fossil-fuel support measures recorded in the OECD's Inventory of Support Measures for Fossil Fuels. In December 2025, the United States asked the OECD to remove its data from that inventory, and the OECD removed it for every year, not only recent ones. Only a small residual reported by other sources remains, so figures for the United States are not comparable with other countries, and are much lower than in earlier versions of this data.
+
+  description_key_fossil_fuel_subsidies_northern_america: |-
+    The figure for Northern America excludes the same OECD support measures for the United States, so it is not comparable with other regions or with earlier versions of this data.
+
+  note_fossil_fuel_subsidies_united_states: |-
+    Data for the US excludes OECD subsidy data, which the US asked the OECD to remove. It is not comparable with other countries, and is lower than in earlier versions of this data.
+
   note_icls_13: |-
     Employment is defined in line with the [13th ICLS](#dod:13-icls) and includes the production of goods for own use, such as subsistence farming.
 
@@ -834,3 +843,45 @@ tables:
         display:
           numDecimalPlaces: 1
           tolerance: 5
+
+  # 12.c.1 -- fossil-fuel subsidies. The three series share a caveat that is invisible in the
+  # data: the OECD deleted the United States from its Inventory of Support Measures for Fossil
+  # Fuels at the US's request in December 2025, retroactively for all years, so the US series is
+  # flat at roughly one-eighth of its former level with no break to signal it. See
+  # owid/owid-issues#2516, and un_sdg.corrections.yml for the five separate source errors in the
+  # same indicator (Latvia, Italy, Venezuela, Poland, Denmark).
+  _12_c_1__er_ffs_cmpt_cd:
+    variables:
+      _12_c_1__er_ffs_cmpt_cd:
+        description_key:
+          - "{definitions.description_key_fossil_fuel_subsidies_united_states}"
+          - "{definitions.description_key_fossil_fuel_subsidies_northern_america}"
+        description_processing: |-
+          Values we consider erroneous are not shown: Latvia in 2022, which the source reports as 50 to 100 times its own values for 2021 and 2023; and Italy in 2024 and Venezuela from 2010 to 2014, where missing data is reported as zero.
+        presentation:
+          grapher_config:
+            note: "{definitions.note_fossil_fuel_subsidies_united_states}"
+
+  _12_c_1__er_ffs_cmpt_gdp:
+    variables:
+      _12_c_1__er_ffs_cmpt_gdp:
+        description_key:
+          - "{definitions.description_key_fossil_fuel_subsidies_united_states}"
+          - "{definitions.description_key_fossil_fuel_subsidies_northern_america}"
+        description_processing: |-
+          Values we consider erroneous are not shown: Latvia in 2022, which the source reports as 50 to 100 times its own values for 2021 and 2023; Venezuela from 2010 to 2014, where missing data is reported as zero; Poland's whole series, which the source publishes as a fraction rather than a percentage, making it around 100 times too small; and Denmark in 2025 and 2026, where the source repeats its 2024 value in years for which no subsidy total is published.
+        presentation:
+          grapher_config:
+            note: "{definitions.note_fossil_fuel_subsidies_united_states}"
+
+  _12_c_1__er_ffs_cmpt_pc_cd:
+    variables:
+      _12_c_1__er_ffs_cmpt_pc_cd:
+        description_key:
+          - "{definitions.description_key_fossil_fuel_subsidies_united_states}"
+          - "{definitions.description_key_fossil_fuel_subsidies_northern_america}"
+        description_processing: |-
+          Values we consider erroneous are not shown: Latvia in 2022, which the source reports as 50 to 100 times its own values for 2021 and 2023; and Italy in 2024 and Venezuela from 2010 to 2014, where missing data is reported as zero.
+        presentation:
+          grapher_config:
+            note: "{definitions.note_fossil_fuel_subsidies_united_states}"

@@ -6,7 +6,7 @@ Run:  .venv/bin/python .claude/skills/create-figma-chart/scripts/test_measure_pi
 The cases that matter are not "does it compute a distance" but the four traps the prose documents:
 masking from the full render hides the overlap being tested for; classifying pixels by color
 collects the wrong shape; an empty mask must be UNMEASURABLE rather than a clean pass; and a
-sub-pixel stroke reads as a defect at 1:1 and clears the bar at 4x.
+sub-pixel stroke reads as a defect at 1:1 and clears the bar at 3x.
 
 Anti-aliasing gets its own case, because it is the difference between these synthetic renders and
 a real one, and because the obvious way to fake it is wrong. Fake AA by supersampling and
@@ -406,7 +406,7 @@ def test_subpixel_stroke_scale(tmp: Path) -> None:
     check("faint fails", out.get("verdict"), "FAIL")
     check("exit code", code, 1)
     check("ratio is low", out.get("peak_contrast", 99) < 1.5, True)
-    check("advises a 4x render", "4x render" in out.get("reason", ""), True)
+    check("advises the export scale", "3x" in out.get("reason", ""), True)
 
     solid = canvas(20, 20)
     solid[5:15, 10] = (70, 70, 70)  # what the same stroke resolves to at export scale

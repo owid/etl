@@ -104,7 +104,37 @@ piece is an **announcement or a Data Insight on the same data, treat the new pos
 that text** rather than a fresh composition — same framing, moved forward. Either way still produce
 two options (step 5); consistency with our past wording is not an excuse to hand over one draft.
 
-**3. Get the chart.** The pick belongs to the data scientist, who has already attached candidates to the Slack message — don't suggest one. Post this block exactly as written:
+**3. Get the chart.** The pick belongs to the data scientist, who has already attached candidates to the Slack message — don't suggest one.
+
+**Two routes lead to the image, and which one is the user's call — ask, don't infer it from how
+interesting the chart looks.** Ask in **both modes**, right after the chart is chosen and **before
+you post any export instructions**: the default route's block below tells the user to export, upload
+and paste in one go, so posting it first settles the question by default instead of asking it. Skip
+the question only when no post is being drafted (a cooldown decline needs no image), or when the
+update is a **static-viz refresh** — there the route is already settled, because
+[`/create-static-viz`](../create-static-viz/SKILL.md) hands its viz to `/create-figma-chart`
+itself. Settled is not delivered, though: the `export://static_viz` PNG is a *pre-Figma*
+artifact, so finish through the designed route's ending below — the approved frame's PNG, then
+upload, alt text, paste back. **A map is not an exception**: it takes the same two routes as any
+other chart. The designed route just carries extra map guidance — `/create-figma-chart` →
+`reference/per-chart-type/maps.md`, where the small-islands trade-off is decided — which is a reason
+to *offer* that route on a map, not to skip the question.
+
+| Route | What it costs | When it fits |
+|---|---|---|
+| **Default grapher export** | minutes | the chart already reads well at 540px: few series, legible labels, nothing to reduce or re-annotate |
+| **Designed chart** via [`/create-figma-chart`](../create-figma-chart/SKILL.md) | a build in the shared Charts file, plus a design review | the default is crowded — many series, a legend eating the width, a marker on every observation, or a story that wants direct labels or an annotation |
+
+**Series count is the usual tell**: past about four lines grapher falls back to an elbow legend that
+can take ~30% of the width, and the lines themselves stop being followable. Say what you can see when
+you ask — *"the default has nine lines and a legend down the right; a designed version could cut it to
+four with direct labels"* is a question the user can answer; *"do you want a Figma chart?"* is not.
+
+Either way the deliverable is named for the post's own image slot —
+`YYYY-MM-data-update-<short-topic>` — so the export drops into the `{.image}` block without renaming.
+In Mode A, record the choice under `announcement:` in `update-context.yml`.
+
+**On the default route**, post this block exactly as written:
 
 ````markdown
 ## Now let's choose a chart
@@ -115,6 +145,16 @@ two options (step 5); consistency with our past wording is not an excuse to hand
 4. Paste your chosen chart here in the chat so that I can use it to draft versions of the announcement
 ````
 
+**On the designed route, ask `/create-figma-chart` for the PNG explicitly** — its Step 9 does *not*
+export one by default, because the designer usually keeps editing, so a run that isn't asked ends at
+an approved frame and the post's image gate never opens. Ask it for the **square 540×540** output
+(the format the block above asks for too), **exported at 3× — 1620×1620**, which is that family's
+export scale; 540×540 names the template, not the file you want. Give it the image slot's name as the
+frame slug, since that skill uses the frame name as the export filename. The last two steps are then the default
+route's, unchanged: upload the PNG to the [admin images page](https://admin.owid.io/admin/images),
+use the button there to generate alt text, and paste it back here. The design review is not the gate
+— the delivered image is.
+
 **Separate the chart *choice* from the chart *image*, and never draft before the choice is settled.**
 Which chart the post is built around has to be fixed first, in **both** modes; only the PNG itself can
 lag. Drafting around an unsettled chart is how you end up rewriting: the view that gets picked turns
@@ -124,9 +164,10 @@ before, the chart we used then is the default, and changing it needs a reason.
 
 *Mode B*: **stop here** and don't draft until the image arrives. The gate is on the post, not on the
 skill — a partial ask the chart has no bearing on (the CTA `url:` and `text:`, a Doc title, a check on
-an existing draft) gets answered straight away; the description invites those. *Mode A*: post the
-block and keep going without the PNG, filling the `filename:` slot from the convention — but get the
-chart *decision* confirmed before you draft, and say which chart you are writing to.
+an existing draft) gets answered straight away; the description invites those. *Mode A*: ask the
+route, post the matching instructions, and keep going without the PNG, filling the `filename:` slot
+from the convention — but get the chart *decision* confirmed before you draft, and say which chart
+you are writing to.
 
 On picking the chart for a **large multi-topic dataset**, see "Big datasets" below — the choice
 question is different there, and it is the case most likely to send you back for a rewrite.

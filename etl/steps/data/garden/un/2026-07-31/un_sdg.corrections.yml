@@ -861,3 +861,193 @@
   expect: {gt: 1000000}
   provider: United Nations Statistics Division and United Nations Environment Programme
   status: open
+
+# ---------------------------------------------------------------------------------------------
+# Indicator 12.c.1 (fossil-fuel subsidies), series ER_FFS_CMPT_CD (billions of nominal USD),
+# ER_FFS_CMPT_GDP (% of GDP) and ER_FFS_CMPT_PC_CD (per capita): three unrelated defects in the
+# 2026 Q2 release, all three of which land on a published chart. The UN passes the
+# OECD/IEA/IMF figures straight through, so two are inherited from the OECD Inventory of
+# Support Measures for Fossil Fuels and one is introduced by UNSD. Full workup in
+# owid/owid-issues#2516.
+#
+#   1. Latvia 2022 = $21.58bn, against $0.22bn in 2021 and $0.42bn in 2023 -- 50 to 100 times
+#      its own neighbouring years. That is 59.3% of Latvian GDP and $11,470 per person, the
+#      largest per-capita value anywhere in the indicator by a factor of 2.5 (next highest:
+#      Kuwait 2022 at $4,510). The OECD's own SDMX API returns 21.57652 for Latvia 2022, so
+#      the UN copied it faithfully and the error is the OECD's.
+#
+#   2. Italy 2024 = exact 0 after $19.51bn in 2023. It is the only country in the release whose
+#      2024 value is 0 following a 2023 value above $50 per capita. The OECD reports $21.78bn
+#      for Italy 2024; the UN uses Italy's own ISTAT submission, which has no 2024 figure, and
+#      encodes the gap as a zero. The % of GDP series has no 2024 value for Italy at all, which
+#      is why only two of the three series are corrected here.
+#
+#   3. Venezuela 2010-2014 = exact 0 in all three series, where the 2023-08-16 release reported
+#      $744-1,185 per capita for those same years. Venezuela is still in the OECD-IEA
+#      82-country list, so this is not a coverage withdrawal -- the years are missing and
+#      encoded as zero.
+#
+# Zeros elsewhere in this indicator are NOT errors: 596 of them are genuine reports of no
+# subsidy and the count is stable across releases (the 2023-08-16 release had 562), so only
+# these two zero blocks are dropped. The Venezuela entries match on the zero itself rather than
+# on a year list, so an upstream fix trips the no-match assertion.
+#
+# What this cannot fix: the UN's regional and world aggregates are published by the UN, not
+# computed by us, so they still contain the bad Latvian value and the missing Italian and
+# Venezuelan ones. Latvia 2022 is ~1.3% of the 2022 world total ($21.58bn of $1,658.70bn).
+#
+# Also known and NOT corrected here: Norway 2019 ($0.58bn) and 2022 ($0.43bn) sit between
+# $7.79bn and $5.16bn neighbours because the OECD left those two years on the old basis. That
+# is a basis inconsistency rather than an impossible number, and dropping it would remove real
+# OECD data, so it is left in place and reported upstream instead.
+
+- indicator: value
+  match: {seriescode: ER_FFS_CMPT_CD, country: Latvia, year: 2022}
+  action: drop
+  reason: >-
+    Fossil-fuel subsidies of $21.58bn for Latvia in 2022, against $0.22bn in 2021 and $0.42bn
+    in 2023. Equivalent to 59.3% of GDP and $11,470 per person, 2.5x the largest per-capita
+    value anywhere else in the indicator. The OECD's SDMX API returns the same figure, so the
+    error is inherited rather than introduced by the UN.
+  expect: {gt: 20}
+  provider: Organisation for Economic Co-operation and Development
+  status: open
+
+- indicator: value
+  match: {seriescode: ER_FFS_CMPT_GDP, country: Latvia, year: 2022}
+  action: drop
+  reason: >-
+    Fossil-fuel subsidies of 59.31% of GDP for Latvia in 2022, against 0.61% in 2021 and 1.17%
+    in 2023. Follows directly from the erroneous $21.58bn total; see the ER_FFS_CMPT_CD entry.
+  expect: {gt: 50}
+  provider: Organisation for Economic Co-operation and Development
+  status: open
+
+- indicator: value
+  match: {seriescode: ER_FFS_CMPT_PC_CD, country: Latvia, year: 2022}
+  action: drop
+  reason: >-
+    Fossil-fuel subsidies of $11,470 per person for Latvia in 2022, against $115 in 2021 and
+    $224 in 2023, and 2.5x the largest value anywhere else in the indicator (Kuwait 2022, at
+    $4,510). Follows directly from the erroneous $21.58bn total; see the ER_FFS_CMPT_CD entry.
+  expect: {gt: 10000}
+  provider: Organisation for Economic Co-operation and Development
+  status: open
+
+- indicator: value
+  match: {seriescode: ER_FFS_CMPT_CD, country: Italy, year: 2024}
+  action: drop
+  reason: >-
+    Italy's 2024 total is an exact 0 after $19.51bn in 2023, and the OECD reports $21.78bn for
+    that year. The UN uses Italy's ISTAT submission, which has no 2024 figure, and encodes the
+    missing year as zero rather than leaving it blank.
+  expect: {eq: 0}
+  provider: United Nations Statistics Division
+  status: open
+
+- indicator: value
+  match: {seriescode: ER_FFS_CMPT_PC_CD, country: Italy, year: 2024}
+  action: drop
+  reason: >-
+    Italy's 2024 per-capita value is an exact 0 after $327.86 in 2023. Missing year encoded as
+    zero; see the ER_FFS_CMPT_CD entry.
+  expect: {eq: 0}
+  provider: United Nations Statistics Division
+  status: open
+
+- indicator: value
+  match: {seriescode: ER_FFS_CMPT_CD, country: Venezuela, value: 0}
+  action: drop
+  reason: >-
+    Venezuela reports an exact 0 for 2010-2014 and $4.98-18.17bn for every year from 2015 on.
+    The 2023-08-16 release published $21.36-35.35bn for those same years, and Venezuela remains
+    in the OECD-IEA 82-country coverage list, so these are missing years encoded as zero rather
+    than a genuine absence of subsidies.
+  provider: United Nations Statistics Division
+  status: open
+
+- indicator: value
+  match: {seriescode: ER_FFS_CMPT_GDP, country: Venezuela, value: 0}
+  action: drop
+  reason: >-
+    Venezuela reports an exact 0% of GDP for 2010-2014 and 1.61-15.74% for every year from 2015
+    on. Missing years encoded as zero; see the ER_FFS_CMPT_CD entry.
+  provider: United Nations Statistics Division
+  status: open
+
+- indicator: value
+  match: {seriescode: ER_FFS_CMPT_PC_CD, country: Venezuela, value: 0}
+  action: drop
+  reason: >-
+    Venezuela reports an exact $0 per person for 2010-2014 and $161-644 for every year from
+    2015 on, where the 2023-08-16 release published $744-1,185. Missing years encoded as zero;
+    see the ER_FFS_CMPT_CD entry.
+  provider: United Nations Statistics Division
+  status: open
+
+# ---------------------------------------------------------------------------------------------
+# Indicator 12.c.1, series ER_FFS_CMPT_GDP (fossil-fuel subsidies as a share of GDP): two more
+# defects, both confined to this one series of the three.
+#
+#   1. Poland's whole series is published as a FRACTION while labelled PERCENT, so it is ~100x
+#      too small. The SDG API returns 0.00089-0.00557 for 2015-2024, which renders as 0.00-0.01%
+#      on our charts, while Poland's own reported total is $0.62-2.71bn. Dividing that total by
+#      Poland's nominal GDP (World Bank, NY.GDP.MKTP.CD) reproduces the published number as a
+#      fraction almost exactly --
+#      2020: 2.71/605.9 = 0.447% against a published 0.00448; 2022: 0.62/695.6 = 0.089% against
+#      0.00089 -- and Poland is the only entity in the indicator whose total exceeds $0.1bn
+#      while its share reads 0. Denmark, by contrast, is in percent (1.00931/424.5 = 0.238%
+#      against a published 0.23775), as is every other country checked. Poland's per-capita
+#      series agrees with its total (25.32 $/capita x 38.5m = $0.975bn against a reported
+#      $0.98bn), so the total is intact and only the share is mis-scaled.
+#
+#      Dropped rather than rescaled. Multiplying by 100 would publish an OWID-adjusted number
+#      under a UN-attributed indicator, which is the trade #6760 declined for EN_HAZ_PCAP; and
+#      2024 does not fit the pattern as cleanly as 2015-2023 (implied GDP $455.8bn against
+#      Poland's actual $917.8bn), so that year may be wrong for a second reason. Poland
+#      keeps its total and per-capita series, which are unaffected.
+#
+#   2. Denmark and Poland are the only two entities in the indicator with 2025 and 2026 values,
+#      and both are exact carry-forwards of their 2024 figure (SDG API: Denmark
+#      2024 = 2025 = 2026 = 0.23775; Poland 2024 = 2025 = 2026 = 0.00215). The subsidy total
+#      ER_FFS_CMPT_CD stops at 2024 for every country, so there is no numerator from which a
+#      2025 or 2026 share could have been measured. Left in, they push the time axis of every
+#      chart on this series two years past the data: the map lands on 2026 with two entities
+#      reporting, while the World series ends in 2024.
+#
+#      The guard here can only be a value band, not "the total is missing" -- the corrections
+#      grammar cannot compare one series against another. A genuine 2025 figure that happened to
+#      land inside the band would still be dropped; a revised one outside it fails the build.
+- indicator: value
+  match: {seriescode: ER_FFS_CMPT_GDP, country: Poland}
+  action: drop
+  reason: >-
+    Published as a fraction while labelled PERCENT: 0.00089-0.00557 for 2015-2024, i.e. ~100x
+    too small, against a reported subsidy total of $0.62-2.71bn. Poland is the only entity in
+    the indicator whose total exceeds $0.1bn while its share reads 0, and its own per-capita
+    series is consistent with the total, so only this series is mis-scaled. Also covers the 2025
+    and 2026 carry-forwards, for which no subsidy total is published.
+  expect: {lt: 0.01}
+  provider: United Nations Statistics Division
+  status: open
+
+- indicator: value
+  match: {seriescode: ER_FFS_CMPT_GDP, country: Denmark, year: 2025}
+  action: drop
+  reason: >-
+    Share of GDP for a year in which the subsidy total is not published for any country. The
+    value is an exact carry-forward of Denmark's 2024 figure (0.23775), not a measured 2025
+    observation.
+  expect: {gt: 0.23, lt: 0.24}
+  provider: United Nations Statistics Division
+  status: open
+
+- indicator: value
+  match: {seriescode: ER_FFS_CMPT_GDP, country: Denmark, year: 2026}
+  action: drop
+  reason: >-
+    As for 2025: an exact carry-forward of Denmark's 2024 figure (0.23775) in a year with no
+    published subsidy total.
+  expect: {gt: 0.23, lt: 0.24}
+  provider: United Nations Statistics Division
+  status: open
