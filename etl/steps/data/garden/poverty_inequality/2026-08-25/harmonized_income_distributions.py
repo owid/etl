@@ -402,7 +402,26 @@ def common_sample(tb_wid: Table, tb_pip: Table) -> list:
 
 def fit_consumption_income_model(tb_percentiles: Table) -> Table:
     """Per-percentile OLS ln(income_p) = alpha_p + beta_p * ln(consumption_p), fitted across the
-    national country-years where PIP publishes both welfare types at the current PPP round."""
+    national country-years where PIP publishes both welfare types at the current PPP round.
+
+    KNOWN LIMITATION — the sample is small and skewed away from where the model is applied. As of
+    the 2026-06-26 PIP release it is 88 country-years across 19 countries:
+
+        high-income          10 countries, 59 country-years  (Bulgaria, Croatia, Estonia, Hungary,
+                                                              Latvia, Lithuania, Poland, Romania,
+                                                              Russia, Slovakia)
+        upper-middle-income   7 countries, 24 country-years  (Albania, Kosovo, Montenegro,
+                                                              Philippines, Saint Lucia, Serbia,
+                                                              Turkey)
+        lower-middle-income   2 countries,  5 country-years  (Haiti, Nicaragua)
+        low-income            0 countries,  0 country-years
+
+    14 of the 19 are European; none is in Sub-Saharan Africa or South Asia, and Poland and Romania
+    alone contribute 30 of the 88 observations. The transform is then applied to consumption-based
+    country-years, which are overwhelmingly the poor ones — so it is extrapolated onto exactly the
+    populations the sample excludes. The fit is also weakest at the bottom (R^2 0.28 at p1), which
+    is where ENFORCE_MONOTONE_INCOME_BASIS has to intervene.
+    """
     d = national_survey_percentiles(tb_percentiles)
 
     # The estimation sample: country-years where PIP publishes BOTH welfare types, so income and
