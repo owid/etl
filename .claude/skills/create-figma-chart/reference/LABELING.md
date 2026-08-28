@@ -56,10 +56,19 @@ shape of the data creates.
 
 Four things to get right:
 
-- **Split the line by slicing its OWN vertices, not by drawing new ones.** Read `vectorPaths`, confirm
-  `index = year - firstYear` against two known points, then clone the line per segment and rewrite each
-  clone's path to its slice. Translate each slice so its own minimum is `(0,0)` and set the node's `x`/`y`
-  to that minimum's absolute position — otherwise the node moves (GOTCHAS). Have consecutive segments
+- **Split the line by slicing its OWN vertices, not by drawing new ones.** Read `vectorPaths`, then map
+  vertices to years *before* you slice anything. `index = year - firstYear` is a shortcut that is only valid
+  on a **gap-free** series, so its precondition is an assertion across the whole range rather than a spot
+  check: **assert `pts.length === lastYear - firstYear + 1`**. A single skipped year shifts every later
+  vertex by one and the recolour then lands on the wrong period with nothing to show for it — and two known
+  points can both agree while the gap sits somewhere between them, so keep the boundary-vertex check (it
+  confirms the range) but never treat it as sufficient on its own. **If the assertion fails, the series has
+  gaps and the index shortcut is unusable**: take each observation's year from the chart's own data (the
+  `.csv` endpoint's year column) and map it to the vertices in order instead. Chile's line satisfied the
+  assertion — 76 vertices for 1950–2025, which is 76 years inclusive — but that is a property of that
+  dataset, not of the technique. Then clone the line per segment and rewrite each clone's path to its
+  slice. Translate each slice so its own minimum is `(0,0)` and set the node's `x`/`y` to that minimum's
+  absolute position — otherwise the node moves (GOTCHAS). Have consecutive segments
   **share** their boundary vertex, and assert afterwards that segment *n*'s end equals segment *n+1*'s
   start and that the union spans exactly what the original did.
 - **`strokeCap = "ROUND"` on the interior ends, and NOT on the two outer ones.** Separate paths have no
