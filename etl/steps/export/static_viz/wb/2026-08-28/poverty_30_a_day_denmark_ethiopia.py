@@ -27,10 +27,80 @@ fixes is the structure: which text slots exist, in what order, and which share a
 
 Figma
 -----
-Not yet placed in the Charts file. Once it is, record here (see `/create-static-viz` skill's Step 8):
-file key, page name and order, frame name and node id, the import mechanics, every text slot's
-content, every colour's library name and key, and the fit -- so a later session can redo the handoff
-from this file alone.
+The whole handoff, written out so it can be redone in a later session with nothing but this file.
+
+**Target.** File `Charts (2026)`, key `s6Sv60bakebRRW2TxsMQbF`. Page
+`20260828 Share of the population living above and below $30 a day (Daniel)`, inserted directly
+below the `-----------` divider (top of the dated block). One frame:
+
+| Frame | Node | Open it | Cloned from | Size |
+|---|---|---|---|---|
+| `poverty-30-a-day-denmark-ethiopia` | `26995:12` | [link](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=26995-12) | `5332:75` Static Chart Template_Horizontal | 850x638 |
+
+The frame name is the durable join -- it is the kebab-case slug the website exports the PNG by, and
+the node id dies the next time the design team rebuilds the template frame (as it already has once,
+per `TEMPLATES.md`). Lost the id? Search the file's page list for "$30 a day"; the page is dated
+20260828, the day it was first placed, which does not change on a data refresh.
+
+**Import.** Two `upload_assets` uploads, not one: the step's own **PNG** goes on the page unwrapped
+(it has no children -- a raster fill on a bare FRAME) as the left-hand reference copy at `x=0,y=0`,
+resized to 850x638; the step's **SVG** is uploaded as a second asset and unwrapped straight into the
+template clone (`unwrap(svgImport, clone, ...)`) -- there is no separate "embed" export for a
+local-SVG step, see FITTING.md's local-SVG route. Never `createNodeFromSvg` (50k-char cap).
+
+**Rescale, then delete duplicates, in that specific order.** The unwrapped SVG lands as a GROUP,
+whose bbox is only trustworthy while its full-canvas background rect (`patch_1`) is still a member --
+delete it too early and `clone.width / svg.width` solves against the axes' own ink instead of the
+canvas (818px against 850px), which is the wrong denominator. So: (1) delete the six duplicate text
+groups the step emits (`title`, `subtitle`, `note`, `data-source`, `tagline`, `license` -- Step 6
+already filled the template's own slots in its bound Lato/Playfair styles), keeping `patch_1` and
+`axes_1`; (2) `svgNode.rescale(clone.width / svgNode.width)` -- measured 1.0417 (816.48 to 850,
+matching the documented 96/100 dpi mismatch); (3) delete `patch_1` last, once the scale is locked in.
+Confirmed on this run: height landed on the clone's 638 at `delta 0`.
+
+**Reposition into the REAL band, not the assumed one.** After the six deletions the group's bbox
+recomputes to whatever is left (`axes_1` alone), so a blind `svg.x = 0; svg.y = 0` after that point
+drops the chart at the frame's top-left corner, behind the header. The template's header is
+`primaryAxisSizingMode: AUTO` and reflows to the *real*, Figma-rendered title/subtitle -- a one-line
+title took `headerBottom` from the matplotlib step's assumed ~142 down to **89** here -- so read the
+clone's actual `header.y + header.height` and `footer.y` after Step 6, and centre the chart in that
+band:  `svg.x = header.x` (16, the content margin); `svg.y = bandTop + (bandBottom - bandTop -
+svg.height) / 2`. On this run: band 89 -> 559 (470px), chart height 397.06, gap 36.47px each end.
+
+**Every text slot**, all in the template's own bound styles (Playfair Display SemiBold 25 / Lato
+Regular 16 / Lato Bold+Regular 12 / Lato Bold+Medium 11), none of them the matplotlib sizes the step
+itself uses (those are for the PNG/SVG preview only, sized down from the template's own type to fit
+DejaVu Sans's wider metrics -- see the step's own font-size comment):
+
+| Slot | Content | Bold run(s) |
+|---|---|---|
+| Title | `Share of the population living above and below $30 a day` | -- |
+| Subtitle | `Share of the population estimated to live below and above $30 a day, measured in 2021 international-$, which adjusts for inflation and for differences in the cost of living between countries.` | -- |
+| Note | `Note: Each country is shown at its own most recent household-survey estimate, which are not the same year: 2023 for Denmark and 2021 for Ethiopia.` | `Note:` |
+| Data source | `Data source: World Bank Poverty and Inequality Platform (2026)` | `Data source:` |
+| Tagline | `OurWorldinData.org — Research and data to make progress against the world's largest problems.` | unchanged from the template's own placeholder |
+| License | `Licensed under CC-BY by Max Roser and Daniel Bachler` | `CC-BY`, `Max Roser and Daniel Bachler` (measured 272px against the 263px nominal slot -- clears because the license row's neighbour, the 467px tagline, leaves ~79px of slack in the shared 818px row; TEMPLATES.md's "drop *the authors*" phrasing is what keeps two names on one line at all) |
+
+Mixed-weight runs were written via `setRangeFontName` after setting `characters` (which propagates
+the *first* character's style over the whole string) -- see TEXTS.md's recipe. Title and subtitle are
+bound to shared text styles (`textStyleId` set); note/source/tagline/license carry no style id, so
+they were edited directly rather than through the style-reset dance that recipe describes for a
+*bound* mixed-weight node.
+
+**Colours.** Not yet assigned to the library palette -- the clone still carries the step's seaborn
+"deep" placeholders (`palette[2]` green for the "above $30" segment, `palette[4]` purple for
+"below"). Picking real Chart-colours-library swatches for these two categories is an open item (see
+the PR).
+
+**The fit.** No rescale beyond the one uniform factor above -- the chart already spans the full
+818px content width by construction (the step lays out its axes at the template's own content
+width), so there was no x-map/width-shortfall to close, unlike a grapher-embed import.
+
+**Audit numbers to expect on a re-run:** SVG group height delta from the clone's own height should be
+`0` (this template's aspect matches the step's `figsize` exactly); the rescale factor should be
+`1.0417`; the in-bar labels render around 16.7px in Figma against the step's own 12pt matplotlib
+size (the DejaVu-to-Lato metric gap this file's own font-size comment describes -- within 0.75px of
+the 12/13/14/15/16 annotation ladder's 16 rung, i.e. expected fit drift, not a defect).
 """
 
 import matplotlib.pyplot as plt
