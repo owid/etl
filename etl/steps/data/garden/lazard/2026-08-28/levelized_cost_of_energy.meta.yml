@@ -25,6 +25,8 @@ tables:
           title_public: |-
             How did the price of electricity from new power plants change over the last {YEAR_LAPSE} years?
           grapher_config:
+            title: |-
+              How did the price of electricity from new power plants change over the last {YEAR_LAPSE} years?
             note: |-
               Data reflects unsubsidized costs, expressed in constant {BASE_DOLLAR_YEAR} US$.
       lcoe_unadjusted:
