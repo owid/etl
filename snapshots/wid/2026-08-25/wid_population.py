@@ -7,7 +7,10 @@ extraction — and writes one CSV file here.
 To update:
 
 1. Run ``wid_population.do`` in a local Stata installation (a few minutes):
-       stata-se -b do wid_population.do
+       /Applications/StataNow/StataSE.app/Contents/MacOS/stata-se -b do wid_population.do
+   Use the full path — several Stata versions can sit side by side under /Applications, and a bare
+   ``stata-se`` may resolve to an older one whose licence has expired. ``-b`` sends output to
+   ``wid_population.log`` rather than the terminal.
    It writes ``wid_population_992_999_i.csv`` into this directory (snapshots/wid/<version>/).
 2. Create the snapshot:
        etls wid/<version>/wid_population
