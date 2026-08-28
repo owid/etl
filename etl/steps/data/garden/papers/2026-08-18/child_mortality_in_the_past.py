@@ -91,6 +91,10 @@ KNODEL_COHORT = (1750, 1799)
 # UN IGME estimates a global rate from this year on; UN WPP life tables carry the years before it.
 SPLICE_YEAR = 1990
 
+# There is no year 0: the calendar runs 1 BCE straight into 1 CE. Volk & Atkinson print "0 A.D." for
+# the Roman Egypt census data, meaning the turn of the era, and this is the real year that names.
+TURN_OF_THE_ERA = 1
+
 # How a printed rate is read. A range becomes its midpoint and keeps its bounds; an open-ended value
 # ("40%+") becomes its lower bound, which is what the chart labels "higher than 40%".
 RATE_RANGE = re.compile(r"^(\d+(?:\.\d+)?)%?-(\d+(?:\.\d+)?)%$")
@@ -191,25 +195,33 @@ def parse_period(printed: str) -> tuple[int, int]:
             return start_sign * int(match.group(1)), end_sign * int(match.group(2))
     if match := PERIOD_SINGLE_YEAR.match(text):
         year = int(match.group(1))
-        return year, year
+        # The paper prints "0 A.D." for the Roman Egypt census data, and there is no year 0 - the
+        # calendar runs 1 BCE straight into 1 CE. Read it as the turn of the era, which is the year
+        # the source means.
+        return (TURN_OF_THE_ERA, TURN_OF_THE_ERA) if year == 0 else (year, year)
     raise ValueError(f"Cannot read {printed!r} as a period")
 
 
 def period_label(start: int, end: int) -> str:
     """Write a period the way the chart labels it.
 
-    A span inside one century abbreviates its end to two digits (1816-50); one that crosses a century
-    keeps all four (1650-1800). That rule reproduces every period label on the published chart.
+    Two conventions, both of them about not asserting things the calendar does not contain:
+
+    - **The era is named wherever a bare number could be read either way.** A year under 1000 takes a
+      `CE`, so "500 CE" cannot be mistaken for the axis's "500 BCE"; four-digit years do not need it.
+    - **A span inside one century abbreviates its end** to two digits (1816-50), and one that crosses a
+      century keeps all four (1650-1800). That rule reproduces every period label on the published
+      chart.
     """
     if start < 0 and end < 0:
         return f"{-start}–{-end} BCE"
     if start < 0:
-        return f"{-start} BCE–{end}"
+        return f"{-start} BCE–{_with_era(end)}"
     if start == end:
-        return "around the year 0" if start == 0 else f"{start}"
+        return _with_era(start)
     if start // 100 == end // 100:
         return f"{start}–{end % 100:02d}"
-    return f"{start}–{end}"
+    return f"{start}–{_with_era(end)}"
 
 
 def build_historical_societies(tb_volk: Table, tb_knodel: Table, tb_life_tables: Table) -> Table:
@@ -494,6 +506,12 @@ def sanity_check_outputs(
     assert tb_historical["share_dying_before_15"].between(20, 70).all(), "A historical rate is outside 20-70%"
     assert (tb_historical["period_start"] <= tb_historical["period_end"]).all(), "A period runs backwards"
     assert tb_historical["period_label"].notna().all(), "A society has no period label"
+    # There is no year 0, so no row may claim one. `period_mid` still can and does - it is a position
+    # on a continuous scale, where 0 falls on the boundary between 1 BCE and 1 CE rather than naming a
+    # year - which is why only the endpoints are checked.
+    for column in ("period_start", "period_end"):
+        offenders = tb_historical.loc[tb_historical[column] == 0, "society"].tolist()
+        assert not offenders, f"{column} is 0 for {offenders}, and there is no year 0"
 
     mean = float(tb_historical["share_dying_before_15"].mean())
     assert abs(mean - 48.1) < 0.1, f"The historical average should be 48.1%, got {mean:.3f}%"
@@ -555,6 +573,14 @@ def sanity_check_outputs(
     assert float(highest.iloc[0]) > latest_global > float(lowest.max()), (
         "The highest and lowest national rates should straddle the latest global rate"
     )
+
+
+def _with_era(year: int) -> str:
+    """Name the era on a year that could otherwise be read as either.
+
+    Under 1000 a bare number sits ambiguously against the axis's BCE ticks; four digits do not.
+    """
+    return f"{year} CE" if year < 1000 else f"{year}"
 
 
 def _has_rate(column) -> list[bool]:

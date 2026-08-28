@@ -189,7 +189,16 @@ HUNTER_GATHERER_RULE_HALF_WIDTH = 110
 # lead-in on the left for the hunter-gatherer marker, and a margin on the right wide enough for the
 # labels of the 1600-1900 cluster, whose marks are only ~50px from the last year. The published chart
 # does the same, and without that margin eleven labels have nowhere to go.
-YEAR_TICKS = [0, 500, 1000, 1500]
+#
+# **There is no tick at 0, because there is no year 0** - the calendar runs 1 BCE straight into 1 CE,
+# so 0 on this scale is the boundary between them rather than a year to label. The published chart
+# labelled it "0".
+#
+# The BCE tick is the other half of that fix: three of the societies are dated in BCE and the axis
+# used to carry no tick left of the era boundary at all, so a third of it had no scale. -500 is the
+# round century that falls between the hunter-gatherer marker and the earliest dated society, so it
+# gives the BCE stretch a reading without landing under the undated marker and appearing to date it.
+YEAR_TICKS = [-500, 500, 1000, 1500]
 
 LAYOUT = {
     # "Static Chart Template_Vertical", node 5332:93, re-read from the file on 2026-08-18 and matching
@@ -540,7 +549,7 @@ def create_visualization(
 
     ticks = [*YEAR_TICKS, latest_year]
     ax.set_xticks(ticks)
-    ax.set_xticklabels([str(tick) for tick in ticks])
+    ax.set_xticklabels([year_tick_label(tick) for tick in ticks])
     # Every tick label stays centred on its mark. Grapher's inward anchoring exists to stop the
     # outermost label half-overhanging the plot, and neither of these sits at an edge - see YEAR_TICKS.
     # The value axis carries no labels; every mark is labelled with its own rate instead.
@@ -861,6 +870,17 @@ def draw_text_block(ax, x: float, y: float, text: str, *, ha: str, va: str, font
             zorder=7,
             gid=f"{gid}-{index + 1}" if len(lines) > 1 else gid,
         )
+
+
+def year_tick_label(year: int) -> str:
+    """Label a year tick, naming the era wherever a bare number could be read either way.
+
+    A BCE tick says so; a CE year under 1000 says so too, because "500" beside "500 BCE" is exactly
+    the pair a reader can misread. Four-digit years need neither.
+    """
+    if year < 0:
+        return f"{-year} BCE"
+    return f"{year} CE" if year < 1000 else f"{year}"
 
 
 def build_hunter_gatherer_label(tb_summary: Table) -> str:
