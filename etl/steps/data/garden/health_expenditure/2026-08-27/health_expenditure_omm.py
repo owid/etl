@@ -11,6 +11,21 @@ paths = PathFinder(__file__)
 # Define category to select from OECD Health Expenditure and Financing Database
 CATEGORY_OECD = "Government/compulsory schemes"
 
+# Coverage floor: the OECD series carries 61 reference areas, and the OMM keeps only
+# countries present there. A drop means the filter or a merge regressed.
+MIN_COUNTRIES = 61
+
+# Upper bound for government/compulsory health spending as a share of GDP. The series
+# peaks at 15.8% (United States, 2020), so 30 leaves generous headroom while still
+# catching a unit slip or a botched splice.
+MAX_SHARE_GDP = 30
+
+# Countries present in both the OECD and the 1993 series but sharing no year with a
+# value in both, so the retroactive splice has no anchor and they get no 1960-1991
+# backcast. This is a property of the sources, not a bug — but a NEW country joining
+# this set means an overlap disappeared, which is worth a look.
+SPLICE_ANCHOR_EXCEPTIONS = {"Belgium", "Switzerland"}
+
 
 def run() -> None:
     #
@@ -26,11 +41,15 @@ def run() -> None:
     tb_oecd_1993 = ds_oecd_1993.read("health_expenditure_1993")
     tb_lindert = ds_lindert.read("lindert")
 
+    sanity_check_inputs(tb_oecd, tb_oecd_1993, tb_lindert)
+
     #
     # Process data.
     #
     # Select the right financing scheme we need from the OECD Health Expenditure and Financing Database
     tb_oecd = tb_oecd[tb_oecd["financing_scheme"] == CATEGORY_OECD].reset_index(drop=True)
+
+    sanity_check_splice_anchors(tb_oecd, tb_oecd_1993)
 
     # Keep only the necessary columns
     tb_oecd = tb_oecd[["country", "year", "share_gdp"]]
@@ -57,6 +76,8 @@ def run() -> None:
     # Keep only the necessary columns
     tb = tb[["country", "year", "share_gdp"]]
 
+    sanity_check_outputs(tb)
+
     tb = tb.format(["country", "year"], short_name="health_expenditure_omm")
 
     #
@@ -67,6 +88,65 @@ def run() -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def sanity_check_inputs(tb_oecd: Table, tb_oecd_1993: Table, tb_lindert: Table) -> None:
+    """
+    Check the three source tables before splicing them.
+    """
+    assert CATEGORY_OECD in set(tb_oecd["financing_scheme"]), (
+        f"Financing scheme {CATEGORY_OECD!r} is missing from the OECD input. The filter in run() would "
+        f"silently yield an empty table. Available: {sorted(set(tb_oecd['financing_scheme']))}"
+    )
+    for name, tb_input in [("OECD", tb_oecd), ("OECD 1993", tb_oecd_1993), ("Lindert", tb_lindert)]:
+        assert not tb_input.empty, f"{name} input table is empty."
+        assert {"country", "year", "share_gdp"} <= set(tb_input.columns), (
+            f"{name} input is missing required columns. Has: {sorted(tb_input.columns)}"
+        )
+
+
+def sanity_check_splice_anchors(tb_oecd: Table, tb_oecd_1993: Table) -> None:
+    """
+    Check that countries in both the OECD and 1993 series share a year with a value in both.
+
+    Without such a year there is no reference value, so the retroactive growth yields NaN and the
+    country silently loses its 1960-1991 backcast. A shared year is only an anchor when share_gdp is
+    non-null on both sides, which is what create_estimations_from_growth requires.
+    """
+    # Membership comes from the unfiltered inputs: a country whose share_gdp is entirely null on one
+    # side must still be flagged, not quietly dropped from the set being checked.
+    countries_both = set(tb_oecd["country"]) & set(tb_oecd_1993["country"])
+    years_oecd = tb_oecd[tb_oecd["share_gdp"].notna()]
+    years_oecd_1993 = tb_oecd_1993[tb_oecd_1993["share_gdp"].notna()]
+    no_anchor = {
+        country
+        for country in countries_both
+        if not (
+            set(years_oecd.loc[years_oecd["country"] == country, "year"])
+            & set(years_oecd_1993.loc[years_oecd_1993["country"] == country, "year"])
+        )
+    }
+    unexpected = no_anchor - SPLICE_ANCHOR_EXCEPTIONS
+    assert not unexpected, (
+        f"Countries lost their splice anchor: {sorted(unexpected)}. They appear in both the OECD and "
+        "1993 series but share no year with a value in both, so they will silently lose the 1960-1991 "
+        "backcast. Confirm the overlap really disappeared upstream before adding them to "
+        "SPLICE_ANCHOR_EXCEPTIONS."
+    )
+
+
+def sanity_check_outputs(tb: Table) -> None:
+    """
+    Check the spliced table right before formatting and saving.
+    """
+    assert tb["country"].nunique() >= MIN_COUNTRIES, (
+        f"Country coverage shrank: {tb['country'].nunique()} < {MIN_COUNTRIES}. Possible filter or merge regression."
+    )
+    assert not tb["share_gdp"].isna().all(), "share_gdp is entirely NaN — the splice produced no values."
+    share_gdp = tb["share_gdp"].dropna()
+    assert share_gdp.min() >= 0 and share_gdp.max() < MAX_SHARE_GDP, (
+        f"share_gdp out of [0, {MAX_SHARE_GDP}): min={share_gdp.min()}, max={share_gdp.max()}"
+    )
 
 
 def create_estimations_from_growth(tb: Table, reference_var_suffix: str, to_adjust_var_suffix: str) -> Table:

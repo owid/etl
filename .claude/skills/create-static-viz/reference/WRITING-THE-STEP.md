@@ -71,6 +71,35 @@ matplotlib.rcParams["svg.hashsalt"] = "owid-static-viz"  # deterministic ids, cl
 - Emit both formats; `paths.export_fig` writes into the step's own directory, so **the PNG and SVG
   are committed next to the `.py`** — for every frame the step emits.
 
+### A dashed line has to be resampled, or Figma renders its dash unevenly
+
+The one part of the handoff `verify_static_viz.py` cannot see, because the SVG is correct and it is
+Figma that reads it differently. **Figma fits a whole number of dash repetitions into each segment of
+a path individually**, so the dash length a reader sees is set by the vertex spacing rather than by
+the dash you asked for. Matplotlib dashes continuously along a path and does not care, so the PNG
+looks right and only the placed frame is wrong.
+
+Path simplification makes a curve the worst case: it keeps vertices where curvature is high and drops
+them where the line is straight, so one end of a curve collapses into dots while the other runs as
+long dashes. Measured in Figma: 6.7px spacing renders as dots, 13px as over-long dashes, >=50px as
+specified.
+
+So resample any dashed line by arc length, one dash period per segment. `who/2026-08-07/height_for_age.py`
+carries the worked version -- `resample_for_even_dashes` plus an `even_dashes(fig, period_pt)` pass that
+finds the lines by gid. Three things it has to get right, each of which is a silent wrong answer:
+
+- run it **after** `subplots_adjust`, or the axes are still at their default size and you measure the
+  wrong page;
+- convert the period to display pixels with **`fig.dpi`**, not with a template-pixel constant -- these
+  figures lay out at 100 template px per inch but render at 200 dpi, so the constant puts half a
+  period in each segment and changes nothing visible in the numbers you are checking;
+- switch path simplification off on the resampled line, or matplotlib drops the vertices you placed.
+
+Also worth knowing when you pick the pattern: matplotlib **multiplies a dash sequence by the line
+width** (`rcParams["lines.scale_dashes"]`), so `(5, 3)` on a 1.4pt line draws a 7pt dash -- five times
+the stroke width, which reads as stretched at any size. Write the pattern in multiples of the width
+and say so, or check the emitted `stroke-dasharray` against what you intended.
+
 ### Style, and where it stops
 
 - **seaborn** `set_style("ticks")` + `set_palette("deep")`, and reference colors by **palette

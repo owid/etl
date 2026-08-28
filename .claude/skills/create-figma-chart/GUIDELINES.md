@@ -21,6 +21,39 @@ Both source files were cross-read on 2026-08-20 — all six Cheat Sheets pages a
 
 Each chart is a component; `get_screenshot` on its node id renders it. Before designing a chart of a given type, open three or four of that page's charts — the exemplars named at the end of each subsection below are a starting set.
 
+## Talking to the person you're building for
+
+Most people who ask for a chart are not data scientists. They want to know what the image says, whether it
+is right, and what you need from them. **In chat, name what changed and why it matters — not the
+mechanism.** Keep pixel measurements, node ids, style keys, check-row names and API calls for the final
+report and the handover doc, which exist for the next person to build on this and are the right place for
+all of it.
+
+The two questions in SKILL.md -> *Two things to ask about, not decide* are the model: they name what
+changes, what it costs, and nothing else. Written the wrong way round they would open with "the content
+box" and "antimeridian straddlers" and lose the reader before the question.
+
+| Don't say | Say |
+|---|---|
+| "`box-alignment` FAIL: the group bbox is 16..526.28 against a 524 content edge, +2.28" | "The chart was sticking out slightly past the text above it. Fixed." |
+| "ink 508.001 x 360.676, gaps 14.66/14.66, labels at 13.979px" | "The chart fills the space properly, with even margins, and the smallest text is comfortably above our 12px minimum." |
+| "the halo is excluded from `series-weight` because the series name no longer pairs with `outline__*`" | "One automated check couldn't inspect the white outline behind the line, so I measured it by hand — it's right." |
+| "grayscale separation 1.14:1, min deltaE 70.1 across deuteranopia/protanopia" | "The two colours are easy to tell apart, including for colour-blind readers. In a black-and-white printout they'd look the same — the dashed year markers still carry the story, so I left it." |
+
+Four habits behind that table:
+
+- **Lead with the verdict, then the detail.** "It passed" or "I found two problems" first. Never make
+  someone read a list of row names to work out whether their chart is OK.
+- **One number is fine when the number IS the answer** ("the labels are 14px and the minimum is 12").
+  A table of six measurements is not — that is the report's job.
+- **Name the design decision, not the code path.** "I coloured the dictatorship years differently" beats
+  "I split the vector at index 22 and bound Rusty Orange by style key".
+- **Say plainly when something is unchecked.** "I can't see Figma comments, so nobody has design-reviewed
+  this yet" is more useful than a `SKIPPED` row, and it is the same fact.
+
+None of this licenses vagueness about problems. If a check failed, say what was wrong and whether it is
+fixed. The rule trims jargon, never substance.
+
 ## Hands off — never change in the grapher export
 
 - Text colors of the title, subtitle, axis labels, source, note, CC BY.
