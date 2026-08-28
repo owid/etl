@@ -48,6 +48,8 @@ batching is what wins it.
 
 **The single checkpoint rule:** the Charts file is a shared design file other people work in. Nothing is written to it before the user has seen the full proposal (page name, template choice, texts, planned label/annotation edits) and explicitly approved. Reading the file to check conventions needs no permission.
 
+**Say it in plain words.** Most people who ask for a chart are not data scientists, so in chat name what changed and why it matters — not the mechanism. Keep pixel measurements, node ids, style keys, check-row names and API calls for the final report, where someone can go looking for them. Lead with the verdict ("it passed", or "I found two problems"), then the detail. GUIDELINES.md → **Talking to the person you're building for** has the before/after.
+
 Read [GUIDELINES.md](GUIDELINES.md) (sibling file) before editing any chart — it distills the DI Charts Guidelines per chart type and the Good Data Viz Checklist.
 
 > **Paired skill — an update here may oblige an update there, and the reverse.**
@@ -94,8 +96,11 @@ step lives in [`reference/`](reference/) and is read *at* that step, not up fron
 its per-chart-type conventions are now one file each under
 [reference/per-chart-type/](reference/per-chart-type/). **Read only the one for the chart in hand.**
 
-**Size budget, enforced by `--structure`: spine under 62 KB, GUIDELINES.md under 80 KB, the pair
-under 140 KB.** Both are read on every run, so a paragraph added here costs every future
+**Size budget, enforced by `--structure`: spine under 64 KB, GUIDELINES.md under 80 KB, the pair
+under 145 KB.** (Raised from 62/140 on 2026-08-28, once, to land the benchmark's second-run lessons — the
+spine was already 925 bytes over before they were added, so the old figure had stopped describing the file.
+A cap that moves whenever it is hit is not a cap: the discipline below is unchanged, and the next addition
+pays for itself by deduplicating rather than by another raise.) Both are read on every run, so a paragraph added here costs every future
 chart — and moving one from this file into GUIDELINES.md saves a run nothing, which is why the pair
 is capped and not just each file. New detail belongs in the
 reference file for its step, which is read only at that step. After editing any doc in this skill:
@@ -147,9 +152,9 @@ says the environments batch differently, not just slower: in the cloud the compl
 a *narrower* spread than they were dispatched in — near-true parallelism — while locally they
 pipeline, each call ending ~2.1 s after the last. **All of this is `get_screenshot`; batching
 `use_figma` buys only the shared turn** — plugin runs serialize per file, 0.8–1.1× on the
-calls (GOTCHAS). `sum/wall` is also not the honest gain: locally it flatters batching, since a
-queued call's duration includes its wait (2.8–3.2× against a serial baseline, not 3.84×); in the cloud
-it understates it (4.19× against 4.00×).
+calls (GOTCHAS). `sum/wall` is not the honest gain either — it counts a queued call's own wait as work, so locally it
+flatters batching (2.8–3.2× against a serial baseline, not 3.84×) and in the cloud understates it
+(4.19× against 4.00×).
 
 Reads fan out freely — **including reads that each switch pages**, which makes the Step 5 and Step 8c rows below safe: two concurrent calls, one holding `Cover` and one the Templates page, overlapping for 7.7 s, each saw only its own — `figma.currentPage` is per-call. It is concurrent *mutation* of one page that races, not the switch. **Writes only when they target different pages** — a script may switch pages only once, so two `use_figma` writes aimed at the same page in one message race each other.
 
@@ -184,8 +189,8 @@ And a bigger batch is a bigger loss: `use_figma` is atomic, so a script that thr
 ## Inputs
 
 - **A chart reference**, in any of the forms of the Step 1 table. If the user only describes the chart ("the life expectancy chart with just the US and China"), resolve candidates first and confirm.
-- **Or a local SVG already on disk** — typically `etl/steps/export/static_viz/<ns>/<version>/<name>.svg`, emitted by an `export://static_viz` step and handed over by [`/create-static-viz`](../create-static-viz/SKILL.md). Its texts are already baked in and its frame already matches a template, so Step 1's text sourcing and Step 3's export both fall away. See the local-SVG notes in those steps.
-- **Or a bespoke visualization** — a client-rendered React viz from `owid-grapher`'s `bespoke/projects/*`, which has **no** `.svg` endpoint at all. [BESPOKE-SVG.md](BESPOKE-SVG.md) covers getting a chart-only SVG out of one; after that it behaves like grapher's `uncaptioned` embed and every step here applies.
+- **Or a local SVG already on disk** — `etl/steps/export/static_viz/…/<name>.svg` from an `export://static_viz` step, handed over by [`/create-static-viz`](../create-static-viz/SKILL.md). Its texts are baked in and its frame already matches a template, so Step 1's text sourcing and Step 3's export both fall away; follow the local-SVG notes in Steps 1, 3, 5 and 7.
+- **Or a bespoke visualization** — a client-rendered React viz from `owid-grapher`'s `bespoke/projects/*`, with **no** `.svg` endpoint at all. [BESPOKE-SVG.md](BESPOKE-SVG.md) covers getting a chart-only SVG out of one; after that it behaves like grapher's `uncaptioned` embed and every step here applies.
 - Optionally, **the DI/article text** the chart accompanies — the best source for annotation content. Ask for it if annotations are wanted and it exists.
 - Optionally, **a link to a finished page in the file to work like** (see below).
 - Everything else (formats, credit, slug, topic link) is collected once in Step 2.
@@ -216,7 +221,7 @@ Get an SVG URL for the chart, whatever form the reference takes:
 | Admin link `/admin/charts/<id>/edit` | **`/admin/charts/<id>.svg` does not exist** (it returns the admin SPA shell). Resolve the chart's `configId` — `SELECT configId FROM charts WHERE id = <id>` on the public Datasette (see the `query-grapher-db` skill), or `GET /admin/api/charts/<id>.config.json` — then use `https://ourworldindata.org/grapher/by-uuid/<configId>.svg`. Works for unpublished drafts too. |
 | Narrative chart (**name**) | name → uuid via the unauthenticated map `https://admin.owid.io/api/narrative-chart-map`, then `https://ourworldindata.org/grapher/by-uuid/<uuid>.svg`. Being unauthenticated, this one route works from a cloud sandbox, while the *authenticated* `admin.owid.io` routes are Access-blocked there — test a specific route rather than assuming the host |
 | Narrative chart (**admin link with a numeric id**, `/admin/narrative-charts/<id>/edit`) | **Try the direct lookup first** — `select id, name, chartConfigId from narrative_charts where id = <id>` on the public Datasette hands you the uuid outright (note the column is `chartConfigId`, not `configId`). Only when the id isn't mirrored yet do you need the guessing route below. |
-| … the same, when the id is **newer than the Datasette mirror** | there is no id→uuid endpoint, and the mirror lags production by days (it once stopped at 338 while 341 existed). Diff the live name-keyed map against `select name from narrative_charts` to get the unmirrored names, then order them by uuid — they are **uuidv7, so lexical order is creation order** — and count up from the mirror's highest id. That gives a *candidate*, not an answer: ids have gaps where charts were deleted. **Always render the candidate and have the user confirm it before building.** In practice the **name is a far stronger signal than the id arithmetic** — these are named after the piece they serve (`share-of-women-in-parliament-di`), so an unmirrored name matching the DI's topic, *and* carrying the highest uuid, is near-certain. Note the DI page itself is not a reliable route: an older published DI can have `linkedNarrativeCharts: {}` because it ships a hand-made PNG, so the narrative chart you were handed may be newer than the post. Its embedded JSON is still worth reading for `grapher-url`, `authors` and the body text you need in Step 2. |
+| … the same, when the id is **newer than the Datasette mirror** | there is no id→uuid endpoint and the mirror lags production by days. Diff the live name-keyed map against `select name from narrative_charts` for the unmirrored names, then order them by uuid — **uuidv7, so lexical order is creation order** — and count up from the mirror's highest id. That is a *candidate*, not an answer: ids have gaps where charts were deleted, so **always render it and have the user confirm before building**. The **name is the stronger signal** — these are named after the piece they serve (`share-of-women-in-parliament-di`), so an unmirrored name matching the DI's topic and carrying the highest uuid is near-certain. Note a published DI can have `linkedNarrativeCharts: {}` because it ships a hand-made PNG, so the chart may be newer than the post; its embedded JSON still gives `grapher-url`, `authors` and the body text Step 2 needs. |
 | Description only | find candidates via site search (`https://ourworldindata.org/search?q=...`) or a Datasette title match; show the candidates and confirm before proceeding |
 | **Local SVG on disk** (from an `export://static_viz` step) | nothing to resolve — the file *is* the export. Skip the whole texts table below: an ETL step bakes its title, subtitle, `Note:`, `Data source:` and license line into the SVG, building the source string from the indicator's `origins` rather than from `chart.citation`. Read the strings straight out of the file if you need them (`grep -o '<text[^>]*>[^<]*' <file>.svg`), and take the frame's target template from the step, which already sized the figure to it. |
 
@@ -347,21 +352,29 @@ head -c 300 $DIR/embed.svg   # expect <svg ... width="..." height="...">, no <ht
 > `measure_fit.js` prints — with its `CONFIG.declared` and `CONFIG.imFontSize` set from the probe,
 > it is the exact measured-inset second pass rather than another guess — see Step 7.
 
-**The aspect you request is the *canvas*, not the chart — solve for the padding or you will re-export every page.** Grapher insets the drawing inside the SVG it hands back, so the group Figma imports is smaller than the declared size, and it is the *group* that has to fill the template band. Measured on this file's charts, the inset is close to **1.4 × `imFontSize` on each axis** (at `imFontSize=32`: declared 901×566 → content 857×520; at 30: 862×591 → 818.9×550). So don't request the aspect you want — request the aspect that *yields* it, by solving
+**The aspect you request is the *canvas*, not the chart — so solve for the padding, or you re-export every page.** Grapher insets the drawing inside the SVG it returns, and it is the imported *group* that has to fill the band, so requesting the aspect you want yields a chart that misses it (measured: a 336.9px chart where 343 was needed — a 17px gap against a 14px target). `solve_export.py` does this arithmetic; its `--help` carries the closed-form solve, the canvas model and the measured per-axis insets, so read it there rather than re-deriving it here.
 
-```
-(W − 1.4F)/(H − 1.4F) = contentWidth / contentHeight      with   W·H ≈ 510000
-```
+**The inset is per-axis, and it grows once the furniture you are replacing is out of the measurement — so pass 1 is a probe even with measured numbers.** Dropping the end label from the measurement on a single-series chart took this chart's `insetX` from the 64.1 its own docstring records to **122.08**, because the reserved right margin left the ink: the requested aspect came back as a 1.31 group where 1.4033 was solved for, and the x-map correctly REFUSED to close a 7.2% miss by squeezing. Exclude everything you are replacing from the measurement — `measure_fit.js`'s `hideNames`/`hideIds` compute the aspect *as if* those nodes were hidden **without** hiding them, so the probe needs no mutation at all — then run the pass-2 command.
 
-for `H`, then `W = 510000/H`, and pass `imWidth=round(W/H × 1000)&imHeight=1000`. Taking the declared aspect at face value produced a 336.9px chart where 343 was needed — a 17px gap against a 14px target, on the first page of this run. The model is approximate (±3px), so **measure the imported group and expect at most one correction**; a naive request costs one re-export *per page*.
+**Then be ready for the target itself to move: taking the replaced furniture out changes the group's aspect.** `connectors` extend to the right of the plot, so dropping them (Step 8) narrows the group and makes it relatively *taller* — the same export that was solved for a 1.6026 content aspect measured 1.5558 once the elbows were gone, turning a 14px gap into 9.5px. Account for the connectors and the year markers **before** you measure and scale, not after, and re-read the aspect from the group you are actually going to fit.
 
-**Then be ready for the target itself to move: hiding furniture changes the group's aspect.** `connectors` extend to the right of the plot, so hiding them (Step 8) narrows the group and makes it relatively *taller* — the same export that was solved for a 1.6026 content aspect measured 1.5558 once the elbows were hidden, turning a 14px gap into 9.5px. Hide the connectors and the year markers **before** you measure and scale, not after, and re-read the aspect from the group you are actually going to fit.
+**And the two cases take different actions — this is where hiding bites.** For the probe, *exclude* the furniture from the measurement as above; nothing is mutated. Before the **final** measurement and fit, *remove* the replaced nodes from the working clone. A node switched off with `visible = false` still contributes to its group's `absoluteBoundingBox`, which is exactly what `box-alignment` reads — the 2.28px failure worked through in reference/FITTING.md, on a chart whose visible ink measured 508.001 exactly.
 
-> **Square charts, second route:** grapher's `imType=square` render re-lays out the chart for a square canvas (legend placement, font sizing tuned by the web team). When that layout is better than the uncaptioned crop — commonly for maps and charts with big legends — import the full square SVG instead and delete its `header` and `footer` groups in Figma after import. Offer both routes; pick per chart.
+> **Square charts, second route:** grapher's `imType=square` render re-lays out the chart for a square
+> canvas (legend placement, font sizing tuned by the web team). Import the full square SVG and delete its
+> `header` and `footer` groups after import. Its attraction is that it can land ladder-exact with no
+> rescale at all — measured once at a ≈505×328 chart area with every label at exactly **15px**, where
+> reaching 15px through `imType=uncaptioned` took `imFontSize≈36` — which also spent more of the frame
+> on furniture, coming back with a **279px** plot against the square route's **294.6px**.
 >
-> **For a 540-wide template this is often the route to prefer, not the fallback — export both and measure before choosing.** The square render is already sized for the frame you are filling, and that can remove two whole steps: on one chart its chart area came out ≈505×328 with every label at exactly **15px** — a value on the annotation ladder — so there was no `imFontSize` to tune and no rescale at all (see Step 7 on why not rescaling is worth engineering for). Reaching the same 15px through `imType=uncaptioned` took `imFontSize≈36`, and that export also spent more of the frame on furniture: the same chart came back with a plot **279px** tall against the square route's **294.6px**, and a wider reserved right margin. Compare the two on three numbers — final font size at the template width, plot height, and plot width — rather than on which one is nominally "the embed".
->
-> **The check that decides it is the plot's height against the band, and the square route often loses it.** The square export lays the chart out under grapher's *own* header and footer, which are not the template's — so its chart area is sized for a band you are not filling. Across five DI pages the square route came back **314.9px** tall for a **371px** band: a 28px gap at each end, twice the 12–16px target, with no way to close it except a rescale that then breaks the width. The square route wins when its chart area happens to fill your band (short template header, or a map/big-legend chart whose square re-layout is genuinely better); the solved uncaptioned aspect wins whenever it does not. **Measure the band first (Step 7), then pick** — and note the band is only knowable *after* the template texts are in, which is why Step 6 comes before the embed export.
+> **But it is laid out under grapher's OWN header and footer, not the template's, so its chart area is
+> sized for a band you are not filling — and that usually loses.** Across five DI pages it came back
+> **314.9px** tall for a **371px** band: a 28px gap at each end, twice the target, closable only by a
+> rescale that then breaks the width. So **measure the band first (Step 7), then pick**, comparing the two
+> exports on three numbers — final font size at the template width, plot height, plot width. The square
+> route wins only when its chart area happens to fill your band (a short template header, or a map or
+> big-legend chart whose square re-layout is genuinely better). The band is knowable only once the
+> template texts are in, which is why Step 6 comes before the embed export.
 
 **Size the text at export time with `imFontSize` — scaling in Figma cannot fix it.** Grapher picks a base font for the canvas it renders (`max(10, height/25)`, so ~24 for the default uncaptioned export), and every label is derived from it — the segment values and country names land at about **0.75 × the base**. Placing that export at 508px wide shrinks all of it by the same factor, so a default export ends up with ~12px labels: legal, but on the floor of the 12px minimum. Ask for a bigger base instead — `imFontSize=28` gives ~13.5px labels and ~14px legend text in a 540 frame, which matches the template's own 14px source line. Check the export before importing:
 

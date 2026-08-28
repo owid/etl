@@ -442,6 +442,18 @@ not in the type file, for that reason — the worked examples stay in `reference
   comment (never inline ones — a URL or a regex can contain `//`), which took it to ~37KB. Worth
   knowing before you plan a run around it, and worth remembering when adding to any of these scripts:
   past the cap, a script cannot be executed at all.
+- **`Read` shows a 45KB script in full; `cat` truncates it and makes the gate look unrunnable.** Measured
+  2026-08-28: `cat` of a 31.7KB slice returned a 2KB preview plus a "saved to file" notice, while `Read` on
+  the same file returned all 595 lines. A run that only tries `cat` concludes `verify_page.js` cannot be
+  relayed and skips the whole pass — the one outcome CHECKS.md forbids. So: emit the slice to a file, then
+  **`Read` the file**, and relay from that. Splitting into 6KB chunks with `split -b` also works and is what
+  the run that found this did first, at 6-8 extra calls per group; `Read` needs one.
+- **Every slice shares a byte-identical preamble, so compose calls instead of sending four.** The preamble is
+  lines 1-227 on every slice — prove it with `head -227 a.js > pre_a; head -227 b.js > pre_b; cmp pre_a pre_b`
+  rather than assuming — and each row group is a self-contained block after it. So `type`+`geometry` fit in
+  ONE call at ~42.5KB, and the documented four-call pass becomes **three**: `annotations`, `series`, then
+  `type,geometry`. Concatenating verbatim blocks is not the hand-rolled subset CHECKS.md forbids — nothing is
+  reimplemented, and the trailing skip/return block must appear exactly once.
 - **`node --check` rejects these scripts, and that is not a syntax error.** They use top-level `await`
   and `return`, which are valid inside the async wrapper `use_figma` provides and invalid in a plain
   CommonJS file. The harnesses are the real gate — they wrap the source the same way the tool does —

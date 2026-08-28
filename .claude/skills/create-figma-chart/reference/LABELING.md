@@ -43,6 +43,59 @@ to the band's width less that padding on both sides. If the text does not fit th
 readable size, the band is too narrow for an in-band label — put the note beside it instead of
 shrinking the type.
 
+### Recolouring a stretch, and bracketing it with event rules
+
+The device table's *period told through the line* and *a moment* rows compose, and together they replace an
+arrow entirely: **recolour the stretch, put a thin dashed event rule at each boundary year, and dot the line
+where each rule meets it.** The rule is the pointer, so adding an arrow re-asserts the single point the
+recolour exists to avoid — the same reason the period band takes no arrow. Worked end to end on Chile's
+liberal-democracy index (1973 coup, 1990 restoration): Denim to 1972, Rusty Orange across the dictatorship,
+Denim from 1989, a rule from each dot to the nearer plot edge, and one annotation beside each rule ending
+8px short of it. No leader line and no arrow, and the annotations sat in the two large empty regions the
+shape of the data creates.
+
+Four things to get right:
+
+- **Split the line by slicing its OWN vertices, not by drawing new ones.** Read `vectorPaths`, then map
+  vertices to years *before* you slice anything. `index = year - firstYear` is a shortcut that is only valid
+  on a **gap-free** series, so its precondition is an assertion across the whole range rather than a spot
+  check: **assert `pts.length === lastYear - firstYear + 1`**. A single skipped year shifts every later
+  vertex by one and the recolour then lands on the wrong period with nothing to show for it — and two known
+  points can both agree while the gap sits somewhere between them, so keep the boundary-vertex check (it
+  confirms the range) but never treat it as sufficient on its own. **If the assertion fails, the series has
+  gaps and the index shortcut is unusable**: take each observation's year from the chart's own data (the
+  `.csv` endpoint's year column) and map it to the vertices in order instead. Chile's line satisfied the
+  assertion — 76 vertices for 1950–2025, which is 76 years inclusive — but that is a property of that
+  dataset, not of the technique. Then clone the line per segment and rewrite each clone's path to its
+  slice. Translate each slice so its own minimum is `(0,0)` and set the node's `x`/`y` to that minimum's
+  absolute position — otherwise the node moves (GOTCHAS). Have consecutive segments
+  **share** their boundary vertex, and assert afterwards that segment *n*'s end equals segment *n+1*'s
+  start and that the union spans exactly what the original did.
+- **`strokeCap = "ROUND"` on the interior ends, and NOT on the two outer ones.** Separate paths have no
+  join, only caps, so a sharp direction change at a boundary shows a wedge with butt caps. But a round cap
+  on the *outer* ends overshoots by half the stroke weight and pushes the group past the content edge. The
+  middle segment's round caps cover both joins on their own, so the first and last segment can keep their
+  outer ends square.
+- **The naming convention cannot express this, and it costs a check.** `line__<Entity>__<phase>` makes the
+  series name `<Entity>__<phase>`, which no longer pairs with `outline__<Entity>` — so `series-weight`
+  reports the halo as an *unpaired* `outline__*` and **excludes it from judging**. Measured: 3 segments
+  judged at the house 3px, halo not judged. Either accept it and verify the halo's 4px by hand (say so in
+  the report), or name all three `line__<Entity>` and lose the phase names a designer opening the file
+  would want. Prefer the descriptive names; this is a gap in the convention, not in the chart.
+- **Decide where the colour changes relative to the event rule, and say why.** The two need not coincide.
+  Chile's coup was September 1973, so the 1973 annual value already reflects it and the 1972->1973 segment
+  *is* the collapse: colouring from the 1972 vertex makes the whole cliff the dictatorship colour, which
+  reads best, at the cost of the colour changing ~7px left of the rule. Starting at 1973 instead aligns
+  them and splits the cliff across two colours, which reads worse. Either is defensible; leaving the choice
+  unrecorded is not, because the next reader will "fix" it.
+
+**Check the grayscale separation of the two phase colours, and expect it to be poor.** Denim and Rusty
+Orange measure 1.14:1 in grayscale — near-identical lightness — so a printed copy loses the phase
+distinction entirely even though colour-vision passes comfortably (min deltaE 70.1). That is acceptable
+*because the rules, dots and annotations carry the story without colour*, which is a property of this
+composition and not a general excuse. If the recolour is the only thing marking the period, pick colours
+that differ in lightness (GUIDELINES.md -> Colors: the lightness column, not the hue).
+
 ## Placing an arrow
 
 An arrow has two ends and both are load-bearing: the tip has to point at the thing it names, and the
@@ -238,7 +291,7 @@ The high-value edits to propose (include them in the Step 4 proposal):
 - **A computed guide line comes from the data value, not the printed label.** A "0.7% target" line is `zeroX + 0.7 × (bar.width / trueValue)` where `trueValue` is the entity's *actual* number (Norway's 1.0307%), not the `1%` its rounded label shows — using the label put the line 8px off. Computed from the true value it landed at x=370.3 against a designer's hand-placed 371, which is also the cheapest confirmation that your whole x-scale is right.
 
 - **On a map, trimming sub-pixel territories is worth real canvas — but hide them, never delete them, and never prune before importing.** A world map's bounding box is set by its most remote specks, and a country that straddles the antimeridian is drawn on *both* edges, so one invisible island chain can double the width (Fiji: a 6.9px speck spanning x 6→954 of a 951-wide map). Pruning those buys width the continents get to use. Three rules make it safe:
-  - **Hide (`visible = false`), don't delete.** Hidden children do **not** contribute to a Figma group's bbox, so hiding buys exactly the same width as deleting while staying reversible in a click and legible to a reviewer. Park them in the map's own subgroups under an explicit name (`United-States__Hawaii`) so what was excluded is a fact in the file, not a diff nobody can see.
+  - **Hide (`visible = false`), don't delete — but the width claim under it is CONTRADICTED and unverified for a map, so measure before relying on it.** This bullet has always said hidden children do **not** contribute to a Figma group's bbox, so hiding buys the same width as deleting while staying reversible and legible to a reviewer. A 2026-08-28 measurement on a LINE chart says otherwise: a hidden leaf (`label__Chile`) inside two *visible* wrapper groups left those groups — and so the whole chart group — spanning it at **526.281** where the visible ink ended at 524, and only `remove()` gave the width back (FITTING.md → the group-box rule, and the 2.28px `box-alignment` failure it caused). Structurally that is the same shape as a hidden territory inside a visible `countries` group, so the reclaim this bullet promises may not happen at all. It is left as written because **no one has measured it on a map**: hiding is still right for reversibility and reviewability, so keep it — then check the map group's own bbox before and after, and if the width does not move, the trim has to be a `remove()` (with the untouched import beside the frame, as elsewhere). Park them in the map's own subgroups under an explicit name (`United-States__Hawaii`) so what was excluded is a fact in the file, not a diff nobody can see.
   - **Prune in Figma, not in the SVG before upload.** Editing the SVG deletes the geometry outright, and getting it back later costs a re-import plus replaying every Step 8 edit. When a territory is a *subpath* of a larger country (Hawaii inside `United-States`, Fiji's wrapped islet), split it out: filter `vectorPaths` by subpath bbox into a keep-set and a hidden clone. Identify the split by **fraction of the country's own span**, not absolute coordinates — Hawaii ends at 4% of the US span and Alaska starts at 19%, so a cut at 12% separates them at any scale.
   - **To re-import geometry into an already-scaled chart, include one country that is still present as an alignment reference.** Import the mini-SVG with the same viewBox and map transform, then derive the scale from `existing.width / ref.width` and the translation from `existing.x − ref.x`, apply both to the imported group, and delete the reference. One shared country pins a uniform scale plus translation exactly — it returned a residual of 0 on all four measures here, where reasoning about accumulated transforms would not have.
 

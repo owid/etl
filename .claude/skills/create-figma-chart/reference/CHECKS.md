@@ -25,25 +25,59 @@ Every one of these caught a real defect on this skill's first run, and none of t
 >
 > | group | rows | size |
 > |---|---|---|
-> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 69% of cap |
-> | `series` | series-weight, furniture-weight, furniture-dash | 64% |
-> | `geometry` | box-alignment, gap, margins, off-palette | 60% |
-> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 76% |
+> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 74% of cap |
+> | `series` | series-weight, furniture-weight, furniture-dash | 68% |
+> | `geometry` | box-alignment, gap, margins, off-palette | 65% |
+> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 90% |
 >
-> Groups combine, so the whole pass is two calls: `--rows type,series` (41,982) then
-> `--rows geometry,annotations` (43,597, **87% of cap** — the figure `inline_script.py --check`
-> reports: it measures **these two calls**, declared as `DOCUMENTED_CALLS` in the script, rather
-> than the smallest split it could find for itself — an optimiser would go on reporting a
-> comfortable number by picking a split nobody is told to send. Change the pair here and there
-> together; `--check` fails if their groups no longer cover the file exactly once.
-> Read its **`floor`** column beside that percentage: `sent` is what today's two calls cost and can
-> always be bought down by re-splitting, while `floor` is the preamble plus the single largest row
-> group — the smallest any call can be, whatever the split. `verify_page.js` reads **87% sent against
-> a 76% floor**, so re-splitting still buys real room; when the floor itself passes the cap, slicing is
-> exhausted and the only move left is splitting the script into separate files with their own
-> preambles. `--check` fails on that and warns past 85%.
-> **Run all four** — each reports its own rows and nothing else, so a group you skip is a group
+> Groups combine, so the whole pass is **three calls**: `--rows annotations` (45,163), `--rows series`
+> (34,217), `--rows type,geometry` (42,489) — measured 2026-08-28. Three and not four because the
+> preamble is byte-identical across slices and each row group is a self-contained block after it
+> (GOTCHAS.md → Running the scripts has the `cmp` proof and the composition rule); concatenating
+> verbatim blocks is not the hand-rolled subset forbidden below, since nothing is reimplemented.
+>
+> `inline_script.py --check` reports the largest of the three, **90% of cap**. It measures **these
+> declared calls**, held as `DOCUMENTED_CALLS` in the script, rather than the smallest split it could
+> find for itself — an optimiser would go on reporting a comfortable number by picking a split nobody is
+> told to send. Change the calls here and there together.
+>
+> Read the **`floor`** column beside the `sent` percentage, because they answer different questions:
+> `sent` is what today's declared calls cost and can always be bought down by re-splitting, while `floor`
+> is the preamble plus the single largest row group — the smallest any call can be, whatever the split.
+> `verify_page.js` now reads **90% sent against a 90% floor**, because `annotations` alone *is* the
+> largest call.
+>
+> **`--check` exits 1 in three distinct cases, and the remedy is different in each — read which one you
+> are in off the output:**
+>
+> | output | what it means | remedy |
+> |---|---|---|
+> | `OVER CAP` beside the `sent` column | the largest **documented** call is over the cap, so the pass as written does not run | **repartition**: declare a split whose largest call fits, here and in `DOCUMENTED_CALLS` together |
+> | `FLOOR OVER CAP` | preamble + the largest single row group is itself over the cap | repartitioning **cannot** help — move rows into a separate script with its own preamble |
+> | `in the file but never sent` / `documented but not in the file` / `sent by more than one call` | `DOCUMENTED_CALLS` and the file's `#region` markers have drifted apart, so the measurement describes a workflow nobody sends | bring this doc and the constant back into step |
+>
+> The two-call pass this file prescribed until 2026-08-28 was the **first** case, not the second:
+> `--rows geometry,annotations` had reached 50,594 characters (101% of cap) while the floor was still
+> 45,163 (90%, under it), so repartitioning was available — and the three calls above are that
+> repartition.
+>
+> **A floor past 85% is a WARNING and exit stays 0.** `verify_page.js` prints `floor at 90% —
+> re-splitting is nearly exhausted` today and still passes: it says the second case is approaching, not
+> that anything is broken. Re-measure both places when the script next grows.
+> **Run all three** — each reports its own rows and nothing else, so a group you skip is a group
 > nobody checked.
+>
+> **Budget for this: relaying the pass is the single largest time cost in a run.** The benchmark's second
+> run took 48 min against a 30.8 min baseline, and roughly 17 min of the difference was relaying these
+> groups verbatim — the baseline never ran them at all. Three composed calls and `Read` instead of `cat`
+> (GOTCHAS.md) is most of that back. It is still worth paying: on that run the pass caught two defects that
+> no screenshot showed and that the build's own measurements had passed.
+>
+> **Run `geometry` once on the FITTED chart, before you add labels and annotations.** Its `box-alignment`
+> row judges the fit, and a fit defect does not heal — on that run it was present from Step 7 onward and
+> was only found at the end, costing a diagnose-fix-reverify cycle with the annotations already built on
+> top of it. One early `geometry` call is cheaper than that cycle, and the rest of the pass still runs
+> after the last change.
 > `diff_against_template.js` (~12,000 stripped) needs none of this.
 >
 > **Do NOT substitute a hand-rolled subset. It is worse than skipping the pass, and this is
@@ -63,6 +97,15 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > tier, annotation block gap, and the series polylines the annotation-overlap row needs. Done one at
 > a time those are a dozen round trips at ~8-10s each.
 >
+> **`label-contrast-on-background` is blind to an annotation built the prescribed way — expect it to skip
+> and compute those by hand.** Bolding the category word (which the house convention requires) makes
+> `node.fills` report `figma.mixed`, so the row's `Array.isArray(n.fills)` guard yields `null` for the fill,
+> the annotation drops out of its candidate list, and the row says *"no label__*/annotation__* text sits on
+> the frame's own background"* — on a frame with two annotations. An end label named anything but
+> `label__*` is invisible to it for a second reason. Measured on the benchmark's second run: both
+> annotations and the end label skipped, and computed by hand they were 6.79:1 (`#5b5b5b`), 5.66:1 (Rusty
+> Orange) and 5.45:1 (Denim) against white — all passing. Report the numbers; do not report the row as
+> covered.
 > **Every row it cannot judge comes back `SKIPPED` with the reason and the tool that owns it** —
 > colour-vision and grayscale (`color_audit.py`), spelling (`codespell`), the data-truth row
 > (`/adversarial-data-review`), entity completeness (needs the *effective* selection from outside
@@ -553,6 +596,27 @@ mock, and both changes make a row *less* red on purpose. Read them before treati
   `[3,2]` allowance belongs to a slope chart's native **zero line**, not to the whole solid-by-design
   bucket: granted in bulk it also accepted an ordinary tick or axis line dashed `[3,2]`, which this
   document permits nowhere.
+
+## Audit the SKIPPED rows before you report, and say which of the three they are
+
+A dozen rows come back `SKIPPED`, and they are not one thing. Sort every one into **N/A here** (no arrows
+on this chart, no legend, not a map), **done by hand this run** (with the number), or **genuinely still
+open** (with who owns it). A report that lists them all as "skipped" understates the coverage in the first
+two cases and overstates it in none — which sounds safe and is not, because the reader cannot see which
+rows actually needed doing.
+
+Measured on the benchmark's second run, where the first report got this wrong: **two rows were satisfied
+and reported as skipped anyway** — `entities-all-render` (one entity selected via `country=~CHL`, one
+rendered, so it passes trivially) and `text-hierarchy-ranks` (25 > 16 > 15 = 15 > 14, same-rank items
+sharing a size). **One was genuinely open and had to be run afterwards**: `text-true-of-indicator`, because
+the subtitle had been *trimmed* from the indicator's `descriptionShort` — six components folded into four —
+which is a claim about what the producer measures and needs checking against the producer, not against the
+chart. The rest were legitimately N/A. So the audit is not paperwork: it found one real gap out of thirteen.
+
+**A trimmed subtitle is the recurring one.** Shortening the indicator's own description to fit a DI is
+normal and often right, but it converts a producer's wording into your paraphrase, so it belongs in
+`text-true-of-indicator` rather than in the layout rows. State the trim explicitly when you report, and name
+what was dropped, so a topic owner can accept or reject it.
 
 ## A skip with a false reason is the failure mode, not a wrong number
 
