@@ -166,6 +166,7 @@ def run() -> None:
     # Consumption -> income model and each country-year's welfare basis.
     tb_model = fit_consumption_income_model(tb_percentiles)
     tb_welfare = build_welfare_basis(tb_percentiles, countries, FIRST_YEAR, last_year)
+    sanity_check_welfare_basis(tb_welfare, tb_percentiles, tb_pip)
 
     # Derived series, in the required order: the top graft needs the income-basis rows, and the
     # rescaled series needs the top-adjusted rows.
@@ -465,16 +466,19 @@ def fit_consumption_income_model(tb_percentiles: Table) -> Table:
 
 def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int, last_year: int) -> Table:
     """Each (country, year)'s welfare basis: the welfare type of the country's nearest national
-    survey. Years with both types count as income.
+    survey. Years with both types count as CONSUMPTION.
 
-    Income wins the tie because it is the TARGET basis of this harmonisation: `pip_income_basis`
-    exists to put every country on an income footing, so where PIP observes income directly there
-    is nothing to estimate and the fitted transform is skipped (`adjusted=False`). Using the model
-    where the real thing is available would only add error.
+    The label must describe what the thousand-bins values ARE, because it decides whether the
+    consumption -> income transform runs on them. For the 88 country-years where PIP publishes both
+    welfare types, the bins are consumption: their means sit 0.03% from PIP's consumption mean and
+    18% from its income mean, for all 88, and the two types differ by a median of 19.5% so the test
+    is not close. This follows PIP's own rule — "Due to its closer connection to welfare, whenever
+    both income and consumption estimates are available for a given reference year, consumption
+    estimates are preferred" (https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#inccon) — which the thousand-bins series applies.
 
-    Note that this DEVIATES from PIP's own rule, deliberately. PIP prefers consumption: "Due to its
-    closer connection to welfare, whenever both income and consumption estimates are available for a
-    given reference year, consumption estimates are preferred" (https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#inccon). That is the right call
+    Labelling them income (as this step did until 2026-08-28) skipped the transform and carried
+    consumption values into `pip_income_basis` as though they were already income, roughly 18% low.
+    Fixing it moved the 2023 between share by -0.24pp. That is the right call
     for measuring poverty, which is PIP's purpose. It is the wrong one here, where the purpose is to
     express PIP on the same income concept WID uses so the two can be compared — so for the 88 dual
     country-years this series carries PIP's observed INCOME where PIP's own headline estimates carry
@@ -484,11 +488,16 @@ def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int,
     income aggregates" — PIP declines to bridge the two concepts. The consumption -> income model in
     this step is exactly such a bridge, which is why it is fitted and reported explicitly rather
     than treated as a detail (see fit_consumption_income_model for how thin its sample is).
+
+    sanity_check_welfare_basis asserts the label-matches-the-bins invariant on every run.
     """
     d = national_survey_percentiles(tb_percentiles)
     types = (
         d.groupby(["country", "year"], observed=True)["welfare_type"]
-        .agg(lambda s: "income" if "income" in set(s) else "consumption")
+        # Consumption wins the tie because that is what the thousand-bins values ARE for these
+        # country-years — verified, not assumed: their bin means sit 0.03% from PIP's consumption
+        # mean and 18% from its income mean, for all 88 of them.
+        .agg(lambda s: "consumption" if "consumption" in set(s) else "income")
         .reset_index()
         .rename(columns={"year": "survey_year_used"})
     )
@@ -525,6 +534,44 @@ def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int,
     tb = Table(tb)
     tb.metadata.short_name = "pip_welfare_basis"
     return tb[["country", "year", "welfare_type", "survey_year_used", "adjusted"]].reset_index(drop=True)
+
+
+def sanity_check_welfare_basis(tb_welfare: Table, tb_percentiles: Table, tb_pip: Table) -> None:
+    """The assigned welfare type must match what the PIP bins actually contain.
+
+    Inferred rather than trusted: compare each survey year's bin mean against the mean PIP's
+    percentiles imply for each welfare type, and check the assigned label is the closer one. Only
+    country-years that ARE survey years are testable (the rest inherit a label by proximity), and
+    only where the two welfare types differ enough to discriminate.
+    """
+    p = national_survey_percentiles(tb_percentiles)
+    per_type = p.groupby(["country", "year", "welfare_type"], observed=True)["avg"].mean().unstack("welfare_type")
+    per_type = per_type.dropna(subset=["consumption", "income"], how="any")
+    if per_type.empty:
+        return
+
+    bins = tb_pip.assign(w=tb_pip["avg"] * tb_pip["pop"])
+    bin_mean = bins.groupby(["country", "year"], observed=True)[["w", "pop"]].sum().pipe(lambda t: t["w"] / t["pop"])
+
+    d = per_type.join(bin_mean.rename("bins"), how="inner").dropna()
+    # Only where the two types are far enough apart for the comparison to mean anything.
+    d = d[(d["income"] - d["consumption"]).abs() / d["consumption"] > 0.02]
+    if d.empty:
+        return
+
+    closer = np.where((d["bins"] - d["income"]).abs() < (d["bins"] - d["consumption"]).abs(), "income", "consumption")
+    assigned = tb_welfare.set_index(["country", "year"])["welfare_type"].reindex(d.index).to_numpy(dtype=object)
+    mismatch = (assigned != closer) & (assigned != None)  # noqa: E711 - country-years absent from the lookup
+    if mismatch.any():
+        examples = [
+            f"{c} {int(y)}: labelled {a}, bins match {b}"
+            for (c, y), a, b in zip(d.index[mismatch], assigned[mismatch], closer[mismatch])
+        ][:5]
+        raise AssertionError(
+            f"Welfare basis disagrees with the PIP bins for {int(mismatch.sum())} of {len(d)} testable "
+            f"survey years — the consumption->income transform would run on the wrong data. {examples}"
+        )
+    log.info(f"Welfare basis matches the PIP bins for all {len(d)} testable survey years")
 
 
 def national_survey_percentiles(tb_percentiles: Table) -> Table:

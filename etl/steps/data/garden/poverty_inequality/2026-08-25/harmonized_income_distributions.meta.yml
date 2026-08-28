@@ -91,7 +91,7 @@ tables:
   pip_welfare_basis:
     title: Welfare basis of each PIP country-year
     description: |-
-      Which welfare concept (income or consumption) underlies each country's PIP series in each year of the panel, taken from the country's nearest national survey. Determines which country-years the consumption-to-income adjustment applies to. Years where both types exist count as income, because income is the basis this dataset harmonizes onto — where the World Bank observes it directly, no adjustment is needed. This differs from the World Bank's own choice, which prefers consumption where both are available because of its closer connection to welfare; that is the better basis for measuring poverty, while income is the one that makes these series comparable with the World Inequality Database. The World Bank publishes both.
+      Which welfare concept (income or consumption) underlies each country's PIP series in each year of the panel, taken from the country's nearest national survey. Determines which country-years the consumption-to-income adjustment applies to. Years where both types exist count as consumption, matching the World Bank's own preference and, more importantly, matching what its underlying distribution actually contains for those years — so the consumption-to-income adjustment is applied to them rather than skipped.
     variables:
       welfare_type:
         title: Welfare basis
