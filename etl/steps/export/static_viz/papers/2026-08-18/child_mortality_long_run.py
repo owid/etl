@@ -66,6 +66,58 @@ character count.
 That is deliberately not a table of hand-tuned offsets. The historical half of this chart never
 changes, but the global series gains a year annually, and a search re-solves around it where fixed
 offsets would silently start colliding.
+
+Figma
+-----
+Written here rather than handed over in chat, because a link given once is gone by the next session
+and "where in Figma is this?" then means searching a ~200-page file by eye.
+
+**Where.** File `Charts (2026)`, key `s6Sv60bakebRRW2TxsMQbF`. Page
+`20260827 The long-run history of child mortality (Pablo A)` (`26888:5`), first placed 2026-08-27 and
+sitting at the top of the dated block, immediately after the `-----------` divider page.
+
+| Frame | Node | Deep link |
+|---|---|---|
+| `long-run-history-child-mortality` | `26888:6` | https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=26888-6 |
+| `long-run-history-child-mortality - step render (reference)` | `26888:799` | this step's own PNG, parked 80px to the left |
+
+**The node ids are a convenience and go stale; the frame name is the durable join.** It is the same
+kebab-case slug the website exports the PNG by, so it is the one string shared by the layer panel, the
+exported filename and this file. Search the file for it, or for the page name above.
+
+**How it was built**, so it can be redone rather than reverse-engineered:
+
+- Clone `5332:93` (`Static Chart Template_Vertical`, 850x1095) onto a new page. Run
+  `create-figma-chart/scripts/verify_templates.js` first - a `DRIFT` verdict stops the run.
+- Import both files with `upload_assets` + a POST to the returned `submitUrl`, never
+  `createNodeFromSvg`. The raster arrives in a 400x300 frame with a FILL-mode fill, so the PNG has to
+  be resized to the frame's own 850x1095 or it ships cropped.
+- Run `create-figma-chart/scripts/restyle_static_import.js` over the SVG. It rescales by
+  `850 / 816` - matplotlib writes the root in points, Figma imports at 96px/in, and this figure is
+  built at 100 template px per inch - drops this step's own copies of the six template slots, restyles
+  the text to Lato and re-anchors every label.
+- Its `families.members` list must name **every** gid suffix the accent covers, or a mark keeps its
+  matplotlib colour while the rest move: `points`, `mean_rule`, `mean_marker`, `series`,
+  `marker-start`, `marker-end`, `highest-marker`, `lowest-marker`, and the four red annotation blocks
+  `mean_label-1/-2`, `label-start-1/-2`, `label-end-1/-2`. All at weight 0, bound to
+  `Default Palette/Coral`, key `e9f3a0fed2eeeae607b6aaf75f79806830fcda78`. Gray labels take
+  `Text/Gray 80`, key `5a7394f8beea1df86bd3ad44cd77182c6625f525`.
+- Fill the template's own slots from this file's constants. The footer on this template is entirely
+  **unbound**, so nothing needs re-binding - only the weight runs, which assigning `characters`
+  collapses to the first character's: `Note:` is `Bold + Medium + Regular`, `Data source:` is
+  `Bold + Regular`, and the license is `Medium + Bold + Medium + Bold`. The tagline is left alone.
+- The tagline/license row is `SPACE_BETWEEN` auto-layout, so a license wider than its 263px
+  placeholder is right-aligned by the layout rather than needing a nudge.
+
+**Expected afterwards:** `diff_against_template.js` reports the frame matches `5332:93`, and the
+header's own `headerBottom` reads **89** - the same number `derive_header` predicts for this chart's
+one-line title over a two-line subtitle.
+
+**One thing that does not apply here but is worth not re-deriving.** Figma fits a whole number of dash
+repetitions into each *segment* of a path, so a dashed line's rendered dash follows its vertex spacing
+rather than the pattern asked for. This chart's gridlines are two-vertex spans of 589pt - one segment
+each, far above the ~50px where it starts to matter - so they render as specified and need no
+resampling. A dashed line that followed a *curve* here would.
 """
 
 import math
