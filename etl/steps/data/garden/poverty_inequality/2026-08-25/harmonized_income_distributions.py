@@ -559,21 +559,26 @@ def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int,
     - A SURVEY year offering both concepts. The bins are consumption, verified rather than assumed:
       their means sit 0.03% from PIP's published consumption mean and 18% from its income mean, for
       all 88 such country-years, with the two concepts a median 19.5% apart so none is a close call.
-      That matches PIP's stated rule — "Due to its closer connection to welfare, whenever both
-      income and consumption estimates are available for a given reference year, consumption
-      estimates are preferred"
+      That matches PIP's stated rule, handbook §5.4: "Due to its closer connection to welfare,
+      whenever both income and consumption estimates are available for a given reference year,
+      consumption estimates are preferred"
       (https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#inccon).
     - A NON-SURVEY year. Those values are PIP's own lined-up estimate, produced by walking the same
-      decision tree, so following the tree recovers the concept PIP used instead of guessing.
+      decision tree, so following the tree recovers the concept PIP used instead of guessing. §5.4
+      again: "when both kinds of poverty estimates are available for the same years (but not for a
+      particular reference year), interpolations and extrapolation are made using the consumption
+      estimates" — so the preference carries past the reference year, which is why the tree checks
+      consumption before income.
 
     Until 2026-08-28 this step labelled the dual survey years income, skipping the transform and
     carrying consumption into `pip_income_basis` as though it were already income, roughly 18% low.
     Correcting it moved the 2023 between share by -0.24pp.
 
     Worth being precise about how the transform relates to PIP's own methods, because they are
-    narrower than they first look. PIP says "interpolations are never done between consumption and
-    income aggregates" — it will not draw a line from a consumption point to an income point. That is
-    a rule about one calculation, not a refusal to change concept over time: the tree's extrapolation
+    narrower than they first look. Handbook §5.2 says "Interpolations are never done between
+    consumption and income aggregates" — but read where it sits: that section is about interpolating
+    a survey MEAN between two surveys using national-accounts growth, so the rule is that one such
+    calculation may not span the two concepts. It is not a refusal to change concept over time: the tree's extrapolation
     branch takes whichever concept its anchor survey carries, so a country's lined-up series does
     switch between concepts across periods. 29 of the countries here do. That is precisely why the
     basis is assigned per country-year rather than once per country.
