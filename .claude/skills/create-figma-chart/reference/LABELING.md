@@ -525,7 +525,7 @@ Keep the export URL — same `imFontSize`, same `imType`, same params — so the
 
 ## Step 8b — Bring recommendations of your own
 
-Fitting the chart into the template is the floor, not the job. Before the Step 4 proposal, look at the chart as an editor would and say what you would change. Read the data, not just the vectors — you have the CSV a `.csv` request away, and the values often make the case. **`by-uuid` has no `.csv`**, so for a narrative chart pull the data from its parent chart's slug instead (`grapher/<parent-slug>.csv?country=…&csvType=filtered&time=…`).
+Fitting the chart into the template is the floor, not the job. Before the Step 4 proposal, look at the chart as an editor would and say what you would change. Read the data, not just the vectors — you have the CSV a `.csv` request away, and the values often make the case. **`by-uuid` has no `.csv`**, so for a narrative chart pull the data from its parent chart's slug instead (`grapher/<parent-slug>.csv`) — and note that the CSV **ignores `country=` and `time=` and returns every entity**, with no param that narrows it to one, so filter on `Code`/`Entity` and assert the row count yourself before quoting any number (GOTCHAS.md).
 
 Worth looking for, roughly in order of how often it pays:
 
