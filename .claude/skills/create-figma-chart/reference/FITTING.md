@@ -676,7 +676,9 @@ Verify against the actual clone with `get_metadata` (the templates evolve; the g
 >
 > So treat the first export as a **probe**, not an attempt:
 >
-> 1. `solve_export.py --band WxH --target-label 15` → export, import, hide the furniture, measure.
+> 1. `solve_export.py --band WxH --target-label 15` → export, import, EXCLUDE the furniture from the
+>    measurement (`measure_fit.js` does it without mutating), measure. Removal comes later, before the
+>    final fit — see the group-box rule above.
 > 2. `inset = declared − ink`, per axis. `scripts/measure_fit.js` returns it, and the ready pass-2
 >    command with it, if you give it `CONFIG.declared` and `CONFIG.imFontSize`.
 > 3. `solve_export.py --band WxH --declared … --ink … --im-font-size …` → export, import, fit.

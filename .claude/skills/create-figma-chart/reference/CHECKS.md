@@ -25,32 +25,32 @@ Every one of these caught a real defect on this skill's first run, and none of t
 >
 > | group | rows | size |
 > |---|---|---|
-> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 69% of cap |
-> | `series` | series-weight, furniture-weight, furniture-dash | 64% |
-> | `geometry` | box-alignment, gap, margins, off-palette | 60% |
-> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 76% |
+> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 74% of cap |
+> | `series` | series-weight, furniture-weight, furniture-dash | 68% |
+> | `geometry` | box-alignment, gap, margins, off-palette | 65% |
+> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 90% |
 >
-> Groups combine, so the whole pass is two calls: `--rows type,series` (41,982) then
-> `--rows geometry,annotations` (43,597, **87% of cap** — the figure `inline_script.py --check`
-> reports: it measures **these two calls**, declared as `DOCUMENTED_CALLS` in the script, rather
-> than the smallest split it could find for itself — an optimiser would go on reporting a
-> comfortable number by picking a split nobody is told to send. Change the pair here and there
-> together; `--check` fails if their groups no longer cover the file exactly once.
-> Read its **`floor`** column beside that percentage: `sent` is what today's two calls cost and can
-> always be bought down by re-splitting, while `floor` is the preamble plus the single largest row
-> group — the smallest any call can be, whatever the split. `verify_page.js` reads **87% sent against
-> a 76% floor**, so re-splitting still buys real room; when the floor itself passes the cap, slicing is
-> exhausted and the only move left is splitting the script into separate files with their own
-> preambles. `--check` fails on that and warns past 85%.
-> **Run all four** — each reports its own rows and nothing else, so a group you skip is a group
+> Groups combine, so the whole pass is **three calls**: `--rows annotations` (45,163), `--rows series`
+> (34,217), `--rows type,geometry` (42,489) — measured 2026-08-28. Three and not four because the
+> preamble is byte-identical across slices and each row group is a self-contained block after it
+> (GOTCHAS.md → Running the scripts has the `cmp` proof and the composition rule); concatenating
+> verbatim blocks is not the hand-rolled subset forbidden below, since nothing is reimplemented.
+>
+> `inline_script.py --check` reports the largest of the three, **90% of cap**. It measures **these
+> declared calls**, held as `DOCUMENTED_CALLS` in the script, rather than the smallest split it could
+> find for itself — an optimiser would go on reporting a comfortable number by picking a split nobody is
+> told to send. Change the calls here and there together; `--check` fails if their groups no longer cover
+> the file exactly once. (The two-call pass this file prescribed until 2026-08-28 is what forced the
+> re-split: `--rows geometry,annotations` had grown to 50,594 characters, 101% of the cap.)
+> Read the **`floor`** column beside that percentage: `sent` is what today's calls cost and can always be
+> bought down by re-splitting, while `floor` is the preamble plus the single largest row group — the
+> smallest any call can be, whatever the split. `verify_page.js` now reads **90% sent against a 90%
+> floor**, because `annotations` alone *is* the largest call: re-splitting has nothing further to buy, and
+> `--check` warns past 85% while still exiting 0. It fails only once the floor itself passes the cap, when
+> the one move left is splitting the script into separate files with their own preambles. Re-measure both
+> places when the script next grows.
+> **Run all three** — each reports its own rows and nothing else, so a group you skip is a group
 > nobody checked.
->
-> **The pair above is STALE — `--rows geometry,annotations` is now 50,594 characters, 101% of the cap.**
-> `inline_script.py --check` measures the pair declared here and will say so. The split that fits, measured
-> 2026-08-28: **`annotations` (45,163), `series` (34,294), `type,geometry` (~42,500)** — three calls, not
-> four, because the preamble is byte-identical across slices and the row groups are self-contained blocks
-> after it (GOTCHAS.md → Running the scripts has the `cmp` proof and the composition rule). Re-measure and
-> update both places together when the script next grows.
 >
 > **Budget for this: relaying the pass is the single largest time cost in a run.** The benchmark's second
 > run took 48 min against a 30.8 min baseline, and roughly 17 min of the difference was relaying these
