@@ -18,13 +18,6 @@ steps:
         - snapshot://economics/2026-07-28/wealth_france.xlsx
 
   # OWID - OWID Deflator.
-  data://garden/economics/2025-08-29/owid_deflator:
-    # World Bank - WDI (specifically indicators used for inflation adjustments).
-    - data://garden/wb/2025-08-29/wdi_prices:
-      - data://meadow/wb/2025-08-29/wdi_prices:
-        - snapshot://wb/2025-08-29/wdi_cpi.zip
-        - snapshot://wb/2025-08-29/wdi_gdp.zip
-        - snapshot://wb/2025-08-29/wdi_gdp_linked.zip
   data://garden/economics/2026-08-21/owid_deflator:
     # World Bank - WDI (specifically indicators used for inflation adjustments).
     - data://garden/wb/2026-08-21/wdi_prices:
