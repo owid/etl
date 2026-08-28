@@ -39,16 +39,31 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > `inline_script.py --check` reports the largest of the three, **90% of cap**. It measures **these
 > declared calls**, held as `DOCUMENTED_CALLS` in the script, rather than the smallest split it could
 > find for itself — an optimiser would go on reporting a comfortable number by picking a split nobody is
-> told to send. Change the calls here and there together; `--check` fails if their groups no longer cover
-> the file exactly once. (The two-call pass this file prescribed until 2026-08-28 is what forced the
-> re-split: `--rows geometry,annotations` had grown to 50,594 characters, 101% of the cap.)
-> Read the **`floor`** column beside that percentage: `sent` is what today's calls cost and can always be
-> bought down by re-splitting, while `floor` is the preamble plus the single largest row group — the
-> smallest any call can be, whatever the split. `verify_page.js` now reads **90% sent against a 90%
-> floor**, because `annotations` alone *is* the largest call: re-splitting has nothing further to buy, and
-> `--check` warns past 85% while still exiting 0. It fails only once the floor itself passes the cap, when
-> the one move left is splitting the script into separate files with their own preambles. Re-measure both
-> places when the script next grows.
+> told to send. Change the calls here and there together.
+>
+> Read the **`floor`** column beside the `sent` percentage, because they answer different questions:
+> `sent` is what today's declared calls cost and can always be bought down by re-splitting, while `floor`
+> is the preamble plus the single largest row group — the smallest any call can be, whatever the split.
+> `verify_page.js` now reads **90% sent against a 90% floor**, because `annotations` alone *is* the
+> largest call.
+>
+> **`--check` exits 1 in three distinct cases, and the remedy is different in each — read which one you
+> are in off the output:**
+>
+> | output | what it means | remedy |
+> |---|---|---|
+> | `OVER CAP` beside the `sent` column | the largest **documented** call is over the cap, so the pass as written does not run | **repartition**: declare a split whose largest call fits, here and in `DOCUMENTED_CALLS` together |
+> | `FLOOR OVER CAP` | preamble + the largest single row group is itself over the cap | repartitioning **cannot** help — move rows into a separate script with its own preamble |
+> | `in the file but never sent` / `documented but not in the file` / `sent by more than one call` | `DOCUMENTED_CALLS` and the file's `#region` markers have drifted apart, so the measurement describes a workflow nobody sends | bring this doc and the constant back into step |
+>
+> The two-call pass this file prescribed until 2026-08-28 was the **first** case, not the second:
+> `--rows geometry,annotations` had reached 50,594 characters (101% of cap) while the floor was still
+> 45,163 (90%, under it), so repartitioning was available — and the three calls above are that
+> repartition.
+>
+> **A floor past 85% is a WARNING and exit stays 0.** `verify_page.js` prints `floor at 90% —
+> re-splitting is nearly exhausted` today and still passes: it says the second case is approaching, not
+> that anything is broken. Re-measure both places when the script next grows.
 > **Run all three** — each reports its own rows and nothing else, so a group you skip is a group
 > nobody checked.
 >
