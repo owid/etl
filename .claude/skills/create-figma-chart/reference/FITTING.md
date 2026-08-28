@@ -164,6 +164,7 @@ before and after, since a rewrap shows up there and nowhere else.
   removing the three took the group to 508.001 with **no rescale at all**, which is the reason to prefer
   removal over a corrective rescale: the type ladder and the 10x10 dots survived untouched. Keep the
   untouched import beside the frame (below) and deletion costs you nothing.
+  - **This contradicts a standing claim in LABELING.md's map-trimming bullet**, which says hidden children do not contribute to a group's bbox and that hiding therefore reclaims the same width as deleting. The measurement above says they do contribute. The map case has not been re-measured, so both are flagged rather than one silently rewritten — settle it with a before/after read of the map group's bbox the next time a map is trimmed.
   - A corollary for the diagnosis, not just the fix: **find the overhanging child before you act.** The
     first hypothesis on that run was ROUND stroke caps overshooting the last vertex — plausible, wrong, and
     disproved in one read that listed every child's right edge. Sort the children by edge and look.
