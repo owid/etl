@@ -625,11 +625,12 @@ Verify against the actual clone with `get_metadata` (the templates evolve; the g
 > scale of ≈1 — "nothing to do" — which is the one answer the script exists to produce. The union is
 > still reported as `contentBoxFromRows` for cross-checking, with the group excluded.
 >
-> **Run the `nextPass` command it prints; do not rebuild the second pass yourself** — with one
-> documented exception: it rebuilds `--band` from the frame's own `contentW`, so a chart whose pass 1
-> deliberately solved against `contentW − dotRadius` (a single-series line chart taking an under-line
-> end label — per-chart-type/line.md) has to re-apply that subtraction by hand, or pass 2 refills the
-> full width and the end dot overhangs it again. With
+> **Run the `nextPass` command it prints; do not rebuild the second pass yourself.** It builds
+> `--band` from `contentW − CONFIG.reserveRightPx`, so a chart that must stop short of the content
+> edge — a single-series line chart taking an under-line end label reserves the end dot's 5px radius
+> (per-chart-type/line.md) — carries that subtraction into pass 2 on its own. Set `reserveRightPx` to
+> the ornament's overhang whenever something is added to the right edge *after* the fit; leave it at
+> 0 on such a chart and pass 2 refills the full width and the dot overhangs it again. With
 > `CONFIG.declared` and `CONFIG.imFontSize` set to what the probe export used, `nextPass` is the
 > **measured-inset** pass 2 (`--declared`/`--ink`/`--im-font-size`): the script subtracts the
 > measured ink from the declared size to get the true per-axis inset, and the re-solve with that

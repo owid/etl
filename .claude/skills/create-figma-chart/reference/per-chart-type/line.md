@@ -13,12 +13,11 @@
     furniture stroke that rescale thinned, plus a re-pin — which is exactly the rework the two-pass
     export exists to avoid. Decide it at Step 3, because it depends only on knowing the chart is
     single-series and will take an under-line end label.
-    - **`measure_fit.js` will try to undo this — the one case where you do not run its `nextPass`
-      command as printed.** It rebuilds `--band` from the frame's actual `contentW`, so after a pass 1
-      solved at `503x<band>` it still emits `508x<band>`; run that verbatim and pass 2 refills the full
-      content width and the dot overhangs exactly as before. Re-apply the `− dotRadius` by hand in the
-      second solve. This is the sole carve-out from FITTING.md's "run the `nextPass` command it prints"
-      rule.
+    - **Tell `measure_fit.js` about it — `CONFIG.reserveRightPx = 5`.** The script targets
+      `contentW − reserveRightPx` for both the x-map and the `--band` it prints, so `nextPass` carries
+      the narrowed band and stays runnable exactly as printed. Leave it at its default 0 on a chart
+      like this and pass 2 refills the full content width, putting the dot back over the edge — which
+      is the failure it used to take a hand-written carve-out to avoid.
   - **Right-align the label**, so a shorter second line ends flush with the longer one rather than starting flush with it.
   - This is a single-series move. With several lines the labels have to sit beside their own ends to stay distinguishable, and the margin is genuinely spent — there the lever is shortening the *longest* label (GUIDELINES.md → Direct labeling).
 - **In a two-line `name / value` end label, step the weight, not the size.** `Chile` over `0.78` at one size reads as two equal facts; bold on the name and Regular on the number makes the eye land on the name and the number read as its annotation. Both lines stay at the ladder value (15 on a 540 frame), both in the series color, both right-aligned. This is the weight analogue of the size-stepping rule in Annotations — prefer it here, because stepping the size would take one of the two lines off the rung the rest of the plot is on.
