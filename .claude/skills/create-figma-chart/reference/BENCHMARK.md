@@ -31,6 +31,16 @@ figure you can hold against the last one.
   delete it once the numbers are recorded**, unless someone actually wants the chart. It is a
   shared design file, and a benchmark that leaves a page behind on every run silts it up. (The
   first run's page was dropped straight after; nothing was lost, which is the proof.)
+  - **Run 3's page was KEPT, at the user's request — the chart was wanted.** So Charts (2026) carries
+    one benchmark-built page on purpose, and it is a deliverable rather than residue: **do not clear
+    it.** Page `20260828 Chile's democracy collapsed in a single year — and took 17 years to return
+    (Pablo A)` (index 9), frame **`chile-democracy-collapse-recovery`** (`27011:6`), beside its
+    reference import `original — grapher square export` (`27014:5`).
+    [Deep link](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=27011-6).
+    The node ids are a convenience; the **frame name is the durable join**, since it is the
+    kebab-case slug the website would export the PNG by. Recorded here because this chart has no
+    `export://static_viz` step whose docstring could hold it, and a link given only in chat is gone
+    by the next session.
 - **So the output cannot be the page.** The number, and the detail explaining it, live outside
   Figma. If a finding only exists as something you can see on the page, it has not been recorded.
 - Run it as a normal build, **checkpoint rule included** — the approval pause is part of the
