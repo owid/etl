@@ -472,10 +472,18 @@ def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int,
     is nothing to estimate and the fitted transform is skipped (`adjusted=False`). Using the model
     where the real thing is available would only add error.
 
-    This is NOT because PIP prefers income. PIP states no preference rule — its handbook calls the
-    choice country-driven and, if anything, leans the other way ("the consumption approach is
-    arguably more directly connected to economic welfare") — and its own consolidated
-    `complete_series` keeps both welfare types for dual country-years rather than picking one.
+    Note that this DEVIATES from PIP's own rule, deliberately. PIP prefers consumption: "Due to its
+    closer connection to welfare, whenever both income and consumption estimates are available for a
+    given reference year, consumption estimates are preferred" (https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#inccon). That is the right call
+    for measuring poverty, which is PIP's purpose. It is the wrong one here, where the purpose is to
+    express PIP on the same income concept WID uses so the two can be compared — so for the 88 dual
+    country-years this series carries PIP's observed INCOME where PIP's own headline estimates carry
+    its consumption. PIP publishes both, so nothing is being overridden.
+
+    The same handbook section notes that "interpolations are never done between consumption and
+    income aggregates" — PIP declines to bridge the two concepts. The consumption -> income model in
+    this step is exactly such a bridge, which is why it is fitted and reported explicitly rather
+    than treated as a detail (see fit_consumption_income_model for how thin its sample is).
     """
     d = national_survey_percentiles(tb_percentiles)
     types = (
