@@ -365,8 +365,8 @@ export delimited using "wid_indices_fiscal_992ijt_exclude.csv", replace
 * aptinc992j says how income is split among adults, not how many adults there
 * are, so aptinc992j / npopul992i is the correct pairing.
 *
-* Unlike the extractions above this is a single fast API call, a few minutes at
-* most.
+* This block is a single API call and takes a few minutes, unlike the extractions
+* above; it is last so it can be re-run on its own if only population changes.
 
 qui wid, indicators(npopul) areas(_all) ages(992 999) population(i) clear
 

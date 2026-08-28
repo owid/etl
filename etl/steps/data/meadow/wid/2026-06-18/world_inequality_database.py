@@ -254,9 +254,8 @@ def run() -> None:
     )
     tb_fiscal = tb_fiscal.format(short_name="world_inequality_database_fiscal")
 
-    # Add population (adults aged 20+ and all ages). It has its own snapshot because it is a
-    # separate, fast API call rather than part of the hours-long main extraction, which is also why
-    # it sits in a different version folder.
+    # Add population (adults aged 20+ and all ages), the demographic base for converting WID's
+    # per-adult series to per capita and for weighting countries in cross-source comparisons.
     snap_population = paths.load_snapshot("wid_population.csv")
     tb_population = snap_population.read(keep_default_na=False, na_values=NA_VALUES)
     tb_population = reshape_population(tb=tb_population)

@@ -45,7 +45,6 @@ steps:
         - snapshot://wid/2026-06-18/world_inequality_database_distribution_with_extrapolations.csv
         - snapshot://wid/2026-06-18/world_inequality_database_fiscal.csv
         - snapshot://wid/2026-06-18/world_inequality_database_with_extrapolations.csv
-        # Population (adults 20+ and all ages): a separate fast API call, hence its own version.
         - snapshot://wid/2026-06-18/wid_population.csv
         - data://garden/regions/2023-01-01/regions
   export://multidim/wid/latest/incomes_wid:
