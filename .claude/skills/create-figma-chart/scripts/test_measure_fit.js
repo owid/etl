@@ -447,6 +447,80 @@ const check = (name, cond, detail) => {
           `measured h=${out2.group.measured.h}`);
   }
 
+  // Case 9: reserveRightPx narrows BOTH the x-map target and the pass-2 `--band`.
+  //
+  // This is the nextPass collision. The fit is solved for `contentW - dotRadius` on a single-series
+  // line chart whose end label sits under the last point, but this script rebuilt the second-pass
+  // command from the frame's full content width — so it re-emitted the UN-narrowed band, and
+  // FITTING.md says in bold to run that command as printed. Following both docs as written therefore
+  // reproduced the very end-dot overhang line.md's rule exists to prevent. The two runs below differ
+  // only by `reserveRightPx`, so every assertion is a difference rather than a literal, and none of
+  // them depends on the mock's own content width.
+  {
+    const cfg = (extra) =>
+      Object.assign(
+        {
+          frameId: "F:1",
+          groupId: "G:9",
+          hideNames: [/^connectors$/, /^datapoints__/],
+          hideIds: [],
+          declared: [791, 645],
+          imFontSize: 30,
+          targetGap: 14,
+          targetLabel: 13.5,
+          slug: "liberal-democracy",
+          params: "country=~CHL",
+          originalGroupId: null,
+        },
+        extra,
+      );
+    const mk = () => {
+      const { frame } = mkFrame();
+      const group = mkGroup("G:9");
+      frame.children.push(group);
+      group.parent = frame;
+      return frame;
+    };
+
+    const base = await run(cfg({}), { frame: mk() });
+    const held = await run(cfg({ reserveRightPx: 5 }), { frame: mk() });
+
+    check(
+      "9 default reserves nothing, so the fit target IS the content box",
+      base.contentBox.reserveRightPx === 0 && base.contentBox.fitW === base.contentBox.w,
+      JSON.stringify(base.contentBox),
+    );
+    check(
+      "9 a reserve narrows the fit target by exactly itself",
+      held.contentBox.fitW === held.contentBox.w - 5,
+      JSON.stringify(held.contentBox),
+    );
+    check(
+      "9 nextPass solves the NARROWED band, not the content box",
+      held.group.nextPass.includes(`--band ${held.contentBox.fitW}x`) &&
+        !held.group.nextPass.includes(`--band ${held.contentBox.w}x`),
+      held.group.nextPass,
+    );
+    check(
+      "9 default nextPass still solves the full content box",
+      base.group.nextPass.includes(`--band ${base.contentBox.w}x`),
+      base.group.nextPass,
+    );
+    check(
+      "9 the x-map target moves with the reserve, and by exactly it",
+      Math.abs(base.group.xMapShortfall - held.group.xMapShortfall - 5) < 0.01,
+      `base ${base.group.xMapShortfall} vs held ${held.group.xMapShortfall}`,
+    );
+
+    // A reserve wider than the box is a config error, not a silent narrowing to nothing.
+    const over = await run(cfg({ reserveRightPx: 9999 }), { frame: mk() });
+    check(
+      "9 an out-of-range reserve is reported rather than applied silently",
+      over.notes.some((n) => n.includes("reserveRightPx is 9999")),
+      JSON.stringify(over.notes),
+    );
+  }
+
   const bad = results.filter((x) => !x.ok);
   for (const x of results) console.log(`${x.ok ? "PASS" : "FAIL"}  ${x.name}${x.ok ? "" : "  " + x.detail}`);
   console.log(bad.length ? `\n${bad.length} FAILURES` : "\nALL PASS");

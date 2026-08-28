@@ -412,8 +412,10 @@ missing, add it:
 
 - **Dot:** clone the same series' *other* dot, so size, fill and shape match exactly, then seat it on
   the line's first path point. Never draw a fresh ellipse.
-- **Value:** take the number from `.csv?…&csvType=filtered` — never read it off the chart or infer it
-  from the other end. The median's 1990 threshold was `3.551` → `$3.55`, which is what the reference
+- **Value:** take the number from the `.csv` — never read it off the chart or infer it from the other
+  end. **Filter to that series' own `Code`/`Entity` first**: the CSV arrives carrying every entity
+  whatever params you pass (GOTCHAS.md), so an unfiltered lookup on the year returns whichever country
+  happened to come last. The median's 1990 threshold was `3.551` → `$3.55`, which is what the reference
   shows.
 
 ### The margins are 12px sides, 10px top and bottom — and the plot must reach them
@@ -630,9 +632,12 @@ reason. Three honest options, in order of preference:
 3. **Ship them as two separate small charts.** A `chart-rows` block has several rows; two charts each
    labeled with their own series is often clearer at 302px than one crowded composite.
 
-Whichever you pick, `.csv?...&csvType=filtered` is how you check the values — and note the CSV returns
-**every entity** unless `csvType=filtered` is present, so a naive `df[df.year == 1913]` silently reads
-some other country.
+Whichever you pick, the `.csv` is how you check the values — but **filter it yourself**. It returns
+**every entity** whatever you pass: `country=` and `time=` are ignored outright, and `csvType=filtered`
+does not narrow it to the chart's selection either (measured: 217 entities with `country=CHL`, still
+174 with `csvType=filtered`). So a naive `df[df.year == 1913]` silently reads some other country.
+Select on `Code`/`Entity` and assert the row count — GOTCHAS.md → "`<slug>.csv` IGNORES `country=` and
+`time=`".
 
 ### `imFontSize` is in rendered pixels, at 0.75×
 

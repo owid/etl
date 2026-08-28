@@ -5,6 +5,19 @@
 
 - Entity labels inside the chart area (end of line, line color, no elbows); use the reclaimed space for the chart.
 - **On a single-series chart, put the end label *under* the line's last point, not beside it — the plot then runs to the content edge and the label costs nothing.** A label placed beside the final point reserves its own full width as right margin for the whole chart, however short the label is; tucking it below the point, right-aligned on the content edge, gives that margin back. Measured on a 540 frame: a plot ending at **485** because a 34px label sat beside it ended at **518.6** once the label moved underneath — **+31.9px, 7% more plot**, for no loss of legibility, because the dot on the last point carries the attachment. So the arithmetic in SKILL.md → Step 7 becomes `plotRight = contentRight − dotRadius` (the end dot's own edge lands on the content edge) instead of `contentRight − labelWidth − 5`.
+  - **Subtract the dot's radius at SOLVE time, not after the fit.** `solve_export.py --band` sizes the
+    chart to fill the whole content width, so solving `508x<band>` lands the plot on 524 and the end dot
+    you then add overhangs to 529 and fails `box-alignment`. Solve `503x<band>` instead (`contentW -
+    dotRadius`): the dot's own edge lands on 524 and the group measures 508 with no correction at all.
+    Getting it wrong costs a whole second fit — a rescale, plus re-restoring the type ladder and every
+    furniture stroke that rescale thinned, plus a re-pin — which is exactly the rework the two-pass
+    export exists to avoid. Decide it at Step 3, because it depends only on knowing the chart is
+    single-series and will take an under-line end label.
+    - **Tell `measure_fit.js` about it — `CONFIG.reserveRightPx = 5`.** The script targets
+      `contentW − reserveRightPx` for both the x-map and the `--band` it prints, so `nextPass` carries
+      the narrowed band and stays runnable exactly as printed. Leave it at its default 0 on a chart
+      like this and pass 2 refills the full content width, putting the dot back over the edge — which
+      is the failure it used to take a hand-written carve-out to avoid.
   - **Right-align the label**, so a shorter second line ends flush with the longer one rather than starting flush with it.
   - This is a single-series move. With several lines the labels have to sit beside their own ends to stay distinguishable, and the margin is genuinely spent — there the lever is shortening the *longest* label (GUIDELINES.md → Direct labeling).
 - **In a two-line `name / value` end label, step the weight, not the size.** `Chile` over `0.78` at one size reads as two equal facts; bold on the name and Regular on the number makes the eye land on the name and the number read as its annotation. Both lines stay at the ladder value (15 on a 540 frame), both in the series color, both right-aligned. This is the weight analogue of the size-stepping rule in Annotations — prefer it here, because stepping the size would take one of the two lines off the rung the rest of the plot is on.

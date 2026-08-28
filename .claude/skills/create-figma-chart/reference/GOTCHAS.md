@@ -435,6 +435,19 @@ not in the type file, for that reason — the worked examples stay in `reference
   the render, not the node list**: the tree looks correct either way. Found on stacked areas, and it
   is the same failure as a map leader hidden by the annotation it starts from.
 
+- **`<slug>.csv` IGNORES `country=` and `time=` — it returns EVERY entity, and a year-keyed dict then
+  silently collapses them into one plausible series.** The `.svg` and `.metadata.json` endpoints honour
+  those params, so the `.csv` reads as though it should too. Measured on `liberal-democracy-index`:
+  `?country=CHL` and `?country=~CHL` each return **217** entities, and `csvType=filtered` only narrows it
+  to **174** — no parameter gets you one country. The damage is done by the natural next line,
+  `{int(r["Year"]): float(r[col]) for r in rows}`: each entity overwrites the last, leaving one value per
+  year from whichever row came last — monotonic, well-formed and wrong. On this chart it printed a Chile
+  whose democracy score *rose* through the Pinochet years, the opposite of the truth, with no error
+  anywhere. **Filter on `Code`/`Entity` yourself, and assert the row count** against the years you expect
+  (76 for 1950-2025). The rendered SVG's own path is the free cross-check: parse `line__<Entity>`'s `d`
+  and compare its shape against the CSV before you quote a number — where they disagree, believe the SVG,
+  because that is the file the reader will see.
+
 ## Running the scripts
 
 - **`use_figma`'s `code` parameter caps at 50,000 bytes**, and `verify_page.js` is ~59KB with its
