@@ -17260,19 +17260,19 @@ L 600.48 140.255844
    <text style="font-size: 16px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #111111" x="11.52" y="23.1675" transform="rotate(-0 11.52 23.1675)">Expected height of boys and girls, from birth to age 19</text>
   </g>
   <g id="subtitle">
-   <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #555555" x="11.52" y="44.290234" transform="rotate(-0 11.52 44.290234)">Global growth reference for infants, children and adolescents, as defined by the World Health Organization.</text>
+   <text style="font-size: 10.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #555555" x="11.52" y="44.290234" transform="rotate(-0 11.52 44.290234)">Global growth reference for infants, children, and adolescents, as defined by the World Health Organization.</text>
   </g>
   <g id="note">
-   <text style="font-size: 7.75px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #777777" transform="translate(11.52 387.976602)">Note: The curves step down slightly at age 2, where height starts being measured standing up rather than lying down, and at age 5, where WHO's standards for under-fives</text>
+   <text style="font-size: 7.75px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #777777" transform="translate(11.52 387.976602)">Note: The curves step down slightly at age 2, where height starts being measured standing up rather than lying down, and at age 5, where WHO’s standards for under-fives</text>
    <text style="font-size: 7.75px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #777777" transform="translate(11.52 396.377844)">give way to its reference for older children. The under-fives standards show how children grow in good conditions; the reference for older children describes how an earlier</text>
-   <text style="font-size: 7.75px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #777777" transform="translate(11.52 404.779086)">sample did grow. A child is stunted if they are more than 2 standard deviations shorter than the median for their age, which is the shaded area's lower edge: 2.3% of the</text>
+   <text style="font-size: 7.75px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #777777" transform="translate(11.52 404.779086)">sample did grow. A child is stunted if they are more than two standard deviations shorter than the median for their age, which is the shaded area’s lower edge: 2.3% of the</text>
    <text style="font-size: 7.75px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #777777" transform="translate(11.52 413.180328)">reference population falls below it.</text>
   </g>
   <g id="data-source">
    <text style="font-size: 7.75px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #888888" x="11.52" y="431.166602" transform="rotate(-0 11.52 431.166602)">Data source: World Health Organization (2006; 2007)</text>
   </g>
   <g id="tagline">
-   <text style="font-size: 7.75px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #888888" x="11.52" y="444.126602" transform="rotate(-0 11.52 444.126602)">OurWorldinData.org — Research and data to make progress against the world's largest problems.</text>
+   <text style="font-size: 7.75px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #888888" x="11.52" y="444.126602" transform="rotate(-0 11.52 444.126602)">OurWorldinData.org — Research and data to make progress against the world’s largest problems.</text>
   </g>
   <g id="license">
    <text style="font-size: 7.75px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #888888" x="600.48" y="444.121758" transform="rotate(-0 600.48 444.121758)">Licensed under CC-BY by the author Pablo Arriagada</text>

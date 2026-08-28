@@ -283,7 +283,7 @@ TITLE = "Expected height of boys and girls, from birth to age 19"
 # static-chart templates leave for it.
 AUTHOR = "Pablo Arriagada"
 
-TAGLINE = "OurWorldinData.org — Research and data to make progress against the world's largest problems."
+TAGLINE = "OurWorldinData.org — Research and data to make progress against the world\u2019s largest problems."
 
 # The two layouts, taken from the static-chart template frames. All geometry is in the
 # templates' own pixel units, measured from the top-left as Figma reports them, and converted
@@ -349,7 +349,9 @@ LAYOUTS = {
 # it fits in about 114 characters at the template's type size. Calling the whole range a *reference*
 # is also what keeps mobile honest without a Note slot to put a caveat in -- it claims only that this
 # is how the reference population's heights are distributed, not that they are heights to aim for.
-SUBTITLE = "Global growth reference for infants, children and adolescents, as defined by the World Health Organization."
+SUBTITLE = (
+    "Global growth reference for infants, children, and adolescents, as defined by the World Health Organization."
+)
 
 # The mobile template has no Note slot, so a condensed form of the note rides in the subtitle instead.
 # It says what causes the two visible steps, which is what a reader needs to know they are real rather
@@ -357,7 +359,7 @@ SUBTITLE = "Global growth reference for infants, children and adolescents, as de
 # since that switch is what the step at 5 is. Every line it adds comes out of the plot's height.
 MOBILE_NOTE = (
     "The steps mark a switch from lying to standing measurement at age {first:.0f}, "
-    "and to an older-age reference at {second:.0f}."
+    "and an older-age reference at {second:.0f}."
 )
 
 # A template pixel in points: the figure is 100 template px per inch and there are 72 points
@@ -746,10 +748,10 @@ def build_note(breaks: list[float], layout: dict) -> str:
     """Compose the Note row: the two source discontinuities and what each product is."""
     text = (
         f"Note: The curves step down slightly at age {breaks[0]:.0f}, where height starts being measured standing "
-        f"up rather than lying down, and at age {breaks[1]:.0f}, where WHO's standards for under-fives give way to "
+        f"up rather than lying down, and at age {breaks[1]:.0f}, where WHO\u2019s standards for under-fives give way to "
         "its reference for older children. The under-fives standards show how children grow in good conditions; the "
         "reference for older children describes how an earlier sample did grow. A child is stunted if they are more "
-        "than 2 standard deviations shorter than the median for their age, which is the shaded area's lower edge: "
+        "than two standard deviations shorter than the median for their age, which is the shaded area\u2019s lower edge: "
         f"{STUNTED_SHARE:.1f}% of the reference population falls below it."
     )
     return wrap_to_content_width(text, layout, layout["footer_fontsize"])
