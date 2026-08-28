@@ -1380,4 +1380,3 @@ include:
   - dag/archive/corruption.yml
   - dag/archive/geography.yml
 
-  - dag/archive/economics.yml
