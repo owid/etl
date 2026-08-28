@@ -306,6 +306,7 @@ def process_wid_distributions(tb_dist: Table, tb_pop: Table, bins_lookup: Table,
     d["bin_adult_population"] = d["adult_population"].astype(np.float64) * bin_width
     d["bin_total_population"] = d["total_population"].astype(np.float64) * bin_width
 
+    # The four raw WID series, on the common 109-bin structure, with all the derived columns needed
     blocks = []
     for series, welfare, basis in SERIES_WID_RAW:
         block = d.loc[

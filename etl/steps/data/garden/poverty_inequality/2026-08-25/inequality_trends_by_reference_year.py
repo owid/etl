@@ -139,6 +139,8 @@ def compute_metrics(tb_distributions: Table) -> Table:
 def latest_year_population(tb_distributions: Table) -> Table:
     """Country population at the latest year: WID total population (the common demographic
     yardstick), recovered as the per-capita WID series' bin-population sum."""
+    # Any per-capita WID series carries the same total population, so the choice of series here is
+    # arbitrary — the bins of one of them sum back to the country's population.
     latest_year = int(tb_distributions["year"].max())
     d = tb_distributions[
         (tb_distributions["series"] == "wid_before_tax_per_capita") & (tb_distributions["year"] == latest_year)
@@ -149,12 +151,16 @@ def latest_year_population(tb_distributions: Table) -> Table:
 def changes_by_country(tb_metrics: Table, tb_population: Table) -> Table:
     """Change in each metric from every reference year to the latest year, per country and series,
     classified as rising/falling/stable."""
+    # Every earlier year is a candidate REFERENCE year, all compared against the single latest
+    # year. Merging on (country, series) only — deliberately not on year — pairs each reference year
+    # with the latest one, so `year` in the output means "the year compared FROM".
     latest_year = int(tb_metrics["year"].max())
     latest = tb_metrics[tb_metrics["year"] == latest_year]
     earlier = tb_metrics[(tb_metrics["year"] < latest_year) & tb_metrics["series"].isin(TREND_SERIES)]
 
     merged = earlier.merge(latest, on=["country", "series"], suffixes=("", "_latest"))
 
+    # Wide -> long over the metrics, so Gini and the GE family share one schema.
     blocks = []
     for metric in METRICS:
         block = merged[["country", "year", "series"]].copy()
@@ -164,6 +170,8 @@ def changes_by_country(tb_metrics: Table, tb_population: Table) -> Table:
         blocks.append(block)
     tb = pr.concat(blocks, ignore_index=True)
 
+    # Classify on the RELATIVE change, so the +/-5% band means the same thing to a Gini near 0.3
+    # and a GE(2) in the tens. Anything inside the band counts as stable rather than as a direction.
     tb["change"] = tb["value_in_latest_year"] - tb["value_in_reference_year"]
     tb["relative_change"] = tb["change"] / tb["value_in_reference_year"]
     tb["direction"] = np.select(
@@ -181,8 +189,11 @@ def changes_by_country(tb_metrics: Table, tb_population: Table) -> Table:
 def aggregate_by_reference_year(tb_changes: Table) -> Table:
     """The slide-level aggregation: counts, population shares and average changes per reference
     year, series and metric."""
+    # One row per (reference year, series, metric): this is the table the slides read.
     g = tb_changes.groupby(["year", "series", "metric"], observed=True)
 
+    # Share of the COVERED population, not of the world — the denominator is the countries present
+    # for that reference year, which shrinks as you go further back.
     def population_share(direction: str):
         return lambda t: t.loc[t["direction"] == direction, "population"].sum() / t["population"].sum()
 
@@ -198,6 +209,8 @@ def aggregate_by_reference_year(tb_changes: Table) -> Table:
                 "population_share_falling": population_share("falling")(t),
                 "population_share_stable": population_share("stable")(t),
                 "population_covered": t["population"].sum(),
+                # Both weightings are published: unweighted treats each country as one
+                # observation, weighted answers "what happened to the average person".
                 "average_change": t["change"].mean(),
                 "average_change_population_weighted": np.average(t["change"], weights=t["population"]),
                 "average_relative_change": t["relative_change"].mean(),
