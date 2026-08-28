@@ -506,8 +506,12 @@ def assign_by_pip_decision_tree(tb_surveys: Table, grid: Table) -> Table:
     concepts counts as an endpoint for EITHER, so it can anchor an income interpolation even though
     the year itself is reported as consumption. Haiti 2007-2011 is that case.
 
-    The "neither spans" fallback is the one branch the published figure leaves ambiguous; nearest
-    survey is used there, which is also what the other modes do, so the ambiguity costs nothing.
+    The "neither spans" fallback is the one branch the published figure leaves ambiguous — its
+    wording ("the latest (earliest) data point") is written for reference years outside the survey
+    range, not for a year sitting between two surveys of different concepts. 46 country-years across
+    9 countries land there. Nearest survey is used, which is what PIP itself does: for 32 of the 33
+    cases where the anchor is identifiable, PIP's lined-up distribution is a scaled copy of the
+    nearest survey's, so its Gini matches that survey's exactly. Ties go to consumption, per above.
     """
     offered = tb_surveys.groupby(["country", "year"], observed=True)["welfare_type"].agg(set)
     resolved = offered.apply(lambda t: "consumption" if "consumption" in t else "income")
@@ -526,7 +530,17 @@ def assign_by_pip_decision_tree(tb_surveys: Table, grid: Table) -> Table:
         has_inc = np.array(["income" in offered.loc[(country, y)] for y in surveys])
 
         for year in years.to_numpy():
-            nearest = int(surveys[np.argmin(np.abs(surveys - year))])
+            # Equidistant surveys: prefer consumption, rather than whichever np.argmin happens to
+            # return. Verified against PIP: Kyrgyzstan 1999 lies one year from a 1998 income survey
+            # and one from a 2000 consumption survey, and PIP's lined-up 1999 distribution matches
+            # the 2000 consumption shape to 4.7e-10.
+            distance = np.abs(surveys - year)
+            closest = surveys[distance == distance.min()]
+            nearest = int(
+                closest[0]
+                if not any("consumption" in offered.loc[(country, int(y))] for y in closest)
+                else next(int(y) for y in closest if "consumption" in offered.loc[(country, int(y))])
+            )
             if year in surveys:
                 welfare, used = resolved.loc[(country, int(year))], int(year)
             else:
