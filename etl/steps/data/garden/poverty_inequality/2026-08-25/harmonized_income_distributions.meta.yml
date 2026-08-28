@@ -98,9 +98,12 @@ tables:
         unit: ""
         description_short: Welfare concept (income or consumption) assigned to the country-year.
       survey_year_used:
-        title: Survey year the welfare basis is taken from
+        title: Nearest national survey year
         unit: ""
-        description_short: Year of the nearest national PIP survey whose welfare type is applied to this year.
+        description_short: Year of the nearest national World Bank survey for this country.
+        description_key:
+          - For a year that is itself surveyed, this is that year and its welfare concept is the one applied.
+          - For a year between surveys, the concept applied may instead come from the surveys on either side of the gap, when both of those use the same concept. This column still reports the nearest survey, so it does not always identify where the concept came from.
       adjusted:
         title: Consumption-to-income adjustment applied
         unit: ""

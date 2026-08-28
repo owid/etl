@@ -546,31 +546,34 @@ def assign_by_pip_decision_tree(tb_surveys: Table, grid: Table) -> Table:
 
 
 def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int, last_year: int) -> Table:
-    """Each (country, year)'s welfare basis, by PIP's own decision tree (see
-    assign_by_pip_decision_tree). Survey years with both types count as CONSUMPTION.
+    """Each (country, year)'s welfare basis — income or consumption — by PIP's own decision tree
+    (see assign_by_pip_decision_tree). Survey years offering both concepts count as CONSUMPTION.
 
-    The label must describe what the thousand-bins values ARE, because it decides whether the
-    consumption -> income transform runs on them. For a non-survey year those values are PIP's own
-    lined-up estimate, produced by walking that tree — so following the tree recovers the concept
-    PIP used rather than guessing at it. For the 88 country-years where PIP publishes both
-    welfare types, the bins are consumption: their means sit 0.03% from PIP's consumption mean and
-    18% from its income mean, for all 88, and the two types differ by a median of 19.5% so the test
-    is not close. This follows PIP's own rule — "Due to its closer connection to welfare, whenever
-    both income and consumption estimates are available for a given reference year, consumption
-    estimates are preferred" (https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#inccon) — which the thousand-bins series applies.
+    Why the label matters: it decides whether the consumption -> income transform runs on that
+    country-year, so it has to describe what the thousand-bins values ARE, not what would be
+    convenient. Getting it backwards either leaves consumption sitting in an income series or
+    transforms income that needed no transforming.
 
-    Labelling them income (as this step did until 2026-08-28) skipped the transform and carried
-    consumption values into `pip_income_basis` as though they were already income, roughly 18% low.
-    Fixing it moved the 2023 between share by -0.24pp. That is the right call
-    for measuring poverty, which is PIP's purpose. It is the wrong one here, where the purpose is to
-    express PIP on the same income concept WID uses so the two can be compared — so for the 88 dual
-    country-years this series carries PIP's observed INCOME where PIP's own headline estimates carry
-    its consumption. PIP publishes both, so nothing is being overridden.
+    Two cases, and PIP settles both:
 
-    The same handbook section notes that "interpolations are never done between consumption and
-    income aggregates" — PIP declines to bridge the two concepts. The consumption -> income model in
-    this step is exactly such a bridge, which is why it is fitted and reported explicitly rather
-    than treated as a detail (see fit_consumption_income_model for how thin its sample is).
+    - A SURVEY year offering both concepts. The bins are consumption, verified rather than assumed:
+      their means sit 0.03% from PIP's published consumption mean and 18% from its income mean, for
+      all 88 such country-years, with the two concepts a median 19.5% apart so none is a close call.
+      That matches PIP's stated rule — "Due to its closer connection to welfare, whenever both
+      income and consumption estimates are available for a given reference year, consumption
+      estimates are preferred"
+      (https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#inccon).
+    - A NON-SURVEY year. Those values are PIP's own lined-up estimate, produced by walking the same
+      decision tree, so following the tree recovers the concept PIP used instead of guessing.
+
+    Until 2026-08-28 this step labelled the dual survey years income, skipping the transform and
+    carrying consumption into `pip_income_basis` as though it were already income, roughly 18% low.
+    Correcting it moved the 2023 between share by -0.24pp.
+
+    Worth knowing what the transform is, in PIP's terms: the same handbook section says
+    "interpolations are never done between consumption and income aggregates" — PIP will not bridge
+    the two concepts. The model in this step is exactly that bridge, which is why its fit and its
+    thin estimation sample are reported rather than buried (see fit_consumption_income_model).
 
     sanity_check_welfare_basis asserts the label-matches-the-bins invariant on every run. It can
     only test SURVEY years, since those are the only ones where PIP publishes both concepts to
