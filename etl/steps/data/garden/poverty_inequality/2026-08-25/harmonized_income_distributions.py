@@ -570,10 +570,19 @@ def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int,
     carrying consumption into `pip_income_basis` as though it were already income, roughly 18% low.
     Correcting it moved the 2023 between share by -0.24pp.
 
-    Worth knowing what the transform is, in PIP's terms: the same handbook section says
-    "interpolations are never done between consumption and income aggregates" — PIP will not bridge
-    the two concepts. The model in this step is exactly that bridge, which is why its fit and its
-    thin estimation sample are reported rather than buried (see fit_consumption_income_model).
+    Worth being precise about how the transform relates to PIP's own methods, because they are
+    narrower than they first look. PIP says "interpolations are never done between consumption and
+    income aggregates" — it will not draw a line from a consumption point to an income point. That is
+    a rule about one calculation, not a refusal to change concept over time: the tree's extrapolation
+    branch takes whichever concept its anchor survey carries, so a country's lined-up series does
+    switch between concepts across periods. 29 of the countries here do. That is precisely why the
+    basis is assigned per country-year rather than once per country.
+
+    What PIP never does is CONVERT one concept into the other — it selects between measured series,
+    it does not estimate an income distribution from a consumption one. That is what this step's
+    model does, and it sits outside PIP's methodology rather than extending it, which is why its fit
+    and its thin estimation sample are reported rather than buried (see
+    fit_consumption_income_model).
 
     sanity_check_welfare_basis asserts the label-matches-the-bins invariant on every run. It can
     only test SURVEY years, since those are the only ones where PIP publishes both concepts to
