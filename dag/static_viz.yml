@@ -18,3 +18,7 @@ steps:
   # Expected height of boys and girls from birth to age 19 (WHO growth reference)
   export://static_viz/who/2026-08-07/height_for_age:
     - data://garden/who/2026-08-07/height_for_age
+
+  # Share of the population living above and below $30 a day, Denmark vs Ethiopia (World Bank PIP)
+  export://static_viz/wb/2026-08-28/poverty_30_a_day_denmark_ethiopia:
+    - data://garden/wb/2026-06-26/world_bank_pip

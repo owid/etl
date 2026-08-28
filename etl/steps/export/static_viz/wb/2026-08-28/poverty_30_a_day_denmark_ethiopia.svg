@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="612pt" height="459.36pt" viewBox="0 0 612 459.36" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 459.36 
+L 612 459.36 
+L 612 0 
+L 0 0 
+L 0 459.36 
+z
+" style="fill: none"/>
+  </g>
+  <g id="axes_1">
+   <g id="denmark__below">
+    <path d="M 11.52 228.171064 
+L 48.015137 228.171064 
+L 48.015137 106.52 
+L 11.52 106.52 
+z
+" style="fill: #8172b3"/>
+   </g>
+   <g id="denmark__above">
+    <path d="M 48.015137 228.171064 
+L 600.48 228.171064 
+L 600.48 106.52 
+L 48.015137 106.52 
+z
+" style="fill: #55a868"/>
+   </g>
+   <g id="ethiopia__below">
+    <path d="M 11.52 392.4 
+L 600.189192 392.4 
+L 600.189192 270.748936 
+L 11.52 270.748936 
+z
+" style="fill: #8172b3"/>
+   </g>
+   <g id="ethiopia__above">
+    <path d="M 600.189192 392.4 
+L 600.48 392.4 
+L 600.48 270.748936 
+L 600.189192 270.748936 
+z
+" style="fill: #55a868"/>
+   </g>
+   <g id="denmark__label">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #ffffff" x="53.775137" y="170.609907" transform="rotate(-0 53.775137 170.609907)">93.8% of Denmark’s population is living on more than $30 per day</text>
+   </g>
+   <g id="ethiopia__label">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #ffffff" x="17.28" y="334.838843" transform="rotate(-0 17.28 334.838843)">more than 99.5% of Ethiopia’s population is living on less than $30 per day</text>
+   </g>
+  </g>
+  <g id="title">
+   <text style="font-size: 20px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #111111" x="11.52" y="26.716875" transform="rotate(-0 11.52 26.716875)">Share of the population living above and below $30 a day</text>
+  </g>
+  <g id="subtitle">
+   <text style="font-size: 14px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #555555" transform="translate(11.52 52.477813)">Share of the population estimated to live below and above $30 a day, measured in</text>
+   <text style="font-size: 14px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #555555" transform="translate(11.52 68.15475)">2021 international-$, which adjusts for inflation and for differences in the cost of</text>
+   <text style="font-size: 14px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; fill: #555555" transform="translate(11.52 83.831688)">living between countries.</text>
+  </g>
+  <g id="note">
+   <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="408.178828" transform="rotate(-0 11.52 408.178828)">Note: Each country is shown at its own most recent household-survey estimate, which are not the same year: 2023 for Denmark and 2021 for Ethiopia.</text>
+  </g>
+  <g id="data-source">
+   <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="431.218828" transform="rotate(-0 11.52 431.218828)">Data source: World Bank Poverty and Inequality Platform (2026)</text>
+  </g>
+  <g id="tagline">
+   <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: start; fill: #858585" x="11.52" y="444.178828" transform="rotate(-0 11.52 444.178828)">OurWorldinData.org — Research and data to make progress against the world’s largest problems.</text>
+  </g>
+  <g id="license">
+   <text style="font-size: 7.5px; font-family: 'Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', sans-serif; text-anchor: end; fill: #858585" x="600.48" y="444.178828" transform="rotate(-0 600.48 444.178828)">Licensed under CC-BY by Max Roser and Daniel Bachler</text>
+  </g>
+ </g>
+</svg>
