@@ -72,12 +72,20 @@ PIP_PPP_VERSION = 2021
 # (see enforce_monotone). Set False to reproduce the source project's unadjusted output.
 ENFORCE_MONOTONE_INCOME_BASIS = True
 
-# How to assign each country's welfare basis (income vs consumption) across the panel:
-#   "nearest_survey": the welfare type of the country's nearest national survey year — correct for
-#                     a multi-year panel when countries switch basis over time.
-#   "latest_survey":  one static type per country, from its most recent survey (what the source
-#                     project used for its single reference year) — kept for validation runs.
-WELFARE_ASSIGNMENT = "nearest_survey"
+# How to assign each country's welfare basis (income vs consumption) across the panel. PIP's
+# lined-up values for a non-survey year were themselves produced by choosing a concept, so the goal
+# is to RECOVER that choice rather than approximate it:
+#   "pip_decision_tree": PIP's own rule (methodology handbook, "Income consumption decision tree").
+#                        At a survey year, consumption if available. Otherwise, if one concept has a
+#                        survey on BOTH sides, interpolate with that concept (consumption first);
+#                        failing that, extrapolate from the nearest survey.
+#   "nearest_survey":    the nearest survey's type, whichever it is. Agrees with the tree for 99.3%
+#                        of country-years and moves the 2023 decomposition by 0.0000pp, but differs
+#                        on 40 interpolated country-years across 11 countries — which is what a
+#                        multi-year reading of the panel would rest on.
+#   "latest_survey":     one static type per country, from its most recent survey (what the source
+#                        project used for its single reference year) — kept for validation runs.
+WELFARE_ASSIGNMENT = "pip_decision_tree"
 
 # Sanity floor on the common PIP-and-WID country sample.
 MIN_COMMON_COUNTRIES = 150
@@ -464,12 +472,70 @@ def fit_consumption_income_model(tb_percentiles: Table) -> Table:
     return tb
 
 
+def assign_by_pip_decision_tree(tb_surveys: Table, grid: Table) -> Table:
+    """PIP's income/consumption decision tree, per country-year.
+
+    https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#inccon
+
+        estimate AT this year?
+          yes -> consumption if this survey has one, else income
+          no  -> a survey on BOTH sides?
+                   consumption on both -> consumption  (interpolated within one concept)
+                   income on both      -> income
+                   neither spans       -> nearest survey's concept
+                 only one side         -> nearest survey's concept
+
+    Note the asymmetry that makes this differ from "nearest survey": a survey year offering both
+    concepts counts as an endpoint for EITHER, so it can anchor an income interpolation even though
+    the year itself is reported as consumption. Haiti 2007-2011 is that case.
+
+    The "neither spans" fallback is the one branch the published figure leaves ambiguous; nearest
+    survey is used there, which is also what the other modes do, so the ambiguity costs nothing.
+    """
+    offered = tb_surveys.groupby(["country", "year"], observed=True)["welfare_type"].agg(set)
+    resolved = offered.apply(lambda t: "consumption" if "consumption" in t else "income")
+
+    # Plain pandas here: the catalog Table's groupby does not yield (key, group) pairs.
+    panel = pd.DataFrame({"country": grid["country"].astype(str), "year": grid["year"].astype(int)})
+    known = set(offered.index.get_level_values(0))
+
+    rows = []
+    for country, block in panel.groupby("country", observed=True):
+        if country not in known:
+            continue
+        years = block["year"]
+        surveys = np.array(sorted(offered.loc[country].index))
+        has_cons = np.array(["consumption" in offered.loc[(country, y)] for y in surveys])
+        has_inc = np.array(["income" in offered.loc[(country, y)] for y in surveys])
+
+        for year in years.to_numpy():
+            nearest = int(surveys[np.argmin(np.abs(surveys - year))])
+            if year in surveys:
+                welfare, used = resolved.loc[(country, int(year))], int(year)
+            else:
+                earlier, later = surveys < year, surveys > year
+                spans_cons = (has_cons & earlier).any() and (has_cons & later).any()
+                spans_inc = (has_inc & earlier).any() and (has_inc & later).any()
+                if spans_cons:
+                    welfare = "consumption"
+                elif spans_inc:
+                    welfare = "income"
+                else:
+                    welfare = resolved.loc[(country, nearest)]
+                used = nearest
+            rows.append((country, int(year), welfare, used))
+
+    return Table(pd.DataFrame(rows, columns=["country", "year", "welfare_type", "survey_year_used"]))
+
+
 def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int, last_year: int) -> Table:
-    """Each (country, year)'s welfare basis: the welfare type of the country's nearest national
-    survey. Years with both types count as CONSUMPTION.
+    """Each (country, year)'s welfare basis, by PIP's own decision tree (see
+    assign_by_pip_decision_tree). Survey years with both types count as CONSUMPTION.
 
     The label must describe what the thousand-bins values ARE, because it decides whether the
-    consumption -> income transform runs on them. For the 88 country-years where PIP publishes both
+    consumption -> income transform runs on them. For a non-survey year those values are PIP's own
+    lined-up estimate, produced by walking that tree — so following the tree recovers the concept
+    PIP used rather than guessing at it. For the 88 country-years where PIP publishes both
     welfare types, the bins are consumption: their means sit 0.03% from PIP's consumption mean and
     18% from its income mean, for all 88, and the two types differ by a median of 19.5% so the test
     is not close. This follows PIP's own rule — "Due to its closer connection to welfare, whenever
@@ -489,7 +555,9 @@ def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int,
     this step is exactly such a bridge, which is why it is fitted and reported explicitly rather
     than treated as a detail (see fit_consumption_income_model for how thin its sample is).
 
-    sanity_check_welfare_basis asserts the label-matches-the-bins invariant on every run.
+    sanity_check_welfare_basis asserts the label-matches-the-bins invariant on every run. It can
+    only test SURVEY years, since those are the only ones where PIP publishes both concepts to
+    compare against; the interpolated years rest on the tree being followed correctly.
     """
     d = national_survey_percentiles(tb_percentiles)
     types = (
@@ -507,10 +575,12 @@ def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int,
     years = Table({"year": range(first_year, last_year + 1)})
     grid = types[["country"]].drop_duplicates().merge(years, how="cross").sort_values(["country", "year"])
 
-    # NOTE: merge_asof(direction="nearest") has NO distance limit, so a panel year far from any
-    # survey still takes that survey's basis — up to 32 years away in the current data. Flagged in
-    # ai/adversarial-review-harmonized_income_distributions-2026-08-26.md, not yet capped.
-    if WELFARE_ASSIGNMENT == "nearest_survey":
+    # NOTE: none of these modes caps the distance to the survey they draw on — up to 32 years in
+    # the current data. Flagged in ai/adversarial-review-harmonized_income_distributions-2026-08-26.md,
+    # not yet capped; PIP itself extrapolates without a limit, so this follows the source.
+    if WELFARE_ASSIGNMENT == "pip_decision_tree":
+        tb = assign_by_pip_decision_tree(d, grid)
+    elif WELFARE_ASSIGNMENT == "nearest_survey":
         tb = pd.merge_asof(
             grid.sort_values("year"),
             types.sort_values("survey_year_used"),
