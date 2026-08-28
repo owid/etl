@@ -13,7 +13,7 @@ What it builds, in order:
    exactly into the 109 bins, so the aggregation is exact; WID arrives on (a superset of) the
    structure. WID values are already PPP-converted upstream (in the snapshot's Stata extraction) —
    here they are only converted from annual to daily and from per-adult to per-capita (using WID's
-   own population counts, see the `wid_population` step).
+   own population counts, published as the `population` table of the WID garden dataset).
 2. Three DERIVED "bridging" series that walk the two sources toward each other:
    - `pip_income_basis`: PIP with consumption-based countries mapped to an income basis, through a
      per-percentile regression ln(income_p) = alpha_p + beta_p * ln(consumption_p) fitted on the
@@ -130,8 +130,7 @@ def run() -> None:
     tb_dist = ds_wid.read("distribution", safe_types=False)
     tb_incomes_wid = ds_wid.read("incomes", safe_types=False)
 
-    ds_wid_pop = paths.load_dataset("wid_population")
-    tb_pop = ds_wid_pop.read("wid_population", safe_types=False)
+    tb_pop = ds_wid.read("population", safe_types=False)
 
     origins = {
         "pip_bins": tb_bins["avg"].metadata.origins,

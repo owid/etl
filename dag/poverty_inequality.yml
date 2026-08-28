@@ -45,6 +45,8 @@ steps:
         - snapshot://wid/2026-06-18/world_inequality_database_distribution_with_extrapolations.csv
         - snapshot://wid/2026-06-18/world_inequality_database_fiscal.csv
         - snapshot://wid/2026-06-18/world_inequality_database_with_extrapolations.csv
+        # Population (adults 20+ and all ages): a separate fast API call, hence its own version.
+        - snapshot://wid/2026-06-18/wid_population.csv
         - data://garden/regions/2023-01-01/regions
   export://multidim/wid/latest/incomes_wid:
     - data://grapher/demography/2024-07-15/population
@@ -57,18 +59,11 @@ steps:
   export://multidim/wid/latest/wealth_wid:
     - data://grapher/wid/2026-06-18/world_inequality_database
 
-  # WID population (adults 20+ and total), the demographic yardstick for WID-vs-PIP comparisons
-  data://garden/wid/2026-08-25/wid_population:
-    - data://meadow/wid/2026-08-25/wid_population:
-      - snapshot://wid/2026-08-25/wid_population.csv
-      - data://garden/regions/2023-01-01/regions
-
   # Harmonized PIP + WID income distributions (109 bins), bridging series and MLD decomposition
   data://garden/poverty_inequality/2026-08-25/harmonized_income_distributions:
     - data://garden/wb/2026-03-25/thousand_bins_distribution
     - data://garden/wb/2026-06-26/world_bank_pip
     - data://garden/wid/2026-06-18/world_inequality_database
-    - data://garden/wid/2026-08-25/wid_population
 
   # Varying-reference-year inequality trend analysis (PIP vs WID)
   data://garden/poverty_inequality/2026-08-25/inequality_trends_by_reference_year:
