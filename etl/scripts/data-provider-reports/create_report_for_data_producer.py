@@ -1,5 +1,6 @@
 """Script to generate an analytics report for a data producer."""
 
+import json
 import re
 import urllib.parse
 from datetime import datetime
@@ -13,6 +14,7 @@ from etl.analytics.data import (
     get_chart_views_by_chart_id,
     get_mdim_explorer_views_by_producer,
     get_post_views_by_chart_id,
+    get_post_views_of_redirected_charts_by_producer,
     get_visualizations_using_data_by_producer,
 )
 from etl.config import (
@@ -83,10 +85,37 @@ def run_sanity_checks(df_charts: pd.DataFrame, df_posts: pd.DataFrame, df_additi
     error = "Expected no duplicates in df_posts. If there are, drop duplicates (and check if that's expected)."
     assert df_posts[df_posts.duplicated(subset=["url"])].empty, error
 
-    error = (
-        "Expected no duplicates in df_additional_charts. If there are, drop duplicates (and check if that's expected)."
-    )
-    assert df_additional_charts[df_additional_charts.duplicated(subset=["url"])].empty, error
+    # df_additional_charts is one row per mdim VIEW (unique by view_config_id) and one row per explorer
+    # (unique by url). Check each kind on its own identity.
+    error = "Expected no duplicate mdim views in df_additional_charts (unique by view_config_id)."
+    df_mdim = df_additional_charts[df_additional_charts["type"] == "multidim"]
+    assert df_mdim[df_mdim.duplicated(subset=["view_config_id"])].empty, error
+
+    error = "Expected no duplicate explorers in df_additional_charts (unique by url)."
+    df_explorer = df_additional_charts[df_additional_charts["type"] == "explorer"]
+    assert df_explorer[df_explorer.duplicated(subset=["url"])].empty, error
+
+
+def _view_label(dimensions: str | None) -> str:
+    """Human-readable label for an mdim view's dimension selection, e.g. '{"metric": "per_capita",
+    "timespan": "decadal"}' -> 'per capita, decadal'. Empty string if there's nothing to show."""
+    if not isinstance(dimensions, str):
+        return ""
+    try:
+        selection = json.loads(dimensions)
+    except (TypeError, ValueError):
+        return ""
+    return ", ".join(str(value).replace("_", " ") for value in selection.values())
+
+
+def _format_collection_title(title: str, type_: str, dimensions: str | None) -> str:
+    """Display title for a collection row. Each mdim row is a single VIEW, so append its dimension
+    selection to tell the mdim's views apart; explorers get a 'Data Explorer' suffix (their title alone,
+    e.g. 'Energy', doesn't reveal it links to an explorer rather than a regular chart)."""
+    if type_ == "explorer":
+        return f"{title} Data Explorer"
+    label = _view_label(dimensions)
+    return f"{title} ({label})" if label else title
 
 
 def gather_producer_analytics(producers: list[str], min_date: str, max_date: str) -> dict[str, pd.DataFrame]:
@@ -133,36 +162,48 @@ def gather_producer_analytics(producers: list[str], min_date: str, max_date: str
         .reset_index(drop=True)
     )
 
-    # Get views of mdims and explorers using data from the producer(s).
+    # Recover posts that cite a chart/explorer slug now redirected into one of the producer's mdim views.
+    # These link to a dead slug, so the live-chart lookup above misses them; they use the same
+    # component-type rule. Concatenate and drop duplicate posts (a post already matched via a live chart).
+    df_posts_redirected = get_post_views_of_redirected_charts_by_producer(
+        producers=producers, date_min=min_date, date_max=max_date
+    )
+    if not df_posts_redirected.empty:
+        df_posts = (
+            pd.concat([df_posts, df_posts_redirected], ignore_index=True)
+            .drop_duplicates(subset=["url"])
+            .reset_index(drop=True)
+        )
+
+    # Get views of the producer's mdim VIEWS (one row per view) and explorers. Each mdim view's total
+    # already folds in views absorbed from charts/explorers redirected into that specific view, and only
+    # views that use the producer's data are included (no whole-surface over-crediting).
     df_additional_charts = get_mdim_explorer_views_by_producer(
         producers=producers, date_min=min_date, date_max=max_date
     )
 
-    # Unlike grapher charts and mdims, explorer titles (e.g. "Energy") don't make it obvious that the link points
-    # to an explorer rather than a regular chart, so make that explicit in the title shown in the report.
-    is_explorer = df_additional_charts["type"] == "explorer"
-    df_additional_charts.loc[is_explorer, "title"] = df_additional_charts.loc[is_explorer, "title"] + " Data Explorer"
-
-    df_additional_charts = (
-        df_additional_charts.drop(columns=["type", "slug"]).assign(featured_on_homepage=False).reset_index(drop=True)
-    )
-
-    # Mdims/explorers where every view uses only this producer's data have their views fully attributable to the
-    # producer, so they are folded into the main chart list and totals. Those that also use other producers'
-    # data are kept separate (reported in their own section) since their views can't be cleanly attributed.
-    df_additional_charts_exclusive = (
-        df_additional_charts[~df_additional_charts["uses_other_producers_data"]].drop(
-            columns=["uses_other_producers_data"]
+    # Build the display title (mdim view -> title + dimension label; explorer -> "... Data Explorer").
+    df_additional_charts["title"] = [
+        _format_collection_title(title=title, type_=type_, dimensions=dimensions)
+        for title, type_, dimensions in zip(
+            df_additional_charts["title"], df_additional_charts["type"], df_additional_charts["dimensions"]
         )
-    ).reset_index(drop=True)
-    df_additional_charts_mixed = (
-        df_additional_charts[df_additional_charts["uses_other_producers_data"]].drop(
-            columns=["uses_other_producers_data"]
-        )
-    ).reset_index(drop=True)
+    ]
+    df_additional_charts["featured_on_homepage"] = False
 
-    # Sanity checks.
+    # Sanity checks (need `type`/`view_config_id`, so run before splitting).
     run_sanity_checks(df_charts=df_charts, df_posts=df_posts, df_additional_charts=df_additional_charts)
+
+    # Split into the main interactive-chart list (folded into the totals) vs the separate "additional
+    # charts" section:
+    # - Mdim VIEWS are ALWAYS in the main list. Per-view attribution credits each view to the right
+    #   producer, so even a multi-producer mdim's views count in full here without over-crediting.
+    # - Explorers are whole-surface (no per-view breakdown). A "pure" explorer (only this producer's data)
+    #   goes in the main list too; a "mixed" explorer (also other producers' data) is reported separately,
+    #   since its whole-explorer views can't be cleanly attributed to this producer.
+    is_mixed_explorer = (df_additional_charts["type"] == "explorer") & df_additional_charts["uses_other_producers_data"]
+    df_additional_charts_exclusive = df_additional_charts[~is_mixed_explorer].reset_index(drop=True)
+    df_additional_charts_mixed = df_additional_charts[is_mixed_explorer].reset_index(drop=True)
 
     # Create a dictionary with all analytics.
     analytics = {
@@ -192,6 +233,11 @@ def insert_list_with_links_in_gdoc(google_doc: GoogleDoc, df: pd.DataFrame, plac
         # Add text for charts that have been featured on our homepage.
         if row["featured_on_homepage"]:
             line += "    This chart was also featured on our homepage.\n"
+
+        # Flag rows whose total includes views recovered from a previous chart URL or from
+        # charts/explorers now redirected into this view.
+        if row.get("includes_redirect_views"):
+            line += "    Includes views from a previous URL, or from charts now redirected to this view.\n"
 
         # Insert line of text.
         edits.append({"insertText": {"location": {"index": end_index}, "text": line}})
@@ -408,21 +454,20 @@ class Report:
         if not self.analytics or not self.google_doc:
             raise ValueError("Analytics and Google Doc must be initialized")
 
-        # Mdims/explorers where every view is attributable to this producer are folded into the main chart list
-        # and totals below, alongside grapher charts. Mdims/explorers that also use other producers' data are
-        # reported separately (see "Additional charts using your data" section further down) and excluded from
-        # these totals.
-        cols = ["url", "views", "title", "featured_on_homepage", "n_days"]
+        # The main chart list and totals below combine grapher charts, all producer mdim VIEWS, and "pure"
+        # explorers (only this producer's data). "Mixed" explorers (also other producers' data) are
+        # reported separately (see "Additional charts using your data" section) and excluded from these
+        # totals, since their whole-explorer views can't be cleanly attributed to this producer.
+        cols = ["url", "views", "title", "featured_on_homepage", "n_days", "includes_redirect_views"]
         df_charts_and_additional_exclusive = pd.concat(
             [self.analytics["charts"][cols], self.analytics["additional_charts_exclusive"][cols]], ignore_index=True
         )
         df_additional_charts_mixed = self.analytics["additional_charts_mixed"]
 
         # Create dataframes for top content.
+        list_cols = ["url", "views", "title", "featured_on_homepage", "includes_redirect_views"]
         df_top_charts = (
-            df_charts_and_additional_exclusive.sort_values("views", ascending=False)[
-                ["url", "views", "title", "featured_on_homepage"]
-            ]
+            df_charts_and_additional_exclusive.sort_values("views", ascending=False)[list_cols]
             .reset_index(drop=True)
             .iloc[0:10]
         )
@@ -431,14 +476,10 @@ class Report:
             .sort_values(["views"], ascending=False)
             .reset_index(drop=True)
             .iloc[0:10]
-            .assign(**{"featured_on_homepage": False})
+            .assign(**{"featured_on_homepage": False, "includes_redirect_views": False})
         )
         df_top_additional_charts = (
-            df_additional_charts_mixed.sort_values("views", ascending=False)[
-                ["url", "views", "title", "featured_on_homepage"]
-            ]
-            .reset_index(drop=True)
-            .iloc[0:5]
+            df_additional_charts_mixed.sort_values("views", ascending=False)[list_cols].reset_index(drop=True).iloc[0:5]
         )
 
         # Calculate metrics.
@@ -506,7 +547,7 @@ class Report:
         insert_list_with_links_in_gdoc(self.google_doc, df=df_top_charts, placeholder=r"{{top_charts_list}}")
         insert_list_with_links_in_gdoc(self.google_doc, df=df_top_posts, placeholder=r"{{top_posts_list}}")
 
-        # Additional charts using this producer's data: mdims/explorers that also use other producers' data, so
+        # Additional charts using this producer's data: explorers that also use other producers' data, so
         # their views aren't folded into the totals above. This section requires the Google Doc template to wrap
         # it between "{{additional_charts_section_start}}" and "{{additional_charts_section_end}}" marker lines,
         # and to have a "{{top_additional_charts_list}}" placeholder inside it (plus {{n_additional_humanized}}

@@ -21,6 +21,12 @@ MAX_DATASETTE_N_ROWS = 10000
 # resolved. See owid/analytics#735 (DuckDB → BigQuery migration).
 SEMANTIC_LAYER_SCHEMA = "prod_semantic"
 
+# Schema (BigQuery dataset) with the intermediate analytics tables (on the same BigQuery connection).
+# Holds the redirect-resolution tables used to recover views across renamed/redirected URLs:
+# `chart_view_identity` (every historical chart URL → current chart_id) and `redirects_all` (the
+# catch-all redirect log). These have no equivalent in `prod_semantic`.
+INTERMEDIATE_SCHEMA = "prod_intermediate"
+
 # Base OWID URL, used to find views in articles and topic pages.
 OWID_BASE_URL = "https://ourworldindata.org/"
 
