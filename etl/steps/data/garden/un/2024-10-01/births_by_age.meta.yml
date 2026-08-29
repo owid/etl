@@ -7,6 +7,10 @@ definitions:
 
 dataset:
   title: Births by age of mother (UN WPP)
+  # Pinned rather than inherited from un_wpp: inheriting its period would apply it to this step's
+  # own (later) version date and land on October 2027, months after the next WPP revision.
+  # 2024-10-01 + 1014 days -> 2027-07-12.
+  update_period_days: 1014
 
 # this metadata file is not used in garden step, but in grapher step
   owners:

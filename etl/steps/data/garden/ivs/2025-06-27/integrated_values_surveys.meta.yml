@@ -207,7 +207,7 @@ tables:
 
       confidence_government:
         title: "Trust: Confidence in government"
-        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organisations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "Government".'
+        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "Government".'
         display:
           name: "Trust: Confidence in government"
           <<: *common-display
@@ -216,7 +216,7 @@ tables:
 
       confidence_churches:
         title: "Trust: Confidence in the churches"
-        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organisations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "The Churches (mosque, temple, etc.)".'
+        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "The Churches (mosque, temple, etc.)".'
         display:
           name: "Trust: Confidence in the churches"
           <<: *common-display
@@ -225,7 +225,7 @@ tables:
 
       confidence_armed_forces:
         title: "Trust: Confidence in the armed forces"
-        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organisations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "The armed forces".'
+        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "The armed forces".'
         display:
           name: "Trust: Confidence in the armed forces"
           <<: *common-display
@@ -234,7 +234,7 @@ tables:
 
       confidence_press:
         title: "Trust: Confidence in the press"
-        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organisations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "The press".'
+        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "The press".'
         display:
           name: "Trust: Confidence in the press"
           <<: *common-display
@@ -243,7 +243,7 @@ tables:
 
       confidence_labour_unions:
         title: "Trust: Confidence in labor unions"
-        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organisations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "Labor unions".'
+        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "Labor unions".'
         display:
           name: "Trust: Confidence in labor unions"
           <<: *common-display
@@ -252,7 +252,7 @@ tables:
 
       confidence_police:
         title: "Trust: Confidence in the police"
-        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organisations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "The police".'
+        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "The police".'
         display:
           name: "Trust: Confidence in the police"
           <<: *common-display
@@ -261,7 +261,7 @@ tables:
 
       confidence_parliament:
         title: "Trust: Confidence in the Parliament"
-        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organisations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "Parliament".'
+        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "Parliament".'
         display:
           name: "Trust: Confidence in the Parliament"
           <<: *common-display
@@ -270,7 +270,7 @@ tables:
 
       confidence_civil_services:
         title: "Trust: Confidence in the civil services"
-        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organisations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "Civil services".'
+        description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "Civil services".'
         display:
           name: "Trust: Confidence in the civil services"
           <<: *common-display
@@ -1208,7 +1208,7 @@ tables:
 
       environment_env_ec:
         title: "Environment vs economic growth: Environment"
-        description_short: '% of respondents choosing option A when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent"'
+        description_short: '% of respondents choosing option A when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent".'
         display:
           name: "Environment vs economic growth: Environment"
           <<: *common-display
@@ -1217,7 +1217,7 @@ tables:
 
       economy_env_ec:
         title: "Environment vs economic growth: Economic growth"
-        description_short: '% of respondents choosing option B when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent"'
+        description_short: '% of respondents choosing option B when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent".'
         display:
           name: "Environment vs economic growth: Economic growth"
           <<: *common-display
@@ -1226,7 +1226,7 @@ tables:
 
       other_answer_env_ec:
         title: "Environment vs economic growth: Other answer"
-        description_short: '% of respondents choosing "Other answer" when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent"'
+        description_short: '% of respondents choosing "Other answer" when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent".'
         display:
           name: "Environment vs economic growth: Other answer"
           <<: *common-display
@@ -1235,7 +1235,7 @@ tables:
 
       dont_know_env_ec:
         title: "Environment vs economic growth: Don't know"
-        description_short: '% of respondents choosing "don''t know" when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent"'
+        description_short: '% of respondents choosing "don''t know" when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent".'
         display:
           name: "Environment vs economic growth: Don't know"
           <<: *common-display
@@ -1244,7 +1244,7 @@ tables:
 
       no_answer_env_ec:
         title: "Environment vs economic growth: No answer"
-        description_short: '% of answers classified as "No answer" for the question "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent"'
+        description_short: '% of answers classified as "No answer" for the question "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent".'
         display:
           name: "Environment vs economic growth: No answer"
           <<: *common-display
@@ -2278,49 +2278,49 @@ tables:
 
       poverty_most_serious:
         title: "Most serious problem: Poverty"
-        description_short: '% of respondents replying "People living in poverty and need" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution"'
+        description_short: '% of respondents replying "People living in poverty and need" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution".'
         display:
           name: "Most serious problem: Poverty"
           <<: *common-display
 
       women_discr_most_serious:
         title: "Most serious problem: Discrimination against women"
-        description_short: '% of respondents replying "Discrimination against girls and women" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution"'
+        description_short: '% of respondents replying "Discrimination against girls and women" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution".'
         display:
           name: "Most serious problem: Discrimination against women"
           <<: *common-display
 
       sanitation_most_serious:
         title: "Most serious problem: Poor sanitation and infectious diseases"
-        description_short: '% of respondents replying "Poor sanitation and infectious diseases" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution"'
+        description_short: '% of respondents replying "Poor sanitation and infectious diseases" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution".'
         display:
           name: "Most serious problem: Poor sanitation and infectious diseases"
           <<: *common-display
 
       education_most_serious:
         title: "Most serious problem: Inadequate education"
-        description_short: '% of respondents replying "Inadequate education" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution"'
+        description_short: '% of respondents replying "Inadequate education" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution".'
         display:
           name: "Most serious problem: Inadequate education"
           <<: *common-display
 
       pollution_most_serious:
         title: "Most serious problem: Environmental pollution"
-        description_short: '% of respondents replying "Environmental pollution" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution"'
+        description_short: '% of respondents replying "Environmental pollution" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution".'
         display:
           name: "Most serious problem: Environmental pollution"
           <<: *common-display
 
       dont_know_most_serious:
         title: "Most serious problem: Don't know"
-        description_short: '% of respondents replying "don''t know" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution"'
+        description_short: '% of respondents replying "don''t know" when asked "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution".'
         display:
           name: "Most serious problem: Don't know"
           <<: *common-display
 
       no_answer_most_serious:
         title: "Most serious problem: No answer"
-        description_short: '% of answers classified as "No answer" for the question "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution"'
+        description_short: '% of answers classified as "No answer" for the question "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution".'
         display:
           name: "Most serious problem: No answer"
           <<: *common-display
@@ -7958,23 +7958,23 @@ tables:
           topic_tags: *topic_tags_technological_change
       economic_growth_aims_of_country_first_choice:
         title: 'A high level of economic growth (first choice, aims of the country)'
-        description_short: '% of respondents who chose "a high level of economic growth" as their first most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their first most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        description_short: '% of respondents who chose "a high level of economic growth" as their first most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their first most important goal among four options ("a high level of economic growth"; "making sure this country has strong defense forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
         display:
           name: 'A high level of economic growth (first choice)'
           <<: *common-display
         presentation:
           topic_tags: *topic_tags_democracy
       strong_defence_aims_of_country_first_choice:
-        title: 'Strong defence forces (first choice, aims of the country)'
-        description_short: '% of respondents who chose "making sure this country has strong defence forces" as their first most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their first most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        title: 'Strong defense forces (first choice, aims of the country)'
+        description_short: '% of respondents who chose "making sure this country has strong defense forces" as their first most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their first most important goal among four options ("a high level of economic growth"; "making sure this country has strong defense forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
         display:
-          name: 'Strong defence forces (first choice)'
+          name: 'Strong defense forces (first choice)'
           <<: *common-display
         presentation:
           topic_tags: *topic_tags_democracy
       more_say_aims_of_country_first_choice:
         title: 'People have more say (first choice, aims of the country)'
-        description_short: '% of respondents who chose "seeing that people have more say about how things are done at their jobs and in their communities" as their first most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their first most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        description_short: '% of respondents who chose "seeing that people have more say about how things are done at their jobs and in their communities" as their first most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their first most important goal among four options ("a high level of economic growth"; "making sure this country has strong defense forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
         display:
           name: 'People have more say (first choice)'
           <<: *common-display
@@ -7982,7 +7982,7 @@ tables:
           topic_tags: *topic_tags_democracy
       beautiful_cities_aims_of_country_first_choice:
         title: 'More beautiful cities and countryside (first choice, aims of the country)'
-        description_short: '% of respondents who chose "trying to make our cities and countryside more beautiful" as their first most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their first most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        description_short: '% of respondents who chose "trying to make our cities and countryside more beautiful" as their first most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their first most important goal among four options ("a high level of economic growth"; "making sure this country has strong defense forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
         display:
           name: 'More beautiful cities and countryside (first choice)'
           <<: *common-display
@@ -7990,7 +7990,7 @@ tables:
           topic_tags: *topic_tags_democracy
       dont_know_aims_of_country_first_choice:
         title: 'Aims of the country (first choice): Don''t know'
-        description_short: '% of respondents replying "Don''t know" when asked which goal should be the country''s top priority for the next ten years, choosing their first most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        description_short: '% of respondents replying "Don''t know" when asked which goal should be the country''s top priority for the next ten years, choosing their first most important goal among four options ("a high level of economic growth"; "making sure this country has strong defense forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
         display:
           name: 'Aims of the country (first choice): Don''t know'
           <<: *common-display
@@ -7998,7 +7998,7 @@ tables:
           topic_tags: *topic_tags_democracy
       no_answer_aims_of_country_first_choice:
         title: 'Aims of the country (first choice): No answer'
-        description_short: '% of answers classified as "No answer" when asked which goal should be the country''s top priority for the next ten years, choosing their first most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        description_short: '% of answers classified as "No answer" when asked which goal should be the country''s top priority for the next ten years, choosing their first most important goal among four options ("a high level of economic growth"; "making sure this country has strong defense forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
         display:
           name: 'Aims of the country (first choice): No answer'
           <<: *common-display
@@ -8006,23 +8006,23 @@ tables:
           topic_tags: *topic_tags_democracy
       economic_growth_aims_of_country_second_choice:
         title: 'A high level of economic growth (second choice, aims of the country)'
-        description_short: '% of respondents who chose "a high level of economic growth" as their second most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their second most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        description_short: '% of respondents who chose "a high level of economic growth" as their second most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their second most important goal among four options ("a high level of economic growth"; "making sure this country has strong defense forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
         display:
           name: 'A high level of economic growth (second choice)'
           <<: *common-display
         presentation:
           topic_tags: *topic_tags_democracy
       strong_defence_aims_of_country_second_choice:
-        title: 'Strong defence forces (second choice, aims of the country)'
-        description_short: '% of respondents who chose "making sure this country has strong defence forces" as their second most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their second most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        title: 'Strong defense forces (second choice, aims of the country)'
+        description_short: '% of respondents who chose "making sure this country has strong defense forces" as their second most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their second most important goal among four options ("a high level of economic growth"; "making sure this country has strong defense forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
         display:
-          name: 'Strong defence forces (second choice)'
+          name: 'Strong defense forces (second choice)'
           <<: *common-display
         presentation:
           topic_tags: *topic_tags_democracy
       more_say_aims_of_country_second_choice:
         title: 'People have more say (second choice, aims of the country)'
-        description_short: '% of respondents who chose "seeing that people have more say about how things are done at their jobs and in their communities" as their second most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their second most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        description_short: '% of respondents who chose "seeing that people have more say about how things are done at their jobs and in their communities" as their second most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their second most important goal among four options ("a high level of economic growth"; "making sure this country has strong defense forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
         display:
           name: 'People have more say (second choice)'
           <<: *common-display
@@ -8030,7 +8030,7 @@ tables:
           topic_tags: *topic_tags_democracy
       beautiful_cities_aims_of_country_second_choice:
         title: 'More beautiful cities and countryside (second choice, aims of the country)'
-        description_short: '% of respondents who chose "trying to make our cities and countryside more beautiful" as their second most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their second most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        description_short: '% of respondents who chose "trying to make our cities and countryside more beautiful" as their second most important goal, when asked which goal should be the country''s top priority for the next ten years, choosing their second most important goal among four options ("a high level of economic growth"; "making sure this country has strong defense forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
         display:
           name: 'More beautiful cities and countryside (second choice)'
           <<: *common-display
@@ -8038,7 +8038,7 @@ tables:
           topic_tags: *topic_tags_democracy
       dont_know_aims_of_country_second_choice:
         title: 'Aims of the country (second choice): Don''t know'
-        description_short: '% of respondents replying "Don''t know" when asked which goal should be the country''s top priority for the next ten years, choosing their second most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        description_short: '% of respondents replying "Don''t know" when asked which goal should be the country''s top priority for the next ten years, choosing their second most important goal among four options ("a high level of economic growth"; "making sure this country has strong defense forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
         display:
           name: 'Aims of the country (second choice): Don''t know'
           <<: *common-display
@@ -8046,7 +8046,7 @@ tables:
           topic_tags: *topic_tags_democracy
       no_answer_aims_of_country_second_choice:
         title: 'Aims of the country (second choice): No answer'
-        description_short: '% of answers classified as "No answer" when asked which goal should be the country''s top priority for the next ten years, choosing their second most important goal among four options ("a high level of economic growth"; "making sure this country has strong defence forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
+        description_short: '% of answers classified as "No answer" when asked which goal should be the country''s top priority for the next ten years, choosing their second most important goal among four options ("a high level of economic growth"; "making sure this country has strong defense forces"; "seeing that people have more say about how things are done at their jobs and in their communities"; "trying to make our cities and countryside more beautiful").'
         display:
           name: 'Aims of the country (second choice): No answer'
           <<: *common-display

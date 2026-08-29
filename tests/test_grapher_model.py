@@ -37,7 +37,7 @@ def test_remap_variable_ids():
 
 def test_chart_config_includes_chart_level_flags():
     class ChartConfigStub:
-        full = {"slug": "test-chart"}
+        config = {"slug": "test-chart"}
 
     class ChartStub:
         chart_config = ChartConfigStub()

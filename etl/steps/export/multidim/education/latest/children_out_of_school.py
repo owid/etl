@@ -47,7 +47,6 @@ EXCLUSION_REGEX = re.compile("|".join(EXCLUSION_PATTERNS), re.IGNORECASE)
 
 # Main chart configuration
 MULTIDIM_CONFIG = {
-    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.008.json",
     "originUrl": "ourworldindata.org/education",
     "hideAnnotationFieldsInTitle": {"time": True},
     "hasMapTab": True,

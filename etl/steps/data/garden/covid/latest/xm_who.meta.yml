@@ -6,13 +6,14 @@ definitions:
         - COVID-19
     display:
       numDecimalPlaces: 2
+      timeInterval: month
 
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-  title: Global excess deaths associated with COVID-19 (modelled estimates)
+  title: Global excess deaths associated with COVID-19 (modeled estimates)
 
   owners:
     - Lucas Rodés-Guirao

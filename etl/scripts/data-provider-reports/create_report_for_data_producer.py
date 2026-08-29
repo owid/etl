@@ -142,6 +142,10 @@ def gather_producer_analytics(producers: list[str], min_date: str, max_date: str
     # Include a column to signal if a chart was featured in the homepage.
     df_charts["featured_on_homepage"] = False
 
+    # Grapher charts don't carry the redirect-recovery flag (chart view counts already fold in renamed-slug
+    # views via the resolved chart_id); the flag is only meaningful for mdim views that absorbed redirects.
+    df_charts["includes_redirect_views"] = False
+
     # Get posts showing charts using data from the current data producer.
     # NOTE: Include DIs as part of posts (for the total view count).
     df_posts = get_post_views_by_chart_id(chart_ids=producer_chart_ids, date_min=min_date, date_max=max_date)

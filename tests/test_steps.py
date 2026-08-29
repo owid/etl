@@ -79,11 +79,18 @@ def test_data_step_recovers_from_partial_output():
         Dataset(dest_dir.as_posix())
 
 
-def test_data_step_failure_raises_step_failed_error():
+def test_data_step_failure_raises_step_failed_error(tmp_path, monkeypatch):
     # A step whose run() raises must surface as a regular Exception carrying the step name and the
     # traceback from the child that ran it. It used to exit via sys.exit(1), and that SystemExit
     # sailed past the `except Exception` handlers in the runners, ending the whole run without
     # logging the step or printing anything.
+
+    # Give this test its own temp dir, so the leftover check below sees only the file this step
+    # creates. The system temp dir is shared with everything else on the host - on CI, several
+    # jobs of the same build run side by side and their traceback files come and go mid-test.
+    # gettempdir() memoises into tempfile.tempdir, so setting $TMPDIR here would have no effect.
+    monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
+
     with temporary_step() as step_name:
         py_file = paths.STEP_DIR / "data" / f"{step_name}.py"
         py_file.write_text("def run() -> None:\n    raise ValueError('boom in step code')\n")

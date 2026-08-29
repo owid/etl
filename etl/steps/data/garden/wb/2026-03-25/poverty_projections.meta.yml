@@ -70,7 +70,7 @@ tables:
         title: Share of population in poverty ({definitions.poverty_line_a_day})
         unit: "%"
         short_unit: "%"
-        description_short: "Percentage of population living in households with an income or consumption below {definitions.poverty_line_per_day}"
+        description_short: "Percentage of population living in households with an income or consumption below {definitions.poverty_line_per_day}."
         description_key:
           - "{definitions.description_key_povertyline}"
           - "{definitions.description_key_extreme_poverty_additional}"
@@ -87,7 +87,7 @@ tables:
         title: Number of people in poverty ({definitions.poverty_line_a_day})
         unit: "people"
         short_unit: ""
-        description_short: "Number of people living in households with an income or consumption below {definitions.poverty_line_per_day}"
+        description_short: "Number of people living in households with an income or consumption below {definitions.poverty_line_per_day}."
         description_key:
           - "{definitions.description_key_povertyline}"
           - "{definitions.description_key_extreme_poverty_additional}"

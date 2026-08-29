@@ -65,7 +65,7 @@ views:
       title: Fish stocks relative to the maximum sustainable yield
       subtitle: |-
         Fish stocks are measured by their biomass: the number of individuals multiplied by their mass.
-        Here it's measured as the biomass of a fish stock divided by the biomass at its maximum sustainable yield – the level at which we can catch the maximum amount of fish without a decline in fish populations. A value of one maximises fish catch without decreasing fish populations.
+        Here it's measured as the biomass of a fish stock divided by the biomass at its maximum sustainable yield – the level at which we can catch the maximum amount of fish without a decline in fish populations. A value of one maximizes fish catch without decreasing fish populations.
       yAxisMin: 0
       yScaleToggle: false
 

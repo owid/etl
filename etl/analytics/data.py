@@ -8,8 +8,8 @@ from etl.analytics.config import (
     COMPONENT_TYPES_TO_LINK_GDOCS_WITH_VIEWS,
     DATE_MAX,
     DATE_MIN,
+    GA_SCHEMA,
     GRAPHERS_BASE_URL,
-    INTERMEDIATE_SCHEMA,
     OWID_BASE_URL,
     POST_LINK_TYPES_TO_URL,
     POST_TYPE_TO_URL,
@@ -65,7 +65,9 @@ def get_number_of_days(
     date_max : str
         Maximum date to consider.
     table_name : str
-        Name of the DB table to query for the maximum informed date.
+        Name of the DB table to query for the maximum informed date, qualified with its schema
+        (BigQuery dataset), e.g. "prod_ga4.grapher_views_detailed". The tables involved no longer all
+        live in the same dataset, so the caller says which one.
     day_column_name : str
         Name of the column in the DB table that contains the date.
 
@@ -85,7 +87,7 @@ def get_number_of_days(
         )
 
     # There is always a lag in analytics, so we need to find out the maximum date informed in the analytics data.
-    query = f"SELECT MAX({day_column_name}) AS date_max FROM {SEMANTIC_LAYER_SCHEMA}.{table_name}"
+    query = f"SELECT MAX({day_column_name}) AS date_max FROM {table_name}"
     date_max_informed = read_analytics(sql=query)["date_max"].item()
     date_end = min(pd.to_datetime(date_max_informed), pd.to_datetime(date_max))
 
@@ -137,6 +139,9 @@ def get_chart_views_per_day_by_chart_id(
 
     where_sql = "WHERE " + " AND ".join(where_clauses) if where_clauses else ""
 
+    # Join on the resolved `chart_id`, not on the URL as GA4 recorded it: that URL is truncated at 126
+    # characters and may be a slug the chart has since been renamed away from, so matching it against
+    # the chart's current URL loses views (owid/analytics#733).
     query = f"""
     SELECT
         c.chart_id,
@@ -144,7 +149,7 @@ def get_chart_views_per_day_by_chart_id(
         v.day,
         SUM(v.events) AS events
     FROM {SEMANTIC_LAYER_SCHEMA}.charts c
-    JOIN {SEMANTIC_LAYER_SCHEMA}.grapher_views_detailed v ON c.url = v.grapher
+    JOIN {GA_SCHEMA}.grapher_views_detailed v ON v.chart_id = c.chart_id
     {where_sql}
     GROUP BY c.chart_id, c.url, v.day
     ORDER BY c.chart_id, v.day ASC;
@@ -177,73 +182,40 @@ def get_chart_views_by_chart_id(
         DataFrame containing the number of chart views per chart.
 
     """
-    # A chart's views are summed over EVERY URL it has ever been reachable at (its current slug plus
-    # any previous/renamed slugs that now redirect to it), not just its current published URL. Without
-    # this, a chart renamed mid-period silently loses the views it drew under its old slug. The mapping
-    # of historical URL (`ga_key`) → current `chart_id` comes from `chart_view_identity`; ambiguous or
-    # truncated identity rows are excluded (safe undercount). `alias_source='own_slug'` is the chart's
-    # current URL; any other value is a redirect source, whose views we surface separately as
-    # `renamed_views` so callers can flag them. Current `url`/`published_at` still come from `charts`.
-    # NOTE: this only covers chart→chart renames (redirect taxonomy category A). Views absorbed when a
-    # chart/explorer is redirected INTO an mdim/explorer are handled in get_mdim_explorer_views_by_producer.
-    id_filter = ""
+    where_clauses = []
+    if date_min:
+        where_clauses.append(f"v.day >= '{date_min}'")
+    if date_max:
+        where_clauses.append(f"v.day <= '{date_max}'")
     if chart_ids:
         id_list = ", ".join(str(cid) for cid in chart_ids)
-        id_filter = f"AND ci.chart_id IN ({id_list})"
+        where_clauses.append(f"c.chart_id IN ({id_list})")
 
-    view_clauses = []
-    if date_min:
-        view_clauses.append(f"day >= '{date_min}'")
-    if date_max:
-        view_clauses.append(f"day <= '{date_max}'")
-    view_where = "WHERE " + " AND ".join(view_clauses) if view_clauses else ""
+    where_sql = "WHERE " + " AND ".join(where_clauses) if where_clauses else ""
 
+    # Join on the resolved `chart_id`, not on the URL as GA4 recorded it: that URL is truncated at 126
+    # characters and may be a slug the chart has since been renamed away from, so matching it against
+    # the chart's current URL loses views (owid/analytics#733).
     query = f"""
-    WITH ident AS (
-        SELECT
-            ci.chart_id,
-            ci.ga_key AS url,
-            (ci.alias_source <> 'own_slug') AS is_redirect
-        FROM {INTERMEDIATE_SCHEMA}.chart_view_identity ci
-        WHERE ci.is_ambiguous = FALSE AND ci.is_truncated = FALSE
-        {id_filter}
-    ),
-    gv AS (
-        SELECT grapher AS url, SUM(events) AS views
-        FROM {SEMANTIC_LAYER_SCHEMA}.grapher_views_detailed
-        {view_where}
-        GROUP BY grapher
-    ),
-    per_chart AS (
-        SELECT
-            ident.chart_id,
-            SUM(gv.views) AS views,
-            SUM(CASE WHEN ident.is_redirect THEN gv.views ELSE 0 END) AS renamed_views
-        FROM ident
-        JOIN gv USING(url)
-        GROUP BY ident.chart_id
-    )
     SELECT
-        pc.chart_id,
+        c.chart_id,
         c.url,
         c.published_at,
-        pc.views,
-        pc.renamed_views
-    FROM per_chart pc
-    JOIN {SEMANTIC_LAYER_SCHEMA}.charts c ON c.chart_id = pc.chart_id
-    ORDER BY pc.views DESC
+        SUM(v.events) AS views
+    FROM {SEMANTIC_LAYER_SCHEMA}.charts c
+    JOIN {GA_SCHEMA}.grapher_views_detailed v ON v.chart_id = c.chart_id
+    {where_sql}
+    GROUP BY c.chart_id, c.url, c.published_at
+    ORDER BY views DESC
     """
     df_views = read_analytics(sql=query)
-
-    # Flag charts whose total includes views recovered from a previous (renamed) URL.
-    df_views["includes_redirect_views"] = df_views["renamed_views"].fillna(0) > 0
 
     # To calculate the average daily views, we need to figure out the number of days for which we are counting views.
     df_views["n_days"] = get_number_of_days(
         published_at=df_views["published_at"],
         date_min=date_min,
         date_max=date_max,
-        table_name="grapher_views_detailed",
+        table_name=f"{GA_SCHEMA}.grapher_views_detailed",
         day_column_name="day",
     )
 
@@ -360,7 +332,7 @@ def get_post_views_by_url(
     df_views["n_days"] = get_number_of_days(
         date_min=date_min,
         date_max=date_max,
-        table_name="views_detailed",
+        table_name=f"{SEMANTIC_LAYER_SCHEMA}.views_detailed",
         day_column_name="day",
     )
 
@@ -419,7 +391,7 @@ def get_explorer_views_by_url(
     df_views["n_days"] = get_number_of_days(
         date_min=date_min,
         date_max=date_max,
-        table_name="views_detailed",
+        table_name=f"{SEMANTIC_LAYER_SCHEMA}.views_detailed",
         day_column_name="day",
     )
     df_views["views_daily"] = df_views["views"] / df_views["n_days"]
@@ -477,7 +449,7 @@ def get_mdim_views_by_slug(
     SELECT
         grapher AS url,
         SUM(events) AS views
-    FROM {SEMANTIC_LAYER_SCHEMA}.grapher_views_detailed
+    FROM {GA_SCHEMA}.grapher_views_detailed
     WHERE day >= '{date_min}'
     AND day <= '{date_max}'
     AND grapher IN ({url_list})
@@ -489,7 +461,7 @@ def get_mdim_views_by_slug(
     df_views["n_days"] = get_number_of_days(
         date_min=date_min,
         date_max=date_max,
-        table_name="grapher_views_detailed",
+        table_name=f"{GA_SCHEMA}.grapher_views_detailed",
         day_column_name="day",
     )
     df_views["views_daily"] = df_views["views"] / df_views["n_days"]
@@ -537,7 +509,7 @@ def get_views_by_url(
             read_analytics(
                 sql=f"""
                 SELECT grapher AS url, SUM(events) AS views
-                FROM {SEMANTIC_LAYER_SCHEMA}.grapher_views_detailed
+                FROM {GA_SCHEMA}.grapher_views_detailed
                 WHERE day >= '{date_min}' AND day <= '{date_max}' AND grapher IN ({url_list})
                 GROUP BY grapher
                 """
@@ -783,7 +755,9 @@ def get_mdim_explorer_views_by_producer(
                 f"FROM multi_dim_data_pages WHERE slug IN ({mdim_list})"
             )
             mdims = mdims.merge(df_titles, on="slug", how="left")
-            n_days_mdim = get_number_of_days(date_min=date_min, date_max=date_max, table_name="chart_views_detailed")
+            n_days_mdim = get_number_of_days(
+                date_min=date_min, date_max=date_max, table_name=f"{SEMANTIC_LAYER_SCHEMA}.chart_views_detailed"
+            )
             mdims["n_days"] = n_days_mdim
             mdims["views_daily"] = mdims["views"] / mdims["n_days"]
             mdims.loc[mdims["views_daily"] == float("inf"), "views_daily"] = 0
@@ -1312,10 +1286,10 @@ def get_visualizations_using_data_by_producer(
     query = f"""WITH t_base AS (
 	SELECT
 		cd.chartId chart_id,
-		JSON_UNQUOTE(JSON_EXTRACT(cc.full, '$.title')) chart_title,
+		JSON_UNQUOTE(JSON_EXTRACT(cc.config, '$.title')) chart_title,
 		cc.slug chart_slug,
 		CONCAT('{GRAPHERS_BASE_URL}', cc.slug) chart_url,
-		JSON_EXTRACT(cc.full, '$.isPublished') is_published,
+		JSON_EXTRACT(cc.config, '$.isPublished') is_published,
 		cd.variableId variable_id,
 		v.name variable_name,
 		d.id dataset_id,

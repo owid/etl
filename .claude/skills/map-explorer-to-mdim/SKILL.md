@@ -5,8 +5,9 @@ description: >-
   explorer's views to the views of one or more replacement MDIMs, writes ONE
   apply-ready JSON payload per explorer for the admin bulk-redirect endpoint, audits
   every article that links or embeds each explorer (with the view each link will land
-  on), preflights every validation the endpoint performs — including site redirects
-  that would block it — and covers retiring the explorer's ETL step afterwards.
+  on) plus the featured metrics pointing at it, preflights every validation the endpoint
+  performs — including site redirects that would block it — and covers retiring the
+  explorer's ETL step afterwards.
   Trigger when the user says "map explorer <slug> to mdim(s) <...>", "suggest
   explorer->MDIM redirects", "we're sunsetting the <slug> explorer, map its views to
   the new multidims", "redirect these explorers to MDIMs", or similar.
@@ -134,6 +135,11 @@ It also writes **`mapping.json`** — the machine record — and
 **`admin_bulk_payload.json`**, which is what you actually apply. The API exists:
 `POST {admin}/api/multi-dim-redirects/bulk` (`handleBulkCreateMultiDimRedirects`), also
 reachable from the *Bulk-create redirects from JSON* button on `/admin/multi-dim-redirects`.
+This endpoint is the **only** way to apply an explorer redirect: the CSV CLI that
+`map-charts-to-mdim` hands over (`createMultiDimRedirectsFromCsv`) accepts an
+`/explorers/` source, but it writes no `sourceQueryParams` — so the row bakes as one
+unconditional rule and every view of the explorer 302s to a single MDIM view,
+per-view routing gone.
 Its Zod schema deliberately mirrors this file's `catchAll` + `redirects` shape, ignores keys
 it doesn't know (`sourceViewId`, `viewId`, `mdim`, `stats`, `targets`), and reports
 `target: null` entries as `skipped`.
@@ -234,6 +240,28 @@ embedded explorer breaks the moment the redirect is **created**, not later at un
 because the embed renders by fetching the explorer page and parsing it. So the 🔴 rows are
 migrated *before* step 7, not after.
 
+The report also carries a **⭐ Featured metrics** section — the one surface where this skill's
+usual "a link survives the 302" reasoning inverts. A featured metric is a topic-page slot held by
+URL, resolved only when Algolia indexes, matching pathname *and* exact params against published
+records. So it does not survive: it empties silently, and cannot be re-added once the explorer is
+gone. Hence step 5b.
+
+### 5b. Swap the featured metrics (before the redirect — it cannot be undone after)
+
+Work the ⭐ section of `references.md`, by hand at `/admin/featured-metrics`. These are editorial
+slots, so ask whoever owns the topic before repointing their rail.
+
+Per row — add the MDIM view under the **same tag and income group**, drag it to the old ranking,
+delete the old row, then re-apply *boost in search* if it was on. One explorer view can hold
+several rows: the key is (URL, tag, income group). Full procedure:
+`docs/guides/data-work/redirect-to-mdims.md`.
+
+**Why here and not after step 7:** creating the redirect darkens the explorer on the spot, and
+adding a featured metric requires a *published* slug. Once the redirect exists, no replacement is
+accepted and no record of the ranking survives. Unlike an embed, which breaks visibly, this fails
+quietly. The replacement is the **bare MDIM view**, not the redirect target — the admin strips
+reader params on paste and never validates the dimension params.
+
 ### 6. Preflight (read-only, gated)
 
 ```bash
@@ -279,6 +307,12 @@ with different targets invalidates that advice while the explorer's own referenc
 reference digest — stay identical. This is the one staleness with no second chance: an operator
 who repoints an embed at the wrong view leaves it no longer naming the explorer, so no later
 sweep can ever surface the mistake. Preflight blocks on it before the reference gate reports.
+
+!!! note "An audit folder predating a surface reads as drifted, and should"
+    The digest hashes the findings, so **adding a surface to `find-chart-references` invalidates
+    every recorded `referenceDigests`** — most recently when featured metrics were added.
+    Preflight blocks on an audit folder from before that, which is correct: it really is missing
+    rows. Re-run `audit_references.py` rather than reading it as a bug.
 
 **Unverifiable is a blocker, not a warning**, in all three cases — no extraction pair, no
 `mapping.json`, no reference digest. A warning does not reach the exit code, so `Ready` would
