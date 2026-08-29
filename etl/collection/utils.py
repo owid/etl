@@ -11,7 +11,7 @@ from string import Formatter
 from typing import Any
 
 from deprecated import deprecated
-from owid.catalog import Dataset
+from owid.catalog import Dataset, Table
 from sqlalchemy.orm import Session
 
 import etl.grapher.model as gm
@@ -23,6 +23,9 @@ from etl.paths import DATA_DIR
 
 CHART_DIMENSIONS = ["y", "x", "size", "color"]
 INDICATORS_SLUG = "indicator"
+
+# A choice of a dimension, as stored in the dimensional metadata of a column (e.g. "female", or 2021).
+DimensionChoice = str | int
 
 # Grapher chart-config schemas are published as
 # https://files.ourworldindata.org/schemas/grapher-schema.011.json
@@ -192,6 +195,130 @@ def get_complete_dimensions_filter(
                 dimensions_filter_complete[dim] = dimensions_filter[dim]
 
     return expand_combinations(dimensions_filter_complete)
+
+
+# steps (public API, exported from etl.collection)
+def filter_columns_by_dimension_choices(
+    tb: Table,
+    dimension_choices: dict[str, DimensionChoice | list[DimensionChoice]],
+    drop_single_choice_dimensions: bool = True,
+) -> Table:
+    """Keep only the indicators of `tb` whose dimensions match `dimension_choices`.
+
+    Use it when a collection should only use some choices of a dimension, e.g. one equivalence
+    scale out of several, or two sexes out of three. Columns with no dimensional metadata at all
+    (e.g. index columns like country or year) are always kept. The input table is not modified; a
+    copy is returned.
+
+    By default, any dimension that is left with a single choice after filtering is removed from the
+    metadata of the kept columns and from the table-level metadata. That is usually what you want:
+    a dimension with one choice renders as a dropdown with a single option. `Collection.save` prunes
+    such dimensions too, but that happens too late for two reasons: `expand_config` would already
+    have built one view per choice of the dimension you are filtering out, and `create_collection`
+    fails earlier if the collection's YAML has hand-written views, since those views do not carry
+    the dimension. Set `drop_single_choice_dimensions=False` to keep the dimensions as they are.
+
+    Example: a table with indicators over `sex` (male, female) and `equivalence_scale` (square root,
+    none)
+
+        income__sex_male__scale_sqrt      dimensions: {"sex": "male", "equivalence_scale": "square root"}
+        income__sex_female__scale_sqrt    dimensions: {"sex": "female", "equivalence_scale": "square root"}
+        income__sex_male__scale_none      dimensions: {"sex": "male", "equivalence_scale": "none"}
+        income__sex_female__scale_none    dimensions: {"sex": "female", "equivalence_scale": "none"}
+
+    filtered with
+
+        >>> tb = filter_columns_by_dimension_choices(tb, {"equivalence_scale": "square root"})
+
+    becomes
+
+        income__sex_male__scale_sqrt      dimensions: {"sex": "male"}
+        income__sex_female__scale_sqrt    dimensions: {"sex": "female"}
+
+    where `equivalence_scale` is gone from the column metadata and from `tb.m.dimensions`, while
+    `sex` stays because it still has two choices.
+
+    Parameters
+    ----------
+    tb : Table
+        Table whose columns carry dimensional metadata, i.e. `tb[column].m.dimensions`.
+    dimension_choices : dict[str, str | int | list[str | int]]
+        Choices to keep, per dimension, e.g. `{"sex": "female"}`, `{"sex": ["female", "male"]}` or
+        `{"sex": "female", "age": "adults"}`. Dimensions that are not listed are not filtered.
+    drop_single_choice_dimensions : bool
+        True to remove every dimension that is left with a single choice after filtering (not only
+        the filtered ones), from the column metadata and from the table-level metadata.
+
+    """
+    # Accept a single choice or a list of choices per dimension.
+    choices_by_dimension = {
+        dimension: list(choices) if isinstance(choices, list) else [choices]
+        for dimension, choices in dimension_choices.items()
+    }
+
+    columns_keep = []
+    columns_without_dimension = defaultdict(list)
+    choices_found = defaultdict(set)
+    for column in tb.columns:
+        dims = tb[column].m.dimensions
+        if not dims:
+            # Columns with no dimensional metadata at all (e.g. country, year) are kept.
+            columns_keep.append(column)
+            continue
+        keep = True
+        for dimension, choices in choices_by_dimension.items():
+            if dimension not in dims:
+                columns_without_dimension[dimension].append(column)
+                keep = False
+                continue
+            choices_found[dimension].add(dims[dimension])
+            if dims[dimension] not in choices:
+                keep = False
+        if keep:
+            columns_keep.append(column)
+
+    for dimension, choices in choices_by_dimension.items():
+        if not choices_found[dimension]:
+            raise ValueError(f"Dimension '{dimension}' not found in any column of table '{tb.m.short_name}'.")
+        # An indicator that has dimensions but not the one being filtered cannot be filtered, and keeping it
+        # would add views for choices the caller excluded.
+        if columns_without_dimension[dimension]:
+            raise ValueError(
+                f"Columns of table '{tb.m.short_name}' have dimensions, but not '{dimension}', so they cannot "
+                f"be filtered by it: {sorted(columns_without_dimension[dimension])[:5]}. Drop them from the "
+                f"table beforehand."
+            )
+        choices_missing = [choice for choice in choices if choice not in choices_found[dimension]]
+        if choices_missing:
+            raise ValueError(
+                f"No column in table '{tb.m.short_name}' has dimension '{dimension}' with choice(s) "
+                f"{sorted(str(choice) for choice in choices_missing)}. "
+                f"Available choices: {sorted(str(choice) for choice in choices_found[dimension])}"
+            )
+
+    # Copy so the metadata edits below don't modify the caller's table.
+    tb = tb[columns_keep].copy()
+
+    if drop_single_choice_dimensions:
+        # Find the choices of each dimension that survived the filtering.
+        choices_kept = defaultdict(set)
+        for column in tb.columns:
+            for dimension, choice in (tb[column].m.dimensions or {}).items():
+                choices_kept[dimension].add(choice)
+        dimensions_drop = {dimension for dimension, choices in choices_kept.items() if len(choices) == 1}
+
+        # Drop them from the metadata of the kept indicators.
+        for column in tb.columns:
+            dims = tb[column].m.dimensions
+            if dims:
+                for dimension in dimensions_drop:
+                    dims.pop(dimension, None)
+
+        # Drop them from the table-level metadata, if defined there.
+        if tb.m.dimensions:
+            tb.m.dimensions = [d for d in tb.m.dimensions if d["slug"] not in dimensions_drop]
+
+    return tb
 
 
 # model.core

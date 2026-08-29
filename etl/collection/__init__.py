@@ -9,12 +9,14 @@ from etl.collection.core.combine import combine_collections, combine_config_dime
 from etl.collection.core.create import create_collection
 from etl.collection.core.expand import expand_config
 from etl.collection.model.core import Collection
+from etl.collection.utils import filter_columns_by_dimension_choices
 
 __all__ = [
     "combine_collections",
     "create_collection",
     "expand_config",
     "combine_config_dimensions",
+    "filter_columns_by_dimension_choices",
     "CollectionSet",
     "Collection",
 ]
