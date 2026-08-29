@@ -140,12 +140,34 @@ before and after, since a rewrap shows up there and nowhere else.
   draws the zero line at **0.5px in canvas units**, so a 0.675 fit leaves 0.34px and *restoring* 0.5
   still ships a 0.5px line against a 1px target. Read CHECKS.md's furniture row and set 1px outright,
   after the last scale. Only the *dash* is a restore-the-original operation.
+  - **And that means EVERY furniture node, and the dash as well as the weight.** Two misses on one run:
+    the axis **tick marks** were left at 0.666px because only the gridlines had been set to 1px, and the
+    gridline **dash** was left at the `[2.663, 2.663]` the `rescale` produced. Note the apparent conflict
+    between "restore the original dash" and CHECKS.md's house `[4, 4]` dissolves on the numbers —
+    2.663 / 0.669 = 3.98, so grapher's original *was* `[4, 4]` and the rescale thinned it. One sweep after
+    the last scale: list every stroked node with its weight and dash, set furniture to 1px, gridlines to
+    `[4, 4]`, the zero line solid, series to 3px and its halo to 4px, then read the list back.
 - **The data lines have the same trap pointing the other way, and no fixed target to fall back on.**
   Their `stroke-width` in the embed SVG is in the **export canvas's** units, so the fit scales it away
   — reading 1.5 there and setting 1.5 here ships a line at whatever fraction the fit left, and it
   *looks* deliberate because you chose the number. There is a constant: the house pair is **3px line,
   4px halo**, outside a highlight treatment as well as in one, and `verify_page.js` gates on it. Set
   that, after the last scale. CHECKS.md's mark-weight row has the measured case.
+- **Fit and align on the GROUP's box, never on a leaf-union ink walk — a group's box includes its HIDDEN
+  descendants.** This is the trap that makes a fit look exact and fail the gate. An ink walk that skips
+  invisible leaves (the sensible way to measure ink) reported **508.001px, exact, left edge on 16** while
+  `box-alignment` — which reads the chart group's `absoluteBoundingBox` — read **510.281** and failed by
+  2.28px. The overhang was the ancestor groups (`vertical-labels` → `text-labels`) of an entity label that
+  had been switched off with `visible = false`: the label painted nothing, and its box still counted.
+  **So: whatever you are replacing, REMOVE it, don't hide it** — the hidden `label__*`, the
+  `datapoints__*` markers you dropped, the full-length `line__*` a recolour superseded. On that run
+  removing the three took the group to 508.001 with **no rescale at all**, which is the reason to prefer
+  removal over a corrective rescale: the type ladder and the 10x10 dots survived untouched. Keep the
+  untouched import beside the frame (below) and deletion costs you nothing.
+  - **This contradicts a standing claim in LABELING.md's map-trimming bullet**, which says hidden children do not contribute to a group's bbox and that hiding therefore reclaims the same width as deleting. The measurement above says they do contribute. The map case has not been re-measured, so both are flagged rather than one silently rewritten — settle it with a before/after read of the map group's bbox the next time a map is trimmed.
+  - A corollary for the diagnosis, not just the fix: **find the overhanging child before you act.** The
+    first hypothesis on that run was ROUND stroke caps overshooting the last vertex — plausible, wrong, and
+    disproved in one read that listed every child's right edge. Sort the children by edge and look.
 - **Align on the group's own bbox, because that is what the canvas reports.** A GROUP's box hugs its
   children's rendered content, so for an imported chart it *is* the ink — and it is the number the user
   reads in the properties panel. A fit that measured leaves with `absoluteRenderBounds` while the user
@@ -603,7 +625,12 @@ Verify against the actual clone with `get_metadata` (the templates evolve; the g
 > scale of ≈1 — "nothing to do" — which is the one answer the script exists to produce. The union is
 > still reported as `contentBoxFromRows` for cross-checking, with the group excluded.
 >
-> **Run the `nextPass` command it prints; do not rebuild the second pass yourself.** With
+> **Run the `nextPass` command it prints; do not rebuild the second pass yourself.** It builds
+> `--band` from `contentW − CONFIG.reserveRightPx`, so a chart that must stop short of the content
+> edge — a single-series line chart taking an under-line end label reserves the end dot's 5px radius
+> (per-chart-type/line.md) — carries that subtraction into pass 2 on its own. Set `reserveRightPx` to
+> the ornament's overhang whenever something is added to the right edge *after* the fit; leave it at
+> 0 on such a chart and pass 2 refills the full width and the dot overhangs it again. With
 > `CONFIG.declared` and `CONFIG.imFontSize` set to what the probe export used, `nextPass` is the
 > **measured-inset** pass 2 (`--declared`/`--ink`/`--im-font-size`): the script subtracts the
 > measured ink from the declared size to get the true per-axis inset, and the re-solve with that
@@ -655,7 +682,9 @@ Verify against the actual clone with `get_metadata` (the templates evolve; the g
 >
 > So treat the first export as a **probe**, not an attempt:
 >
-> 1. `solve_export.py --band WxH --target-label 15` → export, import, hide the furniture, measure.
+> 1. `solve_export.py --band WxH --target-label 15` → export, import, EXCLUDE the furniture from the
+>    measurement (`measure_fit.js` does it without mutating), measure. Removal comes later, before the
+>    final fit — see the group-box rule above.
 > 2. `inset = declared − ink`, per axis. `scripts/measure_fit.js` returns it, and the ready pass-2
 >    command with it, if you give it `CONFIG.declared` and `CONFIG.imFontSize`.
 > 3. `solve_export.py --band WxH --declared … --ink … --im-font-size …` → export, import, fit.
