@@ -138,15 +138,23 @@ def build(
     use_cache: bool = True,
     ttl_hours: float = cache.DEFAULT_TTL_HOURS,
     with_config: bool = True,
+    params: str = "",
 ) -> Bundle:
-    """Fetch and assemble the review bundle for one chart slug.
+    """Fetch and assemble the review bundle for one chart slug, optionally for one view.
+
+    ``params`` must be threaded through **all three** requests, not just the render. A
+    multi-dimensional page's ``.metadata.json`` and ``.csv`` answer for the view its dimension
+    parameters select, and answer ``500`` when the view is underspecified — so fetching metadata
+    for the bare slug while rendering a specific view both fails on some mdims and, where it
+    succeeds, describes a different view than the picture shows.
 
     Raises:
         ChartGone: the slug does not resolve (deleted chart, or an explorer).
         HTTPError: anything else the endpoints return.
     """
+    cache_key = f"{slug}?{params}" if params else slug
     if use_cache:
-        cached = cache.read_bundle(slug, ttl_hours=ttl_hours)
+        cached = cache.read_bundle(cache_key, ttl_hours=ttl_hours)
         if cached and (cached.get("png") is not None or not with_image):
             return Bundle(
                 slug=slug,
@@ -161,7 +169,8 @@ def build(
     bundle = Bundle(slug=slug)
 
     try:
-        meta = json.loads(_fetch(f"{GRAPHER_URL}/{slug}.metadata.json?useColumnShortNames=true"))
+        query = "useColumnShortNames=true" + (f"&{params.lstrip('?')}" if params else "")
+        meta = json.loads(_fetch(f"{GRAPHER_URL}/{slug}.metadata.json?{query}"))
     except HTTPError as e:
         if e.code == 404:
             raise ChartGone(slug) from e
@@ -179,7 +188,10 @@ def build(
         lines.append("\n".join(entry))
 
     try:
-        raw = _fetch(f"{GRAPHER_URL}/{slug}.csv?useColumnShortNames=true&csvType=full").decode()
+        csv_query = "useColumnShortNames=true&csvType=" + ("filtered" if params else "full")
+        if params:
+            csv_query += f"&{params.lstrip('?')}"
+        raw = _fetch(f"{GRAPHER_URL}/{slug}.csv?{csv_query}").decode()
         if raw.lstrip().startswith("{"):
             # The endpoint answers 200 with a JSON error body for non-redistributable data.
             raise ValueError(json.loads(raw).get("error", "data unavailable"))
@@ -207,11 +219,19 @@ def build(
     bundle.summary = "\n".join(lines)
 
     if with_image:
-        bundle.png = _fetch(f"{GRAPHER_URL}/{slug}.png")
+        try:
+            bundle.png = render(slug, params)
+        except HTTPError as e:
+            # Measured 2026-08-31: the static render answers 500 for roughly 77% of *declared*
+            # multi-dim views (sampled across 11 of 12 mdims), while the interactive page for the
+            # same view answers 200 — so the view is real and only its static export is broken.
+            # Reviewing the metadata and values is still worth doing, so carry on without a picture.
+            bundle.png = None
+            bundle.notes.append(f"no render available (HTTP {e.code}) — reviewed without the image")
 
     if use_cache:
         cache.write_bundle(
-            slug, bundle.summary, bundle.png, bundle.notes, bundle.data_available, bundle.extremes_params
+            cache_key, bundle.summary, bundle.png, bundle.notes, bundle.data_available, bundle.extremes_params
         )
 
     return bundle

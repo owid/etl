@@ -33,7 +33,7 @@ import rich_click as click
 from rich.console import Console
 from rich.table import Table
 
-from apps.chart_critic import cache, fixtures, report
+from apps.chart_critic import cache, fixtures, mdim, report
 from apps.chart_critic.bundle import GRAPHER_URL, Bundle, ChartGone, build, render
 from apps.chart_critic.critic import (
     CHEAP_MODEL,
@@ -75,9 +75,32 @@ def _pageviews(min_views: int) -> Any:
     return df[~df.slug.str.contains(r"[?#/]", regex=True)].drop_duplicates("slug").reset_index(drop=True)
 
 
-def _select(slugs: str | None, sample: int | None, top: int | None, min_views: int, seed: int) -> list[tuple[str, int]]:
+def _expand_mdims(targets: list[tuple[str, int, str]], mdim_views: int, seed: int) -> list[tuple[str, int, str]]:
+    """Replace each multi-dim slug with a sample of its views.
+
+    One view of a multi-dim is a chart in its own right — same render, same metadata, same values
+    — so reviewing only the default view leaves most of an mdim unreviewed. 40 mdims are
+    published and some have dozens of views.
+    """
+    if mdim_views < 1:
+        return targets
+    expanded: list[tuple[str, int, str]] = []
+    for slug, pageviews, params in targets:
+        views = [] if params else mdim.sample_views(slug, mdim_views, seed=seed)
+        if not views:
+            expanded.append((slug, pageviews, params))
+            continue
+        for _, view_params in views:
+            merged = "&".join(x for x in (params, view_params) if x)
+            expanded.append((slug, pageviews, merged))
+    return expanded
+
+
+def _select(
+    slugs: str | None, sample: int | None, top: int | None, min_views: int, seed: int, params: str = ""
+) -> list[tuple[str, int, str]]:
     if slugs:
-        return [(s.strip(), 0) for s in slugs.split(",") if s.strip()]
+        return [(s.strip(), 0, params) for s in slugs.split(",") if s.strip()]
 
     df = _pageviews(min_views)
     if df.empty:
@@ -96,7 +119,7 @@ def _select(slugs: str | None, sample: int | None, top: int | None, min_views: i
     else:
         raise click.ClickException("Pass one of --slugs, --sample or --top")
 
-    return list(zip(df.slug, df.views_365d))
+    return [(slug, int(v), params) for slug, v in zip(df.slug, df.views_365d)]
 
 
 def _cost(model: str, input_tokens: int, output_tokens: int) -> float:
@@ -108,13 +131,19 @@ def _cost(model: str, input_tokens: int, output_tokens: int) -> float:
         return input_tokens / 1e6 * rate_in + output_tokens / 1e6 * rate_out
 
 
-def chart_link(slug: str, params: str = "") -> str:
-    """A chart URL, carrying only query parameters that grapher actually understands."""
+def chart_link(slug: str, params: str = "", extra_keys: set[str] | None = None) -> str:
+    """A chart URL, carrying only query parameters that grapher actually understands.
+
+    ``extra_keys`` carries an mdim's own dimension names (``metric``, ``antigen``, …), which are
+    per-mdim and so cannot be in a fixed allowlist. Without them a finding about one view of a
+    multi-dim would link to the default view instead — a link to the wrong chart.
+    """
+    allowed = ALLOWED_PARAMS | (extra_keys or set())
     clean = []
     for pair in (params or "").lstrip("?").split("&"):
         key, _, value = pair.partition("=")
         key, value = key.strip(), value.strip()
-        if key in ALLOWED_PARAMS and value and re.fullmatch(r"[A-Za-z0-9_~.\-]+", value):
+        if key in allowed and value and re.fullmatch(r"[A-Za-z0-9_~.\-]+", value):
             clean.append(f"{key}={value}")
     return f"{GRAPHER_URL}/{slug}" + ("?" + "&".join(clean) if clean else "")
 
@@ -152,12 +181,17 @@ def _review_one(
     views: int = 1,
     params: str = "",
 ) -> dict[str, Any]:
-    result: dict[str, Any] = {"slug": slug, "views": pageviews, "issues": [], "cost": 0.0, "status": "ok", "cached": 0}
+    result: dict[str, Any] = {
+        "slug": slug,
+        "views": pageviews,
+        "params": params,
+        "issues": [],
+        "cost": 0.0,
+        "status": "ok",
+        "cached": 0,
+    }
     try:
-        bundle: Bundle = build(slug, with_image=with_image, use_cache=use_cache, ttl_hours=ttl_hours)
-        if params and with_image:
-            # An explicit view was asked for; review that instead of the default.
-            bundle.png = render(slug, params)
+        bundle: Bundle = build(slug, with_image=with_image, use_cache=use_cache, ttl_hours=ttl_hours, params=params)
     except ChartGone:
         result["status"] = "gone"
         return result
@@ -267,6 +301,16 @@ def _review_one(
     ),
 )
 @click.option(
+    "--mdim-views",
+    type=int,
+    default=0,
+    show_default=True,
+    help=(
+        "For each multi-dim, review this many of its views instead of just the default one. "
+        "Every combination of a multi-dim's dimensions is a chart a reader can land on."
+    ),
+)
+@click.option(
     "--params",
     type=str,
     default="",
@@ -306,6 +350,7 @@ def cli(
     no_image: bool,
     repeat: int,
     views: int,
+    mdim_views: int,
     params: str,
     workers: int,
     output: Path | None,
@@ -333,7 +378,7 @@ def cli(
 
     use_cache = not no_cache
     charts_cached, reviews_cached, cache_mb = cache.stats()
-    targets = _select(slugs, sample, top, min_views, seed)
+    targets = _expand_mdims(_select(slugs, sample, top, min_views, seed, params), mdim_views, seed)
     console.print(
         f"[bold]Reviewing {len(targets)} charts[/bold] with {model}"
         f"{' (no renders)' if no_image else ''}"
@@ -348,14 +393,33 @@ def cli(
 
     results: list[dict[str, Any]] = []
     with cf.ThreadPoolExecutor(workers) as ex:
-        futures = [ex.submit(_review_one, slug, views, model, not no_image, dry_run, repeat) for slug, views in targets]
+        futures = [
+            ex.submit(
+                _review_one,
+                slug,
+                chart_pageviews,
+                model,
+                not no_image,
+                dry_run,
+                repeat,
+                use_cache,
+                cache_ttl,
+                views,
+                target_params,
+            )
+            for slug, chart_pageviews, target_params in targets
+        ]
         for f in cf.as_completed(futures):
             r = f.result()
             results.append(r)
             if r["issues"]:
-                console.print(f"  [red]●[/red] {r['slug']} — {len(r['issues'])} issue(s)")
+                view = f" [dim]?{r['params']}[/dim]" if r.get("params") else ""
+                console.print(f"  [red]●[/red] {r['slug']}{view} — {len(r['issues'])} issue(s)")
                 for i in r["issues"]:
-                    i["url"] = chart_link(r["slug"], i.get("chart_params", ""))
+                    # Keep the parameters that select the reviewed view, merged with whatever the
+                    # model asked for, so an mdim finding links to the view it is about.
+                    merged = "&".join(x for x in (r.get("params", ""), i.get("chart_params", "")) if x)
+                    i["url"] = chart_link(r["slug"], merged, mdim.dimension_keys(r["slug"]))
                     colour = SEVERITY_COLOR.get(i["severity"], "white")
                     seen = f" [dim]({i['passes']}/{r['passes']} passes)[/dim]" if r.get("passes", 1) > 1 else ""
                     console.print(f"      [{colour}]{i['severity']}/{i['kind']}[/{colour}] {i['claim']}{seen}")
@@ -460,8 +524,16 @@ def _print_summary(results: list[dict[str, Any]], model: str) -> None:
         f"{len(flagged)} with issues ({len(issues)} in total) · "
         f"{len(results) - len(flagged) - len(gone) - len(failed)} clean"
     )
+    no_render = [r for r in results if any("no render" in n for n in r.get("notes", []))]
     if no_values:
-        console.print(f"[dim]{len(no_values)} reviewed without values (non-redistributable data)[/dim]")
+        console.print(
+            f"[dim]{len(no_values) - len(no_render)} reviewed without values (non-redistributable data)[/dim]"
+        )
+    if no_render:
+        console.print(
+            f"[yellow]{len(no_render)} reviewed without a render[/yellow] — the static export 500s for "
+            "most multi-dim views, so those were judged on metadata and values alone"
+        )
     if gone:
         console.print(f"[dim]{len(gone)} slugs no longer resolve: {', '.join(r['slug'] for r in gone[:5])}[/dim]")
     if failed:
