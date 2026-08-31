@@ -167,6 +167,7 @@ GROUPS = (
         {
             "name": "Charts",
             "commands": {
+                "chart-critic": "apps.chart_critic.cli.cli",
                 "chart-sync": "apps.chart_sync.cli.cli",
                 "approve": "apps.chart_approval.cli.cli",
                 "related-charts": "apps.related_charts.cli.cli",
