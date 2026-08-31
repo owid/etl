@@ -30,20 +30,40 @@ CRITIC_CACHE_DIR = CACHE_DIR / "chart_critic"
 DEFAULT_TTL_HOURS = 24
 
 
-def algo_fingerprint() -> str:
-    """A short hash of everything that determines what a review says.
+def _source_hash(*module_names: str) -> str:
+    """Hash the source of the modules that decide what gets cached."""
+    h = hashlib.sha256()
+    for name in module_names:
+        path = Path(__file__).with_name(name)
+        h.update(path.read_bytes() if path.exists() else name.encode())
+    return h.hexdigest()
 
-    Derived from the prompt text and the output schema rather than a hand-maintained version
-    number, so editing either one invalidates cached reviews without anyone remembering to.
+
+def bundle_fingerprint() -> str:
+    """A short hash of the code that builds a bundle.
+
+    The bundle cache needs this as much as the review cache does, and for a reason learned the
+    hard way: filtering grapher's ``yAxis: {"max": 0}`` sentinel out of the config summary changed
+    what the model is shown, but cached bundles were keyed on the slug alone — so a sweep kept
+    replaying the old summary and kept reproducing the false positive the fix had just removed.
+
+    Hashing the source rather than a version constant means nobody has to remember to bump it.
+    Editing a comment invalidates bundles too, which is a fine price: re-fetching is cheap and a
+    stale bundle is silent.
     """
-    from apps.chart_critic import bundle as bundle_module
+    return _source_hash("bundle.py", "chart_config.py")[:12]
+
+
+def algo_fingerprint() -> str:
+    """A short hash of everything that determines what a review says."""
     from apps.chart_critic import critic
 
     material = json.dumps(
         {
             "instructions": critic.INSTRUCTIONS,
             "schema": critic.Review.model_json_schema(),
-            "bundle_fields": [bundle_module.CHART_FIELDS, bundle_module.COLUMN_FIELDS, bundle_module.MAX_COLUMNS],
+            "bundle": bundle_fingerprint(),
+            "critic_source": _source_hash("critic.py"),
         },
         sort_keys=True,
     )
@@ -53,7 +73,7 @@ def algo_fingerprint() -> str:
 def _slug_dir(slug: str) -> Path:
     # Slugs are URL path segments, but be defensive about anything odd.
     safe = "".join(c if c.isalnum() or c in "-_" else "_" for c in slug)[:120]
-    return CRITIC_CACHE_DIR / safe
+    return CRITIC_CACHE_DIR / bundle_fingerprint() / safe
 
 
 def bundle_paths(slug: str) -> tuple[Path, Path]:
