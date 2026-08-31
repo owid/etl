@@ -76,10 +76,27 @@ def read_bundle(slug: str, ttl_hours: float = DEFAULT_TTL_HOURS) -> dict[str, An
     return payload
 
 
-def write_bundle(slug: str, summary: str, png: bytes | None, notes: list[str], data_available: bool) -> None:
+def write_bundle(
+    slug: str,
+    summary: str,
+    png: bytes | None,
+    notes: list[str],
+    data_available: bool,
+    extremes_params: str = "",
+) -> None:
     meta_path, png_path = bundle_paths(slug)
     meta_path.parent.mkdir(parents=True, exist_ok=True)
-    meta_path.write_text(json.dumps({"summary": summary, "notes": notes, "data_available": data_available}, indent=1))
+    meta_path.write_text(
+        json.dumps(
+            {
+                "summary": summary,
+                "notes": notes,
+                "data_available": data_available,
+                "extremes_params": extremes_params,
+            },
+            indent=1,
+        )
+    )
     if png is not None:
         png_path.write_bytes(png)
 

@@ -33,8 +33,8 @@ import rich_click as click
 from rich.console import Console
 from rich.table import Table
 
-from apps.chart_critic import cache, report
-from apps.chart_critic.bundle import GRAPHER_URL, Bundle, ChartGone, build
+from apps.chart_critic import cache, fixtures, report
+from apps.chart_critic.bundle import GRAPHER_URL, Bundle, ChartGone, build, render
 from apps.chart_critic.critic import (
     CHEAP_MODEL,
     DEFAULT_MODEL,
@@ -142,17 +142,22 @@ def _merge(issues: list[dict[str, Any]], new: dict[str, Any]) -> None:
 
 def _review_one(
     slug: str,
-    views: int,
+    pageviews: int,
     model: str,
     with_image: bool,
     dry_run: bool,
     repeat: int = 1,
     use_cache: bool = True,
     ttl_hours: float = cache.DEFAULT_TTL_HOURS,
+    views: int = 1,
+    params: str = "",
 ) -> dict[str, Any]:
-    result: dict[str, Any] = {"slug": slug, "views": views, "issues": [], "cost": 0.0, "status": "ok", "cached": 0}
+    result: dict[str, Any] = {"slug": slug, "views": pageviews, "issues": [], "cost": 0.0, "status": "ok", "cached": 0}
     try:
         bundle: Bundle = build(slug, with_image=with_image, use_cache=use_cache, ttl_hours=ttl_hours)
+        if params and with_image:
+            # An explicit view was asked for; review that instead of the default.
+            bundle.png = render(slug, params)
     except ChartGone:
         result["status"] = "gone"
         return result
@@ -166,8 +171,21 @@ def _review_one(
         result["status"] = "not reviewed (dry run)"
         return result
 
+    extra_views: list[tuple[str, bytes]] = []
+    if views > 1 and with_image and bundle.extremes_params:
+        try:
+            extra_views.append(
+                (
+                    f"the same chart at ?{bundle.extremes_params} — the entities holding the highest and "
+                    "lowest values in the series, which the default view does not show",
+                    render(slug, bundle.extremes_params),
+                )
+            )
+        except Exception:  # noqa: BLE001 — a second view is a bonus, not a requirement
+            pass
+
     agent = build_agent(model)
-    parts = prompt_parts(bundle)
+    parts = prompt_parts(bundle, extra_views)
     found: list[dict[str, Any]] = []
     in_tokens = out_tokens = 0
 
@@ -201,6 +219,8 @@ def _review_one(
     result["issues"] = sorted(found, key=lambda i: (-i["passes"], i["severity"]))
     result["passes"] = max(repeat, 1)
     result["bundle_cached"] = bundle.from_cache
+    result["views_reviewed"] = 1 + len(extra_views)
+    result["extremes_params"] = bundle.extremes_params
     result["input_tokens"], result["output_tokens"] = in_tokens, out_tokens
     result["cost"] = _cost(model, in_tokens, out_tokens)
     return result
@@ -229,6 +249,28 @@ def _review_one(
     default=1,
     show_default=True,
     help="Review each chart N times and union the findings. The model is not reproducible, so this is the recall dial.",
+)
+@click.option(
+    "--eval",
+    "run_eval",
+    is_flag=True,
+    help="Run the known-answer fixtures instead of a sweep, and exit nonzero if any regressed.",
+)
+@click.option(
+    "--views",
+    type=int,
+    default=1,
+    show_default=True,
+    help=(
+        "How many views of each chart to show: 1 is the default view; 2 adds the entities holding the "
+        "highest and lowest values, which is where implausible numbers usually hide."
+    ),
+)
+@click.option(
+    "--params",
+    type=str,
+    default="",
+    help="Review a specific view of every requested chart, e.g. 'country=~COM&time=2014..latest'.",
 )
 @click.option("--workers", type=int, default=6, show_default=True, help="Charts reviewed in parallel.")
 @click.option(
@@ -263,6 +305,8 @@ def cli(
     cheap: bool,
     no_image: bool,
     repeat: int,
+    views: int,
+    params: str,
     workers: int,
     output: Path | None,
     json_out: Path | None,
@@ -270,6 +314,7 @@ def cli(
     no_cache: bool,
     clear_cache: bool,
     cache_ttl: float,
+    run_eval: bool,
 ) -> None:
     if clear_cache:
         removed, freed = cache.clear()
@@ -279,13 +324,21 @@ def cli(
     if cheap:
         model = CHEAP_MODEL
 
+    if run_eval:
+        # Five passes, because that is what was measured to reach 8/8: at two passes the two
+        # subtlest cases (a subtitle typo and a baseline offset) are missed about half the time,
+        # and a regression test that cries wolf is worse than one that costs 22 cents.
+        _evaluate(model, not no_image, max(repeat, 5), not no_cache, cache_ttl)
+        return
+
     use_cache = not no_cache
     charts_cached, reviews_cached, cache_mb = cache.stats()
     targets = _select(slugs, sample, top, min_views, seed)
     console.print(
         f"[bold]Reviewing {len(targets)} charts[/bold] with {model}"
         f"{' (no renders)' if no_image else ''}"
-        f"{f', {repeat} passes each' if repeat > 1 else ''}{' — dry run' if dry_run else ''}"
+        f"{f', {repeat} passes each' if repeat > 1 else ''}"
+        f"{f', {views} views each' if views > 1 else ''}{' — dry run' if dry_run else ''}"
     )
     if use_cache and charts_cached:
         console.print(
@@ -319,6 +372,61 @@ def cli(
     if output:
         report.write(results, output, model=model)
         console.print(f"report → {output}")
+
+
+def _evaluate(model: str, with_image: bool, repeat: int, use_cache: bool, ttl_hours: float) -> None:
+    """Run the fixtures and report which known answers the critic still gets right."""
+    console.print(
+        f"[bold]Evaluating against {len(fixtures.CASES)} known-answer cases[/bold] with {model}, {repeat} passes each"
+    )
+    results = []
+    with cf.ThreadPoolExecutor(min(len(fixtures.CASES), 6)) as ex:
+        futures = {
+            ex.submit(
+                _review_one, c.slug, 0, model, with_image, False, repeat, use_cache, ttl_hours, c.views, c.params
+            ): c
+            for c in fixtures.CASES
+        }
+        for fut in cf.as_completed(futures):
+            case = futures[fut]
+            r = fut.result()
+            results.append((case, r, fixtures.matches(case, r["issues"])))
+
+    table = Table(title="Known-answer evaluation")
+    table.add_column("chart")
+    table.add_column("expects")
+    table.add_column("result")
+    table.add_column("what the critic said", max_width=54)
+    for case, r, ok in sorted(results, key=lambda x: (x[2], x[0].slug)):
+        expects = "finds: " + ", ".join(case.expect_keywords) if case.expect_keywords else "nothing"
+        said = "; ".join(i["claim"] for i in r["issues"])[:200] or "—"
+        verdict = "[green]PASS[/green]" if ok else "[red]FAIL[/red]"
+        if case.guards_against and ok:
+            verdict += " [dim](guard)[/dim]"
+        table.add_row(case.slug, expects, verdict, said)
+    console.print(table)
+
+    passed = sum(1 for _, _, ok in results if ok)
+    found = [(c, r) for c, r, ok in results if c.expect_keywords and ok]
+    clean_ok = [(c, r) for c, r, ok in results if not c.expect_keywords and ok]
+    cost = sum(r["cost"] for _, r, _ in results)
+    console.print(
+        f"\n[bold]{passed}/{len(results)} cases pass[/bold] — "
+        f"{len(found)}/{sum(1 for c in fixtures.CASES if c.expect_keywords)} known errors found, "
+        f"{len(clean_ok)}/{sum(1 for c in fixtures.CASES if not c.expect_keywords)} clean charts left alone"
+        f" · ${cost:.4f}"
+    )
+    for case, r, ok in results:
+        if not ok:
+            console.print(f"[red]FAIL[/red] {case.slug}: {case.why}")
+            if case.guards_against:
+                console.print(f"       this case guards against: {case.guards_against}")
+    if passed < len(results):
+        console.print(
+            "\n[dim]The model is not reproducible — re-run before treating a single failure as a "
+            "regression. A fixture can also fail because the chart was fixed; check, then update the case.[/dim]"
+        )
+        raise SystemExit(1)
 
 
 def _print_summary(results: list[dict[str, Any]], model: str) -> None:

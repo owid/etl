@@ -24,7 +24,7 @@ from urllib.request import Request, urlopen
 
 import pandas as pd
 
-from apps.chart_critic import cache
+from apps.chart_critic import cache, chart_config
 
 GRAPHER_URL = "https://ourworldindata.org/grapher"
 
@@ -60,6 +60,10 @@ class Bundle:
     data_available: bool = True
     notes: list[str] = field(default_factory=list)
     from_cache: bool = False
+    # Query params for a second view worth reviewing: the entities holding the highest and
+    # lowest value in the series, which is where implausible numbers tend to live and which the
+    # default view almost never shows.
+    extremes_params: str = ""
 
     @property
     def url(self) -> str:
@@ -68,6 +72,23 @@ class Bundle:
 
 def _fetch(url: str) -> bytes:
     return urlopen(Request(url, headers=HEADERS), timeout=120).read()
+
+
+def _extremes_params(df: pd.DataFrame, time_col: str, col: str) -> str:
+    """``country=CODE~CODE`` for the entities at the extremes of one indicator."""
+    series = df[["Entity", "Code", time_col, col]].dropna(subset=[col])
+    if series.empty or "Code" not in series:
+        return ""
+    codes = []
+    for idx in (series[col].idxmax(), series[col].idxmin()):
+        code = series.loc[idx, "Code"]
+        if isinstance(code, str) and code and code not in codes:
+            codes.append(code)
+    if not codes:
+        return ""
+    years = series[time_col]
+    span = f"&time={years.min()}..latest" if pd.api.types.is_integer_dtype(years) else ""
+    return f"country=~{'~'.join(codes)}{span}"
 
 
 def _numeric_summary(df: pd.DataFrame) -> list[str]:
@@ -112,7 +133,11 @@ def render(slug: str, params: str = "") -> bytes:
 
 
 def build(
-    slug: str, with_image: bool = True, use_cache: bool = True, ttl_hours: float = cache.DEFAULT_TTL_HOURS
+    slug: str,
+    with_image: bool = True,
+    use_cache: bool = True,
+    ttl_hours: float = cache.DEFAULT_TTL_HOURS,
+    with_config: bool = True,
 ) -> Bundle:
     """Fetch and assemble the review bundle for one chart slug.
 
@@ -130,6 +155,7 @@ def build(
                 data_available=cached["data_available"],
                 notes=list(cached["notes"]),
                 from_cache=True,
+                extremes_params=cached.get("extremes_params", ""),
             )
 
     bundle = Bundle(slug=slug)
@@ -162,11 +188,21 @@ def build(
             columns={c: c.capitalize() for c in df.columns if c.lower() in ("entity", "code", "year", "day")}
         )
         lines += _numeric_summary(df)
+        time_col = "Year" if "Year" in df.columns else ("Day" if "Day" in df.columns else df.columns[2])
+        numeric = [
+            c for c in df.columns if c not in ("Entity", "Code", time_col) and pd.api.types.is_numeric_dtype(df[c])
+        ]
+        if numeric:
+            bundle.extremes_params = _extremes_params(df, time_col, numeric[0])
     except (HTTPError, ValueError) as e:
         bundle.data_available = False
         reason = str(e)[:120]
         bundle.notes.append(f"values unavailable: {reason}")
         lines.append(f"\ndata: not available to this reviewer ({reason})")
+
+    config = chart_config.fetch(slug) if with_config else None
+    if config:
+        lines += chart_config.summarize(config)
 
     bundle.summary = "\n".join(lines)
 
@@ -174,6 +210,8 @@ def build(
         bundle.png = _fetch(f"{GRAPHER_URL}/{slug}.png")
 
     if use_cache:
-        cache.write_bundle(slug, bundle.summary, bundle.png, bundle.notes, bundle.data_available)
+        cache.write_bundle(
+            slug, bundle.summary, bundle.png, bundle.notes, bundle.data_available, bundle.extremes_params
+        )
 
     return bundle

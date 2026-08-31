@@ -87,6 +87,7 @@ Look for anything that would make a reader believe something false:
 - a unit, denominator or scale that is wrong
 - a breakdown pointing the wrong way (a share, sex, age or income split that is inverted)
 - coverage or aggregation that misleads
+- a chart that renders empty, or stops before its data does
 
 Judge the numbers against what you know actually happened. A war, an epidemic or a policy
 change can move a series enormously and legitimately; say nothing about those.
@@ -98,6 +99,12 @@ trend. Say so when a discontinuity looks like an artefact of measurement rather 
 For each issue, set chart_params to the grapher query parameters that put the problem on
 screen — the entity and time range you are talking about — so a reviewer sees it immediately
 rather than the chart's default view.
+
+Your knowledge of definitions and thresholds may be out of date, and the chart's own metadata
+is more current than you are. Do not flag a definition, a poverty line, a classification or a
+unit convention merely because it differs from what you remember — flag it only when the chart
+contradicts itself or contradicts its own data. (A real example of getting this wrong: objecting
+that the International Poverty Line is not $3 per day, when it was revised to exactly that.)
 
 Do not invent problems. An ordinary chart has no issues, and returning an empty list is the
 expected outcome for most charts."""
@@ -114,7 +121,7 @@ def build_agent(model: str = DEFAULT_MODEL) -> Agent[None, Review]:
     return Agent[None, Review](model=model, output_type=Review, retries=2)
 
 
-def prompt_parts(bundle: Bundle) -> list[str | BinaryContent]:
+def prompt_parts(bundle: Bundle, extra_views: list[tuple[str, bytes]] | None = None) -> list[str | BinaryContent]:
     """The user turn: the render, then the metadata and numbers, then the instruction.
 
     The instruction goes **here rather than in the agent's system instructions**, and the
@@ -133,7 +140,13 @@ def prompt_parts(bundle: Bundle) -> list[str | BinaryContent]:
     """
     parts: list[str | BinaryContent] = []
     if bundle.png:
+        parts.append("Image 1 — the chart's default view, as a reader first sees it:")
         parts.append(BinaryContent(data=bundle.png, media_type="image/png"))
+    # Extra views matter because the default view is usually not where a problem is visible.
+    # In #we-need-to-correct-it almost every reported chart link carries query parameters.
+    for i, (label, png) in enumerate(extra_views or [], start=2):
+        parts.append(f"Image {i} — {label}:")
+        parts.append(BinaryContent(data=png, media_type="image/png"))
     parts.append(bundle.summary)
     parts.append(INSTRUCTIONS.format(today=dt.date.today().isoformat()))
     return parts
