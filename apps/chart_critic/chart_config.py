@@ -55,11 +55,25 @@ def fetch(slug: str) -> dict[str, Any] | None:
     return json.loads(raw) if isinstance(raw, str) else raw
 
 
+def _clean_axis(axis: dict[str, Any]) -> dict[str, Any]:
+    """Drop axis bounds that are grapher's auto-scale sentinel rather than a real limit.
+
+    ``yAxis: {"max": 0}`` means "scale automatically", not "cap the axis at zero" — the default
+    for a great many charts. Passing it through unexplained produced confident false positives
+    ("the y-axis maximum is set to 0, breaking the chart") on ``wheat-production`` and
+    ``cocoa-bean-production``, both of which render perfectly. ``min: 0`` is left alone: starting
+    an axis at zero is a real and common choice.
+    """
+    return {k: v for k, v in axis.items() if not (k == "max" and v == 0)}
+
+
 def summarize(config: dict[str, Any]) -> list[str]:
     """Describe the configuration in the same flat style as the rest of the bundle."""
     lines = ["\nchart configuration (what this chart is set to show):"]
     for key in KEYS:
         value = config.get(key)
+        if key in ("yAxis", "xAxis") and isinstance(value, dict):
+            value = _clean_axis(value)
         if value in (None, "", [], {}):
             continue
         if key in ("title", "subtitle", "note"):

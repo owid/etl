@@ -96,6 +96,14 @@ CASES: list[Case] = [
         "from the superseded $2.15 figure. Fixed by telling it the chart's metadata is more current than "
         "its own knowledge of definitions.",
     ),
+    Case(
+        slug="wheat-production",
+        why="Renders fine. Its config carries yAxis {'max': 0, 'min': 0}, which is grapher's "
+        "auto-scale sentinel, not a zero ceiling.",
+        guards_against="Adding the chart config to the bundle made the critic report 'the y-axis maximum "
+        "is set to 0, breaking the chart' at high confidence, on this chart and cocoa-bean-production. "
+        "Fixed by dropping max: 0 from the config summary.",
+    ),
     Case(slug="literacy", why="An ordinary chart. Nothing wrong with it."),
     Case(slug="real-gdp-growth", why="An ordinary chart, and one where year-to-year swings are genuine."),
 ]
