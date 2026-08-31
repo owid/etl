@@ -33,8 +33,8 @@ import rich_click as click
 from rich.console import Console
 from rich.table import Table
 
-from apps.chart_critic import report
-from apps.chart_critic.bundle import Bundle, ChartGone, build
+from apps.chart_critic import cache, report
+from apps.chart_critic.bundle import GRAPHER_URL, Bundle, ChartGone, build
 from apps.chart_critic.critic import (
     CHEAP_MODEL,
     DEFAULT_MODEL,
@@ -49,6 +49,10 @@ from etl.db import read_sql
 console = Console()
 
 SEVERITY_COLOR = {"high": "red", "medium": "yellow", "low": "cyan"}
+
+# Grapher query parameters the model is allowed to put in a link. Anything else it invents is
+# dropped rather than passed through into a URL a reviewer will click.
+ALLOWED_PARAMS = {"country", "time", "tab", "region", "stackMode", "mapSelect", "facet", "yScale", "xScale"}
 
 # Charts below this get little enough traffic that a finding is rarely worth a ticket.
 DEFAULT_MIN_VIEWS = 2000
@@ -104,6 +108,17 @@ def _cost(model: str, input_tokens: int, output_tokens: int) -> float:
         return input_tokens / 1e6 * rate_in + output_tokens / 1e6 * rate_out
 
 
+def chart_link(slug: str, params: str = "") -> str:
+    """A chart URL, carrying only query parameters that grapher actually understands."""
+    clean = []
+    for pair in (params or "").lstrip("?").split("&"):
+        key, _, value = pair.partition("=")
+        key, value = key.strip(), value.strip()
+        if key in ALLOWED_PARAMS and value and re.fullmatch(r"[A-Za-z0-9_~.\-]+", value):
+            clean.append(f"{key}={value}")
+    return f"{GRAPHER_URL}/{slug}" + ("?" + "&".join(clean) if clean else "")
+
+
 def _claim_tokens(claim: str) -> set[str]:
     return {w for w in re.findall(r"[a-z0-9]{4,}", claim.lower())}
 
@@ -125,10 +140,19 @@ def _merge(issues: list[dict[str, Any]], new: dict[str, Any]) -> None:
     issues.append(new | {"passes": 1})
 
 
-def _review_one(slug: str, views: int, model: str, with_image: bool, dry_run: bool, repeat: int = 1) -> dict[str, Any]:
-    result: dict[str, Any] = {"slug": slug, "views": views, "issues": [], "cost": 0.0, "status": "ok"}
+def _review_one(
+    slug: str,
+    views: int,
+    model: str,
+    with_image: bool,
+    dry_run: bool,
+    repeat: int = 1,
+    use_cache: bool = True,
+    ttl_hours: float = cache.DEFAULT_TTL_HOURS,
+) -> dict[str, Any]:
+    result: dict[str, Any] = {"slug": slug, "views": views, "issues": [], "cost": 0.0, "status": "ok", "cached": 0}
     try:
-        bundle: Bundle = build(slug, with_image=with_image)
+        bundle: Bundle = build(slug, with_image=with_image, use_cache=use_cache, ttl_hours=ttl_hours)
     except ChartGone:
         result["status"] = "gone"
         return result
@@ -151,20 +175,32 @@ def _review_one(slug: str, views: int, model: str, with_image: bool, dry_run: bo
     # chart it raises a genuine finding on some and not others. Measured on three charts with
     # known findings, one pass caught 1-2 of them and three passes caught all three. So a pass
     # count is a recall dial, and at these prices it is cheap to turn up.
-    for _ in range(max(repeat, 1)):
+    bundle_hash = cache.content_hash(bundle.summary, bundle.png)
+    for pass_index in range(max(repeat, 1)):
+        if use_cache:
+            hit = cache.read_review(slug, model, bundle_hash, pass_index)
+            if hit is not None:
+                for issue in hit:
+                    _merge(found, issue)
+                result["cached"] += 1
+                continue
         try:
             run = agent.run_sync(parts)
         except Exception as e:  # noqa: BLE001 — one pass failing should not end the sweep
             result["status"] = f"review failed: {str(e)[:90]}"
             break
-        for issue in run.output.issues:
-            _merge(found, issue.model_dump())
+        issues = [i.model_dump() for i in run.output.issues]
+        for issue in issues:
+            _merge(found, issue)
+        if use_cache:
+            cache.write_review(slug, model, bundle_hash, pass_index, issues)
         usage = run.usage
         in_tokens += usage.input_tokens or 0
         out_tokens += usage.output_tokens or 0
 
     result["issues"] = sorted(found, key=lambda i: (-i["passes"], i["severity"]))
     result["passes"] = max(repeat, 1)
+    result["bundle_cached"] = bundle.from_cache
     result["input_tokens"], result["output_tokens"] = in_tokens, out_tokens
     result["cost"] = _cost(model, in_tokens, out_tokens)
     return result
@@ -204,6 +240,19 @@ def _review_one(slug: str, views: int, model: str, with_image: bool, dry_run: bo
 @click.option(
     "--dry-run", is_flag=True, help="Build the bundles and print what would be reviewed, without calling the model."
 )
+@click.option("--no-cache", is_flag=True, help="Ignore the cache and re-fetch and re-review everything.")
+@click.option(
+    "--clear-cache",
+    is_flag=True,
+    help="Delete the cache and exit. Editing the prompt or the schema already invalidates it on its own.",
+)
+@click.option(
+    "--cache-ttl",
+    type=float,
+    default=cache.DEFAULT_TTL_HOURS,
+    show_default=True,
+    help="Hours a cached chart bundle stays fresh. Use -1 to keep bundles indefinitely.",
+)
 def cli(
     slugs: str | None,
     sample: int | None,
@@ -218,16 +267,31 @@ def cli(
     output: Path | None,
     json_out: Path | None,
     dry_run: bool,
+    no_cache: bool,
+    clear_cache: bool,
+    cache_ttl: float,
 ) -> None:
+    if clear_cache:
+        removed, freed = cache.clear()
+        console.print(f"Cleared {removed} cached files ({freed:.1f} MB) from {cache.CRITIC_CACHE_DIR}")
+        return
+
     if cheap:
         model = CHEAP_MODEL
 
+    use_cache = not no_cache
+    charts_cached, reviews_cached, cache_mb = cache.stats()
     targets = _select(slugs, sample, top, min_views, seed)
     console.print(
         f"[bold]Reviewing {len(targets)} charts[/bold] with {model}"
         f"{' (no renders)' if no_image else ''}"
         f"{f', {repeat} passes each' if repeat > 1 else ''}{' — dry run' if dry_run else ''}"
     )
+    if use_cache and charts_cached:
+        console.print(
+            f"[dim]cache: {charts_cached} charts, {reviews_cached} reviews, {cache_mb:.1f} MB "
+            f"(algorithm {cache.algo_fingerprint()})[/dim]"
+        )
 
     results: list[dict[str, Any]] = []
     with cf.ThreadPoolExecutor(workers) as ex:
@@ -238,9 +302,11 @@ def cli(
             if r["issues"]:
                 console.print(f"  [red]●[/red] {r['slug']} — {len(r['issues'])} issue(s)")
                 for i in r["issues"]:
+                    i["url"] = chart_link(r["slug"], i.get("chart_params", ""))
                     colour = SEVERITY_COLOR.get(i["severity"], "white")
                     seen = f" [dim]({i['passes']}/{r['passes']} passes)[/dim]" if r.get("passes", 1) > 1 else ""
                     console.print(f"      [{colour}]{i['severity']}/{i['kind']}[/{colour}] {i['claim']}{seen}")
+                    console.print(f"      [link={i['url']}][blue underline]{i['url']}[/blue underline][/link]")
             elif r["status"] != "ok":
                 console.print(f"  [dim]○ {r['slug']} — {r['status']}[/dim]")
 
@@ -270,7 +336,10 @@ def _print_summary(results: list[dict[str, Any]], model: str) -> None:
         for i in r["issues"]:
             colour = SEVERITY_COLOR.get(i["severity"], "white")
             views = f"{r['views']:,}" if r["views"] else "—"
-            table.add_row(r["slug"], views, f"[{colour}]{i['severity']}[/{colour}]", i["kind"], i["claim"])
+            url = i.get("url") or chart_link(r["slug"], i.get("chart_params", ""))
+            table.add_row(
+                f"[link={url}]{r['slug']}[/link]", views, f"[{colour}]{i['severity']}[/{colour}]", i["kind"], i["claim"]
+            )
     if flagged:
         console.print(table)
 

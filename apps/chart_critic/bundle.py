@@ -24,6 +24,8 @@ from urllib.request import Request, urlopen
 
 import pandas as pd
 
+from apps.chart_critic import cache
+
 GRAPHER_URL = "https://ourworldindata.org/grapher"
 
 # A browser-like UA. Without it the JSON and CSV endpoints answer 403 (the PNG does not).
@@ -57,6 +59,7 @@ class Bundle:
     summary: str = ""
     data_available: bool = True
     notes: list[str] = field(default_factory=list)
+    from_cache: bool = False
 
     @property
     def url(self) -> str:
@@ -102,13 +105,33 @@ def _numeric_summary(df: pd.DataFrame) -> list[str]:
     return lines
 
 
-def build(slug: str, with_image: bool = True) -> Bundle:
+def render(slug: str, params: str = "") -> bytes:
+    """The chart's PNG for a specific view, e.g. ``params="country=~CAF&time=2000..latest"``."""
+    query = f"?{params.lstrip('?')}" if params else ""
+    return _fetch(f"{GRAPHER_URL}/{slug}.png{query}")
+
+
+def build(
+    slug: str, with_image: bool = True, use_cache: bool = True, ttl_hours: float = cache.DEFAULT_TTL_HOURS
+) -> Bundle:
     """Fetch and assemble the review bundle for one chart slug.
 
     Raises:
         ChartGone: the slug does not resolve (deleted chart, or an explorer).
         HTTPError: anything else the endpoints return.
     """
+    if use_cache:
+        cached = cache.read_bundle(slug, ttl_hours=ttl_hours)
+        if cached and (cached.get("png") is not None or not with_image):
+            return Bundle(
+                slug=slug,
+                png=cached["png"] if with_image else None,
+                summary=cached["summary"],
+                data_available=cached["data_available"],
+                notes=list(cached["notes"]),
+                from_cache=True,
+            )
+
     bundle = Bundle(slug=slug)
 
     try:
@@ -149,5 +172,8 @@ def build(slug: str, with_image: bool = True) -> Bundle:
 
     if with_image:
         bundle.png = _fetch(f"{GRAPHER_URL}/{slug}.png")
+
+    if use_cache:
+        cache.write_bundle(slug, bundle.summary, bundle.png, bundle.notes, bundle.data_available)
 
     return bundle

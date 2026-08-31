@@ -62,6 +62,15 @@ class Issue(BaseModel):
     evidence: str = Field(description="The specific numbers or strings relied on.")
     reader_impact: str = Field(description="What a reader would wrongly conclude.")
     confidence: Literal["high", "medium", "low"]
+    chart_params: str = Field(
+        default="",
+        description=(
+            "Grapher query parameters that make this problem visible, so a reviewer lands on it "
+            "instead of the default view. Use ISO3 codes joined with ~ for entities, e.g. "
+            "'country=~CAF&time=2000..latest' or 'country=~GBR&time=1945..1960&tab=line'. "
+            "Leave empty if the default view already shows it."
+        ),
+    )
 
 
 class Review(BaseModel):
@@ -81,6 +90,10 @@ Look for anything that would make a reader believe something false:
 
 Judge the numbers against what you know actually happened. A war, an epidemic, a policy change
 or a methodology break can move a series enormously and legitimately; say nothing about those.
+
+For each issue, set chart_params to the grapher query parameters that put the problem on
+screen — the entity and time range you are talking about — so a reviewer sees it immediately
+rather than the chart's default view.
 
 Do not invent problems. An ordinary chart has no issues, and returning an empty list is the
 expected outcome for most charts."""

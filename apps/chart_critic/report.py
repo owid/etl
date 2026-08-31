@@ -12,7 +12,7 @@ import html
 from pathlib import Path
 from typing import Any
 
-from apps.chart_critic.bundle import GRAPHER_URL, build
+from apps.chart_critic.bundle import render
 
 CSS = """
 :root{--bg:#f7f6f3;--panel:#fff;--ink:#1b1b1b;--soft:#4a4a4a;--muted:#767676;--line:#e2ded6;
@@ -55,6 +55,7 @@ SEV_CLASS = {"high": "hi", "medium": "md", "low": "lo"}
 
 def _finding(result: dict[str, Any], issue: dict[str, Any], png: bytes | None) -> str:
     sev = issue.get("severity", "low")
+    url = issue.get("url") or f"https://ourworldindata.org/grapher/{result['slug']}"
     parts = [
         f'<div class="f {sev}">',
         '<div class="tags">',
@@ -64,10 +65,11 @@ def _finding(result: dict[str, Any], issue: dict[str, Any], png: bytes | None) -
         f'<span class="tag bl">{html.escape(issue.get("kind", "?"))}-level</span>',
         f'<span class="tag lo">{result["views"]:,} views/yr</span>' if result["views"] else "",
         "</div>",
-        f'<h3><a href="{GRAPHER_URL}/{result["slug"]}">{html.escape(issue.get("claim", ""))}</a></h3>',
+        f'<h3><a href="{url}">{html.escape(issue.get("claim", ""))}</a></h3>',
         f"<p><b>Evidence:</b> {html.escape(issue.get('evidence', ''))}</p>",
         f"<p><b>A reader would conclude:</b> {html.escape(issue.get('reader_impact', ''))}</p>",
-        f"<p><b>Chart:</b> <code>{html.escape(result['slug'])}</code></p>",
+        f'<p><b>Chart:</b> <a href="{url}"><code>{html.escape(result["slug"])}</code></a>'
+        f"{' — linked to the view showing it' if issue.get('chart_params') else ''}</p>",
     ]
     if png:
         b64 = base64.b64encode(png).decode()
@@ -83,14 +85,16 @@ def write(results: list[dict[str, Any]], path: Path, model: str) -> None:
     cost = sum(r["cost"] for r in results)
     n_issues = sum(len(r["issues"]) for r in flagged)
 
-    # Re-fetch renders only for the charts with findings, so the page carries just those images.
+    # Render each finding's own view rather than the chart's default, so the image shows what
+    # the claim is about.
     cards = []
     for r in flagged:
-        try:
-            png = build(r["slug"], with_image=True).png
-        except Exception:  # noqa: BLE001 — a missing render must not break the report
-            png = None
-        cards += [_finding(r, i, png) for i in r["issues"]]
+        for issue in r["issues"]:
+            try:
+                png = render(r["slug"], issue.get("chart_params", ""))
+            except Exception:  # noqa: BLE001 — a missing render must not break the report
+                png = None
+            cards.append(_finding(r, issue, png))
 
     chips = "\n".join(
         f'<span class="chip"><b>{html.escape(r["slug"])}</b><i>{r["views"]:,}</i></span>'
