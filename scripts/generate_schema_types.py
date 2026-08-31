@@ -205,7 +205,7 @@ class TypedDictGenerator:
                     lines.append(f"    # {desc_line.strip()}")
 
         if quoted:
-            lines.append(f'        "{prop_name}": {python_type},')
+            lines.append(f"        {prop_name!r}: {python_type},")
         else:
             lines.append(f"    {prop_name}: {python_type}")
         return lines
