@@ -13,6 +13,9 @@ Two details worth knowing:
 
 - Dimension parameter names are per-mdim (``metric``, ``antigen``, ``level``, ``sex`` …), so they
   cannot be hard-coded into a link allowlist. :func:`dimension_keys` supplies them.
+- A declared view is not guaranteed to render: measured 2026-08-31, ~82% of sampled mdim views
+  answered 500 from the static render while their interactive pages answered 200 (against ~22%
+  for ordinary charts). So the render is best-effort and a review may be text-only.
 - Choices whose slug ends in ``_side_by_side`` are comparison views rather than a single series.
   They are worth reviewing but are excluded from sampling by default, because a faceted view is
   harder to judge and the single-series views are where a bad number shows plainly.
@@ -54,6 +57,30 @@ def dimension_keys(slug: str) -> set[str]:
     if not cfg:
         return set()
     return {d["slug"] for d in cfg.get("dimensions", []) if d.get("slug")}
+
+
+def all_published_views(include_side_by_side: bool = False) -> dict[str, list[str]]:
+    """``{slug: [params, …]}`` for every published mdim, from one query.
+
+    Used to build a review pool in which an mdim's views compete with ordinary charts. Note the
+    scale: a handful of mdims declare over a hundred views each, so this is a few thousand rows.
+    """
+    try:
+        from etl.db import read_sql
+
+        df = read_sql("SELECT slug, config FROM multi_dim_data_pages WHERE published = 1 AND slug IS NOT NULL")
+    except Exception:  # noqa: BLE001 — without a database there is no pool to build
+        return {}
+
+    out: dict[str, list[str]] = {}
+    for slug, raw in zip(df.slug, df.config):
+        cfg: dict[str, Any] = json.loads(raw) if isinstance(raw, str) else (raw or {})
+        views = [v["dimensions"] for v in cfg.get("views", []) if v.get("dimensions")]
+        if not include_side_by_side:
+            views = [v for v in views if not any(str(x).endswith(SIDE_BY_SIDE) for x in v.values())] or views
+        if views:
+            out[str(slug)] = ["&".join(f"{k}={v}" for k, v in combo.items()) for combo in views]
+    return out
 
 
 def sample_views(slug: str, n: int, seed: int = 0, include_side_by_side: bool = False) -> list[tuple[str, str]]:

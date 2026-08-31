@@ -96,30 +96,58 @@ def _expand_mdims(targets: list[tuple[str, int, str]], mdim_views: int, seed: in
     return expanded
 
 
+def _pool(min_views: int) -> Any:
+    """Everything reviewable, with a weight: ordinary charts, and every view of every mdim.
+
+    An mdim's traffic is recorded only against its base slug — analytics attributes **zero** views
+    to query-string URLs — so per-view popularity does not exist. Rather than pretend otherwise,
+    an mdim's pageviews are split evenly across its declared views. A multi-dim therefore carries
+    the same total weight as a chart with the same readership, spread over the views it offers,
+    and a 112-view mdim contributes many light candidates rather than one heavy one.
+    """
+    import pandas as pd
+
+    charts = _pageviews(min_views)
+    views_by_slug = mdim.all_published_views()
+
+    rows = []
+    for slug, base_views in zip(charts.slug, charts.views_365d):
+        views = views_by_slug.get(slug)
+        if views:
+            share = base_views / len(views)
+            rows += [{"slug": slug, "params": p, "views": int(base_views), "weight": share} for p in views]
+        else:
+            rows.append({"slug": slug, "params": "", "views": int(base_views), "weight": float(base_views)})
+    return pd.DataFrame(rows)
+
+
 def _select(
     slugs: str | None, sample: int | None, top: int | None, min_views: int, seed: int, params: str = ""
 ) -> list[tuple[str, int, str]]:
     if slugs:
         return [(s.strip(), 0, params) for s in slugs.split(",") if s.strip()]
 
-    df = _pageviews(min_views)
-    if df.empty:
-        raise click.ClickException("No pageview data found — is the database reachable?")
-
     if top:
+        df = _pageviews(min_views)
+        if df.empty:
+            raise click.ClickException("No pageview data found — is the database reachable?")
         df = df.head(top)
-    elif sample:
-        import numpy as np
+        return [(slug, int(v), params) for slug, v in zip(df.slug, df.views_365d)]
 
-        if sample > len(df):
-            raise click.ClickException(f"--sample {sample} exceeds the {len(df)} charts above {min_views} views")
-        rng = np.random.default_rng(seed)
-        idx = rng.choice(len(df), size=sample, replace=False, p=df.views_365d / df.views_365d.sum())
-        df = df.iloc[idx]
-    else:
+    if not sample:
         raise click.ClickException("Pass one of --slugs, --sample or --top")
 
-    return [(slug, int(v), params) for slug, v in zip(df.slug, df.views_365d)]
+    import numpy as np
+
+    pool = _pool(min_views)
+    if pool.empty:
+        raise click.ClickException("No pageview data found — is the database reachable?")
+    if sample > len(pool):
+        raise click.ClickException(f"--sample {sample} exceeds the {len(pool)} candidates above {min_views} views")
+    rng = np.random.default_rng(seed)
+    idx = rng.choice(len(pool), size=sample, replace=False, p=pool.weight / pool.weight.sum())
+    picked = pool.iloc[idx]
+    return [(r.slug, int(r.views), r.params) for r in picked.itertuples()]
 
 
 def _cost(model: str, input_tokens: int, output_tokens: int) -> float:
@@ -306,8 +334,8 @@ def _review_one(
     default=0,
     show_default=True,
     help=(
-        "For each multi-dim, review this many of its views instead of just the default one. "
-        "Every combination of a multi-dim's dimensions is a chart a reader can land on."
+        "With --slugs, expand each multi-dim into this many of its views. Not needed with --sample: "
+        "that pool already contains every mdim view, weighted by readership."
     ),
 )
 @click.option(

@@ -222,10 +222,14 @@ def build(
         try:
             bundle.png = render(slug, params)
         except HTTPError as e:
-            # Measured 2026-08-31: the static render answers 500 for roughly 77% of *declared*
-            # multi-dim views (sampled across 11 of 12 mdims), while the interactive page for the
-            # same view answers 200 — so the view is real and only its static export is broken.
-            # Reviewing the metadata and values is still worth doing, so carry on without a picture.
+            # The static render fails often enough that it cannot be a hard requirement. Measured
+            # 2026-08-31, sampling published charts and declared mdim views at low concurrency:
+            # ~22% of ordinary charts and ~82% of mdim views answered 500, while the interactive
+            # page for the same URL answered 200. Some of that was a live degradation rather than a
+            # property of those charts — population-density rendered fine earlier the same day and
+            # 500d hours later — so treat the split, not the absolute rate, as the durable finding:
+            # mdim views fail far more often than ordinary charts.
+            # Either way, metadata and values are still worth reviewing, so carry on without a picture.
             bundle.png = None
             bundle.notes.append(f"no render available (HTTP {e.code}) — reviewed without the image")
 
