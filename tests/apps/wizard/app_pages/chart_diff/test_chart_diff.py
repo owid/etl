@@ -62,7 +62,7 @@ def test_config_uuid_matching_ignores_case():
     assert _is_cross_env_twin(source, target)
 
 
-def test_catalog_path_identifies_etl_chart_twins(monkeypatch):
+def test_catalog_path_identifies_etl_chart_twins():
     from apps.wizard.app_pages.chart_diff.chart_diff import (
         ChartDiff,
         _is_cross_env_twin,
@@ -70,13 +70,6 @@ def test_catalog_path_identifies_etl_chart_twins(monkeypatch):
         _target_updated_at_for_review,
     )
 
-    # catalogPath matching only kicks in when the target (prod) DB has the
-    # columns; the SimpleNamespace charts here aren't bound to a session, so
-    # force the detection on to exercise the logic.
-    monkeypatch.setattr(
-        "apps.wizard.app_pages.chart_diff.chart_diff._target_has_etl_columns",
-        lambda _target_chart: True,
-    )
     source = _chart(100, datetime(2026, 1, 1), "animal_welfare/latest/chart#chart")
     target = _chart(200, datetime(2026, 1, 2), "animal_welfare/latest/chart#chart")
 
