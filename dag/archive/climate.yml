@@ -2882,3 +2882,23 @@ steps:
   # archived; last active in be72221eef2d on 2026-08-21
   data://grapher/climate/2026-07-10/nasa_ozone_hole:
     - data://garden/climate/2026-07-10/nasa_ozone_hole
+  # archived; last active in 5f13da3a11d6 on 2026-08-28
+  data://grapher/climate/2026-08-21/wildfires_by_week:
+    - data://garden/climate/2026-08-21/weekly_wildfires
+  # archived; last active in 5f13da3a11d6 on 2026-08-28
+  data://grapher/climate/2026-08-21/wildfires_by_week_average:
+    - data://grapher/climate/2026-08-21/wildfires_by_week
+  # archived; last active in 5f13da3a11d6 on 2026-08-28
+  data://grapher/climate/2026-08-21/wildfires_by_year:
+    - data://garden/climate/2026-08-21/weekly_wildfires
+  # archived; last active in 5f13da3a11d6 on 2026-08-28
+  data://garden/climate/2026-08-21/weekly_wildfires:
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/faostat/2026-02-25/faostat_rl
+    - data://meadow/climate/2026-08-21/weekly_wildfires
+  # archived; last active in 5f13da3a11d6 on 2026-08-28
+  data://meadow/climate/2026-08-21/weekly_wildfires:
+    - snapshot://climate/2026-08-21/weekly_wildfires.csv
+  # archived; last active in 5f13da3a11d6 on 2026-08-28
+  data://grapher/climate/2026-08-21/weekly_wildfires:
+    - data://garden/climate/2026-08-21/weekly_wildfires

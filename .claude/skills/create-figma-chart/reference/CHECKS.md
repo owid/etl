@@ -25,25 +25,59 @@ Every one of these caught a real defect on this skill's first run, and none of t
 >
 > | group | rows | size |
 > |---|---|---|
-> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 69% of cap |
-> | `series` | series-weight, furniture-weight, furniture-dash | 64% |
-> | `geometry` | box-alignment, gap, margins, off-palette | 60% |
-> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 76% |
+> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 74% of cap |
+> | `series` | series-weight, furniture-weight, furniture-dash | 68% |
+> | `geometry` | box-alignment, gap, margins, off-palette | 65% |
+> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 90% |
 >
-> Groups combine, so the whole pass is two calls: `--rows type,series` (41,982) then
-> `--rows geometry,annotations` (43,597, **87% of cap** — the figure `inline_script.py --check`
-> reports: it measures **these two calls**, declared as `DOCUMENTED_CALLS` in the script, rather
-> than the smallest split it could find for itself — an optimiser would go on reporting a
-> comfortable number by picking a split nobody is told to send. Change the pair here and there
-> together; `--check` fails if their groups no longer cover the file exactly once.
-> Read its **`floor`** column beside that percentage: `sent` is what today's two calls cost and can
-> always be bought down by re-splitting, while `floor` is the preamble plus the single largest row
-> group — the smallest any call can be, whatever the split. `verify_page.js` reads **87% sent against
-> a 76% floor**, so re-splitting still buys real room; when the floor itself passes the cap, slicing is
-> exhausted and the only move left is splitting the script into separate files with their own
-> preambles. `--check` fails on that and warns past 85%.
-> **Run all four** — each reports its own rows and nothing else, so a group you skip is a group
+> Groups combine, so the whole pass is **three calls**: `--rows annotations` (45,163), `--rows series`
+> (34,217), `--rows type,geometry` (42,489) — measured 2026-08-28. Three and not four because the
+> preamble is byte-identical across slices and each row group is a self-contained block after it
+> (GOTCHAS.md → Running the scripts has the `cmp` proof and the composition rule); concatenating
+> verbatim blocks is not the hand-rolled subset forbidden below, since nothing is reimplemented.
+>
+> `inline_script.py --check` reports the largest of the three, **90% of cap**. It measures **these
+> declared calls**, held as `DOCUMENTED_CALLS` in the script, rather than the smallest split it could
+> find for itself — an optimiser would go on reporting a comfortable number by picking a split nobody is
+> told to send. Change the calls here and there together.
+>
+> Read the **`floor`** column beside the `sent` percentage, because they answer different questions:
+> `sent` is what today's declared calls cost and can always be bought down by re-splitting, while `floor`
+> is the preamble plus the single largest row group — the smallest any call can be, whatever the split.
+> `verify_page.js` now reads **90% sent against a 90% floor**, because `annotations` alone *is* the
+> largest call.
+>
+> **`--check` exits 1 in three distinct cases, and the remedy is different in each — read which one you
+> are in off the output:**
+>
+> | output | what it means | remedy |
+> |---|---|---|
+> | `OVER CAP` beside the `sent` column | the largest **documented** call is over the cap, so the pass as written does not run | **repartition**: declare a split whose largest call fits, here and in `DOCUMENTED_CALLS` together |
+> | `FLOOR OVER CAP` | preamble + the largest single row group is itself over the cap | repartitioning **cannot** help — move rows into a separate script with its own preamble |
+> | `in the file but never sent` / `documented but not in the file` / `sent by more than one call` | `DOCUMENTED_CALLS` and the file's `#region` markers have drifted apart, so the measurement describes a workflow nobody sends | bring this doc and the constant back into step |
+>
+> The two-call pass this file prescribed until 2026-08-28 was the **first** case, not the second:
+> `--rows geometry,annotations` had reached 50,594 characters (101% of cap) while the floor was still
+> 45,163 (90%, under it), so repartitioning was available — and the three calls above are that
+> repartition.
+>
+> **A floor past 85% is a WARNING and exit stays 0.** `verify_page.js` prints `floor at 90% —
+> re-splitting is nearly exhausted` today and still passes: it says the second case is approaching, not
+> that anything is broken. Re-measure both places when the script next grows.
+> **Run all three** — each reports its own rows and nothing else, so a group you skip is a group
 > nobody checked.
+>
+> **Budget for this: relaying the pass is the single largest time cost in a run.** The benchmark's second
+> run took 48 min against a 30.8 min baseline, and roughly 17 min of the difference was relaying these
+> groups verbatim — the baseline never ran them at all. Three composed calls and `Read` instead of `cat`
+> (GOTCHAS.md) is most of that back. It is still worth paying: on that run the pass caught two defects that
+> no screenshot showed and that the build's own measurements had passed.
+>
+> **Run `geometry` once on the FITTED chart, before you add labels and annotations.** Its `box-alignment`
+> row judges the fit, and a fit defect does not heal — on that run it was present from Step 7 onward and
+> was only found at the end, costing a diagnose-fix-reverify cycle with the annotations already built on
+> top of it. One early `geometry` call is cheaper than that cycle, and the rest of the pass still runs
+> after the last change.
 > `diff_against_template.js` (~12,000 stripped) needs none of this.
 >
 > **Do NOT substitute a hand-rolled subset. It is worse than skipping the pass, and this is
@@ -63,6 +97,15 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > tier, annotation block gap, and the series polylines the annotation-overlap row needs. Done one at
 > a time those are a dozen round trips at ~8-10s each.
 >
+> **`label-contrast-on-background` is blind to an annotation built the prescribed way — expect it to skip
+> and compute those by hand.** Bolding the category word (which the house convention requires) makes
+> `node.fills` report `figma.mixed`, so the row's `Array.isArray(n.fills)` guard yields `null` for the fill,
+> the annotation drops out of its candidate list, and the row says *"no label__*/annotation__* text sits on
+> the frame's own background"* — on a frame with two annotations. An end label named anything but
+> `label__*` is invisible to it for a second reason. Measured on the benchmark's second run: both
+> annotations and the end label skipped, and computed by hand they were 6.79:1 (`#5b5b5b`), 5.66:1 (Rusty
+> Orange) and 5.45:1 (Denim) against white — all passing. Report the numbers; do not report the row as
+> covered.
 > **Every row it cannot judge comes back `SKIPPED` with the reason and the tool that owns it** —
 > colour-vision and grayscale (`color_audit.py`), spelling (`codespell`), the data-truth row
 > (`/adversarial-data-review`), entity completeness (needs the *effective* selection from outside
@@ -272,7 +315,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Direct labels name what they sit on | for each category label, compare its **fill** against the fill of the segment it names, and its **x** against that segment's edges in the reference row | the color is identical (same bound style, not merely a close hex) and the label is anchored on its own segment. A direct label carries the swatch's job with none of the swatch's proximity, so a mispaired one is unfalsifiable by eye |
 | Direct labels readable as text | `contrast(labelHex, "#ffffff")` for every category label drawn on the background | **4.5:1**. The same color must also clear 4.5:1 against the white value label inside its bar — a palette that only clears one of the two has to move (Step 8) |
 | Text size | read `fontSize` off every text node | nothing below **12px**; annotations on the named ladder |
-| Mark weight | read `strokeWeight` off **every** line and halo, after the last scale | on a highlight treatment: context **1px** (the settled value — GUIDELINES.md → Highlighting; 1.5px is the reference-page treatment this skill tells you not to copy), protagonist **3px**, halo 2× (or line+1 where nothing crosses). Read it even when you never set it — and especially *because* you never set it: `rescale()` multiplies stroke weight, so fitting a chart to the band took grapher's 2.5px lines down to **0.88px** hairlines on a frame that otherwise measured perfect. Set the weights explicitly *after* the final scale, never before |
+| Mark weight | read `strokeWeight` off **every** line and halo, after the last scale | on a highlight treatment: context **1px** (the settled value — GUIDELINES.md → Highlighting; 1.5px is the reference-page treatment this skill tells you not to copy), protagonist **3px**, halo 2× (or line+1 where nothing crosses). With **no** highlight treatment every series takes that same house pair — **3px line, 4px halo** — which is what `verify_page.js` gates on (`HOUSE_LINE`/`HOUSE_HALO`, and it is not frame-width dependent). Read it even when you never set it — and especially *because* you never set it: `rescale()` multiplies stroke weight, so fitting a chart to the band took grapher's 2.5px lines down to **0.88px** hairlines on a frame that otherwise measured perfect. Set the weights explicitly *after* the final scale, never before |
 | Furniture weight | read `strokeWeight` **and `dashPattern`** off the gridlines, the zero line and the tick marks | all **1px** — but the dash target is **per node type**, not blanket: the dashed gridlines are `[4, 4]`, while the **zero line and the tick marks are solid** and must keep an **empty `dashPattern`**. Applying one `[4, 4]` target to all three restyles the furniture instead of unscaling it. The safe repair is conditional — reset the weight everywhere, and only re-dash a node that already had a dash pattern, scaling its existing values back rather than assigning new ones. `rescale()` thins these too, and they are the easiest properties in the frame to miss because you never touch them and "don't restyle the grid" reads as "don't look at it": a 0.7× height fit left every gridline at **0.7px with a [2.81, 2.81] dash**, i.e. a visibly fainter, finer grid than any OWID chart ships. Restore them in the same pass as the series weights |
 | Label-on-fill contrast | `contrast(labelHex, barHex)` for every in-bar label | **4.5:1** at 13.5px regular — the 3:1 large-text allowance does not apply |
 | Text hierarchy | list every distinct `fontSize` with what it belongs to, **and its rank** | title > subtitle ≥ annotations > supporting text ≥ labels. Sizes may vary inside the plot by rank; a lead annotation may *equal* the subtitle (Annotation XL 16) but nothing may exceed it, and same-rank items must share a size |
@@ -286,6 +329,21 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Every pointer lands on its target | for each leader, the **terminal vertex** (transformed, not the bbox) vs the thing it names — the country's own **ink** on a map, the band border at the stated year on a chart | the dot or tip is inside/on its target, and where the text names a year, at that year's x — with the first and last year taken from the plot's edge, not the tick label's centre. **A country's bounding box is not the target.** Countries are concave and multi-part, so a point can sit well inside the box and still be in open ocean — the US box reaches past Hawaii, an antimeridian straddler's spans the whole Pacific (see the map fit in `reference/per-chart-type/maps.md`). **Do it in VECTORS first — it is exact, and it is one call.** Transform the terminal into the country's local space through the inverse of its `absoluteTransform`, parse its `vectorPaths` into rings, and ray-cast. No renders, no masks, and it caught a leader whose terminal sat in the Bay of Bengal while its bbox test passed. Fall back to the **pixel** mask — hide the country vector, diff the renders, require the dot within ~1px of that pixel set — only where the vector test cannot answer: a country a few pixels across whose ring is smaller than the dot, or a shape whose fill rule makes the ray-cast ambiguous |
 | Nothing in the margins | every visible mark's `absoluteBoundingBox` vs the content band | no ink outside **16…524** on a 540-wide frame. A speck left in the margin after a map fit renders as a cut sliver at the frame edge |
 | How much is on the page | count the plot-bearing objects anywhere on the page — `countries-with-data` groups on a map, the equivalent plot group otherwise — and name what each one is for | one per **intended** item: the deliverable, plus the reference copies you meant to place. A third is clutter. **Do not check this by testing top-level children for overlap** — that answers a different question and answers it "clean": on one page three world maps sat at three distinct positions, so an overlap test passed twice while the reader was looking at a pile of near-identical maps in the left-hand column, one of which displayed the export's own legend/map collision. The reader's question is *how many of this thing am I looking at*, and only a count answers it. Watch the truncation trap too: a per-item node census keyed on a **shortened** name silently merged `<slug>` with `<slug> — original SVG (unstyled)` into one bucket, which is how a 467-node count for a 233-node frame read as normal |
+
+**A stroke weight read out of the embed SVG is in the EXPORT CANVAS's units, and the fit then scales
+it — so it is the weight the line *starts* at, never the one it arrives at.** Never take it as a
+target. The target is the house pair above, and if you want to see it confirmed at delivery size, the
+**reference copy** in the page's left-hand column is grapher's own export at 1:1 — compare **per unit
+of plot width**, since the two charts' plots differ. This is the data-line twin of the furniture rule
+in [FITTING.md](FITTING.md): restoring grapher's exported *number* is not restoring its delivered
+*weight*, in either direction — furniture ships too thin and lines too thick.
+
+(Measured: an 879-wide embed declaring `stroke-width="1.5"` arrived at **0.94px** after a 0.58 fit.
+Setting 1.5 as the "restored" weight shipped a chart at 3.9 units of stroke per 1000px of plot against
+the reference export's **8.9**. **The run had skipped `verify_page.js` and hand-rolled its own rows** —
+whose stroke assertion compared against the 1.5 it had just chosen, so it could not fail. The real
+gate would have failed it outright at `HOUSE_LINE`. That is the warning above this table arriving in
+practice, and it is why the row to trust is the script's, not one you write while holding the answer.)
 
 **For arrows, drop vectors entirely and probe the rendered pixels.** Arrow groups are rotated, so every vector-space measurement of theirs is wrong (see Gotchas), and "very close but never on top" is a pixel property anyway. Screenshot the frame at 1:1, take the arrow's **`absoluteBoundingBox`** in frame coordinates, and inside it measure how close the arrow's pixels come to the target line's.
 
@@ -338,8 +396,9 @@ clear" from "I measured nothing", which is the whole reason these return a code 
 **What it does not buy is arithmetic speed — measured, on the same three renders.** The all-pairs
 loop it replaces is `O(arrow × target)` against a linear distance transform, and that only pays at
 scale: at a 1× probe the loop wins (**0.01 s** against **0.32 s**, since the script pays numpy and
-scipy import), the two draw around 2×, and only at the **4×** render the hairline check requires
-does the loop fall behind (**1.61 s** against **0.31 s**, 8.9M pairs). Both agree on the answer at
+scipy import), the two draw around 2×, and only at the scaled render the hairline check requires
+does the loop fall behind (**1.61 s** against **0.31 s**, 8.9M pairs — measured at 4×, before
+that check moved to the **3×** the 540 family actually exports at). Both agree on the answer at
 every scale. So reach for the script for what it guards, not for what it computes: the loop's
 numbers were never wrong, its *failure modes* were. `touching` is also clarified rather than
 changed — it counted *pairs* within 1.5px, exactly the 3×3 neighbourhood, and the script reports
@@ -355,8 +414,8 @@ resampling, not of the chart, and it looks exactly like a real defect. So: `get_
 `maxDimension` downscales, and the desktop server caps the longer edge at **1024px** (Gotchas) — a
 540-wide frame is safe on either, but the **616×1096 Reel arrives at 576×1024 from the desktop
 server**, already resampled. For a pixel probe on a frame taller or wider than 1024, use the hosted
-`get_screenshot` at natural size, or the 4× clone trick. Same reason the arrow renders are specified
-at 1:1 above.
+`get_screenshot` at natural size, or the clone trick at your family's export scale (NODE-MAP.md →
+Export scale per family). Same reason the arrow renders are specified at 1:1 above.
 
 Verified under fake AA (supersample, area-average down): masks hold their size at every separation
 and `min_gap` tracks the true gap exactly. Note `min_gap` is the distance between pixel *centres*,
@@ -375,7 +434,7 @@ absolute box starts at **100.0**, and the second reports raw `x: 536.7, width: 2
 absolute `495.1, 41.7` — crop from the raw numbers and you probe empty canvas.
 
 The same script covers the other two pixel checks: `contrast` for a hairline (the sub-pixel stroke
-trap in Gotchas — measure it on the 4× clone, not the 540px preview) and `ink-box` for "nothing in
+trap in Gotchas — measure it on the 3× clone, not the 540px preview) and `ink-box` for "nothing in
 the margins", which reads the true extent of everything that paints. Run against a stock 540 frame,
 `ink-box` returns `[16, 16, 524, 524]` — the content band this file specifies — with the background
 inferred rather than declared.
@@ -537,6 +596,27 @@ mock, and both changes make a row *less* red on purpose. Read them before treati
   `[3,2]` allowance belongs to a slope chart's native **zero line**, not to the whole solid-by-design
   bucket: granted in bulk it also accepted an ordinary tick or axis line dashed `[3,2]`, which this
   document permits nowhere.
+
+## Audit the SKIPPED rows before you report, and say which of the three they are
+
+A dozen rows come back `SKIPPED`, and they are not one thing. Sort every one into **N/A here** (no arrows
+on this chart, no legend, not a map), **done by hand this run** (with the number), or **genuinely still
+open** (with who owns it). A report that lists them all as "skipped" understates the coverage in the first
+two cases and overstates it in none — which sounds safe and is not, because the reader cannot see which
+rows actually needed doing.
+
+Measured on the benchmark's second run, where the first report got this wrong: **two rows were satisfied
+and reported as skipped anyway** — `entities-all-render` (one entity selected via `country=~CHL`, one
+rendered, so it passes trivially) and `text-hierarchy-ranks` (25 > 16 > 15 = 15 > 14, same-rank items
+sharing a size). **One was genuinely open and had to be run afterwards**: `text-true-of-indicator`, because
+the subtitle had been *trimmed* from the indicator's `descriptionShort` — six components folded into four —
+which is a claim about what the producer measures and needs checking against the producer, not against the
+chart. The rest were legitimately N/A. So the audit is not paperwork: it found one real gap out of thirteen.
+
+**A trimmed subtitle is the recurring one.** Shortening the indicator's own description to fit a DI is
+normal and often right, but it converts a producer's wording into your paraphrase, so it belongs in
+`text-true-of-indicator` rather than in the layout rows. State the trim explicitly when you report, and name
+what was dropped, so a topic owner can accept or reject it.
 
 ## A skip with a false reason is the failure mode, not a wrong number
 

@@ -4,8 +4,9 @@
 Two problems this solves, and the first one is a hard blocker:
 
   * **`verify_page.js` does not fit.** `use_figma` caps `code` at 50,000 characters and that file is
-    ~79,000 — so Step 8c's "runs the mechanical rows in ONE read-only call" is impossible as written.
-    Stripped of comments it is ~45,000, which fits but leaves you relaying 90% of the cap verbatim.
+    ~134,000 — so Step 8c's "runs the mechanical rows in ONE read-only call" is impossible as written.
+    Stripped of comments it is ~68,000, which does not fit either, so the pass runs as the three
+    `--rows` slices CHECKS.md prescribes; the largest of them relays 90% of the cap verbatim.
   * **Reading a script to paste it costs the model context twice** — once for the Read, once for the
     tool call. Piping this straight into the call skips the Read entirely.
 
@@ -20,7 +21,7 @@ the output can go straight into the call.
     .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js \
         --rows series --frame-id 26417:6
     .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js \
-        --rows type,series                                      # groups combine
+        --rows type,geometry                                    # groups combine
 
 Stripping is context-aware, not a regex. These files contain `https://` inside strings, regex
 literals holding `/*`, and template literals spanning lines — a naive `//`-to-end-of-line strip
@@ -48,7 +49,7 @@ REGION = re.compile(r"^//\s*#(region\s+\S+|endregion)\s*$")
 # The calls reference/CHECKS.md tells an operator to send, per script. `--check` measures THESE.
 # Keep the two in step: this list is the workflow, and the doc is where a human reads it.
 DOCUMENTED_CALLS: dict[str, list[tuple[str, ...]]] = {
-    "verify_page.js": [("type", "series"), ("geometry", "annotations")],
+    "verify_page.js": [("annotations",), ("series",), ("type", "geometry")],
 }
 
 
@@ -277,15 +278,16 @@ def main() -> int:
         # already refused above CROWDED.
         #
         # But the largest SINGLE group is not the answer either: `--rows` combines groups, and the
-        # documented pass is two calls covering all of them (CHECKS.md), so nobody sends one slice at
+        # documented pass covers all of them in three calls (CHECKS.md), so nobody sends one slice at
         # a time. So measure THE DOCUMENTED CALLS, the ones an operator is actually told to send —
         # not the best split this script can find for itself. Minimising over every partition answers
         # a question nobody asked, and it can hold the check green by discovering an undocumented
-        # split while the workflow in the doc is over the cap. Measured on this file: 16,000 more
-        # characters in `annotations` puts the documented `geometry,annotations` call at 50,314 —
-        # over the cap and refused — while `annotations` alone against the other three peaks at
-        # 45,131, so the optimiser would report 90% and exit 0 for a workflow that no longer runs.
-        # The number has to be the one the operator will hit.
+        # split while the workflow in the doc is over the cap. That is not hypothetical: growth in
+        # `annotations` took the then-documented `geometry,annotations` call to 50,594 — over the cap
+        # and refused — while `annotations` alone measured 45,163, so an optimiser would have reported
+        # 90% and exited 0 for a workflow that no longer ran. This check failed instead, and the doc
+        # and the list above were re-split to three calls. The number has to be the one the operator
+        # will hit.
         failed = False
         print(f"{'script':<30} {'raw':>8} {'stripped':>9} {'sent':>9} {'of cap':>8} {'floor':>8}")
         for p in sorted(SCRIPTS.glob("*.js")):

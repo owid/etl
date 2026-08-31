@@ -8,8 +8,8 @@ as `chart_config_id` in the config YAML. The endpoint has upsert semantics: if n
 chart with that UUID exists yet, the admin creates a minimal draft chart carrying
 it. Nothing is ever looked up per environment, so the same YAML addresses the
 same chart everywhere. Admin-authored edits live in
-`chart_configs.patch` and are preserved across ETL re-pushes by construction
-(ETL and admin write to different rows).
+the chart's admin layer (`charts.patchConfigId`) and are preserved across ETL re-pushes by
+construction (ETL and admin write to different rows).
 """
 
 import secrets
@@ -76,9 +76,9 @@ def upsert_collection_as_chart(collection: "Collection", owid_env: OWIDEnv) -> i
     # in the same request, a new chart's admin patch starts out (almost) empty, so
     # the ETL layer owns all fields — notably `dimensions` — from birth. New charts
     # are unpublished drafts with indicator inheritance enabled (the admin's
-    # default for new charts). Server-side, `full` is recomputed as
-    # merge(variableETL, etlConfig, existing patch), so any admin patches already
-    # in chart_configs.patch are preserved.
+    # default for new charts). Server-side, the rendered config is recomputed as
+    # merge(indicator config, etlConfig, existing admin layer), so anything already
+    # authored in the admin is preserved.
     log.info("collection.chart.upsert", slug=slug, chart_config_id=chart_config_id)
     result = admin_api.upsert_chart_etl_config(
         chart_config_id=chart_config_id,

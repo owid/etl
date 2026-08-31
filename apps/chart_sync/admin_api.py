@@ -436,6 +436,39 @@ class AdminAPI:
             raise AdminAPIError({"error": js.get("error"), "narrative_chart_id": narrative_chart_id, "config": config})
         return js
 
+    def delete_variables(self, variable_ids: list[int]) -> dict:
+        """Delete variables, leaving alone any that a chart, a published explorer or a live
+        multi-dim view still uses.
+
+        Grapher owns the delete because it owns the schema around it: the tables holding a
+        `variableId` foreign key, and the `chart_configs` rows (and their R2 objects) that a
+        variable leaves behind. It deletes what it safely can and reports the rest back;
+        deciding whether a variable still used by a chart should fail the run is left to the
+        caller, which is why nothing here raises on `blocked`.
+
+        Args:
+            variable_ids: The variables to remove
+
+        Returns:
+            {"deleted": [variable_id],
+             "blocked": [{"variableId", "variableName", "usedBy", "ref"}]}
+
+            `usedBy` is "chart", "explorer" or "multiDimView"; `ref` is the chart's slug (or
+            its id when the config has none), the explorer slug, or `catalogPath#viewId`.
+        """
+        # Retry in case we're restarting Admin on staging server. This is idempotent — a
+        # variable already gone stays gone — so repeating it is safe.
+        resp = requests_with_retry().post(
+            f"{self.owid_env.admin_api}/variables/delete",
+            headers=self._headers(),
+            json={"variableIds": variable_ids},
+            timeout=TIMEOUT,
+        )
+        js = self._json_from_response(resp)
+        if not js.get("success", True):
+            raise AdminAPIError({"error": js.get("error"), "variable_ids": variable_ids})
+        return js
+
     def set_dataset_archived(self, dataset_id: int, is_archived: bool, user_id: int | None = None) -> dict:
         """Set the archived status of a dataset.
 
@@ -473,7 +506,15 @@ def requests_with_retry() -> requests.Session:
     # grapher-build's DB migrations run concurrently with this build (see owid/ops#540).
     # `read=1` keeps a hung server from multiplying TIMEOUT by the full retry budget; the
     # status retries are the ones worth spending.
-    retries = Retry(total=5, read=1, backoff_factor=1, status_forcelist=[401, 500, 502, 503, 504])
+    # POST is not retryable by default because urllib3 can't know whether a POST is safe to
+    # repeat. Ours are: only route an idempotent POST through this session.
+    retries = Retry(
+        total=5,
+        read=1,
+        backoff_factor=1,
+        status_forcelist=[401, 500, 502, 503, 504],
+        allowed_methods=Retry.DEFAULT_ALLOWED_METHODS | {"POST"},
+    )
     # One adapter for both schemes: pool_maxsize covers the upsert thread pool that calls
     # put_grapher_config concurrently, so threads don't discard each other's connections.
     adapter = HTTPAdapter(max_retries=retries, pool_maxsize=20)

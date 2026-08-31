@@ -384,6 +384,55 @@
                 "type": "string"
             }
         },
+        "download_package": {
+            "type": "object",
+            "title": "Complete-dataset download package",
+            "description": "Where the pre-built \"download the complete dataset\" package for this collection was published. Not authored by hand: Collection.save() builds the package, uploads it to R2, and fills this in. Absent when no package was built.",
+            "requirement_level": "optional",
+            "guidelines": [
+                [
+                    "Never set this by hand -- it records the output of a build, and a stale value points readers at an object that no longer matches the data."
+                ],
+                [
+                    "Pass `download_package=False` to `Collection.save()` to publish a collection without a package."
+                ]
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "url": {
+                    "type": "string",
+                    "description": "Public URL of the zip (wide CSV + metadata.json + readme.md), for the download button."
+                },
+                "parquetUrl": {
+                    "type": "string",
+                    "description": "Public URL of the same data as Parquet, for reading with code."
+                },
+                "metadataUrl": {
+                    "type": "string",
+                    "description": "Public URL of the standalone metadata.json accompanying the Parquet."
+                },
+                "indicatorCount": {
+                    "type": "integer",
+                    "description": "Number of indicator columns in the package."
+                },
+                "rowCount": {
+                    "type": "integer",
+                    "description": "Number of data rows in the package."
+                },
+                "sizeBytes": {
+                    "type": "integer",
+                    "description": "Size of the zip in bytes."
+                }
+            },
+            "required": [
+                "url",
+                "parquetUrl",
+                "metadataUrl",
+                "indicatorCount",
+                "rowCount",
+                "sizeBytes"
+            ]
+        },
         "dimensions": {
             "type": "array",
             "title": "Collection dimensions",

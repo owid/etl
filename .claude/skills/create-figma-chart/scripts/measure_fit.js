@@ -45,6 +45,18 @@
 //                  `nextPass` solves the numbers and leaves you to rebuild the request by hand —
 //                  which is where a selection or a view param gets dropped and the re-export quietly
 //                  comes back with different data.
+//     reserveRightPx — px of the content width that an ornament added AFTER the fit will occupy on
+//                  the right edge. The GROUP must stop short by that much for the ornament's own
+//                  edge to land on the content edge, so both the x-map target and the pass-2
+//                  `--band` below solve for `contentW - reserveRightPx` rather than the full box.
+//                  Set **5** for the house 10x10 end dot on a single-series line chart whose end
+//                  label sits UNDER the last point (reference/per-chart-type/line.md). Leaving it
+//                  0 there is the trap this parameter exists for: the group fills the box, the dot
+//                  you add next overhangs it, `box-alignment` fails, and undoing it costs a whole
+//                  second fit — the corrective rescale re-thins every furniture stroke and knocks
+//                  the type off its ladder. It matters most in `nextPass`: without it that command
+//                  re-emits the UN-narrowed band, so following the docs as printed reproduces the
+//                  overhang the first pass was solved to avoid.
 //     originalGroupId — the untouched reference import of the SAME format, left on the page beside
 //                  the frame. Given it, this checks stroke widths: `rescale()` multiplies them, so
 //                  a fitted chart's data line comes out thinner than grapher shipped it (measured
@@ -69,6 +81,7 @@ const CONFIG = {
   imFontSize: null, // the imFontSize the probe was requested at, e.g. 30
   targetGap: 14, // px per end the fit aims for; 12-16 on 540-wide frames, 30 on the IG portrait
   targetLabel: 13.5, // final label px the probe was solved for; the portrait ladder uses 15
+  reserveRightPx: 0, // px reserved for an ornament added AFTER the fit; 5 = the house end dot (see USAGE)
   slug: "", // slug the probe came from, e.g. "life-expectancy"; an explorer view needs its path, "explorers/<slug>"
   params: "", // the probe's extra query params, e.g. "country=USA~CHN" or an MDim view
   originalGroupId: null, // the untouched reference import of the same format, for stroke checks
@@ -80,6 +93,7 @@ const hideNames = CONFIG.hideNames || [];
 const hideIds = CONFIG.hideIds || [];
 const targetGap = CONFIG.targetGap ?? 14;
 const targetLabel = CONFIG.targetLabel ?? 13.5;
+const reserveRightPx = CONFIG.reserveRightPx ?? 0;
 const slug = CONFIG.slug || "";
 const params = CONFIG.params || "";
 
@@ -138,6 +152,11 @@ const band = bandTop !== null && footerTop !== null ? { top: bandTop, bottom: r(
 // near 0, i.e. "nothing left to close", which is the one answer this script exists to produce.
 const contentX = header ? r(header.x) : null;
 const contentW = header ? r(header.width) : null;
+// The width the chart GROUP must actually land on. An ornament added after the fit occupies the
+// last `reserveRightPx` of the content box, so the group has to stop short of it. Everything that
+// targets a width uses this, never the raw contentW — solving the full box is exactly what made
+// `nextPass` re-emit the un-narrowed band and reproduce the overhang.
+const fitW = contentW === null ? null : r(contentW - reserveRightPx);
 
 // The union over the template's own rows, kept as a cross-check and NOT used for the scale. The
 // group and the logo are excluded — the group via its top-level ancestor, since it is the ancestor,
@@ -328,7 +347,7 @@ if (groupNode) {
     // diagnostic — the leftover width is. `xMapShortfall` is what the closed-form x-map has to
     // close, and it IS the aspect miss expressed in px; a value far from 0 means re-export.
     widthAtFitScale: fitScale === null ? null : r(w * fitScale),
-    xMapShortfall: fitScale === null || !contentW ? null : r(contentW - w * fitScale),
+    xMapShortfall: fitScale === null || !fitW ? null : r(fitW - w * fitScale),
   };
 
   // The second pass, solved rather than guessed: the per-axis inset, which is what makes the SECOND
@@ -339,11 +358,11 @@ if (groupNode) {
   // and the re-export silently returns different data. Runnable as printed, from the repo root:
   // these scripts are committed non-executable like every other script in this directory, and the
   // repo rule is that Python goes through the venv.
-  if (band && contentW) {
+  if (band && fitW) {
     const carry = (slug ? ` --slug ${slug}` : "") + (params ? ` --params '${params}'` : "");
     const cmd =
       ".venv/bin/python .claude/skills/create-figma-chart/scripts/solve_export.py" +
-      ` --band ${contentW}x${r(band.height)} --gap ${targetGap}`;
+      ` --band ${fitW}x${r(band.height)} --gap ${targetGap}`;
     if (CONFIG.declared) {
       const [dw, dh] = CONFIG.declared;
       const insetX = r(dw - w);
@@ -469,7 +488,7 @@ if (groupNode) {
 
 return {
   frame: { id: frame.id, name: frame.name, w: fb ? r(fb.width) : null, h: fb ? r(fb.height) : null },
-  contentBox: { x: contentX, w: contentW, from: header ? "header" : null },
+  contentBox: { x: contentX, w: contentW, reserveRightPx, fitW, from: header ? "header" : null },
   contentBoxFromRows: { x: rowsX, w: rowsW },
   header: header ? { id: header.id, name: header.name, y: r(header.y), h: r(header.height) } : null,
   footer: footer ? { id: footer.id, name: footer.name, y: r(footer.y), h: r(footer.height), layoutMode: footer.layoutMode } : null,
@@ -494,7 +513,10 @@ return {
     // height-first fit: |gap error| = |xMapShortfall| / (2 x measured aspect), so at the aspects
     // these templates run (~1.4-1.6) the two trip at very nearly the same aspect miss.
     group && group.xMapShortfall !== null && Math.abs(group.xMapShortfall) > 6
-      ? `the height-fitted group lands ${group.xMapShortfall}px off the ${contentW}px content width — that leftover IS the aspect miss in px, and it is more than the x-map should be asked to close. Re-export with the \`nextPass\` command above (read \`nextPassNote\` first if it is set). The ${targetGap}px gap per end is already correct by construction, so do not judge this fit by the gap.`
+      ? `the height-fitted group lands ${group.xMapShortfall}px off the ${fitW}px it has to fill${reserveRightPx ? ` (the ${contentW}px content box, less ${reserveRightPx}px reserved for an ornament added after the fit)` : ""} — that leftover IS the aspect miss in px, and it is more than the x-map should be asked to close. Re-export with the \`nextPass\` command above (read \`nextPassNote\` first if it is set). The ${targetGap}px gap per end is already correct by construction, so do not judge this fit by the gap.`
+      : null,
+    reserveRightPx < 0 || (contentW !== null && reserveRightPx >= contentW)
+      ? `CONFIG.reserveRightPx is ${reserveRightPx}, which is not a slice of the ${contentW}px content box — the fit target came out ${fitW}. It is the ornament's own overhang past the plot, so 5 for the house 10x10 end dot, or 0 when nothing is added after the fit.`
       : null,
     group && group.nextPass && !slug
       ? "CONFIG.slug is empty, so `nextPass` solves the numbers but prints no curl — solve_export.py emits the re-export command only with `--slug`. Set `slug` (and `params`, for a country selection or an MDim view) to what the probe used, so the second pass runs as printed instead of being rebuilt by hand."
