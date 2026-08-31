@@ -88,8 +88,12 @@ Look for anything that would make a reader believe something false:
 - a breakdown pointing the wrong way (a share, sex, age or income split that is inverted)
 - coverage or aggregation that misleads
 
-Judge the numbers against what you know actually happened. A war, an epidemic, a policy change
-or a methodology break can move a series enormously and legitimately; say nothing about those.
+Judge the numbers against what you know actually happened. A war, an epidemic or a policy
+change can move a series enormously and legitimately; say nothing about those.
+
+A change in how something was *measured* is different, and worth flagging: a survey redesign,
+a rebased index or a source switch produces a jump that a reader will read as a real-world
+trend. Say so when a discontinuity looks like an artefact of measurement rather than an event.
 
 For each issue, set chart_params to the grapher query parameters that put the problem on
 screen — the entity and time range you are talking about — so a reviewer sees it immediately
