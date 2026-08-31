@@ -111,6 +111,14 @@ steps:
         - data://garden/demography/2024-07-15/population
 
 
+  # Long-run net migration for Ireland (CSO)
+  data://grapher/migration/2026-08-05/ireland_net_migration:
+    - data://garden/migration/2026-08-05/ireland_net_migration:
+      - data://meadow/migration/2026-08-05/ireland_net_migration:
+        - snapshot://migration/2026-08-05/ireland_population_change.json
+        - snapshot://migration/2026-08-05/ireland_components_of_population_change.json
+        - snapshot://migration/2026-08-05/ireland_net_emigration_1871_1926.csv
+
   # UN DESA migration flows S3 JSON export (2024)
   export://s3/un_migration/latest/migration_stock_flows_json:
     - data://garden/demography/2024-07-15/population
