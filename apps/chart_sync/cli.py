@@ -17,6 +17,7 @@ from apps.wizard.app_pages.chart_diff.chart_diff import (
     ChartDiffsLoader,
     configs_are_equal,
     get_deleted_charts,
+    patch_paths_lost_by_sync,
     same_config_uuid,
     tags_are_equal,
 )
@@ -103,6 +104,9 @@ def cli(
     - You get a notification if the chart **_has been modified on live_** after staging server was created.
     - If the chart is pending in chart-diff, you'll get a warning and Slack notification
     - Deleted charts are **_not synced_**.
+    - A chart created on this branch is **_not overwritten_** if it carries edits in `TARGET` that
+      `SOURCE` doesn't have: you get a warning and a Slack notification naming those fields. Note a
+      field you deleted in `SOURCE` looks the same from here, so use `--ignore-conflicts` to sync it.
     - Use `--ignore-conflicts` to sync approved charts ignoring conflicts. Useful when syncing between staging servers.
 
     **Considerations on tags:**
@@ -291,6 +295,45 @@ def cli(
 
                         # Change has been approved, update the chart
                         if diff.is_approved:
+                            # A chart this branch created has no counterpart in the target at
+                            # review time, so its approval records no target version and never
+                            # goes stale (unlike an existing chart's — see
+                            # `_target_updated_at_for_review`). The target's own ETL creates the
+                            # chart after the merge, and if someone edits it there before this
+                            # runs, the approval still matches and we would overwrite them.
+                            # Compare what each side authored and refuse instead. Tags count too:
+                            # `set_tags` below replaces the target's set wholesale, and adding a
+                            # tag in the target moves no timestamp (grapher's `setChartTags`
+                            # rewrites `chart_tags` without touching `charts.updatedAt`), so
+                            # nothing else would notice one going missing.
+                            # A field the reviewer *deleted* on the source looks the same from
+                            # here as one added in the target, so `--ignore-conflicts` is the way
+                            # to say "I know, sync anyway", as it is for every other conflict.
+                            lost = (
+                                patch_paths_lost_by_sync(
+                                    diff.target_chart.load_patch_config(target_session),
+                                    diff.source_chart.load_patch_config(source_session),
+                                )
+                                + [
+                                    f"tag: {name}"
+                                    for name in sorted(
+                                        {t["name"] for t in target_tags} - {t["name"] for t in source_tags}
+                                    )
+                                ]
+                                if cross_env_twin and not ignore_conflicts
+                                else []
+                            )
+                            if lost:
+                                log.warning(
+                                    "chart_sync.target_edited_after_creation",
+                                    slug=chart_slug,
+                                    chart_id=chart_id,
+                                    target_chart_id=target_chart_id,
+                                    lost=lost,
+                                )
+                                _notify_slack_target_edited(chart_id, str(source), diff, lost, dry_run)
+                                continue
+
                             log.info(
                                 "chart_sync.chart_update",
                                 slug=chart_slug,
@@ -333,6 +376,9 @@ def cli(
                     else:
                         # New chart has been approved
                         if diff.is_approved:
+                            # Say so, as the update path does. Without this a dry run reports
+                            # nothing at all for a chart it would create.
+                            log.info("chart_sync.chart_create", slug=chart_slug, chart_id=chart_id)
                             charts_synced += 1
                             synced_chart_ids.add(chart_id)
                             # Note: New charts don't have old datasets to archive, so no dataset IDs collected
@@ -433,6 +479,34 @@ def cli(
 
 def _is_commit_sha(source: str) -> bool:
     return re.match(r"[0-9a-f]{40}", source) is not None
+
+
+def _notify_slack_target_edited(chart_id: int, source: str, diff: ChartDiff, lost: list[str], dry_run: bool) -> None:
+    """Report a chart whose target copy carries edits this sync would have dropped.
+
+    Deliberately not the "pending" message: nothing is stale here. The chart was approved, and
+    the approval is still valid, because a chart the branch created has no target version to
+    bind to. What stops the sync is that someone edited the chart in the target's own admin
+    after the target's ETL created it.
+    """
+    assert diff.target_chart
+    target_chart_id = diff.target_chart.id
+
+    message = f"""
+:warning: *ETL chart-sync: Chart Edited In Target, Not Synced* from `{source}`
+<http://{get_container_name(source)}/admin/charts/{chart_id}/edit|View Staging Chart> | <https://admin.owid.io/admin/charts/{target_chart_id}/edit|View Admin Chart>
+Syncing would have dropped these fields, authored in the target's admin: `{"`, `".join(lost)}`
+*Staging Edited*: {str(diff.source_chart.updatedAt)} UTC
+*Production Edited*: {str(diff.target_chart.updatedAt)} UTC
+```
+{_chart_config_diff(diff.target_chart.config, diff.source_chart.config, tabs=0, color=False)}
+```
+    """.strip()
+
+    print(message)
+
+    if config.SLACK_API_TOKEN and not dry_run:
+        send_slack_message(channel="#data-architecture-github", message=message)
 
 
 def _notify_slack_chart_update(chart_id: int, source: str, diff: ChartDiff, dry_run: bool) -> None:

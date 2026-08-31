@@ -1025,6 +1025,8 @@ def build_download_package_for_collection(
     #
     # metadata.json + readme.md
     #
+    # An mdim without a title fails validation long before this point, so absence here is a bug.
+    assert collection.title, f"Collection '{collection.catalog_path}' has no title."
     title = collection.title.get("title")
     metadata_columns = {}
     readme_sections = []

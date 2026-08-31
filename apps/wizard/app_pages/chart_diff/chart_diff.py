@@ -1,6 +1,5 @@
 import datetime as dt
 import difflib
-import functools
 import json
 import pprint
 from dataclasses import dataclass
@@ -11,7 +10,7 @@ import pandas as pd
 from sqlalchemy import select, text
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.orm import Session, defer, object_session
+from sqlalchemy.orm import Session
 from structlog import get_logger
 
 from apps.anomalist.anomalist_api import get_anomalies_for_chart_ids
@@ -142,43 +141,6 @@ class ArticleRef:
             return "0"
 
 
-# TODO: Remove this guard (and the defer() in _get_target_charts) once
-# owid-grapher #6826 — which adds charts.etlConfigCatalogPath and charts.patchConfigIdETL — is
-# merged to master and deployed. Until then PRODUCTION's charts table lacks those
-# columns, so chart-diff (which queries prod) must not select or match on them.
-# We detect their presence at runtime instead of using a manual flag, so the
-# moment prod has the columns chart-diff switches to catalogPath matching on its
-# own — nothing to flip when this lands. While the columns are absent, chart-diff
-# falls back to id+createdAt matching, which makes no practical difference because
-# prod has no ETL-authored (catalogPath) charts yet.
-@functools.lru_cache(maxsize=8)
-def _charts_table_has_etl_columns(engine) -> bool:
-    """Whether the `charts` table behind `engine` has the ETL columns."""
-    with engine.connect() as con:
-        n = con.execute(
-            text(
-                "SELECT COUNT(*) FROM information_schema.COLUMNS "
-                "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'charts' "
-                "AND COLUMN_NAME IN ('etlConfigCatalogPath', 'patchConfigIdETL')"
-            )
-        ).scalar()
-    return n == 2
-
-
-def _target_has_etl_columns(target_chart: gm.Chart | None) -> bool:
-    """Whether the target (production) DB has the ETL chart columns."""
-    if target_chart is None:
-        return False
-    try:
-        session = object_session(target_chart)
-    except Exception:
-        return False
-    if session is None:
-        return False
-    bind = session.get_bind()
-    return _charts_table_has_etl_columns(getattr(bind, "engine", bind))
-
-
 def same_config_uuid(a: str | None, b: str | None) -> bool:
     """Compare two config UUIDs (`charts.configId`) case-insensitively.
 
@@ -196,11 +158,7 @@ def _same_chart_across_envs(source_chart: gm.Chart, target_chart: gm.Chart) -> b
     # creating a chart on production. It's the strongest signal we have.
     if same_config_uuid(source_chart.configId, target_chart.configId):
         return True
-    if (
-        _target_has_etl_columns(target_chart)
-        and source_chart.etlConfigCatalogPath
-        and source_chart.etlConfigCatalogPath == target_chart.etlConfigCatalogPath
-    ):
+    if source_chart.etlConfigCatalogPath and source_chart.etlConfigCatalogPath == target_chart.etlConfigCatalogPath:
         return True
     # Legacy fallback for charts synced before config UUIDs were carried
     # across environments: same numeric id and same creation time.
@@ -214,8 +172,6 @@ def _is_cross_env_twin(source_chart: gm.Chart, target_chart: gm.Chart | None) ->
         return False
     if same_config_uuid(source_chart.configId, target_chart.configId):
         return True
-    if not _target_has_etl_columns(target_chart):
-        return False
     return bool(
         source_chart.etlConfigCatalogPath and source_chart.etlConfigCatalogPath == target_chart.etlConfigCatalogPath
     )
@@ -727,23 +683,8 @@ class ChartDiff:
         chart_ids = source_charts.keys()
 
         if target_session is not None:
-            target_has_cols = _charts_table_has_etl_columns(target_session.get_bind())
             try:
-                if target_has_cols:
-                    target_charts_list = gm.Chart.load_charts(target_session, chart_ids=chart_ids)
-                else:
-                    # prod doesn't have charts.etlConfigCatalogPath/patchConfigIdETL yet, so don't
-                    # SELECT them (it would raise "Unknown column"). See
-                    # _charts_table_has_etl_columns.
-                    target_charts_list = list(
-                        target_session.scalars(
-                            select(gm.Chart)
-                            .where(gm.Chart.id.in_(list(chart_ids)))
-                            .options(defer(gm.Chart.etlConfigCatalogPath), defer(gm.Chart.patchConfigIdETL))
-                        ).all()
-                    )
-                    if not target_charts_list:
-                        raise NoResultFound()
+                target_charts_list = gm.Chart.load_charts(target_session, chart_ids=chart_ids)
             except NoResultFound:
                 target_charts = {}
             else:
@@ -753,23 +694,20 @@ class ChartDiff:
                 }
             # Charts created on staging and synced to production keep their
             # config UUID (charts.configId) but get a fresh numeric id there.
-            # Match still-unmatched charts by config UUID first (the column
-            # exists everywhere), then by catalogPath for ETL-authored charts
-            # synced before config UUIDs were carried across environments
-            # (only possible once prod has the column).
+            # Match still-unmatched charts by config UUID first, then by
+            # catalogPath for ETL-authored charts synced before config UUIDs
+            # were carried across environments.
             for source_chart_id, source_chart in source_charts.items():
                 if target_charts.get(source_chart_id) is not None:
                     continue
 
                 stmt = select(gm.Chart).where(gm.Chart.configId == source_chart.configId)
-                if not target_has_cols:
-                    stmt = stmt.options(defer(gm.Chart.etlConfigCatalogPath), defer(gm.Chart.patchConfigIdETL))
                 twin = target_session.scalars(stmt).one_or_none()
                 if twin is not None:
                     target_charts[source_chart_id] = twin
                     continue
 
-                if target_has_cols and source_chart.etlConfigCatalogPath:
+                if source_chart.etlConfigCatalogPath:
                     try:
                         target_charts[source_chart_id] = gm.Chart.load_chart(
                             target_session, catalog_path=source_chart.etlConfigCatalogPath
@@ -1299,6 +1237,43 @@ def get_chart_diffs_from_grapher(
     chart_diffs = {chart.chart_id: chart for chart in chart_diffs}
 
     return chart_diffs
+
+
+# Bookkeeping keys of an authored layer: grapher writes them itself, so their presence says
+# nothing about anyone having edited the chart.
+_PATCH_BOOKKEEPING_KEYS = ("id", "version", "$schema")
+
+
+def patch_paths_lost_by_sync(
+    target_patch: dict[str, Any] | None, source_patch: dict[str, Any] | None, _prefix: str = ""
+) -> list[str]:
+    """Fields of the target's authored layer that syncing the source over it would drop.
+
+    Chart-sync writes the source chart's config to the target, where the server re-diffs it into
+    the target's authored layer. That layer is then derived entirely from the source, so anything
+    only the target carries is lost. On a chart the branch created, the target's layer starts out
+    holding only the bootstrap `slug`, so anything beyond that was authored in the target's admin.
+
+    Nested fields are compared field by field, not as whole objects: the two sides can each hold a
+    different corner of the same object (`yAxis.min` in the target, `yAxis.max` in the source), and
+    reporting only `yAxis` as shared would let the target's half be dropped silently.
+
+    A field both sides carry is not reported. The source wins there by design, and that difference
+    is the change the reviewer approved in chart-diff — a slug renamed on staging, say.
+    """
+    target_patch = target_patch or {}
+    source_patch = source_patch or {}
+    lost = []
+    for key, target_value in target_patch.items():
+        # Bookkeeping only appears at the top level, and grapher writes it, not a person.
+        if not _prefix and key in _PATCH_BOOKKEEPING_KEYS:
+            continue
+        path = f"{_prefix}{key}"
+        if key not in source_patch:
+            lost.append(path)
+        elif isinstance(target_value, dict) and isinstance(source_patch[key], dict):
+            lost.extend(patch_paths_lost_by_sync(target_value, source_patch[key], f"{path}."))
+    return sorted(lost)
 
 
 def configs_are_equal(config_1: dict[str, Any], config_2: dict[str, Any], verbose=False) -> bool:
