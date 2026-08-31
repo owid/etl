@@ -17,6 +17,7 @@ from apps.wizard.app_pages.chart_diff.chart_diff import (
     ChartDiffsLoader,
     configs_are_equal,
     get_deleted_charts,
+    same_config_uuid,
     tags_are_equal,
 )
 from apps.wizard.utils import get_staging_creation_time
@@ -241,6 +242,7 @@ def cli(
 
                     # Map variable IDs from source to target
                     migrated_config = diff.source_chart.migrate_config(source_session, target_session)
+                    migrated_etl_config = diff.source_chart.migrate_etl_config(source_session, target_session)
 
                     # Get user who edited the chart
                     user_id = diff.source_chart.lastEditedByUserId
@@ -250,29 +252,63 @@ def cli(
 
                     # Chart in target exists, update it
                     if diff.target_chart:
+                        target_chart_id = diff.target_chart.id
+                        # Target row was matched by config UUID or catalogPath
+                        # rather than numeric id (production minted its own row).
+                        cross_env_twin = diff.source_chart.id != diff.target_chart.id and (
+                            same_config_uuid(diff.source_chart.configId, diff.target_chart.configId)
+                            or (
+                                diff.source_chart.etlConfigCatalogPath
+                                and diff.source_chart.etlConfigCatalogPath == diff.target_chart.etlConfigCatalogPath
+                            )
+                        )
+
                         # Check if configs and tags are equal
                         target_tags = diff.target_chart.tags(target_session)
                         configs_equal = configs_are_equal(migrated_config, diff.target_chart.config)
                         tags_equal = tags_are_equal(source_tags, target_tags)
+                        target_etl_config = diff.target_chart.load_etl_config(target_session)
+                        etl_configs_equal = migrated_etl_config == target_etl_config
+                        publication_equal = migrated_config.get("isPublished") == diff.target_chart.config.get(
+                            "isPublished"
+                        )
 
                         # Skip if both configs and tags are equal
-                        if configs_equal and tags_equal:
+                        if (
+                            configs_equal
+                            and tags_equal
+                            and etl_configs_equal
+                            and (not cross_env_twin or publication_equal)
+                        ):
                             log.info(
                                 "chart_sync.skip",
                                 slug=diff.target_chart.slug,
                                 reason="identical chart already exists",
                                 chart_id=chart_id,
+                                target_chart_id=target_chart_id,
                             )
                             continue
 
                         # Change has been approved, update the chart
                         if diff.is_approved:
-                            log.info("chart_sync.chart_update", slug=chart_slug, chart_id=chart_id)
+                            log.info(
+                                "chart_sync.chart_update",
+                                slug=chart_slug,
+                                chart_id=chart_id,
+                                target_chart_id=target_chart_id,
+                            )
                             charts_synced += 1
                             synced_chart_ids.add(chart_id)
                             if not dry_run:
-                                target_api.update_chart(chart_id, migrated_config, user_id=user_id)
-                                target_api.set_tags(chart_id, source_tags, user_id=user_id)
+                                if migrated_etl_config is not None:
+                                    target_api.upsert_chart_etl_config(
+                                        chart_config_id=diff.target_chart.configId,
+                                        grapher_config=migrated_etl_config,
+                                        catalog_path=diff.source_chart.etlConfigCatalogPath,
+                                        user_id=user_id,
+                                    )
+                                target_api.update_chart(target_chart_id, migrated_config, user_id=user_id)
+                                target_api.set_tags(target_chart_id, source_tags, user_id=user_id)
 
                         # Rejected chart diff
                         elif diff.is_rejected:
@@ -284,6 +320,7 @@ def cli(
                                 "chart_sync.pending_chart",
                                 slug=chart_slug,
                                 chart_id=chart_id,
+                                target_chart_id=target_chart_id,
                                 source_updatedAt=str(diff.source_chart.updatedAt),
                                 target_updatedAt=str(diff.target_chart.updatedAt),
                                 staging_created_at=SERVER_CREATION_TIME,
@@ -300,7 +337,23 @@ def cli(
                             synced_chart_ids.add(chart_id)
                             # Note: New charts don't have old datasets to archive, so no dataset IDs collected
                             if not dry_run:
-                                resp = target_api.create_chart(migrated_config, user_id=user_id)
+                                # Carry the source chart's config UUID (its stable
+                                # identity) to the target, so future diffs/syncs
+                                # match the two rows directly instead of relying
+                                # on the id+createdAt heuristic.
+                                source_config_id = diff.source_chart.configId
+                                if migrated_etl_config is not None:
+                                    resp = target_api.upsert_chart_etl_config(
+                                        chart_config_id=source_config_id,
+                                        grapher_config=migrated_etl_config,
+                                        catalog_path=diff.source_chart.etlConfigCatalogPath,
+                                        user_id=user_id,
+                                    )
+                                    target_api.update_chart(resp["chartId"], migrated_config, user_id=user_id)
+                                else:
+                                    resp = target_api.create_chart(
+                                        migrated_config, user_id=user_id, config_id=source_config_id
+                                    )
                                 target_api.set_tags(resp["chartId"], source_tags, user_id=user_id)
                             else:
                                 resp = {"chartId": None}
@@ -384,10 +437,11 @@ def _is_commit_sha(source: str) -> bool:
 
 def _notify_slack_chart_update(chart_id: int, source: str, diff: ChartDiff, dry_run: bool) -> None:
     assert diff.target_chart
+    target_chart_id = diff.target_chart.id
 
     message = f"""
 :warning: *ETL chart-sync: Pending Chart Update Not Synced* from `{source}`
-<http://{get_container_name(source)}/admin/charts/{chart_id}/edit|View Staging Chart> | <https://admin.owid.io/admin/charts/{chart_id}/edit|View Admin Chart>
+<http://{get_container_name(source)}/admin/charts/{chart_id}/edit|View Staging Chart> | <https://admin.owid.io/admin/charts/{target_chart_id}/edit|View Admin Chart>
 *Staging        Edited*: {str(diff.source_chart.updatedAt)} UTC
 *Production Edited*: {str(diff.target_chart.updatedAt)} UTC
 ```
@@ -532,7 +586,9 @@ def _sync_narrative_charts(
     """Sync narrative charts for the given synced parent chart IDs.
 
     When a chart is synced, we also sync all its child narrative charts.
-    Narrative charts are matched by ID between environments.
+    Narrative charts are matched by their config UUID
+    (`narrative_charts.chartConfigId`) between environments — numeric ids are
+    minted independently per environment and may collide.
 
     The sync process:
     1. Fetch the merged config from source via Admin API
@@ -559,8 +615,11 @@ def _sync_narrative_charts(
     )
 
     for source_nc in source_narrative_charts:
-        # Check if narrative chart exists in target by ID
-        target_nc = target_session.get(gm.NarrativeChart, source_nc.id)
+        # Check if the narrative chart exists in target, matched by its config
+        # UUID — the stable cross-environment identity (rows copied from
+        # production keep it; a numeric-id match could be a different chart
+        # that happens to share the id).
+        target_nc = gm.NarrativeChart.load_by_chart_config_id(target_session, source_nc.chartConfigId)
 
         if not target_nc:
             # Narrative chart doesn't exist in target - this is expected if it's new
