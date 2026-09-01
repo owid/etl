@@ -748,13 +748,29 @@ def get_mdim_explorer_views_by_producer(
             mdims["url"] = mdims["chart_view_url"].where(
                 mdims["chart_view_url"].notna(), GRAPHERS_BASE_URL + mdims["slug"]
             )
-            # Titles from the grapher DB.
+            # Title = the actual grapher chart title for each view. Every mdim view resolves to its own
+            # grapher config (chart_configs row named by view_config_id); its `$.title` is the chart title
+            # a reader sees for that view (e.g. "Decadal average: Annual death rate from all natural
+            # disasters"), which is more informative than the mdim title plus the raw dimension selection.
+            vc_list = ", ".join(f"'{v}'" for v in mdims["view_config_id"].dropna().unique())
+            df_view_titles = (
+                OWID_ENV.read_sql(
+                    f"SELECT id AS view_config_id, JSON_UNQUOTE(JSON_EXTRACT(config, '$.title')) AS title "
+                    f"FROM chart_configs WHERE id IN ({vc_list})"
+                )
+                if vc_list
+                else pd.DataFrame(columns=["view_config_id", "title"])
+            )
+            mdims = mdims.merge(df_view_titles, on="view_config_id", how="left")
+            # Fall back to the mdim's own title, then its slug, for any view without a resolved title.
             mdim_list = ", ".join(f"'{s}'" for s in mdim_slugs)
-            df_titles = OWID_ENV.read_sql(
-                f"SELECT slug, JSON_UNQUOTE(JSON_EXTRACT(config, '$.title.title')) AS title "
+            df_mdim_titles = OWID_ENV.read_sql(
+                f"SELECT slug, JSON_UNQUOTE(JSON_EXTRACT(config, '$.title.title')) AS mdim_title "
                 f"FROM multi_dim_data_pages WHERE slug IN ({mdim_list})"
             )
-            mdims = mdims.merge(df_titles, on="slug", how="left")
+            mdims = mdims.merge(df_mdim_titles, on="slug", how="left")
+            mdims["title"] = mdims["title"].fillna(mdims["mdim_title"]).fillna(mdims["slug"])
+            mdims = mdims.drop(columns=["mdim_title"])
             n_days_mdim = get_number_of_days(
                 date_min=date_min, date_max=date_max, table_name=f"{SEMANTIC_LAYER_SCHEMA}.chart_views_detailed"
             )

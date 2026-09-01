@@ -1,6 +1,5 @@
 """Script to generate an analytics report for a data producer."""
 
-import json
 import re
 import urllib.parse
 from datetime import datetime
@@ -95,27 +94,59 @@ def run_sanity_checks(df_charts: pd.DataFrame, df_posts: pd.DataFrame, df_additi
     df_explorer = df_additional_charts[df_additional_charts["type"] == "explorer"]
     assert df_explorer[df_explorer.duplicated(subset=["url"])].empty, error
 
+    # View counts must be well-formed numbers: a NaN means a merge silently dropped a match, a negative
+    # means a subtraction/merge bug. Check every dataframe that carries a `views` column.
+    for name, df in [("charts", df_charts), ("posts", df_posts), ("additional_charts", df_additional_charts)]:
+        assert not df["views"].isna().any(), f"NaN views in df_{name}."
+        assert (df["views"] >= 0).all(), f"Negative views in df_{name}."
 
-def _view_label(dimensions: str | None) -> str:
-    """Human-readable label for an mdim view's dimension selection, e.g. '{"metric": "per_capita",
-    "timespan": "decadal"}' -> 'per capita, decadal'. Empty string if there's nothing to show."""
-    if not isinstance(dimensions, str):
-        return ""
-    try:
-        selection = json.loads(dimensions)
-    except (TypeError, ValueError):
-        return ""
-    return ", ".join(str(value).replace("_", " ") for value in selection.values())
+    # Daily-average columns (only charts and additional_charts carry them) must also be clean non-negatives.
+    for name, df in [("charts", df_charts), ("additional_charts", df_additional_charts)]:
+        assert not df["views_daily"].isna().any(), f"NaN views_daily in df_{name}."
+        assert (df["views_daily"] >= 0).all(), f"Negative views_daily in df_{name}."
+
+    # Additional-charts arithmetic: the reported total is exactly own + redirected, and the
+    # includes_redirect_views flag matches whether any redirected views were folded in.
+    ac = df_additional_charts
+    assert (ac["own_views"] >= 0).all() and (ac["redirected_views"] >= 0).all(), (
+        "Negative component views in df_additional_charts."
+    )
+    assert (ac["views"] == ac["own_views"] + ac["redirected_views"]).all(), (
+        "df_additional_charts: views != own_views + redirected_views."
+    )
+    assert (ac["includes_redirect_views"] == (ac["redirected_views"] > 0)).all(), (
+        "df_additional_charts: includes_redirect_views does not match redirected_views > 0."
+    )
+
+    # View distributions are heavily skewed, not flat: the top 10 charts should draw MORE than their
+    # uniform share (10/N of total views). If they don't, the counts look suspiciously uniform (e.g. a
+    # broken join assigning every chart the same number). Only meaningful with clearly more than 10 charts.
+    n_charts = len(df_charts)
+    if n_charts > 10:
+        total_views = df_charts["views"].sum()
+        top10_views = df_charts["views"].nlargest(10).sum()
+        uniform_share = total_views * (10 / n_charts)
+        assert top10_views > uniform_share, (
+            f"Top 10 charts hold {top10_views:,.0f} views, not more than the uniform-share expectation of "
+            f"{uniform_share:,.0f} (10/{n_charts} of {total_views:,.0f}). Chart view counts look suspiciously flat."
+        )
+
+    # All checks passed (a failure above raises AssertionError). Log a positive confirmation so a run
+    # shows the checks executed and on how much data.
+    log.info(
+        "run_sanity_checks.passed",
+        charts=len(df_charts),
+        posts=len(df_posts),
+        additional_charts=len(df_additional_charts),
+    )
 
 
-def _format_collection_title(title: str, type_: str, dimensions: str | None) -> str:
-    """Display title for a collection row. Each mdim row is a single VIEW, so append its dimension
-    selection to tell the mdim's views apart; explorers get a 'Data Explorer' suffix (their title alone,
-    e.g. 'Energy', doesn't reveal it links to an explorer rather than a regular chart)."""
-    if type_ == "explorer":
-        return f"{title} Data Explorer"
-    label = _view_label(dimensions)
-    return f"{title} ({label})" if label else title
+def _format_collection_title(title: str, type_: str) -> str:
+    """Display title for a collection row. Mdim rows already carry the actual grapher chart title of the
+    view (set in get_mdim_explorer_views_by_producer), so they're shown as-is; explorers get a
+    'Data Explorer' suffix (their title alone, e.g. 'Energy', doesn't reveal it links to an explorer
+    rather than a regular chart)."""
+    return f"{title} Data Explorer" if type_ == "explorer" else title
 
 
 def gather_producer_analytics(producers: list[str], min_date: str, max_date: str) -> dict[str, pd.DataFrame]:
@@ -141,10 +172,6 @@ def gather_producer_analytics(producers: list[str], min_date: str, max_date: str
 
     # Include a column to signal if a chart was featured in the homepage.
     df_charts["featured_on_homepage"] = False
-
-    # Grapher charts don't carry the redirect-recovery flag (chart view counts already fold in renamed-slug
-    # views via the resolved chart_id); the flag is only meaningful for mdim views that absorbed redirects.
-    df_charts["includes_redirect_views"] = False
 
     # Get posts showing charts using data from the current data producer.
     # NOTE: Include DIs as part of posts (for the total view count).
@@ -186,12 +213,11 @@ def gather_producer_analytics(producers: list[str], min_date: str, max_date: str
         producers=producers, date_min=min_date, date_max=max_date
     )
 
-    # Build the display title (mdim view -> title + dimension label; explorer -> "... Data Explorer").
+    # Build the display title (mdim view -> the view's grapher chart title, as-is; explorer -> "... Data
+    # Explorer").
     df_additional_charts["title"] = [
-        _format_collection_title(title=title, type_=type_, dimensions=dimensions)
-        for title, type_, dimensions in zip(
-            df_additional_charts["title"], df_additional_charts["type"], df_additional_charts["dimensions"]
-        )
+        _format_collection_title(title=title, type_=type_)
+        for title, type_ in zip(df_additional_charts["title"], df_additional_charts["type"])
     ]
     df_additional_charts["featured_on_homepage"] = False
 
@@ -237,11 +263,6 @@ def insert_list_with_links_in_gdoc(google_doc: GoogleDoc, df: pd.DataFrame, plac
         # Add text for charts that have been featured on our homepage.
         if row["featured_on_homepage"]:
             line += "    This chart was also featured on our homepage.\n"
-
-        # Flag rows whose total includes views recovered from a previous chart URL or from
-        # charts/explorers now redirected into this view.
-        if row.get("includes_redirect_views"):
-            line += "    Includes views from a previous URL, or from charts now redirected to this view.\n"
 
         # Insert line of text.
         edits.append({"insertText": {"location": {"index": end_index}, "text": line}})
@@ -462,14 +483,14 @@ class Report:
         # explorers (only this producer's data). "Mixed" explorers (also other producers' data) are
         # reported separately (see "Additional charts using your data" section) and excluded from these
         # totals, since their whole-explorer views can't be cleanly attributed to this producer.
-        cols = ["url", "views", "title", "featured_on_homepage", "n_days", "includes_redirect_views"]
+        cols = ["url", "views", "title", "featured_on_homepage", "n_days"]
         df_charts_and_additional_exclusive = pd.concat(
             [self.analytics["charts"][cols], self.analytics["additional_charts_exclusive"][cols]], ignore_index=True
         )
         df_additional_charts_mixed = self.analytics["additional_charts_mixed"]
 
         # Create dataframes for top content.
-        list_cols = ["url", "views", "title", "featured_on_homepage", "includes_redirect_views"]
+        list_cols = ["url", "views", "title", "featured_on_homepage"]
         df_top_charts = (
             df_charts_and_additional_exclusive.sort_values("views", ascending=False)[list_cols]
             .reset_index(drop=True)
@@ -480,7 +501,7 @@ class Report:
             .sort_values(["views"], ascending=False)
             .reset_index(drop=True)
             .iloc[0:10]
-            .assign(**{"featured_on_homepage": False, "includes_redirect_views": False})
+            .assign(**{"featured_on_homepage": False})
         )
         df_top_additional_charts = (
             df_additional_charts_mixed.sort_values("views", ascending=False)[list_cols].reset_index(drop=True).iloc[0:5]
