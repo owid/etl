@@ -137,8 +137,10 @@ def sanity_check_generation_series(tb: Table) -> None:
     ]:
         informed = tb[year_mask].dropna(subset=[total])
         residual = (informed[components].sum(axis=1, min_count=1) - informed[total]).abs()
+        error = f"Some years report a total but no components ({scope})."
+        assert residual.notna().all(), error
         error = f"Generation components do not add up to the total ({scope})."
-        assert (residual.fillna(0) < 0.005).all(), error
+        assert (residual < 0.005).all(), error
 
 
 def add_combined_generation_series(tb: Table) -> Table:

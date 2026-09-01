@@ -612,7 +612,8 @@ def add_uk_historical_electricity(combined: Table, tb_beis: Table) -> Table:
     """Extend the United Kingdom's electricity series back to ~1920 with BEIS historical data.
 
     BEIS has the lowest priority: it only fills UK years before the modern data (Ember and the Statistical
-    Review) begins (1965 for total, hydro, nuclear and renewables, and 1985 for fossil generation).
+    Review) begins (1965 for hydro, nuclear and renewables, and 1985 for total and fossil generation, which
+    the Statistical Review does not report for the UK before then).
     All series are electricity supplied, as reported by BEIS (covering all generators from 1951, and major
     power producers before then). Wind, solar and other renewables were negligible in that period, so they
     are set to zero to complete the historical mix.
