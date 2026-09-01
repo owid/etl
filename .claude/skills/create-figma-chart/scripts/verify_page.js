@@ -1092,6 +1092,18 @@ const checkFrame = async (frameId) => {
       }
       return out;
     };
+    // `fills` is `figma.mixed` — a SYMBOL — on a text node with PER-RANGE fills, which is exactly the
+    // shape the prescribed styled annotations take: one recoloured word inside grey text. Array.isArray
+    // reads the symbol as "no fills", a text node carries no strokes and no children, so the ink test
+    // below dropped precisely the text most likely to be hand-placed near an artboard edge. Read the
+    // RANGES, the way sizeRanges already reads per-range fontSize; when they cannot be read, count the
+    // node as ink — a spurious overhang names a node the operator can go and look at, a spurious pass
+    // cuts its text from the export with no report at all.
+    const mixedFillInks = (n) => {
+      if (typeof n.fills !== "symbol") return false;
+      try { return n.getStyledTextSegments(["fills"]).some((s) => Array.isArray(s.fills) && s.fills.some(paints)); }
+      catch (e) { return true; }
+    };
     const offenders = [];
     for (const n of frame.findAll(() => true)) {
       if (!shown(n)) continue;
@@ -1113,6 +1125,7 @@ const checkFrame = async (frameId) => {
       // strokeless zero-area node contributes none; here the question is "does this render outside the
       // frame", and a stroke renders. Drop only what paints nothing at all.
       const inks = (Array.isArray(n.fills) && n.fills.some(paints))
+                || mixedFillInks(n)
                 || (Array.isArray(n.strokes) && n.strokes.some(paints));
       // A CONTAINER is judged whether or not it paints anything of its own: the template's footer is
       // an auto-layout frame carrying NO fill, and it is both the node this row exists to catch and

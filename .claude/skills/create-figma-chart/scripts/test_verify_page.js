@@ -2253,6 +2253,42 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
           row(unclipped, "within-frame").detail);
   }
 
+  // 48 — the seventh Codex round. A text node with PER-RANGE fills reports `fills` as `figma.mixed` —
+  // a SYMBOL — so both Array.isArray tests read it as paintless, and within-frame skipped it entirely.
+  // Per-range fills are the styled-annotation shape CHECKS.md prescribes, so the one text class most
+  // likely to be hand-placed near an artboard edge was the one class the row could not see.
+  {
+    const offstage = (extra) => (f) => {
+      const t = text("callout__offstage", "A styled note", 13, 100, 530, 120, 18, undefined,
+                     Object.assign({ fills: MIXED }, extra));
+      t.parent = f;
+      f.children.push(t);
+      return f;
+    };
+    // Per-range fills with visible ink: judged like any painting leaf, overshoot and name reported.
+    const inked = await run(buildFrame(), {}, offstage({
+      segments: { fills: [[solid("#b13507"), 0, 1], [solid("#2d2e2d"), 1, 13]] } }));
+    check("48 a mixed-fill text off the artboard FAILS",
+          row(inked, "within-frame").status === "FAIL", row(inked, "within-frame").detail);
+    check("48 and it names the node and the overshoot",
+          /callout__offstage/.test(row(inked, "within-frame").detail)
+          && /bottom by 8/.test(row(inked, "within-frame").detail),
+          row(inked, "within-frame").detail);
+    // The negative: every range's fill list is empty, so the node still paints nothing anywhere and
+    // the paintless-leaf rule keeps holding — mixed alone is not ink, its ranges are.
+    const ghost = await run(buildFrame(), {}, offstage({
+      segments: { fills: [[[], 0, 1], [[], 1, 13]] } }));
+    check("48 a mixed-fill text whose every range paints nothing is still skipped",
+          row(ghost, "within-frame").status === "ok", row(ghost, "within-frame").detail);
+    // Ranges that cannot be read fall back to INK, not to silence: a spurious overhang names a node
+    // the operator can go and look at, a spurious pass cuts text from the export unreported.
+    const unread = await run(buildFrame(), {}, offstage({ segments: { fontSize: [[13, 0, 13]] } }));
+    check("48 unreadable ranges are counted as ink, not silence",
+          row(unread, "within-frame").status === "FAIL"
+          && /callout__offstage/.test(row(unread, "within-frame").detail),
+          row(unread, "within-frame").detail);
+  }
+
   const bad = results.filter((x) => !x.ok);
   for (const x of results) console.log(`${x.ok ? "PASS" : "FAIL"}  ${x.name}${x.ok ? "" : "  >> " + x.detail}`);
   console.log(bad.length ? `\n${bad.length} FAILURES` : `\nALL PASS (${results.length} checks)`);
