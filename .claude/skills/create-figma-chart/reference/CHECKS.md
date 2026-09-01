@@ -132,6 +132,14 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > after the last change.
 > `diff_against_template.js` (~12,000 stripped) needs none of this.
 >
+> **This generalizes past the fitting step: after any small incremental edit, re-run the smallest
+> `--rows` group that covers what you touched — never the whole three-call pass, and never a
+> hand-rolled substitute.** Moved a tick, nudged a label's offset, added one gridline? That's a
+> `geometry`-only or `series`-only re-check, sized in seconds. The temptation to write a quick inline
+> equivalent instead grows with how small the edit feels — which is exactly backwards, since the row
+> group costs the same whether the edit was one line or twenty, and the paragraph below is why the
+> hand-rolled option is never the cheaper one, however small the edit.
+>
 > **Do NOT substitute a hand-rolled subset. It is worse than skipping the pass, and this is
 > measured.** A run that could not relay the script wrote its own seven rows instead, reported six
 > `PASS` and shipped three defects a reviewer caught by eye within minutes: a series line left at
@@ -576,6 +584,19 @@ different losses come out of that, and only one is mechanical:
 
 Keep the improvements — the point is not to revert a colleague's edits, but to notice which of them
 were trades nobody actually chose, and put those back to the author.
+
+**Recovering geometry after a hand-edit, without trusting what you remember.** A hand-edit (or
+simply picking the work back up a session later) can leave you unsure whether a chart's current
+scale or origin still matches what you last computed — a note that grew a line and pushed the
+footer, a rebuilt template, a colleague's drag. Don't re-derive by re-reading your own old numbers;
+re-derive from what's actually on the canvas now. Any two marks whose underlying data *value* you
+know — two bars, two axis points — pin a linear scale exactly: solve for slope and origin from those
+two, then check a third known point against the prediction before trusting either. Agreement (within
+rounding) confirms the scale is still the simple linear one you assumed; a mismatch means something
+*besides* the scale changed — a mark moved by hand, a non-uniform rescale — and the size of the
+mismatch tells you where to go looking. This costs one extra query against the alternative: silently
+drawing new geometry (a threshold line, a rescaled bar, a repositioned label) against constants that
+no longer describe the frame.
 
 ### Checking the words, not just the geometry
 
