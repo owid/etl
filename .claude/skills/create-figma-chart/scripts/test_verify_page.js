@@ -246,6 +246,35 @@ function buildFrame(opts = {}) {
   if (opts.backdrop || opts.backdropFills) children.unshift(node({ type: "RECTANGLE", name: "backdrop", x: 0, y: 0,
     width: W, height: opts.frameH || 540, fills: opts.backdropFills || solid(opts.backdrop) }));
 
+  // A footer that GREW a row. Every template but static mobile 1 constrains its footer MIN, so it
+  // keeps its top edge and the extra height goes DOWNWARD, past the artboard (TEXTS.md). Nothing
+  // errors and nothing clips, which is why only a bounds test finds it.
+  if (opts.footerGrown) { footer.height = opts.footerGrown; footer.absoluteBoundingBox = { x: 16, y: 488, width: contentW, height: opts.footerGrown }; }
+  // Overflowing ink that is switched OFF. Visibility is inherited and `findAll` returns a hidden
+  // node's descendants with visible:true, so this is what stops the row reporting ink nobody can see.
+  if (opts.hiddenOverflow) children.push(node({ type: "RECTANGLE", name: "offstage", visible: false,
+    x: 16, y: 600, width: 100, height: 40, fills: solid("#4c6a9c") }));
+  // A matplotlib clipPath as `upload_assets` imports it: every path windingRule NONE — it paints
+  // nothing — carrying Figma's default black fill.
+  if (opts.deadVector) children.push(node({ type: "VECTOR", name: "Vector", x: 40, y: 200, width: 80, height: 57,
+    fills: solid("#000000"), strokes: [], vectorPaths: [{ windingRule: "NONE", data: "M 0 0 L 80 0 L 80 57 Z" }] }));
+  // The same artifact but ALSO stroked: its stroke still renders, so only the fill is dead and the row
+  // has to say which — deleting a node whose stroke is real would remove visible ink.
+  if (opts.deadVectorStroked) children.push(node({ type: "VECTOR", name: "half-dead", x: 40, y: 300, width: 80, height: 20,
+    fills: solid("#000000"), strokes: solid("#4c6a9c"), strokeWeight: 1,
+    vectorPaths: [{ windingRule: "NONE", data: "M 0 0 L 80 20" }] }));
+  // Grapher's own gridline, as it really imports: an open stroked path of ZERO HEIGHT named after its
+  // tick value, carrying windingRule NONE and Figma's default black fill. Measured live, one untouched
+  // grapher import held 29 of these — so without the area gate the row fails every imported chart.
+  if (opts.grapherGridline) children.push(node({ type: "VECTOR", name: "$20k", x: 40, y: 240, width: 123.75, height: 0,
+    fills: solid("#000000"), strokes: solid("#dddddd"), strokeWeight: 1,
+    vectorPaths: [{ windingRule: "NONE", data: "M 0 0 L 123.75 0" }] }));
+  // An ordinary open stroked path — windingRule NONE and NO fill. The commonest shape in any SVG
+  // import, and the row must not fire on it or every imported line chart reports dozens of defects.
+  if (opts.openStrokedPath) children.push(node({ type: "VECTOR", name: "line-open", x: 40, y: 350, width: 80, height: 20,
+    fills: [], strokes: solid("#4c6a9c"), strokeWeight: 2,
+    vectorPaths: [{ windingRule: "NONE", data: "M 0 0 L 80 20" }] }));
+
   return node({ id: "F:1", name: "test frame", x: 0, y: 0, width: W, height: opts.frameH || 540,
                 fills: solid(opts.frameFill || "#ffffff"), children });
 }
@@ -301,10 +330,24 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     check("1 label-contrast-on-fill DECLARED", row(out, "label-contrast-on-fill") && row(out, "label-contrast-on-fill").status === "SKIPPED", "row missing");
     // Every row CHECKS.md prescribes has to EXIST, even where it is not computed — a prescribed check
     // with no row is how a run reports "no mechanical row failed" and means "nobody looked".
-    check("1 page-census DECLARED", row(out, "page-census") && row(out, "page-census").status === "SKIPPED", "row missing");
-    check("1 page-census says COUNT, not overlap",
-          /count the plot-bearing objects/i.test(row(out, "page-census").detail) && /overlap test/i.test(row(out, "page-census").detail),
+    // page-census is COMPUTED now, not declared. The half that blocked it — no page to read, and a
+    // short read off a page nobody switched to — is stale: the frame gate resolves the frame's own
+    // PAGE and switches to it. The half that remains is INTENT, so the row is REVIEW and never ok.
+    check("1 page-census computed, not declared", row(out, "page-census") && row(out, "page-census").status === "REVIEW", "row missing or still SKIPPED");
+    check("1 page-census counts the page's top-level objects",
+          /1 top-level object\(s\) on page/.test(row(out, "page-census").detail),
           row(out, "page-census").detail);
+    // CHECKS.md's two warnings have to survive into the computed row, or the guidance is lost with the
+    // declaration that carried it.
+    check("1 page-census keeps the one-per-intended-item rule",
+          /One per INTENDED item/.test(row(out, "page-census").detail),
+          row(out, "page-census").detail);
+    check("1 page-census warns against shortened names",
+          /shortened name/i.test(row(out, "page-census").detail),
+          row(out, "page-census").detail);
+    check("1 page-census names each object in full",
+          Array.isArray(row(out, "page-census").pageObjects) && row(out, "page-census").pageObjects.length === 1,
+          JSON.stringify(row(out, "page-census").pageObjects));
     // leader-on-map is declared, but it must declare the VECTOR test as the method and pixels as the
     // fallback. Named backwards it sends the reader past a one-call exact check.
     check("1 leader-on-map DECLARED", row(out, "leader-on-map") && row(out, "leader-on-map").status === "SKIPPED", "row missing");
@@ -1659,6 +1702,69 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
           /highlightTreatment is set/.test(hi) && /Run: \.venv\/bin\/python/.test(hi), hi);
     check("36 and an undeclared frame carries no such warning",
           !/highlightTreatment is set/.test(twoColour), twoColour);
+  }
+
+  // 37 — within-frame. The failure this row exists for is a footer that grew off the bottom of the
+  // artboard: silent, unclipped, and absent from the export. `margins` cannot see it (left/right only,
+  // plot ink only), which is why the row is not a duplicate of it.
+  {
+    const clean = await run(buildFrame(), {});
+    check("37 within-frame ok on a clean frame", row(clean, "within-frame").status === "ok", row(clean, "within-frame").detail);
+    check("37 and it says what it measured against",
+          /540x540 artboard/.test(row(clean, "within-frame").detail), row(clean, "within-frame").detail);
+
+    const grown = await run(buildFrame({ footerGrown: 70 }), {});
+    check("37 a footer grown past the artboard FAILS", row(grown, "within-frame").status === "FAIL", row(grown, "within-frame").detail);
+    check("37 and it names the footer and the overshoot",
+          /footer/.test(row(grown, "within-frame").detail) && /bottom by 18/.test(row(grown, "within-frame").detail),
+          row(grown, "within-frame").detail);
+    check("37 and it prescribes the re-pin",
+          /footer\.y = FOOTER_BOTTOM - footer\.height/.test(row(grown, "within-frame").detail),
+          row(grown, "within-frame").detail);
+    // margins must stay silent on it, or the two rows are the same row and one of them is redundant.
+    check("37 margins does NOT catch a vertical overflow", row(grown, "margins").status === "ok", row(grown, "margins").detail);
+
+    const hidden = await run(buildFrame({ hiddenOverflow: true }), {});
+    check("37 hidden overflowing ink does not fail", row(hidden, "within-frame").status === "ok", row(hidden, "within-frame").detail);
+  }
+
+  // 38 — dead-fills. Invisible on canvas, visible in the layer panel and in every fill inventory:
+  // nine of these put a phantom #000000 into a real page's palette.
+  {
+    const clean = await run(buildFrame(), {});
+    check("38 dead-fills ok when there are none", row(clean, "dead-fills").status === "ok", row(clean, "dead-fills").detail);
+
+    const dead = await run(buildFrame({ deadVector: true }), {});
+    check("38 a zero-winding filled vector FAILS", row(dead, "dead-fills").status === "FAIL", row(dead, "dead-fills").detail);
+    check("38 and it explains why no screenshot shows it",
+          /render nothing/.test(row(dead, "dead-fills").detail), row(dead, "dead-fills").detail);
+    check("38 and it warns about the auto-removed wrapper group",
+          /parent\.removed/.test(row(dead, "dead-fills").detail), row(dead, "dead-fills").detail);
+
+    // An open stroked path is the commonest node in any SVG import. Firing on it would report dozens
+    // of defects on every imported chart, so this is the row's most important negative.
+    const open = await run(buildFrame({ openStrokedPath: true }), {});
+    check("38 an open STROKED path with no fill is not dead", row(open, "dead-fills").status === "ok", row(open, "dead-fills").detail);
+
+    // The regression that a mock alone could not have found: on a REAL page this row returned 29
+    // findings against an untouched grapher import, every one of them a gridline. Zero-area nodes
+    // cannot paint a fill at all, which is the same reason the fill inventory already drops them.
+    const grid = await run(buildFrame({ grapherGridline: true }), {});
+    check("38 a zero-area grapher gridline is NOT a dead fill", row(grid, "dead-fills").status === "ok", row(grid, "dead-fills").detail);
+
+    const half = await run(buildFrame({ deadVectorStroked: true }), {});
+    check("38 a stroked node with a dead fill is reported", row(half, "dead-fills").status === "FAIL", row(half, "dead-fills").detail);
+    check("38 and it says the stroke still renders",
+          /STROKE still renders/.test(row(half, "dead-fills").detail), row(half, "dead-fills").detail);
+  }
+
+  // 39 — slice coverage. `inline_script.py --rows` sends one group at a time, and a slice can only
+  // fail its own rows. Without this the verdict from one documented call reads as a verdict on the
+  // frame — the confident silence this file exists to remove, reached by slicing.
+  {
+    const out = await run(buildFrame(), {});
+    check("39 a whole-file run declares no omissions", out.coverage && out.coverage.omitted.length === 0, JSON.stringify(out.coverage));
+    check("39 and its verdict carries no PARTIAL PASS warning", !/PARTIAL PASS/.test(out.verdict), out.verdict);
   }
 
   const bad = results.filter((x) => !x.ok);

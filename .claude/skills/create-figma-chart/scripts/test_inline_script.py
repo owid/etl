@@ -10,7 +10,11 @@ a wrong verdict rather than failing. The cases below are the ones that have actu
 
 from __future__ import annotations
 
+import re
+import shutil
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -182,6 +186,74 @@ for script, calls in DOCUMENTED_CALLS.items():
     for call in calls:
         size = len(select_rows(strip_js(path.read_text()), set(call))[0])
         check(f"{script}: --rows {','.join(call)} fits the cap", size <= CAP, f"{size:,} > {CAP:,}")
+
+# --- a slice has to declare its own coverage ------------------------------------------------------
+# A slice can only fail the rows it carries. Without a stamped EMITTED_ROWS its verdict cannot name
+# what it omitted, and "no mechanical row failed" out of one documented call reads as a verdict on the
+# whole frame — the confident silence the SKIPPED rows exist to prevent, reached by slicing.
+_vp = Path(__file__).resolve().parent / "verify_page.js"
+if _vp.exists():
+    check(
+        "verify_page.js declares EMITTED_ROWS for the slicer to stamp",
+        "const EMITTED_ROWS = " in _vp.read_text(),
+        "no EMITTED_ROWS declaration",
+    )
+    for _call in DOCUMENTED_CALLS["verify_page.js"]:
+        _out = subprocess.run(
+            [sys.executable, str(Path(__file__).resolve().parent / "inline_script.py"),
+             "verify_page.js", "--rows", ",".join(_call)],
+            capture_output=True, text=True,
+        )
+        _want = "const EMITTED_ROWS = [" + ", ".join(f'"{g}"' for g in _call) + "];"
+        check(
+            f"--rows {','.join(_call)} stamps its own coverage",
+            _want in _out.stdout,
+            f"expected {_want}",
+        )
+    # The two declared lists and the file's actual #regions must agree. A region added to the script
+    # and left out of them is invisible: the slicer stamps a coverage list that omits it, and the
+    # verdict then reports full coverage for a group nobody sent. `--whole` is deliberately NOT the
+    # vehicle for this — verify_page.js is over the cap whole and correctly refuses to emit — so the
+    # invariant is read off the source.
+    _src = _vp.read_text()
+    _regions = list(dict.fromkeys(select_rows(strip_js(_src), set())[1]))
+    for _name in ("EMITTED_ROWS", "ALL_ROW_GROUPS"):
+        _m = re.search(_name + r" = \[([^\]]*)\];", _src)
+        check(f"verify_page.js declares {_name}", bool(_m), "declaration missing")
+        if _m:
+            _declared = re.findall(r'"([^"]+)"', _m.group(1))
+            check(
+                f"{_name} lists every #region exactly once",
+                _declared == _regions,
+                f"{_name} {_declared} vs regions {_regions}",
+            )
+
+# --- a slice must PARSE, not merely fit ------------------------------------------------------------
+# Fitting the cap and being valid JavaScript are different properties, and `#region` markers are what
+# separates them: a marker in the wrong place slices mid-expression and emits text that is the right
+# SIZE and syntactically broken. That surfaces in Figma as a plugin error with no clue to its cause,
+# which is the one failure mode `inline_script.py` exists to prevent. Skipped where node is absent.
+_node = shutil.which("node")
+check("node is available to parse-check the slices", bool(_node), "node not on PATH — slices unverified")
+if _node and _vp.exists():
+    _here = Path(__file__).resolve().parent
+    for _call in DOCUMENTED_CALLS["verify_page.js"]:
+        _emit = subprocess.run(
+            [sys.executable, str(_here / "inline_script.py"), "verify_page.js", "--rows", ",".join(_call)],
+            capture_output=True, text=True,
+        )
+        # verify_page.js uses top-level `return`, which is legal only inside a function — the same
+        # wrapper `use_figma` puts around the code it is handed.
+        _wrapped = "async function __w(){\n" + _emit.stdout + "\n}\n"
+        _tmp = Path(tempfile.gettempdir()) / "verify_page_slice_check.js"
+        _tmp.write_text(_wrapped)
+        _parsed = subprocess.run([_node, "--check", str(_tmp)], capture_output=True, text=True)
+        check(
+            f"--rows {','.join(_call)} emits parseable JavaScript",
+            _parsed.returncode == 0,
+            _parsed.stderr[:200],
+        )
+        _tmp.unlink(missing_ok=True)
 
 bad = [r for r in results if not r[1]]
 for name, ok, detail in results:

@@ -57,6 +57,13 @@ const CONFIG = {
   xlAnnotations: false,
 };
 
+// Which row groups this TEXT carries. `inline_script.py --rows` rewrites it to the slice it emitted.
+// Without it a slice cannot say what it did not cover, and "no mechanical row failed" out of ONE of
+// the documented calls reads as a verdict on the whole pass — the same confident-silence failure the
+// SKIPPED rows exist to prevent, arrived at by slicing rather than by not looking.
+const EMITTED_ROWS = ["type", "series", "geometry", "annotations", "skipped"];
+const ALL_ROW_GROUPS = ["type", "series", "geometry", "annotations", "skipped"];
+
 const LADDER_FULL = [12, 13, 14, 15, 16]; // Annotation XS..XL; the ceiling is L 15, XL only when
 const LADDER_CEILING = 15;                // the annotation IS the message (GUIDELINES.md)
 const SMALL_FRAME_W = 302;                // the small/pull templates, whose floor is 11 not 12
@@ -917,6 +924,111 @@ const checkFrame = async (frameId) => {
     }
   }
 
+
+  // Nothing outside the ARTBOARD. `margins` above is the LEFT/RIGHT content box tested against plot
+  // ink; this is the other axis and the other population — every visible node in the frame, against
+  // the frame's own bounds. It exists because this skill documents a failure that nothing caught:
+  // almost every template's footer is constrained MIN, so it keeps its TOP edge and a row that gains
+  // a line grows DOWNWARD, off the bottom of the artboard (TEXTS.md). Nothing errors and nothing
+  // clips, so it survives a screenshot of the frame and is simply missing from the export.
+  // A frame with clipsContent HIDES the overflow instead of spilling it. Still a defect — content the
+  // author wrote is not in the image — but a different one, so it is named rather than merged.
+  {
+    const OUT_EPS = 0.5;
+    // Visibility is INHERITED, and `findAll` returns a hidden node's descendants with their own
+    // `visible: true` intact. Climbing to the frame is what stops a switched-off block being reported
+    // as overflowing ink nobody can see — the same inherited-switch trap the frame gate above handles.
+    const shown = (n) => { let m = n; while (m && m !== frame) { if ("visible" in m && !m.visible) return false; m = m.parent; } return true; };
+    const offenders = [];
+    for (const n of frame.findAll(() => true)) {
+      if (!shown(n)) continue;
+      const b = rel(n);
+      if (!b || b.w <= 0 || b.h <= 0) continue;
+      const edges = [];
+      if (b.l < -OUT_EPS) edges.push("left by " + r(-b.l));
+      if (b.t < -OUT_EPS) edges.push("top by " + r(-b.t));
+      if (fb && b.rr > fb.width + OUT_EPS) edges.push("right by " + r(b.rr - fb.width));
+      if (fb && b.bb > fb.height + OUT_EPS) edges.push("bottom by " + r(b.bb - fb.height));
+      if (edges.length) offenders.push((n.name || n.type) + " (" + n.type + ") " + edges.join(", "));
+    }
+    const clipped = frame.clipsContent === true;
+    if (!fb) skip("within-frame", "frame box not resolved");
+    else add("within-frame", offenders.length ? "FAIL" : "ok",
+        offenders.length
+          ? offenders.length + " node(s) extend past the " + r(fb.width) + "x" + r(fb.height)
+            + " artboard: " + offenders.slice(0, 6).join("; ")
+            + (clipped
+                ? ". The frame CLIPS, so this does not spill onto the canvas — it is silently CUT from the export instead."
+                : ". The frame does not clip, so this renders outside the artboard and is lost on export.")
+            + " Almost every template footer is constrained MIN and grows downward (TEXTS.md): re-pin it"
+            + " with footer.y = FOOTER_BOTTOM - footer.height after any edit that changes its height."
+          : "every visible node sits inside the " + r(fb.width) + "x" + r(fb.height) + " artboard");
+  }
+
+  // Imported artifacts that carry paint but cannot paint it. A matplotlib `clipPath` arrives through
+  // `upload_assets` as a VECTOR whose every path has `windingRule: "NONE"` — a fill rule that paints
+  // nothing — while Figma gives it a default BLACK fill. It is invisible in every screenshot, so no
+  // visual review finds it, and it is fully visible in the layer panel and in `fills`: on a real page
+  // nine of them entered the palette as #000000, a colour that was nowhere on the canvas. That is the
+  // phantom-colour failure `renders` and the zero-area exclusion already guard against, reached by a
+  // third route. Reported as a FAIL because it corrupts off-palette and the colour-audit command
+  // below, not merely because it is clutter.
+  {
+    const dead = [];
+    for (const n of frame.findAll(() => true)) {
+      if (n.type !== "VECTOR" || !Array.isArray(n.vectorPaths) || !n.vectorPaths.length) continue;
+      if (!n.vectorPaths.every((vp) => vp && vp.windingRule === "NONE")) continue;
+      if (!Array.isArray(n.fills) || !n.fills.some(paints)) continue;
+      // ZERO-AREA nodes are excluded, on the same grounds the fill inventory already excludes them:
+      // a grapher import's gridlines and ticks are open stroked paths measuring 123.75x0, so they
+      // carry windingRule NONE and Figma's default black fill and match every test above. Measured on
+      // a real page, an untouched grapher import produced 29 of them — a row that fires on every
+      // imported chart is the fire-on-correct-work failure this file exists to avoid, and it is the
+      // AREA that separates them: a clipPath artifact is a rectangle (79x57 on that same page), a
+      // gridline has no area to fill in the first place.
+      const db = rel(n);
+      if (!db || db.w <= 0 || db.h <= 0) continue;
+      const hasStroke = Array.isArray(n.strokes) && n.strokes.some(paints);
+      dead.push((n.name || n.type) + " " + r(n.width) + "x" + r(n.height)
+                + (hasStroke ? " (its STROKE still renders; only the fill is dead)" : ""));
+    }
+    add("dead-fills", dead.length ? "FAIL" : "ok",
+        dead.length
+          ? dead.length + " node(s) carry a visible fill that CANNOT paint (every path windingRule NONE): "
+            + dead.slice(0, 6).join("; ")
+            + ". These are clipPath imports. They render nothing, so a screenshot cannot show them, but"
+            + " they sit in the layer panel with a paint swatch and their colour enters the fill"
+            + " inventory that off-palette and the color_audit.py palette are built from. Delete them"
+            + " (Figma removes the wrapper GROUP once its last child goes, so re-reading parent.children"
+            + " after a remove throws — guard with parent.removed)."
+          : "no zero-winding filled vectors — nothing carrying a paint it cannot render");
+  }
+
+  // The page-level census CHECKS.md prescribes. It was DECLARED unrunnable on two grounds and only one
+  // of them still holds. The first — that this script never has a page, and `page.children` on a page
+  // nobody switched to comes back short without erroring — is stale: the frame gate above already
+  // resolves the frame's own PAGE and switches to it, which is what loads the children. The second
+  // does not go away: the target is one object per INTENDED item, and how many reference copies were
+  // meant to be left beside the deliverable is not a property of the file. So the objects are counted
+  // and NAMED — which is the half a human cannot do quickly and the half CHECKS.md warns about
+  // ("do NOT substitute an overlap test", "do not key the census on a SHORTENED node name") — and the
+  // row is REVIEW rather than ok, because only a human can say how many were meant.
+  {
+    if (!page || !Array.isArray(page.children)) skip("page-census", "the frame's PAGE did not resolve, so its children cannot be counted");
+    else {
+      const items = page.children.map((c) => (c.name || "(unnamed)") + " [" + c.type + "] "
+        + r(c.width) + "x" + r(c.height) + " @" + r(c.x) + "," + r(c.y)
+        + (c.visible === false ? " HIDDEN" : ""));
+      add("page-census", "REVIEW",
+          page.children.length + " top-level object(s) on page \"" + (page.name || "?") + "\": "
+          + items.join(" | ")
+          + ". One per INTENDED item — the deliverable plus the reference copies you meant to place."
+          + " A spare is clutter. Names are given in FULL: keying this on a shortened name merges a"
+          + " slug with its own \"— original SVG (unstyled)\" copy into one bucket.",
+          { pageObjects: items });
+    }
+  }
+
   // Off-palette fills. Two standing exceptions are listed rather than flagged.
   {
     const plotFills = fills.filter((f) => f.insidePlot);
@@ -1330,6 +1442,7 @@ const checkFrame = async (frameId) => {
 
   // ---------------------------------------------------------------- declared gaps in coverage
 // #endregion
+// #region skipped
   // These two are owned by color_audit.py, which cannot run in here — this is a Figma plugin
   // sandbox with no shell. But the palette it needs is already on the canvas, so emit the command
   // ready to paste instead of a tool name to go and look up. A declared gap the operator has to
@@ -1579,17 +1692,18 @@ const checkFrame = async (frameId) => {
   // wording named the PIXEL mask as the method, which sent a reader following this output straight
   // past a one-call exact test and into a multi-render fallback.
   skip("leader-on-map", "terminal vertex against the country's own GEOMETRY, not its bounding box. Do it in VECTORS first: transform the terminal into the country's local space through the inverse of its `absoluteTransform`, parse `vectorPaths` into rings, ray-cast. Exact, and one call. The PIXEL mask (hide the country vector, diff the renders, require the dot within ~1px of that pixel set) is the FALLBACK, for the cases the ray-cast cannot answer — a country a few pixels across whose ring is smaller than the dot, or a fill rule that makes the cast ambiguous", "CHECKS.md + per-chart-type/maps.md");
-  // CHECKS.md -> "How much is on the page" prescribes this, so it gets a row: a prescribed check with
-  // no row at all is how a run returns "no mechanical row failed" while the reader is looking at a
-  // pile of near-identical maps. Declared rather than computed for two reasons, and only the first is
-  // fixable here. This script is handed FRAME ids and never a page, and `page.children` on a page
-  // nobody switched to comes back SHORT without erroring (GOTCHAS.md) — so an undercount would read
-  // as "clean", which is the exact failure the row exists to catch. `PageNode.loadAsync()` would
-  // settle that half (diff_against_template.js does it). The other half does not go away: the target
-  // is one object per INTENDED item, and how many reference copies were meant to be left on the page
-  // is not a property of the file.
-  skip("page-census", "count the plot-bearing objects ANYWHERE on the page — `countries-with-data` groups on a map, the equivalent plot group otherwise — and name what each one is for. One per intended item: the deliverable plus the reference copies you meant to place; a spare is clutter. Do NOT substitute an overlap test between top-level children — three maps at three distinct positions pass it while the reader sees a pile. And do not key the census on a SHORTENED node name, which merges `<slug>` with `<slug> — original SVG (unstyled)` into one bucket", "CHECKS.md -> How much is on the page");
 
+// #endregion
+  // What this TEXT could not have checked, stated in the verdict itself. A slice's rows are the only
+  // ones it can fail, so "no mechanical row failed" out of one documented call is a verdict on that
+  // call and not on the frame — and nothing in the returned shape said so, which is the same
+  // confident silence the SKIPPED rows exist to prevent, reached by slicing instead of by not looking.
+  const omittedGroups = ALL_ROW_GROUPS.filter((g) => !EMITTED_ROWS.includes(g));
+  const coverage = omittedGroups.length
+    ? ` — PARTIAL PASS: this call carried ${EMITTED_ROWS.join("+")} only. The ${omittedGroups.join(", ")}`
+      + ` row(s) are NOT in this text, so they are neither passed nor failed here. Send the other`
+      + ` documented call(s) (CHECKS.md) before reading this as a clean frame.`
+    : "";
   const fails = rows.filter((x) => x.status === "FAIL");
   const review = rows.filter((x) => x.status === "REVIEW");
   const skipped = rows.filter((x) => x.status === "SKIPPED");
@@ -1597,8 +1711,9 @@ const checkFrame = async (frameId) => {
     frame: { id: frame.id, name: frame.name, w: fb ? r(fb.width) : null, h: fb ? r(fb.height) : null },
     resolved: { chartBy: chartResolvedBy, contentBox: [r(contentL), r(contentR)], band: [r(bandTop), r(footerTop)],
                 counts: { texts: texts.length, stroked: stroked.length, plotLeaves: leaves.filter((x) => x.insidePlot).length, annotations: annotations.length } },
-    verdict: fails.length ? `FAIL on ${fails.length} row(s): ${fails.map((f) => f.check).join(", ")}`
-                          : `no mechanical row failed (${review.length} to review, ${skipped.length} not covered here)`,
+    verdict: (fails.length ? `FAIL on ${fails.length} row(s): ${fails.map((f) => f.check).join(", ")}`
+                          : `no mechanical row failed (${review.length} to review, ${skipped.length} not covered here)`) + coverage,
+    coverage: { emitted: EMITTED_ROWS, omitted: ALL_ROW_GROUPS.filter((g) => !EMITTED_ROWS.includes(g)) },
     rows,
   };
 

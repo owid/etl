@@ -5,47 +5,62 @@
 
 Every one of these caught a real defect on this skill's first run, and none of them is visible by looking at the frame. Run them as a pass, and report the numbers rather than "looks fine".
 
-> **⚠️ `verify_page.js` does not fit in a `use_figma` call as it ships.** The `code` argument caps at
-> **50,000 characters** and the file is **~117,000**, so the instruction below is not executable
-> verbatim — a run that pastes it is rejected. Emit it stripped instead:
+> **⚠️ `verify_page.js` does not fit in a `use_figma` call whole.** The `code` argument caps at
+> **50,000 characters** and the file is **141,201** raw / **72,276** stripped, so the instruction below
+> is not executable verbatim. `inline_script.py verify_page.js` with no `--rows` **refuses and exits 1**,
+> and `--whole` does not override it — the cap is a hard floor for this script, not a judgement call.
 >
-> **Run it in slices — that is the supported path, and the only one.** Stripping the comments used to
-> get it *just* under the cap (the helper is context-aware, so URLs, regex literals and template
-> strings survive), and even then it sat at 97%, all of which has to be relayed verbatim — where a
-> one-character corruption yields a *wrong verdict* rather than an error, the exact failure this gate
-> exists to catch. It has since grown past the cap outright: **60,937 stripped**. So
-> `inline_script.py verify_page.js` with no `--rows` **refuses and exits 1**, naming the size and
-> pointing here, and `--whole` no longer overrides that — the cap is now a hard floor for this
-> script, not a judgement call. The rows are grouped, each slice carries the shared preamble:
+> **Run it in slices — that is the supported path, and the only one.** The stripper is context-aware,
+> so URLs, regex literals and template strings survive. Each slice carries the shared preamble:
+>
+> **Every character of a slice has to be relayed verbatim, and that is why the percentages matter
+> beyond "does it fit".** A one-character corruption in this file yields a *wrong verdict* rather than
+> an error — the exact failure the gate exists to catch. Pipe `inline_script.py` straight into the
+> call; never retype a slice, and never hand-minify one to buy room. (Minifying `verify_page.js`
+> whole does fit — 45.9KB — and is a trap for the same reason: it trades a size problem for an
+> unreadable blob you cannot proofread.)
 >
 > ```bash
 > .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js --list-rows
-> .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js --rows series --frame-id <your frame>
+> .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js --rows series,skipped --frame-id <your frame>
 > ```
 >
 > | group | rows | size |
 > |---|---|---|
-> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 74% of cap |
-> | `series` | series-weight, furniture-weight, furniture-dash | 68% |
-> | `geometry` | box-alignment, gap, margins, off-palette | 65% |
-> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 90% |
+> | `type` | text-floor, annotation-ladder, ladder-sizes, named-styles, source-line-weight, text-hierarchy | 52% of cap |
+> | `series` | series-weight, furniture-weight, furniture-dash | 46% |
+> | `geometry` | box-alignment, gap, margins, **within-frame**, **dead-fills**, **page-census**, off-palette | 50% |
+> | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 68% |
+> | `skipped` | every declared gap — the colour_audit.py command, spelling, entity completeness, arrows, leader-on-map | 54% |
 >
-> Groups combine, so the whole pass is **three calls**: `--rows annotations` (45,163), `--rows series`
-> (34,217), `--rows type,geometry` (42,489) — measured 2026-08-28. Three and not four because the
-> preamble is byte-identical across slices and each row group is a self-contained block after it
-> (GOTCHAS.md → Running the scripts has the `cmp` proof and the composition rule); concatenating
-> verbatim blocks is not the hand-rolled subset forbidden below, since nothing is reimplemented.
+> Groups combine, so the whole pass is **three calls**: `--rows annotations` (33,974), `--rows
+> type,geometry` (35,245), `--rows series,skipped` (34,311) — measured 2026-09-01, largest **70% of
+> cap** against a **68% floor**. Three and not four because the preamble is byte-identical across
+> slices and each row group is a self-contained block after it (GOTCHAS.md → Running the scripts has
+> the `cmp` proof and the composition rule); concatenating verbatim blocks is not the hand-rolled
+> subset forbidden below, since nothing is reimplemented.
 >
-> `inline_script.py --check` reports the largest of the three, **90% of cap**. It measures **these
-> declared calls**, held as `DOCUMENTED_CALLS` in the script, rather than the smallest split it could
-> find for itself — an optimiser would go on reporting a comfortable number by picking a split nobody is
-> told to send. Change the calls here and there together.
+> **The `skipped` region is why the numbers came down.** Those rows are pure prose — the declared gaps
+> and the ready-to-paste `color_audit.py` command — and until 2026-09-01 they sat OUTSIDE every region,
+> so all three calls re-sent the same 13,217 characters. That was the whole reason the shared floor
+> stood at 26,899 and the largest call at **90% of cap** with re-splitting "nearly exhausted". Moving
+> them into their own region took the floor to ~15,700 and the worst call to 70% — while three checks
+> were *added*. If this creeps back up, look first for prose that every slice is paying for.
+>
+> **Every slice declares what it did NOT carry.** `--rows` stamps `EMITTED_ROWS` into the emitted text,
+> and the returned object carries `coverage: { emitted, omitted }` plus a `PARTIAL PASS:` clause in the
+> `verdict`. Without it, "no mechanical row failed" out of one of three calls reads as a verdict on the
+> frame — the same confident silence the SKIPPED rows exist to prevent, reached by slicing rather than
+> by not looking. A sliceable script that declares no `EMITTED_ROWS` is refused by `inline_script.py`.
+>
+> `inline_script.py --check` reports the largest of the three. It measures **these declared calls**,
+> held as `DOCUMENTED_CALLS` in the script, rather than the smallest split it could find for itself —
+> an optimiser would go on reporting a comfortable number by picking a split nobody is told to send.
+> Change the calls here and there together; `test_inline_script.py` fails if they drift.
 >
 > Read the **`floor`** column beside the `sent` percentage, because they answer different questions:
 > `sent` is what today's declared calls cost and can always be bought down by re-splitting, while `floor`
 > is the preamble plus the single largest row group — the smallest any call can be, whatever the split.
-> `verify_page.js` now reads **90% sent against a 90% floor**, because `annotations` alone *is* the
-> largest call.
 >
 > **`--check` exits 1 in three distinct cases, and the remedy is different in each — read which one you
 > are in off the output:**
@@ -53,19 +68,20 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > | output | what it means | remedy |
 > |---|---|---|
 > | `OVER CAP` beside the `sent` column | the largest **documented** call is over the cap, so the pass as written does not run | **repartition**: declare a split whose largest call fits, here and in `DOCUMENTED_CALLS` together |
-> | `FLOOR OVER CAP` | preamble + the largest single row group is itself over the cap | repartitioning **cannot** help — move rows into a separate script with its own preamble |
+> | `FLOOR OVER CAP` | preamble + the largest single row group is itself over the cap | repartitioning **cannot** help — move rows into a separate script with its own preamble, or find prose every slice is paying for and give it its own region |
 > | `in the file but never sent` / `documented but not in the file` / `sent by more than one call` | `DOCUMENTED_CALLS` and the file's `#region` markers have drifted apart, so the measurement describes a workflow nobody sends | bring this doc and the constant back into step |
 >
-> The two-call pass this file prescribed until 2026-08-28 was the **first** case, not the second:
-> `--rows geometry,annotations` had reached 50,594 characters (101% of cap) while the floor was still
-> 45,163 (90%, under it), so repartitioning was available — and the three calls above are that
-> repartition.
+> Two worked examples of the first case, both real. The two-call pass this file prescribed until
+> 2026-08-28: `--rows geometry,annotations` had reached 50,594 (101% of cap) while the floor was still
+> 45,163 (90%, under it), so repartitioning was available and the three calls were that repartition.
+> Then on 2026-09-01 the floor itself hit 90% and `--check` printed `re-splitting is nearly exhausted`
+> — which was **not** the second case: the exhaustion was 13,217 characters of declared-gap prose
+> outside every region, and giving it one bought the floor back down to 68%.
 >
-> **A floor past 85% is a WARNING and exit stays 0.** `verify_page.js` prints `floor at 90% —
-> re-splitting is nearly exhausted` today and still passes: it says the second case is approaching, not
-> that anything is broken. Re-measure both places when the script next grows.
+> **A floor past 85% is a WARNING and exit stays 0.** It says the second case is approaching, not that
+> anything is broken. Re-measure both places when the script next grows.
 > **Run all three** — each reports its own rows and nothing else, so a group you skip is a group
-> nobody checked.
+> nobody checked, and each one now says so in its own verdict.
 >
 > **Budget for this: relaying the pass is the single largest time cost in a run.** The benchmark's second
 > run took 48 min against a 30.8 min baseline, and roughly 17 min of the difference was relaying these
@@ -328,7 +344,9 @@ Every one of these caught a real defect on this skill's first run, and none of t
 | Annotation block gap | the **block's** outer edges (topmost annotation, bottommost annotation, plot — whichever is extreme) vs the header and footer frames | the same clearance the plot owes: **27px** each side on the 540×540 pages. An annotation outside the plot is part of the block, so spacing the plot alone is not enough ([ANNOTATIONS-AND-ARROWS.md](ANNOTATIONS-AND-ARROWS.md)) |
 | Every pointer lands on its target | for each leader, the **terminal vertex** (transformed, not the bbox) vs the thing it names — the country's own **ink** on a map, the band border at the stated year on a chart | the dot or tip is inside/on its target, and where the text names a year, at that year's x — with the first and last year taken from the plot's edge, not the tick label's centre. **A country's bounding box is not the target.** Countries are concave and multi-part, so a point can sit well inside the box and still be in open ocean — the US box reaches past Hawaii, an antimeridian straddler's spans the whole Pacific (see the map fit in `reference/per-chart-type/maps.md`). **Do it in VECTORS first — it is exact, and it is one call.** Transform the terminal into the country's local space through the inverse of its `absoluteTransform`, parse its `vectorPaths` into rings, and ray-cast. No renders, no masks, and it caught a leader whose terminal sat in the Bay of Bengal while its bbox test passed. Fall back to the **pixel** mask — hide the country vector, diff the renders, require the dot within ~1px of that pixel set — only where the vector test cannot answer: a country a few pixels across whose ring is smaller than the dot, or a shape whose fill rule makes the ray-cast ambiguous |
 | Nothing in the margins | every visible mark's `absoluteBoundingBox` vs the content band | no ink outside **16…524** on a 540-wide frame. A speck left in the margin after a map fit renders as a cut sliver at the frame edge |
-| How much is on the page | count the plot-bearing objects anywhere on the page — `countries-with-data` groups on a map, the equivalent plot group otherwise — and name what each one is for | one per **intended** item: the deliverable, plus the reference copies you meant to place. A third is clutter. **Do not check this by testing top-level children for overlap** — that answers a different question and answers it "clean": on one page three world maps sat at three distinct positions, so an overlap test passed twice while the reader was looking at a pile of near-identical maps in the left-hand column, one of which displayed the export's own legend/map collision. The reader's question is *how many of this thing am I looking at*, and only a count answers it. Watch the truncation trap too: a per-item node census keyed on a **shortened** name silently merged `<slug>` with `<slug> — original SVG (unstyled)` into one bucket, which is how a 467-node count for a 233-node frame read as normal |
+| Nothing outside the artboard | every visible node's `absoluteBoundingBox` vs the **frame's own** bounds, all four edges | nothing past `0…frame.width` / `0…frame.height`. This is not the margins row: that one is left/right against the *content box* and plot ink only. The failure it exists for is a **footer that grew a row** — every template but static mobile 1 constrains its footer `MIN`, so it keeps its top edge and the extra height goes *downward, off the artboard*. Nothing errors, nothing clips, and it survives a screenshot of the frame; it is simply missing from the export. Re-pin with `footer.y = FOOTER_BOTTOM - footer.height` after any edit that changes a footer's height. A frame with `clipsContent` hides the overflow instead of spilling it — still a defect, and the row names which of the two you have |
+| Dead fills | any VECTOR whose every `vectorPaths` entry is `windingRule: "NONE"` **and** carries a visible fill **and** has area | none. A matplotlib `clipPath` arrives through `upload_assets` as exactly this: it paints nothing, so no screenshot shows it, while the layer panel shows a paint swatch and its colour enters the fill inventory that `off-palette` and the `color_audit.py` palette are built from. Nine of them put a phantom `#000000` into one real page's palette. **The area test is load-bearing** — grapher's own gridlines are open stroked paths measuring `123.75x0` with `windingRule: NONE` and a default black fill, and without it an untouched grapher import reports **29** findings, i.e. the row fires on every imported chart. Deleting them: Figma removes the wrapper GROUP once its last child goes, so reading `parent.children` after a `remove()` throws — guard with `parent.removed` |
+| How much is on the page (**computed** — `page-census`, REVIEW) | count the plot-bearing objects anywhere on the page — `countries-with-data` groups on a map, the equivalent plot group otherwise — and name what each one is for | one per **intended** item: the deliverable, plus the reference copies you meant to place. A third is clutter. **Do not check this by testing top-level children for overlap** — that answers a different question and answers it "clean": on one page three world maps sat at three distinct positions, so an overlap test passed twice while the reader was looking at a pile of near-identical maps in the left-hand column, one of which displayed the export's own legend/map collision. The reader's question is *how many of this thing am I looking at*, and only a count answers it. Watch the truncation trap too: a per-item node census keyed on a **shortened** name silently merged `<slug>` with `<slug> — original SVG (unstyled)` into one bucket, which is how a 467-node count for a 233-node frame read as normal. **`verify_page.js` now counts and names them for you**, in full and unshortened: the objection that it never has a page was stale, since the frame gate already resolves the frame's own PAGE and switches to it, which is what loads the children. It stays `REVIEW` and never `ok`, because the target is one per *intended* item and intent is not a property of the file |
 
 **A stroke weight read out of the embed SVG is in the EXPORT CANVAS's units, and the fit then scales
 it — so it is the weight the line *starts* at, never the one it arrives at.** Never take it as a

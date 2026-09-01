@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import argparse
 import itertools
+import json
 import re
 import sys
 from collections.abc import Iterator
@@ -49,7 +50,11 @@ REGION = re.compile(r"^//\s*#(region\s+\S+|endregion)\s*$")
 # The calls reference/CHECKS.md tells an operator to send, per script. `--check` measures THESE.
 # Keep the two in step: this list is the workflow, and the doc is where a human reads it.
 DOCUMENTED_CALLS: dict[str, list[tuple[str, ...]]] = {
-    "verify_page.js": [("annotations",), ("series",), ("type", "geometry")],
+    # Rebalanced when the declared-gap rows moved into their own `skipped` region. Those rows are
+    # pure prose and were being re-sent by all three calls, which is what held the largest slice at
+    # 90% of the cap: the shared floor was 26,899 characters, of which 13,217 was text nobody needed
+    # three copies of. Splitting it out took the floor to ~15,700 and the worst call from 90% to 70%.
+    "verify_page.js": [("annotations",), ("type", "geometry"), ("series", "skipped")],
 }
 
 
@@ -255,7 +260,7 @@ def main() -> int:
     ap.add_argument(
         "--rows",
         help="comma-separated row groups to keep (verify_page.js: type, series, geometry, "
-        "annotations). Omit for the whole file. Use --list-rows to see them with their sizes.",
+        "annotations, skipped). Omit for the whole file. Use --list-rows to see them with their sizes.",
     )
     ap.add_argument("--list-rows", action="store_true", help="list a script's row groups and exit")
     ap.add_argument(
@@ -388,6 +393,27 @@ def main() -> int:
             ap.error(
                 f"no such row group(s): {', '.join(sorted(unknown))}. Available: {', '.join(dict.fromkeys(groups))}"
             )
+        # A slice can only fail the rows it carries, so its verdict has to say which those were.
+        # Without this, "no mechanical row failed" out of ONE documented call reads as a verdict on
+        # the frame — the same confident silence the SKIPPED rows exist to prevent, reached by
+        # slicing rather than by not looking. REQUIRED rather than best-effort: a sliceable script
+        # with no declaration cannot produce an honest partial verdict, and discovering that from a
+        # misleading result later is exactly the failure being closed here.
+        emitted = [g for g in dict.fromkeys(groups) if g in wanted]
+        stripped, n_rows = re.subn(
+            r"(const EMITTED_ROWS = )\[[^\]]*\];",
+            lambda m: m.group(1) + json.dumps(emitted) + ";",
+            stripped,
+            count=1,
+        )
+        if not n_rows:
+            print(
+                f"{args.script} carries #region markers but declares no EMITTED_ROWS, so a slice of it "
+                "cannot report which rows it left out. Add "
+                '`const EMITTED_ROWS = [...];` beside its CONFIG.',
+                file=sys.stderr,
+            )
+            return 1
 
     if args.frame_id:
         stripped, n_sub = re.subn(
