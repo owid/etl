@@ -9,9 +9,9 @@ It is no longer a faithful port: three corrections make the output differ from t
 design, each documented where it happens and in
 ai/adversarial-review-harmonized_income_distributions-2026-08-26.md.
 
-  - The welfare basis of a country-year now follows PIP's own decision tree. The source project
-    preferred INCOME where PIP publishes both concepts, which mislabelled the 88 country-years whose
-    PIP distribution is in fact consumption (see build_welfare_basis).
+  - The welfare basis of a country-year follows PIP's own decision tree. The source project
+    preferred INCOME where PIP publishes both concepts, which mislabelled the 88 country-years
+    whose PIP distribution is in fact consumption (see build_welfare_basis).
   - Fitted income profiles are made monotone (see ENFORCE_MONOTONE_INCOME_BASIS).
   - WID is converted at the PPP year WID prices its series in, not a fixed one (in the snapshot).
 
@@ -90,18 +90,18 @@ ENFORCE_MONOTONE_INCOME_BASIS = True
 # How to assign each country's welfare basis (income vs consumption) across the panel. PIP's
 # lined-up values for a non-survey year were themselves produced by choosing a concept, so the goal
 # is to RECOVER that choice rather than approximate it:
-#   "pip_decision_tree": PIP's own rule (methodology handbook, "Income consumption decision tree").
-#                        At a survey year, consumption if available. Otherwise, if one concept has a
-#                        survey on BOTH sides, interpolate with that concept (consumption first);
-#                        failing that, extrapolate from the nearest survey.
-#   "nearest_survey":    the nearest survey's type, whichever it is. Agrees with the tree for 99.3%
-#                        of country-years and moves the 2023 decomposition by 0.0000pp, but differs
-#                        on 40 interpolated country-years across 11 countries — which is what a
-#                        multi-year reading of the panel would rest on.
+#   "pip_decision_tree": PIP's own rule — the surveyed concept at a survey year, the concept whose
+#                        surveys bracket the gap where one does, the nearest survey's otherwise.
+#                        Both branches are verified against PIP's published distributions; see
+#                        assign_by_pip_decision_tree.
+#   "nearest_survey":    always the nearest survey's concept. Differs from the tree on 24
+#                        country-years across 8 countries, and the evidence goes against it in all
+#                        24 (they are interpolated years, where the bracketing concept is the only
+#                        one PIP could have used). Kept to measure that sensitivity.
 #   "latest_survey":     one static type per country, from its most recent survey — the shape the
-#                        source project used for its single reference year. Kept for comparison,
-#                        but it does NOT reproduce that project: it preferred income where both
-#                        concepts exist, which is the mislabelling this step corrects.
+#                        source project used for its single reference year. Kept for comparison, but
+#                        it does NOT reproduce that project: it preferred income where both concepts
+#                        exist, which is the mislabelling this step corrects.
 WELFARE_ASSIGNMENT = "pip_decision_tree"
 
 # Sanity floor on the common PIP-and-WID country sample.
@@ -490,28 +490,79 @@ def fit_consumption_income_model(tb_percentiles: Table) -> Table:
 
 
 def assign_by_pip_decision_tree(tb_surveys: Table, grid: Table) -> Table:
-    """PIP's income/consumption decision tree, per country-year.
+    """PIP's income/consumption decision tree, applied per country-year:
 
-    https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#inccon
+        is there a survey AT this year?
+          yes -> its concept, taking consumption if the year offers both (handbook §5.4)
+          no  -> a survey of ONE resolved concept both before and after? (consumption checked first)
+                   yes -> that concept, because PIP interpolates between those two surveys
+                   no  -> the nearest survey's concept, because PIP extrapolates from it
+                          (equidistant surveys resolve to the earlier one)
 
-        estimate AT this year?
-          yes -> consumption if this survey has one, else income
-          no  -> a survey on BOTH sides?
-                   consumption on both -> consumption  (interpolated within one concept)
-                   income on both      -> income
-                   neither spans       -> nearest survey's concept
-                 only one side         -> nearest survey's concept
+    The subtle part, and the reason a first attempt at this got 16 country-years wrong, is that the
+    "both sides" test runs on each survey year's RESOLVED concept — consumption where PIP publishes
+    both — and not on raw availability. A year offering both is a consumption endpoint only. Testing
+    raw availability instead lets a dual-concept year anchor an income interpolation that PIP never
+    performed: it made Haiti 2007-2011 income, when PIP's published bins for those years carry the
+    2012 consumption survey's shape.
 
-    Note the asymmetry that makes this differ from "nearest survey": a survey year offering both
-    concepts counts as an endpoint for EITHER, so it can anchor an income interpolation even though
-    the year itself is reported as consumption. Haiti 2007-2011 is that case.
+    Everything below is measured against PIP's published distributions, not read off the diagram.
 
-    The "neither spans" fallback is the one branch the published figure leaves ambiguous — its
-    wording ("the latest (earliest) data point") is written for reference years outside the survey
-    range, not for a year sitting between two surveys of different concepts. 46 country-years across
-    9 countries land there. Nearest survey is used, which is what PIP itself does: for 32 of the 33
-    cases where the anchor is identifiable, PIP's lined-up distribution is a scaled copy of the
-    nearest survey's, so its Gini matches that survey's exactly. Ties go to consumption, per above.
+    The label has to be inferred, because PIP attaches no welfare type to a filled-in year: the
+    thousand-bins product calls its values "welfare (income or consumption)", and none of the 5,860
+    filled-in country-years appears in PIP's own `complete_series`, which does carry `welfare_type`
+    but only for survey years.
+
+    What makes the tree checkable is that the bins are an inversion of PIP's own lined-up poverty
+    curve. The source paper's replication code queries `pip ... fillgaps` at ~1,000 poverty lines and
+    differences the headcounts into bins (Mahler, Yonzan & Lakner 2022, WP 10198, `01-QueryPIP.do`).
+    That paper covers 1990-2019 in 2017 PPPs, so it does not describe our data on its own authority —
+    but the construction is still intact in the 2026-03 vintage used here: 1,000 exactly
+    equal-population bins per country-year, the same distinctive top-bin step, and bin-implied
+    headcount ratios that reproduce PIP's published lined-up ones to within 0.09pp at every poverty
+    line tested ($3.00, $8.30, $20.00 a day; 8,028 country-years, survey and filled-in alike).
+
+    Given that, the two lineup mechanisms leave different fingerprints, and both branches of the tree
+    can be checked directly:
+
+    - EXTRAPOLATION scales one survey's distribution, which leaves inequality untouched. Past a
+      country's last survey the Gini should therefore be a flat plateau while the mean moves, and it
+      is: exactly flat across the whole stretch for 158 of the 167 countries with one, and in 151 of
+      those the mean moves by more than 1% — distribution-neutral scaling, visibly. The exceptions
+      are Venezuela (Gini spread 0.049) and South Sudan (0.003); the other seven deviate by <0.0003.
+    - INTERPOLATION averages two surveys' poverty rates, which does not preserve either Gini. Of the
+      1,878 country-years that ANY same-concept pair spans, exactly 0 carry a survey's Gini, and
+      where the two spanning surveys are the immediate neighbours 90.7% sit strictly between them.
+      That is the tree's middle branch. Note "any pair", not "the immediate neighbours": Belize's
+      2000-2017 sit between a 1999 income and a 2018 consumption survey, but a 1995 consumption
+      survey further back means consumption spans them, and their Gini slides smoothly from 0.5403
+      to 0.4095 — an interpolation, exactly as the tree implies. This is why the spanning test below
+      scans all earlier and all later surveys rather than the adjacent two.
+    - Where NO concept spans the year, PIP cannot interpolate (§5.2: "Interpolations are never done
+      between consumption and income aggregates"), so it extrapolates from one survey — and of those
+      78 country-years, 71 (91%) carry the NEAREST survey's Gini exactly, the 7 misses being the
+      one-year plateau offset. That is the tree's fallback branch, and the anchor switch is directly
+      visible as a plateau boundary at the gap's midpoint: Haiti 2002-2006 sit at 0.5891 (its 2001
+      income survey) and 2007-2011 at 0.4106 (its 2012 consumption survey).
+
+    Both branches are therefore verified rather than assumed, and the tree strictly dominates a
+    plain nearest-survey rule. They differ on 24 country-years across 8 countries (Belize 9, Croatia
+    4, Bulgaria 3, Slovakia 3, Ukraine 2, Hungary 1, Lithuania 1, Slovenia 1), every one of them a
+    year whose Gini matches no survey — so interpolated, so bracketed by two surveys of one concept,
+    and that concept is what the tree names. Croatia 1994 is the clean case: nearest-survey would
+    call it consumption from the 1998 survey, but no consumption survey precedes 1998, so a
+    consumption interpolation is impossible; income brackets it (1988 and 2011), and the tree says
+    income. Ukraine 1998 is the mirror image — no income survey precedes 1999, consumption brackets
+    it (1996, 2002), and the tree says consumption where nearest-survey says income.
+
+    Equidistant surveys in the fallback branch go to the EARLIER one, which is what np.argmin
+    returns on a sorted array. Those plateau boundaries settle this directly, because a tie year
+    falls visibly on one side: Namibia's plateaus are 1994-1998 at 0.7104 and 1999-2002 at 0.6327,
+    so 1998 — five years from either survey — sits with the earlier, income one; Saint Lucia's are
+    1996-2005 and 2006-2014, so 2005 goes to the earlier; Nicaragua's are 2006-2007 and 2008, so
+    2007 goes to the earlier. Uzbekistan 2012 agrees. The one exception is Kyrgyzstan 1999, whose
+    candidates are a single year away on either side — near-certainly a survey reference period a
+    whole-year distance cannot resolve.
     """
     offered = tb_surveys.groupby(["country", "year"], observed=True)["welfare_type"].agg(set)
     resolved = offered.apply(lambda t: "consumption" if "consumption" in t else "income")
@@ -524,51 +575,38 @@ def assign_by_pip_decision_tree(tb_surveys: Table, grid: Table) -> Table:
     for country, block in panel.groupby("country", observed=True):
         if country not in known:
             continue
-        years = block["year"]
         surveys = np.array(sorted(offered.loc[country].index))
-        has_cons = np.array(["consumption" in offered.loc[(country, y)] for y in surveys])
-        has_inc = np.array(["income" in offered.loc[(country, y)] for y in surveys])
+        # One resolved concept per survey year — never raw availability, see the docstring.
+        concepts = np.array([resolved.loc[(country, int(y))] for y in surveys])
+        years = block["year"].to_numpy()
+        # argmin over a sorted survey array takes the earliest of any tie; a year that IS a survey
+        # year has distance 0, the unique minimum, so it resolves to itself.
+        nearest = np.abs(surveys[None, :] - years[:, None]).argmin(axis=1)
 
-        for year in years.to_numpy():
-            # Equidistant surveys: prefer consumption, rather than whichever np.argmin happens to
-            # return. Verified against PIP: Kyrgyzstan 1999 lies one year from a 1998 income survey
-            # and one from a 2000 consumption survey, and PIP's lined-up 1999 distribution matches
-            # the 2000 consumption shape to 4.7e-10.
-            distance = np.abs(surveys - year)
-            closest = surveys[distance == distance.min()]
-            nearest = int(
-                closest[0]
-                if not any("consumption" in offered.loc[(country, int(y))] for y in closest)
-                else next(int(y) for y in closest if "consumption" in offered.loc[(country, int(y))])
-            )
-            if year in surveys:
-                welfare, used = resolved.loc[(country, int(year))], int(year)
-            else:
+        for year, near_i in zip(years, nearest):
+            survey_used, welfare = int(surveys[near_i]), concepts[near_i]
+            if year not in surveys:
                 earlier, later = surveys < year, surveys > year
-                spans_cons = (has_cons & earlier).any() and (has_cons & later).any()
-                spans_inc = (has_inc & earlier).any() and (has_inc & later).any()
-                if spans_cons:
-                    welfare = "consumption"
-                elif spans_inc:
-                    welfare = "income"
-                else:
-                    welfare = resolved.loc[(country, nearest)]
-                used = nearest
-            rows.append((country, int(year), welfare, used))
+                for concept in ("consumption", "income"):  # §5.4 prefers consumption
+                    spans = concepts == concept
+                    if (spans & earlier).any() and (spans & later).any():
+                        welfare = concept
+                        break
+            rows.append((country, int(year), welfare, survey_used))
 
     return Table(pd.DataFrame(rows, columns=["country", "year", "welfare_type", "survey_year_used"]))
 
 
 def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int, last_year: int) -> Table:
     """Each (country, year)'s welfare basis — income or consumption — by PIP's own decision tree
-    (see assign_by_pip_decision_tree). Survey years offering both concepts count as CONSUMPTION.
+    (see assign_by_pip_decision_tree). Survey years offering both count as CONSUMPTION.
 
     Why the label matters: it decides whether the consumption -> income transform runs on that
     country-year, so it has to describe what the thousand-bins values ARE, not what would be
     convenient. Getting it backwards either leaves consumption sitting in an income series or
     transforms income that needed no transforming.
 
-    Two cases, and PIP settles both:
+    Two cases, and PIP's data settles both:
 
     - A SURVEY year offering both concepts. The bins are consumption, verified rather than assumed:
       their means sit 0.03% from PIP's published consumption mean and 18% from its income mean, for
@@ -577,25 +615,20 @@ def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int,
       whenever both income and consumption estimates are available for a given reference year,
       consumption estimates are preferred"
       (https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#inccon).
-    - A NON-SURVEY year. Those values are PIP's own lined-up estimate, produced by walking the same
-      decision tree, so following the tree recovers the concept PIP used instead of guessing. §5.4
-      again: "when both kinds of poverty estimates are available for the same years (but not for a
-      particular reference year), interpolations and extrapolation are made using the consumption
-      estimates" — so the preference carries past the reference year, which is why the tree checks
-      consumption before income.
+    - A NON-SURVEY year. PIP attaches no concept to these at all, so it has to be inferred, and
+      PIP's decision tree is the rule — with both of its branches verified against the published
+      distributions rather than taken on trust. See assign_by_pip_decision_tree.
 
     Until 2026-08-28 this step labelled the dual survey years income, skipping the transform and
     carrying consumption into `pip_income_basis` as though it were already income, roughly 18% low.
     Correcting it moved the 2023 between share by -0.24pp.
 
-    Worth being precise about how the transform relates to PIP's own methods, because they are
-    narrower than they first look. Handbook §5.2 says "Interpolations are never done between
-    consumption and income aggregates" — but read where it sits: that section is about interpolating
-    a survey MEAN between two surveys using national-accounts growth, so the rule is that one such
-    calculation may not span the two concepts. It is not a refusal to change concept over time: the tree's extrapolation
-    branch takes whichever concept its anchor survey carries, so a country's lined-up series does
-    switch between concepts across periods. 29 of the countries here do. That is precisely why the
-    basis is assigned per country-year rather than once per country.
+    A country's basis is therefore assigned per country-year, not once per country: 29 countries
+    here switch concept across the panel, because their anchor surveys do. That is consistent with
+    PIP, whose handbook §5.2 rule "Interpolations are never done between consumption and income
+    aggregates" is narrower than it first sounds — it sits in a section about interpolating a survey
+    MEAN between two surveys with national-accounts growth, so it forbids one such calculation
+    spanning the two concepts, not a series changing concept over time.
 
     What PIP never does is CONVERT one concept into the other — it selects between measured series,
     it does not estimate an income distribution from a consumption one. That is what this step's
@@ -605,7 +638,9 @@ def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int,
 
     sanity_check_welfare_basis asserts the label-matches-the-bins invariant on every run. It can
     only test SURVEY years, since those are the only ones where PIP publishes both concepts to
-    compare against; the interpolated years rest on the tree being followed correctly.
+    compare against. The non-survey years are covered instead by the Gini-fingerprint evidence in
+    assign_by_pip_decision_tree, which validates both branches of the tree against PIP's own
+    published distributions.
     """
     d = national_survey_percentiles(tb_percentiles)
     types = (
@@ -623,11 +658,11 @@ def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int,
     years = Table({"year": range(first_year, last_year + 1)})
     grid = types[["country"]].drop_duplicates().merge(years, how="cross").sort_values(["country", "year"])
 
-    # None of these modes caps the distance to the survey they draw on — up to 32 years. That is
-    # deliberate, and measured: PIP's own published country-years sit up to the same 32 years from a
-    # survey (median 1, 90th percentile 9, 99th 23), because this panel IS PIP's coverage, and PIP
-    # picks the concept from that same anchor. Capping would make this step diverge from the source,
-    # not follow it. `survey_year_used` is published so consumers can filter if they want to.
+    # No mode caps the distance to the survey it draws on — up to 32 years. That is deliberate, and
+    # measured: PIP's own published country-years sit up to the same 32 years from a survey (median
+    # 1, 90th percentile 9, 99th 23), because this panel IS PIP's coverage, and PIP picks the concept
+    # from that same anchor. Capping would make this step diverge from the source, not follow it.
+    # `survey_year_used` is published so consumers can filter if they want to.
     if WELFARE_ASSIGNMENT == "pip_decision_tree":
         tb = assign_by_pip_decision_tree(d, grid)
     elif WELFARE_ASSIGNMENT == "nearest_survey":
