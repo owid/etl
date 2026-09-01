@@ -4,7 +4,7 @@ meta:
   origin:
     # Data product / Snapshot
     title: "The Crime Survey for England and Wales"
-    description: The Crime Survey for England and Wales (CSEW) is an interviewer-administered face-to-face survey asking people (aged 16 years and over) resident in households about their experiences of crime in the past year. It provides a reliable measure of crime trends for the population, and the offence types it covers. This is because it is unaffected by police reporting or recording changes. The survey excludes crimes against commercial or public sector bodies, tourists, or those living in communal establishments like care homes, student halls of residence and prisons. The survey does not cover crimes where there is not a specific victim, such as drug possession, and other crimes against the state.
+    description: The Crime Survey for England and Wales (CSEW) is an interviewer-administered face-to-face survey asking people (aged 16 years and over) resident in households about their experiences of crime in the past year. It provides a reliable measure of crime trends for the population, and the offense types it covers. This is because it is unaffected by police reporting or recording changes. The survey excludes crimes against commercial or public sector bodies, tourists, or those living in communal establishments like care homes, student halls of residence and prisons. The survey does not cover crimes where there is not a specific victim, such as drug possession, and other crimes against the state.
     date_published: "2025-10-23"
 
     # Citation

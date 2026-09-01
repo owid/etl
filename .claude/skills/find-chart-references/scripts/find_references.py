@@ -49,6 +49,28 @@ from etl.config import OWID_ENV
 RENDER, EMBED, LINK = "render", "embed", "link"
 TAILSCALE_SUFFIX_RE = re.compile(r"\.tail[0-9a-z]+\.ts\.net")
 GOOGLE_REDIRECT_RE = re.compile(r"^https?://(?:www\.)?google\.[a-z.]+/url\?", re.IGNORECASE)
+
+
+def url_pathname(target: str | None) -> str:
+    """Pathname of a URL, with a trailing slash normalized away.
+
+    A URL may be a bare path, a path carrying a query and/or fragment, or absolute, and only its
+    PATHNAME says which page it points at. One that merely mentions another page inside its query
+    — `/article?next=/explorers/foo` — does not navigate there, so substring-matching the raw
+    string reports an unrelated page as a reference to that page.
+
+    Used for BOTH a site redirect's target and a gdoc's raw link target, because the consequence
+    is the same in both: a spurious match becomes a RED row, and a RED row blocks a preflight.
+
+    It lives in this module, which imports no siblings by design (it is loaded by path, not as a
+    package), because the sweep and the redirect preflights must apply this rule IDENTICALLY:
+    the sweep decides whether to raise the finding and a preflight decides whether to block on
+    it. Two copies drifted once already, so consumers import this one.
+    """
+    path = urlsplit((target or "").strip()).path
+    return path.rstrip("/") or path
+
+
 # Every raw-URL sweep adds this to its SQL prefilter. A wrapper can percent-encode the
 # nested URL's slashes, in which case a `LIKE '%/grapher/<slug>%'` prefilter drops the row
 # before `unwrap_redirect` ever sees it — so wrapper rows are always candidates and the
@@ -63,7 +85,7 @@ ARCHIVE_HOST = "archive.ourworldindata.org"
 # Surfaces this run could NOT sweep, and subjects that did not resolve. An empty result for
 # any of these means UNKNOWN, not "nothing references it", so they must survive past stdout:
 # they go into the `--markdown` report's "Not searched" section, and `--gaps-json` hands them
-# to whatever wraps this script (audit_references.py puts them in its own Unverified bucket).
+# to whatever wraps this script (audit_references.py lists them under "What this sweep didn't cover").
 # Otherwise a truncated sweep reads as a complete audit.
 COVERAGE_GAPS: list[str] = []
 
@@ -225,6 +247,65 @@ def sweep_gdoc_links(by_slug: dict[str, dict]) -> list[dict]:
     return out
 
 
+def sweep_articles_placing_narrative_charts(findings: list[dict]) -> list[dict]:
+    """The articles that place each narrative chart already found — its second hop.
+
+    A narrative-chart row says what has to change but not where the change lands: the chart
+    itself is not in an article, articles place it **by name** in a `{.narrative-chart}` block.
+    Replacing one therefore always includes an article edit, and without this hop the report
+    names a narrative chart and leaves the operator to find its usages by hand.
+
+    `posts_gdocs_links` records those placements with `linkType='narrative-chart'` and the name
+    in `target` — the same table and column the admin's own references endpoint reads
+    (`getNarrativeChartReferences` → `getPublishedLinksTo(…, ContentGraphLinkType.NarrativeChart)`).
+
+    Unpublished drafts are kept, unlike that endpoint, which filters `published = TRUE`. A draft
+    referencing the name does not affect readers but does affect the operator: it is the thing
+    that surprises you at delete time, and it is carried with `published` so a consumer can rank
+    it below the live ones rather than confuse the two.
+    """
+    names = sorted({str(f["where"]) for f in findings if f["surface"] == "narrative chart" and f.get("where")})
+    if not names:
+        return []
+    df = OWID_ENV.read_sql(
+        "SELECT pgl.target, pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, "
+        "       pg.published, pgl.componentType, pgl.text, pgl.queryString "
+        "FROM posts_gdocs_links pgl JOIN posts_gdocs pg ON pg.id = pgl.sourceId "
+        "WHERE pgl.linkType = 'narrative-chart' AND pgl.target IN %(n)s ORDER BY pgl.target, pg.slug",
+        params={"n": tuple(names)},
+    )
+    by_name = {str(f["where"]): f for f in findings if f["surface"] == "narrative chart"}
+    out = []
+    for r in df.to_dict("records"):
+        parent = by_name[r["target"]]
+        out.append(
+            rec(
+                # The subject is the narrative chart, not the chart being retired: this row is
+                # only reachable because that chart is, and `subject` has to be the string an
+                # operator searches the doc for — which for a block placement is the name.
+                "narrative chart",
+                r["target"],
+                parent["surface_id"],
+                "gdoc (narrative chart)",
+                EMBED,
+                r["post_slug"],
+                f"/{r['post_slug']}",
+                surface_id=r["gdoc_id"],
+                # The parenthesized type is load-bearing: `reference_report.page_type` reads it
+                # to pick the public base, and a data insight or author page is not served at
+                # the site root the way an article is.
+                context=f"places narrative chart `{r['target']}` ({r['post_type']})",
+                query_string=r["queryString"],
+                # Deliberately left empty even when the column has something: a block placement
+                # has no visible anchor text, so `find_in_doc` must fall through to the name,
+                # which is what the ArchieML block actually spells out.
+                text="",
+                published=r["published"],
+            )  # fmt: skip
+        )
+    return out
+
+
 def unwrap_redirect(target: str) -> str:
     """The real URL behind a `google.com/url?…` wrapper, which is what a raw link often is.
 
@@ -360,7 +441,8 @@ def sweep_narrative_charts_of_charts(by_slug: dict[str, dict]) -> list[dict]:
                 r["name"],
                 f"/admin/narrative-charts/{r['id']}/edit",
                 surface_id=int(r["id"]),
-                # NOTE: chart_configs.full for a narrative chart is materialized and lags a
+                # NOTE: a narrative chart's rendered config (chart_configs.config for the row
+                # named by chartConfigId) is materialized and lags a
                 # parent edit. To inspect one, use AdminAPI.get_narrative_chart(id)["configFull"]
                 # rather than reading this row directly.
                 config_id=r["chartConfigId"],
@@ -449,6 +531,75 @@ def sweep_key_charts(by_slug: dict[str, dict]) -> list[dict]:
     ]
 
 
+# Every featured metric, keyed by nothing but its URL string, so all three subject types match
+# it in Python. Read once: a run can ask for charts, MDIMs and explorers in the same pass.
+_FEATURED_METRICS: list[dict] | None = None
+
+
+def featured_metric_rows() -> list[dict]:
+    """The whole `featured_metrics` table, with its parent tag name.
+
+    Read whole and filtered in Python, not joined or `LIKE`-matched, because the only handle a
+    row carries is a URL: `LIKE '%/grapher/<slug>%'` cannot tell `/grapher/foo` from
+    `/grapher/foo-bar`, and `SUBSTRING_INDEX(url, '/', -1)` — the wizard search-comparison
+    app's spelling — returns `slug?a=b` whenever there is a query string, i.e. most MDIM and
+    all explorer rows. A few hundred rows in total.
+    """
+    global _FEATURED_METRICS
+    if _FEATURED_METRICS is None:
+        df = OWID_ENV.read_sql(
+            "SELECT fm.id, fm.url, fm.ranking, fm.incomeGroup, fm.boostInSearch, "
+            "       t.name AS tag, t.id AS tag_id "
+            "FROM featured_metrics fm JOIN tags t ON t.id = fm.parentTagId "
+            "ORDER BY t.name, fm.ranking"
+        )
+        _FEATURED_METRICS = df.to_dict("records")
+    return _FEATURED_METRICS
+
+
+def sweep_featured_metrics(subject_type: str, by_pathname: dict[str, tuple]) -> list[dict]:
+    """Topic-page featured-metric slots holding any of these pathnames.
+
+    An editorial slot on a topic page, so `render` like a key chart — but held by URL rather
+    than an id, and **a redirect does not rescue it**. The row is resolved only when Algolia
+    indexes, by exact pathname AND exact query-param map, against published records. Retiring
+    what it names therefore empties the slot silently, and re-adding the old URL is then
+    refused (creating a row validates that the slug resolves to something *published*), so it
+    must be swapped by hand before the migration.
+
+    Matching is on pathname alone for the same reason: for an MDIM or explorer the row's query
+    string IS the view, so a params-equal test would drop the rows a migration most needs to
+    see — those whose params no longer name a live view. They travel in `query_string` instead,
+    for the caller to compare with the machinery it already has.
+
+    `by_pathname` maps each pathname reaching the subject to its `(subject, subject_id)`, so a
+    chart subject can pass every old slug alongside the current one.
+    """
+    out = []
+    for r in featured_metric_rows():
+        url = unwrap_redirect(r["url"])
+        hit = by_pathname.get(url_pathname(url))
+        if hit is None:
+            continue
+        subject, subject_id = hit
+        boost = " boostInSearch" if r["boostInSearch"] else ""
+        out.append(
+            rec(
+                subject_type,
+                subject,
+                subject_id,
+                "featured metric",
+                RENDER,
+                r["tag"],
+                "/admin/featured-metrics",
+                surface_id=int(r["id"]),
+                context=f"ranking={r['ranking']} incomeGroup={r['incomeGroup']}{boost}",
+                query_string=url_query(url),
+            )  # fmt: skip
+        )
+    return out
+
+
 # There is deliberately no WordPress sweep. The `posts` mirror is dead: every published row
 # that links a chart 404s on the live site, and none of those slugs exists as a published
 # gdoc, so they are not migrated content the gdoc sweeps already cover. The sweep that used
@@ -493,7 +644,7 @@ def sweep_charts_of_indicators(variable_ids: list[int]) -> list[dict]:
     """
     df = OWID_ENV.read_sql(
         "SELECT DISTINCT cd.variableId, c.id AS chart_id, cc.id AS config_id, cc.slug, "
-        "       COALESCE(cc.full->>'$.isPublished', 'false') = 'true' AS published, "
+        "       COALESCE(cc.config->>'$.isPublished', 'false') = 'true' AS published, "
         "       c.isInheritanceEnabled AS inheritance "
         "FROM chart_dimensions cd JOIN charts c ON c.id = cd.chartId "
         "JOIN chart_configs cc ON cc.id = c.configId WHERE cd.variableId IN %(ids)s ORDER BY cc.slug",
@@ -712,7 +863,7 @@ def sweep_explorer_views_of_indicators(variable_ids: list[int]) -> list[dict]:
 
     views = OWID_ENV.read_sql(
         "SELECT ev.explorerSlug, ev.viewId, ev.dimensions, ev.chartConfigId, "
-        "       cc.full->'$.dimensions' AS config_dimensions "
+        "       cc.config->'$.dimensions' AS config_dimensions "
         "FROM explorer_views ev JOIN chart_configs cc ON cc.id = ev.chartConfigId "
         "WHERE ev.explorerSlug IN %(s)s ORDER BY ev.explorerSlug, ev.viewId",
         params={"s": tuple(published)},
@@ -829,10 +980,11 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
         "WHERE pgl.linkType = 'url' AND (pgl.target LIKE %(t)s OR pgl.target LIKE %(wrap)s)",
         params={"t": f"%/grapher/{slug}%", "wrap": WRAPPER_LIKE},
     )
-    exact = re.compile(rf"/grapher/{re.escape(slug)}(?:[?#/]|$)")
     for r in raw.to_dict("records"):
         target = unwrap_redirect(r["target"])
-        if not exact.search(target):
+        # As in the explorer pass: compare the unwrapped url's pathname, so a link that merely
+        # names this slug inside another page's query is not counted as a reference to it.
+        if url_pathname(target) != f"/grapher/{slug}":
             continue
         if ARCHIVE_HOST in target:
             continue  # archived snapshots are frozen by design
@@ -886,16 +1038,27 @@ def sweep_mdim_subject(mdim: str) -> list[dict]:
     )
     for r in redirects.to_dict("records"):
         out.append(rec("mdim", slug, mdim_id, "redirect", LINK, r["source"], r["source"], context="redirects here"))
+
+    # An MDIM's featured-metric rows live under `/grapher/<slug>`, same namespace as a chart's:
+    # multi-dims are served from `/grapher/`, so one pathname covers both. A row with no query
+    # string names the MDIM's default view.
+    out += sweep_featured_metrics("mdim", {f"/grapher/{slug}": (slug, mdim_id)})
     return out
 
 
 def sweep_explorer_subject(explorer: str) -> list[dict]:
-    # An unknown slug matches nothing in every query below, so the run would end with
-    # `references: 0` — the same output as an explorer nothing points at. Resolve it first,
-    # as the chart, indicator and MDIM subjects do.
+    # An unknown slug matches nothing in every query below, so a run would end with
+    # `references: 0` — the same output as an explorer nothing points at. But unlike a chart,
+    # an explorer that is GONE is the normal end state of a migration, and pages can still
+    # link to it: every query here keys on the slug, not on a row id, so they all work for a
+    # deleted explorer. So record a gap and keep sweeping instead of returning empty — a
+    # retired explorer's leftover links are exactly what someone needs to find, and
+    # returning [] hid them. A typo now surfaces as a gap rather than a bare print.
     if OWID_ENV.read_sql("SELECT slug FROM explorers WHERE slug = %(s)s", params={"s": explorer}).empty:
-        print(f"  (explorer not found: {explorer})")
-        return []
+        gap(
+            f"explorer '{explorer}' is not in the `explorers` table — swept its references anyway "
+            "(already retired?). If the slug is simply wrong, every count for it is a false zero."
+        )
 
     df = OWID_ENV.read_sql(
         "SELECT pg.id AS gdoc_id, pg.slug AS post_slug, pg.type AS post_type, pg.published, "
@@ -938,10 +1101,12 @@ def sweep_explorer_subject(explorer: str) -> list[dict]:
         "WHERE pgl.linkType = 'url' AND (pgl.target LIKE %(t)s OR pgl.target LIKE %(wrap)s)",
         params={"t": f"%/explorers/{explorer}%", "wrap": WRAPPER_LIKE},
     )
-    exact = re.compile(rf"/explorers/{re.escape(explorer)}(?:[?#/]|$)")
     for r in raw.to_dict("records"):
         target = unwrap_redirect(r["target"])
-        if not exact.search(target):
+        # Pathname of the UNWRAPPED url: a gdoc link to another page that merely carries this
+        # explorer's URL in its query or fragment does not navigate here, and a non-span
+        # component would be emitted as a RED row, which blocks the redirect preflight.
+        if url_pathname(target) != f"/explorers/{explorer}":
             continue
         if ARCHIVE_HOST in target:
             continue  # archived snapshots are frozen by design
@@ -964,6 +1129,48 @@ def sweep_explorer_subject(explorer: str) -> list[dict]:
                 published=r["published"],
             )  # fmt: skip
         )
+
+    out += sweep_explorer_inbound_redirects(explorer)
+    out += sweep_featured_metrics("explorer", {f"/explorers/{explorer}": (explorer, None)})
+    return out
+
+
+def sweep_explorer_inbound_redirects(explorer: str) -> list[dict]:
+    """Site redirects pointing AT this explorer.
+
+    Symmetric with the `redirect` surface the MDIM subject already reports, and load-bearing
+    rather than informational: an explorer path that is the target of a site redirect cannot
+    be given an MDIM redirect at all — the admin endpoint rejects it as a chain, and because
+    it caches its per-source checks, that one row fails every entry for the explorer. So this
+    is a blocker a consumer needs to surface before it tries to apply anything.
+
+    The `LIKE` prefilter is re-checked in Python for the same reason the URL passes are: a
+    prefix match would let `/explorers/inequality-wb` answer for `inequality`.
+    """
+    df = OWID_ENV.read_sql(
+        "SELECT id, source, target FROM redirects WHERE target LIKE %(like)s",
+        params={"like": f"%/explorers/{explorer}%"},
+    )
+    out = []
+    for r in df.to_dict("records"):
+        # Pathname equality, via the same helper the preflight blocks on: a redirect to another
+        # page that merely names this explorer in its query or fragment is not an inbound chain.
+        if url_pathname(r["target"]) != f"/explorers/{explorer}":
+            continue
+        out.append(
+            rec(
+                "explorer",
+                explorer,
+                None,
+                "site redirect",
+                LINK,
+                r["source"],
+                r["source"],
+                surface_id=int(r["id"]),
+                context=f"site redirect id={r['id']} points here — blocks creating an MDIM redirect (chain)",
+                query_string=url_query(r["target"]),
+            )  # fmt: skip
+        )
     return out
 
 
@@ -975,17 +1182,27 @@ def sweep_containers_for_articles(mdim_rows: list[dict], explorer_rows: list[dic
     and carries the same `country=`/`time=` pins the downstream audits grade — so walk
     the containers too. Rows keep their container as the subject: the reference is to
     the page, not to any one indicator inside it.
+
+    Article surfaces AND the containers' featured-metric slots are kept. The narrative-chart
+    and redirect rows these sweeps also return are dropped, because the indicator path emits
+    those itself and keeping them here would double-count.
     """
     mdims = sorted({f["where_path"].rsplit("/", 1)[-1] for f in mdim_rows if f["where_path"]})
     explorers = sorted({f["surface_id"] for f in explorer_rows if f["surface_id"]})
     if not mdims and not explorers:
         return []
     print(f"  transitive: sweeping articles for {len(mdims)} MDIM(s) and {len(explorers)} explorer(s)")
+    # Featured metrics ride along with the article surfaces. The filter exists to drop the
+    # narrative-chart and redirect rows these sweeps also return, because the indicator path
+    # emits those elsewhere and they would double-count — but nothing else emits a CONTAINER's
+    # featured-metric rows, so filtering them out left an indicator reachable only through a
+    # featured MDIM/explorer view reporting a false clean.
+    kept = (*GDOC_SURFACES, "featured metric")
     out = []
     for slug in mdims:
-        out += [f for f in sweep_mdim_subject(slug) if f["surface"] in GDOC_SURFACES]
+        out += [f for f in sweep_mdim_subject(slug) if f["surface"] in kept]
     for slug in explorers:
-        out += [f for f in sweep_explorer_subject(slug) if f["surface"] in GDOC_SURFACES]
+        out += [f for f in sweep_explorer_subject(slug) if f["surface"] in kept]
     return out
 
 
@@ -1008,6 +1225,13 @@ def summarize(findings: list[dict]) -> None:
 
 GDOC_SURFACES = ("gdoc", "gdoc (url link)", "data insight")
 
+# What `write_markdown` renders with the Google-Doc columns (doc edit link, admin preview,
+# find-in-doc hint). A narrative-chart placement lives in a gdoc too and exists precisely to
+# locate an article edit, so it needs those links — but it stays OUT of `GDOC_SURFACES`,
+# which consumers use to COUNT a subject's own article references: a placement references
+# the narrative chart, not the chart under audit, so counting it there would overstate both.
+GDOC_RENDERED_SURFACES = (*GDOC_SURFACES, "gdoc (narrative chart)")
+
 
 def gdoc_preview_url(f: dict, admin: str) -> str:
     """Admin preview of the article itself — renders the gdoc, including unpublished drafts."""
@@ -1019,14 +1243,33 @@ def doc_url(f: dict) -> str:
     return f"https://docs.google.com/document/d/{f['surface_id']}/edit" if f["surface_id"] else ""
 
 
-def deep_link(f: dict, host: str) -> str:
+def admin_url(where_path: str, host: str, admin: str = "") -> str:
+    """Absolute URL for a `where_path`, routing admin routes to the admin origin.
+
+    `admin` is an admin ROOT (".../admin"), while an admin `where_path` already starts
+    with `/admin/`, so the root's own suffix has to come off before joining or the result
+    carries `/admin/admin/`.
+    """
+    if not where_path:
+        return ""
+    if where_path.startswith("/admin/"):
+        origin = (admin or host).removesuffix("/").removesuffix("/admin")
+        return f"{origin}{where_path}"
+    return f"{host}{where_path}"
+
+
+def deep_link(f: dict, host: str, admin: str = "") -> str:
     """Published-article URL with a scroll-to-text fragment on the link's anchor text.
 
     Opens the article scrolled to (and highlighting) the reference, which is the
     fastest way to find it. Falls back to the plain article URL when the reference
     is a block embed with no anchor text.
+
+    Some `where_path`s are admin routes, not public ones (a narrative chart's editor).
+    Those must resolve against the admin origin — the public site does not serve
+    `/admin/...`, so prefixing them with `host` yields a link that 404s.
     """
-    base = f"{host}{f['where_path']}"
+    base = admin_url(f["where_path"], host, admin)
     anchor = (f.get("text") or "").strip()
     if not anchor:
         return base
@@ -1054,10 +1297,19 @@ def add_admin_urls(findings: list[dict]) -> None:
     """
     admin = admin_base()
     for f in findings:
-        if f["surface"] == "narrative chart" and f["surface_id"]:
+        if f["surface"] == "featured metric":
+            # The editable object is the slot, not the chart it names — and the swap is done
+            # on one page for every row. Checked before the subject_type fallbacks below,
+            # which would otherwise send a chart's featured-metric row to the chart editor.
+            f["admin_url"] = f"{admin}/featured-metrics"
+        elif f["surface"] == "narrative chart" and f["surface_id"]:
             f["admin_url"] = f"{admin}/narrative-charts/{f['surface_id']}/edit"
         elif f["surface"] == "chart" and f["surface_id"]:
             f["admin_url"] = f"{admin}/charts/{f['surface_id']}/edit"
+        elif f["subject_type"] == "narrative chart" and f["subject_id"]:
+            # An article placing a narrative chart: the editable object is the narrative
+            # chart, so `subject_id` is its id, not a chart's.
+            f["admin_url"] = f"{admin}/narrative-charts/{f['subject_id']}/edit"
         elif f["subject_type"] == "chart" and f["subject_id"]:
             # The row is a reference *to* a chart (article, explorer, static viz…).
             f["admin_url"] = f"{admin}/charts/{f['subject_id']}/edit"
@@ -1119,7 +1371,9 @@ def search_hint(f: dict) -> str:
     A prose hyperlink has visible anchor text, so that phrase is the search term. A
     block embed has none — the doc holds a bare grapher URL — so the slug is. Use the
     slug exactly as recorded: `posts_gdocs_links.target` keeps what the author typed,
-    which may be an old slug, and that is what is actually in the document.
+    which may be an old slug, and that is what is actually in the document. A
+    narrative-chart placement's `{.narrative-chart}` block spells out the name, so for
+    those the name is the search term.
     """
     # The cell holds the search string and nothing else, so it can be copied straight
     # into the doc's find box. What each variant means is in the legend under the table.
@@ -1127,7 +1381,7 @@ def search_hint(f: dict) -> str:
     if anchor:
         safe = cell(anchor, 55).replace("`", "'")
         return f"`{safe}`"
-    if f["subject_type"] == "chart":
+    if f["subject_type"] in ("chart", "narrative chart"):
         return f"`{cell(f['subject'], 55)}`"
     return "—"
 
@@ -1187,9 +1441,10 @@ def write_markdown(findings: list[dict], path: str, host: str, admin: str, cavea
         for surface in sorted(by_surface):
             rows = by_surface[surface]
             lines += [f"### {surface} ({len(rows)})", ""]
-            if surface in GDOC_SURFACES:
+            if surface in GDOC_RENDERED_SURFACES:
+                subject_col = "Narrative chart" if surface == "gdoc (narrative chart)" else "Chart"
                 lines += [
-                    "| Chart | Article | Open | Find in the doc |",
+                    f"| {subject_col} | Article | Open | Find in the doc |",
                     "|---|---|---|---|",
                 ]
                 for f in rows:
@@ -1199,9 +1454,12 @@ def write_markdown(findings: list[dict], path: str, host: str, admin: str, cavea
                     ptype = f["context"].split("(")[-1].rstrip(")") if "(" in f["context"] else ""
                     page_type = f" _{ptype}_" if ptype else ""
                     preview = f" · [👁 preview]({gdoc_preview_url(f, admin)})" if f["surface_id"] else ""
-                    links = f"[📄 doc]({doc_url(f)}){preview} · [🔗 page]({deep_link(f, host)})"
+                    links = f"[📄 doc]({doc_url(f)}){preview} · [🔗 page]({deep_link(f, host, admin)})"
                     if f["admin_url"]:
-                        links += f" · [✎ chart admin]({f['admin_url']})"
+                        # A placement row's editor opens the narrative chart, not a chart —
+                        # same mislabel `build_reference_handoff.open_links` already avoids.
+                        editor = "✎ narrative admin" if f["subject_type"] == "narrative chart" else "✎ chart admin"
+                        links += f" · [{editor}]({f['admin_url']})"
                     subject = (
                         f"[`{cell(f['subject_label'], 44)}`]({f['preview_url']})"
                         if f["preview_url"]
@@ -1213,7 +1471,7 @@ def write_markdown(findings: list[dict], path: str, host: str, admin: str, cavea
                 lines += ["| Subject | Where | Context | Open |", "|---|---|---|---|"]
                 for f in rows:
                     draft = "" if f["published"] else " ⚠️draft"
-                    link = f"[🔗 open]({host}{f['where_path']})" if f["where_path"] else "—"
+                    link = f"[🔗 open]({admin_url(f['where_path'], host, admin)})" if f["where_path"] else "—"
                     lines.append(
                         f"| {cell(f['subject_label'], 44)} | {cell(f['where'], 72)}{draft} | "
                         f"{cell(f['context'], 44)} | "
@@ -1303,6 +1561,9 @@ def main() -> int:
         findings += sweep_data_insights(by_slug)
         findings += sweep_static_viz(by_slug)
         findings += sweep_key_charts(by_slug)
+        # Keyed on every slug that reaches the chart, current and old alike: a featured metric
+        # added before a rename still holds the old one, and it is matched literally.
+        findings += sweep_featured_metrics("chart", {f"/grapher/{s}": (s, v["id"]) for s, v in by_slug.items()})
 
     if variable_ids:
         print(f"indicator subjects: {len(variable_ids)} variable(s)")
@@ -1324,6 +1585,9 @@ def main() -> int:
                 findings += sweep_gdoc_url_links(hop)
                 findings += sweep_data_insights(hop)
                 findings += sweep_narrative_charts_of_charts(hop)
+                # A chart rendering one of these indicators can also hold a featured-metric
+                # slot, which no other hop reaches.
+                findings += sweep_featured_metrics("chart", {f"/grapher/{s}": (s, v["id"]) for s, v in hop.items()})
             # A narrative chart can hang off an MDIM view instead of a chart, so the
             # chart hop alone leaves those configs unaudited.
             findings += sweep_narrative_charts_of_mdim_views(mdim_hits)
@@ -1336,9 +1600,9 @@ def main() -> int:
             findings += sweep_containers_for_articles(mdim_hits, explorer_hits)
         else:
             caveats.append(
-                "`--transitive` was not passed, so no article, data-insight or narrative-chart "
-                "surface was swept for the indicator subjects — only the charts, MDIM views and "
-                "explorer views that render them directly."
+                "`--transitive` was not passed, so no article, data-insight, narrative-chart or "
+                "featured-metric surface was swept for the indicator subjects — only the charts, "
+                "MDIM views and explorer views that render them directly."
             )
 
     # `--transitive` only has a second hop to make from an indicator. Passing it with just an
@@ -1361,6 +1625,11 @@ def main() -> int:
             f"{len(all_charts)} auto-generated 'All charts' index entries on {', '.join(pages)} were "
             "excluded from the tables below (`--include-all-charts` keeps them)."
         )
+
+    # After the 'All charts' exclusion, so a narrative chart dropped from the run cannot leave
+    # its article placements behind, and before the enrichment passes so the new rows get the
+    # same admin/preview links as every other row.
+    findings += sweep_articles_placing_narrative_charts(findings)
 
     label_indicator_subjects(findings)
     add_admin_urls(findings)

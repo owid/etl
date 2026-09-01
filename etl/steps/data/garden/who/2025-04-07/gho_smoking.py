@@ -12,7 +12,9 @@ paths = PathFinder(__file__)
 
 REGIONS = [r for r in geo.REGIONS.keys() if r != "European Union (27)"] + ["World"]
 
-LAST_YEAR = 2022
+# needed to filter out predictions from the GHO dataset, should be updated to the latest year that has real estimates when the GHO dataset is updated
+# this refers to the 6th edition numbers, which are estimates up to 2024: https://www.who.int/publications/i/item/9789240116276
+LAST_YEAR = 2024
 
 # short table names
 afford_gdp = "affordability__percentage_of_gdp_per_capita_required_to_purchase_2000_cigarettes_of_the_most_sold_brand"

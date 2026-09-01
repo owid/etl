@@ -62,7 +62,7 @@ tables:
         description_key:
           - Measures how unevenly educational attainment is distributed within a country. It is the [Atkinson inequality measure](#dod:atkinson) (ε = 1) applied to years-of-schooling data.
           - This version of the Atkinson index uses an inequality aversion parameter ε equal to 1. The parameter defines how sensitive the index is to changes in the lower end of the distribution. In this form, the inequality measure is A = 1 - g/μ, where g is the geometric mean and μ is the arithmetic mean of the distribution.
-          - Data are originally sourced from harmonised datasets, including CEDLAS and World Bank (2024), Eurostat's European Union Statistics on Income and Living Conditions (2024), ICF Macro Demographic and Health Surveys (various years), LIS (2024), United Nations Children's Fund Multiple Indicator Cluster Surveys (various years) and UNESCO Institute for Statistics (2024)
+          - Data are originally sourced from harmonized datasets, including CEDLAS and World Bank (2024), Eurostat's European Union Statistics on Income and Living Conditions (2024), ICF Macro Demographic and Health Surveys (various years), LIS (2024), United Nations Children's Fund Multiple Indicator Cluster Surveys (various years) and UNESCO Institute for Statistics (2024)
           - This metric is used to estimate the Inequality-adjusted Human Development Index.
         display:
           numDecimalPlaces: 2
@@ -120,7 +120,7 @@ tables:
           - An unweighted average of inequalities in health, education and income, expressed as the percentage of human development "lost" due to uneven achievements across these three HDI dimensions.
           - |-
             Formula: (A_health + A_education + A_income) / 3, where each A_x is the Atkinson inequality measure (ε = 1) for that dimension.
-          - Provides a single percentage figure summarising overall inequality, expressed as the percentage of human development "lost" due to uneven achievements across these three HDI dimensions.
+          - Provides a single percentage figure summarizing overall inequality, expressed as the percentage of human development "lost" due to uneven achievements across these three HDI dimensions.
           - When all inequalities in dimensions are of a similar magnitude, the coefficient of human inequality and the loss in HDI value differ negligibly.
           - When inequalities differ in magnitude, the loss in HDI value tends to be higher than the coefficient of human inequality.
           - Data is originally sourced from UNDESA life-table data, international household-survey databases (SEDLAC, DHS, MICS, EU-SILC, LIS) and the UNU-WIDER World Income Inequality Database.
@@ -140,7 +140,7 @@ tables:
           - The Inequality-adjusted Human Development Index (IHDI) adjusts the Human Development Index (HDI) for inequality in the distribution of each dimension across the population.
           - It is based on a distribution-sensitive class of composite indices proposed by Foster, Lopez-Calva and Szekely (2005), which draws on the Atkinson (1970) family of inequality measures. It is computed as a geometric mean of inequality-adjusted dimensional indices.
           - The IHDI accounts for inequalities in HDI dimensions by "discounting" each dimension's average value according to its level of inequality. The IHDI value equals the HDI value when there is no inequality across people but falls below the HDI value as inequality rises. In this sense the IHDI measures the level of human development when inequality is accounted for.
-          - Data is originally sourced from UNDESA complete life tables (health), harmonised household-survey micro-datasets (education) and the UNU-WIDER WIID (income).
+          - Data is originally sourced from UNDESA complete life tables (health), harmonized household-survey micro-datasets (education) and the UNU-WIDER WIID (income).
         display:
           numDecimalPlaces: 3
         presentation:
@@ -162,7 +162,7 @@ tables:
           - "The Gender Development Index (GDI) measures gender inequalities in achievement in three basic dimensions of human development: health, measured by female and male life expectancy at birth; education, measured by female and male expected years of schooling for children and female and male mean years of schooling for adults ages 25 years and older; and command over economic resources, measured by female and male estimated earned income."
           - Values below 1 indicate higher human development for men than women, while values above 1 indicate the opposite. Values close to 1 therefore indicate higher gender equality.
           - "Interpretable scale: an absolute deviation of, say, 5% means women's HDI is 95 % of men's (or vice-versa)."
-          - Data is originally sourced from UNDESA life tables, DHS/MICS & UIS education surveys, ILO labour data, IMF & World Bank income statistics and HDRO wage-ratio estimates.
+          - Data is originally sourced from UNDESA life tables, DHS/MICS & UIS education surveys, ILO labor data, IMF & World Bank income statistics and HDRO wage-ratio estimates.
 
         display:
           numDecimalPlaces: 3
@@ -194,13 +194,13 @@ tables:
         title: Gender Inequality Index
         unit: ""
         description_short: |-
-          This index captures gender-based disadvantage in reproductive health, empowerment and the labour market; ranges from 0 (full equality) to 1 (maximum inequality), representing the share of potential human development lost because of gender gaps.
+          This index captures gender-based disadvantage in reproductive health, empowerment and the labor market; ranges from 0 (full equality) to 1 (maximum inequality), representing the share of potential human development lost because of gender gaps.
         description_key:
-          - The Gender Inequality Index (GII) reflects gender-based disadvantage in three dimensions— reproductive health, empowerment and the labour market—for as many countries as data of reasonable quality allow. It shows the loss in potential human development due to inequality between female and male achievements in these dimensions.
+          - The Gender Inequality Index (GII) reflects gender-based disadvantage in three dimensions— reproductive health, empowerment and the labor market—for as many countries as data of reasonable quality allow. It shows the loss in potential human development due to inequality between female and male achievements in these dimensions.
           - It ranges from 0, where women and men fare equally, to 1, where one gender fares as poorly as possible in all measured dimensions.
           - The GII highlights how unequal opportunities for women and men translate into foregone national human‑development potential.
           - |-
-            It combines five indicators: maternal mortality ratio, adolescent birth rate, women’s parliamentary seats, secondary‑education attainment, and labour‑force participation (all sex‑disaggregated).
+            It combines five indicators: maternal mortality ratio, adolescent birth rate, women’s parliamentary seats, secondary‑education attainment, and labor‑force participation (all sex‑disaggregated).
           - Data is originally sourced from WHO/UNICEF/UNFPA/World Bank, UNDESA, IPU, UNESCO UIS, Barro-Lee, DHS/MICS and ILO datasets.
         display:
           numDecimalPlaces: 3
@@ -277,7 +277,7 @@ tables:
         title: Maternal mortality ratio
         unit: "deaths per 100,000 live births"
         description_short: |-
-          The number of maternal deaths during a given time period per 100,000 live births during the same time period.
+          Number of maternal deaths during a given time period per 100,000 live births during the same time period.
         description_key:
           - It depicts the risk of maternal death relative to the number of live births and essentially captures the risk of death in a single pregnancy or a single live birth (WHO).
           - Maternal deaths are defined as "the annual number of female deaths from any cause related to or aggravated by pregnancy or its management (excluding accidental or incidental causes) during pregnancy and childbirth or within 42 days of termination of pregnancy, irrespective of the duration and site of the pregnancy, expressed per 100,000 live births, for a specified time period." (WHO).
@@ -308,7 +308,7 @@ tables:
         title: Total population
         unit: "people"
         description_short: |-
-          The total number of people living in a country.
+          Total number of people living in a country.
         display:
           numDecimalPlaces: 0
 
@@ -497,14 +497,14 @@ tables:
 
       # Labour force
       lfpr:
-        title: Labour force participation rate (<<sex>>)
+        title: Labor force participation rate (<<sex>>)
         short_unit: "%"
         unit: "% ages 15 and older"
         description_short: |-
-          Measures the proportion of a country's <<sex>> working-age population that engages actively in the labour market, either by working or looking for work.
+          Measures the proportion of a country's <<sex>> working-age population that engages actively in the labor market, either by working or looking for work.
         description_key:
-          - It provides an indication of the size of the supply of labour available to engage in the production of goods and services, relative to the population at working age (ILOSTAT).
-          - The breakdown of the labour force (formerly known as economically active population) by sex and age group gives a profile of the distribution of the labour force within a country (ILOSTAT).
+          - It provides an indication of the size of the supply of labor available to engage in the production of goods and services, relative to the population at working age (ILOSTAT).
+          - The breakdown of the labor force (formerly known as economically active population) by sex and age group gives a profile of the distribution of the labor force within a country (ILOSTAT).
           - UNDP originally obtained this data from ILO (2024).
         display:
           numDecimalPlaces: 2
@@ -525,7 +525,7 @@ tables:
         short_unit: "%"
         unit: "% ages 25 and older"
         description_short: |-
-          The percentage of population (<<sex>>, age 25 and over) with at least completed lower secondary education (ISCED 2 or higher).
+          Percentage of population (<<sex>>, age 25 and over) with at least completed lower secondary education (ISCED 2 or higher).
         description_key:
           - This indicator is calculated by dividing the number of persons (<<sex>>s) aged 25 years and above with completed lower secondary education by the total <<sex>> population of the same age group and multiplying the result by 100.
           - The UNESCO Institute for Statistics (UIS) educational attainment dataset shows the educational composition of the population aged 25 years and above and hence the stock and quality of human capital within a country.

@@ -167,6 +167,7 @@ GROUPS = (
         {
             "name": "Charts",
             "commands": {
+                "chart-config-id": "apps.chart_config_id.cli.cli",
                 "chart-sync": "apps.chart_sync.cli.cli",
                 "approve": "apps.chart_approval.cli.cli",
                 "related-charts": "apps.related_charts.cli.cli",
@@ -182,6 +183,7 @@ GROUPS = (
             "name": "Anomalist",
             "commands": {
                 "anomalist": "apps.anomalist.cli.cli",
+                "anomalist-view": "apps.anomalist.view.cli",
             },
         },
         {

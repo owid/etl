@@ -534,7 +534,7 @@ views:
             colorScaleNumericBins: -300000.0,,;-100000.0,,;-30000,,;-10000.0,,;-0.0,,;10000.0,,;30000.0,,;100000.0,,;300000.0,,;0
     config:
       title: Net migration
-      subtitle: The total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country).
+      subtitle: Total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country).
   - dimensions:
       metric: net_migration
       period_radio: total_number
@@ -549,7 +549,7 @@ views:
             colorScaleNumericBins: -5,,;-2,,;-1,,;-0.5,,;-0.2,,;-0.0,,;0.2,,;0.5,,;1,,;2,,;5,,;10,,;0
     config:
       title: Net migration rate
-      subtitle: The total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country), per 1,000 people in the population.
+      subtitle: Total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country), per 1,000 people in the population.
 
   # World Bank remittance indicators
   - dimensions:
@@ -566,7 +566,7 @@ views:
             colorScaleNumericBins: 2.0,,;4.0,,;6.0,,;8.0,,;10.0,,;12.0,,;14.0,,;0.996667
     config:
       title: Average cost for sending remittances to country
-      subtitle: The average transaction cost as a percentage of total remittance sent from abroad to this country. The cost is based on a single transaction of USD 200.
+      subtitle: Average transaction cost as a percentage of total remittance sent from abroad to this country. The cost is based on a single transaction of USD 200.
   - dimensions:
       metric: cost_of_sending_remittances
       period_radio: total_number
@@ -581,7 +581,7 @@ views:
             colorScaleNumericBins: 2.0,,;4.0,,;6.0,,;8.0,,;10.0,,;12.0,,;14.0,,;1.943111
     config:
       title: Average cost for sending remittances from country
-      subtitle: The average transaction cost as a percentage of total remittance received from abroad. The cost is based on a single transaction of USD 200.
+      subtitle: Average transaction cost as a percentage of total remittance received from abroad. The cost is based on a single transaction of USD 200.
   - dimensions:
       metric: remittances_as_share_of_gdp
       period_radio: total_number

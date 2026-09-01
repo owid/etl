@@ -11,7 +11,7 @@ dataset:
   title: Global Health Observatory - World Health Organization
   update_period_days: 365
   owners:
-    - Mojmir Vinkler
+    - Mojmír Vinkler
 
 tables:
   # Custom OOMs
@@ -26,7 +26,7 @@ tables:
           Confirmed neonatal tetanus cases per million.
 
           #### Method of estimation
-          WHO compiles neonatal tetanus data as reported by national authorities. Our World In Data converts this into a rate by standardising with our population variable.
+          WHO compiles neonatal tetanus data as reported by national authorities. Our World In Data converts this into a rate by standardizing with our population variable.
 
   proportion_of_population_with_primary_reliance_on_clean_fuels_and_technologies_for_cooking__pct:
     variables:
@@ -52,7 +52,7 @@ tables:
       population_without_primary_reliance_on_clean_fuels_and_technologies_for_cooking__in_millions:
         title: Population without primary reliance on clean fuels and technologies for cooking (in millions)
         description_short: |-
-          The population who are not able to rely on clean fuels and technologies as the primary source of domestic energy for cooking.
+          Population who are not able to rely on clean fuels and technologies as the primary source of domestic energy for cooking.
         description_from_producer: |-
           #### Rationale
           The use of solid fuels and kerosene in households is associated with increased mortality from acute lower respiratory, chronic obstructive pulmonary disease, stroke, ischaemic heart disease, and lung cancer.
@@ -64,7 +64,7 @@ tables:
           The indicator is calculated as the total population minus the number of people using clean fuels and technologies. Based on the recommendations included in the WHO Guidelines for indoor air quality: household fuel combustion, the fuels and technologies that are considered clean include electricity, natural gas, liquified petroleum gas, biogas, ethanol, and solar.
 
           #### Method of estimation
-          Modelled estimates. A non-parametrical statistical model based on household survey data and time as inputs is applied to derive estimates. For further information on the model, see Stoner O et al, 2020: Global Household Energy Model: A Multivariate Hierarchical Approach to Estimating Trends in the Use of Polluting and Clean Fuels for Cooking (see link below).
+          Modeled estimates. A non-parametrical statistical model based on household survey data and time as inputs is applied to derive estimates. For further information on the model, see Stoner O et al, 2020: Global Household Energy Model: A Multivariate Hierarchical Approach to Estimating Trends in the Use of Polluting and Clean Fuels for Cooking (see link below).
           Input data for the model is found in the WHO Household Energy Database. This database compiles data from nationally-representative surveys and censuses that provide estimates of primary cooking fuels and technologies. In cases where estimates of the population not cooking at home, with missing data or cooking with other fuels are provided, these populations are removed from the denominator for estimation purposes. The population data is calculated by OWID and is available at: https://ourworldindata.org/grapher/population-past-future
   # Overweight adults — custom title
   overweight_among_adults__bmi__gt__25_kg_m2__age_standardized_estimate__pct:
@@ -97,7 +97,7 @@ tables:
         unit: '% of children under 5'
         short_unit: '%'
         description_short: |-
-          The share of children younger than five years old whose growth is stunted.
+          Share of children younger than five years old whose growth is stunted.
         description_key:
           - Stunting is when a child is significantly shorter than the average for their age.
           - Stunted growth is a consequence of poor nutrition and/or repeated infection.
@@ -119,7 +119,7 @@ tables:
           grapher_config:
             title: 'Malnutrition: share of children who are stunted'
             subtitle: >-
-              The share of children younger than five years old that are defined as stunted.
+              Share of children younger than five years old that are defined as stunted.
               [Stunting](#dod:stunting) is when a child is significantly shorter than the
               average for their age. It is a consequence of poor nutrition and/or repeated
               infection.
@@ -184,7 +184,7 @@ tables:
         description_short: "Total number of registered vehicles (i.e., vehicles reported to a government agency and given some form of registration) per 1,000 people in each country."
         description_key:
           - "Registered vehicles per 1,000 people are calculated by Our World in Data based on vehicle registration from the World Health Organization's Global Health Observatory, and population estimates from the United Nations World Population Prospects."
-        description_from_producer: "The total number of registered vehicles (i.e. vehicles reported to a government agency and given some form of registration) in each country. Data were collected from a number of different sectors and stakeholders in each country and were submitted to the World Health Organization after consensus meetings, facilitated by national data coordinators. All legislative documents were analysed by lawyers at WHO headquarters who extracted the relevant information. The legal analysis was then shared with National Data Coordinators and a validation process resolved any data conflicts through discussion and submission of new legal documents."
+        description_from_producer: "The total number of registered vehicles (i.e. vehicles reported to a government agency and given some form of registration) in each country. Data were collected from a number of different sectors and stakeholders in each country and were submitted to the World Health Organization after consensus meetings, facilitated by national data coordinators. All legislative documents were analyzed by lawyers at WHO headquarters who extracted the relevant information. The legal analysis was then shared with National Data Coordinators and a validation process resolved any data conflicts through discussion and submission of new legal documents."
         short_unit: ""
         unit: vehicles per 1,000 people
         display:

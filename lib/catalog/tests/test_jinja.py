@@ -1,3 +1,6 @@
+import jinja2
+import pytest
+
 from owid.catalog.core import jinja, meta
 
 
@@ -133,3 +136,43 @@ def test_empty_jinja_in_grapher_config_preserves_empty_string():
         dim_dict={"variant": "estimates"},
     )
     assert out == {"subtitle": "", "note": "", "originUrl": "https://example.org"}
+
+
+def test_jinja_sandbox_blocks_attribute_traversal():
+    """Producer-supplied metadata must not be able to reach arbitrary code.
+
+    `description_from_producer` and friends are assembled from producer files (e.g.
+    WDISeries.csv inside the World Bank WDI zip), so any value containing `<<` or `<%`
+    reaches `.render()`. Under a plain `jinja2.Environment` the payload below walks
+    `__class__`/`__subclasses__` to arbitrary callables; the SandboxedEnvironment in
+    `jinja.py` must refuse it. Failing loudly is the intended outcome — the exception
+    is not caught in `_expand_jinja_text`, so a poisoned field stops the ETL run.
+    """
+    payload = "<< ''.__class__.__mro__[1].__subclasses__() | length >>"
+
+    with pytest.raises(jinja2.exceptions.SecurityError):
+        jinja._expand_jinja_text(payload, dim_dict={})
+
+    m = meta.VariableMeta(description_from_producer=payload)
+    with pytest.raises(jinja2.exceptions.SecurityError):
+        m.render({})
+
+
+def test_jinja_sandbox_still_renders_our_own_templates():
+    """The sandbox must not change how the templates we write behave.
+
+    Covers the pieces the sandbox could plausibly break: custom delimiters, the
+    `as_value` filter, the `raise` global, and dimension substitution.
+    """
+    out = jinja._expand_jinja(
+        {
+            "title": "Emissions from << sector >>",
+            "min": "<% if sector == 'transport' %><< 90 | as_value >><% endif %>",
+            "isProjection": "<% if sector == 'transport' %>true<% else %>false<% endif %>",
+        },
+        dim_dict={"sector": "transport"},
+    )
+    assert out == {"title": "Emissions from transport", "min": 90, "isProjection": True}
+
+    with pytest.raises(Exception, match="uh oh"):
+        jinja._expand_jinja_text('<< raise("uh oh") >>', dim_dict={})

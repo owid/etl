@@ -5,9 +5,9 @@ meta:
     # Data product / Snapshot
     title: Global Human Settlement Layer Dataset
     description: |-
-      The dataset includes population projections by degree of urbanisation and at the city level.
+      The dataset includes population projections by degree of urbanization and at the city level.
 
-      For every country and territory in the world, the authors estimated their population from 1950 to 2100 in cities, towns and semi-dense areas, and rural areas. It relies on the UN-endorsed Degree of Urbanisation methodology. As a result, the definitions used in each country are fully harmonised; while national definitions vary considerably.
+      For every country and territory in the world, the authors estimated their population from 1950 to 2100 in cities, towns and semi-dense areas, and rural areas. It relies on the UN-endorsed Degree of Urbanisation methodology. As a result, the definitions used in each country are fully harmonized; while national definitions vary considerably.
 
       The long time series consists of three parts:
 

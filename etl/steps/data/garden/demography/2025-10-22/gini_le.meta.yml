@@ -23,7 +23,7 @@ tables:
         unit: ""
         processing_level: major
         description_short: |-
-          The level of inequality in lifespans, measured between 0 and 1.
+          Level of inequality in lifespans, measured between 0 and 1.
         description_key:
           - |-
             {tables.gini_le.variables.life_expectancy_gini.description_short}

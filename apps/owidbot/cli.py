@@ -92,7 +92,7 @@ def cli(
             chart_diff.create_check_run(repo_name, branch, charts_df, dry_run)
 
         elif service == "grapher":
-            services_body["grapher"] = grapher.run(branch)
+            services_body["grapher"] = grapher.run(branch, head_sha=pr.head.sha)
 
         elif service == "anomalist":
             # TODO: anomalist could post a summary of anomalies to the PR

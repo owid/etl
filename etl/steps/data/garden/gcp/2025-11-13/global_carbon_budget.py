@@ -846,6 +846,11 @@ def combine_data_and_add_variables(
         )
 
     # Add total emissions per unit energy (in grams of emissions per kWh).
+    # NOTE: This still divides by the old substitution-method primary energy. A Total Energy Supply
+    # version now lives in energy/latest/carbon_intensity_of_energy. On the next update, repoint this
+    # step's energy input to Total Energy Supply (energy_mix) and remove that separate step — but note
+    # that carbon_intensity_of_energy currently depends on this step, so drop that dependency first to
+    # avoid a cycle.
     tb_co2_with_regions["emissions_total_per_unit_energy"] = (
         TONNES_OF_CO2_TO_G_OF_CO2
         * tb_co2_with_regions["emissions_total"]

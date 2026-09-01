@@ -10,10 +10,11 @@ import json
 import re
 from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
-from typing import Any, Literal, NewType, NotRequired, Required, Self, TypedDict, TypeVar
+from typing import Any, Literal, NewType, NoReturn, NotRequired, Required, Self, TypedDict, TypeVar
 
 import mistune
 import pandas as pd
+import yaml
 from dataclasses_json import DataClassJsonMixin
 
 from owid.catalog.core import jinja
@@ -418,6 +419,116 @@ def _collapse_description_key_item(item: str) -> str:
     return "".join(parts)
 
 
+# A crude bound on `description_key` authored as a list of bullets. It is meant to exclude an
+# obviously broken value, not to encode an editorial limit: the longest list authored in the
+# repo has 13 bullets and the longest published anywhere is 19, so 50 leaves plenty of room.
+# Other user-facing metadata fields with equally obvious bounds (indicator title length,
+# `description_short` length, unit length) can be guarded the same way — a named constant plus
+# a call to `_reject_metadata_value`.
+#
+# This is a backstop, not the primary defence. A list arriving here is legal by design (YAML
+# authoring sugar), so no check at this point can tell corruption from content by type alone;
+# `Markdown` below stops the corruption being constructible in the first place, and this bound
+# only catches what reaches a write path from somewhere the type cannot see — an admin API
+# payload, a DB row, a list built in a loop.
+DESCRIPTION_KEY_MAX_ITEMS = 50
+
+
+_CHARACTER_EXPLOSION_HINT = (
+    "The most likely cause is a markdown string that was split into its characters, e.g. "
+    "`list(description_key)`. Pass the value through unchanged when it is already a string, "
+    "instead of rebuilding it as a list."
+)
+
+
+def _is_character_explosion(bullets: list[str]) -> bool:
+    """Whether a bullet list is in fact a string that was iterated character by character.
+
+    This is an exact signature rather than a heuristic: `list(some_string)` yields items that
+    are *every one* a single character, so there is no threshold to tune and nothing to judge.
+    Real content never looks like this — a "bullet list" whose every bullet is one character
+    carries no text either way.
+    """
+    return len(bullets) >= 2 and all(len(bullet) == 1 for bullet in bullets)
+
+
+def _reject_metadata_value(field_name: str, problem: str, context: str | None, hint: str) -> NoReturn:
+    """Raise for a metadata value that fails one of the sanity bounds above."""
+    where = f" of {context}" if context else ""
+    raise ValueError(f"Pathological `{field_name}`{where}: {problem}. {hint}")
+
+
+def validate_description_key_list(items: list[str], context: str | None = None) -> None:
+    """Reject a `description_key` list that cannot plausibly be real content.
+
+    A `description_key` can be authored as a list of bullets, which is joined into a markdown
+    string on the way out. Nothing about that conversion notices when the "list" is in fact one
+    item per character, so a corrupted value used to be published to readers silently.
+
+    Empty items are ignored, because they are dropped by `description_key_to_string`
+    too — Jinja conditionals routinely render a bullet to nothing.
+
+    Args:
+        items: the bullets, as authored.
+        context: what is being validated (catalog path, indicator or view), quoted in
+            the error so the offending indicator is identifiable.
+
+    Raises:
+        ValueError: if the list is far longer than any real bullet list.
+    """
+    bullets = [str(item).strip() for item in items if item and str(item).strip()]
+
+    # Corruption below the cap: a short string exploded into characters (e.g. a 16-character
+    # value assembled as a plain dict, which never passes through `Markdown`).
+    if _is_character_explosion(bullets):
+        _reject_metadata_value(
+            "description_key",
+            f"all {len(bullets)} of its bullets are a single character",
+            context,
+            _CHARACTER_EXPLOSION_HINT,
+        )
+
+    if len(bullets) > DESCRIPTION_KEY_MAX_ITEMS:
+        _reject_metadata_value(
+            "description_key",
+            f"{len(bullets)} bullets, far more than the {DESCRIPTION_KEY_MAX_ITEMS} a real list ever has",
+            context,
+            f"{_CHARACTER_EXPLOSION_HINT} If the bullets really are content, raise `DESCRIPTION_KEY_MAX_ITEMS`.",
+        )
+
+
+class Markdown(str):
+    """A markdown string that refuses to be iterated character by character.
+
+    `description_key` is authored as a list of bullets but published as markdown, and a step
+    reading one has to cope with either shape. That is easy to get wrong in a way no type
+    checker flags: `list(some_markdown_string)` is valid Python that yields one item per
+    character, and every write path then rejoined those characters into convincing markdown —
+    which is how ~2,900 one-character bullets reached readers.
+
+    A bound on the resulting list can only judge the damage after the fact, and cannot
+    distinguish it from real content by type. Refusing to iterate makes the mistake a
+    `TypeError` on the line that writes it instead.
+
+    Everything else a caller does with a string still works: slicing, `len`, `.strip()`,
+    `.splitlines()`, f-strings, `in`, concatenation, `json.dumps`, copying, pickling.
+    """
+
+    __slots__ = ()
+
+    def __iter__(self):
+        raise TypeError(
+            "description_key is a markdown string, not a list of bullets — iterating it yields "
+            "one item per character. Pass the value through unchanged, or use .splitlines()."
+        )
+
+
+# PyYAML picks representers by exact type, so a str subclass would otherwise raise
+# RepresenterError on `yaml.safe_dump`. Dump it as the plain string it is.
+yaml.add_representer(Markdown, lambda dumper, data: dumper.represent_str(str(data)), Dumper=yaml.SafeDumper)
+yaml.add_representer(Markdown, lambda dumper, data: dumper.represent_str(str(data)), Dumper=yaml.Dumper)
+
+
 def description_key_to_string(items: list[str]) -> str | None:
     """Convert a legacy description_key list of bullet points into a single
     markdown string.
@@ -428,11 +539,24 @@ def description_key_to_string(items: list[str]) -> str | None:
     list with line breaks inside items flattened.
     """
     cleaned = [item.strip() for item in items if item and item.strip()]
+
+    # Every list -> string conversion passes through here, including paths that never reach a
+    # write-path guard: `get_unique_description_key_points_from_indicators` stringifies when it
+    # combines two indicators with different keys, so the result arrives downstream already a
+    # str. Rejecting the exploded shape here covers those, and any conversion path added later.
+    if _is_character_explosion(cleaned):
+        _reject_metadata_value(
+            "description_key",
+            f"all {len(cleaned)} of its bullets are a single character",
+            None,
+            _CHARACTER_EXPLOSION_HINT,
+        )
+
     if not cleaned:
         return None
     if len(cleaned) == 1:
-        return cleaned[0]
-    return "\n".join("- " + _collapse_description_key_item(item) for item in cleaned)
+        return Markdown(cleaned[0])
+    return Markdown("\n".join("- " + _collapse_description_key_item(item) for item in cleaned))
 
 
 @pruned_json
@@ -502,6 +626,12 @@ class VariableMeta(MetaBase):
     original_short_name: str | None = None
     # TODO: it's possible that we might not need `original_title` at all
     original_title: str | None = None
+
+    def __post_init__(self):
+        # A markdown string is not a list of bullets; make that unrepresentable rather than
+        # something each write path has to notice. See `Markdown`.
+        if isinstance(self.description_key, str):
+            self.description_key = Markdown(self.description_key)
 
     @property
     def schema_version(self) -> int:
@@ -750,9 +880,12 @@ def update_variable_metadata(meta: VariableMeta) -> VariableMeta:
     # empty.
     if meta.description_key:
         if isinstance(meta.description_key, list):
+            validate_description_key_list(meta.description_key, context=getattr(meta, "_name", None) or meta.title)
             meta.description_key = description_key_to_string(meta.description_key)
         elif not meta.description_key.strip():
             meta.description_key = None
+        else:
+            meta.description_key = Markdown(meta.description_key)
 
     # Convert from string to proper type when it comes from YAML
     grapher_config = getattr(getattr(meta, "presentation", None), "grapher_config", {}) or {}

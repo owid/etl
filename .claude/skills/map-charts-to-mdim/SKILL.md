@@ -7,8 +7,8 @@ description: >-
   targets by default); writes a proposal CSV, one redirect payload JSON per source
   chart, a side-by-side review HTML, and the `;`-delimited CSV that grapher's
   `createMultiDimRedirectsFromCsv` CLI consumes. Also audits every article, explorer,
-  narrative chart, data insight and static viz that links or embeds each chart, with
-  the replacement URL. Only charts with a confident match get a proposed redirect —
+  narrative chart, data insight, static viz and featured metric that links, embeds or
+  features each chart, with the replacement URL. Only charts with a confident match get a proposed redirect —
   the rest are reported. Creating the redirects is a separate, human-run step.
   Trigger when the user says "map charts tagged <X> to mdims", "propose chart -> MDIM
   redirects", "which charts are covered by the new multidim", "where do I replace the
@@ -35,6 +35,31 @@ for these charts**: it rejects any source that already has an old slug pointing
 at it, and its bulk endpoint accepts explorer sources only. The CLI
 (`owid-grapher/devTools/createMultiDimRedirectsFromCsv.ts`) exists precisely for
 the chart case.
+
+**And only for that case: one bare chart path per row.** Two shapes the CSV
+pipeline cannot express. Neither is worked around by editing the CSV — one has
+another route, the other needs the CLI changed:
+
+- **Source query params.** The source column is a path. Anything after `?`
+  survives into `multi_dim_redirects.source` verbatim, and chart sources are baked
+  as a flat slug → path map that strips only the `/grapher/` prefix
+  (`getGrapherToMultiDimRedirects` → `getMultiDimRedirectTargets`), so the row
+  matches no request and the redirect never fires. Conditioning on the incoming
+  params is what the `sourceQueryParams` column does, and the CLI never writes it —
+  grapher honors it for `/explorers/` sources only (they bake to a query-param
+  decision tree resolved at the edge), and the admin route rejects it outright on a
+  `/grapher/` source. A per-params chart redirect therefore needs changes on both
+  sides, CLI and serving. `preflight.py` rejects a source carrying a query string
+  for this reason.
+- **Explorer sources.** `/explorers/...` passes the CLI's source regex, and the row
+  it writes is worse than inert: with `sourceQueryParams` NULL it bakes as an
+  *unconditional* rule, and explorer redirects are consulted on **every** request
+  (unlike chart redirects, which fire only on a 404), so the entire explorer —
+  every view, whatever the params — starts 302-ing to the single target view. The
+  chart handling it also skips, silently: the source is never unpublished
+  (`getChartSlugsToUnpublish` skips non-`/grapher/` sources), and the chained
+  old-slug migration early-returns. Explorers go through the admin bulk endpoint,
+  which is `map-explorer-to-mdim`'s job, not this skill's.
 
 ## Inputs
 
@@ -238,11 +263,95 @@ ENV_FILE=<prod creds> DATA_API_ENV=production .venv/bin/python \
 
 The sweep itself is the shared `find-chart-references` skill; this script is the
 redirect-specific consumer that adds the replacement URLs. It writes
-`references.csv` + `references.md`, one row per reference. Severity: **🔴**
-embed — the surface renders the chart's own config, so the redirect does not fix
-it and it breaks on unpublish; migrate before applying · **🟡** hyperlink (the
-301 covers it, update the href anyway) or key-chart slot (re-tag the MDIM) ·
-**ℹ️** unpublished/draft.
+`references.csv` + `references.md`, one row per reference. The report is
+organized by what the reader does, not by severity tier: **embedded charts and
+text links sit adjacent in one "Google Doc edits" section** (one editing pass
+per doc covers both — 🔴 embeds break on unpublish and gate the CLI, 🟡 links
+stay functional behind the 301), with reader-facing section names ("Embedded
+charts", "Text links", "Front-matter chart URLs") rather than raw ArchieML
+tokens (those live in the CSV's `component` column). **Topic-page All charts
+entries collapse to a per-page summary and need NO action**: the block lists
+only published charts (`GdocPost.loadRelatedCharts` filters on `isPublished` —
+verified in grapher), so entries drop out on their own at the next bake — and
+no replacement is possible either, because the block is built from `charts` ×
+`chart_tags` only and cannot list MDIMs; featuring the MDIM on a topic page is
+a separate gdoc-authoring change. **Featured metrics get their own ⭐ section,
+and they are the opposite case**: the All charts block heals itself, a featured
+metric does not. It is a topic-page slot held by URL, matched on exact pathname
+*and* params only when Algolia indexes, against published records — so
+unpublishing empties it silently, and the window to swap closes with the CLI
+(adding a row requires a **published** slug). It does not block the CLI, for the
+same reason a key chart doesn't, but it is unrecoverable afterwards — hence step
+4b rather than post-migration cleanup. **Narrative charts get their own table
+(before the All charts summary)**, one row per chart: the admin editor link and
+parent chart; **"create from this view"** — the target view carrying that
+narrative chart's stored controls, which is both the rendering to match and the
+place to create from; **"text to re-apply"** (see below); **the pages that
+actually embed it**, resolved by a second hop the sweep doesn't make
+(`posts_gdocs_links` on `linkType='narrative-chart'`, both `narrative-chart` and
+`key-insights` components), each with its doc link and the name to search for;
+and the ordered steps. Each row carries only the order that applies to it, on
+the rule above: a **published** page among the users makes create → repoint →
+delete mandatory; with none, the row emits the delete → create shortcut that
+reuses the same name (a draft reference then keeps resolving, since pages
+reference the name). **ℹ️** unpublished/draft pages close the report.
+
+**Create from the view, not from a create link.** Tell the operator to open the
+target view and use the chart's own **"Create narrative chart"** admin control:
+the MDIM page builds that control's target from whichever view is on screen
+(`site/multiDim/MultiDim.tsx`), so the new chart is parented to the right view
+and inherits the controls set on it. A bare
+`/admin/narrative-charts/create?type=multiDim&chartConfigId=<viewConfigId>` link
+looks equivalent but opens a copy of the MDIM's **default** view — verified in
+practice — so never hand that out as the create step.
+
+**The new chart opens at the parent view's defaults — the state does not carry
+over.** The control gets the *parent* right, but not the state on top of it: the
+dimension selection, the entity selection and tab/time all come up at defaults,
+and authored text never transfers at all. So the report's **"Set by hand after
+creating"** column lists all three groups per chart, in the order they get
+applied in the editor:
+
+1. **view dimensions** — the target view's own dimension values (from the
+   proposal), because the new chart opens on the MDIM's default view;
+2. **controls** — taken from the narrative chart's authored layer (`narrative_charts.patchConfigId` → `chart_configs.config`) (the
+   delta its author typed on top of the parent) plus its stored
+   `queryParamsForParentChart`, and listed **chart type first** (it decides
+   which other controls exist), **then the entity selection** (the most visible
+   thing to get wrong), then the rest alphabetically. Entities are always shown
+   by **name**, never as codes: a URL param spells them `ZWE~MDG`, so those are
+   resolved against `entities` before display (unknown codes pass through). The
+   patch and the params encode the same state, so a URL param is dropped when
+   the patch already carries the equivalent config key (`country` ↔
+   `selectedEntityNames`, `focus` ↔ `focusedSeriesNames`, `time` ↔
+   `minTime`/`maxTime`) — otherwise the cell asks for one setting twice in two
+   spellings, and the config form is what the editor's fields expose;
+3. **FAUST text** — `title`, `subtitle`, `note`, `sourceDesc`,
+   `hideAnnotationFieldsInTitle` from the patch. Miss these and the replacement
+   silently renders the *view's* wording instead of the text the article was
+   written around.
+
+Every group is diffed against the target view's config, so only genuine
+differences are asked for. `dimensions` and `$schema` are excluded from the patch
+on purpose: the new parent view supplies them, and re-applying the old ones would
+repoint the chart at the retired chart's indicators.
+
+**Suggest the replacement's name, and check it is free.** When a published page
+holds the original name the replacement needs a different one — and that name is
+**permanent**, since `create` rejects an existing name and there is no rename, so
+it is not a staging name to tidy up after the delete. The report suggests
+`<original>-mdim` (falling back to `-mdim-2`, `-mdim-3`, …), validated against
+every name in `narrative_charts` so the suggestion cannot be the one thing
+`create` refuses; suggestions handed out within a run are reserved as they go. In
+the delete-first case there is nothing to suggest — the row names the original,
+which the delete frees for reuse.
+
+**Admin routes need the admin origin.** A narrative chart's `where_path` is
+`/admin/narrative-charts/<id>/edit`, and the public site does not serve
+`/admin` — prefixing it with the site host yields a link that 404s. Both the
+sweep and this consumer route such paths through a helper
+(`admin_url` / `absolute_url`) that strips the admin root's own `/admin` suffix
+before joining, or the result carries `/admin/admin/`.
 
 Pure SQL, so read-only credentials are enough. It sweeps both the current slug
 and every old slug that reaches the chart — references written before a rename
@@ -291,16 +400,21 @@ same name. The name is preserved and nothing else changes.
 Never delete first. The delete will fail, and unpublishing the article to force it
 through breaks the page for readers.
 
-**Do the create in the admin UI — it is deep-linkable to the right view:**
+**Do the create from the target view in the site UI**, using the chart's own
+**"Create narrative chart"** admin control (see the rule above). The three routes
+do NOT behave alike, so don't describe them interchangeably:
 
-```
-{admin_site}/narrative-charts/create?type=multiDim&chartConfigId=<target.viewConfigId>
-```
+| route | parent view | state to redo by hand |
+|---|---|---|
+| the view's **"Create narrative chart"** control | the view on screen — correct | the entity selection and other controls open at that view's defaults, and authored FAUST never transfers |
+| a bare `{admin_site}/narrative-charts/create?type=multiDim&chartConfigId=…` link | the MDIM's **default** view — wrong | everything, on top of a parent you then cannot change |
+| scripted `POST {admin_api}/narrative-charts` | whatever `parentChartConfigId` you send | nothing you include in the `config` you post |
 
-That opens the narrative-chart editor already parented to the MDIM view, so you
-set the name and the view's controls and save. Prefer this over the API: `AdminAPI`
-has `get_narrative_chart` and `update_narrative_chart` but **no create or delete**,
-so the API route means hand-rolled HTTP for both ends of the swap.
+So: use the control, then set what the report's **Set by hand after creating**
+column lists. Never hand out the bare create link. Prefer the UI over the API
+anyway — `AdminAPI` has `get_narrative_chart` and `update_narrative_chart` but
+**no create or delete**, so scripting means hand-rolled HTTP for both ends of the
+swap.
 
 If you do script it, the endpoints are `POST {admin_api}/narrative-charts` and
 `DELETE {admin_api}/narrative-charts/<id>`:
@@ -356,6 +470,23 @@ MDIM-parented narrative chart. Production carries 1 today. If that count grows,
 re-file it as its own issue — the write-up is in
 `ai/narrative-charts-grapher-issue.md` (§2), alongside
 `ai/narrative-charts-slack-post.md`.
+
+### 4b. Swap the featured metrics (before the handoff — the window closes with the CLI)
+
+Work the ⭐ section of `references.md`, by hand at `/admin/featured-metrics`. These are editorial
+slots, so ask whoever owns the topic before repointing their rail.
+
+Per row — add the MDIM view under the **same tag and income group**, drag it to the old ranking,
+delete the old row, then re-apply *boost in search* if it was on. One chart can hold several
+rows: the key is (URL, tag, income group). Full procedure:
+`docs/guides/data-work/redirect-to-mdims.md`.
+
+**Say this out loud:** the CLI unpublishes the sources in the same transaction that creates the
+redirects, and adding a featured metric requires a *published* slug — so afterwards the old URL
+is refused and the ranking is gone. This is the one item in the migration that is unrecoverable
+rather than merely broken. And the replacement is the **bare view**, not the redirect target: the
+admin strips reader params on paste and never validates the dimension params, so a redirect
+target is accepted and then fails silently.
 
 ### 5. Apply — the grapher CLI (GATED, production only)
 
@@ -426,9 +557,9 @@ them:
   tolerated **only** on line 1, no comment lines anywhere, no duplicate sources,
   both fields must start with `/`. Any violation aborts the CLI's whole run. The
   extractor validates its own output and `preflight.py` re-validates it.
-- **Never put query params on the source.** They pass the CLI's regex and get
-  stored verbatim, but serving matches the bare path — so the redirect would
-  simply never fire.
+- **Never put query params on the source, and never an `/explorers/` source.**
+  Both pass the CLI's regex and neither works — see "one bare chart path per row"
+  above for the mechanism and for what would have to change in grapher.
 - **Targets carry every dimension or none.** The CLI resolves the target query
   string to exactly one view; a partial dimension spec matches several and
   throws. Our targets always carry the full dict, so don't hand-trim them.
@@ -440,7 +571,7 @@ them:
   an MDIM looks each view up by its dimension-derived view id and updates that
   `chart_configs` row in place, so the id survives content edits and only ever
   changes together with `view_id`. To tell whether the reviewed *rendering* still
-  holds, compare `viewConfigMd5` (`chart_configs.fullMd5`) — the target-side
+  holds, compare `viewConfigMd5` (`chart_configs.configMd5`) — the target-side
   mirror of a source chart's `configMd5`. Both md5s are in the review
   fingerprint and in `preflight.py`'s staleness checks.
 - **`charts.publishedAt` is not the live publication flag.** It records the first
@@ -488,6 +619,13 @@ this SKILL.md (and check whether the sibling `map-explorer-to-mdim` /
   the sweep exempts (e.g. `all-charts` — a topic page's auto-generated index
   where a retired chart just drops out) must be exempted there too, or preflight
   blocks on a reference the audit rightly never lists.
+- **"Doesn't block" and "doesn't matter" are different, and a featured metric separates
+  them.** It is exempt from the gate for the same reason a key chart is: a topic-page
+  slot, not a rendered copy of the config. But unlike a key chart it does not heal
+  itself, and the window to swap it shuts when the CLI unpublishes the source. So it is
+  RED in the audit and has its own step, while staying out of the embed count preflight
+  gates on. When a surface is unrecoverable but non-blocking, say both — reporting only
+  "does not block" is how a slot gets lost.
 - **Re-runs that add targets invalidate those rows' review decisions** — the
   review HTML fingerprints each decision on (target, both config md5s), so a row
   that gains or changes a target gets its saved approval/note pruned on next
