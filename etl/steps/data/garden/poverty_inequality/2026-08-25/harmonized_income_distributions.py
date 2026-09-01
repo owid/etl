@@ -604,6 +604,22 @@ def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int,
     convenient. Getting it backwards either leaves consumption sitting in an income series or
     transforms income that needed no transforming.
 
+    Returns one row per (country, year) for every country with at least one national PIP survey:
+
+    - `welfare_type` — the concept the PIP thousand-bins values are on for this country-year,
+      "income" or "consumption". A statement about the data, not the country: a country's rows can
+      carry different values in different years, following its surveys.
+    - `survey_year_used` — the nearest national PIP survey to this year, equidistant ties to the
+      earlier one. Its meaning depends on the branch that labelled the year: for a survey year it
+      is the year itself, and for an extrapolated year it is the survey PIP scaled the estimate
+      from — in both cases also the source of `welfare_type`. For an INTERPOLATED year the concept
+      comes from the pair of surveys spanning the gap instead, so there this column only measures
+      how far the year sits from data, and consumers filtering on survey distance is exactly why
+      it is published.
+    - `adjusted` — True where `welfare_type` is "consumption"; the flag
+      adjust_consumption_to_income keys on when deciding which rows to map through the
+      consumption -> income model. Published so which country-years were mapped stays visible.
+
     Two cases, and PIP's data settles both:
 
     - A SURVEY year offering both concepts. The bins are consumption, verified rather than assumed:
@@ -679,16 +695,32 @@ def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int,
             latest = types.sort_values("survey_year_used").groupby("country", observed=True).tail(1)
             tb = grid.merge(latest, on="country", how="left")
 
-    # `adjusted` drives the transform downstream: only consumption country-years get mapped.
+    # `adjusted` is the flag the consumption->income transform keys on:
+    # adjust_consumption_to_income left-joins it onto the PIP bins and maps `avg` through the
+    # fitted model only where it is True. It is published in the table, not kept internal, so
+    # readers can see exactly which country-years were mapped.
     tb["adjusted"] = tb["welfare_type"] == "consumption"
+
+    # Two diagnostics for the log, so a PIP update that moves either is noticed at build time:
+    # countries whose basis switches concept across the panel (29 on the 2026-06 PIP vintage —
+    # expected, since a country's anchor surveys can change concept over time), and countries in
+    # the common sample with no national PIP survey at all (40). The latter get no row here;
+    # downstream, the transform's left-join fills their flag with False, so their PIP values pass
+    # through untouched.
     n_switch = tb.groupby("country", observed=True)["welfare_type"].nunique().gt(1).sum()
     missing = sorted(set(countries) - set(tb["country"].unique()))
     log.info(
         f"Welfare basis ({WELFARE_ASSIGNMENT}): {tb['country'].nunique()} countries in the lookup, "
         f"{n_switch} switch basis across the panel; not in the lookup (passed through): {len(missing)}"
     )
+
+    # The assignment modes hand back plain pandas objects; re-wrap as a Table and set the
+    # short_name so create_dataset can attach this table's .meta.yml metadata.
     tb = Table(tb)
     tb.metadata.short_name = "pip_welfare_basis"
+
+    # A fixed column selection and order — the modes build `tb` with different shapes (merge_asof
+    # leaves join leftovers) — and a clean RangeIndex for the .format() call in run().
     return tb[["country", "year", "welfare_type", "survey_year_used", "adjusted"]].reset_index(drop=True)
 
 
