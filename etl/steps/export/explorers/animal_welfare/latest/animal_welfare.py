@@ -1,5 +1,6 @@
 """Load grapher datasets and create an explorer tsv file."""
 
+import re
 from copy import deepcopy
 
 from etl.collection import expand_config
@@ -223,6 +224,20 @@ def run() -> None:
     )
 
     # Add view with map chart for chick culling laws.
+    # The grapher step embeds each country's effective year in the status value (e.g. "Banned (2023)").
+    # Build one bin per status-year value found in the data, relabeled back to its plain status, so the
+    # legend shows one entry per status while the tooltip shows the year.
+    tb_chick = paths.load_dataset("chick_culling_laws").read("chick_culling_laws")
+    status_colors = {
+        "Banned": "#759AC8",
+        "Banned but not yet in effect": "#058580",
+        "Not banned": "#AE2E3F",
+        "Partially banned": "#A46F49",
+    }
+    bins = []
+    for value in sorted(set(tb_chick["status"])):
+        plain = re.sub(r" \(\d{4}\)$", "", value)
+        bins.append(f"{value},{status_colors[plain]},{plain if plain != value else ''}")
     config["views"].append(
         {
             "dimensions": {
@@ -237,10 +252,7 @@ def run() -> None:
                         "catalogPath": "chick_culling_laws#status",
                         "display": {
                             "colorScaleScheme": "OwidCategoricalC",
-                            # NOTE: The grapher step embeds each country's effective year in the status
-                            # value; an effective year appearing for the first time in a future update
-                            # must be added here too.
-                            "colorScaleCategoricalBins": "Banned (2018),#759AC8,Banned;Banned (2022),#759AC8,Banned;Banned (2023),#759AC8,Banned;Banned but not yet in effect (2026),#058580,Banned but not yet in effect;Not banned,#AE2E3F,;Partially banned (2020),#A46F49,Partially banned;Partially banned (2021),#A46F49,Partially banned;No data,,",
+                            "colorScaleCategoricalBins": ";".join(bins) + ";No data,,",
                         },
                     }
                 ]
