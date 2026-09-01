@@ -61,7 +61,7 @@ Assumptions:
 - [ ] Address Codex review comments (fix valid ones + resolve all threads)
 - [ ] Run downstream-dependency check (`rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"`); for each consumer outside the dataset's own chain, decide with the user whether to bump in this PR or document under "Downstream dependencies" for a follow-up PR (see "Downstream dependency check" section below for details)
 - [ ] Run the silent-breakage check whenever downstream consumers were repointed in this PR: confirm the `buildkite/etl-automated-staging-environment` PR check is green (red = a consumer crashed on staging, and the report under-reports until it's fixed; `.venv/bin/etlr --modified --continue-on-failure --private` is the optional local equivalent for small fan-outs), then triage the data-diff report — every red "− lost N data point(s)" entry in its Top-changes list and every 🔴-tier dataset (see "Silent-breakage check" section) and run the full-report audit probes (structural / World / raw-country / >30% / wipe-vs-edge per loss)
-- [ ] Ask the user whether to remove the old DAG entries; if yes, delete them and their files AND relocate the new entries into the old slot (see "Removing the old version & reordering the DAG") — don't forget this step
+- [ ] After review sign-off — never before, the consecutive-version review needs the old steps in place (see "Removing the old version & reordering the DAG") — ask the user whether to remove the old DAG entries; if yes, delete them and their files AND relocate the new entries into the old slot — don't forget this step
 - [ ] Hand off the QA links to the user (Anomalist + Chart Diff on the staging branch, plus the data-diff report) — this is the final step
 
 Persistence:
@@ -903,6 +903,8 @@ The samples cap at ~100 rows/diff, so pair the probes with the mechanism argumen
 
 After the ETL update, `etl update` appends the new version entries to the **bottom** of the main DAG file while the old version's entries stay in their original slot. **Always ask the user** whether to remove the old version — but never skip this checklist item, and when the user agrees, always do the reorder too.
 
+**Timing: only after the PR review is done.** Reviewers compare consecutive versions with a VS Code extension that diffs the old and new step files side by side — deleting the old version before the review breaks that comparison. Keep the old chain (files AND active dag entries) in place until the reviewer signs off, then run this removal+archive flow as the final commits before merge. Two corollaries: (a) if `etl update` replaced the old dag entries in place instead of leaving them (this happens when the old chain was only defined nested under a consumer, e.g. an explorer block), re-add the old chain as its own top-level block with a `# NOTE: Old version, kept until the PR review is done; remove and archive before merging.` comment; (b) the Final QA hand-off (Anomalist / Chart Diff / data-diff) happens with the old chain still active — that's fine, none of those tools require the old version to be gone (Anomalist's upgrade detectors actually need the old grapher dataset available).
+
 Workflow when the user agrees:
 
 1. **Delete the old version.** Remove its entries (snapshot → meadow → garden → grapher) from the main DAG file (e.g., `dag/poverty_inequality.yml`) and delete its files (`etl/steps/...`, `snapshots/...`). The archive dag (`dag/archive/*.yml`) is **not** edited by hand — `etl archive-dag` reconstructs it from git history, recording each removed step with the commit where it was last active (for recovery via `git checkout`).
@@ -927,7 +929,7 @@ Workflow when the user agrees:
 
 ## Final QA hand-off — Anomalist, Chart Diff and data-diff
 
-This is the **last step**, after the DAG archive has been committed. Don't auto-run these — they're human-judgment tools. Hand off the three links so the user can review and click through:
+This is the **last step** of the pre-review work — it happens with the old chain still in the DAG (removal+archive comes only after review sign-off; see "Removing the old version & reordering the DAG"). Don't auto-run these — they're human-judgment tools. Hand off the three links so the user can review and click through:
 
 - **Anomalist** — flags variables whose new values diverge from the old version beyond statistical thresholds. Catches accidental scale changes, base-year rebases that propagated the wrong way, and silent drops.
   ```

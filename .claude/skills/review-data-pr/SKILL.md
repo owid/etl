@@ -231,7 +231,7 @@ When the PR body (or `workbench/<short_name>/update-context.yml`) does reference
 
 ### 11. DAG checks
 
-The remove-and-reorder procedure is in `/update-dataset` § "Removing the old version & reordering the DAG". As reviewer, verify the **outcome** (the archive dag is regenerated separately by `etl archive-dag`, so don't expect the old version under `dag/archive/` in this PR):
+The remove-and-reorder procedure is in `/update-dataset` § "Removing the old version & reordering the DAG", and it is deliberately deferred until **after** this review: the consecutive-version comparison (VS Code extension) needs the old and new step files side by side, so at review time the old chain should still be in the working tree and the active dag (typically with a `# NOTE: ... remove and archive before merging.` comment). Old version already deleted at review time = 🟡 — ask the author to restore it until sign-off. Once the review is signed off and the author has removed+archived, verify the **outcome** (the archive dag is regenerated separately by `etl archive-dag`, so don't expect the old version under `dag/archive/` in this PR):
 
 ```bash
 rg "<namespace>/<old_version>/<short_name>" dag/ -g "*.yml" | grep -v "^dag/archive"   # should be empty (old version removed from active dag)
