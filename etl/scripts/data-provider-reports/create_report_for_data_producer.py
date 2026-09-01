@@ -1,7 +1,6 @@
 """Script to generate an analytics report for a data producer."""
 
 import re
-import urllib.parse
 from datetime import datetime
 
 import click
@@ -43,29 +42,6 @@ PERIODS = {
     "H2": {"name": "second half", "min_date": "07-01", "max_date": "12-31"},
     "Y": {"name": "year", "min_date": "01-01", "max_date": "12-31"},
 }
-
-
-def get_mb_table_url(producer, period, year, type="chart") -> str:
-    """Get the URL of the chart view table in Metabase for a given producer and period.
-    URLs look like this:
-    chart view: http://metabase.owid.io/question/1687-chart-views-by-producer?producer=IHME%2C%20Global%20Burden%20of%20Disease&date_min=2025-01-01&date_max=2025-12-31
-    page view: http://metabase.owid.io/question/1688-page-views-per-producer?producer=IHME%2C%20Global%20Burden%20of%20Disease&date_min=2025-01-01&date_max=2025-12-01
-    """
-    # Get the min and max dates for the given period and year.
-    min_date = f"{year}-{PERIODS[period]['min_date']}"
-    max_date = f"{year}-{PERIODS[period]['max_date']}"
-
-    url_encoded_producer = urllib.parse.quote(producer)
-
-    # Construct the Metabase URL.
-    if type == "chart":
-        mb_url = f"http://metabase.owid.io/question/1687-chart-views-by-producer?producer={url_encoded_producer}&date_min={min_date}&date_max={max_date}"
-    elif type == "page":
-        mb_url = f"http://metabase.owid.io/question/1688-page-views-per-producer?producer={url_encoded_producer}&date_min={min_date}&date_max={max_date}"
-    else:
-        raise ValueError(f"Unknown type: {type}, expected 'chart' or 'page'.")
-
-    return mb_url
 
 
 def get_chart_title_from_url(chart_url: str) -> str:
@@ -566,9 +542,15 @@ class Report:
         # Add content.
         # NOTE: The top chart image can only come from a grapher chart (via its ".png" static export), never from
         # an mdim/explorer, so it's picked from self.analytics["charts"] directly rather than
-        # df_charts_and_additional_exclusive.
-        top_chart_url = self.analytics["charts"].sort_values("views", ascending=False).iloc[0]["url"] + ".png"
-        self.google_doc.insert_image(image_url=top_chart_url, placeholder=r"{{top_chart_image}}", width=320)
+        # df_charts_and_additional_exclusive. charts may be empty (a producer whose only traffic in the period
+        # came from mdim views/explorers): there's no grapher chart to render, so drop the image placeholder.
+        df_grapher_charts = self.analytics["charts"]
+        if df_grapher_charts.empty:
+            log.warning("No grapher charts with views in the period; skipping the top-chart image.")
+            self.google_doc.replace_text(mapping={r"{{top_chart_image}}": ""})
+        else:
+            top_chart_url = df_grapher_charts.sort_values("views", ascending=False).iloc[0]["url"] + ".png"
+            self.google_doc.insert_image(image_url=top_chart_url, placeholder=r"{{top_chart_image}}", width=320)
         insert_list_with_links_in_gdoc(self.google_doc, df=df_top_charts, placeholder=r"{{top_charts_list}}")
         insert_list_with_links_in_gdoc(self.google_doc, df=df_top_posts, placeholder=r"{{top_posts_list}}")
 
@@ -839,9 +821,6 @@ def run(producer, aliases, period, year, overwrite_pdf, grant_permissions):
     )
     print_impact_highlights(highlights=highlights)
 
-    mb_chart_url = get_mb_table_url(producer=producer, period=period, year=year, type="chart")
-    mb_page_url = get_mb_table_url(producer=producer, period=period, year=year, type="page")
-
     # Add new entry in the status sheet.
     df = pd.DataFrame(
         {
@@ -850,8 +829,6 @@ def run(producer, aliases, period, year, overwrite_pdf, grant_permissions):
             "period": [period],
             "report": [report.pdf_link],
             "gdoc": [report.doc_link],
-            "mb chart url": [mb_chart_url],
-            "mb page url": [mb_page_url],
             "reviewed": [0],
             "shared with producer on": [None],
         }

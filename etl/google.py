@@ -72,7 +72,9 @@ class GoogleDrive:
     SCOPES = [
         # Create and edit docs.
         "https://www.googleapis.com/auth/documents",
-        # Only access files created by the app.
+        # Full Drive access (read/write, not just files created by the app): reports live in a shared
+        # Drive folder and are copied from a template the app did not create, so the narrower
+        # drive.file scope can't find or write them.
         "https://www.googleapis.com/auth/drive",
         # Read and write Google Sheets.
         "https://www.googleapis.com/auth/spreadsheets",
