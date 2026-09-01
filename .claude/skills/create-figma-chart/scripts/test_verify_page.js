@@ -316,7 +316,7 @@ async function run(frame, config, wrap) {
   const figma = { currentPage: page, getNodeByIdAsync: async (id) => byId[id] || null, setCurrentPageAsync: async () => {} };
   const body = SRC.replace(/^const CONFIG = \{[\s\S]*?^\};/m, "const CONFIG = __CONFIG__;");
   const fn = new Function("figma", "__CONFIG__", `return (async () => { ${body} })();`);
-  return fn(figma, Object.assign({ frameId: "F:1", chartName: "chart", gapTarget: null, tightlyMeasured: false, highlightTreatment: false, textFloor: null }, config));
+  return fn(figma, Object.assign({ frameId: "F:1", chartName: "chart", gapTarget: null, tightlyMeasured: false, highlightTreatment: false, textFloor: null, faceted: false }, config));
 }
 
 const results = [];
@@ -1834,6 +1834,36 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const out = await run(buildFrame(), {});
     check("39 a whole-file run declares no omissions", out.coverage && out.coverage.omitted.length === 0, JSON.stringify(out.coverage));
     check("39 and its verdict carries no PARTIAL PASS warning", !/PARTIAL PASS/.test(out.verdict), out.verdict);
+  }
+
+  // 40 — a FACETED chart runs a 2px series line, not the house 3px. Nine panels of 3px reads as
+  // heavy rule work rather than data. Declared rather than detected, so both directions must be
+  // exercised: a correct faceted chart must pass, and the same weights must FAIL when undeclared —
+  // otherwise the flag is decoration and the row cannot tell the two designs apart.
+  {
+    // 2px lines + a 3px halo, declared faceted: correct.
+    const okFacet = await run(buildFrame({ lineWeight: 2 }), { faceted: true });
+    check("40 a 2px faceted chart passes", row(okFacet, "series-weight").status === "ok", row(okFacet, "series-weight").detail);
+    check("40 and the verdict names the faceted target",
+          /faceted 2\/3/.test(row(okFacet, "series-weight").detail), row(okFacet, "series-weight").detail);
+
+    // The SAME frame undeclared must fail, or the flag changes nothing.
+    const undeclared = await run(buildFrame({ lineWeight: 2 }), {});
+    check("40 the same frame undeclared FAILS", row(undeclared, "series-weight").status === "FAIL", row(undeclared, "series-weight").detail);
+    check("40 and it points at CONFIG.faceted",
+          /CONFIG\.faceted/.test(row(undeclared, "series-weight").detail), row(undeclared, "series-weight").detail);
+
+    // A house-weight chart wrongly declared faceted must fail too — the flag is not a way to pass.
+    const wrong = await run(buildFrame({ lineWeight: 3 }), { faceted: true });
+    check("40 a 3px chart declared faceted FAILS", row(wrong, "series-weight").status === "FAIL", row(wrong, "series-weight").detail);
+    check("40 and it asks for 2, not 3",
+          /-> 2/.test(row(wrong, "series-weight").detail), row(wrong, "series-weight").detail);
+
+    // And the untouched default still reproduces the house pair exactly.
+    const house = await run(buildFrame(), {});
+    check("40 the house 3/4 still passes undeclared", row(house, "series-weight").status === "ok", row(house, "series-weight").detail);
+    check("40 and it still calls it the house pair",
+          /house 3\/4/.test(row(house, "series-weight").detail), row(house, "series-weight").detail);
   }
 
   const bad = results.filter((x) => !x.ok);

@@ -50,6 +50,11 @@
 //                     changes the mark-weight bar (context 1px, protagonist 3px, halo 2x), makes
 //                     the muting grays a standing palette exception, and makes a muted CONTEXT line
 //                     legal to cross with an annotation (CHECKS.md allows exactly that).
+//     faceted       — true for a SMALL-MULTIPLES frame, which runs a 2px series line rather than the
+//                     house 3px (see FACET_LINE). Declared rather than detected: "is this faceted"
+//                     is a fact about the chart's design, and guessing it from node counts would
+//                     mean a correct nine-panel chart passing or failing on a heuristic. Left false
+//                     on a faceted frame, series-weight reports every line as 1px too thin.
 //     xlAnnotations — true when a lead annotation deliberately carries the message and takes
 //                     Annotation XL 16, level with the subtitle. That is the documented ceiling, spent
 //                     only when the annotation IS the message — so it has to be declared rather than
@@ -78,6 +83,7 @@ const CONFIG = {
   highlightTreatment: false,
   textFloor: null,
   xlAnnotations: false,
+  faceted: false,
 };
 
 // Which row groups this TEXT carries. `inline_script.py --rows` rewrites it to the slice it emitted.
@@ -91,6 +97,11 @@ const LADDER_FULL = [12, 13, 14, 15, 16]; // Annotation XS..XL; the ceiling is L
 const LADDER_CEILING = 15;                // the annotation IS the message (GUIDELINES.md)
 const SMALL_FRAME_W = 302;                // the small/pull templates, whose floor is 11 not 12
 const HOUSE_LINE = 3, HOUSE_HALO = 4;
+// A FACETED chart — small multiples — runs a thinner series line. Nine panels of 3px reads as heavy
+// rule work rather than as data: the line stops being the thing that varies and starts being the
+// grid. Settled at 2px on a nine-panel DI. The halo stays line+1, which is what the house pair
+// already is (3 -> 4), so the two cases differ in ONE number rather than in a rule.
+const FACET_LINE = 2;
 const FURNITURE_W = 1, FURNITURE_DASH = [4, 4];
 const BLOCK_CLEARANCE = 27;          // annotation block vs header/footer on the 540x540 pages
 // The chart's box must meet the content box EXACTLY — same tolerance verify_templates.js calls
@@ -753,10 +764,15 @@ const checkFrame = async (frameId) => {
       add("series-weight", bad.length ? "FAIL" : "ok",
           bad.length ? bad.join("; ") : `all ${series.length} series stroke(s) hold the highlight relationship (line 1 or ${HOUSE_LINE}; halo 2x or line+1)`);
     } else {
-      const bad = series.filter((s) => Math.abs(s.w - (s.seriesKind === "outline" ? HOUSE_HALO : HOUSE_LINE)) >= 0.05);
+      // The pair is line + (line+1), which reproduces the house 3/4 exactly and gives a faceted
+      // frame 2/3. One number moves, so a faceted chart is not a second rule to keep in step.
+      const lineW = CONFIG.faceted ? FACET_LINE : HOUSE_LINE;
+      const haloW = lineW + 1;
+      const which = CONFIG.faceted ? "faceted" : "house";
+      const bad = series.filter((s) => Math.abs(s.w - (s.seriesKind === "outline" ? haloW : lineW)) >= 0.05);
       add("series-weight", bad.length ? "FAIL" : "ok",
-          (bad.length ? `off the house ${HOUSE_LINE}/${HOUSE_HALO}: ` + bad.map((s) => `${s.seriesKind}__${s.seriesName} ${r(s.w)} -> ${s.seriesKind === "outline" ? HOUSE_HALO : HOUSE_LINE}`).join(", ") + ". rescale() multiplies stroke weight — set these AFTER the last scale."
-                      : `all ${series.length} series stroke(s) at the house ${HOUSE_LINE}/${HOUSE_HALO}`) +
+          (bad.length ? `off the ${which} ${lineW}/${haloW}: ` + bad.map((s) => `${s.seriesKind}__${s.seriesName} ${r(s.w)} -> ${s.seriesKind === "outline" ? haloW : lineW}`).join(", ") + ". rescale() multiplies stroke weight — set these AFTER the last scale." + (CONFIG.faceted ? "" : " If this frame is SMALL MULTIPLES, set CONFIG.faceted and the target becomes " + FACET_LINE + "/" + (FACET_LINE + 1) + ".")
+                      : `all ${series.length} series stroke(s) at the ${which} ${lineW}/${haloW}`) +
           (unpairedOutlines.length ? ` (${unpairedOutlines.length} unpaired outline__* node(s) excluded — point rings, not halos)` : ""));
     }
   }
