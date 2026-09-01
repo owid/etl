@@ -26,7 +26,7 @@ views:
           baseColorScheme: "BinaryMapPaletteA"
           customNumericColorsActive: true
           customCategoryColors:
-            Banned: "#4881c6"
-            "Not banned": "#ad9882"
-            "Partially banned": "#a084c1"
-            "Banned but not yet in effect": "#3e94a1"
+            Banned: "#759ac8"
+            "Not banned": "#ae2e3f"
+            "Partially banned": "#a46f49"
+            "Banned but not yet in effect": "#058580"
