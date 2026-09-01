@@ -57,7 +57,7 @@ def run() -> None:
     # Select and rename columns.
     tb = tb[TECHNOLOGIES.keys()].rename(columns=TECHNOLOGIES, errors="raise")
 
-    # The original table has a column per technology, each with it's own short description.
+    # The original table has a column per technology, each with its own short description.
     # I will gather all descriptions and add them later as a key description of the resulting (melted) capacity indicator.
     short_descriptions = {column: tb[column].metadata.description_short for column in tb.columns}
 

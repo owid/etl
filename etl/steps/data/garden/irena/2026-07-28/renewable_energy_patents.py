@@ -1,7 +1,6 @@
 from owid.catalog import Table
 from owid.datautils.dataframes import map_series
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -74,6 +73,20 @@ def regroup_sub_technologies(tb: Table) -> Table:
         Data with number of patents per country, year and sub-technology.
 
     """
+    # Rows without a technology classification (given as "N/A" in the original file, and read as NaN) are counts of
+    # broader climate-mitigation patents (in sectors like industry, transport, or adaptation) that IRENA does not
+    # attribute to any specific clean-energy technology. This dataset only covers patents classified into a specific
+    # technology, so those rows are excluded.
+    # NOTE: These rows carry a large share of all filed patents (58% in the February 2026 edition). They used to be
+    #  dropped silently (unintentionally, by the groupby below, since their technology is NaN); this makes the
+    #  exclusion explicit.
+    unclassified = tb["technology"].isna()
+    error = "Rows without technology were expected to have no sub-technology either."
+    assert tb[unclassified]["sub_technology"].isna().all(), error
+    tb = tb[~unclassified].reset_index(drop=True)
+    error = "Unexpected NaN sub-technology in rows with a technology classification."
+    assert tb["sub_technology"].notna().all(), error
+
     # It seems that sub-technologies can belong to only one technology.
     # As long as this is true, we can just ignore "technology" and select by "sub_technology".
     assert set(
@@ -81,9 +94,6 @@ def regroup_sub_technologies(tb: Table) -> Table:
     ) == {1}
     # This does not happen with sectors.
     # For example, sub-technology Biofuels is included in sectors "Power", "Transport", and "Industry".
-
-    # There seems to be one nan sub-technology. Add this to "Others".
-    tb["sub_technology"] = tb["sub_technology"].fillna("Others")
 
     # Rename sub-technologies conveniently.
     tb["sub_technology"] = map_series(
@@ -154,12 +164,6 @@ def run() -> None:
     ds_meadow = paths.load_dataset("renewable_energy_patents")
     tb = ds_meadow.read("renewable_energy_patents")
 
-    # Load income groups dataset.
-    ds_income_groups = paths.load_dataset("income_groups")
-
-    # Load regions dataset.
-    ds_regions = paths.load_dataset("regions")
-
     #
     # Process data.
     #
@@ -167,13 +171,11 @@ def run() -> None:
     tb = regroup_sub_technologies(tb=tb)
 
     # Harmonize country names.
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = paths.regions.harmonize_names(tb=tb)
 
     # Add region aggregates.
-    tb = geo.add_regions_to_table(
+    tb = paths.regions.add_aggregates(
         tb=tb,
-        ds_regions=ds_regions,
-        ds_income_groups=ds_income_groups,
         regions=REGIONS,
         index_columns=["country", "year", "sector", "technology", "sub_technology"],
     )
