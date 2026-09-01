@@ -1005,6 +1005,16 @@ const checkFrame = async (frameId) => {
     const offenders = [];
     for (const n of frame.findAll(() => true)) {
       if (!shown(n)) continue;
+      // A GROUP paints no ink of its own: its box is a UNION of its children's, and FITTING.md's
+      // measured case says that union counts HIDDEN descendants — one switched-off entity label held
+      // its ancestor groups at 510.281 against the 508.001 their visible ink actually measured. So a
+      // VISIBLE group wrapping a hidden node parked off the artboard reports an overhang that paints
+      // nothing, and `shown` cannot catch it because the group itself is genuinely shown. That is the
+      // fire-on-correct-work failure `dead-fills` needed its area gate for, reached through container
+      // bounds instead of through paint. Skipping costs no coverage — `findAll` visits every painting
+      // descendant separately, so real lost ink is still reported, and reported under the name of the
+      // node that actually overflows rather than of a wrapper three levels up.
+      if (n.type === "GROUP") continue;
       const b = rel(n);
       if (!b || b.w <= 0 || b.h <= 0) continue;
       const edges = [];

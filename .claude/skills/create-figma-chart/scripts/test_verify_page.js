@@ -265,6 +265,18 @@ function buildFrame(opts = {}) {
         fills: solid("#4c6a9c") })] }));
   // A matplotlib clipPath as `upload_assets` imports it: every path windingRule NONE — it paints
   // nothing — carrying Figma's default black fill.
+  // A VISIBLE group whose only overflow is a HIDDEN child. FITTING.md measured this: a group's box is
+  // a union that counts hidden descendants, so the wrapper's box hangs off the artboard while nothing
+  // inside it paints there. `shown` cannot catch it — the group genuinely is shown.
+  // Takes the CHILD's visibility rather than a flag, because the two answers are opposite: switched
+  // off, the group's box overhangs but nothing paints there; switched on, it is real lost ink and
+  // must still be reported — under the child's name, since the group is no longer judged.
+  if (opts.groupWrappedOverflow !== undefined) children.push(node({ type: "GROUP", name: "text-labels",
+    x: 16, y: 400, width: 100, height: 240, children: [
+      node({ type: "TEXT", name: "label__kept", x: 16, y: 400, width: 100, height: 40,
+        fills: solid("#4c6a9c"), characters: "Kept" }),
+      node({ type: "RECTANGLE", name: "label__retired", visible: opts.groupWrappedOverflow,
+        x: 16, y: 600, width: 100, height: 40, fills: solid("#4c6a9c") })] }));
   if (opts.deadVector) children.push(node({ type: "VECTOR", name: "Vector", x: 40, y: 200, width: 80, height: 57,
     fills: solid("#000000"), strokes: [], vectorPaths: [{ windingRule: "NONE", data: "M 0 0 L 80 0 L 80 57 Z" }] }));
   // The same artifact but ALSO stroked: its stroke still renders, so only the fill is dead and the row
@@ -1765,6 +1777,26 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
           row(dim, "within-frame").status === "FAIL", row(dim, "within-frame").detail);
     check("37 and it names the dimmed node",
           /offstage-faded/.test(row(dim, "within-frame").detail), row(dim, "within-frame").detail);
+
+    // A GROUP's box is a union that counts HIDDEN descendants (FITTING.md's measured 510.281 against
+    // 508.001 of visible ink), so a visible wrapper around a switched-off node reports an overhang
+    // that paints nothing. `shown` cannot catch it: the group itself IS shown. A group paints no ink
+    // of its own, so it is not judged; its painting descendants each are.
+    const wrapper = await run(buildFrame({ groupWrappedOverflow: false }), {});
+    check("37 a visible group hiding an off-artboard child does not fail",
+          row(wrapper, "within-frame").status === "ok", row(wrapper, "within-frame").detail);
+    check("37 and the wrapper is not named as an offender",
+          !/text-labels/.test(row(wrapper, "within-frame").detail), row(wrapper, "within-frame").detail);
+
+    // The skip must not become a way to hide real lost ink. The SAME wrapper with the child switched
+    // ON still fails, and it is the CHILD that is named — which is the more useful report anyway.
+    const wrapperReal = await run(buildFrame({ groupWrappedOverflow: true }), {});
+    check("37 the same group with a VISIBLE off-artboard child still FAILS",
+          row(wrapperReal, "within-frame").status === "FAIL", row(wrapperReal, "within-frame").detail);
+    check("37 and it names the child, not the wrapper",
+          /label__retired/.test(row(wrapperReal, "within-frame").detail)
+          && !/text-labels/.test(row(wrapperReal, "within-frame").detail),
+          row(wrapperReal, "within-frame").detail);
   }
 
   // 38 — dead-fills. Invisible on canvas, visible in the layer panel and in every fill inventory:

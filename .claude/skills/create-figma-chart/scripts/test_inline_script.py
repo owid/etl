@@ -362,6 +362,42 @@ check("and emits it as one valid JS string",
 _slash = _run_cfg("--rows", "series", "--config", r"chartName=share\rate")
 check("--config escapes a backslash", r'chartName: "share\\rate",' in _slash.stdout, _slash.stdout[:300])
 
+# An ARRAY has to stay an array. Quoting it into a string does not fail, it RUNS: gapTarget is truthy
+# so it survives its `||` default and then indexes character-by-character, and frameIds fails
+# Array.isArray and is silently dropped back to the single frameId. Both are documented as arrays.
+_arr = _run_cfg("--rows", "geometry", "--config", "gapTarget=[12,16]")
+check("--config keeps an array an array", "gapTarget: [12, 16]," in _arr.stdout, _arr.stdout[:300])
+check("and does not quote it into a string", 'gapTarget: "[' not in _arr.stdout, _arr.stdout[:300])
+
+# The value runs to the LAST comma on the line — a first-comma match would strand ` 16],` behind the
+# rewrite, which is a syntax error rather than a wrong value, but only for the keys that take arrays.
+check("the rest of the array is not stranded", "16]," in _arr.stdout and " 16]," not in _arr.stdout.replace("[12, 16],", ""),
+      _arr.stdout[:300])
+
+_ids = _run_cfg("--rows", "series", "--config", 'frameIds=["1:2","3:4"]')
+check("--config sets an array of strings", 'frameIds: ["1:2", "3:4"],' in _ids.stdout, _ids.stdout[:300])
+
+# A string that merely LOOKS numeric or bracketed is still whatever json says it is; a value that is
+# not JSON at all falls back to a quoted string rather than erroring.
+_notjson = _run_cfg("--rows", "series", "--config", "chartName=[unclosed")
+check("a non-JSON value falls back to a string", 'chartName: "[unclosed",' in _notjson.stdout, _notjson.stdout[:300])
+
+# The assertions above read the emitted TEXT, which is how a value that is quoted but not escaped
+# still looks right. What actually matters is that the slice PARSES after --config has rewritten it,
+# so the awkward values go through the same node --check the documented calls get.
+if _node and _vp.exists():
+    _cfg_emit = _run_cfg(
+        "--rows", "geometry",
+        "--config", "gapTarget=[12,16]",
+        "--config", 'chartName=A "quoted" chart',
+        "--config", r"frameId=1:2",
+    )
+    _cfg_tmp = Path(tempfile.gettempdir()) / "verify_page_config_check.js"
+    _cfg_tmp.write_text("async function __w(){\n" + _cfg_emit.stdout + "\n}\n")
+    _cfg_parsed = subprocess.run([_node, "--check", str(_cfg_tmp)], capture_output=True, text=True)
+    check("a --config-rewritten slice still parses", _cfg_parsed.returncode == 0, _cfg_parsed.stderr[:200])
+    _cfg_tmp.unlink(missing_ok=True)
+
 # json.loads is the arbiter: it accepts exactly the string syntax JavaScript does, so a value that
 # round-trips through it is one the plugin can parse.
 _emitted = re.search(r"\n\s*chartName:\s*(\"(?:[^\"\\]|\\.)*\"),", _quoted.stdout)

@@ -6,7 +6,7 @@
 Every one of these caught a real defect on this skill's first run, and none of them is visible by looking at the frame. Run them as a pass, and report the numbers rather than "looks fine".
 
 > **⚠️ `verify_page.js` does not fit in a `use_figma` call whole.** The `code` argument caps at
-> **50,000 characters** and the file is **152,581** raw / **74,587** stripped, so the instruction below
+> **50,000 characters** and the file is **153,517** raw / **74,627** stripped, so the instruction below
 > is not executable verbatim. `inline_script.py verify_page.js` with no `--rows` **refuses and exits 1**,
 > and `--whole` does not override it — the cap is a hard floor for this script, not a judgement call.
 >
@@ -34,7 +34,7 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > | `skipped` | every declared gap — the colour_audit.py command, spelling, entity completeness, arrows, leader-on-map | 55% |
 >
 > Groups combine, so the whole pass is **three calls**: `--rows annotations` (34,198), `--rows
-> type,geometry` (36,634), `--rows series,skipped` (35,089) — measured 2026-09-01, largest **73% of
+> type,geometry` (36,674), `--rows series,skipped` (35,089) — measured 2026-09-01, largest **73% of
 > cap** against a **68% floor**. Three and not four because the preamble is byte-identical across
 > slices and each row group is a self-contained block after it (GOTCHAS.md → Running the scripts has
 > the `cmp` proof and the composition rule); concatenating verbatim blocks is not the hand-rolled

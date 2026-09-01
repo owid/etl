@@ -447,16 +447,27 @@ def main() -> int:
                 ap.error(f"--config expects KEY=VALUE, got {pair!r}")
             key, _, val = pair.partition("=")
             key, val = key.strip(), val.strip()
-            if val not in ("true", "false", "null") and not re.fullmatch(r"-?\d+(?:\.\d+)?", val):
-                # json.dumps, not a hand-built pair of quotes. JSON string syntax is a subset of
-                # JavaScript's, so this is the escaping the emitted slice needs — and the slice is
-                # pasted STRAIGHT into use_figma. A value carrying a double quote or a backslash
-                # (`--config 'chartName=A "quoted" chart'`) closes the string early and what reaches
-                # the plugin is a syntax error whose cause is nowhere in the message, which is the
-                # same paste-time corruption the cap check below refuses to risk.
+            # ONE json round-trip covers every shape CONFIG holds, and json.dumps is what makes it
+            # safe: JSON's syntax for strings, numbers, booleans, null and arrays is a subset of
+            # JavaScript's, and the emitted slice is pasted STRAIGHT into use_figma. Hand-building a
+            # pair of quotes instead broke both ends of that. A value carrying a double quote or a
+            # backslash (`--config 'chartName=A "quoted" chart'`) closed the string early and reached
+            # the plugin as a syntax error whose cause is nowhere in the message. And an ARRAY —
+            # `gapTarget=[12,16]`, `frameIds=["1:2","3:4"]`, both documented as arrays in
+            # verify_page.js's header — was quoted into a STRING, which is worse than an error
+            # because it runs: `gapTarget` is truthy so it survives its `||` default and then indexes
+            # character-by-character into "[", "1"; `frameIds` fails Array.isArray and is silently
+            # dropped back to the single frameId. A parse failure means it was never JSON, so it is a
+            # bare string and gets quoted as one.
+            try:
+                val = json.dumps(json.loads(val))
+            except json.JSONDecodeError:
                 val = json.dumps(val.strip("\"'"))
             body, n = re.subn(
-                rf"(\n\s*{re.escape(key)}:\s*)[^,\n]*(,)",
+                # The value runs to the LAST comma on its line, not the first: `[12, 16]` contains
+                # one, and a first-comma match would rewrite `gapTarget: [12,` and leave ` 16],`
+                # stranded behind it. Greedy to end-of-line, then backtrack to the separator.
+                rf"(\n\s*{re.escape(key)}:\s*)[^\n]*(,)(?=[^\n]*\n)",
                 lambda m: f"{m.group(1)}{val}{m.group(2)}",
                 body,
                 count=1,
