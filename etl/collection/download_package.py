@@ -827,13 +827,53 @@ def _zip_timestamp(build_date: date) -> tuple[int, int, int, int, int, int]:
     return (build_date.year, build_date.month, build_date.day, 0, 0, 0)
 
 
-def _readme(title: str, page_url: str, column_sections: list[str], sources_section: str = "") -> str:
+def _time_column_lines(time_header: str, frequency_column: bool) -> str:
+    """The bullet describing the CSV's time column(s), for the shape this package
+    actually has.
+
+    Upstream hedges -- "the third column is either Year or Day" -- because a chart
+    download's readme is one static string. This one is built per package, so it can
+    just say which it is, and can describe the Frequency/Time pair that a
+    mixed-resolution collection gets and no chart download has.
+    """
+    if frequency_column:
+        return (
+            '- "Frequency" and "Time" — the resolution a row is reported at ("annual", "monthly", ...) and '
+            'the timepoint at that resolution ("2025", "2026-06"). Collections that report the same metric at '
+            "more than one resolution keep it in a single column and tell the rows apart here."
+        )
+    if time_header == "Day":
+        return '- "Day" — the timepoint, as a date string in the form "YYYY-MM-DD".'
+    return '- "Year" — the timepoint, as an integer year.'
+
+
+def _readme(
+    title: str,
+    page_url: str,
+    column_sections: list[str],
+    sources_section: str = "",
+    time_header: str = "Year",
+    frequency_column: bool = False,
+) -> str:
     """Ported from `constructReadme`'s multi-column branch (readmeTools.ts),
     with the tolerance-column paragraph dropped (a complete-dataset package has
     no tolerance columns) and three MDIM-only additions that have no counterpart
     there: that the package covers every dimension combination, that column
     headers shouldn't be parsed, and how to read metadata.json's "dimensions"
     and per-column "dimensions"/"url" keys instead.
+
+    Two changes to the boilerplate. The CSV section is a bulleted list rather than a
+    paragraph per column, and names the time column this package actually has instead of
+    hedging between "Year" and "Day". And "About the data" is gone as a heading: it
+    announced a description of *this* dataset and then delivered generic text about how
+    OWID processes data, so that is what it is now called -- taking with it the
+    sub-heading of the same name, which was the only thing under it. The wording of
+    those paragraphs, and of the metadata.json section, is upstream's untouched.
+
+    Sources come last, after the indicators. What a reader opens this file for is the
+    column they are looking at; the source list is reference material they consult from
+    a citation, and putting it first pushed the indicators below several screens of
+    producer descriptions.
 
     Detail-on-demand links are stripped from the whole document. `[terawatt-hours](#dod:watt-hours)`
     renders as a tooltip on our site and as a dead link in a downloaded markdown file, so it is noise
@@ -846,17 +886,16 @@ def _readme(title: str, page_url: str, column_sections: list[str], sources_secti
     """
     return strip_detail_on_demand_links(f"""# {title} - Data package
 
-This data package contains the data that powers the chart ["{title}"]({page_url}) on the Our World in Data website. It includes every dimension combination of this multidimensional dataset -- all metric/breakdown choices, not just the view selected on the chart.
+This data package contains the data that powers the chart ["{title}"]({page_url}) on the Our World in Data website. It covers every dimension combination of this multidimensional dataset, not just the view the chart opens on.
 
-## CSV Structure
+## CSV structure
 
-The high level structure of the CSV file is that each row is an observation for an entity (usually a country or region) and a timepoint (usually a year).
+Each row is an observation for an entity (usually a country or region) at a timepoint.
 
-The first two columns in the CSV file are "Entity" and "Code". "Entity" is the name of the entity (e.g. "United States"). "Code" is the OWID internal entity code that we use if the entity is a country or region. For most countries, this is the same as the [iso alpha-3](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3) code of the entity (e.g. "USA") - for non-standard countries like historical countries these are custom codes.
-
-The third column is either "Year" or "Day". If the data is annual, this is "Year" and contains only the year as an integer. If the column is "Day", the column contains a date string in the form "YYYY-MM-DD".
-
-The remaining columns are the data columns, each of which is a time series corresponding to one dimension combination of this dataset. Their headers are human-readable names; don't parse them to work out which dimension combination a column belongs to, use the .metadata.json file described below instead.
+- "Entity" — the name of the entity, e.g. "United States".
+- "Code" — our internal entity code. For most countries this is the [ISO alpha-3](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3) code, e.g. "USA"; historical and other non-standard entities get a custom code.
+{_time_column_lines(time_header, frequency_column)}
+- Every remaining column is one time series, corresponding to one dimension combination. Their headers are human-readable names — don't parse them to work out which combination a column belongs to, use the .metadata.json file for that.
 
 ## Metadata.json structure
 
@@ -866,19 +905,17 @@ The "dimensions" key lists this dataset's dimensions and the choices available f
 
 A few columns belong to more than one combination, which happens when a dimension makes no difference to that particular indicator. Those carry an extra "otherViews" key listing the remaining combinations in the same shape; if you need every combination a column appears under, read both keys.
 
-## About the data
+## How we process data at Our World in Data
 
 Our World in Data is almost never the original producer of the data - almost all of the data we use has been compiled by others. If you want to re-use data, it is your responsibility to ensure that you adhere to the sources' license and to credit them correctly. Please note that a single time series may have more than one source - e.g. when we stich together data from different time periods by different producers or when we calculate per capita metrics using population data from a second source.
 
-### How we process data at Our World In Data
 All data and visualizations on Our World in Data rely on data sourced from one or several original data providers. Preparing this original data involves several processing steps. Depending on the data, this can include standardizing country names and world region definitions, converting units, calculating derived indicators such as per capita measures, as well as adding or adapting metadata such as the name or the description given to an indicator.
 [Read about our data pipeline](https://docs.owid.io/projects/etl/)
-
-{sources_section}
 
 ## Detailed information about each time series
 
 {chr(10).join(column_sections)}
+{sources_section}
 """)
 
 
@@ -1070,7 +1107,14 @@ def build_download_package_for_collection(
     # MDIM overwhelmingly share their sources, so repeating them per column is nearly all
     # duplication -- 354 blocks describing 7 sources on electricity-mix.
     sources_section = "\n".join(sources_section_lines(collect_unique_sources([c.col for c in columns])))
-    readme = _readme(title, page_url, readme_sections, sources_section)
+    readme = _readme(
+        title,
+        page_url,
+        readme_sections,
+        sources_section,
+        time_header=wide_table.time_header,
+        frequency_column=wide_table.frequency_column is not None,
+    )
 
     #
     # The CSV, in its final downloadable shape: Entity/Code/Year, long

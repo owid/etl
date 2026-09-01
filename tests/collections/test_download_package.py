@@ -223,6 +223,20 @@ def test_readme_strips_detail_on_demand_links():
     assert "Measured in terawatt-hours of energy." in out, "the label survives, only the link goes"
 
 
+def test_readme_puts_the_sources_section_after_the_indicators():
+    """Test _readme - Sources is the last section, not the one before the indicators.
+
+    It is reference material a reader arrives at from a citation. Ahead of the
+    indicators it pushed the column they opened the file for below several screens of
+    producer descriptions.
+    """
+    from etl.collection.download_package import _readme
+
+    out = _readme("Energy mix", "https://example.org", ["## Total generation"], sources_section="## Sources\n\nEmber")
+
+    assert out.index("## Detailed information") < out.index("## Sources")
+
+
 def test_zip_entries_are_stamped_with_the_build_date():
     """Test _zip_timestamp - entries carry the build date, not 1980.
 
@@ -239,3 +253,94 @@ def test_zip_entries_are_stamped_with_the_build_date():
     # Same day in, same stamp out -- this is what keeps a same-day rebuild byte-identical.
     assert _zip_timestamp(date(2026, 8, 27)) == _zip_timestamp(date(2026, 8, 27))
     assert _zip_timestamp(date(2026, 8, 28)) != _zip_timestamp(date(2026, 8, 27))
+
+
+def _indicator_meta() -> dict:
+    """An indicator's public metadata JSON, cut down to the fields the readme reads."""
+    return {
+        "name": "Total electricity generation",
+        "unit": "terawatt-hours",
+        "timespan": "1900-2025",
+        "processingLevel": "major",
+        "updatePeriodDays": 365,
+        "descriptionShort": "Total electricity generated, measured in terawatt-hours.",
+        "descriptionKey": ["Covers utility-scale generation only."],
+        "descriptionFromProducer": "Ember compiles this from national statistics.",
+        "descriptionProcessing": "We stitch Ember onto the Energy Institute's earlier years.",
+        "origins": [
+            {
+                "producer": "Ember",
+                "title": "Yearly Electricity Data",
+                "datePublished": "2026-04-21",
+                "dateAccessed": "2026-04-24",
+                "urlMain": "https://ember-energy.org/data/yearly-electricity-data/",
+            }
+        ],
+    }
+
+
+def test_indicator_section_sits_under_the_heading_that_introduces_it():
+    """Test column_readme_text - per-indicator headings are one level deeper than upstream's.
+
+    The document puts these sections under "## Detailed information about each time
+    series"; upstream's levels made each indicator a sibling of that heading rather
+    than a child, so the second half of the readme had no structure at all.
+    """
+    from datetime import date
+
+    from etl.collection.download_package_format import IndicatorColumn, column_readme_text
+
+    lines = column_readme_text(
+        IndicatorColumn(_indicator_meta()), date(2026, 8, 27), heading="Electricity - TWh", include_sources=False
+    )
+    headings = [line for line in lines if line.startswith("#")]
+
+    assert headings == [
+        "### Electricity - TWh",
+        "#### How to cite this data",
+        "#### What you should know about this data",
+        "#### How this data is described by its producers",
+        "#### Notes on our processing step for this indicator",
+    ]
+
+
+def test_indicator_section_drops_the_full_citation_and_softens_the_update_date():
+    """Test column_readme_text - the short citation stands alone, next update is expected.
+
+    The full citation restated producer names the Sources section already gives in
+    detail, and was a fifth of electricity-mix's readme. The next-update date is our
+    last update plus the producer's stated period, so it is an expectation, not a date
+    we can promise.
+    """
+    from datetime import date
+
+    from etl.collection.download_package_format import IndicatorColumn, column_readme_text
+
+    col = IndicatorColumn(_indicator_meta())
+    text = "\n".join(column_readme_text(col, date(2026, 8, 27), heading="Electricity - TWh", include_sources=False))
+
+    assert "Next expected update:" in text
+    assert "Next update:" not in text
+    assert col.citation_short() in text
+    assert "[original data]" not in text, "the full citation is gone"
+    assert "#### In-line citation" not in text, "nothing left to contrast the citation with"
+    # The full attribution moves in with the other facts about the indicator, above the
+    # citation rather than trailing it.
+    assert text.index("Source: ") < text.index("#### How to cite this data")
+
+
+def test_readme_describes_the_time_columns_the_package_actually_has():
+    """Test _readme - the CSV section names this package's time columns, not both options.
+
+    Upstream's readme is one static string, so it has to hedge ("either Year or Day").
+    This one is built per package, and a package that mixes resolutions has a
+    Frequency/Time pair that the hedge does not describe at all.
+    """
+    from etl.collection.download_package import _readme
+
+    annual = _readme("Energy mix", "https://example.org", [], time_header="Year")
+    assert '"Year" — the timepoint, as an integer year.' in annual
+    assert "Frequency" not in annual
+
+    stacked = _readme("Energy mix", "https://example.org", [], time_header="Time", frequency_column=True)
+    assert '"Frequency" and "Time"' in stacked
