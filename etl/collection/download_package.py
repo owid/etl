@@ -862,12 +862,13 @@ def _readme(
     headers shouldn't be parsed, and how to read metadata.json's "dimensions"
     and per-column "dimensions"/"url" keys instead.
 
-    The prose is tightened against upstream's, which repeats in a paragraph what a
-    bullet says, and restates the file it is describing ("The .metadata.json file
-    contains metadata about the data package"). "About the data" is gone as a heading:
-    it announced a description of *this* dataset and then delivered generic text about
-    how OWID processes data, so that is what it is now called -- and the sub-heading it
-    contained went with it, being the only thing under it.
+    Two changes to the boilerplate. The CSV section is a bulleted list rather than a
+    paragraph per column, and names the time column this package actually has instead of
+    hedging between "Year" and "Day". And "About the data" is gone as a heading: it
+    announced a description of *this* dataset and then delivered generic text about how
+    OWID processes data, so that is what it is now called -- taking with it the
+    sub-heading of the same name, which was the only thing under it. The wording of
+    those paragraphs, and of the metadata.json section, is upstream's untouched.
 
     Detail-on-demand links are stripped from the whole document. `[terawatt-hours](#dod:watt-hours)`
     renders as a tooltip on our site and as a dead link in a downloaded markdown file, so it is noise
@@ -893,17 +894,18 @@ Each row is an observation for an entity (usually a country or region) at a time
 
 ## Metadata.json structure
 
-"chart" holds what is needed to recreate the chart — title, subtitle and so on. "columns" describes each column of the CSV — unit, timespan covered, citation, and the rest.
+The .metadata.json file contains metadata about the data package. The "chart" key contains information to recreate the chart, like the title, subtitle etc.. The "columns" key contains information about each of the columns in the csv, like the unit, timespan covered, citation for the data etc..
 
-"dimensions" lists this dataset's dimensions and the choices available for each, as a stable slug plus a display name. Each column entry carries its own "dimensions" key naming the combination it belongs to, by slug, plus a "url" that opens that combination on our website. Together they let you go from a CSV column to its dimension choices and back without parsing column headers.
+The "dimensions" key lists this dataset's dimensions and the choices available for each, as a stable slug plus a display name. Every column entry then carries its own "dimensions" key naming the combination of choices that column belongs to, by slug, plus a "url" that opens that combination on our website. Together those let you go from a CSV column to its dimension choices, and back, without parsing column headers.
 
-Where a dimension makes no difference to a particular indicator, one column stands for several combinations. Those columns carry an extra "otherViews" key listing the rest in the same shape, so read both keys if you need every combination a column appears under.
+A few columns belong to more than one combination, which happens when a dimension makes no difference to that particular indicator. Those carry an extra "otherViews" key listing the remaining combinations in the same shape; if you need every combination a column appears under, read both keys.
 
 ## How we process data at Our World in Data
 
-We are almost never the original producer of the data we publish — nearly all of it has been compiled by others. If you re-use it, it is your responsibility to respect the sources' licenses and credit them correctly. A single time series may draw on more than one source: we stitch together data from different periods by different producers, and calculate metrics such as per capita figures using population data from a second source.
+Our World in Data is almost never the original producer of the data - almost all of the data we use has been compiled by others. If you want to re-use data, it is your responsibility to ensure that you adhere to the sources' license and to credit them correctly. Please note that a single time series may have more than one source - e.g. when we stich together data from different time periods by different producers or when we calculate per capita metrics using population data from a second source.
 
-Preparing that original data takes several processing steps. Depending on the data, these can include standardizing country names and world region definitions, converting units, calculating derived indicators such as per capita measures, and adding or adapting metadata such as an indicator's name or description. [Read about our data pipeline](https://docs.owid.io/projects/etl/)
+All data and visualizations on Our World in Data rely on data sourced from one or several original data providers. Preparing this original data involves several processing steps. Depending on the data, this can include standardizing country names and world region definitions, converting units, calculating derived indicators such as per capita measures, as well as adding or adapting metadata such as the name or the description given to an indicator.
+[Read about our data pipeline](https://docs.owid.io/projects/etl/)
 
 {sources_section}
 
