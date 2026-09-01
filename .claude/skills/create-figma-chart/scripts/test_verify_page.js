@@ -328,6 +328,27 @@ function buildFrame(opts = {}) {
     x: 0, y: 100, width: 0, height: 200, fills: [], strokes: solid("#dddddd"),
     strokeWeight: opts.fullBleedColumn, strokeAlign: "CENTER", strokeCap: "NONE",
     vectorPaths: [{ windingRule: "NONE", data: "M 0 0 L 0 200" }] }));
+  // A SHALLOW diagonal open path starting exactly on the left edge. Its perpendicular is almost
+  // entirely vertical, so a butt-capped 3px stroke paints ~0.015px past x=0 — inside the tolerance.
+  // `absoluteTransform` is a pure translation, which is what lets the vertex maths be trusted.
+  if (opts.shallowDiagonal) children.push(node({ type: "VECTOR", name: "rule__shallow",
+    x: 0, y: 10, width: 100, height: 1, fills: [], strokes: solid("#dddddd"),
+    strokeWeight: 3, strokeAlign: "CENTER", strokeCap: "NONE",
+    absoluteTransform: [[1, 0, 0], [0, 1, 10]],
+    vectorNetwork: { vertices: [{ x: 0, y: 0 }, { x: 100, y: 1 }], segments: [{ start: 0, end: 1 }] } }));
+  // The same shape STEEP. Now the perpendicular is almost entirely horizontal, so the overhang past
+  // the left edge is real and must still be reported.
+  if (opts.steepDiagonal) children.push(node({ type: "VECTOR", name: "rule__steep",
+    x: 0, y: 100, width: 1, height: 200, fills: [], strokes: solid("#dddddd"),
+    strokeWeight: 3, strokeAlign: "CENTER", strokeCap: "NONE",
+    absoluteTransform: [[1, 0, 0], [0, 1, 100]],
+    vectorNetwork: { vertices: [{ x: 0, y: 0 }, { x: 1, y: 200 }], segments: [{ start: 0, end: 1 }] } }));
+  // A viewport frame sitting INSIDE the artboard, holding a mark that runs past its bottom edge. With
+  // `clipsContent` the overflow is gone before export; without it the mark really does reach y=600.
+  if (opts.clippedOverflow !== undefined) children.push(node({ type: "FRAME", name: "plot__viewport",
+    x: 16, y: 200, width: 300, height: 340, fills: [], clipsContent: opts.clippedOverflow,
+    children: [node({ type: "RECTANGLE", name: "series__overflow", x: 16, y: 500,
+      width: 100, height: 100, fills: solid("#4c6a9c") })] }));
   // A positive-area LEAF that paints nothing at all — the fill-less placeholder rectangle a template
   // carries for layout. Parked off the artboard, where it still renders no pixel.
   if (opts.paintlessLeaf) children.push(node({ type: "RECTANGLE", name: "spacer__placeholder",
@@ -2195,6 +2216,41 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const cen = row(await run(buildFrame(), {}), "page-census").detail;
     check("46 page-census says it lists everything, unfiltered", /EVERYTHING placed on the page/.test(cen), cen);
     check("46 and says why it does not guess at plot-bearing", /DROPS a duplicate deliverable/.test(cen), cen);
+  }
+
+  // 47 — the sixth Codex round. Both are the painted-extent measurement claiming ink that the export
+  // never loses, reached through geometry the first two rounds did not model.
+  {
+    // (a) the butt-cap exemption only covered EXACTLY horizontal and vertical paths, so every diagonal
+    // carried the full half-weight on both axes. The share landing on an axis is the perpendicular's
+    // own share: a shallow segment starting on the left edge paints ~0.015px past it, not 1.5.
+    const shallow = await run(buildFrame({ shallowDiagonal: true }), {});
+    check("47 a shallow butt-capped diagonal on the left edge does not fail",
+          row(shallow, "within-frame").status === "ok", row(shallow, "within-frame").detail);
+    // The perpendicular still governs, so the STEEP case — where the overhang is real — must fail, or
+    // the fix has exempted open paths wholesale.
+    const steep = await run(buildFrame({ steepDiagonal: true }), {});
+    check("47 a steep diagonal on the left edge still FAILS",
+          row(steep, "within-frame").status === "FAIL"
+          && /left by 1\.5/.test(row(steep, "within-frame").detail),
+          row(steep, "within-frame").detail);
+
+    // (b) an ancestor frame with clipsContent removes the overflow before export, so a mark running
+    // past its own viewport cannot then be lost at the artboard edge. An imported SVG arrives wrapped
+    // in exactly these clip groups, so this is the ordinary case, not an exotic one.
+    const clipped = await run(buildFrame({ clippedOverflow: true }), {});
+    check("47 a mark clipped by its viewport ancestor does not fail",
+          row(clipped, "within-frame").status === "ok", row(clipped, "within-frame").detail);
+    check("47 and it is not named as an offender",
+          !/series__overflow/.test(row(clipped, "within-frame").detail), row(clipped, "within-frame").detail);
+    // The negative: the SAME wrapper without clipsContent lets the mark through, and it is reported
+    // with the overshoot measured from the artboard rather than from the wrapper.
+    const unclipped = await run(buildFrame({ clippedOverflow: false }), {});
+    check("47 the same wrapper without clipsContent still FAILS",
+          row(unclipped, "within-frame").status === "FAIL"
+          && /series__overflow/.test(row(unclipped, "within-frame").detail)
+          && /bottom by 60/.test(row(unclipped, "within-frame").detail),
+          row(unclipped, "within-frame").detail);
   }
 
   const bad = results.filter((x) => !x.ok);

@@ -1014,6 +1014,26 @@ const checkFrame = async (frameId) => {
     // folds in blur and drop shadows too, and a shadow falling off the artboard is not ink anyone
     // should re-pin a footer for. So the outset is computed from the stroke alone, and only from one
     // that actually PAINTS — the same `paints` test the zero-area gate below uses.
+    // How much of a unit perpendicular falls on each axis, taken over every segment of an open path.
+    // Vertices are LOCAL to the node, so a ROTATED node would report the wrong axes — the shares are
+    // refused there and the caller keeps the full, conservative outset. Over-reporting an overhang is
+    // recoverable; missing one is the failure this row exists to prevent.
+    const perpShare = (n) => {
+      const vn = n.vectorNetwork;
+      if (!vn || !Array.isArray(vn.vertices) || !Array.isArray(vn.segments) || !vn.segments.length) return null;
+      const at = n.absoluteTransform;
+      if (at && !(at[0][0] === 1 && at[0][1] === 0 && at[1][0] === 0 && at[1][1] === 1)) return null;
+      let x = 0, y = 0;
+      for (const s of vn.segments) {
+        const a = vn.vertices[s.start], z = vn.vertices[s.end];
+        if (!a || !z) return null;
+        const dx = z.x - a.x, dy = z.y - a.y, len = Math.sqrt(dx * dx + dy * dy);
+        if (!len) continue;
+        x = Math.max(x, Math.abs(dy) / len);
+        y = Math.max(y, Math.abs(dx) / len);
+      }
+      return { x, y };
+    };
     const strokeOutset = (n, b) => {
       if (!Array.isArray(n.strokes) || !n.strokes.some(paints)) return null;
       // INSIDE keeps the whole stroke within the geometry; CENTER puts half of it outside; OUTSIDE all
@@ -1036,12 +1056,41 @@ const checkFrame = async (frameId) => {
       // failure this file exists to avoid, reached through the cap. ROUND and SQUARE caps DO project
       // half a weight past the endpoint, so those keep the outset on the path's own axis. A mixed or
       // arrow cap is treated as butt: erring toward not firing is this row's standing preference.
+      // The share of that half-weight landing on each AXIS is the perpendicular's own share, so it is
+      // full for a rule at right angles to the axis and near zero along the path's own direction.
+      // Restricting the exemption to exactly horizontal and vertical paths left every DIAGONAL
+      // carrying the full outset on both axes: a 3px segment from (0,10) to (100,11) paints 0.015px
+      // past the left edge and was reported as 1.5. Segments come from `vectorNetwork`, and the MAX
+      // over them is taken because one steep segment in an otherwise flat polyline does overhang, and
+      // because a corner join reaches past either segment's own perpendicular (an L of one horizontal
+      // and one vertical segment lands back on the full outset, which is right).
       const capped = n.strokeCap === "ROUND" || n.strokeCap === "SQUARE";
-      if (!capped && b) {
-        if (b.h === 0 && b.w > 0) { o.l = 0; o.rr = 0; }
-        if (b.w === 0 && b.h > 0) { o.t = 0; o.bb = 0; }
+      if (!capped) {
+        const p = perpShare(n) || (b && b.h === 0 && b.w > 0 ? { x: 0, y: 1 }
+                                 : b && b.w === 0 && b.h > 0 ? { x: 1, y: 0 } : null);
+        if (p) { o.l *= p.x; o.rr *= p.x; o.t *= p.y; o.bb *= p.y; }
       }
       return o;
+    };
+    // An intermediate frame with `clipsContent` removes its descendants' overflow BEFORE export, so a
+    // node hanging out of its own clipped viewport paints nothing beyond it and cannot then be lost at
+    // the artboard edge — those pixels were already gone, and the node needs no re-pinning. FITTING.md
+    // records the same rule from the other side: `absoluteRenderBounds` "is clipped by an ancestor
+    // frame, so it cannot measure a group that overflows". `findAll` still visits the descendant and
+    // `shown` reads only the visibility and opacity switches, so without this the row reports a series
+    // line running past its own clip group as ink lost off the artboard — an SVG import arrives
+    // wrapped in exactly those clip groups.
+    const clipTo = (n, box) => {
+      let m = n.parent, out = box;
+      while (m && m !== frame) {
+        if (m.clipsContent === true) {
+          const cb = rel(m);
+          if (cb) out = { l: Math.max(out.l, cb.l), t: Math.max(out.t, cb.t),
+                          rr: Math.min(out.rr, cb.rr), bb: Math.min(out.bb, cb.bb) };
+        }
+        m = m.parent;
+      }
+      return out;
     };
     const offenders = [];
     for (const n of frame.findAll(() => true)) {
@@ -1080,11 +1129,15 @@ const checkFrame = async (frameId) => {
       // the stroke hangs off that side. OUT_EPS still absorbs the hairline case: a 1px centered rule
       // flush with the edge overhangs by exactly 0.5 and does not fire.
       const so = strokeOutset(n, b) || { l: 0, t: 0, rr: 0, bb: 0 };
+      const px = clipTo(n, { l: b.l - so.l, t: b.t - so.t, rr: b.rr + so.rr, bb: b.bb + so.bb });
+      // A clip can leave nothing at all. The test is STRICT, so a zero-extent gridline — whose top and
+      // bottom are equal by construction — is not mistaken for one that was clipped away.
+      if (px.rr < px.l || px.bb < px.t) continue;
       const edges = [];
-      if (b.l - so.l < -OUT_EPS) edges.push("left by " + r(so.l - b.l));
-      if (b.t - so.t < -OUT_EPS) edges.push("top by " + r(so.t - b.t));
-      if (fb && b.rr + so.rr > fb.width + OUT_EPS) edges.push("right by " + r(b.rr + so.rr - fb.width));
-      if (fb && b.bb + so.bb > fb.height + OUT_EPS) edges.push("bottom by " + r(b.bb + so.bb - fb.height));
+      if (px.l < -OUT_EPS) edges.push("left by " + r(-px.l));
+      if (px.t < -OUT_EPS) edges.push("top by " + r(-px.t));
+      if (fb && px.rr > fb.width + OUT_EPS) edges.push("right by " + r(px.rr - fb.width));
+      if (fb && px.bb > fb.height + OUT_EPS) edges.push("bottom by " + r(px.bb - fb.height));
       if (!edges.length) continue;
       // Whether the stroke is what pushed it out decides what the operator has to go and change: a box
       // already outside needs re-pinning, a box still inside needs its strokeAlign or half a stroke of
