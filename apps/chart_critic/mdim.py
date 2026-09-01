@@ -13,9 +13,10 @@ Two details worth knowing:
 
 - Dimension parameter names are per-mdim (``metric``, ``antigen``, ``level``, ``sex`` …), so they
   cannot be hard-coded into a link allowlist. :func:`dimension_keys` supplies them.
-- A declared view is not guaranteed to render: measured 2026-08-31, ~82% of sampled mdim views
-  answered 500 from the static render while their interactive pages answered 200 (against ~22%
-  for ordinary charts). So the render is best-effort and a review may be text-only.
+- A declared view is not guaranteed to render, so the render is best-effort and a review may be
+  text-only. (A render-service bug on 2026-08-31 had ~82% of sampled mdim views answering 500;
+  it was fixed the next day and 28/28 sampled views rendered. Kept as a note because the
+  degradation path exists for a reason, not because mdims are inherently unrenderable.)
 - Choices whose slug ends in ``_side_by_side`` are comparison views rather than a single series.
   They are worth reviewing but are excluded from sampling by default, because a faceted view is
   harder to judge and the single-series views are where a bad number shows plainly.
