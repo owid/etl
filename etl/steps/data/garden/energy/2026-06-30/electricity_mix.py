@@ -359,12 +359,31 @@ def add_per_capita_variables(combined: Table) -> Table:
     return combined
 
 
+def sanity_check_shares(tb: Table) -> None:
+    """Check that no source's share of total generation is negative or above 100%.
+
+    A share above 100% means that a source's generation and the total generation are inconsistent for
+    that country-year (e.g. they cover different sets of generators, or one of them is not truly
+    electricity generation). A small tolerance above 100% is allowed for rounding errors.
+    """
+    for variable in SHARE_VARIABLES:
+        if variable == "total_generation__twh":
+            continue
+        column = variable.replace("_generation__twh", "_share_of_electricity__pct")
+        invalid = tb[tb[column].notna() & ~tb[column].between(0, 101)]
+        error = f"Column '{column}' has shares outside the range [0, 101]% for: {sorted(set(invalid['country']))}."
+        assert invalid.empty, error
+
+
 def add_share_variables(combined: Table) -> Table:
     """Share-of-electricity (%), share of electricity in primary energy, and net-imports-share variables."""
     # Each source's generation as a share of total generation (shared with the monthly builder).
     for variable in SHARE_VARIABLES:
         new_column = variable.replace("_generation__twh", "_share_of_electricity__pct")
         combined[new_column] = 100 * combined[variable] / combined["total_generation__twh"]
+
+    # Check that no source's share is negative or above 100%.
+    sanity_check_shares(tb=combined)
 
     # Share of primary energy that is generated as electricity, where primary energy is total energy
     # supply (the same quantity we report as primary energy everywhere else).
@@ -575,13 +594,16 @@ def add_historical_electricity(combined: Table, tb_historical: Table) -> Table:
 
 
 # Mapping from the UK BEIS historical electricity columns to the electricity mix columns.
+# NOTE: BEIS' thermal generation is mostly fossil-fired, but includes a small amount of
+# thermally-generated renewables (like waste and landfill gas). BEIS does not report the split of
+# thermal generation into coal, oil and gas (it only reports the fuel *input* of each), so those
+# columns are not filled for the historical period. Non-thermal renewables are all hydro in that
+# period (checked below).
 UK_BEIS_COLUMNS = {
-    "coal": "coal_generation__twh",
-    "oil": "oil_generation__twh",
-    "gas": "gas_generation__twh",
-    "hydro": "hydro_generation__twh",
-    "nuclear": "nuclear_generation__twh",
-    "electricity_generation": "total_generation__twh",
+    "thermal_generation": "fossil_generation__twh",
+    "nuclear_generation": "nuclear_generation__twh",
+    "non_thermal_renewables_generation": "hydro_generation__twh",
+    "total_generation": "total_generation__twh",
     "net_imports": "total_net_imports__twh",
 }
 
@@ -590,28 +612,26 @@ def add_uk_historical_electricity(combined: Table, tb_beis: Table) -> Table:
     """Extend the United Kingdom's electricity series back to ~1920 with BEIS historical data.
 
     BEIS has the lowest priority: it only fills UK years before the modern data (Ember and the Statistical
-    Review) begins, around 1985. BEIS reports fuel *input* for fossil fuels, so their generation is
-    estimated with BEIS's implied efficiency. Wind, solar and other renewables were negligible in that
-    period, so they are set to zero to complete the historical mix.
+    Review) begins (1965 for total, hydro, nuclear and renewables, and 1985 for fossil generation).
+    All series are electricity supplied, as reported by BEIS (covering all generators from 1951, and major
+    power producers before then). Wind, solar and other renewables were negligible in that period, so they
+    are set to zero to complete the historical mix.
 
     The generation columns and net imports get BEIS as an origin (last, since it is the lowest-priority
     source); demand, emissions and carbon intensity are not in BEIS, so those stay on the modern period.
     """
-    tb_beis = tb_beis.reset_index()[
-        ["country", "year"] + list(UK_BEIS_COLUMNS) + ["implied_efficiency", "wind_and_solar"]
-    ].rename(columns=UK_BEIS_COLUMNS, errors="raise")
+    tb_beis = tb_beis.reset_index()[["country", "year"] + list(UK_BEIS_COLUMNS) + ["wind_and_solar"]].rename(
+        columns=UK_BEIS_COLUMNS, errors="raise"
+    )
     tb_beis = tb_beis[tb_beis["country"] == "United Kingdom"].reset_index(drop=True)
-
-    # BEIS reports fuel input for fossil fuels; convert to electricity generation via its implied efficiency.
-    for column in ["coal_generation__twh", "oil_generation__twh", "gas_generation__twh"]:
-        tb_beis[column] *= tb_beis["implied_efficiency"]
 
     # First year the modern UK data reports solar or wind generation.
     modern_first_year = combined[
         (combined["country"] == "United Kingdom")
         & (combined["solar_generation__twh"].notna() | combined["wind_generation__twh"].notna())
     ]["year"].min()
-    # BEIS gives wind and solar combined; confirm it is negligible before the modern data begins.
+    # BEIS gives wind and solar fuel input combined; confirm it is negligible before the modern data
+    # begins (this also guarantees that BEIS' non-thermal renewables are all hydro in that period).
     assert tb_beis[tb_beis["year"] < modern_first_year]["wind_and_solar"].fillna(0).max() == 0, (
         "BEIS wind+solar is no longer negligible before the modern data begins; revisit this assumption."
     )
@@ -625,12 +645,10 @@ def add_uk_historical_electricity(combined: Table, tb_beis: Table) -> Table:
     for column in zero_columns:
         tb_beis[column] = 0.0
     tb_beis.loc[tb_beis["year"] >= modern_first_year, zero_columns] = np.nan
-    tb_beis = tb_beis.drop(columns=["implied_efficiency", "wind_and_solar"], errors="raise")
+    tb_beis = tb_beis.drop(columns=["wind_and_solar"], errors="raise")
 
-    # Recompute the aggregate generation columns from the base sources for the historical period.
-    tb_beis["fossil_generation__twh"] = tb_beis[
-        ["coal_generation__twh", "oil_generation__twh", "gas_generation__twh"]
-    ].sum(axis=1, min_count=3)
+    # Recompute the aggregate generation columns for the historical period (fossil generation is
+    # reported directly by BEIS as thermal generation, so it does not need to be recomputed).
     tb_beis["renewable_generation__twh"] = tb_beis[
         [
             "hydro_generation__twh",
@@ -675,6 +693,10 @@ def add_share_variables_monthly(tb: Table) -> Table:
     for variable in SHARE_VARIABLES:
         new_column = variable.replace("_generation__twh", "_share_of_electricity__pct")
         tb[new_column] = 100 * tb[variable] / tb["total_generation__twh"]
+
+    # Check that no source's share is negative or above 100%.
+    sanity_check_shares(tb=tb)
+
     tb["net_imports_share_of_demand__pct"] = 100 * tb["total_net_imports__twh"] / tb["total_demand__twh"]
     error = "Total electricity share does not add up to 100%."
     assert all(abs(tb["total_share_of_electricity__pct"].dropna() - 100) < 0.01), error
