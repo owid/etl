@@ -75,8 +75,8 @@ BANS = [
     },
 ]
 
-# Countries (and the European Union) without a ban, but with formal initiatives or discussions about ending chick
-# culling; used only in the citation.
+# Countries without a ban, but with formal initiatives or discussions about ending chick culling; used only in the
+# citation.
 CONSIDERED = [
     {
         "country": "European Union",
@@ -133,7 +133,10 @@ def build_citation_full() -> str:
         "will become, effective are given in the data):",
     ]
     lines += [f"- {row['country']}: [{row['source']}]({row['url']}). {row['note']}".strip() for row in BANS]
-    lines += ["", "Countries (and the European Union) without a ban, but with formal initiatives or discussions about ending chick culling:"]
+    lines += [
+        "",
+        "Countries without a ban, but with formal initiatives or discussions about ending chick culling:",
+    ]
     lines += [f"- {row['country']}: [{row['source']}]({row['url']}). {row['note']}" for row in CONSIDERED]
     lines += ["", CITATION_CLOSING]
     return "\n".join(lines)
