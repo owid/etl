@@ -254,6 +254,15 @@ function buildFrame(opts = {}) {
   // node's descendants with visible:true, so this is what stops the row reporting ink nobody can see.
   if (opts.hiddenOverflow) children.push(node({ type: "RECTANGLE", name: "offstage", visible: false,
     x: 16, y: 600, width: 100, height: 40, fills: solid("#4c6a9c") }));
+  // The same ink switched off the OTHER way. `opacity` is inherited exactly like visibility, so the
+  // fade sits on an ANCESTOR while the rectangle keeps its own visible:true and opacity:1 — precisely
+  // the state a `visible`-only climb reads as rendering ink hanging off the artboard. Takes the value
+  // rather than a flag, because zero and merely-dim are opposite answers: 0 paints nothing, 0.5 is
+  // still ink and still missing from the export.
+  if (opts.fadedOverflow !== undefined) children.push(node({ type: "GROUP", name: "retired",
+    opacity: opts.fadedOverflow, x: 16, y: 600, width: 100, height: 40, children: [
+      node({ type: "RECTANGLE", name: "offstage-faded", x: 16, y: 600, width: 100, height: 40,
+        fills: solid("#4c6a9c") })] }));
   // A matplotlib clipPath as `upload_assets` imports it: every path windingRule NONE — it paints
   // nothing — carrying Figma's default black fill.
   if (opts.deadVector) children.push(node({ type: "VECTOR", name: "Vector", x: 40, y: 200, width: 80, height: 57,
@@ -334,8 +343,12 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     // short read off a page nobody switched to — is stale: the frame gate resolves the frame's own
     // PAGE and switches to it. The half that remains is INTENT, so the row is REVIEW and never ok.
     check("1 page-census computed, not declared", row(out, "page-census") && row(out, "page-census").status === "REVIEW", "row missing or still SKIPPED");
-    check("1 page-census counts the page's top-level objects",
-          /1 top-level object\(s\) on page/.test(row(out, "page-census").detail),
+    check("1 page-census counts the page's objects",
+          /1 object\(s\) on page "page", from 1 top-level child\(ren\)/.test(row(out, "page-census").detail),
+          row(out, "page-census").detail);
+    // An unwrapped page descends through nothing, and must not claim it did.
+    check("1 page-census does not claim a descent it did not make",
+          !/descending through/.test(row(out, "page-census").detail),
           row(out, "page-census").detail);
     // CHECKS.md's two warnings have to survive into the computed row, or the guidance is lost with the
     // declaration that carried it.
@@ -1726,6 +1739,20 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
 
     const hidden = await run(buildFrame({ hiddenOverflow: true }), {});
     check("37 hidden overflowing ink does not fail", row(hidden, "within-frame").status === "ok", row(hidden, "within-frame").detail);
+
+    // Figma switches a node off two ways and this file treats them as ONE state everywhere else, so a
+    // group faded to zero must read the same as a hidden one. The fade is on the ANCESTOR: the
+    // rectangle's own opacity is 1, which is what a `visible`-only climb misses.
+    const faded = await run(buildFrame({ fadedOverflow: 0 }), {});
+    check("37 overflowing ink at effective opacity ZERO does not fail",
+          row(faded, "within-frame").status === "ok", row(faded, "within-frame").detail);
+    // ...and the guard is EXACTLY zero, not "any fade": a half-transparent mark is still ink, and it is
+    // still missing from the export when it hangs off the artboard.
+    const dim = await run(buildFrame({ fadedOverflow: 0.5 }), {});
+    check("37 but a merely DIMMED overflow still fails",
+          row(dim, "within-frame").status === "FAIL", row(dim, "within-frame").detail);
+    check("37 and it names the dimmed node",
+          /offstage-faded/.test(row(dim, "within-frame").detail), row(dim, "within-frame").detail);
   }
 
   // 38 — dead-fills. Invisible on canvas, visible in the layer panel and in every fill inventory:
@@ -1756,6 +1783,48 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     check("38 a stroked node with a dead fill is reported", row(half, "dead-fills").status === "FAIL", row(half, "dead-fills").detail);
     check("38 and it says the stroke still renders",
           /STROKE still renders/.test(row(half, "dead-fills").detail), row(half, "dead-fills").detail);
+    // The remediation has to split with it. A node whose stroke renders is VISIBLE ARTWORK, so telling
+    // the operator to delete it trades an invisible fill for a missing line.
+    check("38 and it does NOT tell the operator to delete live artwork",
+          /Do NOT delete the 1/.test(row(half, "dead-fills").detail)
+          && /Clear that fill/.test(row(half, "dead-fills").detail)
+          && !/DELETE the /.test(row(half, "dead-fills").detail),
+          row(half, "dead-fills").detail);
+    check("38 while a fill-only artifact is still deleted",
+          /DELETE the 1 that render nothing at all/.test(row(dead, "dead-fills").detail)
+          && !/Do NOT delete/.test(row(dead, "dead-fills").detail),
+          row(dead, "dead-fills").detail);
+  }
+
+  // 38b — page-census must survive WRAPPER nesting. `page.children` alone counts a SECTION holding the
+  // deliverable and two reference copies as ONE object, so the row answers "clean" to the very question
+  // it exists to ask — the same clean-wrong-answer CHECKS.md records for the overlap test it forbids.
+  {
+    const section = (f) => node({
+      type: "SECTION", name: "deliverables", x: 0, y: 0, width: 1800, height: 600,
+      children: [
+        f,
+        node({ type: "FRAME", name: "20260901 Title — original SVG (unstyled)", x: 600, y: 0, width: 540, height: 540 }),
+        node({ type: "FRAME", name: "20260901 Title — reference export", x: 1200, y: 0, width: 540, height: 540 }),
+      ],
+    });
+    const wrapped = await run(buildFrame(), {}, section);
+    const detail = row(wrapped, "page-census").detail;
+    check("38b a SECTION of three is not counted as one object",
+          /3 object\(s\) on page "page", from 1 top-level child\(ren\)/.test(detail), detail);
+    check("38b and it says it descended", /descending through SECTION\/GROUP wrappers/.test(detail), detail);
+    check("38b and every nested object is named in full under its wrapper",
+          Array.isArray(row(wrapped, "page-census").pageObjects)
+          && row(wrapped, "page-census").pageObjects.length === 3
+          && row(wrapped, "page-census").pageObjects.every((s) => s.indexOf("deliverables / ") === 0)
+          && row(wrapped, "page-census").pageObjects.some((s) => /original SVG \(unstyled\)/.test(s)),
+          JSON.stringify(row(wrapped, "page-census").pageObjects));
+    // The wrapper itself is not an item, and a FRAME stays terminal — its own children are the chart's
+    // parts, not more objects to count.
+    check("38b the wrapper itself is not counted as an item",
+          !row(wrapped, "page-census").pageObjects.some((s) => /\[SECTION\]/.test(s)),
+          JSON.stringify(row(wrapped, "page-census").pageObjects));
+    check("38b and the row stays REVIEW", row(wrapped, "page-census").status === "REVIEW", detail);
   }
 
   // 39 — slice coverage. `inline_script.py --rows` sends one group at a time, and a slice can only

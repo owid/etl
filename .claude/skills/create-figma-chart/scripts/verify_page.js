@@ -961,7 +961,23 @@ const checkFrame = async (frameId) => {
     // Visibility is INHERITED, and `findAll` returns a hidden node's descendants with their own
     // `visible: true` intact. Climbing to the frame is what stops a switched-off block being reported
     // as overflowing ink nobody can see — the same inherited-switch trap the frame gate above handles.
-    const shown = (n) => { let m = n; while (m && m !== frame) { if ("visible" in m && !m.visible) return false; m = m.parent; } return true; };
+    // OPACITY is the OTHER switch and it INHERITS the same way, so the same climb reads both. This file
+    // treats `visible: false` and effective opacity ZERO as ONE non-rendering state everywhere else —
+    // the frame gate above, `renders` for a paint, the zero-opacity return in `collect` for a node —
+    // and this row was the last place they were two. A block parked off the artboard at opacity 0
+    // paints no pixels, so calling it lost-on-export is a verdict about ink nobody can see: the same
+    // fire-on-nothing failure the visibility climb already exists to prevent, reached by the other
+    // switch. The test is EXACTLY zero, as it is everywhere else — a faded node is still ink, and a
+    // faded node hanging off the bottom of the artboard is still missing from the export.
+    const shown = (n) => {
+      let m = n, opacity = 1;
+      while (m && m !== frame) {
+        if ("visible" in m && !m.visible) return false;
+        if ("opacity" in m && typeof m.opacity === "number") opacity *= m.opacity;
+        m = m.parent;
+      }
+      return opacity > 0;
+    };
     const offenders = [];
     for (const n of frame.findAll(() => true)) {
       if (!shown(n)) continue;
@@ -998,6 +1014,7 @@ const checkFrame = async (frameId) => {
   // below, not merely because it is clutter.
   {
     const dead = [];
+    let stroked = 0;
     for (const n of frame.findAll(() => true)) {
       if (n.type !== "VECTOR" || !Array.isArray(n.vectorPaths) || !n.vectorPaths.length) continue;
       if (!n.vectorPaths.every((vp) => vp && vp.windingRule === "NONE")) continue;
@@ -1012,18 +1029,36 @@ const checkFrame = async (frameId) => {
       const db = rel(n);
       if (!db || db.w <= 0 || db.h <= 0) continue;
       const hasStroke = Array.isArray(n.strokes) && n.strokes.some(paints);
+      if (hasStroke) stroked++;
       dead.push((n.name || n.type) + " " + r(n.width) + "x" + r(n.height)
                 + (hasStroke ? " (its STROKE still renders; only the fill is dead)" : ""));
     }
+    // The REMEDIATION splits on that stroke, because the two cases need OPPOSITE actions and only one
+    // of them is "delete". The zero-area gate above excludes a gridline, but it does not exclude every
+    // stroked path: an open DIAGONAL — a series segment, a leader line — has both width and height in
+    // its bbox, so it has area, and it reaches this row carrying a live stroke and Figma's default
+    // black fill. That node is VISIBLE ARTWORK. A blanket "delete them" then removes a line the reader
+    // can see in order to tidy away a fill nobody can see, which is a worse defect than the one being
+    // fixed — and this row already knows the difference, since it prints "STROKE still renders" for
+    // exactly these. Clear the dead FILL there and keep the node; delete only what renders nothing.
+    const orphans = dead.length - stroked;
     add("dead-fills", dead.length ? "FAIL" : "ok",
         dead.length
           ? dead.length + " node(s) carry a visible fill that CANNOT paint (every path windingRule NONE): "
             + dead.slice(0, 6).join("; ")
             + ". These are clipPath imports. They render nothing, so a screenshot cannot show them, but"
             + " they sit in the layer panel with a paint swatch and their colour enters the fill"
-            + " inventory that off-palette and the color_audit.py palette are built from. Delete them"
-            + " (Figma removes the wrapper GROUP once its last child goes, so re-reading parent.children"
-            + " after a remove throws — guard with parent.removed)."
+            + " inventory that off-palette and the color_audit.py palette are built from."
+            + (orphans
+                ? " DELETE the " + orphans + " that render nothing at all (Figma removes the wrapper"
+                  + " GROUP once its last child goes, so re-reading parent.children after a remove"
+                  + " throws — guard with parent.removed)."
+                : "")
+            + (stroked
+                ? " Do NOT delete the " + stroked + " marked \"STROKE still renders\" — the node is"
+                  + " visible artwork and only its FILL is dead. Clear that fill (fills = []) and KEEP"
+                  + " the node: deleting it removes a line the reader can see."
+                : "")
           : "no zero-winding filled vectors — nothing carrying a paint it cannot render");
   }
 
@@ -1039,11 +1074,36 @@ const checkFrame = async (frameId) => {
   {
     if (!page || !Array.isArray(page.children)) skip("page-census", "the frame's PAGE did not resolve, so its children cannot be counted");
     else {
-      const items = page.children.map((c) => (c.name || "(unnamed)") + " [" + c.type + "] "
-        + r(c.width) + "x" + r(c.height) + " @" + r(c.x) + "," + r(c.y)
-        + (c.visible === false ? " HIDDEN" : ""));
+      // CHECKS.md asks for the objects ANYWHERE on the page, and `page.children` alone is not that.
+      // SECTION and GROUP are pure WRAPPERS — containers the operator made, not items they placed — so
+      // a section holding the deliverable and two reference copies counts and NAMES a single object,
+      // and the pile of near-identical charts this row exists to surface is exactly what hides inside
+      // it. That is the census answering "clean" to the reader's question, which is the failure mode
+      // CHECKS.md already records for the overlap test it forbids. Wrappers are therefore descended
+      // THROUGH, keeping the wrapper name as a path prefix so the reader still knows where each item
+      // sits. A FRAME stays TERMINAL: a frame IS one of the objects being counted, and its children
+      // are that chart's parts rather than more items.
+      const WRAPPERS = ["SECTION", "GROUP"];
+      let descended = false;
+      const census = (nodes, prefix) => nodes.flatMap((c) => {
+        const name = prefix + (c.name || "(unnamed)");
+        if (WRAPPERS.indexOf(c.type) !== -1 && Array.isArray(c.children) && c.children.length) {
+          descended = true;
+          return census(c.children, name + " / ");
+        }
+        // Position from the ABSOLUTE box, not `x`/`y`: those are relative to the PARENT, so a nested
+        // item's coordinates would be reported in its wrapper's space and two items under different
+        // wrappers could not be compared to each other at all.
+        const cb = c.absoluteBoundingBox;
+        return [name + " [" + c.type + "] " + r(c.width) + "x" + r(c.height)
+                + " @" + (cb ? r(cb.x) + "," + r(cb.y) : "?")
+                + (c.visible === false ? " HIDDEN" : "")];
+      });
+      const items = census(page.children, "");
       add("page-census", "REVIEW",
-          page.children.length + " top-level object(s) on page \"" + (page.name || "?") + "\": "
+          items.length + " object(s) on page \"" + (page.name || "?") + "\", from "
+          + page.children.length + " top-level child(ren)"
+          + (descended ? " after descending through SECTION/GROUP wrappers" : "") + ": "
           + items.join(" | ")
           + ". One per INTENDED item — the deliverable plus the reference copies you meant to place."
           + " A spare is clutter. Names are given in FULL: keying this on a shortened name merges a"
