@@ -1099,7 +1099,16 @@ const checkFrame = async (frameId) => {
       // THROUGH, keeping the wrapper name as a path prefix so the reader still knows where each item
       // sits. A FRAME stays TERMINAL: a frame IS one of the objects being counted, and its children
       // are that chart's parts rather than more items.
-      const WRAPPERS = ["SECTION", "GROUP"];
+      // SECTION only. A SECTION exists to ORGANISE a canvas, so one holding the deliverable and two
+      // reference copies is three objects and counting it as one is the undercount this descent was
+      // added to fix. A GROUP is the opposite: in this skill every imported chart IS a group, so
+      // descending into it enumerates its internals. Measured on a real page — a grapher import
+      // turned a 2-object census into **94**, listing every gridline and tick label, which answers
+      // "how many nodes" when the row's whole question is "how many of this thing am I looking at".
+      // Both directions are wrong and they are not symmetric: the undercount hides clutter, the
+      // overcount buries the answer. A FRAME was already terminal; a GROUP is terminal for the same
+      // reason.
+      const WRAPPERS = ["SECTION"];
       let descended = false;
       const census = (nodes, prefix) => nodes.flatMap((c) => {
         const name = prefix + (c.name || "(unnamed)");
@@ -1119,7 +1128,7 @@ const checkFrame = async (frameId) => {
       add("page-census", "REVIEW",
           items.length + " object(s) on page \"" + (page.name || "?") + "\", from "
           + page.children.length + " top-level child(ren)"
-          + (descended ? " after descending through SECTION/GROUP wrappers" : "") + ": "
+          + (descended ? " after descending through SECTION wrappers" : "") + ": "
           + items.join(" | ")
           + ". One per INTENDED item — the deliverable plus the reference copies you meant to place."
           + " A spare is clutter. Names are given in FULL: keying this on a shortened name merges a"
@@ -1191,7 +1200,14 @@ const checkFrame = async (frameId) => {
     const identify = (v) => {
       const m = /^(line|slope|outline)__(.+)$/.exec(v.node.name);
       if (m) return { kind: m[1], series: m[2], label: v.node.name };
-      if (v.seriesOf && /^line$/i.test(v.node.name)) return { kind: v.seriesOf.kind, series: v.seriesOf.series, label: `${v.seriesOf.kind}__${v.seriesOf.series}` };
+      // `seriesOf` came from an ANCESTOR, so trusting it does not require the node to be named
+      // anything in particular. The old `/^line$/i` guard was written for a slope chart, whose
+      // stroked node happens to be called `line` — an SVG import names it `Vector` and buries it
+      // under Figma's own "Clip path group" wrappers, so every series failed to identify and this
+      // row reported "no line__*/outline__* VECTOR carried a readable vectorNetwork" on a frame
+      // whose nine series `series-weight` had just measured. Same group-carries-the-name trap the
+      // collector already solves; the row was the last place still reading the node's own name.
+      if (v.seriesOf) return { kind: v.seriesOf.kind, series: v.seriesOf.series, label: `${v.seriesOf.kind}__${v.seriesOf.series}` };
       return null;
     };
     const lineWeightBySeries = {};
@@ -1486,7 +1502,19 @@ const checkFrame = async (frameId) => {
   // judged against the FRAME's fill, which is what is actually behind them; `label__*` nodes stay gated
   // on insidePlot because what is behind those is a mark, not the frame.
   {
-    const candidates = texts.filter((t) => t.fill && (/^annotation__/.test(t.name) || (t.insidePlot && /^label__/.test(t.name))));
+    // The name can sit on an ancestor GROUP rather than on the text: an SVG import puts the gid on a
+    // wrapping <g>, so `label__Mauritius` is a GROUP holding a TEXT called "Mauritius". Reading the
+    // node's own name misses every one of them — measured on a real page, 27 correctly named direct
+    // labels and this row reported "no label__*/annotation__* text sits on the frame's background".
+    const namedAs = (t) => {
+      let m = t.node;
+      while (m && m !== frame) {
+        if (/^(annotation|label)__/.test(m.name)) return m.name;
+        m = m.parent;
+      }
+      return t.name;
+    };
+    const candidates = texts.filter((t) => t.fill && (/^annotation__/.test(namedAs(t)) || (t.insidePlot && /^label__/.test(namedAs(t)))));
     // Two ways a label can be UNJUDGEABLE against the frame, and neither may be dropped: the on-fill row
     // is a DECLARED gap below (it needs label->mark pairing, which nothing here has), so anything routed
     // to it is reported by NOBODY, and a defect that leaves no row is worse than a row a human looks at.
@@ -1672,11 +1700,21 @@ const checkFrame = async (frameId) => {
       }
       const shared = [...catsByHex].filter(([, c]) => c.size > 1)
         .map(([h, c]) => `${h} carries ${[...c].slice(0, 4).join(" + ")}`);
-      const sharedNote = shared.length
-        ? ` One colour, two categories — the audit sees these as ONE entry and cannot report the clash,`
-          + ` so judge them by eye: ${shared.slice(0, 4).join("; ")}. Correct for a highlight treatment;`
-          + " a defect if they are separate categories."
-        : "";
+      // Two categories on one colour is normally worth raising — the audit collapses them into one
+      // entry and cannot report the clash. On a FACETED chart it is the design: every panel draws
+      // the same series in the same colour, and the panel, not the hue, is what separates them. Left
+      // ungated this note fires on every small-multiples frame and asks the reader to adjudicate
+      // nine "clashes" that are the chart working as intended — a warning that always fires is one
+      // nobody reads.
+      const sharedNote = !shared.length
+        ? ""
+        : CONFIG.faceted
+          ? ` ${shared.length} colour(s) carry more than one category (${shared.slice(0, 2).join("; ")}).`
+            + " EXPECTED here: CONFIG.faceted is set, and a small-multiples chart draws every panel's"
+            + " series in the same colour — the panel separates them, not the hue. Nothing to reconcile."
+          : ` One colour, two categories — the audit sees these as ONE entry and cannot report the clash,`
+            + ` so judge them by eye: ${shared.slice(0, 4).join("; ")}. Correct for a highlight treatment;`
+            + " a defect if they are separate categories.";
       const soleName = [...seen.values()][0];
       if (hexes.length < 2) {
         return (mixed ? (src.some((x) => x.fromMap) ? " MAP shapes —" : " Chart marks and series —") : "")

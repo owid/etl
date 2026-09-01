@@ -268,6 +268,16 @@ def main() -> int:
         help="rewrite CONFIG.frameId in the emitted source, so the output is ready to send as-is",
     )
     ap.add_argument(
+        "--config",
+        action="append",
+        metavar="KEY=VALUE",
+        help="rewrite any other CONFIG key in the emitted source, repeatable "
+        "(e.g. --config faceted=true --config chartName=chart-body). Bare true/false/null and "
+        "numbers are emitted as literals; anything else is quoted as a string. An unknown key is "
+        "an error, not a no-op — a silently ignored flag means running the pass with the wrong "
+        "frame facts and never being told.",
+    )
+    ap.add_argument(
         "--whole",
         action="store_true",
         # argparse runs help through %-formatting, so a literal percent sign must be doubled.
@@ -422,6 +432,35 @@ def main() -> int:
         if not n_sub:
             print(f"--frame-id given but {args.script} has no CONFIG.frameId to rewrite", file=sys.stderr)
             return 1
+
+    if args.config:
+        # Scope every substitution to the CONFIG object. A bare `key:` pattern would also match an
+        # object literal further down the file, which is how a "config" flag quietly edits a row's
+        # internals instead of its configuration.
+        block = re.search(r"const CONFIG = \{.*?^\};", stripped, re.S | re.M)
+        if not block:
+            print(f"--config given but {args.script} has no CONFIG block to rewrite", file=sys.stderr)
+            return 1
+        body = block.group(0)
+        for pair in args.config:
+            if "=" not in pair:
+                ap.error(f"--config expects KEY=VALUE, got {pair!r}")
+            key, _, val = pair.partition("=")
+            key, val = key.strip(), val.strip()
+            if val not in ("true", "false", "null") and not re.fullmatch(r"-?\d+(?:\.\d+)?", val):
+                val = '"' + val.strip('"\'') + '"'
+            body, n = re.subn(
+                rf"(\n\s*{re.escape(key)}:\s*)[^,\n]*(,)",
+                lambda m: f"{m.group(1)}{val}{m.group(2)}",
+                body,
+                count=1,
+            )
+            if not n:
+                ap.error(
+                    f"--config {key}: no such key in {args.script}'s CONFIG. "
+                    "Rewriting a key that is not there would emit a script running on defaults."
+                )
+        stripped = stripped[: block.start()] + body + stripped[block.end() :]
 
     if len(stripped) > CAP:
         print(

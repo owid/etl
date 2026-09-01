@@ -312,6 +312,42 @@ check(
     "the spine must carry the command, not just a pointer",
 )
 
+# --- --config, the way a declared frame fact reaches a slice ---------------------------------------
+# CONFIG.faceted and friends are frame FACTS, and before this flag the only way to set one was to
+# hand-edit verify_page.js before emitting — which means the committed file carries one run's
+# settings, and the next run inherits them silently.
+def _run_cfg(*a: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [sys.executable, str(Path(__file__).resolve().parent / "inline_script.py"), "verify_page.js", *a],
+        capture_output=True, text=True,
+    )
+
+_out = _run_cfg("--rows", "series", "--config", "faceted=true")
+check("--config sets a boolean as a literal", "faceted: true," in _out.stdout, _out.stdout[:200] + _out.stderr[:200])
+check("--config leaves the other keys alone", 'chartName: "chart",' in _out.stdout, "chartName was disturbed")
+
+_out2 = _run_cfg("--rows", "series", "--config", "chartName=chart-body")
+check("--config quotes a string value", 'chartName: "chart-body",' in _out2.stdout, _out2.stdout[:200])
+
+_out3 = _run_cfg("--rows", "series", "--config", "faceted=true", "--config", "textFloor=11")
+check("--config is repeatable", "faceted: true," in _out3.stdout and "textFloor: 11," in _out3.stdout, _out3.stdout[:200])
+
+# An unknown key must be an ERROR. Silently ignoring it emits a script running on defaults while the
+# operator believes they declared something — the same confident-wrong-answer shape as a row that
+# cannot fail.
+_bad = _run_cfg("--rows", "series", "--config", "nosuchkey=true")
+check("--config refuses an unknown key", _bad.returncode != 0, f"exit {_bad.returncode}")
+check("and says why rather than just failing", "no such key" in _bad.stderr, _bad.stderr[:200])
+
+_malformed = _run_cfg("--rows", "series", "--config", "faceted")
+check("--config refuses a malformed pair", _malformed.returncode != 0, f"exit {_malformed.returncode}")
+
+# --frame-id and --config must compose: the documented call sets both.
+_both = _run_cfg("--rows", "series", "--frame-id", "12:34", "--config", "faceted=true")
+check("--frame-id and --config compose",
+      'frameId: "12:34",' in _both.stdout and "faceted: true," in _both.stdout,
+      _both.stdout[:200])
+
 bad = [r for r in results if not r[1]]
 for name, ok, detail in results:
     print(f"{'PASS' if ok else 'FAIL'}  {name}" + ("" if ok else f"  >> {detail}"))

@@ -363,6 +363,12 @@ thinner than the same sentence on a grapher import. So emit `gid="line__<Entity>
 inventing a scheme. Renaming in Figma afterwards works but does not survive a re-import; the `gid`
 does.
 
+Note what a `gid` actually produces: matplotlib writes `<g id="label__Ghana"><text/></g>`, so Figma
+imports a GROUP named `label__Ghana` holding a TEXT named `Ghana` — the name lands on the wrapper,
+never on the painted node, and a series arrives with Figma's own "Clip path group" wrappers between
+the named group and the vector. That is fine and expected; `/create-figma-chart`'s rows resolve
+through the naming ancestor. Set the `gid` on the artist and don't try to name the glyph itself.
+
 ## Step 8 — Record the Figma handoff in the step's docstring
 
 Once the Figma page exists, write the handoff back into the step's module docstring. **The bar is that a

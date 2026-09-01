@@ -272,6 +272,18 @@ function buildFrame(opts = {}) {
   if (opts.deadVectorStroked) children.push(node({ type: "VECTOR", name: "half-dead", x: 40, y: 300, width: 80, height: 20,
     fills: solid("#000000"), strokes: solid("#4c6a9c"), strokeWeight: 1,
     vectorPaths: [{ windingRule: "NONE", data: "M 0 0 L 80 20" }] }));
+  // How a `gid` actually imports: matplotlib writes <g id="label__X"><text/></g>, so Figma names the
+  // GROUP and the TEXT keeps its own content as a name. Same for a series, with Figma's own
+  // "Clip path group" wrappers between the named group and the vector.
+  if (opts.groupNamedLabel) children.push(node({ name: "label__Wrapped", x: 40, y: 250, width: 60, height: 16,
+    children: [text("Wrapped", "Country W", 13, 40, 250, 60, 16, "#4c6a9c")] }));
+  if (opts.groupNamedSeries) kids.push(node({ name: "line__Wrapped", x: 40, y: 200, width: 300, height: 120, children: [
+    node({ name: "Clip path group", x: 40, y: 200, width: 300, height: 120, children: [
+      node({ type: "VECTOR", name: "Vector", x: 40, y: 200, width: 300, height: 120, strokeWeight: 3,
+             strokes: solid("#00847e"), dashPattern: [], strokeAlign: "CENTER",
+             absoluteTransform: [[1, 0, 0], [0, 1, 0]],
+             vectorNetwork: { vertices: [{ x: 40, y: 320 }, { x: 200, y: 260 }, { x: 340, y: 200 }],
+                              segments: [{ start: 0, end: 1 }, { start: 1, end: 2 }] } })] })] }));
   // Grapher's own gridline, as it really imports: an open stroked path of ZERO HEIGHT named after its
   // tick value, carrying windingRule NONE and Figma's default black fill. Measured live, one untouched
   // grapher import held 29 of these — so without the area gate the row fails every imported chart.
@@ -1812,7 +1824,7 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     const detail = row(wrapped, "page-census").detail;
     check("38b a SECTION of three is not counted as one object",
           /3 object\(s\) on page "page", from 1 top-level child\(ren\)/.test(detail), detail);
-    check("38b and it says it descended", /descending through SECTION\/GROUP wrappers/.test(detail), detail);
+    check("38b and it says it descended", /descending through SECTION wrappers/.test(detail), detail);
     check("38b and every nested object is named in full under its wrapper",
           Array.isArray(row(wrapped, "page-census").pageObjects)
           && row(wrapped, "page-census").pageObjects.length === 3
@@ -1825,6 +1837,22 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
           !row(wrapped, "page-census").pageObjects.some((s) => /\[SECTION\]/.test(s)),
           JSON.stringify(row(wrapped, "page-census").pageObjects));
     check("38b and the row stays REVIEW", row(wrapped, "page-census").status === "REVIEW", detail);
+
+    // A GROUP is NOT a wrapper. In this skill every imported chart IS a group, so descending into
+    // one enumerates its gridlines and tick labels: on a real page that turned a 2-object census
+    // into 94. The undercount a SECTION causes hides clutter; this overcount buries the answer.
+    const grouped = await run(buildFrame(), {}, (f) => node({
+      type: "GROUP", name: "original-chart (grapher)", x: 0, y: 0, width: 540, height: 540,
+      children: [f, node({ type: "FRAME", name: "chart-area", x: 0, y: 0, width: 500, height: 400,
+                           children: [node({ type: "TEXT", name: "$0", x: 0, y: 0, width: 16, height: 16 })] })],
+    }));
+    const gdetail = row(grouped, "page-census").detail;
+    check("38b a GROUP is counted as ONE object, not opened up",
+          /1 object\(s\) on page/.test(gdetail), gdetail);
+    check("38b and the group is named rather than its contents",
+          /original-chart \(grapher\)/.test(gdetail) && !/chart-area/.test(gdetail), gdetail);
+    check("38b and it does not claim to have descended",
+          !/descending through/.test(gdetail), gdetail);
   }
 
   // 39 — slice coverage. `inline_script.py --rows` sends one group at a time, and a slice can only
@@ -1864,6 +1892,49 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     check("40 the house 3/4 still passes undeclared", row(house, "series-weight").status === "ok", row(house, "series-weight").detail);
     check("40 and it still calls it the house pair",
           /house 3\/4/.test(row(house, "series-weight").detail), row(house, "series-weight").detail);
+  }
+
+  // 41 — the shared-colour note must know about faceting. Two categories on one colour is a real
+  // finding on an ordinary chart and the DESIGN on a small-multiples one, where every panel draws
+  // the same series in the same colour. Ungated it fires on every faceted frame, and a warning that
+  // always fires is one nobody reads.
+  {
+    // The base fixture has line__A and line__B sharing a colour — two categories, one hue.
+    const plain = row(await run(buildFrame({ extraLine: 3 }), {}), "colour-vision").detail;
+    check("41 an ordinary chart still gets the clash warning",
+          /judge them by eye/.test(plain) && /a defect if they are separate categories/.test(plain), plain);
+
+    const faceted = row(await run(buildFrame({ extraLine: 2 }), { faceted: true }), "colour-vision").detail;
+    check("41 a faceted chart is told it is expected",
+          /EXPECTED here/.test(faceted) && /Nothing to reconcile/.test(faceted), faceted);
+    check("41 and it is NOT asked to adjudicate a clash",
+          !/a defect if they are separate categories/.test(faceted), faceted);
+    check("41 and the note still names the shared colour",
+          /carry more than one category/.test(faceted), faceted);
+  }
+
+  // 42 — the naming ANCESTOR. An SVG import puts the gid on a wrapping <g>, so the text/vector
+  // inside keeps a meaningless name. Two rows read the node's own name and silently covered
+  // nothing: on a real frame, 27 named labels reported "no label__* text" and nine identified
+  // series reported "no line__* VECTOR".
+  {
+    const lbl = await run(buildFrame({ groupNamedLabel: true }), {});
+    const d = row(lbl, "label-contrast-on-background").detail;
+    check("42 a label named on its GROUP is found", row(lbl, "label-contrast-on-background").status !== "SKIPPED", d);
+    check("42 and it is measured against the frame", /clear 4\.5:1|want 4\.5/.test(d), d);
+
+    const ser = await run(buildFrame({ groupNamedSeries: true }), {});
+    const pd = row(ser, "polylines").detail;
+    check("42 a series named on its GROUP is sampled", row(ser, "polylines").status === "ok", pd);
+    check("42 and it is reported under the group's name",
+          JSON.stringify(row(ser, "polylines").polylines || []).indexOf("line__Wrapped") !== -1,
+          JSON.stringify(row(ser, "polylines").polylines));
+
+    // The negative: an unnamed text must NOT be swept in just because it sits in the plot.
+    const plain = await run(buildFrame(), {});
+    check("42 an unnamed in-plot text is still not a label",
+          !/Country A/.test(row(plain, "label-contrast-on-background").detail || ""),
+          row(plain, "label-contrast-on-background").detail);
   }
 
   const bad = results.filter((x) => !x.ok);

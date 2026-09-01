@@ -104,6 +104,21 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > afterwards, so a re-import keeps it. `/create-static-viz` owns the emitting step, so a change here is
 > one for that skill too.
 >
+> **A `gid` names the wrapping GROUP, not the node inside it** — matplotlib writes
+> `<g id="label__Ghana"><text/></g>`, so Figma gives you a GROUP called `label__Ghana` holding a TEXT
+> called `Ghana`, and a series arrives as `line__Ghana` wrapping Figma's own "Clip path group"
+> wrappers around the vector. Any row reading a node's **own** name therefore still sees nothing.
+> `series-weight` and the palette were always safe (the collector carries the naming ancestor down the
+> walk), but `polylines` and `label-contrast-on-background` each read the node's own name and reported
+> "no line__* VECTOR" and "no label__* text" on a frame carrying **27 of each**. Both now resolve
+> through the ancestor. If you add a row that keys on a name, key it on the ancestor: on an imported
+> chart the name is essentially never on the painted node.
+>
+> Two rows stay skipped whatever you name: **`furniture-weight`** (nothing sits under an
+> `axis`/`grid-lines` container unless the generator emits one) and, on a single-series-colour chart,
+> the **colour audit**, which correctly reports NOTHING TO RUN because a palette of one colour has no
+> pair to compare.
+>
 > **Budget for this: relaying the pass is the single largest time cost in a run.** The benchmark's second
 > run took 48 min against a 30.8 min baseline, and roughly 17 min of the difference was relaying these
 > groups verbatim — the baseline never ran them at all. Three composed calls and `Read` instead of `cat`
