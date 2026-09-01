@@ -313,6 +313,25 @@ function buildFrame(opts = {}) {
     x: 16, y: 0, width: 508, height: 0, fills: [], strokes: solid("#dddddd"),
     strokeWeight: opts.edgeStroke, strokeAlign: opts.edgeStrokeAlign || "CENTER",
     vectorPaths: [{ windingRule: "NONE", data: "M 0 0 L 508 0" }] }));
+  // A FULL-BLEED horizontal rule: an open path spanning the artboard edge to edge. Its stroke expands
+  // perpendicular to the path only, so with Figma's default butt cap it paints nothing to the left of
+  // x=0 or the right of x=540 however heavy it is. `strokeCap` is taken from the option so the ROUND
+  // case — which DOES project half a weight past each endpoint — can be exercised against it.
+  if (opts.fullBleedRule) children.push(node({ type: "VECTOR", name: "rule__full-bleed",
+    x: 0, y: 200, width: W, height: 0, fills: [], strokes: solid("#dddddd"),
+    strokeWeight: opts.fullBleedRule, strokeAlign: "CENTER", strokeCap: opts.fullBleedCap || "NONE",
+    vectorPaths: [{ windingRule: "NONE", data: "M 0 0 L " + W + " 0" }] }));
+  // The same shape rotated: a VERTICAL open path flush with the LEFT edge. Here the perpendicular is
+  // the x axis, so the overhang is real and must still be reported — the cap rule must not become a
+  // blanket exemption for open paths.
+  if (opts.fullBleedColumn) children.push(node({ type: "VECTOR", name: "rule__column",
+    x: 0, y: 100, width: 0, height: 200, fills: [], strokes: solid("#dddddd"),
+    strokeWeight: opts.fullBleedColumn, strokeAlign: "CENTER", strokeCap: "NONE",
+    vectorPaths: [{ windingRule: "NONE", data: "M 0 0 L 0 200" }] }));
+  // A positive-area LEAF that paints nothing at all — the fill-less placeholder rectangle a template
+  // carries for layout. Parked off the artboard, where it still renders no pixel.
+  if (opts.paintlessLeaf) children.push(node({ type: "RECTANGLE", name: "spacer__placeholder",
+    x: 16, y: 600, width: 100, height: 40, fills: [], strokes: [] }));
   // Zero-area AND painting nothing: still noise, still skipped.
   if (opts.offstageGhost) children.push(node({ type: "VECTOR", name: "ghost-offstage",
     x: 40, y: 620, width: 0, height: 0, fills: [], strokes: [],
@@ -2127,6 +2146,55 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     check("45 a clean slice is still a PARTIAL PASS",
           /PARTIAL PASS/.test(cleanSlice.verdict) && /clean frame/.test(cleanSlice.verdict), cleanSlice.verdict);
     check("45 and it names the rows it left out", /annotations/.test(cleanSlice.verdict), cleanSlice.verdict);
+  }
+
+  // 46 — the fifth Codex round. Both are ways the new painted-extent measurement could fire on work
+  // that is correct, which is the failure mode this file cares about most.
+  {
+    // (a) the outset was applied to all four sides. A stroke on an OPEN axis-aligned path expands
+    // PERPENDICULAR to the path only — a butt cap adds nothing past either endpoint — so a full-bleed
+    // rule was reported as overhanging left and right where it paints no pixel.
+    const bleed = await run(buildFrame({ fullBleedRule: 3 }), {});
+    check("46 a butt-capped full-bleed rule does not overhang along its own axis",
+          row(bleed, "within-frame").status === "ok", row(bleed, "within-frame").detail);
+    // ...but the PERPENDICULAR axis is still measured, or the exemption has swallowed the whole check.
+    // A vertical rule flush with the left edge overhangs left for real.
+    const column = await run(buildFrame({ fullBleedColumn: 3 }), {});
+    check("46 a vertical rule flush with the left edge still FAILS",
+          row(column, "within-frame").status === "FAIL"
+          && /left by 1\.5/.test(row(column, "within-frame").detail),
+          row(column, "within-frame").detail);
+    // ROUND and SQUARE caps DO project half a weight past the endpoint, so the same horizontal rule
+    // is a real overhang once it is capped. Without this the fix would be a blanket open-path pass.
+    const capped = await run(buildFrame({ fullBleedRule: 3, fullBleedCap: "ROUND" }), {});
+    check("46 the same rule with a ROUND cap overhangs both ends",
+          row(capped, "within-frame").status === "FAIL"
+          && /left by 1\.5/.test(row(capped, "within-frame").detail)
+          && /right by 1\.5/.test(row(capped, "within-frame").detail),
+          row(capped, "within-frame").detail);
+
+    // (b) a positive-area LEAF that paints nothing was still judged, because the paint test only
+    // applied below zero area. A fill-less placeholder renders no pixel, so reporting it as cut from
+    // the export is a verdict about ink that does not exist.
+    const spacer = await run(buildFrame({ paintlessLeaf: true }), {});
+    check("46 a paintless positive-area leaf off the artboard does not fail",
+          row(spacer, "within-frame").status === "ok", row(spacer, "within-frame").detail);
+    check("46 and it is not named as an offender",
+          !/spacer__placeholder/.test(row(spacer, "within-frame").detail), row(spacer, "within-frame").detail);
+    // The negative that keeps the gate honest: a CONTAINER is judged whether or not it paints. The
+    // template's footer is an auto-layout frame with no fill of its own, and it is the node this whole
+    // row exists to catch — exempting paintless nodes wholesale would have silently removed it.
+    const grownFooter = await run(buildFrame({ footerGrown: 70 }), {});
+    check("46 a paintless CONTAINER growing off the artboard still FAILS",
+          row(grownFooter, "within-frame").status === "FAIL"
+          && /footer/.test(row(grownFooter, "within-frame").detail),
+          row(grownFooter, "within-frame").detail);
+
+    // page-census lists everything placed on the page rather than guessing which children bear a plot.
+    // The detail has to SAY so, or the inventory reads as a list of deliverables.
+    const cen = row(await run(buildFrame(), {}), "page-census").detail;
+    check("46 page-census says it lists everything, unfiltered", /EVERYTHING placed on the page/.test(cen), cen);
+    check("46 and says why it does not guess at plot-bearing", /DROPS a duplicate deliverable/.test(cen), cen);
   }
 
   const bad = results.filter((x) => !x.ok);

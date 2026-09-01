@@ -1014,7 +1014,7 @@ const checkFrame = async (frameId) => {
     // folds in blur and drop shadows too, and a shadow falling off the artboard is not ink anyone
     // should re-pin a footer for. So the outset is computed from the stroke alone, and only from one
     // that actually PAINTS — the same `paints` test the zero-area gate below uses.
-    const strokeOutset = (n) => {
+    const strokeOutset = (n, b) => {
       if (!Array.isArray(n.strokes) || !n.strokes.some(paints)) return null;
       // INSIDE keeps the whole stroke within the geometry; CENTER puts half of it outside; OUTSIDE all
       // of it. Anything else (an unset align on an imported node) is treated as INSIDE and costs
@@ -1026,8 +1026,22 @@ const checkFrame = async (frameId) => {
       // per-side weights stay numbers exactly when the node-level one does not.
       const side = (k) => (typeof n.strokeWeight === "number" ? n.strokeWeight
                                                               : typeof n[k] === "number" ? n[k] : 0);
-      return { l: side("strokeLeftWeight") * share, t: side("strokeTopWeight") * share,
-               rr: side("strokeRightWeight") * share, bb: side("strokeBottomWeight") * share };
+      const o = { l: side("strokeLeftWeight") * share, t: side("strokeTopWeight") * share,
+                  rr: side("strokeRightWeight") * share, bb: side("strokeBottomWeight") * share };
+      // A stroke on an OPEN axis-aligned path expands PERPENDICULAR to the path only: a BUTT cap —
+      // `strokeCap: "NONE"`, Figma's default — adds nothing beyond either endpoint. Grapher's
+      // gridlines and every full-bleed rule are exactly this shape, an open path measuring 123.75x0,
+      // so growing all four sides would report a 3px rule spanning the artboard as overhanging left
+      // and right by 1.5 each where it paints no pixel at all. That is the fire-on-correct-work
+      // failure this file exists to avoid, reached through the cap. ROUND and SQUARE caps DO project
+      // half a weight past the endpoint, so those keep the outset on the path's own axis. A mixed or
+      // arrow cap is treated as butt: erring toward not firing is this row's standing preference.
+      const capped = n.strokeCap === "ROUND" || n.strokeCap === "SQUARE";
+      if (!capped && b) {
+        if (b.h === 0 && b.w > 0) { o.l = 0; o.rr = 0; }
+        if (b.w === 0 && b.h > 0) { o.t = 0; o.bb = 0; }
+      }
+      return o;
     };
     const offenders = [];
     for (const n of frame.findAll(() => true)) {
@@ -1051,11 +1065,21 @@ const checkFrame = async (frameId) => {
       // frame", and a stroke renders. Drop only what paints nothing at all.
       const inks = (Array.isArray(n.fills) && n.fills.some(paints))
                 || (Array.isArray(n.strokes) && n.strokes.some(paints));
-      if (!b || ((b.w <= 0 || b.h <= 0) && !inks)) continue;
+      // A CONTAINER is judged whether or not it paints anything of its own: the template's footer is
+      // an auto-layout frame carrying NO fill, and it is both the node this row exists to catch and
+      // the node CHECKS.md tells you to re-pin. A LEAF that paints nothing is the opposite case — a
+      // fill-less placeholder rectangle, an empty spacer, a text node with no fill — and it renders no
+      // pixel anywhere, so reporting it as cut from the export is a verdict about ink that does not
+      // exist. The zero-area gate below already stated that rule ("drop only what paints nothing at
+      // all"); applying it ONLY under zero area was the oversight, not the rule itself. Area still
+      // decides nothing on its own: a zero-area node that paints IS ink, which is what the gridline
+      // case established.
+      const container = Array.isArray(n.children) && n.children.length > 0;
+      if (!b || (!inks && (!container || b.w <= 0 || b.h <= 0))) continue;
       // Every edge is measured from the PAINTED extent — the geometry box grown by whatever share of
       // the stroke hangs off that side. OUT_EPS still absorbs the hairline case: a 1px centered rule
       // flush with the edge overhangs by exactly 0.5 and does not fire.
-      const so = strokeOutset(n) || { l: 0, t: 0, rr: 0, bb: 0 };
+      const so = strokeOutset(n, b) || { l: 0, t: 0, rr: 0, bb: 0 };
       const edges = [];
       if (b.l - so.l < -OUT_EPS) edges.push("left by " + r(so.l - b.l));
       if (b.t - so.t < -OUT_EPS) edges.push("top by " + r(so.t - b.t));
@@ -1204,7 +1228,11 @@ const checkFrame = async (frameId) => {
           + (descended ? " after descending through SECTION wrappers" : "") + ": "
           + items.join(" | ")
           + ". One per INTENDED item — the deliverable plus the reference copies you meant to place."
-          + " A spare is clutter. Names are given in FULL: keying this on a shortened name merges a"
+          + " A spare is clutter. EVERYTHING placed on the page is listed, notes and stray shapes"
+          + " included: each carries its type and size so you can dismiss the non-plot ones by eye."
+          + " They are not filtered out, because deciding what bears a plot is a guess, and a wrong"
+          + " one DROPS a duplicate deliverable and answers \"clean\" to the question this row asks."
+          + " Names are given in FULL: keying this on a shortened name merges a"
           + " slug with its own \"— original SVG (unstyled)\" copy into one bucket.",
           { pageObjects: items });
     }
