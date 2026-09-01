@@ -1,11 +1,7 @@
 """Load a garden dataset and create a grapher dataset.
 
-Following the same approach as the net_zero_tracker grapher step, each country's effective year is
-embedded in the status value (e.g. "Banned (2023)") purely for the map visualization: the chart and
-explorer steps relabel every status-year value back to its plain status with a shared color (derived
-programmatically from the data, so new effective years need no config edits), and grapher collapses the
-identical legend entries into a single swatch, while the map tooltip shows when the law takes (or took)
-effect.
+Each country's effective year is embedded in the status value (e.g. "Banned (2023)") so that the map
+tooltip shows it. The chart and explorer steps map each status-year value back to its plain status.
 """
 
 from etl.helpers import PathFinder

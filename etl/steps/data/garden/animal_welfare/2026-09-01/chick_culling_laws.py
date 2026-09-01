@@ -38,8 +38,6 @@ def run() -> None:
     sanity_check_inputs(tb=tb, tb_regions=tb_regions)
 
     # Add all countries that are not in the data, assuming chick culling is not banned there.
-    # NOTE: Chick culling bans are notable legislative events that animal advocacy organizations track closely, so a
-    # country with no known law can safely be assumed to have no ban (instead of showing it as having no data).
     tb_added = (
         tb_regions[
             (~tb_regions["name"].isin(tb["country"].unique()))
