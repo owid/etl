@@ -255,6 +255,63 @@ if _node and _vp.exists():
         )
         _tmp.unlink(missing_ok=True)
 
+# --- discoverability: the file that cannot be pasted must say so ----------------------------------
+# This is the failure that actually happens, and it happened across several sessions: someone opens
+# verify_page.js, reads a header saying "paste the whole file as one `use_figma` call", finds it is
+# 142,000 characters, concludes the check is unrunnable, and hand-rolls a subset of the rows — which
+# reports a pass nobody earned. The slicing was documented in CHECKS.md the whole time; the script's
+# own header contradicted it, and the header is what a reader reaches first. So the claim is pinned
+# here rather than left to prose discipline.
+_skill = Path(__file__).resolve().parent.parent
+_targets = {
+    "scripts/verify_page.js": _skill / "scripts" / "verify_page.js",
+    "SKILL.md": _skill / "SKILL.md",
+    "reference/CHECKS.md": _skill / "reference" / "CHECKS.md",
+}
+# Phrases that assert the whole file goes in one call. `diff_against_template.js` genuinely IS one
+# call, so match only claims naming verify_page or its own header.
+_banned = ["paste the whole file", "in one read-only `use_figma` call"]
+for _label, _path in _targets.items():
+    if not _path.exists():
+        check(f"{_label} exists", False, str(_path))
+        continue
+    _text = _path.read_text()
+    for _phrase in _banned:
+        # CHECKS.md legitimately uses the second phrase about diff_against_template.js, so only the
+        # verify_page.js header is held to it; the docs are held to the explicit one-call claim.
+        if _label != "scripts/verify_page.js" and _phrase == "in one read-only `use_figma` call":
+            continue
+        check(
+            f"{_label} does not claim verify_page.js fits in one call ({_phrase!r})",
+            _phrase not in _text,
+            f"found {_phrase!r}",
+        )
+
+_vp_head = (_skill / "scripts" / "verify_page.js").read_text()[:3000]
+check(
+    "verify_page.js's header names inline_script.py",
+    "inline_script.py" in _vp_head,
+    "a reader who opens the file must be told how to emit it",
+)
+check(
+    "verify_page.js's header names --rows",
+    "--rows" in _vp_head,
+    "the header must carry the slicing flag, not just the tool",
+)
+check(
+    "verify_page.js's header warns against hand-rolling a subset",
+    "hand-roll" in _vp_head,
+    "the header must name the failure it is preventing",
+)
+# The spine is what an agent reads first, so the commands have to be reachable from there without
+# a detour through CHECKS.md.
+_spine = (_skill / "SKILL.md").read_text()
+check(
+    "SKILL.md Step 8c carries the emit command",
+    "inline_script.py verify_page.js --rows" in _spine,
+    "the spine must carry the command, not just a pointer",
+)
+
 bad = [r for r in results if not r[1]]
 for name, ok, detail in results:
     print(f"{'PASS' if ok else 'FAIL'}  {name}" + ("" if ok else f"  >> {detail}"))

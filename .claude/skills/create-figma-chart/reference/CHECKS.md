@@ -107,11 +107,12 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > *closes* the gap on paper while leaving it open in the frame, and you cannot tell from the report
 > which you have. So: relay the script, or declare the whole pass unrun.
 >
-> **[`scripts/verify_page.js`](../scripts/verify_page.js) runs the MECHANICAL rows in ONE read-only
-> `use_figma` call** — text floor, annotation ladder, named styles, text hierarchy, series and
-> furniture weights, dash patterns, box alignment, gap, margins, unbound fills, annotation knockout
-> tier, annotation block gap, and the series polylines the annotation-overlap row needs. Done one at
-> a time those are a dozen round trips at ~8-10s each.
+> **[`scripts/verify_page.js`](../scripts/verify_page.js) runs the MECHANICAL rows in THREE sliced
+> read-only `use_figma` calls** (the slicing is above; it does not fit in one and never will) — text
+> floor, annotation ladder, named styles, text hierarchy, series and furniture weights, dash
+> patterns, box alignment, gap, margins, nothing past the artboard, dead fills, the page census,
+> unbound fills, annotation knockout tier, annotation block gap, and the series polylines the
+> annotation-overlap row needs. Done one at a time those are a dozen round trips at ~8-10s each.
 >
 > **`label-contrast-on-background` is blind to an annotation built the prescribed way — expect it to skip
 > and compute those by hand.** Bolding the category word (which the house convention requires) makes

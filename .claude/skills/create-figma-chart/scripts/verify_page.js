@@ -1,15 +1,38 @@
-// verify_page.js — the MECHANICAL rows of Step 8c, in one read-only `use_figma` call.
+// verify_page.js — the MECHANICAL rows of Step 8c, as THREE sliced read-only `use_figma` calls.
+//
+// ============================================================================================
+//  DO NOT PASTE THIS FILE INTO `use_figma`. IT DOES NOT FIT AND IT NEVER WILL.
+//
+//  `code` caps at 50,000 characters; this file is ~142,000 raw and ~72,000 stripped. Emit it in
+//  slices with the tool that exists for it — never by hand, and never by minifying it yourself:
+//
+//    .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js \
+//        --rows type,geometry --frame-id <frame>
+//    ... --rows series,skipped --frame-id <frame>
+//    ... --rows annotations   --frame-id <frame>
+//
+//  Three calls, that is the whole pass, and each one PARSES AND RUNS ALONE. Pipe the output
+//  straight into the call; every character is relayed verbatim, and a one-character corruption
+//  here yields a WRONG VERDICT rather than an error.
+//
+//  If you are about to hand-roll your own subset of these rows because this file "doesn't fit":
+//  stop. That is the exact failure the gate exists to catch, and it has happened — a run skipped
+//  this script, hand-rolled a handful of rows, and reported a pass it had not earned. Read
+//  reference/CHECKS.md, which documents the three calls and what each carries.
+// ============================================================================================
 //
 // reference/CHECKS.md is the gate before anyone sees a frame, and most of its rows are property
 // reads of a single page: font sizes, stroke weights, dash patterns, gaps, box alignment, margins,
 // bound-vs-raw fills, annotation knockouts. Run one at a time that is a dozen MCP round trips at
-// ~8-10s each; run as one traversal it is one. This is the same move `verify_templates.js` makes for
-// the template geometry, applied to a finished page.
+// ~8-10s each; run as one traversal per slice it is three. This is the same move
+// `verify_templates.js` makes for the template geometry, applied to a finished page.
 //
 // Read-only. It sets no property and creates no node.
 //
 // USAGE
-//   Fill in CONFIG and paste the whole file as one `use_figma` call.
+//   Emit a slice with `inline_script.py --rows <groups> --frame-id <frame>` (see the banner above);
+//   `--frame-id` rewrites CONFIG.frameId for you, so the output is ready to send as-is. The rest of
+//   CONFIG is edited here, in the file, before emitting.
 //     frameId       — the finished frame (the template clone, after Step 8).
 //     frameIds      — optional array, for a chart-rows SET: every frame is checked and the result is
 //                     one entry per frame. All of them must be on the SAME page, since a script may

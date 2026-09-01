@@ -89,7 +89,7 @@ step lives in [`reference/`](reference/) and is read *at* that step, not up fron
 | [reference/TEXTS.md](reference/TEXTS.md) | Step 6 | Filling the template's text slots, and the header reflow that makes the band measurable. |
 | [reference/FITTING.md](reference/FITTING.md) | Step 7 | Measuring the band, importing the embed, unwrapping and scaling. The local-SVG restyle route. |
 | [reference/LABELING.md](reference/LABELING.md) | Step 8, 8b, and any re-export | Direct labels, highlighting, the palette and its bound styles, annotations and arrows. What to replay after a re-import — `scripts/replay_chart_edits.js` does it in one call, in the right order. |
-| [reference/CHECKS.md](reference/CHECKS.md) | Step 8c, before showing anyone | The gate. Every check, and the rule to re-run the pass after the *last* change. `scripts/verify_page.js` runs the mechanical rows in one call and declares what it cannot judge; `scripts/diff_against_template.js` checks the finished frame back **against the template it was cloned from**. |
+| [reference/CHECKS.md](reference/CHECKS.md) | Step 8c, before showing anyone | The gate. Every check, and the rule to re-run the pass after the *last* change. `scripts/verify_page.js` runs the mechanical rows as **three sliced calls** (it never fits in one) and declares what it cannot judge; `scripts/diff_against_template.js` checks the finished frame back **against the template it was cloned from**. |
 | [reference/GOTCHAS.md](reference/GOTCHAS.md) | On an error, or grep by symptom | Every known pitfall. Worth one skim before your first `use_figma` call. |
 
 [GUIDELINES.md](GUIDELINES.md) stays eagerly read — it is pointed into from all over this page — but
@@ -162,7 +162,7 @@ What is independent — **the batch manifest, keyed by the step that owes it.** 
 in one message, so batching is mechanical rather than a fresh judgment call every run.
 
 - **Step 5 — the page survey.** The page enumeration and `verify_templates.js` go together. Checking N pages means N calls — `page.children` on a page you have not switched to is lazily loaded — and they fan out.
-- **Step 8c — the checks.** `verify_page.js` and `diff_against_template.js` are one read-only call each; issue them together, with every pixel probe that reads one fixed state.
+- **Step 8c — the checks.** `verify_page.js` is **three** read-only slices and `diff_against_template.js` is one; issue all four together, with every pixel probe that reads one fixed state.
 - **Step 9 — the delivery renders.** One screenshot per delivered frame, all in one message.
 - **The palette harvest.** `search_design_system` caps at ~14 results against a 24-fill palette, so it takes one group query plus ~11 by-name queries. All independent; 4–6 per message.
 - **A size-only survey is one batch, not two.** `get_screenshot` returns `original_width`/`original_height` — the node's natural size — beside the rendered dimensions, so it already answers how big a frame is. Add `get_metadata` only when you also need names or structure; eight A/B runs each paid for both batches before noticing.
@@ -533,6 +533,12 @@ Direct labels instead of legends, the highlight treatment, the palette and its b
 ## Step 8c — The checks that must pass before you show it
 
 > **Read [reference/CHECKS.md](reference/CHECKS.md) for this step.**
+
+**`verify_page.js` never fits one `use_figma` call — don't paste it, and never hand-roll a subset instead.** Emit its three slices; each runs alone:
+
+```bash
+.venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js --rows type,geometry --frame-id <frame>   # then series,skipped; then annotations
+```
 
 The checks are a gate, not a formality: **re-run the whole pass after the last change**, not after each one, and treat "I already checked that" as false after any re-export, reorder, rescale or restyle.
 
