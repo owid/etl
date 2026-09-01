@@ -69,8 +69,11 @@ def run() -> None:
 
 
 def sanity_check_inputs(tb: Table, tb_regions: Table) -> None:
-    error = f"Undefined status of banning: {set(tb['status']) - STATUS_ALL}"
-    assert set(tb["status"]) <= STATUS_ALL, error
+    error = (
+        "The snapshot should only contain countries with a (full or partial) ban; all other countries "
+        f"are added by this step. Unexpected statuses: {set(tb['status']) - (STATUS_ALL - {STATUS_NOT_BANNED})}"
+    )
+    assert set(tb["status"]) <= STATUS_ALL - {STATUS_NOT_BANNED}, error
 
     error = (
         "Country names in the snapshot that are not canonical OWID country names "
@@ -81,8 +84,8 @@ def sanity_check_inputs(tb: Table, tb_regions: Table) -> None:
     error = "Duplicated countries found in the snapshot data."
     assert not tb["country"].duplicated().any(), error
 
-    error = "All banned statuses should have a year when the ban became (or will become) effective."
-    assert tb[tb["status"] != STATUS_NOT_BANNED]["year_effective"].notna().all(), error
+    error = "All rows should have a year when the ban became (or will become) effective."
+    assert tb["year_effective"].notna().all(), error
 
     error = (
         "A ban marked as not yet in effect has an effective year in the past. "

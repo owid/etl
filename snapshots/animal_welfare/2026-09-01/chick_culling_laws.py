@@ -1,12 +1,13 @@
 """Script to create a snapshot of dataset.
 
-The data is manually curated: evidence of laws banning chick culling (and of chick culling being practiced without any
-ban) is gathered from official sources for each country, and stored in this script.
+The data is manually curated: it contains only the countries with a (full or partial) ban on chick
+culling, gathered from official sources. All other countries are assumed to have no ban (this is handled
+in the garden step). The evidence for each entry, and for notable legislative activity in countries
+without a ban, is curated by hand in the citation_full field of the accompanying .dvc file — keep the two
+files in sync when a law changes.
 """
 
 from pathlib import Path
-
-import numpy as np
 
 from etl.snapshot import Snapshot
 
@@ -18,187 +19,19 @@ def run(upload: bool = True) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"animal_welfare/{SNAPSHOT_VERSION}/chick_culling_laws.csv")
 
-    # Create a table of data manually extracted from different websites.
-    columns = ["country", "status", "year_effective", "comments", "evidence", "url"]
+    # Countries with a (full or partial) ban on chick culling, and the year when the ban became (or will
+    # become) effective. Sources are curated in the citation_full field of the .dvc file.
+    columns = ["country", "status", "year_effective"]
     data = [
-        # Add countries where chick culling is fully or partially banned (or planned to be so).
-        (
-            "Austria",
-            "Banned",
-            2023,
-            "Chicks used for feed production are exempt.",
-            "Section 6(2a) of the Animal Welfare Act (§ 6 Abs. 2a Tierschutzgesetz).",
-            "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=20003541",
-        ),
-        (
-            "France",
-            "Banned",
-            2023,
-            "Chicks used for animal feed are exempt.",
-            "Article R 214-17(II) of the Rural Code (Article R 214-17(II) du Code rural et de la pêche maritime).",
-            "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000045129069",
-        ),
-        (
-            "Germany",
-            "Banned",
-            2022,
-            "",
-            "Section 4c of the Animal Welfare Act (§ 4c Tierschutzgesetz).",
-            "https://www.gesetze-im-internet.de/tierschg/BJNR012770972.html",
-        ),
-        (
-            "Italy",
-            "Banned but not yet in effect",
-            2026,
-            "Date effective: 2026-12-31. Implementing guidelines on in-ovo sexing were published in September 2025.",
-            "Legislative Decree 205/2023 (Decreto Legislativo 7 dicembre 2023, n. 205).",
-            "https://www.normattiva.it/eli/id/2023/12/23/23G00212/ORIGINAL",
-        ),
-        (
-            "Luxembourg",
-            "Banned",
-            2018,
-            "General ban on killing animals for purely economic reasons.",
-            "Article 12(13) of the Law of 27 June 2018 on animal protection (Loi du 27 juin 2018 sur la protection des animaux).",
-            "https://legilux.public.lu/eli/etat/leg/loi/2018/06/27/a537/jo",
-        ),
-        (
-            "Switzerland",
-            "Partially banned",
-            2020,
-            "Shredding of live chicks is banned since 2020. Since February 2025, destroying embryos from day 13 of incubation is also banned. Killing hatched chicks by gas remains legal.",
-            "Article 20(g) of the Animal Protection Ordinance (Art. 20 Bst. g Tierschutzverordnung).",
-            "https://www.fedlex.admin.ch/eli/cc/2008/416/de",
-        ),
-        (
-            "Belgium",
-            "Partially banned",
-            2021,
-            "Regional measures only. Wallonia banned the grinding of live chicks in 2021 (a ban on gassing is under discussion). Flanders approved a ban on killing day-old chicks in its 2024 Animal Welfare Code, which will only take effect on a date yet to be decided.",
-            "Article 37 of the Flemish Animal Welfare Code (Artikel 37 van de Vlaamse Codex Dierenwelzijn van 17 mei 2024), and Walloon Government communiqué, 3 July 2025 (Communiqué du Gouvernement de Wallonie, 3 juillet 2025).",
-            "https://www.wallonie.be/fr/acteurs-et-institutions/wallonie/gouvernement-de-wallonie/communiques-presse/2025-07-03-0",
-        ),
-        (
-            "Norway",
-            "Not banned",
-            np.nan,
-            "No binding legislation. A parliamentary proposal to ban chick culling was rejected in 2025. The industry pledged to adopt in-ovo sexing by July 2027.",
-            "Parliamentary recommendation on the animal welfare white paper (Innst. 200 S (2024-2025), Stortinget).",
-            "https://www.stortinget.no/no/Saker-og-publikasjoner/Publikasjoner/Innstillinger/Stortinget/2024-2025/inns-202425-200s/",
-        ),
-        (
-            "Netherlands",
-            "Not banned",
-            np.nan,
-            "No binding legislation. A voluntary agreement between the government and the egg sector phases out the culling of male chicks for table-egg production from 2026.",
-            "Parliamentary letter on chick culling roadmap, Dutch Government (Kamerbrief aanbieden roadmap eendagshaantjes).",
-            "https://www.rijksoverheid.nl/documenten/kamerstukken/2025/02/11/kamerbrief-aanbieden-roadmap-eendagshaantjes",
-        ),
-        # Add countries for which there is evidence of chick culling with no ban.
-        (
-            "Australia",
-            "Not banned",
-            np.nan,
-            "",
-            "Australian Animal Welfare Standards and Guidelines, Department of Agriculture, Fisheries and Forestry (DAFF).",
-            "https://www.agriculture.gov.au/agriculture-land/animal/welfare/standards-guidelines",
-        ),
-        (
-            "Brazil",
-            "Not banned",
-            np.nan,
-            "A bill to ban the cruel disposal of chicks (PL 783/2024) is under discussion in Congress but has not been adopted.",
-            "Bill PL 783/2024, Chamber of Deputies of Brazil (Projeto de Lei 783/2024, Câmara dos Deputados).",
-            "https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=2421303",
-        ),
-        (
-            "Canada",
-            "Not banned",
-            np.nan,
-            "",
-            "Preventive Control Plan for Hatcheries, Canadian Food Inspection Agency (CFIA).",
-            "https://inspection.canada.ca/en/animal-health/terrestrial-animals/hatcheries/preventive-control-plan-hatcheries",
-        ),
-        (
-            "New Zealand",
-            "Not banned",
-            np.nan,
-            "",
-            "Code of Welfare: Layer Hens, Ministry for Primary Industries (MPI) New Zealand.",
-            "https://www.mpi.govt.nz/animals/animal-welfare/codes/all-animal-welfare-codes/code-of-welfare-layer-hens",
-        ),
-        (
-            "Ukraine",
-            "Not banned",
-            np.nan,
-            "Chick maceration is explicitly listed as a permitted killing method.",
-            "Order No. 628 of 29 August 2022 on requirements for the protection of animals at the time of killing, Ministry of Agrarian Policy of Ukraine.",
-            "https://zakon.rada.gov.ua/go/z1244-22",
-        ),
-        (
-            "United Kingdom",
-            "Not banned",
-            np.nan,
-            "The government's 2025 animal welfare strategy encourages the industry to end chick culling, but has no legal force.",
-            "The Welfare of Animals at the Time of Killing (England) Regulations 2015 (WATOK).",
-            "https://www.legislation.gov.uk/uksi/2015/1782/schedule/2/paragraph/44/made",
-        ),
-        (
-            "United States",
-            "Not banned",
-            np.nan,
-            "",
-            "Animal Legal & Historical Center, Michigan State University.",
-            "https://www.animallaw.info/article/detailed-discussion-legal-protections-domestic-chicken-united-states-and-europe",
-        ),
+        ("Austria", "Banned", 2023),
+        ("Belgium", "Partially banned", 2021),
+        ("France", "Banned", 2023),
+        ("Germany", "Banned", 2022),
+        ("Italy", "Banned but not yet in effect", 2026),
+        ("Luxembourg", "Banned", 2018),
+        ("Switzerland", "Partially banned", 2020),
     ]
-    # Countries in the European Union for which there is no law against chick culling.
-    rest_of_eu = [
-        "Bulgaria",
-        "Croatia",
-        "Cyprus",
-        "Czechia",
-        "Denmark",
-        "Estonia",
-        "Finland",
-        "Greece",
-        "Hungary",
-        "Ireland",
-        "Latvia",
-        "Lithuania",
-        "Malta",
-        "Poland",
-        "Portugal",
-        "Romania",
-        "Slovakia",
-        "Slovenia",
-        "Spain",
-        "Sweden",
-    ]
-    for country in rest_of_eu:
-        data += (
-            (
-                country,
-                "Not banned",
-                np.nan,
-                "",
-                "European Institute for Animal Law & Policy (2024-12).",
-                "https://animallaweurope.org/wp-content/uploads/Chick-and-Duckling-Killing-UPDATE-December-2024.pdf",
-            ),
-        )
     tb = snap.read_from_records(data=data, columns=columns)
 
-    # Add all individual sources to the full citation in the metadata.
-    sources_text = """Evidence of laws banning chick culling, and evidence of chick culling being practiced without any ban, has been gathered from various sources for different countries.\n Some of those sources were extracted from [a report by the European Institute for Animal Law & Policy](https://animallaweurope.org/wp-content/uploads/Chick-and-Duckling-Killing-UPDATE-December-2024.pdf): "Chick and Duckling Killing: Achieving an EU-Wide Prohibition" (White paper, updated December 2024) by Alice Di Concetto, Olivier Morice, Matthias Corion, Simão Santos.\n"""
-    for _, row in tb.iterrows():
-        sources_text += f"- {row['country']}: {row['status']}. Source: [{row['evidence']}]({row['url']})"
-        if len(row["comments"]) > 0:
-            sources_text += f" {row['comments']}"
-        sources_text += "\n"
-    # Replace the full citation in the metadata.
-    snap.metadata.origin.citation_full = sources_text  # ty: ignore
-    # Rewrite metadata to dvc file.
-    snap.metadata.save()
-
-    # Download data from source, add file to DVC and upload to S3.
+    # Add file to DVC and upload to S3.
     snap.create_snapshot(data=tb, upload=upload)
