@@ -143,6 +143,25 @@ def _review_path(slug: str, model: str, bundle_hash: str, pass_index: int) -> Pa
     return _slug_dir(slug) / f"review_{algo_fingerprint()}_{model_safe}_{bundle_hash}_{pass_index}.json"
 
 
+def cached_passes(slug: str, model: str, bundle_hash: str) -> dict[int, list[dict[str, Any]]]:
+    """Every cached pass for this exact bundle, keyed by pass index.
+
+    Callers should use *all* of these rather than the first N. The model is flaky, so passes
+    disagree; using everything already paid for is free extra evidence, and it means a run can
+    only ever gain findings from the cache, never lose them to a slot that happened to miss.
+    """
+    model_safe = model.replace(":", "_").replace("/", "_")
+    prefix = f"review_{algo_fingerprint()}_{model_safe}_{bundle_hash}_"
+    out: dict[int, list[dict[str, Any]]] = {}
+    for path in _slug_dir(slug).glob(f"{prefix}*.json"):
+        try:
+            index = int(path.stem.rsplit("_", 1)[1])
+            out[index] = json.loads(path.read_text())["issues"]
+        except (ValueError, IndexError, json.JSONDecodeError, KeyError):
+            continue
+    return out
+
+
 def read_review(slug: str, model: str, bundle_hash: str, pass_index: int) -> list[dict[str, Any]] | None:
     path = _review_path(slug, model, bundle_hash, pass_index)
     if not path.exists():

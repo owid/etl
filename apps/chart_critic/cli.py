@@ -256,14 +256,19 @@ def _review_one(
     # known findings, one pass caught 1-2 of them and three passes caught all three. So a pass
     # count is a recall dial, and at these prices it is cheap to turn up.
     bundle_hash = cache.content_hash(bundle.summary, bundle.png)
-    for pass_index in range(max(repeat, 1)):
-        if use_cache:
-            hit = cache.read_review(slug, model, bundle_hash, pass_index)
-            if hit is not None:
-                for issue in hit:
-                    _merge(found, issue)
-                result["cached"] += 1
-                continue
+
+    # Take every pass already cached for this bundle, not the first --repeat of them. Passes
+    # disagree, so replaying a fixed slot that happened to miss froze a chart as "clean" forever;
+    # using all of them means the cache can only add findings. Then top up to --repeat with fresh
+    # passes, so asking for more than is cached still buys new evidence.
+    already = cache.cached_passes(slug, model, bundle_hash) if use_cache else {}
+    for issues in already.values():
+        for issue in issues:
+            _merge(found, issue)
+    result["cached"] = len(already)
+
+    next_index = (max(already) + 1) if already else 0
+    for offset in range(max(max(repeat, 1) - len(already), 0)):
         try:
             run = agent.run_sync(parts)
         except Exception as e:  # noqa: BLE001 — one pass failing should not end the sweep
@@ -273,13 +278,13 @@ def _review_one(
         for issue in issues:
             _merge(found, issue)
         if use_cache:
-            cache.write_review(slug, model, bundle_hash, pass_index, issues)
+            cache.write_review(slug, model, bundle_hash, next_index + offset, issues)
         usage = run.usage
         in_tokens += usage.input_tokens or 0
         out_tokens += usage.output_tokens or 0
 
     result["issues"] = sorted(found, key=lambda i: (-i["passes"], i["severity"]))
-    result["passes"] = max(repeat, 1)
+    result["passes"] = max(max(repeat, 1), len(already))
     result["bundle_cached"] = bundle.from_cache
     result["views_reviewed"] = 1 + len(extra_views)
     result["extremes_params"] = bundle.extremes_params
@@ -564,8 +569,8 @@ def _print_summary(results: list[dict[str, Any]], model: str) -> None:
     total_passes = sum(r.get("passes", 0) for r in results if r["status"] == "ok")
     if cached_passes:
         console.print(
-            f"[dim]{cached_passes} of {total_passes} passes served from cache — a cached miss stays a miss, "
-            f"so use --no-cache or a higher --repeat to test a chart afresh[/dim]"
+            f"[dim]{cached_passes} of {total_passes} passes served from cache. Every cached pass is used, "
+            f"so re-running can only add findings; raise --repeat or use --no-cache to buy fresh ones[/dim]"
         )
     no_render = [r for r in results if any("no render" in n for n in r.get("notes", []))]
     if no_values:
