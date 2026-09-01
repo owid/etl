@@ -83,6 +83,27 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > **Run all three** — each reports its own rows and nothing else, so a group you skip is a group
 > nobody checked, and each one now says so in its own verdict.
 >
+> **A locally-authored SVG gets materially LESS checking than a grapher embed, and the rows say so
+> rather than failing.** Most of this file keys off grapher's own node names — `line__<Entity>`,
+> `outline__<Entity>`, `label__<Entity>`, `datapoints__<Entity>`, `horizontal-grid-lines`,
+> `vertical-axis`. A chart drawn by `build_body.py` or any other local generator arrives with
+> matplotlib's names instead (`Vector`, and text nodes named after their own content), so those rows
+> find nothing to judge. Measured on a real DI frame — nine panels, nine teal lines, 27 labels, every
+> one of them correct — **seven rows skipped**: `series-weight`, `furniture-weight`, `polylines`,
+> `label-contrast-on-background`, `colour-vision`, `grayscale-seams`, and with them the palette, which
+> read the chart as a **single-colour** palette of `#fffbf5` (the nine panel rectangles) and never saw
+> the teal at all.
+>
+> Nothing there is wrong, and nothing is silently passed — every one of those rows names what it could
+> not find. But a run that reads "no mechanical row failed" off such a frame has far thinner coverage
+> than the same sentence on a grapher import, so **say which rows skipped for want of a name**.
+>
+> The fix is cheap and belongs in the generator: **name the nodes the way grapher does.** A series line
+> becomes `line__<Entity>`, a direct label `label__<Entity>`, the gridline group
+> `horizontal-grid-lines`. Do it in the SVG (matplotlib takes `gid`) rather than renaming in Figma
+> afterwards, so a re-import keeps it. `/create-static-viz` owns the emitting step, so a change here is
+> one for that skill too.
+>
 > **Budget for this: relaying the pass is the single largest time cost in a run.** The benchmark's second
 > run took 48 min against a 30.8 min baseline, and roughly 17 min of the difference was relaying these
 > groups verbatim — the baseline never ran them at all. Three composed calls and `Read` instead of `cat`
