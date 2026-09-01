@@ -177,7 +177,10 @@ def chart_link(slug: str, params: str = "", extra_keys: set[str] | None = None) 
 
 
 def _claim_tokens(claim: str) -> set[str]:
-    return {w for w in re.findall(r"[a-z0-9]{4,}", claim.lower())}
+    # Crude singular/plural folding. Without it "the unit for all three indicators is incorrectly
+    # set to 'doses'" and "the indicator unit is incorrectly set to 'doses'" scored below the
+    # merge threshold and were reported as two findings.
+    return {w.rstrip("s") for w in re.findall(r"[a-z0-9]{4,}", claim.lower())}
 
 
 def _merge(issues: list[dict[str, Any]], new: dict[str, Any]) -> None:

@@ -80,8 +80,11 @@ def _fetch(url: str) -> bytes:
 
 def _extremes_params(df: pd.DataFrame, time_col: str, col: str) -> str:
     """``country=CODE~CODE`` for the entities at the extremes of one indicator."""
+    # Not every CSV has a Code column — a multi-dim view's CSV is entity/year/value only.
+    if "Code" not in df.columns:
+        return ""
     series = df[["Entity", "Code", time_col, col]].dropna(subset=[col])
-    if series.empty or "Code" not in series:
+    if series.empty:
         return ""
     codes = []
     for idx in (series[col].idxmax(), series[col].idxmin()):
@@ -122,8 +125,12 @@ def _numeric_summary(df: pd.DataFrame) -> list[str]:
         )
         last = series[series[time_col] == latest].sort_values(col, ascending=False)
         if len(last):
-            top = ", ".join(f"{r.Entity} {fmt(getattr(r, col))}" for r in last.head(4).itertuples())
-            bottom = ", ".join(f"{r.Entity} {fmt(getattr(r, col))}" for r in last.tail(3).itertuples())
+            # Index by position, not attribute: itertuples renames any column that is not a valid
+            # Python identifier (SDG indicator columns start with a digit), and attribute access
+            # then raises — which failed 4 charts of 100 silently before this.
+            pairs = list(zip(last.Entity, last[col]))
+            top = ", ".join(f"{e} {fmt(v)}" for e, v in pairs[:4])
+            bottom = ", ".join(f"{e} {fmt(v)}" for e, v in pairs[-3:])
             lines.append(f"     {latest} highest: {top} | lowest: {bottom}")
     if len(data_cols) > MAX_COLUMNS:
         lines.append(f"  … and {len(data_cols) - MAX_COLUMNS} further indicators not summarised")
