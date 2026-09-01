@@ -2,9 +2,9 @@
 
 The data is manually curated: it contains only the countries with a (full or partial) ban on chick
 culling, gathered from official sources. All other countries are assumed to have no ban (this is handled
-in the garden step). The evidence for each entry, and for notable legislative activity in countries
-without a ban, is curated by hand in the citation_full field of the accompanying .dvc file — keep the two
-files in sync when a law changes.
+in the garden step). Each fact lives in exactly one place: the status and effective year are defined only
+here (as data), while the sources and legal nuances are curated only in the citation_full field of the
+accompanying .dvc file (which deliberately does not restate statuses or years).
 """
 
 from pathlib import Path

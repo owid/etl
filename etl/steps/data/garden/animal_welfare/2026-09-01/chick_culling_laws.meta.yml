@@ -19,7 +19,6 @@ tables:
         description_short: Legal status of the culling of male chicks in the egg industry.
         description_key:
           - Chick culling is the killing of newly hatched male chicks, which cannot lay eggs and are of no commercial value to the egg industry. Billions of male chicks are estimated to be killed around the world every year.
-          - Chick culling is banned in Luxembourg (since 2018), Germany (2022), Austria, and France (2023). Italy's ban takes effect at the end of 2026. Switzerland and Belgium have partial bans.
           - Countries with no known law on chick culling are shown as not banned.
           - In some countries without a ban, such as Norway and the Netherlands, governments or the egg industry have pledged to phase out chick culling, but these commitments are not legally binding.
         description_processing: |-
