@@ -33,9 +33,9 @@ Every one of these caught a real defect on this skill's first run, and none of t
 > | `annotations` | polylines, annotation-overlap, annotation-knockout, annotation-block-gap, label-contrast | 68% |
 > | `skipped` | every declared gap — the colour_audit.py command, spelling, entity completeness, arrows, leader-on-map | 55% |
 >
-> Groups combine, so the whole pass is **three calls**: `--rows annotations` (34,198), `--rows
-> type,geometry` (36,674), `--rows series,skipped` (35,089) — measured 2026-09-01, largest **73% of
-> cap** against a **68% floor**. Three and not four because the preamble is byte-identical across
+> Groups combine, so the whole pass is **three calls**: `--rows annotations` (34,280), `--rows
+> type,geometry` (36,913), `--rows series,skipped` (35,089) — measured 2026-09-01, largest **74% of
+> cap** against a **69% floor**. Three and not four because the preamble is byte-identical across
 > slices and each row group is a self-contained block after it (GOTCHAS.md → Running the scripts has
 > the `cmp` proof and the composition rule); concatenating verbatim blocks is not the hand-rolled
 > subset forbidden below, since nothing is reimplemented.

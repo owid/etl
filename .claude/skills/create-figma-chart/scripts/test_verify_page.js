@@ -290,12 +290,29 @@ function buildFrame(opts = {}) {
   if (opts.groupNamedLabel) children.push(node({ name: "label__Wrapped", x: 40, y: 250, width: 60, height: 16,
     children: [text("Wrapped", "Country W", 13, 40, 250, 60, 16, "#4c6a9c")] }));
   if (opts.groupNamedSeries) kids.push(node({ name: "line__Wrapped", x: 40, y: 200, width: 300, height: 120, children: [
+    ...(opts.seriesMarker ? [node({ type: "VECTOR", name: "Vector", x: 40, y: 320, width: 6, height: 6,
+        fills: solid("#00847e"), strokes: [], strokeWeight: 0,
+        absoluteTransform: [[1, 0, 0], [0, 1, 0]],
+        vectorNetwork: { vertices: [{ x: 40, y: 320 }, { x: 46, y: 326 }], segments: [{ start: 0, end: 1 }] } })] : []),
     node({ name: "Clip path group", x: 40, y: 200, width: 300, height: 120, children: [
       node({ type: "VECTOR", name: "Vector", x: 40, y: 200, width: 300, height: 120, strokeWeight: 3,
              strokes: solid("#00847e"), dashPattern: [], strokeAlign: "CENTER",
              absoluteTransform: [[1, 0, 0], [0, 1, 0]],
              vectorNetwork: { vertices: [{ x: 40, y: 320 }, { x: 200, y: 260 }, { x: 340, y: 200 }],
                               segments: [{ start: 0, end: 1 }, { start: 1, end: 2 }] } })] })] }));
+  // A gridline parked BELOW the artboard. Zero HEIGHT but a live stroke, so it is ink — and ink off
+  // the artboard is exactly what within-frame exists to catch. The blanket zero-area skip hid it.
+  if (opts.offstageGridline) children.push(node({ type: "VECTOR", name: "grid-offstage",
+    x: 40, y: 600, width: 123.75, height: 0, fills: [], strokes: solid("#dddddd"), strokeWeight: 1,
+    vectorPaths: [{ windingRule: "NONE", data: "M 0 0 L 123.75 0" }] }));
+  // Zero-area AND painting nothing: still noise, still skipped.
+  if (opts.offstageGhost) children.push(node({ type: "VECTOR", name: "ghost-offstage",
+    x: 40, y: 620, width: 0, height: 0, fills: [], strokes: [],
+    vectorPaths: [{ windingRule: "NONE", data: "M 0 0" }] }));
+  // A clipPath artifact that cannot render: it can put no phantom colour in any palette.
+  if (opts.hiddenDeadVector) children.push(node({ type: "VECTOR", name: "Vector", visible: false,
+    x: 40, y: 200, width: 80, height: 57, fills: solid("#000000"), strokes: [],
+    vectorPaths: [{ windingRule: "NONE", data: "M 0 0 L 80 0 L 80 57 Z" }] }));
   // Grapher's own gridline, as it really imports: an open stroked path of ZERO HEIGHT named after its
   // tick value, carrying windingRule NONE and Figma's default black fill. Measured live, one untouched
   // grapher import held 29 of these — so without the area gate the row fails every imported chart.
@@ -2000,6 +2017,41 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
     check("42 an unnamed in-plot text is still not a label",
           !/Country A/.test(row(plain, "label-contrast-on-background").detail || ""),
           row(plain, "label-contrast-on-background").detail);
+  }
+
+  // 44 — the three findings from the third Codex round. Each is a row reaching a confident wrong
+  // answer, and each is pinned in BOTH directions: the case it used to miss, and the case it must
+  // still not fire on.
+  {
+    // (a) within-frame skipped every zero-area node, so a stroked gridline off the artboard read ok.
+    const grid = await run(buildFrame({ offstageGridline: true }), {});
+    check("44 a stroked zero-height line off the artboard FAILS",
+          row(grid, "within-frame").status === "FAIL", row(grid, "within-frame").detail);
+    check("44 and it names the offender and the overshoot",
+          /grid-offstage/.test(row(grid, "within-frame").detail) && /bottom by/.test(row(grid, "within-frame").detail),
+          row(grid, "within-frame").detail);
+    // The negative: zero-area AND paintless is still noise.
+    const ghost = await run(buildFrame({ offstageGhost: true }), {});
+    check("44 a zero-area node painting nothing is still skipped",
+          row(ghost, "within-frame").status === "ok", row(ghost, "within-frame").detail);
+
+    // (b) dead-fills fired on a node that cannot render, whose stated harm cannot occur.
+    const hidden = await run(buildFrame({ hiddenDeadVector: true }), {});
+    check("44 a HIDDEN clipPath artifact is not reported",
+          row(hidden, "dead-fills").status === "ok", row(hidden, "dead-fills").detail);
+    const visible = await run(buildFrame({ deadVector: true }), {});
+    check("44 while a visible one still is",
+          row(visible, "dead-fills").status === "FAIL", row(visible, "dead-fills").detail);
+
+    // (c) identify() trusted the ancestor for EVERY vector, so markers became polylines.
+    const marked = await run(buildFrame({ groupNamedSeries: true, seriesMarker: true }), {});
+    const pl = row(marked, "polylines");
+    const wrapped = (pl.polylines || []).filter((x) => x.name === "line__Wrapped");
+    check("44 a filled marker inside a series group is not a polyline",
+          pl.status === "ok" && wrapped.length === 1,
+          JSON.stringify(pl.polylines));
+    check("44 and it is the STROKED path that was sampled, not the 2-vertex marker",
+          (wrapped[0] || {}).n === 3, JSON.stringify(wrapped));
   }
 
   const bad = results.filter((x) => !x.ok);

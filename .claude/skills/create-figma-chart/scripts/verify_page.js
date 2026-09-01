@@ -980,6 +980,17 @@ const checkFrame = async (frameId) => {
   // clips, so it survives a screenshot of the frame and is simply missing from the export.
   // A frame with clipsContent HIDES the overflow instead of spilling it. Still a defect — content the
   // author wrote is not in the image — but a different one, so it is named rather than merged.
+  // Shared by within-frame and dead-fills: both ask whether a node RENDERS, and both switches —
+  // `visible: false` and effective opacity zero — are INHERITED, so neither can be read off the node.
+  const rendersHere = (n, root) => {
+    let m = n, opacity = 1;
+    while (m && m !== root) {
+      if ("visible" in m && !m.visible) return false;
+      if ("opacity" in m && typeof m.opacity === "number") opacity *= m.opacity;
+      m = m.parent;
+    }
+    return opacity > 0;
+  };
   {
     const OUT_EPS = 0.5;
     // Visibility is INHERITED, and `findAll` returns a hidden node's descendants with their own
@@ -993,15 +1004,7 @@ const checkFrame = async (frameId) => {
     // fire-on-nothing failure the visibility climb already exists to prevent, reached by the other
     // switch. The test is EXACTLY zero, as it is everywhere else — a faded node is still ink, and a
     // faded node hanging off the bottom of the artboard is still missing from the export.
-    const shown = (n) => {
-      let m = n, opacity = 1;
-      while (m && m !== frame) {
-        if ("visible" in m && !m.visible) return false;
-        if ("opacity" in m && typeof m.opacity === "number") opacity *= m.opacity;
-        m = m.parent;
-      }
-      return opacity > 0;
-    };
+    const shown = (n) => rendersHere(n, frame);
     const offenders = [];
     for (const n of frame.findAll(() => true)) {
       if (!shown(n)) continue;
@@ -1016,7 +1019,15 @@ const checkFrame = async (frameId) => {
       // node that actually overflows rather than of a wrapper three levels up.
       if (n.type === "GROUP") continue;
       const b = rel(n);
-      if (!b || b.w <= 0 || b.h <= 0) continue;
+      // A zero-AREA node can still be INK. A gridline is an open stroked path measuring 123.75x0, and
+      // one parked off the artboard is precisely the silently-lost-on-export case this row exists to
+      // catch — so skipping every zero-area node was a FALSE NEGATIVE, not noise control. The blanket
+      // skip came from the fill inventory, where the question is "what colour is on the page" and a
+      // strokeless zero-area node contributes none; here the question is "does this render outside the
+      // frame", and a stroke renders. Drop only what paints nothing at all.
+      const inks = (Array.isArray(n.fills) && n.fills.some(paints))
+                || (Array.isArray(n.strokes) && n.strokes.some(paints));
+      if (!b || ((b.w <= 0 || b.h <= 0) && !inks)) continue;
       const edges = [];
       if (b.l < -OUT_EPS) edges.push("left by " + r(-b.l));
       if (b.t < -OUT_EPS) edges.push("top by " + r(-b.t));
@@ -1051,6 +1062,12 @@ const checkFrame = async (frameId) => {
     let stroked = 0;
     for (const n of frame.findAll(() => true)) {
       if (n.type !== "VECTOR" || !Array.isArray(n.vectorPaths) || !n.vectorPaths.length) continue;
+      // A node that cannot RENDER cannot put a phantom colour in the palette, which is the entire harm
+      // this row reports. `paints` tests the fill's own switches but not the node's, and both of those
+      // are INHERITED — so a hidden or fully transparent clipPath artifact was reported as a defect
+      // whose stated consequence could not occur, and the remediation told the operator to go and
+      // delete something already invisible. Same inherited-switch climb within-frame uses.
+      if (!rendersHere(n, frame)) continue;
       if (!n.vectorPaths.every((vp) => vp && vp.windingRule === "NONE")) continue;
       if (!Array.isArray(n.fills) || !n.fills.some(paints)) continue;
       // ZERO-AREA nodes are excluded, on the same grounds the fill inventory already excludes them:
@@ -1225,7 +1242,16 @@ const checkFrame = async (frameId) => {
       // row reported "no line__*/outline__* VECTOR carried a readable vectorNetwork" on a frame
       // whose nine series `series-weight` had just measured. Same group-carries-the-name trap the
       // collector already solves; the row was the last place still reading the node's own name.
-      if (v.seriesOf) return { kind: v.seriesOf.kind, series: v.seriesOf.series, label: `${v.seriesOf.kind}__${v.seriesOf.series}` };
+      // ...but only for a STROKED vector. `seriesOf` comes from an ancestor, so EVERY vector inside
+      // `line__Ghana` inherits it — the endpoint markers (filled, no stroke) and Figma's own clip
+      // rectangles included. Unnarrowed, one series is reported as several polylines and
+      // annotation-overlap is handed a marker's box as though it were the line: measured on a real
+      // frame, nine series came back as 27. The series path is the stroked one; a marker is a filled
+      // blob. This narrows the ancestor rule rather than contradicting it — the name still comes from
+      // the group, because an import never puts it on the painted node.
+      if (v.seriesOf && Array.isArray(v.node.strokes) && v.node.strokes.some(paints)) {
+        return { kind: v.seriesOf.kind, series: v.seriesOf.series, label: `${v.seriesOf.kind}__${v.seriesOf.series}` };
+      }
       return null;
     };
     const lineWeightBySeries = {};
