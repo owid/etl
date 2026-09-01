@@ -20,7 +20,5 @@ tables:
         description_key:
           - Chick culling is the killing of newly hatched male chicks, which cannot lay eggs and are of no commercial value to the egg industry.
           - Billions of male chicks are estimated to be killed around the world every year.
-          - For countries with no known law on chick culling, we assume that it is not banned. Bans on chick culling are widely reported, so a country with no known law is unlikely to have one.
-          - In some countries without a ban, such as Norway and the Netherlands, governments or the egg industry have pledged to phase out chick culling, but these commitments are not legally binding.
         description_processing: |-
           Countries for which we found no law on chick culling are shown as "Not banned". Chick culling bans are notable legislative events that animal advocacy organizations track closely, so a country with no known law can safely be assumed to have no ban.
