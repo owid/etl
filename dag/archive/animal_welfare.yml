@@ -243,3 +243,12 @@ steps:
   # archived; last active in fbf0285a2336 on 2026-07-01
   data://grapher/animal_welfare/2024-12-17/fur_laws:
     - data://garden/animal_welfare/2024-12-17/fur_laws
+  # archived; last active in ab4287ace193 on 2026-09-01
+  data://meadow/animal_welfare/2026-04-16/chick_culling_laws:
+    - snapshot://animal_welfare/2026-04-16/chick_culling_laws.csv
+  # archived; last active in ab4287ace193 on 2026-09-01
+  data://grapher/animal_welfare/2026-04-16/chick_culling_laws:
+    - data://garden/animal_welfare/2026-04-16/chick_culling_laws
+  # archived; last active in ab4287ace193 on 2026-09-01
+  data://garden/animal_welfare/2026-04-16/chick_culling_laws:
+    - data://meadow/animal_welfare/2026-04-16/chick_culling_laws
