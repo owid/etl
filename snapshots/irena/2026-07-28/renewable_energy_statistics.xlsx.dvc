@@ -30,16 +30,16 @@ meta:
         - Off-grid hydropower
         - Off-grid solar photovoltaic
         - Other off-grid renewable energy
-    citation_full: IRENA - Renewable energy statistics 2025. International Renewable Energy Agency, Abu Dhabi (2025).
+    citation_full: IRENA - Renewable energy statistics 2026. International Renewable Energy Agency, Abu Dhabi (2026).
     attribution_short: IRENA
-    url_main: https://www.irena.org/Publications/2025/Jul/Renewable-energy-statistics-2025
-    url_download: http://www.irena.org/-/media/Files/IRENA/Agency/Publication/2025/Jul/IRENA_Statistics_Extract_2025H2.xlsx
-    date_accessed: '2025-07-18'
-    date_published: '2025-07-01'
+    url_main: https://www.irena.org/Publications/2026/Jul/Renewable-Energy-Statistics-2026
+    url_download: https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2026/Jul/IRENA_Statistics_Extract_2026.xlsx
+    date_accessed: '2026-07-28'
+    date_published: '2026-07-01'
     license:
-      name: ©IRENA 2025
-      url: https://www.irena.org/Publications/2025/Jul/Renewable-energy-statistics-2025
+      name: ©IRENA 2026
+      url: https://www.irena.org/Publications/2026/Jul/Renewable-Energy-Statistics-2026
 outs:
-  - md5: 18d1a8d4d6b0181478c48365ace16141
-    size: 12726392
+  - md5: cc97a09d988beacde9ca3d643439a8bf
+    size: 7817860
     path: renewable_energy_statistics.xlsx
