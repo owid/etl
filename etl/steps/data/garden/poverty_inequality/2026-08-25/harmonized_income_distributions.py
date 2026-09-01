@@ -499,12 +499,18 @@ def assign_by_pip_decision_tree(tb_surveys: Table, grid: Table) -> Table:
                    no  -> the nearest survey's concept, because PIP extrapolates from it
                           (equidistant surveys resolve to the earlier one)
 
-    The subtle part, and the reason a first attempt at this got 16 country-years wrong, is that the
-    "both sides" test runs on each survey year's RESOLVED concept — consumption where PIP publishes
-    both — and not on raw availability. A year offering both is a consumption endpoint only. Testing
-    raw availability instead lets a dual-concept year anchor an income interpolation that PIP never
-    performed: it made Haiti 2007-2011 income, when PIP's published bins for those years carry the
-    2012 consumption survey's shape.
+    Two things about that "both sides" test are load-bearing, and neither is visible in the diagram.
+
+    It runs on each survey year's RESOLVED concept — consumption where PIP publishes both — and
+    never on raw availability, because a year publishing both is a consumption endpoint only. On raw
+    availability a dual-concept year would anchor an income interpolation PIP never performed, which
+    for Haiti means calling 2007-2011 income when the published bins carry the 2012 consumption
+    survey's shape (see below).
+
+    And it scans ALL earlier and ALL later surveys, not the two adjacent ones. Belize 2000-2017 sits
+    between a 1999 income survey and a 2018 consumption survey, but a 1995 consumption survey
+    further back means consumption spans those years, and PIP interpolates accordingly — their Gini
+    slides smoothly from 0.5403 to 0.4095 with no plateau anywhere.
 
     Everything below is measured against PIP's published distributions, not read off the diagram.
 
@@ -533,11 +539,8 @@ def assign_by_pip_decision_tree(tb_surveys: Table, grid: Table) -> Table:
     - INTERPOLATION averages two surveys' poverty rates, which does not preserve either Gini. Of the
       1,878 country-years that ANY same-concept pair spans, exactly 0 carry a survey's Gini, and
       where the two spanning surveys are the immediate neighbours 90.7% sit strictly between them.
-      That is the tree's middle branch. Note "any pair", not "the immediate neighbours": Belize's
-      2000-2017 sit between a 1999 income and a 2018 consumption survey, but a 1995 consumption
-      survey further back means consumption spans them, and their Gini slides smoothly from 0.5403
-      to 0.4095 — an interpolation, exactly as the tree implies. This is why the spanning test below
-      scans all earlier and all later surveys rather than the adjacent two.
+      That is the tree's middle branch, and it is why the spanning test scans every earlier and
+      later survey rather than the adjacent two.
     - Where NO concept spans the year, PIP cannot interpolate (§5.2: "Interpolations are never done
       between consumption and income aggregates"), so it extrapolates from one survey — and of those
       78 country-years, 71 (91%) carry the NEAREST survey's Gini exactly, the 7 misses being the
@@ -619,9 +622,10 @@ def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int,
       PIP's decision tree is the rule — with both of its branches verified against the published
       distributions rather than taken on trust. See assign_by_pip_decision_tree.
 
-    Until 2026-08-28 this step labelled the dual survey years income, skipping the transform and
-    carrying consumption into `pip_income_basis` as though it were already income, roughly 18% low.
-    Correcting it moved the 2023 between share by -0.24pp.
+    This is where the step departs from the source project, which labelled the dual survey years
+    income. That skipped the transform and carried consumption into `pip_income_basis` as though it
+    were already income, roughly 18% low; labelling them consumption moves the 2023 between share by
+    -0.24pp against that project's figure.
 
     A country's basis is therefore assigned per country-year, not once per country: 29 countries
     here switch concept across the panel, because their anchor surveys do. That is consistent with
