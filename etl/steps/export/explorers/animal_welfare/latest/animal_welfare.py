@@ -259,7 +259,7 @@ def run() -> None:
             },
             "config": {
                 "title": "Which countries have banned chick culling?",
-                "subtitle": "Chick culling is the process of separating and killing unwanted male and unhealthy female chicks that cannot produce eggs in industrialized egg facilities.",
+                "subtitle": "Chick culling is the routine killing of newly hatched male chicks, which cannot lay eggs and are of no commercial value to the egg industry.",
                 "hasMapTab": True,
                 "type": "None",
             },
