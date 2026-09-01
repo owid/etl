@@ -1005,6 +1005,30 @@ const checkFrame = async (frameId) => {
     // switch. The test is EXACTLY zero, as it is everywhere else — a faded node is still ink, and a
     // faded node hanging off the bottom of the artboard is still missing from the export.
     const shown = (n) => rendersHere(n, frame);
+    // `absoluteBoundingBox` is GEOMETRY: Figma documents it as excluding stroke and effects, so a
+    // CENTER- or OUTSIDE-aligned stroke paints OUTSIDE the box every comparison below reads. A 3px
+    // centered rule sitting exactly on the artboard edge therefore measured as safely inside while
+    // half its width was cut from the export — the same silently-lost ink this row exists to catch,
+    // reached through the STROKE instead of through layout, and the one FITTING.md separates render
+    // bounds from bounding boxes for. `absoluteRenderBounds` would fold this in for free, but it
+    // folds in blur and drop shadows too, and a shadow falling off the artboard is not ink anyone
+    // should re-pin a footer for. So the outset is computed from the stroke alone, and only from one
+    // that actually PAINTS — the same `paints` test the zero-area gate below uses.
+    const strokeOutset = (n) => {
+      if (!Array.isArray(n.strokes) || !n.strokes.some(paints)) return null;
+      // INSIDE keeps the whole stroke within the geometry; CENTER puts half of it outside; OUTSIDE all
+      // of it. Anything else (an unset align on an imported node) is treated as INSIDE and costs
+      // nothing: the plain box still gets compared.
+      const share = n.strokeAlign === "OUTSIDE" ? 1 : n.strokeAlign === "CENTER" ? 0.5 : 0;
+      if (!share) return null;
+      // `strokeWeight` is `figma.mixed` — a SYMBOL, not a number — when the four sides differ, so a
+      // `typeof === "number"` gate alone would read every per-side-weighted node as unstroked. The
+      // per-side weights stay numbers exactly when the node-level one does not.
+      const side = (k) => (typeof n.strokeWeight === "number" ? n.strokeWeight
+                                                              : typeof n[k] === "number" ? n[k] : 0);
+      return { l: side("strokeLeftWeight") * share, t: side("strokeTopWeight") * share,
+               rr: side("strokeRightWeight") * share, bb: side("strokeBottomWeight") * share };
+    };
     const offenders = [];
     for (const n of frame.findAll(() => true)) {
       if (!shown(n)) continue;
@@ -1028,12 +1052,25 @@ const checkFrame = async (frameId) => {
       const inks = (Array.isArray(n.fills) && n.fills.some(paints))
                 || (Array.isArray(n.strokes) && n.strokes.some(paints));
       if (!b || ((b.w <= 0 || b.h <= 0) && !inks)) continue;
+      // Every edge is measured from the PAINTED extent — the geometry box grown by whatever share of
+      // the stroke hangs off that side. OUT_EPS still absorbs the hairline case: a 1px centered rule
+      // flush with the edge overhangs by exactly 0.5 and does not fire.
+      const so = strokeOutset(n) || { l: 0, t: 0, rr: 0, bb: 0 };
       const edges = [];
-      if (b.l < -OUT_EPS) edges.push("left by " + r(-b.l));
-      if (b.t < -OUT_EPS) edges.push("top by " + r(-b.t));
-      if (fb && b.rr > fb.width + OUT_EPS) edges.push("right by " + r(b.rr - fb.width));
-      if (fb && b.bb > fb.height + OUT_EPS) edges.push("bottom by " + r(b.bb - fb.height));
-      if (edges.length) offenders.push((n.name || n.type) + " (" + n.type + ") " + edges.join(", "));
+      if (b.l - so.l < -OUT_EPS) edges.push("left by " + r(so.l - b.l));
+      if (b.t - so.t < -OUT_EPS) edges.push("top by " + r(so.t - b.t));
+      if (fb && b.rr + so.rr > fb.width + OUT_EPS) edges.push("right by " + r(b.rr + so.rr - fb.width));
+      if (fb && b.bb + so.bb > fb.height + OUT_EPS) edges.push("bottom by " + r(b.bb + so.bb - fb.height));
+      if (!edges.length) continue;
+      // Whether the stroke is what pushed it out decides what the operator has to go and change: a box
+      // already outside needs re-pinning, a box still inside needs its strokeAlign or half a stroke of
+      // position. Saying which costs one comparison and saves a hunt for a layout bug that is not there.
+      const boxInside = b.l >= -OUT_EPS && b.t >= -OUT_EPS
+                     && (!fb || (b.rr <= fb.width + OUT_EPS && b.bb <= fb.height + OUT_EPS));
+      offenders.push((n.name || n.type) + " (" + n.type + ") " + edges.join(", ")
+        + (boxInside ? " — its BOX is inside the artboard; the overhang is its " + n.strokeAlign
+                     + "-aligned stroke, which paints outside the geometry absoluteBoundingBox reports"
+                     : ""));
     }
     const clipped = frame.clipsContent === true;
     if (!fb) skip("within-frame", "frame box not resolved");
@@ -1046,7 +1083,8 @@ const checkFrame = async (frameId) => {
                 : ". The frame does not clip, so this renders outside the artboard and is lost on export.")
             + " Almost every template footer is constrained MIN and grows downward (TEXTS.md): re-pin it"
             + " with footer.y = FOOTER_BOTTOM - footer.height after any edit that changes its height."
-          : "every visible node sits inside the " + r(fb.width) + "x" + r(fb.height) + " artboard");
+          : "every visible node's PAINTED extent — its box grown by any centered or outside stroke —"
+            + " sits inside the " + r(fb.width) + "x" + r(fb.height) + " artboard");
   }
 
   // Imported artifacts that carry paint but cannot paint it. A matplotlib `clipPath` arrives through
@@ -1879,13 +1917,19 @@ const checkFrame = async (frameId) => {
   // ones it can fail, so "no mechanical row failed" out of one documented call is a verdict on that
   // call and not on the frame — and nothing in the returned shape said so, which is the same
   // confident silence the SKIPPED rows exist to prevent, reached by slicing instead of by not looking.
-  const omittedGroups = ALL_ROW_GROUPS.filter((g) => !EMITTED_ROWS.includes(g));
-  const coverage = omittedGroups.length
-    ? ` — PARTIAL PASS: this call carried ${EMITTED_ROWS.join("+")} only. The ${omittedGroups.join(", ")}`
-      + ` row(s) are NOT in this text, so they are neither passed nor failed here. Send the other`
-      + ` documented call(s) (CHECKS.md) before reading this as a clean frame.`
-    : "";
   const fails = rows.filter((x) => x.status === "FAIL");
+  const omittedGroups = ALL_ROW_GROUPS.filter((g) => !EMITTED_ROWS.includes(g));
+  // The word that names the OUTCOME has to agree with the verdict it is appended to. This suffix was
+  // unconditional, so a slice that FAILED a row returned `FAIL on 1 row(s): margins — PARTIAL PASS` —
+  // self-contradicting to read, and it hands the string PASS to anything grepping these summaries for
+  // one. The coverage caveat itself is the same either way; only the verdict word and the sentence
+  // that says what the caveat means for the reader change.
+  const coverage = omittedGroups.length
+    ? ` — PARTIAL ${fails.length ? "CHECK" : "PASS"}: this call carried ${EMITTED_ROWS.join("+")} only.`
+      + ` The ${omittedGroups.join(", ")} row(s) are NOT in this text, so they are neither passed nor`
+      + ` failed here. Send the other documented call(s) (CHECKS.md) before reading`
+      + `${fails.length ? " the failure(s) above as this frame's only defects" : " this as a clean frame"}.`
+    : "";
   const review = rows.filter((x) => x.status === "REVIEW");
   const skipped = rows.filter((x) => x.status === "SKIPPED");
   return {

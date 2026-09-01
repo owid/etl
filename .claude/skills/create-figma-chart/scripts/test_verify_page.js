@@ -305,6 +305,14 @@ function buildFrame(opts = {}) {
   if (opts.offstageGridline) children.push(node({ type: "VECTOR", name: "grid-offstage",
     x: 40, y: 600, width: 123.75, height: 0, fills: [], strokes: solid("#dddddd"), strokeWeight: 1,
     vectorPaths: [{ windingRule: "NONE", data: "M 0 0 L 123.75 0" }] }));
+  // A rule flush with the artboard's TOP edge. Its BOX is entirely inside — `absoluteBoundingBox` is
+  // geometry and excludes stroke — while a CENTER-aligned stroke paints half its weight above y=0,
+  // where the export cuts it. Takes the weight and the alignment, because they are what decide the
+  // answer: INSIDE loses nothing, CENTER loses half, OUTSIDE loses all of it.
+  if (opts.edgeStroke) children.push(node({ type: "VECTOR", name: "rule__flush-top",
+    x: 16, y: 0, width: 508, height: 0, fills: [], strokes: solid("#dddddd"),
+    strokeWeight: opts.edgeStroke, strokeAlign: opts.edgeStrokeAlign || "CENTER",
+    vectorPaths: [{ windingRule: "NONE", data: "M 0 0 L 508 0" }] }));
   // Zero-area AND painting nothing: still noise, still skipped.
   if (opts.offstageGhost) children.push(node({ type: "VECTOR", name: "ghost-offstage",
     x: 40, y: 620, width: 0, height: 0, fills: [], strokes: [],
@@ -349,13 +357,18 @@ const annotation = (o) => text("annotation__test", o.chars || "Note", o.size || 
 // `wrap` puts the frame under an ancestor — a section or a group — because two of the switches that
 // decide whether a frame renders at all live ABOVE it, and a page whose only child is the frame cannot
 // model either. It takes the frame and returns whatever should sit on the page in its place.
-async function run(frame, config, wrap) {
+async function run(frame, config, wrap, emitted) {
   const byId = {};
   const index = (n) => { if (n.id) byId[n.id] = n; for (const c of n.children || []) index(c); };
   const page = node({ id: "P:1", type: "PAGE", name: "page", children: [wrap ? wrap(frame) : frame] });
   index(page);
   const figma = { currentPage: page, getNodeByIdAsync: async (id) => byId[id] || null, setCurrentPageAsync: async () => {} };
-  const body = SRC.replace(/^const CONFIG = \{[\s\S]*?^\};/m, "const CONFIG = __CONFIG__;");
+  let body = SRC.replace(/^const CONFIG = \{[\s\S]*?^\};/m, "const CONFIG = __CONFIG__;");
+  // `inline_script.py --rows` stamps EMITTED_ROWS with the slice it actually emitted. The harness does
+  // the same rewrite, so a SLICE's verdict — the only place the coverage caveat appears — is testable
+  // off-canvas rather than only reachable through the slicer.
+  if (emitted) body = body.replace(/^const EMITTED_ROWS = \[[^\]]*\];$/m,
+    "const EMITTED_ROWS = [" + emitted.map((g) => `"${g}"`).join(", ") + "];");
   const fn = new Function("figma", "__CONFIG__", `return (async () => { ${body} })();`);
   return fn(figma, Object.assign({ frameId: "F:1", chartName: "chart", gapTarget: null, tightlyMeasured: false, highlightTreatment: false, textFloor: null, faceted: false }, config));
 }
@@ -2052,6 +2065,68 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
           JSON.stringify(pl.polylines));
     check("44 and it is the STROKED path that was sampled, not the 2-vertex marker",
           (wrapped[0] || {}).n === 3, JSON.stringify(wrapped));
+  }
+
+  // 45 — the two findings from the fourth Codex round. Both are a row reaching a confident wrong
+  // answer, and both are pinned in BOTH directions.
+  {
+    // (a) within-frame compared GEOMETRY boxes only. Figma documents `absoluteBoundingBox` as
+    // excluding stroke, so every CENTER- or OUTSIDE-aligned stroke paints outside the box this row
+    // was reading: a 3px rule flush with the top edge loses half its width on export while measuring
+    // perfectly inside. FITTING.md separates render bounds from bounding boxes for exactly this.
+    const edge = await run(buildFrame({ edgeStroke: 3 }), {});
+    check("45 a CENTER-aligned stroke overhanging the artboard FAILS",
+          row(edge, "within-frame").status === "FAIL", row(edge, "within-frame").detail);
+    check("45 and it names the node, the edge and the overhang",
+          /rule__flush-top/.test(row(edge, "within-frame").detail)
+          && /top by 1\.5/.test(row(edge, "within-frame").detail),
+          row(edge, "within-frame").detail);
+    // The report has to say WHICH defect it is, or the operator goes looking for a layout bug that is
+    // not there: nothing about this node's position needs re-pinning.
+    check("45 and it says the BOX is inside, pointing at the stroke instead of the position",
+          /BOX is inside/.test(row(edge, "within-frame").detail)
+          && /CENTER-aligned stroke/.test(row(edge, "within-frame").detail),
+          row(edge, "within-frame").detail);
+
+    // OUTSIDE puts the WHOLE weight beyond the geometry, so the same rule overhangs by 3, not 1.5.
+    const outside = await run(buildFrame({ edgeStroke: 3, edgeStrokeAlign: "OUTSIDE" }), {});
+    check("45 an OUTSIDE-aligned stroke overhangs by its full weight",
+          row(outside, "within-frame").status === "FAIL"
+          && /top by 3/.test(row(outside, "within-frame").detail),
+          row(outside, "within-frame").detail);
+
+    // The negatives, which are what keep this from becoming a row that fires on correct work.
+    // INSIDE keeps the stroke within the geometry, so the identical node is clean...
+    const inside = await run(buildFrame({ edgeStroke: 3, edgeStrokeAlign: "INSIDE" }), {});
+    check("45 the same rule stroked INSIDE does not fail",
+          row(inside, "within-frame").status === "ok", row(inside, "within-frame").detail);
+    // ...and OUT_EPS still absorbs the HAIRLINE: a 1px centered rule flush with the edge overhangs by
+    // exactly 0.5, which is the tolerance every other edge is already measured against. Without this
+    // the row would fail every full-bleed hairline on every page.
+    const hairline = await run(buildFrame({ edgeStroke: 1 }), {});
+    check("45 a 1px centered rule flush with the edge is within tolerance",
+          row(hairline, "within-frame").status === "ok", row(hairline, "within-frame").detail);
+    // A stroke that paints NOTHING inflates nothing — same `paints` test the zero-area gate uses.
+    const unpainted = await run(buildFrame({ edgeStroke: 3, edgeStrokeAlign: "CENTER" }), {}, (f) => {
+      for (const n of f.findAll(() => true)) if (n.name === "rule__flush-top") n.strokes = [];
+      return f;
+    });
+    check("45 a strokeless node at the edge is not inflated",
+          row(unpainted, "within-frame").status === "ok", row(unpainted, "within-frame").detail);
+
+    // (b) the coverage suffix was appended unconditionally, so a slice that FAILED a row returned
+    // `FAIL on 1 row(s): within-frame — PARTIAL PASS`: self-contradicting, and it hands the string
+    // PASS to anything grepping these summaries for one.
+    const failing = await run(buildFrame({ footerGrown: 70 }), {}, null, ["geometry"]);
+    check("45 a failing slice does not call itself a PARTIAL PASS",
+          /^FAIL on /.test(failing.verdict) && !/PARTIAL PASS/.test(failing.verdict), failing.verdict);
+    check("45 and it still declares what it did not cover",
+          /PARTIAL CHECK/.test(failing.verdict) && /are NOT in this text/.test(failing.verdict), failing.verdict);
+    // The clean slice must KEEP its original label, or the fix has cost the passing case its warning.
+    const cleanSlice = await run(buildFrame(), {}, null, ["geometry"]);
+    check("45 a clean slice is still a PARTIAL PASS",
+          /PARTIAL PASS/.test(cleanSlice.verdict) && /clean frame/.test(cleanSlice.verdict), cleanSlice.verdict);
+    check("45 and it names the rows it left out", /annotations/.test(cleanSlice.verdict), cleanSlice.verdict);
   }
 
   const bad = results.filter((x) => !x.ok);
