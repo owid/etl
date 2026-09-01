@@ -103,7 +103,7 @@ tables:
         description_short: Year of the nearest national World Bank survey for this country.
         description_key:
           - For a year that is itself surveyed, this is that year, and the welfare concept applied is that survey's.
-          - For a year the World Bank extrapolated to, this is the survey it scaled that year's estimate from, so it is also where the concept comes from. Equidistant surveys resolve to the earlier one.
+          - For a year the World Bank extrapolated to, this is the survey it scaled that year's estimate from, so it is also where the concept comes from. Equidistant surveys resolve to the earlier survey, unless the published distribution identifies the later one as the source.
           - For a year the World Bank interpolated, the concept instead comes from the surveys bracketing the gap, which both use it. This column still reports the nearest survey, so for those years it does not identify where the concept came from.
           - The distance is not capped, and reaches 32 years for the sparsest countries. Filter on this column if a maximum distance matters for your use.
       adjusted:

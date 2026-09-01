@@ -104,6 +104,16 @@ ENFORCE_MONOTONE_INCOME_BASIS = True
 #                        exist, which is the mislabelling this step corrects.
 WELFARE_ASSIGNMENT = "pip_decision_tree"
 
+# Equidistant-tie anchors pinned by measurement where the earlier-survey rule disagrees with the
+# published bins. Kyrgyzstan 1999 sits one year from a 1998 income survey and one from a 2000
+# consumption survey, and its bins carry the 2000 consumption survey's Gini (to 4.7e-10) — almost
+# certainly a survey reference period the whole-year distance cannot see. The other four
+# identifiable ties all went to the earlier survey, so the general rule stays "earlier" and this
+# one exception is pinned as (welfare_type, survey_year_used). sanity_check_welfare_basis
+# re-verifies it against the bins on every run, so a PIP revision that changes the anchor fails
+# the build rather than silently outdating this entry.
+TIE_OVERRIDES = {("Kyrgyzstan", 1999): ("consumption", 2000)}
+
 # Sanity floor on the common PIP-and-WID country sample.
 MIN_COMMON_COUNTRIES = 150
 
@@ -541,7 +551,8 @@ def assign_by_pip_decision_tree(resolved: pd.Series, grid: Table) -> Table:
 
     Ties resolve to the earlier survey because that is where PIP puts them: across a concept change
     the Gini forms two flat plateaus, and the equidistant year falls in the earlier one (Namibia
-    1998, Saint Lucia 2005, Nicaragua 2007).
+    1998, Saint Lucia 2005, Nicaragua 2007). The one measured exception is pinned in TIE_OVERRIDES
+    rather than bent into the rule.
     """
     # STEP 1 — the panel to label: every (country, year) in the grid, as plain pandas. The catalog
     # Table's groupby does not yield (key, group) pairs, so it cannot drive the loop below.
@@ -563,8 +574,9 @@ def assign_by_pip_decision_tree(resolved: pd.Series, grid: Table) -> Table:
 
         # STEP 3 — the nearest survey for every panel year at once, as an index into `surveys`.
         # Two properties come free from argmin on a sorted array: it returns the FIRST minimum, so
-        # equidistant surveys resolve to the earlier one (which is what PIP does); and a year that
-        # IS a survey year has distance 0, a unique minimum, so it resolves to itself.
+        # equidistant surveys resolve to the earlier one (which is what PIP does, TIE_OVERRIDES
+        # aside); and a year that IS a survey year has distance 0, a unique minimum, so it
+        # resolves to itself.
         nearest = np.abs(surveys[None, :] - years[:, None]).argmin(axis=1)
 
         for year, near_i in zip(years, nearest):
@@ -592,7 +604,16 @@ def assign_by_pip_decision_tree(resolved: pd.Series, grid: Table) -> Table:
             # came from the spanning pair instead, not from this survey.
             rows.append((country, int(year), welfare, survey_used))
 
-    return Table(pd.DataFrame(rows, columns=["country", "year", "welfare_type", "survey_year_used"]))
+    out = pd.DataFrame(rows, columns=["country", "year", "welfare_type", "survey_year_used"])
+
+    # The measured tie exceptions (see TIE_OVERRIDES): the anchor the bins identify, not the rule's.
+    for (country, year), (concept, survey) in TIE_OVERRIDES.items():
+        out.loc[(out["country"] == country) & (out["year"] == year), ["welfare_type", "survey_year_used"]] = [
+            concept,
+            survey,
+        ]
+
+    return Table(out)
 
 
 def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int, last_year: int) -> Table:
@@ -610,7 +631,7 @@ def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int,
       "income" or "consumption". A statement about the data, not the country: a country's rows can
       carry different values in different years, following its surveys.
     - `survey_year_used` — the nearest national PIP survey to this year, equidistant ties to the
-      earlier one. Its meaning depends on the branch that labelled the year: for a survey year it
+      earlier one (TIE_OVERRIDES excepted). Its meaning depends on the branch that labelled the year: for a survey year it
       is the year itself, and for an extrapolated year it is the survey PIP scaled the estimate
       from — in both cases also the source of `welfare_type`. For an INTERPOLATED year the concept
       comes from the pair of surveys spanning the gap instead, so there this column only measures
@@ -651,11 +672,11 @@ def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int,
     and its thin estimation sample are reported rather than buried (see
     fit_consumption_income_model).
 
-    sanity_check_welfare_basis asserts the label-matches-the-bins invariant on every run. It can
-    only test SURVEY years, since those are the only ones where PIP publishes both concepts to
-    compare against. The non-survey years are covered instead by the Gini-fingerprint evidence in
-    assign_by_pip_decision_tree, which validates both branches of the tree against PIP's own
-    published distributions.
+    sanity_check_welfare_basis asserts the label-matches-the-bins invariant on every run, twice
+    over: survey years against PIP's published per-concept means, and extrapolated years against
+    the Gini fingerprint of the survey they were scaled from. Interpolated years carry no
+    fingerprint; their labels rest on the spanning logic in assign_by_pip_decision_tree, whose
+    evidence is in its docstring.
     """
     d = national_survey_percentiles(tb_percentiles)
 
@@ -725,12 +746,19 @@ def build_welfare_basis(tb_percentiles: Table, countries: list, first_year: int,
 
 
 def sanity_check_welfare_basis(tb_welfare: Table, tb_percentiles: Table, tb_pip: Table) -> None:
-    """The assigned welfare type must match what the PIP bins actually contain.
+    """The assigned welfare type must match what the PIP bins actually contain. Two parts:
 
-    Inferred rather than trusted: compare each survey year's bin mean against the mean PIP's
-    percentiles imply for each welfare type, and check the assigned label is the closer one. Only
-    country-years that ARE survey years are testable (the rest inherit a label by proximity), and
-    only where the two welfare types differ enough to discriminate.
+    1. SURVEY years, via the mean: where PIP publishes both concepts, compare the year's bin mean
+       against the mean each concept's percentiles imply, and check the assigned label is the
+       closer one (only where the two concepts differ enough to discriminate).
+    2. EXTRAPOLATED years, via the Gini: PIP fills these by scaling one survey's distribution,
+       which leaves its Gini untouched — so wherever a non-survey year's Gini equals exactly one
+       concept's survey Gini, the label must be that concept. This guards the tree's fallback
+       branch and its tie-break on every run; it is the check that fails on a label drawn from the
+       wrong side of a gap (e.g. Haiti 2007-2011 labelled income when the bins carry the 2012
+       consumption survey's shape). Interpolated years match no survey and are skipped — their
+       labels rest on the spanning logic in assign_by_pip_decision_tree, whose evidence is in its
+       docstring.
     """
     p = national_survey_percentiles(tb_percentiles)
     per_type = p.groupby(["country", "year", "welfare_type"], observed=True)["avg"].mean().unstack("welfare_type")
@@ -760,6 +788,64 @@ def sanity_check_welfare_basis(tb_welfare: Table, tb_percentiles: Table, tb_pip:
             f"survey years — the consumption->income transform would run on the wrong data. {examples}"
         )
     log.info(f"Welfare basis matches the PIP bins for all {len(d)} testable survey years")
+
+    # --- Part 2: extrapolated years, fingerprinted by the Gini -----------------------------------
+    # Scaling every income by one growth factor leaves the Lorenz curve, and so the Gini, exactly
+    # where it was — and it commutes with the fixed-quantile 109-bin aggregation, so the equality
+    # survives here. Plain pandas and float64 throughout: the comparison is at 1e-6.
+    b = pd.DataFrame(
+        {
+            "country": tb_pip["country"].astype(str),
+            "year": tb_pip["year"].astype(int),
+            "avg": tb_pip["avg"].astype(float),
+            "pop": tb_pip["pop"].astype(float),
+        }
+    ).sort_values(["country", "year", "avg"], kind="stable")
+    grouped = b.groupby(["country", "year"], observed=True)
+    b["cum_pop"] = grouped["pop"].cumsum() / grouped["pop"].transform("sum")
+    b["income"] = b["avg"] * b["pop"]
+    b["cum_income"] = grouped["income"].cumsum() / grouped["income"].transform("sum")
+    b["area"] = (b["cum_pop"] - grouped["cum_pop"].shift(fill_value=0.0)) * (
+        b["cum_income"] + grouped["cum_income"].shift(fill_value=0.0)
+    )
+    gini = (1 - grouped["area"].sum()).rename("gini").reset_index()
+
+    # The candidate anchors: each survey year's Gini and resolved concept.
+    # Plain pandas: resolve_survey_concepts hands back a catalog Series, and a Table refuses to
+    # merge with the plain frames built above.
+    resolved = pd.DataFrame(resolve_survey_concepts(p).rename("survey_concept").reset_index())
+    resolved["country"] = resolved["country"].astype(str)
+    resolved["year"] = resolved["year"].astype(int)
+    anchors = resolved.merge(gini.rename(columns={"gini": "survey_gini"}), on=["country", "year"]).rename(
+        columns={"year": "survey_year"}
+    )
+
+    # Non-survey years (year != survey_year_used exactly when the year has no survey), each paired
+    # with every survey of its country whose Gini it carries to within tolerance.
+    filled = pd.DataFrame(tb_welfare[tb_welfare["year"] != tb_welfare["survey_year_used"]])
+    filled = filled.astype({"country": str, "year": int, "welfare_type": str})
+    filled = filled.merge(gini, on=["country", "year"]).merge(anchors, on="country")
+    hits = filled[(filled["gini"] - filled["survey_gini"]).abs() < 1e-6]
+
+    # Identified = the matching surveys all carry ONE concept (ambiguous matches are skipped).
+    concepts = hits.groupby(["country", "year"], observed=True).agg(
+        matched_concepts=("survey_concept", "nunique"),
+        survey_concept=("survey_concept", "first"),
+        welfare_type=("welfare_type", "first"),
+    )
+    identified = concepts[concepts["matched_concepts"] == 1]
+    wrong = identified[identified["welfare_type"] != identified["survey_concept"]]
+    if not wrong.empty:
+        examples = [
+            f"{c} {int(y)}: labelled {r.welfare_type}, but the bins carry a {r.survey_concept} survey's Gini"
+            for (c, y), r in wrong.head(5).iterrows()
+        ]
+        raise AssertionError(
+            f"Welfare basis disagrees with the PIP bins for {len(wrong)} of {len(identified)} "
+            f"Gini-identifiable extrapolated years — a label was drawn from the wrong side of a "
+            f"survey gap. {examples}"
+        )
+    log.info(f"Welfare basis matches the PIP bins for all {len(identified)} Gini-identifiable extrapolated years")
 
 
 def national_survey_percentiles(tb_percentiles: Table) -> Table:
