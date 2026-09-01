@@ -75,8 +75,15 @@ BANS = [
     },
 ]
 
-# Countries without a ban, where a ban has been formally considered; used only in the citation.
+# Countries (and the European Union) without a ban, where a ban has been formally considered; used only in the
+# citation.
 CONSIDERED = [
+    {
+        "country": "European Union",
+        "source": "EU Livestock Strategy, European Commission (COM(2026) 576 final)",
+        "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:52026DC0576",
+        "note": "The European Commission intends to propose, by the end of 2026, a revision of animal welfare rules for laying hens and broilers that includes ending the systematic killing of male chicks.",
+    },
     {
         "country": "Brazil",
         "source": "Bill PL 783/2024, Chamber of Deputies of Brazil (Projeto de Lei 783/2024, Câmara dos Deputados)",
@@ -126,7 +133,7 @@ def build_citation_full() -> str:
         "will become, effective are given in the data):",
     ]
     lines += [f"- {row['country']}: [{row['source']}]({row['url']}). {row['note']}".strip() for row in BANS]
-    lines += ["", "Countries without a ban, where a ban has been formally considered:"]
+    lines += ["", "Countries and regions without a ban, where a ban has been formally considered:"]
     lines += [f"- {row['country']}: [{row['source']}]({row['url']}). {row['note']}" for row in CONSIDERED]
     lines += ["", CITATION_CLOSING]
     return "\n".join(lines)
