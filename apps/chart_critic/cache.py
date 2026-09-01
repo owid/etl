@@ -13,6 +13,15 @@ Two separate things are cached, for different reasons:
 That last property is the point. A review tool whose cache outlives a prompt change will
 happily report yesterday's answers about today's algorithm, and the failure is silent —
 a stale clean result looks exactly like a fresh clean result.
+
+**Caching interacts badly with a flaky model, and the interaction is worth understanding.** The
+model raises a genuine finding on some passes and not others: for ``share-elec-by-source``, five
+cached passes over the same bundle read CLEAN, FLAGGED, CLEAN, FLAGGED, FLAGGED. Reviews are
+cached per pass index, so a single-pass run replays pass 0 — and where pass 0 was a miss, that
+chart reports clean on every subsequent run, permanently and invisibly. Two things address it:
+``--repeat`` defaults to 3 rather than 1, and every run prints how many passes were served from
+cache instead of reviewed. Neither removes the underlying flakiness; they stop it from being
+silent.
 """
 
 from __future__ import annotations

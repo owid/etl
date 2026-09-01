@@ -308,9 +308,13 @@ def _review_one(
 @click.option(
     "--repeat",
     type=int,
-    default=1,
+    default=3,
     show_default=True,
-    help="Review each chart N times and union the findings. The model is not reproducible, so this is the recall dial.",
+    help=(
+        "Review each chart N times and union the findings. The model is not reproducible, so this is the "
+        "recall dial: on charts with known errors a single pass catches roughly half of them and five "
+        "catches all. Use 1 for a cheap first look, knowing it will miss things."
+    ),
 )
 @click.option(
     "--eval",
@@ -552,6 +556,17 @@ def _print_summary(results: list[dict[str, Any]], model: str) -> None:
         f"{len(flagged)} with issues ({len(issues)} in total) · "
         f"{len(results) - len(flagged) - len(gone) - len(failed)} clean"
     )
+
+    # A cached negative looks exactly like a fresh negative, and because the model is flaky the
+    # first pass over a chart with a real error is often a miss. Cache that miss and the chart is
+    # "clean" for good. So always say how much of a run was replayed rather than reviewed.
+    cached_passes = sum(r.get("cached", 0) for r in results)
+    total_passes = sum(r.get("passes", 0) for r in results if r["status"] == "ok")
+    if cached_passes:
+        console.print(
+            f"[dim]{cached_passes} of {total_passes} passes served from cache — a cached miss stays a miss, "
+            f"so use --no-cache or a higher --repeat to test a chart afresh[/dim]"
+        )
     no_render = [r for r in results if any("no render" in n for n in r.get("notes", []))]
     if no_values:
         console.print(
