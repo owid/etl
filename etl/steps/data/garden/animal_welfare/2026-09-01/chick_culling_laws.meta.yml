@@ -1,0 +1,28 @@
+dataset:
+  update_period_days: 365
+  owners:
+    - Pablo Rosado
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Animal Welfare
+
+tables:
+  chick_culling_laws:
+    variables:
+      status:
+        title: Banning of chick culling
+        unit: ""
+        short_unit: ""
+        processing_level: major
+        description_short: Legal status of the culling of male chicks in the egg industry.
+        description_processing: |-
+          Countries for which we found no law on chick culling are shown as "Not banned". Chick culling bans are notable legislative events that animal advocacy organizations track closely, so a country with no known law can safely be assumed to have no ban.
+        presentation:
+          grapher_config:
+            title: Which countries have banned chick culling?
+            map:
+              hideTimeline: true
+            note: |-
+              In Switzerland grinding is banned but gassing is still allowed. Belgium has only regional measures. Countries with no known law on chick culling are shown as not banned.

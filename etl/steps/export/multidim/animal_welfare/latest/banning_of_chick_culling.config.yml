@@ -13,7 +13,7 @@ views:
     config:
       title: "Which countries have banned chick culling?"
       subtitle: "Chick culling is the process of separating and killing unwanted male and unhealthy female chicks that cannot produce eggs in industrialized egg facilities."
-      note: "In Switzerland grinding is banned but gassing is still allowed. Belgium has only a regional ban."
+      note: "In Switzerland grinding is banned but gassing is still allowed. Belgium has only regional measures. Countries with no known law on chick culling are shown as not banned."
       originUrl: "/animal-welfare"
       tab: "map"
       hasMapTab: true
@@ -27,7 +27,6 @@ views:
           customNumericColorsActive: true
           customCategoryColors:
             Banned: "#4881c6"
-            "No laws": "#b6a28c"
             "Not banned": "#ad9882"
             "Partially banned": "#a084c1"
-            "Banned but not yet effective": "#3e94a1"
+            "Banned but not yet in effect": "#3e94a1"
