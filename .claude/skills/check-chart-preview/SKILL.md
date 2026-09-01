@@ -11,9 +11,9 @@ Visually verify that a chart or multidimensional indicator page renders correctl
 
 ## Prerequisites
 
-- The `agent-browser` skill must be available (for browser automation)
 - A staging server must be running for the current git branch (check via `curl -s -o /dev/null -w "%{http_code}" http://<container>/`)
 - The chart/mdim must have been pushed to staging already (either via `etlr --watch` in VSCode or manually)
+- For non-trivial UI checks (MDIM dropdowns, link/unlink chips, etc.) the `agent-browser` skill is needed; for plain PNG snapshots it isn't
 
 ## Getting the Staging URL
 
@@ -56,26 +56,40 @@ For export multidim: derive from path `etl/steps/export/multidim/<namespace>/<ve
 
 ## Checking the Preview
 
-Use the `agent-browser` skill to:
+### Recommended: PNG via `/grapher/by-uuid/<UUID>.png` (works for drafts)
 
-1. **Navigate** to the staging URL
-2. **Wait** for the chart to render (look for the Grapher SVG or iframe content to load)
-3. **Verify**:
-   - No error banner or "Chart not found" message
-   - Chart title is visible
-   - Data points / map regions are rendered (not an empty chart)
-   - For mdim: dimension dropdowns are present and functional
-4. **Take a screenshot** and save to `ai/` directory
+The fastest, most reliable way to grab a chart's rendered image — works for **drafts as well as published charts**, no browser, no auth required. Uses the same render pipeline OWID's public site uses for `/grapher/<slug>.png`, but addresses the chart by its `chart_configs.id` UUID, which is published to R2's `byUUID/` directory for every chart (whether or not the chart itself is `isPublished`).
 
-### Quick PNG check (non-mdim charts only)
+```bash
+# Resolve slug → by-uuid PNG URL, then fetch
+URL=$(.venv/bin/python .claude/skills/check-chart-preview/get_chart_png_url.py <slug-or-id>)
+curl -o ai/chart_preview.png "$URL"
+```
 
-For simple (non-mdim) charts, you can fetch a PNG directly without a browser:
+Pass extra grapher query params with `--<key>=<value>`:
+
+```bash
+.venv/bin/python .claude/skills/check-chart-preview/get_chart_png_url.py <slug> --tab=map
+.venv/bin/python .claude/skills/check-chart-preview/get_chart_png_url.py <slug> --tab=chart --time=earliest..2020
+```
+
+The helper queries the staging MySQL via `etl.config.OWID_ENV.read_sql` (which auto-routes to `staging-site-<branch>`), so it works as long as the staging server is up and the chart has been pushed.
+
+Use the resulting PNG by reading it directly with the `Read` tool (Claude can view images).
+
+### Fallback: browser preview for `mdim` pages / interactive UI
+
+The by-uuid PNG route renders a single chart frame. For MDIM data pages with dropdowns, or for verifying interactive UI (controls, link/unlink chips, etc.), use the `agent-browser` skill to navigate to the staging URL from `get_staging_url.py` and take an in-browser screenshot.
+
+### Quick PNG check (published charts only)
+
+For charts that are already published, the slug-based PNG route also works:
 
 ```bash
 curl -o ai/chart_preview.png "http://<container>/grapher/<slug>.png?nocache"
 ```
 
-Add `&tab=map` or `&tab=chart` to control which tab is shown. This does NOT work for mdim charts.
+This 404s for drafts — use the by-uuid route above instead.
 
 ## Pushing to Staging First
 

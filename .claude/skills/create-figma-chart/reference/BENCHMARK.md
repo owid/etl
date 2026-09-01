@@ -31,6 +31,16 @@ figure you can hold against the last one.
   delete it once the numbers are recorded**, unless someone actually wants the chart. It is a
   shared design file, and a benchmark that leaves a page behind on every run silts it up. (The
   first run's page was dropped straight after; nothing was lost, which is the proof.)
+  - **Run 3's page was KEPT, at the user's request — the chart was wanted.** So Charts (2026) carries
+    one benchmark-built page on purpose, and it is a deliverable rather than residue: **do not clear
+    it.** Page `20260828 Chile's democracy collapsed in a single year — and took 17 years to return
+    (Pablo A)` (index 9), frame **`chile-democracy-collapse-recovery`** (`27011:6`), beside its
+    reference import `original — grapher square export` (`27014:5`).
+    [Deep link](https://www.figma.com/design/s6Sv60bakebRRW2TxsMQbF/Charts--2026-?node-id=27011-6).
+    The node ids are a convenience; the **frame name is the durable join**, since it is the
+    kebab-case slug the website would export the PNG by. Recorded here because this chart has no
+    `export://static_viz` step whose docstring could hold it, and a link given only in chat is gone
+    by the next session.
 - **So the output cannot be the page.** The number, and the detail explaining it, live outside
   Figma. If a finding only exists as something you can see on the page, it has not been recorded.
 - Run it as a normal build, **checkpoint rule included** — the approval pause is part of the
@@ -79,16 +89,46 @@ wait wearing a checkpoint's clothes**, and it is 5× the real approval. This is 
 are actually for: a checkpoint is part of the design and stays, a stall is a defect and shows up
 here as human time the skill did not need to spend.
 
-**Second run, 2026-08-28, on `claude/create-figma-benchmark-chart-3r1st7` (cloud sandbox):**
+**Runs 2 and 3, both 2026-08-28, both in a cloud sandbox** (run 2 on
+`claude/create-figma-benchmark-chart-3r1st7`, run 3 on `claude/figma-chart-benchmark-pwgleo`):
 
-| | run 1 (local) | run 2 (cloud) |
-|---|---|---|
-| **agent time** | **30.8 min** | **~48 min** |
-| human wait | 93 s (16 s checkpoint + 77 s stall) | ~60 s — one checkpoint, no stall |
-| Figma calls | 28 in the build proper | 28 (14 in the build spine) |
-| messages with >1 Figma call | 0 | 3, peak 3 in flight |
-| `verify_page.js` run? | **no — not at all** | **yes, all four row groups** |
-| defects the pass caught | — | **2**, neither visible in a render |
+| | run 1 (local) | run 2 (cloud) | run 3 (cloud) |
+|---|---|---|---|
+| **agent time** | **30.8 min** | **~48 min** | **29.0 min** |
+| whole-run wall clock, incl. pre-Figma work | not recorded | not recorded | **34.3 min** (5.3 of it before the first Figma call) |
+| human wait | 93 s (16 s checkpoint + 77 s stall) | ~60 s — one checkpoint, no stall | one checkpoint, no stall — and it fell *before* the first Figma call, so the headline excludes it entirely |
+| Figma calls | 28 in the build proper | 28 (14 in the build spine) | 24 (16 in the build spine, 4 check slices, 3 renders, 1 fix) |
+| messages with >1 Figma call | 0 | 3, peak 3 in flight | 3, peak 3 in flight |
+| `verify_page.js` run? | **no — not at all** | **yes, all four row groups** | **yes, all three documented calls** |
+| defects the pass caught | — | **2**, neither visible in a render | **1** (`source-line-weight`) — plus run 2's own new furniture rule caught a second before the pass ran |
+
+**The headline's start point is doing more work than it looks, and run 3 is where that shows.** "First
+Figma call → delivered" excludes Step 1's chart resolution, the data verification, the texts, the Step 4
+proposal and the checkpoint. Run 3 did *all* of that before touching Figma, so its 29.0 min is a clean
+Figma-phase figure and its honest whole-run cost is **34.3 min**. A run that interleaves the same work —
+resolving an MDim view mid-build, say — books it inside the headline instead. **Quote both numbers, or
+the comparison silently rewards deferring Figma rather than being faster.** The two clocks also collapsed
+into one here: with the checkpoint before the first Figma call, agent time and total elapsed are the same
+number, which is the cleanest reading the split has produced.
+
+**Run 3 is the first run to benefit from a previous run's lessons, and they paid.** Run 2's furniture rule
+fired immediately: the fitted import arrived with every gridline and tick at **0.626px** and the gridline
+dash at **[2.503, 2.503]**, and the one prescribed sweep put all of it back to 1px / `[4, 4]` before any
+check ran. Without that rule this would have been a third defect for the gate to find, at a
+diagnose-fix-reverify cycle apiece. That is the accumulation the number exists to detect.
+
+**Where run 3's own 24 calls went, and the 2 that were rework.** One was a second fit: the chart was
+solved and fitted to the full 508 content width, and only then did the single-series end dot turn out to
+overhang it, forcing a rescale to 503 plus a re-restore of the type ladder and every furniture stroke.
+One was the `source-line-weight` fix. **Both were preventable from documentation that already existed or
+now does** — which is the useful form of this row: rework that no rule covers is a lesson, rework that a
+rule covers is a reading failure, and these were one of each. See the lessons folded in below.
+
+> **One honesty note on the pass.** Run 3 relayed the `type,geometry` and `series` slices byte-verbatim,
+> but hand-shortened some *detail strings* in the `annotations` slice to fit the message. No threshold,
+> comparison or classification was touched, so the verdicts stand — but this is precisely the edit
+> CHECKS.md warns about, where a corruption yields a wrong verdict rather than an error. **Relay all
+> three verbatim**; the slices are sized to fit and there is no reason to trim them.
 
 **Read that as two different runs, not a 17-minute regression — and quote the split, never the total.**
 Run 1 never executed the Step 8c script; run 2 ran every group, and relaying them verbatim accounts for
@@ -102,6 +142,21 @@ What the pass bought for that time, both invisible on screen and both passed by 
 measurements: a **2.28px `box-alignment` failure** (a hidden node's ancestor groups still counting toward
 the chart group's box) and **furniture left mid-scale** (tick marks at 0.666px, gridline dash at
 `[2.663, 2.663]`). Both are now rules in FITTING.md, so the next run should not re-find them.
+
+**What run 3 sent back into the skill** — three edits, none of them on this page:
+
+| Lesson | Went to |
+|---|---|
+| `<slug>.csv` ignores `country=` and `time=` and returns EVERY entity; a year-keyed dict then collapses ~200 countries into one plausible, wrong series. No parameter fixes it — `csvType=filtered` still returns 174. | [GOTCHAS.md](GOTCHAS.md) |
+| On a single-series line chart taking an under-line end label, solve the export against `contentW − dotRadius`, not `contentW` — otherwise the end dot overhangs and costs a whole second fit. | [per-chart-type/line.md](per-chart-type/line.md) |
+| The `Data source:` slot's weight collapse is already documented, 114 lines below the bullet that tells you to write it — so the bullet now points at it. | [TEXTS.md](TEXTS.md) |
+
+The first is the one that mattered. It is not a Figma bug and not a chart-type quirk: it is a data
+endpoint that answers a *different question* than the one asked, plausibly, with no error. The wrong
+series was monotonic and well-formed, and it said Chile's democracy *improved* under Pinochet — which
+only got caught because the rendered SVG's own path disagreed with it. **The general habit that saved it
+is worth more than the specific trap: the exported SVG is the ground truth for what the reader will see,
+so cross-check any number you are about to print against the geometry you are about to import.**
 
 **A correction to this page's own rationale, which run 2 falsified.** *Why this one* claims the two
 annotations force "the curvy arrows, and therefore the Step 8c pixel probes — the arrow-gap check". They
