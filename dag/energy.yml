@@ -264,9 +264,13 @@ steps:
       - data://meadow/energy/2026-02-06/global_historical_electricity:
         - snapshot://energy/2026-02-06/global_historical_electricity.zip
     # UK BEIS historical electricity, merged here to extend the UK series back to ~1920.
-    - data://garden/uk_beis/2023-12-12/uk_historical_electricity:
-      - data://meadow/uk_beis/2023-12-12/uk_historical_electricity:
+    - data://garden/uk_beis/2026-09-01/uk_historical_electricity:
+      - data://meadow/uk_beis/2026-09-01/uk_historical_electricity:
         - snapshot://uk_beis/2023-12-12/uk_historical_electricity.xls
+    # DESNZ estimated UK electricity generation by fuel, 1920-2020.
+    - data://garden/uk_desnz/2026-09-01/uk_electricity_capacity_and_generation:
+      - data://meadow/uk_desnz/2026-09-01/uk_electricity_capacity_and_generation:
+        - snapshot://uk_desnz/2026-09-01/uk_electricity_capacity_and_generation.xlsx
   data://grapher/energy/2026-06-30/electricity_mix:
     - data://garden/energy/2026-06-30/electricity_mix
   export://multidim/energy/latest/electricity_mix:
