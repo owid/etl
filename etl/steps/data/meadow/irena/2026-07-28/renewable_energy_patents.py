@@ -7,7 +7,8 @@ paths = PathFinder(__file__)
 
 # Columns to use from raw data and how to rename them.
 COLUMNS = {
-    "Country": "country",
+    # NOTE: This column used to be called "Country" (until the February 2025 edition).
+    "Country/area": "country",
     "Year": "year",
     "Sector": "sector",
     "Technology": "technology",

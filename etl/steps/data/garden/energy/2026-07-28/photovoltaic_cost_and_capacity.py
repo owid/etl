@@ -26,15 +26,24 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current data step.
 paths = PathFinder(__file__)
 
-# Conversion factors.
 # IRENA costs are given in the latest year's USD, so we convert other costs to the same currency.
-LATEST_YEAR = 2024
-# Convert 2004 USD and 2013 USD to LATEST_YEAR USD using the World Bank's GDP deflator:
-# https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS.AD?locations=US
-# Download the excel file, and divide the value for the latest year by the value of 2004 (79.0769459998626):
-USD2004_TO_USDLATEST = 1.58
-# Similarly, divide the value for the latest year by the value of 2013 (94.7705183765681):
-USD2013_TO_USDLATEST = 1.32
+LATEST_YEAR = 2025
+
+
+def get_usd_conversion_factor(from_year: int) -> float:
+    """Get the factor to convert constant US$ of a given year into constant US$ of LATEST_YEAR, using the US GDP
+    deflator (linked series).
+
+    NOTE: The factor is returned as a plain float so that the deflator's metadata (from WDI, which is used as an
+    auxiliary dataset) does not propagate into the indicators.
+    """
+    ds_deflator = paths.load_dataset("owid_deflator")
+    tb_deflator = ds_deflator.read("owid_deflator")
+    us = tb_deflator[tb_deflator["country"] == "United States"].set_index("year")["gdp_deflator_linked"]
+    factor = float(us.loc[LATEST_YEAR] / us.loc[from_year])
+    assert 1.0 <= factor < 2.0, f"Unexpected US deflator factor from {from_year} to {LATEST_YEAR}."
+
+    return factor
 
 
 def prepare_capacity_data(tb_nemet: Table, tb_irena_capacity: Table) -> Table:
@@ -85,7 +94,7 @@ def prepare_cost_data(tb_nemet: Table, tb_irena_cost: Table, tb_farmer_lafond: T
     tb_nemet_cost = tb_nemet[["year", "cost"]].copy()
     tb_nemet_cost["cost_source"] = "Nemet (2009)"
     # Costs are given in "2004 USD/watt", so we need to convert them to the latest year USD.
-    tb_nemet_cost["cost"] *= USD2004_TO_USDLATEST
+    tb_nemet_cost["cost"] *= get_usd_conversion_factor(from_year=2004)
     tb_nemet_cost["cost"].metadata.unit = f"constant {LATEST_YEAR} US$ per watt"
 
     # Prepare solar photovoltaic cost data from Farmer & Lafond (2016).
@@ -97,7 +106,7 @@ def prepare_cost_data(tb_nemet: Table, tb_irena_cost: Table, tb_farmer_lafond: T
     )
     tb_farmer_lafond["cost_source"] = "Farmer & Lafond (2016)"
     # Costs are given in "2013 USD/Wp", so we need to convert them to the latest year USD.
-    tb_farmer_lafond["cost"] *= USD2013_TO_USDLATEST
+    tb_farmer_lafond["cost"] *= get_usd_conversion_factor(from_year=2013)
     tb_farmer_lafond["cost"].metadata.unit = f"constant {LATEST_YEAR} US$ per watt"
 
     # Prepare solar photovoltaic cost data from IRENA.
@@ -105,8 +114,10 @@ def prepare_cost_data(tb_nemet: Table, tb_irena_cost: Table, tb_farmer_lafond: T
 
     tb_irena_cost["cost_source"] = "IRENA"
     # Costs are given in latest year "USD/W", so we do not need to correct them.
+    # NOTE: The series ends in 2024 (IRENA discontinued the global module price index after the Renewable Power
+    #  Generation Costs in 2024 report), but its values are expressed in constant US$ of LATEST_YEAR.
     error = "IRENA data has changed, prices may need to be deflated to the latest year."
-    assert tb_irena_cost["year"].max() == LATEST_YEAR, error
+    assert tb_irena_cost["cost"].metadata.unit == f"constant {LATEST_YEAR} US$ per watt", error
 
     # Combine Nemet (2009) and Farmer & Lafond (2016), prioritizing the former.
     combined = combine_two_overlapping_dataframes(df1=tb_nemet_cost, df2=tb_farmer_lafond, index_columns="year")
