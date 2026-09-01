@@ -24,8 +24,6 @@ KEYS = (
     "timelineMaxTime",
     "stackMode",
     "hasMapTab",
-    "yAxis",
-    "xAxis",
     "title",
     "subtitle",
     "note",
@@ -55,16 +53,14 @@ def fetch(slug: str) -> dict[str, Any] | None:
     return json.loads(raw) if isinstance(raw, str) else raw
 
 
-def _clean_axis(axis: dict[str, Any]) -> dict[str, Any]:
-    """Drop axis bounds that are grapher's auto-scale sentinel rather than a real limit.
-
-    ``yAxis: {"max": 0}`` means "scale automatically", not "cap the axis at zero" — the default
-    for a great many charts. Passing it through unexplained produced confident false positives
-    ("the y-axis maximum is set to 0, breaking the chart") on ``wheat-production`` and
-    ``cocoa-bean-production``, both of which render perfectly. ``min: 0`` is left alone: starting
-    an axis at zero is a real and common choice.
-    """
-    return {k: v for k, v in axis.items() if not (k == "max" and v == 0)}
+# Axis bounds are deliberately NOT shown to the model. `yAxis: {"max": 0, "min": 0}` is
+# grapher's auto-scale default, not a zero ceiling or floor, and passing it through produced
+# three confident false positives in two sweeps — "the y-axis maximum is set to 0, which
+# collapses the y-axis" on wheat-production and cocoa-bean-production, and "the Y-axis is fixed
+# to a minimum of 0%, truncating negative growth values" on weekly-growth-covid-deaths — against
+# zero true findings. Filtering just the zeros was tried first and was not enough: the model
+# reasons about whichever half survives. If axis bounds are ever worth checking, compare them
+# against the data range in code, where a sentinel can be handled exactly rather than described.
 
 
 def summarize(config: dict[str, Any]) -> list[str]:
@@ -72,8 +68,6 @@ def summarize(config: dict[str, Any]) -> list[str]:
     lines = ["\nchart configuration (what this chart is set to show):"]
     for key in KEYS:
         value = config.get(key)
-        if key in ("yAxis", "xAxis") and isinstance(value, dict):
-            value = _clean_axis(value)
         if value in (None, "", [], {}):
             continue
         if key in ("title", "subtitle", "note"):

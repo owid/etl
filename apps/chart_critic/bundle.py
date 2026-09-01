@@ -60,6 +60,10 @@ class Bundle:
     data_available: bool = True
     notes: list[str] = field(default_factory=list)
     from_cache: bool = False
+    # True when the render was requested and the service refused it, as opposed to not asked for.
+    # Without this distinction a chart whose render 500s looks like an incomplete cache entry and
+    # is re-fetched in full on every run — and those are often the charts with the largest CSVs.
+    render_failed: bool = False
     # Query params for a second view worth reviewing: the entities holding the highest and
     # lowest value in the series, which is where implausible numbers tend to live and which the
     # default view almost never shows.
@@ -155,7 +159,7 @@ def build(
     cache_key = f"{slug}?{params}" if params else slug
     if use_cache:
         cached = cache.read_bundle(cache_key, ttl_hours=ttl_hours)
-        if cached and (cached.get("png") is not None or not with_image):
+        if cached and (cached.get("png") is not None or cached.get("render_failed") or not with_image):
             return Bundle(
                 slug=slug,
                 png=cached["png"] if with_image else None,
@@ -164,6 +168,7 @@ def build(
                 notes=list(cached["notes"]),
                 from_cache=True,
                 extremes_params=cached.get("extremes_params", ""),
+                render_failed=bool(cached.get("render_failed")),
             )
 
     bundle = Bundle(slug=slug)
@@ -231,11 +236,18 @@ def build(
             # mdim views fail far more often than ordinary charts.
             # Either way, metadata and values are still worth reviewing, so carry on without a picture.
             bundle.png = None
+            bundle.render_failed = True
             bundle.notes.append(f"no render available (HTTP {e.code}) — reviewed without the image")
 
     if use_cache:
         cache.write_bundle(
-            cache_key, bundle.summary, bundle.png, bundle.notes, bundle.data_available, bundle.extremes_params
+            cache_key,
+            bundle.summary,
+            bundle.png,
+            bundle.notes,
+            bundle.data_available,
+            bundle.extremes_params,
+            bundle.render_failed,
         )
 
     return bundle

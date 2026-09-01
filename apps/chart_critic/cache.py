@@ -112,6 +112,7 @@ def write_bundle(
     notes: list[str],
     data_available: bool,
     extremes_params: str = "",
+    render_failed: bool = False,
 ) -> None:
     meta_path, png_path = bundle_paths(slug)
     meta_path.parent.mkdir(parents=True, exist_ok=True)
@@ -122,6 +123,7 @@ def write_bundle(
                 "notes": notes,
                 "data_available": data_available,
                 "extremes_params": extremes_params,
+                "render_failed": render_failed,
             },
             indent=1,
         )

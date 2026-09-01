@@ -101,8 +101,9 @@ CASES: list[Case] = [
         why="Renders fine. Its config carries yAxis {'max': 0, 'min': 0}, which is grapher's "
         "auto-scale sentinel, not a zero ceiling.",
         guards_against="Adding the chart config to the bundle made the critic report 'the y-axis maximum "
-        "is set to 0, breaking the chart' at high confidence, on this chart and cocoa-bean-production. "
-        "Fixed by dropping max: 0 from the config summary.",
+        "is set to 0, breaking the chart' at high confidence, here and on cocoa-bean-production; a third "
+        "variant appeared on weekly-growth-covid-deaths. Fixed by dropping axis bounds from the config "
+        "summary entirely — three false positives, no true ones.",
     ),
     Case(slug="literacy", why="An ordinary chart. Nothing wrong with it."),
     Case(slug="real-gdp-growth", why="An ordinary chart, and one where year-to-year swings are genuine."),
