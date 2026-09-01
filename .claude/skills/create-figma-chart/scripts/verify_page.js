@@ -747,13 +747,21 @@ const checkFrame = async (frameId) => {
       // A shared set of allowed numbers is the wrong shape: it rejects a valid 1px context line whose
       // halo is the required 2px, and accepts nonsense like a 4px `line__` beside a 1px `outline__`.
       // The bar is a RELATIONSHIP — context 1, protagonist 3, halo 2x (or line+1 where nothing crosses).
+      // The two flags COMPOSE: a small-multiples chart can also carry a highlight, and this branch runs
+      // first, so reading HOUSE_LINE here would judge a faceted frame against the house protagonist no
+      // matter what CONFIG.faceted says. That fails a correct 2px faceted protagonist and passes an
+      // incorrect 3px one — the row confidently inverted on the one frame that sets both. Only the
+      // protagonist number moves; the muted context stays 1 (it is the FLOOR of the relationship, not a
+      // scaled-down house weight) and the halo is already derived from its own paired line.
+      const proto = CONFIG.faceted ? FACET_LINE : HOUSE_LINE;
+      const which = CONFIG.faceted ? "faceted" : "house";
       const lineW = {};
       for (const s of series) if (s.seriesKind !== "outline") lineW[s.seriesName] = s.w;
       const bad = [];
       for (const s of series) {
         if (!s.seriesKind) continue;
         if (s.seriesKind !== "outline") {
-          if (!(Math.abs(s.w - 1) < 0.05 || Math.abs(s.w - HOUSE_LINE) < 0.05)) bad.push(`${s.name} ${r(s.w)} — a series line is 1 (muted context) or ${HOUSE_LINE} (protagonist)`);
+          if (!(Math.abs(s.w - 1) < 0.05 || Math.abs(s.w - proto) < 0.05)) bad.push(`${s.name} ${r(s.w)} — a series line is 1 (muted context) or ${proto} (${which} protagonist)`);
         } else {
           const lw = lineW[s.seriesName];
           if (lw === undefined) { bad.push(`${s.name} has no paired series line for ${s.seriesName} to size its halo against`); continue; }
@@ -762,7 +770,7 @@ const checkFrame = async (frameId) => {
         }
       }
       add("series-weight", bad.length ? "FAIL" : "ok",
-          bad.length ? bad.join("; ") : `all ${series.length} series stroke(s) hold the highlight relationship (line 1 or ${HOUSE_LINE}; halo 2x or line+1)`);
+          bad.length ? bad.join("; ") : `all ${series.length} series stroke(s) hold the ${which} highlight relationship (line 1 or ${proto}; halo 2x or line+1)`);
     } else {
       // The pair is line + (line+1), which reproduces the house 3/4 exactly and gives a faceted
       // frame 2/3. One number moves, so a faceted chart is not a second rule to keep in step.

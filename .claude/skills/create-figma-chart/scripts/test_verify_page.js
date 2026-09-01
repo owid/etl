@@ -1894,6 +1894,39 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
           /house 3\/4/.test(row(house, "series-weight").detail), row(house, "series-weight").detail);
   }
 
+  // 43 — the two flags COMPOSE. highlightTreatment takes its own branch, which read HOUSE_LINE
+  // directly, so a faceted highlight chart was judged against the house protagonist regardless of
+  // CONFIG.faceted: the correct 2px frame FAILED and an over-heavy 3px one PASSED. A row that
+  // inverts is worse than one that is silent, so both directions are pinned here.
+  {
+    const both = { faceted: true, highlightTreatment: true };
+
+    // 2px protagonist + its 3px halo (line+1), faceted AND highlighted: correct, and previously failed.
+    const okFacetHi = await run(buildFrame({ lineWeight: 2 }), both);
+    check("43 a 2px faceted highlight chart passes", row(okFacetHi, "series-weight").status === "ok", row(okFacetHi, "series-weight").detail);
+    check("43 and the verdict names the faceted regime",
+          /faceted highlight relationship/.test(row(okFacetHi, "series-weight").detail), row(okFacetHi, "series-weight").detail);
+
+    // The house protagonist is now WRONG here — this is the one that used to pass.
+    const heavy = await run(buildFrame({ lineWeight: 3 }), both);
+    check("43 a 3px protagonist declared faceted FAILS", row(heavy, "series-weight").status === "FAIL", row(heavy, "series-weight").detail);
+    check("43 and it asks for the faceted protagonist",
+          /2 \(faceted protagonist\)/.test(row(heavy, "series-weight").detail), row(heavy, "series-weight").detail);
+
+    // The muted context line is the FLOOR of the relationship, not a scaled house weight, so it
+    // stays 1 under faceting — a 1px context line with its 2px halo must still pass.
+    const muted = await run(buildFrame({ lineWeight: 1 }), both);
+    check("43 a 1px muted context still passes when faceted", row(muted, "series-weight").status === "ok", row(muted, "series-weight").detail);
+
+    // And plain highlight, undeclared, still holds the house bar exactly as before.
+    const houseHi = await run(buildFrame({ lineWeight: 3 }), { highlightTreatment: true });
+    check("43 the house highlight bar is unchanged", row(houseHi, "series-weight").status === "ok", row(houseHi, "series-weight").detail);
+    check("43 and it names the house regime",
+          /house highlight relationship/.test(row(houseHi, "series-weight").detail), row(houseHi, "series-weight").detail);
+    const facetWeightUndeclared = await run(buildFrame({ lineWeight: 2 }), { highlightTreatment: true });
+    check("43 a 2px protagonist undeclared still FAILS", row(facetWeightUndeclared, "series-weight").status === "FAIL", row(facetWeightUndeclared, "series-weight").detail);
+  }
+
   // 41 — the shared-colour note must know about faceting. Two categories on one colour is a real
   // finding on an ordinary chart and the DESIGN on a small-multiples one, where every panel draws
   // the same series in the same colour. Ungated it fires on every faceted frame, and a warning that

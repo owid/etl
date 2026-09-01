@@ -10,6 +10,7 @@ a wrong verdict rather than failing. The cases below are the ones that have actu
 
 from __future__ import annotations
 
+import json
 import re
 import shutil
 import subprocess
@@ -347,6 +348,27 @@ _both = _run_cfg("--rows", "series", "--frame-id", "12:34", "--config", "faceted
 check("--frame-id and --config compose",
       'frameId: "12:34",' in _both.stdout and "faceted: true," in _both.stdout,
       _both.stdout[:200])
+
+# A string value must be ESCAPED, not just wrapped in a pair of quotes. The slice is pasted straight
+# into use_figma, so a value carrying a double quote or a backslash closed the string early and the
+# plugin got a syntax error with nothing in it pointing back at the flag that caused it. The emitted
+# value has to parse as JavaScript, so the assertion is that the CONFIG block still parses — checking
+# only that the characters survived would pass on the broken output too.
+_quoted = _run_cfg("--rows", "series", "--config", 'chartName=A "quoted" chart')
+check("--config escapes a double quote", _quoted.returncode == 0, _quoted.stderr[:200])
+check("and emits it as one valid JS string",
+      r'chartName: "A \"quoted\" chart",' in _quoted.stdout, _quoted.stdout[:300])
+
+_slash = _run_cfg("--rows", "series", "--config", r"chartName=share\rate")
+check("--config escapes a backslash", r'chartName: "share\\rate",' in _slash.stdout, _slash.stdout[:300])
+
+# json.loads is the arbiter: it accepts exactly the string syntax JavaScript does, so a value that
+# round-trips through it is one the plugin can parse.
+_emitted = re.search(r"\n\s*chartName:\s*(\"(?:[^\"\\]|\\.)*\"),", _quoted.stdout)
+check("the escaped value round-trips", _emitted is not None, _quoted.stdout[:300])
+check("and decodes back to what was asked for",
+      _emitted is not None and json.loads(_emitted.group(1)) == 'A "quoted" chart',
+      _emitted.group(1) if _emitted else "no match")
 
 bad = [r for r in results if not r[1]]
 for name, ok, detail in results:

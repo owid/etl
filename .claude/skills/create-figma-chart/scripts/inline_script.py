@@ -448,7 +448,13 @@ def main() -> int:
             key, _, val = pair.partition("=")
             key, val = key.strip(), val.strip()
             if val not in ("true", "false", "null") and not re.fullmatch(r"-?\d+(?:\.\d+)?", val):
-                val = '"' + val.strip('"\'') + '"'
+                # json.dumps, not a hand-built pair of quotes. JSON string syntax is a subset of
+                # JavaScript's, so this is the escaping the emitted slice needs — and the slice is
+                # pasted STRAIGHT into use_figma. A value carrying a double quote or a backslash
+                # (`--config 'chartName=A "quoted" chart'`) closes the string early and what reaches
+                # the plugin is a syntax error whose cause is nowhere in the message, which is the
+                # same paste-time corruption the cap check below refuses to risk.
+                val = json.dumps(val.strip("\"'"))
             body, n = re.subn(
                 rf"(\n\s*{re.escape(key)}:\s*)[^,\n]*(,)",
                 lambda m: f"{m.group(1)}{val}{m.group(2)}",
