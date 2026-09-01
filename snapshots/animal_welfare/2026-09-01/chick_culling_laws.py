@@ -31,7 +31,7 @@ BANS = [
         "year_effective": 2021,
         "source": "Walloon Government communiqué, 3 July 2025 (Communiqué du Gouvernement de Wallonie, 3 juillet 2025)",
         "url": "https://www.wallonie.be/fr/acteurs-et-institutions/wallonie/gouvernement-de-wallonie/communiques-presse/2025-07-03-0",
-        "note": "Regional measures only: Wallonia banned the grinding of live chicks (a ban on gassing is under discussion), and Flanders approved a ban on killing day-old chicks in its Animal Welfare Code, which will only take effect on a date yet to be decided.",
+        "note": "Regional measures only: Wallonia banned the grinding of live chicks (a ban on gassing is under discussion), and Flanders approved [a ban on killing day-old chicks](https://www.vlaamsparlement.be/nl/actueel/nieuws-uit-het-vlaams-parlement/wanneer-komt-er-een-verbod-op-het-doden-van-eendagshaantjes) in its Animal Welfare Code, which will only take effect on a date yet to be decided.",
     },
     {
         "country": "France",
@@ -114,7 +114,7 @@ CITATION_INTRO = (
 
 CITATION_CLOSING = (
     "All other countries are shown as not banned: no law against chick culling is known there. For European Union "
-    "countries, the report above confirms that only Austria, France, Germany, and Italy have adopted legislation."
+    "countries, this is confirmed (as of December 2024) by the report above."
 )
 
 
