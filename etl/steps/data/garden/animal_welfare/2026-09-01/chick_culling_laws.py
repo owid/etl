@@ -52,6 +52,9 @@ def run() -> None:
     )
     tb = pr.concat([tb, tb_added], ignore_index=True)
 
+    # Run sanity checks on outputs.
+    sanity_check_outputs(tb=tb, tb_regions=tb_regions)
+
     # Set an appropriate index and sort conveniently.
     tb = tb.format(keys=["country"], short_name=paths.short_name)
 
@@ -86,3 +89,19 @@ def sanity_check_inputs(tb: Table, tb_regions: Table) -> None:
         "Check whether it is now in effect and update the snapshot accordingly."
     )
     assert (tb[tb["status"] == STATUS_BANNED_NOT_EFFECTIVE]["year_effective"] >= CURRENT_YEAR).all(), error
+
+
+def sanity_check_outputs(tb: Table, tb_regions: Table) -> None:
+    countries_expected = set(
+        tb_regions[
+            (tb_regions["region_type"] == "country")
+            & (~tb_regions["is_historical"])
+            & (tb_regions["defined_by"] == "owid")
+        ]["name"]
+    )
+    error = "Output should contain exactly one row for each current country."
+    assert set(tb["country"]) == countries_expected, error
+    assert not tb["country"].duplicated().any(), error
+
+    error = "There were missing or undefined statuses in the output."
+    assert tb["status"].isin(STATUS_ALL).all(), error
