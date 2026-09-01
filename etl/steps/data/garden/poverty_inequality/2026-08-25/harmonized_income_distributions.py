@@ -865,25 +865,45 @@ def national_survey_percentiles(tb_percentiles: Table) -> Table:
 def adjust_consumption_to_income(tb_pip: Table, tb_model: Table, tb_welfare: Table) -> Table:
     """The income-basis PIP series: consumption country-years mapped through the fitted model
     (income countries and countries absent from the welfare lookup pass through unchanged)."""
+    # STEP 1 — start from a copy of the raw PIP rows, relabelled as the new series. The raw `pip`
+    # series is untouched; this one becomes `pip_income_basis`, the base the top adjustment builds
+    # on. (Column origins are attached explicitly at the end of run(), in format_with_origins, so
+    # the numpy assignments below are free to replace column contents.)
     tb = tb_pip.copy()
     tb["series"] = TOP_ADJUSTMENT_BASE_SERIES
 
-    # The model's percentile for each bin follows from its position: 1% bins map 1:1, and every
-    # bin inside the top 1% uses the p=100 coefficients.
+    # STEP 2 — pick each bin's regression. The model fits one (alpha, beta) per whole percentile
+    # 1..100, so the 99 one-percent bins map 1:1 (bin_index 0 = p0p1 -> percentile 1, ...) and the
+    # ten finer bins inside the top 1% all share the p=100 coefficients. A non-positive beta would
+    # let the mapping reverse the ranking of two bins, so it is asserted away.
     k = np.minimum(tb["bin_index"].to_numpy() + 1, 100)
     alpha = tb_model.set_index("percentile")["alpha"]
     beta = tb_model.set_index("percentile")["beta"]
     assert (beta > 0).all(), "Non-positive beta in the consumption->income model."
 
+    # STEP 3 — which rows to transform: the welfare lookup's `adjusted` flag, joined per
+    # (country, year), marks the consumption country-years. The left join keeps tb's row order
+    # (the lookup is unique on its key), and countries absent from the lookup — no national PIP
+    # survey — get NaN, filled to False: their values pass through unchanged.
     consumption = tb.merge(tb_welfare[["country", "year", "adjusted"]], on=["country", "year"], how="left")[
         "adjusted"
     ].fillna(False)
     consumption = consumption.to_numpy(dtype=bool)
 
+    # STEP 4 — the mapping itself, in levels: ln(income) = alpha + beta * ln(consumption)
+    # exponentiates to income = e^alpha * consumption^beta, applied bin by bin with that bin's own
+    # coefficients, and written only where the mask is True.
     avg = tb["avg"].to_numpy(dtype=float)
     adjusted_avg = np.exp(alpha.loc[k].to_numpy()) * avg ** beta.loc[k].to_numpy()
     tb["avg"] = np.where(consumption, adjusted_avg, avg)
 
+    # STEP 5 — repair the profiles the mapping breaks. The coefficients are not monotone in the
+    # percentile (p1's beta is the only one below 1, on the worst fit of the hundred), so at the
+    # sub-$1 levels found at the bottom of poor countries a monotone consumption profile can come
+    # out non-monotone. Isotonic regression projects each violating country-year back onto the
+    # monotone cone, population-weighted and mean-preserving (see enforce_monotone), and the
+    # re-check asserts nothing slipped through. The False branch keeps the raw fitted profile, as
+    # the source project did.
     non_monotone = check_monotone_within_groups(tb.loc[consumption])
     if non_monotone:
         if ENFORCE_MONOTONE_INCOME_BASIS:
@@ -896,6 +916,8 @@ def adjust_consumption_to_income(tb_pip: Table, tb_model: Table, tb_welfare: Tab
                 f"Non-monotone income-basis distributions (kept, as in the source project): {non_monotone[:10]}"
             )
 
+    # STEP 6 — `avg` changed, so each bin's share of its country-year's total income is stale;
+    # rebuild it from avg * pop.
     tb = recompute_shares(tb)
     return tb
 
