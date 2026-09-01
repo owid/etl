@@ -35,7 +35,7 @@ def run() -> None:
     # Process data.
     #
     # Run sanity checks on inputs.
-    sanity_check_inputs(tb=tb)
+    sanity_check_inputs(tb=tb, tb_regions=tb_regions)
 
     # Add all countries that are not in the data, assuming chick culling is not banned there.
     # NOTE: Chick culling bans are notable legislative events that animal advocacy organizations track closely, so a
@@ -65,9 +65,15 @@ def run() -> None:
     ds_garden.save()
 
 
-def sanity_check_inputs(tb: Table) -> None:
+def sanity_check_inputs(tb: Table, tb_regions: Table) -> None:
     error = f"Undefined status of banning: {set(tb['status']) - STATUS_ALL}"
     assert set(tb["status"]) <= STATUS_ALL, error
+
+    error = (
+        "Country names in the snapshot that are not canonical OWID country names "
+        f"(they would create duplicated entities): {set(tb['country']) - set(tb_regions['name'])}"
+    )
+    assert set(tb["country"]) <= set(tb_regions["name"]), error
 
     error = "Duplicated countries found in the snapshot data."
     assert not tb["country"].duplicated().any(), error
