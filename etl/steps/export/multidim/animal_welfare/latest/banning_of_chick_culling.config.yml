@@ -25,8 +25,21 @@ views:
         colorScale:
           baseColorScheme: "BinaryMapPaletteA"
           customNumericColorsActive: true
+          # NOTE: The grapher step embeds each country's effective year in the status value; an effective
+          # year appearing for the first time in a future update must be added here too.
           customCategoryColors:
-            Banned: "#759ac8"
+            "Banned (2018)": "#759ac8"
+            "Banned (2022)": "#759ac8"
+            "Banned (2023)": "#759ac8"
+            "Partially banned (2020)": "#a46f49"
+            "Partially banned (2021)": "#a46f49"
+            "Banned but not yet in effect (2026)": "#058580"
             "Not banned": "#ae2e3f"
-            "Partially banned": "#a46f49"
-            "Banned but not yet in effect": "#058580"
+          customCategoryLabels:
+            "Banned (2018)": "Banned"
+            "Banned (2022)": "Banned"
+            "Banned (2023)": "Banned"
+            "Partially banned (2020)": "Partially banned"
+            "Partially banned (2021)": "Partially banned"
+            "Banned but not yet in effect (2026)": "Banned but not yet in effect"
+            "Not banned": "Not banned"

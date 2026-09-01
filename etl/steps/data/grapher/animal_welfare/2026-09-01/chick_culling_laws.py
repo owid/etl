@@ -1,4 +1,13 @@
-"""Load a garden dataset and create a grapher dataset."""
+"""Load a garden dataset and create a grapher dataset.
+
+Following the same approach as the net_zero_tracker grapher step, each country's effective year is
+embedded in the status value (e.g. "Banned (2023)") purely for the map visualization: the chart's custom
+category labels and colors relabel every status-year value back to its plain status with a shared color,
+and grapher collapses the identical legend entries into a single swatch, while the map tooltip shows when
+the law takes (or took) effect.
+NOTE: the chart config lists each status-year value, so an effective year appearing for the first time in
+a future update must be added there too.
+"""
 
 from etl.helpers import PathFinder
 
@@ -33,6 +42,14 @@ def run() -> None:
     assert (status_unknown := (set(tb["status"]) - STATUS_ALL)) == set(), (
         f"Undefined status of banning: {status_unknown}"
     )
+
+    # Embed each country's effective year in the status value so it shows in the map tooltip.
+    status = tb["status"]
+    is_banned = status != STATUS_NOT_BANNED
+    with_year = status.astype("string") + " (" + tb["year_effective"].astype("Int64").astype("string") + ")"
+    new_status = status.astype("string")
+    new_status[is_banned] = with_year[is_banned]
+    tb["status"] = new_status.copy_metadata(status)
 
     # Select relevant columns.
     tb = tb[["country", "status"]]

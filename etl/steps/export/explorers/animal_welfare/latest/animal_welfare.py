@@ -237,7 +237,10 @@ def run() -> None:
                         "catalogPath": "chick_culling_laws#status",
                         "display": {
                             "colorScaleScheme": "OwidCategoricalC",
-                            "colorScaleCategoricalBins": "Banned,#759AC8,;Banned but not yet in effect,#058580,;Not banned,#AE2E3F,;Partially banned,#A46F49,;No data,,",
+                            # NOTE: The grapher step embeds each country's effective year in the status
+                            # value; an effective year appearing for the first time in a future update
+                            # must be added here too.
+                            "colorScaleCategoricalBins": "Banned (2018),#759AC8,Banned;Banned (2022),#759AC8,Banned;Banned (2023),#759AC8,Banned;Banned but not yet in effect (2026),#058580,Banned but not yet in effect;Not banned,#AE2E3F,;Partially banned (2020),#A46F49,Partially banned;Partially banned (2021),#A46F49,Partially banned;No data,,",
                         },
                     }
                 ]
