@@ -9,7 +9,7 @@ definitions:
   description_processing_electricity_generation_origins: |-
     - Electricity data from 2000 onwards (and from 1990 onwards for European countries, including Turkey) comes from Ember. Earlier data comes from the Energy Institute.
     - For the World, data before 1965 (going back to 1900) comes from a historical reconstruction by Pinto et al. (2023).
-    - For the United Kingdom, data for earlier years (going back to 1920) comes from the UK's Department for Business, Energy & Industrial Strategy (BEIS), as gross electricity supplied, covering major power producers before 1951 and all generators from 1951 onwards. BEIS reports thermal generation only as a total, without breaking it down into coal, oil and gas, so for the United Kingdom that breakdown is only available from 1985. Between 1965 and 1984, shares for the United Kingdom divide each source's generation (from the Energy Institute) by BEIS's total electricity supplied, which slightly overstates them.
+    - For the United Kingdom, data for earlier years (going back to 1920) comes from estimates of generation by fuel published by the UK's Department for Energy Security and Net Zero (DESNZ). These cover total, coal, oil, gas and fossil generation up to 1984, and nuclear and hydro generation up to 1964, after which the sources above take over.
   # Processing description for indicators that only use Ember data.
   description_processing_only_ember_origins: ""
   # Processing description for the indicators affected by the bioenergy vs other-renewables split
