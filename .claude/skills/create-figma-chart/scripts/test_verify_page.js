@@ -2289,6 +2289,30 @@ const row = (out, name) => out.rows.find((x) => x.check === name);
           row(unread, "within-frame").detail);
   }
 
+  // 49 — the eighth Codex round. `strokeCap` is `figma.mixed` — a SYMBOL — exactly when a path's two
+  // ends differ, which is how a one-ended leader arrow reports, so at least one end carries a
+  // projecting cap; and the ARROW variants paint ink around the endpoint that no butt cap has.
+  // Treating both as butt suppressed the longitudinal outset on precisely the leader shapes
+  // LABELING.md prescribes.
+  {
+    const mixedCap = await run(buildFrame({ fullBleedRule: 3, fullBleedCap: MIXED }), {});
+    check("49 a MIXED-cap full-bleed rule keeps the longitudinal outset and FAILS",
+          row(mixedCap, "within-frame").status === "FAIL"
+          && /left by 1\.5/.test(row(mixedCap, "within-frame").detail)
+          && /right by 1\.5/.test(row(mixedCap, "within-frame").detail),
+          row(mixedCap, "within-frame").detail);
+    const arrowCap = await run(buildFrame({ fullBleedRule: 3, fullBleedCap: "ARROW_EQUILATERAL" }), {});
+    check("49 an ARROW-capped rule is a projecting cap, not a butt",
+          row(arrowCap, "within-frame").status === "FAIL"
+          && /left by 1\.5/.test(row(arrowCap, "within-frame").detail),
+          row(arrowCap, "within-frame").detail);
+    // The negative: the suppressed case is NONE — the shape every gridline and full-bleed rule
+    // actually is, and never mixed — so the butt-cap exemption must keep holding exactly there.
+    const butt = await run(buildFrame({ fullBleedRule: 3 }), {});
+    check("49 a NONE-capped full-bleed rule is still exempt",
+          row(butt, "within-frame").status === "ok", row(butt, "within-frame").detail);
+  }
+
   const bad = results.filter((x) => !x.ok);
   for (const x of results) console.log(`${x.ok ? "PASS" : "FAIL"}  ${x.name}${x.ok ? "" : "  >> " + x.detail}`);
   console.log(bad.length ? `\n${bad.length} FAILURES` : `\nALL PASS (${results.length} checks)`);

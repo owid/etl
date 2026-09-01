@@ -1054,8 +1054,13 @@ const checkFrame = async (frameId) => {
       // so growing all four sides would report a 3px rule spanning the artboard as overhanging left
       // and right by 1.5 each where it paints no pixel at all. That is the fire-on-correct-work
       // failure this file exists to avoid, reached through the cap. ROUND and SQUARE caps DO project
-      // half a weight past the endpoint, so those keep the outset on the path's own axis. A mixed or
-      // arrow cap is treated as butt: erring toward not firing is this row's standing preference.
+      // half a weight past the endpoint, so those keep the outset on the path's own axis. So do a
+      // MIXED cap and the ARROW variants: `strokeCap` is `figma.mixed` — a SYMBOL — exactly when the
+      // two ends DIFFER, which is how a one-ended leader arrow reports, so at least one end carries a
+      // projecting cap; and an arrowhead paints ink around its endpoint that no butt cap has. Treating
+      // both as butt read the prescribed arrow-capped leaders as gridlines. The suppressed case stays
+      // `NONE` — the shape every gridline and full-bleed rule actually is, and never mixed — so the
+      // fire-on-correct-work cases this branch was built for stay closed.
       // The share of that half-weight landing on each AXIS is the perpendicular's own share, so it is
       // full for a rule at right angles to the axis and near zero along the path's own direction.
       // Restricting the exemption to exactly horizontal and vertical paths left every DIAGONAL
@@ -1064,7 +1069,8 @@ const checkFrame = async (frameId) => {
       // over them is taken because one steep segment in an otherwise flat polyline does overhang, and
       // because a corner join reaches past either segment's own perpendicular (an L of one horizontal
       // and one vertical segment lands back on the full outset, which is right).
-      const capped = n.strokeCap === "ROUND" || n.strokeCap === "SQUARE";
+      const capped = n.strokeCap === "ROUND" || n.strokeCap === "SQUARE"
+                  || typeof n.strokeCap === "symbol" || /^ARROW_/.test(n.strokeCap || "");
       if (!capped) {
         const p = perpShare(n) || (b && b.h === 0 && b.w > 0 ? { x: 0, y: 1 }
                                  : b && b.w === 0 && b.h > 0 ? { x: 1, y: 0 } : null);
