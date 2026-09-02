@@ -63,6 +63,36 @@ def fetch(slug: str) -> dict[str, Any] | None:
 # against the data range in code, where a sentinel can be handled exactly rather than described.
 
 
+# Grapher chart types mapped to the tab parameter that shows them.
+_TAB_FOR_TYPE = {
+    "LineChart": "line",
+    "DiscreteBar": "discrete-bar",
+    "SlopeChart": "slope",
+    "StackedArea": "line",
+    "StackedBar": "line",
+    "Marimekko": "marimekko",
+    "ScatterPlot": "scatter",
+}
+
+
+def other_tab(config: dict[str, Any]) -> str | None:
+    """The ``tab=`` parameter for a second view of the same chart, or None if there isn't one.
+
+    Charts that open on the map hide the time dimension entirely, and a series that misbehaves
+    over time is invisible there — which is where problems are most often spotted in practice.
+    So when a chart defaults to the map, look at its time-series tab as well, and vice versa.
+    """
+    default = (config.get("tab") or "").lower()
+    types = [t for t in (config.get("chartTypes") or []) if t in _TAB_FOR_TYPE]
+
+    if default == "map":
+        # chartTypes is often absent, in which case grapher's default applies: a line chart.
+        return f"tab={_TAB_FOR_TYPE[types[0]]}" if types else "tab=line"
+    if config.get("hasMapTab") and default in ("", "chart", "line", "discrete-bar", "slope"):
+        return "tab=map"
+    return None
+
+
 def summarize(config: dict[str, Any]) -> list[str]:
     """Describe the configuration in the same flat style as the rest of the bundle."""
     lines = ["\nchart configuration (what this chart is set to show):"]

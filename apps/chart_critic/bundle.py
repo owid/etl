@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import io
 import json
+import time
 from dataclasses import dataclass, field
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
@@ -68,14 +69,26 @@ class Bundle:
     # lowest value in the series, which is where implausible numbers tend to live and which the
     # default view almost never shows.
     extremes_params: str = ""
+    # ``tab=`` for the chart's other view, when it has one. A map-default chart hides time.
+    other_tab_params: str = ""
 
     @property
     def url(self) -> str:
         return f"{GRAPHER_URL}/{self.slug}"
 
 
-def _fetch(url: str) -> bytes:
-    return urlopen(Request(url, headers=HEADERS), timeout=120).read()
+def _fetch(url: str, attempts: int = 3) -> bytes:
+    """Fetch with a short backoff on 5xx. Transient 503s from the render service and the CSV
+    endpoint were the only failure category left after the bundle bugs were fixed, and a chart
+    lost to one is a chart nobody reviewed."""
+    for attempt in range(attempts):
+        try:
+            return urlopen(Request(url, headers=HEADERS), timeout=120).read()
+        except HTTPError as e:
+            if e.code < 500 or attempt == attempts - 1:
+                raise
+            time.sleep(2 * (attempt + 1))
+    raise RuntimeError("unreachable")
 
 
 def _extremes_params(df: pd.DataFrame, time_col: str, col: str) -> str:
@@ -175,6 +188,7 @@ def build(
                 notes=list(cached["notes"]),
                 from_cache=True,
                 extremes_params=cached.get("extremes_params", ""),
+                other_tab_params=cached.get("other_tab_params", ""),
                 render_failed=bool(cached.get("render_failed")),
             )
 
@@ -227,6 +241,8 @@ def build(
     config = chart_config.fetch(slug) if with_config else None
     if config:
         lines += chart_config.summarize(config)
+        if not params:
+            bundle.other_tab_params = chart_config.other_tab(config) or ""
 
     bundle.summary = "\n".join(lines)
 
@@ -254,6 +270,7 @@ def build(
             bundle.data_available,
             bundle.extremes_params,
             bundle.render_failed,
+            bundle.other_tab_params,
         )
 
     return bundle

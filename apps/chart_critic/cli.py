@@ -236,18 +236,33 @@ def _review_one(
         result["status"] = "not reviewed (dry run)"
         return result
 
+    # The view ladder. Rung 2 is the chart's other tab, because a map-default chart hides the
+    # time dimension entirely and a series misbehaving over time is where problems usually show.
+    # Rung 3 is the entities at the extremes of the data, which the default view rarely includes.
     extra_views: list[tuple[str, bytes]] = []
-    if views > 1 and with_image and bundle.extremes_params:
-        try:
-            extra_views.append(
+    if with_image:
+        rungs = []
+        if views > 1 and bundle.other_tab_params:
+            rungs.append(
                 (
-                    f"the same chart at ?{bundle.extremes_params} — the entities holding the highest and "
-                    "lowest values in the series, which the default view does not show",
-                    render(slug, bundle.extremes_params),
+                    f"the same chart's other tab, at ?{bundle.other_tab_params} — the default view "
+                    "hides what this one shows",
+                    bundle.other_tab_params,
                 )
             )
-        except Exception:  # noqa: BLE001 — a second view is a bonus, not a requirement
-            pass
+        if views > 2 and bundle.extremes_params:
+            rungs.append(
+                (
+                    f"the same chart at ?{bundle.extremes_params} — the entities holding the highest "
+                    "and lowest values in the series, which the default view does not show",
+                    bundle.extremes_params,
+                )
+            )
+        for label, view_params in rungs:
+            try:
+                extra_views.append((label, render(slug, view_params)))
+            except Exception:  # noqa: BLE001 — an extra view is a bonus, not a requirement
+                pass
 
     agent = build_agent(model)
     parts = prompt_parts(bundle, extra_views)
@@ -336,8 +351,9 @@ def _review_one(
     default=1,
     show_default=True,
     help=(
-        "How many views of each chart to show: 1 is the default view; 2 adds the entities holding the "
-        "highest and lowest values, which is where implausible numbers usually hide."
+        "How many views of each chart to show. 1 is the default view; 2 adds the chart's other tab "
+        "(a map-default chart hides time, which is where problems usually show); 3 adds the entities "
+        "holding the highest and lowest values."
     ),
 )
 @click.option(
@@ -588,7 +604,17 @@ def _print_summary(results: list[dict[str, Any]], model: str) -> None:
     if gone:
         console.print(f"[dim]{len(gone)} slugs no longer resolve: {', '.join(r['slug'] for r in gone[:5])}[/dim]")
     if failed:
-        console.print(f"[yellow]{len(failed)} failed[/yellow]: {', '.join(r['slug'] for r in failed[:5])}")
+        # A finding that fires is loud; a chart that was never looked at is silent. So failures
+        # are grouped by cause and the run exits non-zero, rather than being a line nobody reads
+        # under a headline that says everything is clean. A sweep of 100 once lost 11 charts to
+        # two bugs of mine, and one of them was hiding a verified finding.
+        by_cause: dict[str, list[str]] = {}
+        for r in failed:
+            by_cause.setdefault(r["status"], []).append(r["slug"])
+        console.print(f"\n[bold red]{len(failed)} charts were not reviewed[/bold red] — treat the run as incomplete:")
+        for cause, slugs in sorted(by_cause.items(), key=lambda kv: -len(kv[1])):
+            shown = ", ".join(slugs[:4]) + (f" … +{len(slugs) - 4}" if len(slugs) > 4 else "")
+            console.print(f"  [red]{len(slugs):>3}[/red]  {cause}\n       {shown}")
     if cost:
         console.print(f"[dim]cost: ${cost:.4f} (${cost / max(len(results), 1):.4f}/chart) on {model}[/dim]")
 
@@ -596,3 +622,5 @@ def _print_summary(results: list[dict[str, Any]], model: str) -> None:
         "\n[dim]Every finding is a claim to check, not a verdict: confirm it against the data before "
         "filing anything, and remember an error in an indicator affects every chart using it.[/dim]"
     )
+    if failed:
+        raise SystemExit(2)

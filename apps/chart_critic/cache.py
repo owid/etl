@@ -113,6 +113,7 @@ def write_bundle(
     data_available: bool,
     extremes_params: str = "",
     render_failed: bool = False,
+    other_tab_params: str = "",
 ) -> None:
     meta_path, png_path = bundle_paths(slug)
     meta_path.parent.mkdir(parents=True, exist_ok=True)
@@ -124,6 +125,7 @@ def write_bundle(
                 "data_available": data_available,
                 "extremes_params": extremes_params,
                 "render_failed": render_failed,
+                "other_tab_params": other_tab_params,
             },
             indent=1,
         )
