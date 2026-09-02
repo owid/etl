@@ -127,6 +127,17 @@ Do not invent problems. An ordinary chart has no issues, and returning an empty 
 expected outcome for most charts."""
 
 
+def issue_params(target_params: str, issue: dict) -> str:
+    """The query string for the view a finding is about.
+
+    Two things narrow a view and both have to survive: the params the chart was *reviewed* at (an
+    mdim view, or a ``--slugs`` entry carrying its own query string) and the params the model
+    attached to the finding. Dropping the first sends a reader to the multi-dim default, which is
+    a different chart than the one the claim is about.
+    """
+    return "&".join(x for x in (target_params, issue.get("chart_params", "")) if x)
+
+
 def build_agent(model: str = DEFAULT_MODEL) -> Agent[None, Review]:
     """An agent with no system instructions — see :func:`prompt_parts` for why.
 

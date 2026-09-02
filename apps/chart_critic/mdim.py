@@ -26,14 +26,29 @@ from __future__ import annotations
 
 import json
 from typing import Any
+from urllib.parse import urlencode
 
 import numpy as np
 
 SIDE_BY_SIDE = "_side_by_side"
 
 
+class MdimLookupError(Exception):
+    """The mdim registry could not be read — as distinct from the slug not being an mdim.
+
+    The difference matters: returning "not an mdim" when the database is simply unreachable makes
+    ``--mdim-views N`` quietly review the bare slug once and report success, and makes ``--sample``
+    treat every multi-dim page as an ordinary chart. Both are silent losses of exactly the thing
+    the caller asked for.
+    """
+
+
 def config(slug: str) -> dict[str, Any] | None:
-    """The mdim config for a slug, or None if it is not an mdim (or there is no database)."""
+    """The mdim config for a slug, or None if the slug is not a published mdim.
+
+    Raises:
+        MdimLookupError: the registry could not be read at all.
+    """
     try:
         from etl.db import read_sql
 
@@ -41,8 +56,8 @@ def config(slug: str) -> dict[str, Any] | None:
             "SELECT config FROM multi_dim_data_pages WHERE slug = %(slug)s AND published = 1 LIMIT 1",
             params={"slug": slug},
         )
-    except Exception:  # noqa: BLE001 — no database just means mdim views are not enumerated
-        return None
+    except Exception as e:
+        raise MdimLookupError(f"could not read the multi-dim registry: {e}") from e
     if df.empty:
         return None
     raw = df.config.iloc[0]
@@ -70,8 +85,8 @@ def all_published_views(include_side_by_side: bool = False) -> dict[str, list[st
         from etl.db import read_sql
 
         df = read_sql("SELECT slug, config FROM multi_dim_data_pages WHERE published = 1 AND slug IS NOT NULL")
-    except Exception:  # noqa: BLE001 — without a database there is no pool to build
-        return {}
+    except Exception as e:
+        raise MdimLookupError(f"could not read the multi-dim registry: {e}") from e
 
     out: dict[str, list[str]] = {}
     for slug, raw in zip(df.slug, df.config):
@@ -80,7 +95,10 @@ def all_published_views(include_side_by_side: bool = False) -> dict[str, list[st
         if not include_side_by_side:
             views = [v for v in views if not any(str(x).endswith(SIDE_BY_SIDE) for x in v.values())] or views
         if views:
-            out[str(slug)] = ["&".join(f"{k}={v}" for k, v in combo.items()) for combo in views]
+            # Nothing in the schema promises dimension slugs are URL-safe, and an unescaped one
+            # would come back as a bundle failure rather than a wrong answer. Latent today:
+            # audited 2026-09-02, none of the 40 published mdims has a slug needing escaping.
+            out[str(slug)] = [urlencode(combo) for combo in views]
     return out
 
 
@@ -109,6 +127,5 @@ def sample_views(slug: str, n: int, seed: int = 0, include_side_by_side: bool = 
     picked = []
     for i in idx:
         combo = views[int(i)]
-        params = "&".join(f"{k}={v}" for k, v in combo.items())
-        picked.append((", ".join(f"{k}={v}" for k, v in combo.items()), params))
+        picked.append((", ".join(f"{k}={v}" for k, v in combo.items()), urlencode(combo)))
     return picked

@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from apps.chart_critic.bundle import render
+from apps.chart_critic.critic import issue_params
 
 CSS = """
 :root{--bg:#f7f6f3;--panel:#fff;--ink:#1b1b1b;--soft:#4a4a4a;--muted:#767676;--line:#e2ded6;
@@ -53,9 +54,10 @@ footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);font-si
 SEV_CLASS = {"high": "hi", "medium": "md", "low": "lo"}
 
 
-def _finding(result: dict[str, Any], issue: dict[str, Any], png: bytes | None) -> str:
+def _finding(result: dict[str, Any], issue: dict[str, Any], png: bytes | None, params: str) -> str:
     sev = issue.get("severity", "low")
-    url = issue.get("url") or f"https://ourworldindata.org/grapher/{result['slug']}"
+    base = f"https://ourworldindata.org/grapher/{result['slug']}"
+    url = issue.get("url") or (f"{base}?{params}" if params else base)
     parts = [
         f'<div class="f {sev}">',
         '<div class="tags">',
@@ -91,11 +93,15 @@ def write(results: list[dict[str, Any]], path: Path, model: str) -> None:
     cards = []
     for r in flagged:
         for issue in r["issues"]:
+            # Both halves of the view: the params the chart was reviewed at (an mdim view) and
+            # the ones the model attached. Rendering only the latter shows the mdim default —
+            # a different chart than the finding is about.
+            params = issue_params(r.get("params", ""), issue)
             try:
-                png = render(r["slug"], issue.get("chart_params", ""))
+                png = render(r["slug"], params)
             except Exception:  # noqa: BLE001 — a missing render must not break the report
                 png = None
-            cards.append(_finding(r, issue, png))
+            cards.append(_finding(r, issue, png, params))
 
     chips = "\n".join(
         f'<span class="chip"><b>{html.escape(r["slug"])}</b><i>{r["views"]:,}</i></span>'

@@ -130,13 +130,24 @@ def write_bundle(
     )
     if png is not None:
         png_path.write_bytes(png)
+    elif png_path.exists():
+        # Otherwise a refresh with --no-image, or one whose render failed, leaves the previous
+        # image beside a fresh summary — and the next image-enabled run shows the model a picture
+        # of different data than the numbers it is reading.
+        png_path.unlink()
 
 
-def content_hash(summary: str, png: bytes | None) -> str:
-    """Hash of what the model is actually shown, so changed data invalidates its review."""
+def content_hash(summary: str, *images: bytes | None) -> str:
+    """Hash of everything the model is actually shown, so a changed prompt invalidates its review.
+
+    Every image counts, not just the chart's own render: a run with ``--views 2`` shows the model
+    strictly more than a run with ``--views 1``, and hashing only the first made the two share a
+    cache entry — so whichever ran first answered for both.
+    """
     h = hashlib.sha256(summary.encode())
-    if png is not None:
-        h.update(png)
+    for png in images:
+        if png is not None:
+            h.update(png)
     return h.hexdigest()[:12]
 
 

@@ -41,6 +41,7 @@ from apps.chart_critic.critic import (
     DEFAULT_MODEL,
     FALLBACK_PRICES,
     build_agent,
+    issue_params,
     prompt_parts,
 )
 from apps.utils.llms.costs import estimate_llm_cost
@@ -86,7 +87,12 @@ def _expand_mdims(targets: list[tuple[str, int, str]], mdim_views: int, seed: in
         return targets
     expanded: list[tuple[str, int, str]] = []
     for slug, pageviews, params in targets:
-        views = [] if params else mdim.sample_views(slug, mdim_views, seed=seed)
+        try:
+            views = [] if params else mdim.sample_views(slug, mdim_views, seed=seed)
+        except mdim.MdimLookupError as e:
+            # The caller explicitly asked for N views. Reviewing the bare slug once and calling
+            # that done would be a silent substitution of a different, weaker job.
+            raise click.ClickException(f"--mdim-views was requested but {e}") from e
         if not views:
             expanded.append((slug, pageviews, params))
             continue
@@ -108,7 +114,12 @@ def _pool(min_views: int) -> Any:
     import pandas as pd
 
     charts = _pageviews(min_views)
-    views_by_slug = mdim.all_published_views()
+    try:
+        views_by_slug = mdim.all_published_views()
+    except mdim.MdimLookupError as e:
+        # Without the registry every mdim silently becomes an ordinary chart reviewed at its
+        # default view, which is a different sample than the one asked for.
+        raise click.ClickException(f"cannot build the review pool: {e}") from e
 
     rows = []
     for slug, base_views in zip(charts.slug, charts.views_365d):
@@ -266,7 +277,7 @@ def _review_one(
     # chart it raises a genuine finding on some and not others. Measured on three charts with
     # known findings, one pass caught 1-2 of them and three passes caught all three. So a pass
     # count is a recall dial, and at these prices it is cheap to turn up.
-    bundle_hash = cache.content_hash(bundle.summary, bundle.png)
+    bundle_hash = cache.content_hash(bundle.summary, bundle.png, *(png for _, png in extra_views))
 
     # Take every pass already cached for this bundle, not the first --repeat of them. Passes
     # disagree, so replaying a fixed slot that happened to miss froze a chart as "clean" forever;
@@ -361,6 +372,14 @@ def _review_one(
     help="Write a Slack-ready digest of the new findings here, and record them as posted.",
 )
 @click.option(
+    "--post",
+    is_flag=True,
+    help=(
+        "Post the digest to #we-need-to-correct-it instead of only writing it. For scheduled runs, "
+        "where there is no human between the file and the channel. Needs SLACK_API_TOKEN."
+    ),
+)
+@click.option(
     "--eval",
     "run_eval",
     is_flag=True,
@@ -439,6 +458,7 @@ def cli(
     changed_since: int | None,
     include_data_updates: bool,
     digest_out: Path | None,
+    post: bool,
 ) -> None:
     if clear_cache:
         removed, freed = cache.clear()
@@ -510,7 +530,7 @@ def cli(
                 for i in r["issues"]:
                     # Keep the parameters that select the reviewed view, merged with whatever the
                     # model asked for, so an mdim finding links to the view it is about.
-                    merged = "&".join(x for x in (r.get("params", ""), i.get("chart_params", "")) if x)
+                    merged = issue_params(r.get("params", ""), i)
                     i["url"] = chart_link(r["slug"], merged, mdim.dimension_keys(r["slug"]))
                     colour = SEVERITY_COLOR.get(i["severity"], "white")
                     seen = f" [dim]({i['passes']}/{r['passes']} passes)[/dim]" if r.get("passes", 1) > 1 else ""
@@ -530,6 +550,9 @@ def cli(
         report.write(results, output, model=model)
         console.print(f"report → {output}")
 
+    if post and not digest_out:
+        raise click.ClickException("--post needs --digest <path> — the file is the record of what was sent")
+
     if digest_out:
         state = digest.load_state()
         fresh = digest.new_findings(results, state)
@@ -543,9 +566,13 @@ def cli(
         )
         digest_out.write_text(message)
         if message:
-            digest.save_state(digest.stamp(fresh, state))
             console.print(f"\n[bold]digest ({len(fresh)} new finding(s)) → {digest_out}[/bold]")
             console.print(message)
+            if post:
+                # Post before recording, so a failed post is re-attempted tomorrow rather than
+                # marked delivered. Duplicating a finding is a smaller harm than dropping one.
+                _post_digest(message)
+            digest.save_state(digest.stamp(fresh, state))
         else:
             already = sum(len(r["issues"]) for r in results)
             console.print(
@@ -558,6 +585,23 @@ def cli(
     # failed chart suppressed the digest and its state, so the next run re-posted everything.
     if incomplete_run:
         raise SystemExit(2)
+
+
+def _post_digest(message: str) -> None:
+    """Send the digest to the channel, or fail the run.
+
+    Deliberately not tolerant of a missing token: ``send_slack_message`` prints to stdout when
+    ``SLACK_API_TOKEN`` is unset, which in a scheduled build is indistinguishable from a
+    successful post — the failure mode where a job runs green for weeks and nobody notices the
+    channel has been silent.
+    """
+    from etl import config
+    from etl.slack_helpers import send_slack_message
+
+    if not config.SLACK_API_TOKEN:
+        raise click.ClickException("--post needs SLACK_API_TOKEN; refusing to silently print instead")
+    send_slack_message(digest.SLACK_CHANNEL, message)
+    console.print(f"[green]posted to {digest.SLACK_CHANNEL}[/green]")
 
 
 def _evaluate(model: str, with_image: bool, repeat: int, use_cache: bool, ttl_hours: float) -> None:
@@ -576,7 +620,11 @@ def _evaluate(model: str, with_image: bool, repeat: int, use_cache: bool, ttl_ho
         for fut in cf.as_completed(futures):
             case = futures[fut]
             r = fut.result()
-            results.append((case, r, fixtures.matches(case, r["issues"])))
+            # A chart that could not be fetched has no issues, which looks exactly like a clean
+            # review — so a guard case would "pass" on a chart nobody looked at, and the eval
+            # would green-light a critic that never ran.
+            ok = r["status"] == "ok" and fixtures.matches(case, r["issues"])
+            results.append((case, r, ok))
 
     table = Table(title="Known-answer evaluation")
     table.add_column("chart")
@@ -585,7 +633,9 @@ def _evaluate(model: str, with_image: bool, repeat: int, use_cache: bool, ttl_ho
     table.add_column("what the critic said", max_width=54)
     for case, r, ok in sorted(results, key=lambda x: (x[2], x[0].slug)):
         expects = "finds: " + ", ".join(case.expect_keywords) if case.expect_keywords else "nothing"
-        said = "; ".join(i["claim"] for i in r["issues"])[:200] or "—"
+        said = "; ".join(i["claim"] for i in r["issues"])[:200] or (
+            "—" if r["status"] == "ok" else f"[yellow]not reviewed: {r['status']}[/yellow]"
+        )
         verdict = "[green]PASS[/green]" if ok else "[red]FAIL[/red]"
         if case.guards_against and ok:
             verdict += " [dim](guard)[/dim]"
@@ -593,6 +643,12 @@ def _evaluate(model: str, with_image: bool, repeat: int, use_cache: bool, ttl_ho
     console.print(table)
 
     passed = sum(1 for _, _, ok in results if ok)
+    # The gate ignores cases marked flaky. Eight of the nine are deterministic in practice
+    # (15/15 cached passes each), so a failure among those is a regression; the ninth lands
+    # roughly one pass in fifteen, and gating on it would fail most scheduled runs and teach
+    # everyone to ignore the result.
+    regressions = [(c, r) for c, r, ok in results if not ok and not c.flaky]
+    flaky_misses = [c for c, _, ok in results if not ok and c.flaky]
     found = [(c, r) for c, r, ok in results if c.expect_keywords and ok]
     clean_ok = [(c, r) for c, r, ok in results if not c.expect_keywords and ok]
     cost = sum(r["cost"] for _, r, _ in results)
@@ -604,13 +660,19 @@ def _evaluate(model: str, with_image: bool, repeat: int, use_cache: bool, ttl_ho
     )
     for case, r, ok in results:
         if not ok:
-            console.print(f"[red]FAIL[/red] {case.slug}: {case.why}")
+            tag = "[yellow]MISS[/yellow]" if case.flaky else "[red]FAIL[/red]"
+            console.print(f"{tag} {case.slug}: {case.why}")
             if case.guards_against:
                 console.print(f"       this case guards against: {case.guards_against}")
-    if passed < len(results):
+    if flaky_misses:
         console.print(
-            "\n[dim]The model is not reproducible — re-run before treating a single failure as a "
-            "regression. A fixture can also fail because the chart was fixed; check, then update the case.[/dim]"
+            f"\n[yellow]{len(flaky_misses)} flaky case(s) missed[/yellow] — a recall probe, not a "
+            "regression, and not gated."
+        )
+    if regressions:
+        console.print(
+            "\n[dim]A fixture can also fail because the chart was fixed — check the chart before "
+            "assuming the critic broke, then update the case and note the date.[/dim]"
         )
         raise SystemExit(1)
 
@@ -631,7 +693,7 @@ def _print_summary(results: list[dict[str, Any]], model: str) -> bool:
         for i in r["issues"]:
             colour = SEVERITY_COLOR.get(i["severity"], "white")
             views = f"{r['views']:,}" if r["views"] else "—"
-            url = i.get("url") or chart_link(r["slug"], i.get("chart_params", ""))
+            url = i.get("url") or chart_link(r["slug"], issue_params(r.get("params", ""), i))
             table.add_row(
                 f"[link={url}]{r['slug']}[/link]", views, f"[{colour}]{i['severity']}[/{colour}]", i["kind"], i["claim"]
             )

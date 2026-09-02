@@ -3,10 +3,11 @@
 Everything here comes from the public grapher endpoints, so the bundle is exactly what a
 reader could see. Three deliberate details, each learned the hard way:
 
-- The endpoints sit behind bot protection: without a browser-like ``User-Agent`` they answer
-  ``403`` for ``.metadata.json`` and ``.csv`` while the PNG still works, which silently yields
-  bundles with no metadata and no data. Hence :data:`HEADERS`, and hard failures rather than
-  empty bundles.
+- The endpoints reject the default ``python-urllib`` User-Agent with ``403`` on
+  ``.metadata.json`` and ``.csv`` while the PNG still works, which silently yields bundles with no
+  metadata and no data. Requests go through ``etl.http.session``, whose ``owid-etl`` UA is both
+  accepted and attributable in our own CDN logs — an earlier version spoofed a browser, which was
+  never necessary: any non-default UA gets through.
 - Some datasets (IHME/GBD among them) are non-redistributable and answer ``403`` on the CSV.
   That is not an error — the chart is still worth reviewing on its render and metadata — so it
   is reported as ``data_available=False``.
@@ -20,22 +21,14 @@ import io
 import json
 import time
 from dataclasses import dataclass, field
-from urllib.error import HTTPError
-from urllib.request import Request, urlopen
 
 import pandas as pd
+from requests import HTTPError
 
 from apps.chart_critic import cache, chart_config
+from etl.http import session as http_session
 
 GRAPHER_URL = "https://ourworldindata.org/grapher"
-
-# A browser-like UA. Without it the JSON and CSV endpoints answer 403 (the PNG does not).
-HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/126.0 Safari/537.36"
-    )
-}
 
 # Fields worth showing the model. The long forms (titleLong, citationLong, fullMetadata) add
 # tokens without adding judgement.
@@ -74,16 +67,20 @@ class Bundle:
 
 
 def _fetch(url: str, attempts: int = 3) -> bytes:
-    """Fetch with a short backoff on 5xx. Transient 503s from the render service and the CSV
-    endpoint were the only failure category left after the bundle bugs were fixed, and a chart
-    lost to one is a chart nobody reviewed."""
+    """Fetch from grapher through the repo's shared session, retrying 5xx with a short backoff.
+
+    Transient 503s from the render service and the CSV endpoint were the only failure category
+    left once the bundle bugs were fixed, and a chart lost to one is a chart nobody reviewed.
+    """
     for attempt in range(attempts):
-        try:
-            return urlopen(Request(url, headers=HEADERS), timeout=120).read()
-        except HTTPError as e:
-            if e.code < 500 or attempt == attempts - 1:
-                raise
+        response = http_session.get(url, timeout=120)
+        if response.status_code >= 500 and attempt < attempts - 1:
             time.sleep(2 * (attempt + 1))
+            continue
+        if response.status_code == 404:
+            raise ChartGone(url)
+        response.raise_for_status()
+        return response.content
     raise RuntimeError("unreachable")
 
 
@@ -169,13 +166,8 @@ def build(
 
     bundle = Bundle(slug=slug)
 
-    try:
-        query = "useColumnShortNames=true" + (f"&{params.lstrip('?')}" if params else "")
-        meta = json.loads(_fetch(f"{GRAPHER_URL}/{slug}.metadata.json?{query}"))
-    except HTTPError as e:
-        if e.code == 404:
-            raise ChartGone(slug) from e
-        raise
+    query = "useColumnShortNames=true" + (f"&{params.lstrip('?')}" if params else "")
+    meta = json.loads(_fetch(f"{GRAPHER_URL}/{slug}.metadata.json?{query}"))
 
     lines: list[str] = []
     chart = meta.get("chart") or {}
@@ -228,7 +220,8 @@ def build(
             # are worth reviewing without a picture.
             bundle.png = None
             bundle.render_failed = True
-            bundle.notes.append(f"no render available (HTTP {e.code}) — reviewed without the image")
+            code = e.response.status_code if e.response is not None else "?"
+            bundle.notes.append(f"no render available (HTTP {code}) — reviewed without the image")
 
     if use_cache:
         cache.write_bundle(
