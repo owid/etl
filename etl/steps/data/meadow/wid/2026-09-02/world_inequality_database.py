@@ -140,6 +140,9 @@ CODES_EXCLUDED = {
     "US-DC": "District of Columbia",
     "US-DE": "Delaware",
     "US-FL": "Florida",
+    # NOTE: this label collides with the country Georgia. It is harmless while the code stays in
+    # CODES_EXCLUDED (the rows are dropped), but moving it to CODES_MISSING would silently merge the
+    # US state into the country instead of failing. Rename it if it is ever published.
     "US-GA": "Georgia",
     "US-HI": "Hawaii",
     "US-IA": "Iowa",
@@ -210,7 +213,11 @@ def run() -> None:
 
     # Load regions table
     ds_regions = paths.load_dataset("regions")
-    tb_regions = ds_regions["regions"].reset_index()
+    # NOTE: safe_types=False is required, not cosmetic. It keeps `name`/`iso_alpha2` as categoricals,
+    # so an unmatched left merge below yields NaN whose astype(str) is "nan" — the sentinel
+    # harmonize_countries() tests for. The default nullable-string dtypes render it "<NA>" instead,
+    # which silently leaves unmatched rows in with country "<NA>" and duplicates the index.
+    tb_regions = ds_regions.read("regions", safe_types=False)
 
     #
     # Load inputs.
@@ -300,9 +307,9 @@ def harmonize_countries(tb: Table, tb_regions: Table, codes_missing: dict, codes
     for x, y in codes_missing.items():
         tb.loc[tb["country"] == x, "name"] = y
 
-    # Create list of unmatched entitites
+    # Create list of unmatched entities
     missing_list = list(tb[tb["name"] == "nan"]["country"].unique())
-    # Substract excluded from missing_list
+    # Subtract excluded from missing_list
     missing_list = [x for x in missing_list if x not in codes_excluded.keys()]
     missing_count = len(missing_list)
 
