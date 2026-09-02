@@ -41,9 +41,11 @@ from apps.chart_critic.critic import (
     DEFAULT_MODEL,
     FALLBACK_PRICES,
     build_agent,
+    claim_tokens,
     format_views,
     issue_params,
     prompt_parts,
+    same_finding,
 )
 from apps.utils.llms.costs import estimate_llm_cost
 from etl.db import read_sql
@@ -211,13 +213,6 @@ def _link_keys(slug: str, params: str) -> set[str]:
         return keys
 
 
-def _claim_tokens(claim: str) -> set[str]:
-    # Crude singular/plural folding. Without it "the unit for all three indicators is incorrectly
-    # set to 'doses'" and "the indicator unit is incorrectly set to 'doses'" scored below the
-    # merge threshold and were reported as two findings.
-    return {w.rstrip("s") for w in re.findall(r"[a-z0-9]{4,}", claim.lower())}
-
-
 def _merge(issues: list[dict[str, Any]], new: dict[str, Any]) -> None:
     """Fold a finding into the list, merging it with the same finding from an earlier pass.
 
@@ -225,11 +220,9 @@ def _merge(issues: list[dict[str, Any]], new: dict[str, Any]) -> None:
     "under 20 years" are one finding — so matching on a prefix counts them separately. Overlap
     of the significant words is crude but survives the rewording.
     """
-    tokens = _claim_tokens(new["claim"])
+    tokens = claim_tokens(new["claim"])
     for existing in issues:
-        other = _claim_tokens(existing["claim"])
-        overlap = len(tokens & other) / max(len(tokens | other), 1)
-        if existing["kind"] == new["kind"] and overlap >= 0.4:
+        if existing["kind"] == new["kind"] and same_finding(tokens, claim_tokens(existing["claim"])):
             existing["passes"] += 1
             return
     issues.append(new | {"passes": 1})

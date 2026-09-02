@@ -20,12 +20,13 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Iterable
 from datetime import datetime, timezone
 from typing import Any
 
 from structlog import get_logger
 
-from apps.chart_critic.critic import format_views
+from apps.chart_critic.critic import claim_tokens, format_views, same_finding
 from etl.paths import CACHE_DIR
 
 log = get_logger()
@@ -156,10 +157,32 @@ def _fingerprint_keys(slug: str, issue: dict[str, Any], facts: dict[str, dict[st
     Chart-level findings stay keyed by slug: a wrong subtitle really is specific to that chart
     even when the data behind it is shared.
     """
-    words = sorted({w.rstrip("s") for w in re.findall(r"[a-z0-9]{5,}", issue.get("claim", "").lower())})
-    tail = f"{issue.get('kind', '')}:{'-'.join(words[:8])}"
+    words = sorted(claim_tokens(issue.get("claim", "")))
+    tail = f"{issue.get('kind', '')}:{'-'.join(words)}"
     indicators = _indicators(facts, slug) if issue.get("kind") == "data" else []
     return [f"{i}:{tail}" for i in indicators] or [f"{slug}:{tail}"]
+
+
+def _already_posted(keys: list[str], known: Iterable[str]) -> bool:
+    """Whether any of these keys names a finding we have already sent.
+
+    Not an exact key match, which is what this used to be. The overlapping review window means
+    a chart is looked at on several consecutive days, and the model does not repeat itself
+    verbatim — so an exact match would file "the unit is set to doses" and "all three indicators
+    are labelled in doses" as two separate findings and post the same thing twice. Subject and
+    kind must agree exactly, and the claim's vocabulary has to overlap by the same margin that
+    folds repeated passes into one finding within a run.
+    """
+    for key in keys:
+        subject, kind, words = key.split(":", 2)
+        tokens = set(words.split("-")) - {""}
+        for other in known:
+            other_subject, other_kind, other_words = other.split(":", 2)
+            if (other_subject, other_kind) != (subject, kind):
+                continue
+            if same_finding(tokens, set(other_words.split("-")) - {""}):
+                return True
+    return False
 
 
 def load_state() -> dict[str, str]:
@@ -194,9 +217,10 @@ def new_findings(
     )
     for result, issue in ranked:
         keys = _fingerprint_keys(result["slug"], issue, facts)
-        # Any overlap counts as already-known: the same defect on a second chart sharing one
-        # indicator is not news, even though the two charts are not the same chart.
-        if any(k in state or k in seen for k in keys):
+        # Already-known on either axis: an earlier day (state) or an earlier chart in this run
+        # sharing one indicator (seen) — the same defect on a second chart is not news, even
+        # though the two charts are not the same chart.
+        if _already_posted(keys, state) or _already_posted(keys, seen):
             continue
         seen.update(keys)
         out.append((result, issue))

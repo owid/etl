@@ -26,6 +26,7 @@ tests are ``apps/anomalist``'s job and are deliberately not duplicated here.
 from __future__ import annotations
 
 import datetime as dt
+import re
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -145,6 +146,30 @@ that the International Poverty Line is not $3 per day, when it was revised to ex
 
 Do not invent problems. An ordinary chart has no issues, and returning an empty list is the
 expected outcome for most charts."""
+
+
+# Two claims are the same finding when this much of their significant vocabulary is shared.
+# One constant, used in both places it is needed: folding a chart's repeated passes into one
+# finding, and recognising a finding the digest already posted on an earlier day. They have to
+# agree — a run that merges two wordings into one while the state files them separately posts
+# the same thing twice.
+SAME_FINDING_OVERLAP = 0.4
+
+
+def claim_tokens(claim: str) -> set[str]:
+    """The significant words of a claim, crudely singular-folded.
+
+    Without the folding, "the unit for all three indicators is incorrectly set to 'doses'" and
+    "the indicator unit is incorrectly set to 'doses'" scored below the threshold and were
+    reported as two findings.
+    """
+    return {word.rstrip("s") for word in re.findall(r"[a-z0-9]{4,}", claim.lower())}
+
+
+def same_finding(tokens: set[str], other: set[str]) -> bool:
+    """Whether two token sets describe one finding. The model rewords freely between passes and
+    between days — "life expectancy of around 18-20 years" and "under 20 years" are one thing."""
+    return len(tokens & other) / max(len(tokens | other), 1) >= SAME_FINDING_OVERLAP
 
 
 def issue_params(target_params: str, issue: dict) -> str:
