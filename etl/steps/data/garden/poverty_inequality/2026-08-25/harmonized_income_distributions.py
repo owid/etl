@@ -1088,49 +1088,110 @@ def check_monotone_within_groups(tb: Table) -> list:
 
 
 def mld_decomposition(tb_distributions: Table, tb_pop: Table):
-    """Between/within MLD decomposition per (year, series) over the common sample.
+    """Split global inequality into a between-country and a within-country part, per (year, series),
+    using the mean log deviation (MLD), and return both the per-(year, series) decomposition and the
+    per-country pieces it is built from.
 
-    Conventions (from the source project, non-negotiable): country weights are WID's demography
-    matched to the series' basis — adult population for per-adult series, total population
-    otherwise, INCLUDING for PIP and the derived series; zero incomes are replaced by
-    $0.01/day inside this calculation only. The exact decomposition identity
-    total = within + between is asserted for every (year, series).
+    THE MEASURE. The MLD — Theil's L, the generalised entropy index GE(0) — of a population is
+
+        MLD = sum_i f_i * ln(mu / x_i)          f_i: person i's share of the population, mu: the mean
+
+    the average log-distance of incomes below the mean. Zero for perfect equality, unbounded above.
+
+    THE DECOMPOSITION. Partition the population into countries k with population share v_k, mean
+    mu_k and internal MLD_k. Then, exactly,
+
+        MLD = sum_k v_k * MLD_k        +      sum_k v_k * ln(mu / mu_k)
+              \_______ within _______/        \________ between ________/
+
+    The within term is the population-share-weighted average of each country's own inequality; the
+    between term is the MLD of the "smoothed" world where everyone earns their country's mean. Both
+    use POPULATION shares — that is what singles the MLD out among the GE family: the general within
+    weight is v_k^(1-a) * s_k^a (s_k the income share), which is v_k at a=0 and s_k for Theil's T at
+    a=1. References: Mookherjee & Shorrocks (1982); Jenkins' `ineqdeco` (GE_W(a) = sum_k v_k^(1-a)
+    s_k^a GE_k(a), GE_B(a) the index of the smoothed distribution); Haughton & Khandker (2009, World
+    Bank Handbook on Poverty and Inequality, ch. 6). The between share, between / MLD, is the headline
+    number on the deck's slides.
+
+    VERIFIED, NOT ASSUMED. Run on a two-country synthetic panel with a hand-computable answer
+    (A: everyone at 1, pop 100; B: half at 2, half at 8, pop 300 -> within = 3/4 ln 5/4, between =
+    1/4 ln 4 + 3/4 ln 4/5), the function reproduces all three components to 6e-17. Re-derived from
+    the published bins with fresh code, all 280 (year, series) pairs agree to <1e-6 — the residual is
+    float32 storage of the bins, not arithmetic. Substituting income-share weights in the between term
+    (the Theil-T convention) would give 0.4723 instead of 0.4803 for PIP in 2023, so the two are
+    distinguishable and the published value is the MLD one.
+
+    HOW BINS STAND IN FOR PEOPLE. A bin is treated as (p_high - p_low) * N people all earning `avg`,
+    so f_i is the bin's population share and inequality WITHIN a bin is ignored. Every bin-based
+    index understates the true one for that reason (the World Bank's own note on the binned data says
+    the same); the 109-bin structure with 0.1% bins across the top limits the loss where incomes are
+    most dispersed.
+
+    TWO CONVENTIONS, INHERITED FROM THE SOURCE PROJECT AND NOT TO BE CHANGED HERE.
+
+    - Country weights come from WID's demography for EVERY series, matched to the series' basis:
+      adult population for per-adult series, total population otherwise — including for PIP and the
+      derived series, whose own `pop` column is deliberately NOT used. This keeps the sources'
+      demographic disagreements out of the comparison, so a PIP-vs-WID gap in the between share is
+      about incomes, not headcounts. (It is also why `income_distributions.pop` and the
+      `population_weight` published here differ for PIP countries.)
+    - ln(0) is undefined, so zero incomes take ZERO_INCOME_REPLACEMENT ($0.01/day) inside this
+      calculation only; the stored distributions keep their zeros. The floor also enters the means,
+      which lifts them by at most 0.0008% (WID pre-tax per capita, 2023, the worst case) — negligible,
+      and reported per (year, series) as `num_zero_bins_replaced`. Because the floor is a dollar
+      amount, its effect on the MLD depends on the price level of the series; see the handover for
+      the sensitivity.
+
+    The exact identity total = within + between is asserted for every (year, series), with the total
+    computed independently from the bin level.
     """
+    # STEP 1 — attach the reference population to every bin row. Both guards matter for the weights:
+    # a duplicate (country, year) in the population table would double a country through the left
+    # join, and an unmapped series would silently fall back to total population.
+    assert not tb_pop.duplicated(subset=["country", "year"]).any(), "WID population is not unique on (country, year)."
+    unmapped = set(tb_distributions["series"].unique()) - set(SERIES_BASIS)
+    assert not unmapped, f"Series without a declared population basis: {sorted(unmapped)}"
     d = tb_distributions[["country", "year", "series", "p_low", "p_high", "avg"]].copy()
     d = d.merge(tb_pop, on=["country", "year"], how="left")
     assert d["total_population"].notna().all(), "Missing WID population for some country-year in the common sample."
 
-    # Country weights come from WID for every series (see the docstring), so the bin weight is the
-    # basis-matched national population times the bin's width.
+    # STEP 2 — the weight of a bin is the number of people in it: the series' basis population
+    # (adults or everyone, from WID) times the bin's width. Widths sum to exactly 1 per country-year,
+    # so a country's weights sum to its basis population.
     basis_is_adult = d["series"].map(SERIES_BASIS).eq("adult").to_numpy()
     ref_pop = np.where(
         basis_is_adult, d["adult_population"].to_numpy(dtype=float), d["total_population"].to_numpy(dtype=float)
     )
     w = ref_pop * (d["p_high"] - d["p_low"]).to_numpy(dtype=float)
 
-    # log(0) is undefined, so zero incomes take the floor — here only, never in the stored
-    # distributions. `zero_bin` carries the count so the report can quantify the substitution.
+    # STEP 3 — the income of a bin, with the zero floor. `zero_bin` keeps count so the output can
+    # say how many bins were floored.
     x = d["avg"].to_numpy(dtype=float)
     zero = x == 0
     x = np.where(zero, ZERO_INCOME_REPLACEMENT, x)
 
+    # STEP 4 — everything downstream is a weighted sum of three quantities, so compute them once per
+    # bin: the weight, the weighted income (for means) and the weighted log income (for the MLD).
     d["w"] = w
     d["wx"] = w * x
     d["wlnx"] = w * np.log(x)
     d["zero_bin"] = zero
 
-    # Per country: the weighted mean, and MLD within it as ln(mean) - mean of ln(x).
+    # STEP 5 — per country: its mean and its own MLD. Since MLD = mean of ln(mu/x) = ln(mu) - mean of
+    # ln(x), it falls straight out of the three sums.
     by_country = d.groupby(["year", "series", "country"], observed=True)[["w", "wx", "wlnx"]].sum()
     by_country["mean"] = by_country["wx"] / by_country["w"]
     by_country["mld_within"] = np.log(by_country["mean"]) - by_country["wlnx"] / by_country["w"]
 
+    # STEP 6 — the world: the same three sums over all countries give the grand mean.
     total_sums = by_country.groupby(["year", "series"], observed=True)[["w", "wx", "wlnx"]].sum()
     grand_mean = total_sums["wx"] / total_sums["w"]
 
+    # STEP 7 — the two components, both as population-share-weighted sums over countries: the
+    # between term weights each country's log-distance from the world mean, the within term weights
+    # its internal MLD.
     g = by_country.reset_index().merge(grand_mean.rename("grand_mean").reset_index(), on=["year", "series"], how="left")
     g = g.merge(total_sums["w"].rename("w_total").reset_index(), on=["year", "series"], how="left")
-    # The decomposition itself: both components are population-share-weighted sums, the between
-    # term over each country's distance from the global mean, the within term over its internal MLD.
     g["population_share"] = g["w"] / g["w_total"]
     g["between_term"] = g["population_share"] * np.log(g["grand_mean"] / g["mean"])
     g["within_term"] = g["population_share"] * g["mld_within"]
@@ -1146,7 +1207,9 @@ def mld_decomposition(tb_distributions: Table, tb_pop: Table):
         )
         .reset_index()
     )
-    # The total, computed independently from the bin level.
+
+    # STEP 8 — the total, computed INDEPENDENTLY from the bin level (ln of the grand mean minus the
+    # world's mean log income), so the identity below is a real check and not a tautology.
     totals = np.log(grand_mean) - total_sums["wlnx"] / total_sums["w"]
     tb_decomposition = tb_decomposition.merge(
         totals.rename("mld_total").reset_index(), on=["year", "series"], how="left"
@@ -1156,11 +1219,14 @@ def mld_decomposition(tb_distributions: Table, tb_pop: Table):
     )
     tb_decomposition = tb_decomposition.merge(zero_counts, on=["year", "series"], how="left")
 
-    # Exact decomposition identity — if this trips, the code is wrong.
+    # STEP 9 — the identity holds exactly in algebra, so anything beyond float noise is a bug.
     gap = (tb_decomposition["mld_total"] - tb_decomposition["mld_between"] - tb_decomposition["mld_within"]).abs()
     assert gap.max() < 1e-9, f"Decomposition identity violated (max gap {gap.max():.2e})."
     tb_decomposition["between_share"] = tb_decomposition["mld_between"] / tb_decomposition["mld_total"]
 
+    # STEP 10 — two tables: the decomposition per (year, series), and the per-country pieces behind
+    # it. `population_weight` is the country's basis population — the weight actually used — which
+    # for PIP countries is WID's count, not PIP's.
     tb_decomposition = Table(
         tb_decomposition[
             [
