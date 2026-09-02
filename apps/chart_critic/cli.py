@@ -590,6 +590,7 @@ def cli(
             incomplete=incomplete,
             window_days=changed_since,
             facts=facts,
+            cost=sum(r["cost"] for r in results),
         )
         digest_out.write_text(message)
         if message:

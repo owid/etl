@@ -211,6 +211,7 @@ def format_slack(
     incomplete: int = 0,
     window_days: int | None = None,
     facts: dict[str, dict[str, Any]] | None = None,
+    cost: float = 0.0,
 ) -> str:
     """Slack mrkdwn — single asterisks for bold, in the shape #analytics-bites uses.
 
@@ -251,9 +252,14 @@ def format_slack(
             f"\n*<{url}|{_chart_title(result)}>*\n{issue.get('claim', '').rstrip('.')}.\n{'   ·   '.join(footer)}"
         )
     lines.append("")
+    # What the run cost, in the footer. It is the sweep's actual model spend, so a day whose
+    # charts were all already reviewed reads as $0.00 — the cache doing its job, not an error.
+    # The gating --eval run is a separate invocation and is not counted here.
+    spend = f"${cost:,.2f}" if cost >= 0.01 else "<$0.01"
     lines.append(
         "_Posted by `etl chart-critic` — an LLM reading each chart, its metadata and its values. "
-        "Each of these is a claim to check rather than a confirmed error._"
+        "Each of these is a claim to check rather than a confirmed error. "
+        f"Reviewing {reviewed} chart{'s' if reviewed != 1 else ''} cost {spend}._"
     )
     if incomplete:
         lines.append(f"_{incomplete} chart(s) could not be reviewed, so treat this as incomplete._")
