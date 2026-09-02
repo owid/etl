@@ -1039,6 +1039,59 @@ def get_post_views_by_chart_id(
 _REPORTED_POST_TYPES = ("article", "topic-page", "linear-topic-page", "data-insight")
 
 
+def _get_post_views_citing_slugs(
+    slugs: list[str],
+    component_types: list[str],
+    date_min: str,
+    date_max: str,
+) -> pd.DataFrame:
+    """Views of published posts that link any of ``slugs`` via one of ``component_types``.
+
+    Shared tail of the post-recovery lookups: posts come from ``posts_gdocs_links`` (grapher DB), views
+    from get_post_views_by_url. Returns the report-aligned columns: url, title, post_type,
+    post_publication_date, views, n_days, views_daily.
+    """
+    cols = ["url", "title", "post_type", "post_publication_date", "views", "n_days", "views_daily"]
+    empty = pd.DataFrame(columns=cols)
+    if not slugs:
+        return empty
+
+    slug_list = ", ".join(f"'{s}'" for s in sorted(set(slugs)))
+    component_types_str = ", ".join(f"'{c}'" for c in component_types)
+
+    # Posts citing those slugs, restricted to the qualifying component types.
+    df = OWID_ENV.read_sql(
+        f"""
+        SELECT DISTINCT
+            pg.slug AS post_slug,
+            pg.type AS post_type,
+            JSON_UNQUOTE(JSON_EXTRACT(pg.content, '$.title')) AS title,
+            pg.publishedAt AS post_publication_date
+        FROM posts_gdocs pg
+        JOIN posts_gdocs_links pgl ON pg.id = pgl.sourceId
+        WHERE pg.published = 1
+          AND pgl.componentType IN ({component_types_str})
+          AND pgl.target IN ({slug_list})
+        """
+    )
+    df = df[df["post_type"].isin(_REPORTED_POST_TYPES)].copy()
+    if df.empty:
+        return empty
+
+    df["url"] = df["post_type"].map(POST_TYPE_TO_URL) + df["post_slug"]
+    df = df.dropna(subset=["url"]).drop_duplicates(subset=["url"]).reset_index(drop=True)
+    df["post_publication_date"] = pd.to_datetime(df["post_publication_date"]).dt.date.astype(str)
+
+    # Attach post views.
+    df_views = get_post_views_by_url(urls=sorted(set(df["url"])), date_min=date_min, date_max=date_max)
+    df = df.merge(df_views, on="url", how="left").dropna(subset=["views"]).reset_index(drop=True)
+    if df.empty:
+        return empty
+    df = df.astype({"views": int, "n_days": int})
+
+    return df[cols]
+
+
 def get_post_views_of_redirected_charts_by_producer(
     producers: list[str],
     date_min: str = DATE_MIN,
@@ -1101,40 +1154,57 @@ def get_post_views_of_redirected_charts_by_producer(
         return source.strip("/")
 
     source_slugs = sorted({_slug(s) for s in df_mdr["source"]})
-    slug_list = ", ".join(f"'{s}'" for s in source_slugs)
-    component_types_str = ", ".join(f"'{c}'" for c in component_types)
 
-    # Posts citing those slugs, restricted to the qualifying component types.
-    df = OWID_ENV.read_sql(
-        f"""
-        SELECT DISTINCT
-            pg.slug AS post_slug,
-            pg.type AS post_type,
-            JSON_UNQUOTE(JSON_EXTRACT(pg.content, '$.title')) AS title,
-            pg.publishedAt AS post_publication_date
-        FROM posts_gdocs pg
-        JOIN posts_gdocs_links pgl ON pg.id = pgl.sourceId
-        WHERE pg.published = 1
-          AND pgl.componentType IN ({component_types_str})
-          AND pgl.target IN ({slug_list})
-        """
+    return _get_post_views_citing_slugs(
+        slugs=source_slugs, component_types=component_types, date_min=date_min, date_max=date_max
     )
-    df = df[df["post_type"].isin(_REPORTED_POST_TYPES)].copy()
-    if df.empty:
+
+
+def get_post_views_of_producer_collections(
+    producers: list[str],
+    date_min: str = DATE_MIN,
+    date_max: str = DATE_MAX,
+    component_types: list[str] | None = None,
+) -> pd.DataFrame:
+    """Views of posts that embed one of the producer's mdims or explorers (linked by the live slug).
+
+    Post-attribution counterpart of get_mdim_explorer_views_by_producer: a post that embeds an mdim or
+    explorer shows the producer's data, but the live-chart post lookup (get_post_views_by_chart_id)
+    matches on chart ids (collections have none), and get_post_views_of_redirected_charts_by_producer
+    only covers dead slugs. When charts are migrated into an mdim, posts are typically re-pointed to the
+    live mdim slug, so both lookups miss them.
+
+    Only links whose ``componentType`` is in ``component_types`` (default
+    COMPONENT_TYPES_TO_LINK_GDOCS_WITH_VIEWS) are counted - the same "post displays the chart" rule as the
+    other post lookups. Like the whole-chart rule, a post embedding a multi-producer collection counts in
+    full for each producer whose data is in it.
+
+    Returns
+    -------
+    pd.DataFrame
+        Columns: url, title, post_type, post_publication_date, views, n_days, views_daily - aligned with
+        the report's processed posts dataframe so it can be concatenated directly.
+    """
+    cols = ["url", "title", "post_type", "post_publication_date", "views", "n_days", "views_daily"]
+    empty = pd.DataFrame(columns=cols)
+
+    if component_types is None:
+        component_types = COMPONENT_TYPES_TO_LINK_GDOCS_WITH_VIEWS
+
+    variable_ids = set(get_producer_variable_ids(producers=producers))
+    if not variable_ids:
         return empty
 
-    df["url"] = df["post_type"].map(POST_TYPE_TO_URL) + df["post_slug"]
-    df = df.dropna(subset=["url"]).drop_duplicates(subset=["url"]).reset_index(drop=True)
-    df["post_publication_date"] = pd.to_datetime(df["post_publication_date"]).dt.date.astype(str)
+    # Slugs of mdims/explorers with at least one view (mdims) or indicator (explorers) using the
+    # producer's data.
+    df_map = read_analytics(
+        sql=f"SELECT DISTINCT slug, indicator_id FROM {SEMANTIC_LAYER_SCHEMA}.mdim_explorers_x_indicators"
+    )
+    collection_slugs = sorted(set(df_map.loc[df_map["indicator_id"].isin(variable_ids), "slug"]))
 
-    # Attach post views.
-    df_views = get_post_views_by_url(urls=sorted(set(df["url"])), date_min=date_min, date_max=date_max)
-    df = df.merge(df_views, on="url", how="left").dropna(subset=["views"]).reset_index(drop=True)
-    if df.empty:
-        return empty
-    df = df.astype({"views": int, "n_days": int})
-
-    return df[cols]
+    return _get_post_views_citing_slugs(
+        slugs=collection_slugs, component_types=component_types, date_min=date_min, date_max=date_max
+    )
 
 
 def get_post_views_last_n_days(
