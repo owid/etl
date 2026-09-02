@@ -4,8 +4,9 @@
 Two problems this solves, and the first one is a hard blocker:
 
   * **`verify_page.js` does not fit.** `use_figma` caps `code` at 50,000 characters and that file is
-    ~79,000 — so Step 8c's "runs the mechanical rows in ONE read-only call" is impossible as written.
-    Stripped of comments it is ~45,000, which fits but leaves you relaying 90% of the cap verbatim.
+    ~134,000 — so Step 8c's "runs the mechanical rows in ONE read-only call" is impossible as written.
+    Stripped of comments it is ~68,000, which does not fit either, so the pass runs as the three
+    `--rows` slices CHECKS.md prescribes; the largest of them relays 90% of the cap verbatim.
   * **Reading a script to paste it costs the model context twice** — once for the Read, once for the
     tool call. Piping this straight into the call skips the Read entirely.
 
@@ -20,7 +21,7 @@ the output can go straight into the call.
     .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js \
         --rows series --frame-id 26417:6
     .venv/bin/python .claude/skills/create-figma-chart/scripts/inline_script.py verify_page.js \
-        --rows type,series                                      # groups combine
+        --rows type,geometry                                    # groups combine
 
 Stripping is context-aware, not a regex. These files contain `https://` inside strings, regex
 literals holding `/*`, and template literals spanning lines — a naive `//`-to-end-of-line strip
@@ -32,6 +33,7 @@ from __future__ import annotations
 
 import argparse
 import itertools
+import json
 import re
 import sys
 from collections.abc import Iterator
@@ -48,7 +50,11 @@ REGION = re.compile(r"^//\s*#(region\s+\S+|endregion)\s*$")
 # The calls reference/CHECKS.md tells an operator to send, per script. `--check` measures THESE.
 # Keep the two in step: this list is the workflow, and the doc is where a human reads it.
 DOCUMENTED_CALLS: dict[str, list[tuple[str, ...]]] = {
-    "verify_page.js": [("type", "series"), ("geometry", "annotations")],
+    # Rebalanced when the declared-gap rows moved into their own `skipped` region. Those rows are
+    # pure prose and were being re-sent by all three calls, which is what held the largest slice at
+    # 90% of the cap: the shared floor was 26,899 characters, of which 13,217 was text nobody needed
+    # three copies of. Splitting it out took the floor to ~15,700 and the worst call from 90% to 70%.
+    "verify_page.js": [("annotations",), ("type", "geometry"), ("series", "skipped")],
 }
 
 
@@ -254,12 +260,22 @@ def main() -> int:
     ap.add_argument(
         "--rows",
         help="comma-separated row groups to keep (verify_page.js: type, series, geometry, "
-        "annotations). Omit for the whole file. Use --list-rows to see them with their sizes.",
+        "annotations, skipped). Omit for the whole file. Use --list-rows to see them with their sizes.",
     )
     ap.add_argument("--list-rows", action="store_true", help="list a script's row groups and exit")
     ap.add_argument(
         "--frame-id",
         help="rewrite CONFIG.frameId in the emitted source, so the output is ready to send as-is",
+    )
+    ap.add_argument(
+        "--config",
+        action="append",
+        metavar="KEY=VALUE",
+        help="rewrite any other CONFIG key in the emitted source, repeatable "
+        "(e.g. --config faceted=true --config chartName=chart-body). Bare true/false/null and "
+        "numbers are emitted as literals; anything else is quoted as a string. An unknown key is "
+        "an error, not a no-op — a silently ignored flag means running the pass with the wrong "
+        "frame facts and never being told.",
     )
     ap.add_argument(
         "--whole",
@@ -277,15 +293,16 @@ def main() -> int:
         # already refused above CROWDED.
         #
         # But the largest SINGLE group is not the answer either: `--rows` combines groups, and the
-        # documented pass is two calls covering all of them (CHECKS.md), so nobody sends one slice at
+        # documented pass covers all of them in three calls (CHECKS.md), so nobody sends one slice at
         # a time. So measure THE DOCUMENTED CALLS, the ones an operator is actually told to send —
         # not the best split this script can find for itself. Minimising over every partition answers
         # a question nobody asked, and it can hold the check green by discovering an undocumented
-        # split while the workflow in the doc is over the cap. Measured on this file: 16,000 more
-        # characters in `annotations` puts the documented `geometry,annotations` call at 50,314 —
-        # over the cap and refused — while `annotations` alone against the other three peaks at
-        # 45,131, so the optimiser would report 90% and exit 0 for a workflow that no longer runs.
-        # The number has to be the one the operator will hit.
+        # split while the workflow in the doc is over the cap. That is not hypothetical: growth in
+        # `annotations` took the then-documented `geometry,annotations` call to 50,594 — over the cap
+        # and refused — while `annotations` alone measured 45,163, so an optimiser would have reported
+        # 90% and exited 0 for a workflow that no longer ran. This check failed instead, and the doc
+        # and the list above were re-split to three calls. The number has to be the one the operator
+        # will hit.
         failed = False
         print(f"{'script':<30} {'raw':>8} {'stripped':>9} {'sent':>9} {'of cap':>8} {'floor':>8}")
         for p in sorted(SCRIPTS.glob("*.js")):
@@ -386,6 +403,27 @@ def main() -> int:
             ap.error(
                 f"no such row group(s): {', '.join(sorted(unknown))}. Available: {', '.join(dict.fromkeys(groups))}"
             )
+        # A slice can only fail the rows it carries, so its verdict has to say which those were.
+        # Without this, "no mechanical row failed" out of ONE documented call reads as a verdict on
+        # the frame — the same confident silence the SKIPPED rows exist to prevent, reached by
+        # slicing rather than by not looking. REQUIRED rather than best-effort: a sliceable script
+        # with no declaration cannot produce an honest partial verdict, and discovering that from a
+        # misleading result later is exactly the failure being closed here.
+        emitted = [g for g in dict.fromkeys(groups) if g in wanted]
+        stripped, n_rows = re.subn(
+            r"(const EMITTED_ROWS = )\[[^\]]*\];",
+            lambda m: m.group(1) + json.dumps(emitted) + ";",
+            stripped,
+            count=1,
+        )
+        if not n_rows:
+            print(
+                f"{args.script} carries #region markers but declares no EMITTED_ROWS, so a slice of it "
+                "cannot report which rows it left out. Add "
+                '`const EMITTED_ROWS = [...];` beside its CONFIG.',
+                file=sys.stderr,
+            )
+            return 1
 
     if args.frame_id:
         stripped, n_sub = re.subn(
@@ -394,6 +432,52 @@ def main() -> int:
         if not n_sub:
             print(f"--frame-id given but {args.script} has no CONFIG.frameId to rewrite", file=sys.stderr)
             return 1
+
+    if args.config:
+        # Scope every substitution to the CONFIG object. A bare `key:` pattern would also match an
+        # object literal further down the file, which is how a "config" flag quietly edits a row's
+        # internals instead of its configuration.
+        block = re.search(r"const CONFIG = \{.*?^\};", stripped, re.S | re.M)
+        if not block:
+            print(f"--config given but {args.script} has no CONFIG block to rewrite", file=sys.stderr)
+            return 1
+        body = block.group(0)
+        for pair in args.config:
+            if "=" not in pair:
+                ap.error(f"--config expects KEY=VALUE, got {pair!r}")
+            key, _, val = pair.partition("=")
+            key, val = key.strip(), val.strip()
+            # ONE json round-trip covers every shape CONFIG holds, and json.dumps is what makes it
+            # safe: JSON's syntax for strings, numbers, booleans, null and arrays is a subset of
+            # JavaScript's, and the emitted slice is pasted STRAIGHT into use_figma. Hand-building a
+            # pair of quotes instead broke both ends of that. A value carrying a double quote or a
+            # backslash (`--config 'chartName=A "quoted" chart'`) closed the string early and reached
+            # the plugin as a syntax error whose cause is nowhere in the message. And an ARRAY —
+            # `gapTarget=[12,16]`, `frameIds=["1:2","3:4"]`, both documented as arrays in
+            # verify_page.js's header — was quoted into a STRING, which is worse than an error
+            # because it runs: `gapTarget` is truthy so it survives its `||` default and then indexes
+            # character-by-character into "[", "1"; `frameIds` fails Array.isArray and is silently
+            # dropped back to the single frameId. A parse failure means it was never JSON, so it is a
+            # bare string and gets quoted as one.
+            try:
+                val = json.dumps(json.loads(val))
+            except json.JSONDecodeError:
+                val = json.dumps(val.strip("\"'"))
+            body, n = re.subn(
+                # The value runs to the LAST comma on its line, not the first: `[12, 16]` contains
+                # one, and a first-comma match would rewrite `gapTarget: [12,` and leave ` 16],`
+                # stranded behind it. Greedy to end-of-line, then backtrack to the separator.
+                rf"(\n\s*{re.escape(key)}:\s*)[^\n]*(,)(?=[^\n]*\n)",
+                lambda m: f"{m.group(1)}{val}{m.group(2)}",
+                body,
+                count=1,
+            )
+            if not n:
+                ap.error(
+                    f"--config {key}: no such key in {args.script}'s CONFIG. "
+                    "Rewriting a key that is not there would emit a script running on defaults."
+                )
+        stripped = stripped[: block.start()] + body + stripped[block.end() :]
 
     if len(stripped) > CAP:
         print(

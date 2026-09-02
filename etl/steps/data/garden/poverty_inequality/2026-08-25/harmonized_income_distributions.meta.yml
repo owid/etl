@@ -1,0 +1,171 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Inequality
+      attribution_short: World Bank; WID
+    processing_level: major
+  description_series: &description_series |-
+    Each row belongs to one of eight series:
+
+    - `pip`: PIP disposable income or consumption, per capita (as published).
+    - `pip_income_basis`: PIP with consumption-based countries mapped to an income basis, through a per-percentile regression ln(income) = α + β·ln(consumption) fitted on the country-years where PIP publishes both welfare types. Income-based countries (and countries absent from the welfare-type lookup) pass through unchanged.
+    - `pip_income_basis_top_adjusted`: the income-basis series with the top of the distribution (above the 95th percentile) rebuilt with the shape of WID's post-tax per-capita distribution, anchored at the income-basis series' own level in the p94p95 bin.
+    - `wid_before_tax_per_adult` / `wid_before_tax_per_capita`: WID pre-tax national income, per adult (as published) and converted to per capita.
+    - `wid_after_tax_per_adult` / `wid_after_tax_per_capita`: WID post-tax national income (DINA concept: all taxes and all government spending are redistributed back, so each country's post-tax total equals its pre-tax total). This is not disposable income.
+    - `wid_after_tax_rescaled`: WID post-tax per capita, rescaled country-year by country-year so its mean equals the `pip_income_basis_top_adjusted` mean — WID's shapes at PIP-side levels.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: Harmonized PIP and WID income distributions
+  update_period_days: 180
+  owners:
+    - Pablo Arriagada
+  description: |-
+    Income distributions from the World Bank's Poverty and Inequality Platform (PIP) and the World Inequality Database (WID), harmonized to an identical 109-bin structure so any statistic can be computed the same way for both sources, together with derived "bridging" series that walk the two sources toward each other and a between/within-country decomposition of global inequality. The methodology follows Joe Hasell's PIP-vs-WID triangulation project.
+
+tables:
+  income_distributions:
+    title: Harmonized PIP and WID income distributions (109 bins)
+    description: |-
+      Full income distributions on an identical structure of 109 quantile bins (99 one-percent bins, nine 0.1% bins between p99 and p99.9, and the top 0.1%) for every country and year covered by both sources. PIP's 1,000 equal bins nest exactly into this structure, so the aggregation introduces no approximation error; WID publishes (a superset of) the structure directly.
+
+      Values are daily incomes in international-$: PIP at 2021 prices, WID at the latest PPP vintage used by its own conversion factors — a known level difference between the two sources. WID series include WID's extrapolated country-years (the only slice with near-complete coverage; PIP's lined-up panel is itself partly extrapolated by the World Bank), flagged per row. Zero incomes in WID's bottom percentiles are retained; how to treat them is an analysis-stage decision.
+    variables:
+      p_low:
+        title: Lower bound of the quantile bin
+        unit: ""
+        description_short: Position of the bin's lower bound in the population, as a fraction between 0 and 1.
+      p_high:
+        title: Upper bound of the quantile bin
+        unit: ""
+        description_short: Position of the bin's upper bound in the population, as a fraction between 0 and 1.
+      avg:
+        title: Mean daily income within the quantile bin
+        unit: international-$
+        short_unit: $
+        description_short: Mean income or consumption per day within the bin, measured in international-$.
+        description_key:
+          - PIP values are at 2021 prices; WID values are at the PPP vintage of WID's own latest conversion factors. Level comparisons between the two sources inherit this difference.
+          - WID incomes are national income concepts (broader than PIP's disposable income or consumption); the per-adult series divide household income equally among adult members ("equal-split adults").
+        description_processing: *description_series
+      pop:
+        title: Population in the quantile bin
+        unit: people
+        description_short: Number of people (or adults, for per-adult series) in the bin, matching the series' population basis.
+        description_key:
+          - WID-side bin populations use an independent demographic yardstick — UN World Population Prospects adults aged 20+ for per-adult series, Our World in Data's population series for per-capita series — spread over bins by bin width. PIP-side bin populations are PIP's own.
+          - This column is therefore not one consistent population across series. To aggregate countries, use `population_weight` in the `inequality_decomposition_by_country` table, which is the yardstick applied to every series alike.
+      share:
+        title: Income share of the quantile bin
+        unit: ""
+        description_short: Bin's share of the country's total income under the series, as a fraction between 0 and 1.
+      wid_extrapolated:
+        title: WID country-year is extrapolated
+        unit: ""
+        description_short: Whether the WID country-year is extrapolated by WID rather than anchored in observed data ("yes"/"no"; empty for PIP-side series).
+
+  consumption_income_model:
+    title: Consumption-to-income mapping, fitted per percentile
+    description: |-
+      Coefficients of one OLS regression per percentile bin, ln(income) = α + β·ln(consumption), fitted across the national country-years where PIP publishes both welfare types at 2021 prices. Used to put PIP's consumption-based countries on an income basis. The estimation sample contains no Sub-Saharan Africa or South Asia, so applying the mapping there is an out-of-sample transfer.
+    variables:
+      alpha:
+        title: Intercept of the consumption-to-income regression
+        unit: ""
+        description_short: Intercept α of ln(income) = α + β·ln(consumption), fitted on daily incomes; unit-specific.
+      beta:
+        title: Slope of the consumption-to-income regression
+        unit: ""
+        description_short: Elasticity β of income with respect to consumption at this percentile.
+      num_country_years:
+        title: Number of dual country-years in the estimation sample
+        unit: country-years
+        description_short: Number of country-years publishing both welfare types used to fit this percentile's regression.
+      r_squared:
+        title: R² of the consumption-to-income regression
+        unit: ""
+        description_short: Share of variance explained by this percentile's regression.
+
+  pip_welfare_basis:
+    title: Welfare basis of each PIP country-year
+    description: |-
+      Which welfare concept (income or consumption) underlies each country's PIP series in each year of the panel, following the World Bank's own decision tree: the surveyed concept in a survey year, otherwise the concept whose surveys bracket the gap on both sides — the concept it must have interpolated with — and failing that the nearest survey's, which is the one it scaled that year's estimate from. Determines which country-years the consumption-to-income adjustment applies to. Years where both types exist count as consumption, matching the World Bank's own preference and, more importantly, matching what its underlying distribution actually contains for those years — so the consumption-to-income adjustment is applied to them rather than skipped.
+    variables:
+      welfare_type:
+        title: Welfare basis
+        unit: ""
+        description_short: Welfare concept (income or consumption) assigned to the country-year.
+      survey_year_used:
+        title: Nearest national survey year
+        unit: ""
+        description_short: Year of the nearest national World Bank survey for this country.
+        description_key:
+          - For a year that is itself surveyed, this is that year, and the welfare concept applied is that survey's.
+          - For a year the World Bank extrapolated to, this is the survey it scaled that year's estimate from, so it is also where the concept comes from. Equidistant surveys resolve to the earlier survey, unless the published distribution identifies the later one as the source.
+          - For a year the World Bank interpolated, the concept instead comes from the surveys bracketing the gap, which both use it. This column still reports the nearest survey, so for those years it does not identify where the concept came from.
+          - The distance is not capped, and reaches 32 years for the sparsest countries. Filter on this column if a maximum distance matters for your use.
+      adjusted:
+        title: Consumption-to-income adjustment applied
+        unit: ""
+        description_short: Whether the consumption-to-income mapping is applied to this country-year in the income-basis series.
+
+  inequality_decomposition:
+    title: Between/within-country decomposition of global inequality (MLD)
+    description: |-
+      Mean log deviation (MLD) of the global income distribution over the common sample of countries covered by both PIP and WID, decomposed exactly into a between-country and a within-country component, per year and series. Comparing the decomposition across the series shows how much of the disagreement between PIP and WID comes from each methodological difference (population basis, tax concept, consumption vs income, top-of-distribution corrections).
+
+      Conventions: every series — including PIP and the derived series — weights countries by one demographic yardstick independent of both sources (UN World Population Prospects adults aged 20+ for per-adult series, Our World in Data's population series otherwise), so the sources' demographic disagreements never enter the comparison; zero incomes are replaced by $0.01/day inside the MLD calculation only.
+    variables:
+      mld_total:
+        title: Total MLD
+        unit: ""
+        description_short: Mean log deviation of the pooled distribution across all countries in the common sample.
+      mld_between:
+        title: Between-country MLD
+        unit: ""
+        description_short: Part of total MLD due to differences in mean income between countries.
+      mld_within:
+        title: Within-country MLD
+        unit: ""
+        description_short: Part of total MLD due to inequality within countries (population-weighted average of country MLDs).
+      between_share:
+        title: Between-country share of total MLD
+        unit: ""
+        description_short: Share of global inequality (MLD) accounted for by differences between countries, as a fraction between 0 and 1.
+      grand_mean:
+        title: Global mean daily income
+        unit: international-$
+        short_unit: $
+        description_short: Population-weighted mean daily income across the common sample under this series.
+      num_countries:
+        title: Number of countries in the common sample
+        unit: countries
+        description_short: Number of countries entering the decomposition.
+      num_zero_bins_replaced:
+        title: Number of zero-income bins replaced
+        unit: bins
+        description_short: Number of bins whose zero income was replaced by $0.01/day inside the MLD calculation.
+      population:
+        title: Population covered
+        unit: people
+        description_short: Total population (or adults aged 20+, for per-adult series) of the common sample, from Our World in Data's population series and UN World Population Prospects respectively.
+
+  inequality_decomposition_by_country:
+    title: Country-level components of the MLD decomposition
+    variables:
+      mean:
+        title: Mean daily income
+        unit: international-$
+        short_unit: $
+        description_short: Population-weighted mean daily income of the country under this series (with zero incomes floored at $0.01/day, as inside the MLD).
+      mld_within:
+        title: Within-country MLD
+        unit: ""
+        description_short: Mean log deviation of the country's own distribution.
+      population_weight:
+        title: Population weight
+        unit: people
+        description_short: Country weight in the global decomposition, matched to the series' basis — UN World Population Prospects adults aged 20+ for per-adult series, Our World in Data's population series otherwise. The same yardstick for every series, PIP included.

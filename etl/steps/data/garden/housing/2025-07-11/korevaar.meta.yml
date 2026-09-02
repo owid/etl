@@ -31,7 +31,7 @@ tables:
         description_short: Real wages, normalized to 1900=100 and adjusted for inflation.
         description_key:
           - This data comes from the paper "The Housing Affordability Revolution" by Korevaar et al. (2023). It provides insights into the long-term trends in housing affordability across various countries, focusing on the ratio of real rents to real wages.
-          - Real wages are based on multiple sources, such as day wages and annual wages of various industries, collective labour agreements, tax documentation and existing wage indices.
+          - Real wages are based on multiple sources, such as day wages and annual wages of various industries, collective labor agreements, tax documentation and existing wage indices.
           - The researchers adjusted the raw values for inflation by constructing a long-term consumer price index for each country.
         unit: Index
         short_unit: ""
