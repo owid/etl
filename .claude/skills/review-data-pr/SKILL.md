@@ -233,8 +233,12 @@ When the PR body (or `workbench/<short_name>/update-context.yml`) does reference
 
 `/update-dataset` step 7 asks the author to read the prose of every surface citing the dataset — articles, data
 insights, and especially titles — for quantitative claims the update invalidates. As reviewer, check the PR body
-records an outcome for it: either "no referencing prose makes an unbounded claim", or a named list of claims with
-what was decided (handed to content, or deliberately left with a reason).
+records an outcome for it: either "no referencing prose makes an unbounded claim" **scoped to the surfaces swept,
+with the sweep's coverage gaps named** (`find-chart-references` prints them and writes them with `--gaps-json`; a
+chart nested in an article layout container, or a data insight holding its chart outside `grapher-url`, can be
+missing from its list), or a named list of claims with what was decided (handed to content, or deliberately left
+with a reason). A blanket "nothing stale" with no scope is the first failure mode below in mild form — ask what
+was swept.
 
 Two ways this goes wrong, both worth a 🟡:
 
