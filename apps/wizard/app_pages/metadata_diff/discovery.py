@@ -396,15 +396,17 @@ def _export_scope_names(export_uri: str) -> set[str]:
     rel = export_uri[len("export://") :].rstrip("/")
     names = {rel.split("/")[-1]}
     step_file = STEP_DIR / "export" / f"{rel}.py"
-    try:
+    if step_file.exists():
         names |= _emitted_collection_names(step_file.read_text())
-    except OSError:
+    elif not step_file.with_suffix(".config.yml").exists():
         # A deleted or renamed recipe: the file name is all we have, and is still worth matching on.
         return names
     # A recipe publishing *several* collections names them from its own config files instead of from
     # literals — `multidim/covid/latest/covid.py` turns `covid.cases.yml` into `covid_cases` — so the
     # literals above find none of them. The `<recipe>.<key>[.config].yml` companion convention
     # reconstructs those names, and a name no collection answers to simply never matches anything.
+    # A YAML-only step — no `.py`, just `<recipe>.config.yml`, the way ETL-authored single charts are
+    # written — has no literals to read either, and names itself here.
     for config_file in step_file.parent.glob(f"{step_file.stem}.*.y*ml"):
         names.add(_config_file_collection_name(config_file.name))
     return names

@@ -1370,19 +1370,34 @@ def test_filtering_to_active_export_recipes_drops_no_real_recipe():
 
     Every export step file that names an active DAG step has to survive it, or a real recipe edit would be
     misfiled as baseline lag — the failure this whole scope exists to prevent, in the other direction.
+
+    A step is a `.py`, or — since ETL-authored single charts arrived — a YAML-only `<recipe>.config.yml`
+    with no script at all. Deriving the universe from scripts alone reported every one of those as a
+    recipe the filter had invented.
     """
-    from apps.wizard.app_pages.metadata_diff.discovery import _active_export_uris
+    from apps.wizard.app_pages.metadata_diff.discovery import _active_export_uris, _export_scope_names
     from etl.paths import STEP_DIR
 
     active = _active_export_uris()
     derived = set()
-    for path in (STEP_DIR / "export").rglob("*.py"):
-        if path.name == "__init__.py":
+    for path in (STEP_DIR / "export").rglob("*"):
+        if path.suffix not in (".py", ".yml", ".yaml") or path.name == "__init__.py":
             continue
-        derived.add("export://" + path.relative_to(STEP_DIR / "export").with_suffix("").as_posix())
+        rel = path.relative_to(STEP_DIR / "export")
+        derived.add("export://" + (rel.parent / rel.name.split(".")[0]).as_posix())
     # Every active step is reachable from a file in the tree, so the filter keeps all of them.
     assert active <= derived
     assert active & derived == active
+
+    # A YAML-only recipe still answers to its own name, so an edit to its config is not filed as lag.
+    yaml_only = [
+        uri
+        for uri in active
+        if not (STEP_DIR / "export" / f"{uri.removeprefix('export://')}.py").exists()
+        and (STEP_DIR / "export" / f"{uri.removeprefix('export://')}.config.yml").exists()
+    ]
+    for uri in yaml_only:
+        assert uri.rsplit("/", 1)[-1] in _export_scope_names(uri)
 
 
 # --- Bullet-level diffing -------------------------------------------------------------------------
